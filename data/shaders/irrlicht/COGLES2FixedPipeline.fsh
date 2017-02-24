@@ -1,142 +1,94 @@
 precision mediump float;
-
-/* Definitions */
-
-#define Solid 0
-#define Solid2Layer 1
-#define LightMap 2
-#define DetailMap 3
-#define SphereMap 4
-#define Reflection2Layer 5
-#define TransparentAlphaChannel 6
-#define TransparentAlphaChannelRef 7
-#define TransparentVertexAlpha 8
-#define TransparentReflection2Layer 9
-
-/* Uniforms */
-
 uniform int uMaterialType;
-
 uniform bool uTextureUsage0;
-uniform bool uTextureUsage1;
-
 uniform sampler2D uTextureUnit0;
 uniform sampler2D uTextureUnit1;
-
-/* Varyings */
-
-varying vec2 varTexCoord0;
-varying vec2 varTexCoord1;
-varying vec4 varVertexColor;
-varying float varEyeDist;
-
-vec4 renderSolid()
-{
-	vec4 Color = varVertexColor;
-
-	if(uTextureUsage0)
-		Color *= texture2D(uTextureUnit0, varTexCoord0);
-		
-	Color.a = 1.0;
-		
-	return Color;
-}
-
-vec4 render2LayerSolid()
-{
-	float BlendFactor = varVertexColor.a;
-	
-	vec4 Texel0 = texture2D(uTextureUnit0, varTexCoord0);
-	vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
-	
-	vec4 Color = Texel0 * BlendFactor + Texel1 * (1.0 - BlendFactor);
-	
-	return Color;
-}
-
-vec4 renderLightMap()
-{
-	vec4 Texel0 = texture2D(uTextureUnit0, varTexCoord0);
-	vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
-	
-	vec4 Color = Texel0 * Texel1 * 4.0;
-	Color.a = Texel0.a * Texel0.a;
-	
-	return Color;
-}
-
-vec4 renderDetailMap()
-{
-	vec4 Texel0 = texture2D(uTextureUnit0, varTexCoord0);
-	vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
-	
-	vec4 Color = Texel0;
-	Color += Texel1 - 0.5;
-	
-	return Color;
-}
-
-vec4 renderReflection2Layer()
-{
-	vec4 Color = varVertexColor;
-	
-	vec4 Texel0 = texture2D(uTextureUnit0, varTexCoord0);
-	vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
-	
-	Color *= Texel0 * Texel1;
-	
-	return Color;
-}
-
-vec4 renderTransparent()
-{
-	vec4 Color = vec4(1.0, 1.0, 1.0, 1.0);
-
-	if(uTextureUsage0)
-		Color *= texture2D(uTextureUnit0, varTexCoord0);
-
-	return Color;
-}
-
+in vec2 varTexCoord0;
+in vec2 varTexCoord1;
+in vec4 varVertexColor;
 void main ()
 {
-    if (uMaterialType == Solid)
-		gl_FragColor = renderSolid();
-	else if(uMaterialType == Solid2Layer)
-		gl_FragColor = render2LayerSolid();
-	else if(uMaterialType == LightMap)
-		gl_FragColor = renderLightMap();
-	else if(uMaterialType == DetailMap)
-		gl_FragColor = renderDetailMap();
-	else if(uMaterialType == SphereMap)
-		gl_FragColor = renderSolid();
-	else if(uMaterialType == Reflection2Layer)
-		gl_FragColor = renderReflection2Layer();
-	else if(uMaterialType == TransparentAlphaChannel)
-		gl_FragColor = renderTransparent();
-	else if(uMaterialType == TransparentAlphaChannelRef)
-	{
-		vec4 Color = renderTransparent();
-		
-		if (Color.a < 0.5)
-			discard;
-		
-		gl_FragColor = Color;
-	}
-	else if(uMaterialType == TransparentVertexAlpha)
-	{
-		vec4 Color = renderTransparent();
-		Color.a = varVertexColor.a;
-		
-		gl_FragColor = Color;
-	}
-	else if(uMaterialType == TransparentReflection2Layer)
-	{
-		vec4 Color = renderReflection2Layer();
-		Color.a = varVertexColor.a;
-		
-		gl_FragColor = Color;
-	}
-	else
-		gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+  if ((uMaterialType == 0)) {
+    vec4 Color_1;
+    Color_1 = varVertexColor;
+    if (uTextureUsage0) {
+      Color_1 = (varVertexColor * texture (uTextureUnit0, varTexCoord0));
+    };
+    Color_1.w = 1.0;
+    gl_FragColor = Color_1;
+  } else {
+    if ((uMaterialType == 1)) {
+      gl_FragColor = ((texture (uTextureUnit0, varTexCoord0) * varVertexColor.w) + (texture (uTextureUnit1, varTexCoord1) * (1.0 - varVertexColor.w)));
+    } else {
+      if ((uMaterialType == 2)) {
+        vec4 Color_2;
+        vec4 tmpvar_3;
+        tmpvar_3 = texture (uTextureUnit0, varTexCoord0);
+        Color_2.xyz = ((tmpvar_3 * texture (uTextureUnit1, varTexCoord1)) * 4.0).xyz;
+        Color_2.w = (tmpvar_3.w * tmpvar_3.w);
+        gl_FragColor = Color_2;
+      } else {
+        if ((uMaterialType == 3)) {
+          gl_FragColor = (texture (uTextureUnit0, varTexCoord0) + (texture (uTextureUnit1, varTexCoord1) - 0.5));
+        } else {
+          if ((uMaterialType == 4)) {
+            vec4 Color_4;
+            Color_4 = varVertexColor;
+            if (uTextureUsage0) {
+              Color_4 = (varVertexColor * texture (uTextureUnit0, varTexCoord0));
+            };
+            Color_4.w = 1.0;
+            gl_FragColor = Color_4;
+          } else {
+            if ((uMaterialType == 5)) {
+              gl_FragColor = (varVertexColor * (texture (uTextureUnit0, varTexCoord0) * texture (uTextureUnit1, varTexCoord1)));
+            } else {
+              if ((uMaterialType == 6)) {
+                vec4 Color_5;
+                Color_5 = vec4(1.0, 1.0, 1.0, 1.0);
+                if (uTextureUsage0) {
+                  Color_5 = texture (uTextureUnit0, varTexCoord0);
+                };
+                gl_FragColor = Color_5;
+              } else {
+                if ((uMaterialType == 7)) {
+                  vec4 Color_6;
+                  Color_6 = vec4(1.0, 1.0, 1.0, 1.0);
+                  if (uTextureUsage0) {
+                    Color_6 = texture (uTextureUnit0, varTexCoord0);
+                  };
+                  if ((Color_6.w < 0.5)) {
+                    discard;
+                  };
+                  gl_FragColor = Color_6;
+                } else {
+                  if ((uMaterialType == 8)) {
+                    vec4 Color_7;
+                    vec4 Color_8;
+                    Color_8 = vec4(1.0, 1.0, 1.0, 1.0);
+                    if (uTextureUsage0) {
+                      Color_8 = texture (uTextureUnit0, varTexCoord0);
+                    };
+                    Color_7.xyz = Color_8.xyz;
+                    Color_7.w = varVertexColor.w;
+                    gl_FragColor = Color_7;
+                  } else {
+                    if ((uMaterialType == 9)) {
+                      vec4 Color_9;
+                      Color_9.xyz = (varVertexColor * (texture (uTextureUnit0, varTexCoord0) * texture (uTextureUnit1, varTexCoord1))).xyz;
+                      Color_9.w = varVertexColor.w;
+                      gl_FragColor = Color_9;
+                    } else {
+                      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+                    };
+                  };
+                };
+              };
+            };
+          };
+        };
+      };
+    };
+  };
 }
+
