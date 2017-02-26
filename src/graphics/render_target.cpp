@@ -37,6 +37,12 @@ GL1RenderTarget::GL1RenderTarget(const irr::core::dimension2du &dimension,
     {
         irr_driver->getVideoDriver()->setRenderTarget(m_render_target_texture);
     }
+    else
+    {
+        // m_render_target_texture will be NULL if RTT doesn't work on this 
+        // computer
+        Log::error("GL1RenderTarget", "Cannot render to texture.");
+    }
 
     m_rtt_main_node = NULL;
 }
@@ -58,12 +64,8 @@ irr::core::dimension2du GL1RenderTarget::getTextureSize() const
 //-----------------------------------------------------------------------------
 void GL1RenderTarget::renderToTexture(irr::scene::ICameraSceneNode* camera, float dt)
 {
-    // m_render_target_texture will be NULL if RTT doesn't work on this computer
     if (m_render_target_texture == NULL)
-    {
-        Log::error("GL1RenderTarget", "Cannot render to texture.");
         return;
-    }
 
     irr_driver->getVideoDriver()->setRenderTarget(m_render_target_texture);
 
