@@ -1107,18 +1107,18 @@ namespace video
 					glVertexAttribPointer(EVA_TCOORD0, 2, GL_FLOAT, false, sizeof(S3DVertex), buffer_offset(28));
 				}
 
-				if (CurrentTexture[1])
-				{
-					// There must be some optimisation here as it uses the same texture coord !
-					glEnableVertexAttribArray(EVA_TCOORD1);
-					if (vertices)
-						glVertexAttribPointer(EVA_TCOORD1, 2, GL_FLOAT, false, sizeof(S3DVertex), &(static_cast<const S3DVertex*>(vertices))[0].TCoords);
-					else
-						glVertexAttribPointer(EVA_TCOORD1, 2, GL_FLOAT, false, sizeof(S3DVertex), buffer_offset(28));
-				}
+				//if (CurrentTexture[1])
+				//{
+				//	// There must be some optimisation here as it uses the same texture coord !
+				//	glEnableVertexAttribArray(EVA_TCOORD1);
+				//	if (vertices)
+				//		glVertexAttribPointer(EVA_TCOORD1, 2, GL_FLOAT, false, sizeof(S3DVertex), &(static_cast<const S3DVertex*>(vertices))[0].TCoords);
+				//	else
+				//		glVertexAttribPointer(EVA_TCOORD1, 2, GL_FLOAT, false, sizeof(S3DVertex), buffer_offset(28));
+				//}
 				break;
 			case EVT_2TCOORDS:
-				glEnableVertexAttribArray(EVA_TCOORD1);
+				//glEnableVertexAttribArray(EVA_TCOORD1);
 				if (vertices)
 				{
 					glVertexAttribPointer(EVA_POSITION, (threed ? 3 : 2), GL_FLOAT, false, sizeof(S3DVertex2TCoords), &(static_cast<const S3DVertex2TCoords*>(vertices))[0].Pos);
@@ -1126,7 +1126,7 @@ namespace video
 						glVertexAttribPointer(EVA_NORMAL, 3, GL_FLOAT, false, sizeof(S3DVertex2TCoords), &(static_cast<const S3DVertex2TCoords*>(vertices))[0].Normal);
 					glVertexAttribPointer(EVA_COLOR, 4, GL_UNSIGNED_BYTE, true, sizeof(S3DVertex2TCoords), &(static_cast<const S3DVertex2TCoords*>(vertices))[0].Color);
 					glVertexAttribPointer(EVA_TCOORD0, 2, GL_FLOAT, false, sizeof(S3DVertex2TCoords), &(static_cast<const S3DVertex2TCoords*>(vertices))[0].TCoords);
-					glVertexAttribPointer(EVA_TCOORD1, 2, GL_FLOAT, false, sizeof(S3DVertex2TCoords), &(static_cast<const S3DVertex2TCoords*>(vertices))[0].TCoords2);
+					//glVertexAttribPointer(EVA_TCOORD1, 2, GL_FLOAT, false, sizeof(S3DVertex2TCoords), &(static_cast<const S3DVertex2TCoords*>(vertices))[0].TCoords2);
 				}
 				else
 				{
@@ -1134,7 +1134,7 @@ namespace video
 					glVertexAttribPointer(EVA_NORMAL, 3, GL_FLOAT, false, sizeof(S3DVertex2TCoords), buffer_offset(12));
 					glVertexAttribPointer(EVA_COLOR, 4, GL_UNSIGNED_BYTE, true, sizeof(S3DVertex2TCoords), buffer_offset(24));
 					glVertexAttribPointer(EVA_TCOORD0, 2, GL_FLOAT, false, sizeof(S3DVertex2TCoords), buffer_offset(28));
-					glVertexAttribPointer(EVA_TCOORD1, 2, GL_FLOAT, false, sizeof(S3DVertex2TCoords), buffer_offset(36));
+					//glVertexAttribPointer(EVA_TCOORD1, 2, GL_FLOAT, false, sizeof(S3DVertex2TCoords), buffer_offset(36));
 
 				}
 				break;
@@ -1266,10 +1266,10 @@ namespace video
 				glDisableVertexAttribArray(EVA_TANGENT);
 				glDisableVertexAttribArray(EVA_BINORMAL);
 			}
-			if ((vType != EVT_STANDARD) || CurrentTexture[1])
-			{
-				glDisableVertexAttribArray(EVA_TCOORD1);
-			}
+			//if ((vType != EVT_STANDARD) || CurrentTexture[1])
+			//{
+			//	glDisableVertexAttribArray(EVA_TCOORD1);
+			//}
 
 #ifdef GL_OES_point_size_array
 			if (FeatureAvailable[IRR_OES_point_size_array] && (Material.Thickness == 0.0f))

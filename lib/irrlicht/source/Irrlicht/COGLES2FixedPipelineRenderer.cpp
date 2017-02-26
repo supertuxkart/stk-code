@@ -144,22 +144,22 @@ bool COGLES2FixedPipelineRenderer::OnRender(IMaterialRendererServices* service, 
 		/* Textures Upload */
 
 		s32 TextureUsage0 = Driver->isActiveTexture(0);
-		s32 TextureUsage1 = Driver->isActiveTexture(1);
+		//s32 TextureUsage1 = Driver->isActiveTexture(1);
 
 		IMaterialRendererServices::setPixelShaderConstant("uTextureUsage0", &TextureUsage0, 1);
-		IMaterialRendererServices::setPixelShaderConstant("uTextureUsage1", &TextureUsage1, 1);
+		//IMaterialRendererServices::setPixelShaderConstant("uTextureUsage1", &TextureUsage1, 1);
 
 		core::matrix4 textureMatrix0 = Driver->getTransform(video::ETS_TEXTURE_0);
-		core::matrix4 textureMatrix1 = Driver->getTransform(video::ETS_TEXTURE_0);
+		//core::matrix4 textureMatrix1 = Driver->getTransform(video::ETS_TEXTURE_0);
 
 		IMaterialRendererServices::setPixelShaderConstant("uTextureMatrix0", textureMatrix0.pointer(), 16);
-		IMaterialRendererServices::setPixelShaderConstant("uTextureMatrix1", textureMatrix1.pointer(), 16);
+		//IMaterialRendererServices::setPixelShaderConstant("uTextureMatrix1", textureMatrix1.pointer(), 16);
 
 		s32 TextureUnit0 = 0;
-		s32 TextureUnit1 = 1;
+		//s32 TextureUnit1 = 1;
 
 		IMaterialRendererServices::setPixelShaderConstant("uTextureUnit0", &TextureUnit0, 1);
-		IMaterialRendererServices::setPixelShaderConstant("uTextureUnit1", &TextureUnit1, 1);
+		//IMaterialRendererServices::setPixelShaderConstant("uTextureUnit1", &TextureUnit1, 1);
 
 		return true;
 	}

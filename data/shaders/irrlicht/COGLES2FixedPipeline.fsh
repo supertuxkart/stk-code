@@ -18,15 +18,15 @@ precision mediump float;
 uniform int uMaterialType;
 
 uniform bool uTextureUsage0;
-uniform bool uTextureUsage1;
+//uniform bool uTextureUsage1;
 
 uniform sampler2D uTextureUnit0;
-uniform sampler2D uTextureUnit1;
+//uniform sampler2D uTextureUnit1;
 
 /* Varyings */
 
 varying vec2 varTexCoord0;
-varying vec2 varTexCoord1;
+//varying vec2 varTexCoord1;
 varying vec4 varVertexColor;
 varying float varEyeDist;
 
@@ -47,9 +47,10 @@ vec4 render2LayerSolid()
 	float BlendFactor = varVertexColor.a;
 	
 	vec4 Texel0 = texture2D(uTextureUnit0, varTexCoord0);
-	vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
+	//vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
 	
-	vec4 Color = Texel0 * BlendFactor + Texel1 * (1.0 - BlendFactor);
+	vec4 Color = Texel0 * BlendFactor;
+	//vec4 Color += Texel1 * (1.0 - BlendFactor);
 	
 	return Color;
 }
@@ -57,9 +58,10 @@ vec4 render2LayerSolid()
 vec4 renderLightMap()
 {
 	vec4 Texel0 = texture2D(uTextureUnit0, varTexCoord0);
-	vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
+	//vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
 	
-	vec4 Color = Texel0 * Texel1 * 4.0;
+	vec4 Color = Texel0 * 4.0;
+	//Color *= Texel1;
 	Color.a = Texel0.a * Texel0.a;
 	
 	return Color;
@@ -68,10 +70,10 @@ vec4 renderLightMap()
 vec4 renderDetailMap()
 {
 	vec4 Texel0 = texture2D(uTextureUnit0, varTexCoord0);
-	vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
+	//vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
 	
 	vec4 Color = Texel0;
-	Color += Texel1 - 0.5;
+	//Color += Texel1 - 0.5;
 	
 	return Color;
 }
@@ -81,9 +83,10 @@ vec4 renderReflection2Layer()
 	vec4 Color = varVertexColor;
 	
 	vec4 Texel0 = texture2D(uTextureUnit0, varTexCoord0);
-	vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
+	//vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
 	
-	Color *= Texel0 * Texel1;
+	Color *= Texel0;
+	//Color *= Texel1;
 	
 	return Color;
 }
