@@ -1,6 +1,5 @@
 uniform vec3 windDir;
 
-#ifdef Explicit_Attrib_Location_Usable
 layout(location = 0) in vec3 Position;
 layout(location = 1) in vec3 Normal;
 layout(location = 2) in vec4 Color;
@@ -14,18 +13,6 @@ layout(location = 10) in vec4 misc_data;
 layout(location = 11) in sampler2D Handle;
 layout(location = 12) in sampler2D SecondHandle;
 layout(location = 13) in sampler2D ThirdHandle;
-#endif
-
-#else
-in vec3 Position;
-in vec3 Normal;
-in vec4 Color;
-in vec2 Texcoord;
-
-in vec3 Origin;
-in vec3 Orientation;
-in vec3 Scale;
-in vec4 misc_data;
 #endif
 
 out vec3 nor;
