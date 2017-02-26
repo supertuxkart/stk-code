@@ -32,6 +32,7 @@ namespace irr
 {
 namespace video
 {
+	bool useCoreContext = true;
 
 //! constructor and init code
 	COGLES2Driver::COGLES2Driver(const SIrrlichtCreationParameters& params,
@@ -254,6 +255,7 @@ namespace video
 		if (EGL_NO_CONTEXT == EglContext)
 		{
 			os::Printer::log("Trying to create Context for OpenGL-ES2.");
+			useCoreContext = false;
 			
 			EGLint contextAttrib[] =
 			{
@@ -647,9 +649,12 @@ namespace video
 		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_TRANSPARENT_VERTEX_ALPHA, this));
 		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_TRANSPARENT_REFLECTION_2_LAYER, this));
 
-		addAndDropMaterialRenderer(new COGLES2NormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_SOLID, this));
-		addAndDropMaterialRenderer(new COGLES2NormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_TRANSPARENT_ADD_COLOR, this));
-		addAndDropMaterialRenderer(new COGLES2NormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA, this));
+		if (!useCoreContext)
+		{
+			addAndDropMaterialRenderer(new COGLES2NormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_SOLID, this));
+			addAndDropMaterialRenderer(new COGLES2NormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_TRANSPARENT_ADD_COLOR, this));
+			addAndDropMaterialRenderer(new COGLES2NormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA, this));
+		}
 
 		addAndDropMaterialRenderer(new COGLES2ParallaxMapRenderer(PMVSData, PMFSData, EMT_PARALLAX_MAP_SOLID, this));
 		addAndDropMaterialRenderer(new COGLES2ParallaxMapRenderer(PMVSData, PMFSData, EMT_PARALLAX_MAP_TRANSPARENT_ADD_COLOR, this));
@@ -1950,6 +1955,9 @@ namespace video
 
 	void COGLES2Driver::setRenderStates3DMode()
 	{
+		if (useCoreContext)
+			return;
+			
 		if (CurrentRenderMode != ERM_3D)
 		{
 			// Reset Texture Stages
@@ -1988,6 +1996,9 @@ namespace video
 	//! Can be called by an IMaterialRenderer to make its work easier.
 	void COGLES2Driver::setBasicRenderStates(const SMaterial& material, const SMaterial& lastmaterial, bool resetAllRenderStates)
 	{
+		if (useCoreContext)
+			return;
+			
 		// ZBuffer
 		if (resetAllRenderStates || lastmaterial.ZBuffer != material.ZBuffer)
 		{
@@ -2116,17 +2127,25 @@ namespace video
 	//! Compare in SMaterial doesn't check texture parameters, so we should call this on each OnRender call.
 	void COGLES2Driver::setTextureRenderStates(const SMaterial& material, bool resetAllRenderstates)
 	{
-		// Set textures to TU/TIU and apply filters to them
+		if (useCoreContext)
+			return;
 
+		// Set textures to TU/TIU and apply filters to them
+		
 		for (s32 i = MaxTextureUnits-1; i>= 0; --i)
 		{
 			const COGLES2Texture* tmpTexture = static_cast<const COGLES2Texture*>(CurrentTexture[i]);
-
+			
 			if (CurrentTexture[i])
 				BridgeCalls->setTexture(i);
 			else
 				continue;
-
+				
+			// This code causes issues on some devices with legacy pipeline
+			// and also mipmaps should be handled in STK texture manager,
+			// so just disable this part of code
+			continue;
+				
 			if(resetAllRenderstates)
 				tmpTexture->getStatesCache().IsCached = false;
 
@@ -2217,6 +2236,9 @@ namespace video
 	//! sets the needed renderstates
 	void COGLES2Driver::setRenderStates2DMode(bool alpha, bool texture, bool alphaChannel)
 	{
+		if (useCoreContext)
+			return;
+
 		if (CurrentRenderMode != ERM_2D)
 		{
 			// unset last 3d material
