@@ -24,6 +24,7 @@
 #include "utils/log.hpp"
 
 #include <fstream>
+#include <regex>
 #include <sstream>
 
 // ----------------------------------------------------------------------------
@@ -130,6 +131,8 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
     if (stream.is_open())
     {
         const std::string stk_include = "#stk_include";
+        std::regex explicit_attrib_regex("layout\\s*\\(\\s*location\\s*=\\s*\\d*\\s*\\)\\s*in");
+
         std::string line;
 
         while (std::getline(stream, line))
@@ -179,7 +182,16 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
             }
             else
             {
-                code << "\n" << line;
+                if(CVS->isARBExplicitAttribLocationUsable())
+                {
+                    code << "\n" << line;
+                }
+                else
+                {
+                    //replace for example "layout(location = 0) in vec3 Position;"
+                    //with "in vec3 Position;"
+                    code << "\n" << std::regex_replace (line, explicit_attrib_regex, "in");
+                }
             }
         }
 
