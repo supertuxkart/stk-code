@@ -8,8 +8,6 @@ attribute vec2 inTexCoord0;
 
 /* Uniforms */
 
-uniform int uMaterialType;
-
 uniform mat4 uMvpMatrix;
 
 uniform mat4 uTextureMatrix0;
@@ -25,12 +23,12 @@ varying float varEyeDist;
 void main(void)
 {
 	gl_Position = uMvpMatrix * vec4(inVertexPosition,1.0);
-	
+
 	vec4 TexCoord0 = vec4(inTexCoord0.x, inTexCoord0.y, 0.0, 0.0);
 	varTexCoord0 = vec4(uTextureMatrix0 * TexCoord0).xy;
-	
+
 	//vec4 TexCoord1 = vec4(inTexCoord1.x, inTexCoord1.y, 0.0, 0.0);
 	//varTexCoord1 = vec4(uTextureMatrix1 * TexCoord1).xy;
-	
+
 	varVertexColor = inVertexColor.zyxw;
 }
