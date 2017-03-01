@@ -317,7 +317,8 @@ namespace video
 		virtual u32 getMaximalPrimitiveCount() const;
 
 		virtual ITexture* addRenderTargetTexture(const core::dimension2d<u32>& size,
-				const io::path& name, const ECOLOR_FORMAT format = ECF_UNKNOWN);
+				const io::path& name, const ECOLOR_FORMAT format = ECF_UNKNOWN,
+				const bool useStencil = false);
 
 		virtual bool setRenderTarget(video::ITexture* texture, bool clearBackBuffer,
 				bool clearZBuffer, SColor color);

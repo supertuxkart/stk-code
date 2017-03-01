@@ -2653,9 +2653,10 @@ namespace video
 	}
 
 
-	ITexture* COGLES2Driver::addRenderTargetTexture(
-			const core::dimension2d<u32>& size,
-			const io::path& name, const ECOLOR_FORMAT format)
+	ITexture* COGLES2Driver::addRenderTargetTexture(const core::dimension2d<u32>& size,
+					const io::path& name,
+					const ECOLOR_FORMAT format,
+					const bool useStencil)
 	{
 		//disable mip-mapping
 		const bool generateMipLevels = getTextureCreationFlag(ETCF_CREATE_MIP_MAPS);
