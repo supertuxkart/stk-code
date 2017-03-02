@@ -108,7 +108,7 @@ void main ()
 	else if(uMaterialType == Solid2Layer)
 		gl_FragColor = render2LayerSolid();
 	else if(uMaterialType == LightMap)
-		gl_FragColor = renderLightMap();
+		gl_FragColor = renderSolid();
 	else if(uMaterialType == DetailMap)
 		gl_FragColor = renderDetailMap();
 	else if(uMaterialType == SphereMap)
