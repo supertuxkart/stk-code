@@ -65,11 +65,11 @@ if [ -f "$DIRNAME/obj/compile_arch" ]; then
     fi
 fi
 
+# Update variables for selected architecture
 if [ -z "$COMPILE_ARCH" ]; then
     COMPILE_ARCH="armv7"
 fi
 
-# Update variables for selected architecture
 if [ "$COMPILE_ARCH" = "armv7" ]; then
     export NDK_PLATFORM=$NDK_PLATFORM_ARMV7
     export NDK_ABI=$NDK_ABI_ARMV7
@@ -88,6 +88,23 @@ elif [ "$COMPILE_ARCH" = "aarch64" ]; then
 else
     echo "Unknow COMPILE_ARCH: $COMPILE_ARCH. Possible values are: " \
          "armv7, aarch64, x86"
+    exit
+fi
+
+# Update variables for selected build type
+if [ -z "$BUILD_TYPE" ]; then
+    BUILD_TYPE="debug"
+fi
+
+if [ "$BUILD_TYPE" = "debug" ] || [ "$BUILD_TYPE" = "Debug" ]; then
+    export BUILD_TYPE="debug"
+    export IS_DEBUG_BUILD=1
+elif [ "$BUILD_TYPE" = "release" ] || [ "$BUILD_TYPE" = "Release" ]; then
+    export BUILD_TYPE="release"
+    export IS_DEBUG_BUILD=0
+else
+    echo "Unsupported BUILD_TYPE: $BUILD_TYPE. Possible values are: " \
+         "debug, release"
     exit
 fi
 
@@ -278,11 +295,12 @@ ${NDK_PATH}/ndk-build $@                 \
     APP_ABI="$NDK_ABI"                   \
     APP_PLATFORM="$NDK_PLATFORM"         \
     APP_CPPFLAGS="$NDK_CPPFLAGS"         \
-    APP_STL=gnustl_static
+    APP_STL=gnustl_static                \
+    NDK_DEBUG=$IS_DEBUG_BUILD
 
 check_error
 
 # Build apk
 echo "Building APK"
-ant debug -Dsdk.dir="$SDK_PATH" -Dtarget=$NDK_PLATFORM
+ant $BUILD_TYPE -Dsdk.dir="$SDK_PATH" -Dtarget=$NDK_PLATFORM
 check_error

@@ -70,6 +70,10 @@ If you want to prepare a package for particular architecture, you can choose it
 by setting the COMPILE_ARCH environmental variable. At this stage, supported
 architectures are "armv7", "x86" and "aarch64". The default is "armv7".
 
+You can choose build type by setting BUILD_TYPE environment variable to "debug"
+or "release". The default is debug build. Note that if you choose release build,
+you have to manually sign the apk with your key and run zipalign.
+
 Basically if all dependencies are installed in the system, it should be enough
 to just run:
 
