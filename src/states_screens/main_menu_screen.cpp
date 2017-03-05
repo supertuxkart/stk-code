@@ -99,6 +99,21 @@ void MainMenuScreen::loadedFromFile()
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
+
+void MainMenuScreen::beforeAddingWidget()
+{
+    IconButtonWidget* w = getWidget<IconButtonWidget>("story");
+    assert(w != NULL);
+    
+    if (track_manager->getTrack("overworld") == NULL ||
+        track_manager->getTrack("introcutscene") == NULL ||
+        track_manager->getTrack("introcutscene2") == NULL)
+    {
+        w->setVisible(false);
+    }
+}
+
+// ----------------------------------------------------------------------------
 //
 void MainMenuScreen::init()
 {
