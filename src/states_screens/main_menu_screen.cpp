@@ -86,6 +86,16 @@ void MainMenuScreen::loadedFromFile()
 {
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     w->setScrollSpeed(15);
+    
+    IconButtonWidget* iw = getWidget<IconButtonWidget>("story");
+    assert(iw != NULL);
+    
+    if (track_manager->getTrack("overworld") == NULL ||
+        track_manager->getTrack("introcutscene") == NULL ||
+        track_manager->getTrack("introcutscene2") == NULL)
+    {
+        iw->setVisible(false);
+    }
 
 #if DEBUG_MENU_ITEM != 1
     RibbonWidget* rw = getWidget<RibbonWidget>("menu_bottomrow");
@@ -102,15 +112,7 @@ void MainMenuScreen::loadedFromFile()
 
 void MainMenuScreen::beforeAddingWidget()
 {
-    IconButtonWidget* w = getWidget<IconButtonWidget>("story");
-    assert(w != NULL);
-    
-    if (track_manager->getTrack("overworld") == NULL ||
-        track_manager->getTrack("introcutscene") == NULL ||
-        track_manager->getTrack("introcutscene2") == NULL)
-    {
-        w->setVisible(false);
-    }
+
 }
 
 // ----------------------------------------------------------------------------
