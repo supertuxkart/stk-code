@@ -42,8 +42,8 @@ namespace video
 #endif
 	)
 		: CNullDriver(io, params.WindowSize), COGLES2ExtensionHandler(),
-		CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
-		Transformation3DChanged(true), AntiAlias(params.AntiAlias), BridgeCalls(0),
+		BridgeCalls(0), CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
+		Transformation3DChanged(true), AntiAlias(params.AntiAlias),
 		RenderTargetTexture(0), CurrentRendertargetSize(0, 0), ColorFormat(ECF_R8G8B8)
 #ifdef EGL_VERSION_1_0
 		, EglDisplay(EGL_NO_DISPLAY)
@@ -106,7 +106,7 @@ namespace video
 		EGL_RED_SIZE, 8,
 		EGL_DEPTH_SIZE, 16,
 		EGL_NONE
-#else		
+#else
 			EGL_RED_SIZE, 5,
 			EGL_GREEN_SIZE, 5,
 			EGL_BLUE_SIZE, 5,
@@ -217,7 +217,7 @@ namespace video
 		if (EGL_NO_SURFACE == EglSurface)
 		{
 			os::Printer::log("FAILED\n");
-			EglSurface = eglCreateWindowSurface(EglDisplay, EglConfig, NULL, NULL);
+			EglSurface = eglCreateWindowSurface(EglDisplay, EglConfig, 0, NULL);
 			os::Printer::log("Creating EglSurface without nativeWindows...");
 		}
 		else
@@ -236,11 +236,11 @@ namespace video
 #endif
 		os::Printer::log("Creating EglContext...");
 		EglContext = EGL_NO_CONTEXT;
-		
+
 		if (!Params.ForceLegacyDevice)
 		{
 			os::Printer::log("Trying to create Context for OpenGL-ES3.");
-			
+
 			EGLint contextAttrib[] =
 			{
 				#ifdef EGL_VERSION_1_3
@@ -248,15 +248,15 @@ namespace video
 				#endif
 				EGL_NONE, 0
 			};
-			
+
 			EglContext = eglCreateContext(EglDisplay, EglConfig, EGL_NO_CONTEXT, contextAttrib);
 		}
-		
+
 		if (EGL_NO_CONTEXT == EglContext)
 		{
 			os::Printer::log("Trying to create Context for OpenGL-ES2.");
 			useCoreContext = false;
-			
+
 			EGLint contextAttrib[] =
 			{
 				#ifdef EGL_VERSION_1_3
@@ -264,7 +264,7 @@ namespace video
 				#endif
 				EGL_NONE, 0
 			};
-			
+
 			EglContext = eglCreateContext(EglDisplay, EglConfig, EGL_NO_CONTEXT, contextAttrib);
 			if (EGL_NO_CONTEXT == EglContext)
 			{
@@ -289,7 +289,7 @@ namespace video
         core::dimension2d<u32> WindowSize(backingWidth, backingHeight);
         CNullDriver::ScreenSize = WindowSize;
 #endif
-        
+
 
 		// set vsync
 		if (params.Vsync)
@@ -308,25 +308,25 @@ namespace video
         GLint backingHeight;
         glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &backingWidth);
         glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &backingHeight);
-        
+
         glGenRenderbuffers(1, &ViewDepthRenderbuffer);
         glBindRenderbuffer(GL_RENDERBUFFER, ViewDepthRenderbuffer);
-        
+
         GLenum depthComponent = GL_DEPTH_COMPONENT16;
-        
+
         if(params.ZBufferBits >= 24)
             depthComponent = GL_DEPTH_COMPONENT24_OES;
-        
+
         glRenderbufferStorage(GL_RENDERBUFFER, depthComponent, backingWidth, backingHeight);
-        
+
         glBindFramebuffer(GL_FRAMEBUFFER, ViewFramebuffer);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, ViewRenderbuffer);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, ViewDepthRenderbuffer);
-        
+
         core::dimension2d<u32> WindowSize(backingWidth, backingHeight);
         CNullDriver::ScreenSize = WindowSize;
         CNullDriver::ViewPort = core::rect<s32>(core::position2d<s32>(0,0), core::dimension2di(WindowSize));
-        
+
         genericDriverInit(WindowSize, params.Stencilbuffer);
 #endif
 	}
@@ -341,22 +341,22 @@ namespace video
 
 		if (BridgeCalls)
 			delete BridgeCalls;
-        
+
 #if defined(EGL_VERSION_1_0)
 		eglMakeCurrent(EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-		
+
 		if (EglContext != EGL_NO_CONTEXT)
 		{
 			eglDestroyContext(EglDisplay, EglContext);
 			EglContext = EGL_NO_CONTEXT;
 		}
-		
+
 		if (EglSurface != EGL_NO_SURFACE)
 		{
 			eglDestroySurface(EglDisplay, EglSurface);
 			EglSurface = EGL_NO_SURFACE;
 		}
-		
+
 		if (EglDisplay != EGL_NO_DISPLAY)
 		{
 			eglTerminate(EglDisplay);
@@ -393,28 +393,28 @@ namespace video
 	void COGLES2Driver::reloadEGLSurface(void* window)
 	{
 		os::Printer::log("Reload EGL surface.");
-		
+
 		#ifdef EGL_VERSION_1_0
 		#if defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
 			EglWindow = (ANativeWindow*)window;
 		#endif
-		
+
 		if (!EglWindow)
 			os::Printer::log("Invalid Egl window.");
-		
+
 		eglMakeCurrent(EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-	
+
 		eglDestroySurface(EglDisplay, EglSurface);
-		
+
 		EglSurface = eglCreateWindowSurface(EglDisplay, EglConfig, EglWindow, 0);
-		
+
 		if (EGL_NO_SURFACE == EglSurface)
 			os::Printer::log("Could not create EGL surface.");
-			
+
 		eglMakeCurrent(EglDisplay, EglSurface, EglSurface, EglContext);
 		#endif
 	}
-	
+
 
 	bool COGLES2Driver::genericDriverInit(const core::dimension2d<u32>& screenSize, bool stencilBuffer)
 	{
@@ -500,10 +500,10 @@ namespace video
 		// Load shaders from files (in future shaders will be merged with source code).
 
 		// Fixed pipeline.
-		
+
 		core::stringc shaders_path = IRR_OGLES2_SHADER_PATH;
 		if (Params.ShadersPath.size() > 0)
-			shaders_path = Params.ShadersPath;		
+			shaders_path = Params.ShadersPath;
 
 		core::stringc FPVSPath = shaders_path;
 		FPVSPath += "COGLES2FixedPipeline.vsh";
@@ -629,7 +629,7 @@ namespace video
 		if (PMFSFile)
 			PMFSFile->drop();
 
-		// Create materials.		
+		// Create materials.
 
 		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_SOLID, this));
 		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_SOLID_2_LAYER, this));
@@ -712,7 +712,7 @@ namespace video
 	bool COGLES2Driver::endScene()
 	{
         CNullDriver::endScene();
-        
+
 #if defined(EGL_VERSION_1_0)
         eglSwapBuffers(EglDisplay, EglSurface);
 		EGLint g = eglGetError();
@@ -734,7 +734,7 @@ namespace video
         Device->displayEnd();
 #endif
 #endif
-        
+
 		return true;
 	}
 
@@ -1160,6 +1160,8 @@ namespace video
 					glVertexAttribPointer(EVA_TANGENT, 3, GL_FLOAT, false, sizeof(S3DVertexTangents), buffer_offset(36));
 					glVertexAttribPointer(EVA_BINORMAL, 3, GL_FLOAT, false, sizeof(S3DVertexTangents), buffer_offset(48));
 				}
+				break;
+			default:
 				break;
 			}
 		}
@@ -1957,7 +1959,7 @@ namespace video
 	{
 		if (useCoreContext)
 			return;
-			
+
 		if (CurrentRenderMode != ERM_3D)
 		{
 			// Reset Texture Stages
@@ -1998,7 +2000,7 @@ namespace video
 	{
 		if (useCoreContext)
 			return;
-			
+
 		// ZBuffer
 		if (resetAllRenderStates || lastmaterial.ZBuffer != material.ZBuffer)
 		{
@@ -2123,7 +2125,7 @@ namespace video
 		// Texture parameters
 		setTextureRenderStates(material, resetAllRenderStates);
 	}
-    
+
 	//! Compare in SMaterial doesn't check texture parameters, so we should call this on each OnRender call.
 	void COGLES2Driver::setTextureRenderStates(const SMaterial& material, bool resetAllRenderstates)
 	{
@@ -2131,21 +2133,21 @@ namespace video
 			return;
 
 		// Set textures to TU/TIU and apply filters to them
-		
+
 		for (s32 i = MaxTextureUnits-1; i>= 0; --i)
 		{
 			const COGLES2Texture* tmpTexture = static_cast<const COGLES2Texture*>(CurrentTexture[i]);
-			
+
 			if (CurrentTexture[i])
 				BridgeCalls->setTexture(i);
 			else
 				continue;
-				
+
 			// This code causes issues on some devices with legacy pipeline
 			// and also mipmaps should be handled in STK texture manager,
 			// so just disable this part of code
 			continue;
-				
+
 			if(resetAllRenderstates)
 				tmpTexture->getStatesCache().IsCached = false;
 
@@ -3004,7 +3006,7 @@ namespace video
 	{
 		return Material;
 	}
-    
+
 	COGLES2CallBridge* COGLES2Driver::getBridgeCalls() const
 	{
 		return BridgeCalls;
@@ -3026,7 +3028,7 @@ namespace video
 
 		glCullFace(GL_BACK);
 		glDisable(GL_CULL_FACE);
-    
+
 		glDepthFunc(GL_LESS);
 		glDepthMask(GL_TRUE);
 		glDisable(GL_DEPTH_TEST);
@@ -3051,7 +3053,7 @@ namespace video
 				glEnable(GL_BLEND);
 			else
 				glDisable(GL_BLEND);
-                
+
 			Blend = enable;
 		}
 	}
@@ -3061,7 +3063,7 @@ namespace video
 		if(CullFaceMode != mode)
 		{
 			glCullFace(mode);
-                
+
 			CullFaceMode = mode;
 		}
 	}
@@ -3074,7 +3076,7 @@ namespace video
 				glEnable(GL_CULL_FACE);
 			else
 				glDisable(GL_CULL_FACE);
-                
+
 			CullFace = enable;
 		}
 	}
@@ -3084,11 +3086,11 @@ namespace video
 		if(DepthFunc != mode)
 		{
 			glDepthFunc(mode);
-                
+
 			DepthFunc = mode;
 		}
 	}
-        
+
 	void COGLES2CallBridge::setDepthMask(bool enable)
 	{
 		if(DepthMask != enable)
@@ -3097,7 +3099,7 @@ namespace video
 				glDepthMask(GL_TRUE);
 			else
 				glDepthMask(GL_FALSE);
-                
+
 			DepthMask = enable;
 		}
 	}
@@ -3110,7 +3112,7 @@ namespace video
 				glEnable(GL_DEPTH_TEST);
 			else
 				glDisable(GL_DEPTH_TEST);
-                
+
 			DepthTest = enable;
 		}
 	}
@@ -3123,7 +3125,7 @@ namespace video
 			Program = program;
 		}
 	}
-        
+
 	void COGLES2CallBridge::setActiveTexture(GLenum texture)
 	{
 		if (ActiveTexture != texture)
@@ -3132,7 +3134,7 @@ namespace video
 			ActiveTexture = texture;
 		}
 	}
-        
+
 	void COGLES2CallBridge::setTexture(u32 stage)
 	{
 		if (stage < MATERIAL_MAX_TEXTURES)

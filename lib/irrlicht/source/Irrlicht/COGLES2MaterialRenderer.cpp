@@ -31,7 +31,7 @@ COGLES2MaterialRenderer::COGLES2MaterialRenderer(COGLES2Driver* driver,
 		IShaderConstantSetCallBack* callback,
 		E_MATERIAL_TYPE baseMaterial,
 		s32 userData)
-	: Driver(driver), CallBack(callback), Program(0), Alpha(false), Blending(false), FixedBlending(false), UserData(userData)
+	: Driver(driver), CallBack(callback), Alpha(false), Blending(false), FixedBlending(false), Program(0), UserData(userData)
 {
 	#ifdef _DEBUG
 	setDebugName("COGLES2MaterialRenderer");
@@ -63,7 +63,7 @@ COGLES2MaterialRenderer::COGLES2MaterialRenderer(COGLES2Driver* driver,
 COGLES2MaterialRenderer::COGLES2MaterialRenderer(COGLES2Driver* driver,
 					IShaderConstantSetCallBack* callback,
 					E_MATERIAL_TYPE baseMaterial, s32 userData)
-: Driver(driver), CallBack(callback), Program(0), Alpha(false), Blending(false), FixedBlending(false), UserData(userData)
+: Driver(driver), CallBack(callback), Alpha(false), Blending(false), FixedBlending(false), Program(0), UserData(userData)
 {
 	if (baseMaterial == EMT_TRANSPARENT_VERTEX_ALPHA || baseMaterial == EMT_TRANSPARENT_ALPHA_CHANNEL ||
 		/*baseMaterial == EMT_TRANSPARENT_ALPHA_CHANNEL_REF || */baseMaterial == EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA ||
@@ -117,7 +117,7 @@ void COGLES2MaterialRenderer::init(s32& outMaterialTypeNr,
 		bool addMaterial)
 {
 	outMaterialTypeNr = -1;
-	
+
 	if (!vertexShaderProgram || !pixelShaderProgram)
 		return;
 

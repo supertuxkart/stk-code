@@ -31,7 +31,7 @@
 
 namespace irr
 {
-namespace video  
+namespace video
 {
 
 class COGLES2Driver;
@@ -44,8 +44,8 @@ public:
 
 	//! Constructor
 	COGLES2MaterialRenderer(
-		COGLES2Driver* driver, 
-		s32& outMaterialTypeNr, 
+		COGLES2Driver* driver,
+		s32& outMaterialTypeNr,
 		const c8* vertexShaderProgram = 0,
 		const c8* pixelShaderProgram = 0,
 		IShaderConstantSetCallBack* callback = 0,
@@ -69,7 +69,7 @@ public:
 
 	// implementations for the render services
 	virtual void setBasicRenderStates(const SMaterial& material, const SMaterial& lastMaterial, bool resetAllRenderstates);
-	
+
 	virtual s32 getVertexShaderConstantID(const c8* name);
 	virtual s32 getPixelShaderConstantID(const c8* name);
 	virtual void setVertexShaderConstant(const f32* data, s32 startRegister, s32 constantAmount=1);
@@ -94,7 +94,7 @@ protected:
 
 	bool createShader(GLenum shaderType, const char* shader);
 	bool linkProgram();
-	
+
 	COGLES2Driver* Driver;
 	IShaderConstantSetCallBack* CallBack;
 

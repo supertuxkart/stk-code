@@ -247,7 +247,7 @@ namespace video
 
 		//! Can be called by an IMaterialRenderer to make its work easier.
 		virtual void setBasicRenderStates(const SMaterial& material, const SMaterial& lastmaterial, bool resetAllRenderstates);
-        
+
         //! Compare in SMaterial doesn't check texture parameters, so we should call this on each OnRender call.
         virtual void setTextureRenderStates(const SMaterial& material, bool resetAllRenderstates);
 
@@ -488,7 +488,7 @@ namespace video
 
     //! This bridge between Irlicht pseudo OpenGL calls
     //! and true OpenGL calls.
-    
+
     class COGLES2CallBridge
     {
     public:
@@ -505,7 +505,7 @@ namespace video
 		void setCullFaceFunc(GLenum mode);
 
 		void setCullFace(bool enable);
-        
+
         // Depth calls.
 
 		void setDepthFunc(GLenum mode);
@@ -517,17 +517,17 @@ namespace video
 		// Program calls.
 
 		void setProgram(GLuint program);
-        
+
         // Texture calls.
-        
+
         void setActiveTexture(GLenum texture);
-        
+
         void setTexture(u32 stage);
 
 		// Viewport calls.
 
 		void setViewport(const core::rect<s32>& viewport);
-        
+
     private:
         COGLES2Driver* Driver;
 
@@ -537,13 +537,13 @@ namespace video
 
 		GLenum CullFaceMode;
 		bool CullFace;
-        
+
 		GLenum DepthFunc;
         bool DepthMask;
         bool DepthTest;
 
 		GLuint Program;
-        
+
 		GLenum ActiveTexture;
 
         const ITexture* Texture[MATERIAL_MAX_TEXTURES];
