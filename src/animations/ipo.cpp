@@ -228,7 +228,7 @@ void Ipo::IpoData::approximateBezier(float t0, float t1,
     // A more sophisticated estimation might be useful (e.g. taking the
     // difference between a linear approximation and the actual bezier
     // curve into accound.
-    if(distance<=2.0f)
+    if(distance<=0.2f)
         return;
 
     // Insert one point at (t0+t1)/2. First split the left part of
