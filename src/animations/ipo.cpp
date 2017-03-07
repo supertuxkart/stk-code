@@ -346,7 +346,7 @@ float Ipo::IpoData::get(float time, unsigned int index, unsigned int n)
     }   // switch
     // Keep the compiler happy:
     return 0;
-}   // get
+}   // IpoData::get
 
 // ----------------------------------------------------------------------------
 /** Computes a cubic bezier curve for a given t in [0,1] and four control
@@ -361,39 +361,65 @@ float Ipo::IpoData::getCubicBezier(float t, float p0, float p1,
     float b = 3.0f*(p2-p1)-c;
     float a = p3 - p0 - c - b;
     return ((a*t+b)*t+c)*t+p0;
-}   // bezier
+}   // getCubicBezier
 
 // ----------------------------------------------------------------------------
-/** Determines the rotation between the start and end of this curve.
+/** Determines the derivative of a IPO at a given point.
+ *  \param time At what time value the derivative is to be computed.
+ *  \param index IpoData is based on 3d data. The index specified which
+ *         value to use (0=x, 1=y, 2=z).
+ *  \param n Curve segment to be used for the computation. It must be correct
+ *         for the specified time value.
  */
-btQuaternion Ipo::IpoData::getOverallRotation()
+float Ipo::IpoData::getDerivative(float time, unsigned int index,
+                                  unsigned int n)
 {
-    // Vectors at start and end of curve
-    Vec3 start, end;
-
-    if (m_interpolation == IP_BEZIER)
+    switch (m_interpolation)
     {
-        // In case of Bezier use the handles to get initial and final
-        // orientation
-        start =  m_handle2[0]     -  m_handle1[0];
-        end   = *m_handle2.back() - *m_handle1.back();
+    case IP_CONST: return 0;   // Const --> Derivative is 0
+    case IP_LINEAR: {
+        return (m_points[n + 1][index] - m_points[n][index]) /
+               (m_points[n + 1].getW() - m_points[n].getW());
     }
-    else   // Const or linear
-    {
-        // In this case determine the start vector by selecting using the
-        // beginning and a second point a bit further on the curve
-        start.setX(get(m_start_time + 0.1f, 0, 0) - m_points[0].getX());
-        start.setY(get(m_start_time + 0.1f, 1, 0) - m_points[0].getY());
-        start.setZ(get(m_start_time + 0.1f, 2, 0) - m_points[0].getZ());
-        int n = m_points.size() - 2;
-        end.  setX(get(m_end_time   - 0.1f, 0, n) - m_points[n].getX());
-        end.  setY(get(m_end_time   - 0.1f, 1, n) - m_points[n].getY());
-        end.  setZ(get(m_end_time   - 0.1f, 2, n) - m_points[n].getZ());
-    }
+    case IP_BEZIER: {
+        if (n == m_points.size() - 1)
+        {
+            // Only const, so derivative is 0
+            return 0;
+        }
+        float t = (time - m_points[n].getW())
+                / (m_points[n + 1].getW() - m_points[n].getW());
+        return getCubicBezierDerivative(t,
+                                        m_points [n    ][index],
+                                        m_handle2[n    ][index],
+                                        m_handle1[n + 1][index],
+                                        m_points [n + 1][index] );
+    }   // case IPBEZIER
+    default:
+        Log::warn("Ipo::IpoData", "Incorrect interpolation %d",
+                  m_interpolation);
+    }   // switch
+    return 0;
+}   // IpoData::getDerivative
 
-    btQuaternion q = shortestArcQuatNormalize2(start, end);
-    return q;
-}   // IpData::getOverallRoation
+
+// ----------------------------------------------------------------------------
+/** Returns the derivative of a cubic bezier curve for a given t in [0,1] and
+ *  four control points. The curve will go through p0 (t=0).
+ *  \param t The parameter for the bezier curve, must be in [0,1].
+ *  \param p0, p1, p2, p3 The four control points.
+ */
+float Ipo::IpoData::getCubicBezierDerivative(float t, float p0, float p1,
+                                             float p2, float p3) const
+{
+    float c = 3.0f*(p1 - p0);
+    float b = 3.0f*(p2 - p1) - c;
+    float a = p3 - p0 - c - b;
+    // f(t)      = ((a*t + b)*t + c)*t + p0;
+    //           = a*t^3 +b*t^2 + c*t + p0
+    // --> f'(t) = 3*a*t^2 + 2*b*t + c
+    return (3*a * t + 2*b) * t + c;
+}   // bezier
 
 // ============================================================================
 /** The Ipo constructor. Ipos can share the actual data to interpolate, which
@@ -504,6 +530,28 @@ void Ipo::update(float time, Vec3 *xyz, Vec3 *hpr,Vec3 *scale)
 }   // update
 
 // ----------------------------------------------------------------------------
+/** Updates the value of m_next_n to point to the right ipo segment based on
+ *  the time.
+ *  \param t Time for which m_next_n needs to be updated.
+ */
+void Ipo::updateNextN(float time) const
+{
+    time = m_ipo_data->adjustTime(time);
+
+    // Time was reset since the last cached value for n,
+    // reset n to start from the beginning again.
+    if (time < m_ipo_data->m_points[m_next_n - 1].getW())
+        m_next_n = 1;
+    // Search for the first point in the (sorted) array which is greater or equal
+    // to the current time.
+    while (m_next_n < m_ipo_data->m_points.size() - 1 &&
+        time >= m_ipo_data->m_points[m_next_n].getW())
+    {
+        m_next_n++;
+    }   // while
+}   // updateNextN
+
+// ----------------------------------------------------------------------------
 /** Returns the interpolated value at the current time (which this objects
  *  keeps track of).
  *  \param time The time for which the interpolated value should be computed.
@@ -516,34 +564,50 @@ float Ipo::get(float time, unsigned int index) const
     if(m_next_n==0)
         return m_ipo_data->m_points[0][index];
 
-    time = m_ipo_data->adjustTime(time);
+    updateNextN(time);
 
-    // Time was reset since the last cached value for n,
-    // reset n to start from the beginning again.
-    if(time < m_ipo_data->m_points[m_next_n-1].getW())
-        m_next_n = 1;
-    // Search for the first point in the (sorted) array which is greater or equal
-    // to the current time.
-    while(m_next_n<m_ipo_data->m_points.size()-1 &&
-         time >=m_ipo_data->m_points[m_next_n].getW())
-        m_next_n++;
     float rval = m_ipo_data->get(time, index, m_next_n-1);
     assert(!std::isnan(rval));
     return rval;
 }   // get
 
 // ----------------------------------------------------------------------------
-/** Return the quaternion that rotates an object form the start of the IPO
- *  to the end.
+/** Returns the derivative for any location based curves.
+ *  \param time Time for which the derivative is being computed.
+ *  \param xyz Pointer where the results should be stored.
  */
-btQuaternion Ipo::getOverallRotation()
+void Ipo::getDerivative(float time, Vec3 *xyz)
 {
-    // In case of a single point only:
+    // Avoid crash in case that only one point is given for this IPO.
     if (m_next_n == 0)
     {
-        // Return a unit quaternion
-        btQuaternion q(0, 0, 0, 1);
-        return q;
+        // Derivative has no real meaning in case of a single point.
+        // So just return a dummy value.
+        xyz->setValue(1, 0, 0);
+        return;
     }
-    return m_ipo_data->getOverallRotation();
-}   // getOverallRoation
+
+    updateNextN(time);
+    switch (m_ipo_data->m_channel)
+    {
+    case Ipo::IPO_LOCX: xyz->setX(m_ipo_data->getDerivative(time, m_next_n, 0)); break;
+    case Ipo::IPO_LOCY: xyz->setY(m_ipo_data->getDerivative(time, m_next_n, 0)); break;
+    case Ipo::IPO_LOCZ: xyz->setZ(m_ipo_data->getDerivative(time, m_next_n, 0)); break;
+    case Ipo::IPO_LOCXYZ:
+    {
+        if (xyz)
+        {
+            for (unsigned int j = 0; j < 3; j++)
+                (*xyz)[j] = m_ipo_data->getDerivative(time, j, m_next_n-1);
+        }
+        break;
+    }
+    default: Log::warn("IPO", "Unexpected channel %d for derivate.",
+                       m_ipo_data->m_channel                         );
+        xyz->setValue(1, 0, 0);
+        break;
+    }   // switch
+
+
+}   // getDerivative
+

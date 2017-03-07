@@ -43,16 +43,18 @@ protected:
      *  kart position (so the kart moves relative to the curve). */
     Vec3           m_delta;
 
-    /** The amount of rotation to be applied to m_delta so that it keeps
-     *  being on the 'right' side of the curve. */
-    btQuaternion m_delta_rotation;
-
     /** Stores the curve interpolation for the cannon. */
     AnimationBase *m_curve;
 
-    /** This stores the original (unmodified) interpolated curve value. THis
-     *  is used to determine the orientation of the kart. */
-    Vec3           m_previous_orig_xyz;
+    /** The original checkline at start. */
+    Vec3 m_start_line;
+
+    /** The original checkline at end. */
+    Vec3 m_end_line;
+
+    /** Stores the position of the kart relative to the line width
+     *  at the current location. */
+    float m_fraction_of_line;
 
 public:
              CannonAnimation(AbstractKart *kart, Ipo *ipo,

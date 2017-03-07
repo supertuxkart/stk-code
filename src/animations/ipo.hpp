@@ -81,6 +81,8 @@ private:
     private:
         float  getCubicBezier(float t, float p0, float p1,
                               float p2, float p3) const;
+        float  getCubicBezierDerivative(float t, float p0, float p1,
+                                        float p2, float p3) const;
         void approximateBezier(float t0, float t1,
                                const Vec3 &p0, const Vec3 &p1,
                                const Vec3 &h0, const Vec3 &h2,
@@ -94,7 +96,7 @@ private:
                                  const Vec3 &h1, const Vec3 &h2);
         float  adjustTime(float time);
         float  get(float time, unsigned int index, unsigned int n);
-        btQuaternion getOverallRotation();
+        float  getDerivative(float time, unsigned int index, unsigned int n);
 
     };   // IpoData
     // ------------------------------------------------------------------------
@@ -114,6 +116,8 @@ private:
     *  it is declared mutable). */
     mutable unsigned int m_next_n;
 
+    void updateNextN(float time) const;
+
     Ipo(const Ipo *ipo);
 public:
              Ipo(const XMLNode &curve, float fps=25, bool reverse=false);
@@ -121,10 +125,10 @@ public:
     Ipo     *clone();
     void     update(float time, Vec3 *xyz=NULL, Vec3 *hpr=NULL,
                                 Vec3 *scale=NULL);
+    void     getDerivative(float time, Vec3 *xyz);
     float    get(float time, unsigned int index) const;
     void     setInitialTransform(const Vec3 &xyz, const Vec3 &hpr);
     void     reset();
-    btQuaternion getOverallRotation();
     // ------------------------------------------------------------------------
     /** Returns the raw data points for this IPO. */
     const std::vector<Vec3>& getPoints() const { return m_ipo_data->m_points; }
