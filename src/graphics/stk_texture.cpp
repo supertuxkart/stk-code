@@ -39,7 +39,8 @@ STKTexture::STKTexture(const std::string& path, bool srgb, bool premul_alpha,
           : video::ITexture(path.c_str()), m_texture_handle(0), m_srgb(srgb),
             m_premul_alpha(premul_alpha), m_mesh_texture(mesh_tex),
             m_single_channel(single_channel), m_material(NULL),
-            m_texture_name(0), m_texture_size(0), m_texture_image(NULL)
+            m_texture_name(0), m_texture_size(0), m_texture_image(NULL),
+            m_file(NULL), m_img_loader(NULL)
 {
     if (set_material)
     {
@@ -62,7 +63,8 @@ STKTexture::STKTexture(uint8_t* data, const std::string& name, size_t size,
           : video::ITexture(name.c_str()), m_texture_handle(0), m_srgb(false),
             m_premul_alpha(false), m_mesh_texture(false),
             m_single_channel(single_channel), m_material(NULL),
-            m_texture_name(0), m_texture_size(0), m_texture_image(NULL)
+            m_texture_name(0), m_texture_size(0), m_texture_image(NULL),
+            m_file(NULL), m_img_loader(NULL)
 {
     m_size.Width = size;
     m_size.Height = size;
@@ -75,7 +77,8 @@ STKTexture::STKTexture(video::IImage* img, const std::string& name)
           : video::ITexture(name.c_str()), m_texture_handle(0), m_srgb(false),
             m_premul_alpha(false), m_mesh_texture(false),
             m_single_channel(false), m_material(NULL), m_texture_name(0),
-            m_texture_size(0), m_texture_image(NULL)
+            m_texture_size(0), m_texture_image(NULL),
+            m_file(NULL), m_img_loader(NULL)
 {
     reload(false/*no_upload*/, NULL/*preload_data*/, img);
 }   // STKTexture
@@ -108,7 +111,6 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
         return;
     }
 #ifndef SERVER_ONLY
-    irr_driver->getDevice()->getLogger()->setLogLevel(ELL_NONE);
 
     std::string compressed_texture;
 #if !defined(USE_GLES2)
@@ -157,31 +159,56 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
     uint8_t* data = preload_data;
     if (data == NULL)
     {
-        orig_img = preload_img ? preload_img :
-            irr_driver->getVideoDriver()->createImageFromFile(NamedPath);
-        if (orig_img == NULL)
+        if (preload_img)
+            orig_img = preload_img;
+        else
         {
-            return;
-        }
-
-        if (orig_img->getDimension().Width  == 0 ||
-            orig_img->getDimension().Height == 0)
-        {
-            orig_img->drop();
-            return;
+            m_file = irr_driver->getDevice()->getFileSystem()
+                ->createAndOpenFile(NamedPath);
+            if (m_file == NULL)
+                return;
+            irr_driver->getVideoDriver()->createImageFromFile(m_file,
+                &m_img_loader);
+            if (m_img_loader == NULL)
+                return;
+            m_file->seek(0);
+            m_orig_size = m_img_loader->getImageSize(m_file);
+            if (m_orig_size.Width <= 1024 && m_orig_size.Height <= 1024 &&
+                (!m_material || m_material->getAlphaMask().empty()) &&
+                useThreadedLoading() && !no_upload)
+            {
+                if (m_orig_size.Width == 0 || m_orig_size.Height == 0)
+                {
+                    m_file->drop();
+                    m_file = NULL;
+                    m_img_loader = NULL;
+                    return;
+                }
+            }
+            else
+            {
+                orig_img = m_img_loader->loadImage(m_file);
+                m_file->drop();
+                m_file = NULL;
+                if (orig_img == NULL || orig_img->getDimension().Width == 0 ||
+                    orig_img->getDimension().Height == 0)
+                {
+                    if (orig_img)
+                        orig_img->drop();
+                    return;
+                }
+                m_img_loader = NULL;
+            }
         }
         orig_img = resizeImage(orig_img, &m_orig_size, &m_size);
         applyMask(orig_img);
-        data = (uint8_t*)orig_img->lock();
-        if (m_single_channel)
+        data = orig_img ? (uint8_t*)orig_img->lock() : NULL;
+        if (m_single_channel && !useThreadedLoading())
         {
-            uint8_t* sc = new uint8_t[m_size.Width * m_size.Height];
-            for (unsigned int i = 0; i < m_size.Width * m_size.Height; i++)
-                sc[i] = data[4 * i + 3];
+            data = singleChannelConversion(data);
             orig_img->unlock();
             orig_img->drop();
             orig_img = NULL;
-            data = sc;
         }
     }
 
@@ -203,31 +230,8 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
             m_single_channel ? GL_R8 : m_srgb ? GL_SRGB_ALPHA : GL_RGBA;
     }
 #endif
-
-#if defined(USE_GLES2)
-    if (!CVS->isEXTTextureFormatBGRA8888Usable() && !m_single_channel)
-    {
-        format = GL_RGBA;
-        for (unsigned int i = 0; i < w * h; i++)
-        {
-            uint8_t tmp_val = data[i * 4];
-            data[i * 4] = data[i * 4 + 2];
-            data[i * 4 + 2] = tmp_val;
-        }
-    }
-#endif
-    if (m_premul_alpha && !m_single_channel)
-    {
-        for (unsigned int i = 0; i < w * h; i++)
-        {
-            float alpha = data[4 * i + 3];
-            if (alpha > 0.0f)
-                alpha = pow(alpha / 255.f, 1.f / 2.2f);
-            data[i * 4] = (uint8_t)(data[i * 4] * alpha);
-            data[i * 4 + 1] = (uint8_t)(data[i * 4 + 1] * alpha);
-            data[i * 4 + 2] = (uint8_t)(data[i * 4 + 2] * alpha);
-        }
-    }
+    if (!useThreadedLoading())
+        formatConversion(data, &format, w, h);
 
     if (!no_upload)
     {
@@ -249,14 +253,14 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
             glTexImage2D(GL_TEXTURE_2D, 0, internal_format, w, h, 0, format,
                 GL_UNSIGNED_BYTE, data);
         }
-        else
+        else if (!useThreadedLoading())
         {
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, format,
                 GL_UNSIGNED_BYTE, data);
         }
         if (orig_img)
             orig_img->unlock();
-        if (hasMipMaps())
+        if (hasMipMaps() && !useThreadedLoading())
             glGenerateMipmap(GL_TEXTURE_2D);
     }
 
@@ -273,53 +277,67 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
     if (!no_upload)
         glBindTexture(GL_TEXTURE_2D, 0);
 
-    irr_driver->getDevice()->getLogger()->setLogLevel(ELL_WARNING);
 #endif   // !SERVER_ONLY
 }   // reload
 
+//-----------------------------------------------------------------------------
+void STKTexture::formatConversion(uint8_t* data, unsigned int* format,
+                                  unsigned int w, unsigned int h) const
+{
+#if defined(USE_GLES2)
+    if (!CVS->isEXTTextureFormatBGRA8888Usable() && !m_single_channel)
+    {
+        if (format)
+            *format = GL_RGBA;
+        for (unsigned int i = 0; i < w * h; i++)
+        {
+            uint8_t tmp_val = data[i * 4];
+            data[i * 4] = data[i * 4 + 2];
+            data[i * 4 + 2] = tmp_val;
+        }
+    }
+#endif
+    if (m_premul_alpha && !m_single_channel)
+    {
+        for (unsigned int i = 0; i < w * h; i++)
+        {
+            float alpha = data[4 * i + 3];
+            if (alpha > 0.0f)
+                alpha = pow(alpha / 255.f, 1.f / 2.2f);
+            data[i * 4] = (uint8_t)(data[i * 4] * alpha);
+            data[i * 4 + 1] = (uint8_t)(data[i * 4 + 1] * alpha);
+            data[i * 4 + 2] = (uint8_t)(data[i * 4 + 2] * alpha);
+        }
+    }
+}   // formatConversion
+
 // ----------------------------------------------------------------------------
 video::IImage* STKTexture::resizeImage(video::IImage* orig_img,
-                                       core::dimension2du* new_img_size,
-                                       core::dimension2du* new_tex_size)
+                                       core::dimension2du* orig_size,
+                                       core::dimension2du* final_size) const
 {
     video::IImage* image = orig_img;
 #ifndef SERVER_ONLY
-    const core::dimension2du& old_size = image->getDimension();
-    core::dimension2du img_size = old_size;
-
-    const float ratio = float(img_size.Width) / float(img_size.Height);
-    const unsigned int drv_max_size =
-        irr_driver->getVideoDriver()->getMaxTextureSize().Width;
-
-    if ((img_size.Width > drv_max_size) && (ratio >= 1.0f))
-    {
-        img_size.Width = drv_max_size;
-        img_size.Height = (unsigned)(drv_max_size / ratio);
-    }
-    else if (img_size.Height > drv_max_size)
-    {
-        img_size.Height = drv_max_size;
-        img_size.Width = (unsigned)(drv_max_size * ratio);
-    }
-
-    if (img_size != old_size)
-    {
-        video::IImage* new_img = irr_driver->getVideoDriver()
-            ->createImage(video::ECF_A8R8G8B8, img_size);
-        image->copyToScaling(new_img);
-        image->drop();
-        image = new_img;
-    }
-
+    if (image == NULL)
+        assert(orig_size && orig_size->Width > 0 && orig_size->Height > 0);
+    core::dimension2du img_size = image ? image->getDimension() : *orig_size;
     core::dimension2du tex_size = img_size.getOptimalSize
         (!irr_driver->getVideoDriver()->queryFeature(video::EVDF_TEXTURE_NPOT));
     const core::dimension2du& max_size = irr_driver->getVideoDriver()
         ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
 
-    if (max_size.Width > 0 && tex_size.Width > max_size.Width)
+    if (tex_size.Width > max_size.Width)
         tex_size.Width = max_size.Width;
-    if (max_size.Height > 0 && tex_size.Height > max_size.Height)
+    if (tex_size.Height > max_size.Height)
         tex_size.Height = max_size.Height;
+
+    if (orig_size && final_size)
+    {
+        *orig_size = img_size;
+        *final_size = tex_size;
+    }
+    if (image == NULL)
+        return NULL;
 
     if (image->getColorFormat() != video::ECF_A8R8G8B8 ||
         tex_size != img_size)
@@ -334,11 +352,6 @@ video::IImage* STKTexture::resizeImage(video::IImage* orig_img,
         image = new_texture;
     }
 
-    if (new_img_size && new_tex_size)
-    {
-        *new_img_size = img_size;
-        *new_tex_size = tex_size;
-    }
 #endif   // !SERVER_ONLY
     return image;
 }   // resizeImage
@@ -548,3 +561,50 @@ void STKTexture::unloadHandle()
     }
 #endif
 }   // unloadHandle
+
+//-----------------------------------------------------------------------------
+bool STKTexture::useThreadedLoading() const
+{
+#ifdef SERVER_ONLY
+    return false;
+#else
+    return CVS->supportsThreadedTextureLoading() &&
+        !CVS->isTextureCompressionEnabled() && m_mesh_texture &&
+        m_img_loader && m_img_loader->supportThreadedLoading();
+#endif
+}   // useThreadedLoading
+
+//-----------------------------------------------------------------------------
+void STKTexture::threadedReload(void* ptr) const
+{
+    video::IImage* orig_img =
+        m_img_loader->loadImage(m_file, true/*skip_checking*/);
+    orig_img = resizeImage(orig_img);
+    uint8_t* data = (uint8_t*)orig_img->lock();
+    if (m_single_channel)
+    {
+        data = singleChannelConversion(data);
+        orig_img->unlock();
+        orig_img->drop();
+        orig_img = NULL;
+    }
+    formatConversion(data, NULL, m_size.Width, m_size.Height);
+    memcpy(ptr, data, m_texture_size);
+
+    if (orig_img)
+    {
+        orig_img->unlock();
+        orig_img->drop();
+    }
+    else
+        delete[] data;
+}   // threadedReload
+
+//-----------------------------------------------------------------------------
+void STKTexture::cleanThreadedLoader()
+{
+    assert(m_file);
+    m_file->drop();
+    m_file = NULL;
+    m_img_loader = NULL;
+}   // cleanThreadedLoader

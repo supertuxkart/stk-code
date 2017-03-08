@@ -103,6 +103,7 @@ CNullDriver::CNullDriver(io::IFileSystem* io, const core::dimension2d<u32>& scre
 //	DriverAttributes->addInt("MaxGeometryVerticesOut", 0);
 //	DriverAttributes->addFloat("MaxTextureLODBias", 0.f);
 	DriverAttributes->addInt("Version", 1);
+	DriverAttributes->setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(16384, 16384));
 //	DriverAttributes->addInt("ShaderLanguageVersion", 0);
 //	DriverAttributes->addInt("AntiAlias", 0);
 
@@ -1278,7 +1279,7 @@ IImage* CNullDriver::createImageFromFile(const io::path& filename)
 
 
 //! Creates a software image from a file.
-IImage* CNullDriver::createImageFromFile(io::IReadFile* file)
+IImage* CNullDriver::createImageFromFile(io::IReadFile* file, video::IImageLoader** loader)
 {
 	if (!file)
 		return 0;
@@ -1292,6 +1293,11 @@ IImage* CNullDriver::createImageFromFile(io::IReadFile* file)
 	{
 		if (SurfaceLoader[i]->isALoadableFileExtension(file->getFileName()))
 		{
+			if (loader)
+			{
+				*loader = SurfaceLoader[i];
+				return 0;
+			}
 			// reset file position which might have changed due to previous loadImage calls
 			file->seek(0);
 			image = SurfaceLoader[i]->loadImage(file);
@@ -1307,6 +1313,11 @@ IImage* CNullDriver::createImageFromFile(io::IReadFile* file)
 		file->seek(0);
 		if (SurfaceLoader[i]->isALoadableFileFormat(file))
 		{
+			if (loader)
+			{
+				*loader = SurfaceLoader[i];
+				return 0;
+			}
 			file->seek(0);
 			image = SurfaceLoader[i]->loadImage(file);
 			if (image)

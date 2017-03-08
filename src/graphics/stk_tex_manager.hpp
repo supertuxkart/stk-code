@@ -21,14 +21,18 @@
 #include "graphics/gl_headers.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/singleton.hpp"
+#include "utils/synchronised.hpp"
 
 #include "irrString.h"
 
 #include <algorithm>
+#include <cassert>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 class STKTexture;
+class ThreadedTexLoader;
 namespace irr
 {
     namespace video { class ITexture; class SColor; }
@@ -43,12 +47,22 @@ private:
      *  This is used to specify details like: "while loading kart '...'" */
     std::string m_texture_error_message;
 
+    Synchronised<std::vector<STKTexture*> > m_threaded_loading_textures;
+
+    std::vector<ThreadedTexLoader*> m_all_tex_loaders;
+
+    GLuint m_pbo;
+
+    uint8_t* m_pbo_ptr;
+
+    unsigned m_pbo_size, m_thread_size;
+
     // ------------------------------------------------------------------------
     STKTexture* findTextureInFileSystem(const std::string& filename,
                                         std::string* full_path);
 public:
     // ------------------------------------------------------------------------
-    STKTexManager() {}
+    STKTexManager();
     // ------------------------------------------------------------------------
     ~STKTexManager();
     // ------------------------------------------------------------------------
@@ -127,6 +141,37 @@ public:
         return getTexture(filename, std::string(error_message),
                           std::string(detail));
     }   // getTexture
+    // ------------------------------------------------------------------------
+    void uploadBatch();
+    // ------------------------------------------------------------------------
+    const unsigned getThreadedLoadingTextureNum() const
+    {
+        m_threaded_loading_textures.lock();
+        const unsigned num = m_threaded_loading_textures.getData().size();
+        m_threaded_loading_textures.unlock();
+        return num;
+    }
+    // ------------------------------------------------------------------------
+    STKTexture* getThreadedLoadingTexture(unsigned num) const
+    {
+        m_threaded_loading_textures.lock();
+        assert(num < m_threaded_loading_textures.getData().size());
+        STKTexture* t = m_threaded_loading_textures.getData()[num];
+        m_threaded_loading_textures.unlock();
+        return t;
+    }
+    // ------------------------------------------------------------------------
+    const bool isThreadedLoaderEmpty() const
+    {
+        m_threaded_loading_textures.lock();
+        const bool empty = m_threaded_loading_textures.getData().empty();
+        m_threaded_loading_textures.unlock();
+        return empty;
+    }
+    // ------------------------------------------------------------------------
+    uint8_t* getPBOPtr()                                  { return m_pbo_ptr; }
+    // ------------------------------------------------------------------------
+    unsigned getNumLoadingThread() const              { return m_thread_size; }
 
 };   // STKTexManager
 

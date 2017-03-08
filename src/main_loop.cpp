@@ -25,6 +25,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "input/input_manager.hpp"
 #include "input/wiimote_manager.hpp"
@@ -263,6 +264,8 @@ void MainLoop::run()
             
             GUIEngine::update(dt);
             PROFILER_POP_CPU_MARKER();
+
+            STKTexManager::getInstance()->uploadBatch();
 
             // Update sfx and music after graphics, so that graphics code
             // can use as many threads as possible without interfering

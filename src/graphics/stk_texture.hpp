@@ -24,6 +24,12 @@
 #include <string>
 #include <ITexture.h>
 
+namespace irr
+{
+    namespace io { class IReadFile; }
+    namespace video { class IImageLoader; }
+}
+
 using namespace irr;
 
 class Material;
@@ -45,16 +51,31 @@ private:
 
     video::IImage* m_texture_image;
 
+    io::IReadFile* m_file;
+
+    video::IImageLoader* m_img_loader;
+
     // ------------------------------------------------------------------------
     video::IImage* resizeImage(video::IImage* orig_img,
-                               core::dimension2du* new_img_size = NULL,
-                               core::dimension2du* new_tex_size = NULL);
+                               core::dimension2du* orig_size = NULL,
+                               core::dimension2du* final_size = NULL) const;
     // ------------------------------------------------------------------------
     void applyMask(video::IImage* orig_img);
     // ------------------------------------------------------------------------
     bool loadCompressedTexture(const std::string& file_name);
     // ------------------------------------------------------------------------
     void saveCompressedTexture(const std::string& file_name);
+    // ------------------------------------------------------------------------
+    void formatConversion(uint8_t* data, unsigned int* format, unsigned int w,
+                          unsigned int h) const;
+    // ------------------------------------------------------------------------
+    uint8_t* singleChannelConversion(uint8_t* data) const
+    {
+        uint8_t* sc = new uint8_t[m_size.Width * m_size.Height];
+        for (unsigned int i = 0; i < m_size.Width * m_size.Height; i++)
+            sc[i] = data[4 * i + 3];
+        return sc;
+    }
 
 public:
     // ------------------------------------------------------------------------
@@ -114,6 +135,8 @@ public:
     // ------------------------------------------------------------------------
     bool isMeshTexture() const                       { return m_mesh_texture; }
     // ------------------------------------------------------------------------
+    bool isSingleChannel() const                   { return m_single_channel; }
+    // ------------------------------------------------------------------------
     void setMeshTexture(bool val)                     { m_mesh_texture = val; }
     // ------------------------------------------------------------------------
     unsigned int getTextureSize() const              { return m_texture_size; }
@@ -122,6 +145,12 @@ public:
                 video::IImage* preload_img = NULL);
     // ------------------------------------------------------------------------
     video::IImage* getTextureImage()                { return m_texture_image; }
+    // ------------------------------------------------------------------------
+    bool useThreadedLoading() const;
+    // ------------------------------------------------------------------------
+    void threadedReload(void* ptr) const;
+    // ------------------------------------------------------------------------
+    void cleanThreadedLoader();
 
 };   // STKTexture
 

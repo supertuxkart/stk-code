@@ -52,6 +52,7 @@ void CentralVideoSettings::init()
     hasGS = false;
     hasTextureFilterAnisotropic = false;
     hasTextureSwizzle = false;
+    hasPixelBufferObject = false;
 
 #if defined(USE_GLES2)
     hasBGRA = false;
@@ -196,6 +197,11 @@ void CentralVideoSettings::init()
             hasTextureSwizzle = true;
             Log::info("GLDriver", "ARB Texture Swizzle Present");
         }
+        if (hasGLExtension("GL_ARB_pixel_buffer_object"))
+        {
+            hasPixelBufferObject = true;
+            Log::info("GLDriver", "ARB Pixel Buffer Object Present");
+        }
         // Only unset the high def textures if they are set as default. If the
         // user has enabled them (bit 1 set), then leave them enabled.
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HIGHDEFINITION_TEXTURES) &&
@@ -237,8 +243,9 @@ void CentralVideoSettings::init()
         {
             hasTextureStorage = true;
             hasTextureSwizzle = true;
+            hasPixelBufferObject = true;
         }
-        
+
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXPLICIT_ATTRIB_LOCATION) &&
             m_glsl == true)
         {
@@ -474,6 +481,16 @@ bool CentralVideoSettings::supportsHardwareSkinning() const
 bool CentralVideoSettings::isARBTextureSwizzleUsable() const
 {
     return m_glsl && hasTextureSwizzle;
+}
+
+bool CentralVideoSettings::isARBPixelBufferObjectUsable() const
+{
+    return hasPixelBufferObject;
+}
+
+bool CentralVideoSettings::supportsThreadedTextureLoading() const
+{
+    return isARBPixelBufferObjectUsable() && supportsAsyncInstanceUpload();
 }
 
 #endif   // !SERVER_ONLY
