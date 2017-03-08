@@ -87,14 +87,14 @@ void MainMenuScreen::loadedFromFile()
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     w->setScrollSpeed(15);
     
-    IconButtonWidget* iw = getWidget<IconButtonWidget>("story");
-    assert(iw != NULL);
+    RibbonWidget* rw_top = getWidget<RibbonWidget>("menu_toprow");
+    assert(rw_top != NULL);
     
     if (track_manager->getTrack("overworld") == NULL ||
         track_manager->getTrack("introcutscene") == NULL ||
         track_manager->getTrack("introcutscene2") == NULL)
     {
-        iw->setVisible(false);
+        rw_top->removeChildNamed("story");
     }
 
 #if DEBUG_MENU_ITEM != 1
