@@ -37,7 +37,7 @@ vec4 renderSolid()
 	if(uTextureUsage0)
 		Color *= texture2D(uTextureUnit0, varTexCoord0);
 		
-	Color.a = 1.0;
+	//Color.a = 1.0;
 		
 	return Color;
 }
