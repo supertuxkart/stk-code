@@ -1653,7 +1653,12 @@ void IrrDriver::onUnloadWorld()
 void IrrDriver::setAmbientLight(const video::SColorf &light, bool force_SH_computation)
 {
 #ifndef SERVER_ONLY
-    m_scene_manager->setAmbientLight(light);
+    video::SColorf color = light;
+    color.r = powf(color.r, 1.0f / 2.2f);
+    color.g = powf(color.g, 1.0f / 2.2f);
+    color.b = powf(color.b, 1.0f / 2.2f);
+    
+    m_scene_manager->setAmbientLight(color);
     m_renderer->setAmbientLight(light, force_SH_computation);    
 #endif
 }   // setAmbientLight
