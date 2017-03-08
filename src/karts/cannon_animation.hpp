@@ -46,11 +46,13 @@ protected:
     /** Stores the curve interpolation for the cannon. */
     AnimationBase *m_curve;
 
-    /** The original checkline at start. */
-    Vec3 m_start_line;
+    /** Length of the (adjusted, i.e. taking kart width into account)
+     *  start line. */
+    float m_start_line_length;
 
-    /** The original checkline at end. */
-    Vec3 m_end_line;
+    /** Length of the (adjusted, i.e. taking kart width into account) 
+     *  end line. */
+    float m_end_line_length;
 
     /** Stores the position of the kart relative to the line width
      *  at the current location. */

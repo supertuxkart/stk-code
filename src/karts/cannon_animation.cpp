@@ -34,77 +34,67 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo,
 {
     m_curve  = new AnimationBase(ipo);
     m_timer  = ipo->getEndTime();
-
-    float kw2 = m_kart->getKartModel()->getWidth()*0.5f;
-
+    
     // First make sure that left and right points are indeed correct
+    // -------------------------------------------------------------
     Vec3 my_start_left = start_left;
     Vec3 my_start_right = start_right;
     Vec3 p0, p1;
+    // Define a plane that goes through the middle of the start line
+    // (the curve's origin must be in the middle of the line.
     m_curve->getAt(0, &p0);
     m_curve->getAt(0.1f, &p1);
     Vec3 p2 = 0.5f*(p0 + p1) + m_kart->getNormal();
     if (start_left.sideofPlane(p0, p1, p2) < 0)
     {
+        // Left and right start line needs to be swapped
         my_start_left = start_right;
         my_start_right = start_left; 
     }
+
     // First adjust start and end points to take on each side half the kart
     // width into account:
     Vec3 direction = my_start_right - my_start_left;
     direction.normalize();
 
-    Vec3 adj_start_left  = my_start_left  + kw2 * direction;
-    Vec3 adj_start_right = my_start_right - kw2 * direction;
+    float kw = m_kart->getKartModel()->getWidth();
+    Vec3 adj_start_left  = my_start_left  + (0.5f*kw) * direction;
+    Vec3 adj_start_right = my_start_right - (0.5f*kw) * direction;
 
-    // Same adjustments for end points
-    float t = m_curve->getAnimationDuration();
-    Vec3 my_end_left = end_left;
-    Vec3 my_end_right = end_right;
-    m_curve->getAt(t-0.1f, &p0);
-    m_curve->getAt(t, &p1);
-    p2 = 0.5f*(p0 + p1) + m_kart->getNormal();
-    if (end_left.sideofPlane(p0, p1, p2) < 0)
-    {
-        my_end_left = end_right;
-        my_end_right = end_left; 
-    }
-    // Left and right end points are sometimes swapped
-    direction = my_end_right - my_end_left;
-    direction.normalize();
+    // Store the length of the start and end line, which is used
+    // during update() to adjust the distance to center
+    m_start_line_length = (adj_start_left - adj_start_right).length();
+    m_end_line_length = (end_left - end_right).length() - kw;
 
-    Vec3 adj_end_left  = my_end_left  + kw2 * direction;
-    Vec3 adj_end_right = my_end_right - kw2 * direction;
-
-    // The kart position is divided into three components:
-    // 1) The point at the curve at t=0.
-    // 2) A component parallel to the start line. This component is scaled
-    //    depending on time, length of start- and end-line (e.g. if the 
+    // The current kart position is divided into three components:
+    // kart.xyz = curve.xyz + parallel_to_start_line_component + rest
+    // 1) curve.xyz: The point at the curve at t=0.
+    // 2) parallel_to_start_line_component:
+    //    A component parallel to the start line. This component is scaled
+    //    depending on time and length of start- and end-line (e.g. if the 
     //    end line is twice as long as the start line, this will make sure
     //    that a kart starting at the very left of the start line will end
-    //    up at the very left of the end line. This component can also be
+    //    up at the very left of the end line). This component can also be
     //    adjusted by steering while in the air. This is done by modifying
     //    m_fraction_of_line, which is multiplied with the current width
     //    vector.
-    // 3) The rest, i.e. the amoount that the kart is ahead and above the
-    //    start line. This is stored in m_delta.
+    // 3) rest: The amoount that the kart is ahead and above the
+    //    start line. This is stored in m_delta and will be added to the
+    //    newly computed curve xyz coordinates.
     // 
     // Compute the delta between the kart position and the start of the curve.
     // This delta is rotated with the kart and added to the interpolated curve
     // position to get the actual kart position during the animation.
-
     Vec3 curve_xyz;
     m_curve->update(0, &curve_xyz);
     m_delta = kart->getXYZ() - curve_xyz;
-
-    m_start_line = 0.5f*(adj_start_right - adj_start_left);
-    m_end_line   = 0.5f*(adj_end_right   - adj_end_left  );
     
+    // Compute on which fraction of the start line the kart is, to get the
+    // second component of the kart position: distance along start line
     Vec3 v = adj_start_left - adj_start_right;
     float l = v.length();
     v /= l;
 
-    // Compute on which fraction of the start line the kart is
     float f = v.dot(adj_start_left - kart->getXYZ());
     if (f <= 0)
         f = 0;
@@ -112,11 +102,14 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo,
         f = l;
     else
         f = f / l;
-    // Now f is in [0,1]. Convert it to [-1,1] assuming that the
-    // ipo for the cannon is in the middle of the start and end line
+    // Now f is in [0,1] - 0 in case of left side, 1 if the kart is at the
+    // very right. Convert this to [-1,1] assuming that the ipo for the
+    // cannon is in the middle of the start and end line
     m_fraction_of_line = 2.0f*f - 1.0f;
 
-    Vec3 delta = m_start_line * m_fraction_of_line;
+    Vec3 delta = 0.5f*m_fraction_of_line * (adj_start_right - adj_start_left);
+    // Subtract the horizontal difference, to get the constant offset the
+    // kart has from the curve.
     m_delta = m_delta - delta;
     
     // The previous call to m_curve->update will set the internal timer
@@ -154,21 +147,14 @@ void CannonAnimation::update(float dt)
         return;
     }
 
-    // Adjust the horizontal location based on steering
-    m_fraction_of_line += m_kart->getSteerPercent()*dt*2.0f;
-
-    // The timer count backwards, so the fraction goes from 1 to 0
-    float f = m_timer / m_curve->getAnimationDuration();
-
-    btClamp(m_fraction_of_line, -1.0f, 1.0f);
-    Vec3 current_width = m_start_line * f + m_end_line * (1.0f - f);
-
+    // First compute the current rotation
+    // -----------------------------------
     // Get the tangent = derivative at the current point to compute the
-    // orientation of the kart
+    // new orientation of the kart
     Vec3 tangent;
     m_curve->getDerivativeAt(m_curve->getAnimationDuration() - m_timer,
                              &tangent);
-
+    // Get the current kart orientation
     Vec3 forward = m_kart->getTrans().getBasis().getColumn(2);
     forward.normalize();
 
@@ -180,13 +166,26 @@ void CannonAnimation::update(float dt)
 
     m_kart->setRotation(q);
 
-    Vec3 xyz;
-    m_curve->update(dt, &xyz);
+    // Then compute the new location of the kart
+    // -----------------------------------------
+    // The timer counts backwards, so the fraction goes from 1 to 0
+    float f = m_timer / m_curve->getAnimationDuration();
+    float f_current_width = m_start_line_length * f
+                          + m_end_line_length   * (1.0f - f);
 
-    Vec3 rotated_delta = quatRotate(q, m_delta ) + current_width * m_fraction_of_line;
-    m_kart->setXYZ(xyz+rotated_delta);
-   // m_kart->setXYZ(xyz);
+    // Adjust the horizontal location based on steering
+    m_fraction_of_line += m_kart->getSteerPercent()*dt*2.0f;
+    btClamp(m_fraction_of_line, -1.0f, 1.0f);
 
+    // horiz_delta is in kart coordinates, the rotation by q will
+    // transform it to the global coordinate system
+    Vec3 horiz_delta = Vec3(0.5f*m_fraction_of_line  * f_current_width, 0, 0);
+
+    Vec3 rotated_delta = quatRotate(q, m_delta + horiz_delta);
+
+    Vec3 curve_xyz;
+    m_curve->update(dt, &curve_xyz);
+    m_kart->setXYZ(curve_xyz+rotated_delta);
 
     AbstractKartAnimation::update(dt);
 }   // update
