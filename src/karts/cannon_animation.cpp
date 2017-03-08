@@ -157,14 +157,27 @@ void CannonAnimation::update(float dt)
     // Get the current kart orientation
     Vec3 forward = m_kart->getTrans().getBasis().getColumn(2);
     forward.normalize();
-
-    // Only adjust the heading. I tried to also adjust pitch,
-    // but that adds a strong roll to the kart on some cannons
+    
+    // Only adjust the heading.
+    // ------------------------
+    // I tried to also adjust pitch at the same time, but that adds a strong
+    // roll to the kart on some cannons
     Vec3 v1(tangent), v2(forward);
     v1.setY(0); v2.setY(0);
     btQuaternion q = m_kart->getRotation()*shortestArcQuatNormalize2(v2, v1);
 
-    m_kart->setRotation(q);
+    // While start and end line have to have the same 'up' vector, karts can 
+    // sometimes be not parallel to them. So slowly adjust this over time
+    Vec3 up = m_kart->getTrans().getBasis().getColumn(1);
+    up.normalize();
+    Vec3 gravity = -m_kart->getBody()->getGravity();
+    gravity.normalize();
+    // Adjust only 5% towards the real up vector. This will smoothly
+    // adjust the kart.
+    Vec3 target_up_vector = (gravity*0.05f + up*0.95f).normalize();
+    btQuaternion q_up = shortestArcQuat(up, target_up_vector);
+
+    m_kart->setRotation(q_up * q);
 
     // Then compute the new location of the kart
     // -----------------------------------------
