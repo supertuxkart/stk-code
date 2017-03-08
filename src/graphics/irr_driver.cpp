@@ -2057,7 +2057,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
     {
         scene::ILightSceneNode* light = m_scene_manager
                ->addLightSceneNode(m_scene_manager->getRootSceneNode(),
-                                   pos, video::SColorf(1.0f, r, g, b));
+                                   pos, video::SColorf(r, g, b, 1.0f));
         light->setRadius(radius);
         return light;
     }
