@@ -123,12 +123,7 @@ CannonAnimation::~CannonAnimation()
 {
     delete m_curve;
 
-    btTransform pos;
-    pos.setOrigin(m_kart->getXYZ());
-    //pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f),
-    //                             m_kart->getHeading()        ));
-    pos.setRotation(m_kart->getRotation());
-
+    btTransform pos = m_kart->getTrans();
     m_kart->getBody()->setCenterOfMassTransform(pos);
     Vec3 v(0, 0, m_kart->getKartProperties()->getEngineMaxSpeed());
     m_kart->setVelocity(pos.getBasis()*v);
