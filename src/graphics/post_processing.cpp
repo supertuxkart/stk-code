@@ -1072,7 +1072,7 @@ void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
     {
         auxiliary.bind();
         Gaussian6VBlurShader::getInstance()
-            ->render(in_fbo.getRTT()[0], in_fbo.getWidth(), in_fbo.getWidth(),
+            ->render(in_fbo.getRTT()[0], in_fbo.getWidth(), in_fbo.getHeight(),
                      sigma_v);
 
         in_fbo.bind();

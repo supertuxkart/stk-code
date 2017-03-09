@@ -225,7 +225,7 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
             for (unsigned int i = 0; i < size; i++)
                 image_data[4 * i + 3] = bits->buffer[i];
             glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
-                bits->width, bits->rows, GL_BGRA, GL_UNSIGNED_BYTE,
+                bits->width, bits->rows, GL_RGBA, GL_UNSIGNED_BYTE,
                 image_data);
             delete[] image_data;
         }
