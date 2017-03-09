@@ -80,8 +80,7 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
 //-----------------------------------------------------------------------------
 Material* MaterialManager::getMaterialFor(video::ITexture* t)
 {
-    core::stringc img_path = core::stringc(t->getName());
-    img_path.make_lower();
+    const io::path& img_path = t->getName().getInternalName();
 
     if (!img_path.empty() && (img_path.findFirst('/') != -1 || img_path.findFirst('\\') != -1))
     {
