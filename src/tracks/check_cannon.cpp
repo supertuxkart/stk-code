@@ -37,8 +37,17 @@
 CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
            : CheckLine(node, index)
 {
-    if( !node.get("target-p1", &m_target_left ) || 
-        !node.get("target-p2", &m_target_right)    )
+    std::string p1("target-p1");
+    std::string p2("target-p2");
+
+    if (race_manager->getReverseTrack())
+    {
+        p1 = "p1";
+        p2 = "p2";
+    }
+
+    if( !node.get(p1, &m_target_left ) || 
+        !node.get(p2, &m_target_right)    )
         Log::fatal("CheckCannon", "No target line specified.");
 
     m_curve = new Ipo(*(node.getNode("curve")),
