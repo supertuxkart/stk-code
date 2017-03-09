@@ -73,6 +73,18 @@ Material::Material(const XMLNode *node, bool deprecated)
         Log::warn("Material", "Cannot determine texture full path : <%s>", m_texname.c_str());
     else
         m_full_path = file_manager->getFileSystem()->getAbsolutePath(relativePath.c_str()).c_str();
+
+    core::stringc texfname(m_texname.c_str());
+    texfname.make_lower();
+    m_texname = texfname.c_str();
+
+    if (m_full_path.size() > 0)
+    {
+        core::stringc texfname2(m_full_path.c_str());
+        texfname2.make_lower();
+        m_full_path = texfname2.c_str();
+    }
+
     init();
 
     bool b = false;
@@ -432,6 +444,14 @@ Material::Material(const std::string& fname, bool is_full_path,
             file_manager->searchTexture(m_texname).c_str()).c_str();
     }
 
+    core::stringc texfname(m_texname.c_str());
+    texfname.make_lower();
+    m_texname = texfname.c_str();
+
+    core::stringc texfname2(m_full_path.c_str());
+    texfname2.make_lower();
+    m_full_path = texfname2.c_str();
+
     m_complain_if_not_found = complain_if_not_found;
 
     if (load_texture)
@@ -515,6 +535,10 @@ void Material::install(bool srgb, bool premul_alpha)
 
     // now set the name to the basename, so that all tests work as expected
     m_texname  = StringUtils::getBasename(m_texname);
+
+    core::stringc texfname(m_texname.c_str());
+    texfname.make_lower();
+    m_texname = texfname.c_str();
 
     m_texture->grab();
 }   // install

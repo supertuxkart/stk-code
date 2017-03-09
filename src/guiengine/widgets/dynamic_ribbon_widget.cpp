@@ -17,6 +17,7 @@
 
 #include "font/font_manager.hpp"
 #include "font/regular_face.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -146,8 +147,14 @@ void DynamicRibbonWidget::add()
     m_right_widget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false);
 
     const int average_y = m_y + (m_h - m_label_height)/2;
-    m_arrows_w = 40;
-    const int button_h = 50;
+
+    unsigned int screen_height = irr_driver->getActualScreenSize().Height;
+    m_arrows_w = (int)(screen_height / 15);
+    m_arrows_w = std::max(m_arrows_w, 40);
+#ifdef ANDROID
+    m_arrows_w *= 1.5f;
+#endif
+    const int button_h = m_arrows_w;
 
     // right arrow
     rect<s32> right_arrow_location = rect<s32>(m_x + m_w - m_arrows_w,

@@ -492,10 +492,13 @@ void STKTexture::saveCompressedTexture(const std::string& compressed_tex)
 //-----------------------------------------------------------------------------
 bool STKTexture::hasMipMaps() const
 {
-#ifndef SERVER_ONLY
+#if defined(USE_GLES2)
+    return true;
+#elif defined(SERVER_ONLY)
+    return false;
+#else
     return CVS->getGLSLVersion() >= 130;
 #endif   // !SERVER_ONLY
-    return false;
 }   // hasMipMaps
 
 //-----------------------------------------------------------------------------

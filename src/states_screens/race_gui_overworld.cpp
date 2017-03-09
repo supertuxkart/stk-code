@@ -73,6 +73,10 @@ const int COMPLETED_HARD = 4;
 RaceGUIOverworld::RaceGUIOverworld()
 {
     m_enabled = true;
+
+    if (UserConfigParams::m_artist_debug_mode && UserConfigParams::m_hide_gui)
+        m_enabled = false;
+
     m_is_first_render_call = true;
     m_close_to_a_challenge = false;
     m_current_challenge = NULL;
@@ -585,6 +589,11 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                        GUIEngine::getSkin()->getColor("font::normal"),
                                        true, true /* vcenter */, NULL);
         }
+    }
+    
+    if (m_multitouch_gui != NULL)
+    {
+        m_multitouch_gui->setGuiAction(m_close_to_a_challenge);
     }
 #endif   // SERVER_ONLY
 }   // drawGlobalMiniMap

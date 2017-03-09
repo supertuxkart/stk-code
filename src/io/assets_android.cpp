@@ -75,24 +75,54 @@ void AssetsAndroid::init()
     paths.push_back("/storage/sdcard1/");
     paths.push_back("/data/data/org.supertuxkart.stk/files/");
 
-    // Check if STK data is available somewhere
+    // Check if STK data for current version is available somewhere
     for (std::string path : paths)
     {
         Log::info("AssetsAndroid", "Check data files in: %s", path.c_str());
 
         if (m_file_manager->fileExists(path + "/stk/data/" + version))
         {
-            Log::info("AssetsAndroid", "Data files found in: %s", path.c_str());
             m_stk_dir = path + "/stk";
             break;
         }
 
         if (m_file_manager->fileExists(path + "/supertuxkart/data/" + version))
         {
-            Log::info("AssetsAndroid", "Data files found in: %s", path.c_str());
             m_stk_dir = path + "/supertuxkart";
             break;
         }
+    }
+    
+    // If data for current version is not available, then try to find any other
+    // version, so that we won't accidentaly create second STK directory in
+    // different place
+    if (m_stk_dir.size() == 0)
+    {
+        for (std::string path : paths)
+        {
+            Log::info("AssetsAndroid", "Check data files for different STK "
+                                       "version in: %s", path.c_str());
+    
+            if (m_file_manager->fileExists(path + "/stk/.extracted"))
+            {
+                m_stk_dir = path + "/stk";
+                needs_extract_data = true;
+                break;
+            }
+    
+            if (m_file_manager->fileExists(path + "/supertuxkart/.extracted"))
+            {
+                m_stk_dir = path + "/supertuxkart";
+                needs_extract_data = true;
+                break;
+            }
+        }
+    }
+    
+    if (m_stk_dir.size() > 0)
+    {
+        Log::info("AssetsAndroid", "Data files found in: %s", 
+                  m_stk_dir.c_str());
     }
 
     // Create data dir if it's not available anywhere

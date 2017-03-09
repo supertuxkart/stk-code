@@ -470,8 +470,12 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             
             if (m_is_glsl)
             {
-                bool additive = (type->getMaterial()->getShaderType() == Material::SHADERTYPE_ADDITIVE);
-                static_cast<ParticleSystemProxy *>(m_node)->setAlphaAdditive(additive);
+                Material* material = type->getMaterial();
+                if (material != nullptr)
+                {
+                    bool additive = (material->getShaderType() == Material::SHADERTYPE_ADDITIVE);
+                    static_cast<ParticleSystemProxy *>(m_node)->setAlphaAdditive(additive);
+                }
             }
         }
 
