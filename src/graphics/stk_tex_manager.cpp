@@ -28,24 +28,31 @@
 
 // ----------------------------------------------------------------------------
 STKTexManager::STKTexManager() : m_pbo(0), m_pbo_ptr(NULL), m_pbo_size(0),
-                                 m_thread_size(0)
+                                 m_thread_size(0), m_tlt_added(0)
 {
 #ifndef SERVER_ONLY
     if (CVS->supportsThreadedTextureLoading())
     {
         m_thread_size =
-            std::max(unsigned(1), std::thread::hardware_concurrency());
-        Log::info("STKTexManager", "%d thread(s) for texture loading.",
-            m_thread_size);
-        m_pbo_size = m_thread_size * 4 * 1024 * 1024;
-        glGenBuffers(1, &m_pbo);
-        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pbo);
-        glBufferStorage(GL_PIXEL_UNPACK_BUFFER, m_pbo_size, NULL,
-            GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
-        m_pbo_ptr = (uint8_t*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0,
-            m_pbo_size, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+           std::max(unsigned(1), std::thread::hardware_concurrency());
+        static const unsigned max_pbo_size = 32 * 1024 * 1024;
+        const unsigned each_capacity = max_pbo_size / m_thread_size;
+        Log::info("STKTexManager", "%d thread(s) for texture loading,"
+            " each capacity %d MB", m_thread_size,
+            each_capacity / 1024 / 1024);
+        GLuint pbo;
+        uint8_t* pbo_ptr;
         for (unsigned i = 0; i < m_thread_size; i++)
-            m_all_tex_loaders.push_back(new ThreadedTexLoader(i, this));
+        {
+            glGenBuffers(1, &pbo);
+            glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo);
+            glBufferStorage(GL_PIXEL_UNPACK_BUFFER, each_capacity, NULL,
+                GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+                pbo_ptr = (uint8_t*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0,
+                each_capacity, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+            m_all_tex_loaders.push_back(new ThreadedTexLoader(each_capacity,
+                pbo, pbo_ptr));
+        }
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     }
 
@@ -128,9 +135,8 @@ video::ITexture* STKTexManager::getTexture(const std::string& path, bool srgb,
         }
         if (new_texture->useThreadedLoading())
         {
-            m_threaded_loading_textures.lock();
-            m_threaded_loading_textures.getData().push_back(new_texture);
-            m_threaded_loading_textures.unlock();
+            m_all_tex_loaders[m_tlt_added++ % m_thread_size]
+                ->addTexture(new_texture);
         }
     }
     uploadBatch();
@@ -315,59 +321,10 @@ void STKTexManager::uploadBatch()
 {
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (!CVS->supportsThreadedTextureLoading()) return;
-
     for (ThreadedTexLoader* ttl : m_all_tex_loaders)
-        if (!ttl->finishedLoading()) return;
-
-    m_threaded_loading_textures.lock();
-    glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pbo);
-    for (unsigned i = 0; i < m_thread_size; i++)
     {
-        size_t offset = 0;
-        for (unsigned j = 0; j < m_all_tex_loaders[i]->getTextureLoaded(); j++)
-        {
-            const unsigned target_tex = j * m_thread_size + i;
-            assert(target_tex < m_threaded_loading_textures.getData().size());
-            STKTexture* stkt =
-                m_threaded_loading_textures.getData()[target_tex];
-            assert(!stkt->useThreadedLoading());
-            glBindTexture(GL_TEXTURE_2D, stkt->getOpenGLTextureName());
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, stkt->getSize().Width,
-                stkt->getSize().Height, stkt->isSingleChannel() ? GL_RED :
-                GL_BGRA, GL_UNSIGNED_BYTE,
-                (const void*)(offset + i * 4 * 1024 * 1024));
-            if (stkt->hasMipMaps())
-                glGenerateMipmap(GL_TEXTURE_2D);
-            offset += stkt->getTextureSize();
-        }
-        m_all_tex_loaders[i]->reset();
+        if (ttl->finishedLoading())
+            ttl->handleCompletedTextures();
     }
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-    auto p = m_threaded_loading_textures.getData().begin();
-    while (p != m_threaded_loading_textures.getData().end())
-    {
-        if (!(*p)->useThreadedLoading())
-        {
-            p = m_threaded_loading_textures.getData().erase(p);
-            continue;
-        }
-        p++;
-    }
-
-    GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-    GLenum reason = glClientWaitSync(sync, GL_SYNC_FLUSH_COMMANDS_BIT, 0);
-    if (reason != GL_ALREADY_SIGNALED)
-    {
-        do
-        {
-            reason = glClientWaitSync(sync, GL_SYNC_FLUSH_COMMANDS_BIT,
-                1000000);
-        }
-        while (reason == GL_TIMEOUT_EXPIRED);
-    }
-    glDeleteSync(sync);
-
-    m_threaded_loading_textures.unlock();
 #endif
 }   // uploadBatch

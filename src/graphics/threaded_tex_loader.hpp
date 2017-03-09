@@ -18,9 +18,12 @@
 #ifndef HEADER_THREADED_TEX_LOADER_HPP
 #define HEADER_THREADED_TEX_LOADER_HPP
 
+#include "graphics/gl_headers.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/types.hpp"
+
+#include <vector>
 
 class STKTexture;
 class STKTexManager;
@@ -28,48 +31,57 @@ class STKTexManager;
 class ThreadedTexLoader : public NoCopy
 {
 private:
-    unsigned m_id, m_tex_loaded, m_wait_count;
+    const unsigned m_tex_capacity;
 
-    bool m_destroy;
+    GLuint m_pbo;
+
+    uint8_t* m_pbo_ptr;
+
+    unsigned m_tex_size_loaded, m_waiting_timeout;
 
     pthread_t m_thread;
 
-    Synchronised<unsigned> m_tex_size_used;
+    pthread_cond_t m_cond_request;
 
-    STKTexManager* m_stktm;
+    Synchronised<bool> m_finished_loading;
+
+    bool m_destroy;
+
+    Synchronised<std::vector<STKTexture*> >
+        m_threaded_loading_textures, m_completed_textures;
 
 public:
     // ------------------------------------------------------------------------
     static void* startRoutine(void *obj);
     // ------------------------------------------------------------------------
-    ThreadedTexLoader(unsigned id, STKTexManager* stktm)
+    ThreadedTexLoader(unsigned capacity, GLuint pbo, uint8_t* pbo_ptr)
+                    : m_tex_capacity(capacity), m_pbo(pbo), m_pbo_ptr(pbo_ptr),
+                      m_tex_size_loaded(0), m_waiting_timeout(0),
+                      m_finished_loading(false), m_destroy(false)
     {
-        m_destroy = false;
-        m_stktm = stktm;
-        m_id = id;
-        reset();
+        pthread_cond_init(&m_cond_request, NULL);
         pthread_create(&m_thread, NULL, &startRoutine, this);
     }
     // ------------------------------------------------------------------------
     ~ThreadedTexLoader()
     {
         m_destroy = true;
+        pthread_cond_destroy(&m_cond_request);
         pthread_join(m_thread, NULL);
     }
     // ------------------------------------------------------------------------
-    void reset()
+    void addTexture(STKTexture* t)
     {
-        m_tex_size_used.setAtomic(0);
-        m_tex_loaded = 0;
-        m_wait_count = 0;
+        m_threaded_loading_textures.lock();
+        m_threaded_loading_textures.getData().push_back(t);
+        pthread_cond_signal(&m_cond_request);
+        m_threaded_loading_textures.unlock();
     }
     // ------------------------------------------------------------------------
-    unsigned getTextureLoaded() const                  { return m_tex_loaded; }
+    bool finishedLoading() const     { return m_finished_loading.getAtomic(); }
     // ------------------------------------------------------------------------
-    bool finishedLoading() const
-    {
-        return m_tex_size_used.getAtomic() > 1024 * 1024 * 4;
-    }
+    void handleCompletedTextures();
+
 };   // ThreadedTexLoader
 
 #endif

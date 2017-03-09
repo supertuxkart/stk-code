@@ -55,7 +55,7 @@ private:
 
     uint8_t* m_pbo_ptr;
 
-    unsigned m_pbo_size, m_thread_size;
+    unsigned m_pbo_size, m_thread_size, m_tlt_added;
 
     // ------------------------------------------------------------------------
     STKTexture* findTextureInFileSystem(const std::string& filename,
