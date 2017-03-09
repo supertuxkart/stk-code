@@ -81,16 +81,14 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
 Material* MaterialManager::getMaterialFor(video::ITexture* t)
 {
     core::stringc img_path = core::stringc(t->getName());
-	img_path.make_lower();
+    img_path.make_lower();
 
     if (!img_path.empty() && (img_path.findFirst('/') != -1 || img_path.findFirst('\\') != -1))
     {
         // Search backward so that temporary (track) textures are found first
         for (int i = (int)m_materials.size() - 1; i >= 0; i--)
         {
-            core::stringc fullpath = core::stringc(m_materials[i]->getTexFullPath().c_str());
-            fullpath.make_lower();
-            if (fullpath == img_path.c_str())
+            if (m_materials[i]->getTexFullPath() == img_path.c_str())
             {
                 return m_materials[i];
             }
@@ -103,9 +101,7 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t)
 
         for (int i = (int)m_materials.size() - 1; i >= 0; i--)
         {
-            core::stringc texfname(m_materials[i]->getTexFname().c_str());
-            texfname.make_lower();
-            if (texfname == image)
+            if (m_materials[i]->getTexFname() == image.c_str())
             {
                 return m_materials[i];
             }
@@ -361,9 +357,7 @@ Material *MaterialManager::getMaterial(const std::string& fname,
     // Search backward so that temporary (track) textures are found first
     for (int i = (int)m_materials.size()-1; i>=0; i-- )
     {
-        core::stringc fname(m_materials[i]->getTexFname().c_str());
-        fname.make_lower();
-        if (fname == basename_lower)
+        if (m_materials[i]->getTexFname() == basename_lower.c_str())
             return m_materials[i];
     }
 
