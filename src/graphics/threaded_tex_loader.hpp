@@ -25,7 +25,6 @@
 #include <vector>
 
 class STKTexture;
-class STKTexManager;
 
 class ThreadedTexLoader : public NoCopy
 {

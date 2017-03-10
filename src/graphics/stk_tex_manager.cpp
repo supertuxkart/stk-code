@@ -250,9 +250,16 @@ core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
             if (p.second == NULL || !p.second->isMeshTexture())
                 continue;
             p.second->reload();
+            if (p.second->useThreadedLoading())
+            {
+                m_all_tex_loaders[m_tlt_added++ % m_thread_size]
+                    ->addTexture(p.second);
+                uploadBatch();
+            }
             Log::info("STKTexManager", "%s reloaded",
                 p.second->getName().getPtr());
         }
+        m_tlt_added = 0;
         return L"All textures reloaded.";
     }
 
@@ -272,11 +279,18 @@ core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
             if (fname == tex_name || fname == tex_path)
             {
                 p.second->reload();
+                if (p.second->useThreadedLoading())
+                {
+                    m_all_tex_loaders[m_tlt_added++ % m_thread_size]
+                        ->addTexture(p.second);
+                    uploadBatch();
+                }
                 result += tex_name.c_str();
                 result += L" ";
                 break;
             }
         }
+        m_tlt_added = 0;
     }
     if (result.empty())
         return L"Texture(s) not found!";
