@@ -48,7 +48,9 @@ private:
 
     GLuint m_pbo;
 
-    unsigned m_thread_size, m_tlt_added;
+    int m_thread_size;
+
+    unsigned m_tlt_added;
 
     // ------------------------------------------------------------------------
     STKTexture* findTextureInFileSystem(const std::string& filename,

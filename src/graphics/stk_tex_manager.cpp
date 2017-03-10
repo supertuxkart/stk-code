@@ -16,6 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/stk_tex_manager.hpp"
+#include "config/hardware_stats.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/materials.hpp"
 #include "graphics/threaded_tex_loader.hpp"
@@ -25,16 +26,15 @@
 #include "utils/log.hpp"
 
 #include <algorithm>
-#include <thread>
 
 // ----------------------------------------------------------------------------
 STKTexManager::STKTexManager() : m_pbo(0), m_thread_size(0), m_tlt_added(0)
 {
-#ifndef SERVER_ONLY
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (CVS->supportsThreadedTextureLoading())
     {
-        m_thread_size =
-           std::max(unsigned(1), std::thread::hardware_concurrency());
+        m_thread_size = HardwareStats::getNumProcessors();
+        m_thread_size = core::clamp(m_thread_size, 1, 8);
         static const unsigned max_pbo_size = 32 * 1024 * 1024;
         const unsigned each_capacity = max_pbo_size / m_thread_size;
         Log::info("STKTexManager", "%d thread(s) for texture loading,"
@@ -49,7 +49,7 @@ STKTexManager::STKTexManager() : m_pbo(0), m_thread_size(0), m_tlt_added(0)
             0, max_pbo_size, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT |
             GL_MAP_COHERENT_BIT);
         size_t offset = 0;
-        for (unsigned i = 0; i < m_thread_size; i++)
+        for (int i = 0; i < m_thread_size; i++)
         {
             m_all_tex_loaders.push_back(new ThreadedTexLoader(each_capacity,
                 offset, pbo_ptr + offset));
