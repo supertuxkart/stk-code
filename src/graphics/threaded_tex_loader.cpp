@@ -18,6 +18,8 @@
 #include "graphics/threaded_tex_loader.hpp"
 #include "graphics/stk_texture.hpp"
 #include "graphics/stk_tex_manager.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/vs.hpp"
 
 #include <cassert>
 
@@ -25,6 +27,8 @@
 void* ThreadedTexLoader::startRoutine(void *obj)
 {
     ThreadedTexLoader* ttl = (ThreadedTexLoader*)obj;
+    VS::setThreadName((std::string("ThrTexLoader") +
+        StringUtils::toString(ttl->m_pbo_offset / 1024 / 1024)).c_str());
     while (!ttl->m_destroy)
     {
         pthread_mutex_lock(&ttl->m_mutex);

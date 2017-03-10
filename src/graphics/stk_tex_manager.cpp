@@ -68,12 +68,14 @@ STKTexManager::STKTexManager() : m_pbo(0), m_thread_size(0)
 STKTexManager::~STKTexManager()
 {
     removeTexture(NULL/*texture*/, true/*remove_all*/);
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (CVS->supportsThreadedTextureLoading())
     {
         pthread_cond_destroy(&m_cond_request);
         for (ThreadedTexLoader* ttl : m_all_tex_loaders)
             delete ttl;
     }
+#endif
 }   // ~STKTexManager
 
 // ----------------------------------------------------------------------------
