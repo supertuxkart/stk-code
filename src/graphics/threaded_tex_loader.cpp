@@ -17,6 +17,7 @@
 
 #include "graphics/threaded_tex_loader.hpp"
 #include "graphics/stk_texture.hpp"
+#include "graphics/stk_tex_manager.hpp"
 
 #include <cassert>
 
@@ -26,69 +27,70 @@ void* ThreadedTexLoader::startRoutine(void *obj)
     ThreadedTexLoader* ttl = (ThreadedTexLoader*)obj;
     while (!ttl->m_destroy)
     {
-        if (ttl->finishedLoading())
+        pthread_mutex_lock(&ttl->m_mutex);
+        bool finished = ttl->finishedLoading();
+        pthread_mutex_unlock(&ttl->m_mutex);
+        if (finished)
         {
             continue;
         }
-        ttl->m_threaded_loading_textures.lock();
-        bool queue_empty = ttl->m_threaded_loading_textures.getData().empty();
-        ttl->m_completed_textures.lock();
-        bool no_unloaded_tex = ttl->m_completed_textures.getData().empty();
-        ttl->m_completed_textures.unlock();
+        bool no_unloaded_tex = ttl->m_completed_textures.empty();
+        pthread_mutex_lock(ttl->m_texture_queue_mutex);
+        bool queue_empty = ttl->m_stktm->isThreadedLoadTexturesEmpty();
         bool waiting = queue_empty && no_unloaded_tex;
         while (waiting)
         {
-            pthread_cond_wait(&ttl->m_cond_request,
-                ttl->m_threaded_loading_textures.getMutex());
-            waiting = ttl->m_threaded_loading_textures.getData().empty();
+            pthread_cond_wait(ttl->m_cond_request, ttl->m_texture_queue_mutex);
+            waiting = ttl->m_stktm->isThreadedLoadTexturesEmpty();
         }
         if (queue_empty)
         {
             if (ttl->m_waiting_timeout++ > 10)
             {
-                ttl->m_finished_loading.setAtomic(true);
+                pthread_mutex_lock(&ttl->m_mutex);
+                ttl->m_finished_loading = true;
                 ttl->m_tex_size_loaded = 0;
                 ttl->m_waiting_timeout = 0;
+                pthread_mutex_unlock(&ttl->m_mutex);
             }
-            ttl->m_threaded_loading_textures.unlock();
+            pthread_mutex_unlock(ttl->m_texture_queue_mutex);
             continue;
         }
         else
         {
             ttl->m_waiting_timeout = 0;
         }
-        STKTexture* target_tex = ttl->m_threaded_loading_textures.getData()[0];
+        STKTexture* target_tex = ttl->m_stktm->getThreadedLoadTexture();
         if (target_tex->getTextureSize() + ttl->m_tex_size_loaded >
             ttl->m_tex_capacity)
         {
-            ttl->m_finished_loading.setAtomic(true);
+            pthread_mutex_lock(&ttl->m_mutex);
+            ttl->m_finished_loading = true;
             ttl->m_tex_size_loaded = 0;
             ttl->m_waiting_timeout = 0;
-            ttl->m_threaded_loading_textures.unlock();
+            pthread_mutex_unlock(&ttl->m_mutex);
+            pthread_mutex_unlock(ttl->m_texture_queue_mutex);
             continue;
         }
-        ttl->m_threaded_loading_textures.getData().erase
-            (ttl->m_threaded_loading_textures.getData().begin());
-        ttl->m_threaded_loading_textures.unlock();
+        ttl->m_stktm->removeThreadedLoadTexture();
+        pthread_mutex_unlock(ttl->m_texture_queue_mutex);
         target_tex->threadedReload(ttl->m_pbo_ptr + ttl->m_tex_size_loaded);
         target_tex->cleanThreadedLoader();
         ttl->m_tex_size_loaded += target_tex->getTextureSize();
-        ttl->m_completed_textures.lock();
-        ttl->m_completed_textures.getData().push_back(target_tex);
-        ttl->m_completed_textures.unlock();
+        ttl->m_completed_textures.push_back(target_tex);
     }
     pthread_exit(NULL);
     return NULL;
 }   // startRoutine
 
+
 // ----------------------------------------------------------------------------
 void ThreadedTexLoader::handleCompletedTextures()
 {
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    m_completed_textures.lock();
-    m_locked = true;
+    assert(m_locked);
     size_t offset = 0;
-    for (STKTexture* stkt : m_completed_textures.getData())
+    for (STKTexture* stkt : m_completed_textures)
     {
         assert(!stkt->useThreadedLoading());
         glBindTexture(GL_TEXTURE_2D, stkt->getOpenGLTextureName());
@@ -99,6 +101,6 @@ void ThreadedTexLoader::handleCompletedTextures()
             glGenerateMipmap(GL_TEXTURE_2D);
         offset += stkt->getTextureSize();
     }
-    m_completed_textures.getData().clear();
+    m_completed_textures.clear();
 #endif
 }   // handleCompletedTextures

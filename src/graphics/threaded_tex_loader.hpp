@@ -19,12 +19,13 @@
 #define HEADER_THREADED_TEX_LOADER_HPP
 
 #include "utils/no_copy.hpp"
-#include "utils/synchronised.hpp"
 #include "utils/types.hpp"
 
+#include <pthread.h>
 #include <vector>
 
 class STKTexture;
+class STKTexManager;
 
 class ThreadedTexLoader : public NoCopy
 {
@@ -35,58 +36,63 @@ private:
 
     uint8_t* m_pbo_ptr;
 
+    pthread_mutex_t m_mutex;
+
+    pthread_mutex_t* m_texture_queue_mutex;
+
+    pthread_cond_t* m_cond_request;
+
+    STKTexManager* m_stktm;
+
     unsigned m_tex_size_loaded, m_waiting_timeout;
 
     pthread_t m_thread;
 
-    pthread_cond_t m_cond_request;
+    bool m_finished_loading, m_destroy, m_locked;
 
-    Synchronised<bool> m_finished_loading;
-
-    bool m_destroy, m_locked;
-
-    Synchronised<std::vector<STKTexture*> >
-        m_threaded_loading_textures, m_completed_textures;
+    std::vector<STKTexture*> m_completed_textures;
 
 public:
     // ------------------------------------------------------------------------
     static void* startRoutine(void *obj);
     // ------------------------------------------------------------------------
-    ThreadedTexLoader(unsigned capacity, size_t offset, uint8_t* pbo_ptr)
+    ThreadedTexLoader(unsigned capacity, size_t offset, uint8_t* pbo_ptr,
+                      pthread_mutex_t* mutex, pthread_cond_t* cond,
+                      STKTexManager* stktm)
                     : m_tex_capacity(capacity), m_pbo_offset(offset),
-                      m_pbo_ptr(pbo_ptr), m_tex_size_loaded(0),
-                      m_waiting_timeout(0), m_finished_loading(false),
-                      m_destroy(false), m_locked(false)
+                      m_pbo_ptr(pbo_ptr), m_texture_queue_mutex(mutex),
+                      m_cond_request(cond), m_stktm(stktm),
+                      m_tex_size_loaded(0), m_waiting_timeout(0),
+                      m_finished_loading(false), m_destroy(false),
+                      m_locked(false)
     {
-        pthread_cond_init(&m_cond_request, NULL);
+        pthread_mutex_init(&m_mutex, NULL);
         pthread_create(&m_thread, NULL, &startRoutine, this);
     }
     // ------------------------------------------------------------------------
     ~ThreadedTexLoader()
     {
         m_destroy = true;
-        pthread_cond_destroy(&m_cond_request);
+        pthread_mutex_destroy(&m_mutex);
         pthread_join(m_thread, NULL);
     }
     // ------------------------------------------------------------------------
-    void addTexture(STKTexture* t)
-    {
-        m_threaded_loading_textures.lock();
-        m_threaded_loading_textures.getData().push_back(t);
-        pthread_cond_signal(&m_cond_request);
-        m_threaded_loading_textures.unlock();
-    }
-    // ------------------------------------------------------------------------
-    bool finishedLoading() const     { return m_finished_loading.getAtomic(); }
+    bool finishedLoading() const                 { return m_finished_loading; }
     // ------------------------------------------------------------------------
     void handleCompletedTextures();
     // ------------------------------------------------------------------------
-    void unlockCompletedTextures()
+    void lock()
+    {
+        pthread_mutex_lock(&m_mutex);
+        m_locked = true;
+    }
+    // ------------------------------------------------------------------------
+    void unlock()
     {
         if (!m_locked) return;
         m_locked = false;
-        m_finished_loading.setAtomic(false);
-        m_completed_textures.unlock();
+        m_finished_loading = false;
+        pthread_mutex_unlock(&m_mutex);
     }
 
 };   // ThreadedTexLoader

@@ -23,8 +23,10 @@
 #include "utils/singleton.hpp"
 
 #include "irrString.h"
+#include <pthread.h>
 
 #include <string>
+#include <queue>
 #include <unordered_map>
 #include <vector>
 
@@ -50,7 +52,17 @@ private:
 
     int m_thread_size;
 
-    unsigned m_tlt_added;
+    class SmallestTexture
+    {
+    public:
+        bool operator() (const STKTexture *a, const STKTexture *b) const;
+    };
+    std::priority_queue<STKTexture*, std::vector<STKTexture*>,
+        SmallestTexture> m_threaded_load_textures;
+
+    pthread_mutex_t m_threaded_load_textures_mutex;
+
+    pthread_cond_t m_cond_request;
 
     // ------------------------------------------------------------------------
     STKTexture* findTextureInFileSystem(const std::string& filename,
@@ -138,6 +150,22 @@ public:
     }   // getTexture
     // ------------------------------------------------------------------------
     void uploadBatch();
+    // ------------------------------------------------------------------------
+    STKTexture* getThreadedLoadTexture()
+                                     { return m_threaded_load_textures.top(); }
+    // ------------------------------------------------------------------------
+    void addThreadedLoadTexture(STKTexture* t)
+    {
+        pthread_mutex_lock(&m_threaded_load_textures_mutex);
+        m_threaded_load_textures.push(t);
+        pthread_cond_signal(&m_cond_request);
+        pthread_mutex_unlock(&m_threaded_load_textures_mutex);
+    }
+    // ------------------------------------------------------------------------
+    void removeThreadedLoadTexture()        { m_threaded_load_textures.pop(); }
+    // ------------------------------------------------------------------------
+    bool isThreadedLoadTexturesEmpty()
+                                   { return m_threaded_load_textures.empty(); }
 
 };   // STKTexManager
 

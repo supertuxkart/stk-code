@@ -28,11 +28,13 @@
 #include <algorithm>
 
 // ----------------------------------------------------------------------------
-STKTexManager::STKTexManager() : m_pbo(0), m_thread_size(0), m_tlt_added(0)
+STKTexManager::STKTexManager() : m_pbo(0), m_thread_size(0)
 {
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (CVS->supportsThreadedTextureLoading())
     {
+        pthread_mutex_init(&m_threaded_load_textures_mutex, NULL);
+        pthread_cond_init(&m_cond_request, NULL);
         m_thread_size = HardwareStats::getNumProcessors();
         m_thread_size = core::clamp(m_thread_size, 1, 8);
         static const unsigned max_pbo_size = 32 * 1024 * 1024;
@@ -52,7 +54,8 @@ STKTexManager::STKTexManager() : m_pbo(0), m_thread_size(0), m_tlt_added(0)
         for (int i = 0; i < m_thread_size; i++)
         {
             m_all_tex_loaders.push_back(new ThreadedTexLoader(each_capacity,
-                offset, pbo_ptr + offset));
+                offset, pbo_ptr + offset, &m_threaded_load_textures_mutex,
+                &m_cond_request, this));
             offset += each_capacity;
         }
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
@@ -65,8 +68,12 @@ STKTexManager::STKTexManager() : m_pbo(0), m_thread_size(0), m_tlt_added(0)
 STKTexManager::~STKTexManager()
 {
     removeTexture(NULL/*texture*/, true/*remove_all*/);
-    for (ThreadedTexLoader* ttl : m_all_tex_loaders)
-        delete ttl;
+    if (CVS->supportsThreadedTextureLoading())
+    {
+        pthread_cond_destroy(&m_cond_request);
+        for (ThreadedTexLoader* ttl : m_all_tex_loaders)
+            delete ttl;
+    }
 }   // ~STKTexManager
 
 // ----------------------------------------------------------------------------
@@ -137,8 +144,7 @@ video::ITexture* STKTexManager::getTexture(const std::string& path, bool srgb,
         }
         if (new_texture->useThreadedLoading())
         {
-            m_all_tex_loaders[m_tlt_added++ % m_thread_size]
-                ->addTexture(new_texture);
+            addThreadedLoadTexture(new_texture);
         }
     }
     uploadBatch();
@@ -252,14 +258,12 @@ core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
             p.second->reload();
             if (p.second->useThreadedLoading())
             {
-                m_all_tex_loaders[m_tlt_added++ % m_thread_size]
-                    ->addTexture(p.second);
+                addThreadedLoadTexture(p.second);
                 uploadBatch();
             }
             Log::info("STKTexManager", "%s reloaded",
                 p.second->getName().getPtr());
         }
-        m_tlt_added = 0;
         return L"All textures reloaded.";
     }
 
@@ -281,8 +285,7 @@ core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
                 p.second->reload();
                 if (p.second->useThreadedLoading())
                 {
-                    m_all_tex_loaders[m_tlt_added++ % m_thread_size]
-                        ->addTexture(p.second);
+                    addThreadedLoadTexture(p.second);
                     uploadBatch();
                 }
                 result += tex_name.c_str();
@@ -290,7 +293,6 @@ core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
                 break;
             }
         }
-        m_tlt_added = 0;
     }
     if (result.empty())
         return L"Texture(s) not found!";
@@ -301,7 +303,6 @@ core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
 // ----------------------------------------------------------------------------
 void STKTexManager::reset()
 {
-    m_tlt_added = 0;
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (!CVS->isAZDOEnabled()) return;
     for (auto p : m_all_textures)
@@ -341,6 +342,7 @@ void STKTexManager::uploadBatch()
     bool uploaded = false;
     for (ThreadedTexLoader* ttl : m_all_tex_loaders)
     {
+        ttl->lock();
         if (ttl->finishedLoading())
         {
             if (!uploaded)
@@ -349,6 +351,10 @@ void STKTexManager::uploadBatch()
                 uploaded = true;
             }
             ttl->handleCompletedTextures();
+        }
+        else
+        {
+            ttl->unlock();
         }
     }
     if (uploaded)
@@ -367,7 +373,14 @@ void STKTexManager::uploadBatch()
         glDeleteSync(sync);
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
         for (ThreadedTexLoader* ttl : m_all_tex_loaders)
-            ttl->unlockCompletedTextures();
+            ttl->unlock();
     }
 #endif
 }   // uploadBatch
+
+// ----------------------------------------------------------------------------
+bool STKTexManager::SmallestTexture::operator()
+    (const STKTexture *a, const STKTexture *b) const
+{
+    return a->getTextureSize() > b->getTextureSize();
+}   // SmallestTexture::operator
