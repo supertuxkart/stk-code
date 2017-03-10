@@ -58,6 +58,9 @@ protected:
      *  at the current location. */
     float m_fraction_of_line;
 
+    /** The initial heading of the kart when crossing the line. This is
+     *  used to smoothly orient the kart towards the normal of the cuve. */
+    btQuaternion m_delta_heading;
 public:
              CannonAnimation(AbstractKart *kart, Ipo *ipo,
                              const Vec3 &start_left, const Vec3 &start_right,

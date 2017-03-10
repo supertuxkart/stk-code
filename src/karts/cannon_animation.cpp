@@ -111,7 +111,27 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo,
     // Subtract the horizontal difference, to get the constant offset the
     // kart has from the curve.
     m_delta = m_delta - delta;
-    
+
+    // Compute the original heading of the kart. At the end of the cannon,
+    // the kart should be parallel to the curve, but at the beginning it 
+    // the kart should be parallel to the curve and facing forwards, but
+    // at the beginning it might not be. The initial rotation between the
+    // tangent of the curce and the kart is stored as a m_delta_heading,
+    // which will be applied to the curve orientation in update, but reduced
+    // over time till it becomes 0 at the end of the curve. The effect is that
+    // initially (t=0) the kart will keep its (non-orhtogonal) rotation,
+    // but smoothly this will adjusted until at the end the kart will be
+    // facing forwards again.
+    Vec3 tangent;
+    m_curve->getDerivativeAt(0, &tangent);
+    // Get the current kart orientation
+    Vec3 forward = m_kart->getTrans().getBasis().getColumn(2);
+    forward.normalize();
+    Vec3 v1(tangent), v2(forward);
+    v1.setY(0); v2.setY(0);
+    m_delta_heading = shortestArcQuatNormalize2(v1, v2);
+
+
     // The previous call to m_curve->update will set the internal timer
     // of the curve to dt. Reset it to 0 to make sure the timer is in
     // synch with the timer of the CanonAnimation
@@ -143,7 +163,7 @@ void CannonAnimation::update(float dt)
     }
 
     // First compute the current rotation
-    // -----------------------------------
+    // ==================================
     // Get the tangent = derivative at the current point to compute the
     // new orientation of the kart
     Vec3 tangent;
@@ -153,14 +173,18 @@ void CannonAnimation::update(float dt)
     Vec3 forward = m_kart->getTrans().getBasis().getColumn(2);
     forward.normalize();
     
-    // Only adjust the heading.
-    // ------------------------
+    // Heading
+    // -------
     // I tried to also adjust pitch at the same time, but that adds a strong
-    // roll to the kart on some cannons
+    // roll to the kart on some cannons while it is in the air (caused by
+    // the rotation axis returned shortestArc not being orthogonal to the 
+    // up vector).
     Vec3 v1(tangent), v2(forward);
     v1.setY(0); v2.setY(0);
-    btQuaternion q = m_kart->getRotation()*shortestArcQuatNormalize2(v2, v1);
+    btQuaternion heading = shortestArcQuatNormalize2(v2, v1);
 
+    // Align to up-vector
+    // ------------------
     // While start and end line have to have the same 'up' vector, karts can 
     // sometimes be not parallel to them. So slowly adjust this over time
     Vec3 up = m_kart->getTrans().getBasis().getColumn(1);
@@ -168,16 +192,32 @@ void CannonAnimation::update(float dt)
     Vec3 gravity = -m_kart->getBody()->getGravity();
     gravity.normalize();
     // Adjust only 5% towards the real up vector. This will smoothly
-    // adjust the kart.
+    // adjust the kart while the kart is in the air
     Vec3 target_up_vector = (gravity*0.05f + up*0.95f).normalize();
     btQuaternion q_up = shortestArcQuat(up, target_up_vector);
 
-    m_kart->setRotation(q_up * q);
+    // Additional kart rotation
+    // ------------------------
+    // Apply any additional rotation the kart had when crossing the start
+    // line. This rotation will be reduced the closer the kart gets to
+    // the end line, with the result that at the start line the kart will
+    // be not rotated at all (so the visuals from physics to cannon will
+    // be smoothed), and at the end line the kart will face in the 
+    // forward direction.
+
+    // The timer counts backwards, so the fraction goes from 1 to 0
+    float f = m_timer / m_curve->getAnimationDuration();
+
+    btQuaternion zero(gravity, 0);
+    btQuaternion current_delta_heading = zero.slerp(m_delta_heading, f);
+
+    btQuaternion all_heading = m_kart->getRotation()*current_delta_heading*heading;
+
+    m_kart->setRotation(q_up * all_heading);
+
 
     // Then compute the new location of the kart
     // -----------------------------------------
-    // The timer counts backwards, so the fraction goes from 1 to 0
-    float f = m_timer / m_curve->getAnimationDuration();
     float f_current_width = m_start_line_length * f
                           + m_end_line_length   * (1.0f - f);
 
@@ -189,7 +229,7 @@ void CannonAnimation::update(float dt)
     // transform it to the global coordinate system
     Vec3 horiz_delta = Vec3(0.5f*m_fraction_of_line  * f_current_width, 0, 0);
 
-    Vec3 rotated_delta = quatRotate(q, m_delta + horiz_delta);
+    Vec3 rotated_delta = quatRotate(all_heading, m_delta + horiz_delta);
 
     Vec3 curve_xyz;
     m_curve->update(dt, &curve_xyz);
