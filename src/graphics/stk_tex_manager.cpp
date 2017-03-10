@@ -71,9 +71,23 @@ STKTexManager::~STKTexManager()
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (CVS->supportsThreadedTextureLoading())
     {
+        STKTexture* delete_ttl = new STKTexture((uint8_t*)NULL, "delete_ttl",
+            0, false, true);
+        for (int i = 0; i < m_thread_size; i++)
+            addThreadedLoadTexture(delete_ttl);
+        for (int i = 0; i < m_thread_size; i++)
+        {
+            if (!m_all_tex_loaders[i]->waitForReadyToDeleted(2.0f))
+            {
+                Log::info("STKTexManager", "ThreadedTexLoader %d not stopping,"
+                    "exiting anyway.", i);
+            }
+            delete m_all_tex_loaders[i];
+        }
+        delete delete_ttl;
+        glDeleteBuffers(1, &m_pbo);
+        pthread_mutex_destroy(&m_threaded_load_textures_mutex);
         pthread_cond_destroy(&m_cond_request);
-        for (ThreadedTexLoader* ttl : m_all_tex_loaders)
-            delete ttl;
     }
 #endif
 }   // ~STKTexManager

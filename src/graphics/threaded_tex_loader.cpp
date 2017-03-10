@@ -29,7 +29,7 @@ void* ThreadedTexLoader::startRoutine(void *obj)
     ThreadedTexLoader* ttl = (ThreadedTexLoader*)obj;
     VS::setThreadName((std::string("ThrTexLoader") +
         StringUtils::toString(ttl->m_pbo_offset / 1024 / 1024)).c_str());
-    while (!ttl->m_destroy)
+    while (true)
     {
         pthread_mutex_lock(&ttl->m_mutex);
         bool finished = ttl->finishedLoading();
@@ -65,6 +65,13 @@ void* ThreadedTexLoader::startRoutine(void *obj)
             ttl->m_waiting_timeout = 0;
         }
         STKTexture* target_tex = ttl->m_stktm->getThreadedLoadTexture();
+        if (strcmp(target_tex->getName().getPtr(), "delete_ttl") == 0)
+        {
+            ttl->m_stktm->removeThreadedLoadTexture();
+            pthread_mutex_unlock(ttl->m_texture_queue_mutex);
+            ttl->setCanBeDeleted();
+            return NULL;
+        }
         if (target_tex->getTextureSize() + ttl->m_tex_size_loaded >
             ttl->m_tex_capacity)
         {
@@ -83,10 +90,8 @@ void* ThreadedTexLoader::startRoutine(void *obj)
         ttl->m_tex_size_loaded += target_tex->getTextureSize();
         ttl->m_completed_textures.push_back(target_tex);
     }
-    pthread_exit(NULL);
     return NULL;
 }   // startRoutine
-
 
 // ----------------------------------------------------------------------------
 void ThreadedTexLoader::handleCompletedTextures()

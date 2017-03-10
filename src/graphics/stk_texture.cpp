@@ -59,7 +59,7 @@ STKTexture::STKTexture(const std::string& path, bool srgb, bool premul_alpha,
 
 // ----------------------------------------------------------------------------
 STKTexture::STKTexture(uint8_t* data, const std::string& name, size_t size,
-                       bool single_channel)
+                       bool single_channel, bool delete_ttl)
           : video::ITexture(name.c_str()), m_texture_handle(0), m_srgb(false),
             m_premul_alpha(false), m_mesh_texture(false),
             m_single_channel(single_channel), m_material(NULL),
@@ -69,7 +69,8 @@ STKTexture::STKTexture(uint8_t* data, const std::string& name, size_t size,
     m_size.Width = size;
     m_size.Height = size;
     m_orig_size = m_size;
-    reload(false/*no_upload*/, data);
+    if (!delete_ttl)
+        reload(false/*no_upload*/, data);
 }   // STKTexture
 
 // ----------------------------------------------------------------------------

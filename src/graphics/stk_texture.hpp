@@ -85,7 +85,7 @@ public:
                bool single_channel = false);
     // ------------------------------------------------------------------------
     STKTexture(uint8_t* data, const std::string& name, size_t size,
-               bool single_channel = false);
+               bool single_channel = false, bool delete_ttl = false);
     // ------------------------------------------------------------------------
     STKTexture(video::IImage* img, const std::string& name);
     // ------------------------------------------------------------------------

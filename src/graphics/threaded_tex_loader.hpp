@@ -18,6 +18,7 @@
 #ifndef HEADER_THREADED_TEX_LOADER_HPP
 #define HEADER_THREADED_TEX_LOADER_HPP
 
+#include "utils/can_be_deleted.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 
@@ -27,7 +28,7 @@
 class STKTexture;
 class STKTexManager;
 
-class ThreadedTexLoader : public NoCopy
+class ThreadedTexLoader : public NoCopy, public CanBeDeleted
 {
 private:
     const unsigned m_tex_capacity;
@@ -48,7 +49,7 @@ private:
 
     pthread_t m_thread;
 
-    bool m_finished_loading, m_destroy, m_locked;
+    bool m_finished_loading, m_locked;
 
     std::vector<STKTexture*> m_completed_textures;
 
@@ -63,8 +64,7 @@ public:
                       m_pbo_ptr(pbo_ptr), m_texture_queue_mutex(mutex),
                       m_cond_request(cond), m_stktm(stktm),
                       m_tex_size_loaded(0), m_waiting_timeout(0),
-                      m_finished_loading(false), m_destroy(false),
-                      m_locked(false)
+                      m_finished_loading(false), m_locked(false)
     {
         pthread_mutex_init(&m_mutex, NULL);
         pthread_create(&m_thread, NULL, &startRoutine, this);
@@ -72,7 +72,6 @@ public:
     // ------------------------------------------------------------------------
     ~ThreadedTexLoader()
     {
-        m_destroy = true;
         pthread_mutex_destroy(&m_mutex);
         pthread_join(m_thread, NULL);
     }
