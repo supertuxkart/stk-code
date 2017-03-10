@@ -86,8 +86,7 @@ void ThreadedTexLoader::handleCompletedTextures()
 {
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     m_completed_textures.lock();
-    glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pbo);
+    m_locked = true;
     size_t offset = 0;
     for (STKTexture* stkt : m_completed_textures.getData())
     {
@@ -95,26 +94,11 @@ void ThreadedTexLoader::handleCompletedTextures()
         glBindTexture(GL_TEXTURE_2D, stkt->getOpenGLTextureName());
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, stkt->getSize().Width,
             stkt->getSize().Height, stkt->isSingleChannel() ? GL_RED : GL_BGRA,
-            GL_UNSIGNED_BYTE, (const void*)offset);
+            GL_UNSIGNED_BYTE, (const void*)(m_pbo_offset + offset));
         if (stkt->hasMipMaps())
             glGenerateMipmap(GL_TEXTURE_2D);
         offset += stkt->getTextureSize();
     }
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     m_completed_textures.getData().clear();
-    GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-    GLenum reason = glClientWaitSync(sync, GL_SYNC_FLUSH_COMMANDS_BIT, 0);
-    if (reason != GL_ALREADY_SIGNALED)
-    {
-        do
-        {
-            reason =
-                glClientWaitSync(sync, GL_SYNC_FLUSH_COMMANDS_BIT, 1000000);
-        }
-        while (reason == GL_TIMEOUT_EXPIRED);
-    }
-    glDeleteSync(sync);
-    m_finished_loading.setAtomic(false);
-    m_completed_textures.unlock();
 #endif
 }   // handleCompletedTextures

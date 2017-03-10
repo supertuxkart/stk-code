@@ -490,7 +490,7 @@ bool CentralVideoSettings::isARBPixelBufferObjectUsable() const
 
 bool CentralVideoSettings::supportsThreadedTextureLoading() const
 {
-    return isARBPixelBufferObjectUsable() && supportsAsyncInstanceUpload();
+    return isARBPixelBufferObjectUsable() && isARBBufferStorageUsable();
 }
 
 #endif   // !SERVER_ONLY

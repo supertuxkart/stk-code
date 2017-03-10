@@ -18,7 +18,6 @@
 #ifndef HEADER_THREADED_TEX_LOADER_HPP
 #define HEADER_THREADED_TEX_LOADER_HPP
 
-#include "graphics/gl_headers.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/types.hpp"
@@ -33,7 +32,7 @@ class ThreadedTexLoader : public NoCopy
 private:
     const unsigned m_tex_capacity;
 
-    GLuint m_pbo;
+    const size_t m_pbo_offset;
 
     uint8_t* m_pbo_ptr;
 
@@ -45,7 +44,7 @@ private:
 
     Synchronised<bool> m_finished_loading;
 
-    bool m_destroy;
+    bool m_destroy, m_locked;
 
     Synchronised<std::vector<STKTexture*> >
         m_threaded_loading_textures, m_completed_textures;
@@ -54,10 +53,11 @@ public:
     // ------------------------------------------------------------------------
     static void* startRoutine(void *obj);
     // ------------------------------------------------------------------------
-    ThreadedTexLoader(unsigned capacity, GLuint pbo, uint8_t* pbo_ptr)
-                    : m_tex_capacity(capacity), m_pbo(pbo), m_pbo_ptr(pbo_ptr),
-                      m_tex_size_loaded(0), m_waiting_timeout(0),
-                      m_finished_loading(false), m_destroy(false)
+    ThreadedTexLoader(unsigned capacity, size_t offset, uint8_t* pbo_ptr)
+                    : m_tex_capacity(capacity), m_pbo_offset(offset),
+                      m_pbo_ptr(pbo_ptr), m_tex_size_loaded(0),
+                      m_waiting_timeout(0), m_finished_loading(false),
+                      m_destroy(false), m_locked(false)
     {
         pthread_cond_init(&m_cond_request, NULL);
         pthread_create(&m_thread, NULL, &startRoutine, this);
@@ -81,6 +81,14 @@ public:
     bool finishedLoading() const     { return m_finished_loading.getAtomic(); }
     // ------------------------------------------------------------------------
     void handleCompletedTextures();
+    // ------------------------------------------------------------------------
+    void unlockCompletedTextures()
+    {
+        if (!m_locked) return;
+        m_locked = false;
+        m_finished_loading.setAtomic(false);
+        m_completed_textures.unlock();
+    }
 
 };   // ThreadedTexLoader
 
