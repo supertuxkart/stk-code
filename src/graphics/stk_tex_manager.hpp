@@ -149,7 +149,7 @@ public:
                           std::string(detail));
     }   // getTexture
     // ------------------------------------------------------------------------
-    void uploadBatch();
+    void checkThreadedLoadTextures(bool util_queue_empty);
     // ------------------------------------------------------------------------
     STKTexture* getThreadedLoadTexture()
                                      { return m_threaded_load_textures.top(); }

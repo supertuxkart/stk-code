@@ -45,7 +45,7 @@ private:
 
     STKTexManager* m_stktm;
 
-    unsigned m_tex_size_loaded, m_waiting_timeout;
+    unsigned m_tex_size_loaded;
 
     pthread_t m_thread;
 
@@ -63,8 +63,8 @@ public:
                     : m_tex_capacity(capacity), m_pbo_offset(offset),
                       m_pbo_ptr(pbo_ptr), m_texture_queue_mutex(mutex),
                       m_cond_request(cond), m_stktm(stktm),
-                      m_tex_size_loaded(0), m_waiting_timeout(0),
-                      m_finished_loading(false), m_locked(false)
+                      m_tex_size_loaded(0), m_finished_loading(false),
+                      m_locked(false)
     {
         pthread_mutex_init(&m_mutex, NULL);
         pthread_create(&m_thread, NULL, &startRoutine, this);
@@ -78,6 +78,14 @@ public:
     // ------------------------------------------------------------------------
     bool finishedLoading() const                 { return m_finished_loading; }
     // ------------------------------------------------------------------------
+    void setFinishLoading()
+    {
+        m_finished_loading = true;
+        m_tex_size_loaded = 0;
+    }
+    // ------------------------------------------------------------------------
+    bool hasCompletedTextures() const { return !m_completed_textures.empty(); }
+    // ------------------------------------------------------------------------
     void handleCompletedTextures();
     // ------------------------------------------------------------------------
     void lock()
@@ -86,11 +94,12 @@ public:
         m_locked = true;
     }
     // ------------------------------------------------------------------------
-    void unlock()
+    void unlock(bool finish_it)
     {
         if (!m_locked) return;
         m_locked = false;
-        m_finished_loading = false;
+        if (finish_it)
+            m_finished_loading = false;
         pthread_mutex_unlock(&m_mutex);
     }
 

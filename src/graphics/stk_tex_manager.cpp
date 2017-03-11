@@ -124,6 +124,7 @@ video::ITexture* STKTexManager::getTexture(const std::string& path, bool srgb,
                                            bool no_upload, bool single_channel,
                                            bool create_if_unfound)
 {
+    checkThreadedLoadTextures(false/*util_queue_empty*/);
     auto ret = m_all_textures.find(path);
     if (!no_upload && ret != m_all_textures.end())
         return ret->second;
@@ -163,7 +164,6 @@ video::ITexture* STKTexManager::getTexture(const std::string& path, bool srgb,
             addThreadedLoadTexture(new_texture);
         }
     }
-    uploadBatch();
 
     if (create_if_unfound && !no_upload)
         addTexture(new_texture);
@@ -275,7 +275,6 @@ core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
             if (p.second->useThreadedLoading())
             {
                 addThreadedLoadTexture(p.second);
-                uploadBatch();
             }
             Log::info("STKTexManager", "%s reloaded",
                 p.second->getName().getPtr());
@@ -302,7 +301,6 @@ core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
                 if (p.second->useThreadedLoading())
                 {
                     addThreadedLoadTexture(p.second);
-                    uploadBatch();
                 }
                 result += tex_name.c_str();
                 result += L" ";
@@ -351,11 +349,42 @@ void STKTexManager::setTextureErrorMessage(const std::string &error,
 }   // setTextureErrorMessage
 
 // ----------------------------------------------------------------------------
-void STKTexManager::uploadBatch()
+void STKTexManager::checkThreadedLoadTextures(bool util_queue_empty)
 {
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (!CVS->supportsThreadedTextureLoading()) return;
     bool uploaded = false;
+    bool empty_queue = false;
+    if (util_queue_empty)
+    {
+        while (true)
+        {
+            pthread_mutex_lock(&m_threaded_load_textures_mutex);
+            empty_queue = m_threaded_load_textures.empty();
+            pthread_mutex_unlock(&m_threaded_load_textures_mutex);
+            if (empty_queue)
+            {
+                for (ThreadedTexLoader* ttl : m_all_tex_loaders)
+                {
+                    ttl->lock();
+                    if (ttl->hasCompletedTextures())
+                    {
+                        ttl->setFinishLoading();
+                        uploaded = true;
+                    }
+                    ttl->unlock(false/*finish_it*/);
+                }
+                break;
+            }
+            else
+            {
+                checkThreadedLoadTextures(false/*util_queue_empty*/);
+            }
+        }
+    }
+    if (empty_queue && !uploaded)
+        return;
+    uploaded = false;
     for (ThreadedTexLoader* ttl : m_all_tex_loaders)
     {
         ttl->lock();
@@ -370,7 +399,7 @@ void STKTexManager::uploadBatch()
         }
         else
         {
-            ttl->unlock();
+            ttl->unlock(false/*finish_it*/);
         }
     }
     if (uploaded)
@@ -389,10 +418,10 @@ void STKTexManager::uploadBatch()
         glDeleteSync(sync);
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
         for (ThreadedTexLoader* ttl : m_all_tex_loaders)
-            ttl->unlock();
+            ttl->unlock(true/*finish_it*/);
     }
 #endif
-}   // uploadBatch
+}   // checkThreadedLoadTextures
 
 // ----------------------------------------------------------------------------
 bool STKTexManager::SmallestTexture::operator()

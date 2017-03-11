@@ -38,31 +38,12 @@ void* ThreadedTexLoader::startRoutine(void *obj)
         {
             continue;
         }
-        bool no_unloaded_tex = ttl->m_completed_textures.empty();
         pthread_mutex_lock(ttl->m_texture_queue_mutex);
-        bool queue_empty = ttl->m_stktm->isThreadedLoadTexturesEmpty();
-        bool waiting = queue_empty && no_unloaded_tex;
+        bool waiting = ttl->m_stktm->isThreadedLoadTexturesEmpty();
         while (waiting)
         {
             pthread_cond_wait(ttl->m_cond_request, ttl->m_texture_queue_mutex);
             waiting = ttl->m_stktm->isThreadedLoadTexturesEmpty();
-        }
-        if (queue_empty)
-        {
-            if (ttl->m_waiting_timeout++ > 10)
-            {
-                pthread_mutex_lock(&ttl->m_mutex);
-                ttl->m_finished_loading = true;
-                ttl->m_tex_size_loaded = 0;
-                ttl->m_waiting_timeout = 0;
-                pthread_mutex_unlock(&ttl->m_mutex);
-            }
-            pthread_mutex_unlock(ttl->m_texture_queue_mutex);
-            continue;
-        }
-        else
-        {
-            ttl->m_waiting_timeout = 0;
         }
         STKTexture* target_tex = ttl->m_stktm->getThreadedLoadTexture();
         if (strcmp(target_tex->getName().getPtr(), "delete_ttl") == 0)
@@ -76,9 +57,7 @@ void* ThreadedTexLoader::startRoutine(void *obj)
             ttl->m_tex_capacity)
         {
             pthread_mutex_lock(&ttl->m_mutex);
-            ttl->m_finished_loading = true;
-            ttl->m_tex_size_loaded = 0;
-            ttl->m_waiting_timeout = 0;
+            ttl->setFinishLoading();
             pthread_mutex_unlock(&ttl->m_mutex);
             pthread_mutex_unlock(ttl->m_texture_queue_mutex);
             continue;

@@ -1837,6 +1837,9 @@ void IrrDriver::update(float dt)
 
     PropertyAnimator::get()->update(dt);
 
+    STKTexManager::getInstance()
+        ->checkThreadedLoadTextures(true/*util_queue_empty*/);
+
     World *world = World::getWorld();
 
     if (world)
