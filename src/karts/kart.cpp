@@ -153,6 +153,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_reset_transform         = init_transform;
     m_speed                   = 0.0f;
     m_smoothed_speed          = 0.0f;
+    m_last_factor_engine_sound = 0.0f;
 
     m_kart_model->setKart(this);
 
@@ -1375,6 +1376,7 @@ void Kart::update(float dt)
             fabs(getSpeed()) < 3.0f)
         {
             new RescueAnimation(this, /*is_auto_rescue*/true);
+            m_last_factor_engine_sound = 0.0f;
         }
     }
 
@@ -1439,7 +1441,10 @@ void Kart::update(float dt)
 
         if((min->getY() - getXYZ().getY() > 17 || dist_to_sector > 25) && !m_flying &&
            !getKartAnimation())
+        {
             new RescueAnimation(this);
+            m_last_factor_engine_sound = 0.0f;
+        }
     }
     else
     {
@@ -1458,7 +1463,10 @@ void Kart::update(float dt)
         }   // if !flying
         handleMaterialSFX(material);
         if     (material->isDriveReset() && isOnGround())
+        {
             new RescueAnimation(this);
+            m_last_factor_engine_sound = 0.0f;
+        }
         else if(material->isZipper()     && isOnGround())
         {
             handleZipper(material);
@@ -2094,6 +2102,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         if (m->getCollisionReaction() == Material::RESCUE)
         {
             new RescueAnimation(this);
+            m_last_factor_engine_sound = 0.0f;
         }
         else if (m->getCollisionReaction() == Material::PUSH_BACK)
         {
@@ -2285,7 +2294,7 @@ void Kart::updatePhysics(float dt)
     m_max_speed->update(dt);
 
 
-    updateEngineSFX();
+    updateEngineSFX(dt);
 #ifdef XX
     Log::info("Kart","angVel %f %f %f heading %f suspension %f %f %f %f"
        ,m_body->getAngularVelocity().getX()
@@ -2304,7 +2313,7 @@ void Kart::updatePhysics(float dt)
 //-----------------------------------------------------------------------------
 /** Adjust the engine sound effect depending on the speed of the kart.
  */
-void Kart::updateEngineSFX()
+void Kart::updateEngineSFX(float dt)
 {
     // when going faster, use higher pitch for engine
     if(!m_engine_sound || !SFXManager::get()->sfxAllowed())
@@ -2312,7 +2321,7 @@ void Kart::updateEngineSFX()
 
     if(isOnGround())
     {
-        float max_speed = m_max_speed->getCurrentMaxSpeed();
+        float max_speed = m_kart_properties->getEngineMaxSpeed();
 
         // Engine noise is based half in total speed, half in fake gears:
         // With a sawtooth graph like /|/|/| we get 3 even spaced gears,
@@ -2320,20 +2329,23 @@ void Kart::updateEngineSFX()
         // good enough brrrBRRRbrrrBRRR sound effect. Speed factor makes
         // it a "staired sawtooth", so more acoustically rich.
         float f = max_speed > 0 ? m_speed/max_speed : 1.0f;
-        // Speed at this stage is not yet capped, so it can be > 1, which
-        // results in odd engine sfx.
-        if (f>1.0f) f=1.0f;
+        // Speed at this stage is not yet capped, reduce the amount beyond 1
+        if (f> 1.0f) f = 1.0f + (1.0f-1.0f/f);
 
-        float gears = 3.0f * fmod(f, 0.333334f);
+        float fc = f;
+        if (fc>1.0f) fc = 1.0f;
+        float gears = 3.0f * fmod(fc, 0.333334f);
         assert(!std::isnan(f));
-        m_engine_sound->setSpeedPosition(0.6f + (f + gears) * 0.35f, getXYZ());
+        m_last_factor_engine_sound = (0.9*f + gears) * 0.35f;
+        m_engine_sound->setSpeedPosition(0.6f + m_last_factor_engine_sound, getXYZ());
     }
     else
-    {
-        // When flying, fixed value but not too high pitch
-        // This gives some variation (vs previous "on wheels" one)
-        m_engine_sound->setSpeedPosition(0.9f, getXYZ());
-    }
+      {
+        // When flying, reduce progressively the sound engine (since we can't accelerate)
+        m_last_factor_engine_sound *= (1.0f-0.1*dt);
+        m_engine_sound->setSpeedPosition(0.6f + m_last_factor_engine_sound, getXYZ());
+        if (m_speed < 0.1f) m_last_factor_engine_sound = 0.0f;
+      }
 }   // updateEngineSFX
 
 //-----------------------------------------------------------------------------
