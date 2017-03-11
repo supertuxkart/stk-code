@@ -1376,7 +1376,7 @@ void Kart::update(float dt)
             fabs(getSpeed()) < 3.0f)
         {
             new RescueAnimation(this, /*is_auto_rescue*/true);
-            m_last_factor_engine_sound=0.0f;
+            m_last_factor_engine_sound = 0.0f;
         }
     }
 
@@ -1443,7 +1443,7 @@ void Kart::update(float dt)
            !getKartAnimation())
         {
             new RescueAnimation(this);
-            m_last_factor_engine_sound=0.0f;
+            m_last_factor_engine_sound = 0.0f;
         }
     }
     else
@@ -1465,7 +1465,7 @@ void Kart::update(float dt)
         if     (material->isDriveReset() && isOnGround())
         {
             new RescueAnimation(this);
-            m_last_factor_engine_sound=0.0f;
+            m_last_factor_engine_sound = 0.0f;
         }
         else if(material->isZipper()     && isOnGround())
         {
@@ -2102,7 +2102,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         if (m->getCollisionReaction() == Material::RESCUE)
         {
             new RescueAnimation(this);
-            m_last_factor_engine_sound=0.0f;
+            m_last_factor_engine_sound = 0.0f;
         }
         else if (m->getCollisionReaction() == Material::PUSH_BACK)
         {
