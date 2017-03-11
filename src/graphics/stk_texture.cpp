@@ -575,7 +575,7 @@ bool STKTexture::useThreadedLoading() const
 }   // useThreadedLoading
 
 //-----------------------------------------------------------------------------
-void STKTexture::threadedReload(void* ptr) const
+void STKTexture::threadedReload(void* ptr, void* param) const
 {
     video::IImage* orig_img =
         m_img_loader->loadImage(m_file, true/*skip_checking*/);
@@ -599,6 +599,16 @@ void STKTexture::threadedReload(void* ptr) const
     else
         delete[] data;
 }   // threadedReload
+
+//-----------------------------------------------------------------------------
+void STKTexture::threadedSubImage(void* ptr) const
+{
+    glBindTexture(GL_TEXTURE_2D, m_texture_name);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_size.Width, m_size.Height,
+        m_single_channel ? GL_RED : GL_BGRA, GL_UNSIGNED_BYTE, ptr);
+    if (hasMipMaps())
+        glGenerateMipmap(GL_TEXTURE_2D);
+}   // threadedSubImage
 
 //-----------------------------------------------------------------------------
 void STKTexture::cleanThreadedLoader()

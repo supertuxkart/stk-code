@@ -425,7 +425,7 @@ void STKTexManager::checkThreadedLoadTextures(bool util_queue_empty)
 
 // ----------------------------------------------------------------------------
 bool STKTexManager::SmallestTexture::operator()
-    (const STKTexture *a, const STKTexture *b) const
+    (const video::ITexture* a, const  video::ITexture* b) const
 {
     return a->getTextureSize() > b->getTextureSize();
 }   // SmallestTexture::operator

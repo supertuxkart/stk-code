@@ -16,12 +16,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/threaded_tex_loader.hpp"
-#include "graphics/stk_texture.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/vs.hpp"
 
 #include <cassert>
+#include <ITexture.h>
 
 // ----------------------------------------------------------------------------
 void* ThreadedTexLoader::startRoutine(void *obj)
@@ -45,7 +45,8 @@ void* ThreadedTexLoader::startRoutine(void *obj)
             pthread_cond_wait(ttl->m_cond_request, ttl->m_texture_queue_mutex);
             waiting = ttl->m_stktm->isThreadedLoadTexturesEmpty();
         }
-        STKTexture* target_tex = ttl->m_stktm->getThreadedLoadTexture();
+        irr::video::ITexture* target_tex =
+            ttl->m_stktm->getThreadedLoadTexture();
         if (strcmp(target_tex->getName().getPtr(), "delete_ttl") == 0)
         {
             ttl->m_stktm->removeThreadedLoadTexture();
@@ -64,7 +65,8 @@ void* ThreadedTexLoader::startRoutine(void *obj)
         }
         ttl->m_stktm->removeThreadedLoadTexture();
         pthread_mutex_unlock(ttl->m_texture_queue_mutex);
-        target_tex->threadedReload(ttl->m_pbo_ptr + ttl->m_tex_size_loaded);
+        target_tex->threadedReload(ttl->m_pbo_ptr + ttl->m_tex_size_loaded,
+            ttl->m_stktm);
         target_tex->cleanThreadedLoader();
         ttl->m_tex_size_loaded += target_tex->getTextureSize();
         ttl->m_completed_textures.push_back(target_tex);
@@ -77,17 +79,11 @@ void ThreadedTexLoader::handleCompletedTextures()
 {
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     assert(m_locked);
-    size_t offset = 0;
-    for (STKTexture* stkt : m_completed_textures)
+    size_t offset = m_pbo_offset;
+    for (irr::video::ITexture* tex : m_completed_textures)
     {
-        assert(!stkt->useThreadedLoading());
-        glBindTexture(GL_TEXTURE_2D, stkt->getOpenGLTextureName());
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, stkt->getSize().Width,
-            stkt->getSize().Height, stkt->isSingleChannel() ? GL_RED : GL_BGRA,
-            GL_UNSIGNED_BYTE, (const void*)(m_pbo_offset + offset));
-        if (stkt->hasMipMaps())
-            glGenerateMipmap(GL_TEXTURE_2D);
-        offset += stkt->getTextureSize();
+        tex->threadedSubImage((void*)offset);
+        offset += tex->getTextureSize();
     }
     m_completed_textures.clear();
 #endif

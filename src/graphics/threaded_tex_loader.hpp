@@ -25,7 +25,10 @@
 #include <pthread.h>
 #include <vector>
 
-class STKTexture;
+namespace irr
+{
+    namespace video { class ITexture; }
+}
 class STKTexManager;
 
 class ThreadedTexLoader : public NoCopy, public CanBeDeleted
@@ -51,7 +54,7 @@ private:
 
     bool m_finished_loading, m_locked;
 
-    std::vector<STKTexture*> m_completed_textures;
+    std::vector<irr::video::ITexture*> m_completed_textures;
 
 public:
     // ------------------------------------------------------------------------

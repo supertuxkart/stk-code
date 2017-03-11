@@ -135,11 +135,9 @@ public:
     // ------------------------------------------------------------------------
     bool isMeshTexture() const                       { return m_mesh_texture; }
     // ------------------------------------------------------------------------
-    bool isSingleChannel() const                   { return m_single_channel; }
-    // ------------------------------------------------------------------------
     void setMeshTexture(bool val)                     { m_mesh_texture = val; }
     // ------------------------------------------------------------------------
-    unsigned int getTextureSize() const              { return m_texture_size; }
+    virtual unsigned int getTextureSize() const      { return m_texture_size; }
     // ------------------------------------------------------------------------
     void reload(bool no_upload = false, uint8_t* preload_data = NULL,
                 video::IImage* preload_img = NULL);
@@ -148,9 +146,11 @@ public:
     // ------------------------------------------------------------------------
     bool useThreadedLoading() const;
     // ------------------------------------------------------------------------
-    void threadedReload(void* ptr) const;
+    virtual void threadedReload(void* ptr, void* param) const;
     // ------------------------------------------------------------------------
-    void cleanThreadedLoader();
+    virtual void threadedSubImage(void* ptr) const;
+    // ------------------------------------------------------------------------
+    virtual void cleanThreadedLoader();
 
 };   // STKTexture
 

@@ -55,10 +55,12 @@ private:
     class SmallestTexture
     {
     public:
-        bool operator() (const STKTexture *a, const STKTexture *b) const;
+        bool operator()(const irr::video::ITexture* a,
+            const irr::video::ITexture* b) const;
     };
-    std::priority_queue<STKTexture*, std::vector<STKTexture*>,
-        SmallestTexture> m_threaded_load_textures;
+    std::priority_queue<irr::video::ITexture*,
+        std::vector<irr::video::ITexture*>, SmallestTexture>
+        m_threaded_load_textures;
 
     pthread_mutex_t m_threaded_load_textures_mutex;
 
@@ -151,10 +153,10 @@ public:
     // ------------------------------------------------------------------------
     void checkThreadedLoadTextures(bool util_queue_empty);
     // ------------------------------------------------------------------------
-    STKTexture* getThreadedLoadTexture()
+    irr::video::ITexture* getThreadedLoadTexture()
                                      { return m_threaded_load_textures.top(); }
     // ------------------------------------------------------------------------
-    void addThreadedLoadTexture(STKTexture* t)
+    void addThreadedLoadTexture(irr::video::ITexture* t)
     {
         pthread_mutex_lock(&m_threaded_load_textures_mutex);
         m_threaded_load_textures.push(t);
