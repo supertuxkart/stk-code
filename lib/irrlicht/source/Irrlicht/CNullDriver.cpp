@@ -103,7 +103,7 @@ CNullDriver::CNullDriver(io::IFileSystem* io, const core::dimension2d<u32>& scre
 //	DriverAttributes->addInt("MaxGeometryVerticesOut", 0);
 //	DriverAttributes->addFloat("MaxTextureLODBias", 0.f);
 	DriverAttributes->addInt("Version", 1);
-	DriverAttributes->setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(16384, 16384));
+	DriverAttributes->setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(2048, 2048));
 //	DriverAttributes->addInt("ShaderLanguageVersion", 0);
 //	DriverAttributes->addInt("AntiAlias", 0);
 

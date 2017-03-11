@@ -36,8 +36,8 @@ STKTexManager::STKTexManager() : m_pbo(0), m_thread_size(0)
         pthread_mutex_init(&m_threaded_load_textures_mutex, NULL);
         pthread_cond_init(&m_cond_request, NULL);
         m_thread_size = HardwareStats::getNumProcessors();
-        m_thread_size = core::clamp(m_thread_size, 1, 8);
-        static const unsigned max_pbo_size = 32 * 1024 * 1024;
+        m_thread_size = core::clamp(m_thread_size, 1, 3);
+        static const unsigned max_pbo_size = 48 * 1024 * 1024;
         const unsigned each_capacity = max_pbo_size / m_thread_size;
         Log::info("STKTexManager", "%d thread(s) for texture loading,"
             " each capacity %d MB", m_thread_size,

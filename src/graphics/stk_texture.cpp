@@ -174,8 +174,7 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
                 return;
             m_file->seek(0);
             m_orig_size = m_img_loader->getImageSize(m_file);
-            if (m_orig_size.Width <= 1024 && m_orig_size.Height <= 1024 &&
-                (!m_material || m_material->getAlphaMask().empty()) &&
+            if ((!m_material || m_material->getAlphaMask().empty()) &&
                 useThreadedLoading() && !no_upload)
             {
                 if (m_orig_size.Width == 0 || m_orig_size.Height == 0)
