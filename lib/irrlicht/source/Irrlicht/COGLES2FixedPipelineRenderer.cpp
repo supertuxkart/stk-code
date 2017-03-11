@@ -67,15 +67,12 @@ void COGLES2FixedPipelineRenderer::OnSetMaterial(const video::SMaterial& materia
 	}
 	else if (Blending)
 	{
-		//E_BLEND_FACTOR srcFact,dstFact;
-		//E_MODULATE_FUNC modulate;
-		//u32 alphaSource;
-		//unpack_textureBlendFunc(srcFact, dstFact, modulate, alphaSource, material.MaterialTypeParam);
+		E_BLEND_FACTOR srcFact,dstFact;
+		E_MODULATE_FUNC modulate;
+		u32 alphaSource;
+		unpack_textureBlendFunc(srcFact, dstFact, modulate, alphaSource, material.MaterialTypeParam);
 
-		//Driver->getBridgeCalls()->setBlendFunc(Driver->getGLBlend(srcFact), Driver->getGLBlend(dstFact));
-		//Driver->getBridgeCalls()->setBlend(true);
-		
-		Driver->getBridgeCalls()->setBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
+		Driver->getBridgeCalls()->setBlendFunc(Driver->getGLBlend(srcFact), Driver->getGLBlend(dstFact));
 		Driver->getBridgeCalls()->setBlend(true);
 	}
 	else
