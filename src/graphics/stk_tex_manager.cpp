@@ -124,7 +124,6 @@ video::ITexture* STKTexManager::getTexture(const std::string& path, bool srgb,
                                            bool no_upload, bool single_channel,
                                            bool create_if_unfound)
 {
-    checkThreadedLoadTextures(false/*util_queue_empty*/);
     auto ret = m_all_textures.find(path);
     if (!no_upload && ret != m_all_textures.end())
         return ret->second;
@@ -162,6 +161,7 @@ video::ITexture* STKTexManager::getTexture(const std::string& path, bool srgb,
         if (new_texture->useThreadedLoading())
         {
             addThreadedLoadTexture(new_texture);
+            checkThreadedLoadTextures(false/*util_queue_empty*/);
         }
     }
 
