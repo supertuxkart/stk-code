@@ -2330,21 +2330,21 @@ void Kart::updateEngineSFX(float dt)
         // it a "staired sawtooth", so more acoustically rich.
         float f = max_speed > 0 ? m_speed/max_speed : 1.0f;
         // Speed at this stage is not yet capped, reduce the amount beyond 1
-        if (f> 1.0f) f=1.0f + (1.0f-1.0f/f);
+        if (f> 1.0f) f = 1.0f + (1.0f-1.0f/f);
 
         float fc = f;
-        if (fc>1.0f) fc=1.0f;
+        if (fc>1.0f) fc = 1.0f;
         float gears = 3.0f * fmod(fc, 0.333334f);
         assert(!std::isnan(f));
-        m_last_factor_engine_sound= (0.9*f + gears) * 0.35f;
+        m_last_factor_engine_sound = (0.9*f + gears) * 0.35f;
         m_engine_sound->setSpeedPosition(0.6f + m_last_factor_engine_sound, getXYZ());
     }
     else
       {
         // When flying, reduce progressively the sound engine (since we can't accelerate)
-        m_last_factor_engine_sound*=(1.0f-0.1*dt);
+        m_last_factor_engine_sound *= (1.0f-0.1*dt);
         m_engine_sound->setSpeedPosition(0.6f + m_last_factor_engine_sound, getXYZ());
-        if (m_speed < 0.1f) m_last_factor_engine_sound=0.0f;
+        if (m_speed < 0.1f) m_last_factor_engine_sound = 0.0f;
       }
 }   // updateEngineSFX
 
