@@ -603,11 +603,13 @@ void STKTexture::threadedReload(void* ptr, void* param) const
 //-----------------------------------------------------------------------------
 void STKTexture::threadedSubImage(void* ptr) const
 {
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     glBindTexture(GL_TEXTURE_2D, m_texture_name);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_size.Width, m_size.Height,
         m_single_channel ? GL_RED : GL_BGRA, GL_UNSIGNED_BYTE, ptr);
     if (hasMipMaps())
         glGenerateMipmap(GL_TEXTURE_2D);
+#endif
 }   // threadedSubImage
 
 //-----------------------------------------------------------------------------
