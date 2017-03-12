@@ -20,9 +20,9 @@
 
 #include "utils/can_be_deleted.hpp"
 #include "utils/no_copy.hpp"
+#include "utils/synchronised.hpp"
 #include "utils/types.hpp"
 
-#include <pthread.h>
 #include <vector>
 
 namespace irr
@@ -54,6 +54,8 @@ private:
 
     bool m_finished_loading, m_locked;
 
+    Synchronised<bool> m_last_queue_ready;
+
     std::vector<irr::video::ITexture*> m_completed_textures;
 
 public:
@@ -67,7 +69,7 @@ public:
                       m_pbo_ptr(pbo_ptr), m_texture_queue_mutex(mutex),
                       m_cond_request(cond), m_stktm(stktm),
                       m_tex_size_loaded(0), m_finished_loading(false),
-                      m_locked(false)
+                      m_locked(false), m_last_queue_ready(false)
     {
         pthread_mutex_init(&m_mutex, NULL);
         pthread_create(&m_thread, NULL, &startRoutine, this);
@@ -83,11 +85,12 @@ public:
     // ------------------------------------------------------------------------
     void setFinishLoading()
     {
+        m_last_queue_ready.setAtomic(false);
         m_finished_loading = true;
         m_tex_size_loaded = 0;
     }
     // ------------------------------------------------------------------------
-    bool hasCompletedTextures() const { return !m_completed_textures.empty(); }
+    bool lastQueueReady() const      { return m_last_queue_ready.getAtomic(); }
     // ------------------------------------------------------------------------
     void handleCompletedTextures();
     // ------------------------------------------------------------------------

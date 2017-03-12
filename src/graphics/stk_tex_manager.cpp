@@ -366,13 +366,13 @@ void STKTexManager::checkThreadedLoadTextures(bool util_queue_empty)
             {
                 for (ThreadedTexLoader* ttl : m_all_tex_loaders)
                 {
-                    ttl->lock();
-                    if (ttl->hasCompletedTextures())
+                    if (ttl->lastQueueReady())
                     {
+                        ttl->lock();
                         ttl->setFinishLoading();
                         uploaded = true;
+                        ttl->unlock(false/*finish_it*/);
                     }
-                    ttl->unlock(false/*finish_it*/);
                 }
                 break;
             }
