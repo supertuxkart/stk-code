@@ -98,6 +98,8 @@ public:
 	//! fills the surface with given color
 	virtual void fill(const SColor &color) =0;
 
+	virtual void setDeleteMemory(bool val) = 0;
+
 	//! get the amount of Bits per Pixel of the given color format
 	static u32 getBitsPerPixelFromFormat(const ECOLOR_FORMAT format)
 	{
