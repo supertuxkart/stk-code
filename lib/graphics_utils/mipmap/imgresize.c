@@ -58,7 +58,11 @@
 
 #if defined(__GNUC__) || defined(__INTEL_COMPILER) || defined(__clang__)
  #define CC_ALWAYSINLINE __attribute__((always_inline))
- #define CC_RESTRICT restrict
+ #if __STDC_VERSION__ >= 199901L
+  #define CC_RESTRICT restrict
+ #else
+  #define CC_RESTRICT
+ #endif
 #elif defined(_MSC_VER)
  #define CC_ALWAYSINLINE __forceinline
  #define CC_RESTRICT __restrict

@@ -41,10 +41,13 @@
 #include <float.h>
 #include <limits.h>
 
-#include <sys/time.h>
-
 
 #include "cpusimd.h"
+
+
+#ifndef M_PI
+ #define M_PI 3.14159265358979323846
+#endif
 
 
 ////
