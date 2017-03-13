@@ -55,22 +55,22 @@
 
 #if CPU_SSE_SUPPORT
 
-const uint32_t simd4fSignMask[4] CPU_ALIGN16 = { 0x80000000, 0x80000000, 0x80000000, 0x80000000 };
-const uint32_t simd4fSignMaskInv[4] CPU_ALIGN16 = { 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff };
-const float simd4fHalf[4] CPU_ALIGN16 = { 0.5, 0.5, 0.5, 0.5 };
-const float simd4fOne[4] CPU_ALIGN16 = { 1.0, 1.0, 1.0, 1.0 };
-const float simd4fTwo[4] CPU_ALIGN16 = { 2.0, 2.0, 2.0, 2.0 };
-const float simd4fThree[4] CPU_ALIGN16 = { 3.0, 3.0, 3.0, 3.0 };
-const uint32_t simd4uOne[4] CPU_ALIGN16 = { 1, 1, 1, 1 };
-const uint32_t simd4uOneInv[4] CPU_ALIGN16 = { ~1, ~1, ~1, ~1 };
-const uint32_t simd4uTwo[4] CPU_ALIGN16 = { 2, 2, 2, 2 };
-const uint32_t simd4uFour[4] CPU_ALIGN16 = { 4, 4, 4, 4 };
-const float simd4fQuarter[4] CPU_ALIGN16 = { 0.25, 0.25, 0.25, 0.25 };
-const float simd4fPi[4] CPU_ALIGN16 = { M_PI, M_PI, M_PI, M_PI };
-const float simd4fZeroOneTwoThree[4] CPU_ALIGN16 = { 0.0, 1.0, 2.0, 3.0 };
-const uint32_t simd4fAlphaMask[4] CPU_ALIGN16 = { 0x00000000, 0x00000000, 0x00000000, 0xffffffff };
-const float simd4f255[4] CPU_ALIGN16 = { 255.0f, 255.0f, 255.0f, 255.0f };
-const float simd4f255Inv[4] CPU_ALIGN16 = { 1.0f/255.0f, 1.0f/255.0f, 1.0f/255.0f, 1.0f/255.0f };
+const uint32_t CPU_ALIGN16 simd4fSignMask[4] = { 0x80000000, 0x80000000, 0x80000000, 0x80000000 };
+const uint32_t CPU_ALIGN16 simd4fSignMaskInv[4] = { 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff };
+const float CPU_ALIGN16 simd4fHalf[4] = { 0.5, 0.5, 0.5, 0.5 };
+const float CPU_ALIGN16 simd4fOne[4] = { 1.0, 1.0, 1.0, 1.0 };
+const float CPU_ALIGN16 simd4fTwo[4] = { 2.0, 2.0, 2.0, 2.0 };
+const float CPU_ALIGN16 simd4fThree[4] = { 3.0, 3.0, 3.0, 3.0 };
+const uint32_t CPU_ALIGN16 simd4uOne[4] = { 1, 1, 1, 1 };
+const uint32_t CPU_ALIGN16 simd4uOneInv[4] = { ~1, ~1, ~1, ~1 };
+const uint32_t CPU_ALIGN16 simd4uTwo[4] = { 2, 2, 2, 2 };
+const uint32_t CPU_ALIGN16 simd4uFour[4] = { 4, 4, 4, 4 };
+const float CPU_ALIGN16 simd4fQuarter[4] = { 0.25, 0.25, 0.25, 0.25 };
+const float CPU_ALIGN16 simd4fPi[4] = { M_PI, M_PI, M_PI, M_PI };
+const float CPU_ALIGN16 simd4fZeroOneTwoThree[4] = { 0.0, 1.0, 2.0, 3.0 };
+const uint32_t CPU_ALIGN16 simd4fAlphaMask[4] = { 0x00000000, 0x00000000, 0x00000000, 0xffffffff };
+const float CPU_ALIGN16 simd4f255[4] = { 255.0f, 255.0f, 255.0f, 255.0f };
+const float CPU_ALIGN16 simd4f255Inv[4] = { 1.0f/255.0f, 1.0f/255.0f, 1.0f/255.0f, 1.0f/255.0f };
 
 #endif
 
@@ -102,16 +102,16 @@ const float simd4f255Inv[4] CPU_ALIGN16 = { 1.0f/255.0f, 1.0f/255.0f, 1.0f/255.0
   (this is the zlib license)
 */
 
-static const float simd4f_cephes_FOPI[4] CPU_ALIGN16 = { 1.27323954473516, 1.27323954473516, 1.27323954473516, 1.27323954473516 };
-static const float simd4f_minus_cephes_DP1[4] CPU_ALIGN16 = { -0.78515625, -0.78515625, -0.78515625, -0.78515625 };
-static const float simd4f_minus_cephes_DP2[4] CPU_ALIGN16 = { -2.4187564849853515625e-4, -2.4187564849853515625e-4, -2.4187564849853515625e-4, -2.4187564849853515625e-4 };
-static const float simd4f_minus_cephes_DP3[4] CPU_ALIGN16 = { -3.77489497744594108e-8, -3.77489497744594108e-8, -3.77489497744594108e-8, -3.77489497744594108e-8 };
-static const float simd4f_sincof_p0[4] CPU_ALIGN16 = { -1.9515295891E-4, -1.9515295891E-4, -1.9515295891E-4, -1.9515295891E-4 };
-static const float simd4f_sincof_p1[4] CPU_ALIGN16 = { 8.3321608736E-3, 8.3321608736E-3, 8.3321608736E-3, 8.3321608736E-3 };
-static const float simd4f_sincof_p2[4] CPU_ALIGN16 = { -1.6666654611E-1, -1.6666654611E-1, -1.6666654611E-1, -1.6666654611E-1 };
-static const float simd4f_coscof_p0[4] CPU_ALIGN16 = { 2.443315711809948E-005, 2.443315711809948E-005, 2.443315711809948E-005, 2.443315711809948E-005 };
-static const float simd4f_coscof_p1[4] CPU_ALIGN16 = { -1.388731625493765E-003, -1.388731625493765E-003, -1.388731625493765E-003, -1.388731625493765E-003 };
-static const float simd4f_coscof_p2[4] CPU_ALIGN16 = { 4.166664568298827E-002, 4.166664568298827E-002, 4.166664568298827E-002, 4.166664568298827E-002 };
+static const float CPU_ALIGN16 simd4f_cephes_FOPI[4] = { 1.27323954473516, 1.27323954473516, 1.27323954473516, 1.27323954473516 };
+static const float CPU_ALIGN16 simd4f_minus_cephes_DP1[4] = { -0.78515625, -0.78515625, -0.78515625, -0.78515625 };
+static const float CPU_ALIGN16 simd4f_minus_cephes_DP2[4] = { -2.4187564849853515625e-4, -2.4187564849853515625e-4, -2.4187564849853515625e-4, -2.4187564849853515625e-4 };
+static const float CPU_ALIGN16 simd4f_minus_cephes_DP3[4] = { -3.77489497744594108e-8, -3.77489497744594108e-8, -3.77489497744594108e-8, -3.77489497744594108e-8 };
+static const float CPU_ALIGN16 simd4f_sincof_p0[4] = { -1.9515295891E-4, -1.9515295891E-4, -1.9515295891E-4, -1.9515295891E-4 };
+static const float CPU_ALIGN16 simd4f_sincof_p1[4] = { 8.3321608736E-3, 8.3321608736E-3, 8.3321608736E-3, 8.3321608736E-3 };
+static const float CPU_ALIGN16 simd4f_sincof_p2[4] = { -1.6666654611E-1, -1.6666654611E-1, -1.6666654611E-1, -1.6666654611E-1 };
+static const float CPU_ALIGN16 simd4f_coscof_p0[4] = { 2.443315711809948E-005, 2.443315711809948E-005, 2.443315711809948E-005, 2.443315711809948E-005 };
+static const float CPU_ALIGN16 simd4f_coscof_p1[4] = { -1.388731625493765E-003, -1.388731625493765E-003, -1.388731625493765E-003, -1.388731625493765E-003 };
+static const float CPU_ALIGN16 simd4f_coscof_p2[4] = { 4.166664568298827E-002, 4.166664568298827E-002, 4.166664568298827E-002, 4.166664568298827E-002 };
 
 __m128 simd4f_sin_ps( __m128 x )
 {
