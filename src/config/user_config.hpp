@@ -934,6 +934,11 @@ namespace UserConfigParams
             PARAM_DEFAULT( BoolUserConfigParam(false, "everything_unlocked",
                                "Enable all karts and tracks") );
 
+    PARAM_PREFIX BoolUserConfigParam        m_hq_mipmap
+            PARAM_DEFAULT( BoolUserConfigParam(false, "hq_mipmap",
+                               "Generate mipmap for textures using "
+                               "high quality method with SSE") );
+
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;
 

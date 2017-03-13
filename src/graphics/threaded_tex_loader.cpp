@@ -84,8 +84,9 @@ void ThreadedTexLoader::handleCompletedTextures()
     size_t offset = m_pbo_offset;
     for (irr::video::ITexture* tex : m_completed_textures)
     {
+        size_t cur_offset = tex->getTextureSize();
         tex->threadedSubImage((void*)offset);
-        offset += tex->getTextureSize();
+        offset += cur_offset;
     }
     m_completed_textures.clear();
 #endif

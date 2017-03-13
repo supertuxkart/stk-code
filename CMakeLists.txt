@@ -116,6 +116,10 @@ if((WIN32 AND NOT MINGW) OR APPLE)
     set(JPEG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/jpeglib/")
     set(JPEG_LIBRARY jpeglib)
 endif()
+
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
+include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
+
 # Build the irrlicht library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
 include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
@@ -370,6 +374,7 @@ target_link_libraries(supertuxkart
     bulletmath
     enet
     stkirrlicht
+    graphics_utils
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}

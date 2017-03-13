@@ -18,14 +18,17 @@
 #include "graphics/stk_texture.hpp"
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/hq_mipmap_generator.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/materials.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <functional>
 
@@ -215,7 +218,7 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
     const unsigned int w = m_size.Width;
     const unsigned int h = m_size.Height;
     unsigned int format = m_single_channel ? GL_RED : GL_BGRA;
-    unsigned int internal_format = m_single_channel ? GL_R8 : GL_RGBA;
+    unsigned int internal_format = m_single_channel ? GL_R8 : GL_RGBA8;
 
 #if !defined(USE_GLES2)
     if (m_mesh_texture && CVS->isTextureCompressionEnabled())
@@ -227,13 +230,41 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
     else
     {
         internal_format =
-            m_single_channel ? GL_R8 : m_srgb ? GL_SRGB_ALPHA : GL_RGBA;
+            m_single_channel ? GL_R8 : m_srgb ? GL_SRGB8_ALPHA8 : GL_RGBA8;
     }
 #endif
     if (!useThreadedLoading())
         formatConversion(data, &format, w, h);
 
-    if (!no_upload)
+    if (useThreadedLoading())
+    {
+        if (m_texture_name == 0)
+        {
+            glGenTextures(1, &m_texture_name);
+            glBindTexture(GL_TEXTURE_2D, m_texture_name);
+            if (m_single_channel)
+            {
+                glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_ONE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_ONE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_ONE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_RED);
+            }
+            int levels = 1;
+            int width = w;
+            int height = h;
+            while (true)
+            {
+                width = width < 2 ? 1 : width >> 1;
+                height = height < 2 ? 1 : height >> 1;
+                levels++;
+                if (width == 1 && height == 1)
+                    break;
+            }
+            glTexStorage2D(GL_TEXTURE_2D, levels, internal_format, w, h);
+        }
+    }
+    else if (!no_upload)
     {
         const bool reload = m_texture_name != 0;
         if (!reload)
@@ -253,14 +284,14 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
             glTexImage2D(GL_TEXTURE_2D, 0, internal_format, w, h, 0, format,
                 GL_UNSIGNED_BYTE, data);
         }
-        else if (!useThreadedLoading())
+        else
         {
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, format,
                 GL_UNSIGNED_BYTE, data);
         }
         if (orig_img)
             orig_img->unlock();
-        if (hasMipMaps() && !useThreadedLoading())
+        if (hasMipMaps())
             glGenerateMipmap(GL_TEXTURE_2D);
     }
 
@@ -594,7 +625,14 @@ void STKTexture::threadedReload(void* ptr, void* param) const
     if (orig_img)
     {
         orig_img->unlock();
+        orig_img->setDeleteMemory(false);
         orig_img->drop();
+    }
+    if (useHQMipmap())
+    {
+        HQMipmapGenerator* hqmg = new HQMipmapGenerator(NamedPath, data,
+            m_size, m_texture_name, m_single_channel);
+        ((STKTexManager*)(param))->addThreadedLoadTexture(hqmg);
     }
     else
         delete[] data;
@@ -607,8 +645,11 @@ void STKTexture::threadedSubImage(void* ptr) const
     glBindTexture(GL_TEXTURE_2D, m_texture_name);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_size.Width, m_size.Height,
         m_single_channel ? GL_RED : GL_BGRA, GL_UNSIGNED_BYTE, ptr);
+    if (useHQMipmap())
+        return;
     if (hasMipMaps())
         glGenerateMipmap(GL_TEXTURE_2D);
+
 #endif
 }   // threadedSubImage
 
@@ -620,3 +661,10 @@ void STKTexture::cleanThreadedLoader()
     m_file = NULL;
     m_img_loader = NULL;
 }   // cleanThreadedLoader
+
+//-----------------------------------------------------------------------------
+bool STKTexture::useHQMipmap() const
+{
+    return UserConfigParams::m_hq_mipmap && m_size.Width > 1 &&
+        m_size.Height > 1;
+}   // useHQMipmap
