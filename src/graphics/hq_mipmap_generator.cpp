@@ -17,7 +17,7 @@
 
 
 #include "graphics/hq_mipmap_generator.hpp"
-#define DUMP_MIPMAP
+#undef DUMP_MIPMAP
 #ifdef DUMP_MIPMAP
 #include "graphics/irr_driver.hpp"
 #include "utils/string_utils.hpp"
