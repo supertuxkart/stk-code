@@ -56,12 +56,15 @@
  #define ADDRESS(p,o) ((void *)(((char *)p)+(o)))
 #endif
 
-#if defined(__GNUC__) || defined(__INTEL_COMPILER)
+#if defined(__GNUC__) || defined(__INTEL_COMPILER) || defined(__clang__)
  #define CC_ALWAYSINLINE __attribute__((always_inline))
+ #define CC_RESTRICT restrict
 #elif defined(_MSC_VER)
  #define CC_ALWAYSINLINE __forceinline
+ #define CC_RESTRICT __restrict
 #else
  #define CC_ALWAYSINLINE
+ #define CC_RESTRICT
 #endif
 
 static inline CC_ALWAYSINLINE uint32_t ccIsPow2Int32( uint32_t v )
@@ -365,7 +368,7 @@ typedef struct
 } imStaticMatrixState;
 
 
-static int imBuildStaticMatrix( imStaticMatrixState * restrict state, int sizedivisor, float hopcount, float alpha )
+static int imBuildStaticMatrix( imStaticMatrixState * CC_RESTRICT state, int sizedivisor, float hopcount, float alpha )
 {
   int i, j, minx, maxx;
   double x, xshift, hopsize, offset, scalefactor, hopcountinv, beta, linsq, sum;
@@ -450,7 +453,7 @@ static int imBuildStaticMatrix( imStaticMatrixState * restrict state, int sizedi
 }
 
 
-static void imFreeStaticState( imStaticMatrixState * restrict state )
+static void imFreeStaticState( imStaticMatrixState * CC_RESTRICT state )
 {
   free( state->alloc );
   state->alloc = 0;
@@ -610,7 +613,7 @@ static inline void imFreeGenericState( imGenericMatrixState *state )
 
 
 
-static void imStaticKernel1Linear( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel1Linear( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
   float f, sum0;
@@ -643,7 +646,7 @@ static void imStaticKernel1Linear( unsigned char *dst, int pointx, int pointy, i
   return;
 }
 
-static void imStaticKernel2Linear( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel2Linear( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
   float f, sum0, sum1;
@@ -679,7 +682,7 @@ static void imStaticKernel2Linear( unsigned char *dst, int pointx, int pointy, i
   return;
 }
 
-static void imStaticKernel3Linear( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel3Linear( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
   float f, sum0, sum1, sum2;
@@ -718,7 +721,7 @@ static void imStaticKernel3Linear( unsigned char *dst, int pointx, int pointy, i
   return;
 }
 
-static void imStaticKernel4Linear( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel4Linear( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
 #if CPU_SSE2_SUPPORT
@@ -782,7 +785,7 @@ static void imStaticKernel4Linear( unsigned char *dst, int pointx, int pointy, i
 
 #if CPU_SSE2_SUPPORT
 
-static void imStaticKernel4Linear_Core( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel4Linear_Core( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
   __m128 vsum, vf, v0, v1, v2, v3;
@@ -828,7 +831,7 @@ static void imStaticKernel4Linear_Core( unsigned char *dst, int pointx, int poin
 ////
 
 
-static void imStaticKernel4LinearAlphaNorm( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel4LinearAlphaNorm( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
   float f, sum0, sum1, sum2, sum3;
@@ -884,7 +887,7 @@ static void imStaticKernel4LinearAlphaNorm( unsigned char *dst, int pointx, int 
 
 #if CPU_SSE2_SUPPORT
 
-static void imStaticKernel4LinearAlphaNorm_Core( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel4LinearAlphaNorm_Core( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
   uint32_t pixel;
@@ -977,7 +980,7 @@ static void imStaticKernel4LinearAlphaNorm_Core( unsigned char *dst, int pointx,
 ////
 
 
-static void imStaticKernel1sRGB( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel1sRGB( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
 #if CPU_SSE2_SUPPORT
@@ -1037,7 +1040,7 @@ static void imStaticKernel1sRGB( unsigned char *dst, int pointx, int pointy, imS
   return;
 }
 
-static void imStaticKernel2sRGB( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel2sRGB( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
 #if CPU_SSE2_SUPPORT
@@ -1101,7 +1104,7 @@ static void imStaticKernel2sRGB( unsigned char *dst, int pointx, int pointy, imS
   return;
 }
 
-static void imStaticKernel3sRGB( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel3sRGB( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
 #if CPU_SSE2_SUPPORT
@@ -1169,7 +1172,7 @@ static void imStaticKernel3sRGB( unsigned char *dst, int pointx, int pointy, imS
   return;
 }
 
-static void imStaticKernel4sRGB( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel4sRGB( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
 #if CPU_SSE2_SUPPORT
@@ -1235,7 +1238,7 @@ static void imStaticKernel4sRGB( unsigned char *dst, int pointx, int pointy, imS
 
 #if CPU_SSE2_SUPPORT
 
-static void imStaticKernel3sRGB_Core( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel3sRGB_Core( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
   __m128 vsum0, vsum1, vsum2, vsrc0, vsrc1, vsrc2, vf;
@@ -1298,7 +1301,7 @@ static void imStaticKernel3sRGB_Core( unsigned char *dst, int pointx, int pointy
   return;
 }
 
-static void imStaticKernel4sRGB_Core( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel4sRGB_Core( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
   __m128 vsum, vsrc0, vsrc1;
@@ -1342,7 +1345,7 @@ static void imStaticKernel4sRGB_Core( unsigned char *dst, int pointx, int pointy
 ////
 
 
-static void imStaticKernel4sRGBAlphaNorm( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel4sRGBAlphaNorm( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
 #if CPU_SSE2_SUPPORT
@@ -1433,7 +1436,7 @@ static void imStaticKernel4sRGBAlphaNorm( unsigned char *dst, int pointx, int po
 
 #if CPU_SSE2_SUPPORT
 
-static void imStaticKernel4sRGBAlphaNorm_Core( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel4sRGBAlphaNorm_Core( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
   __m128 vsum, vsrc0, vsrc1, valpha0, valpha1;
@@ -1491,7 +1494,7 @@ static void imStaticKernel4sRGBAlphaNorm_Core( unsigned char *dst, int pointx, i
 ////
 
 
-static void imStaticKernel3Normal( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel3Normal( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
   float f, sum0, sum1, sum2, suminv;
@@ -1539,7 +1542,7 @@ static void imStaticKernel3Normal( unsigned char *dst, int pointx, int pointy, i
   return;
 }
 
-static void imStaticKernel4Normal( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel4Normal( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
 #if CPU_SSE2_SUPPORT
@@ -1622,7 +1625,7 @@ static void imStaticKernel4Normal( unsigned char *dst, int pointx, int pointy, i
 ////
 
 
-static void imStaticKernel3NormalSustain( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel3NormalSustain( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
   float f, v0, v1, v2, energy, sum0, sum1, sum2, sumenergy, suminv;
@@ -1689,7 +1692,7 @@ static void imStaticKernel3NormalSustain( unsigned char *dst, int pointx, int po
   return;
 }
 
-static void imStaticKernel4NormalSustain( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel4NormalSustain( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
   float f, v0, v1, v2, v3, energy, sum0, sum1, sum2, sum3, sumenergy, suminv;
@@ -1764,7 +1767,7 @@ static void imStaticKernel4NormalSustain( unsigned char *dst, int pointx, int po
 ////
 
 
-static void imStaticKernel4NormalSustainAlphaNorm( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernel4NormalSustainAlphaNorm( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy;
   float f, v0, v1, v2, v3, energy, sum0, sum1, sum2, sum3, sumenergy, suminv;
@@ -1853,7 +1856,7 @@ static void imStaticKernel4NormalSustainAlphaNorm( unsigned char *dst, int point
 ////
 
 
-static void imStaticKernelPoT3Water( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernelPoT3Water( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy, heightmask, widthmask;
   int minx, maxx, miny, maxy;
@@ -1921,7 +1924,7 @@ static void imStaticKernelPoT3Water( unsigned char *dst, int pointx, int pointy,
   return;
 }
 
-static void imStaticKernelPoT4Water( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernelPoT4Water( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy, heightmask, widthmask;
   int minx, maxx, miny, maxy;
@@ -1996,7 +1999,7 @@ static void imStaticKernelPoT4Water( unsigned char *dst, int pointx, int pointy,
 ////
 
 
-static void imStaticKernelPoT4Plant( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state )
+static void imStaticKernelPoT4Plant( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state )
 {
   int x, y, mapx, mapy, heightmask, widthmask;
   int minx, maxx, miny, maxy;
@@ -2052,10 +2055,10 @@ int imReduceImageKaiserDataDivisor( unsigned char *dstdata, unsigned char *srcda
   int newwidth, newheight;
   unsigned char *dst;
   imStaticMatrixState state;
-  void (*applykernel)( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state );
+  void (*applykernel)( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state );
 #if CPU_SSE2_SUPPORT
   int corebase, corerange;
-  void (*applykernelcore)( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * restrict state );
+  void (*applykernelcore)( unsigned char *dst, int pointx, int pointy, imStaticMatrixState * CC_RESTRICT state );
 #endif
 
   filter = options->filter;

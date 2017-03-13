@@ -66,7 +66,7 @@ HQMipmapGenerator::~HQMipmapGenerator()
 void HQMipmapGenerator::threadedReload(void* ptr, void* param) const
 {
     imReduceOptions options;
-    imReduceSetOptions(&options, IM_REDUCE_FILTER_SRGB, 3, 2.0f, 0.0f, 0.0f);
+    imReduceSetOptions(&options, IM_REDUCE_FILTER_SRGB, 2, 2.0f, 0.0f, 0.0f);
     imMipmapCascade* mm_cascade = (imMipmapCascade*)m_mipmap_data;
 #ifdef DEBUG
     int ret = imBuildMipmapCascade(mm_cascade, m_orig_data, m_size.Width,
