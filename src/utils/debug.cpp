@@ -723,11 +723,15 @@ bool onEvent(const SEvent &event)
     if(!UserConfigParams::m_artist_debug_mode)
         return true;    // keep handling the events
 
-    if(event.EventType == EET_MOUSE_INPUT_EVENT)
+    if (event.EventType == EET_MOUSE_INPUT_EVENT)
     {
         // Create the menu (only one menu at a time)
-        if(event.MouseInput.Event == EMIE_RMOUSE_PRESSED_DOWN &&
-             !g_debug_menu_visible)
+        #ifdef ANDROID
+        if (event.MouseInput.X < 30 && event.MouseInput.Y < 30 &&
+        #else
+        if (event.MouseInput.Event == EMIE_RMOUSE_PRESSED_DOWN &&
+        #endif
+            !g_debug_menu_visible)
         {
             irr_driver->getDevice()->getCursorControl()->setVisible(true);
 

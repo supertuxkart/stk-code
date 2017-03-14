@@ -201,6 +201,9 @@ protected:
     /** For camera handling an exponentially smoothened value is used, which
      *  reduces stuttering of the camera. */
     float         m_smoothed_speed;
+    
+    /** For smoothing engine sound**/
+    float         m_last_factor_engine_sound;
 
     std::vector<SFXBase*> m_custom_sounds;
     SFXBase      *m_beep_sound;
@@ -226,7 +229,7 @@ protected:
     void          updateFlying();
     void          updateSliding();
     void          updateEnginePowerAndBrakes(float dt);
-    void          updateEngineSFX();
+    void          updateEngineSFX(float dt);
     void          updateSpeed();
     void          updateNitro(float dt);
     float         getActualWheelForce();
