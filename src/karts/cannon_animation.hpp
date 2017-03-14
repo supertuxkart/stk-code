@@ -64,7 +64,8 @@ protected:
 public:
              CannonAnimation(AbstractKart *kart, Ipo *ipo,
                              const Vec3 &start_left, const Vec3 &start_right,
-                             const Vec3 &end_left, const Vec3 &end_right);
+                             const Vec3 &end_left, const Vec3 &end_right,
+                             float skid_rot);
     virtual ~CannonAnimation();
     virtual void  update(float dt);
 

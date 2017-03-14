@@ -27,9 +27,22 @@
 
 #include "LinearMath/btTransform.h"
 
+/** The constructor for the cannon animation. 
+ *  \param kart The kart to be animated.
+ *  \param ipo The IPO (blender interpolation curve) which the kart
+ *         should follow.
+ *  \param start_left, start_right: Left and right end points of the line
+ *         that the kart just crossed.
+ *  \param end_left, end_right: Left and right end points of the line at
+ *         which the kart finishes.
+ *  \param skid_rot Visual rotation of the kart due to skidding (while this
+ *         value can be queried, the AbstractkartAnimation constructor
+ *         resets the value to 0, so it needs to be passed in.
+ */
 CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo,
                                  const Vec3 &start_left, const Vec3 &start_right,
-                                 const Vec3 &end_left,   const Vec3 &end_right   )
+                                 const Vec3 &end_left,   const Vec3 &end_right,
+                                 float skid_rot)
                : AbstractKartAnimation(kart, "CannonAnimation")
 {
     m_curve  = new AnimationBase(ipo);
@@ -126,10 +139,10 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo,
     m_curve->getDerivativeAt(0, &tangent);
     // Get the current kart orientation
     Vec3 forward = m_kart->getTrans().getBasis().getColumn(2);
-    forward.normalize();
     Vec3 v1(tangent), v2(forward);
     v1.setY(0); v2.setY(0);
-    m_delta_heading = shortestArcQuatNormalize2(v1, v2);
+    m_delta_heading = shortestArcQuatNormalize2(v1, v2) 
+                    * btQuaternion(Vec3(0,1,0), skid_rot);
 
 
     // The previous call to m_curve->update will set the internal timer
@@ -171,7 +184,6 @@ void CannonAnimation::update(float dt)
                              &tangent);
     // Get the current kart orientation
     Vec3 forward = m_kart->getTrans().getBasis().getColumn(2);
-    forward.normalize();
     
     // Heading
     // -------
