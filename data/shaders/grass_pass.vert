@@ -20,13 +20,16 @@ out vec2 uv;
 void main()
 {
 
+    vec3 test = sin(windDir * (Position.y* 0.5)) * 0.5;
+    test += cos(windDir) * 0.7;
+
     mat4 new_model_matrix = ModelMatrix;
     mat4 new_inverse_model_matrix = InverseModelMatrix;
-    new_model_matrix[3].xyz += windDir * Color.r;
+    new_model_matrix[3].xyz += test * Color.r;
 
     // FIXME doesn't seem to make too much difference in pass 2, because this
     // affects "nor" which is later only * 0.1 by scattering
-    new_inverse_model_matrix[3].xyz -= windDir * Color.r;
+    new_inverse_model_matrix[3].xyz -= test * Color.r;
 
     mat4 ModelViewProjectionMatrix = ProjectionViewMatrix * new_model_matrix;
     mat4 TransposeInverseModelView = transpose(InverseViewMatrix * new_inverse_model_matrix);

@@ -22,14 +22,17 @@
 #include "karts/abstract_kart_animation.hpp"
 #include "utils/vec3.hpp"
 
-/** This animation shoots the kart to a specified point on the track.
- *
- * \ingroup karts
- */
+#include "LinearMath/btQuaternion.h"
 
 class AbstractKart;
 class AnimationBase;
 class Ipo;
+
+
+/** This animation shoots the kart to a specified point on the track.
+ *
+ * \ingroup karts
+ */
 
 class CannonAnimation: public AbstractKartAnimation
 {
@@ -43,12 +46,26 @@ protected:
     /** Stores the curve interpolation for the cannon. */
     AnimationBase *m_curve;
 
-    /** This stores the original (unmodified) interpolated curve value. THis
-     *  is used to determine the orientation of the kart. */
-    Vec3           m_previous_orig_xyz;
+    /** Length of the (adjusted, i.e. taking kart width into account)
+     *  start line. */
+    float m_start_line_length;
 
+    /** Length of the (adjusted, i.e. taking kart width into account) 
+     *  end line. */
+    float m_end_line_length;
+
+    /** Stores the position of the kart relative to the line width
+     *  at the current location. */
+    float m_fraction_of_line;
+
+    /** The initial heading of the kart when crossing the line. This is
+     *  used to smoothly orient the kart towards the normal of the cuve. */
+    btQuaternion m_delta_heading;
 public:
-             CannonAnimation(AbstractKart *kart, Ipo *ipo);
+             CannonAnimation(AbstractKart *kart, Ipo *ipo,
+                             const Vec3 &start_left, const Vec3 &start_right,
+                             const Vec3 &end_left, const Vec3 &end_right,
+                             float skid_rot);
     virtual ~CannonAnimation();
     virtual void  update(float dt);
 

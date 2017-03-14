@@ -40,17 +40,20 @@ flat out uvec2 hdle;
 
 void main(void)
 {
+
+    vec3 test = sin(windDir * (Position.y* 0.5)) * 0.5;
+    test += cos(windDir) * 0.7;
     mat4 ModelMatrix = getWorldMatrix(Origin, Orientation, Scale);
 #ifdef VSLayer
     gl_Layer = layer;
-    gl_Position = ShadowViewProjMatrixes[gl_Layer] * ModelMatrix * vec4(Position + windDir * Color.r, 1.);
+    gl_Position = ShadowViewProjMatrixes[gl_Layer] * ModelMatrix * vec4(Position + test * Color.r, 1.);
     uv = Texcoord;
 #ifdef Use_Bindless_Texture
     handle = Handle;
 #endif
 #else
     layerId = layer;
-    gl_Position = ShadowViewProjMatrixes[layerId] * ModelMatrix * vec4(Position + windDir * Color.r, 1.);
+    gl_Position = ShadowViewProjMatrixes[layerId] * ModelMatrix * vec4(Position + test * Color.r, 1.);
     tc = Texcoord;
 #ifdef Use_Bindless_Texture
     hdle = Handle;

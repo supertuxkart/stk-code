@@ -21,13 +21,17 @@ out int layerId;
 
 void main(void)
 {
+
+    vec3 test = sin(windDir * (Position.y* 0.5)) * 0.5;
+    test += cos(windDir) * 0.7;
+
 #ifdef VSLayer
     gl_Layer = layer;
     uv = Texcoord;
-    gl_Position = ShadowViewProjMatrixes[gl_Layer] * ModelMatrix * vec4(Position + windDir * Color.r, 1.);
+    gl_Position = ShadowViewProjMatrixes[gl_Layer] * ModelMatrix * vec4(Position + test * Color.r, 1.);
 #else
     layerId = layer;
     tc = Texcoord;
-    gl_Position = ShadowViewProjMatrixes[layerId] * ModelMatrix * vec4(Position + windDir * Color.r, 1.);
+    gl_Position = ShadowViewProjMatrixes[layerId] * ModelMatrix * vec4(Position + test * Color.r, 1.);
 #endif
 }
