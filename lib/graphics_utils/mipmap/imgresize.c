@@ -140,7 +140,7 @@ static inline CC_ALWAYSINLINE float srgb2linear( float v )
   if( v <= 0.04045f )
     v = v * (1.0f/12.92);
   else
-    v = pow( ( v + 0.055f ) * (1.0f/1.055f), 2.4f );
+    v = powf( ( v + 0.055f ) * (1.0f/1.055f), 2.4f );
   return v;
 }
 
@@ -151,7 +151,7 @@ static inline CC_ALWAYSINLINE float linear2srgb( float v )
   if( v <= 0.0031308f )
     v = v * 12.92f;
   else
-    v = 1.055f * pow( v, 1.0f/2.4f ) - 0.055f;
+    v = 1.055f * powf( v, 1.0f/2.4f ) - 0.055f;
   return 255.0f * v;
 }
 
