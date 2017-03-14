@@ -56,13 +56,6 @@ HQMipmapGenerator::HQMipmapGenerator(const io::path& name, uint8_t* data,
 }   // HQMipmapGenerator
 
 // ----------------------------------------------------------------------------
-HQMipmapGenerator::~HQMipmapGenerator()
-{
-    imFreeMipmapCascade((imMipmapCascade*)m_mipmap_data);
-    free(m_mipmap_data);
-}   // ~HQMipmapGenerator
-
-// ----------------------------------------------------------------------------
 void HQMipmapGenerator::threadedReload(void* ptr, void* param) const
 {
     imReduceOptions options;
@@ -84,16 +77,25 @@ void HQMipmapGenerator::threadedReload(void* ptr, void* param) const
             mm_cascade->mipmap[i + 1],
             m_mipmap_sizes[i].first.getArea() * (m_single_channel ? 1 : 4));
 #ifdef DUMP_MIPMAP
-        if (m_single_channel) continue;
+        uint8_t* data = (uint8_t*)mm_cascade->mipmap[i + 1];
+        if (m_single_channel)
+        {
+            const unsigned size = m_mipmap_sizes[i].first.getArea() * 4;
+            data = new uint8_t[size]();
+            for (unsigned j = 0; j < m_mipmap_sizes[i].first.getArea(); j++)
+                data[j * 4 + 3] = *((uint8_t*)(mm_cascade->mipmap[i + 1]) + j);
+        }
         video::IImage* image = irr_driver->getVideoDriver()
             ->createImageFromData(video::ECF_A8R8G8B8, m_mipmap_sizes[i].first,
-            mm_cascade->mipmap[i + 1], false/*ownForeignMemory*/);
+            data, m_single_channel/*ownForeignMemory*/);
         irr_driver->getVideoDriver()->writeImageToFile(image, std::string
             (StringUtils::toString(i) + "_" +
-            StringUtils::getBasename(NamedPath.getPtr()) + ".png").c_str());
+            StringUtils::getBasename(NamedPath.getPtr())).c_str());
         image->drop();
 #endif
     }
+    imFreeMipmapCascade((imMipmapCascade*)m_mipmap_data);
+    free(m_mipmap_data);
 }   // threadedReload
 
 // ----------------------------------------------------------------------------
