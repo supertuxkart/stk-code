@@ -531,7 +531,7 @@ static inline CC_ALWAYSINLINE __m128 simd4f_fastpow_ps( __m128 arg, uint32_t exp
 __m128 simd4f_pow12d5_ps( __m128 arg )
 {
   /* Lower exponents provide lower initial error, but too low causes overflow. */
-  __m128 xf = simd4f_fastpow_ps( arg, 4, 5, (int)( 1.38316186f * 1e9 ), (int)1e9 );
+  __m128 xf = simd4f_fastpow_ps( arg, 4, 5, (int)( 1.38316186f * (float)1e9 ), (int)1e9 );
   /* Imprecise 4-cycle sqrt is still far better than fastpow, good enough. */
   __m128 xfm4 = _mm_rsqrt_ps( xf );
   __m128 xf4 = _mm_mul_ps( xf, xfm4 );
@@ -552,7 +552,7 @@ __m128 simd4f_pow5d12_ps( __m128 arg )
   /* 5/12 is too small, so compute the 4th root of 20/12 instead. */
   /* 20/12 = 5/3 = 1 + 2/3 = 2 - 1/3. 2/3 is a suitable argument for fastpow. */
   /* weighting coefficient: a^-1/2 = 2 a; a = 2^-2/3 */
-  __m128 xf = simd4f_fastpow_ps( arg, 2, 3, (int)( 0.629960524947437f * 1e9 ), (int)1e9 );
+  __m128 xf = simd4f_fastpow_ps( arg, 2, 3, (int)( 0.629960524947437f * (float)1e9 ), (int)1e9 );
   __m128 xover = _mm_mul_ps( arg, xf );
   __m128 xfm1 = _mm_rsqrt_ps( xf );
   __m128 x2 = _mm_mul_ps( arg, arg );

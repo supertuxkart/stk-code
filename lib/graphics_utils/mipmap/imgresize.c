@@ -82,7 +82,7 @@ static inline CC_ALWAYSINLINE uint32_t ccIsPow2Int32( uint32_t v )
 ////
 
 
-#if defined(__x86_64__) || defined(__x86_64) || defined(__amd64__) || defined(__amd64) || defined(__i386__) || defined(__i386)  || defined(i386)
+#if defined(__x86_64__) || defined(__x86_64) || defined(__amd64__) || defined(__amd64) || defined(__i386__) || defined(__i386) || defined(i386) || defined(_M_X64) || defined(_M_AMD64) || defined(_M_IX86) || defined(_X86_)
 
 /* Input is 0.0,255.0, output is 0.0,1.0 */
 static inline CC_ALWAYSINLINE float srgb2linear( float v )
@@ -270,7 +270,7 @@ static inline CC_ALWAYSINLINE double bessel( double x )
 
 static inline CC_ALWAYSINLINE double kaiser( double x, double beta )
 {
-  return bessel( beta * sqrt( fmaxf( 0.0, 1.0 - ( x * x ) ) ) );
+  return bessel( beta * sqrt( fmax( 0.0, 1.0 - ( x * x ) ) ) );
 }
 
 static inline CC_ALWAYSINLINE double sinc( double x )
@@ -377,18 +377,19 @@ static int imBuildStaticMatrix( imStaticMatrixState * CC_RESTRICT state, int siz
   int i, j, minx, maxx;
   double x, xshift, hopsize, offset, scalefactor, hopcountinv, beta, linsq, sum;
   double *linear;
+  float suminv;
   float *matrix;
 
   if( alpha > 16.0f )
     alpha = 16.0f;
-  beta = alpha * M_PI;
-  hopcountinv = 1.0 / hopcount;
+  beta = (double)alpha * (double)M_PI;
+  hopcountinv = 1.0 / (double)hopcount;
 
   scalefactor = 1.0 / (double)sizedivisor;
   hopsize = 0.5 * (double)sizedivisor;
   offset = hopsize - 0.5;
-  minx = (int)ceil( ( -hopcount * hopsize ) + offset );
-  maxx = (int)floor( ( hopcount * hopsize ) + offset );
+  minx = (int)ceil( ( (double)-hopcount * hopsize ) + offset );
+  maxx = (int)floor( ( (double)hopcount * hopsize ) + offset );
   state->matrixoffset = minx;
   state->matrixsize = ( maxx - minx ) + 1;
   state->matrixrowwidth = ( state->matrixsize + 3 ) & ~3;
@@ -435,10 +436,10 @@ static int imBuildStaticMatrix( imStaticMatrixState * CC_RESTRICT state, int siz
   printf( "Matrix sum : %f\n", sum );
 #endif
 
-  sum = 1.0 / sum;
+  suminv = (float)( 1.0 / sum );
   j = state->matrixsize * state->matrixrowwidth;
   for( i = 0 ; i < j ; i++ )
-    state->matrix[i] *= sum;
+    state->matrix[i] *= suminv;
 
 #if IM_RESIZE_DEBUG
   printf( "Matrix %dx%d :\n", state->matrixsize, state->matrixsize );
@@ -508,7 +509,7 @@ static inline int imAllocGenericState( imGenericMatrixState *state, float scalex
   align = (void *)( ( (uintptr_t)state->alloc + 0xf ) & ~0xf );
   state->linearx = align;
   state->lineary = ADDRESS( align, allocx * sizeof(float) );
-  state->beta = (float)alpha * M_PI;
+  state->beta = alpha * (float)M_PI;
   state->hopcountinv = 1.0f / (float)hopcount;
   return 1;
 }
@@ -519,7 +520,7 @@ static inline void imBuildGenericLinearX( imGenericMatrixState *state, float sca
   float hopsizex, offsetx;
   float *linearx;
 
-  hopsizex = 0.5 * scaleinvx;
+  hopsizex = 0.5f * scaleinvx;
   offsetx = (float)sourcex;
   minx = (int)ceil( ( -hopcount * hopsizex ) + offsetx );
   maxx = (int)floor( ( hopcount * hopsizex ) + offsetx );
@@ -527,7 +528,7 @@ static inline void imBuildGenericLinearX( imGenericMatrixState *state, float sca
   state->matrixoffsetx = ( minx + ( width << 8 ) ) % width;
 
   linearx = state->linearx;
-  scalex *= 2.0;
+  scalex *= 2.0f;
 #if CPU_SSE2_SUPPORT
   for( i = 0 ; i < state->matrixsizex ; i += 4 )
   {
@@ -564,7 +565,7 @@ static inline void imBuildGenericLinearY( imGenericMatrixState *state, float sca
   float hopsizey, offsety;
   float *lineary;
 
-  hopsizey = 0.5 * scaleinvy;
+  hopsizey = 0.5f * scaleinvy;
   offsety = (float)sourcey;
   miny = (int)ceil( ( -hopcount * hopsizey ) + offsety );
   maxy = (int)floor( ( hopcount * hopsizey ) + offsety );
@@ -572,7 +573,7 @@ static inline void imBuildGenericLinearY( imGenericMatrixState *state, float sca
   state->matrixoffsety = ( miny + ( height << 8 ) ) % height;
 
   lineary = state->lineary;
-  scaley *= 2.0;
+  scaley *= 2.0f;
 #if CPU_SSE2_SUPPORT
   for( i = 0 ; i < state->matrixsizey ; i += 4 )
   {
@@ -1029,14 +1030,7 @@ static void imStaticKernel1sRGB( unsigned char *dst, int pointx, int pointy, imS
   }
 
 #if CPU_SSE2_SUPPORT
-  union
-  {
-    char c[4];
-    uint32_t i;
-  } u;
-  vsum = linear2srgb3( vsum );
-  _mm_store_ss( (void *)&u.i, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
-  dst[0] = u.c[0];
+  dst[0] = _mm_cvtsi128_si32( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) );
 #else
   dst[0] = (unsigned char)( fmaxf( 0.0f, fminf( 255.0f, linear2srgb( sum0 ) + 0.5f ) ) );
 #endif
@@ -2501,7 +2495,7 @@ static void imDynamicKernel4LinearAlphaNorm( unsigned char *dst, imGenericMatrix
   sum3 *= matrixsum;
   if( sum3 >= state->minimumalphaf )
   {
-    f = 1.0 / sum3;
+    f = 1.0f / sum3;
     dst[0] = (unsigned char)( fmaxf( 0.0f, fminf( 255.0f, ( sum0 * f ) + 0.5f ) ) );
     dst[1] = (unsigned char)( fmaxf( 0.0f, fminf( 255.0f, ( sum1 * f ) + 0.5f ) ) );
     dst[2] = (unsigned char)( fmaxf( 0.0f, fminf( 255.0f, ( sum2 * f ) + 0.5f ) ) );
@@ -3662,19 +3656,19 @@ static inline CC_ALWAYSINLINE void imReduceHalfBox3Normal( unsigned char *dst, u
 {
   float v0, v1, v2, suminv;
 
-  v0 = (1.0/1020.0) * (float)( (int)src[0] + (int)src[bytesperpixel+0] + (int)src[bytesperline+0] + (int)src[bytesperpixel+bytesperline+0] );
-  v1 = (1.0/1020.0) * (float)( (int)src[1] + (int)src[bytesperpixel+1] + (int)src[bytesperline+1] + (int)src[bytesperpixel+bytesperline+1] );
-  v2 = (1.0/1020.0) * (float)( (int)src[2] + (int)src[bytesperpixel+2] + (int)src[bytesperline+2] + (int)src[bytesperpixel+bytesperline+2] );
-  v0 = 2.0 * ( v0 - 0.5 );
-  v1 = 2.0 * ( v1 - 0.5 );
-  v2 = 2.0 * ( v2 - 0.5 );
-  suminv = 0.5 / sqrtf( ( v0 * v0 ) + ( v1 * v1 ) + ( v2 * v2 ) );
-  v0 = 0.5 + ( v0 * suminv );
-  v1 = 0.5 + ( v1 * suminv );
-  v2 = 0.5 + ( v2 * suminv );
-  dst[0] = (unsigned char)ROUND_POSITIVE_FLOAT( 255.0 * v0 );
-  dst[1] = (unsigned char)ROUND_POSITIVE_FLOAT( 255.0 * v1 );
-  dst[2] = (unsigned char)ROUND_POSITIVE_FLOAT( 255.0 * v2 );
+  v0 = (1.0f/1020.0f) * (float)( (int)src[0] + (int)src[bytesperpixel+0] + (int)src[bytesperline+0] + (int)src[bytesperpixel+bytesperline+0] );
+  v1 = (1.0f/1020.0f) * (float)( (int)src[1] + (int)src[bytesperpixel+1] + (int)src[bytesperline+1] + (int)src[bytesperpixel+bytesperline+1] );
+  v2 = (1.0f/1020.0f) * (float)( (int)src[2] + (int)src[bytesperpixel+2] + (int)src[bytesperline+2] + (int)src[bytesperpixel+bytesperline+2] );
+  v0 = 2.0f * ( v0 - 0.5f );
+  v1 = 2.0f * ( v1 - 0.5f );
+  v2 = 2.0f * ( v2 - 0.5f );
+  suminv = 0.5f / sqrtf( ( v0 * v0 ) + ( v1 * v1 ) + ( v2 * v2 ) );
+  v0 = 0.5f + ( v0 * suminv );
+  v1 = 0.5f + ( v1 * suminv );
+  v2 = 0.5f + ( v2 * suminv );
+  dst[0] = (unsigned char)ROUND_POSITIVE_FLOAT( 255.0f * v0 );
+  dst[1] = (unsigned char)ROUND_POSITIVE_FLOAT( 255.0f * v1 );
+  dst[2] = (unsigned char)ROUND_POSITIVE_FLOAT( 255.0f * v2 );
 
   return;
 }
@@ -3683,19 +3677,19 @@ static inline CC_ALWAYSINLINE void imReduceHalfBox4Normal( unsigned char *dst, u
 {
   float v0, v1, v2, suminv;
 
-  v0 = (1.0/1020.0) * (float)( (int)src[0] + (int)src[bytesperpixel+0] + (int)src[bytesperline+0] + (int)src[bytesperpixel+bytesperline+0] );
-  v1 = (1.0/1020.0) * (float)( (int)src[1] + (int)src[bytesperpixel+1] + (int)src[bytesperline+1] + (int)src[bytesperpixel+bytesperline+1] );
-  v2 = (1.0/1020.0) * (float)( (int)src[2] + (int)src[bytesperpixel+2] + (int)src[bytesperline+2] + (int)src[bytesperpixel+bytesperline+2] );
-  v0 = 2.0 * ( v0 - 0.5 );
-  v1 = 2.0 * ( v1 - 0.5 );
-  v2 = 2.0 * ( v2 - 0.5 );
-  suminv = 0.5 / sqrtf( ( v0 * v0 ) + ( v1 * v1 ) + ( v2 * v2 ) );
-  v0 = 0.5 + ( v0 * suminv );
-  v1 = 0.5 + ( v1 * suminv );
-  v2 = 0.5 + ( v2 * suminv );
-  dst[0] = (unsigned char)ROUND_POSITIVE_FLOAT( 255.0 * v0 );
-  dst[1] = (unsigned char)ROUND_POSITIVE_FLOAT( 255.0 * v1 );
-  dst[2] = (unsigned char)ROUND_POSITIVE_FLOAT( 255.0 * v2 );
+  v0 = (1.0f/1020.0f) * (float)( (int)src[0] + (int)src[bytesperpixel+0] + (int)src[bytesperline+0] + (int)src[bytesperpixel+bytesperline+0] );
+  v1 = (1.0f/1020.0f) * (float)( (int)src[1] + (int)src[bytesperpixel+1] + (int)src[bytesperline+1] + (int)src[bytesperpixel+bytesperline+1] );
+  v2 = (1.0f/1020.0f) * (float)( (int)src[2] + (int)src[bytesperpixel+2] + (int)src[bytesperline+2] + (int)src[bytesperpixel+bytesperline+2] );
+  v0 = 2.0f * ( v0 - 0.5f );
+  v1 = 2.0f * ( v1 - 0.5f );
+  v2 = 2.0f * ( v2 - 0.5f );
+  suminv = 0.5f / sqrtf( ( v0 * v0 ) + ( v1 * v1 ) + ( v2 * v2 ) );
+  v0 = 0.5f + ( v0 * suminv );
+  v1 = 0.5f + ( v1 * suminv );
+  v2 = 0.5f + ( v2 * suminv );
+  dst[0] = (unsigned char)ROUND_POSITIVE_FLOAT( 255.0f * v0 );
+  dst[1] = (unsigned char)ROUND_POSITIVE_FLOAT( 255.0f * v1 );
+  dst[2] = (unsigned char)ROUND_POSITIVE_FLOAT( 255.0f * v2 );
   dst[3] = (unsigned char)( ( (int)src[3] + (int)src[bytesperpixel+3] + (int)src[bytesperline+3] + (int)src[bytesperpixel+bytesperline+3] + 2 ) >> 2 );
 
   return;
@@ -4100,6 +4094,5 @@ void imPropagateAlphaBorder( unsigned char *imagedata, int width, int height, in
 
   return;
 }
-
 
 

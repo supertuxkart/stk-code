@@ -356,7 +356,7 @@ static inline void simdPrintDebugSSE4f( char *str, __m128 v )
 {
   float CPU_ALIGN16 store[4];
   _mm_store_ps( (void *)store, v );
-  printf( "%s %f %f %f %f\n", str, store[0], store[1], store[2], store[3] );
+  printf( "%s %f %f %f %f\n", str, (double)store[0], (double)store[1], (double)store[2], (double)store[3] );
   return;
 }
 
