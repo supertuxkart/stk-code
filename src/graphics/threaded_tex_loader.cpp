@@ -72,6 +72,9 @@ void* ThreadedTexLoader::startRoutine(void *obj)
         target_tex->cleanThreadedLoader();
         ttl->m_tex_size_loaded += target_tex->getTextureSize();
         ttl->m_completed_textures.push_back(target_tex);
+        pthread_mutex_lock(ttl->m_texture_queue_mutex);
+        ttl->m_stktm->setThreadedLoadTextureCounter(-1);
+        pthread_mutex_unlock(ttl->m_texture_queue_mutex);
     }
     return NULL;
 }   // startRoutine

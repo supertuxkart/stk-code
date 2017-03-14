@@ -23,8 +23,10 @@
 #include "utils/singleton.hpp"
 
 #include "irrString.h"
+#include "ITexture.h"
 #include <pthread.h>
 
+#include <cassert>
 #include <string>
 #include <queue>
 #include <unordered_map>
@@ -34,7 +36,7 @@ class STKTexture;
 class ThreadedTexLoader;
 namespace irr
 {
-    namespace video { class ITexture; class SColor; }
+    namespace video { class SColor; }
 }
 
 class STKTexManager : public Singleton<STKTexManager>, NoCopy
@@ -61,6 +63,8 @@ private:
     std::priority_queue<irr::video::ITexture*,
         std::vector<irr::video::ITexture*>, SmallestTexture>
         m_threaded_load_textures;
+
+    int m_threaded_load_textures_counter;
 
     pthread_mutex_t m_threaded_load_textures_mutex;
 
@@ -156,10 +160,17 @@ public:
     irr::video::ITexture* getThreadedLoadTexture()
                                      { return m_threaded_load_textures.top(); }
     // ------------------------------------------------------------------------
+    void setThreadedLoadTextureCounter(int val)
+    {
+        m_threaded_load_textures_counter += val;
+        assert(m_threaded_load_textures_counter >= 0);
+    }
+    // ------------------------------------------------------------------------
     void addThreadedLoadTexture(irr::video::ITexture* t)
     {
         pthread_mutex_lock(&m_threaded_load_textures_mutex);
         m_threaded_load_textures.push(t);
+        setThreadedLoadTextureCounter(t->getThreadedLoadTextureCounter());
         pthread_cond_signal(&m_cond_request);
         pthread_mutex_unlock(&m_threaded_load_textures_mutex);
     }

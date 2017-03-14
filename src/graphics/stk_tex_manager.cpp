@@ -29,7 +29,8 @@
 #include <algorithm>
 
 // ----------------------------------------------------------------------------
-STKTexManager::STKTexManager() : m_pbo(0), m_thread_size(0)
+STKTexManager::STKTexManager() : m_pbo(0), m_thread_size(0),
+                                 m_threaded_load_textures_counter(0)
 {
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (CVS->supportsThreadedTextureLoading())
@@ -362,7 +363,7 @@ void STKTexManager::checkThreadedLoadTextures(bool util_queue_empty)
         while (true)
         {
             pthread_mutex_lock(&m_threaded_load_textures_mutex);
-            empty_queue = m_threaded_load_textures.empty();
+            empty_queue = m_threaded_load_textures_counter == 0;
             pthread_mutex_unlock(&m_threaded_load_textures_mutex);
             if (empty_queue)
             {

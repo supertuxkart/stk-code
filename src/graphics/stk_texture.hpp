@@ -153,6 +153,11 @@ public:
     virtual void threadedSubImage(void* ptr) const;
     // ------------------------------------------------------------------------
     virtual void cleanThreadedLoader();
+    // ------------------------------------------------------------------------
+    virtual int getThreadedLoadTextureCounter() const
+    {
+        return useHQMipmap() ? 2 : 1;
+    }
 
 };   // STKTexture
 
