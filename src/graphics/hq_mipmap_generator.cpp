@@ -33,10 +33,10 @@ extern "C"
 // ----------------------------------------------------------------------------
 HQMipmapGenerator::HQMipmapGenerator(const io::path& name, uint8_t* data,
                                      const core::dimension2d<u32>& size,
-                                     GLuint texture_name, bool single_channel)
+                                     GLuint texture_name)
                  : video::ITexture(name), m_orig_data(data), m_size(size),
                    m_texture_name(texture_name), m_texture_size(0),
-                   m_single_channel(single_channel), m_mipmap_data(NULL)
+                   m_mipmap_data(NULL)
 {
     unsigned width = m_size.Width;
     unsigned height = m_size.Height;
@@ -46,12 +46,11 @@ HQMipmapGenerator::HQMipmapGenerator(const io::path& name, uint8_t* data,
         height = height < 2 ? 1 : height >> 1;
         m_mipmap_sizes.emplace_back(core::dimension2du(width, height),
             m_texture_size);
-        m_texture_size += width * height * (m_single_channel ? 1 : 4);
+        m_texture_size += width * height * 4;
         if (width == 1 && height == 1)
             break;
     }
-    m_texture_size = unsigned(m_mipmap_sizes.back().second) +
-        (m_single_channel ? 1 : 4);
+    m_texture_size = unsigned(m_mipmap_sizes.back().second) + 4;
     m_mipmap_data = malloc(sizeof(imMipmapCascade));
 }   // HQMipmapGenerator
 
@@ -63,19 +62,17 @@ void HQMipmapGenerator::threadedReload(void* ptr, void* param) const
     imMipmapCascade* mm_cascade = (imMipmapCascade*)m_mipmap_data;
 #ifdef DEBUG
     int ret = imBuildMipmapCascade(mm_cascade, m_orig_data, m_size.Width,
-        m_size.Height, 1/*layercount*/, m_single_channel ? 1 : 4,
-        m_single_channel ? m_size.Width : m_size.Width * 4, &options, 0);
+        m_size.Height, 1/*layercount*/, 4, m_size.Width * 4, &options, 0);
     assert(ret == 1);
 #else
     imBuildMipmapCascade(mm_cascade, m_orig_data, m_size.Width,
-        m_size.Height, 1/*layercount*/, m_single_channel ? 1 : 4,
-        m_single_channel ? m_size.Width : m_size.Width * 4, &options, 0);
+        m_size.Height, 1/*layercount*/, 4, m_size.Width * 4, &options, 0);
 #endif
     for (unsigned int i = 0; i < m_mipmap_sizes.size(); i++)
     {
         memcpy((uint8_t*)ptr + m_mipmap_sizes[i].second,
             mm_cascade->mipmap[i + 1],
-            m_mipmap_sizes[i].first.getArea() * (m_single_channel ? 1 : 4));
+            m_mipmap_sizes[i].first.getArea() *  4);
 #ifdef DUMP_MIPMAP
         uint8_t* data = (uint8_t*)mm_cascade->mipmap[i + 1];
         if (m_single_channel)
@@ -94,8 +91,6 @@ void HQMipmapGenerator::threadedReload(void* ptr, void* param) const
         image->drop();
 #endif
     }
-    imFreeMipmapCascade((imMipmapCascade*)m_mipmap_data);
-    free(m_mipmap_data);
 }   // threadedReload
 
 // ----------------------------------------------------------------------------
@@ -107,7 +102,7 @@ void HQMipmapGenerator::threadedSubImage(void* ptr) const
     {
         glTexSubImage2D(GL_TEXTURE_2D, i + 1, 0, 0,
             m_mipmap_sizes[i].first.Width, m_mipmap_sizes[i].first.Height,
-            m_single_channel ? GL_RED : GL_BGRA, GL_UNSIGNED_BYTE,
+            GL_BGRA, GL_UNSIGNED_BYTE,
             (uint8_t*)ptr + m_mipmap_sizes[i].second);
     }
     delete this;
@@ -118,4 +113,6 @@ void HQMipmapGenerator::threadedSubImage(void* ptr) const
 void HQMipmapGenerator::cleanThreadedLoader()
 {
     delete[] m_orig_data;
+    imFreeMipmapCascade((imMipmapCascade*)m_mipmap_data);
+    free(m_mipmap_data);
 }   // cleanThreadedLoader

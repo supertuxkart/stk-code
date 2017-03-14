@@ -236,35 +236,7 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
     if (!useThreadedLoading())
         formatConversion(data, &format, w, h);
 
-    if (useThreadedLoading())
-    {
-        if (m_texture_name == 0)
-        {
-            glGenTextures(1, &m_texture_name);
-            glBindTexture(GL_TEXTURE_2D, m_texture_name);
-            if (m_single_channel)
-            {
-                glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_ONE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_ONE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_ONE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_RED);
-            }
-            int levels = 1;
-            int width = w;
-            int height = h;
-            while (true)
-            {
-                width = width < 2 ? 1 : width >> 1;
-                height = height < 2 ? 1 : height >> 1;
-                levels++;
-                if (width == 1 && height == 1)
-                    break;
-            }
-            glTexStorage2D(GL_TEXTURE_2D, levels, internal_format, w, h);
-        }
-    }
-    else if (!no_upload)
+    if (!no_upload)
     {
         const bool reload = m_texture_name != 0;
         if (!reload)
@@ -281,8 +253,26 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_ONE);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_RED);
             }
-            glTexImage2D(GL_TEXTURE_2D, 0, internal_format, w, h, 0, format,
-                GL_UNSIGNED_BYTE, data);
+            if (useThreadedLoading())
+            {
+                int levels = 1;
+                int width = w;
+                int height = h;
+                while (true)
+                {
+                    width = width < 2 ? 1 : width >> 1;
+                    height = height < 2 ? 1 : height >> 1;
+                    levels++;
+                    if (width == 1 && height == 1)
+                        break;
+                }
+                glTexStorage2D(GL_TEXTURE_2D, levels, internal_format, w, h);
+            }
+            else
+            {
+                glTexImage2D(GL_TEXTURE_2D, 0, internal_format, w, h, 0, format,
+                    GL_UNSIGNED_BYTE, data);
+            }
         }
         else
         {
@@ -291,7 +281,7 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
         }
         if (orig_img)
             orig_img->unlock();
-        if (hasMipMaps())
+        if (!useThreadedLoading() && hasMipMaps())
             glGenerateMipmap(GL_TEXTURE_2D);
     }
 
@@ -631,7 +621,7 @@ void STKTexture::threadedReload(void* ptr, void* param) const
     if (useHQMipmap())
     {
         HQMipmapGenerator* hqmg = new HQMipmapGenerator(NamedPath, data,
-            m_size, m_texture_name, m_single_channel);
+            m_size, m_texture_name);
         ((STKTexManager*)(param))->addThreadedLoadTexture(hqmg);
     }
     else
@@ -665,6 +655,6 @@ void STKTexture::cleanThreadedLoader()
 //-----------------------------------------------------------------------------
 bool STKTexture::useHQMipmap() const
 {
-    return UserConfigParams::m_hq_mipmap && m_size.Width > 1 &&
-        m_size.Height > 1;
+    return !m_single_channel && UserConfigParams::m_hq_mipmap &&
+        m_size.Width > 1 && m_size.Height > 1;
 }   // useHQMipmap

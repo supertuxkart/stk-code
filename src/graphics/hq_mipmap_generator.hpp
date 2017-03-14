@@ -38,8 +38,6 @@ private:
 
     unsigned int m_texture_size;
 
-    bool m_single_channel;
-
     void* m_mipmap_data;
 
     std::vector<std::pair<core::dimension2d<u32>, size_t> > m_mipmap_sizes;
@@ -47,8 +45,7 @@ private:
 public:
     // ------------------------------------------------------------------------
     HQMipmapGenerator(const io::path& name, uint8_t* data,
-                      const core::dimension2d<u32>& size, GLuint texture_name,
-                      bool single_channel);
+                      const core::dimension2d<u32>& size, GLuint texture_name);
     // ------------------------------------------------------------------------
     virtual ~HQMipmapGenerator() {}
     // ------------------------------------------------------------------------
