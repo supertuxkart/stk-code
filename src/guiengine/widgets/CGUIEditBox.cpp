@@ -1256,7 +1256,7 @@ bool CGUIEditBox::processMouse(const SEvent& event)
 
                 if (GUIEngine::ScreenKeyboard::getCurrent() == NULL)
                 {
-                    new GUIEngine::ScreenKeyboard(0.98, 0.30, this);
+                    new GUIEngine::ScreenKeyboard(0.98f, 0.30f, this);
                 }
 
                 return true;
