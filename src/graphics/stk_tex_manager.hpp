@@ -57,8 +57,11 @@ private:
     class SmallestTexture
     {
     public:
-        bool operator()(const irr::video::ITexture* a,
-            const irr::video::ITexture* b) const;
+        inline bool operator()(const irr::video::ITexture* a,
+            const irr::video::ITexture* b) const
+        {
+            return a->getTextureSize() > b->getTextureSize();
+        }
     };
     std::priority_queue<irr::video::ITexture*,
         std::vector<irr::video::ITexture*>, SmallestTexture>

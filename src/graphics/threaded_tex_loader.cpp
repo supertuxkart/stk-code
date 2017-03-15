@@ -33,7 +33,6 @@ void* ThreadedTexLoader::startRoutine(void *obj)
     {
         pthread_mutex_lock(&ttl->m_mutex);
         bool finished = ttl->finishedLoading();
-        bool has_completed_tex = !ttl->m_completed_textures.empty();
         pthread_mutex_unlock(&ttl->m_mutex);
         if (finished)
         {
@@ -41,7 +40,8 @@ void* ThreadedTexLoader::startRoutine(void *obj)
         }
         pthread_mutex_lock(ttl->m_texture_queue_mutex);
         bool waiting = ttl->m_stktm->isThreadedLoadTexturesEmpty();
-        ttl->m_last_queue_ready.setAtomic(has_completed_tex && waiting);
+        ttl->m_last_queue_ready.setAtomic(!ttl->m_completed_textures.empty() &&
+            waiting);
         while (waiting)
         {
             pthread_cond_wait(ttl->m_cond_request, ttl->m_texture_queue_mutex);
