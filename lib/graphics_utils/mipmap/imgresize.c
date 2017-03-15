@@ -1030,7 +1030,7 @@ static void imStaticKernel1sRGB( unsigned char *dst, int pointx, int pointy, imS
   }
 
 #if CPU_SSE2_SUPPORT
-  dst[0] = _mm_cvtsi128_si32( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) );
+  dst[0] = _mm_cvtsi128_si32( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( linear2srgb3( vsum ) ), vzero ), vzero ) );
 #else
   dst[0] = (unsigned char)( fmaxf( 0.0f, fminf( 255.0f, linear2srgb( sum0 ) + 0.5f ) ) );
 #endif
