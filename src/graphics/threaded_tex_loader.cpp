@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+
 #include "graphics/threaded_tex_loader.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -82,7 +84,6 @@ void* ThreadedTexLoader::startRoutine(void *obj)
 // ----------------------------------------------------------------------------
 void ThreadedTexLoader::handleCompletedTextures()
 {
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     assert(m_locked);
     size_t offset = m_pbo_offset;
     for (irr::video::ITexture* tex : m_completed_textures)
@@ -92,5 +93,6 @@ void ThreadedTexLoader::handleCompletedTextures()
         offset += cur_offset;
     }
     m_completed_textures.clear();
-#endif
 }   // handleCompletedTextures
+
+#endif

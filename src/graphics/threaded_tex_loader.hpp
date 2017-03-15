@@ -18,6 +18,8 @@
 #ifndef HEADER_THREADED_TEX_LOADER_HPP
 #define HEADER_THREADED_TEX_LOADER_HPP
 
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+
 #include "utils/can_be_deleted.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/synchronised.hpp"
@@ -110,5 +112,7 @@ public:
     }
 
 };   // ThreadedTexLoader
+
+#endif
 
 #endif

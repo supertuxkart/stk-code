@@ -18,6 +18,8 @@
 #ifndef HEADER_HQ_MIPMAP_GENERATOR_HPP
 #define HEADER_HQ_MIPMAP_GENERATOR_HPP
 
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+
 #include "graphics/gl_headers.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
@@ -91,5 +93,7 @@ public:
     virtual void cleanThreadedLoader();
 
 };   // HQMipmapGenerator
+
+#endif
 
 #endif

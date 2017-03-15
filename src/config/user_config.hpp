@@ -553,6 +553,11 @@ namespace UserConfigParams
         &m_video_group, "Max texture size when high definition textures are "
                         "disabled"));
 
+    PARAM_PREFIX BoolUserConfigParam        m_hq_mipmap
+        PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
+        &m_video_group, "Generate mipmap for textures using "
+                        "high quality method with SSE"));
+
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
     PARAM_PREFIX bool m_unit_testing PARAM_DEFAULT(false);
@@ -616,9 +621,6 @@ namespace UserConfigParams
 
     /** True if graphical profiler should be displayed */
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
-
-    /** True if hardware skinning should be enabled */
-    PARAM_PREFIX bool m_hw_skinning_enabled  PARAM_DEFAULT( false );
 
     // not saved to file
 
@@ -933,11 +935,6 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_everything_unlocked
             PARAM_DEFAULT( BoolUserConfigParam(false, "everything_unlocked",
                                "Enable all karts and tracks") );
-
-    PARAM_PREFIX BoolUserConfigParam        m_hq_mipmap
-            PARAM_DEFAULT( BoolUserConfigParam(false, "hq_mipmap",
-                               "Generate mipmap for textures using "
-                               "high quality method with SSE") );
 
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;

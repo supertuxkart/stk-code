@@ -243,7 +243,6 @@ void CentralVideoSettings::init()
         {
             hasTextureStorage = true;
             hasTextureSwizzle = true;
-            hasPixelBufferObject = true;
         }
 
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXPLICIT_ATTRIB_LOCATION) &&

@@ -28,7 +28,6 @@
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
-#include <algorithm>
 #include <fstream>
 #include <functional>
 
@@ -218,7 +217,7 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
     const unsigned int w = m_size.Width;
     const unsigned int h = m_size.Height;
     unsigned int format = m_single_channel ? GL_RED : GL_BGRA;
-    unsigned int internal_format = m_single_channel ? GL_R8 : GL_RGBA8;
+    unsigned int internal_format = m_single_channel ? GL_R8 : GL_RGBA;
 
 #if !defined(USE_GLES2)
     if (m_mesh_texture && CVS->isTextureCompressionEnabled())
@@ -598,6 +597,7 @@ bool STKTexture::useThreadedLoading() const
 //-----------------------------------------------------------------------------
 void STKTexture::threadedReload(void* ptr, void* param) const
 {
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     video::IImage* orig_img =
         m_img_loader->loadImage(m_file, true/*skip_checking*/);
     orig_img = resizeImage(orig_img);
@@ -626,6 +626,7 @@ void STKTexture::threadedReload(void* ptr, void* param) const
     }
     else
         delete[] data;
+#endif
 }   // threadedReload
 
 //-----------------------------------------------------------------------------
@@ -646,10 +647,12 @@ void STKTexture::threadedSubImage(void* ptr) const
 //-----------------------------------------------------------------------------
 void STKTexture::cleanThreadedLoader()
 {
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     assert(m_file);
     m_file->drop();
     m_file = NULL;
     m_img_loader = NULL;
+#endif
 }   // cleanThreadedLoader
 
 //-----------------------------------------------------------------------------
