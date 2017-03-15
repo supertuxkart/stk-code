@@ -38,12 +38,11 @@ struct GFXPreset
     bool weather;
     bool animatedScenery;
     int animatedCharacters;
-    int anisotropy;
+    int image_quality;
     /** Depth of field */
     bool dof;
     bool global_illumination;
     bool degraded_ibl;
-    int hd_textures;
 };
 
 /**
@@ -81,6 +80,8 @@ public:
     virtual void unloaded() OVERRIDE;
 
     void         updateGfxSlider();
+    static int getImageQuality();
+    static void setImageQuality(int quality);
 };
 
 #endif

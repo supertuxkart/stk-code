@@ -35,23 +35,24 @@ STKTexManager::STKTexManager() : m_pbo(0), m_thread_size(0),
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (CVS->supportsThreadedTextureLoading())
     {
-        UserConfigParams::m_hq_mipmap = true;
         pthread_mutex_init(&m_threaded_load_textures_mutex, NULL);
         pthread_cond_init(&m_cond_request, NULL);
         m_thread_size = HardwareStats::getNumProcessors();
-        m_thread_size = core::clamp(m_thread_size, 1, 8);
-        static const unsigned max_pbo_size = 128 * 1024 * 1024;
-        const unsigned each_capacity = max_pbo_size / m_thread_size;
+        m_thread_size = core::clamp(m_thread_size, 1,
+            UserConfigParams::m_hq_mipmap ? m_thread_size : 3);
+        const unsigned each_capacity = 16 * 1024 * 1024;
+        const unsigned pbo_size = each_capacity * m_thread_size;
         Log::info("STKTexManager", "%d thread(s) for texture loading,"
-            " each capacity %d MB", m_thread_size,
-            each_capacity / 1024 / 1024);
+            " each capacity 16 MB.", m_thread_size);
+        if (UserConfigParams::m_hq_mipmap)
+            Log::info("STKTexManager", "High quality mipmap enabled.");
         glGenBuffers(1, &m_pbo);
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pbo);
-        glBufferStorage(GL_PIXEL_UNPACK_BUFFER, max_pbo_size, NULL,
+        glBufferStorage(GL_PIXEL_UNPACK_BUFFER, pbo_size, NULL,
             GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT |
             GL_MAP_COHERENT_BIT);
         uint8_t* pbo_ptr = (uint8_t*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER,
-            0, max_pbo_size, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT |
+            0, pbo_size, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT |
             GL_MAP_COHERENT_BIT);
         size_t offset = 0;
         for (int i = 0; i < m_thread_size; i++)
@@ -63,7 +64,6 @@ STKTexManager::STKTexManager() : m_pbo(0), m_thread_size(0),
         }
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     }
-
 #endif
 }   // STKTexManager
 
