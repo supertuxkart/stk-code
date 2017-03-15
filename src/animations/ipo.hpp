@@ -116,7 +116,7 @@ private:
     *  it is declared mutable). */
     mutable unsigned int m_next_n;
 
-    void updateNextN(float time) const;
+    void updateNextN(float *time) const;
 
     Ipo(const Ipo *ipo);
 public:

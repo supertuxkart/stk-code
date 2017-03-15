@@ -534,18 +534,18 @@ void Ipo::update(float time, Vec3 *xyz, Vec3 *hpr,Vec3 *scale)
  *  the time.
  *  \param t Time for which m_next_n needs to be updated.
  */
-void Ipo::updateNextN(float time) const
+void Ipo::updateNextN(float *time) const
 {
-    time = m_ipo_data->adjustTime(time);
+    *time = m_ipo_data->adjustTime(*time);
 
     // Time was reset since the last cached value for n,
     // reset n to start from the beginning again.
-    if (time < m_ipo_data->m_points[m_next_n - 1].getW())
+    if (*time < m_ipo_data->m_points[m_next_n - 1].getW())
         m_next_n = 1;
     // Search for the first point in the (sorted) array which is greater or equal
     // to the current time.
     while (m_next_n < m_ipo_data->m_points.size() - 1 &&
-        time >= m_ipo_data->m_points[m_next_n].getW())
+        *time >= m_ipo_data->m_points[m_next_n].getW())
     {
         m_next_n++;
     }   // while
@@ -564,7 +564,7 @@ float Ipo::get(float time, unsigned int index) const
     if(m_next_n==0)
         return m_ipo_data->m_points[0][index];
 
-    updateNextN(time);
+    updateNextN(&time);
 
     float rval = m_ipo_data->get(time, index, m_next_n-1);
     assert(!std::isnan(rval));
@@ -587,7 +587,7 @@ void Ipo::getDerivative(float time, Vec3 *xyz)
         return;
     }
 
-    updateNextN(time);
+    updateNextN(&time);
     switch (m_ipo_data->m_channel)
     {
     case Ipo::IPO_LOCX: xyz->setX(m_ipo_data->getDerivative(time, m_next_n, 0)); break;
