@@ -274,7 +274,7 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
                     GL_UNSIGNED_BYTE, data);
             }
         }
-        else
+        else if (!useThreadedLoading())
         {
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, format,
                 GL_UNSIGNED_BYTE, data);
