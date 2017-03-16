@@ -2043,7 +2043,10 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         impulse *= ( abs_speed<10 ? 10.0f : sqrt(abs_speed) )
                  * m_kart_properties->getCollisionTerrainImpulse();
         m_bounce_back_time = 0.2f;
-        m_vehicle->setTimedCentralImpulse(0.1f, impulse);
+        m_bounce_back_time = 0.0f;;
+        impulse = Vec3(0, 0, 0);
+        //m_vehicle->setTimedCentralImpulse(0.1f, impulse);
+        m_vehicle->setTimedCentralImpulse(0.0, impulse);
     }
     // If there is a quad graph, push the kart towards the previous
     // graph node center (we have to use the previous point since the

@@ -675,7 +675,7 @@ void btKart::updateSuspension(btScalar deltaTime)
         // force is used, which makes it much less likely for the kart to hit
         // the terrain, while when driving on flat terrain (length small),
         // there is hardly any difference
-        length_diff *= f*f;
+        //length_diff *= f*f;
         force = wheel_info.m_suspensionStiffness * length_diff
               * wheel_info.m_clippedInvContactDotSuspension;
 
