@@ -117,8 +117,10 @@ if((WIN32 AND NOT MINGW) OR APPLE)
     set(JPEG_LIBRARY jpeglib)
 endif()
 
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
-include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
+if(NOT SERVER_ONLY AND NOT USE_GLES2)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
+endif()
 
 # Build the irrlicht library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
@@ -367,7 +369,6 @@ target_link_libraries(supertuxkart
     bulletmath
     enet
     stkirrlicht
-    graphics_utils
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
@@ -377,7 +378,7 @@ target_link_libraries(supertuxkart
 
 if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
-        target_link_libraries(supertuxkart ${OPENGL_LIBRARIES} glew)
+        target_link_libraries(supertuxkart ${OPENGL_LIBRARIES} glew graphics_utils)
     else()
         target_link_libraries(supertuxkart EGL GLESv2)
     endif()
