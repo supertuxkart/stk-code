@@ -445,7 +445,7 @@ struct SkinnedSolid
     static const enum InstanceType Instance;
     static const std::tuple<size_t> FirstPassTextures;
     static const std::tuple<size_t, size_t, size_t> SecondPassTextures;
-    static const std::tuple<> constexpr ShadowTextures {};
+    static const std::tuple<> constexpr ShadowTextures = {};
     static const std::tuple<size_t> RSMTextures;
 };   // SkinnedSolid
 
@@ -487,7 +487,7 @@ struct SkinnedNormalMat
     static const enum InstanceType Instance;
     static const std::tuple<size_t, size_t> FirstPassTextures;
     static const std::tuple<size_t, size_t, size_t> SecondPassTextures;
-    static const std::tuple<> constexpr ShadowTextures {};
+    static const std::tuple<> constexpr ShadowTextures = {};
     static const std::tuple<size_t> RSMTextures;
 };   // SkinnedNormalMat
 
@@ -530,7 +530,7 @@ struct DefaultMaterial
     static const enum InstanceType Instance;
     static const std::tuple<size_t> FirstPassTextures;
     static const std::tuple<size_t, size_t, size_t> SecondPassTextures;
-    static const std::tuple<> constexpr ShadowTextures {};
+    static const std::tuple<> constexpr ShadowTextures = {};
     static const std::tuple<size_t> RSMTextures;
 };   // DefaultMaterial
 
@@ -573,7 +573,7 @@ struct SphereMap
     static const enum InstanceType Instance;
     static const std::tuple<size_t> FirstPassTextures;
     static const std::tuple<size_t> SecondPassTextures;
-    static const std::tuple<> constexpr ShadowTextures {};
+    static const std::tuple<> constexpr ShadowTextures = {};
     static const std::tuple<size_t> RSMTextures;
 };   // SphereMap
 
@@ -639,7 +639,7 @@ struct NormalMat
     static const enum InstanceType Instance;
     static const std::tuple<size_t, size_t> FirstPassTextures;
     static const std::tuple<size_t, size_t, size_t> SecondPassTextures;
-    static const std::tuple<> constexpr ShadowTextures {};
+    static const std::tuple<> constexpr ShadowTextures = {};
     static const std::tuple<size_t> RSMTextures;
 };   // NormalMat
 
@@ -661,7 +661,7 @@ struct DetailMat
     static const enum InstanceType Instance;
     static const std::tuple<size_t> FirstPassTextures;
     static const std::tuple<size_t, size_t, size_t> SecondPassTextures;
-    static const std::tuple<> constexpr ShadowTextures {};
+    static const std::tuple<> constexpr ShadowTextures = {};
     static const std::tuple<size_t> RSMTextures;
 };   // DetailMat
 
@@ -681,7 +681,7 @@ struct SplattingMat
     static const std::tuple<size_t> FirstPassTextures;
     static const std::tuple<size_t, size_t, size_t, size_t, size_t>
                                                          SecondPassTextures;
-    static const std::tuple<> constexpr ShadowTextures {};
+    static const std::tuple<> constexpr ShadowTextures = {};
     static const std::tuple<size_t, size_t, size_t, size_t, size_t>
                                                                 RSMTextures;
 };   // SplattingMat
