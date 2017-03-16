@@ -39,6 +39,27 @@ namespace irr
     namespace video { class SColor; }
 }
 
+struct TexConfig
+{
+     bool m_srgb;
+     bool m_premul_alpha;
+     bool m_mesh_tex;
+     bool m_set_material;
+     bool m_colorization_mask;
+     bool m_normal_map;
+     TexConfig(bool srgb = false, bool premul_alpha = false,
+               bool mesh_tex = true, bool set_material = false,
+               bool color_mask = false, bool normal_map = false)
+     {
+         m_srgb = srgb;
+         m_premul_alpha = premul_alpha;
+         m_mesh_tex = mesh_tex;
+         m_set_material = set_material;
+         m_colorization_mask = color_mask;
+         m_normal_map = normal_map;
+     }
+};
+
 class STKTexManager : public Singleton<STKTexManager>, NoCopy
 {
 private:
@@ -83,12 +104,8 @@ public:
     ~STKTexManager();
     // ------------------------------------------------------------------------
     irr::video::ITexture* getTexture(const std::string& path,
-                                     bool srgb = false,
-                                     bool premul_alpha = false,
-                                     bool set_material = false,
-                                     bool mesh_tex = false,
+                                     TexConfig* tc = NULL,
                                      bool no_upload = false,
-                                     bool single_channel = false,
                                      bool create_if_unfound = true);
     // ------------------------------------------------------------------------
     irr::video::ITexture* getUnicolorTexture(const irr::video::SColor &c);

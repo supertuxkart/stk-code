@@ -526,9 +526,9 @@ void Material::install(bool srgb, bool premul_alpha)
     }
     else
     {
-        m_texture = STKTexManager::getInstance()->getTexture
-            (m_original_full_path, srgb, premul_alpha, false/*set_material*/,
-            srgb/*mesh_tex*/);
+        TexConfig tc(srgb, premul_alpha, srgb/*mesh_tex*/);
+        m_texture = STKTexManager::getInstance()
+            ->getTexture(m_original_full_path, &tc);
     }
 
     if (m_texture == NULL) return;
@@ -771,9 +771,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         STKTexManager* stm = STKTexManager::getInstance();
         if (m_gloss_map.size() > 0 && CVS->isDefferedEnabled())
         {
-            glossytex = stm->getTexture(m_gloss_map, false/*srgb*/,
-                false/*premul_alpha*/, false/*set_material*/,
-                true/*mesh_tex*/);
+            TexConfig gtc(false/*srgb*/, false/*premul_alpha*/);
+            glossytex = stm->getTexture(m_gloss_map, &gtc);
         }
         else
         {
@@ -787,9 +786,11 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                 stm->STKTexManager::getInstance()->getUnicolorTexture(SColor(0, 0, 0, 0));
             if (m_colorization_mask.size() > 0)
             {
+                TexConfig cmtc(false/*srgb*/, false/*premul_alpha*/,
+                    true/*mesh_tex*/, false/*set_material*/,
+                    true/*color_mask*/);
                 colorization_mask_tex = stm->getTexture(m_colorization_mask,
-                    false/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
-                    true/*mesh_tex*/, false/*no_upload*/, true/*single_channel*/);
+                    &cmtc);
             }
             m->setTexture(2, colorization_mask_tex);
         }
@@ -845,32 +846,29 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->setTexture(1, glossytex);
             return;
         case SHADERTYPE_SPLATTING:
-            tex = stm->getTexture(m_splatting_texture_1,
-                true/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
-                true/*mesh_tex*/);
+        {
+            TexConfig stc(true/*srgb*/, false/*premul_alpha*/,
+                true/*mesh_tex*/, false/*set_material*/);
+            tex = stm->getTexture(m_splatting_texture_1, &stc);
             m->setTexture(3, tex);
 
             if (m_splatting_texture_2.size() > 0)
             {
-                tex = stm->getTexture(m_splatting_texture_2,
-                    true/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
-                    true/*mesh_tex*/);
+                tex = stm->getTexture(m_splatting_texture_2, &stc);
             }
             m->setTexture(4, tex);
 
             if (m_splatting_texture_3.size() > 0)
             {
-                tex = stm->getTexture(m_splatting_texture_3,
-                    true/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
-                    true/*mesh_tex*/);
+                tex = stm->getTexture(m_splatting_texture_3, &stc);
             }
             m->setTexture(5, tex);
 
             if (m_splatting_texture_4.size() > 0)
             {
-                tex = stm->getTexture(m_splatting_texture_4,
-                    false/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
-                    true/*mesh_tex*/);
+                TexConfig s4tc(false/*srgb*/, false/*premul_alpha*/,
+                    true/*mesh_tex*/, false/*set_material*/);
+                tex = stm->getTexture(m_splatting_texture_4, &s4tc);
             }
             m->setTexture(6, tex);
             m->setTexture(7, glossytex);
@@ -878,6 +876,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             // Material and shaders
             m->MaterialType = Shaders::getShader(ES_SPLATTING);
             return;
+        }
         case SHADERTYPE_WATER:
             m->setTexture(1, irr_driver->getTexture(FileManager::TEXTURE,
                 "waternormals.jpg"));
@@ -912,9 +911,10 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         {
             if (CVS->isDefferedEnabled())
             {
-                tex = stm->getTexture(m_normal_map_tex, false/*srgb*/,
-                    false/*premul_alpha*/, false/*set_material*/,
-                    true/*mesh_tex*/);
+                TexConfig nmtc(false/*srgb*/, false/*premul_alpha*/,
+                    true/*mesh_tex*/, false/*set_material*/,
+                    false/*color_mask*/, true/*normal_map*/);
+                tex = stm->getTexture(m_normal_map_tex, &nmtc);
             }
             else
                 tex = stm->STKTexManager::getInstance()->getUnicolorTexture(SColor(0, 0, 0, 0));

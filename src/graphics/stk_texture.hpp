@@ -32,6 +32,7 @@ namespace irr
 
 using namespace irr;
 
+struct TexConfig;
 class Material;
 
 class STKTexture : public video::ITexture, NoCopy
@@ -41,7 +42,9 @@ private:
 
     uint64_t m_texture_handle;
 
-    bool m_srgb, m_premul_alpha, m_mesh_texture, m_single_channel;
+    bool m_single_channel;
+
+    TexConfig* m_tex_config;
 
     Material* m_material;
 
@@ -78,13 +81,14 @@ private:
     }
     // ------------------------------------------------------------------------
     bool useHQMipmap() const;
+    // ------------------------------------------------------------------------
+    bool isSrgb() const;
+    // ------------------------------------------------------------------------
+    bool isPremulAlpha() const;
 
 public:
     // ------------------------------------------------------------------------
-    STKTexture(const std::string& path, bool srgb = false,
-               bool premul_alpha = false, bool set_material = false,
-               bool mesh_tex = false, bool no_upload = false,
-               bool single_channel = false);
+    STKTexture(const std::string& path, TexConfig* tc, bool no_upload = false);
     // ------------------------------------------------------------------------
     STKTexture(uint8_t* data, const std::string& name, size_t size,
                bool single_channel = false, bool delete_ttl = false);
@@ -131,14 +135,6 @@ public:
     // ------------------------------------------------------------------------
     virtual void unloadHandle();
     // ------------------------------------------------------------------------
-    bool isSrgb() const                                      { return m_srgb; }
-    // ------------------------------------------------------------------------
-    bool isPremulAlpha() const                       { return m_premul_alpha; }
-    // ------------------------------------------------------------------------
-    bool isMeshTexture() const                       { return m_mesh_texture; }
-    // ------------------------------------------------------------------------
-    void setMeshTexture(bool val)                     { m_mesh_texture = val; }
-    // ------------------------------------------------------------------------
     virtual unsigned int getTextureSize() const      { return m_texture_size; }
     // ------------------------------------------------------------------------
     void reload(bool no_upload = false, uint8_t* preload_data = NULL,
@@ -158,6 +154,8 @@ public:
     {
         return useHQMipmap() ? 2 : 1;
     }
+    // ------------------------------------------------------------------------
+    bool isMeshTexture() const;
 
 };   // STKTexture
 

@@ -141,10 +141,8 @@ STKTexture* STKTexManager::findTextureInFileSystem(const std::string& filename,
 }   // findTextureInFileSystem
 
 // ----------------------------------------------------------------------------
-video::ITexture* STKTexManager::getTexture(const std::string& path, bool srgb,
-                                           bool premul_alpha,
-                                           bool set_material, bool mesh_tex,
-                                           bool no_upload, bool single_channel,
+video::ITexture* STKTexManager::getTexture(const std::string& path,
+                                           TexConfig* tc, bool no_upload,
                                            bool create_if_unfound)
 {
     auto ret = m_all_textures.find(path);
@@ -165,8 +163,7 @@ video::ITexture* STKTexManager::getTexture(const std::string& path, bool srgb,
     if (create_if_unfound)
     {
         new_texture = new STKTexture(full_path.empty() ? path : full_path,
-            srgb, premul_alpha, set_material, mesh_tex, no_upload,
-            single_channel);
+            tc, no_upload);
         if (new_texture->getOpenGLTextureName() == 0 && !no_upload)
         {
             const char* name = new_texture->getName().getPtr();

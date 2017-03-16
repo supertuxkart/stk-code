@@ -35,24 +35,23 @@
 static const uint8_t CACHE_VERSION = 1;
 #endif
 // ----------------------------------------------------------------------------
-STKTexture::STKTexture(const std::string& path, bool srgb, bool premul_alpha,
-                       bool set_material, bool mesh_tex, bool no_upload,
-                       bool single_channel)
-          : video::ITexture(path.c_str()), m_texture_handle(0), m_srgb(srgb),
-            m_premul_alpha(premul_alpha), m_mesh_texture(mesh_tex),
-            m_single_channel(single_channel), m_material(NULL),
+STKTexture::STKTexture(const std::string& path, TexConfig* tc, bool no_upload)
+          : video::ITexture(path.c_str()), m_texture_handle(0),
+            m_single_channel(false), m_tex_config(NULL), m_material(NULL),
             m_texture_name(0), m_texture_size(0), m_texture_image(NULL),
             m_file(NULL), m_img_loader(NULL)
 {
-    if (set_material)
+    if (tc != NULL)
     {
-        m_material = material_manager->getMaterialFor(this);
-        m_mesh_texture = true;
+        m_tex_config = (TexConfig*)malloc(sizeof(TexConfig));
+        memcpy(m_tex_config, tc, sizeof(TexConfig));
+        m_single_channel = m_tex_config->m_colorization_mask;
+        if (m_tex_config->m_set_material)
+            m_material = material_manager->getMaterialFor(this);
     }
-
 #ifndef SERVER_ONLY
-    if (!CVS->isGLSL())
-        m_srgb = false;
+    if (m_tex_config && !CVS->isGLSL())
+        m_tex_config->m_srgb = false;
     if (!CVS->isARBTextureSwizzleUsable())
         m_single_channel = false;
 #endif
@@ -62,11 +61,10 @@ STKTexture::STKTexture(const std::string& path, bool srgb, bool premul_alpha,
 // ----------------------------------------------------------------------------
 STKTexture::STKTexture(uint8_t* data, const std::string& name, size_t size,
                        bool single_channel, bool delete_ttl)
-          : video::ITexture(name.c_str()), m_texture_handle(0), m_srgb(false),
-            m_premul_alpha(false), m_mesh_texture(false),
-            m_single_channel(single_channel), m_material(NULL),
-            m_texture_name(0), m_texture_size(0), m_texture_image(NULL),
-            m_file(NULL), m_img_loader(NULL)
+          : video::ITexture(name.c_str()), m_texture_handle(0),
+            m_single_channel(single_channel), m_tex_config(NULL),
+            m_material(NULL), m_texture_name(0), m_texture_size(0),
+            m_texture_image(NULL), m_file(NULL), m_img_loader(NULL)
 {
     m_size.Width = size;
     m_size.Height = size;
@@ -77,10 +75,9 @@ STKTexture::STKTexture(uint8_t* data, const std::string& name, size_t size,
 
 // ----------------------------------------------------------------------------
 STKTexture::STKTexture(video::IImage* img, const std::string& name)
-          : video::ITexture(name.c_str()), m_texture_handle(0), m_srgb(false),
-            m_premul_alpha(false), m_mesh_texture(false),
-            m_single_channel(false), m_material(NULL), m_texture_name(0),
-            m_texture_size(0), m_texture_image(NULL),
+          : video::ITexture(name.c_str()), m_texture_handle(0),
+            m_single_channel(false), m_tex_config(NULL), m_material(NULL),
+            m_texture_name(0), m_texture_size(0), m_texture_image(NULL),
             m_file(NULL), m_img_loader(NULL)
 {
     reload(false/*no_upload*/, NULL/*preload_data*/, img);
@@ -98,6 +95,7 @@ STKTexture::~STKTexture()
 #endif   // !SERVER_ONLY
     if (m_texture_image != NULL)
         m_texture_image->drop();
+    free(m_tex_config);
 }   // ~STKTexture
 
 // ----------------------------------------------------------------------------
@@ -117,7 +115,7 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
 
     std::string compressed_texture;
 #if !defined(USE_GLES2)
-    if (!no_upload && m_mesh_texture && CVS->isTextureCompressionEnabled())
+    if (!no_upload && isMeshTexture() && CVS->isTextureCompressionEnabled())
     {
         std::string orig_file = NamedPath.getPtr();
 
@@ -220,16 +218,16 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
     unsigned int internal_format = m_single_channel ? GL_R8 : GL_RGBA;
 
 #if !defined(USE_GLES2)
-    if (m_mesh_texture && CVS->isTextureCompressionEnabled())
+    if (isMeshTexture() && CVS->isTextureCompressionEnabled())
     {
         internal_format = m_single_channel ? GL_COMPRESSED_RED_RGTC1 :
-            m_srgb ? GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT :
+            isSrgb() ? GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT :
             GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
     }
     else
     {
         internal_format =
-            m_single_channel ? GL_R8 : m_srgb ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+            m_single_channel ? GL_R8 : isSrgb() ? GL_SRGB8_ALPHA8 : GL_RGBA8;
     }
 #endif
     if (!useThreadedLoading())
@@ -317,7 +315,7 @@ void STKTexture::formatConversion(uint8_t* data, unsigned int* format,
         }
     }
 #endif
-    if (m_premul_alpha && !m_single_channel)
+    if (isPremulAlpha() && !m_single_channel)
     {
         for (unsigned int i = 0; i < w * h; i++)
         {
@@ -589,7 +587,7 @@ bool STKTexture::useThreadedLoading() const
     return false;
 #else
     return CVS->supportsThreadedTextureLoading() &&
-        !CVS->isTextureCompressionEnabled() && m_mesh_texture &&
+        !CVS->isTextureCompressionEnabled() && isMeshTexture() &&
         m_img_loader && m_img_loader->supportThreadedLoading();
 #endif
 }   // useThreadedLoading
@@ -661,3 +659,21 @@ bool STKTexture::useHQMipmap() const
     return !m_single_channel && UserConfigParams::m_hq_mipmap &&
         m_size.Width > 1 && m_size.Height > 1;
 }   // useHQMipmap
+
+//-----------------------------------------------------------------------------
+bool STKTexture::isSrgb() const
+{
+    return m_tex_config && m_tex_config->m_srgb;
+}   // isSrgb
+
+//-----------------------------------------------------------------------------
+bool STKTexture::isPremulAlpha() const
+{
+    return m_tex_config && m_tex_config->m_premul_alpha;
+}   // isPremulAlpha
+
+//-----------------------------------------------------------------------------
+bool STKTexture::isMeshTexture() const
+{
+    return m_tex_config && m_tex_config->m_mesh_tex;
+}   // isMeshTexture
