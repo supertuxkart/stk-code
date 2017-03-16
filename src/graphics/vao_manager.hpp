@@ -20,7 +20,7 @@
 
 #include "graphics/gl_headers.hpp"
 #include "utils/singleton.hpp"
-#include "utils/tuple.hpp"
+#include <tuple>
 #include <S3DVertex.h>
 #include <IMeshBuffer.h>
 #include <ISceneNode.h>
@@ -40,7 +40,7 @@ enum InstanceType : unsigned int
     InstanceTypeCount,
 };
 
-typedef STK::Tuple<scene::ISceneNode*, core::vector2df, core::vector2df,
+typedef std::tuple<scene::ISceneNode*, core::vector2df, core::vector2df,
     int32_t> InstanceSettings;
 
 struct GLMesh;

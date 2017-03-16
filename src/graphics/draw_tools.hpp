@@ -40,10 +40,10 @@ struct CustomUnrollArgs<n, list...>
     template<typename S,
              typename ...TupleTypes,
              typename ...Args>
-    static void drawMesh(const STK::Tuple<TupleTypes...> &t,
+    static void drawMesh(const std::tuple<TupleTypes...> &t,
                          Args... args)
     {
-        CustomUnrollArgs<list...>::template drawMesh<S>(t, STK::tuple_get<n>(t), args...);
+        CustomUnrollArgs<list...>::template drawMesh<S>(t, std::get<n>(t), args...);
     }   // drawMesh
     
 };   // CustomUnrollArgs
@@ -56,11 +56,11 @@ struct CustomUnrollArgs<>
     template<typename S,
              typename ...TupleTypes,
              typename ...Args>
-    static void drawMesh(const STK::Tuple<TupleTypes...> &t,
+    static void drawMesh(const std::tuple<TupleTypes...> &t,
                          Args... args)
     {
         irr_driver->increaseObjectCount(); //TODO: move somewhere else
-        GLMesh *mesh = STK::tuple_get<0>(t);
+        GLMesh *mesh = std::get<0>(t);
         if (!mesh->mb->getMaterial().BackfaceCulling)
             glDisable(GL_CULL_FACE);
         S::getInstance()->setUniforms(args...);
@@ -82,10 +82,10 @@ struct TexExpanderImpl
     template<typename...TupleArgs,
              typename... Args>
     static void expandTex(const GLMesh &mesh,
-                          const STK::Tuple<TupleArgs...> &tex_swizzle,
+                          const std::tuple<TupleArgs...> &tex_swizzle,
                           Args... args)
     {
-        size_t idx = STK::tuple_get<sizeof...(TupleArgs) - N>(tex_swizzle);
+        size_t idx = std::get<sizeof...(TupleArgs) - N>(tex_swizzle);
         TexExpanderImpl<T, N - 1>::template expandTex(mesh, tex_swizzle,
             args..., mesh.textures[idx]->getOpenGLTextureName());
     }   // ExpandTex
@@ -98,7 +98,7 @@ struct TexExpanderImpl<T, 0>
 {
     template<typename...TupleArgs, typename... Args>
     static void expandTex(const GLMesh &mesh,
-                          const STK::Tuple<TupleArgs...> &tex_swizzle,
+                          const std::tuple<TupleArgs...> &tex_swizzle,
                           Args... args)
     {
         T::getInstance()->setTextureUnits(args...);
@@ -117,7 +117,7 @@ struct TexExpander
     template<typename...TupleArgs,
              typename... Args>
     static void expandTex(const GLMesh &mesh,
-                          const STK::Tuple<TupleArgs...> &tex_swizzle,
+                          const std::tuple<TupleArgs...> &tex_swizzle,
                           Args... args)
     {
         TexExpanderImpl<T, sizeof...(TupleArgs)>::expandTex(mesh,
@@ -134,10 +134,10 @@ struct HandleExpanderImpl
 {
     template<typename...TupleArgs, typename... Args>
     static void expand(uint64_t *texture_handles, 
-                       const STK::Tuple<TupleArgs...> &tex_swizzle,
+                       const std::tuple<TupleArgs...> &tex_swizzle,
                        Args... args)
     {
-        size_t idx = STK::tuple_get<sizeof...(TupleArgs)-N>(tex_swizzle);
+        size_t idx = std::get<sizeof...(TupleArgs)-N>(tex_swizzle);
         HandleExpanderImpl<T, N - 1>::template expand(texture_handles,
                                                        tex_swizzle,
                                                        args...,
@@ -152,7 +152,7 @@ struct HandleExpanderImpl<T, 0>
 {
     template<typename...TupleArgs, typename... Args>
     static void expand(uint64_t *texture_handles,
-                       const STK::Tuple<TupleArgs...> &tex_swizzle,
+                       const std::tuple<TupleArgs...> &tex_swizzle,
                        Args... args)
     {
         T::getInstance()->setTextureHandles(args...);
@@ -174,7 +174,7 @@ struct HandleExpander
     template<typename...TupleArgs,
              typename... Args>
     static void expand(uint64_t *texture_handles,
-                       const STK::Tuple<TupleArgs...> &tex_swizzle,
+                       const std::tuple<TupleArgs...> &tex_swizzle,
                        Args... args)
     {
         HandleExpanderImpl<T, sizeof...(TupleArgs)>::expand(texture_handles,

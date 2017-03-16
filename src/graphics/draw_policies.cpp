@@ -32,7 +32,7 @@ void renderMeshes1stPass()
         glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
-        GLMesh &mesh = *(STK::tuple_get<0>(meshes.at(i)));
+        GLMesh &mesh = *(std::get<0>(meshes.at(i)));
         if (!CVS->isARBBaseInstanceUsable())
             glBindVertexArray(mesh.vao);
         if (mesh.VAOType != T::VertexType)
@@ -62,7 +62,7 @@ void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
         glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
-        GLMesh &mesh = *(STK::tuple_get<0>(meshes.at(i)));
+        GLMesh &mesh = *(std::get<0>(meshes.at(i)));
         if (!CVS->isARBBaseInstanceUsable())
             glBindVertexArray(mesh.vao);
 
@@ -101,7 +101,7 @@ void renderMeshes2ndPass<GrassMat, 4, 3, 1>
         glBindVertexArray(VAOManager::getInstance()->getVAO(GrassMat::VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
-        GLMesh &mesh = *(STK::tuple_get<0>(meshes.at(i)));
+        GLMesh &mesh = *(std::get<0>(meshes.at(i)));
         if (!CVS->isARBBaseInstanceUsable())
             glBindVertexArray(mesh.vao);
 
@@ -142,7 +142,7 @@ void renderShadow(unsigned cascade)
         glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
     for (unsigned i = 0; i < t.size(); i++)
     {
-        GLMesh *mesh = STK::tuple_get<0>(t.at(i));
+        GLMesh *mesh = std::get<0>(t.at(i));
         if (!CVS->isARBBaseInstanceUsable())
             glBindVertexArray(mesh->vao);
         if (CVS->isAZDOEnabled())
@@ -164,7 +164,7 @@ void drawRSM(const core::matrix4 & rsm_matrix)
     for (unsigned i = 0; i < t.size(); i++)
     {
         std::vector<GLuint> Textures;
-        GLMesh *mesh = STK::tuple_get<0>(t.at(i));
+        GLMesh *mesh = std::get<0>(t.at(i));
         if (!CVS->isARBBaseInstanceUsable())
             glBindVertexArray(mesh->vao);
         if (CVS->isAZDOEnabled())

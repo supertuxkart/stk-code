@@ -443,10 +443,10 @@ struct SkinnedSolid
     static const enum Material::ShaderType MaterialType
                                       = Material::SHADERTYPE_SOLID_SKINNED_MESH;
     static const enum InstanceType Instance;
-    static const STK::Tuple<size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
-    static const STK::Tuple<> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
+    static const std::tuple<size_t> FirstPassTextures;
+    static const std::tuple<size_t, size_t, size_t> SecondPassTextures;
+    static const std::tuple<> ShadowTextures;
+    static const std::tuple<size_t> RSMTextures;
 };   // SkinnedSolid
 
 // ----------------------------------------------------------------------------
@@ -464,10 +464,10 @@ struct SkinnedAlphaRef
     static const enum Material::ShaderType MaterialType =
                                    Material::SHADERTYPE_ALPHA_TEST_SKINNED_MESH;
     static const enum InstanceType Instance;
-    static const STK::Tuple<size_t, size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
-    static const STK::Tuple<size_t> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
+    static const std::tuple<size_t, size_t> FirstPassTextures;
+    static const std::tuple<size_t, size_t, size_t> SecondPassTextures;
+    static const std::tuple<size_t> ShadowTextures;
+    static const std::tuple<size_t> RSMTextures;
 };   // SkinnedAlphaRef
 
 // ----------------------------------------------------------------------------
@@ -485,10 +485,10 @@ struct SkinnedNormalMat
     static const enum Material::ShaderType MaterialType =
                                    Material::SHADERTYPE_NORMAL_MAP_SKINNED_MESH;
     static const enum InstanceType Instance;
-    static const STK::Tuple<size_t, size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
-    static const STK::Tuple<> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
+    static const std::tuple<size_t, size_t> FirstPassTextures;
+    static const std::tuple<size_t, size_t, size_t> SecondPassTextures;
+    static const std::tuple<> ShadowTextures;
+    static const std::tuple<size_t> RSMTextures;
 };   // SkinnedNormalMat
 
 // ----------------------------------------------------------------------------
@@ -506,10 +506,10 @@ struct SkinnedUnlitMat
     static const enum Material::ShaderType MaterialType =
                                   Material::SHADERTYPE_SOLID_UNLIT_SKINNED_MESH;
     static const enum InstanceType Instance;
-    static const STK::Tuple<size_t, size_t> FirstPassTextures;
-    static const STK::Tuple<size_t> SecondPassTextures;
-    static const STK::Tuple<size_t> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
+    static const std::tuple<size_t, size_t> FirstPassTextures;
+    static const std::tuple<size_t> SecondPassTextures;
+    static const std::tuple<size_t> ShadowTextures;
+    static const std::tuple<size_t> RSMTextures;
 };   // SkinnedUnlitMat
 
 // ----------------------------------------------------------------------------
@@ -528,10 +528,10 @@ struct DefaultMaterial
     static const enum Material::ShaderType MaterialType
                                                = Material::SHADERTYPE_SOLID;
     static const enum InstanceType Instance;
-    static const STK::Tuple<size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
-    static const STK::Tuple<> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
+    static const std::tuple<size_t> FirstPassTextures;
+    static const std::tuple<size_t, size_t, size_t> SecondPassTextures;
+    static const std::tuple<> ShadowTextures;
+    static const std::tuple<size_t> RSMTextures;
 };   // DefaultMaterial
 
 // ----------------------------------------------------------------------------
@@ -549,10 +549,10 @@ struct AlphaRef
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType = Material::SHADERTYPE_ALPHA_TEST;
     static const enum InstanceType Instance;
-    static const STK::Tuple<size_t, size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
-    static const STK::Tuple<size_t> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
+    static const std::tuple<size_t, size_t> FirstPassTextures;
+    static const std::tuple<size_t, size_t, size_t> SecondPassTextures;
+    static const std::tuple<size_t> ShadowTextures;
+    static const std::tuple<size_t> RSMTextures;
 };   // AlphaRef
 
 // ----------------------------------------------------------------------------
@@ -571,10 +571,10 @@ struct SphereMap
     static const enum Material::ShaderType MaterialType
                                           = Material::SHADERTYPE_SPHERE_MAP;
     static const enum InstanceType Instance;
-    static const STK::Tuple<size_t> FirstPassTextures;
-    static const STK::Tuple<size_t> SecondPassTextures;
-    static const STK::Tuple<> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
+    static const std::tuple<size_t> FirstPassTextures;
+    static const std::tuple<size_t> SecondPassTextures;
+    static const std::tuple<> ShadowTextures;
+    static const std::tuple<size_t> RSMTextures;
 };   // SphereMap
 
 // ----------------------------------------------------------------------------
@@ -593,10 +593,10 @@ struct UnlitMat
     static const enum Material::ShaderType MaterialType =
                                            Material::SHADERTYPE_SOLID_UNLIT;
     static const enum InstanceType Instance;
-    static const STK::Tuple<size_t, size_t> FirstPassTextures;
-    static const STK::Tuple<size_t> SecondPassTextures;
-    static const STK::Tuple<size_t> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
+    static const std::tuple<size_t, size_t> FirstPassTextures;
+    static const std::tuple<size_t> SecondPassTextures;
+    static const std::tuple<size_t> ShadowTextures;
+    static const std::tuple<size_t> RSMTextures;
 };   // UnlitMat
 
 // ----------------------------------------------------------------------------
@@ -615,10 +615,10 @@ struct GrassMat
     static const enum Material::ShaderType MaterialType
         = Material::SHADERTYPE_VEGETATION;
     static const enum InstanceType Instance;
-    static const STK::Tuple<size_t, size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
-    static const STK::Tuple<size_t> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
+    static const std::tuple<size_t, size_t> FirstPassTextures;
+    static const std::tuple<size_t, size_t, size_t> SecondPassTextures;
+    static const std::tuple<size_t> ShadowTextures;
+    static const std::tuple<size_t> RSMTextures;
 };   // GrassMat
 
 // ----------------------------------------------------------------------------
@@ -637,10 +637,10 @@ struct NormalMat
     static const enum Material::ShaderType MaterialType
                                           = Material::SHADERTYPE_NORMAL_MAP;
     static const enum InstanceType Instance;
-    static const STK::Tuple<size_t, size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
-    static const STK::Tuple<> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
+    static const std::tuple<size_t, size_t> FirstPassTextures;
+    static const std::tuple<size_t, size_t, size_t> SecondPassTextures;
+    static const std::tuple<> ShadowTextures;
+    static const std::tuple<size_t> RSMTextures;
 };   // NormalMat
 
 // ----------------------------------------------------------------------------
@@ -659,10 +659,10 @@ struct DetailMat
     static const enum Material::ShaderType MaterialType
                                           = Material::SHADERTYPE_DETAIL_MAP;
     static const enum InstanceType Instance;
-    static const STK::Tuple<size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
-    static const STK::Tuple<> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
+    static const std::tuple<size_t> FirstPassTextures;
+    static const std::tuple<size_t, size_t, size_t> SecondPassTextures;
+    static const std::tuple<> ShadowTextures;
+    static const std::tuple<size_t> RSMTextures;
 };   // DetailMat
 
 // ----------------------------------------------------------------------------
@@ -678,11 +678,11 @@ struct SplattingMat
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
     static const enum Material::ShaderType MaterialType
                                            = Material::SHADERTYPE_SPLATTING;
-    static const STK::Tuple<size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t, size_t, size_t, size_t>
+    static const std::tuple<size_t> FirstPassTextures;
+    static const std::tuple<size_t, size_t, size_t, size_t, size_t>
                                                          SecondPassTextures;
-    static const STK::Tuple<> ShadowTextures;
-    static const STK::Tuple<size_t, size_t, size_t, size_t, size_t>
+    static const std::tuple<> ShadowTextures;
+    static const std::tuple<size_t, size_t, size_t, size_t, size_t>
                                                                 RSMTextures;
 };   // SplattingMat
 
