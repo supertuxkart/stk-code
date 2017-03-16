@@ -54,10 +54,12 @@ void* ThreadedTexLoader::startRoutine(void *obj)
         if (strcmp(target_tex->getName().getPtr(), "delete_ttl") == 0)
         {
             ttl->m_stktm->removeThreadedLoadTexture();
+            ttl->m_stktm->setThreadedLoadTextureCounter(-1);
             pthread_mutex_unlock(ttl->m_texture_queue_mutex);
             ttl->setCanBeDeleted();
             return NULL;
         }
+        assert(target_tex->getTextureSize() <= ttl->m_tex_capacity);
         if (target_tex->getTextureSize() + ttl->m_tex_size_loaded >
             ttl->m_tex_capacity)
         {

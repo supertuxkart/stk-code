@@ -53,6 +53,7 @@ class OptionsScreenVideo : public GUIEngine::Screen, public GUIEngine::ScreenSin
 {
 private:
     bool m_prev_adv_pipline;
+    int m_prev_img_quality;
     OptionsScreenVideo();
     bool m_inited;
     std::vector<GFXPreset> m_presets;

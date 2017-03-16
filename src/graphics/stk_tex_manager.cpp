@@ -32,6 +32,19 @@
 STKTexManager::STKTexManager() : m_pbo(0), m_thread_size(0),
                                  m_threaded_load_textures_counter(0)
 {
+    createThreadedTexLoaders();
+}   // STKTexManager
+
+// ----------------------------------------------------------------------------
+STKTexManager::~STKTexManager()
+{
+    removeTexture(NULL/*texture*/, true/*remove_all*/);
+    destroyThreadedTexLoaders();
+}   // ~STKTexManager
+
+// ----------------------------------------------------------------------------
+void STKTexManager::createThreadedTexLoaders()
+{
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (CVS->supportsThreadedTextureLoading())
     {
@@ -40,10 +53,14 @@ STKTexManager::STKTexManager() : m_pbo(0), m_thread_size(0),
         m_thread_size = HardwareStats::getNumProcessors();
         m_thread_size = core::clamp(m_thread_size, 1,
             UserConfigParams::m_hq_mipmap ? m_thread_size : 3);
-        const unsigned each_capacity = 16 * 1024 * 1024;
+        const unsigned max_tex_size =
+            (UserConfigParams::m_high_definition_textures & 0x01) == 0 ?
+            UserConfigParams::m_max_texture_size : 2048;
+        const unsigned each_capacity = max_tex_size * max_tex_size * 4;
         const unsigned pbo_size = each_capacity * m_thread_size;
         Log::info("STKTexManager", "%d thread(s) for texture loading,"
-            " each capacity 16 MB.", m_thread_size);
+            " each capacity %d MB.", m_thread_size,
+            each_capacity / 1024 / 1024);
         if (UserConfigParams::m_hq_mipmap)
             Log::info("STKTexManager", "High quality mipmap enabled.");
         glGenBuffers(1, &m_pbo);
@@ -65,12 +82,11 @@ STKTexManager::STKTexManager() : m_pbo(0), m_thread_size(0),
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     }
 #endif
-}   // STKTexManager
+}   // createThreadedTexLoaders
 
 // ----------------------------------------------------------------------------
-STKTexManager::~STKTexManager()
+void STKTexManager::destroyThreadedTexLoaders()
 {
-    removeTexture(NULL/*texture*/, true/*remove_all*/);
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (CVS->supportsThreadedTextureLoading())
     {
@@ -89,11 +105,15 @@ STKTexManager::~STKTexManager()
         }
         delete delete_ttl;
         glDeleteBuffers(1, &m_pbo);
+        m_pbo = 0;
+        m_thread_size = 0;
+        m_threaded_load_textures_counter = 0;
+        m_all_tex_loaders.clear();
         pthread_mutex_destroy(&m_threaded_load_textures_mutex);
         pthread_cond_destroy(&m_cond_request);
     }
 #endif
-}   // ~STKTexManager
+}   // destroyThreadedTexLoaders
 
 // ----------------------------------------------------------------------------
 STKTexture* STKTexManager::findTextureInFileSystem(const std::string& filename,

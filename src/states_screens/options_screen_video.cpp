@@ -23,6 +23,7 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shared_gpu_objects.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
@@ -210,7 +211,8 @@ void OptionsScreenVideo::setImageQuality(int quality)
 // ----------------------------------------------------------------------------
 
 OptionsScreenVideo::OptionsScreenVideo() : Screen("options_video.stkgui"),
-                                           m_prev_adv_pipline(false)
+                                           m_prev_adv_pipline(false),
+                                           m_prev_img_quality(-1)
 {
     m_inited = false;
     initPresets();
@@ -236,6 +238,7 @@ void OptionsScreenVideo::init()
 {
     Screen::init();
     m_prev_adv_pipline = UserConfigParams::m_dynamic_lights;
+    m_prev_img_quality = getImageQuality();
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
     assert(ribbon != NULL);
     ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
@@ -644,6 +647,12 @@ void OptionsScreenVideo::tearDown()
 {
     if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights)
         irr_driver->sameRestart();
+    else if (m_prev_img_quality != getImageQuality())
+    {
+        irr_driver->setMaxTextureSize();
+        STKTexManager::getInstance()->destroyThreadedTexLoaders();
+        STKTexManager::getInstance()->createThreadedTexLoaders();
+    }
     Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();

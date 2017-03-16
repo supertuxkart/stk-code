@@ -716,13 +716,11 @@ void IrrDriver::initDevice()
 // ----------------------------------------------------------------------------
 void IrrDriver::setMaxTextureSize()
 {
-    if( (UserConfigParams::m_high_definition_textures & 0x01) == 0)
-    {
-        io::IAttributes &att = m_video_driver->getNonConstDriverAttributes();
-        att.setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(
-                                        UserConfigParams::m_max_texture_size,
-                                        UserConfigParams::m_max_texture_size));
-    }
+    const unsigned max =
+        (UserConfigParams::m_high_definition_textures & 0x01) == 0 ?
+        UserConfigParams::m_max_texture_size : 2048;
+    io::IAttributes &att = m_video_driver->getNonConstDriverAttributes();
+    att.setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(max, max));
 }   // setMaxTextureSize
 
 // ----------------------------------------------------------------------------

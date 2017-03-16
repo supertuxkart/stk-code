@@ -182,6 +182,10 @@ public:
     // ------------------------------------------------------------------------
     bool isThreadedLoadTexturesEmpty()
                                    { return m_threaded_load_textures.empty(); }
+    // ------------------------------------------------------------------------
+    void createThreadedTexLoaders();
+    // ------------------------------------------------------------------------
+    void destroyThreadedTexLoaders();
 
 };   // STKTexManager
 
