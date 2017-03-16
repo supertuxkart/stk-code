@@ -746,7 +746,7 @@ const std::tuple<size_t> SkinnedSolid::FirstPassTextures
     = std::tuple<size_t>(1);
 const std::tuple<size_t, size_t, size_t> SkinnedSolid::SecondPassTextures
     = std::tuple<size_t, size_t, size_t>(0, 1, 2);
-const std::tuple<> constexpr SkinnedSolid::ShadowTextures;
+std::tuple<> SkinnedSolid::ShadowTextures;
 const std::tuple<size_t> SkinnedSolid::RSMTextures = std::tuple<size_t>(0);
 
 // ----------------------------------------------------------------------------
@@ -775,7 +775,7 @@ const std::tuple<size_t, size_t> SkinnedNormalMat::FirstPassTextures
     = std::tuple<size_t, size_t>(3, 1);
 const std::tuple<size_t, size_t, size_t> SkinnedNormalMat::SecondPassTextures
     = std::tuple<size_t, size_t, size_t>(0, 1, 2);
-const std::tuple<> constexpr SkinnedNormalMat::ShadowTextures;
+std::tuple<> SkinnedNormalMat::ShadowTextures;
 const std::tuple<size_t> SkinnedNormalMat::RSMTextures = std::tuple<size_t>(0);
 
 // ----------------------------------------------------------------------------
@@ -784,7 +784,7 @@ const std::tuple<size_t> DefaultMaterial::FirstPassTextures
     = std::tuple<size_t>(1);
 const std::tuple<size_t, size_t, size_t> DefaultMaterial::SecondPassTextures
     = std::tuple<size_t, size_t, size_t>(0, 1, 2);
-const std::tuple<> constexpr DefaultMaterial::ShadowTextures;
+std::tuple<> DefaultMaterial::ShadowTextures;
 const std::tuple<size_t> DefaultMaterial::RSMTextures = std::tuple<size_t>(0);
 
 // ----------------------------------------------------------------------------
@@ -800,7 +800,7 @@ const std::tuple<size_t> AlphaRef::RSMTextures = std::tuple<size_t>(0);
 const InstanceType SphereMap::Instance = InstanceTypeThreeTex;
 const std::tuple<size_t> SphereMap::FirstPassTextures = std::tuple<size_t>(1);
 const std::tuple<size_t> SphereMap::SecondPassTextures = std::tuple<size_t>(0);
-const std::tuple<> constexpr SphereMap::ShadowTextures;
+std::tuple<> SphereMap::ShadowTextures;
 const std::tuple<size_t> SphereMap::RSMTextures = std::tuple<size_t>(0);
 
 // ----------------------------------------------------------------------------
@@ -826,7 +826,7 @@ const std::tuple<size_t, size_t> NormalMat::FirstPassTextures
     = std::tuple<size_t, size_t>(3, 1);
 const std::tuple<size_t, size_t, size_t> NormalMat::SecondPassTextures
     = std::tuple<size_t, size_t, size_t>(0, 1, 2);
-const std::tuple<> constexpr NormalMat::ShadowTextures;
+std::tuple<> NormalMat::ShadowTextures;
 const std::tuple<size_t> NormalMat::RSMTextures = std::tuple<size_t>(0);
 
 // ----------------------------------------------------------------------------
@@ -834,7 +834,7 @@ const InstanceType DetailMat::Instance = InstanceTypeFourTex;
 const std::tuple<size_t> DetailMat::FirstPassTextures = std::tuple<size_t>(1);
 const std::tuple<size_t, size_t, size_t> DetailMat::SecondPassTextures
     = std::tuple<size_t, size_t, size_t>(0, 3, 1);
-const std::tuple<> constexpr DetailMat::ShadowTextures;
+std::tuple<> DetailMat::ShadowTextures;
 const std::tuple<size_t> DetailMat::RSMTextures = std::tuple<size_t>(0);
 
 // ----------------------------------------------------------------------------
@@ -843,7 +843,7 @@ const std::tuple<size_t> SplattingMat::FirstPassTextures
 const std::tuple<size_t, size_t, size_t, size_t, size_t>
     SplattingMat::SecondPassTextures
     = std::tuple<size_t, size_t, size_t, size_t, size_t>(1, 3, 4, 5, 6);
-const std::tuple<> constexpr SplattingMat::ShadowTextures;
+std::tuple<> SplattingMat::ShadowTextures;
 const std::tuple<size_t, size_t, size_t, size_t, size_t>
     SplattingMat::RSMTextures
     = std::tuple<size_t, size_t, size_t, size_t, size_t>(1, 3, 4, 5, 6);
