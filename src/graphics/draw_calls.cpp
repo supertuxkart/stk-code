@@ -688,38 +688,20 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
         return;
 
 #if !defined(USE_GLES2)
-    int enableOpenMP = 0;
-    
-    if (CVS->supportsAsyncInstanceUpload())
-        enableOpenMP = 1;
-    
     PROFILER_PUSH_CPU_MARKER("- Draw Command upload", 0xFF, 0x0, 0xFF);
+    m_solid_cmd_buffer->fill(m_solid_pass_mesh);
+    m_glow_cmd_buffer->fill(&m_glow_pass_mesh);
 
-#pragma omp parallel sections if(enableOpenMP)
+    irr_driver->setPhase(SHADOW_PASS);
+    m_shadow_cmd_buffer->fill(m_shadow_pass_mesh);
+    if (!shadow_matrices.isRSMMapAvail())
     {
-#pragma omp section
-        {
-            m_solid_cmd_buffer->fill(m_solid_pass_mesh);
-        }
-#pragma omp section
-        {            
-            m_glow_cmd_buffer->fill(&m_glow_pass_mesh);
-        }
-#pragma omp section
-        {
-            irr_driver->setPhase(SHADOW_PASS);
-            m_shadow_cmd_buffer->fill(m_shadow_pass_mesh);
-        }
-#pragma omp section
-        if (!shadow_matrices.isRSMMapAvail())
-        {
-            m_reflective_shadow_map_cmd_buffer->fill(m_reflective_shadow_map_mesh);
-        }
+        m_reflective_shadow_map_cmd_buffer->fill(m_reflective_shadow_map_mesh);
     }
     PROFILER_POP_CPU_MARKER();
     solid_poly_count = m_solid_cmd_buffer->getPolyCount();
     shadow_poly_count = m_shadow_cmd_buffer->getPolyCount();    
-    
+
     if (CVS->supportsAsyncInstanceUpload())
         glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
 #endif // !defined(USE_GLES2)

@@ -26,7 +26,7 @@
 #include "graphics/shaders.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
-#include "utils/tuple.hpp"
+#include <tuple>
 #include <SColor.h>
 #include <S3DVertex.h>
 
@@ -199,14 +199,14 @@ void AbstractGeometryPasses::setFirstPassRenderTargets(const std::vector<GLuint>
 template<typename Shader, enum video::E_VERTEX_TYPE VertexType, int...List, 
          typename... TupleType>
 void renderTransparenPass(const std::vector<RenderGeometry::TexUnit> &TexUnits, 
-                          std::vector<STK::Tuple<TupleType...> > *meshes)
+                          std::vector<std::tuple<TupleType...> > *meshes)
 {
     Shader::getInstance()->use();
     if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
     for (unsigned i = 0; i < meshes->size(); i++)
     {
-        GLMesh &mesh = *(STK::tuple_get<0>(meshes->at(i)));
+        GLMesh &mesh = *(std::get<0>(meshes->at(i)));
         if (!CVS->isARBBaseInstanceUsable())
             glBindVertexArray(mesh.vao);
         if (mesh.VAOType != VertexType)
@@ -329,11 +329,11 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
     for (unsigned i = 0; i < ListDisplacement::getInstance()->size(); i++)
     {
         const GLMesh &mesh =
-            *(STK::tuple_get<0>(ListDisplacement::getInstance()->at(i)));
+            *(std::get<0>(ListDisplacement::getInstance()->at(i)));
         if (!CVS->isARBBaseInstanceUsable())
             glBindVertexArray(mesh.vao);
         const core::matrix4 &AbsoluteTransformation
-            = STK::tuple_get<1>(ListDisplacement::getInstance()->at(i));
+            = std::get<1>(ListDisplacement::getInstance()->at(i));
         if (mesh.VAOType != video::EVT_2TCOORDS)
         {
 #ifdef DEBUG
@@ -360,11 +360,11 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
     for (unsigned i = 0; i < ListDisplacement::getInstance()->size(); i++)
     {
         const GLMesh &mesh = 
-            *(STK::tuple_get<0>(ListDisplacement::getInstance()->at(i)));
+            *(std::get<0>(ListDisplacement::getInstance()->at(i)));
         if (!CVS->isARBBaseInstanceUsable())
             glBindVertexArray(mesh.vao);
         const core::matrix4 &AbsoluteTransformation =
-            STK::tuple_get<1>(ListDisplacement::getInstance()->at(i));
+            std::get<1>(ListDisplacement::getInstance()->at(i));
         if (mesh.VAOType != video::EVT_2TCOORDS)
             continue;
 
