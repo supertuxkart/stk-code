@@ -514,7 +514,6 @@ void SFXManager::loadSfx()
         array[i++] = buffer;
     }
 
-    #pragma omp parallel for private(i)
     for (i = 0; i < max; i++)
     {
         array[i]->load();
