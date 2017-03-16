@@ -22,7 +22,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "utils/singleton.hpp"
-#include "utils/tuple.hpp"
+#include <tuple>
 
 #include <IMeshSceneNode.h>
 #include <IMesh.h>
@@ -101,7 +101,7 @@ template<typename T, typename... Args>
 class MeshList : public Singleton<T>
 {
 public:
-    std::vector<STK::Tuple<Args...> > SolidPass, Shadows[4], RSM;
+    std::vector<std::tuple<Args...> > SolidPass, Shadows[4], RSM;
     void clear()
     {
         SolidPass.clear();
@@ -183,7 +183,7 @@ class ListMatDetails : public MeshList<ListMatDetails, GLMesh *, core::matrix4,
 // ----------------------------------------------------------------------------
 // Transparent
 template <typename T, typename ...Args>
-class MiscList : public Singleton<T>, public std::vector<STK::Tuple<Args...> >
+class MiscList : public Singleton<T>, public std::vector<std::tuple<Args...> >
 {};
 
 // ----------------------------------------------------------------------------

@@ -29,29 +29,107 @@
 #include <cassert>
 #include <irrlicht.h>
 
+#if __SSE2__ || _M_X64 || _M_IX86_FP >= 2
+ #include <emmintrin.h>
+ #define SIMD_SSE2_SUPPORT (1)
+#endif
+#if __SSE4_1__ || __AVX__
+ #include <smmintrin.h>
+ #define SIMD_SSE4_1_SUPPORT (1)
+#endif
+
+#if SIMD_SSE4_1_SUPPORT
+ #include <smmintrin.h>
+ #define SIMD_BLENDV_PS(x,y,mask) _mm_blendv_ps(x,y,mask)
+#elif SIMD_SSE2_SUPPORT
+ #define SIMD_BLENDV_PS(x,y,mask) _mm_or_ps(_mm_andnot_ps(mask,x),_mm_and_ps(y,mask))
+#endif
+
+#if defined(__GNUC__) || defined(__INTEL_COMPILER) || defined(__clang__)
+ #define ALWAYSINLINE __attribute__((always_inline))
+ #define SIMD_ALIGN16 __attribute__((aligned(16)))
+#elif defined(_MSC_VER)
+ #define SIMD_ALIGN16 __declspec(align(16))
+ #define ALWAYSINLINE __forceinline
+#else
+ #define ALWAYSINLINE
+#endif
+
+
 using namespace irr;
 
 namespace 
 {
-    /** Convert an unsigned char cubemap texture to a float texture
-     *  \param sh_rgba The 6 faces of the cubemap texture
-     *  \param sh_w Texture width
-     *  \param sh_h Texture height
-     *  \param[out] float_tex_cube The converted float cubemap texture
-     */    
-    void convertToFloatTexture(unsigned char *sh_rgba[6], unsigned sh_w, unsigned sh_h, Color *float_tex_cube[6])
+
+    #if defined(__x86_64__) || defined(__x86_64) || defined(__amd64__) || defined(__amd64) || defined(__i386__) || defined(__i386)  || defined(i386)
+
+    /* Input is 0.0,255.0, output is 0.0,1.0 */
+    static inline ALWAYSINLINE float srgb2linear( float v )
     {
-        for (unsigned i = 0; i < 6; i++)
+        float v2, vpow, vpwsqrt;
+        union
         {
-            float_tex_cube[i] = new Color[sh_w * sh_h];
-            for (unsigned j = 0; j < sh_w * sh_h; j++)
-            {
-                float_tex_cube[i][j].Blue = powf(float(0xFF & sh_rgba[i][4 * j]) / 255.f, 2.2f);
-                float_tex_cube[i][j].Green = powf(float(0xFF & sh_rgba[i][4 * j + 1]) / 255.f, 2.2f);
-                float_tex_cube[i][j].Red = powf(float(0xFF & sh_rgba[i][4 * j + 2]) / 255.f, 2.2f);
-            }
-        }    
-    } //convertToFloatTexture
+            int32_t i;
+            float f;
+        } u;
+        if( v <= (0.04045f*255.0f) )
+            v = v * ( (1.0f/12.92f)*(1.0f/255.0f) );
+        else
+        {
+            v = ( v + (0.055f*255.0f) ) * ( (1.0f/1.055f)*(1.0f/255.0f) );
+            v2 = v * v;
+            u.f = v * 5417434112.0f;
+            u.i = (int32_t)( ( (float)u.i * 0.8f ) + 0.5f );
+            vpow = u.f;
+            vpwsqrt = sqrtf( vpow );
+            v = ( ( v2 * vpwsqrt ) + ( ( ( v2 * v ) / vpwsqrt ) / sqrtf( vpwsqrt ) ) ) * 0.51011878327f;
+        }
+        return v;
+    }
+
+    #else
+
+    /* Input is 0.0,255.0, output is 0.0,1.0 */
+    /* Only for reference, this is waayyy too slow and should never be used */
+    static inline ALWAYSINLINE float srgb2linear( float v )
+    {
+        v *= (1.0f/255.0f);
+        if( v <= 0.04045f )
+            v = v * (1.0f/12.92);
+        else
+            v = pow( ( v + 0.055f ) * (1.0f/1.055f), 2.4f );
+        return v;
+    }
+
+    #endif
+
+    #if SIMD_SSE2_SUPPORT
+
+    static const float SIMD_ALIGN16 srgbLinearConst00[4] = { 0.04045f*255.0f, 0.04045f*255.0f, 0.04045f*255.0f, 0.04045f*255.0f };
+    static const float SIMD_ALIGN16 srgbLinearConst01[4] = { (1.0f/12.92f)*(1.0f/255.0f), (1.0f/12.92f)*(1.0f/255.0f), (1.0f/12.92f)*(1.0f/255.0f), (1.0f/12.92f)*(1.0f/255.0f) };
+    static const float SIMD_ALIGN16 srgbLinearConst02[4] = { 0.055f*255.0f, 0.055f*255.0f, 0.055f*255.0f, 0.055f*255.0f };
+    static const float SIMD_ALIGN16 srgbLinearConst03[4] = { (1.0f/1.055f)*(1.0f/255.0f), (1.0f/1.055f)*(1.0f/255.0f), (1.0f/1.055f)*(1.0f/255.0f), (1.0f/1.055f)*(1.0f/255.0f) };
+    static const float SIMD_ALIGN16 srgbLinearConst04[4] = { 5417434112.0f, 5417434112.0f, 5417434112.0f, 5417434112.0f };
+    static const float SIMD_ALIGN16 srgbLinearConst05[4] = { 0.8f, 0.8f, 0.8f, 0.8f };
+    static const float SIMD_ALIGN16 srgbLinearConst06[4] = { 0.51011878327f, 0.51011878327f, 0.51011878327f, 0.51011878327f };
+
+    /* Input is 0.0,255.0 ~ output is 0.0,1.0 */
+    static inline ALWAYSINLINE __m128 srgb2linear4( __m128 vx )
+    {
+        __m128 vmask, vbase;
+        __m128 vpow, vpwsqrtinv, vpwsqrt, vx2;
+        vmask = _mm_cmple_ps( vx, *(__m128*)srgbLinearConst00 );
+        vbase = _mm_mul_ps( vx, *(__m128*)srgbLinearConst01 );
+        vx = _mm_mul_ps( _mm_add_ps( vx, *(__m128*)srgbLinearConst02 ), *(__m128*)srgbLinearConst03 );
+        vx2 = _mm_mul_ps( vx, vx );
+        vpow = _mm_castsi128_ps( _mm_cvtps_epi32( _mm_mul_ps( _mm_cvtepi32_ps( _mm_castps_si128( _mm_mul_ps( vx, *(__m128*)srgbLinearConst04 ) ) ), *(__m128*)srgbLinearConst05 ) ) );
+        vpwsqrtinv = _mm_rsqrt_ps( vpow );
+        vpwsqrt = _mm_mul_ps( vpow, vpwsqrtinv );
+        vx = _mm_mul_ps( _mm_add_ps( _mm_mul_ps( vx2, vpwsqrt ), _mm_mul_ps( _mm_mul_ps( _mm_mul_ps( vx2, vx ), vpwsqrtinv ), _mm_rsqrt_ps( vpwsqrt ) ) ), *(__m128*)srgbLinearConst06 );
+        return SIMD_BLENDV_PS( vx, vbase, vmask );
+    }
+
+    #endif
 
     // ------------------------------------------------------------------------
     /** Print the nine first spherical harmonics coefficients
@@ -106,174 +184,292 @@ namespace
      */    
     void getXYZ(GLenum face, float i, float j, float &x, float &y, float &z)
     {
+        float norminv;
         switch (face)
         {
-        case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
-            x = 1.;
+        case 0: // PosX
+            x = 1.0f;
             y = -i;
             z = -j;
             break;
-        case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
-            x = -1.;
+        case 1: // NegX
+            x = -1.0f;
             y = -i;
             z = j;
             break;
-        case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
+        case 2: // PosY
             x = j;
-            y = 1.;
+            y = 1.0f;
             z = i;
             break;
-        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
+        case 3: // NegY
             x = j;
-            y = -1;
+            y = -1.0f;
             z = -i;
             break;
-        case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
+        case 4: // PosZ
             x = j;
             y = -i;
-            z = 1;
+            z = 1.0f;
             break;
-        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
+        case 5: // NegZ
             x = -j;
             y = -i;
-            z = -1;
+            z = -1.0f;
             break;
         }
 
-        float norm = sqrt(x * x + y * y + z * z);
-        x /= norm, y /= norm, z /= norm;
+        norminv = 1.0f / sqrtf(x * x + y * y + z * z);
+        x *= norminv, y *= norminv, z *= norminv;
         return;
     }   // getXYZ
 
-    // ------------------------------------------------------------------------
-    /** Compute the value of the spherical harmonics basis functions (Yml)
-     *  on each texel of a cubemap face
-     *  \param face Face of the cubemap
-     *  \param edge_size Size of the cubemap face
-     *  \param[out] Yml The sphericals harmonics functions values on each texel of the cubemap
-     */
-    void getYml(GLenum face, size_t edge_size,
-                float *Y00,
-                float *Y1minus1, float *Y10, float *Y11,
-                float *Y2minus2, float *Y2minus1, float *Y20, float *Y21, float *Y22)
-    {
-    #pragma omp parallel for
-        for (int i = 0; i < int(edge_size); i++)
-        {
-            for (unsigned j = 0; j < edge_size; j++)
-            {
-                float x, y, z;
-                float fi = float(i), fj = float(j);
-                fi /= edge_size, fj /= edge_size;
-                fi = 2 * fi - 1, fj = 2 * fj - 1;
-                getXYZ(face, fi, fj, x, y, z);
-
-                // constant part of Ylm
-                float c00 = 0.282095f;
-                float c1minus1 = 0.488603f;
-                float c10 = 0.488603f;
-                float c11 = 0.488603f;
-                float c2minus2 = 1.092548f;
-                float c2minus1 = 1.092548f;
-                float c21 = 1.092548f;
-                float c20 = 0.315392f;
-                float c22 = 0.546274f;
-
-                size_t idx = i * edge_size + j;
-
-                Y00[idx] = c00;
-                Y1minus1[idx] = c1minus1 * y;
-                Y10[idx] = c10 * z;
-                Y11[idx] = c11 * x;
-                Y2minus2[idx] = c2minus2 * x * y;
-                Y2minus1[idx] = c2minus1 * y * z;
-                Y21[idx] = c21 * x * z;
-                Y20[idx] = c20 * (3 * z * z - 1);
-                Y22[idx] = c22 * (x * x - y * y);
-            }
-        }
-    }
     
 } //namespace
 
 // ----------------------------------------------------------------------------
 /** Compute m_SH_coeff->red_SH_coeff, m_SH_coeff->green_SH_coeff 
  *  and m_SH_coeff->blue_SH_coeff from Yml values
- *  \param cubemap_face The 6 cubemap faces (float textures)
+ *  \param sh_rgba The 6 cubemap faces (sRGB byte textures)
  *  \param edge_size Size of the cubemap face
- *  \param Yml The sphericals harmonics functions values on each texel of the cubemap
  */
-void SphericalHarmonics::projectSH(Color *cubemap_face[6], size_t edge_size,
-                                   float *Y00[],
-                                   float *Y1minus1[], float *Y10[], float *Y11[],
-                                   float *Y2minus2[], float *Y2minus1[], float * Y20[],
-                                   float *Y21[], float *Y22[])
+void SphericalHarmonics::generateSphericalHarmonics(unsigned char *sh_rgba[6], size_t edge_size)
 {
-    for (unsigned i = 0; i < 9; i++)
+
+#if SIMD_SSE2_SUPPORT
+
+    float wh = float(edge_size * edge_size);
+    float edge_size_inv;
+    float fi, fj, fi2p1;
+    unsigned char *shface;
+    __m128 sh0, sh1, sh2, sh3, sh4, sh5, sh6, sh7, sh8;
+
+    // constant part of Ylm
+    const float c00 = 0.282095f;
+    const float c1minus1 = 0.488603f;
+    const float c10 = 0.488603f;
+    const float c11 = 0.488603f;
+    const float c2minus2 = 1.092548f;
+    const float c2minus1 = 1.092548f;
+    const float c21 = 1.092548f;
+    const float c20 = 0.315392f;
+    const float c22 = 0.546274f;
+
+    sh0 = _mm_setzero_ps();
+    sh1 = _mm_setzero_ps();
+    sh2 = _mm_setzero_ps();
+    sh3 = _mm_setzero_ps();
+    sh4 = _mm_setzero_ps();
+    sh5 = _mm_setzero_ps();
+    sh6 = _mm_setzero_ps();
+    sh7 = _mm_setzero_ps();
+    sh8 = _mm_setzero_ps();
+
+    edge_size_inv = 2.0f / edge_size;
+    for (unsigned face = 0; face < 6; face++)
     {
-        m_SH_coeff->blue_SH_coeff[i] = 0;
-        m_SH_coeff->green_SH_coeff[i] = 0;
-        m_SH_coeff->red_SH_coeff[i] = 0;
+        shface = sh_rgba[face];
+        for (int i = 0; i < int(edge_size); i++)
+        {
+            int shidx = ( i * edge_size ) * 4;
+            fi = (float(i) * edge_size_inv) - 1.0f;
+            fi2p1 = (fi * fi) + 1.0f;
+            for (unsigned j = 0; j < edge_size; j++, shidx += 4)
+            {
+                float d, solidangle, dinv;
+                float shx, shy, shz;
+                __m128 vrgb;
+
+                fj = (float(j) * edge_size_inv) - 1.0f;
+                d = sqrtf(fi2p1 + (fj * fj));
+                dinv = 1.0f / d;
+                // Constant obtained by projecting unprojected ref values
+                solidangle = 2.75f / (wh * sqrtf(d*d*d));
+ #if SIMD_SSE4_1_SUPPORT
+                vrgb = _mm_cvtepi32_ps( _mm_cvtepu8_epi32( _mm_castps_si128( _mm_load_ss( (float *)&shface[shidx+0] ) ) ) );
+ #else
+                vrgb = _mm_cvtepi32_ps( _mm_unpacklo_epi16( _mm_unpacklo_epi8( _mm_castps_si128( _mm_load_ss( (float *)&shface[shidx+0] ) ), _mm_setzero_si128() ), _mm_setzero_si128() ) );
+ #endif
+                vrgb = _mm_mul_ps( srgb2linear4( vrgb ), _mm_set1_ps( solidangle ) );
+
+                // TODO: This is very suboptimal, and a pity to break such a streamlined loop
+                // I think people will disapprove if I unroll the 'face' loop 6 times...
+                // What about some branchless vblendps masking?
+                switch (face)
+                {
+                case 0: // PosX
+                    shx = 1.0f;
+                    shy = -fi;
+                    shz = -fj;
+                    break;
+                case 1: // NegX
+                    shx = -1.0f;
+                    shy = -fi;
+                    shz = fj;
+                    break;
+                case 2: // PosY
+                    shx = fj;
+                    shy = 1.0f;
+                    shz = fi;
+                    break;
+                case 3: // NegY
+                    shx = fj;
+                    shy = -1.0f;
+                    shz = -fi;
+                    break;
+                case 4: // PosZ
+                    shx = fj;
+                    shy = -fi;
+                    shz = 1.0f;
+                    break;
+                case 5: // NegZ
+                    shx = -fj;
+                    shy = -fi;
+                    shz = -1.0f;
+                    break;
+                }
+                shx *= dinv;
+                shy *= dinv;
+                shz *= dinv;
+
+                sh0 = _mm_add_ps( sh0, vrgb );
+                sh1 = _mm_add_ps( sh1, _mm_mul_ps( vrgb, _mm_set1_ps( shy ) ) );
+                sh2 = _mm_add_ps( sh2, _mm_mul_ps( vrgb, _mm_set1_ps( shz ) ) );
+                sh3 = _mm_add_ps( sh3, _mm_mul_ps( vrgb, _mm_set1_ps( shx ) ) );
+                sh4 = _mm_add_ps( sh4, _mm_mul_ps( vrgb, _mm_set1_ps( shx * shy ) ) );
+                sh5 = _mm_add_ps( sh5, _mm_mul_ps( vrgb, _mm_set1_ps( shy * shz ) ) );
+                sh6 = _mm_add_ps( sh6, _mm_mul_ps( vrgb, _mm_set1_ps( shx * shz ) ) );
+                sh7 = _mm_add_ps( sh7, _mm_mul_ps( vrgb, _mm_set1_ps( ((3.0f * shz * shz) - 1.0f) ) ) );
+                sh8 = _mm_add_ps( sh8, _mm_mul_ps( vrgb, _mm_set1_ps( ((shx * shx) - (shy * shy)) ) ) );
+            }
+        }
     }
+
+    sh0 = _mm_mul_ps( sh0, _mm_set1_ps( c00 ) );
+    sh1 = _mm_mul_ps( sh1, _mm_set1_ps( c1minus1 ) );
+    sh2 = _mm_mul_ps( sh2, _mm_set1_ps( c10 ) );
+    sh3 = _mm_mul_ps( sh3, _mm_set1_ps( c11 ) );
+    sh4 = _mm_mul_ps( sh4, _mm_set1_ps( c2minus2 ) );
+    sh5 = _mm_mul_ps( sh5, _mm_set1_ps( c2minus1 ) );
+    sh6 = _mm_mul_ps( sh6, _mm_set1_ps( c21 ) );
+    sh7 = _mm_mul_ps( sh7, _mm_set1_ps( c20 ) );
+    sh8 = _mm_mul_ps( sh8, _mm_set1_ps( c22 ) );
+
+    m_SH_coeff->blue_SH_coeff[0] = _mm_cvtss_f32( sh0 );
+    m_SH_coeff->blue_SH_coeff[1] = _mm_cvtss_f32( sh1 );
+    m_SH_coeff->blue_SH_coeff[2] = _mm_cvtss_f32( sh2 );
+    m_SH_coeff->blue_SH_coeff[3] = _mm_cvtss_f32( sh3 );
+    m_SH_coeff->blue_SH_coeff[4] = _mm_cvtss_f32( sh4 );
+    m_SH_coeff->blue_SH_coeff[5] = _mm_cvtss_f32( sh5 );
+    m_SH_coeff->blue_SH_coeff[6] = _mm_cvtss_f32( sh6 );
+    m_SH_coeff->blue_SH_coeff[7] = _mm_cvtss_f32( sh7 );
+    m_SH_coeff->blue_SH_coeff[8] = _mm_cvtss_f32( sh8 );
+
+    m_SH_coeff->green_SH_coeff[0] = _mm_cvtss_f32( _mm_shuffle_ps( sh0, sh0, 0x55 ) );
+    m_SH_coeff->green_SH_coeff[1] = _mm_cvtss_f32( _mm_shuffle_ps( sh1, sh1, 0x55 ) );
+    m_SH_coeff->green_SH_coeff[2] = _mm_cvtss_f32( _mm_shuffle_ps( sh2, sh2, 0x55 ) );
+    m_SH_coeff->green_SH_coeff[3] = _mm_cvtss_f32( _mm_shuffle_ps( sh3, sh3, 0x55 ) );
+    m_SH_coeff->green_SH_coeff[4] = _mm_cvtss_f32( _mm_shuffle_ps( sh4, sh4, 0x55 ) );
+    m_SH_coeff->green_SH_coeff[5] = _mm_cvtss_f32( _mm_shuffle_ps( sh5, sh5, 0x55 ) );
+    m_SH_coeff->green_SH_coeff[6] = _mm_cvtss_f32( _mm_shuffle_ps( sh6, sh6, 0x55 ) );
+    m_SH_coeff->green_SH_coeff[7] = _mm_cvtss_f32( _mm_shuffle_ps( sh7, sh7, 0x55 ) );
+    m_SH_coeff->green_SH_coeff[8] = _mm_cvtss_f32( _mm_shuffle_ps( sh8, sh8, 0x55 ) );
+
+    m_SH_coeff->red_SH_coeff[0] = _mm_cvtss_f32( _mm_movehl_ps( sh0, sh0 ) );
+    m_SH_coeff->red_SH_coeff[1] = _mm_cvtss_f32( _mm_movehl_ps( sh1, sh1 ) );
+    m_SH_coeff->red_SH_coeff[2] = _mm_cvtss_f32( _mm_movehl_ps( sh2, sh2 ) );
+    m_SH_coeff->red_SH_coeff[3] = _mm_cvtss_f32( _mm_movehl_ps( sh3, sh3 ) );
+    m_SH_coeff->red_SH_coeff[4] = _mm_cvtss_f32( _mm_movehl_ps( sh4, sh4 ) );
+    m_SH_coeff->red_SH_coeff[5] = _mm_cvtss_f32( _mm_movehl_ps( sh5, sh5 ) );
+    m_SH_coeff->red_SH_coeff[6] = _mm_cvtss_f32( _mm_movehl_ps( sh6, sh6 ) );
+    m_SH_coeff->red_SH_coeff[7] = _mm_cvtss_f32( _mm_movehl_ps( sh7, sh7 ) );
+    m_SH_coeff->red_SH_coeff[8] = _mm_cvtss_f32( _mm_movehl_ps( sh8, sh8 ) );
+
+#else
 
     float wh = float(edge_size * edge_size);
     float b0 = 0., b1 = 0., b2 = 0., b3 = 0., b4 = 0., b5 = 0., b6 = 0., b7 = 0., b8 = 0.;
-    float r0 = 0., r1 = 0., r2 = 0., r3 = 0., r4 = 0., r5 = 0., r6 = 0., r7 = 0., r8 = 0.;
     float g0 = 0., g1 = 0., g2 = 0., g3 = 0., g4 = 0., g5 = 0., g6 = 0., g7 = 0., g8 = 0.;
+    float r0 = 0., r1 = 0., r2 = 0., r3 = 0., r4 = 0., r5 = 0., r6 = 0., r7 = 0., r8 = 0.;
+    float edge_size_inv;
+    float fi, fj, fi2p1;
+    unsigned char *shface;
+
+    // constant part of Ylm
+    const float c00 = 0.282095f;
+    const float c1minus1 = 0.488603f;
+    const float c10 = 0.488603f;
+    const float c11 = 0.488603f;
+    const float c2minus2 = 1.092548f;
+    const float c2minus1 = 1.092548f;
+    const float c21 = 1.092548f;
+    const float c20 = 0.315392f;
+    const float c22 = 0.546274f;
+
+    edge_size_inv = 2.0f / edge_size;
     for (unsigned face = 0; face < 6; face++)
     {
-#pragma omp parallel for reduction(+ : b0, b1, b2, b3, b4, b5, b6, b7, b8, \
-                                       r0, r1, r2, r3, r4, r5, r6, r7, r8, \
-                                       g0, g1, g2, g3, g4, g5, g6, g7, g8)
+        shface = sh_rgba[face];
         for (int i = 0; i < int(edge_size); i++)
         {
-            for (unsigned j = 0; j < edge_size; j++)
+            int shidx = ( i * edge_size ) * 4;
+            fi = (float(i) * edge_size_inv) - 1.0f;
+            fi2p1 = (fi * fi) + 1.0f;
+            for (unsigned j = 0; j < edge_size; j++, shidx += 4)
             {
-                int idx = i * edge_size + j;
-                float fi = float(i), fj = float(j);
-                fi /= edge_size, fj /= edge_size;
-                fi = 2 * fi - 1, fj = 2 * fj - 1;
+                fj = (float(j) * edge_size_inv) - 1.0f;
 
-
-                float d = sqrt(fi * fi + fj * fj + 1);
-
+                float d = sqrtf(fi2p1 + (fj * fj));
                 // Constant obtained by projecting unprojected ref values
-                float solidangle = 2.75f / (wh * pow(d, 1.5f));
-                // pow(., 2.2) to convert from srgb
-                float b = cubemap_face[face][edge_size * i + j].Blue;
-                float g = cubemap_face[face][edge_size * i + j].Green;
-                float r = cubemap_face[face][edge_size * i + j].Red;
+                float solidangle = 2.75f / (wh * sqrtf(d*d*d));
+                float r, g, b;
+                float y00, y1m1, y10, y11, y2m2, y2m1, y21, y20, y22;
+                float shx, shy, shz;
 
-                b0 += b * Y00[face][idx] * solidangle;
-                b1 += b * Y1minus1[face][idx] * solidangle;
-                b2 += b * Y10[face][idx] * solidangle;
-                b3 += b * Y11[face][idx] * solidangle;
-                b4 += b * Y2minus2[face][idx] * solidangle;
-                b5 += b * Y2minus1[face][idx] * solidangle;
-                b6 += b * Y20[face][idx] * solidangle;
-                b7 += b * Y21[face][idx] * solidangle;
-                b8 += b * Y22[face][idx] * solidangle;
+                b = srgb2linear( float(shface[shidx+0]) ) * solidangle;
+                g = srgb2linear( float(shface[shidx+1]) ) * solidangle;
+                r = srgb2linear( float(shface[shidx+2]) ) * solidangle;
 
-                g0 += g * Y00[face][idx] * solidangle;
-                g1 += g * Y1minus1[face][idx] * solidangle;
-                g2 += g * Y10[face][idx] * solidangle;
-                g3 += g * Y11[face][idx] * solidangle;
-                g4 += g * Y2minus2[face][idx] * solidangle;
-                g5 += g * Y2minus1[face][idx] * solidangle;
-                g6 += g * Y20[face][idx] * solidangle;
-                g7 += g * Y21[face][idx] * solidangle;
-                g8 += g * Y22[face][idx] * solidangle;
+                getXYZ(face, fi, fj, shx, shy, shz);
+                y00 = c00;
+                y1m1 = c1minus1 * shy;
+                y10 = c10 * shz;
+                y11 = c11 * shx;
+                y2m2 = c2minus2 * shx * shy;
+                y2m1 = c2minus1 * shy * shz;
+                y21 = c21 * shx * shz;
+                y20 = c20 * ((3.0f * shz * shz) - 1.0f);
+                y22 = c22 * ((shx * shx) - (shy * shy));
 
+                b0 += b * y00;
+                b1 += b * y1m1;
+                b2 += b * y10;
+                b3 += b * y11;
+                b4 += b * y2m2;
+                b5 += b * y2m1;
+                b6 += b * y20;
+                b7 += b * y21;
+                b8 += b * y22;
 
-                r0 += r * Y00[face][idx] * solidangle;
-                r1 += r * Y1minus1[face][idx] * solidangle;
-                r2 += r * Y10[face][idx] * solidangle;
-                r3 += r * Y11[face][idx] * solidangle;
-                r4 += r * Y2minus2[face][idx] * solidangle;
-                r5 += r * Y2minus1[face][idx] * solidangle;
-                r6 += r * Y20[face][idx] * solidangle;
-                r7 += r * Y21[face][idx] * solidangle;
-                r8 += r * Y22[face][idx] * solidangle;
+                g0 += g * y00;
+                g1 += g * y1m1;
+                g2 += g * y10;
+                g3 += g * y11;
+                g4 += g * y2m2;
+                g5 += g * y2m1;
+                g6 += g * y20;
+                g7 += g * y21;
+                g8 += g * y22;
+
+                r0 += r * y00;
+                r1 += r * y1m1;
+                r2 += r * y10;
+                r3 += r * y11;
+                r4 += r * y2m2;
+                r5 += r * y2m1;
+                r6 += r * y20;
+                r7 += r * y21;
+                r8 += r * y22;
             }
         }
     }
@@ -307,59 +503,14 @@ void SphericalHarmonics::projectSH(Color *cubemap_face[6], size_t edge_size,
     m_SH_coeff->green_SH_coeff[6] = g6;
     m_SH_coeff->green_SH_coeff[7] = g7;
     m_SH_coeff->green_SH_coeff[8] = g8;
+
+#endif
+/*
+printf( "#### SH ; Coeffs R ; %f %f %f %f %f %f %f %f\n", m_SH_coeff->red_SH_coeff[0], m_SH_coeff->red_SH_coeff[1], m_SH_coeff->red_SH_coeff[2], m_SH_coeff->red_SH_coeff[3], m_SH_coeff->red_SH_coeff[4], m_SH_coeff->red_SH_coeff[5], m_SH_coeff->red_SH_coeff[6], m_SH_coeff->red_SH_coeff[7] );
+printf( "#### SH ; Coeffs G ; %f %f %f %f %f %f %f %f\n", m_SH_coeff->green_SH_coeff[0], m_SH_coeff->green_SH_coeff[1], m_SH_coeff->green_SH_coeff[2], m_SH_coeff->green_SH_coeff[3], m_SH_coeff->green_SH_coeff[4], m_SH_coeff->green_SH_coeff[5], m_SH_coeff->green_SH_coeff[6], m_SH_coeff->green_SH_coeff[7] );
+printf( "#### SH ; Coeffs B ; %f %f %f %f %f %f %f %f\n", m_SH_coeff->blue_SH_coeff[0], m_SH_coeff->blue_SH_coeff[1], m_SH_coeff->blue_SH_coeff[2], m_SH_coeff->blue_SH_coeff[3], m_SH_coeff->blue_SH_coeff[4], m_SH_coeff->blue_SH_coeff[5], m_SH_coeff->blue_SH_coeff[6], m_SH_coeff->blue_SH_coeff[7] );
+*/
 }   // projectSH
-
-// ----------------------------------------------------------------------------
-/** Generate the 9 first SH coefficients for each color channel
- *  using the cubemap provided by CubemapFace.
- *  \param cubemap_face The 6 cubemap faces (float textures)
- *  \param edge_size Size of the cubemap face
- */
-void SphericalHarmonics::generateSphericalHarmonics(Color *cubemap_face[6], size_t edge_size)
-{
-    float *Y00[6];
-    float *Y1minus1[6];
-    float *Y10[6];
-    float *Y11[6];
-    float *Y2minus2[6];
-    float *Y2minus1[6];
-    float *Y20[6];
-    float *Y21[6];
-    float *Y22[6];
-
-    for (unsigned face = 0; face < 6; face++)
-    {
-        Y00[face] = new float[edge_size * edge_size];
-        Y1minus1[face] = new float[edge_size * edge_size];
-        Y10[face] = new float[edge_size * edge_size];
-        Y11[face] = new float[edge_size * edge_size];
-        Y2minus2[face] = new float[edge_size * edge_size];
-        Y2minus1[face] = new float[edge_size * edge_size];
-        Y20[face] = new float[edge_size * edge_size];
-        Y21[face] = new float[edge_size * edge_size];
-        Y22[face] = new float[edge_size * edge_size];
-
-        getYml(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, edge_size, Y00[face],
-               Y1minus1[face], Y10[face], Y11[face], Y2minus2[face],
-               Y2minus1[face], Y20[face], Y21[face], Y22[face]);
-    }
-
-    projectSH(cubemap_face, edge_size, Y00, Y1minus1, Y10, Y11, Y2minus2,
-              Y2minus1, Y20, Y21, Y22);
-
-    for (unsigned face = 0; face < 6; face++)
-    {
-        delete[] Y00[face];
-        delete[] Y1minus1[face];
-        delete[] Y10[face];
-        delete[] Y11[face];
-        delete[] Y2minus2[face];
-        delete[] Y2minus1[face];
-        delete[] Y20[face];
-        delete[] Y21[face];
-        delete[] Y22[face];
-    }
-}   // generateSphericalHarmonics
 
 // ----------------------------------------------------------------------------
 SphericalHarmonics::SphericalHarmonics(const std::vector<video::ITexture *> &spherical_harmonics_textures)
@@ -427,15 +578,10 @@ void SphericalHarmonics::setTextures(const std::vector<video::ITexture *> &spher
 #endif
     } //for (unsigned i = 0; i < 6; i++)
 
-    Color *float_tex_cube[6];
-    convertToFloatTexture(sh_rgba, sh_w, sh_h, float_tex_cube);
-    generateSphericalHarmonics(float_tex_cube, sh_w);
+    generateSphericalHarmonics(sh_rgba, sh_w);
 
     for (unsigned i = 0; i < 6; i++)
-    {
         delete[] sh_rgba[i];
-        delete[] float_tex_cube[i];
-    }
 } //setSphericalHarmonicsTextures
 
 /** Compute spherical harmonics coefficients from ambient light */
@@ -451,29 +597,28 @@ void SphericalHarmonics::setAmbientLight(const video::SColor &ambient)
     unsigned char *sh_rgba[6];
     unsigned sh_w = 16;
     unsigned sh_h = 16;
+    unsigned ambr, ambg, ambb;
+
+    ambr = ambient.getBlue();
+    ambg = ambient.getGreen();
+    ambb = ambient.getBlue();
 
     for (unsigned i = 0; i < 6; i++)
     {
         sh_rgba[i] = new unsigned char[sh_w * sh_h * 4];
-
         for (unsigned j = 0; j < sh_w * sh_h * 4; j += 4)
         {
-            sh_rgba[i][j] = ambient.getBlue();
-            sh_rgba[i][j + 1] = ambient.getGreen();
-            sh_rgba[i][j + 2] = ambient.getRed();
+            sh_rgba[i][j] = ambb;
+            sh_rgba[i][j + 1] = ambg;
+            sh_rgba[i][j + 2] = ambr;
             sh_rgba[i][j + 3] = 255;
         }
     }    
 
-    Color *float_tex_cube[6];
-    convertToFloatTexture(sh_rgba, sh_w, sh_h, float_tex_cube);
-    generateSphericalHarmonics(float_tex_cube, sh_w);
+    generateSphericalHarmonics(sh_rgba, sh_w);
 
     for (unsigned i = 0; i < 6; i++)
-    {
         delete[] sh_rgba[i];
-        delete[] float_tex_cube[i];
-    }
 
     // Diffuse env map is x 0.25, compensate
     for (unsigned i = 0; i < 9; i++)
