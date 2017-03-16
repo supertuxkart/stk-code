@@ -83,8 +83,6 @@ SFXManager::SFXManager()
     m_listener_front              = Vec3(0, 0, 1);
     m_listener_up                 = Vec3(0, 1, 0);
 
-    loadSfx();
-
     pthread_cond_init(&m_cond_request, NULL);
 
     pthread_attr_t  attr;
@@ -296,6 +294,7 @@ void* SFXManager::mainLoop(void *obj)
     VS::setThreadName("SFXManager");
     SFXManager *me = (SFXManager*)obj;
 
+    me->loadSfx();
     me->m_sfx_commands.lock();
 
     // Wait till we have an empty sfx in the queue
