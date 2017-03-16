@@ -1,5 +1,5 @@
-//  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2015 Marianne Gagnon
+//  SuperTuxKart - a fun racing game with go-karts
+//  Copyright (C) 2006-2017 The SuperTuxKart Team and contributers
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -75,16 +75,16 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
         UserConfigParams::m_show_steering_animations == 2 ?
         1 : UserConfigParams::m_show_steering_animations);
 
-    SpinnerWidget* geometry_level = getWidget<SpinnerWidget>("geometry_detail");
-    //I18N: Geometry level disabled : lowest level, no details
-    geometry_level->addLabel(_("Disabled"));
-    //I18N: Geometry level low : few details are displayed
-    geometry_level->addLabel(_("low"));
-    //I18N: Geometry level high : everything is displayed
-    geometry_level->addLabel(_("high"));
-    geometry_level->setValue(
-        UserConfigParams::m_geometry_level == 2 ? 0 :
-        UserConfigParams::m_geometry_level == 0 ? 2 : 1);
+    SpinnerWidget* scenery_level = getWidget<SpinnerWidget>("scenery_level");
+    //I18N: Scenery level low : lowest level, only basic scenery
+    scenery_level->addLabel(_("Low"));
+    //I18N: Scenery level medium : some more scenery is displayed
+    scenery_level->addLabel(_("Medium"));
+    //I18N: Scenery level high : all scenery is displayed
+    scenery_level->addLabel(_("High"));
+    scenery_level->setValue(
+        UserConfigParams::m_scenery_level == 2 ? 0 :
+        UserConfigParams::m_scenery_level == 0 ? 2 : 1);
 
     SpinnerWidget* filtering = getWidget<SpinnerWidget>("filtering");
     int value = 0;
@@ -204,8 +204,8 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             getWidget<SpinnerWidget>("steering_animations")->getValue();
 
         const int val =
-            getWidget<SpinnerWidget>("geometry_detail")->getValue();
-        UserConfigParams::m_geometry_level = val == 2 ? 0 : val == 0 ? 2 : 1;
+            getWidget<SpinnerWidget>("scenery_level")->getValue();
+        UserConfigParams::m_scenery_level = val == 2 ? 0 : val == 0 ? 2 : 1;
 
         switch (getWidget<SpinnerWidget>("filtering")->getValue())
         {

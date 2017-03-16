@@ -1,6 +1,5 @@
-//
-//  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2015 SuperTuxKart-Team
+//  SuperTuxKart - a fun racing game with go-karts
+//  Copyright (C) 2006-2017 The SuperTuxKart Team and contributers
 //  Modelled after Supertux's configfile.h
 //
 //  This program is free software; you can redistribute it and/or
@@ -701,9 +700,9 @@ namespace UserConfigParams
                 "Whether to display kart animations (0=disabled for all; "
                 "1=enabled for humans, disabled for AIs; 2=enabled for all") );
 
-    PARAM_PREFIX IntUserConfigParam        m_geometry_level
+    PARAM_PREFIX IntUserConfigParam        m_scenery_level
             PARAM_DEFAULT(  IntUserConfigParam(GEOLEVEL_0,
-                            "geometry_level", &m_graphics_quality,
+                            "scenery_level", &m_graphics_quality,
                 "Geometry quality 0=everything is displayed; "
                 "1=a few details are displayed; 2=lowest level, no details") );
 

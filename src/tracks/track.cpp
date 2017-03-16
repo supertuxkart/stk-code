@@ -1,7 +1,5 @@
-//  SuperTuxKart - a fun racing game with go-kart
-//
-//  Copyright (C) 2004-2015  Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2009-2015  Joerg Henrichs, Steve Baker
+//  SuperTuxKart - a fun racing game with go-karts
+//  Copyright (C) 2004-2017 The SuperTuxKart Team and contributers
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -1942,7 +1940,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         {
             int geo_level = 0;
             node->get("geometry-level", &geo_level);
-            if (UserConfigParams::m_geometry_level + geo_level - 2 > 0)
+            if (UserConfigParams::m_scenery_level + geo_level - 2 > 0)
                 continue;
             m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
         }
