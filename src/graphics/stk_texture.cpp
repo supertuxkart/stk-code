@@ -619,7 +619,7 @@ void STKTexture::threadedReload(void* ptr, void* param) const
     if (useHQMipmap())
     {
         HQMipmapGenerator* hqmg = new HQMipmapGenerator(NamedPath, data,
-            m_size, m_texture_name);
+            m_size, m_texture_name, m_tex_config);
         ((STKTexManager*)(param))->addThreadedLoadTexture(hqmg);
     }
     else

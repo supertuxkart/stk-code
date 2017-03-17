@@ -18,6 +18,7 @@
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
 
 #include "graphics/hq_mipmap_generator.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #undef DUMP_MIPMAP
 #ifdef DUMP_MIPMAP
 #include "graphics/irr_driver.hpp"
@@ -34,11 +35,12 @@ extern "C"
 // ----------------------------------------------------------------------------
 HQMipmapGenerator::HQMipmapGenerator(const io::path& name, uint8_t* data,
                                      const core::dimension2d<u32>& size,
-                                     GLuint texture_name)
+                                     GLuint texture_name, TexConfig* tc)
                  : video::ITexture(name), m_orig_data(data), m_size(size),
                    m_texture_name(texture_name), m_texture_size(0),
-                   m_mipmap_data(NULL)
+                   m_mipmap_data(NULL), m_tex_config(tc)
 {
+    assert(m_tex_config != NULL);
     unsigned width = m_size.Width;
     unsigned height = m_size.Height;
     while (true)
@@ -59,7 +61,9 @@ HQMipmapGenerator::HQMipmapGenerator(const io::path& name, uint8_t* data,
 void HQMipmapGenerator::threadedReload(void* ptr, void* param) const
 {
     imReduceOptions options;
-    imReduceSetOptions(&options, IM_REDUCE_FILTER_SRGB, 2, 2.0f, 0.0f, 0.0f);
+    imReduceSetOptions(&options, m_tex_config->m_normal_map ?
+        IM_REDUCE_FILTER_NORMALMAP: IM_REDUCE_FILTER_SRGB,
+        2, 2.0f, 0.0f, 0.0f);
     imMipmapCascade* mm_cascade = (imMipmapCascade*)m_mipmap_data;
 #ifdef DEBUG
     int ret = imBuildMipmapCascade(mm_cascade, m_orig_data, m_size.Width,
@@ -75,17 +79,9 @@ void HQMipmapGenerator::threadedReload(void* ptr, void* param) const
             mm_cascade->mipmap[i + 1],
             m_mipmap_sizes[i].first.getArea() *  4);
 #ifdef DUMP_MIPMAP
-        uint8_t* data = (uint8_t*)mm_cascade->mipmap[i + 1];
-        if (m_single_channel)
-        {
-            const unsigned size = m_mipmap_sizes[i].first.getArea() * 4;
-            data = new uint8_t[size]();
-            for (unsigned j = 0; j < m_mipmap_sizes[i].first.getArea(); j++)
-                data[j * 4 + 3] = *((uint8_t*)(mm_cascade->mipmap[i + 1]) + j);
-        }
         video::IImage* image = irr_driver->getVideoDriver()
             ->createImageFromData(video::ECF_A8R8G8B8, m_mipmap_sizes[i].first,
-            data, m_single_channel/*ownForeignMemory*/);
+            mm_cascade->mipmap[i + 1], false/*ownForeignMemory*/);
         irr_driver->getVideoDriver()->writeImageToFile(image, std::string
             (StringUtils::toString(i) + "_" +
             StringUtils::getBasename(NamedPath.getPtr())).c_str());

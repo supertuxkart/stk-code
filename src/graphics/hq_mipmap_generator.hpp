@@ -28,6 +28,7 @@
 #include <ITexture.h>
 
 using namespace irr;
+struct TexConfig;
 
 class HQMipmapGenerator : public video::ITexture, NoCopy
 {
@@ -42,12 +43,15 @@ private:
 
     void* m_mipmap_data;
 
+    TexConfig* m_tex_config;
+
     std::vector<std::pair<core::dimension2d<u32>, size_t> > m_mipmap_sizes;
 
 public:
     // ------------------------------------------------------------------------
     HQMipmapGenerator(const io::path& name, uint8_t* data,
-                      const core::dimension2d<u32>& size, GLuint texture_name);
+                      const core::dimension2d<u32>& size, GLuint texture_name,
+                      TexConfig* tc);
     // ------------------------------------------------------------------------
     virtual ~HQMipmapGenerator() {}
     // ------------------------------------------------------------------------
