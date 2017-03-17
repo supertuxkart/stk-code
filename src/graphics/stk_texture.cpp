@@ -187,7 +187,8 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
             }
             else
             {
-                orig_img = m_img_loader->loadImage(m_file);
+                orig_img = m_img_loader->loadImage(m_file,
+                    false/*skip_checking*/, handleGamma());
                 m_file->drop();
                 m_file = NULL;
                 if (orig_img == NULL || orig_img->getDimension().Width == 0 ||
@@ -597,7 +598,7 @@ void STKTexture::threadedReload(void* ptr, void* param) const
 {
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     video::IImage* orig_img =
-        m_img_loader->loadImage(m_file, true/*skip_checking*/);
+        m_img_loader->loadImage(m_file, true/*skip_checking*/, handleGamma());
     orig_img = resizeImage(orig_img);
     uint8_t* data = (uint8_t*)orig_img->lock();
     if (m_single_channel)
@@ -677,3 +678,17 @@ bool STKTexture::isMeshTexture() const
 {
     return m_tex_config && m_tex_config->m_mesh_tex;
 }   // isMeshTexture
+
+//-----------------------------------------------------------------------------
+bool STKTexture::handleGamma() const
+{
+#ifndef SERVER_ONLY
+    if (!CVS->isGLSL() || !m_tex_config)
+#endif
+        return true;
+
+    if ((m_tex_config->m_mesh_tex && m_tex_config->m_srgb) ||
+        (!m_tex_config->m_mesh_tex && !m_tex_config->m_srgb))
+        return true;
+    return false;
+}   // handleGamma

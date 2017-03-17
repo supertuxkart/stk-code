@@ -19,7 +19,7 @@
 
 #include "graphics/hq_mipmap_generator.hpp"
 #include "graphics/stk_tex_manager.hpp"
-#undef DUMP_MIPMAP
+#define DUMP_MIPMAP
 #ifdef DUMP_MIPMAP
 #include "graphics/irr_driver.hpp"
 #include "utils/string_utils.hpp"
@@ -75,13 +75,26 @@ void HQMipmapGenerator::threadedReload(void* ptr, void* param) const
 #endif
     for (unsigned int i = 0; i < m_mipmap_sizes.size(); i++)
     {
+        const unsigned size = m_mipmap_sizes[i].first.getArea() *  4;
         memcpy((uint8_t*)ptr + m_mipmap_sizes[i].second,
-            mm_cascade->mipmap[i + 1],
-            m_mipmap_sizes[i].first.getArea() *  4);
+            mm_cascade->mipmap[i + 1], size);
 #ifdef DUMP_MIPMAP
+        uint8_t* data = (uint8_t*)(mm_cascade->mipmap[i + 1]);
+        if (!m_tex_config->m_srgb)
+        {
+            for (unsigned int j = 0; j < size / 4; j++)
+            {
+                data[j * 4] =
+                    (uint8_t)(powf(data[j * 4] / 255.f , 2.2f) * 255);
+                data[j * 4 + 1] =
+                    (uint8_t)(powf(data[j * 4 + 1] / 255.f , 2.2f) * 255);
+                data[j * 4 + 2] =
+                    (uint8_t)(powf(data[j * 4 + 2] / 255.f , 2.2f) * 255);
+            }
+        }
         video::IImage* image = irr_driver->getVideoDriver()
             ->createImageFromData(video::ECF_A8R8G8B8, m_mipmap_sizes[i].first,
-            mm_cascade->mipmap[i + 1], false/*ownForeignMemory*/);
+            data, false/*ownForeignMemory*/);
         irr_driver->getVideoDriver()->writeImageToFile(image, std::string
             (StringUtils::toString(i) + "_" +
             StringUtils::getBasename(NamedPath.getPtr())).c_str());

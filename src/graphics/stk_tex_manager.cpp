@@ -105,12 +105,12 @@ void STKTexManager::destroyThreadedTexLoaders()
         }
         delete delete_ttl;
         glDeleteBuffers(1, &m_pbo);
+        pthread_mutex_destroy(&m_threaded_load_textures_mutex);
+        pthread_cond_destroy(&m_cond_request);
         m_pbo = 0;
         m_thread_size = 0;
         m_threaded_load_textures_counter = 0;
         m_all_tex_loaders.clear();
-        pthread_mutex_destroy(&m_threaded_load_textures_mutex);
-        pthread_cond_destroy(&m_cond_request);
     }
 #endif
 }   // destroyThreadedTexLoaders
