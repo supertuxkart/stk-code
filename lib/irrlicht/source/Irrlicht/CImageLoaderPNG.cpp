@@ -174,20 +174,6 @@ IImage* CImageLoaderPng::loadImage(io::IReadFile* file, bool skip_checking) cons
 	if (ColorType==PNG_COLOR_TYPE_GRAY || ColorType==PNG_COLOR_TYPE_GRAY_ALPHA)
 		png_set_gray_to_rgb(png_ptr);
 
-	int intent;
-	const double screen_gamma = 2.2;
-
-	if (png_get_sRGB(png_ptr, info_ptr, &intent))
-		png_set_gamma(png_ptr, screen_gamma, 0.45455);
-	else
-	{
-		double image_gamma;
-		if (png_get_gAMA(png_ptr, info_ptr, &image_gamma))
-			png_set_gamma(png_ptr, screen_gamma, image_gamma);
-		else
-			png_set_gamma(png_ptr, screen_gamma, 0.45455);
-	}
-
 	// Update the changes in between, as we need to get the new color type
 	// for proper processing of the RGBA type
 	png_read_update_info(png_ptr, info_ptr);
