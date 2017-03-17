@@ -19,7 +19,7 @@
 
 #include "graphics/hq_mipmap_generator.hpp"
 #include "graphics/stk_tex_manager.hpp"
-#define DUMP_MIPMAP
+#undef DUMP_MIPMAP
 #ifdef DUMP_MIPMAP
 #include "graphics/irr_driver.hpp"
 #include "utils/string_utils.hpp"
@@ -61,9 +61,12 @@ HQMipmapGenerator::HQMipmapGenerator(const io::path& name, uint8_t* data,
 void HQMipmapGenerator::threadedReload(void* ptr, void* param) const
 {
     imReduceOptions options;
-    imReduceSetOptions(&options, m_tex_config->m_normal_map ?
-        IM_REDUCE_FILTER_NORMALMAP: IM_REDUCE_FILTER_SRGB,
-        2, 2.0f, 0.0f, 0.0f);
+    imReduceSetOptions(&options,
+        m_tex_config->m_normal_map ?
+        IM_REDUCE_FILTER_NORMALMAP: m_tex_config->m_srgb ?
+        IM_REDUCE_FILTER_SRGB : IM_REDUCE_FILTER_LINEAR/*filter*/,
+        2/*hopcount*/, 2.0f/*alpha*/, 1.0f/*amplifynormal*/,
+        0.0f/*normalsustainfactor*/);
     imMipmapCascade* mm_cascade = (imMipmapCascade*)m_mipmap_data;
 #ifdef DEBUG
     int ret = imBuildMipmapCascade(mm_cascade, m_orig_data, m_size.Width,
@@ -79,22 +82,9 @@ void HQMipmapGenerator::threadedReload(void* ptr, void* param) const
         memcpy((uint8_t*)ptr + m_mipmap_sizes[i].second,
             mm_cascade->mipmap[i + 1], size);
 #ifdef DUMP_MIPMAP
-        uint8_t* data = (uint8_t*)(mm_cascade->mipmap[i + 1]);
-        if (!m_tex_config->m_srgb)
-        {
-            for (unsigned int j = 0; j < size / 4; j++)
-            {
-                data[j * 4] =
-                    (uint8_t)(powf(data[j * 4] / 255.f , 2.2f) * 255);
-                data[j * 4 + 1] =
-                    (uint8_t)(powf(data[j * 4 + 1] / 255.f , 2.2f) * 255);
-                data[j * 4 + 2] =
-                    (uint8_t)(powf(data[j * 4 + 2] / 255.f , 2.2f) * 255);
-            }
-        }
         video::IImage* image = irr_driver->getVideoDriver()
             ->createImageFromData(video::ECF_A8R8G8B8, m_mipmap_sizes[i].first,
-            data, false/*ownForeignMemory*/);
+            mm_cascade->mipmap[i + 1], false/*ownForeignMemory*/);
         irr_driver->getVideoDriver()->writeImageToFile(image, std::string
             (StringUtils::toString(i) + "_" +
             StringUtils::getBasename(NamedPath.getPtr())).c_str());

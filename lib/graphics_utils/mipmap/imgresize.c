@@ -1591,7 +1591,7 @@ static void imStaticKernel4Normal( unsigned char *dst, int pointx, int pointy, i
   }
 
 #if CPU_SSE2_SUPPORT
-  vsum = _mm_sub_ps( vsum, _mm_set_ps( 1.0f/255.0f, 1.0f/255.0f, 1.0f/255.0f, 0.0f ) );
+  vsum = _mm_sub_ps( vsum, _mm_set_ps( 0.0f, 0.5f*255.0f, 0.5f*255.0f, 0.5f*255.0f ) );
   sum0 = _mm_cvtss_f32( vsum );
  #if CPU_SSE3_SUPPORT
   sum1 = _mm_cvtss_f32( _mm_movehdup_ps( vsum ) );
