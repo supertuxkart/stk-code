@@ -28,8 +28,7 @@ bool AVIWriter::addJUNKChunk(std::string str, unsigned int min_size)
     chunk.fcc = FOURCC('J', 'U', 'N', 'K');
     chunk.cb = size;
 
-    char buffer[size];
-    memset(buffer, '\0', size);
+    char* buffer = (char*)calloc(size, 1);
     strcpy(buffer, str.c_str());
 
     int num = fwrite(&chunk, 1, sizeof(chunk), m_file);
@@ -37,6 +36,7 @@ bool AVIWriter::addJUNKChunk(std::string str, unsigned int min_size)
         goto error;
 
     num = fwrite(buffer, 1, size * sizeof(char), m_file);
+    free(buffer);
     if (num != size)
         goto error;
 
