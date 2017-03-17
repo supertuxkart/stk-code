@@ -15,14 +15,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
 
 #include "graphics/skybox.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/shaders.hpp"
+#include "graphics/stk_texture.hpp"
+#include "graphics/texture_shader.hpp"
 
-
-#include <algorithm> 
+#include <algorithm>
 #include <cassert>
 
 using namespace irr;
@@ -55,24 +56,21 @@ public:
     }   // bindVertexArray
 };   // SkyboxShader
 
-
-class SpecularIBLGenerator : public TextureShader<SpecularIBLGenerator, 1, 
+#if !defined(USE_GLES2)
+class SpecularIBLGenerator : public TextureShader<SpecularIBLGenerator, 2,
                                                   core::matrix4, float >
 {
 public:
-    GLuint m_tu_samples;
     SpecularIBLGenerator()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER,   "screenquad.vert",
                             GL_FRAGMENT_SHADER, "importance_sampling_specular.frag");
         assignUniforms("PermutationMatrix", "ViewportSize");
-        m_tu_samples = 1;
-        assignSamplerNames(0, "tex", ST_TRILINEAR_CUBEMAP);
-        assignTextureUnit(m_tu_samples, "samples");
+        assignSamplerNames(0, "tex", ST_TRILINEAR_CUBEMAP,
+                           1, "samples", ST_TEXTURE_BUFFER);
     }
-
 };   // SpecularIBLGenerator
-
+#endif
 
 namespace {
     // ----------------------------------------------------------------------------
@@ -84,7 +82,7 @@ namespace {
         new_img[4 * (stride * new_i + new_j) + 2] = old_img[4 * (stride * old_i + old_j) + 2];
         new_img[4 * (stride * new_i + new_j) + 3] = old_img[4 * (stride * old_i + old_j) + 3];
     }   // swapPixels
-    
+
     // ----------------------------------------------------------------------------
     // From http://http.developer.nvidia.com/GPUGems3/gpugems3_ch20.html
     /** Returns the index-th pair from Hammersley set of pseudo random set.
@@ -97,7 +95,7 @@ namespace {
         float InvertedBinaryRepresentation = 0.;
         for (size_t i = 0; i < 32; i++)
         {
-            InvertedBinaryRepresentation += ((index >> i) & 0x1) 
+            InvertedBinaryRepresentation += ((index >> i) & 0x1)
                                           * powf(.5, (float) (i + 1.));
         }
         return std::make_pair(float(index) / float(samples),
@@ -108,7 +106,7 @@ namespace {
     // ----------------------------------------------------------------------------
     /** Returns a pseudo random (theta, phi) generated from a probability density
     *  function modeled after Phong function.
-    *  \param a pseudo random float pair from a uniform density function between 
+    *  \param a pseudo random float pair from a uniform density function between
     *         0 and 1.
     *   \param exponent from the Phong formula.
     */
@@ -120,8 +118,8 @@ namespace {
     }   // getImportanceSamplingPhong
 
     // ----------------------------------------------------------------------------
-    static core::matrix4 getPermutationMatrix(size_t indexX, float valX, 
-                                              size_t indexY, float valY, 
+    static core::matrix4 getPermutationMatrix(size_t indexX, float valX,
+                                              size_t indexY, float valY,
                                               size_t indexZ, float valZ)
     {
         core::matrix4 result_mat;
@@ -135,7 +133,7 @@ namespace {
         M[8 + indexZ] = valZ;
         return result_mat;
     }   // getPermutationMatrix
-    
+
 }  //namespace
 
 // ----------------------------------------------------------------------------
@@ -160,15 +158,23 @@ void Skybox::generateCubeMapFromTextures()
     for (unsigned i = 0; i < 6; i++)
     {
         unsigned idx = texture_permutation[i];
+        video::IImage* img = static_cast<STKTexture*>
+            (m_skybox_textures[idx])->getTextureImage();
+        assert(img != NULL);
+        img->copyToScaling(rgba[i], size, size);
 
-        video::IImage* image = irr_driver->getVideoDriver()
-            ->createImageFromData(m_skybox_textures[idx]->getColorFormat(),
-                                  m_skybox_textures[idx]->getSize(),
-                                  m_skybox_textures[idx]->lock(), false   );
-        m_skybox_textures[idx]->unlock();
-
-        image->copyToScaling(rgba[i], size, size);
-        image->drop();
+#if defined(USE_GLES2)
+        if (CVS->isEXTTextureFormatBGRA8888Usable())
+        {
+            // BGRA image returned by getTextureImage causes black sky in gles
+            for (unsigned int j = 0; j < size * size; j++)
+            {
+                char tmp_val = rgba[i][j * 4];
+                rgba[i][j * 4] = rgba[i][j * 4 + 2];
+                rgba[i][j * 4 + 2] = tmp_val;
+            }
+        }
+#endif
 
         if (i == 2 || i == 3)
         {
@@ -185,18 +191,18 @@ void Skybox::generateCubeMapFromTextures()
         }
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_cube_map);
-        if (CVS->isTextureCompressionEnabled())
-        {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
-                         GL_COMPRESSED_SRGB_ALPHA, size, size, 0, GL_BGRA,
-                         GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
-        }
-        else
-        {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
-                         GL_SRGB_ALPHA, size, size, 0, GL_BGRA,
-                         GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
-        }
+#if !defined(USE_GLES2)
+        GLint internal_format = CVS->isTextureCompressionEnabled() ?
+                                    GL_COMPRESSED_SRGB_ALPHA : GL_SRGB_ALPHA;
+        GLint format = GL_BGRA;
+#else
+        GLint internal_format = GL_RGBA8;
+        GLint format = GL_RGBA;
+#endif
+
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
+                     internal_format, size, size, 0, format,
+                     GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
     }
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
     for (unsigned i = 0; i < 6; i++)
@@ -212,13 +218,20 @@ void Skybox::generateSpecularCubemap()
     size_t cubemap_size = 256;
     for (int i = 0; i < 6; i++)
     {
+#if !defined(USE_GLES2)
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16F,
                      cubemap_size, cubemap_size, 0, GL_BGRA, GL_FLOAT, 0);
+#else
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8,
+                     cubemap_size, cubemap_size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+#endif
     }
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
     if (!CVS->isDefferedEnabled())
         return;
+
+#if !defined(USE_GLES2)
 
     GLuint fbo;
     glGenFramebuffers(1, &fbo);
@@ -253,7 +266,7 @@ void Skybox::generateSpecularCubemap()
         float *tmp = new float[2048];
         for (unsigned i = 0; i < 1024; i++)
         {
-            std::pair<float, float> sample = 
+            std::pair<float, float> sample =
                 getImportanceSamplingPhong(getHammersleySequence(i, 1024),
                                         roughness);
             tmp[2 * i] = sample.first;
@@ -261,44 +274,44 @@ void Skybox::generateSpecularCubemap()
         }
 
         glBindVertexArray(0);
-        glActiveTexture(GL_TEXTURE0 + 
-                        SpecularIBLGenerator::getInstance()->m_tu_samples);
-        GLuint sampleTex, sampleBuffer;
-        glGenBuffers(1, &sampleBuffer);
-        glBindBuffer(GL_TEXTURE_BUFFER, sampleBuffer);
-        glBufferData(GL_TEXTURE_BUFFER, 2048 * sizeof(float), tmp, 
+        GLuint sample_texture, sample_buffer;
+        glGenBuffers(1, &sample_buffer);
+        glBindBuffer(GL_TEXTURE_BUFFER, sample_buffer);
+        glBufferData(GL_TEXTURE_BUFFER, 2048 * sizeof(float), tmp,
                      GL_STATIC_DRAW);
-        glGenTextures(1, &sampleTex);
-        glBindTexture(GL_TEXTURE_BUFFER, sampleTex);
-        glTexBuffer(GL_TEXTURE_BUFFER, GL_RG32F, sampleBuffer);
+        glGenTextures(1, &sample_texture);
+        glBindTexture(GL_TEXTURE_BUFFER, sample_texture);
+        glTexBuffer(GL_TEXTURE_BUFFER, GL_RG32F, sample_buffer);
+        glBindTexture(GL_TEXTURE_BUFFER, 0);
         glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
 
         for (unsigned face = 0; face < 6; face++)
         {
 
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                    GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
                                    m_specular_probe, level);
             GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
             assert(status == GL_FRAMEBUFFER_COMPLETE);
 
-            SpecularIBLGenerator::getInstance()->setTextureUnits(m_cube_map);
+            SpecularIBLGenerator::getInstance()
+                ->setTextureUnits(m_cube_map, sample_texture);
             SpecularIBLGenerator::getInstance()->setUniforms(M[face],
                                                              viewportSize);
 
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
-        glActiveTexture(  GL_TEXTURE0
-                        + SpecularIBLGenerator::getInstance()->m_tu_samples);
         glBindBuffer(GL_TEXTURE_BUFFER, 0);
         glBindTexture(GL_TEXTURE_BUFFER, 0);
 
         delete[] tmp;
-        glDeleteTextures(1, &sampleTex);
-        glDeleteBuffers(1, &sampleBuffer);
+        glDeleteTextures(1, &sample_texture);
+        glDeleteBuffers(1, &sample_buffer);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &fbo);
+    glActiveTexture(GL_TEXTURE0);
+#endif
 }   // generateSpecularCubemap
 
 
@@ -316,20 +329,23 @@ Out of legacy the sequence of textures maps to:
 Skybox::Skybox(const std::vector<video::ITexture *> &skybox_textures)
 {
     m_skybox_textures = skybox_textures;
-    
+
+#if !defined(USE_GLES2)
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+#endif
 
     if (!skybox_textures.empty())
     {
         generateCubeMapFromTextures();
-        generateSpecularCubemap();
+        if(CVS->isGLSL())
+            generateSpecularCubemap();
     }
 }
 
 Skybox::~Skybox()
 {
     glDeleteTextures(1, &m_cube_map);
-    glDeleteTextures(1, &m_specular_probe);    
+    glDeleteTextures(1, &m_specular_probe);
 }
 
 
@@ -354,4 +370,5 @@ void Skybox::render(const scene::ICameraSceneNode *camera) const
     glBindVertexArray(0);
 }   // renderSkybox
 
+#endif   // !SERVER_ONLY
 

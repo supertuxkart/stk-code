@@ -16,14 +16,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/water.hpp"
 
 #include "graphics/callbacks.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/material_manager.hpp"
-#include "graphics/material.hpp"
-#include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 
 using namespace video;
@@ -93,3 +91,6 @@ void WaterNode::OnRegisterSceneNode()
         ISceneNode::OnRegisterSceneNode();
     }
 }
+
+#endif   // !SERVER_ONLY
+

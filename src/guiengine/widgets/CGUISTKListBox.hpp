@@ -178,12 +178,14 @@ namespace irr
             s32 ItemHeightOverride;
             s32 TotalItemHeight;
             s32 ItemsIconWidth;
+            s32 MousePosY;
             gui::IGUIFont* Font;
             gui::IGUISpriteBank* IconBank;
             gui::IGUIScrollBar* ScrollBar;
             u32 selectTime;
             core::stringw KeyBuffer;
             bool Selecting;
+            bool Moving;
             bool DrawBack;
             bool MoveOverSelect;
             bool AutoScroll;

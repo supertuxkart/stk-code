@@ -1,3 +1,8 @@
+#ifdef GL_ES
+uniform mat4 ModelMatrix;
+uniform mat4 InverseModelMatrix;
+uniform vec2 texture_trans;
+#else
 uniform mat4 ModelMatrix =
     mat4(1., 0., 0., 0.,
          0., 1., 0., 0.,
@@ -9,13 +14,10 @@ uniform mat4 InverseModelMatrix =
          0., 0., 1., 0.,
          0., 0., 0., 1.);
 
-uniform mat4 TextureMatrix =
-    mat4(1., 0., 0., 0.,
-         0., 1., 0., 0.,
-         0., 0., 1., 0.,
-         0., 0., 0., 1.);
+uniform vec2 texture_trans = vec2(0., 0.);
+#endif
 
-#if __VERSION__ >= 330
+#ifdef Explicit_Attrib_Location_Usable
 layout(location = 0) in vec3 Position;
 layout(location = 1) in vec3 Normal;
 layout(location = 2) in vec4 Color;
@@ -44,7 +46,7 @@ out vec4 color;
 void main(void)
 {
     color = Color.zyxw;
-    mat4 ModelViewProjectionMatrix = ProjectionMatrix * ViewMatrix * ModelMatrix;
+    mat4 ModelViewProjectionMatrix = ProjectionViewMatrix * ModelMatrix;
     mat4 TransposeInverseModelView = transpose(InverseModelMatrix * InverseViewMatrix);
     gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
     // Keep orthogonality
@@ -52,6 +54,6 @@ void main(void)
     // Keep direction
     tangent = (ViewMatrix * ModelMatrix * vec4(Tangent, 0.)).xyz;
     bitangent = (ViewMatrix * ModelMatrix * vec4(Bitangent, 0.)).xyz;
-    uv = (TextureMatrix * vec4(Texcoord, 1., 1.)).xy;
+    uv = vec2(Texcoord.x + texture_trans.x, Texcoord.y + texture_trans.y);
     uv_bis = SecondTexcoord;
 }

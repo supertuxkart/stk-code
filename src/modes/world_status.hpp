@@ -45,6 +45,10 @@ public:
         // Game setup, e.g. track loading
         SETUP_PHASE,
 
+        // Used in network games only: wait for the server to broadcast
+        // 'start'. This happens on a network client only
+        WAIT_FOR_SERVER_PHASE,
+
         // 'Ready' is displayed
         READY_PHASE,
 
@@ -82,7 +86,15 @@ public:
         //Goal scored phase
         GOAL_PHASE
     };
+
 protected:
+    /** Elasped/remaining time in seconds. */
+    double          m_time;
+
+    /** If the start race should be played, disabled in cutscenes. */
+    bool            m_play_racestart_sounds;
+
+private:
     /** Sound to play at the beginning of a race, during which a
      *  a camera intro of the track can be shown. */
     SFXBase    *m_track_intro_sound;
@@ -91,13 +103,11 @@ protected:
     /** The third sound to be played in ready, set, go. */
     SFXBase    *m_start_sound;
 
-    /**
-      * Elasped/remaining time in seconds
-      */
-    double          m_time;
+    /** The clock mode: normal counting forwards, or countdown */ 
     ClockType       m_clock_mode;
-
-    bool            m_play_racestart_sounds;
+protected:
+    bool            m_play_track_intro_sound;
+    bool            m_play_ready_set_go_sounds;
 
 private:
     Phase           m_phase;
@@ -113,17 +123,29 @@ private:
      */
     float           m_auxiliary_timer;
 
+    float           m_count_up_timer;
+
+    bool            m_engines_started;
+    void            startEngines();
+    /** In networked game a client must wait for the server to start 'ready
+     *  set go' to make sure all client are actually ready to start the game.
+     *  A server on the other hand will run behind all clients, so it will
+     *  wait for all clients to indicate that they have started the race. */
+    bool m_server_is_ready;
+
 public:
              WorldStatus();
     virtual ~WorldStatus();
 
-    void     reset();
-    void     update(const float dt);
-    void     setTime(const float time);
+    virtual void reset();
+    virtual void updateTime(const float dt);
+    virtual void update(float dt);
+    void         startReadySetGo();
     virtual void pause(Phase phase);
     virtual void unpause();
     virtual void enterRaceOverState();
     virtual void terminateRace();
+    void         setTime(const float time);
 
     // ------------------------------------------------------------------------
     // Note: GO_PHASE is both: start phase and race phase
@@ -168,6 +190,12 @@ public:
     // ------------------------------------------------------------------------
     /** Called when the race actually starts. */
     virtual void onGo() {};
+
+    // ------------------------------------------------------------------------
+    /** Get the time since start regardless of which way the clock counts */
+    float getTimeSinceStart() const { return m_count_up_timer; }
+    // ------------------------------------------------------------------------
+    void setReadyToRace() { m_server_is_ready = true; }
 
 };   // WorldStatus
 

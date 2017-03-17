@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <string>
+#include "race/race_manager.hpp"
 
 class AbstractKart;
 class ParticleEmitter;
@@ -49,6 +50,8 @@ public:
                        KGFX_NITRO2,
                        KGFX_NITROSMOKE1,
                        KGFX_NITROSMOKE2,
+                       KGFX_EXHAUST1,
+                       KGFX_EXHAUST2,
                        KGFX_ZIPPER,
                        KGFX_TERRAIN,
                        KGFX_SKIDL,
@@ -74,6 +77,9 @@ private:
 
     /** Used to alternate particle effects from the rear wheels. */
     int         m_wheel_toggle;
+    
+    /** A skid level that is currently in use */
+    int m_skid_level;
 
     /** A light that's shown when the kart uses nitro. */
     irr::scene::ISceneNode* m_nitro_light;
@@ -84,12 +90,15 @@ private:
     /** A light that's shown on the second skid-level with another color. */
     irr::scene::ISceneNode* m_skidding_light_2;
 
+    /** A light that's shown on the second skid-level with another color. */
+    irr::scene::ISceneNode* m_head_light;
+
     void addEffect(KartGFXType type, const std::string &file_name,
                    const Vec3 &position, bool important);
     void resizeBox(const KartGFXType type, float new_size);
 
 public:
-         KartGFX(const AbstractKart *kart);
+         KartGFX(const AbstractKart *kart, RaceManager::KartType type, bool is_day);
         ~KartGFX();
     void reset();
     void setSkidLevel(const unsigned int level);
@@ -101,6 +110,11 @@ public:
     void update(float dt);
     void updateNitroGraphics(float f);
     void updateSkidLight(unsigned int level);
+    void getGFXStatus(int* nitro, bool* zipper,
+                      int* skidding, bool* red_skidding) const;
+    void setGFXFromReplay(int nitro, bool zipper,
+                          int skidding, bool red_skidding);
+    void setGFXInvisible();
 
 };   // KartWGFX
 #endif

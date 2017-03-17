@@ -3,8 +3,8 @@ uniform float vignette_weight;
 
 out vec4 FragColor;
 
-vec3 getCIEYxy(vec3 rgbColor);
-vec3 getRGBFromCIEXxy(vec3 YxyColor);
+#stk_include "utils/getCIEXYZ.frag"
+#stk_include "utils/getRGBfromCIEXxy.frag"
 
 void main()
 {

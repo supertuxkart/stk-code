@@ -26,9 +26,12 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
+#include "graphics/material.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "tracks/drive_graph.hpp"
+#include "tracks/drive_node.hpp"
 #include "tracks/track_sector.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -58,8 +61,8 @@ void LinearWorld::init()
 {
     WorldWithRank::init();
 
-    assert(!m_track->isArena());
-    assert(!m_track->isSoccer());
+    assert(!Track::getCurrentTrack()->isArena());
+    assert(!Track::getCurrentTrack()->isSoccer());
 
     m_last_lap_sfx_played           = false;
     m_last_lap_sfx_playing          = false;
@@ -91,7 +94,6 @@ void LinearWorld::reset()
     for(unsigned int i=0; i<kart_amount; i++)
     {
         m_kart_info[i].reset();
-        m_kart_info[i].getTrackSector()->update(m_karts[i]->getXYZ());
         m_karts[i]->setWrongwayCounter(0);
     }   // next kart
 
@@ -100,7 +102,7 @@ void LinearWorld::reset()
     // the track length must be extended (to avoid negative numbers in
     // estimateFinishTimeForKart()). On the other hand future game modes
     // might not follow this rule, so check the distance for all karts here:
-    m_distance_increase = m_track->getTrackLength();
+    m_distance_increase = Track::getCurrentTrack()->getTrackLength();
     for(unsigned int i=0; i<kart_amount; i++)
     {
         m_distance_increase = std::min(m_distance_increase,
@@ -110,8 +112,8 @@ void LinearWorld::reset()
     // be increased to avoid negative values in estimateFinishTimeForKart
     // Increase this value somewhat in case that a kart drivess/slides
     // backwards a little bit at start.
-    m_distance_increase = m_track->getTrackLength() - m_distance_increase
-                        + 5.0f;
+    m_distance_increase = Track::getCurrentTrack()->getTrackLength() 
+                        - m_distance_increase + 5.0f;
 
     if(m_distance_increase<0) m_distance_increase = 1.0f;  // shouldn't happen
 
@@ -178,13 +180,14 @@ void LinearWorld::update(float dt)
         // in the position of the kart (e.g. while falling the kart
         // might get too close to another part of the track, shortly
         // jump to position one, then on reset fall back to last)
-        if (!kart_info.getTrackSector()->isOnRoad() &&
+        if ((!getTrackSector(n)->isOnRoad() &&
             (!kart->getMaterial() ||
-              kart->getMaterial()->isDriveReset())     )
+              kart->getMaterial()->isDriveReset()))  &&
+             !kart->isGhostKart())
             continue;
-        kart_info.getTrackSector()->update(kart->getFrontXYZ());
+        getTrackSector(n)->update(kart->getFrontXYZ());
         kart_info.m_overall_distance = kart_info.m_race_lap
-                                     * m_track->getTrackLength()
+                                     * Track::getCurrentTrack()->getTrackLength()
                         + getDistanceDownTrackForKart(kart->getWorldKartId());
     }   // for n
 
@@ -247,9 +250,8 @@ void LinearWorld::newLap(unsigned int kart_index)
     AbstractKart *kart  = m_karts[kart_index];
 
     // Reset reset-after-lap achievements
-    StateManager::ActivePlayer *c = kart->getController()->getPlayer();
     PlayerProfile *p = PlayerManager::getCurrentPlayer();
-    if (c && c->getConstProfile() == p)
+    if (kart->getController()->canGetAchievements())
     {
         p->getAchievementsStatus()->onLapEnd();
     }
@@ -275,7 +277,8 @@ void LinearWorld::newLap(unsigned int kart_index)
         kart_info.m_time_at_last_lap=getTime();
         kart_info.m_race_lap++;
         m_kart_info[kart_index].m_overall_distance =
-              m_kart_info[kart_index].m_race_lap * m_track->getTrackLength()
+              m_kart_info[kart_index].m_race_lap 
+            * Track::getCurrentTrack()->getTrackLength()
             + getDistanceDownTrackForKart(kart->getWorldKartId());
     }
     // Last lap message (kart_index's assert in previous block already)
@@ -378,32 +381,13 @@ void LinearWorld::newLap(unsigned int kart_index)
 }   // newLap
 
 //-----------------------------------------------------------------------------
-/** Gets the sector a kart is on. This function returns UNKNOWN_SECTOR if the
- *  kart_id is larger than the current kart info. This is necessary in the case
- *  that a collision with the track happens during resetAllKarts: at this time
- *  m_kart_info is not initialised (and has size 0), so it would trigger this
- *  assert. While this normally does not happen, it is useful for track
- *  designers that STK does not crash.
- *  \param kart_id The world kart id of the kart for which to return
- *                 the sector.
- */
-int LinearWorld::getSectorForKart(const AbstractKart *kart) const
-{
-    if(kart->getWorldKartId()>=m_kart_info.size())
-        return QuadGraph::UNKNOWN_SECTOR;
-    return m_kart_info[kart->getWorldKartId()].getTrackSector()
-          ->getCurrentGraphNode();
-}   // getSectorForKart
-
-//-----------------------------------------------------------------------------
 /** Returns the distance the kart has travelled along the track since
  *  crossing the start line..
  *  \param kart_id Index of the kart.
  */
 float LinearWorld::getDistanceDownTrackForKart(const int kart_id) const
 {
-    assert(kart_id < (int)m_kart_info.size());
-    return m_kart_info[kart_id].getTrackSector()->getDistanceFromStart();
+    return getTrackSector(kart_id)->getDistanceFromStart();
 }   // getDistanceDownTrackForKart
 
 //-----------------------------------------------------------------------------
@@ -413,8 +397,7 @@ float LinearWorld::getDistanceDownTrackForKart(const int kart_id) const
  */
 float LinearWorld::getDistanceToCenterForKart(const int kart_id) const
 {
-    assert(kart_id < (int)m_kart_info.size());
-    return m_kart_info[kart_id].getTrackSector()->getDistanceToCenter();
+    return getTrackSector(kart_id)->getDistanceToCenter();
 }   // getDistanceToCenterForKart
 
 //-----------------------------------------------------------------------------
@@ -567,7 +550,7 @@ float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
     const KartInfo &kart_info = m_kart_info[kart->getWorldKartId()];
 
     float full_distance = race_manager->getNumLaps()
-                        * m_track->getTrackLength();
+                        * Track::getCurrentTrack()->getTrackLength();
 
     if(full_distance == 0)
         full_distance = 1.0f;   // For 0 lap races avoid warning below
@@ -626,29 +609,45 @@ float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
   */
 unsigned int LinearWorld::getNumberOfRescuePositions() const
 {
-    return QuadGraph::get()->getNumNodes();
+    return DriveGraph::get()->getNumNodes();
 }   // getNumberOfRescuePositions
 
 // ------------------------------------------------------------------------
 unsigned int LinearWorld::getRescuePositionIndex(AbstractKart *kart)
 {
-    KartInfo& info = m_kart_info[kart->getWorldKartId()];
+    const unsigned int kart_id = kart->getWorldKartId();
 
-    info.getTrackSector()->rescue();
+    getTrackSector(kart_id)->rescue();
     // Setting XYZ for the kart is important since otherwise the kart
     // will not detect the right material again when doing the next
     // raycast to detect where it is driving on (--> potential rescue loop)
-    return info.getTrackSector()->getCurrentGraphNode();
+    int index = getTrackSector(kart_id)->getCurrentGraphNode();
+
+    // Do not rescue to an ignored quad, find another (non-ignored) quad
+    if (Graph::get()->getQuad(index)->isIgnored())
+    {
+        Vec3 pos = kart->getFrontXYZ();
+        int sector = Graph::get()->findOutOfRoadSector(pos);
+        return sector;
+    }
+
+    return index;
 }   // getRescuePositionIndex
 
 // ------------------------------------------------------------------------
 btTransform LinearWorld::getRescueTransform(unsigned int index) const
 {
-    const Vec3 &xyz = QuadGraph::get()->getQuadOfNode(index).getCenter();
+    const Vec3 &xyz = DriveGraph::get()->getNode(index)->getCenter();
+    const Vec3 &normal = DriveGraph::get()->getNode(index)->getNormal();
     btTransform pos;
     pos.setOrigin(xyz);
-    pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f),
-                    m_track->getAngle(index)));
+
+    // First rotate into the quad's plane (q1), then rotate so that the kart points in the
+    // right direction (q2).
+    btQuaternion q1 = shortestArcQuat(Vec3(0, 1, 0), normal);
+    // First apply the heading change, than the 'parallelisation' to the plane
+    btQuaternion q2(btVector3(0,1,0), Track::getCurrentTrack()->getAngle(index));
+    pos.setRotation(q1*q2);
     return pos;
 }   // getRescueTransform
 
@@ -840,7 +839,7 @@ void LinearWorld::updateRacePosition()
  */
 void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
 {
-    if (!m_karts[i]->getController()->isPlayerController()) 
+    if (!m_karts[i]->getController()->isLocalPlayerController()) 
         return;
 
     float wrongway_counter = m_karts[i]->getWrongwayCounter();
@@ -849,19 +848,21 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
     // If the kart can go in more than one directions from the current track
     // don't do any reverse message handling, since it is likely that there
     // will be one direction in which it isn't going backwards anyway.
-    int sector = m_kart_info[i].getTrackSector()->getCurrentGraphNode();
+    int sector = getTrackSector(i)->getCurrentGraphNode();
     
-    if (QuadGraph::get()->getNumberOfSuccessors(sector) > 1)
+    if (DriveGraph::get()->getNumberOfSuccessors(sector) > 1)
         return;
 
     // check if the player is going in the wrong direction
-    float angle_diff = kart->getHeading() - m_track->getAngle(sector);
-    
-    if (angle_diff > M_PI) 
+    const DriveNode* node = DriveGraph::get()->getNode(sector);
+    Vec3 center_line = node->getUpperCenter() - node->getLowerCenter();
+    float angle_diff = kart->getVelocity().angle(center_line);
+
+    if (angle_diff > M_PI)
         angle_diff -= 2*M_PI;
-    else if (angle_diff < -M_PI) 
+    else if (angle_diff < -M_PI)
         angle_diff += 2*M_PI;
-        
+
     // Display a warning message if the kart is going back way (unless
     // the kart has already finished the race).
     if ((angle_diff > DEGREE_TO_RAD * 120.0f ||
@@ -898,3 +899,8 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
 }   // checkForWrongDirection
 
 //-----------------------------------------------------------------------------
+void LinearWorld::setLastTriggeredCheckline(unsigned int kart_index, int index)
+{
+    if (m_kart_info.size() == 0) return;
+    getTrackSector(kart_index)->setLastTriggeredCheckline(index);
+}   // setLastTriggeredCheckline

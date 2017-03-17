@@ -25,6 +25,7 @@
 #include "graphics/irr_driver.hpp"
 #include "input/gamepad_device.hpp"
 #include "input/keyboard_device.hpp"
+#include "input/multitouch_device.hpp"
 #include "input/wiimote_manager.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/kart_selection.hpp"
@@ -43,6 +44,7 @@ DeviceManager::DeviceManager()
     m_latest_used_device = NULL;
     m_assign_mode = NO_ASSIGN;
     m_single_player = NULL;
+    m_multitouch_device = NULL;
 }   // DeviceManager
 
 // -----------------------------------------------------------------------------
@@ -98,8 +100,9 @@ bool DeviceManager::initialize()
     {
         core::stringc name = m_irrlicht_gamepads[id].Name;
 
-        // Some linux systems report a disk accelerometer as a gamepad, skip that
+        // Some systems report a disk accelerometer as a gamepad, skip that
         if (name.find("LIS3LV02DL") != -1) continue;
+        if (name == "applesmc") continue;
 
         if(m_irrlicht_gamepads[id].HasGenericName)
         {
@@ -138,6 +141,11 @@ bool DeviceManager::initialize()
         addGamepad(gamepadDevice);
     } // end for
 
+    if (UserConfigParams::m_multitouch_enabled)
+    {
+        m_multitouch_device = new MultitouchDevice();
+    }
+
     if (created) save();
 
     return created;
@@ -154,6 +162,12 @@ void DeviceManager::clearGamepads()
 {
     m_gamepads.clearAndDeleteAll(); 
 }   // clearGamepads
+// -----------------------------------------------------------------------------
+void DeviceManager::clearMultitouchDevices()
+{
+    delete m_multitouch_device;
+    m_multitouch_device = NULL;
+}   // clearMultitouchDevices
 
 // -----------------------------------------------------------------------------
 void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
@@ -177,6 +191,9 @@ void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
         {
             m_keyboards[i].setPlayer(NULL);
         }
+
+        if (m_multitouch_device != NULL)
+            m_multitouch_device->setPlayer(NULL);
     }
 }   // setAssignMode
 
@@ -391,6 +408,25 @@ InputDevice *DeviceManager::mapGamepadInput(Input::InputType type,
 
 //-----------------------------------------------------------------------------
 
+void DeviceManager::updateMultitouchDevice()
+{
+    if (m_multitouch_device == NULL)
+        return;
+
+    if (m_single_player != NULL)
+    {
+        // in single-player mode, assign the gamepad as needed
+        if (m_multitouch_device->getPlayer() != m_single_player)
+            m_multitouch_device->setPlayer(m_single_player);
+    }
+    else if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
+    {
+        m_multitouch_device->setPlayer(NULL);
+    }
+}   // updateMultitouchDevice
+
+//-----------------------------------------------------------------------------
+
 bool DeviceManager::translateInput( Input::InputType type,
                                     int device_id,
                                     int button_id,
@@ -490,6 +526,7 @@ bool DeviceManager::load()
     if(input->getName()!="input")
     {
         Log::warn("DeviceManager", "Invalid input.xml file - no input node.");
+        delete input;
         return false;
     }
 
@@ -500,6 +537,7 @@ bool DeviceManager::load()
         GUIEngine::showMessage(_("Please re-configure your key bindings."));
         GUIEngine::showMessage(_("Your input config file is not compatible "
                                  "with this version of STK."));
+        delete input;
         return false;
     }
 
@@ -602,5 +640,7 @@ void DeviceManager::shutdown()
     m_keyboards.clearAndDeleteAll();
     m_gamepad_configs.clearAndDeleteAll();
     m_keyboard_configs.clearAndDeleteAll();
+    delete m_multitouch_device;
+    m_multitouch_device = NULL;
     m_latest_used_device = NULL;
 }   // shutdown

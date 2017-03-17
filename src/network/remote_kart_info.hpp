@@ -31,7 +31,6 @@ enum SoccerTeam
     SOCCER_TEAM_NONE=-1,
     SOCCER_TEAM_RED=0,
     SOCCER_TEAM_BLUE=1,
-    NB_SOCCER_TEAMS
 };
 
 /** Game difficulty per player. */
@@ -76,8 +75,8 @@ public:
     void setGlobalPlayerId(int id)           { m_global_player_id = id;   }
     void setSoccerTeam(SoccerTeam team)      { m_soccer_team = team;      }
     void setNetworkPlayer(bool value)        { m_network_player = value;  }
-    void setDifficulty(PerPlayerDifficulty value) { m_difficulty = value; }
-
+    void setPerPlayerDifficulty(PerPlayerDifficulty value) 
+                                             { m_difficulty = value;      }
     int  getHostId() const                   { return m_host_id;          }
     int  getLocalPlayerId() const            { return m_local_player_id;  }
     int  getGlobalPlayerId() const           { return m_global_player_id; }

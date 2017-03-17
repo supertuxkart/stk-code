@@ -41,7 +41,7 @@ bool  ProfileWorld::m_no_graphics = false;
  */
 ProfileWorld::ProfileWorld()
 {
-    race_manager->setNumLocalPlayers(0);
+    race_manager->setNumPlayers(0);
     // Set number of laps so that the end of the race can be detected by
     // quering the number of finished karts from the race manager (in laps
     // based profiling) - in case of time based profiling, the number of
@@ -106,7 +106,7 @@ void ProfileWorld::setProfileModeLaps(int laps)
 AbstractKart *ProfileWorld::createKart(const std::string &kart_ident, int index,
                                        int local_player_id, int global_player_id,
                                        RaceManager::KartType type,
-                                       const PlayerDifficulty *difficulty)
+                                       PerPlayerDifficulty difficulty)
 {
     btTransform init_pos   = getStartTransform(index);
 
@@ -244,7 +244,7 @@ void ProfileWorld::enterRaceOverState()
         all_groups.insert(kart->getController()->getControllerName());
         float distance = (float)(m_profile_mode==PROFILE_LAPS
                                  ? race_manager->getNumLaps() : 1);
-        distance *= m_track->getTrackLength();
+        distance *= Track::getCurrentTrack()->getTrackLength();
         ss << distance/kart->getFinishTime() << " " << kart->getTopSpeed() << " ";
         ss << kart->getSkiddingTime() << " " << kart->getRescueTime() << " ";
         ss << kart->getRescueCount() << " " << kart->getBrakeCount() << " ";
@@ -271,7 +271,7 @@ void ProfileWorld::enterRaceOverState()
     std::ostringstream ss;
     Log::verbose("profile", "");
     ss << "name" << std::setw(max_len-4) << " "
-       << "Strt End  Time    AvSp  Top   Skid  Resc Rsc Brake Expl Exp Itm Ban SNitLNit Bub  Off";
+       << "Strt End  Time    AvSp  Top   Skid  Resc Rsc Brake Expl Exp Itm Ban SNitLNit Bub Off Energy";
     Log::verbose("profile", ss.str().c_str());
     for(std::set<std::string>::iterator it = all_groups.begin();
         it !=all_groups.end(); it++)
@@ -281,7 +281,7 @@ void ProfileWorld::enterRaceOverState()
         int   l_nitro_count = 0,    s_nitro_count   = 0,    bubble_count = 0;
         int   expl_count    = 0,    off_track_count = 0;
         float skidding_time = 0.0f, rescue_time     = 0.0f, expl_time    = 0.0f;
-        float av_time       = 0.0f;
+        float av_time       = 0.0f, energy          = 0;
         for ( unsigned int i = 0; i < (unsigned int)m_karts.size(); ++i)
         {
             KartWithStats* kart = dynamic_cast<KartWithStats*>(m_karts[i]);
@@ -300,10 +300,10 @@ void ProfileWorld::enterRaceOverState()
 
             float distance = (float)(m_profile_mode==PROFILE_LAPS
                                      ? race_manager->getNumLaps() : 1);
-            distance *= m_track->getTrackLength();
+            distance *= Track::getCurrentTrack()->getTrackLength();
 
             Log::verbose("profile",
-                   "%s %4.2f %3.2f %6.2f %4.2f %3d %5d %4.2f %3d %3d %3d %3d %3d %3d %5d",
+                   "%s %4.2f %3.2f %6.2f %4.2f %3d %5d %4.2f %3d %3d %3d %3d %3d %3d %5d %4.2f",
                    ss.str().c_str(), distance/kart->getFinishTime(),
                    kart->getTopSpeed(),
                    kart->getSkiddingTime(),        kart->getRescueTime(),
@@ -311,9 +311,9 @@ void ProfileWorld::enterRaceOverState()
                    kart->getExplosionTime(),       kart->getExplosionCount(),
                    kart->getBonusCount(),          kart->getBananaCount(),
                    kart->getSmallNitroCount(),     kart->getLargeNitroCount(),
-                   kart->getBubblegumCount(),      kart->getOffTrackCount()
+                   kart->getBubblegumCount(),      kart->getOffTrackCount(),
+                   kart->getEnergy()
                    );
-            Log::verbose("profile", "nitro %f\n", kart->getEnergy());
             av_time += kart->getFinishTime();
             skidding_time   += kart->getSkiddingTime();
             rescue_time     += kart->getRescueTime();
@@ -327,9 +327,10 @@ void ProfileWorld::enterRaceOverState()
             expl_time       += kart->getExplosionTime();
             expl_count      += kart->getExplosionCount();
             off_track_count += kart->getOffTrackCount();
+            energy          += kart->getEnergy();
         }    // for i < m_karts.size
 
-        Log::verbose("profile", std::string(max_len+85, '-').c_str());
+        Log::verbose("profile", std::string(max_len+90, '-').c_str());
         ss.clear();
         ss.str("");
         ss << *it << std::string(max_len-it->size(),' ');
@@ -337,11 +338,11 @@ void ProfileWorld::enterRaceOverState()
            << std::noshowpos << std::setw(13) << av_time/count
            << std::string(11,' ');
 
-        Log::verbose("profile", "%s%6.2f %4.2f %3d %5d %4.2f %3d %3d %3d %3d %3d %3d %5d",
+        Log::verbose("profile", "%s%6.2f %4.2f %3d %5d %4.2f %3d %3d %3d %3d %3d %3d %5d %4.2f",
                ss.str().c_str(), skidding_time/count, rescue_time/count,
                rescue_count,brake_count, expl_time, expl_count, bonus_count,
                banana_count, s_nitro_count, l_nitro_count, bubble_count,
-               off_track_count);
+               off_track_count, energy);
         Log::verbose("profile", "");
     }   // for it !=all_groups.end
     delete this;

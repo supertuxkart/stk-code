@@ -20,8 +20,8 @@ void main()
     g0 *= g1;
     g1 *= g2;
     for (int i = 1; i < 6; i++) {
-        sum += texture(tex, vec2(X, Y - i * pixel.y)) * g0;
-        sum += texture(tex, vec2(X, Y + i * pixel.y)) * g0;
+        sum += texture(tex, vec2(X, Y - float(i) * pixel.y)) * g0;
+        sum += texture(tex, vec2(X, Y + float(i) * pixel.y)) * g0;
         g0 *= g1;
         g1 *= g2;
     }

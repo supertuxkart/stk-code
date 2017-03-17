@@ -147,16 +147,8 @@
                 <spacer width="10" height="10"/>
                 <label text="Texture compression" I18N="Video settings"/>
             </div>
-            
-            <spacer height="4" width="10" />
-            
-            <div layout="horizontal-row" proportion="1" height="fit">
-                <checkbox id="hd-textures"/>
-                <spacer width="10" height="10"/>
-                <label text="Use high definition textures" I18N="Video settings"/>
-            </div>
         </div>
-        
+
         <spacer height="20" width="10" />
 
         <div layout="horizontal-row" width="100%" proportion="1">
@@ -168,9 +160,17 @@
         <spacer height="4" width="10" />
 
         <div layout="horizontal-row" width="100%" proportion="1">
-            <label text="Texture filtering" I18N="Video settings" width="40%"/>
+            <label text="Rendered image quality" I18N="Video settings" width="40%"/>
             <spacer width="10" height="10"/>
-            <gauge id="filtering" min_value="0" max_value="5" width="50%" />
+            <gauge id="image_quality" min_value="0" max_value="3" width="50%" />
+        </div>
+
+        <spacer height="4" width="10" />
+
+        <div layout="horizontal-row" width="100%" proportion="1">
+            <label text="Geometry detail" I18N="Video settings" width="40%"/>
+            <spacer width="10" height="10"/>
+            <gauge id="geometry_detail" min_value="0" max_value="2" width="50%" />
         </div>
 
         <spacer height="10" width="10" />

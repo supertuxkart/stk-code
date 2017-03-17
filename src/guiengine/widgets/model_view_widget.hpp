@@ -28,6 +28,8 @@
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
+class RenderInfo;
+
 namespace GUIEngine
 {
     /** \brief A model view widget.
@@ -44,66 +46,68 @@ namespace GUIEngine
         RotationMode m_rotation_mode;
         float m_rotation_speed;
         float m_rotation_target;
-        
+
         PtrVector<scene::IMesh, REF> m_models;
         AlignedArray<Vec3> m_model_location;
         AlignedArray<Vec3> m_model_scale;
-        std::vector<int> m_model_frames;
-        
-        RTT* m_rtt_provider;
-        
-        float angle;
-        
+        std::vector<std::pair<int, int> > m_model_frames;
+        std::vector<bool> m_model_render_info_affected;
+        std::vector<float> m_model_animation_speed;
+        std::unique_ptr<RenderTarget> m_render_target;
+        float m_angle;
+
         bool m_rtt_unsupported;
-        
+
         scene::ISceneNode          *m_rtt_main_node;
 
         scene::ICameraSceneNode    *m_camera;
 
         scene::ISceneNode          *m_light;
 
-        FrameBuffer                *m_frame_buffer;
+        RenderInfo                 *m_render_info;
 
     public:
-        
+
         LEAK_CHECK()
-        
+
         ModelViewWidget();
         virtual ~ModelViewWidget();
-        
+
         void add();
         void clearModels();
         void addModel(irr::scene::IMesh* mesh,
                       const Vec3& location = Vec3(0,0,0),
                       const Vec3& scale = Vec3(1,1,1),
-                      const int frame=-1);
-        
+                      const int start_loop_frame=-1,
+                      const int end_loop_frame=-1,
+                      bool all_parts_colorized = false,
+                      float animation_speed=0.0f);
+
         void update(float delta);
-        
+
         virtual void elementRemoved();
-        
+
         /** Disables any model rotation */
         void setRotateOff();
-        
+
         /** Makes the model rotate at given speed (in degrees per second) */
         void setRotateContinuously(float speed);
-        
+
         /** Rotate to 'targetAngle' in degrees at given speed (in degrees per second) */
         void setRotateTo(float targetAngle, float speed);
-        
+
         /** Returns information if currently kart is rotating */
         bool isRotating();
-        
+
         void clearRttProvider();
 
-        void setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
-            AlignedArray<Vec3>& mesh_location,
-            AlignedArray<Vec3>& mesh_scale,
-            const std::vector<int>& model_frames);
+        void setupRTTScene();
 
-        FrameBuffer* getFrameBuffer() { return m_frame_buffer; }
+        void drawRTTScene(const irr::core::rect<s32>& dest_rect) const;
+
+        RenderInfo* getModelViewRenderInfo() { return m_render_info; }
     };
-    
+
 }
 
 #endif

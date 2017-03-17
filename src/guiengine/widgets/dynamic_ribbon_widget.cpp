@@ -15,6 +15,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "font/font_manager.hpp"
+#include "font/regular_face.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -46,6 +49,7 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
     m_supports_multiplayer = true;
     m_scrolling_enabled    = true;
     m_animated_contents    = false;
+    m_font                 = new ScalableFont(font_manager->getFont<RegularFace>());
 
     // by default, set all players to have no selection in this ribbon
     for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
@@ -62,6 +66,7 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
 DynamicRibbonWidget::~DynamicRibbonWidget()
 {
     m_font->drop();
+    m_font = NULL;
     if (m_animated_contents)
     {
         GUIEngine::needsUpdate.remove(this);
@@ -142,8 +147,14 @@ void DynamicRibbonWidget::add()
     m_right_widget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false);
 
     const int average_y = m_y + (m_h - m_label_height)/2;
-    m_arrows_w = 40;
-    const int button_h = 50;
+
+    unsigned int screen_height = irr_driver->getActualScreenSize().Height;
+    m_arrows_w = (int)(screen_height / 15);
+    m_arrows_w = std::max(m_arrows_w, 40);
+#ifdef ANDROID
+    m_arrows_w *= 1.5f;
+#endif
+    const int button_h = m_arrows_w;
 
     // right arrow
     rect<s32> right_arrow_location = rect<s32>(m_x + m_w - m_arrows_w,
@@ -207,7 +218,6 @@ void DynamicRibbonWidget::add()
         // const int count = m_items.size();
 
         m_row_amount = -1;
-        float max_score_so_far = -1;
 
         if (m_h - m_label_height < 0)
         {
@@ -216,6 +226,7 @@ void DynamicRibbonWidget::add()
         }
         else
         {
+            float max_score_so_far = -1;
             for (int row_count = 1; row_count < 10; row_count++)
             {
                 int visible_items;
@@ -383,8 +394,6 @@ void DynamicRibbonWidget::buildInternalStructure()
         name << this->m_properties[PROP_ID] << "_row" << n;
         ribbon->m_properties[PROP_ID] = name.str();
         ribbon->m_event_handler = this;
-
-        m_font = GUIEngine::getFont()->getHollowCopy();
 
         // calculate font size
         if (m_col_amount > 0)
@@ -726,6 +735,16 @@ EventPropagation DynamicRibbonWidget::focused(const int playerID)
 void DynamicRibbonWidget::onRibbonWidgetScroll(const int delta_x)
 {
     scroll(delta_x);
+}
+
+// -----------------------------------------------------------------------------
+
+void DynamicRibbonWidget::setText(const wchar_t *text)
+{
+    Widget::setText(text);
+
+    if (m_label != NULL)
+        m_label->setText(text);
 }
 
 // -----------------------------------------------------------------------------

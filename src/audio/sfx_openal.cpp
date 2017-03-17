@@ -34,7 +34,7 @@
 #endif
 
 #include <assert.h>
-#include <math.h>
+#include <cmath>
 #include <stdio.h>
 #include <string>
 
@@ -147,7 +147,7 @@ void SFXOpenAL::updatePlayingSFX(float dt)
 void SFXOpenAL::setSpeed(float factor)
 {
     //if(m_status!=SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
-    assert(!isnan(factor));
+    assert(!std::isnan(factor));
     SFXManager::get()->queue(SFXManager::SFX_SPEED, this, factor);
 }   // setSpeed
 
@@ -186,7 +186,7 @@ void SFXOpenAL::reallySetSpeed(float factor)
 void SFXOpenAL::setVolume(float volume)
 {
     if(m_status==SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
-    assert(!isnan(volume)) ;
+    assert(!std::isnan(volume)) ;
     SFXManager::get()->queue(SFXManager::SFX_VOLUME, this, volume);
 }   // setVolume
 
@@ -424,7 +424,7 @@ void SFXOpenAL::setPosition(const Vec3 &position)
 {
     // Don't send a position command to the thread if the sound is not playing
     // (or sfx disabled or the sound was not initialised correctly)
-//    if (m_status != SFX_PLAYING|| !SFXManager::get()->sfxAllowed()) return;
+    if (!SFXManager::get()->sfxAllowed()) return;
     SFXManager::get()->queue(SFXManager::SFX_POSITION, this, position);
 
 }   // setPosition

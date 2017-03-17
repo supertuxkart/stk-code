@@ -28,6 +28,7 @@
 #include <irrlicht.h>
 #include <IMesh.h>
 #include <IMeshBuffer.h>
+#include <SSkinMeshBuffer.h>
 
 void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max) {
 
@@ -327,6 +328,7 @@ void recalculateTangents(scene::IMesh* mesh, bool recalculate_normals, bool smoo
     }
 }
 
+#ifndef SERVER_ONLY
 bool MeshTools::isNormalMap(scene::IMeshBuffer* mb)
 {
     if (!CVS->isGLSL())
@@ -334,6 +336,7 @@ bool MeshTools::isNormalMap(scene::IMeshBuffer* mb)
     return (mb->getMaterial().MaterialType == Shaders::getShader(ES_NORMAL_MAP) &&
             mb->getVertexType() != video::EVT_TANGENTS);
 }
+#endif
 
 // Copied from irrlicht
 scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh,
@@ -418,6 +421,8 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh,
                         vNew = v[idx[i]];
                 }
                 break;
+                default:
+                break;
             }
             core::map<video::S3DVertexTangents, int>::Node* n = vertMap.find(vNew);
             if (n)
@@ -444,29 +449,38 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh,
     clone->recalculateBoundingBox();
     if (calculate_tangents)
         recalculateTangents(clone, recalculate_normals, smooth, angle_weighted);
-    
-    int mbcount = clone->getMeshBufferCount();
-    for (int i = 0; i < mbcount; i++)
-    {
-        scene::IMeshBuffer* mb = clone->getMeshBuffer(i);
-
-        for (u32 t = 0; t < video::MATERIAL_MAX_TEXTURES; t++)
-        {
-            video::ITexture* texture = mb->getMaterial().TextureLayer[t].Texture;
-            if (texture != NULL)
-                texture->grab();
-        }
-    }
 
     scene::IMeshCache* meshCache = irr_driver->getSceneManager()->getMeshCache();
     io::SNamedPath path = meshCache->getMeshName(mesh);
-    irr_driver->removeMeshFromCache(mesh);
+    if (path.getPath() == "")
+    {
+        // This mesh is not in irrlicht cache, drop it directly
+        assert(mesh->getReferenceCount() == 1);
+        mesh->drop();
+        return clone;
+    }
+    else
+    {
+        // Cache the calcuated tangent mesh with path
+        irr_driver->removeMeshFromCache(mesh);
+        scene::SAnimatedMesh* amesh = new scene::SAnimatedMesh(clone);
+        clone->drop();
+        meshCache->addMesh(path, amesh);
+        Track* track = Track::getCurrentTrack();
+        if (track)
+        {
+            irr_driver->grabAllTextures(amesh);
+            track->addCachedMesh(amesh);
+            return amesh;
+        }
+        amesh->drop();
+        return amesh;
+    }
 
-    scene::SAnimatedMesh* amesh = new scene::SAnimatedMesh(clone);
-    meshCache->addMesh(path, amesh);
-
-    World::getWorld()->getTrack()->addCachedMesh(amesh);
-
-    return clone;
 }
 
+void MeshTools::createSkinnedMeshWithTangents(scene::ISkinnedMesh* mesh,
+                                              bool(*predicate)(scene::IMeshBuffer*))
+{
+    mesh->convertMeshToTangents(predicate);
+}

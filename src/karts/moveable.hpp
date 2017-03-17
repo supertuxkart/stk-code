@@ -31,14 +31,13 @@ using namespace irr;
 #include "physics/user_pointer.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
-#include "network/types.hpp"
 
 class Material;
 
 /**
   * \ingroup karts
   */
-class Moveable: public NoCopy, public CallbackObject
+class Moveable: public NoCopy
 {
 private:
     btVector3              m_velocityLC;      /**<Velocity in kart coordinates. */
@@ -85,20 +84,28 @@ public:
     virtual void stopFlying();
 
     /** Sets the XYZ coordinates of the moveable. */
-    void setXYZ(const Vec3& a)
+    virtual void setXYZ(const Vec3& a)
     {
         m_transform.setOrigin(a);
         if(m_motion_state)
             m_motion_state->setWorldTransform(m_transform);
-    }
+    }   // setXYZ
     // ------------------------------------------------------------------------
-    /** Sets the rotation of this moveable. */
-    void setRotation(const btQuaternion&a)
+    /** Sets the rotation of the physical body this moveable. */
+    void setRotation(const btMatrix3x3 &m)
     {
-        m_transform.setRotation(a);
+        m_transform.setBasis(m);
         if(m_motion_state)
             m_motion_state->setWorldTransform(m_transform);
-    }
+    }   // setRotation(btMatrix3x3)
+    // ------------------------------------------------------------------------
+    /** Sets the rotation of the physical body this moveable. */
+    void setRotation(const btQuaternion &q)
+    {
+        m_transform.setRotation(q);
+        if(m_motion_state)
+            m_motion_state->setWorldTransform(m_transform);
+    }   // setRotation(btQuaternion)
     // ------------------------------------------------------------------------
     virtual void  updateGraphics(float dt, const Vec3& off_xyz,
                                  const btQuaternion& off_rotation);
@@ -111,6 +118,7 @@ public:
     const btTransform
                  &getTrans() const {return m_transform;}
     void          setTrans(const btTransform& t);
+    void          updatePosition();
 }
 ;   // class Moveable
 

@@ -16,6 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
+#ifndef SERVER_ONLY
+
 /**
 \page shaders_overview Shaders Overview
 
@@ -173,64 +175,6 @@ static std::string loadHeader()
 }   // loadHeader
 
 // ----------------------------------------------------------------------------
-// Mostly from shader tutorial
-GLuint loadShader(const char * file, unsigned type)
-{
-    GLuint Id = glCreateShader(type);
-    char versionString[20];
-    sprintf(versionString, "#version %d\n", CVS->getGLSLVersion());
-    std::string Code = versionString;
-    if (CVS->isAMDVertexShaderLayerUsable())
-        Code += "#extension GL_AMD_vertex_shader_layer : enable\n";
-    if (CVS->isAZDOEnabled())
-    {
-        Code += "#extension GL_ARB_bindless_texture : enable\n";
-        Code += "#define Use_Bindless_Texture\n";
-    }
-    std::ifstream Stream(file, std::ios::in);
-    Code += "//" + std::string(file) + "\n";
-    if (!CVS->isARBUniformBufferObjectUsable())
-        Code += "#define UBO_DISABLED\n";
-    if (CVS->isAMDVertexShaderLayerUsable())
-        Code += "#define VSLayer\n";
-    if (CVS->needsRGBBindlessWorkaround())
-        Code += "#define SRGBBindlessFix\n";
-    Code += loadHeader();
-    if (Stream.is_open())
-    {
-        std::string Line = "";
-        while (getline(Stream, Line))
-            Code += "\n" + Line;
-        Stream.close();
-    }
-    GLint Result = GL_FALSE;
-    int InfoLogLength;
-    Log::info("GLWrap", "Compiling shader : %s", file);
-    char const * SourcePointer = Code.c_str();
-    int length = (int)strlen(SourcePointer);
-    glShaderSource(Id, 1, &SourcePointer, &length);
-    glCompileShader(Id);
-
-    glGetShaderiv(Id, GL_COMPILE_STATUS, &Result);
-    if (Result == GL_FALSE)
-    {
-        Log::error("GLWrap", "Error in shader %s", file);
-        glGetShaderiv(Id, GL_INFO_LOG_LENGTH, &InfoLogLength);
-        if (InfoLogLength<0)
-            InfoLogLength = 1024;
-        char *ErrorMessage = new char[InfoLogLength];
-        ErrorMessage[0] = 0;
-        glGetShaderInfoLog(Id, InfoLogLength, NULL, ErrorMessage);
-        Log::error("GLWrap", ErrorMessage);
-        delete[] ErrorMessage;
-    }
-
-    glGetError();
-
-    return Id;
-}   // loadShader
-
-// ----------------------------------------------------------------------------
 void Shaders::loadShaders()
 {
     const std::string &dir = file_manager->getAsset(FileManager::SHADER, "");
@@ -245,45 +189,51 @@ void Shaders::loadShaders()
     // Save previous shaders (used in case some shaders don't compile)
     int saved_shaders[ES_COUNT];
     memcpy(saved_shaders, m_shaders, sizeof(m_shaders));
+    
+#if !defined(USE_GLES2)
+    std::string name = "pass";
+#else
+    std::string name = "pass_gles";
+#endif
 
     // Ok, go
-    m_shaders[ES_NORMAL_MAP] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
-    m_shaders[ES_NORMAL_MAP_LIGHTMAP] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_NORMAL_MAP] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
+    m_shaders[ES_NORMAL_MAP_LIGHTMAP] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
 
-    m_shaders[ES_SKYBOX] = glslmat(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_SKYBOX] = glslmat(dir + name + ".vert", dir + name + ".frag",
                                    m_callbacks[ES_SKYBOX], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
-    m_shaders[ES_SPLATTING] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_SPLATTING] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
 
-    m_shaders[ES_WATER] = glslmat(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_WATER] = glslmat(dir + name + ".vert", dir + name + ".frag",
                                   m_callbacks[ES_WATER], EMT_TRANSPARENT_ALPHA_CHANNEL);
-    m_shaders[ES_WATER_SURFACE] = glsl(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_WATER_SURFACE] = glsl(dir + name + ".vert", dir + name + ".frag",
                                        m_callbacks[ES_WATER]);
 
-    m_shaders[ES_SPHERE_MAP] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_SPHERE_MAP] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
 
-    m_shaders[ES_GRASS] = glslmat(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_GRASS] = glslmat(dir + name + ".vert", dir + name + ".frag",
                                   m_callbacks[ES_GRASS], EMT_TRANSPARENT_ALPHA_CHANNEL);
-    m_shaders[ES_GRASS_REF] = glslmat(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_GRASS_REF] = glslmat(dir + name + ".vert", dir + name + ".frag",
                                       m_callbacks[ES_GRASS], EMT_TRANSPARENT_ALPHA_CHANNEL_REF);
 
-    m_shaders[ES_MOTIONBLUR] = glsl(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_MOTIONBLUR] = glsl(dir + name + ".vert", dir + name + ".frag",
                                     m_callbacks[ES_MOTIONBLUR]);
 
-    m_shaders[ES_GAUSSIAN3H] = glslmat(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_GAUSSIAN3H] = glslmat(dir + name + ".vert", dir + name + ".frag",
                                        m_callbacks[ES_GAUSSIAN3H], EMT_SOLID);
-    m_shaders[ES_GAUSSIAN3V] = glslmat(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_GAUSSIAN3V] = glslmat(dir + name + ".vert", dir + name + ".frag",
                                        m_callbacks[ES_GAUSSIAN3V], EMT_SOLID);
 
-    m_shaders[ES_MIPVIZ] = glslmat(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_MIPVIZ] = glslmat(dir + name + ".vert", dir + name + ".frag",
                                    m_callbacks[ES_MIPVIZ], EMT_SOLID);
 
-    m_shaders[ES_OBJECTPASS] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
-    m_shaders[ES_OBJECT_UNLIT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
-    m_shaders[ES_OBJECTPASS_REF] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
-    m_shaders[ES_OBJECTPASS_RIMLIT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_OBJECTPASS] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
+    m_shaders[ES_OBJECT_UNLIT] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
+    m_shaders[ES_OBJECTPASS_REF] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
+    m_shaders[ES_OBJECTPASS_RIMLIT] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
 
-    m_shaders[ES_DISPLACE] = glslmat(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_DISPLACE] = glslmat(dir + name + ".vert", dir + name + ".frag",
         m_callbacks[ES_DISPLACE], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
     // Check that all successfully loaded
@@ -309,7 +259,6 @@ void Shaders::loadShaders()
     }
 
     initGL();
-    SharedGPUObjects::init();
 }   // loadShaders
 
 // ----------------------------------------------------------------------------
@@ -324,37 +273,21 @@ void Shaders::check(const int num)
 }   // check
 
 // ============================================================================
-// Solid Normal and depth pass shaders
-Shaders::ObjectPass1Shader::ObjectPass1Shader()
+Shaders::SkinnedTransparentShader::SkinnedTransparentShader()
 {
-    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                        GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
-                        GL_FRAGMENT_SHADER, "object_pass1.frag");
-    assignUniforms("ModelMatrix", "InverseModelMatrix");
+    if (!CVS->supportsHardwareSkinning()) return;
+    loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning.vert",
+                        GL_FRAGMENT_SHADER, "transparent.frag");
+    assignUniforms("ModelMatrix", "texture_trans", "skinning_offset",  "custom_alpha");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-}   // ObjectPass1Shader
-
-// ============================================================================
-// Solid Lit pass shaders
-Shaders::ObjectPass2Shader::ObjectPass2Shader()
-{
-    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                        GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
-                        GL_FRAGMENT_SHADER, "object_pass2.frag");
-    assignUniforms("ModelMatrix", "TextureMatrix");
-    assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
-                       1, "SpecularMap", ST_NEAREST_FILTERED,
-                       2, "SSAO", ST_BILINEAR_FILTERED,
-                       3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                       4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-}   // ObjectPass2Shader
+}   // SkinnedTransparentShader
 
 // ============================================================================
 Shaders::TransparentShader::TransparentShader()
 {
     loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                         GL_FRAGMENT_SHADER, "transparent.frag");
-    assignUniforms("ModelMatrix", "TextureMatrix");
+    assignUniforms("ModelMatrix", "texture_trans", "custom_alpha");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // TransparentShader
 
@@ -363,7 +296,7 @@ Shaders::TransparentFogShader::TransparentFogShader()
 {
     loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                         GL_FRAGMENT_SHADER, "transparentfog.frag");
-    assignUniforms("ModelMatrix", "TextureMatrix", "fogmax", "startH",
+    assignUniforms("ModelMatrix", "texture_trans", "fogmax", "startH",
                    "endH", "start", "end", "col");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // TransparentFogShader
@@ -386,3 +319,5 @@ Shaders::ColoredLine::ColoredLine()
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }   // Shaders::ColoredLine
+
+#endif   // !SERVER_ONLY

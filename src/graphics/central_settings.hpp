@@ -28,21 +28,32 @@ private:
     bool hasVSLayer;
     bool hasBaseInstance;
     bool hasDrawIndirect;
-    bool hasBuffserStorage;
+    bool hasBufferStorage;
     bool hasComputeShaders;
+    bool hasArraysOfArrays;
     bool hasTextureStorage;
     bool hasTextureView;
     bool hasBindlessTexture;
     bool hasUBO;
+    bool hasExplicitAttribLocation;
     bool hasGS;
     bool hasTextureCompression;
     bool hasAtomics;
     bool hasSSBO;
     bool hasImageLoadStore;
     bool hasMultiDrawIndirect;
+    bool hasTextureFilterAnisotropic;
+    bool hasTextureSwizzle;
+    bool hasPixelBufferObject;
+
+#if defined(USE_GLES2)
+    bool hasBGRA;
+    bool hasColorBufferFloat;
+#endif
 
     bool m_need_rh_workaround;
     bool m_need_srgb_workaround;
+    bool m_need_srgb_visual_workaround;
     bool m_GI_has_artifact;
 public:
     void init();
@@ -52,15 +63,17 @@ public:
     // Needs special handle ?
     bool needRHWorkaround() const;
     bool needsRGBBindlessWorkaround() const;
+    bool needsSRGBCapableVisualWorkaround() const;
 
     // Extension is available and safe to use
     bool isARBUniformBufferObjectUsable() const;
     bool isEXTTextureCompressionS3TCUsable() const;
     bool isARBTextureViewUsable() const;
-    bool isARBGeometryShader4Usable() const;
+    bool isARBGeometryShadersUsable() const;
     bool isARBTextureStorageUsable() const;
     bool isAMDVertexShaderLayerUsable() const;
     bool isARBComputeShaderUsable() const;
+    bool isARBArraysOfArraysUsable() const;
     bool isARBBindlessTextureUsable() const;
     bool isARBBufferStorageUsable() const;
     bool isARBBaseInstanceUsable() const;
@@ -69,6 +82,15 @@ public:
     bool isARBShaderStorageBufferObjectUsable() const;
     bool isARBImageLoadStoreUsable() const;
     bool isARBMultiDrawIndirectUsable() const;
+    bool isARBExplicitAttribLocationUsable() const;
+    bool isEXTTextureFilterAnisotropicUsable() const;
+    bool isARBTextureSwizzleUsable() const;
+    bool isARBPixelBufferObjectUsable() const;
+
+#if defined(USE_GLES2)
+    bool isEXTTextureFormatBGRA8888Usable() const;
+    bool isEXTColorBufferFloatUsable() const;
+#endif
 
 
     // Are all required extensions available for feature support
@@ -77,6 +99,8 @@ public:
     bool supportsIndirectInstancingRendering() const;
     bool supportsComputeShadersFiltering() const;
     bool supportsAsyncInstanceUpload() const;
+    bool supportsHardwareSkinning() const;
+    bool supportsThreadedTextureLoading() const;
 
     // "Macro" around feature support and user config
     bool isShadowEnabled() const;

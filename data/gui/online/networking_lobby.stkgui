@@ -10,6 +10,14 @@
                         <label proportion="1" text_align="left" I18N="In the networking lobby" text="Server name:"/>
                         <label proportion="2" text_align="left" id="server_name" text=""/>
                     </div>
+                    <div width="100%" height="fit" layout="horizontal-row" >
+                        <label proportion="1" text_align="left" I18N="In the networking lobby" text="Difficulty:"/>
+                        <label proportion="2" text_align="left" id="server_difficulty" text=""/>
+                    </div>
+                    <div width="100%" height="fit" layout="horizontal-row" >
+                        <label proportion="1" text_align="left" I18N="In the networking lobby" text="Game mode:"/>
+                        <label proportion="2" text_align="left" id="server_game_mode" text=""/>
+                    </div>
                 </box>
                 <spacer width="20" height="20"/>
                 <box proportion="1" height="100%" layout="vertical-row">
@@ -25,7 +33,11 @@
                 </box>
                 <spacer width="20" height="20"/>
                 <box id="actions" proportion="1" height="100%" layout="vertical-row">
-                    <label I18N="In networking lobby" word_wrap="true" text="actions" align="center" text-align="center"/>
+<!--                    <label I18N="In networking lobby" word_wrap="true" text="actions" align="center" text-align="center"/>
+-->
+                  <icon-button id="start" width="64" height="64" icon="gui/green_check.png" align="center"
+                      I18N="In the network lobby" text="Start Race"/>
+
                 </box>
             </div>
         </div>

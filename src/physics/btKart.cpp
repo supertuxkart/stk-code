@@ -22,8 +22,8 @@
 #include "LinearMath/btIDebugDraw.h"
 #include "BulletDynamics/ConstraintSolver/btContactConstraint.h"
 
+#include "graphics/material.hpp"
 #include "karts/kart.hpp"
-#include "modes/world.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/terrain_info.hpp"
 #include "tracks/track.hpp"
@@ -116,8 +116,7 @@ void btKart::reset()
         updateWheelTransform(i, true);
     }
     m_visual_wheels_touch_ground = false;
-    m_zipper_active              = false;
-    m_zipper_velocity            = btScalar(0);
+    m_zipper_speed               = btScalar(0);
     m_skid_angular_velocity      = 0;
     m_is_skidding                = false;
     m_allow_sliding              = false;
@@ -445,7 +444,9 @@ void btKart::updateVehicle( btScalar step )
     if(m_num_wheels_on_ground==0)
     {
         btVector3 kart_up    = getChassisWorldTransform().getBasis().getColumn(1);
-        btVector3 terrain_up(0,1,0);
+        btVector3 terrain_up =
+            m_kart->getMaterial() && m_kart->getMaterial()->hasGravity() ?
+            m_kart->getNormal() : Vec3(0, 1, 0);
         // Length of axis depends on the angle - i.e. the further awat
         // the kart is from being upright, the larger the applied impulse
         // will be, resulting in fast changes when the kart is on its
@@ -461,7 +462,7 @@ void btKart::updateVehicle( btScalar step )
         av.setZ(0);
         m_chassisBody->setAngularVelocity(av);
         // Give a nicely balanced feeling for rebalancing the kart
-        m_chassisBody->applyTorqueImpulse(axis * m_kart->getKartProperties()->getSmoothFlyingImpulse());
+        m_chassisBody->applyTorqueImpulse(axis * m_kart->getKartProperties()->getStabilitySmoothFlyingImpulse());
     }
     
     // Work around: make sure that either both wheels on one axis
@@ -522,9 +523,9 @@ void btKart::updateVehicle( btScalar step )
     for (int i=0;i<m_wheelInfo.size();i++)
     {
         btWheelInfo& wheel = m_wheelInfo[i];
-        btVector3 relpos   = wheel.m_raycastInfo.m_hardPointWS
-                           - getRigidBody()->getCenterOfMassPosition();
-        btVector3 vel      = getRigidBody()->getVelocityInLocalPoint(relpos);
+        //btVector3 relpos   = wheel.m_raycastInfo.m_hardPointWS
+        //                   - getRigidBody()->getCenterOfMassPosition();
+        //btVector3 vel      = getRigidBody()->getVelocityInLocalPoint(relpos);
 
         if (wheel.m_raycastInfo.m_isInContact)
         {
@@ -543,7 +544,7 @@ void btKart::updateVehicle( btScalar step )
 
     // If configured, add a force to keep karts on the track
     // -----------------------------------------------------
-    float dif = m_kart->getKartProperties()->getDownwardImpulseFactor();
+    float dif = m_kart->getKartProperties()->getStabilityDownwardImpulseFactor();
     if(dif!=0 && m_num_wheels_on_ground==4)
     {
         float f = -fabsf(m_kart->getSpeed()) * dif;
@@ -655,7 +656,7 @@ void btKart::updateSuspension(btScalar deltaTime)
             // is already guaranteed that either both or no wheels on one axis
             // are on the ground, so we have to test only one of the wheels
             wheel_info.m_wheelsSuspensionForce =
-                 -m_kart->getKartProperties()->getTrackConnectionAccel()
+                 -m_kart->getKartProperties()->getStabilityTrackConnectionAccel()
                 * chassisMass;
             continue;
         }
@@ -666,7 +667,7 @@ void btKart::updateSuspension(btScalar deltaTime)
         btScalar susp_length    = wheel_info.getSuspensionRestLength();
         btScalar current_length = wheel_info.m_raycastInfo.m_suspensionLength;
         btScalar length_diff    = (susp_length - current_length);
-        if(m_kart->getKartProperties()->getExpSpringResponse())
+        if(m_kart->getKartProperties()->getSuspensionExpSpringResponse())
             length_diff *= fabsf(length_diff)/susp_length;
         float f = (1.0f + fabsf(length_diff) / susp_length);
         // Scale the length diff. This results that in uphill sections, when
@@ -810,7 +811,7 @@ void btKart::updateFriction(btScalar timeStep)
             (btRigidBody*) wheelInfo.m_raycastInfo.m_groundObject;
         if(!groundObject) continue;
 
-        if(m_zipper_active && m_zipper_velocity > 0)
+        if(m_zipper_speed > 0)
         {
             if (wheel==2 || wheel==3)
             {
@@ -818,7 +819,7 @@ void btKart::updateFriction(btScalar timeStep)
                 // reached. So compute the impulse to accelerate the
                 // kart up to that speed:
                 m_forwardImpulse[wheel] =
-                    0.5f*(m_zipper_velocity -
+                    0.5f*(m_zipper_speed -
                           getRigidBody()->getLinearVelocity().length())
                     / m_chassisBody->getInvMass();
             }
@@ -847,7 +848,7 @@ void btKart::updateFriction(btScalar timeStep)
                 // bullet then tries to offset by applying a backward
                 // impulse - which is a bit too big, causing a impulse
                 // backwards, ... till the kart is shaking backwards and
-                // forwards. By onlyu applying half of the impulse in cae
+                // forwards. By only applying half of the impulse in case
                 // of low friction this goes away.
                 if(wheelInfo.m_brake && fabsf(rollingFriction)<10)
                     rollingFriction*=0.5f;
@@ -882,8 +883,8 @@ void btKart::updateFriction(btScalar timeStep)
     }   // for (int wheel=0; wheel<getNumWheels(); wheel++)
 
 
-    m_zipper_active   = false;
-    m_zipper_velocity = 0;
+    // Note: don't reset zipper speed, or the kart rewinder will
+    // get incorrect zipper information.
 
     // The kart just stopped skidding. Adjust the velocity so that
     // it points in the right direction.
@@ -1024,7 +1025,7 @@ void btKart::debugDraw(btIDebugDraw* debugDrawer)
         int n = w.m_raycastInfo.m_triangle_index;
         if (n > -1)
         {
-            const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
+            const TriangleMesh &tm = Track::getCurrentTrack()->getTriangleMesh();
             btVector3 *p1, *p2, *p3;
             tm.getTriangle(n, &p1, &p2, &p3);
             const btVector3 *n1, *n2, *n3;
@@ -1061,8 +1062,12 @@ void btKart::setSliding(bool active)
  */
 void btKart::instantSpeedIncreaseTo(float speed)
 {
-    m_zipper_active   = true;
-    m_zipper_velocity = speed;
+    // Avoid that a speed 'increase' might cause a slowdown
+    if (m_chassisBody->getLinearVelocity().length2() > speed*speed)
+    {
+        return;
+    }
+    m_zipper_speed  = speed;
 }   // activateZipper
 
 // ----------------------------------------------------------------------------

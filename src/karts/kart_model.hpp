@@ -35,7 +35,10 @@ using namespace irr;
 
 class AbstractKart;
 class KartProperties;
+class RenderInfo;
 class XMLNode;
+
+enum KartRenderType: unsigned int;
 
 /** A speed-weighted object is an object whose characteristics are influenced by the kart's speed */
 struct SpeedWeightedObject
@@ -81,6 +84,65 @@ struct SpeedWeightedObject
 };
 typedef std::vector<SpeedWeightedObject>    SpeedWeightedObjectList;
 
+// ============================================================================
+/** A class to store the headlights of a kart.
+ */
+class HeadlightObject
+{
+private:
+    /** The filename of the headlight model. */
+    std::string m_filename;
+    /** The position relative to the parent kart scene node where the
+     *  headlight mesh is attached to. */
+    core::vector3df m_position;
+    /** The mesh for the headlight. */
+    scene::IMesh* m_model;
+    /** The scene node of the headlight. */
+    scene::ISceneNode* m_node;
+
+public:
+
+    HeadlightObject()
+    {
+        m_model    = NULL;
+        m_node     = NULL;
+        m_filename = "";
+        m_position.set(0, 0, 0);
+    }   // HeadlightObject
+    // ------------------------------------------------------------------------
+    HeadlightObject(const std::string& filename, core::vector3df &pos)
+    {
+        m_filename = filename;
+        m_position = pos;
+        m_model    = NULL;
+        m_node     = NULL;
+    }   // HeadlightObjects
+    // ------------------------------------------------------------------------
+    const std::string& getFilename() const { return m_filename; }
+    // ------------------------------------------------------------------------
+    /** Sets the mesh for this headlight object. */
+    void setModel(scene::IMesh *mesh) { m_model = mesh; }
+    // ------------------------------------------------------------------------
+    /** Sets the node of the headlight, and (if not NULL) also sets the
+     *  position of this scene node to be the position of the headlight. */
+    void setNode(scene::ISceneNode *node)
+    {
+        m_node = node; 
+        if (m_node) m_node->setPosition(m_position);
+    }   // setNode
+    // ------------------------------------------------------------------------
+    const scene::ISceneNode *getNode() const { return m_node;  }
+    // ------------------------------------------------------------------------
+    scene::ISceneNode *getNode() { return m_node; }
+    // ------------------------------------------------------------------------
+    const scene::IMesh *getModel() const { return m_model;  }
+    // ------------------------------------------------------------------------
+    scene::IMesh *getModel() { return m_model; }
+    // ------------------------------------------------------------------------
+};   // class HeadlightObject
+
+// ============================================================================
+
 /**
  * \brief This class stores a 3D kart model.
  * It takes especially care of attaching
@@ -111,10 +173,16 @@ public:
             AF_WIN_START,          // Begin of win animation
             AF_WIN_LOOP_START,     // Begin of win loop animation
             AF_WIN_END,            // End of win animation
+            AF_SELECTION_START,    // Start frame in kart selection screen
+            AF_SELECTION_END,      // End frame in kart selection screen
+            AF_BACK_LEFT,          // Going back left
+            AF_BACK_STRAIGHT,      // Going back straight
+            AF_BACK_RIGHT,         // Going back right
             AF_SPEED_WEIGHTED_START,        // Start of speed-weighted animation
             AF_SPEED_WEIGHTED_END,          // End of speed-weighted animation
             AF_END=AF_SPEED_WEIGHTED_END,   // Last animation frame
             AF_COUNT};             // Number of entries here
+
 private:
     /** Which frame number starts/end which animation. */
     int m_animation_frame[AF_COUNT];
@@ -169,6 +237,8 @@ private:
     /** The speed weighted objects. */
     SpeedWeightedObjectList     m_speed_weighted_objects;
     
+    std::vector<HeadlightObject> m_headlight_objects;
+
     /** Length of the physics suspension when the kart is at rest. */
     float m_default_physics_suspension[4];
 
@@ -207,8 +277,13 @@ private:
 
     /** True if this is the master copy, managed by KartProperties. This
      *  is mainly used for debugging, e.g. the master copies might not have
-     * anything attached to it etc. */
+     *  anything attached to it etc. */
     bool  m_is_master;
+
+    /** True if the animation played is non-loop, which will reset to
+     *  AF_DEFAULT after first loop ends. Mainly used in soccer mode for
+     *  animation playing after scored. */
+    bool  m_play_non_loop;
 
     void  loadWheelInfo(const XMLNode &node,
                         const std::string &wheel_name, int index);
@@ -219,22 +294,32 @@ private:
     void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node,
                                 const SpeedWeightedObject::Properties& fallback_properties);
 
+    void  loadHeadlights(const XMLNode &node);
+
     void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);
 
     /** Pointer to the kart object belonging to this kart model. */
     AbstractKart* m_kart;
 
+    KartRenderType m_krt;
+
+    RenderInfo* m_render_info;
+
+    bool m_support_colorization;
+
 public:
                   KartModel(bool is_master);
                  ~KartModel();
-    KartModel*    makeCopy();
+    KartModel*    makeCopy(KartRenderType krt);
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
     void          setDefaultSuspension();
-    void          update(float dt, float distance, float steer,
-                         float speed);
+    void          update(float dt, float distance, float steer, float speed,
+                         float current_lean_angle,
+                         int gt_replay_index = -1);
     void          finishedRace();
+    void          resetVisualWheelPosition();
     scene::ISceneNode*
                   attachModel(bool animatedModels, bool always_animated);
     // ------------------------------------------------------------------------
@@ -250,6 +335,10 @@ public:
     /** Since karts might be animated, we might need to know which base frame
      *  to use. */
     int  getBaseFrame() const   { return m_animation_frame[AF_STRAIGHT];  }
+    // ------------------------------------------------------------------------
+    int  getFrame(AnimationFrameType f) const  { return m_animation_frame[f]; }
+    // ------------------------------------------------------------------------
+    float  getAnimationSpeed() const              { return m_animation_speed; }
     // ------------------------------------------------------------------------
     /** Returns the position of a wheel relative to the kart.
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear
@@ -306,7 +395,7 @@ public:
     AnimationFrameType getAnimation() { return m_current_animation; }
     // ------------------------------------------------------------------------
     /** Enables- or disables the end animation. */
-    void  setAnimation(AnimationFrameType type);
+    void  setAnimation(AnimationFrameType type, bool play_non_loop = false);
     // ------------------------------------------------------------------------
     /** Sets the kart this model is currently used for */
     void  setKart(AbstractKart* k) { m_kart = k; }
@@ -322,6 +411,10 @@ public:
     scene::IAnimatedMeshSceneNode* getAnimatedNode(){ return m_animated_node; }
     // ------------------------------------------------------------------------
     core::vector3df getHatOffset() { return m_hat_offset; }
+    // ------------------------------------------------------------------------
+    RenderInfo* getRenderInfo();
+    // ------------------------------------------------------------------------
+    bool supportColorization() const         { return m_support_colorization; }
 
 };   // KartModel
 #endif

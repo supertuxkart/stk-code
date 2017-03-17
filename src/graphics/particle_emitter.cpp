@@ -16,6 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/particle_emitter.hpp"
 
 #include "graphics/central_settings.hpp"
@@ -24,7 +26,6 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind.hpp"
-#include "graphics/shaders.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track.hpp"
@@ -427,8 +428,17 @@ int ParticleEmitter::getCreationRate()
  */
 void ParticleEmitter::setPosition(const Vec3 &pos)
 {
-  m_node->setPosition(pos.toIrrVector());
+    m_node->setPosition(pos.toIrrVector());
 }   // setPosition
+
+//-----------------------------------------------------------------------------
+/** Sets the rotation of the particle emitter.
+ *  \param pos The rotation for the particle emitter.
+ */
+void ParticleEmitter::setRotation(const Vec3 &rot)
+{
+    m_node->setRotation(rot.toIrrVector());
+}   // setRotation
 
 //-----------------------------------------------------------------------------
 
@@ -460,8 +470,12 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             
             if (m_is_glsl)
             {
-                bool additive = (type->getMaterial()->getShaderType() == Material::SHADERTYPE_ADDITIVE);
-                static_cast<ParticleSystemProxy *>(m_node)->setAlphaAdditive(additive);
+                Material* material = type->getMaterial();
+                if (material != nullptr)
+                {
+                    bool additive = (material->getShaderType() == Material::SHADERTYPE_ADDITIVE);
+                    static_cast<ParticleSystemProxy *>(m_node)->setAlphaAdditive(additive);
+                }
             }
         }
 
@@ -512,14 +526,6 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             m_node->setMaterialTexture(0, material->getTexture());
 
             mat0.ZWriteEnable = !material->isTransparent(); // disable z-buffer writes if material is transparent
-
-            // fallback for old render engine
-            if (material->getShaderType() == Material::SHADERTYPE_ADDITIVE)
-                mat0.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
-            else if (material->getShaderType() == Material::SHADERTYPE_ALPHA_BLEND)
-                mat0.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-            else if (material->getShaderType() == Material::SHADERTYPE_ALPHA_TEST)
-                mat0.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
         }
         else
         {
@@ -707,7 +713,6 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
 
 void ParticleEmitter::addHeightMapAffector(Track* t)
 {
-    
     if (m_is_glsl)
     {
         const Vec3* aabb_min;
@@ -763,3 +768,5 @@ void ParticleEmitter::resizeBox(float size)
     }
 #endif
 }
+
+#endif   // !SERVER_ONLY

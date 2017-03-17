@@ -24,6 +24,7 @@
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
+#include "utils/vs.hpp"
 
 #include <pthread.h>
 #include <stdexcept>
@@ -82,16 +83,11 @@ SFXManager::SFXManager()
     m_listener_front              = Vec3(0, 0, 1);
     m_listener_up                 = Vec3(0, 1, 0);
 
-    loadSfx();
-
     pthread_cond_init(&m_cond_request, NULL);
 
     pthread_attr_t  attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
-    // Should be the default, but just in case:
-    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
     m_thread_id.setAtomic(new pthread_t());
     // The thread is created even if there atm sfx are disabled
@@ -295,10 +291,10 @@ void SFXManager::stopThread()
  */
 void* SFXManager::mainLoop(void *obj)
 {
+    VS::setThreadName("SFXManager");
     SFXManager *me = (SFXManager*)obj;
 
-    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-
+    me->loadSfx();
     me->m_sfx_commands.lock();
 
     // Wait till we have an empty sfx in the queue
@@ -412,6 +408,7 @@ void* SFXManager::mainLoop(void *obj)
         delete me->m_sfx_commands.getData().front();
         me->m_sfx_commands.getData().erase(me->m_sfx_commands.getData().begin());
     }
+    me->m_sfx_commands.unlock();
     return NULL;
 }   // mainLoop
 
@@ -516,7 +513,6 @@ void SFXManager::loadSfx()
         array[i++] = buffer;
     }
 
-    #pragma omp parallel for private(i)
     for (i = 0; i < max; i++)
     {
         array[i]->load();

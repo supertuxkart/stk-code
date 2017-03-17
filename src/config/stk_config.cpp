@@ -27,7 +27,6 @@
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
 #include "karts/kart_properties.hpp"
-#include "karts/player_difficulty.hpp"
 #include "utils/log.hpp"
 
 STKConfig* stk_config=0;
@@ -104,7 +103,7 @@ void STKConfig::load(const std::string &filename)
                    strA,filename.c_str());              \
     }
 
-    if(m_score_increase.size()==0 || (int)m_score_increase.size()!=m_max_karts)
+    if(m_score_increase.size()==0)
     {
         Log::fatal("StkConfig", "Not or not enough scores defined in stk_config");
     }
@@ -119,19 +118,8 @@ void STKConfig::load(const std::string &filename)
     }
 
     CHECK_NEG(m_max_karts,                 "<karts max=..."             );
-    CHECK_NEG(m_parachute_friction,        "parachute-friction"         );
-    CHECK_NEG(m_parachute_lbound_fraction, "parachute-lbound-fraction"  );
-    CHECK_NEG(m_parachute_ubound_fraction, "parachute-ubound-fraction"  );
-    CHECK_NEG(m_parachute_max_speed,       "parachute-max-speed"        );
-    CHECK_NEG(m_parachute_time,            "parachute-time"             );
-    CHECK_NEG(m_parachute_time_other,      "parachute-time-other"       );
-    CHECK_NEG(m_bomb_time,                 "bomb-time"                  );
-    CHECK_NEG(m_bomb_time_increase,        "bomb-time-increase"         );
-    CHECK_NEG(m_anvil_time,                "anvil-time"                 );
-    CHECK_NEG(m_anvil_weight,              "anvil-weight"               );
     CHECK_NEG(m_item_switch_time,          "item-switch-time"           );
     CHECK_NEG(m_bubblegum_counter,         "bubblegum disappear counter");
-    CHECK_NEG(m_bubblegum_shield_time,     "bubblegum shield-time"      );
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
     CHECK_NEG(m_max_skidmarks,             "max-skidmarks"              );
     CHECK_NEG(m_min_kart_version,          "<kart-version min...>"      );
@@ -163,18 +151,13 @@ void STKConfig::load(const std::string &filename)
  */
 void STKConfig::init_defaults()
 {
-    m_anvil_weight               = m_parachute_friction        =
-        m_parachute_time         = m_parachute_lbound_fraction =
-        m_parachute_time_other   = m_anvil_speed_factor        =
-        m_bomb_time              = m_bomb_time_increase        =
-        m_anvil_time             = m_music_credit_time         =
+    m_bomb_time                  = m_bomb_time_increase        =
+        m_explosion_impulse_objects = m_music_credit_time      =
         m_delay_finish_time      = m_skid_fadeout_time         =
         m_near_ground            = m_item_switch_time          =
-        m_smooth_angle_limit     = m_parachute_ubound_fraction =
-        m_penalty_time           = m_explosion_impulse_objects =
-        m_parachute_max_speed    = UNDEFINED;
+        m_smooth_angle_limit     = m_penalty_time              =
+        UNDEFINED;
     m_bubblegum_counter          = -100;
-    m_bubblegum_shield_time      = -100;
     m_shield_restrict_weapos     = false;
     m_max_karts                  = -100;
     m_max_skidmarks              = -100;
@@ -194,10 +177,13 @@ void STKConfig::init_defaults()
     m_ai_acceleration            = 1.0f;
     m_disable_steer_while_unskid = false;
     m_camera_follow_skid         = false;
+    m_cutscene_fov               = 0.61f;
 
     m_score_increase.clear();
     m_leader_intervals.clear();
     m_switch_items.clear();
+    m_normal_ttf.clear();
+    m_digit_ttf.clear();
 }   // init_defaults
 
 //-----------------------------------------------------------------------------
@@ -228,22 +214,20 @@ void STKConfig::getAllData(const XMLNode * root)
         for(unsigned int i=0; i<gp_node->getNumNodes(); i++)
         {
             const XMLNode *pn=gp_node->getNode(i);
-            int from=-1;
-            pn->get("from", &from);
-            int to=-1;
-            pn->get("to", &to);
-            if(to<0) to=m_max_karts;
             int points=-1;
             pn->get("points", &points);
-            if(points<0 || from<0 || from>to||
-               (int)m_score_increase.size()!=from-1)
+            if(points<0)
             {
                 Log::error("StkConfig", "Incorrect GP point specification:");
-                Log::fatal("StkConfig", "from: %d  to: %d  points: %d",
-                        from, to, points);
+                Log::fatal("StkConfig", "points: %d",
+                        points);
             }
-            for(int j=from; j<=to; j++)
-                m_score_increase.push_back(points);
+            m_score_increase.push_back(points);
+        }
+        if (m_max_karts > int(gp_node->getNumNodes()))
+        {
+            Log::error("StkConfig", "Not enough grand-prix ranking nodes:");
+            m_score_increase.resize(m_max_karts, 0);
         }
     }
 
@@ -281,6 +265,7 @@ void STKConfig::getAllData(const XMLNode * root)
         camera->get("fov-2", &m_camera_fov[1]);
         camera->get("fov-3", &m_camera_fov[2]);
         camera->get("fov-4", &m_camera_fov[3]);
+        camera->get("cutscene-fov", &m_cutscene_fov);
     }
 
     if (const XMLNode *music_node = root->getNode("music"))
@@ -309,23 +294,6 @@ void STKConfig::getAllData(const XMLNode * root)
     if(const XMLNode *credits_node= root->getNode("credits"))
         credits_node->get("music", &m_music_credit_time);
 
-
-    if(const XMLNode *anvil_node= root->getNode("anvil"))
-    {
-        anvil_node->get("weight",       &m_anvil_weight      );
-        anvil_node->get("speed-factor", &m_anvil_speed_factor);
-        anvil_node->get("time",         &m_anvil_time        );
-    }
-
-    if(const XMLNode *parachute_node= root->getNode("parachute"))
-    {
-        parachute_node->get("friction",         &m_parachute_friction       );
-        parachute_node->get("time",             &m_parachute_time           );
-        parachute_node->get("time-other",       &m_parachute_time_other     );
-        parachute_node->get("lbound-fraction",  &m_parachute_lbound_fraction);
-        parachute_node->get("ubound-fraction",  &m_parachute_ubound_fraction);
-        parachute_node->get("max-speed",        &m_parachute_max_speed      );
-    }
 
     if(const XMLNode *bomb_node= root->getNode("bomb"))
     {
@@ -359,7 +327,6 @@ void STKConfig::getAllData(const XMLNode * root)
     if(const XMLNode *bubblegum_node= root->getNode("bubblegum"))
     {
         bubblegum_node->get("disappear-counter", &m_bubblegum_counter     );
-        bubblegum_node->get("shield-time",       &m_bubblegum_shield_time );
         bubblegum_node->get("restrict-weapons",  &m_shield_restrict_weapos);
     }
 
@@ -385,15 +352,10 @@ void STKConfig::getAllData(const XMLNode * root)
 
     }
 
-    if(const XMLNode *font_node = root->getNode("font"))
+    if (const XMLNode *fonts_list = root->getNode("fonts-list"))
     {
-        font_node->get("default",          &m_font_default         );
-        font_node->get("default_fallback", &m_font_default_fallback);
-        font_node->get("cjk",              &m_font_cjk             );
-        font_node->get("ar",               &m_font_ar              );
-        font_node->get("bold",             &m_font_bold            );
-        font_node->get("bold_fallback",    &m_font_bold_fallback   );
-        font_node->get("digit",            &m_font_digit           );
+        fonts_list->get("normal-ttf", &m_normal_ttf);
+        fonts_list->get("digit-ttf",  &m_digit_ttf );
     }
 
     // Get the default KartProperties
@@ -415,14 +377,6 @@ void STKConfig::getAllData(const XMLNode * root)
         m_kart_properties[type->getName()]->copyFrom(m_default_kart_properties);
         m_kart_properties[type->getName()]->getAllData(type);
     }
-
-    child_node = node->getNode("difficulties");
-    for (unsigned int i = 0; i < child_node->getNumNodes(); ++i)
-    {
-        const XMLNode* type = child_node->getNode(i);
-        m_player_difficulties[i] = new PlayerDifficulty();
-        m_player_difficulties[i]->getAllData(type);
-    }
 }   // getAllData
 
 // ----------------------------------------------------------------------------
@@ -435,15 +389,27 @@ void STKConfig::getAllData(const XMLNode * root)
  */
 void  STKConfig::getAllScores(std::vector<int> *all_scores, int num_karts)
 {
+    std::vector<int> sorted_score_increase;
+
     if (num_karts == 0) return;
 
     assert(num_karts <= m_max_karts);
     all_scores->resize(num_karts);
-    (*all_scores)[num_karts-1] = 1;  // last position gets one point
+    sorted_score_increase.resize(num_karts+1); //sorting function is [begin, end[
+
+    //get increase data into sorted_score_increase
+    for(int i=0; i<num_karts; i++)
+    {
+        sorted_score_increase[i] = m_score_increase[i];
+    }
+
+    std::sort (sorted_score_increase.begin(), sorted_score_increase.end());
+
+    (*all_scores)[num_karts-1] = sorted_score_increase[0];  // last position score
 
     // Must be signed, in case that num_karts==1
     for(int i=num_karts-2; i>=0; i--)
     {
-        (*all_scores)[i] = (*all_scores)[i+1] + m_score_increase[i];
+        (*all_scores)[i] = (*all_scores)[i+1] + sorted_score_increase[num_karts-i];
     }
 }   // getAllScores

@@ -37,6 +37,7 @@
 #include "modes/cutscene_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/demo_world.hpp"
+#include "network/network_config.hpp"
 #include "online/request_manager.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/credits.hpp"
@@ -44,7 +45,7 @@
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/online_profile_achievements.hpp"
-#include "states_screens/online_screen.hpp"
+#include "states_screens/online_profile_servers.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
@@ -74,6 +75,9 @@ bool MainMenuScreen::m_enable_online = false;
 
 MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
 {
+    m_online_string = _("Online");
+    //I18N: Used as a verb, appears on the main menu (login button)
+    m_login_string = _("Login");
 }   // MainMenuScreen
 
 // ----------------------------------------------------------------------------
@@ -82,6 +86,16 @@ void MainMenuScreen::loadedFromFile()
 {
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     w->setScrollSpeed(15);
+    
+    RibbonWidget* rw_top = getWidget<RibbonWidget>("menu_toprow");
+    assert(rw_top != NULL);
+    
+    if (track_manager->getTrack("overworld") == NULL ||
+        track_manager->getTrack("introcutscene") == NULL ||
+        track_manager->getTrack("introcutscene2") == NULL)
+    {
+        rw_top->removeChildNamed("story");
+    }
 
 #if DEBUG_MENU_ITEM != 1
     RibbonWidget* rw = getWidget<RibbonWidget>("menu_bottomrow");
@@ -93,6 +107,13 @@ void MainMenuScreen::loadedFromFile()
     rw->removeChildNamed("test_outro");
 #endif
 }   // loadedFromFile
+
+// ----------------------------------------------------------------------------
+
+void MainMenuScreen::beforeAddingWidget()
+{
+
+}
 
 // ----------------------------------------------------------------------------
 //
@@ -167,12 +188,12 @@ void MainMenuScreen::onUpdate(float delta)
     {
         m_user_id->setText(player->getLastOnlineName() + "@stk");
         m_online->setActive(true);
-        m_online->setLabel( _("Online"));
+        m_online->setLabel(m_online_string);
     }
     else if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_OUT)
     {
         m_online->setActive(true);
-        m_online->setLabel( _("Login" ));
+        m_online->setLabel(m_login_string);
         m_user_id->setText(player->getName());
     }
     else
@@ -182,8 +203,8 @@ void MainMenuScreen::onUpdate(float delta)
         m_user_id->setText(player->getName());
     }
 
-    m_online->setLabel(PlayerManager::getCurrentOnlineId() ? _("Online")
-                                                           : _("Login" )  );
+    m_online->setLabel(PlayerManager::getCurrentOnlineId() ? m_online_string
+                                                           : m_login_string);
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
@@ -245,7 +266,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts( 0 );
         race_manager->setNumPlayers(0);
-        race_manager->setNumLocalPlayers(0);
+        race_manager->setNumPlayers(0);
         race_manager->startSingleRace("endcutscene", 999, false);
 
         std::vector<std::string> parts;
@@ -268,7 +289,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts(0);
         race_manager->setNumPlayers(0);
-        race_manager->setNumLocalPlayers(0);
+        race_manager->setNumPlayers(0);
         race_manager->startSingleRace("gpwin", 999, false);
         GrandPrixWin* scene = GrandPrixWin::getInstance();
         scene->push();
@@ -281,7 +302,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts(0);
         race_manager->setNumPlayers(0);
-        race_manager->setNumLocalPlayers(0);
+        race_manager->setNumPlayers(0);
         race_manager->startSingleRace("gplose", 999, false);
         GrandPrixLose* scene = GrandPrixLose::getInstance();
         scene->push();
@@ -302,7 +323,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts(0);
         race_manager->setNumPlayers(0);
-        race_manager->setNumLocalPlayers(0);
+        race_manager->setNumPlayers(0);
         race_manager->startSingleRace("featunlocked", 999, false);
 
         FeatureUnlockedCutScene* scene =
@@ -355,7 +376,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts(0);
         race_manager->setNumPlayers(0);
-        race_manager->setNumLocalPlayers(0);
+        race_manager->setNumPlayers(0);
         race_manager->startSingleRace("introcutscene", 999, false);
 
         std::vector<std::string> parts;
@@ -372,7 +393,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts(0);
         race_manager->setNumPlayers(0);
-        race_manager->setNumLocalPlayers(0);
+        race_manager->setNumPlayers(0);
         race_manager->startSingleRace("endcutscene", 999, false);
 
         std::vector<std::string> parts;
@@ -383,7 +404,8 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 #endif
     if (selection == "new")
     {
-        KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance(); //FIXME : that was for tests
+        NetworkConfig::get()->unsetNetworking();
+        KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
         s->setMultiplayer(false);
         s->setFromOverworld(false);
         s->push();
@@ -391,6 +413,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     else if (selection == "multiplayer")
     {
         KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
+        NetworkConfig::get()->unsetNetworking();
         s->setMultiplayer(true);
         s->setFromOverworld(false);
         s->push();
@@ -414,7 +437,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "startTutorial")
     {
-        race_manager->setNumLocalPlayers(1);
+        race_manager->setNumPlayers(1);
         race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
         race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
         race_manager->setNumKarts( 1 );
@@ -435,7 +458,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                       UserConfigParams::m_default_kart.c_str());
             UserConfigParams::m_default_kart.revertToDefaults();
         }
-        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+        race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
 
         // ASSIGN should make sure that only input from assigned devices
         // is read.
@@ -457,7 +480,6 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
             race_manager->setNumKarts( 0 );
             race_manager->setNumPlayers(0);
-            race_manager->setNumLocalPlayers(0);
             race_manager->startSingleRace("introcutscene", 999, false);
 
             std::vector<std::string> parts;
@@ -491,15 +513,11 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                 "\"Connect to the Internet\"."));
             return;
         }
+        
         if (PlayerManager::getCurrentOnlineId())
         {
-            // For 0.8.2 disable the server menu, instead go to online profile
-            #ifdef ENABLE_NETWORK_MULTIPLAYER_SCREEN
-            OnlineScreen::getInstance()->push();
-            #else
             ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
-            TabOnlineProfileAchievements::getInstance()->push();
-            #endif
+            OnlineProfileServers::getInstance()->push();
         }
         else
         {

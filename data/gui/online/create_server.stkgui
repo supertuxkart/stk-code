@@ -17,6 +17,42 @@
                         <label proportion="1" text_align="left" I18N="In the server creation screen" text="Max. number of players"/>
                         <gauge id="max_players" proportion="1" min_value="2" max_value="12"/>
                     </div>
+                    
+                    <spacer height="20" width="20"/>
+
+                    <div width="100%" height="fit" layout="horizontal-row" >
+                        <label proportion="1" text_align="left" I18N="In the server creation screen" text="Password (optional)"/>
+                        <textbox proportion="1" id="password" I18N="In the server creation screen"/>
+                    </div>
+                    
+                    <spacer height="20" width="20"/>
+                    
+                    <label width="100%" height="fit" text_align="left" I18N="In the server creation screen" text="Difficulty"/>
+                        <!--<gauge id="difficulty" proportion="1" min_value="1" max_value="4"/>-->
+                    <ribbon id="difficulty" height="135" width="90%" align="center">
+                        <icon-button id="novice" width="128" height="128" icon="gui/difficulty_easy.png"
+                                I18N="Difficulty" text="Novice"/>
+                        <icon-button id="intermediate" width="128" height="128" icon="gui/difficulty_medium.png"
+                                I18N="Difficulty" text="Intermediate"/>
+                        <icon-button id="expert" width="128" height="128" icon="gui/difficulty_hard.png"
+                                I18N="Difficulty"  text="Expert"/>
+                        <icon-button id="best" width="128" height="128" icon="gui/difficulty_best.png"
+                                I18N="Difficulty"  text="SuperTux"/>
+                    </ribbon>
+                    
+                    <spacer height="20" width="20"/>
+                    
+                    <label width="100%" height="fit" text_align="left" I18N="In the server creation screen" text="Game mode"/>
+                    <ribbon id="gamemode" height="135" width="50%" align="center">
+                        <icon-button id="normal" width="128" height="128" icon="gui/mode_normal.png"
+                                I18N="Multiplayer game mode" text="Normal Race"/>
+                        <icon-button id="timetrial" width="128" height="128" icon="gui/mode_tt.png"
+                                I18N="Multiplayer game mode" text="Time Trial"/>
+                    </ribbon>
+                    <!--
+                    <scrollable_toolbar id="gamemode" height="135" width="90%" label_location="bottom" align="center"
+                            child_width="135" child_height="135" />
+                    -->
                 </div>
 
                 <label id="info" proportion="1" width="100%" align="center" text_align="center" word_wrap="true" text=""/>

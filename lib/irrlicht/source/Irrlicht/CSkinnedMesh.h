@@ -14,6 +14,16 @@
 #include "matrix4.h"
 #include "quaternion.h"
 
+class JointInfluence
+{
+public:
+	int joint_idx;
+	float weight;
+};
+
+typedef irr::core::array<irr::core::array
+		<irr::core::array<JointInfluence> > > WeightInfluence;
+
 namespace irr
 {
 namespace scene
@@ -25,7 +35,6 @@ namespace scene
 	class CSkinnedMesh: public ISkinnedMesh
 	{
 	public:
-
 		//! constructor
 		CSkinnedMesh();
 
@@ -52,7 +61,7 @@ namespace scene
 		virtual void animateMesh(f32 frame, f32 blend);
 
 		//! Preforms a software skin on this mesh based of joint positions
-		virtual void skinMesh(f32 strength=1.f);
+		virtual void skinMesh(f32 strength=1.f, SkinningCallback sc = NULL, int offset = -1);
 
 		//! returns amount of mesh buffers.
 		virtual u32 getMeshBufferCount() const;
@@ -105,7 +114,7 @@ namespace scene
 		virtual void setInterpolationMode(E_INTERPOLATION_MODE mode);
 
 		//! Convertes the mesh to contain tangent information
-		virtual void convertMeshToTangents();
+		virtual void convertMeshToTangents(bool(*predicate)(IMeshBuffer*));
 
 		//! Does the mesh have no animation
 		virtual bool isStatic();
@@ -159,8 +168,16 @@ namespace scene
 		void addJoints(core::array<IBoneSceneNode*> &jointChildSceneNodes,
 				IAnimatedMeshSceneNode* node,
 				ISceneManager* smgr);
-        CSkinnedMesh *clone();
+
+		void convertForSkinning();
+
+		void computeWeightInfluence(SJoint *joint, size_t &index, WeightInfluence& wi);
+
+		u32 getTotalJoints() const { return m_total_joints; }
+
 private:
+		void toStaticPose();
+
 		void checkForAnimation();
 
 		void normalizeWeights();
@@ -176,12 +193,16 @@ private:
 
 		void calculateGlobalMatrices(SJoint *Joint,SJoint *ParentJoint);
 
-		void skinJoint(SJoint *Joint, SJoint *ParentJoint, f32 strength=1.f);
+		void skinJoint(SJoint *Joint, SJoint *ParentJoint, f32 strength=1.f,
+						SkinningCallback sc = NULL, int offset = -1);
 
 		void calculateTangents(core::vector3df& normal,
 			core::vector3df& tangent, core::vector3df& binormal,
 			core::vector3df& vt1, core::vector3df& vt2, core::vector3df& vt3,
 			core::vector2df& tc1, core::vector2df& tc2, core::vector2df& tc3);
+			
+		static bool sortJointInfluenceFunc(const JointInfluence& a, 
+										   const JointInfluence& b);
 
 		core::array<SSkinMeshBuffer*> *SkinningBuffers; //Meshbuffer to skin, default is to skin localBuffers
 
@@ -206,6 +227,8 @@ private:
 		bool PreparedForSkinning;
 		bool AnimateNormals;
 		bool HardwareSkinning;
+		u32 m_total_joints;
+		u32 m_current_joint;
 	};
 
 } // end namespace scene

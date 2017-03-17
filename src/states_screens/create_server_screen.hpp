@@ -35,9 +35,6 @@ class CreateServerScreen :      public GUIEngine::Screen,
 private:
     friend class GUIEngine::ScreenSingleton<CreateServerScreen>;
 
-    /** */
-    bool m_is_lan;
-
     CreateServerScreen();
 
     GUIEngine::TextBoxWidget * m_name_widget;
@@ -49,24 +46,7 @@ private:
     GUIEngine::IconButtonWidget * m_create_widget;
     GUIEngine::IconButtonWidget * m_cancel_widget;
 
-    // --------------------------------------------------------------------
-    class ServerCreationRequest : public Online::XMLRequest
-    {
-        virtual void callback();
-        uint32_t m_created_server_id;
-    public:
-        const uint32_t getCreatedServerID() const
-        {
-            assert(isDone());
-            return m_created_server_id;
-        }   // getCreatedServerID
-    };   // ServerCreationRequest
-    // --------------------------------------------------------------------
-
-
-    ServerCreationRequest *m_server_creation_request;
-
-    void serverCreationRequest();
+    void createServer();
 
 public:
 
@@ -85,9 +65,6 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown() OVERRIDE;
 
-    // ------------------------------------------------------------------------
-    /** Sets if a lan or wan server is to be created. */
-    void setIsLan(bool is_lan) { m_is_lan = is_lan; }
 };   // class CreateServerScreen
 
 #endif

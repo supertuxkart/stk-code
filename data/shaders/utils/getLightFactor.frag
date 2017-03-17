@@ -14,6 +14,10 @@ vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapVa
     vec3 DiffuseComponent = texture(DiffuseMap, tc).xyz;
     vec3 SpecularComponent = texture(SpecularMap, tc).xyz;
     float ao = texture(SSAO, tc).x;
+#ifdef GL_ES
+    DiffuseComponent = pow(DiffuseComponent, vec3(1. / 2.2));
+    SpecularComponent = pow(SpecularComponent, vec3(1. / 2.2));
+#endif
     vec3 tmp = diffuseMatColor * DiffuseComponent * (1. - specMapValue) + specularMatColor * SpecularComponent * specMapValue;
     vec3 emitCol = diffuseMatColor.xyz * diffuseMatColor.xyz * diffuseMatColor.xyz * 15.;
     return tmp * ao + (emitMapValue * emitCol);

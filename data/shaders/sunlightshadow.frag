@@ -9,14 +9,19 @@ uniform float splitmax;
 uniform float shadow_res;
 
 in vec2 uv;
+#ifdef GL_ES
+layout (location = 0) out vec4 Diff;
+layout (location = 1) out vec4 Spec;
+#else
 out vec4 Diff;
 out vec4 Spec;
+#endif
 
-vec3 DecodeNormal(vec2 n);
-vec3 SpecularBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
-vec3 DiffuseBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
-vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
-vec3 SunMRP(vec3 normal, vec3 eyedir);
+#stk_include "utils/decodeNormal.frag"
+#stk_include "utils/SpecularBRDF.frag"
+#stk_include "utils/DiffuseBRDF.frag"
+#stk_include "utils/getPosFromUVDepth.frag"
+#stk_include "utils/SunMRP.frag"
 
 float getShadowFactor(vec3 pos, int index)
 {
@@ -30,7 +35,11 @@ float getShadowFactor(vec3 pos, int index)
     for (float i = -1.; i <= 1.; i += 1.)
     {
         for (float j = -1.; j <= 1.; j += 1.)
-            result += texture(shadowtex, vec4(shadowtexcoord + vec2(i,j) / shadow_res, float(index), d));
+        {
+            // result += texture(shadowtex, vec4(shadowtexcoord + vec2(i,j) / shadow_res, float(index), d));
+            // Added a hack with j+1. to avoid ugly lines
+            result += texture(shadowtex, vec4(shadowtexcoord + vec2(i,j+1.) / shadow_res, float(index), d));
+        }
     }
 
     return result / 9.;

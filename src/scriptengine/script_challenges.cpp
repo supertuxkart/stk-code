@@ -20,11 +20,10 @@
 
 #include "animations/three_d_animation.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/stk_text_billboard.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/scalable_font.hpp"
 #include "modes/world.hpp"
 #include "config/player_manager.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
@@ -50,37 +49,47 @@ namespace Scripting
         * @{
         */
 
-        /** Get number of challenges that were completed at any difficulty */
-        int getCompletedChallengesCount()
-        {
-            ::Track* track = World::getWorld()->getTrack();
-            return track->getNumOfCompletedChallenges();
-        }
-
+        // --------------------------------------------------------------------
         /** Get total number of challenges */
         int getChallengeCount()
         {
-            ::Track* track = World::getWorld()->getTrack();
-            return track->getChallengeList().size();
-        }
+            return ::Track::getCurrentTrack()->getChallengeList().size();
+        }   // getChallengeCount
 
+        // --------------------------------------------------------------------
+        /** Get number of challenges that were completed at any difficulty */
+        int getCompletedChallengesCount()
+        {
+            if (UserConfigParams::m_everything_unlocked)
+                return getChallengeCount();
+
+            return ::Track::getCurrentTrack()->getNumOfCompletedChallenges();
+        }   // getCompletedChallengesCount
+
+        // --------------------------------------------------------------------
         int getChallengeRequiredPoints(std::string* challenge_name)
         {
-            const ChallengeData* challenge = unlock_manager->getChallengeData(*challenge_name);
+            const ChallengeData* challenge =
+                             unlock_manager->getChallengeData(*challenge_name);
             if (challenge == NULL)
             {
                 if (*challenge_name != "tutorial")
                     Log::error("track", "Cannot find challenge named '%s'\n",
-                    challenge_name->c_str());
+                               challenge_name->c_str());
                 return false;
             }
 
             return challenge->getNumTrophies();
-        }
+        }   // getChallengeRequiredPoints
 
+        // --------------------------------------------------------------------
         bool isChallengeUnlocked(std::string* challenge_name)
         {
-            const ChallengeData* challenge = unlock_manager->getChallengeData(*challenge_name);
+            if (UserConfigParams::m_everything_unlocked)
+                return true;
+
+            const ChallengeData* challenge =
+                             unlock_manager->getChallengeData(*challenge_name);
             if (challenge == NULL)
             {
                 if (*challenge_name != "tutorial")
@@ -92,8 +101,9 @@ namespace Scripting
             const unsigned int val = challenge->getNumTrophies();
             bool shown = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
             return shown;
-        }
+        }   // isChallengeUnlocked
 
+        // --------------------------------------------------------------------
         /** @}*/
         /** @}*/
 
@@ -103,15 +113,27 @@ namespace Scripting
 
             engine->SetDefaultNamespace("Challenges");
 
-            r = engine->RegisterGlobalFunction("int getCompletedChallengesCount()", asFUNCTION(getCompletedChallengesCount), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("int getChallengeCount()", asFUNCTION(getChallengeCount), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("bool isChallengeUnlocked(string &in)", asFUNCTION(isChallengeUnlocked), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("int getChallengeRequiredPoints(string &in)", asFUNCTION(getChallengeRequiredPoints), asCALL_CDECL); assert(r >= 0);
-        }
+            r = engine->RegisterGlobalFunction("int getCompletedChallengesCount()", 
+                                               asFUNCTION(getCompletedChallengesCount),
+                                               asCALL_CDECL);
+            assert(r >= 0);
+            r = engine->RegisterGlobalFunction("int getChallengeCount()", 
+                                               asFUNCTION(getChallengeCount),
+                                               asCALL_CDECL);
+            assert(r >= 0);
+            r = engine->RegisterGlobalFunction("bool isChallengeUnlocked(string &in)",
+                                               asFUNCTION(isChallengeUnlocked),
+                                               asCALL_CDECL);
+            assert(r >= 0);
+            r = engine->RegisterGlobalFunction("int getChallengeRequiredPoints(string &in)",
+                                               asFUNCTION(getChallengeRequiredPoints),
+                                               asCALL_CDECL);
+            assert(r >= 0);
+        }   // registerScriptFunctions
 
-    }
+    }   // namespace Challenges
 
     /** \cond DOXYGEN_IGNORE */
-}
+}   // namespace Scripting
 /** \endcond */
 

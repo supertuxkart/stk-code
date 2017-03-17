@@ -25,12 +25,9 @@
 #include <IGUIImage.h>
 #include <string>
 
-namespace Online
-{
-    class OnlineProfile;
-}
 
 class KartSelectionScreen;
+class NetworkPlayerProfile;
 
 namespace GUIEngine
 {
@@ -69,7 +66,7 @@ namespace GUIEngine
         int m_player_id;
 
         /** Network info about the user. */
-        Online::OnlineProfile* m_associated_user;
+        NetworkPlayerProfile* m_associated_user;
 
         /** Internal name of the spinner; useful to interpret spinner events,
          *  which contain the name of the activated object */
@@ -100,7 +97,7 @@ namespace GUIEngine
 
         PlayerKartWidget(KartSelectionScreen* parent,
                          StateManager::ActivePlayer* associated_player,
-                         Online::OnlineProfile* associated_user,
+                         NetworkPlayerProfile* associated_user,
                          core::recti area, const int player_id,
                          std::string kart_group,
                          const int irrlicht_idget_id=-1);

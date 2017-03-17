@@ -15,12 +15,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/glwrap.hpp"
+#ifndef SERVER_ONLY
 
+#include "graphics/glwrap.hpp"
 
 #include "config/hardware_stats.hpp"
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stk_mesh.hpp"
 #include "utils/profiler.hpp"
@@ -30,19 +32,45 @@
 #include <string>
 #include <sstream>
 
+#ifdef DEBUG
+#if !defined(__APPLE__) && !defined(ANDROID)
+#define ARB_DEBUG_OUTPUT
+#endif
+#endif
+
+#if defined(USE_GLES2)
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+
+#ifdef ARB_DEBUG_OUTPUT
+#define GL_DEBUG_SEVERITY_HIGH_ARB            GL_DEBUG_SEVERITY_HIGH_KHR
+#define GL_DEBUG_SEVERITY_LOW_ARB             GL_DEBUG_SEVERITY_LOW_KHR
+#define GL_DEBUG_SEVERITY_MEDIUM_ARB          GL_DEBUG_SEVERITY_MEDIUM_KHR
+#define GL_DEBUG_SOURCE_API_ARB               GL_DEBUG_SOURCE_API_KHR
+#define GL_DEBUG_SOURCE_APPLICATION_ARB       GL_DEBUG_SOURCE_APPLICATION_KHR
+#define GL_DEBUG_SOURCE_OTHER_ARB             GL_DEBUG_SOURCE_OTHER_KHR
+#define GL_DEBUG_SOURCE_SHADER_COMPILER_ARB   GL_DEBUG_SOURCE_SHADER_COMPILER_KHR
+#define GL_DEBUG_SOURCE_THIRD_PARTY_ARB       GL_DEBUG_SOURCE_THIRD_PARTY_KHR
+#define GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB     GL_DEBUG_SOURCE_WINDOW_SYSTEM_KHR
+#define GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_KHR
+#define GL_DEBUG_TYPE_ERROR_ARB               GL_DEBUG_TYPE_ERROR_KHR
+#define GL_DEBUG_TYPE_OTHER_ARB               GL_DEBUG_TYPE_OTHER_KHR
+#define GL_DEBUG_TYPE_PERFORMANCE_ARB         GL_DEBUG_TYPE_PERFORMANCE_KHR
+#define GL_DEBUG_TYPE_PORTABILITY_ARB         GL_DEBUG_TYPE_PORTABILITY_KHR
+#define GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB  GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_KHR
+
+#define GLDEBUGPROCARB GLDEBUGPROCKHR
+PFNGLDEBUGMESSAGECALLBACKKHRPROC pglDebugMessageCallbackKHR;
+#define glDebugMessageCallbackARB pglDebugMessageCallbackKHR
+#endif
+#endif
+
 static bool is_gl_init = false;
 
 #if DEBUG
 bool GLContextDebugBit = true;
 #else
 bool GLContextDebugBit = false;
-#endif
-
-
-#ifdef DEBUG
-#if !defined(__APPLE__)
-#define ARB_DEBUG_OUTPUT
-#endif
 #endif
 
 #ifdef ARB_DEBUG_OUTPUT
@@ -134,12 +162,19 @@ void initGL()
         return;
     is_gl_init = true;
     // For Mesa extension reporting
+#if !defined(USE_GLES2)
 #ifndef WIN32
     glewExperimental = GL_TRUE;
 #endif
     GLenum err = glewInit();
     if (GLEW_OK != err)
         Log::fatal("GLEW", "Glew initialisation failed with error %s", glewGetErrorString(err));
+#else
+#ifdef ARB_DEBUG_OUTPUT
+    glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKKHRPROC)eglGetProcAddress("glDebugMessageCallbackKHR");
+#endif
+#endif
+
 #ifdef ARB_DEBUG_OUTPUT
     if (glDebugMessageCallbackARB)
         glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
@@ -198,12 +233,14 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h,
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+#if !defined(USE_GLES2)
     if (layered)
     {
         for (unsigned i = 0; i < RTTs.size(); i++)
             glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, RTTs[i], 0);
     }
     else
+#endif
     {
         for (unsigned i = 0; i < RTTs.size(); i++)
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, RTTs[i], 0);
@@ -219,6 +256,7 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w,
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+#if !defined(USE_GLES2)
     if (layered)
     {
         for (unsigned i = 0; i < RTTs.size(); i++)
@@ -226,6 +264,7 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w,
         glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, DS, 0);
     }
     else
+#endif
     {
         for (unsigned i = 0; i < RTTs.size(); i++)
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, RTTs[i], 0);
@@ -252,17 +291,18 @@ void FrameBuffer::bind() const
     glDrawBuffers((int)RenderTargets.size(), bufs);
 }
 
-void FrameBuffer::bindLayer(unsigned i)
+void FrameBuffer::bindLayer(unsigned i) const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbolayer);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, RenderTargets[0], 0, i);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, DepthTexture, 0, i);
+    assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE_EXT);
     glViewport(0, 0, (int)width, (int)height);
     GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
     glDrawBuffers((int)RenderTargets.size(), bufs);
 }
 
-void FrameBuffer::Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask, GLenum filter)
+void FrameBuffer::Blit(const FrameBuffer &Src, const FrameBuffer &Dst, GLbitfield mask, GLenum filter)
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, Src.fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Dst.fbo);
@@ -309,6 +349,7 @@ void draw3DLine(const core::vector3df& start,
 
 bool hasGLExtension(const char* extension) 
 {
+#if !defined(USE_GLES2)
     if (glGetStringi != NULL)
     {
         GLint numExtensions = 0;
@@ -324,6 +365,7 @@ bool hasGLExtension(const char* extension)
         }
     }
     else
+#endif
     {
         const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
         if (extensions && strstr(extensions, extension) != NULL)
@@ -341,6 +383,7 @@ bool hasGLExtension(const char* extension)
 const std::string getGLExtensions()
 {
     std::string result;
+#if !defined(USE_GLES2)
     if (glGetStringi != NULL)
     {
         GLint num_extensions = 0;
@@ -354,6 +397,7 @@ const std::string getGLExtensions()
         }
     }
     else
+#endif
     {
         const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
         result = extensions;
@@ -720,3 +764,50 @@ else \
 
 #endif  // ifdef XX
 }   // getGLLimits
+
+
+// ----------------------------------------------------------------------------
+/** Executes glGetError and prints error to the console
+ * \return True if error ocurred
+ */
+bool checkGLError()
+{
+    GLenum err = glGetError();
+    
+    switch (err)
+    {
+    case GL_NO_ERROR:
+        break;
+    case GL_INVALID_ENUM:
+        Log::warn("GLWrap", "glGetError: GL_INVALID_ENUM");
+        break;
+    case GL_INVALID_VALUE:
+        Log::warn("GLWrap", "glGetError: GL_INVALID_VALUE");
+        break;
+    case GL_INVALID_OPERATION:
+        Log::warn("GLWrap", "glGetError: GL_INVALID_OPERATION");
+        break;
+    case GL_INVALID_FRAMEBUFFER_OPERATION:
+        Log::warn("GLWrap", "glGetError: GL_INVALID_FRAMEBUFFER_OPERATION");
+        break;
+    case GL_OUT_OF_MEMORY:
+        Log::warn("GLWrap", "glGetError: GL_OUT_OF_MEMORY");
+        break;
+#if !defined(USE_GLES2)
+    case GL_STACK_UNDERFLOW:
+        Log::warn("GLWrap", "glGetError: GL_STACK_UNDERFLOW");
+        break;
+    case GL_STACK_OVERFLOW:
+        Log::warn("GLWrap", "glGetError: GL_STACK_OVERFLOW");
+        break;
+#endif
+    default:
+        Log::warn("GLWrap", "glGetError: %i", (int)err);
+        break;
+    }
+    
+    return err != GL_NO_ERROR;
+}
+
+#endif   // !SERVER_ONLY
+

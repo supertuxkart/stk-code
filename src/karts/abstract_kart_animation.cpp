@@ -20,8 +20,8 @@
 
 #include "graphics/slip_stream.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/skidding.hpp"
-#include "modes/world.hpp"
 #include "physics/physics.hpp"
 
 AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
@@ -47,7 +47,7 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
     // Register this animation with the kart (which will free it
     // later).
     kart->setKartAnimation(this);
-    World::getWorld()->getPhysics()->removeKart(m_kart);
+    Physics::getInstance()->removeKart(m_kart);
     kart->getSkidding()->reset();
     kart->getSlipstream()->reset();
     if(kart->isSquashed())
@@ -55,6 +55,12 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
         // A time of 0 reset the squashing
         kart->setSquash(0.0f, 0.0f);
     }
+
+    // Reset the wheels (and any other animation played for that kart)
+    // This avoid the effect that some wheels might be way below the kart
+    // which is very obvious in the rescue animation.
+    m_kart->getKartModel()->resetVisualWheelPosition();
+
 }   // AbstractKartAnimation
 
 // ----------------------------------------------------------------------------
@@ -67,7 +73,7 @@ AbstractKartAnimation::~AbstractKartAnimation()
     if(m_timer < 0)
     {
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
-        World::getWorld()->getPhysics()->addKart(m_kart);
+        Physics::getInstance()->addKart(m_kart);
     }
 }   // ~AbstractKartAnimation
 

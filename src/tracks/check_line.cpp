@@ -20,7 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/glwrap.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
@@ -30,6 +30,7 @@
 #include "irrlicht.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <string>
 
 /** Constructor for a checkline.
@@ -71,6 +72,7 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
     m_line.setLine(p1, p2);
     if(UserConfigParams::m_check_debug)
     {
+#ifndef SERVER_ONLY
         video::SMaterial material;
         material.setFlag(video::EMF_BACK_FACE_CULLING, false);
         material.setFlag(video::EMF_LIGHTING, false);
@@ -101,12 +103,14 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
                               : video::SColor(128, 128, 128, 128);
         }
         buffer->recalculateBoundingBox();
-        buffer->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
-        buffer->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        buffer->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+        buffer->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        buffer->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
         buffer->getMaterial().BackfaceCulling = false;
         //mesh->setBoundingBox(buffer->getBoundingBox());
         m_debug_node = irr_driver->addMesh(mesh, "checkdebug");
         mesh->drop();
+#endif
     }
     else
     {
@@ -134,6 +138,14 @@ void CheckLine::reset(const Track &track)
 }   // reset
 
 // ----------------------------------------------------------------------------
+void CheckLine::resetAfterKartMove(unsigned int kart_index)
+{
+    if (m_previous_position.empty()) return;
+    AbstractKart *kart = World::getWorld()->getKart(kart_index);
+    m_previous_position[kart_index] = kart->getXYZ();
+}   // resetAfterKartMove
+
+// ----------------------------------------------------------------------------
 void CheckLine::changeDebugColor(bool is_active)
 {
     assert(m_debug_node);
@@ -148,7 +160,9 @@ void CheckLine::changeDebugColor(bool is_active)
     {
         vertices[i].Color = color;
     }
-    buffer->getMaterial().setTexture(0, getUnicolorTexture(color));
+#ifndef SERVER_ONLY
+    buffer->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(color));
+#endif
 
 }   // changeDebugColor
 
@@ -161,7 +175,7 @@ void CheckLine::changeDebugColor(bool is_active)
  *                  additional data.
  */
 bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
-    unsigned int kart_index)
+                            unsigned int kart_index)
 {
     World* w = World::getWorld();
     core::vector2df p=new_pos.toIrrVector2d();
@@ -170,7 +184,7 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
 
     bool previous_sign;
 
-    if (kart_index == -1)
+    if (kart_index == UINT_MAX)
     {
         core::vector2df p = old_pos.toIrrVector2d();
         previous_sign = (m_line.getPointOrientation(p) >= 0);
@@ -211,10 +225,10 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     else
         result = false;
 
-    if (kart_index != -1)
+    if (kart_index != UINT_MAX)
         m_previous_sign[kart_index] = sign;
 
-    if (result && kart_index != -1)
+    if (result && kart_index != UINT_MAX)
     {
         LinearWorld* lw = dynamic_cast<LinearWorld*>(w);
         if (lw != NULL)

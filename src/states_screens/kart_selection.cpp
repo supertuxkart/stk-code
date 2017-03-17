@@ -31,6 +31,7 @@
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "items/item_manager.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
@@ -147,8 +148,6 @@ EventPropagation FocusDispatcher::focused(const int player_id)
     return GUIEngine::EVENT_LET;
 }   // focused
 
-static FocusDispatcher  *g_dispatcher = NULL;
-
 #if 0
 #pragma mark -
 #pragma mark KartHoverListener
@@ -228,6 +227,7 @@ bool sameKart(const PlayerKartWidget& player1, const PlayerKartWidget& player2)
 
 KartSelectionScreen::KartSelectionScreen(const char* filename) : Screen(filename)
 {
+    m_dispatcher           = NULL;
     m_removed_widget       = NULL;
     m_multiplayer_message  = NULL;
     m_from_overworld       = false;
@@ -245,8 +245,8 @@ KartSelectionScreen* KartSelectionScreen::getRunningInstance()
 
 void KartSelectionScreen::loadedFromFile()
 {
-    g_dispatcher          = new FocusDispatcher(this);
-    m_first_widget        = g_dispatcher;
+    m_dispatcher          = new FocusDispatcher(this);
+    m_first_widget        = m_dispatcher;
     m_game_master_confirmed    = false;
     m_multiplayer_message = NULL;
     // Dynamically add tabs
@@ -304,6 +304,7 @@ void KartSelectionScreen::beforeAddingWidget()
 
 void KartSelectionScreen::init()
 {
+    m_instance_ptr = this;
     Screen::init();
     m_must_delete_on_back = false;
 
@@ -317,17 +318,17 @@ void KartSelectionScreen::init()
 
     // FIXME : The reserved id value is -1 when we switch from KSS to NKSS and vice-versa
 
-    g_dispatcher->setRootID(placeholder->m_reserved_id);
+    m_dispatcher->setRootID(placeholder->m_reserved_id);
 
     g_root_id = placeholder->m_reserved_id;
-    if (!m_widgets.contains(g_dispatcher))
+    if (!m_widgets.contains(m_dispatcher))
     {
-        m_widgets.push_back(g_dispatcher);
+        m_widgets.push_back(m_dispatcher);
 
         // this is only needed if the dispatcher wasn't already in
         // the list of widgets. If it already was, it was added along
         // other widgets.
-        g_dispatcher->add();
+        m_dispatcher->add();
     }
 
     m_game_master_confirmed = false;
@@ -425,7 +426,7 @@ void KartSelectionScreen::tearDown()
 void KartSelectionScreen::unloaded()
 {
     // these pointer is no more valid (have been deleted along other widgets)
-    g_dispatcher = NULL;
+    m_dispatcher = NULL;
 }
 
 // ----------------------------------------------------------------------------
@@ -438,7 +439,7 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device)
         Log::info("KartSelectionScreen",  "joinPlayer() invoked");
     if (!m_multiplayer && !first_player) return false;
 
-    assert (g_dispatcher != NULL);
+    assert (m_dispatcher != NULL);
 
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL)
@@ -808,16 +809,16 @@ void KartSelectionScreen::updateKartStats(uint8_t widget_id,
 
     const KartProperties *kp =
                     kart_properties_manager->getKart(selection);
+
     if (kp != NULL)
     {
-        w->setValue(KartStatsWidget::SKILL_MASS, (int)(kp->getMass()/5));
-        w->setValue(KartStatsWidget::SKILL_SPEED, (int)((kp->getAbsMaxSpeed()-20)*9));
-        w->setValue(KartStatsWidget::SKILL_POWER, (int)(kp->getAvgPower()));
+        w->setValues(kp);
         w->update(0);
     }
 }
 
-void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
+// ----------------------------------------------------------------------------
+void KartSelectionScreen::updateKartWidgetModel(int widget_id,
                 const std::string& selection,
                 const irr::core::stringw& selectionText)
 {
@@ -874,9 +875,29 @@ void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
             }
 
             w3->clearModels();
+            const bool has_win_anime =
+                UserConfigParams::m_show_steering_animations != 0 &&
+                (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
+                kart_model.getFrame(KartModel::AF_WIN_START) > -1) &&
+                kart_model.getFrame(KartModel::AF_WIN_END) > -1) ||
+                (kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 &&
+                kart_model.getFrame(KartModel::AF_SELECTION_END) > -1));
             w3->addModel( kart_model.getModel(), Vec3(0,0,0),
                 Vec3(scale, scale, scale),
-                          kart_model.getBaseFrame() );
+                has_win_anime ?
+                kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 ?
+                kart_model.getFrame(KartModel::AF_SELECTION_START) :
+                kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ?
+                kart_model.getFrame(KartModel::AF_WIN_LOOP_START) :
+                kart_model.getFrame(KartModel::AF_WIN_START) :
+                kart_model.getBaseFrame(),
+                has_win_anime ?
+                kart_model.getFrame(KartModel::AF_SELECTION_END) > -1 ?
+                kart_model.getFrame(KartModel::AF_SELECTION_END) :
+                kart_model.getFrame(KartModel::AF_WIN_END) :
+                kart_model.getBaseFrame(),
+                false/*all_parts_colorized*/,
+                kart_model.getAnimationSpeed());
             w3->addModel( kart_model.getWheelModel(0),
                           kart_model.getWheelGraphicsPosition(0) );
             w3->addModel( kart_model.getWheelModel(1),
@@ -920,8 +941,8 @@ void KartSelectionScreen::addMultiplayerMessage()
     {
         m_multiplayer_message = new BubbleWidget();
         m_multiplayer_message->m_properties[PROP_TEXT_ALIGN] = "center";
-        m_multiplayer_message->setText( _("Everyone:\nPress 'Select' now to "
-                                          "join the game!") );
+        m_multiplayer_message->setText( _("Everyone:\nPress the 'Select' button to "
+                                          "join the game") );
         m_multiplayer_message->m_x = message_x;
         m_multiplayer_message->m_y = (int) (fullarea->m_y + fullarea->m_h * 0.3f);
         m_multiplayer_message->m_w = (int) (splitWidth * 0.6f);
@@ -1125,13 +1146,10 @@ void KartSelectionScreen::allPlayersDone()
             ->incrementUseFrequency();
     }
     // ---- Give player info to race manager
-    race_manager->setNumLocalPlayers( players.size() );
+    race_manager->setNumPlayers(players.size());
 
     // ---- Manage 'random kart' selection(s)
     RandomGenerator random;
-
-    //m_kart_widgets.clearAndDeleteAll();
-    //race_manager->setLocalKartInfo(0, w->getSelectionIDString());
 
     std::vector<ItemDescription> items = w->getItems();
 
@@ -1155,13 +1173,12 @@ void KartSelectionScreen::allPlayersDone()
         if (selected_kart == RANDOM_KART_ID)
         {
             // don't select an already selected kart
-            int random_id;
             // to prevent infinite loop in case they are all locked
             int count = 0;
             bool done = false;
             do
             {
-                random_id = random.get(item_count);
+                int random_id = random.get(item_count);
                 // valid kart if it can bt used, and is either not locked,
                 // or it's a multiplayer race.
                 if (items[random_id].m_code_name != ID_DONT_USE &&
@@ -1191,7 +1208,7 @@ void KartSelectionScreen::allPlayersDone()
             }
         }
 
-        race_manager->setLocalKartInfo(n, selected_kart);
+        race_manager->setPlayerKart(n, selected_kart);
 
         // Set per player difficulty if needed
         if (m_multiplayer && UserConfigParams::m_per_player_difficulty &&
@@ -1202,15 +1219,10 @@ void KartSelectionScreen::allPlayersDone()
     // ---- Switch to assign mode
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 
-    if (!m_multiplayer)
-    {
-        input_manager->getDeviceManager()
-            ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
-    }
-    else
-    {
-        input_manager->getDeviceManager()->setSinglePlayer( NULL );
-    }
+    StateManager::ActivePlayer *ap = m_multiplayer 
+                                   ? NULL 
+                                   : StateManager::get()->getActivePlayer(0);
+    input_manager->getDeviceManager()->setSinglePlayer(ap);
 
     // ---- Go to next screen or return to overworld
     if (m_from_overworld || m_go_to_overworld_next)

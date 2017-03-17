@@ -149,7 +149,7 @@ protected:
                                     const Vec3 &velocity,
                                     btCollisionShape *shape,
                                     float restitution,
-                                    const float gravity=0.0f,
+                                    const btVector3& gravity=btVector3(0.0f,0.0f,0.0f),
                                     const bool rotates=false,
                                     const bool turn_around=false,
                                     const btTransform* customDirection=NULL);

@@ -19,21 +19,24 @@
 #include "input/input_manager.hpp"
 
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera_fps.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "input/device_manager.hpp"
 #include "input/gamepad_device.hpp"
 #include "input/keyboard_device.hpp"
+#include "input/multitouch_device.hpp"
 #include "input/input.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "replay/replay_recorder.hpp"
@@ -100,6 +103,8 @@ InputManager::~InputManager()
 void InputManager::handleStaticAction(int key, int value)
 {
     static bool control_is_pressed = false;
+    static bool shift_is_pressed   = false;
+
     World *world = World::getWorld();
 
     // When no players... a cutscene
@@ -110,7 +115,7 @@ void InputManager::handleStaticAction(int key, int value)
     }
 
 
-    if (world != NULL && UserConfigParams::m_artist_debug_mode && 
+    if (world != NULL && UserConfigParams::m_artist_debug_mode &&
         control_is_pressed && value > 0)
     {
         if (Debug::handleStaticAction(key))
@@ -149,6 +154,10 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_LWIN:
             control_is_pressed = value!=0;
             break;
+        case KEY_LSHIFT:
+        case KEY_RSHIFT:
+        case KEY_SHIFT:
+            shift_is_pressed = value!=0; break;
 
         // Flying up and down
         case KEY_KEY_I:
@@ -174,89 +183,89 @@ void InputManager::handleStaticAction(int key, int value)
         // Moving the first person camera
         case KEY_KEY_W:
         {
-            if (!world || !UserConfigParams::m_artist_debug_mode ||
-                UserConfigParams::m_camera_debug != 3) break;
-
-            Camera *cam = Camera::getActiveCamera();
-            core::vector3df vel(cam->getLinearVelocity());
-            vel.Z = value ? cam->getMaximumVelocity() : 0;
-            cam->setLinearVelocity(vel);
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (world && UserConfigParams::m_artist_debug_mode && cam  )
+            {
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.Z = value ? cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
             break;
         }
         case KEY_KEY_S:
         {
-            if (!world || !UserConfigParams::m_artist_debug_mode ||
-                UserConfigParams::m_camera_debug != 3) break;
-
-            Camera *cam = Camera::getActiveCamera();
-            core::vector3df vel(cam->getLinearVelocity());
-            vel.Z = value ? -cam->getMaximumVelocity() : 0;
-            cam->setLinearVelocity(vel);
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (world && UserConfigParams::m_artist_debug_mode && cam)
+            {
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.Z = value ? -cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
             break;
         }
         case KEY_KEY_D:
         {
-            if (!world || !UserConfigParams::m_artist_debug_mode ||
-                UserConfigParams::m_camera_debug != 3) break;
-
-            Camera *cam = Camera::getActiveCamera();
-            core::vector3df vel(cam->getLinearVelocity());
-            vel.X = value ? -cam->getMaximumVelocity() : 0;
-            cam->setLinearVelocity(vel);
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (world && !UserConfigParams::m_artist_debug_mode && cam)
+            {
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.X = value ? -cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
             break;
         }
         case KEY_KEY_A:
         {
-            if (!world || !UserConfigParams::m_artist_debug_mode ||
-                UserConfigParams::m_camera_debug != 3) break;
-
-            Camera *cam = Camera::getActiveCamera();
-            core::vector3df vel(cam->getLinearVelocity());
-            vel.X = value ? cam->getMaximumVelocity() : 0;
-            cam->setLinearVelocity(vel);
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (world && UserConfigParams::m_artist_debug_mode && cam)
+            {
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.X = value ? cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
             break;
         }
         case KEY_KEY_R:
         {
-            if (!world || !UserConfigParams::m_artist_debug_mode ||
-                UserConfigParams::m_camera_debug != 3) break;
-
-            Camera *cam = Camera::getActiveCamera();
-            core::vector3df vel(cam->getLinearVelocity());
-            vel.Y = value ? cam->getMaximumVelocity() : 0;
-            cam->setLinearVelocity(vel);
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (world && UserConfigParams::m_artist_debug_mode && cam)
+            {
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.Y = value ? cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
             break;
         }
         case KEY_KEY_F:
         {
-            if (!world || !UserConfigParams::m_artist_debug_mode ||
-                UserConfigParams::m_camera_debug != 3) break;
-
-            Camera *cam = Camera::getActiveCamera();
-            core::vector3df vel(cam->getLinearVelocity());
-            vel.Y = value ? -cam->getMaximumVelocity() : 0;
-            cam->setLinearVelocity(vel);
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (world && UserConfigParams::m_artist_debug_mode && cam)
+            {
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.Y = value ? -cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
             break;
         }
         // Rotating the first person camera
         case KEY_KEY_Q:
         {
-            if (!world || !UserConfigParams::m_artist_debug_mode ||
-                UserConfigParams::m_camera_debug != 3) break;
-
-            Camera *active_cam = Camera::getActiveCamera();
-            active_cam->setAngularVelocity(value ?
-                UserConfigParams::m_fpscam_max_angular_velocity : 0.0f);
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (world && UserConfigParams::m_artist_debug_mode && cam )
+            {
+                cam->setAngularVelocity(value ?
+                    UserConfigParams::m_fpscam_max_angular_velocity : 0.0f);
+            }
             break;
         }
         case KEY_KEY_E:
         {
-            if (!world || !UserConfigParams::m_artist_debug_mode ||
-                UserConfigParams::m_camera_debug != 3) break;
-
-            Camera *active_cam = Camera::getActiveCamera();
-            active_cam->setAngularVelocity(value ?
-                -UserConfigParams::m_fpscam_max_angular_velocity : 0);
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (world && UserConfigParams::m_artist_debug_mode && cam)
+            {
+                cam->setAngularVelocity(value ?
+                    -UserConfigParams::m_fpscam_max_angular_velocity : 0);
+            }
             break;
         }
 
@@ -267,9 +276,22 @@ void InputManager::handleStaticAction(int key, int value)
             if (value ==0 )
                 irr_driver->requestScreenshot();
             break;
+        case KEY_F11:
+            if(value && shift_is_pressed && world && RewindManager::isEnabled())
+            {
+                printf("Enter rewind to time:");
+                char s[256];
+                fgets(s, 256, stdin);
+                float t;
+                StringUtils::fromString(s,t);
+                RewindManager::get()->rewindTo(t);
+                Log::info("Rewind", "Rewinding from %f to %f",
+                          world->getTime(), t);
+            }
+            break;
+
             /*
-        case KEY_F1:
-            if (UserConfigParams::m_artist_debug_mode && world)
+            else if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
 
@@ -367,8 +389,8 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_F10:
             if(world && value)
             {
-                if(control_is_pressed && ReplayRecorder::get())
-                    ReplayRecorder::get()->Save();
+                if(control_is_pressed)
+                    ReplayRecorder::get()->save();
                 else
                     history->Save();
             }
@@ -630,7 +652,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         else if (button == KEY_RIGHT)  action = PA_MENU_RIGHT;
         else if (button == KEY_SPACE)  action = PA_MENU_SELECT;
         else if (button == KEY_RETURN) action = PA_MENU_SELECT;
-        else if (button == KEY_TAB)    
+        else if (button == KEY_TAB)
         {
             if (shift_mask)
             {
@@ -642,9 +664,13 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             }
         }
 
-        if (button == KEY_RETURN && GUIEngine::ModalDialog::isADialogActive())
+        if (button == KEY_RETURN)
         {
-            GUIEngine::ModalDialog::onEnterPressed();
+            if (GUIEngine::ModalDialog::isADialogActive() &&
+                !GUIEngine::ScreenKeyboard::isActive())
+            {
+                GUIEngine::ModalDialog::onEnterPressed();
+            }
         }
 
         if (action != PA_BEFORE_FIRST)
@@ -710,7 +736,9 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
         // ... when in-game
         if (StateManager::get()->getGameState() == GUIEngine::GAME &&
-             !GUIEngine::ModalDialog::isADialogActive()                  )
+             !GUIEngine::ModalDialog::isADialogActive()            &&
+             !GUIEngine::ScreenKeyboard::isActive()                &&
+             !race_manager->isWatchingReplay() )
         {
             if (player == NULL)
             {
@@ -730,6 +758,12 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
             Controller* controller = pk->getController();
             if (controller != NULL) controller->action(action, abs(value));
+        }
+        else if (race_manager->isWatchingReplay())
+        {
+            // Get the first ghost kart
+            World::getWorld()->getKart(0)
+                ->getController()->action(action, abs(value));
         }
         // ... when in menus
         else
@@ -987,6 +1021,30 @@ EventPropagation InputManager::input(const SEvent& event)
             return EVENT_BLOCK; // Don't propagate key up events
         }
     }
+    else if (event.EventType == EET_TOUCH_INPUT_EVENT)
+    {
+        MultitouchDevice* device = m_device_manager->getMultitouchDevice();
+        unsigned int id = event.TouchInput.ID;
+
+        if (device != NULL && id < device->m_events.size())
+        {
+            device->m_events[id].id = id;
+            device->m_events[id].x = event.TouchInput.X;
+            device->m_events[id].y = event.TouchInput.Y;
+
+            if (event.TouchInput.Event == ETIE_PRESSED_DOWN)
+            {
+                device->m_events[id].touched = true;
+            }
+            else if (event.TouchInput.Event == ETIE_LEFT_UP)
+            {
+                device->m_events[id].touched = false;
+            }
+
+            m_device_manager->updateMultitouchDevice();
+            device->updateDeviceState(id);
+        }
+    }
     // Use the mouse to change the looking direction when first person view is activated
     else if (event.EventType == EET_MOUSE_INPUT_EVENT)
     {
@@ -994,13 +1052,13 @@ EventPropagation InputManager::input(const SEvent& event)
 
         if (type == EMIE_MOUSE_MOVED)
         {
-            if (UserConfigParams::m_camera_debug == 3)
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (cam)
             {
-                Camera *cam = Camera::getActiveCamera();
                 // Center of the screen
-                core::vector2df screen_size = irr_driver->getCurrentScreenSize();
-                int mid_x = (int) screen_size.X / 2;
-                int mid_y = (int) screen_size.Y / 2;
+                core::dimension2du screen_size = irr_driver->getActualScreenSize();
+                int mid_x = (int) screen_size.Width / 2;
+                int mid_y = (int) screen_size.Height / 2;
                 // Relative mouse movement
                 int diff_x = event.MouseInput.X - m_mouse_val_x;
                 int diff_y = event.MouseInput.Y - m_mouse_val_y;
@@ -1049,12 +1107,12 @@ EventPropagation InputManager::input(const SEvent& event)
         }
         else if (type == EMIE_MOUSE_WHEEL)
         {
-            if (UserConfigParams::m_camera_debug == 3)
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (cam)
             {
                 // Use scrolling to change the maximum speed
                 // Only test if it's more or less than 0 as it seems to be not
                 // reliable accross more platforms.
-                Camera *cam = Camera::getActiveCamera();
                 if (event.MouseInput.Wheel < 0)
                 {
                     float vel = cam->getMaximumVelocity() - 3;
@@ -1069,6 +1127,31 @@ EventPropagation InputManager::input(const SEvent& event)
             }
         }
 
+        // Simulate touch event on non-android devices
+        #if !defined(ANDROID)
+        MultitouchDevice* device = m_device_manager->getMultitouchDevice();
+        
+        if (device != NULL && (type == EMIE_LMOUSE_PRESSED_DOWN || 
+            type == EMIE_LMOUSE_LEFT_UP || type == EMIE_MOUSE_MOVED))
+        {
+            device->m_events[0].id = 0;
+            device->m_events[0].x = event.MouseInput.X;
+            device->m_events[0].y = event.MouseInput.Y;
+
+            if (type == EMIE_LMOUSE_PRESSED_DOWN)
+            {
+                device->m_events[0].touched = true;
+            }
+            else if (type == EMIE_LMOUSE_LEFT_UP)
+            {
+                device->m_events[0].touched = false;
+            }
+
+            m_device_manager->updateMultitouchDevice();
+            device->updateDeviceState(0);
+        }
+        #endif
+
         /*
         EMIE_LMOUSE_PRESSED_DOWN    Left mouse button was pressed down.
         EMIE_RMOUSE_PRESSED_DOWN    Right mouse button was pressed down.
@@ -1082,6 +1165,32 @@ EventPropagation InputManager::input(const SEvent& event)
                             how fast.
          */
     }
+    else if (event.EventType == EET_ACCELEROMETER_EVENT)
+    {
+        MultitouchDevice* device = m_device_manager->getMultitouchDevice();
+        
+        if (device)
+        {
+            for (unsigned int i = 0; i < device->getButtonsCount(); i++)
+            {
+                MultitouchButton* button = device->getButton(i);
+                
+                if (button->type != BUTTON_STEERING)
+                    continue;
+
+                if (UserConfigParams::m_multitouch_accelerometer == 1)
+                {
+                    button->axis_x = -event.AccelerometerEvent.X / 5.0f;
+                    device->handleControls(button);
+                }
+                else if (UserConfigParams::m_multitouch_accelerometer == 2)
+                {
+                    button->axis_x = event.AccelerometerEvent.Y / 5.0f;
+                    device->handleControls(button);                    
+                }
+            }
+        }
+    }
 
     // block events in all modes but initial menus (except in text boxes to
     // allow typing, and except in modal dialogs in-game)
@@ -1090,6 +1199,7 @@ EventPropagation InputManager::input(const SEvent& event)
     if (getDeviceManager()->getAssignMode() != NO_ASSIGN &&
         !GUIEngine::isWithinATextBox() &&
         (!GUIEngine::ModalDialog::isADialogActive() &&
+        !GUIEngine::ScreenKeyboard::isActive() &&
         StateManager::get()->getGameState() == GUIEngine::GAME))
     {
         return EVENT_BLOCK;

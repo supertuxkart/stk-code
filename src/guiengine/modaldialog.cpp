@@ -15,10 +15,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "guiengine/modaldialog.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/layout_manager.hpp"
-#include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "input/input_manager.hpp"
@@ -137,6 +138,8 @@ void ModalDialog::doInit()
                                                           true /* modal */);
     m_irrlicht_window->setDrawTitlebar(false);
     m_irrlicht_window->getCloseButton()->setVisible(false);
+    if (!UserConfigParams::m_artist_debug_mode)
+        m_irrlicht_window->setDraggable(false);
 
     GUIEngine::getSkin()->m_dialog = true;
     GUIEngine::getSkin()->m_dialog_size = 0.0f;

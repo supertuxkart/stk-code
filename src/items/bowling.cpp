@@ -24,6 +24,7 @@
 #include "graphics/material.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
+#include "modes/linear_world.hpp"
 #include "utils/random_generator.hpp"
 
 #include "utils/log.hpp" //TODO: remove after debugging is done
@@ -40,7 +41,7 @@ Bowling::Bowling(AbstractKart *kart)
     float y_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f;
 
     // if the kart is looking backwards, release from the back
-    if( kart->getControls().m_look_back )
+    if( kart->getControls().getLookBack())
     {
         y_offset   = -y_offset;
         m_speed    = -m_speed*2;
@@ -55,10 +56,11 @@ Bowling::Bowling(AbstractKart *kart)
         if(m_speed < min_speed) m_speed = min_speed;
     }
 
+    const Vec3& normal = kart->getNormal();
     createPhysics(y_offset, btVector3(0.0f, 0.0f, m_speed*2),
                   new btSphereShape(0.5f*m_extend.getY()),
-                  1.0f /*restitution*/,
-                  -70.0f /*gravity*/,
+                  0.4f /*restitution*/,
+                  -70.0f*normal /*gravity*/,
                   true /*rotates*/);
     // Even if the ball is fired backwards, m_speed must be positive,
     // otherwise the ball can start to vibrate when energy is added.
@@ -136,14 +138,15 @@ bool Bowling::updateAndDelete(float dt)
             m_body->applyCentralForce(direction);
         }
     }
-
+    
+   
     // Bowling balls lose energy (e.g. when hitting the track), so increase
     // the speed if the ball is too slow, but only if it's not too high (if
     // the ball is too high, it is 'pushed down', which can reduce the
     // speed, which causes the speed to increase, which in turn causes
     // the ball to fly higher and higher.
     //btTransform trans = getTrans();
-    float hat         = getXYZ().getY()-getHoT();
+    float hat = (getXYZ() - getHitPoint()).length();
     if(hat-0.5f*m_extend.getY()<0.01f)
     {
         const Material *material = getMaterial();

@@ -18,12 +18,12 @@
 
 #include "physics/triangle_mesh.hpp"
 
-#include "btBulletDynamicsCommon.h"
-
-#include "modes/world.hpp"
+#include "config/stk_config.hpp"
 #include "physics/physics.hpp"
 #include "utils/constants.hpp"
 #include "utils/time.hpp"
+
+#include "btBulletDynamicsCommon.h"
 
 #include <fstream>
 
@@ -188,8 +188,9 @@ void TriangleMesh::createPhysicalBody(btCollisionObject::CollisionFlags flags,
     m_motion_state = new btDefaultMotionState(startTransform);
     btRigidBody::btRigidBodyConstructionInfo info(0.0f, m_motion_state,
                                                   m_collision_shape);
+    info.m_restitution = 0.8f;
     m_body=new btRigidBody(info);
-    World::getWorld()->getPhysics()->addBody(m_body);
+    Physics::getInstance()->addBody(m_body);
 
     m_body->setUserPointer(&m_user_pointer);
     m_body->setCollisionFlags(m_body->getCollisionFlags()  |
@@ -209,7 +210,7 @@ void TriangleMesh::removeAll()
     // Don't free the physical body if it was created outside this object.
     if(m_body && m_free_body)
     {
-        World::getWorld()->getPhysics()->removeBody(m_body);
+        Physics::getInstance()->removeBody(m_body);
         delete m_body;
         delete m_motion_state;
         m_body         = NULL;

@@ -37,6 +37,17 @@ using namespace irr;
 #include "io/xml_node.hpp"
 #include "utils/no_copy.hpp"
 
+struct TextureSearchPath
+{
+    std::string m_texture_search_path;
+    std::string m_container_id;
+
+    TextureSearchPath(std::string path, std::string container_id) :
+        m_texture_search_path(path), m_container_id(container_id)
+    {
+    }
+};
+
 /**
   * \brief class handling files and paths
   * \ingroup io
@@ -48,10 +59,11 @@ public:
      *  The last entry ASSET_COUNT specifies the number of entries. */
     enum AssetType {ASSET_MIN,
                     CHALLENGE=ASSET_MIN,
-                    GFX, GRANDPRIX, GUI, LIBRARY, MODEL, MUSIC,
+                    GFX, GRANDPRIX, GUI, LIBRARY, MODEL, MUSIC, REPLAY,
                     SCRIPT, SFX, SHADER, SKIN, TEXTURE, TTF,
                     TRANSLATION, ASSET_MAX = TRANSLATION,
                     ASSET_COUNT};
+
 private:
 
     /** The names of the various subdirectories of the asset types. */
@@ -75,28 +87,36 @@ private:
     /** Directory to store screenshots in. */
     std::string       m_screenshot_dir;
 
+    /** Directory to store replays in. */
+    std::string       m_replay_dir;
+
     /** Directory where resized textures are cached. */
     std::string       m_cached_textures_dir;
 
     /** Directory where user-defined grand prix are stored. */
     std::string       m_gp_dir;
 
+    std::vector<TextureSearchPath> m_texture_search_path;
+
     std::vector<std::string>
-                      m_texture_search_path,
                       m_model_search_path,
                       m_music_search_path;
     bool              findFile(std::string& full_path,
                                const std::string& fname,
                                const std::vector<std::string>& search_path)
                                const;
+    bool              findFile(std::string& full_path,
+                               const std::string& fname,
+                               const std::vector<TextureSearchPath>& search_path)
+                               const;
     void              makePath(std::string& path, const std::string& dir,
                                const std::string& fname) const;
     bool              checkAndCreateDirectory(const std::string &path);
     io::path          createAbsoluteFilename(const std::string &f);
     void              checkAndCreateConfigDir();
-    bool              isDirectory(const std::string &path) const;
     void              checkAndCreateAddonsDir();
     void              checkAndCreateScreenshotDir();
+    void              checkAndCreateReplayDir();
     void              checkAndCreateCachedTexturesDir();
     void              checkAndCreateGPDir();
     void              discoverPaths();
@@ -118,13 +138,14 @@ public:
     XMLNode          *createXMLTreeFromString(const std::string & content);
 
     std::string       getScreenshotDir() const;
+    std::string       getReplayDir() const;
     std::string       getCachedTexturesDir() const;
     std::string       getGPDir() const;
-    std::string       getTextureCacheLocation(const std::string& filename);
     bool              checkAndCreateDirectoryP(const std::string &path);
     const std::string &getAddonsDir() const;
     std::string        getAddonsFile(const std::string &name);
     void checkAndCreateDirForAddons(const std::string &dir);
+    bool isDirectory(const std::string &path) const;
     bool removeFile(const std::string &name) const;
     bool removeDirectory(const std::string &name) const;
     bool copyFile(const std::string &source, const std::string &dest);
@@ -133,7 +154,13 @@ public:
                                 bool abort_on_error=false) const;
     std::string getAsset(AssetType type, const std::string &name) const;
     std::string getAsset(const std::string &name) const;
-
+    // ------------------------------------------------------------------------
+    /** Returns the directory of an asset. */
+    std::string getAssetDirectory(AssetType type) const
+    {
+        return m_subdir_name[type];
+    }
+    // ------------------------------------------------------------------------
     std::string searchMusic(const std::string& file_name) const;
     std::string searchTexture(const std::string& fname) const;
     std::string getUserConfigFile(const std::string& fname) const;
@@ -146,12 +173,18 @@ public:
         return fileExists(std::string(prefix) + path);
     }
     // ------------------------------------------------------------------------
+    bool searchTextureContainerId(std::string& container_id,
+        const std::string& file_name) const;
+    // ------------------------------------------------------------------------
+    /** Returns the name of the stdout file for log messages. */
+    static const std::string& getStdoutName() { return m_stdout_filename; }
+    // ------------------------------------------------------------------------
     void        listFiles        (std::set<std::string>& result,
                                   const std::string& dir,
                                   bool make_full_path=false) const;
 
 
-    void       pushTextureSearchPath(const std::string& path);
+    void       pushTextureSearchPath(const std::string& path, const std::string& container_id);
     void       pushModelSearchPath(const std::string& path);
     void       popTextureSearchPath();
     void       popModelSearchPath();
@@ -180,6 +213,11 @@ public:
         return getAsset(SHADER, name);
 
     }   // getShader
+    
+    std::string getShadersDir() const
+    {
+        return m_subdir_name[SHADER];
+    }
 };   // FileManager
 
 extern FileManager* file_manager;

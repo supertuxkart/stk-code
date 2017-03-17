@@ -21,6 +21,7 @@
 #define HEADER_MATERIAL_HPP
 
 #include "utils/no_copy.hpp"
+#include "utils/random_generator.hpp"
 
 #include <assert.h>
 #include <map>
@@ -46,16 +47,20 @@ class Material : public NoCopy
 public:
     enum ShaderType
     {
-        SHADERTYPE_SOLID,
+        SHADERTYPE_SOLID = 0,
+        SHADERTYPE_SOLID_SKINNED_MESH,
         SHADERTYPE_ALPHA_TEST,
+        SHADERTYPE_ALPHA_TEST_SKINNED_MESH,
         SHADERTYPE_ALPHA_BLEND,
         SHADERTYPE_ADDITIVE,
         SHADERTYPE_SOLID_UNLIT,
+        SHADERTYPE_SOLID_UNLIT_SKINNED_MESH,
         /** Effect that makes grass wave as in the wind */
         SHADERTYPE_VEGETATION,
         SHADERTYPE_WATER,
         SHADERTYPE_SPHERE_MAP,
         SHADERTYPE_NORMAL_MAP,
+        SHADERTYPE_NORMAL_MAP_SKINNED_MESH,
         SHADERTYPE_DETAIL_MAP,
         SHADERTYPE_SPLATTING,
         SHADERTYPE_COUNT,
@@ -86,12 +91,8 @@ private:
     std::string      m_texname;
 
     std::string      m_full_path;
-
-    /** If true, the texture will not automatically be loaded and bound
-     *  at load time, it must be loaded elsewhere. This is used to store
-     *  material settings for font textures, without loading fonts for
-     *  languages that might not be needed at all. */
-    bool             m_dont_load_texture;
+    
+    std::string      m_original_full_path;
 
     /** Name of a special sfx to play when a kart is on this terrain, or
      *  "" if no special sfx exists. */
@@ -161,6 +162,12 @@ private:
      *  the direction. */
     char             m_mirror_axis_when_reverse;
 
+    /** 
+    * Associated with m_mirror_axis_when_reverse, to avoid mirroring the same material twice
+    * (setAllMaterialFlags can be called multiple times on the same mesh buffer)
+    */
+    std::map<void*, bool> m_mirrorred_mesh_buffers;
+
     ParticleKind*    m_particles_effects[EMIT_KINDS_COUNT];
 
     /** For normal maps */
@@ -174,6 +181,18 @@ private:
 
     /** Set to true to disable writing to the Z buffer. Usually to be used with alpha blending */
     bool             m_disable_z_write;
+
+    /** True if this material can be colorized (like red/blue in team game). */
+    bool             m_colorizable;
+
+    /** Minimum resulting saturation when colorized (from 0 to 1) */
+    float            m_colorization_factor;
+
+    /** List of hue pre-defined for colorization (from 0 to 1) */
+    std::vector<float> m_hue_settings;
+
+    /** Random generator for getting pre-defined hue */
+    RandomGenerator m_random_hue;
 
     /** Some textures need to be pre-multiplied, some divided to give
      *  the intended effect. */
@@ -227,6 +246,8 @@ private:
     
     std::string      m_mask;
 
+    std::string      m_colorization_mask;
+
     /** If m_splatting is true, indicates the first splatting texture */
     std::string      m_splatting_texture_1;
 
@@ -241,10 +262,14 @@ private:
 
     std::string      m_gloss_map;
 
+    bool  m_complain_if_not_found;
+
     bool  m_deprecated;
 
+    bool  m_installed;
+
     void  init    ();
-    void  install (bool is_full_path=false, bool complain_if_not_found=true);
+    void  install (bool srgb = false, bool premul_alpha = false);
     void  initCustomSFX(const XMLNode *sfx);
     void  initParticlesEffect(const XMLNode *node);
 
@@ -256,6 +281,8 @@ public:
                    bool load_texture = true);
          ~Material ();
 
+    void unloadTexture();
+
     void  setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) const;
     void  setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb);
     void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, 
@@ -265,14 +292,7 @@ public:
     void isInitiallyHidden(scene::IMeshBuffer* who);
 
     /** Returns the ITexture associated with this material. */
-    video::ITexture *getTexture() const
-    {
-        // Note that dont load means that the textures are not loaded
-        // via the material. So getTexture should only get called for
-		// automatically loaded textures (used atm for font textures).
-        assert(!m_dont_load_texture);
-        return m_texture;
-    }   // getTexture
+    video::ITexture *getTexture(bool srgb = true, bool premul_alpha = false);
     // ------------------------------------------------------------------------
     bool  isIgnore           () const { return m_ignore;             }
     // ------------------------------------------------------------------------
@@ -282,6 +302,25 @@ public:
     /** Returns if this material should trigger a rescue if a kart
      *  is driving on it. */
     bool  isDriveReset       () const { return m_drive_reset;        }
+    // ------------------------------------------------------------------------
+    /** Returns if this material can be colorized.
+     */
+    bool  isColorizable      () const { return m_colorizable;        }
+    // ------------------------------------------------------------------------
+    /** Returns the minimum resulting saturation when colorized.
+     */
+    float getColorizationFactor () const { return m_colorization_factor;   }
+    // ------------------------------------------------------------------------
+    /** Returns a random hue when colorized.
+     */
+    float getRandomHue()
+    {
+        if (m_hue_settings.empty())
+            return 0.0f;
+        const unsigned int hue = m_random_hue.get(m_hue_settings.size());
+        assert(hue < m_hue_settings.size());
+        return m_hue_settings[hue];
+    }
     // ------------------------------------------------------------------------
     /** Returns if this material should trigger a rescue if a kart
      *  crashes against it. */
@@ -382,7 +421,8 @@ public:
     /** True if this texture should have the U coordinates mirrored. */
     char getMirrorAxisInReverse() const { return m_mirror_axis_when_reverse; }
     // ------------------------------------------------------------------------
-} ;
+    const std::string getAlphaMask() const                 { return m_mask; }
+};
 
 
 #endif

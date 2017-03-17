@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #ifndef HEADER_GPU_PARTICLES_HPP
 #define HEADER_GPU_PARTICLES_HPP
 
@@ -41,7 +43,7 @@ protected:
     bool m_first_execution;
     bool m_randomize_initial_y;
     
-    GLuint texture;
+    GLuint m_texture_name;
     
     /** Previous frame particles emitter source matrix */
     core::matrix4 m_previous_frame_matrix;
@@ -109,3 +111,5 @@ public:
 };
 
 #endif // GPUPARTICLES_H
+
+#endif  // !SERVER_ONLY

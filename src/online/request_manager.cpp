@@ -23,6 +23,7 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/vs.hpp"
 
 #include <iostream>
 #include <stdio.h>
@@ -30,6 +31,7 @@
 #include <errno.h>
 
 #if defined(WIN32) && !defined(__CYGWIN__)
+#  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
 #else
 #  include <sys/time.h>
@@ -101,10 +103,6 @@ namespace Online
         pthread_attr_t  attr;
         pthread_attr_init(&attr);
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
-        // Should be the default, but just in case:
-        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-        //pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
         m_thread_id.setAtomic(new pthread_t());
         int error = pthread_create(m_thread_id.getData(), &attr,
@@ -184,9 +182,8 @@ namespace Online
      */
     void *RequestManager::mainLoop(void *obj)
     {
+        VS::setThreadName("RequestManager");
         RequestManager *me = (RequestManager*) obj;
-
-        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
         me->m_current_request = NULL;
         me->m_request_queue.lock();

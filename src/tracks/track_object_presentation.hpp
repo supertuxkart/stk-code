@@ -37,6 +37,7 @@ class ParticleEmitter;
 class PhysicalObject;
 class ThreeDAnimation;
 class ModelDefinitionLoader;
+class RenderInfo;
 class STKInstancedSceneNode;
 class XMLNode;
 class TrackObject;
@@ -184,11 +185,15 @@ public:
 class TrackObjectPresentationLibraryNode : public TrackObjectPresentationSceneNode
 {
     TrackObject* m_parent;
+    using TrackObjectPresentationSceneNode::move;
+    std::string m_name;
+    bool m_start_executed;
 public:
     TrackObjectPresentationLibraryNode(TrackObject* parent,
         const XMLNode& xml_node,
         ModelDefinitionLoader& model_def_loader);
     virtual ~TrackObjectPresentationLibraryNode();
+    virtual void update(float dt);
     void move(const core::vector3df& xyz, const core::vector3df& hpr,
         const core::vector3df& scale, bool isAbsoluteCoord, bool moveChildrenPhysicalBodies);
 };   // TrackObjectPresentationLibraryNode
@@ -203,8 +208,10 @@ public:
 
     TrackObjectPresentationLOD(const XMLNode& xml_node,
                                scene::ISceneNode* parent,
-                               ModelDefinitionLoader& model_def_loader);
+                               ModelDefinitionLoader& model_def_loader,
+                               RenderInfo* ri);
     virtual ~TrackObjectPresentationLOD();
+    virtual void reset() OVERRIDE;
 };
 
 // ============================================================================
@@ -224,19 +231,16 @@ private:
     /** True if the object is in the skybox */
     bool                    m_is_in_skybox;
 
-    /** Start frame of the animation to be played. */
-    unsigned int            m_frame_start;
-
-    /** End frame of the animation to be played. */
-    unsigned int            m_frame_end;
-
     std::string             m_model_file;
+
+    RenderInfo* m_render_info;
 
     void init(const XMLNode* xml_node, scene::ISceneNode* parent, bool enabled);
 
 public:
     TrackObjectPresentationMesh(const XMLNode& xml_node, bool enabled,
-                                scene::ISceneNode* parent);
+                                scene::ISceneNode* parent,
+                                RenderInfo* render_info);
 
     TrackObjectPresentationMesh(const std::string& model_file,
                                 const core::vector3df& xyz,
@@ -354,19 +358,12 @@ private:
     video::SColor m_color;
     float m_distance;
     float m_energy;
-
-    float m_energy_animation_from;
-    float m_energy_animation_to;
-    float m_energy_animation_total_duration;
-    float m_energy_animation_remaining_duration;
-
 public:
     TrackObjectPresentationLight(const XMLNode& xml_node,
                                  scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationLight();
+    float getEnergy() const { return m_energy; }
     void setEnergy(float energy);
-    void setEnergy(float energy, float duration);
-    virtual void update(float dt) OVERRIDE;
 };   // TrackObjectPresentationLight
 
 // ============================================================================

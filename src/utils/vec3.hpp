@@ -212,7 +212,11 @@ public:
                (end.getZ()-start.getZ())*(m_floats[0]-start.getX());
 
     }   // sideOfLine2D
-};    // Vec3
 
+    float sideofPlane(const Vec3& x1, const Vec3& x2, const Vec3& x3) const
+    {
+        return ((x2 - x1).cross(x3 - x1)).dot(*this - x1);
+    } // sideOfPlane
+};    // Vec3
 
 #endif

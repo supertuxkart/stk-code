@@ -279,6 +279,16 @@ enum AnimType {ANIMS_NONE         = 0,
                ANIMS_PLAYERS_ONLY = 1,
                ANIMS_ALL          = 2 };
 
+enum GeometryLevel
+{
+    /** Display everything */
+    GEOLEVEL_0    = 0,
+    /** a few details are displayed */
+    GEOLEVEL_1    = 1,
+    /** Lowest level, no details are displayed. */
+    GEOLEVEL_2    = 2
+};
+
 /** Using X-macros for setting-possible values is not very pretty, but it's a
  *  no-maintenance case :
  *  when you want to add a new parameter, just add one signle line below and
@@ -335,9 +345,15 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam          m_num_goals
             PARAM_DEFAULT(  IntUserConfigParam(3, "numgoals",
             &m_race_setup_group, "Default number of goals in soccer mode.") );
+    PARAM_PREFIX IntUserConfigParam          m_soccer_default_team
+            PARAM_DEFAULT(  IntUserConfigParam(0, "soccer-default-team",
+            &m_race_setup_group, "Default team in soccer mode for single player.") );
     PARAM_PREFIX IntUserConfigParam          m_soccer_time_limit
             PARAM_DEFAULT(  IntUserConfigParam(3, "soccer-time-limit",
-            &m_race_setup_group, "Limit in soccer time mode.") );
+            &m_race_setup_group, "Time limit in soccer mode.") );
+    PARAM_PREFIX BoolUserConfigParam         m_soccer_use_time_limit
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "soccer-use-time-limit",
+            &m_race_setup_group, "Enable time limit in soccer mode.") );
     PARAM_PREFIX IntUserConfigParam          m_difficulty
             PARAM_DEFAULT(  IntUserConfigParam(0, "difficulty",
                             &m_race_setup_group,
@@ -382,6 +398,49 @@ namespace UserConfigParams
             PARAM_DEFAULT( FloatUserConfigParam(0.0f, "wiimote-weight-sin",
             &m_wiimote_group,
             "A weight applied to the sin component of mapping wiimote angle to steering angle"));
+
+    // ---- Multitouch device
+    PARAM_PREFIX GroupUserConfigParam        m_multitouch_group
+        PARAM_DEFAULT( GroupUserConfigParam("Multitouch",
+                                            "Settings for the multitouch device") );
+
+    PARAM_PREFIX BoolUserConfigParam         m_multitouch_enabled
+            PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_enabled",
+            &m_multitouch_group,
+            "Enable multitouch support.") );
+            
+    PARAM_PREFIX IntUserConfigParam         m_multitouch_mode
+            PARAM_DEFAULT( IntUserConfigParam(1, "multitouch_mode",
+            &m_multitouch_group,
+            "Steering mode: 0 = off, 1 = buttons"));
+            
+    PARAM_PREFIX IntUserConfigParam         m_multitouch_accelerometer
+            PARAM_DEFAULT( IntUserConfigParam(0, "multitouch_accelerometer",
+            &m_multitouch_group,
+            "Accelerometer mode: 0 = off, 1 = tablet, 2 = phone"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_center
+            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone_center",
+            &m_multitouch_group,
+            "A parameter in range [0, 0.5] that determines the zone that is "
+            "considered as centered in steering button."));
+
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_edge
+            PARAM_DEFAULT( FloatUserConfigParam(0.25f, "multitouch_deadzone_edge",
+            &m_multitouch_group,
+            "A parameter in range [0, 0.5] that determines the zone that is "
+            "considered as max value in steering button."));
+
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_scale
+            PARAM_DEFAULT( FloatUserConfigParam(1.0f, "multitouch_scale",
+            &m_multitouch_group,
+            "A parameter in range [0.5, 1.5] that determines the scale of the "
+            "multitouch interface."));
+
+    PARAM_PREFIX BoolUserConfigParam         m_screen_keyboard
+            PARAM_DEFAULT( BoolUserConfigParam(false, "screen_keyboard",
+            &m_multitouch_group,
+            "Enable screen keyboard.") );
 
     // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
@@ -447,7 +506,7 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_texture_compression
         PARAM_DEFAULT(BoolUserConfigParam(true, "enable_texture_compression",
         &m_video_group, "Enable Texture Compression"));
-    /** This is a bit flag: bit 0: enabled (1) or disabled(0). 
+    /** This is a bit flag: bit 0: enabled (1) or disabled(0).
      *  Bit 1: setting done by default(0), or by user choice (2). This allows
      *  to e.g. disable h.d. textures on hd3000 as default, but still allow the
      *  user to enable it. */
@@ -485,6 +544,19 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_old_driver_popup
         PARAM_DEFAULT(BoolUserConfigParam(true, "old_driver_popup",
         &m_video_group, "Determines if popup message about too old drivers should be displayed."));
+    PARAM_PREFIX FloatUserConfigParam       m_scale_rtts_factor
+        PARAM_DEFAULT(FloatUserConfigParam(1.0f, "scale_rtts_factor",
+        &m_video_group, "Allows to increase performance by setting lower RTTs "
+                        "resolution. Value should be smaller or equal to 1.0"));
+    PARAM_PREFIX IntUserConfigParam         m_max_texture_size
+        PARAM_DEFAULT(IntUserConfigParam(512, "max_texture_size",
+        &m_video_group, "Max texture size when high definition textures are "
+                        "disabled"));
+
+    PARAM_PREFIX BoolUserConfigParam        m_hq_mipmap
+        PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
+        &m_video_group, "Generate mipmap for textures using "
+                        "high quality method with SSE"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
@@ -509,19 +581,20 @@ namespace UserConfigParams
     /** If track debugging is enabled. */
     PARAM_PREFIX int m_track_debug PARAM_DEFAULT( false );
 
+    /** If random number of items is used in an arena. */
+    PARAM_PREFIX bool m_random_arena_item PARAM_DEFAULT( false );
+
     /** True if check structures should be debugged. */
     PARAM_PREFIX bool m_check_debug PARAM_DEFAULT( false );
-
-    /** Special debug camera: 0: normal camera;   1: being high over the kart;
-                              2: on ground level; 3: free first person camera; 
-                              4: straight behind kart */
-    PARAM_PREFIX int m_camera_debug PARAM_DEFAULT( false );
 
     /** True if physics debugging should be enabled. */
     PARAM_PREFIX bool m_physics_debug PARAM_DEFAULT( false );
 
     /** True if fps should be printed each frame. */
     PARAM_PREFIX bool m_fps_debug PARAM_DEFAULT(false);
+
+    /** True if arena (battle/soccer) ai profiling. */
+    PARAM_PREFIX bool m_arena_ai_stats PARAM_DEFAULT(false);
 
     /** True if slipstream debugging is activated. */
     PARAM_PREFIX bool m_slipstream_debug  PARAM_DEFAULT( false );
@@ -540,15 +613,14 @@ namespace UserConfigParams
 
     PARAM_PREFIX bool m_race_now          PARAM_DEFAULT( false );
 
+    PARAM_PREFIX bool m_enforce_current_player PARAM_DEFAULT( false );
+
     /** True to test funky ambient/diffuse/specularity in RGB &
      *  all anisotropic */
     PARAM_PREFIX bool m_rendering_debug   PARAM_DEFAULT( false );
 
     /** True if graphical profiler should be displayed */
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
-
-    /** True if hardware skinning should be enabled */
-    PARAM_PREFIX bool m_hw_skinning_enabled  PARAM_DEFAULT( false );
 
     // not saved to file
 
@@ -587,9 +659,9 @@ namespace UserConfigParams
                             "stun.voxgratia.org",
                             "stun.xten.com") );
 
-    PARAM_PREFIX StringUserConfigParam m_packets_log_filename
-            PARAM_DEFAULT( StringUserConfigParam("packets_log.txt", "packets_log_filename",
-                                                 "Where to log received and sent packets.") );
+    PARAM_PREFIX BoolUserConfigParam m_log_packets
+            PARAM_DEFAULT( BoolUserConfigParam(false, "log-network-packets",
+                                                 "If all network packets should be logged") );
 
     // ---- Graphic Quality
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality
@@ -630,6 +702,13 @@ namespace UserConfigParams
                             "steering_animations", &m_graphics_quality,
                 "Whether to display kart animations (0=disabled for all; "
                 "1=enabled for humans, disabled for AIs; 2=enabled for all") );
+
+    PARAM_PREFIX IntUserConfigParam        m_geometry_level
+            PARAM_DEFAULT(  IntUserConfigParam(GEOLEVEL_0,
+                            "geometry_level", &m_graphics_quality,
+                "Geometry quality 0=everything is displayed; "
+                "1=a few details are displayed; 2=lowest level, no details") );
+
     PARAM_PREFIX IntUserConfigParam         m_anisotropic
             PARAM_DEFAULT( IntUserConfigParam(4, "anisotropic",
                            &m_graphics_quality,
@@ -663,7 +742,7 @@ namespace UserConfigParams
                            "Enable Screen Space Ambient Occlusion") );
     PARAM_PREFIX IntUserConfigParam          m_shadows_resolution
             PARAM_DEFAULT( IntUserConfigParam(0,
-                           "shadows_resoltion", &m_graphics_quality,
+                           "shadows_resolution", &m_graphics_quality,
                            "Shadow resolution (0 = disabled") );
     PARAM_PREFIX BoolUserConfigParam          m_degraded_IBL
         PARAM_DEFAULT(BoolUserConfigParam(true,
@@ -848,6 +927,14 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_artist_debug_mode
             PARAM_DEFAULT( BoolUserConfigParam(false, "artist_debug_mode",
                                "Whether to enable track debugging features") );
+
+    PARAM_PREFIX BoolUserConfigParam        m_hide_gui
+        PARAM_DEFAULT(BoolUserConfigParam(false, "debug_hide_gui",
+            "Whether to hide the GUI (artist debug mode)"));
+
+    PARAM_PREFIX BoolUserConfigParam        m_everything_unlocked
+            PARAM_DEFAULT( BoolUserConfigParam(false, "everything_unlocked",
+                               "Enable all karts and tracks") );
 
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;

@@ -14,10 +14,14 @@ if(APPLE)
     option(BUILD_FRAMEWORK "Build Framework bundle for OSX" OFF)
 endif()
 
-set(ANGELSCRIPT_VERSION_MAJOR 2)
-set(ANGELSCRIPT_VERSION_MINOR 30)
-set(ANGELSCRIPT_VERSION_PATCH 0)
+file(READ ../../include/angelscript.h ANGELSCRIPT_H)
+string(REGEX MATCH "#define ANGELSCRIPT_VERSION_STRING \"([0-9]*).([0-9]*).([0-9]*)" ANGELSCRIPT_VERSION_REGEX ${ANGELSCRIPT_H})
+set(ANGELSCRIPT_VERSION_MAJOR ${CMAKE_MATCH_1})
+set(ANGELSCRIPT_VERSION_MINOR ${CMAKE_MATCH_2})
+set(ANGELSCRIPT_VERSION_PATCH ${CMAKE_MATCH_3})
 set(PROJECT_VERSION ${ANGELSCRIPT_VERSION_MAJOR}.${ANGELSCRIPT_VERSION_MINOR}.${ANGELSCRIPT_VERSION_PATCH})
+
+message(STATUS "Configuring angelscript ${PROJECT_VERSION}")
 
 find_package(Threads)
 
@@ -63,6 +67,7 @@ set(ANGELSCRIPT_SOURCE
     ../../source/as_builder.cpp
     ../../source/as_bytecode.cpp
     ../../source/as_callfunc.cpp
+    ../../source/as_callfunc_mips.cpp
     ../../source/as_callfunc_x86.cpp
     ../../source/as_callfunc_x64_gcc.cpp
     ../../source/as_callfunc_x64_msvc.cpp
@@ -102,12 +107,13 @@ if(MSVC AND CMAKE_CL_64)
     endif()
 endif()
 
-if(ANDROID)
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm")
     enable_language(ASM)
     if(CMAKE_ASM_COMPILER_WORKS)
         set(ANGELSCRIPT_SOURCE ${ANGELSCRIPT_SOURCE} ../../source/as_callfunc_arm.cpp ../../source/as_callfunc_arm_gcc.S)
+        set_property(SOURCE ../../source/as_callfunc_arm_gcc.S APPEND PROPERTY COMPILE_FLAGS " -Wa,-mimplicit-it=always")
     else()
-        message(FATAL ERROR "Android target requires a working assembler")
+        message(FATAL ERROR "ARM target requires a working assembler")
     endif()
 endif()
 
@@ -156,4 +162,5 @@ endif()
 
 #set(RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../../bin)
 
+#add_subdirectory(../../../samples/game/projects/cmake/ ./game)
 

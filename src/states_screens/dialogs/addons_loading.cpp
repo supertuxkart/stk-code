@@ -45,9 +45,10 @@ using namespace irr::gui;
 */
 
 AddonsLoading::AddonsLoading(const std::string &id)
-             : ModalDialog(0.8f, 0.8f)
+             : ModalDialog(0.8f, 0.8f),
+               m_addon(*(addons_manager->getAddon(id)) )
 {
-    m_addon            = *(addons_manager->getAddon(id));
+    
     m_icon_shown       = false;
     m_download_request = NULL;
 

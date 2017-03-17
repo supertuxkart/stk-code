@@ -1,12 +1,17 @@
 uniform sampler2D ntex;
 
+#ifdef GL_ES
+layout (location = 0) out vec4 Diff;
+layout (location = 1) out vec4 Spec;
+#else
 out vec4 Diff;
 out vec4 Spec;
+#endif
 
-vec3 DecodeNormal(vec2 n);
-vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
-vec3 DiffuseIBL(vec3 normal);
-vec3 SpecularIBL(vec3 normal, vec3 V, float roughness);
+#stk_include "utils/decodeNormal.frag"
+#stk_include "utils/getPosFromUVDepth.frag"
+#stk_include "utils/DiffuseIBL.frag"
+#stk_include "utils/SpecularIBL.frag"
 
 void main(void)
 {

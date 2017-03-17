@@ -31,6 +31,7 @@
 #include "scriptengine/script_utils.hpp"
 #include "scriptengine/scriptstdstring.hpp"
 #include "scriptengine/scriptvec3.hpp"
+#include "scriptengine/scriptarray.hpp"
 #include <string.h>
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track_object_manager.hpp"
@@ -77,6 +78,8 @@ namespace Scripting
     ScriptEngine::~ScriptEngine()
     {
         // Release the engine
+        m_pending_timeouts.clearAndDeleteAll();
+        m_engine->DiscardModule(MODULE_ID_MAIN_SCRIPT_FILE);
         m_engine->Release();
     }
 
@@ -93,7 +96,7 @@ namespace Scripting
         FILE *f = fopen(script_path.c_str(), "rb");
         if (f == NULL)
         {
-            Log::debug("Scripting", "File does not exist : {0}", script_path.c_str());
+            Log::debug("Scripting", "File does not exist : %s", script_path.c_str());
             return "";
         }
 
@@ -172,6 +175,99 @@ namespace Scripting
 
     //-----------------------------------------------------------------------------
 
+    void ScriptEngine::runDelegate(asIScriptFunction* delegate)
+    {
+        asIScriptContext *ctx = m_engine->CreateContext();
+        if (ctx == NULL)
+        {
+            Log::error("Scripting", "runMethod: Failed to create the context.");
+            //m_engine->Release();
+            return;
+        }
+
+        int r = ctx->Prepare(delegate);
+        if (r < 0)
+        {
+            Log::error("Scripting", "runMethod: Failed to prepare the context.");
+            ctx->Release();
+            return;
+        }
+
+        // Execute the function
+        r = ctx->Execute();
+        if (r != asEXECUTION_FINISHED)
+        {
+            // The execution didn't finish as we had planned. Determine why.
+            if (r == asEXECUTION_ABORTED)
+            {
+                Log::error("Scripting", "The script was aborted before it could finish. Probably it timed out.");
+            }
+            else if (r == asEXECUTION_EXCEPTION)
+            {
+                Log::error("Scripting", "The script ended with an exception : (line %i) %s",
+                    ctx->GetExceptionLineNumber(), 
+                    ctx->GetExceptionString());
+            }
+            else
+            {
+                Log::error("Scripting", "The script ended for some unforeseen reason (%i)", r);
+            }
+        }
+
+        ctx->Release();
+    }
+
+    //-----------------------------------------------------------------------------
+    
+    /*
+    void ScriptEngine::runMethod(asIScriptObject* obj, std::string methodName)
+    {
+        asIObjectType* type = obj->GetObjectType();
+        asIScriptFunction* method = type->GetMethodByName(methodName.c_str());
+        if (method == NULL)
+            Log::error("Scripting", ("runMethod: object does not implement method " + methodName).c_str());
+
+
+        asIScriptContext *ctx = m_engine->CreateContext();
+        if (ctx == NULL)
+        {
+            Log::error("Scripting", "runMethod: Failed to create the context.");
+            //m_engine->Release();
+            return;
+        }
+
+        int r = ctx->Prepare(method);
+        if (r < 0)
+        {
+            Log::error("Scripting", "runMethod: Failed to prepare the context.");
+            ctx->Release();
+            return;
+        }
+
+        // Execute the function
+        r = ctx->Execute();
+        if (r != asEXECUTION_FINISHED)
+        {
+            // The execution didn't finish as we had planned. Determine why.
+            if (r == asEXECUTION_ABORTED)
+            {
+                Log::error("Scripting", "The script was aborted before it could finish. Probably it timed out.");
+            }
+            else if (r == asEXECUTION_EXCEPTION)
+            {
+                Log::error("Scripting", "The script ended with an exception.");
+            }
+            else
+            {
+                Log::error("Scripting", "The script ended for some unforeseen reason (%i)", r);
+            }
+        }
+
+        ctx->Release();
+    }
+    */
+    //-----------------------------------------------------------------------------
+
     /** runs the specified script
     *  \param string scriptName = name of script to run
     */
@@ -212,9 +308,20 @@ namespace Scripting
             // Find the function for the function we want to execute.
             //      This is how you call a normal function with arguments
             //      asIScriptFunction *func = engine->GetModule(0)->GetFunctionByDecl("void func(arg1Type, arg2Type)");
-            func = m_engine->GetModule(MODULE_ID_MAIN_SCRIPT_FILE)
-                        ->GetFunctionByDecl(function_name.c_str());
-        
+            asIScriptModule* module = m_engine->GetModule(MODULE_ID_MAIN_SCRIPT_FILE);
+
+            if (module == NULL)
+            {
+                if (warn_if_not_found)
+                    Log::warn("Scripting", "Scripting function was not found : %s (module not found)", function_name.c_str());
+                else
+                    Log::debug("Scripting", "Scripting function was not found : %s (module not found)", function_name.c_str());
+                m_functions_cache[function_name] = NULL; // remember that this function is unavailable
+                return;
+            }
+
+            func = module->GetFunctionByDecl(function_name.c_str());
+            
             if (func == NULL)
             {
                 if (warn_if_not_found)
@@ -285,7 +392,7 @@ namespace Scripting
                 Log::error("Scripting", "The script ended with an exception.");
 
                 // Write some information about the script exception
-                asIScriptFunction *func = ctx->GetExceptionFunction();
+                //asIScriptFunction *func = ctx->GetExceptionFunction();
                 //std::cout << "func: " << func->GetDeclaration() << std::endl;
                 //std::cout << "modl: " << func->GetModuleName() << std::endl;
                 //std::cout << "sect: " << func->GetScriptSectionName() << std::endl;
@@ -333,6 +440,7 @@ namespace Scripting
         // Register the script string type
         RegisterStdString(engine); //register std::string
         RegisterVec3(engine);      //register Vec3
+        RegisterScriptArray(engine, true);
 
         Scripting::Track::registerScriptFunctions(m_engine);
         Scripting::Challenges::registerScriptFunctions(m_engine);
@@ -415,9 +523,34 @@ namespace Scripting
 
     //-----------------------------------------------------------------------------
 
+    PendingTimeout::PendingTimeout(double time, asIScriptFunction* callback_delegate) 
+    {
+        m_time = time;
+        m_callback_delegate = callback_delegate;
+    }
+
+    //-----------------------------------------------------------------------------
+
+    PendingTimeout::~PendingTimeout()
+    {
+        if (m_callback_delegate != NULL)
+        {
+            m_callback_delegate->Release();
+        }
+    }
+
+    //-----------------------------------------------------------------------------
+
     void ScriptEngine::addPendingTimeout(double time, const std::string& callback_name)
     {
-        m_pending_timeouts.push_back(PendingTimeout(time, callback_name));
+        m_pending_timeouts.push_back(new PendingTimeout(time, callback_name));
+    }
+
+    //-----------------------------------------------------------------------------
+
+    void ScriptEngine::addPendingTimeout(double time, asIScriptFunction* delegate)
+    {
+        m_pending_timeouts.push_back(new PendingTimeout(time, delegate));
     }
 
     //-----------------------------------------------------------------------------
@@ -430,8 +563,16 @@ namespace Scripting
             curr.m_time -= dt;
             if (curr.m_time <= 0.0)
             {
-                runFunction(true, "void " + curr.m_callback_name + "()");
-                m_pending_timeouts.erase(m_pending_timeouts.begin() + i);
+                if (curr.m_callback_delegate != NULL)
+                {
+                    runDelegate(curr.m_callback_delegate);
+                }
+                else
+                {
+                    runFunction(true, "void " + curr.m_callback_name + "()");
+                }
+
+                m_pending_timeouts.erase(i);
             }
         }
     }

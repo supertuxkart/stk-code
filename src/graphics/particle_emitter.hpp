@@ -92,8 +92,10 @@ public:
     void         setCreationRateAbsolute(float fraction);
     void         setCreationRateRelative(float f);
     int          getCreationRate();
+    float        getCreationRateFloat() {return m_min_rate;}
 
     void         setPosition(const Vec3 &pos);
+    void         setRotation(const Vec3 &rot);
 
     const ParticleKind* getParticlesInfo() const { return m_particle_type; }
 

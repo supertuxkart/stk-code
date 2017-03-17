@@ -21,7 +21,8 @@
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
-#include "network/network_manager.hpp"
+#include "karts/controller/ghost_controller.hpp"
+#include "network/network_config.hpp"
 
 //-----------------------------------------------------------------------------
 StandardRace::StandardRace() : LinearWorld()
@@ -34,6 +35,11 @@ StandardRace::StandardRace() : LinearWorld()
  */
 bool StandardRace::isRaceOver()
 {
+    if (race_manager->isWatchingReplay())
+    {
+        return dynamic_cast<GhostController*>
+            (m_karts[0]->getController())->isReplayEnd();
+    }
     // The race is over if all players have finished the race. Remaining
     // times for AI opponents will be estimated in enterRaceOverState
     return race_manager->allPlayerFinished();
@@ -43,7 +49,8 @@ bool StandardRace::isRaceOver()
 void StandardRace::getDefaultCollectibles(int *collectible_type, int *amount)
 {
     // in time trial mode, give zippers
-    if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
+    if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL &&
+        !race_manager->isWatchingReplay())
     {
         *collectible_type = PowerupManager::POWERUP_ZIPPER;
         *amount = race_manager->getNumLaps();
@@ -124,6 +131,6 @@ void StandardRace::endRaceEarly()
     } // Finish the active players
     endSetKartPositions();
     setPhase(RESULT_DISPLAY_PHASE);
-    if (!isNetworkWorld() || NetworkManager::getInstance()->isServer())
+    if (!isNetworkWorld() || NetworkConfig::get()->isServer())
         terminateRace();
 } // endRaceEarly

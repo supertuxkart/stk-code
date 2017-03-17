@@ -12,10 +12,15 @@
 //#include "os.h"
 #include "Keycodes.h"
 
+#include "config/user_config.hpp"
 #include "graphics/2dutils.hpp"
+#include "graphics/irr_driver.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 #include "utils/time.hpp"
+
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceLinux.h"
 
 /*
     todo:
@@ -24,8 +29,18 @@
     double click/ctrl click: word select + drag to select whole words, triple click to select line
     optional? dragging selected text
     numerical
+    correct the mark position in RTL text, currently you can identify by highlight the text
 */
 
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+#define UTF16_IS_SURROGATE_LO(c)	(((c) & 0xFC00) == 0xDC00)
+#define UTF16_IS_SURROGATE_HI(c)	(((c) & 0xFC00) == 0xD800)
+
+namespace irr
+{
+    void updateICPos(void* hWnd, s32 x, s32 y, s32 height);
+}
+#endif
 
 StkTime::TimeType getTime()
 {
@@ -44,7 +59,11 @@ CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
     PasswordChar(L'*'), HAlign(EGUIA_UPPERLEFT), VAlign(EGUIA_CENTER),
     CurrentTextRect(0,0,1,1), FrameRect(rectangle)
 {
-    m_rtl = is_rtl;
+    //m_rtl = is_rtl;
+    m_rtl = false;
+    // FIXME quick hack to enable mark movement with keyboard and mouse for rtl language,
+    // don't know why it's disabled in the first place, because STK fail
+    // to input unicode characters before?
 
     #ifdef _DEBUG
     setDebugName("CGUIEditBox");
@@ -82,11 +101,17 @@ CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
 //! destructor
 CGUIEditBox::~CGUIEditBox()
 {
+#ifndef SERVER_ONLY
     if (OverrideFont)
         OverrideFont->drop();
 
     if (Operator)
         Operator->drop();
+#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
+    CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
+    dl->setIMEEnable(false);
+#endif
+#endif
 }
 
 
@@ -214,6 +239,7 @@ void CGUIEditBox::setTextAlignment(EGUI_ALIGNMENT horizontal, EGUI_ALIGNMENT ver
 //! called if an event happened.
 bool CGUIEditBox::OnEvent(const SEvent& event)
 {
+#ifndef SERVER_ONLY
     if (isEnabled())
     {
 
@@ -227,8 +253,26 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                     MouseMarking = false;
                     setTextMarkers(0,0);
                 }
+#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
+                CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
+                dl->setIMEEnable(false);
+#endif
             }
+#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
+            else if (event.GUIEvent.EventType == EGET_ELEMENT_FOCUSED)
+            {
+                CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
+                dl->setIMEEnable(true);
+                dl->setIMELocation(calculateICPos());
+            }
+#endif
             break;
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+        case EET_IMPUT_METHOD_EVENT:
+            if (processIMEEvent(event))
+                return true;
+            break;
+#endif
         case EET_KEY_INPUT_EVENT:
             if (processKey(event))
                 return true;
@@ -241,7 +285,7 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
             break;
         }
     }
-
+#endif
     return IGUIElement::OnEvent(event);
 }
 
@@ -282,7 +326,11 @@ bool CGUIEditBox::processKey(const SEvent& event)
 
                 core::stringw s;
                 s = Text.subString(realmbgn, realmend - realmbgn).c_str();
-                Operator->copyToClipboard(StringUtils::wide_to_utf8(s.c_str()).c_str());
+#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+                Operator->copyToClipboard(s.c_str());
+#else
+                Operator->copyToClipboard(StringUtils::wideToUtf8(s).c_str());
+#endif
             }
             break;
         case KEY_KEY_X:
@@ -295,7 +343,11 @@ bool CGUIEditBox::processKey(const SEvent& event)
                 // copy
                 core::stringw sc;
                 sc = Text.subString(realmbgn, realmend - realmbgn).c_str();
-                Operator->copyToClipboard(StringUtils::wide_to_utf8(sc.c_str()).c_str());
+#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+                Operator->copyToClipboard(sc.c_str());
+#else
+                Operator->copyToClipboard(StringUtils::wideToUtf8(sc).c_str());
+#endif
 
                 if (isEnabled())
                 {
@@ -324,20 +376,32 @@ bool CGUIEditBox::processKey(const SEvent& event)
                 const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
                 // add new character
+#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+                const wchar_t* p = Operator->getTextFromClipboard();
+#else
                 const c8* p = Operator->getTextFromClipboard();
+#endif
                 if (p)
                 {
                     if (MarkBegin == MarkEnd)
                     {
                         // insert text
                         core::stringw s = Text.subString(0, CursorPos);
-                        s.append(StringUtils::utf8_to_wide(p));
+#ifndef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+                        s.append(StringUtils::utf8ToWide(p));
+#else
+                        s.append(p);
+#endif
                         s.append( Text.subString(CursorPos, Text.size()-CursorPos) );
 
                         if (!Max || s.size()<=Max) // thx to Fish FH for fix
                         {
                             Text = s;
-                            s = StringUtils::utf8_to_wide(p);
+#ifndef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+                            s = StringUtils::utf8ToWide(p);
+#else
+                            s = p;
+#endif
                             CursorPos += s.size();
                         }
                     }
@@ -346,13 +410,22 @@ bool CGUIEditBox::processKey(const SEvent& event)
                         // replace text
 
                         core::stringw s = Text.subString(0, realmbgn);
-                        s.append(StringUtils::utf8_to_wide(p));
+
+#ifndef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+                        s.append(StringUtils::utf8ToWide(p));
+#else
+                        s.append(p);
+#endif
                         s.append( Text.subString(realmend, Text.size()-realmend) );
 
                         if (!Max || s.size()<=Max)  // thx to Fish FH for fix
                         {
                             Text = s;
-                            s = StringUtils::utf8_to_wide(p);
+#ifndef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+                            s = StringUtils::utf8ToWide(p);
+#else
+                            s = p;
+#endif
                             CursorPos = realmbgn + s.size();
                         }
                     }
@@ -734,13 +807,108 @@ bool CGUIEditBox::processKey(const SEvent& event)
 
     calculateScrollPos();
 
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+    switch(event.KeyInput.Key)
+    {
+    // If cursor points the surrogate low, send KEY_LEFT event.
+    case KEY_UP:
+    case KEY_DOWN:
+        if (MultiLine || (WordWrap && BrokenText.size() > 1) )
+        {
+            if (UTF16_IS_SURROGATE_LO(Text[CursorPos]))
+            {
+                SEvent leftEvent;
+                leftEvent = event;
+                leftEvent.KeyInput.Key = KEY_LEFT;
+                Environment->postEventFromUser(leftEvent);
+            }
+        }
+        break;
+    // If cursor points the surrogate low, send a same event.
+    case KEY_LEFT:
+    case KEY_RIGHT:
+    case KEY_DELETE:
+        if (UTF16_IS_SURROGATE_LO(Text[CursorPos]))
+            Environment->postEventFromUser(event);
+        break;
+    // If cursor points front of the surrogate high, send a same event.
+    case KEY_BACK:
+        if (CursorPos > 0)
+        {
+            if (UTF16_IS_SURROGATE_HI(Text[CursorPos-1]))
+                Environment->postEventFromUser(event);
+        }
+        break;
+    default:
+        break;
+    }
+#endif
     return true;
 }
 
 
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+bool CGUIEditBox::processIMEEvent(const SEvent& event)
+{
+    switch(event.InputMethodEvent.Event)
+    {
+    case EIME_CHAR_INPUT:
+        inputChar(event.InputMethodEvent.Char);
+        return true;
+    case EIME_CHANGE_POS:
+    {
+        core::position2di pos = calculateICPos();
+
+        IGUIFont* font = OverrideFont;
+        IGUISkin* skin = Environment->getSkin();
+
+        if (!OverrideFont)
+            font = skin->getFont();
+
+        irr::updateICPos(event.InputMethodEvent.Handle, pos.X,pos.Y, font->getDimension(L"|").Height);
+
+        return true;
+    }
+    default:
+        break;
+    }
+
+    return false;
+}
+#endif
+
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_X11_DEVICE_)
+//! calculate the position of input composition window
+core::position2di CGUIEditBox::calculateICPos()
+{
+    core::position2di pos;
+    IGUIFont* font = OverrideFont;
+    IGUISkin* skin = Environment->getSkin();
+    if (!OverrideFont)
+        font = skin->getFont();
+
+    //drop the text that clipping on the right side
+    if (WordWrap | MultiLine)
+    {
+        // todo : It looks like a heavy drinker. Strange!!
+        pos.X = CurrentTextRect.LowerRightCorner.X - font->getDimension(Text.subString(CursorPos, BrokenTextPositions[getLineFromPos(CursorPos)] + BrokenText[getLineFromPos(CursorPos)].size() - CursorPos).c_str()).Width;
+        pos.Y = CurrentTextRect.UpperLeftCorner.Y + font->getDimension(L"|").Height + (Border ? 3 : 0) - ((MultiLine | WordWrap) ? 3 : 0);
+    }
+    else
+    {
+        pos.X = CurrentTextRect.LowerRightCorner.X - font->getDimension(Text.subString(CursorPos, Text.size() - CursorPos).c_str()).Width;
+        pos.Y = AbsoluteRect.getCenter().Y + (Border ? 3 : 0); //bug? The text is always drawn in the height of the center. SetTextAlignment() doesn't influence.
+    }
+
+    return pos;
+}
+
+
+#endif
 //! draws the element and its children
 void CGUIEditBox::draw()
 {
+#ifndef SERVER_ONLY
     if (!IsVisible)
         return;
 
@@ -849,20 +1017,12 @@ void CGUIEditBox::draw()
                     startPos = ml ? BrokenTextPositions[i] : 0;
                 }
 
-
-                if (m_rtl)
-                {
-                    font->draw(translations->fribidize(txtLine->c_str()), CurrentTextRect,
-                               OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
-                               false, true, &localClipRect);
-                }
-                else
-                {
-                    // draw normal text
-                    font->draw(txtLine->c_str(), CurrentTextRect,
-                        OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
-                        false, true, &localClipRect);
-                }
+                font->draw(translations->fribidize(txtLine->c_str()), CurrentTextRect,
+                           OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
+                           false, true, &localClipRect);
+                // draw with fribidize no matter what language, because in fribidize function,
+                // it will return the input pointer if (this->isRTLLanguage()) from Translations::isRTLText
+                // is false
 
                 // draw mark and marked text
                 if (focus && MarkBegin != MarkEnd && i >= hlineStart && i < hlineStart + hlineCount)
@@ -950,6 +1110,7 @@ void CGUIEditBox::draw()
 
     // draw children
     IGUIElement::draw();
+#endif
 }
 
 
@@ -1028,6 +1189,13 @@ bool CGUIEditBox::processMouse(const SEvent& event)
         if (Environment->hasFocus(this) && !m_rtl)
         {
             CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+            if (UTF16_IS_SURROGATE_LO(Text[CursorPos]))
+            {
+                if (CursorPos > 0)
+                    --CursorPos;
+            }
+#endif
             if (MouseMarking)
             {
                 setTextMarkers( MarkBegin, CursorPos );
@@ -1042,6 +1210,13 @@ bool CGUIEditBox::processMouse(const SEvent& event)
             if (MouseMarking)
             {
                 CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+                if (UTF16_IS_SURROGATE_LO(Text[CursorPos]))
+                {
+                    if (CursorPos > 0)
+                        --CursorPos;
+                }
+#endif
                 setTextMarkers( MarkBegin, CursorPos );
                 calculateScrollPos();
                 return true;
@@ -1054,8 +1229,16 @@ bool CGUIEditBox::processMouse(const SEvent& event)
             BlinkStartTime = getTime();
             MouseMarking = true;
             CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+            if (UTF16_IS_SURROGATE_LO(Text[CursorPos]))
+            {
+                if (CursorPos > 0)
+                    --CursorPos;
+            }
+#endif
             setTextMarkers(CursorPos, CursorPos );
             calculateScrollPos();
+
             return true;
         }
         else if (!m_rtl)
@@ -1065,11 +1248,31 @@ bool CGUIEditBox::processMouse(const SEvent& event)
             {
                 return false;
             }
+            else if (UserConfigParams::m_screen_keyboard)
+            {
+                CursorPos = Text.size();
+                setTextMarkers(CursorPos, CursorPos);
+                calculateScrollPos();
+
+                if (GUIEngine::ScreenKeyboard::getCurrent() == NULL)
+                {
+                    new GUIEngine::ScreenKeyboard(0.98f, 0.30f, this);
+                }
+
+                return true;
+            }
             else
             {
                 // move cursor
                 CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
 
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+                if (UTF16_IS_SURROGATE_LO(Text[CursorPos]))
+                {
+                    if (CursorPos > 0)
+                        --CursorPos;
+                }
+#endif
                 s32 newMarkBegin = MarkBegin;
                 if (!MouseMarking)
                     newMarkBegin = CursorPos;
@@ -1077,6 +1280,7 @@ bool CGUIEditBox::processMouse(const SEvent& event)
                 MouseMarking = true;
                 setTextMarkers( newMarkBegin, CursorPos);
                 calculateScrollPos();
+
                 return true;
             }
         }
@@ -1160,11 +1364,10 @@ void CGUIEditBox::breakText()
     s32 size = Text.size();
     s32 length = 0;
     s32 elWidth = RelativeRect.getWidth() - 6;
-    wchar_t c;
 
     for (s32 i=0; i<size; ++i)
     {
-        c = Text[i];
+        wchar_t c = Text[i];
         bool lineBreak = false;
 
         if (c == L'\r') // Mac or Windows breaks
@@ -1382,6 +1585,7 @@ void CGUIEditBox::inputChar(wchar_t c)
 
 void CGUIEditBox::calculateScrollPos()
 {
+#ifndef SERVER_ONLY
     if (!AutoScroll)
         return;
 
@@ -1428,6 +1632,14 @@ void CGUIEditBox::calculateScrollPos()
         VScrollPos = 0;
 
     // todo: adjust scrollbar
+#if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
+    CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
+    if (dl)
+    {
+        dl->setIMELocation(calculateICPos());
+    }
+#endif
+#endif   // SERVER_ONLY
 }
 
 //! set text markers

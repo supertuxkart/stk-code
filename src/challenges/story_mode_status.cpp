@@ -23,6 +23,7 @@
 #include "challenges/challenge_data.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
 
@@ -67,6 +68,9 @@ void StoryModeStatus::addStatus(ChallengeStatus *cs)
 //-----------------------------------------------------------------------------
 bool StoryModeStatus::isLocked(const std::string& feature)
 {
+    if (UserConfigParams::m_everything_unlocked)
+        return false;
+
     return m_locked_features.find(feature)!=m_locked_features.end();
 }  // featureIsLocked
 

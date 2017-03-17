@@ -130,6 +130,10 @@ ParticleKind::ParticleKind(const std::string &file)
     {
         material->get("file", &m_material_file);
 
+        core::stringc tmp(m_material_file.c_str());
+        tmp.make_lower();
+        m_material_file = tmp.c_str();
+
         if (m_material_file.size() == 0)
         {
             delete xml;
@@ -257,7 +261,7 @@ Material* ParticleKind::getMaterial() const
     if (material_manager->hasMaterial(m_material_file))
     {
         Material* material = material_manager->getMaterial(m_material_file);
-        if (material->getTexture() == NULL)
+        if (material == NULL || material->getTexture(true/*srgb*/, true/*premul_alpha*/) == NULL)
         {
             throw std::runtime_error("[ParticleKind] Cannot locate file " + m_material_file);
         }

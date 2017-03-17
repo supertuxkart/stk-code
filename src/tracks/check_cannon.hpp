@@ -37,7 +37,8 @@ class CheckCannon : public CheckLine
 {
 private:
     /** The target point the kart will fly to. */
-    core::line3df   m_target;
+    Vec3 m_target_left;
+    Vec3 m_target_right;
 
     /** Stores the cannon curve data. */
     Ipo *m_curve;
@@ -46,12 +47,16 @@ private:
     /** If track debugging is enabled, this will show the the curve of
      *  the cannon in the race. */
     ShowCurve * m_show_curve;
+
+    /** Used to display debug information about checklines. */
+    scene::IMeshSceneNode *m_debug_target_node;
 #endif
 
 public:
              CheckCannon(const XMLNode &node, unsigned int index);
     virtual ~CheckCannon();
     virtual void trigger(unsigned int kart_index);
+    virtual void changeDebugColor(bool is_active);
 };   // CheckLine
 
 #endif

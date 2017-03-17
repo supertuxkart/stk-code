@@ -19,14 +19,14 @@
 #include "graphics/slip_stream.hpp"
 #include "graphics/central_settings.hpp"
 #include "config/user_config.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "io/file_manager.hpp"
-#include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
 #include "modes/world.hpp"
@@ -51,10 +51,12 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
     scene::IMeshBuffer* buffer = m_mesh->getMeshBuffer(0);
     material->setMaterialProperties(&buffer->getMaterial(), buffer);
 
+#ifndef SERVER_ONLY
     STKMeshSceneNode* stk_node = dynamic_cast<STKMeshSceneNode*>(m_node);
     if (stk_node != NULL)
         stk_node->setReloadEachFrame(true);
     m_mesh->drop();
+#endif
 
 #ifdef DEBUG
     std::string debug_name = m_kart->getIdent()+" (slip-stream)";
@@ -67,11 +69,9 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
     setTextureMatrix(&(m_node->getMaterial(0).getTextureMatrix(0)));
     m_slipstream_time      = 0.0f;
 
-    float length = m_kart->getKartProperties()->getSlipstreamLength() *
-                   m_kart->getPlayerDifficulty()->getSlipstreamLength();
+    float length = m_kart->getKartProperties()->getSlipstreamLength();
     float kw     = m_kart->getKartWidth();
-    float ew     = m_kart->getKartProperties()->getSlipstreamWidth() *
-                   m_kart->getPlayerDifficulty()->getSlipstreamWidth();
+    float ew     = m_kart->getKartProperties()->getSlipstreamWidth();
     float kl     = m_kart->getKartLength();
 
     Vec3 p[4];
@@ -79,7 +79,6 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
     p[1]=Vec3(-ew*0.5f, 0, -kl*0.5f-length);
     p[2]=Vec3( ew*0.5f, 0, -kl*0.5f-length);
     p[3]=Vec3( kw*0.5f, 0, -kl*0.5f       );
-    m_slipstream_original_quad = new Quad(p[0], p[1], p[2], p[3]);
     m_slipstream_quad          = new Quad(p[0], p[1], p[2], p[3]);
     if(UserConfigParams::m_slipstream_debug)
     {
@@ -102,8 +101,10 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
         }
         video::SMaterial &mat = buffer->getMaterial();
         // Meshes need a texture, otherwise stk crashes.
-        video::ITexture *red_texture = getUnicolorTexture(red);
+#ifndef SERVER_ONLY
+        video::ITexture *red_texture = STKTexManager::getInstance()->getUnicolorTexture(red);
         mat.setTexture(0, red_texture);
+#endif
 
         buffer->recalculateBoundingBox();
         m_mesh->setBoundingBox(buffer->getBoundingBox());
@@ -129,7 +130,6 @@ SlipStream::~SlipStream()
         m_debug_node->drop();
         m_debug_mesh->drop();
     }
-    delete m_slipstream_original_quad;
     delete m_slipstream_quad;
 
 }   // ~SlipStream
@@ -235,7 +235,9 @@ void SlipStream::createMesh(Material* material)
     }   // for j<num_circles-1
 
     material->setMaterialProperties(&buffer->getMaterial(), buffer);
+#ifndef SERVER_ONLY
     if (!CVS->isGLSL())
+#endif
     {
         buffer->Material.setFlag(video::EMF_BACK_FACE_CULLING, false);
         buffer->Material.setFlag(video::EMF_COLOR_MATERIAL, true);
@@ -314,8 +316,7 @@ void SlipStream::setIntensity(float f, const AbstractKart *kart)
 bool SlipStream::isSlipstreamReady() const
 {
     return m_slipstream_time>
-        m_kart->getKartProperties()->getSlipstreamCollectTime() *
-        m_kart->getPlayerDifficulty()->getSlipstreamCollectTime();
+        m_kart->getKartProperties()->getSlipstreamCollectTime();
 }   // isSlipstreamReady
 
 //-----------------------------------------------------------------------------
@@ -329,16 +330,12 @@ void SlipStream::updateSlipstreamPower()
     if(m_slipstream_mode==SS_USE)
     {
         setIntensity(2.0f, NULL);
-        const KartProperties *kp=m_kart->getKartProperties();
+        const KartProperties *kp = m_kart->getKartProperties();
         m_kart->increaseMaxSpeed(MaxSpeed::MS_INCREASE_SLIPSTREAM,
-                                kp->getSlipstreamMaxSpeedIncrease() *
-                                m_kart->getPlayerDifficulty()->getSlipstreamMaxSpeedIncrease(),
-                                kp->getSlipstreamAddPower() *
-                                m_kart->getPlayerDifficulty()->getSlipstreamAddPower(),
-                                kp->getSlipstreamDuration() *
-                                m_kart->getPlayerDifficulty()->getSlipstreamDuration(),
-                                kp->getSlipstreamFadeOutTime() *
-                                m_kart->getPlayerDifficulty()->getSlipstreamFadeOutTime());
+                                kp->getSlipstreamMaxSpeedIncrease(),
+                                kp->getSlipstreamAddPower(),
+                                kp->getSlipstreamDuration(),
+                                kp->getSlipstreamFadeOutTime());
     }
 }   // upateSlipstreamPower
 
@@ -368,17 +365,14 @@ void SlipStream::setDebugColor(const video::SColor &color)
  */
 void SlipStream::update(float dt)
 {
-    // Low level AIs should not do any slipstreaming.
-    if(m_kart->getController()->disableSlipstreamBonus())
+    const KartProperties *kp = m_kart->getKartProperties();
+
+    // Low level AIs and ghost karts should not do any slipstreaming.
+    if (m_kart->getController()->disableSlipstreamBonus()
+        || m_kart->isGhostKart())
         return;
 
     MovingTexture::update(dt);
-
-    // Update this karts slipstream quad (even for low level AI which don't
-    // use slipstream, since even then player karts can get slipstream,
-    // and so have to compare with the modified slipstream quad.
-    m_slipstream_original_quad->transform(m_kart->getTrans(),
-                                          m_slipstream_quad);
 
     if(m_slipstream_mode==SS_USE)
     {
@@ -394,8 +388,7 @@ void SlipStream::update(float dt)
     // not moving. This is useful for debugging the graphics of SS-ing.
 //#define DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
 #ifndef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
-    if(m_kart->getSpeed()<m_kart->getKartProperties()->getSlipstreamMinSpeed() *
-                          m_kart->getPlayerDifficulty()->getSlipstreamMinSpeed())
+    if(m_kart->getSpeed() < kp->getSlipstreamMinSpeed())
     {
         setIntensity(0, NULL);
         m_slipstream_mode = SS_NONE;
@@ -419,29 +412,29 @@ void SlipStream::update(float dt)
     {
         m_target_kart= world->getKart(i);
         // Don't test for slipstream with itself, a kart that is being
-        // rescued or exploding, or an eliminated kart
+        // rescued or exploding, a ghost kart or an eliminated kart
         if(m_target_kart==m_kart               ||
             m_target_kart->getKartAnimation()  ||
+            m_target_kart->isGhostKart()       ||
             m_target_kart->isEliminated()        ) continue;
 
-        float diff = fabsf(m_target_kart->getXYZ().getY()
-                           - m_kart->getXYZ().getY()      );
+        // Transform this kart location into target kart point of view
+        Vec3 lc = m_target_kart->getTrans().inverse()(m_kart->getXYZ());
+
         // If the kart is 'on top' of this kart (e.g. up on a bridge),
         // don't consider it for slipstreaming.
+        if (fabsf(lc.y()) > 6.0f) continue;
 
-        if(diff>6.0f) continue;
         // If the kart we are testing against is too slow, no need to test
         // slipstreaming. Note: We compare the speed of the other kart
         // against the minimum slipstream speed kart of this kart - not
         // entirely sure if this makes sense, but it makes it easier to
         // give karts different slipstream properties.
 #ifndef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
-        if(m_target_kart->getSpeed() <
-            m_kart->getKartProperties()->getSlipstreamMinSpeed() *
-            m_kart->getPlayerDifficulty()->getSlipstreamMinSpeed())
+        if (m_target_kart->getSpeed() < kp->getSlipstreamMinSpeed())
         {
             if(UserConfigParams::m_slipstream_debug &&
-                m_kart->getController()->isPlayerController())
+                m_kart->getController()->isLocalPlayerController())
                 m_target_kart->getSlipstream()
                               ->setDebugColor(video::SColor(255, 0, 0, 0));
 
@@ -452,27 +445,26 @@ void SlipStream::update(float dt)
         // slipstream length+0.5*kart_length()+0.5*target_kart_length
         // away from the other kart
         Vec3 delta = m_kart->getXYZ() - m_target_kart->getXYZ();
-        float l    = m_kart->getKartProperties()->getSlipstreamLength() *
-                     m_kart->getPlayerDifficulty()->getSlipstreamLength()
+        float l    = kp->getSlipstreamLength()
                    + 0.5f*( m_target_kart->getKartLength()
                            +m_kart->getKartLength()        );
-        if(delta.length2_2d() > l*l)
+        if(delta.length2() > l*l)
         {
             if(UserConfigParams::m_slipstream_debug &&
-                m_kart->getController()->isPlayerController())
+                m_kart->getController()->isLocalPlayerController())
                 m_target_kart->getSlipstream()
                              ->setDebugColor(video::SColor(255, 0, 0, 128));
             continue;
         }
         // Real test: if in slipstream quad of other kart
         if(m_target_kart->getSlipstream()->m_slipstream_quad
-                                         ->pointInQuad(m_kart->getXYZ()))
+                                         ->pointInside(lc))
         {
             is_sstreaming     = true;
             break;
         }
         if(UserConfigParams::m_slipstream_debug &&
-            m_kart->getController()->isPlayerController())
+            m_kart->getController()->isLocalPlayerController())
             m_target_kart->getSlipstream()
                          ->setDebugColor(video::SColor(255, 0, 0, 255));
     }   // for i < num_karts
@@ -480,7 +472,7 @@ void SlipStream::update(float dt)
     if(!is_sstreaming)
     {
         if(UserConfigParams::m_slipstream_debug &&
-            m_kart->getController()->isPlayerController())
+            m_kart->getController()->isLocalPlayerController())
             m_target_kart->getSlipstream()
                          ->setDebugColor(video::SColor(255, 255, 0, 0));
 
@@ -493,9 +485,7 @@ void SlipStream::update(float dt)
             {
                 m_slipstream_mode = SS_USE;
                 m_kart->handleZipper();
-                m_slipstream_time =
-                    m_kart->getKartProperties()->getSlipstreamCollectTime() *
-                    m_kart->getPlayerDifficulty()->getSlipstreamCollectTime();
+                m_slipstream_time = kp->getSlipstreamCollectTime();
                 return;
             }
         }
@@ -506,7 +496,7 @@ void SlipStream::update(float dt)
     }   // if !is_sstreaming
 
     if(UserConfigParams::m_slipstream_debug &&
-        m_kart->getController()->isPlayerController())
+        m_kart->getController()->isLocalPlayerController())
         m_target_kart->getSlipstream()->setDebugColor(video::SColor(255, 0, 255, 0));
     // Accumulate slipstream credits now
     m_slipstream_time = m_slipstream_mode==SS_NONE ? dt
@@ -516,8 +506,7 @@ void SlipStream::update(float dt)
     setIntensity(m_slipstream_time, m_target_kart);
 
     m_slipstream_mode = SS_COLLECT;
-    if(m_slipstream_time>m_kart->getKartProperties()->getSlipstreamCollectTime() *
-                         m_kart->getPlayerDifficulty()->getSlipstreamCollectTime())
+    if (m_slipstream_time > kp->getSlipstreamCollectTime())
     {
         setIntensity(1.0f, m_target_kart);
     }

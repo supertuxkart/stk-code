@@ -686,7 +686,7 @@ namespace StringUtils
 
     // ------------------------------------------------------------------------
 
-    std::string wide_to_utf8(const wchar_t* input)
+    std::string wideToUtf8(const wchar_t* input)
     {
         static std::vector<char> utf8line;
         utf8line.clear();
@@ -695,11 +695,19 @@ namespace StringUtils
         utf8line.push_back(0);
 
         return std::string(&utf8line[0]);
-    }
+    }   // wideToUtf8
 
     // ------------------------------------------------------------------------
+    /** Converts the irrlicht wide string to an utf8-encoded std::string.
+     */
+    std::string wideToUtf8(const irr::core::stringw& input)
+    {
+        return wideToUtf8(input.c_str());
+    }   // wideToUtf8
 
-    irr::core::stringw utf8_to_wide(const char* input)
+    // ------------------------------------------------------------------------
+    /** Converts the irrlicht wide string to an utf8-encoded std::string. */
+    irr::core::stringw utf8ToWide(const char* input)
     {
         static std::vector<wchar_t> utf16line;
         utf16line.clear();
@@ -708,7 +716,14 @@ namespace StringUtils
         utf16line.push_back(0);
 
         return irr::core::stringw(&utf16line[0]);
-    }
+    }   // utf8ToWide
+
+    // ------------------------------------------------------------------------
+    /** Converts a utf8-encoded std::string into an irrlicht wide string. */
+    irr::core::stringw utf8ToWide(const std::string &input)
+    {
+        return utf8ToWide(input.c_str());
+    }   // utf8ToWide
 
     // ------------------------------------------------------------------------
     /** Converts a version string (in the form of 'X.Y.Za-rcU' into an

@@ -144,8 +144,8 @@ void RibbonWidget::add()
     //int biggest_y = 0;
     const int button_y = 10;
 
-    const int one_button_space =
-        int(roundf((float)m_w / (float)subbuttons_amount));
+    const int one_button_space = (subbuttons_amount == 0 ? m_w :
+        int(roundf((float)m_w / (float)subbuttons_amount)));
 
     int widget_x = -1;
 
@@ -370,6 +370,9 @@ void RibbonWidget::add()
     m_element->setTabOrder(id);
     m_element->setTabGroup(false);
     updateSelection();
+
+    if (!m_is_visible)
+        setVisible(false);
 }   // add
 
 // ----------------------------------------------------------------------------
@@ -662,6 +665,26 @@ void RibbonWidget::updateSelection()
 
     if (m_listener) m_listener->onSelectionChange();
 }   // updateSelection
+
+// ----------------------------------------------------------------------------
+EventPropagation RibbonWidget::onActivationInput(const int playerID)
+{
+    assert(m_magic_number == 0xCAFEC001);
+
+    if (m_deactivated)
+        return EVENT_BLOCK;
+
+    if (m_selection[playerID] > -1 &&
+        m_selection[playerID] < (int)(m_active_children.size()))
+    {
+        if (m_active_children[m_selection[playerID]].m_deactivated)
+        {
+            return EVENT_BLOCK;
+        }
+    }
+
+    return EVENT_LET;
+}
 
 // ----------------------------------------------------------------------------
 EventPropagation RibbonWidget::transmitEvent(Widget* w,

@@ -25,9 +25,10 @@ CGUISTKListBox::CGUISTKListBox(IGUIEnvironment* environment, IGUIElement* parent
             bool drawBack, bool moveOverSelect)
 : IGUIElement(EGUIET_LIST_BOX, environment, parent, id, rectangle), Selected(-1),
     ItemHeight(0),ItemHeightOverride(0),
-    TotalItemHeight(0), ItemsIconWidth(0), Font(0), IconBank(0),
-    ScrollBar(0), selectTime(0), Selecting(false), DrawBack(drawBack),
-    MoveOverSelect(moveOverSelect), AutoScroll(true), HighlightWhenNotFocused(true)
+    TotalItemHeight(0), ItemsIconWidth(0), MousePosY(0), Font(0), IconBank(0),
+    ScrollBar(0), selectTime(0), Selecting(false), Moving(false),
+    DrawBack(drawBack), MoveOverSelect(moveOverSelect), AutoScroll(true),
+    HighlightWhenNotFocused(true)
 {
     #ifdef _DEBUG
     setDebugName("CGUISTKListBox");
@@ -334,10 +335,12 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
             case gui::EGET_ELEMENT_FOCUS_LOST:
                 {
                     if (event.GUIEvent.Caller == this)
+                    {
+                        Moving = false;
                         Selecting = false;
+                    }
                     break;
                 }
-
             default:
             break;
             }
@@ -356,6 +359,8 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
                 case EMIE_LMOUSE_PRESSED_DOWN:
                 {
                     Selecting = true;
+                    Moving = false;
+                    MousePosY = event.MouseInput.Y;
                     return true;
                 }
 
@@ -363,20 +368,32 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
                 {
                     Selecting = false;
 
-                    if (isPointInside(p))
+                    if (isPointInside(p) && !Moving)
                         selectNew(event.MouseInput.Y);
 
                     return true;
                 }
 
                 case EMIE_MOUSE_MOVED:
-                    if (Selecting || MoveOverSelect)
+                    if (!event.MouseInput.isLeftPressed())
                     {
-                        if (isPointInside(p))
-                        {
-                            selectNew(event.MouseInput.Y, true);
-                            return true;
-                        }
+                        Selecting = false;
+                        Moving = false;
+                    }
+
+                    if (Selecting &&
+                        fabs(event.MouseInput.Y - MousePosY) > ItemHeight/3)
+                    {
+                        Moving = true;
+                        Selecting = false;
+                        MousePosY = event.MouseInput.Y;
+                    }
+
+                    if (Moving)
+                    {
+                        int pos = ScrollBar->getPos() - event.MouseInput.Y + MousePosY;
+                        ScrollBar->setPos(pos);
+                        MousePosY = event.MouseInput.Y;
                     }
                 default:
                 break;
@@ -388,6 +405,8 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
         case EET_JOYSTICK_INPUT_EVENT:
         case EGUIET_FORCE_32_BIT:
             break;
+        default:
+            break;
         }
     }
 
@@ -397,16 +416,15 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
 
 void CGUISTKListBox::selectNew(s32 ypos, bool onlyHover)
 {
-    u32 now = (u32)StkTime::getTimeSinceEpoch();
+    u32 now = (u32)StkTime::getRealTime() * 1000;
     s32 oldSelected = Selected;
 
     Selected = getItemAt(AbsoluteRect.UpperLeftCorner.X, ypos);
-    if (Selected<0 && !Items.empty())
+    if (Selected < 0 && !Items.empty())
         Selected = 0;
 
     recalculateScrollPos();
 
-    gui::EGUI_EVENT_TYPE eventType = (Selected == oldSelected && now < selectTime + 500) ? EGET_LISTBOX_SELECTED_AGAIN : EGET_LISTBOX_CHANGED;
     selectTime = now;
     // post the news
     if (Parent && !onlyHover)
@@ -415,7 +433,14 @@ void CGUISTKListBox::selectNew(s32 ypos, bool onlyHover)
         event.EventType = EET_GUI_EVENT;
         event.GUIEvent.Caller = this;
         event.GUIEvent.Element = 0;
-        event.GUIEvent.EventType = eventType;
+        
+#if !defined(ANDROID)
+        if (Selected != oldSelected /*|| now < selectTime + 500*/)
+            event.GUIEvent.EventType = EGET_LISTBOX_CHANGED;
+        else
+#endif
+            event.GUIEvent.EventType = EGET_LISTBOX_SELECTED_AGAIN;
+            
         Parent->OnEvent(event);
     }
 }
@@ -637,12 +662,11 @@ void CGUISTKListBox::recalculateIconWidth()
 
 void CGUISTKListBox::setCell(u32 row_num, u32 col_num, const wchar_t* text, s32 icon)
 {
-    if ( row_num >= Items.size() )
+    if ( row_num >= Items.size() || col_num >= Items[row_num].m_contents.size())
         return;
-        if ( col_num >= Items[row_num].m_contents.size() )
-                return;
-        Items[row_num].m_contents[col_num].m_text = text;
-        Items[row_num].m_contents[col_num].m_icon = icon;
+
+    Items[row_num].m_contents[col_num].m_text = text;
+    Items[row_num].m_contents[col_num].m_icon = icon;
 
     recalculateItemHeight();
     recalculateIconWidth();

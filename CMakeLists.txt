@@ -1,6 +1,6 @@
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
-set(PROJECT_VERSION "0.8.1")
+set(PROJECT_VERSION "0.9.1")
 
 cmake_minimum_required(VERSION 2.8.4)
 if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
@@ -15,11 +15,15 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "STKRelease")
 endif()
 
-option(USE_WIIUSE "Support for wiimote input devices" ON)
+option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
 option(ENABLE_NETWORK_MULTIPLAYER "Enable network multiplayer. This will replace the online profile GUI in the main menu with the network multiplayer GUI" OFF)
+
+if (UNIX AND NOT APPLE)
+    option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
+endif()
 
 if(MSVC AND (MSVC_VERSION LESS 1900))
     # Normally hide the option to build wiiuse on VS, since it depends
@@ -31,13 +35,15 @@ else()
     set(WIIUSE_BUILD ON)
 endif()
 
-if(MINGW OR CYGWIN)
-    set(USE_WIIUSE OFF)
+if(MINGW OR CYGWIN OR SERVER_ONLY)
+    option(USE_WIIUSE "Support for wiimote input devices" OFF)
+else()
+    option(USE_WIIUSE "Support for wiimote input devices" ON)
 endif()
 
 if(UNIX AND NOT APPLE)
-    option(USE_XRANDR "Use xrandr instead of vidmode" ON)
     option(USE_ASAN   "Build with Leak/Address sanitizer" OFF)
+    option(USE_LIBBFD "Use libbfd for crash reporting and leak check" OFF)
 endif()
 
 set(STK_SOURCE_DIR "src")
@@ -56,6 +62,16 @@ if(WIN32)
     set(ENV{LIB} ${PROJECT_SOURCE_DIR}/dependencies/lib)
     set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/dependencies)
     add_definitions(-D_IRR_STATIC_LIB_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
+endif()
+
+if(USE_GLES2)
+    add_definitions(-DUSE_GLES2)
+endif()
+
+if(SERVER_ONLY)
+    add_definitions(-DSERVER_ONLY)
+    add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
 endif()
 
 # Build the Bullet physics library
@@ -67,8 +83,11 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 
 # Build glew library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
-include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
+if(NOT USE_GLES2 AND NOT SERVER_ONLY)
+    add_definitions(-DGLEW_NO_GLU)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
+endif()
 
 if((WIN32 AND NOT MINGW) OR APPLE)
     if (NOT APPLE)
@@ -97,6 +116,12 @@ if((WIN32 AND NOT MINGW) OR APPLE)
     set(JPEG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/jpeglib/")
     set(JPEG_LIBRARY jpeglib)
 endif()
+
+if(NOT SERVER_ONLY AND NOT USE_GLES2)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
+endif()
+
 # Build the irrlicht library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
 include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
@@ -116,8 +141,8 @@ endif()
 include_directories(${STK_SOURCE_DIR})
 
 if(APPLE)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch i386")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch i386 -F/Library/Frameworks")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch x86_64")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch x86_64 -F/Library/Frameworks")
 elseif(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")   # Enable multi-processor compilation (faster)
 endif()
@@ -185,36 +210,38 @@ if(USE_FRIBIDI)
     endif()
 endif()
 
-# OpenMP
-find_package(OpenMP)
-if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+# OpenGL
+if(NOT USE_GLES2 AND NOT SERVER_ONLY)
+    find_package(OpenGL REQUIRED)
+    include_directories(${OPENGL_INCLUDE_DIR})
 endif()
 
-# OpenGL
-find_package(OpenGL REQUIRED)
-include_directories(${OPENGL_INCLUDE_DIR})
 
-if(UNIX AND NOT APPLE)
+if(UNIX AND NOT APPLE AND NOT SERVER_ONLY)
     find_package(X11 REQUIRED)
     include_directories(${X11_INCLUDE_DIR})
 
-    if(USE_XRANDR)
-        find_package(Xrandr REQUIRED)
-        if(NOT XRANDR_FOUND)
-            message(FATAL_ERROR "XRANDR not found.")
+    find_package(Xrandr REQUIRED)
+    if(NOT XRANDR_FOUND)
+        message(FATAL_ERROR "XRANDR not found.")
+    endif()
+
+    if(USE_LIBBFD)
+        find_package(Libbfd)
+        if(LIBBFD_FOUND)
+            add_definitions(-DENABLE_LIBBFD)
+            include_directories(${LIBBFD_INCLUDE_DIRS})
+        else()
+            set(USE_LIBBFD OFF CACHE BOOL "Use libbfd for crash reporting and leak check" FORCE)
+            message(WARNING "Libbfd not found, disable integrated stack trace.")
         endif()
-    else()
-        find_library(IRRLICHT_XF86VM_LIBRARY Xxf86vm)
-        mark_as_advanced(IRRLICHT_XF86VM_LIBRARY)
     endif()
 endif()
 
 # Set some compiler options
 if(UNIX OR MINGW)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-function")
 endif()
 
 if(MINGW AND CMAKE_BUILD_TYPE MATCHES Release)
@@ -257,7 +284,7 @@ endif()
 add_definitions(-DHAVE_OGGVORBIS)
 
 if(WIN32)
-    configure_file("${STK_SOURCE_DIR}/windows_installer/icon_rc.template" "${PROJECT_BINARY_DIR}/tmp/icon.rc")
+    configure_file("${STK_SOURCE_DIR}/../tools/windows_installer/icon_rc.template" "${PROJECT_BINARY_DIR}/tmp/icon.rc")
 endif()
 
 # Provides list of source and header files (STK_SOURCES and STK_HEADERS)
@@ -341,22 +368,26 @@ target_link_libraries(supertuxkart
     bulletcollision
     bulletmath
     enet
-    glew
     stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
-    ${OPENGL_LIBRARIES}
     ${FREETYPE_LIBRARIES}
     )
 
-if(UNIX AND NOT APPLE)
-    target_link_libraries(supertuxkart ${X11_LIBRARIES})
-    if(USE_XRANDR)
-        target_link_libraries(supertuxkart ${XRANDR_LIBRARIES})
+if(NOT SERVER_ONLY)
+    if(NOT USE_GLES2)
+        target_link_libraries(supertuxkart ${OPENGL_LIBRARIES} glew graphics_utils)
     else()
-        target_link_libraries(supertuxkart ${IRRLICHT_XF86VM_LIBRARY})
+        target_link_libraries(supertuxkart EGL GLESv2)
+    endif()
+endif()
+
+if(UNIX AND NOT APPLE)
+    target_link_libraries(supertuxkart ${X11_LIBRARIES} ${XRANDR_LIBRARIES})
+    if(USE_LIBBFD)
+        target_link_libraries(supertuxkart ${LIBBFD_LIBRARIES})
     endif()
     if(USE_ASAN)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
@@ -364,12 +395,17 @@ if(UNIX AND NOT APPLE)
     endif()
 endif()
 
+# FreeBSD does not search in /usr/local/lib, but at least Freetype is installed there :(
+if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/usr/local/lib")
+endif()
+
 if(APPLE)
     # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
     # unix-style installs of Vorbis/Ogg/OpenAL/etc. they will be picked up over our frameworks. This is blocking when I make releases :
     # the mac I use to make STK releases does have other installs of vorbis/ogg/etc. which aren't compatible with STK, so letting
     # CMake pick the library it wants essentially means I can't build.
-    set_target_properties(supertuxkart PROPERTIES LINK_FLAGS "-arch i386 -F/Library/Frameworks -framework OpenAL -framework Ogg -framework Vorbis")
+    set_target_properties(supertuxkart PROPERTIES LINK_FLAGS "-arch x86_64 -F/Library/Frameworks -framework OpenAL -framework Ogg -framework Vorbis")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/Library/Frameworks/OpenAL.framework/Versions/A/Headers")
 endif()
 
@@ -415,10 +451,6 @@ if(MINGW)
     find_library(LIBSTDCPP NAMES "libstdc++-6.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
     if(LIBSTDCPP)
         file(COPY ${LIBSTDCPP} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
-    endif()
-    find_library(LIBOPENMP NAMES "libgomp-1.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
-    if(LIBOPENMP)
-        file(COPY ${LIBOPENMP} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
     endif()
     find_library(LIBPTHREAD NAMES "winpthread-1.dll" "libwinpthread-1.dll" "pthreadGC2.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
     if(LIBPTHREAD)

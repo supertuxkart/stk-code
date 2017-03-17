@@ -35,6 +35,12 @@ Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 {
     m_target = NULL;
 
+    setDoTerrainInfo(false);
+
+    btVector3 gravity_vector;
+    btQuaternion q = kart->getTrans().getRotation();
+    gravity_vector = Vec3(0, -1, 0).rotate(q.getAxis(), q.getAngle());
+    gravity_vector = gravity_vector.normalize() * m_gravity;
     // A bit of a hack: the mass of this kinematic object is still 1.0
     // (see flyable), which enables collisions. I tried setting
     // collisionFilterGroup/mask, but still couldn't get this object to
@@ -61,7 +67,7 @@ Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
     float pitch = kart->getTerrainPitch(heading);
 
     // Find closest kart in front of the current one
-    const bool  backwards = kart->getControls().m_look_back;
+    const bool  backwards = kart->getControls().getLookBack();
     const AbstractKart *closest_kart=NULL;
     Vec3        direction;
     float       kart_dist_squared;
@@ -85,13 +91,14 @@ Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
                                        &fire_angle, &up_velocity);
 
         // apply transformation to the bullet object (without pitch)
-        trans.setRotation(btQuaternion(btVector3(0,1,0), fire_angle));
-
+        btQuaternion q;
+        q = trans.getRotation() * btQuaternion(btVector3(0, 1, 0), fire_angle);
+        trans.setRotation(q);
         m_initial_velocity = Vec3(0.0f, up_velocity, m_speed);
 
         createPhysics(forward_offset, m_initial_velocity,
                       new btCylinderShape(0.5f*m_extend),
-                      0.5f /* restitution */, -m_gravity,
+                      0.5f /* restitution */, gravity_vector,
                       true /* rotation */, false /* backwards */, &trans);
     }
     else
@@ -105,7 +112,7 @@ Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 
         createPhysics(forward_offset, m_initial_velocity,
                       new btCylinderShape(0.5f*m_extend),
-                      0.5f /* restitution */, -m_gravity,
+                      0.5f /* restitution */, gravity_vector,
                       true /* rotation */, backwards, &trans);
     }
 

@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/vao_manager.hpp"
 
 #include "graphics/central_settings.hpp"
@@ -39,14 +41,16 @@ VAOManager::VAOManager()
     {
         glGenBuffers(1, &instance_vbo[i]);
         glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[i]);
+#if !defined(USE_GLES2)
         if (CVS->supportsAsyncInstanceUpload())
         {
-            glBufferStorage(GL_ARRAY_BUFFER, 10000 * sizeof(InstanceDataDualTex), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
-            Ptr[i] = glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+            glBufferStorage(GL_ARRAY_BUFFER, 10000 * sizeof(InstanceDataThreeTex), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+            Ptr[i] = glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataThreeTex), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
         }
         else
+#endif
         {
-            glBufferData(GL_ARRAY_BUFFER, 10000 * sizeof(InstanceDataDualTex), 0, GL_STREAM_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, 10000 * sizeof(InstanceDataThreeTex), 0, GL_STREAM_DRAW);
         }
     }
 }
@@ -88,12 +92,14 @@ resizeBufferIfNecessary(size_t &lastIndex, size_t newLastIndex, size_t bufferSiz
         GLuint newVBO;
         glGenBuffers(1, &newVBO);
         glBindBuffer(type, newVBO);
+#if !defined(USE_GLES2)
         if (CVS->supportsAsyncInstanceUpload())
         {
             glBufferStorage(type, bufferSize *stride, 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
             Pointer = glMapBufferRange(type, 0, bufferSize * stride, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
         }
         else
+#endif
             glBufferData(type, bufferSize * stride, 0, GL_DYNAMIC_DRAW);
 
         if (id)
@@ -154,21 +160,12 @@ template<>
 void VAOInstanceUtil<InstanceDataSingleTex>::SetVertexAttrib()
 {
     SetVertexAttrib_impl();
-    glEnableVertexAttribArray(10);
-    glVertexAttribIPointer(10, 2, GL_UNSIGNED_INT, sizeof(InstanceDataSingleTex), (GLvoid*)(9 * sizeof(float)));
-    glVertexAttribDivisorARB(10, 1);
-}
-
-template<>
-void VAOInstanceUtil<InstanceDataDualTex>::SetVertexAttrib()
-{
-    SetVertexAttrib_impl();
-    glEnableVertexAttribArray(10);
-    glVertexAttribIPointer(10, 2, GL_UNSIGNED_INT, sizeof(InstanceDataDualTex), (GLvoid*)(9 * sizeof(float)));
-    glVertexAttribDivisorARB(10, 1);
     glEnableVertexAttribArray(11);
-    glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceDataDualTex), (GLvoid*)(9 * sizeof(float) + 2 * sizeof(unsigned)));
+    glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceDataSingleTex), (GLvoid*)(9 * sizeof(float)));
     glVertexAttribDivisorARB(11, 1);
+    glEnableVertexAttribArray(15);
+    glVertexAttribIPointer(15, 1, GL_INT, sizeof(InstanceDataSingleTex), (GLvoid*)(11 * sizeof(float)));
+    glVertexAttribDivisorARB(15, 1);
 }
 
 template<>
@@ -176,23 +173,53 @@ void VAOInstanceUtil<InstanceDataThreeTex>::SetVertexAttrib()
 {
     SetVertexAttrib_impl();
     glEnableVertexAttribArray(10);
-    glVertexAttribIPointer(10, 2, GL_UNSIGNED_INT, sizeof(InstanceDataThreeTex), (GLvoid*)(9 * sizeof(float)));
+    glVertexAttribPointer(10, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceDataThreeTex), (GLvoid*)(9 * sizeof(float)));
     glVertexAttribDivisorARB(10, 1);
     glEnableVertexAttribArray(11);
-    glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceDataThreeTex), (GLvoid*)(9 * sizeof(float) + 2 * sizeof(unsigned)));
+    glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceDataThreeTex), (GLvoid*)(13 * sizeof(float)));
     glVertexAttribDivisorARB(11, 1);
+    glEnableVertexAttribArray(12);
+    glVertexAttribIPointer(12, 2, GL_UNSIGNED_INT, sizeof(InstanceDataThreeTex), (GLvoid*)(13 * sizeof(float) + 2 * sizeof(unsigned)));
+    glVertexAttribDivisorARB(12, 1);
     glEnableVertexAttribArray(13);
-    glVertexAttribIPointer(13, 2, GL_UNSIGNED_INT, sizeof(InstanceDataThreeTex), (GLvoid*)(9 * sizeof(float) + 4 * sizeof(unsigned)));
+    glVertexAttribIPointer(13, 2, GL_UNSIGNED_INT, sizeof(InstanceDataThreeTex), (GLvoid*)(13 * sizeof(float) + 4 * sizeof(unsigned)));
     glVertexAttribDivisorARB(13, 1);
+    glEnableVertexAttribArray(15);
+    glVertexAttribIPointer(15, 1, GL_INT, sizeof(InstanceDataThreeTex), (GLvoid*)(13 * sizeof(float) + 6 * sizeof(unsigned)));;
+    glVertexAttribDivisorARB(15, 1);
+}
+
+template<>
+void VAOInstanceUtil<InstanceDataFourTex>::SetVertexAttrib()
+{
+    SetVertexAttrib_impl();
+    glEnableVertexAttribArray(10);
+    glVertexAttribPointer(10, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceDataFourTex), (GLvoid*)(9 * sizeof(float)));
+    glVertexAttribDivisorARB(10, 1);
+    glEnableVertexAttribArray(11);
+    glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceDataFourTex), (GLvoid*)(13 * sizeof(float)));
+    glVertexAttribDivisorARB(11, 1);
+    glEnableVertexAttribArray(12);
+    glVertexAttribIPointer(12, 2, GL_UNSIGNED_INT, sizeof(InstanceDataFourTex), (GLvoid*)(13 * sizeof(float) + 2 * sizeof(unsigned)));
+    glVertexAttribDivisorARB(12, 1);
+    glEnableVertexAttribArray(13);
+    glVertexAttribIPointer(13, 2, GL_UNSIGNED_INT, sizeof(InstanceDataFourTex), (GLvoid*)(13 * sizeof(float) + 4 * sizeof(unsigned)));
+    glVertexAttribDivisorARB(13, 1);
+    glEnableVertexAttribArray(14);
+    glVertexAttribIPointer(14, 2, GL_UNSIGNED_INT, sizeof(InstanceDataFourTex), (GLvoid*)(13 * sizeof(float) + 6 * sizeof(unsigned)));
+    glVertexAttribDivisorARB(14, 1);
+    glEnableVertexAttribArray(15);
+    glVertexAttribIPointer(15, 1, GL_INT, sizeof(InstanceDataFourTex), (GLvoid*)(13 * sizeof(float) + 8 * sizeof(unsigned)));
+    glVertexAttribDivisorARB(15, 1);
 }
 
 template<>
 void VAOInstanceUtil<GlowInstanceData>::SetVertexAttrib()
 {
     SetVertexAttrib_impl();
-    glEnableVertexAttribArray(12);
-    glVertexAttribPointer(12, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(GlowInstanceData), (GLvoid*)(9 * sizeof(float)));
-    glVertexAttribDivisorARB(12, 1);
+    glEnableVertexAttribArray(10);
+    glVertexAttribPointer(10, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(GlowInstanceData), (GLvoid*)(9 * sizeof(float)));
+    glVertexAttribDivisorARB(10, 1);
 }
 
 
@@ -200,21 +227,21 @@ void VAOManager::regenerateInstancedVAO()
 {
     cleanInstanceVAOs();
 
-    enum video::E_VERTEX_TYPE IrrVT[] = { video::EVT_STANDARD, video::EVT_2TCOORDS, video::EVT_TANGENTS };
+    enum video::E_VERTEX_TYPE IrrVT[] = { video::EVT_STANDARD, video::EVT_2TCOORDS, video::EVT_TANGENTS, video::EVT_SKINNED_MESH };
     for (unsigned i = 0; i < VTXTYPE_COUNT; i++)
     {
         video::E_VERTEX_TYPE tp = IrrVT[i];
         if (!vbo[tp] || !ibo[tp])
             continue;
         GLuint vao = createVAO(vbo[tp], ibo[tp], tp);
-        glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[InstanceTypeDualTex]);
-        VAOInstanceUtil<InstanceDataDualTex>::SetVertexAttrib();
-        InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, InstanceTypeDualTex)] = vao;
-
-        vao = createVAO(vbo[tp], ibo[tp], tp);
         glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[InstanceTypeThreeTex]);
         VAOInstanceUtil<InstanceDataThreeTex>::SetVertexAttrib();
         InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, InstanceTypeThreeTex)] = vao;
+
+        vao = createVAO(vbo[tp], ibo[tp], tp);
+        glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[InstanceTypeFourTex]);
+        VAOInstanceUtil<InstanceDataFourTex>::SetVertexAttrib();
+        InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, InstanceTypeFourTex)] = vao;
 
         vao = createVAO(vbo[tp], ibo[tp], tp);
         glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[InstanceTypeShadow]);
@@ -248,6 +275,8 @@ size_t VAOManager::getVertexPitch(enum VTXTYPE tp) const
         return getVertexPitchFromType(video::EVT_2TCOORDS);
     case VTXTYPE_TANGENT:
         return getVertexPitchFromType(video::EVT_TANGENTS);
+    case VTXTYPE_SKINNED_MESH:
+        return getVertexPitchFromType(video::EVT_SKINNED_MESH);
     default:
         assert(0 && "Wrong vtxtype");
         return -1;
@@ -266,6 +295,8 @@ VAOManager::VTXTYPE VAOManager::getVTXTYPE(video::E_VERTEX_TYPE type)
         return VTXTYPE_TCOORD;
     case video::EVT_TANGENTS:
         return VTXTYPE_TANGENT;
+    case video::EVT_SKINNED_MESH:
+        return VTXTYPE_SKINNED_MESH;
     }
 };
 
@@ -280,6 +311,8 @@ irr::video::E_VERTEX_TYPE VAOManager::getVertexType(enum VTXTYPE tp)
         return video::EVT_2TCOORDS;
     case VTXTYPE_TANGENT:
         return video::EVT_TANGENTS;
+    case VTXTYPE_SKINNED_MESH:
+        return video::EVT_SKINNED_MESH;
     }
 }
 
@@ -289,22 +322,26 @@ void VAOManager::append(scene::IMeshBuffer *mb, VTXTYPE tp)
     size_t old_idx_cnt = last_index[tp];
 
     regenerateBuffer(tp, old_vtx_cnt + mb->getVertexCount(), old_idx_cnt + mb->getIndexCount());
+#if !defined(USE_GLES2)
     if (CVS->supportsAsyncInstanceUpload())
     {
         void *tmp = (char*)VBOPtr[tp] + old_vtx_cnt * getVertexPitch(tp);
         memcpy(tmp, mb->getVertices(), mb->getVertexCount() * getVertexPitch(tp));
     }
     else
+#endif
     {
         glBindBuffer(GL_ARRAY_BUFFER, vbo[tp]);
         glBufferSubData(GL_ARRAY_BUFFER, old_vtx_cnt * getVertexPitch(tp), mb->getVertexCount() * getVertexPitch(tp), mb->getVertices());
     }
+#if !defined(USE_GLES2)
     if (CVS->supportsAsyncInstanceUpload())
     {
         void *tmp = (char*)IBOPtr[tp] + old_idx_cnt * sizeof(u16);
         memcpy(tmp, mb->getIndices(), mb->getIndexCount() * sizeof(u16));
     }
     else
+#endif
     {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[tp]);
         glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, old_idx_cnt * sizeof(u16), mb->getIndexCount() * sizeof(u16), mb->getIndices());
@@ -333,3 +370,5 @@ std::pair<unsigned, unsigned> VAOManager::getBase(scene::IMeshBuffer *mb)
     assert(It != mappedBaseIndex[tp].end());
     return std::pair<unsigned, unsigned>(vtx, It->second);
 }
+
+#endif   // !SERVER_ONLY

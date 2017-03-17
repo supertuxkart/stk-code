@@ -79,6 +79,12 @@ struct SExposedVideoData
 			void* X11Context;
 			unsigned long X11Window;
 		} OpenGLLinux;
+		
+		struct
+		{
+			//! The ANativeWindow object.
+			void* Window;
+		} OGLESAndroid;
 	};
 };
 

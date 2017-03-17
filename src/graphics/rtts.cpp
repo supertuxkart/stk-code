@@ -15,14 +15,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/rtts.hpp"
-#include "central_settings.hpp"
+
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
-#include "graphics/irr_driver.hpp"
-#include "graphics/post_processing.hpp"
+#include "graphics/materials.hpp"
 #include "utils/log.hpp"
-#include <ISceneManager.h>
 
 static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint internalFormat, GLint format, GLint type, unsigned mipmaplevel = 1)
 {
@@ -58,13 +59,15 @@ RTT::RTT(size_t width, size_t height)
     m_RH_FBO = NULL;
     using namespace video;
     using namespace core;
-
-    const dimension2du res(width, height);
+    
+    dimension2du res(int(width * UserConfigParams::m_scale_rtts_factor),
+                     int(height * UserConfigParams::m_scale_rtts_factor) );
+    
     const dimension2du half = res/2;
     const dimension2du quarter = res/4;
     const dimension2du eighth = res/8;
 
-    const u16 shadowside = 1024;
+    const u16 shadowside = u16(1024 * UserConfigParams::m_scale_rtts_factor);
     const dimension2du shadowsize0(shadowside, shadowside);
     const dimension2du shadowsize1(shadowside / 2, shadowside / 2);
     const dimension2du shadowsize2(shadowside / 4, shadowside / 4);
@@ -76,49 +79,76 @@ RTT::RTT(size_t width, size_t height)
 
     // All RTTs are currently RGBA16F mostly with stencil. The four tmp RTTs are the same size
     // as the screen, for use in post-processing.
+    
+    GLint rgba_internal_format = GL_RGBA16F;
+    GLint rgba_format = GL_BGRA;
+    GLint red_internal_format = GL_R16F;
+    GLint red32_internal_format = GL_R32F;
+    GLint red_format = GL_RED;
+    GLint rgb_format = GL_BGR;
+    GLint diffuse_specular_internal_format = GL_R11F_G11F_B10F;
+    GLint type = GL_FLOAT;
+    GLint srgb_internal_format = GL_SRGB8_ALPHA8;
+    
+#if defined(USE_GLES2)
+    if (!CVS->isEXTColorBufferFloatUsable())
+    {
+        rgba_internal_format = GL_RGBA8;
+        rgba_format = GL_RGBA;
+        red_internal_format = GL_R8;
+        red32_internal_format = GL_R8;
+        red_format = GL_RED;
+        rgb_format = GL_RGB;
+        diffuse_specular_internal_format = GL_RGBA8;
+        type = GL_UNSIGNED_BYTE;
+    }
+    
+    srgb_internal_format = GL_RGBA8;
+#endif
 
-    RenderTargetTextures[RTT_TMP1] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_TMP2] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_TMP3] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_TMP4] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
-    RenderTargetTextures[RTT_LINEAR_DEPTH] = generateRTT(res, GL_R32F, GL_RED, GL_FLOAT, linear_depth_mip_levels);
-    RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RGBA16F, GL_RGBA, GL_FLOAT);
-    RenderTargetTextures[RTT_COLOR] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_SRGB8_ALPHA8, GL_BGR, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_MLAA_TMP] = generateRTT(res, GL_SRGB8_ALPHA8, GL_BGR, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_MLAA_BLEND] = generateRTT(res, GL_SRGB8_ALPHA8, GL_BGR, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_SSAO] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
-    RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_DIFFUSE] = generateRTT(res, GL_R11F_G11F_B10F, GL_BGR, GL_FLOAT);
-    RenderTargetTextures[RTT_SPECULAR] = generateRTT(res, GL_R11F_G11F_B10F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_TMP1] = generateRTT(res, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_TMP2] = generateRTT(res, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_TMP3] = generateRTT(res, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_TMP4] = generateRTT(res, red_internal_format, red_format, type);
+    RenderTargetTextures[RTT_LINEAR_DEPTH] = generateRTT(res, red32_internal_format, red_format, type, linear_depth_mip_levels);
+    RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, rgba_internal_format, GL_RGBA, type);
+    RenderTargetTextures[RTT_COLOR] = generateRTT(res, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, srgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_TMP] = generateRTT(res, srgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_BLEND] = generateRTT(res, srgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_SSAO] = generateRTT(res, red_internal_format, red_format, type);
+    RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_DIFFUSE] = generateRTT(res, diffuse_specular_internal_format, rgb_format, type);
+    RenderTargetTextures[RTT_SPECULAR] = generateRTT(res, diffuse_specular_internal_format, rgb_format, type);
 
-    RenderTargetTextures[RTT_HALF1] = generateRTT(half, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_QUARTER1] = generateRTT(quarter, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_EIGHTH1] = generateRTT(eighth, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_HALF1_R] = generateRTT(half, GL_R16F, GL_RED, GL_FLOAT);
+    RenderTargetTextures[RTT_HALF1] = generateRTT(half, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_QUARTER1] = generateRTT(quarter, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_EIGHTH1] = generateRTT(eighth, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_HALF1_R] = generateRTT(half, red_internal_format, red_format, type);
 
-    RenderTargetTextures[RTT_HALF2] = generateRTT(half, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_QUARTER2] = generateRTT(quarter, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_EIGHTH2] = generateRTT(eighth, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_HALF2_R] = generateRTT(half, GL_R16F, GL_RED, GL_FLOAT);
+    RenderTargetTextures[RTT_HALF2] = generateRTT(half, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_QUARTER2] = generateRTT(quarter, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_EIGHTH2] = generateRTT(eighth, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_HALF2_R] = generateRTT(half, red_internal_format, red_format, type);
 
-    RenderTargetTextures[RTT_BLOOM_1024] = generateRTT(shadowsize0, GL_RGBA16F, GL_BGR, GL_FLOAT);
-    RenderTargetTextures[RTT_SCALAR_1024] = generateRTT(shadowsize0, GL_R32F, GL_RED, GL_FLOAT);
-    RenderTargetTextures[RTT_BLOOM_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
-    RenderTargetTextures[RTT_TMP_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
-	RenderTargetTextures[RTT_LENS_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_BLOOM_1024] = generateRTT(shadowsize0, rgba_internal_format, rgb_format, type);
+#if !defined(USE_GLES2)
+    RenderTargetTextures[RTT_SCALAR_1024] = generateRTT(shadowsize0, red32_internal_format, red_format, type);
+#endif
+    RenderTargetTextures[RTT_BLOOM_512] = generateRTT(shadowsize1, rgba_internal_format, rgb_format, type);
+    RenderTargetTextures[RTT_TMP_512] = generateRTT(shadowsize1, rgba_internal_format, rgb_format, type);
+    RenderTargetTextures[RTT_LENS_512] = generateRTT(shadowsize1, rgba_internal_format, rgb_format, type);
 	
-    RenderTargetTextures[RTT_BLOOM_256] = generateRTT(shadowsize2, GL_RGBA16F, GL_BGR, GL_FLOAT);
-    RenderTargetTextures[RTT_TMP_256] = generateRTT(shadowsize2, GL_RGBA16F, GL_BGR, GL_FLOAT);
-	RenderTargetTextures[RTT_LENS_256] = generateRTT(shadowsize2, GL_RGBA16F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_BLOOM_256] = generateRTT(shadowsize2, rgba_internal_format, rgb_format, type);
+    RenderTargetTextures[RTT_TMP_256] = generateRTT(shadowsize2, rgba_internal_format, rgb_format, type);
+    RenderTargetTextures[RTT_LENS_256] = generateRTT(shadowsize2, rgba_internal_format, rgb_format, type);
 	
-    RenderTargetTextures[RTT_BLOOM_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
-    RenderTargetTextures[RTT_TMP_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
-	RenderTargetTextures[RTT_LENS_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_BLOOM_128] = generateRTT(shadowsize3, rgba_internal_format, rgb_format, type);
+    RenderTargetTextures[RTT_TMP_128] = generateRTT(shadowsize3, rgba_internal_format, rgb_format, type);
+    RenderTargetTextures[RTT_LENS_128] = generateRTT(shadowsize3, rgba_internal_format, rgb_format, type);
 
     std::vector<GLuint> somevector;
     somevector.push_back(RenderTargetTextures[RTT_SSAO]);
-
     FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_NORMAL_AND_DEPTH]);
@@ -158,12 +188,12 @@ RTT::RTT(size_t width, size_t height)
     somevector.push_back(RenderTargetTextures[RTT_LINEAR_DEPTH]);
     FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
     somevector.clear();
+    
     somevector.push_back(RenderTargetTextures[RTT_HALF1]);
     FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_HALF1_R]);
     FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
-
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_HALF2]);
     FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
@@ -186,42 +216,44 @@ RTT::RTT(size_t width, size_t height)
     somevector.push_back(RenderTargetTextures[RTT_DISPLACE]);
     FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
     somevector.clear();
+    
     somevector.push_back(RenderTargetTextures[RTT_BLOOM_1024]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 1024, 1024));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize0.Width, shadowsize0.Height));
     somevector.clear();
+#if !defined(USE_GLES2)
     somevector.push_back(RenderTargetTextures[RTT_SCALAR_1024]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 1024, 1024));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize0.Width, shadowsize0.Height));
     somevector.clear();
+#endif
+    
     somevector.push_back(RenderTargetTextures[RTT_BLOOM_512]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 512, 512));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize1.Width, shadowsize1.Height));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_TMP_512]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 512, 512));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize1.Width, shadowsize1.Height));
 	somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_LENS_512]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 512, 512));
-
-
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize1.Width, shadowsize1.Height));
     somevector.clear();
+    
     somevector.push_back(RenderTargetTextures[RTT_BLOOM_256]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 256, 256));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize2.Width, shadowsize2.Height));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_TMP_256]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 256, 256));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize2.Width, shadowsize2.Height));
 	somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_LENS_256]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 256, 256));
-
-
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize2.Width, shadowsize2.Height));
     somevector.clear();
+    
     somevector.push_back(RenderTargetTextures[RTT_BLOOM_128]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize3.Width, shadowsize3.Height));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_TMP_128]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize3.Width, shadowsize3.Height));
 	somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_LENS_128]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize3.Width, shadowsize3.Height));
 
     if (CVS->isShadowEnabled())
     {
@@ -243,7 +275,7 @@ RTT::RTT(size_t width, size_t height)
         somevector.clear();
         somevector.push_back(RSM_Color);
         somevector.push_back(RSM_Normal);
-        m_RSM = new FrameBuffer(somevector, RSM_Depth, 1024, 1024, true);
+        m_RSM = new FrameBuffer(somevector, RSM_Depth, shadowsize0.Width, shadowsize0.Height, true);
 
         RH_Red = generateRTT3D(GL_TEXTURE_3D, 32, 16, 32, GL_RGBA16F, GL_RGBA, GL_FLOAT);
         RH_Green = generateRTT3D(GL_TEXTURE_3D, 32, 16, 32, GL_RGBA16F, GL_RGBA, GL_FLOAT);
@@ -265,10 +297,43 @@ RTT::RTT(size_t width, size_t height)
     glClearColor(.5, .5, .5, .5);
     glClear(GL_COLOR_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#if !defined(USE_GLES2)
+    if (CVS->isAZDOEnabled())
+    {
+        uint64_t handle =
+            glGetTextureSamplerHandleARB(getRenderTarget(RTT_DIFFUSE),
+            ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
+        glMakeTextureHandleResidentARB(handle);
+        m_prefilled_handles.push_back(handle);
+        handle =
+            glGetTextureSamplerHandleARB(getRenderTarget(RTT_SPECULAR),
+            ObjectPass2Shader::getInstance()->m_sampler_ids[1]);
+        glMakeTextureHandleResidentARB(handle);
+        m_prefilled_handles.push_back(handle);
+        handle =
+            glGetTextureSamplerHandleARB(getRenderTarget(RTT_HALF1_R),
+            ObjectPass2Shader::getInstance()->m_sampler_ids[2]);
+        glMakeTextureHandleResidentARB(handle);
+        m_prefilled_handles.push_back(handle);
+        handle =
+            glGetTextureSamplerHandleARB(getDepthStencilTexture(),
+            ObjectPass2Shader::getInstance()->m_sampler_ids[3]);
+        glMakeTextureHandleResidentARB(handle);
+        m_prefilled_handles.push_back(handle);
+    }
+#endif
 }
 
 RTT::~RTT()
 {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#if !defined(USE_GLES2)
+    if (CVS->isAZDOEnabled())
+    {
+        for (uint64_t& handle : m_prefilled_handles)
+            glMakeTextureHandleNonResidentARB(handle);
+    }
+#endif
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
     if (CVS->isShadowEnabled())
@@ -290,33 +355,5 @@ RTT::~RTT()
     }
 }
 
-void RTT::prepareRender(scene::ICameraSceneNode* camera)
-{
-    irr_driver->setRTT(this);
-    irr_driver->getSceneManager()->setActiveCamera(camera);
 
-}
-
-FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
-{
-    irr_driver->setRTT(this);
-
-    irr_driver->getSceneManager()->setActiveCamera(camera);
-
-    std::vector<IrrDriver::GlowData> glows;
-    irr_driver->computeMatrixesAndCameras(camera, m_width, m_height);
-    unsigned plc = irr_driver->updateLightsInfo(camera, dt);
-    irr_driver->uploadLightingData();
-    irr_driver->renderScene(camera, plc, glows, dt, false, true);
-    FrameBuffer* frame_buffer = irr_driver->getPostProcessing()->render(camera, false);
-
-    // reset
-    glViewport(0, 0,
-        irr_driver->getActualScreenSize().Width,
-        irr_driver->getActualScreenSize().Height);
-    irr_driver->setRTT(NULL);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    irr_driver->getSceneManager()->setActiveCamera(NULL);
-    return frame_buffer;
-}
+#endif   // !SERVER_ONLY

@@ -24,6 +24,7 @@
 
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
+#include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -74,15 +75,15 @@ namespace GUIEngine
         void updateSelection();
         
         /** Callbacks */
-        virtual EventPropagation rightPressed(const int playerID=0);
-        virtual EventPropagation leftPressed(const int playerID=0);
+        virtual EventPropagation rightPressed(const int playerID=0) OVERRIDE;
+        virtual EventPropagation leftPressed(const int playerID=0) OVERRIDE;
         virtual EventPropagation mouseHovered(Widget* child,
-                                              const int playerID);
+                                              const int playerID) OVERRIDE;
         virtual EventPropagation transmitEvent(Widget* w,
                                                const std::string& originator,
-                                               const int playerID=0);
-        virtual EventPropagation focused(const int playerID);
-        virtual void unfocused(const int playerID, Widget* new_focus);
+                                               const int playerID=0) OVERRIDE;
+        virtual EventPropagation focused(const int playerID) OVERRIDE;
+        virtual void unfocused(const int playerID, Widget* new_focus) OVERRIDE;
         
         PtrVector<irr::gui::IGUIStaticText, REF> m_labels;
         
@@ -108,7 +109,7 @@ namespace GUIEngine
         RibbonWidget(const RibbonType type=RIBBON_COMBO);
         virtual ~RibbonWidget();
         
-        void add();
+        virtual void add() OVERRIDE;
 
         /** Sets a listener that will be notified of changes on this ribbon.
          *  Does _not_ take ownership of the listener, i.e. will not delete it.
@@ -192,6 +193,8 @@ namespace GUIEngine
         void removeChildNamed(const char* name);
         
         PtrVector<Widget>& getRibbonChildren() { return m_children; }
+
+        virtual EventPropagation onActivationInput(const int playerID) OVERRIDE;
     };
 
 }

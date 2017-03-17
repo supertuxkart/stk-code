@@ -31,6 +31,7 @@
 #include "states_screens/help_screen_2.hpp"
 #include "states_screens/help_screen_3.hpp"
 #include "states_screens/help_screen_4.hpp"
+#include "states_screens/help_screen_5.hpp"
 #include "states_screens/state_manager.hpp"
 
 using namespace GUIEngine;
@@ -55,7 +56,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
 {
     if (name == "startTutorial")
     {
-        race_manager->setNumLocalPlayers(1);
+        race_manager->setNumPlayers(1);
         race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
         race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
         race_manager->setNumKarts( 1 );
@@ -76,7 +77,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
                       UserConfigParams::m_default_kart.c_str());
             UserConfigParams::m_default_kart.revertToDefaults();
         }
-        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+        race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
 
         // ASSIGN should make sure that only input from assigned devices
         // is read.
@@ -101,6 +102,8 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
             screen = HelpScreen3::getInstance();
         else if (selection == "page4")
             screen = HelpScreen4::getInstance();
+        else if (selection == "page5")
+            screen = HelpScreen5::getInstance();
         if(screen)
             StateManager::get()->replaceTopMostScreen(screen);
     }
@@ -118,7 +121,7 @@ void HelpScreen1::init()
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
     ButtonWidget* tutorial = getWidget<ButtonWidget>("startTutorial");
 
-    tutorial->setActive(StateManager::get()->getGameState() != 
+    tutorial->setActive(StateManager::get()->getGameState() !=
                                                        GUIEngine::INGAME_MENU);
 
     if (w != NULL)  w->select( "page1", PLAYER_ID_GAME_MASTER );

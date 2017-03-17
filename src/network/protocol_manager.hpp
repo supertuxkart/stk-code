@@ -37,17 +37,6 @@ class STKPeer;
 
 #define TIME_TO_KEEP_EVENTS 1.0
 
-/** \enum PROTOCOL_STATE
- *  \brief Defines the three states that a protocol can have.
- */
-enum ProtocolState
-{
-    PROTOCOL_STATE_INITIALISING, //!< The protocol is waiting to be started
-    PROTOCOL_STATE_RUNNING,      //!< The protocol is being updated everytime.
-    PROTOCOL_STATE_PAUSED,       //!< The protocol is paused.
-    PROTOCOL_STATE_TERMINATED    //!< The protocol is terminated/does not exist.
-};   // ProtocolState
-
 // ----------------------------------------------------------------------------
 /** \enum ProtocolRequestType
  *  \brief Defines actions that can be done about protocols.
@@ -57,48 +46,39 @@ enum ProtocolState
 enum ProtocolRequestType
 {
     PROTOCOL_REQUEST_START,     //!< Start a protocol
-    PROTOCOL_REQUEST_STOP,      //!< Stop a protocol
     PROTOCOL_REQUEST_PAUSE,     //!< Pause a protocol
     PROTOCOL_REQUEST_UNPAUSE,   //!< Unpause a protocol
     PROTOCOL_REQUEST_TERMINATE  //!< Terminate a protocol
 };   // ProtocolRequestType
 
 // ----------------------------------------------------------------------------
-/** \struct ProtocolInfo
- *  \brief Stores the information needed to manage protocols
- */
-typedef struct ProtocolInfo
-{
-    ProtocolState   m_state;      //!< The state of the protocol
-    Protocol*       m_protocol;   //!< A pointer to the protocol
-    uint32_t        m_id;         //!< The unique id of the protocol
-} ProtocolInfo;
-
-// ----------------------------------------------------------------------------
 /** \struct ProtocolRequest
  *  \brief Represents a request to do an action about a protocol.
  */
-typedef struct ProtocolRequest
+class ProtocolRequest
 {
+public:
     /** The type of request. */
     ProtocolRequestType m_type;
 
     /** The concerned protocol information. */
-    ProtocolInfo m_protocol_info; 
-} ProtocolRequest;
+    Protocol *m_protocol;
 
-// ----------------------------------------------------------------------------
-/** \struct ProtocolRequest
- *  \brief Used to pass the event to protocols that need it
- */
-typedef struct EventProcessingInfo
-{
-    Event* m_event;
-    double m_arrival_time;
-    std::vector<unsigned int> m_protocols_ids;
-} EventProcessingInfo;
+public:
+    ProtocolRequest(ProtocolRequestType type, Protocol *protocol)
+    {
+        m_type     = type;
+        m_protocol = protocol;
+    }   // ProtocolRequest
+    // ------------------------------------------------------------------------
+    /** Returns the request type. */
+    ProtocolRequestType getType() const { return m_type;  }
+    // ------------------------------------------------------------------------
+    /** Returns the protocol for this request. */
+    Protocol *getProtocol() { return m_protocol;  }
+};   // class ProtocolRequest;
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 /** \class ProtocolManager
  *  \brief Manages the protocols at runtime.
  *
@@ -108,123 +88,65 @@ typedef struct EventProcessingInfo
  *  protocol and give it to this singleton. The protocols are updated in a
  *  special thread, to ensure that they are processed independently from the
  *  frames per second. Then, the management of protocols is thread-safe: any
- *  object can start/pause/stop protocols whithout problems.
+ *  object can start/pause/... protocols whithout problems.
  */ 
 class ProtocolManager : public AbstractSingleton<ProtocolManager>,
                         public NoCopy
 {
     friend class AbstractSingleton<ProtocolManager>;
+private:
+
+    /** Contains the running protocols.
+     *  This stores the protocols that are either running or paused, their
+     *  state and their unique id. */
+    Synchronised<std::vector<Protocol*> >m_protocols;
+
+    /** Contains the network events to pass asynchronously to protocols
+     *  (i.e. from the separate ProtocolManager thread). */
+    Synchronised<std::vector<Event*> > m_events_to_process;
+
+    /** Contains the requests to start/pause etc... protocols. */
+    Synchronised< std::vector<ProtocolRequest> > m_requests;
+
+    /*! \brief The next id to assign to a protocol.
+     * This value is incremented by 1 each time a protocol is started.
+     * If a protocol has an id lower than this value, it means that it has
+     * been formerly started.
+     */
+    Synchronised<uint32_t> m_next_protocol_id;
+
+    /** When set to true, the main thread will exit. */
+    Synchronised<bool> m_exit;
+
+    // mutexes:
+    /*! Used to ensure that the protocol vector is used thread-safely.   */
+    pthread_mutex_t m_asynchronous_protocols_mutex;
+
+    /*! Asynchronous update thread.*/
+    pthread_t* m_asynchronous_update_thread;
+
+                 ProtocolManager();
+    virtual     ~ProtocolManager();
     static void* mainLoop(void *data);
-    public:
-        
-        virtual void abort();    
-        virtual void propagateEvent(Event* event);
-        virtual void sendMessage(Protocol* sender,
-                                 const NetworkString& message,
-                                 bool reliable = true);
-        virtual void sendMessage(Protocol* sender, STKPeer* peer,
-                                 const NetworkString& message,
-                                 bool reliable = true);
-        virtual void sendMessageExcept(Protocol* sender, STKPeer* peer,
-                                       const NetworkString& message,
-                                       bool reliable = true);
-        virtual uint32_t requestStart(Protocol* protocol);
-        virtual void requestStop(Protocol* protocol);
-        virtual void requestPause(Protocol* protocol);
-        virtual void requestUnpause(Protocol* protocol);
-        virtual void requestTerminate(Protocol* protocol);
-        virtual void update();
-        virtual void asynchronousUpdate();
-        virtual ProtocolState getProtocolState(uint32_t id);
-        virtual ProtocolState getProtocolState(Protocol* protocol);
-        virtual uint32_t  getProtocolID(Protocol* protocol);
-        virtual Protocol* getProtocol(uint32_t id);
-        virtual Protocol* getProtocol(ProtocolType type);
-        bool isServer();
-        int exit();
+    uint32_t     getNextProtocolId();
+    bool         sendEvent(Event* event);
 
-    protected:
-        // protected functions
-        /*!
-         * \brief Constructor
-         */
-        ProtocolManager();
-        /*!
-         * \brief Destructor
-         */
-        virtual ~ProtocolManager();
-        /*!
-         * \brief Assign an id to a protocol.
-         * This function will assign m_next_protocol_id as the protocol id.
-         * This id starts at 0 at the beginning and is increased by 1 each time
-         * a protocol starts.
-         * \param protocol_info : The protocol info that needs an id.
-         */
-        void                    assignProtocolId(ProtocolInfo* protocol_info);
+    virtual void startProtocol(Protocol *protocol);
+    virtual void terminateProtocol(Protocol *protocol);
+    virtual void asynchronousUpdate();
+    virtual void pauseProtocol(Protocol *protocol);
+    virtual void unpauseProtocol(Protocol *protocol);
 
-        virtual void startProtocol(ProtocolInfo &protocol);
-        /*!
-         * \brief Stops a protocol.
-         * Coes nothing. Noone can stop running protocols for now.
-         * \param protocol : ProtocolInfo to stop.
-         */
-        virtual void            stopProtocol(ProtocolInfo protocol);
-        /*!
-         * \brief Pauses a protocol.
-         * Pauses a protocol and tells it that it's being paused.
-         * \param protocol : ProtocolInfo to pause.
-         */
-        virtual void            pauseProtocol(ProtocolInfo protocol);
-        /*!
-         * \brief Unpauses a protocol.
-         * Unpauses a protocol and notifies it.
-         * \param protocol : ProtocolInfo to unpause.
-         */
-        virtual void            unpauseProtocol(ProtocolInfo protocol);
-        /*!
-         * \brief Notes that a protocol is terminated.
-         * Remove a protocol from the protocols vector.
-         * \param protocol : ProtocolInfo concerned.
-         */
-        virtual void            protocolTerminated(ProtocolInfo protocol);
-
-        bool sendEvent(EventProcessingInfo* event, bool synchronous);
-
-        // protected members
-        /** Contains the running protocols.
-         *  This stores the protocols that are either running or paused, their
-         * state and their unique id. */
-        Synchronised<std::vector<ProtocolInfo> >m_protocols;
-
-        /** Contains the network events to pass to protocols. */
-        Synchronised<std::vector<EventProcessingInfo> > m_events_to_process;
-
-        /** Contains the requests to start/stop etc... protocols. */
-        std::vector<ProtocolRequest>    m_requests;
-        /*! \brief The next id to assign to a protocol.
-         * This value is incremented by 1 each time a protocol is started.
-         * If a protocol has an id lower than this value, it means that it have
-         * been formerly started.
-         */
-        uint32_t                        m_next_protocol_id;
-
-        // mutexes:
-        /*! Used to ensure that the protocol vector is used thread-safely.   */
-        pthread_mutex_t                 m_asynchronous_protocols_mutex;
-        /*! Used to ensure that the request vector is used thread-safely.    */
-        pthread_mutex_t                 m_requests_mutex;
-        /*! Used to ensure that the protocol id is used in a thread-safe way.*/
-        pthread_mutex_t                 m_id_mutex;
-        /*! Used when need to quit.*/
-        pthread_mutex_t                 m_exit_mutex;
-
-        /*! Update thread.*/
-        pthread_t* m_update_thread;
-        /*! Asynchronous update thread.*/
-        pthread_t* m_asynchronous_update_thread;
-        /*! True if the thread is running. */
-        bool m_asynchronous_thread_running;
-
-};
+public:
+    virtual void      abort();
+    virtual void      propagateEvent(Event* event);
+    virtual uint32_t  requestStart(Protocol* protocol);
+    virtual void      requestPause(Protocol* protocol);
+    virtual void      requestUnpause(Protocol* protocol);
+    virtual void      requestTerminate(Protocol* protocol);
+    virtual void      update(float dt);
+    virtual Protocol* getProtocol(uint32_t id);
+    virtual Protocol* getProtocol(ProtocolType type);
+};   // class ProtocolManager
 
 #endif // PROTOCOL_MANAGER_HPP

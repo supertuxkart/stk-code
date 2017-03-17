@@ -19,6 +19,8 @@
 #include "script_track.hpp"
 
 #include "animations/three_d_animation.hpp"
+#include "font/digit_face.hpp"
+#include "font/font_manager.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/stk_text_billboard.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -26,6 +28,7 @@
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "modes/world.hpp"
+#include "scriptengine/property_animator.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "tracks/track.hpp"
@@ -64,7 +67,8 @@ namespace Scripting
           */
         ::TrackObject* getTrackObject(std::string* libraryInstance, std::string* objID)
         {
-            return World::getWorld()->getTrack()->getTrackObjectManager()->getTrackObject(*libraryInstance, *objID);
+            return ::Track::getCurrentTrack()->getTrackObjectManager()
+                          ->getTrackObject(*libraryInstance, *objID);
         }
 
         /** Creates a trigger at the specified location */
@@ -81,46 +85,46 @@ namespace Scripting
             ::TrackObject* tobj = new ::TrackObject(posi, hpr, scale,
                 "none", newtrigger, false /* isDynamic */, NULL /* physics settings */);
             tobj->setID(*triggerID);
-            World::getWorld()->getTrack()->getTrackObjectManager()->insertObject(tobj);
+            ::Track::getCurrentTrack()->getTrackObjectManager()->insertObject(tobj);
         }
 
         void createTextBillboard(std::string* text, SimpleVec3* location)
         {
-            core::stringw wtext = StringUtils::utf8_to_wide(text->c_str());
-            core::dimension2d<u32> textsize = GUIEngine::getHighresDigitFont()
-                ->getDimension(wtext.c_str());
-
-            assert(GUIEngine::getHighresDigitFont() != NULL);
+            core::stringw wtext = StringUtils::utf8ToWide(*text);
+            DigitFace* digit_face = font_manager->getFont<DigitFace>();
+            core::dimension2d<u32> textsize = digit_face->getDimension(wtext.c_str());
 
             core::vector3df xyz(location->getX(), location->getY(), location->getZ());
-
+#ifndef SERVER_ONLY
             if (CVS->isGLSL())
             {
-                gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-                STKTextBillboard* tb = new STKTextBillboard(wtext.c_str(), font,
+                STKTextBillboard* tb = new STKTextBillboard(wtext.c_str(), digit_face,
                     GUIEngine::getSkin()->getColor("font::bottom"),
                     GUIEngine::getSkin()->getColor("font::top"),
                     irr_driver->getSceneManager()->getRootSceneNode(),
                     irr_driver->getSceneManager(), -1, xyz,
                     core::vector3df(1.5f, 1.5f, 1.5f));
 
-                World::getWorld()->getTrack()->addNode(tb);
+                ::Track::getCurrentTrack()->addNode(tb);
+                tb->drop();
             }
             else
             {
+                assert(GUIEngine::getHighresDigitFont() != NULL);
                 scene::ISceneManager* sm = irr_driver->getSceneManager();
                 scene::ISceneNode* sn =
                     sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
-                    wtext.c_str(),
-                    NULL,
-                    core::dimension2df(textsize.Width / 35.0f,
-                    textsize.Height / 35.0f),
-                    xyz,
-                    -1, // id
-                    GUIEngine::getSkin()->getColor("font::bottom"),
-                    GUIEngine::getSkin()->getColor("font::top"));
-                World::getWorld()->getTrack()->addNode(sn);
+                        wtext.c_str(),
+                        NULL,
+                        core::dimension2df(textsize.Width / 35.0f,
+                            textsize.Height / 35.0f),
+                        xyz,
+                        -1, // id
+                        GUIEngine::getSkin()->getColor("font::bottom"),
+                        GUIEngine::getSkin()->getColor("font::top"));
+                ::Track::getCurrentTrack()->addNode(sn);
             }
+#endif
         }
 
         /** Exits the race to the main menu */
@@ -132,6 +136,53 @@ namespace Scripting
         void pauseRace()
         {
             new RacePausedDialog(0.8f, 0.6f);
+        }
+
+        int getNumberOfKarts()
+        {
+            return race_manager->getNumberOfKarts();
+        }
+
+        int getNumLocalPlayers()
+        {
+            return race_manager->getNumLocalPlayers();
+        }
+
+        bool isTrackReverse()
+        {
+            return race_manager->getReverseTrack();
+        }
+
+        void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)
+        {
+            PropertyAnimator* animator = PropertyAnimator::get();
+            ::Track* track = ::Track::getCurrentTrack();
+            animator->add(
+                new AnimatedProperty(FOG_MAX, 1,
+                    new double[1] { track->getFogMax() }, 
+                    new double[1] { maxDensity }, duration, track)
+            );
+            animator->add(
+                new AnimatedProperty(FOG_RANGE, 2,
+                    new double[2] { track->getFogStart(), track->getFogEnd() },
+                    new double[2] { start, end }, duration, track)
+            );
+
+            video::SColor color = track->getFogColor();
+            animator->add(
+                new AnimatedProperty(FOG_COLOR, 3,
+                    new double[3] { 
+                        (double)color.getRed(), 
+                        (double)color.getGreen(), 
+                        (double)color.getBlue() 
+                    },
+                    new double[3] { 
+                        (double)r,
+                        (double)g,
+                        (double)b
+                    }, 
+                    duration, track)
+            );
         }
     }
 
@@ -230,7 +281,12 @@ namespace Scripting
 
             void animateEnergy(float energy, float duration, /** \cond DOXYGEN_IGNORE */void *memory /** \endcond */)
             {
-                ((TrackObjectPresentationLight*)memory)->setEnergy(energy, duration);
+                TrackObjectPresentationLight* light = ((TrackObjectPresentationLight*)memory);
+                PropertyAnimator::get()->add(
+                    new AnimatedProperty(AP_LIGHT_ENERGY, 1,
+                    new double[1] { light->getEnergy() },
+                    new double[1] { energy }, duration, light)
+                );
             }
 
             /** @} */
@@ -326,6 +382,10 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("TrackObject@ getTrackObject(const string &in, const string &in)", asFUNCTION(getTrackObject), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void exitRace()", asFUNCTION(exitRace), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void pauseRace()", asFUNCTION(pauseRace), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)", asFUNCTION(setFog), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("int getNumberOfKarts()", asFUNCTION(getNumberOfKarts), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("int getNumLocalPlayers()", asFUNCTION(getNumLocalPlayers), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("bool isReverse()", asFUNCTION(isTrackReverse), asCALL_CDECL); assert(r >= 0);
 
             // TrackObject
             r = engine->RegisterObjectMethod("TrackObject", "void setEnabled(bool status)", asMETHOD(::TrackObject, setEnabled), asCALL_THISCALL); assert(r >= 0);

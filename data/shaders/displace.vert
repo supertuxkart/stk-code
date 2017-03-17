@@ -1,6 +1,6 @@
 uniform mat4 ModelMatrix;
 
-#if __VERSION__ >= 330
+#ifdef Explicit_Attrib_Location_Usable
 layout(location = 0) in vec3 Position;
 layout(location = 3) in vec2 Texcoord;
 layout(location = 4) in vec2 SecondTexcoord;
@@ -15,7 +15,7 @@ out vec2 uv_bis;
 out float camdist;
 
 void main() {
-	gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(Position, 1.);
+	gl_Position = ProjectionViewMatrix * ModelMatrix * vec4(Position, 1.);
 	uv = Texcoord;
 	uv_bis = SecondTexcoord;
 	camdist = length(ViewMatrix * ModelMatrix *  vec4(Position, 1.));

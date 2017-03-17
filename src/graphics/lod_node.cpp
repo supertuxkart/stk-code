@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/camera.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/material_manager.hpp"
@@ -253,7 +254,16 @@ void LODNode::OnRegisterSceneNode()
 
     m_previous_visibility = (shown ? WAS_SHOWN : WAS_HIDDEN);
     m_last_tick = now;
-
+#ifndef SERVER_ONLY
+    if (!CVS->isGLSL())
+    {
+        for (core::list<ISceneNode*>::Iterator it = Children.begin();
+            it != Children.end(); it++)
+        {
+            (*it)->updateAbsolutePosition();
+        }
+    }
+#endif
     scene::ISceneNode::OnRegisterSceneNode();
 }
 
@@ -287,5 +297,8 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
     node->drop();
 
     node->updateAbsolutePosition();
+#ifndef SERVER_ONLY
     irr_driver->applyObjectPassShader(node);
+#endif
 }
+

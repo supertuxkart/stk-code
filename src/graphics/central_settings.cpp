@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
 #include "graphics/central_settings.hpp"
 
 #include "config/user_config.hpp"
@@ -22,6 +23,7 @@
 #include "graphics/gl_headers.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/graphics_restrictions.hpp"
+
 
 CentralVideoSettings *CVS = new CentralVideoSettings();
 
@@ -33,9 +35,10 @@ void CentralVideoSettings::init()
     // Parse extensions
     hasVSLayer = false;
     hasBaseInstance = false;
-    hasBuffserStorage = false;
+    hasBufferStorage = false;
     hasDrawIndirect = false;
     hasComputeShaders = false;
+    hasArraysOfArrays = false;
     hasTextureStorage = false;
     hasTextureView = false;
     hasBindlessTexture = false;
@@ -45,11 +48,21 @@ void CentralVideoSettings::init()
     hasMultiDrawIndirect = false;
     hasTextureCompression = false;
     hasUBO = false;
+    hasExplicitAttribLocation = false;
     hasGS = false;
-    m_GI_has_artifact = false;
+    hasTextureFilterAnisotropic = false;
+    hasTextureSwizzle = false;
+    hasPixelBufferObject = false;
 
+#if defined(USE_GLES2)
+    hasBGRA = false;
+    hasColorBufferFloat = false;
+#endif
+
+    m_GI_has_artifact = false;
     m_need_rh_workaround = false;
     m_need_srgb_workaround = false;
+    m_need_srgb_visual_workaround = false;
 
     // Call to glGetIntegerv should not be made if --no-graphics is used
     if (!ProfileWorld::isNoGraphics())
@@ -65,8 +78,12 @@ void CentralVideoSettings::init()
         Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
         Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
     }
+#if !defined(USE_GLES2)
     m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1))
            && !UserConfigParams::m_force_legacy_device;
+#else
+    m_glsl = m_gl_major_version >= 3 && !UserConfigParams::m_force_legacy_device;
+#endif
     if (!ProfileWorld::isNoGraphics())
         initGL();
 
@@ -76,15 +93,20 @@ void CentralVideoSettings::init()
         std::string card((char*)(glGetString(GL_RENDERER)));
         GraphicsRestrictions::init(driver, card);
 
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE))
+        {
+            m_glsl = false;
+        }
+
+#if !defined(USE_GLES2)
         if (hasGLExtension("GL_AMD_vertex_shader_layer")) {
             hasVSLayer = true;
             Log::info("GLDriver", "AMD Vertex Shader Layer Present");
         }
-
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_BUFFER_STORAGE) &&
             hasGLExtension("GL_ARB_buffer_storage")  )
         {
-            hasBuffserStorage = true;
+            hasBufferStorage = true;
             Log::info("GLDriver", "ARB Buffer Storage Present");
         }
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_BASE_INSTANCE) &&
@@ -101,6 +123,11 @@ void CentralVideoSettings::init()
             hasGLExtension("GL_ARB_compute_shader")) {
             hasComputeShaders = true;
             Log::info("GLDriver", "ARB Compute Shader Present");
+        }
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_ARRAYS_OF_ARRAYS) &&
+            hasGLExtension("GL_ARB_arrays_of_arrays")) {
+            hasArraysOfArrays = true;
+            Log::info("GLDriver", "ARB Arrays of Arrays Present");
         }
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_TEXTURE_STORAGE) &&
             hasGLExtension("GL_ARB_texture_storage")) {
@@ -138,21 +165,43 @@ void CentralVideoSettings::init()
             Log::info("GLDriver", "ARB Multi Draw Indirect Present");
         }
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXT_TEXTURE_COMPRESSION_S3TC) &&
-            hasGLExtension("GL_EXT_texture_compression_s3tc")) {
+            hasGLExtension("GL_EXT_texture_compression_s3tc") &&
+            hasGLExtension("GL_ARB_texture_compression_rgtc"))
+        {
             hasTextureCompression = true;
             Log::info("GLDriver", "EXT Texture Compression S3TC Present");
+            Log::info("GLDriver", "ARB Texture Compression RGTC Present");
         }
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_UNIFORM_BUFFER_OBJECT) &&
             hasGLExtension("GL_ARB_uniform_buffer_object")) {
             hasUBO = true;
             Log::info("GLDriver", "ARB Uniform Buffer Object Present");
         }
-        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GEOMETRY_SHADER4) &&
-            hasGLExtension("GL_ARB_geometry_shader4")) {
-            hasGS = true;
-            Log::info("GLDriver", "ARB Geometry Shader 4 Present");
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXPLICIT_ATTRIB_LOCATION) &&
+            hasGLExtension("GL_ARB_explicit_attrib_location")) {
+            hasExplicitAttribLocation = true;
+            Log::info("GLDriver", "ARB Explicit Attrib Location Present");
         }
-
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_TEXTURE_FILTER_ANISOTROPIC) &&
+            hasGLExtension("GL_EXT_texture_filter_anisotropic")) {
+            hasTextureFilterAnisotropic = true;
+            Log::info("GLDriver", "EXT Texture Filter Anisotropic Present");
+        }
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GEOMETRY_SHADER) &&
+            (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 2))) {
+            hasGS = true;
+            Log::info("GLDriver", "Geometry Shaders Present");
+        }
+        if (hasGLExtension("GL_ARB_texture_swizzle"))
+        {
+            hasTextureSwizzle = true;
+            Log::info("GLDriver", "ARB Texture Swizzle Present");
+        }
+        if (hasGLExtension("GL_ARB_pixel_buffer_object"))
+        {
+            hasPixelBufferObject = true;
+            Log::info("GLDriver", "ARB Pixel Buffer Object Present");
+        }
         // Only unset the high def textures if they are set as default. If the
         // user has enabled them (bit 1 set), then leave them enabled.
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HIGHDEFINITION_TEXTURES) &&
@@ -179,17 +228,63 @@ void CentralVideoSettings::init()
             // Bindless textures are all treated RGB even sRGB one
             m_need_srgb_workaround = true;
         }
+
+        // Check if visual is sRGB-capable
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_CAPABLE) &&
+            m_glsl == true)
+        {
+            GLint param = GL_SRGB;
+            glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT,
+                              GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &param);
+            m_need_srgb_visual_workaround = (param != GL_SRGB);
+        }
+#else
+        if (m_glsl == true)
+        {
+            hasTextureStorage = true;
+            hasTextureSwizzle = true;
+        }
+
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXPLICIT_ATTRIB_LOCATION) &&
+            m_glsl == true)
+        {
+            Log::info("GLDriver", "Explicit Attrib Location Present");
+            hasExplicitAttribLocation = true;
+        }
+
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_TEXTURE_FORMAT_BGRA8888) &&
+            (hasGLExtension("GL_IMG_texture_format_BGRA8888") ||
+             hasGLExtension("GL_EXT_texture_format_BGRA8888")))
+        {
+            hasBGRA = true;
+            Log::info("GLDriver", "EXT texture format BGRA8888 Present");
+        }
+
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_COLOR_BUFFER_FLOAT) &&
+            hasGLExtension("GL_EXT_color_buffer_float"))
+        {
+            hasColorBufferFloat = true;
+            Log::info("GLDriver", "EXT Color Buffer Float Present");
+        }
+#endif
     }
 }
 
 unsigned CentralVideoSettings::getGLSLVersion() const
 {
+#if defined(USE_GLES2)
+    if (m_gl_major_version >= 3)
+        return 300;
+    else
+        return 100;
+#else
     if (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version == 3))
         return m_gl_major_version * 100 + m_gl_minor_version * 10;
     else if (m_gl_major_version == 3)
         return 100 + (m_gl_minor_version + 3) * 10;
     else
         return 120;
+#endif
 }
 
 bool CentralVideoSettings::isGLSL() const
@@ -207,7 +302,12 @@ bool CentralVideoSettings::needsRGBBindlessWorkaround() const
     return m_need_srgb_workaround;
 }
 
-bool CentralVideoSettings::isARBGeometryShader4Usable() const
+bool CentralVideoSettings::needsSRGBCapableVisualWorkaround() const
+{
+    return m_need_srgb_visual_workaround;
+}
+
+bool CentralVideoSettings::isARBGeometryShadersUsable() const
 {
     return hasGS;
 }
@@ -215,6 +315,11 @@ bool CentralVideoSettings::isARBGeometryShader4Usable() const
 bool CentralVideoSettings::isARBUniformBufferObjectUsable() const
 {
     return hasUBO;
+}
+
+bool CentralVideoSettings::isARBExplicitAttribLocationUsable() const
+{
+    return hasExplicitAttribLocation;
 }
 
 bool CentralVideoSettings::isEXTTextureCompressionS3TCUsable() const
@@ -239,12 +344,17 @@ bool CentralVideoSettings::isAMDVertexShaderLayerUsable() const
 
 bool CentralVideoSettings::isARBBufferStorageUsable() const
 {
-    return hasBuffserStorage;
+    return hasBufferStorage;
 }
 
 bool CentralVideoSettings::isARBComputeShaderUsable() const
 {
     return hasComputeShaders;
+}
+
+bool CentralVideoSettings::isARBArraysOfArraysUsable() const
+{
+    return hasArraysOfArrays;
 }
 
 bool CentralVideoSettings::isARBTextureStorageUsable() const
@@ -274,7 +384,7 @@ bool CentralVideoSettings::isARBShaderStorageBufferObjectUsable() const
 
 bool CentralVideoSettings::isARBImageLoadStoreUsable() const
 {
-    return hasComputeShaders;
+    return hasImageLoadStore;
 }
 
 bool CentralVideoSettings::isARBMultiDrawIndirectUsable() const
@@ -282,14 +392,31 @@ bool CentralVideoSettings::isARBMultiDrawIndirectUsable() const
     return hasMultiDrawIndirect;
 }
 
+bool CentralVideoSettings::isEXTTextureFilterAnisotropicUsable() const
+{
+    return hasTextureFilterAnisotropic;
+}
+
+#if defined(USE_GLES2)
+bool CentralVideoSettings::isEXTTextureFormatBGRA8888Usable() const
+{
+    return hasBGRA;
+}
+
+bool CentralVideoSettings::isEXTColorBufferFloatUsable() const
+{
+    return hasColorBufferFloat;
+}
+#endif
+
 bool CentralVideoSettings::supportsShadows() const
 {
-    return isARBGeometryShader4Usable() && isARBUniformBufferObjectUsable();
+    return isARBGeometryShadersUsable() && isARBUniformBufferObjectUsable() && isARBExplicitAttribLocationUsable();
 }
 
 bool CentralVideoSettings::supportsGlobalIllumination() const
 {
-    return isARBGeometryShader4Usable() && isARBUniformBufferObjectUsable() && !m_GI_has_artifact;
+    return isARBGeometryShadersUsable() && isARBUniformBufferObjectUsable() && isARBExplicitAttribLocationUsable() && !m_GI_has_artifact;
 }
 
 bool CentralVideoSettings::supportsIndirectInstancingRendering() const
@@ -299,7 +426,7 @@ bool CentralVideoSettings::supportsIndirectInstancingRendering() const
 
 bool CentralVideoSettings::supportsComputeShadersFiltering() const
 {
-    return isARBBufferStorageUsable() && isARBImageLoadStoreUsable() && isARBComputeShaderUsable();
+    return isARBBufferStorageUsable() && isARBImageLoadStoreUsable() && isARBComputeShaderUsable() && isARBArraysOfArraysUsable();
 }
 
 bool CentralVideoSettings::supportsAsyncInstanceUpload() const
@@ -344,3 +471,25 @@ bool CentralVideoSettings::isDefferedEnabled() const
 {
     return UserConfigParams::m_dynamic_lights && !GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_ADVANCED_PIPELINE);
 }
+
+bool CentralVideoSettings::supportsHardwareSkinning() const
+{
+    return isARBUniformBufferObjectUsable();
+}
+
+bool CentralVideoSettings::isARBTextureSwizzleUsable() const
+{
+    return m_glsl && hasTextureSwizzle;
+}
+
+bool CentralVideoSettings::isARBPixelBufferObjectUsable() const
+{
+    return hasPixelBufferObject;
+}
+
+bool CentralVideoSettings::supportsThreadedTextureLoading() const
+{
+    return isARBPixelBufferObjectUsable() && isARBBufferStorageUsable() && isARBTextureStorageUsable();
+}
+
+#endif   // !SERVER_ONLY

@@ -28,20 +28,21 @@
 
 #include "LinearMath/btTransform.h"
 
-#include "items/powerup.hpp"
+#include "graphics/render_info.hpp"
+#include "items/powerup_manager.hpp"    // For PowerupType
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
-#include "karts/player_difficulty.hpp"
 #include "utils/no_copy.hpp"
 
-class btKart;
-
-class Attachment;
-class Controller;
-class Item;
 class AbstractKartAnimation;
+class Attachment;
+class btKart;
+class btUprightConstraint;
+class Controller;
 class HitEffect;
+class Item;
 class KartGFX;
+class KartRewinder;
 class MaxSpeed;
 class ParticleEmitter;
 class ParticleKind;
@@ -65,7 +66,18 @@ class TerrainInfo;
 class Kart : public AbstractKart
 {
     friend class Skidding;
-private:
+protected:
+    /** Offset of the graphical kart chassis from the physical chassis. */
+    float m_graphical_y_offset;
+
+    /** The coordinates of the front of the kart, used to determine when a
+     *  new lap is triggered. */
+    Vec3 m_xyz_front;
+
+    /** Is time flying activated */
+    bool m_is_jumping;
+
+protected:
     /** Handles speed increase and capping due to powerup, terrain, ... */
     MaxSpeed *m_max_speed;
 
@@ -103,12 +115,8 @@ private:
     /** Current race position (1-num_karts). */
     int m_race_position;
 
-    /** The coordinates of the front of the kart, used to determine when a
-     *  new lap is triggered. */
-    Vec3 m_xyz_front;
-
-    /** Offset of the graphical kart chassis from the physical chassis. */
-    float m_graphical_y_offset;
+    /** True if the kart wins, false otherwise. */
+    bool m_race_result;
 
     /** True if the kart is eliminated. */
     bool m_eliminated;
@@ -167,13 +175,8 @@ private:
     // Graphical effects
     // -----------------
 
-    /** Is time flying activated */
-    bool             m_is_jumping;
-
     /** The shadow of a kart. */
     Shadow          *m_shadow;
-
-    ParticleEmitter *m_sky_particles_emitter;
 
     /** All particle effects. */
     KartGFX         *m_kart_gfx;
@@ -193,7 +196,14 @@ private:
     /** When a kart has its view blocked by the plunger, this variable will be
      *  > 0 the number it contains is the time left before removing plunger. */
     float         m_view_blocked_by_plunger;
+    /** The current speed (i.e. length of velocity vector) of this kart. */
     float         m_speed;
+    /** For camera handling an exponentially smoothened value is used, which
+     *  reduces stuttering of the camera. */
+    float         m_smoothed_speed;
+    
+    /** For smoothing engine sound**/
+    float         m_last_factor_engine_sound;
 
     std::vector<SFXBase*> m_custom_sounds;
     SFXBase      *m_beep_sound;
@@ -219,7 +229,8 @@ private:
     void          updateFlying();
     void          updateSliding();
     void          updateEnginePowerAndBrakes(float dt);
-    void          updateEngineSFX();
+    void          updateEngineSFX(float dt);
+    void          updateSpeed();
     void          updateNitro(float dt);
     float         getActualWheelForce();
     void          playCrashSFX(const Material* m, AbstractKart *k);
@@ -228,7 +239,8 @@ private:
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
-                        const PlayerDifficulty *difficulty);
+                        PerPlayerDifficulty difficulty,
+                        KartRenderType krt = KRT_DEFAULT);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
     virtual void   kartIsInRestNow();
@@ -236,6 +248,8 @@ public:
                                   const btQuaternion& off_rotation);
     virtual void   createPhysics    ();
     virtual void   updateWeight     ();
+    virtual float  getSpeedForTurnRadius(float radius) const;
+    virtual float  getMaxSteerAngle(float speed) const;
     virtual bool   isInRest         () const;
     virtual void   applyEngineForce (float force);
 
@@ -251,6 +265,8 @@ public:
                                float fade_in_time);
     virtual float getSpeedIncreaseTimeLeft(unsigned int category) const;
     virtual void  collectedItem(Item *item, int random_attachment);
+    virtual float getStartupBoost() const;
+
     virtual const Material *getMaterial() const;
     virtual const Material *getLastMaterial() const;
     /** Returns the pitch of the terrain depending on the heading. */
@@ -265,14 +281,15 @@ public:
     virtual void   crashed          (const Material *m, const Vec3 &normal);
     virtual float  getHoT           () const;
     virtual void   update           (float dt);
-    virtual void   finishedRace(float time);
-    virtual void   setPosition(int p);
+    virtual void   finishedRace     (float time, bool from_server=false);
+    virtual void   setPosition      (int p);
     virtual void   beep             ();
     virtual void   showZipperFire   ();
     virtual float  getCurrentMaxSpeed() const;
 
     virtual bool   playCustomSFX    (unsigned int type);
     virtual void   setController(Controller *controller);
+    virtual void   setXYZ(const Vec3& a);
 
     // ========================================================================
     // Powerup related functions.
@@ -290,7 +307,7 @@ public:
     virtual int getNumPowerup() const;
     // ------------------------------------------------------------------------
     /** Returns a points to this kart's graphical effects. */
-    KartGFX*       getKartGFX()                   { return m_kart_gfx;        }
+    virtual KartGFX* getKartGFX()               { return m_kart_gfx;         }
     // ------------------------------------------------------------------------
     /** Returns the remaining collected energy. */
     virtual float  getEnergy           () const { return m_collected_energy; }
@@ -331,15 +348,12 @@ public:
     /** Returns the time till full steering is reached for this kart.
      *  \param steer Current steer value (must be >=0), on which the time till
      *         full steer depends. */
-    virtual float getTimeFullSteer(float steer) const
-    {
-        return m_kart_properties->getTimeFullSteer(steer);
-    }   // getTimeFullSteer
+    virtual float getTimeFullSteer(float steer) const;
     // ------------------------------------------------------------------------
     /** Returns the maximum steering angle for this kart, which depends on the
      *  speed. */
     virtual float getMaxSteerAngle () const
-                    { return m_kart_properties->getMaxSteerAngle(getSpeed()); }
+                    { return getMaxSteerAngle(getSpeed()); }
     // ------------------------------------------------------------------------
     /** Returns the skidding object for this kart (which can be used to query
      *  skidding related values). */
@@ -356,6 +370,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. */
     virtual float        getSpeed() const {return m_speed;                 }
+    // ------------------------------------------------------------------------
+    /** Returns the speed of the kart in meters/second. */
+    virtual float        getSmoothedSpeed() const { return m_smoothed_speed; }
     // ------------------------------------------------------------------------
     /** This is used on the client side only to set the speed of the kart
      *  from the server information.                                       */
@@ -386,7 +403,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if the kart is close to the ground, used to dis/enable
      *  the upright constraint to allow for more realistic explosions. */
-    bool           isNearGround     () const;
+    bool isNearGround() const;
     // ------------------------------------------------------------------------
     /** Returns true if the kart is eliminated.  */
     virtual bool isEliminated() const { return m_eliminated; }
@@ -427,9 +444,13 @@ public:
     virtual void showStarEffect(float t);
     // ------------------------------------------------------------------------
     /** Returns the terrain info oject. */
-    TerrainInfo *getTerrainInfo() { return m_terrain_info; }
+    virtual const TerrainInfo *getTerrainInfo() const { return m_terrain_info; }
     // ------------------------------------------------------------------------
     virtual void setOnScreenText(const wchar_t *text);
+    // ------------------------------------------------------------------------
+    /** Returns the normal of the terrain the kart is over atm. This is
+     *  defined even if the kart is flying. */
+    virtual const Vec3& getNormal() const;
     // ------------------------------------------------------------------------
     /** For debugging only: check if a kart is flying. */
     bool isFlying() const { return m_flying;  }
@@ -438,6 +459,18 @@ public:
     float getWrongwayCounter() { return m_wrongway_counter; }
     // ------------------------------------------------------------------------
     void setWrongwayCounter(float counter) { m_wrongway_counter = counter; }
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart wins or loses. */
+    virtual bool getRaceResult() const { return m_race_result;  }
+    // ------------------------------------------------------------------------
+    /** Set this kart race result. */
+    void setRaceResult();
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart is a ghost (replay) kart. */
+    virtual bool isGhostKart() const { return false;  }
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart is jumping. */
+    virtual bool isJumping() const { return m_is_jumping; };
 
 };   // Kart
 

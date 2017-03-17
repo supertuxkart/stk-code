@@ -1,0 +1,409 @@
+<?xml version="1.0"?>
+<!-- Format
+    It is possible to give relative values (factors and more) for each property.
+
+    The format as a regex is: ([+-*/](%d+|x))*
+    An empty value means no change, a value without sign or with a '-' replaces
+    the previous value. If an operator prefixes the string, e.g. *1.5 (- doesn't
+    work because it's a sign). x will get replaced by the previous value which
+    means *1.5 is equal to x*1.5. It's also possible to combine operations:
+    +1.5*20 means "add 1.5 to the previous value and then multiply by 20".
+    Note that it's computed sequentially from left to right and there is no
+    operator precedence. Also whitespaces aren't allowed because they are used
+    to split arrays.
+    If you want to return the square of something use x*x or only *x.
+
+    ATTENTION: '-' is a special case if it is the first character of a number-
+    string. It means that the number is negative and NOT that the following
+    float will be substracted from the base value. So if x = 10 and the string
+    "-5" is processed, the result will be -5 and not the same as "x-5", which
+    would result in 10 - 5 = 5.
+-->
+<characteristics>
+    <!-- The default values that can be modified by the difficulty, karts, etc.
+        The values here should also be the values of the maximum difficulty. -->
+    <characteristic name="base">
+        <!-- ********** Physics ********** -->
+
+        <!-- Suspension
+            stiffness: kart's suspension stiffness.
+            rest: Length of suspension when at rest.
+            travel-cm: maximum movement of suspension - in cm!!
+            exp-string-response: dampen the suspension spring reaction
+                exponentially. See
+                http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=7369\&p=25236&hilit=vehicle#p25236
+                for details.
+            max-force: Maximum suspension force -->
+        <suspension stiffness="140" rest="0.3" travel="0.29"
+            exp-spring-response="false" max-force="12000" />
+
+        <!-- Values related to stability of the chassis: damping, and reduced
+                impact of roll.
+            downward-impulse-factor: A speed proportional impulse applied each
+                frame that pushes the vehicle onto the ground.
+            track-connection-accel: An artificial force that pulls a wheel to
+                the ground if its off ground. Reduces the affect if a kart loses
+                contact with the ground (i.e. it then can't steer or accelerate
+                anymore).
+            smooth-flying-impulse: apply a torque impulse to flying kart to keep
+                them parallel to the ground. -->
+        <stability roll-influence="0.3"
+                   chassis-linear-damping="0.2"
+                   chassis-angular-damping="0"
+                   downward-impulse-factor="5"
+                   track-connection-accel="2"
+                   smooth-flying-impulse="250" />
+
+        <!-- Turning
+            radius: The turn radius of the kart at
+                a given speed. The actual steering angle is dependent on the
+                wheel base of the kart: radius = wheel_base/sin(steering_angle).
+                The values below define that at speed 0 the turn radius is 2, at
+                speed 10 the radius is 7.5 etc.
+                The actual turn radius is piece-wise linearly interpolated. This
+                allows for tighter turning at lower speeds, and also avoids that
+                the kart becomes too hard to control at high speed (speeds of
+                higher than 23 can only be reached with powerups).
+            time-full-steer: This is the amount of change in steering depending
+                on current steering. So if the steering is between 0 and 0.5,
+                the time-for-steering-change is 0.15. If the current steering is
+                between 0.5 and 1.0, the time-for-steering-change is 0.25.
+                The speed is used as dt/time-for-steering-change.
+                In short: steering at less than halfway is somewhat faster,
+                which should avoid oversteering (by pressing the key for too long),
+                but slower when you want to steer more. Overwall with the current
+                settings the expected time-to-full-steer is:
+                0.5 * 0.25 + 0.5 * 0.15 = 0.2 ... which is overall the same
+                time we had previously. -->
+        <turn radius="0:2.0 10:7.5 25:15 45:30"
+              time-full-steer="0:0.17 0.5:0.17 0.5:0.28 1.0:0.28"
+              time-reset-steer="0.1" />
+
+        <!-- Speed and acceleration
+            power: The power of the kart
+            max-speed: The base maximum speed of the kart in m/s
+            brake-factor: Value used when braking.
+            brake-time-increase: The brake force is multiplied by
+                (1 + brake_time) * brake_time_increase - i.e. the longer the
+                brake was pressed, the harder the kart will brake.
+            max-speed-reverse-ratio is the percentage of max speed for reverse
+                gear.
+          -->
+        <engine power="875" max-speed="25" brake-factor="15"
+                brake-time-increase="6" max-speed-reverse-ratio="0.65" />
+
+        <!-- Simulated gears
+            switch-ratio defines at what ratio of the maximum
+                speed what gear is selected, e.g. 0.25 means that if the speed is
+                bigger or equal to 0.25 * maxSpeed then use gear 1, 0.5 means if
+                the speed is bigger or equal to 0.5 x maxSpeed then gear 2.
+                gear-power-increase contains the increase in max power (to simulate
+                different gears), e.g. 2.5 as first entry means: 2.5 * maxPower in gear 1
+                | first  | second |  third | . -->
+        <gear switch-ratio="0.25 0.7 1.0" power-increase="2.2 1.7 1.3" />
+
+        <!-- Mass of a kart -->
+        <mass value="350" />
+
+        <!-- Wheels
+            damping-relaxation/compression: for bullet
+            damping parameters
+            Radius and width of wheel
+            front-right, front-left, rear-right and rear-left give the
+                position of the physics raycast wheels relative to the center of
+                gravity. Default is to use the corners of the chassis to attach
+                the wheels to. -->
+        <wheels damping-relaxation="35"  damping-compression="5">
+            <front-right position="0.38 0 0.6"   />
+            <front-left  position="-0.38 0 0.6"  />
+            <rear-right  position="0.38 0 -0.6"  />
+            <rear-left   position="-0.38 0 -0.6" />
+        </wheels>
+
+
+        <!-- ********** Visuals ********** -->
+
+        <!-- Skidding
+            increase: multiplicative increase of skidding factor in each frame.
+            decrease: multiplicative decrease of skidding factor in each frame.
+            max: maximum skidding factor = maximum increase of steering angle.
+            time-till-max: Time till maximum skidding is reached.
+            visual: Additional graphical rotation of kart. The graphical rotation
+                of the kart also determines the direction the kart is driving to
+                when skidding is stopped.
+            visual-time: How long it takes for the visual skid to reach maximum.
+            revert-visual-time: how long it takes when stopping a skid to revert
+                the visual skid and bring visuals and physics in sync again.
+            angular-velocity: Angular velocity to be used for the kart when skidding.
+            min-speed: Minimum speed a kart must have before it can skid. Must be
+                >0, otherwise the kart can skid at the start of the race.
+            time-till-bonus: How long a kart needs to skid in order to get a bonus.
+            bonus-force: A speedup applied to the kart whick skidded for a while.
+            bonus-time: How long the bonus-force is applied.
+            bonus-force: Additional engine force (this is used to offset the fact
+                that turning after skidding (e.g. to correct direction) often uses
+                up the skid bonus).
+            post-skid-rotate-factor: a factor to be used to determine how much
+                the chassis of a kart should rotate to match the graphical view.
+                A factor of 1 is identical, a smaller factor will rotate the kart
+                less (which might  feel better).
+            physical-jump-time: Time for a physical jump at the beginning of a skid.
+                graphical-jump-time: Time for a graphics-only jump at the beginning
+                of a skid.
+            reduce-turn-min/max: The steering done by the controller (which is in
+                [-1,1]) is mapped to [reduce-turn-min, reduce-turn-max] when skidding
+                is active (for left turn, right turn will use [-max, -min]). The
+                effect is that while you skid (say left) you can adjust the direction
+                of the turn the kart is doing somewhat by steering to the left and right,
+                but you will always keep on doing a left turn, just more or less. -->
+        <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
+              visual="1.25" visual-time="0.7" revert-visual-time="0.7"
+              min-speed="10"  time-till-bonus="1.0 3.0"
+              bonus-speed="4.5 6.5" bonus-time="3.0 4.0"
+              bonus-force="250 350"
+              physical-jump-time="0" graphical-jump-time="0.4"
+              post-skid-rotate-factor="1"
+              reduce-turn-min="0.2" reduce-turn-max="0.8" enabled="true" />
+
+        <!-- Camera
+            Distance between kart and camera.
+            forward-up-angle: Angle between camera and plane of kart (pitch)
+                when the camera is pointing forward
+            backward-up-angle: Angle between camera and plane of kart (pitch)
+                when the camera is pointing backwards. This is usually
+                larger than the forward-up-angle, since the kart itself
+                otherwise obstricts too much of the view. -->
+        <camera distance="1.0" forward-up-angle="15"
+                backward-up-angle="5" />
+
+        <!-- Jump animation
+            animation-time: only if the estimated time for a jump is larger
+                than this value will the jump animation being
+                shown. -->
+       <jump animation-time="0.5" />
+
+        <!-- Leaning related parameters, i.e. slightly leaning the karts when
+             driving a fast curve.
+            max: maximum leaning (i.e. when steering as much as possible at highest
+                speed), in degrees.
+            speed: Speed with which the leaning changes (in degree/second). -->
+        <lean max="6.6" speed="15.0" />
+
+
+        <!-- ********** Items ********** -->
+
+        <!-- Anvil
+            weight: The additional weight an anvil adds to a kart.
+            speed-factor: The additional slowdown caused by the anvil.
+            duration: The time an anvil is active. -->
+        <anvil duration="2.0" weight="150"  speed-factor="0.2" />
+
+        <!-- Parachute
+            friction: The friction increase when a parachute is attached.
+            duration: The time an attached parachute is active
+            duration-other: The time a parachute attached from other kart works
+            duration-rank-mult: The multiplier applied to the duration of the
+            parachute on the 1st kart when affected by the item. Scale for
+            intermediary ranks to 1.0 for the last affected.
+            duration-speed-mult: Applied in all cases, multitplier to duration
+            of the parachute at max-speed. Scale to 1.0 at 0 speed.
+            lbound-fraction: The lower bound fraction of speed when lost will
+                detach parachute. E.g. at nearly 0 speed, only 20% of speed
+                need to be lost.
+            ubound-fraction: The upper bound fraction of speed when lost will
+                detach parachute. E.g. at max-speed 50% of speed must be lost.
+            max-speed: A factor that decides the impact of rate of speed
+                (distance between bounds) -->
+        <parachute friction="2.0" duration="2.0" duration-other="2.6"
+                   duration-rank-mult="1.35" duration-speed-mult="2.0"
+                   lbound-fraction="0.8" ubound-fraction="0.5" max-speed="23" />
+        <!-- Bubblegum
+            duration: How long the bubblegum lasts.
+            speed-fraction: To what fraction of top-speed the speed is reduced.
+            torque: To rotate the kart somewhat.
+            fade-in-time: How quick the slowdown takes effect.
+            shield-duration: How long the bubblegum shield lasts -->
+        <bubblegum duration="1" speed-fraction="0.3" torque="500" fade-in-time="0.01"
+                   shield-duration="10.0" />
+
+        <!-- Zipper
+            duration: Time a zipper is active.
+            force: Additional zipper force.
+            speed-gain: One time additional speed.
+            max-speed-increase: Additional speed allowed on top of the
+                kart-specific maximum kart speed.
+            fade-out-time: determines how long it takes for a zipper
+                to fade out (after 'time'). -->
+        <zipper duration="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
+                fade-out-time="1.0" />
+
+        <!-- Swatter
+            duration: How long can the swatter be active.
+            distance: How close a kart or an item must be before it can be hit.
+                      This is the square of the real distance to accelerate the
+                      compution.
+            squash-duration: How long a kart will remain squashed.
+            squash-slowdown: Percentage of max speed that a kart is
+                restricted to. -->
+        <swatter duration="10" distance="9" squash-duration="5"
+                 squash-slowdown="0.5" />
+
+        <!-- Plunger and rubber band handling
+            band-max-length: The maximum length of rubber band before it snaps.
+            band-force: The force a plunger/rubber band applies to the kart(s).
+            band-duration: The duration a rubber band acts.
+            in-face-time determines how long it takes before a plunger
+                in your face is removed. -->
+        <plunger band-max-length="50" band-force="1500" band-duration="1"
+                 band-speed-increase="7" band-fade-out-time="3"
+                 in-face-time="4.5" />
+
+
+        <!-- ********** Miscellaneous ********** -->
+
+        <!-- Startup
+            If a kart starts within the specified time after 'go',
+            it receives the corresponding bonus from 'boost'. Those
+            fields must have the same size, and must be sorted by
+            increasing times. -->
+        <startup time="0.3 0.5"
+                 boost="6 3" />
+
+        <!-- Rescue
+            duration: How long it takes the kart to be raised.
+            height: how height the kart will be raised before it is
+                dropped back onto the track.
+            vert rescue offset: used to raise karts a bit higher before
+                releasing them on the ground after a rescue. Used to avoid
+                resetting karts into the track. Not sure if this is still
+                necessary. -->
+        <rescue vert-offset="0.0" duration="1.2" height="2" />
+
+        <!-- Explosion
+            duration: how long it takes before the kart can drive again (this
+                determines how height the kart is being thrown).
+            invulnerability-time: how long a kart will be invulnerable
+                after being hit by an explosion.
+            radius: Kart closer to this value will be affected by
+                an explosion as well.  -->
+        <explosion duration="2" radius="5"
+                   invulnerability-time="6" />
+
+        <!-- Nitro
+            engine-force: additional engine power
+            consumption: nitro consumption - heavier characters can be set
+                to need more nitro than lighter character.
+            small-container: how much energy a small container gives.
+            big-container: how much energy a big container gives.
+            max-speed-increase: How much the speed of a kart might exceed
+                its maximum speed (in m/s).
+            duration: How long the increased speed will be valid after
+                the kart stops using nitro (and the fade-out-time starts).
+            fade-out-time: Duration during which the increased maximum
+                speed due to nitro fades out.
+            max: How much nitro a kart can store. -->
+        <nitro engine-force="600" consumption="1" small-container="1" big-container="3"
+               max-speed-increase="5" duration="1" fade-out-time="2" max="20" />
+
+        <!-- Slipstream
+            length: How far behind a kart slipstream works
+            width: how wide slipstream works furthest away from the kart.
+            collect-time: How many seconds of sstream give  maximum benefit
+            use-time: How long the benefit will last.
+            add-power: Additional power due to sstreaming. 1 = +100%
+            min-speed: Minimum speed necessary for slipstream to take effect.
+            max-speed-increase: How much the speed of the kart might exceed
+                its normal maximum speed.
+            duration: How long the higher speed lasts after slipstream stopped
+                working.
+            fade-out-time: How long the slip stream speed increase will
+                gradually be reduced.  -->
+        <slipstream length="10" width="2" collect-time="2" use-time="5"
+                    add-power="3" min-speed="10" max-speed-increase="5"
+                    duration="1" fade-out-time="2" />
+    </characteristic>
+
+    <!-- The different difficulties (like easy, medium, hard) -->
+    <difficulties>
+        <characteristic name="easy">
+            <engine power="*0.66" max-speed="*0.6" />
+            <plunger in-face-time="3" />
+        </characteristic>
+        <characteristic name="medium">
+            <engine power="*0.77" max-speed="*0.8" />
+            <plunger in-face-time="4" />
+        </characteristic>
+        <characteristic name="hard">
+            <engine power="*0.89" max-speed="*0.92" />
+        </characteristic>
+        <!-- This doesn't need to be changed because the most fast/heavy/extreme
+            values should also be the default ones. -->
+        <characteristic name="best" />
+    </difficulties>
+
+    <!-- The different kart types, that can be specified in the kart.xml file -->
+    <kart-types>
+        <characteristic name="light">
+            <engine power="*0.46" max-speed="*0.92" brake-factor="*1"
+                 max-speed-reverse-ratio="*0.77" />
+            <gear switch-ratio="0.20 0.55 1" power-increase="5 4 3" />
+            <mass value="*0.56" />
+            <startup time="0.3 0.5"
+                     boost="8.5 4.5" />
+            <explosion time="2.1" radius="5.5"
+                       invulnerability-time="7" />
+            <nitro engine-force="350" max-speed-increase="4.5" duration="1.5"
+                   fade-out-time="2.5" />
+            <slipstream length="11" collect-time="1.5" use-time="2.5" add-power="3.2"
+                        min-speed="9" max-speed-increase="4" duration="1.2"
+                        fade-out-time="2.3" />
+        </characteristic>
+        <characteristic name="medium">
+            <engine power="*0.63" max-speed="*1" brake-factor="*0.73"
+                    max-speed-reverse-ratio="*0.62" />
+            <gear switch-ratio="0.30 0.7 1.0" power-increase="2.2 2.2 2.5" />
+            <mass value="*0.71" />
+            <startup time="0.3 0.5"
+                     boost="4.2 2.6" />
+            <explosion time="1.8" radius="5"
+                       invulnerability-time="6" />
+            <nitro engine-force="425" consumption="1.4" duration="1" />
+            <slipstream use-time="3.3" add-power="2.8" duration="0.9"
+                        fade-out-time="1.6" />
+        </characteristic>
+        <characteristic name="heavy">
+            <engine power="*1" max-speed="*1" brake-factor="*0.66"
+                    max-speed-reverse-ratio="*1" />
+            <gear switch-ratio="0.45 0.70 1" power-increase="1.5 1.7 2.5" />
+            <mass value="*1" />
+            <swatter duration="10" distance="3" squash-duration="5"
+                     squash-slowdown="0.5" />
+            <startup time="0.3 0.5"
+                     boost="3.8 2" />
+            <explosion time="1.5" radius="4"
+                       invulnerability-time="6" />
+            <nitro engine-force="600" consumption="2" max-speed-increase="8"
+                   duration="0.7" fade-out-time="1.3" />
+            <slipstream length="8.5" use-time="4" add-power="2.7" min-speed="10.5"
+                   max-speed-increase="8" duration="0.7" fade-out-time="1" />
+        </characteristic>
+    </kart-types>
+
+    <!-- Per-player settings/handicaps (or boosts) -->
+    <player-characteristics>
+        <characteristic name="normal" />
+        <characteristic name="handicap">
+            <engine brake-factor="*0.8" brake-time-increase="*0.85" max-speed-reverse-ratio="*0.8" />
+            <bubblegum duration="*1.5" speed-fraction="*1.5" torque="*1.5" />
+            <zipper duration="*0.8" force="*0.8" speed-gain="*0.8" max-speed-increase="*0.8" />
+            <swatter duration="*0.8" squash-duration="*1.5" squash-slowdown="*1.8" />
+            <plunger band-max-length="*0.8" band-speed-increase="*0.8" in-face-time="*1.3" />
+            <startup time="*0.8 0.8" boost="*0.8 0.8" />
+            <rescue duration="*1.5" />
+            <explosion duration="*1.3" invulnerability-time="*0.7" />
+            <nitro engine-force="*0.8" consumption="*1.1" max-speed-increase="*0.9" max="*0.8" />
+            <slipstream length="*0.8" width="*0.8" collect-time="*1.5" use-time="*0.8"
+                add-power="*0.8" min-speed="*0.8" max-speed-increase="*0.9" duration="*0.8" />
+        </characteristic>
+    </player-characteristics>
+</characteristics>

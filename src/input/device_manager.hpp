@@ -34,6 +34,7 @@ class DeviceConfig;
 class InputDevice;
 class GamePadDevice;
 class KeyboardDevice;
+class MultitouchDevice;
 
 
 enum PlayerAssignMode
@@ -66,6 +67,7 @@ private:
     PtrVector<GamePadDevice, HOLD>     m_gamepads;
     PtrVector<KeyboardConfig, HOLD>    m_keyboard_configs;
     PtrVector<GamepadConfig, HOLD>     m_gamepad_configs;
+    MultitouchDevice*                  m_multitouch_device;
 
     /** The list of all joysticks that were found and activated. */
     core::array<SJoystickInfo>         m_irrlicht_gamepads;
@@ -129,6 +131,11 @@ public:
     KeyboardConfig*     getKeyboardConfig(const int i)      { return m_keyboard_configs.get(i); }
     KeyboardDevice*     getKeyboardFromBtnID(const int btnID);
 
+    // ---- Multitouch device ----
+    MultitouchDevice*   getMultitouchDevice()    { return m_multitouch_device; }
+    void                clearMultitouchDevices();
+    void                updateMultitouchDevice();
+
 
     /**
       * \brief Delete the given config and removes DeviceManager references to it.
@@ -158,8 +165,21 @@ public:
     bool initialize();
     void save();
 
-    StateManager::ActivePlayer* getSinglePlayer()       { return m_single_player; }
-    void setSinglePlayer(StateManager::ActivePlayer* p) { m_single_player = p;    }
+    // ------------------------------------------------------------------------
+    /** Returns the active player if there is only a single local player. It
+     *  returns NULL if multiplayer is active. */
+    StateManager::ActivePlayer* getSinglePlayer()  { return m_single_player; }
+    // ------------------------------------------------------------------------
+    /** Sets the ActivePlayer if there is only a single local player. p must
+     *  be NULL in case of splitscreen. A single player will receive events
+     *  from all connected devices. This allows for example a single player
+     *  to select a kart with the keyboard, but then use a gamepad for
+     *  the actual racing. In splitscreen each player will only receive
+     *  events from the device used to connect in the kart selection screen. */
+    void setSinglePlayer(StateManager::ActivePlayer* p)
+    {
+        m_single_player = p; 
+    }   // setSinglePlayer
     // ------------------------------------------------------------------------
     /** Sets or reset the 'map fire to select' option.
      */
