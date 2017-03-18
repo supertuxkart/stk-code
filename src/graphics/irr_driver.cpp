@@ -61,6 +61,7 @@
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/avi_writer.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
@@ -146,6 +147,7 @@ IrrDriver::IrrDriver()
     m_last_light_bucket_distance = 0;
     m_clear_color                = video::SColor(255, 100, 101, 140);
     m_skinning_joint             = 0;
+    m_recording = false;
 
 }   // IrrDriver
 
@@ -1885,7 +1887,21 @@ void IrrDriver::update(float dt)
     // menu.
     //if(World::getWorld() && World::getWorld()->isRacePhase())
     //    printRenderStats();
+#ifndef SERVER_ONLY
+    if (m_recording)
+        AVIWriter::getInstance()->captureFrameBufferImage(dt);
+#endif
 }   // update
+
+// ----------------------------------------------------------------------------
+void IrrDriver::setRecording(bool val)
+{
+    if (val == false && m_recording == false)
+        return;
+    m_recording = val;
+    if (val == false)
+        AVIWriter::getInstance()->stopRecording();
+}   // setRecording
 
 // ----------------------------------------------------------------------------
 

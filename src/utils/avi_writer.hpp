@@ -16,9 +16,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <cstring>
-#include <string>
+#ifndef SERVER_ONLY
 
+#include "graphics/gl_headers.hpp"
+#include "utils/can_be_deleted.hpp"
+#include "utils/no_copy.hpp"
+#include "utils/singleton.hpp"
+
+#include <string>
+#include <list>
+
+#include <pthread.h>
 #include <jpeglib.h>
 
 #define FOURCC(a,b,c,d) ((uint32_t) (((d)<<24) | ((c)<<16) | ((b)<<8) | (a)))
@@ -45,17 +53,17 @@ const uint32_t AVIIF_MIDPART = 0x00000060;
 const uint32_t AVIIF_NOTIME = 0x00000100;
 const uint32_t AVIIF_COMPUSE = 0x0FFF0000;
 
-enum AVIFormat 
+enum AVIFormat
 {
-	AVI_FORMAT_BMP, 
-	AVI_FORMAT_JPG
+    AVI_FORMAT_BMP,
+    AVI_FORMAT_JPG
 };
 
 enum AVIErrCode
 {
-	AVI_SUCCESS,
-	AVI_SIZE_LIMIT_ERR,
-	AVI_IO_ERR
+    AVI_SUCCESS,
+    AVI_SIZE_LIMIT_ERR,
+    AVI_IO_ERR
 };
 
 const int MAX_FRAMES = 1000000;
@@ -153,38 +161,71 @@ struct IndexTable
 };
 
 
-class AVIWriter
+class AVIWriter : public CanBeDeleted, public NoCopy,
+                  public Singleton<AVIWriter>
 {
 private:
     FILE* m_file;
+
     std::string m_filename;
-    int m_last_junk_chunk;
-    int m_end_of_header;
-    int m_movi_start;
-    unsigned int m_msec_per_frame;
-    unsigned int m_stream_bytes;
-    unsigned int m_total_frames;
+
+    int m_last_junk_chunk, m_end_of_header, m_movi_start;
+
+    unsigned int m_msec_per_frame, m_stream_bytes, m_total_frames, m_pbo_use;
+
+    float m_dt;
+
     AVIHeader m_avi_hdr;
+
     CHUNK m_movi_chunk;
+
     FormatHeader m_format_hdr;
+
     IndexTable m_index_table[MAX_FRAMES];
+
     uint32_t m_chunk_fcc;
 
+    std::list<uint8_t*> m_fbi_queue;
+
+    pthread_t m_thread;
+
+    pthread_mutex_t m_fbi_mutex;
+
+    pthread_cond_t m_cond_request;
+
+    GLuint m_pbo[3];
+
+    // ------------------------------------------------------------------------
+    static int bmpToJpg(unsigned char* image_data, unsigned char* image_output,
+                        unsigned long buf_length, unsigned int width,
+                        unsigned int height, int num_channels, int quality);
+    // ------------------------------------------------------------------------
+    AVIErrCode addImage(unsigned char* buffer, int size);
+    // ------------------------------------------------------------------------
+    bool closeFile(bool delete_file = false);
+    // ------------------------------------------------------------------------
+    bool createFile(AVIFormat avi_format, int bits, int quality);
+    // ------------------------------------------------------------------------
     bool addJUNKChunk(std::string str, unsigned int min_size);
+    // ------------------------------------------------------------------------
+    void addFrameBufferImage(uint8_t* fbi)
+    {
+        pthread_mutex_lock(&m_fbi_mutex);
+        m_fbi_queue.push_back(fbi);
+        pthread_cond_signal(&m_cond_request);
+        pthread_mutex_unlock(&m_fbi_mutex);
+    }
 
 public:
-    AVIWriter() {m_file = NULL;}
+    // ------------------------------------------------------------------------
+    AVIWriter();
+    // ------------------------------------------------------------------------
+    static void* startRoutine(void *obj);
+    // ------------------------------------------------------------------------
+    void captureFrameBufferImage(float dt);
+    // ------------------------------------------------------------------------
+    void stopRecording();
 
-    AVIErrCode addImage(unsigned char* buffer, int size);
-    bool closeFile(bool delete_file = false);
-    bool createFile(std::string filename, AVIFormat avi_format, int width,
-                    int height, unsigned int msec_per_frame, int bits,
-                    int quality);
-                    
-	void updateMsecPerFrame(unsigned int value) 
-						{m_msec_per_frame = (m_msec_per_frame + value) / 2;}
-						
-	int bmpToJpg(unsigned char* image_data, unsigned char* image_output,
-				 unsigned long buf_length, unsigned int width, 
-				 unsigned int height, int num_channels, int quality);
 };
+
+#endif
