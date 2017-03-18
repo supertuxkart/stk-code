@@ -1896,11 +1896,15 @@ void IrrDriver::update(float dt)
 // ----------------------------------------------------------------------------
 void IrrDriver::setRecording(bool val)
 {
+#ifndef SERVER_ONLY
+    if (!CVS->isARBPixelBufferObjectUsable())
+        return;
     if (val == false && m_recording == false)
         return;
     m_recording = val;
     if (val == false)
         AVIWriter::getInstance()->stopRecording();
+#endif
 }   // setRecording
 
 // ----------------------------------------------------------------------------
