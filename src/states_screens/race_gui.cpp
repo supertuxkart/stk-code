@@ -128,8 +128,11 @@ RaceGUI::RaceGUI()
 
     m_is_tutorial = (race_manager->getTrackName() == "tutorial");
 
+    // Load speedmeter texture before rendering the first frame
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
+    m_speed_meter_icon->getTexture();
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
+    m_speed_bar_icon->getTexture();
     //createMarkerTexture();
 }   // RaceGUI
 
