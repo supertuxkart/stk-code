@@ -144,7 +144,7 @@ enum TypeRTT : unsigned int
 class RTT
 {
 public:
-    RTT(size_t width, size_t height);
+    RTT(size_t width, size_t height, float rtt_scale = 1.0f);
     ~RTT();
     
     size_t getWidth () const { return m_width ; }

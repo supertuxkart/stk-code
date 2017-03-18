@@ -199,10 +199,8 @@ void ShaderBasedRenderer::uploadLightingData() const
 void ShaderBasedRenderer::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
                                                     size_t width, size_t height)
 {
-    float w = width * UserConfigParams::m_scale_rtts_factor;
-    float h = height * UserConfigParams::m_scale_rtts_factor;
-    m_current_screen_size = core::vector2df(w, h);
-    m_shadow_matrices.computeMatrixesAndCameras(camnode, int(w), int(h),
+    m_current_screen_size = core::vector2df((float)width, (float)height);
+    m_shadow_matrices.computeMatrixesAndCameras(camnode, width, height,
         m_rtts->getDepthStencilTexture());
 }   // computeMatrixesAndCameras
 
@@ -669,7 +667,8 @@ void ShaderBasedRenderer::onLoadWorld()
     const core::recti &viewport = Camera::getCamera(0)->getViewport();
     size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
     size_t height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
-    RTT* rtts = new RTT(width, height);
+    RTT* rtts = new RTT(width, height, CVS->isDefferedEnabled() ?
+                        UserConfigParams::m_scale_rtts_factor : 1.0f);
     setRTT(rtts);
 }
 
@@ -787,9 +786,7 @@ void ShaderBasedRenderer::render(float dt)
     RaceGUIBase *rg = world->getRaceGUI();
     if (rg) rg->update(dt);
     
-    bool force_rtt = UserConfigParams::m_scale_rtts_factor != 1.0f;
-    
-    if (!CVS->isDefferedEnabled() && !force_rtt)
+    if (!CVS->isDefferedEnabled())
     {
         prepareForwardRenderer();
     }
@@ -803,11 +800,9 @@ void ShaderBasedRenderer::render(float dt)
         oss << "drawAll() for kart " << cam;
         PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (cam+1)*60,
                                  0x00, 0x00);
-        camera->activate(!CVS->isDefferedEnabled() && !force_rtt);
+        camera->activate(!CVS->isDefferedEnabled());
         rg->preRenderCallback(camera);   // adjusts start referee
         irr_driver->getSceneManager()->setActiveCamera(camnode);
-
-        const core::recti &viewport = camera->getViewport();
 
         if (!CVS->isDefferedEnabled())
             glEnable(GL_FRAMEBUFFER_SRGB);
@@ -816,12 +811,12 @@ void ShaderBasedRenderer::render(float dt)
         m_lighting_passes.updateLightsInfo(camnode, dt);
         PROFILER_POP_CPU_MARKER();
         PROFILER_PUSH_CPU_MARKER("UBO upload", 0x0, 0xFF, 0x0);
-        computeMatrixesAndCameras(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
+        computeMatrixesAndCameras(camnode, m_rtts->getWidth(), m_rtts->getHeight());
         m_shadow_matrices.updateSunOrthoMatrices();
         if(CVS->isARBUniformBufferObjectUsable())
             uploadLightingData();
         PROFILER_POP_CPU_MARKER();
-        renderScene(camnode, dt, track->hasShadows(), force_rtt); 
+        renderScene(camnode, dt, track->hasShadows(), false); 
         
         if (irr_driver->getBoundingBoxesViz())
         {        
@@ -830,7 +825,7 @@ void ShaderBasedRenderer::render(float dt)
         
         debugPhysics();
         
-        if (CVS->isDefferedEnabled() || force_rtt)
+        if (CVS->isDefferedEnabled())
         {
             renderPostProcessing(camera);
         }
