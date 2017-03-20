@@ -169,11 +169,12 @@ private:
 
     std::string m_filename;
 
-    int m_last_junk_chunk, m_end_of_header, m_movi_start;
+    int m_last_junk_chunk, m_end_of_header, m_movi_start, m_img_quality;
 
-    unsigned int m_msec_per_frame, m_stream_bytes, m_total_frames, m_pbo_use;
+    unsigned int m_msec_per_frame, m_stream_bytes, m_total_frames, m_pbo_use,
+        m_width, m_height;
 
-    float m_dt;
+    float m_accumulated_time, m_remaining_time;
 
     AVIHeader m_avi_hdr;
 
@@ -185,7 +186,7 @@ private:
 
     uint32_t m_chunk_fcc;
 
-    std::list<uint8_t*> m_fbi_queue;
+    std::list<std::pair<uint8_t*, float> > m_fbi_queue;
 
     pthread_t m_thread;
 
@@ -196,25 +197,26 @@ private:
     GLuint m_pbo[3];
 
     // ------------------------------------------------------------------------
-    static int bmpToJpg(unsigned char* image_data, unsigned char* image_output,
-                        unsigned long buf_length, unsigned int width,
-                        unsigned int height, int num_channels, int quality);
+    int bmpToJpg(unsigned char* image_data, unsigned char* image_output,
+                 unsigned long buf_length);
     // ------------------------------------------------------------------------
     AVIErrCode addImage(unsigned char* buffer, int size);
     // ------------------------------------------------------------------------
     bool closeFile(bool delete_file = false);
     // ------------------------------------------------------------------------
-    bool createFile(AVIFormat avi_format, int bits, int quality);
+    bool createFile(AVIFormat avi_format, int fps, int bits, int quality);
     // ------------------------------------------------------------------------
     bool addJUNKChunk(std::string str, unsigned int min_size);
     // ------------------------------------------------------------------------
-    void addFrameBufferImage(uint8_t* fbi)
+    void addFrameBufferImage(uint8_t* fbi, float dt)
     {
         pthread_mutex_lock(&m_fbi_mutex);
-        m_fbi_queue.push_back(fbi);
+        m_fbi_queue.emplace_back(fbi, dt);
         pthread_cond_signal(&m_cond_request);
         pthread_mutex_unlock(&m_fbi_mutex);
     }
+    // ------------------------------------------------------------------------
+    int handleFrameBufferImage(uint8_t* fbi, float dt);
 
 public:
     // ------------------------------------------------------------------------

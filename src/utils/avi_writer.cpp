@@ -33,14 +33,17 @@ AVIWriter::AVIWriter()
 {
     m_file = NULL;
     m_pbo_use = 0;
-    m_dt = 0.0f;
+    m_accumulated_time = 0.0f;
+    m_remaining_time = 0.0f;
+    m_img_quality = 0;
+    m_width = irr_driver->getActualScreenSize().Width;
+    m_height = irr_driver->getActualScreenSize().Height;
     glGenBuffers(3, m_pbo);
     for (int i = 0; i < 3; i++)
     {
         glBindBuffer(GL_PIXEL_PACK_BUFFER, m_pbo[i]);
-        glBufferData(GL_PIXEL_PACK_BUFFER,
-           irr_driver->getActualScreenSize().getArea() * 4, NULL,
-           GL_STREAM_READ);
+        glBufferData(GL_PIXEL_PACK_BUFFER, m_width * m_height * 4, NULL,
+            GL_STREAM_READ);
     }
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
     pthread_mutex_init(&m_fbi_mutex, NULL);
@@ -63,15 +66,10 @@ void* AVIWriter::startRoutine(void *obj)
                 &avi_writer->m_fbi_mutex);
             waiting = avi_writer->m_fbi_queue.empty();
         }
-        uint8_t* fbi = avi_writer->m_fbi_queue.front();
-        if (fbi == NULL)
-        {
-            avi_writer->setCanBeDeleted();
-            avi_writer->m_fbi_queue.pop_front();
-            pthread_mutex_unlock(&avi_writer->m_fbi_mutex);
-            return NULL;
-        }
-        if (fbi == (uint8_t*)0xAAAB1E5D)
+        auto& p =  avi_writer->m_fbi_queue.front();
+        uint8_t* fbi = p.first;
+        const float dt = p.second;
+        if (dt < 0.0f)
         {
             avi_writer->closeFile();
             avi_writer->m_file = NULL;
@@ -79,8 +77,21 @@ void* AVIWriter::startRoutine(void *obj)
             pthread_mutex_unlock(&avi_writer->m_fbi_mutex);
             continue;
         }
+        else if (fbi == NULL)
+        {
+            avi_writer->setCanBeDeleted();
+            avi_writer->m_fbi_queue.pop_front();
+            pthread_mutex_unlock(&avi_writer->m_fbi_mutex);
+            return NULL;
+        }
         avi_writer->m_fbi_queue.pop_front();
         pthread_mutex_unlock(&avi_writer->m_fbi_mutex);
+        int frame_count = avi_writer->handleFrameBufferImage(fbi, dt);
+        if (frame_count == -1)
+        {
+            delete [] fbi;
+            continue;
+        }
         video::IImage* image = irr_driver->getVideoDriver()
             ->createImageFromData(video::ECF_A8R8G8B8,
             irr_driver->getActualScreenSize(), fbi,
@@ -94,12 +105,12 @@ void* AVIWriter::startRoutine(void *obj)
         rgb->unlock();
         rgb->drop();
         uint8_t* orig_fbi = fbi;
-        const int pitch = irr_driver->getActualScreenSize().Width * 3;
-        uint8_t* p2 = fbi + (irr_driver->getActualScreenSize().Height - 1) *
-            pitch;
+        const unsigned width = avi_writer->m_width;
+        const unsigned height = avi_writer->m_height;
+        const int pitch = width * 3;
+        uint8_t* p2 = fbi + (height - 1) * pitch;
         uint8_t* tmp_buf = new uint8_t[pitch];
-        for (unsigned i = 0; i < irr_driver->getActualScreenSize().Height;
-            i += 2)
+        for (unsigned i = 0; i < height; i += 2)
         {
             memcpy(tmp_buf, fbi, pitch);
             memcpy(fbi, p2, pitch);
@@ -108,47 +119,67 @@ void* AVIWriter::startRoutine(void *obj)
             p2 -= pitch;
         }
         delete [] tmp_buf;
-        const unsigned size = irr_driver->getActualScreenSize().getArea() * 3;
+        const unsigned size = width * height * 3;
         uint8_t* jpg = new uint8_t[size];
-        int new_len = bmpToJpg(orig_fbi, jpg, size,
-            irr_driver->getActualScreenSize().Width,
-            irr_driver->getActualScreenSize().Height, 3, 70);
-        delete[] orig_fbi;
-        avi_writer->addImage(jpg, new_len);
-        delete[] jpg;
+        int new_len = avi_writer->bmpToJpg(orig_fbi, jpg, size);
+        delete [] orig_fbi;
+        while (frame_count != 0)
+        {
+            avi_writer->addImage(jpg, new_len);
+            frame_count--;
+        }
+        delete [] jpg;
     }
     return NULL;
 }   // startRoutine
+
+// ----------------------------------------------------------------------------
+int AVIWriter::handleFrameBufferImage(uint8_t* fbi, float dt)
+{
+    const float frame_rate = 0.001f * m_msec_per_frame;
+    m_accumulated_time += dt;
+    if (m_accumulated_time < frame_rate && m_remaining_time < frame_rate)
+    {
+        return -1;
+    }
+    int frame_count = 1;
+    m_remaining_time += m_accumulated_time - frame_rate;
+    m_accumulated_time = 0.0f;
+    while (m_remaining_time > frame_rate)
+    {
+        frame_count++;
+        m_remaining_time -= frame_rate;
+    }
+    return frame_count;
+}   // handleFrameBufferImage
 
 // ----------------------------------------------------------------------------
 void AVIWriter::captureFrameBufferImage(float dt)
 {
     if (m_file == NULL)
     {
-        createFile(AVI_FORMAT_JPG, 24, 70);
+        createFile(AVI_FORMAT_JPG, 24/*fps*/, 24/*bits*/, 90/*quality*/);
     }
-
-    m_dt += dt;
     glReadBuffer(GL_BACK);
+
     int pbo_read = -1;
-    if (m_pbo_use > 2 && m_dt >= 0.0416666667f)
+    if (m_pbo_use > 3 && m_pbo_use % 3 == 0)
+        m_pbo_use = 3;
+    if (m_pbo_use >= 3)
     {
-        m_dt = 0.0f;
         pbo_read = m_pbo_use % 3;
         glBindBuffer(GL_PIXEL_PACK_BUFFER, m_pbo[pbo_read]);
         void* ptr = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
-        const unsigned size = irr_driver->getActualScreenSize().getArea() * 4;
+        const unsigned size = m_width * m_height * 4;
         uint8_t* fbi = new uint8_t[size];
         memcpy(fbi, ptr, size);
         glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
-        addFrameBufferImage(fbi);
+        addFrameBufferImage(fbi, dt);
     }
     int pbo_use = m_pbo_use++ % 3;
     assert(pbo_read == -1 || pbo_use == pbo_read);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, m_pbo[pbo_use]);
-    glReadPixels(0, 0, irr_driver->getActualScreenSize().Width,
-        irr_driver->getActualScreenSize().Height, GL_BGRA, GL_UNSIGNED_BYTE,
-        0);
+    glReadPixels(0, 0, m_width, m_height, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 }   // captureFrameBufferImage
 
@@ -156,7 +187,7 @@ void AVIWriter::captureFrameBufferImage(float dt)
 void AVIWriter::stopRecording()
 {
     assert(m_file != NULL);
-    addFrameBufferImage((uint8_t*)0xAAAB1E5D);
+    addFrameBufferImage(NULL, -1.0f);
 }   // stopRecording
 
 // ----------------------------------------------------------------------------
@@ -348,14 +379,13 @@ error:
 }   // closeFile
 
 // ----------------------------------------------------------------------------
-bool AVIWriter::createFile(AVIFormat avi_format, int bits, int quality)
+bool AVIWriter::createFile(AVIFormat avi_format, int fps, int bits,
+                           int quality)
 {
     if (m_file != NULL)
         return false;
 
-    int width = irr_driver->getActualScreenSize().Width;
-    int height = irr_driver->getActualScreenSize().Height;
-
+    m_img_quality = quality;
     time_t rawtime;
     time(&rawtime);
     tm* timeInfo = localtime(&rawtime);
@@ -372,19 +402,19 @@ bool AVIWriter::createFile(AVIFormat avi_format, int bits, int quality)
         + time_buffer + ".avi";
     m_stream_bytes = 0;
     m_total_frames = 0;
-    m_msec_per_frame = 42;
+    m_msec_per_frame = unsigned(1000 / fps);
     m_movi_start = 0;
     m_last_junk_chunk = 0;
     m_total_frames = 0;
 
     BitmapInfoHeader bitmap_hdr;
     bitmap_hdr.biSize = sizeof(BitmapInfoHeader);
-    bitmap_hdr.biWidth = width;
-    bitmap_hdr.biHeight = height;
+    bitmap_hdr.biWidth = m_width;
+    bitmap_hdr.biHeight = m_height;
     bitmap_hdr.biPlanes = 1;
     bitmap_hdr.biBitCount = bits;
     bitmap_hdr.biCompression = 0;
-    bitmap_hdr.biSizeImage = (width * height * 3 * bitmap_hdr.biPlanes);
+    bitmap_hdr.biSizeImage = (m_width * m_height * 3 * bitmap_hdr.biPlanes);
     bitmap_hdr.biXPelsPerMeter = 0;
     bitmap_hdr.biYPelsPerMeter = 0;
     bitmap_hdr.biClrUsed = 0;
@@ -407,8 +437,8 @@ bool AVIWriter::createFile(AVIFormat avi_format, int bits, int quality)
     m_avi_hdr.avih.dwInitialFrames = 0;
     m_avi_hdr.avih.dwStreams = 1; // 1 = video, 2 = video and audio
     m_avi_hdr.avih.dwSuggestedBufferSize = 0; // can be just 0
-    m_avi_hdr.avih.dwWidth = width;
-    m_avi_hdr.avih.dwHeight = height;
+    m_avi_hdr.avih.dwWidth = m_width;
+    m_avi_hdr.avih.dwHeight = m_height;
 
     m_format_hdr.list.fcc = FOURCC('L', 'I', 'S', 'T');
     m_format_hdr.list.cb = (sizeof(m_format_hdr) - 8) +
@@ -427,7 +457,7 @@ bool AVIWriter::createFile(AVIFormat avi_format, int bits, int quality)
     m_format_hdr.strh.dwStart = 0;
     m_format_hdr.strh.dwLength = 0; // update when finished
     m_format_hdr.strh.dwSuggestedBufferSize = 0; // can be just 0
-    m_format_hdr.strh.dwQuality = quality * 100;
+    m_format_hdr.strh.dwQuality = m_img_quality * 100;
     m_format_hdr.strh.dwSampleSize = 0;
     m_format_hdr.strh.Left = 0;
     m_format_hdr.strh.Top = 0;
@@ -445,7 +475,7 @@ bool AVIWriter::createFile(AVIFormat avi_format, int bits, int quality)
     }
     else if (avi_format == AVI_FORMAT_BMP)
     {
-        bitmap_hdr.biHeight = -height;
+        bitmap_hdr.biHeight = -m_height;
         bitmap_hdr.biCompression = 0;
         m_chunk_fcc = FOURCC('0', '0', 'd', 'b');
     }
@@ -501,8 +531,7 @@ error:
 
 // ----------------------------------------------------------------------------
 int AVIWriter::bmpToJpg(unsigned char* image_data, unsigned char* image_output,
-                        unsigned long buf_length, unsigned int width,
-                        unsigned int height, int num_channels, int quality)
+                        unsigned long buf_length)
 {
     struct jpeg_compress_struct cinfo;
     struct jpeg_error_mgr jerr;
@@ -510,13 +539,13 @@ int AVIWriter::bmpToJpg(unsigned char* image_data, unsigned char* image_output,
 
     jpeg_create_compress(&cinfo);
 
-    cinfo.image_width = width;
-    cinfo.image_height = height;
-    cinfo.input_components = num_channels;
+    cinfo.image_width = m_width;
+    cinfo.image_height = m_height;
+    cinfo.input_components = 3;
     cinfo.in_color_space = JCS_RGB;
 
     jpeg_set_defaults(&cinfo);
-    jpeg_set_quality(&cinfo, quality, true);
+    jpeg_set_quality(&cinfo, m_img_quality, true);
 
     jpeg_mem_dest(&cinfo, &image_output, &buf_length);
 
@@ -525,7 +554,7 @@ int AVIWriter::bmpToJpg(unsigned char* image_data, unsigned char* image_output,
     JSAMPROW jrow[1];
     while (cinfo.next_scanline < cinfo.image_height)
     {
-        jrow[0] = &image_data[cinfo.next_scanline * width * num_channels];
+        jrow[0] = &image_data[cinfo.next_scanline * m_width * 3];
         jpeg_write_scanlines(&cinfo, jrow, 1);
     }
 
