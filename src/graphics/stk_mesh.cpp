@@ -461,6 +461,7 @@ void initTextures(GLMesh &mesh, Material::ShaderType mat)
         setTexture(mesh, 5, true, getShaderTypeName(mat));
         setTexture(mesh, 6, false, getShaderTypeName(mat));
         setTexture(mesh, 7, false, getShaderTypeName(mat));
+        setTexture(mesh, 8, false, getShaderTypeName(mat));
         break;
     }
 }   // initTextures

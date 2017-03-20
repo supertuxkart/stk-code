@@ -223,7 +223,8 @@ SplattingShader::SplattingShader()
                        4, "tex_detail0", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                        5, "tex_detail1", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                        6, "tex_detail2", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                       7, "tex_detail3", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+                       7, "tex_detail3", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                       8, "tex_hf", ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // SplattingShader
 
 // ============================================================================
@@ -839,10 +840,10 @@ const std::tuple<size_t> DetailMat::RSMTextures = std::tuple<size_t>(0);
 
 // ----------------------------------------------------------------------------
 const std::tuple<size_t> SplattingMat::FirstPassTextures
-    = std::tuple<size_t>(7);
-const std::tuple<size_t, size_t, size_t, size_t, size_t>
+    = std::tuple<size_t>(8);
+const std::tuple<size_t, size_t, size_t, size_t, size_t, size_t>
     SplattingMat::SecondPassTextures
-    = std::tuple<size_t, size_t, size_t, size_t, size_t>(1, 3, 4, 5, 6);
+    = std::tuple<size_t, size_t, size_t, size_t, size_t, size_t>(1, 3, 4, 5, 6, 7);
 std::tuple<> SplattingMat::ShadowTextures;
 const std::tuple<size_t, size_t, size_t, size_t, size_t>
     SplattingMat::RSMTextures

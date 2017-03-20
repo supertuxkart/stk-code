@@ -221,6 +221,7 @@ Material::Material(const XMLNode *node, bool deprecated)
         else if (s == "splatting")
         {
             m_shader_type = SHADERTYPE_SPLATTING;
+            node->get("hf-texture", &m_hf_texture);
             node->get("splatting-texture-1", &m_splatting_texture_1);
             node->get("splatting-texture-2", &m_splatting_texture_2);
             node->get("splatting-texture-3", &m_splatting_texture_3);
@@ -864,14 +865,17 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             }
             m->setTexture(5, tex);
 
+			TexConfig s4tc(false/*srgb*/, false/*premul_alpha*/,
+				true/*mesh_tex*/, false/*set_material*/);
             if (m_splatting_texture_4.size() > 0)
             {
-                TexConfig s4tc(false/*srgb*/, false/*premul_alpha*/,
-                    true/*mesh_tex*/, false/*set_material*/);
+                
                 tex = stm->getTexture(m_splatting_texture_4, &s4tc);
             }
             m->setTexture(6, tex);
             m->setTexture(7, glossytex);
+            tex = stm->getTexture(m_hf_texture, &s4tc);
+			m->setTexture(8, tex);
 
             // Material and shaders
             m->MaterialType = Shaders::getShader(ES_SPLATTING);
