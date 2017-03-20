@@ -68,8 +68,8 @@ void* AVIWriter::startRoutine(void *obj)
         }
         auto& p =  avi_writer->m_fbi_queue.front();
         uint8_t* fbi = p.first;
-        const float dt = p.second;
-        if (dt < 0.0f)
+        int frame_count = p.second;
+        if (frame_count == -1)
         {
             avi_writer->closeFile();
             avi_writer->m_file = NULL;
@@ -86,12 +86,6 @@ void* AVIWriter::startRoutine(void *obj)
         }
         avi_writer->m_fbi_queue.pop_front();
         pthread_mutex_unlock(&avi_writer->m_fbi_mutex);
-        int frame_count = avi_writer->handleFrameBufferImage(fbi, dt);
-        if (frame_count == -1)
-        {
-            delete [] fbi;
-            continue;
-        }
         video::IImage* image = irr_driver->getVideoDriver()
             ->createImageFromData(video::ECF_A8R8G8B8,
             irr_driver->getActualScreenSize(), fbi,
@@ -134,13 +128,13 @@ void* AVIWriter::startRoutine(void *obj)
 }   // startRoutine
 
 // ----------------------------------------------------------------------------
-int AVIWriter::handleFrameBufferImage(uint8_t* fbi, float dt)
+int AVIWriter::handleFrameBufferImage(float dt)
 {
     const float frame_rate = 0.001f * m_msec_per_frame;
     m_accumulated_time += dt;
     if (m_accumulated_time < frame_rate && m_remaining_time < frame_rate)
     {
-        return -1;
+        return 0;
     }
     int frame_count = 1;
     m_remaining_time += m_accumulated_time - frame_rate;
@@ -158,7 +152,7 @@ void AVIWriter::captureFrameBufferImage(float dt)
 {
     if (m_file == NULL)
     {
-        createFile(AVI_FORMAT_JPG, 24/*fps*/, 24/*bits*/, 90/*quality*/);
+        createFile(AVI_FORMAT_JPG, 30/*fps*/, 24/*bits*/, 90/*quality*/);
     }
     glReadBuffer(GL_BACK);
 
@@ -167,14 +161,18 @@ void AVIWriter::captureFrameBufferImage(float dt)
         m_pbo_use = 3;
     if (m_pbo_use >= 3)
     {
-        pbo_read = m_pbo_use % 3;
-        glBindBuffer(GL_PIXEL_PACK_BUFFER, m_pbo[pbo_read]);
-        void* ptr = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
-        const unsigned size = m_width * m_height * 4;
-        uint8_t* fbi = new uint8_t[size];
-        memcpy(fbi, ptr, size);
-        glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
-        addFrameBufferImage(fbi, dt);
+        int frame_count = handleFrameBufferImage(dt);
+        if (frame_count != 0)
+        {
+            pbo_read = m_pbo_use % 3;
+            glBindBuffer(GL_PIXEL_PACK_BUFFER, m_pbo[pbo_read]);
+            void* ptr = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+            const unsigned size = m_width * m_height * 4;
+            uint8_t* fbi = new uint8_t[size];
+            memcpy(fbi, ptr, size);
+            glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
+            addFrameBufferImage(fbi, frame_count);
+        }
     }
     int pbo_use = m_pbo_use++ % 3;
     assert(pbo_read == -1 || pbo_use == pbo_read);
@@ -187,7 +185,7 @@ void AVIWriter::captureFrameBufferImage(float dt)
 void AVIWriter::stopRecording()
 {
     assert(m_file != NULL);
-    addFrameBufferImage(NULL, -1.0f);
+    addFrameBufferImage(NULL, -1);
 }   // stopRecording
 
 // ----------------------------------------------------------------------------

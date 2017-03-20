@@ -169,10 +169,10 @@ private:
 
     std::string m_filename;
 
-    int m_last_junk_chunk, m_end_of_header, m_movi_start, m_img_quality;
-
-    unsigned int m_msec_per_frame, m_stream_bytes, m_total_frames, m_pbo_use,
+    int m_last_junk_chunk, m_end_of_header, m_movi_start, m_img_quality,
         m_width, m_height;
+
+    unsigned int m_msec_per_frame, m_stream_bytes, m_total_frames, m_pbo_use;
 
     float m_accumulated_time, m_remaining_time;
 
@@ -186,7 +186,7 @@ private:
 
     uint32_t m_chunk_fcc;
 
-    std::list<std::pair<uint8_t*, float> > m_fbi_queue;
+    std::list<std::pair<uint8_t*, int> > m_fbi_queue;
 
     pthread_t m_thread;
 
@@ -208,15 +208,15 @@ private:
     // ------------------------------------------------------------------------
     bool addJUNKChunk(std::string str, unsigned int min_size);
     // ------------------------------------------------------------------------
-    void addFrameBufferImage(uint8_t* fbi, float dt)
+    void addFrameBufferImage(uint8_t* fbi, int frame_count)
     {
         pthread_mutex_lock(&m_fbi_mutex);
-        m_fbi_queue.emplace_back(fbi, dt);
+        m_fbi_queue.emplace_back(fbi, frame_count);
         pthread_cond_signal(&m_cond_request);
         pthread_mutex_unlock(&m_fbi_mutex);
     }
     // ------------------------------------------------------------------------
-    int handleFrameBufferImage(uint8_t* fbi, float dt);
+    int handleFrameBufferImage(float dt);
 
 public:
     // ------------------------------------------------------------------------
