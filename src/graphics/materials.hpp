@@ -140,7 +140,7 @@ public:
 };   // InstancedSphereMapShader
 
 // ============================================================================
-class SplattingShader : public TextureShader<SplattingShader, 9, core::matrix4>
+class SplattingShader : public TextureShader<SplattingShader, 8, core::matrix4>
 {
 public:
     SplattingShader();
@@ -679,7 +679,7 @@ struct SplattingMat
     static const enum Material::ShaderType MaterialType
                                            = Material::SHADERTYPE_SPLATTING;
     static const std::tuple<size_t> FirstPassTextures;
-    static const std::tuple<size_t, size_t, size_t, size_t, size_t, size_t>
+    static const std::tuple<size_t, size_t, size_t, size_t, size_t>
                                                          SecondPassTextures;
     static std::tuple<> ShadowTextures;
     static const std::tuple<size_t, size_t, size_t, size_t, size_t>
