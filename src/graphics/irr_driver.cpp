@@ -169,6 +169,9 @@ IrrDriver::~IrrDriver()
 #endif
     delete m_wind;
     delete m_renderer;
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+    AVIWriter::kill();
+#endif
 }   // ~IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -923,6 +926,9 @@ void IrrDriver::applyResolutionSettings()
     // (we're sure to update main.cpp at some point and forget this one...)
     VAOManager::getInstance()->kill();
     STKTexManager::getInstance()->kill();
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+    AVIWriter::kill();
+#endif
     // initDevice will drop the current device.
     if (CVS->isGLSL())
     {
@@ -1899,11 +1905,20 @@ void IrrDriver::setRecording(bool val)
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (!CVS->isARBPixelBufferObjectUsable())
         return;
-    if (val == false && m_recording == false)
+    if (m_recording == val)
         return;
     m_recording = val;
-    if (val == false)
+    if (val == true)
+    {
+        std::string track_name = World::getWorld() != NULL ?
+            race_manager->getTrackName() : "menu";
+        AVIWriter::getInstance()->setRecordingTarget(file_manager
+            ->getScreenshotDir() + track_name);
+    }
+    else
+    {
         AVIWriter::getInstance()->stopRecording();
+    }
 #endif
 }   // setRecording
 

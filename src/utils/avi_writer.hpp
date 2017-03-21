@@ -22,6 +22,7 @@
 #include "utils/can_be_deleted.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/singleton.hpp"
+#include "utils/synchronised.hpp"
 
 #include <string>
 #include <list>
@@ -166,6 +167,8 @@ class AVIWriter : public CanBeDeleted, public NoCopy,
 private:
     FILE* m_file;
 
+    Synchronised<std::string> m_recording_target;
+
     std::string m_filename;
 
     int m_last_junk_chunk, m_end_of_header, m_movi_start, m_img_quality,
@@ -187,11 +190,9 @@ private:
 
     uint32_t m_chunk_fcc;
 
-    std::list<std::pair<uint8_t*, int> > m_fbi_queue;
+    Synchronised<std::list<std::pair<uint8_t*, int> > > m_fbi_queue;
 
     pthread_t m_thread;
-
-    pthread_mutex_t m_fbi_mutex;
 
     pthread_cond_t m_cond_request;
 
@@ -211,23 +212,38 @@ private:
     // ------------------------------------------------------------------------
     void addFrameBufferImage(uint8_t* fbi, int frame_count)
     {
-        pthread_mutex_lock(&m_fbi_mutex);
-        m_fbi_queue.emplace_back(fbi, frame_count);
+        m_fbi_queue.lock();
+        m_fbi_queue.getData().emplace_back(fbi, frame_count);
         pthread_cond_signal(&m_cond_request);
-        pthread_mutex_unlock(&m_fbi_mutex);
+        m_fbi_queue.unlock();
     }
     // ------------------------------------------------------------------------
     int getFrameCount(float dt);
+    // ------------------------------------------------------------------------
+    void cleanAllFrameBufferImages()
+    {
+        m_fbi_queue.lock();
+        for (auto& p : m_fbi_queue.getData())
+            delete p.first;
+        m_fbi_queue.unlock();
+    }
 
 public:
     // ------------------------------------------------------------------------
     AVIWriter();
     // ------------------------------------------------------------------------
+    ~AVIWriter();
+    // ------------------------------------------------------------------------
     static void* startRoutine(void *obj);
     // ------------------------------------------------------------------------
     void captureFrameBufferImage(float dt);
     // ------------------------------------------------------------------------
-    void stopRecording();
+    void reset();
+    // ------------------------------------------------------------------------
+    void stopRecording()                     { addFrameBufferImage(NULL, -1); }
+    // ------------------------------------------------------------------------
+    void setRecordingTarget(const std::string& name)
+                                        { m_recording_target.setAtomic(name); }
 
 };
 

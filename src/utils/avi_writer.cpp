@@ -20,10 +20,6 @@
 
 #include "utils/avi_writer.hpp"
 #include "config/user_config.hpp"
-#include "io/file_manager.hpp"
-#include "modes/world.hpp"
-#include "race/race_manager.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/vs.hpp"
 
 #include <jpeglib.h>
@@ -33,10 +29,7 @@
 AVIWriter::AVIWriter()
 {
     m_file = NULL;
-    m_pbo_use = 0;
-    m_accumulated_time = 0.0f;
-    m_remaining_time = 0.0f;
-    m_img_quality = 0;
+    reset();
     m_width = UserConfigParams::m_width;
     m_height = UserConfigParams::m_height;
     glGenBuffers(3, m_pbo);
@@ -47,10 +40,36 @@ AVIWriter::AVIWriter()
             GL_STREAM_READ);
     }
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-    pthread_mutex_init(&m_fbi_mutex, NULL);
     pthread_cond_init(&m_cond_request, NULL);
     pthread_create(&m_thread, NULL, &startRoutine, this);
 }   // AVIWriter
+
+// ----------------------------------------------------------------------------
+AVIWriter::~AVIWriter()
+{
+    glDeleteBuffers(3, m_pbo);
+    addFrameBufferImage(NULL, 0);
+    if (!waitForReadyToDeleted(2.0f))
+        Log::info("AVIWriter", "AVIWriter not stopping," "exiting anyway.");
+    pthread_join(m_thread, NULL);
+    pthread_cond_destroy(&m_cond_request);
+}   // ~AVIWriter
+
+// ----------------------------------------------------------------------------
+void AVIWriter::reset()
+{
+    m_last_junk_chunk = 0;
+    m_end_of_header = 0;
+    m_movi_start = 0;
+    m_img_quality = UserConfigParams::m_record_compression;
+    m_msec_per_frame = unsigned(1000 / UserConfigParams::m_record_fps);
+    m_stream_bytes = 0;
+    m_total_frames = 0;
+    m_pbo_use = 0;
+    m_accumulated_time = 0.0f;
+    m_remaining_time = 0.0f;
+    m_chunk_fcc = 0;
+}   // reset
 
 // ----------------------------------------------------------------------------
 void* AVIWriter::startRoutine(void *obj)
@@ -59,34 +78,51 @@ void* AVIWriter::startRoutine(void *obj)
     AVIWriter* avi_writer = (AVIWriter*)obj;
     while (true)
     {
-        pthread_mutex_lock(&avi_writer->m_fbi_mutex);
-        bool waiting = avi_writer->m_fbi_queue.empty();
+        avi_writer->m_fbi_queue.lock();
+        bool waiting = avi_writer->m_fbi_queue.getData().empty();
         while (waiting)
         {
             pthread_cond_wait(&avi_writer->m_cond_request,
-                &avi_writer->m_fbi_mutex);
-            waiting = avi_writer->m_fbi_queue.empty();
+                avi_writer->m_fbi_queue.getMutex());
+            waiting = avi_writer->m_fbi_queue.getData().empty();
         }
-        auto& p =  avi_writer->m_fbi_queue.front();
+        auto& p =  avi_writer->m_fbi_queue.getData().front();
         uint8_t* fbi = p.first;
         int frame_count = p.second;
         if (frame_count == -1)
         {
             avi_writer->closeFile();
-            avi_writer->m_file = NULL;
-            avi_writer->m_fbi_queue.pop_front();
-            pthread_mutex_unlock(&avi_writer->m_fbi_mutex);
+            avi_writer->m_fbi_queue.getData().pop_front();
+            avi_writer->m_fbi_queue.unlock();
             continue;
         }
         else if (fbi == NULL)
         {
+            avi_writer->closeFile();
             avi_writer->setCanBeDeleted();
-            avi_writer->m_fbi_queue.pop_front();
-            pthread_mutex_unlock(&avi_writer->m_fbi_mutex);
+            avi_writer->m_fbi_queue.getData().pop_front();
+            avi_writer->m_fbi_queue.unlock();
             return NULL;
         }
-        avi_writer->m_fbi_queue.pop_front();
-        pthread_mutex_unlock(&avi_writer->m_fbi_mutex);
+        const bool too_slow = avi_writer->m_fbi_queue.getData().size() > 50;
+        avi_writer->m_fbi_queue.getData().pop_front();
+        avi_writer->m_fbi_queue.unlock();
+        if (too_slow)
+        {
+            delete [] fbi;
+            avi_writer->cleanAllFrameBufferImages();
+            continue;
+        }
+        if (avi_writer->m_file == NULL)
+        {
+            bool ret = avi_writer->createFile();
+            if (!ret)
+            {
+                delete [] fbi;
+                avi_writer->cleanAllFrameBufferImages();
+                continue;
+            }
+        }
         uint8_t* orig_fbi = fbi;
         const unsigned width = avi_writer->m_width;
         const unsigned height = avi_writer->m_height;
@@ -129,8 +165,16 @@ void* AVIWriter::startRoutine(void *obj)
         }
         while (frame_count != 0)
         {
-            avi_writer->addImage(avi_writer->m_avi_format == AVI_FORMAT_JPG ?
-                orig_fbi : orig_fbi + area, size);
+            AVIErrCode code = avi_writer->addImage
+                (avi_writer->m_avi_format == AVI_FORMAT_JPG ? orig_fbi :
+                orig_fbi + area, size);
+            if (code == AVI_SIZE_LIMIT_ERR)
+            {
+                avi_writer->createFile();
+                continue;
+            }
+            else if (code == AVI_IO_ERR)
+                break;
             frame_count--;
         }
         delete [] orig_fbi;
@@ -161,12 +205,7 @@ int AVIWriter::getFrameCount(float dt)
 // ----------------------------------------------------------------------------
 void AVIWriter::captureFrameBufferImage(float dt)
 {
-    if (m_file == NULL)
-    {
-        createFile();
-    }
     glReadBuffer(GL_BACK);
-
     int pbo_read = -1;
     if (m_pbo_use > 3 && m_pbo_use % 3 == 0)
         m_pbo_use = 3;
@@ -193,13 +232,6 @@ void AVIWriter::captureFrameBufferImage(float dt)
         GL_UNSIGNED_BYTE, NULL);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 }   // captureFrameBufferImage
-
-// ----------------------------------------------------------------------------
-void AVIWriter::stopRecording()
-{
-    assert(m_file != NULL);
-    addFrameBufferImage(NULL, -1);
-}   // stopRecording
 
 // ----------------------------------------------------------------------------
 bool AVIWriter::addJUNKChunk(std::string str, unsigned int min_size)
@@ -390,12 +422,8 @@ error:
 // ----------------------------------------------------------------------------
 bool AVIWriter::createFile()
 {
-    if (m_file != NULL)
-        return false;
-
     m_avi_format =
         UserConfigParams::m_record_bmp ? AVI_FORMAT_BMP : AVI_FORMAT_JPG;
-    m_img_quality = UserConfigParams::m_record_compression;
     time_t rawtime;
     time(&rawtime);
     tm* timeInfo = localtime(&rawtime);
@@ -405,14 +433,9 @@ bool AVIWriter::createFile()
         timeInfo->tm_mday, timeInfo->tm_hour,
         timeInfo->tm_min, timeInfo->tm_sec);
 
-    std::string track_name = World::getWorld() != NULL ?
-        race_manager->getTrackName() : "menu";
-
-    m_filename = file_manager->getScreenshotDir() + track_name + "-"
-        + time_buffer + ".avi";
+    m_filename = m_recording_target.getAtomic() + "-" + time_buffer + ".avi";
     m_stream_bytes = 0;
     m_total_frames = 0;
-    m_msec_per_frame = unsigned(1000 / UserConfigParams::m_record_fps);
     m_movi_start = 0;
     m_last_junk_chunk = 0;
     m_total_frames = 0;
