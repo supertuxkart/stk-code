@@ -2,13 +2,8 @@ uniform mat4 ModelViewMatrix;
 uniform vec3 Position;
 uniform vec2 Size;
 
-#ifdef Explicit_Attrib_Location_Usable
 layout(location = 0) in vec2 Corner;
 layout(location = 3) in vec2 Texcoord;
-#else
-in vec2 Corner;
-in vec2 Texcoord;
-#endif
 
 out vec2 uv;
 

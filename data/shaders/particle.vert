@@ -1,21 +1,12 @@
 uniform vec3 color_from;
 uniform vec3 color_to;
 
-#ifdef Explicit_Attrib_Location_Usable
 layout(location=0) in vec3 Position;
 layout(location = 1) in float lifetime;
 layout(location = 2) in float size;
 
 layout(location=3) in vec2 Texcoord;
 layout(location = 4) in vec2 quadcorner;
-#else
-in vec3 Position;
-in float lifetime;
-in float size;
-
-in vec2 Texcoord;
-in vec2 quadcorner;
-#endif
 
 out float lf;
 out vec2 tc;
