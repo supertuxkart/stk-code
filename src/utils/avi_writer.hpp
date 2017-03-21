@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef SERVER_ONLY
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
 
 #include "graphics/gl_headers.hpp"
 #include "utils/can_be_deleted.hpp"
@@ -175,6 +175,8 @@ private:
 
     float m_accumulated_time, m_remaining_time;
 
+    AVIFormat m_avi_format;
+
     AVIHeader m_avi_hdr;
 
     CHUNK m_movi_chunk;
@@ -203,7 +205,7 @@ private:
     // ------------------------------------------------------------------------
     bool closeFile(bool delete_file = false);
     // ------------------------------------------------------------------------
-    bool createFile(AVIFormat avi_format, int fps, int bits, int quality);
+    bool createFile();
     // ------------------------------------------------------------------------
     bool addJUNKChunk(std::string str, unsigned int min_size);
     // ------------------------------------------------------------------------
@@ -215,7 +217,7 @@ private:
         pthread_mutex_unlock(&m_fbi_mutex);
     }
     // ------------------------------------------------------------------------
-    int handleFrameBufferImage(float dt);
+    int getFrameCount(float dt);
 
 public:
     // ------------------------------------------------------------------------

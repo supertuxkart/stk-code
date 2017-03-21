@@ -1887,7 +1887,7 @@ void IrrDriver::update(float dt)
     // menu.
     //if(World::getWorld() && World::getWorld()->isRacePhase())
     //    printRenderStats();
-#ifndef SERVER_ONLY
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (m_recording)
         AVIWriter::getInstance()->captureFrameBufferImage(dt);
 #endif
@@ -1896,7 +1896,7 @@ void IrrDriver::update(float dt)
 // ----------------------------------------------------------------------------
 void IrrDriver::setRecording(bool val)
 {
-#ifndef SERVER_ONLY
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (!CVS->isARBPixelBufferObjectUsable())
         return;
     if (val == false && m_recording == false)

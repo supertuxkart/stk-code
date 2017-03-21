@@ -16,9 +16,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef SERVER_ONLY
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
 
 #include "utils/avi_writer.hpp"
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "modes/world.hpp"
@@ -114,22 +115,26 @@ void* AVIWriter::startRoutine(void *obj)
             p2 -= pitch;
         }
         delete [] tmp_buf;
-        const unsigned size = width * height * 3;
-        uint8_t* jpg = new uint8_t[size];
-        int new_len = avi_writer->bmpToJpg(orig_fbi, jpg, size);
-        delete [] orig_fbi;
+        int size = width * height * 3;
+        if (avi_writer->m_avi_format == AVI_FORMAT_JPG)
+        {
+            uint8_t* jpg = new uint8_t[size];
+            size = avi_writer->bmpToJpg(orig_fbi, jpg, size);
+            delete [] orig_fbi;
+            orig_fbi = jpg;
+        }
         while (frame_count != 0)
         {
-            avi_writer->addImage(jpg, new_len);
+            avi_writer->addImage(orig_fbi, size);
             frame_count--;
         }
-        delete [] jpg;
+        delete [] orig_fbi;
     }
     return NULL;
 }   // startRoutine
 
 // ----------------------------------------------------------------------------
-int AVIWriter::handleFrameBufferImage(float dt)
+int AVIWriter::getFrameCount(float dt)
 {
     const float frame_rate = 0.001f * m_msec_per_frame;
     m_accumulated_time += dt;
@@ -146,14 +151,14 @@ int AVIWriter::handleFrameBufferImage(float dt)
         m_remaining_time -= frame_rate;
     }
     return frame_count;
-}   // handleFrameBufferImage
+}   // getFrameCount
 
 // ----------------------------------------------------------------------------
 void AVIWriter::captureFrameBufferImage(float dt)
 {
     if (m_file == NULL)
     {
-        createFile(AVI_FORMAT_JPG, 30/*fps*/, 24/*bits*/, 90/*quality*/);
+        createFile();
     }
     glReadBuffer(GL_BACK);
 
@@ -162,7 +167,7 @@ void AVIWriter::captureFrameBufferImage(float dt)
         m_pbo_use = 3;
     if (m_pbo_use >= 3)
     {
-        int frame_count = handleFrameBufferImage(dt);
+        int frame_count = getFrameCount(dt);
         if (frame_count != 0)
         {
             pbo_read = m_pbo_use % 3;
@@ -178,7 +183,9 @@ void AVIWriter::captureFrameBufferImage(float dt)
     int pbo_use = m_pbo_use++ % 3;
     assert(pbo_read == -1 || pbo_use == pbo_read);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, m_pbo[pbo_use]);
-    glReadPixels(0, 0, m_width, m_height, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+    glReadPixels(0, 0, m_width, m_height,
+        m_avi_format == AVI_FORMAT_JPG ? GL_BGRA: GL_RGBA,
+        GL_UNSIGNED_BYTE, NULL);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 }   // captureFrameBufferImage
 
@@ -336,7 +343,6 @@ bool AVIWriter::closeFile(bool delete_file)
             goto error;
 
         m_avi_hdr.riff.cb = size - sizeof(m_avi_hdr.riff);
-        m_avi_hdr.avih.dwMicroSecPerFrame = m_msec_per_frame * 1000;
         m_avi_hdr.avih.dwMaxBytesPerSec = (uint32_t)
             (((m_stream_bytes / m_total_frames) * m_format_hdr.strh.dwRate) /
             m_msec_per_frame + 0.5f);
@@ -346,7 +352,6 @@ bool AVIWriter::closeFile(bool delete_file)
         if (num != sizeof(m_avi_hdr))
             goto error;
 
-        m_format_hdr.strh.dwScale = m_msec_per_frame;
         m_format_hdr.strh.dwLength = m_total_frames;
 
         num = fwrite(&m_format_hdr, 1, sizeof(m_format_hdr), m_file);
@@ -378,13 +383,14 @@ error:
 }   // closeFile
 
 // ----------------------------------------------------------------------------
-bool AVIWriter::createFile(AVIFormat avi_format, int fps, int bits,
-                           int quality)
+bool AVIWriter::createFile()
 {
     if (m_file != NULL)
         return false;
 
-    m_img_quality = quality;
+    m_avi_format =
+        UserConfigParams::m_record_bmp ? AVI_FORMAT_BMP : AVI_FORMAT_JPG;
+    m_img_quality = UserConfigParams::m_record_compression;
     time_t rawtime;
     time(&rawtime);
     tm* timeInfo = localtime(&rawtime);
@@ -401,7 +407,7 @@ bool AVIWriter::createFile(AVIFormat avi_format, int fps, int bits,
         + time_buffer + ".avi";
     m_stream_bytes = 0;
     m_total_frames = 0;
-    m_msec_per_frame = unsigned(1000 / fps);
+    m_msec_per_frame = unsigned(1000 / UserConfigParams::m_record_fps);
     m_movi_start = 0;
     m_last_junk_chunk = 0;
     m_total_frames = 0;
@@ -411,7 +417,7 @@ bool AVIWriter::createFile(AVIFormat avi_format, int fps, int bits,
     bitmap_hdr.biWidth = m_width;
     bitmap_hdr.biHeight = m_height;
     bitmap_hdr.biPlanes = 1;
-    bitmap_hdr.biBitCount = bits;
+    bitmap_hdr.biBitCount = 24;
     bitmap_hdr.biCompression = 0;
     bitmap_hdr.biSizeImage = (m_width * m_height * 3 * bitmap_hdr.biPlanes);
     bitmap_hdr.biXPelsPerMeter = 0;
@@ -465,14 +471,14 @@ bool AVIWriter::createFile(AVIFormat avi_format, int fps, int bits,
     m_format_hdr.strfhdr.fcc = FOURCC('s', 't', 'r', 'f');
     m_format_hdr.strfhdr.cb = sizeof(BitmapInfoHeader);
 
-    //Format specific changes
-    if (avi_format == AVI_FORMAT_JPG)
+    // Format specific changes
+    if (m_avi_format == AVI_FORMAT_JPG)
     {
         m_format_hdr.strh.fccHandler = CC_MJPG;
         bitmap_hdr.biCompression = FOURCC('M', 'J', 'P', 'G');
         m_chunk_fcc = FOURCC('0', '0', 'd', 'c');
     }
-    else if (avi_format == AVI_FORMAT_BMP)
+    else if (m_avi_format == AVI_FORMAT_BMP)
     {
         bitmap_hdr.biHeight = -m_height;
         bitmap_hdr.biCompression = 0;
