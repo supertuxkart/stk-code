@@ -27,7 +27,6 @@
 #include <list>
 
 #include <pthread.h>
-#include <jpeglib.h>
 
 #define FOURCC(a,b,c,d) ((uint32_t) (((d)<<24) | ((c)<<16) | ((b)<<8) | (a)))
 

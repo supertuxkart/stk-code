@@ -26,6 +26,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/vs.hpp"
 
+#include <jpeglib.h>
 #include <cstring>
 
 // ----------------------------------------------------------------------------
