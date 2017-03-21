@@ -192,6 +192,8 @@ private:
 
     Synchronised<std::list<std::pair<uint8_t*, int> > > m_fbi_queue;
 
+    Synchronised<bool> m_idle;
+
     pthread_t m_thread;
 
     pthread_cond_t m_cond_request;
@@ -227,6 +229,8 @@ private:
             delete p.first;
         m_fbi_queue.unlock();
     }
+    // ------------------------------------------------------------------------
+    bool isIdle() const                          { return m_idle.getAtomic(); }
 
 public:
     // ------------------------------------------------------------------------
@@ -238,7 +242,9 @@ public:
     // ------------------------------------------------------------------------
     void captureFrameBufferImage(float dt);
     // ------------------------------------------------------------------------
-    void reset();
+    void resetFrameBufferImage();
+    // ------------------------------------------------------------------------
+    void resetCaptureFormat();
     // ------------------------------------------------------------------------
     void stopRecording()                     { addFrameBufferImage(NULL, -1); }
     // ------------------------------------------------------------------------

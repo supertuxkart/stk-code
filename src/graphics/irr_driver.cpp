@@ -1914,6 +1914,7 @@ void IrrDriver::setRecording(bool val)
             race_manager->getTrackName() : "menu";
         AVIWriter::getInstance()->setRecordingTarget(file_manager
             ->getScreenshotDir() + track_name);
+        AVIWriter::getInstance()->resetFrameBufferImage();
     }
     else
     {

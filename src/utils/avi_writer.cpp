@@ -20,18 +20,26 @@
 
 #include "utils/avi_writer.hpp"
 #include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "utils/vs.hpp"
 
 #include <jpeglib.h>
 #include <cstring>
 
 // ----------------------------------------------------------------------------
-AVIWriter::AVIWriter()
+AVIWriter::AVIWriter() : m_idle(true)
 {
+    resetFrameBufferImage();
+    resetCaptureFormat();
     m_file = NULL;
-    reset();
-    m_width = UserConfigParams::m_width;
-    m_height = UserConfigParams::m_height;
+    m_last_junk_chunk = 0;
+    m_end_of_header = 0;
+    m_movi_start = 0;
+    m_stream_bytes = 0;
+    m_total_frames = 0;
+    m_chunk_fcc = 0;
+    m_width = irr_driver->getActualScreenSize().Width;
+    m_height = irr_driver->getActualScreenSize().Height;
     glGenBuffers(3, m_pbo);
     for (int i = 0; i < 3; i++)
     {
@@ -56,20 +64,21 @@ AVIWriter::~AVIWriter()
 }   // ~AVIWriter
 
 // ----------------------------------------------------------------------------
-void AVIWriter::reset()
+void AVIWriter::resetFrameBufferImage()
 {
-    m_last_junk_chunk = 0;
-    m_end_of_header = 0;
-    m_movi_start = 0;
-    m_img_quality = UserConfigParams::m_record_compression;
-    m_msec_per_frame = unsigned(1000 / UserConfigParams::m_record_fps);
-    m_stream_bytes = 0;
-    m_total_frames = 0;
     m_pbo_use = 0;
     m_accumulated_time = 0.0f;
     m_remaining_time = 0.0f;
-    m_chunk_fcc = 0;
-}   // reset
+}   // resetFrameBufferImage
+
+// ----------------------------------------------------------------------------
+void AVIWriter::resetCaptureFormat()
+{
+    m_img_quality = UserConfigParams::m_record_compression;
+    m_msec_per_frame = unsigned(1000 / UserConfigParams::m_record_fps);
+    m_avi_format =
+        UserConfigParams::m_record_bmp ? AVI_FORMAT_BMP : AVI_FORMAT_JPG;
+}   // resetCaptureFormat
 
 // ----------------------------------------------------------------------------
 void* AVIWriter::startRoutine(void *obj)
@@ -92,6 +101,7 @@ void* AVIWriter::startRoutine(void *obj)
         if (frame_count == -1)
         {
             avi_writer->closeFile();
+            avi_writer->m_idle.setAtomic(true);
             avi_writer->m_fbi_queue.getData().pop_front();
             avi_writer->m_fbi_queue.unlock();
             continue;
@@ -422,8 +432,7 @@ error:
 // ----------------------------------------------------------------------------
 bool AVIWriter::createFile()
 {
-    m_avi_format =
-        UserConfigParams::m_record_bmp ? AVI_FORMAT_BMP : AVI_FORMAT_JPG;
+    m_idle.setAtomic(false);
     time_t rawtime;
     time(&rawtime);
     tm* timeInfo = localtime(&rawtime);
@@ -438,7 +447,6 @@ bool AVIWriter::createFile()
     m_total_frames = 0;
     m_movi_start = 0;
     m_last_junk_chunk = 0;
-    m_total_frames = 0;
 
     BitmapInfoHeader bitmap_hdr;
     bitmap_hdr.biSize = sizeof(BitmapInfoHeader);
