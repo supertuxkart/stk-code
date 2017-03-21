@@ -21,7 +21,6 @@
 #include "utils/avi_writer.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
-#include "graphics/irr_driver.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -38,8 +37,8 @@ AVIWriter::AVIWriter()
     m_accumulated_time = 0.0f;
     m_remaining_time = 0.0f;
     m_img_quality = 0;
-    m_width = irr_driver->getActualScreenSize().Width;
-    m_height = irr_driver->getActualScreenSize().Height;
+    m_width = UserConfigParams::m_width;
+    m_height = UserConfigParams::m_height;
     glGenBuffers(3, m_pbo);
     for (int i = 0; i < 3; i++)
     {
@@ -88,21 +87,26 @@ void* AVIWriter::startRoutine(void *obj)
         }
         avi_writer->m_fbi_queue.pop_front();
         pthread_mutex_unlock(&avi_writer->m_fbi_mutex);
-        video::IImage* image = irr_driver->getVideoDriver()
-            ->createImageFromData(video::ECF_A8R8G8B8,
-            irr_driver->getActualScreenSize(), fbi,
-            true/*ownForeignMemory*/);
-        video::IImage* rgb = irr_driver->getVideoDriver()->createImage
-            (video::ECF_R8G8B8, irr_driver->getActualScreenSize());
-        image->copyTo(rgb);
-        image->drop();
-        rgb->setDeleteMemory(false);
-        fbi = (uint8_t*)rgb->lock();
-        rgb->unlock();
-        rgb->drop();
         uint8_t* orig_fbi = fbi;
         const unsigned width = avi_writer->m_width;
         const unsigned height = avi_writer->m_height;
+        const unsigned area = width * height;
+        int size = area * 4;
+        int dest = size - 3;
+        int src = size - 4;
+        int copied = 0;
+        while (true)
+        {
+            if (copied++ > 1)
+                memcpy(fbi + dest, fbi + src, 3);
+            else
+                memmove(fbi + dest, fbi + src, 3);
+            if (src == 0)
+                break;
+            dest -= 3;
+            src -= 4;
+        }
+        fbi = fbi + area;
         const int pitch = width * 3;
         uint8_t* p2 = fbi + (height - 1) * pitch;
         uint8_t* tmp_buf = new uint8_t[pitch];
@@ -115,17 +119,18 @@ void* AVIWriter::startRoutine(void *obj)
             p2 -= pitch;
         }
         delete [] tmp_buf;
-        int size = width * height * 3;
+        size = area * 3;
         if (avi_writer->m_avi_format == AVI_FORMAT_JPG)
         {
             uint8_t* jpg = new uint8_t[size];
-            size = avi_writer->bmpToJpg(orig_fbi, jpg, size);
+            size = avi_writer->bmpToJpg(orig_fbi + area, jpg, size);
             delete [] orig_fbi;
             orig_fbi = jpg;
         }
         while (frame_count != 0)
         {
-            avi_writer->addImage(orig_fbi, size);
+            avi_writer->addImage(avi_writer->m_avi_format == AVI_FORMAT_JPG ?
+                orig_fbi : orig_fbi + area, size);
             frame_count--;
         }
         delete [] orig_fbi;
@@ -184,7 +189,7 @@ void AVIWriter::captureFrameBufferImage(float dt)
     assert(pbo_read == -1 || pbo_use == pbo_read);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, m_pbo[pbo_use]);
     glReadPixels(0, 0, m_width, m_height,
-        m_avi_format == AVI_FORMAT_JPG ? GL_BGRA: GL_RGBA,
+        m_avi_format == AVI_FORMAT_JPG ? GL_RGBA: GL_BGRA,
         GL_UNSIGNED_BYTE, NULL);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 }   // captureFrameBufferImage
