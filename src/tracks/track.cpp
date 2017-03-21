@@ -480,6 +480,7 @@ void Track::loadTrackInfo()
     m_fog_height_start      = 0.0f;
     m_fog_height_end        = 100.0f;
     m_gravity               = 9.80665f;
+    m_friction              = 0.5f;
     m_smooth_normals        = false;
     m_godrays               = false;
     m_godrays_opacity       = 1.0f;
@@ -514,6 +515,7 @@ void Track::loadTrackInfo()
     getMusicInformation(filenames, m_music);
     root->get("screenshot",            &m_screenshot);
     root->get("gravity",               &m_gravity);
+    root->get("friction",              &m_friction);
     root->get("soccer",                &m_is_soccer);
     root->get("arena",                 &m_is_arena);
     root->get("max-arena-players",     &m_max_arena_players);
@@ -836,7 +838,7 @@ void Track::createPhysicsModel(unsigned int main_track_count)
     {
         convertTrackToBullet(m_all_nodes[i]);
     }
-    m_track_mesh->createPhysicalBody();
+    m_track_mesh->createPhysicalBody(m_friction);
     m_gfx_effect_mesh->createCollisionShape();
 }   // createPhysicsModel
 
