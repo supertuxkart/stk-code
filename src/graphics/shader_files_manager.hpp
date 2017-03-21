@@ -38,6 +38,7 @@ private:
 
     // ------------------------------------------------------------------------
     const std::string& getHeader();
+    void readFile(const std::string& file, std::ostringstream& code);
 
 public:
     // ------------------------------------------------------------------------
