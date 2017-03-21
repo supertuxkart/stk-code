@@ -1908,7 +1908,7 @@ void IrrDriver::setRecording(bool val)
     if (m_recording == val)
         return;
     m_recording = val;
-    if (val == true)
+    if (m_recording == true)
     {
         std::string track_name = World::getWorld() != NULL ?
             race_manager->getTrackName() : "menu";

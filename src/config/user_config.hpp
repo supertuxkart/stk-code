@@ -563,6 +563,11 @@ namespace UserConfigParams
         &m_video_group, "Record video using uncompressed bitmap, notice: this "
                         "will require a lot of space and fast disk access."));
 
+    PARAM_PREFIX BoolUserConfigParam        m_limit_game_fps
+        PARAM_DEFAULT(BoolUserConfigParam(true, "limit_game_fps",
+        &m_video_group, "Limit game framerate not beyond the fps of recording "
+                        "video."));
+
     PARAM_PREFIX IntUserConfigParam         m_record_compression
         PARAM_DEFAULT(IntUserConfigParam(90, "record_compression",
         &m_video_group, "Specify the compression level of recording video"));
