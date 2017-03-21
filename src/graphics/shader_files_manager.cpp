@@ -146,7 +146,9 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
 
     if (CVS->isARBExplicitAttribLocationUsable())
     {
+#if !defined(USE_GLES2)
         code << "#extension GL_ARB_explicit_attrib_location : enable\n";
+#endif
         code << "#define Explicit_Attrib_Location_Usable\n";
     }
 
