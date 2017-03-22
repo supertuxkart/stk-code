@@ -102,7 +102,7 @@ int getRAM()
  */
 int getNumProcessors()
 {
-#ifdef __linux__
+#if defined(__linux__) || defined(__CYGWIN__)
     return sysconf(_SC_NPROCESSORS_CONF);
 #endif
 #ifdef WIN32
