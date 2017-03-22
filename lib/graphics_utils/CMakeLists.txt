@@ -4,6 +4,5 @@ if (UNIX OR MINGW)
 endif()
 add_library(graphics_utils STATIC
     mipmap/cpusimd.c
-    mipmap/img.c
     mipmap/imgresize.c
 )
