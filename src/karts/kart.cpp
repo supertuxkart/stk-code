@@ -1858,8 +1858,19 @@ void Kart::handleMaterialGFX()
 }   // handleMaterialGFX
 
 //-----------------------------------------------------------------------------
+/** Display visual effect and play sound if needed for zipper or skid feedback
+* \param play_sound If true this will cause a sfx to be played even if the
+*                  terrain hasn't changed. It is used by the zipper powerup.
+*/
+void Kart::showZipperVisualEffects(bool play_sound)
+{
+    playCustomSFX(SFXManager::CUSTOM_ZIPPER);
+    m_controller->handleZipper(play_sound);
+}
+
+//-----------------------------------------------------------------------------
 /** Sets zipper time, and apply one time additional speed boost. It can be
- *  used with a specific material, in which case the zipper parmaters are
+ *  used with a specific material, in which case the zipper parameters are
  *  taken from this material (parameters that are <0 will be using the
  *  kart-specific values from kart-properties.
  *  \param material If not NULL, will be used to determine the zipper
@@ -1914,8 +1925,7 @@ void Kart::handleZipper(const Material *material, bool play_sound)
                                      max_speed_increase, speed_gain,
                                      engine_force, duration, fade_out_time);
     // Play custom character sound (weee!)
-    playCustomSFX(SFXManager::CUSTOM_ZIPPER);
-    m_controller->handleZipper(play_sound);
+    showZipperVisualEffects(play_sound);
 }   // handleZipper
 
 // -----------------------------------------------------------------------------
