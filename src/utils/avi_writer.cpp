@@ -340,7 +340,7 @@ error:
 
 size_limit:
     MessageQueue::add(MessageQueue::MT_GENERIC,
-       _("Video exceed size limit, start saving to a new one."));
+       _("Video exceeded size limit, starting a new one."));
     closeFile();
     return AVI_SIZE_LIMIT_ERR;
 }   // addImage
