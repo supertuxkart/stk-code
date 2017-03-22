@@ -167,7 +167,7 @@ class AVIWriter : public CanBeDeleted, public NoCopy,
 private:
     FILE* m_file;
 
-    Synchronised<std::string> m_recording_target;
+    static Synchronised<std::string> m_recording_target;
 
     std::string m_filename;
 
@@ -241,6 +241,11 @@ public:
     // ------------------------------------------------------------------------
     static void* startRoutine(void *obj);
     // ------------------------------------------------------------------------
+    static void setRecordingTarget(const std::string& name)
+    {
+        m_recording_target.setAtomic(name);
+    }
+    // ------------------------------------------------------------------------
     void captureFrameBufferImage(float dt);
     // ------------------------------------------------------------------------
     void resetFrameBufferImage();
@@ -248,9 +253,6 @@ public:
     void resetCaptureFormat();
     // ------------------------------------------------------------------------
     void stopRecording()                     { addFrameBufferImage(NULL, -1); }
-    // ------------------------------------------------------------------------
-    void setRecordingTarget(const std::string& name)
-                                        { m_recording_target.setAtomic(name); }
 
 };
 

@@ -1912,8 +1912,8 @@ void IrrDriver::setRecording(bool val)
     {
         std::string track_name = World::getWorld() != NULL ?
             race_manager->getTrackName() : "menu";
-        AVIWriter::getInstance()->setRecordingTarget(file_manager
-            ->getScreenshotDir() + track_name);
+        AVIWriter::setRecordingTarget(file_manager->getScreenshotDir() +
+            track_name);
         AVIWriter::getInstance()->resetFrameBufferImage();
         MessageQueue::add(MessageQueue::MT_GENERIC,
             _("Video recording started."));

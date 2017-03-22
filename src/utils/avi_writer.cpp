@@ -28,6 +28,7 @@
 #include <jpeglib.h>
 #include <cstring>
 
+Synchronised<std::string> AVIWriter::m_recording_target("");
 // ----------------------------------------------------------------------------
 AVIWriter::AVIWriter() : m_idle(true)
 {
