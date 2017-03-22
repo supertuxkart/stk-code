@@ -110,7 +110,7 @@ void* AVIWriter::startRoutine(void *obj)
         }
         else if (fbi == NULL)
         {
-            avi_writer->closeFile();
+            avi_writer->closeFile(false/*delete_file*/, true/*exiting*/);
             avi_writer->setCanBeDeleted();
             avi_writer->m_fbi_queue.getData().pop_front();
             avi_writer->m_fbi_queue.unlock();
@@ -276,7 +276,7 @@ bool AVIWriter::addJUNKChunk(std::string str, unsigned int min_size)
     return true;
 
 error:
-    closeFile(true);
+    closeFile(true/*delete_file*/);
     return false;
 }   // addJUNKChunk
 
@@ -335,7 +335,7 @@ AVIErrCode AVIWriter::addImage(unsigned char* buffer, int buf_size)
     return AVI_SUCCESS;
 
 error:
-    closeFile(true);
+    closeFile(true/*delete_file*/);
     return AVI_IO_ERR;
 
 size_limit:
@@ -346,7 +346,7 @@ size_limit:
 }   // addImage
 
 // ----------------------------------------------------------------------------
-bool AVIWriter::closeFile(bool delete_file)
+bool AVIWriter::closeFile(bool delete_file, bool exiting)
 {
     if (m_file == NULL)
         return false;
@@ -426,12 +426,19 @@ bool AVIWriter::closeFile(bool delete_file)
     fclose(m_file);
     m_file = NULL;
 
-    MessageQueue::add(MessageQueue::MT_GENERIC,
-        _("Video saved in \"%s\".", m_filename.c_str()));
+    if (!exiting)
+    {
+        MessageQueue::add(MessageQueue::MT_GENERIC,
+            _("Video saved in \"%s\".", m_filename.c_str()));
+    }
     return true;
 
 error:
-    MessageQueue::add(MessageQueue::MT_ERROR, _("Error when saving video."));
+    if (!exiting)
+    {
+        MessageQueue::add(MessageQueue::MT_ERROR,
+            _("Error when saving video."));
+    }
     fclose(m_file);
     remove(m_filename.c_str());
     m_file = NULL;
@@ -575,7 +582,7 @@ bool AVIWriter::createFile()
     return true;
 
 error:
-    closeFile(true);
+    closeFile(true/*delete_file*/);
     return false;
 }   // createFile
 
