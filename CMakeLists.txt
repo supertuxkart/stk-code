@@ -107,20 +107,19 @@ if((WIN32 AND NOT MINGW) OR APPLE)
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libpng")
     include_directories("${PROJECT_SOURCE_DIR}/lib/libpng")
 
-    # Add jpeg-turbo library
-    if (APPLE)
-        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/jpeglib")
-        include_directories("${PROJECT_SOURCE_DIR}/lib/jpeglib")
-        set(JPEG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/jpeglib/")
-        set(JPEG_LIBRARY jpeglib)
-    else()
-        find_library(JPEG_LIBRARY NAMES libjpeg-62 PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
-        find_path(JPEG_INCLUDE_DIRS NAMES jpeglib.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
-        set(JPEG_LIBRARIES ${JPEG_LIBRARY})
-    endif()
-
     set(PNG_PNG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/libpng/")
     set(PNG_LIBRARY png15_static)
+endif()
+
+# Add jpeg-turbo library
+if (APPLE)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/jpeglib")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/jpeglib")
+    set(JPEG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/jpeglib/")
+    set(JPEG_LIBRARY jpeglib)
+else()
+    find_package(JPEG REQUIRED)
+    include_directories(${JPEG_INCLUDE_DIR})
 endif()
 
 if(NOT SERVER_ONLY AND NOT USE_GLES2)
@@ -380,6 +379,7 @@ target_link_libraries(supertuxkart
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
     ${FREETYPE_LIBRARIES}
+    ${JPEG_LIBRARIES}
     )
 
 if(NOT SERVER_ONLY)
@@ -418,10 +418,6 @@ endif()
 if(USE_FRIBIDI)
     target_link_libraries(supertuxkart ${FRIBIDI_LIBRARIES})
     add_definitions(-DENABLE_BIDI)
-endif()
-
-if(MSVC)
-    target_link_libraries(supertuxkart ${JPEG_LIBRARIES})
 endif()
 
 # Wiiuse
