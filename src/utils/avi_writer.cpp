@@ -21,6 +21,8 @@
 #include "utils/avi_writer.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "guiengine/message_queue.hpp"
+#include "utils/translation.hpp"
 #include "utils/vs.hpp"
 
 #include <jpeglib.h>
@@ -58,7 +60,7 @@ AVIWriter::~AVIWriter()
     glDeleteBuffers(3, m_pbo);
     addFrameBufferImage(NULL, 0);
     if (!waitForReadyToDeleted(2.0f))
-        Log::info("AVIWriter", "AVIWriter not stopping," "exiting anyway.");
+        Log::info("AVIWriter", "AVIWriter not stopping, exiting anyway.");
     pthread_join(m_thread, NULL);
     pthread_cond_destroy(&m_cond_request);
 }   // ~AVIWriter
@@ -119,6 +121,8 @@ void* AVIWriter::startRoutine(void *obj)
         avi_writer->m_fbi_queue.unlock();
         if (too_slow)
         {
+            MessageQueue::add(MessageQueue::MT_ERROR,
+                _("Encoding is too slow, dropping frames."));
             delete [] fbi;
             avi_writer->cleanAllFrameBufferImages();
             continue;
@@ -335,6 +339,8 @@ error:
     return AVI_IO_ERR;
 
 size_limit:
+    MessageQueue::add(MessageQueue::MT_GENERIC,
+       _("Video exceed size limit, start saving to a new one."));
     closeFile();
     return AVI_SIZE_LIMIT_ERR;
 }   // addImage
@@ -420,9 +426,12 @@ bool AVIWriter::closeFile(bool delete_file)
     fclose(m_file);
     m_file = NULL;
 
+    MessageQueue::add(MessageQueue::MT_GENERIC,
+        _("Video saved in \"%s\".", m_filename.c_str()));
     return true;
 
 error:
+    MessageQueue::add(MessageQueue::MT_ERROR, _("Error when saving video."));
     fclose(m_file);
     remove(m_filename.c_str());
     m_file = NULL;

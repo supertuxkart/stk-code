@@ -1915,6 +1915,8 @@ void IrrDriver::setRecording(bool val)
         AVIWriter::getInstance()->setRecordingTarget(file_manager
             ->getScreenshotDir() + track_name);
         AVIWriter::getInstance()->resetFrameBufferImage();
+        MessageQueue::add(MessageQueue::MT_GENERIC,
+            _("Video recording started."));
     }
     else
     {
