@@ -273,6 +273,8 @@ public:
     virtual float getTerrainPitch(float heading) const;
 
     virtual void   reset            ();
+    
+    virtual void   showZipperVisualEffects(bool play_sound=false);
     virtual void   handleZipper     (const Material *m=NULL,
                                      bool play_sound=false);
     virtual void   setSquash        (float time, float slowdown);
