@@ -226,7 +226,7 @@ private:
     {
         m_fbi_queue.lock();
         for (auto& p : m_fbi_queue.getData())
-            delete p.first;
+            delete [] p.first;
         m_fbi_queue.getData().clear();
         m_fbi_queue.unlock();
     }
