@@ -92,9 +92,15 @@
           case (all three normals discarded, the interpolation will just
           return the normal of the triangle (i.e. de facto no interpolation),
           but it helps making smoothing much more useful without fixing tracks.
+      default-track-friction: Default friction to be used for the track and
+          any track/library pbject.
+      default-moveable-friction: Default friction to be used for any moveable,
+          e.g. karts, bowling balls, ...
       -->
   <physics smooth-normals="true"
-           smooth-angle-limit="0.65"/>
+           smooth-angle-limit="0.65"
+           default-track-friction="0.5"
+           default-moveable-friction="0.5" />
 
   <!-- The title music. -->
   <music title="main_theme.music"/>

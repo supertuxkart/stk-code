@@ -136,6 +136,9 @@ public:
         PARACHUTE_UBOUND_FRACTION,
         PARACHUTE_MAX_SPEED,
 
+        // Friction
+        FRICTION_KART_FRICTION,
+
         // Bubblegum
         BUBBLEGUM_DURATION,
         BUBBLEGUM_SPEED_FRACTION,
@@ -307,6 +310,8 @@ public:
     float getParachuteLboundFraction() const;
     float getParachuteUboundFraction() const;
     float getParachuteMaxSpeed() const;
+
+    float getFrictionKartFriction() const;
 
     float getBubblegumDuration() const;
     float getBubblegumSpeedFraction() const;

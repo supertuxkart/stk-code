@@ -447,6 +447,12 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[PARACHUTE_MAX_SPEED]);
     }
 
+    if (const XMLNode *sub_node = node->getNode("friction"))
+    {
+        sub_node->get("kart-friction",
+            &m_values[FRICTION_KART_FRICTION]);
+    }
+
     if (const XMLNode *sub_node = node->getNode("bubblegum"))
     {
         sub_node->get("duration",

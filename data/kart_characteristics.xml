@@ -120,6 +120,8 @@
             <rear-left   position="-0.38 0 -0.6" />
         </wheels>
 
+        <!-- Friction of a kart when e.g. sliding along a wall. -->
+        <friction kart-friction="0.5" />
 
         <!-- ********** Visuals ********** -->
 

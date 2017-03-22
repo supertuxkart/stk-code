@@ -136,6 +136,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case PARACHUTE_MAX_SPEED:
         return TYPE_FLOAT;
+    case FRICTION_KART_FRICTION:
+        return TYPE_FLOAT;
     case BUBBLEGUM_DURATION:
         return TYPE_FLOAT;
     case BUBBLEGUM_SPEED_FRACTION:
@@ -364,6 +366,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "PARACHUTE_UBOUND_FRACTION";
     case PARACHUTE_MAX_SPEED:
         return "PARACHUTE_MAX_SPEED";
+    case FRICTION_KART_FRICTION:
+        return "FRICTION_KART_FRICTION";
     case BUBBLEGUM_DURATION:
         return "BUBBLEGUM_DURATION";
     case BUBBLEGUM_SPEED_FRACTION:
@@ -993,6 +997,18 @@ float AbstractCharacteristic::getParachuteMaxSpeed() const
                     getName(PARACHUTE_MAX_SPEED).c_str());
     return result;
 }  // getParachuteMaxSpeed
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getFrictionKartFriction() const
+{
+    float result;
+    bool is_set = false;
+    process(FRICTION_KART_FRICTION, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+            getName(FRICTION_KART_FRICTION).c_str());
+    return result;
+}  // getFrictionKartFriction
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getBubblegumDuration() const
