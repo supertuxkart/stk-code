@@ -61,6 +61,7 @@
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/avi_writer.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
@@ -146,6 +147,7 @@ IrrDriver::IrrDriver()
     m_last_light_bucket_distance = 0;
     m_clear_color                = video::SColor(255, 100, 101, 140);
     m_skinning_joint             = 0;
+    m_recording = false;
 
 }   // IrrDriver
 
@@ -167,6 +169,9 @@ IrrDriver::~IrrDriver()
 #endif
     delete m_wind;
     delete m_renderer;
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+    AVIWriter::kill();
+#endif
 }   // ~IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -921,6 +926,9 @@ void IrrDriver::applyResolutionSettings()
     // (we're sure to update main.cpp at some point and forget this one...)
     VAOManager::getInstance()->kill();
     STKTexManager::getInstance()->kill();
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+    AVIWriter::kill();
+#endif
     // initDevice will drop the current device.
     if (CVS->isGLSL())
     {
@@ -1885,7 +1893,37 @@ void IrrDriver::update(float dt)
     // menu.
     //if(World::getWorld() && World::getWorld()->isRacePhase())
     //    printRenderStats();
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+    if (m_recording)
+        AVIWriter::getInstance()->captureFrameBufferImage(dt);
+#endif
 }   // update
+
+// ----------------------------------------------------------------------------
+void IrrDriver::setRecording(bool val)
+{
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+    if (!CVS->isARBPixelBufferObjectUsable())
+        return;
+    if (m_recording == val)
+        return;
+    m_recording = val;
+    if (m_recording == true)
+    {
+        std::string track_name = World::getWorld() != NULL ?
+            race_manager->getTrackName() : "menu";
+        AVIWriter::getInstance()->setRecordingTarget(file_manager
+            ->getScreenshotDir() + track_name);
+        AVIWriter::getInstance()->resetFrameBufferImage();
+        MessageQueue::add(MessageQueue::MT_GENERIC,
+            _("Video recording started."));
+    }
+    else
+    {
+        AVIWriter::getInstance()->stopRecording();
+    }
+#endif
+}   // setRecording
 
 // ----------------------------------------------------------------------------
 
@@ -2095,5 +2133,4 @@ GLuint IrrDriver::getDepthStencilTexture()
 {
     return m_renderer->getDepthStencilTexture();
 }   // getDepthStencilTexture
-
 

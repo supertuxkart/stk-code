@@ -24,6 +24,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/skin.hpp"
+#include "utils/synchronised.hpp"
 
 #include "IGUIElement.h"
 
@@ -88,11 +89,10 @@ public:
     }   // operator ()
 };   // operator()
 
-
 // ============================================================================
 /** List of all messages. */
-std::priority_queue<Message*, std::vector<Message*>,
-                   CompareMessages> g_all_messages;
+Synchronised<std::priority_queue<Message*, std::vector<Message*>,
+                   CompareMessages> > g_all_messages;
 
 /** How long the current message has been displayed. The special value
  *  -1 indicates that a new message was added when the queue was empty. */
@@ -130,9 +130,16 @@ void createLabel(const Message *message)
  *  position of the message. */
 void updatePosition()
 {
-    if (g_all_messages.empty()) return;
-    Message *last = g_all_messages.top();
+    g_all_messages.lock();
+    bool empty = g_all_messages.getData().empty();
+    if (empty)
+    {
+        g_all_messages.unlock();
+        return;
+    }
+    Message *last = g_all_messages.getData().top();
     createLabel(last);
+    g_all_messages.unlock();
 }   // updatePosition
 
 // ----------------------------------------------------------------------------
@@ -143,13 +150,15 @@ void updatePosition()
 void add(MessageType mt, const irr::core::stringw &message)
 {
     Message *m = new Message(mt, message);
-    if(g_all_messages.empty())
+    g_all_messages.lock();
+    if (g_all_messages.getData().empty())
     {
         // Indicate that there is a new message, which should
         // which needs a new label etc. to be computed.
         g_current_display_time =-1.0f;
     }
-    g_all_messages.push(m);
+    g_all_messages.getData().push(m);
+    g_all_messages.unlock();
 }   // add
 
 // ----------------------------------------------------------------------------
@@ -161,32 +170,41 @@ void add(MessageType mt, const irr::core::stringw &message)
  */
 void update(float dt)
 {
-    if(g_all_messages.empty()) return;
+    g_all_messages.lock();
+    bool empty = g_all_messages.getData().empty();
+    g_all_messages.unlock();
+    if (empty) return;
 
+    g_all_messages.lock();
     g_current_display_time += dt;
-    if(g_current_display_time > g_max_display_time)
+    if (g_current_display_time > g_max_display_time)
     {
-        Message *last = g_all_messages.top();
-        g_all_messages.pop();
+        Message *last = g_all_messages.getData().top();
+        g_all_messages.getData().pop();
         delete last;
-        if(g_all_messages.empty()) return;
+        if (g_all_messages.getData().empty())
+        {
+            g_all_messages.unlock();
+            return;
+        }
         g_current_display_time = -1.0f;
     }
 
+    Message *current = g_all_messages.getData().top();
     // Create new data for the display.
-    if(g_current_display_time < 0)
+    if (g_current_display_time < 0)
     {
-        createLabel(g_all_messages.top());
+        createLabel(current);
     }
+    g_all_messages.unlock();
 
-    Message *current = g_all_messages.top();
     GUIEngine::getSkin()->drawMessage(g_container, g_area,
                                       current->getRenderType());
     gui::ScalableFont *font = GUIEngine::getFont();
-    
+
     video::SColor color(255, 0, 0, 0);
     font->draw(current->getMessage(), g_area, color, true, true);
-    
+
 }   // update
 
 }   // namespace GUIEngine
