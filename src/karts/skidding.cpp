@@ -443,6 +443,7 @@ void Skidding::update(float dt, bool is_on_ground,
                                              bonus_speed, bonus_speed,
                                              bonus_force, bonus_time,
                                              /*fade-out-time*/ 1.0f);
+                    m_kart->showZipperVisualEffects(true);
                     
                     if (m_kart->getController()->canGetAchievements())
                     {
