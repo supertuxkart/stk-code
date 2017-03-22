@@ -51,6 +51,8 @@ void STKTexManager::createThreadedTexLoaders()
         pthread_mutex_init(&m_threaded_load_textures_mutex, NULL);
         pthread_cond_init(&m_cond_request, NULL);
         m_thread_size = HardwareStats::getNumProcessors();
+        if (m_thread_size == 0)
+            m_thread_size = 1;
         m_thread_size = core::clamp(m_thread_size, 1,
             UserConfigParams::m_hq_mipmap ? m_thread_size : 3);
         const unsigned max_tex_size =
