@@ -34,7 +34,7 @@
                 http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=7369\&p=25236&hilit=vehicle#p25236
                 for details.
             max-force: Maximum suspension force -->
-        <suspension stiffness="140" rest="0.3" travel="0.29"
+        <suspension stiffness="280" rest="0.3" travel="0.29"
             exp-spring-response="false" max-force="12000" />
 
         <!-- Values related to stability of the chassis: damping, and reduced
