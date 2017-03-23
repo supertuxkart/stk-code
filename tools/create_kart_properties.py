@@ -28,7 +28,7 @@ import sys
 # Each line contains a topic and the attributes of that topic.
 # This model is used for the xml file and to access the kart properties in the code.
 characteristics = """Suspension: stiffness, rest, travel, expSpringResponse(bool), maxForce
-Stability: rollInfluence, chassisLinearDamping, chassisAngularDamping, downwardImpulseFactor, trackConnectionAccel, smoothFlyingImpulse
+Stability: rollInfluence, chassisLinearDamping, chassisAngularDamping, downwardImpulseFactor, trackConnectionAccel, angularFactor(std::vector<float>/floatVector), smoothFlyingImpulse
 Turn: radius(InterpolationArray), timeResetSteer, timeFullSteer(InterpolationArray)
 Engine: power, maxSpeed, brakeFactor, brakeTimeIncrease, maxSpeedReverseRatio
 Gear: switchRatio(std::vector<float>/floatVector), powerIncrease(std::vector<float>/floatVector)

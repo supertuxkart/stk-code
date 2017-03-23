@@ -343,6 +343,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[STABILITY_DOWNWARD_IMPULSE_FACTOR]);
         sub_node->get("track-connection-accel",
             &m_values[STABILITY_TRACK_CONNECTION_ACCEL]);
+        sub_node->get("angular-factor",
+            &m_values[STABILITY_ANGULAR_FACTOR]);
         sub_node->get("smooth-flying-impulse",
             &m_values[STABILITY_SMOOTH_FLYING_IMPULSE]);
     }

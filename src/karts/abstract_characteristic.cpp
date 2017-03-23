@@ -74,6 +74,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case STABILITY_TRACK_CONNECTION_ACCEL:
         return TYPE_FLOAT;
+    case STABILITY_ANGULAR_FACTOR:
+        return TYPE_FLOAT_VECTOR;
     case STABILITY_SMOOTH_FLYING_IMPULSE:
         return TYPE_FLOAT;
     case TURN_RADIUS:
@@ -304,6 +306,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "STABILITY_DOWNWARD_IMPULSE_FACTOR";
     case STABILITY_TRACK_CONNECTION_ACCEL:
         return "STABILITY_TRACK_CONNECTION_ACCEL";
+    case STABILITY_ANGULAR_FACTOR:
+        return "STABILITY_ANGULAR_FACTOR";
     case STABILITY_SMOOTH_FLYING_IMPULSE:
         return "STABILITY_SMOOTH_FLYING_IMPULSE";
     case TURN_RADIUS:
@@ -625,6 +629,18 @@ float AbstractCharacteristic::getStabilityTrackConnectionAccel() const
                     getName(STABILITY_TRACK_CONNECTION_ACCEL).c_str());
     return result;
 }  // getStabilityTrackConnectionAccel
+
+// ----------------------------------------------------------------------------
+std::vector<float> AbstractCharacteristic::getStabilityAngularFactor() const
+{
+    std::vector<float> result;
+    bool is_set = false;
+    process(STABILITY_ANGULAR_FACTOR, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(STABILITY_ANGULAR_FACTOR).c_str());
+    return result;
+}  // getStabilityAngularFactor
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getStabilitySmoothFlyingImpulse() const
@@ -1006,7 +1022,7 @@ float AbstractCharacteristic::getFrictionKartFriction() const
     process(FRICTION_KART_FRICTION, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-            getName(FRICTION_KART_FRICTION).c_str());
+                    getName(FRICTION_KART_FRICTION).c_str());
     return result;
 }  // getFrictionKartFriction
 

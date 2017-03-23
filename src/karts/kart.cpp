@@ -668,6 +668,10 @@ void Kart::createPhysics()
     trans.setIdentity();
     createBody(mass, trans, &m_kart_chassis,
                m_kart_properties->getRestitution());
+    std::vector<float> ang_fact = m_kart_properties->getStabilityAngularFactor();
+    // The angular factor (with X and Z values <1) helps to keep the kart
+    // upright, especially in case of a collision.
+    m_body->setAngularFactor(Vec3(ang_fact[0], ang_fact[1], ang_fact[2]));
     m_body->setFriction(m_kart_properties->getFrictionKartFriction());
     m_user_pointer.set(this);
     m_body->setDamping(m_kart_properties->getStabilityChassisLinearDamping(),

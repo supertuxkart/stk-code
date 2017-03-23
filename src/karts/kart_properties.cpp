@@ -598,6 +598,12 @@ float KartProperties::getStabilityTrackConnectionAccel() const
 }  // getStabilityTrackConnectionAccel
 
 // ----------------------------------------------------------------------------
+std::vector<float> KartProperties::getStabilityAngularFactor() const
+{
+    return m_cached_characteristic->getStabilityAngularFactor();
+}  // getStabilityAngularFactor
+
+// ----------------------------------------------------------------------------
 float KartProperties::getStabilitySmoothFlyingImpulse() const
 {
     return m_cached_characteristic->getStabilitySmoothFlyingImpulse();

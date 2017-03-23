@@ -84,6 +84,7 @@ public:
         STABILITY_CHASSIS_ANGULAR_DAMPING,
         STABILITY_DOWNWARD_IMPULSE_FACTOR,
         STABILITY_TRACK_CONNECTION_ACCEL,
+        STABILITY_ANGULAR_FACTOR,
         STABILITY_SMOOTH_FLYING_IMPULSE,
 
         // Turn
@@ -269,6 +270,7 @@ public:
     float getStabilityChassisAngularDamping() const;
     float getStabilityDownwardImpulseFactor() const;
     float getStabilityTrackConnectionAccel() const;
+    std::vector<float> getStabilityAngularFactor() const;
     float getStabilitySmoothFlyingImpulse() const;
 
     InterpolationArray getTurnRadius() const;
