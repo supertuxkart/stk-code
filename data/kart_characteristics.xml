@@ -45,9 +45,9 @@
                 the ground if its off ground. Reduces the affect if a kart loses
                 contact with the ground (i.e. it then can't steer or accelerate
                 anymore).
-	    angular-factor: Factor to change angular impulses. X and Z rotations
+            angular-factor: Factor to change angular impulses. X and Z rotations
                 are damped to avoid that karts in a collision are too easily pushed
-	        into a roll or pitch, which makes them topple over
+                into a roll or pitch, which makes them topple over
             smooth-flying-impulse: apply a torque impulse to flying kart to keep
                 them parallel to the ground. -->
         <stability roll-influence="0.3"
@@ -55,7 +55,7 @@
                    chassis-angular-damping="0"
                    downward-impulse-factor="5"
                    track-connection-accel="2"
-		   angular-factor="1.0 1.0 1.0"
+                   angular-factor="0.5 1.0 0.5"
                    smooth-flying-impulse="250" />
 
         <!-- Turning
@@ -125,7 +125,7 @@
         </wheels>
 
         <!-- Friction of a kart when e.g. sliding along a wall. -->
-        <friction kart-friction="0.5" />
+        <friction kart-friction="0.0" />
 
         <!-- ********** Visuals ********** -->
 
