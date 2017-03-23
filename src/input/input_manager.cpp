@@ -1180,12 +1180,12 @@ EventPropagation InputManager::input(const SEvent& event)
 
                 if (UserConfigParams::m_multitouch_accelerometer == 1)
                 {
-                    button->axis_x = -event.AccelerometerEvent.X / 5.0f;
+                    button->axis_x = (float)-event.AccelerometerEvent.X / 5.0f;
                     device->handleControls(button);
                 }
                 else if (UserConfigParams::m_multitouch_accelerometer == 2)
                 {
-                    button->axis_x = event.AccelerometerEvent.Y / 5.0f;
+                    button->axis_x = (float)event.AccelerometerEvent.Y / 5.0f;
                     device->handleControls(button);                    
                 }
             }
