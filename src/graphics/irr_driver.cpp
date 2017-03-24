@@ -1904,7 +1904,10 @@ void IrrDriver::setRecording(bool val)
 {
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (!CVS->isARBPixelBufferObjectUsable())
+    {
+        Log::warn("irr_driver", "PBO extension missing, can't record video.");
         return;
+    }
     if (m_recording == val)
         return;
     m_recording = val;
