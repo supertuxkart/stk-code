@@ -543,7 +543,6 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     case DEBUG_VISUAL_VALUES:
     {
-#if !defined(__APPLE__)
         DebugSliderDialog *dsd = new DebugSliderDialog();
         dsd->setSliderHook("red_slider", 0, 255,
             [](){ return int(irr_driver->getAmbientLight().r * 255.f); },
@@ -578,12 +577,10 @@ bool handleContextMenuAction(s32 cmd_id)
             [](){ return int(irr_driver->getSSAOSigma() * 10.f); },
             [](int v){irr_driver->setSSAOSigma(v / 10.f); }
         );
-#endif
     }
     break;
     case DEBUG_ADJUST_LIGHTS:
     {
-#if !defined(__APPLE__)
         // Some sliders use multipliers because the spinner widget
         // only supports integers
         DebugSliderDialog *dsd = new DebugSliderDialog();
@@ -637,7 +634,6 @@ bool handleContextMenuAction(s32 cmd_id)
             [](int v){        findNearestLight()->setRadius(float(v)); }
         );
         dsd->changeLabel("SSAO Sigma", "[None]");
-#endif
         break;
     }
     case DEBUG_SCRIPT_CONSOLE:
