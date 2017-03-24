@@ -169,7 +169,7 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
     // shader compilation fails with some drivers if there is no precision
     // qualifier
     if (type == GL_FRAGMENT_SHADER)
-        code << "precision mediump float;\n";
+        code << "precision highp float;\n";
 #else
     int range[2], precision;
     glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_HIGH_FLOAT, range,
