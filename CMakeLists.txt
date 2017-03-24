@@ -122,6 +122,10 @@ else()
     include_directories(${JPEG_INCLUDE_DIR})
 endif()
 
+include(FindPkgConfig)
+pkg_check_modules(PULSEAUDIO libpulse)
+include_directories(${PULSEAUDIO_INCLUDEDIR})
+
 if(NOT SERVER_ONLY AND NOT USE_GLES2)
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
     include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
@@ -380,6 +384,7 @@ target_link_libraries(supertuxkart
     ${OPENAL_LIBRARY}
     ${FREETYPE_LIBRARIES}
     ${JPEG_LIBRARIES}
+    ${PULSEAUDIO_LIBRARIES}
     )
 
 if(NOT SERVER_ONLY)

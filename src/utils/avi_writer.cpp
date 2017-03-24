@@ -25,6 +25,10 @@
 #include "utils/translation.hpp"
 #include "utils/vs.hpp"
 
+#include <pulse/pulseaudio.h>
+#include <ogg/ogg.h>
+#include <vorbis/vorbisenc.h>
+
 #include <jpeglib.h>
 #include <cstring>
 
@@ -52,7 +56,7 @@ AVIWriter::AVIWriter() : m_idle(true)
     }
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
     pthread_cond_init(&m_cond_request, NULL);
-    pthread_create(&m_thread, NULL, &startRoutine, this);
+    pthread_create(&m_video_thread, NULL, &videoRecord, this);
 }   // AVIWriter
 
 // ----------------------------------------------------------------------------
@@ -62,7 +66,7 @@ AVIWriter::~AVIWriter()
     addFrameBufferImage(NULL, 0);
     if (!waitForReadyToDeleted(2.0f))
         Log::info("AVIWriter", "AVIWriter not stopping, exiting anyway.");
-    pthread_join(m_thread, NULL);
+    pthread_join(m_video_thread, NULL);
     pthread_cond_destroy(&m_cond_request);
 }   // ~AVIWriter
 
@@ -84,9 +88,9 @@ void AVIWriter::resetCaptureFormat()
 }   // resetCaptureFormat
 
 // ----------------------------------------------------------------------------
-void* AVIWriter::startRoutine(void *obj)
+void* AVIWriter::videoRecord(void *obj)
 {
-    VS::setThreadName("AVIWriter");
+    VS::setThreadName("videoRecord");
     AVIWriter* avi_writer = (AVIWriter*)obj;
     while (true)
     {
@@ -105,6 +109,7 @@ void* AVIWriter::startRoutine(void *obj)
         {
             avi_writer->closeFile();
             avi_writer->m_idle.setAtomic(true);
+            pthread_join(avi_writer->m_audio_thread, NULL);
             avi_writer->m_fbi_queue.getData().pop_front();
             avi_writer->m_fbi_queue.unlock();
             continue;
@@ -195,7 +200,254 @@ void* AVIWriter::startRoutine(void *obj)
         delete [] orig_fbi;
     }
     return NULL;
-}   // startRoutine
+}   // videoRecord
+
+// ----------------------------------------------------------------------------
+struct OggEncoderInfo
+{
+    Synchronised<std::list<int8_t*> >* m_pcm_data;
+    pthread_cond_t* m_enc_request;
+};   // OggEncoderInfo
+
+// ----------------------------------------------------------------------------
+void* AVIWriter::oggEncoder(void *obj)
+{
+    VS::setThreadName("oggEncoder");
+    FILE* ogg_data = fopen((m_recording_target.getAtomic() + "_audio.ogg")
+        .c_str(), "wb");
+    if (ogg_data == NULL)
+    {
+        Log::error("oggEncoder", "Failed to encode ogg file");
+        return NULL;
+    }
+    ogg_stream_state os;
+    ogg_page og;
+    ogg_packet op;
+    vorbis_info vi;
+    vorbis_comment vc;
+    vorbis_dsp_state vd;
+    vorbis_block vb;
+    vorbis_info_init(&vi);
+    vorbis_encode_init(&vi, 2, 44100, -1, 112000, -1);
+    vorbis_comment_init(&vc);
+    vorbis_comment_add_tag(&vc, "ENCODER", "STK audio encoder");
+    vorbis_analysis_init(&vd, &vi);
+    vorbis_block_init(&vd, &vb);
+    ogg_stream_init(&os, 1);
+    ogg_packet header;
+    ogg_packet header_comm;
+    ogg_packet header_code;
+    vorbis_analysis_headerout(&vd, &vc, &header, &header_comm, &header_code);
+    ogg_stream_packetin(&os, &header);
+    ogg_stream_packetin(&os, &header_comm);
+    ogg_stream_packetin(&os, &header_code);
+    while (true)
+    {
+        int result = ogg_stream_flush(&os, &og);
+        if (result == 0)
+            break;
+        fwrite(og.header, 1, og.header_len, ogg_data);
+        fwrite(og.body, 1, og.body_len, ogg_data);
+    }
+    OggEncoderInfo* oei = (OggEncoderInfo*)obj;
+    Synchronised<std::list<int8_t*> >* pcm_data = oei->m_pcm_data;
+    pthread_cond_t* cond_request = oei->m_enc_request;
+    int eos = 0;
+    while (eos == 0)
+    {
+        pcm_data->lock();
+        bool waiting = pcm_data->getData().empty();
+        while (waiting)
+        {
+            pthread_cond_wait(cond_request, pcm_data->getMutex());
+            waiting = pcm_data->getData().empty();
+        }
+        const int8_t* pcm_buf = pcm_data->getData().front();
+        pcm_data->getData().pop_front();
+        pcm_data->unlock();
+        long i = 0;
+        if (pcm_buf == NULL)
+        {
+            vorbis_analysis_wrote(&vd, 0);
+            eos = 1;
+        }
+        else
+        {
+            float **buffer = vorbis_analysis_buffer(&vd, 1024);
+            for (i = 0; i < 1024; i++)
+            {
+                buffer[0][i]=((pcm_buf[i * 4 + 1] << 8) |
+                    (0x00ff & (int)pcm_buf[i * 4])) / 32768.0f;
+                buffer[1][i]=((pcm_buf[i * 4 + 3] << 8) |
+                    (0x00ff&(int)pcm_buf[i * 4 + 2])) / 32768.0f;
+            }
+            vorbis_analysis_wrote(&vd, i);
+        }
+        while (vorbis_analysis_blockout(&vd, &vb) == 1)
+        {
+            vorbis_analysis(&vb, NULL);
+            vorbis_bitrate_addblock(&vb);
+            while (vorbis_bitrate_flushpacket(&vd, &op))
+            {
+                ogg_stream_packetin(&os, &op);
+                while (true)
+                {
+                    int result = ogg_stream_pageout(&os, &og);
+                    if (result==0)
+                        break;
+                    fwrite(og.header, 1, og.header_len, ogg_data);
+                    fwrite(og.body, 1, og.body_len, ogg_data);
+                }
+            }
+        }
+        delete [] pcm_buf;
+    }
+    ogg_stream_clear(&os);
+    vorbis_block_clear(&vb);
+    vorbis_dsp_clear(&vd);
+    vorbis_comment_clear(&vc);
+    vorbis_info_clear(&vi);
+    fclose(ogg_data);
+    return NULL;
+
+}   // oggEncoder
+
+// ----------------------------------------------------------------------------
+void serverInfoCallBack(pa_context* c, const pa_server_info* i, void* data)
+{
+    *(std::string*)data = i->default_sink_name;
+}   // serverInfoCallBack
+
+// ----------------------------------------------------------------------------
+void* AVIWriter::audioRecord(void *obj)
+{
+    VS::setThreadName("audioRecord");
+    pa_mainloop* ml = pa_mainloop_new();
+    assert(ml);
+    pa_context* ctx = pa_context_new(pa_mainloop_get_api(ml), "audioRecord");
+    assert(ctx);
+    pa_context_connect(ctx, NULL, PA_CONTEXT_NOAUTOSPAWN , NULL);
+    while (true)
+    {
+        while (pa_mainloop_iterate(ml, 0, NULL) > 0);
+        pa_context_state_t state = pa_context_get_state(ctx);
+        if (state == PA_CONTEXT_READY)
+            break;
+        if (!PA_CONTEXT_IS_GOOD(state))
+        {
+            Log::error("audioRecord", "Failed to connect to context");
+            return NULL;
+        }
+    }
+    std::string default_sink;
+    pa_operation* pa_op =
+        pa_context_get_server_info(ctx, serverInfoCallBack, &default_sink);
+    enum pa_operation_state op_state;
+    while ((op_state = pa_operation_get_state(pa_op)) == PA_OPERATION_RUNNING)
+        pa_mainloop_iterate(ml, 0, NULL);
+    pa_operation_unref(pa_op);
+    if (default_sink.empty())
+    {
+        Log::error("audioRecord", "Failed to get default sink");
+        return NULL;
+    }
+    default_sink += ".monitor";
+
+    pa_sample_spec sam_spec;
+    sam_spec.format = PA_SAMPLE_S16LE;
+    sam_spec.rate = 44100;
+    sam_spec.channels = 2;
+
+    pa_buffer_attr buf_attr;
+    const unsigned frag_size = 1024 * 2 * sizeof(int16_t);
+    buf_attr.fragsize = frag_size;
+    const unsigned max_uint = -1;
+    buf_attr.maxlength = max_uint;
+    buf_attr.minreq = max_uint;
+    buf_attr.prebuf = max_uint;
+    buf_attr.tlength = max_uint;
+
+    pa_stream* stream = pa_stream_new(ctx, "input", &sam_spec, NULL);
+    assert(stream);
+    pa_stream_connect_record(stream, default_sink.c_str(), &buf_attr,
+        (pa_stream_flags_t) (PA_STREAM_ADJUST_LATENCY));
+
+    while (true)
+    {
+        while (pa_mainloop_iterate(ml, 0, NULL) > 0);
+        pa_stream_state_t state = pa_stream_get_state(stream);
+        if (state == PA_STREAM_READY)
+            break;
+        if (!PA_STREAM_IS_GOOD(state))
+        {
+            Log::error("audioRecord", "Failed to connect to stream");
+            return NULL;
+        }
+    }
+
+    Synchronised<bool>* idle = (Synchronised<bool>*)obj;
+    Synchronised<std::list<int8_t*> > pcm_data;
+    pthread_cond_t m_enc_request;
+    pthread_cond_init(&m_enc_request, NULL);
+    pthread_t m_ogg_enc_thread;
+
+    OggEncoderInfo oei;
+    oei.m_pcm_data = &pcm_data;
+    oei.m_enc_request = &m_enc_request;
+    pthread_create(&m_ogg_enc_thread, NULL, &oggEncoder, &oei);
+    int8_t* each_pcm_buf = new int8_t[frag_size]();
+    unsigned readed = 0;
+    while (true)
+    {
+        if (idle->getAtomic() == true)
+        {
+            pcm_data.lock();
+            pcm_data.getData().push_back(each_pcm_buf);
+            pthread_cond_signal(&m_enc_request);
+            pcm_data.unlock();
+            break;
+        }
+        while (pa_mainloop_iterate(ml, 0, NULL) > 0);
+        const void* data;
+        size_t bytes;
+        size_t readable = pa_stream_readable_size(stream);
+        if (readable == 0)
+            continue;
+        pa_stream_peek(stream, &data, &bytes);
+        if (data == NULL)
+        {
+            if (bytes > 0)
+                pa_stream_drop(stream);
+            continue;
+        }
+        bool buf_full = readed + (unsigned)bytes > frag_size;
+        unsigned copy_size = buf_full ? frag_size - readed : (unsigned)bytes;
+        memcpy(each_pcm_buf + readed, data, copy_size);
+        if (buf_full)
+        {
+            pcm_data.lock();
+            pcm_data.getData().push_back(each_pcm_buf);
+            pthread_cond_signal(&m_enc_request);
+            pcm_data.unlock();
+            each_pcm_buf = new int8_t[frag_size]();
+            readed = (unsigned)bytes - copy_size;
+            memcpy(each_pcm_buf, (uint8_t*)data + copy_size, readed);
+        }
+        else
+        {
+            readed += (unsigned)bytes;
+        }
+        pa_stream_drop(stream);
+    }
+    pcm_data.lock();
+    pcm_data.getData().push_back(NULL);
+    pthread_cond_signal(&m_enc_request);
+    pcm_data.unlock();
+    pthread_join(m_ogg_enc_thread, NULL);
+    pthread_cond_destroy(&m_enc_request);
+
+    return NULL;
+}   // audioRecord
 
 // ----------------------------------------------------------------------------
 int AVIWriter::getFrameCount(float dt)
@@ -450,6 +702,7 @@ error:
 bool AVIWriter::createFile()
 {
     m_idle.setAtomic(false);
+    pthread_create(&m_audio_thread, NULL, &audioRecord, &m_idle);
     time_t rawtime;
     time(&rawtime);
     tm* timeInfo = localtime(&rawtime);

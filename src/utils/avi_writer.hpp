@@ -194,7 +194,7 @@ private:
 
     Synchronised<bool> m_idle;
 
-    pthread_t m_thread;
+    pthread_t m_video_thread, m_audio_thread;
 
     pthread_cond_t m_cond_request;
 
@@ -239,7 +239,11 @@ public:
     // ------------------------------------------------------------------------
     ~AVIWriter();
     // ------------------------------------------------------------------------
-    static void* startRoutine(void *obj);
+    static void* videoRecord(void *obj);
+    // ------------------------------------------------------------------------
+    static void* audioRecord(void *obj);
+    // ------------------------------------------------------------------------
+    static void* oggEncoder(void *obj);
     // ------------------------------------------------------------------------
     static void setRecordingTarget(const std::string& name)
     {
