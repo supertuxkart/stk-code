@@ -119,12 +119,16 @@ if (APPLE)
     set(JPEG_LIBRARY jpeglib)
 else()
     find_package(JPEG REQUIRED)
+    find_library(TURBOJPEG_LIBRARY NAMES turbojpeg)
     include_directories(${JPEG_INCLUDE_DIR})
 endif()
 
 include(FindPkgConfig)
 pkg_check_modules(PULSEAUDIO libpulse)
 include_directories(${PULSEAUDIO_INCLUDEDIR})
+
+pkg_check_modules(VPX vpx)
+include_directories(${VPX_INCLUDEDIR})
 
 if(NOT SERVER_ONLY AND NOT USE_GLES2)
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
@@ -385,6 +389,8 @@ target_link_libraries(supertuxkart
     ${FREETYPE_LIBRARIES}
     ${JPEG_LIBRARIES}
     ${PULSEAUDIO_LIBRARIES}
+    ${TURBOJPEG_LIBRARY}
+    ${VPX_LIBRARIES}
     )
 
 if(NOT SERVER_ONLY)

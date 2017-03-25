@@ -194,7 +194,7 @@ private:
 
     Synchronised<bool> m_idle;
 
-    pthread_t m_video_thread, m_audio_thread;
+    pthread_t m_record_thread;
 
     pthread_cond_t m_cond_request;
 
@@ -244,6 +244,8 @@ public:
     static void* audioRecord(void *obj);
     // ------------------------------------------------------------------------
     static void* oggEncoder(void *obj);
+    // ------------------------------------------------------------------------
+    static void* vpxEncoder(void *obj);
     // ------------------------------------------------------------------------
     static void setRecordingTarget(const std::string& name)
     {
