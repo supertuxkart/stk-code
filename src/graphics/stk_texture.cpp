@@ -322,7 +322,13 @@ void STKTexture::formatConversion(uint8_t* data, unsigned int* format,
         {
             float alpha = data[4 * i + 3];
             if (alpha > 0.0f)
-                alpha = pow(alpha / 255.f, 1.f / 2.2f);
+            {
+                alpha /= 255.0f;
+#if defined(USE_GLES2)
+                if (CVS->isDefferedEnabled())
+#endif
+                    alpha = pow(alpha, 1.0f / 2.2f);
+            }
             data[i * 4] = (uint8_t)(data[i * 4] * alpha);
             data[i * 4 + 1] = (uint8_t)(data[i * 4 + 1] * alpha);
             data[i * 4 + 2] = (uint8_t)(data[i * 4 + 2] * alpha);
