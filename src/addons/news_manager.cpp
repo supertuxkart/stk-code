@@ -319,7 +319,7 @@ void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
         // a new read on the next start, instead of waiting
         // for some time).
         file_manager->removeFile(filename);
-        NewsMessage n(_("Can't access stkaddons server..."), -1);
+        NewsMessage n(_("Failed to connect to 'addons.supertuxkart.net'."), -1);
         m_news.lock();
         m_news.getData().push_back(n);
 
