@@ -78,7 +78,6 @@ void AVIWriter::resetFrameBufferImage()
 {
     m_pbo_use = 0;
     m_accumulated_time = 0.0f;
-    m_remaining_time = 0.0f;
 }   // resetFrameBufferImage
 
 // ----------------------------------------------------------------------------
@@ -166,13 +165,13 @@ void writeFrameHeader(FILE *out, int64_t pts, size_t frame_size)
 
 // ----------------------------------------------------------------------------
 int vpxEncodeFrame(vpx_codec_ctx_t *codec, vpx_image_t *img, int frame_index,
-                   int frame_count, FILE *out)
+                   FILE *out)
 {
     int got_pkts = 0;
     vpx_codec_iter_t iter = NULL;
     const vpx_codec_cx_pkt_t *pkt = NULL;
-    const vpx_codec_err_t res = vpx_codec_encode(codec, img, frame_index,
-        frame_count, 0, VPX_DL_REALTIME);
+    const vpx_codec_err_t res = vpx_codec_encode(codec, img, frame_index, 1, 0,
+        VPX_DL_REALTIME);
     if (res != VPX_CODEC_OK)
     {
         Log::error("vpxEncoder", "Failed to encode frame");
@@ -211,7 +210,7 @@ struct EncoderInfo
 void* AVIWriter::vpxEncoder(void *obj)
 {
     VS::setThreadName("vpxEncoder");
-    FILE* vpx_data = fopen((m_recording_target.getAtomic() + "_video.ivf")
+    FILE* vpx_data = fopen((m_recording_target.getAtomic() + ".ivf")
         .c_str(), "wb");
     if (vpx_data == NULL)
     {
@@ -284,12 +283,15 @@ void* AVIWriter::vpxEncoder(void *obj)
         free(jpg);
         vpx_image_t each_frame;
         vpx_img_wrap(&each_frame, VPX_IMG_FMT_I420, width, height, 1, yuv);
-        vpxEncodeFrame(&codec, &each_frame, frames_encoded++, frame_count,
-            vpx_data);
+        while (frame_count != 0)
+        {
+            vpxEncodeFrame(&codec, &each_frame, frames_encoded++, vpx_data);
+            frame_count--;
+        }
         delete [] yuv;
     }
 
-    while (vpxEncodeFrame(&codec, NULL, -1, 1, vpx_data));
+    while (vpxEncodeFrame(&codec, NULL, -1, vpx_data));
     if (vpx_codec_destroy(&codec))
     {
         Log::error("vpxEncoder", "Failed to destroy codec.");
@@ -301,20 +303,22 @@ void* AVIWriter::vpxEncoder(void *obj)
     return NULL;
 }   // vpxEncoder
 
+
+// ----------------------------------------------------------------------------
+Synchronised<std::list<std::tuple<uint8_t*, unsigned, int> > > jpg_data;
+pthread_cond_t vpx_enc_request;
+pthread_t audio_thread, vpx_enc_thread;
+EncoderInfo vpx_ei =
+{
+    .m_data = &jpg_data,
+    .m_enc_request = &vpx_enc_request
+};
+
 // ----------------------------------------------------------------------------
 void* AVIWriter::videoRecord(void *obj)
 {
     VS::setThreadName("videoRecord");
     AVIWriter* avi_writer = (AVIWriter*)obj;
-
-    Synchronised<std::list<std::tuple<uint8_t*, unsigned, int> > > jpg_data;
-    pthread_cond_t enc_request;
-    pthread_cond_init(&enc_request, NULL);
-    pthread_t audio_thread, vpx_enc_thread;
-    EncoderInfo ei;
-    ei.m_data = &jpg_data;
-    ei.m_enc_request = &enc_request;
-
     while (true)
     {
         avi_writer->m_fbi_queue.lock();
@@ -325,13 +329,6 @@ void* AVIWriter::videoRecord(void *obj)
                 avi_writer->m_fbi_queue.getMutex());
             waiting = avi_writer->m_fbi_queue.getData().empty();
         }
-        if (avi_writer->m_idle.getAtomic())
-        {
-            avi_writer->m_idle.setAtomic(false);
-            pthread_create(&audio_thread, NULL, &audioRecord,
-                &avi_writer->m_idle);
-            pthread_create(&vpx_enc_thread, NULL, &vpxEncoder, &ei);
-        }
         auto& p =  avi_writer->m_fbi_queue.getData().front();
         uint8_t* fbi = p.first;
         int frame_count = p.second;
@@ -340,7 +337,7 @@ void* AVIWriter::videoRecord(void *obj)
             avi_writer->m_idle.setAtomic(true);
             jpg_data.lock();
             jpg_data.getData().emplace_back((uint8_t*)NULL, 0, 0);
-            pthread_cond_signal(&enc_request);
+            pthread_cond_signal(vpx_ei.m_enc_request);
             jpg_data.unlock();
             pthread_join(audio_thread, NULL);
             pthread_join(vpx_enc_thread, NULL);
@@ -353,7 +350,7 @@ void* AVIWriter::videoRecord(void *obj)
             avi_writer->m_idle.setAtomic(true);
             jpg_data.lock();
             jpg_data.getData().emplace_back((uint8_t*)NULL, 0, 0);
-            pthread_cond_signal(&enc_request);
+            pthread_cond_signal(vpx_ei.m_enc_request);
             jpg_data.unlock();
             pthread_join(audio_thread, NULL);
             pthread_join(vpx_enc_thread, NULL);
@@ -418,7 +415,7 @@ void* AVIWriter::videoRecord(void *obj)
         jpg = shrinken;
         jpg_data.lock();
         jpg_data.getData().emplace_back(jpg, size, frame_count);
-        pthread_cond_signal(&enc_request);
+        pthread_cond_signal(vpx_ei.m_enc_request);
         jpg_data.unlock();
     }
     return NULL;
@@ -428,7 +425,7 @@ void* AVIWriter::videoRecord(void *obj)
 void* AVIWriter::oggEncoder(void *obj)
 {
     VS::setThreadName("oggEncoder");
-    FILE* ogg_data = fopen((m_recording_target.getAtomic() + "_audio.ogg")
+    FILE* ogg_data = fopen((m_recording_target.getAtomic() + ".ogg")
         .c_str(), "wb");
     if (ogg_data == NULL)
     {
@@ -666,35 +663,43 @@ void* AVIWriter::audioRecord(void *obj)
 }   // audioRecord
 
 // ----------------------------------------------------------------------------
-int AVIWriter::getFrameCount(float dt)
+int AVIWriter::getFrameCount(double rate)
 {
-    const float frame_rate = 0.001f * m_msec_per_frame;
-    m_accumulated_time += dt;
-    if (m_accumulated_time < frame_rate && m_remaining_time < frame_rate)
+    const double frame_rate = 1. / double(UserConfigParams::m_record_fps);
+    m_accumulated_time += rate;
+    if (m_accumulated_time < frame_rate)
     {
         return 0;
     }
-    int frame_count = 1;
-    m_remaining_time += m_accumulated_time - frame_rate;
-    m_accumulated_time = 0.0f;
-    while (m_remaining_time > frame_rate)
+    int frame_count = 0;
+    while (m_accumulated_time >= frame_rate)
     {
         frame_count++;
-        m_remaining_time -= frame_rate;
+        m_accumulated_time = m_accumulated_time - frame_rate;
     }
     return frame_count;
 }   // getFrameCount
 
 // ----------------------------------------------------------------------------
-void AVIWriter::captureFrameBufferImage(float dt)
+void AVIWriter::captureFrameBufferImage()
 {
+    if (m_idle.getAtomic())
+    {
+        m_idle.setAtomic(false);
+        pthread_create(&audio_thread, NULL, &audioRecord, &m_idle);
+        pthread_cond_init(vpx_ei.m_enc_request, NULL);
+        pthread_create(&vpx_enc_thread, NULL, &vpxEncoder, &vpx_ei);
+    }
+    auto rate = std::chrono::high_resolution_clock::now() - m_framerate_timer;
+    m_framerate_timer = std::chrono::high_resolution_clock::now();
     glReadBuffer(GL_BACK);
     int pbo_read = -1;
     if (m_pbo_use > 3 && m_pbo_use % 3 == 0)
         m_pbo_use = 3;
     if (m_pbo_use >= 3)
     {
-        int frame_count = getFrameCount(dt);
+        int frame_count = getFrameCount(std::chrono::duration_cast
+            <std::chrono::duration<double> >(rate).count());
         if (frame_count != 0)
         {
             pbo_read = m_pbo_use % 3;

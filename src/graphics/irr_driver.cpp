@@ -1895,7 +1895,7 @@ void IrrDriver::update(float dt)
     //    printRenderStats();
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (m_recording)
-        AVIWriter::getInstance()->captureFrameBufferImage(dt);
+        AVIWriter::getInstance()->captureFrameBufferImage();
 #endif
 }   // update
 

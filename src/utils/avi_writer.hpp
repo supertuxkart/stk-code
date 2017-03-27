@@ -24,6 +24,7 @@
 #include "utils/singleton.hpp"
 #include "utils/synchronised.hpp"
 
+#include <chrono>
 #include <string>
 #include <list>
 
@@ -176,7 +177,7 @@ private:
 
     unsigned int m_msec_per_frame, m_stream_bytes, m_total_frames, m_pbo_use;
 
-    float m_accumulated_time, m_remaining_time;
+    double m_accumulated_time;
 
     AVIFormat m_avi_format;
 
@@ -200,6 +201,8 @@ private:
 
     GLuint m_pbo[3];
 
+    std::chrono::high_resolution_clock::time_point m_framerate_timer;
+
     // ------------------------------------------------------------------------
     int bmpToJpg(unsigned char* image_data, unsigned char* image_output,
                  unsigned long buf_length);
@@ -220,7 +223,7 @@ private:
         m_fbi_queue.unlock();
     }
     // ------------------------------------------------------------------------
-    int getFrameCount(float dt);
+    int getFrameCount(double rate);
     // ------------------------------------------------------------------------
     void cleanAllFrameBufferImages()
     {
@@ -252,7 +255,7 @@ public:
         m_recording_target.setAtomic(name);
     }
     // ------------------------------------------------------------------------
-    void captureFrameBufferImage(float dt);
+    void captureFrameBufferImage();
     // ------------------------------------------------------------------------
     void resetFrameBufferImage();
     // ------------------------------------------------------------------------
