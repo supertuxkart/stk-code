@@ -101,7 +101,7 @@ void AddonsManager::init(const XMLNode *xml,
     {
         file_manager->removeFile(filename);
         setErrorState();
-        NewsManager::get()->addNewsMessage(_("Can't access stkaddons server..."));
+        NewsManager::get()->addNewsMessage(_("Failed to connect to 'addons.supertuxkart.net'."));
         return;
     }
 
