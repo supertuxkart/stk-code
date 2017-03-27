@@ -18,8 +18,8 @@ configuration:
 matrix:
     fast_finish: true
 
-cache:
-    - '%DEPS_DIR%'
+#cache:
+    #- '%DEPS_DIR%'
     #- '%ASSETS_DIR%'
 
 install:
