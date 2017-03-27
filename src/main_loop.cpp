@@ -119,7 +119,7 @@ float MainLoop::getLimitedDt()
         // When in menus, reduce FPS much, it's not necessary to push to the maximum for plain menus
         const int max_fps = (irr_driver->isRecording() &&
             UserConfigParams::m_limit_game_fps ? UserConfigParams::m_record_fps :
-            StateManager::get()->throttleFPS() ? 30 : UserConfigParams::m_max_fps);
+            StateManager::get()->throttleFPS() ? 60 : UserConfigParams::m_max_fps);
         if (dt > 0)
         {
             const int current_fps = (int)(1000.0f / dt);
