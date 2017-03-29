@@ -192,7 +192,8 @@ void btKart::resetSuspension()
 
 // ----------------------------------------------------------------------------
 void btKart::updateWheelTransformsWS(btWheelInfo& wheel,
-                                     bool interpolatedTransform)
+                                     bool interpolatedTransform,
+                                     float fraction)
 {
     wheel.m_raycastInfo.m_isInContact = false;
 
@@ -203,7 +204,7 @@ void btKart::updateWheelTransformsWS(btWheelInfo& wheel,
     }
 
     wheel.m_raycastInfo.m_hardPointWS =
-        chassisTrans( wheel.m_chassisConnectionPointCS );
+        chassisTrans( wheel.m_chassisConnectionPointCS*fraction );
     wheel.m_raycastInfo.m_wheelDirectionWS = chassisTrans.getBasis() *
                                                 wheel.m_wheelDirectionCS ;
     wheel.m_raycastInfo.m_wheelAxleWS      = chassisTrans.getBasis() *
@@ -213,7 +214,7 @@ void btKart::updateWheelTransformsWS(btWheelInfo& wheel,
 // ----------------------------------------------------------------------------
 /**
  */
-btScalar btKart::rayCast(unsigned int index)
+btScalar btKart::rayCast(unsigned int index, float fraction)
 {
     btWheelInfo &wheel = m_wheelInfo[index];
 
@@ -229,7 +230,7 @@ btScalar btKart::rayCast(unsigned int index)
         m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
 
-    updateWheelTransformsWS( wheel,false);
+    updateWheelTransformsWS( wheel,false, fraction);
 
     btScalar max_susp_len = wheel.getSuspensionRestLength()
                           + wheel.m_maxSuspensionTravel;
@@ -391,6 +392,16 @@ void btKart::updateVehicle( btScalar step )
         rayCast( i);
         if(m_wheelInfo[i].m_raycastInfo.m_isInContact)
             m_num_wheels_on_ground++;
+        else
+        {
+            // If the original raycast did not hit the ground,
+            // try a little bit (5%) closer to the centre of the chassis.
+            // Some tracks have very minor gaps that would otherwise
+            // trigger odd physical behaviour.
+            rayCast(i, 0.95f);
+            if (m_wheelInfo[i].m_raycastInfo.m_isInContact)
+                m_num_wheels_on_ground++;
+        }
     }
 
     // Test if the kart is falling so fast 
