@@ -32,8 +32,12 @@ addons:
     - libjpeg-dev
     - libogg-dev
     - libopenal-dev
+    - libpulse-dev
     - libpng-dev
+    - libturbojpeg
     - libvorbis-dev
+    - libvorbisenc2
+    - libvpx-dev
     - libxrandr-dev
     - mesa-common-dev
     - pkg-config

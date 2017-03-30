@@ -120,6 +120,7 @@ if (APPLE)
 else()
     find_package(JPEG REQUIRED)
     find_library(TURBOJPEG_LIBRARY NAMES turbojpeg)
+    mark_as_advanced(TURBOJPEG_LIBRARY)
     include_directories(${JPEG_INCLUDE_DIR})
 endif()
 
@@ -133,6 +134,11 @@ include_directories(${VPX_INCLUDEDIR})
 if(NOT SERVER_ONLY AND NOT USE_GLES2)
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
     include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
+endif()
+
+if(NOT SERVER_ONLY AND NOT USE_GLES2)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libwebm")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/libwebm")
 endif()
 
 # Build the irrlicht library
@@ -395,7 +401,7 @@ target_link_libraries(supertuxkart
 
 if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
-        target_link_libraries(supertuxkart ${OPENGL_LIBRARIES} glew graphics_utils)
+        target_link_libraries(supertuxkart ${OPENGL_LIBRARIES} glew graphics_utils webm)
     else()
         target_link_libraries(supertuxkart EGL GLESv2)
     endif()
