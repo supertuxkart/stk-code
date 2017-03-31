@@ -146,10 +146,9 @@ int vpxEncodeFrame(vpx_codec_ctx_t *codec, vpx_image_t *img, int frame_index,
 // ----------------------------------------------------------------------------
 void AVIWriter::resetCaptureFormat()
 {
-    m_img_quality = UserConfigParams::m_record_compression;
+    m_img_quality = UserConfigParams::m_recorder_jpg_quality;
     m_msec_per_frame = unsigned(1000 / UserConfigParams::m_record_fps);
-    m_avi_format =
-        UserConfigParams::m_record_bmp ? AVI_FORMAT_BMP : AVI_FORMAT_JPG;
+    m_avi_format = AVI_FORMAT_JPG;
 }   // resetCaptureFormat
 
 // ----------------------------------------------------------------------------
@@ -193,7 +192,9 @@ void* AVIWriter::vpxEncoder(void *obj)
     cfg.g_h = height;
     cfg.g_timebase.num = 1;
     cfg.g_timebase.den = UserConfigParams::m_record_fps;
-    //cfg.rc_target_bitrate = 2000;
+    int end_usage = UserConfigParams::m_vp_end_usage;
+    cfg.rc_end_usage = (vpx_rc_mode)end_usage;
+    cfg.rc_target_bitrate = UserConfigParams::m_vp_bitrate;
     if (vpx_codec_enc_init(&codec, vpx_codec_vp8_cx(), &cfg, 0) > 0)
     {
         Log::error("vpxEncoder", "Failed to initialize encoder");

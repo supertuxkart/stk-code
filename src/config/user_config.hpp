@@ -562,19 +562,27 @@ namespace UserConfigParams
     PARAM_PREFIX GroupUserConfigParam        m_recording_group
         PARAM_DEFAULT( GroupUserConfigParam("Recording", "Recording Settings") );
 
-    PARAM_PREFIX BoolUserConfigParam        m_record_bmp
-        PARAM_DEFAULT(BoolUserConfigParam(false, "record_bmp",
-        &m_recording_group, "Record video using uncompressed bitmap, notice: this "
-                        "will require a lot of space and fast disk access."));
-
     PARAM_PREFIX BoolUserConfigParam        m_limit_game_fps
         PARAM_DEFAULT(BoolUserConfigParam(true, "limit_game_fps",
-        &m_recording_group, "Limit game framerate not beyond the fps of recording "
-                        "video."));
+        &m_recording_group, "Limit game framerate not beyond the fps of"
+                        " recording video."));
 
-    PARAM_PREFIX IntUserConfigParam         m_record_compression
-        PARAM_DEFAULT(IntUserConfigParam(90, "record_compression",
-        &m_recording_group, "Specify the compression level of recording video"));
+    PARAM_PREFIX IntUserConfigParam         m_vp_codec
+        PARAM_DEFAULT(IntUserConfigParam(0, "vp_codec",
+        &m_recording_group, "Specify the codec for libvpx (VP8 / VP9)"));
+
+    PARAM_PREFIX IntUserConfigParam         m_vp_end_usage
+        PARAM_DEFAULT(IntUserConfigParam(0, "vp_end_usage",
+        &m_recording_group, "Specify the rate control algorithm for libvpx,"
+                            " see enum vpx_rc_mode"));
+
+    PARAM_PREFIX IntUserConfigParam         m_vp_bitrate
+        PARAM_DEFAULT(IntUserConfigParam(20000, "vp_bitrate",
+        &m_recording_group, "Specify the bitrate for libvpx"));
+
+    PARAM_PREFIX IntUserConfigParam         m_recorder_jpg_quality
+        PARAM_DEFAULT(IntUserConfigParam(90, "recorder_jpg_quality",
+        &m_recording_group, "Specify the jpg compression level of recorder"));
 
     PARAM_PREFIX IntUserConfigParam         m_record_fps
         PARAM_DEFAULT(IntUserConfigParam(30, "record_fps",
