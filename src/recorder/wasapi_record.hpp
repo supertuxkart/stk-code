@@ -1,4 +1,3 @@
-
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2017 SuperTuxKart-Team
 //
@@ -16,16 +15,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2)) && defined(WIN32)
 
-#ifndef HEADER_WEBM_WRITER_HPP
-#define HEADER_WEBM_WRITER_HPP
-#include <string>
+#ifndef HEADER_WASAPI_RECORD_HPP
+#define HEADER_WASAPI_RECORD_HPP
 
 namespace Recorder
 {
-    void writeWebm(const std::string& video, const std::string& audio);
+    void* audioRecord(void *obj);
 };
+
 #endif
 
 #endif

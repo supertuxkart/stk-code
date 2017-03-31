@@ -119,16 +119,24 @@ if (APPLE)
     set(JPEG_LIBRARY jpeglib)
 else()
     find_package(JPEG REQUIRED)
-    find_library(TURBOJPEG_LIBRARY NAMES turbojpeg)
+    find_library(TURBOJPEG_LIBRARY NAMES turbojpeg libturbojpeg PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
     mark_as_advanced(TURBOJPEG_LIBRARY)
     include_directories(${JPEG_INCLUDE_DIR})
 endif()
 
-include(FindPkgConfig)
-pkg_check_modules(PULSEAUDIO libpulse)
-include_directories(${PULSEAUDIO_INCLUDEDIR})
+if (UNIX AND NOT APPLE)
+    include(FindPkgConfig)
+    pkg_check_modules(PULSEAUDIO libpulse)
+    include_directories(${PULSEAUDIO_INCLUDEDIR})
+endif()
 
-pkg_check_modules(VPX vpx)
+if (UNIX AND NOT APPLE)
+    pkg_check_modules(VPX vpx)
+else()
+    find_path(VPX_INCLUDEDIR NAMES vpx/vpx_codec.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
+    find_library(VPX_LIBRARIES NAMES vpxmt PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
+endif()
+
 include_directories(${VPX_INCLUDEDIR})
 
 if(NOT SERVER_ONLY AND NOT USE_GLES2)
@@ -394,7 +402,6 @@ target_link_libraries(supertuxkart
     ${OPENAL_LIBRARY}
     ${FREETYPE_LIBRARIES}
     ${JPEG_LIBRARIES}
-    ${PULSEAUDIO_LIBRARIES}
     ${TURBOJPEG_LIBRARY}
     ${VPX_LIBRARIES}
     )
@@ -408,7 +415,7 @@ if(NOT SERVER_ONLY)
 endif()
 
 if(UNIX AND NOT APPLE)
-    target_link_libraries(supertuxkart ${X11_LIBRARIES} ${XRANDR_LIBRARIES})
+    target_link_libraries(supertuxkart ${X11_LIBRARIES} ${XRANDR_LIBRARIES} ${PULSEAUDIO_LIBRARIES})
     if(USE_LIBBFD)
         target_link_libraries(supertuxkart ${LIBBFD_LIBRARIES})
     endif()

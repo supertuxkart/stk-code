@@ -27,7 +27,12 @@
 #include "utils/vs.hpp"
 
 #include <ogg/ogg.h>
-#include <pulse/pulseaudio.h>
+#ifdef WIN32
+    #include "recorder/wasapi_record.hpp"
+#else
+    #include <pulse/pulseaudio.h>
+#endif
+
 #include <turbojpeg.h>
 #include <vorbis/vorbisenc.h>
 #include <vpx/vpx_encoder.h>
@@ -405,6 +410,8 @@ void* AVIWriter::vorbisEncoder(void *obj)
     const uint32_t all = header.bytes + header_comm.bytes + header_code.bytes
         + 3;
     fwrite(&all, 1, sizeof(uint32_t), vb_data);
+    fwrite(&all, 1, sizeof(uint32_t), vb_data);
+    fwrite(&all, 1, sizeof(uint32_t), vb_data);
     uint8_t size = 2;
     fwrite(&size, 1, sizeof(uint8_t), vb_data);
     size = (uint8_t)header.bytes;
@@ -477,6 +484,7 @@ void* AVIWriter::vorbisEncoder(void *obj)
 
 }   // vorbisEncoder
 
+#ifndef WIN32
 // ----------------------------------------------------------------------------
 void serverInfoCallBack(pa_context* c, const pa_server_info* i, void* data)
 {
@@ -614,6 +622,7 @@ void* AVIWriter::audioRecord(void *obj)
     return NULL;
 }   // audioRecord
 
+#endif
 // ----------------------------------------------------------------------------
 int AVIWriter::getFrameCount(double rate)
 {
@@ -638,7 +647,12 @@ void AVIWriter::captureFrameBufferImage()
     if (m_idle.getAtomic())
     {
         m_idle.setAtomic(false);
+#ifdef WIN32
+        pthread_create(&audio_thread, NULL, &Recorder::audioRecord, &m_idle);
+
+#else
         pthread_create(&audio_thread, NULL, &audioRecord, &m_idle);
+#endif
         pthread_cond_init(vpx_ei.m_enc_request, NULL);
         pthread_create(&vpx_enc_thread, NULL, &vpxEncoder, &vpx_ei);
     }

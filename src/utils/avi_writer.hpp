@@ -255,6 +255,11 @@ public:
         m_recording_target.setAtomic(name);
     }
     // ------------------------------------------------------------------------
+    static std::string getRecordingTarget()
+    {
+        return m_recording_target.getAtomic();
+    }
+    // ------------------------------------------------------------------------
     void captureFrameBufferImage();
     // ------------------------------------------------------------------------
     void resetFrameBufferImage();

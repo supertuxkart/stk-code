@@ -27,6 +27,7 @@
 #include <mkvmuxer/mkvmuxer.h>
 #include <mkvmuxer/mkvwriter.h>
 #include <mkvparser/mkvparser.h>
+#include <sys/stat.h>
 #include <vpx/vpx_encoder.h>
 
 namespace Recorder
@@ -56,53 +57,63 @@ namespace Recorder
             Log::error("writeWebm", "Could not initialize muxer segment.");
             return;
         }
-        uint64_t aud_track = muxer_segment.AddAudioTrack(44100, 2, 0);
-        if (!aud_track)
-        {
-            Log::error("writeWebm", "Could not add audio track.");
-            return;
-        }
-        mkvmuxer::AudioTrack* const at = static_cast<mkvmuxer::AudioTrack*>(
-            muxer_segment.GetTrackByNumber(aud_track));
-        if (!at)
-        {
-            Log::error("writeWebm", "Could not get audio track.");
-            return;
-        }
-        FILE* input = fopen(audio.c_str(), "rb");
-        uint32_t codec_private_size;
-        fread(&codec_private_size, 1, sizeof(uint32_t), input);
-        uint8_t* buf = (uint8_t*)malloc(1024 * 1024);
-        fread(buf, 1, codec_private_size, input);
-        if (!at->SetCodecPrivate(buf, codec_private_size))
-        {
-            Log::warn("writeWebm", "Could not add audio private data.");
-            return;
-        }
         std::list<mkvmuxer::Frame*> audio_frames;
-        while (fread(buf, 1, 12, input) == 12)
+        uint8_t* buf = (uint8_t*)malloc(1024 * 1024);
+        FILE* input = NULL;
+        struct stat st;
+        int result = stat(audio.c_str(), &st);
+        if (result == 0)
         {
-            uint32_t frame_size;
-            int64_t timestamp;
-            memcpy(&frame_size, buf, sizeof(uint32_t));
-            memcpy(&timestamp, buf + sizeof(uint32_t), sizeof(int64_t));
-            fread(buf, 1, frame_size, input);
-            mkvmuxer::Frame* audio_frame = new mkvmuxer::Frame();
-            if (!audio_frame->Init(buf, frame_size))
+            input = fopen(audio.c_str(), "rb");
+            uint32_t sample_rate, channels;
+            fread(&sample_rate, 1, sizeof(uint32_t), input);
+            fread(&channels, 1, sizeof(uint32_t), input);
+            uint64_t aud_track = muxer_segment.AddAudioTrack(sample_rate,
+                channels, 0);
+            if (!aud_track)
             {
-                Log::error("writeWebm", "Failed to construct a frame.");
+                Log::error("writeWebm", "Could not add audio track.");
                 return;
             }
-            audio_frame->set_track_number(aud_track);
-            audio_frame->set_timestamp(timestamp);
-            audio_frame->set_is_key(true);
-            audio_frames.push_back(audio_frame);
+            mkvmuxer::AudioTrack* const at = static_cast<mkvmuxer::AudioTrack*>
+                (muxer_segment.GetTrackByNumber(aud_track));
+            if (!at)
+            {
+                Log::error("writeWebm", "Could not get audio track.");
+                return;
+            }
+            uint32_t codec_private_size;
+            fread(&codec_private_size, 1, sizeof(uint32_t), input);
+            fread(buf, 1, codec_private_size, input);
+            if (!at->SetCodecPrivate(buf, codec_private_size))
+            {
+                Log::warn("writeWebm", "Could not add audio private data.");
+                return;
+            }
+            while (fread(buf, 1, 12, input) == 12)
+            {
+                uint32_t frame_size;
+                int64_t timestamp;
+                memcpy(&frame_size, buf, sizeof(uint32_t));
+                memcpy(&timestamp, buf + sizeof(uint32_t), sizeof(int64_t));
+                fread(buf, 1, frame_size, input);
+                mkvmuxer::Frame* audio_frame = new mkvmuxer::Frame();
+                if (!audio_frame->Init(buf, frame_size))
+                {
+                    Log::error("writeWebm", "Failed to construct a frame.");
+                    return;
+                }
+                audio_frame->set_track_number(aud_track);
+                audio_frame->set_timestamp(timestamp);
+                audio_frame->set_is_key(true);
+                audio_frames.push_back(audio_frame);
+            }
+            fclose(input);
+            if (remove(audio.c_str()) != 0)
+            {
+                Log::warn("writeWebm", "Failed to remove audio data file");
+            }
         }
-        if (remove(audio.c_str()) != 0)
-        {
-            Log::warn("writeWebm", "Failed to remove audio data file");
-        }
-        fclose(input);
         uint64_t vid_track = muxer_segment.AddVideoTrack(
             irr_driver->getActualScreenSize().Width,
             irr_driver->getActualScreenSize().Height, 0);
@@ -139,17 +150,26 @@ namespace Recorder
             muxer_frame.set_track_number(vid_track);
             muxer_frame.set_timestamp(timestamp);
             muxer_frame.set_is_key((flag & VPX_FRAME_IS_KEY) != 0);
-            mkvmuxer::Frame* cur_aud_frame = audio_frames.front();
-            while (cur_aud_frame->timestamp() < (uint64_t)timestamp)
+            mkvmuxer::Frame* cur_aud_frame =
+                audio_frames.empty() ? NULL : audio_frames.front();
+            if (cur_aud_frame != NULL)
             {
-                if (!muxer_segment.AddGenericFrame(cur_aud_frame))
+                while (cur_aud_frame->timestamp() < (uint64_t)timestamp)
                 {
-                    Log::error("writeWebm", "Could not add audio frame.");
-                    return;
+                    if (!muxer_segment.AddGenericFrame(cur_aud_frame))
+                    {
+                        Log::error("writeWebm", "Could not add audio frame.");
+                        return;
+                    }
+                    delete cur_aud_frame;
+                    audio_frames.pop_front();
+                    if (audio_frames.empty())
+                    {
+                        cur_aud_frame = NULL;
+                        break;
+                    }
+                    cur_aud_frame = audio_frames.front();
                 }
-                delete cur_aud_frame;
-                audio_frames.pop_front();
-                cur_aud_frame = audio_frames.front();
             }
             if (!muxer_segment.AddGenericFrame(&muxer_frame))
             {
