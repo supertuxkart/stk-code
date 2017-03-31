@@ -164,12 +164,14 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
         code << "#define VSLayer\n";
     if (CVS->needsRGBBindlessWorkaround())
         code << "#define SRGBBindlessFix\n";
+    if (CVS->isDefferedEnabled())
+        code << "#define Advanced_Lighting_Enabled\n";
 
 #if !defined(USE_GLES2)
     // shader compilation fails with some drivers if there is no precision
     // qualifier
     if (type == GL_FRAGMENT_SHADER)
-        code << "precision mediump float;\n";
+        code << "precision highp float;\n";
 #else
     int range[2], precision;
     glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_HIGH_FLOAT, range,

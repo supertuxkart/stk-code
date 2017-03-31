@@ -293,7 +293,12 @@ RTT::RTT(size_t width, size_t height, float rtt_scale)
     glClear(GL_COLOR_BUFFER_BIT);
 
     getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
-    glClearColor(.5, .5, .5, .5);
+    float color = 0.5;
+#if defined(USE_GLES2)
+    if (!CVS->isDefferedEnabled())
+        color = pow(color, 1. / 2.2);
+#endif
+    glClearColor(color, color, color, color);
     glClear(GL_COLOR_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #if !defined(USE_GLES2)

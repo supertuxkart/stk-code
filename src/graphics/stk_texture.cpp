@@ -52,6 +52,10 @@ STKTexture::STKTexture(const std::string& path, TexConfig* tc, bool no_upload)
 #ifndef SERVER_ONLY
     if (m_tex_config && !CVS->isGLSL())
         m_tex_config->m_srgb = false;
+#ifdef USE_GLES2
+    if (m_tex_config && !CVS->isDefferedEnabled())
+        m_tex_config->m_srgb = false;
+#endif
     if (!CVS->isARBTextureSwizzleUsable())
         m_single_channel = false;
 #endif
@@ -215,7 +219,8 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
     const unsigned int w = m_size.Width;
     const unsigned int h = m_size.Height;
     unsigned int format = m_single_channel ? GL_RED : GL_BGRA;
-    unsigned int internal_format = m_single_channel ? GL_R8 : GL_RGBA;
+    unsigned int internal_format = m_single_channel ? GL_R8 : isSrgb() ? 
+                                                    GL_SRGB8_ALPHA8 : GL_RGBA8;
 
 #if !defined(USE_GLES2)
     if (isMeshTexture() && CVS->isTextureCompressionEnabled())
@@ -224,12 +229,8 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
             isSrgb() ? GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT :
             GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
     }
-    else
-    {
-        internal_format =
-            m_single_channel ? GL_R8 : isSrgb() ? GL_SRGB8_ALPHA8 : GL_RGBA8;
-    }
 #endif
+
     if (!useThreadedLoading())
         formatConversion(data, &format, w, h);
 
@@ -303,7 +304,7 @@ void STKTexture::formatConversion(uint8_t* data, unsigned int* format,
                                   unsigned int w, unsigned int h) const
 {
 #if defined(USE_GLES2)
-    if (!CVS->isEXTTextureFormatBGRA8888Usable() && !m_single_channel)
+    if (!m_single_channel)
     {
         if (format)
             *format = GL_RGBA;
@@ -321,7 +322,13 @@ void STKTexture::formatConversion(uint8_t* data, unsigned int* format,
         {
             float alpha = data[4 * i + 3];
             if (alpha > 0.0f)
-                alpha = pow(alpha / 255.f, 1.f / 2.2f);
+            {
+                alpha /= 255.0f;
+#if defined(USE_GLES2)
+                if (CVS->isDefferedEnabled())
+#endif
+                    alpha = pow(alpha, 1.0f / 2.2f);
+            }
             data[i * 4] = (uint8_t)(data[i * 4] * alpha);
             data[i * 4 + 1] = (uint8_t)(data[i * 4 + 1] * alpha);
             data[i * 4 + 2] = (uint8_t)(data[i * 4 + 2] * alpha);

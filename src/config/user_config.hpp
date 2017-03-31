@@ -557,24 +557,28 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
         &m_video_group, "Generate mipmap for textures using "
                         "high quality method with SSE"));
+                        
+    // ---- Recording
+    PARAM_PREFIX GroupUserConfigParam        m_recording_group
+        PARAM_DEFAULT( GroupUserConfigParam("Recording", "Recording Settings") );
 
     PARAM_PREFIX BoolUserConfigParam        m_record_bmp
         PARAM_DEFAULT(BoolUserConfigParam(false, "record_bmp",
-        &m_video_group, "Record video using uncompressed bitmap, notice: this "
+        &m_recording_group, "Record video using uncompressed bitmap, notice: this "
                         "will require a lot of space and fast disk access."));
 
     PARAM_PREFIX BoolUserConfigParam        m_limit_game_fps
         PARAM_DEFAULT(BoolUserConfigParam(true, "limit_game_fps",
-        &m_video_group, "Limit game framerate not beyond the fps of recording "
+        &m_recording_group, "Limit game framerate not beyond the fps of recording "
                         "video."));
 
     PARAM_PREFIX IntUserConfigParam         m_record_compression
         PARAM_DEFAULT(IntUserConfigParam(90, "record_compression",
-        &m_video_group, "Specify the compression level of recording video"));
+        &m_recording_group, "Specify the compression level of recording video"));
 
     PARAM_PREFIX IntUserConfigParam         m_record_fps
         PARAM_DEFAULT(IntUserConfigParam(30, "record_fps",
-        &m_video_group, "Specify the fps of recording video"));
+        &m_recording_group, "Specify the fps of recording video"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
