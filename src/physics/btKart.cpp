@@ -504,28 +504,6 @@ void btKart::updateVehicle( btScalar step )
     // ------------------------------------
     updateFriction( step);
 
-    for (int i=0;i<m_wheelInfo.size();i++)
-    {
-        btWheelInfo& wheel = m_wheelInfo[i];
-        //btVector3 relpos   = wheel.m_raycastInfo.m_hardPointWS
-        //                   - getRigidBody()->getCenterOfMassPosition();
-        //btVector3 vel      = getRigidBody()->getVelocityInLocalPoint(relpos);
-
-        if (wheel.m_raycastInfo.m_isInContact)
-        {
-            const btTransform& chassisWorldTransform =
-                                                 getChassisWorldTransform();
-
-            btVector3 fwd (
-                chassisWorldTransform.getBasis()[0][m_indexForwardAxis],
-                chassisWorldTransform.getBasis()[1][m_indexForwardAxis],
-                chassisWorldTransform.getBasis()[2][m_indexForwardAxis]);
-
-            btScalar proj = fwd.dot(wheel.m_raycastInfo.m_contactNormalWS);
-            fwd -= wheel.m_raycastInfo.m_contactNormalWS * proj;
-        } 
-    }
-
     // If configured, add a force to keep karts on the track
     // -----------------------------------------------------
     float dif = m_kart->getKartProperties()->getStabilityDownwardImpulseFactor();
