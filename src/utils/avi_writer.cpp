@@ -82,6 +82,26 @@ void AVIWriter::resetFrameBufferImage()
 }   // resetFrameBufferImage
 
 // ----------------------------------------------------------------------------
+int bmpToJPG(uint8_t* raw, unsigned width, unsigned height,
+             uint8_t** jpeg_buffer, unsigned long* jpeg_size)
+{
+    tjhandle handle = NULL;
+    int ret = 0;
+    handle = tjInitCompress();
+    ret = tjCompress2(handle, raw, width, 0, height, TJPF_BGR, jpeg_buffer,
+        jpeg_size, TJSAMP_420, UserConfigParams::m_recorder_jpg_quality,
+        TJFLAG_FASTDCT);
+    if (ret != 0)
+    {
+        char* err = tjGetErrorStr();
+        Log::error("vpxEncoder", "Jpeg encode error: %s.", err);
+        return ret;
+    }
+    tjDestroy(handle);
+    return ret;
+}   // bmpToJPG
+
+// ----------------------------------------------------------------------------
 int jpgToYuv(uint8_t* jpeg_buffer, unsigned jpeg_size, uint8_t** yuv_buffer,
              TJSAMP* yuv_type, unsigned* yuv_size)
 {
@@ -230,11 +250,11 @@ void* AVIWriter::vpxEncoder(void *obj)
         if (ret < 0)
         {
             delete [] yuv;
-            free(jpg);
+            tjFree(jpg);
             continue;
         }
         assert(yuv_type == TJSAMP_420 && yuv_size != 0);
-        free(jpg);
+        tjFree(jpg);
         vpx_image_t each_frame;
         vpx_img_wrap(&each_frame, VPX_IMG_FMT_I420, width, height, 1, yuv);
         while (frame_count != 0)
@@ -353,19 +373,12 @@ void* AVIWriter::videoRecord(void *obj)
             p2 -= pitch;
         }
         delete [] tmp_buf;
-        size = area * 3;
-        uint8_t* jpg = (uint8_t*)malloc(size);
-        size = avi_writer->bmpToJpg(orig_fbi + area, jpg, size);
-        delete [] orig_fbi;
-        uint8_t* shrinken = (uint8_t*)realloc(jpg, size);
-        if (shrinken == NULL)
-        {
-            free(jpg);
-            continue;
-        }
-        jpg = shrinken;
+        uint8_t* jpg = NULL;
+        unsigned long jpg_size = 0;
+        bmpToJPG(orig_fbi + area, width, height, &jpg, &jpg_size);
+        delete[] orig_fbi;
         jpg_data.lock();
-        jpg_data.getData().emplace_back(jpg, size, frame_count);
+        jpg_data.getData().emplace_back(jpg, jpg_size, frame_count);
         pthread_cond_signal(vpx_ei.m_enc_request);
         jpg_data.unlock();
     }
@@ -425,9 +438,7 @@ void AVIWriter::captureFrameBufferImage()
     int pbo_use = m_pbo_use++ % 3;
     assert(pbo_read == -1 || pbo_use == pbo_read);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, m_pbo[pbo_use]);
-    glReadPixels(0, 0, m_width, m_height,
-        m_avi_format == AVI_FORMAT_JPG ? GL_RGBA: GL_BGRA,
-        GL_UNSIGNED_BYTE, NULL);
+    glReadPixels(0, 0, m_width, m_height, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 }   // captureFrameBufferImage
 
