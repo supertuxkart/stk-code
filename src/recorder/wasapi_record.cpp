@@ -17,7 +17,7 @@
 
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2)) && defined(WIN32)
 
-#include "recorder/vorbis_encode.hpp"
+#include "recorder/vorbis_encoder.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/log.hpp"
 #include "utils/vs.hpp"
@@ -44,6 +44,7 @@ namespace Recorder
         IAudioCaptureClient* m_capture_client;
         WAVEFORMATEX* m_wav_format;
         uint32_t m_buffer_size;
+        // --------------------------------------------------------------------
         WasapiData()
         {
             m_loaded = false;
@@ -53,6 +54,7 @@ namespace Recorder
             m_capture_client = NULL;
             m_wav_format = NULL;
         }   // WasapiData
+        // --------------------------------------------------------------------
         bool load()
         {
             HRESULT hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL,
@@ -93,6 +95,7 @@ namespace Recorder
             m_loaded = true;
             return true;
         }   // load
+        // --------------------------------------------------------------------
         ~WasapiData()
         {
             if (m_loaded)
@@ -180,25 +183,25 @@ namespace Recorder
             ->nSamplesPerSec;
 
         Synchronised<bool>* idle = (Synchronised<bool>*)obj;
-        Synchronised<std::list<int8_t*> > pcm_data;
+        Synchronised<std::list<int8_t*> > audio_data;
         pthread_cond_t enc_request;
         pthread_cond_init(&enc_request, NULL);
         pthread_t vorbis_enc;
-        ved.m_data = &pcm_data;
+        ved.m_data = &audio_data;
         ved.m_enc_request = &enc_request;
         pthread_create(&vorbis_enc, NULL, &Recorder::vorbisEncoder, &ved);
         const unsigned frag_size = 1024 * ved.m_channels *
             (g_wasapi_data.m_wav_format->wBitsPerSample / 8);
-        int8_t* each_pcm_buf = new int8_t[frag_size]();
+        int8_t* each_audio_buf = new int8_t[frag_size]();
         unsigned readed = 0;
         while (true)
         {
             if (idle->getAtomic())
             {
-                pcm_data.lock();
-                pcm_data.getData().push_back(each_pcm_buf);
+                audio_data.lock();
+                audio_data.getData().push_back(each_audio_buf);
                 pthread_cond_signal(&enc_request);
-                pcm_data.unlock();
+                audio_data.unlock();
                 break;
             }
             REFERENCE_TIME sleep_time = duration / 10000 / 2;
@@ -224,25 +227,25 @@ namespace Recorder
                 unsigned copy_size = buf_full ? frag_size - readed : bytes;
                 if (!(flags & AUDCLNT_BUFFERFLAGS_SILENT))
                 {
-                    memcpy(each_pcm_buf + readed, data, copy_size);
+                    memcpy(each_audio_buf + readed, data, copy_size);
                 }
                 if (buf_full)
                 {
-                    pcm_data.lock();
-                    pcm_data.getData().push_back(each_pcm_buf);
+                    audio_data.lock();
+                    audio_data.getData().push_back(each_audio_buf);
                     pthread_cond_signal(&enc_request);
-                    pcm_data.unlock();
-                    each_pcm_buf = new int8_t[frag_size]();
-                    readed = (unsigned)bytes - copy_size;
+                    audio_data.unlock();
+                    each_audio_buf = new int8_t[frag_size]();
+                    readed = bytes - copy_size;
                     if (!(flags & AUDCLNT_BUFFERFLAGS_SILENT))
                     {
-                        memcpy(each_pcm_buf, (uint8_t*)data + copy_size,
+                        memcpy(each_audio_buf, (uint8_t*)data + copy_size,
                             readed);
                     }
                 }
                 else
                 {
-                    readed += (unsigned)bytes;
+                    readed += bytes;
                 }
                 hr = g_wasapi_data.m_capture_client->ReleaseBuffer(frame_size);
                 if (FAILED(hr))
@@ -257,10 +260,10 @@ namespace Recorder
                     return NULL;
             }
         }
-        pcm_data.lock();
-        pcm_data.getData().push_back(NULL);
+        audio_data.lock();
+        audio_data.getData().push_back(NULL);
         pthread_cond_signal(&enc_request);
-        pcm_data.unlock();
+        audio_data.unlock();
         pthread_join(vorbis_enc, NULL);
         pthread_cond_destroy(&enc_request);
 

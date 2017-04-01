@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/message_queue.hpp"
+#include "recorder/vorbis_encoder.hpp"
 #include "recorder/webm_writer.hpp"
 #include "utils/translation.hpp"
 #include "utils/vs.hpp"
@@ -34,7 +35,6 @@
 #endif
 
 #include <turbojpeg.h>
-#include <vorbis/vorbisenc.h>
 #include <vpx/vpx_encoder.h>
 #include <vpx/vp8cx.h>
 
@@ -377,113 +377,6 @@ void* AVIWriter::videoRecord(void *obj)
     return NULL;
 }   // videoRecord
 
-// ----------------------------------------------------------------------------
-void* AVIWriter::vorbisEncoder(void *obj)
-{
-    VS::setThreadName("vorbisEncoder");
-    vorbis_info vi;
-    vorbis_dsp_state vd;
-    vorbis_block vb;
-    vorbis_info_init(&vi);
-    vorbis_encode_init(&vi, 2, 44100, -1, 112000, -1);
-    vorbis_analysis_init(&vd, &vi);
-    vorbis_block_init(&vd, &vb);
-    vorbis_comment vc;
-    vorbis_comment_init(&vc);
-    vorbis_comment_add_tag(&vc, "ENCODER", "STK vorbis encoder");
-    ogg_packet header;
-    ogg_packet header_comm;
-    ogg_packet header_code;
-    vorbis_analysis_headerout(&vd, &vc, &header, &header_comm, &header_code);
-    if (header.bytes > 255 || header_comm.bytes > 255)
-    {
-        Log::error("vorbisEncoder", "Header is too long.");
-        return NULL;
-    }
-    FILE* vb_data = fopen((m_recording_target.getAtomic() + ".vb_data")
-        .c_str(), "wb");
-    if (vb_data == NULL)
-    {
-        Log::error("vorbisEncoder", "Failed to open file for encoding vorbis.");
-        return NULL;
-    }
-    const uint32_t all = header.bytes + header_comm.bytes + header_code.bytes
-        + 3;
-    fwrite(&all, 1, sizeof(uint32_t), vb_data);
-    fwrite(&all, 1, sizeof(uint32_t), vb_data);
-    fwrite(&all, 1, sizeof(uint32_t), vb_data);
-    uint8_t size = 2;
-    fwrite(&size, 1, sizeof(uint8_t), vb_data);
-    size = (uint8_t)header.bytes;
-    fwrite(&size, 1, sizeof(uint8_t), vb_data);
-    size = (uint8_t)header_comm.bytes;
-    fwrite(&size, 1, sizeof(uint8_t), vb_data);
-    fwrite(header.packet, 1, header.bytes, vb_data);
-    fwrite(header_comm.packet, 1, header_comm.bytes, vb_data);
-    fwrite(header_code.packet, 1, header_code.bytes, vb_data);
-    EncoderInfo* ei = (EncoderInfo*)obj;
-    Synchronised<std::list<int8_t*> >* pcm_data =
-        (Synchronised<std::list<int8_t*> >*)ei->m_data;
-    pthread_cond_t* cond_request = ei->m_enc_request;
-    ogg_packet op;
-    int64_t last_timestamp = 0;
-    while (true)
-    {
-        pcm_data->lock();
-        bool waiting = pcm_data->getData().empty();
-        while (waiting)
-        {
-            pthread_cond_wait(cond_request, pcm_data->getMutex());
-            waiting = pcm_data->getData().empty();
-        }
-        const int8_t* pcm_buf = pcm_data->getData().front();
-        pcm_data->getData().pop_front();
-        pcm_data->unlock();
-        long i = 0;
-        if (pcm_buf == NULL)
-        {
-            break;
-        }
-        else
-        {
-            float **buffer = vorbis_analysis_buffer(&vd, 1024);
-            for (i = 0; i < 1024; i++)
-            {
-                buffer[0][i] = ((pcm_buf[i * 4 + 1] << 8) |
-                    (0x00ff & (int)pcm_buf[i * 4])) / 32768.0f;
-                buffer[1][i] = ((pcm_buf[i * 4 + 3] << 8) |
-                    (0x00ff & (int)pcm_buf[i * 4 + 2])) / 32768.0f;
-            }
-            vorbis_analysis_wrote(&vd, i);
-        }
-        while (vorbis_analysis_blockout(&vd, &vb) == 1)
-        {
-            vorbis_analysis(&vb, NULL);
-            vorbis_bitrate_addblock(&vb);
-            while (vorbis_bitrate_flushpacket(&vd, &op))
-            {
-                if (op.granulepos > 0)
-                {
-                    uint32_t frame_size = (uint32_t)op.bytes;
-                    fwrite(&frame_size, 1, sizeof(uint32_t), vb_data);
-                    fwrite(&last_timestamp, 1, sizeof(int64_t), vb_data);
-                    fwrite(op.packet, 1, frame_size, vb_data);
-                    double s = (double)op.granulepos / 44100. * 1000000000.;
-                    last_timestamp = (int64_t)s;
-                }
-            }
-        }
-        delete [] pcm_buf;
-    }
-    vorbis_block_clear(&vb);
-    vorbis_dsp_clear(&vd);
-    vorbis_comment_clear(&vc);
-    vorbis_info_clear(&vi);
-    fclose(vb_data);
-    return NULL;
-
-}   // vorbisEncoder
-
 #ifndef WIN32
 // ----------------------------------------------------------------------------
 void serverInfoCallBack(pa_context* c, const pa_server_info* i, void* data)
@@ -532,7 +425,7 @@ void* AVIWriter::audioRecord(void *obj)
     sam_spec.channels = 2;
 
     pa_buffer_attr buf_attr;
-    const unsigned frag_size = 1024 * 2 * sizeof(int16_t);
+    const unsigned frag_size = 1024 * sam_spec.channels * sizeof(int16_t);
     buf_attr.fragsize = frag_size;
     const unsigned max_uint = -1;
     buf_attr.maxlength = max_uint;
@@ -564,10 +457,13 @@ void* AVIWriter::audioRecord(void *obj)
     pthread_cond_init(&enc_request, NULL);
     pthread_t vorbis_enc_thread;
 
-    EncoderInfo ei;
-    ei.m_data = &pcm_data;
-    ei.m_enc_request = &enc_request;
-    pthread_create(&vorbis_enc_thread, NULL, &vorbisEncoder, &ei);
+    Recorder::VorbisEncoderData ved;
+    ved.m_sample_rate = sam_spec.rate;
+    ved.m_channels = sam_spec.channels;
+    ved.m_audio_type = Recorder::VorbisEncoderData::AT_PCM;
+    ved.m_data = &pcm_data;
+    ved.m_enc_request = &enc_request;
+    pthread_create(&vorbis_enc_thread, NULL, &Recorder::vorbisEncoder, &ved);
     int8_t* each_pcm_buf = new int8_t[frag_size]();
     unsigned readed = 0;
     while (true)

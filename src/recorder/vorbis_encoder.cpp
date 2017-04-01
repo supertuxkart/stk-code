@@ -17,7 +17,7 @@
 
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
 
-#include "recorder/vorbis_encode.hpp"
+#include "recorder/vorbis_encoder.hpp"
 #include "utils/avi_writer.hpp"
 #include "utils/log.hpp"
 #include "utils/vs.hpp"
@@ -79,7 +79,6 @@ namespace Recorder
         pthread_cond_t* cond_request = ved->m_enc_request;
         ogg_packet op;
         int64_t last_timestamp = 0;
-        const unsigned channels = ved->m_channels;
         while (true)
         {
             audio_data->lock();
@@ -92,7 +91,6 @@ namespace Recorder
             int8_t* audio_buf = audio_data->getData().front();
             audio_data->getData().pop_front();
             audio_data->unlock();
-            long i = 0;
             if (audio_buf == NULL)
             {
                 break;
@@ -100,28 +98,32 @@ namespace Recorder
             else
             {
                 float **buffer = vorbis_analysis_buffer(&vd, 1024);
+                const unsigned channels = ved->m_channels;
                 if (ved->m_audio_type == VorbisEncoderData::AT_PCM)
                 {
-                    for (i = 0; i < 1024; i++)
+                    for (unsigned j = 0; j < channels; j++)
                     {
-                        buffer[0][i] = ((audio_buf[i * 4 + 1] << 8) |
-                            (0x00ff & (int)audio_buf[i * 4])) / 32768.0f;
-                        buffer[1][i] = ((audio_buf[i * 4 + 3] << 8) |
-                            (0x00ff & (int)audio_buf[i * 4 + 2])) / 32768.0f;
+                        for (unsigned i = 0; i < 1024; i++)
+                        {
+                            int8_t* each_channel =
+                                &audio_buf[i * channels * 2 + j * 2];
+                            buffer[j][i] = float((each_channel[1] << 8) |
+                               (0x00ff & (int)each_channel[0])) / 32768.0f;
+                        }
                     }
                 }
                 else
                 {
-                    float* float_buf = reinterpret_cast<float*>(audio_buf);
                     for (unsigned j = 0; j < channels; j++)
                     {
-                        for (i = 0; i < 1024; i++)
+                        for (unsigned i = 0; i < 1024; i++)
                         {
-                            buffer[j][i] = float_buf[i * channels + j];
+                            float* fbuf = reinterpret_cast<float*>(audio_buf);
+                            buffer[j][i] = fbuf[i * channels + j];
                         }
                     }
                 }
-                vorbis_analysis_wrote(&vd, i);
+                vorbis_analysis_wrote(&vd, 1024);
             }
             while (vorbis_analysis_blockout(&vd, &vb) == 1)
             {
