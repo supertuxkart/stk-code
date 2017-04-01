@@ -15,14 +15,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2)) && defined(WIN32)
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2)) && !defined(WIN32)
 
-#ifndef HEADER_WASAPI_RECORD_HPP
-#define HEADER_WASAPI_RECORD_HPP
+#ifndef HEADER_PULSEAUDIO_RECORD_HPP
+#define HEADER_PULSEAUDIO_RECORD_HPP
 
 namespace Recorder
 {
-    void* audioRecord(void *obj);
+    void* audioRecorder(void *obj);
 };
 
 #endif

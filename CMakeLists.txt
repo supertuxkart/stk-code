@@ -415,7 +415,7 @@ if(NOT SERVER_ONLY)
 endif()
 
 if(UNIX AND NOT APPLE)
-    target_link_libraries(supertuxkart ${X11_LIBRARIES} ${XRANDR_LIBRARIES} ${PULSEAUDIO_LIBRARIES})
+    target_link_libraries(supertuxkart dl ${X11_LIBRARIES} ${XRANDR_LIBRARIES})
     if(USE_LIBBFD)
         target_link_libraries(supertuxkart ${LIBBFD_LIBRARIES})
     endif()

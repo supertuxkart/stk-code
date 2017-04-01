@@ -22,17 +22,12 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/message_queue.hpp"
+#include "recorder/pulseaudio_recorder.hpp"
 #include "recorder/vorbis_encoder.hpp"
+#include "recorder/wasapi_recorder.hpp"
 #include "recorder/webm_writer.hpp"
 #include "utils/translation.hpp"
 #include "utils/vs.hpp"
-
-#include <ogg/ogg.h>
-#ifdef WIN32
-    #include "recorder/wasapi_record.hpp"
-#else
-    #include <pulse/pulseaudio.h>
-#endif
 
 #include <turbojpeg.h>
 #include <vpx/vpx_encoder.h>
@@ -308,8 +303,8 @@ void* AVIWriter::videoRecord(void *obj)
             jpg_data.getData().emplace_back((uint8_t*)NULL, 0, 0);
             pthread_cond_signal(vpx_ei.m_enc_request);
             jpg_data.unlock();
-            pthread_join(audio_thread, NULL);
-            pthread_join(vpx_enc_thread, NULL);
+            //pthread_join(audio_thread, NULL);
+            //pthread_join(vpx_enc_thread, NULL);
             avi_writer->setCanBeDeleted();
             avi_writer->m_fbi_queue.getData().clear();
             avi_writer->m_fbi_queue.unlock();
@@ -377,148 +372,6 @@ void* AVIWriter::videoRecord(void *obj)
     return NULL;
 }   // videoRecord
 
-#ifndef WIN32
-// ----------------------------------------------------------------------------
-void serverInfoCallBack(pa_context* c, const pa_server_info* i, void* data)
-{
-    *(std::string*)data = i->default_sink_name;
-}   // serverInfoCallBack
-
-// ----------------------------------------------------------------------------
-void* AVIWriter::audioRecord(void *obj)
-{
-    VS::setThreadName("audioRecord");
-    pa_mainloop* ml = pa_mainloop_new();
-    assert(ml);
-    pa_context* ctx = pa_context_new(pa_mainloop_get_api(ml), "audioRecord");
-    assert(ctx);
-    pa_context_connect(ctx, NULL, PA_CONTEXT_NOAUTOSPAWN , NULL);
-    while (true)
-    {
-        while (pa_mainloop_iterate(ml, 0, NULL) > 0);
-        pa_context_state_t state = pa_context_get_state(ctx);
-        if (state == PA_CONTEXT_READY)
-            break;
-        if (!PA_CONTEXT_IS_GOOD(state))
-        {
-            Log::error("audioRecord", "Failed to connect to context");
-            return NULL;
-        }
-    }
-    std::string default_sink;
-    pa_operation* pa_op =
-        pa_context_get_server_info(ctx, serverInfoCallBack, &default_sink);
-    enum pa_operation_state op_state;
-    while ((op_state = pa_operation_get_state(pa_op)) == PA_OPERATION_RUNNING)
-        pa_mainloop_iterate(ml, 0, NULL);
-    pa_operation_unref(pa_op);
-    if (default_sink.empty())
-    {
-        Log::error("audioRecord", "Failed to get default sink");
-        return NULL;
-    }
-    default_sink += ".monitor";
-
-    pa_sample_spec sam_spec;
-    sam_spec.format = PA_SAMPLE_S16LE;
-    sam_spec.rate = 44100;
-    sam_spec.channels = 2;
-
-    pa_buffer_attr buf_attr;
-    const unsigned frag_size = 1024 * sam_spec.channels * sizeof(int16_t);
-    buf_attr.fragsize = frag_size;
-    const unsigned max_uint = -1;
-    buf_attr.maxlength = max_uint;
-    buf_attr.minreq = max_uint;
-    buf_attr.prebuf = max_uint;
-    buf_attr.tlength = max_uint;
-
-    pa_stream* stream = pa_stream_new(ctx, "input", &sam_spec, NULL);
-    assert(stream);
-    pa_stream_connect_record(stream, default_sink.c_str(), &buf_attr,
-        (pa_stream_flags_t) (PA_STREAM_ADJUST_LATENCY));
-
-    while (true)
-    {
-        while (pa_mainloop_iterate(ml, 0, NULL) > 0);
-        pa_stream_state_t state = pa_stream_get_state(stream);
-        if (state == PA_STREAM_READY)
-            break;
-        if (!PA_STREAM_IS_GOOD(state))
-        {
-            Log::error("audioRecord", "Failed to connect to stream");
-            return NULL;
-        }
-    }
-
-    Synchronised<bool>* idle = (Synchronised<bool>*)obj;
-    Synchronised<std::list<int8_t*> > pcm_data;
-    pthread_cond_t enc_request;
-    pthread_cond_init(&enc_request, NULL);
-    pthread_t vorbis_enc_thread;
-
-    Recorder::VorbisEncoderData ved;
-    ved.m_sample_rate = sam_spec.rate;
-    ved.m_channels = sam_spec.channels;
-    ved.m_audio_type = Recorder::VorbisEncoderData::AT_PCM;
-    ved.m_data = &pcm_data;
-    ved.m_enc_request = &enc_request;
-    pthread_create(&vorbis_enc_thread, NULL, &Recorder::vorbisEncoder, &ved);
-    int8_t* each_pcm_buf = new int8_t[frag_size]();
-    unsigned readed = 0;
-    while (true)
-    {
-        if (idle->getAtomic() == true)
-        {
-            pcm_data.lock();
-            pcm_data.getData().push_back(each_pcm_buf);
-            pthread_cond_signal(&enc_request);
-            pcm_data.unlock();
-            break;
-        }
-        while (pa_mainloop_iterate(ml, 0, NULL) > 0);
-        const void* data;
-        size_t bytes;
-        size_t readable = pa_stream_readable_size(stream);
-        if (readable == 0)
-            continue;
-        pa_stream_peek(stream, &data, &bytes);
-        if (data == NULL)
-        {
-            if (bytes > 0)
-                pa_stream_drop(stream);
-            continue;
-        }
-        bool buf_full = readed + (unsigned)bytes > frag_size;
-        unsigned copy_size = buf_full ? frag_size - readed : (unsigned)bytes;
-        memcpy(each_pcm_buf + readed, data, copy_size);
-        if (buf_full)
-        {
-            pcm_data.lock();
-            pcm_data.getData().push_back(each_pcm_buf);
-            pthread_cond_signal(&enc_request);
-            pcm_data.unlock();
-            each_pcm_buf = new int8_t[frag_size]();
-            readed = (unsigned)bytes - copy_size;
-            memcpy(each_pcm_buf, (uint8_t*)data + copy_size, readed);
-        }
-        else
-        {
-            readed += (unsigned)bytes;
-        }
-        pa_stream_drop(stream);
-    }
-    pcm_data.lock();
-    pcm_data.getData().push_back(NULL);
-    pthread_cond_signal(&enc_request);
-    pcm_data.unlock();
-    pthread_join(vorbis_enc_thread, NULL);
-    pthread_cond_destroy(&enc_request);
-
-    return NULL;
-}   // audioRecord
-
-#endif
 // ----------------------------------------------------------------------------
 int AVIWriter::getFrameCount(double rate)
 {
@@ -543,12 +396,7 @@ void AVIWriter::captureFrameBufferImage()
     if (m_idle.getAtomic())
     {
         m_idle.setAtomic(false);
-#ifdef WIN32
-        pthread_create(&audio_thread, NULL, &Recorder::audioRecord, &m_idle);
-
-#else
-        pthread_create(&audio_thread, NULL, &audioRecord, &m_idle);
-#endif
+        pthread_create(&audio_thread, NULL, &Recorder::audioRecorder, &m_idle);
         pthread_cond_init(vpx_ei.m_enc_request, NULL);
         pthread_create(&vpx_enc_thread, NULL, &vpxEncoder, &vpx_ei);
     }

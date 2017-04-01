@@ -115,14 +115,14 @@ namespace Recorder
     // ========================================================================
     WasapiData g_wasapi_data;
     // ========================================================================
-    void* audioRecord(void *obj)
+    void* audioRecorder(void *obj)
     {
-        VS::setThreadName("audioRecord");
+        VS::setThreadName("audioRecorder");
         if (!g_wasapi_data.m_loaded)
         {
             if (!g_wasapi_data.load())
             {
-                Log::error("WasapiRecord", "Failed to load wasapi data");
+                Log::error("WasapiRecorder", "Failed to load wasapi data");
                 return NULL;
             }
         }
@@ -138,7 +138,8 @@ namespace Recorder
                 ved.m_audio_type = VorbisEncoderData::AT_PCM;
                 if (wav_for_ext->Format.wBitsPerSample != 16)
                 {
-                    Log::error("WasapiRecord", "Only 16bit PCM is supported.");
+                    Log::error("WasapiRecorder", "Only 16bit PCM is"
+                        " supported.");
                     return NULL;
                 }
             }
@@ -148,14 +149,15 @@ namespace Recorder
                 ved.m_audio_type = VorbisEncoderData::AT_FLOAT;
                 if (wav_for_ext->Format.wBitsPerSample != 32)
                 {
-                    Log::error("WasapiRecord", "Only 32bit float is"
+                    Log::error("WasapiRecorder", "Only 32bit float is"
                         " supported.");
                     return NULL;
                 }
             }
             else
             {
-                Log::error("WasapiRecord", "Unsupported audio input format.");
+                Log::error("WasapiRecorder", "Unsupported audio input"
+                    " format.");
                 return NULL;
             }
         }
@@ -166,13 +168,13 @@ namespace Recorder
             ved.m_audio_type = VorbisEncoderData::AT_PCM;
             if (g_wasapi_data.m_wav_format->wBitsPerSample != 16)
             {
-                Log::error("WasapiRecord", "Only 16bit PCM is supported.");
+                Log::error("WasapiRecorder", "Only 16bit PCM is supported.");
                 return NULL;
             }
         }
         else
         {
-            Log::error("WasapiRecord", "Unsupported audio input format");
+            Log::error("WasapiRecorder", "Unsupported audio input format");
             return NULL;
         }
         HRESULT hr = g_wasapi_data.m_client->Start();
@@ -271,6 +273,6 @@ namespace Recorder
         if (FAILED(hr))
             return NULL;
         return NULL;
-    }   // audioRecord
+    }   // audioRecorder
 }
 #endif
