@@ -88,9 +88,14 @@ int bmpToJPG(uint8_t* raw, unsigned width, unsigned height,
     tjhandle handle = NULL;
     int ret = 0;
     handle = tjInitCompress();
+#ifdef TJFLAG_FASTDCT
     ret = tjCompress2(handle, raw, width, 0, height, TJPF_BGR, jpeg_buffer,
         jpeg_size, TJSAMP_420, UserConfigParams::m_recorder_jpg_quality,
         TJFLAG_FASTDCT);
+#else
+    ret = tjCompress2(handle, raw, width, 0, height, TJPF_BGR, jpeg_buffer,
+        jpeg_size, TJSAMP_420, UserConfigParams::m_recorder_jpg_quality, 0);
+#endif
     if (ret != 0)
     {
         char* err = tjGetErrorStr();
