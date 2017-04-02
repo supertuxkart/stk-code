@@ -79,7 +79,8 @@ namespace Recorder
         pthread_cond_t* cond_request = ved->m_enc_request;
         ogg_packet op;
         int64_t last_timestamp = 0;
-        while (true)
+        bool eos = false;
+        while (eos == false)
         {
             audio_data->lock();
             bool waiting = audio_data->getData().empty();
@@ -93,7 +94,8 @@ namespace Recorder
             audio_data->unlock();
             if (audio_buf == NULL)
             {
-                break;
+                vorbis_analysis_wrote(&vd, 0);
+                eos = true;
             }
             else
             {
