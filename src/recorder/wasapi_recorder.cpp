@@ -30,6 +30,27 @@
 #include <mmdeviceapi.h>
 #include <windows.h>
 
+#if defined (__MINGW32__) || defined(__CYGWIN__)
+    #include "utils/types.hpp"
+    inline GUID uuidFromString(const char* s)
+    {
+        unsigned long p0;
+        unsigned int p1, p2, p3, p4, p5, p6, p7, p8, p9, p10;
+        sscanf_s(s, "%08lX-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+            &p0, &p1, &p2, &p3, &p4, &p5, &p6, &p7, &p8, &p9, &p10);
+        GUID g = { p0, (uint16_t)p1, (uint16_t)p2, { (uint8_t)p3, (uint8_t)p4,
+            (uint8_t)p5, (uint8_t)p6, (uint8_t)p7, (uint8_t)p8, (uint8_t)p9,
+            (uint8_t)p10 }};
+        return g;
+    }
+    #undef KSDATAFORMAT_SUBTYPE_PCM
+    #define KSDATAFORMAT_SUBTYPE_PCM \
+        uuidFromString("00000001-0000-0010-8000-00aa00389b71")
+    #undef KSDATAFORMAT_SUBTYPE_IEEE_FLOAT
+    #define KSDATAFORMAT_SUBTYPE_IEEE_FLOAT \
+        uuidFromString("00000003-0000-0010-8000-00aa00389b71")
+#endif
+
 namespace Recorder
 {
     // ========================================================================

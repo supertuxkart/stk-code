@@ -134,7 +134,7 @@ if (UNIX AND NOT APPLE)
     pkg_check_modules(VPX vpx)
 else()
     find_path(VPX_INCLUDEDIR NAMES vpx/vpx_codec.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
-    find_library(VPX_LIBRARIES NAMES vpxmt PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
+    find_library(VPX_LIBRARIES NAMES vpxmt libvpx PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
 endif()
 
 include_directories(${VPX_INCLUDEDIR})
