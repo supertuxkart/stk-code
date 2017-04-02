@@ -177,9 +177,18 @@ namespace Recorder
             Log::error("WasapiRecorder", "Unsupported audio input format");
             return NULL;
         }
-        HRESULT hr = g_wasapi_data.m_client->Start();
+        HRESULT hr = g_wasapi_data.m_client->Reset();
         if (FAILED(hr))
+        {
+            Log::error("WasapiRecorder", "Failed to reset recorder");
             return NULL;
+        }
+        hr = g_wasapi_data.m_client->Start();
+        if (FAILED(hr))
+        {
+            Log::error("WasapiRecorder", "Failed to start recorder");
+            return NULL;
+        }
         REFERENCE_TIME duration = REFTIMES_PER_SEC *
             g_wasapi_data.m_buffer_size / g_wasapi_data.m_wav_format
             ->nSamplesPerSec;
@@ -202,76 +211,71 @@ namespace Recorder
             {
                 audio_data.lock();
                 audio_data.getData().push_back(each_audio_buf);
+                audio_data.getData().push_back(NULL);
                 pthread_cond_signal(&enc_request);
                 audio_data.unlock();
                 break;
             }
-            REFERENCE_TIME sleep_time = duration / 10000 / 2;
-            Sleep((uint32_t)sleep_time);
-            uint32_t packet_length;
+            uint32_t packet_length = 0;
             hr = g_wasapi_data.m_capture_client->GetNextPacketSize(
                 &packet_length);
             if (FAILED(hr))
-                return NULL;
-            while (packet_length != 0)
             {
-                BYTE* data;
-                uint32_t frame_size;
-                DWORD flags;
-                hr = g_wasapi_data.m_capture_client->GetBuffer(&data,
-                    &frame_size, &flags, NULL, NULL);
-                if (FAILED(hr))
-                    return NULL;
-                const unsigned bytes = ved.m_channels *
-                    (g_wasapi_data.m_wav_format->wBitsPerSample / 8) *
-                    frame_size;
-                bool buf_full = readed + bytes > frag_size;
-                unsigned copy_size = buf_full ? frag_size - readed : bytes;
+                Log::warn("WasapiRecorder", "Failed to get next packet size");
+            }
+            if (packet_length == 0)
+            {
+                REFERENCE_TIME sleep_time = duration / 10000 / 2;
+                Sleep((uint32_t)sleep_time);
+                continue;
+            }
+            BYTE* data;
+            DWORD flags;
+            hr = g_wasapi_data.m_capture_client->GetBuffer(&data,
+                &packet_length, &flags, NULL, NULL);
+            if (FAILED(hr))
+            {
+                Log::warn("WasapiRecorder", "Failed to get buffer");
+            }
+            const unsigned bytes = ved.m_channels * (g_wasapi_data.m_wav_format
+                ->wBitsPerSample / 8) * packet_length;
+            bool buf_full = readed + bytes > frag_size;
+            unsigned copy_size = buf_full ? frag_size - readed : bytes;
+            if (!(flags & AUDCLNT_BUFFERFLAGS_SILENT))
+            {
+                memcpy(each_audio_buf + readed, data, copy_size);
+            }
+            if (buf_full)
+            {
+                audio_data.lock();
+                audio_data.getData().push_back(each_audio_buf);
+                pthread_cond_signal(&enc_request);
+                audio_data.unlock();
+                each_audio_buf = new int8_t[frag_size]();
+                readed = bytes - copy_size;
                 if (!(flags & AUDCLNT_BUFFERFLAGS_SILENT))
                 {
-                    memcpy(each_audio_buf + readed, data, copy_size);
+                    memcpy(each_audio_buf, (uint8_t*)data + copy_size, readed);
                 }
-                if (buf_full)
-                {
-                    audio_data.lock();
-                    audio_data.getData().push_back(each_audio_buf);
-                    pthread_cond_signal(&enc_request);
-                    audio_data.unlock();
-                    each_audio_buf = new int8_t[frag_size]();
-                    readed = bytes - copy_size;
-                    if (!(flags & AUDCLNT_BUFFERFLAGS_SILENT))
-                    {
-                        memcpy(each_audio_buf, (uint8_t*)data + copy_size,
-                            readed);
-                    }
-                }
-                else
-                {
-                    readed += bytes;
-                }
-                hr = g_wasapi_data.m_capture_client->ReleaseBuffer(frame_size);
-                if (FAILED(hr))
-                    return NULL;
-                if (idle->getAtomic())
-                {
-                    break;
-                }
-                hr = g_wasapi_data.m_capture_client->GetNextPacketSize(
-                    &frame_size);
-                if (FAILED(hr))
-                    return NULL;
+            }
+            else
+            {
+                readed += bytes;
+            }
+            hr = g_wasapi_data.m_capture_client->ReleaseBuffer(packet_length);
+            if (FAILED(hr))
+            {
+                Log::warn("WasapiRecorder", "Failed to release buffer");
             }
         }
-        audio_data.lock();
-        audio_data.getData().push_back(NULL);
-        pthread_cond_signal(&enc_request);
-        audio_data.unlock();
+        hr = g_wasapi_data.m_client->Stop();
+        if (FAILED(hr))
+        {
+            Log::warn("WasapiRecorder", "Failed to stop recorder");
+        }
         pthread_join(vorbis_enc, NULL);
         pthread_cond_destroy(&enc_request);
 
-        hr = g_wasapi_data.m_client->Stop();
-        if (FAILED(hr))
-            return NULL;
         return NULL;
     }   // audioRecorder
 }

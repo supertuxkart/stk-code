@@ -460,6 +460,7 @@ namespace Recorder
             {
                 pcm_data.lock();
                 pcm_data.getData().push_back(each_pcm_buf);
+                pcm_data.getData().push_back(NULL);
                 pthread_cond_signal(&enc_request);
                 pcm_data.unlock();
                 break;
@@ -498,10 +499,6 @@ namespace Recorder
             }
             g_pa_data.pa_stream_drop(stream);
         }
-        pcm_data.lock();
-        pcm_data.getData().push_back(NULL);
-        pthread_cond_signal(&enc_request);
-        pcm_data.unlock();
         pthread_join(vorbis_enc, NULL);
         pthread_cond_destroy(&enc_request);
         g_pa_data.pa_stream_disconnect(stream);
