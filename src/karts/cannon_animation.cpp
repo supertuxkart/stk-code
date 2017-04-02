@@ -174,6 +174,7 @@ void CannonAnimation::update(float dt)
         AbstractKartAnimation::update(dt);
         return;
     }
+    AbstractKartAnimation::update(dt);
 
     // First compute the current rotation
     // ==================================
@@ -241,11 +242,14 @@ void CannonAnimation::update(float dt)
     // transform it to the global coordinate system
     Vec3 horiz_delta = Vec3(0.5f*m_fraction_of_line  * f_current_width, 0, 0);
 
-    Vec3 rotated_delta = quatRotate(all_heading, m_delta + horiz_delta);
+    // Determine direction orthogonal to the curve for the sideway movement
+    // of the kart.
+    Vec3 sideways = gravity.cross(tangent);
+
+    Vec3 rotated_delta = sideways*(0.5f*m_fraction_of_line  * f_current_width)
+                       + quatRotate(all_heading, m_delta);
 
     Vec3 curve_xyz;
     m_curve->update(dt, &curve_xyz);
     m_kart->setXYZ(curve_xyz+rotated_delta);
-
-    AbstractKartAnimation::update(dt);
 }   // update
