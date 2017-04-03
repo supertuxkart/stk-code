@@ -8,8 +8,8 @@ clone_depth: 1
 shallow_clone: true
 
 platform:
-    - x86
-      #- x64
+    # - x86
+    - x64
       
 configuration:
     - Debug
@@ -18,15 +18,15 @@ configuration:
 matrix:
     fast_finish: true
 
-cache:
-    - '%DEPS_DIR%'
+#cache:
+#    - '%DEPS_DIR%'
     #- '%ASSETS_DIR%'
 
 install:
     - ps: >-
         If(!(Test-Path "$env:DEPS_DIR")) {
             Write-Host "Downloading dependencies";
-            Start-Process -FilePath "git" -ArgumentList "clone --branch master --single-branch --depth 1 https://github.com/supertuxkart/dependencies.git $env:DEPS_DIR" -Wait;
+            Start-Process -FilePath "git" -ArgumentList "clone --branch adv_recording_64 --single-branch --depth 1 https://github.com/supertuxkart/dependencies.git $env:DEPS_DIR" -Wait;
         }
         Else {
             Write-Host "Updating dependencies";
@@ -45,11 +45,11 @@ install:
         #Get-ChildItem $env:ASSETS_DIR | Measure-Object -property length -sum
 
 before_build:
-    - ps: Copy-Item "${env:DEPS_DIR}\windows\dependencies" c:\projects\stk-code\dependencies –Recurse
+    - ps: Copy-Item "${env:DEPS_DIR}\windows_64bit\dependencies" c:\projects\stk-code\dependencies –Recurse
     - cmd: |
         md build
         cd build
-        if "%platform%"=="x86" set CMAKE_GENERATOR_NAME="Visual Studio 14 2015"
+        if "%platform%"=="x64" set CMAKE_GENERATOR_NAME="Visual Studio 14 2015 Win64"
         cmake -G %CMAKE_GENERATOR_NAME% -DCMAKE_BUILD_TYPE="%configuration%" .. -DCHECK_ASSETS=OFF
 
 build:
