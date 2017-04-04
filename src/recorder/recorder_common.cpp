@@ -107,7 +107,8 @@ namespace Recorder
                 g_jpg_list.getData().emplace_back((uint8_t*)NULL, 0, 0);
                 pthread_cond_signal(&g_jpg_request);
                 g_jpg_list.unlock();
-                pthread_join(*g_video_thread.getAtomic(), NULL);
+                pthread_join(*g_video_thread.getData(), NULL);
+                delete g_video_thread.getData();
                 g_video_thread.setAtomic(NULL);
                 Recorder::writeMKV(g_recording_name + ".video",
                     g_recording_name + ".audio");

@@ -40,12 +40,9 @@ namespace Recorder
         }
         ThreadData* td = (ThreadData*)obj;
         Synchronised<std::list<std::tuple<uint8_t*, unsigned, int> > >*
-            jpg_data = (Synchronised<std::list<std::tuple<uint8_t*,
-                unsigned, int> > >*)td->m_data;
+            jpg_data = (Synchronised<std::list<std::tuple<uint8_t*, unsigned,
+            int> > >*)td->m_data;
         pthread_cond_t* cond_request = td->m_request;
-
-        const unsigned width = irr_driver->getActualScreenSize().Width;
-        const unsigned height = irr_driver->getActualScreenSize().Height;
         int64_t frames_encoded = 0;
         while (true)
         {
