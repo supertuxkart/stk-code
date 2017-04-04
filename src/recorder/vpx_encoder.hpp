@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+#ifdef ENABLE_RECORDER
 
 #ifndef HEADER_VPX_ENCODER_HPP
 #define HEADER_VPX_ENCODER_HPP

@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2)) && !defined(WIN32)
+#if defined(ENABLE_REC_SOUND) && !defined(WIN32)
 
 #include "recorder/vorbis_encoder.hpp"
 #include "utils/synchronised.hpp"
@@ -23,10 +23,13 @@
 #include "utils/vs.hpp"
 
 #include <cstring>
-#include <dlfcn.h>
 #include <list>
 #include <pulse/pulseaudio.h>
 #include <string>
+
+#ifndef ENABLE_PULSE_WO_DL
+#include <dlfcn.h>
+#endif
 
 namespace Recorder
 {
@@ -42,9 +45,10 @@ namespace Recorder
         pa_mainloop* m_loop;
         pa_context* m_context;
         pa_stream* m_stream;
-        void* m_dl_handle;
         pa_sample_spec m_sample_spec;
         std::string m_default_sink;
+#ifndef ENABLE_PULSE_WO_DL
+        void* m_dl_handle;
 
         typedef pa_stream* (*pa_stream_new_t)(pa_context*, const char*,
             const pa_sample_spec*, const pa_channel_map*);
@@ -110,6 +114,7 @@ namespace Recorder
 
         typedef void (*pa_mainloop_free_t)(pa_mainloop*);
         pa_mainloop_free_t pa_mainloop_free;
+#endif
         // --------------------------------------------------------------------
         PulseAudioData()
         {
@@ -117,6 +122,7 @@ namespace Recorder
             m_loop = NULL;
             m_context = NULL;
             m_stream = NULL;
+#ifndef ENABLE_PULSE_WO_DL
             m_dl_handle = NULL;
             pa_stream_new = NULL;
             pa_stream_connect_record = NULL;
@@ -138,8 +144,10 @@ namespace Recorder
             pa_context_disconnect = NULL;
             pa_context_unref = NULL;
             pa_mainloop_free = NULL;
+#endif
         }   // PulseAudioData
         // --------------------------------------------------------------------
+#ifndef ENABLE_PULSE_WO_DL
         bool loadPulseAudioLibrary()
         {
             m_dl_handle = dlopen("libpulse.so", RTLD_LAZY);
@@ -311,9 +319,11 @@ namespace Recorder
             }
             return true;
         }   // loadPulseAudioLibrary
+#endif
         // --------------------------------------------------------------------
         bool load()
         {
+#ifndef ENABLE_PULSE_WO_DL
             if (!loadPulseAudioLibrary())
             {
                 if (m_dl_handle != NULL)
@@ -323,6 +333,7 @@ namespace Recorder
                 }
                 return false;
             }
+#endif
             m_loop = pa_mainloop_new();
             if (m_loop == NULL)
             {
@@ -455,10 +466,12 @@ namespace Recorder
                 {
                     pa_mainloop_free(m_loop);
                 }
+#ifndef ENABLE_PULSE_WO_DL
                 if (m_dl_handle != NULL)
                 {
                     dlclose(m_dl_handle);
                 }
+#endif
             }
         }   // ~PulseAudioData
     };

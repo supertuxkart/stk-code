@@ -15,14 +15,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2)) && !defined(WIN32)
+#ifndef WIN32
 
 #ifndef HEADER_PULSEAUDIO_RECORD_HPP
 #define HEADER_PULSEAUDIO_RECORD_HPP
 
 namespace Recorder
 {
+#ifdef ENABLE_REC_SOUND
     void* audioRecorder(void *obj);
+#else
+    inline void* audioRecorder(void *obj) { return NULL; }
+#endif
 };
 
 #endif

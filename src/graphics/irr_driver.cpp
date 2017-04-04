@@ -169,7 +169,7 @@ IrrDriver::~IrrDriver()
 #endif
     delete m_wind;
     delete m_renderer;
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+#ifdef ENABLE_RECORDER
     Recorder::destroyRecorder();
 #endif
 }   // ~IrrDriver
@@ -926,7 +926,7 @@ void IrrDriver::applyResolutionSettings()
     // (we're sure to update main.cpp at some point and forget this one...)
     VAOManager::getInstance()->kill();
     STKTexManager::getInstance()->kill();
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+#ifdef ENABLE_RECORDER
     Recorder::destroyRecorder();
     m_recording = false;
 #endif
@@ -1894,7 +1894,7 @@ void IrrDriver::update(float dt)
     // menu.
     //if(World::getWorld() && World::getWorld()->isRacePhase())
     //    printRenderStats();
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+#ifdef ENABLE_RECORDER
     if (m_recording)
         Recorder::captureFrameBufferImage();
 #endif
@@ -1903,7 +1903,7 @@ void IrrDriver::update(float dt)
 // ----------------------------------------------------------------------------
 void IrrDriver::setRecording(bool val)
 {
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+#ifdef ENABLE_RECORDER
     if (!CVS->isARBPixelBufferObjectUsable())
     {
         Log::warn("irr_driver", "PBO extension missing, can't record video.");
