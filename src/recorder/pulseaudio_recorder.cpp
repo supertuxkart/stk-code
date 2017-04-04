@@ -41,6 +41,7 @@ namespace Recorder
         bool m_loaded;
         pa_mainloop* m_loop;
         pa_context* m_context;
+        pa_stream* m_stream;
         void* m_dl_handle;
         pa_sample_spec m_sample_spec;
         std::string m_default_sink;
@@ -115,6 +116,7 @@ namespace Recorder
             m_loaded = false;
             m_loop = NULL;
             m_context = NULL;
+            m_stream = NULL;
             m_dl_handle = NULL;
             pa_stream_new = NULL;
             pa_stream_connect_record = NULL;
@@ -369,6 +371,77 @@ namespace Recorder
             return true;
         }   // load
         // --------------------------------------------------------------------
+        void configAudioType(Recorder::VorbisEncoderData* ved)
+        {
+            ved->m_sample_rate = m_sample_spec.rate;
+            ved->m_channels = m_sample_spec.channels;
+            ved->m_audio_type = Recorder::VorbisEncoderData::AT_PCM;
+        }   // configAudioType
+        // --------------------------------------------------------------------
+        inline void mainLoopIterate()
+        {
+            while (pa_mainloop_iterate(m_loop, 0, NULL) > 0);
+        }   // mainLoopIterate
+        // --------------------------------------------------------------------
+        bool createRecordStream()
+        {
+            assert(m_stream == NULL);
+            m_stream = pa_stream_new(m_context, "input", &m_sample_spec, NULL);
+            if (m_stream == NULL)
+            {
+                return false;
+            }
+            pa_buffer_attr buf_attr;
+            const unsigned frag_size = 1024 * m_sample_spec.channels *
+                sizeof(int16_t);
+            buf_attr.fragsize = frag_size;
+            const unsigned max_uint = -1;
+            buf_attr.maxlength = max_uint;
+            buf_attr.minreq = max_uint;
+            buf_attr.prebuf = max_uint;
+            buf_attr.tlength = max_uint;
+            pa_stream_connect_record(m_stream, m_default_sink.c_str(),
+                &buf_attr, (pa_stream_flags_t)(PA_STREAM_ADJUST_LATENCY));
+            while (true)
+            {
+                mainLoopIterate();
+                pa_stream_state_t state = pa_stream_get_state(m_stream);
+                if (state == PA_STREAM_READY)
+                    break;
+                if (!PA_STREAM_IS_GOOD(state))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }   // createRecordStream
+        // --------------------------------------------------------------------
+        void removeRecordStream()
+        {
+            assert(m_stream != NULL);
+            pa_stream_disconnect(m_stream);
+            pa_stream_unref(m_stream);
+            m_stream = NULL;
+        }   // removeRecordStream
+        // --------------------------------------------------------------------
+        inline size_t getReadableSize()
+        {
+            assert(m_stream != NULL);
+            return pa_stream_readable_size(m_stream);
+        }   // removeRecordStream
+        // --------------------------------------------------------------------
+        inline void peekStream(const void** data, size_t* bytes)
+        {
+            assert(m_stream != NULL);
+            pa_stream_peek(m_stream, data, bytes);
+        }   // peekStream
+        // --------------------------------------------------------------------
+        inline void dropStream()
+        {
+            assert(m_stream != NULL);
+            pa_stream_drop(m_stream);
+        }   // dropStream
+        // --------------------------------------------------------------------
         ~PulseAudioData()
         {
             if (m_loaded)
@@ -404,41 +477,15 @@ namespace Recorder
             }
         }
 
-        pa_stream* stream = g_pa_data.pa_stream_new(g_pa_data.m_context,
-            "input", &g_pa_data.m_sample_spec, NULL);
-        if (stream == NULL)
+        if (g_pa_data.createRecordStream() == false)
         {
             Log::error("PulseAudioRecorder", "Failed to create stream");
+            if (g_pa_data.m_stream != NULL)
+            {
+                g_pa_data.removeRecordStream();
+            }
             return NULL;
         }
-        pa_buffer_attr buf_attr;
-        const unsigned frag_size = 1024 * g_pa_data.m_sample_spec.channels *
-            sizeof(int16_t);
-        buf_attr.fragsize = frag_size;
-        const unsigned max_uint = -1;
-        buf_attr.maxlength = max_uint;
-        buf_attr.minreq = max_uint;
-        buf_attr.prebuf = max_uint;
-        buf_attr.tlength = max_uint;
-        g_pa_data.pa_stream_connect_record(stream,
-            g_pa_data.m_default_sink.c_str(), &buf_attr,
-            (pa_stream_flags_t)(PA_STREAM_ADJUST_LATENCY));
-
-        while (true)
-        {
-            while (g_pa_data.pa_mainloop_iterate(g_pa_data.m_loop, 0, NULL)
-                > 0);
-            pa_stream_state_t state = g_pa_data.pa_stream_get_state(stream);
-            if (state == PA_STREAM_READY)
-                break;
-            if (!PA_STREAM_IS_GOOD(state))
-            {
-                Log::error("PulseAudioRecorder", "Failed to connect to"
-                    " stream");
-                return NULL;
-            }
-        }
-
         Synchronised<bool>* idle = (Synchronised<bool>*)obj;
         Synchronised<std::list<int8_t*> > pcm_data;
         pthread_cond_t enc_request;
@@ -446,11 +493,11 @@ namespace Recorder
         pthread_t vorbis_enc;
 
         Recorder::VorbisEncoderData ved;
-        ved.m_sample_rate = g_pa_data.m_sample_spec.rate;
-        ved.m_channels = g_pa_data.m_sample_spec.channels;
-        ved.m_audio_type = Recorder::VorbisEncoderData::AT_PCM;
+        g_pa_data.configAudioType(&ved);
         ved.m_data = &pcm_data;
         ved.m_enc_request = &enc_request;
+        const unsigned frag_size = 1024 * g_pa_data.m_sample_spec.channels *
+            sizeof(int16_t);
         pthread_create(&vorbis_enc, NULL, &Recorder::vorbisEncoder, &ved);
         int8_t* each_pcm_buf = new int8_t[frag_size]();
         unsigned readed = 0;
@@ -465,18 +512,17 @@ namespace Recorder
                 pcm_data.unlock();
                 break;
             }
-            while (g_pa_data.pa_mainloop_iterate(g_pa_data.m_loop, 0, NULL)
-                > 0);
+            g_pa_data.mainLoopIterate();
             const void* data;
             size_t bytes;
-            size_t readable = g_pa_data.pa_stream_readable_size(stream);
+            size_t readable = g_pa_data.getReadableSize();
             if (readable == 0)
                 continue;
-            g_pa_data.pa_stream_peek(stream, &data, &bytes);
+            g_pa_data.peekStream(&data, &bytes);
             if (data == NULL)
             {
                 if (bytes > 0)
-                    g_pa_data.pa_stream_drop(stream);
+                    g_pa_data.dropStream();
                 continue;
             }
             bool buf_full = readed + (unsigned)bytes > frag_size;
@@ -497,12 +543,11 @@ namespace Recorder
             {
                 readed += (unsigned)bytes;
             }
-            g_pa_data.pa_stream_drop(stream);
+            g_pa_data.dropStream();
         }
         pthread_join(vorbis_enc, NULL);
         pthread_cond_destroy(&enc_request);
-        g_pa_data.pa_stream_disconnect(stream);
-        g_pa_data.pa_stream_unref(stream);
+        g_pa_data.removeRecordStream();
         return NULL;
     }   // audioRecorder
 }
