@@ -24,6 +24,7 @@
 #include "guiengine/message_queue.hpp"
 #include "recorder/pulseaudio_recorder.hpp"
 #include "recorder/vorbis_encoder.hpp"
+#include "recorder/vpx_encoder.hpp"
 #include "recorder/wasapi_recorder.hpp"
 #include "recorder/webm_writer.hpp"
 #include "utils/translation.hpp"
@@ -60,7 +61,6 @@ AVIWriter::AVIWriter() : m_idle(true)
     }
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
     pthread_cond_init(&m_cond_request, NULL);
-    pthread_create(&m_record_thread, NULL, &videoRecord, this);
 }   // AVIWriter
 
 // ----------------------------------------------------------------------------
@@ -70,7 +70,6 @@ AVIWriter::~AVIWriter()
     addFrameBufferImage(NULL, 0);
     if (!waitForReadyToDeleted(2.0f))
         Log::info("AVIWriter", "AVIWriter not stopping, exiting anyway.");
-    pthread_join(m_record_thread, NULL);
     pthread_cond_destroy(&m_cond_request);
 }   // ~AVIWriter
 
@@ -82,313 +81,12 @@ void AVIWriter::resetFrameBufferImage()
 }   // resetFrameBufferImage
 
 // ----------------------------------------------------------------------------
-int bmpToJPG(uint8_t* raw, unsigned width, unsigned height,
-             uint8_t** jpeg_buffer, unsigned long* jpeg_size)
-{
-    tjhandle handle = NULL;
-    int ret = 0;
-    handle = tjInitCompress();
-#ifdef TJFLAG_FASTDCT
-    ret = tjCompress2(handle, raw, width, 0, height, TJPF_BGR, jpeg_buffer,
-        jpeg_size, TJSAMP_420, UserConfigParams::m_recorder_jpg_quality,
-        TJFLAG_FASTDCT);
-#else
-    ret = tjCompress2(handle, raw, width, 0, height, TJPF_BGR, jpeg_buffer,
-        jpeg_size, TJSAMP_420, UserConfigParams::m_recorder_jpg_quality, 0);
-#endif
-    if (ret != 0)
-    {
-        char* err = tjGetErrorStr();
-        Log::error("vpxEncoder", "Jpeg encode error: %s.", err);
-        return ret;
-    }
-    tjDestroy(handle);
-    return ret;
-}   // bmpToJPG
-
-// ----------------------------------------------------------------------------
-int jpgToYuv(uint8_t* jpeg_buffer, unsigned jpeg_size, uint8_t** yuv_buffer,
-             TJSAMP* yuv_type, unsigned* yuv_size)
-{
-    tjhandle handle = NULL;
-    int width, height;
-    TJSAMP subsample;
-    int ret = 0;
-    handle = tjInitDecompress();
-    ret = tjDecompressHeader2(handle, jpeg_buffer, jpeg_size, &width, &height,
-          (int*)&subsample);
-    if (ret != 0)
-    {
-        char* err = tjGetErrorStr();
-        Log::error("vpxEncoder", "Jpeg decode error: %s.", err);
-        return ret;
-    }
-
-    *yuv_type = subsample;
-    *yuv_size = tjBufSizeYUV(width, height, subsample);
-    *yuv_buffer = new uint8_t[*yuv_size];
-    ret = tjDecompressToYUV(handle, jpeg_buffer, jpeg_size, *yuv_buffer, 0);
-    if (ret != 0)
-    {
-        char* err = tjGetErrorStr();
-        Log::error("vpxEncoder", "YUV conversion error: %s.", err);
-        return ret;
-    }
-    tjDestroy(handle);
-
-    return ret;
-}   // jpgToYuv
-
-// ----------------------------------------------------------------------------
-int vpxEncodeFrame(vpx_codec_ctx_t *codec, vpx_image_t *img, int frame_index,
-                   FILE *out)
-{
-    int got_pkts = 0;
-    vpx_codec_iter_t iter = NULL;
-    const vpx_codec_cx_pkt_t *pkt = NULL;
-    const vpx_codec_err_t res = vpx_codec_encode(codec, img, frame_index, 1, 0,
-        VPX_DL_REALTIME);
-    if (res != VPX_CODEC_OK)
-    {
-        Log::error("vpxEncoder", "Failed to encode frame");
-        return -1;
-    }
-    while ((pkt = vpx_codec_get_cx_data(codec, &iter)) != NULL)
-    {
-        got_pkts = 1;
-        if (pkt->kind == VPX_CODEC_CX_FRAME_PKT)
-        {
-            fwrite(&pkt->data.frame.sz, 1, sizeof(uint32_t), out);
-            fwrite(&pkt->data.frame.pts, 1, sizeof(int64_t), out);
-            fwrite(&pkt->data.frame.flags, 1, sizeof(vpx_codec_frame_flags_t),
-                out);
-            fwrite(pkt->data.frame.buf, 1, pkt->data.frame.sz, out);
-        }
-    }
-    return got_pkts;
-}   // vpxEncodeFrame
-
-// ----------------------------------------------------------------------------
 void AVIWriter::resetCaptureFormat()
 {
     m_img_quality = UserConfigParams::m_recorder_jpg_quality;
     m_msec_per_frame = unsigned(1000 / UserConfigParams::m_record_fps);
     m_avi_format = AVI_FORMAT_JPG;
 }   // resetCaptureFormat
-
-// ----------------------------------------------------------------------------
-struct EncoderInfo
-{
-    void* m_data;
-    pthread_cond_t* m_enc_request;
-};   // EncoderInfo
-
-// ----------------------------------------------------------------------------
-void* AVIWriter::vpxEncoder(void *obj)
-{
-    VS::setThreadName("vpxEncoder");
-    FILE* vpx_data = fopen((m_recording_target.getAtomic() + ".vp_data")
-        .c_str(), "wb");
-    if (vpx_data == NULL)
-    {
-        Log::error("vorbisEncoder", "Failed to encode ogg file");
-        return NULL;
-    }
-    EncoderInfo* ei = (EncoderInfo*)obj;
-    Synchronised<std::list<std::tuple<uint8_t*, unsigned, int> > >* jpg_data =
-        (Synchronised<std::list<std::tuple<uint8_t*, unsigned, int> > >*)
-        ei->m_data;
-    pthread_cond_t* cond_request = ei->m_enc_request;
-
-    vpx_codec_ctx_t codec;
-    vpx_codec_enc_cfg_t cfg;
-    vpx_codec_err_t res = vpx_codec_enc_config_default(vpx_codec_vp8_cx(),
-       &cfg, 0);
-    if (res > 0)
-    {
-        Log::error("vpxEncoder", "Failed to get default codec config.");
-        return NULL;
-    }
-
-    const unsigned width = irr_driver->getActualScreenSize().Width;
-    const unsigned height = irr_driver->getActualScreenSize().Height;
-    int frames_encoded = 0;
-    cfg.g_w = width;
-    cfg.g_h = height;
-    cfg.g_timebase.num = 1;
-    cfg.g_timebase.den = UserConfigParams::m_record_fps;
-    int end_usage = UserConfigParams::m_vp_end_usage;
-    cfg.rc_end_usage = (vpx_rc_mode)end_usage;
-    cfg.rc_target_bitrate = UserConfigParams::m_vp_bitrate;
-    if (vpx_codec_enc_init(&codec, vpx_codec_vp8_cx(), &cfg, 0) > 0)
-    {
-        Log::error("vpxEncoder", "Failed to initialize encoder");
-        fclose(vpx_data);
-        return NULL;
-    }
-
-    while (true)
-    {
-        jpg_data->lock();
-        bool waiting = jpg_data->getData().empty();
-        while (waiting)
-        {
-            pthread_cond_wait(cond_request, jpg_data->getMutex());
-            waiting = jpg_data->getData().empty();
-        }
-        auto& p =  jpg_data->getData().front();
-        uint8_t* jpg = std::get<0>(p);
-        unsigned jpg_size = std::get<1>(p);
-        int frame_count = std::get<2>(p);
-        if (jpg == NULL)
-        {
-            jpg_data->getData().clear();
-            jpg_data->unlock();
-            break;
-        }
-        jpg_data->getData().pop_front();
-        jpg_data->unlock();
-        uint8_t* yuv = NULL;
-        TJSAMP yuv_type;
-        unsigned yuv_size;
-        int ret = jpgToYuv(jpg, jpg_size, &yuv, &yuv_type, &yuv_size);
-        if (ret < 0)
-        {
-            delete [] yuv;
-            tjFree(jpg);
-            continue;
-        }
-        assert(yuv_type == TJSAMP_420 && yuv_size != 0);
-        tjFree(jpg);
-        vpx_image_t each_frame;
-        vpx_img_wrap(&each_frame, VPX_IMG_FMT_I420, width, height, 1, yuv);
-        while (frame_count != 0)
-        {
-            vpxEncodeFrame(&codec, &each_frame, frames_encoded++, vpx_data);
-            frame_count--;
-        }
-        delete [] yuv;
-    }
-
-    while (vpxEncodeFrame(&codec, NULL, -1, vpx_data));
-    if (vpx_codec_destroy(&codec))
-    {
-        Log::error("vpxEncoder", "Failed to destroy codec.");
-        return NULL;
-    }
-    fclose(vpx_data);
-    return NULL;
-}   // vpxEncoder
-
-
-// ----------------------------------------------------------------------------
-Synchronised<std::list<std::tuple<uint8_t*, unsigned, int> > > jpg_data;
-pthread_cond_t vpx_enc_request;
-pthread_t audio_thread, vpx_enc_thread;
-EncoderInfo vpx_ei;
-// ----------------------------------------------------------------------------
-void* AVIWriter::videoRecord(void *obj)
-{
-    VS::setThreadName("videoRecord");
-    vpx_ei.m_data = &jpg_data;
-    vpx_ei.m_enc_request = &vpx_enc_request;
-    AVIWriter* avi_writer = (AVIWriter*)obj;
-    while (true)
-    {
-        avi_writer->m_fbi_queue.lock();
-        bool waiting = avi_writer->m_fbi_queue.getData().empty();
-        while (waiting)
-        {
-            pthread_cond_wait(&avi_writer->m_cond_request,
-                avi_writer->m_fbi_queue.getMutex());
-            waiting = avi_writer->m_fbi_queue.getData().empty();
-        }
-        auto& p =  avi_writer->m_fbi_queue.getData().front();
-        uint8_t* fbi = p.first;
-        int frame_count = p.second;
-        if (frame_count == -1)
-        {
-            avi_writer->m_idle.setAtomic(true);
-            jpg_data.lock();
-            jpg_data.getData().emplace_back((uint8_t*)NULL, 0, 0);
-            pthread_cond_signal(vpx_ei.m_enc_request);
-            jpg_data.unlock();
-            pthread_join(audio_thread, NULL);
-            pthread_join(vpx_enc_thread, NULL);
-            Recorder::writeWebm(m_recording_target.getAtomic() + ".vp_data",
-                m_recording_target.getAtomic() + ".vb_data");
-            avi_writer->m_fbi_queue.getData().clear();
-            avi_writer->m_fbi_queue.unlock();
-            continue;
-        }
-        else if (fbi == NULL)
-        {
-            avi_writer->m_idle.setAtomic(true);
-            jpg_data.lock();
-            jpg_data.getData().emplace_back((uint8_t*)NULL, 0, 0);
-            pthread_cond_signal(vpx_ei.m_enc_request);
-            jpg_data.unlock();
-            //pthread_join(audio_thread, NULL);
-            //pthread_join(vpx_enc_thread, NULL);
-            avi_writer->setCanBeDeleted();
-            avi_writer->m_fbi_queue.getData().clear();
-            avi_writer->m_fbi_queue.unlock();
-            return NULL;
-        }
-        const bool too_slow = avi_writer->m_fbi_queue.getData().size() > 50;
-        avi_writer->m_fbi_queue.getData().pop_front();
-        avi_writer->m_fbi_queue.unlock();
-        if (too_slow)
-        {
-            MessageQueue::add(MessageQueue::MT_ERROR,
-                _("Encoding is too slow, dropping frames."));
-            delete [] fbi;
-            avi_writer->cleanAllFrameBufferImages();
-            continue;
-        }
-        uint8_t* orig_fbi = fbi;
-        const unsigned width = avi_writer->m_width;
-        const unsigned height = avi_writer->m_height;
-        const unsigned area = width * height;
-        int size = area * 4;
-        int dest = size - 3;
-        int src = size - 4;
-        int copied = 0;
-        while (true)
-        {
-            if (copied++ > 1)
-                memcpy(fbi + dest, fbi + src, 3);
-            else
-                memmove(fbi + dest, fbi + src, 3);
-            if (src == 0)
-                break;
-            dest -= 3;
-            src -= 4;
-        }
-        fbi = fbi + area;
-        const int pitch = width * 3;
-        uint8_t* p2 = fbi + (height - 1) * pitch;
-        uint8_t* tmp_buf = new uint8_t[pitch];
-        for (unsigned i = 0; i < height; i += 2)
-        {
-            memcpy(tmp_buf, fbi, pitch);
-            memcpy(fbi, p2, pitch);
-            memcpy(p2, tmp_buf, pitch);
-            fbi += pitch;
-            p2 -= pitch;
-        }
-        delete [] tmp_buf;
-        uint8_t* jpg = NULL;
-        unsigned long jpg_size = 0;
-        bmpToJPG(orig_fbi + area, width, height, &jpg, &jpg_size);
-        delete[] orig_fbi;
-        jpg_data.lock();
-        jpg_data.getData().emplace_back(jpg, jpg_size, frame_count);
-        pthread_cond_signal(vpx_ei.m_enc_request);
-        jpg_data.unlock();
-    }
-    return NULL;
-}   // videoRecord
 
 // ----------------------------------------------------------------------------
 int AVIWriter::getFrameCount(double rate)
@@ -411,40 +109,6 @@ int AVIWriter::getFrameCount(double rate)
 // ----------------------------------------------------------------------------
 void AVIWriter::captureFrameBufferImage()
 {
-    if (m_idle.getAtomic())
-    {
-        m_idle.setAtomic(false);
-        pthread_create(&audio_thread, NULL, &Recorder::audioRecorder, &m_idle);
-        pthread_cond_init(vpx_ei.m_enc_request, NULL);
-        pthread_create(&vpx_enc_thread, NULL, &vpxEncoder, &vpx_ei);
-    }
-    int pbo_read = -1;
-    if (m_pbo_use > 3 && m_pbo_use % 3 == 0)
-        m_pbo_use = 3;
-    auto rate = std::chrono::high_resolution_clock::now() - m_framerate_timer;
-    m_framerate_timer = std::chrono::high_resolution_clock::now();
-    glReadBuffer(GL_BACK);
-    if (m_pbo_use >= 3)
-    {
-        int frame_count = getFrameCount(std::chrono::duration_cast
-            <std::chrono::duration<double> >(rate).count());
-        if (frame_count != 0)
-        {
-            pbo_read = m_pbo_use % 3;
-            glBindBuffer(GL_PIXEL_PACK_BUFFER, m_pbo[pbo_read]);
-            void* ptr = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
-            const unsigned size = m_width * m_height * 4;
-            uint8_t* fbi = new uint8_t[size];
-            memcpy(fbi, ptr, size);
-            glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
-            addFrameBufferImage(fbi, frame_count);
-        }
-    }
-    int pbo_use = m_pbo_use++ % 3;
-    assert(pbo_read == -1 || pbo_use == pbo_read);
-    glBindBuffer(GL_PIXEL_PACK_BUFFER, m_pbo[pbo_use]);
-    glReadPixels(0, 0, m_width, m_height, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
-    glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 }   // captureFrameBufferImage
 
 // ----------------------------------------------------------------------------

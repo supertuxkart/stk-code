@@ -57,11 +57,11 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
+#include "recorder/recorder_common.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
-#include "utils/avi_writer.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
@@ -170,7 +170,7 @@ IrrDriver::~IrrDriver()
     delete m_wind;
     delete m_renderer;
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    AVIWriter::kill();
+    Recorder::destroyRecorder();
 #endif
 }   // ~IrrDriver
 
@@ -927,7 +927,8 @@ void IrrDriver::applyResolutionSettings()
     VAOManager::getInstance()->kill();
     STKTexManager::getInstance()->kill();
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    AVIWriter::kill();
+    Recorder::destroyRecorder();
+    m_recording = false;
 #endif
     // initDevice will drop the current device.
     if (CVS->isGLSL())
@@ -1895,7 +1896,7 @@ void IrrDriver::update(float dt)
     //    printRenderStats();
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     if (m_recording)
-        AVIWriter::getInstance()->captureFrameBufferImage();
+        Recorder::captureFrameBufferImage();
 #endif
 }   // update
 
@@ -1910,20 +1911,23 @@ void IrrDriver::setRecording(bool val)
     }
     if (m_recording == val)
         return;
-    m_recording = val;
-    if (m_recording == true)
+    if (val == true)
     {
+        if (!Recorder::isRecording())
+            return;
+        m_recording = val;
         std::string track_name = World::getWorld() != NULL ?
             race_manager->getTrackName() : "menu";
-        AVIWriter::setRecordingTarget(file_manager->getScreenshotDir() +
+        Recorder::setRecordingName(file_manager->getScreenshotDir() +
             track_name);
-        AVIWriter::getInstance()->resetFrameBufferImage();
+        Recorder::prepareCapture();
         MessageQueue::add(MessageQueue::MT_GENERIC,
             _("Video recording started."));
     }
     else
     {
-        AVIWriter::getInstance()->stopRecording();
+        m_recording = val;
+        Recorder::stopRecording();
     }
 #endif
 }   // setRecording

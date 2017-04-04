@@ -18,8 +18,9 @@
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
 
 #include "recorder/vorbis_encoder.hpp"
-#include "utils/avi_writer.hpp"
+#include "recorder/recorder_common.hpp"
 #include "utils/log.hpp"
+#include "utils/synchronised.hpp"
 #include "utils/vs.hpp"
 
 #include <ogg/ogg.h>
@@ -52,8 +53,7 @@ namespace Recorder
             Log::error("vorbisEncoder", "Header is too long.");
             return NULL;
         }
-        FILE* vb_data = fopen((AVIWriter::getRecordingTarget() + ".vb_data")
-            .c_str(), "wb");
+        FILE* vb_data = fopen((getRecordingName() + ".audio").c_str(), "wb");
         if (vb_data == NULL)
         {
             Log::error("vorbisEncoder", "Failed to open file for encoding"
@@ -154,6 +154,6 @@ namespace Recorder
         fclose(vb_data);
         return NULL;
 
-    }   // vorbisEncode
+    }   // vorbisEncoder
 }
 #endif

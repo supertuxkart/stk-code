@@ -560,16 +560,18 @@ namespace UserConfigParams
                         
     // ---- Recording
     PARAM_PREFIX GroupUserConfigParam        m_recording_group
-        PARAM_DEFAULT( GroupUserConfigParam("Recording", "Recording Settings") );
+        PARAM_DEFAULT(GroupUserConfigParam("Recording",
+                            "Recording Settings"));
 
     PARAM_PREFIX BoolUserConfigParam        m_limit_game_fps
         PARAM_DEFAULT(BoolUserConfigParam(true, "limit_game_fps",
         &m_recording_group, "Limit game framerate not beyond the fps of"
-                        " recording video."));
+                            " recording video."));
 
-    PARAM_PREFIX IntUserConfigParam         m_vp_codec
-        PARAM_DEFAULT(IntUserConfigParam(0, "vp_codec",
-        &m_recording_group, "Specify the codec for libvpx (VP8 / VP9)"));
+    PARAM_PREFIX IntUserConfigParam         m_record_format
+        PARAM_DEFAULT(IntUserConfigParam(0, "record_format",
+        &m_recording_group, "Specify the format for record (VP8, VP9, mjpeg,"
+                            " h264)"));
 
     PARAM_PREFIX IntUserConfigParam         m_vp_end_usage
         PARAM_DEFAULT(IntUserConfigParam(0, "vp_end_usage",
