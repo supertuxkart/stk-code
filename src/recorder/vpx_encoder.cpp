@@ -17,7 +17,6 @@
 
 #ifdef ENABLE_RECORDER
 
-#include "recorder/vpx_encoder.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "recorder/recorder_common.hpp"
@@ -110,7 +109,7 @@ namespace Recorder
         FILE* vpx_data = fopen((getRecordingName() + ".video").c_str(), "wb");
         if (vpx_data == NULL)
         {
-            Log::error("vorbisEncoder", "Failed to encode ogg file");
+            Log::error("vpxEncoder", "Failed to open file for writing");
             return NULL;
         }
         ThreadData* td = (ThreadData*)obj;

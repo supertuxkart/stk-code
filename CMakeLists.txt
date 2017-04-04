@@ -442,7 +442,7 @@ endif()
 
 if(BUILD_RECORDER)
     target_link_libraries(supertuxkart webm ${TURBOJPEG_LIBRARY} ${VPX_LIBRARIES})
-    if(BUILD_RECORDER_WITH_SOUND)
+    if(BUILD_RECORDER_WITH_SOUND AND UNIX)
         if(BUILD_PULSE_WO_DL)
             target_link_libraries(supertuxkart ${PULSEAUDIO_LIBRARIES})
         else()

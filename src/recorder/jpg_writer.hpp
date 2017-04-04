@@ -18,12 +18,12 @@
 
 #ifdef ENABLE_RECORDER
 
-#ifndef HEADER_VPX_ENCODER_HPP
-#define HEADER_VPX_ENCODER_HPP
+#ifndef HEADER_JPG_WRITER_HPP
+#define HEADER_JPG_WRITER_HPP
 
 namespace Recorder
 {
-    void* vpxEncoder(void *obj);
+    void* jpgWriter(void *obj);
 };
 #endif
 

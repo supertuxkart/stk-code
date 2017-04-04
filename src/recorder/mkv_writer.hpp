@@ -18,13 +18,13 @@
 
 #ifdef ENABLE_RECORDER
 
-#ifndef HEADER_WEBM_WRITER_HPP
-#define HEADER_WEBM_WRITER_HPP
+#ifndef HEADER_MKV_WRITER_HPP
+#define HEADER_MKV_WRITER_HPP
 #include <string>
 
 namespace Recorder
 {
-    void writeWebm(const std::string& video, const std::string& audio);
+    void writeMKV(const std::string& video, const std::string& audio);
 };
 #endif
 

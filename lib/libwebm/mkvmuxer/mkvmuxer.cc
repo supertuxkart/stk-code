@@ -4151,11 +4151,11 @@ bool Segment::WriteFramesLessThan(uint64_t timestamp) {
 }
 
 bool Segment::DocTypeIsWebm() const {
-  const int kNumCodecIds = 9;
+  const int kNumCodecIds = 8;
 
   // TODO(vigneshv): Tweak .clang-format.
   const char* kWebmCodecIds[kNumCodecIds] = {
-      Tracks::kOpusCodecId,          Tracks::kVorbisCodecId,
+      Tracks::kOpusCodecId,          //Tracks::kVorbisCodecId,
       Tracks::kVp8CodecId,           Tracks::kVp9CodecId,
       Tracks::kVp10CodecId,          Tracks::kWebVttCaptionsId,
       Tracks::kWebVttDescriptionsId, Tracks::kWebVttMetadataId,
@@ -4165,20 +4165,14 @@ bool Segment::DocTypeIsWebm() const {
   for (int track_index = 0; track_index < num_tracks; ++track_index) {
     const Track* const track = tracks_.GetTrackByIndex(track_index);
     const std::string codec_id = track->codec_id();
-
-    bool id_is_webm = false;
     for (int id_index = 0; id_index < kNumCodecIds; ++id_index) {
       if (codec_id == kWebmCodecIds[id_index]) {
-        id_is_webm = true;
-        break;
+        return true;
       }
     }
-
-    if (!id_is_webm)
-      return false;
   }
 
-  return true;
+  return false;
 }
 
 }  // namespace mkvmuxer

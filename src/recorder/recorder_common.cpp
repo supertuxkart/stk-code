@@ -22,10 +22,11 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/gl_headers.hpp"
 #include "guiengine/message_queue.hpp"
+#include "recorder/jpg_writer.hpp"
+#include "recorder/mkv_writer.hpp"
 #include "recorder/pulseaudio_recorder.hpp"
-#include "recorder/wasapi_recorder.hpp"
 #include "recorder/vpx_encoder.hpp"
-#include "recorder/webm_writer.hpp"
+#include "recorder/wasapi_recorder.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/translation.hpp"
 #include "utils/vs.hpp"
@@ -108,7 +109,7 @@ namespace Recorder
                 g_jpg_list.unlock();
                 pthread_join(*g_video_thread.getAtomic(), NULL);
                 g_video_thread.setAtomic(NULL);
-                Recorder::writeWebm(g_recording_name + ".video",
+                Recorder::writeMKV(g_recording_name + ".video",
                     g_recording_name + ".audio");
                 if (g_destroy)
                 {
@@ -281,8 +282,21 @@ namespace Recorder
         pthread_create(&g_audio_thread, NULL, &Recorder::audioRecorder,
             &g_idle);
         g_video_thread.setAtomic(new pthread_t());
-        pthread_create(g_video_thread.getAtomic(), NULL, &Recorder::vpxEncoder,
-            &g_jpg_thread_data);
+        VideoFormat vf = (VideoFormat)(int)UserConfigParams::m_record_format;
+        switch (vf)
+        {
+        case VF_VP8:
+        case VF_VP9:
+            pthread_create(g_video_thread.getAtomic(), NULL,
+                &Recorder::vpxEncoder, &g_jpg_thread_data);
+            break;
+        case VF_MJPEG:
+            pthread_create(g_video_thread.getAtomic(), NULL,
+                &Recorder::jpgWriter, &g_jpg_thread_data);
+            break;
+        case VF_H264:
+            break;
+        }
     }   // prepareCapture
     // ------------------------------------------------------------------------
     int getFrameCount(double rate)

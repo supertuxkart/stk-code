@@ -17,9 +17,9 @@
 
 #ifdef ENABLE_RECORDER
 
-#include "recorder/webm_writer.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "recorder/recorder_common.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -33,7 +33,7 @@
 namespace Recorder
 {
     // ------------------------------------------------------------------------
-    void writeWebm(const std::string& video, const std::string& audio)
+    void writeMKV(const std::string& video, const std::string& audio)
     {
         time_t rawtime;
         time(&rawtime);
@@ -44,17 +44,19 @@ namespace Recorder
             timeInfo->tm_mday, timeInfo->tm_hour,
             timeInfo->tm_min, timeInfo->tm_sec);
         std::string no_ext = StringUtils::removeExtension(video);
-        std::string webm_name = no_ext + "-" + time_buffer + ".webm";
+        VideoFormat vf = (VideoFormat)(int)UserConfigParams::m_record_format;
+        std::string file_name = no_ext + "-" + time_buffer +
+            (vf == VF_VP8 || vf == VF_VP9 ? ".webm" : ".mkv");
         mkvmuxer::MkvWriter writer;
-        if (!writer.Open(webm_name.c_str()))
+        if (!writer.Open(file_name.c_str()))
         {
-            Log::error("writeWebm", "Error while opening output file.");
+            Log::error("writeMKV", "Error while opening output file.");
             return;
         }
         mkvmuxer::Segment muxer_segment;
         if (!muxer_segment.Init(&writer))
         {
-            Log::error("writeWebm", "Could not initialize muxer segment.");
+            Log::error("writeMKV", "Could not initialize muxer segment.");
             return;
         }
         std::list<mkvmuxer::Frame*> audio_frames;
@@ -72,14 +74,14 @@ namespace Recorder
                 channels, 0);
             if (!aud_track)
             {
-                Log::error("writeWebm", "Could not add audio track.");
+                Log::error("writeMKV", "Could not add audio track.");
                 return;
             }
             mkvmuxer::AudioTrack* const at = static_cast<mkvmuxer::AudioTrack*>
                 (muxer_segment.GetTrackByNumber(aud_track));
             if (!at)
             {
-                Log::error("writeWebm", "Could not get audio track.");
+                Log::error("writeMKV", "Could not get audio track.");
                 return;
             }
             uint32_t codec_private_size;
@@ -87,7 +89,7 @@ namespace Recorder
             fread(buf, 1, codec_private_size, input);
             if (!at->SetCodecPrivate(buf, codec_private_size))
             {
-                Log::warn("writeWebm", "Could not add audio private data.");
+                Log::warn("writeMKV", "Could not add audio private data.");
                 return;
             }
             while (fread(buf, 1, 12, input) == 12)
@@ -100,7 +102,7 @@ namespace Recorder
                 mkvmuxer::Frame* audio_frame = new mkvmuxer::Frame();
                 if (!audio_frame->Init(buf, frame_size))
                 {
-                    Log::error("writeWebm", "Failed to construct a frame.");
+                    Log::error("writeMKV", "Failed to construct a frame.");
                     return;
                 }
                 audio_frame->set_track_number(aud_track);
@@ -111,7 +113,7 @@ namespace Recorder
             fclose(input);
             if (remove(audio.c_str()) != 0)
             {
-                Log::warn("writeWebm", "Failed to remove audio data file");
+                Log::warn("writeMKV", "Failed to remove audio data file");
             }
         }
         uint64_t vid_track = muxer_segment.AddVideoTrack(
@@ -119,17 +121,32 @@ namespace Recorder
             irr_driver->getActualScreenSize().Height, 0);
         if (!vid_track)
         {
-            Log::error("writeWebm", "Could not add video track.");
+            Log::error("writeMKV", "Could not add video track.");
             return;
         }
         mkvmuxer::VideoTrack* const vt = static_cast<mkvmuxer::VideoTrack*>(
             muxer_segment.GetTrackByNumber(vid_track));
         if (!vt)
         {
-            Log::error("writeWebm", "Could not get video track.");
+            Log::error("writeMKV", "Could not get video track.");
             return;
         }
         vt->set_frame_rate(UserConfigParams::m_record_fps);
+        switch (vf)
+        {
+        case VF_VP8:
+            vt->set_codec_id("V_VP8");
+            break;
+        case VF_VP9:
+            vt->set_codec_id("V_VP9");
+            break;
+        case VF_MJPEG:
+            vt->set_codec_id("V_MJPEG");
+            break;
+        case VF_H264:
+            vt->set_codec_id("V_MPEG4/ISO/AVC");
+            break;
+        }
         input = fopen(video.c_str(), "rb");
         while (fread(buf, 1, 16, input) == 16)
         {
@@ -144,12 +161,19 @@ namespace Recorder
             mkvmuxer::Frame muxer_frame;
             if (!muxer_frame.Init(buf, frame_size))
             {
-                Log::error("writeWebm", "Failed to construct a frame.");
+                Log::error("writeMKV", "Failed to construct a frame.");
                 return;
             }
             muxer_frame.set_track_number(vid_track);
             muxer_frame.set_timestamp(timestamp);
-            muxer_frame.set_is_key((flag & VPX_FRAME_IS_KEY) != 0);
+            if (vf == VF_VP8 || vf == VF_VP9)
+            {
+                muxer_frame.set_is_key((flag & VPX_FRAME_IS_KEY) != 0);
+            }
+            else
+            {
+                muxer_frame.set_is_key(true);
+            }
             mkvmuxer::Frame* cur_aud_frame =
                 audio_frames.empty() ? NULL : audio_frames.front();
             if (cur_aud_frame != NULL)
@@ -158,7 +182,7 @@ namespace Recorder
                 {
                     if (!muxer_segment.AddGenericFrame(cur_aud_frame))
                     {
-                        Log::error("writeWebm", "Could not add audio frame.");
+                        Log::error("writeMKV", "Could not add audio frame.");
                         return;
                     }
                     delete cur_aud_frame;
@@ -173,7 +197,7 @@ namespace Recorder
             }
             if (!muxer_segment.AddGenericFrame(&muxer_frame))
             {
-                Log::error("writeWebm", "Could not add video frame.");
+                Log::error("writeMKV", "Could not add video frame.");
                 return;
             }
         }
@@ -185,14 +209,14 @@ namespace Recorder
         }
         if (remove(video.c_str()) != 0)
         {
-            Log::warn("writeWebm", "Failed to remove video data file");
+            Log::warn("writeMKV", "Failed to remove video data file");
         }
         if (!muxer_segment.Finalize())
         {
-            Log::error("writeWebm", "Finalization of segment failed.");
+            Log::error("writeMKV", "Finalization of segment failed.");
             return;
         }
         writer.Close();
-    }   // writeWebm
+    }   // writeMKV
 };
 #endif
