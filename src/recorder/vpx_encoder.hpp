@@ -23,7 +23,11 @@
 
 namespace Recorder
 {
+#ifdef NO_VPX
+    inline void* vpxEncoder(void *obj) { return NULL; }
+#else
     void* vpxEncoder(void *obj);
+#endif
 };
 #endif
 

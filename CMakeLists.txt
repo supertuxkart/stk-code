@@ -82,6 +82,10 @@ if(SERVER_ONLY)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
 endif()
 
+if(DISABLE_VPX)
+    add_definitions(-DNO_VPX)
+endif()
+
 if(BUILD_RECORDER)
     add_definitions(-DENABLE_RECORDER)
     if(BUILD_RECORDER_WITH_SOUND)

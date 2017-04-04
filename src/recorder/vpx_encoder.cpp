@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifdef ENABLE_RECORDER
+#if defined(ENABLE_RECORDER) && !defined(NO_VPX)
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -120,8 +120,22 @@ namespace Recorder
 
         vpx_codec_ctx_t codec;
         vpx_codec_enc_cfg_t cfg;
-        vpx_codec_err_t res = vpx_codec_enc_config_default(vpx_codec_vp8_cx(),
-           &cfg, 0);
+        vpx_codec_iface_t* codec_if = NULL;
+        VideoFormat vf = (VideoFormat)(int)UserConfigParams::m_record_format;
+        switch (vf)
+        {
+        case VF_VP8:
+            codec_if = vpx_codec_vp8_cx();
+            break;
+        case VF_VP9:
+            codec_if = vpx_codec_vp9_cx();
+            break;
+        case VF_MJPEG:
+        case VF_H264:
+            assert(false);
+            break;
+        }
+        vpx_codec_err_t res = vpx_codec_enc_config_default(codec_if, &cfg, 0);
         if (res > 0)
         {
             Log::error("vpxEncoder", "Failed to get default codec config.");
@@ -139,7 +153,7 @@ namespace Recorder
         cfg.rc_end_usage = (vpx_rc_mode)end_usage;
         cfg.rc_target_bitrate = UserConfigParams::m_vp_bitrate;
 
-        if (vpx_codec_enc_init(&codec, vpx_codec_vp8_cx(), &cfg, 0) > 0)
+        if (vpx_codec_enc_init(&codec, codec_if, &cfg, 0) > 0)
         {
             Log::error("vpxEncoder", "Failed to initialize encoder");
             fclose(vpx_data);
