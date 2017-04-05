@@ -107,15 +107,26 @@ if((WIN32 AND NOT MINGW) OR APPLE)
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libpng")
     include_directories("${PROJECT_SOURCE_DIR}/lib/libpng")
 
-    #build jpeg library
-    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/jpeglib")
-    include_directories("${PROJECT_SOURCE_DIR}/lib/jpeglib")
-
     set(PNG_PNG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/libpng/")
     set(PNG_LIBRARY png15_static)
+endif()
+
+# Add jpeg-turbo library
+if (APPLE)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/jpeglib")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/jpeglib")
     set(JPEG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/jpeglib/")
     set(JPEG_LIBRARY jpeglib)
+else()
+    find_package(JPEG REQUIRED)
+    include_directories(${JPEG_INCLUDE_DIR})
 endif()
+
+if(NOT SERVER_ONLY AND NOT USE_GLES2)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
+endif()
+
 # Build the irrlicht library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
 include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
@@ -368,11 +379,12 @@ target_link_libraries(supertuxkart
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
     ${FREETYPE_LIBRARIES}
+    ${JPEG_LIBRARIES}
     )
 
 if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
-        target_link_libraries(supertuxkart ${OPENGL_LIBRARIES} glew)
+        target_link_libraries(supertuxkart ${OPENGL_LIBRARIES} glew graphics_utils)
     else()
         target_link_libraries(supertuxkart EGL GLESv2)
     endif()

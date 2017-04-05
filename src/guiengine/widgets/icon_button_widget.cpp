@@ -342,9 +342,7 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
     name += "_disabled";
     STKTexManager* stkm = STKTexManager::getInstance();
     STKTexture* disabled_stk_tex = static_cast<STKTexture*>(stkm->getTexture
-        (name, false/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
-        false/*mesh_tex*/, false /*no_upload*/, false/*single_channel*/,
-        false/*create_if_unfound*/));
+        (name, NULL/*tc*/, false /*no_upload*/, false/*create_if_unfound*/));
     if (disabled_stk_tex == NULL)
     {
         SColor c;

@@ -2176,9 +2176,7 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
             if (CVS->isGLSL())
             {
                 t = STKTexManager::getInstance()->getTexture(v[i],
-                    false/*srgb*/, false/*premul_alpha*/,
-                    false/*set_material*/, false/*mesh_tex*/,
-                    true/*no_upload*/);
+                    (TexConfig*)NULL/*tex_config*/, true/*no_upload*/);
             }
             else
 #endif   // !SERVER_ONLY
@@ -2222,9 +2220,7 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
             if (CVS->isGLSL())
             {
                 t = STKTexManager::getInstance()->getTexture(v[i],
-                    false/*srgb*/, false/*premul_alpha*/,
-                    false/*set_material*/, false/*mesh_tex*/,
-                    true/*no_upload*/);
+                    (TexConfig*)NULL/*tex_config*/, true/*no_upload*/);
             }
             else
 #endif   // !SERVER_ONLY

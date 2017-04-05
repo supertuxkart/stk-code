@@ -104,9 +104,10 @@ bool breakable (wchar_t c)
 	if ((c > 12287 && c < 40960) || //Common CJK words
 		(c > 44031 && c < 55204)  || //Hangul
 		(c > 63743 && c < 64256)  || //More Chinese
-		c == 173 || c == L' ' || c == 0) //Soft hyphen and white space
-			return true;
-			return false;
+		c == 173 || c == L' ' || //Soft hyphen and white space
+		c == 47 || c == 92) //Slash and blackslash
+		return true;
+	return false;
 }
 } // end namespace gui
 } // end namespace irr

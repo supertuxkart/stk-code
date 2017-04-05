@@ -40,6 +40,10 @@
 #  include <windows.h>
 #endif
 
+#if defined(__linux__) && defined(__GLIBC__) && defined(__GLIBC_MINOR__)
+#  include <pthread.h>
+#endif
+
 namespace VS
 {
 #if defined(_MSC_VER) && defined(DEBUG)
@@ -77,6 +81,13 @@ namespace VS
         {
         }
 
+    }   // setThreadName
+#elif defined(__linux__) && defined(__GLIBC__) && defined(__GLIBC_MINOR__)
+    static void setThreadName(const char* name)
+    {
+#if __GLIBC__ > 2 || __GLIBC_MINOR__ > 11
+        pthread_setname_np(pthread_self(), name);
+#endif
     }   // setThreadName
 #else
     static void setThreadName(const char* name)

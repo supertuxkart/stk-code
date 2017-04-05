@@ -38,12 +38,11 @@ struct GFXPreset
     bool weather;
     bool animatedScenery;
     int animatedCharacters;
-    int anisotropy;
+    int image_quality;
     /** Depth of field */
     bool dof;
     bool global_illumination;
     bool degraded_ibl;
-    int hd_textures;
 };
 
 /**
@@ -54,6 +53,7 @@ class OptionsScreenVideo : public GUIEngine::Screen, public GUIEngine::ScreenSin
 {
 private:
     bool m_prev_adv_pipline;
+    int m_prev_img_quality;
     OptionsScreenVideo();
     bool m_inited;
     std::vector<GFXPreset> m_presets;
@@ -81,6 +81,8 @@ public:
     virtual void unloaded() OVERRIDE;
 
     void         updateGfxSlider();
+    static int getImageQuality();
+    static void setImageQuality(int quality);
 };
 
 #endif

@@ -1044,10 +1044,11 @@ void STKMeshLoader::loadTextures(SB3dMaterial& material) const
             else
                 full_path = fs->getFileBasename(B3dTexture->TextureName);
 
+            TexConfig mtc(i <= 1 ? true : false/*srgb*/, false/*premul_alpha*/,
+                true/*mesh_tex*/, true/*set_material*/);
             video::ITexture* tex =
                 STKTexManager::getInstance()->getTexture(full_path.c_str(),
-                i <= 1 ? true : false/*is_srgb*/, false/*premul_alpha*/,
-                true/*set_material*/);
+                &mtc);
 
             material.Material.setTexture(i, tex);
             if (material.Textures[i]->Flags & 0x10) // Clamp U

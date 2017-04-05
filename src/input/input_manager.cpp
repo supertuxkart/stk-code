@@ -273,8 +273,18 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_PRINT:
             // on windows we don't get a press event, only release.  So
             // save on release only (to avoid saving twice on other platforms)
-            if (value ==0 )
-                irr_driver->requestScreenshot();
+            if (value == 0)
+            {
+                if (control_is_pressed)
+                {
+                    const bool is_recording = irr_driver->isRecording();
+                    irr_driver->setRecording(!is_recording);
+                }
+                else
+                {
+                    irr_driver->requestScreenshot();
+                }
+            }
             break;
         case KEY_F11:
             if(value && shift_is_pressed && world && RewindManager::isEnabled())
