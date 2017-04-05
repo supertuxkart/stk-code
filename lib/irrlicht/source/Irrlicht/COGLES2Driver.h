@@ -10,13 +10,7 @@
 
 #include "IrrCompileConfig.h"
 
-#if defined(_IRR_WINDOWS_API_)
-// include windows headers for HWND
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
-#elif defined(_IRR_COMPILE_WITH_OSX_DEVICE_)
+#if defined(_IRR_COMPILE_WITH_OSX_DEVICE_)
 #include "MacOSX/CIrrDeviceMacOSX.h"
 #elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 #include "iOS/CIrrDeviceiOS.h"
@@ -30,11 +24,8 @@
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
-#include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #include "android_native_app_glue.h"
-#else
-#include <EGL/eglplatform.h>
 #endif
 
 #include "CNullDriver.h"
@@ -43,7 +34,6 @@
 #include "fast_atof.h"
 
 #ifdef _MSC_VER
-#pragma comment(lib, "libEGL.lib")
 #pragma comment(lib, "libGLESv2.lib")
 #endif
 #include "COGLES2ExtensionHandler.h"
@@ -58,6 +48,7 @@ namespace video
 	class COGLES2Renderer2D;
 	class COGLES2NormalMapRenderer;
 	class COGLES2ParallaxMapRenderer;
+	class ContextEGL;
 
 	class COGLES2Driver : public CNullDriver, public IMaterialRendererServices, public COGLES2ExtensionHandler
 	{
@@ -340,9 +331,6 @@ namespace video
 		//! checks if an OpenGL error has happend and prints it
 		bool testGLError();
 
-		//! checks if an OGLES1 error has happend and prints it
-		bool testEGLError();
-
 		//! Set/unset a clipping plane.
 		virtual bool setClipPlane(u32 index, const core::plane3df& plane, bool enable = false);
 
@@ -381,8 +369,6 @@ namespace video
 
 		//! Get bridge calls.
         COGLES2CallBridge* getBridgeCalls() const;
-
-		void reloadEGLSurface(void* window);
 
 	private:
 		// Bridge calls.
@@ -466,21 +452,15 @@ namespace video
 		SColorf AmbientLight;
 
 		COGLES2Renderer2D* MaterialRenderer2D;
-
-#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-		HDC HDc;
+		
+#if defined(_IRR_COMPILE_WITH_EGL_)
+		ContextEGL* EglContext;
 #endif
 #if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 		CIrrDeviceIPhone* Device;
 		GLuint ViewFramebuffer;
 		GLuint ViewRenderbuffer;
 		GLuint ViewDepthRenderbuffer;
-#else
-		NativeWindowType EglWindow;
-		void* EglDisplay;
-		void* EglSurface;
-		void* EglContext;
-		EGLConfig EglConfig;
 #endif
 
 		SIrrlichtCreationParameters Params;
