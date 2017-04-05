@@ -24,6 +24,7 @@
 #include "utils/synchronised.hpp"
 #include "utils/vs.hpp"
 
+#include <chrono>
 #include <turbojpeg.h>
 #include <vpx/vpx_encoder.h>
 #include <vpx/vp8cx.h>
@@ -159,7 +160,7 @@ namespace Recorder
             fclose(vpx_data);
             return NULL;
         }
-
+        std::chrono::high_resolution_clock::time_point tp;
         while (true)
         {
             jpg_data->lock();
@@ -168,6 +169,20 @@ namespace Recorder
             {
                 pthread_cond_wait(cond_request, jpg_data->getMutex());
                 waiting = jpg_data->getData().empty();
+            }
+
+            if (displayProgress())
+            {
+                auto rate = std::chrono::high_resolution_clock::now() -
+                    tp;
+                double t = std::chrono::duration_cast<std::chrono::
+                    duration<double> >(rate).count();
+                if (t > 3.)
+                {
+                    tp = std::chrono::high_resolution_clock::now();
+                    Log::info("vpxEncoder", "%d frames remaining.",
+                        jpg_data->getData().size());
+                }
             }
             auto& p =  jpg_data->getData().front();
             uint8_t* jpg = std::get<0>(p);

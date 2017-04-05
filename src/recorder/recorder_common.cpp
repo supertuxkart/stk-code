@@ -78,6 +78,8 @@ namespace Recorder
     // ========================================================================
     std::string g_recording_name;
     // ========================================================================
+    Synchronised<bool> g_display_progress(false);
+    // ========================================================================
     void* fbiConversion(void* obj)
     {
         VS::setThreadName("fbiConversion");
@@ -104,17 +106,34 @@ namespace Recorder
                 g_idle.setAtomic(true);
                 pthread_join(g_audio_thread, NULL);
                 g_jpg_list.lock();
+                if (!g_destroy && g_jpg_list.getData().size() > 100)
+                {
+                    MessageQueue::add(MessageQueue::MT_GENERIC,
+                        _("Please wait while encoding is finished."));
+                }
                 g_jpg_list.getData().emplace_back((uint8_t*)NULL, 0, 0);
                 pthread_cond_signal(&g_jpg_request);
                 g_jpg_list.unlock();
+                g_display_progress.setAtomic(true);
                 pthread_join(*g_video_thread.getData(), NULL);
                 delete g_video_thread.getData();
                 g_video_thread.setAtomic(NULL);
-                Recorder::writeMKV(g_recording_name + ".video",
+                std::string f = Recorder::writeMKV(g_recording_name + ".video",
                     g_recording_name + ".audio");
+                g_display_progress.setAtomic(false);
                 if (g_destroy)
                 {
                     return NULL;
+                }
+                if (f.empty())
+                {
+                    MessageQueue::add(MessageQueue::MT_ERROR,
+                        _("Error when saving video."));
+                }
+                else
+                {
+                    MessageQueue::add(MessageQueue::MT_GENERIC,
+                        _("Video saved in \"%s\".", f.c_str()));
                 }
                 continue;
             }
@@ -372,6 +391,11 @@ namespace Recorder
         stopRecording();
         g_common_data.destroy();
     }   // destroyRecorder
+    // ------------------------------------------------------------------------
+    bool displayProgress()
+    {
+        return g_display_progress.getAtomic();
+    }   // displayProgress
 
 }
 #endif

@@ -33,7 +33,7 @@
 namespace Recorder
 {
     // ------------------------------------------------------------------------
-    void writeMKV(const std::string& video, const std::string& audio)
+    std::string writeMKV(const std::string& video, const std::string& audio)
     {
         time_t rawtime;
         time(&rawtime);
@@ -51,13 +51,13 @@ namespace Recorder
         if (!writer.Open(file_name.c_str()))
         {
             Log::error("writeMKV", "Error while opening output file.");
-            return;
+            return "";
         }
         mkvmuxer::Segment muxer_segment;
         if (!muxer_segment.Init(&writer))
         {
             Log::error("writeMKV", "Could not initialize muxer segment.");
-            return;
+            return "";
         }
         std::list<mkvmuxer::Frame*> audio_frames;
         uint8_t* buf = (uint8_t*)malloc(1024 * 1024);
@@ -75,14 +75,14 @@ namespace Recorder
             if (!aud_track)
             {
                 Log::error("writeMKV", "Could not add audio track.");
-                return;
+                return "";
             }
             mkvmuxer::AudioTrack* const at = static_cast<mkvmuxer::AudioTrack*>
                 (muxer_segment.GetTrackByNumber(aud_track));
             if (!at)
             {
                 Log::error("writeMKV", "Could not get audio track.");
-                return;
+                return "";
             }
             uint32_t codec_private_size;
             fread(&codec_private_size, 1, sizeof(uint32_t), input);
@@ -90,7 +90,7 @@ namespace Recorder
             if (!at->SetCodecPrivate(buf, codec_private_size))
             {
                 Log::warn("writeMKV", "Could not add audio private data.");
-                return;
+                return "";
             }
             while (fread(buf, 1, 12, input) == 12)
             {
@@ -103,7 +103,7 @@ namespace Recorder
                 if (!audio_frame->Init(buf, frame_size))
                 {
                     Log::error("writeMKV", "Failed to construct a frame.");
-                    return;
+                    return "";
                 }
                 audio_frame->set_track_number(aud_track);
                 audio_frame->set_timestamp(timestamp);
@@ -122,14 +122,14 @@ namespace Recorder
         if (!vid_track)
         {
             Log::error("writeMKV", "Could not add video track.");
-            return;
+            return "";
         }
         mkvmuxer::VideoTrack* const vt = static_cast<mkvmuxer::VideoTrack*>(
             muxer_segment.GetTrackByNumber(vid_track));
         if (!vt)
         {
             Log::error("writeMKV", "Could not get video track.");
-            return;
+            return "";
         }
         vt->set_frame_rate(UserConfigParams::m_record_fps);
         switch (vf)
@@ -162,7 +162,7 @@ namespace Recorder
             if (!muxer_frame.Init(buf, frame_size))
             {
                 Log::error("writeMKV", "Failed to construct a frame.");
-                return;
+                return "";
             }
             muxer_frame.set_track_number(vid_track);
             muxer_frame.set_timestamp(timestamp);
@@ -183,7 +183,7 @@ namespace Recorder
                     if (!muxer_segment.AddGenericFrame(cur_aud_frame))
                     {
                         Log::error("writeMKV", "Could not add audio frame.");
-                        return;
+                        return "";
                     }
                     delete cur_aud_frame;
                     audio_frames.pop_front();
@@ -198,7 +198,7 @@ namespace Recorder
             if (!muxer_segment.AddGenericFrame(&muxer_frame))
             {
                 Log::error("writeMKV", "Could not add video frame.");
-                return;
+                return "";
             }
         }
         free(buf);
@@ -214,9 +214,10 @@ namespace Recorder
         if (!muxer_segment.Finalize())
         {
             Log::error("writeMKV", "Finalization of segment failed.");
-            return;
+            return "";
         }
         writer.Close();
+        return file_name;
     }   // writeMKV
 };
 #endif

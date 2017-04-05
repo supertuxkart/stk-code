@@ -24,7 +24,7 @@
 
 namespace Recorder
 {
-    void writeMKV(const std::string& video, const std::string& audio);
+    std::string writeMKV(const std::string& video, const std::string& audio);
 };
 #endif
 
