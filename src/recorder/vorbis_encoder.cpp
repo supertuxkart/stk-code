@@ -139,8 +139,8 @@ namespace Recorder
                         fwrite(&frame_size, 1, sizeof(uint32_t), vb_data);
                         fwrite(&last_timestamp, 1, sizeof(int64_t), vb_data);
                         fwrite(op.packet, 1, frame_size, vb_data);
-                        double s =
-                            (double)op.granulepos / 44100. * 1000000000.;
+                        double s = (double)op.granulepos /
+                            (double)ved->m_sample_rate * 1000000000.;
                         last_timestamp = (int64_t)s;
                     }
                 }

@@ -198,6 +198,12 @@ namespace Recorder
             Log::error("WasapiRecorder", "Unsupported audio input format");
             return NULL;
         }
+        if (ved.m_sample_rate > 48000)
+        {
+            Log::error("WasapiRecorder", "Only support maximum 48000hz sample "
+                "rate audio.");
+            return NULL;
+        }
         HRESULT hr = g_wasapi_data.m_client->Reset();
         if (FAILED(hr))
         {
