@@ -369,6 +369,10 @@ namespace video
 
 		//! Get bridge calls.
         COGLES2CallBridge* getBridgeCalls() const;
+        
+#if defined(_IRR_COMPILE_WITH_EGL_)
+		ContextEGL* getEGLContext() {return EglContext;}
+#endif
 
 	private:
 		// Bridge calls.

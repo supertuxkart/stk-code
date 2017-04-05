@@ -10,6 +10,10 @@
 #include "os.h"
 #include "fast_atof.h"
 
+#if defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
+#include "android_native_app_glue.h"
+#endif
+
 #if defined(_IRR_COMPILE_WITH_EGL_)
 
 namespace irr

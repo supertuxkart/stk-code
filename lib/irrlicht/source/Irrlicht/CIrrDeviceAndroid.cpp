@@ -10,6 +10,7 @@
 
 #include <assert.h>
 #include "os.h"
+#include "CContextEGL.h"
 #include "CFileSystem.h"
 #include "COGLES2Driver.h"
 
@@ -306,7 +307,7 @@ void CIrrDeviceAndroid::handleAndroidCommand(android_app* app, int32_t cmd)
 				device->CreationParams.DriverType == video::EDT_OGLES2)
 			{
 				video::COGLES2Driver* driver = (video::COGLES2Driver*)(device->VideoDriver);
-				driver->reloadEGLSurface(app->window);
+				driver->getEGLContext()->reloadEGLSurface(app->window);
 			}
 		}
 		
