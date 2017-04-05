@@ -192,7 +192,8 @@ void btKart::resetSuspension()
 
 // ----------------------------------------------------------------------------
 void btKart::updateWheelTransformsWS(btWheelInfo& wheel,
-                                     bool interpolatedTransform)
+                                     bool interpolatedTransform,
+                                     float fraction)
 {
     wheel.m_raycastInfo.m_isInContact = false;
 
@@ -203,7 +204,7 @@ void btKart::updateWheelTransformsWS(btWheelInfo& wheel,
     }
 
     wheel.m_raycastInfo.m_hardPointWS =
-        chassisTrans( wheel.m_chassisConnectionPointCS );
+        chassisTrans( wheel.m_chassisConnectionPointCS*fraction );
     wheel.m_raycastInfo.m_wheelDirectionWS = chassisTrans.getBasis() *
                                                 wheel.m_wheelDirectionCS ;
     wheel.m_raycastInfo.m_wheelAxleWS      = chassisTrans.getBasis() *
@@ -213,7 +214,7 @@ void btKart::updateWheelTransformsWS(btWheelInfo& wheel,
 // ----------------------------------------------------------------------------
 /**
  */
-btScalar btKart::rayCast(unsigned int index)
+btScalar btKart::rayCast(unsigned int index, float fraction)
 {
     btWheelInfo &wheel = m_wheelInfo[index];
 
@@ -229,7 +230,7 @@ btScalar btKart::rayCast(unsigned int index)
         m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
 
-    updateWheelTransformsWS( wheel,false);
+    updateWheelTransformsWS( wheel,false, fraction);
 
     btScalar max_susp_len = wheel.getSuspensionRestLength()
                           + wheel.m_maxSuspensionTravel;
@@ -391,6 +392,16 @@ void btKart::updateVehicle( btScalar step )
         rayCast( i);
         if(m_wheelInfo[i].m_raycastInfo.m_isInContact)
             m_num_wheels_on_ground++;
+        else
+        {
+            // If the original raycast did not hit the ground,
+            // try a little bit (5%) closer to the centre of the chassis.
+            // Some tracks have very minor gaps that would otherwise
+            // trigger odd physical behaviour.
+            rayCast(i, 0.95f);
+            if (m_wheelInfo[i].m_raycastInfo.m_isInContact)
+                m_num_wheels_on_ground++;
+        }
     }
 
     // Test if the kart is falling so fast 
@@ -464,33 +475,6 @@ void btKart::updateVehicle( btScalar step )
         // Give a nicely balanced feeling for rebalancing the kart
         m_chassisBody->applyTorqueImpulse(axis * m_kart->getKartProperties()->getStabilitySmoothFlyingImpulse());
     }
-    
-    // Work around: make sure that either both wheels on one axis
-    // are on ground, or none of them. This avoids the problem of
-    // the kart suddenly getting additional angular velocity because
-    // e.g. only one rear wheel is on the ground and then the kart
-    // rotates very abruptly.
-    for(int i=0; i<m_wheelInfo.size(); i+=2)
-    {
-        if( m_wheelInfo[i  ].m_raycastInfo.m_isInContact !=
-            m_wheelInfo[i+1].m_raycastInfo.m_isInContact)
-        {
-            int wheel_air_index = i;
-            int wheel_ground_index = i+1;
-
-            if (m_wheelInfo[i].m_raycastInfo.m_isInContact)
-            {
-                wheel_air_index = i+1;
-                wheel_ground_index = i;
-            }
-
-            btWheelInfo& wheel_air = m_wheelInfo[wheel_air_index];
-            btWheelInfo& wheel_ground = m_wheelInfo[wheel_ground_index];
-
-            wheel_air.m_raycastInfo = wheel_ground.m_raycastInfo;
-        }
-    }   // for i=0; i<m_wheelInfo.size(); i+=2
-
 
     // Apply suspension forcen (i.e. upwards force)
     // --------------------------------------------
@@ -519,28 +503,6 @@ void btKart::updateVehicle( btScalar step )
     // Update friction (i.e. forward force)
     // ------------------------------------
     updateFriction( step);
-
-    for (int i=0;i<m_wheelInfo.size();i++)
-    {
-        btWheelInfo& wheel = m_wheelInfo[i];
-        //btVector3 relpos   = wheel.m_raycastInfo.m_hardPointWS
-        //                   - getRigidBody()->getCenterOfMassPosition();
-        //btVector3 vel      = getRigidBody()->getVelocityInLocalPoint(relpos);
-
-        if (wheel.m_raycastInfo.m_isInContact)
-        {
-            const btTransform& chassisWorldTransform =
-                                                 getChassisWorldTransform();
-
-            btVector3 fwd (
-                chassisWorldTransform.getBasis()[0][m_indexForwardAxis],
-                chassisWorldTransform.getBasis()[1][m_indexForwardAxis],
-                chassisWorldTransform.getBasis()[2][m_indexForwardAxis]);
-
-            btScalar proj = fwd.dot(wheel.m_raycastInfo.m_contactNormalWS);
-            fwd -= wheel.m_raycastInfo.m_contactNormalWS * proj;
-        } 
-    }
 
     // If configured, add a force to keep karts on the track
     // -----------------------------------------------------
@@ -669,13 +631,6 @@ void btKart::updateSuspension(btScalar deltaTime)
         btScalar length_diff    = (susp_length - current_length);
         if(m_kart->getKartProperties()->getSuspensionExpSpringResponse())
             length_diff *= fabsf(length_diff)/susp_length;
-        float f = (1.0f + fabsf(length_diff) / susp_length);
-        // Scale the length diff. This results that in uphill sections, when
-        // the suspension is more compressed (i.e. length is bigger), more
-        // force is used, which makes it much less likely for the kart to hit
-        // the terrain, while when driving on flat terrain (length small),
-        // there is hardly any difference
-        length_diff *= f*f;
         force = wheel_info.m_suspensionStiffness * length_diff
               * wheel_info.m_clippedInvContactDotSuspension;
 

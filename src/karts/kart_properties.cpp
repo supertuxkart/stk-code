@@ -598,6 +598,12 @@ float KartProperties::getStabilityTrackConnectionAccel() const
 }  // getStabilityTrackConnectionAccel
 
 // ----------------------------------------------------------------------------
+std::vector<float> KartProperties::getStabilityAngularFactor() const
+{
+    return m_cached_characteristic->getStabilityAngularFactor();
+}  // getStabilityAngularFactor
+
+// ----------------------------------------------------------------------------
 float KartProperties::getStabilitySmoothFlyingImpulse() const
 {
     return m_cached_characteristic->getStabilitySmoothFlyingImpulse();
@@ -782,6 +788,12 @@ float KartProperties::getParachuteMaxSpeed() const
 {
     return m_cached_characteristic->getParachuteMaxSpeed();
 }  // getParachuteMaxSpeed
+
+// ----------------------------------------------------------------------------
+float KartProperties::getFrictionKartFriction() const
+{
+    return m_cached_characteristic->getFrictionKartFriction();
+}  // getFrictionKartFriction
 
 // ----------------------------------------------------------------------------
 float KartProperties::getBubblegumDuration() const

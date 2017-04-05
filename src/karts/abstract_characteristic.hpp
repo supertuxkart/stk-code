@@ -84,6 +84,7 @@ public:
         STABILITY_CHASSIS_ANGULAR_DAMPING,
         STABILITY_DOWNWARD_IMPULSE_FACTOR,
         STABILITY_TRACK_CONNECTION_ACCEL,
+        STABILITY_ANGULAR_FACTOR,
         STABILITY_SMOOTH_FLYING_IMPULSE,
 
         // Turn
@@ -135,6 +136,9 @@ public:
         PARACHUTE_LBOUND_FRACTION,
         PARACHUTE_UBOUND_FRACTION,
         PARACHUTE_MAX_SPEED,
+
+        // Friction
+        FRICTION_KART_FRICTION,
 
         // Bubblegum
         BUBBLEGUM_DURATION,
@@ -266,6 +270,7 @@ public:
     float getStabilityChassisAngularDamping() const;
     float getStabilityDownwardImpulseFactor() const;
     float getStabilityTrackConnectionAccel() const;
+    std::vector<float> getStabilityAngularFactor() const;
     float getStabilitySmoothFlyingImpulse() const;
 
     InterpolationArray getTurnRadius() const;
@@ -307,6 +312,8 @@ public:
     float getParachuteLboundFraction() const;
     float getParachuteUboundFraction() const;
     float getParachuteMaxSpeed() const;
+
+    float getFrictionKartFriction() const;
 
     float getBubblegumDuration() const;
     float getBubblegumSpeedFraction() const;

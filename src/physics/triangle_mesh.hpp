@@ -57,7 +57,8 @@ public:
                      const btVector3 &n2, const btVector3 &n3,
                      const Material* m);
     void createCollisionShape(bool create_collision_object=true, const char* serialized_bhv=NULL);
-    void createPhysicalBody(btCollisionObject::CollisionFlags flags=
+    void createPhysicalBody(float friction,
+                            btCollisionObject::CollisionFlags flags=
                                (btCollisionObject::CollisionFlags)0,
                             const char* serializedBhv = NULL);
     void removeAll();
