@@ -48,7 +48,8 @@ private:
 	void* EglSurface;
 	void* EglContext;
 	EGLConfig EglConfig;
-	u16 EGLVersion;
+	int EGLVersionMajor;
+	int EGLVersionMinor;
 	
 #ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
 	HDC HDc;

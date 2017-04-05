@@ -21,6 +21,12 @@ ContextEGL::ContextEGL(const SIrrlichtCreationParameters& params,
 					   const SExposedVideoData& data)
 {
 	EglDisplay = EGL_NO_DISPLAY;
+	EglSurface = EGL_NO_SURFACE;
+	EglContext = EGL_NO_CONTEXT;
+	EglConfig = 0;
+	EglWindow = 0;
+	EGLVersionMajor = 1;
+	EGLVersionMinor = 0;
 	IsCoreContext = true;
 	
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
@@ -28,38 +34,38 @@ ContextEGL::ContextEGL(const SIrrlichtCreationParameters& params,
 #endif
 	
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-		EglWindow = (NativeWindowType)data.OpenGLWin32.HWnd;
-		HDc = GetDC((HWND)EglWindow);
-		EglDisplay = eglGetDisplay((NativeDisplayType)HDc);
+	EglWindow = (NativeWindowType)data.OpenGLWin32.HWnd;
+	HDc = GetDC((HWND)EglWindow);
+	EglDisplay = eglGetDisplay((NativeDisplayType)HDc);
 #elif defined(_IRR_COMPILE_WITH_X11_DEVICE_)
-		EglWindow = (NativeWindowType)data.OpenGLLinux.X11Window;
-		EglDisplay = eglGetDisplay((NativeDisplayType)data.OpenGLLinux.X11Display);
+	EglWindow = (NativeWindowType)data.OpenGLLinux.X11Window;
+	EglDisplay = eglGetDisplay((NativeDisplayType)data.OpenGLLinux.X11Display);
 #elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
-		EglWindow =	((struct android_app *)(params.PrivateData))->window;
-		EglDisplay = EGL_NO_DISPLAY;
+	EglWindow =	((struct android_app *)(params.PrivateData))->window;
+	EglDisplay = EGL_NO_DISPLAY;
 #endif
 
-		if (EglDisplay == EGL_NO_DISPLAY)
-		{
-			os::Printer::log("Getting OpenGL-ES2 display.");
-			EglDisplay = eglGetDisplay((NativeDisplayType) EGL_DEFAULT_DISPLAY);
-		}
-		if (EglDisplay == EGL_NO_DISPLAY)
-		{
-			os::Printer::log("Could not get OpenGL-ES2 display.");
-		}
+	if (EglDisplay == EGL_NO_DISPLAY)
+	{
+		os::Printer::log("Getting EGL display.");
+		EglDisplay = eglGetDisplay((NativeDisplayType) EGL_DEFAULT_DISPLAY);
+	}
+	
+	if (EglDisplay == EGL_NO_DISPLAY)
+	{
+		os::Printer::log("Could not get EGL display.");
+	}
 
-		EGLint majorVersion, minorVersion;
-		if (!eglInitialize(EglDisplay, &majorVersion, &minorVersion))
-		{
-			os::Printer::log("Could not initialize OpenGL-ES2 display.");
-		}
-		else
-		{
-			char text[64];
-			sprintf(text, "EglDisplay initialized. Egl version %d.%d\n", majorVersion, minorVersion);
-			os::Printer::log(text);
-		}
+	if (!eglInitialize(EglDisplay, &EGLVersionMajor, &EGLVersionMinor))
+	{
+		os::Printer::log("Could not initialize EGL display.");
+	}
+	else
+	{
+		char text[64];
+		sprintf(text, "EglDisplay initialized. Egl version %d.%d\n", EGLVersionMajor, EGLVersionMinor);
+		os::Printer::log(text);
+	}
 		
 	EGLint EglOpenGLBIT = 0;
 
@@ -85,9 +91,7 @@ ContextEGL::ContextEGL(const SIrrlichtCreationParameters& params,
 		EGL_STENCIL_SIZE, params.Stencilbuffer,
 		EGL_SAMPLE_BUFFERS, params.AntiAlias ? 1:0,
 		EGL_SAMPLES, params.AntiAlias,
-#ifdef EGL_VERSION_1_3
 		EGL_RENDERABLE_TYPE, EglOpenGLBIT,
-#endif
 		EGL_NONE, 0
 	};
 
@@ -177,105 +181,73 @@ ContextEGL::ContextEGL(const SIrrlichtCreationParameters& params,
 	if (params.Bits > Attribs[9])
 		os::Printer::log("No full color buffer.");
 		
-		#if defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
-	   /* EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is
-		* guaranteed to be accepted by ANativeWindow_setBuffersGeometry().
-		* As soon as we picked a EGLConfig, we can safely reconfigure the
-		* ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID. */
-	   EGLint format;
-	   eglGetConfigAttrib(EglDisplay, EglConfig, EGL_NATIVE_VISUAL_ID, &format);
+	#if defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
+	/* EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is
+	* guaranteed to be accepted by ANativeWindow_setBuffersGeometry().
+	* As soon as we picked a EGLConfig, we can safely reconfigure the
+	* ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID. */
+	EGLint format;
+	eglGetConfigAttrib(EglDisplay, EglConfig, EGL_NATIVE_VISUAL_ID, &format);
+	
+	ANativeWindow_setBuffersGeometry(EglWindow, 0, 0, format);
+	#endif
+   
+	os::Printer::log(" Creating EglSurface with nativeWindow...");
+	EglSurface = eglCreateWindowSurface(EglDisplay, EglConfig, EglWindow, NULL);
+	
+	if (EGL_NO_SURFACE == EglSurface)
+	{
+		os::Printer::log("FAILED");
+		os::Printer::log("Creating EglSurface without nativeWindows...");
+		EglSurface = eglCreateWindowSurface(EglDisplay, EglConfig, 0, NULL);
+	}
+	
+	if (EGL_NO_SURFACE == EglSurface)
+	{
+		os::Printer::log("FAILED");
+		os::Printer::log("Could not create surface for EGL display.");
+	}
 
-	   ANativeWindow_setBuffersGeometry(EglWindow, 0, 0, format);
-	   #endif
-		os::Printer::log(" Creating EglSurface with nativeWindow...");
-		EglSurface = eglCreateWindowSurface(EglDisplay, EglConfig, EglWindow, NULL);
-		if (EGL_NO_SURFACE == EglSurface)
+	eglBindAPI(EGL_OPENGL_ES_API);
+
+	os::Printer::log("Creating EglContext...");
+
+	if (!params.ForceLegacyDevice)
+	{
+		os::Printer::log("Trying to create Context for OpenGL ES3.");
+		EGLint contextAttrib[] =
 		{
-			os::Printer::log("FAILED\n");
-			EglSurface = eglCreateWindowSurface(EglDisplay, EglConfig, 0, NULL);
-			os::Printer::log("Creating EglSurface without nativeWindows...");
-		}
-		else
-			os::Printer::log("SUCCESS\n");
-		if (EGL_NO_SURFACE == EglSurface)
+			EGL_CONTEXT_CLIENT_VERSION, 3,
+			EGL_NONE, 0
+		};
+		
+		EglContext = eglCreateContext(EglDisplay, EglConfig, EGL_NO_CONTEXT, contextAttrib);
+	}
+	
+	if (EGL_NO_CONTEXT == EglContext)
+	{
+		os::Printer::log("Trying to create Context for OpenGL ES2.");
+		EGLint contextAttrib[] =
 		{
-			os::Printer::log("FAILED\n");
-			os::Printer::log("Could not create surface for OpenGL-ES2 display.");
-		}
-		else
-			os::Printer::log("SUCCESS\n");
+			EGL_CONTEXT_CLIENT_VERSION, 2,
+			EGL_NONE, 0
+		};
+		
+		EglContext = eglCreateContext(EglDisplay, EglConfig, EGL_NO_CONTEXT, contextAttrib);
+		IsCoreContext = false;
+	}
 
-#ifdef EGL_VERSION_1_2
-		if (minorVersion>1)
-			eglBindAPI(EGL_OPENGL_ES_API);
-#endif
-		os::Printer::log("Creating EglContext...");
-		EglContext = EGL_NO_CONTEXT;
+	eglMakeCurrent(EglDisplay, EglSurface, EglSurface, EglContext);
+	if (testEGLError())
+	{
+		os::Printer::log("Could not make Context current for EGL display.");
+	}
 
-		if (!params.ForceLegacyDevice)
-		{
-			os::Printer::log("Trying to create Context for OpenGL-ES3.");
-
-			EGLint contextAttrib[] =
-			{
-				#ifdef EGL_VERSION_1_3
-				EGL_CONTEXT_CLIENT_VERSION, 3,
-				#endif
-				EGL_NONE, 0
-			};
-
-			EglContext = eglCreateContext(EglDisplay, EglConfig, EGL_NO_CONTEXT, contextAttrib);
-		}
-
-		if (EGL_NO_CONTEXT == EglContext)
-		{
-			os::Printer::log("Trying to create Context for OpenGL-ES2.");
-			IsCoreContext = false;
-
-			EGLint contextAttrib[] =
-			{
-				#ifdef EGL_VERSION_1_3
-				EGL_CONTEXT_CLIENT_VERSION, 2,
-				#endif
-				EGL_NONE, 0
-			};
-
-			EglContext = eglCreateContext(EglDisplay, EglConfig, EGL_NO_CONTEXT, contextAttrib);
-			if (EGL_NO_CONTEXT == EglContext)
-			{
-				os::Printer::log("FAILED\n");
-				os::Printer::log("Could not create Context for OpenGL-ES2 display.");
-			}
-		}
-
-		eglMakeCurrent(EglDisplay, EglSurface, EglSurface, EglContext);
-		if (testEGLError())
-		{
-			os::Printer::log("Could not make Context current for OpenGL-ES2 display.");
-		}
-
-//~ #ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
-		//~ int backingWidth;
-		//~ int backingHeight;
-		//~ eglQuerySurface(EglDisplay, EglSurface, EGL_WIDTH, &backingWidth);
-		//~ eglQuerySurface(EglDisplay, EglSurface, EGL_HEIGHT, &backingHeight);
-        //~ core::dimension2d<u32> WindowSize(backingWidth, backingHeight);
-        //~ CNullDriver::ScreenSize = WindowSize;
-//~ #endif
-
-
-		// set vsync
-		if (params.Vsync)
-			eglSwapInterval(EglDisplay, 1);
-			
-			
-			
-        const f32 egl_ver = core::fast_atof(reinterpret_cast<const c8*>(eglQueryString(EglDisplay, EGL_VERSION)));
-        EGLVersion = static_cast<u16>(core::floor32(egl_ver)*100+core::round32(core::fract(egl_ver)*10.0f));
-        core::stringc eglExtensions = eglQueryString(EglDisplay, EGL_EXTENSIONS);
-        os::Printer::log(eglExtensions.c_str());
-        
-        os::Printer::log(eglQueryString(EglDisplay, EGL_CLIENT_APIS));
+	// set vsync
+	if (params.Vsync)
+		eglSwapInterval(EglDisplay, 1);
+		
+	os::Printer::log(eglQueryString(EglDisplay, EGL_CLIENT_APIS));
 }
 
 
@@ -326,7 +298,7 @@ void ContextEGL::reloadEGLSurface(void* window)
 	#endif
 
 	if (!EglWindow)
-		os::Printer::log("Invalid Egl window.");
+		os::Printer::log("Invalid EGL window.");
 
 	eglMakeCurrent(EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 
