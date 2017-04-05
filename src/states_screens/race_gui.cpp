@@ -128,8 +128,11 @@ RaceGUI::RaceGUI()
 
     m_is_tutorial = (race_manager->getTrackName() == "tutorial");
 
+    // Load speedmeter texture before rendering the first frame
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
+    m_speed_meter_icon->getTexture();
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
+    m_speed_bar_icon->getTexture();
     //createMarkerTexture();
 }   // RaceGUI
 
@@ -401,8 +404,7 @@ void RaceGUI::drawGlobalMiniMap()
         const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
         track->mapPoint2MiniMap(xyz, &draw_at);
-        draw_at *= UserConfigParams::m_scale_rtts_factor;
-
+        
         video::ITexture* icon = sta ?
             irr_driver->getTexture(FileManager::GUI, "heart.png") :
             kart->getKartProperties()->getMinimapIcon();
@@ -424,7 +426,7 @@ void RaceGUI::drawGlobalMiniMap()
     {
         Vec3 draw_at;
         track->mapPoint2MiniMap(sw->getBallPosition(), &draw_at);
-        draw_at *= UserConfigParams::m_scale_rtts_factor;
+        
         video::ITexture* icon =
             irr_driver->getTexture(FileManager::GUI, "soccer_ball_normal.png");
 

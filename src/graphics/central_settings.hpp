@@ -44,6 +44,7 @@ private:
     bool hasMultiDrawIndirect;
     bool hasTextureFilterAnisotropic;
     bool hasTextureSwizzle;
+    bool hasPixelBufferObject;
 
 #if defined(USE_GLES2)
     bool hasBGRA;
@@ -84,6 +85,7 @@ public:
     bool isARBExplicitAttribLocationUsable() const;
     bool isEXTTextureFilterAnisotropicUsable() const;
     bool isARBTextureSwizzleUsable() const;
+    bool isARBPixelBufferObjectUsable() const;
 
 #if defined(USE_GLES2)
     bool isEXTTextureFormatBGRA8888Usable() const;
@@ -98,6 +100,7 @@ public:
     bool supportsComputeShadersFiltering() const;
     bool supportsAsyncInstanceUpload() const;
     bool supportsHardwareSkinning() const;
+    bool supportsThreadedTextureLoading() const;
 
     // "Macro" around feature support and user config
     bool isShadowEnabled() const;

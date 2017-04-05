@@ -52,6 +52,62 @@ const std::string& ShaderFilesManager::getHeader()
 }   // getHeader
 
 // ----------------------------------------------------------------------------
+void ShaderFilesManager::readFile(const std::string& file, 
+                                  std::ostringstream& code)
+{
+    std::ifstream stream(file_manager->getShader(file), std::ios::in);
+    
+    if (!stream.is_open())
+    {
+        Log::error("ShaderFilesManager", "Can not open '%s'.", file.c_str());
+        return;
+    }
+    
+    const std::string stk_include = "#stk_include";
+    std::string line;
+
+    while (std::getline(stream, line))
+    {
+        const std::size_t pos = line.find(stk_include);
+
+        // load the custom file pointed by the #stk_include directive
+        if (pos != std::string::npos)
+        {
+            // find the start "
+            std::size_t pos = line.find("\"");
+            if (pos == std::string::npos)
+            {
+                Log::error("ShaderFilesManager", "Invalid #stk_include"
+                    " line: '%s'.", line.c_str());
+                continue;
+            }
+
+            std::string filename = line.substr(pos + 1);
+
+            // find the end "
+            pos = filename.find("\"");
+            if (pos == std::string::npos)
+            {
+                Log::error("ShaderFilesManager", "Invalid #stk_include"
+                    " line: '%s'.", line.c_str());
+                continue;
+            }
+
+            filename = filename.substr(0, pos);
+            
+            // read the whole include file
+            readFile(filename, code);
+        }
+        else
+        {
+            code << "\n" << line;
+        }
+    }
+
+    stream.close();
+}
+
+// ----------------------------------------------------------------------------
 /** Loads a single shader. This is NOT cached, use addShaderFile for that.
  *  \param file Filename of the shader to load.
  *  \param type Type of the shader.
@@ -90,7 +146,9 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
 
     if (CVS->isARBExplicitAttribLocationUsable())
     {
+#if !defined(USE_GLES2)
         code << "#extension GL_ARB_explicit_attrib_location : enable\n";
+#endif
         code << "#define Explicit_Attrib_Location_Usable\n";
     }
 
@@ -106,12 +164,14 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
         code << "#define VSLayer\n";
     if (CVS->needsRGBBindlessWorkaround())
         code << "#define SRGBBindlessFix\n";
+    if (CVS->isDefferedEnabled())
+        code << "#define Advanced_Lighting_Enabled\n";
 
 #if !defined(USE_GLES2)
     // shader compilation fails with some drivers if there is no precision
     // qualifier
     if (type == GL_FRAGMENT_SHADER)
-        code << "precision mediump float;\n";
+        code << "precision highp float;\n";
 #else
     int range[2], precision;
     glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_HIGH_FLOAT, range,
@@ -126,69 +186,7 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
 
     code << getHeader();
 
-    std::ifstream stream(file_manager->getShader(file), std::ios::in);
-    if (stream.is_open())
-    {
-        const std::string stk_include = "#stk_include";
-        std::string line;
-
-        while (std::getline(stream, line))
-        {
-            const std::size_t pos = line.find(stk_include);
-
-            // load the custom file pointed by the #stk_include directive
-            if (pos != std::string::npos)
-            {
-                // find the start "
-                std::size_t pos = line.find("\"");
-                if (pos == std::string::npos)
-                {
-                    Log::error("ShaderFilesManager", "Invalid #stk_include"
-                        " line: '%s'.", line.c_str());
-                    continue;
-                }
-
-                std::string filename = line.substr(pos + 1);
-
-                // find the end "
-                pos = filename.find("\"");
-                if (pos == std::string::npos)
-                {
-                    Log::error("ShaderFilesManager", "Invalid #stk_include"
-                        " line: '%s'.", line.c_str());
-                    continue;
-                }
-
-                filename = filename.substr(0, pos);
-
-                // read the whole include file
-                std::ifstream include_stream(file_manager->getShader(filename), std::ios::in);
-                if (!include_stream.is_open())
-                {
-                    Log::error("ShaderFilesManager", "Couldn't open included"
-                        " shader: '%s'.", filename.c_str());
-                    continue;
-                }
-
-                std::string include_line = "";
-                while (std::getline(include_stream, include_line))
-                {
-                    code << "\n" << include_line;
-                }
-                include_stream.close();
-            }
-            else
-            {
-                code << "\n" << line;
-            }
-        }
-
-        stream.close();
-    }
-    else
-    {
-        Log::error("ShaderFilesManager", "Can not open '%s'.", file.c_str());
-    }
+    readFile(file, code);
 
     Log::info("ShaderFilesManager", "Compiling shader : %s", file.c_str());
     const std::string &source  = code.str();

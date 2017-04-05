@@ -23,6 +23,7 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shared_gpu_objects.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
@@ -53,32 +54,32 @@ void OptionsScreenVideo::initPresets()
     ({
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
-        false /* animatedScenery */, 0 /* animatedCharacters */, 0 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */, true /* degraded IBL */, 0 /* hd_textures */
+        false /* animatedScenery */, 0 /* animatedCharacters */, 0 /* image_quality */,
+        false /* depth of field */, false /* global illumination */, true /* degraded IBL */
     });
 
     m_presets.push_back
     ({
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
-        true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */, true /* degraded IBL */, 0 /* hd_textures */
+        true /* animatedScenery */, 1 /* animatedCharacters */, 1 /* image_quality */,
+        false /* depth of field */, false /* global illumination */, true /* degraded IBL */
     });
 
     m_presets.push_back
     ({
         true /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, true /* weather */,
-        true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */, true /* degraded IBL */, 1 /* hd_textures */
+        true /* animatedScenery */, 1 /* animatedCharacters */, 2 /* image_quality */,
+        false /* depth of field */, false /* global illumination */, true /* degraded IBL */
     });
 
     m_presets.push_back
     ({
         true /* light */, 0 /* shadow */, false /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, false /* ssao */, true /* weather */,
-        true /* animatedScenery */, 1 /* animatedCharacters */, 8 /* anisotropy */,
-        false /* depth of field */, false /* global illumination */, false /* degraded IBL */, 1 /* hd_textures */
+        true /* animatedScenery */, 1 /* animatedCharacters */, 2 /* image_quality */,
+        false /* depth of field */, false /* global illumination */, false /* degraded IBL */
     });
 
     m_presets.push_back
@@ -91,8 +92,8 @@ void OptionsScreenVideo::initPresets()
 #else
         2 /* animatedCharacters */,
 #endif
-        16 /* anisotropy */,
-        true /* depth of field */, false /* global illumination */, false /* degraded IBL */, 1 /* hd_textures */
+        3 /* image_quality */,
+        true /* depth of field */, false /* global illumination */, false /* degraded IBL */
     });
 
     m_presets.push_back
@@ -105,8 +106,8 @@ void OptionsScreenVideo::initPresets()
 #else
         2 /* animatedCharacters */,
 #endif
-        16 /* anisotropy */,
-        true /* depth of field */, true /* global illumination */, false /* degraded IBL */, 1 /* hd_textures */
+        3 /* image_quality */,
+        true /* depth of field */, true /* global illumination */, false /* degraded IBL */
     });
 
 }   // initPresets
@@ -140,9 +141,78 @@ struct Resolution
 };
 
 // ----------------------------------------------------------------------------
+int OptionsScreenVideo::getImageQuality()
+{
+    if (UserConfigParams::m_scale_rtts_factor == 0.8f &&
+        UserConfigParams::m_trilinear == false &&
+        UserConfigParams::m_anisotropic == 0 &&
+        (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
+        UserConfigParams::m_hq_mipmap == false)
+        return 0;
+    if (UserConfigParams::m_scale_rtts_factor == 1.0f &&
+        UserConfigParams::m_trilinear == true &&
+        UserConfigParams::m_anisotropic == 2 &&
+        (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
+        UserConfigParams::m_hq_mipmap == false)
+        return 1;
+    if (UserConfigParams::m_scale_rtts_factor == 1.0f &&
+        UserConfigParams::m_trilinear == true &&
+        UserConfigParams::m_anisotropic == 4 &&
+        (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
+        UserConfigParams::m_hq_mipmap == false)
+        return 2;
+    if (UserConfigParams::m_scale_rtts_factor == 1.0f &&
+        UserConfigParams::m_trilinear == true &&
+        UserConfigParams::m_anisotropic == 16 &&
+        (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
+        UserConfigParams::m_hq_mipmap == true)
+        return 3;
+    return 2;
+}   // getImageQuality
+
+// ----------------------------------------------------------------------------
+void OptionsScreenVideo::setImageQuality(int quality)
+{
+    switch (quality)
+    {
+        case 0:
+            UserConfigParams::m_scale_rtts_factor = 0.8f;
+            UserConfigParams::m_trilinear = false;
+            UserConfigParams::m_anisotropic = 0;
+            UserConfigParams::m_high_definition_textures = 0x02;
+            UserConfigParams::m_hq_mipmap = false;
+            break;
+        case 1:
+            UserConfigParams::m_scale_rtts_factor = 1.0f;
+            UserConfigParams::m_trilinear = true;
+            UserConfigParams::m_anisotropic = 2;
+            UserConfigParams::m_high_definition_textures = 0x02;
+            UserConfigParams::m_hq_mipmap = false;
+            break;
+        case 2:
+            UserConfigParams::m_scale_rtts_factor = 1.0f;
+            UserConfigParams::m_trilinear = true;
+            UserConfigParams::m_anisotropic = 4;
+            UserConfigParams::m_high_definition_textures = 0x03;
+            UserConfigParams::m_hq_mipmap = false;
+            break;
+        case 3:
+            UserConfigParams::m_scale_rtts_factor = 1.0f;
+            UserConfigParams::m_trilinear = true;
+            UserConfigParams::m_anisotropic = 16;
+            UserConfigParams::m_high_definition_textures = 0x03;
+            UserConfigParams::m_hq_mipmap = true;
+            break;
+        default:
+            assert(false);
+    }
+}   // setImageQuality
+
+// ----------------------------------------------------------------------------
 
 OptionsScreenVideo::OptionsScreenVideo() : Screen("options_video.stkgui"),
-                                           m_prev_adv_pipline(false)
+                                           m_prev_adv_pipline(false),
+                                           m_prev_img_quality(-1)
 {
     m_inited = false;
     initPresets();
@@ -168,6 +238,7 @@ void OptionsScreenVideo::init()
 {
     Screen::init();
     m_prev_adv_pipline = UserConfigParams::m_dynamic_lights;
+    m_prev_img_quality = getImageQuality();
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
     assert(ribbon != NULL);
     ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
@@ -341,7 +412,7 @@ void OptionsScreenVideo::updateGfxSlider()
     {
         if (m_presets[l].animatedCharacters == UserConfigParams::m_show_steering_animations &&
             m_presets[l].animatedScenery == UserConfigParams::m_graphical_effects &&
-            m_presets[l].anisotropy == UserConfigParams::m_anisotropic &&
+            m_presets[l].image_quality == getImageQuality() &&
             m_presets[l].bloom == UserConfigParams::m_bloom &&
             m_presets[l].glow == UserConfigParams::m_glow &&
             m_presets[l].lights == UserConfigParams::m_dynamic_lights &&
@@ -354,8 +425,7 @@ void OptionsScreenVideo::updateGfxSlider()
             m_presets[l].weather == UserConfigParams::m_weather_effects &&
             m_presets[l].dof == UserConfigParams::m_dof &&
             m_presets[l].global_illumination == UserConfigParams::m_gi &&
-            m_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL &&
-            m_presets[l].hd_textures == (UserConfigParams::m_high_definition_textures & 0x01))
+            m_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL)
         {
             gfx->setValue(l + 1);
             found = true;
@@ -394,6 +464,19 @@ void OptionsScreenVideo::updateTooltip()
     const core::stringw me = _LTR("Me Only");
     //I18N: if no kart animations are enabled
     const core::stringw none = _LTR("None");
+
+    //I18N: in the graphical options tooltip;
+    // indicates the rendered image quality is very low
+    const core::stringw very_low = _LTR("Very Low");
+    //I18N: in the graphical options tooltip;
+    // indicates the rendered image quality is low
+    const core::stringw low = _LTR("Low");
+    //I18N: in the graphical options tooltip;
+    // indicates the rendered image quality is high
+    const core::stringw high = _LTR("High");
+    //I18N: in the graphical options tooltip;
+    // indicates the rendered image quality is very high
+    const core::stringw very_high = _LTR("Very High");
 
     //I18N: in graphical options
 //    tooltip = tooltip + L"\n" + _("Pixel shaders: %s",
@@ -448,9 +531,11 @@ void OptionsScreenVideo::updateTooltip()
         UserConfigParams::m_gi ? enabled : disabled);
     
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Use high definition textures: %s",
-        (UserConfigParams::m_high_definition_textures & 0x1) == 0 ? disabled : enabled);
-    
+    int quality = getImageQuality();
+    tooltip = tooltip + L"\n" + _("Rendered image quality: %s",
+        quality == 0 ? very_low : quality == 1 ? low : quality == 2 ?
+        high : very_high);
+
     gfx->setTooltip(tooltip);
 }   // updateTooltip
 
@@ -518,7 +603,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
         UserConfigParams::m_show_steering_animations = m_presets[level].animatedCharacters;
         UserConfigParams::m_graphical_effects = m_presets[level].animatedScenery;
-        UserConfigParams::m_anisotropic = m_presets[level].anisotropy;
+        setImageQuality(m_presets[level].image_quality);
         UserConfigParams::m_bloom = m_presets[level].bloom;
         UserConfigParams::m_glow = m_presets[level].glow;
         UserConfigParams::m_dynamic_lights = m_presets[level].lights;
@@ -532,7 +617,6 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_dof = m_presets[level].dof;
         UserConfigParams::m_gi = m_presets[level].global_illumination;
         UserConfigParams::m_degraded_IBL = m_presets[level].degraded_ibl;
-        UserConfigParams::m_high_definition_textures = 0x02 | m_presets[level].hd_textures;
 
         updateGfxSlider();
     }
@@ -563,6 +647,12 @@ void OptionsScreenVideo::tearDown()
 {
     if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights)
         irr_driver->sameRestart();
+    else if (m_prev_img_quality != getImageQuality())
+    {
+        irr_driver->setMaxTextureSize();
+        STKTexManager::getInstance()->destroyThreadedTexLoaders();
+        STKTexManager::getInstance()->createThreadedTexLoaders();
+    }
     Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();

@@ -553,6 +553,33 @@ namespace UserConfigParams
         &m_video_group, "Max texture size when high definition textures are "
                         "disabled"));
 
+    PARAM_PREFIX BoolUserConfigParam        m_hq_mipmap
+        PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
+        &m_video_group, "Generate mipmap for textures using "
+                        "high quality method with SSE"));
+                        
+    // ---- Recording
+    PARAM_PREFIX GroupUserConfigParam        m_recording_group
+        PARAM_DEFAULT( GroupUserConfigParam("Recording", "Recording Settings") );
+
+    PARAM_PREFIX BoolUserConfigParam        m_record_bmp
+        PARAM_DEFAULT(BoolUserConfigParam(false, "record_bmp",
+        &m_recording_group, "Record video using uncompressed bitmap, notice: this "
+                        "will require a lot of space and fast disk access."));
+
+    PARAM_PREFIX BoolUserConfigParam        m_limit_game_fps
+        PARAM_DEFAULT(BoolUserConfigParam(true, "limit_game_fps",
+        &m_recording_group, "Limit game framerate not beyond the fps of recording "
+                        "video."));
+
+    PARAM_PREFIX IntUserConfigParam         m_record_compression
+        PARAM_DEFAULT(IntUserConfigParam(90, "record_compression",
+        &m_recording_group, "Specify the compression level of recording video"));
+
+    PARAM_PREFIX IntUserConfigParam         m_record_fps
+        PARAM_DEFAULT(IntUserConfigParam(30, "record_fps",
+        &m_recording_group, "Specify the fps of recording video"));
+
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
     PARAM_PREFIX bool m_unit_testing PARAM_DEFAULT(false);
@@ -616,9 +643,6 @@ namespace UserConfigParams
 
     /** True if graphical profiler should be displayed */
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
-
-    /** True if hardware skinning should be enabled */
-    PARAM_PREFIX bool m_hw_skinning_enabled  PARAM_DEFAULT( false );
 
     // not saved to file
 

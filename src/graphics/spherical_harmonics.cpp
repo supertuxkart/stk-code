@@ -565,15 +565,12 @@ void SphericalHarmonics::setTextures(const std::vector<video::ITexture *> &spher
         assert(img != NULL);
         img->copyToScaling(sh_rgba[i], sh_w, sh_h);
 #if defined(USE_GLES2)
-        if (!CVS->isEXTTextureFormatBGRA8888Usable())
+        // Code here assume color format is BGRA
+        for (unsigned int j = 0; j < sh_w * sh_h; j++)
         {
-            // Code here assume color format is BGRA
-            for (unsigned int j = 0; j < sh_w * sh_h; j++)
-            {
-                char tmp_val = sh_rgba[i][j * 4];
-                sh_rgba[i][j * 4] = sh_rgba[i][j * 4 + 2];
-                sh_rgba[i][j * 4 + 2] = tmp_val;
-            }
+            char tmp_val = sh_rgba[i][j * 4];
+            sh_rgba[i][j * 4] = sh_rgba[i][j * 4 + 2];
+            sh_rgba[i][j * 4 + 2] = tmp_val;
         }
 #endif
     } //for (unsigned i = 0; i < 6; i++)

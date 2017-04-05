@@ -134,6 +134,8 @@ enum DebugMenuCommand
     DEBUG_SCRIPT_CONSOLE,
     DEBUG_RUN_CUTSCENE,
     DEBUG_TEXTURE_CONSOLE,
+    DEBUG_START_RECORDING,
+    DEBUG_STOP_RECORDING
 };   // DebugMenuCommand
 
 // -----------------------------------------------------------------------------
@@ -541,7 +543,6 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     case DEBUG_VISUAL_VALUES:
     {
-#if !defined(__APPLE__)
         DebugSliderDialog *dsd = new DebugSliderDialog();
         dsd->setSliderHook("red_slider", 0, 255,
             [](){ return int(irr_driver->getAmbientLight().r * 255.f); },
@@ -576,12 +577,10 @@ bool handleContextMenuAction(s32 cmd_id)
             [](){ return int(irr_driver->getSSAOSigma() * 10.f); },
             [](int v){irr_driver->setSSAOSigma(v / 10.f); }
         );
-#endif
     }
     break;
     case DEBUG_ADJUST_LIGHTS:
     {
-#if !defined(__APPLE__)
         // Some sliders use multipliers because the spinner widget
         // only supports integers
         DebugSliderDialog *dsd = new DebugSliderDialog();
@@ -635,7 +634,6 @@ bool handleContextMenuAction(s32 cmd_id)
             [](int v){        findNearestLight()->setRadius(float(v)); }
         );
         dsd->changeLabel("SSAO Sigma", "[None]");
-#endif
         break;
     }
     case DEBUG_SCRIPT_CONSOLE:
@@ -710,6 +708,12 @@ bool handleContextMenuAction(s32 cmd_id)
                 // Don't close the dialog after each run
                 return false;
             });
+        break;
+        case DEBUG_START_RECORDING:
+            irr_driver->setRecording(true);
+        break;
+        case DEBUG_STOP_RECORDING:
+            irr_driver->setRecording(false);
         break;
     }   // switch
     return false;
@@ -793,8 +797,13 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Toggle smooth camera", DEBUG_GUI_CAM_SMOOTH);
             sub->addItem(L"Attach fps camera to kart", DEBUG_GUI_CAM_ATTACH);
 
-            mnu->addItem(L"Change camera target >",-1,true, true);
+            mnu->addItem(L"Recording >",-1,true, true);
             sub = mnu->getSubMenu(4);
+            sub->addItem(L"Start recording", DEBUG_START_RECORDING);
+            sub->addItem(L"Stop recording", DEBUG_STOP_RECORDING);
+
+            mnu->addItem(L"Change camera target >",-1,true, true);
+            sub = mnu->getSubMenu(5);
             sub->addItem(L"To kart one", DEBUG_VIEW_KART_ONE);
             sub->addItem(L"To kart two", DEBUG_VIEW_KART_TWO);
             sub->addItem(L"To kart three", DEBUG_VIEW_KART_THREE);
@@ -805,7 +814,7 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"To kart eight", DEBUG_VIEW_KART_EIGHT);
 
             mnu->addItem(L"Font >",-1,true, true);
-            sub = mnu->getSubMenu(5);
+            sub = mnu->getSubMenu(6);
             sub->addItem(L"Dump glyph pages of fonts", DEBUG_FONT_DUMP_GLYPH_PAGE);
             sub->addItem(L"Reload all fonts", DEBUG_FONT_RELOAD);
 

@@ -29,13 +29,16 @@ export ASSETS_PATHS="../data                    \
 export ASSETS_DIRS="library models music sfx textures"
 
 export TEXTURE_SIZE=256
-export SOUND_QUALITY=64
+export SOUND_QUALITY=42
+export SOUND_MONO=1
+export SOUND_SAMPLE=32000
 
 export RUN_OPTIMIZE_SCRIPT=0
 export DECREASE_QUALITY=1
 
 ################################################################################
 
+export LANG=C
 
 cd "`dirname "$0"`"
 
@@ -191,7 +194,22 @@ convert_sound()
    oggdec "$FILE" -o tmp.wav
 
    if [ -s tmp.wav ]; then
-      oggenc --downmix -b $SOUND_QUALITY tmp.wav -o tmp.ogg
+      OGGENC_CMD=""
+      
+      if [ "$SOUND_MONO" -gt 0 ]; then
+         OGGENC_CMD="$OGGENC_CMD --downmix"
+      fi
+      
+      OGG_RATE=`ogginfo "$FILE" | grep "Rate: " | cut -f 2 -d " " \
+                                                            | grep -o '[0-9]*'`
+      
+      if [ ! -z "$OGG_RATE" ] && [ "$OGG_RATE" -gt "32000" ]; then
+         OGGENC_CMD="$OGGENC_CMD --resample 32000"
+      fi
+      
+      OGGENC_CMD="$OGGENC_CMD -b $SOUND_QUALITY"
+      
+      oggenc $OGGENC_CMD tmp.wav -o tmp.ogg
    fi
 
    if [ -s tmp.ogg ]; then
