@@ -60,112 +60,123 @@ ContextEGL::ContextEGL(const SIrrlichtCreationParameters& params,
 			sprintf(text, "EglDisplay initialized. Egl version %d.%d\n", majorVersion, minorVersion);
 			os::Printer::log(text);
 		}
+		
+	EGLint EglOpenGLBIT = 0;
 
-		EGLint attribs[] =
-		{
-#if defined( _IRR_COMPILE_WITH_ANDROID_DEVICE_ )
-		EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-		EGL_BLUE_SIZE, 8,
-		EGL_GREEN_SIZE, 8,
+	// We need proper OpenGL BIT.
+	switch (params.DriverType)
+	{
+	case EDT_OGLES2:
+		EglOpenGLBIT = EGL_OPENGL_ES2_BIT;
+		break;
+	default:
+		break;
+	}
+
+	EGLint Attribs[] =
+	{
 		EGL_RED_SIZE, 8,
-		EGL_DEPTH_SIZE, 16,
-		EGL_NONE
-#else
-			EGL_RED_SIZE, 5,
-			EGL_GREEN_SIZE, 5,
-			EGL_BLUE_SIZE, 5,
-			EGL_ALPHA_SIZE, params.WithAlphaChannel ? 1 : 0,
-			EGL_BUFFER_SIZE, params.Bits,
-			EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-			//EGL_COLOR_BUFFER_TYPE, EGL_RGB_BUFFER,
-			EGL_DEPTH_SIZE, params.ZBufferBits,
-			EGL_STENCIL_SIZE, params.Stencilbuffer,
-			EGL_SAMPLE_BUFFERS, params.AntiAlias ? 1 : 0,
-			EGL_SAMPLES, params.AntiAlias,
+		EGL_GREEN_SIZE, 8,
+		EGL_BLUE_SIZE, 8,
+		EGL_ALPHA_SIZE, params.WithAlphaChannel ? 1:0,
+		EGL_BUFFER_SIZE, params.Bits,
+		EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+		EGL_DEPTH_SIZE, params.ZBufferBits,
+		EGL_STENCIL_SIZE, params.Stencilbuffer,
+		EGL_SAMPLE_BUFFERS, params.AntiAlias ? 1:0,
+		EGL_SAMPLES, params.AntiAlias,
 #ifdef EGL_VERSION_1_3
-			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+		EGL_RENDERABLE_TYPE, EglOpenGLBIT,
 #endif
-			EGL_NONE, 0
-#endif
-		};
+		EGL_NONE, 0
+	};
 
-		EGLint num_configs;
-		u32 steps=5;
-		while (!eglChooseConfig(EglDisplay, attribs, &EglConfig, 1, &num_configs) || !num_configs)
+	EglConfig = 0;
+	EGLint NumConfigs = 0;
+	u32 Steps = 5;
+
+	// Choose the best EGL config.
+	while (!eglChooseConfig(EglDisplay, Attribs, &EglConfig, 1, &NumConfigs) || !NumConfigs)
+	{
+		switch (Steps)
 		{
-			switch (steps)
+		case 5: // samples
+			if (Attribs[19] > 2)
+				--Attribs[19];
+			else
 			{
-			case 5: // samples
-				if (attribs[19]>2)
-				{
-					--attribs[19];
-				}
-				else
-				{
-					attribs[17]=0;
-					attribs[19]=0;
-					--steps;
-				}
-				break;
-			case 4: // alpha
-				if (attribs[7])
-				{
-					attribs[7]=0;
-					if (params.AntiAlias)
-					{
-						attribs[17]=1;
-						attribs[19]=params.AntiAlias;
-						steps=5;
-					}
-				}
-				else
-					--steps;
-				break;
-			case 3: // stencil
-				if (attribs[15])
-				{
-					attribs[15]=0;
-					if (params.AntiAlias)
-					{
-						attribs[17]=1;
-						attribs[19]=params.AntiAlias;
-						steps=5;
-					}
-				}
-				else
-					--steps;
-				break;
-			case 2: // depth size
-				if (attribs[13]>16)
-				{
-					attribs[13]-=8;
-				}
-				else
-					--steps;
-				break;
-			case 1: // buffer size
-				if (attribs[9]>16)
-				{
-					attribs[9]-=8;
-				}
-				else
-					--steps;
-				break;
-			default:
-				os::Printer::log("Could not get config for OpenGL-ES2 display.");
-				return;
+				Attribs[17] = 0;
+				Attribs[19] = 0;
+				--Steps;
 			}
+			break;
+		case 4: // alpha
+			if (Attribs[7])
+			{
+				Attribs[7] = 0;
+
+				if (params.AntiAlias)
+				{
+					Attribs[17] = 1;
+					Attribs[19] = params.AntiAlias;
+					Steps = 5;
+				}
+			}
+			else
+				--Steps;
+			break;
+		case 3: // stencil
+			if (Attribs[15])
+			{
+				Attribs[15] = 0;
+
+				if (params.AntiAlias)
+				{
+					Attribs[17] = 1;
+					Attribs[19] = params.AntiAlias;
+					Steps = 5;
+				}
+			}
+			else
+				--Steps;
+			break;
+		case 2: // depth size
+			if (Attribs[13] > 16)
+			{
+				Attribs[13] -= 8;
+			}
+			else
+				--Steps;
+			break;
+		case 1: // buffer size
+			if (Attribs[9] > 16)
+			{
+				Attribs[9] -= 8;
+			}
+			else
+				--Steps;
+			break;
+		default:
+			os::Printer::log("Could not get config for EGL display.");
+			return;
 		}
-		if (params.AntiAlias && !attribs[17])
-			os::Printer::log("No multisampling.");
-		if (params.WithAlphaChannel && !attribs[7])
-			os::Printer::log("No alpha.");
-		if (params.Stencilbuffer && !attribs[15])
-			os::Printer::log("No stencil buffer.");
-		if (params.ZBufferBits > attribs[13])
-			os::Printer::log("No full depth buffer.");
-		if (params.Bits > attribs[9])
-			os::Printer::log("No full color buffer.");
+	}
+
+	if (params.AntiAlias && !Attribs[17])
+		os::Printer::log("No multisampling.");
+
+	if (params.WithAlphaChannel && !Attribs[7])
+		os::Printer::log("No alpha.");
+
+	if (params.Stencilbuffer && !Attribs[15])
+		os::Printer::log("No stencil buffer.");
+
+	if (params.ZBufferBits > Attribs[13])
+		os::Printer::log("No full depth buffer.");
+
+	if (params.Bits > Attribs[9])
+		os::Printer::log("No full color buffer.");
+		
 		#if defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
 	   /* EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is
 		* guaranteed to be accepted by ANativeWindow_setBuffersGeometry().
