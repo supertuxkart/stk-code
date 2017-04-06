@@ -161,7 +161,7 @@ public:
         {
             TYPE * pointer = m_contents_vector[n];
             delete pointer;
-            m_contents_vector[n] = (TYPE*)0xDEADBEEF;
+            m_contents_vector[n] = (TYPE*)(intptr_t)0xDEADBEEF;
 
             // When deleting, it's important that the same pointer cannot be
             // twice in the vector, resulting in a double delete

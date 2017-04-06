@@ -213,7 +213,7 @@ protected:
 
 			int *intPtr=0;
 			short *shtPtr=0;
-#ifdef __MINGW64__
+#if defined(__MINGW64__) || defined(_WIN64) 
 			char *cp = 0;int dataLen =0;intptr_t nr=0;
 #else
 			char *cp = 0;int dataLen =0;long nr=0;
@@ -251,7 +251,7 @@ protected:
 				cp++;
 			}
 			{
-#ifdef __MINGW64__
+#if defined(__MINGW64__) || defined(_WIN64)
 				nr= (intptr_t)cp;
 #else
 				nr= (long)cp;
@@ -290,7 +290,7 @@ protected:
 			}
 
 		{
-#ifdef __MINGW64__
+#if defined(__MINGW64__) || defined(_WIN64)
 				nr= (intptr_t)cp;
 #else
 				nr= (long)cp;

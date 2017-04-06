@@ -171,7 +171,7 @@ public:
      *  difference to size() happens if the string to be sent was previously
      *  read, and has m_current_offset != 0. Even in this case the whole
      *  string must be sent. */
-    unsigned int getTotalSize() const { return m_buffer.size(); }
+    unsigned int getTotalSize() const { return (unsigned int)m_buffer.size(); }
     // ------------------------------------------------------------------------
     // All functions related to adding data to a network string
     /** Add 8 bit unsigned int. */

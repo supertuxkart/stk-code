@@ -317,7 +317,7 @@ public:
     {
         if (m_hue_settings.empty())
             return 0.0f;
-        const unsigned int hue = m_random_hue.get(m_hue_settings.size());
+        const unsigned int hue = m_random_hue.get((int)m_hue_settings.size());
         assert(hue < m_hue_settings.size());
         return m_hue_settings[hue];
     }
