@@ -174,10 +174,13 @@ void TriangleMesh::createCollisionShape(bool create_collision_object, const char
  *  removed and all objects together with the track is converted again into
  *  a single rigid body. This avoids using irrlicht (or the graphics engine)
  *  for height of terrain detection).
- *  @param serializedBhv if non-NULL, the bhv is deserialized instead of
+ *  \param friction Friction to be used for this TriangleMesh.
+ *  \param flags Additional collision flags (default 0).
+ *  \param serializedBhv if non-NULL, the bhv is deserialized instead of
  *                       being calculated on the fly
  */
-void TriangleMesh::createPhysicalBody(btCollisionObject::CollisionFlags flags,
+void TriangleMesh::createPhysicalBody(float friction,
+                                      btCollisionObject::CollisionFlags flags,
                                       const char* serializedBhv)
 {
     // We need the collision shape, but not the collision object (since
@@ -189,6 +192,8 @@ void TriangleMesh::createPhysicalBody(btCollisionObject::CollisionFlags flags,
     btRigidBody::btRigidBodyConstructionInfo info(0.0f, m_motion_state,
                                                   m_collision_shape);
     info.m_restitution = 0.8f;
+    info.m_friction    = friction;
+
     m_body=new btRigidBody(info);
     Physics::getInstance()->addBody(m_body);
 

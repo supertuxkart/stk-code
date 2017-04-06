@@ -431,6 +431,7 @@ public:
     float getStabilityChassisAngularDamping() const;
     float getStabilityDownwardImpulseFactor() const;
     float getStabilityTrackConnectionAccel() const;
+    std::vector<float> getStabilityAngularFactor() const;
     float getStabilitySmoothFlyingImpulse() const;
 
     InterpolationArray getTurnRadius() const;
@@ -472,6 +473,8 @@ public:
     float getParachuteLboundFraction() const;
     float getParachuteUboundFraction() const;
     float getParachuteMaxSpeed() const;
+
+    float getFrictionKartFriction() const;
 
     float getBubblegumDuration() const;
     float getBubblegumSpeedFraction() const;

@@ -34,7 +34,7 @@
                 http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=7369\&p=25236&hilit=vehicle#p25236
                 for details.
             max-force: Maximum suspension force -->
-        <suspension stiffness="140" rest="0.3" travel="0.29"
+        <suspension stiffness="280" rest="0.3" travel="0.29"
             exp-spring-response="false" max-force="12000" />
 
         <!-- Values related to stability of the chassis: damping, and reduced
@@ -45,6 +45,9 @@
                 the ground if its off ground. Reduces the affect if a kart loses
                 contact with the ground (i.e. it then can't steer or accelerate
                 anymore).
+            angular-factor: Factor to change angular impulses. X and Z rotations
+                are damped to avoid that karts in a collision are too easily pushed
+                into a roll or pitch, which makes them topple over
             smooth-flying-impulse: apply a torque impulse to flying kart to keep
                 them parallel to the ground. -->
         <stability roll-influence="0.3"
@@ -52,6 +55,7 @@
                    chassis-angular-damping="0"
                    downward-impulse-factor="5"
                    track-connection-accel="2"
+                   angular-factor="0.5 1.0 0.5"
                    smooth-flying-impulse="250" />
 
         <!-- Turning
@@ -120,6 +124,8 @@
             <rear-left   position="-0.38 0 -0.6" />
         </wheels>
 
+        <!-- Friction of a kart when e.g. sliding along a wall. -->
+        <friction kart-friction="0.0" />
 
         <!-- ********** Visuals ********** -->
 

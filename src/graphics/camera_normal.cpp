@@ -127,8 +127,13 @@ void CameraNormal::smoothMoveCamera(float dt)
         delta2 = 1;
 
     btTransform btt = m_kart->getTrans();
-    m_kart_position = btt.getOrigin();// m_kart_position + (btt.getOrigin() - m_kart_position) * delta2;
-    m_kart_rotation = m_kart_rotation.normalized().slerp(btt.getRotation().normalized(), delta2);
+    m_kart_position = btt.getOrigin();
+    btQuaternion q1, q2;
+    q1 = m_kart_rotation.normalized();
+    q2 = btt.getRotation().normalized();
+    if (dot(q1, q2) < 0.0f)
+        q2 = -q2;
+    m_kart_rotation = q1.slerp(q2, delta2);
 
     btt.setOrigin(m_kart_position);
     btt.setRotation(m_kart_rotation);

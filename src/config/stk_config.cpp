@@ -138,6 +138,8 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_replay_delta_pos2,         "replay delta-position"      );
     CHECK_NEG(m_replay_dt,                 "replay delta-t"             );
     CHECK_NEG(m_smooth_angle_limit,        "physics smooth-angle-limit" );
+    CHECK_NEG(m_default_track_friction,    "physics default-track-friction");
+    CHECK_NEG(m_default_moveable_friction, "physics default-moveable-friction");
 
     // Square distance to make distance checks cheaper (no sqrt)
     m_replay_delta_pos2 *= m_replay_delta_pos2;
@@ -156,6 +158,7 @@ void STKConfig::init_defaults()
         m_delay_finish_time      = m_skid_fadeout_time         =
         m_near_ground            = m_item_switch_time          =
         m_smooth_angle_limit     = m_penalty_time              =
+        m_default_track_friction = m_default_moveable_friction =
         UNDEFINED;
     m_bubblegum_counter          = -100;
     m_shield_restrict_weapos     = false;
@@ -239,8 +242,11 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if (const XMLNode *physics_node= root->getNode("physics"))
     {
-        physics_node->get("smooth-normals",     &m_smooth_normals    );
-        physics_node->get("smooth-angle-limit", &m_smooth_angle_limit);
+        physics_node->get("smooth-normals",         &m_smooth_normals        );
+        physics_node->get("smooth-angle-limit",     &m_smooth_angle_limit    );
+        physics_node->get("default-track-friction", &m_default_track_friction);
+        physics_node->get("default-moveable-friction",
+                                                 &m_default_moveable_friction);
     }
 
     if (const XMLNode *startup_node= root->getNode("startup"))
