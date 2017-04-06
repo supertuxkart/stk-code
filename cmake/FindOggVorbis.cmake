@@ -10,12 +10,12 @@
 #     OggVorbis library list
 
 
-find_path(OGGVORBIS_OGG_INCLUDE_DIR NAMES ogg/ogg.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
-find_path(OGGVORBIS_VORBIS_INCLUDE_DIR NAMES vorbis/vorbisfile.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
-find_library(OGGVORBIS_OGG_LIBRARY NAMES ogg Ogg libogg PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
-find_library(OGGVORBIS_VORBIS_LIBRARY NAMES vorbis Vorbis libvorbis PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
-find_library(OGGVORBIS_VORBISFILE_LIBRARY NAMES vorbisfile libvorbisfile PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
-find_library(OGGVORBIS_VORBISENC_LIBRARY NAMES vorbisenc libvorbisenc PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
+find_path(OGGVORBIS_OGG_INCLUDE_DIR NAMES ogg/ogg.h PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/include")
+find_path(OGGVORBIS_VORBIS_INCLUDE_DIR NAMES vorbis/vorbisfile.h PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/include")
+find_library(OGGVORBIS_OGG_LIBRARY NAMES ogg Ogg libogg PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib")
+find_library(OGGVORBIS_VORBIS_LIBRARY NAMES vorbis Vorbis libvorbis PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib")
+find_library(OGGVORBIS_VORBISFILE_LIBRARY NAMES vorbisfile libvorbisfile PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib")
+find_library(OGGVORBIS_VORBISENC_LIBRARY NAMES vorbisenc libvorbisenc PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib")
 
 if (APPLE)
     set(OGGVORBIS_OGG_INCLUDE_DIR "/Library/Frameworks/Ogg.framework/Headers/")
