@@ -126,7 +126,11 @@ namespace video
 		};
 
 		EGLint num_configs;
+#if defined( _IRR_COMPILE_WITH_ANDROID_DEVICE_ )
+		u32 steps=0;
+#else
 		u32 steps=5;
+#endif
 		while (!eglChooseConfig(EglDisplay, attribs, &EglConfig, 1, &num_configs) || !num_configs)
 		{
 			switch (steps)
@@ -192,6 +196,7 @@ namespace video
 				return;
 			}
 		}
+#if !defined( _IRR_COMPILE_WITH_ANDROID_DEVICE_ )
 		if (params.AntiAlias && !attribs[17])
 			os::Printer::log("No multisampling.");
 		if (params.WithAlphaChannel && !attribs[7])
@@ -202,6 +207,7 @@ namespace video
 			os::Printer::log("No full depth buffer.");
 		if (params.Bits > attribs[9])
 			os::Printer::log("No full color buffer.");
+#endif
 		#if defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
 	   /* EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is
 		* guaranteed to be accepted by ANativeWindow_setBuffersGeometry().
