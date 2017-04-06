@@ -570,8 +570,8 @@ namespace UserConfigParams
 
     PARAM_PREFIX IntUserConfigParam         m_record_format
         PARAM_DEFAULT(IntUserConfigParam(0, "record_format",
-        &m_recording_group, "Specify the format for record (VP8, VP9, mjpeg,"
-                            " h264)"));
+        &m_recording_group, "Specify the format for record (VP8, VP9, "
+                            "mjpeg)"));
 
     PARAM_PREFIX IntUserConfigParam         m_vp_end_usage
         PARAM_DEFAULT(IntUserConfigParam(0, "vp_end_usage",
