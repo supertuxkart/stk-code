@@ -28,6 +28,7 @@
 
 #include <vector>
 #include <assert.h>
+#include <stdint.h>
 
 #include "utils/aligned_array.hpp"
 
