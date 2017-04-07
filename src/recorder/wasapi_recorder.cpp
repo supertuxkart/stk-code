@@ -36,7 +36,7 @@
     {
         unsigned long p0;
         unsigned int p1, p2, p3, p4, p5, p6, p7, p8, p9, p10;
-        sscanf_s(s, "%08lX-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+        sscanf(s, "%08lX-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
             &p0, &p1, &p2, &p3, &p4, &p5, &p6, &p7, &p8, &p9, &p10);
         GUID g = { p0, (uint16_t)p1, (uint16_t)p2, { (uint8_t)p3, (uint8_t)p4,
             (uint8_t)p5, (uint8_t)p6, (uint8_t)p7, (uint8_t)p8, (uint8_t)p9,
