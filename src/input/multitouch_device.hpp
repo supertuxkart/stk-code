@@ -110,7 +110,7 @@ public:
     void clearButtons();
 
     /** Returns the number of created buttons */
-    unsigned int getButtonsCount() {return m_buttons.size();}
+    unsigned int getButtonsCount() { return (unsigned int)m_buttons.size();}
 
     /** Returns pointer to the selected button */
     MultitouchButton* getButton(unsigned int i) {return m_buttons.at(i);}

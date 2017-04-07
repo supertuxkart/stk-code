@@ -55,7 +55,8 @@ Camera::CameraType   Camera::m_default_type  = Camera::CM_TYPE_NORMAL;
  */
 Camera* Camera::createCamera(AbstractKart* kart)
 {
-    Camera *camera = createCamera(m_all_cameras.size(), m_default_type, kart);
+    Camera *camera = createCamera((int)m_all_cameras.size(), 
+                                   m_default_type, kart      );
     m_all_cameras.push_back(camera);
     return camera;
 }   // createCamera(kart)

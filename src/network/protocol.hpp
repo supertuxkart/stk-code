@@ -128,7 +128,7 @@ public:
     virtual void asynchronousUpdate() = 0;
 
     /// functions to check incoming data easily
-    NetworkString* getNetworkString(int capacity=16);
+    NetworkString* getNetworkString(size_t capacity=16);
     bool checkDataSize(Event* event, unsigned int minimum_size);
     void sendMessageToPeersChangingToken(NetworkString *message,
                                          bool reliable = true);

@@ -817,7 +817,7 @@ float Kart::getSpeedForTurnRadius(float radius) const
 {
     InterpolationArray turn_angle_at_speed = m_kart_properties->getTurnRadius();
     // Convert the turn radius into turn angle
-    for(std::size_t i = 0; i < turn_angle_at_speed.size(); i++)
+    for(int i = 0; i < (int)turn_angle_at_speed.size(); i++)
         turn_angle_at_speed.setY(i, sin(m_kart_properties->getWheelBase() /
             turn_angle_at_speed.getY(i)));
 
@@ -831,7 +831,7 @@ float Kart::getMaxSteerAngle(float speed) const
 {
     InterpolationArray turn_angle_at_speed = m_kart_properties->getTurnRadius();
     // Convert the turn radius into turn angle
-    for(std::size_t i = 0; i < turn_angle_at_speed.size(); i++)
+    for(int i = 0; i < (int)turn_angle_at_speed.size(); i++)
         turn_angle_at_speed.setY(i, sin(m_kart_properties->getWheelBase() /
             turn_angle_at_speed.getY(i)));
 

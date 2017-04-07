@@ -626,7 +626,7 @@ void SoccerWorld::enterRaceOverState()
         std::sort(m_goal_frame.begin(), m_goal_frame.end());
 
         const int mean = std::accumulate(m_goal_frame.begin(),
-            m_goal_frame.end(), 0) / m_goal_frame.size();
+            m_goal_frame.end(), 0) / (int)m_goal_frame.size();
 
         // Prevent overflow if there is a large frame in vector
         double squared_sum = 0;
@@ -668,9 +668,9 @@ void SoccerWorld::enterRaceOverState()
         }
 
         int red_goal = ((int(m_red_scorers.size()) - blue_own_goal) >= 0 ?
-            m_red_scorers.size() - blue_own_goal : 0);
+            (int)m_red_scorers.size() - blue_own_goal : 0);
         int blue_goal = ((int(m_blue_scorers.size()) - red_own_goal) >= 0 ?
-            m_blue_scorers.size() - red_own_goal : 0);
+            (int)m_blue_scorers.size() - red_own_goal : 0);
 
         Log::verbose("Soccer AI profiling", "Red goal: %d, Red own goal: %d,"
             "Blue goal: %d, Blue own goal: %d", red_goal, red_own_goal,

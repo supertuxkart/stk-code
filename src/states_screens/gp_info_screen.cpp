@@ -137,7 +137,7 @@ void GPInfoScreen::beforeAddingWidget()
             race_manager->getMinorMode(),
             race_manager->getNumLocalPlayers());
             
-        int tracks = m_gp.getTrackNames().size();
+        int tracks = (int)m_gp.getTrackNames().size();
         bool continue_visible = saved_gp && saved_gp->getNextTrack() > 0 &&
                                             saved_gp->getNextTrack() < tracks;
 
