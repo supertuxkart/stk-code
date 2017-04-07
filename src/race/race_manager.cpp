@@ -338,7 +338,7 @@ void RaceManager::startNew(bool from_overworld)
                                          ->getUniqueID(),
                                          m_grand_prix.getId(),
                                          m_minor_mode,
-                                         m_player_karts.size());
+                                         (unsigned int)m_player_karts.size());
     
             // Saved GP only in offline mode
             if (m_continue_saved_gp)
@@ -394,7 +394,7 @@ void RaceManager::startNew(bool from_overworld)
 
     // Then add the AI karts (randomly chosen)
     // ----------------------------------------
-    const unsigned int ai_kart_count = m_ai_kart_list.size();
+    const unsigned int ai_kart_count = (unsigned int)m_ai_kart_list.size();
     for(unsigned int i = 0; i < ai_kart_count; i++)
     {
         m_kart_status.push_back(KartStatus(m_ai_kart_list[i], i, -1, -1,
@@ -445,7 +445,7 @@ void RaceManager::startNew(bool from_overworld)
                                              ->getUniqueID(),
                                              m_grand_prix.getId(),
                                              m_minor_mode,
-                                             m_player_karts.size());
+                                             (unsigned int)m_player_karts.size());
             }   // while m_saved_gp
         }   // if m_continue_saved_gp
     }   // if grand prix

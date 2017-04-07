@@ -126,15 +126,16 @@ public:
                                           { return m_replay_file_list.at(n); }
     // ------------------------------------------------------------------------
     const unsigned int getNumReplayFile() const
-                                         { return m_replay_file_list.size(); }
+                           { return (unsigned int)m_replay_file_list.size(); }
     // ------------------------------------------------------------------------
     GhostKart*         getGhostKart(int n)    { return m_ghost_karts.get(n); }
     // ------------------------------------------------------------------------
     const unsigned int getNumGhostKart() const
     {
         assert(m_replay_file_list.size() > 0);
-        return m_replay_file_list.at(m_current_replay_file).m_kart_list.size();
-    }
+        return (unsigned int)m_replay_file_list.at(m_current_replay_file)
+                                               .m_kart_list.size();
+    }   // getNumGhostKart
     // ------------------------------------------------------------------------
     const std::string& getGhostKartName(int n) const
     {

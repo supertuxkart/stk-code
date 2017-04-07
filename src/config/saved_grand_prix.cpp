@@ -172,7 +172,7 @@ void SavedGrandPrix::loadKarts(std::vector<RaceManager::KartStatus> & kart_list)
         else
         {
             // Get correct player
-            for(unsigned int x = kart_list.size()-m_player_karts;
+            for(unsigned int x = (unsigned int)kart_list.size()-m_player_karts;
                 x < kart_list.size(); x++)
             {
                 if(kart_list[x].m_local_player_id == m_karts[i].m_local_player_id)

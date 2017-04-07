@@ -146,7 +146,7 @@ public:
         return m_all_nodes[i];
     }
     // ------------------------------------------------------------------------
-    unsigned int getNumNodes() const             { return m_all_nodes.size(); }
+    unsigned int getNumNodes() const { return (unsigned int)m_all_nodes.size(); }
     // ------------------------------------------------------------------------
     void findRoadSector(const Vec3& XYZ, int *sector,
                         std::vector<int> *all_sectors = NULL,

@@ -122,7 +122,7 @@ void GroupUserConfigParam::writeInner(std::ofstream& stream, int level) const
 {
     std::string tab(level * 4,' ');
     for(int i = 0; i < level; i++) tab =+ "    ";
-    const int children_amount = m_attributes.size();
+    const int  children_amount = (int)m_attributes.size();
 
     stream << "    " << tab.c_str() << "<" << m_param_name.c_str() << "\n";
 
@@ -144,7 +144,7 @@ void GroupUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
         return;
     }
 
-    const int attributes_amount = m_attributes.size();
+    const int attributes_amount = (int)m_attributes.size();
     for (int n=0; n<attributes_amount; n++)
     {
         m_attributes[n]->findYourDataInAnAttributeOf(child);
@@ -246,7 +246,7 @@ ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
 template<typename T, typename U>
 void ListUserConfigParam<T, U>::write(std::ofstream& stream) const
 {
-    const int elts_amount = m_elements.size();
+    const int elts_amount = (int)m_elements.size();
 
     // comment
     if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str();
@@ -728,7 +728,7 @@ bool UserConfig::loadConfig()
     UserConfigParams::m_saved_grand_prix_list.clearAndDeleteAll();
     std::vector<XMLNode*> saved_gps;
     root->getNodes("SavedGP", saved_gps);
-    const int gp_amount = saved_gps.size();
+    const int gp_amount = (int)saved_gps.size();
     for (int i=0; i<gp_amount; i++)
     {
         UserConfigParams::m_saved_grand_prix_list.push_back(

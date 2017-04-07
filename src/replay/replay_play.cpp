@@ -200,7 +200,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay)
     assert(m_replay_file_list.size() > 0);
     // Force to use custom replay file immediately
     if (custom_replay)
-        m_current_replay_file = m_replay_file_list.size() - 1;
+        m_current_replay_file = (unsigned int)m_replay_file_list.size() - 1;
 
     return true;
 

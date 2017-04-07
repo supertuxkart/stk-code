@@ -51,7 +51,7 @@ public:
     FT_Face getFace(unsigned int i) const;
     // ------------------------------------------------------------------------
     /** Return the total TTF files loaded. */
-    unsigned int getTotalFaces() const               { return m_faces.size(); }
+    unsigned int getTotalFaces() const { return (unsigned int)m_faces.size(); }
 
 };   // FaceTTF
 

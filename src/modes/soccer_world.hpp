@@ -340,8 +340,8 @@ public:
     // ------------------------------------------------------------------------
     int getScore(SoccerTeam team) const
     {
-        return (team == SOCCER_TEAM_BLUE ? m_blue_scorers.size() :
-            m_red_scorers.size());
+        return (int)(team == SOCCER_TEAM_BLUE ? m_blue_scorers.size()
+                                              : m_red_scorers.size());
     }
     // ------------------------------------------------------------------------
     const std::vector<ScorerData>& getScorers(SoccerTeam team) const
