@@ -95,7 +95,7 @@ namespace
     {
         v *= (1.0f/255.0f);
         if( v <= 0.04045f )
-            v = v * (1.0f/12.92);
+            v = v * (1.0f/12.92f);
         else
             v = pow( ( v + 0.055f ) * (1.0f/1.055f), 2.4f );
         return v;
@@ -233,7 +233,8 @@ namespace
  *  \param sh_rgba The 6 cubemap faces (sRGB byte textures)
  *  \param edge_size Size of the cubemap face
  */
-void SphericalHarmonics::generateSphericalHarmonics(unsigned char *sh_rgba[6], size_t edge_size)
+void SphericalHarmonics::generateSphericalHarmonics(unsigned char *sh_rgba[6],
+                                                    unsigned int edge_size)
 {
 
 #if SIMD_SSE2_SUPPORT
@@ -644,7 +645,7 @@ void SphericalHarmonics::printCoeff() {
 *  \param Yml The sphericals harmonics functions values
 *  \param[out] output The environment map texels values
 */    
-void SphericalHarmonics::unprojectSH(size_t width, size_t height,
+void SphericalHarmonics::unprojectSH(unsigned int width, unsigned int height,
                                      float *Y00[], float *Y1minus1[], float *Y10[],
                                      float *Y11[], float *Y2minus2[], float *Y2minus1[],
                                      float *Y20[], float *Y21[], float *Y22[],

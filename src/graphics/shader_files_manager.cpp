@@ -191,7 +191,7 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
     Log::info("ShaderFilesManager", "Compiling shader : %s", file.c_str());
     const std::string &source  = code.str();
     char const *source_pointer = source.c_str();
-    int len                    = source.size();
+    int len                    = (int)source.size();
     glShaderSource(id, 1, &source_pointer, &len);
     glCompileShader(id);
 

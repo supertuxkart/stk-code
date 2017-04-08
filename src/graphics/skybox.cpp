@@ -203,7 +203,7 @@ void Skybox::generateSpecularCubemap()
 {
     glGenTextures(1, &m_specular_probe);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_specular_probe);
-    size_t cubemap_size = 256;
+    unsigned int cubemap_size = 256;
     for (int i = 0; i < 6; i++)
     {
 #if !defined(USE_GLES2)

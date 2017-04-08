@@ -197,7 +197,7 @@ void ShaderBasedRenderer::uploadLightingData() const
 
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
-                                                    size_t width, size_t height)
+                                                    unsigned int width, unsigned int height)
 {
     m_current_screen_size = core::vector2df((float)width, (float)height);
     m_shadow_matrices.computeMatrixesAndCameras(camnode, width, height,
@@ -665,8 +665,8 @@ ShaderBasedRenderer::~ShaderBasedRenderer()
 void ShaderBasedRenderer::onLoadWorld()
 {
     const core::recti &viewport = Camera::getCamera(0)->getViewport();
-    size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
-    size_t height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
+    unsigned int width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
+    unsigned int height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
     RTT* rtts = new RTT(width, height, CVS->isDefferedEnabled() ?
                         UserConfigParams::m_scale_rtts_factor : 1.0f);
     setRTT(rtts);

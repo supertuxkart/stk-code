@@ -108,7 +108,7 @@ namespace Scripting
         // Read the entire file
         std::string script;
         script.resize(len);
-        int c = fread(&script[0], len, 1, f);
+        size_t c = fread(&script[0], len, 1, f);
         fclose(f);
         if (c != 1)
         {

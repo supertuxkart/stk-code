@@ -373,8 +373,8 @@ void TrackObject::onWorldReady()
             // There are arguments to pass to the function
             // TODO: For the moment we only support string arguments
             // TODO: this parsing could be improved
-            unsigned first = m_visibility_condition.find("(");
-            unsigned last = m_visibility_condition.find_last_of(")");
+            unsigned first = (unsigned)m_visibility_condition.find("(");
+            unsigned last = (unsigned)m_visibility_condition.find_last_of(")");
             std::string fn_name = m_visibility_condition.substr(0, first);
             std::string str_arguments = m_visibility_condition.substr(first + 1, last - first - 1);
             arguments = StringUtils::split(str_arguments, ',');
@@ -403,7 +403,7 @@ void TrackObject::onWorldReady()
                 {
                     ctx->SetArgObject(i, &arguments[i]);
                 }
-                ctx->SetArgObject(arguments.size(), self);
+                ctx->SetArgObject((int)arguments.size(), self);
             },
             [&](asIScriptContext* ctx) { result = ctx->GetReturnByte(); });
 

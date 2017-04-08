@@ -25,7 +25,9 @@
 #include "graphics/materials.hpp"
 #include "utils/log.hpp"
 
-static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint internalFormat, GLint format, GLint type, unsigned mipmaplevel = 1)
+static GLuint generateRTT3D(GLenum target, unsigned int w, unsigned int h, 
+                            unsigned int d, GLint internalFormat, GLint format,
+                            GLint type, unsigned mipmaplevel = 1)
 {
     GLuint result;
     glGenTextures(1, &result);
@@ -49,10 +51,10 @@ static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, G
     return result;
 }
 
-RTT::RTT(size_t width, size_t height, float rtt_scale)
+RTT::RTT(unsigned int width, unsigned int height, float rtt_scale)
 {
-    m_width = width * rtt_scale;
-    m_height = height  * rtt_scale;
+    m_width = unsigned int(width * rtt_scale);
+    m_height = unsigned int(height  * rtt_scale);
     m_shadow_FBO = NULL;
     m_RH_FBO = NULL;
     m_RSM = NULL;

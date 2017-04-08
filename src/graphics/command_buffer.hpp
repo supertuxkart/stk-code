@@ -74,13 +74,13 @@ template<typename T>
 void FillInstances_impl(const InstanceList& instance_list,
                         T * instance_buffer,
                         DrawElementsIndirectCommand *command_buffer,
-                        size_t &instance_buffer_offset,
-                        size_t &command_buffer_offset,
-                        size_t &poly_count)
+                        unsigned int &instance_buffer_offset,
+                        unsigned int &command_buffer_offset,
+                        unsigned int&poly_count)
 {
     // Should never be empty
     GLMesh *mesh = instance_list.m_mesh;
-    size_t initial_offset = instance_buffer_offset;
+    unsigned int initial_offset = instance_buffer_offset;
 
     for (unsigned i = 0; i < instance_list.m_instance_settings.size(); i++)
     {
@@ -92,7 +92,7 @@ void FillInstances_impl(const InstanceList& instance_list,
     DrawElementsIndirectCommand &CurrentCommand = command_buffer[command_buffer_offset++];
     CurrentCommand.baseVertex = mesh->vaoBaseVertex;
     CurrentCommand.count = mesh->IndexCount;
-    CurrentCommand.firstIndex = mesh->vaoOffset / 2;
+    CurrentCommand.firstIndex = GLuint(mesh->vaoOffset / 2);
     CurrentCommand.baseInstance = initial_offset;
     CurrentCommand.instanceCount = instance_buffer_offset - initial_offset;
     
@@ -153,12 +153,12 @@ protected:
     DrawElementsIndirectCommand *m_draw_indirect_cmd;
     
     std::array<std::vector<GLMesh *>, N> m_meshes;
-    std::array<size_t,N> m_offset;
-    std::array<size_t,N> m_size;
+    std::array<unsigned int,N> m_offset;
+    std::array<unsigned int,N> m_size;
     
-    size_t m_poly_count;
-    size_t m_instance_buffer_offset;
-    size_t m_command_buffer_offset;
+    unsigned int m_poly_count;
+    unsigned int m_instance_buffer_offset;
+    unsigned int m_command_buffer_offset;
 
     void clearMeshes();
     void mapIndirectBuffer();
@@ -238,7 +238,7 @@ public:
     CommandBuffer();
     virtual ~CommandBuffer() { glDeleteBuffers(1, &m_draw_indirect_cmd_id); }
 
-    inline size_t getPolyCount() const {return m_poly_count;}
+    inline unsigned int getPolyCount() const {return m_poly_count;}
 
     inline void bind() const
     {

@@ -158,7 +158,7 @@ void STKMeshSceneNode::drawGlow(const GLMesh &mesh)
 
     GLenum ptype = mesh.PrimitiveType;
     GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
+    unsigned int count = mesh.IndexCount;
     ColorizeShader::getInstance()->setUniforms(AbsoluteTransformation, video::SColorf(glowcolor.getRed() / 255.f, glowcolor.getGreen() / 255.f, glowcolor.getBlue() / 255.f));
     glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
@@ -352,7 +352,7 @@ void STKMeshSceneNode::render()
             GLMesh &mesh = GLmeshes[i];
             GLenum ptype = mesh.PrimitiveType;
             GLenum itype = mesh.IndexType;
-            size_t count = mesh.IndexCount;
+            unsigned int count = mesh.IndexCount;
 
 #if !defined(USE_GLES2)
             if (CVS->isAZDOEnabled())
@@ -392,7 +392,7 @@ void STKMeshSceneNode::render()
             GLMesh &mesh = GLmeshes[i];
             GLenum ptype = mesh.PrimitiveType;
             GLenum itype = mesh.IndexType;
-            size_t count = mesh.IndexCount;
+            unsigned int count = mesh.IndexCount;
 
 #if !defined(USE_GLES2)
             if (CVS->isAZDOEnabled())
@@ -484,7 +484,7 @@ void STKMeshSceneNode::render()
                     irr_driver->increaseObjectCount();
                     GLenum ptype = mesh.PrimitiveType;
                     GLenum itype = mesh.IndexType;
-                    size_t count = mesh.IndexCount;
+                    unsigned int count = mesh.IndexCount;
 
                     // This function is only called once per frame - thus no need for setters.
                     const float fogmax = track->getFogMax();
@@ -531,7 +531,7 @@ void STKMeshSceneNode::render()
                     GLMesh &mesh = GLmeshes[i];
                     GLenum ptype = mesh.PrimitiveType;
                     GLenum itype = mesh.IndexType;
-                    size_t count = mesh.IndexCount;
+                    unsigned int count = mesh.IndexCount;
 
 #if !defined(USE_GLES2)
                     if (CVS->isAZDOEnabled())

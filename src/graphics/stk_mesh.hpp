@@ -52,11 +52,11 @@ struct GLMesh
     video::ITexture *textures[8];
     GLenum PrimitiveType;
     GLenum IndexType;
-    size_t IndexCount;
-    size_t Stride;
+    unsigned int IndexCount;
+    unsigned int Stride;
     core::vector2df texture_trans;
-    size_t vaoBaseVertex;
-    size_t vaoOffset;
+    unsigned int vaoBaseVertex;
+    intptr_t vaoOffset;
     video::E_VERTEX_TYPE VAOType;
     uint64_t TextureHandles[8];
     scene::IMeshBuffer *mb;
@@ -72,7 +72,7 @@ GLMesh               allocateMeshBuffer(scene::IMeshBuffer* mb,
                                         const std::string& debug_name,
                                         RenderInfo* render_info);
 void                 fillLocalBuffer(GLMesh &, scene::IMeshBuffer* mb);
-video::E_VERTEX_TYPE getVTXTYPEFromStride(size_t stride);
+video::E_VERTEX_TYPE getVTXTYPEFromStride(unsigned int stride);
 GLuint               createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type);
 core::matrix4        computeMVP(const core::matrix4 &ModelViewProjectionMatrix);
 bool                 isObject(video::E_MATERIAL_TYPE type);

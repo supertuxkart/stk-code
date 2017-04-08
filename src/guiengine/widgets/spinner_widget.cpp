@@ -318,7 +318,7 @@ void SpinnerWidget::addLabel(stringw label)
 {
     m_labels.push_back(label);
     m_min = 0;
-    m_max = m_labels.size()-1;
+    m_max = (int)m_labels.size()-1;
 
     if (m_element != NULL) setValue(0);
 }

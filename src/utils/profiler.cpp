@@ -171,7 +171,7 @@ void Profiler::pushCpuMarker(const char* name, const video::SColor& color)
     ThreadInfo& ti = getThreadInfo();
     MarkerStack& markers_stack = ti.markers_stack[m_write_id];
     double  start = getTimeMilliseconds() - m_time_last_sync;
-    size_t  layer = markers_stack.size();
+    unsigned int layer = (unsigned int)markers_stack.size();
 
     // Add to the stack of current markers
     markers_stack.push(Marker(start, -1.0, name, color, layer));

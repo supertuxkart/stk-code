@@ -998,7 +998,7 @@ void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo,
 // ----------------------------------------------------------------------------
 void PostProcessing::renderGaussian6BlurLayer(const FrameBuffer &in_fbo,
                                               const FrameBuffer &scalar_fbo,
-                                              size_t layer, float sigma_h,
+                                              unsigned int layer, float sigma_h,
                                               float sigma_v) const
 {
 #if !defined(USE_GLES2)

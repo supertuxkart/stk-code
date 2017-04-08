@@ -83,7 +83,9 @@ VAOManager::~VAOManager()
 }
 
 static void
-resizeBufferIfNecessary(size_t &lastIndex, size_t newLastIndex, size_t bufferSize, size_t stride, GLenum type, GLuint &id, void *&Pointer)
+resizeBufferIfNecessary(unsigned int &lastIndex, unsigned int  newLastIndex,
+                        unsigned int bufferSize, unsigned int stride, GLenum type,
+                        GLuint &id, void *&Pointer)
 {
     if (newLastIndex * stride >= bufferSize)
     {
@@ -116,11 +118,14 @@ resizeBufferIfNecessary(size_t &lastIndex, size_t newLastIndex, size_t bufferSiz
     lastIndex = newLastIndex;
 }
 
-void VAOManager::regenerateBuffer(enum VTXTYPE tp, size_t newlastvertex, size_t newlastindex)
+void VAOManager::regenerateBuffer(enum VTXTYPE tp, unsigned int newlastvertex,
+                                  unsigned int newlastindex)
 {
     glBindVertexArray(0);
-    resizeBufferIfNecessary(last_vertex[tp], newlastvertex, RealVBOSize[tp], getVertexPitch(tp), GL_ARRAY_BUFFER, vbo[tp], VBOPtr[tp]);
-    resizeBufferIfNecessary(last_index[tp], newlastindex, RealIBOSize[tp], sizeof(u16), GL_ELEMENT_ARRAY_BUFFER, ibo[tp], IBOPtr[tp]);
+    resizeBufferIfNecessary(last_vertex[tp], newlastvertex, RealVBOSize[tp],
+                            getVertexPitch(tp), GL_ARRAY_BUFFER, vbo[tp], VBOPtr[tp]);
+    resizeBufferIfNecessary(last_index[tp], newlastindex, RealIBOSize[tp],
+                            sizeof(u16), GL_ELEMENT_ARRAY_BUFFER, ibo[tp], IBOPtr[tp]);
 }
 
 void VAOManager::regenerateVAO(enum VTXTYPE tp)
@@ -265,7 +270,7 @@ void VAOManager::regenerateInstancedVAO()
 
 }
 
-size_t VAOManager::getVertexPitch(enum VTXTYPE tp) const
+unsigned int VAOManager::getVertexPitch(enum VTXTYPE tp) const
 {
     switch (tp)
     {
@@ -318,8 +323,8 @@ irr::video::E_VERTEX_TYPE VAOManager::getVertexType(enum VTXTYPE tp)
 
 void VAOManager::append(scene::IMeshBuffer *mb, VTXTYPE tp)
 {
-    size_t old_vtx_cnt = last_vertex[tp];
-    size_t old_idx_cnt = last_index[tp];
+    unsigned int old_vtx_cnt = last_vertex[tp];
+    unsigned int old_idx_cnt = last_index[tp];
 
     regenerateBuffer(tp, old_vtx_cnt + mb->getVertexCount(), old_idx_cnt + mb->getIndexCount());
 #if !defined(USE_GLES2)

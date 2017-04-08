@@ -243,7 +243,7 @@ public:
     /** If *this < other. */
     bool operator< (const Version &other) const
     {
-        unsigned int min_n = std::min(m_version.size(), other.m_version.size());
+        unsigned int min_n = (unsigned int)std::min(m_version.size(), other.m_version.size());
         for (unsigned int i = 0; i<min_n; i++)
         {
             if (m_version[i] > other.m_version[i]) return false;
@@ -258,7 +258,7 @@ public:
     /** If *this <= other. */
     bool operator<= (const Version &other) const
     {
-        unsigned int min_n = std::min(m_version.size(), other.m_version.size());
+        unsigned int min_n = (unsigned int)std::min(m_version.size(), other.m_version.size());
         for (unsigned int i = 0; i<min_n; i++)
         {
             if (m_version[i] > other.m_version[i]) return false;

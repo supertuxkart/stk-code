@@ -233,7 +233,7 @@ void TrackManager::removeTrack(const std::string &ident)
     if (it == m_tracks.end())
         Log::fatal("TrackManager", "Cannot find track '%s' in map!!", ident.c_str());
 
-    int index = it - m_tracks.begin();
+    int index = int(it - m_tracks.begin());
 
     // Remove the track from all groups it belongs to
     Group2Indices &group_2_indices =

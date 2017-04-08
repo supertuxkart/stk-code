@@ -226,8 +226,8 @@ unsigned GPUTimer::elapsedTimeus()
 
 FrameBuffer::FrameBuffer() {}
 
-FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h,
-                         bool layered)
+FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, unsigned int w, 
+                         unsigned int h, bool layered)
            : fbolayer(0), RenderTargets(RTTs), DepthTexture(0), 
              width(w), height(h)
 {
@@ -249,8 +249,8 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h,
     assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
 }
 
-FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w,
-                         size_t h, bool layered) 
+FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, unsigned int w,
+                         unsigned int h, bool layered) 
            : fbolayer(0), RenderTargets(RTTs), DepthTexture(DS), width(w), 
              height(h)
 {

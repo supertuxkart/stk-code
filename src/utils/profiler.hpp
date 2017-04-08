@@ -136,12 +136,13 @@ private:
     {
         double  start;  // Times of start and end, in milliseconds,
         double  end;    // relatively to the time of last synchronization
-        size_t  layer;
+        unsigned int layer;
 
         std::string     name;
         video::SColor   color;
 
-        Marker(double start, double end, const char* name="N/A", const video::SColor& color=video::SColor(), size_t layer=0)
+        Marker(double start, double end, const char* name="N/A", 
+               const video::SColor& color=video::SColor(), unsigned int layer=0)
             : start(start), end(end), layer(layer), name(name), color(color)
         {
         }

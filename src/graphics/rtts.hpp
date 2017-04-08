@@ -144,11 +144,11 @@ enum TypeRTT : unsigned int
 class RTT
 {
 public:
-    RTT(size_t width, size_t height, float rtt_scale = 1.0f);
+    RTT(unsigned int width, unsigned int height, float rtt_scale = 1.0f);
     ~RTT();
     
-    size_t getWidth () const { return m_width ; }
-    size_t getHeight() const { return m_height; }
+    unsigned int getWidth () const { return m_width ; }
+    unsigned int getHeight() const { return m_height; }
 
     FrameBuffer &getShadowFrameBuffer() { return *m_shadow_FBO; }
     FrameBuffer &getRadianceHintFrameBuffer() { return *m_RH_FBO; }
@@ -165,8 +165,8 @@ private:
     std::vector<uint64_t> m_prefilled_handles;
     unsigned DepthStencilTexture;
 
-    size_t m_width;
-    size_t m_height;
+    unsigned int m_width;
+    unsigned int m_height;
 
     unsigned shadowColorTex, shadowDepthTex;
     unsigned RSM_Color, RSM_Normal, RSM_Depth;

@@ -63,7 +63,7 @@ STKTexture::STKTexture(const std::string& path, TexConfig* tc, bool no_upload)
 }   // STKTexture
 
 // ----------------------------------------------------------------------------
-STKTexture::STKTexture(uint8_t* data, const std::string& name, size_t size,
+STKTexture::STKTexture(uint8_t* data, const std::string& name, unsigned int size,
                        bool single_channel, bool delete_ttl)
           : video::ITexture(name.c_str()), m_texture_handle(0),
             m_single_channel(single_channel), m_tex_config(NULL),

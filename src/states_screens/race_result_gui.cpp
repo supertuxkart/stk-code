@@ -135,7 +135,7 @@ void RaceResultGUI::init()
     else
     {
         m_start_track = 0;
-        m_end_track = tracks.size();
+        m_end_track = (int)tracks.size();
     }
 }   // init
 
@@ -1340,7 +1340,7 @@ void RaceResultGUI::backToLobby()
     // ----------------------------------------------------------------------------
     void RaceResultGUI::cleanupGPProgress()
     {
-        for (size_t i = 0; i < m_gp_progress_widgets.size(); i++)
+        for (unsigned int i = 0; i < m_gp_progress_widgets.size(); i++)
             m_widgets.remove(m_gp_progress_widgets.get(i));
         m_gp_progress_widgets.clearAndDeleteAll();
     }   // cleanupGPProgress

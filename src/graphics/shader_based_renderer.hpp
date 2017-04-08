@@ -52,7 +52,7 @@ private:
     /** Static glowing things are loaded once per track.
      * Glowing items can appear ordisappear each frame */
     std::vector<GlowData>       m_glowing;
-    size_t                      m_nb_static_glowing;
+    unsigned int                m_nb_static_glowing;
 
     void setOverrideMaterial();
     
@@ -67,7 +67,7 @@ private:
     void uploadLightingData() const;
 
     void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode,
-                                   size_t width, size_t height);
+                                   unsigned int width, unsigned int height);
     
     void resetShadowCamNodes(){m_shadow_matrices.resetShadowCamNodes();}
     
