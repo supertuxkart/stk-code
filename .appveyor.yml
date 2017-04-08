@@ -1,5 +1,6 @@
 environment:
     DEPS_DIR: c:\\projects\dependencies
+    DEPS_BRANCH: master
     ASSETS_DIR: c:\\projects\stk-assets
     APPVEYOR_CACHE_ENTRY_ZIP_ARGS: -t7z -m0=lzma2 -mx=9
     IRC_NOTIFY_SCRIPT: c:\\projects\stk-code\tools\appveyor-irc-notify.py
@@ -11,7 +12,7 @@ shallow_clone: true
 platform:
     # - x86
     - x64
-      
+
 configuration:
     - Debug
     - Release
@@ -27,7 +28,7 @@ install:
     - ps: >-
         If(!(Test-Path "$env:DEPS_DIR")) {
             Write-Host "Downloading dependencies";
-            Start-Process -FilePath "git" -ArgumentList "clone --branch adv_recording_64 --single-branch --depth 1 https://github.com/supertuxkart/dependencies.git $env:DEPS_DIR" -Wait;
+            Start-Process -FilePath "git" -ArgumentList "clone --branch $env:DEPS_BRANCH --single-branch --depth 1 https://github.com/supertuxkart/dependencies.git $env:DEPS_DIR" -Wait;
         }
         Else {
             Write-Host "Updating dependencies";
