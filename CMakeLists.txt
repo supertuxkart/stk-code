@@ -429,7 +429,7 @@ target_link_libraries(supertuxkart
 
 if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
-        target_link_libraries(supertuxkart ${OPENGL_LIBRARIES} glew graphics_utils)
+        target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} glew graphics_utils)
     else()
         target_link_libraries(supertuxkart EGL GLESv2)
     endif()
