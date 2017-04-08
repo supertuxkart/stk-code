@@ -1,5 +1,5 @@
 environment:
-    DEPS_DIR: c:\\projects\dependencies
+    DEPS_DIR: c:\\projects\stk-code\dependencies
     ASSETS_DIR: c:\\projects\stk-assets
     APPVEYOR_CACHE_ENTRY_ZIP_ARGS: -t7z -m0=lzma2 -mx=9
     IRC_NOTIFY_SCRIPT: c:\\projects\stk-code\tools\appveyor-irc-notify.py
