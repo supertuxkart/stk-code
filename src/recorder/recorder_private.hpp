@@ -6,6 +6,14 @@
 
 #include <string>
 
+extern ogrFucReadPixels ogrReadPixels;
+extern ogrFucGenBuffers ogrGenBuffers;
+extern ogrFucBindBuffer ogrBindBuffer;
+extern ogrFucBufferData ogrBufferData;
+extern ogrFucDeleteBuffers ogrDeleteBuffers;
+extern ogrFucMapBuffer ogrMapBuffer;
+extern ogrFucUnmapBuffer ogrUnmapBuffer;
+
 RecorderConfig* getConfig();
 const std::string& getSavedName();
 void setCapturing(bool val);

@@ -2,6 +2,8 @@
 #ifndef HEADER_OPENGLRECORDER_H
 #define HEADER_OPENGLRECORDER_H
 
+#include <stddef.h>
+
 /**
  * \mainpage libopenglrecorder
  *
@@ -160,6 +162,16 @@ struct RecorderConfig
     unsigned int m_record_jpg_quality;
 };
 
+/* List of opengl function used by libopenglrecorder: */
+typedef void(*ogrFucReadPixels)(int, int, int, int, unsigned int, unsigned int,
+    void*);
+typedef void(*ogrFucGenBuffers)(int, unsigned int*);
+typedef void(*ogrFucBindBuffer)(unsigned int, unsigned int);
+typedef void(*ogrFucBufferData)(unsigned int, ptrdiff_t, const void*, unsigned int);
+typedef void(*ogrFucDeleteBuffers)(int, const unsigned int*);
+typedef void*(*ogrFucMapBuffer)(unsigned int, unsigned int);
+typedef void(*ogrFucUnmapBuffer)(unsigned int);
+
 #ifdef  __cplusplus
 extern "C"
 {
@@ -214,6 +226,16 @@ void ogrRegIntCallback(CallBackType, IntCallback, void*);
  * Return 1 if recording is happening in libopenglrecorder, 0 otherwise.
  */
 int ogrCapturing(void);
+/**
+ * Set opengl function for read pixels (always required).
+ */
+void ogrRegReadPixelsFunction(ogrFucReadPixels);
+/**
+ * Set opengl functions for using PBOs (required if triple buffering is used).
+ */
+void ogrRegPBOFunctions(ogrFucGenBuffers, ogrFucBindBuffer, ogrFucBufferData,
+                        ogrFucDeleteBuffers, ogrFucMapBuffer,
+                        ogrFucUnmapBuffer);
 #ifdef  __cplusplus
 }
 #endif

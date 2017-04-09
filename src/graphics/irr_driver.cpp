@@ -623,6 +623,12 @@ void IrrDriver::initDevice()
             "RecorderConfig is invalid, use the default one.");
     }
 
+    ogrRegReadPixelsFunction((ogrFucReadPixels)glReadPixels);
+    ogrRegPBOFunctions((ogrFucGenBuffers)glGenBuffers,
+        (ogrFucBindBuffer)glBindBuffer, (ogrFucBufferData)glBufferData,
+        (ogrFucDeleteBuffers)glDeleteBuffers, (ogrFucMapBuffer)glMapBuffer,
+        (ogrFucUnmapBuffer)glUnmapBuffer);
+
     ogrRegGeneralCallback(OGR_CBT_START_RECORDING,
         [] (void* user_data) { MessageQueue::add
         (MessageQueue::MT_GENERIC, _("Video recording started.")); }, NULL);

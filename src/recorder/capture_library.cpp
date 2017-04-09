@@ -8,11 +8,6 @@
 #include "vpx_encoder.hpp"
 #include "wasapi_recorder.hpp"
 
-extern "C"
-{
-#include <GL/glew.h>
-}
-
 const uint32_t E_GL_PIXEL_PACK_BUFFER = 0x88EB;
 const uint32_t E_GL_STREAM_READ = 0x88E1;
 const uint32_t E_GL_READ_ONLY = 0x88B8;
@@ -30,14 +25,14 @@ CaptureLibrary::CaptureLibrary(RecorderConfig* rc)
     m_decompress_handle = tjInitDecompress();
     if (m_recorder_cfg->m_triple_buffering > 0)
     {
-        glGenBuffers(3, m_pbo);
+        ogrGenBuffers(3, m_pbo);
         for (int i = 0; i < 3; i++)
         {
-            glBindBuffer(GL_PIXEL_PACK_BUFFER, m_pbo[i]);
-            glBufferData(GL_PIXEL_PACK_BUFFER, m_recorder_cfg->m_width *
-                m_recorder_cfg->m_height * 4, NULL, GL_STREAM_READ);
+            ogrBindBuffer(E_GL_PIXEL_PACK_BUFFER, m_pbo[i]);
+            ogrBufferData(E_GL_PIXEL_PACK_BUFFER, m_recorder_cfg->m_width *
+                m_recorder_cfg->m_height * 4, NULL, E_GL_STREAM_READ);
         }
-        glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+        ogrBindBuffer(E_GL_PIXEL_PACK_BUFFER, 0);
     }
     m_capture_thread = std::thread(CaptureLibrary::captureConversion, this);
 }   // CaptureLibrary
@@ -52,7 +47,7 @@ CaptureLibrary::~CaptureLibrary()
     tjDestroy(m_decompress_handle);
     if (m_recorder_cfg->m_triple_buffering > 0)
     {
-        glDeleteBuffers(3, m_pbo);
+        ogrDeleteBuffers(3, m_pbo);
     }
 }   // ~CaptureLibrary
 
@@ -176,15 +171,16 @@ void CaptureLibrary::capture()
             if (use_pbo)
             {
                 pbo_read = m_pbo_use % 3;
-                glBindBuffer(GL_PIXEL_PACK_BUFFER, m_pbo[pbo_read]);
-                void* ptr = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+                ogrBindBuffer(E_GL_PIXEL_PACK_BUFFER, m_pbo[pbo_read]);
+                void* ptr = ogrMapBuffer(E_GL_PIXEL_PACK_BUFFER,
+                    E_GL_READ_ONLY);
                 memcpy(fbi, ptr, size);
-                glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
+                ogrUnmapBuffer(E_GL_PIXEL_PACK_BUFFER);
             }
             else
             {
-                glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE,
-                    fbi);
+                ogrReadPixels(0, 0, width, height, E_GL_RGBA,
+                    E_GL_UNSIGNED_BYTE, fbi);
             }
             addFrameBufferImage(fbi, frame_count);
         }
@@ -194,9 +190,9 @@ void CaptureLibrary::capture()
         return;
 
     assert(pbo_read == -1 || pbo_use == pbo_read);
-    glBindBuffer(GL_PIXEL_PACK_BUFFER, m_pbo[pbo_use]);
-    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+    ogrBindBuffer(E_GL_PIXEL_PACK_BUFFER, m_pbo[pbo_use]);
+    ogrReadPixels(0, 0, width, height, E_GL_RGBA, E_GL_UNSIGNED_BYTE, NULL);
+    ogrBindBuffer(E_GL_PIXEL_PACK_BUFFER, 0);
 }   // capture
 
 // ----------------------------------------------------------------------------

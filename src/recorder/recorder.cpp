@@ -9,6 +9,14 @@
 #include <cstring>
 
 // ============================================================================
+ogrFucReadPixels ogrReadPixels = NULL;
+ogrFucGenBuffers ogrGenBuffers = NULL;
+ogrFucBindBuffer ogrBindBuffer = NULL;
+ogrFucBufferData ogrBufferData = NULL;
+ogrFucDeleteBuffers ogrDeleteBuffers = NULL;
+ogrFucMapBuffer ogrMapBuffer = NULL;
+ogrFucUnmapBuffer ogrUnmapBuffer = NULL;
+// ============================================================================
 std::unique_ptr<RecorderConfig> g_recorder_config(nullptr);
 // ============================================================================
 std::unique_ptr<CaptureLibrary> g_capture_library(nullptr);
@@ -105,7 +113,8 @@ const std::string& getSavedName()
 // ----------------------------------------------------------------------------
 void ogrPrepareCapture(void)
 {
-    assert(g_recorder_config.get() != nullptr && !g_saved_name.empty());
+    assert(g_recorder_config.get() != nullptr && !g_saved_name.empty() &&
+        ogrReadPixels != NULL);
     if (g_capture_library.get() == nullptr)
     {
         assert(g_recorder_config.get() != nullptr);
@@ -242,6 +251,35 @@ int ogrCapturing(void)
 {
     return g_capturing.load() ? 1 : 0;
 }   // ogrCapturing
+
+// ----------------------------------------------------------------------------
+void ogrRegReadPixelsFunction(ogrFucReadPixels read_pixels)
+{
+    assert(read_pixels != NULL);
+    ogrReadPixels = read_pixels;
+}   // ogrRegReadPixelsFunction
+
+// ----------------------------------------------------------------------------
+void ogrRegPBOFunctions(ogrFucGenBuffers gen_buffers,
+                        ogrFucBindBuffer bind_buffer,
+                        ogrFucBufferData buffer_data,
+                        ogrFucDeleteBuffers delete_buffers,
+                        ogrFucMapBuffer map_buffer,
+                        ogrFucUnmapBuffer unmap_buffer)
+{
+    assert(gen_buffers != NULL);
+    ogrGenBuffers = gen_buffers;
+    assert(bind_buffer != NULL);
+    ogrBindBuffer = bind_buffer;
+    assert(buffer_data != NULL);
+    ogrBufferData = buffer_data;
+    assert(delete_buffers != NULL);
+    ogrDeleteBuffers = delete_buffers;
+    assert(map_buffer != NULL);
+    ogrMapBuffer = map_buffer;
+    assert(unmap_buffer != NULL);
+    ogrUnmapBuffer = unmap_buffer;
+}   // ogrRegPBOFunctions
 
 // ----------------------------------------------------------------------------
 void setCapturing(bool val)

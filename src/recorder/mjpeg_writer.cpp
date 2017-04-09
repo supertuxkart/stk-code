@@ -20,8 +20,6 @@
 #include "capture_library.hpp"
 #include "recorder_private.hpp"
 
-#include <turbojpeg.h>
-
 namespace Recorder
 {
     // ------------------------------------------------------------------------
