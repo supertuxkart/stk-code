@@ -20,12 +20,13 @@
 #ifndef HEADER_PULSEAUDIO_RECORD_HPP
 #define HEADER_PULSEAUDIO_RECORD_HPP
 
+class CaptureLibrary;
 namespace Recorder
 {
 #ifdef ENABLE_REC_SOUND
-    void* audioRecorder(void *obj);
+    void audioRecorder(CaptureLibrary* cl);
 #else
-    inline void* audioRecorder(void *obj) { return NULL; }
+    inline void audioRecorder(CaptureLibrary* cl) {}
 #endif
 };
 

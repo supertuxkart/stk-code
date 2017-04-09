@@ -17,12 +17,9 @@
 
 #ifdef ENABLE_RECORDER
 
-#include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
-#include "recorder/recorder_common.hpp"
-#include "utils/log.hpp"
-#include "utils/string_utils.hpp"
+#include "recorder_private.hpp"
 
+#include <cstring>
 #include <list>
 #include <mkvmuxer/mkvmuxer.h>
 #include <mkvmuxer/mkvwriter.h>
@@ -35,28 +32,20 @@ namespace Recorder
     // ------------------------------------------------------------------------
     std::string writeMKV(const std::string& video, const std::string& audio)
     {
-        time_t rawtime;
-        time(&rawtime);
-        tm* timeInfo = localtime(&rawtime);
-        char time_buffer[256];
-        sprintf(time_buffer, "%i.%02i.%02i_%02i.%02i.%02i",
-            timeInfo->tm_year + 1900, timeInfo->tm_mon + 1,
-            timeInfo->tm_mday, timeInfo->tm_hour,
-            timeInfo->tm_min, timeInfo->tm_sec);
-        std::string no_ext = StringUtils::removeExtension(video);
-        VideoFormat vf = (VideoFormat)(int)UserConfigParams::m_record_format;
-        std::string file_name = no_ext + "-" + time_buffer +
-            (vf == VF_VP8 || vf == VF_VP9 ? ".webm" : ".mkv");
+        std::string no_ext = video.substr(0, video.find_last_of("."));
+        VideoFormat vf = getConfig()->m_video_format;
+        std::string file_name = no_ext +
+            (vf == REC_VF_VP8 || vf == REC_VF_VP9 ? ".webm" : ".mkv");
         mkvmuxer::MkvWriter writer;
         if (!writer.Open(file_name.c_str()))
         {
-            Log::error("writeMKV", "Error while opening output file.");
+            printf("Error while opening output file.\n");
             return "";
         }
         mkvmuxer::Segment muxer_segment;
         if (!muxer_segment.Init(&writer))
         {
-            Log::error("writeMKV", "Could not initialize muxer segment.");
+            printf("Could not initialize muxer segment.\n");;
             return "";
         }
         std::list<mkvmuxer::Frame*> audio_frames;
@@ -70,18 +59,18 @@ namespace Recorder
             uint32_t sample_rate, channels;
             fread(&sample_rate, 1, sizeof(uint32_t), input);
             fread(&channels, 1, sizeof(uint32_t), input);
-            uint64_t aud_track = muxer_segment.AddAudioTrack(sample_rate,
-                channels, 0);
+            uint64_t aud_track = muxer_segment.AddAudioTrack(sample_rate, channels,
+                0);
             if (!aud_track)
             {
-                Log::error("writeMKV", "Could not add audio track.");
+                printf("Could not add audio track.\n");
                 return "";
             }
             mkvmuxer::AudioTrack* const at = static_cast<mkvmuxer::AudioTrack*>
                 (muxer_segment.GetTrackByNumber(aud_track));
             if (!at)
             {
-                Log::error("writeMKV", "Could not get audio track.");
+                printf("Could not get audio track.\n");
                 return "";
             }
             uint32_t codec_private_size;
@@ -89,7 +78,7 @@ namespace Recorder
             fread(buf, 1, codec_private_size, input);
             if (!at->SetCodecPrivate(buf, codec_private_size))
             {
-                Log::warn("writeMKV", "Could not add audio private data.");
+                printf("Could not add audio private data.\n");
                 return "";
             }
             while (fread(buf, 1, 12, input) == 12)
@@ -102,7 +91,7 @@ namespace Recorder
                 mkvmuxer::Frame* audio_frame = new mkvmuxer::Frame();
                 if (!audio_frame->Init(buf, frame_size))
                 {
-                    Log::error("writeMKV", "Failed to construct a frame.");
+                    printf("Failed to construct a frame.\n");
                     return "";
                 }
                 audio_frame->set_track_number(aud_track);
@@ -113,37 +102,36 @@ namespace Recorder
             fclose(input);
             if (remove(audio.c_str()) != 0)
             {
-                Log::warn("writeMKV", "Failed to remove audio data file");
+                printf("Failed to remove audio data file\n");
             }
         }
-        uint64_t vid_track = muxer_segment.AddVideoTrack(
-            irr_driver->getActualScreenSize().Width,
-            irr_driver->getActualScreenSize().Height, 0);
+        uint64_t vid_track = muxer_segment.AddVideoTrack(getConfig()->m_width,
+            getConfig()->m_height, 0);
         if (!vid_track)
         {
-            Log::error("writeMKV", "Could not add video track.");
+            printf("Could not add video track.\n");
             return "";
         }
         mkvmuxer::VideoTrack* const vt = static_cast<mkvmuxer::VideoTrack*>(
             muxer_segment.GetTrackByNumber(vid_track));
         if (!vt)
         {
-            Log::error("writeMKV", "Could not get video track.");
+            printf("Could not get video track.\n");
             return "";
         }
-        vt->set_frame_rate(UserConfigParams::m_record_fps);
+        vt->set_frame_rate(getConfig()->m_record_fps);
         switch (vf)
         {
-        case VF_VP8:
+        case REC_VF_VP8:
             vt->set_codec_id("V_VP8");
             break;
-        case VF_VP9:
+        case REC_VF_VP9:
             vt->set_codec_id("V_VP9");
             break;
-        case VF_MJPEG:
+        case REC_VF_MJPEG:
             vt->set_codec_id("V_MJPEG");
             break;
-        case VF_H264:
+        case REC_VF_H264:
             vt->set_codec_id("V_MPEG4/ISO/AVC");
             break;
         }
@@ -156,17 +144,17 @@ namespace Recorder
             memcpy(&timestamp, buf + sizeof(uint32_t), sizeof(int64_t));
             memcpy(&flag, buf + sizeof(uint32_t) + sizeof(int64_t),
                 sizeof(uint32_t));
-            timestamp *= 1000000000ll / UserConfigParams::m_record_fps;
+            timestamp *= 1000000000ll / getConfig()->m_record_fps;
             fread(buf, 1, frame_size, input);
             mkvmuxer::Frame muxer_frame;
             if (!muxer_frame.Init(buf, frame_size))
             {
-                Log::error("writeMKV", "Failed to construct a frame.");
+                printf("Failed to construct a frame.\n");
                 return "";
             }
             muxer_frame.set_track_number(vid_track);
             muxer_frame.set_timestamp(timestamp);
-            if (vf == VF_VP8 || vf == VF_VP9)
+            if (vf == REC_VF_VP8 || vf == REC_VF_VP9)
             {
                 muxer_frame.set_is_key((flag & VPX_FRAME_IS_KEY) != 0);
             }
@@ -182,7 +170,7 @@ namespace Recorder
                 {
                     if (!muxer_segment.AddGenericFrame(cur_aud_frame))
                     {
-                        Log::error("writeMKV", "Could not add audio frame.");
+                        printf("Could not add audio frame.\n");
                         return "";
                     }
                     delete cur_aud_frame;
@@ -197,7 +185,7 @@ namespace Recorder
             }
             if (!muxer_segment.AddGenericFrame(&muxer_frame))
             {
-                Log::error("writeMKV", "Could not add video frame.");
+                printf("Could not add video frame.\n");
                 return "";
             }
         }
@@ -209,15 +197,16 @@ namespace Recorder
         }
         if (remove(video.c_str()) != 0)
         {
-            Log::warn("writeMKV", "Failed to remove video data file");
+            printf("Failed to remove video data file\n");
         }
         if (!muxer_segment.Finalize())
         {
-            Log::error("writeMKV", "Finalization of segment failed.");
+            printf("Finalization of segment failed.\n");
             return "";
         }
         writer.Close();
         return file_name;
     }   // writeMKV
 };
+
 #endif

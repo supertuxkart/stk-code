@@ -17,12 +17,9 @@
 
 #if defined(ENABLE_REC_SOUND) && defined(WIN32)
 
-#include "recorder/vorbis_encoder.hpp"
-#include "utils/synchronised.hpp"
-#include "utils/log.hpp"
-#include "utils/vs.hpp"
-
-#include <list>
+#include "capture_library.hpp"
+#include "recorder_private.hpp"
+#include "vorbis_encoder.hpp"
 
 #include <audioclient.h>
 #include <mmsystem.h>
@@ -31,7 +28,7 @@
 #include <windows.h>
 
 #if defined (__MINGW32__) || defined(__CYGWIN__)
-    #include "utils/types.hpp"
+    #include <stdint.h>
     inline GUID uuidFromString(const char* s)
     {
         unsigned long p0;
@@ -136,111 +133,114 @@ namespace Recorder
     // ========================================================================
     WasapiData g_wasapi_data;
     // ========================================================================
-    void* audioRecorder(void *obj)
+    void audioRecorder(CaptureLibrary* cl)
     {
-        VS::setThreadName("audioRecorder");
+        setThreadName("audioRecorder");
         if (!g_wasapi_data.m_loaded)
         {
             if (!g_wasapi_data.load())
             {
-                Log::error("WasapiRecorder", "Failed to load wasapi data");
-                return NULL;
+                printf("Failed to load wasapi data.\n");
+                return;
             }
         }
-        VorbisEncoderData ved = {};
+        AudioEncoderData aed = {};
         if (g_wasapi_data.m_wav_format->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
         {
             WAVEFORMATEXTENSIBLE* wav_for_ext =
                 (WAVEFORMATEXTENSIBLE*)g_wasapi_data.m_wav_format;
-            ved.m_channels = wav_for_ext->Format.nChannels;
-            ved.m_sample_rate = wav_for_ext->Format.nSamplesPerSec;
+            aed.m_channels = wav_for_ext->Format.nChannels;
+            aed.m_sample_rate = wav_for_ext->Format.nSamplesPerSec;
             if (IsEqualGUID(KSDATAFORMAT_SUBTYPE_PCM, wav_for_ext->SubFormat))
             {
-                ved.m_audio_type = VorbisEncoderData::AT_PCM;
+                aed.m_audio_type = AudioEncoderData::AT_PCM;
                 if (wav_for_ext->Format.wBitsPerSample != 16)
                 {
-                    Log::error("WasapiRecorder", "Only 16bit PCM is"
-                        " supported.");
-                    return NULL;
+                    printf("Only 16bit PCM is supported.\n");
+                    return;
                 }
             }
             else if (IsEqualGUID(KSDATAFORMAT_SUBTYPE_IEEE_FLOAT, wav_for_ext
                 ->SubFormat))
             {
-                ved.m_audio_type = VorbisEncoderData::AT_FLOAT;
+                aed.m_audio_type = AudioEncoderData::AT_FLOAT;
                 if (wav_for_ext->Format.wBitsPerSample != 32)
                 {
-                    Log::error("WasapiRecorder", "Only 32bit float is"
-                        " supported.");
-                    return NULL;
+                    printf("Only 32bit float is supported.\n");
+                    return;
                 }
             }
             else
             {
-                Log::error("WasapiRecorder", "Unsupported audio input"
-                    " format.");
-                return NULL;
+                printf("Unsupported audio input format.\n");
+                return;
             }
         }
         else if (g_wasapi_data.m_wav_format->wFormatTag == WAVE_FORMAT_PCM)
         {
-            ved.m_channels = g_wasapi_data.m_wav_format->nChannels;
-            ved.m_sample_rate = g_wasapi_data.m_wav_format->nSamplesPerSec;
-            ved.m_audio_type = VorbisEncoderData::AT_PCM;
+            aed.m_channels = g_wasapi_data.m_wav_format->nChannels;
+            aed.m_sample_rate = g_wasapi_data.m_wav_format->nSamplesPerSec;
+            aed.m_audio_type = AudioEncoderData::AT_PCM;
             if (g_wasapi_data.m_wav_format->wBitsPerSample != 16)
             {
-                Log::error("WasapiRecorder", "Only 16bit PCM is supported.");
-                return NULL;
+                printf("Only 16bit PCM is supported.\n");
+                return;
             }
         }
         else
         {
-            Log::error("WasapiRecorder", "Unsupported audio input format");
-            return NULL;
+            printf("Unsupported audio input format\n");
+            return;
         }
-        if (ved.m_sample_rate > 48000)
+        if (aed.m_sample_rate > 48000)
         {
-            Log::error("WasapiRecorder", "Only support maximum 48000hz sample "
-                "rate audio.");
-            return NULL;
+            printf("Only support maximum 48000hz sample rate audio.\n");
+            return;
         }
         HRESULT hr = g_wasapi_data.m_client->Reset();
         if (FAILED(hr))
         {
-            Log::error("WasapiRecorder", "Failed to reset recorder");
-            return NULL;
+            printf("Failed to reset audio recorder.\n");
+            return;
         }
         hr = g_wasapi_data.m_client->Start();
         if (FAILED(hr))
         {
-            Log::error("WasapiRecorder", "Failed to start recorder");
-            return NULL;
+            printf("Failed to start audio recorder.\n");
+            return;
         }
         REFERENCE_TIME duration = REFTIMES_PER_SEC *
             g_wasapi_data.m_buffer_size / g_wasapi_data.m_wav_format
             ->nSamplesPerSec;
 
-        Synchronised<bool>* idle = (Synchronised<bool>*)obj;
-        Synchronised<std::list<int8_t*> > audio_data;
-        pthread_cond_t enc_request;
-        pthread_cond_init(&enc_request, NULL);
-        pthread_t vorbis_enc;
-        ved.m_data = &audio_data;
-        ved.m_enc_request = &enc_request;
-        pthread_create(&vorbis_enc, NULL, &Recorder::vorbisEncoder, &ved);
-        const unsigned frag_size = 1024 * ved.m_channels *
+        std::list<int8_t*> audio_data;
+        std::mutex audio_mutex;
+        std::condition_variable audio_cv;
+        std::thread audio_enc_thread;
+        aed.m_buf_list = &audio_data;
+        aed.m_mutex = &audio_mutex;
+        aed.m_cv = &audio_cv;
+        aed.m_audio_bitrate = cl->getRecorderConfig().m_audio_bitrate;
+
+        switch (cl->getRecorderConfig().m_audio_format)
+        {
+        case REC_AF_VORBIS:
+            audio_enc_thread = std::thread(vorbisEncoder, &aed);
+            break;
+        }
+
+        const unsigned frag_size = 1024 * aed.m_channels *
             (g_wasapi_data.m_wav_format->wBitsPerSample / 8);
         int8_t* each_audio_buf = new int8_t[frag_size]();
         unsigned readed = 0;
         while (true)
         {
-            if (idle->getAtomic())
+            if (cl->getSoundStop())
             {
-                audio_data.lock();
-                audio_data.getData().push_back(each_audio_buf);
-                audio_data.getData().push_back(NULL);
-                pthread_cond_signal(&enc_request);
-                audio_data.unlock();
+                std::lock_guard<std::mutex> lock(audio_mutex);
+                audio_data.push_back(each_audio_buf);
+                audio_data.push_back(NULL);
+                audio_cv.notify_one();
                 break;
             }
             uint32_t packet_length = 0;
@@ -248,7 +248,7 @@ namespace Recorder
                 &packet_length);
             if (FAILED(hr))
             {
-                Log::warn("WasapiRecorder", "Failed to get next packet size");
+                printf("Failed to get next audio packet size\n");
             }
             if (packet_length == 0)
             {
@@ -262,9 +262,9 @@ namespace Recorder
                 &packet_length, &flags, NULL, NULL);
             if (FAILED(hr))
             {
-                Log::warn("WasapiRecorder", "Failed to get buffer");
+                printf("Failed to get audio buffer\n");
             }
-            const unsigned bytes = ved.m_channels * (g_wasapi_data.m_wav_format
+            const unsigned bytes = aed.m_channels * (g_wasapi_data.m_wav_format
                 ->wBitsPerSample / 8) * packet_length;
             bool buf_full = readed + bytes > frag_size;
             unsigned copy_size = buf_full ? frag_size - readed : bytes;
@@ -274,12 +274,12 @@ namespace Recorder
             }
             if (buf_full)
             {
-                audio_data.lock();
-                audio_data.getData().push_back(each_audio_buf);
-                pthread_cond_signal(&enc_request);
-                audio_data.unlock();
+                std::unique_lock<std::mutex> ul(audio_mutex);
+                audio_data.push_back(each_audio_buf);
+                audio_cv.notify_one();
+                ul.unlock();
                 each_audio_buf = new int8_t[frag_size]();
-                readed = bytes - copy_size;
+                readed = (unsigned)bytes - copy_size;
                 if (!(flags & AUDCLNT_BUFFERFLAGS_SILENT))
                 {
                     memcpy(each_audio_buf, (uint8_t*)data + copy_size, readed);
@@ -292,18 +292,15 @@ namespace Recorder
             hr = g_wasapi_data.m_capture_client->ReleaseBuffer(packet_length);
             if (FAILED(hr))
             {
-                Log::warn("WasapiRecorder", "Failed to release buffer");
+                printf("Failed to release audio buffer\n");
             }
         }
         hr = g_wasapi_data.m_client->Stop();
         if (FAILED(hr))
         {
-            Log::warn("WasapiRecorder", "Failed to stop recorder");
+            printf("Failed to stop audio recorder\n");
         }
-        pthread_join(vorbis_enc, NULL);
-        pthread_cond_destroy(&enc_request);
-
-        return NULL;
+        audio_enc_thread.join();
     }   // audioRecorder
 }
 #endif

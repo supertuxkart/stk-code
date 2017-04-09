@@ -17,13 +17,10 @@
 
 #if defined(ENABLE_REC_SOUND) && !defined(WIN32)
 
-#include "recorder/vorbis_encoder.hpp"
-#include "utils/synchronised.hpp"
-#include "utils/log.hpp"
-#include "utils/vs.hpp"
+#include "capture_library.hpp"
+#include "recorder_private.hpp"
+#include "vorbis_encoder.hpp"
 
-#include <cstring>
-#include <list>
 #include <pulse/pulseaudio.h>
 #include <string>
 
@@ -153,168 +150,147 @@ namespace Recorder
             m_dl_handle = dlopen("libpulse.so", RTLD_LAZY);
             if (m_dl_handle == NULL)
             {
-                Log::error("PulseAudioRecorder", "Failed to open PulseAudio"
-                " library");
+                printf("Failed to open PulseAudio library\n");
                 return false;
             }
             pa_stream_new = (pa_stream_new_t)dlsym(m_dl_handle,
                 "pa_stream_new");
             if (pa_stream_new == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_stream_new'");
+                printf("Cannot load function 'pa_stream_new'\n");
                 return false;
             }
             pa_stream_connect_record = (pa_stream_connect_record_t)dlsym
                 (m_dl_handle, "pa_stream_connect_record");
             if (pa_stream_connect_record == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_stream_connect_record'");
+                printf("Cannot load function 'pa_stream_connect_record'\n");
                 return false;
             }
             pa_stream_get_state = (pa_stream_get_state_t)dlsym(m_dl_handle,
                 "pa_stream_get_state");
             if (pa_stream_get_state == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_stream_get_state'");
+                printf("Cannot load function 'pa_stream_get_state'\n");
                 return false;
             }
             pa_stream_readable_size = (pa_stream_readable_size_t)dlsym
                 (m_dl_handle, "pa_stream_readable_size");
             if (pa_stream_readable_size == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_stream_readable_size'");
+                printf("Cannot load function 'pa_stream_readable_size'\n");
                 return false;
             }
             pa_stream_peek = (pa_stream_peek_t)dlsym(m_dl_handle,
                 "pa_stream_peek");
             if (pa_stream_peek == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_stream_peek'");
+                printf("Cannot load function 'pa_stream_peek'\n");
                 return false;
             }
             pa_stream_drop = (pa_stream_drop_t)dlsym(m_dl_handle,
                 "pa_stream_drop");
             if (pa_stream_drop == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_stream_drop'");
+                printf("Cannot load function 'pa_stream_drop'\n");
                 return false;
             }
             pa_stream_disconnect = (pa_stream_disconnect_t)dlsym(m_dl_handle,
                 "pa_stream_disconnect");
             if (pa_stream_disconnect == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_stream_disconnect'");
+                printf("Cannot load function 'pa_stream_disconnect'\n");
                 return false;
             }
             pa_stream_unref = (pa_stream_unref_t)dlsym(m_dl_handle,
                 "pa_stream_unref");
             if (pa_stream_unref == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_stream_unref'");
+                printf("Cannot load function 'pa_stream_unref'\n");
                 return false;
             }
             pa_mainloop_new = (pa_mainloop_new_t)dlsym(m_dl_handle,
                 "pa_mainloop_new");
             if (pa_mainloop_new == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_mainloop_new'");
+                printf("Cannot load function 'pa_mainloop_new'\n");
                 return false;
             }
             pa_mainloop_get_api = (pa_mainloop_get_api_t)dlsym(m_dl_handle,
                 "pa_mainloop_get_api");
             if (pa_mainloop_get_api == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_mainloop_get_api'");
+                printf("Cannot load function 'pa_mainloop_get_api'\n");
                 return false;
             }
             pa_context_new = (pa_context_new_t)dlsym(m_dl_handle,
                 "pa_context_new");
             if (pa_context_new == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_context_new'");
+                printf("Cannot load function 'pa_context_new'\n");
                 return false;
             }
             pa_context_connect = (pa_context_connect_t)dlsym(m_dl_handle,
                 "pa_context_connect");
             if (pa_context_connect == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_context_connect'");
+                printf("Cannot load function 'pa_context_connect'\n");
                 return false;
             }
             pa_mainloop_iterate = (pa_mainloop_iterate_t)dlsym(m_dl_handle,
                 "pa_mainloop_iterate");
             if (pa_mainloop_iterate == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_mainloop_iterate'");
+                printf("Cannot load function 'pa_mainloop_iterate'\n");
                 return false;
             }
             pa_context_get_state = (pa_context_get_state_t)dlsym(m_dl_handle,
                 "pa_context_get_state");
             if (pa_context_get_state == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_context_get_state'");
+                printf("Cannot load function 'pa_context_get_state'\n");
                 return false;
             }
             pa_context_get_server_info = (pa_context_get_server_info_t)dlsym
                 (m_dl_handle, "pa_context_get_server_info");
             if (pa_context_get_server_info == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_context_get_server_info'");
+                printf("Cannot load function 'pa_context_get_server_info'\n");
                 return false;
             }
             pa_operation_get_state = (pa_operation_get_state_t)dlsym
                 (m_dl_handle, "pa_operation_get_state");
             if (pa_operation_get_state == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_operation_get_state'");
+                printf("Cannot load function 'pa_operation_get_state'\n");
                 return false;
             }
             pa_operation_unref = (pa_operation_unref_t)dlsym(m_dl_handle,
                 "pa_operation_unref");
             if (pa_operation_unref == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_operation_unref'");
+                printf("Cannot load function 'pa_operation_unref'\n");
                 return false;
             }
             pa_context_disconnect = (pa_context_disconnect_t)dlsym(m_dl_handle,
                 "pa_context_disconnect");
             if (pa_context_disconnect == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_context_disconnect'");
+                printf("Cannot load function 'pa_context_disconnect'\n");
                 return false;
             }
             pa_context_unref = (pa_context_unref_t)dlsym(m_dl_handle,
                 "pa_context_unref");
             if (pa_context_unref == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_context_unref'");
+                printf("Cannot load function 'pa_context_unref'\n");
                 return false;
             }
             pa_mainloop_free = (pa_mainloop_free_t)dlsym(m_dl_handle,
                 "pa_mainloop_free");
             if (pa_mainloop_free == NULL)
             {
-                Log::error("PulseAudioRecorder", "Cannot load function"
-                    " 'pa_mainloop_free'");
+                printf("Cannot load function 'pa_mainloop_free'\n");
                 return false;
             }
             return true;
@@ -337,14 +313,14 @@ namespace Recorder
             m_loop = pa_mainloop_new();
             if (m_loop == NULL)
             {
-                Log::error("PulseAudioRecorder", "Failed to create mainloop");
+                printf("Failed to create mainloop\n");
                 return false;
             }
             m_context = pa_context_new(pa_mainloop_get_api(m_loop),
                 "audioRecord");
             if (m_context == NULL)
             {
-                Log::error("PulseAudioRecorder", "Failed to create context");
+                printf("Failed to create context\n");
                 return false;
             }
             pa_context_connect(m_context, NULL, PA_CONTEXT_NOAUTOSPAWN , NULL);
@@ -356,8 +332,7 @@ namespace Recorder
                     break;
                 if (!PA_CONTEXT_IS_GOOD(state))
                 {
-                    Log::error("PulseAudioRecorder", "Failed to connect to"
-                        " context");
+                    printf("Failed to connect to context\n");
                     return false;
                 }
             }
@@ -370,7 +345,7 @@ namespace Recorder
             pa_operation_unref(pa_op);
             if (m_default_sink.empty())
             {
-                Log::error("PulseAudioRecorder", "Failed to get default sink");
+                printf("Failed to get default sink\n");
                 return false;
             }
             m_default_sink += ".monitor";
@@ -382,11 +357,11 @@ namespace Recorder
             return true;
         }   // load
         // --------------------------------------------------------------------
-        void configAudioType(Recorder::VorbisEncoderData* ved)
+        void configAudioType(AudioEncoderData* aed)
         {
-            ved->m_sample_rate = m_sample_spec.rate;
-            ved->m_channels = m_sample_spec.channels;
-            ved->m_audio_type = Recorder::VorbisEncoderData::AT_PCM;
+            aed->m_sample_rate = m_sample_spec.rate;
+            aed->m_channels = m_sample_spec.channels;
+            aed->m_audio_type = AudioEncoderData::AT_PCM;
         }   // configAudioType
         // --------------------------------------------------------------------
         inline void mainLoopIterate()
@@ -478,51 +453,59 @@ namespace Recorder
     // ========================================================================
     PulseAudioData g_pa_data;
     // ========================================================================
-    void* audioRecorder(void *obj)
+    void audioRecorder(CaptureLibrary* cl)
     {
-        VS::setThreadName("audioRecorder");
+        setThreadName("audioRecorder");
         if (!g_pa_data.m_loaded)
         {
             if (!g_pa_data.load())
             {
-                Log::error("PulseAudioRecord", "Cannot pulseaudio data");
-                return NULL;
+                printf("Cannot load pulseaudio data.\n");
+                return;
             }
         }
 
         if (g_pa_data.createRecordStream() == false)
         {
-            Log::error("PulseAudioRecorder", "Failed to create stream");
+            printf("Failed to create audio record stream.\n");
             if (g_pa_data.m_stream != NULL)
             {
                 g_pa_data.removeRecordStream();
             }
-            return NULL;
+            return;
         }
-        Synchronised<bool>* idle = (Synchronised<bool>*)obj;
-        Synchronised<std::list<int8_t*> > pcm_data;
-        pthread_cond_t enc_request;
-        pthread_cond_init(&enc_request, NULL);
-        pthread_t vorbis_enc;
 
-        Recorder::VorbisEncoderData ved;
-        g_pa_data.configAudioType(&ved);
-        ved.m_data = &pcm_data;
-        ved.m_enc_request = &enc_request;
+        std::list<int8_t*> pcm_data;
+        std::mutex pcm_mutex;
+        std::condition_variable pcm_cv;
+        std::thread audio_enc_thread;
+
+        AudioEncoderData aed;
+        g_pa_data.configAudioType(&aed);
+        aed.m_buf_list = &pcm_data;
+        aed.m_mutex = &pcm_mutex;
+        aed.m_cv = &pcm_cv;
+        aed.m_audio_bitrate = cl->getRecorderConfig().m_audio_bitrate;
         const unsigned frag_size = 1024 * g_pa_data.m_sample_spec.channels *
             sizeof(int16_t);
-        pthread_create(&vorbis_enc, NULL, &Recorder::vorbisEncoder, &ved);
+
+        switch (cl->getRecorderConfig().m_audio_format)
+        {
+        case REC_AF_VORBIS:
+            audio_enc_thread = std::thread(vorbisEncoder, &aed);
+            break;
+        }
+
         int8_t* each_pcm_buf = new int8_t[frag_size]();
         unsigned readed = 0;
         while (true)
         {
-            if (idle->getAtomic())
+            if (cl->getSoundStop())
             {
-                pcm_data.lock();
-                pcm_data.getData().push_back(each_pcm_buf);
-                pcm_data.getData().push_back(NULL);
-                pthread_cond_signal(&enc_request);
-                pcm_data.unlock();
+                std::lock_guard<std::mutex> lock(pcm_mutex);
+                pcm_data.push_back(each_pcm_buf);
+                pcm_data.push_back(NULL);
+                pcm_cv.notify_one();
                 break;
             }
             g_pa_data.mainLoopIterate();
@@ -544,10 +527,10 @@ namespace Recorder
             memcpy(each_pcm_buf + readed, data, copy_size);
             if (buf_full)
             {
-                pcm_data.lock();
-                pcm_data.getData().push_back(each_pcm_buf);
-                pthread_cond_signal(&enc_request);
-                pcm_data.unlock();
+                std::unique_lock<std::mutex> ul(pcm_mutex);
+                pcm_data.push_back(each_pcm_buf);
+                pcm_cv.notify_one();
+                ul.unlock();
                 each_pcm_buf = new int8_t[frag_size]();
                 readed = (unsigned)bytes - copy_size;
                 memcpy(each_pcm_buf, (uint8_t*)data + copy_size, readed);
@@ -558,10 +541,8 @@ namespace Recorder
             }
             g_pa_data.dropStream();
         }
-        pthread_join(vorbis_enc, NULL);
-        pthread_cond_destroy(&enc_request);
+        audio_enc_thread.join();
         g_pa_data.removeRecordStream();
-        return NULL;
     }   // audioRecorder
 }
 #endif

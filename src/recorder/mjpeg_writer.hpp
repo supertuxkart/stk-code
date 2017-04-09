@@ -18,13 +18,16 @@
 
 #ifdef ENABLE_RECORDER
 
-#ifndef HEADER_JPG_WRITER_HPP
-#define HEADER_JPG_WRITER_HPP
+#ifndef HEADER_MJPEG_WRITER_HPP
+#define HEADER_MJPEG_WRITER_HPP
+
+class CaptureLibrary;
 
 namespace Recorder
 {
-    void* jpgWriter(void *obj);
+    void mjpegWriter(CaptureLibrary* cl);
 };
+
 #endif
 
 #endif

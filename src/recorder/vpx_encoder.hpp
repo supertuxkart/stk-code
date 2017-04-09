@@ -21,12 +21,14 @@
 #ifndef HEADER_VPX_ENCODER_HPP
 #define HEADER_VPX_ENCODER_HPP
 
+class CaptureLibrary;
+
 namespace Recorder
 {
 #ifdef NO_VPX
-    inline void* vpxEncoder(void *obj) { return NULL; }
+    inline void vpxEncoder(CaptureLibrary* cl) {}
 #else
-    void* vpxEncoder(void *obj);
+    void vpxEncoder(CaptureLibrary* cl);
 #endif
 };
 #endif

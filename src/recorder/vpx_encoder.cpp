@@ -17,65 +17,15 @@
 
 #if defined(ENABLE_RECORDER) && !defined(NO_VPX)
 
-#include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
-#include "recorder/recorder_common.hpp"
-#include "utils/log.hpp"
-#include "utils/synchronised.hpp"
-#include "utils/vs.hpp"
+#include "capture_library.hpp"
+#include "recorder_private.hpp"
 
-#include <chrono>
-#include <turbojpeg.h>
 #include <vpx/vpx_encoder.h>
 #include <vpx/vp8cx.h>
 
 namespace Recorder
 {
-    // ========================================================================
-    struct JPGDecoder
-    {
-        tjhandle m_handle;
-        // --------------------------------------------------------------------
-        JPGDecoder()
-        {
-            m_handle = tjInitDecompress();
-        }   // JPGDecoder
-        // --------------------------------------------------------------------
-        ~JPGDecoder()
-        {
-            tjDestroy(m_handle);
-        }   // ~JPGDecoder
-        // --------------------------------------------------------------------
-        int yuvConversion(uint8_t* jpeg_buffer, unsigned jpeg_size,
-                          uint8_t** yuv_buffer, unsigned* yuv_size)
-        {
-            int width, height;
-            TJSAMP subsample;
-            int ret = 0;
-            ret = tjDecompressHeader2(m_handle, jpeg_buffer, jpeg_size, &width,
-                &height, (int*)&subsample);
-            if (ret != 0)
-            {
-                char* err = tjGetErrorStr();
-                Log::error("vpxEncoder", "Jpeg decode error: %s.", err);
-                return ret;
-            }
-            *yuv_size = tjBufSizeYUV(width, height, subsample);
-            *yuv_buffer = new uint8_t[*yuv_size];
-            ret = tjDecompressToYUV(m_handle, jpeg_buffer, jpeg_size,
-                *yuv_buffer, 0);
-            if (ret != 0)
-            {
-                char* err = tjGetErrorStr();
-                Log::error("vpxEncoder", "YUV conversion error: %s.", err);
-                return ret;
-            }
-            return ret;
-        }   // yuvConversion
-    };
-    // ========================================================================
-    JPGDecoder g_jpg_decoder;
-    // ========================================================================
+    // ------------------------------------------------------------------------
     int vpxEncodeFrame(vpx_codec_ctx_t *codec, vpx_image_t *img,
                        int frame_index, FILE *out)
     {
@@ -86,7 +36,7 @@ namespace Recorder
             1, 0, VPX_DL_REALTIME);
         if (res != VPX_CODEC_OK)
         {
-            Log::error("vpxEncoder", "Failed to encode frame");
+            printf("Failed to encode frame\n");
             return -1;
         }
         while ((pkt = vpx_codec_get_cx_data(codec, &iter)) != NULL)
@@ -104,101 +54,85 @@ namespace Recorder
         return got_pkts;
     }   // vpxEncodeFrame
     // ------------------------------------------------------------------------
-    void* vpxEncoder(void *obj)
+    void vpxEncoder(CaptureLibrary* cl)
     {
-        VS::setThreadName("vpxEncoder");
-        FILE* vpx_data = fopen((getRecordingName() + ".video").c_str(), "wb");
+        setThreadName("vpxEncoder");
+        FILE* vpx_data = fopen((getSavedName() + ".video").c_str(), "wb");
         if (vpx_data == NULL)
         {
-            Log::error("vpxEncoder", "Failed to open file for writing");
-            return NULL;
+            printf("Failed to open file for writing vpx.\n");
+            return;
         }
-        ThreadData* td = (ThreadData*)obj;
-        Synchronised<std::list<std::tuple<uint8_t*, unsigned, int> > >*
-            jpg_data = (Synchronised<std::list<std::tuple<uint8_t*,
-            unsigned, int> > >*)td->m_data;
-        pthread_cond_t* cond_request = td->m_request;
 
         vpx_codec_ctx_t codec;
         vpx_codec_enc_cfg_t cfg;
         vpx_codec_iface_t* codec_if = NULL;
-        VideoFormat vf = (VideoFormat)(int)UserConfigParams::m_record_format;
-        switch (vf)
+        switch (cl->getRecorderConfig().m_video_format)
         {
-        case VF_VP8:
+        case REC_VF_VP8:
             codec_if = vpx_codec_vp8_cx();
             break;
-        case VF_VP9:
+        case REC_VF_VP9:
             codec_if = vpx_codec_vp9_cx();
             break;
-        case VF_MJPEG:
-        case VF_H264:
+        case REC_VF_MJPEG:
+        case REC_VF_H264:
             assert(false);
             break;
         }
         vpx_codec_err_t res = vpx_codec_enc_config_default(codec_if, &cfg, 0);
         if (res > 0)
         {
-            Log::error("vpxEncoder", "Failed to get default codec config.");
-            return NULL;
+            printf("Failed to get default vpx codec config.\n");
+            return;
         }
 
-        const unsigned width = irr_driver->getActualScreenSize().Width;
-        const unsigned height = irr_driver->getActualScreenSize().Height;
+        const unsigned width = cl->getRecorderConfig().m_width;
+        const unsigned height = cl->getRecorderConfig().m_height;
         int frames_encoded = 0;
         cfg.g_w = width;
         cfg.g_h = height;
         cfg.g_timebase.num = 1;
-        cfg.g_timebase.den = UserConfigParams::m_record_fps;
-        int end_usage = UserConfigParams::m_vp_end_usage;
-        cfg.rc_end_usage = (vpx_rc_mode)end_usage;
-        cfg.rc_target_bitrate = UserConfigParams::m_vp_bitrate;
+        cfg.g_timebase.den = cl->getRecorderConfig().m_record_fps;
+        cfg.rc_end_usage = VPX_VBR;
+        cfg.rc_target_bitrate = cl->getRecorderConfig().m_video_bitrate;
 
         if (vpx_codec_enc_init(&codec, codec_if, &cfg, 0) > 0)
         {
-            Log::error("vpxEncoder", "Failed to initialize encoder");
+            printf("Failed to initialize vpx encoder\n");
             fclose(vpx_data);
-            return NULL;
+            return;
         }
-        std::chrono::high_resolution_clock::time_point tp;
+        float last_size = -1.0f;
+        int cur_finished_count = 0;
         while (true)
         {
-            jpg_data->lock();
-            bool waiting = jpg_data->getData().empty();
-            while (waiting)
-            {
-                pthread_cond_wait(cond_request, jpg_data->getMutex());
-                waiting = jpg_data->getData().empty();
-            }
-
-            if (displayProgress())
-            {
-                auto rate = std::chrono::high_resolution_clock::now() -
-                    tp;
-                double t = std::chrono::duration_cast<std::chrono::
-                    duration<double> >(rate).count();
-                if (t > 3.)
-                {
-                    tp = std::chrono::high_resolution_clock::now();
-                    Log::info("vpxEncoder", "%d frames remaining.",
-                        jpg_data->getData().size());
-                }
-            }
-            auto& p =  jpg_data->getData().front();
+            std::unique_lock<std::mutex> ul(*cl->getJPGListMutex());
+            cl->getJPGListCV()->wait(ul, [&cl]
+                { return !cl->getJPGList()->empty(); });
+            auto& p = cl->getJPGList()->front();
             uint8_t* jpg = std::get<0>(p);
-            unsigned jpg_size = std::get<1>(p);
+            uint32_t jpg_size = std::get<1>(p);
             int frame_count = std::get<2>(p);
             if (jpg == NULL)
             {
-                jpg_data->getData().clear();
-                jpg_data->unlock();
+                cl->getJPGList()->clear();
+                ul.unlock();
                 break;
             }
-            jpg_data->getData().pop_front();
-            jpg_data->unlock();
+            cl->getJPGList()->pop_front();
+            ul.unlock();
+            if (!cl->getDestroy() && cl->displayingProgress())
+            {
+                if (last_size == -1.0f)
+                    last_size = (float)(cl->getJPGList()->size());
+                cur_finished_count += frame_count;
+                int rate = (int)(cur_finished_count / last_size * 100.0f);
+                runCallback(REC_CBT_PROGRESS_RECORDING, &rate);
+            }
             uint8_t* yuv = NULL;
             unsigned yuv_size;
-            int ret = g_jpg_decoder.yuvConversion(jpg, jpg_size, &yuv,
+            int ret = cl->yuvConversion(jpg, jpg_size, &yuv,
                 &yuv_size);
             if (ret < 0)
             {
@@ -221,12 +155,10 @@ namespace Recorder
         while (vpxEncodeFrame(&codec, NULL, -1, vpx_data));
         if (vpx_codec_destroy(&codec))
         {
-            Log::error("vpxEncoder", "Failed to destroy codec.");
-            return NULL;
+            printf("Failed to destroy vpx codec.\n");
+            return;
         }
         fclose(vpx_data);
-        return NULL;
-
     }   // vpxEncoder
 }
 #endif

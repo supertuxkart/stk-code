@@ -17,32 +17,29 @@
 
 #ifdef ENABLE_RECORDER
 
-#include "recorder/vorbis_encoder.hpp"
-#include "recorder/recorder_common.hpp"
-#include "utils/log.hpp"
-#include "utils/synchronised.hpp"
-#include "utils/vs.hpp"
+#include "capture_library.hpp"
+#include "recorder_private.hpp"
 
 #include <ogg/ogg.h>
 #include <vorbis/vorbisenc.h>
 
 namespace Recorder
 {
-    void* vorbisEncoder(void *obj)
+    void vorbisEncoder(AudioEncoderData* aed)
     {
-        VS::setThreadName("vorbisEncoder");
-        VorbisEncoderData* ved = (VorbisEncoderData*)obj;
+        setThreadName("vorbisEncoder");
         vorbis_info vi;
         vorbis_dsp_state vd;
         vorbis_block vb;
         vorbis_info_init(&vi);
-        vorbis_encode_init(&vi, ved->m_channels, ved->m_sample_rate, -1,
-            112000, -1);
+        vorbis_encode_init(&vi, aed->m_channels, aed->m_sample_rate, -1,
+            aed->m_audio_bitrate, -1);
         vorbis_analysis_init(&vd, &vi);
         vorbis_block_init(&vd, &vb);
         vorbis_comment vc;
         vorbis_comment_init(&vc);
-        vorbis_comment_add_tag(&vc, "ENCODER", "STK vorbis encoder");
+        vorbis_comment_add_tag(&vc, "Encoder",
+            "vorbis encoder by libopenglrecorder");
         ogg_packet header;
         ogg_packet header_comm;
         ogg_packet header_code;
@@ -50,18 +47,17 @@ namespace Recorder
             &header_code);
         if (header.bytes > 255 || header_comm.bytes > 255)
         {
-            Log::error("vorbisEncoder", "Header is too long.");
-            return NULL;
+            printf("Header is too long for vorbis.\n");
+            return;
         }
-        FILE* vb_data = fopen((getRecordingName() + ".audio").c_str(), "wb");
+        FILE* vb_data = fopen((getSavedName() + ".audio").c_str(), "wb");
         if (vb_data == NULL)
         {
-            Log::error("vorbisEncoder", "Failed to open file for encoding"
-                " vorbis.");
-            return NULL;
+            printf("Failed to open file for encoding vorbis.\n");
+            return;
         }
-        fwrite(&ved->m_sample_rate, 1, sizeof(uint32_t), vb_data);
-        fwrite(&ved->m_channels, 1, sizeof(uint32_t), vb_data);
+        fwrite(&aed->m_sample_rate, 1, sizeof(uint32_t), vb_data);
+        fwrite(&aed->m_channels, 1, sizeof(uint32_t), vb_data);
         const uint32_t all = header.bytes + header_comm.bytes +
             header_code.bytes + 3;
         fwrite(&all, 1, sizeof(uint32_t), vb_data);
@@ -74,24 +70,16 @@ namespace Recorder
         fwrite(header.packet, 1, header.bytes, vb_data);
         fwrite(header_comm.packet, 1, header_comm.bytes, vb_data);
         fwrite(header_code.packet, 1, header_code.bytes, vb_data);
-        Synchronised<std::list<int8_t*> >* audio_data =
-            (Synchronised<std::list<int8_t*> >*)ved->m_data;
-        pthread_cond_t* cond_request = ved->m_enc_request;
         ogg_packet op;
         int64_t last_timestamp = 0;
         bool eos = false;
         while (eos == false)
         {
-            audio_data->lock();
-            bool waiting = audio_data->getData().empty();
-            while (waiting)
-            {
-                pthread_cond_wait(cond_request, audio_data->getMutex());
-                waiting = audio_data->getData().empty();
-            }
-            int8_t* audio_buf = audio_data->getData().front();
-            audio_data->getData().pop_front();
-            audio_data->unlock();
+            std::unique_lock<std::mutex> ul(*aed->m_mutex);
+            aed->m_cv->wait(ul, [&aed] { return !aed->m_buf_list->empty(); });
+            int8_t* audio_buf = aed->m_buf_list->front();
+            aed->m_buf_list->pop_front();
+            ul.unlock();
             if (audio_buf == NULL)
             {
                 vorbis_analysis_wrote(&vd, 0);
@@ -100,8 +88,8 @@ namespace Recorder
             else
             {
                 float **buffer = vorbis_analysis_buffer(&vd, 1024);
-                const unsigned channels = ved->m_channels;
-                if (ved->m_audio_type == VorbisEncoderData::AT_PCM)
+                const unsigned channels = aed->m_channels;
+                if (aed->m_audio_type == AudioEncoderData::AT_PCM)
                 {
                     for (unsigned j = 0; j < channels; j++)
                     {
@@ -110,7 +98,7 @@ namespace Recorder
                             int8_t* each_channel =
                                 &audio_buf[i * channels * 2 + j * 2];
                             buffer[j][i] = float((each_channel[1] << 8) |
-                               (0x00ff & (int)each_channel[0])) / 32768.0f;
+                                (0x00ff & (int)each_channel[0])) / 32768.0f;
                         }
                     }
                 }
@@ -140,7 +128,7 @@ namespace Recorder
                         fwrite(&last_timestamp, 1, sizeof(int64_t), vb_data);
                         fwrite(op.packet, 1, frame_size, vb_data);
                         double s = (double)op.granulepos /
-                            (double)ved->m_sample_rate * 1000000000.;
+                            (double)aed->m_sample_rate * 1000000000.;
                         last_timestamp = (int64_t)s;
                     }
                 }
@@ -152,8 +140,6 @@ namespace Recorder
         vorbis_comment_clear(&vc);
         vorbis_info_clear(&vi);
         fclose(vb_data);
-        return NULL;
-
     }   // vorbisEncoder
 }
 #endif

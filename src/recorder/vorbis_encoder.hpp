@@ -20,24 +20,10 @@
 #ifndef HEADER_VORBIS_ENCODE_HPP
 #define HEADER_VORBIS_ENCODE_HPP
 
-#include "utils/no_copy.hpp"
-#include "utils/types.hpp"
-
-#include <pthread.h>
-
+struct AudioEncoderData;
 namespace Recorder
 {
-    struct VorbisEncoderData : public NoCopy
-    {
-        enum AudioType { AT_FLOAT, AT_PCM };
-        void* m_data;
-        pthread_cond_t* m_enc_request;
-        uint32_t m_sample_rate;
-        uint32_t m_channels;
-        AudioType m_audio_type;
-    };
-
-    void* vorbisEncoder(void *obj);
+    void vorbisEncoder(AudioEncoderData* aed);
 };
 
 #endif
