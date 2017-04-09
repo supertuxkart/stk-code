@@ -39,7 +39,7 @@ namespace Recorder
         vorbis_comment vc;
         vorbis_comment_init(&vc);
         vorbis_comment_add_tag(&vc, "Encoder",
-            "vorbis encoder by libopenglrecorder");
+            "Vorbis encoder by libopenglrecorder");
         ogg_packet header;
         ogg_packet header_comm;
         ogg_packet header_code;

@@ -59,7 +59,7 @@ CaptureLibrary::~CaptureLibrary()
 // ----------------------------------------------------------------------------
 void CaptureLibrary::reset()
 {
-    runCallback(REC_CBT_START_RECORDING, NULL);
+    runCallback(OGR_CBT_START_RECORDING, NULL);
     m_pbo_use = 0;
     m_accumulated_time = 0.;
     assert(m_sound_stop.load() && ogrCapturing() == 0);
@@ -71,14 +71,14 @@ void CaptureLibrary::reset()
     setCapturing(true);
     switch (m_recorder_cfg->m_video_format)
     {
-    case REC_VF_VP8:
-    case REC_VF_VP9:
+    case OGR_VF_VP8:
+    case OGR_VF_VP9:
         m_video_enc_thread = std::thread(Recorder::vpxEncoder, this);
         break;
-    case REC_VF_MJPEG:
+    case OGR_VF_MJPEG:
         m_video_enc_thread = std::thread(Recorder::mjpegWriter, this);
         break;
-    case REC_VF_H264:
+    case OGR_VF_H264:
         break;
     }
 }   // reset
@@ -221,7 +221,7 @@ void CaptureLibrary::captureConversion(CaptureLibrary* cl)
             std::unique_lock<std::mutex> ulj(cl->m_jpg_list_mutex);
             if (!cl->m_destroy.load() && cl->m_jpg_list.size() > 100)
             {
-                runCallback(REC_CBT_WAIT_RECORDING, NULL);
+                runCallback(OGR_CBT_WAIT_RECORDING, NULL);
             }
             cl->m_display_progress.store(true);
             cl->m_jpg_list.emplace_back((uint8_t*)NULL, 0, 0);
@@ -237,11 +237,11 @@ void CaptureLibrary::captureConversion(CaptureLibrary* cl)
             }
             if (f.empty())
             {
-                runCallback(REC_CBT_ERROR_RECORDING, NULL);
+                runCallback(OGR_CBT_ERROR_RECORDING, NULL);
             }
             else
             {
-                runCallback(REC_CBT_SAVED_RECORDING, f.c_str());
+                runCallback(OGR_CBT_SAVED_RECORDING, f.c_str());
             }
             setCapturing(false);
             continue;
@@ -255,7 +255,7 @@ void CaptureLibrary::captureConversion(CaptureLibrary* cl)
         const bool too_slow = cl->m_fbi_list.size() > 50;
         if (too_slow)
         {
-            runCallback(REC_CBT_SLOW_RECORDING, NULL);
+            runCallback(OGR_CBT_SLOW_RECORDING, NULL);
             delete [] fbi;
             cl->m_fbi_list.pop_front();
             for (auto& p : cl->m_fbi_list)

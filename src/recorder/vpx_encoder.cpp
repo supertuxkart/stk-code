@@ -69,14 +69,14 @@ namespace Recorder
         vpx_codec_iface_t* codec_if = NULL;
         switch (cl->getRecorderConfig().m_video_format)
         {
-        case REC_VF_VP8:
+        case OGR_VF_VP8:
             codec_if = vpx_codec_vp8_cx();
             break;
-        case REC_VF_VP9:
+        case OGR_VF_VP9:
             codec_if = vpx_codec_vp9_cx();
             break;
-        case REC_VF_MJPEG:
-        case REC_VF_H264:
+        case OGR_VF_MJPEG:
+        case OGR_VF_H264:
             assert(false);
             break;
         }
@@ -128,7 +128,7 @@ namespace Recorder
                     last_size = (float)(cl->getJPGList()->size());
                 cur_finished_count += frame_count;
                 int rate = (int)(cur_finished_count / last_size * 100.0f);
-                runCallback(REC_CBT_PROGRESS_RECORDING, &rate);
+                runCallback(OGR_CBT_PROGRESS_RECORDING, &rate);
             }
             uint8_t* yuv = NULL;
             unsigned yuv_size;

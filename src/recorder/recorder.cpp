@@ -29,11 +29,48 @@ GeneralCallback g_cb_error_rec = NULL;
 // ============================================================================
 GeneralCallback g_cb_slow_rec = NULL;
 // ============================================================================
-std::array<void*, REC_CBT_COUNT> g_all_user_data;
+std::array<void*, OGR_CBT_COUNT> g_all_user_data;
 // ============================================================================
-void ogrInitConfig(RecorderConfig* rc)
+bool validateConfig(RecorderConfig* rc)
+{
+    if (rc == NULL)
+        return false;
+    if (rc->m_triple_buffering > 1 || rc->m_record_audio > 1)
+        return false;
+    if (rc->m_width > 16384 || rc->m_height > 16384)
+        return false;
+    if (rc->m_video_format >= OGR_VF_COUNT ||
+        rc->m_audio_format >= OGR_AF_COUNT)
+        return false;
+    if (rc->m_audio_bitrate == 0 || rc->m_video_bitrate == 0 ||
+        rc->m_record_fps == 0)
+        return false;
+    if (rc->m_record_jpg_quality > 100)
+        return false;
+    return true;
+}   // validateConfig
+
+// ----------------------------------------------------------------------------
+int ogrInitConfig(RecorderConfig* rc)
 {
     RecorderConfig* new_rc = new RecorderConfig;
+    g_recorder_config.reset(new_rc);
+
+    if (!validateConfig(rc))
+    {
+        new_rc->m_triple_buffering = 1;
+        new_rc->m_record_audio = 0;
+        new_rc->m_width = 800;
+        new_rc->m_height = 600;
+        new_rc->m_video_format = OGR_VF_MJPEG;
+        new_rc->m_audio_format = OGR_AF_VORBIS;
+        new_rc->m_audio_bitrate = 112000;
+        new_rc->m_video_bitrate = 100000;
+        new_rc->m_record_fps = 30;
+        new_rc->m_record_jpg_quality = 90;
+        return 0;
+    }
+
     memcpy(new_rc, rc, sizeof(RecorderConfig));
     while (new_rc->m_width % 8 != 0)
     {
@@ -43,7 +80,7 @@ void ogrInitConfig(RecorderConfig* rc)
     {
         new_rc->m_height--;
     }
-    g_recorder_config.reset(new_rc);
+    return 1;
 }   // ogrInitConfig
 
 // ----------------------------------------------------------------------------
@@ -100,21 +137,21 @@ void ogrRegGeneralCallback(CallBackType cbt, GeneralCallback cb, void* data)
 {
     switch (cbt)
     {
-    case REC_CBT_ERROR_RECORDING:
+    case OGR_CBT_ERROR_RECORDING:
         g_cb_error_rec = cb;
-        g_all_user_data[REC_CBT_ERROR_RECORDING] = data;
+        g_all_user_data[OGR_CBT_ERROR_RECORDING] = data;
         break;
-    case REC_CBT_START_RECORDING:
+    case OGR_CBT_START_RECORDING:
         g_cb_start_rec = cb;
-        g_all_user_data[REC_CBT_START_RECORDING] = data;
+        g_all_user_data[OGR_CBT_START_RECORDING] = data;
         break;
-    case REC_CBT_SLOW_RECORDING:
+    case OGR_CBT_SLOW_RECORDING:
         g_cb_slow_rec = cb;
-        g_all_user_data[REC_CBT_SLOW_RECORDING] = data;
+        g_all_user_data[OGR_CBT_SLOW_RECORDING] = data;
         break;
-    case REC_CBT_WAIT_RECORDING:
+    case OGR_CBT_WAIT_RECORDING:
         g_cb_wait_rec = cb;
-        g_all_user_data[REC_CBT_WAIT_RECORDING] = data;
+        g_all_user_data[OGR_CBT_WAIT_RECORDING] = data;
         break;
     default:
         assert(false && "Wrong callback enum");
@@ -127,9 +164,9 @@ void ogrRegStringCallback(CallBackType cbt, StringCallback cb, void* data)
 {
     switch (cbt)
     {
-    case REC_CBT_SAVED_RECORDING:
+    case OGR_CBT_SAVED_RECORDING:
         g_cb_saved_rec = cb;
-        g_all_user_data[REC_CBT_SAVED_RECORDING] = data;
+        g_all_user_data[OGR_CBT_SAVED_RECORDING] = data;
         break;
     default:
         assert(false && "Wrong callback enum");
@@ -142,9 +179,9 @@ void ogrRegIntCallback(CallBackType cbt, IntCallback cb, void* data)
 {
     switch (cbt)
     {
-    case REC_CBT_PROGRESS_RECORDING:
+    case OGR_CBT_PROGRESS_RECORDING:
         g_cb_progress_rec = cb;
-        g_all_user_data[REC_CBT_PROGRESS_RECORDING] = data;
+        g_all_user_data[OGR_CBT_PROGRESS_RECORDING] = data;
         break;
     default:
         assert(false && "Wrong callback enum");
@@ -157,42 +194,42 @@ void runCallback(CallBackType cbt, const void* arg)
 {
     switch (cbt)
     {
-    case REC_CBT_START_RECORDING:
+    case OGR_CBT_START_RECORDING:
     {
         if (g_cb_start_rec == NULL) return;
-        g_cb_start_rec(g_all_user_data[REC_CBT_START_RECORDING]);
+        g_cb_start_rec(g_all_user_data[OGR_CBT_START_RECORDING]);
         break;
     }
-    case REC_CBT_SAVED_RECORDING:
+    case OGR_CBT_SAVED_RECORDING:
     {
         if (g_cb_saved_rec == NULL) return;
         const char* s = (const char*)arg;
-        g_cb_saved_rec(s, g_all_user_data[REC_CBT_SAVED_RECORDING]);
+        g_cb_saved_rec(s, g_all_user_data[OGR_CBT_SAVED_RECORDING]);
         break;
     }
-    case REC_CBT_ERROR_RECORDING:
+    case OGR_CBT_ERROR_RECORDING:
     {
         if (g_cb_error_rec == NULL) return;
-        g_cb_error_rec(g_all_user_data[REC_CBT_ERROR_RECORDING]);
+        g_cb_error_rec(g_all_user_data[OGR_CBT_ERROR_RECORDING]);
         break;
     }
-    case REC_CBT_PROGRESS_RECORDING:
+    case OGR_CBT_PROGRESS_RECORDING:
     {
         if (g_cb_progress_rec == NULL) return;
         const int* i = (const int*)arg;
-        g_cb_progress_rec(*i, g_all_user_data[REC_CBT_PROGRESS_RECORDING]);
+        g_cb_progress_rec(*i, g_all_user_data[OGR_CBT_PROGRESS_RECORDING]);
         break;
     }
-    case REC_CBT_WAIT_RECORDING:
+    case OGR_CBT_WAIT_RECORDING:
     {
         if (g_cb_wait_rec == NULL) return;
-        g_cb_wait_rec(g_all_user_data[REC_CBT_WAIT_RECORDING]);
+        g_cb_wait_rec(g_all_user_data[OGR_CBT_WAIT_RECORDING]);
         break;
     }
-    case REC_CBT_SLOW_RECORDING:
+    case OGR_CBT_SLOW_RECORDING:
     {
         if (g_cb_slow_rec == NULL) return;
-        g_cb_slow_rec(g_all_user_data[REC_CBT_SLOW_RECORDING]);
+        g_cb_slow_rec(g_all_user_data[OGR_CBT_SLOW_RECORDING]);
         break;
     }
     default:

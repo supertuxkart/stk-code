@@ -224,7 +224,7 @@ namespace Recorder
 
         switch (cl->getRecorderConfig().m_audio_format)
         {
-        case REC_AF_VORBIS:
+        case OGR_AF_VORBIS:
             audio_enc_thread = std::thread(vorbisEncoder, &aed);
             break;
         }

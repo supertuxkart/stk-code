@@ -6,21 +6,27 @@
  * \mainpage libopenglrecorder
  *
  * libopenglrecorder is a library allowing (optional) async readback opengl
- * framebuffer with audio recording. It will do video and audio encoding
+ * frame buffer with audio recording. It will do video and audio encoding
  * together. The user of this library has to setup opengl context himself
  * and load suitable callback. All function here should be called by the same
  * thread which created the opengl context.
  */
 
 /**
- * List of audio encoder supported by libopenglrecorder.
+ * List of audio encoder supported by libopenglrecorder, if you want to record
+ * without sound, just set m_record_audio in \ref RecorderConfig to 0 and use
+ * any encoder below.
  */
 enum AudioFormat
 {
     /**
      * Vorbis encoder by libvorbisenc.
      */
-    REC_AF_VORBIS,
+    OGR_AF_VORBIS = 0,
+    /**
+    * Total numbers of audio encoder.
+    */
+    OGR_AF_COUNT
 };
 
 /**
@@ -31,19 +37,23 @@ enum VideoFormat
     /**
      * VP8 encoder by libvpx.
      */
-    REC_VF_VP8,
+    OGR_VF_VP8 = 0,
     /**
      * VP9 encoder by libvpx. Notice: this is very slow.
      */
-    REC_VF_VP9,
+    OGR_VF_VP9,
     /**
      * MJPEG encoder, it's provided by turbojpeg and will always present.
      */
-    REC_VF_MJPEG,
+    OGR_VF_MJPEG,
     /**
      * H264 encoder by openh264.
      */
-    REC_VF_H264
+    OGR_VF_H264,
+    /**
+     * Total numbers of video encoder.
+     */
+    OGR_VF_COUNT
 };
 
 /**
@@ -67,35 +77,35 @@ enum CallBackType
     /**
      * A \ref GeneralCallback which notify the starting of recording.
      */
-    REC_CBT_START_RECORDING = 0,
+    OGR_CBT_START_RECORDING = 0,
     /**
      * A \ref StringCallback which notify the saved filename of recorded file.
      */
-    REC_CBT_SAVED_RECORDING,
+    OGR_CBT_SAVED_RECORDING,
     /**
      * A \ref GeneralCallback which notify error when recording.
      */
-    REC_CBT_ERROR_RECORDING,
+    OGR_CBT_ERROR_RECORDING,
     /**
      * A \ref IntCallback which the tells the progress percentage for video
      * encoding after the issue of \ref ogrStopCapture.
      */
-    REC_CBT_PROGRESS_RECORDING,
+    OGR_CBT_PROGRESS_RECORDING,
     /**
      * A \ref GeneralCallback which notify user if there is still video
      * encoding happening after the issue of \ref ogrStopCapture.
      */
-    REC_CBT_WAIT_RECORDING,
+    OGR_CBT_WAIT_RECORDING,
     /**
      * A \ref GeneralCallback which notify user if the coversion to jpeg
      * from opengl frame buffer image is too slow, so libopenglrecorder will
      * drop frames.
      */
-    REC_CBT_SLOW_RECORDING,
+    OGR_CBT_SLOW_RECORDING,
     /**
      * Total callback numbers.
      */
-    REC_CBT_COUNT
+    OGR_CBT_COUNT
 };
 
 /**
@@ -104,16 +114,16 @@ enum CallBackType
 struct RecorderConfig
 {
     /**
-     * 1 if triple buffering is used when capture the opengl buffer.
+     * 1 if triple buffering is used when capture the opengl frame buffer.
      * It will create 3 pixel buffer objects for async reading, recommend on.
      * 0 otherwise.
      */
-    int m_triple_buffering;
+    unsigned int m_triple_buffering;
     /**
      * 1 if audio is recorded together, it will use wasapi in windows,
-     * pulseaudio in linux. 0 otherwise.
+     * pulseaudio in linux. 0 means no audio will be recorded.
      */
-    int m_record_audio;
+    unsigned int m_record_audio;
     /**
      * Width of the capture, it will be floored down to the closest integer divisble
      * by 8 if needed.
@@ -156,8 +166,10 @@ extern "C"
 #endif
 /**
  * Initialize the configuration, call this first before using the library.
+ *  \return 1 if succesfully configured, 0 otherwise and a default
+ * configuration will be used.
  */
-void ogrInitConfig(RecorderConfig*);
+int ogrInitConfig(RecorderConfig*);
 /**
  * Set the full path with filename for saving the recorded video, excluding
  * extension, libopenglrecorder will automatically add .webm or .mkv as needed.

@@ -612,32 +612,36 @@ void IrrDriver::initDevice()
     cfg.m_height = m_actual_screen_size.Height;
     int vf = UserConfigParams::m_record_format;
     cfg.m_video_format = (VideoFormat)vf;
-    cfg.m_audio_format = REC_AF_VORBIS;
+    cfg.m_audio_format = OGR_AF_VORBIS;
     cfg.m_audio_bitrate = 112000;
     cfg.m_video_bitrate = UserConfigParams::m_vp_bitrate;
     cfg.m_record_fps = UserConfigParams::m_record_fps;
     cfg.m_record_jpg_quality = UserConfigParams::m_recorder_jpg_quality;
-    ogrInitConfig(&cfg);
+    if (ogrInitConfig(&cfg) == 0)
+    {
+        Log::error("irr_driver",
+            "RecorderConfig is invalid, use the default one.");
+    }
 
-    ogrRegGeneralCallback(REC_CBT_START_RECORDING,
+    ogrRegGeneralCallback(OGR_CBT_START_RECORDING,
         [] (void* user_data) { MessageQueue::add
         (MessageQueue::MT_GENERIC, _("Video recording started.")); }, NULL);
-    ogrRegGeneralCallback(REC_CBT_ERROR_RECORDING,
+    ogrRegGeneralCallback(OGR_CBT_ERROR_RECORDING,
         [] (void* user_data) { MessageQueue::add
         (MessageQueue::MT_ERROR, _("Error when saving video.")); }, NULL);
-    ogrRegGeneralCallback(REC_CBT_SLOW_RECORDING,
+    ogrRegGeneralCallback(OGR_CBT_SLOW_RECORDING,
         [] (void* user_data) { MessageQueue::add
         (MessageQueue::MT_ERROR, _("Encoding is too slow, dropping frames."));
         }, NULL);
-    ogrRegGeneralCallback(REC_CBT_WAIT_RECORDING,
+    ogrRegGeneralCallback(OGR_CBT_WAIT_RECORDING,
         [] (void* user_data) { MessageQueue::add
         (MessageQueue::MT_GENERIC, _("Please wait while encoding is finished."
         )); }, NULL);
-    ogrRegStringCallback(REC_CBT_SAVED_RECORDING,
+    ogrRegStringCallback(OGR_CBT_SAVED_RECORDING,
         [] (const char* s, void* user_data) { MessageQueue::add
         (MessageQueue::MT_GENERIC, _("Video saved in \"%s\".", s));
         }, NULL);
-    ogrRegIntCallback(REC_CBT_PROGRESS_RECORDING,
+    ogrRegIntCallback(OGR_CBT_PROGRESS_RECORDING,
         [] (const int i, void* user_data)
         { Log::info("Recorder", "%d%% of video encoding finished", i);}, NULL);
 

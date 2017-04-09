@@ -35,7 +35,7 @@ namespace Recorder
         std::string no_ext = video.substr(0, video.find_last_of("."));
         VideoFormat vf = getConfig()->m_video_format;
         std::string file_name = no_ext +
-            (vf == REC_VF_VP8 || vf == REC_VF_VP9 ? ".webm" : ".mkv");
+            (vf == OGR_VF_VP8 || vf == OGR_VF_VP9 ? ".webm" : ".mkv");
         mkvmuxer::MkvWriter writer;
         if (!writer.Open(file_name.c_str()))
         {
@@ -122,16 +122,16 @@ namespace Recorder
         vt->set_frame_rate(getConfig()->m_record_fps);
         switch (vf)
         {
-        case REC_VF_VP8:
+        case OGR_VF_VP8:
             vt->set_codec_id("V_VP8");
             break;
-        case REC_VF_VP9:
+        case OGR_VF_VP9:
             vt->set_codec_id("V_VP9");
             break;
-        case REC_VF_MJPEG:
+        case OGR_VF_MJPEG:
             vt->set_codec_id("V_MJPEG");
             break;
-        case REC_VF_H264:
+        case OGR_VF_H264:
             vt->set_codec_id("V_MPEG4/ISO/AVC");
             break;
         }
@@ -154,7 +154,7 @@ namespace Recorder
             }
             muxer_frame.set_track_number(vid_track);
             muxer_frame.set_timestamp(timestamp);
-            if (vf == REC_VF_VP8 || vf == REC_VF_VP9)
+            if (vf == OGR_VF_VP8 || vf == OGR_VF_VP9)
             {
                 muxer_frame.set_is_key((flag & VPX_FRAME_IS_KEY) != 0);
             }
