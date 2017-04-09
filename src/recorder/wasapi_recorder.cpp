@@ -227,6 +227,8 @@ namespace Recorder
         case OGR_AF_VORBIS:
             audio_enc_thread = std::thread(vorbisEncoder, &aed);
             break;
+        default:
+            break;
         }
 
         const unsigned frag_size = 1024 * aed.m_channels *

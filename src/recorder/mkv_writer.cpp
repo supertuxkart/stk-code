@@ -134,6 +134,8 @@ namespace Recorder
         case OGR_VF_H264:
             vt->set_codec_id("V_MPEG4/ISO/AVC");
             break;
+        default:
+            break;
         }
         input = fopen(video.c_str(), "rb");
         while (fread(buf, 1, 16, input) == 16)

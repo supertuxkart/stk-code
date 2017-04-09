@@ -75,8 +75,7 @@ namespace Recorder
         case OGR_VF_VP9:
             codec_if = vpx_codec_vp9_cx();
             break;
-        case OGR_VF_MJPEG:
-        case OGR_VF_H264:
+        default:
             assert(false);
             break;
         }

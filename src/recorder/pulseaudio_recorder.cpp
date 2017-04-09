@@ -494,6 +494,8 @@ namespace Recorder
         case OGR_AF_VORBIS:
             audio_enc_thread = std::thread(vorbisEncoder, &aed);
             break;
+        default:
+            break;
         }
 
         int8_t* each_pcm_buf = new int8_t[frag_size]();

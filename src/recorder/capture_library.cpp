@@ -16,7 +16,7 @@ extern "C"
 const uint32_t E_GL_PIXEL_PACK_BUFFER = 0x88EB;
 const uint32_t E_GL_STREAM_READ = 0x88E1;
 const uint32_t E_GL_READ_ONLY = 0x88B8;
-const uint32_t E_GL_RGB = 0x1907;
+const uint32_t E_GL_RGBA = 0x1908;
 const uint32_t E_GL_UNSIGNED_BYTE = 0x1401;
 
 // ----------------------------------------------------------------------------
@@ -80,6 +80,8 @@ void CaptureLibrary::reset()
         break;
     case OGR_VF_H264:
         break;
+    default:
+        break;
     }
 }   // reset
 
@@ -89,11 +91,11 @@ int CaptureLibrary::bmpToJPG(uint8_t* raw, unsigned width, unsigned height,
 {
     int ret = 0;
 #ifdef TJFLAG_FASTDCT
-    ret = tjCompress2(m_compress_handle, raw, width, 0, height, TJPF_RGB,
+    ret = tjCompress2(m_compress_handle, raw, width, 0, height, TJPF_RGBX,
         jpeg_buffer, jpeg_size, TJSAMP_420,
         m_recorder_cfg->m_record_jpg_quality, TJFLAG_FASTDCT);
 #else
-    ret = tjCompress2(m_compress_handle, raw, width, 0, height, TJPF_RGB,
+    ret = tjCompress2(m_compress_handle, raw, width, 0, height, TJPF_RGBX,
         jpeg_buffer, jpeg_size, TJSAMP_420,
         m_recorder_cfg->m_record_jpg_quality, 0);
 #endif
@@ -181,7 +183,7 @@ void CaptureLibrary::capture()
             }
             else
             {
-                glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE,
+                glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE,
                     fbi);
             }
             addFrameBufferImage(fbi, frame_count);
@@ -193,7 +195,7 @@ void CaptureLibrary::capture()
 
     assert(pbo_read == -1 || pbo_use == pbo_read);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, m_pbo[pbo_use]);
-    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 }   // capture
 
@@ -270,8 +272,7 @@ void CaptureLibrary::captureConversion(CaptureLibrary* cl)
         uint8_t* orig_fbi = fbi;
         const unsigned width = cl->m_recorder_cfg->m_width;
         const unsigned height = cl->m_recorder_cfg->m_height;
-        const unsigned area = width * height;
-        const int pitch = width * 3;
+        const int pitch = width * 4;
         uint8_t* p2 = fbi + (height - 1) * pitch;
         uint8_t* tmp_buf = new uint8_t[pitch];
         for (unsigned i = 0; i < height; i += 2)
