@@ -167,10 +167,11 @@ typedef void(*ogrFucReadPixels)(int, int, int, int, unsigned int, unsigned int,
     void*);
 typedef void(*ogrFucGenBuffers)(int, unsigned int*);
 typedef void(*ogrFucBindBuffer)(unsigned int, unsigned int);
-typedef void(*ogrFucBufferData)(unsigned int, ptrdiff_t, const void*, unsigned int);
+typedef void(*ogrFucBufferData)(unsigned int, ptrdiff_t, const void*,
+    unsigned int);
 typedef void(*ogrFucDeleteBuffers)(int, const unsigned int*);
 typedef void*(*ogrFucMapBuffer)(unsigned int, unsigned int);
-typedef void(*ogrFucUnmapBuffer)(unsigned int);
+typedef unsigned char(*ogrFucUnmapBuffer)(unsigned int);
 
 #ifdef  __cplusplus
 extern "C"

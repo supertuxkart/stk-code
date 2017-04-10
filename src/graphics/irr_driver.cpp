@@ -624,11 +624,17 @@ void IrrDriver::initDevice()
             "RecorderConfig is invalid, use the default one.");
     }
 
-    ogrRegReadPixelsFunction((ogrFucReadPixels)glReadPixels);
-    ogrRegPBOFunctions((ogrFucGenBuffers)glGenBuffers,
-        (ogrFucBindBuffer)glBindBuffer, (ogrFucBufferData)glBufferData,
-        (ogrFucDeleteBuffers)glDeleteBuffers, (ogrFucMapBuffer)glMapBuffer,
-        (ogrFucUnmapBuffer)glUnmapBuffer);
+    ogrRegReadPixelsFunction([]
+        (int x, int y, int w, int h, unsigned int f, unsigned int t, void* d)
+        { glReadPixels(x, y, w, h, f, t, d); });
+
+    ogrRegPBOFunctions([](int n, unsigned int* b) { glGenBuffers(n, b); },
+        [](unsigned int t, unsigned int b) { glBindBuffer(t, b); },
+        [](unsigned int t, ptrdiff_t s, const void* d, unsigned int u)
+        { glBufferData(t, s, d, u); },
+        [](int n, const unsigned int* b) { glDeleteBuffers(n, b); },
+        [](unsigned int t, unsigned int a) { return glMapBuffer(t, a); },
+        [](unsigned int t) { return glUnmapBuffer(t); });
 
     ogrRegGeneralCallback(OGR_CBT_START_RECORDING,
         [] (void* user_data) { MessageQueue::add
