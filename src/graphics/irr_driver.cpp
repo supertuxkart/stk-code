@@ -68,6 +68,7 @@
 #include "utils/vs.hpp"
 
 #include <irrlicht.h>
+#include <chrono>
 
 /* Build-time check that the Irrlicht we're building against works for us.
  * Should help prevent distros building against an incompatible library.
@@ -647,9 +648,22 @@ void IrrDriver::initDevice()
         [] (const char* s, void* user_data) { MessageQueue::add
         (MessageQueue::MT_GENERIC, _("Video saved in \"%s\".", s));
         }, NULL);
+    static std::chrono::high_resolution_clock::time_point tp;
     ogrRegIntCallback(OGR_CBT_PROGRESS_RECORDING,
         [] (const int i, void* user_data)
-        { Log::info("Recorder", "%d%% of video encoding finished", i);}, NULL);
+        {
+            std::chrono::high_resolution_clock::time_point* timer =
+                (std::chrono::high_resolution_clock::time_point*)user_data;
+            auto rate = std::chrono::high_resolution_clock::now() -
+                *timer;
+            float t = std::chrono::duration_cast<std::chrono::
+                duration<float> >(rate).count();
+            if (t > 3.0f)
+            {
+                *timer = std::chrono::high_resolution_clock::now();
+                Log::info("Recorder", "%d%% of video encoding finished", i);
+            }
+        }, &tp);
 
 #endif
 

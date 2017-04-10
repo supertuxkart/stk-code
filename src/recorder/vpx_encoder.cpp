@@ -117,16 +117,22 @@ namespace Recorder
             {
                 cl->getJPGList()->clear();
                 ul.unlock();
+                if (cl->displayingProgress())
+                {
+                    int rate = 100;
+                    runCallback(OGR_CBT_PROGRESS_RECORDING, &rate);
+                }
                 break;
             }
             cl->getJPGList()->pop_front();
             ul.unlock();
-            if (!cl->getDestroy() && cl->displayingProgress())
+            if (cl->displayingProgress())
             {
                 if (last_size == -1.0f)
                     last_size = (float)(cl->getJPGList()->size());
                 cur_finished_count += frame_count;
                 int rate = (int)(cur_finished_count / last_size * 100.0f);
+                rate = rate > 100 ? 100 : rate;
                 runCallback(OGR_CBT_PROGRESS_RECORDING, &rate);
             }
             uint8_t* yuv = NULL;

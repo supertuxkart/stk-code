@@ -221,10 +221,10 @@ void CaptureLibrary::captureConversion(CaptureLibrary* cl)
             {
                 runCallback(OGR_CBT_WAIT_RECORDING, NULL);
             }
-            cl->m_display_progress.store(true);
             cl->m_jpg_list.emplace_back((uint8_t*)NULL, 0, 0);
             cl->m_jpg_list_ready.notify_one();
             ulj.unlock();
+            cl->m_display_progress.store(!cl->m_destroy.load());
             cl->m_video_enc_thread.join();
             cl->m_display_progress.store(false);
             std::string f = Recorder::writeMKV(getSavedName() + ".video",
@@ -253,7 +253,8 @@ void CaptureLibrary::captureConversion(CaptureLibrary* cl)
         const bool too_slow = cl->m_fbi_list.size() > 50;
         if (too_slow)
         {
-            runCallback(OGR_CBT_SLOW_RECORDING, NULL);
+            if (!cl->m_destroy.load())
+                runCallback(OGR_CBT_SLOW_RECORDING, NULL);
             delete [] fbi;
             cl->m_fbi_list.pop_front();
             for (auto& p : cl->m_fbi_list)
