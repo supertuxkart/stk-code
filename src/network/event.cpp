@@ -49,7 +49,7 @@ Event::Event(ENetEvent* event)
     if (m_type == EVENT_TYPE_MESSAGE)
     {
         m_data = new NetworkString(event->packet->data, 
-                                      event->packet->dataLength);
+                                   (int)event->packet->dataLength);
     }
     else
         m_data = NULL;

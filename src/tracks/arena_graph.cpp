@@ -149,11 +149,11 @@ void ArenaGraph::loadNavmesh(const std::string &navmesh)
 
                 createQuad(all_vertices[quad_index[0]],
                     all_vertices[quad_index[1]], all_vertices[quad_index[2]],
-                    all_vertices[quad_index[3]], m_all_nodes.size(),
+                    all_vertices[quad_index[3]], (int)m_all_nodes.size(),
                     false/*invisible*/, false/*ai_ignore*/, true/*is_arena*/,
                     false/*ignore*/);
 
-                ArenaNode* cur_node = getNode(m_all_nodes.size() - 1);
+                ArenaNode* cur_node = getNode((int)m_all_nodes.size() - 1);
                 cur_node->setAdjacentNodes(adjacent_quad_index);
             }
         }
@@ -337,7 +337,7 @@ void ArenaGraph::setNearbyNodesOfAllNodes()
         {
             std::vector<float>::iterator it =
                 std::min_element(dist.begin(), dist.end());
-            const int pos = it - dist.begin();
+            const int pos = int(it - dist.begin());
             nearby_nodes.push_back(pos);
             dist[pos] = 999999.0f;
         }

@@ -55,7 +55,7 @@ Protocol::~Protocol()
  */
 NetworkString* Protocol::getNetworkString(size_t capacity)
 {
-    return new NetworkString(m_type, capacity);
+    return new NetworkString(m_type, (int)capacity);
 }   // getNetworkString
 
 // ----------------------------------------------------------------------------
