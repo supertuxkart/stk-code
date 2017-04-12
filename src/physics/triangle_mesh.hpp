@@ -79,6 +79,7 @@ public:
         m_free_body = false;
         m_body = body;
     }
+    const btRigidBody *getBody() const { return m_body; }
     // ------------------------------------------------------------------------
     const Material* getMaterial(int n) const
                                           {return m_triangleIndex2Material[n];}

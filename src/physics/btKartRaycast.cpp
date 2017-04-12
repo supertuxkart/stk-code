@@ -73,8 +73,17 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
             result.m_triangle_index = -1;
             const TriangleMesh &tm =
                 Track::getCurrentTrack()->getTriangleMesh();
+            // FIXME: this code assumes atm that the object the kart is
+            // driving on is the main track (and not e.g. a physical object).
+            // If this should not be the case (i.e. the object hit by the
+            // raycast is not the object of the main track mesh, don't smooth
+            // the normals (since the index of the triangle is meant for a
+            // different triangle mesh). TODO: Add a mapping from bullet
+            // objects back to triangle meshes, so that it's easy to pick up
+            // the right triangle mesh for smoothing
             if(m_smooth_normals &&
-                rayCallback.getTriangleIndex()>-1)
+                rayCallback.getTriangleIndex()>-1 &&
+                body == Track::getCurrentTrack()->getTriangleMesh().getBody())
             {
 #undef DEBUG_NORMALS
 #ifdef DEBUG_NORMALS
