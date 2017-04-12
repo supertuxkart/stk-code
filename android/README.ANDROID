@@ -85,6 +85,59 @@ to just run:
 
 
 --------------------------------------------------------------------------------
+ RELEASE BUILD
+--------------------------------------------------------------------------------
+
+Making a release build is similar to typical compilation, but there are few
+additional things to do. 
+
+You have to change version numbers. This is important, because assets manager
+in STK checks these numbers and detects if already extracted data files are
+up to date. So that when you will install new STK version, this will force new 
+data extraction automatically.
+
+So that you have to:
+
+1. Change "data/supertuxkart.git" to "data/supertuxkart.VERSION_NUMBER"
+
+2. Open "src/utils/constants.cpp" and change:
+
+    const char STK_VERSION[] = "git";
+      
+   to
+    
+    const char STK_VERSION[] = "VERSION_NUMBER";
+      
+   where "VERSION_NUMBER" is for example "0.9.3" or "git20170409" or whatever.
+    
+3. You can also update these lines in "android/AndroidManifest.xml":
+    android:versionCode="1"
+    android:versionName="1.0"
+
+
+Before compilation you have to set:
+
+    export BUILD_TYPE=release
+
+and then you make standard compilation with:
+
+    ./generate_assets.sh
+    ./make.sh -j5
+    
+
+The compiled apk is unsigned, so you have to sign it with your key. To sign it,
+you have to run:
+
+    jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore \
+        my-release-key.keystore SuperTuxKart-release-unsigned.apk alias_name
+        
+and then:
+
+    zipalign -v 4 SuperTuxKart-release-unsigned.apk SuperTuxKart-release.apk
+
+
+
+--------------------------------------------------------------------------------
  KNOWN ISSUES
 --------------------------------------------------------------------------------
 

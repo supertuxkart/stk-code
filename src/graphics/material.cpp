@@ -1010,6 +1010,18 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     if (m_shader_type == SHADERTYPE_VEGETATION)
     {
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+
+#ifndef SERVER_ONLY
+        // A hack that makes the grass more bright in legacy pipeline, so that
+        // it looks more similar to our shader-based pipeline
+        if (!CVS->isGLSL())
+        {
+            m->AmbientColor  = video::SColor(255, 150, 150, 150);
+            m->DiffuseColor  = video::SColor(255, 150, 150, 150);
+            m->EmissiveColor = video::SColor(255, 150, 150, 150);
+            m->SpecularColor = video::SColor(255, 150, 150, 150);
+        }
+#endif
     }
 
     if (m_disable_z_write)
