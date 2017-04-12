@@ -57,7 +57,6 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
-#include "recorder/openglrecorder.h"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
 #include "states_screens/state_manager.hpp"
@@ -67,8 +66,9 @@
 #include "utils/profiler.hpp"
 #include "utils/vs.hpp"
 
-#include <irrlicht.h>
 #include <chrono>
+#include <irrlicht.h>
+#include <openglrecorder.h>
 
 /* Build-time check that the Irrlicht we're building against works for us.
  * Should help prevent distros building against an incompatible library.

@@ -24,10 +24,6 @@ option(ENABLE_NETWORK_MULTIPLAYER "Enable network multiplayer. This will replace
 
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT USE_GLES2;NOT APPLE" OFF)
-CMAKE_DEPENDENT_OPTION(BUILD_RECORDER_WITH_SOUND "Build opengl recorder with sound" ON
-    BUILD_RECORDER OFF)
-CMAKE_DEPENDENT_OPTION(BUILD_PULSE_WO_DL "If pulseaudio in your distro / system is optional, turn this off to load pulse with libdl"
-    ON "BUILD_RECORDER_WITH_SOUND;UNIX" OFF)
 
 if (UNIX AND NOT APPLE)
     option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
@@ -88,12 +84,6 @@ endif()
 
 if(BUILD_RECORDER)
     add_definitions(-DENABLE_RECORDER)
-    if(BUILD_RECORDER_WITH_SOUND)
-        add_definitions(-DENABLE_REC_SOUND)
-        if(BUILD_PULSE_WO_DL)
-            add_definitions(-DENABLE_PULSE_WO_DL)
-        endif()
-    endif()
 endif()
 
 # Build the Bullet physics library
@@ -145,22 +135,12 @@ else()
 endif()
 
 if(BUILD_RECORDER)
-    find_library(TURBOJPEG_LIBRARY NAMES turbojpeg libturbojpeg PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
-    mark_as_advanced(TURBOJPEG_LIBRARY)
-    if(UNIX)
-        include(FindPkgConfig)
-        pkg_check_modules(VPX vpx)
-    else()
-        find_path(VPX_INCLUDEDIR NAMES vpx/vpx_codec.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
-        find_library(VPX_LIBRARIES NAMES libvpx PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
-    endif()
-    include_directories(${VPX_INCLUDEDIR})
-    if(BUILD_RECORDER_WITH_SOUND AND UNIX)
-        pkg_check_modules(PULSEAUDIO libpulse)
-        include_directories(${PULSEAUDIO_INCLUDEDIR})
-    endif()
-    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libwebm")
-    include_directories("${PROJECT_SOURCE_DIR}/lib/libwebm")
+    find_library(OPENGLRECORDER_LIBRARY NAMES openglrecorder libopenglrecorder PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
+    find_path(OPENGLRECORDER_INCLUDEDIR NAMES openglrecorder.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
+    find_library(OPENGLRECORDER_LIBRARY NAMES openglrecorder libopenglrecorder PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
+    find_path(OPENGLRECORDER_INCLUDEDIR NAMES openglrecorder.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
+    include_directories(${OPENGLRECORDER_INCLUDEDIR})
+    mark_as_advanced(OPENGLRECORDER_LIBRARY OPENGLRECORDER_INCLUDEDIR)
 endif()
 
 if(NOT SERVER_ONLY AND NOT USE_GLES2)
@@ -447,14 +427,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 if(BUILD_RECORDER)
-    target_link_libraries(supertuxkart webm ${TURBOJPEG_LIBRARY} ${VPX_LIBRARIES})
-    if(BUILD_RECORDER_WITH_SOUND AND UNIX)
-        if(BUILD_PULSE_WO_DL)
-            target_link_libraries(supertuxkart ${PULSEAUDIO_LIBRARIES})
-        else()
-            target_link_libraries(supertuxkart dl)
-        endif()
-    endif()
+    target_link_libraries(supertuxkart ${OPENGLRECORDER_LIBRARY})
 endif()
 
 # FreeBSD does not search in /usr/local/lib, but at least Freetype is installed there :(
