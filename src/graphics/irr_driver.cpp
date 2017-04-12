@@ -66,9 +66,12 @@
 #include "utils/profiler.hpp"
 #include "utils/vs.hpp"
 
-#include <chrono>
 #include <irrlicht.h>
+
+#ifdef ENABLE_RECORDER
+#include <chrono>
 #include <openglrecorder.h>
+#endif
 
 /* Build-time check that the Irrlicht we're building against works for us.
  * Should help prevent distros building against an incompatible library.
