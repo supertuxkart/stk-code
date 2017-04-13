@@ -642,17 +642,13 @@ void IrrDriver::initDevice()
     ogrRegGeneralCallback(OGR_CBT_START_RECORDING,
         [] (void* user_data) { MessageQueue::add
         (MessageQueue::MT_GENERIC, _("Video recording started.")); }, NULL);
-    ogrRegGeneralCallback(OGR_CBT_ERROR_RECORDING,
-        [] (void* user_data) { MessageQueue::add
-        (MessageQueue::MT_ERROR, _("Error when saving video.")); }, NULL);
-    ogrRegGeneralCallback(OGR_CBT_SLOW_RECORDING,
-        [] (void* user_data) { MessageQueue::add
-        (MessageQueue::MT_ERROR, _("Encoding is too slow, dropping frames."));
-        }, NULL);
     ogrRegGeneralCallback(OGR_CBT_WAIT_RECORDING,
         [] (void* user_data) { MessageQueue::add
         (MessageQueue::MT_GENERIC, _("Please wait while encoding is finished."
         )); }, NULL);
+    ogrRegStringCallback(OGR_CBT_ERROR_RECORDING,
+        [](const char* s, void* user_data)
+        { Log::error("openglrecorder", "%s", s); }, NULL);
     ogrRegStringCallback(OGR_CBT_SAVED_RECORDING,
         [] (const char* s, void* user_data) { MessageQueue::add
         (MessageQueue::MT_GENERIC, _("Video saved in \"%s\".", s));
@@ -1968,7 +1964,7 @@ void IrrDriver::update(float dt)
     //if(World::getWorld() && World::getWorld()->isRacePhase())
     //    printRenderStats();
 #ifdef ENABLE_RECORDER
-    if (m_recording)
+    if (!world && m_recording)
         ogrCapture();
 #endif
 }   // update
@@ -1982,13 +1978,11 @@ void IrrDriver::setRecording(bool val)
         Log::warn("irr_driver", "PBO extension missing, can't record video.");
         return;
     }
-    if (m_recording == val)
+    if (val == (ogrCapturing() == 1))
         return;
+    m_recording = val;
     if (val == true)
     {
-        if (ogrCapturing() > 0)
-            return;
-        m_recording = val;
         std::string track_name = World::getWorld() != NULL ?
             race_manager->getTrackName() : "menu";
         time_t rawtime;
@@ -2005,7 +1999,6 @@ void IrrDriver::setRecording(bool val)
     }
     else
     {
-        m_recording = val;
         ogrStopCapture();
     }
 #endif
