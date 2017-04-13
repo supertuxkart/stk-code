@@ -1964,8 +1964,12 @@ void IrrDriver::update(float dt)
     //if(World::getWorld() && World::getWorld()->isRacePhase())
     //    printRenderStats();
 #ifdef ENABLE_RECORDER
-    if (!world && m_recording)
+    if (m_recording)
+    {
+        PROFILER_PUSH_CPU_MARKER("- Recording", 0x0, 0x50, 0x40);
         ogrCapture();
+        PROFILER_POP_CPU_MARKER();
+    }
 #endif
 }   // update
 

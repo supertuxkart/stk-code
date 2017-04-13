@@ -34,9 +34,6 @@
 #include "utils/profiler.hpp"
 
 #include <numeric>
-#ifdef ENABLE_RECORDER
-#include <openglrecorder.h>
-#endif
 
 // ----------------------------------------------------------------------------
 void DrawCalls::clearLists()
@@ -649,15 +646,6 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
     PROFILER_POP_CPU_MARKER();
 
     irr_driver->setSkinningJoint(getSkinningOffset());
-#ifdef ENABLE_RECORDER
-    if (irr_driver->isRecording())
-    {
-        PROFILER_PUSH_CPU_MARKER("- Recording", 0x0, 0x50, 0x40);
-        ogrCapture();
-        PROFILER_POP_CPU_MARKER();
-    }
-#endif
-
     // Add a 1 s timeout
     if (!m_sync)
         m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
