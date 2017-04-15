@@ -840,6 +840,19 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
 }   // drawProgress
 
 // ----------------------------------------------------------------------------
+void Skin::drawProgress(SkinWidgetContainer* swc,
+                        const core::rect< s32 > &rect, int progress)
+{
+    drawBoxFromStretchableTexture(swc, rect,
+        SkinConfig::m_render_params["progress::neutral"]);
+    core::recti rect2 = rect;
+    rect2.LowerRightCorner.X -= (rect.getWidth())
+                              - progress * rect.getWidth() / 100;
+    drawBoxFromStretchableTexture(swc, rect2,
+        SkinConfig::m_render_params["progress::fill"]);
+}   // drawProgress
+
+// ----------------------------------------------------------------------------
 /**
  * @param focused whether this element is focus by the master player (focus
  * for other players is not supported)

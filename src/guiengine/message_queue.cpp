@@ -22,6 +22,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/skin.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/translation.hpp"
@@ -30,23 +31,66 @@
 #include "IGUIEnvironment.h"
 #include "IGUIStaticText.h"
 
+#include <atomic>
+
 using namespace GUIEngine;
 
 namespace MessageQueue
 {
 // ============================================================================
-/** The area which the message is drawn. */
-core::recti g_area;
+/** The label widget used to show the current message. */
+SkinWidgetContainer* g_container = NULL;
 
 // ============================================================================
-/** A small helper class to store and sort messages to be displayed. */
+/** A base class for any messages. */
 class Message
+{
+protected:
+    /** The message. */
+    core::stringw m_message;
+
+    /** If this < 0, remove this message from queue. */
+    float m_display_timer;
+
+    /** The area which the message is drawn. */
+    core::recti m_area;
+
+private:
+    /** Tell if this message has been initialized. */
+    bool m_inited;
+
+public:
+    Message(float timer) : m_display_timer(timer), m_inited(false) {}
+    // ------------------------------------------------------------------------
+    virtual ~Message() {}
+    // ------------------------------------------------------------------------
+    virtual MessageQueue::MessageType getMessageType() const = 0;
+    // ------------------------------------------------------------------------
+    virtual void init() = 0;
+    // ------------------------------------------------------------------------
+    virtual void draw(float dt)
+    {
+        if (!m_inited)
+        {
+            m_inited = true;
+            init();
+        }
+        m_display_timer -= dt;
+    }
+    // ------------------------------------------------------------------------
+    bool canBeRemoved() const                { return m_display_timer < 0.0f; }
+    // ------------------------------------------------------------------------
+    virtual void remove() {}
+
+};
+
+// ============================================================================
+/** A small helper class to store and sort text messages to be displayed. */
+class TextMessage : public Message
 {
 private:
     /** The type of the message. */
     MessageQueue::MessageType m_message_type;
-    /** The message. */
-    core::stringw m_message;
 
     /** The render type of the message: either achievement-message::neutral
      *  or friend-message::neutral. */
@@ -56,42 +100,38 @@ private:
     gui::IGUIStaticText* m_text;
 
 public:
-    Message(MessageQueue::MessageType mt, const core::stringw &message)
+    TextMessage(MessageQueue::MessageType mt, const core::stringw &message) :
+        Message(5.0f)
     {
         m_message_type = mt;
         m_message      = message;
         m_text         = NULL;
-        if(mt==MessageQueue::MT_ACHIEVEMENT)
+        assert(mt != MessageQueue::MT_PROGRESS);
+        if (mt == MessageQueue::MT_ACHIEVEMENT)
             m_render_type = "achievement-message::neutral";
-        else if (mt==MessageQueue::MT_ERROR)
+        else if (mt == MessageQueue::MT_ERROR)
             m_render_type = "error-message::neutral";
-        else if (mt==MessageQueue::MT_GENERIC)
+        else if (mt == MessageQueue::MT_GENERIC)
             m_render_type = "generic-message::neutral";
         else
             m_render_type = "friend-message::neutral";
     }   // Message
     // ------------------------------------------------------------------------
-    ~Message()
+    ~TextMessage()
     {
         assert(m_text != NULL);
         m_text->drop();
     }
-    /** Returns the message. */
-    const core::stringw & getMessage() const { return m_message; }
     // ------------------------------------------------------------------------
-    /** Returns the type of the message (achievement or friend). */
-    MessageQueue::MessageType getMessageType() const { return m_message_type; }
-    // ------------------------------------------------------------------------
-    /** Returns the render type: either achievement-message::neutral or
-     *  friend-message::neutral (see skin for details). */
-    const std::string &getRenderType() const
-    {
-        return m_render_type;
-    }
+    /** Returns the type of the message.*/
+    virtual MessageQueue::MessageType getMessageType() const
+                                                     { return m_message_type; }
     // ------------------------------------------------------------------------
     /** Init the message text, do linebreak as required. */
-    void init()
+    virtual void init()
     {
+        if (m_text)
+            m_text->drop();
         const GUIEngine::BoxRenderParams &brp =
             GUIEngine::getSkin()->getBoxRenderParams(m_render_type);
         const unsigned width = irr_driver->getActualScreenSize().Width;
@@ -107,21 +147,25 @@ public:
         dim.Width += brp.m_left_border + brp.m_right_border;
         int x = (width - dim.Width) / 2;
         int y = height - int(1.5f * dim.Height);
-        g_area = irr::core::recti(x, y, x + dim.Width, y + dim.Height);
-        m_text->setRelativePosition(g_area);
+        m_area = irr::core::recti(x, y, x + dim.Width, y + dim.Height);
+        m_text->setRelativePosition(m_area);
         m_text->setTextAlignment(gui::EGUIA_CENTER, gui::EGUIA_CENTER);
         m_text->grab();
         m_text->remove();
     }
     // ------------------------------------------------------------------------
     /** Draw the message. */
-    void draw()
+    virtual void draw(float dt)
     {
+        Message::draw(dt);
+        GUIEngine::getSkin()->drawMessage(g_container, m_area, m_render_type);
         assert(m_text != NULL);
         m_text->draw();
     }
+    // ------------------------------------------------------------------------
+    virtual void remove()                                      { delete this; }
 
-};   // class Message
+};   // class TextMessage
 
 // ============================================================================
 /** A function class to compare messages, required for priority_queue. */
@@ -142,30 +186,87 @@ public:
 Synchronised<std::priority_queue<Message*, std::vector<Message*>,
                    CompareMessages> > g_all_messages;
 
-/** How long the current message has been displayed. The special value
- *  -1 indicates that a new message was added when the queue was empty. */
-float        g_current_display_time = -1.0f;
-
-/** How long the current message should be displaed. */
-float        g_max_display_time     = 5.0f;
-
-/** The label widget used to show the current message. */
-SkinWidgetContainer *g_container    = NULL;
+// ============================================================================
+/** Add any message to the message queue.
+ *  \param message Any message.
+ */
+void privateAdd(Message* m)
+{
+    g_all_messages.lock();
+    g_all_messages.getData().push(m);
+    g_all_messages.unlock();
+}   // privateAdd
 
 // ============================================================================
-
-void createLabel(Message *message)
+/** A class which display a progress bar in game, only one can be displayed. */
+class ProgressBarMessage : public Message
 {
-    if(!g_container)
-        g_container = new SkinWidgetContainer();
+private:
+    std::atomic_int_fast8_t m_progress_value;
 
-    g_current_display_time = 0.0f;
-    // Maybe make this time dependent on message length as well?
-    g_max_display_time     = 5.0f;
-    message->init();
-}   // createLabel
+    bool m_showing;
 
-// ----------------------------------------------------------------------------
+    SkinWidgetContainer m_swc;
+public:
+    ProgressBarMessage() :
+               Message(9999999.9f)
+    {
+        m_progress_value.store(0);
+        m_showing = false;
+    }   // ProgressBarMessage
+    // ------------------------------------------------------------------------
+    ~ProgressBarMessage() {}
+    // ------------------------------------------------------------------------
+    /** Returns the type of the message.*/
+    virtual MessageQueue::MessageType getMessageType() const
+                                                        { return MT_PROGRESS; }
+    // ------------------------------------------------------------------------
+    virtual void init()
+    {
+        const unsigned width = irr_driver->getActualScreenSize().Width;
+        const unsigned height = irr_driver->getActualScreenSize().Height;
+        core::dimension2du dim(width * 0.75f, height * 0.05f);
+        int x = (width - dim.Width) / 2;
+        int y = height - int(1.5f * dim.Height);
+        m_area = irr::core::recti(x, y, x + dim.Width,
+            y + dim.Height);
+    }
+    // ------------------------------------------------------------------------
+    virtual void draw(float dt)
+    {
+        Message::draw(dt);
+        m_display_timer = 9999999.9f;
+        GUIEngine::getSkin()->drawProgress(&m_swc, m_area,
+            m_progress_value.load());
+        video::SColor color(255, 0, 0, 0);
+        GUIEngine::getFont()->draw(m_message, m_area, color, true, true);
+        if (m_progress_value.load() >= 100)
+        {
+            m_display_timer = -1.0f;
+            m_showing = false;
+        }
+    }
+    // ------------------------------------------------------------------------
+    void setProgress(int progress, const wchar_t* msg)
+    {
+        if (progress < 0)
+            return;
+        if (progress > 100)
+            progress = 100;
+        m_progress_value.store((int_fast8_t)progress);
+        if (!m_showing && progress == 0)
+        {
+            m_showing = true;
+            m_message = msg;
+            privateAdd(this);
+        }
+    }
+};   // class ProgressBarMessage
+
+// ============================================================================
+/** One instance of progress bar. */
+ProgressBarMessage g_progress_bar_msg;
+// ============================================================================
 /** Called when the screen resolution is changed to compute the new
  *  position of the message. */
 void updatePosition()
@@ -177,28 +278,19 @@ void updatePosition()
         g_all_messages.unlock();
         return;
     }
-    Message *last = g_all_messages.getData().top();
-    createLabel(last);
+    g_all_messages.getData().top()->init();
     g_all_messages.unlock();
 }   // updatePosition
 
 // ----------------------------------------------------------------------------
-/** Adds a message to the message queue.
+/** Adds a Text message to the message queue.
  *  \param mt The MessageType of the message.
  *  \param message The actual message.
  */
 void add(MessageType mt, const irr::core::stringw &message)
 {
-    Message *m = new Message(mt, message);
-    g_all_messages.lock();
-    if (g_all_messages.getData().empty())
-    {
-        // Indicate that there is a new message, which should
-        // which needs a new label etc. to be computed.
-        g_current_display_time =-1.0f;
-    }
-    g_all_messages.getData().push(m);
-    g_all_messages.unlock();
+    Message *m = new TextMessage(mt, message);
+    privateAdd(m);
 }   // add
 
 // ----------------------------------------------------------------------------
@@ -210,39 +302,40 @@ void add(MessageType mt, const irr::core::stringw &message)
  */
 void update(float dt)
 {
+    if (!g_container)
+        g_container = new SkinWidgetContainer();
+
     g_all_messages.lock();
     bool empty = g_all_messages.getData().empty();
-    g_all_messages.unlock();
-    if (empty) return;
-
-    g_all_messages.lock();
-    g_current_display_time += dt;
-    if (g_current_display_time > g_max_display_time)
+    if (empty)
     {
-        Message *last = g_all_messages.getData().top();
+        g_all_messages.unlock();
+        return;
+    }
+
+    Message* current = g_all_messages.getData().top();
+    current->draw(dt);
+
+    if (current->canBeRemoved())
+    {
         g_all_messages.getData().pop();
-        delete last;
-        if (g_all_messages.getData().empty())
-        {
-            g_all_messages.unlock();
-            return;
-        }
-        g_current_display_time = -1.0f;
-    }
-
-    Message *current = g_all_messages.getData().top();
-    // Create new data for the display.
-    if (g_current_display_time < 0)
-    {
-        createLabel(current);
+        current->remove();
     }
     g_all_messages.unlock();
-
-    GUIEngine::getSkin()->drawMessage(g_container, g_area,
-                                      current->getRenderType());
-    current->draw();
 
 }   // update
+
+// ----------------------------------------------------------------------------
+/** The time a user firstly call this function with a zero progress, a progress
+ *  bar will display in the game, the time the value of progress become 100,
+ *  the progress bar will disappear. So make sure only 1 progress bar is being
+ *  used each time.
+ *  \param progress Progress from 0 to 100.
+ */
+void showProgressBar(int progress, const wchar_t* msg)
+{
+    g_progress_bar_msg.setProgress(progress, msg);
+}   // showProgressBar
 
 }   // namespace GUIEngine
 

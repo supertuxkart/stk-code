@@ -160,6 +160,9 @@ IrrDriver::IrrDriver()
  */
 IrrDriver::~IrrDriver()
 {
+#ifdef ENABLE_RECORDER
+    ogrDestroy();
+#endif
     assert(m_device != NULL);
     m_device->drop();
     m_device = NULL;
@@ -173,9 +176,6 @@ IrrDriver::~IrrDriver()
 #endif
     delete m_wind;
     delete m_renderer;
-#ifdef ENABLE_RECORDER
-    ogrDestroy();
-#endif
 }   // ~IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -642,10 +642,6 @@ void IrrDriver::initDevice()
     ogrRegGeneralCallback(OGR_CBT_START_RECORDING,
         [] (void* user_data) { MessageQueue::add
         (MessageQueue::MT_GENERIC, _("Video recording started.")); }, NULL);
-    ogrRegGeneralCallback(OGR_CBT_WAIT_RECORDING,
-        [] (void* user_data) { MessageQueue::add
-        (MessageQueue::MT_GENERIC, _("Please wait while encoding is finished."
-        )); }, NULL);
     ogrRegStringCallback(OGR_CBT_ERROR_RECORDING,
         [](const char* s, void* user_data)
         { Log::error("openglrecorder", "%s", s); }, NULL);
@@ -653,22 +649,9 @@ void IrrDriver::initDevice()
         [] (const char* s, void* user_data) { MessageQueue::add
         (MessageQueue::MT_GENERIC, _("Video saved in \"%s\".", s));
         }, NULL);
-    static std::chrono::high_resolution_clock::time_point tp;
     ogrRegIntCallback(OGR_CBT_PROGRESS_RECORDING,
         [] (const int i, void* user_data)
-        {
-            std::chrono::high_resolution_clock::time_point* timer =
-                (std::chrono::high_resolution_clock::time_point*)user_data;
-            auto rate = std::chrono::high_resolution_clock::now() -
-                *timer;
-            float t = std::chrono::duration_cast<std::chrono::
-                duration<float> >(rate).count();
-            if (t > 3.0f)
-            {
-                *timer = std::chrono::high_resolution_clock::now();
-                Log::info("Recorder", "%d%% of video encoding finished", i);
-            }
-        }, &tp);
+        { MessageQueue::showProgressBar(i, _("Encoding progress:")); }, NULL);
 
 #endif
 
