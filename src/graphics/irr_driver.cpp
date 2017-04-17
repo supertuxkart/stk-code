@@ -57,7 +57,6 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
-#include "recorder/recorder_common.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
 #include "states_screens/state_manager.hpp"
@@ -68,6 +67,11 @@
 #include "utils/vs.hpp"
 
 #include <irrlicht.h>
+
+#ifdef ENABLE_RECORDER
+#include <chrono>
+#include <openglrecorder.h>
+#endif
 
 /* Build-time check that the Irrlicht we're building against works for us.
  * Should help prevent distros building against an incompatible library.
@@ -156,6 +160,9 @@ IrrDriver::IrrDriver()
  */
 IrrDriver::~IrrDriver()
 {
+#ifdef ENABLE_RECORDER
+    ogrDestroy();
+#endif
     assert(m_device != NULL);
     m_device->drop();
     m_device = NULL;
@@ -169,9 +176,6 @@ IrrDriver::~IrrDriver()
 #endif
     delete m_wind;
     delete m_renderer;
-#ifdef ENABLE_RECORDER
-    Recorder::destroyRecorder();
-#endif
 }   // ~IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -603,6 +607,54 @@ void IrrDriver::initDevice()
     sml->drop();
 
     m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
+
+#ifdef ENABLE_RECORDER
+    RecorderConfig cfg;
+    cfg.m_triple_buffering = 1;
+    cfg.m_record_audio = 1;
+    cfg.m_width = m_actual_screen_size.Width;
+    cfg.m_height = m_actual_screen_size.Height;
+    int vf = UserConfigParams::m_record_format;
+    cfg.m_video_format = (VideoFormat)vf;
+    cfg.m_audio_format = OGR_AF_VORBIS;
+    cfg.m_audio_bitrate = 112000;
+    cfg.m_video_bitrate = UserConfigParams::m_vp_bitrate;
+    cfg.m_record_fps = UserConfigParams::m_record_fps;
+    cfg.m_record_jpg_quality = UserConfigParams::m_recorder_jpg_quality;
+    if (ogrInitConfig(&cfg) == 0)
+    {
+        Log::error("irr_driver",
+            "RecorderConfig is invalid, use the default one.");
+    }
+
+    ogrRegReadPixelsFunction([]
+        (int x, int y, int w, int h, unsigned int f, unsigned int t, void* d)
+        { glReadPixels(x, y, w, h, f, t, d); });
+
+    ogrRegPBOFunctions([](int n, unsigned int* b) { glGenBuffers(n, b); },
+        [](unsigned int t, unsigned int b) { glBindBuffer(t, b); },
+        [](unsigned int t, ptrdiff_t s, const void* d, unsigned int u)
+        { glBufferData(t, s, d, u); },
+        [](int n, const unsigned int* b) { glDeleteBuffers(n, b); },
+        [](unsigned int t, unsigned int a) { return glMapBuffer(t, a); },
+        [](unsigned int t) { return glUnmapBuffer(t); });
+
+    ogrRegGeneralCallback(OGR_CBT_START_RECORDING,
+        [] (void* user_data) { MessageQueue::add
+        (MessageQueue::MT_GENERIC, _("Video recording started.")); }, NULL);
+    ogrRegStringCallback(OGR_CBT_ERROR_RECORDING,
+        [](const char* s, void* user_data)
+        { Log::error("openglrecorder", "%s", s); }, NULL);
+    ogrRegStringCallback(OGR_CBT_SAVED_RECORDING,
+        [] (const char* s, void* user_data) { MessageQueue::add
+        (MessageQueue::MT_GENERIC, _("Video saved in \"%s\".", s));
+        }, NULL);
+    ogrRegIntCallback(OGR_CBT_PROGRESS_RECORDING,
+        [] (const int i, void* user_data)
+        { MessageQueue::showProgressBar(i, _("Encoding progress:")); }, NULL);
+
+#endif
+
 #ifndef SERVER_ONLY
     if(CVS->isGLSL())
         m_renderer = new ShaderBasedRenderer();
@@ -927,7 +979,7 @@ void IrrDriver::applyResolutionSettings()
     VAOManager::getInstance()->kill();
     STKTexManager::getInstance()->kill();
 #ifdef ENABLE_RECORDER
-    Recorder::destroyRecorder();
+    ogrDestroy();
     m_recording = false;
 #endif
     // initDevice will drop the current device.
@@ -1896,7 +1948,11 @@ void IrrDriver::update(float dt)
     //    printRenderStats();
 #ifdef ENABLE_RECORDER
     if (m_recording)
-        Recorder::captureFrameBufferImage();
+    {
+        PROFILER_PUSH_CPU_MARKER("- Recording", 0x0, 0x50, 0x40);
+        ogrCapture();
+        PROFILER_POP_CPU_MARKER();
+    }
 #endif
 }   // update
 
@@ -1909,25 +1965,28 @@ void IrrDriver::setRecording(bool val)
         Log::warn("irr_driver", "PBO extension missing, can't record video.");
         return;
     }
-    if (m_recording == val)
+    if (val == (ogrCapturing() == 1))
         return;
+    m_recording = val;
     if (val == true)
     {
-        if (!Recorder::isRecording())
-            return;
-        m_recording = val;
         std::string track_name = World::getWorld() != NULL ?
             race_manager->getTrackName() : "menu";
-        Recorder::setRecordingName(file_manager->getScreenshotDir() +
-            track_name);
-        Recorder::prepareCapture();
-        MessageQueue::add(MessageQueue::MT_GENERIC,
-            _("Video recording started."));
+        time_t rawtime;
+        time(&rawtime);
+        tm* timeInfo = localtime(&rawtime);
+        char time_buffer[256];
+        sprintf(time_buffer, "%i.%02i.%02i_%02i.%02i.%02i",
+            timeInfo->tm_year + 1900, timeInfo->tm_mon + 1,
+            timeInfo->tm_mday, timeInfo->tm_hour,
+            timeInfo->tm_min, timeInfo->tm_sec);
+        ogrSetSavedName((file_manager->getScreenshotDir() +
+            track_name + "_" + time_buffer).c_str());
+        ogrPrepareCapture();
     }
     else
     {
-        m_recording = val;
-        Recorder::stopRecording();
+        ogrStopCapture();
     }
 #endif
 }   // setRecording

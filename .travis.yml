@@ -32,12 +32,8 @@ addons:
     - libjpeg-dev
     - libogg-dev
     - libopenal-dev
-    - libpulse-dev
     - libpng-dev
-    - libturbojpeg
     - libvorbis-dev
-    - libvorbisenc2
-    - libvpx-dev
     - libxrandr-dev
     - mesa-common-dev
     - pkg-config
@@ -57,7 +53,7 @@ before_script:
 script:
   - mkdir "build"
   - cd "build"
-  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DDISABLE_VPX=on
+  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off
   - make VERBOSE=1 -j $THREADS
 
 notifications:
