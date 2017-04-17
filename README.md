@@ -109,7 +109,6 @@ or [SuperTuxKart on GitHub - Dependencies](https://github.com/supertuxkart/depen
 5. Press 'Configure'; CMake will ask you if it is OK to create the aformentioned directory, press `Yes`. CMake will then ask you about your version of Visual Studio. 
 Confirm your selection; *Please look at the table below to avoid confusion between version numbers and releases of Visual Studio*;
 CMake will begin creating the required files for the build in the directory.
-*If CMake fails to find the dependencies during configuration; you'll need to manually add them in the missing fields*
 6. Navigate to your build directory and open the `SuperTuxKart.sln` file; Visual Studio will now load the solution. 
 7. In the 'Solution Explorer', right click on the `supertuxkart` project and select "Set as StartUp project"
 8. Open the 'Build' menu and select 'Build Solution'; or, press the default keyboard shortcut: `CTRL + SHIFT + B` to build the solution.
