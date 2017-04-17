@@ -12,7 +12,7 @@
   <!-- Maximum number of karts to be used at the same time. This limit
        can easily be increased, but some tracks might not have valid start
        positions for those additional karts. -->
-  <karts max-number="20"/>
+  <karts max-number="50"/>
 
   <!-- Scores are the number of points given when the race ends. -->
   <grand-prix>
