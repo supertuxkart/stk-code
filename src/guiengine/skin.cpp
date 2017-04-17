@@ -819,12 +819,11 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
         drawBoxFromStretchableTexture(w, rect,
                               SkinConfig::m_render_params["progress::neutral"],
                               w->m_deactivated);
-        //the " - 10" is a dirty hack to avoid to have the right arrow
-        // before the left one
-        //FIXME
+
         core::recti rect2 = rect;
-        rect2.LowerRightCorner.X -= (rect.getWidth() - 10)
-                                  - progress->getValue()*rect.getWidth()/100;
+
+        rect2.LowerRightCorner.X -= rect.getWidth()
+            - progress->getValue()*rect.getWidth() / 100;
 
         drawBoxFromStretchableTexture(w, rect2,
                                  SkinConfig::m_render_params["progress::fill"],
