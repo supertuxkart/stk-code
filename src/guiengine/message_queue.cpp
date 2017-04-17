@@ -236,7 +236,7 @@ public:
     {
         Message::draw(dt);
         m_display_timer = 9999999.9f;
-        GUIEngine::getSkin()->drawProgress(&m_swc, m_area,
+        GUIEngine::getSkin()->drawProgressBarInScreen(&m_swc, m_area,
             m_progress_value.load());
         video::SColor color(255, 0, 0, 0);
         GUIEngine::getFont()->draw(m_message, m_area, color, true, true);
