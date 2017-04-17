@@ -13,7 +13,7 @@ To run SuperTuxKart, make sure that your computer's specifications are equal or 
 * A graphics card capable of 3D rendering - NVIDIA GeForce 8 series and newer (GeForce 8100 or newer), AMD/ATI Radeon HD 4000 series and newer, Intel HD Graphics 3000 and newer. OpenGL >= 3.3
 * You should have a CPU that's running at 1 GHz or faster. 
 * You'll need at least 512 MB of free VRAM (video memory).
-* Minimum disk space: 25 GB 
+* Minimum disk space: 800 MB 
 * Ideally, you'll want a joystick with at least 6 buttons.
 
 ## License
@@ -53,7 +53,6 @@ To build SuperTuxKart from source, you'll need to install the following packages
   * libpng (libpng-devel)
   * zlib (zlib-devel)
   * jpeg (libjpeg-turbo-devel)
-  * vpx (libvpx-devel)
 
 Ubuntu command:
 
@@ -113,7 +112,7 @@ CMake will begin creating the required files for the build in the directory.
 *If CMake fails to find the dependencies during configuration; you'll need to manually add them in the missing fields*
 6. Navigate to your build directory and open the `SuperTuxKart.sln` file; Visual Studio will now load the solution. 
 7. In the 'Solution Explorer', right click on the `supertuxkart` project and select "Set as StartUp project"
-8. Open the 'Build' menu and select 'Build Solution'; or, press `CTRL + SHIFT + B` - your solution's build process has begun.
+8. Open the 'Build' menu and select 'Build Solution'; or, press the default keyboard shortcut: `CTRL + SHIFT + B` to build the solution.
 
 *Note: To avoid confusion between releases and versions, refer to this table:*
 
