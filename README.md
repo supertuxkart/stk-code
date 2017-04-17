@@ -63,7 +63,7 @@ mesa-common-dev pkg-config zlib1g-dev
 ### In-game recorder
 
 In order to build the in-game recorder for STK, you have to install
-libopenglrecorder from your distribution or compile it yourself, get it [here](https://github.com/Benau/libopenglrecorder):
+libopenglrecorder from your distribution or compile it yourself, get it [here](https://github.com/Benau/libopenglrecorder).
 Compilation instruction is explained there, if you don't need such feature,
 pass `-DBUILD_RECORDER=off` to cmake.
 
