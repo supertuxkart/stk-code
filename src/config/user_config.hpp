@@ -568,19 +568,20 @@ namespace UserConfigParams
         &m_recording_group, "Limit game framerate not beyond the fps of"
                             " recording video."));
 
-    PARAM_PREFIX IntUserConfigParam         m_record_format
-        PARAM_DEFAULT(IntUserConfigParam(0, "record_format",
-        &m_recording_group, "Specify the format for record (VP8, VP9, "
-                            "mjpeg)"));
+    PARAM_PREFIX IntUserConfigParam         m_video_format
+        PARAM_DEFAULT(IntUserConfigParam(0, "video_format",
+        &m_recording_group, "Specify the video for record, which is the enum"
+                            " of VideoFormat in libopenglrecorder. It will"
+                            " auto fallback to MJPEG if libopenglrecorder was"
+                            " not compiled with such video encoder."));
 
-    PARAM_PREFIX IntUserConfigParam         m_vp_end_usage
-        PARAM_DEFAULT(IntUserConfigParam(0, "vp_end_usage",
-        &m_recording_group, "Specify the rate control algorithm for libvpx,"
-                            " see enum vpx_rc_mode"));
+    PARAM_PREFIX IntUserConfigParam         m_audio_bitrate
+        PARAM_DEFAULT(IntUserConfigParam(112000, "audio_bitrate",
+        &m_recording_group, "Specify the bitrate for audio"));
 
-    PARAM_PREFIX IntUserConfigParam         m_vp_bitrate
-        PARAM_DEFAULT(IntUserConfigParam(20000, "vp_bitrate",
-        &m_recording_group, "Specify the bitrate for libvpx"));
+    PARAM_PREFIX IntUserConfigParam         m_video_bitrate
+        PARAM_DEFAULT(IntUserConfigParam(20000, "video_bitrate",
+        &m_recording_group, "Specify the bitrate for video"));
 
     PARAM_PREFIX IntUserConfigParam         m_recorder_jpg_quality
         PARAM_DEFAULT(IntUserConfigParam(90, "recorder_jpg_quality",
