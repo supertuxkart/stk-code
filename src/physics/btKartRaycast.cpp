@@ -81,9 +81,11 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
             // different triangle mesh). TODO: Add a mapping from bullet
             // objects back to triangle meshes, so that it's easy to pick up
             // the right triangle mesh for smoothing
+            TriangleMesh::RigidBodyTriangleMesh *rbtm =
+                dynamic_cast<TriangleMesh::RigidBodyTriangleMesh*>(body);
             if(m_smooth_normals &&
                 rayCallback.getTriangleIndex()>-1 &&
-                body == Track::getCurrentTrack()->getTriangleMesh().getBody())
+                rbtm != NULL                         )
             {
 #undef DEBUG_NORMALS
 #ifdef DEBUG_NORMALS
@@ -91,7 +93,7 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
 #endif
                 result.m_triangle_index = rayCallback.getTriangleIndex();
                 result.m_hitNormalInWorld =
-                    tm.getInterpolatedNormal(rayCallback.getTriangleIndex(),
+                    rbtm->m_triangle_mesh->getInterpolatedNormal(rayCallback.getTriangleIndex(),
                                              result.m_hitPointInWorld);
 #ifdef DEBUG_NORMALS
                 printf("old %f %f %f new %f %f %f\n",

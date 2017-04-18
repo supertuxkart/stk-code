@@ -981,17 +981,17 @@ void btKart::debugDraw(btIDebugDraw* debugDrawer)
         if (n > -1)
         {
             const TriangleMesh &tm = Track::getCurrentTrack()->getTriangleMesh();
-            btVector3 *p1, *p2, *p3;
+            btVector3 p1, p2, p3;
             tm.getTriangle(n, &p1, &p2, &p3);
-            const btVector3 *n1, *n2, *n3;
+            btVector3 n1, n2, n3;
             tm.getNormals(n, &n1, &n2, &n3);
             // Draw the normals at the vertices
-            debugDrawer->drawLine(*p1, *p1 + *n1, white);
-            debugDrawer->drawLine(*p2, *p2 + *n2, white);
-            debugDrawer->drawLine(*p3, *p3 + *n3, white);
+            debugDrawer->drawLine(p1, p1 + n1, white);
+            debugDrawer->drawLine(p2, p2 + n2, white);
+            debugDrawer->drawLine(p3, p3 + n3, white);
             // Also draw the triangle in white, it can make it easier
             // to identify which triangle a wheel is on
-            debugDrawer->drawTriangle(*p1, *p2, *p3, white, 1.0f);
+            debugDrawer->drawTriangle(p1, p2, p3, white, 1.0f);
         }
 
     }   // for i < getNumWheels

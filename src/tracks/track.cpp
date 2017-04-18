@@ -1095,8 +1095,8 @@ bool Track::loadMainTrack(const XMLNode &root)
 
     m_challenges.clear();
 
-    m_track_mesh      = new TriangleMesh();
-    m_gfx_effect_mesh = new TriangleMesh();
+    m_track_mesh      = new TriangleMesh(/*can_be_transformed*/false);
+    m_gfx_effect_mesh = new TriangleMesh(/*can_be_transformed*/false);
 
     const XMLNode *track_node = root.getNode("track");
     std::string model_name;
