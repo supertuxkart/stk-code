@@ -33,7 +33,7 @@
                 <label proportion="1" height="100%" text_align="right" I18N="In the audio options screen" text="Volume"/>
                 <div proportion="1" height="fit" layout="horizontal-row" >
                     <spacer width="40" height="100%" />
-                    <gauge id="music_volume" proportion="1" min_value="1" max_value="10"/>
+                    <gauge id="music_volume" proportion="1" min_value="0" max_value="10"/>
                 </div>
             </div>
 
@@ -54,7 +54,7 @@
                 <label proportion="1" height="100%" text_align="right" I18N="In the audio options screen" text="Volume"/>
                 <div proportion="1" height="fit" layout="horizontal-row" >
                     <spacer width="40" height="100%" />
-                    <gauge id="sfx_volume" proportion="1" min_value="1" max_value="10"/>
+                    <gauge id="sfx_volume" proportion="1" min_value="0" max_value="10"/>
                 </div>
             </div>
 
