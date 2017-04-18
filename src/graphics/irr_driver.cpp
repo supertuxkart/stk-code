@@ -609,16 +609,30 @@ void IrrDriver::initDevice()
     m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
 
 #ifdef ENABLE_RECORDER
+    ogrRegGeneralCallback(OGR_CBT_START_RECORDING,
+        [] (void* user_data) { MessageQueue::add
+        (MessageQueue::MT_GENERIC, _("Video recording started.")); }, NULL);
+    ogrRegStringCallback(OGR_CBT_ERROR_RECORDING,
+        [](const char* s, void* user_data)
+        { Log::error("openglrecorder", "%s", s); }, NULL);
+    ogrRegStringCallback(OGR_CBT_SAVED_RECORDING,
+        [] (const char* s, void* user_data) { MessageQueue::add
+        (MessageQueue::MT_GENERIC, _("Video saved in \"%s\".", s));
+        }, NULL);
+    ogrRegIntCallback(OGR_CBT_PROGRESS_RECORDING,
+        [] (const int i, void* user_data)
+        { MessageQueue::showProgressBar(i, _("Encoding progress:")); }, NULL);
+
     RecorderConfig cfg;
     cfg.m_triple_buffering = 1;
     cfg.m_record_audio = 1;
     cfg.m_width = m_actual_screen_size.Width;
     cfg.m_height = m_actual_screen_size.Height;
-    int vf = UserConfigParams::m_record_format;
+    int vf = UserConfigParams::m_video_format;
     cfg.m_video_format = (VideoFormat)vf;
     cfg.m_audio_format = OGR_AF_VORBIS;
-    cfg.m_audio_bitrate = 112000;
-    cfg.m_video_bitrate = UserConfigParams::m_vp_bitrate;
+    cfg.m_audio_bitrate = UserConfigParams::m_audio_bitrate;
+    cfg.m_video_bitrate = UserConfigParams::m_video_bitrate;
     cfg.m_record_fps = UserConfigParams::m_record_fps;
     cfg.m_record_jpg_quality = UserConfigParams::m_recorder_jpg_quality;
     if (ogrInitConfig(&cfg) == 0)
@@ -638,20 +652,6 @@ void IrrDriver::initDevice()
         [](int n, const unsigned int* b) { glDeleteBuffers(n, b); },
         [](unsigned int t, unsigned int a) { return glMapBuffer(t, a); },
         [](unsigned int t) { return glUnmapBuffer(t); });
-
-    ogrRegGeneralCallback(OGR_CBT_START_RECORDING,
-        [] (void* user_data) { MessageQueue::add
-        (MessageQueue::MT_GENERIC, _("Video recording started.")); }, NULL);
-    ogrRegStringCallback(OGR_CBT_ERROR_RECORDING,
-        [](const char* s, void* user_data)
-        { Log::error("openglrecorder", "%s", s); }, NULL);
-    ogrRegStringCallback(OGR_CBT_SAVED_RECORDING,
-        [] (const char* s, void* user_data) { MessageQueue::add
-        (MessageQueue::MT_GENERIC, _("Video saved in \"%s\".", s));
-        }, NULL);
-    ogrRegIntCallback(OGR_CBT_PROGRESS_RECORDING,
-        [] (const int i, void* user_data)
-        { MessageQueue::showProgressBar(i, _("Encoding progress:")); }, NULL);
 
 #endif
 

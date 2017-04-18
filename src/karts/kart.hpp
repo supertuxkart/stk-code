@@ -209,6 +209,8 @@ protected:
     SFXBase      *m_beep_sound;
     SFXBase      *m_engine_sound;
     SFXBase      *m_crash_sound;
+    SFXBase      *m_crash_sound2;
+    SFXBase      *m_crash_sound3;
     SFXBase      *m_terrain_sound;
     SFXBase      *m_nitro_sound;
     /** A pointer to the previous terrain sound needs to be saved so that an
