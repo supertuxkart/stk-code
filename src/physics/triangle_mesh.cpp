@@ -244,6 +244,8 @@ btVector3 TriangleMesh::getInterpolatedNormal(unsigned int index,
     btVector3 n1, n2, n3;
     if(m_can_be_transformed)
     {
+        // If the object of this mesh can be transformed, we need to compute
+        // the updated positions and normals before interpolating.
         btVector3 q1, q2, q3;
         getTriangle(index, &q1, &q2, &q3);
         const btTransform &tf = m_body->getWorldTransform();
