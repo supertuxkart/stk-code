@@ -177,6 +177,7 @@ PlayerManager::~PlayerManager()
         }
     }
     save();
+    delete m_player_data;
 
 }   // ~PlayerManager
 
