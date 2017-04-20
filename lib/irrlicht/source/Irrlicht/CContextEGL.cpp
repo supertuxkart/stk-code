@@ -6,376 +6,566 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in Irrlicht.h
 
-#include "CContextEGL.h"
-#include "os.h"
-#include "fast_atof.h"
-
-#if defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
-#include "android_native_app_glue.h"
-#endif
+#include "IrrCompileConfig.h"
 
 #if defined(_IRR_COMPILE_WITH_EGL_)
 
-namespace irr
-{
-namespace video
-{
-	
-ContextEGL::ContextEGL(const SIrrlichtCreationParameters& params,
-					   const SExposedVideoData& data)
-{
-	EglDisplay = EGL_NO_DISPLAY;
-	EglSurface = EGL_NO_SURFACE;
-	EglContext = EGL_NO_CONTEXT;
-	EglConfig = 0;
-	EglWindow = 0;
-	EGLVersionMajor = 1;
-	EGLVersionMinor = 0;
-	IsCoreContext = true;
-	
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-	HDc = 0;
-#endif
-	
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-	EglWindow = (NativeWindowType)data.OpenGLWin32.HWnd;
-	HDc = GetDC((HWND)EglWindow);
-	EglDisplay = eglGetDisplay((NativeDisplayType)HDc);
-#elif defined(_IRR_COMPILE_WITH_X11_DEVICE_)
-	EglWindow = (NativeWindowType)data.OpenGLLinux.X11Window;
-	EglDisplay = eglGetDisplay((NativeDisplayType)data.OpenGLLinux.X11Display);
-#elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
-	EglWindow =	((struct android_app *)(params.PrivateData))->window;
-	EglDisplay = EGL_NO_DISPLAY;
+#include <cassert>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+
+#ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
+#include <android_native_app_glue.h>
 #endif
 
-	if (EglDisplay == EGL_NO_DISPLAY)
-	{
-		os::Printer::log("Getting EGL display.");
-		EglDisplay = eglGetDisplay((NativeDisplayType) EGL_DEFAULT_DISPLAY);
-	}
-	
-	if (EglDisplay == EGL_NO_DISPLAY)
-	{
-		os::Printer::log("Could not get EGL display.");
-	}
+#include "CContextEGL.h"
+#include "os.h"
 
-	if (!eglInitialize(EglDisplay, &EGLVersionMajor, &EGLVersionMinor))
-	{
-		os::Printer::log("Could not initialize EGL display.");
-	}
-	else
-	{
-		char text[64];
-		sprintf(text, "EglDisplay initialized. Egl version %d.%d\n", EGLVersionMajor, EGLVersionMinor);
-		os::Printer::log(text);
-	}
-		
-	EGLint EglOpenGLBIT = 0;
+using namespace irr;
 
-	// We need proper OpenGL BIT.
-	switch (params.DriverType)
-	{
-	case EDT_OGLES2:
-		EglOpenGLBIT = EGL_OPENGL_ES2_BIT;
-		break;
-	default:
-		break;
-	}
-
-	EGLint Attribs[] =
-	{
-		EGL_RED_SIZE, 8,
-		EGL_GREEN_SIZE, 8,
-		EGL_BLUE_SIZE, 8,
-		EGL_ALPHA_SIZE, params.WithAlphaChannel ? 1:0,
-		EGL_BUFFER_SIZE, params.Bits,
-		EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-		EGL_DEPTH_SIZE, params.ZBufferBits,
-		EGL_STENCIL_SIZE, params.Stencilbuffer,
-		EGL_SAMPLE_BUFFERS, params.AntiAlias ? 1:0,
-		EGL_SAMPLES, params.AntiAlias,
-		EGL_RENDERABLE_TYPE, EglOpenGLBIT,
-		EGL_NONE, 0
-	};
-
-	EglConfig = 0;
-	EGLint NumConfigs = 0;
-	u32 Steps = 5;
-
-	// Choose the best EGL config.
-	while (!eglChooseConfig(EglDisplay, Attribs, &EglConfig, 1, &NumConfigs) || !NumConfigs)
-	{
-		switch (Steps)
-		{
-		case 5: // samples
-			if (Attribs[19] > 2)
-				--Attribs[19];
-			else
-			{
-				Attribs[17] = 0;
-				Attribs[19] = 0;
-				--Steps;
-			}
-			break;
-		case 4: // alpha
-			if (Attribs[7])
-			{
-				Attribs[7] = 0;
-
-				if (params.AntiAlias)
-				{
-					Attribs[17] = 1;
-					Attribs[19] = params.AntiAlias;
-					Steps = 5;
-				}
-			}
-			else
-				--Steps;
-			break;
-		case 3: // stencil
-			if (Attribs[15])
-			{
-				Attribs[15] = 0;
-
-				if (params.AntiAlias)
-				{
-					Attribs[17] = 1;
-					Attribs[19] = params.AntiAlias;
-					Steps = 5;
-				}
-			}
-			else
-				--Steps;
-			break;
-		case 2: // depth size
-			if (Attribs[13] > 16)
-			{
-				Attribs[13] -= 8;
-			}
-			else
-				--Steps;
-			break;
-		case 1: // buffer size
-			if (Attribs[9] > 16)
-			{
-				Attribs[9] -= 8;
-			}
-			else
-				--Steps;
-			break;
-		default:
-			os::Printer::log("Could not get config for EGL display.");
-			return;
-		}
-	}
-
-	if (params.AntiAlias && !Attribs[17])
-		os::Printer::log("No multisampling.");
-
-	if (params.WithAlphaChannel && !Attribs[7])
-		os::Printer::log("No alpha.");
-
-	if (params.Stencilbuffer && !Attribs[15])
-		os::Printer::log("No stencil buffer.");
-
-	if (params.ZBufferBits > Attribs[13])
-		os::Printer::log("No full depth buffer.");
-
-	if (params.Bits > Attribs[9])
-		os::Printer::log("No full color buffer.");
-		
-	#if defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
-	/* EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is
-	* guaranteed to be accepted by ANativeWindow_setBuffersGeometry().
-	* As soon as we picked a EGLConfig, we can safely reconfigure the
-	* ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID. */
-	EGLint format;
-	eglGetConfigAttrib(EglDisplay, EglConfig, EGL_NATIVE_VISUAL_ID, &format);
-	
-	ANativeWindow_setBuffersGeometry(EglWindow, 0, 0, format);
-	#endif
-   
-	os::Printer::log(" Creating EglSurface with nativeWindow...");
-	EglSurface = eglCreateWindowSurface(EglDisplay, EglConfig, EglWindow, NULL);
-	
-	if (EGL_NO_SURFACE == EglSurface)
-	{
-		os::Printer::log("FAILED");
-		os::Printer::log("Creating EglSurface without nativeWindows...");
-		EglSurface = eglCreateWindowSurface(EglDisplay, EglConfig, 0, NULL);
-	}
-	
-	if (EGL_NO_SURFACE == EglSurface)
-	{
-		os::Printer::log("FAILED");
-		os::Printer::log("Could not create surface for EGL display.");
-	}
-
-	eglBindAPI(EGL_OPENGL_ES_API);
-
-	os::Printer::log("Creating EglContext...");
-
-	if (!params.ForceLegacyDevice)
-	{
-		os::Printer::log("Trying to create Context for OpenGL ES3.");
-		EGLint contextAttrib[] =
-		{
-			EGL_CONTEXT_CLIENT_VERSION, 3,
-			EGL_NONE, 0
-		};
-		
-		EglContext = eglCreateContext(EglDisplay, EglConfig, EGL_NO_CONTEXT, contextAttrib);
-	}
-	
-	if (EGL_NO_CONTEXT == EglContext)
-	{
-		os::Printer::log("Trying to create Context for OpenGL ES2.");
-		EGLint contextAttrib[] =
-		{
-			EGL_CONTEXT_CLIENT_VERSION, 2,
-			EGL_NONE, 0
-		};
-		
-		EglContext = eglCreateContext(EglDisplay, EglConfig, EGL_NO_CONTEXT, contextAttrib);
-		IsCoreContext = false;
-	}
-
-	eglMakeCurrent(EglDisplay, EglSurface, EglSurface, EglContext);
-	if (testEGLError())
-	{
-		os::Printer::log("Could not make Context current for EGL display.");
-	}
-
-	// set vsync
-	if (params.Vsync)
-		eglSwapInterval(EglDisplay, 1);
-		
-	os::Printer::log(eglQueryString(EglDisplay, EGL_CLIENT_APIS));
+ContextManagerEGL::ContextManagerEGL()
+{
+    m_egl_window = 0;
+    m_egl_display = EGL_NO_DISPLAY;
+    m_egl_surface = EGL_NO_SURFACE;
+    m_egl_context = EGL_NO_CONTEXT;
+    m_egl_config = 0;
+    m_egl_version = 0;
+    m_is_legacy_device = false;
+    m_initialized = false;
+    
+    memset(&m_creation_params, 0, sizeof(ContextEGLParams));
 }
 
 
-ContextEGL::~ContextEGL()
+ContextManagerEGL::~ContextManagerEGL()
 {
-	eglMakeCurrent(EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+    close();
+}
 
-	if (EglContext != EGL_NO_CONTEXT)
-	{
-		eglDestroyContext(EglDisplay, EglContext);
-		EglContext = EGL_NO_CONTEXT;
-	}
 
-	if (EglSurface != EGL_NO_SURFACE)
-	{
-		eglDestroySurface(EglDisplay, EglSurface);
-		EglSurface = EGL_NO_SURFACE;
-	}
+bool ContextManagerEGL::init(const ContextEGLParams& params)
+{
+    if (m_initialized)
+        return false;
 
-	if (EglDisplay != EGL_NO_DISPLAY)
-	{
-		eglTerminate(EglDisplay);
-		EglDisplay = EGL_NO_DISPLAY;
-	}
+    m_creation_params = params;
+    m_egl_window = m_creation_params.window;
 
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-	if (HDc)
-		ReleaseDC((HWND)EglWindow, HDc);
+    bool success = initDisplay();
+
+    if (!success)
+    {
+        os::Printer::log("Error: Could not initialize EGL display.\n");
+        close();
+        return false;
+    }
+
+    bool has_minimum_requirements = false;
+
+    if (m_creation_params.opengl_api == CEGL_API_OPENGL)
+    {
+        if (hasEGLExtension("EGL_KHR_create_context") || m_egl_version >= 150)
+        {
+            has_minimum_requirements = true;
+            eglBindAPI(EGL_OPENGL_API);
+        }
+    }
+    else if (m_creation_params.opengl_api == CEGL_API_OPENGL_ES)
+    {
+        if (m_egl_version >= 130)
+        {
+            has_minimum_requirements = true;
+            eglBindAPI(EGL_OPENGL_ES_API);
+        }
+    }
+
+    if (!has_minimum_requirements)
+    {
+        os::Printer::log("Error: EGL version is too old.\n");
+        close();
+        return false;
+    }
+
+    success = chooseConfig();
+
+    if (!success)
+    {
+        os::Printer::log("Error: Couldn't get EGL config.\n");
+        close();
+        return false;
+    }
+
+    success = createSurface();
+
+    if (!success)
+    {
+        os::Printer::log("Error: Couldn't create EGL surface.\n");
+        close();
+        return false;
+    }
+
+    success = createContext();
+
+    if (!success)
+    {
+        os::Printer::log("Error: Couldn't create OpenGL context.\n");
+        close();
+        return false;
+    }
+
+    success = eglMakeCurrent(m_egl_display, m_egl_surface, m_egl_surface,
+                             m_egl_context);
+
+    if (!success)
+    {
+        checkEGLError();
+        os::Printer::log("Error: Couldn't make context current for EGL display.\n");
+        close();
+        return false;
+    }
+
+    eglSwapInterval(m_egl_display, m_creation_params.vsync_enabled ? 1 : 0);
+
+    m_initialized = true;
+    return true;
+}
+
+
+bool ContextManagerEGL::initDisplay()
+{
+    NativeDisplayType display = (NativeDisplayType)(m_creation_params.display);
+
+#ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
+    display = EGL_DEFAULT_DISPLAY;
 #endif
-}
 
+    if (display != EGL_DEFAULT_DISPLAY)
+    {
+        m_egl_display = eglGetDisplay(display);
+    }
 
-bool ContextEGL::swapBuffers()
-{
-	eglSwapBuffers(EglDisplay, EglSurface);
-	EGLint g = eglGetError();
-	
-	return g == EGL_SUCCESS;
-}
+    if (m_egl_display == EGL_NO_DISPLAY)
+    {
+        m_egl_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    }
 
+    if (m_egl_display == EGL_NO_DISPLAY)
+    {
+        return false;
+    }
 
-void ContextEGL::reloadEGLSurface(void* window)
-{
-	os::Printer::log("Reload EGL surface.");
+    int egl_version_major = 0;
+    int egl_version_minor = 0;
 
-	#if defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
-		EglWindow = (ANativeWindow*)window;
-	#endif
+    bool success = eglInitialize(m_egl_display, &egl_version_major,
+                                                &egl_version_minor);
 
-	if (!EglWindow)
-		os::Printer::log("Invalid EGL window.");
-
-	eglMakeCurrent(EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-
-	eglDestroySurface(EglDisplay, EglSurface);
-
-	EglSurface = eglCreateWindowSurface(EglDisplay, EglConfig, EglWindow, 0);
-
-	if (EGL_NO_SURFACE == EglSurface)
-		os::Printer::log("Could not create EGL surface.");
-
-	eglMakeCurrent(EglDisplay, EglSurface, EglSurface, EglContext);
-}
-
-
-bool ContextEGL::testEGLError()
-{
-#if defined(_DEBUG)
-	EGLint g = eglGetError();
-	switch (g)
+	if (success)
 	{
-		case EGL_SUCCESS:
-			return false;
-		case EGL_NOT_INITIALIZED :
-			os::Printer::log("Not Initialized", ELL_ERROR);
-			break;
-		case EGL_BAD_ACCESS:
-			os::Printer::log("Bad Access", ELL_ERROR);
-			break;
-		case EGL_BAD_ALLOC:
-			os::Printer::log("Bad Alloc", ELL_ERROR);
-			break;
-		case EGL_BAD_ATTRIBUTE:
-			os::Printer::log("Bad Attribute", ELL_ERROR);
-			break;
-		case EGL_BAD_CONTEXT:
-			os::Printer::log("Bad Context", ELL_ERROR);
-			break;
-		case EGL_BAD_CONFIG:
-			os::Printer::log("Bad Config", ELL_ERROR);
-			break;
-		case EGL_BAD_CURRENT_SURFACE:
-			os::Printer::log("Bad Current Surface", ELL_ERROR);
-			break;
-		case EGL_BAD_DISPLAY:
-			os::Printer::log("Bad Display", ELL_ERROR);
-			break;
-		case EGL_BAD_SURFACE:
-			os::Printer::log("Bad Surface", ELL_ERROR);
-			break;
-		case EGL_BAD_MATCH:
-			os::Printer::log("Bad Match", ELL_ERROR);
-			break;
-		case EGL_BAD_PARAMETER:
-			os::Printer::log("Bad Parameter", ELL_ERROR);
-			break;
-		case EGL_BAD_NATIVE_PIXMAP:
-			os::Printer::log("Bad Native Pixmap", ELL_ERROR);
-			break;
-		case EGL_BAD_NATIVE_WINDOW:
-			os::Printer::log("Bad Native Window", ELL_ERROR);
-			break;
-		case EGL_CONTEXT_LOST:
-			os::Printer::log("Context Lost", ELL_ERROR);
-			break;
-	};
-	return true;
-#else
-	return false;
+		m_egl_version = 100 * egl_version_major + 10 * egl_version_minor;
+	}
+
+    return success;
+}
+
+
+bool ContextManagerEGL::chooseConfig()
+{
+    std::vector<EGLint> config_attribs;
+    config_attribs.push_back(EGL_RED_SIZE);
+    config_attribs.push_back(8);
+    config_attribs.push_back(EGL_GREEN_SIZE);
+    config_attribs.push_back(8);
+    config_attribs.push_back(EGL_BLUE_SIZE);
+    config_attribs.push_back(8);
+    config_attribs.push_back(EGL_ALPHA_SIZE);
+    config_attribs.push_back(m_creation_params.with_alpha_channel ? 8 : 0);
+    // config_attribs.push_back(EGL_BUFFER_SIZE);
+    // config_attribs.push_back(24);
+    config_attribs.push_back(EGL_DEPTH_SIZE);
+    config_attribs.push_back(16);
+    // config_attribs.push_back(EGL_STENCIL_SIZE);
+    // config_attribs.push_back(stencil_buffer);
+    // config_attribs.push_back(EGL_SAMPLE_BUFFERS);
+    // config_attribs.push_back(antialias ? 1 : 0);
+    // config_attribs.push_back(EGL_SAMPLES);
+    // config_attribs.push_back(antialias);
+
+    if (m_creation_params.opengl_api == CEGL_API_OPENGL)
+    {
+		config_attribs.push_back(EGL_RENDERABLE_TYPE);
+		config_attribs.push_back(EGL_OPENGL_BIT);
+	}
+    else if (m_creation_params.opengl_api == CEGL_API_OPENGL_ES)
+    {
+		config_attribs.push_back(EGL_RENDERABLE_TYPE);
+		config_attribs.push_back(EGL_OPENGL_ES2_BIT);
+	}
+
+	if (m_creation_params.surface_type == CEGL_SURFACE_WINDOW)
+	{
+		config_attribs.push_back(EGL_SURFACE_TYPE);
+		config_attribs.push_back(EGL_WINDOW_BIT);
+	}
+	else if (m_creation_params.surface_type == CEGL_SURFACE_PBUFFER)
+	{
+		config_attribs.push_back(EGL_SURFACE_TYPE);
+		config_attribs.push_back(EGL_PBUFFER_BIT);
+	}
+
+    config_attribs.push_back(EGL_NONE);
+    config_attribs.push_back(0);
+
+    EGLint num_configs = 0;
+
+    bool success = eglChooseConfig(m_egl_display, &config_attribs[0],
+                                   &m_egl_config, 1, &num_configs);
+
+    if (!success || num_configs == 0)
+    {
+        return false;
+    }
+
+#ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
+    EGLint format = 0;
+    eglGetConfigAttrib(m_egl_display, m_egl_config, EGL_NATIVE_VISUAL_ID,
+                       &format);
+    ANativeWindow_setBuffersGeometry(m_egl_window, 0, 0, format);
 #endif
+
+    return true;
 }
 
+
+bool ContextManagerEGL::createSurface()
+{
+    if (m_creation_params.surface_type == CEGL_SURFACE_WINDOW)
+    {
+        if (m_egl_surface == EGL_NO_SURFACE)
+        {
+            m_egl_surface = eglCreateWindowSurface(m_egl_display, m_egl_config,
+                                                   m_egl_window, NULL);
+        }
+
+        if (m_egl_surface == EGL_NO_SURFACE)
+        {
+            m_egl_surface = eglCreateWindowSurface(m_egl_display, m_egl_config,
+                                                   0, NULL);
+        }
+    }
+    else if (m_creation_params.surface_type == CEGL_SURFACE_PBUFFER)
+    {
+        if (m_egl_surface == EGL_NO_SURFACE)
+        {
+			std::vector<EGLint> pbuffer_attribs;
+			pbuffer_attribs.push_back(EGL_WIDTH);
+			pbuffer_attribs.push_back(m_creation_params.pbuffer_width);
+			pbuffer_attribs.push_back(EGL_HEIGHT);
+			pbuffer_attribs.push_back(m_creation_params.pbuffer_height);
+			pbuffer_attribs.push_back(EGL_NONE);
+			pbuffer_attribs.push_back(0);
+
+			m_egl_surface = eglCreatePbufferSurface(m_egl_display,
+													m_egl_config,
+													&pbuffer_attribs[0]);
+        }
+
+        if (m_egl_surface == EGL_NO_SURFACE)
+        {
+            std::vector<EGLint> pbuffer_attribs;
+			pbuffer_attribs.push_back(EGL_WIDTH);
+			pbuffer_attribs.push_back(m_creation_params.pbuffer_width);
+			pbuffer_attribs.push_back(EGL_HEIGHT);
+			pbuffer_attribs.push_back(m_creation_params.pbuffer_height);
+            pbuffer_attribs.push_back(EGL_LARGEST_PBUFFER);
+            pbuffer_attribs.push_back(EGL_TRUE);
+            pbuffer_attribs.push_back(EGL_NONE);
+            pbuffer_attribs.push_back(0);
+
+            m_egl_surface = eglCreatePbufferSurface(m_egl_display,
+                                                    m_egl_config,
+                                                    &pbuffer_attribs[0]);
+        }
+    }
+
+    return m_egl_surface != EGL_NO_SURFACE;
 }
 
+
+bool ContextManagerEGL::createContext()
+{
+    m_is_legacy_device = false;
+
+    if (m_creation_params.opengl_api == CEGL_API_OPENGL_ES)
+    {
+        if (!m_creation_params.force_legacy_device)
+        {
+            if (m_egl_context == EGL_NO_CONTEXT)
+            {
+                std::vector<EGLint> context_attribs;
+                context_attribs.push_back(EGL_CONTEXT_CLIENT_VERSION);
+                context_attribs.push_back(3);
+                context_attribs.push_back(EGL_NONE);
+                context_attribs.push_back(0);
+
+                m_egl_context = eglCreateContext(m_egl_display,
+                                                 m_egl_config,
+                                                 EGL_NO_CONTEXT,
+                                                 &context_attribs[0]);
+            }
+        }
+
+        if (m_egl_context == EGL_NO_CONTEXT)
+        {
+            m_is_legacy_device = true;
+
+            std::vector<EGLint> context_attribs;
+            context_attribs.push_back(EGL_CONTEXT_CLIENT_VERSION);
+            context_attribs.push_back(2);
+            context_attribs.push_back(EGL_NONE);
+            context_attribs.push_back(0);
+
+            m_egl_context = eglCreateContext(m_egl_display,
+                                             m_egl_config,
+                                             EGL_NO_CONTEXT,
+                                             &context_attribs[0]);
+        }
+    }
+    else if (m_creation_params.opengl_api == CEGL_API_OPENGL)
+    {
+        if (!m_creation_params.force_legacy_device)
+        {
+            if (m_egl_context == EGL_NO_CONTEXT)
+            {
+                std::vector<EGLint> context_attribs;
+                context_attribs.push_back(EGL_CONTEXT_MAJOR_VERSION_KHR);
+                context_attribs.push_back(4);
+                context_attribs.push_back(EGL_CONTEXT_MINOR_VERSION_KHR);
+                context_attribs.push_back(3);
+                context_attribs.push_back(EGL_NONE);
+                context_attribs.push_back(0);
+
+                m_egl_context = eglCreateContext(m_egl_display,
+                                                 m_egl_config,
+                                                 EGL_NO_CONTEXT,
+                                                 &context_attribs[0]);
+            }
+
+            if (m_egl_context == EGL_NO_CONTEXT)
+            {
+                std::vector<EGLint> context_attribs;
+                context_attribs.push_back(EGL_CONTEXT_MAJOR_VERSION_KHR);
+                context_attribs.push_back(3);
+                context_attribs.push_back(EGL_CONTEXT_MINOR_VERSION_KHR);
+                context_attribs.push_back(3);
+                context_attribs.push_back(EGL_NONE);
+                context_attribs.push_back(0);
+
+                m_egl_context = eglCreateContext(m_egl_display,
+                                                 m_egl_config,
+                                                 EGL_NO_CONTEXT,
+                                                 &context_attribs[0]);
+            }
+
+            if (m_egl_context == EGL_NO_CONTEXT)
+            {
+                std::vector<EGLint> context_attribs;
+                context_attribs.push_back(EGL_CONTEXT_MAJOR_VERSION_KHR);
+                context_attribs.push_back(3);
+                context_attribs.push_back(EGL_CONTEXT_MINOR_VERSION_KHR);
+                context_attribs.push_back(1);
+                context_attribs.push_back(EGL_NONE);
+                context_attribs.push_back(0);
+
+                m_egl_context = eglCreateContext(m_egl_display,
+                                                 m_egl_config,
+                                                 EGL_NO_CONTEXT,
+                                                 &context_attribs[0]);
+            }
+        }
+
+        if (m_egl_context == EGL_NO_CONTEXT)
+        {
+            m_is_legacy_device = true;
+
+            std::vector<EGLint> context_attribs;
+            context_attribs.push_back(EGL_CONTEXT_MAJOR_VERSION_KHR);
+            context_attribs.push_back(2);
+            context_attribs.push_back(EGL_CONTEXT_MINOR_VERSION_KHR);
+            context_attribs.push_back(1);
+            context_attribs.push_back(EGL_NONE);
+            context_attribs.push_back(0);
+
+            m_egl_context = eglCreateContext(m_egl_display,
+                                             m_egl_config,
+                                             EGL_NO_CONTEXT,
+                                             &context_attribs[0]);
+        }
+    }
+
+    return m_egl_context != EGL_NO_CONTEXT;
+}
+
+
+void ContextManagerEGL::close()
+{
+    eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+                   EGL_NO_CONTEXT);
+
+    if (m_egl_context != EGL_NO_CONTEXT)
+    {
+        eglDestroyContext(m_egl_display, m_egl_context);
+        m_egl_context = EGL_NO_CONTEXT;
+    }
+
+    if (m_egl_surface != EGL_NO_SURFACE)
+    {
+        eglDestroySurface(m_egl_display, m_egl_surface);
+        m_egl_surface = EGL_NO_SURFACE;
+    }
+
+    if (m_egl_display != EGL_NO_DISPLAY)
+    {
+        eglTerminate(m_egl_display);
+        m_egl_display = EGL_NO_DISPLAY;
+    }
+}
+
+
+bool ContextManagerEGL::swapBuffers()
+{
+    bool success = eglSwapBuffers(m_egl_display, m_egl_surface);
+
+#ifdef DEBUG
+	if (!success)
+	{
+		eglGetError();
+	}
+#endif
+
+	return success;
+}
+
+
+void ContextManagerEGL::reloadEGLSurface(void* window)
+{
+#ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
+    m_egl_window = (ANativeWindow*)window;
+
+    if (!m_egl_window)
+    {
+        os::Printer::log("Error: Invalid EGL window.\n");
+    }
+#endif
+
+    eglMakeCurrent(m_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+				   EGL_NO_CONTEXT);
+
+    eglDestroySurface(m_egl_display, m_egl_surface);
+	m_egl_surface = EGL_NO_SURFACE;
+	
+    bool success = createSurface();
+
+    if (!success)
+    {
+        os::Printer::log("Error: Could not create EGL surface.");
+    }
+
+    success = eglMakeCurrent(m_egl_display, m_egl_surface, m_egl_surface,
+							 m_egl_context);
+
+    if (!success)
+    {
+        checkEGLError();
+        os::Printer::log("Error: Couldn't make context current for EGL display.\n");
+    }
+}
+
+
+bool ContextManagerEGL::getSurfaceDimensions(int* width, int* height)
+{
+    if (!eglQuerySurface(m_egl_display, m_egl_surface, EGL_WIDTH, width))
+        return false;
+
+    if (!eglQuerySurface(m_egl_display, m_egl_surface, EGL_HEIGHT, height))
+        return false;
+
+    return true;
+}
+
+
+bool ContextManagerEGL::hasEGLExtension(const char* extension)
+{
+    const char* extensions = eglQueryString(m_egl_display, EGL_EXTENSIONS);
+
+    if (extensions && strstr(extensions, extension) != NULL)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+
+bool ContextManagerEGL::checkEGLError()
+{
+    bool result = true;
+
+    switch (eglGetError())
+    {
+        case EGL_SUCCESS:
+            result = false;
+            break;
+        case EGL_NOT_INITIALIZED:
+            os::Printer::log("Error: EGL_NOT_INITIALIZED\n");
+            break;
+        case EGL_BAD_ACCESS:
+            os::Printer::log("Error: EGL_BAD_ACCESS\n");
+            break;
+        case EGL_BAD_ALLOC:
+            os::Printer::log("Error: EGL_BAD_ALLOC\n");
+            break;
+        case EGL_BAD_ATTRIBUTE:
+            os::Printer::log("Error: EGL_BAD_ATTRIBUTE\n");
+            break;
+        case EGL_BAD_CONTEXT:
+            os::Printer::log("Error: EGL_BAD_CONTEXT\n");
+            break;
+        case EGL_BAD_CONFIG:
+            os::Printer::log("Error: EGL_BAD_CONFIG\n");
+            break;
+        case EGL_BAD_CURRENT_SURFACE:
+            os::Printer::log("Error: EGL_BAD_CURRENT_SURFACE\n");
+            break;
+        case EGL_BAD_DISPLAY:
+            os::Printer::log("Error: EGL_BAD_DISPLAY\n");
+            break;
+        case EGL_BAD_SURFACE:
+            os::Printer::log("Error: EGL_BAD_SURFACE\n");
+            break;
+        case EGL_BAD_MATCH:
+            os::Printer::log("Error: EGL_BAD_MATCH\n");
+            break;
+        case EGL_BAD_PARAMETER:
+            os::Printer::log("Error: EGL_BAD_PARAMETER\n");
+            break;
+        case EGL_BAD_NATIVE_PIXMAP:
+            os::Printer::log("Error: EGL_BAD_NATIVE_PIXMAP\n");
+            break;
+        case EGL_BAD_NATIVE_WINDOW:
+            os::Printer::log("Error: EGL_BAD_NATIVE_WINDOW\n");
+            break;
+        case EGL_CONTEXT_LOST:
+            os::Printer::log("Error: EGL_CONTEXT_LOST\n");
+            break;
+        default:
+            os::Printer::log("Error: Unknown EGL error.\n");
+            break;
+    };
+
+    return result;
 }
 
 #endif

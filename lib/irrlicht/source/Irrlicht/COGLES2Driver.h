@@ -38,6 +38,8 @@
 #endif
 #include "COGLES2ExtensionHandler.h"
 
+class ContextManagerEGL;
+
 namespace irr
 {
 namespace video
@@ -48,7 +50,6 @@ namespace video
 	class COGLES2Renderer2D;
 	class COGLES2NormalMapRenderer;
 	class COGLES2ParallaxMapRenderer;
-	class ContextEGL;
 
 	class COGLES2Driver : public CNullDriver, public IMaterialRendererServices, public COGLES2ExtensionHandler
 	{
@@ -371,7 +372,7 @@ namespace video
         COGLES2CallBridge* getBridgeCalls() const;
         
 #if defined(_IRR_COMPILE_WITH_EGL_)
-		ContextEGL* getEGLContext() {return EglContext;}
+		ContextManagerEGL* getEGLContext() {return EglContext;}
 #endif
 
 	private:
@@ -458,13 +459,16 @@ namespace video
 		COGLES2Renderer2D* MaterialRenderer2D;
 		
 #if defined(_IRR_COMPILE_WITH_EGL_)
-		ContextEGL* EglContext;
+		ContextManagerEGL* EglContext;
 #endif
 #if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 		CIrrDeviceIPhone* Device;
 		GLuint ViewFramebuffer;
 		GLuint ViewRenderbuffer;
 		GLuint ViewDepthRenderbuffer;
+#endif
+#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+		HDC HDc;
 #endif
 
 		SIrrlichtCreationParameters Params;

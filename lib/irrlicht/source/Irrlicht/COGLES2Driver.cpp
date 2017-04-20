@@ -52,6 +52,9 @@ namespace video
 		, ViewRenderbuffer(0)
 		, ViewDepthRenderbuffer(0)
 #endif
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+		, HDc(0)
+#endif
 		, Params(params)
 	{
 #ifdef _DEBUG
@@ -60,10 +63,38 @@ namespace video
 		ExposedData = data;
 
 #if defined(_IRR_COMPILE_WITH_EGL_)
-		EglContext = new ContextEGL(params, data);
-		useCoreContext = EglContext->isCoreContext();
+		EglContext = new ContextManagerEGL();
+		
+		ContextEGLParams egl_params;
+		egl_params.opengl_api = CEGL_API_OPENGL_ES;
+		egl_params.surface_type = CEGL_SURFACE_WINDOW;
+		egl_params.force_legacy_device = Params.ForceLegacyDevice;
+		egl_params.with_alpha_channel = Params.WithAlphaChannel;
+		egl_params.vsync_enabled = Params.Vsync;
+	
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+		egl_params.window = (EGLNativeWindowType)(data.OpenGLWin32.HWnd);
+		HDc = GetDC(data.OpenGLWin32.HWnd);
+		egl_params.display = (NativeDisplayType)(HDc);
+#elif defined(_IRR_COMPILE_WITH_X11_DEVICE_)
+		egl_params.window = data.OpenGLLinux.X11Window;
+		egl_params.display = (EGLNativeDisplayType)(data.OpenGLLinux.X11Display);
+#elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
+		egl_params.window =	((struct android_app *)(params.PrivateData))->window;
+		egl_params.display = NULL;
+#endif
+		
+		EglContext->init(egl_params);
+		useCoreContext = !EglContext->isLegacyDevice();
 
 		genericDriverInit(params.WindowSize, params.Stencilbuffer);
+		
+#ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
+		int width = 0;
+		int height = 0;
+		EglContext->getSurfaceDimensions(&width, &height);
+        CNullDriver::ScreenSize = core::dimension2d<u32>(width, height);
+#endif
 
 #elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 		Device = device;
@@ -115,6 +146,11 @@ namespace video
 
 #if defined(_IRR_COMPILE_WITH_EGL_)
 		delete EglContext;
+		
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+		if (HDc)
+			ReleaseDC((ExposedData.OpenGLWin32.HWnd, HDc);
+#endif
 
 
 #elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)

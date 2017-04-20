@@ -6,71 +6,75 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in Irrlicht.h
 
-#ifndef __C_CONTEXT_EGL_H_INCLUDED__
-#define __C_CONTEXT_EGL_H_INCLUDED__
+#ifndef CONTEXT_EGL_HPP
+#define CONTEXT_EGL_HPP
 
 #include "IrrCompileConfig.h"
 
 #if defined(_IRR_COMPILE_WITH_EGL_)
 
-#include "SIrrCreationParameters.h"
-#include "SExposedVideoData.h"
-
-#if defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
 #include <EGL/egl.h>
-#else
-#include <EGL/egl.h>
-#include <EGL/eglplatform.h>
-#endif
+#include <EGL/eglext.h>
 
-#if defined(_IRR_WINDOWS_API_)
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
-#endif
-
-#ifdef _MSC_VER
-#pragma comment(lib, "libEGL.lib")
-#endif
-
-
-namespace irr
+enum ContextEGLOpenGLAPI
 {
-namespace video
-{
-	
-class ContextEGL
-{
-private:
-	NativeWindowType EglWindow;
-	void* EglDisplay;
-	void* EglSurface;
-	void* EglContext;
-	EGLConfig EglConfig;
-	int EGLVersionMajor;
-	int EGLVersionMinor;
-	
-#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-	HDC HDc;
-#endif
-
-	bool IsCoreContext;
-	
-	bool testEGLError();
-
-public:
-	ContextEGL(const SIrrlichtCreationParameters& params,
-			   const SExposedVideoData& data);
-	~ContextEGL();
-
-	void reloadEGLSurface(void* window);
-	bool swapBuffers();
-	bool isCoreContext() {return IsCoreContext;}
+    CEGL_API_OPENGL,
+    CEGL_API_OPENGL_ES
 };
 
-}
-}
+enum ContextEGLSurfaceType
+{
+    CEGL_SURFACE_WINDOW,
+    CEGL_SURFACE_PBUFFER
+};
+
+struct ContextEGLParams
+{
+    ContextEGLOpenGLAPI opengl_api;
+    ContextEGLSurfaceType surface_type;
+    EGLNativeWindowType window;
+    EGLNativeDisplayType display;
+    bool force_legacy_device;
+    bool with_alpha_channel;
+    bool vsync_enabled;
+    int pbuffer_width;
+    int pbuffer_height;
+};
+
+
+class ContextManagerEGL
+{
+private:
+    NativeWindowType m_egl_window;
+    EGLDisplay m_egl_display;
+    EGLSurface m_egl_surface;
+    EGLContext m_egl_context;
+    EGLConfig m_egl_config;
+
+    ContextEGLParams m_creation_params;
+    bool m_is_legacy_device;
+    bool m_initialized;
+    int m_egl_version;
+
+    bool initDisplay();
+    bool chooseConfig();
+    bool createSurface();
+    bool createContext();
+    bool hasEGLExtension(const char* extension);
+    bool checkEGLError();
+
+public:
+    ContextManagerEGL();
+    ~ContextManagerEGL();
+
+    bool init(const ContextEGLParams& params);
+    void close();
+
+    void reloadEGLSurface(void* window);
+    bool swapBuffers();
+    bool isLegacyDevice() {return m_is_legacy_device;}
+    bool getSurfaceDimensions(int* width, int* height);
+};
 
 #endif
 
