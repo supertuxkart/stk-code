@@ -215,6 +215,7 @@
 #include "network/protocols/get_public_address.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
+#include "online/ssm.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
@@ -1514,6 +1515,14 @@ void askForInternetPermission()
 int main(int argc, char *argv[] )
 {
     CommandLine::init(argc, argv);
+
+    SSM *ssm = new SSM();
+    bool steam_avail = ssm->isSteamAvailable();
+    std::string id = ssm->getId();
+    std::string name = ssm->getName();
+    int n = ssm->saveAvatarAs("test.png");
+    //std::vector<std::string> friends = ssm->getFriends();
+    //std::string quit = ssm->sendCommand("quit");
 
     CrashReporting::installHandlers();
 
