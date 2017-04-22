@@ -15,8 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SSM_HPP
-#define HEADER_SSM_HPP
+#ifndef HEADER_STEAM_HPP
+#define HEADER_STEAM_HPP
 
 #ifdef WIN32
 #  include <windows.h>
@@ -25,7 +25,13 @@
 #include <string>
 #include <vector>
 
-class SSM
+/** This class provides a simple interface to the SteamWorks API. Due to 
+ *  our current license, the SteamWorks lib can not be linked with STK.
+ *  So this wrapper class actually starts a seprate process (ssm, see
+ *  https://github.com/hiker/steam-synchron-manager) and communicats
+ *  with the SSM using pipes.
+ */
+class Steam
 {
 private:
 #ifdef WIN32
@@ -43,16 +49,16 @@ private:
     std::string sendCommand(const std::string &command);
     std::string getLine();
 public:
-    SSM();
-    ~SSM();
+     Steam();
+    ~Steam();
     std::string getName();
     std::string getId();
     int saveAvatarAs(const std::string filename);
     std::vector<std::string> getFriends();
     // ------------------------------------------------------------------------
-    /** Returns true if the connection to the SSM was successful, i.e. 
+    /** Returns true if the connection to the Steam API was successful, i.e.
      *  connection to steam worked, and SteamWorks API could be initialised. */
     bool isSteamAvailable() { return m_steam_available;  }
-};   // class SSM
+};   // class Steam
 
-#endif // HEADER_SSM_HPP
+#endif // HEADER_STEAM_HPP

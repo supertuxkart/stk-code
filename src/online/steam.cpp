@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "online/ssm.hpp"
+#include "online/steam.hpp"
 
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
@@ -24,7 +24,7 @@
 #  include <windows.h> 
 #endif
 
-SSM::SSM()
+Steam::Steam()
 {
 #ifdef WIN32
     // Based on: https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx
@@ -39,42 +39,42 @@ SSM::SSM()
 
     if (!CreatePipe(&m_child_stdout_read, &m_child_stdout_write, &sec_attr, 0))
     {
-        Log::error("SSM", "Error creating StdoutRd CreatePipe");
+        Log::error("Steam", "Error creating StdoutRd CreatePipe");
     }
 
     // Ensure the read handle to the pipe for STDOUT is not inherited.
 
     if (!SetHandleInformation(m_child_stdout_read, HANDLE_FLAG_INHERIT, 0))
     {
-        Log::error("SSM", "Stdout SetHandleInformation");
+        Log::error("Steam", "Stdout SetHandleInformation");
     }
 
     // Create a pipe for the child process's STDIN. 
     if (!CreatePipe(&m_child_stdin_read, &m_child_stdin_write, &sec_attr, 0))
     {
-        Log::error("SSM", "Stdin CreatePipe");
+        Log::error("Steam", "Stdin CreatePipe");
     }
 
     // Ensure the write handle to the pipe for STDIN is not inherited. 
 
     if (!SetHandleInformation(m_child_stdin_write, HANDLE_FLAG_INHERIT, 0))
     {
-        Log::error("SSM", "Stdin SetHandleInformation");
+        Log::error("Steam", "Stdin SetHandleInformation");
     }
 
     // Create the child process. 
 
     createChildProcess();
 #endif
-}   // SSM
+}   // Steam
 // ----------------------------------------------------------------------------
-SSM::~SSM()
+Steam::~Steam()
 {
 
-}   // ~SSM
+}   // ~Steam
 
 // ----------------------------------------------------------------------------
-int SSM::createChildProcess()
+int Steam::createChildProcess()
 {
 #ifdef WIN32
     TCHAR command_line[] = TEXT("ssm.exe 1");
@@ -112,7 +112,7 @@ int SSM::createChildProcess()
                        // If an error occurs, exit the application. 
     if (!bSuccess)
     {
-        Log::error("SSM", "CreateProcess");
+        Log::error("Steam", "CreateProcess");
     }
     else
     {
@@ -129,7 +129,7 @@ int SSM::createChildProcess()
 }   // createChildProcess
 
 // ----------------------------------------------------------------------------
-std::string SSM::getLine()
+std::string Steam::getLine()
 {
 #define BUFSIZE 1024
     CHAR buffer[BUFSIZE];
@@ -147,7 +147,7 @@ std::string SSM::getLine()
 }   // getLine
 
 // ----------------------------------------------------------------------------
-std::string SSM::sendCommand(const std::string &command)
+std::string Steam::sendCommand(const std::string &command)
 {
 #ifdef WIN32
     // Write to the pipe that is the standard input for a child process. 
@@ -163,7 +163,7 @@ std::string SSM::sendCommand(const std::string &command)
 }   // sendCommand
 
 // ----------------------------------------------------------------------------
-std::string SSM::decodeString(const std::string &s)
+std::string Steam::decodeString(const std::string &s)
 {
     std::vector<std::string> l = StringUtils::split(s, ' ');
     if (l.size() != 2) return "INVALID ANSWER - wrong number of fields";
@@ -180,7 +180,7 @@ std::string SSM::decodeString(const std::string &s)
 /** Returns the steam user name. SSM returns 'N name" where N is
  *  the length of the name.
  */
-std::string SSM::getName()
+std::string Steam::getName()
 {
     std::string s = sendCommand("name");
     return decodeString(s);
@@ -190,7 +190,7 @@ std::string SSM::getName()
 /** Returns a unique id (string) from steam. SSM returns 'N ID" where N is
  *  the length of the ID.
  */
-std::string SSM::getId()
+std::string Steam::getId()
 {
     std::string s = sendCommand("id");
     return decodeString(s);
@@ -200,7 +200,7 @@ std::string SSM::getId()
 /** Returns a std::vector with the names of all friends. SSM returns a first
  *  line with the number of friends, then one friend in a line.
  */
-std::vector<std::string> SSM::getFriends()
+std::vector<std::string> Steam::getFriends()
 {
     std::string s = sendCommand("friends");
     int num_friends;
@@ -214,7 +214,7 @@ std::vector<std::string> SSM::getFriends()
     return result;
 }
 // ----------------------------------------------------------------------------
-int SSM::saveAvatarAs(const std::string filename)
+int Steam::saveAvatarAs(const std::string filename)
 {
     //std::string s = sendCommand(std::string("avatar ")+filename);
     std::string s = sendCommand("avatar");
