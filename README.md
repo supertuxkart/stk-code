@@ -150,7 +150,7 @@ msbuild.exe SuperTuxKart.sln
 ``` 
 SuperTuxKart can now be run as `bin\Debug\supertuxkart.exe` or `bin\Release\supertuxkart.exe` 
 
-## Building SuperTuxKart on macOS X
+## Building SuperTuxKart on macOS
 
 ### Getting Started
 
