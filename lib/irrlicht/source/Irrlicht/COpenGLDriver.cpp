@@ -27,7 +27,7 @@ extern bool GLContextDebugBit;
 #endif
 
 #ifdef _IRR_COMPILE_WITH_WAYLAND
-#include "cirrdevicewayland.h"
+#include "CIrrDeviceWayland.h"
 #include "CContextEGL.h"
 #endif
 

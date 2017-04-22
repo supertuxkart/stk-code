@@ -27,7 +27,7 @@
 #endif
 
 #ifdef _IRR_COMPILE_WITH_WAYLAND
-#include "cirrdevicewayland.h"
+#include "CIrrDeviceWayland.h"
 #endif
 
 #ifdef _IRR_COMPILE_WITH_X11_DEVICE_

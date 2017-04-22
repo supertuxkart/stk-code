@@ -119,7 +119,7 @@ source/Irrlicht/CIrrDeviceFB.cpp
 source/Irrlicht/CIrrDeviceLinux.cpp
 source/Irrlicht/CIrrDeviceSDL.cpp
 source/Irrlicht/CIrrDeviceStub.cpp
-source/Irrlicht/cirrdevicewayland.cpp
+source/Irrlicht/CIrrDeviceWayland.cpp
 source/Irrlicht/CIrrDeviceWin32.cpp
 source/Irrlicht/CLightSceneNode.cpp
 source/Irrlicht/CLimitReadFile.cpp
@@ -253,7 +253,7 @@ source/Irrlicht/CIrrDeviceFB.h
 source/Irrlicht/CIrrDeviceLinux.h
 source/Irrlicht/CIrrDeviceSDL.h
 source/Irrlicht/CIrrDeviceStub.h
-source/Irrlicht/cirrdevicewayland.h
+source/Irrlicht/CIrrDeviceWayland.h
 source/Irrlicht/CIrrDeviceWin32.h
 source/Irrlicht/CLightSceneNode.h
 source/Irrlicht/CLimitReadFile.h
