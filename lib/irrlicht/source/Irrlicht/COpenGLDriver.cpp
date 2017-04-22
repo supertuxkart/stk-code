@@ -28,6 +28,7 @@ extern bool GLContextDebugBit;
 
 #ifdef _IRR_COMPILE_WITH_WAYLAND
 #include "cirrdevicewayland.h"
+#include "CContextEGL.h"
 #endif
 
 namespace irr
@@ -981,7 +982,7 @@ bool COpenGLDriver::endScene()
 	if (DeviceType == EIDT_WAYLAND)
 	{
 		wl_display_dispatch_pending(wl_device->display);
-		eglSwapBuffers(wl_device->egl_display, wl_device->egl_surface);
+		wl_device->getEGLContext()->swapBuffers();
 
 		return true;
 	}

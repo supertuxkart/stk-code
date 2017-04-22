@@ -14,11 +14,11 @@
 #include <xkbcommon/xkbcommon.h>
 
 #include <GL/gl.h>
-#include <EGL/egl.h>
-#include <EGL/eglext.h>
 
 #include <vector>
 #define KeySym s32
+
+class ContextManagerEGL;
 
 // Note : only supporting shell interface
 
@@ -231,6 +231,8 @@ namespace irr
 		std::vector<core::dimension2du> Modes;
 		core::dimension2du CurrentModes;
 
+		ContextManagerEGL* EglContext;
+		
 	public:
 		void signalEvent(const SEvent&);
 		void addMode(const core::dimension2du &mode) { Modes.push_back(mode); }
@@ -251,10 +253,9 @@ namespace irr
 		wl_surface *surface;
 		wl_shell_surface *shell_surface;
 		wl_egl_window *egl_window;
-
-		EGLSurface egl_surface;
-		EGLDisplay egl_display;
-		EGLContext egl_context;
+		
+		ContextManagerEGL* getEGLContext() {return EglContext;}
+		
 	private:
 //		XVisualInfo* visual;
 		mutable core::stringc Clipboard;

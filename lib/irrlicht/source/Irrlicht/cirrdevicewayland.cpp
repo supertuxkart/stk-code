@@ -20,6 +20,7 @@ extern bool GLContextDebugBit;
 #include "IGUISpriteBank.h"
 #include <sys/mman.h>
 #include "CVideoModeList.h"
+#include "CContextEGL.h"
 
 #if defined _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 #include <fcntl.h>
@@ -461,7 +462,8 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& param)
 	#ifdef _DEBUG
 	setDebugName("CIrrDeviceLinux");
 	#endif
-
+	
+	EglContext = NULL;
 
 	// print version, distribution etc.
 	// thx to LynxLuna for pointing me to the uname function
@@ -530,7 +532,9 @@ CIrrDeviceWayland::~CIrrDeviceWayland()
 	wl_registry_destroy(registry);
 	wl_display_disconnect(display);
 	xkb_context_unref(xkbctx);
-//TODO : surfaces, egl
+	
+	delete EglContext;
+
 #if defined(_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
 	for (u32 joystick = 0; joystick < ActiveJoysticks.size(); ++joystick)
 	{
@@ -565,50 +569,19 @@ void CIrrDeviceWayland::initEGL()
 {
 	egl_window = wl_egl_window_create(surface, Width, Height);
 
-	egl_display = eglGetDisplay(display);
-	if (egl_display == EGL_NO_DISPLAY)
-	{
-		os::Printer::log("eglGetDisplay() error", "", ELL_ERROR);
-	}
-	if(!eglInitialize(egl_display, NULL, NULL))
-	{
-		os::Printer::log("eglInitialize() error", "", ELL_ERROR);
-	}
-
-	int confsize;
-	int attrib[] = {EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
-		EGL_RED_SIZE, 4,
-		EGL_GREEN_SIZE, 4,
-		EGL_BLUE_SIZE, 4,
-		EGL_DEPTH_SIZE, 24,
-		EGL_NONE};
-	EGLConfig eglconf;
-
-	if (!eglChooseConfig(egl_display, attrib, &eglconf, 1, &confsize))
-	{
-		os::Printer::log("eglChooseConfig() error", "", ELL_ERROR);
-	}
-	egl_surface = eglCreateWindowSurface(egl_display, eglconf, egl_window, 0);
-	if (egl_surface == EGL_NO_SURFACE)
-	{
-		os::Printer::log("eglCreateWindowSurface() error", "", ELL_ERROR);
-	}
-	if (!eglBindAPI(EGL_OPENGL_API))
-	{
-		os::Printer::log("eglBindAPI() error", "", ELL_ERROR);
-	}
-	int glattrib[] = {EGL_CONTEXT_MAJOR_VERSION_KHR, 3, EGL_CONTEXT_MINOR_VERSION_KHR, 3, EGL_NONE};
-	egl_context = eglCreateContext(egl_display, eglconf, EGL_NO_CONTEXT, glattrib);
-	if (egl_context == EGL_NO_CONTEXT)
-	{
-		os::Printer::log("eglCreateContext() error", "", ELL_ERROR);
-	}
-	if (!eglMakeCurrent(egl_display, egl_surface, egl_surface, egl_context))
-	{
-		os::Printer::log("eglMakeCurrent() error", "", ELL_ERROR);
-	}
-	video::useCoreContext = true;
-	eglSwapInterval(egl_display, CreationParams.Vsync ? 1 : 0);
+	EglContext = new ContextManagerEGL();
+		
+	ContextEGLParams egl_params;
+	egl_params.opengl_api = CEGL_API_OPENGL;
+	egl_params.surface_type = CEGL_SURFACE_WINDOW;
+	egl_params.force_legacy_device = CreationParams.ForceLegacyDevice;
+	egl_params.with_alpha_channel = CreationParams.WithAlphaChannel;
+	egl_params.vsync_enabled = CreationParams.Vsync;
+	egl_params.window = egl_window;
+	egl_params.display = display;
+	
+	EglContext->init(egl_params);
+	video::useCoreContext = !EglContext->isLegacyDevice();
 }
 
 bool CIrrDeviceWayland::createWindow()
