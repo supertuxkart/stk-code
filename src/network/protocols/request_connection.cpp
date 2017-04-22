@@ -20,8 +20,11 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "network/network.hpp"
+#include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
-#include "online/servers_manager.hpp"
+#include "network/servers_manager.hpp"
+#include "network/stk_host.hpp"
 
 using namespace Online;
 
@@ -29,9 +32,10 @@ using namespace Online;
  *  \param server_id Id of the server.
  */
 RequestConnection::RequestConnection(uint32_t server_id)
-                 : Protocol(NULL, PROTOCOL_SILENT)
+                 : Protocol(PROTOCOL_SILENT)
 {
     m_server_id = server_id;
+    m_request   = NULL;
 }   // RequestConnection
 
 // ----------------------------------------------------------------------------
@@ -71,12 +75,24 @@ void RequestConnection::asynchronousUpdate()
     {
         case NONE:
         {
-            m_request = new ServerJoinRequest();
-            PlayerManager::setUserDetails(m_request, "request-connection", Online::API::SERVER_PATH);
+            if(NetworkConfig::get()->isLAN())
+            {
+                const Server *server = 
+                    ServersManager::get()->getServerByID(m_server_id);
+                BareNetworkString message(std::string("connection-request"));
+                STKHost::get()->sendRawPacket(message, server->getAddress());
+                m_state = DONE;
+            }
+            else
+            {
+                m_request = new ServerJoinRequest();
+                PlayerManager::setUserDetails(m_request, "request-connection",
+                                               Online::API::SERVER_PATH);
 
-            m_request->addParameter("server_id", m_server_id);
-            m_request->queue();
-            m_state = REQUEST_PENDING;
+                m_request->addParameter("server_id", m_server_id);
+                m_request->queue();
+                m_state = REQUEST_PENDING;
+            }
             break;
         }
         case REQUEST_PENDING:
@@ -113,7 +129,7 @@ void RequestConnection::asynchronousUpdate()
             m_state = EXITING;
             delete m_request;
             m_request = NULL;
-            m_listener->requestTerminate(this);
+            requestTerminate();
             break;
         case EXITING:
             break;

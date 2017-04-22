@@ -19,10 +19,11 @@
 #ifndef HEADER_ABSTRACT_KART_HPP
 #define HEADER_ABSTRACT_KART_HPP
 
+#include <memory>
+
 #include "items/powerup_manager.hpp"
 #include "karts/moveable.hpp"
 #include "karts/controller/kart_control.hpp"
-#include "karts/player_difficulty.hpp"
 #include "race/race_manager.hpp"
 
 namespace irr
@@ -39,12 +40,16 @@ class btKart;
 class btQuaternion;
 class Controller;
 class Item;
+class KartGFX;
 class KartModel;
 class KartProperties;
 class Material;
 class Powerup;
 class Skidding;
 class SlipStream;
+class TerrainInfo;
+
+enum KartRenderType: unsigned int;
 
 /** An abstract interface for the actual karts. Some functions are actually
  *  implemented here in order to allow inlining.
@@ -70,10 +75,10 @@ private:
 
 protected:
     /** The kart properties. */
-    const KartProperties *m_kart_properties;
+    std::unique_ptr<KartProperties> m_kart_properties;
 
     /** The per-player difficulty. */
-    const PlayerDifficulty *m_difficulty;
+    PerPlayerDifficulty m_difficulty;
 
     /** This stores a copy of the kart model. It has to be a copy
      *  since otherwise incosistencies can happen if the same kart
@@ -95,7 +100,8 @@ public:
                    AbstractKart(const std::string& ident,
                                 int world_kart_id,
                                 int position, const btTransform& init_transform,
-                                const PlayerDifficulty *difficulty);
+                                PerPlayerDifficulty difficulty,
+                                KartRenderType krt);
     virtual       ~AbstractKart();
     virtual core::stringw getName() const;
     virtual void   reset();
@@ -104,36 +110,30 @@ public:
     // Functions related to controlling the kart
     // ------------------------------------------------------------------------
     /** Returns the current steering value for this kart. */
-    float getSteerPercent() const { return m_controls.m_steer;  }
+    float getSteerPercent() const { return m_controls.getSteer();  }
     // ------------------------------------------------------------------------
     /** Returns all controls of this kart. */
     KartControl&  getControls() { return m_controls; }
     // ------------------------------------------------------------------------
     /** Returns all controls of this kart - const version. */
     const KartControl& getControls() const { return m_controls; }
-    // ------------------------------------------------------------------------
-    /** Sets the kart controls. Used e.g. by replaying history. */
-    void setControls(const KartControl &c) { m_controls = c; }
 
     // ========================================================================
     // Access to the kart properties.
     // ------------------------------------------------------------------------
     /** Returns the kart properties of this kart. */
     const KartProperties* getKartProperties() const
-                            { return m_kart_properties; }
-    // ------------------------------------------------------------------------
-    /** Sets the kart properties. */
-    void setKartProperties(const KartProperties *kp) { m_kart_properties=kp; }
+                            { return m_kart_properties.get(); }
 
     // ========================================================================
     // Access to the per-player difficulty.
     // ------------------------------------------------------------------------
     /** Returns the per-player difficulty of this kart. */
-    const PlayerDifficulty* getPlayerDifficulty() const
+    const PerPlayerDifficulty getPerPlayerDifficulty() const
                             { return m_difficulty; }
     // ------------------------------------------------------------------------
     /** Sets the per-player difficulty. */
-    void setPlayerDifficulty(const PlayerDifficulty *pd) { m_difficulty=pd; }
+    void setPerPlayerDifficulty(const PerPlayerDifficulty d) { m_difficulty=d; }
 
     // ------------------------------------------------------------------------
     /** Returns a unique identifier for this kart (name of the directory the
@@ -143,6 +143,10 @@ public:
     /** Returns the maximum steering angle for this kart, which depends on the
      *  speed. */
     virtual float getMaxSteerAngle () const = 0;
+    // ------------------------------------------------------------------------
+    /** Returns the (maximum) speed for a given turn radius.
+     *  \param radius The radius for which the speed needs to be computed. */
+    virtual float  getSpeedForTurnRadius(float radius) const = 0;
     // ------------------------------------------------------------------------
     /** Returns the time till full steering is reached for this kart.
      *  This can depend on the current steering value, which must be >= 0.
@@ -245,7 +249,7 @@ public:
     /** Marks this kart to be eliminated. */
     virtual void eliminate() = 0;
     // ------------------------------------------------------------------------
-    virtual void finishedRace(float time) = 0;
+    virtual void finishedRace(float time, bool from_server=false) = 0;
     // ------------------------------------------------------------------------
     /** Returns the finished time for a kart. */
     virtual float getFinishTime() const = 0;
@@ -270,6 +274,10 @@ public:
      *  pure abstract, since this function is not needed for certain classes,
      *  like Ghost. */
     virtual float getSpeed() const = 0;
+    // ------------------------------------------------------------------------
+    /** Returns the exponentially smoothened speed of the kart in 
+     *  which is removes shaking from camera. */
+    virtual float getSmoothedSpeed() const = 0;
     // ------------------------------------------------------------------------
     /** Returns the current maximum speed for this kart, this includes all
      *  bonus and maluses that are currently applied. */
@@ -373,6 +381,9 @@ public:
     /** Returns the current powerup. */
     virtual Powerup *getPowerup() = 0;
     // ------------------------------------------------------------------------
+    /** Returns a points to this kart's graphical effects. */
+    virtual KartGFX* getKartGFX() = 0;
+    // ------------------------------------------------------------------------
     virtual void setPowerup (PowerupManager::PowerupType t, int n) = 0;
     // ------------------------------------------------------------------------
     /** Returns the bullet vehicle which represents this kart. */
@@ -419,6 +430,9 @@ public:
     /** Shows the star effect for a certain time. */
     virtual void showStarEffect(float t) = 0;
     // ------------------------------------------------------------------------
+    /** Returns the terrain info oject. */
+    virtual const TerrainInfo *getTerrainInfo() const = 0;
+    // ------------------------------------------------------------------------
     /** Called when the kart crashes against another kart.
      *  \param k The kart that was hit.
      *  \param update_attachments If true the attachment of this kart and the
@@ -426,6 +440,10 @@ public:
     virtual void crashed(AbstractKart *k, bool update_attachments) = 0;
     // ------------------------------------------------------------------------
     virtual void crashed(const Material *m, const Vec3 &normal) = 0;
+    // ------------------------------------------------------------------------
+    /** Returns the normal of the terrain the kart is over atm. This is
+     *  defined even if the kart is flying. */
+    virtual const Vec3& getNormal() const = 0;
     // ------------------------------------------------------------------------
     /** Returns the height of the terrain. we're currently above */
     virtual float getHoT() const = 0;
@@ -445,6 +463,15 @@ public:
     /** Counter which is used for displaying wrong way message after a delay */
     virtual float getWrongwayCounter() = 0;
     virtual void setWrongwayCounter(float counter) = 0;
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart wins or loses. */
+    virtual bool getRaceResult() const = 0;
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart is a ghost (replay) kart. */
+    virtual bool isGhostKart() const = 0;
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart is jumping. */
+    virtual bool isJumping() const = 0;
 
 };   // AbstractKart
 

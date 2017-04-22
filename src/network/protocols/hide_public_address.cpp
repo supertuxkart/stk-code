@@ -24,7 +24,7 @@
 #include "online/request_manager.hpp"
 #include "utils/log.hpp"
 
-HidePublicAddress::HidePublicAddress() : Protocol(NULL, PROTOCOL_SILENT)
+HidePublicAddress::HidePublicAddress() : Protocol(PROTOCOL_SILENT)
 {
 }
 
@@ -56,16 +56,16 @@ void HidePublicAddress::asynchronousUpdate()
         {
             if(rec_success == "yes")
             {
-                Log::debug("ShowPublicAddress", "Address hidden successfully.");
+                Log::debug("HidePublicAddress", "Address hidden successfully.");
             }
             else
             {
-                Log::error("ShowPublicAddress", "Fail to hide address.");
+                Log::error("HidePublicAddress", "Fail to hide address.");
             }
         }
         else
         {
-            Log::error("ShowPublicAddress", "Fail to hide address.");
+            Log::error("HidePublicAddress", "Fail to hide address.");
         }
         m_state = DONE;
     }
@@ -74,6 +74,6 @@ void HidePublicAddress::asynchronousUpdate()
         m_state = EXITING;
         delete m_request;
         m_request = NULL;
-        m_listener->requestTerminate(this);
+        requestTerminate();
     }
 }

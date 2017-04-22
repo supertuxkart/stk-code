@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # Automate the build process on Linux based on 
-# http://supertuxkart.sourceforge.net/Build_STK_on_Linux
+# http://supertuxkart.net/Build_STK_on_Linux
 
 # CMake build type
 BUILDTYPE=Debug

@@ -43,6 +43,14 @@ private:
 public:
     InterpolationArray() {};
 
+    /** Removes all saved values from this object. */
+    void clear()
+    {
+        m_x.clear();
+        m_y.clear();
+        m_delta.clear();
+    }
+
     /** Adds the value pair x/y to the list of all points. It is tested
      *  that the x values are added in order.
      *  \param x, y The pair to add.

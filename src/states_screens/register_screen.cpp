@@ -55,6 +55,7 @@ void RegisterScreen::init()
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget);
     m_info_widget->setDefaultColor();
+    m_info_widget->setText(L"", false);
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget);
     m_password_widget = getWidget<TextBoxWidget>("password");
@@ -83,7 +84,7 @@ void RegisterScreen::init()
     stringw username = "";
     if(m_existing_player)
     {
-        username = m_existing_player->getName();
+        username = m_existing_player->getName(true/*ignoreRTL*/);
     }
     else if (PlayerManager::get()->getNumPlayers() == 0)
     {

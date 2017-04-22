@@ -10,6 +10,7 @@ namespace irr
 
 	enum EKEY_CODE
 	{
+		KEY_UNKNOWN          = 0x0,
 		KEY_LBUTTON          = 0x01,  // Left mouse button
 		KEY_RBUTTON          = 0x02,  // Right mouse button
 		KEY_CANCEL           = 0x03,  // Control-break processing
@@ -141,6 +142,20 @@ namespace irr
 		KEY_RCONTROL         = 0xA3,  // Right CONTROL key
 		KEY_LMENU            = 0xA4,  // Left MENU key
 		KEY_RMENU            = 0xA5,  // Right MENU key
+		KEY_BROWSER_BACK     = 0xA6,  // Browser Back key
+		KEY_BROWSER_FORWARD  = 0xA7,  // Browser Forward key
+		KEY_BROWSER_REFRESH  = 0xA8,  // Browser Refresh key
+		KEY_BROWSER_STOP     = 0xA9,  // Browser Stop key
+		KEY_BROWSER_SEARCH   = 0xAA,  // Browser Search key 
+		KEY_BROWSER_FAVORITES =0xAB,  // Browser Favorites key
+		KEY_BROWSER_HOME     = 0xAC,  // Browser Start and Home key
+		KEY_VOLUME_MUTE      = 0xAD,  // Volume Mute key
+		KEY_VOLUME_DOWN      = 0xAE,  // Volume Down key
+		KEY_VOLUME_UP        = 0xAF,  // Volume Up key
+		KEY_MEDIA_NEXT_TRACK = 0xB0,  // Next Track key
+		KEY_MEDIA_PREV_TRACK = 0xB1,  // Previous Track key
+		KEY_MEDIA_STOP       = 0xB2,  // Stop Media key
+		KEY_MEDIA_PLAY_PAUSE = 0xB3,  // Play/Pause Media key
 		KEY_OEM_1            = 0xBA,  // for US    ";:"
 		KEY_PLUS             = 0xBB,  // Plus Key   "+"
 		KEY_COMMA            = 0xBC,  // Comma Key  ","

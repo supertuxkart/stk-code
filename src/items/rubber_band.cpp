@@ -20,16 +20,15 @@
 
 #include <IMeshSceneNode.h>
 
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "items/plunger.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
-#include "modes/world.hpp"
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -68,18 +67,24 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
         verts[i].Color = color;
     }
 
+#ifndef SERVER_ONLY
     // Color
-    mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
+    mb->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 255, 255, 255)));
     // Gloss
-    mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    mb->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    // Colorization mask
+    mb->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+#endif
     updatePosition();
     m_node = irr_driver->addMesh(m_mesh, "rubberband");
+#ifndef SERVER_ONLY
     irr_driver->applyObjectPassShader(m_node);
     if (STKMeshSceneNode *stkm = dynamic_cast<STKMeshSceneNode *>(m_node))
         stkm->setReloadEachFrame(true);
 #ifdef DEBUG
     std::string debug_name = m_owner->getIdent()+" (rubber-band)";
     m_node->setName(debug_name.c_str());
+#endif
 #endif
 
 }   // RubberBand
@@ -134,6 +139,8 @@ void RubberBand::updatePosition()
  */
 void RubberBand::update(float dt)
 {
+    const KartProperties *kp = m_owner->getKartProperties();
+
     if(m_owner->isEliminated())
     {
         // Rubber band snaps
@@ -149,8 +156,7 @@ void RubberBand::update(float dt)
     // Check for rubber band snapping
     // ------------------------------
     float l = (m_end_position-k).length2();
-    float max_len = m_owner->getKartProperties()->getRubberBandMaxLength() *
-                    m_owner->getPlayerDifficulty()->getRubberBandMaxLength();
+    float max_len = kp->getPlungerBandMaxLength();
     if(l>max_len*max_len)
     {
         // Rubber band snaps
@@ -163,8 +169,7 @@ void RubberBand::update(float dt)
     // ----------------------------
     if(m_attached_state!=RB_TO_PLUNGER)
     {
-        float force = m_owner->getKartProperties()->getRubberBandForce() *
-                      m_owner->getPlayerDifficulty()->getRubberBandForce();
+        float force = kp->getPlungerBandForce();
         Vec3 diff   = m_end_position-k;
 
         // detach rubber band if kart gets very close to hit point
@@ -180,12 +185,10 @@ void RubberBand::update(float dt)
         diff.normalize();   // diff can't be zero here
         m_owner->getBody()->applyCentralForce(diff*force);
         m_owner->increaseMaxSpeed(MaxSpeed::MS_INCREASE_RUBBER,
-            m_owner->getKartProperties()->getRubberBandSpeedIncrease() *
-            m_owner->getPlayerDifficulty()->getRubberBandSpeedIncrease(),
+            kp->getPlungerBandSpeedIncrease(),
             /*engine_force*/ 0.0f,
             /*duration*/0.1f,
-            m_owner->getKartProperties()->getRubberBandFadeOutTime() *
-            m_owner->getPlayerDifficulty()->getRubberBandFadeOutTime());
+            kp->getPlungerBandFadeOutTime());
         if(m_attached_state==RB_TO_KART)
             m_hit_kart->getBody()->applyCentralForce(diff*(-force));
     }
@@ -211,8 +214,7 @@ void RubberBand::checkForHit(const Vec3 &k, const Vec3 &p)
         m_owner->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = 0;
 
     // Do the raycast
-    World::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(k, p,
-                                                                ray_callback);
+    Physics::getInstance()->getPhysicsWorld()->rayTest(k, p, ray_callback);
     // Reset collision groups
     m_plunger->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = old_plunger_group;
     if(m_owner->getBody()->getBroadphaseHandle())

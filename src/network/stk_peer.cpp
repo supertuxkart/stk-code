@@ -17,20 +17,23 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/stk_peer.hpp"
-#include "network/network_manager.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_string.hpp"
+#include "network/network_player_profile.hpp"
+#include "network/stk_host.hpp"
+#include "network/transport_address.hpp"
 #include "utils/log.hpp"
 
 #include <string.h>
 
 /** Constructor for an empty peer.
  */
-STKPeer::STKPeer()
+STKPeer::STKPeer(ENetPeer *enet_peer)
 {
-    m_enet_peer           = NULL;
-    m_player_profile      = NULL;
+    m_enet_peer           = enet_peer;
+    m_is_authorised       = false;
     m_client_server_token = 0;
+    m_host_id             = 0;
     m_token_set           = false;
 }   // STKPeer
 
@@ -39,32 +42,9 @@ STKPeer::STKPeer()
  */
 STKPeer::~STKPeer()
 {
-    if (m_enet_peer)
-        m_enet_peer = NULL;
-    if (m_player_profile)
-        delete m_player_profile;
-    m_player_profile = NULL;
+    m_enet_peer           = NULL;
     m_client_server_token = 0;
 }   // ~STKPeer
-
-//-----------------------------------------------------------------------------
-/** Connect to the specified host.
- */
-bool STKPeer::connectToHost(STKHost* localhost, const TransportAddress &host,
-                            uint32_t channel_count, uint32_t data)
-{
-    const ENetAddress address = host.toEnetAddress();
-
-    ENetPeer* peer = enet_host_connect(localhost->m_host, &address, 2, 0);
-    if (peer == NULL)
-    {
-        Log::error("STKPeer", "Could not try to connect to server.\n");
-        return false;
-    }
-    TransportAddress a(peer->address);
-    Log::verbose("STKPeer", "Connecting to %s", a.toString().c_str());
-    return true;
-}   // connectToHost
 
 //-----------------------------------------------------------------------------
 /** Disconnect from the server.
@@ -79,13 +59,15 @@ void STKPeer::disconnect()
  *  \param data The data to send.
  *  \param reliable If the data is sent reliable or not.
  */
-void STKPeer::sendPacket(NetworkString const& data, bool reliable)
+void STKPeer::sendPacket(NetworkString *data, bool reliable)
 {
+    data->setToken(m_client_server_token);
     TransportAddress a(m_enet_peer->address);
     Log::verbose("STKPeer", "sending packet of size %d to %s",
-                 a.toString().c_str());
+                 data->size(), a.toString().c_str());
          
-    ENetPacket* packet = enet_packet_create(data.getBytes(), data.size() + 1,
+    ENetPacket* packet = enet_packet_create(data->getData(),
+                                            data->getTotalSize(),
                                     (reliable ? ENET_PACKET_FLAG_RELIABLE
                                               : ENET_PACKET_FLAG_UNSEQUENCED));
     enet_peer_send(m_enet_peer, 0, packet);
@@ -124,11 +106,28 @@ bool STKPeer::exists() const
 }
 
 //-----------------------------------------------------------------------------
-
+/** Returns if this STKPeer is the same as the given peer.
+ */
 bool STKPeer::isSamePeer(const STKPeer* peer) const
 {
     return peer->m_enet_peer==m_enet_peer;
-}
+}   // isSamePeer
 
 //-----------------------------------------------------------------------------
+/** Returns if this STKPeer is the same as the given peer.
+*/
+bool STKPeer::isSamePeer(const ENetPeer* peer) const
+{
+    return peer==m_enet_peer;
+}   // isSamePeer
+
+//-----------------------------------------------------------------------------
+/** Returns the list of all player profiles connected to this peer. Note that
+ *  this function is somewhat expensive (it loops over all network profiles
+ *  to find the ones with the same host id as this peer.
+ */
+std::vector<NetworkPlayerProfile*> STKPeer::getAllPlayerProfiles()
+{
+    return STKHost::get()->getGameSetup()->getAllPlayersOnHost(getHostId());
+}   // getAllPlayerProfiles
 

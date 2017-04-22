@@ -42,7 +42,7 @@ out vec4 FragColor;
 // Number of samples used for blurring
 #define NB_SAMPLES 8
 
-vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
+#stk_include "utils/getPosFromUVDepth.frag"
 
 void main()
 {
@@ -74,7 +74,7 @@ void main()
 
     // Compute the blur
     vec2 inc_vec = blur_dir / vec2(NB_SAMPLES);
-    vec2 blur_texcoords = texcoords - inc_vec * NB_SAMPLES / 2;
+    vec2 blur_texcoords = texcoords - inc_vec * float(NB_SAMPLES) / 2.;
     for(int i=1 ; i < NB_SAMPLES ; i++)
     {
         color += texture(color_buffer, blur_texcoords).rgb;

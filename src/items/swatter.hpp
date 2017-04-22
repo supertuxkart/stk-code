@@ -49,8 +49,16 @@ private:
     enum    {SWATTER_AIMING, SWATTER_TO_TARGET, SWATTER_FROM_TARGET}
                     m_animation_phase;
 
+    /** True if the swatter will be discarded now. */
+    bool               m_discard_now;
+
+    /** Require for the sfx to complete. */
+    float              m_discard_timeout;
+
     /** The kart the swatter is aiming at. */
     Moveable          *m_target;
+
+    AbstractKart      *m_closest_kart;
 
     SFXBase           *m_swat_sound;
 

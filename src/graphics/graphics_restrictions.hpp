@@ -32,16 +32,17 @@ namespace GraphicsRestrictions
      *  the variable m_names_of_restrictions in the cpp file contains the
      *  string representation used in the XML files. Any change to this
      *  type declaration needs a change in that variable as well. */
-    enum GraphicsRestrictionsType 
+    enum GraphicsRestrictionsType
     {
         GR_UNIFORM_BUFFER_OBJECT,
-        GR_GEOMETRY_SHADER4,
+        GR_GEOMETRY_SHADER,
         GR_DRAW_INDIRECT,
         GR_TEXTURE_VIEW,
         GR_TEXTURE_STORAGE,
         GR_IMAGE_LOAD_STORE,
         GR_BASE_INSTANCE,
         GR_COMPUTE_SHADER,
+        GR_ARRAYS_OF_ARRAYS,
         GR_SHADER_STORAGE_BUFFER_OBJECT,
         GR_MULTI_DRAW_INDIRECT,
         GR_SHADER_ATOMIC_COUNTERS,
@@ -49,11 +50,17 @@ namespace GraphicsRestrictions
         GR_BINDLESS_TEXTURE,
         GR_EXT_TEXTURE_COMPRESSION_S3TC,
         GR_AMD_VERTEX_SHADER_LAYER,
+        GR_EXPLICIT_ATTRIB_LOCATION,
+        GR_TEXTURE_FILTER_ANISOTROPIC,
+        GR_TEXTURE_FORMAT_BGRA8888,
+        GR_COLOR_BUFFER_FLOAT,
         GR_DRIVER_RECENT_ENOUGH,
         GR_HIGHDEFINITION_TEXTURES,
         GR_ADVANCED_PIPELINE,
         GR_FRAMEBUFFER_SRGB_WORKING,
+        GR_FRAMEBUFFER_SRGB_CAPABLE,
         GR_GI,
+        GR_FORCE_LEGACY_DEVICE,
         GR_COUNT  /** MUST be last entry. */
     } ;
 

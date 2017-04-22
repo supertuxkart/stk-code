@@ -64,7 +64,7 @@ bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     World* w = World::getWorld();
     LinearWorld* lin_world = dynamic_cast<LinearWorld*>(w);
 
-    float track_length = w->getTrack()->getTrackLength();
+    float track_length = Track::getCurrentTrack()->getTrackLength();
     // Can happen if a non-lap based race mode is used with a scene file that
     // has check defined.
     if(!lin_world)

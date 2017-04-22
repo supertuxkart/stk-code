@@ -9,7 +9,7 @@ in vec3 nor;
 in vec2 uv;
 out vec3 EncodedNormal;
 
-vec2 EncodeNormal(vec3 n);
+#stk_include "utils/encode_normal.frag"
 
 void main(void)
 {

@@ -178,6 +178,9 @@ namespace scene
 		\return The newly created clone of this node. */
 		virtual ISceneNode* clone(ISceneNode* newParent=0, ISceneManager* newManager=0) = 0;
 
+		virtual u32 getAnimationSetNum() = 0;
+		virtual void addAnimationSet(u32 start, u32 end) = 0;
+		virtual void useAnimationSet(u32 set_num) = 0;
 	};
 
 } // end namespace scene

@@ -38,12 +38,14 @@ public:
 
              RequestConnection(uint32_t server_id);
     virtual ~RequestConnection();
-
-    virtual bool notifyEvent(Event* event) { return true; }
-    virtual bool notifyEventAsynchronous(Event* event) { return true; }
-    virtual void setup();
-    virtual void update() {}
-    virtual void asynchronousUpdate();
+    virtual void setup() OVERRIDE;
+    virtual void asynchronousUpdate() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool notifyEvent(Event* event) OVERRIDE { return true; }
+    // ------------------------------------------------------------------------
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE { return true; }
+    // ------------------------------------------------------------------------
+    virtual void update(float dt) OVERRIDE {}
 
 
 };   // RequestConnection

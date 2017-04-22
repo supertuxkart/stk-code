@@ -348,7 +348,7 @@ namespace video
 		virtual IImage* createImageFromFile(const io::path& filename);
 
 		//! Creates a software image from a file.
-		virtual IImage* createImageFromFile(io::IReadFile* file);
+		virtual IImage* createImageFromFile(io::IReadFile* file, video::IImageLoader** loader = NULL);
 
 		//! Creates a software image from a byte array.
 		/** \param useForeignMemory: If true, the image will use the data pointer
@@ -700,17 +700,20 @@ namespace video
 		//! normal map lookup 32 bit version
 		inline f32 nml32(int x, int y, int pitch, int height, s32 *p) const
 		{
-			if (x < 0) x = pitch-1; if (x >= pitch) x = 0;
-			if (y < 0) y = height-1; if (y >= height) y = 0;
+			if (x < 0) x = pitch-1;
+			if (x >= pitch) x = 0;
+			if (y < 0) y = height-1;
+			if (y >= height) y = 0;
 			return (f32)(((p[(y * pitch) + x])>>16) & 0xff);
 		}
 
 		//! normal map lookup 16 bit version
 		inline f32 nml16(int x, int y, int pitch, int height, s16 *p) const
 		{
-			if (x < 0) x = pitch-1; if (x >= pitch) x = 0;
-			if (y < 0) y = height-1; if (y >= height) y = 0;
-
+			if (x < 0) x = pitch-1;
+			if (x >= pitch) x = 0;
+			if (y < 0) y = height-1;
+			if (y >= height) y = 0;
 			return (f32) getAverage ( p[(y * pitch) + x] );
 		}
 
@@ -741,6 +744,8 @@ namespace video
 			virtual E_DRIVER_TYPE getDriverType() const { return video::EDT_NULL; }
 			virtual ECOLOR_FORMAT getColorFormat() const { return video::ECF_A1R5G5B5; };
 			virtual u32 getPitch() const { return 0; }
+			virtual u32 getOpenGLTextureName() const { return 0; }
+			virtual u64 getHandle() { return 0; }
 			virtual void regenerateMipMapLevels(void* mipmapData=0) {};
 			core::dimension2d<u32> size;
 		};

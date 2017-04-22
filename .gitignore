@@ -1,14 +1,14 @@
 bld*/
 build*/
-cmake_build/
 cmake_build*/
-dependencies/
+dependencies*/
 CMakeFiles/
 stk-editor/
 
 .config/
 supertuxkart-64
 make*.bat
+__pycache__
 
 data/editor
 data/karts
@@ -51,3 +51,20 @@ packets_log.txt
 history.dat
 README.dependencies
 xx
+
+android/android-ndk*
+android/android-sdk*
+android/assets
+android/bin
+android/obj
+android/libs
+android-*
+*.apk
+
+lib/curl
+lib/freetype
+lib/ifaddrs
+lib/libogg
+lib/libvorbis
+lib/openal
+lib/openssl

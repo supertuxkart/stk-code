@@ -276,6 +276,8 @@ void COctreeSceneNode::render()
 			}
 		}
 		break;
+	default:
+		break;
 	}
 }
 
@@ -371,6 +373,8 @@ bool COctreeSceneNode::createTree(IMesh* mesh)
 							for (v=0; v<b->getVertexCount(); ++v)
 								nchunk.Vertices.push_back(((video::S3DVertexTangents*)b->getVertices())[v]);
 							break;
+						default:
+							break;
 						}
 
 						polyCount += b->getIndexCount();
@@ -424,6 +428,8 @@ bool COctreeSceneNode::createTree(IMesh* mesh)
 							for (v=0; v<b->getVertexCount(); ++v)
 								nchunk.Vertices.push_back(((video::S3DVertexTangents*)b->getVertices())[v]);
 							break;
+						default:
+							break;
 						}
 
 						polyCount += b->getIndexCount();
@@ -474,6 +480,8 @@ bool COctreeSceneNode::createTree(IMesh* mesh)
 							for (v=0; v<b->getVertexCount(); ++v)
 								nchunk.Vertices.push_back(((video::S3DVertexTangents*)b->getVertices())[v]);
 							break;
+						default:
+							break;
 						}
 
 						polyCount += b->getIndexCount();
@@ -486,6 +494,8 @@ bool COctreeSceneNode::createTree(IMesh* mesh)
 				TangentsOctree = new Octree<video::S3DVertexTangents>(TangentsMeshes, MinimalPolysPerNode);
 				nodeCount = TangentsOctree->getNodeCount();
 			}
+			break;
+		default:
 			break;
 		}
 	}

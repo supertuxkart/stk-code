@@ -18,16 +18,12 @@
 
 #include "physics/physical_object.hpp"
 
-#include <string>
-#include <vector>
-
-using namespace irr;
-
+#include "config/stk_config.hpp"
+#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
-#include "modes/world.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
@@ -38,6 +34,11 @@ using namespace irr;
 #include <ISceneManager.h>
 #include <IMeshSceneNode.h>
 #include <ITexture.h>
+using namespace irr;
+
+#include <memory>
+#include <string>
+#include <vector>
 
 /** Creates a physical Settings object with the given type, radius and mass.
  */
@@ -56,13 +57,21 @@ PhysicalObject::Settings::Settings(const XMLNode &xml_node)
 {
     init();
     std::string shape;
-    xml_node.get("id",      &m_id          );
-    xml_node.get("mass",    &m_mass        );
-    xml_node.get("radius",  &m_radius      );
-    xml_node.get("shape",   &shape         );
-    xml_node.get("reset",   &m_crash_reset );
-    xml_node.get("explode", &m_knock_kart  );
-    xml_node.get("flatten", &m_flatten_kart);
+    xml_node.get("id",                &m_id               );
+    xml_node.get("mass",              &m_mass             );
+    xml_node.get("radius",            &m_radius           );
+    xml_node.get("height",            &m_height           );
+    xml_node.get("friction",          &m_friction         );
+    xml_node.get("restitution",       &m_restitution      );
+    xml_node.get("linear-factor",     &m_linear_factor    );
+    xml_node.get("angular-factor",    &m_angular_factor   );
+    xml_node.get("linear-damping",    &m_linear_damping   );
+    xml_node.get("angular-damping",   &m_angular_damping  );
+
+    xml_node.get("shape",             &shape              );
+    xml_node.get("reset",             &m_crash_reset      );
+    xml_node.get("explode",           &m_knock_kart       );
+    xml_node.get("flatten",           &m_flatten_kart     );
     xml_node.get("on-kart-collision", &m_on_kart_collision);
     xml_node.get("on-item-collision", &m_on_item_collision);
     m_reset_when_too_low =
@@ -96,6 +105,14 @@ void PhysicalObject::Settings::init()
     m_knock_kart         = false;
     m_mass               = 0.0f;
     m_radius             = -1.0f;
+    m_height             = -1.0f;
+    m_friction           = 0.5f;   // default bullet value
+    m_restitution        = 0.0f;
+    m_linear_factor      = Vec3(1.0f, 1.0f, 1.0f);
+    m_angular_factor     = Vec3(1.0f, 1.0f, 1.0f); 
+    m_linear_damping     = 0.0f;
+    // Make sure that the cones stop rolling by defining angular friction != 0.
+    m_angular_damping    = 0.5f;
     m_reset_when_too_low = false;
     m_flatten_kart       = false;
 }   // Settings
@@ -127,11 +144,10 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_flatten_kart       = false;
     m_triangle_mesh      = NULL;
 
-    m_object = object;
-
-    m_init_xyz = object->getAbsoluteCenterPosition();
-    m_init_hpr   = object->getRotation();
-    m_init_scale = object->getScale();
+    m_object             = object;
+    m_init_xyz           = object->getAbsoluteCenterPosition();
+    m_init_hpr           = object->getRotation();
+    m_init_scale         = object->getScale();
 
     m_id                 = settings.m_id;
     m_mass               = settings.m_mass;
@@ -157,13 +173,13 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
 
     m_is_dynamic = is_dynamic;
 
-    init();
+    init(settings);
 }   // PhysicalObject
 
 // ----------------------------------------------------------------------------
 PhysicalObject::~PhysicalObject()
 {
-    World::getWorld()->getPhysics()->removeBody(m_body);
+    Physics::getInstance()->removeBody(m_body);
     delete m_body;
     delete m_motion_state;
 
@@ -201,7 +217,7 @@ void PhysicalObject::move(const Vec3& xyz, const core::vector3df& hpr)
 // ----------------------------------------------------------------------------
 /** Additional initialisation after loading of the model is finished.
  */
-void PhysicalObject::init()
+void PhysicalObject::init(const PhysicalObject::Settings& settings)
 {
     // 1. Determine size of the object
     // -------------------------------
@@ -292,6 +308,8 @@ void PhysicalObject::init()
     }
     case MP_CYLINDER_Y:
     {
+        if(settings.m_height > 0)
+            extend.setY(settings.m_height);
         if (m_radius < 0) m_radius = 0.5f*extend.length_2d();
         m_shape = new btCylinderShape(0.5f*extend);
         break;
@@ -325,7 +343,6 @@ void PhysicalObject::init()
     case MP_EXACT:
     {
         extend.setY(0);
-        TriangleMesh* triangle_mesh = new TriangleMesh();
 
         // In case of readonly materials we have to get the material from
         // the mesh, otherwise from the node. This is esp. important for
@@ -361,6 +378,9 @@ void PhysicalObject::init()
                 return;
         }   // switch node->getType()
 
+        std::unique_ptr<TriangleMesh> 
+                   triangle_mesh(new TriangleMesh(/*can_be_transformed*/true));
+
         for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
         {
             scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
@@ -385,7 +405,6 @@ void PhysicalObject::init()
             video::ITexture* t=irrMaterial.getTexture(0);
 
             const Material* material=0;
-            TriangleMesh *tmesh = triangle_mesh;
             if(t)
             {
                 std::string image =
@@ -414,10 +433,10 @@ void PhysicalObject::init()
                         vertices[k]=v;
                         normals[k]=mbVertices[indx].Normal;
                     }   // for k
-                    if(tmesh) tmesh->addTriangle(vertices[0], vertices[1],
-                                                 vertices[2], normals[0],
-                                                 normals[1],  normals[2],
-                                                 material                 );
+                    triangle_mesh->addTriangle(vertices[0], vertices[1],
+                                               vertices[2], normals[0],
+                                               normals[1],  normals[2],
+                                               material                 );
                 }   // for j
             }
             else
@@ -436,10 +455,10 @@ void PhysicalObject::init()
                             vertices[k]=v;
                             normals[k]=mbVertices[indx].Normal;
                         }   // for k
-                        if(tmesh) tmesh->addTriangle(vertices[0], vertices[1],
-                                                     vertices[2], normals[0],
-                                                     normals[1],  normals[2],
-                                                     material                 );
+                        triangle_mesh->addTriangle(vertices[0], vertices[1],
+                                                   vertices[2], normals[0],
+                                                   normals[1],  normals[2],
+                                                   material                 );
                     }   // for j
 
                 }
@@ -448,7 +467,7 @@ void PhysicalObject::init()
         }   // for i<getMeshBufferCount
         triangle_mesh->createCollisionShape();
         m_shape = &triangle_mesh->getCollisionShape();
-        m_triangle_mesh = triangle_mesh;
+        m_triangle_mesh = triangle_mesh.release();
         m_init_pos.setOrigin(m_init_pos.getOrigin() + m_graphical_offset);
         // m_graphical_offset = Vec3(0,0,0);
         break;
@@ -470,7 +489,7 @@ void PhysicalObject::init()
     if (m_is_dynamic)
     {
         m_init_pos.setOrigin(m_init_pos.getOrigin() +
-            btVector3(0, extend.getY()*0.5f, 0));
+                             btVector3(0, extend.getY()*0.5f, 0));
     }
 
 
@@ -504,11 +523,18 @@ void PhysicalObject::init()
     btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state,
                                                   m_shape, inertia);
 
-    // Make sure that the cones stop rolling by defining angular friction != 0.
-    info.m_angularDamping = 0.5f;
-    m_body = new btRigidBody(info);
+    if(m_triangle_mesh)
+        m_body = new TriangleMesh::RigidBodyTriangleMesh(m_triangle_mesh, info);
+    else
+        m_body = new btRigidBody(info);
     m_user_pointer.set(this);
     m_body->setUserPointer(&m_user_pointer);
+
+    m_body->setFriction(settings.m_friction);
+    m_body->setRestitution(settings.m_restitution);
+    m_body->setLinearFactor(settings.m_linear_factor);
+    m_body->setAngularFactor(settings.m_angular_factor);
+    m_body->setDamping(settings.m_linear_damping,settings.m_angular_damping);
 
     if (!m_is_dynamic)
     {
@@ -517,7 +543,7 @@ void PhysicalObject::init()
         m_body->setActivationState(DISABLE_DEACTIVATION);
     }
 
-    World::getWorld()->getPhysics()->addBody(m_body);
+    Physics::getInstance()->addBody(m_body);
     m_body_added = true;
     if(m_triangle_mesh)
         m_triangle_mesh->setBody(m_body);
@@ -649,7 +675,7 @@ void PhysicalObject::removeBody()
 {
     if (m_body_added)
     {
-        World::getWorld()->getPhysics()->removeBody(m_body);
+        Physics::getInstance()->removeBody(m_body);
         m_body_added = false;
     }
 }   // Remove body
@@ -661,7 +687,7 @@ void PhysicalObject::addBody()
     if (!m_body_added)
     {
         m_body_added = true;
-        World::getWorld()->getPhysics()->addBody(m_body);
+        Physics::getInstance()->addBody(m_body);
     }
 }   // Add body
 

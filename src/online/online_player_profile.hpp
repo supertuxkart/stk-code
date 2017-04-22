@@ -23,7 +23,6 @@
 #include "online/http_request.hpp"
 #include "online/online_profile.hpp"
 #include "online/request_manager.hpp"
-#include "online/server.hpp"
 #include "online/xml_request.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/types.hpp"

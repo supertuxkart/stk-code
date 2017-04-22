@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -43,7 +43,9 @@
 // various fixes in asm ppcFunc
 // fix for variable arguments
 //
-
+// Modified by Anthony Clark May 2015
+// Fixed the issue where int64 and uint64 could not be passed nativly
+// few minor fixes within asm ppcFunc to handle int64 and uint64
 
 
 // XBox 360 calling convention
@@ -87,7 +89,6 @@
 // References:
 // https://www-01.ibm.com/chips/techlib/techlib.nsf/techdocs/852569B20050FF77852569970071B0D6/$file/eabi_app.pdf
 //
-// TODO: The code doesn't handle int64 and uint64 parameters
 // TODO: The code doesn't handle objects passed by value (unless they are max 4 bytes in size)
 
 
@@ -128,7 +129,7 @@ enum argTypes
 // pArgs     is the array of the argument values
 // pArgTypes is an array containing a byte indicating the type (enum argTypes) for each argument.
 // dwFunc    is the address of the function that will be called
-asQWORD __declspec( naked ) ppcFunc(const asDWORD* pArgs, asDWORD dwFunc, const asBYTE* pArgTypes)
+asQWORD __declspec( naked ) ppcFunc(const asQWORD* pArgs, asDWORD dwFunc, const asBYTE* pArgTypes)
 {
 	__asm
 	{
@@ -202,7 +203,7 @@ ppcNextArg:
 //////////////////////////////////////////////////////////////////////////
 ppcArgIsInteger:
 		// Get the arg from the stack
-		lwz r12, 0(r26)
+		ld  r12, 0(r26)
 
 		// r23 holds the integer arg count so far
 		cmplwi cr6, r23, 0
@@ -251,11 +252,11 @@ ppcArgIsInteger:
 		b ppcLoadIntRegUpd
 
 		ppcLoadIntRegUpd:
-		stw	    r12, 0(r31)			// push on the stack
+		std	    r12, 0(r31)			// push on the stack
 		addi	r31, r31, 8			// inc stack by 1 reg
 
 		addi r23, r23, 1			// Increment used int register count
-		addi r26, r26, 4			// Increment pArgs
+		addi r26, r26, 8			// Increment pArgs
 		b ppcNextArg				// Call next arg
 
 //////////////////////////////////////////////////////////////////////////
@@ -511,7 +512,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 
 	// Pack the arguments into an array that ppcFunc() can use to load each CPU register properly
 	asBYTE  ppcArgsType[AS_PPC_MAX_ARGS + AS_PPC_RETURNINMEM_REG + AS_PPC_THISCALL_REG + AS_PPC_ENDOFARGS];
-	asDWORD ppcArgs[AS_PPC_MAX_ARGS + AS_PPC_RETURNINMEM_REG + AS_PPC_THISCALL_REG];
+	asQWORD ppcArgs[AS_PPC_MAX_ARGS + AS_PPC_RETURNINMEM_REG + AS_PPC_THISCALL_REG];
 	int     argsCnt = 0;
 
 	// If the function returns an object in memory, we allocate the memory and put the ptr to the front (will go to r3)
@@ -625,35 +626,34 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		}
 		else
 		{
-			// TODO: How should int64 and uint64 be passed natively? 
-			//       Currently the code doesn't handle these types
-
 			// TODO: The code also ignore the fact that large objects
 			//       passed by value has been copied to the stack
 			//       in the above loop.
 
 			*pCurArgType++ = ppcINTARG;
 
-			*((int*) pCurFixedArgValue) = *((int*) pCurStackArgValue);
+			*((asQWORD*) pCurFixedArgValue) = *((asUINT*) pCurStackArgValue);
 
 			if( !descr->parameterTypes[n].IsReference() )
 			{
-				// If the arg is less that 4 bytes, then move the  
-				// bytes to the higher bytes within the dword
+				// If the arg is not 4 bytes which we coppied, lets do it again the right way
 				asUINT numBytes = descr->parameterTypes[n].GetSizeInMemoryBytes();
 				if( numBytes == 1 )
 				{
-					pCurFixedArgValue[3] = pCurFixedArgValue[0];
-					pCurFixedArgValue[0] = 0;
+					*((asQWORD*) pCurFixedArgValue) = *((asBYTE*) pCurStackArgValue);
 				}
 				else if( numBytes == 2 )
 				{
-					*(asWORD*)&pCurFixedArgValue[2] = *(asWORD*)&pCurFixedArgValue[0];
-					*(asWORD*)&pCurFixedArgValue[0] = 0;
+					*((asQWORD*) pCurFixedArgValue) = *((asWORD*) pCurStackArgValue);
+				}
+				else if( numBytes == 8 )
+				{
+					*((asQWORD*) pCurFixedArgValue) = *((asQWORD*) pCurStackArgValue);
+					pCurStackArgValue += 4; // Increase our cur stack arg value by 4 bytes to = 8 total later
 				}
 			}
 
-			pCurFixedArgValue += 4;
+			pCurFixedArgValue += 8;
 			pCurStackArgValue += 4;
 
 			// if it is a variable argument, account for the typeId
@@ -703,7 +703,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		// Add the object pointer as the last argument
 		ppcArgsType[argsCnt++] = ppcINTARG;
 		ppcArgsType[argsCnt] = ppcENDARG;
-		*((asPWORD*)pCurFixedArgValue) = (asPWORD)obj;
+		*((asQWORD*)pCurFixedArgValue) = (asPWORD)obj;
 		retQW = ppcFunc( ppcArgs, (asDWORD)func, ppcArgsType );
 		break;
 	}

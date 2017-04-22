@@ -96,7 +96,7 @@ irr::core::stringw Binding::getAsString() const
 
             switch(m_id)
             {
-#ifdef WIN32
+#if defined(WIN32) || (defined(__linux__) && !defined(ANDROID))
             // Windows codes certain special keys, which have atm no defined
             // value in irr::KEY_*. So for now hardcode the values.
             // FIXME: what happens with international keyboards? E.g. A [

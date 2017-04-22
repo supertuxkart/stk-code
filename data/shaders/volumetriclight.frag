@@ -21,7 +21,9 @@ void main()
 {
     vec4 diffusecolor = texture(tex, uv);
 #ifdef Use_Bindless_Texture
+#ifdef SRGBBindlessFix
     diffusecolor.xyz = pow(diffusecolor.xyz, vec3(2.2));
+#endif
 #endif
     diffusecolor.xyz *= pow(color.xyz, vec3(2.2));
     diffusecolor.a *= color.a;

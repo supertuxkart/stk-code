@@ -20,10 +20,10 @@
 #include <math.h>
 #include "karts/moveable.hpp"
 
+#include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "modes/world.hpp"
 #include "tracks/track.hpp"
 
 #include "ISceneNode.h"
@@ -66,6 +66,7 @@ void Moveable::setNode(scene::ISceneNode *n)
 void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
                               const btQuaternion& rotation)
 {
+#ifndef SERVER_ONLY
     Vec3 xyz=getXYZ()+offset_xyz;
     m_node->setPosition(xyz.toIrrVector());
     btQuaternion r_all = getRotation()*rotation;
@@ -75,6 +76,7 @@ void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
     Vec3 hpr;
     hpr.setHPR(r_all);
     m_node->setRotation(hpr.toIrrHPR());
+#endif
 }   // updateGraphics
 
 //-----------------------------------------------------------------------------
@@ -116,7 +118,7 @@ void Moveable::flyDown()
 // ----------------------------------------------------------------------------
 void Moveable::stopFlying()
 {
-    m_body->setGravity(btVector3(0.0, -World::getWorld()->getTrack()->getGravity(), 0.0));
+    m_body->setGravity(btVector3(0.0, -Track::getCurrentTrack()->getGravity(), 0.0));
 }   // stopFlying
 
 //-----------------------------------------------------------------------------
@@ -128,9 +130,20 @@ void Moveable::update(float dt)
 {
     if(m_body->getInvMass()!=0)
         m_motion_state->getWorldTransform(m_transform);
-    m_velocityLC  = getVelocity()*m_transform.getBasis();
-    Vec3 forw_vec = m_transform.getBasis().getColumn(0);
-    m_heading     = -atan2f(forw_vec.getZ(), forw_vec.getX());
+    m_velocityLC = getVelocity()*m_transform.getBasis();
+    updatePosition();
+
+    updateGraphics(dt, Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
+}   // update
+
+//-----------------------------------------------------------------------------
+/** Updates the current position and rotation. This function is also called
+ *  by ghost karts for getHeading() to work.
+ */
+void Moveable::updatePosition()
+{
+    Vec3 forw_vec = m_transform.getBasis().getColumn(2);
+    m_heading     = atan2f(forw_vec.getX(), forw_vec.getZ());
 
     // The pitch in hpr is in between -pi and pi. But for the camera it
     // must be restricted to -pi/2 and pi/2 - so recompute it by restricting
@@ -138,9 +151,7 @@ void Moveable::update(float dt)
     Vec3 up       = getTrans().getBasis().getColumn(1);
     m_pitch       = atan2(up.getZ(), fabsf(up.getY()));
     m_roll        = atan2(up.getX(), up.getY());
-
-    updateGraphics(dt, Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
-}   // update
+}   // updatePosition
 
 //-----------------------------------------------------------------------------
 /** Creates the bullet rigid body for this moveable.
@@ -160,6 +171,7 @@ void Moveable::createBody(float mass, btTransform& trans,
     btRigidBody::btRigidBodyConstructionInfo info(mass, m_motion_state,
                                                   shape, inertia);
     info.m_restitution = restitution;
+    info.m_friction = stk_config->m_default_moveable_friction;
 
     // Then create a rigid body
     // ------------------------

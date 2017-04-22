@@ -15,10 +15,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "guiengine/widgets/icon_button_widget.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/stk_tex_manager.hpp"
+#include "graphics/stk_texture.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
-#include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -329,21 +332,26 @@ const video::ITexture* IconButtonWidget::getTexture()
 // -----------------------------------------------------------------------------
 video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* texture)
 {
-#ifdef DO_NOT_USE_IT_CAUSES_BUG_1780_FONT_CORRUPTION
-    video::ITexture* t;
+#if !defined(SERVER_ONLY) && !defined(USE_GLES2)
+    STKTexture* stk_tex = static_cast<STKTexture*>(texture);
+    // Compressed texture can't be turned into greyscale
+    if (stk_tex->isMeshTexture() && CVS->isTextureCompressionEnabled())
+        return stk_tex;
 
-    std::string name = texture->getName().getPath().c_str();
+    std::string name = stk_tex->getName().getPtr();
     name += "_disabled";
-    t = irr_driver->getTexture(name, /*premul*/false, /*prediv*/false,
-                                     /*compain_if_not_found*/false);
-    if (t == NULL)
+    STKTexManager* stkm = STKTexManager::getInstance();
+    STKTexture* disabled_stk_tex = static_cast<STKTexture*>(stkm->getTexture
+        (name, NULL/*tc*/, false /*no_upload*/, false/*create_if_unfound*/));
+    if (disabled_stk_tex == NULL)
     {
         SColor c;
         u32 g;
 
         video::IVideoDriver* driver = irr_driver->getVideoDriver();
-        std::unique_ptr<video::IImage> image (driver->createImageFromData (texture->getColorFormat(),
-            texture->getSize(), texture->lock(), false));
+        video::IImage* image = driver->createImageFromData
+            (video::ECF_A8R8G8B8, stk_tex->getSize(), stk_tex->lock(),
+            stk_tex->getTextureImage() == NULL/*ownForeignMemory*/);
         texture->unlock();
 
         //Turn the image into grayscale
@@ -357,13 +365,12 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
                 image->setPixel(x, y, c);
             }
         }
-
-        t = driver->addTexture(name.c_str(), image.get ());
+        return stkm->addTexture(new STKTexture(image, name));
     }
-
-    return t;
-#endif
+    return disabled_stk_tex;
+#else
     return texture;
+#endif   // !SERVER_ONLY
 }
 
 // -----------------------------------------------------------------------------

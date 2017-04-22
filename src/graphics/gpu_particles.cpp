@@ -15,13 +15,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/gpu_particles.hpp"
 
 #include "config/user_config.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_emitter.hpp"
-#include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/texture_shader.hpp"
 #include "guiengine/engine.hpp"
@@ -63,7 +63,6 @@ public:
     {
         loadProgram(PARTICLES_RENDERING,
                     GL_VERTEX_SHADER,   "particle.vert",
-                    GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                     GL_FRAGMENT_SHADER, "particle.frag");
 
         assignUniforms("color_from", "color_to");
@@ -82,7 +81,6 @@ public:
     {
         loadProgram(PARTICLES_RENDERING,
                     GL_VERTEX_SHADER,   "flipparticle.vert",
-                    GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                     GL_FRAGMENT_SHADER, "particle.frag");
         assignUniforms();
         assignSamplerNames(0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -93,13 +91,14 @@ public:
 
 // ============================================================================
 /** */
-class HeightmapSimulationShader : public Shader <HeightmapSimulationShader,
-                                                 core::matrix4, int, int,
-                                                 float,float,float,float,float>
+#if !defined(USE_GLES2)
+class HeightmapSimulationShader :
+                             public TextureShader<HeightmapSimulationShader, 1,
+                                                  core::matrix4, int, int,
+                                                  float, float, float, float,
+                                                  float>
 {
 public:
-    GLuint m_TU_heightmap;
-
     HeightmapSimulationShader()
     {
         const char *varyings[] = {"new_particle_position", "new_lifetime",
@@ -107,12 +106,12 @@ public:
         loadTFBProgram("particlesimheightmap.vert", varyings, 4);
         assignUniforms("sourcematrix", "dt", "level", "size_increase_factor",
                        "track_x", "track_x_len", "track_z", "track_z_len");
-        m_TU_heightmap = 2;
-        assignTextureUnit(m_TU_heightmap, "heightmap");
+        assignSamplerNames(0, "heightmap",  ST_TEXTURE_BUFFER);
     }   // HeightmapSimulationShader
 
 
 };   // class HeightmapSimulationShader
+#endif
 
 // ============================================================================
 
@@ -149,7 +148,7 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 
     m_color_from[0] = m_color_from[1] = m_color_from[2] = 1.0;
     m_color_to[0] = m_color_to[1] = m_color_to[2] = 1.0;
-    
+
     // We set these later but avoid coverity report them
     heighmapbuffer = 0;
     heightmaptexture = 0;
@@ -159,7 +158,7 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     track_z = 0;
     track_x_len = 0;
     track_z_len = 0;
-    texture = 0;
+    m_texture_name = 0;
 }
 
 ParticleSystemProxy::~ParticleSystemProxy()
@@ -184,6 +183,7 @@ void ParticleSystemProxy::setFlip()
 void ParticleSystemProxy::setHeightmap(const std::vector<std::vector<float> > &hm,
     float f1, float f2, float f3, float f4)
 {
+#if !defined(USE_GLES2)
     track_x = f1, track_z = f2, track_x_len = f3, track_z_len = f4;
 
     unsigned width  = (unsigned)hm.size();
@@ -204,8 +204,10 @@ void ParticleSystemProxy::setHeightmap(const std::vector<std::vector<float> > &h
     glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
     glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, heighmapbuffer);
     glBindBuffer(GL_TEXTURE_BUFFER, 0);
+    glBindTexture(GL_TEXTURE_BUFFER, 0);
 
     delete[] hm_array;
+#endif
 }
 
 static
@@ -263,7 +265,7 @@ void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePoin
         ParticleParams[i].PositionZ = 0;
         // Initial lifetime is >1
         InitialValues[i].Lifetime = 2.;
-        
+
         memcpy(&(InitialValues[i].PositionX), &(ParticleParams[i].PositionX), 3 * sizeof(float));
 
         generateLifetimeSizeDirection(emitter, ParticleParams[i].Lifetime, ParticleParams[i].Size,
@@ -393,9 +395,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
         assert(0 && "Wrong particle type");
     }
 
-    video::ITexture *tex = getMaterial(0).getTexture(0);
-    compressTexture(tex, true, true);
-    texture = getTextureGLuint(getMaterial(0).getTexture(0));
+    m_texture_name = getMaterial(0).getTexture(0)->getOpenGLTextureName();
 }
 
 void ParticleSystemProxy::cleanGL()
@@ -467,18 +467,19 @@ void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initia
 }
 
 void ParticleSystemProxy::simulate()
-{    
+{
     int timediff = int(GUIEngine::getLatestDt() * 1000.f);
     int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
     core::matrix4 matrix = getAbsoluteTransformation();
-    
+
     glEnable(GL_RASTERIZER_DISCARD);
     if (has_height_map)
     {
+#if !defined(USE_GLES2)
         HeightmapSimulationShader::getInstance()->use();
-        glActiveTexture(GL_TEXTURE0 + HeightmapSimulationShader::getInstance()->m_TU_heightmap);
-        glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
+        HeightmapSimulationShader::getInstance()->setTextureUnits(heightmaptexture);
         HeightmapSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor, track_x, track_x_len, track_z, track_z_len);
+#endif
     }
     else
     {
@@ -486,7 +487,7 @@ void ParticleSystemProxy::simulate()
         PointEmitterShader::getInstance()->setUniforms(m_previous_frame_matrix, matrix, timediff, active_count, size_increase_factor);
     }
     m_previous_frame_matrix = matrix;
-    
+
     glBindVertexArray(current_simulation_vao);
     glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
 
@@ -494,6 +495,7 @@ void ParticleSystemProxy::simulate()
     glDrawArrays(GL_POINTS, 0, m_count);
     glEndTransformFeedback();
     glBindVertexArray(0);
+    glActiveTexture(GL_TEXTURE0);
 
     glDisable(GL_RASTERIZER_DISCARD);
 #ifdef DEBUG_PARTICLES
@@ -524,7 +526,7 @@ void ParticleSystemProxy::drawFlip()
     glBlendFunc(GL_ONE, GL_ONE);
     FlipParticleRender::getInstance()->use();
 
-    FlipParticleRender::getInstance()->setTextureUnits(texture, irr_driver->getDepthStencilTexture());
+    FlipParticleRender::getInstance()->setTextureUnits(m_texture_name, irr_driver->getDepthStencilTexture());
     FlipParticleRender::getInstance()->setUniforms();
 
     glBindVertexArray(current_rendering_vao);
@@ -539,7 +541,7 @@ void ParticleSystemProxy::drawNotFlip()
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     SimpleParticleRender::getInstance()->use();
 
-    SimpleParticleRender::getInstance()->setTextureUnits(texture, irr_driver->getDepthStencilTexture());
+    SimpleParticleRender::getInstance()->setTextureUnits(m_texture_name, irr_driver->getDepthStencilTexture());
     video::SColorf ColorFrom = video::SColorf(getColorFrom()[0], getColorFrom()[1], getColorFrom()[2]);
     video::SColorf ColorTo = video::SColorf(getColorTo()[0], getColorTo()[1], getColorTo()[2]);
 
@@ -630,3 +632,5 @@ void ParticleSystemProxy::render() {
         draw();
     }
 }
+
+#endif   // SERVER_ONLY

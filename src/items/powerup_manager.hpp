@@ -19,20 +19,19 @@
 #ifndef HEADER_POWERUPMANAGER_HPP
 #define HEADER_POWERUPMANAGER_HPP
 
-namespace irr
-{
-    namespace scene { class IMesh; }
-}
+#include "utils/no_copy.hpp"
+
+#include "btBulletDynamicsCommon.h"
 
 #include <string>
 #include <vector>
 
-#include "btBulletDynamicsCommon.h"
-
-#include "utils/no_copy.hpp"
-
 class Material;
 class XMLNode;
+namespace irr
+{
+    namespace scene { class IMesh; }
+}
 
 /**
   * \ingroup items
@@ -96,6 +95,7 @@ public:
                         POSITION_END33,
                         POSITION_LAST,
                         POSITION_BATTLE_MODE,
+                        POSITION_SOCCER_MODE,
                         POSITION_TUTORIAL_MODE,
                         POSITION_COUNT};
 

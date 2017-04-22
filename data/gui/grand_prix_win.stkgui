@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <div x="2%" y="2%" width="96%" height="96%" layout="horizontal-row">
-        <button id="continue" width="250" align="bottom" text="Continue"/>
-        <spacer width="20"/>
-        <button id="save"     width="250" align="bottom" text="Save Grand Prix"/>
+    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row">
+        <spacer proportion="1"/>
+        <button id="save"     width="450" align="center" text="Save Grand Prix"/>
+        <spacer height="20"/>
+        <button id="continue" width="450" align="center" text="Continue"/>
     </div>
 </stkgui>
 

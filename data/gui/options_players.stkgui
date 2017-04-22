@@ -30,7 +30,7 @@
 
             <label width="100%"
                 I18N="In the player configuration screen"
-                text="Press enter or double-click on a player to edit him/her"
+                text="Press enter or double-click on a player to edit their settings"
                 text_align="center" />
 
             <spacer width="5" height="20"/>

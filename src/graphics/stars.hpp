@@ -21,9 +21,12 @@
 
 #include "utils/no_copy.hpp"
 
+#include "vector3d.h"
+
 #include <vector>
 
-#include <vector3d.h>
+class AbstractKart;
+
 namespace irr
 {
     namespace scene { class ISceneNode; }
@@ -54,7 +57,7 @@ private:
     float m_remaining_time;
 
  public:
-           Stars  (scene::ISceneNode* parentKart, core::vector3df center);
+           Stars  (AbstractKart *kart);
           ~Stars  ();
     void   showFor(float time);
     void   reset();

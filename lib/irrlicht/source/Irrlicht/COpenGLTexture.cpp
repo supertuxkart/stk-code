@@ -274,15 +274,15 @@ GLint COpenGLTexture::getOpenGLFormatAndParametersFromColorFormat(ECOLOR_FORMAT 
 			internalformat =  GL_RGBA8;
 		}
 	}
-#if defined(GL_ARB_framebuffer_sRGB) || defined(GL_EXT_framebuffer_sRGB)
-	if (Driver->Params.HandleSRGB)
-	{
-		if (internalformat==GL_RGBA)
-			internalformat=GL_SRGB_ALPHA_EXT;
-		else if (internalformat==GL_RGB)
-			internalformat=GL_SRGB_EXT;
-	}
-#endif
+//#if defined(GL_ARB_framebuffer_sRGB) || defined(GL_EXT_framebuffer_sRGB)
+//	if (Driver->Params.HandleSRGB)
+//	{
+//		if (internalformat==GL_RGBA)
+//			internalformat=GL_SRGB_ALPHA_EXT;
+//		else if (internalformat==GL_RGB)
+//			internalformat=GL_SRGB_EXT;
+//	}
+//#endif
 	return internalformat;
 }
 

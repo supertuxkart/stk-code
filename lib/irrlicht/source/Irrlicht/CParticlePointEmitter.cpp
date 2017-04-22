@@ -25,7 +25,7 @@ CParticlePointEmitter::CParticlePointEmitter(
 	MaxParticlesPerSecond(maxParticlesPerSecond),
 	MinStartColor(minStartColor), MaxStartColor(maxStartColor),
 	MinLifeTime(lifeTimeMin), MaxLifeTime(lifeTimeMax),
-	MaxAngleDegrees(maxAngleDegrees), Time(0), Emitted(0)
+	MaxAngleDegrees(maxAngleDegrees), Time(0)
 {
 	#ifdef _DEBUG
 	setDebugName("CParticlePointEmitter");

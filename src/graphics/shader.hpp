@@ -15,11 +15,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #ifndef HEADER_SHADER_HPP
 #define HEADER_SHADER_HPP
 
 #include "graphics/central_settings.hpp"
 #include "graphics/gl_headers.hpp"
+#include "graphics/shader_files_manager.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "utils/singleton.hpp"
 
@@ -30,7 +33,7 @@
 #include <string>
 #include <vector>
 
-/** A simple non-templated base class. It is used to store some enums used in 
+/** A simple non-templated base class. It is used to store some enums used in
  *  templates, the actual header for a shader, and a statis list of all kill
  *  functions (which delete all singletons, and therefore forces a reload of all
  *  shaders).
@@ -38,13 +41,6 @@
  */
 class ShaderBase
 {
-private:
-    // Static members
-    /** Stores the context of header.txt, to avoid reading
-    *  this file repeatedly. */
-    static std::string m_shader_header;
-
-
 protected:
     /** Maintains a list of all shaders. */
     static std::vector<void (*)()> m_all_kill_functions;
@@ -54,6 +50,7 @@ protected:
         OBJECT,
         PARTICLES_SIM,
         PARTICLES_RENDERING,
+        SKINNED_MESH,
     };   // AttributeType
 
     /** OpenGL's program id. */
@@ -73,9 +70,13 @@ protected:
     void loadAndAttachShader(GLint shader_type, const std::string &name,
                              Types ... args)
     {
-        GLint shader_id = loadShader(name, shader_type);
+        GLint shader_id = ShaderFilesManager::getInstance()
+            ->getShaderFile(name, shader_type);
         glAttachShader(m_program, shader_id);
-        glDeleteShader(shader_id);
+        GLint is_deleted = GL_TRUE;
+        glGetShaderiv(shader_id, GL_DELETE_STATUS, &is_deleted);
+        if (is_deleted == GL_FALSE)
+            glDeleteShader(shader_id);
         loadAndAttachShader(args...);
     }   // loadAndAttachShader
     // ------------------------------------------------------------------------
@@ -87,9 +88,6 @@ protected:
         loadAndAttachShader(shader_type, std::string(name), args...);
     }   // loadAndAttachShader
     // ------------------------------------------------------------------------
-
-    const std::string& getHeader();
-    GLuint loadShader(const std::string &file, unsigned type);
     void setAttribute(AttributeType type);
 
 public:
@@ -150,6 +148,7 @@ private:
     {
         bindPoint("MatrixData",   0);
         bindPoint("LightingData", 1);
+        bindPoint("SkinningData", 2);
     }   // assignUniformsImpl
 
     // ------------------------------------------------------------------------
@@ -302,7 +301,7 @@ public:
      *  \param index Index of the texture.
      *  \param uniform Uniform name.
      */
-    template<typename... T1> 
+    template<typename... T1>
     void assignTextureUnit(GLuint index, const char* uniform, T1... rest)
     {
         glUseProgram(m_program);
@@ -350,7 +349,7 @@ public:
     {
         m_program = glCreateProgram();
         loadAndAttachShader(args...);
-        if (CVS->getGLSLVersion() < 330)
+        if (!CVS->isARBExplicitAttribLocationUsable())
             setAttribute(type);
         glLinkProgram(m_program);
 
@@ -358,12 +357,12 @@ public:
         glGetProgramiv(m_program, GL_LINK_STATUS, &Result);
         if (Result == GL_FALSE) {
             int info_length;
-            Log::error("GLWrapp", "Error when linking these shaders :");
+            Log::error("Shader", "Error when linking these shaders :");
             printFileList(args...);
             glGetProgramiv(m_program, GL_INFO_LOG_LENGTH, &info_length);
             char *error_message = new char[info_length];
             glGetProgramInfoLog(m_program, info_length, NULL, error_message);
-            Log::error("GLWrapp", error_message);
+            Log::error("Shader", error_message);
             delete[] error_message;
         }
     }   // loadProgram
@@ -382,3 +381,6 @@ public:
 // ============================================================================
 
 #endif
+
+#endif   // !SERVER_ONLY
+

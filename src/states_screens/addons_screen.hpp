@@ -84,6 +84,8 @@ private:
     /** List of date filters **/
     std::vector<DateFilter> m_date_filters;
 
+    bool             m_show_tips;
+
 public:
 
     /** Load the addons into the main list.*/
@@ -101,7 +103,7 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
 
-    virtual void onColumnClicked(int columnId);
+    virtual void onColumnClicked(int columnId) OVERRIDE;
 
     virtual void init() OVERRIDE;
     virtual void tearDown() OVERRIDE;

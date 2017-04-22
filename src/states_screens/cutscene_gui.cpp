@@ -40,6 +40,7 @@ CutsceneGUI::~CutsceneGUI()
 
 void CutsceneGUI::renderGlobal(float dt)
 {
+#ifndef SERVER_ONLY
     core::dimension2d<u32> screen_size = irr_driver->getActualScreenSize();
 
     if (m_fade_level > 0.0f)
@@ -67,5 +68,6 @@ void CutsceneGUI::renderGlobal(float dt)
                                        video::SColor(255,255,255,255), true, true, NULL);
         }
     }
+#endif
 }
 

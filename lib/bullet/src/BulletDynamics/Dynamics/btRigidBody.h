@@ -21,15 +21,7 @@ subject to the following restrictions:
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h"
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
 
-#if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
-#  define isnan _isnan
-#endif
-#include <math.h>
-
-#if defined(__MINGW32__) && __cplusplus >= 201103
-	#include <cmath>
-	using std::isnan;
-#endif
+#include <cmath>
 
 class btCollisionShape;
 class btMotionState;
@@ -263,9 +255,9 @@ public:
 	}
 	void setLinearFactor(const btVector3& linearFactor)
 	{
-        btAssert(!isnan(linearFactor.getX()));
-        btAssert(!isnan(linearFactor.getY()));
-        btAssert(!isnan(linearFactor.getZ()));
+        btAssert(!std::isnan(linearFactor.getX()));
+        btAssert(!std::isnan(linearFactor.getY()));
+        btAssert(!std::isnan(linearFactor.getZ()));
 		m_linearFactor = linearFactor;
 		m_invMass = m_linearFactor*m_inverseMass;
 	}
@@ -280,9 +272,9 @@ public:
 
 	void			applyCentralForce(const btVector3& force)
 	{
-        btAssert(!isnan(force.getX()));
-        btAssert(!isnan(force.getY()));
-        btAssert(!isnan(force.getZ()));
+        btAssert(!std::isnan(force.getX()));
+        btAssert(!std::isnan(force.getY()));
+        btAssert(!std::isnan(force.getZ()));
 		m_totalForce += force*m_linearFactor;
 	}
 
@@ -303,9 +295,9 @@ public:
 
 	void	setInvInertiaDiagLocal(const btVector3& diagInvInertia)
 	{
-        btAssert(!isnan(diagInvInertia.getX()));
-        btAssert(!isnan(diagInvInertia.getY()));
-        btAssert(!isnan(diagInvInertia.getZ()));
+        btAssert(!std::isnan(diagInvInertia.getX()));
+        btAssert(!std::isnan(diagInvInertia.getY()));
+        btAssert(!std::isnan(diagInvInertia.getZ()));
 		m_invInertiaLocal = diagInvInertia;
 	}
 
@@ -317,48 +309,48 @@ public:
 
 	void	applyTorque(const btVector3& torque)
 	{
-        btAssert(!isnan(torque.getX()));
-        btAssert(!isnan(torque.getY()));
-        btAssert(!isnan(torque.getZ()));
+        btAssert(!std::isnan(torque.getX()));
+        btAssert(!std::isnan(torque.getY()));
+        btAssert(!std::isnan(torque.getZ()));
 		m_totalTorque += torque*m_angularFactor;
 	}
 
 	void	applyForce(const btVector3& force, const btVector3& rel_pos)
 	{
-        btAssert(!isnan(force.getX()));
-        btAssert(!isnan(force.getY()));
-        btAssert(!isnan(force.getZ()));
-        btAssert(!isnan(rel_pos.getX()));
-        btAssert(!isnan(rel_pos.getY()));
-        btAssert(!isnan(rel_pos.getZ()));
+        btAssert(!std::isnan(force.getX()));
+        btAssert(!std::isnan(force.getY()));
+        btAssert(!std::isnan(force.getZ()));
+        btAssert(!std::isnan(rel_pos.getX()));
+        btAssert(!std::isnan(rel_pos.getY()));
+        btAssert(!std::isnan(rel_pos.getZ()));
 		applyCentralForce(force);
 		applyTorque(rel_pos.cross(force*m_linearFactor));
 	}
 
 	void applyCentralImpulse(const btVector3& impulse)
 	{
-        btAssert(!isnan(impulse.getX()));
-        btAssert(!isnan(impulse.getY()));
-        btAssert(!isnan(impulse.getZ()));
+        btAssert(!std::isnan(impulse.getX()));
+        btAssert(!std::isnan(impulse.getY()));
+        btAssert(!std::isnan(impulse.getZ()));
 		m_linearVelocity += impulse *m_linearFactor * m_inverseMass;
 	}
 
   	void applyTorqueImpulse(const btVector3& torque)
 	{
-            btAssert(!isnan(torque.getX()));
-            btAssert(!isnan(torque.getY()));
-            btAssert(!isnan(torque.getZ()));
+            btAssert(!std::isnan(torque.getX()));
+            btAssert(!std::isnan(torque.getY()));
+            btAssert(!std::isnan(torque.getZ()));
 			m_angularVelocity += m_invInertiaTensorWorld * torque * m_angularFactor;
 	}
 
 	void applyImpulse(const btVector3& impulse, const btVector3& rel_pos)
 	{
-        btAssert(!isnan(impulse.getX()));
-        btAssert(!isnan(impulse.getY()));
-        btAssert(!isnan(impulse.getZ()));
-        btAssert(!isnan(rel_pos.getX()));
-        btAssert(!isnan(rel_pos.getY()));
-        btAssert(!isnan(rel_pos.getZ()));
+        btAssert(!std::isnan(impulse.getX()));
+        btAssert(!std::isnan(impulse.getY()));
+        btAssert(!std::isnan(impulse.getZ()));
+        btAssert(!std::isnan(rel_pos.getX()));
+        btAssert(!std::isnan(rel_pos.getY()));
+        btAssert(!std::isnan(rel_pos.getZ()));
 		if (m_inverseMass != btScalar(0.))
 		{
 			applyCentralImpulse(impulse);
@@ -395,17 +387,17 @@ public:
 
 	inline void setLinearVelocity(const btVector3& lin_vel)
 	{
-        btAssert(!isnan(lin_vel.getX()));
-        btAssert(!isnan(lin_vel.getY()));
-        btAssert(!isnan(lin_vel.getZ()));
+        btAssert(!std::isnan(lin_vel.getX()));
+        btAssert(!std::isnan(lin_vel.getY()));
+        btAssert(!std::isnan(lin_vel.getZ()));
 		m_linearVelocity = lin_vel;
 	}
 
 	inline void setAngularVelocity(const btVector3& ang_vel)
 	{
-        btAssert(!isnan(ang_vel.getX()));
-        btAssert(!isnan(ang_vel.getY()));
-        btAssert(!isnan(ang_vel.getZ()));
+        btAssert(!std::isnan(ang_vel.getX()));
+        btAssert(!std::isnan(ang_vel.getY()));
+        btAssert(!std::isnan(ang_vel.getZ()));
 		m_angularVelocity = ang_vel;
 	}
 
@@ -635,10 +627,10 @@ public:
 	{
 		if (m_inverseMass)
 		{
-            btAssert(!isnan(impulseMagnitude));
-            btAssert(!isnan(linearComponent.getX()));
-            btAssert(!isnan(linearComponent.getY()));
-            btAssert(!isnan(linearComponent.getZ()));
+            btAssert(!std::isnan(impulseMagnitude));
+            btAssert(!std::isnan(linearComponent.getX()));
+            btAssert(!std::isnan(linearComponent.getY()));
+            btAssert(!std::isnan(linearComponent.getZ()));
 			m_deltaLinearVelocity += linearComponent*impulseMagnitude;
 			m_deltaAngularVelocity += angularComponent*(impulseMagnitude*m_angularFactor);
 		}

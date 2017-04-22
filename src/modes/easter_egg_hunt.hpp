@@ -46,20 +46,20 @@ public:
              EasterEggHunt();
     virtual ~EasterEggHunt();
 
-    virtual void init();
+    virtual void init() OVERRIDE;
 
-    virtual bool isRaceOver();
+    virtual bool isRaceOver() OVERRIDE;
 
     // overriding World methods
-    virtual void reset();
+    virtual void reset() OVERRIDE;
 
-    virtual bool raceHasLaps(){ return false; }
+    virtual bool raceHasLaps() OVERRIDE { return false; }
 
-    virtual const std::string& getIdent() const;
-    virtual void terminateRace();
-    virtual void update(float dt);
+    virtual const std::string& getIdent() const OVERRIDE;
+    virtual void terminateRace() OVERRIDE;
+    virtual void update(float dt) OVERRIDE;
     virtual void getKartsDisplayInfo(
-                          std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
+                          std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
 
     void updateKartRanks();
     void collectedEasterEgg(const AbstractKart *kart);

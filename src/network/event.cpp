@@ -17,8 +17,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/event.hpp"
-#include "network/network_manager.hpp"
 
+#include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 
 #include <string.h>
@@ -28,6 +29,8 @@
  */
 Event::Event(ENetEvent* event)
 {
+    m_arrival_time = (double)StkTime::getTimeSinceEpoch();
+
     switch (event->type)
     {
     case ENET_EVENT_TYPE_CONNECT:
@@ -45,39 +48,27 @@ Event::Event(ENetEvent* event)
     }
     if (m_type == EVENT_TYPE_MESSAGE)
     {
-        m_data = NetworkString(std::string((char*)(event->packet->data),
-                               event->packet->dataLength-1));
+        m_data = new NetworkString(event->packet->data, 
+                                      event->packet->dataLength);
     }
+    else
+        m_data = NULL;
 
-    m_packet = NULL;
     if (event->packet)
     {
-        m_packet = event->packet;
         // we got all we need, just remove the data.
-        enet_packet_destroy(m_packet);
+        enet_packet_destroy(event->packet);
     }
-    m_packet = NULL;
 
-    std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
-    m_peer = NULL;
-    for (unsigned int i = 0; i < peers.size(); i++)
+    m_peer = STKHost::get()->getPeer(event->peer);
+    if(m_type == EVENT_TYPE_MESSAGE && m_peer->isClientServerTokenSet() &&
+        m_data->getToken()!=m_peer->getClientServerToken() )
     {
-        if (peers[i]->m_enet_peer == event->peer)
-        {
-            m_peer = peers[i];
-            Log::verbose("Event", "The peer you sought has been found on %p",
-                         m_peer);
-            return;
-        }
-    }
-    if (m_peer == NULL) // peer does not exist, create him
-    {
-        STKPeer* new_peer = new STKPeer();
-        new_peer->m_enet_peer = event->peer;
-        m_peer = new_peer;
-        Log::debug("Event", 
-                   "Creating a new peer, address are STKPeer:%p, Peer:%p",
-                    new_peer, event->peer);
+        Log::error("Event", "Received event with invalid token!");
+        Log::error("Event", "HostID %d Token %d message token %d",
+            m_peer->getHostId(), m_peer->getClientServerToken(),
+            m_data->getToken());
+        Log::error("Event", m_data->getLogMessage().c_str());
     }
 }   // Event(ENetEvent)
 
@@ -86,17 +77,9 @@ Event::Event(ENetEvent* event)
  */
 Event::~Event()
 {
-    delete m_peer;
+    // Do not delete m_peer, it's a pointer to the enet data structure
+    // which is persistent.
     m_peer = NULL;
-    m_packet = NULL;
+    delete m_data;
 }   // ~Event
-
-// ----------------------------------------------------------------------------
-/** \brief Remove bytes at the beginning of data.
- *  \param size : The number of bytes to remove.
- */
-void Event::removeFront(int size)
-{
-    m_data.removeFront(size);
-}   // removeFront
 

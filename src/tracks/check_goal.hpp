@@ -24,9 +24,9 @@
 #include <line2d.h>
 using namespace irr;
 
-class CheckManager;
 class XMLNode;
 class Track;
+class Vec3;
 
 /**
  *  \brief Implements a simple checkline that will score a point when the
@@ -36,21 +36,46 @@ class Track;
  */
 class CheckGoal : public CheckStructure
 {
+public:
+    /** Used by AIs to test whether the ball is likely to goal. */
+    enum PointLocation
+    {
+        POINT_FIRST,
+        POINT_CENTER,
+        POINT_LAST
+    };
 private:
+    /** Previois ball position. */
+    Vec3            m_previous_ball_position;
+
     /** Which team is this goal for? */
     bool            m_first_goal;
 
     /** The line that is tested for being crossed. */
     core::line2df   m_line;
 
+    /** Used by AIs to test whether the ball is likely to goal. */
+    Vec3            m_p1;
+    Vec3            m_p2;
+    Vec3            m_p3;
+
 public:
              CheckGoal(const XMLNode &node, unsigned int index);
     virtual ~CheckGoal() {}
     virtual void update(float dt) OVERRIDE;
-    virtual void trigger(unsigned int kart_index);
+    virtual void trigger(unsigned int kart_index) OVERRIDE;
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                              unsigned int indx) OVERRIDE;
     virtual void reset(const Track &track) OVERRIDE;
-};   // CheckLine
+
+    // ------------------------------------------------------------------------
+    bool getTeam() const                             { return m_first_goal; }
+    // ------------------------------------------------------------------------
+    const Vec3& getPoint(PointLocation point) const
+    {
+        return (point == POINT_LAST ? m_p3 :
+            (point == POINT_CENTER ? m_p2 : m_p1));
+    }
+};   // CheckGoal
 
 #endif

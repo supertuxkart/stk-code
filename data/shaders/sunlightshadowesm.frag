@@ -8,14 +8,19 @@ uniform float split2;
 uniform float splitmax;
 
 in vec2 uv;
+#ifdef GL_ES
+layout (location = 0) out vec4 Diff;
+layout (location = 1) out vec4 Spec;
+#else
 out vec4 Diff;
 out vec4 Spec;
+#endif
 
-vec3 DecodeNormal(vec2 n);
-vec3 SpecularBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
-vec3 DiffuseBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
-vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
-vec3 SunMRP(vec3 normal, vec3 eyedir);
+#stk_include "utils/decodeNormal.frag"
+#stk_include "utils/SpecularBRDF.frag"
+#stk_include "utils/DiffuseBRDF.frag"
+#stk_include "utils/getPosFromUVDepth.frag"
+#stk_include "utils/SunMRP.frag"
 
 float getShadowFactor(vec3 pos, int index)
 {

@@ -21,6 +21,7 @@
 #include <sstream>
 
 #include "challenges/unlock_manager.hpp"
+#include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -28,6 +29,7 @@
 #include "race/grand_prix_data.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
+#include "replay/replay_play.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 
@@ -41,6 +43,7 @@ ChallengeData::ChallengeData(const std::string& filename)
     m_gp_id        = "";
     m_version      = 0;
     m_num_trophies = 0;
+    m_is_ghost_replay = false;
 
     for (int d=0; d<RaceManager::DIFFICULTY_COUNT; d++)
     {
@@ -175,6 +178,13 @@ ChallengeData::ChallengeData(const std::string& filename)
         if (!karts_node->get("number", &num_karts)) error("karts");
         m_num_karts[d] = num_karts;
 
+        std::string replay_file;
+        if (karts_node->get("replay_file", &replay_file))
+        {
+            m_is_ghost_replay = true;
+            m_replay_files[d] = replay_file;
+        }
+
         std::string ai_kart_ident;
         if (karts_node->get("aiIdent", &ai_kart_ident))
             m_ai_kart_ident[d] = ai_kart_ident;
@@ -241,22 +251,29 @@ ChallengeData::ChallengeData(const std::string& filename)
             throw std::runtime_error("Unknown unlock entry");
         }
     }
-
-    core::stringw description;
-    if (track_node != NULL && m_minor!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
-    {
-        //I18N: number of laps to race in a challenge
-        description += _("Laps : %i", m_num_laps);
-        description += core::stringw(L"\n");
-    }
-    else if (track_node)
-    {
-        // Follow the leader mode:
-        description = _("Follow the leader");
-    }
-
-    m_challenge_description = description;
 }   // ChallengeData
+
+// ----------------------------------------------------------------------------
+
+const irr::core::stringw ChallengeData::getChallengeDescription() const
+{
+    core::stringw description;
+    if (!m_track_id.empty())
+    {
+        if (m_minor != RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
+            //I18N: number of laps to race in a challenge
+            description += _("Laps: %i", m_num_laps);
+            description += core::stringw(L"\n");
+        }
+        else
+        {
+            // Follow the leader mode:
+            description = _("Follow the leader");
+        }
+    }
+    return description;
+}   // getChallengeDescription
 
 // ----------------------------------------------------------------------------
 void ChallengeData::error(const char *id) const
@@ -369,7 +386,7 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
         race_manager->setTrack(m_track_id);
         race_manager->setNumLaps(m_num_laps);
         race_manager->setNumKarts(m_num_karts[d]);
-        race_manager->setNumLocalPlayers(1);
+        race_manager->setNumPlayers(1);
         race_manager->setCoinTarget(m_energy[d]);
         race_manager->setDifficulty(d);
 
@@ -384,7 +401,17 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
         race_manager->setGrandPrix(*grand_prix_manager->getGrandPrix(m_gp_id));
         race_manager->setDifficulty(d);
         race_manager->setNumKarts(m_num_karts[d]);
-        race_manager->setNumLocalPlayers(1);
+        race_manager->setNumPlayers(1);
+    }
+
+    if (m_is_ghost_replay)
+    {
+        const bool result = ReplayPlay::get()->addReplayFile(file_manager
+            ->getAsset(FileManager::CHALLENGE, m_replay_files[d]),
+            true/*custom_replay*/);
+        if (!result)
+            Log::fatal("ChallengeData", "Can't open replay for challenge!");
+        race_manager->setRaceGhostKarts(true);
     }
 
     if (m_ai_kart_ident[d] != "")
@@ -409,7 +436,7 @@ bool ChallengeData::isChallengeFulfilled() const
     // Single races
     // ------------
     World *world = World::getWorld();
-    std::string track_name = world->getTrack()->getIdent();
+    std::string track_name = Track::getCurrentTrack()->getIdent();
 
     int d = race_manager->getDifficulty();
 
@@ -489,7 +516,6 @@ const irr::core::stringw
             if (track == NULL) return irr::core::stringw( L"????" );
 
             return _("New track '%s' now available", track->getName());
-            break;
         }
         case UNLOCK_MODE:
         {

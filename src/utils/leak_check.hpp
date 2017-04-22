@@ -40,9 +40,9 @@ namespace MemoryLeaks
         char **m_stack;
         /** Keeps stacksize information if available (OSX only). */
         int    m_stack_size;
-#elif defined(WIN32)
-        /** Keep the stack information the way it is returned by windows,
-         *  a flat string, which will be split when printing it. */
+#elif defined(WIN32) || ENABLE_LIBBFD
+        /** Keep the stack information the way it is returned by windows or
+         *  libbfd, a flat string, which will be split when printing it. */
         std::string m_stack;
 #endif
 

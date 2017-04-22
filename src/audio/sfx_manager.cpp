@@ -24,6 +24,7 @@
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
+#include "utils/vs.hpp"
 
 #include <pthread.h>
 #include <stdexcept>
@@ -89,9 +90,6 @@ SFXManager::SFXManager()
     pthread_attr_t  attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
-    // Should be the default, but just in case:
-    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
     m_thread_id.setAtomic(new pthread_t());
     // The thread is created even if there atm sfx are disabled
@@ -295,9 +293,8 @@ void SFXManager::stopThread()
  */
 void* SFXManager::mainLoop(void *obj)
 {
+    VS::setThreadName("SFXManager");
     SFXManager *me = (SFXManager*)obj;
-
-    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
     me->m_sfx_commands.lock();
 
@@ -378,7 +375,10 @@ void* SFXManager::mainLoop(void *obj)
         case SFX_MUSIC_DEFAULT_VOLUME:
         {
             current->m_music_information->setDefaultVolume();
+            break;
         }
+        case SFX_CREATE_SOURCE:
+            current->m_sfx->init(); break;
         default: assert("Not yet supported.");
         }
         delete current;
@@ -409,6 +409,7 @@ void* SFXManager::mainLoop(void *obj)
         delete me->m_sfx_commands.getData().front();
         me->m_sfx_commands.getData().erase(me->m_sfx_commands.getData().begin());
     }
+    me->m_sfx_commands.unlock();
     return NULL;
 }   // mainLoop
 
@@ -513,7 +514,6 @@ void SFXManager::loadSfx()
         array[i++] = buffer;
     }
 
-    #pragma omp parallel for private(i)
     for (i = 0; i < max; i++)
     {
         array[i]->load();
@@ -592,7 +592,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
     // to load terrain specific sfx.
     const std::string full_path = (path == "")
                                 ? file_manager->getAsset(FileManager::SFX,filename)
-                                : path;
+                                : path+"/"+filename;
 
     SFXBuffer tmpbuffer(full_path, node);
 

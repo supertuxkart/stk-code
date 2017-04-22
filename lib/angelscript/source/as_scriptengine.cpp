@@ -118,6 +118,9 @@ AS_API const char * asGetLibraryOptions()
 #ifdef WIP_16BYTE_ALIGN
 		"WIP_16BYTE_ALIGN "
 #endif
+#ifdef AS_BIG_ENDIAN
+		"AS_BIG_ENDIAN "
+#endif
 
 	// Target system
 #ifdef AS_WIN
@@ -584,21 +587,22 @@ asCScriptEngine::asCScriptEngine()
 	// Reserve function id 0 for no function
 	scriptFunctions.PushLast(0);
 
+	// Reserve the first typeIds for the primitive types
+	typeIdSeqNbr = asTYPEID_DOUBLE + 1;
+
 	// Make sure typeId for the built-in primitives are defined according to asETypeIdFlags
-	int id = 0;
-	UNUSED_VAR(id); // It is only used in debug mode
-	id = GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttVoid,   false)); asASSERT( id == asTYPEID_VOID   );
-	id = GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttBool,   false)); asASSERT( id == asTYPEID_BOOL   );
-	id = GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttInt8,   false)); asASSERT( id == asTYPEID_INT8   );
-	id = GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttInt16,  false)); asASSERT( id == asTYPEID_INT16  );
-	id = GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttInt,    false)); asASSERT( id == asTYPEID_INT32  );
-	id = GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttInt64,  false)); asASSERT( id == asTYPEID_INT64  );
-	id = GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttUInt8,  false)); asASSERT( id == asTYPEID_UINT8  );
-	id = GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttUInt16, false)); asASSERT( id == asTYPEID_UINT16 );
-	id = GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttUInt,   false)); asASSERT( id == asTYPEID_UINT32 );
-	id = GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttUInt64, false)); asASSERT( id == asTYPEID_UINT64 );
-	id = GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttFloat,  false)); asASSERT( id == asTYPEID_FLOAT  );
-	id = GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttDouble, false)); asASSERT( id == asTYPEID_DOUBLE );
+	asASSERT( GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttVoid,   false)) == asTYPEID_VOID   );
+	asASSERT( GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttBool,   false)) == asTYPEID_BOOL   );
+	asASSERT( GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttInt8,   false)) == asTYPEID_INT8   );
+	asASSERT( GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttInt16,  false)) == asTYPEID_INT16  );
+	asASSERT( GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttInt,    false)) == asTYPEID_INT32  );
+	asASSERT( GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttInt64,  false)) == asTYPEID_INT64  );
+	asASSERT( GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttUInt8,  false)) == asTYPEID_UINT8  );
+	asASSERT( GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttUInt16, false)) == asTYPEID_UINT16 );
+	asASSERT( GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttUInt,   false)) == asTYPEID_UINT32 );
+	asASSERT( GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttUInt64, false)) == asTYPEID_UINT64 );
+	asASSERT( GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttFloat,  false)) == asTYPEID_FLOAT  );
+	asASSERT( GetTypeIdFromDataType(asCDataType::CreatePrimitive(ttDouble, false)) == asTYPEID_DOUBLE );
 
 	defaultArrayObjectType = 0;
 
@@ -608,9 +612,9 @@ asCScriptEngine::asCScriptEngine()
 
 void asCScriptEngine::DeleteDiscardedModules()
 {
-	// TODO: 2.30.0: redesign: Prevent more than one thread from entering this function at the same time. 
-	//                         If a thread is already doing the work for the clean-up the other thread should
-	//                         simply return, as the first thread will continue.
+	// TODO: redesign: Prevent more than one thread from entering this function at the same time. 
+	//                 If a thread is already doing the work for the clean-up the other thread should
+	//                 simply return, as the first thread will continue.
 
 	ACQUIRESHARED(engineRWLock);
 	asUINT maxCount = discardedModules.GetLength();
@@ -646,7 +650,7 @@ void asCScriptEngine::DeleteDiscardedModules()
 
 asCScriptEngine::~asCScriptEngine()
 {
-	// TODO: 2.30.0: redesign: Clean up redundant code
+	// TODO: clean-up: Clean up redundant code
 
 	asUINT n = 0;
 	inDestructor = true;
@@ -690,12 +694,8 @@ asCScriptEngine::~asCScriptEngine()
 	if( refCount.get() > 0 )
 		WriteMessage("", 0, 0, asMSGTYPE_ERROR, TXT_ENGINE_REF_COUNT_ERROR_DURING_SHUTDOWN);
 
-	asSMapNode<int,asCDataType*> *cursor = 0;
-	while( mapTypeIdToDataType.MoveFirst(&cursor) )
-	{
-		asDELETE(mapTypeIdToDataType.GetValue(cursor),asCDataType);
-		mapTypeIdToDataType.Erase(cursor);
-	}
+	mapTypeIdToObjectType.EraseAll();
+	mapTypeIdToFunction.EraseAll();
 
 	// First remove what is not used, so that other groups can be deleted safely
 	defaultGroup.RemoveConfiguration(this, true);
@@ -1976,7 +1976,7 @@ int asCScriptEngine::RegisterBehaviourToObjectType(asCObjectType *objectType, as
 			listPattern->Destroy(this);
 		return ConfigError(asINVALID_DECLARATION, "RegisterObjectBehaviour", objectType->name.AddressOf(), decl);
 	}
-	func.name.Format("_beh_%d_", behaviour);
+	func.name.Format("$beh%d", behaviour);
 
 	if( behaviour != asBEHAVE_FACTORY && behaviour != asBEHAVE_LIST_FACTORY )
 	{
@@ -3229,7 +3229,7 @@ int asCScriptEngine::RegisterStringFactory(const char *datatype, const asSFuncPt
 		return ConfigError(asOUT_OF_MEMORY, "RegisterStringFactory", datatype, 0);
 	}
 
-	func->name        = "_string_factory_";
+	func->name        = "$str";
 	func->sysFuncIntf = newInterface;
 
 	asCBuilder bld(this, 0);
@@ -3590,6 +3590,9 @@ asCObjectType *asCScriptEngine::GetTemplateInstanceType(asCObjectType *templateT
 	if( templateType->beh.listFactory )
 	{
 		asCScriptFunction *func = GenerateTemplateFactoryStub(templateType, ot, templateType->beh.listFactory);
+		
+		// Rename the function to easily identify it in LoadByteCode
+		func->name = "$list";
 
 		ot->beh.listFactory = func->id;
 	}
@@ -3787,7 +3790,7 @@ asCScriptFunction *asCScriptEngine::GenerateTemplateFactoryStub(asCObjectType *t
 
 	func->funcType         = asFUNC_SCRIPT;
 	func->AllocateScriptFunctionData();
-	func->name             = "factstub";
+	func->name             = "$fact";
 	func->id               = GetNextScriptFunctionId();
 	AddScriptFunction(func);
 
@@ -4230,6 +4233,62 @@ void *asCScriptEngine::CallObjectMethodRetPtr(void *obj, int func) const
 #endif
 }
 
+void *asCScriptEngine::CallObjectMethodRetPtr(void *obj, int param1, asCScriptFunction *func) const
+{
+	asASSERT( func != 0 );
+	asSSystemFunctionInterface *i = func->sysFuncIntf;
+
+#ifndef AS_NO_CLASS_METHODS
+	if( i->callConv == ICC_THISCALL || i->callConv == ICC_VIRTUAL_THISCALL )
+	{
+#if defined(__GNUC__) || defined(AS_PSVITA)
+		// For virtual thiscalls we must call the method as a true class method so that the compiler will lookup the function address in the vftable
+		union
+		{
+			asSIMPLEMETHOD_t mthd;
+			struct
+			{
+				asFUNCTION_t func;
+				asPWORD baseOffset;
+			} f;
+		} p;
+		p.f.func = (asFUNCTION_t)(i->func);
+		p.f.baseOffset = asPWORD(i->baseOffset);
+		void *(asCSimpleDummy::*f)(int) = (void *(asCSimpleDummy::*)(int))(p.mthd);
+		return (((asCSimpleDummy*)obj)->*f)(param1);
+#else
+		union
+		{
+			asSIMPLEMETHOD_t mthd;
+			asFUNCTION_t func;
+		} p;
+		p.func = (asFUNCTION_t)(i->func);
+		void *(asCSimpleDummy::*f)(int) = (void *(asCSimpleDummy::*)(int))p.mthd;
+		obj = (void*)(asPWORD(obj) + i->baseOffset);
+		return (((asCSimpleDummy*)obj)->*f)(param1);
+#endif
+	}
+	else
+#endif
+	if( i->callConv == ICC_GENERIC_METHOD )
+	{
+		asCGeneric gen(const_cast<asCScriptEngine*>(this), func, obj, reinterpret_cast<asDWORD*>(&param1));
+		void (*f)(asIScriptGeneric *) = (void (*)(asIScriptGeneric *))(i->func);
+		f(&gen);
+		return *(void **)gen.GetReturnPointer();
+	}
+	else if( i->callConv == ICC_CDECL_OBJLAST )
+	{
+		void *(*f)(int, void *) = (void *(*)(int, void *))(i->func);
+		return f(param1, obj);
+	}
+	else /*if( i->callConv == ICC_CDECL_OBJFIRST )*/
+	{
+		void *(*f)(void *, int) = (void *(*)(void *, int))(i->func);
+		return f(obj, param1);
+	}
+}
+
 void *asCScriptEngine::CallGlobalFunctionRetPtr(int func) const
 {
 	asCScriptFunction *s = scriptFunctions[func];
@@ -4496,82 +4555,154 @@ void asCScriptEngine::GCEnumCallback(void *reference)
 }
 
 
-// TODO: multithread: The mapTypeIdToDataType must be protected with critical sections in all functions that access it
 int asCScriptEngine::GetTypeIdFromDataType(const asCDataType &dtIn) const
 {
-	if( dtIn.IsNullHandle() ) return 0;
+	if( dtIn.IsNullHandle() ) return asTYPEID_VOID;
 
-	// Register the base form
-	asCDataType dt(dtIn);
-	if( dt.GetObjectType() )
-		dt.MakeHandle(false);
-
-	// Find the existing type id
-	asSMapNode<int,asCDataType*> *cursor = 0;
-	mapTypeIdToDataType.MoveFirst(&cursor);
-	while( cursor )
+	if( dtIn.GetObjectType() == 0 )
 	{
-		if( mapTypeIdToDataType.GetValue(cursor)->IsEqualExceptRefAndConst(dt) )
+		// Primitives have pre-fixed typeIds
+		switch( dtIn.GetTokenType() )
 		{
-			int typeId = mapTypeIdToDataType.GetKey(cursor);
-			if( dtIn.GetObjectType() && !(dtIn.GetObjectType()->flags & asOBJ_ASHANDLE) )
+		case ttVoid:   return asTYPEID_VOID;
+		case ttBool:   return asTYPEID_BOOL;
+		case ttInt8:   return asTYPEID_INT8;
+		case ttInt16:  return asTYPEID_INT16;
+		case ttInt:    return asTYPEID_INT32;
+		case ttInt64:  return asTYPEID_INT64;
+		case ttUInt8:  return asTYPEID_UINT8;
+		case ttUInt16: return asTYPEID_UINT16;
+		case ttUInt:   return asTYPEID_UINT32;
+		case ttUInt64: return asTYPEID_UINT64;
+		case ttFloat:  return asTYPEID_FLOAT;
+		case ttDouble: return asTYPEID_DOUBLE;
+		default:
+			// All types should be covered by the above. The variable type is not really a type
+			asASSERT(dtIn.GetTokenType() == ttQuestion);
+			return -1;
+		}
+	}
+
+	int typeId = -1;
+	asCObjectType *ot = dtIn.GetObjectType();
+	if( ot != &functionBehaviours )
+	{
+		// Object's hold the typeId themselves
+		typeId = ot->typeId;
+
+		if( typeId == -1 )
+		{
+			ACQUIREEXCLUSIVE(engineRWLock);
+			// Make sure another thread didn't determine the typeId while we were waiting for the lock
+			if( ot->typeId == -1 )
 			{
-				// The ASHANDLE types behave like handles, but are really
-				// value types so the typeId is never returned as a handle
-				if( dtIn.IsObjectHandle() )
-					typeId |= asTYPEID_OBJHANDLE;
-				if( dtIn.IsHandleToConst() )
-					typeId |= asTYPEID_HANDLETOCONST;
+				typeId = typeIdSeqNbr++;
+				if( ot->flags & asOBJ_SCRIPT_OBJECT ) typeId |= asTYPEID_SCRIPTOBJECT;
+				else if( ot->flags & asOBJ_TEMPLATE ) typeId |= asTYPEID_TEMPLATE;
+				else if( ot->flags & asOBJ_ENUM ) {} // TODO: Should we have a specific bit for this?
+				else typeId |= asTYPEID_APPOBJECT;
+
+				ot->typeId = typeId;
+
+				mapTypeIdToObjectType.Insert(typeId, ot);
+			}
+			RELEASEEXCLUSIVE(engineRWLock);
+		}
+	}
+	else
+	{
+		// This a funcdef, so we'll need to look in the map for the funcdef
+
+		// TODO: optimize: It shouldn't be necessary to exclusive lock when the typeId already exists
+		ACQUIREEXCLUSIVE(engineRWLock);
+
+		// Find the existing type id
+		asCScriptFunction *func = dtIn.GetFuncDef();
+		asASSERT(func);
+		asSMapNode<int,asCScriptFunction*> *cursor = 0;
+		mapTypeIdToFunction.MoveFirst(&cursor);
+		while( cursor )
+		{
+			if( mapTypeIdToFunction.GetValue(cursor) == func )
+			{
+				typeId = mapTypeIdToFunction.GetKey(cursor);
+				break;
 			}
 
-			return typeId;
+			mapTypeIdToFunction.MoveNext(&cursor, cursor);
 		}
 
-		mapTypeIdToDataType.MoveNext(&cursor, cursor);
+		// The type id doesn't exist, create it
+		if( typeId == -1 )
+		{
+			// Setup the type id for the funcdef
+			typeId = typeIdSeqNbr++;
+			typeId |= asTYPEID_APPOBJECT;
+			mapTypeIdToFunction.Insert(typeId, func);
+		}
+
+		RELEASEEXCLUSIVE(engineRWLock);
 	}
 
-	// The type id doesn't exist, create it
-
-	// Setup the basic type id
-	int typeId = typeIdSeqNbr++;
-	if( dt.GetObjectType() )
+	// Add flags according to the requested type
+	if( dtIn.GetObjectType() && !(dtIn.GetObjectType()->flags & asOBJ_ASHANDLE) )
 	{
-		if( dt.GetObjectType()->flags & asOBJ_SCRIPT_OBJECT ) typeId |= asTYPEID_SCRIPTOBJECT;
-		else if( dt.GetObjectType()->flags & asOBJ_TEMPLATE ) typeId |= asTYPEID_TEMPLATE;
-		else if( dt.GetObjectType()->flags & asOBJ_ENUM ) {} // TODO: Should we have a specific bit for this?
-		else typeId |= asTYPEID_APPOBJECT;
+		// The ASHANDLE types behave like handles, but are really
+		// value types so the typeId is never returned as a handle
+		if( dtIn.IsObjectHandle() )
+			typeId |= asTYPEID_OBJHANDLE;
+		if( dtIn.IsHandleToConst() )
+			typeId |= asTYPEID_HANDLETOCONST;
 	}
 
-	// Insert the basic object type
-	asCDataType *newDt = asNEW(asCDataType)(dt);
-	if( newDt == 0 )
-	{
-		// Out of memory
-		return 0;
-	}
-
-	newDt->MakeReference(false);
-	newDt->MakeReadOnly(false);
-	newDt->MakeHandle(false);
-
-	mapTypeIdToDataType.Insert(typeId, newDt);
-
-	// Call recursively to get the correct typeId
-	return GetTypeIdFromDataType(dtIn);
+	return typeId;
 }
 
 asCDataType asCScriptEngine::GetDataTypeFromTypeId(int typeId) const
 {
 	int baseId = typeId & (asTYPEID_MASK_OBJECT | asTYPEID_MASK_SEQNBR);
 
-	asSMapNode<int,asCDataType*> *cursor = 0;
-	if( mapTypeIdToDataType.MoveTo(&cursor, baseId) )
+	if( typeId <= asTYPEID_DOUBLE )
 	{
-		asCDataType dt(*mapTypeIdToDataType.GetValue(cursor));
+		eTokenType type[] = {ttVoid, ttBool, ttInt8, ttInt16, ttInt, ttInt64, ttUInt8, ttUInt16, ttUInt, ttUInt64, ttFloat, ttDouble};
+		return asCDataType::CreatePrimitive(type[typeId], false);
+	}
+
+	// First check if the typeId is an object type
+	asCObjectType *ot = 0;
+	ACQUIRESHARED(engineRWLock);
+	asSMapNode<int,asCObjectType*> *cursor = 0;
+	if( mapTypeIdToObjectType.MoveTo(&cursor, baseId) )
+		ot = mapTypeIdToObjectType.GetValue(cursor);
+	RELEASESHARED(engineRWLock);
+
+	if( ot )
+	{
+		asCDataType dt = asCDataType::CreateObject(ot, false);
 		if( typeId & asTYPEID_OBJHANDLE )
 			dt.MakeHandle(true, true);
 		if( typeId & asTYPEID_HANDLETOCONST )
 			dt.MakeHandleToConst(true);
+
+		return dt;
+	}
+
+	// Then check if it is a funcdef
+	asCScriptFunction *func = 0;
+	ACQUIRESHARED(engineRWLock);
+	asSMapNode<int,asCScriptFunction*> *cursor2 = 0;
+	if( mapTypeIdToFunction.MoveTo(&cursor2, baseId) )
+		func = mapTypeIdToFunction.GetValue(cursor2);
+	RELEASESHARED(engineRWLock);
+
+	if( func )
+	{
+		asCDataType dt = asCDataType::CreateFuncDef(func);
+		if( typeId & asTYPEID_OBJHANDLE )
+			dt.MakeHandle(true, true);
+		if( typeId & asTYPEID_HANDLETOCONST )
+			dt.MakeHandleToConst(true);
+
 		return dt;
 	}
 
@@ -4586,19 +4717,19 @@ asCObjectType *asCScriptEngine::GetObjectTypeFromTypeId(int typeId) const
 
 void asCScriptEngine::RemoveFromTypeIdMap(asCObjectType *type)
 {
-	asSMapNode<int,asCDataType*> *cursor = 0;
-	mapTypeIdToDataType.MoveFirst(&cursor);
+	ACQUIREEXCLUSIVE(engineRWLock);
+	asSMapNode<int,asCObjectType*> *cursor = 0;
+	mapTypeIdToObjectType.MoveFirst(&cursor);
 	while( cursor )
 	{
-		asCDataType *dt = mapTypeIdToDataType.GetValue(cursor);
-		asSMapNode<int,asCDataType*> *old = cursor;
-		mapTypeIdToDataType.MoveNext(&cursor, cursor);
-		if( dt->GetObjectType() == type )
+		if( mapTypeIdToObjectType.GetValue(cursor) == type )
 		{
-			asDELETE(dt,asCDataType);
-			mapTypeIdToDataType.Erase(old);
+			mapTypeIdToObjectType.Erase(cursor);
+			break;
 		}
+		mapTypeIdToObjectType.MoveNext(&cursor, cursor);
 	}
+	RELEASEEXCLUSIVE(engineRWLock);
 }
 
 // interface
@@ -5318,7 +5449,6 @@ void asCScriptEngine::RemoveScriptFunction(asCScriptFunction *func)
 // internal
 void asCScriptEngine::RemoveFuncdef(asCScriptFunction *funcdef)
 {
-	// TODO: 2.30.0: redesign: How to avoid removing a funcdef that is shared by multiple modules?
 	funcDefs.RemoveValue(funcdef);
 }
 

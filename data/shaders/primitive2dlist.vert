@@ -1,4 +1,4 @@
-#if __VERSION__ >= 330
+#ifdef Explicit_Attrib_Location_Usable
 layout(location = 0) in vec3 Position;
 layout(location = 1) in vec3 Normal;
 layout(location = 2) in vec4 Color;
@@ -24,7 +24,7 @@ void main(void)
     color = Color.zyxw;
     vec3 P = Position / vec3(screen, 1.);
     P = 2. * P - 1.;
-    P.y *= -1;
+    P.y *= -1.;
     gl_Position = vec4(P, 1.);
     uv = Texcoord;
 }

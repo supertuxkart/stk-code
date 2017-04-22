@@ -33,5 +33,8 @@
         <box proportion="1" width="98%" align="center" layout="vertical-row" padding="6">
             <list id="list_addons" x="0" y="0" width="100%" height="100%"/>
         </box>
+
+        <bright width="97%" id="tips_label" text="" align="center"/>
+
     </div>
 </stkgui>

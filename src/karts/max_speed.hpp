@@ -22,6 +22,7 @@
 /** \defgroup karts */
 
 class AbstractKart;
+class BareNetworkString;
 
 class MaxSpeed
 {
@@ -82,17 +83,26 @@ private:
          *  entry, i.e. an entry that does affect top speed at all. */
         SpeedIncrease()
         {
+            reset();
+        }   // SpeedIncrease
+        // --------------------------------------------------------------------
+        /** Resets this increase category to be not active. */
+        void reset()
+        {
             m_max_add_speed   = 0;
             m_duration        = -9999999;
             m_fade_out_time   = 0;
             m_current_speedup = 0;
             m_engine_force    = 0;
-        }   // SpeedIncrease
+        }   // reset
         // --------------------------------------------------------------------
         void update(float dt);
-        /** Returns the current speedup for this category. */
+        void saveState(BareNetworkString *buffer) const;
+        void rewindTo(BareNetworkString *buffer, bool is_active);
         // --------------------------------------------------------------------
+        /** Returns the current speedup for this category. */
         float getSpeedIncrease() const {return m_current_speedup;}
+        // --------------------------------------------------------------------
         /** Returns the remaining time till the fade out time starts.
          *  Note that this function will return a negative value if
          *  the fade_out time has started or this speed increase has
@@ -103,7 +113,10 @@ private:
         float getEngineForce() const
         {
             return m_duration > 0 ? m_engine_force : 0;
-        }
+        }   // getEngineForce
+        // --------------------------------------------------------------------
+        /** Returns if this speed increase is active atm. */
+        bool isActive() const { return m_duration > -m_fade_out_time; }
     };   // SpeedIncrease
 
     // ------------------------------------------------------------------------
@@ -127,16 +140,29 @@ private:
          *  affect top speed at all. */
         SpeedDecrease()
         {
+            reset();
+        }   // SpeedDecrease
+        // --------------------------------------------------------------------
+        /** Resets the state to be inactive. */
+        void reset()
+        {
             m_max_speed_fraction = 1.0f;
             m_fade_in_time       = 0.0f;
             m_current_fraction   = 1.0f;
-            m_duration           = -1.0f;
-        }   // SpeedDecrease
+            m_duration           = 0.0f;
+        }   //reset
+        // --------------------------------------------------------------------
         void update(float dt);
+        void saveState(BareNetworkString *buffer) const;
+        void rewindTo(BareNetworkString *buffer, bool is_active);
         // --------------------------------------------------------------------
         /** Returns the current slowdown fracftion, taking a 'fade in'
          *  into account. */
         float getSlowdownFraction() const {return m_current_fraction;}
+        // --------------------------------------------------------------------
+        /** Returns if this speed decrease is active atm. A duration of
+         *  -1 indicates an ongoing effect. */
+        bool isActive() const { return m_duration > 0 || m_duration <= -1.0f; }
     };   // SpeedDecrease
 
     // ------------------------------------------------------------------------
@@ -164,6 +190,8 @@ public:
     float getSpeedIncreaseTimeLeft(unsigned int category);
     void  update(float dt);
     void  reset();
+    void  saveState(BareNetworkString *buffer) const;
+    void  rewindTo(BareNetworkString *buffer);
     // ------------------------------------------------------------------------
     /** Sets the minimum speed a kart should have. This is used to guarantee
      *  that e.g. zippers on ramps will always fast enough for the karts to

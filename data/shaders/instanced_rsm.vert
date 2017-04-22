@@ -9,7 +9,7 @@ layout(location = 7) in vec3 Origin;
 layout(location = 8) in vec3 Orientation;
 layout(location = 9) in vec3 Scale;
 #ifdef Use_Bindless_Texture
-layout(location = 10) in uvec2 Handle;
+layout(location = 11) in uvec2 Handle;
 #endif
 
 out vec3 nor;
@@ -21,8 +21,7 @@ flat out uvec2 handle;
 #endif
 
 
-mat4 getWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
-mat4 getInverseWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
+#stk_include "utils/getworldmatrix.vert"
 
 void main(void)
 {

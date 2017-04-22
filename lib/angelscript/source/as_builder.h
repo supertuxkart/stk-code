@@ -174,7 +174,7 @@ protected:
 	asCString          GetCleanExpressionString(asCScriptNode *n, asCScriptCode *file);
 
 	asSNameSpace      *GetNameSpaceFromNode(asCScriptNode *node, asCScriptCode *script, asSNameSpace *implicitNs, asCScriptNode **next);
-	asSNameSpace      *GetNameSpaceByString(const asCString &nsName, asSNameSpace *implicitNs, asCScriptNode *errNode, asCScriptCode *script);
+	asSNameSpace      *GetNameSpaceByString(const asCString &nsName, asSNameSpace *implicitNs, asCScriptNode *errNode, asCScriptCode *script, bool isRequired = true);
 	asCString          GetScopeFromNode(asCScriptNode *n, asCScriptCode *script, asCScriptNode **next = 0);
 
 	asCObjectType     *GetObjectType(const char *type, asSNameSpace *ns);
@@ -213,6 +213,7 @@ protected:
 	int                RegisterEnum(asCScriptNode *node, asCScriptCode *file, asSNameSpace *ns);
 	int                RegisterTypedef(asCScriptNode *node, asCScriptCode *file, asSNameSpace *ns);
 	int                RegisterFuncDef(asCScriptNode *node, asCScriptCode *file, asSNameSpace *ns);
+	asCScriptFunction *RegisterLambda(asCScriptNode *node, asCScriptCode *file, asCScriptFunction *funcDef, const asCString &name, asSNameSpace *ns);
 	void               CompleteFuncDef(sFuncDef *funcDef);
 	void               CompileInterfaces();
 	void               CompileClasses(asUINT originalNumTempl);

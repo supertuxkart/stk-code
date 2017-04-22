@@ -27,7 +27,8 @@ namespace GUIEngine { class Widget; class LabelWidget; class ModelViewWidget; }
   * \brief Screen with soccer setup options
   * \ingroup states_screens
   */
-class SoccerSetupScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<SoccerSetupScreen>
+class SoccerSetupScreen : public GUIEngine::Screen,
+                          public GUIEngine::ScreenSingleton<SoccerSetupScreen>
 {
     friend class GUIEngine::ScreenSingleton<SoccerSetupScreen>;
 
@@ -37,14 +38,15 @@ class SoccerSetupScreen : public GUIEngine::Screen, public GUIEngine::ScreenSing
     {
         GUIEngine::ModelViewWidget* view;
         bool                        confirmed;
-        int                         local_player_id;
+        bool                        support_colorization;
         SoccerTeam                  team;
 
-        KartViewInfo() : view(NULL), confirmed(false), local_player_id(-1), team(SOCCER_TEAM_NONE) {}
+        KartViewInfo() : view(), confirmed(false), support_colorization(false),
+                         team(SOCCER_TEAM_NONE) {}
     };
 
     AlignedArray<KartViewInfo>  m_kart_view_info;
-    
+
     bool m_schedule_continue;
 
 public:
@@ -74,11 +76,14 @@ public:
                                                        Input::InputType type,
                                                        int playerId) OVERRIDE;
 
+    virtual bool onEscapePressed() OVERRIDE;
+
 private:
     bool areAllKartsConfirmed() const;
-    int getNumKartsInTeam(int team);
     int getNumConfirmedKarts();
     void updateKartViewsLayout();
+    void changeTeam(int player_id, SoccerTeam team);
+    void prepareGame();
 };
 
 #endif // HEADER_SOCCER_SETUP_SCREEN_HPP

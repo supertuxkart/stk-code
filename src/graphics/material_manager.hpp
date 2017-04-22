@@ -59,6 +59,9 @@ public:
     void      loadMaterial     ();
     Material* getMaterialFor(video::ITexture* t,
                              scene::IMeshBuffer *mb);
+    Material* getMaterialFor(video::ITexture* t,
+                             video::E_MATERIAL_TYPE material_type);
+    Material* getMaterialFor(video::ITexture* t);
     void      setAllMaterialFlags(video::ITexture* t,
                                   scene::IMeshBuffer *mb);
     void      adjustForFog(video::ITexture* t,
@@ -80,6 +83,8 @@ public:
     void      popTempMaterial  ();
     void      makeMaterialsPermanent();
     bool      hasMaterial(const std::string& fname);
+
+    void      unloadAllTextures();
 
     Material* getLatestMaterial() { return m_materials[m_materials.size()-1]; }
 };   // MaterialManager

@@ -12,6 +12,8 @@ mode_tt, released under Creative-Commons BY-SA 3, incorporatings artwork from ye
 
 mode_easter, mode_ftl, mode_soccer, mode_normal, race_giveup: by Totoplus62, released under CC-BY-SA 3.0
 
+soccer balls released under CC-BY-SA 3.0 by Néd J. Édoire
+
 tutorial.png    by Totoplus62, released under CC-BY-SA 3.0
 
 Logo and Logo_slim : under CC-BY-SA 3.0+ by 'rastapax'

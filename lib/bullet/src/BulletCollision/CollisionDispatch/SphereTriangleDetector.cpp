@@ -17,6 +17,9 @@ subject to the following restrictions:
 #include "SphereTriangleDetector.h"
 #include "BulletCollision/CollisionShapes/btTriangleShape.h"
 #include "BulletCollision/CollisionShapes/btSphereShape.h"
+#include "BulletCollision/CollisionDispatch/btCollisionObject.h"
+#include "BulletCollision/CollisionDispatch/btManifoldResult.h"
+#include "BulletCollision/CollisionShapes/btTriangleShape.h"
 
 
 SphereTriangleDetector::SphereTriangleDetector(btSphereShape* sphere,btTriangleShape* triangle,btScalar contactBreakingThreshold)
@@ -43,6 +46,35 @@ void	SphereTriangleDetector::getClosestPoints(const ClosestPointInput& input,Res
 
 	if (collide(sphereInTr.getOrigin(),point,normal,depth,timeOfImpact,m_contactBreakingThreshold))
 	{
+
+        // In some cases the normalInB is incorrect with a static triangle
+        // mesh (i.e. it's the connection point between puck and triangle, not
+        // the normal from the triangle - which is fine if the triangle mesh
+        // is a dynamic rigid body (i.e. can be pushed away), but appears to
+        // be wrong in case of a static body - it causes #2522 (puck suddenly
+        // pushed in air). So in case of a static triangle mesh, recompute
+        // the normal just based on the triangle mesh:
+        const btManifoldResult *mani = dynamic_cast<btManifoldResult*>(&output);
+        if(mani)
+        {
+            // Find the triangle:
+            const btCollisionObject *co = mani->getBody0Internal();
+            const btTriangleShape *tri = dynamic_cast<const btTriangleShape*>(co->getCollisionShape());
+            if(!tri)
+            {
+                co  = mani->getBody1Internal();
+                tri = dynamic_cast<const btTriangleShape*>(co->getCollisionShape());
+            }
+            // If we have a triangle and it is static, recompute the normal
+            if(tri && co->isStaticOrKinematicObject())
+            {
+                normal = (tri->m_vertices1[1]-tri->m_vertices1[0])
+                   .cross(tri->m_vertices1[2]-tri->m_vertices1[0]);
+                normal.normalize();;
+            }
+        }
+
+
 		if (swapResults)
 		{
 			btVector3 normalOnB = transformB.getBasis()*normal;

@@ -2,7 +2,7 @@
 in vec4 color;
 out vec4 FragColor;
 
-vec3 getLightFactor(float specMapValue);
+#stk_include "utils/getLightFactor.frag"
 
 void main(void)
 {

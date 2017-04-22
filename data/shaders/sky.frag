@@ -4,7 +4,7 @@ out vec4 FragColor;
 
 void main(void)
 {
-    vec3 eyedir = vec3(gl_FragCoord.xy / screen, 1.);
+    vec3 eyedir = vec3(mod(gl_FragCoord.xy, screen) / screen, 1.);
     eyedir = 2.0 * eyedir - 1.0;
     vec4 tmp = (InverseProjectionMatrix * vec4(eyedir, 1.));
     tmp /= tmp.w;

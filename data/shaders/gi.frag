@@ -14,7 +14,7 @@ uniform mat4 RHMatrix;
 uniform mat4 InvRHMatrix;
 
 vec4 SHBasis (const in vec3 dir)
-{ 
+{
     float   L00  = 0.282095;
     float   L1_1 = 0.488603 * dir.y;
     float   L10  = 0.488603 * dir.z;
@@ -30,8 +30,8 @@ vec3 SH2RGB (in vec4 sh_r, in vec4 sh_g, in vec4 sh_b, in vec3 dir)
 
 out vec4 Diffuse;
 
-vec3 DecodeNormal(vec2 n);
-vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
+#stk_include "utils/decodeNormal.frag"
+#stk_include "utils/getPosFromUVDepth.frag"
 
 vec3 resolution = vec3(32, 16, 32);
 

@@ -15,12 +15,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SHADER_ONLY
+
 #ifndef HEADER_TEXTURE_SHADER_HPP
 #define HEADER_TEXTURE_SHADER_HPP
 
 #include "graphics/central_settings.hpp"
 #include "graphics/gl_headers.hpp"
 #include "graphics/shader.hpp"
+#include "utils/cpp2011.hpp"
 
 #include <assert.h>
 #include <functional>
@@ -40,13 +43,18 @@ enum SamplerTypeNew
     ST_NEARED_CLAMPED_FILTERED,
     ST_BILINEAR_CLAMPED_FILTERED,
     ST_SEMI_TRILINEAR,
+#ifdef USE_GLES2
     ST_MAX = ST_SEMI_TRILINEAR
+#else
+    ST_TEXTURE_BUFFER,
+    ST_MAX = ST_TEXTURE_BUFFER
+#endif
 };   // SamplerTypeNew
 
 // ============================================================================
 /** A simple non-templated base class for a shader that uses textures. A non
- *  templated base class is necessary to easily handle static objects (like 
- *  list of all bind functions to call) - with templates each instance is a 
+ *  templated base class is necessary to easily handle static objects (like
+ *  list of all bind functions to call) - with templates each instance is a
  *  different class (with different static values).
  */
 class TextureShaderBase
@@ -65,7 +73,8 @@ protected:
     static void   bindTextureShadow(GLuint tex_unit, GLuint tex_id);
     static void   bindTrilinearClampedArrayTexture(GLuint tex_unit, GLuint tex_id);
     static void   bindTextureVolume(GLuint tex_unit, GLuint tex_id);
-    
+    static void   bindTextureBuffer(GLuint tex_unit, GLuint tex_id);
+
     GLuint        createSamplers(SamplerTypeNew sampler_type);
 private:
 
@@ -85,7 +94,7 @@ protected:
 // ========================================================================
 /** Class C needs to be the newly declared shaders class (necessary for
  *  the instance template). NUM_TEXTURES is the number of texture units
- *  used in this shader. It is used to test at compile time that the 
+ *  used in this shader. It is used to test at compile time that the
  *  right number of arguments are supplied to the variadic functions.
  */
 template<class C, int NUM_TEXTURES, typename...tp>
@@ -168,13 +177,15 @@ public:
     template<int N, typename... TexIds>
     void setTextureUnitsImpl(GLuint tex_id, TexIds... args)
     {
+#if defined(USE_GLES2)
+        if (CVS->getGLSLVersion() >= 300)
+#else
         if (CVS->getGLSLVersion() >= 330)
+#endif
         {
-#ifdef GL_VERSION_3_3
             glActiveTexture(GL_TEXTURE0 + m_texture_units[N]);
             glBindTexture(m_texture_type[N], tex_id);
             glBindSampler(m_texture_units[N], m_sampler_ids[N]);
-#endif
         }
         else
         {
@@ -215,8 +226,10 @@ public:
     template<int N, typename... HandlesId>
     void setTextureHandlesImpl(uint64_t handle, HandlesId... args)
     {
+#if !defined(USE_GLES2)
         if (handle)
             glUniformHandleui64ARB(m_texture_location[N], handle);
+#endif
         setTextureHandlesImpl<N + 1>(args...);
     }   // setTextureHandlesImpl
 
@@ -240,8 +253,21 @@ public:
         for (unsigned i = 0; i < m_sampler_ids.size(); i++)
             glDeleteSamplers(1, &m_sampler_ids[i]);
     }   // ~TextureShader
-
+    // ------------------------------------------------------------------------
+    /** For AZDO to remove the old texture handles, according to specification,
+     *  they can only be removed when the underlying texture or sampler objects
+     *  are finally deleted. This deletion will happen only when no handle
+     *  using the texture or sampler object is resident on any context.
+     */
+    void recreateTrilinearSampler(int sampler_id)
+    {
+        glDeleteSamplers(1, &m_sampler_ids[sampler_id]);
+        m_sampler_ids[sampler_id] =
+            createSamplers(ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // recreateTrilinearSampler
 
 };   // class TextureShader
 
 #endif
+
+#endif   // SHADER_ONLY

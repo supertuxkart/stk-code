@@ -126,14 +126,14 @@ void GamepadConfig::setDefaultBinds ()
 {
     setBinding(PA_STEER_LEFT,   Input::IT_STICKMOTION, 0, Input::AD_NEGATIVE);
     setBinding(PA_STEER_RIGHT,  Input::IT_STICKMOTION, 0, Input::AD_POSITIVE);
-    setBinding(PA_ACCEL,        Input::IT_STICKMOTION, 1, Input::AD_NEGATIVE);
-    setBinding(PA_BRAKE,        Input::IT_STICKMOTION, 1, Input::AD_POSITIVE);
-    setBinding(PA_FIRE,         Input::IT_STICKBUTTON, 0);
-    setBinding(PA_NITRO,        Input::IT_STICKBUTTON, 1);
-    setBinding(PA_DRIFT,        Input::IT_STICKBUTTON, 2);
-    setBinding(PA_RESCUE,       Input::IT_STICKBUTTON, 3);
-    setBinding(PA_LOOK_BACK,    Input::IT_STICKBUTTON, 4);
-    setBinding(PA_PAUSE_RACE,   Input::IT_STICKBUTTON, 5);
+    setBinding(PA_ACCEL,        Input::IT_STICKBUTTON, 0, Input::AD_NEGATIVE);
+    setBinding(PA_BRAKE,        Input::IT_STICKBUTTON, 3, Input::AD_POSITIVE);
+    setBinding(PA_FIRE,         Input::IT_STICKBUTTON, 1);
+    setBinding(PA_NITRO,        Input::IT_STICKBUTTON, 4);
+    setBinding(PA_DRIFT,        Input::IT_STICKBUTTON, 5);
+    setBinding(PA_RESCUE,       Input::IT_STICKBUTTON, 8);
+    setBinding(PA_LOOK_BACK,    Input::IT_STICKBUTTON, 6);
+    setBinding(PA_PAUSE_RACE,   Input::IT_STICKBUTTON, 9);
 
     setBinding(PA_MENU_UP,      Input::IT_STICKMOTION, 1, Input::AD_NEGATIVE);
     setBinding(PA_MENU_DOWN,    Input::IT_STICKMOTION, 1, Input::AD_POSITIVE);

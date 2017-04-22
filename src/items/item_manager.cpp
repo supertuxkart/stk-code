@@ -23,15 +23,18 @@
 #include <sstream>
 
 #include "config/stk_config.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
-#include "modes/linear_world.hpp"
-#include "network/network_manager.hpp"
-#include "network/network_world.hpp"
-#include "tracks/quad_graph.hpp"
+#include "karts/controller/spare_tire_ai.hpp"
+#include "network/network_config.hpp"
+#include "network/race_event_manager.hpp"
+#include "physics/triangle_mesh.hpp"
+#include "tracks/arena_graph.hpp"
+#include "tracks/arena_node.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
@@ -155,12 +158,12 @@ ItemManager::ItemManager()
         m_switch_to.push_back((Item::ItemType)i);
     setSwitchItems(stk_config->m_switch_items);
 
-    if(QuadGraph::get())
+    if(Graph::get())
     {
         m_items_in_quads = new std::vector<AllItemTypes>;
         // Entries 0 to n-1 are for the quads, entry
         // n is for all items that are not on a quad.
-        m_items_in_quads->resize(QuadSet::get()->getNumberOfQuads()+1);
+        m_items_in_quads->resize(Graph::get()->getNumNodes()+1);
     }
     else
     {
@@ -222,11 +225,10 @@ void ItemManager::insertItem(Item *item)
     if(m_items_in_quads)
     {
         int graph_node = item->getGraphNode();
-        // If the item is on the driveline, store it at the appropriate index
+        // If the item is on the graph, store it at the appropriate index
         if(graph_node > -1)
         {
-            int sector = QuadGraph::get()->getNode(graph_node).getQuadIndex();
-            (*m_items_in_quads)[sector].push_back(item);
+            (*m_items_in_quads)[graph_node].push_back(item);
         }
         else  // otherwise store it in the 'outside' index
             (*m_items_in_quads)[m_items_in_quads->size()-1].push_back(item);
@@ -285,8 +287,12 @@ Item* ItemManager::newItem(const Vec3& xyz, float distance,
 void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
 {
     assert(item);
-    if((item->getType() == Item::ITEM_BUBBLEGUM || item->getType() == Item::ITEM_BUBBLEGUM_NOLOK) && kart->isShielded())
-    {// shielded karts can simply drive over bubble gums without any effect.
+    // Spare tire karts don't collect items
+    if (dynamic_cast<SpareTireAI*>(kart->getController()) != NULL) return;
+    if( (item->getType() == Item::ITEM_BUBBLEGUM || 
+         item->getType() == Item::ITEM_BUBBLEGUM_NOLOK) && kart->isShielded())
+    {
+        // shielded karts can simply drive over bubble gums without any effect.
         return;
     }
     item->collected(kart);
@@ -318,12 +324,15 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
         if((*i)->hitKart(kart->getXYZ(), kart))
         {
             // if we're not playing online, pick the item.
-            if (!NetworkWorld::getInstance()->isRunning())
+            if (!RaceEventManager::getInstance()->isRunning())
                 collectedItem(*i, kart);
-            else if (NetworkManager::getInstance()->isServer())
+            else if (NetworkConfig::get()->isServer())
             {
+                // Only the server side detects item being collected
+                // A client does the collection upon receiving the 
+                // event from the server!
                 collectedItem(*i, kart);
-                NetworkWorld::getInstance()->collectedItem(*i, kart);
+                RaceEventManager::getInstance()->collectedItem(*i, kart);
             }
         }   // if hit
     }   // for m_all_items
@@ -418,10 +427,8 @@ void ItemManager::deleteItem(Item *item)
     // First check if the item needs to be removed from the items-in-quad list
     if(m_items_in_quads)
     {
-        const Vec3 &xyz = item->getXYZ();
-        int sector = QuadGraph::UNKNOWN_SECTOR;
-        QuadGraph::get()->findRoadSector(xyz, &sector);
-        unsigned int indx = sector==QuadGraph::UNKNOWN_SECTOR
+        int sector = item->getGraphNode();
+        unsigned int indx = sector==Graph::UNKNOWN_SECTOR
                           ? (unsigned int) m_items_in_quads->size()-1
                           : sector;
         AllItemTypes &items = (*m_items_in_quads)[indx];
@@ -468,3 +475,122 @@ void ItemManager::switchItems()
     m_switch_time = m_switch_time < 0 ? stk_config->m_item_switch_time : -1;
 
 }   // switchItems
+
+//-----------------------------------------------------------------------------
+bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
+{
+    if (!UserConfigParams::m_random_arena_item) return false;
+    if (!ArenaGraph::get()) return false;
+
+    const ArenaGraph* ag = ArenaGraph::get();
+    std::vector<int> used_location;
+    std::vector<int> invalid_location;
+    for (unsigned int i = 0; i < pos.size(); i++)
+    {
+        // Load all starting positions of arena, so no items will be near them
+        int node = -1;
+        ag->findRoadSector(pos[i].getOrigin(), &node, NULL, true);
+        assert(node != -1);
+        used_location.push_back(node);
+        invalid_location.push_back(node);
+    }
+
+    RandomGenerator random;
+    const unsigned int ALL_NODES = ag->getNumNodes();
+    const unsigned int MIN_DIST = int(sqrt(ALL_NODES));
+    const unsigned int TOTAL_ITEM = MIN_DIST / 2;
+
+    Log::info("[ItemManager]","Creating %d random items for arena", TOTAL_ITEM);
+    for (unsigned int i = 0; i < TOTAL_ITEM; i++)
+    {
+        int chosen_node = -1;
+        while(true)
+        {
+            if (used_location.size() - pos.size() +
+                invalid_location.size() == ALL_NODES)
+            {
+                Log::warn("[ItemManager]","Can't place more random items! "
+                    "Use default item location.");
+                return false;
+            }
+
+            const int node = random.get(ALL_NODES);
+
+            // Check if tried
+            std::vector<int>::iterator it = std::find(invalid_location.begin(),
+                invalid_location.end(), node);
+            if (it != invalid_location.end())
+                continue;
+
+            // Check if near edge
+            if (ag->getNode(node)->isNearEdge())
+            {
+                invalid_location.push_back(node);
+                continue;
+            }
+            // Check if too close
+            bool found = true;
+            for (unsigned int j = 0; j < used_location.size(); j++)
+            {
+                if (!found) continue;
+                float test_distance = ag->getDistance(used_location[j], node);
+                found = test_distance > MIN_DIST;
+            }
+            if (found)
+            {
+                chosen_node = node;
+                invalid_location.push_back(node);
+                break;
+            }
+            else
+                invalid_location.push_back(node);
+        }
+
+        assert(chosen_node != -1);
+        used_location.push_back(chosen_node);
+    }
+
+    for (unsigned int i = 0; i < pos.size(); i++)
+        used_location.erase(used_location.begin());
+
+    assert (used_location.size() == TOTAL_ITEM);
+
+    // Hard-coded ratio for now
+    const int BONUS_BOX = 4;
+    const int NITRO_BIG = 2;
+    const int NITRO_SMALL = 1;
+
+    for (unsigned int i = 0; i < TOTAL_ITEM; i++)
+    {
+        const int j = random.get(10);
+        Item::ItemType type = (j > BONUS_BOX ? Item::ITEM_BONUS_BOX :
+            j > NITRO_BIG ? Item::ITEM_NITRO_BIG :
+            j > NITRO_SMALL ? Item::ITEM_NITRO_SMALL : Item::ITEM_BANANA);
+
+        ArenaNode* an = ag->getNode(used_location[i]);
+        Vec3 loc = an->getCenter();
+        Vec3 quad_normal = an->getNormal();
+        loc += quad_normal;
+
+        // Do a raycast to help place it fully on the surface
+        const Material* m;
+        Vec3 normal;
+        Vec3 hit_point;
+        const TriangleMesh& tm = Track::getCurrentTrack()->getTriangleMesh();
+        bool success = tm.castRay(loc, an->getCenter() + (-10000*quad_normal),
+            &hit_point, &m, &normal);
+
+        if (success)
+        {
+            newItem(type, hit_point, normal);
+        }
+        else
+        {
+            Log::warn("[ItemManager]","Raycast to surface failed"
+                      "from node %d", used_location[i]);
+            newItem(type, an->getCenter(), quad_normal);
+        }
+    }
+
+    return true;
+}   // randomItemsForArena

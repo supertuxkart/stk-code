@@ -27,7 +27,6 @@
 #include "io/file_manager.hpp"
 #include "modes/overworld.hpp"
 #include "modes/world.hpp"
-#include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/main_menu_screen.hpp"

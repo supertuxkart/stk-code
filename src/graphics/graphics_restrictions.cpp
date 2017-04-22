@@ -26,6 +26,7 @@
 #include "utils/types.hpp"
 
 #include <algorithm>
+#include <array>
 
 namespace GraphicsRestrictions
 {
@@ -39,15 +40,16 @@ namespace GraphicsRestrictions
         /** The list of names used in the XML file for the graphics
          *  restriction types. They must be in the same order as the types. */
 
-        const char *m_names_of_restrictions[] = {
+        std::array<std::string, 27> m_names_of_restrictions = {
             "UniformBufferObject",
-            "GeometryShader4",
+            "GeometryShader",
             "DrawIndirect",
             "TextureView",
             "TextureStorage",
             "ImageLoadStore",
             "BaseInstance",
             "ComputeShader",
+            "ArraysOfArrays",
             "ShaderStorageBufferObject",
             "MultiDrawIndirect",
             "ShaderAtomicCounters",
@@ -55,11 +57,17 @@ namespace GraphicsRestrictions
             "BindlessTexture",
             "TextureCompressionS3TC",
             "AMDVertexShaderLayer",
+            "ExplicitAttribLocation",
+            "TextureFilterAnisotropic",
+            "TextureFormatBGRA8888",
+            "ColorBufferFloat",
             "DriverRecentEnough",
             "HighDefinitionTextures",
             "AdvancedPipeline",
             "FramebufferSRGBWorking",
+            "FramebufferSRGBCapable",
             "GI",
+            "ForceLegacyDevice"
         };
     }   // namespace Private
     using namespace Private;
@@ -68,12 +76,10 @@ namespace GraphicsRestrictions
      *  GR_COUNT if the name is not found. */
 GraphicsRestrictionsType getTypeForName(const std::string &name)
 {
-    unsigned int i = 0;
-    while (m_names_of_restrictions[i] != NULL)
+    for (unsigned int i = 0; i < m_names_of_restrictions.size(); i++)
     {
         if (name == m_names_of_restrictions[i])
             return (GraphicsRestrictionsType)i;
-        i++;
     }
     return GR_COUNT;
 }   // getTypeForName
@@ -137,12 +143,16 @@ public:
             std::vector<std::string> l = StringUtils::split(driver, ' ');
             if (l.size() > 2)
             {
-                // driver can be: "1.4 (3.0 Mesa 10.1.0)" --> l[3] must be used
-                if (l[2] != "Mesa")
-                    convertVersionString(l[2]);
-                else
-                    convertVersionString(l[3]);
-                return;
+                // driver can be: "1.4 (3.0 Mesa 10.1.0)" -->
+                // we use value next to "Mesa" word.
+                for (unsigned int i = 0; i < l.size(); i++)
+                {
+                    if (l[i] == "Mesa" && i < l.size() - 1)
+                    {
+                        convertVersionString(l[i+1]);
+                        return;
+                    }
+                }
             }
         }
 
@@ -185,7 +195,8 @@ public:
 
         // AMD: driver_version = "4.3.13283 Core Profile/Debug Context 14.501.1003.0"
         // ----------------------------------------------
-        if (card_name.find("AMD") != std::string::npos)
+        if (card_name.find("AMD") != std::string::npos
+            || card_name.find("Radeon") != std::string::npos)
         {
             std::vector<std::string> s = StringUtils::split(driver_version, ' ');
             if (s.size() == 5)
@@ -265,13 +276,13 @@ class Rule : public NoCopy
 {
 private:
     /** Operators to test for a card. */
-    enum {CARD_IS, CARD_CONTAINS} m_card_test;
+    enum {CARD_IGNORE, CARD_IS, CARD_CONTAINS} m_card_test;
 
     /** Name of the card for which this rule applies. */
     std::string m_card_name;
 
     /** Operators to test version numbers with. */
-    enum {VERSION_IGNORE, VERSION_EQUAL, VERSION_LESS, 
+    enum {VERSION_IGNORE, VERSION_EQUAL, VERSION_LESS,
           VERSION_LESS_EQUAL}  m_version_test;
 
     /** Driver version for which this rule applies. */
@@ -286,6 +297,8 @@ public:
     Rule(const XMLNode *rule)
     {
         m_version_test = VERSION_IGNORE;
+        m_card_test = CARD_IGNORE;
+
         if(rule->get("is", &m_card_name))
         {
             m_card_test = CARD_IS;
@@ -333,7 +346,7 @@ public:
         // -----------
         if(m_os.size()>0)
         {
-#ifdef __linux__
+#if defined(__linux__) && !defined(ANDROID)
             if(m_os!="linux") return false;
 #endif
 #ifdef WIN32
@@ -345,16 +358,20 @@ public:
 #ifdef BSD
             if(m_os!="bsd") return false;
 #endif
+#ifdef ANDROID
+            if(m_os!="android") return false;
+#endif
         }   // m_os.size()>0
 
         // Test for card
         // -------------
         switch(m_card_test)
         {
+        case CARD_IGNORE: break;   // always true
         case CARD_IS:
             if(card!=m_card_name) return false;
             break;
-        case CARD_CONTAINS: 
+        case CARD_CONTAINS:
             if(card.find(m_card_name)==std::string::npos)
                 return false;
             break;
@@ -410,7 +427,7 @@ void unitTesting()
     assert(Version("10.3") <=  Version("10.3.2"));
     assert(!(Version("10.3.2") <  Version("10.3")));
     assert(!(Version("10.3.2") <= Version("10.3")));
-    assert(Version("3.3 NVIDIA-10.0.19 310.90.10.05b1", 
+    assert(Version("3.3 NVIDIA-10.0.19 310.90.10.05b1",
                    "NVIDIA GeForce GTX 680MX OpenGL Engine")
            == Version("310.90.10.5")                                    );
 
@@ -421,7 +438,7 @@ void unitTesting()
     assert(Version("3.1 (Core Profile) Mesa 10.3.0",
                   "Mesa DRI Mobile Intel\u00ae GM45 Express Chipset")
            == Version("10.3.0")                                         );
-    assert(Version("3.3 (Core Profile) Mesa 10.5.0-devel", 
+    assert(Version("3.3 (Core Profile) Mesa 10.5.0-devel",
                    "Gallium 0.4 on NVC1")
            == Version("10.5.0")                                         );
     assert(Version("3.3 (Core Profile) Mesa 10.5.0-devel",
@@ -439,7 +456,7 @@ void unitTesting()
     assert(Version("4.0.10188 Core Profile Context",
                    "ATI Radeon HD 5400 Series")
         == Version("4.0.10188"));
-    assert(Version("4.1 ATI-1.24.38", "AMD Radeon HD 6970M OpenGL Engine") 
+    assert(Version("4.1 ATI-1.24.38", "AMD Radeon HD 6970M OpenGL Engine")
         == Version("1.24.38"));
 
 }   // unitTesting

@@ -8,9 +8,23 @@
        <spacer height="20" width="50"/>
 
         <div width="80%" align="center" layout="vertical-row" height="fit" >
+            <!--
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label proportion="1" text_align="left" I18N="In the server info dialog" text="Name"/>
                 <label id="name" proportion="2" text_align="left" text=""/>
+            </div>
+            -->
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label proportion="1" text_align="left" I18N="In the networking lobby" text="Server name:"/>
+                <label proportion="2" text_align="left" id="server_name" text=""/>
+            </div>
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label proportion="1" text_align="left" I18N="In the networking lobby" text="Difficulty:"/>
+                <label proportion="2" text_align="left" id="server_difficulty" text=""/>
+            </div>
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label proportion="1" text_align="left" I18N="In the networking lobby" text="Game mode:"/>
+                <label proportion="2" text_align="left" id="server_game_mode" text=""/>
             </div>
         </div>
 

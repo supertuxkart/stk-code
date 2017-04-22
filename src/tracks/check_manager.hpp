@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+class AbstractKart;
 class CheckStructure;
 class Track;
 class XMLNode;
@@ -48,6 +49,7 @@ public:
     void   load(const XMLNode &node);
     void   update(float dt);
     void   reset(const Track &track);
+    void   resetAfterKartMove(AbstractKart *kart);
     unsigned int getLapLineIndex() const;
     int    getChecklineTriggering(const Vec3 &from, const Vec3 &to) const;
     // ------------------------------------------------------------------------

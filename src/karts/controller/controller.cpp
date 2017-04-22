@@ -22,17 +22,15 @@
 
 #include "karts/controller/controller.hpp"
 
+#include "config/player_manager.hpp"
 #include "karts/abstract_kart.hpp"
 
 /** Constructor, saves the kart pointer and a pointer to the KartControl
  *  of the kart.
  */
-Controller::Controller(AbstractKart *kart, StateManager::ActivePlayer *player)
+Controller::Controller(AbstractKart *kart)
 {
     m_controls = &(kart->getControls());
     m_kart     = kart;
-    m_player   = player;
     setControllerName("Controller");
 }   // Controller
-
-// ----------------------------------------------------------------------------

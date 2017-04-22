@@ -69,12 +69,9 @@ private:
     btScalar            m_damping;
     btVehicleRaycaster *m_vehicleRaycaster;
 
-    /** True if a zipper is active for that kart. */
-    bool                m_zipper_active;
-
-    /** The zipper velocity (i.e. the velocity the kart should reach in
+    /** The zipper speed (i.e. the velocity the kart should reach in
      *  the first frame that the zipper is active). */
-    btScalar            m_zipper_velocity;
+    btScalar            m_zipper_speed;
 
     /** The angular velocity to be applied when the kart skids.
      *  0 means no skidding. */
@@ -153,7 +150,7 @@ public:
     void               reset();
     void               debugDraw(btIDebugDraw* debugDrawer);
     const btTransform& getChassisWorldTransform() const;
-    btScalar           rayCast(unsigned int index);
+    btScalar           rayCast(unsigned int index, float fraction=1.0f);
     virtual void       updateVehicle(btScalar step);
     void               resetSuspension();
     btScalar           getSteeringValue(int wheel) const;
@@ -172,7 +169,8 @@ public:
     const btWheelInfo& getWheelInfo(int index) const;
     btWheelInfo&       getWheelInfo(int index);
     void               updateWheelTransformsWS(btWheelInfo& wheel,
-                                              bool interpolatedTransform=true);
+                                               bool interpolatedTransform=true,
+                                               float fraction = 1.0f);
     void               setAllBrakes(btScalar brake);
     void               updateSuspension(btScalar deltaTime);
     virtual void       updateFriction(btScalar timeStep);
@@ -274,6 +272,11 @@ public:
         m_additional_rotation      = rot/t;
         m_time_additional_rotation = t;
     }   // setTimedTorque
+    // ------------------------------------------------------------------------
+    /** Returns the current zipper speed. */
+    float getInstantSpeedIncrease() const { return m_zipper_speed; }
+    // ------------------------------------------------------------------------
+    void resetInstantSpeed() { m_zipper_speed = 0;  }
 };   // class btKart
 
 #endif //BT_KART_HPP

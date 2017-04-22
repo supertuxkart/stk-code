@@ -21,7 +21,7 @@
 
 #include "input/gamepad_config.hpp"
 #include "karts/abstract_kart.hpp"
-#include "karts/controller/player_controller.hpp"
+#include "karts/controller/local_player_controller.hpp"
 
 /** Constructor for GamePadDevice from a connected gamepad for which no
  *  configuration existed (defaults will be used)
@@ -57,7 +57,8 @@ GamePadDevice::GamePadDevice(const int irr_index, const std::string &name,
         m_axis_ok[i] = false;
     }
 
-    for(int n=0; n<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; n++)
+    m_buttonPressed = new bool[button_count];
+    for(int n=0; n<button_count; n++)
         m_buttonPressed[n] = false;
 }   // GamePadDevice
 
@@ -66,6 +67,7 @@ GamePadDevice::GamePadDevice(const int irr_index, const std::string &name,
  */
 GamePadDevice::~GamePadDevice()
 {
+    delete[] m_buttonPressed;
     delete[] m_prev_axis_directions;
     delete[] m_prev_axis_value;
     delete[] m_axis_ok;
@@ -124,7 +126,7 @@ void GamePadDevice::resetAxisDirection(const int axis,
            bind.getDirection()== direction &&
            pk->getController() != NULL)
         {
-            ((PlayerController*)(pk->getController()))
+            ((LocalPlayerController*)(pk->getController()))
                                                   ->action((PlayerAction)n, 0);
             return;
         }

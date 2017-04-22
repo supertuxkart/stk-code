@@ -39,18 +39,26 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
 {
     m_referee     = new Referee(*m_kart);
     m_kart->getNode()->addChild(m_referee->getSceneNode());
-    m_timer       = m_kart->getKartProperties()->getRescueTime() *
-                    m_kart->getPlayerDifficulty()->getRescueTime();
+    m_timer       = m_kart->getKartProperties()->getRescueDuration();
     m_velocity    = m_kart->getKartProperties()->getRescueHeight() / m_timer;
     m_xyz         = m_kart->getXYZ();
 
     m_kart->getAttachment()->clear();
 
-    m_curr_rotation.setPitch(m_kart->getPitch());
-    m_curr_rotation.setRoll(m_kart->getRoll()  );
-    m_curr_rotation.setHeading(0);
-    m_add_rotation = -m_curr_rotation/m_timer;
-    m_curr_rotation.setHeading(m_kart->getHeading());
+    // Get the current rotation of the kart
+    m_curr_rotation = m_kart->getNode()->getRotation() * DEGREE_TO_RAD;
+
+    // Determine the rotation that will rotate the kart from the current
+    // up direction to the right up direction it should have according to
+    // the normal at the kart's location
+    Vec3 up = m_kart->getTrans().getBasis().getColumn(1);
+    btQuaternion q = shortestArcQuat(up, m_kart->getNormal());
+   
+    // Store this rotation as 'delta HPR', which is added over time to the
+    // current rotation to end up (after m_timer seconds) with the right up
+    // rotation
+    m_add_rotation.setHPR(q);
+    m_add_rotation /= m_timer;
 
     // Add a hit unless it was auto-rescue
     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
@@ -58,6 +66,8 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     {
         ThreeStrikesBattle *world=(ThreeStrikesBattle*)World::getWorld();
         world->kartHit(m_kart->getWorldKartId());
+        if (UserConfigParams::m_arena_ai_stats)
+            world->increaseRescueCount();
     }
 };   // RescueAnimation
 
@@ -79,12 +89,12 @@ RescueAnimation::~RescueAnimation()
     {
         m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
-        World::getWorld()->getPhysics()->addKart(m_kart);
+        Physics::getInstance()->addKart(m_kart);
         for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
             Camera *camera = Camera::getCamera(i);
             if(camera && camera->getKart()==m_kart &&
-                camera->getMode() != Camera::CM_FINAL)
+                camera->getType() != Camera::CM_TYPE_END)
                 camera->setMode(Camera::CM_NORMAL);
         }
     }
@@ -97,13 +107,13 @@ RescueAnimation::~RescueAnimation()
  */
 void RescueAnimation::update(float dt)
 {
-
-    m_xyz.setY(m_xyz.getY() + dt*m_velocity);
+    m_xyz += dt*m_velocity * m_kart->getNormal();
     m_kart->setXYZ(m_xyz);
     m_curr_rotation += dt*m_add_rotation;
-    btQuaternion q(m_curr_rotation.getHeading(), m_curr_rotation.getPitch(),
+    btMatrix3x3 m;
+    m.setEulerZYX(m_curr_rotation.getPitch(), m_curr_rotation.getHeading(),
                    m_curr_rotation.getRoll());
-    m_kart->setRotation(q);
+    m_kart->setRotation(m);
 
     AbstractKartAnimation::update(dt);
 

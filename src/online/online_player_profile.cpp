@@ -25,7 +25,6 @@
 #include "guiengine/screen.hpp"
 #include "online/online_profile.hpp"
 #include "online/profile_manager.hpp"
-#include "online/servers_manager.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/online_profile_friends.hpp"
 #include "states_screens/user_screen.hpp"
@@ -92,10 +91,9 @@ namespace Online
     /** Request a login using the saved credentials of the user. */
     void OnlinePlayerProfile::requestSavedSession()
     {
-        SignInRequest *request = NULL;
         if (m_online_state == OS_SIGNED_OUT && hasSavedSession())
         {
-            request = new SignInRequest(true);
+            SignInRequest *request = new SignInRequest(true);
             setUserDetails(request, "saved-session");
 
             // The userid must be taken from the saved data,
@@ -153,7 +151,8 @@ namespace Online
                 PlayerProfile *player = PlayerManager::get()->getPlayer(i);
                 if(player != current &&
                     player->hasSavedSession() &&
-                    player->getLastOnlineName() == current->getLastOnlineName())
+                    player->getLastOnlineName(true/*ignoreRTL*/) ==
+                    current->getLastOnlineName(true/*ignoreRTL*/))
                 {
                     player->clearSession();
                 }

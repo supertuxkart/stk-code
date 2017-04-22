@@ -31,9 +31,10 @@
 #include <string>
 #include "animations/three_d_animation.hpp"
 
-class XMLNode;
-class ThreeDAnimation;
 class ModelDefinitionLoader;
+class RenderInfo;
+class ThreeDAnimation;
+class XMLNode;
 
 /**
  * \ingroup tracks
@@ -59,8 +60,9 @@ private:
 
     std::string m_id;
 
-protected:
+    RenderInfo*              m_render_info;
 
+protected:
 
     /** The initial XYZ position of the object. */
     core::vector3df                m_init_xyz;
@@ -197,6 +199,10 @@ public:
       * On the script side, the returned object is of type : @ref Scripting_SoundEmitter
       */
     TrackObjectPresentationSound* getSoundEmitter(){ return getPresentation<TrackObjectPresentationSound>(); }
+    /** Should only be used on sound emitter track objects.
+    * On the script side, the returned object is of type : @ref Scripting_Light
+    */
+    TrackObjectPresentationLight* getLight() { return getPresentation<TrackObjectPresentationLight>(); }
     // For angelscript. Needs to be named something different than getAnimator since it's overloaded.
     /** Should only be used on TrackObjects that use curve-based animation.
       * On the script side, the returned object is of type : @ref Scripting_Animator

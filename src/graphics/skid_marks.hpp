@@ -85,10 +85,11 @@ private:
 
     public:
             SkidMarkQuads (const Vec3 &left, const Vec3 &right,
-                           video::SMaterial *material, float z_offset,
-                           video::SColor* custom_color = NULL);
+                           const Vec3 &normal, video::SMaterial *material,
+                           float z_offset, video::SColor* custom_color = NULL);
         void add          (const Vec3 &left,
                            const Vec3 &right,
+                           const Vec3 &normal,
                            float distance);
         void fade         (float f);
         /** Returns the aabb of this skid mark quads. */

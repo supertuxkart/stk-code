@@ -20,24 +20,25 @@
 #include "audio/sfx_manager.hpp"
 #include "graphics/weather.hpp"
 #include "modes/world.hpp"
-#include "states_screens/race_gui.hpp"
+#include "tracks/track.hpp"
 #include "utils/random_generator.hpp"
 
 
-// The weather manager
-
-Weather::Weather(bool lightning, std::string sound)
+/**  The weather manager stores information about the weather.
+ */
+Weather::Weather()
 {
-    m_lightning = lightning;
     m_thunder_sound = NULL;
     m_weather_sound = NULL;
+    m_lightning = 0.0f;
     
-    if (m_lightning)
+    if (Track::getCurrentTrack()->getWeatherLightning())
     {
         m_thunder_sound = SFXManager::get()->createSoundSource("thunder");
     }
 
-    if (sound != "")
+    const std::string &sound = Track::getCurrentTrack()->getWeatherSound();
+    if (!sound.empty())
     {
         m_weather_sound = SFXManager::get()->createSoundSource(sound);
     }
@@ -61,27 +62,30 @@ Weather::~Weather()
 
 void Weather::update(float dt)
 {
-    if (m_lightning)
+    if (!Track::getCurrentTrack()->getWeatherLightning())
+        return;
+        
+    if (World::getWorld()->getRaceGUI() == NULL)
+        return;
+        
+    m_next_lightning -= dt;
+
+    if (m_next_lightning < 0.0f)
     {
-        m_next_lightning -= dt;
-    
-        if (m_next_lightning < 0.0f)
+        startLightning();
+
+        if (m_thunder_sound)
         {
-            RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
-
-            if (gui_base != NULL)
-            {
-                gui_base->doLightning();
-
-                if (m_thunder_sound)
-                {
-                    m_thunder_sound->play();
-                }
-            }
-    
-            RandomGenerator g;
-            m_next_lightning = 35 + (float)g.get(35);
+            m_thunder_sound->play();
         }
+
+        RandomGenerator g;
+        m_next_lightning = 35 + (float)g.get(35);
+    }
+    
+    if (m_lightning > 0.0f)
+    {
+        m_lightning -= dt;
     }
 }   // update
 
@@ -94,4 +98,13 @@ void Weather::playSound()
         m_weather_sound->setLoop(true);
         m_weather_sound->play();
     }
+}
+
+irr::core::vector3df Weather::getIntensity()
+{
+    irr::core::vector3df value = {0.7f * m_lightning, 
+                                  0.7f * m_lightning, 
+                                  0.7f * std::min(1.0f, m_lightning * 1.5f)};
+                                 
+    return value;
 }

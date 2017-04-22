@@ -127,7 +127,6 @@ private:
     static SortOrder m_sort_order;
 
 public:
-         Addon() {};
          /** Initialises the object from an XML node. */
          Addon(const XMLNode &xml);
 

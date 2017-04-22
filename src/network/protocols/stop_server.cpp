@@ -20,10 +20,10 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "network/network_manager.hpp"
+#include "network/network_config.hpp"
 #include "online/request_manager.hpp"
 
-StopServer::StopServer() : Protocol(NULL, PROTOCOL_SILENT)
+StopServer::StopServer() : Protocol(PROTOCOL_SILENT)
 {
 }
 
@@ -45,7 +45,7 @@ void StopServer::asynchronousUpdate()
 {
     if (m_state == NONE)
     {
-        const TransportAddress& addr = NetworkManager::getInstance()->getPublicAddress();
+        const TransportAddress& addr = NetworkConfig::get()->getMyAddress();
         m_request = new Online::XMLRequest();
         PlayerManager::setUserDetails(m_request, "stop", Online::API::SERVER_PATH);
 
@@ -84,6 +84,6 @@ void StopServer::asynchronousUpdate()
         m_state = EXITING;
         delete m_request;
         m_request = NULL;
-        m_listener->requestTerminate(this);
+        requestTerminate();
     }
-}
+}   // asynchronousUpdate

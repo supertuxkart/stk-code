@@ -20,7 +20,7 @@
 #define CONNECT_TO_SERVER_HPP
 
 #include "network/protocol.hpp"
-#include "network/types.hpp"
+#include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
 #include <string>
 
@@ -30,37 +30,41 @@ private:
     TransportAddress m_server_address;
     uint32_t m_server_id;
     uint32_t m_host_id;
-    uint32_t m_current_protocol_id;
+
+    /** Protocol currently being monitored. */
+    Protocol *m_current_protocol;
     bool m_quick_join;
 
-    enum State
+    /** State for finite state machine. */
+    enum
     {
         NONE,
         GETTING_SELF_ADDRESS,
-        SHOWING_SELF_ADDRESS,
-        GETTING_SERVER_ADDRESS,
+        GOT_SERVER_ADDRESS,
         REQUESTING_CONNECTION,
+        QUICK_JOIN,
         CONNECTING,
         CONNECTED,
         HIDING_ADDRESS,
         DONE,
         EXITING
-    };
-    /** State for finite state machine. */
-    State m_state;
+    } m_state;
 
+    void registerWithSTKServer();
+    void handleQuickConnect();
     void handleSameLAN();
 
 public:
-    ConnectToServer();
-    ConnectToServer(uint32_t server_id, uint32_t host_id);
+             ConnectToServer();
+             ConnectToServer(uint32_t server_id, uint32_t host_id);
     virtual ~ConnectToServer();
 
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
     virtual void setup() OVERRIDE;
-    virtual void asynchronousUpdate();
-    virtual void update() OVERRIDE {}
-
+    virtual void asynchronousUpdate() OVERRIDE;
+    virtual void callback(Protocol *protocol) OVERRIDE;
+    virtual void update(float dt) OVERRIDE {}
+    void setServerAddress(const TransportAddress &address);
 };   // class ConnectToServer
 
 #endif // CONNECT_TO_SERVER_HPP

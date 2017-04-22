@@ -14,6 +14,7 @@ extern bool GLContextDebugBit;
 #include <unistd.h>
 #include <sys/utsname.h>
 #include <time.h>
+#include <locale.h>
 #include "IEventReceiver.h"
 #include "ISceneManager.h"
 #include "IGUIEnvironment.h"
@@ -38,7 +39,7 @@ extern bool GLContextDebugBit;
 
 #ifdef __FreeBSD__
 #include <sys/joystick.h>
-#else
+#elif defined(__linux__)
 
 // linux/joystick.h includes linux/input.h, which #defines values for various KEY_FOO keys.
 // These override the irr::KEY_FOO equivalents, which stops key handling from working.
@@ -62,16 +63,19 @@ namespace irr
 		extern bool useCoreContext;
 		IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 				io::IFileSystem* io, CIrrDeviceLinux* device);
+		IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
+			video::SExposedVideoData& data, io::IFileSystem* io);
 	}
 } // end namespace irr
 
+#if defined(_IRR_COMPILE_WITH_X11_)
 namespace
 {
 	Atom X_ATOM_CLIPBOARD;
 	Atom X_ATOM_TARGETS;
 	Atom X_ATOM_UTF8_STRING;
-	Atom X_ATOM_TEXT;
 };
+#endif
 
 namespace irr
 {
@@ -83,6 +87,8 @@ CIrrDeviceLinux::CIrrDeviceLinux(const SIrrlichtCreationParameters& param)
 	: CIrrDeviceStub(param),
 #ifdef _IRR_COMPILE_WITH_X11_
 	display(0), visual(0), screennr(0), window(0), StdHints(0), SoftwareImage(0),
+	XInputMethod(0), XInputContext(0), m_font_set(0), numlock_mask(0),
+	m_ime_enabled(false),
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 	glxWin(0),
 	Context(0),
@@ -134,6 +140,15 @@ CIrrDeviceLinux::CIrrDeviceLinux(const SIrrlichtCreationParameters& param)
 	if (!VideoDriver)
 		return;
 
+#ifdef _IRR_COMPILE_WITH_X11_
+	m_ime_position.x = 0;
+	m_ime_position.y = 0;
+	createInputContext();
+	numlock_mask = getNumlockMask(display);
+	// Get maximum 16 characters from input method
+	m_ime_char_holder.reallocate(16);
+#endif
+
 	createGUIAndScene();
 }
 
@@ -167,6 +182,8 @@ CIrrDeviceLinux::~CIrrDeviceLinux()
 		VideoDriver->drop();
 		VideoDriver = NULL;
 	}
+
+	destroyInputContext();
 
 	if (display)
 	{
@@ -498,6 +515,7 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 }
 #endif
 
+#ifdef _IRR_COMPILE_WITH_OPENGL_
 static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, bool force_legacy_context)
 {
 	GLXContext Context;
@@ -550,30 +568,30 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, boo
 	PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = 0;
 	glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
 						glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
-  
-    if(!force_legacy_context)
-    {
-        // create core 4.3 context
-        os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
-        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
-        if (!XErrorSignaled)
-            return Context;
-        
-        XErrorSignaled = false;
-        // create core 3.3 context
-        os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
-        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
-        if (!XErrorSignaled)
-            return Context;
 
-        XErrorSignaled = false;
-        // create core 3.1 context (for older mesa)
-        os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
-        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
-        if (!XErrorSignaled)
-            return Context;
+	if(!force_legacy_context)
+	{
+		// create core 4.3 context
+		os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
+		Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
+		if (!XErrorSignaled)
+			return Context;
 
-    }   // if(force_legacy_context)
+		XErrorSignaled = false;
+		// create core 3.3 context
+		os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
+		Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
+		if (!XErrorSignaled)
+			return Context;
+
+		XErrorSignaled = false;
+		// create core 3.1 context (for older mesa)
+		os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
+		Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
+		if (!XErrorSignaled)
+			return Context;
+
+	}   // if(force_legacy_context)
 
 	XErrorSignaled = false;
 	irr::video::useCoreContext = false;
@@ -582,6 +600,8 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, boo
 	Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
 	return Context;
 }
+
+#endif
 
 bool CIrrDeviceLinux::createWindow()
 {
@@ -606,7 +626,7 @@ bool CIrrDeviceLinux::createWindow()
 
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 
-	GLXFBConfig glxFBConfig;
+	GLXFBConfig glxFBConfig = NULL;
 	int major, minor;
 	bool isAvailableGLX=false;
 	if (CreationParams.DriverType==video::EDT_OPENGL)
@@ -645,11 +665,11 @@ bool CIrrDeviceLinux::createWindow()
 					GLX_SAMPLE_BUFFERS_SGIS, 1,
 					GLX_SAMPLES_SGIS, CreationParams.AntiAlias, // 18,19
 #endif
-//#ifdef GL_ARB_framebuffer_sRGB
-//					GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB, CreationParams.HandleSRGB,
-//#elif defined(GL_EXT_framebuffer_sRGB)
-//					GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, CreationParams.HandleSRGB,
-//#endif
+#ifdef GLX_ARB_framebuffer_sRGB
+					GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB, CreationParams.HandleSRGB,
+#elif defined(GLX_EXT_framebuffer_sRGB)
+					GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, CreationParams.HandleSRGB,
+#endif
 					GLX_STEREO, CreationParams.Stereobuffer?True:False,
 					None
 				};
@@ -796,11 +816,11 @@ bool CIrrDeviceLinux::createWindow()
 					// GLX_USE_GL, which is silently ignored by glXChooseVisual
 					CreationParams.Doublebuffer?GLX_DOUBLEBUFFER:GLX_USE_GL, // 14
 					CreationParams.Stereobuffer?GLX_STEREO:GLX_USE_GL, // 15
-//#ifdef GL_ARB_framebuffer_sRGB
-//					CreationParams.HandleSRGB?GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB:GLX_USE_GL,
-//#elif defined(GL_EXT_framebuffer_sRGB)
-//					CreationParams.HandleSRGB?GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT:GLX_USE_GL,
-//#endif
+#ifdef GLX_ARB_framebuffer_sRGB
+					CreationParams.HandleSRGB?GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB:GLX_USE_GL,
+#elif defined(GLX_EXT_framebuffer_sRGB)
+					CreationParams.HandleSRGB?GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT:GLX_USE_GL,
+#endif
 					None
 				};
 
@@ -886,7 +906,7 @@ bool CIrrDeviceLinux::createWindow()
 									  WMCheck, 0L, 1L, False, XA_WINDOW,
 									  &type, &form, &len, &remain,
 									  (unsigned char **)&list);
-
+		XFree(list);
 		bool netWM = (s == Success) && len;
 		attributes.override_redirect = !netWM && CreationParams.Fullscreen;
 
@@ -1024,7 +1044,9 @@ bool CIrrDeviceLinux::createWindow()
 		glxWin=glXCreateWindow(display,glxFBConfig,window,NULL);
 		if (glxWin)
 		{
+			getLogger()->setLogLevel(ELL_NONE);
 			Context = getMeAGLContext(display, glxFBConfig, CreationParams.ForceLegacyDevice);
+			getLogger()->setLogLevel(CreationParams.LoggingLevel);
 			if (Context)
 			{
 				if (!glXMakeContextCurrent(display, glxWin, glxWin, Context))
@@ -1130,6 +1152,19 @@ void CIrrDeviceLinux::createDriver()
 		#endif
 		break;
 
+	case video::EDT_OGLES2:
+	{
+		#ifdef _IRR_COMPILE_WITH_OGLES2_
+		video::SExposedVideoData data;
+		data.OpenGLLinux.X11Window = window;
+		data.OpenGLLinux.X11Display = display;
+		VideoDriver = video::createOGLES2Driver(CreationParams, data, FileSystem);
+		#else
+		os::Printer::log("No OpenGL ES 2.0 support compiled in.", ELL_ERROR);
+		#endif
+		break;
+	}
+
 	case video::EDT_DIRECT3D8:
 	case video::EDT_DIRECT3D9:
 		os::Printer::log("This driver is not available in Linux. Try OpenGL or Software renderer.",
@@ -1154,6 +1189,259 @@ void CIrrDeviceLinux::createDriver()
 	}
 }
 
+#ifdef _IRR_COMPILE_WITH_X11_
+bool CIrrDeviceLinux::createInputContext()
+{
+	if (!display)
+		return false;
+
+	// One one side it would be nicer to let users do that - on the other hand
+	// not setting the environment locale will not work when using i18n X11 functions.
+	// So users would have to call it always or their input is broken badly.
+	// We can restore immediately - so won't mess with anything in users apps.
+	core::stringc oldLocale(setlocale(LC_CTYPE, NULL));
+	setlocale(LC_CTYPE, "");        // use environment locale
+
+	if ( !XSupportsLocale() )
+	{
+		os::Printer::log("Locale not supported. Falling back to non-i18n input.", ELL_WARNING);
+		setlocale(LC_CTYPE, oldLocale.c_str());
+		return false;
+	}
+
+	char* p = XSetLocaleModifiers("");
+	if (p == NULL)
+	{
+		os::Printer::log("Could not set locale modifiers. Falling back to non-i18n input.", ELL_WARNING);
+		setlocale(LC_CTYPE, oldLocale.c_str());
+		return false;
+	}
+
+	XInputMethod = XOpenIM(display, NULL, NULL, NULL);
+	if ( !XInputMethod )
+	{
+		os::Printer::log("XOpenIM failed to create an input method. Falling back to non-i18n input.", ELL_WARNING);
+		setlocale(LC_CTYPE, oldLocale.c_str());
+		return false;
+	}
+
+	XIMStyles *im_supported_styles = NULL;
+	XGetIMValues(XInputMethod, XNQueryInputStyle, &im_supported_styles, (void*)NULL);
+	if (!im_supported_styles)
+	{
+		os::Printer::log("XGetIMValues failed to get supported styles. Falling back to non-i18n input.", ELL_WARNING);
+		setlocale(LC_CTYPE, oldLocale.c_str());
+		return false;
+	}
+
+	// Only OverTheSpot and Root pre-edit type are implemented for now
+	core::array<unsigned long> supported_style;
+	//supported_style.push_back(XIMPreeditPosition | XIMStatusNothing);
+	supported_style.push_back(XIMPreeditNothing | XIMStatusNothing);
+	XIMStyle best_style = 0;
+	bool found = false;
+	int supported_style_start = -1;
+
+	while (!found && supported_style_start < (int)supported_style.size())
+	{
+		supported_style_start++;
+		for (int i = 0; i < im_supported_styles->count_styles; i++)
+		{
+			XIMStyle cur_style = im_supported_styles->supported_styles[i];
+			if (cur_style == supported_style[supported_style_start])
+			{
+				best_style = cur_style;
+				found = true;
+				break;
+			}
+		}
+	}
+	XFree(im_supported_styles);
+
+	if (!found)
+	{
+		XDestroyIC(XInputContext);
+		XInputContext = 0;
+
+		os::Printer::log("XInputMethod has no input style we can use. Falling back to non-i18n input.", ELL_WARNING);
+		setlocale(LC_CTYPE, oldLocale.c_str());
+		return false;
+	}
+
+	// Only use root preedit type for now
+	/*if (best_style != (XIMPreeditNothing | XIMStatusNothing))
+	{
+		char **list = NULL;
+		int count = 0;
+		m_font_set = XCreateFontSet(display, "fixed", &list, &count, NULL);
+		if (!m_font_set)
+		{
+			os::Printer::log("XInputContext failed to create font set. Falling back to non-i18n input.", ELL_WARNING);
+			setlocale(LC_CTYPE, oldLocale.c_str());
+			return false;
+		}
+		if (count > 0)
+		{
+			XFreeStringList(list);
+		}
+
+		XPoint spot = {0, 0};
+		XVaNestedList p_list = XVaCreateNestedList(0, XNSpotLocation, &spot,
+												XNFontSet, m_font_set, (void*)NULL);
+		XInputContext = XCreateIC(XInputMethod,
+								XNInputStyle, best_style,
+								XNClientWindow, window,
+								XNFocusWindow, window,
+								XNPreeditAttributes, p_list,
+								(void*)NULL);
+		XFree(p_list);
+	}
+	else*/
+	{
+		XInputContext = XCreateIC(XInputMethod,
+								XNInputStyle, best_style,
+								XNClientWindow, window,
+								XNFocusWindow, window,
+								(void*)NULL);
+	}
+
+	if (!XInputContext )
+	{
+		os::Printer::log("XInputContext failed to create an input context. Falling back to non-i18n input.", ELL_WARNING);
+		setlocale(LC_CTYPE, oldLocale.c_str());
+		return false;
+	}
+
+	XSetICFocus(XInputContext);
+	setlocale(LC_CTYPE, oldLocale.c_str());
+	return true;
+}
+
+void CIrrDeviceLinux::destroyInputContext()
+{
+	if ( XInputContext )
+	{
+		XUnsetICFocus(XInputContext);
+		XDestroyIC(XInputContext);
+		XInputContext = 0;
+	}
+	if ( XInputMethod )
+	{
+		XCloseIM(XInputMethod);
+		XInputMethod = 0;
+	}
+	if (display && m_font_set)
+	{
+		XFreeFontSet(display, m_font_set);
+		m_font_set = 0;
+	}
+}
+
+void CIrrDeviceLinux::setIMELocation(const irr::core::position2di& pos)
+{
+	if (!XInputContext || !m_ime_enabled) return;
+	m_ime_position.x = pos.X;
+	m_ime_position.y = pos.Y;
+	updateIMELocation();
+}
+
+void CIrrDeviceLinux::updateIMELocation()
+{
+	if (!XInputContext || !m_ime_enabled) return;
+	XVaNestedList list;
+	list = XVaCreateNestedList(0, XNSpotLocation, &m_ime_position, (void*)NULL);
+	XSetICValues(XInputContext, XNPreeditAttributes, list, (void*)NULL);
+	XFree(list);
+}
+
+void CIrrDeviceLinux::setIMEEnable(bool enable)
+{
+	if (!XInputContext) return;
+	m_ime_enabled = enable;
+}
+
+int CIrrDeviceLinux::getNumlockMask(Display* display)
+{
+	int mask_table[8] = {ShiftMask, LockMask, ControlMask, Mod1Mask,
+						 Mod2Mask, Mod3Mask, Mod4Mask, Mod5Mask};
+
+	if (!display)
+		return 0;		
+
+	KeyCode numlock_keycode = XKeysymToKeycode(display, XK_Num_Lock);
+
+	if (numlock_keycode == NoSymbol)
+		return 0;
+
+	XModifierKeymap* map = XGetModifierMapping(display);
+	if (!map)
+		return 0;
+
+	int mask = 0;
+	for (int i = 0; i < 8 * map->max_keypermod; i++) 
+	{
+		if (map->modifiermap[i] != numlock_keycode)
+			continue;
+
+		mask = mask_table[i/map->max_keypermod];
+		break;
+	}
+
+	XFreeModifiermap(map);
+
+	return mask;
+}
+
+EKEY_CODE CIrrDeviceLinux::getKeyCode(XEvent &event)
+{
+	EKEY_CODE keyCode = (EKEY_CODE)0;
+	SKeyMap mp;
+	
+	// First check for numpad keys
+	bool is_numpad_key = false;
+	if (event.xkey.state & numlock_mask)
+	{
+		mp.X11Key = XkbKeycodeToKeysym(display, event.xkey.keycode, 0, 1);
+		
+		if (mp.X11Key >=XK_KP_0 && mp.X11Key <= XK_KP_9)
+			is_numpad_key = true;
+	}
+	
+	// If it's not numpad key, then get keycode in typical way
+	if (!is_numpad_key)
+	{
+		mp.X11Key = XkbKeycodeToKeysym(display, event.xkey.keycode, 0, 0);
+	}
+		
+	const s32 idx = KeyMap.binary_search(mp);
+	if (idx != -1)
+	{
+		keyCode = (EKEY_CODE)KeyMap[idx].Win32Key;
+	}
+	if (keyCode == 0)
+	{
+		// Any value is better than none, that allows at least using the keys.
+		// Worst case is that some keys will be identical, still better than _all_
+		// unknown keys being identical.
+		if ( !mp.X11Key )
+		{
+			keyCode = (EKEY_CODE)event.xkey.keycode;
+			os::Printer::log("No such X11Key, using event keycode", core::stringc(event.xkey.keycode).c_str(), ELL_INFORMATION);
+		}
+		else if (idx == -1)
+		{
+			keyCode = (EKEY_CODE)mp.X11Key;
+			os::Printer::log("EKEY_CODE not found, using orig. X11 keycode", core::stringc(mp.X11Key).c_str(), ELL_INFORMATION);
+		}
+		else
+		{
+			keyCode = (EKEY_CODE)mp.X11Key;
+			os::Printer::log("EKEY_CODE is 0, using orig. X11 keycode", core::stringc(mp.X11Key).c_str(), ELL_INFORMATION);
+		}
+	}
+	return keyCode;
+}
+#endif
 
 //! runs the device. Returns false if device wants to be deleted
 bool CIrrDeviceLinux::run()
@@ -1172,12 +1460,30 @@ bool CIrrDeviceLinux::run()
 
 		while (XPending(display) > 0 && !Close)
 		{
+			if (!m_ime_char_holder.empty())
+			{
+				irrevent.KeyInput.Char = m_ime_char_holder[0];
+				irrevent.EventType = irr::EET_KEY_INPUT_EVENT;
+				irrevent.KeyInput.PressedDown = true;
+				irrevent.KeyInput.Control = false;
+				irrevent.KeyInput.Shift = false;
+				irrevent.KeyInput.Key = (irr::EKEY_CODE)0;
+				postEventFromUser(irrevent);
+				m_ime_char_holder.erase(0);
+				continue;
+			}
+
 			XEvent event;
 			XNextEvent(display, &event);
-
+			if (m_ime_enabled && XFilterEvent(&event, None))
+			{
+				updateIMELocation();
+				continue;
+			}
 			switch (event.type)
 			{
 			case ConfigureNotify:
+				updateIMELocation();
 				// check for changed window size
 				if ((event.xconfigure.width != (int) Width) ||
 					(event.xconfigure.height != (int) Height))
@@ -1330,52 +1636,65 @@ bool CIrrDeviceLinux::run()
 						(next_event.xkey.keycode == event.xkey.keycode) &&
 						(next_event.xkey.time - event.xkey.time) < 2)	// usually same time, but on some systems a difference of 1 is possible
 					{
-						/* Ignore the key release event */
+						// Ignore the key release event
 						break;
 					}
 				}
-				// fall-through in case the release should be handled
+
+				irrevent.EventType = irr::EET_KEY_INPUT_EVENT;
+				irrevent.KeyInput.PressedDown = false;
+				irrevent.KeyInput.Char = 0;	// on release that's undefined
+				irrevent.KeyInput.Control = (event.xkey.state & ControlMask) != 0;
+				irrevent.KeyInput.Shift = (event.xkey.state & ShiftMask) != 0;
+				irrevent.KeyInput.Key = getKeyCode(event);
+
+				postEventFromUser(irrevent);
+				break;
+
 			case KeyPress:
 				{
 					SKeyMap mp;
-					char buf[8]={0};
-					XLookupString(&event.xkey, buf, sizeof(buf), &mp.X11Key, NULL);
-
-					irrevent.EventType = irr::EET_KEY_INPUT_EVENT;
-					irrevent.KeyInput.PressedDown = (event.type == KeyPress);
-//					mbtowc(&irrevent.KeyInput.Char, buf, sizeof(buf));
-					irrevent.KeyInput.Char = ((wchar_t*)(buf))[0];
-					irrevent.KeyInput.Control = (event.xkey.state & ControlMask) != 0;
-					irrevent.KeyInput.Shift = (event.xkey.state & ShiftMask) != 0;
-
-					event.xkey.state &= ~(ControlMask|ShiftMask); // ignore shift-ctrl states for figuring out the key
-					XLookupString(&event.xkey, buf, sizeof(buf), &mp.X11Key, NULL);
-					const s32 idx = KeyMap.binary_search(mp);
-					if (idx != -1)
+					if ( XInputContext )
 					{
-						irrevent.KeyInput.Key = (EKEY_CODE)KeyMap[idx].Win32Key;
-					}
-					else
-					{
-						irrevent.KeyInput.Key = (EKEY_CODE)0;
-					}
-					if (irrevent.KeyInput.Key == 0)
-					{
-						// 1:1 mapping to windows-keys would require testing for keyboard type (us, ger, ...)
-						// So unless we do that we will have some unknown keys here.
-						if (idx == -1)
+						Status status;
+						int strLen = XwcLookupString(XInputContext, &event.xkey, m_ime_char_holder.pointer(), 16 * sizeof(wchar_t), &mp.X11Key, &status);
+						if ( status == XBufferOverflow )
 						{
-							os::Printer::log("Could not find EKEY_CODE, using orig. X11 keycode instead", core::stringc(event.xkey.keycode).c_str(), ELL_INFORMATION);
+							os::Printer::log("XwcLookupString needs a larger buffer", ELL_INFORMATION);
+						}
+						if ( strLen > 0 && (status == XLookupChars || status == XLookupBoth) )
+						{
+							if ( strLen > 1 )
+							{
+								m_ime_char_holder.set_used(strLen > 16 ? 16 : strLen);
+								continue;
+							}
+							else
+							{
+								irrevent.KeyInput.Char = m_ime_char_holder[0];
+							}
 						}
 						else
 						{
-							os::Printer::log("EKEY_CODE is 0, using orig. X11 keycode instead", core::stringc(event.xkey.keycode).c_str(), ELL_INFORMATION);
+							irrevent.KeyInput.Char = 0;
 						}
-						// Any value is better than none, that allows at least using the keys.
-						// Worst case is that some keys will be identical, still better than _all_
-						// unknown keys being identical.
-						irrevent.KeyInput.Key = (EKEY_CODE)event.xkey.keycode;
 					}
+					else	// Old version without InputContext. Does not support i18n, but good to have as fallback.
+					{
+						union
+						{
+							char buf[8];
+							wchar_t wbuf[2];
+						} tmp = {{0}};
+						XLookupString(&event.xkey, tmp.buf, sizeof(tmp.buf), &mp.X11Key, NULL);
+						irrevent.KeyInput.Char = tmp.wbuf[0];
+					}
+
+					irrevent.EventType = irr::EET_KEY_INPUT_EVENT;
+					irrevent.KeyInput.PressedDown = true;
+					irrevent.KeyInput.Control = (event.xkey.state & ControlMask) != 0;
+					irrevent.KeyInput.Shift = (event.xkey.state & ShiftMask) != 0;
+					irrevent.KeyInput.Key = getKeyCode(event);
 
 					postEventFromUser(irrevent);
 				}
@@ -1405,7 +1724,7 @@ bool CIrrDeviceLinux::run()
 				{
 					XEvent respond;
 					XSelectionRequestEvent *req = &(event.xselectionrequest);
-					if (  req->target == XA_STRING)
+					if (  req->target == X_ATOM_UTF8_STRING)
 					{
 						XChangeProperty (display,
 								req->requestor,
@@ -1418,14 +1737,13 @@ bool CIrrDeviceLinux::run()
 					}
 					else if ( req->target == X_ATOM_TARGETS )
 					{
-						long data[2];
+						long data[1];
 
-						data[0] = X_ATOM_TEXT;
-						data[1] = XA_STRING;
+						data[0] = X_ATOM_UTF8_STRING;
 
 						XChangeProperty (display, req->requestor,
-								req->property, req->target,
-								8, PropModeReplace,
+								req->property, XA_ATOM,
+								32, PropModeReplace,
 								(unsigned char *) &data,
 								sizeof (data));
 						respond.xselection.property = req->property;
@@ -2052,7 +2370,7 @@ bool CIrrDeviceLinux::activateJoysticks(core::array<SJoystickInfo> & joystickInf
 #ifdef __FreeBSD__
 		info.axes=2;
 		info.buttons=2;
-#else
+#elif defined(__linux__)
 		ioctl( info.fd, JSIOCGAXES, &(info.axes) );
 		ioctl( info.fd, JSIOCGBUTTONS, &(info.buttons) );
 		fcntl( info.fd, F_SETFL, O_NONBLOCK );
@@ -2074,7 +2392,7 @@ bool CIrrDeviceLinux::activateJoysticks(core::array<SJoystickInfo> & joystickInf
 		returnInfo.Axes = info.axes;
 		returnInfo.Buttons = info.buttons;
 
-#ifndef __FreeBSD__
+#if !defined(__FreeBSD__) && !defined(__OpenBSD__) && !defined(__NetBSD__)
 		char name[80];
 		ioctl( info.fd, JSIOCGNAME(80), name);
 		returnInfo.Name = name;
@@ -2119,7 +2437,7 @@ void CIrrDeviceLinux::pollJoysticks()
 			info.persistentData.JoystickEvent.Axis[0] = js.x; /* X axis */
 			info.persistentData.JoystickEvent.Axis[1] = js.y; /* Y axis */
 		}
-#else
+#elif defined(__linux__)
 		struct js_event event;
 		while (sizeof(event) == read(info.fd, &event, sizeof(event)))
 		{
@@ -2267,7 +2585,7 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
 		os::Printer::log("Couldn't access X clipboard", ELL_WARNING);
 		return 0;
 	}
-	
+
 	Window ownerWindow = XGetSelectionOwner(display, X_ATOM_CLIPBOARD);
 	if (ownerWindow == window)
 	{
@@ -2280,8 +2598,8 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
 		return 0;
 
 	Atom selection = XInternAtom(display, "IRR_SELECTION", False);
-	XConvertSelection(display, X_ATOM_CLIPBOARD, XA_STRING, selection, window, CurrentTime);
-	
+	XConvertSelection(display, X_ATOM_CLIPBOARD, X_ATOM_UTF8_STRING, selection, window, CurrentTime);
+
 	const int SELECTION_RETRIES = 500;
 	int i = 0;
 	for (i = 0; i < SELECTION_RETRIES; i++)
@@ -2294,13 +2612,13 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
 
 		usleep(1000);
 	}
-	
+
 	if (i == SELECTION_RETRIES)
 	{
 		os::Printer::log("Timed out waiting for SelectionNotify event", ELL_WARNING);
 		return 0;
 	}
-	
+
 	Atom type;
 	int format;
 	unsigned long numItems, dummy;
@@ -2312,7 +2630,7 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
 
 	if (result == Success)
 		Clipboard = (irr::c8*)data;
-		
+
 	XFree (data);
 	return Clipboard.c_str();
 #else
@@ -2372,7 +2690,6 @@ void CIrrDeviceLinux::initXAtoms()
 	X_ATOM_CLIPBOARD = XInternAtom(display, "CLIPBOARD", False);
 	X_ATOM_TARGETS = XInternAtom(display, "TARGETS", False);
 	X_ATOM_UTF8_STRING = XInternAtom (display, "UTF8_STRING", False);
-	X_ATOM_TEXT = XInternAtom (display, "TEXT", False);
 #endif
 }
 

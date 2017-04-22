@@ -26,7 +26,7 @@
 #include "input/input_device.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "online/online_profile.hpp"
+#include "network/network_player_profile.hpp"
 #include "states_screens/kart_selection.hpp"
 #include <IGUIEnvironment.h>
 
@@ -34,7 +34,7 @@ using namespace GUIEngine;
 
 PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
                                    StateManager::ActivePlayer* associated_player,
-                                   Online::OnlineProfile* associated_user,
+                                   NetworkPlayerProfile* associated_user,
                                    core::recti area, const int player_id,
                                    std::string kart_group,
                                    const int irrlicht_widget_id) : Widget(WTYPE_DIV)
@@ -195,6 +195,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
 
     m_model_view->addModel( kart_model.getModel(), Vec3(0,0,0),
                             Vec3(scale, scale, scale),
+                            kart_model.getBaseFrame(),
                             kart_model.getBaseFrame() );
     m_model_view->addModel( kart_model.getWheelModel(0),
                             kart_model.getWheelGraphicsPosition(0) );
@@ -343,7 +344,7 @@ void PlayerKartWidget::add()
     if (m_associated_player)
         name = m_associated_player->getProfile()->getName();
     if (m_associated_user)
-        name = m_associated_user->getUserName();
+        name = m_associated_user->getName();
     core::stringw label = translations->fribidize(name);
 
     if (m_parent_screen->m_multiplayer)

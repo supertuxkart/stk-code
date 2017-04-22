@@ -20,41 +20,54 @@
 #define GET_PUBLIC_ADDRESS_HPP
 
 #include "network/protocol.hpp"
+#include "network/transport_address.hpp"
+#include "utils/cpp2011.hpp"
 
 #include <string>
 
-class STKHost;
+class Network;
 
 class GetPublicAddress : public Protocol
 {
-    public:
-        GetPublicAddress();
-        virtual ~GetPublicAddress() {}
+private:
+    void createStunRequest();
+    std::string parseStunResponse();
 
-        virtual bool notifyEvent(Event* event) { return true; }
-        virtual bool notifyEventAsynchronous(Event* event) { return true; }
-        virtual void setup() { m_state = NOTHING_DONE; }
-        virtual void update() {}
-        virtual void asynchronousUpdate();
+    // Constants
+    static const uint32_t m_stun_magic_cookie;
+    static const int m_stun_server_port = 3478;
 
-    private:
-        void createStunRequest();
-        std::string parseStunResponse();
+    /** The user can specify its own IP address to make the use of stun
+     *  unnecessary (though that means that the user has to take care of
+     *  opening the firewall). */
+    static TransportAddress m_my_address;
+    enum State
+    {
+        NOTHING_DONE,
+        STUN_REQUEST_SENT,
+        EXITING
+    } m_state;
 
-        // Constants
-        static const uint32_t m_stun_magic_cookie;
-        static const int m_stun_server_port = 3478;
+    uint8_t m_stun_tansaction_id[12];
+    uint32_t m_stun_server_ip;
+    Network* m_transaction_host;
 
-        enum STATE
-        {
-            NOTHING_DONE,
-            STUN_REQUEST_SENT,
-            EXITING
-        };
-        STATE m_state;
-        uint8_t m_stun_tansaction_id[12];
-        uint32_t m_stun_server_ip;
-        STKHost* m_transaction_host;
-};
+public:
+    static void setMyIPAddress(const std::string &s);
+                GetPublicAddress(CallbackObject *callback = NULL);
+    virtual    ~GetPublicAddress() {}
+
+    virtual void asynchronousUpdate() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void update(float dt) OVERRIDE {}
+    // ------------------------------------------------------------------------
+    virtual bool notifyEvent(Event* event) OVERRIDE { return true; }
+    // ------------------------------------------------------------------------
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE { return true; }
+    // ------------------------------------------------------------------------
+    virtual void setup() { m_state = NOTHING_DONE; }
+    // ------------------------------------------------------------------------
+
+};   // class GetPublicAddress
 
 #endif // GET_PUBLIC_ADDRESS_HPP

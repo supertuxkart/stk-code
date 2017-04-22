@@ -44,6 +44,8 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /** A pointer to the track of which the info is shown. */
     Track *m_track;
 
+    bool m_record_this_race;
+
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
     /** Spinner for number of laps. */
@@ -52,8 +54,11 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /** Spinner for number of AI karts. */
     GUIEngine::SpinnerWidget* m_ai_kart_spinner;
 
-    /** Check box for reverse mode. */
-    GUIEngine::CheckBoxWidget* m_reverse;
+    /** Check box for reverse mode or random item in arena. */
+    GUIEngine::CheckBoxWidget* m_option;
+
+    /** Check box for record race. */
+    GUIEngine::CheckBoxWidget* m_record_race;
 
     /** The label of the highscore list. */
     GUIEngine::LabelWidget* m_highscore_label;

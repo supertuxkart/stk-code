@@ -975,8 +975,6 @@ bool CScriptArray::Less(const void *a, const void *b, bool asc, asIScriptContext
 	}
 	else
 	{
-		int r = 0;
-
 		if( subTypeId & asTYPEID_OBJHANDLE )
 		{
 			// Allow sort to work even if the array contains null handles
@@ -988,7 +986,7 @@ bool CScriptArray::Less(const void *a, const void *b, bool asc, asIScriptContext
 		if( cache && cache->cmpFunc )
 		{
 			// TODO: Add proper error handling
-			r = ctx->Prepare(cache->cmpFunc); assert(r >= 0);
+            int r = ctx->Prepare(cache->cmpFunc); assert(r >= 0);
 
 			if( subTypeId & asTYPEID_OBJHANDLE )
 			{

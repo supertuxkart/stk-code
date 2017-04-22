@@ -99,6 +99,8 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
 //------------------------------------------------------------------------------
 PlayerProfile::~PlayerProfile()
 {
+    delete m_story_mode_status;
+    delete m_achievements_status;
 #ifdef DEBUG
     m_magic_number = 0xDEADBEEF;
 #endif

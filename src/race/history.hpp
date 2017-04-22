@@ -77,26 +77,21 @@ private:
     std::vector<std::string>  m_kart_ident;
 
     void  allocateMemory(int number_of_frames);
-    void  updateSaving(float dt);
-    void  updateReplay(float dt);
 public:
           History        ();
     void  startReplay    ();
     void  initRecording  ();
-    void  update         (float dt);
     void  Save           ();
     void  Load           ();
+    void  updateSaving(float dt);
+    float updateReplayAndGetDT();
 
     // -------------------I-----------------------------------------------------
     /** Returns the identifier of the n-th kart. */
     const std::string& getKartIdent(unsigned int n)
     {
         return m_kart_ident[n];
-    }
-    // ------------------------------------------------------------------------
-    /** Returns the size of the next timestep. */
-    float getNextDelta   () const { return m_all_deltas[m_current];         }
-
+    }   // getKartIdent
     // ------------------------------------------------------------------------
     /** Returns if a history is replayed, i.e. the history mode is not none. */
     bool  replayHistory  () const { return m_replay_mode != HISTORY_NONE;    }

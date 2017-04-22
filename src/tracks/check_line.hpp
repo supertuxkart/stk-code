@@ -71,12 +71,17 @@ private:
     /** How much a kart is allowed to be over the minimum height of a
      *  quad and still considered to be able to cross it. */
     static const int m_over_min_height  = 4;
+protected:
+    const Vec3 &getLeftPoint() const { return m_left_point;  }
+    const Vec3 &getRightPoint() const { return m_right_point; }
+
 public:
                  CheckLine(const XMLNode &node, unsigned int index);
     virtual     ~CheckLine();
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                              unsigned int indx);
     virtual void reset(const Track &track);
+    virtual void resetAfterKartMove(unsigned int kart_index);
     virtual void changeDebugColor(bool is_active);
     /** Returns the actual line data for this checkpoint. */
     const core::line2df &getLine2D() const {return m_line;}

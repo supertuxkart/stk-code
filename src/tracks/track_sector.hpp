@@ -57,7 +57,7 @@ public:
           TrackSector();
     void  reset();
     void  rescue();
-    void  update(const Vec3 &xyz);
+    void  update(const Vec3 &xyz, bool ignore_vertical = false);
     float getRelativeDistanceToCenter() const;
     // ------------------------------------------------------------------------
     /** Returns how far the the object is from the start line. */

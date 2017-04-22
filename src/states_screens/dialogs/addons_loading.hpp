@@ -59,15 +59,15 @@ public:
 
    ~AddonsLoading();
 
-    virtual GUIEngine::EventPropagation processEvent(const std::string& event_source);
-    virtual void beforeAddingWidgets();
-    virtual void init();
+    virtual GUIEngine::EventPropagation processEvent(const std::string& event_source) OVERRIDE;
+    virtual void beforeAddingWidgets() OVERRIDE;
+    virtual void init() OVERRIDE;
     
     /** This function is called by the GUI, all the frame (or somthing like
      * that). It checks the flags (m_can_load_icon and
      *  and do the necessary.
      * */
-    void onUpdate(float delta);
+    void onUpdate(float delta) OVERRIDE;
     void voteClicked();
     virtual bool onEscapePressed() OVERRIDE;
     

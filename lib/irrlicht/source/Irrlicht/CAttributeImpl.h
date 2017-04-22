@@ -2028,7 +2028,7 @@ public:
 	{
 		u32 tmp;
 		sscanf(text, "0x%x", &tmp);
-		Value = (void *) tmp;
+		Value = reinterpret_cast<void *>(tmp);
 	}
 
 	virtual E_ATTRIBUTE_TYPE getType() const

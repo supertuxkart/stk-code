@@ -1,7 +1,7 @@
 uniform int layer;
 uniform mat4 ModelMatrix;
 
-#if __VERSION__ >= 330
+#ifdef Explicit_Attrib_Location_Usable
 layout(location = 0) in vec3 Position;
 layout(location = 3) in vec2 Texcoord;
 #else

@@ -20,6 +20,7 @@
 #define HEADER_CONFIRM_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
 
 /**
@@ -93,13 +94,13 @@ public:
     
     ~MessageDialog();
     
-    virtual void onEnterPressedInternal();
-    virtual void onUpdate(float dt);
-    virtual void load();
+    virtual void onEnterPressedInternal() OVERRIDE;
+    virtual void onUpdate(float dt) OVERRIDE;
+    virtual void load() OVERRIDE;
 
-    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    GUIEngine::EventPropagation processEvent(const std::string& eventSource) OVERRIDE;
 
-    virtual void loadedFromFile();
+    virtual void loadedFromFile() OVERRIDE;
 };
 
 

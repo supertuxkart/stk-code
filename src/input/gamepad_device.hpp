@@ -31,7 +31,7 @@ class GamepadConfig;
 class GamePadDevice : public InputDevice
 {
     void resetAxisDirection(const int axis, Input::AxisDirection direction);
-    bool m_buttonPressed[SEvent::SJoystickEvent::NUMBER_OF_BUTTONS];
+    bool* m_buttonPressed;
 
     Input::AxisDirection *m_prev_axis_directions;
 

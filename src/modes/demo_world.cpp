@@ -50,8 +50,8 @@ DemoWorld::DemoWorld()
     race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
     race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
     race_manager->setNumKarts(m_num_karts);
-    race_manager->setNumLocalPlayers(1);
-    race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+    race_manager->setNumPlayers(1);
+    race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
 
 }   // DemoWorld
 
@@ -137,7 +137,7 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
     }
 
     StateManager::get()->enterGameState();
-    race_manager->setNumLocalPlayers(1);
+    race_manager->setNumPlayers(1);
     InputDevice *device;
 
     // Use keyboard 0 by default in --no-start-screen
@@ -150,7 +150,7 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
 
     m_do_demo = true;
     race_manager->setNumKarts(m_num_karts);
-    race_manager->setLocalKartInfo(0, "tux");
+    race_manager->setPlayerKart(0, "tux");
     race_manager->setupPlayerKartInfo();
     race_manager->startSingleRace(m_demo_tracks[0], m_num_laps, false);
     m_demo_tracks.push_back(m_demo_tracks[0]);

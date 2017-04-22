@@ -20,12 +20,15 @@
 
 #include "graphics/stk_mesh.hpp"
 
-#include "graphics/shaders.hpp"
 #include "utils/ptr_vector.hpp"
+
+class RenderInfo;
 
 class STKMeshSceneNode : public irr::scene::CMeshSceneNode, public STKMeshCommon
 {
 protected:
+    PtrVector<RenderInfo> m_static_render_info;
+    bool m_got_animated_matrix;
     std::vector<GLMesh> GLmeshes;
     core::matrix4 ModelViewProjectionMatrix;
     core::vector3df windDir;
@@ -33,7 +36,7 @@ protected:
 
     // Misc passes shaders (glow, displace...)
     void drawGlow(const GLMesh &mesh);
-    void createGLMeshes();
+    void createGLMeshes(RenderInfo* render_info = NULL, bool all_parts_colorized = false);
     void cleanGLMeshes();
     void setFirstTimeMaterial();
     void updatevbo();
@@ -54,23 +57,14 @@ public:
         const irr::core::vector3df& position = irr::core::vector3df(0, 0, 0),
         const irr::core::vector3df& rotation = irr::core::vector3df(0, 0, 0),
         const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f),
-        bool createGLMeshes = true);
+        bool createGLMeshes = true,
+        RenderInfo* render_info = NULL, bool all_parts_colorized = false);
     virtual void render();
     virtual void setMesh(irr::scene::IMesh* mesh);
     virtual void OnRegisterSceneNode();
     virtual ~STKMeshSceneNode();
     virtual bool isImmediateDraw() const { return immediate_draw; }
-    void setIsDisplacement(bool v) {
-        isDisplacement = v;
-        for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
-        {
-            scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-            if (!mb)
-                continue;
-            if (isDisplacement)
-                mb->getMaterial().MaterialType = Shaders::getShader(ES_DISPLACE);
-        }
-    }
+    void setIsDisplacement(bool v);
     virtual bool glow() const { return isGlow; }
     void setGlowColors(const video::SColor &c) { isGlow = true; glowcolor = c; }
     video::SColor getGlowColor() const { return glowcolor; }

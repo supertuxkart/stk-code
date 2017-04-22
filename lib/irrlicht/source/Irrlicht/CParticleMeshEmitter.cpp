@@ -27,7 +27,7 @@ CParticleMeshEmitter::CParticleMeshEmitter(
 	MinParticlesPerSecond(minParticlesPerSecond), MaxParticlesPerSecond(maxParticlesPerSecond),
 	MinStartColor(minStartColor), MaxStartColor(maxStartColor),
 	MinLifeTime(lifeTimeMin), MaxLifeTime(lifeTimeMax),
-	Time(0), Emitted(0), MaxAngleDegrees(maxAngleDegrees),
+	Time(0), MaxAngleDegrees(maxAngleDegrees),
 	EveryMeshVertex(everyMeshVertex), UseNormalDirection(useNormalDirection)
 {
 	#ifdef _DEBUG

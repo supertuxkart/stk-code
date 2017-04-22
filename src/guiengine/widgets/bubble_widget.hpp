@@ -69,7 +69,7 @@ namespace GUIEngine
 
         void setText(const irr::core::stringw &s);
 
-
+        virtual int getHeightNeededAroundLabel() const { return 10; }
     };
 
 }

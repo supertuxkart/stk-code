@@ -112,7 +112,6 @@ private:
 	s32 MaxAngleDegrees;
 
 	u32 Time;
-	u32 Emitted;
 };
 
 } // end namespace scene

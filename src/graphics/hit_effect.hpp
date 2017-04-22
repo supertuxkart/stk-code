@@ -34,11 +34,11 @@ class HitEffect: public NoCopy
 private:
     /** True if this effect affected a player kart. Used to play certain SFX
      *  less loud if only an AI is hit. */
-    bool m_player_kart_hit;
+    bool m_local_player_kart_hit;
 
 public:
                  /** Constructor for a hit effect. */
-                 HitEffect() {m_player_kart_hit = false; }
+                 HitEffect() {m_local_player_kart_hit = false; }
     virtual     ~HitEffect() {}
     /** Updates a hit effect. Called once per frame.
      *  \param dt Time step size.
@@ -49,10 +49,10 @@ public:
     /** Sets that this SFX affects a player kart, which can be used to
      *  make certain sfx louder/less loud. Default is that the affect
      *  does not affect a player kart. */
-    virtual void setPlayerKartHit() { m_player_kart_hit = true; }
+    virtual void setLocalPlayerKartHit() { m_local_player_kart_hit = true; }
     // ------------------------------------------------------------------------
     /** Returns if this effect affects a player kart. */
-    bool getPlayerKartHit() const { return m_player_kart_hit; }
+    bool getLocalPlayerKartHit() const { return m_local_player_kart_hit; }
 };   // HitEffect
 
 #endif

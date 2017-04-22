@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -53,7 +53,6 @@ asCTypeInfo::asCTypeInfo()
 	isExplicitHandle      = false;
 	qwordValue            = 0;
 	isLValue              = false;
-	isVoidExpression      = false;
 	isRefToLocal          = false;
 }
 
@@ -68,7 +67,6 @@ void asCTypeInfo::Set(const asCDataType &dt)
 	isExplicitHandle = false;
 	qwordValue       = 0;
 	isLValue         = false;
-	isVoidExpression = false;
 	isRefToLocal     = false;
 }
 
@@ -135,6 +133,18 @@ void asCTypeInfo::SetUndefinedFuncHandle(asCScriptEngine *engine)
 	isLValue         = false;
 }
 
+bool asCTypeInfo::IsUndefinedFuncHandle() const
+{
+	if( isConstant == false ) return false;
+	if( qwordValue == 0 ) return false;
+	if( isLValue ) return false;
+	if( dataType.GetObjectType() == 0 ) return false;
+	if( dataType.GetObjectType()->name != "$func" ) return false;
+	if( dataType.GetFuncDef() ) return false;
+
+	return true;
+}
+
 void asCTypeInfo::SetNullConstant()
 {
 	Set(asCDataType::CreateNullHandle());
@@ -153,17 +163,19 @@ bool asCTypeInfo::IsNullConstant() const
 	return false;
 }
 
-void asCTypeInfo::SetVoidExpression()
+void asCTypeInfo::SetVoid()
 {
 	Set(asCDataType::CreatePrimitive(ttVoid, false));
 	isLValue = false;
-	isConstant = false;
-	isVoidExpression = true;
+	isConstant = true;
 }
 
-bool asCTypeInfo::IsVoidExpression() const
+bool asCTypeInfo::IsVoid() const
 {
-	return isVoidExpression;
+	if( dataType.GetTokenType() == ttVoid )
+		return true;
+
+	return false;
 }
 
 void asCTypeInfo::SetDummy()

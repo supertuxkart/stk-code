@@ -41,9 +41,11 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound, const char 
     m_remaining_time  = burst_time;
     m_emission_frames = 0;
 
+#ifndef SERVER_ONLY
     ParticleKindManager* pkm = ParticleKindManager::get();
     ParticleKind* particles = pkm->getParticles(particle_file);
     m_emitter = new ParticleEmitter(particles, coord,  NULL);
+#endif
 }   // Explosion
 
 //-----------------------------------------------------------------------------
@@ -51,10 +53,12 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound, const char 
  */
 Explosion::~Explosion()
 {
+#ifndef SERVER_ONLY
     if(m_emitter)
     {
         delete m_emitter;
     }
+#endif
 }   // ~Explosion
 
 //-----------------------------------------------------------------------------
@@ -71,6 +75,7 @@ bool Explosion::updateAndDelete(float dt)
     m_emission_frames++;
     m_remaining_time -= dt;
 
+#ifndef SERVER_ONLY
     if (m_remaining_time < 0.0f && m_remaining_time >= -explosion_time)
     {
         scene::ISceneNode* node = m_emitter->getNode();
@@ -88,7 +93,7 @@ bool Explosion::updateAndDelete(float dt)
         node->getMaterial(0).DiffuseColor.setRed(intensity);
         node->getMaterial(0).EmissiveColor.setRed(intensity);
     }
-
+#endif
 
     // Do nothing more if the animation is still playing
     if (m_remaining_time>0) return false;
@@ -98,6 +103,7 @@ bool Explosion::updateAndDelete(float dt)
     // object is removed.
     if (m_remaining_time > -explosion_time)
     {
+#ifndef SERVER_ONLY
         // if framerate is very low, emit for at least a few frames, in case
         // burst time is lower than the time of 1 frame
         if (m_emission_frames > 2)
@@ -106,6 +112,7 @@ bool Explosion::updateAndDelete(float dt)
             m_emitter->getNode()->getEmitter()->setMinParticlesPerSecond(0);
             m_emitter->getNode()->getEmitter()->setMaxParticlesPerSecond(0);
         }
+#endif
     }
     else
     {

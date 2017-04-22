@@ -19,6 +19,7 @@
 #include "items/attachment_manager.hpp"
 
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
 

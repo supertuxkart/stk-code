@@ -21,7 +21,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -67,8 +67,10 @@ void TrackInfoScreen::loadedFromFile()
 {
     m_lap_spinner     = getWidget<SpinnerWidget>("lap-spinner");
     m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
-    m_reverse         = getWidget<CheckBoxWidget>("reverse");
-    m_reverse->setState(false);
+    m_option          = getWidget<CheckBoxWidget>("option");
+    m_record_race     = getWidget<CheckBoxWidget>("record");
+    m_option->setState(false);
+    m_record_race->setState(false);
 
     m_highscore_label = getWidget<LabelWidget>("highscores");
 
@@ -97,8 +99,11 @@ void TrackInfoScreen::setTrack(Track *track)
  */
 void TrackInfoScreen::init()
 {
-    const bool has_laps       = race_manager->modeHasLaps();
-    const bool has_highscores = race_manager->modeHasHighscores();
+    m_record_this_race = false;
+
+    const int max_arena_players = m_track->getMaxArenaPlayers();
+    const bool has_laps         = race_manager->modeHasLaps();
+    const bool has_highscores   = race_manager->modeHasHighscores();
 
     getWidget<LabelWidget>("name")->setText(translations->fribidize(m_track->getName()), false);
 
@@ -106,6 +111,14 @@ void TrackInfoScreen::init()
     //I18N: (place %s where the name of the author should appear)
     getWidget<LabelWidget>("author")->setText( _("Track by %s", m_track->getDesigner()),
                                                false );
+
+    LabelWidget* max_players = getWidget<LabelWidget>("max-arena-players");
+    max_players->setVisible(m_track->isArena());
+    if (m_track->isArena())
+    {
+        //I18N: the max players supported by an arena.
+        max_players->setText( _("Max players supported: %d", max_arena_players), false );
+    }
 
     // ---- Track screenshot
     GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
@@ -115,14 +128,13 @@ void TrackInfoScreen::init()
     // temporary icon, will replace it just after (but it will be shown if the given icon is not found)
     screenshot->m_properties[PROP_ICON] = "gui/main_help.png";
 
-    ITexture* image = irr_driver->getTexture(m_track->getScreenshotFile(),
-                                    "While loading screenshot for track '%s':",
-                                           m_track->getFilename()            );
+    ITexture* image = STKTexManager::getInstance()
+        ->getTexture(m_track->getScreenshotFile(),
+        "While loading screenshot for track '%s':", m_track->getFilename());
     if(!image)
     {
-        image = irr_driver->getTexture("main_help.png",
-                                    "While loading screenshot for track '%s':",
-                                    m_track->getFilename());
+        image = STKTexManager::getInstance()->getTexture("main_help.png",
+            "While loading screenshot for track '%s':", m_track->getFilename());
     }
     if (image != NULL)
         screenshot->setImage(image);
@@ -143,7 +155,12 @@ void TrackInfoScreen::init()
 
     // Number of AIs
     // -------------
-    const bool has_AI = race_manager->hasAI();
+    const int local_players = race_manager->getNumLocalPlayers();
+    const bool has_AI =
+        (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
+         race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ?
+         m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
+         race_manager->hasAI());
     m_ai_kart_spinner->setVisible(has_AI);
     getWidget<LabelWidget>("ai-text")->setVisible(has_AI);
     if (has_AI)
@@ -152,33 +169,84 @@ void TrackInfoScreen::init()
 
         // Avoid negative numbers (which can happen if e.g. the number of karts
         // in a previous race was lower than the number of players now.
-        int num_ai = UserConfigParams::m_num_karts - race_manager->getNumLocalPlayers();
+        int num_ai = UserConfigParams::m_num_karts - local_players;
         if (num_ai < 0) num_ai = 0;
         m_ai_kart_spinner->setValue(num_ai);
-        race_manager->setNumKarts(num_ai + race_manager->getNumLocalPlayers());
-        m_ai_kart_spinner->setMax(stk_config->m_max_karts - race_manager->getNumLocalPlayers());
+        race_manager->setNumKarts(num_ai + local_players);
+        // Set the max karts supported based on the battle arena selected
+        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
+           race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
+        {
+            m_ai_kart_spinner->setMax(max_arena_players - local_players);
+        }
+        else
+            m_ai_kart_spinner->setMax(stk_config->m_max_karts - local_players);
         // A ftl reace needs at least three karts to make any sense
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
-            m_ai_kart_spinner->setMin(3-race_manager->getNumLocalPlayers());
+            m_ai_kart_spinner->setMin(3 - local_players);
         }
+        // Make sure in battle and soccer mode at least 1 ai for single player
+        else if((race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
+            race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER) &&
+            local_players == 1 &&
+            !UserConfigParams::m_artist_debug_mode)
+            m_ai_kart_spinner->setMin(1);
         else
             m_ai_kart_spinner->setMin(0);
 
     }   // has_AI
+    else
+        race_manager->setNumKarts(local_players);
 
-    // Reverse track
+    // Reverse track or random item in arena
     // -------------
     const bool reverse_available = m_track->reverseAvailable() &&
                race_manager->getMinorMode() != RaceManager::MINOR_MODE_EASTER_EGG;
-    m_reverse->setVisible(reverse_available);
-    getWidget<LabelWidget>("reverse-text")->setVisible(reverse_available);
+    const bool random_item = m_track->hasNavMesh();
+
+    m_option->setVisible(reverse_available || random_item);
+    getWidget<LabelWidget>("option-text")->setVisible(reverse_available || random_item);
     if (reverse_available)
     {
-        m_reverse->setState(race_manager->getReverseTrack());
+        //I18N: In the track info screen
+        getWidget<LabelWidget>("option-text")->setText(_("Drive in reverse"), false);
+    }
+    else if (random_item)
+    {
+        //I18N: In the track info screen
+        getWidget<LabelWidget>("option-text")->setText(_("Random item location"), false);
+    }
+
+    if (reverse_available)
+    {
+        m_option->setState(race_manager->getReverseTrack());
     }
     else
-        m_reverse->setState(false);
+        m_option->setState(false);
+
+    // Record race or not
+    // -------------
+    const bool record_available = race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL;
+    m_record_race->setVisible(record_available);
+    getWidget<LabelWidget>("record-race-text")->setVisible(record_available);
+    if (race_manager->isRecordingRace())
+    {
+        // isRecordingRace() is true when it's pre-set by ghost replay selection
+        // which force record this race
+        m_record_this_race = true;
+        m_record_race->setState(true);
+        m_record_race->setActive(false);
+        m_ai_kart_spinner->setValue(0);
+        m_ai_kart_spinner->setActive(false);
+        race_manager->setNumKarts(race_manager->getNumLocalPlayers());
+        UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers();
+    }
+    else if (record_available)
+    {
+        m_record_race->setActive(true);
+        m_record_race->setState(false);
+    }
 
     // ---- High Scores
     m_highscore_label->setVisible(has_highscores);
@@ -242,7 +310,8 @@ void TrackInfoScreen::updateHighScores()
             if (prop != NULL)
             {
                 const std::string &icon_path = prop->getAbsoluteIconFile();
-                ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
+                ITexture* kart_icon_texture =
+                    STKTexManager::getInstance()->getTexture( icon_path );
                 m_kart_icons[n]->setImage(kart_icon_texture);
             }
             line = name + "\t" + core::stringw(time_string.c_str());
@@ -252,9 +321,9 @@ void TrackInfoScreen::updateHighScores()
             //I18N: for empty highscores entries
             line = _("(Empty)");
 
-            ITexture* no_kart_texture = irr_driver->getTexture(
-                                 file_manager->getAsset(FileManager::GUI,
-                                                        "random_kart.png") );
+            ITexture* no_kart_texture =
+                STKTexManager::getInstance()->getTexture
+                (file_manager->getAsset(FileManager::GUI, "random_kart.png"));
             m_kart_icons[n]->setImage(no_kart_texture);
 
         }
@@ -269,16 +338,40 @@ void TrackInfoScreen::updateHighScores()
 void TrackInfoScreen::onEnterPressedInternal()
 {
 
+    race_manager->setRecordRace(m_record_this_race);
     // Create a copy of member variables we still need, since they will
     // not be accessible after dismiss:
     const int num_laps = race_manager->modeHasLaps() ? m_lap_spinner->getValue()
                                                      : -1;
-    const bool reverse_track = m_reverse == NULL ? false
-                                                 : m_reverse->getState();
+    const bool option_state = m_option == NULL ? false
+                                               : m_option->getState();
     // Avoid negative lap numbers (after e.g. easter egg mode).
     if(num_laps>=0)
         m_track->setActualNumberOfLaps(num_laps);
-    race_manager->setReverseTrack(reverse_track);
+
+    if(m_track->hasNavMesh())
+        UserConfigParams::m_random_arena_item = option_state;
+    else
+        race_manager->setReverseTrack(option_state);
+
+    // Avoid invaild Ai karts number during switching game modes
+    const int max_arena_players = m_track->getMaxArenaPlayers();
+    const int local_players = race_manager->getNumLocalPlayers();
+    const bool has_AI =
+        (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
+         race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ?
+         m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
+         race_manager->hasAI());
+
+    int num_ai = 0;
+    if (has_AI)
+       num_ai = m_ai_kart_spinner->getValue();
+
+    if (UserConfigParams::m_num_karts != (local_players + num_ai))
+    {
+        race_manager->setNumKarts(local_players + num_ai);
+        UserConfigParams::m_num_karts = local_players + num_ai;
+    }
 
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
@@ -303,12 +396,36 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     {
         StateManager::get()->escapePressed();
     }
-    else if (name == "reverse")
+    else if (name == "option")
     {
-        race_manager->setReverseTrack(m_reverse->getState());
-        // Makes sure the highscores get swapped when clicking the 'reverse'
-        // checkbox.
-        updateHighScores();
+        if (m_track->hasNavMesh())
+        {
+            UserConfigParams::m_random_arena_item = m_option->getState();
+        }
+        else
+        {
+            race_manager->setReverseTrack(m_option->getState());
+            // Makes sure the highscores get swapped when clicking the 'reverse'
+            // checkbox.
+            updateHighScores();
+        }
+    }
+    else if (name == "record")
+    {
+        const bool record = m_record_race->getState();
+        m_record_this_race = record;
+        m_ai_kart_spinner->setValue(0);
+        // Disable AI when recording ghost race
+        if (record)
+        {
+            m_ai_kart_spinner->setActive(false);
+            race_manager->setNumKarts(race_manager->getNumLocalPlayers());
+            UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers();
+        }
+        else
+        {
+            m_ai_kart_spinner->setActive(true);
+        }
     }
     else if (name == "lap-spinner")
     {

@@ -56,7 +56,7 @@ class CreditsScreen : public GUIEngine::Screen,
 
     friend class GUIEngine::ScreenSingleton<CreditsScreen>;
     CreditsScreen();
-    bool getWideLine(std::ifstream& file, core::stringw* out);
+    bool getLineAsWide(std::ifstream& file, core::stringw* out);
 
     bool m_is_victory_music;
 
@@ -84,7 +84,7 @@ public:
 
     void setVictoryMusic(bool isVictory) { m_is_victory_music = isVictory; }
 
-    virtual MusicInformation* getMusic() const
+    virtual MusicInformation* getMusic() const OVERRIDE
     {
         if (m_is_victory_music)
             return music_manager->getMusicInformation("win_theme.music");

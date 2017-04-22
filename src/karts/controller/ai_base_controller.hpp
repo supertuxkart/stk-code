@@ -20,11 +20,8 @@
 #define HEADER_AI_BASE_CONTROLLER_HPP
 
 #include "karts/controller/controller.hpp"
-#include "states_screens/state_manager.hpp"
 
 class AIProperties;
-class LinearWorld;
-class QuadGraph;
 class Track;
 class Vec3;
 
@@ -42,9 +39,10 @@ private:
 
     /** A flag that is set during the physics processing to indicate that
     *  this kart is stuck and needs to be rescued. */
-    bool m_stuck_trigger_rescue;
+    bool m_stuck;
 
 protected:
+
     /** Length of the kart, storing it here saves many function calls. */
     float m_kart_length;
 
@@ -52,69 +50,55 @@ protected:
     float m_kart_width;
 
     /** Keep a pointer to the track to reduce calls */
-    Track       *m_track;
-
-    /** Keep a pointer to world. */
-    LinearWorld *m_world;
+    Track *m_track;
 
     /** A pointer to the AI properties for this kart. */
     const AIProperties *m_ai_properties;
 
-    /** The current node the kart is on. This can be different from the value
-     *  in LinearWorld, since it takes the chosen path of the AI into account
-     *  (e.g. the closest point in LinearWorld might be on a branch not
-     *  chosen by the AI). */
-    int   m_track_node;
+    static bool m_ai_debug;
 
-    /** Which of the successors of a node was selected by the AI. */
-    std::vector<int> m_successor_index;
-    /** For each node in the graph this list contains the chosen next node.
-     *  For normal lap track without branches we always have
-     *  m_next_node_index[i] = (i+1) % size;
-     *  but if a branch is possible, the AI will select one option here.
-     *  If the node is not used, m_next_node_index will be -1. */
-    std::vector<int> m_next_node_index;
-    /** For each graph node this list contains a list of the next X
-     *  graph nodes. */
-    std::vector<std::vector<int> > m_all_look_aheads;
+    /** Stores the '--test-ai=n' command line parameter:
+     *  It indicates which fraction of the AIs are going to
+     *  be the test AI: 1 means only to use the TestAI,
+     *  2 means every second AI will be test etc. Used
+     *  for AI testing only. */
+    static int m_test_ai;
 
-    virtual void update      (float delta) ;
-    virtual unsigned int getNextSector(unsigned int index);
-    virtual void  newLap             (int lap);
-    virtual void setControllerName(const std::string &name);
-    virtual void setSteering   (float angle, float dt);
-    float    steerToAngle  (const unsigned int sector, const float angle);
-    float    steerToPoint  (const Vec3 &point);
-    float    normalizeAngle(float angle);
-    void     computePath();
-    virtual bool doSkid(float steer_fraction);
-    // ------------------------------------------------------------------------
-    /** Nothing special to do when the race is finished. */
-    virtual void raceFinished() {};
+    void         setControllerName(const std::string &name);
+    float        steerToPoint(const Vec3 &point);
+    float        normalizeAngle(float angle);
     // ------------------------------------------------------------------------
     /** This can be called to detect if the kart is stuck (i.e. repeatedly
     *  hitting part of the track). */
-    bool     isStuck() const { return m_stuck_trigger_rescue; }
+    bool         isStuck() const { return m_stuck; }
+    void         determineTurnRadius(const Vec3 &end, Vec3 *center,
+                                     float *radius) const;
+    virtual void update      (float delta);
+    virtual void setSteering   (float angle, float dt);
+    // ------------------------------------------------------------------------
+    /** Return true if AI can skid now. */
+    virtual bool canSkid(float steer_fraction) = 0;
 
-    static bool m_ai_debug;
 public:
-             AIBaseController(AbstractKart *kart,
-                              StateManager::ActivePlayer *player=NULL);
+             AIBaseController(AbstractKart *kart);
     virtual ~AIBaseController() {};
     virtual void reset();
-    static void enableDebug() {m_ai_debug = true; }
-    virtual void crashed(const AbstractKart *k) {};
+    virtual bool disableSlipstreamBonus() const;
     virtual void crashed(const Material *m);
+    static  void enableDebug() {m_ai_debug = true; }
+    static  void setTestAI(int n) {m_test_ai = n; }
+    static  int  getTestAI() { return m_test_ai; }
+    virtual void crashed(const AbstractKart *k) {};
     virtual void handleZipper(bool play_sound) {};
     virtual void finishedRace(float time) {};
     virtual void collectedItem(const Item &item, int add_info=-1,
                                float previous_energy=0) {};
     virtual void setPosition(int p) {};
-    virtual bool isNetworkController() const { return false; }
     virtual bool isPlayerController() const { return false; }
+    virtual bool isLocalPlayerController() const { return false; }
     virtual void action(PlayerAction action, int value) {};
-    virtual void  skidBonusTriggered() {};
-    virtual bool  disableSlipstreamBonus() const;
+    virtual void skidBonusTriggered() {};
+
 };   // AIBaseController
 
 #endif

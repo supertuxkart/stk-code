@@ -36,6 +36,7 @@ namespace Online
     class OnlineProfile;
 }
 
+class FocusDispatcher;
 class InputDevice;
 class KartHoverListener;
 
@@ -79,6 +80,8 @@ protected:
     /** Message shown in multiplayer mode */
     GUIEngine::BubbleWidget* m_multiplayer_message;
 
+    FocusDispatcher  *m_dispatcher;
+
     KartSelectionScreen(const char* filename);
 
     /** Called when all players selected their kart */
@@ -107,8 +110,9 @@ protected:
     void updateKartStats(uint8_t widget_id,
                          const std::string& selection);
 
-    /** updates model of a kart widget, to have the good selection when the user validates */
-    void updateKartWidgetModel(uint8_t widget_id,
+    /** updates model of a kart widget, to have the good selection when the
+     *  user validates */
+    void updateKartWidgetModel(int widget_id,
                 const std::string& selection,
                 const irr::core::stringw& selectionText);
 

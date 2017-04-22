@@ -6,7 +6,7 @@ uniform vec3 col;
 out vec4 FragColor;
 
 
-vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
+#stk_include "utils/getPosFromUVDepth.frag"
 
 void main()
 {

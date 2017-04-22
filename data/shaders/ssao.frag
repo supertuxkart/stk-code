@@ -3,8 +3,8 @@
 
 uniform sampler2D dtex;
 uniform float radius;
-uniform float k = 1.5;
-uniform float sigma = 1.;
+uniform float k;
+uniform float sigma;
 out float AO;
 
 const float tau = 7.;
@@ -12,14 +12,13 @@ const float beta = 0.002;
 const float epsilon = .00001;
 
 #define SAMPLES 16
-
-const float invSamples = 1. / SAMPLES;
+const float invSamples = 0.0625; // 1. / SAMPLES
 
 vec3 getXcYcZc(int x, int y, float zC)
 {
     // We use perspective symetric projection matrix hence P(0,2) = P(1, 2) = 0
-    float xC= (2 * (float(x)) / screen.x - 1.) * zC / ProjectionMatrix[0][0];
-    float yC= (2 * (float(y)) / screen.y - 1.) * zC / ProjectionMatrix[1][1];
+    float xC= (2. * (float(x)) / screen.x - 1.) * zC / ProjectionMatrix[0][0];
+    float yC= (2. * (float(y)) / screen.y - 1.) * zC / ProjectionMatrix[1][1];
     return vec3(xC, yC, zC);
 }
 
@@ -36,16 +35,16 @@ void main(void)
     vec3 norm = normalize(cross(ddy, ddx));
 
     float r = radius / FragPos.z;
-    float phi = 3. * (x ^ y) + x * y;
+    float phi = 3. * float((x ^ y) + x * y);
     float bl = 0.0;
-    float m = log2(r) + 6 + log2(invSamples);
+    float m = log2(r) + 6. + log2(invSamples);
 
-    float theta = 2. * 3.14 * tau * .5 * invSamples + phi;
+    float theta = mod(2. * 3.14 * tau * .5 * invSamples + phi, 6.283185307179586);
     vec2 rotations = vec2(cos(theta), sin(theta)) * screen;
     vec2 offset = vec2(cos(invSamples), sin(invSamples));
 
     for(int i = 0; i < SAMPLES; ++i) {
-        float alpha = (i + .5) * invSamples;
+        float alpha = (float(i) + .5) * invSamples;
         rotations = vec2(rotations.x * offset.x - rotations.y * offset.y, rotations.x * offset.y + rotations.y * offset.x);
         float h = r * alpha;
         vec2 localoffset = h * rotations;
@@ -53,13 +52,13 @@ void main(void)
         m = m + .5;
         ivec2 ioccluder_uv = ivec2(x, y) + ivec2(localoffset);
 
-        if (ioccluder_uv.x < 0 || ioccluder_uv.x > screen.x || ioccluder_uv.y < 0 || ioccluder_uv.y > screen.y) continue;
+        if (ioccluder_uv.x < 0 || ioccluder_uv.x > int(screen.x) || ioccluder_uv.y < 0 || ioccluder_uv.y > int(screen.y)) continue;
 
         float LinearoccluderFragmentDepth = textureLod(dtex, vec2(ioccluder_uv) / screen, max(m, 0.)).x;
         vec3 OccluderPos = getXcYcZc(ioccluder_uv.x, ioccluder_uv.y, LinearoccluderFragmentDepth);
 
         vec3 vi = OccluderPos - FragPos;
-        bl += max(0, dot(vi, norm) - FragPos.z * beta) / (dot(vi, vi) + epsilon);
+        bl += max(0., dot(vi, norm) - FragPos.z * beta) / (dot(vi, vi) + epsilon);
     }
 
     AO = max(pow(1.0 - min(2. * sigma * bl * invSamples, 0.99), k), 0.);

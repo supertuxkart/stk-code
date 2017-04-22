@@ -28,13 +28,15 @@
 
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/stars.hpp"
 #include "io/xml_node.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/explosion_animation.hpp"
-#include "modes/world.hpp"
+#include "modes/linear_world.hpp"
+#include "modes/soccer_world.hpp"
 #include "physics/physics.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -74,6 +76,7 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
     m_max_lifespan = -1;
 
     // Add the graphical model
+#ifndef SERVER_ONLY
     setNode(irr_driver->addMesh(m_st_model[type], StringUtils::insertValues("flyable_%i", (int)type)));
     irr_driver->applyObjectPassShader(getNode());
 #ifdef DEBUG
@@ -81,7 +84,7 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
     debug_name += type;
     getNode()->setName(debug_name.c_str());
 #endif
-
+#endif
 }   // Flyable
 
 // ----------------------------------------------------------------------------
@@ -100,7 +103,7 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
  */
 void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
                             btCollisionShape *shape,
-                            float restitution, const float gravity,
+                            float restitution, const btVector3& gravity,
                             const bool rotates, const bool turn_around,
                             const btTransform* custom_direction)
 {
@@ -111,8 +114,8 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
     // Apply offset
     btTransform offset_transform;
     offset_transform.setIdentity();
-    assert(!isnan(m_average_height));
-    assert(!isnan(forw_offset));
+    assert(!std::isnan(m_average_height));
+    assert(!std::isnan(forw_offset));
     offset_transform.setOrigin(Vec3(0,m_average_height,forw_offset));
 
     // turn around
@@ -130,9 +133,9 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
     m_shape = shape;
     createBody(m_mass, trans, m_shape, restitution);
     m_user_pointer.set(this);
-    World::getWorld()->getPhysics()->addBody(getBody());
+    Physics::getInstance()->addBody(getBody());
 
-    m_body->setGravity(btVector3(0.0f, gravity, 0));
+    m_body->setGravity(gravity);
 
     // Rotate velocity to point in the right direction
     btVector3 v=trans.getBasis()*velocity;
@@ -141,16 +144,16 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
     {
 #ifdef DEBUG
         // Just to get some additional information if the assert is triggered
-        if(isnan(v.getX()) || isnan(v.getY()) || isnan(v.getZ()))
+        if(std::isnan(v.getX()) || std::isnan(v.getY()) || std::isnan(v.getZ()))
         {
             Log::debug("[Flyable]", "vel %f %f %f v %f %f %f",
                         velocity.getX(),velocity.getY(),velocity.getZ(),
                         v.getX(),v.getY(),v.getZ());
         }
 #endif
-        assert(!isnan(v.getX()));
-        assert(!isnan(v.getY()));
-        assert(!isnan(v.getZ()));
+        assert(!std::isnan(v.getX()));
+        assert(!std::isnan(v.getY()));
+        assert(!std::isnan(v.getZ()));
         m_body->setLinearVelocity(v);
         if(!rotates) m_body->setAngularFactor(0.0f);   // prevent rotations
     }
@@ -196,7 +199,7 @@ void Flyable::init(const XMLNode &node, scene::IMesh *model,
 Flyable::~Flyable()
 {
     if(m_shape) delete m_shape;
-    World::getWorld()->getPhysics()->removeBody(getBody());
+    Physics::getInstance()->removeBody(getBody());
 }   // ~Flyable
 
 //-----------------------------------------------------------------------------
@@ -226,6 +229,16 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
         if(kart->isEliminated() || kart == m_owner ||
             kart->isInvulnerable()                 ||
             kart->getKartAnimation()                   ) continue;
+
+        const SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+        if (sw)
+        {
+            // Don't hit teammates in soccer world
+            if (sw->getKartTeam(kart->getWorldKartId()) == sw
+                ->getKartTeam(m_owner->getWorldKartId()))
+            continue;
+        }
+
         btTransform t=kart->getTrans();
 
         Vec3 delta      = t.getOrigin()-trans_projectile.getOrigin();
@@ -285,58 +298,59 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
                                              float *fire_angle,
                                              float *up_velocity)
 {
-    Vec3 relative_target_kart_loc = target_kart->getXYZ() - origin;
-
+    // Transform the target into the firing kart's frame of reference
+    btTransform inv_trans = m_owner->getTrans().inverse();
+    
+    Vec3 relative_target_kart_loc = inv_trans(target_kart->getXYZ());
+    
+    // Find the direction target is moving in
     btTransform trans = target_kart->getTrans();
     Vec3 target_direction(trans.getBasis().getColumn(2));
 
-    float dx = relative_target_kart_loc.getX();
-    float dy = relative_target_kart_loc.getY();
-    float dz = relative_target_kart_loc.getZ();
+    // Now rotate it to the firing kart's frame of reference
+    btQuaternion inv_rotate = inv_trans.getRotation();
+    target_direction = 
+        target_direction.rotate(inv_rotate.getAxis(), inv_rotate.getAngle());
+    
+    // Now we try to find the angle to aim at to hit the target. 
+    // Warning : Funky math stuff going on below. To understand, see answer by 
+    // Jeffrey Hantin here : 
+    // http://stackoverflow.com/questions/2248876/2d-game-fire-at-a-moving-target-by-predicting-intersection-of-projectile-and-u
+    
+    float target_x_speed = target_direction.getX()*target_kart->getSpeed();
+    float target_z_speed = target_direction.getZ()*target_kart->getSpeed();
+    float target_y_speed = target_direction.getY()*target_kart->getSpeed();
 
-    float gy = target_direction.getY();
+    float a = (target_x_speed*target_x_speed) + (target_z_speed*target_z_speed) -
+                (item_XZ_speed*item_XZ_speed);
+    float b = 2 * (target_x_speed * (relative_target_kart_loc.getX())
+                    + target_z_speed * (relative_target_kart_loc.getZ()));
+    float c = relative_target_kart_loc.getX()*relative_target_kart_loc.getX()
+                + relative_target_kart_loc.getZ()*relative_target_kart_loc.getZ();
+    
+    float discriminant = b*b - 4 * a*c;
+    if (discriminant < 0) discriminant = 0;
 
-    //Projected onto X-Z plane
-    float target_kart_speed = target_direction.length_2d()
-                            * target_kart->getSpeed();
-
-    float target_kart_heading = target_kart->getHeading();
-
-    float dist = -(target_kart_speed / item_XZ_speed)
-               * (dx * cosf(target_kart_heading) -
-                  dz * sinf(target_kart_heading)   );
-
-    float fire_th = (dx*dist - dz * sqrtf(dx*dx + dz*dz - dist*dist))
-                  / (dx*dx + dz*dz);
-    if(fire_th>1)
-        fire_th = 1.0f;
-    else if (fire_th<-1.0f)
-        fire_th = -1.0f;
-    fire_th = (((dist - dx*fire_th) / dz > 0) ? -acosf(fire_th)
-                                              :  acosf(fire_th));
-
-    float time = 0.0f;
-    float a = item_XZ_speed     * sinf (fire_th)
-            + target_kart_speed * sinf (target_kart_heading);
-    float b = item_XZ_speed     * cosf (fire_th)
-            + target_kart_speed * cosf (target_kart_heading);
-
-    if (fabsf(a) > fabsf(b)) time = fabsf (dx / a);
-    else if (b != 0.0f)      time = fabsf(dz / b);
-
-    if (fire_th > M_PI)
-        fire_th -= M_PI;
-    else
-        fire_th += M_PI;
+    float t1 = (-b + sqrt(discriminant)) / (2 * a);
+    float t2 = (-b - sqrt(discriminant)) / (2 * a);
+    float time;
+    if (t1 >= 0 && t1<t2) time = t1;
+    else time = t2;
 
     //createPhysics offset
-    assert(sqrt(a*a+b*b)!=0);
-    time -= forw_offset / sqrt(a*a+b*b);
+    time -= forw_offset / item_XZ_speed;
+
+    float aimX = time*target_x_speed + relative_target_kart_loc.getX();
+    float aimZ = time*target_z_speed + relative_target_kart_loc.getZ();
 
     assert(time!=0);
-    *fire_angle = fire_th;
-    *up_velocity = (0.5f * time * gravity) + (dy / time)
-                 + (gy * target_kart->getSpeed());
+    float angle = atan2f(aimX, aimZ);
+    
+    *fire_angle = angle;
+
+    // Now find the up_velocity. This is an application of newton's equation.
+    *up_velocity = (0.5f * time * gravity) + (relative_target_kart_loc.getY() / time)
+                 + ( target_y_speed);
 }   // getLinearKartItemIntersection
 
 //-----------------------------------------------------------------------------
@@ -357,7 +371,7 @@ bool Flyable::updateAndDelete(float dt)
     const Vec3 &xyz=getXYZ();
     // Check if the flyable is outside of the track. If so, explode it.
     const Vec3 *min, *max;
-    World::getWorld()->getTrack()->getAABB(&min, &max);
+    Track::getCurrentTrack()->getAABB(&min, &max);
 
     // I have seen that the bullet AABB can be slightly different from the
     // one computed here - I assume due to minor floating point errors
@@ -368,9 +382,9 @@ bool Flyable::updateAndDelete(float dt)
     // But since we couldn't reproduce the problem, and the epsilon used
     // here does not hurt, I'll leave it in.
     float eps = 0.1f;
-    assert(!isnan(xyz.getX()));
-    assert(!isnan(xyz.getY()));
-    assert(!isnan(xyz.getZ()));
+    assert(!std::isnan(xyz.getX()));
+    assert(!std::isnan(xyz.getY()));
+    assert(!std::isnan(xyz.getZ()));
     if(xyz[0]<(*min)[0]+eps || xyz[2]<(*min)[2]+eps || xyz[1]<(*min)[1]+eps ||
        xyz[0]>(*max)[0]-eps || xyz[2]>(*max)[2]-eps || xyz[1]>(*max)[1]-eps   )
     {
@@ -378,15 +392,32 @@ bool Flyable::updateAndDelete(float dt)
         return true;
     }
 
-    // Add the position offset so that the flyable can adjust its position
-    // (usually to do the raycast from a slightly higher position to avoid
-    // problems finding the terrain in steep uphill sections).
-    if(m_do_terrain_info)
-        TerrainInfo::update(xyz+m_position_offset);
+    if (m_do_terrain_info)
+    {
+        Vec3 towards = getBody()->getGravity();
+        towards.normalize();
+        // Add the position offset so that the flyable can adjust its position
+        // (usually to do the raycast from a slightly higher position to avoid
+        // problems finding the terrain in steep uphill sections).
+        // Towards is a unit vector. so we can multiply -towards to offset the
+        // position by one unit.
+        TerrainInfo::update(xyz + m_position_offset*(-towards), towards);
+
+        // Make flyable anti-gravity when the it's projected on such surface
+        const Material* m = TerrainInfo::getMaterial();
+        if (m && m->hasGravity())
+        {
+            getBody()->setGravity(TerrainInfo::getNormal() * -70.0f);
+        }
+        else
+        {
+            getBody()->setGravity(Vec3(0, 1, 0) * -70.0f);
+        }
+    }
 
     if(m_adjust_up_velocity)
     {
-        float hat = xyz.getY()-getHoT();
+        float hat = (xyz - getHitPoint()).length();
 
         // Use the Height Above Terrain to set the Z velocity.
         // HAT is clamped by min/max height. This might be somewhat
@@ -395,16 +426,16 @@ bool Flyable::updateAndDelete(float dt)
         float delta = m_average_height - std::max(std::min(hat, m_max_height),
                                                   m_min_height);
         Vec3 v = getVelocity();
-        assert(!isnan(v.getX()));
-        assert(!isnan(v.getX()));
-        assert(!isnan(v.getX()));
+        assert(!std::isnan(v.getX()));
+        assert(!std::isnan(v.getX()));
+        assert(!std::isnan(v.getX()));
         float heading = atan2f(v.getX(), v.getZ());
-        assert(!isnan(heading));
+        assert(!std::isnan(heading));
         float pitch   = getTerrainPitch(heading);
         float vel_up = m_force_updown*(delta);
         if (hat < m_max_height) // take into account pitch of surface
             vel_up += v.length_2d()*tanf(pitch);
-        assert(!isnan(vel_up));
+        assert(!std::isnan(vel_up));
         v.setY(vel_up);
         setVelocity(v);
     }   // if m_adjust_up_velocity
@@ -461,6 +492,16 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
     {
         AbstractKart *kart = world->getKart(i);
 
+        const SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+        if (sw)
+        {
+            // Don't explode teammates in soccer world
+            if (sw->getKartTeam(kart->getWorldKartId()) == sw
+                ->getKartTeam(m_owner->getWorldKartId()))
+            continue;
+        }
+        if (kart->isGhostKart()) continue;
+
         // If no secondary hits should be done, only hit the
         // direct hit kart.
         if(!secondary_hits && kart!=kart_hit)
@@ -474,13 +515,13 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
             // The explosion animation will register itself with the kart
             // and will free it later.
             ExplosionAnimation::create(kart, getXYZ(), kart==kart_hit);
-            if(kart==kart_hit && world->getTrack()->isArena())
+            if(kart==kart_hit && Track::getCurrentTrack()->isArena())
             {
                 world->kartHit(kart->getWorldKartId());
             }
         }
     }
-    world->getTrack()->handleExplosion(getXYZ(), object, secondary_hits);
+    Track::getCurrentTrack()->handleExplosion(getXYZ(), object,secondary_hits);
 }   // explode
 
 // ----------------------------------------------------------------------------

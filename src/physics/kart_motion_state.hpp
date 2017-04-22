@@ -19,7 +19,7 @@
 #ifndef HEADER_KART_MOTION_STATE_HPP
 #define HEADER_KART_MOTION_STATE_HPP
 
-#include <math.h>
+#include <cmath>
 #include "utils/vs.hpp"
 
 #include "LinearMath/btMotionState.h"
@@ -63,13 +63,13 @@ public:
      */
     virtual void setWorldTransform(const btTransform &new_trans)
     {
-        assert(!isnan(new_trans.getOrigin().getX()));
-        assert(!isnan(new_trans.getOrigin().getY()));
-        assert(!isnan(new_trans.getOrigin().getZ()));
-        assert(!isnan(new_trans.getRotation().getX()));
-        assert(!isnan(new_trans.getRotation().getY()));
-        assert(!isnan(new_trans.getRotation().getZ()));
-        assert(!isnan(new_trans.getRotation().getW()));
+        assert(!std::isnan(new_trans.getOrigin().getX()));
+        assert(!std::isnan(new_trans.getOrigin().getY()));
+        assert(!std::isnan(new_trans.getOrigin().getZ()));
+        assert(!std::isnan(new_trans.getRotation().getX()));
+        assert(!std::isnan(new_trans.getRotation().getY()));
+        assert(!std::isnan(new_trans.getRotation().getZ()));
+        assert(!std::isnan(new_trans.getRotation().getW()));
         m_center_of_mass = new_trans;
     }   // setWorldTransform
 

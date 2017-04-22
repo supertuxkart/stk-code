@@ -1,5 +1,5 @@
 uniform sampler2D source;
-uniform layout(rgba16f) restrict writeonly image2D dest;
+layout(rgba16f) restrict writeonly uniform image2D dest;
 uniform vec2 pixel;
 uniform float weights[7];
 

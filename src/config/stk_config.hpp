@@ -34,7 +34,6 @@
 #include <map>
 
 class KartProperties;
-class PlayerDifficulty;
 class MusicInformation;
 class XMLNode;
 
@@ -51,8 +50,6 @@ protected:
     /** Default kart properties. */
     KartProperties *m_default_kart_properties;
     std::map<std::string, KartProperties*> m_kart_properties;
-    /** Per-player difficulties. */
-    PlayerDifficulty* m_player_difficulties[PLAYER_DIFFICULTY_COUNT];
 
 public:
     /** What to do if a kart already has a powerup when it hits a bonus box:
@@ -66,26 +63,12 @@ public:
           m_same_powerup_mode;
 
     static float UNDEFINED;
-    float m_anvil_weight;              /**<Additional kart weight if anvil is
-                                           attached.                           */
-    float m_anvil_speed_factor;        /**<Speed decrease when attached first. */
-    float m_parachute_friction;        /**<Increased parachute air friction.   */
-    float m_parachute_ubound_fraction; /**<Upper bound fraction of speed when
-                                           lost will detach parachute.         */
-    float m_parachute_lbound_fraction; /**<Lower bound fraction of speed when
-                                           lost will detach parachute.           */
-    float m_parachute_max_speed;       /**<Max speed to rate current speed     */
-    float m_parachute_time;            /**<Time a parachute is active.         */
-    float m_parachute_time_other;      /**<Time a parachute attached to other
-                                           karts is active.                    */
     float m_bomb_time;                 /**<Time before a bomb explodes.        */
     float m_bomb_time_increase;        /**<Time added to bomb timer when it's
                                            passed on.                          */
-    float m_anvil_time;                /**<Time an anvil is active.            */
     float m_item_switch_time;          /**< Time items will be switched.       */
     int   m_bubblegum_counter;         /**< How many times bubble gums must be
                                             driven over before they disappear. */
-    float m_bubblegum_shield_time;     /**<How long a bubble gum shield lasts. */
     bool  m_shield_restrict_weapos;    /**<Wether weapon usage is punished. */
     float m_explosion_impulse_objects; /**<Impulse of explosion on moving
                                             objects, e.g. road cones, ...      */
@@ -102,6 +85,13 @@ public:
      *  triangle are more than this value, the physics will use the normal
      *  of the triangle in smoothing normal. */
     float m_smooth_angle_limit;
+
+    /** Default friction for the track and any track/library object. */
+    float m_default_track_friction;
+
+    /** Default friction to be used for any moveable, e.g. karts, balls. */
+    float m_default_moveable_friction;
+
     int   m_max_skidmarks;           /**<Maximum number of skid marks/kart.  */
     float m_skid_fadeout_time;       /**<Time till skidmarks fade away.      */
     float m_near_ground;             /**<Determines when a kart is not near
@@ -160,6 +150,12 @@ public:
     /** The field of view for 1, 2, 3, 4 player split screen. */
     float m_camera_fov[4];
 
+    float m_cutscene_fov;
+
+    /** Lists of TTF files used in STK. */
+    std::vector<std::string> m_normal_ttf;
+    std::vector<std::string> m_digit_ttf;
+
 private:
     /** True if stk_config has been loaded. This is necessary if the
      *  --stk-config command line parameter has been specified to avoid
@@ -186,14 +182,10 @@ public:
      *  \throw out_of_range if there is no data for 'type'.
      *  \param type Type of kart (e.g. heavy, medium, ...).
      */
-    const KartProperties& getKartProperties(std::string type)
+    const KartProperties& getKartProperties(const std::string &type)
     {
-        return *m_kart_properties.at(type); 
+        return *m_kart_properties.at(type);
     }   // getKartProperties
-
-    // ------------------------------------------------------------------------
-    const PlayerDifficulty * getPlayerDifficulty(PerPlayerDifficulty difficulty)
-        { return m_player_difficulties[difficulty]; }
 }
 ;   // STKConfig
 

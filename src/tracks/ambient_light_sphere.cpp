@@ -24,7 +24,6 @@
 #include "graphics/camera.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
-#include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 
@@ -47,7 +46,6 @@ void AmbientLightSphere::update(float dt)
 {
     CheckStructure::update(dt);
 
-    World *world = World::getWorld();
     for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {
         Camera *camera = Camera::getCamera(i);
@@ -57,7 +55,7 @@ void AmbientLightSphere::update(float dt)
         {
             float d2=getDistance2ForKart(i);
             video::SColor color;
-            Track *track=world->getTrack();
+            Track *track=Track::getCurrentTrack();
             if(d2<m_inner_radius2)
             {   // Inside inner radius --> use new ambient color
                 color = m_ambient_color;

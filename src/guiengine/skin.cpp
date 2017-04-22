@@ -24,15 +24,16 @@
 
 #include "config/user_config.hpp"
 #include "graphics/2dutils.hpp"
+#include "graphics/central_settings.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "guiengine/widgets.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
-#include "graphics/glwrap.hpp"
 
 using namespace GUIEngine;
 using namespace irr;
@@ -326,7 +327,7 @@ Skin::~Skin()
 // ----------------------------------------------------------------------------
 void Skin::drawBgImage()
 {
-
+#ifndef SERVER_ONLY
     // ---- background image
     // on one end, making these static is not too clean.
     // on another end, these variables are really only used locally,
@@ -370,6 +371,7 @@ void Skin::drawBgImage()
                                         /* no clipping */0, /*color*/ 0,
                                         /*alpha*/false);
     irr_driver->getVideoDriver()->enableMaterial2D(false);
+#endif
 }   // drawBgImage
 
 // ----------------------------------------------------------------------------
@@ -401,6 +403,7 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w,
                                          bool deactivated,
                                          const core::recti* clipRect)
 {
+#ifndef SERVER_ONLY
     // check if widget moved. if so, recalculate coords
     if (w->m_skin_x != dest.UpperLeftCorner.X ||
         w->m_skin_y != dest.UpperLeftCorner.Y ||
@@ -701,7 +704,7 @@ X##_yflip.LowerRightCorner.Y = w->m_skin_dest_y + \
     {
         delete[] colorptr;
     }
-
+#endif
 }   // drawBoxFromStretchableTexture
 
 // ----------------------------------------------------------------------------
@@ -813,27 +816,23 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
     else
     {
         ProgressBarWidget * progress = (ProgressBarWidget*)w;
-        drawBoxFromStretchableTexture(w, rect,
-                              SkinConfig::m_render_params["progress::neutral"],
-                              w->m_deactivated);
-        //the " - 10" is a dirty hack to avoid to have the right arrow
-        // before the left one
-        //FIXME
-        core::recti rect2 = rect;
-        rect2.LowerRightCorner.X -= (rect.getWidth() - 10)
-                                  - progress->getValue()*rect.getWidth()/100;
-
-        drawBoxFromStretchableTexture(w, rect2,
-                                 SkinConfig::m_render_params["progress::fill"],
-                                 w->m_deactivated);
-#if 0
-          draw2DImage(
-              SkinConfig::m_render_params["progress::fill"].getImage(),
-              sized_rect, core::recti(0,0,progress->m_w, progress->m_h),
-              0 /* no clipping */, colors, true);
-#endif
-
+        drawProgressBarInScreen(w, rect, progress->getValue(),
+            w->m_deactivated);
     }
+}   // drawProgress
+
+// ----------------------------------------------------------------------------
+void Skin::drawProgressBarInScreen(SkinWidgetContainer* swc,
+                                   const core::rect< s32 > &rect, int progress,
+                                   bool deactivated)
+{
+    drawBoxFromStretchableTexture(swc, rect,
+        SkinConfig::m_render_params["progress::neutral"], deactivated);
+    core::recti rect2 = rect;
+    rect2.LowerRightCorner.X -= (rect.getWidth())
+                              - progress * rect.getWidth() / 100;
+    drawBoxFromStretchableTexture(swc, rect2,
+        SkinConfig::m_render_params["progress::fill"], deactivated);
 }   // drawProgress
 
 // ----------------------------------------------------------------------------
@@ -844,6 +843,7 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
 void Skin::drawRatingBar(Widget *w, const core::recti &rect,
                         const bool pressed, const bool focused)
 {
+#ifndef SERVER_ONLY
     RatingBarWidget *ratingBar = (RatingBarWidget*)w;
 
     const ITexture *texture = SkinConfig::m_render_params["rating::neutral"].getImage();
@@ -897,7 +897,7 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
                                            (w->m_deactivated || ID_DEBUG) ? colors : 0,
                                             true /* alpha */);
     }
-
+#endif
 }   // drawRatingBar
 
 // ----------------------------------------------------------------------------
@@ -921,12 +921,12 @@ void Skin::drawRibbon(const core::recti &rect, Widget* widget,
 void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                            const bool pressed, bool focused)
 {
+#ifndef SERVER_ONLY
     // for now, when this kind of widget is disabled, just hide it. we can
     // change that behaviour if we ever need to...
     //if (widget->m_deactivated) return;
 
     bool mark_selected = widget->isSelected(PLAYER_ID_GAME_MASTER);
-    bool always_show_selection = false;
 
     IGUIElement* focusedElem = NULL;
     if (GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER) != NULL)
@@ -1006,6 +1006,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
         /* in combo ribbons, always show selection */
         RibbonWidget* parentRibbonWidget = NULL;
+        bool always_show_selection = false;
 
         if (widget->m_event_handler != NULL &&
             widget->m_event_handler->m_type == WTYPE_RIBBON)
@@ -1220,6 +1221,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
             m_tooltips.push_back(widget);
         }
     }
+#endif
 }   // drawRibbonChild
 
 // ----------------------------------------------------------------------------
@@ -1435,6 +1437,7 @@ void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
 void Skin::drawIconButton(const core::recti &rect, Widget* widget,
                           const bool pressed, bool focused)
 {
+#ifndef SERVER_ONLY
     RibbonWidget* parentRibbon = dynamic_cast<RibbonWidget*>(widget->m_event_handler);
     IGUIElement* focusedElem = NULL;
     if (GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER) != NULL)
@@ -1543,6 +1546,7 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
     {
         irr_driver->getVideoDriver()->enableMaterial2D();
     }
+#endif
 }   // drawIconButton
 
 // ----------------------------------------------------------------------------
@@ -1662,6 +1666,7 @@ void Skin::drawListSelection(const core::recti &rect, Widget* widget,
 void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect,
                           Widget* widget)
 {
+#ifndef SERVER_ONLY
     bool isSelected =
          (((ListWidget*)widget->m_event_handler)->m_selected_column == widget &&
          ((ListWidget*)widget->m_event_handler)->m_sort_default == false);
@@ -1689,7 +1694,7 @@ void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect,
         draw2DImage(img, destRect, srcRect,
                                                   NULL, NULL, /* alpha */true);
     }
-
+#endif
 }   // drawListHeader
 
 // ----------------------------------------------------------------------------
@@ -1698,6 +1703,7 @@ void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect,
  */
 void Skin::renderSections(PtrVector<Widget>* within_vector)
 {
+#ifndef SERVER_ONLY
     if (within_vector == NULL) within_vector = &getCurrentScreen()->m_widgets;
 
     const unsigned short widgets_amount = within_vector->size();
@@ -1770,12 +1776,13 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
             }
         }
     } // next
-
+#endif   // !SERVER_ONLY
 }   // renderSections
 
 // ----------------------------------------------------------------------------
 void Skin::drawScrollbarBackground(const irr::core::rect< irr::s32 > &rect)
 {
+#ifndef SERVER_ONLY
     // leave square space at both ends for up/down buttons (yeah, irrlicht
     // doesn't handle that)
     core::recti rect2 = rect;
@@ -1789,12 +1796,13 @@ void Skin::drawScrollbarBackground(const irr::core::rect< irr::s32 > &rect)
                                         p.m_source_area_center,
                                         0 /* no clipping */, 0,
                                         true /* alpha */);
-
+#endif
 }   // drawScrollbarBackground
 
 // ----------------------------------------------------------------------------
 void Skin::drawScrollbarThumb(const irr::core::rect< irr::s32 > &rect)
 {
+#ifndef SERVER_ONLY
     BoxRenderParams& p =
         SkinConfig::m_render_params["scrollbar_thumb::neutral"];
 
@@ -1802,7 +1810,7 @@ void Skin::drawScrollbarThumb(const irr::core::rect< irr::s32 > &rect)
                                         p.m_source_area_center,
                                         0 /* no clipping */, 0,
                                         true /* alpha */);
-
+#endif
 }   // drawScrollbarThumb
 
 // ----------------------------------------------------------------------------
@@ -1958,14 +1966,11 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
     else if (type == WTYPE_MODEL_VIEW)
     {
         ModelViewWidget* mvw = dynamic_cast<ModelViewWidget*>(widget);
-        FrameBuffer* fb = mvw->getFrameBuffer();
-        if (fb != NULL && fb->getRTT().size() > 0)
-        {
-            draw2DImageFromRTT(fb->getRTT()[0], 512, 512,
-                rect, core::rect<s32>(0, 0, 512, 512), NULL, SColor(255, 255, 255, 255), true);
-        }
+#ifndef SERVER_ONLY
+        mvw->drawRTTScene(rect);
+#endif
     }
-    else if (type == WTYPE_ICON_BUTTON || type == WTYPE_MODEL_VIEW)
+    else if (type == WTYPE_ICON_BUTTON)
     {
         drawIconButton(rect, widget, pressed, focused);
     }
@@ -2021,6 +2026,7 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
 void doDrawBadge(ITexture* texture, const core::recti& rect,
                  float max_icon_size, bool badge_at_left)
 {
+#ifndef SERVER_ONLY
     // In case of a problem
     if(!texture) return;
 
@@ -2046,6 +2052,7 @@ void doDrawBadge(ITexture* texture, const core::recti& rect,
     draw2DImage(texture, rect2, source_area,
                                         0 /* no clipping */, 0,
                                         true /* alpha */);
+#endif
 }  // doDrawBadge
 
 // ----------------------------------------------------------------------------
@@ -2144,6 +2151,7 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
                              bool flat, bool fillBackGround,
                              const core::recti &rect, const core::recti *clip)
 {
+#ifndef SERVER_ONLY
     const int id = element->getID();
     Widget* widget = GUIEngine::getWidget(id);
 
@@ -2262,18 +2270,21 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
 
         return;
     }
+#endif
 }   // draw3DSunkenPane
 
 // -----------------------------------------------------------------------------
 
 void Skin::drawBGFadeColor()
 {
+#ifndef SERVER_ONLY
     // fade out background
     SColor color = SkinConfig::m_colors["dialog_background::neutral"];
     if (m_dialog_size < 1.0f)
         color.setAlpha( (unsigned int)(color.getAlpha()*m_dialog_size ));
     GL32_draw2DRectangle(color, core::recti(position2d< s32 >(0,0),
                          irr_driver->getActualScreenSize()));
+#endif
 }   // drawBGFadeColor
 
 // -----------------------------------------------------------------------------
@@ -2285,32 +2296,41 @@ core::recti Skin::draw3DWindowBackground(IGUIElement *element,
                                          const core::recti *clip,
                                          core::recti* checkClientArea)
 {
-    if (ModalDialog::getCurrent() == NULL) return rect;
-
-    if (ModalDialog::getCurrent()->fadeBackground())
-        drawBGFadeColor();
-
-    // draw frame
-    if (m_dialog_size < 1.0f)
+    if (ScreenKeyboard::getCurrent() &&
+        ScreenKeyboard::getCurrent()->getIrrlichtElement() == element)
     {
-        core::recti sized_rect = rect;
-        core::position2d<s32> center = sized_rect.getCenter();
-        const int w = sized_rect.getWidth();
-        const int h = sized_rect.getHeight();
-        const float texture_size = sin(m_dialog_size*M_PI*0.5f);
-        sized_rect.UpperLeftCorner.X  = (int)(center.X -(w/2.0f)*texture_size);
-        sized_rect.UpperLeftCorner.Y  = (int)(center.Y -(h/2.0f)*texture_size);
-        sized_rect.LowerRightCorner.X = (int)(center.X +(w/2.0f)*texture_size);
-        sized_rect.LowerRightCorner.Y = (int)(center.Y +(h/2.0f)*texture_size);
-        drawBoxFromStretchableTexture( ModalDialog::getCurrent(), sized_rect,
-                               SkinConfig::m_render_params["window::neutral"]);
-
-        m_dialog_size += GUIEngine::getLatestDt()*5;
+        drawBoxFromStretchableTexture( ScreenKeyboard::getCurrent(), rect,
+                           SkinConfig::m_render_params["window::neutral"]);
     }
-    else
+    else if (ModalDialog::getCurrent() &&
+             ModalDialog::getCurrent()->getIrrlichtElement() == element)
     {
-        drawBoxFromStretchableTexture( ModalDialog::getCurrent(), rect,
+        if (ModalDialog::getCurrent()->fadeBackground())
+            drawBGFadeColor();
+        
+        // draw frame
+        if (m_dialog_size < 1.0f)
+        {
+            core::recti sized_rect = rect;
+            core::position2d<s32> center = sized_rect.getCenter();
+            const int w = sized_rect.getWidth();
+            const int h = sized_rect.getHeight();
+            const float tex_size = sin(m_dialog_size*M_PI*0.5f);
+            sized_rect.UpperLeftCorner.X  = (int)(center.X -(w/2.0f)*tex_size);
+            sized_rect.UpperLeftCorner.Y  = (int)(center.Y -(h/2.0f)*tex_size);
+            sized_rect.LowerRightCorner.X = (int)(center.X +(w/2.0f)*tex_size);
+            sized_rect.LowerRightCorner.Y = (int)(center.Y +(h/2.0f)*tex_size);
+            
+            drawBoxFromStretchableTexture(ModalDialog::getCurrent(), sized_rect,
                                SkinConfig::m_render_params["window::neutral"]);
+
+            m_dialog_size += GUIEngine::getLatestDt()*5;
+        }
+        else
+        {
+            drawBoxFromStretchableTexture(ModalDialog::getCurrent(), rect,
+                               SkinConfig::m_render_params["window::neutral"]);
+        }
     }
 
     return rect;
@@ -2321,8 +2341,10 @@ core::recti Skin::draw3DWindowBackground(IGUIElement *element,
 void Skin::draw3DMenuPane (IGUIElement *element, const core::recti &rect,
                            const core::recti *clip)
 {
+#ifndef SERVER_ONLY
     SColor color = SColor(150, 96, 74, 196);
     GL32_draw2DRectangle(color, rect);
+#endif
 }   // draw3DMenuPane
 
 // -----------------------------------------------------------------------------
@@ -2381,7 +2403,9 @@ void Skin::draw2DImage(const video::ITexture* texture, const core::rect<s32>& de
     const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
     const video::SColor* const colors, bool useAlphaChannelOfTexture)
 {
+#ifndef SERVER_ONLY
     ::draw2DImage(texture, destRect, sourceRect, clipRect, colors, useAlphaChannelOfTexture);
+#endif
 }
 
 // -----------------------------------------------------------------------------

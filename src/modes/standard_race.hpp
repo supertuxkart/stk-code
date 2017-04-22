@@ -29,7 +29,7 @@ class StandardRace : public LinearWorld
 {
 protected:
     // clock events
-    virtual bool  isRaceOver();
+    virtual bool  isRaceOver() OVERRIDE;
 
 public:
                   StandardRace();

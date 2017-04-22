@@ -82,8 +82,6 @@ private:
         float            m_y_pos;
         /** True if kart is a player kart. */
         bool             m_is_player_kart;
-        /** Only if m_is_player_kart is true */
-        const StateManager::ActivePlayer* m_player;
         /** The radius to use when sorting the entries. Positive values
             will rotate downwards, negatives are upwards. */
         float            m_radius;
@@ -162,7 +160,7 @@ private:
     bool                       m_gp_position_was_changed;
 
     /** The previous monospace state of the font. */
-    bool                       m_was_monospace;
+    //bool                       m_was_monospace;
 
     /** Sound effect at end of race. */
     SFXBase                   *m_finish_sound;
@@ -171,16 +169,7 @@ private:
     MusicInformation          *m_race_over_music;
 
     /** For highscores */
-    std::string m_highscore_who;
-
-    /** For highscores */
-    StateManager::ActivePlayer *m_highscore_player;
-
-    /** For highscores */
     int m_highscore_rank;
-
-    /** For highscores */
-    int m_highscore_time;
 
     unsigned int m_width_all_points;
 
@@ -202,19 +191,20 @@ private:
     void addGPProgressWidget(GUIEngine::Widget* widget);
     void displayGPProgress();
     void cleanupGPProgress();
-    void displayHighScores();
+    void displayPostRaceInfo();
     void displaySoccerResults();
     void displayScreenShots();
+    irr::core::stringw getKartDisplayName(const AbstractKart *kart) const;
 
     int  getFontHeight () const;
 
 public:
 
                  RaceResultGUI();
-    virtual void renderGlobal(float dt);
+    virtual void renderGlobal(float dt) OVERRIDE;
 
     /** \brief Implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile() {};
+    virtual void loadedFromFile() OVERRIDE {};
 
     virtual void init() OVERRIDE;
     virtual void tearDown() OVERRIDE;
@@ -224,16 +214,17 @@ public:
                                Input::InputType type, int playerId) OVERRIDE;
     void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                        const int playerID) OVERRIDE;
+    void backToLobby();
 
 
     friend class GUIEngine::ScreenSingleton<RaceResultGUI>;
 
     /** Should not be called anymore.  */
-    const core::dimension2du getMiniMapSize() const
+    const core::dimension2du getMiniMapSize() const OVERRIDE
                   { assert(false); return core::dimension2du(0, 0); }
 
     /** No kart specific view needs to be rendered in the result gui. */
-    virtual void renderPlayerView(const Camera *camera, float dt) {}
+    virtual void renderPlayerView(const Camera *camera, float dt) OVERRIDE {}
 
     virtual void onUpdate(float dt) OVERRIDE;
 
@@ -247,7 +238,7 @@ public:
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
                             bool important=true,
-                            bool big_font=false) { }
+                            bool big_font=false) OVERRIDE { }
 
     void nextPhase();
 
@@ -261,10 +252,9 @@ public:
       * \param rank Highscore rank (first highscore, second highscore, etc.). This is not the race rank
       * \param time Finish time in seconds
       */
-    void setHighscore(const std::string &kart,
-                      StateManager::ActivePlayer* player, int rank, int time);
+    void setHighscore(int rank);
 
-    virtual void onConfirm();
+    virtual void onConfirm() OVERRIDE;
 };   // RaceResultGUI
 
 #endif

@@ -48,8 +48,7 @@ public:
     // overriding World methods
     virtual void reset() OVERRIDE;
     virtual const std::string& getIdent() const OVERRIDE;
-    virtual const btTransform &getStartTransform(int index);
-    virtual float getClockStartTime() const;
+    virtual const btTransform &getStartTransform(int index) OVERRIDE;
     virtual void getKartsDisplayInfo(
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
     virtual void init() OVERRIDE;

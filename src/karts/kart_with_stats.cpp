@@ -18,6 +18,7 @@
 
 #include "karts/kart_with_stats.hpp"
 
+#include "graphics/render_info.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/rescue_animation.hpp"
 #include "items/item.hpp"
@@ -26,9 +27,9 @@
 KartWithStats::KartWithStats(const std::string& ident,
                              unsigned int world_kart_id,
                              int position, const btTransform& init_transform,
-                             const PlayerDifficulty *difficulty)
+                             PerPlayerDifficulty difficulty)
              : Kart(ident, world_kart_id, position,
-                    init_transform, difficulty)
+                    init_transform, difficulty, KRT_DEFAULT)
 {
 }   // KartWithStats
 
@@ -61,11 +62,9 @@ void KartWithStats::reset()
 void KartWithStats::update(float dt)
 {
     Kart::update(dt);
-    if(getSpeed()>m_top_speed) m_top_speed = getSpeed();
-    if(getControls().m_skid)
-        m_skidding_time += dt;
-    if(getControls().m_brake)
-        m_brake_count ++;
+    if(getSpeed()>m_top_speed        ) m_top_speed = getSpeed();
+    if(getControls().getSkidControl()) m_skidding_time += dt;
+    if(getControls().getBrake()      ) m_brake_count ++;
     LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
     if(world && !world->isOnRoad(getWorldKartId()))
         m_off_track_count ++;

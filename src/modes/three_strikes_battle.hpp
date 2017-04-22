@@ -31,7 +31,8 @@
 class PhysicalObject;
 
 /**
- * \brief An implementation of World, to provide the 3 strikes battle game mode
+ *  \brief An implementation of WorldWithRank, to provide the 3 strikes battle
+ *  game mode
  * \ingroup modes
  */
 class ThreeStrikesBattle : public WorldWithRank
@@ -39,7 +40,7 @@ class ThreeStrikesBattle : public WorldWithRank
 private:
     struct BattleInfo
     {
-        int m_lives;
+        int  m_lives;
     };
 
     /** This vector contains an 'BattleInfo' struct for every kart in the race.
@@ -70,43 +71,69 @@ private:
 
     PtrVector<TrackObject, REF> m_tires;
 
-public:
+    /** Profiling usage */
+    int m_total_rescue;
+    int m_frame_count;
+    int m_start_time;
+    int m_total_hit;
 
+    std::vector<AbstractKart*> m_spare_tire_karts;
+    float m_next_sta_spawn_time;
+
+public:
     /** Used to show a nice graph when battle is over */
     struct BattleEvent
     {
         float m_time;
         std::vector<BattleInfo> m_kart_info;
     };
+    // ------------------------------------------------------------------------
     std::vector<BattleEvent> m_battle_events;
-
+    // ------------------------------------------------------------------------
     ThreeStrikesBattle();
+    // ------------------------------------------------------------------------
     virtual ~ThreeStrikesBattle();
-
-    virtual void init();
-
+    // ------------------------------------------------------------------------
+    virtual void init() OVERRIDE;
+    // ------------------------------------------------------------------------
     // clock events
-    virtual bool isRaceOver();
-    virtual void terminateRace();
-
+    virtual bool isRaceOver() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void terminateRace() OVERRIDE;
+    // ------------------------------------------------------------------------
     // overriding World methods
-    virtual void reset();
-
-    //virtual void getDefaultCollectibles(int& collectible_type, int& amount);
-    virtual bool useFastMusicNearEnd() const { return false; }
+    virtual void reset() OVERRIDE;
+    // ------------------------------------------------------------------------
     virtual void getKartsDisplayInfo(
-                          std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
-    virtual bool raceHasLaps(){ return false; }
-
-    virtual const std::string& getIdent() const;
-
-    virtual void kartHit(const unsigned int kart_id);
-    virtual void update(float dt);
-
-    virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node);
-
-
+                 std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool raceHasLaps() OVERRIDE                       { return false; }
+    // ------------------------------------------------------------------------
+    virtual const std::string& getIdent() const OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void kartHit(const unsigned int kart_id) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void update(float dt) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node)
+                                                                      OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void enterRaceOverState() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void loadCustomModels() OVERRIDE;
+    // ------------------------------------------------------------------------
     void updateKartRanks();
+    // ------------------------------------------------------------------------
+    void increaseRescueCount()                            { m_total_rescue++; }
+    // ------------------------------------------------------------------------
+    void addKartLife(unsigned int id);
+    // ------------------------------------------------------------------------
+    int getKartLife(unsigned int id) const  { return m_kart_info[id].m_lives; }
+    // ------------------------------------------------------------------------
+    bool spareTireKartsSpawned() const;
+    // ------------------------------------------------------------------------
+    void spawnSpareTireKarts();
+
 };   // ThreeStrikesBattles
 
 

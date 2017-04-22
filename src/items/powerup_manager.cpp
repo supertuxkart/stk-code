@@ -136,6 +136,7 @@ void PowerupManager::loadAllPowerups()
     loadWeights(*root, "end33",   POSITION_END33      );
     loadWeights(*root, "last" ,   POSITION_LAST       );
     loadWeights(*root, "battle" , POSITION_BATTLE_MODE);
+    loadWeights(*root, "soccer" , POSITION_SOCCER_MODE);
     loadWeights(*root, "tuto",    POSITION_TUTORIAL_MODE);
 
     delete root;
@@ -273,7 +274,8 @@ void PowerupManager::updateWeightsForRace(unsigned int num_karts)
 {
     m_position_to_class.clear();
     // In battle mode no positions exist, so use only position 1
-    unsigned int end_position = (race_manager->isBattleMode()) ? 1 : num_karts;
+    unsigned int end_position = (race_manager->isBattleMode() ||
+        race_manager->isSoccerMode()) ? 1 : num_karts;
     for(unsigned int position =1; position <= end_position; position++)
     {
         // Set up the mapping of position to position class:
@@ -322,6 +324,7 @@ PowerupManager::PositionClass
                                                      unsigned int position)
 {
     if(race_manager->isBattleMode()) return POSITION_BATTLE_MODE;
+    if(race_manager->isSoccerMode()) return POSITION_SOCCER_MODE;
     if(race_manager->isTutorialMode()) return POSITION_TUTORIAL_MODE;
     if(position==1)         return POSITION_FIRST;
     if(position==num_karts) return POSITION_LAST;
@@ -354,6 +357,7 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
     // Positions start with 1, while the index starts with 0 - so subtract 1
     PositionClass pos_class =
         (race_manager->isBattleMode() ? POSITION_BATTLE_MODE :
+         race_manager->isSoccerMode() ? POSITION_SOCCER_MODE :
          (race_manager->isTutorialMode() ? POSITION_TUTORIAL_MODE :
                                      m_position_to_class[pos-1]));
 

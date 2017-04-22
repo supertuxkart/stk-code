@@ -22,7 +22,6 @@
 #include "input/input.hpp"
 #include "input/input_device.hpp"
 #include "karts/abstract_kart.hpp"
-#include "karts/controller/player_controller.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"

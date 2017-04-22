@@ -238,6 +238,7 @@ public:
 	bool  CallObjectMethodRetBool(void *obj, int func) const;
 	int   CallObjectMethodRetInt(void *obj, int func) const;
 	void *CallObjectMethodRetPtr(void *obj, int func) const;
+	void *CallObjectMethodRetPtr(void *obj, int param1, asCScriptFunction *func) const;
 	void  CallGlobalFunction(void *param1, void *param2, asSSystemFunctionInterface *func, asCScriptFunction *desc) const;
 	bool  CallGlobalFunctionRetBool(void *param1, void *param2, asSSystemFunctionInterface *func, asCScriptFunction *desc) const;
 
@@ -400,16 +401,17 @@ public:
 	// This array stores the template instances types that have been automatically generated from template types
 	asCArray<asCObjectType *> generatedTemplateTypes;
 	// Stores the funcdefs
-	// TODO: 2.30.0: redesign: Only shared funcdefs should be stored here
-	//                         a funcdef becomes shared if all arguments and the return type are shared (or application registered)
+	// TODO: redesign: Only shared funcdefs should be stored here
+	//                 a funcdef becomes shared if all arguments and the return type are shared (or application registered)
 	asCArray<asCScriptFunction *> funcDefs; // doesn't increase ref count
 
 	// Stores the names of the script sections for debugging purposes
 	asCArray<asCString *> scriptSectionNames;
 
 	// Type identifiers
-	mutable int                       typeIdSeqNbr;
-	mutable asCMap<int, asCDataType*> mapTypeIdToDataType;
+	mutable int                             typeIdSeqNbr;
+	mutable asCMap<int, asCObjectType*>     mapTypeIdToObjectType;
+	mutable asCMap<int, asCScriptFunction*> mapTypeIdToFunction;
 
 	// Garbage collector
 	asCGarbageCollector gc;

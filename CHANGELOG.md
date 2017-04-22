@@ -1,4 +1,19 @@
-## SupertTuxKart 0.9.1
+## SuperTuxKart 0.9.2
+* Ghost replay races by Benau
+* Battle mode AI by Benau
+* Soccer mode AI by Benau
+* New icy soccer field by samuncle and Benau
+* New subsea track by samuncle
+* New volcano track by Ponzino
+* TTF font rendering by Benau
+* Kart properties refactor by Flakebi
+* Scripting work under the hood
+* Work on the track editor by mhp
+* Tweak to challenges
+* New farm track song by 0zone0ne and Krobonil
+* Bugfixes
+
+## SuperTuxKart 0.9.1
 * Many bug fixes
 * Started to use scripting in tracks
 * Significant audio performance improvements

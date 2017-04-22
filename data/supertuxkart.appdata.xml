@@ -1,35 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2014 Richard Hughes <richard@hughsie.com> -->
-
-<application>
-  <id type="desktop">supertuxkart.desktop</id>
+<component type="desktop">
+  <id>supertuxkart.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0+</project_license>
   <name>SuperTuxKart</name>
   <summary>A racing game</summary>
   <description>
     <p>
-      SuperTuxKart is a fun 3D kart racing game.
-      You can play with up to 4 friends on one PC, racing against each other or
-      just try to beat the computer.
+      Supertuxkart is a free 3D kart racing game, with a focus on having fun over
+      realism. You can play with up to 4 friends on one PC, racing against each
+      other, or try to beat the computer in single-player mode.
     </p>
     <p>
       See the great lighthouse or drive through the sand and visit the pyramids.
-      Race underground or in space, watching the stars passing by.
-      Have some rest under the palms on the beach (watching the other karts
-      overtaking you :) ).
-      But don't eat the bananas! Watch for bowling balls, plungers, bubble gum
-      and cakes thrown by opponents.
+      Race underground or in space, watching the stars pass by. Or rest under the
+      palm trees on the beach, watching the other karts overtake you. But don't eat
+      the bananas! Watch for bowling balls, plungers, bubble gum and cakes thrown by
+      your opponents.
     </p>
     <p>
-      You can do a single race against other karts, compete in one of several
-      Grand Prix, try to beat the high score in time trials on your own, play
-      battle mode against your friends, and more!
+      You can do a single race against other karts, compete in one of several Grand
+      Prix, try to beat the high score in time trials on your own, play battle mode
+      against the computer or your friends, and more!
     </p>
   </description>
-  <url type="homepage">http://supertuxkart.sourceforge.net/</url>
   <screenshots>
-    <screenshot type="default">http://supertuxkart.sourceforge.net/persistent/images/4/4d/SuperTuxKart_0.8_screenshot.jpg</screenshot>
-    <screenshot>http://supertuxkart.sourceforge.net/persistent/images/1/1f/SuperTuxKart_0.8_screenshot4.jpg</screenshot>
+    <screenshot type="default">
+      <image>https://supertuxkart.net/images/8/83/Supertuxkart-0.9.2-screenshot-3.jpg</image>
+      <caption>Normal Race</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://supertuxkart.net/images/1/1f/Supertuxkart-0.9.2-screenshot-1.jpg</image>
+      <caption>Battle Mode</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://supertuxkart.net/images/2/2a/Supertuxkart-0.9.2-screenshot-2.jpg</image>
+      <caption>Soccer Mode</caption>
+    </screenshot>
   </screenshots>
-  <updatecontact>supertuxkart-devel@lists.sourceforge.net</updatecontact>
-</application>
+  <developer_name>SuperTuxKart Team</developer_name>
+  <update_contact>supertuxkart-devel@lists.sourceforge.net</update_contact>
+  <url type="homepage">https://supertuxkart.net</url>
+  <url type="bugtracker">https://github.com/supertuxkart/stk-code/issues</url>
+  <url type="donation">https://supertuxkart.net/Donate</url>
+  <url type="help">https://supertuxkart.net/Community</url>
+  <url type="translate">https://supertuxkart.net/Translating_STK</url>
+</component>

@@ -53,6 +53,8 @@ CheckStructure::CheckStructure(const XMLNode &node, unsigned int index)
     // Cannons don't have a kind specified, so test for the name in this case
     else if(node.getName()=="cannon")
         m_check_type = CT_CANNON;
+    else if(node.getName()=="goal")
+        m_check_type = CT_GOAL;
     else
         Log::warn("CheckStructure", "Unknown check structure '%s' - ignored.", kind.c_str());
 

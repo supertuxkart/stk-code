@@ -75,7 +75,7 @@ public:
                                unsigned int world_kart_id,
                                int position,
                                const btTransform& init_transform,
-                               const PlayerDifficulty *difficulty);
+                               PerPlayerDifficulty difficulty);
     virtual void update(float dt);
     virtual void reset();
     virtual void collectedItem(Item *item, int add_info);

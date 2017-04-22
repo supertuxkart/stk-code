@@ -176,19 +176,50 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 {
     m_dictionary_manager.add_directory(
                         file_manager->getAsset(FileManager::TRANSLATION,""));
-                        
+
     if (g_language_list.size() == 0)
     {
         std::set<Language> languages = m_dictionary_manager.get_languages();      
-        
+
         // English is always there but won't be found on file system
         g_language_list.push_back("en");
-    
+
         std::set<Language>::iterator it;
         for (it = languages.begin(); it != languages.end(); it++)
         {
             g_language_list.push_back((*it).str());
         }
+    }
+
+    const std::string file_name = file_manager->getAsset("localized_name.txt");
+    try
+    {
+        std::unique_ptr<std::istream> in(new std::ifstream(file_name.c_str()));
+        if (!in.get())
+        {
+            Log::error("translation", "error: failure opening: '%s'.",
+                file_name.c_str());
+        }
+        else
+        {
+            for (std::string line; std::getline(*in, line); )
+            {
+                std::size_t pos = line.find("=");
+                std::string name = line.substr(0, pos);
+                std::string localized_name = line.substr(pos + 1);
+                if (localized_name == "0")
+                {
+                    localized_name =
+                        tinygettext::Language::from_name(name).get_name();
+                }
+                m_localized_name[name] = localized_name;
+            }
+        }
+    }
+    catch(std::exception& e)
+    {
+        Log::error("translation", "error: failure extract localized name.");
+        Log::error("translation", "%s", e.what());
     }
 
     // LC_ALL does not work, sscanf will then not always be able
@@ -416,26 +447,23 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
 bool Translations::isRTLText(const wchar_t *in_ptr)
 {
 #if ENABLE_BIDI
-    if (this->isRTLLanguage())
+    std::size_t length = wcslen(in_ptr);
+    FriBidiChar *fribidiInput = toFribidiChar(in_ptr);
+
+    FriBidiCharType *types = new FriBidiCharType[length];
+    fribidi_get_bidi_types(fribidiInput, length, types);
+    freeFribidiChar(fribidiInput);
+
+    // Declare as RTL if one character is RTL
+    for (std::size_t i = 0; i < length; i++)
     {
-        std::size_t length = wcslen(in_ptr);
-        FriBidiChar *fribidiInput = toFribidiChar(in_ptr);
-
-        FriBidiCharType *types = new FriBidiCharType[length];
-        fribidi_get_bidi_types(fribidiInput, length, types);
-        freeFribidiChar(fribidiInput);
-
-        // Declare as RTL if one character is RTL
-        for (std::size_t i = 0; i < length; i++)
+        if (types[i] & FRIBIDI_MASK_RTL)
         {
-            if (types[i] & FRIBIDI_MASK_RTL)
-            {
-                delete[] types;
-                return true;
-            }
+            delete[] types;
+            return true;
         }
-        delete[] types;
     }
+    delete[] types;
     return false;
 #else
     return false;
@@ -449,7 +477,7 @@ bool Translations::isRTLText(const wchar_t *in_ptr)
  */
 const wchar_t* Translations::w_gettext(const wchar_t* original, const char* context)
 {
-    std::string in = StringUtils::wide_to_utf8(original);
+    std::string in = StringUtils::wideToUtf8(original);
     return w_gettext(in.c_str(), context);
 }
 
@@ -473,7 +501,7 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
     if (original_t == original)
     {
         static irr::core::stringw converted_string;
-        converted_string = StringUtils::utf8_to_wide(original);
+        converted_string = StringUtils::utf8ToWide(original);
 
 #if TRANSLATE_VERBOSE
         std::wcout << L"  translation : " << converted_string << std::endl;
@@ -485,7 +513,7 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
     //for (int n=0;; n+=4)
 
     static core::stringw original_tw;
-    original_tw = StringUtils::utf8_to_wide(original_t.c_str());
+    original_tw = StringUtils::utf8ToWide(original_t);
 
     const wchar_t* out_ptr = original_tw.c_str();
     if (REMOVE_BOM) out_ptr++;
@@ -506,8 +534,8 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
  */
 const wchar_t* Translations::w_ngettext(const wchar_t* singular, const wchar_t* plural, int num, const char* context)
 {
-    std::string in = StringUtils::wide_to_utf8(singular);
-    std::string in2 = StringUtils::wide_to_utf8(plural);
+    std::string in = StringUtils::wideToUtf8(singular);
+    std::string in2 = StringUtils::wideToUtf8(plural);
     return w_ngettext(in.c_str(), in2.c_str(), num, context);
 }
 
@@ -525,7 +553,7 @@ const wchar_t* Translations::w_ngettext(const char* singular, const char* plural
                               m_dictionary.translate_ctxt_plural(context, singular, plural, num));
 
     static core::stringw str_buffer;
-    str_buffer = StringUtils::utf8_to_wide(res.c_str());
+    str_buffer = StringUtils::utf8ToWide(res);
     const wchar_t* out_ptr = str_buffer.c_str();
     if (REMOVE_BOM) out_ptr++;
 
@@ -606,4 +634,12 @@ core::stringw Translations::fribidizeLine(const core::stringw &str)
 #else
     return core::stringw(str);
 #endif // ENABLE_BIDI
+
+}
+
+const std::string& Translations::getLocalizedName(const std::string& str) const
+{
+    std::map<std::string, std::string>::const_iterator n = m_localized_name.find(str);
+    assert (n != m_localized_name.end());
+    return n->second;
 }
