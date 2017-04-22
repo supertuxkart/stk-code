@@ -26,13 +26,14 @@
 
 Steam::Steam()
 {
+    m_steam_available = false;
 #ifdef WIN32
     // Based on: https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx
     SECURITY_ATTRIBUTES sec_attr;
 
     // Set the bInheritHandle flag so pipe handles are inherited. 
     sec_attr.nLength = sizeof(SECURITY_ATTRIBUTES);
-    sec_attr.bInheritHandle = TRUE;
+    sec_attr.bInheritHandle       = TRUE;
     sec_attr.lpSecurityDescriptor = NULL;
 
     // Create a pipe for the child process's STDOUT. 
@@ -40,47 +41,85 @@ Steam::Steam()
     if (!CreatePipe(&m_child_stdout_read, &m_child_stdout_write, &sec_attr, 0))
     {
         Log::error("Steam", "Error creating StdoutRd CreatePipe");
+        return;
     }
 
     // Ensure the read handle to the pipe for STDOUT is not inherited.
-
     if (!SetHandleInformation(m_child_stdout_read, HANDLE_FLAG_INHERIT, 0))
     {
         Log::error("Steam", "Stdout SetHandleInformation");
+        return;
     }
 
     // Create a pipe for the child process's STDIN. 
     if (!CreatePipe(&m_child_stdin_read, &m_child_stdin_write, &sec_attr, 0))
     {
         Log::error("Steam", "Stdin CreatePipe");
+        return;
     }
 
     // Ensure the write handle to the pipe for STDIN is not inherited. 
-
     if (!SetHandleInformation(m_child_stdin_write, HANDLE_FLAG_INHERIT, 0))
     {
         Log::error("Steam", "Stdin SetHandleInformation");
+        return;
     }
 
     // Create the child process. 
 
-    createChildProcess();
+    if (!createChildProcess())
+    {
+        Log::error("Steam", "Could not start ssm.exe");
+        return;
+    }
 #endif
+    std::string s = sendCommand("init");
+    if (s != "1")
+    {
+        Log::error("Steam", "Could not initialise Steam API.");
+        return;
+    }
+
+    s = sendCommand("name");
+    m_user_name   =  decodeString(s);
+    if (m_user_name == "")
+    {
+        Log::error("Steam", "Can not get Steam user name.");
+        return;
+    }
+
+    s = sendCommand("id");
+    m_steam_id = decodeString(s);
+    if (m_steam_id== "")
+    {
+        Log::error("Steam", "Can not get Steam id.");
+        return;
+    }
+
+    m_steam_available = true;
 }   // Steam
 // ----------------------------------------------------------------------------
+/** Terminates the child processes and shuts down the Steam API.
+ */
 Steam::~Steam()
 {
-
+    std::string s = sendCommand("quit");
+    if (s != "quit")
+    {
+        Log::error("Steam", "Could not shutdown Steam process properly");
+    }
 }   // ~Steam
 
 // ----------------------------------------------------------------------------
-int Steam::createChildProcess()
+/** Starts ssm.exe as a child process and sets up communication via pipes.
+ *  \return True if the child process creation was successful.
+ */
+bool Steam::createChildProcess()
 {
 #ifdef WIN32
     TCHAR command_line[] = TEXT("ssm.exe 1");
     PROCESS_INFORMATION piProcInfo;
     STARTUPINFO siStartInfo;
-    BOOL bSuccess = FALSE;
 
     // Set up members of the PROCESS_INFORMATION structure. 
 
@@ -98,41 +137,40 @@ int Steam::createChildProcess()
 
     // Create the child process. 
 
-    bSuccess = CreateProcess(NULL,
+    bool success = CreateProcess(NULL,
         command_line,  // command line 
         NULL,          // process security attributes 
-        NULL,          // primary thread security attributes 
+        NULL,          // primary thread security attributes
         TRUE,          // handles are inherited 
         0,             // creation flags 
         NULL,          // use parent's environment 
         NULL,          // use parent's current directory 
         &siStartInfo,  // STARTUPINFO pointer 
-        &piProcInfo);  // receives PROCESS_INFORMATION 
-
-                       // If an error occurs, exit the application. 
-    if (!bSuccess)
+        &piProcInfo) != 0; // receives PROCESS_INFORMATION 
+       
+    if (!success)
     {
-        Log::error("Steam", "CreateProcess");
+        return false;
     }
-    else
-    {
-        // Close handles to the child process and its primary thread.
-        // Some applications might keep these handles to monitor the status
-        // of the child process, for example. 
 
-        CloseHandle(piProcInfo.hProcess);
-        CloseHandle(piProcInfo.hThread);
-    }
+    // Close handles to the child process and its primary thread.
+    // Some applications might keep these handles to monitor the status
+    // of the child process, for example. 
+
+    CloseHandle(piProcInfo.hProcess);
+    CloseHandle(piProcInfo.hThread);
 #endif
 
-    return 0;
+    return true;
 }   // createChildProcess
 
 // ----------------------------------------------------------------------------
+/** Reads a command from the input pipe.
+ */
 std::string Steam::getLine()
 {
 #define BUFSIZE 1024
-    CHAR buffer[BUFSIZE];
+    char buffer[BUFSIZE];
     DWORD bytes_read;
     // Read from pipe that is the standard output for child process. 
     bool success = ReadFile(m_child_stdout_read, buffer, BUFSIZE-1,
@@ -147,6 +185,9 @@ std::string Steam::getLine()
 }   // getLine
 
 // ----------------------------------------------------------------------------
+/** Sends a command to the SSM via a pipe, and reads the answer.
+ *  \return Answer from SSM.
+ */
 std::string Steam::sendCommand(const std::string &command)
 {
 #ifdef WIN32
@@ -163,6 +204,12 @@ std::string Steam::sendCommand(const std::string &command)
 }   // sendCommand
 
 // ----------------------------------------------------------------------------
+/** All answer strings from 'SSM' are in the form: "length string", i.e. the
+ *  length of the string, followed by a space and then the actual strings.
+ *  This allows for checking on some potential problems (e.g. if a pipe should
+ *  only send part of the answer string - todo: handle this problem instead of
+ *  ignoring it.
+ */
 std::string Steam::decodeString(const std::string &s)
 {
     std::vector<std::string> l = StringUtils::split(s, ' ');
@@ -180,21 +227,21 @@ std::string Steam::decodeString(const std::string &s)
 /** Returns the steam user name. SSM returns 'N name" where N is
  *  the length of the name.
  */
-std::string Steam::getName()
+const std::string& Steam::getUserName()
 {
-    std::string s = sendCommand("name");
-    return decodeString(s);
-}   // getName
+    assert(m_steam_available);
+    return m_user_name;
+}   // getUserName
 
 // ----------------------------------------------------------------------------
 /** Returns a unique id (string) from steam. SSM returns 'N ID" where N is
  *  the length of the ID.
  */
-std::string Steam::getId()
+const std::string& Steam::getSteamID()
 {
-    std::string s = sendCommand("id");
-    return decodeString(s);
-}   // getId
+    assert(m_steam_available);
+    return m_steam_id;
+}   // getSteamID
 
 // ----------------------------------------------------------------------------
 /** Returns a std::vector with the names of all friends. SSM returns a first
@@ -214,6 +261,10 @@ std::vector<std::string> Steam::getFriends()
     return result;
 }
 // ----------------------------------------------------------------------------
+/** Instructs the SSM to save the avatar of the user with the specified 
+ *  filename. Note that the avatar is always saved in png format (independent
+ *  on what is specified as filename).
+ */
 int Steam::saveAvatarAs(const std::string filename)
 {
     //std::string s = sendCommand(std::string("avatar ")+filename);

@@ -1518,11 +1518,10 @@ int main(int argc, char *argv[] )
 
     Steam *steam = new Steam();
     bool steam_avail = steam->isSteamAvailable();
-    std::string id = steam->getId();
-    std::string name = steam->getName();
+    std::string id = steam->getSteamID();
+    std::string name = steam->getUserName();
     int n = steam->saveAvatarAs("test.png");
-    //std::vector<std::string> friends = steam->getFriends();
-    //std::string quit = steam->sendCommand("quit");
+    delete steam;
 
     CrashReporting::installHandlers();
 

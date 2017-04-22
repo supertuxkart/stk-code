@@ -34,6 +34,15 @@
 class Steam
 {
 private:
+    /** True if a connection to steam was made successfully. */
+    bool m_steam_available;
+
+    /** Steam user name. Only defined if m_steam_available. */
+    std::string m_user_name;
+
+    /** Unique steam id. */
+    std::string m_steam_id;
+
 #ifdef WIN32
     // Various handles for the window pipes
     HANDLE m_child_stdin_read;
@@ -41,24 +50,23 @@ private:
     HANDLE m_child_stdout_read;
     HANDLE m_child_stdout_write;
 
-    int createChildProcess();
+    bool createChildProcess();
 #endif
 
-    bool m_steam_available;
     std::string decodeString(const std::string &s);
     std::string sendCommand(const std::string &command);
     std::string getLine();
 public:
      Steam();
     ~Steam();
-    std::string getName();
-    std::string getId();
+    const std::string& getUserName();
+    const std::string& getSteamID();
     int saveAvatarAs(const std::string filename);
     std::vector<std::string> getFriends();
     // ------------------------------------------------------------------------
     /** Returns true if the connection to the Steam API was successful, i.e.
      *  connection to steam worked, and SteamWorks API could be initialised. */
-    bool isSteamAvailable() { return m_steam_available;  }
+    bool isSteamAvailable() const { return m_steam_available;  }
 };   // class Steam
 
 #endif // HEADER_STEAM_HPP
