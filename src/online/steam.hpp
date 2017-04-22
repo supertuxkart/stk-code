@@ -61,7 +61,7 @@ public:
     ~Steam();
     const std::string& getUserName();
     const std::string& getSteamID();
-    int saveAvatarAs(const std::string filename);
+    int saveAvatarAs(const std::string &filename);
     std::vector<std::string> getFriends();
     // ------------------------------------------------------------------------
     /** Returns true if the connection to the Steam API was successful, i.e.

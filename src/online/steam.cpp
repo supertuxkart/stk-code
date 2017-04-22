@@ -265,9 +265,8 @@ std::vector<std::string> Steam::getFriends()
  *  filename. Note that the avatar is always saved in png format (independent
  *  on what is specified as filename).
  */
-int Steam::saveAvatarAs(const std::string filename)
+int Steam::saveAvatarAs(const std::string &filename)
 {
-    //std::string s = sendCommand(std::string("avatar ")+filename);
     std::string s = sendCommand("avatar");
     if(s=="filename")
         s=sendCommand(filename);
