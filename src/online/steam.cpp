@@ -24,6 +24,9 @@
 #  include <windows.h> 
 #endif
 
+Steam * Steam::m_steam = NULL;
+
+// ----------------------------------------------------------------------------
 Steam::Steam()
 {
     m_steam_available = false;

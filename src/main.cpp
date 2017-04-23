@@ -1516,12 +1516,12 @@ int main(int argc, char *argv[] )
 {
     CommandLine::init(argc, argv);
 
-    Steam *steam = new Steam();
-    bool steam_avail = steam->isSteamAvailable();
-    std::string id = steam->getSteamID();
-    std::string name = steam->getUserName();
-    int n = steam->saveAvatarAs("test.png");
-    delete steam;
+    Steam::create();
+    bool steam_avail = Steam::get()->isSteamAvailable();
+    std::string id   = Steam::get()->getSteamID();
+    std::string name = Steam::get()->getUserName();
+    int n = Steam::get()->saveAvatarAs("test.png");
+    Steam::destroy();
 
     CrashReporting::installHandlers();
 
