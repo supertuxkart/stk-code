@@ -119,9 +119,9 @@ Steam::~Steam()
 /** Starts ssm.exe as a child process and sets up communication via pipes.
  *  \return True if the child process creation was successful.
  */
+#ifdef WIN32
 bool Steam::createChildProcess()
 {
-#ifdef WIN32
     TCHAR command_line[] = TEXT("ssm.exe 1");
     PROCESS_INFORMATION piProcInfo;
     STARTUPINFO siStartInfo;
@@ -164,16 +164,17 @@ bool Steam::createChildProcess()
 
     CloseHandle(piProcInfo.hProcess);
     CloseHandle(piProcInfo.hThread);
-#endif
 
     return true;
 }   // createChildProcess
+#endif
 
 // ----------------------------------------------------------------------------
 /** Reads a command from the input pipe.
  */
 std::string Steam::getLine()
 {
+#ifdef WIN32
 #define BUFSIZE 1024
     char buffer[BUFSIZE];
     DWORD bytes_read;
@@ -186,6 +187,7 @@ std::string Steam::getLine()
         std::string s = buffer;
         return s;
     }
+#endif
     return std::string("");
 }   // getLine
 
