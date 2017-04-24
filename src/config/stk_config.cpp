@@ -181,6 +181,7 @@ void STKConfig::init_defaults()
     m_disable_steer_while_unskid = false;
     m_camera_follow_skid         = false;
     m_cutscene_fov               = 0.61f;
+    m_steam_ask_for_internet     = false;
 
     m_score_increase.clear();
     m_leader_intervals.clear();
@@ -272,6 +273,11 @@ void STKConfig::getAllData(const XMLNode * root)
         camera->get("fov-3", &m_camera_fov[2]);
         camera->get("fov-4", &m_camera_fov[3]);
         camera->get("cutscene-fov", &m_cutscene_fov);
+    }
+
+    if (const XMLNode *steam = root->getNode("steam"))
+    {
+        steam->get("ask-for-internet", &m_steam_ask_for_internet);
     }
 
     if (const XMLNode *music_node = root->getNode("music"))

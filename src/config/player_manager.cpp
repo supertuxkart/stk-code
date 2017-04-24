@@ -25,6 +25,7 @@
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
 #include "online/online_player_profile.hpp"
+#include "online/steam.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
@@ -216,7 +217,17 @@ void PlayerManager::load()
         stringw name;
         current->getAndDecode("player", &name);
         m_current_player = getPlayer(name);
-    }
+        // If the account is a steam account, make sure we are logged 
+        // into steam with the right user id.
+        if(m_current_player->isSteamUser() &&
+            Steam::get()->getSteamID() != m_current_player->getSteamUserID())
+        {
+            Log::warn("PlayerManager",
+                   "Logged in as different steam user, please log in as '%s'.",
+                   name.c_str());
+            m_current_player = NULL;
+        }
+    }   // if current
 
 }   // load
 

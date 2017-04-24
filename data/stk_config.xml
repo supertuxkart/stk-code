@@ -162,6 +162,11 @@
       work anymore - so for now don't enable this. -->
   <networking enable="false"/>
 
+  <!-- Steam related settings:
+      ask-for-internet - If true the user on first start will be asked
+        for permission to connect to stk servers.  -->
+  <steam ask-for-internet="false"/>
+
   <!-- The field od views for 1-4 player split screen. fov-3 is
        actually not used (since 3 player split screen uses the
        same layout as 4 player split screen) -->

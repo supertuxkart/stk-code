@@ -24,6 +24,7 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include "online/steam.hpp"
 #include "online/xml_request.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -88,7 +89,9 @@ void RegisterScreen::init()
     }
     else if (PlayerManager::get()->getNumPlayers() == 0)
     {
-        if (getenv("USERNAME") != NULL)        // for windows
+        if (Steam::get()->isSteamAvailable())
+            username = StringUtils::utf8ToWide( Steam::get()->getUserName());
+        else if (getenv("USERNAME") != NULL)        // for windows
             username = getenv("USERNAME");
         else if (getenv("USER") != NULL)       // Linux, Macs
             username = getenv("USER");

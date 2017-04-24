@@ -24,6 +24,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "online/online_player_profile.hpp"
+#include "online/steam.hpp"
 #include "io/xml_node.hpp"
 #include "io/utf_writer.hpp"
 #include "utils/string_utils.hpp"
@@ -38,6 +39,14 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
 #ifdef DEBUG
     m_magic_number = 0xABCD1234;
 #endif
+    if(Steam::get()->isSteamAvailable() &&
+        name == StringUtils::utf8ToWide(Steam::get()->getUserName()) )
+    {
+        m_steam_id = Steam::get()->getSteamID();
+    }
+    else
+        m_steam_id = "";
+
     m_local_name          = name;
     m_is_guest_account    = is_guest;
     m_use_frequency       = is_guest ? -1 : 0;
@@ -68,6 +77,7 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
 */
 PlayerProfile::PlayerProfile(const XMLNode* node)
 {
+    m_steam_id            = "";
     m_saved_session       = false;
     m_saved_token         = "";
     m_saved_user_id       = 0;
@@ -78,7 +88,8 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     m_achievements_status = NULL;
     m_icon_filename       = "";
 
-    node->getAndDecode("name",     &m_local_name);
+    node->getAndDecode("name",     &m_local_name       );
+    node->get("steam-id",          &m_steam_id         );
     node->get("guest",             &m_is_guest_account );
     node->get("use-frequency",     &m_use_frequency    );
     node->get("unique-id",         &m_unique_id        );
@@ -154,6 +165,23 @@ void PlayerProfile::addIcon()
     if (m_icon_filename.size() > 0 || isGuestAccount())
         return;
 
+    if (isSteamUser())
+    {
+        std::ostringstream out;
+        out << m_unique_id << ".png";
+        std::string full_path = file_manager->getUserConfigFile(out.str());
+        Steam::get()->saveAvatarAs(full_path);
+        if (file_manager->fileExists(full_path))
+        {
+            m_icon_filename = out.str();
+        }
+        else
+        {
+            m_icon_filename = "";
+        }
+        return;
+    }
+
     int n = (m_unique_id + kart_properties_manager->getKartId("tux") - 1)
           % kart_properties_manager->getNumberOfKarts();
 
@@ -202,6 +230,7 @@ void PlayerProfile::save(UTFWriter &out)
         << L"\" guest=\""         << m_is_guest_account
         << L"\" use-frequency=\"" << m_use_frequency << L"\"\n";
 
+    out << L"            steam-id=\"" << m_steam_id << L"\"\n";
     out << L"            icon-filename=\"" << m_icon_filename << L"\"\n";
 
     out << L"            unique-id=\""  << m_unique_id

@@ -97,6 +97,11 @@ private:
     /** The token of the saved session. */
     std::string m_saved_token;
 
+    /** If the account is a steam account, this stores the steam user id.
+     *  Otherwise it is empty. A steam account can only be selected if
+     *  the user is logged into steam! */
+    std::string m_steam_id;
+
     /** The online user name used last (empty if not used online). */
     core::stringw m_last_online_name;
 
@@ -299,6 +304,12 @@ public:
     // ------------------------------------------------------------------------
     /** Sets if this player was logged in last time it was used. */
     void setRememberPassword(bool b) { m_remember_password = b; }
+    // ------------------------------------------------------------------------
+    /** Returns if this account is a steam account. */
+    bool isSteamUser() const { return m_steam_id != ""; }
+    // ------------------------------------------------------------------------
+    /** Returns the steam user id of this player ("" if not a steam account).*/
+    const std::string &getSteamUserID() const { return m_steam_id;  }
     // ------------------------------------------------------------------------
 };   // class PlayerProfile
 

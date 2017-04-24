@@ -91,6 +91,8 @@ Steam::Steam()
         return;
     }
 
+    m_user_name_wchar = StringUtils::utf8ToWide(m_user_name);
+
     s = sendCommand("id");
     m_steam_id = decodeString(s);
     if (m_steam_id== "")

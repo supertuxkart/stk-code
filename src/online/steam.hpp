@@ -18,6 +18,8 @@
 #ifndef HEADER_STEAM_HPP
 #define HEADER_STEAM_HPP
 
+#include "irrString.h"
+
 #ifdef WIN32
 #  include <windows.h>
 #endif
@@ -43,6 +45,9 @@ private:
 
     /** Steam user name. Only defined if m_steam_available. */
     std::string m_user_name;
+
+    /** User name as irr::stringw (wchar), which is used in STK. */
+    irr::core::stringw m_user_name_wchar;
 
     /** Unique steam id. */
     std::string m_steam_id;
@@ -96,6 +101,13 @@ public:
     const std::string& getSteamID();
     int saveAvatarAs(const std::string &filename);
     std::vector<std::string> getFriends();
+    // ------------------------------------------------------------------------
+    /** Returns the user name as wide string. */
+    const irr::core::stringw& getUserNameWchar()
+    {
+        assert(m_steam_available);
+        return m_user_name_wchar;
+    }   // getUserNameWchar
     // ------------------------------------------------------------------------
     /** Returns true if the connection to the Steam API was successful, i.e.
      *  connection to steam worked, and SteamWorks API could be initialised. */

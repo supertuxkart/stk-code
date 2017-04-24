@@ -152,6 +152,10 @@ public:
 
     float m_cutscene_fov;
 
+    /** True if the internet question should still be asked when
+     *  a steam connection is make. */
+    bool m_steam_ask_for_internet;
+
     /** Lists of TTF files used in STK. */
     std::vector<std::string> m_normal_ttf;
     std::vector<std::string> m_digit_ttf;

@@ -1459,6 +1459,16 @@ void askForInternetPermission()
         Online::RequestManager::IPERM_NOT_ASKED)
         return;
 
+    // If a steam connection is available, we could skip the
+    // internet permission question (depending on settings).
+    if (Steam::get()->isSteamAvailable() &&
+        !stk_config->m_steam_ask_for_internet)
+    {
+        UserConfigParams::m_internet_status = 
+                                     Online::RequestManager::IPERM_ALLOWED;
+        return;
+    }
+
     class ConfirmServer :
           public MessageDialog::IConfirmDialogListener
     {
@@ -1517,11 +1527,6 @@ int main(int argc, char *argv[] )
     CommandLine::init(argc, argv);
 
     Steam::create();
-    bool steam_avail = Steam::get()->isSteamAvailable();
-    std::string id   = Steam::get()->getSteamID();
-    std::string name = Steam::get()->getUserName();
-    int n = Steam::get()->saveAvatarAs("test.png");
-    Steam::destroy();
 
     CrashReporting::installHandlers();
 
@@ -1703,16 +1708,26 @@ int main(int argc, char *argv[] )
             }
             else
             {
-                UserScreen::getInstance()->push();
-                // If there is no player, push the RegisterScreen on top of
-                // the login screen. This way on first start players are
-                // forced to create a player.
-                if (PlayerManager::get()->getNumPlayers() == 0)
+                if (Steam::get()->isSteamAvailable())
                 {
-                    RegisterScreen::getInstance()->push();
-                    RegisterScreen::getInstance()->setParent(UserScreen::getInstance());
+                    PlayerProfile *steam_player = PlayerManager::get()
+                              ->addNewPlayer(Steam::get()->getUserNameWchar());
+                    PlayerManager::get()->setCurrentPlayer(steam_player);
+                    MainMenuScreen::getInstance()->push();
                 }
-            }
+                else
+                {
+                    UserScreen::getInstance()->push();
+                    // If there is no player, push the RegisterScreen on top of
+                    // the login screen. This way on first start players are
+                    // forced to create a player.
+                    if (PlayerManager::get()->getNumPlayers() == 0)
+                    {
+                        RegisterScreen::getInstance()->push();
+                        RegisterScreen::getInstance()->setParent(UserScreen::getInstance());
+                    }
+                }   // !steam->isAvailable
+            }   // no player available
 #ifdef ENABLE_WIIUSE
             // Show a dialog to allow connection of wiimotes. */
             if(WiimoteManager::isEnabled())
@@ -1800,6 +1815,7 @@ int main(int argc, char *argv[] )
     if(NetworkConfig::get()->isNetworking() && STKHost::existHost())
         STKHost::get()->abort();
 
+    Steam::destroy();
     cleanSuperTuxKart();
 
 #ifdef DEBUG
