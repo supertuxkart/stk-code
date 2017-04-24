@@ -391,15 +391,15 @@ public:
 		CIrrDeviceWayland *dev = static_cast<CIrrDeviceWayland *>(data);
 		if (!strcmp(interface,"wl_compositor")) {
 			printf("binding compositor\n");
-			dev->compositor = static_cast<wl_compositor *>(wl_registry_bind (registry, name, &wl_compositor_interface, 0));
+			dev->compositor = static_cast<wl_compositor *>(wl_registry_bind (registry, name, &wl_compositor_interface, 1));
 		}
 		else if (!strcmp(interface,"wl_shell")) {
 			printf("binding shell\n");
-			dev->shell = static_cast<wl_shell *>(wl_registry_bind (registry, name, &wl_shell_interface, 0));
+			dev->shell = static_cast<wl_shell *>(wl_registry_bind (registry, name, &wl_shell_interface, 1));
 		}
 		else if (strcmp(interface, "wl_seat") == 0) {
 			printf("binding seat\n");
-			dev->seat = static_cast<wl_seat *>(wl_registry_bind(registry, name, &wl_seat_interface, 0));
+			dev->seat = static_cast<wl_seat *>(wl_registry_bind(registry, name, &wl_seat_interface, 1));
 		}
 		else if (strcmp(interface, "wl_output") == 0)
 		{
@@ -525,15 +525,18 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& param)
 CIrrDeviceWayland::~CIrrDeviceWayland()
 {
 	printf("destroy dev\n");
+	
+	delete EglContext;
+	
 	wl_output_destroy(output);
 	wl_keyboard_destroy(keyboard);
 	wl_pointer_destroy(pointer);
 	wl_seat_destroy(seat);
 	wl_registry_destroy(registry);
+	wl_display_flush(display);
 	wl_display_disconnect(display);
 	xkb_context_unref(xkbctx);
 	
-	delete EglContext;
 
 #if defined(_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
 	for (u32 joystick = 0; joystick < ActiveJoysticks.size(); ++joystick)
