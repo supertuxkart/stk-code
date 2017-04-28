@@ -1,25 +1,27 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Algimantas Margevičius <margevicius.algimantas@gmail.com>, 2011
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
 # Jonas Kriaučiūnas <jonukas@gmail.com>, 2015
 # Mantas Kriaučiūnas <mantas@akl.lt>, 2015
+# Zygimantus <zygimantus@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-09-26 00:20+1000\n"
-"PO-Revision-Date: 2015-09-26 09:35+0000\n"
-"Last-Translator: Auria <auria.mg@gmail.com>\n"
+"PO-Revision-Date: 2016-11-04 14:08+0200\n"
+"Last-Translator: Zygimantus <zygimantus@gmail.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/supertuxkart/supertuxkart/language/lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: lt\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 1.8.11\n"
 
 #. I18N: ./data/achievements.xml
 msgid "Christoffel Columbus"
@@ -47,7 +49,7 @@ msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Marathoner"
-msgstr ""
+msgstr "Maratonininkas"
 
 #. I18N: ./data/achievements.xml
 msgid "Make a race with 5 laps or more."
@@ -79,7 +81,7 @@ msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Unstoppable"
-msgstr ""
+msgstr "Nesustabdomas"
 
 #. I18N: ./data/achievements.xml
 msgid "Win 5 single races in a row."
@@ -106,9 +108,7 @@ msgid "Mosquito Hunter"
 msgstr "Uodų gaudytojas"
 
 #. I18N: ./data/achievements.xml
-msgid ""
-"Take your opponents for mosquitos! With the swatter, squash at least 5 of "
-"them in a race."
+msgid "Take your opponents for mosquitos! With the swatter, squash at least 5 of them in a race."
 msgstr ""
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
@@ -140,8 +140,7 @@ msgstr "Pašalinti"
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:216
-#: src/states_screens/dialogs/addons_loading.cpp:284
+#: src/input/gamepad_config.cpp:216 src/states_screens/dialogs/addons_loading.cpp:284
 msgid "Back"
 msgstr "Grįžti"
 
@@ -153,13 +152,13 @@ msgstr "SuperTuxKart papildiniai"
 #. I18N: In addons screen, in the filtering bar, to enable a filter that will
 #. show only recently updated items
 msgid "Updated"
-msgstr ""
+msgstr "Atnaujinta"
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: In addons screen, in the filtering bar, to enable a filter that will
 #. show only items with good rating
 msgid "Rating >="
-msgstr ""
+msgstr "Reitingas >="
 
 #. I18N: ./data/gui/addons_screen.stkgui
 #. I18N: In the addons screen
@@ -196,11 +195,7 @@ msgstr "Standartiniai"
 #. I18N: track group name
 #. I18N: kart group name
 #. I18N: track group name
-#: src/states_screens/arenas_screen.cpp:83
-#: src/states_screens/easter_egg_screen.cpp:145
-#: src/states_screens/grand_prix_editor_screen.cpp:327
-#: src/states_screens/kart_selection.cpp:286
-#: src/states_screens/tracks_screen.cpp:155
+#: src/states_screens/arenas_screen.cpp:83 src/states_screens/easter_egg_screen.cpp:145 src/states_screens/grand_prix_editor_screen.cpp:327 src/states_screens/kart_selection.cpp:286 src/states_screens/tracks_screen.cpp:155
 msgid "Add-Ons"
 msgstr "Papildymai"
 
@@ -213,15 +208,7 @@ msgstr "Papildymai"
 #. I18N: name of the tab that will show tracks from all groups
 #. I18N: if all kart animations are enabled
 #. I18N: name of the tab that will show tracks from all groups
-#: src/states_screens/addons_screen.cpp:49
-#: src/states_screens/arenas_screen.cpp:75
-#: src/states_screens/easter_egg_screen.cpp:137
-#: src/states_screens/edit_track_screen.cpp:147
-#: src/states_screens/gp_info_screen.cpp:76
-#: src/states_screens/grand_prix_editor_screen.cpp:324
-#: src/states_screens/kart_selection.cpp:278
-#: src/states_screens/options_screen_video.cpp:389
-#: src/states_screens/tracks_screen.cpp:145
+#: src/states_screens/addons_screen.cpp:49 src/states_screens/arenas_screen.cpp:75 src/states_screens/easter_egg_screen.cpp:137 src/states_screens/edit_track_screen.cpp:147 src/states_screens/gp_info_screen.cpp:76 src/states_screens/grand_prix_editor_screen.cpp:324 src/states_screens/kart_selection.cpp:278 src/states_screens/options_screen_video.cpp:389 src/states_screens/tracks_screen.cpp:145
 msgid "All"
 msgstr "Viskas"
 
@@ -260,9 +247,7 @@ msgstr "Taip"
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/dialogs/addons_loading.cpp:227
-#: src/states_screens/dialogs/add_device_dialog.cpp:128
-#: src/states_screens/user_screen.cpp:112
+#: src/states_screens/dialogs/addons_loading.cpp:227 src/states_screens/dialogs/add_device_dialog.cpp:128 src/states_screens/user_screen.cpp:112
 msgid "Cancel"
 msgstr "Atsisakyti"
 
@@ -403,8 +388,7 @@ msgstr ""
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/dialogs/message_dialog.cpp:123
-#: src/states_screens/dialogs/message_dialog.cpp:136
+#: src/states_screens/dialogs/message_dialog.cpp:123 src/states_screens/dialogs/message_dialog.cpp:136
 msgid "OK"
 msgstr "Gerai"
 
@@ -425,8 +409,7 @@ msgstr "Įrašykite naujo žaidėjo vardą"
 #. I18N: In soccer setup screen
 #. I18N: ./data/gui/tutorial_message_dialog.stkgui
 #. I18N: Button in tutorial
-#: src/states_screens/dialogs/gp_info_dialog.cpp:214
-#: src/states_screens/race_result_gui.cpp:186
+#: src/states_screens/dialogs/gp_info_dialog.cpp:214 src/states_screens/race_result_gui.cpp:186
 msgid "Continue"
 msgstr "Tęsti"
 
@@ -498,7 +481,7 @@ msgstr "Pervadinti"
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "AI karts"
-msgstr ""
+msgstr "AI kartai"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -590,24 +573,18 @@ msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-#: ../stk-assets/tracks/tutorial/scripting.as:32
-#: ../stk-assets/tracks/tutorial/triggers.as:16
+#: ../stk-assets/tracks/tutorial/scripting.as:32 ../stk-assets/tracks/tutorial/triggers.as:16
 msgid "Avoid bananas!"
 msgstr "Apvažiuok bananus!"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-msgid ""
-"Collecting nitro allows you to get speed boosts whenever you wish by "
-"pressing the appropriate key. You can see your current level of nitro in the"
-" bar at the right of the game screen."
+msgid "Collecting nitro allows you to get speed boosts whenever you wish by pressing the appropriate key. You can see your current level of nitro in the bar at the right of the game screen."
 msgstr "Jei rinksi „Nitro“ kurą - paspaudęs atitinkamą klavišą, galėsi trumpam panaudoti greičio persvarą. Dešinėj ekrano pusėj esančioj juostoj gali matyti dabartinį savo „Nitro“ kuro kiekį."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
-msgid ""
-"If you see a button with a lock like this one, you need to complete a "
-"challenge to unlock it."
+msgid "If you see a button with a lock like this one, you need to complete a challenge to unlock it."
 msgstr "Jei matai mygtuką su užraktu kaip šis, norint atrakinti tau reikia įveikti užduotį."
 
 #. I18N: ./data/gui/help1.stkgui
@@ -626,26 +603,19 @@ msgid "To help you win, there are some powerups you can collect:"
 msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
-msgid ""
-"BubbleGum - protect yourself with a shield, or use while looking back to "
-"leave a sticky pink puddle behind you."
+msgid "BubbleGum - protect yourself with a shield, or use while looking back to leave a sticky pink puddle behind you."
 msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
-msgid ""
-"Cake - thrown at the closest rival, best on short ranges and long straights."
+msgid "Cake - thrown at the closest rival, best on short ranges and long straights."
 msgstr "Pyragėlis - metamas į artimiausią priešininką, geriausiai tinka trumpiem atstumams bei ilgom tiesiosioms."
 
 #. I18N: ./data/gui/help2.stkgui
-msgid ""
-"Plunger - throw straight to pull an opponent back, or throw while looking "
-"back to make one lose sight."
+msgid "Plunger - throw straight to pull an opponent back, or throw while looking back to make one lose sight."
 msgstr "Naras - metamas į priekį, siekiant truktelti priešininką atgal, arba metamas, žiūrint atgal, norint apakinti priešininką."
 
 #. I18N: ./data/gui/help2.stkgui
-msgid ""
-"Bowling Ball - bounces off walls. If you are looking back, it will be thrown"
-" backwards."
+msgid "Bowling Ball - bounces off walls. If you are looking back, it will be thrown backwards."
 msgstr "Boulingo kamuolys - atšoka nuo sienų. Jei žiūrėsite atgal, bus metamas atgal."
 
 #. I18N: ./data/gui/help2.stkgui
@@ -653,15 +623,11 @@ msgid "Parachute - slows down all karts in a better position."
 msgstr "Parašiutas - sulėtina visus kartus esančius geresnėje pozicijoj nei tu."
 
 #. I18N: ./data/gui/help2.stkgui
-msgid ""
-"Swapper - gift boxes are transformed into bananas and vice versa for a short"
-" time."
+msgid "Swapper - gift boxes are transformed into bananas and vice versa for a short time."
 msgstr "Keitiklis - trumpam laikui dovanos pakeičiamos bananais ir atvirkščiai."
 
 #. I18N: ./data/gui/help2.stkgui
-msgid ""
-"Basket Ball - bounces after the leader, and might squash and slow down karts"
-" down on the way."
+msgid "Basket Ball - bounces after the leader, and might squash and slow down karts down on the way."
 msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
@@ -674,9 +640,7 @@ msgstr "SuperTuxKart lenktynėse yra keli žaidimo būdai (režimai)"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-msgid ""
-"Regular Race: All blows allowed, so catch weapons and make clever use of "
-"them!"
+msgid "Regular Race: All blows allowed, so catch weapons and make clever use of them!"
 msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
@@ -686,24 +650,17 @@ msgstr "Tikros lenktynės: nėra gerų dalykėlių, rezultatą lemia tik vairavi
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-msgid ""
-"Follow the leader: Run for second place, as the last kart will be "
-"disqualified every time the counter hits zero. Beware: going in front of the"
-" leader will get you eliminated too!"
+msgid "Follow the leader: Run for second place, as the last kart will be disqualified every time the counter hits zero. Beware: going in front of the leader will get you eliminated too!"
 msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-msgid ""
-"3 Strikes Battle: Only in multiplayer games. Hit others with weapons until "
-"they lose all their lives."
+msgid "3 Strikes Battle: Only in multiplayer games. Hit others with weapons until they lose all their lives."
 msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-msgid ""
-"Soccer: Only in multiplayer games. Use your kart to push the ball into the "
-"goal."
+msgid "Soccer: Only in multiplayer games. Use your kart to push the ball into the goal."
 msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
@@ -713,11 +670,7 @@ msgstr "Paslėpti kiaušiniai: Tyrinėk trasas ir surask visus paslėptus kiauš
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-msgid ""
-"* Most of these game modes can also be played in a Grand Prix fashion: "
-"instead of playing a single race, you play many in a row. The better you "
-"rank, the more points you get. In the end, the player with the most points "
-"wins the cup."
+msgid "* Most of these game modes can also be played in a Grand Prix fashion: instead of playing a single race, you play many in a row. The better you rank, the more points you get. In the end, the player with the most points wins the cup."
 msgstr "* Dauguma šių žaidimų gali būti žaidžiami čempionato (Grand Prix) stiliumi: vietoj vienos trasos lenktynių, žaidi daug lenktynių keliose trasose iš eilės. Kuo geresnė tavo vieta, tuo daugiau gauni taškų. Pabaigoj, žaidėjas turintis daugiausia taškų laimi taurę."
 
 #. I18N: ./data/gui/help4.stkgui
@@ -730,24 +683,12 @@ msgstr "(tinklo režimas kol kas neprieinamas)"
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
-msgid ""
-"First, you will need several input devices (having multiple gamepads or "
-"joysticks is the best way to play with several people). Go in the input "
-"configuration screen and setup the gamepads. It is also possible to play on "
-"keyboard(s), however each player will need a different set of keys, and keep"
-" in mind that most keyboards are not appropriate for multiplayer gameplay "
-"because they do not support large number of keypresses."
+msgid "First, you will need several input devices (having multiple gamepads or joysticks is the best way to play with several people). Go in the input configuration screen and setup the gamepads. It is also possible to play on keyboard(s), however each player will need a different set of keys, and keep in mind that most keyboards are not appropriate for multiplayer gameplay because they do not support large number of keypresses."
 msgstr "Pirmiausia, jums reikės kelių įvesties įrenginių (geriausia žaisti keliese yra turint kelis „gamepads“ ar vairalazdes). Eikite į įvesties konfigūravimo ekraną ir nustatykite „gamepads“. Taipogi yra galimybė žaisti su keliomis klaviatūromis, bet kiekvienam žaidėjui reikės skirtingų klavišų rinkinių. Turėkit omeny jog dauguma klaviatūrų netinka žaisti keliese, nes jos nesusitvarko su daug klavišų paspaudimų vienu metu."
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
-msgid ""
-"When input devices are configured, you are ready to play. Select the "
-"'multiplayer race' icon in the main menu. When it is time to choose a kart, "
-"each player can press on the 'fire' key of their gamepad or keyboard to join"
-" the game. Each player can use their input device to select their kart. The "
-"game continues when everyone selected their kart. Note that the mouse may "
-"not be used for this operation."
+msgid "When input devices are configured, you are ready to play. Select the 'multiplayer race' icon in the main menu. When it is time to choose a kart, each player can press on the 'fire' key of their gamepad or keyboard to join the game. Each player can use their input device to select their kart. The game continues when everyone selected their kart. Note that the mouse may not be used for this operation."
 msgstr "Kai įvesties įrenginiai nustatyti, tu pasiruošęs žaisti. Pagrindiniame meniu pasirink „kelių žaidėjo režimo“ piktogramą. Tada reikės pasirinkti kartą, kiekvienas žaidėjas gali paspausti „šauti“ klavišą, jų klaviatūrose ar „gamepad“ ir prisijungti prie žaidimo. Kiekvienas žaidėjas, naudodamasis savo įvesties įrenginiu, gali pasirinkti savo kartą. Žaidimas tęsis kai visi pasirinks savo kartą. Šiam veiksmui atlikti pele naudotis negalima."
 
 #. I18N: ./data/gui/karts.stkgui
@@ -778,9 +719,7 @@ msgstr "Žaisti keliese"
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/main_menu_screen.cpp:170
-#: src/states_screens/main_menu_screen.cpp:185
-#: src/states_screens/online_profile_friends.cpp:221
+#: src/states_screens/main_menu_screen.cpp:170 src/states_screens/main_menu_screen.cpp:185 src/states_screens/online_profile_friends.cpp:221
 msgid "Online"
 msgstr ""
 
@@ -863,7 +802,7 @@ msgstr "Patvirtinti"
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 msgid "Submit"
-msgstr ""
+msgstr "Pateikti"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -883,7 +822,7 @@ msgstr "Užverti"
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Server Creation"
-msgstr ""
+msgstr "Serverio kūrimas"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -897,7 +836,7 @@ msgstr "Serverio vardas"
 #. I18N: ./data/gui/online/lobby_settings.stkgui
 #. I18N: In the lobby settings screen
 msgid "Max. number of players"
-msgstr ""
+msgstr "Maks. žaidėjų skaičius"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -906,25 +845,24 @@ msgstr "Kurti"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
-#: src/states_screens/main_menu_screen.cpp:175
-#: src/states_screens/main_menu_screen.cpp:186
+#: src/states_screens/main_menu_screen.cpp:175 src/states_screens/main_menu_screen.cpp:186
 msgid "Login"
 msgstr "Prisijungti"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: Tab in login menu
 msgid "Sign In"
-msgstr ""
+msgstr "Prisijungti"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: Tab in login menu
 msgid "Sign In As Guest"
-msgstr ""
+msgstr "Prisijungti kaip svečiui"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: Tab in login menu
 msgid "Register"
-msgstr ""
+msgstr "Registruotis"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: In the login dialog
@@ -933,10 +871,7 @@ msgstr "Prisijungti svečiu"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: In the login dialog
-msgid ""
-"Logging in as a guest allows you to participate in online races, but it does"
-" not allow you to vote for addons, or collect any achievements while being "
-"online."
+msgid "Logging in as a guest allows you to participate in online races, but it does not allow you to vote for addons, or collect any achievements while being online."
 msgstr ""
 
 #. I18N: ./data/gui/online/guest_login.stkgui
@@ -952,12 +887,12 @@ msgstr ""
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In the networking lobby
 msgid "Server name:"
-msgstr ""
+msgstr "Serverio pavadinimas:"
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In networking lobby
 msgid "actions"
-msgstr ""
+msgstr "veiksmai"
 
 #. I18N: ./data/gui/online/lobby.stkgui
 #. I18N: In the networking lobby
@@ -1004,7 +939,7 @@ msgstr "Atsijungti"
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View"
-msgstr ""
+msgstr "Peržiūra"
 
 #. I18N: ./data/gui/online/profile_achievements.stkgui
 #. I18N: ./data/gui/online/profile_achievements_tab.stkgui
@@ -1023,17 +958,17 @@ msgstr "Draugai"
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: In the profile screen
 msgid "Look for more friends:"
-msgstr ""
+msgstr "Ieškoti daugiau draugų:"
 
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: ./data/gui/online/user_search.stkgui
 msgid "Search"
-msgstr ""
+msgstr "Ieškoti"
 
 #. I18N: ./data/gui/online/profile_overview.stkgui
 #. I18N: Section in the profile screen
 msgid "Overview"
-msgstr ""
+msgstr "Apžvalga"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 #. I18N: Section in the profile screen
@@ -1044,7 +979,7 @@ msgstr "Paskyros Nustatymai"
 #. I18N: ./data/gui/online/profile_settings.stkgui
 #. I18N: In the online account settings screen
 msgid "Password:"
-msgstr ""
+msgstr "Slaptažodis:"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "Change"
@@ -1059,15 +994,11 @@ msgstr "Paskyros Atkūrimas"
 
 #. I18N: ./data/gui/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
-msgid ""
-"You will receive an email with further instructions on how to reset your "
-"password. Please be patient and be sure to check your spam folder."
+msgid "You will receive an email with further instructions on how to reset your password. Please be patient and be sure to check your spam folder."
 msgstr ""
 
 #. I18N: ./data/gui/online/recovery_input.stkgui
-msgid ""
-"Fill in the username and email address you supplied at registration to be "
-"able to reset your password."
+msgid "Fill in the username and email address you supplied at registration to be able to reset your password."
 msgstr ""
 
 #. I18N: ./data/gui/online/recovery_input.stkgui
@@ -1076,8 +1007,7 @@ msgstr ""
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/online_profile_friends.cpp:72
-#: src/states_screens/online_user_search.cpp:74
+#: src/states_screens/online_profile_friends.cpp:72 src/states_screens/online_user_search.cpp:74
 msgid "Username"
 msgstr "Naudotojo vardas"
 
@@ -1129,10 +1059,7 @@ msgstr "Slaptažodis"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
-msgid ""
-"You can play without creating an online account by selecting an offline "
-"account. Though then you can not connect to friends, vote for addons etc. "
-"Please read our privacy statement at http://privacy.supertuxkart.net"
+msgid "You can play without creating an online account by selecting an offline account. Though then you can not connect to friends, vote for addons etc. Please read our privacy statement at http://privacy.supertuxkart.net"
 msgstr ""
 
 #. I18N: ./data/gui/online/registration_terms.stkgui
@@ -1161,8 +1088,7 @@ msgstr "Serverio informacija"
 #. I18N: In the server info dialog
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
-#: src/states_screens/online_profile_achievements.cpp:73
-#: src/states_screens/server_selection.cpp:91
+#: src/states_screens/online_profile_achievements.cpp:73 src/states_screens/server_selection.cpp:91
 msgid "Name"
 msgstr "Vardas"
 
@@ -1192,12 +1118,12 @@ msgstr "Nepriimti"
 
 #. I18N: ./data/gui/online/user_search.stkgui
 msgid "User search"
-msgstr ""
+msgstr "Naudotojo paieška"
 
 #. I18N: ./data/gui/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
 msgid "Vote"
-msgstr ""
+msgstr "Balsuoti"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: ./data/gui/options_device.stkgui
@@ -1211,11 +1137,7 @@ msgstr "SuperTuxKart nustatymai"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_input.cpp:140
-#: src/states_screens/options_screen_input2.cpp:86
-#: src/states_screens/options_screen_ui.cpp:119
-#: src/states_screens/options_screen_video.cpp:172
-#: src/states_screens/user_screen.cpp:637
+#: src/states_screens/options_screen_input.cpp:140 src/states_screens/options_screen_input2.cpp:86 src/states_screens/options_screen_ui.cpp:119 src/states_screens/options_screen_video.cpp:172 src/states_screens/user_screen.cpp:637
 msgid "Audio"
 msgstr "Garsas"
 
@@ -1246,10 +1168,7 @@ msgstr "Garso efektai"
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_audio.cpp:68
-#: src/states_screens/options_screen_ui.cpp:121
-#: src/states_screens/options_screen_video.cpp:175
-#: src/states_screens/user_screen.cpp:639
+#: src/states_screens/options_screen_audio.cpp:68 src/states_screens/options_screen_ui.cpp:121 src/states_screens/options_screen_video.cpp:175 src/states_screens/user_screen.cpp:639
 msgid "Controls"
 msgstr "Valdymas"
 
@@ -1276,27 +1195,20 @@ msgstr "Pridėti valdymo įrenginį"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
-msgid ""
-"* Which config to use will be inferred from which 'Select' key is pressed to"
-" join the game."
+msgid "* Which config to use will be inferred from which 'Select' key is pressed to join the game."
 msgstr ""
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_audio.cpp:67
-#: src/states_screens/options_screen_input.cpp:142
-#: src/states_screens/options_screen_input2.cpp:88
-#: src/states_screens/options_screen_ui.cpp:120
-#: src/states_screens/options_screen_video.cpp:174
-#: src/states_screens/server_selection.cpp:92
+#: src/states_screens/options_screen_audio.cpp:67 src/states_screens/options_screen_input.cpp:142 src/states_screens/options_screen_input2.cpp:88 src/states_screens/options_screen_ui.cpp:120 src/states_screens/options_screen_video.cpp:174 src/states_screens/server_selection.cpp:92
 msgid "Players"
 msgstr "Žaidėjai"
 
 #. I18N: ./data/gui/options_players.stkgui
 msgid "You are playing as"
-msgstr ""
+msgstr "Žaidžiate už"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In the player configuration screen
@@ -1310,11 +1222,7 @@ msgstr "Pridėti žaidėją"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_audio.cpp:66
-#: src/states_screens/options_screen_input.cpp:141
-#: src/states_screens/options_screen_input2.cpp:87
-#: src/states_screens/options_screen_video.cpp:173
-#: src/states_screens/user_screen.cpp:638
+#: src/states_screens/options_screen_audio.cpp:66 src/states_screens/options_screen_input.cpp:141 src/states_screens/options_screen_input2.cpp:87 src/states_screens/options_screen_video.cpp:173 src/states_screens/user_screen.cpp:638
 msgid "User Interface"
 msgstr "Naudotojo sąsaja"
 
@@ -1350,11 +1258,7 @@ msgstr "Prisijungti prie interneto"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: Section in the settings menu
-#: src/states_screens/options_screen_audio.cpp:65
-#: src/states_screens/options_screen_input.cpp:139
-#: src/states_screens/options_screen_input2.cpp:85
-#: src/states_screens/options_screen_ui.cpp:118
-#: src/states_screens/user_screen.cpp:636
+#: src/states_screens/options_screen_audio.cpp:65 src/states_screens/options_screen_input.cpp:139 src/states_screens/options_screen_input2.cpp:85 src/states_screens/options_screen_ui.cpp:118 src/states_screens/user_screen.cpp:636
 msgid "Graphics"
 msgstr "Vaizdas"
 
@@ -1440,7 +1344,7 @@ msgstr "Lenktynių nustatymai"
 
 #. I18N: ./data/gui/racesetup.stkgui
 msgid "Select a difficulty"
-msgstr ""
+msgstr "Pasirinkti sudėtingumą"
 
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
@@ -1466,7 +1370,7 @@ msgstr "Ekspertas"
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
 msgid "SuperTux"
-msgstr ""
+msgstr "SuperTux"
 
 #. I18N: ./data/gui/racesetup.stkgui
 msgid "Select a game mode"
@@ -1501,7 +1405,7 @@ msgstr "Baigti lenktynes"
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Type of race, in a challenge
 msgid "Type:"
-msgstr ""
+msgstr "Tipas:"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
@@ -1511,7 +1415,7 @@ msgstr ""
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Maximum time (min.)"
-msgstr ""
+msgstr "Maksimalus laikas (min.)"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
@@ -1563,7 +1467,7 @@ msgstr "Važiuoti priešinga kryptimi"
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Remember password"
-msgstr ""
+msgstr "Prisiminti slaptažodį"
 
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
@@ -1605,7 +1509,7 @@ msgstr "Magmos fortas"
 
 #. I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
 msgid "Gran Paradiso Island"
-msgstr ""
+msgstr "Gran Paradiso sala"
 
 #. I18N: ../stk-assets/tracks/greenvalley/track.xml
 msgid "Green Valley"
@@ -1637,9 +1541,7 @@ msgstr ""
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
-msgid ""
-" But you pathetic little twerps will never be able to beat me - King of the "
-"Karts!"
+msgid " But you pathetic little twerps will never be able to beat me - King of the Karts!"
 msgstr ""
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
@@ -1656,7 +1558,7 @@ msgstr "Sena kasykla"
 
 #. I18N: ../stk-assets/tracks/minigolf/track.xml
 msgid "Minigolf"
-msgstr ""
+msgstr "Minigolfas"
 
 #. I18N: ../stk-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"
@@ -1696,7 +1598,7 @@ msgstr "Subsea"
 
 #. I18N: ../stk-assets/tracks/temple/track.xml
 msgid "Temple"
-msgstr ""
+msgstr "Šventykla"
 
 #. I18N: ../stk-assets/tracks/xr591/track.xml
 msgid "XR591"
@@ -1740,7 +1642,7 @@ msgstr "Ratai : %i"
 
 #: src/challenges/challenge_data.cpp:255
 msgid "Follow the leader"
-msgstr ""
+msgstr "Sekti lyderį"
 
 #: src/challenges/challenge_data.cpp:491
 #, c-format
@@ -1769,7 +1671,7 @@ msgstr "Galėsite žaisti nauju kartu „%s“"
 
 #: src/config/player_manager.cpp:91
 msgid "Currently not signed in"
-msgstr ""
+msgstr "Dabar neprisijungęs"
 
 #. I18N: Name of first guest player (without number)
 #: src/config/player_manager.cpp:392
@@ -1783,15 +1685,11 @@ msgid "Guest %d"
 msgstr "Svečias %d"
 
 #: src/config/user_config.cpp:700
-msgid ""
-"Your config file was malformed, so it was deleted and a new one will be "
-"created."
+msgid "Your config file was malformed, so it was deleted and a new one will be created."
 msgstr "Jūsų konfigūracija sugadinta, ji buvo ištrinta, bus sukurta nauja."
 
 #: src/config/user_config.cpp:711
-msgid ""
-"Your config file was too old, so it was deleted and a new one will be "
-"created."
+msgid "Your config file was too old, so it was deleted and a new one will be created."
 msgstr "Jūsų konfigūracija buvo per sena, ji buvo ištrinta, bus sukurta nauja."
 
 #: src/graphics/irr_driver.cpp:1852
@@ -2337,7 +2235,7 @@ msgstr "Juodasis"
 #. I18N: Name of the white button on xbox controller
 #: src/input/gamepad_config.cpp:171
 msgid "White"
-msgstr ""
+msgstr "Baltasis"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
@@ -2408,7 +2306,7 @@ msgstr ""
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:218
 msgid "Start"
-msgstr ""
+msgstr "Pradėti"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:220
@@ -2450,15 +2348,11 @@ msgid "Only the Game Master may act at this point!"
 msgstr "Čia veikti gali tik žaidimo meistrai!"
 
 #: src/input/wiimote_manager.cpp:387
-msgid ""
-"Connect your wiimote to the Bluetooth manager, then click on Ok.Detailed "
-"instructions at supertuxkart.net/Wiimote"
+msgid "Connect your wiimote to the Bluetooth manager, then click on Ok.Detailed instructions at supertuxkart.net/Wiimote"
 msgstr ""
 
 #: src/input/wiimote_manager.cpp:390
-msgid ""
-"Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
-"mode, then click on Ok.Detailed instructions at supertuxkart.net/Wiimote"
+msgid "Press the buttons 1+2 simultaneously on your wiimote to put it in discovery mode, then click on Ok.Detailed instructions at supertuxkart.net/Wiimote"
 msgstr ""
 
 #: src/input/wiimote_manager.cpp:413
@@ -2473,13 +2367,11 @@ msgstr[2] ""
 msgid "Could not detect any wiimote :/"
 msgstr ""
 
-#: src/karts/controller/network_player_controller.cpp:281
-#: src/karts/controller/player_controller.cpp:356
+#: src/karts/controller/network_player_controller.cpp:281 src/karts/controller/player_controller.cpp:356
 msgid "Penalty time!!"
 msgstr "Baudos sekundės!!!"
 
-#: src/karts/controller/network_player_controller.cpp:283
-#: src/karts/controller/player_controller.cpp:358
+#: src/karts/controller/network_player_controller.cpp:283 src/karts/controller/player_controller.cpp:358
 msgid "Don't accelerate before go"
 msgstr "Nepradėkite važiuoti prieš lenktynių startą"
 
@@ -2492,25 +2384,15 @@ msgid "You finished the race!"
 msgstr "Jūs baigėte lenktynes!"
 
 #: src/main.cpp:1227
-msgid ""
-"SuperTuxKart may connect to a server to download add-ons and notify you of "
-"updates. We also collect anonymous hardware statistics to help with the "
-"development of STK. Please read our privacy policy at "
-"http://privacy.supertuxkart.net. Would you like this feature to be enabled? "
-"(To change this setting at a later time, go to options, select tab 'User "
-"Interface', and edit \"Connect to the Internet\" and \"Send anonymous HW "
-"statistics\")."
+msgid "SuperTuxKart may connect to a server to download add-ons and notify you of updates. We also collect anonymous hardware statistics to help with the development of STK. Please read our privacy policy at http://privacy.supertuxkart.net. Would you like this feature to be enabled? (To change this setting at a later time, go to options, select tab 'User Interface', and edit \"Connect to the Internet\" and \"Send anonymous HW statistics\")."
 msgstr ""
 
 #: src/main.cpp:1399
-msgid ""
-"Your driver version is too old. Please install the latest video drivers."
+msgid "Your driver version is too old. Please install the latest video drivers."
 msgstr ""
 
 #: src/main.cpp:1411
-msgid ""
-"Your OpenGL version appears to be too old. Please verify if an update for "
-"your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."
+msgid "Your OpenGL version appears to be too old. Please verify if an update for your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."
 msgstr ""
 
 #: src/modes/easter_egg_hunt.cpp:202
@@ -2591,9 +2473,7 @@ msgid "You have a new friend request!"
 msgstr ""
 
 #: src/online/xml_request.cpp:83
-msgid ""
-"Unable to connect to the server. Check your internet connection or try again"
-" later."
+msgid "Unable to connect to the server. Check your internet connection or try again later."
 msgstr ""
 
 #: src/race/grand_prix_data.hpp:171
@@ -2604,7 +2484,9 @@ msgstr "Atsitiktinis čempionatas"
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
-msgstr "Geriausių rezultatų failas buvo per senas.\nvisi rezultatai buvo ištrinti."
+msgstr ""
+"Geriausių rezultatų failas buvo per senas.\n"
+"visi rezultatai buvo ištrinti."
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:176
@@ -2687,32 +2569,19 @@ msgstr "%s sukūrė %s"
 msgid "Please wait while addons are updated"
 msgstr "Palaukite kol papildiniai bus atnaujinti"
 
-#: src/states_screens/addons_screen.cpp:512
-#: src/states_screens/main_menu_screen.cpp:553
-msgid ""
-"Sorry, an error occurred while contacting the add-ons website. Make sure you"
-" are connected to the Internet and that SuperTuxKart is not blocked by a "
-"firewall"
+#: src/states_screens/addons_screen.cpp:512 src/states_screens/main_menu_screen.cpp:553
+msgid "Sorry, an error occurred while contacting the add-ons website. Make sure you are connected to the Internet and that SuperTuxKart is not blocked by a firewall"
 msgstr "Deja, jungiantis prie papildinių svetainės kilo klaida. Įsitikinkite jog jūs prisijungę prie interneto ir „SuperTuxKart“ neblokuojamas ugniasienės"
 
 #. I18N: arena group name
 #. I18N: track group name
 #. I18N: kart group name
 #. I18N: track group name
-#: src/states_screens/arenas_screen.cpp:81
-#: src/states_screens/easter_egg_screen.cpp:143
-#: src/states_screens/kart_selection.cpp:284
-#: src/states_screens/tracks_screen.cpp:153
+#: src/states_screens/arenas_screen.cpp:81 src/states_screens/easter_egg_screen.cpp:143 src/states_screens/kart_selection.cpp:284 src/states_screens/tracks_screen.cpp:153
 msgid "standard"
 msgstr "standartinis"
 
-#: src/states_screens/arenas_screen.cpp:237
-#: src/states_screens/arenas_screen.cpp:267
-#: src/states_screens/easter_egg_screen.cpp:225
-#: src/states_screens/easter_egg_screen.cpp:256
-#: src/states_screens/kart_selection.cpp:858
-#: src/states_screens/kart_selection.cpp:1452
-#: src/states_screens/race_setup_screen.cpp:214
+#: src/states_screens/arenas_screen.cpp:237 src/states_screens/arenas_screen.cpp:267 src/states_screens/easter_egg_screen.cpp:225 src/states_screens/easter_egg_screen.cpp:256 src/states_screens/kart_selection.cpp:858 src/states_screens/kart_selection.cpp:1452 src/states_screens/race_setup_screen.cpp:214
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "Užrakinta: įvykdykite aktyvias užduotis (iššūkius) ir gausite daugiau galimybių!"
 
@@ -2739,7 +2608,11 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Algimantas Margevičius https://launchpad.net/~gymka\n  Mantas Kriaučiūnas https://launchpad.net/~mantas\n  STK-team https://launchpad.net/~stk"
+msgstr ""
+"Launchpad Contributions:\n"
+"  Algimantas Margevičius https://launchpad.net/~gymka\n"
+"  Mantas Kriaučiūnas https://launchpad.net/~mantas\n"
+"  STK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:96
 msgid "Update"
@@ -2759,8 +2632,7 @@ msgstr "atliko"
 msgid "%s MB"
 msgstr "%s MB"
 
-#: src/states_screens/dialogs/addons_loading.cpp:172
-#: src/states_screens/dialogs/addons_loading.cpp:176
+#: src/states_screens/dialogs/addons_loading.cpp:172 src/states_screens/dialogs/addons_loading.cpp:176
 #, c-format
 msgid "%s KB"
 msgstr "%s KB"
@@ -2779,8 +2651,7 @@ msgstr ""
 msgid "Problems installing the addon '%s'."
 msgstr "Įdiegiant papildinį „%s“ kilo bėdų."
 
-#: src/states_screens/dialogs/addons_loading.cpp:371
-#: src/states_screens/dialogs/addons_loading.cpp:408
+#: src/states_screens/dialogs/addons_loading.cpp:371 src/states_screens/dialogs/addons_loading.cpp:408
 msgid "Try again"
 msgstr "Bandyti dar kartą"
 
@@ -2794,7 +2665,10 @@ msgid ""
 "To add a new Gamepad/Joystick device, simply start SuperTuxKart with it connected and it will appear in the list.\n"
 "\n"
 "To add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to the computer. Remember that everyone still needs different keybindings in this case.)"
-msgstr "Norint pridėti naują Gamepad/Joystick įrenginį, paprasčiausiai paleiskite „SuperTuxKart“ su prijungtu įrenginiu ir jis rodomas sąraše.\n\nNorint pridėti klaviatūros konfigūraciją, gali naudotis mygtuku apačioje, BET dauguma klaviatūrų supranta tik ribotą klavišų paspaudimų skaičių, vienu metu ir tai netinka žaidžiant keliems žaidėjams. (Nepaisant to, tu gali prijungti kelias klaviatūras prie kompiuterio. Nepamiršk jog kiekvienai klaviatūrai reikės atskirų mygtukų rinkinių.)"
+msgstr ""
+"Norint pridėti naują Gamepad/Joystick įrenginį, paprasčiausiai paleiskite „SuperTuxKart“ su prijungtu įrenginiu ir jis rodomas sąraše.\n"
+"\n"
+"Norint pridėti klaviatūros konfigūraciją, gali naudotis mygtuku apačioje, BET dauguma klaviatūrų supranta tik ribotą klavišų paspaudimų skaičių, vienu metu ir tai netinka žaidžiant keliems žaidėjams. (Nepaisant to, tu gali prijungti kelias klaviatūras prie kompiuterio. Nepamiršk jog kiekvienai klaviatūrai reikės atskirų mygtukų rinkinių.)"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:90
@@ -2810,13 +2684,11 @@ msgstr "Pridėti klavišų nustatymus kitam žaidėjui"
 msgid "Current password invalid."
 msgstr "Dabartinis slaptažodis netinkamas."
 
-#: src/states_screens/dialogs/change_password_dialog.cpp:140
-#: src/states_screens/register_screen.cpp:288
+#: src/states_screens/dialogs/change_password_dialog.cpp:140 src/states_screens/register_screen.cpp:288
 msgid "Password has to be between 8 and 30 characters long!"
 msgstr "Slaptažodis turi būti nuo 8 iki 30 simbolių!"
 
-#: src/states_screens/dialogs/change_password_dialog.cpp:147
-#: src/states_screens/register_screen.cpp:272
+#: src/states_screens/dialogs/change_password_dialog.cpp:147 src/states_screens/register_screen.cpp:272
 msgid "Passwords don't match!"
 msgstr "Slaptažodžiai nesutampa!"
 
@@ -2824,9 +2696,7 @@ msgstr "Slaptažodžiai nesutampa!"
 msgid "Password successfully changed."
 msgstr "Slaptažodis sėkmingai pakeistas"
 
-#: src/states_screens/dialogs/change_password_dialog.cpp:235
-#: src/states_screens/dialogs/recovery_dialog.cpp:209
-#: src/states_screens/register_screen.cpp:353
+#: src/states_screens/dialogs/change_password_dialog.cpp:235 src/states_screens/dialogs/recovery_dialog.cpp:209 src/states_screens/register_screen.cpp:353
 msgid "Validating info"
 msgstr ""
 
@@ -2842,9 +2712,7 @@ msgstr[2] ""
 
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:62
-#: src/states_screens/dialogs/custom_video_settings.cpp:86
-#: src/states_screens/options_screen_video.cpp:387
+#: src/states_screens/dialogs/custom_video_settings.cpp:62 src/states_screens/dialogs/custom_video_settings.cpp:86 src/states_screens/options_screen_video.cpp:387
 msgid "Disabled"
 msgstr "Išjungta"
 
@@ -2884,15 +2752,15 @@ msgstr ""
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
 msgid "low"
-msgstr ""
+msgstr "žemas"
 
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
 msgid "high"
-msgstr ""
+msgstr "aukštas"
 
 #: src/states_screens/dialogs/enter_gp_name_dialog.cpp:125
 msgid "Name is empty."
-msgstr ""
+msgstr "Vardas tuščias."
 
 #: src/states_screens/dialogs/enter_gp_name_dialog.cpp:132
 msgid "Another grand prix with this name already exists."
@@ -2900,14 +2768,13 @@ msgstr "Kitas čempionatas (grand prix) tokiu pačiu pavadinimu jau yra."
 
 #: src/states_screens/dialogs/enter_gp_name_dialog.cpp:137
 msgid "Name is too long."
-msgstr ""
+msgstr "Vardas per ilgas."
 
 #: src/states_screens/dialogs/gp_info_dialog.cpp:211
 msgid "Start Grand Prix"
 msgstr "Pradėti čempionatą"
 
-#: src/states_screens/dialogs/message_dialog.cpp:129
-#: src/states_screens/edit_gp_screen.cpp:256
+#: src/states_screens/dialogs/message_dialog.cpp:129 src/states_screens/edit_gp_screen.cpp:256
 msgid "No"
 msgstr "Ne"
 
@@ -2917,12 +2784,7 @@ msgstr ""
 
 #: src/states_screens/dialogs/registration_dialog.cpp:42
 #, c-format
-msgid ""
-"Please read the terms and conditions for SuperTuxKart at '%s'. You must "
-"agree to these terms in order to register an account for STK. By checking "
-"the box below, you are confirming that you understand these terms. If you "
-"have any questions or comments regarding these terms, one of the members of "
-"the development team would gladly assist you."
+msgid "Please read the terms and conditions for SuperTuxKart at '%s'. You must agree to these terms in order to register an account for STK. By checking the box below, you are confirming that you understand these terms. If you have any questions or comments regarding these terms, one of the members of the development team would gladly assist you."
 msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:53
@@ -2961,8 +2823,7 @@ msgstr "Jungiamasi prie serverio"
 msgid "Cancel Request"
 msgstr "Atsisakyti prašymo"
 
-#: src/states_screens/dialogs/user_info_dialog.cpp:154
-#: src/states_screens/dialogs/user_info_dialog.cpp:211
+#: src/states_screens/dialogs/user_info_dialog.cpp:154 src/states_screens/dialogs/user_info_dialog.cpp:211
 msgid "Today"
 msgstr "Šiandien"
 
@@ -2988,7 +2849,7 @@ msgstr ""
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:474
 msgid "Processing"
-msgstr ""
+msgstr "Apdorojama"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:171
 msgid "Fetching last vote"
@@ -2999,9 +2860,7 @@ msgid "You can adapt your previous rating by clicking the stars beneath."
 msgstr ""
 
 #: src/states_screens/dialogs/vote_dialog.cpp:195
-msgid ""
-"You have not yet voted for this addon. Select your desired rating by "
-"clicking the stars beneath"
+msgid "You have not yet voted for this addon. Select your desired rating by clicking the stars beneath"
 msgstr ""
 
 #: src/states_screens/dialogs/vote_dialog.cpp:230
@@ -3012,14 +2871,13 @@ msgstr ""
 msgid "Performing vote"
 msgstr ""
 
-#: src/states_screens/easter_egg_screen.cpp:270
-#: src/states_screens/tracks_screen.cpp:299
+#: src/states_screens/easter_egg_screen.cpp:270 src/states_screens/tracks_screen.cpp:299
 msgid "Random Track"
 msgstr "Atsitiktinė trasa"
 
 #: src/states_screens/edit_gp_screen.cpp:66
 msgid "Track"
-msgstr ""
+msgstr "Trasa"
 
 #: src/states_screens/edit_gp_screen.cpp:67
 msgid "Laps"
@@ -3029,8 +2887,7 @@ msgstr "Ratai"
 msgid "Reversed"
 msgstr ""
 
-#: src/states_screens/edit_gp_screen.cpp:123
-#: src/states_screens/grand_prix_editor_screen.cpp:109
+#: src/states_screens/edit_gp_screen.cpp:123 src/states_screens/grand_prix_editor_screen.cpp:109
 #, c-format
 msgid "Are you sure you want to remove '%s'?"
 msgstr "Ar tikrai norite pašalinti '%s'?"
@@ -3051,7 +2908,7 @@ msgstr ""
 
 #: src/states_screens/edit_track_screen.cpp:237
 msgid "Select a track"
-msgstr ""
+msgstr "Pasirinkti trasą"
 
 #: src/states_screens/feature_unlocked.cpp:199
 #, c-format
@@ -3060,14 +2917,12 @@ msgstr ""
 
 #: src/states_screens/feature_unlocked.cpp:203
 #, c-format
-msgid ""
-"You completed the intermediate challenge! Points earned on this level: %i/%i"
+msgid "You completed the intermediate challenge! Points earned on this level: %i/%i"
 msgstr ""
 
 #: src/states_screens/feature_unlocked.cpp:207
 #, c-format
-msgid ""
-"You completed the difficult challenge! Points earned on this level: %i/%i"
+msgid "You completed the difficult challenge! Points earned on this level: %i/%i"
 msgstr ""
 
 #: src/states_screens/feature_unlocked.cpp:492
@@ -3076,7 +2931,7 @@ msgstr "Užduotis įvykdyta"
 
 #: src/states_screens/feature_unlocked.cpp:529
 msgid "You unlocked track %0"
-msgstr ""
+msgstr "Atrakinote trasą %0"
 
 #: src/states_screens/feature_unlocked.cpp:567
 msgid "You unlocked grand prix %0"
@@ -3087,8 +2942,7 @@ msgid "Default"
 msgstr "Įprastas"
 
 #. I18N: if no kart animations are enabled
-#: src/states_screens/gp_info_screen.cpp:75
-#: src/states_screens/options_screen_video.cpp:393
+#: src/states_screens/gp_info_screen.cpp:75 src/states_screens/options_screen_video.cpp:393
 msgid "None"
 msgstr "Nieko"
 
@@ -3096,10 +2950,9 @@ msgstr "Nieko"
 msgid "Random"
 msgstr "Atsitiktinis"
 
-#: src/states_screens/gp_info_screen.cpp:153
-#: src/states_screens/gp_info_screen.cpp:178
+#: src/states_screens/gp_info_screen.cpp:153 src/states_screens/gp_info_screen.cpp:178
 msgid "Reload"
-msgstr ""
+msgstr "Perkrauti"
 
 #: src/states_screens/grand_prix_editor_screen.cpp:164
 msgid "Please select a Grand Prix"
@@ -3114,8 +2967,7 @@ msgstr ""
 msgid "Better luck next time!"
 msgstr "Sėkmės lenktyniaujant kitą kart!"
 
-#: src/states_screens/grand_prix_win.cpp:125
-#: src/states_screens/race_result_gui.cpp:175
+#: src/states_screens/grand_prix_win.cpp:125 src/states_screens/race_result_gui.cpp:175
 msgid "You completed a challenge!"
 msgstr "Jūs įvykdėte užduotį!"
 
@@ -3123,8 +2975,7 @@ msgstr "Jūs įvykdėte užduotį!"
 msgid "You completed the Grand Prix!"
 msgstr "Jūs baigėte čempionatą (Grand Prix)!"
 
-#: src/states_screens/kart_selection.cpp:839
-#: src/states_screens/kart_selection.cpp:1470
+#: src/states_screens/kart_selection.cpp:839 src/states_screens/kart_selection.cpp:1470
 msgid "Random Kart"
 msgstr "Atsitiktinis kartas"
 
@@ -3139,17 +2990,11 @@ msgid ""
 msgstr ""
 
 #: src/states_screens/main_menu_screen.cpp:488
-msgid ""
-"You can not play online without internet access. If you want to play online,"
-" go to options, select  tab 'User Interface', and edit \"Connect to the "
-"Internet\"."
+msgid "You can not play online without internet access. If you want to play online, go to options, select  tab 'User Interface', and edit \"Connect to the Internet\"."
 msgstr ""
 
 #: src/states_screens/main_menu_screen.cpp:516
-msgid ""
-"You can not download addons without internet access. If you want to download"
-" addons, go to options, select  tab 'User Interface', and edit \"Connect to "
-"the Internet\"."
+msgid "You can not download addons without internet access. If you want to download addons, go to options, select  tab 'User Interface', and edit \"Connect to the Internet\"."
 msgstr ""
 
 #: src/states_screens/main_menu_screen.cpp:548
@@ -3162,15 +3007,13 @@ msgstr "Palaukite kol papildiniai įkraunami"
 
 #: src/states_screens/online_profile_achievements.cpp:79
 msgid "Progress"
-msgstr ""
+msgstr "Progresas"
 
-#: src/states_screens/online_profile_achievements.cpp:128
-#: src/states_screens/online_profile_achievements.cpp:168
+#: src/states_screens/online_profile_achievements.cpp:128 src/states_screens/online_profile_achievements.cpp:168
 msgid "Fetching achievements"
 msgstr "Atsiunčiami titulai"
 
-#: src/states_screens/online_profile_base.cpp:105
-#: src/states_screens/online_profile_base.cpp:115
+#: src/states_screens/online_profile_base.cpp:105 src/states_screens/online_profile_base.cpp:115
 msgid "Your profile"
 msgstr "Tavo duomenys"
 
@@ -3181,24 +3024,23 @@ msgstr "Naudotojo %s duomenys"
 
 #: src/states_screens/online_profile_friends.cpp:75
 msgid "Since"
-msgstr ""
+msgstr "Nuo"
 
 #: src/states_screens/online_profile_friends.cpp:76
 msgid "Status"
 msgstr "Būsena"
 
-#: src/states_screens/online_profile_friends.cpp:95
-#: src/states_screens/online_profile_friends.cpp:246
+#: src/states_screens/online_profile_friends.cpp:95 src/states_screens/online_profile_friends.cpp:246
 msgid "Fetching friends"
 msgstr ""
 
 #: src/states_screens/online_profile_friends.cpp:217
 msgid "New Request"
-msgstr ""
+msgstr "Naujas prašymas"
 
 #: src/states_screens/online_profile_friends.cpp:218
 msgid "Pending"
-msgstr ""
+msgstr "Laukiama"
 
 #: src/states_screens/online_profile_friends.cpp:222
 msgid "Offline"
@@ -3215,12 +3057,11 @@ msgstr "Jungiamasi"
 
 #: src/states_screens/online_screen.cpp:160
 msgid "Logging out"
-msgstr ""
+msgstr "Atsijungiama"
 
-#: src/states_screens/online_user_search.cpp:208
-#: src/states_screens/online_user_search.cpp:288
+#: src/states_screens/online_user_search.cpp:208 src/states_screens/online_user_search.cpp:288
 msgid "Searching"
-msgstr ""
+msgstr "Ieškoma"
 
 #: src/states_screens/options_screen_input.cpp:97
 #, c-format
@@ -3236,14 +3077,12 @@ msgid "Key binding"
 msgstr ""
 
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options_screen_input2.cpp:96
-#: src/states_screens/options_screen_input2.cpp:575
+#: src/states_screens/options_screen_input2.cpp:96 src/states_screens/options_screen_input2.cpp:575
 msgid "Disable Device"
 msgstr "Išjungti įrenginį"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options_screen_input2.cpp:98
-#: src/states_screens/options_screen_input2.cpp:576
+#: src/states_screens/options_screen_input2.cpp:98 src/states_screens/options_screen_input2.cpp:576
 msgid "Enable Device"
 msgstr "Įjungti įrenginį"
 
@@ -3346,10 +3185,7 @@ msgid "* A red item means a conflict in the current configuration"
 msgstr ""
 
 #: src/states_screens/options_screen_input2.cpp:467
-msgid ""
-"Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
-" all keys that contain a character that is different in upper-case will stop"
-" working."
+msgid "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down, all keys that contain a character that is different in upper-case will stop working."
 msgstr ""
 
 #. I18N: shown before deleting an input configuration
@@ -3358,9 +3194,7 @@ msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "Ar esate įsitikinę jog norite ištrinti konfigūraciją visam laikui?"
 
 #: src/states_screens/options_screen_ui.cpp:155
-msgid ""
-"Players can select handicapped (more difficult) profiles on the kart "
-"selection screen"
+msgid "Players can select handicapped (more difficult) profiles on the kart selection screen"
 msgstr ""
 
 #. I18N: in the language choice, to select the same language as the OS
@@ -3540,7 +3374,7 @@ msgstr "Tęsti."
 
 #: src/states_screens/race_result_gui.cpp:159
 msgid "Quit the server."
-msgstr ""
+msgstr "Išeiti iš serverio."
 
 #: src/states_screens/race_result_gui.cpp:176
 msgid "You completed challenges!"
@@ -3566,8 +3400,7 @@ msgstr "Grįžti į meniu"
 msgid "Do you really want to abort the Grand Prix?"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:475
-#: src/states_screens/race_result_gui.cpp:840
+#: src/states_screens/race_result_gui.cpp:475 src/states_screens/race_result_gui.cpp:840
 msgid "Eliminated"
 msgstr ""
 
@@ -3586,7 +3419,7 @@ msgstr "Lygiosios"
 #: src/states_screens/race_result_gui.cpp:1148
 #, c-format
 msgid "Track %i/%i"
-msgstr ""
+msgstr "Trasa %i%i"
 
 #: src/states_screens/race_result_gui.cpp:1232
 msgid "Grand Prix progress:"
@@ -3610,23 +3443,18 @@ msgid "Keep up with the leader kart but don't overtake it!"
 msgstr "Važiuok paskui pirmaujantį, bet jo nepralenk!"
 
 #: src/states_screens/race_setup_screen.cpp:231
-msgid ""
-"Hit others with weapons until they lose all their lives (only in multiplayer"
-" games)."
+msgid "Hit others with weapons until they lose all their lives (only in multiplayer games)."
 msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:240
-msgid ""
-"Push the ball to the opposite cage to score goals (only in multiplayer "
-"games)."
+msgid "Push the ball to the opposite cage to score goals (only in multiplayer games)."
 msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:252
 msgid "Explore tracks to find all hidden eggs"
 msgstr "Tyrinėk trasas ir surask visus paslėptus kiaušinius"
 
-#: src/states_screens/register_screen.cpp:217
-#: src/states_screens/register_screen.cpp:224
+#: src/states_screens/register_screen.cpp:217 src/states_screens/register_screen.cpp:224
 #, c-format
 msgid "Could not create player '%s'."
 msgstr ""
@@ -3652,25 +3480,21 @@ msgid "Email is invalid!"
 msgstr "Neteisingas el. pašto adresas!"
 
 #: src/states_screens/register_screen.cpp:361
-msgid ""
-"You will receive an email with further instructions regarding account "
-"activation. Please be patient and be sure to check your spam folder."
+msgid "You will receive an email with further instructions regarding account activation. Please be patient and be sure to check your spam folder."
 msgstr ""
 
-#: src/states_screens/register_screen.cpp:401
-#: src/states_screens/user_screen.cpp:317
+#: src/states_screens/register_screen.cpp:401 src/states_screens/user_screen.cpp:317
 msgid "Internet access is disabled, please enable it in the options"
 msgstr ""
 
-#: src/states_screens/server_selection.cpp:67
-#: src/states_screens/server_selection.cpp:210
+#: src/states_screens/server_selection.cpp:67 src/states_screens/server_selection.cpp:210
 msgid "Fetching servers"
 msgstr ""
 
 #. I18N: track group name
 #: src/states_screens/tracks_screen.cpp:151
 msgid "all"
-msgstr ""
+msgstr "visi"
 
 #: src/states_screens/tracks_screen.cpp:202
 msgid "Locked!"
@@ -3693,7 +3517,7 @@ msgstr "Baigti žaidimą"
 
 #: src/states_screens/user_screen.cpp:461
 msgid "You need to enter a password."
-msgstr ""
+msgstr "Turite įvesti slaptažodį."
 
 #: src/states_screens/user_screen.cpp:482
 #, c-format
@@ -3735,23 +3559,17 @@ msgstr ""
 msgid "Accelerate with <%s>, and steer with <%s> and <%s>."
 msgstr ""
 
-#: ../stk-assets/tracks/tutorial/scripting.as:37
-#: ../stk-assets/tracks/tutorial/triggers.as:38
+#: ../stk-assets/tracks/tutorial/scripting.as:37 ../stk-assets/tracks/tutorial/triggers.as:38
 #, c-format
-msgid ""
-"Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
+msgid "Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
 msgstr ""
 
-#: ../stk-assets/tracks/tutorial/scripting.as:43
-#: ../stk-assets/tracks/tutorial/triggers.as:44
+#: ../stk-assets/tracks/tutorial/scripting.as:43 ../stk-assets/tracks/tutorial/triggers.as:44
 #, c-format
-msgid ""
-"Press <%s> to look behind. Fire the weapon with <%s> while pressing <%s> to "
-"fire behind!"
+msgid "Press <%s> to look behind. Fire the weapon with <%s> while pressing <%s> to fire behind!"
 msgstr ""
 
-#: ../stk-assets/tracks/tutorial/scripting.as:53
-#: ../stk-assets/tracks/tutorial/triggers.as:54
+#: ../stk-assets/tracks/tutorial/scripting.as:53 ../stk-assets/tracks/tutorial/triggers.as:54
 #, c-format
 msgid "Use the nitro you collected by pressing <%s>!"
 msgstr "Panaudokite surinktą „nitro“ kurą paspausdami <%s>!"
@@ -3765,23 +3583,16 @@ msgstr ""
 msgid "Oops! When you're in trouble, press <%s> to be rescued."
 msgstr ""
 
-#: ../stk-assets/tracks/tutorial/scripting.as:69
-#: ../stk-assets/tracks/tutorial/triggers.as:70
+#: ../stk-assets/tracks/tutorial/scripting.as:69 ../stk-assets/tracks/tutorial/triggers.as:70
 #, c-format
-msgid ""
-"Accelerate and press the <%s> key while turning to skid. Skidding for a "
-"short while can help you turn faster to take sharp turns."
+msgid "Accelerate and press the <%s> key while turning to skid. Skidding for a short while can help you turn faster to take sharp turns."
 msgstr ""
 
-#: ../stk-assets/tracks/tutorial/scripting.as:77
-#: ../stk-assets/tracks/tutorial/triggers.as:78
-msgid ""
-"Note that if you manage to skid for several seconds, you will receive a "
-"bonus speedup as a reward!"
+#: ../stk-assets/tracks/tutorial/scripting.as:77 ../stk-assets/tracks/tutorial/triggers.as:78
+msgid "Note that if you manage to skid for several seconds, you will receive a bonus speedup as a reward!"
 msgstr ""
 
-#: ../stk-assets/tracks/tutorial/scripting.as:82
-#: ../stk-assets/tracks/tutorial/triggers.as:83
+#: ../stk-assets/tracks/tutorial/scripting.as:82 ../stk-assets/tracks/tutorial/triggers.as:83
 msgid "You are now ready to race. Good luck!"
 msgstr "Jūs jau pasiruošęs lenktynėms. Sėkmės!"
 
