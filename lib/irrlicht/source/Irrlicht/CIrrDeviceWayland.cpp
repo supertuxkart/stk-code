@@ -384,8 +384,27 @@ public:
 			dev->VideoModeList.setDesktop(24, core::dimension2du(width, height));
 		}
 	}
+	
+	static void
+	handle_ping(void *data, struct wl_shell_surface *shell_surface,
+	            uint32_t serial)
+	{
+	    wl_shell_surface_pong(shell_surface, serial);
+	}
+	
+	static void
+	handle_configure(void *data, struct wl_shell_surface *shell_surface,
+	                 uint32_t edges, int32_t width, int32_t height)
+	{
+	}
+	
+	static void
+	handle_popup_done(void *data, struct wl_shell_surface *shell_surface)
+	{
+	}
 
 	static const struct wl_output_listener output_listener;
+	static const struct wl_shell_surface_listener shell_surface_listener;
 
 	static void registry_add (void *data, struct wl_registry *registry, uint32_t name, const char *interface, uint32_t version) {
 		CIrrDeviceWayland *dev = static_cast<CIrrDeviceWayland *>(data);
@@ -443,10 +462,18 @@ const struct wl_output_listener WaylandCallbacks::output_listener = {
 	WaylandCallbacks::display_handle_scale
 };
 
+const struct wl_shell_surface_listener WaylandCallbacks::shell_surface_listener = 
+{
+    WaylandCallbacks::handle_ping,
+    WaylandCallbacks::handle_configure,
+    WaylandCallbacks::handle_popup_done
+};
+
 const wl_registry_listener WaylandCallbacks::registry_listener = {
 	WaylandCallbacks::registry_add,
 	WaylandCallbacks::registry_remove,
 };
+
 
 
 //const char* wmDeleteWindow = "WM_DELETE_WINDOW";
@@ -495,6 +522,8 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& param)
 
 	wl_seat_add_listener(seat, &WaylandCallbacks::seat_listener, this);
 	wl_output_add_listener(output, &WaylandCallbacks::output_listener, this);
+	
+	shell_surface = NULL;
 
 	// create keymap
 	createKeyMap();
@@ -532,6 +561,8 @@ CIrrDeviceWayland::~CIrrDeviceWayland()
 	wl_keyboard_destroy(keyboard);
 	wl_pointer_destroy(pointer);
 	wl_seat_destroy(seat);
+	if (shell_surface)
+		wl_shell_surface_destroy(shell_surface);
 	wl_registry_destroy(registry);
 	wl_display_flush(display);
 	wl_display_disconnect(display);
@@ -591,6 +622,9 @@ bool CIrrDeviceWayland::createWindow()
 {
 	surface = wl_compositor_create_surface(compositor);
 	shell_surface = wl_shell_get_shell_surface(shell, surface);
+	
+	wl_shell_surface_add_listener(shell_surface,
+								  &WaylandCallbacks::shell_surface_listener, this);
 	
 	if (CreationParams.Fullscreen)
 	{

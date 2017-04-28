@@ -20,6 +20,7 @@
 #include "utils/translation.hpp"
 #include "utils/time.hpp"
 
+#include "../../../lib/irrlicht/include/IrrCompileConfig.h"
 #include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceLinux.h"
 
 /*

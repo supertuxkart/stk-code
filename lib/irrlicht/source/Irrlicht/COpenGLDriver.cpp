@@ -978,7 +978,7 @@ bool COpenGLDriver::endScene()
 	}
 #endif
 
-#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
+#ifdef _IRR_COMPILE_WITH_WAYLAND
 	if (DeviceType == EIDT_WAYLAND)
 	{
 		wl_display_dispatch_pending(wl_device->display);

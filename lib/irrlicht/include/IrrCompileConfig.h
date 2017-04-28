@@ -215,6 +215,8 @@ define out. */
 
 #ifdef _IRR_COMPILE_WITH_WAYLAND
 #define _IRR_COMPILE_WITH_EGL_
+#undef _IRR_COMPILE_WITH_X11_
+#undef _IRR_COMPILE_WITH_X11_DEVICE_
 #endif
 
 //! Define _IRR_OPENGL_USE_EXTPOINTER_ if the OpenGL renderer should use OpenGL extensions via function pointers.
