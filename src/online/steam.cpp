@@ -111,28 +111,28 @@ bool Steam::createChildProcess()
     if (!CreatePipe(&m_child_stdout_read, &m_child_stdout_write, &sec_attr, 0))
     {
         Log::error("Steam", "Error creating StdoutRd CreatePipe");
-        return;
+        return false;
     }
 
     // Ensure the read handle to the pipe for STDOUT is not inherited.
     if (!SetHandleInformation(m_child_stdout_read, HANDLE_FLAG_INHERIT, 0))
     {
         Log::error("Steam", "Stdout SetHandleInformation");
-        return;
+        return false;
     }
 
     // Create a pipe for the child process's STDIN. 
     if (!CreatePipe(&m_child_stdin_read, &m_child_stdin_write, &sec_attr, 0))
     {
         Log::error("Steam", "Stdin CreatePipe");
-        return;
+        return false;
     }
 
     // Ensure the write handle to the pipe for STDIN is not inherited. 
     if (!SetHandleInformation(m_child_stdin_write, HANDLE_FLAG_INHERIT, 0))
     {
         Log::error("Steam", "Stdin SetHandleInformation");
-        return;
+        return false;
     }
 
     TCHAR command_line[] = TEXT("ssm.exe 1");
@@ -307,7 +307,7 @@ std::string Steam::sendCommand(const std::string &command)
     // Data is written to the pipe's buffers, so it is not necessary to wait
     // until the child process is running before writing data.
     DWORD bytes_written;
-    bool success = WriteFile(m_child_stdin_write, (command+"\n").c_str(),
+    bool success = WriteFile(m_child_stdin_write, command.c_str(),
                              command.size()+1, &bytes_written, NULL     ) != 0;
 #else
     write(m_child_stdin_write, (command+"\n").c_str(), command.size()+1);
