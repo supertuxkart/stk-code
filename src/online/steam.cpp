@@ -135,7 +135,7 @@ bool Steam::createChildProcess()
         return false;
     }
 
-    TCHAR command_line[] = TEXT("ssm.exe 1");
+    TCHAR command_line[] = TEXT("ssm.exe");
     PROCESS_INFORMATION piProcInfo;
     STARTUPINFO siStartInfo;
 
