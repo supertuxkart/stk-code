@@ -59,8 +59,14 @@ private:
     HANDLE m_child_stdout_read;
     HANDLE m_child_stdout_write;
 
-    bool createChildProcess();
+#else
+    int m_child_stdin_read;
+    int m_child_stdin_write;
+    int m_child_stdout_read;
+    int m_child_stdout_write;
+
 #endif
+    bool createChildProcess();
 
     std::string decodeString(const std::string &s);
     std::string sendCommand(const std::string &command);

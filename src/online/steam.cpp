@@ -22,6 +22,9 @@
 
 #ifdef WIN32
 #  include <windows.h> 
+#else
+#  include <iostream>
+#  include <unistd.h>
 #endif
 
 Steam * Steam::m_steam = NULL;
@@ -30,7 +33,71 @@ Steam * Steam::m_steam = NULL;
 Steam::Steam()
 {
     m_steam_available = false;
+
+    // Create the child process SSM to mamage steam:
+    if (!createChildProcess())
+    {
+        Log::error("Steam", "Could not start ssm.exe");
+        return;
+    }
+
+    Log::info("Steam", "Starting steam manager");
+        
+    std::string s = sendCommand("init");
+    if (s != "1")
+    {
+        Log::error("Steam", "Could not initialise Steam API.");
+        return;
+    }
+
+    s = sendCommand("name");
+    m_user_name   =  decodeString(s);
+    if (m_user_name == "")
+    {
+        Log::error("Steam", "Can not get Steam user name.");
+        return;
+    }
+
+    m_user_name_wchar = StringUtils::utf8ToWide(m_user_name);
+
+    s = sendCommand("id");
+    m_steam_id = decodeString(s);
+    if (m_steam_id== "")
+    {
+        Log::error("Steam", "Can not get Steam id.");
+        return;
+    }
+
+    m_steam_available = true;
+}   // Steam
+
+// ----------------------------------------------------------------------------
+/** Terminates the child processes and shuts down the Steam API.
+ */
+Steam::~Steam()
+{
+    std::string s = sendCommand("quit");
+    if (s != "quit")
+    {
+        Log::error("Steam", "Could not shutdown Steam process properly");
+    }
+
+#ifdef LINUX
+    close(m_child_stdin_write);
+    close(m_child_stdout_read);
+#endif
+    Log::info("Steam", "Shutting down steam manager");
+
+}   // ~Steam
+
+// ----------------------------------------------------------------------------
+/** Starts ssm.exe (on windows) or ssm (other platforms) as a child process
+ *  and sets up communication via pipes.
+ *  \return True if the child process creation was successful.
+ */
 #ifdef WIN32
+bool Steam::createChildProcess()
+{
     // Based on: https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx
     SECURITY_ATTRIBUTES sec_attr;
 
@@ -68,60 +135,6 @@ Steam::Steam()
         return;
     }
 
-    // Create the child process. 
-
-    if (!createChildProcess())
-    {
-        Log::error("Steam", "Could not start ssm.exe");
-        return;
-    }
-#endif
-    std::string s = sendCommand("init");
-    if (s != "1")
-    {
-        Log::error("Steam", "Could not initialise Steam API.");
-        return;
-    }
-
-    s = sendCommand("name");
-    m_user_name   =  decodeString(s);
-    if (m_user_name == "")
-    {
-        Log::error("Steam", "Can not get Steam user name.");
-        return;
-    }
-
-    m_user_name_wchar = StringUtils::utf8ToWide(m_user_name);
-
-    s = sendCommand("id");
-    m_steam_id = decodeString(s);
-    if (m_steam_id== "")
-    {
-        Log::error("Steam", "Can not get Steam id.");
-        return;
-    }
-
-    m_steam_available = true;
-}   // Steam
-// ----------------------------------------------------------------------------
-/** Terminates the child processes and shuts down the Steam API.
- */
-Steam::~Steam()
-{
-    std::string s = sendCommand("quit");
-    if (s != "quit")
-    {
-        Log::error("Steam", "Could not shutdown Steam process properly");
-    }
-}   // ~Steam
-
-// ----------------------------------------------------------------------------
-/** Starts ssm.exe as a child process and sets up communication via pipes.
- *  \return True if the child process creation was successful.
- */
-#ifdef WIN32
-bool Steam::createChildProcess()
-{
     TCHAR command_line[] = TEXT("ssm.exe 1");
     PROCESS_INFORMATION piProcInfo;
     STARTUPINFO siStartInfo;
@@ -166,6 +179,85 @@ bool Steam::createChildProcess()
     CloseHandle(piProcInfo.hThread);
 
     return true;
+}   // createChildProcess - windows version
+
+#else    // linux and osx
+
+bool Steam::createChildProcess()
+{
+    const int PIPE_READ=0;
+    const int PIPE_WRITE=1;
+    int       stdin_pipe[2];
+    int       stdout_pipe[2];
+    int       child;
+
+    if (pipe(stdin_pipe) < 0)
+    {
+        Log::error("Steam", "Can't allocate pipe for input redirection.");
+        return -1;
+    }
+    if (pipe(stdout_pipe) < 0)
+    {
+        close(stdin_pipe[PIPE_READ]);
+        close(stdin_pipe[PIPE_WRITE]);
+        Log::error("Steam", "allocating pipe for child output redirect");
+        return false;
+    }
+
+    child = fork();
+    if (child == 0)
+    {
+        // Child process:
+        Log::info("Steam", "Child process started.");
+
+        // redirect stdin
+        if (dup2(stdin_pipe[PIPE_READ], STDIN_FILENO) == -1)
+        {
+            Log::error("Steam", "Redirecting stdin");
+            return false;
+        }
+
+        // redirect stdout
+        if (dup2(stdout_pipe[PIPE_WRITE], STDOUT_FILENO) == -1)
+        {
+            Log::error("Steam", "Redirecting stdout");
+            return false;
+        }
+
+        // all these are for use by parent only
+        close(stdin_pipe[PIPE_READ]);
+        close(stdin_pipe[PIPE_WRITE]);
+        close(stdout_pipe[PIPE_READ]);
+        close(stdout_pipe[PIPE_WRITE]); 
+        
+        // run child process image
+        execl("./ssm", "", NULL);
+        Log::error("Steam", "Error in execl: errnp %d", errno);
+
+        // if we get here at all, an error occurred, but we are in the child
+        // process, so just exit
+        perror("Steam: execl error");
+        exit(-1);
+    }
+    else if (child > 0)
+    {
+        // parent continues here
+        // close unused file descriptors, these are for child only
+        close(stdin_pipe[PIPE_READ]);
+        close(stdout_pipe[PIPE_WRITE]); 
+        m_child_stdin_write = stdin_pipe[PIPE_WRITE];
+        m_child_stdout_read = stdout_pipe[PIPE_READ];
+    } 
+    else   // child < 0 
+    {
+        // failed to create child
+        close(stdin_pipe[PIPE_READ]);
+        close(stdin_pipe[PIPE_WRITE]);
+        close(stdout_pipe[PIPE_READ]);
+        close(stdout_pipe[PIPE_WRITE]);
+        return false;
+    }
+    return true;
 }   // createChildProcess
 #endif
 
@@ -174,14 +266,27 @@ bool Steam::createChildProcess()
  */
 std::string Steam::getLine()
 {
-#ifdef WIN32
 #define BUFSIZE 1024
     char buffer[BUFSIZE];
+
+#ifdef WIN32
     DWORD bytes_read;
     // Read from pipe that is the standard output for child process. 
     bool success = ReadFile(m_child_stdout_read, buffer, BUFSIZE-1,
                             &bytes_read, NULL)!=0;
     if (success && bytes_read < BUFSIZE)
+    {
+        buffer[bytes_read] = 0;
+        std::string s = buffer;
+        return s;
+    }
+#else
+    //std::string s;
+    //std::getline(std::cin, s);
+    //return s;
+
+    int bytes_read = read(m_child_stdout_read, buffer, BUFSIZE-1);
+    if(bytes_read>0)
     {
         buffer[bytes_read] = 0;
         std::string s = buffer;
@@ -203,9 +308,11 @@ std::string Steam::sendCommand(const std::string &command)
     // until the child process is running before writing data.
     DWORD bytes_written;
     bool success = WriteFile(m_child_stdin_write, (command+"\n").c_str(),
-                             command.size(), &bytes_written, NULL) != 0;
-    return getLine();
+                             command.size()+1, &bytes_written, NULL     ) != 0;
+#else
+    write(m_child_stdin_write, (command+"\n").c_str(), command.size()+1);
 #endif
+    return getLine();
 
     return std::string("");
 }   // sendCommand
@@ -224,7 +331,7 @@ std::string Steam::decodeString(const std::string &s)
 
     int n;
     StringUtils::fromString(l[0], n);
-    if (n != l[1].size()) return "INVALID ANSWER - incorrect length";
+    if (n != (int)l[1].size()) return "INVALID ANSWER - incorrect length";
 
     return l[1];
 
