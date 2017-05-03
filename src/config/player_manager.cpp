@@ -210,26 +210,87 @@ void PlayerManager::load()
         PlayerProfile *player = new Online::OnlinePlayerProfile(player_xml);
         m_all_players.push_back(player);
     }
+
     m_current_player = NULL;
     const XMLNode *current = m_player_data->getNode("current");
-    if(current)
+    stringw current_name;
+    
+    if (current)
     {
-        stringw name;
-        current->getAndDecode("player", &name);
-        m_current_player = getPlayer(name);
-        // If the account is a steam account, make sure we are logged 
-        // into steam with the right user id.
-        if(m_current_player->isSteamUser() &&
-            Steam::get()->getSteamID() != m_current_player->getSteamUserID())
-        {
-            Log::warn("PlayerManager",
-                   "Logged in as different steam user, please log in as '%s'.",
-                   name.c_str());
-            m_current_player = NULL;
-        }
+        current->getAndDecode("player", &current_name);
+    }
+    if (!checkSteamAccount(current_name))
+    {
+        m_current_player = getPlayer(current_name);
     }   // if current
 
 }   // load
+
+// ----------------------------------------------------------------------------
+/** This functions checks if a stk user exists with the same steam id as the
+ *  current steam user, and if so switches to that player (ignoring that stk
+ *  might have a different 'current' player). If no stk account with same
+ *  steam id is found, it then also checks if a non-steam stk account with the
+ *  same name (case independent) exists, and if so, switches that account
+ *  to be connect to the current steam user.
+ *  If no matching stk account can be found, do nothing - the user then would
+ *  have to rename an existing account or create a new account to be connected
+ *  to the steam id.
+ *  \return True if a matching steam account was found (which means that the
+ *          current user in stk is ignored).
+ */
+bool PlayerManager::checkSteamAccount(const irr::core::stringw &current_name)
+{
+    if (!Steam::get()->isSteamAvailable())
+        return false;
+
+    // First check for an stk account with same steam id:
+    const stringw     &steam_name = Steam::get()->getUserNameWchar();
+    const std::string &steam_id   = Steam::get()->getSteamID();
+
+    for (unsigned int i = 0; i < m_all_players.size(); i++)
+    {
+        if (m_all_players[i].isSteamUser() &&
+            m_all_players[i].getSteamUserID() == steam_id)
+        {
+            // Check if the previously (current) name is different from
+            // the steam name, and if so print a warning, but continue
+            // with switching to the correct steam user id.
+            if (!current_name.equals_ignore_case(steam_name))
+            {
+                Log::warn("PlayerManager",
+                          "Switching from previous user '%ls' to '%ls'.",
+                          current_name.c_str(), steam_name.c_str()       );
+            }   // if steam and current name are different
+
+            m_current_player = getPlayer(i);
+            return true;
+        }   // same steam user id
+    }   // for i in m_all_players
+
+    for (unsigned int i = 0; i < m_all_players.size(); i++)
+    {
+        // Ignore existing steam users, they must have a different id 
+        // (otherwise they would have been picked in the previous loop)
+        if (m_all_players[i].isSteamUser()) continue;
+        stringw name = m_all_players[i].getName();
+        if (name.equals_ignore_case(steam_name))
+        {
+            Log::warn("PlayerManager",
+                      "Connecting '%ls' to current steam account '%ls'.",
+                      current_name.c_str(), steam_name.c_str());
+            m_all_players[i].setSteamUserID(steam_id);
+            m_current_player = getPlayer(i);
+            return true;
+        }   // if steam and current name are different
+    }   // for i in m_all_players
+
+    //TODO: At this stage there are a few options:
+    // 1) If there is only one STK account, connect it to the steam account?
+    // 2) automatically connect 'current' to the steam account?
+    // 3) bring up a gui?
+    return false;
+}   // checkSteamAccount
 
 // ----------------------------------------------------------------------------
 /** The 2nd loading stage. During this stage achievements and story mode

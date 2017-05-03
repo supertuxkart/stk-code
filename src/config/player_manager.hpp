@@ -66,6 +66,7 @@ private:
     const XMLNode *m_player_data;
 
     void load();
+    bool checkSteamAccount(const irr::core::stringw &current_name);
      PlayerManager();
     ~PlayerManager();
 

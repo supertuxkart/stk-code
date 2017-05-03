@@ -311,6 +311,9 @@ public:
     /** Returns the steam user id of this player ("" if not a steam account).*/
     const std::string &getSteamUserID() const { return m_steam_id;  }
     // ------------------------------------------------------------------------
+    /** Sets the steam user id of this player. */
+    void setSteamUserID(const std::string &id) { m_steam_id = id; }
+    // ------------------------------------------------------------------------
 };   // class PlayerProfile
 
 #endif
