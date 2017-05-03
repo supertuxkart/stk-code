@@ -7,6 +7,7 @@ extern bool GLContextDebugBit;
 #include <stdlib.h>
 #include <sys/utsname.h>
 #include <time.h>
+#include <string>
 #include "IEventReceiver.h"
 #include "ISceneManager.h"
 #include "IGUIEnvironment.h"
@@ -158,11 +159,15 @@ public:
 	keyboard_handle_keymap(void *data, struct wl_keyboard *keyboard,
 						 uint32_t format, int fd, uint32_t size)
 	{
-		printf("initiating mmaped keymap\n");
 		CIrrDeviceWayland *device = static_cast<CIrrDeviceWayland *>(data);
+		
+		//~ struct xkb_keymap *keymap;
+		//~ struct xkb_state *state;
+		//~ struct xkb_compose_table *compose_table;
+		//~ struct xkb_compose_state *compose_state;
 		char *map_str;
 	
-		if (!data) {
+		if (!device) {
 			close(fd);
 			return;
 		}
@@ -178,10 +183,11 @@ public:
 			return;
 		}
 	
+		/* Set up XKB keymap */
 		device->keymap = xkb_keymap_new_from_string(device->xkbctx,
-						map_str,
-						XKB_KEYMAP_FORMAT_TEXT_V1,
-						XKB_KEYMAP_COMPILE_NO_FLAGS);
+						    map_str,
+						    XKB_KEYMAP_FORMAT_TEXT_V1,
+						    XKB_KEYMAP_COMPILE_NO_FLAGS);
 		munmap(map_str, size);
 		close(fd);
 	
@@ -190,24 +196,60 @@ public:
 			return;
 		}
 	
+		/* Set up XKB state */
 		device->state = xkb_state_new(device->keymap);
 		if (!device->state) {
 			fprintf(stderr, "failed to create XKB state\n");
 			xkb_keymap_unref(device->keymap);
 			return;
 		}
-
-	//	xkb_keymap_unref(device->keymap);
-	//	xkb_state_unref(device->state);
-	//	device->keymap = keymap;
-	//	device->state = state;
 	
-	/*	input->xkb.control_mask =
-			1 << xkb_keymap_mod_get_index(input->xkb.keymap, "Control");
-		input->xkb.alt_mask =
-			1 << xkb_keymap_mod_get_index(input->xkb.keymap, "Mod1");
-		input->xkb.shift_mask =
-			1 << xkb_keymap_mod_get_index(input->xkb.keymap, "Shift");*/
+		/* Look up the preferred locale, falling back to "C" as default */
+		std::string locale = "C";
+		
+		if (getenv("LC_ALL"))
+			locale = getenv("LC_ALL");
+		else if (getenv("LC_CTYPE"))
+			locale = getenv("LC_CTYPE");
+		else if (getenv("LANG"))
+			locale = getenv("LANG");
+	
+		/* Set up XKB compose table */
+		device->compose_table =
+			xkb_compose_table_new_from_locale(device->xkbctx,
+							  locale.c_str(),
+							  XKB_COMPOSE_COMPILE_NO_FLAGS);
+		if (device->compose_table) {
+			/* Set up XKB compose state */
+			device->compose_state = xkb_compose_state_new(device->compose_table,
+						      XKB_COMPOSE_STATE_NO_FLAGS);
+			if (device->compose_state) {
+				//~ xkb_compose_state_unref(device->compose_state);
+				//~ xkb_compose_table_unref(device->compose_table);
+				//~ device->compose_state = compose_state;
+				//~ device->compose_table = compose_table;
+			} else {
+				fprintf(stderr, "could not create XKB compose state.  "
+					"Disabiling compose.\n");
+				xkb_compose_table_unref(device->compose_table);
+				device->compose_table = NULL;
+			}
+		} else {
+			fprintf(stderr, "could not create XKB compose table for locale '%s'.  "
+				"Disabiling compose\n", locale.c_str());
+	}
+	
+		//~ xkb_keymap_unref(device->keymap);
+		//~ xkb_state_unref(device->state);
+		//~ device->keymap = keymap;
+		//~ device->state = state;
+	
+		device->control_mask =
+			1 << xkb_keymap_mod_get_index(device->keymap, "Control");
+		device->alt_mask =
+			1 << xkb_keymap_mod_get_index(device->keymap, "Mod1");
+		device->shift_mask =
+			1 << xkb_keymap_mod_get_index(device->keymap, "Shift");
 	}
 
 	static void
@@ -229,22 +271,69 @@ public:
 					uint32_t state_w)
 	{
 		CIrrDeviceWayland *device = static_cast<CIrrDeviceWayland *>(data);
+		
 		uint32_t code;
 		enum wl_keyboard_key_state state = (wl_keyboard_key_state) state_w;
 		xkb_keysym_t sym;
+		uint32_t num_syms;
+		const xkb_keysym_t *syms;
 		SEvent irrevent;
+		
+		if (!device->state)
+			return;
 	
 		code = key + 8;
-		sym = xkb_state_key_get_one_sym(device->state, code);
+		
+		num_syms = xkb_state_key_get_syms(device->state, code, &syms);
 	
+		sym = XKB_KEY_NoSymbol;
+		if (num_syms == 1)
+			sym = syms[0];
+			
 		CIrrDeviceWayland::SKeyMap mp;
 		mp.X11Key = sym;
+			
+
+	if (!device->compose_state)
+		sym = sym;
+	if (sym == XKB_KEY_NoSymbol)
+		sym = sym;
+	if (xkb_compose_state_feed(device->compose_state,
+				   sym) != XKB_COMPOSE_FEED_ACCEPTED)
+		sym = sym;
+
+	switch (xkb_compose_state_get_status(device->compose_state)) {
+	case XKB_COMPOSE_COMPOSING:
+		return;
+	case XKB_COMPOSE_COMPOSED:
+		sym = xkb_compose_state_get_one_sym(device->compose_state);
+	case XKB_COMPOSE_CANCELLED:
+		return;
+	case XKB_COMPOSE_NOTHING:
+		sym = sym;
+	default:
+		sym = sym;
+	}
+
+	
+	//~ printf("%c\n", sym);
+	
+		if (sym == XKB_KEY_NoSymbol)
+			sym = 0;
+	
+
 	
 		irrevent.EventType = irr::EET_KEY_INPUT_EVENT;
 		irrevent.KeyInput.PressedDown = (state == WL_KEYBOARD_KEY_STATE_PRESSED);
+		irrevent.KeyInput.Char = 	xkb_keysym_to_utf32(sym);
 	//	irrevent.KeyInput.Char = ((wchar_t*)(buf))[0];
 	//	irrevent.KeyInput.Control = (event.xkey.state & ControlMask) != 0;
 	//	irrevent.KeyInput.Shift = (event.xkey.state & ShiftMask) != 0;
+	
+	
+	
+
+	
 	
 		const s32 idx = device->KeyMap.binary_search(mp);
 		if (idx != -1)
@@ -282,25 +371,27 @@ public:
 					uint32_t mods_latched, uint32_t mods_locked,
 					uint32_t group)
 	{
-	/*	struct input *input = data;
-		xkb_mod_mask_t mask;*/
+		CIrrDeviceWayland *device = static_cast<CIrrDeviceWayland *>(data);
+
+		xkb_mod_mask_t mask;
 	
 		/* If we're not using a keymap, then we don't handle PC-style modifiers */
-	/*	if (!input->xkb.keymap)
+		if (!device->keymap)
 			return;
 	
-		xkb_state_update_mask(input->xkb.state, mods_depressed, mods_latched,
-							mods_locked, 0, 0, group);
-		mask = xkb_state_serialize_mods(input->xkb.state,
-						XKB_STATE_MODS_DEPRESSED |
-						XKB_STATE_MODS_LATCHED);
-		input->modifiers = 0;
-		if (mask & input->xkb.control_mask)
-			input->modifiers |= MOD_CONTROL_MASK;
-		if (mask & input->xkb.alt_mask)
-			input->modifiers |= MOD_ALT_MASK;
-		if (mask & input->xkb.shift_mask)
-			input->modifiers |= MOD_SHIFT_MASK;*/
+		xkb_state_update_mask(device->state, mods_depressed, mods_latched,
+				      mods_locked, 0, 0, group);
+		xkb_state_component state_component = (xkb_state_component)(
+							XKB_STATE_MODS_DEPRESSED | XKB_STATE_MODS_LATCHED);
+		mask = xkb_state_serialize_mods(device->state,
+						state_component);
+		//~ input->modifiers = 0;
+		//~ if (mask & input->xkb.control_mask)
+			//~ input->modifiers |= MOD_CONTROL_MASK;
+		//~ if (mask & input->xkb.alt_mask)
+			//~ input->modifiers |= MOD_ALT_MASK;
+		//~ if (mask & input->xkb.shift_mask)
+			//~ input->modifiers |= MOD_SHIFT_MASK;
 	}
 
 	static void
@@ -389,6 +480,7 @@ public:
 	handle_ping(void *data, struct wl_shell_surface *shell_surface,
 	            uint32_t serial)
 	{
+		printf("ping");
 	    wl_shell_surface_pong(shell_surface, serial);
 	}
 	

@@ -12,6 +12,7 @@
 #include <wayland-client.h>
 #include <wayland-egl.h>
 #include <xkbcommon/xkbcommon.h>
+#include <xkbcommon/xkbcommon-compose.h>
 
 #include <GL/gl.h>
 
@@ -248,6 +249,11 @@ namespace irr
 		xkb_context *xkbctx;
 		xkb_keymap *keymap;
 		xkb_state *state;
+		xkb_mod_mask_t control_mask;
+		xkb_mod_mask_t alt_mask;
+		xkb_mod_mask_t shift_mask;
+		struct xkb_compose_table *compose_table;
+		struct xkb_compose_state *compose_state;
 
 		wl_shell *shell;
 		wl_surface *surface;
