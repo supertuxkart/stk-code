@@ -101,7 +101,7 @@ void AddonsManager::init(const XMLNode *xml,
     {
         file_manager->removeFile(filename);
         setErrorState();
-        NewsManager::get()->addNewsMessage(_("Failed to connect to 'addons.supertuxkart.net'."));
+        NewsManager::get()->addNewsMessage(_("Failed to connect to the SuperTuxKart add-ons server."));
         return;
     }
 
