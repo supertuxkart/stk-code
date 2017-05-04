@@ -264,6 +264,8 @@ bool PlayerManager::checkSteamAccount(const irr::core::stringw &current_name)
             }   // if steam and current name are different
 
             m_current_player = getPlayer(i);
+            // Update the steam name in case that the user did a rename
+            m_current_player->setSteamName(Steam::get()->getUserNameWchar());
             return true;
         }   // same steam user id
     }   // for i in m_all_players
@@ -279,8 +281,10 @@ bool PlayerManager::checkSteamAccount(const irr::core::stringw &current_name)
             Log::warn("PlayerManager",
                       "Connecting '%ls' to current steam account '%ls'.",
                       current_name.c_str(), steam_name.c_str());
-            m_all_players[i].setSteamUserID(steam_id);
+            
             m_current_player = getPlayer(i);
+            m_current_player->setSteamUserID(steam_id);
+            m_current_player->setSteamName(steam_name);
             return true;
         }   // if steam and current name are different
     }   // for i in m_all_players

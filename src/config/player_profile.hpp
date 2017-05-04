@@ -102,6 +102,10 @@ private:
      *  the user is logged into steam! */
     std::string m_steam_id;
 
+    /** Name of the corresponding steam account. Empty if this is
+     *  not a steam account. */
+    core::stringw m_steam_name;
+
     /** The online user name used last (empty if not used online). */
     core::stringw m_last_online_name;
 
@@ -313,6 +317,13 @@ public:
     // ------------------------------------------------------------------------
     /** Sets the steam user id of this player. */
     void setSteamUserID(const std::string &id) { m_steam_id = id; }
+    // ------------------------------------------------------------------------
+    /** Returns the steam name of the connected steam account (or "" if
+     *  this account is not a steam account. */
+    const core::stringw &getSteamName() const { return m_steam_name;  }
+    // ------------------------------------------------------------------------
+    /** Sets the steam name of this account. */
+    void setSteamName(const core::stringw &name) { m_steam_name = name; }
     // ------------------------------------------------------------------------
 };   // class PlayerProfile
 

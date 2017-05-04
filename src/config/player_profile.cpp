@@ -40,13 +40,16 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
     m_magic_number = 0xABCD1234;
 #endif
     if(Steam::get()->isSteamAvailable() &&
-        name == StringUtils::utf8ToWide(Steam::get()->getUserName()) )
+        name == Steam::get()->getUserNameWchar() )
     {
-        m_steam_id = Steam::get()->getSteamID();
+        m_steam_id   = Steam::get()->getSteamID();
+        m_steam_name = Steam::get()->getUserNameWchar();
     }
     else
-        m_steam_id = "";
-
+    {
+        m_steam_id   = "";
+        m_steam_name = "";
+    }
     m_local_name          = name;
     m_is_guest_account    = is_guest;
     m_use_frequency       = is_guest ? -1 : 0;
@@ -78,6 +81,7 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
 PlayerProfile::PlayerProfile(const XMLNode* node)
 {
     m_steam_id            = "";
+    m_steam_name          = "";
     m_saved_session       = false;
     m_saved_token         = "";
     m_saved_user_id       = 0;
@@ -90,6 +94,7 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
 
     node->getAndDecode("name",     &m_local_name       );
     node->get("steam-id",          &m_steam_id         );
+    node->get("steam-name",        &m_steam_name       );
     node->get("guest",             &m_is_guest_account );
     node->get("use-frequency",     &m_use_frequency    );
     node->get("unique-id",         &m_unique_id        );
@@ -230,7 +235,9 @@ void PlayerProfile::save(UTFWriter &out)
         << L"\" guest=\""         << m_is_guest_account
         << L"\" use-frequency=\"" << m_use_frequency << L"\"\n";
 
-    out << L"            steam-id=\"" << m_steam_id << L"\"\n";
+    out << L"            steam-id=\""      << m_steam_id
+        << L"\" steam-name=\""             << m_steam_name << L"\"\n";
+
     out << L"            icon-filename=\"" << m_icon_filename << L"\"\n";
 
     out << L"            unique-id=\""  << m_unique_id
