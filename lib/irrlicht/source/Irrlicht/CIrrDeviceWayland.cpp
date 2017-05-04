@@ -65,6 +65,26 @@ public:
 					 wl_fixed_t sx, wl_fixed_t sy)
 	{
 		printf("enter!\n");
+		
+		CIrrDeviceWayland *device = static_cast<CIrrDeviceWayland *>(data);
+
+
+		if (device->default_cursor) 
+		{
+			wl_cursor_image* image = device->default_cursor->images[0];
+			wl_buffer* buffer = wl_cursor_image_get_buffer(image);
+			
+			if (!buffer)
+				return;
+				
+			wl_pointer_set_cursor(pointer, serial, device->cursor_surface,
+							      image->hotspot_x, image->hotspot_y);
+			wl_surface_attach(device->cursor_surface, buffer, 0, 0);
+			wl_surface_damage(device->cursor_surface, 0, 0,
+							  image->width, image->height);
+			wl_surface_commit(device->cursor_surface);
+		}
+		
 	}
 
 	static void
@@ -512,6 +532,19 @@ public:
 			printf("binding seat\n");
 			dev->seat = static_cast<wl_seat *>(wl_registry_bind(registry, name, &wl_seat_interface, 1));
 		}
+		else if (strcmp(interface, "wl_shm") == 0) {
+			dev->shm = static_cast<wl_shm*>(wl_registry_bind(registry, name, &wl_shm_interface, 1));
+			dev->cursor_theme = wl_cursor_theme_load(NULL, 32, dev->shm);
+			if (!dev->cursor_theme) {
+				printf("unable to load default theme\n");
+				return;
+			}
+			dev->default_cursor =
+				wl_cursor_theme_get_cursor(dev->cursor_theme, "left_ptr");
+			if (!dev->default_cursor) {
+				printf("unable to load default left pointer\n");
+			}
+		}
 		else if (strcmp(interface, "wl_output") == 0)
 		{
 			printf("binding output\n");
@@ -616,6 +649,8 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& param)
 	wl_output_add_listener(output, &WaylandCallbacks::output_listener, this);
 	
 	shell_surface = NULL;
+	cursor_surface = NULL;
+	cursor_theme = NULL;
 
 	// create keymap
 	createKeyMap();
@@ -626,6 +661,8 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& param)
 		// create the window, only if we do not use the null device
 		if (!createWindow())
 			return;
+			
+		cursor_surface = wl_compositor_create_surface(compositor);
 	}
 
 	// create cursor control
@@ -653,8 +690,16 @@ CIrrDeviceWayland::~CIrrDeviceWayland()
 	wl_keyboard_destroy(keyboard);
 	wl_pointer_destroy(pointer);
 	wl_seat_destroy(seat);
+	
+	if (cursor_surface)
+		wl_surface_destroy(cursor_surface);
+		
+	if (cursor_theme)
+		wl_cursor_theme_destroy(cursor_theme);
+	
 	if (shell_surface)
 		wl_shell_surface_destroy(shell_surface);
+		
 	wl_registry_destroy(registry);
 	wl_display_flush(display);
 	wl_display_disconnect(display);

@@ -426,7 +426,7 @@ if(UNIX AND NOT APPLE)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
         target_link_libraries(supertuxkart "-fsanitize=address")
     endif()
-    target_link_libraries(supertuxkart wayland-client wayland-egl EGL xkbcommon)
+    target_link_libraries(supertuxkart wayland-client wayland-egl wayland-cursor EGL xkbcommon)
 endif()
 
 if(BUILD_RECORDER)

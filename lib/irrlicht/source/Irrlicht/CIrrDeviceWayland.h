@@ -11,6 +11,7 @@
 
 #include <wayland-client.h>
 #include <wayland-egl.h>
+#include <wayland-cursor.h>
 #include <xkbcommon/xkbcommon.h>
 #include <xkbcommon/xkbcommon-compose.h>
 
@@ -246,6 +247,12 @@ namespace irr
 		wl_pointer *pointer;
 		wl_keyboard *keyboard;
 		wl_output *output;
+		
+		wl_shm* shm;
+		wl_cursor_theme* cursor_theme;
+		wl_cursor* default_cursor;
+		wl_surface* cursor_surface;
+		
 		xkb_context *xkbctx;
 		xkb_keymap *keymap;
 		xkb_state *state;
