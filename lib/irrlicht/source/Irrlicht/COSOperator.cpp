@@ -25,6 +25,9 @@
 #if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
 #include "CIrrDeviceLinux.h"
 #endif
+#if defined(_IRR_COMPILE_WITH_WAYLAND)
+#include "CIrrDeviceWayland.h"
+#endif
 #ifdef _IRR_COMPILE_WITH_OSX_DEVICE_
 #include "MacOSX/OSXClipboard.h"
 #endif
@@ -36,6 +39,14 @@ namespace irr
 // constructor  linux
 	COSOperator::COSOperator(const core::stringc& osVersion, CIrrDeviceLinux* device)
 : OperatingSystem(osVersion), IrrDeviceLinux(device)
+{
+}
+#endif
+
+#if defined(_IRR_COMPILE_WITH_WAYLAND)
+// constructor  linux
+	COSOperator::COSOperator(const core::stringc& osVersion, CIrrDeviceWayland* device)
+: OperatingSystem(osVersion), IrrDeviceWayland(device)
 {
 }
 #endif
@@ -121,6 +132,9 @@ void COSOperator::copyToClipboard(const c8* text) const
 #elif defined(_IRR_COMPILE_WITH_X11_DEVICE_)
     if ( IrrDeviceLinux )
         IrrDeviceLinux->copyToClipboard(text);
+#elif defined(_IRR_COMPILE_WITH_WAYLAND)
+    if ( IrrDeviceWayland )
+        IrrDeviceWayland->copyToClipboard(text);
 #else
 
 #endif
@@ -175,6 +189,11 @@ const c8* COSOperator::getTextFromClipboard() const
 #elif defined(_IRR_COMPILE_WITH_X11_DEVICE_)
     if ( IrrDeviceLinux )
         return IrrDeviceLinux->getTextFromClipboard();
+    return 0;
+
+#elif defined(_IRR_COMPILE_WITH_WAYLAND)
+    if ( IrrDeviceWayland )
+        return IrrDeviceWayland->getTextFromClipboard();
     return 0;
 
 #else

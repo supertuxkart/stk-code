@@ -259,6 +259,7 @@ namespace irr
 		xkb_mod_mask_t control_mask;
 		xkb_mod_mask_t alt_mask;
 		xkb_mod_mask_t shift_mask;
+		uint32_t modifiers;
 		struct xkb_compose_table *compose_table;
 		struct xkb_compose_state *compose_state;
 

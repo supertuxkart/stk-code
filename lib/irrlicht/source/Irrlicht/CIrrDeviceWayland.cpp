@@ -39,8 +39,9 @@ extern bool GLContextDebugBit;
 
 #endif // _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 
-#define XRANDR_ROTATION_LEFT    (1 << 1)
-#define XRANDR_ROTATION_RIGHT   (1 << 3)
+#define MOD_SHIFT_MASK		0x01
+#define MOD_ALT_MASK		0x02
+#define MOD_CONTROL_MASK	0x04
 
 namespace irr
 {
@@ -346,9 +347,8 @@ public:
 		irrevent.EventType = irr::EET_KEY_INPUT_EVENT;
 		irrevent.KeyInput.PressedDown = (state == WL_KEYBOARD_KEY_STATE_PRESSED);
 		irrevent.KeyInput.Char = 	xkb_keysym_to_utf32(sym);
-	//	irrevent.KeyInput.Char = ((wchar_t*)(buf))[0];
-	//	irrevent.KeyInput.Control = (event.xkey.state & ControlMask) != 0;
-	//	irrevent.KeyInput.Shift = (event.xkey.state & ShiftMask) != 0;
+		irrevent.KeyInput.Control = (device->modifiers & MOD_CONTROL_MASK) != 0;
+		irrevent.KeyInput.Shift = (device->modifiers & MOD_SHIFT_MASK) != 0;
 	
 	
 	
@@ -405,13 +405,14 @@ public:
 							XKB_STATE_MODS_DEPRESSED | XKB_STATE_MODS_LATCHED);
 		mask = xkb_state_serialize_mods(device->state,
 						state_component);
-		//~ input->modifiers = 0;
-		//~ if (mask & input->xkb.control_mask)
-			//~ input->modifiers |= MOD_CONTROL_MASK;
-		//~ if (mask & input->xkb.alt_mask)
-			//~ input->modifiers |= MOD_ALT_MASK;
-		//~ if (mask & input->xkb.shift_mask)
-			//~ input->modifiers |= MOD_SHIFT_MASK;
+						
+		device->modifiers = 0;
+		if (mask & device->control_mask)
+			device->modifiers |= MOD_CONTROL_MASK;
+		if (mask & device->alt_mask)
+			device->modifiers |= MOD_ALT_MASK;
+		if (mask & device->shift_mask)
+			device->modifiers |= MOD_SHIFT_MASK;
 	}
 
 	static void
@@ -631,7 +632,7 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& param)
 	linuxversion += " ";
 	linuxversion += LinuxInfo.machine;
 
-	Operator = new COSOperator(linuxversion);
+	Operator = new COSOperator(linuxversion, this);
 	os::Printer::log(linuxversion.c_str(), ELL_INFORMATION);
 
 	// Retrieve wayland infos
@@ -1365,13 +1366,16 @@ bool CIrrDeviceWayland::getGammaRamp( f32 &red, f32 &green, f32 &blue, f32 &brig
 //! \return Returns 0 if no string is in there.
 const c8* CIrrDeviceWayland::getTextFromClipboard() const
 {
-	return 0;
+	printf("get text from clipboard: %s\n", Clipboard.c_str());
+	return Clipboard.c_str();
 
 }
 
 //! copies text to the clipboard
 void CIrrDeviceWayland::copyToClipboard(const c8* text) const
 {
+	printf("copy to clipboard: %s\n", text);
+	Clipboard = text;
 }
 
 
