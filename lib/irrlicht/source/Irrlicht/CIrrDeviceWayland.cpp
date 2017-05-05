@@ -22,6 +22,7 @@ extern bool GLContextDebugBit;
 #include <sys/mman.h>
 #include "CVideoModeList.h"
 #include "CContextEGL.h"
+#include <linux/input.h>
 
 #if defined _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 #include <fcntl.h>
@@ -98,22 +99,18 @@ public:
 	pointer_handle_motion(void *data, struct wl_pointer *pointer,
 						uint32_t time, wl_fixed_t sx, wl_fixed_t sy)
 	{
-		CIrrDeviceWayland *dev = static_cast<CIrrDeviceWayland *>(data);
-		dev->getCursorControl()->setPosition(sx, sy);
+		CIrrDeviceWayland *device = static_cast<CIrrDeviceWayland *>(data);
+		device->getCursorControl()->setPosition(sx, sy);
 		SEvent irrevent;
 		irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
 		irrevent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
-		irrevent.MouseInput.X = dev->getCursorControl()->getPosition().X;
-		irrevent.MouseInput.Y = dev->getCursorControl()->getPosition().Y;
-//		irrevent.MouseInput.Control = (event.xkey.state & ControlMask) != 0;
-//		irrevent.MouseInput.Shift = (event.xkey.state & ShiftMask) != 0;
+		irrevent.MouseInput.X = device->getCursorControl()->getPosition().X;
+		irrevent.MouseInput.Y = device->getCursorControl()->getPosition().Y;
+		irrevent.MouseInput.Control = (device->modifiers & MOD_CONTROL_MASK) != 0;
+		irrevent.MouseInput.Shift = (device->modifiers & MOD_SHIFT_MASK) != 0;
+		irrevent.MouseInput.ButtonStates = device->ButtonStates;
 
-		// mouse button states
-		irrevent.MouseInput.ButtonStates = 0;//(event.xbutton.state & Button1Mask) ? irr::EMBSM_LEFT : 0;
-		irrevent.MouseInput.ButtonStates |= 0;//(event.xbutton.state & Button3Mask) ? irr::EMBSM_RIGHT : 0;
-		irrevent.MouseInput.ButtonStates |= 0;//(event.xbutton.state & Button2Mask) ? irr::EMBSM_MIDDLE : 0;
-
-		dev->signalEvent(irrevent);
+		device->signalEvent(irrevent);
 	}
 
 	static void
@@ -121,46 +118,60 @@ public:
 						uint32_t serial, uint32_t time, uint32_t button,
 						uint32_t state)
 	{
-		CIrrDeviceWayland *dev = static_cast<CIrrDeviceWayland *>(data);
+		CIrrDeviceWayland *device = static_cast<CIrrDeviceWayland *>(data);
 
 		SEvent irrevent;
-		irrevent.MouseInput.ButtonStates = 0xffffffff;
-
 		irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
-		irrevent.MouseInput.X = dev->getCursorControl()->getPosition().X;
-		irrevent.MouseInput.Y = dev->getCursorControl()->getPosition().Y;
-	//	irrevent.MouseInput.Control = (event.xkey.state & ControlMask) != 0;
-	//	irrevent.MouseInput.Shift = (event.xkey.state & ShiftMask) != 0;
+		irrevent.MouseInput.X = device->getCursorControl()->getPosition().X;
+		irrevent.MouseInput.Y = device->getCursorControl()->getPosition().Y;
+		irrevent.MouseInput.Control = (device->modifiers & MOD_CONTROL_MASK) != 0;
+		irrevent.MouseInput.Shift = (device->modifiers & MOD_SHIFT_MASK) != 0;
+		irrevent.MouseInput.Event = irr::EMIE_COUNT;
 
-			// mouse button states
-			// This sets the state which the buttons had _prior_ to the event.
-			// So unlike on Windows the button which just got changed has still the old state here.
-			// We handle that below by flipping the corresponding bit later.
-	//		irrevent.MouseInput.ButtonStates = (event.xbutton.state & Button1Mask) ? irr::EMBSM_LEFT : 0;
-	//		irrevent.MouseInput.ButtonStates |= (event.xbutton.state & Button3Mask) ? irr::EMBSM_RIGHT : 0;
-	//		irrevent.MouseInput.ButtonStates |= (event.xbutton.state & Button2Mask) ? irr::EMBSM_MIDDLE : 0;
-
-			irrevent.MouseInput.Event = irr::EMIE_COUNT;
-			switch(button)
+		switch (button)
+		{
+		case BTN_LEFT:
+			if (state == WL_POINTER_BUTTON_STATE_PRESSED)
 			{
-			case 272: // Left button
-				irrevent.MouseInput.Event =
-					(state == WL_POINTER_BUTTON_STATE_PRESSED) ? irr::EMIE_LMOUSE_PRESSED_DOWN : irr::EMIE_LMOUSE_LEFT_UP;
-				irrevent.MouseInput.ButtonStates ^= irr::EMBSM_LEFT;
-				break;
-			case 273: // Right button
-				irrevent.MouseInput.Event =
-					(state == WL_POINTER_BUTTON_STATE_PRESSED) ? irr::EMIE_RMOUSE_PRESSED_DOWN : irr::EMIE_RMOUSE_LEFT_UP;
-				irrevent.MouseInput.ButtonStates ^= irr::EMBSM_RIGHT;
-				break;
-			case 274: // Middle button
-				irrevent.MouseInput.Event =
-					(state == WL_POINTER_BUTTON_STATE_PRESSED) ? irr::EMIE_MMOUSE_PRESSED_DOWN : irr::EMIE_MMOUSE_LEFT_UP;
-				irrevent.MouseInput.ButtonStates ^= irr::EMBSM_MIDDLE;
-			default:
-				break;
+				irrevent.MouseInput.Event = irr::EMIE_LMOUSE_PRESSED_DOWN;
+				device->ButtonStates |= irr::EMBSM_LEFT;
 			}
-		dev->signalEvent(irrevent);
+			else if (state == WL_POINTER_BUTTON_STATE_RELEASED)
+			{
+				irrevent.MouseInput.Event = irr::EMIE_LMOUSE_LEFT_UP;
+				device->ButtonStates &= ~(irr::EMBSM_LEFT);
+			}
+			break;
+		case BTN_RIGHT:
+			if (state == WL_POINTER_BUTTON_STATE_PRESSED)
+			{
+				irrevent.MouseInput.Event = irr::EMIE_RMOUSE_PRESSED_DOWN;
+				device->ButtonStates |= irr::EMBSM_RIGHT;
+			}
+			else if (state == WL_POINTER_BUTTON_STATE_RELEASED)
+			{
+				irrevent.MouseInput.Event = irr::EMIE_RMOUSE_LEFT_UP;
+				device->ButtonStates &= ~(irr::EMBSM_RIGHT);
+			}
+			break;
+		case BTN_MIDDLE:
+			if (state == WL_POINTER_BUTTON_STATE_PRESSED)
+			{
+				irrevent.MouseInput.Event = irr::EMIE_MMOUSE_PRESSED_DOWN;
+				device->ButtonStates |= irr::EMBSM_MIDDLE;
+			}
+			else if (state == WL_POINTER_BUTTON_STATE_RELEASED)
+			{
+				irrevent.MouseInput.Event = irr::EMIE_MMOUSE_LEFT_UP;
+				device->ButtonStates &= ~(irr::EMBSM_MIDDLE);
+			}
+		default:
+			break;
+		}
+			
+		irrevent.MouseInput.ButtonStates = device->ButtonStates;
+		
+		device->signalEvent(irrevent);
 	}
 
 	static void
@@ -645,6 +656,7 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& param)
 
 	pointer = 0;
 	keyboard = 0;
+	ButtonStates = 0;
 
 	wl_seat_add_listener(seat, &WaylandCallbacks::seat_listener, this);
 	wl_output_add_listener(output, &WaylandCallbacks::output_listener, this);

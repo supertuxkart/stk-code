@@ -268,6 +268,8 @@ namespace irr
 		wl_shell_surface *shell_surface;
 		wl_egl_window *egl_window;
 		
+		u32 ButtonStates;
+		
 		ContextManagerEGL* getEGLContext() {return EglContext;}
 		
 	private:
