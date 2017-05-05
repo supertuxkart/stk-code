@@ -26,6 +26,7 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include "online/steam.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/dialogs/recovery_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
@@ -55,6 +56,10 @@ BaseUserScreen::BaseUserScreen(const std::string &name) : Screen(name.c_str())
 
 void BaseUserScreen::loadedFromFile()
 {
+    m_steam_cb = getWidget<CheckBoxWidget>("steam");
+    assert(m_steam_cb);
+    m_steam_label = getWidget<LabelWidget>("label-steam");
+    assert(m_steam_label);
     m_online_cb = getWidget<CheckBoxWidget>("online");
     assert(m_online_cb);
     m_username_tb = getWidget<TextBoxWidget >("username");
@@ -184,10 +189,10 @@ void BaseUserScreen::tearDown()
 // ----------------------------------------------------------------------------
 
 EventPropagation BaseUserScreen::filterActions(PlayerAction action,
-    int deviceID,
-    const unsigned int value,
-    Input::InputType type,
-    int playerId)
+                                               int deviceID,
+                                               const unsigned int value,
+                                               Input::InputType type,
+                                               int playerId              )
 {
     if (action == PA_MENU_SELECT)
     {
@@ -218,6 +223,27 @@ void BaseUserScreen::selectUser(int index)
     m_players->setSelection(StringUtils::toString(index), PLAYER_ID_GAME_MASTER,
                             focus_it);
     
+    m_steam_cb->setVisible   (Steam::get()->isSteamAvailable());
+    m_steam_label->setVisible(Steam::get()->isSteamAvailable());
+    if (Steam::get()->isSteamAvailable())
+    {
+        m_steam_cb->setState(profile->isSteamUser());
+        if (profile->isSteamUser())
+        {
+            //I18N: Checkbox text shown when this player is a steam user
+            // with the name displayed in ().
+            core::stringw label = _("Is Steam user (%s)",
+                                    profile->getSteamName() );
+            m_steam_label->setText(label, true);
+        }
+        else
+        {
+            //I18N: Checbox text shown when the user is not a steam user
+            // but can select the check box in order to become one
+            m_steam_label->setText(_("Is Steam user"), true);
+        }   // no steam user
+    }   // If steam is available
+
     if (!m_new_registered_data)
         m_username_tb->setText(profile->getLastOnlineName(true/*ignoreRTL*/));
 
@@ -300,9 +326,8 @@ void BaseUserScreen::makeEntryFieldsVisible()
 // ----------------------------------------------------------------------------
 /** Called when the user selects anything on the screen.
  */
-void BaseUserScreen::eventCallback(Widget* widget,
-                               const std::string& name,
-                               const int player_id)
+void BaseUserScreen::eventCallback(Widget* widget, const std::string& name,
+                                   const int player_id)
 {
     // Clean any error message still shown
     m_info_widget->setText("", true);
@@ -389,10 +414,47 @@ void BaseUserScreen::eventCallback(Widget* widget,
     {
         StateManager::get()->escapePressed();
     }
-
+    else if (name == "steam")
+    {
+        handleSteamAccount(player_id);
+    }
     return;
 
 }   // eventCallback
+
+// ----------------------------------------------------------------------------
+/** Called when an STK account is connected or disconnected to a steam
+ * account.
+ * \param player_id The index of the currently selected player.
+ */
+void BaseUserScreen::handleSteamAccount(int player_id)
+{
+    // Shouldn't happen, this option is only shown when
+    // steam is available
+    if (!Steam::get()->isSteamAvailable()) return;
+
+    const std::string &s_index = getWidget<DynamicRibbonWidget>("players")
+                               ->getSelectionIDString(player_id);
+
+    if (s_index == "") return;  // can happen if the list is empty
+
+    unsigned int id = 0;
+    StringUtils::fromString(s_index, id);
+    PlayerProfile *profile = PlayerManager::get()->getPlayer(id);
+
+    bool steam_user = m_steam_cb->getState();
+    if (m_steam_cb->getState())
+    {
+        // We need to disconnect any other STK account which uses the
+        // same steam account
+        PlayerManager::get()->disconnectSteamAccount(Steam::get()->getSteamID());
+        profile->setToCurrentSteamUser();
+    }
+    else
+        profile->clearSteamData();
+
+    selectUser(id);
+}   // handleSteamAccount
 
 // ----------------------------------------------------------------------------
 /** Closes the BaseUserScreen, and makes sure that the right screen is displayed

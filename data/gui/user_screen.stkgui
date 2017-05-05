@@ -15,6 +15,12 @@
             <spacer height="15" width="10"/>
             <div width="90%" align="center" layout="vertical-row" proportion="1">
                 <div width="100%" height="fit" layout="horizontal-row" >
+                    <checkbox width="fit" id="steam" I18N="In the user screen" text_align="left"/>
+                    <spacer width="10"/>
+                    <label proportion="1" id="label-steam" height="100%" text_align="left"
+                          I18N="In the user screen" text="Is a Steam account"/>
+                </div>
+                <div width="100%" height="fit" layout="horizontal-row" >
                     <checkbox width="fit" id="online" I18N="In the user screen" text_align="left"/>
                     <spacer width="10"/>
                     <label proportion="1" height="100%" text_align="left" I18N="In the user screen" text="Online"/>

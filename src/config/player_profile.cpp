@@ -303,6 +303,30 @@ void PlayerProfile::raceFinished()
 }   // raceFinished
 
 //------------------------------------------------------------------------------
+/** Connects this user to the currently logged in Steam account. It saves the
+ *  unique steam id and the (not necessarily unique) steam user name.
+ */
+void PlayerProfile::setToCurrentSteamUser()
+{
+    if (!Steam::get()->isSteamAvailable())
+    {
+        Log::error("PlayerProfile",
+                   "Can not set to current steam user, steam is not available.");
+        return;
+    }
+    m_steam_id   = Steam::get()->getSteamID();
+    m_steam_name = Steam::get()->getUserNameWchar();
+}   // setToCurrentSteamUser
+
+//------------------------------------------------------------------------------
+/** Disconnects this player from its steam account.
+ */
+void PlayerProfile::clearSteamData()
+{
+    m_steam_id   = "";
+    m_steam_name = "";
+}   // clearSteamData
+//------------------------------------------------------------------------------
 /** Comparison used to sort players.
  */
 bool PlayerProfile::operator<(const PlayerProfile &other)

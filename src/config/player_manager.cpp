@@ -265,7 +265,7 @@ bool PlayerManager::checkSteamAccount(const irr::core::stringw &current_name)
 
             m_current_player = getPlayer(i);
             // Update the steam name in case that the user did a rename
-            m_current_player->setSteamName(Steam::get()->getUserNameWchar());
+            m_current_player->setToCurrentSteamUser();
             return true;
         }   // same steam user id
     }   // for i in m_all_players
@@ -283,8 +283,7 @@ bool PlayerManager::checkSteamAccount(const irr::core::stringw &current_name)
                       current_name.c_str(), steam_name.c_str());
             
             m_current_player = getPlayer(i);
-            m_current_player->setSteamUserID(steam_id);
-            m_current_player->setSteamName(steam_name);
+            m_current_player->setToCurrentSteamUser();
             return true;
         }   // if steam and current name are different
     }   // for i in m_all_players
@@ -296,6 +295,20 @@ bool PlayerManager::checkSteamAccount(const irr::core::stringw &current_name)
     return false;
 }   // checkSteamAccount
 
+// ----------------------------------------------------------------------------
+/** Disconnects all account(s) that uses the given steam id from steam.
+ */
+void PlayerManager::disconnectSteamAccount(const std::string &steam_id)
+{
+    for (unsigned int i = 0; i < m_all_players.size(); i++)
+    {
+        PlayerProfile &player = m_all_players[i];
+        if (player.isSteamUser() && player.getSteamUserID() == steam_id)
+        {
+            player.clearSteamData();
+        }   // if right steam user
+    }   // for i in m_all_players
+}   // disconnectSteamAccount
 // ----------------------------------------------------------------------------
 /** The 2nd loading stage. During this stage achievements and story mode
  *  data is initialised for each player. In case of existing player (i.e. not

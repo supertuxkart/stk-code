@@ -102,6 +102,8 @@ public:
     static void setUserDetails(Online::HTTPRequest *request,
                                const std::string &action,
                                const std::string &php_name = "");
+    void disconnectSteamAccount(const std::string &steam_id);
+
     static unsigned int getCurrentOnlineId();
     static bool isCurrentLoggedIn();
     static Online::OnlineProfile* getCurrentOnlineProfile();

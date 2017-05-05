@@ -134,6 +134,8 @@ public:
     void saveSession(int user_id, const std::string &token);
     void clearSession(bool save=true);
     void addIcon();
+    void setToCurrentSteamUser();
+    void clearSteamData();
 
     /** Abstract virtual classes, to be implemented by the OnlinePlayer. */
     virtual void setUserDetails(Online::HTTPRequest *request,
@@ -315,15 +317,9 @@ public:
     /** Returns the steam user id of this player ("" if not a steam account).*/
     const std::string &getSteamUserID() const { return m_steam_id;  }
     // ------------------------------------------------------------------------
-    /** Sets the steam user id of this player. */
-    void setSteamUserID(const std::string &id) { m_steam_id = id; }
-    // ------------------------------------------------------------------------
     /** Returns the steam name of the connected steam account (or "" if
      *  this account is not a steam account. */
     const core::stringw &getSteamName() const { return m_steam_name;  }
-    // ------------------------------------------------------------------------
-    /** Sets the steam name of this account. */
-    void setSteamName(const core::stringw &name) { m_steam_name = name; }
     // ------------------------------------------------------------------------
 };   // class PlayerProfile
 

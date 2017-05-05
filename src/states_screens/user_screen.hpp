@@ -66,6 +66,12 @@ private:
     irr::core::stringw m_sign_in_name;
 
     /** Online check box. */
+    GUIEngine::CheckBoxWidget *m_steam_cb;
+
+    /** Label field for steam details. */
+    GUIEngine::LabelWidget * m_steam_label;
+
+    /** Online check box. */
     GUIEngine::CheckBoxWidget *m_online_cb;
 
     /** User name entry field. */
@@ -98,6 +104,7 @@ private:
     void closeScreen();
     void deletePlayer();
     void doDeletePlayer();
+    void handleSteamAccount(int player_id);
     PlayerProfile* getSelectedPlayer();
     virtual void onUpdate(float dt) OVERRIDE;
 
