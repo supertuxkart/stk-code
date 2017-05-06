@@ -486,6 +486,12 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
 void Attachment::update(float dt)
 {
     if(m_type==ATTACH_NOTHING) return;
+
+    // suspend the bomb during animations to avoid having 2 animations at the
+    // same time should the bomb explode before the previous animation is done
+    if (m_type == ATTACH_BOMB && m_kart->getKartAnimation() != NULL)
+        return;
+
     m_time_left -=dt;
 
 
