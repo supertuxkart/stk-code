@@ -11,6 +11,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
 if (SERVER_ONLY)
     add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_WAYLAND)
 else()
     if(NOT USE_GLES2)
         find_package(OpenGL REQUIRED)
@@ -21,6 +22,10 @@ endif()
 if (UNIX AND NOT APPLE)
     find_package(X11 REQUIRED)
     include_directories(${X11_INCLUDE_DIR})
+endif()
+
+if(ENABLE_WAYLAND_DEVICE)
+    add_definitions(-D_IRR_COMPILE_WITH_WAYLAND)
 endif()
 
 if(APPLE)
@@ -551,6 +556,14 @@ endif()
 
 add_library(stkirrlicht STATIC ${IRRLICHT_SOURCES})
 target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY} ${ZLIB_LIBRARY})
+
+if(USE_GLES2 OR ENABLE_WAYLAND_DEVICE)
+    target_link_libraries(stkirrlicht EGL)
+endif()
+
+if(ENABLE_WAYLAND_DEVICE)
+    target_link_libraries(stkirrlicht wayland-client wayland-egl wayland-cursor xkbcommon)
+endif()
 
 if(WIN32)
     target_link_libraries(stkirrlicht imm32)

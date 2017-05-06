@@ -22,6 +22,9 @@
 #endif
 #endif
 
+#include <cassert>
+
+#include "IrrlichtDevice.h"
 #if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
 #include "CIrrDeviceLinux.h"
 #endif
@@ -35,24 +38,16 @@
 namespace irr
 {
 
-#if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
 // constructor  linux
-	COSOperator::COSOperator(const core::stringc& osVersion, CIrrDeviceLinux* device)
-: OperatingSystem(osVersion), IrrDeviceLinux(device)
+	COSOperator::COSOperator(const core::stringc& osVersion, IrrlichtDevice* device)
+: OperatingSystem(osVersion), IrrDevice(device)
 {
 }
-#endif
 
-#if defined(_IRR_COMPILE_WITH_WAYLAND)
-// constructor  linux
-	COSOperator::COSOperator(const core::stringc& osVersion, CIrrDeviceWayland* device)
-: OperatingSystem(osVersion), IrrDeviceWayland(device)
-{
-}
-#endif
 
 // constructor
-COSOperator::COSOperator(const core::stringc& osVersion) : OperatingSystem(osVersion)
+COSOperator::COSOperator(const core::stringc& osVersion) 
+: OperatingSystem(osVersion), IrrDevice(NULL)
 {
 	#ifdef _DEBUG
 	setDebugName("COSOperator");
@@ -128,13 +123,29 @@ void COSOperator::copyToClipboard(const c8* text) const
 #elif defined(_IRR_COMPILE_WITH_OSX_DEVICE_)
 
 	OSXCopyToClipboard(text);
-
-#elif defined(_IRR_COMPILE_WITH_X11_DEVICE_)
-    if ( IrrDeviceLinux )
-        IrrDeviceLinux->copyToClipboard(text);
-#elif defined(_IRR_COMPILE_WITH_WAYLAND)
-    if ( IrrDeviceWayland )
-        IrrDeviceWayland->copyToClipboard(text);
+	
+#elif defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_WAYLAND)
+    if (IrrDevice != NULL)
+    {
+#if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
+		if (IrrDevice->getType() == EIDT_X11)
+		{
+			CIrrDeviceLinux* device = dynamic_cast<CIrrDeviceLinux*>(IrrDevice);
+			assert(device);
+			
+			device->copyToClipboard(text);
+		}
+#endif
+#if defined(_IRR_COMPILE_WITH_WAYLAND)
+		if (IrrDevice->getType() == EIDT_WAYLAND)
+		{
+			CIrrDeviceWayland* device = dynamic_cast<CIrrDeviceWayland*>(IrrDevice);
+			assert(device);
+			
+			device->copyToClipboard(text);
+		}
+#endif
+	}
 #else
 
 #endif
@@ -185,16 +196,32 @@ const c8* COSOperator::getTextFromClipboard() const
 
 #elif defined(_IRR_COMPILE_WITH_OSX_DEVICE_)
 	return (OSXCopyFromClipboard());
+	
+	
 
-#elif defined(_IRR_COMPILE_WITH_X11_DEVICE_)
-    if ( IrrDeviceLinux )
-        return IrrDeviceLinux->getTextFromClipboard();
-    return 0;
-
-#elif defined(_IRR_COMPILE_WITH_WAYLAND)
-    if ( IrrDeviceWayland )
-        return IrrDeviceWayland->getTextFromClipboard();
-    return 0;
+#elif defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_WAYLAND)
+    if (IrrDevice != NULL)
+    {
+#if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
+		if (IrrDevice->getType() == EIDT_X11)
+		{
+			CIrrDeviceLinux* device = dynamic_cast<CIrrDeviceLinux*>(IrrDevice);
+			assert(device);
+			
+			return device->getTextFromClipboard();
+		}
+#endif
+#if defined(_IRR_COMPILE_WITH_WAYLAND)
+		if (IrrDevice->getType() == EIDT_WAYLAND)
+		{
+			CIrrDeviceWayland* device = dynamic_cast<CIrrDeviceWayland*>(IrrDevice);
+			assert(device);
+			
+			return device->getTextFromClipboard();
+		}
+#endif
+	}
+	return 0;
 
 #else
 

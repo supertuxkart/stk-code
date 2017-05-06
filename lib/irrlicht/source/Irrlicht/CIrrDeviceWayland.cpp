@@ -1,7 +1,6 @@
-extern bool GLContextDebugBit;
-
 #include "CIrrDeviceWayland.h"
 
+#ifdef _IRR_COMPILE_WITH_WAYLAND
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -614,6 +613,21 @@ const wl_registry_listener WaylandCallbacks::registry_listener = {
 
 
 //const char* wmDeleteWindow = "WM_DELETE_WINDOW";
+
+bool CIrrDeviceWayland::isWaylandDeviceWorking()
+{
+	bool is_working = false;
+	
+	wl_display* display = wl_display_connect(NULL);
+
+	if (display != NULL) 
+	{
+		is_working = true;
+		wl_display_disconnect(display);
+	}
+
+    return is_working;
+}
 
 //! constructor
 CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& param)
@@ -1401,3 +1415,5 @@ void CIrrDeviceWayland::initXAtoms()
 }
 
 } // end namespace
+
+#endif

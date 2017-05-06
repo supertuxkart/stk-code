@@ -3,6 +3,8 @@
 
 #include "IrrCompileConfig.h"
 
+#ifdef _IRR_COMPILE_WITH_WAYLAND
+
 #include "CIrrDeviceStub.h"
 #include "IrrlichtDevice.h"
 #include "IImagePresenter.h"
@@ -236,6 +238,7 @@ namespace irr
 		ContextManagerEGL* EglContext;
 		
 	public:
+		static bool isWaylandDeviceWorking();
 		void signalEvent(const SEvent&);
 		void addMode(const core::dimension2du &mode) { Modes.push_back(mode); }
 		void setCurrentMode(const core::dimension2du &mode) { CurrentModes = mode; }
@@ -321,6 +324,8 @@ private:
 
 
 } // end namespace irr
+
+#endif
 
 #endif // CIRRDEVICEWAYLAND_H
 

@@ -704,6 +704,7 @@ COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
 
 bool COpenGLDriver::changeRenderContext(const SExposedVideoData& videoData, CIrrDeviceWayland* device)
 {
+	//TODO
 	return true;
 }
 
@@ -722,7 +723,7 @@ bool COpenGLDriver::initDriver(CIrrDeviceWayland* device)
 	return true;
 }
 
-#endif // _IRR_COMPILE_WITH_X11_DEVICE_
+#endif // _IRR_COMPILE_WITH_WAYLAND
 
 
 
