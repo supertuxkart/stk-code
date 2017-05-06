@@ -21,7 +21,6 @@
 #include <sys/mman.h>
 #include "CVideoModeList.h"
 #include "CContextEGL.h"
-#include <linux/input.h>
 
 #if defined _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 #include <fcntl.h>
@@ -129,7 +128,7 @@ public:
 
 		switch (button)
 		{
-		case BTN_LEFT:
+		case 272:
 			if (state == WL_POINTER_BUTTON_STATE_PRESSED)
 			{
 				irrevent.MouseInput.Event = irr::EMIE_LMOUSE_PRESSED_DOWN;
@@ -141,7 +140,7 @@ public:
 				device->ButtonStates &= ~(irr::EMBSM_LEFT);
 			}
 			break;
-		case BTN_RIGHT:
+		case 273:
 			if (state == WL_POINTER_BUTTON_STATE_PRESSED)
 			{
 				irrevent.MouseInput.Event = irr::EMIE_RMOUSE_PRESSED_DOWN;
@@ -153,7 +152,7 @@ public:
 				device->ButtonStates &= ~(irr::EMBSM_RIGHT);
 			}
 			break;
-		case BTN_MIDDLE:
+		case 274:
 			if (state == WL_POINTER_BUTTON_STATE_PRESSED)
 			{
 				irrevent.MouseInput.Event = irr::EMIE_MMOUSE_PRESSED_DOWN;
