@@ -270,28 +270,49 @@ bool PlayerManager::checkSteamAccount(const irr::core::stringw &current_name)
         }   // same steam user id
     }   // for i in m_all_players
 
-    for (unsigned int i = 0; i < m_all_players.size(); i++)
+    // Now check for an existing account name that matches the steam name.
+    // This is only done on the first time an STK version is running that
+    // connects to steam. From then on the user must go to the user screen
+    // to connect or disconnect STK accounts to steam accounts.
+    if (UserConfigParams::m_steam_first_start)
     {
-        // Ignore existing steam users, they must have a different id 
-        // (otherwise they would have been picked in the previous loop)
-        if (m_all_players[i].isSteamUser()) continue;
-        stringw name = m_all_players[i].getName();
-        if (name.equals_ignore_case(steam_name))
+        for (unsigned int i = 0; i < m_all_players.size(); i++)
         {
-            Log::warn("PlayerManager",
-                      "Connecting '%ls' to current steam account '%ls'.",
-                      current_name.c_str(), steam_name.c_str());
-            
-            m_current_player = getPlayer(i);
-            m_current_player->setToCurrentSteamUser();
-            return true;
-        }   // if steam and current name are different
-    }   // for i in m_all_players
+            // Ignore existing steam users, they must have a different id 
+            // (otherwise they would have been picked in the previous loop)
+            if (m_all_players[i].isSteamUser()) continue;
+            stringw name = m_all_players[i].getName();
+            if (name.equals_ignore_case(steam_name))
+            {
+                Log::warn("PlayerManager",
+                          "Connecting '%ls' to current steam account '%ls'.",
+                          current_name.c_str(), steam_name.c_str());
 
-    //TODO: At this stage there are a few options:
-    // 1) If there is only one STK account, connect it to the steam account?
-    // 2) automatically connect 'current' to the steam account?
-    // 3) bring up a gui?
+                m_current_player = getPlayer(i);
+                m_current_player->setToCurrentSteamUser();
+                return true;
+            }   // if steam and current name are different
+        }   // for i in m_all_players
+
+        // No matching existing user found. Last try: if there is only
+        // one stk account, connect it to the current steam account:
+        if (m_all_players.size() == 1)
+        {
+            m_current_player = getPlayer(0);
+            m_current_player->setToCurrentSteamUser();
+            Log::warn("PlayerManager",
+               "Connecting only account '%ls' to current steam account '%ls'.",
+                      m_current_player->getName().c_str(), steam_name.c_str());
+            return true;
+        }
+
+    }   // If first time steam version is started.
+
+    // Otherwise now current user is NULL: if this is the first time that
+    // stk starts under steam (and an stk account existed, otherwise this
+    // function is not called), main() will bring up the user login screen
+    // where the user can connect and disconnect stk- and steam-accounts.
+
     return false;
 }   // checkSteamAccount
 

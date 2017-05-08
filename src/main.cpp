@@ -1701,10 +1701,20 @@ int main(int argc, char *argv[] )
             // so we immediately start the main menu (unless it was requested
             // to always show the login screen). Otherwise show the login
             // screen first.
-            if(PlayerManager::getCurrentPlayer() && !
-                UserConfigParams::m_always_show_login_screen)
+            if(PlayerManager::getCurrentPlayer() && 
+                !UserConfigParams::m_always_show_login_screen)
             {
                 MainMenuScreen::getInstance()->push();
+                // If this is the first time that steam starts, and at startup
+                // we could not detect a 'matching' stk account to the steam
+                // account, bring up the user screen (on top of the main menu),
+                // so that the user can manually connect an stk account with
+                // a steam account.
+                if (UserConfigParams::m_steam_first_start &&
+                    !PlayerManager::getCurrentPlayer()->isSteamUser())
+                {
+                    UserScreen::getInstance()->push();
+                }
             }
             else
             {
@@ -1801,7 +1811,7 @@ int main(int argc, char *argv[] )
     }
 
     /* Program closing...*/
-
+    UserConfigParams::m_steam_first_start = false;
 #ifdef ENABLE_WIIUSE
     if(wiimote_manager)
         delete wiimote_manager;

@@ -914,6 +914,16 @@ namespace UserConfigParams
                                                  &m_online_group,
                                                     "Version of the server API to use."));
 
+    // ---- Online gameplay related
+    PARAM_PREFIX GroupUserConfigParam       m_steam_group
+            PARAM_DEFAULT(GroupUserConfigParam("Steam",
+                                              "Everything related to steam."));
+
+    PARAM_PREFIX BoolUserConfigParam        m_steam_first_start
+            PARAM_DEFAULT(BoolUserConfigParam(true,
+                                              "steam-first-start",
+                                              &m_steam_group,
+                              "If this is the first time the STK steam version was started"));
 
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group
