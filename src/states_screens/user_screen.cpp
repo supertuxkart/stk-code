@@ -442,7 +442,6 @@ void BaseUserScreen::handleSteamAccount(int player_id)
     StringUtils::fromString(s_index, id);
     PlayerProfile *profile = PlayerManager::get()->getPlayer(id);
 
-    bool steam_user = m_steam_cb->getState();
     if (m_steam_cb->getState())
     {
         // We need to disconnect any other STK account which uses the
