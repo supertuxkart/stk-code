@@ -108,8 +108,8 @@ void ScreenKeyboard::init()
     const core::dimension2d<u32>& frame_size = irr_driver->getFrameSize();
 
     int margin = 15;
-    int w = frame_size.Width * m_percent_width;
-    int h = frame_size.Height * m_percent_height;
+    int w = int(frame_size.Width * m_percent_width);
+    int h = int(frame_size.Height * m_percent_height);
     int x = frame_size.Width/2 - w/2;
     int y = frame_size.Height - h - margin;
 

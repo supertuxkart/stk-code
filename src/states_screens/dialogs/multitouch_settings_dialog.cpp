@@ -162,7 +162,7 @@ void MultitouchSettingsDialog::updateValues()
                 
     CheckBoxWidget* buttons_en = getWidget<CheckBoxWidget>("buttons_enabled");
     assert(buttons_en != NULL);
-    buttons_en->setState(UserConfigParams::m_multitouch_mode);
+    buttons_en->setState(UserConfigParams::m_multitouch_mode!=0);
     
     CheckBoxWidget* accelerometer;
     accelerometer = getWidget<CheckBoxWidget>("accelerometer_disabled");

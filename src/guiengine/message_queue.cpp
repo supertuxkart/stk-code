@@ -225,7 +225,7 @@ public:
     {
         const unsigned width = irr_driver->getActualScreenSize().Width;
         const unsigned height = irr_driver->getActualScreenSize().Height;
-        core::dimension2du dim(width * 0.75f, height * 0.05f);
+        core::dimension2du dim(int(width * 0.75f), int(height * 0.05f));
         int x = (width - dim.Width) / 2;
         int y = height - int(1.5f * dim.Height);
         m_area = irr::core::recti(x, y, x + dim.Width,
