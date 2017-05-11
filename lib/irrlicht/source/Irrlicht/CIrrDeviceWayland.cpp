@@ -67,9 +67,14 @@ public:
 		printf("enter!\n");
 		
 		CIrrDeviceWayland *device = static_cast<CIrrDeviceWayland *>(data);
-
-
-		if (device->default_cursor) 
+		
+		//TODO: move it to better place
+		if (!device->getCursorControl()->isVisible() &&
+			device->CreationParams.Fullscreen)
+		{
+			wl_pointer_set_cursor(pointer, serial, NULL, 0, 0);
+		}
+		else if (device->default_cursor) 
 		{
 			wl_cursor_image* image = device->default_cursor->images[0];
 			wl_buffer* buffer = wl_cursor_image_get_buffer(image);
@@ -167,9 +172,30 @@ public:
 			break;
 		}
 			
-		irrevent.MouseInput.ButtonStates = device->ButtonStates;
-		
-		device->signalEvent(irrevent);
+		if (irrevent.MouseInput.Event != irr::EMIE_COUNT)
+		{
+			irrevent.MouseInput.ButtonStates = device->ButtonStates;
+			
+			device->signalEvent(irrevent);
+
+			// It's not exactly true for middle/right button, but keep consistency with x11 device
+			if ( irrevent.MouseInput.Event >= EMIE_LMOUSE_PRESSED_DOWN && irrevent.MouseInput.Event <= EMIE_MMOUSE_PRESSED_DOWN )
+			{
+				u32 clicks = device->checkSuccessiveClicks(irrevent.MouseInput.X, irrevent.MouseInput.Y, irrevent.MouseInput.Event);
+				if ( clicks == 2 )
+				{
+					printf("doubleclick\n");
+					irrevent.MouseInput.Event = (EMOUSE_INPUT_EVENT)(EMIE_LMOUSE_DOUBLE_CLICK + irrevent.MouseInput.Event-EMIE_LMOUSE_PRESSED_DOWN);
+					device->signalEvent(irrevent);
+				}
+				else if ( clicks == 3 )
+				{
+					printf("tripleclick\n");
+					irrevent.MouseInput.Event = (EMOUSE_INPUT_EVENT)(EMIE_LMOUSE_TRIPLE_CLICK + irrevent.MouseInput.Event-EMIE_LMOUSE_PRESSED_DOWN);
+					device->signalEvent(irrevent);
+				}
+			}
+		}
 	}
 
 	static void
@@ -611,8 +637,6 @@ const wl_registry_listener WaylandCallbacks::registry_listener = {
 
 
 
-//const char* wmDeleteWindow = "WM_DELETE_WINDOW";
-
 bool CIrrDeviceWayland::isWaylandDeviceWorking()
 {
 	bool is_working = false;
@@ -743,24 +767,6 @@ CIrrDeviceWayland::~CIrrDeviceWayland()
 #endif
 }
 
-bool CIrrDeviceWayland::restoreResolution()
-{
-	if (!CreationParams.Fullscreen)
-		return true;
-	return true;
-}
-
-
-bool CIrrDeviceWayland::changeResolution()
-{
-	if (!CreationParams.Fullscreen)
-		return true;
-
-	getVideoModeList();
-
-	return CreationParams.Fullscreen;
-}
-
 
 void CIrrDeviceWayland::initEGL()
 {
@@ -820,14 +826,19 @@ void CIrrDeviceWayland::createDriver()
 		os::Printer::log("Wayland driver only supports OpenGL.", ELL_ERROR);
 		break;
 	case video::EDT_OPENGL:
-//		#ifdef _IRR_COMPILE_WITH_OPENGL_
-//		if (Context)
-			VideoDriver = video::createOpenGLDriver(CreationParams, FileSystem, this);
-/*		#else
+		#ifdef _IRR_COMPILE_WITH_OPENGL_
+		VideoDriver = video::createOpenGLDriver(CreationParams, FileSystem, this);
+		#else
 		os::Printer::log("No OpenGL support compiled in.", ELL_ERROR);
-		#endif*/
+		#endif
 		break;
 	}
+}
+
+void CIrrDeviceWayland::swapBuffers()
+{
+	wl_display_dispatch_pending(display);
+	EglContext->swapBuffers();
 }
 
 
@@ -836,35 +847,12 @@ bool CIrrDeviceWayland::run()
 {
 	os::Timer::tick();
 
-//	printf("vents size is %d\n", events.size());
 	for (unsigned i = 0; i < events.size(); i++)
 	{
 		postEventFromUser(events[i]);
-
-/*		if (irrevent.MouseInput.Event != irr::EMIE_COUNT)
-		{
-						printf("posteventfromuser\n");
-			bool v = postEventFromUser(irrevent);
-			printf("v is %d\n", v);
-
-			if ( irrevent.MouseInput.Event >= EMIE_LMOUSE_PRESSED_DOWN && irrevent.MouseInput.Event <= EMIE_MMOUSE_PRESSED_DOWN )
-			{
-				u32 clicks = checkSuccessiveClicks(irrevent.MouseInput.X, irrevent.MouseInput.Y, irrevent.MouseInput.Event);
-				if ( clicks == 2 )
-				{
-					irrevent.MouseInput.Event = (EMOUSE_INPUT_EVENT)(EMIE_LMOUSE_DOUBLE_CLICK + irrevent.MouseInput.Event-EMIE_LMOUSE_PRESSED_DOWN);
-					postEventFromUser(irrevent);
-				}
-				else if ( clicks == 3 )
-				{
-					irrevent.MouseInput.Event = (EMOUSE_INPUT_EVENT)(EMIE_LMOUSE_TRIPLE_CLICK + irrevent.MouseInput.Event-EMIE_LMOUSE_PRESSED_DOWN);
-					postEventFromUser(irrevent);
-				}
-			}
-		}*/
 	}
+	
 	events.clear();
-
 
 	if (!Close)
 		pollJoysticks();
@@ -1409,9 +1397,6 @@ void CIrrDeviceWayland::clearSystemMessages()
 {
 }
 
-void CIrrDeviceWayland::initXAtoms()
-{
-}
 
 } // end namespace
 

@@ -125,11 +125,6 @@ namespace irr
 
 		void pollJoysticks();
 
-		void initXAtoms();
-
-		bool restoreResolution();
-		bool changeResolution();
-
 		//! Implementation of the linux cursor control
 		class CCursorControl : public gui::ICursorControl
 		{
@@ -274,6 +269,7 @@ namespace irr
 		u32 ButtonStates;
 		
 		ContextManagerEGL* getEGLContext() {return EglContext;}
+		void swapBuffers();
 		
 	private:
 //		XVisualInfo* visual;

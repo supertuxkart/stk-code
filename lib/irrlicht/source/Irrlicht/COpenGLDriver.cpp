@@ -702,9 +702,15 @@ COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
 }
 
 
-bool COpenGLDriver::changeRenderContext(const SExposedVideoData& videoData, CIrrDeviceWayland* device)
+bool COpenGLDriver::changeRenderContext(const SExposedVideoData& videoData, 
+										CIrrDeviceWayland* device)
 {
-	//TODO
+	if (!device->getEGLContext()->makeCurrent())
+	{
+		os::Printer::log("Render Context switch failed.");
+		return false;
+	}
+	
 	return true;
 }
 
@@ -712,12 +718,6 @@ bool COpenGLDriver::changeRenderContext(const SExposedVideoData& videoData, CIrr
 //! inits the open gl driver
 bool COpenGLDriver::initDriver(CIrrDeviceWayland* device)
 {
-/*	ExposedData.OpenGLLinux.X11Context = glXGetCurrentContext();
-	ExposedData.OpenGLLinux.X11Display = glXGetCurrentDisplay();
-	ExposedData.OpenGLLinux.X11Window = (unsigned long)Params.WindowId;
-	Drawable = glXGetCurrentDrawable();
-	X11Display = (Display*)ExposedData.OpenGLLinux.X11Display;*/
-
 	genericDriverInit();
 
 	return true;
@@ -982,9 +982,7 @@ bool COpenGLDriver::endScene()
 #ifdef _IRR_COMPILE_WITH_WAYLAND
 	if (DeviceType == EIDT_WAYLAND)
 	{
-		wl_display_dispatch_pending(wl_device->display);
-		wl_device->getEGLContext()->swapBuffers();
-
+		wl_device->swapBuffers();
 		return true;
 	}
 #endif
@@ -1055,6 +1053,11 @@ bool COpenGLDriver::beginScene(bool backBuffer, bool zBuffer, SColor color,
 #ifdef _IRR_COMPILE_WITH_X11_DEVICE_
 	case EIDT_X11:
 		changeRenderContext(videoData, X11Device);
+		break;
+#endif
+#ifdef _IRR_COMPILE_WITH_WAYLAND
+	case EIDT_WAYLAND:
+		changeRenderContext(videoData, wl_device);
 		break;
 #endif
 	default:
