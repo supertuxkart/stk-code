@@ -436,6 +436,8 @@ World::~World()
 
     irr_driver->onUnloadWorld();
 
+    projectile_manager->cleanup();
+
     // In case that a race is aborted (e.g. track not found) track is 0.
     if(Track::getCurrentTrack())
         Track::getCurrentTrack()->cleanup();
@@ -485,8 +487,6 @@ World::~World()
     race_manager->setSpareTireKartNum(0);
 
     Camera::removeAllCameras();
-
-    projectile_manager->cleanup();
 
     // In case that the track is not found, Physics was not instantiated,
     // but kill handles this correctly.
