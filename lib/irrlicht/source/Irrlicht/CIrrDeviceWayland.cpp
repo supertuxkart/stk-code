@@ -84,7 +84,8 @@ public:
 	{
 		CIrrDeviceWayland *device = static_cast<CIrrDeviceWayland *>(data);
 		
-		device->getCursorControl()->setPosition(sx, sy);
+		device->getCursorControl()->setPosition(wl_fixed_to_int(sx), 
+												wl_fixed_to_int(sy));
 		
 		SEvent irrevent;
 		irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
@@ -908,49 +909,11 @@ CIrrDeviceWayland::CCursorControl::~CCursorControl()
 	// TODO (cutealien): droping cursorcontrol earlier might work, not sure about reason why that's done in stub currently.
 }
 
-//! Sets the new position of the cursor.
-void CIrrDeviceWayland::CCursorControl::setPosition(s32 x, s32 y)
-{
-	CursorPos = core::position2di(x / 256, y / 256);
-}
-
-//! Returns the current position of the mouse cursor.
-const core::position2d<s32>& CIrrDeviceWayland::CCursorControl::getPosition()
-{
-	return CursorPos;
-}
-
-core::position2d<f32> CIrrDeviceWayland::CCursorControl::getRelativePosition()
-{}
-
-//! Sets the active cursor icon
-void CIrrDeviceWayland::CCursorControl::setActiveIcon(gui::ECURSOR_ICON iconId)
-{
-
-}
-
 void CIrrDeviceWayland::signalEvent(const SEvent &event)
 {
 	events.push_back(event);
 }
 
-//! Add a custom sprite as cursor icon.
-gui::ECURSOR_ICON CIrrDeviceWayland::CCursorControl::addIcon(const gui::SCursorSprite& icon)
-{
-	return gui::ECI_NORMAL;
-}
-
-//! replace the given cursor icon.
-void CIrrDeviceWayland::CCursorControl::changeIcon(gui::ECURSOR_ICON iconId, const gui::SCursorSprite& icon)
-{
-}
-
-irr::core::dimension2di CIrrDeviceWayland::CCursorControl::getSupportedIconSize() const
-{
-	// this returns the closest match that is smaller or same size, so we just pass a value which should be large enough for cursors
-	unsigned int width=0, height=0;
-	return core::dimension2di(width, height);
-}
 
 //! sets the caption of the window
 void CIrrDeviceWayland::setWindowCaption(const wchar_t* text)

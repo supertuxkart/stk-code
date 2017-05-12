@@ -169,11 +169,30 @@ namespace irr
 			}
 
 			//! Sets the new position of the cursor.
-			virtual void setPosition(s32 x, s32 y);
+			virtual void setPosition(s32 x, s32 y)
+			{
+				//TODO
+				CursorPos.X = x;
+				CursorPos.Y = y;
+			}
 
 			//! Returns the current position of the mouse cursor.
-			virtual const core::position2d<s32>& getPosition();
-			virtual core::position2d<f32> getRelativePosition();
+			virtual const core::position2d<s32>& getPosition()
+			{
+				return CursorPos;
+			}
+			
+			virtual core::position2d<f32> getRelativePosition()
+			{
+				if (!UseReferenceRect)
+				{
+					return core::position2d<f32>(CursorPos.X / (f32)Device->Width,
+						CursorPos.Y / (f32)Device->Height);
+				}
+
+				return core::position2d<f32>(CursorPos.X / (f32)ReferenceRect.getWidth(),
+						CursorPos.Y / (f32)ReferenceRect.getHeight());
+			}
 
 			virtual void setReferenceRect(core::rect<s32>* rect=0)
 			{
@@ -195,7 +214,7 @@ namespace irr
 			}
 
 			//! Sets the active cursor icon
-			virtual void setActiveIcon(gui::ECURSOR_ICON iconId);
+			virtual void setActiveIcon(gui::ECURSOR_ICON iconId) {};
 
 			//! Gets the currently active icon
 			virtual gui::ECURSOR_ICON getActiveIcon() const
@@ -204,13 +223,19 @@ namespace irr
 			}
 
 			//! Add a custom sprite as cursor icon.
-			virtual gui::ECURSOR_ICON addIcon(const gui::SCursorSprite& icon);
+			virtual gui::ECURSOR_ICON addIcon(const gui::SCursorSprite& icon) 
+			{
+				return gui::ECI_NORMAL;
+			}
 
 			//! replace the given cursor icon.
-			virtual void changeIcon(gui::ECURSOR_ICON iconId, const gui::SCursorSprite& icon);
+			virtual void changeIcon(gui::ECURSOR_ICON iconId, const gui::SCursorSprite& icon) {}
 
 			//! Return a system-specific size which is supported for cursors. Larger icons will fail, smaller icons might work.
-			virtual core::dimension2di getSupportedIconSize() const;
+			virtual core::dimension2di getSupportedIconSize() const
+			{
+				return core::dimension2di(0, 0);
+			}
 		private:
 
 			CIrrDeviceWayland* Device;
