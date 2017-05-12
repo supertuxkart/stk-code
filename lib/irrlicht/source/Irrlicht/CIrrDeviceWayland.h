@@ -139,7 +139,9 @@ namespace irr
 			{
 				if (visible==IsVisible)
 					return;
+					
 				IsVisible = visible;
+				Device->updateCursor();
 			}
 
 			//! Returns if the cursor is currently visible.
@@ -267,9 +269,11 @@ namespace irr
 		wl_egl_window *egl_window;
 		
 		u32 ButtonStates;
+		uint32_t enter_serial;
 		
 		ContextManagerEGL* getEGLContext() {return EglContext;}
 		void swapBuffers();
+		void updateCursor();
 		
 	private:
 //		XVisualInfo* visual;

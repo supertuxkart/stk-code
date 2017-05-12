@@ -68,28 +68,8 @@ public:
 		
 		CIrrDeviceWayland *device = static_cast<CIrrDeviceWayland *>(data);
 		
-		//TODO: move it to better place
-		if (!device->getCursorControl()->isVisible() &&
-			device->CreationParams.Fullscreen)
-		{
-			wl_pointer_set_cursor(pointer, serial, NULL, 0, 0);
-		}
-		else if (device->default_cursor) 
-		{
-			wl_cursor_image* image = device->default_cursor->images[0];
-			wl_buffer* buffer = wl_cursor_image_get_buffer(image);
-			
-			if (!buffer)
-				return;
-				
-			wl_pointer_set_cursor(pointer, serial, device->cursor_surface,
-							      image->hotspot_x, image->hotspot_y);
-			wl_surface_attach(device->cursor_surface, buffer, 0, 0);
-			wl_surface_damage(device->cursor_surface, 0, 0,
-							  image->width, image->height);
-			wl_surface_commit(device->cursor_surface);
-		}
-		
+		device->enter_serial = serial;
+		device->updateCursor();
 	}
 
 	static void
@@ -103,7 +83,9 @@ public:
 						uint32_t time, wl_fixed_t sx, wl_fixed_t sy)
 	{
 		CIrrDeviceWayland *device = static_cast<CIrrDeviceWayland *>(data);
+		
 		device->getCursorControl()->setPosition(sx, sy);
+		
 		SEvent irrevent;
 		irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
 		irrevent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
@@ -694,6 +676,7 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& param)
 	pointer = 0;
 	keyboard = 0;
 	ButtonStates = 0;
+	enter_serial = 0;
 
 	wl_seat_add_listener(seat, &WaylandCallbacks::seat_listener, this);
 	wl_output_add_listener(output, &WaylandCallbacks::output_listener, this);
@@ -835,10 +818,35 @@ void CIrrDeviceWayland::createDriver()
 	}
 }
 
+
 void CIrrDeviceWayland::swapBuffers()
 {
 	wl_display_dispatch_pending(display);
 	EglContext->swapBuffers();
+}
+
+
+void CIrrDeviceWayland::updateCursor()
+{
+	if (!getCursorControl()->isVisible() && CreationParams.Fullscreen)
+	{
+		wl_pointer_set_cursor(pointer, enter_serial, NULL, 0, 0);
+	}
+	else if (default_cursor) 
+	{
+		wl_cursor_image* image = default_cursor->images[0];
+		wl_buffer* buffer = wl_cursor_image_get_buffer(image);
+		
+		if (!buffer)
+			return;
+			
+		wl_pointer_set_cursor(pointer, enter_serial, cursor_surface,
+							  image->hotspot_x, image->hotspot_y);
+		wl_surface_attach(cursor_surface, buffer, 0, 0);
+		wl_surface_damage(cursor_surface, 0, 0,
+						  image->width, image->height);
+		wl_surface_commit(cursor_surface);
+	}
 }
 
 
