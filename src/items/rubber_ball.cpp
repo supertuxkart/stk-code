@@ -151,7 +151,10 @@ void RubberBall::initializeControlPoints(const Vec3 &xyz)
 void RubberBall::setAnimation(AbstractKartAnimation *animation)
 {
     if (!animation)
+    {
         initializeControlPoints(getXYZ());
+        m_height_timer = 0;
+    }
     Flyable::setAnimation(animation);
 }   // setAnimation
 

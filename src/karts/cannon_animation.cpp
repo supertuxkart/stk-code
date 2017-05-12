@@ -293,7 +293,15 @@ void CannonAnimation::update(float dt)
         btClamp(m_fraction_of_line, -1.0f, 1.0f);
     }   // if m_kart
     else
+    {
+        // If a rubber ball is in this cannon, reduce its height over
+        // time so that it starts closer to the ground when released
+        float height = m_delta.getY();
+        float radius = m_flyable->getExtend().getY();
+        height = (height - radius) * 0.95f + radius;
+        m_delta.setY(height);
         all_heading.setValue(0, 0, 0, 1);
+    }
 
     // Determine direction orthogonal to the curve for the sideway movement
     // of the kart.
