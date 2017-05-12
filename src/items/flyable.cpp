@@ -67,13 +67,14 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
     m_type                         = type;
     m_has_hit_something            = false;
     m_shape                        = NULL;
+    m_animation                    = NULL;
     m_mass                         = mass;
     m_adjust_up_velocity           = true;
     m_time_since_thrown            = 0;
     m_position_offset              = Vec3(0,0,0);
     m_owner_has_temporary_immunity = true;
     m_do_terrain_info              = true;
-    m_max_lifespan = -1;
+    m_max_lifespan                 = -1;
 
     // Add the graphical model
 #ifndef SERVER_ONLY
@@ -354,6 +355,24 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
 }   // getLinearKartItemIntersection
 
 //-----------------------------------------------------------------------------
+
+void Flyable::setAnimation(AbstractKartAnimation *animation)
+{
+    if (animation)
+    {
+        assert(m_animation == NULL);
+        Physics::getInstance()->removeBody(m_body);
+    }
+    else   // animation = NULL
+    {
+        assert(m_animation != NULL);
+        m_body->setWorldTransform(getTrans());
+        Physics::getInstance()->addBody(m_body);
+    }
+    m_animation = animation;
+}   // addAnimation
+
+//-----------------------------------------------------------------------------
 /** Updates this flyable. It calls Moveable::update. If this function returns
  *  true, the flyable will be deleted by the projectile manager.
  *  \param dt Time step size.
@@ -361,6 +380,13 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
  */
 bool Flyable::updateAndDelete(float dt)
 {
+    if (hasAnimation())
+    {
+        m_animation->update(dt);
+        Moveable::update(dt);
+        return false;
+    }   // if animation
+
     m_time_since_thrown += dt;
     if(m_max_lifespan > -1 && m_time_since_thrown > m_max_lifespan)
         hit(NULL);

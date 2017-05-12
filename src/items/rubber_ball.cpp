@@ -29,6 +29,7 @@
 #include "modes/linear_world.hpp"
 #include "physics/btKart.hpp"
 #include "physics/triangle_mesh.hpp"
+#include "tracks/check_manager.hpp"
 #include "tracks/drive_graph.hpp"
 #include "tracks/drive_node.hpp"
 #include "tracks/track.hpp"
@@ -103,7 +104,7 @@ RubberBall::RubberBall(AbstractKart *kart)
         DriveGraph::get()->getNode(getCurrentGraphNode())->getNormal();
     TerrainInfo::update(getXYZ(), -normal);
     initializeControlPoints(m_owner->getXYZ());
-
+    CheckManager::get()->addFlyableToCannons(this);
 }   // RubberBall
 
 // ----------------------------------------------------------------------------
@@ -114,6 +115,7 @@ RubberBall::~RubberBall()
     if(m_ping_sfx->getStatus()==SFXBase::SFX_PLAYING)
         m_ping_sfx->stop();
     m_ping_sfx->deleteSFX();
+    CheckManager::get()->removeFlyableFromCannons(this);
 }   // ~RubberBall
 
 // ----------------------------------------------------------------------------
@@ -144,6 +146,14 @@ void RubberBall::initializeControlPoints(const Vec3 &xyz)
     m_t             = 0;
     m_t_increase    = m_speed/m_length_cp_1_2;
 }   // initializeControlPoints
+
+// ----------------------------------------------------------------------------
+void RubberBall::setAnimation(AbstractKartAnimation *animation)
+{
+    if (!animation)
+        initializeControlPoints(getXYZ());
+    Flyable::setAnimation(animation);
+}   // setAnimation
 
 // ----------------------------------------------------------------------------
 /** Determines the first kart that is still in the race.
@@ -310,6 +320,7 @@ bool RubberBall::updateAndDelete(float dt)
     // FIXME: what does the rubber ball do in case of battle mode??
     if(!world) return true;
 
+    
     if(m_delete_timer>0)
     {
         m_delete_timer -= dt;
@@ -321,6 +332,14 @@ bool RubberBall::updateAndDelete(float dt)
 #endif
             return true;
         }
+    }
+
+    if (hasAnimation())
+    {
+        // Flyable will call update() of the animation to 
+        // update the ball's position.
+        m_previous_xyz = getXYZ();
+        return Flyable::updateAndDelete(dt);
     }
 
     // Update the target in case that the first kart was overtaken (or has

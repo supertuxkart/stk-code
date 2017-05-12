@@ -21,6 +21,7 @@
 #include "animations/animation_base.hpp"
 #include "animations/ipo.hpp"
 #include "animations/three_d_animation.hpp"
+#include "items/flyable.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
@@ -28,7 +29,8 @@
 #include "LinearMath/btTransform.h"
 
 /** The constructor for the cannon animation. 
- *  \param kart The kart to be animated.
+ *  \param kart The kart to be animated. Can also be NULL if a basket ball
+ *         etc is animated (e.g. cannon animation).
  *  \param ipo The IPO (blender interpolation curve) which the kart
  *         should follow.
  *  \param start_left, start_right: Left and right end points of the line
@@ -45,9 +47,41 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo,
                                  float skid_rot)
                : AbstractKartAnimation(kart, "CannonAnimation")
 {
-    m_curve  = new AnimationBase(ipo);
-    m_timer  = ipo->getEndTime();
-    
+    m_flyable = NULL;
+    init(ipo, start_left, start_right, end_left, end_right, skid_rot);
+}   // CannonAnimation
+
+// ----------------------------------------------------------------------------
+/** Constructor for a flyable. It sets the kart data to NULL.
+ */
+CannonAnimation::CannonAnimation(Flyable *flyable, Ipo *ipo,
+                                 const Vec3 &start_left, const Vec3 &start_right,
+                                 const Vec3 &end_left, const Vec3 &end_right   )
+               : AbstractKartAnimation(NULL, "CannonAnimation")
+{
+    m_flyable = flyable;
+    init(ipo, start_left, start_right, end_left, end_right, /*skid_rot*/0);
+}   // CannonAnimation(Flyable*...)
+
+// ----------------------------------------------------------------------------
+/** Common initialisation for kart-based and flyable-based animations.
+ *  \param ipo The IPO (blender interpolation curve) which the kart
+ *         should follow.
+ *  \param start_left, start_right: Left and right end points of the line
+ *         that the kart just crossed.
+ *  \param end_left, end_right: Left and right end points of the line at
+ *         which the kart finishes.
+ *  \param skid_rot Visual rotation of the kart due to skidding (while this
+ *         value can be queried, the AbstractkartAnimation constructor
+ *         resets the value to 0, so it needs to be passed in.
+ */
+void CannonAnimation::init(Ipo *ipo, const Vec3 &start_left,
+    const Vec3 &start_right, const Vec3 &end_left,
+    const Vec3 &end_right, float skid_rot)
+{
+    m_curve = new AnimationBase(ipo);
+    m_timer = ipo->getEndTime();
+
     // First make sure that left and right points are indeed correct
     // -------------------------------------------------------------
     Vec3 my_start_left = start_left;
@@ -57,12 +91,17 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo,
     // (the curve's origin must be in the middle of the line.
     m_curve->getAt(0, &p0);
     m_curve->getAt(0.1f, &p1);
-    Vec3 p2 = 0.5f*(p0 + p1) + m_kart->getNormal();
+    Vec3 p2;
+    if (m_kart)
+        p2 = 0.5f*(p0 + p1) + m_kart->getNormal();
+    else
+        p2 = 0.5f*(p0 + p1) + m_flyable->getNormal();
+
     if (start_left.sideofPlane(p0, p1, p2) < 0)
     {
         // Left and right start line needs to be swapped
         my_start_left = start_right;
-        my_start_right = start_left; 
+        my_start_right = start_left;
     }
 
     // First adjust start and end points to take on each side half the kart
@@ -70,8 +109,9 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo,
     Vec3 direction = my_start_right - my_start_left;
     direction.normalize();
 
-    float kw = m_kart->getKartModel()->getWidth();
-    Vec3 adj_start_left  = my_start_left  + (0.5f*kw) * direction;
+    float kw = m_kart ? m_kart->getKartModel()->getWidth()
+                      : m_flyable->getExtend().getX();
+    Vec3 adj_start_left = my_start_left + (0.5f*kw) * direction;
     Vec3 adj_start_right = my_start_right - (0.5f*kw) * direction;
 
     // Store the length of the start and end line, which is used
@@ -99,16 +139,17 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo,
     // This delta is rotated with the kart and added to the interpolated curve
     // position to get the actual kart position during the animation.
     Vec3 curve_xyz;
+    Vec3 xyz = m_kart ? m_kart->getXYZ() : m_flyable->getXYZ();
     m_curve->update(0, &curve_xyz);
-    m_delta = kart->getXYZ() - curve_xyz;
-    
+    m_delta = xyz - curve_xyz;
+
     // Compute on which fraction of the start line the kart is, to get the
     // second component of the kart position: distance along start line
     Vec3 v = adj_start_left - adj_start_right;
     float l = v.length();
     v /= l;
 
-    float f = v.dot(adj_start_left - kart->getXYZ());
+    float f = v.dot(adj_start_left - xyz);
     if (f <= 0)
         f = 0;
     else if (f >= l)
@@ -138,28 +179,36 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo,
     Vec3 tangent;
     m_curve->getDerivativeAt(0, &tangent);
     // Get the current kart orientation
-    Vec3 forward = m_kart->getTrans().getBasis().getColumn(2);
+    const btTransform &trans = m_kart ? m_kart->getTrans()
+                                      : m_flyable->getBody()->getWorldTransform();
+    Vec3 forward = trans.getBasis().getColumn(2);
     Vec3 v1(tangent), v2(forward);
     v1.setY(0); v2.setY(0);
-    m_delta_heading = shortestArcQuatNormalize2(v1, v2) 
-                    * btQuaternion(Vec3(0,1,0), skid_rot);
+    m_delta_heading = shortestArcQuatNormalize2(v1, v2)
+        * btQuaternion(Vec3(0, 1, 0), skid_rot);
 
 
     // The previous call to m_curve->update will set the internal timer
     // of the curve to dt. Reset it to 0 to make sure the timer is in
     // synch with the timer of the CanonAnimation
     m_curve->reset();
-}   // CannonAnimation
+}   // init
 
 // ----------------------------------------------------------------------------
 CannonAnimation::~CannonAnimation()
 {
     delete m_curve;
-
-    btTransform pos = m_kart->getTrans();
-    m_kart->getBody()->setCenterOfMassTransform(pos);
-    Vec3 v(0, 0, m_kart->getKartProperties()->getEngineMaxSpeed());
-    m_kart->setVelocity(pos.getBasis()*v);
+    if (m_kart)
+    {
+        btTransform pos = m_kart->getTrans();
+        m_kart->getBody()->setCenterOfMassTransform(pos);
+        Vec3 v(0, 0, m_kart->getKartProperties()->getEngineMaxSpeed());
+        m_kart->setVelocity(pos.getBasis()*v);
+    }
+    else
+    {
+        m_flyable->setAnimation(NULL);
+    }
 }   // ~CannonAnimation
 
 // ----------------------------------------------------------------------------
@@ -184,7 +233,9 @@ void CannonAnimation::update(float dt)
     m_curve->getDerivativeAt(m_curve->getAnimationDuration() - m_timer,
                              &tangent);
     // Get the current kart orientation
-    Vec3 forward = m_kart->getTrans().getBasis().getColumn(2);
+    const btTransform &trans = m_kart ? m_kart->getTrans()
+                                      : m_flyable->getBody()->getWorldTransform();
+    Vec3 forward = trans.getBasis().getColumn(2);
     
     // Heading
     // -------
@@ -200,10 +251,14 @@ void CannonAnimation::update(float dt)
     // ------------------
     // While start and end line have to have the same 'up' vector, karts can 
     // sometimes be not parallel to them. So slowly adjust this over time
-    Vec3 up = m_kart->getTrans().getBasis().getColumn(1);
+    Vec3 up = trans.getBasis().getColumn(1);
     up.normalize();
-    Vec3 gravity = -m_kart->getBody()->getGravity();
-    gravity.normalize();
+    Vec3 gravity = m_kart ? -m_kart->getBody()->getGravity()
+                          : -m_flyable->getBody()->getGravity();
+    if (gravity.length2() > 0)
+        gravity.normalize();
+    else
+        gravity.setValue(0, -1, 0);
     // Adjust only 5% towards the real up vector. This will smoothly
     // adjust the kart while the kart is in the air
     Vec3 target_up_vector = (gravity*0.05f + up*0.95f).normalize();
@@ -220,27 +275,25 @@ void CannonAnimation::update(float dt)
 
     // The timer counts backwards, so the fraction goes from 1 to 0
     float f = m_timer / m_curve->getAnimationDuration();
-
-    btQuaternion zero(gravity, 0);
-    btQuaternion current_delta_heading = zero.slerp(m_delta_heading, f);
-
-    btQuaternion all_heading = m_kart->getRotation()*current_delta_heading*heading;
-
-    m_kart->setRotation(q_up * all_heading);
-
-
-    // Then compute the new location of the kart
-    // -----------------------------------------
     float f_current_width = m_start_line_length * f
                           + m_end_line_length   * (1.0f - f);
 
-    // Adjust the horizontal location based on steering
-    m_fraction_of_line += m_kart->getSteerPercent()*dt*2.0f;
-    btClamp(m_fraction_of_line, -1.0f, 1.0f);
+    // Then compute the new location of the kart
+    // -----------------------------------------
+    btQuaternion all_heading;
+    if (m_kart)
+    {
+        btQuaternion zero(gravity, 0);
+        btQuaternion current_delta_heading = zero.slerp(m_delta_heading, f);
+        all_heading = m_kart->getRotation()*current_delta_heading*heading;
+        m_kart->setRotation(q_up * all_heading);
 
-    // horiz_delta is in kart coordinates, the rotation by q will
-    // transform it to the global coordinate system
-    Vec3 horiz_delta = Vec3(0.5f*m_fraction_of_line  * f_current_width, 0, 0);
+        // Adjust the horizontal location based on steering
+        m_fraction_of_line += m_kart->getSteerPercent()*dt*2.0f;
+        btClamp(m_fraction_of_line, -1.0f, 1.0f);
+    }   // if m_kart
+    else
+        all_heading.setValue(0, 0, 0, 1);
 
     // Determine direction orthogonal to the curve for the sideway movement
     // of the kart.
@@ -251,5 +304,8 @@ void CannonAnimation::update(float dt)
 
     Vec3 curve_xyz;
     m_curve->update(dt, &curve_xyz);
-    m_kart->setXYZ(curve_xyz+rotated_delta);
+    if (m_kart)
+        m_kart->setXYZ(curve_xyz + rotated_delta);
+    else
+        m_flyable->setXYZ(curve_xyz + rotated_delta);
 }   // update

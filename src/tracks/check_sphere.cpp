@@ -53,11 +53,11 @@ CheckSphere::CheckSphere(const XMLNode &node, unsigned int index)
  *  updates the flag about which karts are inside
  *  \param old_pos  Position in previous frame.
  *  \param new_pos  Position in current frame.
- *  \param kart_id     Index of the kart, can be used to store kart specific
+ *  \param kart_id  Index of the kart, can be used to store kart specific
  *                  additional data.
  */
 bool CheckSphere::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
-                              unsigned int kart_id)
+                              int kart_id)
 {
     float old_dist2   = (old_pos-m_center_point).length2();
     float new_dist2   = (new_pos-m_center_point).length2();
