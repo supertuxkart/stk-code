@@ -454,7 +454,7 @@ bool ContextManagerEGL::makeCurrent()
     bool success = eglMakeCurrent(m_egl_display, m_egl_surface, m_egl_surface,
                              m_egl_context);
 
-	return success;
+    return success;
 }
 
 
