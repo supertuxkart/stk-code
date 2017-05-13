@@ -14064,8 +14064,11 @@ GLenum glxewContextInit (GLXEW_CONTEXT_ARG_DEF_LIST)
   GLXEW_VERSION_1_2 = GL_TRUE;
   GLXEW_VERSION_1_3 = GL_TRUE;
   GLXEW_VERSION_1_4 = GL_TRUE;
+  /* Check if GLX display is available */
+  if (glXGetCurrentDisplay == NULL || glXGetCurrentDisplay() == NULL)
+    return GLEW_OK;
   /* query GLX version */
-/*  glXQueryVersion(glXGetCurrentDisplay(), &major, &minor);
+  glXQueryVersion(glXGetCurrentDisplay(), &major, &minor);
   if (major == 1 && minor <= 3)
   {
     switch (minor)
@@ -14081,7 +14084,7 @@ GLenum glxewContextInit (GLXEW_CONTEXT_ARG_DEF_LIST)
       return GLEW_ERROR_GLX_VERSION_11_ONLY;
       break;
     }
-  }*/
+  }
   /* query GLX extension string */
   extStart = 0;
   if (glXGetCurrentDisplay != NULL)
