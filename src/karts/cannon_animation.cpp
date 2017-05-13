@@ -258,7 +258,7 @@ void CannonAnimation::update(float dt)
     if (gravity.length2() > 0)
         gravity.normalize();
     else
-        gravity.setValue(0, -1, 0);
+        gravity.setValue(0, 1, 0);
     // Adjust only 5% towards the real up vector. This will smoothly
     // adjust the kart while the kart is in the air
     Vec3 target_up_vector = (gravity*0.05f + up*0.95f).normalize();
