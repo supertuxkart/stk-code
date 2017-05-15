@@ -301,17 +301,10 @@ namespace irr
 		void updateCursor();
 		
 	private:
-//		XVisualInfo* visual;
 		mutable core::stringc Clipboard;
-
 		u32 Width, Height;
 		bool WindowHasFocus;
 		bool WindowMinimized;
-		bool UseXVidMode;
-		bool UseXRandR;
-		bool UseGLXWindow;
-		bool ExternalWindow;
-		int AutorepeatSupport;
 public:
 		struct SKeyMap
 		{

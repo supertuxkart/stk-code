@@ -639,9 +639,7 @@ bool CIrrDeviceWayland::isWaylandDeviceWorking()
 CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& param)
 	: CIrrDeviceStub(param),
 	Width(param.WindowSize.Width), Height(param.WindowSize.Height),
-	WindowHasFocus(false), WindowMinimized(false),
-	UseXVidMode(false), UseXRandR(false), UseGLXWindow(false),
-	ExternalWindow(false), AutorepeatSupport(0)
+	WindowHasFocus(false), WindowMinimized(false)
 {
 	#ifdef _DEBUG
 	setDebugName("CIrrDeviceLinux");
@@ -769,6 +767,17 @@ void CIrrDeviceWayland::initEGL()
 	
 	EglContext->init(egl_params);
 	video::useCoreContext = !EglContext->isLegacyDevice();
+	
+	int w = 0;
+	int h = 0;
+	
+	if (EglContext->getSurfaceDimensions(&w, &h))
+	{
+		Width = w;
+		Height = h;
+		CreationParams.WindowSize.Width = Width;
+		CreationParams.WindowSize.Height = Height;
+	}
 }
 
 bool CIrrDeviceWayland::createWindow()
@@ -789,14 +798,18 @@ bool CIrrDeviceWayland::createWindow()
 	{   
 		wl_shell_surface_set_toplevel(shell_surface);
 	}
-
+	
 	wl_display_flush(display);
-
+	
 	initEGL();
-
-	CreationParams.WindowSize.Width = Width;
-	CreationParams.WindowSize.Height = Height;
-
+	
+	wl_region* region = wl_compositor_create_region(compositor);
+	wl_region_add(region, 0, 0, Width, Height);
+	wl_surface_set_opaque_region(surface, region);
+	wl_region_destroy(region);
+	
+	wl_display_flush(display);
+	
 	return true;
 }
 
