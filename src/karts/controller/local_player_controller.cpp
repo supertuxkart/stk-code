@@ -142,15 +142,21 @@ void LocalPlayerController::resetInputState()
  */
 void LocalPlayerController::action(PlayerAction action, int value)
 {
+    // If this event does not change the control state (e.g.
+    // it's a (auto) repeat event), do nothing. This especially
+    // optimises traffic to the server and other clients.
+    if (!actionChangesState(action, value))
+        return;
+
     // If this is a client, send the action to networking layer
     if (World::getWorld()->isNetworkWorld() && 
         NetworkConfig::get()->isClient()    &&
         !RewindManager::get()->isRewinding()   )
     {
-        GameProtocol::getInstance()->controllerAction(m_kart->getWorldKartId(),
-                                                      action, value,
-                                                      m_steer_val_l,
-                                                      m_steer_val_r);
+        GameProtocol::getInstance()
+                    ->controllerAction(m_kart->getWorldKartId(),
+                                       action, value,
+                                       m_steer_val_l, m_steer_val_r);
     }
     PlayerController::action(action, value);
 }   // action

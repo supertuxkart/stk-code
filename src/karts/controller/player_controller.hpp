@@ -45,6 +45,7 @@ public:
     virtual     ~PlayerController  ();
     virtual void update            (float) OVERRIDE;
     virtual void action            (PlayerAction action, int value) OVERRIDE;
+    virtual bool actionChangesState(PlayerAction action, int value);
     virtual void actionFromNetwork(PlayerAction action, int value,
                                    int value_l, int value_r);
     virtual void skidBonusTriggered() OVERRIDE;

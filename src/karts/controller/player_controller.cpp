@@ -79,17 +79,128 @@ void PlayerController::resetInputState()
 }   // resetInputState
 
 // ----------------------------------------------------------------------------
+/** Returns true if the specified action and value will trigger a state
+ *  change. If a new action from the player does not cause a state change,
+ *  there is no need to forward that action to the server (or other clients).
+ *  NOTE: this function must close mirror action(), make sure both functions
+ *  are changed in synch.
+ *  \param action  The action to be executed.
+ *  \param value   If 32768, it indicates a digital value of 'fully set'
+ *                 if between 1 and 32767, it indicates an analog value,
+ *                 and if it's 0 it indicates that the corresponding button
+ *                 was released.
+ *  \return
+ */
+ bool PlayerController::actionChangesState(PlayerAction action, int value)
+{
+     switch (action)
+     {
+     case PA_STEER_LEFT:
+         if (m_steer_val_l != value) return true;
+         if (value)
+         {
+             if (m_steer_val != value) return true;
+             return (m_controls->getSkidControl() == KartControl::SC_NO_DIRECTION);
+         }
+         else
+             return m_steer_val != m_steer_val_r;
+
+         break;
+     case PA_STEER_RIGHT:
+         if (m_steer_val_r != -value) return true;
+         if (value)
+         {
+             if(m_steer_val != -value) return true;
+             return m_controls->getSkidControl() == KartControl::SC_NO_DIRECTION;
+         }
+         else
+             return m_steer_val != m_steer_val_l;
+
+         break;
+     case PA_ACCEL:
+         if (m_prev_accel != value) return true;
+         if (value && !(m_penalty_time > 0.0f))
+         {
+             if (m_controls->getAccel() != value / 32768.f) return true;
+             if (m_controls->getBrake()) return true;
+             return m_controls->getNitro() != m_prev_nitro;
+         }
+         else
+         {
+             if (m_controls->getAccel() != 0           ) return true;
+             if (m_controls->getBrake() != m_prev_brake) return true;
+             return m_controls->getNitro();
+         }
+         break;
+     case PA_BRAKE:
+         if (m_prev_brake != (value != 0) ) return true;
+         // let's consider below that to be a deadzone
+         if (value > 32768 / 2)
+         {
+             if (!m_controls->getBrake()    ) return true;
+             if (m_controls->getAccel() != 0) return true;
+             return m_controls->getNitro();
+         }
+         else
+         {
+             if (m_controls->getBrake()                         ) return true;
+             if (m_controls->getAccel() != m_prev_accel/32768.0f) return true;
+             // Nitro still depends on whether we're accelerating
+             return m_controls->getNitro() != m_prev_nitro && m_prev_accel;
+         }
+         break;
+     case PA_NITRO:
+         // This basically keeps track whether the button still is being pressed
+         if (m_prev_nitro != (value != 0)) return true;
+         // Enable nitro only when also accelerating
+         return m_controls->getNitro() != ( (value != 0) &&
+                                            m_controls->getAccel() );
+         break;
+     case PA_RESCUE:
+         return m_controls->getRescue() != (value != 0);
+         break;
+     case PA_FIRE:
+         return m_controls->getFire() != (value != 0);
+         break;
+     case PA_LOOK_BACK:
+         return m_controls->getLookBack() != (value != 0);
+         break;
+     case PA_DRIFT:
+         if (value == 0)
+             return m_controls->getSkidControl() != KartControl::SC_NONE;
+         else
+         {
+             if (m_steer_val == 0)
+                 return m_controls->getSkidControl() != KartControl::SC_NO_DIRECTION;
+             else
+                 return m_controls->getSkidControl() != (m_steer_val<0
+                                                     ?  KartControl::SC_RIGHT
+                                                     :  KartControl::SC_LEFT  );
+         }
+         break;
+     case PA_PAUSE_RACE:
+         if (value != 0) StateManager::get()->escapePressed();
+         break;
+     default:
+         break;
+     }
+     return true;
+}   // actionChangesState
+
+// ----------------------------------------------------------------------------
 /** This function interprets a kart action and value, and set the corresponding
  *  entries in the kart control data structure. This function handles esp.
  *  cases like 'press left, press right, release right' - in this case after
  *  releasing right, the steering must switch to left again. Similarly it
  *  handles 'press left, press right, release left' (in which case still
  *  right must be selected). Similarly for braking and acceleration.
- * \param action  The action to be executed.
- * \param value   If 32768, it indicates a digital value of 'fully set'
- *                if between 1 and 32767, it indicates an analog value,
- *                and if it's 0 it indicates that the corresponding button
- *                was released.
+ *  NOTE: this function must close mirror action(), make sure both functions
+ *  are changed in synch.
+ *  \param action  The action to be executed.
+ *  \param value   If 32768, it indicates a digital value of 'fully set'
+ *                 if between 1 and 32767, it indicates an analog value,
+ *                 and if it's 0 it indicates that the corresponding button
+ *                 was released.
  */
 void PlayerController::action(PlayerAction action, int value)
 {
