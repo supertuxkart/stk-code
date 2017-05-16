@@ -236,7 +236,9 @@ void RewindManager::playEventsTill(float time, float *dt)
 
     if (needs_rewind)
     {
+        Log::setPrefix("Rewind");
         rewindTo(rewind_time);
+        Log::setPrefix("");
     }
 
     // This is necessary to avoid that rewinding an event will store the 
