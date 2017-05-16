@@ -59,6 +59,9 @@ private:
     /** The file where stdout output will be written */
     static FILE* m_file_stdout;
 
+    /** An optional prefix to be printed. */
+    static std::string m_prefix;
+
     static void setTerminalColor(LogLevel level);
     static void resetTerminalColor();
 
@@ -120,5 +123,9 @@ public:
     {
         m_no_colors = true;
     }   // disableColor
+    // ------------------------------------------------------------------------
+    /** Sets a prefix to be printed before each line. To disable the prefix,
+     *  set it to "". */
+    static void setPrefix(const std::string &prefix) { m_prefix = prefix; }
 };   // Log
 #endif

@@ -35,6 +35,7 @@
 Log::LogLevel Log::m_min_log_level = Log::LL_VERBOSE;
 bool          Log::m_no_colors     = false;
 FILE*         Log::m_file_stdout   = NULL;
+std::string   Log::m_prefix        = "";
 
 // ----------------------------------------------------------------------------
 /** Selects background/foreground colors for the message depending on
@@ -181,6 +182,8 @@ void Log::printMessage(int level, const char *component, const char *format,
         #ifdef ANDROID
         __android_log_vprint(alp, "SuperTuxKart", format, out);
         #else
+        if(!m_prefix.empty())
+            printf("%s ", m_prefix.c_str());
         printf("[%s] %s: ", names[level], component);
         vprintf(format, out);
         #endif
@@ -193,6 +196,11 @@ void Log::printMessage(int level, const char *component, const char *format,
     static char szBuff[2048];
     vsnprintf(szBuff, sizeof(szBuff), format, copy2);
 
+    if (!m_prefix.empty())
+    {
+        OutputDebugString(m_prefix.c_str());
+        OutputDebugString(" ");
+    }
     OutputDebugString("[");
     OutputDebugString(names[level]);
     OutputDebugString("] ");
@@ -205,6 +213,8 @@ void Log::printMessage(int level, const char *component, const char *format,
 
     if(m_file_stdout)
     {
+        if(!m_prefix.empty())
+            fprintf(m_file_stdout, "%s ", m_prefix.c_str());
         fprintf (m_file_stdout, "[%s] %s: ", names[level], component);
         vfprintf(m_file_stdout, format, copy);
         fprintf (m_file_stdout, "\n");
