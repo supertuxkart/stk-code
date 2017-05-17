@@ -211,6 +211,22 @@ public:
     static void pointer_axis(void* data, wl_pointer* wl_pointer, uint32_t time,
                              uint32_t axis, wl_fixed_t value)
     {
+        CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland* >(data);
+
+        if (axis == WL_POINTER_AXIS_VERTICAL_SCROLL)
+        {
+            SEvent irrevent;
+            irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
+            irrevent.MouseInput.X = device->getCursorControl()->getPosition().X;
+            irrevent.MouseInput.Y = device->getCursorControl()->getPosition().Y;
+            irrevent.MouseInput.Control = (device->m_xkb_modifiers & MOD_CONTROL_MASK) != 0;
+            irrevent.MouseInput.Shift = (device->m_xkb_modifiers & MOD_SHIFT_MASK) != 0;
+            irrevent.MouseInput.ButtonStates = device->m_mouse_button_states;
+            irrevent.MouseInput.Event = EMIE_MOUSE_WHEEL;
+            irrevent.MouseInput.Wheel = wl_fixed_to_double(value) / -10.0f;
+
+            device->signalEvent(irrevent);
+        }
     }
 
     static void keyboard_keymap(void* data, wl_keyboard* keyboard,
