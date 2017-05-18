@@ -26,7 +26,7 @@
 #include "CIrrDeviceWinCE.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_WAYLAND
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 #include "CIrrDeviceWayland.h"
 #endif
 
@@ -100,7 +100,7 @@ namespace irr
 			device_type = EIDT_WINCE;
 		}
 #endif
-#ifdef _IRR_COMPILE_WITH_WAYLAND
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 		if (strcmp(irr_device_type, "wayland") == 0)
 		{
 			device_type = EIDT_WAYLAND;
@@ -161,7 +161,7 @@ namespace irr
 			dev = new CIrrDeviceWinCE(creation_params);
 #endif
 
-#ifdef _IRR_COMPILE_WITH_WAYLAND
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 		if (creation_params.DeviceType == EIDT_WAYLAND || (!dev && creation_params.DeviceType == EIDT_BEST))
 		{
 			if (CIrrDeviceWayland::isWaylandDeviceWorking())

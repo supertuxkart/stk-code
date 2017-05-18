@@ -18,7 +18,7 @@
 
 #include "CIrrDeviceWayland.h"
 
-#ifdef _IRR_COMPILE_WITH_WAYLAND
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 
 #include <cstdio>
 #include <cstdlib>

@@ -11,7 +11,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
 if (SERVER_ONLY)
     add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
-    add_definitions(-DNO_IRR_COMPILE_WITH_WAYLAND)
+    add_definitions(-DNO_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
 else()
     if(NOT USE_GLES2)
         find_package(OpenGL REQUIRED)
@@ -25,7 +25,7 @@ if (UNIX AND NOT APPLE)
 endif()
 
 if(ENABLE_WAYLAND_DEVICE)
-    add_definitions(-D_IRR_COMPILE_WITH_WAYLAND)
+    add_definitions(-D_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
 endif()
 
 if(APPLE)

@@ -45,7 +45,7 @@ namespace video
 		bool changeRenderContext(const SExposedVideoData& videoData, CIrrDeviceWin32* device);
 		#endif
 
-		#ifdef _IRR_COMPILE_WITH_WAYLAND
+		#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 		COpenGLDriver(const SIrrlichtCreationParameters& params, io::IFileSystem* io, CIrrDeviceWayland* device);
 		//! inits the EGL specific parts of the open gl driver
 		bool initDriver(CIrrDeviceWayland* device);
@@ -595,7 +595,7 @@ namespace video
 			Display* X11Display;
 			CIrrDeviceLinux *X11Device;
 		#endif
-		#ifdef _IRR_COMPILE_WITH_WAYLAND
+		#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 			CIrrDeviceWayland *wl_device;
 		#endif
 		#ifdef _IRR_COMPILE_WITH_OSX_DEVICE_

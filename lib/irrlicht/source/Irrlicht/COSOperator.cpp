@@ -28,7 +28,7 @@
 #if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
 #include "CIrrDeviceLinux.h"
 #endif
-#if defined(_IRR_COMPILE_WITH_WAYLAND)
+#if defined(_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
 #include "CIrrDeviceWayland.h"
 #endif
 #ifdef _IRR_COMPILE_WITH_OSX_DEVICE_
@@ -124,7 +124,7 @@ void COSOperator::copyToClipboard(const c8* text) const
 
 	OSXCopyToClipboard(text);
 	
-#elif defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_WAYLAND)
+#elif defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
     if (IrrDevice != NULL)
     {
 #if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
@@ -136,7 +136,7 @@ void COSOperator::copyToClipboard(const c8* text) const
 			device->copyToClipboard(text);
 		}
 #endif
-#if defined(_IRR_COMPILE_WITH_WAYLAND)
+#if defined(_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
 		if (IrrDevice->getType() == EIDT_WAYLAND)
 		{
 			CIrrDeviceWayland* device = dynamic_cast<CIrrDeviceWayland*>(IrrDevice);
@@ -199,7 +199,7 @@ const c8* COSOperator::getTextFromClipboard() const
 	
 	
 
-#elif defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_WAYLAND)
+#elif defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
     if (IrrDevice != NULL)
     {
 #if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
@@ -211,7 +211,7 @@ const c8* COSOperator::getTextFromClipboard() const
 			return device->getTextFromClipboard();
 		}
 #endif
-#if defined(_IRR_COMPILE_WITH_WAYLAND)
+#if defined(_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
 		if (IrrDevice->getType() == EIDT_WAYLAND)
 		{
 			CIrrDeviceWayland* device = dynamic_cast<CIrrDeviceWayland*>(IrrDevice);

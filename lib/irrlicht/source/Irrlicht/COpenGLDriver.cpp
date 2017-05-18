@@ -26,7 +26,7 @@ extern bool GLContextDebugBit;
 #include "MacOSX/CIrrDeviceMacOSX.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_WAYLAND
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 #include "CIrrDeviceWayland.h"
 #include "CContextEGL.h"
 #endif
@@ -685,7 +685,7 @@ bool COpenGLDriver::initDriver(CIrrDeviceLinux* device)
 // -----------------------------------------------------------------------
 // Wayland CONSTRUCTOR
 // -----------------------------------------------------------------------
-#ifdef _IRR_COMPILE_WITH_WAYLAND
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 //! Linux constructor and init code
 COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
 		io::IFileSystem* io, CIrrDeviceWayland* device)
@@ -723,7 +723,7 @@ bool COpenGLDriver::initDriver(CIrrDeviceWayland* device)
 	return true;
 }
 
-#endif // _IRR_COMPILE_WITH_WAYLAND
+#endif // _IRR_COMPILE_WITH_WAYLAND_DEVICE
 
 
 
@@ -979,7 +979,7 @@ bool COpenGLDriver::endScene()
 	}
 #endif
 
-#ifdef _IRR_COMPILE_WITH_WAYLAND
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 	if (DeviceType == EIDT_WAYLAND)
 	{
 		wl_device->swapBuffers();
@@ -1055,7 +1055,7 @@ bool COpenGLDriver::beginScene(bool backBuffer, bool zBuffer, SColor color,
 		changeRenderContext(videoData, X11Device);
 		break;
 #endif
-#ifdef _IRR_COMPILE_WITH_WAYLAND
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 	case EIDT_WAYLAND:
 		changeRenderContext(videoData, wl_device);
 		break;
@@ -4994,7 +4994,7 @@ IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 // -----------------------------------
 // Wayland VERSION
 // -----------------------------------
-#ifdef _IRR_COMPILE_WITH_WAYLAND
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 		io::IFileSystem* io, CIrrDeviceWayland* device)
 {
@@ -5007,7 +5007,7 @@ IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 	return ogl;
 
 }
-#endif // _IRR_COMPILE_WITH_WAYLAND
+#endif // _IRR_COMPILE_WITH_WAYLAND_DEVICE
 
 
 // -----------------------------------
