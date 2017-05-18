@@ -449,6 +449,15 @@ bool ContextManagerEGL::swapBuffers()
 }
 
 
+bool ContextManagerEGL::makeCurrent()
+{
+    bool success = eglMakeCurrent(m_egl_display, m_egl_surface, m_egl_surface,
+                             m_egl_context);
+
+    return success;
+}
+
+
 void ContextManagerEGL::reloadEGLSurface(void* window)
 {
 #ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_

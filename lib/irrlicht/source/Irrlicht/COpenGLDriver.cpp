@@ -26,6 +26,11 @@ extern bool GLContextDebugBit;
 #include "MacOSX/CIrrDeviceMacOSX.h"
 #endif
 
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#include "CIrrDeviceWayland.h"
+#include "CContextEGL.h"
+#endif
+
 namespace irr
 {
 namespace video
@@ -678,6 +683,51 @@ bool COpenGLDriver::initDriver(CIrrDeviceLinux* device)
 
 
 // -----------------------------------------------------------------------
+// Wayland CONSTRUCTOR
+// -----------------------------------------------------------------------
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+//! Linux constructor and init code
+COpenGLDriver::COpenGLDriver(const SIrrlichtCreationParameters& params,
+		io::IFileSystem* io, CIrrDeviceWayland* device)
+: CNullDriver(io, params.WindowSize), COpenGLExtensionHandler(),
+	CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
+	Transformation3DChanged(true), AntiAlias(params.AntiAlias),
+	RenderTargetTexture(0), CurrentRendertargetSize(0, 0), ColorFormat(ECF_R8G8B8),
+	CurrentTarget(ERT_FRAME_BUFFER), Params(params),
+	wl_device(device), DeviceType(EIDT_WAYLAND)
+{
+	#ifdef _DEBUG
+	setDebugName("COpenGLDriver");
+	#endif
+}
+
+
+bool COpenGLDriver::changeRenderContext(const SExposedVideoData& videoData, 
+										CIrrDeviceWayland* device)
+{
+	if (!device->getEGLContext()->makeCurrent())
+	{
+		os::Printer::log("Render Context switch failed.");
+		return false;
+	}
+	
+	return true;
+}
+
+
+//! inits the open gl driver
+bool COpenGLDriver::initDriver(CIrrDeviceWayland* device)
+{
+	genericDriverInit();
+
+	return true;
+}
+
+#endif // _IRR_COMPILE_WITH_WAYLAND_DEVICE
+
+
+
+// -----------------------------------------------------------------------
 // SDL CONSTRUCTOR
 // -----------------------------------------------------------------------
 #ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
@@ -929,6 +979,14 @@ bool COpenGLDriver::endScene()
 	}
 #endif
 
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+	if (DeviceType == EIDT_WAYLAND)
+	{
+		wl_device->swapBuffers();
+		return true;
+	}
+#endif
+
 #ifdef _IRR_COMPILE_WITH_OSX_DEVICE_
 	if (DeviceType == EIDT_OSX)
 	{
@@ -995,6 +1053,11 @@ bool COpenGLDriver::beginScene(bool backBuffer, bool zBuffer, SColor color,
 #ifdef _IRR_COMPILE_WITH_X11_DEVICE_
 	case EIDT_X11:
 		changeRenderContext(videoData, X11Device);
+		break;
+#endif
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+	case EIDT_WAYLAND:
+		changeRenderContext(videoData, wl_device);
 		break;
 #endif
 	default:
@@ -4926,6 +4989,25 @@ IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 #endif //  _IRR_COMPILE_WITH_OPENGL_
 }
 #endif // _IRR_COMPILE_WITH_X11_DEVICE_
+
+
+// -----------------------------------
+// Wayland VERSION
+// -----------------------------------
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
+		io::IFileSystem* io, CIrrDeviceWayland* device)
+{
+	COpenGLDriver* ogl =  new COpenGLDriver(params, io, device);
+	if (!ogl->initDriver(device))
+	{
+		ogl->drop();
+		ogl = 0;
+	}
+	return ogl;
+
+}
+#endif // _IRR_COMPILE_WITH_WAYLAND_DEVICE
 
 
 // -----------------------------------

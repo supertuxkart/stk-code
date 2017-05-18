@@ -20,6 +20,7 @@
 #include "utils/translation.hpp"
 #include "utils/time.hpp"
 
+#include "../../../lib/irrlicht/include/IrrCompileConfig.h"
 #include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceLinux.h"
 
 /*
@@ -108,8 +109,12 @@ CGUIEditBox::~CGUIEditBox()
     if (Operator)
         Operator->drop();
 #ifdef _IRR_COMPILE_WITH_X11_DEVICE_
-    CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
-    dl->setIMEEnable(false);
+    if (irr_driver->getDevice()->getType() == irr::EIDT_X11)
+    {
+        CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
+                                                       irr_driver->getDevice());
+        dl->setIMEEnable(false);
+    }
 #endif
 #endif
 }
@@ -242,7 +247,6 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
 #ifndef SERVER_ONLY
     if (isEnabled())
     {
-
         switch(event.EventType)
         {
         case EET_GUI_EVENT:
@@ -254,16 +258,24 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                     setTextMarkers(0,0);
                 }
 #ifdef _IRR_COMPILE_WITH_X11_DEVICE_
-                CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
-                dl->setIMEEnable(false);
+                if (irr_driver->getDevice()->getType() == irr::EIDT_X11)
+                {
+                    CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
+                                                       irr_driver->getDevice());
+                    dl->setIMEEnable(false);
+                }
 #endif
             }
 #ifdef _IRR_COMPILE_WITH_X11_DEVICE_
             else if (event.GUIEvent.EventType == EGET_ELEMENT_FOCUSED)
             {
-                CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
-                dl->setIMEEnable(true);
-                dl->setIMELocation(calculateICPos());
+                if (irr_driver->getDevice()->getType() == irr::EIDT_X11)
+                {
+                    CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
+                                                       irr_driver->getDevice());
+                    dl->setIMEEnable(true);
+                    dl->setIMELocation(calculateICPos());
+                }
             }
 #endif
             break;
@@ -1633,10 +1645,14 @@ void CGUIEditBox::calculateScrollPos()
 
     // todo: adjust scrollbar
 #if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
-    CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
-    if (dl)
+    if (irr_driver->getDevice()->getType() == irr::EIDT_X11)
     {
-        dl->setIMELocation(calculateICPos());
+        CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
+                                                       irr_driver->getDevice());
+        if (dl)
+        {
+            dl->setIMELocation(calculateICPos());
+        }
     }
 #endif
 #endif   // SERVER_ONLY

@@ -516,6 +516,7 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 #endif
 
 #ifdef _IRR_COMPILE_WITH_OPENGL_
+#ifdef _IRR_COMPILE_WITH_X11_
 static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, bool force_legacy_context)
 {
 	GLXContext Context;
@@ -600,7 +601,7 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, boo
 	Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
 	return Context;
 }
-
+#endif
 #endif
 
 bool CIrrDeviceLinux::createWindow()

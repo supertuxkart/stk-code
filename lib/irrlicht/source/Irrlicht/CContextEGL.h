@@ -78,6 +78,7 @@ public:
 
     void reloadEGLSurface(void* window);
     bool swapBuffers();
+    bool makeCurrent();
     bool isLegacyDevice() {return m_is_legacy_device;}
     bool getSurfaceDimensions(int* width, int* height);
 };

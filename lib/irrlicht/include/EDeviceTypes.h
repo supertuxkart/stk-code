@@ -20,6 +20,9 @@ namespace irr
 		/** This device works on Windows Mobile, Pocket PC and Microsoft SmartPhone devices */
 		EIDT_WINCE,
 
+		//! A device native to Linux
+		EIDT_WAYLAND,
+
 		//! A device native to Unix style operating systems.
 		/** This device uses the X11 windowing system and works in Linux, Solaris, FreeBSD, OSX and
 		other operating systems which support X11. */
