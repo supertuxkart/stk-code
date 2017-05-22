@@ -44,8 +44,8 @@ public:
                  PlayerController(AbstractKart *kart);
     virtual     ~PlayerController  ();
     virtual void update            (float) OVERRIDE;
-    virtual void action            (PlayerAction action, int value) OVERRIDE;
-    virtual bool actionChangesState(PlayerAction action, int value);
+    virtual bool action            (PlayerAction action, int value,
+                                    bool dry_run = false           ) OVERRIDE;
     virtual void actionFromNetwork(PlayerAction action, int value,
                                    int value_l, int value_r);
     virtual void skidBonusTriggered() OVERRIDE;

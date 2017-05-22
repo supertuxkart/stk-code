@@ -89,7 +89,7 @@ public:
     const std::string &getControllerName() const { return m_controller_name; }
     // ------------------------------------------------------------------------
     /** Default: ignore actions. Only PlayerController get them. */
-    virtual void action(PlayerAction action, int value) = 0;
+    virtual bool action(PlayerAction action, int value, bool dry_run=false) = 0;
     // ------------------------------------------------------------------------
     /** Callback whenever a new lap is triggered. Used by the AI
      *  to trigger a recomputation of the way to use.            */

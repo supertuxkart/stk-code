@@ -85,20 +85,23 @@ public:
              AIBaseController(AbstractKart *kart);
     virtual ~AIBaseController() {};
     virtual void reset();
-    virtual bool disableSlipstreamBonus() const;
-    virtual void crashed(const Material *m);
+    virtual bool disableSlipstreamBonus() const OVERRIDE;
+    virtual void crashed(const Material *m) OVERRIDE;
     static  void enableDebug() {m_ai_debug = true; }
     static  void setTestAI(int n) {m_test_ai = n; }
     static  int  getTestAI() { return m_test_ai; }
-    virtual void crashed(const AbstractKart *k) {};
-    virtual void handleZipper(bool play_sound) {};
-    virtual void finishedRace(float time) {};
+    virtual void crashed(const AbstractKart *k) OVERRIDE {};
+    virtual void handleZipper(bool play_sound) OVERRIDE {};
+    virtual void finishedRace(float time) OVERRIDE {};
     virtual void collectedItem(const Item &item, int add_info=-1,
-                               float previous_energy=0) {};
-    virtual void setPosition(int p) {};
-    virtual bool isPlayerController() const { return false; }
-    virtual bool isLocalPlayerController() const { return false; }
-    virtual void action(PlayerAction action, int value) {};
+                               float previous_energy=0) OVERRIDE {};
+    virtual void setPosition(int p) OVERRIDE {};
+    virtual bool isPlayerController() const OVERRIDE { return false; }
+    virtual bool isLocalPlayerController() const OVERRIDE { return false; }
+    virtual bool action(PlayerAction action, int value, bool dry_run=false) OVERRIDE 
+    {
+        return true;
+    };
     virtual void skidBonusTriggered() {};
     // ------------------------------------------------------------------------
     /** Not used for AIs. */

@@ -55,7 +55,8 @@ public:
     virtual void setPosition(int p) OVERRIDE {}
     virtual bool isPlayerController() const OVERRIDE { return false; }
     virtual bool isLocalPlayerController() const OVERRIDE { return false; }
-    virtual void action(PlayerAction action, int value) OVERRIDE;
+    virtual bool action(PlayerAction action, int value,
+                        bool dry_run=false) OVERRIDE;
     virtual void skidBonusTriggered() OVERRIDE {}
     virtual void newLap(int lap) OVERRIDE {}
     virtual void saveState(BareNetworkString *buffer) const {};

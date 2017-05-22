@@ -139,14 +139,18 @@ void LocalPlayerController::resetInputState()
  *                if between 1 and 32767, it indicates an analog value,
  *                and if it's 0 it indicates that the corresponding button
  *                was released.
+ *  \param dry_run If set it will return if this action will trigger a
+ *                 state change or not.
+ *  \return       True if dry_run==true and a state change would be triggered.
+ *                If dry_run==false, it returns true.
  */
-void LocalPlayerController::action(PlayerAction action, int value)
+bool LocalPlayerController::action(PlayerAction action, int value,
+                                   bool dry_run)
 {
     // If this event does not change the control state (e.g.
     // it's a (auto) repeat event), do nothing. This especially
     // optimises traffic to the server and other clients.
-    if (!actionChangesState(action, value))
-        return;
+    if (!PlayerController::action(action, value, /*dry_run*/true)) return false;
 
     // If this is a client, send the action to networking layer
     if (World::getWorld()->isNetworkWorld() && 
@@ -158,7 +162,7 @@ void LocalPlayerController::action(PlayerAction action, int value)
                                        action, value,
                                        m_steer_val_l, m_steer_val_r);
     }
-    PlayerController::action(action, value);
+    return PlayerController::action(action, value, /*dry_run*/false);
 }   // action
 
 //-----------------------------------------------------------------------------
