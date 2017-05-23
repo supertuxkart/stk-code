@@ -330,63 +330,73 @@ public:
     }
 
     static void keyboard_key(void* data, wl_keyboard* keyboard, uint32_t serial,
-                             uint32_t time, uint32_t key, uint32_t state_w)
+                             uint32_t time, uint32_t key, uint32_t state)
     {
         CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
 
         if (!device->m_xkb_state)
             return;
 
-        wl_keyboard_key_state state = (wl_keyboard_key_state)state_w;
-        uint32_t code = key + 8;
         xkb_keysym_t sym = XKB_KEY_NoSymbol;
+        wchar_t key_char = 0;
 
         const xkb_keysym_t* syms;
-        uint32_t num_syms = xkb_state_key_get_syms(device->m_xkb_state, code,
+        uint32_t num_syms = xkb_state_key_get_syms(device->m_xkb_state, key + 8,
                                                    &syms);
 
         if (num_syms == 1)
             sym = syms[0];
 
-        bool ignore = false;
-
-        if (sym != XKB_KEY_NoSymbol && device->m_xkb_compose_state)
+        if (state == WL_KEYBOARD_KEY_STATE_PRESSED)
         {
-            xkb_compose_feed_result result;
-            result = xkb_compose_state_feed(device->m_xkb_compose_state, sym);
+            xkb_keysym_t key_sym = sym;
+            bool ignore = false;
 
-            if (result == XKB_COMPOSE_FEED_ACCEPTED)
+            if (sym != XKB_KEY_NoSymbol && device->m_xkb_compose_state)
             {
-                xkb_compose_status status;
-                status = xkb_compose_state_get_status(
-                                                   device->m_xkb_compose_state);
+                xkb_compose_feed_result result = xkb_compose_state_feed(
+                                              device->m_xkb_compose_state, sym);
 
-                if (status == XKB_COMPOSE_COMPOSING ||
-                    status == XKB_COMPOSE_CANCELLED)
+                if (result == XKB_COMPOSE_FEED_ACCEPTED)
                 {
-                    ignore = true;
-                }
-
-                if (status == XKB_COMPOSE_COMPOSED)
-                {
-                    sym = xkb_compose_state_get_one_sym(
+                    xkb_compose_status status = xkb_compose_state_get_status(
                                                    device->m_xkb_compose_state);
+                    switch (status)
+                    {
+                    case XKB_COMPOSE_COMPOSING:
+                    case XKB_COMPOSE_CANCELLED:
+                        ignore = true;
+                        break;
+                    case XKB_COMPOSE_COMPOSED:
+                        key_sym = xkb_compose_state_get_one_sym(
+                                                   device->m_xkb_compose_state);
+                        break;
+                    default:
+                        break;
+                    }
                 }
+            }
+
+            if (!ignore)
+            {
+                key_char = xkb_keysym_to_utf32(key_sym);
             }
         }
 
-        if (ignore == true)
-            return;
-
         SEvent irrevent;
         irrevent.EventType = irr::EET_KEY_INPUT_EVENT;
-        irrevent.KeyInput.PressedDown = (state == WL_KEYBOARD_KEY_STATE_PRESSED);
-        irrevent.KeyInput.Char = xkb_keysym_to_utf32(sym);
         irrevent.KeyInput.Control = (device->m_xkb_modifiers &
                                                         MOD_CONTROL_MASK) != 0;
         irrevent.KeyInput.Shift = (device->m_xkb_modifiers &
                                                         MOD_SHIFT_MASK) != 0;
-        irrevent.KeyInput.Key = device->m_key_map[sym];
+        irrevent.KeyInput.PressedDown = (state == WL_KEYBOARD_KEY_STATE_PRESSED);
+        irrevent.KeyInput.Char = key_char;
+        irrevent.KeyInput.Key = device->m_key_map[key];
+
+        if (irrevent.KeyInput.Key == 0 && key > 0)
+        {
+            irrevent.KeyInput.Key = (EKEY_CODE)(KEY_KEY_CODES_COUNT + key);
+        }
 
         device->signalEvent(irrevent);
     }
@@ -1021,195 +1031,133 @@ void CIrrDeviceWayland::clearSystemMessages()
 
 void CIrrDeviceWayland::createKeyMap()
 {
-    m_key_map[XKB_KEY_NoSymbol] = KEY_UNKNOWN;
-    m_key_map[XKB_KEY_BackSpace] = KEY_BACK;
-    m_key_map[XKB_KEY_Tab] = KEY_TAB;
-    m_key_map[XKB_KEY_ISO_Left_Tab] = KEY_TAB;
-//  m_key_map[XK_Linefeed] = 0; // ???
-    m_key_map[XKB_KEY_Clear] = KEY_CLEAR;
-    m_key_map[XKB_KEY_Return] = KEY_RETURN;
-    m_key_map[XKB_KEY_Pause] = KEY_PAUSE;
-    m_key_map[XKB_KEY_Scroll_Lock] = KEY_SCROLL;
-//  m_key_map[XK_Sys_Req] = 0; // ???
-    m_key_map[XKB_KEY_Escape] = KEY_ESCAPE;
-    m_key_map[XKB_KEY_Insert] = KEY_INSERT;
-    m_key_map[XKB_KEY_Delete] = KEY_DELETE;
-    m_key_map[XKB_KEY_Home] = KEY_HOME;
-    m_key_map[XKB_KEY_Left] = KEY_LEFT;
-    m_key_map[XKB_KEY_Up] = KEY_UP;
-    m_key_map[XKB_KEY_Right] = KEY_RIGHT;
-    m_key_map[XKB_KEY_Down] = KEY_DOWN;
-    m_key_map[XKB_KEY_Prior] = KEY_PRIOR;
-    m_key_map[XKB_KEY_Page_Up] = KEY_PRIOR;
-    m_key_map[XKB_KEY_Next] = KEY_NEXT;
-    m_key_map[XKB_KEY_Page_Down] = KEY_NEXT;
-    m_key_map[XKB_KEY_End] = KEY_END;
-    m_key_map[XKB_KEY_Begin] = KEY_HOME;
-    m_key_map[XKB_KEY_Num_Lock] = KEY_NUMLOCK;
-    m_key_map[XKB_KEY_space] = KEY_SPACE;
-    m_key_map[XKB_KEY_KP_Tab] = KEY_TAB;
-    m_key_map[XKB_KEY_KP_Enter] = KEY_RETURN;
-    m_key_map[XKB_KEY_KP_F1] = KEY_F1;
-    m_key_map[XKB_KEY_KP_F2] = KEY_F2;
-    m_key_map[XKB_KEY_KP_F3] = KEY_F3;
-    m_key_map[XKB_KEY_KP_F4] = KEY_F4;
-    m_key_map[XKB_KEY_KP_Home] = KEY_HOME;
-    m_key_map[XKB_KEY_KP_Left] = KEY_LEFT;
-    m_key_map[XKB_KEY_KP_Up] = KEY_UP;
-    m_key_map[XKB_KEY_KP_Right] = KEY_RIGHT;
-    m_key_map[XKB_KEY_KP_Down] = KEY_DOWN;
-    m_key_map[XKB_KEY_Print] = KEY_PRINT;
-    m_key_map[XKB_KEY_KP_Prior] = KEY_PRIOR;
-    m_key_map[XKB_KEY_KP_Page_Up] = KEY_PRIOR;
-    m_key_map[XKB_KEY_KP_Next] = KEY_NEXT;
-    m_key_map[XKB_KEY_KP_Page_Down] = KEY_NEXT;
-    m_key_map[XKB_KEY_KP_End] = KEY_END;
-    m_key_map[XKB_KEY_KP_Begin] = KEY_HOME;
-    m_key_map[XKB_KEY_KP_Insert] = KEY_INSERT;
-    m_key_map[XKB_KEY_KP_Delete] = KEY_DELETE;
-//  m_key_map[XK_KP_Equal] = 0; // ???
-    m_key_map[XKB_KEY_KP_Multiply] = KEY_MULTIPLY;
-    m_key_map[XKB_KEY_KP_Add] = KEY_ADD;
-    m_key_map[XKB_KEY_KP_Separator] = KEY_SEPARATOR;
-    m_key_map[XKB_KEY_KP_Subtract] = KEY_SUBTRACT;
-    m_key_map[XKB_KEY_KP_Decimal] = KEY_DECIMAL;
-    m_key_map[XKB_KEY_KP_Divide] = KEY_DIVIDE;
-    m_key_map[XKB_KEY_KP_0] = KEY_NUMPAD0;
-    m_key_map[XKB_KEY_KP_1] = KEY_NUMPAD1;
-    m_key_map[XKB_KEY_KP_2] = KEY_NUMPAD2;
-    m_key_map[XKB_KEY_KP_3] = KEY_NUMPAD3;
-    m_key_map[XKB_KEY_KP_4] = KEY_NUMPAD4;
-    m_key_map[XKB_KEY_KP_5] = KEY_NUMPAD5;
-    m_key_map[XKB_KEY_KP_6] = KEY_NUMPAD6;
-    m_key_map[XKB_KEY_KP_7] = KEY_NUMPAD7;
-    m_key_map[XKB_KEY_KP_8] = KEY_NUMPAD8;
-    m_key_map[XKB_KEY_KP_9] = KEY_NUMPAD9;
-    m_key_map[XKB_KEY_F1] = KEY_F1;
-    m_key_map[XKB_KEY_F2] = KEY_F2;
-    m_key_map[XKB_KEY_F3] = KEY_F3;
-    m_key_map[XKB_KEY_F4] = KEY_F4;
-    m_key_map[XKB_KEY_F5] = KEY_F5;
-    m_key_map[XKB_KEY_F6] = KEY_F6;
-    m_key_map[XKB_KEY_F7] = KEY_F7;
-    m_key_map[XKB_KEY_F8] = KEY_F8;
-    m_key_map[XKB_KEY_F9] = KEY_F9;
-    m_key_map[XKB_KEY_F10] = KEY_F10;
-    m_key_map[XKB_KEY_F11] = KEY_F11;
-    m_key_map[XKB_KEY_F12] = KEY_F12;
-    m_key_map[XKB_KEY_Shift_L] = KEY_LSHIFT;
-    m_key_map[XKB_KEY_Shift_R] = KEY_RSHIFT;
-    m_key_map[XKB_KEY_Control_L] = KEY_LCONTROL;
-    m_key_map[XKB_KEY_Control_R] = KEY_RCONTROL;
-    m_key_map[XKB_KEY_Caps_Lock] = KEY_CAPITAL;
-    m_key_map[XKB_KEY_Shift_Lock] = KEY_CAPITAL;
-    m_key_map[XKB_KEY_Meta_L] = KEY_LWIN;
-    m_key_map[XKB_KEY_Meta_R] = KEY_RWIN;
-    m_key_map[XKB_KEY_Alt_L] = KEY_LMENU;
-    m_key_map[XKB_KEY_Alt_R] = KEY_RMENU;
-    m_key_map[XKB_KEY_ISO_Level3_Shift] = KEY_RMENU;
-    m_key_map[XKB_KEY_Menu] = KEY_MENU;
-    m_key_map[XKB_KEY_space] = KEY_SPACE;
-//  m_key_map[XKB_key_ex] = 0; //?
-//  m_key_map[XK_quotedbl] = 0; //?
-//  m_key_map[XK_section] = 0; //?
-    m_key_map[XKB_KEY_numbersign] = KEY_OEM_2;
-//  m_key_map[XK_dollar] = 0; //?
-//  m_key_map[XK_percent] = 0; //?
-//  m_key_map[XK_ampersand] = 0; //?
-    m_key_map[XKB_KEY_apostrophe] = KEY_OEM_7;
-//  m_key_map[XK_parenleft] = 0; //?
-//  m_key_map[XK_parenright] = 0; //?
-//  m_key_map[XK_asterisk] = 0; //?
-    m_key_map[XKB_KEY_plus] = KEY_PLUS; //?
-    m_key_map[XKB_KEY_comma] = KEY_COMMA; //?
-    m_key_map[XKB_KEY_minus] = KEY_MINUS; //?
-    m_key_map[XKB_KEY_period] = KEY_PERIOD; //?
-    m_key_map[XKB_KEY_slash] = KEY_OEM_2; //?
-    m_key_map[XKB_KEY_0] = KEY_KEY_0;
-    m_key_map[XKB_KEY_1] = KEY_KEY_1;
-    m_key_map[XKB_KEY_2] = KEY_KEY_2;
-    m_key_map[XKB_KEY_3] = KEY_KEY_3;
-    m_key_map[XKB_KEY_4] = KEY_KEY_4;
-    m_key_map[XKB_KEY_5] = KEY_KEY_5;
-    m_key_map[XKB_KEY_6] = KEY_KEY_6;
-    m_key_map[XKB_KEY_7] = KEY_KEY_7;
-    m_key_map[XKB_KEY_8] = KEY_KEY_8;
-    m_key_map[XKB_KEY_9] = KEY_KEY_9;
-//  m_key_map[XK_colon] = 0; //?
-    m_key_map[XKB_KEY_semicolon] = KEY_OEM_1;
-    m_key_map[XKB_KEY_less] = KEY_OEM_102;
-    m_key_map[XKB_KEY_equal] = KEY_PLUS;
-//  m_key_map[XK_greater] = 0; //?
-//  m_key_map[XK_question] = 0; //?
-    m_key_map[XKB_KEY_at] = KEY_KEY_2; //?
-//  m_key_map[XK_mu] = 0; //?
-//  m_key_map[XK_EuroSign] = 0; //?
-    m_key_map[XKB_KEY_A] = KEY_KEY_A;
-    m_key_map[XKB_KEY_B] = KEY_KEY_B;
-    m_key_map[XKB_KEY_C] = KEY_KEY_C;
-    m_key_map[XKB_KEY_D] = KEY_KEY_D;
-    m_key_map[XKB_KEY_E] = KEY_KEY_E;
-    m_key_map[XKB_KEY_F] = KEY_KEY_F;
-    m_key_map[XKB_KEY_G] = KEY_KEY_G;
-    m_key_map[XKB_KEY_H] = KEY_KEY_H;
-    m_key_map[XKB_KEY_I] = KEY_KEY_I;
-    m_key_map[XKB_KEY_J] = KEY_KEY_J;
-    m_key_map[XKB_KEY_K] = KEY_KEY_K;
-    m_key_map[XKB_KEY_L] = KEY_KEY_L;
-    m_key_map[XKB_KEY_M] = KEY_KEY_M;
-    m_key_map[XKB_KEY_N] = KEY_KEY_N;
-    m_key_map[XKB_KEY_O] = KEY_KEY_O;
-    m_key_map[XKB_KEY_P] = KEY_KEY_P;
-    m_key_map[XKB_KEY_Q] = KEY_KEY_Q;
-    m_key_map[XKB_KEY_R] = KEY_KEY_R;
-    m_key_map[XKB_KEY_S] = KEY_KEY_S;
-    m_key_map[XKB_KEY_T] = KEY_KEY_T;
-    m_key_map[XKB_KEY_U] = KEY_KEY_U;
-    m_key_map[XKB_KEY_V] = KEY_KEY_V;
-    m_key_map[XKB_KEY_W] = KEY_KEY_W;
-    m_key_map[XKB_KEY_X] = KEY_KEY_X;
-    m_key_map[XKB_KEY_Y] = KEY_KEY_Y;
-    m_key_map[XKB_KEY_Z] = KEY_KEY_Z;
-    m_key_map[XKB_KEY_bracketleft] = KEY_OEM_4;
-    m_key_map[XKB_KEY_backslash] = KEY_OEM_5;
-    m_key_map[XKB_KEY_bracketright] = KEY_OEM_6;
-    m_key_map[XKB_KEY_asciicircum] = KEY_OEM_5;
-//  m_key_map[XK_degree] = 0; //?
-    m_key_map[XKB_KEY_underscore] = KEY_MINUS; //?
-    m_key_map[XKB_KEY_grave] = KEY_OEM_3;
-    m_key_map[XKB_KEY_acute] = KEY_OEM_6;
-    m_key_map[XKB_KEY_a] = KEY_KEY_A;
-    m_key_map[XKB_KEY_b] = KEY_KEY_B;
-    m_key_map[XKB_KEY_c] = KEY_KEY_C;
-    m_key_map[XKB_KEY_d] = KEY_KEY_D;
-    m_key_map[XKB_KEY_e] = KEY_KEY_E;
-    m_key_map[XKB_KEY_f] = KEY_KEY_F;
-    m_key_map[XKB_KEY_g] = KEY_KEY_G;
-    m_key_map[XKB_KEY_h] = KEY_KEY_H;
-    m_key_map[XKB_KEY_i] = KEY_KEY_I;
-    m_key_map[XKB_KEY_j] = KEY_KEY_J;
-    m_key_map[XKB_KEY_k] = KEY_KEY_K;
-    m_key_map[XKB_KEY_l] = KEY_KEY_L;
-    m_key_map[XKB_KEY_m] = KEY_KEY_M;
-    m_key_map[XKB_KEY_n] = KEY_KEY_N;
-    m_key_map[XKB_KEY_o] = KEY_KEY_O;
-    m_key_map[XKB_KEY_p] = KEY_KEY_P;
-    m_key_map[XKB_KEY_q] = KEY_KEY_Q;
-    m_key_map[XKB_KEY_r] = KEY_KEY_R;
-    m_key_map[XKB_KEY_s] = KEY_KEY_S;
-    m_key_map[XKB_KEY_t] = KEY_KEY_T;
-    m_key_map[XKB_KEY_u] = KEY_KEY_U;
-    m_key_map[XKB_KEY_v] = KEY_KEY_V;
-    m_key_map[XKB_KEY_w] = KEY_KEY_W;
-    m_key_map[XKB_KEY_x] = KEY_KEY_X;
-    m_key_map[XKB_KEY_y] = KEY_KEY_Y;
-    m_key_map[XKB_KEY_z] = KEY_KEY_Z;
-    m_key_map[XKB_KEY_ssharp] = KEY_OEM_4;
-    m_key_map[XKB_KEY_adiaeresis] = KEY_OEM_7;
-    m_key_map[XKB_KEY_odiaeresis] = KEY_OEM_3;
-    m_key_map[XKB_KEY_udiaeresis] = KEY_OEM_1;
-    m_key_map[XKB_KEY_Super_L] = KEY_LWIN;
-    m_key_map[XKB_KEY_Super_R] = KEY_RWIN;
+    m_key_map[0] = KEY_UNKNOWN; //KEY_RESERVED
+    m_key_map[1] = KEY_ESCAPE; //KEY_ESC
+    m_key_map[2] = KEY_KEY_1; //KEY_1
+    m_key_map[3] = KEY_KEY_2; //KEY_2
+    m_key_map[4] = KEY_KEY_3; //KEY_3
+    m_key_map[5] = KEY_KEY_4; //KEY_4
+    m_key_map[6] = KEY_KEY_5; //KEY_5
+    m_key_map[7] = KEY_KEY_6; //KEY_6
+    m_key_map[8] = KEY_KEY_7; //KEY_7
+    m_key_map[9] = KEY_KEY_8; //KEY_8
+    m_key_map[10] = KEY_KEY_9; //KEY_9
+    m_key_map[11] = KEY_KEY_0; //KEY_0
+    m_key_map[12] = KEY_MINUS; //KEY_MINUS
+    m_key_map[13] = KEY_PLUS; //KEY_EQUAL
+    m_key_map[14] = KEY_BACK; //KEY_BACKSPACE
+    m_key_map[15] = KEY_TAB; //KEY_TAB
+    m_key_map[16] = KEY_KEY_Q; //KEY_Q
+    m_key_map[17] = KEY_KEY_W; //KEY_W
+    m_key_map[18] = KEY_KEY_E; //KEY_E
+    m_key_map[19] = KEY_KEY_R; //KEY_R
+    m_key_map[20] = KEY_KEY_T; //KEY_T
+    m_key_map[21] = KEY_KEY_Y; //KEY_Y
+    m_key_map[22] = KEY_KEY_U; //KEY_U
+    m_key_map[23] = KEY_KEY_I; //KEY_I
+    m_key_map[25] = KEY_KEY_P; //KEY_P
+    m_key_map[24] = KEY_KEY_O; //KEY_O
+    m_key_map[26] = KEY_OEM_4; //KEY_LEFTBRACE
+    m_key_map[27] = KEY_OEM_6; //KEY_RIGHTBRACE
+    m_key_map[28] = KEY_RETURN; //KEY_ENTER
+    m_key_map[29] = KEY_LCONTROL; //KEY_LEFTCTRL
+    m_key_map[30] = KEY_KEY_A; //KEY_A
+    m_key_map[31] = KEY_KEY_S; // KEY_S
+    m_key_map[32] = KEY_KEY_D; //KEY_D
+    m_key_map[33] = KEY_KEY_F; //KEY_F
+    m_key_map[34] = KEY_KEY_G; //KEY_G
+    m_key_map[35] = KEY_KEY_H; //KEY_H
+    m_key_map[36] = KEY_KEY_J; //KEY_J
+    m_key_map[37] = KEY_KEY_K; //KEY_K
+    m_key_map[38] = KEY_KEY_L; //KEY_L
+    m_key_map[39] = KEY_OEM_1; //KEY_SEMICOLON
+    m_key_map[40] = KEY_OEM_7; //KEY_APOSTROPHE
+    m_key_map[41] = KEY_OEM_3; //KEY_GRAVE
+    m_key_map[42] = KEY_LSHIFT; //KEY_LEFTSHIFT
+    m_key_map[43] = KEY_OEM_5; //KEY_BACKSLASH
+    m_key_map[44] = KEY_KEY_Z; //KEY_Z
+    m_key_map[45] = KEY_KEY_X; //KEY_X
+    m_key_map[46] = KEY_KEY_C; //KEY_C
+    m_key_map[47] = KEY_KEY_V; //KEY_V
+    m_key_map[48] = KEY_KEY_B; //KEY_B
+    m_key_map[49] = KEY_KEY_N; //KEY_N
+    m_key_map[50] = KEY_KEY_M; //KEY_M
+    m_key_map[51] = KEY_COMMA; //KEY_COMMA
+    m_key_map[52] = KEY_PERIOD; //KEY_DOT
+    m_key_map[53] = KEY_OEM_2; // KEY_SLASH
+    m_key_map[54] = KEY_RSHIFT; //KEY_RIGHTSHIFT
+    m_key_map[55] = KEY_MULTIPLY; //KEY_KPASTERISK
+    m_key_map[56] = KEY_LMENU; //KEY_LEFTALT
+    m_key_map[57] = KEY_SPACE; //KEY_SPACE
+    m_key_map[58] = KEY_CAPITAL; //KEY_CAPSLOCK
+    m_key_map[59] = KEY_F1; //KEY_F1
+    m_key_map[60] = KEY_F2; //KEY_F2
+    m_key_map[61] = KEY_F3; //KEY_F3
+    m_key_map[62] = KEY_F4; //KEY_F4
+    m_key_map[63] = KEY_F5; //KEY_F5
+    m_key_map[64] = KEY_F6; //KEY_F6
+    m_key_map[65] = KEY_F7; //KEY_F7
+    m_key_map[66] = KEY_F8; //KEY_F8
+    m_key_map[67] = KEY_F9; //KEY_F9
+    m_key_map[68] = KEY_F10; //KEY_F10
+    m_key_map[69] = KEY_NUMLOCK; //KEY_NUMLOCK
+    m_key_map[70] = KEY_SCROLL; //KEY_SCROLLLOCK
+    m_key_map[71] = KEY_NUMPAD7; //KEY_KP7
+    m_key_map[72] = KEY_NUMPAD8; //KEY_KP8
+    m_key_map[73] = KEY_NUMPAD9; //KEY_KP9
+    m_key_map[74] = KEY_SUBTRACT; //KEY_KPMINUS
+    m_key_map[75] = KEY_NUMPAD4; //KEY_KP4
+    m_key_map[76] = KEY_NUMPAD5; //KEY_KP5
+    m_key_map[77] = KEY_NUMPAD6; //KEY_KP6
+    m_key_map[78] = KEY_ADD; //KEY_KPPLUS
+    m_key_map[79] = KEY_NUMPAD1; //KEY_KP1
+    m_key_map[80] = KEY_NUMPAD2; //KEY_KP2
+    m_key_map[81] = KEY_NUMPAD3; //KEY_KP3
+    m_key_map[82] = KEY_NUMPAD0; //KEY_KP0
+    m_key_map[83] = KEY_SEPARATOR; //KEY_KPDOT
+    m_key_map[85] = KEY_UNKNOWN; //KEY_ZENKAKUHANKAKU
+    m_key_map[86] = KEY_OEM_102; //KEY_102ND
+    m_key_map[87] = KEY_F11; //KEY_F11
+    m_key_map[88] = KEY_F12; //KEY_F12
+    m_key_map[89] = KEY_UNKNOWN; //KEY_RO
+    m_key_map[90] = KEY_UNKNOWN; //KEY_KATAKANA
+    m_key_map[91] = KEY_UNKNOWN; //KEY_HIRAGANA
+    m_key_map[92] = KEY_UNKNOWN; //KEY_HENKAN
+    m_key_map[93] = KEY_UNKNOWN; //KEY_KATAKANAHIRAGANA
+    m_key_map[94] = KEY_UNKNOWN; //KEY_MUHENKAN
+    m_key_map[95] = KEY_SEPARATOR; //KEY_KPJPCOMMA
+    m_key_map[96] = KEY_RETURN; //KEY_KPENTER
+    m_key_map[97] = KEY_RCONTROL; //KEY_RIGHTCTRL
+    m_key_map[98] = KEY_DIVIDE; //KEY_KPSLASH
+    m_key_map[99] = KEY_UNKNOWN; //KEY_SYSRQ
+    m_key_map[100] = KEY_RMENU; //KEY_RIGHTALT
+    m_key_map[101] = KEY_UNKNOWN; //KEY_LINEFEED
+    m_key_map[102] = KEY_HOME; //KEY_HOME
+    m_key_map[103] = KEY_UP; //KEY_UP
+    m_key_map[104] = KEY_PRIOR; //KEY_PAGEUP
+    m_key_map[105] = KEY_LEFT; //KEY_LEFT
+    m_key_map[106] = KEY_RIGHT; //KEY_RIGHT
+    m_key_map[107] = KEY_END; //KEY_END
+    m_key_map[108] = KEY_DOWN; //KEY_DOWN
+    m_key_map[109] = KEY_NEXT; //KEY_PAGEDOWN
+    m_key_map[110] = KEY_INSERT; //KEY_INSERT
+    m_key_map[111] = KEY_DELETE; //KEY_DELETE
+    m_key_map[112] = KEY_UNKNOWN; //KEY_MACRO
+    m_key_map[113] = KEY_VOLUME_MUTE; //KEY_MUTE
+    m_key_map[114] = KEY_VOLUME_DOWN; //KEY_VOLUMEDOWN
+    m_key_map[115] = KEY_VOLUME_UP; //KEY_VOLUMEUP
+    m_key_map[116] = KEY_UNKNOWN; //KEY_POWER
+    m_key_map[117] = KEY_RETURN; //KEY_KPEQUAL
+    m_key_map[118] = KEY_PLUS; //KEY_KPPLUSMINUS
+    m_key_map[119] = KEY_PAUSE; //KEY_PAUSE
+    m_key_map[120] = KEY_UNKNOWN; //KEY_SCALE
+    m_key_map[121] = KEY_COMMA; //KEY_KPCOMMA
+    m_key_map[122] = KEY_UNKNOWN; //KEY_HANGEUL
+    m_key_map[123] = KEY_UNKNOWN; //KEY_HANJA
+    m_key_map[124] = KEY_UNKNOWN; //KEY_YEN
+    m_key_map[125] = KEY_LWIN; //KEY_LEFTMETA
+    m_key_map[126] = KEY_RWIN; //KEY_RIGHTMETA
+    m_key_map[127] = KEY_MENU; //KEY_COMPOSE
 }
 
 // The joystick code is mostly copied from CIrrDeviceLinux.
