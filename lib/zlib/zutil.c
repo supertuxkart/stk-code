@@ -14,7 +14,7 @@
 struct internal_state      {int dummy;}; /* for buggy compilers */
 #endif
 
-const char * const z_errmsg[10] = {
+z_const char * const z_errmsg[10] = {
 "need dictionary",     /* Z_NEED_DICT       2  */
 "stream end",          /* Z_STREAM_END      1  */
 "",                    /* Z_OK              0  */
@@ -90,25 +90,25 @@ uLong ZEXPORT zlibCompileFlags()
 #endif
 #if defined(STDC) || defined(Z_HAVE_STDARG_H)
 #  ifdef NO_vsnprintf
-        flags += 1L << 25;
+    flags += 1L << 25;
 #    ifdef HAS_vsprintf_void
-        flags += 1L << 26;
+    flags += 1L << 26;
 #    endif
 #  else
 #    ifdef HAS_vsnprintf_void
-        flags += 1L << 26;
+    flags += 1L << 26;
 #    endif
 #  endif
 #else
-        flags += 1L << 24;
+    flags += 1L << 24;
 #  ifdef NO_snprintf
-        flags += 1L << 25;
+    flags += 1L << 25;
 #    ifdef HAS_sprintf_void
-        flags += 1L << 26;
+    flags += 1L << 26;
 #    endif
 #  else
 #    ifdef HAS_snprintf_void
-        flags += 1L << 26;
+    flags += 1L << 26;
 #    endif
 #  endif
 #endif
