@@ -68,6 +68,9 @@ namespace irr
 		//! sets the caption of the window
 		virtual void setWindowCaption(const wchar_t* text);
 
+		//! sets the class of the window
+		virtual void setWindowClass(const char* text);
+
 		//! returns if window is active. if not, nothing need to be drawn
 		virtual bool isWindowActive() const;
 

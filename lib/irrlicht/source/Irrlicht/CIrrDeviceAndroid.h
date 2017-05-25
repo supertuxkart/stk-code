@@ -35,6 +35,7 @@ namespace irr
 		virtual void yield();
 		virtual void sleep(u32 timeMs, bool pauseTimer=false);
 		virtual void setWindowCaption(const wchar_t* text);
+		virtual void setWindowClass(const char* text) {}
 		virtual bool present(video::IImage* surface, void* windowId, core::rect<s32>* srcClip);
 		virtual bool isWindowActive() const;
 		virtual bool isWindowFocused() const;

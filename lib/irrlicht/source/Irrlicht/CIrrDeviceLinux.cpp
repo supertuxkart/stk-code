@@ -1824,6 +1824,22 @@ void CIrrDeviceLinux::setWindowCaption(const wchar_t* text)
 #endif
 }
 
+//! sets the class of the window
+void CIrrDeviceLinux::setWindowClass(const char* text)
+{
+#ifdef _IRR_COMPILE_WITH_X11_
+	if (CreationParams.DriverType == video::EDT_NULL)
+		return;
+
+	// Set class hints on Linux, used by Window Managers.
+	XClassHint* classhint = XAllocClassHint();
+	classhint->res_name = (char*)text;
+	classhint->res_class = (char*)text;
+	XSetClassHint(display, window, classhint);
+	XFree(classhint);
+#endif
+}
+
 
 //! presents a surface in the client area
 bool CIrrDeviceLinux::present(video::IImage* image, void* windowId, core::rect<s32>* srcRect)
