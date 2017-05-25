@@ -175,10 +175,12 @@ namespace irr
         xkb_compose_state* m_xkb_compose_state;
         xkb_keymap* m_xkb_keymap;
         xkb_state* m_xkb_state;
-        xkb_mod_mask_t m_xkb_control_mask;
         xkb_mod_mask_t m_xkb_alt_mask;
+        xkb_mod_mask_t m_xkb_ctrl_mask;
         xkb_mod_mask_t m_xkb_shift_mask;
-        uint32_t m_xkb_modifiers;
+        bool m_xkb_alt_pressed;
+        bool m_xkb_ctrl_pressed;
+        bool m_xkb_shift_pressed;
 
         uint32_t m_mouse_button_states;
         unsigned int m_width;

@@ -57,10 +57,6 @@
 #include "os.h"
 #include "SIrrCreationParameters.h"
 
-#define MOD_SHIFT_MASK   0x01
-#define MOD_ALT_MASK     0x02
-#define MOD_CONTROL_MASK 0x04
-
 namespace irr
 {
     namespace video
@@ -111,8 +107,8 @@ public:
         irrevent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
         irrevent.MouseInput.X = device->getCursorControl()->getPosition().X;
         irrevent.MouseInput.Y = device->getCursorControl()->getPosition().Y;
-        irrevent.MouseInput.Control = (device->m_xkb_modifiers & MOD_CONTROL_MASK) != 0;
-        irrevent.MouseInput.Shift = (device->m_xkb_modifiers & MOD_SHIFT_MASK) != 0;
+        irrevent.MouseInput.Control = device->m_xkb_ctrl_pressed;
+        irrevent.MouseInput.Shift = device->m_xkb_shift_pressed;
         irrevent.MouseInput.ButtonStates = device->m_mouse_button_states;
 
         device->signalEvent(irrevent);
@@ -128,8 +124,8 @@ public:
         irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
         irrevent.MouseInput.X = device->getCursorControl()->getPosition().X;
         irrevent.MouseInput.Y = device->getCursorControl()->getPosition().Y;
-        irrevent.MouseInput.Control = (device->m_xkb_modifiers & MOD_CONTROL_MASK) != 0;
-        irrevent.MouseInput.Shift = (device->m_xkb_modifiers & MOD_SHIFT_MASK) != 0;
+        irrevent.MouseInput.Control = device->m_xkb_ctrl_pressed;
+        irrevent.MouseInput.Shift = device->m_xkb_shift_pressed;
         irrevent.MouseInput.Event = irr::EMIE_COUNT;
 
         switch (button)
@@ -219,8 +215,8 @@ public:
             irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
             irrevent.MouseInput.X = device->getCursorControl()->getPosition().X;
             irrevent.MouseInput.Y = device->getCursorControl()->getPosition().Y;
-            irrevent.MouseInput.Control = (device->m_xkb_modifiers & MOD_CONTROL_MASK) != 0;
-            irrevent.MouseInput.Shift = (device->m_xkb_modifiers & MOD_SHIFT_MASK) != 0;
+            irrevent.MouseInput.Control = device->m_xkb_ctrl_pressed;
+            irrevent.MouseInput.Shift = device->m_xkb_shift_pressed;
             irrevent.MouseInput.ButtonStates = device->m_mouse_button_states;
             irrevent.MouseInput.Event = EMIE_MOUSE_WHEEL;
             irrevent.MouseInput.Wheel = wl_fixed_to_double(value) / -10.0f;
@@ -277,10 +273,10 @@ public:
             return;
         }
 
-        device->m_xkb_control_mask =
-            1 << xkb_keymap_mod_get_index(device->m_xkb_keymap, "Control");
         device->m_xkb_alt_mask =
             1 << xkb_keymap_mod_get_index(device->m_xkb_keymap, "Mod1");
+        device->m_xkb_ctrl_mask =
+            1 << xkb_keymap_mod_get_index(device->m_xkb_keymap, "Control");
         device->m_xkb_shift_mask =
             1 << xkb_keymap_mod_get_index(device->m_xkb_keymap, "Shift");
 
@@ -337,20 +333,18 @@ public:
         if (!device->m_xkb_state)
             return;
 
-        xkb_keysym_t sym = XKB_KEY_NoSymbol;
         wchar_t key_char = 0;
-
-        const xkb_keysym_t* syms;
-        uint32_t num_syms = xkb_state_key_get_syms(device->m_xkb_state, key + 8,
-                                                   &syms);
-
-        if (num_syms == 1)
-            sym = syms[0];
 
         if (state == WL_KEYBOARD_KEY_STATE_PRESSED)
         {
-            xkb_keysym_t key_sym = sym;
-            bool ignore = false;
+            xkb_keysym_t sym = XKB_KEY_NoSymbol;
+
+            const xkb_keysym_t* syms;
+            uint32_t num_syms = xkb_state_key_get_syms(device->m_xkb_state,
+                                                       key + 8, &syms);
+
+            if (num_syms == 1)
+                sym = syms[0];
 
             if (sym != XKB_KEY_NoSymbol && device->m_xkb_compose_state)
             {
@@ -365,10 +359,10 @@ public:
                     {
                     case XKB_COMPOSE_COMPOSING:
                     case XKB_COMPOSE_CANCELLED:
-                        ignore = true;
+                        sym = XKB_KEY_NoSymbol;
                         break;
                     case XKB_COMPOSE_COMPOSED:
-                        key_sym = xkb_compose_state_get_one_sym(
+                        sym = xkb_compose_state_get_one_sym(
                                                    device->m_xkb_compose_state);
                         break;
                     default:
@@ -377,18 +371,16 @@ public:
                 }
             }
 
-            if (!ignore)
+            if (sym != XKB_KEY_NoSymbol)
             {
-                key_char = xkb_keysym_to_utf32(key_sym);
+                key_char = xkb_keysym_to_utf32(sym);
             }
         }
 
         SEvent irrevent;
         irrevent.EventType = irr::EET_KEY_INPUT_EVENT;
-        irrevent.KeyInput.Control = (device->m_xkb_modifiers &
-                                                        MOD_CONTROL_MASK) != 0;
-        irrevent.KeyInput.Shift = (device->m_xkb_modifiers &
-                                                        MOD_SHIFT_MASK) != 0;
+        irrevent.KeyInput.Control = device->m_xkb_ctrl_pressed;
+        irrevent.KeyInput.Shift = device->m_xkb_shift_pressed;
         irrevent.KeyInput.PressedDown = (state == WL_KEYBOARD_KEY_STATE_PRESSED);
         irrevent.KeyInput.Char = key_char;
         irrevent.KeyInput.Key = device->m_key_map[key];
@@ -415,25 +407,13 @@ public:
                               mods_locked, 0, 0, group);
         xkb_state_component state_component = (xkb_state_component)(
                             XKB_STATE_MODS_DEPRESSED | XKB_STATE_MODS_LATCHED);
-        xkb_mod_mask_t mask = xkb_state_serialize_mods(device->m_xkb_state,
+
+        xkb_mod_mask_t mods = xkb_state_serialize_mods(device->m_xkb_state,
                                                        state_component);
 
-        device->m_xkb_modifiers = 0;
-
-        if (mask & device->m_xkb_control_mask)
-        {
-            device->m_xkb_modifiers |= MOD_CONTROL_MASK;
-        }
-
-        if (mask & device->m_xkb_alt_mask)
-        {
-            device->m_xkb_modifiers |= MOD_ALT_MASK;
-        }
-
-        if (mask & device->m_xkb_shift_mask)
-        {
-            device->m_xkb_modifiers |= MOD_SHIFT_MASK;
-        }
+        device->m_xkb_alt_pressed = (mods & device->m_xkb_alt_mask) != 0;
+        device->m_xkb_ctrl_pressed = (mods & device->m_xkb_ctrl_mask) != 0;
+        device->m_xkb_shift_pressed = (mods & device->m_xkb_shift_mask) != 0;
     }
 
     static void keyboard_repeat_info(void* data, wl_keyboard* keyboard,
@@ -654,10 +634,12 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     m_xkb_compose_state = NULL;
     m_xkb_keymap = NULL;
     m_xkb_state = NULL;
-    m_xkb_control_mask = 0;
     m_xkb_alt_mask = 0;
+    m_xkb_ctrl_mask = 0;
     m_xkb_shift_mask = 0;
-    m_xkb_modifiers = 0;
+    m_xkb_alt_pressed = false;
+    m_xkb_ctrl_pressed = false;
+    m_xkb_shift_pressed = false;
 
     m_egl_context = NULL;
 
