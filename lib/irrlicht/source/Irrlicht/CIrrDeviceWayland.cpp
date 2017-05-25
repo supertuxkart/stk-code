@@ -912,6 +912,14 @@ void CIrrDeviceWayland::sleep(u32 timeMs, bool pauseTimer=false)
 //! sets the caption of the window
 void CIrrDeviceWayland::setWindowCaption(const wchar_t* text)
 {
+	if (!m_shell_surface)
+		return;
+		
+	char title[1024];
+	wcstombs(title, text, sizeof(title));
+	title[1023] = '\0';
+	
+	wl_shell_surface_set_title(m_shell_surface, title);
 }
 
 //! presents a surface in the client area
