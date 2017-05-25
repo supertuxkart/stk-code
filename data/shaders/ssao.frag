@@ -44,10 +44,8 @@ void main(void)
     vec2 offset = vec2(cos(invSamples), sin(invSamples));
 
     for(int i = 0; i < SAMPLES; ++i) {
-        float alpha = (float(i) + .5) * invSamples;
-        rotations = vec2(rotations.x * offset.x - rotations.y * offset.y, rotations.x * offset.y + rotations.y * offset.x);
-        float h = r * alpha;
-        vec2 localoffset = h * rotations;
+        rotations.xy = rotations.xy * offset.xy - rotations.yx * offset.yx;
+        vec2 localoffset = (r * ((float(i) + .5) * invSamples)) * rotations;
 
         m = m + .5;
         ivec2 ioccluder_uv = ivec2(x, y) + ivec2(localoffset);
