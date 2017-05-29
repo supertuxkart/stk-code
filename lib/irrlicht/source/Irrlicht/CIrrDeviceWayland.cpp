@@ -167,6 +167,7 @@ public:
                 irrevent.MouseInput.Event = irr::EMIE_MMOUSE_LEFT_UP;
                 device->m_mouse_button_states &= ~(irr::EMBSM_MIDDLE);
             }
+            break;
         default:
             break;
         }
@@ -928,23 +929,23 @@ void CIrrDeviceWayland::sleep(u32 timeMs, bool pauseTimer=false)
 //! sets the caption of the window
 void CIrrDeviceWayland::setWindowCaption(const wchar_t* text)
 {
-	if (!m_shell_surface)
-		return;
-		
-	char title[1024];
-	wcstombs(title, text, sizeof(title));
-	title[1023] = '\0';
-	
-	wl_shell_surface_set_title(m_shell_surface, title);
+    if (!m_shell_surface)
+        return;
+
+    char title[1024];
+    wcstombs(title, text, sizeof(title));
+    title[1023] = '\0';
+
+    wl_shell_surface_set_title(m_shell_surface, title);
 }
 
 //! sets the class of the window
 void CIrrDeviceWayland::setWindowClass(const char* text)
 {
-	if (!m_shell_surface)
-		return;
-		
-	wl_shell_surface_set_class(m_shell_surface, text);
+    if (!m_shell_surface)
+        return;
+
+    wl_shell_surface_set_class(m_shell_surface, text);
 }
 
 //! presents a surface in the client area
