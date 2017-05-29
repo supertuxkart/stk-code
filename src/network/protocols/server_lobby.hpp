@@ -43,8 +43,9 @@ private:
 
     /** Keeps track of an artificial server delay (which makes sure that the
      *  data from all clients has arrived when the server computes a certain
-     *  timestep. */
-    float m_server_delay;
+     *  timestep.(. It stores the real time since epoch + delta (atm 0.1
+     *  seconds), which is the real time at which the server should start. */
+    double m_server_delay;
 
     Protocol *m_current_protocol;
     bool m_selection_enabled;

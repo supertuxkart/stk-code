@@ -237,7 +237,6 @@ void ServerLobby::update(float dt)
             m_client_ready_count.getData() == m_game_setup->getPlayerCount())
         {
             signalRaceStartToClients();
-            m_server_delay = 0.1f;
             m_client_ready_count.getData() = 0;
         }
         m_client_ready_count.unlock();
@@ -249,9 +248,10 @@ void ServerLobby::update(float dt)
         // next state.
         break;
     case DELAY_SERVER:
-        m_server_delay -= dt;
-        if (m_server_delay < 0)
+        if (m_server_delay < StkTime::getRealTime())
         {
+            Log::verbose("ServerLobby", "End delay at %lf",
+                         StkTime::getRealTime());
             m_state = RACING;
             World::getWorld()->setReadyToRace();
         }
@@ -350,7 +350,8 @@ void ServerLobby::registerServer()
  */
 void ServerLobby::signalRaceStartToClients()
 {
-    Log::verbose("Server", "Signaling race start to clients");
+    Log::verbose("Server", "Signaling race start to clients at %lf",
+                 StkTime::getRealTime());
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     NetworkString *ns = getNetworkString(1);
     ns->addUInt8(LE_START_RACE);
@@ -935,12 +936,16 @@ void ServerLobby::finishedLoadingWorldClient(Event *event)
 void ServerLobby::startedRaceOnClient(Event *event)
 {
     m_client_ready_count.lock();
-    Log::verbose("ServerLobby", "Host %d has started race.",
-                 event->getPeer()->getHostId());
+    Log::verbose("ServerLobby", "Host %d has started race at %lf.",
+                 event->getPeer()->getHostId(), StkTime::getRealTime());
     m_client_ready_count.getData()++;
     if (m_client_ready_count.getData() == m_game_setup->getPlayerCount())
     {
         m_state = DELAY_SERVER;
+        m_server_delay = StkTime::getRealTime() + 0.1f;
+        Log::verbose("ServerLobby", "Started delay at %lf set delay to %lf",
+                     StkTime::getRealTime(),
+                    m_server_delay);
         terminateLatencyProtocol();
     }
     m_client_ready_count.unlock();
