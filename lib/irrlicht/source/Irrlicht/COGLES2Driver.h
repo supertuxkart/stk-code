@@ -14,6 +14,8 @@
 #include "MacOSX/CIrrDeviceMacOSX.h"
 #elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 #include "iOS/CIrrDeviceiOS.h"
+#elif _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#include "CIrrDeviceWayland.h"
 #endif
 
 #include "SIrrCreationParameters.h"
@@ -61,6 +63,11 @@ namespace video
 		COGLES2Driver(const SIrrlichtCreationParameters& params,
 					const SExposedVideoData& data,
 					io::IFileSystem* io);
+#endif
+
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+		COGLES2Driver(const SIrrlichtCreationParameters& params, 
+					io::IFileSystem* io, CIrrDeviceWayland* device);
 #endif
 
 #ifdef _IRR_COMPILE_WITH_OSX_DEVICE_
@@ -460,6 +467,9 @@ namespace video
 		
 #if defined(_IRR_COMPILE_WITH_EGL_)
 		ContextManagerEGL* EglContext;
+#endif
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+		CIrrDeviceWayland* wl_device;
 #endif
 #if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 		CIrrDeviceIPhone* Device;

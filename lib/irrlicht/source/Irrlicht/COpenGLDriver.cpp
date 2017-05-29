@@ -4998,6 +4998,7 @@ IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 		io::IFileSystem* io, CIrrDeviceWayland* device)
 {
+#ifdef _IRR_COMPILE_WITH_OPENGL_
 	COpenGLDriver* ogl =  new COpenGLDriver(params, io, device);
 	if (!ogl->initDriver(device))
 	{
@@ -5005,7 +5006,9 @@ IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 		ogl = 0;
 	}
 	return ogl;
-
+#else
+	return 0;
+#endif //  _IRR_COMPILE_WITH_OPENGL_
 }
 #endif // _IRR_COMPILE_WITH_WAYLAND_DEVICE
 
