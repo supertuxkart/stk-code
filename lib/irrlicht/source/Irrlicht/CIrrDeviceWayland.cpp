@@ -120,7 +120,7 @@ public:
                                uint32_t serial, uint32_t time, uint32_t button,
                                uint32_t state)
     {
-        CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland* >(data);
+        CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
 
         SEvent irrevent;
         irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
@@ -210,7 +210,7 @@ public:
     static void pointer_axis(void* data, wl_pointer* wl_pointer, uint32_t time,
                              uint32_t axis, wl_fixed_t value)
     {
-        CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland* >(data);
+        CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
 
         if (axis == WL_POINTER_AXIS_VERTICAL_SCROLL)
         {
@@ -733,11 +733,16 @@ bool CIrrDeviceWayland::initEGL()
     m_egl_context = new ContextManagerEGL();
 
     ContextEGLParams egl_params;
-#ifdef _IRR_COMPILE_WITH_OGLES2_
-    egl_params.opengl_api = CEGL_API_OPENGL_ES;
-#else
-    egl_params.opengl_api = CEGL_API_OPENGL;
-#endif
+
+    if (CreationParams.DriverType == video::EDT_OGLES2)
+    {
+        egl_params.opengl_api = CEGL_API_OPENGL_ES;
+    }
+    else
+    {
+        egl_params.opengl_api = CEGL_API_OPENGL;
+    }
+
     egl_params.surface_type = CEGL_SURFACE_WINDOW;
     egl_params.force_legacy_device = CreationParams.ForceLegacyDevice;
     egl_params.with_alpha_channel = CreationParams.WithAlphaChannel;
@@ -849,12 +854,6 @@ void CIrrDeviceWayland::createDriver()
     }
 }
 
-void CIrrDeviceWayland::swapBuffers()
-{
-    wl_display_dispatch_pending(m_display);
-    m_egl_context->swapBuffers();
-}
-
 void CIrrDeviceWayland::updateCursor()
 {
     if (!getCursorControl()->isVisible() && CreationParams.Fullscreen)
@@ -886,6 +885,8 @@ void CIrrDeviceWayland::signalEvent(const SEvent &event)
 bool CIrrDeviceWayland::run()
 {
     os::Timer::tick();
+
+    wl_display_dispatch_pending(m_display);
 
     for (unsigned int i = 0; i < m_events.size(); i++)
     {

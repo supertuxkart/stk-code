@@ -982,7 +982,7 @@ bool COpenGLDriver::endScene()
 #ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 	if (DeviceType == EIDT_WAYLAND)
 	{
-		wl_device->swapBuffers();
+		wl_device->getEGLContext()->swapBuffers();
 		return true;
 	}
 #endif

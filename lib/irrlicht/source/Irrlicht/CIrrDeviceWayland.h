@@ -135,7 +135,6 @@ namespace irr
         static bool isWaylandDeviceWorking();
 
         ContextManagerEGL* getEGLContext() {return m_egl_context;}
-        void swapBuffers();
         void updateCursor();
         unsigned int getWidth() {return m_width;}
         unsigned int getHeight() {return m_height;}

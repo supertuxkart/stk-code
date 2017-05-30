@@ -468,9 +468,6 @@ namespace video
 #if defined(_IRR_COMPILE_WITH_EGL_)
 		ContextManagerEGL* EglContext;
 #endif
-#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
-		CIrrDeviceWayland* wl_device;
-#endif
 #if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 		CIrrDeviceIPhone* Device;
 		GLuint ViewFramebuffer;

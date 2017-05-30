@@ -55,9 +55,6 @@ namespace video
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
 		, HDc(0)
 #endif
-#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
-		, wl_device(0)
-#endif
 		, Params(params)
 	{
 #ifdef _DEBUG
@@ -146,7 +143,6 @@ namespace video
 		ColorFormat(ECF_R8G8B8), EglContext(0), Params(params)
 	{
 		EglContext = device->getEGLContext();
-		wl_device = device;
 		genericDriverInit(params.WindowSize, params.Stencilbuffer);
 	}
 #endif
@@ -162,7 +158,7 @@ namespace video
 		if (BridgeCalls)
 			delete BridgeCalls;
 
-#if defined(_IRR_COMPILE_WITH_EGL_)
+#if defined(_IRR_COMPILE_WITH_EGL_) && !defined(_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
 		delete EglContext;
 		
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
@@ -482,30 +478,20 @@ namespace video
 	//! presents the rendered scene on the screen, returns false if failed
 	bool COGLES2Driver::endScene()
 	{
-        CNullDriver::endScene();
+		CNullDriver::endScene();
 
 #if defined(_IRR_COMPILE_WITH_EGL_)
-#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
-		if (wl_device != NULL)
+		bool res = EglContext->swapBuffers();
+		
+		if (!res)
 		{
-			wl_device->swapBuffers();
-			return true;
-		}
-		else
-#endif
-		{
-			bool res = EglContext->swapBuffers();
-			
-			if (!res)
-			{
-				os::Printer::log("Could not swap buffers for OpenGL-ES2 driver.");
-				return false;
-			}
+			os::Printer::log("Could not swap buffers for OpenGL-ES2 driver.");
+			return false;
 		}
 #elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
-        glFlush();
-        glBindRenderbuffer(GL_RENDERBUFFER, ViewRenderbuffer);
-        Device->displayEnd();
+		glFlush();
+		glBindRenderbuffer(GL_RENDERBUFFER, ViewRenderbuffer);
+		Device->displayEnd();
 #endif
 
 		return true;
