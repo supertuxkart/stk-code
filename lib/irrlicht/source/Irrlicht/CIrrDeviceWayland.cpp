@@ -467,6 +467,10 @@ public:
         }
     }
 
+    static void seat_name(void* data, wl_seat* wl_seat, const char* name)
+    {
+    }
+
     static void output_geometry(void* data, wl_output* wl_output, int32_t x,
                                 int32_t y, int32_t physical_width,
                                 int32_t physical_height, int32_t subpixel,
@@ -541,7 +545,8 @@ public:
         else if (interface_str == "wl_seat")
         {
             device->m_seat = static_cast<wl_seat*>(wl_registry_bind(registry,
-                                                  name, &wl_seat_interface, 1));
+                                                   name, &wl_seat_interface,
+                                                   version < 4 ? version : 4));
         }
         else if (interface_str == "wl_shm")
         {
@@ -582,7 +587,8 @@ const wl_keyboard_listener WaylandCallbacks::keyboard_listener =
 
 const wl_seat_listener WaylandCallbacks::seat_listener =
 {
-    WaylandCallbacks::seat_capabilities
+    WaylandCallbacks::seat_capabilities,
+    WaylandCallbacks::seat_name
 };
 
 const wl_output_listener WaylandCallbacks::output_listener =
