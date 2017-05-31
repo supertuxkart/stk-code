@@ -467,6 +467,7 @@ namespace video
 		
 #if defined(_IRR_COMPILE_WITH_EGL_)
 		ContextManagerEGL* EglContext;
+		bool EglContextExternal;
 #endif
 #if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 		CIrrDeviceIPhone* Device;

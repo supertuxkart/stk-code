@@ -47,6 +47,7 @@ namespace video
 		RenderTargetTexture(0), CurrentRendertargetSize(0, 0), ColorFormat(ECF_R8G8B8)
 #if defined(_IRR_COMPILE_WITH_EGL_)
 		, EglContext(0)
+		, EglContextExternal(false)
 #elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 		, ViewFramebuffer(0)
 		, ViewRenderbuffer(0)
@@ -140,9 +141,11 @@ namespace video
 		BridgeCalls(0), CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
 		Transformation3DChanged(true), AntiAlias(params.AntiAlias),
 		RenderTargetTexture(0), CurrentRendertargetSize(0, 0), 
-		ColorFormat(ECF_R8G8B8), EglContext(0), Params(params)
+		ColorFormat(ECF_R8G8B8), EglContext(0), EglContextExternal(false), 
+		Params(params)
 	{
 		EglContext = device->getEGLContext();
+		EglContextExternal = true;
 		genericDriverInit(params.WindowSize, params.Stencilbuffer);
 	}
 #endif
@@ -158,8 +161,9 @@ namespace video
 		if (BridgeCalls)
 			delete BridgeCalls;
 
-#if defined(_IRR_COMPILE_WITH_EGL_) && !defined(_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
-		delete EglContext;
+#if defined(_IRR_COMPILE_WITH_EGL_)
+		if (!EglContextExternal)
+			delete EglContext;
 		
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
 		if (HDc)
