@@ -263,9 +263,7 @@ public:
         close(fd);
 
         if (!device->m_xkb_keymap)
-        {
             return;
-        }
 
         device->m_xkb_state = xkb_state_new(device->m_xkb_keymap);
 
@@ -394,6 +392,19 @@ public:
         }
 
         device->signalEvent(irrevent);
+
+        bool repeats = xkb_keymap_key_repeats(device->m_xkb_keymap, key + 8);
+
+        if (repeats && state == WL_KEYBOARD_KEY_STATE_PRESSED)
+        {
+            device->m_repeat_enabled = true;
+            device->m_repeat_time = os::Timer::getRealTime();
+            device->m_repeat_event = irrevent;
+        }
+        else
+        {
+            device->m_repeat_enabled = false;
+        }
     }
 
     static void keyboard_modifiers(void* data, wl_keyboard* keyboard,
@@ -422,6 +433,10 @@ public:
     static void keyboard_repeat_info(void* data, wl_keyboard* keyboard,
                                      int32_t rate, int32_t delay)
     {
+        CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
+
+        device->m_repeat_rate = 1000 / rate;
+        device->m_repeat_delay = delay;
     }
 
     static void seat_capabilities(void* data, wl_seat* seat, uint32_t caps)
@@ -643,6 +658,11 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     m_xkb_alt_pressed = false;
     m_xkb_ctrl_pressed = false;
     m_xkb_shift_pressed = false;
+
+    m_repeat_enabled = false;
+    m_repeat_time = 0;
+    m_repeat_rate = 40;
+    m_repeat_delay = 400;
 
     m_egl_context = NULL;
 
@@ -894,6 +914,17 @@ bool CIrrDeviceWayland::run()
     }
 
     m_events.clear();
+
+    if (m_repeat_enabled && m_repeat_rate > 0)
+    {
+        uint32_t curr_time = os::Timer::getRealTime();
+
+        while (curr_time - m_repeat_time > m_repeat_delay + m_repeat_rate)
+        {
+            postEventFromUser(m_repeat_event);
+            m_repeat_time += m_repeat_rate;
+        }
+    }
 
     if (!Close)
         pollJoysticks();

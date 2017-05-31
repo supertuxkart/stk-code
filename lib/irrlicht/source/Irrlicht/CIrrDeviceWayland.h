@@ -183,6 +183,12 @@ namespace irr
         bool m_xkb_alt_pressed;
         bool m_xkb_ctrl_pressed;
         bool m_xkb_shift_pressed;
+        
+        bool m_repeat_enabled;
+        SEvent m_repeat_event;
+        uint32_t m_repeat_time;
+        uint32_t m_repeat_rate;
+        uint32_t m_repeat_delay;
 
         uint32_t m_mouse_button_states;
         unsigned int m_width;
