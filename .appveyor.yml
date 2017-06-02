@@ -60,7 +60,9 @@ build:
 
 
 on_success:
-    - "python %IRC_NOTIFY_SCRIPT% supertuxkart [{author}:{branch}] {short_commit}: {message} {color_green}Succeeded,Details: {build_url},Commit: {commit_url}"
+    - cmd: |
+        if "%APPVEYOR_REPO_BRANCH%" == "master" "python %IRC_NOTIFY_SCRIPT% supertuxkart [{author}:{branch}] {short_commit}: {message} {color_green}Succeeded,Details: {build_url},Commit: {commit_url}"
 
 on_failure:
-    - "python %IRC_NOTIFY_SCRIPT% supertuxkart [{author}:{branch}] {short_commit}: {message} {color_red}Failed,Details: {build_url},Commit: {commit_url}"
+    - cmd: |
+        if "%APPVEYOR_REPO_BRANCH%" == "master" "python %IRC_NOTIFY_SCRIPT% supertuxkart [{author}:{branch}] {short_commit}: {message} {color_red}Failed,Details: {build_url},Commit: {commit_url}"
