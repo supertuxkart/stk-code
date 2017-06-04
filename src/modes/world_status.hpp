@@ -140,7 +140,6 @@ private:
     *  wait for all clients to indicate that they have started the race. */
     bool m_server_is_ready;
 
-    float adjustDT(float dt);
     void startEngines();
 
 public:
@@ -156,6 +155,7 @@ public:
     virtual void enterRaceOverState();
     virtual void terminateRace();
     void         setTime(const float time);
+    float        adjustDT(float dt);
 
     // ------------------------------------------------------------------------
     // Note: GO_PHASE is both: start phase and race phase

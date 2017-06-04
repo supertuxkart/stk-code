@@ -393,23 +393,14 @@ void WorldStatus::updateTime(const float dt)
     }
 
     IrrlichtDevice *device = irr_driver->getDevice();
-    // If this is a client, the server might request an 
-    // adjustment of this client's world clock (to reduce
-    // number of rewinds).
-    float actual_dt;
-    if (NetworkConfig::get()->isClient() &&
-        !RewindManager::get()->isRewinding())
-        actual_dt = adjustDT(dt);
-    else
-        actual_dt = dt;
-
+    
     switch (m_clock_mode)
     {
         case CLOCK_CHRONO:
             if (!device->getTimer()->isStopped())
             {
-                m_time += actual_dt;
-                m_count_up_timer += actual_dt;
+                m_time += dt;
+                m_count_up_timer += dt;
             }
             break;
         case CLOCK_COUNTDOWN:
@@ -423,8 +414,8 @@ void WorldStatus::updateTime(const float dt)
 
             if (!device->getTimer()->isStopped())
             {
-                m_time -= actual_dt;
-                m_count_up_timer += actual_dt;
+                m_time -= dt;
+                m_count_up_timer += dt;
             }
 
             if(m_time <= 0.0)

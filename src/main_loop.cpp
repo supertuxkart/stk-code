@@ -136,6 +136,16 @@ float MainLoop::getLimitedDt()
         PROFILER_POP_CPU_MARKER();
     }
     dt *= 0.001f;
+
+    // If this is a client, the server might request an 
+    // adjustment of this client's world clock (to reduce
+    // number of rewinds).
+    if (World::getWorld()                   &&
+        NetworkConfig::get()->isClient()    &&
+        !RewindManager::get()->isRewinding()   )
+    {
+        dt = World::getWorld()->adjustDT(dt);
+    }
     return dt;
 }   // getLimitedDt
 
