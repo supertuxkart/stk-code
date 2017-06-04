@@ -81,6 +81,12 @@ public:
     int   m_max_karts;                 /**<Maximum number of karts.            */
     bool  m_smooth_normals;            /**< If normals for raycasts for wheels
                                            should be interpolated.             */
+
+    /** Network events that are less than this value apart will be executed
+     *  at the same time (instead of adding a new time step, which causes
+     *  one more time step to be simulated). */
+    float m_network_combine_threshold;
+
     /** If the angle between a normal on a vertex and the normal of the
      *  triangle are more than this value, the physics will use the normal
      *  of the triangle in smoothing normal. */

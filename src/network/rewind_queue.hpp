@@ -55,7 +55,7 @@ private:
      *  always be at the same time as World::getTime(). */
     AllTimeStepInfo::iterator m_current;
 
-    TimeStepInfo *findClosestTimeStepInfo(float t);
+    AllTimeStepInfo::iterator findPreviousTimeStepInfo(float t);
     void insertRewindInfo(RewindInfo *ri);
 
     struct _TimeStepInfoCompare
@@ -77,12 +77,13 @@ public:
     void addLocalEvent(EventRewinder *event_rewinder, BareNetworkString *buffer,
                        bool confirmed, float time);
     void addLocalState(Rewinder *rewinder, BareNetworkString *buffer,
-                       bool confirmed);
+                       bool confirmed, float time);
     void addNetworkEvent(EventRewinder *event_rewinder,
                          BareNetworkString *buffer, float time);
     void addNetworkState(Rewinder *rewinder, BareNetworkString *buffer,
                          float time, float dt);
-    void mergeNetworkData(bool *needs_rewind, float *rewind_time);
+    void mergeNetworkData(float world_time, float dt,
+                          bool *needs_rewind, float *rewind_time);
     bool isEmpty() const;
     bool hasMoreRewindInfo() const;
     void undoUntil(float undo_time);

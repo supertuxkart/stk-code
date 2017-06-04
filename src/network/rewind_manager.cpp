@@ -97,6 +97,22 @@ void RewindManager::reset()
     m_rewind_queue.reset();
 }   // reset
 
+// ----------------------------------------------------------------------------
+/** Adds a new TimeStep entry. Only exception is time=0 (which happens during
+ *  all of 'ready, set, go') - for which only one entry is created.
+ */
+void RewindManager::addNextTimeStep(float time, float dt)
+{
+    // Add a timestep entry each timestep, except at 'ready, set, go'
+    // at which time is 0 - we add only one entry there
+    if (time>0 || m_rewind_queue.isEmpty())
+    {
+        Log::info("RewindManager", "Adding new timestamp %f dt %f at %lf",
+                  time, dt, StkTime::getRealTime());
+        m_rewind_queue.addNewTimeStep(time, dt);
+    }
+}   // addNextTimeStep
+
 // ----------------------------------------------------------------------------    
 /** Adds an event to the rewind data. The data to be stored must be allocated
  *  and not freed by the caller!
@@ -172,12 +188,6 @@ void RewindManager::update(float dt)
     float time = World::getWorld()->getTime();
     m_not_rewound_time = time;
 
-    // Avoid duplicating time step during ready-set-go, all with time 0
-    if (time > m_last_saved_state)
-    {
-        m_rewind_queue.addNewTimeStep(World::getWorld()->getTime(), dt);
-    }
-
     // Clients don't save state, so they just update m_last_saved_state
     // (only for the above if test) and exit.
     if ( NetworkConfig::get()->isClient() || 
@@ -196,7 +206,8 @@ void RewindManager::update(float dt)
         {
             m_overall_state_size += buffer->size();
             // Add to the previously created container
-            m_rewind_queue.addLocalState(*rewinder, buffer, /*confirmed*/true);
+            m_rewind_queue.addLocalState(*rewinder, buffer, /*confirmed*/true,
+                                         World::getWorld()->getTime());
             GameProtocol::getInstance()->addState(buffer);
         }   // size >= 0
         else
@@ -218,14 +229,19 @@ void RewindManager::update(float dt)
  */
 void RewindManager::playEventsTill(float time, float *dt)
 {    
+    bool needs_rewind;
+    float rewind_time;
+
+    // Merge in all network events that have happened since the last
+    // merge and that have happened before the current time (which will
+    // be getTime()+dt - world time has not been updated yet).
+    m_rewind_queue.mergeNetworkData(World::getWorld()->getTime(), *dt,
+                                    &needs_rewind, &rewind_time);
+
     // No events, nothing to do
     if (m_rewind_queue.isEmpty())
         return;
 
-    bool needs_rewind;
-    float rewind_time;
-
-    m_rewind_queue.mergeNetworkData(&needs_rewind, &rewind_time);
     if(needs_rewind)
         Log::info("RewindManager", "At %f merging states from %f needs rewind",
                   World::getWorld()->getTime(), rewind_time);
@@ -307,9 +323,6 @@ void RewindManager::rewindTo(float rewind_time)
     // will be potentially stored in several state objects. State can be NULL
     // if the next event is not a state
     float dt = -1.0f;
-
-    // Restore the state, then all events for the specified time
-    current->replayAllStates();
 
     // Need to exit loop if in-game menu is open, since world clock
     // will not be increased while the game is paused

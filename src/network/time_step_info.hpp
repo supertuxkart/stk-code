@@ -62,11 +62,17 @@ private:
      *  60 fps. Restoring this value exactly improves accuracy of rewinds. */
     float m_local_physics_time;
 public:
-         TimeStepInfo(float time, float dt);
+    TimeStepInfo(float time, float dt);
     void insert(RewindInfo *ri);
     void undoAll();
     void replayAllEvents();
     void replayAllStates();
+    // ------------------------------------------------------------------------
+    /** Sets the tiem of this object. */
+    void setTime(float time) { m_time = time; }
+    // ------------------------------------------------------------------------
+    /** Sets the time step size of this object. */
+    void setDT(float dt) { m_dt = dt;  }
     // ------------------------------------------------------------------------
     /** Returns the time for this TimeStepInfo instance. */
     float getTime() const { return m_time;  }
@@ -86,6 +92,10 @@ public:
         const RewindInfo *ri = m_list_of_events[0];
         return ri->isState() && ri->isConfirmed();
     }   // hasConfirmedState
+    // ------------------------------------------------------------------------
+    /** Returns the number of events (and states) at this time step. Used
+     *  in unit testing. */
+    int getNumberOfEvents() const { return m_list_of_events.size(); }
 };   // TimeStepInfo
 
 #endif

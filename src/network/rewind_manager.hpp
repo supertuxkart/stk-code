@@ -145,6 +145,7 @@ public:
                          BareNetworkString *buffer, float time);
     void addNetworkState(int rewinder_index, BareNetworkString *buffer,
                          float time);
+    void addNextTimeStep(float time, float dt);
     // ------------------------------------------------------------------------
     /** Adds a Rewinder to the list of all rewinders.
      *  \return true If rewinding is enabled, false otherwise. 

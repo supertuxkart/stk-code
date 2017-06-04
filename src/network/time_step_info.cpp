@@ -29,8 +29,12 @@ TimeStepInfo::TimeStepInfo(float time, float dt)
 {
     m_time = time;
     m_dt = dt;
-    m_local_physics_time = Physics::getInstance()->getPhysicsWorld()
-                                                 ->getLocalTime();
+    // In case of unit testing physics does not exist
+    if (Physics::getInstance())
+        m_local_physics_time = Physics::getInstance()->getPhysicsWorld()
+                                                     ->getLocalTime();
+    else
+        m_local_physics_time = 0.0f;
 }   // StateEventList
 
 // --------------------------------------------------------------------
@@ -55,7 +59,7 @@ void TimeStepInfo::insert(RewindInfo *ri)
         // Events at the same time are just added to the end
         m_list_of_events.push_back(ri);
     }
-}   // addStaet
+}   // insert
 
 // --------------------------------------------------------------------
 /** Undos all events and states for this time step.
@@ -68,6 +72,7 @@ void TimeStepInfo::undoAll()
         (*i)->undo();
     }
 }   // undoAll
+
 // --------------------------------------------------------------------
 /** Replays all events for this TimeStepInfo.
  */

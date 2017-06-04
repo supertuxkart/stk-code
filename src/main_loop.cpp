@@ -33,6 +33,7 @@
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/race_event_manager.hpp"
+#include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
 #include "online/request_manager.hpp"
 #include "race/history.hpp"
@@ -234,6 +235,14 @@ void MainLoop::run()
 
         m_prev_time = m_curr_time;
         float dt   = getLimitedDt();
+
+        // Add a Time step entry to the rewind list, which can store all
+        // all input ecents being issued during the driver update.
+        if (World::getWorld() && RewindManager::get()->isEnabled())
+        {
+            RewindManager::get()
+                ->addNextTimeStep(World::getWorld()->getTime(), dt);
+        }
 
         if (!m_abort && !ProfileWorld::isNoGraphics())
         {

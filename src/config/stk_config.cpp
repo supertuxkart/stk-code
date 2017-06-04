@@ -138,6 +138,8 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_replay_delta_pos2,         "replay delta-position"      );
     CHECK_NEG(m_replay_dt,                 "replay delta-t"             );
     CHECK_NEG(m_smooth_angle_limit,        "physics smooth-angle-limit" );
+    CHECK_NEG(m_network_combine_threshold, "network combine-threshold"  );
+    
 
     // Square distance to make distance checks cheaper (no sqrt)
     m_replay_delta_pos2 *= m_replay_delta_pos2;
@@ -170,6 +172,7 @@ void STKConfig::init_defaults()
     m_replay_delta_angle         = -100;
     m_replay_delta_pos2          = -100;
     m_replay_dt                  = -100;
+    m_network_combine_threshold  = -100;
     m_title_music                = NULL;
     m_enable_networking          = true;
     m_smooth_normals             = false;
@@ -342,8 +345,11 @@ void STKConfig::getAllData(const XMLNode * root)
         ai_node->get("acceleration", &m_ai_acceleration);
     }
 
-    if(const XMLNode *networking_node= root->getNode("networking"))
+    if (const XMLNode *networking_node = root->getNode("networking"))
+    {
         networking_node->get("enable", &m_enable_networking);
+        networking_node->get("combine-threshold", &m_network_combine_threshold);
+    }
 
     if(const XMLNode *replay_node = root->getNode("replay"))
     {
