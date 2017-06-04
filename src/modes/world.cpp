@@ -299,13 +299,14 @@ void World::reset()
         Log::info("World", "Start Recording race.");
         ReplayRecorder::get()->init();
     }
-    if((NetworkConfig::get()->isServer() && !ProfileWorld::isNoGraphics()) ||
-        race_manager->isWatchingReplay())
+    if( ( (NetworkConfig::get()->isServer() && 
+           !ProfileWorld::isNoGraphics()        ) ||
+          race_manager->isWatchingReplay()           ) &&       
+        Camera::getNumCameras()==0                          )
     {
         // In case that the server is running with gui or watching replay,
         // create a camera and attach it to the first kart.
         Camera::createCamera(World::getWorld()->getKart(0));
-
     }
 
     // Reset all data structures that depend on number of karts.
