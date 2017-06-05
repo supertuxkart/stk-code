@@ -1,8 +1,8 @@
 
-/* sym.dfn - define format of libpng.sym
+/* sym.c - define format of libpng.sym
  *
- * Last changed in libpng version 1.5.0 [January 6, 2011]
- * Copyright (c) 1998-2011 Glenn Randers-Pehrson
+ * Last changed in libpng version 1.6.16 [December 22, 2014]
+ * Copyright (c) 2011-2014 Glenn Randers-Pehrson
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -10,6 +10,6 @@
  */
 
 #define PNG_EXPORTA(ordinal, type, name, args, attributes)\
-	PNG_DEFN_MAGIC-SYMBOL_PREFIX PNG_JOIN name-PNG_DEFN_END
+        PNG_DFN "@" SYMBOL_PREFIX "@@" name "@"
 
 #include "../png.h"

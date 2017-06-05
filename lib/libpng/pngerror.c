@@ -1,8 +1,8 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.5.8 [February 1, 2011]
- * Copyright (c) 1998-2012 Glenn Randers-Pehrson
+ * Last changed in libpng 1.5.28 [December 29, 2016]
+ * Copyright (c) 1998-2002,2004,2006-2014,2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -161,7 +161,7 @@ png_format_number(png_const_charp start, png_charp end, int format,
          case PNG_NUMBER_FORMAT_02u:
             /* Expects at least 2 digits. */
             mincount = 2;
-            /* fall through */
+            /* FALL THROUGH */
 
          case PNG_NUMBER_FORMAT_u:
             *--end = digits[number % 10];
@@ -171,7 +171,7 @@ png_format_number(png_const_charp start, png_charp end, int format,
          case PNG_NUMBER_FORMAT_02x:
             /* This format expects at least two digits */
             mincount = 2;
-            /* fall through */
+            /* FALL THROUGH */
 
          case PNG_NUMBER_FORMAT_x:
             *--end = digits[number & 0xf];
@@ -193,7 +193,7 @@ png_format_number(png_const_charp start, png_charp end, int format,
           * drop the decimal point.  If the number is a true zero handle that
           * here.
           */
-         if (output)
+         if (output != 0)
             *--end = '.';
          else if (number == 0) /* and !output */
             *--end = '0';
@@ -371,14 +371,15 @@ png_benign_error(png_structp png_ptr, png_const_charp error_message)
  * to 63 bytes, the name characters are output as hex digits wrapped in []
  * if the character is invalid.
  */
+
+#define PNG_MAX_ERROR_TEXT 64
+#if defined(PNG_WARNINGS_SUPPORTED) || defined(PNG_ERROR_TEXT_SUPPORTED)
 #define isnonalpha(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
 static PNG_CONST char png_digit[16] = {
    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
    'A', 'B', 'C', 'D', 'E', 'F'
 };
 
-#define PNG_MAX_ERROR_TEXT 64
-#if defined(PNG_WARNINGS_SUPPORTED) || defined(PNG_ERROR_TEXT_SUPPORTED)
 static void /* PRIVATE */
 png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp
     error_message)
@@ -578,6 +579,9 @@ png_longjmp,(png_structp png_ptr, int val),PNG_NORETURN)
    png_ptr->longjmp_fn(png_ptr->longjmp_buffer, val);
 #  endif
    }
+#else
+   PNG_UNUSED(png_ptr);
+   PNG_UNUSED(val);
 #endif
    /* Here if not setjmp support or if png_ptr is null. */
    PNG_ABORT();
