@@ -6,8 +6,8 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
                     "${JPEG_INCLUDE_DIR}"
                     "${PNG_INCLUDE_DIRS}"
                     "${ZLIB_INCLUDE_DIR}"
-                    "${CMAKE_CURRENT_BINARY_DIR}/../zlib/") # For zconf.h on WIN32
-
+                    "${CMAKE_CURRENT_BINARY_DIR}/../zlib/" # For zconf.h on WIN32
+                    "${CMAKE_CURRENT_BINARY_DIR}/../libpng/")
 if (SERVER_ONLY)
     add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)

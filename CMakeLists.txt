@@ -113,15 +113,15 @@ if((WIN32 AND NOT MINGW) OR APPLE)
     endif()
 
     # Build png library
-    set (SKIP_INSTALL_ALL TRUE)
-    set (PNG_STATIC TRUE)
-    set (PNG_TESTS FALSE)
-    set (PNG_SHARED FALSE)
+    set(SKIP_INSTALL_ALL TRUE)
+    set(PNG_STATIC TRUE CACHE BOOL "Build static lib")
+    set(PNG_TESTS FALSE CACHE BOOL "Build libpng tests")
+    set(PNG_SHARED FALSE CACHE BOOL "Build shared lib")
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libpng")
     include_directories("${PROJECT_SOURCE_DIR}/lib/libpng")
 
     set(PNG_PNG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/libpng/")
-    set(PNG_LIBRARY png15_static)
+    set(PNG_LIBRARY png_static)
 endif()
 
 # Add jpeg library
