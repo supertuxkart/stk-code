@@ -30,7 +30,6 @@ endif(POLICY CMP0054)
 
 set(CMAKE_CONFIGURATION_TYPES "Release;Debug;MinSizeRel;RelWithDebInfo")
 
-project(libpng C)
 enable_testing()
 
 set(PNGLIB_MAJOR 1)
@@ -39,9 +38,19 @@ set(PNGLIB_RELEASE 28)
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
-# needed packages
-find_package(ZLIB REQUIRED)
-include_directories(${ZLIB_INCLUDE_DIR})
+if(APPLE)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch x86_64")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch x86_64 -F/Library/Frameworks")
+endif()
+
+# Needed packages. Since WIN32 (except mingw) uses the included zlib
+# version, find_package would fail with an error message. Since
+# all variables are already set in this case, the find package
+# is actually not necessary in this case, so just ignore it
+if(NOT WIN32 OR MINGW)
+    find_package(ZLIB REQUIRED)
+    include_directories(${ZLIB_INCLUDE_DIR})
+endif()
 
 if(NOT WIN32)
   find_library(M_LIBRARY
@@ -50,6 +59,7 @@ if(NOT WIN32)
   )
   if(NOT M_LIBRARY)
     message(STATUS "math lib 'libm' not found; floating point support disabled")
+    set(M_LIBRARY "")
   endif()
 else()
   # not needed on windows
