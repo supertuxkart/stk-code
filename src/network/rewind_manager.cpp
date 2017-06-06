@@ -188,8 +188,7 @@ void RewindManager::update(float dt)
     float time = World::getWorld()->getTime();
     m_not_rewound_time = time;
 
-    // Clients don't save state, so they just update m_last_saved_state
-    // (only for the above if test) and exit.
+    // Clients don't save state, so they just exit.
     if ( NetworkConfig::get()->isClient() || 
          time - m_last_saved_state < m_state_frequency  )
     {
@@ -336,7 +335,7 @@ void RewindManager::rewindTo(float rewind_time)
 
     // Now go forward through the list of rewind infos:
     // ------------------------------------------------
-    while (world->getTime() < current_time)
+    while (current !=m_rewind_queue.getLast())
     {
         // Now handle all events(!) at the current time (i.e. between 
         // World::getTime() and World::getTime()+dt) before updating

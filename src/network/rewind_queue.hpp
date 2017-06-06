@@ -88,6 +88,11 @@ public:
     bool hasMoreRewindInfo() const;
     void undoUntil(float undo_time);
     float determineNextDT(float max_time);
+    // ------------------------------------------------------------------------
+    /** Returns the last (i.e. newest) entry in the TimeStepInfo list. This is
+     *  used for rewinds, since it's the first TimeStep that must not be
+     *  rewound. */
+    TimeStepInfo *getLast() { return *m_time_step_info.rbegin(); }
 
     // ------------------------------------------------------------------------
     RewindQueue::AllTimeStepInfo::iterator& operator++()
