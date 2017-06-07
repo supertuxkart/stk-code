@@ -1248,22 +1248,21 @@ void Kart::update(float dt)
         );
 #endif
 
-#undef DEBUG_TO_COMPARE_KART_PHYSICS
+#define DEBUG_TO_COMPARE_KART_PHYSICS
 #ifdef DEBUG_TO_COMPARE_KART_PHYSICS
     // This information is useful when comparing kart physics, e.g. to
     // see top speed, acceleration (i.e. time to top speed) etc.
-    Log::verbose("physics", "%s t %f %f xyz %f %f %f v %f %f %f sk %f %d %f %f %f st %f %f",
+    Log::verbose("physics", "%s t %f %f xyz(9-11) %f %f %f v(13-15) %f %f %f steerf(17) %f maxangle(19) %f speed(21) %f steering(23-24) %f %f clock %lf",
         getIdent().c_str(),
         World::getWorld()->getTime(), dt,
         getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
-        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),
-        m_skidding->getSkidFactor(),
-        m_skidding->getSkidState(),
-        m_skidding->getSteeringFraction(),
-        getMaxSteerAngle(),
-        m_speed,
-        m_vehicle->getWheelInfo(0).m_steering,
-        m_vehicle->getWheelInfo(1).m_steering
+        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),  //13,14,15
+        m_skidding->getSteeringFraction(), //19
+        getMaxSteerAngle(),  //20
+        m_speed,  //21
+        m_vehicle->getWheelInfo(0).m_steering,  //23
+        m_vehicle->getWheelInfo(1).m_steering,  //24
+        StkTime::getRealTime()
         );
 #endif
 

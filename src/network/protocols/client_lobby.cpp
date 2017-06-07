@@ -628,7 +628,8 @@ void ClientLobby::startGame(Event* event)
     // Triggers the world finite state machine to go from WAIT_FOR_SERVER_PHASE
     // to READY_PHASE.
     World::getWorld()->setReadyToRace();
-    Log::info("ClientLobby", "Starting new game");
+    Log::info("ClientLobby", "Starting new game at %lf",
+              StkTime::getRealTime());
 }   // startGame
 
 //-----------------------------------------------------------------------------
@@ -644,6 +645,8 @@ void ClientLobby::startingRaceNow()
     NetworkString *ns = getNetworkString(2);
     ns->addUInt8(LE_STARTED_RACE);
     sendToServer(ns, /*reliable*/true);
+    Log::verbose("ClientLobby", "StartingRaceNow at %lf",
+                 StkTime::getRealTime());
     terminateLatencyProtocol();
 }   // startingRaceNow
 

@@ -128,11 +128,12 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
                                    World::getWorld()->getTime() );
 
     Log::info("GameProtocol", "Action at %f: %d value %d",
-              World::getWorld()->getTime(), action, value);
+              World::getWorld()->getTime(), action, 
+              action==PlayerAction::PA_STEER_RIGHT ? -value : value);
 }   // controllerAction
 
 // ----------------------------------------------------------------------------
-/** Called when a controller event is receiver - either on the server from
+/** Called when a controller event is received - either on the server from
  *  a client, or on a client from the server. It sorts the event into the
  *  RewindManager's network event queue. The server will also send this 
  *  event immediately to all clients (except to the original sender).
