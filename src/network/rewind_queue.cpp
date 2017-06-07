@@ -295,7 +295,8 @@ void RewindQueue::mergeNetworkData(float world_time, float dt,
 
 
         // Check if a rewind is necessary
-        if (tsi->getTime() < world_time)
+        if (tsi->getTime() < world_time ||
+            (*i)->isState() && tsi == m_time_step_info.back())
         {
             *needs_rewind = true;
             if (tsi->getTime() < *rewind_time) *rewind_time = tsi->getTime();
