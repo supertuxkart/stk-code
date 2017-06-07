@@ -383,43 +383,6 @@ void RewindQueue::undoUntil(float undo_time)
 }   // undoUntil
 
 // ----------------------------------------------------------------------------
-
-#ifdef XX
-    // Now test if the three events are sorted in the right order:
-    // State, then time, then event
-    assert(hasMoreRewindInfo());
-    assert(!isEmpty());
-    RewindInfo *ri = getCurrent();
-    assert(ri->getTime() == 0.0f);
-    assert(ri->isState());
-    RewindInfoState *ris = dynamic_cast<RewindInfoState*>(ri);
-    assert(ris->getBuffer()->getTotalSize() == 1);
-    assert(ris->getBuffer()->getUInt8() == 1);
-
-    operator++();
-    ri = getCurrent();
-    assert(!isEmpty());
-    assert(hasMoreRewindInfo());
-    assert(ri->getTime() == 0.0f);
-    assert(ri->isTime());
-
-    operator++();
-    ri = getCurrent();
-    assert(!isEmpty());
-    assert(hasMoreRewindInfo());
-    assert(ri->getTime() == 0.0f);
-    assert(ri->isEvent());
-    RewindInfoEvent *rie = dynamic_cast<RewindInfoEvent*>(ri);
-    assert(rie->getBuffer()->getTotalSize() == 1);
-    assert(rie->getBuffer()->getUInt8() == 2);
-
-    operator++();
-    assert(isEmpty());
-    assert(!hasMoreRewindInfo());
-
-}    // testingSortingOrderType
-#endif
-// ----------------------------------------------------------------------------
 /** Unit tests for RewindQueue. It tests:
  *  - Sorting order of RewindInfos at the same time (i.e. state before time
  *    before events).
@@ -466,42 +429,34 @@ void RewindQueue::unitTesting()
     assert(q0.m_time_step_info.size() == 2);
 
     q0.addNetworkEvent(dummy_rewinder, NULL, 0.0f);
-    assert((*q0.m_time_step_info.begin())->getNumberOfEvents() == 1);
 
     bool needs_rewind;
     float rewind_time;
     float world_time = 0.0f;
     float dt = 0.01f;
+    assert((*q0.m_time_step_info.begin())->getNumberOfEvents() == 1);
     q0.mergeNetworkData(world_time, dt, &needs_rewind, &rewind_time);
     assert((*q0.m_time_step_info.begin())->getNumberOfEvents() == 2);
 
-    // This will add a third TimeStep at t=0.5
-    q0.addNetworkEvent(dummy_rewinder, NULL, 0.5f);
+    // This will be added to timestep 0
+    q0.addNetworkEvent(dummy_rewinder, NULL, 0.2f);
+    dt = 0.01f;   // to small, event from 0.2 will not be merged
     q0.mergeNetworkData(world_time, dt, &needs_rewind, &rewind_time);
-    assert(q0.m_time_step_info.size() == 3);
+    assert(q0.m_time_step_info.size() == 2);
+    assert((*q0.m_time_step_info.begin())->getNumberOfEvents() == 2);
+    dt = 0.3f;
+    q0.mergeNetworkData(world_time, dt, &needs_rewind, &rewind_time);
+    assert(q0.m_time_step_info.size() == 2);
+    assert((*q0.m_time_step_info.begin())->getNumberOfEvents() == 3);
 
     // This event will get added to the last time step info at 1.0:
     q0.addNetworkEvent(dummy_rewinder, NULL, 1.0f);
+    world_time = 0.8f;
+    dt = 0.3f;
     q0.mergeNetworkData(world_time, dt, &needs_rewind, &rewind_time);
     // Note that end() is behind the list, i.e. invalid, but rbegin()
     // is the last element
     assert((*q0.m_time_step_info.rbegin())->getNumberOfEvents() == 1);
-
-    q0.addNetworkEvent(dummy_rewinder, NULL, 1.5f);
-    q0.mergeNetworkData(world_time, dt, &needs_rewind, &rewind_time);
-    assert(q0.m_time_step_info.size() == 4);
-
-    // Add events within the thresold size to the last event and make sure
-    // no new time step info is created, but the events are all added to the
-    // last entry:
-    q0.addNetworkEvent(dummy_rewinder, NULL,
-                       1.5f - stk_config->m_network_combine_threshold / 2.0f);
-    q0.addNetworkEvent(dummy_rewinder, NULL, 
-                       1.5f + stk_config->m_network_combine_threshold / 2.0f);
-    q0.mergeNetworkData(world_time, dt, &needs_rewind, &rewind_time);
-    assert(q0.m_time_step_info.size() == 4);
-    assert((*q0.m_time_step_info.rbegin())->getNumberOfEvents() == 3);
-
 
     // Bugs seen before
     // ----------------
@@ -514,6 +469,4 @@ void RewindQueue::unitTesting()
     b1.addNewTimeStep(2.0f, 0.1f);
     TimeStepInfo *tsi = b1.getCurrent();
     assert(tsi->getTime() == 2.0f);
-#ifdef XX
-#endif
 }   // unitTesting
