@@ -350,7 +350,6 @@ void RewindManager::rewindTo(float rewind_time)
         world->updateTime(dt);
 
         ++m_rewind_queue;
-        if (!m_rewind_queue.hasMoreRewindInfo()) break;
         current = m_rewind_queue.getCurrent();
     }   // while (world->getTime() < current_time)
 
