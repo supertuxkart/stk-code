@@ -203,8 +203,8 @@ convert_sound()
       OGG_RATE=`ogginfo "$FILE" | grep "Rate: " | cut -f 2 -d " " \
                                                             | grep -o '[0-9]*'`
       
-      if [ ! -z "$OGG_RATE" ] && [ "$OGG_RATE" -gt "32000" ]; then
-         OGGENC_CMD="$OGGENC_CMD --resample 32000"
+      if [ ! -z "$OGG_RATE" ] && [ "$OGG_RATE" -gt "$SOUND_SAMPLE" ]; then
+         OGGENC_CMD="$OGGENC_CMD --resample $SOUND_SAMPLE"
       fi
       
       OGGENC_CMD="$OGGENC_CMD -b $SOUND_QUALITY"
