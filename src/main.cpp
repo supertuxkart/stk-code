@@ -1670,8 +1670,8 @@ int main(int argc, char *argv[] )
         if (Online::UpdateManager::UpdateAvailable())
         {
             MessageDialog *dialog =
-                new MessageDialog(_("A new version of SuperTuxKart is available! Get it from: "
-                "SuperTuxKart.net/Download"),
+                new MessageDialog(_("A new version of SuperTuxKart is available! \n"
+                "Get it from: SuperTuxKart.net/Download"),
                 /*from queue*/ true);
             GUIEngine::DialogQueue::get()->pushDialog(dialog);
         }
