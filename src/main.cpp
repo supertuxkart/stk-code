@@ -1,8 +1,8 @@
 
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2011-2015 Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2004-2017 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2011-2017 Joerg Henrichs, Marianne Gagnon, The SuperTuxKart Team and contributors
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -215,6 +215,7 @@
 #include "network/protocols/get_public_address.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
+#include "online/update_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
@@ -527,8 +528,8 @@ void cmdLineHelp()
 {
     fprintf(stdout,
     "Usage: %s [OPTIONS]\n\n"
-    "Run SuperTuxKart, a racing game with go-kart that features"
-    " the Tux and friends.\n\n"
+    "Run SuperTuxKart, a go-kart racing game that features "
+    "Tux and friends.\n\n"
     "Options:\n"
     "  -N,  --no-start-screen  Immediately start race without showing a "
                               "menu.\n"
@@ -1664,6 +1665,17 @@ int main(int argc, char *argv[] )
             Log::warn("OpenGL", "OpenGL version is too old!");
         }
 #endif
+
+        // Alert the user if there are any updates available
+        if (Online::UpdateManager::UpdateAvailable())
+        {
+            MessageDialog *dialog =
+                new MessageDialog(_("A new version of SuperTuxKart is available! Get it from: "
+                "SuperTuxKart.net/Download"),
+                /*from queue*/ true);
+            GUIEngine::DialogQueue::get()->pushDialog(dialog);
+        }
+
         // Note that on the very first run of STK internet status is set to
         // "not asked", so the report will only be sent in the next run.
         if(UserConfigParams::m_internet_status==Online::RequestManager::IPERM_ALLOWED)
