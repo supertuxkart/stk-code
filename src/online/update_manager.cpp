@@ -53,12 +53,20 @@ namespace Online
 
             if(major < otherVersion.major)
                 return true;
+            if(major > otherVersion.major)
+                return false;
             if(minor < otherVersion.minor)
                 return true;
+            if(minor > otherVersion.minor)
+                return false;
             if(revision < otherVersion.revision)
                 return true;
+            if(revision > otherVersion.revision)
+                return false;
             if(build < otherVersion.build)
                 return true;
+            if(build > otherVersion.build)
+                return false;
             return false;
         }
 
