@@ -212,6 +212,7 @@ void WorldStatus::updateTime(const float dt)
             m_auxiliary_timer += dt;
 
             if (UserConfigParams::m_artist_debug_mode &&
+                !NetworkConfig::get()->isNetworking() &&
                 race_manager->getNumberOfKarts() -
                 race_manager->getNumSpareTireKarts() == 1 &&
                 race_manager->getTrackName() != "tutorial")
