@@ -528,8 +528,8 @@ void cmdLineHelp()
 {
     fprintf(stdout,
     "Usage: %s [OPTIONS]\n\n"
-    "Run SuperTuxKart, a go-kart racing game that features "
-    "Tux and friends.\n\n"
+    "Run SuperTuxKart, a racing game with go-kart that features"
+    " the Tux and friends.\n\n"
     "Options:\n"
     "  -N,  --no-start-screen  Immediately start race without showing a "
                               "menu.\n"
