@@ -91,7 +91,7 @@ namespace Online
 
         curl = curl_easy_init();
         if (curl) { // Make sure curl initialized properly
-            curl_easy_setopt(curl, CURLOPT_URL, "https://jacobspctuneup.tk/CurrVer.php");
+            curl_easy_setopt(curl, CURLOPT_URL, "http://addons.supertuxkart.net/CurrVer.php");
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
             result = curl_easy_perform(curl);
