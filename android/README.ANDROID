@@ -31,7 +31,8 @@ after some tweaks, but atm. only linux is supported.
 
 Dependencies list (may be incomplete):
 
-    autoconf, automake, make, python, ant, imagemagick, cmake, vorbis-tools
+    autoconf, automake, make, python, gradle, ant, imagemagick, cmake, 
+    vorbis-tools
 
 Additionally some dependencies for optimize_data script:
 
@@ -73,6 +74,13 @@ architectures are "armv7", "x86" and "aarch64". The default is "armv7".
 You can choose build type by setting BUILD_TYPE environment variable to "debug"
 or "release". The default is debug build. Note that if you choose release build,
 you have to manually sign the apk with your key and run zipalign.
+
+Additionally you can choose the build tool by setting BUILD_TOOL environment
+variable to "gradle" or "ant". Note that ant has been already removed from
+Android SDK, so you have to use SDK <= 25.2.5 for building with ant. By default 
+the BUILD_TOOL is set to "gradle". It has hardcoded version of SDK build-tools 
+that are set to "25.0.3", so you have to use this particular version (or you can
+edit build.gradle file).
 
 Basically if all dependencies are installed in the system, it should be enough
 to just run:
