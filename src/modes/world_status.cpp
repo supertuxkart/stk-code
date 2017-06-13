@@ -182,6 +182,10 @@ void WorldStatus::update(float dt)
  */
 void WorldStatus::updateTime(const float dt)
 {
+    Log::info("worldstatus", "phase %d time %lf %aux %lf dt %f next time %f",
+        m_phase, m_time, m_auxiliary_timer, dt,
+        m_time + dt
+    );
     switch (m_phase)
     {
         // Note: setup phase must be a separate phase, since the race_manager
@@ -440,7 +444,7 @@ float WorldStatus::adjustDT(float dt)
     // If request, adjust world time to go ahead (adjust>0) or
     // slow down (<0). This is done in 5% of dt steps so that the
     // user will not notice this.
-    const float FRACTION = 0.05f;   // fraction of dt to be adjusted
+    const float FRACTION = 0.10f;   // fraction of dt to be adjusted
     float time_adjust;
     if (m_adjust_time_by >= 0)   // make it run faster
     {
@@ -449,7 +453,7 @@ float WorldStatus::adjustDT(float dt)
         if (m_adjust_time_by > 0)
             Log::verbose("info", "At %f %f adjusting time by %f dt %f to dt %f for %f",
                 World::getWorld()->getTime(), StkTime::getRealTime(),
-                time_adjust, dt, dt + time_adjust, m_adjust_time_by);
+                time_adjust, dt, dt - time_adjust, m_adjust_time_by);
     }
     else   // m_adjust_time negative, i.e. will go slower
     {
@@ -457,10 +461,10 @@ float WorldStatus::adjustDT(float dt)
         if (time_adjust < m_adjust_time_by) time_adjust = m_adjust_time_by;
         Log::verbose("info", "At %f %f adjusting time by %f dt %f to dt %f for %f",
             World::getWorld()->getTime(), StkTime::getRealTime(),
-            time_adjust, dt, dt + time_adjust, m_adjust_time_by);
+            time_adjust, dt, dt - time_adjust, m_adjust_time_by);
     }
     m_adjust_time_by -= time_adjust;
-    dt += time_adjust;
+    dt -= time_adjust;
     return dt;
 }  // adjustDT
 
