@@ -1,4 +1,4 @@
-//  SuperTuxKart - a fun racing game with go-kart
+//  SuperTuxKart - a fun racing game with go-karts
 //
 //  Copyright (C) 2013-2015 Lionel Fuentes
 //
@@ -91,7 +91,7 @@
 
             std::string msg =   "SuperTuxKart crashed!\n"
                                 "Please hit Ctrl+C to copy to clipboard and signal the problem\n"
-                                "to the developers on our forum: http://forum.freegamedev.net/viewforum.php?f=16\n"
+                                "to the developers on our issue tracker: http://issues.supertuxkart.net/ \n"
                                 "\n"
                                 "Call stack:\n";
             msg += callstack;
