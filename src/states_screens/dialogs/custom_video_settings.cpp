@@ -201,7 +201,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         UserConfigParams::m_high_definition_textures =
             getWidget<CheckBoxWidget>("hd-textures")->getState() ? 0x03 : 0x02;
 
-        UserConfigParams::m_texture_compression =
+        UserConfigParams::m_hq_mipmap =
             getWidget<CheckBoxWidget>("hq-mipmap")->getState();
 
         UserConfigParams::m_show_steering_animations =
