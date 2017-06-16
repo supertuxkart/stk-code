@@ -19,15 +19,15 @@
             <spacer height="15" width="10"/>
 
             <!-- ************ GRAPHICAL EFFECTS SETTINGS ************ -->
-            <div width="75%" height="fit" layout="horizontal-row" id="outer_box" >
-                <label I18N="In the video settings" text="Graphical Effects Level" align="center"/>
-                <spacer width="20" height="20"/>
+            <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
+                <label width="25%" I18N="In the video settings" text="Graphical Effects Level" />
 
-                <div layout="vertical-row" proportion="1" height="fit" id="inner_box">
+                <div layout="vertical-row" proportion="1" height="fit" width="50%" id="inner_box" >
                     <gauge id="gfx_level" min_value="1" max_value="8" width="300" align="center" />
                     <spacer height="5" width="10"/>
-                    <button id="custom" text="Custom settings..." I18N="In the video settings" align="center"/>
+                    <button id="custom" text="Advanced settings..." I18N="In the video settings" align="center"/>
                 </div>
+                <spacer height="10" width="25%"/>
             </div>
 
             <spacer height="10" width="10"/>
@@ -41,6 +41,15 @@
             </div>
 
             <spacer height="10" width="10"/>
+
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label width="25%" I18N="In the video settings" text="Rendered image scale" />
+
+                <div layout="vertical-row" proportion="1" height="fit" width="50%" >
+                    <gauge id="image_quality" min_value="0" max_value="2" width="300" align="center" />
+                </div>
+                <spacer height="10" width="25%"/>
+            </div>
 
             <!-- ************ RESOLUTION CHOICE ************ -->
             <spacer height="10" width="10"/>
