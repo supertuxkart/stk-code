@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2015 Marianne Gagnon
+//  Copyright (C) 2009-2017 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -39,10 +39,12 @@ struct GFXPreset
     bool animatedScenery;
     int animatedCharacters;
     int image_quality;
+    int anisotropy;
     /** Depth of field */
     bool dof;
     bool global_illumination;
     bool degraded_ibl;
+    int hd_textures;
 };
 
 /**

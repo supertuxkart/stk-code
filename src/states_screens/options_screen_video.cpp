@@ -261,6 +261,17 @@ void OptionsScreenVideo::init()
     assert( vsync != NULL );
     vsync->setState( UserConfigParams::m_vsync );
 
+    GUIEngine::SpinnerWidget* image_quality =
+        getWidget<GUIEngine::SpinnerWidget>("image_quality");
+    assert( image_quality != NULL );
+    int image_quality_value = 2;
+    if (UserConfigParams::m_scale_rtts_factor == 0.5f)  image_quality_value = 0;
+    else if (UserConfigParams::m_scale_rtts_factor == 0.75f)  image_quality_value = 1;
+    image_quality->addLabel(_("0.5x"));
+    image_quality->addLabel(_("0.75x"));
+    image_quality->addLabel(_("1x"));
+    image_quality->setValue(image_quality_value);
+
 
     // ---- video modes
     DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");
@@ -461,7 +472,7 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: if all kart animations are enabled
     const core::stringw all = _LTR("All");
     //I18N: if some kart animations are enabled
-    const core::stringw me = _LTR("Me Only");
+    const core::stringw me = _LTR("Human players only");
     //I18N: if no kart animations are enabled
     const core::stringw none = _LTR("None");
 
@@ -638,6 +649,21 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
 
         rememberWinpos->setActive(!fullscreen->getState());
+    }
+    else if (name == "image_quality")
+    {
+        switch (getWidget<SpinnerWidget>("image_quality")->getValue())
+        {
+            case 0:
+                UserConfigParams::m_scale_rtts_factor = 0.5f;
+                break;
+            case 1:
+                UserConfigParams::m_scale_rtts_factor = 0.75f;
+                break;
+            case 2:
+                UserConfigParams::m_scale_rtts_factor = 1.0f;
+                break;
+        }
     }
 }   // eventCallback
 
