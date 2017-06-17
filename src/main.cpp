@@ -558,6 +558,8 @@ void cmdLineHelp()
                               "laps.\n"
     "       --profile-time=n   Enable automatic driven profile mode for n "
                               "seconds.\n"
+    "       --unlock-all       Permanently unlock all karts and tracks for testing.\n"
+    "       --no-unlock-all    Disable unlock-all (i.e. base unlocking on player achievement).\n"
     "       --no-graphics      Do not display the actual race.\n"
     "       --demo-mode=t      Enables demo mode after t seconds of idle time in "
                                "main menu.\n"
@@ -1234,7 +1236,17 @@ int handleCmdLine()
             race_manager->setNumLaps(n);
         }
     }   // --profile-laps
-
+    
+    if(CommandLine::has("--unlock-all"))
+    {
+        UserConfigParams::m_everything_unlocked = true;
+    } // --unlock-all
+    
+    if(CommandLine::has("--no-unlock-all"))
+    {
+        UserConfigParams::m_everything_unlocked = false;
+    } // --no-unlock-all
+    
     if(CommandLine::has("--profile-time",  &n))
     {
         Log::verbose("main", "Profiling: %d seconds.", n);
