@@ -1162,6 +1162,7 @@ int handleCmdLine()
     // used only for debugging/testing
     if (CommandLine::has("--cutscene", &s))
     {
+        UserConfigParams::m_no_start_screen = true; // Purple menu background otherwise
         race_manager->setTrack(s);
         StateManager::get()->enterGameState();
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
