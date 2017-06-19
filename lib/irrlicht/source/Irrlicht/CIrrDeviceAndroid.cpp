@@ -89,7 +89,7 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
 	
 	ExposedVideoData.OGLESAndroid.Window = Android->window;
 
-	getVideoModeList();
+	createVideoModeList();
 
 	createDriver();
 
@@ -103,25 +103,26 @@ CIrrDeviceAndroid::~CIrrDeviceAndroid()
 	Android->userData = NULL;
 }
 
-video::IVideoModeList* CIrrDeviceAndroid::getVideoModeList()
+void CIrrDeviceAndroid::createVideoModeList()
 {
-	if (Android == NULL || Android->window == NULL)
-		return NULL;
-
-	core::dimension2d<u32> size = core::dimension2d<u32>(
-									ANativeWindow_getWidth(Android->window),
-									ANativeWindow_getHeight(Android->window));
-
-	CreationParams.WindowSize.Width = size.Width;
-	CreationParams.WindowSize.Height = size.Height;
-
-	if (!VideoModeList.getVideoModeCount())
+	if (VideoModeList.getVideoModeCount() > 0)
+		return;
+		
+	int width = ANativeWindow_getWidth(Android->window);
+	int height = ANativeWindow_getHeight(Android->window);
+	
+	if (width > 0 && height > 0)
 	{
-		VideoModeList.addMode(size, 32);
-		VideoModeList.setDesktop(32, size);
+		CreationParams.WindowSize.Width = width;
+		CreationParams.WindowSize.Height = height;
 	}
 
-	return &VideoModeList;
+	core::dimension2d<u32> size = core::dimension2d<u32>(
+									CreationParams.WindowSize.Width,
+									CreationParams.WindowSize.Height);
+
+	VideoModeList.addMode(size, 32);
+	VideoModeList.setDesktop(32, size);
 }
 
 void CIrrDeviceAndroid::createDriver()

@@ -54,7 +54,6 @@ namespace irr
 		virtual bool deactivateGyroscope();
 		virtual bool isGyroscopeActive();
 		virtual bool isGyroscopeAvailable();
-		video::IVideoModeList* getVideoModeList();
 		
 		class CCursorControl : public gui::ICursorControl
 		{
@@ -114,6 +113,7 @@ namespace irr
 		
 		void createDriver();
 		void createKeyMap();
+		void createVideoModeList();
 		void getKeyChar(SEvent& event);
 		video::SExposedVideoData& getExposedVideoData();
 		
