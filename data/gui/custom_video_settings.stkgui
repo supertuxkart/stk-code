@@ -152,25 +152,25 @@
         <spacer height="20" width="10" />
 
         <div layout="horizontal-row" width="100%" proportion="1">
-            <label text="Animated Characters" I18N="Video settings" width="40%"/>
+            <label text="Animated Characters" I18N="Video settings" width="50%"/>
             <spacer width="10" height="10"/>
-            <gauge id="steering_animations" min_value="0" max_value="2" width="50%" />
+            <gauge id="steering_animations" min_value="0" max_value="2" width="45%" />
         </div>
 
         <spacer height="4" width="10" />
 
         <div layout="horizontal-row" width="100%" proportion="1">
-            <label text="Rendered image quality" I18N="Video settings" width="40%"/>
+            <label text="Rendered image quality" I18N="Video settings" width="50%"/>
             <spacer width="10" height="10"/>
-            <gauge id="image_quality" min_value="0" max_value="3" width="50%" />
+            <gauge id="image_quality" min_value="0" max_value="3" width="45%" />
         </div>
 
         <spacer height="4" width="10" />
 
         <div layout="horizontal-row" width="100%" proportion="1">
-            <label text="Amount of scenery (Geometry detail)" I18N="Video settings" width="40%"/>
+            <label text="Amount of scenery (Geometry detail)" I18N="Video settings" width="50%"/>
             <spacer width="10" height="10"/>
-            <gauge id="geometry_detail" min_value="0" max_value="2" width="50%" />
+            <gauge id="geometry_detail" min_value="0" max_value="2" width="45%" />
         </div>
 
         <spacer height="10" width="10" />
