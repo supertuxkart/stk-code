@@ -256,11 +256,18 @@ void OptionsScreenVideo::init()
     GUIEngine::SpinnerWidget* scale_rtts_factor =
         getWidget<GUIEngine::SpinnerWidget>("scale_rtts_factor");
     assert( scale_rtts_factor != NULL );
-    int scale_rtts_factor_value = 2;
+    int scale_rtts_factor_value = 5;
     if (UserConfigParams::m_scale_rtts_factor == 0.5f)  scale_rtts_factor_value = 0;
-    else if (UserConfigParams::m_scale_rtts_factor == 0.75f)  scale_rtts_factor_value = 1;
+    else if (UserConfigParams::m_scale_rtts_factor == 0.6f)  scale_rtts_factor_value = 1;
+    else if (UserConfigParams::m_scale_rtts_factor == 0.7f)  scale_rtts_factor_value = 2;
+    else if (UserConfigParams::m_scale_rtts_factor == 0.8f)  scale_rtts_factor_value = 3;
+    else if (UserConfigParams::m_scale_rtts_factor == 0.9f)  scale_rtts_factor_value = 4;
+    scale_rtts_factor->clearLabels();
     scale_rtts_factor->addLabel(_("0.5x"));
-    scale_rtts_factor->addLabel(_("0.75x"));
+    scale_rtts_factor->addLabel(_("0.6x"));
+    scale_rtts_factor->addLabel(_("0.7x"));
+    scale_rtts_factor->addLabel(_("0.8x"));
+    scale_rtts_factor->addLabel(_("0.9x"));
     scale_rtts_factor->addLabel(_("1x"));
     scale_rtts_factor->setValue(scale_rtts_factor_value);
 
@@ -650,9 +657,18 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
                 UserConfigParams::m_scale_rtts_factor = 0.5f;
                 break;
             case 1:
-                UserConfigParams::m_scale_rtts_factor = 0.75f;
+                UserConfigParams::m_scale_rtts_factor = 0.6f;
                 break;
             case 2:
+                UserConfigParams::m_scale_rtts_factor = 0.7f;
+                break;
+            case 3:
+                UserConfigParams::m_scale_rtts_factor = 0.8f;
+                break;
+            case 4:
+                UserConfigParams::m_scale_rtts_factor = 0.9f;
+                break;
+            case 5:
                 UserConfigParams::m_scale_rtts_factor = 1.0f;
                 break;
         }
