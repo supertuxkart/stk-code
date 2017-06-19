@@ -74,11 +74,11 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
         1 : UserConfigParams::m_show_steering_animations);
 
     SpinnerWidget* geometry_level = getWidget<SpinnerWidget>("geometry_detail");
-    //I18N: Geometry level disabled : lowest level, no details
-    geometry_level->addLabel(_("Disabled"));
-    //I18N: Geometry level low : few details are displayed
-    geometry_level->addLabel(_("Low"));
-    //I18N: Geometry level high : everything is displayed
+    //I18N: Geometry level low: lowest level, just basic details
+     geometry_level->addLabel(_("Low"));
+    //I18N: Geometry level medium: some more details are displayed
+    geometry_level->addLabel(_("Medium"));
+    //I18N: Geometry level high: everything is displayed
     geometry_level->addLabel(_("High"));
     geometry_level->setValue(
         UserConfigParams::m_geometry_level == 2 ? 0 :

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2015 Marianne Gagnon
+//  Copyright (C) 2009-2017 Marianne Gagnon, STK Team and contributors
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -143,26 +143,22 @@ struct Resolution
 // ----------------------------------------------------------------------------
 int OptionsScreenVideo::getImageQuality()
 {
-    if (UserConfigParams::m_scale_rtts_factor == 0.8f &&
-        UserConfigParams::m_trilinear == false &&
+    if (UserConfigParams::m_trilinear == false &&
         UserConfigParams::m_anisotropic == 0 &&
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
         UserConfigParams::m_hq_mipmap == false)
         return 0;
-    if (UserConfigParams::m_scale_rtts_factor == 1.0f &&
-        UserConfigParams::m_trilinear == true &&
+    if (UserConfigParams::m_trilinear == true &&
         UserConfigParams::m_anisotropic == 2 &&
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
         UserConfigParams::m_hq_mipmap == false)
         return 1;
-    if (UserConfigParams::m_scale_rtts_factor == 1.0f &&
-        UserConfigParams::m_trilinear == true &&
+    if (UserConfigParams::m_trilinear == true &&
         UserConfigParams::m_anisotropic == 4 &&
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
         UserConfigParams::m_hq_mipmap == false)
         return 2;
-    if (UserConfigParams::m_scale_rtts_factor == 1.0f &&
-        UserConfigParams::m_trilinear == true &&
+    if (UserConfigParams::m_trilinear == true &&
         UserConfigParams::m_anisotropic == 16 &&
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
         UserConfigParams::m_hq_mipmap == true)
@@ -176,28 +172,24 @@ void OptionsScreenVideo::setImageQuality(int quality)
     switch (quality)
     {
         case 0:
-            UserConfigParams::m_scale_rtts_factor = 0.8f;
             UserConfigParams::m_trilinear = false;
             UserConfigParams::m_anisotropic = 0;
             UserConfigParams::m_high_definition_textures = 0x02;
             UserConfigParams::m_hq_mipmap = false;
             break;
         case 1:
-            UserConfigParams::m_scale_rtts_factor = 1.0f;
             UserConfigParams::m_trilinear = true;
             UserConfigParams::m_anisotropic = 2;
             UserConfigParams::m_high_definition_textures = 0x02;
             UserConfigParams::m_hq_mipmap = false;
             break;
         case 2:
-            UserConfigParams::m_scale_rtts_factor = 1.0f;
             UserConfigParams::m_trilinear = true;
             UserConfigParams::m_anisotropic = 4;
             UserConfigParams::m_high_definition_textures = 0x03;
             UserConfigParams::m_hq_mipmap = false;
             break;
         case 3:
-            UserConfigParams::m_scale_rtts_factor = 1.0f;
             UserConfigParams::m_trilinear = true;
             UserConfigParams::m_anisotropic = 16;
             UserConfigParams::m_high_definition_textures = 0x03;
@@ -260,6 +252,17 @@ void OptionsScreenVideo::init()
         getWidget<GUIEngine::CheckBoxWidget>("vsync");
     assert( vsync != NULL );
     vsync->setState( UserConfigParams::m_vsync );
+
+    GUIEngine::SpinnerWidget* scale_rtts_factor =
+        getWidget<GUIEngine::SpinnerWidget>("scale_rtts_factor");
+    assert( scale_rtts_factor != NULL );
+    int scale_rtts_factor_value = 2;
+    if (UserConfigParams::m_scale_rtts_factor == 0.5f)  scale_rtts_factor_value = 0;
+    else if (UserConfigParams::m_scale_rtts_factor == 0.75f)  scale_rtts_factor_value = 1;
+    scale_rtts_factor->addLabel(_("0.5x"));
+    scale_rtts_factor->addLabel(_("0.75x"));
+    scale_rtts_factor->addLabel(_("1x"));
+    scale_rtts_factor->setValue(scale_rtts_factor_value);
 
 
     // ---- video modes
@@ -461,7 +464,7 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: if all kart animations are enabled
     const core::stringw all = _LTR("All");
     //I18N: if some kart animations are enabled
-    const core::stringw me = _LTR("Me Only");
+    const core::stringw me = _LTR("Human players only");
     //I18N: if no kart animations are enabled
     const core::stringw none = _LTR("None");
 
@@ -638,6 +641,21 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
 
         rememberWinpos->setActive(!fullscreen->getState());
+    }
+    else if (name == "scale_rtts_factor")
+    {
+        switch (getWidget<SpinnerWidget>("scale_rtts_factor")->getValue())
+        {
+            case 0:
+                UserConfigParams::m_scale_rtts_factor = 0.5f;
+                break;
+            case 1:
+                UserConfigParams::m_scale_rtts_factor = 0.75f;
+                break;
+            case 2:
+                UserConfigParams::m_scale_rtts_factor = 1.0f;
+                break;
+        }
     }
 }   // eventCallback
 
