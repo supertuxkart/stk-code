@@ -1252,7 +1252,7 @@ void Kart::update(float dt)
 #ifdef DEBUG_TO_COMPARE_KART_PHYSICS
     // This information is useful when comparing kart physics, e.g. to
     // see top speed, acceleration (i.e. time to top speed) etc.
-    Log::verbose("physics", "%s t %f %f xyz(9-11) %f %f %f v(13-15) %f %f %f steerf(17) %f maxangle(19) %f speed(21) %f steering(23-24) %f %f clock %lf",
+    Log::verbose("physics", "     %s t %f %f xyz(9-11) %f %f %f v(13-15) %f %f %f steerf(17) %f maxangle(19) %f speed(21) %f steering(23-24) %f %f clock %lf",
         getIdent().c_str(),
         World::getWorld()->getTime(), dt,
         getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
@@ -1385,6 +1385,19 @@ void Kart::update(float dt)
         old_group = m_body->getBroadphaseHandle()->m_collisionFilterGroup;
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
+
+    Log::verbose("physicsafter", "%s t %f %f xyz(9-11) %f %f %f v(13-15) %f %f %f steerf(17) %f maxangle(19) %f speed(21) %f steering(23-24) %f %f clock %lf",
+        getIdent().c_str(),
+        World::getWorld()->getTime(), dt,
+        getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
+        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),  //13,14,15
+        m_skidding->getSteeringFraction(), //19
+        getMaxSteerAngle(),  //20
+        m_speed,  //21
+        m_vehicle->getWheelInfo(0).m_steering,  //23
+        m_vehicle->getWheelInfo(1).m_steering,  //24
+        StkTime::getRealTime()
+    );
 
     // After the physics step was done, the position of the wheels (as stored
     // in wheelInfo) is actually outdated, since the chassis was moved
