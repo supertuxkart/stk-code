@@ -26,7 +26,19 @@
 
 #include <algorithm>
 
-/** The constructor.
+/** The RewindQueue stores one TimeStepInfo for each time step done.
+ *  The TimeStepInfo stores all states and events to be used at the
+ *  given timestep. 
+ *  All network events (i.e. new states or client events) are stored in a
+ *  separate list m_network_events. At the very start of a new time step
+ *  a new TimeStepInfo object is added. Then all network events that are
+ *  supposed to happen between t and t+dt are added to this newly added
+ *  TimeStep (see mergeNetworkData), and are then being executed.
+ *  In case of a rewind the RewindQueue finds the last TimeStepInfo with
+ *  a confirmed server state (undoing the events, see undoUntil). Then
+ *  the state is restored from the TimeStepInfo object (see replayAllStates)
+ *  then the rewind manager re-executes the time steps (using the events
+ *  stored at each timestep).
  */
 RewindQueue::RewindQueue()
 {
