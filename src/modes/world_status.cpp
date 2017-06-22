@@ -182,7 +182,7 @@ void WorldStatus::update(float dt)
  */
 void WorldStatus::updateTime(const float dt)
 {
-    Log::info("worldstatus", "phase %d time %lf %aux %lf dt %f next time %f",
+    Log::info("worldstatus", "phase %d time %lf aux %f dt %f next time %f",
         m_phase, m_time, m_auxiliary_timer, dt,
         m_time + dt
     );

@@ -105,7 +105,9 @@ void RewindManager::addNextTimeStep(float time, float dt)
 {
     // Add a timestep entry each timestep, except at 'ready, set, go'
     // at which time is 0 - we add only one entry there
-    if (time>0 || m_rewind_queue.isEmpty())
+    if (  ( time>0 || m_rewind_queue.isEmpty()                           ) &&
+          World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE    )
+
     {
         Log::info("RewindManager", "Adding new timestamp %f dt %f at %lf",
                   time, dt, StkTime::getRealTime());
@@ -237,10 +239,6 @@ void RewindManager::playEventsTill(float time, float *dt)
     m_rewind_queue.mergeNetworkData(World::getWorld()->getTime(), *dt,
                                     &needs_rewind, &rewind_time);
 
-    // No events, nothing to do
-    if (m_rewind_queue.isEmpty())
-        return;
-
     if(needs_rewind)
         Log::info("RewindManager", "At %f merging states from %f needs rewind",
                   World::getWorld()->getTime(), rewind_time);
@@ -254,6 +252,8 @@ void RewindManager::playEventsTill(float time, float *dt)
         Log::setPrefix("Rewind");
         rewindTo(rewind_time);
         Log::setPrefix("");
+        TimeStepInfo *tsi = m_rewind_queue.getCurrent();
+        World::getWorld()->setTime(tsi->getTime());
     }
 
     // This is necessary to avoid that rewinding an event will store the 
@@ -261,24 +261,23 @@ void RewindManager::playEventsTill(float time, float *dt)
     assert(!m_is_rewinding);
     m_is_rewinding = true;
 
-    // Now play all events between time and time + dt
-    // Note that we need to use time and not World::getTime(), since
-    // the world time was potentially set back during a rewind
-    while(m_rewind_queue.hasMoreRewindInfo())
+    // Now play all events between time and time + dt, i.e. all events
+    // stored at the last TimeStep info in the rewind queue.
+    //assert(m_rewind_queue.getLast() == m_rewind_queue.getCurrent());
+
+    TimeStepInfo *tsi = m_rewind_queue.getLast();
+    Log::verbose("rewindmanager", "Time diff world %f stamp %f",
+                 World::getWorld()->getTime(),
+                 tsi->getTime());
+
+   // ++m_rewind_queue;   // Point to end of queue now
+    tsi->replayAllEvents();
+
+    if (tsi->hasConfirmedState() && NetworkConfig::get()->isClient())
     {
-        TimeStepInfo *tsi = m_rewind_queue.getCurrent();
-        // This timestep simulates from time to time+dt
-        if (tsi->getTime() > time + *dt) break;
-
-        ++m_rewind_queue;   // Point to next rewind info
-        tsi->replayAllEvents();
-
-        if (tsi->hasConfirmedState() && NetworkConfig::get()->isClient())
-        {
-            Log::warn("RewindManager",
-                      "Client has received state in the future: at %f state %f",
-                      World::getWorld()->getTime(), tsi->getTime());
-        }
+        Log::warn("RewindManager",
+            "Client has received state in the future: at %f state %f",
+            World::getWorld()->getTime(), tsi->getTime());
     }
     m_is_rewinding = false;
 }   // playEventsTill
@@ -318,9 +317,6 @@ void RewindManager::rewindTo(float rewind_time)
     float local_physics_time = current->getLocalPhysicsTime();
     Physics::getInstance()->getPhysicsWorld()->setLocalTime(local_physics_time);
 
-    // Restore all states from the current time - the full state of a race
-    // will be potentially stored in several state objects. State can be NULL
-    // if the next event is not a state
     float dt = -1.0f;
 
     // Need to exit loop if in-game menu is open, since world clock
@@ -331,10 +327,13 @@ void RewindManager::rewindTo(float rewind_time)
         return;
     }
 
+    // Restore state from the current time
     current->replayAllStates();
 
-    // Now go forward through the list of rewind infos:
-    // ------------------------------------------------
+    // Now go forward through the list of rewind infos. A new timestep
+    // info for the current time has already been added previously, so
+    // we rewind till we have reached the last timestep entry (which is
+    // the current time step).
     while (current !=m_rewind_queue.getLast())
     {
         // Now handle all events(!) at the current time (i.e. between 
@@ -351,6 +350,7 @@ void RewindManager::rewindTo(float rewind_time)
 
         ++m_rewind_queue;
         current = m_rewind_queue.getCurrent();
+        world->setTime(current->getTime());
     }   // while (world->getTime() < current_time)
 
     m_is_rewinding = false;

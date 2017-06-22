@@ -89,22 +89,15 @@ void RewindQueue::reset()
 void RewindQueue::addNewTimeStep(float time, float dt)
 {
     TimeStepInfo *tsi = new TimeStepInfo(time, dt);
-
-    AllTimeStepInfo::iterator i = m_time_step_info.end();
-    while (i != m_time_step_info.begin())
-    {
-        --i;
-        if ((*i)->getTime() < time)
-        {
-            i++;
-            break;
-        }
-    };
+    assert(m_time_step_info.empty()                 ||
+           time > m_time_step_info.back()->getTime()  );
+    m_time_step_info.push_back(tsi);
 
     // If current was not initialised
-    AllTimeStepInfo::iterator new_tsi = m_time_step_info.insert(i, tsi);
     if (m_current == m_time_step_info.end())
-        m_current = new_tsi;
+    {
+        m_current--;
+    }
 }   // addNewTimeStep
 
 // ----------------------------------------------------------------------------
@@ -311,14 +304,7 @@ void RewindQueue::mergeNetworkData(float world_time, float dt,
 // ----------------------------------------------------------------------------
 bool RewindQueue::isEmpty() const
 {
-    if (m_current != m_time_step_info.end())
-        return false;
-
-    m_network_events.lock();
-    bool no_network_events = m_network_events.getData().empty();
-    m_network_events.unlock();
-
-    return no_network_events;
+    return m_time_step_info.empty();
 }   // isEmpty
 
 // ----------------------------------------------------------------------------
