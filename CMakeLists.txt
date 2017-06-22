@@ -135,9 +135,14 @@ if (BUILD_RECORDER)
     find_library(OPENGLRECORDER_LIBRARY NAMES openglrecorder libopenglrecorder PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
     find_path(OPENGLRECORDER_INCLUDEDIR NAMES openglrecorder.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
     if (NOT OPENGLRECORDER_LIBRARY OR NOT OPENGLRECORDER_INCLUDEDIR)
-        message(WARNING "libopenglrecorder not found.  Disabling ingame recorder."
-            "To use recorder, install libopenglrecorder.")
-        option(BUILD_RECORDER "Build opengl recorder" OFF)
+        if(PROJECT_VERSION=="git")
+            message(WARNING "libopenglrecorder not found, disabling in-game recorder. "
+                "To use recorder, install libopenglrecorder.")
+            option(BUILD_RECORDER "Build opengl recorder" OFF)
+        else()
+            message(FATAL_ERROR "libopenglrecorder not found. "
+            "Either install libopenglrecorder or disable in-game recorder with -DBUILD_RECORDER=0")
+        endif()
     else()
         include_directories(${OPENGLRECORDER_INCLUDEDIR})
         mark_as_advanced(OPENGLRECORDER_LIBRARY OPENGLRECORDER_INCLUDEDIR)
