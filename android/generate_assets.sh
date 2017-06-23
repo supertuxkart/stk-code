@@ -17,7 +17,7 @@
 
 ################################################################################
 
-export KARTS="tux nolok xue"
+export KARTS="gnu nolok tux xue"
 export TRACKS="battleisland cornfield_crossing featunlocked gplose gpwin   \
                hacienda introcutscene introcutscene2 lighthouse olivermath \
                overworld snowmountain snowtuxpeak soccer_field tutorial"
@@ -29,12 +29,16 @@ export ASSETS_PATHS="../data                    \
 export ASSETS_DIRS="library models music sfx textures"
 
 export TEXTURE_SIZE=256
+export JPEG_QUALITY=85
+export PNG_QUALITY=95
 export SOUND_QUALITY=42
 export SOUND_MONO=1
 export SOUND_SAMPLE=32000
 
 export RUN_OPTIMIZE_SCRIPT=0
 export DECREASE_QUALITY=1
+
+export BLACKLIST_FILES="data/music/cocoa_river_fast.ogg2"
 
 ################################################################################
 
@@ -158,6 +162,7 @@ convert_image()
    fi
 
    FILE="$1"
+   FILE_TYPE="$2"
 
    W=`identify -format "%[fx:w]" "$FILE"`
    H=`identify -format "%[fx:h]" "$FILE"`
@@ -167,19 +172,36 @@ convert_image()
       return
    fi
 
-   if [ $W -le $TEXTURE_SIZE ] && [ $H -le $TEXTURE_SIZE ]; then
-      return
+   if [ $W -gt $TEXTURE_SIZE ] || [ $H -gt $TEXTURE_SIZE ]; then
+      if [ $W -gt $H ]; then
+         SCALED_W=$TEXTURE_SIZE
+         SCALED_H=$(($TEXTURE_SIZE * $H / $W))
+      else
+         SCALED_W=$(($TEXTURE_SIZE * $W / $H))
+         SCALED_H=$TEXTURE_SIZE
+      fi
+      
+      SCALE_CMD="-scale ${SCALED_W}x${SCALED_H}"
+   fi
+   
+   if [ "$FILE_TYPE" = "jpg" ]; then
+      QUALITY_CMD="-quality $JPEG_QUALITY"
+   elif [ "$FILE_TYPE" = "png" ]; then
+      QUALITY_CMD="-quality $PNG_QUALITY"
    fi
 
-   if [ $W -gt $H ]; then
-      SCALED_W=$TEXTURE_SIZE
-      SCALED_H=$(($TEXTURE_SIZE * $H / $W))
-   else
-      SCALED_W=$(($TEXTURE_SIZE * $W / $H))
-      SCALED_H=$TEXTURE_SIZE
+   convert $SCALE_CMD $QUALITY_CMD "$FILE" "tmp.$FILE_TYPE"
+   
+   if [ -s "tmp.$FILE_TYPE" ]; then
+      SIZE_OLD=`du -k "$FILE" | cut -f1`
+      SIZE_NEW=`du -k "tmp.$FILE_TYPE" | cut -f1`
+
+      if [ $SIZE_NEW -lt $SIZE_OLD ]; then
+         mv "tmp.$FILE_TYPE" "$FILE"
+      fi
    fi
 
-   convert -scale $SCALED_WE\x$SCALED_H "$FILE" "$FILE"
+   rm -f "tmp.$FILE_TYPE"
 }
 
 convert_sound()
@@ -225,8 +247,8 @@ convert_sound()
 }
 
 if [ $DECREASE_QUALITY -gt 0 ]; then
-   find assets/data -iname "*.png" | while read f; do convert_image "$f"; done
-   find assets/data -iname "*.jpg" | while read f; do convert_image "$f"; done
+   find assets/data -iname "*.png" | while read f; do convert_image "$f" "png"; done
+   find assets/data -iname "*.jpg" | while read f; do convert_image "$f" "jpg"; done
    find assets/data -iname "*.ogg" | while read f; do convert_sound "$f"; done
 fi
 
@@ -234,6 +256,12 @@ fi
 # Copy data directory
 echo "Copy data directory"
 cp -a ../data/* assets/data/
+
+
+# Remove unused files
+for BLACKLIST_FILE in $BLACKLIST_FILES; do
+   rm -f "assets/$BLACKLIST_FILE"
+done
 
 
 # Run optimize_data.sh script
