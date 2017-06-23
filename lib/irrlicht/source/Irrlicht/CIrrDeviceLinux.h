@@ -18,13 +18,8 @@
 #ifdef _IRR_COMPILE_WITH_X11_
 
 #ifdef _IRR_COMPILE_WITH_OPENGL_
-#include <GL/gl.h>
 #define GLX_GLXEXT_LEGACY 1
 #include <GL/glx.h>
-#ifdef _IRR_OPENGL_USE_EXTPOINTER_
-#define GLX_GLXEXT_PROTOTYPES
-#include "glxext.h"
-#endif
 #endif
 
 #include <X11/Xlib.h>

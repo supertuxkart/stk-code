@@ -29,6 +29,14 @@ extern bool GLContextDebugBit;
 #include <X11/XKBlib.h>
 #include <X11/Xatom.h>
 
+#ifdef _IRR_COMPILE_WITH_OPENGL_
+#include <GL/gl.h>
+#ifdef _IRR_OPENGL_USE_EXTPOINTER_
+#define GLX_GLXEXT_PROTOTYPES
+#include "glxext.h"
+#endif
+#endif
+
 #ifdef _IRR_LINUX_XCURSOR_
 #include <X11/Xcursor/Xcursor.h>
 #endif
