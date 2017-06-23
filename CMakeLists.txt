@@ -1,6 +1,6 @@
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
-set(PROJECT_VERSION "0.9.1")
+set(PROJECT_VERSION "git")
 
 cmake_minimum_required(VERSION 2.8.4)
 if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
@@ -83,10 +83,6 @@ if(DISABLE_VPX)
     add_definitions(-DNO_VPX)
 endif()
 
-if(BUILD_RECORDER)
-    add_definitions(-DENABLE_RECORDER)
-endif()
-
 # Build the Bullet physics library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
@@ -139,11 +135,19 @@ if (BUILD_RECORDER)
     find_library(OPENGLRECORDER_LIBRARY NAMES openglrecorder libopenglrecorder PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
     find_path(OPENGLRECORDER_INCLUDEDIR NAMES openglrecorder.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
     if (NOT OPENGLRECORDER_LIBRARY OR NOT OPENGLRECORDER_INCLUDEDIR)
-        message(FATAL_ERROR "libopenglrecorder not found. "
-            "Either install libopenglrecorder or disable ingame recorder with -DBUILD_RECORDER=0")
+        if(PROJECT_VERSION STREQUAL "git")
+            message(WARNING "libopenglrecorder not found, disabling in-game recorder. "
+                "To use recorder, install libopenglrecorder.")
+            option(BUILD_RECORDER "Build opengl recorder" OFF)
+        else()
+            message(FATAL_ERROR "libopenglrecorder not found. "
+            "Either install libopenglrecorder or disable in-game recorder with -DBUILD_RECORDER=0")
+        endif()
+    else()
+        include_directories(${OPENGLRECORDER_INCLUDEDIR})
+        mark_as_advanced(OPENGLRECORDER_LIBRARY OPENGLRECORDER_INCLUDEDIR)
+        add_definitions(-DENABLE_RECORDER)
     endif()
-    include_directories(${OPENGLRECORDER_INCLUDEDIR})
-    mark_as_advanced(OPENGLRECORDER_LIBRARY OPENGLRECORDER_INCLUDEDIR)
 endif()
 
 if(NOT SERVER_ONLY AND NOT USE_GLES2)
