@@ -182,10 +182,10 @@ bool ContextManagerEGL::chooseConfig()
     config_attribs.push_back(8);
     config_attribs.push_back(EGL_ALPHA_SIZE);
     config_attribs.push_back(m_creation_params.with_alpha_channel ? 8 : 0);
-    // config_attribs.push_back(EGL_BUFFER_SIZE);
-    // config_attribs.push_back(24);
     config_attribs.push_back(EGL_DEPTH_SIZE);
     config_attribs.push_back(16);
+    // config_attribs.push_back(EGL_BUFFER_SIZE);
+    // config_attribs.push_back(24);
     // config_attribs.push_back(EGL_STENCIL_SIZE);
     // config_attribs.push_back(stencil_buffer);
     // config_attribs.push_back(EGL_SAMPLE_BUFFERS);
@@ -223,7 +223,19 @@ bool ContextManagerEGL::chooseConfig()
     bool success = eglChooseConfig(m_egl_display, &config_attribs[0],
                                    &m_egl_config, 1, &num_configs);
 
-    if (!success || num_configs == 0)
+    if (!success || m_egl_config == NULL || num_configs < 1)
+    {
+        config_attribs[1] = 5; //EGL_RED_SIZE
+        config_attribs[3] = 6; //EGL_GREEN_SIZE
+        config_attribs[5] = 5; //EGL_BLUE_SIZE
+        config_attribs[7] = 0; //EGL_ALPHA_SIZE
+        config_attribs[9] = 1; //EGL_DEPTH_SIZE
+        
+        success = eglChooseConfig(m_egl_display, &config_attribs[0],
+                                           &m_egl_config, 1, &num_configs);
+    }
+
+    if (!success || m_egl_config == NULL || num_configs < 1)
     {
         return false;
     }
@@ -460,6 +472,9 @@ bool ContextManagerEGL::makeCurrent()
 
 void ContextManagerEGL::reloadEGLSurface(void* window)
 {
+    if (!m_initialized)
+        return;
+
 #ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
     m_egl_window = (ANativeWindow*)window;
 
