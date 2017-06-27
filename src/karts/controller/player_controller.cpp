@@ -302,7 +302,9 @@ void PlayerController::steer(float dt, int steer_val)
             if(steer>0.0f) steer=0.0f;
         }   // if steer<=0.0f
     }   // no key is pressed
-    Log::info("steer", "Setting steer to %f", steer);
+    Log::info("steer", "Setting steer to %f at %f dt %f worldtime %f", steer,
+        World::getWorld()->getTime(),
+        dt, StkTime::getRealTime());
     m_controls->setSteer(std::min(1.0f, std::max(-1.0f, steer)) );
 
 }   // steer
