@@ -138,7 +138,9 @@ if (BUILD_RECORDER)
         if(PROJECT_VERSION STREQUAL "git")
             message(WARNING "libopenglrecorder not found, disabling in-game recorder. "
                 "To use recorder, install libopenglrecorder.")
-            option(BUILD_RECORDER "Build opengl recorder" OFF)
+            set(OPENGLRECORDER_LIBRARY CACHE INTERNAL "")
+            set(OPENGLRECORDER_INCLUDEDIR CACHE INTERNAL "")
+            set(BUILD_RECORDER OFF)
         else()
             message(FATAL_ERROR "libopenglrecorder not found. "
             "Either install libopenglrecorder or disable in-game recorder with -DBUILD_RECORDER=0")
