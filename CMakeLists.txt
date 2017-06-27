@@ -139,6 +139,8 @@ if (BUILD_RECORDER)
             message(WARNING "libopenglrecorder not found, disabling in-game recorder. "
                 "To use recorder, install libopenglrecorder.")
             option(BUILD_RECORDER "Build opengl recorder" OFF)
+            set(OPENGLRECORDER_LIBRARY VAR-FOUND CACHE INTERNAL "")
+            set(OPENGLRECORDER_INCLUDEDIR VAR-FOUND CACHE INTERNAL "")
         else()
             message(FATAL_ERROR "libopenglrecorder not found. "
             "Either install libopenglrecorder or disable in-game recorder with -DBUILD_RECORDER=0")
