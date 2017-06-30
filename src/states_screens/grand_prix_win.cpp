@@ -58,13 +58,9 @@ using namespace irr::gui;
 using namespace irr::video;
 using namespace GUIEngine;
 
-/*const float KARTS_X = 20.75f;
-const float KARTS_DELTA_X = 3.88f;
-const float KARTS_DELTA_Y = -0.55f;
-const float KARTS_INITIAL_Z = 40.90f;
-const float KARTS_DEST_Z = 40.90f;
-const float KARTS_INITIAL_Y = -1.27f;*/
-//const float KARTS_DELTA_Y = 1.0f;
+/*
+ * FIXME: Some of these are not yet fully implemented
+ */
 
 // { 2nd, 1st, 3rd }
 
@@ -107,7 +103,6 @@ const float PODIUMS_FINAL_Y[3] = {
             PODIUMS_INITIAL_Y[1] + PODIUMS_HEIGHT * 0.9f,
             PODIUMS_INITIAL_Y[2] + PODIUMS_HEIGHT * 0.3f
 };
-
 
 DEFINE_SCREEN_SINGLETON( GrandPrixWin );
 
@@ -276,7 +271,6 @@ void GrandPrixWin::onUpdate(float dt)
                     m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false, true);
 
                     core::vector3df podium_pos = m_podium_steps[k]->getInitXYZ();
-                    //podium_pos.Y = PODIUMS_INITIAL_Y[k];
                     core::vector3df podium_rot(0, m_kart_rotation[k], 0);
                     m_podium_steps[k]->move(podium_pos, podium_rot, core::vector3df(1.0f, 1.0f, 1.0f), false, true);
 
@@ -391,10 +385,6 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
 
     for (int k=0; k<3; k++)
     {
-        /*core::vector3df podium_pos = m_podium_steps[k]->getInitXYZ();
-        podium_pos.Y = PODIUMS_INITIAL_Y[k];
-        core::vector3df podium_rot(0, KARTS_AND_PODIUMS_INITIAL_ROTATION[k], 0);*/
-
         m_podium_x[k] = m_podium_steps[k]->getInitXYZ().X;
         m_podium_y[k] = PODIUMS_INITIAL_Y[k];
         m_podium_z[k] = m_podium_steps[k]->getInitXYZ().Z;
