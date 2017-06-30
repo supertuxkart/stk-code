@@ -104,6 +104,8 @@ const float PODIUMS_FINAL_Y[3] = {
             PODIUMS_INITIAL_Y[2] + PODIUMS_HEIGHT * 0.3f
 };
 
+const float PODIUMS_AND_KARTS_SPEED_Y[3] = { 0.9f, 1.35f, 0.45f };
+
 DEFINE_SCREEN_SINGLETON( GrandPrixWin );
 
 // -------------------------------------------------------------------------------------
@@ -292,7 +294,7 @@ void GrandPrixWin::onUpdate(float dt)
             {
                 if (m_kart_y[k] < KARTS_FINAL_Y[k])
                 {
-                    m_kart_y[k] += dt;
+                    m_kart_y[k] += dt * PODIUMS_AND_KARTS_SPEED_Y[k];
                     core::vector3df kart_pos(m_kart_x[k], m_kart_y[k], m_kart_z[k]);
                     core::vector3df kart_rot(0, m_kart_rotation[k], 0);
                     core::vector3df kart_scale(1.0f, 1.0f, 1.0f);
@@ -302,7 +304,7 @@ void GrandPrixWin::onUpdate(float dt)
                 if (m_podium_y[k] < PODIUMS_FINAL_Y[k]) {
                     core::vector3df podium_pos(m_podium_steps[k]->getInitXYZ().X, m_podium_y[k], m_podium_steps[k]->getInitXYZ().Z);
                     core::vector3df podium_rot(0, m_kart_rotation[k], 0);
-                    m_podium_y[k] += dt;
+                    m_podium_y[k] += dt * PODIUMS_AND_KARTS_SPEED_Y[k];
                     m_podium_steps[k]->move(core::vector3df(m_podium_x[k], m_podium_y[k], m_podium_z[k]), podium_rot, core::vector3df(1.0f, 1.0f, 1.0f), false, true);
                 }
             }
