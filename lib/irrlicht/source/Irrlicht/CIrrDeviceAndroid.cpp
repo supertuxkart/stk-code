@@ -35,7 +35,6 @@ namespace irr
 bool CIrrDeviceAndroid::IsPaused = true;
 bool CIrrDeviceAndroid::IsFocused = false;
 bool CIrrDeviceAndroid::IsStarted = false;
-bool CIrrDeviceAndroid::IsClosing = false;
 
 //! constructor
 CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
@@ -49,12 +48,21 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
 	#endif
 
 	Android = (android_app *)(param.PrivateData);
-	
-	IsClosing = Android->destroyRequested;
+	assert(Android != NULL);
 
 	Android->userData = this;
 	Android->onAppCmd = handleAndroidCommand;
 	Android->onInputEvent = handleInput;
+	
+	createKeyMap();
+
+	CursorControl = new CCursorControl();
+	
+	Close = Android->destroyRequested;
+
+	// It typically shouldn't happen, but just in case...
+	if (Close)
+		return;
 
 	SensorManager = ASensorManager_getInstance();
 	SensorEventQueue = ASensorManager_createEventQueue(SensorManager,
@@ -63,15 +71,10 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
 	ANativeActivity_setWindowFlags(Android->activity,
 								   AWINDOW_FLAG_KEEP_SCREEN_ON |
 								   AWINDOW_FLAG_FULLSCREEN, 0);
-								   
-	createKeyMap();
-
-	// Create cursor control
-	CursorControl = new CCursorControl();
 
 	os::Printer::log("Waiting for Android activity window to be created.", ELL_DEBUG);
 
-	while ((!IsStarted || !IsFocused || IsPaused) && !IsClosing)
+	while (!IsStarted || !IsFocused || IsPaused)
 	{
 		s32 events = 0;
 		android_poll_source* source = 0;
@@ -101,6 +104,8 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
 CIrrDeviceAndroid::~CIrrDeviceAndroid()
 {
 	Android->userData = NULL;
+	Android->onAppCmd = NULL;
+	Android->onInputEvent = NULL;
 }
 
 void CIrrDeviceAndroid::createVideoModeList()
@@ -159,12 +164,12 @@ void CIrrDeviceAndroid::createDriver()
 bool CIrrDeviceAndroid::run()
 {
 	os::Timer::tick();
-
-	while (!IsClosing)
+	
+	while (!Close)
 	{
 		s32 Events = 0;
 		android_poll_source* Source = 0;
-		bool should_run = (IsStarted && IsFocused && !IsPaused) || IsClosing;
+		bool should_run = (IsStarted && IsFocused && !IsPaused);
 		s32 id = ALooper_pollAll(should_run ? 0 : -1, NULL, &Events,
 								 (void**)&Source);
 
@@ -210,7 +215,7 @@ bool CIrrDeviceAndroid::run()
 		}
 	}
 
-	return !IsClosing;
+	return !Close;
 }
 
 void CIrrDeviceAndroid::yield()
@@ -263,6 +268,7 @@ bool CIrrDeviceAndroid::isWindowMinimized() const
 
 void CIrrDeviceAndroid::closeDevice()
 {
+	Close = true;
 }
 
 void CIrrDeviceAndroid::setResizable(bool resize)
@@ -289,6 +295,7 @@ E_DEVICE_TYPE CIrrDeviceAndroid::getType() const
 void CIrrDeviceAndroid::handleAndroidCommand(android_app* app, int32_t cmd)
 {
 	CIrrDeviceAndroid* device = (CIrrDeviceAndroid *)app->userData;
+	assert(device != NULL);
 	
 	switch (cmd)
 	{
@@ -298,18 +305,15 @@ void CIrrDeviceAndroid::handleAndroidCommand(android_app* app, int32_t cmd)
 	case APP_CMD_INIT_WINDOW:
 		os::Printer::log("Android command APP_CMD_INIT_WINDOW", ELL_DEBUG);
 		
-		if (device != NULL)
+		device->getExposedVideoData().OGLESAndroid.Window = app->window;
+		
+		// If the Android app is resumed, we need to re-create EGL surface
+		// to allow to draw something on it again.
+		if (device->VideoDriver != NULL && 
+			device->CreationParams.DriverType == video::EDT_OGLES2)
 		{
-			device->getExposedVideoData().OGLESAndroid.Window = app->window;
-			
-			// If the Android app is resumed, we need to re-create EGL surface
-			// to allow to draw something on it again.
-			if (device->VideoDriver != NULL && 
-				device->CreationParams.DriverType == video::EDT_OGLES2)
-			{
-				video::COGLES2Driver* driver = (video::COGLES2Driver*)(device->VideoDriver);
-				driver->getEGLContext()->reloadEGLSurface(app->window);
-			}
+			video::COGLES2Driver* driver = (video::COGLES2Driver*)(device->VideoDriver);
+			driver->getEGLContext()->reloadEGLSurface(app->window);
 		}
 		
 		IsStarted = true;
@@ -328,7 +332,7 @@ void CIrrDeviceAndroid::handleAndroidCommand(android_app* app, int32_t cmd)
 		break;
 	case APP_CMD_DESTROY:
 		os::Printer::log("Android command APP_CMD_DESTROY", ELL_DEBUG);
-		IsClosing = true;
+		device->Close = true;
 		// Make sure that state variables are set to the default state
 		// when the app is destroyed
 		IsPaused = true;
@@ -362,25 +366,20 @@ void CIrrDeviceAndroid::handleAndroidCommand(android_app* app, int32_t cmd)
 		break;
 	}
 	
-	if (device != NULL)
-	{
-		SEvent event;
-		event.EventType = EET_SYSTEM_EVENT;
-		event.SystemEvent.EventType = ESET_ANDROID_CMD;
-		event.SystemEvent.AndroidCmd.Cmd = cmd;
-		device->postEventFromUser(event);
-	}
+	SEvent event;
+	event.EventType = EET_SYSTEM_EVENT;
+	event.SystemEvent.EventType = ESET_ANDROID_CMD;
+	event.SystemEvent.AndroidCmd.Cmd = cmd;
+	device->postEventFromUser(event);
 }
 
 s32 CIrrDeviceAndroid::handleInput(android_app* app, AInputEvent* androidEvent)
 {
 	CIrrDeviceAndroid* device = (CIrrDeviceAndroid*)app->userData;
+	assert(device != NULL);
+	
 	s32 status = 0;
 	
-	if (device == NULL)
-		return status;
-		
-
 	switch (AInputEvent_getType(androidEvent))
 	{
 	case AINPUT_EVENT_TYPE_MOTION:

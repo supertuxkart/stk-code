@@ -103,7 +103,6 @@ namespace irr
 		static bool IsPaused;
 		static bool IsFocused;
 		static bool IsStarted;
-		static bool IsClosing;
 		
 		bool IsMousePressed;
 
