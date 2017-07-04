@@ -18,9 +18,6 @@ namespace irr
 {
 	namespace video
 	{
-		IVideoDriver* createOGLES1Driver(const SIrrlichtCreationParameters& params,
-			video::SExposedVideoData& data, io::IFileSystem* io);
-
 		IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
 			video::SExposedVideoData& data, io::IFileSystem* io);
 	}
@@ -135,14 +132,6 @@ void CIrrDeviceAndroid::createDriver()
 	// Create the driver.
 	switch(CreationParams.DriverType)
 	{
-	case video::EDT_OGLES1:
-		#ifdef _IRR_COMPILE_WITH_OGLES1_
-		VideoDriver = video::createOGLES1Driver(CreationParams, ExposedVideoData, FileSystem);
-		#else
-		os::Printer::log("No OpenGL ES 1.0 support compiled in.", ELL_ERROR);
-		#endif
-		break;
-
 	case video::EDT_OGLES2:
 		#ifdef _IRR_COMPILE_WITH_OGLES2_
 		VideoDriver = video::createOGLES2Driver(CreationParams, ExposedVideoData, FileSystem);
