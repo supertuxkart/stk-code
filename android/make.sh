@@ -49,8 +49,10 @@ check_error()
 # Handle clean command
 if [ ! -z "$1" ] && [ "$1" = "clean" ]; then
     rm -rf bin
+    rm -rf build
     rm -rf libs
     rm -rf obj
+    rm -rf .gradle
     exit
 fi
 
