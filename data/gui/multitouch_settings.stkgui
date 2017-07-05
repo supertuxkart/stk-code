@@ -23,29 +23,11 @@
             </div>
         </div>
 
-        <label width="100%" I18N="In the multitouch settings screen" text="Accelerometer"/>
-
         <div width="75%" layout="horizontal-row" proportion="1">
-            <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Disabled"/>
+            <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Accelerometer"/>
             <div proportion="1" align="center" height="fit" layout="horizontal-row" >
                 <spacer width="40" height="10" />
-                <checkbox id="accelerometer_disabled"/>
-            </div>
-        </div>
-
-        <div width="75%" layout="horizontal-row" proportion="1">
-            <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Phone"/>
-            <div proportion="1" align="center" height="fit" layout="horizontal-row" >
-                <spacer width="40" height="10" />
-                <checkbox id="accelerometer_phone"/>
-            </div>
-        </div>
-
-        <div width="75%" layout="horizontal-row" proportion="1">
-            <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Tablet"/>
-            <div proportion="1" align="center" height="fit" layout="horizontal-row" >
-                <spacer width="40" height="10" />
-                <checkbox id="accelerometer_tablet"/>
+                <spinner id="accelerometer" proportion="1"/>
             </div>
         </div>
 
