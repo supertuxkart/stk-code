@@ -413,7 +413,12 @@ namespace UserConfigParams
             PARAM_DEFAULT( IntUserConfigParam(1, "multitouch_mode",
             &m_multitouch_group,
             "Steering mode: 0 = off, 1 = buttons"));
-            
+
+    PARAM_PREFIX BoolUserConfigParam         m_multitouch_inverted
+            PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_inverted",
+            &m_multitouch_group,
+            "Draw steering wheel on right side.") );
+
     PARAM_PREFIX IntUserConfigParam         m_multitouch_accelerometer
             PARAM_DEFAULT( IntUserConfigParam(0, "multitouch_accelerometer",
             &m_multitouch_group,

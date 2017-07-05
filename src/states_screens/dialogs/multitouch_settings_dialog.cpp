@@ -89,6 +89,10 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         CheckBoxWidget* buttons_en = getWidget<CheckBoxWidget>("buttons_enabled");
         assert(buttons_en != NULL);
         UserConfigParams::m_multitouch_mode = buttons_en->getState() ? 1 : 0;
+        
+        CheckBoxWidget* buttons_inv = getWidget<CheckBoxWidget>("buttons_inverted");
+        assert(buttons_inv != NULL);
+        UserConfigParams::m_multitouch_inverted = buttons_inv->getState();
 
         SpinnerWidget* accelerometer = getWidget<SpinnerWidget>("accelerometer");
         assert(accelerometer != NULL);
@@ -144,7 +148,11 @@ void MultitouchSettingsDialog::updateValues()
 
     CheckBoxWidget* buttons_en = getWidget<CheckBoxWidget>("buttons_enabled");
     assert(buttons_en != NULL);
-    buttons_en->setState(UserConfigParams::m_multitouch_mode!=0);
+    buttons_en->setState(UserConfigParams::m_multitouch_mode != 0);
+    
+    CheckBoxWidget* buttons_inv = getWidget<CheckBoxWidget>("buttons_inverted");
+    assert(buttons_inv != NULL);
+    buttons_inv->setState(UserConfigParams::m_multitouch_inverted);
 
     SpinnerWidget* accelerometer = getWidget<SpinnerWidget>("accelerometer");
     assert(accelerometer != NULL);
