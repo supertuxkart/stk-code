@@ -313,6 +313,7 @@ void OptionsScreenVideo::init()
             }
         }
 
+#ifndef ANDROID
         if (!found_config_res)
         {
             r.width  = UserConfigParams::m_width;
@@ -332,6 +333,7 @@ void OptionsScreenVideo::init()
             r.height = 768;
             resolutions.push_back(r);
         }
+#endif
 
         // Sort resolutions by size
         std::sort(resolutions.begin(), resolutions.end());
