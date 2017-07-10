@@ -44,7 +44,7 @@ namespace GraphicsRestrictions
         /** The list of names used in the XML file for the graphics
          *  restriction types. They must be in the same order as the types. */
 
-        std::array<std::string, 27> m_names_of_restrictions = {
+        std::array<std::string, 28> m_names_of_restrictions = {
             "UniformBufferObject",
             "GeometryShader",
             "DrawIndirect",
@@ -71,7 +71,8 @@ namespace GraphicsRestrictions
             "FramebufferSRGBWorking",
             "FramebufferSRGBCapable",
             "GI",
-            "ForceLegacyDevice"
+            "ForceLegacyDevice",
+            "VertexIdWorking"
         };
     }   // namespace Private
     using namespace Private;

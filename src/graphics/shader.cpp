@@ -156,6 +156,11 @@ void ShaderBase::setAttribute(AttributeType type)
         glBindAttribLocation(m_program, 5, "lifetime_initial");
         glBindAttribLocation(m_program, 6, "particle_velocity_initial");
         glBindAttribLocation(m_program, 7, "size_initial");
+        
+        if (CVS->needsVertexIdWorkaround())
+        {
+            glBindAttribLocation(m_program, 8, "vertex_id");
+        }
         break;
     case PARTICLES_RENDERING:
         glBindAttribLocation(m_program, 1, "lifetime");

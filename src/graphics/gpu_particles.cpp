@@ -145,6 +145,7 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     size_increase_factor = 0.;
     ParticleParams = NULL;
     InitialValues = NULL;
+    m_vertex_id_values = NULL;
 
     m_color_from[0] = m_color_from[1] = m_color_from[2] = 1.0;
     m_color_to[0] = m_color_to[1] = m_color_to[2] = 1.0;
@@ -163,6 +164,8 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 
 ParticleSystemProxy::~ParticleSystemProxy()
 {
+    delete[] m_vertex_id_values;
+    
     if (InitialValues)
         free(InitialValues);
     if (ParticleParams)
@@ -380,6 +383,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 
     m_previous_count = m_count;   // save to handle out of memory errors
     m_count = emitter->getMaxParticlesPerSecond() * emitter->getMaxLifeTime() / 1000;
+    
     switch (emitter->getType())
     {
     case scene::EPET_POINT:
@@ -393,6 +397,25 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
         break;
     default:
         assert(0 && "Wrong particle type");
+    }
+    
+    if (CVS->needsVertexIdWorkaround())
+    {
+        if (m_count != m_previous_count)
+        {
+            delete[] m_vertex_id_values;
+            m_vertex_id_values = NULL;
+        }
+        
+        if (m_vertex_id_values == NULL && m_count > 0)
+        {
+            m_vertex_id_values = new int[m_count];
+    
+            for (unsigned int i = 0; i < m_count; i++)
+            {
+                m_vertex_id_values[i] = i;
+            }
+        }
     }
 
     m_texture_name = getMaterial(0).getTexture(0)->getOpenGLTextureName();
@@ -443,7 +466,7 @@ void ParticleSystemProxy::AppendQuaternionRenderingVAO(GLuint QuaternionBuffer)
     glVertexAttribDivisorARB(6, 1);
 }
 
-void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initialValues_vbo)
+void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initialValues_vbo, GLuint vertex_id_buffer)
 {
     glBindBuffer(GL_ARRAY_BUFFER, position_vbo);
     glEnableVertexAttribArray(0);
@@ -464,6 +487,13 @@ void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initia
     glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(4 * sizeof(float)));
     glEnableVertexAttribArray(7);
     glVertexAttribPointer(7, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(7 * sizeof(float)));
+
+    if (CVS->needsVertexIdWorkaround())
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, vertex_id_buffer);
+        glEnableVertexAttribArray(8);
+        glVertexAttribIPointer(8, 1, GL_INT, sizeof(int), (GLvoid*)0);
+    }
 }
 
 void ParticleSystemProxy::simulate()
@@ -570,6 +600,15 @@ void ParticleSystemProxy::generateVAOs()
     glBufferData(GL_ARRAY_BUFFER, m_count * sizeof(ParticleData), InitialValues, GL_STREAM_COPY);
     glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
     glBufferData(GL_ARRAY_BUFFER, m_count * sizeof(ParticleData), 0, GL_STREAM_COPY);
+    
+    if (CVS->needsVertexIdWorkaround())
+    {
+        glGenBuffers(1, &vertex_id_buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, vertex_id_buffer);
+        glBufferData(GL_ARRAY_BUFFER, m_count * sizeof(int), 
+                     m_vertex_id_values, GL_STATIC_DRAW);
+    }
+    
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glGenVertexArrays(1, &current_rendering_vao);
@@ -577,10 +616,12 @@ void ParticleSystemProxy::generateVAOs()
     glGenVertexArrays(1, &current_simulation_vao);
     glGenVertexArrays(1, &non_current_simulation_vao);
 
+    // TODO: Don't execute CommonSimulationVAO twice because it unnecessarily
+    // initializes initial_values_buffer and vertex_id_buffer twice.
     glBindVertexArray(current_simulation_vao);
-    CommonSimulationVAO(tfb_buffers[0], initial_values_buffer);
+    CommonSimulationVAO(tfb_buffers[0], initial_values_buffer, vertex_id_buffer);
     glBindVertexArray(non_current_simulation_vao);
-    CommonSimulationVAO(tfb_buffers[1], initial_values_buffer);
+    CommonSimulationVAO(tfb_buffers[1], initial_values_buffer, vertex_id_buffer);
 
 
     glBindVertexArray(0);
@@ -612,6 +653,7 @@ void ParticleSystemProxy::generateVAOs()
     if (flip)
         AppendQuaternionRenderingVAO(quaternionsbuffer);
     glBindVertexArray(0);
+    
 }
 
 void ParticleSystemProxy::render() {
