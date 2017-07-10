@@ -21,8 +21,9 @@
 #include "graphics/irr_driver.hpp"
 #include "utils/log.hpp"
 
-
 extern int main(int argc, char *argv[]);
+
+struct android_app* global_android_app;
 
 void override_default_params()
 {

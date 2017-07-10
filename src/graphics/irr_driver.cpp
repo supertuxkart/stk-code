@@ -99,10 +99,6 @@ using namespace irr;
 #include <X11/Xutil.h>
 #endif
 
-#ifdef ANDROID
-struct android_app* global_android_app;
-#endif
-
 /** singleton */
 IrrDriver *irr_driver = NULL;
 
