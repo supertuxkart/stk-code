@@ -19,10 +19,11 @@
 
 ################################################################################
 
-export KARTS="gnu nolok tux xue"
+export KARTS="elephpant gnu nolok pidgin suzanne tux xue"
 export TRACKS="battleisland cornfield_crossing featunlocked gplose gpwin   \
                hacienda introcutscene introcutscene2 lighthouse olivermath \
-               overworld snowmountain snowtuxpeak soccer_field tutorial"
+               overworld sandtrack scotland snowmountain snowtuxpeak       \
+               soccer_field tutorial"
 
 export ASSETS_PATHS="../data                    \
                      ../../stk-assets           \
@@ -39,7 +40,7 @@ export SOUND_SAMPLE=32000
 
 export RUN_OPTIMIZE_SCRIPT=0
 export DECREASE_QUALITY=1
-export CONVERT_TO_JPG=0
+export CONVERT_TO_JPG=1
 
 export BLACKLIST_FILES="data/music/cocoa_river_fast.ogg2"
 
