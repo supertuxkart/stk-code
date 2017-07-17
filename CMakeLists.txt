@@ -20,7 +20,6 @@ option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
-option(ENABLE_NETWORK_MULTIPLAYER "Enable network multiplayer. This will replace the online profile GUI in the main menu with the network multiplayer GUI" OFF)
 option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" OFF)
 
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
@@ -281,11 +280,6 @@ endif()
 
 if(MINGW AND CMAKE_BUILD_TYPE MATCHES Release)
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--subsystem,windows")
-endif()
-
-# Netwowk Multiplayer
-if(ENABLE_NETWORK_MULTIPLAYER)
-  add_definitions(-DENABLE_NETWORK_MULTIPLAYER_SCREEN)
 endif()
 
 if(WIN32)
