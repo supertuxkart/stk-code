@@ -1140,8 +1140,8 @@ EventPropagation InputManager::input(const SEvent& event)
         // Simulate touch event on non-android devices
         #if !defined(ANDROID)
         MultitouchDevice* device = m_device_manager->getMultitouchDevice();
-        
-        if (device != NULL && (type == EMIE_LMOUSE_PRESSED_DOWN || 
+
+        if (device != NULL && (type == EMIE_LMOUSE_PRESSED_DOWN ||
             type == EMIE_LMOUSE_LEFT_UP || type == EMIE_MOUSE_MOVED))
         {
             device->m_events[0].id = 0;
@@ -1178,13 +1178,13 @@ EventPropagation InputManager::input(const SEvent& event)
     else if (event.EventType == EET_ACCELEROMETER_EVENT)
     {
         MultitouchDevice* device = m_device_manager->getMultitouchDevice();
-        
-        if (device)
+
+        if (device && device->isAccelerometerActive())
         {
             for (unsigned int i = 0; i < device->getButtonsCount(); i++)
             {
                 MultitouchButton* button = device->getButton(i);
-                
+
                 if (button->type != BUTTON_STEERING)
                     continue;
 
@@ -1196,7 +1196,7 @@ EventPropagation InputManager::input(const SEvent& event)
                 else if (UserConfigParams::m_multitouch_accelerometer == 2)
                 {
                     button->axis_x = (float)event.AccelerometerEvent.Y / 5.0f;
-                    device->handleControls(button);                    
+                    device->handleControls(button);
                 }
             }
         }

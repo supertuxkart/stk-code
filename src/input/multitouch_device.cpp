@@ -36,6 +36,7 @@ MultitouchDevice::MultitouchDevice()
     m_type          = DT_MULTITOUCH;
     m_name          = "Multitouch";
     m_player        = NULL;
+    m_accelerometer_active = false;
 #ifdef ANDROID
     m_android_device = dynamic_cast<CIrrDeviceAndroid*>(
                                                     irr_driver->getDevice());
@@ -58,13 +59,6 @@ MultitouchDevice::MultitouchDevice()
  */
 MultitouchDevice::~MultitouchDevice()
 {
-#ifdef ANDROID   
-    if (m_android_device->isAccelerometerActive())
-    {
-        m_android_device->deactivateAccelerometer();
-    }
-#endif
-
     clearButtons();
 }
 
@@ -149,6 +143,23 @@ void MultitouchDevice::addButton(MultitouchButtonType type, int x, int y,
     }
 
     m_buttons.push_back(button);
+
+#ifdef ANDROID
+    if (button->type == MultitouchButtonType::BUTTON_STEERING)
+    {
+        if (UserConfigParams::m_multitouch_accelerometer > 0 &&
+            !m_android_device->isAccelerometerActive())
+        {
+            m_android_device->activateAccelerometer(1.0f / 30);
+
+            if (m_android_device->isAccelerometerActive())
+            {
+                m_accelerometer_active = true;
+            }
+        }
+
+    }
+#endif
 } // addButton
 
 // ----------------------------------------------------------------------------
@@ -156,6 +167,15 @@ void MultitouchDevice::addButton(MultitouchButtonType type, int x, int y,
  */
 void MultitouchDevice::clearButtons()
 {
+#ifdef ANDROID
+    if (m_accelerometer_active == true &&
+        m_android_device->isAccelerometerActive())
+    {
+        m_android_device->deactivateAccelerometer();
+        m_accelerometer_active = false;
+    }
+#endif
+
     for (MultitouchButton* button : m_buttons)
     {
         delete button;
@@ -217,7 +237,7 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
                 }
             }
         }
-        
+
         if (prev_button_state != button->pressed)
         {
             update_controls = true;
@@ -241,25 +261,6 @@ void MultitouchDevice::updateConfigParams()
 
     m_deadzone_edge = UserConfigParams::m_multitouch_deadzone_edge;
     m_deadzone_edge = std::min(std::max(m_deadzone_edge, 0.0f), 0.5f);
-    
-#ifdef ANDROID   
-    if (UserConfigParams::m_multitouch_accelerometer > 0 &&
-        !m_android_device->isAccelerometerActive())
-    {
-        m_android_device->activateAccelerometer(1.0f / 30);
-        
-        // Disable accelerometer if it couldn't be activated
-        if (!m_android_device->isAccelerometerActive())
-        {
-            UserConfigParams::m_multitouch_accelerometer = 0;
-        }
-    }
-    else if (UserConfigParams::m_multitouch_accelerometer == 0 &&
-             m_android_device->isAccelerometerActive())
-    {
-        m_android_device->deactivateAccelerometer();
-    }
-#endif
 } // updateConfigParams
 
 // ----------------------------------------------------------------------------
@@ -270,10 +271,10 @@ float MultitouchDevice::getSteeringFactor(float value)
 {
     if (m_deadzone_edge + m_deadzone_center >= 1.0f)
         return 1.0f;
-    
+
     assert(m_deadzone_edge + m_deadzone_center != 1.0f);
-    
-    return std::min((value - m_deadzone_center) / (1.0f - m_deadzone_edge - 
+
+    return std::min((value - m_deadzone_center) / (1.0f - m_deadzone_edge -
                     m_deadzone_center), 1.0f);
 }
 
@@ -283,14 +284,14 @@ float MultitouchDevice::getSteeringFactor(float value)
  *  \param x A value from 0 to 1
  *  \param y A value from 0 to 1
  */
-void MultitouchDevice::updateButtonAxes(MultitouchButton* button, float x, 
+void MultitouchDevice::updateButtonAxes(MultitouchButton* button, float x,
                                         float y)
 {
-    if (UserConfigParams::m_multitouch_accelerometer == 0)
+    if (m_accelerometer_active == false)
     {
         button->axis_x = x;
     }
-    
+
     button->axis_y = y;
 }
 
