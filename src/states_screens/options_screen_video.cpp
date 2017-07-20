@@ -143,26 +143,22 @@ struct Resolution
 // ----------------------------------------------------------------------------
 int OptionsScreenVideo::getImageQuality()
 {
-    if (UserConfigParams::m_scale_rtts_factor == 0.8f &&
-        UserConfigParams::m_trilinear == false &&
+    if (UserConfigParams::m_trilinear == false &&
         UserConfigParams::m_anisotropic == 0 &&
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
         UserConfigParams::m_hq_mipmap == false)
         return 0;
-    if (UserConfigParams::m_scale_rtts_factor == 1.0f &&
-        UserConfigParams::m_trilinear == true &&
+    if (UserConfigParams::m_trilinear == true &&
         UserConfigParams::m_anisotropic == 2 &&
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
         UserConfigParams::m_hq_mipmap == false)
         return 1;
-    if (UserConfigParams::m_scale_rtts_factor == 1.0f &&
-        UserConfigParams::m_trilinear == true &&
+    if (UserConfigParams::m_trilinear == true &&
         UserConfigParams::m_anisotropic == 4 &&
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
         UserConfigParams::m_hq_mipmap == false)
         return 2;
-    if (UserConfigParams::m_scale_rtts_factor == 1.0f &&
-        UserConfigParams::m_trilinear == true &&
+    if (UserConfigParams::m_trilinear == true &&
         UserConfigParams::m_anisotropic == 16 &&
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
         UserConfigParams::m_hq_mipmap == true)
@@ -176,28 +172,24 @@ void OptionsScreenVideo::setImageQuality(int quality)
     switch (quality)
     {
         case 0:
-            UserConfigParams::m_scale_rtts_factor = 0.8f;
             UserConfigParams::m_trilinear = false;
             UserConfigParams::m_anisotropic = 0;
             UserConfigParams::m_high_definition_textures = 0x02;
             UserConfigParams::m_hq_mipmap = false;
             break;
         case 1:
-            UserConfigParams::m_scale_rtts_factor = 1.0f;
             UserConfigParams::m_trilinear = true;
             UserConfigParams::m_anisotropic = 2;
             UserConfigParams::m_high_definition_textures = 0x02;
             UserConfigParams::m_hq_mipmap = false;
             break;
         case 2:
-            UserConfigParams::m_scale_rtts_factor = 1.0f;
             UserConfigParams::m_trilinear = true;
             UserConfigParams::m_anisotropic = 4;
             UserConfigParams::m_high_definition_textures = 0x03;
             UserConfigParams::m_hq_mipmap = false;
             break;
         case 3:
-            UserConfigParams::m_scale_rtts_factor = 1.0f;
             UserConfigParams::m_trilinear = true;
             UserConfigParams::m_anisotropic = 16;
             UserConfigParams::m_high_definition_textures = 0x03;
