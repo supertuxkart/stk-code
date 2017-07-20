@@ -1,13 +1,15 @@
 ## SuperTuxKart 0.9.3
-* Improved VRAM management, reducing loading time by Auria and Benau
+* Improved VRAM management, reducing load times by Auria and Benau
 * New kart Wilbert by Jymis
 * New kart Hexley by Jymis
 * New track Cornfield Crossing by samuncle
-* Physic improvement and various physic related bugfix
-* Kart GFX improvement (exhaust and headlight)
-* Screen Recording by Benau and Stragus
+* Physics improvements and various physics bugfixes by hiker
+* Kart GFX improvements (exhaust and headlight)
+* In-game screen recording feature by Benau and Stragus
 * Bug fixes on the old render pipeline by Benau and Stragus
 * Hardware skinning
+* New smoother camera by Auria
+* New grand prix win scene
 
 ## SuperTuxKart 0.9.2
 * Ghost replay races by Benau
