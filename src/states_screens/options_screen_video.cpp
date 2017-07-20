@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2015 Marianne Gagnon
+//  Copyright (C) 2009-2017 Marianne Gagnon, STK Team and contributors
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -253,6 +253,24 @@ void OptionsScreenVideo::init()
     assert( vsync != NULL );
     vsync->setState( UserConfigParams::m_vsync );
 
+    GUIEngine::SpinnerWidget* scale_rtts_factor =
+        getWidget<GUIEngine::SpinnerWidget>("scale_rtts_factor");
+    assert( scale_rtts_factor != NULL );
+    int scale_rtts_factor_value = 5;
+    if (UserConfigParams::m_scale_rtts_factor == 0.5f)  scale_rtts_factor_value = 0;
+    else if (UserConfigParams::m_scale_rtts_factor == 0.6f)  scale_rtts_factor_value = 1;
+    else if (UserConfigParams::m_scale_rtts_factor == 0.7f)  scale_rtts_factor_value = 2;
+    else if (UserConfigParams::m_scale_rtts_factor == 0.8f)  scale_rtts_factor_value = 3;
+    else if (UserConfigParams::m_scale_rtts_factor == 0.9f)  scale_rtts_factor_value = 4;
+    scale_rtts_factor->clearLabels();
+    scale_rtts_factor->addLabel(_("0.5x"));
+    scale_rtts_factor->addLabel(_("0.6x"));
+    scale_rtts_factor->addLabel(_("0.7x"));
+    scale_rtts_factor->addLabel(_("0.8x"));
+    scale_rtts_factor->addLabel(_("0.9x"));
+    scale_rtts_factor->addLabel(_("1x"));
+    scale_rtts_factor->setValue(scale_rtts_factor_value);
+
 
     // ---- video modes
     DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");
@@ -455,7 +473,7 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: if all kart animations are enabled
     const core::stringw all = _LTR("All");
     //I18N: if some kart animations are enabled
-    const core::stringw me = _LTR("Me Only");
+    const core::stringw me = _LTR("Human players only");
     //I18N: if no kart animations are enabled
     const core::stringw none = _LTR("None");
 
@@ -632,6 +650,30 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
 
         rememberWinpos->setActive(!fullscreen->getState());
+    }
+    else if (name == "scale_rtts_factor")
+    {
+        switch (getWidget<SpinnerWidget>("scale_rtts_factor")->getValue())
+        {
+            case 0:
+                UserConfigParams::m_scale_rtts_factor = 0.5f;
+                break;
+            case 1:
+                UserConfigParams::m_scale_rtts_factor = 0.6f;
+                break;
+            case 2:
+                UserConfigParams::m_scale_rtts_factor = 0.7f;
+                break;
+            case 3:
+                UserConfigParams::m_scale_rtts_factor = 0.8f;
+                break;
+            case 4:
+                UserConfigParams::m_scale_rtts_factor = 0.9f;
+                break;
+            case 5:
+                UserConfigParams::m_scale_rtts_factor = 1.0f;
+                break;
+        }
     }
 }   // eventCallback
 
