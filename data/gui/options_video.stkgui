@@ -32,7 +32,7 @@
 
             <spacer height="10" width="10"/>
 
-            <<!-- ****************** VSYNC ****************** -->
+            <!-- ******************* VSYNC ****************** -->
             <div width="75%" height="fit" layout="horizontal-row" >
                 <spacer width="40" height="2" />
                 <checkbox id="vsync"/>
