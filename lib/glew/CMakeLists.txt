@@ -18,6 +18,6 @@ add_library(glew STATIC
     src/glew.c         src/glewinfo.c
 )
 
-target_link_libraries(glew ${OPENGL_LIBRARIES})
+target_link_libraries(glew ${OPENGL_gl_LIBRARY})
 
 endif()

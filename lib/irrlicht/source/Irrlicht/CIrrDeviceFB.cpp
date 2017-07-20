@@ -239,30 +239,30 @@ bool CIrrDeviceFB::run()
 			
 			switch (ev.code)
 			{
-				case KEY_RIGHTCTRL:
-				case KEY_LEFTCTRL:
+				case IRR_KEY_RIGHTCTRL:
+				case IRR_KEY_LEFTCTRL:
 					irrevent.KeyInput.Control = true;
 				break;
-				case KEY_RIGHTSHIFT:
-				case KEY_LEFTSHIFT:
+				case IRR_KEY_RIGHTSHIFT:
+				case IRR_KEY_LEFTSHIFT:
 					irrevent.KeyInput.Shift = true;
 				break;
-				case KEY_ESC:
+				case IRR_KEY_ESC:
 					irrevent.KeyInput.Key = (EKEY_CODE)0x1B;
 				break;
-				case KEY_SPACE:
+				case IRR_KEY_SPACE:
 					irrevent.KeyInput.Key = (EKEY_CODE)0x20;
 				break;
-				case KEY_UP:
+				case IRR_KEY_UP:
 					irrevent.KeyInput.Key = (EKEY_CODE)0x26;
 				break;
-				case KEY_LEFT:
+				case IRR_KEY_LEFT:
 					irrevent.KeyInput.Key = (EKEY_CODE)0x25;
 				break;
-				case KEY_RIGHT:
+				case IRR_KEY_RIGHT:
 					irrevent.KeyInput.Key = (EKEY_CODE)0x27;
 				break;
-				case KEY_DOWN:
+				case IRR_KEY_DOWN:
 					irrevent.KeyInput.Key = (EKEY_CODE)0x28;
 				break;
 				default:

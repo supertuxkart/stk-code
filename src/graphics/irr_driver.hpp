@@ -46,9 +46,7 @@
 #include <vector>
 
 #ifdef ANDROID
-#include <android_native_app_glue.h>
-
-extern struct android_app* global_android_app;
+#include "main_android.hpp"
 #endif
 
 

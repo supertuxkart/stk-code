@@ -5,9 +5,13 @@ find_package(JPEG REQUIRED)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
                     "${JPEG_INCLUDE_DIR}"
                     "${PNG_INCLUDE_DIRS}"
-                    "${ZLIB_INCLUDE_DIR}"
-                    "${CMAKE_CURRENT_BINARY_DIR}/../zlib/" # For zconf.h on WIN32
-                    "${CMAKE_CURRENT_BINARY_DIR}/../libpng/")
+                    "${ZLIB_INCLUDE_DIR}")
+
+if(MSVC OR APPLE)
+    include_directories("${CMAKE_CURRENT_BINARY_DIR}/../zlib/" # For zconf.h on WIN32
+                        "${CMAKE_CURRENT_BINARY_DIR}/../libpng/")
+endif()
+
 if (SERVER_ONLY)
     add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
@@ -58,7 +62,7 @@ else()
 endif()
 
 if(USE_GLES2)
-    add_definitions(-D_IRR_COMPILE_WITH_OGLES2_ -DNO_IRR_COMPILE_WITH_SOFTWARE_ -DNO_IRR_COMPILE_WITH_BURNINGSVIDEO_ -DNO_IRR_COMPILE_WITH_OGLES1_ -DNO_IRR_COMPILE_WITH_OPENGL_ -DNO_IRR_USE_NON_SYSTEM_JPEG_LIB_ -DNO_IRR_USE_NON_SYSTEM_LIB_PNG_ -DNO_IRR_USE_NON_SYSTEM_ZLIB_)
+    add_definitions(-D_IRR_COMPILE_WITH_OGLES2_ -DNO_IRR_COMPILE_WITH_OPENGL_)
 endif()
 
 if(CYGWIN)

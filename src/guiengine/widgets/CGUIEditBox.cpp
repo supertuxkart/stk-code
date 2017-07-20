@@ -324,12 +324,12 @@ bool CGUIEditBox::processKey(const SEvent& event)
 
         switch(event.KeyInput.Key)
         {
-        case KEY_KEY_A:
+        case IRR_KEY_A:
             // select all
             newMarkBegin = 0;
             newMarkEnd = Text.size();
             break;
-        case KEY_KEY_C:
+        case IRR_KEY_C:
             // copy to clipboard
             if (!PasswordBox && Operator && MarkBegin != MarkEnd)
             {
@@ -345,7 +345,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 #endif
             }
             break;
-        case KEY_KEY_X:
+        case IRR_KEY_X:
             // cut to the clipboard
             if (!PasswordBox && Operator && MarkBegin != MarkEnd)
             {
@@ -377,7 +377,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
             }
             break;
 
-        case KEY_KEY_V:
+        case IRR_KEY_V:
             if ( !isEnabled() )
                 break;
 
@@ -448,7 +448,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
                 textChanged = true;
             }
             break;
-        case KEY_HOME:
+        case IRR_KEY_HOME:
             if (!m_rtl)
             {
                 // move/highlight to start of text
@@ -466,7 +466,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
                 }
             }
             break;
-        case KEY_END:
+        case IRR_KEY_END:
             if (!m_rtl)
             {
                 // move/highlight to end of text
@@ -493,33 +493,33 @@ bool CGUIEditBox::processKey(const SEvent& event)
     switch(event.KeyInput.Key)
     {
             /*
-        case KEY_KEY_Q:
+        case IRR_KEY_Q:
             inputChar(L'\u05DC');
             textChanged = true;
             return true;
-        case KEY_KEY_W:
+        case IRR_KEY_W:
             inputChar(L'\u05DB');
             textChanged = true;
             return true;
-        case KEY_KEY_E:
+        case IRR_KEY_E:
             inputChar(L'\u05DA');
             textChanged = true;
             return true;
-        case KEY_KEY_R:
+        case IRR_KEY_R:
             inputChar(L'\u05D9');
             textChanged = true;
             return true;
-        case KEY_KEY_T:
+        case IRR_KEY_T:
             inputChar(L'\u05D8');
             textChanged = true;
             return true;
-        case KEY_KEY_Y:
+        case IRR_KEY_Y:
             inputChar(L'\u05D7');
             textChanged = true;
             return true;
             */
 
-    case KEY_END:
+    case IRR_KEY_END:
         if (!m_rtl)
         {
             s32 p = Text.size();
@@ -547,7 +547,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
             BlinkStartTime = getTime();
         }
         break;
-    case KEY_HOME:
+    case IRR_KEY_HOME:
         if (!m_rtl)
         {
 
@@ -573,7 +573,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
             BlinkStartTime = getTime();
         }
         break;
-    case KEY_RETURN:
+    case IRR_KEY_RETURN:
         if (MultiLine)
         {
             inputChar(L'\n');
@@ -584,7 +584,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
             sendGuiEvent( EGET_EDITBOX_ENTER );
         }
         break;
-    case KEY_LEFT:
+    case IRR_KEY_LEFT:
         if (!m_rtl)
         {
             if (event.KeyInput.Shift)
@@ -608,7 +608,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
         }
         break;
 
-    case KEY_RIGHT:
+    case IRR_KEY_RIGHT:
         if (!m_rtl)
         {
             if (event.KeyInput.Shift)
@@ -631,7 +631,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
             BlinkStartTime = getTime();
         }
         break;
-    case KEY_UP:
+    case IRR_KEY_UP:
         if (MultiLine || (WordWrap && BrokenText.size() > 1) )
         {
             s32 lineNo = getLineFromPos(CursorPos);
@@ -662,7 +662,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
             return false;
         }
         break;
-    case KEY_DOWN:
+    case IRR_KEY_DOWN:
         if (MultiLine || (WordWrap && BrokenText.size() > 1) )
         {
             s32 lineNo = getLineFromPos(CursorPos);
@@ -694,7 +694,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
         }
         break;
 
-    case KEY_BACK:
+    case IRR_KEY_BACK:
         if ( !isEnabled() )
             break;
 
@@ -734,7 +734,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
             textChanged = true;
         }
         break;
-    case KEY_DELETE:
+    case IRR_KEY_DELETE:
         if ( !isEnabled() )
             break;
 
@@ -772,33 +772,33 @@ bool CGUIEditBox::processKey(const SEvent& event)
         }
         break;
 
-    case KEY_ESCAPE:
-    case KEY_TAB:
-    case KEY_SHIFT:
-    case KEY_F1:
-    case KEY_F2:
-    case KEY_F3:
-    case KEY_F4:
-    case KEY_F5:
-    case KEY_F6:
-    case KEY_F7:
-    case KEY_F8:
-    case KEY_F9:
-    case KEY_F10:
-    case KEY_F11:
-    case KEY_F12:
-    case KEY_F13:
-    case KEY_F14:
-    case KEY_F15:
-    case KEY_F16:
-    case KEY_F17:
-    case KEY_F18:
-    case KEY_F19:
-    case KEY_F20:
-    case KEY_F21:
-    case KEY_F22:
-    case KEY_F23:
-    case KEY_F24:
+    case IRR_KEY_ESCAPE:
+    case IRR_KEY_TAB:
+    case IRR_KEY_SHIFT:
+    case IRR_KEY_F1:
+    case IRR_KEY_F2:
+    case IRR_KEY_F3:
+    case IRR_KEY_F4:
+    case IRR_KEY_F5:
+    case IRR_KEY_F6:
+    case IRR_KEY_F7:
+    case IRR_KEY_F8:
+    case IRR_KEY_F9:
+    case IRR_KEY_F10:
+    case IRR_KEY_F11:
+    case IRR_KEY_F12:
+    case IRR_KEY_F13:
+    case IRR_KEY_F14:
+    case IRR_KEY_F15:
+    case IRR_KEY_F16:
+    case IRR_KEY_F17:
+    case IRR_KEY_F18:
+    case IRR_KEY_F19:
+    case IRR_KEY_F20:
+    case IRR_KEY_F21:
+    case IRR_KEY_F22:
+    case IRR_KEY_F23:
+    case IRR_KEY_F24:
         // ignore these keys
         return false;
 
@@ -822,29 +822,29 @@ bool CGUIEditBox::processKey(const SEvent& event)
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
     switch(event.KeyInput.Key)
     {
-    // If cursor points the surrogate low, send KEY_LEFT event.
-    case KEY_UP:
-    case KEY_DOWN:
+    // If cursor points the surrogate low, send IRR_KEY_LEFT event.
+    case IRR_KEY_UP:
+    case IRR_KEY_DOWN:
         if (MultiLine || (WordWrap && BrokenText.size() > 1) )
         {
             if (UTF16_IS_SURROGATE_LO(Text[CursorPos]))
             {
                 SEvent leftEvent;
                 leftEvent = event;
-                leftEvent.KeyInput.Key = KEY_LEFT;
+                leftEvent.KeyInput.Key = IRR_KEY_LEFT;
                 Environment->postEventFromUser(leftEvent);
             }
         }
         break;
     // If cursor points the surrogate low, send a same event.
-    case KEY_LEFT:
-    case KEY_RIGHT:
-    case KEY_DELETE:
+    case IRR_KEY_LEFT:
+    case IRR_KEY_RIGHT:
+    case IRR_KEY_DELETE:
         if (UTF16_IS_SURROGATE_LO(Text[CursorPos]))
             Environment->postEventFromUser(event);
         break;
     // If cursor points front of the surrogate high, send a same event.
-    case KEY_BACK:
+    case IRR_KEY_BACK:
         if (CursorPos > 0)
         {
             if (UTF16_IS_SURROGATE_HI(Text[CursorPos-1]))

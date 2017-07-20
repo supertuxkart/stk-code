@@ -14,6 +14,11 @@ layout (location = 0) in vec3 particle_position;
 layout (location = 1) in float lifetime;
 layout (location = 2) in vec3 particle_velocity;
 layout (location = 3) in float size;
+
+#ifdef Needs_Vertex_Id_Workaround
+layout (location = 8) in int vertex_id;
+#endif
+
 #else
 in vec3 particle_position_initial;
 in float lifetime_initial;
@@ -24,6 +29,11 @@ in vec3 particle_position;
 in float lifetime;
 in vec3 particle_velocity;
 in float size;
+
+#ifdef Needs_Vertex_Id_Workaround
+in int vertex_id;
+#endif
+
 #endif
 
 out vec3 new_particle_position;
@@ -36,7 +46,11 @@ void main(void)
     float updated_lifetime = lifetime  + (float(dt)/lifetime_initial);
     if (updated_lifetime > 1.)
     {
+#ifdef Needs_Vertex_Id_Workaround
+        if (vertex_id < level)
+#else
         if (gl_VertexID < level)
+#endif
         {
             float dt_from_last_frame = fract(updated_lifetime) * lifetime_initial;
             float coeff = dt_from_last_frame / float(dt);

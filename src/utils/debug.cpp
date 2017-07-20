@@ -870,15 +870,15 @@ bool onEvent(const SEvent &event)
 
 bool handleStaticAction(int key)
 {
-    if (key == KEY_F1)
+    if (key == IRR_KEY_F1)
     {
         handleContextMenuAction(DEBUG_GUI_CAM_FREE);
     }
-    else if (key == KEY_F2)
+    else if (key == IRR_KEY_F2)
     {
         handleContextMenuAction(DEBUG_GUI_CAM_NORMAL);
     }
-    else if (key == KEY_F3)
+    else if (key == IRR_KEY_F3)
     {
         STKTexManager::getInstance()->reloadTexture("");
         return true;
