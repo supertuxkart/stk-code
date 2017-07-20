@@ -305,8 +305,9 @@ void gamepadVisualisation()
 
                     if (evt.PressedDown)
                     {
-                        if (evt.Key == KEY_RETURN || evt.Key == KEY_ESCAPE ||
-                            evt.Key == KEY_SPACE)
+                        if (evt.Key == IRR_KEY_RETURN || 
+                            evt.Key == IRR_KEY_ESCAPE ||
+                            evt.Key == IRR_KEY_SPACE)
                         {
                             exit(0);
                         }

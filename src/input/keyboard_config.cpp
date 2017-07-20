@@ -53,23 +53,23 @@ void KeyboardConfig::save(std::ofstream& stream)
 
 void KeyboardConfig::setDefaultBinds()
 {
-    setBinding(PA_NITRO,       Input::IT_KEYBOARD, KEY_KEY_N);
-    setBinding(PA_ACCEL,       Input::IT_KEYBOARD, KEY_UP);
-    setBinding(PA_BRAKE,       Input::IT_KEYBOARD, KEY_DOWN);
-    setBinding(PA_STEER_LEFT,  Input::IT_KEYBOARD, KEY_LEFT);
-    setBinding(PA_STEER_RIGHT, Input::IT_KEYBOARD, KEY_RIGHT);
-    setBinding(PA_DRIFT,       Input::IT_KEYBOARD, KEY_KEY_V);
-    setBinding(PA_RESCUE,      Input::IT_KEYBOARD, KEY_BACK);
-    setBinding(PA_FIRE,        Input::IT_KEYBOARD, KEY_SPACE);
-    setBinding(PA_LOOK_BACK,   Input::IT_KEYBOARD, KEY_KEY_B);
-    setBinding(PA_PAUSE_RACE,  Input::IT_KEYBOARD, KEY_ESCAPE);
+    setBinding(PA_NITRO,       Input::IT_KEYBOARD, IRR_KEY_N);
+    setBinding(PA_ACCEL,       Input::IT_KEYBOARD, IRR_KEY_UP);
+    setBinding(PA_BRAKE,       Input::IT_KEYBOARD, IRR_KEY_DOWN);
+    setBinding(PA_STEER_LEFT,  Input::IT_KEYBOARD, IRR_KEY_LEFT);
+    setBinding(PA_STEER_RIGHT, Input::IT_KEYBOARD, IRR_KEY_RIGHT);
+    setBinding(PA_DRIFT,       Input::IT_KEYBOARD, IRR_KEY_V);
+    setBinding(PA_RESCUE,      Input::IT_KEYBOARD, IRR_KEY_BACK);
+    setBinding(PA_FIRE,        Input::IT_KEYBOARD, IRR_KEY_SPACE);
+    setBinding(PA_LOOK_BACK,   Input::IT_KEYBOARD, IRR_KEY_B);
+    setBinding(PA_PAUSE_RACE,  Input::IT_KEYBOARD, IRR_KEY_ESCAPE);
 
-    setBinding(PA_MENU_UP,     Input::IT_KEYBOARD, KEY_UP);
-    setBinding(PA_MENU_DOWN,   Input::IT_KEYBOARD, KEY_DOWN);
-    setBinding(PA_MENU_LEFT,   Input::IT_KEYBOARD, KEY_LEFT);
-    setBinding(PA_MENU_RIGHT,  Input::IT_KEYBOARD, KEY_RIGHT);
-    setBinding(PA_MENU_SELECT, Input::IT_KEYBOARD, KEY_RETURN);
-    setBinding(PA_MENU_CANCEL, Input::IT_KEYBOARD, KEY_BACK);
+    setBinding(PA_MENU_UP,     Input::IT_KEYBOARD, IRR_KEY_UP);
+    setBinding(PA_MENU_DOWN,   Input::IT_KEYBOARD, IRR_KEY_DOWN);
+    setBinding(PA_MENU_LEFT,   Input::IT_KEYBOARD, IRR_KEY_LEFT);
+    setBinding(PA_MENU_RIGHT,  Input::IT_KEYBOARD, IRR_KEY_RIGHT);
+    setBinding(PA_MENU_SELECT, Input::IT_KEYBOARD, IRR_KEY_RETURN);
+    setBinding(PA_MENU_CANCEL, Input::IT_KEYBOARD, IRR_KEY_BACK);
 }
 
 //------------------------------------------------------------------------------
