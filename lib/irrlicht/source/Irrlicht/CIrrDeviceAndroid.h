@@ -18,6 +18,8 @@
 #include "IImagePresenter.h"
 #include "ICursorControl.h"
 
+#include <map>
+
 
 namespace irr
 {
@@ -108,7 +110,7 @@ namespace irr
 
 		video::SExposedVideoData ExposedVideoData;
 
-		core::array<EKEY_CODE> KeyMap;
+		std::map<int, EKEY_CODE> KeyMap;
 		
 		void createDriver();
 		void createKeyMap();
