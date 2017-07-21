@@ -29,6 +29,10 @@ if (UNIX AND NOT APPLE)
     option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
 endif()
 
+if(USE_GLES2)
+    add_definitions(-D_IRR_COMPILE_WITH_OGLES2_ -DNO_IRR_COMPILE_WITH_OPENGL_)
+endif()
+
 if(MSVC AND (MSVC_VERSION LESS 1900))
     # Normally hide the option to build wiiuse on VS, since it depends
     # on the installation of the Windows DDK (Driver Developer Kit),
