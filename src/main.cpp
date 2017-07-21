@@ -1,8 +1,8 @@
 
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2011-2015 Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2004-2017 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2011-2017 Joerg Henrichs, Marianne Gagnon, The SuperTuxKart Team and contributors
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -215,6 +215,7 @@
 #include "network/protocols/get_public_address.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
+#include "online/update_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
@@ -227,6 +228,7 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/dialogs/update_dialog.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -1694,6 +1696,12 @@ int main(int argc, char *argv[] )
             }
         }
 #endif
+
+        // Alert the user if there are any updates available
+        if (Online::UpdateManager::UpdateAvailable() && UserConfigParams::m_update_popup) {
+            new UpdateDialog();
+        }
+
         // Note that on the very first run of STK internet status is set to
         // "not asked", so the report will only be sent in the next run.
         if(UserConfigParams::m_internet_status==Online::RequestManager::IPERM_ALLOWED)
