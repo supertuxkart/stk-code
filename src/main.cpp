@@ -228,6 +228,7 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/dialogs/update_dialog.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -1697,13 +1698,8 @@ int main(int argc, char *argv[] )
 #endif
 
         // Alert the user if there are any updates available
-        if (Online::UpdateManager::UpdateAvailable())
-        {
-            MessageDialog *dialog =
-                new MessageDialog(_("A new version of SuperTuxKart is available! \n"
-                "Get it from: SuperTuxKart.net/Download"),
-                /*from queue*/ true);
-            GUIEngine::DialogQueue::get()->pushDialog(dialog);
+        if (Online::UpdateManager::UpdateAvailable() && UserConfigParams::m_update_popup) {
+            new UpdateDialog();
         }
 
         // Note that on the very first run of STK internet status is set to

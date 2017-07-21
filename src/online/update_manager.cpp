@@ -15,12 +15,13 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "online/update_manager.hpp"
+
 #include "config/user_config.hpp"
 #include "online/request_manager.hpp"
 #include "utils/constants.hpp"
-#include "utils/log.hpp"
 #include "curl/curl.h"
-#include <cstdio>
+
+//#include <cstdio>
 #include <string>
 #include <iostream>
 

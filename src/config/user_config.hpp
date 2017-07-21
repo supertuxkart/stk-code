@@ -871,6 +871,10 @@ namespace UserConfigParams
                                                "wasn't asked, 1: allowed, 2: "
                                                "not allowed") );
 
+    PARAM_PREFIX BoolUserConfigParam        m_update_popup
+        PARAM_DEFAULT(BoolUserConfigParam(true, "update_popup",
+                            "Determines if popup message for updates should be displayed."));
+
     PARAM_PREFIX GroupUserConfigParam       m_hw_report_group
             PARAM_DEFAULT( GroupUserConfigParam("HWReport",
                                           "Everything related to hardware configuration.") );

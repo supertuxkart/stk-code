@@ -132,16 +132,17 @@ void OptionsScreenUI::init()
     CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
     assert( fps != NULL );
     fps->setState( UserConfigParams::m_display_fps );
+
     CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
     assert( news != NULL );
     news->setState( UserConfigParams::m_internet_status
                                      ==RequestManager::IPERM_ALLOWED );
+
     CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
     assert( stats != NULL );
     LabelWidget *stats_label = getWidget<LabelWidget>("label-hw-report");
     assert( stats_label );
             stats->setState(UserConfigParams::m_hw_report_enable);
-
     if(news->getState())
     {
         stats_label->setVisible(true);
@@ -153,6 +154,11 @@ void OptionsScreenUI::init()
         stats_label->setVisible(false);
         stats->setVisible(false);
     }
+
+    CheckBoxWidget* update = getWidget<CheckBoxWidget>("enable-update-popup");
+    assert( update != NULL );
+    update->setState( UserConfigParams::m_update_popup );
+
     CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
     assert( difficulty != NULL );
     difficulty->setState( UserConfigParams::m_per_player_difficulty );
@@ -262,6 +268,12 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
         assert( fps != NULL );
         UserConfigParams::m_display_fps = fps->getState();
+    }
+    else if (name == "enable-update-popup")
+    {
+        CheckBoxWidget* update = getWidget<CheckBoxWidget>("enable-update-popup");
+        assert( update != NULL );
+        UserConfigParams::m_update_popup = update->getState();
     }
     else if (name=="enable-internet")
     {
