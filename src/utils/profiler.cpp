@@ -194,7 +194,7 @@ void Profiler::popCpuMarker()
         return;
 
     ThreadInfo&    ti = getThreadInfo();
-    assert(ti.markers_stack[m_write_id].size() > 0);
+    assert(ti.m_markers_stack[m_write_id].size() > 0);
 
     MarkerStack& markers_stack = ti.m_markers_stack[m_write_id];
     MarkerList&  markers_done  = ti.m_markers_done[m_write_id];
@@ -345,7 +345,7 @@ void Profiler::draw()
         for (MarkerList::const_iterator it = markers.begin(); it != it_end; it++)
         {
             const Marker&    m = *it;
-            assert(m.end >= 0.0);
+            assert(m.m_end >= 0.0);
 
             if (m_capture_report)
             {
