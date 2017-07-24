@@ -89,19 +89,22 @@ double getTimeMilliseconds();
 
 using namespace irr;
 
-/** For profiling reports, we need a custom strijng stream that writes to a large
-    pre-allocated buffer, to avoid allocating as much as possible durign profiling */
+// ============================================================================
+/** For profiling reports, we need a custom strijng stream that writes to a 
+ *  large pre-allocated buffer, to avoid allocating as much as possible during
+ *  profiling. */
 template <typename char_type>
-struct ostreambuf : public std::basic_streambuf<char_type, std::char_traits<char_type> >
+struct ostreambuf : public std::basic_streambuf<char_type,
+                                                std::char_traits<char_type> >
 {
     ostreambuf(char_type* buffer, std::streamsize bufferLength)
     {
         // set the "put" pointer the start of the buffer and record it's length.
         this->setp(buffer, buffer + bufferLength);
     }
-};
+};   // basic_streambuf
 
-
+// ============================================================================
 class StringBuffer
 {
 private:
@@ -111,59 +114,78 @@ private:
 
 public:
 
-    StringBuffer(unsigned int size) : m_buffer((char*)calloc(size, 1)), ostreamBuffer(m_buffer, size), messageStream(&ostreamBuffer)
+    StringBuffer(unsigned int size) : m_buffer((char*)calloc(size, 1)),
+                                      ostreamBuffer(m_buffer, size),
+                                      messageStream(&ostreamBuffer)
     {
-    }
-
+    }   // StringBuffer
+    // ------------------------------------------------------------------------
     ~StringBuffer()
     {
         free(m_buffer);
     }
 
+    // ------------------------------------------------------------------------
     std::ostream& getStdStream() { return messageStream; }
-
+    // ------------------------------------------------------------------------
     char* getRawBuffer() { return m_buffer; }
-};
+};   // class StringBuffer
 
+// ============================================================================
 /**
-  * \brief class that allows run-time graphical profiling through the use of markers
-  * \ingroup utils
-  */
+ * \brief class that allows run-time graphical profiling through the use of markers
+ * \ingroup utils
+ */
 class Profiler
 {
 private:
+    // ------------------------------------------------------------------------
     struct Marker
     {
-        double  start;  // Times of start and end, in milliseconds,
-        double  end;    // relatively to the time of last synchronization
-        size_t  layer;
+        /** Start time of marker (relative to time of last synch). */
+        double  m_start;
+        /** End time of marker (relative to time of last synch). */
+        double  m_end;
+        /** Distance of marker from root (for nested events), used to
+         *  adjust vertical height when drawing. */
+        size_t  m_layer;
 
-        std::string     name;
-        video::SColor   color;
+        /** Name of event. */
+        std::string   m_name;
 
-        Marker(double start, double end, const char* name="N/A", const video::SColor& color=video::SColor(), size_t layer=0)
-            : start(start), end(end), layer(layer), name(name), color(color)
+        /** Color for this event. */
+        video::SColor m_color;
+
+        Marker(double start, double end, const char* name="N/A",
+               const video::SColor& color=video::SColor(), size_t layer=0)
+           : m_start(start), m_end(end), m_layer(layer), m_name(name)
+            , m_color(color)
         {
         }
 
         Marker(const Marker& ref)
-            : start(ref.start), end(ref.end), layer(ref.layer), name(ref.name), color(ref.color)
+            : m_start(ref.m_start), m_end(ref.m_end), m_layer(ref.m_layer)
+            , m_name(ref.m_name), m_color(ref.m_color)
         {
         }
-    };
+    };   // struct Marker
+    // ------------------------------------------------------------------------
 
     typedef    std::list<Marker>   MarkerList;
     typedef    std::stack<Marker>  MarkerStack;
 
     struct ThreadInfo
     {
-        MarkerList   markers_done[2];
-        MarkerStack  markers_stack[2];
+        MarkerList   m_markers_done[2];
+        MarkerStack  m_markers_stack[2];
     };
+    // ------------------------------------------------------------------------
 
     typedef    std::vector<ThreadInfo>  ThreadInfoList;
 
     ThreadInfoList  m_thread_infos;
+
+    /** Which of the two buffers to store data in. */
     int             m_write_id;
     double          m_time_last_sync;
     double          m_time_between_sync;
@@ -185,28 +207,29 @@ private:
     StringBuffer* m_capture_report_buffer;
     StringBuffer* m_gpu_capture_report_buffer;
 
-public:
-    Profiler();
-    virtual ~Profiler();
-
-    void    pushCpuMarker(const char* name="N/A", const video::SColor& color=video::SColor());
-    void    popCpuMarker();
-    void    synchronizeFrame();
-
-    void    draw();
-
-    void    onClick(const core::vector2di& mouse_pos);
-
-    bool getCaptureReport() const { return m_capture_report; }
-    void setCaptureReport(bool captureReport);
-
-    bool isFrozen() const { return m_freeze_state == FROZEN; }
-
 protected:
     // TODO: detect on which thread this is called to support multithreading
     ThreadInfo& getThreadInfo() { return m_thread_infos[0]; }
     void        drawBackground();
 
+
+public:
+    Profiler();
+    virtual ~Profiler();
+
+    void    pushCpuMarker(const char* name="N/A",
+                          const video::SColor& color=video::SColor());
+    void    popCpuMarker();
+    void    synchronizeFrame();
+    void    draw();
+    void    onClick(const core::vector2di& mouse_pos);
+
+    // ------------------------------------------------------------------------
+    bool getCaptureReport() const { return m_capture_report; }
+    // ------------------------------------------------------------------------
+    void setCaptureReport(bool captureReport);
+    // ------------------------------------------------------------------------
+    bool isFrozen() const { return m_freeze_state == FROZEN; }
 
 };
 
