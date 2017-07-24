@@ -408,6 +408,11 @@ namespace UserConfigParams
             PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_enabled",
             &m_multitouch_group,
             "Enable multitouch support.") );
+            
+    PARAM_PREFIX IntUserConfigParam         m_multitouch_mode
+            PARAM_DEFAULT( IntUserConfigParam(1, "multitouch_mode",
+            &m_multitouch_group,
+            "Steering mode: 0 = off, 1 = buttons, 2 = accelerometer") );
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_center
             PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone_center",

@@ -102,7 +102,8 @@ RaceGUIBase::RaceGUIBase()
     m_referee               = NULL;
     m_multitouch_gui        = NULL;
 
-    if (UserConfigParams::m_multitouch_enabled &&
+    if (UserConfigParams::m_multitouch_enabled && 
+        UserConfigParams::m_multitouch_mode != 0 &&
         race_manager->getNumLocalPlayers() == 1)
     {
         m_multitouch_gui = new RaceGUIMultitouch(this);
@@ -721,7 +722,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     {
         y_icons_limit = irr_driver->getActualScreenSize().Height - ICON_WIDTH;
     }
-    else if (UserConfigParams::m_multitouch_enabled)
+    else if (m_multitouch_gui != NULL)
     {
         y_icons_limit = irr_driver->getActualScreenSize().Height / 2;
     }

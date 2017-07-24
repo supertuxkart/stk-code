@@ -10,6 +10,16 @@
 	<spacer height="15" width="10"/>
 	
 	<div width="75%" height="fit" layout="horizontal-row" >
+	    <label proportion="1" height="100%" text_align="right" I18N="In the multitouch settings screen" text="Device enabled"/>
+	    <div proportion="1" height="fit" layout="horizontal-row" >
+		<spacer width="40" height="100%" />
+                <checkbox id="buttons_enabled" width="40" height="40"/>
+	    </div>
+	</div>
+
+	<spacer height="15" width="10"/>
+	
+	<div width="75%" height="fit" layout="horizontal-row" >
 	    <label proportion="1" height="100%" text_align="right" I18N="In the multitouch settings screen" text="Buttons scale"/>
 	    <div proportion="1" height="fit" layout="horizontal-row" >
 		<spacer width="40" height="100%" />
