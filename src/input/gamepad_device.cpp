@@ -39,13 +39,21 @@ GamePadDevice::GamePadDevice(const int irr_index, const std::string &name,
     {
         config->setNumberOfButtons(button_count);
     }
-    if(m_configuration->getNumberOfAxes()<axis_count)
+
+    // HAT/POV buttons will be reported as additional axis with the values
+    // HAT_V_ID > HAT_H_ID. So increase the number of axis to be large
+    // enough to handle HAT_V/H_ID as axis number.
+    assert(Input::HAT_V_ID > Input::HAT_H_ID);
+    int adj_axis_count = axis_count > Input::HAT_V_ID ? axis_count 
+                                                      : Input::HAT_V_ID+1;
+
+    if(m_configuration->getNumberOfAxes()<adj_axis_count)
     {
-        config->setNumberOfAxis(axis_count);
+        config->setNumberOfAxis(adj_axis_count);
     }
-    m_prev_axis_directions.resize(axis_count);
-    m_prev_axis_value.resize(axis_count);
-    m_axis_ok.resize(axis_count);
+    m_prev_axis_directions.resize(adj_axis_count);
+    m_prev_axis_value.resize(adj_axis_count);
+    m_axis_ok.resize(adj_axis_count);
     m_irr_index             = irr_index;
     m_name                  = name;
 
