@@ -88,7 +88,7 @@ enum DebugMenuCommand
     DEBUG_GRAPHICS_BULLET_2,
     DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ,
     DEBUG_PROFILER,
-    DEBUG_PROFILER_GENERATE_REPORT,
+    DEBUG_PROFILER_WRITE_REPORT,
     DEBUG_FONT_DUMP_GLYPH_PAGE,
     DEBUG_FONT_RELOAD,
     DEBUG_FPS,
@@ -349,8 +349,8 @@ bool handleContextMenuAction(s32 cmd_id)
         UserConfigParams::m_profiler_enabled =
             !UserConfigParams::m_profiler_enabled;
         break;
-    case DEBUG_PROFILER_GENERATE_REPORT:
-        profiler.setCaptureReport(!profiler.getCaptureReport());
+    case DEBUG_PROFILER_WRITE_REPORT:
+        profiler.writeToFile();
         break;
     case DEBUG_THROTTLE_FPS:
         main_loop->setThrottleFPS(false);
@@ -822,8 +822,8 @@ bool onEvent(const SEvent &event)
 
             mnu->addItem(L"Profiler", DEBUG_PROFILER);
             if (UserConfigParams::m_profiler_enabled)
-                mnu->addItem(L"Toggle capture profiler report",
-                             DEBUG_PROFILER_GENERATE_REPORT);
+                mnu->addItem(L"Save profiler report",
+                             DEBUG_PROFILER_WRITE_REPORT);
             mnu->addItem(L"Do not limit FPS", DEBUG_THROTTLE_FPS);
             mnu->addItem(L"Toggle FPS", DEBUG_FPS);
             mnu->addItem(L"Save replay", DEBUG_SAVE_REPLAY);
