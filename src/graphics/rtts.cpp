@@ -51,8 +51,8 @@ static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, G
 
 RTT::RTT(size_t width, size_t height, float rtt_scale)
 {
-    m_width = width * rtt_scale;
-    m_height = height  * rtt_scale;
+    m_width = size_t(width * rtt_scale);
+    m_height = size_t(height  * rtt_scale);
     m_shadow_FBO = NULL;
     m_RH_FBO = NULL;
     m_RSM = NULL;
