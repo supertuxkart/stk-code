@@ -160,8 +160,9 @@ int Profiler::getThreadID()
 /// Push a new marker that starts now
 void Profiler::pushCPUMarker(const char* name, const video::SColor& colour)
 {
-    // Don't do anything when frozen
-    if (m_freeze_state == FROZEN || m_freeze_state == WAITING_FOR_UNFREEZE)
+    // Don't do anything when disabled or frozen
+    if (!UserConfigParams::m_profiler_enabled || 
+         m_freeze_state == FROZEN || m_freeze_state == WAITING_FOR_UNFREEZE )
         return;
 
     double  start = getTimeMilliseconds() - m_time_last_sync;
@@ -191,13 +192,23 @@ void Profiler::pushCPUMarker(const char* name, const video::SColor& colour)
 /// Stop the last pushed marker
 void Profiler::popCPUMarker()
 {
-    // Don't do anything when frozen
-    if(m_freeze_state == FROZEN || m_freeze_state == WAITING_FOR_UNFREEZE)
+    // Don't do anything when disabled or frozen
+    if( !UserConfigParams::m_profiler_enabled || 
+        m_freeze_state == FROZEN || m_freeze_state == WAITING_FOR_UNFREEZE )
         return;
 
     m_lock.lock();
     int thread_id = getThreadID();
     ThreadData &td = m_all_threads_data[thread_id];
+
+    // When the profiler gets enabled (which happens in the middle of the
+    // main loop), there can be some pops without matching pushes (for one
+    // frame) - ignore those events.
+    if (td.m_event_stack.size() == 0)
+    {
+        m_lock.unlock();
+        return;
+    }
 
     assert(td.m_event_stack.size() > 0);
 
@@ -218,7 +229,7 @@ void Profiler::popCPUMarker()
 void Profiler::synchronizeFrame()
 {
     // Don't do anything when frozen
-    if(m_freeze_state == FROZEN)
+    if(!UserConfigParams::m_profiler_enabled || m_freeze_state == FROZEN)
         return;
 
     // Avoid using several times getTimeMilliseconds(),
