@@ -371,7 +371,7 @@ FileManager::~FileManager()
             continue;
         }
         if(UserConfigParams::logAddons())
-            Log::verbose("[FileManager]", "Deleting tmp file'%s'.",full_path.c_str());
+            Log::verbose("[FileManager]", "Deleting tmp file '%s'.",full_path.c_str());
         removeFile(full_path);
 
     }   // for i in all files in tmp
