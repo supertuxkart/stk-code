@@ -31,6 +31,7 @@
 #ifdef _MSC_VER
 #pragma comment(lib, "winmm.lib")
 #endif
+#include <Xinput.h>
 #endif
 #endif
 
@@ -80,6 +81,8 @@ struct SJoystickWin32Control
 #else
         JOYCAPS Caps;
 #endif
+        /** For xbox-360 controller. */
+        bool m_use_xinput;
     };
     core::array<JoystickInfo> ActiveJoysticks;
 #endif
@@ -194,10 +197,11 @@ struct SJoystickWin32Control
 
 void pollJoysticks()
 {
+    if (0 == ActiveJoysticks.size())
+        return;
+
 #if defined _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 #ifdef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
-    if(0 == ActiveJoysticks.size())
-        return;
 
     u32 joystick;
     DIJOYSTATE2 info;
@@ -295,37 +299,51 @@ void pollJoysticks()
         }
     }
 #else
-    if (0 == ActiveJoysticks.size())
-        return;
-
     u32 joystick;
-    JOYINFOEX info;
 
     for(joystick = 0; joystick < ActiveJoysticks.size(); ++joystick)
     {
-        // needs to be reset for each joystick
-        // request ALL values and POV as continuous if possible
-        info.dwSize = sizeof(info);
-        info.dwFlags = JOY_RETURNALL|JOY_RETURNPOVCTS;
-        const JOYCAPS & caps = ActiveJoysticks[joystick].Caps;
-        // if no POV is available don't ask for POV values
-        if (!(caps.wCaps & JOYCAPS_HASPOV))
-            info.dwFlags &= ~(JOY_RETURNPOV|JOY_RETURNPOVCTS);
-        if(JOYERR_NOERROR == joyGetPosEx(ActiveJoysticks[joystick].Index, &info))
-        {
-            SEvent event;
+        SEvent event;
 
-            event.EventType = irr::EET_JOYSTICK_INPUT_EVENT;
-            event.JoystickEvent.Joystick = (u8)joystick;
+        event.EventType = irr::EET_JOYSTICK_INPUT_EVENT;
+        event.JoystickEvent.Joystick = (u8)joystick;
+        for (int axis = 0; axis < SEvent::SJoystickEvent::NUMBER_OF_AXES; ++axis)
+            event.JoystickEvent.Axis[axis] = 0;
+
+        if (ActiveJoysticks[joystick].m_use_xinput)
+        {
+            XINPUT_STATE state;
+            memset(&state, 0, sizeof(state));
+            DWORD result = XInputGetState(joystick, &state);
+            event.JoystickEvent.ButtonStates = state.Gamepad.wButtons;
+            // Thumb values are in [-32768, 32767]
+            event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_V] = state.Gamepad.sThumbRX;
+            event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_X] = state.Gamepad.sThumbRY;
+            event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_Y] = state.Gamepad.sThumbLX;
+            event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_Z] = state.Gamepad.sThumbLY;
+            event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_R] = state.Gamepad.bLeftTrigger*128;
+            event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_U] = state.Gamepad.bRightTrigger*128;
+        }
+        else   // old API
+        { 
+            JOYINFOEX info;
+            // needs to be reset for each joystick
+            // request ALL values and POV as continuous if possible
+            info.dwSize = sizeof(info);
+            info.dwFlags = JOY_RETURNALL | JOY_RETURNPOVCTS;
+            const JOYCAPS & caps = ActiveJoysticks[joystick].Caps;
+            // if no POV is available don't ask for POV values
+            if (!(caps.wCaps & JOYCAPS_HASPOV))
+                info.dwFlags &= ~(JOY_RETURNPOV | JOY_RETURNPOVCTS);
+            if (joyGetPosEx(ActiveJoysticks[joystick].Index, &info) != JOYERR_NOERROR)
+                continue;
+
 
             event.JoystickEvent.POV = (u16)info.dwPOV;
             // set to undefined if no POV value was returned or the value
             // is out of range
             if (!(info.dwFlags & JOY_RETURNPOV) || (event.JoystickEvent.POV > 35900))
                 event.JoystickEvent.POV = 65535;
-
-            for(int axis = 0; axis < SEvent::SJoystickEvent::NUMBER_OF_AXES; ++axis)
-                event.JoystickEvent.Axis[axis] = 0;
 
             event.JoystickEvent.ButtonStates = info.dwButtons;
 
@@ -355,11 +373,10 @@ void pollJoysticks()
             case 1:
                 event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_X] =
                     (s16)((65535 * (info.dwXpos - caps.wXmin)) / (caps.wXmax - caps.wXmin) - 32768);
-            }
-
-            (void)Device->postEventFromUser(event);
-        }
-    }
+            }   // switch
+        }   // if XInput ... else
+        (void)Device->postEventFromUser(event);
+    }   // for all joysticks
 #endif
 #endif // _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 }
@@ -449,6 +466,7 @@ bool activateJoysticks(core::array<SJoystickInfo> & joystickInfo)
     joystickInfo.clear();
     ActiveJoysticks.clear();
 
+    // This number includes XInput and legacy devices
     const u32 numberOfJoysticks = ::joyGetNumDevs();
     JOYINFOEX info;
     info.dwSize = sizeof(info);
@@ -460,7 +478,34 @@ bool activateJoysticks(core::array<SJoystickInfo> & joystickInfo)
     joystickInfo.reallocate(numberOfJoysticks);
     ActiveJoysticks.reallocate(numberOfJoysticks);
 
+    // First discover all Xbox 360 controllers, which need to use
+    // XInput to get the state (otherwise the two triggers can not
+    // be used at the same time).
     u32 joystick = 0;
+    for (int i = 0; i < XUSER_MAX_COUNT; i++)
+    {
+        XINPUT_STATE state;
+        memset(&state, 0, sizeof(state));
+
+        DWORD result = XInputGetState(i, &state);
+        // Not connected or not an XInput device
+        if (result != ERROR_SUCCESS) continue;
+
+        activeJoystick.Index = i;
+        activeJoystick.m_use_xinput = true;
+        ActiveJoysticks.push_back(activeJoystick);
+
+        // This information is returned to the calling program
+        SJoystickInfo joy_info;
+        // 2 sticks with 2 directions each plus two triggers
+        joy_info.Axes           = 6;
+        joy_info.Buttons        = 30;
+        joy_info.Name           = "XBOX 360 Gamepad";
+        joy_info.HasGenericName = false;
+        joy_info.PovHat         = SJoystickInfo::POV_HAT_PRESENT;
+        joystickInfo.push_back(joy_info);
+    }   // for i < XUSER_MAX_COUNT
+
     for(; joystick < numberOfJoysticks; ++joystick)
     {
         if(JOYERR_NOERROR == joyGetPosEx(joystick, &info)
@@ -469,12 +514,17 @@ bool activateJoysticks(core::array<SJoystickInfo> & joystickInfo)
                                             &activeJoystick.Caps,
                                             sizeof(activeJoystick.Caps)))
         {
+            setJoystickName(joystick, activeJoystick.Caps, &returnInfo);
+            core::stringc low_name = returnInfo.Name.make_lower();
+            // Ignore xbox controller, which are handled using XInput above
+            if (low_name.find("xbox") != -1) continue;
+            
             activeJoystick.Index = joystick;
+            activeJoystick.m_use_xinput = false;
             ActiveJoysticks.push_back(activeJoystick);
             returnInfo.Joystick = (u8)joystick;
             returnInfo.Axes = activeJoystick.Caps.wNumAxes;
             returnInfo.Buttons = activeJoystick.Caps.wNumButtons;
-            setJoystickName(joystick, activeJoystick.Caps, &returnInfo);
             returnInfo.PovHat = ((activeJoystick.Caps.wCaps & JOYCAPS_HASPOV) == JOYCAPS_HASPOV)
                                 ? SJoystickInfo::POV_HAT_PRESENT : SJoystickInfo::POV_HAT_ABSENT;
 
