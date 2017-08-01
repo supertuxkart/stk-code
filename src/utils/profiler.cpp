@@ -113,10 +113,6 @@ Profiler::Profiler()
     m_time_between_sync   = 0.0;
     m_freeze_state        = UNFROZEN;
 
-    // By limiting the number of threads that can be created, we avoid the
-    // problem that all access to m_all_event_data need to be locked
-    // (otherwise adding a thread to m_all_event_data can trigger a
-    // reallocate, which makes concurrent access invalid)
     m_max_frames          = int(  UserConfigParams::m_profiler_buffer_duration
                                 * UserConfigParams::m_max_fps                 );
     m_current_frame       = 0;
@@ -124,7 +120,7 @@ Profiler::Profiler()
     m_threads_used        = 0;
     const int MAX_THREADS = 10;
     m_all_threads_data.resize(MAX_THREADS);
-    m_thread_mapping.getData().resize(MAX_THREADS);
+    m_thread_mapping.resize(MAX_THREADS);
     m_gpu_times.resize(Q_LAST*m_max_frames);
 }   // Profile
 
@@ -134,27 +130,28 @@ Profiler::~Profiler()
 }   // ~Profiler
 
 //-----------------------------------------------------------------------------
+/** Returns a unique index for a thread. If the calling thread is not yet in
+ *  the mapping, it will assign a new unique id to this thread. This function
+ *  is NOT thread-safe and must be called from a properly protected code
+ *  section. */
 int Profiler::getThreadID()
 {
-    m_thread_mapping.lock();
     pthread_t thread = pthread_self();
     int i = 0;
     while(i < m_threads_used)
     {
-        if (memcmp( &m_thread_mapping.getData()[i],
+        if (memcmp( &m_thread_mapping[i],
                     &thread,
                     sizeof(thread)) ==0 )
         {
-            m_thread_mapping.unlock();
             return i;
         }
         i++;
     }   // for i <m_threads_used
 
-    assert(m_threads_used < (int)m_thread_mapping.getData().size());
-    m_thread_mapping.getData()[m_threads_used] = thread;
+    assert(m_threads_used < (int)m_thread_mapping.size());
+    m_thread_mapping[m_threads_used] = thread;
     m_threads_used++;
-    m_thread_mapping.unlock();
 
     return m_threads_used - 1;
 }   // getThreadID
@@ -168,6 +165,10 @@ void Profiler::pushCPUMarker(const char* name, const video::SColor& colour)
         return;
 
     double  start = getTimeMilliseconds() - m_time_last_sync;
+
+    // We need to look before getting the thread id (since this might
+    // be a new thread which changes the structure).
+    m_lock.lock();
     int thread_id = getThreadID();
 
     ThreadData &td = m_all_threads_data[thread_id];
@@ -182,8 +183,8 @@ void Profiler::pushCPUMarker(const char* name, const video::SColor& colour)
         ed.setStart(m_current_frame, start, td.m_event_stack.size());
         td.m_all_event_data[name] = ed;
     }
-
     td.m_event_stack.push_back(name);
+    m_lock.unlock();
 }   // pushCPUMarker
 
 //-----------------------------------------------------------------------------
@@ -194,6 +195,7 @@ void Profiler::popCPUMarker()
     if(m_freeze_state == FROZEN || m_freeze_state == WAITING_FOR_UNFREEZE)
         return;
 
+    m_lock.lock();
     int thread_id = getThreadID();
     ThreadData &td = m_all_threads_data[thread_id];
 
@@ -204,6 +206,7 @@ void Profiler::popCPUMarker()
                                      getTimeMilliseconds() - m_time_last_sync);
 
     td.m_event_stack.pop_back();
+    m_lock.unlock();
 }   // popCPUMarker
 
 //-----------------------------------------------------------------------------
@@ -222,6 +225,7 @@ void Profiler::synchronizeFrame()
     // which would yield different results
     double now = getTimeMilliseconds();
 
+    m_lock.lock();
     // Set index to next frame
     int next_frame = m_current_frame+1;
     if (next_frame >= m_max_frames)
@@ -250,13 +254,15 @@ void Profiler::synchronizeFrame()
 
     // Remember the date of last synchronization
     m_time_between_sync = now - m_time_last_sync;
-    m_time_last_sync = now;
+    m_time_last_sync    = now;
 
     // Freeze/unfreeze as needed
     if(m_freeze_state == WAITING_FOR_FREEZE)
         m_freeze_state = FROZEN;
     else if(m_freeze_state == WAITING_FOR_UNFREEZE)
         m_freeze_state = UNFROZEN;
+
+    m_lock.unlock();
 }   // synchronizeFrame
 
 //-----------------------------------------------------------------------------
@@ -269,8 +275,10 @@ void Profiler::draw()
 
     // Current frame points to the frame in which currently data is
     // being accumulated. Draw the previous (i.e. complete) frame.
+    m_lock.lock();
     int indx = m_current_frame - 1;
     if (indx < 0) indx = m_max_frames - 1;
+    m_lock.unlock();
 
     drawBackground();
 
@@ -492,6 +500,7 @@ void Profiler::drawBackground()
  */
 void Profiler::writeToFile()
 {
+    m_lock.lock();
     std::string base_name = 
                file_manager->getUserConfigFile(file_manager->getStdoutName());
     // First CPU data
@@ -551,4 +560,6 @@ void Profiler::writeToFile()
         start = (start + 1) % m_max_frames;
     }
     f.close();
+    m_lock.unlock();
+
 }   // writeFile
