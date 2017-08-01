@@ -314,7 +314,7 @@ void pollJoysticks()
         {
             XINPUT_STATE state;
             memset(&state, 0, sizeof(state));
-            DWORD result = XInputGetState(joystick, &state);
+            DWORD result = XInputGetState(ActiveJoysticks[joystick].Index, &state);
             event.JoystickEvent.ButtonStates = state.Gamepad.wButtons;
             // Thumb values are in [-32768, 32767]
             event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_V] = state.Gamepad.sThumbRX;
