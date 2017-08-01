@@ -69,7 +69,6 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_parent                = NULL;
     m_focusable             = true;
     m_bottom_bar            = false;
-    m_top_bar               = false;
     m_event_handler         = NULL;
     m_reserve_id            = reserve_id;
     m_show_bounding_box     = false;

@@ -248,7 +248,6 @@ namespace GUIEngine
         bool m_focusable;
 
         bool m_bottom_bar;
-        bool m_top_bar;
 
         /** If a badge wouldn't look too pretty on the very side of the widget */
         int m_badge_x_shift;
@@ -347,7 +346,6 @@ namespace GUIEngine
         bool isSelected(const int playerID) const { return m_selected[playerID]; }
 
         bool isBottomBar() const { return m_bottom_bar; }
-        bool isTopBar   () const { return m_top_bar;    }
 
         /**
          * \name Enabling or disabling widgets

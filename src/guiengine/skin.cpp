@@ -1759,17 +1759,6 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
                 draw2DImage(tex, r1, r2,
                                                           0, 0, /*alpha*/true);
             }
-            else if (widget.isTopBar())
-            {
-                ITexture* tex =
-                    irr_driver->getTexture(FileManager::GUI, "top_bar.png");
-
-                core::recti r1(0,               0,
-                               (int)widget.m_w, (int)widget.m_h);
-                core::recti r2(core::dimension2di(0,0), tex->getSize());
-                draw2DImage(tex, r1, r2,
-                                                          0, 0, /*alpha*/false);
-            }
             else
             {
                 renderSections( &widget.m_children );
