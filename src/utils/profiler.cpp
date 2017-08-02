@@ -196,6 +196,7 @@ void Profiler::popCPUMarker()
     if( !UserConfigParams::m_profiler_enabled || 
         m_freeze_state == FROZEN || m_freeze_state == WAITING_FOR_UNFREEZE )
         return;
+    double now = getTimeMilliseconds();
 
     m_lock.lock();
     int thread_id = getThreadID();
@@ -213,8 +214,7 @@ void Profiler::popCPUMarker()
     assert(td.m_event_stack.size() > 0);
 
     const std::string &name = td.m_event_stack.back();
-    td.m_all_event_data[name].setEnd(m_current_frame,
-                                     getTimeMilliseconds() - m_time_last_sync);
+    td.m_all_event_data[name].setEnd(m_current_frame, now - m_time_last_sync);
 
     td.m_event_stack.pop_back();
     m_lock.unlock();
