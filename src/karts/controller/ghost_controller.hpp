@@ -76,7 +76,10 @@ public:
     unsigned int getCurrentReplayIndex() const
                                                    { return m_current_index; }
     // ------------------------------------------------------------------------
-    core::stringw getName() const OVERRIDE { return m_display_name; }
+    /** Return the display name; if not set, use default display name (kart name) */
+    core::stringw getName() const OVERRIDE { return m_display_name.empty() ?
+                                                    Controller::getName() :
+                                                    m_display_name; }
 };   // GhostController
 
 #endif
