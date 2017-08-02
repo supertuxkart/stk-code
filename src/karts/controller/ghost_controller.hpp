@@ -37,11 +37,14 @@ private:
     /** The current world time. */
     float m_current_time;
 
+    /** Player name of the ghost kart. */
+    core::stringw m_display_name;
+
     /** The list of the times at which the events of kart were reached. */
     std::vector<float> m_all_times;
 
 public:
-             GhostController(AbstractKart *kart);
+             GhostController(AbstractKart *kart, core::stringw display_name);
     virtual ~GhostController() {};
     virtual void reset() OVERRIDE;
     virtual void update (float dt) OVERRIDE;
@@ -73,6 +76,7 @@ public:
     unsigned int getCurrentReplayIndex() const
                                                    { return m_current_index; }
     // ------------------------------------------------------------------------
+    core::stringw getName() const OVERRIDE { return m_display_name; }
 };   // GhostController
 
 #endif

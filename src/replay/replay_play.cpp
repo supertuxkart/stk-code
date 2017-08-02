@@ -135,13 +135,20 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay)
         is_end.trim();
         if (is_end == "kart_list_end") break;
         char s1[1024];
+        char display_name_encoded[1024];
 
-        if (sscanf(s,"kart: %s", s1) != 1)
+        if (sscanf(s,"kart: %s %[^\n]", s1, display_name_encoded) != 2)
         {
             Log::warn("Replay", "Could not read ghost karts info!");
             break;
         }
         rd.m_kart_list.push_back(std::string(s1));
+        rd.m_name_list.push_back(StringUtils::xmlDecode(std::string(display_name_encoded)));
+
+        if (rd.m_name_list.size() == 1) {
+            // First user is the game master and the "owner" of this replay file
+            rd.m_user_name = rd.m_name_list[0];
+        }
     }
 
     int reverse = 0;
@@ -249,11 +256,12 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
 {
     char s[1024];
     const unsigned int kart_num = m_ghost_karts.size();
-    m_ghost_karts.push_back(new GhostKart(m_replay_file_list
-        [m_current_replay_file].m_kart_list.at(kart_num),
-        kart_num, kart_num + 1));
+    ReplayData &rd = m_replay_file_list[m_current_replay_file];
+    m_ghost_karts.push_back(new GhostKart(rd.m_kart_list.at(kart_num),
+                                          kart_num, kart_num + 1));
     m_ghost_karts[kart_num].init(RaceManager::KT_GHOST);
-    Controller* controller = new GhostController(getGhostKart(kart_num));
+    Controller* controller = new GhostController(getGhostKart(kart_num),
+                                                 rd.m_name_list[kart_num]);
     getGhostKart(kart_num)->setController(controller);
 
     unsigned int size;

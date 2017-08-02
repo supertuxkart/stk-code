@@ -28,9 +28,9 @@ using namespace irr;
   */
 
 #include "input/input.hpp"
+#include "karts/abstract_kart.hpp"
 #include "states_screens/state_manager.hpp"
 
-class AbstractKart;
 class Item;
 class KartControl;
 class Material;
@@ -100,17 +100,19 @@ public:
     /** Only local players can get achievements. */
     virtual bool  canGetAchievements () const { return false; }
     // ------------------------------------------------------------------------
-    /** This should only be called for End- and LocalPlayer-Controller. */
+    /** Display name of the controller.
+     *  Defaults to kart name; overriden by controller classes
+     *  (such as player controllers) to display username. */
     virtual core::stringw getName() const
     {
-        assert(false);
-        return core::stringw(""); 
+        return translations->fribidize(m_kart->getName());
     }   // getName
     // ------------------------------------------------------------------------
     /** Returns the kart controlled by this controller. */
     AbstractKart *getKart() const { return m_kart; }
 };   // Controller
 
+extern Translations* translations;
 #endif
 
 /* EOF */

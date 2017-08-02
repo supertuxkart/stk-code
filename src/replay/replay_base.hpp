@@ -81,7 +81,7 @@ protected:
     /** Returns the version number of the replay file. This is used to check
      *  that a loaded replay file can still be understood by this
      *  executable. */
-    unsigned int getReplayVersion() const { return 3; }
+    unsigned int getReplayVersion() const { return 4; }
 
 public:
              ReplayBase();
