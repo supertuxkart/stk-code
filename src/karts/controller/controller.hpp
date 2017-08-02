@@ -28,9 +28,9 @@ using namespace irr;
   */
 
 #include "input/input.hpp"
-#include "karts/abstract_kart.hpp"
 #include "states_screens/state_manager.hpp"
 
+class AbstractKart;
 class Item;
 class KartControl;
 class Material;
@@ -103,10 +103,7 @@ public:
     /** Display name of the controller.
      *  Defaults to kart name; overriden by controller classes
      *  (such as player controllers) to display username. */
-    virtual core::stringw getName() const
-    {
-        return translations->fribidize(m_kart->getName());
-    }   // getName
+    virtual core::stringw getName() const;
     // ------------------------------------------------------------------------
     /** Returns the kart controlled by this controller. */
     AbstractKart *getKart() const { return m_kart; }
