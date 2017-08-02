@@ -142,21 +142,23 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay)
         {
             Log::warn("Replay", "Could not read ghost karts info!");
             break;
-        } else {
-            rd.m_kart_list.push_back(std::string(s1));
+        }
 
-            if (scanned == 2) {
-                // If username of kart is present, use it
-                rd.m_name_list.push_back(StringUtils::xmlDecode(std::string(display_name_encoded)));
-                if (rd.m_name_list.size() == 1) {
-                    // First user is the game master and the "owner" of this replay file
-                    rd.m_user_name = rd.m_name_list[0];
-                }
-            } else { // scanned == 1
-                // If username is not present, kart display name will default to kart name
-                // (see GhostController::getName)
-                rd.m_name_list.push_back("");
+        rd.m_kart_list.push_back(std::string(s1));
+        if (scanned == 2)
+        {
+            // If username of kart is present, use it
+            rd.m_name_list.push_back(StringUtils::xmlDecode(std::string(display_name_encoded)));
+            if (rd.m_name_list.size() == 1)
+            {
+                // First user is the game master and the "owner" of this replay file
+                rd.m_user_name = rd.m_name_list[0];
             }
+        } else
+        { // scanned == 1
+            // If username is not present, kart display name will default to kart name
+            // (see GhostController::getName)
+            rd.m_name_list.push_back("");
         }
     }
 
