@@ -486,7 +486,7 @@ void RaceResultGUI::backToLobby()
             // Save a pointer to the current row_info entry
             RowInfo *ri = &(m_all_row_infos[position - first_position]);
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
-            ri->m_kart_name = getKartDisplayName(kart);
+            ri->m_kart_name = kart->getController()->getName();
 
             video::ITexture *icon =
                 kart->getKartProperties()->getIconMaterial()->getTexture();
@@ -855,7 +855,7 @@ void RaceResultGUI::backToLobby()
             ri->m_kart_icon =
                 kart->getKartProperties()->getIconMaterial()->getTexture();
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
-            ri->m_kart_name = getKartDisplayName(kart);
+            ri->m_kart_name = kart->getController()->getName();
 
             // In FTL karts do have a time, which is shown even when the kart
             // is eliminated
@@ -906,29 +906,6 @@ void RaceResultGUI::backToLobby()
         }   // i < num_karts
 #endif
     }   // determineGPLayout
-
-    //-----------------------------------------------------------------------------
-    /** Returns a string to display next to a kart. For a player that's the name
-     *  of the player, for an AI kart it's the name of the driver.
-     */
-    core::stringw RaceResultGUI::getKartDisplayName(const AbstractKart *kart) const
-    {
-        const EndController *ec =
-            dynamic_cast<const EndController*>(kart->getController());
-        // If the race was given up, there is no end controller for the
-        // players, so this case needs to be handled separately
-        if(ec && ec->isLocalPlayerController())
-            return ec->getName();
-        else
-        {
-            // No end controller, check explicitely for a player controller
-            const PlayerController *pc =
-                dynamic_cast<const PlayerController*>(kart->getController());
-            // Check if the kart is a player controller to get the real name
-            if(pc) return pc->getName();
-        }
-        return translations->fribidize(kart->getName());
-    }   // getKartDisplayName
 
     //-----------------------------------------------------------------------------
     /** Displays the race results for a single kart.

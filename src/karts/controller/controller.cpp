@@ -34,3 +34,8 @@ Controller::Controller(AbstractKart *kart)
     m_kart     = kart;
     setControllerName("Controller");
 }   // Controller
+
+core::stringw Controller::getName() const
+{
+    return translations->fribidize(m_kart->getName());
+}
