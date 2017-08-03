@@ -860,7 +860,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			event.InputMethodEvent.Handle = hWnd;
 
 			event.KeyInput.Char = 0;
-			event.KeyInput.Key = irr::KEY_OEM_CLEAR;
+			event.KeyInput.Key = irr::IRR_KEY_OEM_CLEAR;
 			event.KeyInput.Shift = 0;
 			event.KeyInput.Control = 0;
 
@@ -889,23 +889,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			event.KeyInput.PressedDown = (message==WM_KEYDOWN || message == WM_SYSKEYDOWN);
 
 			const UINT MY_MAPVK_VSC_TO_VK_EX = 3; // MAPVK_VSC_TO_VK_EX should be in SDK according to MSDN, but isn't in mine.
-			if ( event.KeyInput.Key == irr::KEY_SHIFT )
+			if ( event.KeyInput.Key == irr::IRR_KEY_SHIFT )
 			{
 				// this will fail on systems before windows NT/2000/XP, not sure _what_ will return there instead.
 				event.KeyInput.Key = (irr::EKEY_CODE)MapVirtualKey( ((lParam>>16) & 255), MY_MAPVK_VSC_TO_VK_EX );
 			}
-			if ( event.KeyInput.Key == irr::KEY_CONTROL )
+			if ( event.KeyInput.Key == irr::IRR_KEY_CONTROL )
 			{
 				event.KeyInput.Key = (irr::EKEY_CODE)MapVirtualKey( ((lParam>>16) & 255), MY_MAPVK_VSC_TO_VK_EX );
 				// some keyboards will just return LEFT for both - left and right keys. So also check extend bit.
 				if (lParam & 0x1000000)
-					event.KeyInput.Key = irr::KEY_RCONTROL;
+					event.KeyInput.Key = irr::IRR_KEY_RCONTROL;
 			}
-			if ( event.KeyInput.Key == irr::KEY_MENU )
+			if ( event.KeyInput.Key == irr::IRR_KEY_MENU )
 			{
 				event.KeyInput.Key = (irr::EKEY_CODE)MapVirtualKey( ((lParam>>16) & 255), MY_MAPVK_VSC_TO_VK_EX );
 				if (lParam & 0x1000000)
-					event.KeyInput.Key = irr::KEY_RMENU;
+					event.KeyInput.Key = irr::IRR_KEY_RMENU;
 			}
 
 			GetKeyboardState(allKeys);

@@ -42,7 +42,7 @@ int ShaderBase::loadTFBProgram(const std::string &shader_name,
 #ifdef USE_GLES2
     loadAndAttachShader(GL_FRAGMENT_SHADER, "tfb_dummy.frag");
 #endif
-    if (CVS->getGLSLVersion() < 330)
+    if (!CVS->isARBExplicitAttribLocationUsable())
         setAttribute(PARTICLES_SIM);
 
     glTransformFeedbackVaryings(m_program, varying_count, varyings,
@@ -74,7 +74,7 @@ void ShaderBase::bypassUBO() const
 
     GLint PM = glGetUniformLocation(m_program, "ProjectionMatrix");
     glUniformMatrix4fv(PM, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
-    
+
     GLint PVM = glGetUniformLocation(m_program, "ProjectionViewMatrix");
     glUniformMatrix4fv(PVM, 1, GL_FALSE, irr_driver->getProjViewMatrix().pointer());
 
@@ -156,6 +156,11 @@ void ShaderBase::setAttribute(AttributeType type)
         glBindAttribLocation(m_program, 5, "lifetime_initial");
         glBindAttribLocation(m_program, 6, "particle_velocity_initial");
         glBindAttribLocation(m_program, 7, "size_initial");
+        
+        if (CVS->needsVertexIdWorkaround())
+        {
+            glBindAttribLocation(m_program, 8, "vertex_id");
+        }
         break;
     case PARTICLES_RENDERING:
         glBindAttribLocation(m_program, 1, "lifetime");

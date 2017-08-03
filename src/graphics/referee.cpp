@@ -237,7 +237,7 @@ void Referee::selectReadySetGo(int rsg)
         return;
     video::SMaterial &m = m_scene_node->getMaterial(m_st_traffic_buffer); // m_scene_node->getMesh()->getMeshBuffer(m_st_traffic_buffer)->getMaterial();
 
-    //if (irr_driver->isGLSL() && UserConfigParams::m_dynamic_lights)
+    //if (irr_driver->isGLSL() && CVS->isDefferedEnabled())
     //    m.MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
 
     core::matrix4* matrix = &m.getTextureMatrix(0);

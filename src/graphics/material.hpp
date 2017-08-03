@@ -91,6 +91,8 @@ private:
     std::string      m_texname;
 
     std::string      m_full_path;
+    
+    std::string      m_original_full_path;
 
     /** Name of a special sfx to play when a kart is on this terrain, or
      *  "" if no special sfx exists. */

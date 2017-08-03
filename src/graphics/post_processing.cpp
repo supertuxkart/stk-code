@@ -354,16 +354,16 @@ public:
     }   // render
 };   // BloomShader
 
-static video::ITexture *lensDustTex = 0;
-
 // ============================================================================
 class BloomBlendShader : public TextureShader<BloomBlendShader, 4>
 {
+private:
+    video::ITexture* m_lens_dust_tex;
 public:
     BloomBlendShader()
     {
-		if (!lensDustTex)
-			lensDustTex = irr_driver->getTexture(FileManager::TEXTURE, "gfx_lensDust_a.png");
+		m_lens_dust_tex =
+            irr_driver->getTexture(FileManager::TEXTURE, "gfx_lensDust_a.png");
 
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "bloomblend.frag");
@@ -381,7 +381,7 @@ public:
         setTextureUnits(render_target_bloom_128,
                         render_target_bloom_256,
                         render_target_bloom_512,
-						lensDustTex->getOpenGLTextureName());
+						m_lens_dust_tex->getOpenGLTextureName());
         drawFullScreenEffect();
     }   // render
 };   // BloomBlendShader
@@ -1072,7 +1072,7 @@ void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
     {
         auxiliary.bind();
         Gaussian6VBlurShader::getInstance()
-            ->render(in_fbo.getRTT()[0], in_fbo.getWidth(), in_fbo.getWidth(),
+            ->render(in_fbo.getRTT()[0], in_fbo.getWidth(), in_fbo.getHeight(),
                      sigma_v);
 
         in_fbo.bind();

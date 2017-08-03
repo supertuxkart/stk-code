@@ -40,9 +40,9 @@ Stars::Stars(AbstractKart *kart)
     m_parent_kart_node = kart->getNode();
     m_enabled = false;
 
+    TexConfig stc(true/*srgb*/, true/*premul_alpha*/);
     video::ITexture* texture = STKTexManager::getInstance()->getTexture
-        ("starparticle.png", true/*srgb*/, true/*premul_alpha*/,
-        false/*set_material*/, true/*mesh_tex*/);
+        ("starparticle.png", &stc);
 
     Material* star_material =
         material_manager->getMaterial("starparticle.png");

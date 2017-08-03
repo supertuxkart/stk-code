@@ -480,6 +480,7 @@ void Track::loadTrackInfo()
     m_fog_height_start      = 0.0f;
     m_fog_height_end        = 100.0f;
     m_gravity               = 9.80665f;
+    m_friction              = stk_config->m_default_track_friction;
     m_smooth_normals        = false;
     m_godrays               = false;
     m_godrays_opacity       = 1.0f;
@@ -514,6 +515,7 @@ void Track::loadTrackInfo()
     getMusicInformation(filenames, m_music);
     root->get("screenshot",            &m_screenshot);
     root->get("gravity",               &m_gravity);
+    root->get("friction",              &m_friction);
     root->get("soccer",                &m_is_soccer);
     root->get("arena",                 &m_is_arena);
     root->get("max-arena-players",     &m_max_arena_players);
@@ -836,7 +838,7 @@ void Track::createPhysicsModel(unsigned int main_track_count)
     {
         convertTrackToBullet(m_all_nodes[i]);
     }
-    m_track_mesh->createPhysicalBody();
+    m_track_mesh->createPhysicalBody(m_friction);
     m_gfx_effect_mesh->createCollisionShape();
 }   // createPhysicsModel
 
@@ -1093,8 +1095,8 @@ bool Track::loadMainTrack(const XMLNode &root)
 
     m_challenges.clear();
 
-    m_track_mesh      = new TriangleMesh();
-    m_gfx_effect_mesh = new TriangleMesh();
+    m_track_mesh      = new TriangleMesh(/*can_be_transformed*/false);
+    m_gfx_effect_mesh = new TriangleMesh(/*can_be_transformed*/false);
 
     const XMLNode *track_node = root.getNode("track");
     std::string model_name;
@@ -2176,9 +2178,7 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
             if (CVS->isGLSL())
             {
                 t = STKTexManager::getInstance()->getTexture(v[i],
-                    false/*srgb*/, false/*premul_alpha*/,
-                    false/*set_material*/, false/*mesh_tex*/,
-                    true/*no_upload*/);
+                    (TexConfig*)NULL/*tex_config*/, true/*no_upload*/);
             }
             else
 #endif   // !SERVER_ONLY
@@ -2222,9 +2222,7 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
             if (CVS->isGLSL())
             {
                 t = STKTexManager::getInstance()->getTexture(v[i],
-                    false/*srgb*/, false/*premul_alpha*/,
-                    false/*set_material*/, false/*mesh_tex*/,
-                    true/*no_upload*/);
+                    (TexConfig*)NULL/*tex_config*/, true/*no_upload*/);
             }
             else
 #endif   // !SERVER_ONLY

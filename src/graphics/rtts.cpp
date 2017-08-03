@@ -49,10 +49,10 @@ static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, G
     return result;
 }
 
-RTT::RTT(size_t width, size_t height)
+RTT::RTT(size_t width, size_t height, float rtt_scale)
 {
-    m_width = width;
-    m_height = height;
+    m_width = width * rtt_scale;
+    m_height = height  * rtt_scale;
     m_shadow_FBO = NULL;
     m_RH_FBO = NULL;
     m_RSM = NULL;
@@ -60,14 +60,13 @@ RTT::RTT(size_t width, size_t height)
     using namespace video;
     using namespace core;
     
-    dimension2du res(int(width * UserConfigParams::m_scale_rtts_factor),
-                     int(height * UserConfigParams::m_scale_rtts_factor) );
+    dimension2du res(m_width, m_height);
     
     const dimension2du half = res/2;
     const dimension2du quarter = res/4;
     const dimension2du eighth = res/8;
 
-    const u16 shadowside = u16(1024 * UserConfigParams::m_scale_rtts_factor);
+    const u16 shadowside = u16(1024 * rtt_scale);
     const dimension2du shadowsize0(shadowside, shadowside);
     const dimension2du shadowsize1(shadowside / 2, shadowside / 2);
     const dimension2du shadowsize2(shadowside / 4, shadowside / 4);
@@ -88,6 +87,7 @@ RTT::RTT(size_t width, size_t height)
     GLint rgb_format = GL_BGR;
     GLint diffuse_specular_internal_format = GL_R11F_G11F_B10F;
     GLint type = GL_FLOAT;
+    GLint srgb_internal_format = GL_SRGB8_ALPHA8;
     
 #if defined(USE_GLES2)
     if (!CVS->isEXTColorBufferFloatUsable())
@@ -101,6 +101,8 @@ RTT::RTT(size_t width, size_t height)
         diffuse_specular_internal_format = GL_RGBA8;
         type = GL_UNSIGNED_BYTE;
     }
+    
+    srgb_internal_format = GL_RGBA8;
 #endif
 
     RenderTargetTextures[RTT_TMP1] = generateRTT(res, rgba_internal_format, rgba_format, type);
@@ -110,9 +112,9 @@ RTT::RTT(size_t width, size_t height)
     RenderTargetTextures[RTT_LINEAR_DEPTH] = generateRTT(res, red32_internal_format, red_format, type, linear_depth_mip_levels);
     RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, rgba_internal_format, GL_RGBA, type);
     RenderTargetTextures[RTT_COLOR] = generateRTT(res, rgba_internal_format, rgba_format, type);
-    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_SRGB8_ALPHA8, rgb_format, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_MLAA_TMP] = generateRTT(res, GL_SRGB8_ALPHA8, rgb_format, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_MLAA_BLEND] = generateRTT(res, GL_SRGB8_ALPHA8, rgb_format, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, srgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_TMP] = generateRTT(res, srgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_BLEND] = generateRTT(res, srgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
     RenderTargetTextures[RTT_SSAO] = generateRTT(res, red_internal_format, red_format, type);
     RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, rgba_internal_format, rgba_format, type);
     RenderTargetTextures[RTT_DIFFUSE] = generateRTT(res, diffuse_specular_internal_format, rgb_format, type);
@@ -291,7 +293,12 @@ RTT::RTT(size_t width, size_t height)
     glClear(GL_COLOR_BUFFER_BIT);
 
     getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
-    glClearColor(.5, .5, .5, .5);
+    float color = 0.5;
+#if defined(USE_GLES2)
+    if (!CVS->isDefferedEnabled())
+        color = pow(color, 1. / 2.2);
+#endif
+    glClearColor(color, color, color, color);
     glClear(GL_COLOR_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #if !defined(USE_GLES2)

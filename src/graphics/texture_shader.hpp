@@ -43,13 +43,18 @@ enum SamplerTypeNew
     ST_NEARED_CLAMPED_FILTERED,
     ST_BILINEAR_CLAMPED_FILTERED,
     ST_SEMI_TRILINEAR,
+#ifdef USE_GLES2
     ST_MAX = ST_SEMI_TRILINEAR
+#else
+    ST_TEXTURE_BUFFER,
+    ST_MAX = ST_TEXTURE_BUFFER
+#endif
 };   // SamplerTypeNew
 
 // ============================================================================
 /** A simple non-templated base class for a shader that uses textures. A non
- *  templated base class is necessary to easily handle static objects (like 
- *  list of all bind functions to call) - with templates each instance is a 
+ *  templated base class is necessary to easily handle static objects (like
+ *  list of all bind functions to call) - with templates each instance is a
  *  different class (with different static values).
  */
 class TextureShaderBase
@@ -68,7 +73,8 @@ protected:
     static void   bindTextureShadow(GLuint tex_unit, GLuint tex_id);
     static void   bindTrilinearClampedArrayTexture(GLuint tex_unit, GLuint tex_id);
     static void   bindTextureVolume(GLuint tex_unit, GLuint tex_id);
-    
+    static void   bindTextureBuffer(GLuint tex_unit, GLuint tex_id);
+
     GLuint        createSamplers(SamplerTypeNew sampler_type);
 private:
 
@@ -88,7 +94,7 @@ protected:
 // ========================================================================
 /** Class C needs to be the newly declared shaders class (necessary for
  *  the instance template). NUM_TEXTURES is the number of texture units
- *  used in this shader. It is used to test at compile time that the 
+ *  used in this shader. It is used to test at compile time that the
  *  right number of arguments are supplied to the variadic functions.
  */
 template<class C, int NUM_TEXTURES, typename...tp>
@@ -171,13 +177,15 @@ public:
     template<int N, typename... TexIds>
     void setTextureUnitsImpl(GLuint tex_id, TexIds... args)
     {
+#if defined(USE_GLES2)
+        if (CVS->getGLSLVersion() >= 300)
+#else
         if (CVS->getGLSLVersion() >= 330)
+#endif
         {
-#ifdef GL_VERSION_3_3
             glActiveTexture(GL_TEXTURE0 + m_texture_units[N]);
             glBindTexture(m_texture_type[N], tex_id);
             glBindSampler(m_texture_units[N], m_sampler_ids[N]);
-#endif
         }
         else
         {

@@ -331,13 +331,12 @@ void SoccerWorld::initKartList()
     std::string blue_path =
             file_manager->getAsset(FileManager::GUI, "soccer_player_blue.png");
 
+    TexConfig btc(true/*srgb*/, true/*premul_alpha*/);
     video::ITexture* red = STKTexManager::getInstance()->getTexture
-        (red_path, true/*srgb*/, true/*premul_alpha*/, false/*set_material*/,
-        true/*mesh_tex*/);
+        (red_path, &btc);
 
     video::ITexture* blue = STKTexManager::getInstance()->getTexture
-        (blue_path, true/*srgb*/, true/*premul_alpha*/, false/*set_material*/,
-        true/*mesh_tex*/);
+        (blue_path, &btc);
 
     //Assigning indicators
     for(unsigned int i = 0; i < kart_amount; i++)

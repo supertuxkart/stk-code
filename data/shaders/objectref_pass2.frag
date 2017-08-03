@@ -25,8 +25,13 @@ void main(void)
     col.xyz = pow(col.xyz, vec3(2.2));
 #endif
 #endif
-    col.xyz *= pow(color.xyz, vec3(2.2));
     if (col.a * color.a < 0.5) discard;
+    
+#if defined(GL_ES) && !defined(Advanced_Lighting_Enabled)
+    col.xyz *= color.xyz;
+#else
+    col.xyz *= pow(color.xyz, vec3(2.2));
+#endif
 
     float mask = texture(colorization_mask, uv).a;
     if (color_change.x > 0.0)

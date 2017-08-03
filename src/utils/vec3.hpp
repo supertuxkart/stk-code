@@ -20,7 +20,6 @@
 #ifndef HEADER_VEC3_HPP
 #define HEADER_VEC3_HPP
 
-#include <triangle3d.h>
 #include <vector3d.h>
 #include <vector2d.h>
 using namespace irr;
@@ -216,12 +215,8 @@ public:
 
     float sideofPlane(const Vec3& x1, const Vec3& x2, const Vec3& x3) const
     {
-        core::triangle3df triangle(x1.toIrrVector(), x2.toIrrVector(), x3.toIrrVector());
-        core::vector3df normal = triangle.getNormal();
-        return normal.dotProduct((*this - x1).toIrrVector());
-
+        return ((x2 - x1).cross(x3 - x1)).dot(*this - x1);
     } // sideOfPlane
 };    // Vec3
-
 
 #endif

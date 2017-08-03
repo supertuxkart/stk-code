@@ -73,6 +73,10 @@ const int COMPLETED_HARD = 4;
 RaceGUIOverworld::RaceGUIOverworld()
 {
     m_enabled = true;
+
+    if (UserConfigParams::m_artist_debug_mode && UserConfigParams::m_hide_gui)
+        m_enabled = false;
+
     m_is_first_render_call = true;
     m_close_to_a_challenge = false;
     m_current_challenge = NULL;
@@ -230,7 +234,10 @@ void RaceGUIOverworld::renderPlayerView(const Camera *camera, float dt)
 
     if(!World::getWorld()->isRacePhase()) return;
 
-    drawPowerupIcons    (kart, viewport, scaling);
+    if (m_multitouch_gui == NULL)
+    {
+        drawPowerupIcons(kart, viewport, scaling);
+    }
 }   // renderPlayerView
 
 //-----------------------------------------------------------------------------
@@ -388,8 +395,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
             kart_xyz= kart->getXYZ();
             Vec3 draw_at;
             track->mapPoint2MiniMap(kart_xyz, &draw_at);
-            draw_at *= UserConfigParams::m_scale_rtts_factor;
-
+            
             video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
             core::rect<s32> source(core::position2di(0, 0), icon->getSize());
             int marker_half_size = (kart->getController()->isLocalPlayerController()
@@ -426,8 +432,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 
         Vec3 draw_at;
         track->mapPoint2MiniMap(challenges[n].m_position, &draw_at);
-        draw_at *= UserConfigParams::m_scale_rtts_factor;
-
+        
         const ChallengeData* challenge = unlock_manager->getChallengeData(challenges[n].m_challenge_id);
         const unsigned int val = challenge->getNumTrophies();
         bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
@@ -502,7 +507,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                      irr_driver->getActualScreenSize().Height - GUIEngine::getFontHeight()*2,
                                      irr_driver->getActualScreenSize().Width,
                                      irr_driver->getActualScreenSize().Height);
-                GUIEngine::getOutlineFont()->draw(_("Press fire to play the tutorial"), pos2,
+                GUIEngine::getOutlineFont()->draw(_("Press fire to start the tutorial"), pos2,
                                            GUIEngine::getSkin()->getColor("font::normal"),
                                            true, true /* vcenter */, NULL);
                 continue;
@@ -582,6 +587,11 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                        GUIEngine::getSkin()->getColor("font::normal"),
                                        true, true /* vcenter */, NULL);
         }
+    }
+    
+    if (m_multitouch_gui != NULL)
+    {
+        m_multitouch_gui->setGuiAction(m_close_to_a_challenge);
     }
 #endif   // SERVER_ONLY
 }   // drawGlobalMiniMap

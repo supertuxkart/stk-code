@@ -28,9 +28,9 @@ void InstanceFiller<InstanceDataSingleTex>::add(GLMesh* mesh,
                                                 const InstanceSettings& is,
                                                 InstanceDataSingleTex& instance)
 {
-    fillOriginOrientationScale<InstanceDataSingleTex>(STK::tuple_get<0>(is), instance);
+    fillOriginOrientationScale<InstanceDataSingleTex>(std::get<0>(is), instance);
     instance.Texture = mesh->TextureHandles[0];
-    instance.skinning_offset = STK::tuple_get<3>(is);
+    instance.skinning_offset = std::get<3>(is);
 }
 
 // ----------------------------------------------------------------------------
@@ -39,15 +39,15 @@ void InstanceFiller<InstanceDataThreeTex>::add(GLMesh* mesh,
                                                const InstanceSettings& is,
                                                InstanceDataThreeTex& instance)
 {
-    fillOriginOrientationScale<InstanceDataThreeTex>(STK::tuple_get<0>(is), instance);
-    instance.MiscData.X = STK::tuple_get<1>(is).X;
-    instance.MiscData.Y = STK::tuple_get<1>(is).Y;
-    instance.MiscData.Z = STK::tuple_get<2>(is).X;
-    instance.MiscData.W = STK::tuple_get<2>(is).Y;
+    fillOriginOrientationScale<InstanceDataThreeTex>(std::get<0>(is), instance);
+    instance.MiscData.X = std::get<1>(is).X;
+    instance.MiscData.Y = std::get<1>(is).Y;
+    instance.MiscData.Z = std::get<2>(is).X;
+    instance.MiscData.W = std::get<2>(is).Y;
     instance.Texture = mesh->TextureHandles[0];
     instance.SecondTexture = mesh->TextureHandles[1];
     instance.ThirdTexture = mesh->TextureHandles[2];
-    instance.skinning_offset = STK::tuple_get<3>(is);
+    instance.skinning_offset = std::get<3>(is);
 }
 
 // ----------------------------------------------------------------------------
@@ -56,16 +56,16 @@ void InstanceFiller<InstanceDataFourTex>::add(GLMesh* mesh,
                                               const InstanceSettings& is,
                                               InstanceDataFourTex& instance)
 {
-    fillOriginOrientationScale<InstanceDataFourTex>(STK::tuple_get<0>(is), instance);
-    instance.MiscData.X = STK::tuple_get<1>(is).X;
-    instance.MiscData.Y = STK::tuple_get<1>(is).Y;
-    instance.MiscData.Z = STK::tuple_get<2>(is).X;
-    instance.MiscData.W = STK::tuple_get<2>(is).Y;
+    fillOriginOrientationScale<InstanceDataFourTex>(std::get<0>(is), instance);
+    instance.MiscData.X = std::get<1>(is).X;
+    instance.MiscData.Y = std::get<1>(is).Y;
+    instance.MiscData.Z = std::get<2>(is).X;
+    instance.MiscData.W = std::get<2>(is).Y;
     instance.Texture = mesh->TextureHandles[0];
     instance.SecondTexture = mesh->TextureHandles[1];
     instance.ThirdTexture = mesh->TextureHandles[2];
     instance.FourthTexture = mesh->TextureHandles[3];
-    instance.skinning_offset = STK::tuple_get<3>(is);
+    instance.skinning_offset = std::get<3>(is);
 }
 
 // ----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ void InstanceFiller<GlowInstanceData>::add(GLMesh* mesh,
                                            const InstanceSettings& is,
                                            GlowInstanceData& instance)
 {
-    scene::ISceneNode* node = STK::tuple_get<0>(is);
+    scene::ISceneNode* node = std::get<0>(is);
     fillOriginOrientationScale<GlowInstanceData>(node, instance);
     STKMeshSceneNode *nd = dynamic_cast<STKMeshSceneNode*>(node);
     instance.Color = nd->getGlowColor().color;

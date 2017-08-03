@@ -108,8 +108,8 @@ void ScreenKeyboard::init()
     const core::dimension2d<u32>& frame_size = irr_driver->getFrameSize();
 
     int margin = 15;
-    int w = frame_size.Width * m_percent_width;
-    int h = frame_size.Height * m_percent_height;
+    int w = int(frame_size.Width * m_percent_width);
+    int h = int(frame_size.Height * m_percent_height);
     int x = frame_size.Width/2 - w/2;
     int y = frame_size.Height - h - margin;
 
@@ -269,19 +269,19 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
     }
     else if (eventSource == "Back")
     {
-        event.KeyInput.Key = KEY_BACK;
+        event.KeyInput.Key = IRR_KEY_BACK;
         event.KeyInput.Char = 0;
         send_event = true;
     }
     else if (eventSource == "Space")
     {
-        event.KeyInput.Key = KEY_UNKNOWN;
+        event.KeyInput.Key = IRR_KEY_UNKNOWN;
         event.KeyInput.Char = ' ';
         send_event = true;
     }
     else if (eventSource.size() > 0)
     {
-        event.KeyInput.Key = KEY_UNKNOWN;
+        event.KeyInput.Key = IRR_KEY_UNKNOWN;
         event.KeyInput.Char = eventSource.at(0);
         send_event = true;
     }

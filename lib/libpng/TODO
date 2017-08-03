@@ -6,6 +6,7 @@ Better C++ wrapper/full C++ implementation?
 Fix problem with C++ and EXTERN "C".
 cHRM transformation.
 Remove setjmp/longjmp usage in favor of returning error codes.
+Palette creation.
 Add "grayscale->palette" transformation and "palette->grayscale" detection.
 Improved dithering.
 Multi-lingual error and warning message support.
@@ -21,7 +22,6 @@ Use greater precision when changing to linear gamma for compositing against
   background and doing rgb-to-gray transformation.
 Investigate pre-incremented loop counters and other loop constructions.
 Add interpolated method of handling interlacing.
-Switch to the simpler zlib (zlib/libpng) license if legally possible.
 Extend pngvalid.c to validate more of the libpng transformations.
 
 */

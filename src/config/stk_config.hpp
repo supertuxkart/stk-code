@@ -85,6 +85,13 @@ public:
      *  triangle are more than this value, the physics will use the normal
      *  of the triangle in smoothing normal. */
     float m_smooth_angle_limit;
+
+    /** Default friction for the track and any track/library object. */
+    float m_default_track_friction;
+
+    /** Default friction to be used for any moveable, e.g. karts, balls. */
+    float m_default_moveable_friction;
+
     int   m_max_skidmarks;           /**<Maximum number of skid marks/kart.  */
     float m_skid_fadeout_time;       /**<Time till skidmarks fade away.      */
     float m_near_ground;             /**<Determines when a kart is not near

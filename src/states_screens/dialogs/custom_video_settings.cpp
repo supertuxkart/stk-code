@@ -61,8 +61,6 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     getWidget<CheckBoxWidget>("anim_gfx")->setState(UserConfigParams::m_graphical_effects);
     getWidget<CheckBoxWidget>("weather_gfx")->setState(UserConfigParams::m_weather_effects);
     getWidget<CheckBoxWidget>("dof")->setState(UserConfigParams::m_dof);
-    getWidget<CheckBoxWidget>("hd-textures")
-        ->setState((UserConfigParams::m_high_definition_textures & 0x01)==0x01);
 
     SpinnerWidget* kart_anim = getWidget<SpinnerWidget>("steering_animations");
     kart_anim->addLabel(_("Disabled")); // 0
@@ -79,33 +77,24 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     //I18N: Geometry level disabled : lowest level, no details
     geometry_level->addLabel(_("Disabled"));
     //I18N: Geometry level low : few details are displayed
-    geometry_level->addLabel(_("low"));
+    geometry_level->addLabel(_("Low"));
     //I18N: Geometry level high : everything is displayed
-    geometry_level->addLabel(_("high"));
+    geometry_level->addLabel(_("High"));
     geometry_level->setValue(
         UserConfigParams::m_geometry_level == 2 ? 0 :
         UserConfigParams::m_geometry_level == 0 ? 2 : 1);
 
-    SpinnerWidget* filtering = getWidget<SpinnerWidget>("filtering");
-    int value = 0;
-    if (UserConfigParams::m_anisotropic == 2)  value = 2;
-    else if (UserConfigParams::m_anisotropic == 4)  value = 3;
-    else if (UserConfigParams::m_anisotropic == 8)  value = 4;
-    else if (UserConfigParams::m_anisotropic == 16) value = 5;
-    else if (UserConfigParams::m_trilinear)         value = 1;
-    filtering->addLabel(_("Bilinear"));        // 0
-    filtering->addLabel(_("Trilinear"));       // 1
-    filtering->addLabel(_("Anisotropic x2"));  // 2
-    filtering->addLabel(_("Anisotropic x4"));  // 3
-    filtering->addLabel(_("Anisotropic x8"));  // 4
-    filtering->addLabel(_("Anisotropic x16")); // 5
-
-    filtering->setValue(value);
+    SpinnerWidget* filtering = getWidget<SpinnerWidget>("image_quality");
+    filtering->addLabel(_("Very Low"));
+    filtering->addLabel(_("Low"));
+    filtering->addLabel(_("High"));
+    filtering->addLabel(_("Very High"));
+    filtering->setValue(OptionsScreenVideo::getImageQuality());
 
     SpinnerWidget* shadows = getWidget<SpinnerWidget>("shadows");
     shadows->addLabel(_("Disabled"));   // 0
-    shadows->addLabel(_("low"));        // 1
-    shadows->addLabel(_("high"));       // 2
+    shadows->addLabel(_("Low"));        // 1
+    shadows->addLabel(_("High"));       // 2
     if (CVS->supportsShadows())
         shadows->setValue(UserConfigParams::m_shadows_resolution / 512);
     else
@@ -195,11 +184,6 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         UserConfigParams::m_weather_effects =
             getWidget<CheckBoxWidget>("weather_gfx")->getState();
 
-        // Set bit 0 for enabled/disabled, and set bit 1 to indicate that this
-        // is now a user's choice and should not be overwritten by any default
-        UserConfigParams::m_high_definition_textures =
-            getWidget<CheckBoxWidget>("hd-textures")->getState() ? 0x03 : 0x02;
-
         UserConfigParams::m_show_steering_animations =
             getWidget<SpinnerWidget>("steering_animations")->getValue();
 
@@ -207,33 +191,8 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             getWidget<SpinnerWidget>("geometry_detail")->getValue();
         UserConfigParams::m_geometry_level = val == 2 ? 0 : val == 0 ? 2 : 1;
 
-        switch (getWidget<SpinnerWidget>("filtering")->getValue())
-        {
-            case 0:
-                UserConfigParams::m_anisotropic = 0;
-                UserConfigParams::m_trilinear   = false;
-                break;
-            case 1:
-                UserConfigParams::m_anisotropic = 0;
-                UserConfigParams::m_trilinear   = true;
-                break;
-            case 2:
-                UserConfigParams::m_anisotropic = 2;
-                UserConfigParams::m_trilinear   = true;
-                break;
-            case 3:
-                UserConfigParams::m_anisotropic = 4;
-                UserConfigParams::m_trilinear   = true;
-                break;
-            case 4:
-                UserConfigParams::m_anisotropic = 8;
-                UserConfigParams::m_trilinear   = true;
-                break;
-            case 5:
-                UserConfigParams::m_anisotropic = 16;
-                UserConfigParams::m_trilinear   = true;
-                break;
-        }
+        OptionsScreenVideo::setImageQuality(getWidget<SpinnerWidget>
+            ("image_quality")->getValue());
 
         user_config->saveConfig();
 

@@ -55,8 +55,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <zlib.h>
 
-#include "png.h"        /* libpng header; includes zlib.h */
+#include "png.h"        /* libpng header */
 #include "readpng.h"    /* typedefs, common macros, public prototypes */
 
 /* future versions of libpng will provide this macro: */
@@ -99,7 +100,8 @@ int readpng_init(FILE *infile, ulg *pWidth, ulg *pHeight)
 
     /* could pass pointers to user-defined error handlers instead of NULLs: */
 
-    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    png_ptr = png_create_read_struct(png_get_libpng_ver(NULL), NULL, NULL,
+        NULL);
     if (!png_ptr)
         return 4;   /* out of memory */
 
@@ -214,6 +216,10 @@ uch *readpng_get_image(double display_exponent, int *pChannels, ulg *pRowbytes)
      * libpng function */
 
     if (setjmp(png_jmpbuf(png_ptr))) {
+        free(image_data);
+        image_data = NULL;
+        free(row_pointers);
+        row_pointers = NULL;
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         return NULL;
     }

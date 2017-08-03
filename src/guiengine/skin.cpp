@@ -816,27 +816,23 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
     else
     {
         ProgressBarWidget * progress = (ProgressBarWidget*)w;
-        drawBoxFromStretchableTexture(w, rect,
-                              SkinConfig::m_render_params["progress::neutral"],
-                              w->m_deactivated);
-        //the " - 10" is a dirty hack to avoid to have the right arrow
-        // before the left one
-        //FIXME
-        core::recti rect2 = rect;
-        rect2.LowerRightCorner.X -= (rect.getWidth() - 10)
-                                  - progress->getValue()*rect.getWidth()/100;
-
-        drawBoxFromStretchableTexture(w, rect2,
-                                 SkinConfig::m_render_params["progress::fill"],
-                                 w->m_deactivated);
-#if 0
-          draw2DImage(
-              SkinConfig::m_render_params["progress::fill"].getImage(),
-              sized_rect, core::recti(0,0,progress->m_w, progress->m_h),
-              0 /* no clipping */, colors, true);
-#endif
-
+        drawProgressBarInScreen(w, rect, progress->getValue(),
+            w->m_deactivated);
     }
+}   // drawProgress
+
+// ----------------------------------------------------------------------------
+void Skin::drawProgressBarInScreen(SkinWidgetContainer* swc,
+                                   const core::rect< s32 > &rect, int progress,
+                                   bool deactivated)
+{
+    drawBoxFromStretchableTexture(swc, rect,
+        SkinConfig::m_render_params["progress::neutral"], deactivated);
+    core::recti rect2 = rect;
+    rect2.LowerRightCorner.X -= (rect.getWidth())
+                              - progress * rect.getWidth() / 100;
+    drawBoxFromStretchableTexture(swc, rect2,
+        SkinConfig::m_render_params["progress::fill"], deactivated);
 }   // drawProgress
 
 // ----------------------------------------------------------------------------

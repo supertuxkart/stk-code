@@ -21,6 +21,8 @@
 #include <irrString.h>
 #include <rect.h>
 #include <vector2d.h>
+#include <IVideoDriver.h>
+
 using namespace irr;
 
 class AbstractKart;
@@ -33,8 +35,19 @@ private:
     RaceGUIBase* m_race_gui;
     MultitouchDevice* m_device;
     
+    bool m_gui_action;
     unsigned int m_minimap_bottom;
     
+    video::ITexture* m_directionnal_wheel_tex;
+    video::ITexture* m_pause_tex;
+    video::ITexture* m_nitro_tex;
+    video::ITexture* m_nitro_empty_tex;
+    video::ITexture* m_wing_mirror_tex;
+    video::ITexture* m_thunderbird_reset_tex;
+    video::ITexture* m_drift_tex;
+    video::ITexture* m_bg_button_tex;
+    video::ITexture* m_bg_button_focus_tex;
+    video::ITexture* m_gui_action_tex;
 
     void initMultitouchSteering();
     void closeMultitouchSteering();
@@ -48,6 +61,7 @@ public:
                                 const core::vector2df &scaling);
                                 
     unsigned int getMinimapBottom() {return m_minimap_bottom;}
+    void setGuiAction(bool enabled = true) {m_gui_action = enabled;}
                                  
 };   // RaceGUIMultitouch
 

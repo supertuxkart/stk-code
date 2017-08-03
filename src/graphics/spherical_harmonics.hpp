@@ -49,12 +49,7 @@ private:
     /** The spherical harmonics coefficients */
     SHCoefficients *m_SH_coeff;
 
-    void projectSH(Color *cubemap_face[6], size_t edge_size, float *Y00[],
-                      float *Y1minus1[], float *Y10[], float *Y11[],
-                      float *Y2minus2[], float *Y2minus1[], float * Y20[],
-                      float *Y21[], float *Y22[]);
-    
-    void generateSphericalHarmonics(Color *cubemap_face[6], size_t edge_size);
+    void generateSphericalHarmonics(unsigned char *sh_rgba[6], size_t edge_size);
     
 public:
     SphericalHarmonics(const std::vector<irr::video::ITexture *> &spherical_harmonics_textures);

@@ -53,7 +53,8 @@ CC = cc
 LD = cc
 RM = rm -f
 # ABI must be the same as that used to build libpng.
-ABI=
+ABI =
+CPPFLAGS =
 CFLAGS = $(ABI) -O -fullwarn $(INCS)
 LDFLAGS = $(ABI)
 O = .o
@@ -73,7 +74,7 @@ EXES = $(RPNG)$(E) $(RPNG2)$(E) $(WPNG)$(E)
 # implicit make rules -------------------------------------------------------
 
 .c$(O):
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
 
 
 # dependencies --------------------------------------------------------------
