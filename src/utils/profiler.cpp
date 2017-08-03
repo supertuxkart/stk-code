@@ -117,10 +117,14 @@ Profiler::Profiler()
                                 * UserConfigParams::m_max_fps                 );
     m_current_frame       = 0;
     m_has_wrapped_around  = false;
-    m_threads_used        = 0;
+
     const int MAX_THREADS = 10;
     m_all_threads_data.resize(MAX_THREADS);
     m_thread_mapping.resize(MAX_THREADS);
+    // Add this thread to the thread mapping
+    m_thread_mapping[0] = pthread_self();
+    m_threads_used = 1;
+
     m_gpu_times.resize(Q_LAST*m_max_frames);
 }   // Profile
 
@@ -161,11 +165,9 @@ int Profiler::getThreadID()
 void Profiler::pushCPUMarker(const char* name, const video::SColor& colour)
 {
     // Don't do anything when disabled or frozen
-    if (!UserConfigParams::m_profiler_enabled || 
+    if (!UserConfigParams::m_profiler_enabled ||
          m_freeze_state == FROZEN || m_freeze_state == WAITING_FOR_UNFREEZE )
         return;
-
-    double  start = getTimeMilliseconds() - m_time_last_sync;
 
     // We need to look before getting the thread id (since this might
     // be a new thread which changes the structure).
@@ -174,6 +176,7 @@ void Profiler::pushCPUMarker(const char* name, const video::SColor& colour)
 
     ThreadData &td = m_all_threads_data[thread_id];
     AllEventData::iterator i = td.m_all_event_data.find(name);
+    double  start = getTimeMilliseconds() - m_time_last_sync;
     if (i != td.m_all_event_data.end())
     {
         i->second.setStart(m_current_frame, start, td.m_event_stack.size());
@@ -193,7 +196,7 @@ void Profiler::pushCPUMarker(const char* name, const video::SColor& colour)
 void Profiler::popCPUMarker()
 {
     // Don't do anything when disabled or frozen
-    if( !UserConfigParams::m_profiler_enabled || 
+    if( !UserConfigParams::m_profiler_enabled ||
         m_freeze_state == FROZEN || m_freeze_state == WAITING_FOR_UNFREEZE )
         return;
     double now = getTimeMilliseconds();
@@ -260,7 +263,7 @@ void Profiler::synchronizeFrame()
         }
 
     }
-    
+
     m_current_frame = next_frame;
 
     // Remember the date of last synchronization
@@ -320,7 +323,7 @@ void Profiler::draw()
         }   // for j in events
     }   // for i in threads
 
-    
+
     const double duration = end - start;
     const double factor = profiler_width / duration;
 
@@ -355,7 +358,7 @@ void Profiler::draw()
         }   // for j in AllEventdata
     }   // for i in threads
 
-    
+
     // GPU profiler
     QueryPerf hovered_gpu_marker = Q_LAST;
     long hovered_gpu_marker_elapsed = 0;
@@ -369,7 +372,7 @@ void Profiler::draw()
         total += n;
 #endif
     }
-    
+
     static video::SColor colors[] = {
         video::SColor(255, 255, 0, 0),
         video::SColor(255, 0, 255, 0),
@@ -410,7 +413,7 @@ void Profiler::draw()
     {
         s32 x_sync = (s32)(x_offset + factor*m_time_between_sync);
         s32 y_up_sync = (s32)(MARGIN_Y*screen_size.Height);
-        s32 y_down_sync = (s32)( (MARGIN_Y + (2+m_threads_used)*LINE_HEIGHT) 
+        s32 y_down_sync = (s32)( (MARGIN_Y + (2+m_threads_used)*LINE_HEIGHT)
                                 * screen_size.Height                         );
 
         GL32_draw2DRectangle(video::SColor(0xFF, 0x00, 0x00, 0x00),
@@ -512,7 +515,7 @@ void Profiler::drawBackground()
 void Profiler::writeToFile()
 {
     m_lock.lock();
-    std::string base_name = 
+    std::string base_name =
                file_manager->getUserConfigFile(file_manager->getStdoutName());
     // First CPU data
     std::ofstream f(base_name + ".profile-cpu");
@@ -523,7 +526,7 @@ void Profiler::writeToFile()
         std::vector<std::string> new_headings;
         for (j = td.m_all_event_data.begin(); j != td.m_all_event_data.end(); j++)
         {
-            std::vector<std::string>::iterator f = 
+            std::vector<std::string>::iterator f =
                 std::find(m_all_event_names.begin(),
                           m_all_event_names.end(), j->first);
             if(f==m_all_event_names.end())
