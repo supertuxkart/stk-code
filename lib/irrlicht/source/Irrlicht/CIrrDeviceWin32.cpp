@@ -131,7 +131,7 @@ struct SJoystickWin32Control
     void directInputAddJoystick(LPCDIDEVICEINSTANCE lpddi)
     {
         //Get the GUID of the joystuck
-        const GUID guid = lpddi->guidInstance;
+        const GUID guid = lpddi->guidProduct;
         JoystickInfo activeJoystick;
         activeJoystick.m_use_xinput = isXInputDevice(&guid);
     
