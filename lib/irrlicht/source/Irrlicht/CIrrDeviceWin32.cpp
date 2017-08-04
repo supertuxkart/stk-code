@@ -20,6 +20,7 @@
 #include <regstr.h>
 #include <winuser.h>
 #if defined(_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
+#include <Xinput.h>
 #ifdef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -34,7 +35,6 @@
 #ifdef _MSC_VER
 #pragma comment(lib, "winmm.lib")
 #endif
-#include <Xinput.h>
 #endif
 #endif
 
@@ -345,6 +345,31 @@ void pollJoysticks()
 
     for(joystick = 0; joystick < ActiveJoysticks.size(); ++joystick)
     {
+        SEvent event;
+
+        event.EventType = irr::EET_JOYSTICK_INPUT_EVENT;
+        event.JoystickEvent.Joystick = (u8)joystick;
+
+        if (ActiveJoysticks[joystick].m_use_xinput)
+        {
+            XINPUT_STATE state;
+            memset(&state, 0, sizeof(state));
+            DWORD result = XInputGetState(ActiveJoysticks[joystick].Index, &state);
+            event.JoystickEvent.ButtonStates = state.Gamepad.wButtons;
+            // Map the axis as they were previously, so existing configs
+            // still work as expected. The Y axis needs to be reversed: 
+            // -32768 --> 32767, ..., 32767 --> -32768
+            // Inverting the bits with ~ does that (-sThumbLY would map -32768 to -32768!!)
+            event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_X] =  state.Gamepad.sThumbLX;
+            event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_Y] = ~state.Gamepad.sThumbLY;
+            event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_Z] =  state.Gamepad.bLeftTrigger * 128;
+            event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_R] =  state.Gamepad.sThumbRX; 
+            event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_U] = ~state.Gamepad.sThumbRY;
+            event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_V] =  state.Gamepad.bRightTrigger * 128;
+            (void)Device->postEventFromUser(event);
+
+            continue;
+        }
         // needs to be reset for each joystick
         // request ALL values and POV as continuous if possible
 
@@ -353,11 +378,6 @@ void pollJoysticks()
 
         if (!FAILED(ActiveJoysticks[joystick].lpdijoy->GetDeviceState(sizeof(info),&info)))
         {
-            SEvent event;
-
-            event.EventType = irr::EET_JOYSTICK_INPUT_EVENT;
-            event.JoystickEvent.Joystick = (u8)joystick;
-
             event.JoystickEvent.POV = (u16)info.rgdwPOV[0];
             // set to undefined if no POV value was returned or the value
             // is out of range
