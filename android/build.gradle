@@ -15,8 +15,8 @@ apply plugin: 'com.android.application'
 
 android
 {
-    compileSdkVersion sdkVersion.toInteger()
-    buildToolsVersion "25.0.3"
+    compileSdkVersion sdk_version.toInteger()
+    buildToolsVersion build_tools_ver
 
     sourceSets
     {

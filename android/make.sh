@@ -155,6 +155,24 @@ if [ ! -d "$SDK_PATH" ]; then
     exit
 fi
 
+# Find newest build-tools version
+if [ -z "$BUILD_TOOLS_VER" ]; then
+    BUILD_TOOLS_DIRS=`ls -1 "$SDK_PATH/build-tools" | sort -V -r`
+   
+    for DIR in $BUILD_TOOLS_DIRS; do
+        if [ "$DIR" = `echo $DIR | sed 's/[^0-9,.]//g'` ]; then
+            BUILD_TOOLS_VER="$DIR"
+            break
+        fi
+    done
+fi
+
+if [ -z "$BUILD_TOOLS_VER" ] || [ ! -d "$SDK_PATH/build-tools/$BUILD_TOOLS_VER" ]; then
+    echo "Error: Couldn't detect build-tools version."
+    exit
+fi
+
+
 # Standalone toolchain
 if [ ! -f "$DIRNAME/obj/make_standalone_toolchain.stamp" ]; then
     echo "Creating standalone toolchain"
@@ -326,9 +344,13 @@ echo "Building APK"
 
 if [ "$BUILD_TOOL" = "gradle" ]; then
     export ANDROID_HOME="$SDK_PATH"
-    gradle -PsdkVersion=$SDK_VERSION $GRADLE_BUILD_TYPE
+    gradle -Psdk_version=$SDK_VERSION           \
+           -Pbuild_tools_ver="$BUILD_TOOLS_VER" \
+           $GRADLE_BUILD_TYPE
 elif [ "$BUILD_TOOL" = "ant" ]; then
-    ant $ANT_BUILD_TYPE -Dsdk.dir="$SDK_PATH" -Dtarget=$NDK_PLATFORM
+    ant -Dsdk.dir="$SDK_PATH"  \
+        -Dtarget=$NDK_PLATFORM \
+        $ANT_BUILD_TYPE
 fi
 
 check_error

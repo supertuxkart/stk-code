@@ -48,9 +48,8 @@ Android NDK r12b.
 
 You need to create proper "android-sdk" and "android-ndk" symlinks in the
 directory with Android project, so that the compilation script will have access
-to the SDK and NDK.
-
-These paths can be also set in SDK_PATH and NDK_PATH environmental variables.
+to the SDK and NDK. These paths can be also set in SDK_PATH and NDK_PATH 
+environmental variables.
 
 Before running the compilation, run the generate_assets script, so that
 selected assets will be copied to "assets" directory, and then included in the
@@ -78,9 +77,10 @@ you have to manually sign the apk with your key and run zipalign.
 Additionally you can choose the build tool by setting BUILD_TOOL environment
 variable to "gradle" or "ant". Note that ant has been already removed from
 Android SDK, so you have to use SDK <= 25.2.5 for building with ant. By default 
-the BUILD_TOOL is set to "gradle". It has hardcoded version of SDK build-tools 
-that are set to "25.0.3", so you have to use this particular version (or you can
-edit build.gradle file).
+the BUILD_TOOL is set to "gradle".
+
+You can override the SDK build-tools version by setting the BUILD_TOOLS_VER
+environment variable.
 
 Basically if all dependencies are installed in the system, it should be enough
 to just run:
