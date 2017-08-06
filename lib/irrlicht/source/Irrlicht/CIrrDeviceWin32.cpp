@@ -197,6 +197,11 @@ struct SJoystickWin32Control
                 activeJoystick.axisValid[i+caxis]=1;
         }
 
+        // On Xbox 360 devices left and right trigger are reported as two
+        // different axes (instead of 1 with DirectInput), so we need one
+        // additional axis:
+        if (activeJoystick.m_use_xinput && activeJoystick.devcaps.dwAxes == 5)
+            activeJoystick.devcaps.dwAxes = 6;
         ActiveJoysticks.push_back(activeJoystick);
     }
 
@@ -355,8 +360,37 @@ void pollJoysticks()
             XINPUT_STATE state;
             memset(&state, 0, sizeof(state));
             DWORD result = XInputGetState(ActiveJoysticks[joystick].Index, &state);
-            event.JoystickEvent.ButtonStates = state.Gamepad.wButtons;
-            // Map the axis as they were previously, so existing configs
+            // XInput reports the buttons in a different order. So to keep
+            // old configs to work as expected, remap the buttons.
+            int abxy     = (state.Gamepad.wButtons & (XINPUT_GAMEPAD_A | 
+                                                      XINPUT_GAMEPAD_B |
+                                                      XINPUT_GAMEPAD_X |
+                                                      XINPUT_GAMEPAD_Y   )
+                           ) >> 12;
+            int shoulder = (state.Gamepad.wButtons & (XINPUT_GAMEPAD_LEFT_SHOULDER|
+                                                      XINPUT_GAMEPAD_RIGHT_SHOULDER)
+                           ) >> 4;
+            int start    = (state.Gamepad.wButtons & XINPUT_GAMEPAD_START) << 3;
+            int back     = (state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK ) << 1;
+
+            event.JoystickEvent.ButtonStates = abxy | shoulder | start | back;
+            int angle = 65535;
+            if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN)
+            {
+                if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT) angle = 22500;
+                else if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT) angle = 13500;
+                else angle = 18000;
+            }
+            else if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)
+            {
+                if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT) angle = 31500;
+                else if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT) angle = 4500;
+                else angle = 0;
+            }
+            else if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT) angle = 9000;
+            else if (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT)  angle = 27000;
+            event.JoystickEvent.POV = angle;
+                // Map the axis as they were previously, so existing configs
             // still work as expected. The Y axis needs to be reversed: 
             // -32768 --> 32767, ..., 32767 --> -32768
             // Inverting the bits with ~ does that (-sThumbLY would map -32768 to -32768!!)
