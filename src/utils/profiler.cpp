@@ -26,6 +26,7 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/vs.hpp"
 
 #include <algorithm>
@@ -186,6 +187,11 @@ void Profiler::pushCPUMarker(const char* name, const video::SColor& colour)
         EventData ed(colour, m_max_frames);
         ed.setStart(m_current_frame, start, td.m_event_stack.size());
         td.m_all_event_data[name] = ed;
+        // Ordered headings is used to determine the order in which the
+        // bar graph is drawn. Outer profiling events will be added first,
+        // so they will be drawn first, which gives the proper nested
+        // displayed of events.
+        td.m_ordered_headings.push_back(name);
     }
     td.m_event_stack.push_back(name);
     m_lock.unlock();
@@ -222,6 +228,21 @@ void Profiler::popCPUMarker()
     td.m_event_stack.pop_back();
     m_lock.unlock();
 }   // popCPUMarker
+
+//-----------------------------------------------------------------------------
+/** Switches the profiler either on or off.
+ */
+void Profiler::toggleStatus()
+{
+    UserConfigParams::m_profiler_enabled = !UserConfigParams::m_profiler_enabled;
+    // If the profiler would immediately enabled, calls that have started but
+    // not finished would not be registered correctly. So set the state to 
+    // waiting, so the unfreeze started at the next sync frame (which is
+    // outside of the main loop, i.e. all profiling events inside of the main
+    // loop will work as expected.
+    if (m_freeze_state == UNFROZEN)
+        m_freeze_state = WAITING_FOR_UNFREEZE;
+}   // toggleStatus
 
 //-----------------------------------------------------------------------------
 /** Saves all data for the current frame, and starts the next frame in the
@@ -335,9 +356,9 @@ void Profiler::draw()
     {
         ThreadData &td = m_all_threads_data[i];
         AllEventData &aed = td.m_all_event_data;
-        AllEventData::iterator j;
-        for (j = aed.begin(); j != aed.end(); ++j)
+        for(int k=0; k<(int)td.m_ordered_headings.size(); k++)
         {
+            AllEventData::iterator j = aed.find(td.m_ordered_headings[k]);
             const Marker &marker = j->second.getMarker(indx);
             core::rect<s32> pos((s32)(x_offset + factor*marker.getStart()),
                                 (s32)(y_offset + i*line_height),
@@ -518,40 +539,29 @@ void Profiler::writeToFile()
     std::string base_name =
                file_manager->getUserConfigFile(file_manager->getStdoutName());
     // First CPU data
-    std::ofstream f(base_name + ".profile-cpu");
     for (int thread_id = 0; thread_id < m_threads_used; thread_id++)
     {
+        std::ofstream f(base_name + ".profile-cpu-" +
+                        StringUtils::toString(thread_id) );
         ThreadData &td = m_all_threads_data[thread_id];
-        AllEventData::iterator j;
-        std::vector<std::string> new_headings;
-        for (j = td.m_all_event_data.begin(); j != td.m_all_event_data.end(); j++)
-        {
-            std::vector<std::string>::iterator f =
-                std::find(m_all_event_names.begin(),
-                          m_all_event_names.end(), j->first);
-            if(f==m_all_event_names.end())
-                new_headings.push_back(j->first);
-        }
-        std::sort(new_headings.begin(), new_headings.end());
-        f << "# \"Thread(1)\"   ";
-        for (unsigned int i = 0; i < new_headings.size(); i++)
-            f << "\"" << new_headings[i] << "(" << i+2 <<")\"   ";
+        f << "#  ";
+        for (unsigned int i = 0; i < td.m_ordered_headings.size(); i++)
+            f << "\"" << td.m_ordered_headings[i] << "(" << i+1 <<")\"   ";
         f << std::endl;
         int start = m_has_wrapped_around ? m_current_frame + 1 : 0;
         if (start > m_max_frames) start -= m_max_frames;
         while (start != m_current_frame)
         {
-            f << "t" << thread_id << " ";
-            for (unsigned int i = 0; i < new_headings.size(); i++)
+            for (unsigned int i = 0; i < td.m_ordered_headings.size(); i++)
             {
-                const EventData &ed = td.m_all_event_data[new_headings[i]];
+                const EventData &ed = td.m_all_event_data[td.m_ordered_headings[i]];
                 f << int(ed.getMarker(start).getDuration()*1000) << " ";
             }   // for i i new_headings
             f << std::endl;
             start = (start + 1) % m_max_frames;
-        }
-    }   // for 
-    f.close();
+        }   // while start != m_current_frame
+        f.close();
+    }   // for all thread_ids
 
     std::ofstream f_gpu(base_name + ".profile-gpu");
     f_gpu << "# ";
@@ -573,7 +583,7 @@ void Profiler::writeToFile()
         f_gpu << std::endl;
         start = (start + 1) % m_max_frames;
     }
-    f.close();
+    f_gpu.close();
     m_lock.unlock();
 
 }   // writeFile

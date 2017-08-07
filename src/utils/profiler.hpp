@@ -209,6 +209,12 @@ private:
         /** Stack of events to detect nesting. */
         std::vector< std::string > m_event_stack;
 
+        /** This stores the event names in the order in which they occur.
+        *  This means that 'outer' events occur here before any child
+        *  events. This list is then used to determine the order in which the
+        *  bar graphs are drawn, which results in the proper nesting of events.*/
+        std::vector<std::string> m_ordered_headings;
+
         AllEventData m_all_event_data;
     };   // class ThreadData
 
@@ -277,6 +283,7 @@ public:
     void     pushCPUMarker(const char* name="N/A",
                            const video::SColor& color=video::SColor());
     void     popCPUMarker();
+    void     toggleStatus(); 
     void     synchronizeFrame();
     void     draw();
     void     onClick(const core::vector2di& mouse_pos);
