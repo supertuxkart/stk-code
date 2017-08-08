@@ -103,7 +103,7 @@ void STKConfig::load(const std::string &filename)
                    strA,filename.c_str());              \
     }
 
-    if(m_score_increase.size()==0 || (int)m_score_increase.size()!=m_max_karts)
+    if(m_score_increase.size()==0)
     {
         Log::fatal("StkConfig", "Not or not enough scores defined in stk_config");
     }
@@ -138,8 +138,9 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_replay_delta_pos2,         "replay delta-position"      );
     CHECK_NEG(m_replay_dt,                 "replay delta-t"             );
     CHECK_NEG(m_smooth_angle_limit,        "physics smooth-angle-limit" );
-    CHECK_NEG(m_network_combine_threshold, "network combine-threshold"  );
-    
+    CHECK_NEG(m_network_combine_threshold, "network combine-threshold"  );    
+    CHECK_NEG(m_default_track_friction,    "physics default-track-friction");
+    CHECK_NEG(m_default_moveable_friction, "physics default-moveable-friction");
 
     // Square distance to make distance checks cheaper (no sqrt)
     m_replay_delta_pos2 *= m_replay_delta_pos2;
@@ -158,6 +159,7 @@ void STKConfig::init_defaults()
         m_delay_finish_time      = m_skid_fadeout_time         =
         m_near_ground            = m_item_switch_time          =
         m_smooth_angle_limit     = m_penalty_time              =
+        m_default_track_friction = m_default_moveable_friction =
         UNDEFINED;
     m_bubblegum_counter          = -100;
     m_shield_restrict_weapos     = false;
@@ -217,22 +219,20 @@ void STKConfig::getAllData(const XMLNode * root)
         for(unsigned int i=0; i<gp_node->getNumNodes(); i++)
         {
             const XMLNode *pn=gp_node->getNode(i);
-            int from=-1;
-            pn->get("from", &from);
-            int to=-1;
-            pn->get("to", &to);
-            if(to<0) to=m_max_karts;
             int points=-1;
             pn->get("points", &points);
-            if(points<0 || from<0 || from>to||
-               (int)m_score_increase.size()!=from-1)
+            if(points<0)
             {
                 Log::error("StkConfig", "Incorrect GP point specification:");
-                Log::fatal("StkConfig", "from: %d  to: %d  points: %d",
-                        from, to, points);
+                Log::fatal("StkConfig", "points: %d",
+                        points);
             }
-            for(int j=from; j<=to; j++)
-                m_score_increase.push_back(points);
+            m_score_increase.push_back(points);
+        }
+        if (m_max_karts > int(gp_node->getNumNodes()))
+        {
+            Log::error("StkConfig", "Not enough grand-prix ranking nodes:");
+            m_score_increase.resize(m_max_karts, 0);
         }
     }
 
@@ -244,8 +244,11 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if (const XMLNode *physics_node= root->getNode("physics"))
     {
-        physics_node->get("smooth-normals",     &m_smooth_normals    );
-        physics_node->get("smooth-angle-limit", &m_smooth_angle_limit);
+        physics_node->get("smooth-normals",         &m_smooth_normals        );
+        physics_node->get("smooth-angle-limit",     &m_smooth_angle_limit    );
+        physics_node->get("default-track-friction", &m_default_track_friction);
+        physics_node->get("default-moveable-friction",
+                                                 &m_default_moveable_friction);
     }
 
     if (const XMLNode *startup_node= root->getNode("startup"))
@@ -397,15 +400,27 @@ void STKConfig::getAllData(const XMLNode * root)
  */
 void  STKConfig::getAllScores(std::vector<int> *all_scores, int num_karts)
 {
+    std::vector<int> sorted_score_increase;
+
     if (num_karts == 0) return;
 
     assert(num_karts <= m_max_karts);
     all_scores->resize(num_karts);
-    (*all_scores)[num_karts-1] = 1;  // last position gets one point
+    sorted_score_increase.resize(num_karts+1); //sorting function is [begin, end[
+
+    //get increase data into sorted_score_increase
+    for(int i=0; i<num_karts; i++)
+    {
+        sorted_score_increase[i] = m_score_increase[i];
+    }
+
+    std::sort (sorted_score_increase.begin(), sorted_score_increase.end());
+
+    (*all_scores)[num_karts-1] = sorted_score_increase[0];  // last position score
 
     // Must be signed, in case that num_karts==1
     for(int i=num_karts-2; i>=0; i--)
     {
-        (*all_scores)[i] = (*all_scores)[i+1] + m_score_increase[i];
+        (*all_scores)[i] = (*all_scores)[i+1] + sorted_score_increase[num_karts-i];
     }
 }   // getAllScores

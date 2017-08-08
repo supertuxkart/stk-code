@@ -412,7 +412,17 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_multitouch_mode
             PARAM_DEFAULT( IntUserConfigParam(1, "multitouch_mode",
             &m_multitouch_group,
-            "Steering mode: 0 = off, 1 = buttons, 2 = accelerometer") );
+            "Steering mode: 0 = off, 1 = buttons"));
+
+    PARAM_PREFIX BoolUserConfigParam         m_multitouch_inverted
+            PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_inverted",
+            &m_multitouch_group,
+            "Draw steering wheel on right side.") );
+
+    PARAM_PREFIX IntUserConfigParam         m_multitouch_accelerometer
+            PARAM_DEFAULT( IntUserConfigParam(0, "multitouch_accelerometer",
+            &m_multitouch_group,
+            "Accelerometer mode: 0 = off, 1 = tablet, 2 = phone"));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_center
             PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone_center",
@@ -548,6 +558,44 @@ namespace UserConfigParams
         &m_video_group, "Max texture size when high definition textures are "
                         "disabled"));
 
+    PARAM_PREFIX BoolUserConfigParam        m_hq_mipmap
+        PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
+        &m_video_group, "Generate mipmap for textures using "
+                        "high quality method with SSE"));
+                        
+    // ---- Recording
+    PARAM_PREFIX GroupUserConfigParam        m_recording_group
+        PARAM_DEFAULT(GroupUserConfigParam("Recording",
+                            "Recording Settings"));
+
+    PARAM_PREFIX BoolUserConfigParam        m_limit_game_fps
+        PARAM_DEFAULT(BoolUserConfigParam(true, "limit_game_fps",
+        &m_recording_group, "Limit game framerate not beyond the fps of"
+                            " recording video."));
+
+    PARAM_PREFIX IntUserConfigParam         m_video_format
+        PARAM_DEFAULT(IntUserConfigParam(0, "video_format",
+        &m_recording_group, "Specify the video for record, which is the enum"
+                            " of VideoFormat in libopenglrecorder. It will"
+                            " auto fallback to MJPEG if libopenglrecorder was"
+                            " not compiled with such video encoder."));
+
+    PARAM_PREFIX IntUserConfigParam         m_audio_bitrate
+        PARAM_DEFAULT(IntUserConfigParam(112000, "audio_bitrate",
+        &m_recording_group, "Specify the bitrate for audio"));
+
+    PARAM_PREFIX IntUserConfigParam         m_video_bitrate
+        PARAM_DEFAULT(IntUserConfigParam(20000, "video_bitrate",
+        &m_recording_group, "Specify the bitrate for video"));
+
+    PARAM_PREFIX IntUserConfigParam         m_recorder_jpg_quality
+        PARAM_DEFAULT(IntUserConfigParam(90, "recorder_jpg_quality",
+        &m_recording_group, "Specify the jpg compression level of recorder"));
+
+    PARAM_PREFIX IntUserConfigParam         m_record_fps
+        PARAM_DEFAULT(IntUserConfigParam(30, "record_fps",
+        &m_recording_group, "Specify the fps of recording video"));
+
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
     PARAM_PREFIX bool m_unit_testing PARAM_DEFAULT(false);
@@ -611,9 +659,6 @@ namespace UserConfigParams
 
     /** True if graphical profiler should be displayed */
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
-
-    /** True if hardware skinning should be enabled */
-    PARAM_PREFIX bool m_hw_skinning_enabled  PARAM_DEFAULT( false );
 
     // not saved to file
 
@@ -920,6 +965,10 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_artist_debug_mode
             PARAM_DEFAULT( BoolUserConfigParam(false, "artist_debug_mode",
                                "Whether to enable track debugging features") );
+
+    PARAM_PREFIX BoolUserConfigParam        m_hide_gui
+        PARAM_DEFAULT(BoolUserConfigParam(false, "debug_hide_gui",
+            "Whether to hide the GUI (artist debug mode)"));
 
     PARAM_PREFIX BoolUserConfigParam        m_everything_unlocked
             PARAM_DEFAULT( BoolUserConfigParam(false, "everything_unlocked",

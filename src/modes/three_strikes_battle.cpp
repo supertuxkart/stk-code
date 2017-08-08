@@ -179,9 +179,9 @@ void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
         // Add heart billboard above it
         std::string heart_path =
             file_manager->getAsset(FileManager::GUI, "heart.png");
+        TexConfig btc(true/*srgb*/, true/*premul_alpha*/);
         video::ITexture* heart = STKTexManager::getInstance()->getTexture
-            (heart_path, true/*srgb*/, true/*premul_alpha*/,
-            false/*set_material*/, true/*mesh_tex*/);
+            (heart_path, &btc);
 
         float height = kart->getKartHeight() + 0.5f;
 

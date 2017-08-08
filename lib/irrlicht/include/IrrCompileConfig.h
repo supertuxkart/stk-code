@@ -117,14 +117,26 @@
 #define _IRR_COMPILE_ANDROID_ASSET_READER_
 #endif
 
+#if defined(_IRR_COMPILE_WITH_OGLES2_) && !defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
+#define _IRR_COMPILE_WITH_EGL_
+#endif
+
 #if !defined(_IRR_WINDOWS_API_) && !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_)
 #ifndef _IRR_SOLARIS_PLATFORM_
 #define _IRR_LINUX_PLATFORM_
 #endif
 #define _IRR_POSIX_API_
 #define _IRR_COMPILE_WITH_X11_DEVICE_
+//#define _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 #endif
 
+#ifdef NO_IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#undef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#endif
+
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#define _IRR_COMPILE_WITH_EGL_
+#endif
 
 //! Define _IRR_COMPILE_WITH_JOYSTICK_SUPPORT_ if you want joystick events.
 #define _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
@@ -309,7 +321,7 @@ tool <http://developer.nvidia.com/object/nvperfhud_home.html>. */
 #undef _IRR_USE_NVIDIA_PERFHUD_
 
 //! Uncomment the following line if you want to ignore the deprecated warnings
-//#define IGNORE_DEPRECATED_WARNING
+#define IGNORE_DEPRECATED_WARNING
 
 //! Define _IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_ if you want to use bone based
 /** animated meshes. If you compile without this, you will be unable to load

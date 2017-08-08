@@ -17,6 +17,7 @@
 #include "COGLES2NormalMapRenderer.h"
 #include "COGLES2ParallaxMapRenderer.h"
 #include "COGLES2Renderer2D.h"
+#include "CContextEGL.h"
 #include "CImage.h"
 #include "os.h"
 
@@ -24,7 +25,6 @@
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #else
-#include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #endif
 
@@ -32,6 +32,7 @@ namespace irr
 {
 namespace video
 {
+	bool useCoreContext = true;
 
 //! constructor and init code
 	COGLES2Driver::COGLES2Driver(const SIrrlichtCreationParameters& params,
@@ -41,18 +42,19 @@ namespace video
 #endif
 	)
 		: CNullDriver(io, params.WindowSize), COGLES2ExtensionHandler(),
-		CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
-		Transformation3DChanged(true), AntiAlias(params.AntiAlias), BridgeCalls(0),
+		BridgeCalls(0), CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
+		Transformation3DChanged(true), AntiAlias(params.AntiAlias),
 		RenderTargetTexture(0), CurrentRendertargetSize(0, 0), ColorFormat(ECF_R8G8B8)
-#ifdef EGL_VERSION_1_0
-		, EglDisplay(EGL_NO_DISPLAY)
-#endif
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-		, HDc(0)
+#if defined(_IRR_COMPILE_WITH_EGL_)
+		, EglContext(0)
+		, EglContextExternal(false)
 #elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 		, ViewFramebuffer(0)
 		, ViewRenderbuffer(0)
 		, ViewDepthRenderbuffer(0)
+#endif
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+		, HDc(0)
 #endif
 		, Params(params)
 	{
@@ -60,275 +62,94 @@ namespace video
 		setDebugName("COGLES2Driver");
 #endif
 		ExposedData = data;
+
+#if defined(_IRR_COMPILE_WITH_EGL_)
+		EglContext = new ContextManagerEGL();
+		
+		ContextEGLParams egl_params;
+		egl_params.opengl_api = CEGL_API_OPENGL_ES;
+		egl_params.surface_type = CEGL_SURFACE_WINDOW;
+		egl_params.force_legacy_device = Params.ForceLegacyDevice;
+		egl_params.with_alpha_channel = Params.WithAlphaChannel;
+		egl_params.vsync_enabled = Params.Vsync;
+	
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-		EglWindow = (NativeWindowType)data.OpenGLWin32.HWnd;
-		HDc = GetDC((HWND)EglWindow);
-		EglDisplay = eglGetDisplay((NativeDisplayType)HDc);
+		egl_params.window = (EGLNativeWindowType)(data.OpenGLWin32.HWnd);
+		HDc = GetDC(data.OpenGLWin32.HWnd);
+		egl_params.display = (NativeDisplayType)(HDc);
 #elif defined(_IRR_COMPILE_WITH_X11_DEVICE_)
-		EglWindow = (NativeWindowType)ExposedData.OpenGLLinux.X11Window;
-		EglDisplay = eglGetDisplay((NativeDisplayType)ExposedData.OpenGLLinux.X11Display);
-#elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
-		Device = device;
+		egl_params.window = (EGLNativeWindowType)(data.OpenGLLinux.X11Window);
+		egl_params.display = (EGLNativeDisplayType)(data.OpenGLLinux.X11Display);
 #elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
-		EglWindow =	((struct android_app *)(params.PrivateData))->window;
-		EglDisplay = EGL_NO_DISPLAY;
+		egl_params.window =	((struct android_app *)(params.PrivateData))->window;
+		egl_params.display = NULL;
 #endif
-#ifdef EGL_VERSION_1_0
-		if (EglDisplay == EGL_NO_DISPLAY)
-		{
-			os::Printer::log("Getting OpenGL-ES2 display.");
-			EglDisplay = eglGetDisplay((NativeDisplayType) EGL_DEFAULT_DISPLAY);
-		}
-		if (EglDisplay == EGL_NO_DISPLAY)
-		{
-			os::Printer::log("Could not get OpenGL-ES2 display.");
-		}
-
-		EGLint majorVersion, minorVersion;
-		if (!eglInitialize(EglDisplay, &majorVersion, &minorVersion))
-		{
-			os::Printer::log("Could not initialize OpenGL-ES2 display.");
-		}
-		else
-		{
-			char text[64];
-			sprintf(text, "EglDisplay initialized. Egl version %d.%d\n", majorVersion, minorVersion);
-			os::Printer::log(text);
-		}
-
-		EGLint attribs[] =
-		{
-#if defined( _IRR_COMPILE_WITH_ANDROID_DEVICE_ )
-		EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-		EGL_BLUE_SIZE, 8,
-		EGL_GREEN_SIZE, 8,
-		EGL_RED_SIZE, 8,
-		EGL_DEPTH_SIZE, 16,
-		EGL_NONE
-#else		
-			EGL_RED_SIZE, 5,
-			EGL_GREEN_SIZE, 5,
-			EGL_BLUE_SIZE, 5,
-			EGL_ALPHA_SIZE, params.WithAlphaChannel ? 1 : 0,
-			EGL_BUFFER_SIZE, params.Bits,
-			EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-			//EGL_COLOR_BUFFER_TYPE, EGL_RGB_BUFFER,
-			EGL_DEPTH_SIZE, params.ZBufferBits,
-			EGL_STENCIL_SIZE, params.Stencilbuffer,
-			EGL_SAMPLE_BUFFERS, params.AntiAlias ? 1 : 0,
-			EGL_SAMPLES, params.AntiAlias,
-#ifdef EGL_VERSION_1_3
-			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-#endif
-			EGL_NONE, 0
-#endif
-		};
-
-		EGLint num_configs;
-		u32 steps=5;
-		while (!eglChooseConfig(EglDisplay, attribs, &EglConfig, 1, &num_configs) || !num_configs)
-		{
-			switch (steps)
-			{
-			case 5: // samples
-				if (attribs[19]>2)
-				{
-					--attribs[19];
-				}
-				else
-				{
-					attribs[17]=0;
-					attribs[19]=0;
-					--steps;
-				}
-				break;
-			case 4: // alpha
-				if (attribs[7])
-				{
-					attribs[7]=0;
-					if (params.AntiAlias)
-					{
-						attribs[17]=1;
-						attribs[19]=params.AntiAlias;
-						steps=5;
-					}
-				}
-				else
-					--steps;
-				break;
-			case 3: // stencil
-				if (attribs[15])
-				{
-					attribs[15]=0;
-					if (params.AntiAlias)
-					{
-						attribs[17]=1;
-						attribs[19]=params.AntiAlias;
-						steps=5;
-					}
-				}
-				else
-					--steps;
-				break;
-			case 2: // depth size
-				if (attribs[13]>16)
-				{
-					attribs[13]-=8;
-				}
-				else
-					--steps;
-				break;
-			case 1: // buffer size
-				if (attribs[9]>16)
-				{
-					attribs[9]-=8;
-				}
-				else
-					--steps;
-				break;
-			default:
-				os::Printer::log("Could not get config for OpenGL-ES2 display.");
-				return;
-			}
-		}
-		if (params.AntiAlias && !attribs[17])
-			os::Printer::log("No multisampling.");
-		if (params.WithAlphaChannel && !attribs[7])
-			os::Printer::log("No alpha.");
-		if (params.Stencilbuffer && !attribs[15])
-			os::Printer::log("No stencil buffer.");
-		if (params.ZBufferBits > attribs[13])
-			os::Printer::log("No full depth buffer.");
-		if (params.Bits > attribs[9])
-			os::Printer::log("No full color buffer.");
-		#if defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
-	   /* EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is
-		* guaranteed to be accepted by ANativeWindow_setBuffersGeometry().
-		* As soon as we picked a EGLConfig, we can safely reconfigure the
-		* ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID. */
-	   EGLint format;
-	   eglGetConfigAttrib(EglDisplay, EglConfig, EGL_NATIVE_VISUAL_ID, &format);
-
-	   ANativeWindow_setBuffersGeometry(EglWindow, 0, 0, format);
-	   #endif
-		os::Printer::log(" Creating EglSurface with nativeWindow...");
-		EglSurface = eglCreateWindowSurface(EglDisplay, EglConfig, EglWindow, NULL);
-		if (EGL_NO_SURFACE == EglSurface)
-		{
-			os::Printer::log("FAILED\n");
-			EglSurface = eglCreateWindowSurface(EglDisplay, EglConfig, NULL, NULL);
-			os::Printer::log("Creating EglSurface without nativeWindows...");
-		}
-		else
-			os::Printer::log("SUCCESS\n");
-		if (EGL_NO_SURFACE == EglSurface)
-		{
-			os::Printer::log("FAILED\n");
-			os::Printer::log("Could not create surface for OpenGL-ES2 display.");
-		}
-		else
-			os::Printer::log("SUCCESS\n");
-
-#ifdef EGL_VERSION_1_2
-		if (minorVersion>1)
-			eglBindAPI(EGL_OPENGL_ES_API);
-#endif
-		os::Printer::log("Creating EglContext...");
-		EglContext = EGL_NO_CONTEXT;
 		
-		if (!Params.ForceLegacyDevice)
-		{
-			os::Printer::log("Trying to create Context for OpenGL-ES3.");
-			
-			EGLint contextAttrib[] =
-			{
-				#ifdef EGL_VERSION_1_3
-				EGL_CONTEXT_CLIENT_VERSION, 3,
-				#endif
-				EGL_NONE, 0
-			};
-			
-			EglContext = eglCreateContext(EglDisplay, EglConfig, EGL_NO_CONTEXT, contextAttrib);
-		}
-		
-		if (EGL_NO_CONTEXT == EglContext)
-		{
-			os::Printer::log("Trying to create Context for OpenGL-ES2.");
-			
-			EGLint contextAttrib[] =
-			{
-				#ifdef EGL_VERSION_1_3
-				EGL_CONTEXT_CLIENT_VERSION, 2,
-				#endif
-				EGL_NONE, 0
-			};
-			
-			EglContext = eglCreateContext(EglDisplay, EglConfig, EGL_NO_CONTEXT, contextAttrib);
-			if (EGL_NO_CONTEXT == EglContext)
-			{
-				os::Printer::log("FAILED\n");
-				os::Printer::log("Could not create Context for OpenGL-ES2 display.");
-			}
-		}
-
-		eglMakeCurrent(EglDisplay, EglSurface, EglSurface, EglContext);
-		if (testEGLError())
-		{
-			os::Printer::log("Could not make Context current for OpenGL-ES2 display.");
-		}
+		EglContext->init(egl_params);
+		useCoreContext = !EglContext->isLegacyDevice();
 
 		genericDriverInit(params.WindowSize, params.Stencilbuffer);
-
+		
 #ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
-		int backingWidth;
-		int backingHeight;
-		eglQuerySurface(EglDisplay, EglSurface, EGL_WIDTH, &backingWidth);
-		eglQuerySurface(EglDisplay, EglSurface, EGL_HEIGHT, &backingHeight);
-        core::dimension2d<u32> WindowSize(backingWidth, backingHeight);
-        CNullDriver::ScreenSize = WindowSize;
+		int width = 0;
+		int height = 0;
+		EglContext->getSurfaceDimensions(&width, &height);
+        CNullDriver::ScreenSize = core::dimension2d<u32>(width, height);
 #endif
-        
 
-		// set vsync
-		if (params.Vsync)
-			eglSwapInterval(EglDisplay, 1);
-#elif defined(GL_ES_VERSION_2_0)
+#elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
+		Device = device;
+
         glGenFramebuffers(1, &ViewFramebuffer);
         glGenRenderbuffers(1, &ViewRenderbuffer);
         glBindRenderbuffer(GL_RENDERBUFFER, ViewRenderbuffer);
 
-#if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
         ExposedData.OGLESIPhone.AppDelegate = Device;
         Device->displayInitialize(&ExposedData.OGLESIPhone.Context, &ExposedData.OGLESIPhone.View);
-#endif
 
         GLint backingWidth;
         GLint backingHeight;
         glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &backingWidth);
         glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &backingHeight);
-        
+
         glGenRenderbuffers(1, &ViewDepthRenderbuffer);
         glBindRenderbuffer(GL_RENDERBUFFER, ViewDepthRenderbuffer);
-        
+
         GLenum depthComponent = GL_DEPTH_COMPONENT16;
-        
+
         if(params.ZBufferBits >= 24)
             depthComponent = GL_DEPTH_COMPONENT24_OES;
-        
+
         glRenderbufferStorage(GL_RENDERBUFFER, depthComponent, backingWidth, backingHeight);
-        
+
         glBindFramebuffer(GL_FRAMEBUFFER, ViewFramebuffer);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, ViewRenderbuffer);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, ViewDepthRenderbuffer);
-        
+
         core::dimension2d<u32> WindowSize(backingWidth, backingHeight);
         CNullDriver::ScreenSize = WindowSize;
         CNullDriver::ViewPort = core::rect<s32>(core::position2d<s32>(0,0), core::dimension2di(WindowSize));
-        
+
         genericDriverInit(WindowSize, params.Stencilbuffer);
 #endif
 	}
 
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+	COGLES2Driver::COGLES2Driver(const SIrrlichtCreationParameters& params, 
+				  io::IFileSystem* io, CIrrDeviceWayland* device)
+		: CNullDriver(io, params.WindowSize), COGLES2ExtensionHandler(),
+		BridgeCalls(0), CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
+		Transformation3DChanged(true), AntiAlias(params.AntiAlias),
+		RenderTargetTexture(0), CurrentRendertargetSize(0, 0), 
+		ColorFormat(ECF_R8G8B8), EglContext(0), EglContextExternal(false), 
+		Params(params)
+	{
+		EglContext = device->getEGLContext();
+		EglContextExternal = true;
+		genericDriverInit(params.WindowSize, params.Stencilbuffer);
+	}
+#endif
+				  
 
 	//! destructor
 	COGLES2Driver::~COGLES2Driver()
@@ -339,33 +160,18 @@ namespace video
 
 		if (BridgeCalls)
 			delete BridgeCalls;
-        
-#if defined(EGL_VERSION_1_0)
-		eglMakeCurrent(EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-		
-		if (EglContext != EGL_NO_CONTEXT)
-		{
-			eglDestroyContext(EglDisplay, EglContext);
-			EglContext = EGL_NO_CONTEXT;
-		}
-		
-		if (EglSurface != EGL_NO_SURFACE)
-		{
-			eglDestroySurface(EglDisplay, EglSurface);
-			EglSurface = EGL_NO_SURFACE;
-		}
-		
-		if (EglDisplay != EGL_NO_DISPLAY)
-		{
-			eglTerminate(EglDisplay);
-			EglDisplay = EGL_NO_DISPLAY;
-		}
 
+#if defined(_IRR_COMPILE_WITH_EGL_)
+		if (!EglContextExternal)
+			delete EglContext;
+		
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
 		if (HDc)
-			ReleaseDC((HWND)EglWindow, HDc);
+			ReleaseDC((ExposedData.OpenGLWin32.HWnd, HDc);
 #endif
-#elif defined(GL_ES_VERSION_2_0)
+
+
+#elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
         if (0 != ViewFramebuffer)
         {
             glDeleteFramebuffers(1,&ViewFramebuffer);
@@ -388,40 +194,11 @@ namespace video
 // METHODS
 // -----------------------------------------------------------------------
 
-	void COGLES2Driver::reloadEGLSurface(void* window)
-	{
-		os::Printer::log("Reload EGL surface.");
-		
-		#ifdef EGL_VERSION_1_0
-		#if defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
-			EglWindow = (ANativeWindow*)window;
-		#endif
-		
-		if (!EglWindow)
-			os::Printer::log("Invalid Egl window.");
-		
-		eglMakeCurrent(EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-	
-		eglDestroySurface(EglDisplay, EglSurface);
-		
-		EglSurface = eglCreateWindowSurface(EglDisplay, EglConfig, EglWindow, 0);
-		
-		if (EGL_NO_SURFACE == EglSurface)
-			os::Printer::log("Could not create EGL surface.");
-			
-		eglMakeCurrent(EglDisplay, EglSurface, EglSurface, EglContext);
-		#endif
-	}
-	
 
 	bool COGLES2Driver::genericDriverInit(const core::dimension2d<u32>& screenSize, bool stencilBuffer)
 	{
 		Name = glGetString(GL_VERSION);
 		printVersion();
-
-#if defined(EGL_VERSION_1_0)
-        os::Printer::log(eglQueryString(EglDisplay, EGL_CLIENT_APIS));
-#endif
 
 		// print renderer information
 		vendorName = glGetString(GL_VENDOR);
@@ -431,11 +208,7 @@ namespace video
 		for (i = 0; i < MATERIAL_MAX_TEXTURES; ++i)
 			CurrentTexture[i] = 0;
 		// load extensions
-		initExtensions(this,
-#if defined(EGL_VERSION_1_0)
-            EglDisplay,
-#endif
-            stencilBuffer);
+		initExtensions(this, stencilBuffer);
 
 		if (!BridgeCalls)
 			BridgeCalls = new COGLES2CallBridge(this);
@@ -498,10 +271,10 @@ namespace video
 		// Load shaders from files (in future shaders will be merged with source code).
 
 		// Fixed pipeline.
-		
+
 		core::stringc shaders_path = IRR_OGLES2_SHADER_PATH;
 		if (Params.ShadersPath.size() > 0)
-			shaders_path = Params.ShadersPath;		
+			shaders_path = Params.ShadersPath;
 
 		core::stringc FPVSPath = shaders_path;
 		FPVSPath += "COGLES2FixedPipeline.vsh";
@@ -627,7 +400,7 @@ namespace video
 		if (PMFSFile)
 			PMFSFile->drop();
 
-		// Create materials.		
+		// Create materials.
 
 		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_SOLID, this));
 		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_SOLID_2_LAYER, this));
@@ -647,9 +420,12 @@ namespace video
 		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_TRANSPARENT_VERTEX_ALPHA, this));
 		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_TRANSPARENT_REFLECTION_2_LAYER, this));
 
-		addAndDropMaterialRenderer(new COGLES2NormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_SOLID, this));
-		addAndDropMaterialRenderer(new COGLES2NormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_TRANSPARENT_ADD_COLOR, this));
-		addAndDropMaterialRenderer(new COGLES2NormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA, this));
+		if (!useCoreContext)
+		{
+			addAndDropMaterialRenderer(new COGLES2NormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_SOLID, this));
+			addAndDropMaterialRenderer(new COGLES2NormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_TRANSPARENT_ADD_COLOR, this));
+			addAndDropMaterialRenderer(new COGLES2NormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA, this));
+		}
 
 		addAndDropMaterialRenderer(new COGLES2ParallaxMapRenderer(PMVSData, PMFSData, EMT_PARALLAX_MAP_SOLID, this));
 		addAndDropMaterialRenderer(new COGLES2ParallaxMapRenderer(PMVSData, PMFSData, EMT_PARALLAX_MAP_TRANSPARENT_ADD_COLOR, this));
@@ -706,30 +482,22 @@ namespace video
 	//! presents the rendered scene on the screen, returns false if failed
 	bool COGLES2Driver::endScene()
 	{
-        CNullDriver::endScene();
-        
-#if defined(EGL_VERSION_1_0)
-        eglSwapBuffers(EglDisplay, EglSurface);
-		EGLint g = eglGetError();
-		if (EGL_SUCCESS != g)
+		CNullDriver::endScene();
+
+#if defined(_IRR_COMPILE_WITH_EGL_)
+		bool res = EglContext->swapBuffers();
+		
+		if (!res)
 		{
-			if (EGL_CONTEXT_LOST == g)
-			{
-				// o-oh, ogl-es has lost contexts...
-				os::Printer::log("Context lost, please restart your app.");
-			}
-			else
-				os::Printer::log("Could not swap buffers for OpenGL-ES2 driver.");
+			os::Printer::log("Could not swap buffers for OpenGL-ES2 driver.");
 			return false;
 		}
-#elif defined(GL_ES_VERSION_2_0)
-        glFlush();
-        glBindRenderbuffer(GL_RENDERBUFFER, ViewRenderbuffer);
-#if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
-        Device->displayEnd();
+#elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
+		glFlush();
+		glBindRenderbuffer(GL_RENDERBUFFER, ViewRenderbuffer);
+		Device->displayEnd();
 #endif
-#endif
-        
+
 		return true;
 	}
 
@@ -1102,18 +870,18 @@ namespace video
 					glVertexAttribPointer(EVA_TCOORD0, 2, GL_FLOAT, false, sizeof(S3DVertex), buffer_offset(28));
 				}
 
-				if (CurrentTexture[1])
-				{
-					// There must be some optimisation here as it uses the same texture coord !
-					glEnableVertexAttribArray(EVA_TCOORD1);
-					if (vertices)
-						glVertexAttribPointer(EVA_TCOORD1, 2, GL_FLOAT, false, sizeof(S3DVertex), &(static_cast<const S3DVertex*>(vertices))[0].TCoords);
-					else
-						glVertexAttribPointer(EVA_TCOORD1, 2, GL_FLOAT, false, sizeof(S3DVertex), buffer_offset(28));
-				}
+				//if (CurrentTexture[1])
+				//{
+				//	// There must be some optimisation here as it uses the same texture coord !
+				//	glEnableVertexAttribArray(EVA_TCOORD1);
+				//	if (vertices)
+				//		glVertexAttribPointer(EVA_TCOORD1, 2, GL_FLOAT, false, sizeof(S3DVertex), &(static_cast<const S3DVertex*>(vertices))[0].TCoords);
+				//	else
+				//		glVertexAttribPointer(EVA_TCOORD1, 2, GL_FLOAT, false, sizeof(S3DVertex), buffer_offset(28));
+				//}
 				break;
 			case EVT_2TCOORDS:
-				glEnableVertexAttribArray(EVA_TCOORD1);
+				//glEnableVertexAttribArray(EVA_TCOORD1);
 				if (vertices)
 				{
 					glVertexAttribPointer(EVA_POSITION, (threed ? 3 : 2), GL_FLOAT, false, sizeof(S3DVertex2TCoords), &(static_cast<const S3DVertex2TCoords*>(vertices))[0].Pos);
@@ -1121,7 +889,7 @@ namespace video
 						glVertexAttribPointer(EVA_NORMAL, 3, GL_FLOAT, false, sizeof(S3DVertex2TCoords), &(static_cast<const S3DVertex2TCoords*>(vertices))[0].Normal);
 					glVertexAttribPointer(EVA_COLOR, 4, GL_UNSIGNED_BYTE, true, sizeof(S3DVertex2TCoords), &(static_cast<const S3DVertex2TCoords*>(vertices))[0].Color);
 					glVertexAttribPointer(EVA_TCOORD0, 2, GL_FLOAT, false, sizeof(S3DVertex2TCoords), &(static_cast<const S3DVertex2TCoords*>(vertices))[0].TCoords);
-					glVertexAttribPointer(EVA_TCOORD1, 2, GL_FLOAT, false, sizeof(S3DVertex2TCoords), &(static_cast<const S3DVertex2TCoords*>(vertices))[0].TCoords2);
+					//glVertexAttribPointer(EVA_TCOORD1, 2, GL_FLOAT, false, sizeof(S3DVertex2TCoords), &(static_cast<const S3DVertex2TCoords*>(vertices))[0].TCoords2);
 				}
 				else
 				{
@@ -1129,7 +897,7 @@ namespace video
 					glVertexAttribPointer(EVA_NORMAL, 3, GL_FLOAT, false, sizeof(S3DVertex2TCoords), buffer_offset(12));
 					glVertexAttribPointer(EVA_COLOR, 4, GL_UNSIGNED_BYTE, true, sizeof(S3DVertex2TCoords), buffer_offset(24));
 					glVertexAttribPointer(EVA_TCOORD0, 2, GL_FLOAT, false, sizeof(S3DVertex2TCoords), buffer_offset(28));
-					glVertexAttribPointer(EVA_TCOORD1, 2, GL_FLOAT, false, sizeof(S3DVertex2TCoords), buffer_offset(36));
+					//glVertexAttribPointer(EVA_TCOORD1, 2, GL_FLOAT, false, sizeof(S3DVertex2TCoords), buffer_offset(36));
 
 				}
 				break;
@@ -1155,6 +923,8 @@ namespace video
 					glVertexAttribPointer(EVA_TANGENT, 3, GL_FLOAT, false, sizeof(S3DVertexTangents), buffer_offset(36));
 					glVertexAttribPointer(EVA_BINORMAL, 3, GL_FLOAT, false, sizeof(S3DVertexTangents), buffer_offset(48));
 				}
+				break;
+			default:
 				break;
 			}
 		}
@@ -1261,10 +1031,10 @@ namespace video
 				glDisableVertexAttribArray(EVA_TANGENT);
 				glDisableVertexAttribArray(EVA_BINORMAL);
 			}
-			if ((vType != EVT_STANDARD) || CurrentTexture[1])
-			{
-				glDisableVertexAttribArray(EVA_TCOORD1);
-			}
+			//if ((vType != EVT_STANDARD) || CurrentTexture[1])
+			//{
+			//	glDisableVertexAttribArray(EVA_TCOORD1);
+			//}
 
 #ifdef GL_OES_point_size_array
 			if (FeatureAvailable[IRR_OES_point_size_array] && (Material.Thickness == 0.0f))
@@ -1889,67 +1659,11 @@ namespace video
 #endif
 	}
 
-	//! prints error if an error happened.
-	bool COGLES2Driver::testEGLError()
-	{
-#if defined(EGL_VERSION_1_0) && defined(_DEBUG)
-		EGLint g = eglGetError();
-		switch (g)
-		{
-			case EGL_SUCCESS:
-				return false;
-			case EGL_NOT_INITIALIZED :
-				os::Printer::log("Not Initialized", ELL_ERROR);
-				break;
-			case EGL_BAD_ACCESS:
-				os::Printer::log("Bad Access", ELL_ERROR);
-				break;
-			case EGL_BAD_ALLOC:
-				os::Printer::log("Bad Alloc", ELL_ERROR);
-				break;
-			case EGL_BAD_ATTRIBUTE:
-				os::Printer::log("Bad Attribute", ELL_ERROR);
-				break;
-			case EGL_BAD_CONTEXT:
-				os::Printer::log("Bad Context", ELL_ERROR);
-				break;
-			case EGL_BAD_CONFIG:
-				os::Printer::log("Bad Config", ELL_ERROR);
-				break;
-			case EGL_BAD_CURRENT_SURFACE:
-				os::Printer::log("Bad Current Surface", ELL_ERROR);
-				break;
-			case EGL_BAD_DISPLAY:
-				os::Printer::log("Bad Display", ELL_ERROR);
-				break;
-			case EGL_BAD_SURFACE:
-				os::Printer::log("Bad Surface", ELL_ERROR);
-				break;
-			case EGL_BAD_MATCH:
-				os::Printer::log("Bad Match", ELL_ERROR);
-				break;
-			case EGL_BAD_PARAMETER:
-				os::Printer::log("Bad Parameter", ELL_ERROR);
-				break;
-			case EGL_BAD_NATIVE_PIXMAP:
-				os::Printer::log("Bad Native Pixmap", ELL_ERROR);
-				break;
-			case EGL_BAD_NATIVE_WINDOW:
-				os::Printer::log("Bad Native Window", ELL_ERROR);
-				break;
-			case EGL_CONTEXT_LOST:
-				os::Printer::log("Context Lost", ELL_ERROR);
-				break;
-		};
-		return true;
-#else
-		return false;
-#endif
-	}
-
-
 	void COGLES2Driver::setRenderStates3DMode()
 	{
+		if (useCoreContext)
+			return;
+
 		if (CurrentRenderMode != ERM_3D)
 		{
 			// Reset Texture Stages
@@ -1988,6 +1702,9 @@ namespace video
 	//! Can be called by an IMaterialRenderer to make its work easier.
 	void COGLES2Driver::setBasicRenderStates(const SMaterial& material, const SMaterial& lastmaterial, bool resetAllRenderStates)
 	{
+		if (useCoreContext)
+			return;
+
 		// ZBuffer
 		if (resetAllRenderStates || lastmaterial.ZBuffer != material.ZBuffer)
 		{
@@ -2112,10 +1829,13 @@ namespace video
 		// Texture parameters
 		setTextureRenderStates(material, resetAllRenderStates);
 	}
-    
+
 	//! Compare in SMaterial doesn't check texture parameters, so we should call this on each OnRender call.
 	void COGLES2Driver::setTextureRenderStates(const SMaterial& material, bool resetAllRenderstates)
 	{
+		if (useCoreContext)
+			return;
+
 		// Set textures to TU/TIU and apply filters to them
 
 		for (s32 i = MaxTextureUnits-1; i>= 0; --i)
@@ -2126,6 +1846,11 @@ namespace video
 				BridgeCalls->setTexture(i);
 			else
 				continue;
+
+			// This code causes issues on some devices with legacy pipeline
+			// and also mipmaps should be handled in STK texture manager,
+			// so just disable this part of code
+			continue;
 
 			if(resetAllRenderstates)
 				tmpTexture->getStatesCache().IsCached = false;
@@ -2217,6 +1942,9 @@ namespace video
 	//! sets the needed renderstates
 	void COGLES2Driver::setRenderStates2DMode(bool alpha, bool texture, bool alphaChannel)
 	{
+		if (useCoreContext)
+			return;
+
 		if (CurrentRenderMode != ERM_2D)
 		{
 			// unset last 3d material
@@ -2631,9 +2359,10 @@ namespace video
 	}
 
 
-	ITexture* COGLES2Driver::addRenderTargetTexture(
-			const core::dimension2d<u32>& size,
-			const io::path& name, const ECOLOR_FORMAT format)
+	ITexture* COGLES2Driver::addRenderTargetTexture(const core::dimension2d<u32>& size,
+					const io::path& name,
+					const ECOLOR_FORMAT format,
+					const bool useStencil)
 	{
 		//disable mip-mapping
 		const bool generateMipLevels = getTextureCreationFlag(ETCF_CREATE_MIP_MAPS);
@@ -2981,7 +2710,7 @@ namespace video
 	{
 		return Material;
 	}
-    
+
 	COGLES2CallBridge* COGLES2Driver::getBridgeCalls() const
 	{
 		return BridgeCalls;
@@ -3003,7 +2732,7 @@ namespace video
 
 		glCullFace(GL_BACK);
 		glDisable(GL_CULL_FACE);
-    
+
 		glDepthFunc(GL_LESS);
 		glDepthMask(GL_TRUE);
 		glDisable(GL_DEPTH_TEST);
@@ -3028,7 +2757,7 @@ namespace video
 				glEnable(GL_BLEND);
 			else
 				glDisable(GL_BLEND);
-                
+
 			Blend = enable;
 		}
 	}
@@ -3038,7 +2767,7 @@ namespace video
 		if(CullFaceMode != mode)
 		{
 			glCullFace(mode);
-                
+
 			CullFaceMode = mode;
 		}
 	}
@@ -3051,7 +2780,7 @@ namespace video
 				glEnable(GL_CULL_FACE);
 			else
 				glDisable(GL_CULL_FACE);
-                
+
 			CullFace = enable;
 		}
 	}
@@ -3061,11 +2790,11 @@ namespace video
 		if(DepthFunc != mode)
 		{
 			glDepthFunc(mode);
-                
+
 			DepthFunc = mode;
 		}
 	}
-        
+
 	void COGLES2CallBridge::setDepthMask(bool enable)
 	{
 		if(DepthMask != enable)
@@ -3074,7 +2803,7 @@ namespace video
 				glDepthMask(GL_TRUE);
 			else
 				glDepthMask(GL_FALSE);
-                
+
 			DepthMask = enable;
 		}
 	}
@@ -3087,7 +2816,7 @@ namespace video
 				glEnable(GL_DEPTH_TEST);
 			else
 				glDisable(GL_DEPTH_TEST);
-                
+
 			DepthTest = enable;
 		}
 	}
@@ -3100,7 +2829,7 @@ namespace video
 			Program = program;
 		}
 	}
-        
+
 	void COGLES2CallBridge::setActiveTexture(GLenum texture)
 	{
 		if (ActiveTexture != texture)
@@ -3109,7 +2838,7 @@ namespace video
 			ActiveTexture = texture;
 		}
 	}
-        
+
 	void COGLES2CallBridge::setTexture(u32 stage)
 	{
 		if (stage < MATERIAL_MAX_TEXTURES)
@@ -3156,6 +2885,22 @@ namespace video
 		return 0;
 #endif // _IRR_COMPILE_WITH_OGLES2_
 	}
+#endif
+
+// -----------------------------------
+// WAYLAND VERSION
+// -----------------------------------
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+	IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params, 
+			io::IFileSystem* io, CIrrDeviceWayland* device)
+	{
+#ifdef _IRR_COMPILE_WITH_OGLES2_
+		return new COGLES2Driver(params, io, device);
+#else
+		return 0;
+#endif // _IRR_COMPILE_WITH_OGLES2_
+	}
+		
 #endif
 
 // -----------------------------------

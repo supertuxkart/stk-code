@@ -153,6 +153,11 @@ namespace Scripting
             return race_manager->getReverseTrack();
         }
 
+        bool isDuringDay()
+        {
+            return ::Track::getCurrentTrack()->getIsDuringDay();
+        }
+
         void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)
         {
             PropertyAnimator* animator = PropertyAnimator::get();
@@ -386,6 +391,7 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("int getNumberOfKarts()", asFUNCTION(getNumberOfKarts), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("int getNumLocalPlayers()", asFUNCTION(getNumLocalPlayers), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("bool isReverse()", asFUNCTION(isTrackReverse), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("bool isDuringDay()", asFUNCTION(isDuringDay), asCALL_CDECL); assert(r >= 0);
 
             // TrackObject
             r = engine->RegisterObjectMethod("TrackObject", "void setEnabled(bool status)", asMETHOD(::TrackObject, setEnabled), asCALL_THISCALL); assert(r >= 0);

@@ -514,7 +514,6 @@ void SFXManager::loadSfx()
         array[i++] = buffer;
     }
 
-    #pragma omp parallel for private(i)
     for (i = 0; i < max; i++)
     {
         array[i]->load();
@@ -593,7 +592,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
     // to load terrain specific sfx.
     const std::string full_path = (path == "")
                                 ? file_manager->getAsset(FileManager::SFX,filename)
-                                : path;
+                                : path+"/"+filename;
 
     SFXBuffer tmpbuffer(full_path, node);
 

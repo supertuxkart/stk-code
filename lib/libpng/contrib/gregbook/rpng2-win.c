@@ -33,6 +33,8 @@
     - 2.02:  fixed improper display of usage screen on PNG error(s); fixed
               unexpected-EOF and file-read-error cases
     - 2.03:  removed runtime MMX-enabling/disabling and obsolete -mmx* options
+    - 2.04:
+             (GR-P)
 
   ---------------------------------------------------------------------------
 
@@ -299,7 +301,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
 #ifndef __CYGWIN__
     /* Next reenable console output, which normally goes to the bit bucket
      * for windowed apps.  Closing the console window will terminate the
-     * app.  Thanks to David.Geldreich@realviz.com for supplying the magical
+     * app.  Thanks to David.Geldreich at realviz.com for supplying the magical
      * incantation. */
 
     AllocConsole();

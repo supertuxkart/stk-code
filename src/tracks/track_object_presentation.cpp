@@ -178,6 +178,7 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
     ModelDefinitionLoader& model_def_loader)
     : TrackObjectPresentationSceneNode(xml_node)
 {
+    m_parent = NULL;
     m_start_executed = false;
 
     std::string name;
@@ -288,13 +289,16 @@ void TrackObjectPresentationLibraryNode::update(float dt)
         m_start_executed = true;
         std::string fn_name = StringUtils::insertValues("void %s::onStart(const string)", m_name.c_str());
 
-        std::string lib_id = m_parent->getID();
-        std::string* lib_id_ptr = &lib_id;
+        if (m_parent != NULL)
+        {
+            std::string lib_id = m_parent->getID();
+            std::string* lib_id_ptr = &lib_id;
 
-        Scripting::ScriptEngine::getInstance()->runFunction(false, fn_name,
-            [&](asIScriptContext* ctx) {
-                ctx->SetArgObject(0, lib_id_ptr);
-            });
+            Scripting::ScriptEngine::getInstance()->runFunction(false, fn_name,
+                [&](asIScriptContext* ctx) {
+                    ctx->SetArgObject(0, lib_id_ptr);
+                });
+        }
     }
 }
 
@@ -858,9 +862,9 @@ TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(
         xml_node.get("start",  &m_fade_out_start);
         xml_node.get("end",    &m_fade_out_end  );
     }
+    TexConfig tc(true/*srgb*/, true/*premul_alpha*/);
     video::ITexture* texture = STKTexManager::getInstance()->getTexture
-        (file_manager->searchTexture(texture_name), true/*srgb*/,
-        true/*premul_alpha*/, false/*set_material*/, true/*mesh_tex*/);
+        (file_manager->searchTexture(texture_name), &tc);
 
     if (texture == NULL)
     {

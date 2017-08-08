@@ -152,6 +152,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_reset_transform         = init_transform;
     m_speed                   = 0.0f;
     m_smoothed_speed          = 0.0f;
+    m_last_factor_engine_sound = 0.0f;
 
     m_kart_model->setKart(this);
 
@@ -171,6 +172,8 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_engine_sound  = SFXManager::get()->createSoundSource(m_kart_properties->getEngineSfxType());
     m_beep_sound    = SFXManager::get()->createSoundSource( "horn"  );
     m_crash_sound   = SFXManager::get()->createSoundSource( "crash" );
+    m_crash_sound2  = SFXManager::get()->createSoundSource( "crash2");
+    m_crash_sound3  = SFXManager::get()->createSoundSource( "crash3");
     m_boing_sound   = SFXManager::get()->createSoundSource( "boing" );
     m_goo_sound     = SFXManager::get()->createSoundSource( "goo"   );
     m_skid_sound    = SFXManager::get()->createSoundSource( "skid"  );
@@ -200,6 +203,8 @@ void Kart::init(RaceManager::KartType type)
         m_goo_sound->setVolume(factor);
         m_skid_sound->setVolume(factor);
         m_crash_sound->setVolume(factor);
+        m_crash_sound2->setVolume(factor);
+        m_crash_sound3->setVolume(factor);
         m_boing_sound->setVolume(factor);
         m_beep_sound->setVolume(factor);
         m_nitro_sound->setVolume(factor);
@@ -252,6 +257,8 @@ Kart::~Kart()
 
     m_engine_sound->deleteSFX();
     m_crash_sound ->deleteSFX();
+    m_crash_sound2->deleteSFX();
+    m_crash_sound3->deleteSFX();
     m_skid_sound  ->deleteSFX();
     m_goo_sound   ->deleteSFX();
     m_beep_sound  ->deleteSFX();
@@ -666,6 +673,11 @@ void Kart::createPhysics()
     trans.setIdentity();
     createBody(mass, trans, &m_kart_chassis,
                m_kart_properties->getRestitution());
+    std::vector<float> ang_fact = m_kart_properties->getStabilityAngularFactor();
+    // The angular factor (with X and Z values <1) helps to keep the kart
+    // upright, especially in case of a collision.
+    m_body->setAngularFactor(Vec3(ang_fact[0], ang_fact[1], ang_fact[2]));
+    m_body->setFriction(m_kart_properties->getFrictionKartFriction());
     m_user_pointer.set(this);
     m_body->setDamping(m_kart_properties->getStabilityChassisLinearDamping(),
                        m_kart_properties->getStabilityChassisAngularDamping() );
@@ -1224,7 +1236,19 @@ void Kart::update(float dt)
         }
     }
 
-    // Update the position and other data taken from the physics
+    // This is to avoid a rescue immediately after an explosion
+    const bool has_animation_before = m_kart_animation != NULL;
+    // A kart animation can change the xyz position. This needs to be done
+    // before updating the graphical position (which is done in
+    // Moveable::update() ), otherwise 'stuttering' can happen (caused by
+    // graphical and physical position not being the same).
+    if (has_animation_before)
+    {
+        m_kart_animation->update(dt);
+    }
+    // Update the position and other data taken from the physics (or
+    // an animation which calls setXYZ(), which also updates the kart
+    // physical position).
     Moveable::update(dt);
 
     Vec3 front(0, 0, getKartLength()*0.5f);
@@ -1307,9 +1331,6 @@ void Kart::update(float dt)
 
     // Used to prevent creating a rescue animation after an explosion animation
     // got deleted
-    const bool has_animation_before = m_kart_animation!= NULL;
-    if(has_animation_before)
-        m_kart_animation->update(dt);
 
     m_attachment->update(dt);
 
@@ -1340,6 +1361,8 @@ void Kart::update(float dt)
 
     m_beep_sound->setPosition   ( getXYZ() );
     m_crash_sound->setPosition  ( getXYZ() );
+    m_crash_sound2->setPosition ( getXYZ() );
+    m_crash_sound3->setPosition ( getXYZ() );
     m_skid_sound->setPosition   ( getXYZ() );
     m_boing_sound->setPosition  ( getXYZ() );
     m_nitro_sound->setPosition  ( getXYZ() );
@@ -1373,6 +1396,7 @@ void Kart::update(float dt)
             fabs(getSpeed()) < 3.0f)
         {
             new RescueAnimation(this, /*is_auto_rescue*/true);
+            m_last_factor_engine_sound = 0.0f;
         }
     }
 
@@ -1452,7 +1476,10 @@ void Kart::update(float dt)
 
         if((min->getY() - getXYZ().getY() > 17 || dist_to_sector > 25) && !m_flying &&
            !getKartAnimation())
+        {
             new RescueAnimation(this);
+            m_last_factor_engine_sound = 0.0f;
+        }
     }
     else
     {
@@ -1471,7 +1498,10 @@ void Kart::update(float dt)
         }   // if !flying
         handleMaterialSFX(material);
         if     (material->isDriveReset() && isOnGround())
+        {
             new RescueAnimation(this);
+            m_last_factor_engine_sound = 0.0f;
+        }
         else if(material->isZipper()     && isOnGround())
         {
             handleZipper(material);
@@ -2039,7 +2069,10 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         impulse *= ( abs_speed<10 ? 10.0f : sqrt(abs_speed) )
                  * m_kart_properties->getCollisionTerrainImpulse();
         m_bounce_back_time = 0.2f;
-        m_vehicle->setTimedCentralImpulse(0.1f, impulse);
+        m_bounce_back_time = 0.0f;;
+        impulse = Vec3(0, 0, 0);
+        //m_vehicle->setTimedCentralImpulse(0.1f, impulse);
+        m_vehicle->setTimedCentralImpulse(0.0, impulse);
     }
     // If there is a quad graph, push the kart towards the previous
     // graph node center (we have to use the previous point since the
@@ -2107,6 +2140,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         if (m->getCollisionReaction() == Material::RESCUE)
         {
             new RescueAnimation(this);
+            m_last_factor_engine_sound = 0.0f;
         }
         else if (m->getCollisionReaction() == Material::PUSH_BACK)
         {
@@ -2150,9 +2184,17 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
             }
             else
             {
-                if (m_crash_sound->getStatus() != SFXBase::SFX_PLAYING)
+                if (m_crash_sound->getStatus() != SFXBase::SFX_PLAYING
+                    && m_crash_sound2->getStatus() != SFXBase::SFX_PLAYING
+                    && m_crash_sound3->getStatus() != SFXBase::SFX_PLAYING)
                 {
-                    m_crash_sound->play(getXYZ());
+                    int idx = rand() % 3;
+                    if (idx == 0)
+                        m_crash_sound->play(getXYZ());
+                    else if (idx == 1)
+                        m_crash_sound2->play(getXYZ());
+                    else
+                        m_crash_sound3->play(getXYZ());
                 }
             }
         }    // if lin_vel > 0.555
@@ -2298,7 +2340,7 @@ void Kart::updatePhysics(float dt)
     m_max_speed->update(dt);
 
 
-    updateEngineSFX();
+    updateEngineSFX(dt);
 #ifdef XX
     Log::info("Kart","angVel %f %f %f heading %f suspension %f %f %f %f"
        ,m_body->getAngularVelocity().getX()
@@ -2317,7 +2359,7 @@ void Kart::updatePhysics(float dt)
 //-----------------------------------------------------------------------------
 /** Adjust the engine sound effect depending on the speed of the kart.
  */
-void Kart::updateEngineSFX()
+void Kart::updateEngineSFX(float dt)
 {
     // when going faster, use higher pitch for engine
     if(!m_engine_sound || !SFXManager::get()->sfxAllowed())
@@ -2325,7 +2367,7 @@ void Kart::updateEngineSFX()
 
     if(isOnGround())
     {
-        float max_speed = m_max_speed->getCurrentMaxSpeed();
+        float max_speed = m_kart_properties->getEngineMaxSpeed();
 
         // Engine noise is based half in total speed, half in fake gears:
         // With a sawtooth graph like /|/|/| we get 3 even spaced gears,
@@ -2333,20 +2375,23 @@ void Kart::updateEngineSFX()
         // good enough brrrBRRRbrrrBRRR sound effect. Speed factor makes
         // it a "staired sawtooth", so more acoustically rich.
         float f = max_speed > 0 ? m_speed/max_speed : 1.0f;
-        // Speed at this stage is not yet capped, so it can be > 1, which
-        // results in odd engine sfx.
-        if (f>1.0f) f=1.0f;
+        // Speed at this stage is not yet capped, reduce the amount beyond 1
+        if (f> 1.0f) f = 1.0f + (1.0f-1.0f/f);
 
-        float gears = 3.0f * fmod(f, 0.333334f);
+        float fc = f;
+        if (fc>1.0f) fc = 1.0f;
+        float gears = 3.0f * fmod(fc, 0.333334f);
         assert(!std::isnan(f));
-        m_engine_sound->setSpeedPosition(0.6f + (f + gears) * 0.35f, getXYZ());
+        m_last_factor_engine_sound = (0.9f*f + gears) * 0.35f;
+        m_engine_sound->setSpeedPosition(0.6f + m_last_factor_engine_sound, getXYZ());
     }
     else
-    {
-        // When flying, fixed value but not too high pitch
-        // This gives some variation (vs previous "on wheels" one)
-        m_engine_sound->setSpeedPosition(0.9f, getXYZ());
-    }
+      {
+        // When flying, reduce progressively the sound engine (since we can't accelerate)
+        m_last_factor_engine_sound *= (1.0f-0.1f*dt);
+        m_engine_sound->setSpeedPosition(0.6f + m_last_factor_engine_sound, getXYZ());
+        if (m_speed < 0.1f) m_last_factor_engine_sound = 0.0f;
+      }
 }   // updateEngineSFX
 
 //-----------------------------------------------------------------------------
@@ -2447,31 +2492,44 @@ void Kart::updateEnginePowerAndBrakes(float dt)
 
 // ----------------------------------------------------------------------------
 /** Handles sliding, i.e. the kart sliding off terrain that is too steep.
+ *  Dynamically determine friction so that the kart looses its traction
+ *  when trying to drive on too steep surfaces. Below angles of 0.25 rad,
+ *  you have full traction; above 0.5 rad angles you have absolutely none;
+ *  inbetween  there is a linear change in friction. This is done for each
+ *  wheel individually (since otherwise karts were still able with enough
+ *  speed to drive on walls - one wheel 'on a wall' would not tilt the
+ *  kart chassis enough to trigger sliding, but since that wheel had still
+ *  full friction, give the kart an upwards velocity).
  */
 void Kart::updateSliding()
 {
-    // dynamically determine friction so that the kart looses its traction
-    // when trying to drive on too steep surfaces. Below angles of 0.25 rad,
-    // you have full traction; above 0.5 rad angles you have absolutely none;
-    // inbetween  there is a linear change in friction
-    float friction = 1.0f;
-    bool enable_sliding = false;
-
-    // This way the current handling of sliding can be disabled
-    // for certain material (e.g. the curve in skyline on which otherwise
-    // karts could not drive).
-    // We also had a crash reported here, which was caused by not
-    // having a material here - no idea how this could have happened,
-    // but this problem is now avoided by testing if there is a material
-    if (isOnGround() &&
-         (!getMaterial() || !getMaterial()->highTireAdhesion()))
+    // Allow the sliding to be disabled per material (for so called
+    // high adhesion material), which is useful for e.g. banked curves.
+    // We don't have per-wheel material, so the test for special material
+    // with high adhesion is done per kart (not per wheel).
+    const Material * material = getMaterial();
+    if (material && material->highTireAdhesion())
     {
-        const btMatrix3x3 &m = m_vehicle->getChassisWorldTransform().getBasis();
-        // To get the angle between up=(0,1,0), we have to do:
-        // m*(0,1,0) to get the up vector of the kart, then the
-        // scalar product between this and (0,1,0) - which is m[1][1]:
-        float distanceFromUp = m[1][1];
+        for (int i = 0; i < m_vehicle->getNumWheels(); i++)
+        {
+            btWheelInfo &wheel = m_vehicle->getWheelInfo(i);
+            wheel.m_frictionSlip = m_kart_properties->getFrictionSlip();
+        }
+        m_vehicle->setSliding(false);
+        return;
+    }
 
+    // Now test for each wheel if it should be sliding
+    // -----------------------------------------------
+    bool enable_sliding = false;
+    for (int i = 0; i < m_vehicle->getNumWheels(); i++)
+    {
+        const btWheelInfo &wheel = m_vehicle->getWheelInfo(i);
+        if (!wheel.m_raycastInfo.m_isInContact) continue;
+
+        const btVector3 &norm = m_vehicle->getWheelInfo(i).m_raycastInfo.m_contactNormalWS;
+        float distanceFromUp = norm.dot(getNormal());
+        float friction;
         if (distanceFromUp < 0.85f)
         {
             friction = 0.0f;
@@ -2486,13 +2544,8 @@ void Kart::updateSliding()
             friction = (distanceFromUp - 0.85f) / 0.5f;
             enable_sliding = true;
         }
-    }
-
-    for (unsigned int i=0; i<4; i++)
-    {
-        btWheelInfo& wheel = m_vehicle->getWheelInfo(i);
-        wheel.m_frictionSlip = friction*m_kart_properties->getFrictionSlip();
-    }
+        m_vehicle->getWheelInfo(i).m_frictionSlip = friction * m_kart_properties->getFrictionSlip();
+    }   // for i < numWheels
 
     m_vehicle->setSliding(enable_sliding);
 }   // updateSliding
@@ -2570,7 +2623,16 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
                          ->isFogEnabled() );
     }
 #ifndef SERVER_ONLY
-    if (!CVS->supportsShadows())
+    bool create_shadow = m_kart_properties->getShadowTexture() != NULL &&
+                         !CVS->supportsShadows();
+                         
+#ifdef USE_GLES2
+    // Disable kart shadow for legacy pipeline in GLES renderer because it's 
+    // broken
+    create_shadow = create_shadow && CVS->isGLSL();
+#endif
+
+    if (create_shadow)
     {
         m_shadow = new Shadow(m_kart_properties.get(), m_node,
                               -m_kart_model->getLowestPoint());

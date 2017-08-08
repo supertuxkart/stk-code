@@ -104,7 +104,12 @@ private:
     unsigned int             m_magic_number;
 #endif
 
+    /* Gravity to be used for this track. */
     float                    m_gravity;
+
+    /** Friction to be used for the track. */
+    float                    m_friction;
+
     std::string              m_ident;
     std::string              m_screenshot;
     bool                     m_is_day;

@@ -14,7 +14,8 @@ LD=$(CC)
 RM=rm -f
 COPY=cp
 
-CFLAGS=-DPNG_USER_CONFIG -DNO_GZCOMPRESS -DNO_GZIP -I. -O1
+CPPFLAGS=-I. -DPNG_USER_CONFIG -DNO_GZCOMPRESS -DZ_SOLO -DNO_GZIP
+CFLAGS=-O1 -Wall
 
 C=.c
 O=.o
@@ -81,7 +82,7 @@ OBJS    = $(PROGOBJS) $(PNGOBJS) $(ZOBJS)
 
 # note: dependencies do not work on implicit rule lines
 .c$(O):
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
 
 # dependencies
 
@@ -95,16 +96,16 @@ pngm2pnm$(E): $(OBJS)
 # The CPP_FLAGS setting causes pngusr.h to be included in
 # both the build of pnglibconf.h and, subsequently, when
 # building libpng itself.
-$(PNGCONF): $(PNGSRC)/scripts/pnglibconf.mak\
+$(PNGCONF): $(PNGSRC)/scripts/pnglibconf.mak $(ZH)\
 	$(PNGSRC)/scripts/pnglibconf.dfa \
 	$(PNGSRC)/scripts/options.awk pngusr.h pngusr.dfa
 	$(RM) pnglibconf.h pnglibconf.dfn
-	$(MAKE) $(MAKEFLAGS) -f $(PNGSRC)/scripts/pnglibconf.mak\
-	    srcdir=$(PNGSRC) CPPFLAGS="-DPNG_USER_CONFIG"\
+	$(MAKE) -f $(PNGSRC)/scripts/pnglibconf.mak $(MAKEFLAGS)\
+	    srcdir=$(PNGSRC) CPPFLAGS="-DPNG_USER_CONFIG -I."\
 	    DFA_XTRA="pngusr.dfa" $@
 
 clean:
-	$(MAKE) $(MAKEFLAGS) -f $(PNGSRC)/scripts/pnglibconf.mak\
+	$(MAKE) -f $(PNGSRC)/scripts/pnglibconf.mak $(MAKEFLAGS)\
 	    srcdir=$(PNGSRC) clean
 	$(RM) pngm2pnm$(O)
 	$(RM) pngm2pnm$(E)

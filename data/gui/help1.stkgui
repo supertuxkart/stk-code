@@ -20,7 +20,7 @@
         <box proportion="1" width="100%" layout="vertical-row">
 
             <spacer width="5" height="15"/>
-            <button id="startTutorial" text="Click here to play the tutorial" align="center"/>
+            <button id="startTutorial" text="Start the tutorial" align="center"/>
             <spacer width="5" height="15"/>
 
             <div width="100%" proportion="2" layout="horizontal-row">

@@ -77,6 +77,9 @@ private:
 
     /** Used to alternate particle effects from the rear wheels. */
     int         m_wheel_toggle;
+    
+    /** A skid level that is currently in use */
+    int m_skid_level;
 
     /** A light that's shown when the kart uses nitro. */
     irr::scene::ISceneNode* m_nitro_light;

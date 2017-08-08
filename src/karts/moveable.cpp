@@ -20,6 +20,7 @@
 #include <math.h>
 #include "karts/moveable.hpp"
 
+#include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
@@ -170,6 +171,7 @@ void Moveable::createBody(float mass, btTransform& trans,
     btRigidBody::btRigidBodyConstructionInfo info(mass, m_motion_state,
                                                   shape, inertia);
     info.m_restitution = restitution;
+    info.m_friction = stk_config->m_default_moveable_friction;
 
     // Then create a rigid body
     // ------------------------

@@ -46,9 +46,7 @@
 #include <vector>
 
 #ifdef ANDROID
-#include <android_native_app_glue.h>
-
-extern struct android_app* global_android_app;
+#include "main_android.hpp"
 #endif
 
 
@@ -163,6 +161,7 @@ private:
     bool                 m_lightviz;
     bool                 m_distortviz;
     bool                 m_boundingboxesviz;
+    bool                 m_recording;
 
     /** Background colour to reset a buffer. Can be changed by each track. */
     irr::video::SColor m_clear_color;
@@ -413,6 +412,10 @@ public:
     void toggleBoundingBoxesViz() { m_boundingboxesviz = !m_boundingboxesviz; }
     // ------------------------------------------------------------------------
     bool getBoundingBoxesViz()    { return m_boundingboxesviz;      }
+    // ------------------------------------------------------------------------
+    bool isRecording() const { return m_recording; }
+    // ------------------------------------------------------------------------
+    void setRecording(bool val);
     // ------------------------------------------------------------------------
     u32 getRenderPass() { return m_renderpass; }
     // ------------------------------------------------------------------------

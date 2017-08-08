@@ -3,14 +3,14 @@ uniform vec2 size;
 uniform vec2 texcenter;
 uniform vec2 texsize;
 
-#if __VERSION__ >= 330
+#ifdef Explicit_Attrib_Location_Usable
 layout(location=0) in vec2 Position;
 layout(location=3) in vec2 Texcoord;
-layout(location=2) in uvec4 Color;
+layout(location=2) in vec4 Color;
 #else
 in vec2 Position;
 in vec2 Texcoord;
-in uvec4 Color;
+in vec4 Color;
 #endif
 
 out vec2 uv;
@@ -18,7 +18,7 @@ out vec4 col;
 
 void main()
 {
-    col = vec4(Color) / 255.;
+    col = Color.zyxw;
     uv = Texcoord * texsize + texcenter;
     gl_Position = vec4(Position * size + center, 0., 1.);
 }

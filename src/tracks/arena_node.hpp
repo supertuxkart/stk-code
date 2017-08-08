@@ -22,6 +22,7 @@
 #include "tracks/quad.hpp"
 #include "utils/cpp2011.hpp"
 
+#include <line3d.h>
 #include <vector>
 
 /**

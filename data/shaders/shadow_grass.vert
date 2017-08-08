@@ -2,7 +2,7 @@ uniform int layer;
 uniform mat4 ModelMatrix;
 uniform vec3 windDir;
 
-#if __VERSION__ >= 330
+#ifdef Explicit_Attrib_Location_Usable
 layout(location = 0) in vec3 Position;
 layout(location = 2) in vec4 Color;
 layout(location = 3) in vec2 Texcoord;
@@ -21,13 +21,17 @@ out int layerId;
 
 void main(void)
 {
+
+    vec3 test = sin(windDir * (Position.y* 0.5)) * 0.5;
+    test += cos(windDir) * 0.7;
+
 #ifdef VSLayer
     gl_Layer = layer;
     uv = Texcoord;
-    gl_Position = ShadowViewProjMatrixes[gl_Layer] * ModelMatrix * vec4(Position + windDir * Color.r, 1.);
+    gl_Position = ShadowViewProjMatrixes[gl_Layer] * ModelMatrix * vec4(Position + test * Color.r, 1.);
 #else
     layerId = layer;
     tc = Texcoord;
-    gl_Position = ShadowViewProjMatrixes[layerId] * ModelMatrix * vec4(Position + windDir * Color.r, 1.);
+    gl_Position = ShadowViewProjMatrixes[layerId] * ModelMatrix * vec4(Position + test * Color.r, 1.);
 #endif
 }

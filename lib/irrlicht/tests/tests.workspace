@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<CodeBlocks_workspace_file>
-	<Workspace title="tests">
-		<Project filename="..\source\Irrlicht\Irrlicht-gcc.cbp" active="1" />
-		<Project filename="tests.cbp" />
-	</Workspace>
-</CodeBlocks_workspace_file>

@@ -150,7 +150,7 @@ public:
     void               reset();
     void               debugDraw(btIDebugDraw* debugDrawer);
     const btTransform& getChassisWorldTransform() const;
-    btScalar           rayCast(unsigned int index);
+    btScalar           rayCast(unsigned int index, float fraction=1.0f);
     virtual void       updateVehicle(btScalar step);
     void               resetSuspension();
     btScalar           getSteeringValue(int wheel) const;
@@ -169,7 +169,8 @@ public:
     const btWheelInfo& getWheelInfo(int index) const;
     btWheelInfo&       getWheelInfo(int index);
     void               updateWheelTransformsWS(btWheelInfo& wheel,
-                                              bool interpolatedTransform=true);
+                                               bool interpolatedTransform=true,
+                                               float fraction = 1.0f);
     void               setAllBrakes(btScalar brake);
     void               updateSuspension(btScalar deltaTime);
     virtual void       updateFriction(btScalar timeStep);

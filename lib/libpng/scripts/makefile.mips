@@ -1,5 +1,5 @@
 # makefile for libpng
-# Copyright (C) Glenn Randers-Pehrson
+# Copyright (C) 1998-2014 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 #
 # This code is released under the libpng license.
@@ -22,22 +22,31 @@ LIBPATH=$(prefix)/lib
 DESTDIR=
 
 CC=cc
-CFLAGS=-I../zlib -O -systype sysv -DSYSV -w -Dmips
+CPPFLAGS=-I../zlib -DSYSV -Dmips
+CFLAGS=-O -systype sysv -w
 #CFLAGS=-O
 LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
 
 #RANLIB=ranlib
 RANLIB=echo
 
+CP=cp
+
+# Pre-built configuration
+# See scripts/pnglibconf.mak for more options
+PNGLIBCONF_H_PREBUILT = scripts/pnglibconf.h.prebuilt
+
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
 
+.c.o:
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
+
 all: libpng.a pngtest
 
-# see scripts/pnglibconf.mak for more options
-pnglibconf.h: scripts/pnglibconf.h.prebuilt
-	cp scripts/pnglibconf.h.prebuilt $@
+pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
+	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
 
 libpng.a: $(OBJS)
 	ar rc $@  $(OBJS)

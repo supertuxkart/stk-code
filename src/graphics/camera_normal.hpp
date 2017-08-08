@@ -49,8 +49,8 @@ private:
     /** Factor of the effects of steering in camera aim. */
     float           m_rotation_range;
 
-    /** Used to smoothly move the camera. */
-    float           m_smooth_dt;
+    Vec3            m_camera_offset;
+
     void smoothMoveCamera(float dt);
     void handleEndCamera(float dt);
     void getCameraSettings(float *above_kart, float *cam_angle,
@@ -58,6 +58,9 @@ private:
                            bool *smoothing);
     void positionCamera(float dt, float above_kart, float cam_angle,
                         float side_way, float distance, float smoothing);
+
+    btVector3 m_kart_position;
+    btQuaternion m_kart_rotation;
 
     // Give a few classes access to the constructor (mostly for inheritance)
     friend class Camera;

@@ -38,7 +38,7 @@ public:
 	struct SStatesCache
 	{
 		SStatesCache() : WrapU(ETC_REPEAT), WrapV(ETC_REPEAT), BilinearFilter(false),
-			TrilinearFilter(false), AnisotropicFilter(0), MipMapStatus(false), IsCached(false), LODBias(0)
+			TrilinearFilter(false), AnisotropicFilter(0), MipMapStatus(false), LODBias(0), IsCached(false)
 		{
 		}
 

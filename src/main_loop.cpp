@@ -118,15 +118,19 @@ float MainLoop::getLimitedDt()
         }
         if (!m_throttle_fps || ProfileWorld::isProfileMode()) break;
 
-        // Throttle fps if more than a certain maximum, which can reduce
-        // the noise the fan on a graphics card makes. When in menus, limit
-        // FPS even more
-        const int max_fps = StateManager::get()->throttleFPS() 
-                          ? 30 
-                          : UserConfigParams::m_max_fps;
-
+        // Throttle fps if more than maximum, which can reduce
+        // the noise the fan on a graphics card makes.
+        // When in menus, reduce FPS much, it's not necessary to push to the
+        // maximum for plain menus
+        const int max_fps = (irr_driver->isRecording() &&
+                             UserConfigParams::m_limit_game_fps )
+                          ? UserConfigParams::m_record_fps 
+                          : ( StateManager::get()->throttleFPS() 
+                              ? 60 
+                              : UserConfigParams::m_max_fps     );
         const int current_fps = (int)(1000.0f / dt);
-        if (current_fps <= max_fps ) break;
+        if (!m_throttle_fps || current_fps <= max_fps ||
+            ProfileWorld::isProfileMode()                )  break;
 
         int wait_time = 1000 / max_fps - 1000 / current_fps;
         if (wait_time < 1) wait_time = 1;
@@ -134,7 +138,8 @@ float MainLoop::getLimitedDt()
         PROFILER_PUSH_CPU_MARKER("Throttle framerate", 0, 0, 0);
         StkTime::sleep(wait_time);
         PROFILER_POP_CPU_MARKER();
-    }
+    }   // while(1)
+
     dt *= 0.001f;
 
     // If this is a client, the server might request an 

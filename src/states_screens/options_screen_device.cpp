@@ -460,9 +460,9 @@ void OptionsScreenDevice::gotSensedInput(const Input& sensed_input)
     ModalDialog::dismiss();
     input_manager->setMode(InputManager::MENU);
 
-    if (keyboard && (sensed_input.m_button_id == irr::KEY_SHIFT ||
-                     sensed_input.m_button_id == irr::KEY_LSHIFT ||
-                     sensed_input.m_button_id == irr::KEY_RSHIFT))
+    if (keyboard && (sensed_input.m_button_id == irr::IRR_KEY_SHIFT ||
+                     sensed_input.m_button_id == irr::IRR_KEY_LSHIFT ||
+                     sensed_input.m_button_id == irr::IRR_KEY_RSHIFT))
     {
         new MessageDialog(_("Warning: The 'Shift' is not a recommended key. When "
                             "'Shift' is pressed down, all keys that contain a "

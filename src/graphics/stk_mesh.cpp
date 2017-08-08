@@ -337,7 +337,7 @@ core::vector3df getWindDir()
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
     GrassShaderProvider *gsp = 
         (GrassShaderProvider *)Shaders::getCallback(ES_GRASS);
-    return (gsp->getSpeed() * cos(time)) * vector3df(1., 0., 0.);
+    return (gsp->getSpeed() * time * vector3df(1., 0., 0.));
 }   // getWindDir
 
 // ----------------------------------------------------------------------------

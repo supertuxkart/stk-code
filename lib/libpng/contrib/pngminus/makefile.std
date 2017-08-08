@@ -23,7 +23,8 @@ ZINC = -I../../../zlib
 ZLIB = -L../../../zlib -lz
 ZLIBS = ../../../zlib/libz.a
 
-CFLAGS=$(PNGINC) $(ZINC)
+CPPFLAGS=$(PNGINC) $(ZINC)
+CFLAGS=
 LDLIBS=$(PNGLIB) $(ZLIB)
 LDLIBSS=$(PNGLIBS) $(ZLIBS)
 C=.c
@@ -37,7 +38,7 @@ E=
 all: png2pnm$(E) pnm2png$(E) png2pnm-static$(E) pnm2png-static$(E)
 
 png2pnm$(O): png2pnm$(C)
-	$(CC) -c $(CFLAGS) png2pnm$(C)
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) png2pnm$(C)
 
 png2pnm$(E): png2pnm$(O)
 	$(LD) $(LDFLAGS) -o png2pnm$(E) png2pnm$(O) $(LDLIBS) -lm
@@ -46,7 +47,7 @@ png2pnm-static$(E): png2pnm$(O)
 	$(LD) $(LDFLAGS) -o png2pnm-static$(E) png2pnm$(O) $(LDLIBSS) -lm
 
 pnm2png$(O): pnm2png$(C)
-	$(CC) -c $(CFLAGS) pnm2png$(C)
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) pnm2png$(C)
 
 pnm2png$(E): pnm2png$(O)
 	$(LD) $(LDFLAGS) -o pnm2png$(E) pnm2png$(O) $(LDLIBS) -lm
