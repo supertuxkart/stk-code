@@ -401,8 +401,8 @@ void pollJoysticks()
             event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_X] =  state.Gamepad.sThumbLX;
             event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_Y] = ~state.Gamepad.sThumbLY;
             event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_Z] =  state.Gamepad.bLeftTrigger * 128;
-            event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_R] =  state.Gamepad.sThumbRX; 
-            event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_U] = ~state.Gamepad.sThumbRY;
+            event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_R] = ~state.Gamepad.sThumbRY;
+            event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_U] =  state.Gamepad.sThumbRX;
             event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_V] =  state.Gamepad.bRightTrigger * 128;
             (void)Device->postEventFromUser(event);
 
