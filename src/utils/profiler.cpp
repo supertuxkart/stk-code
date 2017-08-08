@@ -357,14 +357,25 @@ void Profiler::draw()
     {
         ThreadData &td = m_all_threads_data[i];
         AllEventData &aed = td.m_all_event_data;
+
+        // Thread 1 has 'proper' start and end events (assuming that each
+        // event is at most called once). But all other threads might have
+        // multiple start and end events, so the recorder start time is only
+        // of the last event and so can not be used to draw the bar graph
+        double start_xpos = 0;
         for(int k=0; k<(int)td.m_ordered_headings.size(); k++)
         {
             AllEventData::iterator j = aed.find(td.m_ordered_headings[k]);
             const Marker &marker = j->second.getMarker(indx);
-            core::rect<s32> pos((s32)(x_offset + factor*marker.getStart()),
+            if (i == 0)
+                start_xpos = factor*marker.getStart();
+            core::rect<s32> pos((s32)(x_offset + start_xpos),
                                 (s32)(y_offset + i*line_height),
-                                (s32)(x_offset + factor*marker.getEnd()),
-                                (s32)(y_offset + (i + 1)*line_height) );
+                                (s32)(x_offset + start_xpos
+                                               + factor*marker.getDuration()),
+                                (s32)(y_offset + (i + 1)*line_height)        );
+            if (i != 0)
+                start_xpos += factor*marker.getDuration();
 
             // Reduce vertically the size of the markers according to their layer
             pos.UpperLeftCorner.Y  += 2 * marker.getLayer();
