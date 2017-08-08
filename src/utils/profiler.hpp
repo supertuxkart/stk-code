@@ -144,10 +144,14 @@ private:
         // --------------------------------------------------------------------
         size_t getLayer() const { return m_layer;  }
         // --------------------------------------------------------------------
+        /** Called when an entry in the cyclic buffer is reused. Makes sure
+         *  that time for a new event can be accumulated. */
+        void clear() { m_duration = 0; }
+        // --------------------------------------------------------------------
         /** Sets start time and layer for this event. */
         void setStart(double start, size_t layer = 0)
         {
-            m_start = start; m_duration = 0;  m_layer = layer;
+            m_start = start; m_layer = layer;
         }   // setStart
         // --------------------------------------------------------------------
         /** Sets the end time of this event. */
@@ -194,6 +198,7 @@ private:
         }   // setEnd
         // --------------------------------------------------------------------
         const Marker& getMarker(int n) const { return m_all_markers[n]; }
+        Marker& getMarker(int n) { return m_all_markers[n]; }
         // --------------------------------------------------------------------
         /** Returns the colour for this event. */
         video::SColor getColour() const { return m_colour;  }

@@ -280,10 +280,24 @@ void Profiler::synchronizeFrame()
         {
             EventData &ed = td.m_all_event_data[td.m_event_stack[j]];
             ed.setEnd(m_current_frame, now-m_time_last_sync);
-            ed.setStart(next_frame, now - m_time_last_sync, j);
-        }
+            ed.setStart(next_frame, 0, j);
+        }   // for j in event stack
+    }   // for i in threads
 
-    }
+    if (m_has_wrapped_around)
+    {
+        // The new entries for the circular buffer need to be cleared
+        // to make sure the new values are not accumulated on top of
+        // the data from a previous frame.
+        for (int i = 0; i < m_threads_used; i++)
+        {
+            ThreadData &td = m_all_threads_data[i];
+            AllEventData &aed = td.m_all_event_data;
+            AllEventData::iterator k;
+            for (k = aed.begin(); k != aed.end(); ++k)
+                k->second.getMarker(next_frame).clear();
+        }
+    }   // is has wrapped around
 
     m_current_frame = next_frame;
 
