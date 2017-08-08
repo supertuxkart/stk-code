@@ -100,17 +100,16 @@ public:
     /** Only local players can get achievements. */
     virtual bool  canGetAchievements () const { return false; }
     // ------------------------------------------------------------------------
-    /** This should only be called for End- and LocalPlayer-Controller. */
-    virtual core::stringw getName() const
-    {
-        assert(false);
-        return core::stringw(""); 
-    }   // getName
+    /** Display name of the controller.
+     *  Defaults to kart name; overriden by controller classes
+     *  (such as player controllers) to display username. */
+    virtual core::stringw getName() const;
     // ------------------------------------------------------------------------
     /** Returns the kart controlled by this controller. */
     AbstractKart *getKart() const { return m_kart; }
 };   // Controller
 
+extern Translations* translations;
 #endif
 
 /* EOF */
