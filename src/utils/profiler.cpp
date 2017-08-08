@@ -279,8 +279,8 @@ void Profiler::synchronizeFrame()
         for(unsigned int j=0; j<td.m_event_stack.size(); j++)
         {
             EventData &ed = td.m_all_event_data[td.m_event_stack[j]];
-            ed.setEnd(m_current_frame, now);
-            ed.setStart(next_frame, now, j);
+            ed.setEnd(m_current_frame, now-m_time_last_sync);
+            ed.setStart(next_frame, now - m_time_last_sync, j);
         }
 
     }
@@ -332,17 +332,18 @@ void Profiler::draw()
     // Compute start end end time for this frame
     double start = 99999.0f;
     double end   = -1.0f;
-    for (int i = 0; i < m_threads_used; i++)
+
+    // Use this thread (thread 0) to compute start and end time. All other
+    // threads might have 'unfinished' events, or multiple identical events
+    // in this frame (i.e. start time would be incorrect(.
+    AllEventData &aed = m_all_threads_data[0].m_all_event_data;
+    AllEventData::iterator j;
+    for (j = aed.begin(); j != aed.end(); ++j)
     {
-        AllEventData &aed = m_all_threads_data[i].m_all_event_data;
-        AllEventData::iterator j;
-        for (j = aed.begin(); j != aed.end(); ++j)
-        {
-            const Marker &marker = j->second.getMarker(indx);
-            start = std::min(start, marker.getStart() );
-            end   = std::max(end,   marker.getEnd()   );
-        }   // for j in events
-    }   // for i in threads
+        const Marker &marker = j->second.getMarker(indx);
+        start = std::min(start, marker.getStart());
+        end = std::max(end, marker.getEnd());
+    }   // for j in events
 
 
     const double duration = end - start;
