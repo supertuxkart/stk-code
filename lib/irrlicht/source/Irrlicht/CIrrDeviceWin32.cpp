@@ -20,6 +20,10 @@
 #include <regstr.h>
 #include <winuser.h>
 #if defined(_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
+// This define will switch to use XInput 9.1, which does not
+// require an installer and works on most windows platforms.
+// See https://blogs.msdn.microsoft.com/chuckw/2012/04/25/xinput-and-windows-8/
+#define _WIN32_WINNT 0x0601
 #include <Xinput.h>
 #ifdef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
 #define DIRECTINPUT_VERSION 0x0800

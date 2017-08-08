@@ -473,7 +473,7 @@ if(USE_WIIUSE)
 endif()
 
 if(MSVC OR MINGW)
-  target_link_libraries(supertuxkart iphlpapi.lib xinput)
+  target_link_libraries(supertuxkart iphlpapi.lib)
   add_custom_command(TARGET supertuxkart POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${PROJECT_SOURCE_DIR}/dependencies/dll"
