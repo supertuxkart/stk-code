@@ -434,6 +434,10 @@ void OptionsScreenDevice::gotSensedInput(const Input& sensed_input)
             // refresh display
             updateInputButtons();
         }
+        else
+        {
+            return;
+        }
     }
     else if (sensed_input.m_type == Input::IT_NONE)
     {
