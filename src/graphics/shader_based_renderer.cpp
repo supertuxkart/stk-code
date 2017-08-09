@@ -33,6 +33,7 @@
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/skybox.hpp"
+#include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/spherical_harmonics.hpp"
 #include "items/item_manager.hpp"
@@ -659,6 +660,7 @@ ShaderBasedRenderer::~ShaderBasedRenderer()
     delete m_skybox;
     delete m_rtts;
     ShaderFilesManager::kill();
+    STKBillboard::destroyBillboardVAO();
 }
 
 // ----------------------------------------------------------------------------
