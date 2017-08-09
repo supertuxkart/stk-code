@@ -570,5 +570,5 @@ if(ENABLE_WAYLAND_DEVICE)
 endif()
 
 if(WIN32)
-    target_link_libraries(stkirrlicht imm32 XINPUT9_1_0.LIB)
+    target_link_libraries(stkirrlicht imm32 XINPUT9_1_0)
 endif()
