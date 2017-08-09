@@ -251,9 +251,6 @@ public:
                                 const core::vector3df& hpr,
                                 const core::vector3df& scale);
     virtual ~TrackObjectPresentationMesh();
-    void setLoop(int start, int end);
-    void setCurrentFrame(int frame);
-    int getCurrentFrame();
     virtual void reset() OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns the mode file name. */
@@ -382,14 +379,15 @@ class TrackObjectPresentationActionTrigger : public TrackObjectPresentation,
 {
 private:
     /** For action trigger objects */
-    std::string m_action;
+    std::string m_action, m_library_id, m_triggered_object, m_library_name;
 
-    bool m_action_active;
+    float m_xml_reenable_timeout, m_reenable_timeout;
 
     ActionTriggerType m_type;
 
 public:
-    TrackObjectPresentationActionTrigger(const XMLNode& xml_node);
+    TrackObjectPresentationActionTrigger(const XMLNode& xml_node,
+                                         TrackObject* parent);
     TrackObjectPresentationActionTrigger(const core::vector3df& xyz,
                                          const std::string& scriptname,
                                          float distance);
@@ -399,11 +397,23 @@ public:
     virtual void onTriggerItemApproached() OVERRIDE;
     // ------------------------------------------------------------------------
     /** Reset the trigger (i.e. sets it to active again). */
-    virtual void reset() OVERRIDE { m_action_active = true; }
+    virtual void reset() OVERRIDE                { m_reenable_timeout = 0.0f; }
+    // ------------------------------------------------------------------------
+    virtual void update(float dt) OVERRIDE
+    {
+        if (m_reenable_timeout < 900000.0f)
+        {
+            m_reenable_timeout -= dt;
+        }
+    }
     // ------------------------------------------------------------------------
     /** Sets the trigger to be enabled or disabled. */
-    virtual void setEnable(bool status) OVERRIDE{ m_action_active = status; }
+    virtual void setEnable(bool status) OVERRIDE
+                            { m_reenable_timeout = status ? 0.0f : 999999.9f; }
+    // ------------------------------------------------------------------------
+    void setReenableTimeout(float time)          { m_reenable_timeout = time; }
 };   // class TrackObjectPresentationActionTrigger
 
 
 #endif // TRACKOBJECTPRESENTATION_HPP
+
