@@ -144,10 +144,14 @@ private:
         // --------------------------------------------------------------------
         size_t getLayer() const { return m_layer;  }
         // --------------------------------------------------------------------
+        /** Called when an entry in the cyclic buffer is reused. Makes sure
+         *  that time for a new event can be accumulated. */
+        void clear() { m_duration = 0; }
+        // --------------------------------------------------------------------
         /** Sets start time and layer for this event. */
         void setStart(double start, size_t layer = 0)
         {
-            m_start = start; m_duration = 0;  m_layer = layer;
+            m_start = start; m_layer = layer;
         }   // setStart
         // --------------------------------------------------------------------
         /** Sets the end time of this event. */
@@ -194,6 +198,7 @@ private:
         }   // setEnd
         // --------------------------------------------------------------------
         const Marker& getMarker(int n) const { return m_all_markers[n]; }
+        Marker& getMarker(int n) { return m_all_markers[n]; }
         // --------------------------------------------------------------------
         /** Returns the colour for this event. */
         video::SColor getColour() const { return m_colour;  }
@@ -209,6 +214,12 @@ private:
         /** Stack of events to detect nesting. */
         std::vector< std::string > m_event_stack;
 
+        /** This stores the event names in the order in which they occur.
+        *  This means that 'outer' events occur here before any child
+        *  events. This list is then used to determine the order in which the
+        *  bar graphs are drawn, which results in the proper nesting of events.*/
+        std::vector<std::string> m_ordered_headings;
+
         AllEventData m_all_event_data;
     };   // class ThreadData
 
@@ -219,7 +230,7 @@ private:
     std::vector< ThreadData> m_all_threads_data;
 
     /** A mapping of thread_t pointers to a unique integer (starting from 0).*/
-    Synchronised< std::vector<pthread_t> > m_thread_mapping;
+    std::vector<pthread_t> m_thread_mapping;
 
     /** Buffer for the GPU times (in ms). */
     std::vector<int> m_gpu_times;
@@ -229,6 +240,12 @@ private:
 
     /** Index of the current frame in the buffer. */
     int m_current_frame;
+
+    /** We don't need the bool, but easiest way to get a lock for the whole
+     *  instance (since we need to avoid that a synch is done which changes
+     *  the current frame while another threaded uses this variable, or
+     *  while a new thread is added. */
+    Synchronised<bool> m_lock;
 
     /** True if the circular buffer has wrapped around. */
     bool m_has_wrapped_around;
@@ -271,6 +288,7 @@ public:
     void     pushCPUMarker(const char* name="N/A",
                            const video::SColor& color=video::SColor());
     void     popCPUMarker();
+    void     toggleStatus(); 
     void     synchronizeFrame();
     void     draw();
     void     onClick(const core::vector2di& mouse_pos);

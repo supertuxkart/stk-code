@@ -346,8 +346,7 @@ bool handleContextMenuAction(s32 cmd_id)
         irr_driver->toggleBoundingBoxesViz();
         break;
     case DEBUG_PROFILER:
-        UserConfigParams::m_profiler_enabled =
-            !UserConfigParams::m_profiler_enabled;
+        profiler.toggleStatus();
         break;
     case DEBUG_PROFILER_WRITE_REPORT:
         profiler.writeToFile();
