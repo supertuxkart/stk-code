@@ -23,12 +23,11 @@
 // This define will switch to use XInput 9.1, which does not
 // require an installer and works on most windows platforms.
 // See https://blogs.msdn.microsoft.com/chuckw/2012/04/25/xinput-and-windows-8/
-#ifdef __CYGWIN__
-#define _WIN32_WINNT 0x0601
-#include <xinput.h>
-#else
 #undef _WIN32_WINNT
 #define _WIN32_WINNT 0x0601
+#ifdef __CYGWIN__
+#include <xinput.h>
+#else
 #include <Xinput.h>
 #endif
 #ifdef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
