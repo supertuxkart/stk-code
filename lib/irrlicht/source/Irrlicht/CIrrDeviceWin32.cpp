@@ -25,11 +25,8 @@
 // See https://blogs.msdn.microsoft.com/chuckw/2012/04/25/xinput-and-windows-8/
 #undef _WIN32_WINNT
 #define _WIN32_WINNT 0x0601
-#ifdef __CYGWIN__
+// Don't change the case of xinput.h, otherwise cygwin compilation fails.
 #include <xinput.h>
-#else
-#include <Xinput.h>
-#endif
 #ifdef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
