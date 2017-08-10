@@ -23,6 +23,7 @@
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
+#include "utils/profiler.hpp"
 #include "utils/time.hpp"
 #include "utils/vs.hpp"
 
@@ -52,7 +53,9 @@ void* ProtocolManager::mainLoop(void* data)
     while(manager && !manager->m_exit.getAtomic())
     {
         manager->asynchronousUpdate();
+        PROFILER_PUSH_CPU_MARKER("sleep", 0, 255, 255);
         StkTime::sleep(2);
+        PROFILER_POP_CPU_MARKER();
     }
     return NULL;
 }   // protocolManagerAsynchronousUpdate
@@ -457,6 +460,7 @@ void ProtocolManager::update(float dt)
  */
 void ProtocolManager::asynchronousUpdate()
 {
+    PROFILER_PUSH_CPU_MARKER("Message delivery", 255, 0, 0);
     // Update from ProtocolManager thread only:
     assert(pthread_equal(pthread_self(), m_asynchronous_update_thread));
 
@@ -487,6 +491,9 @@ void ProtocolManager::asynchronousUpdate()
     }   // while i != m_events_to_process.end()
     m_async_events_to_process.unlock();
 
+    PROFILER_POP_CPU_MARKER();
+    PROFILER_PUSH_CPU_MARKER("Message delivery", 255, 0, 0);
+
     // Second: update all running protocols
     // ====================================
     // Now update all protocols.
@@ -500,6 +507,9 @@ void ProtocolManager::asynchronousUpdate()
         opt.update(0, /*async*/true);  // dt does not matter, so set it to 0
         opt.unlock();
     }
+
+    PROFILER_POP_CPU_MARKER();
+    PROFILER_PUSH_CPU_MARKER("Process events", 0, 255, 0);
 
     // Process queued events (start, pause, ...) for protocols asynchronously
     // ======================================================================
@@ -530,6 +540,7 @@ void ProtocolManager::asynchronousUpdate()
         m_requests.lock();
     }   // while m_requests.size()>0
     m_requests.unlock();
+    PROFILER_POP_CPU_MARKER();
 }   // asynchronousUpdate
 
 // ----------------------------------------------------------------------------
