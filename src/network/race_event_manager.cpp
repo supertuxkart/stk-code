@@ -7,7 +7,7 @@
 #include "network/protocol_manager.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/rewind_manager.hpp"
-
+#include "utils/profiler.hpp"
 
 RaceEventManager::RaceEventManager()
 {
@@ -37,8 +37,10 @@ void RaceEventManager::update(float dt)
     {
         // This might adjust dt - if a new state is being played, the dt is
         // determined from the last state till 'now'
+        PROFILER_PUSH_CPU_MARKER("RaceEvent:play event", 100, 100, 100);
         RewindManager::get()->playEventsTill(World::getWorld()->getTime(),
                                              &dt);
+        PROFILER_POP_CPU_MARKER();
     }
 
     World::getWorld()->updateWorld(dt);
