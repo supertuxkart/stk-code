@@ -29,6 +29,7 @@
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "utils/log.hpp"
+#include "utils/profiler.hpp"
 
 #include <algorithm>
 
@@ -196,6 +197,7 @@ void RewindManager::update(float dt)
     {
         return;
     }
+    PROFILER_PUSH_CPU_MARKER("RewindManager - save state", 0x20, 0x7F, 0x20);
 
     // Save state
     GameProtocol::getInstance()->startNewState();
@@ -214,10 +216,10 @@ void RewindManager::update(float dt)
         else
             delete buffer;   // NULL or 0 byte buffer
     }
+    PROFILER_POP_CPU_MARKER();
+    PROFILER_PUSH_CPU_MARKER("RewindManager - send state", 0x20, 0x7F, 0x40);
     GameProtocol::getInstance()->sendState();
-
-    Log::verbose("RewindManager", "%f allocated %ld",
-                 World::getWorld()->getTime(), m_overall_state_size);
+    PROFILER_POP_CPU_MARKER();
 
     m_last_saved_state = time;
 }   // update
@@ -239,18 +241,12 @@ void RewindManager::playEventsTill(float time, float *dt)
     m_rewind_queue.mergeNetworkData(World::getWorld()->getTime(), *dt,
                                     &needs_rewind, &rewind_time);
 
-    if(needs_rewind)
-        Log::info("RewindManager", "At %f merging states from %f needs rewind",
-                  World::getWorld()->getTime(), rewind_time);
-    else
-        Log::info("RewindManager", "At %f no need for rewind",
-                  World::getWorld()->getTime());
-
-
     if (needs_rewind)
     {
         Log::setPrefix("Rewind");
+        PROFILER_POP_CPU_MARKER("Rewind", 128, 128, 128);
         rewindTo(rewind_time);
+        PROFILER_POP_CPU_MARKER();
         Log::setPrefix("");
         TimeStepInfo *tsi = m_rewind_queue.getCurrent();
         World::getWorld()->setTime(tsi->getTime());
