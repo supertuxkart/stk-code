@@ -103,9 +103,6 @@ void PlayerController::resetInputState()
  */
 bool PlayerController::action(PlayerAction action, int value, bool dry_run)
 {
-    Log::info("action", "t %f action %d value %d val_l %d val_r %d val %d dryrun %d",
-        World::getWorld()->getTime(), action, value,
-        m_steer_val_l, m_steer_val_r, m_steer_val, dry_run);
 
     /** If dry_run (parameter) is true, this macro tests if this action would
      *  trigger a state change in the specified variable (without actually
@@ -264,8 +261,6 @@ void PlayerController::steer(float dt, int steer_val)
         steer = 0;
     }
 
-    Log::info("steer", "t %f dt %f steer_val %d steer %f",
-        World::getWorld()->getTime(), dt, steer_val, steer);
     // Amount the steering is changed for digital devices.
     // If the steering is 'back to straight', a different steering
     // change speed is used.
@@ -302,9 +297,6 @@ void PlayerController::steer(float dt, int steer_val)
             if(steer>0.0f) steer=0.0f;
         }   // if steer<=0.0f
     }   // no key is pressed
-    Log::info("steer", "Setting steer to %f at %f dt %f worldtime %f", steer,
-        World::getWorld()->getTime(),
-        dt, StkTime::getRealTime());
     m_controls->setSteer(std::min(1.0f, std::max(-1.0f, steer)) );
 
 }   // steer

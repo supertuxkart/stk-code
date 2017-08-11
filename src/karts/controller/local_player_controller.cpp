@@ -172,7 +172,6 @@ void LocalPlayerController::steer(float dt, int steer_val)
 {
     if(UserConfigParams::m_gamepad_debug)
     {
-        Log::debug("LocalPlayerController", "steering: steer_val %d ", steer_val);
         RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
         gui_base->clearAllMessages();
         gui_base->addMessage(StringUtils::insertValues(L"steer_val %i", steer_val),

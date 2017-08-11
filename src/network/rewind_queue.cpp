@@ -153,8 +153,6 @@ void RewindQueue::insertRewindInfo(RewindInfo *ri)
 {
     // FIXME: this should always be the last element in the list(??)
     AllTimeStepInfo::iterator bucket = findPreviousTimeStepInfo(ri->getTime());
-    Log::verbose("RewindQueue", "Insert rewind from %f at %f",
-                 ri->getTime(), (*bucket)->getTime());
     (*bucket)->insert(ri);
 }   // insertRewindInfo
 
@@ -246,8 +244,6 @@ void RewindQueue::mergeNetworkData(float world_time, float dt,
 {
     *needs_rewind = false;
     m_network_events.lock();
-    Log::verbose("RewindQueue", "#events in queue at %f %f are %d",
-        world_time, dt, m_network_events.getData().size());
     if(m_network_events.getData().empty())
     {
         m_network_events.unlock();

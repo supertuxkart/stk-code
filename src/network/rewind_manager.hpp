@@ -133,7 +133,7 @@ public:
         return m_rewind_manager;
     }   // get
 
-    // Non-static functtion declarations:
+    // Non-static function declarations:
 
     void reset();
     void update(float dt);

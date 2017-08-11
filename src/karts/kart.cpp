@@ -1409,6 +1409,7 @@ void Kart::update(float dt)
         old_group = m_body->getBroadphaseHandle()->m_collisionFilterGroup;
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
+#ifdef XX
     Log::verbose("physicsafter", "%s t %f %f xyz(9-11) %f %f %f %f %f %f v(13-15) %f %f %f steerf(17) %f maxangle(19) %f speed(21) %f steering(23-24) %f %f clock %lf",
         getIdent().c_str(),
         World::getWorld()->getTime(), dt,
@@ -1424,7 +1425,7 @@ void Kart::update(float dt)
         m_vehicle->getWheelInfo(1).m_steering,  //24
         StkTime::getRealTime()
     );
-
+#endif
     // After the physics step was done, the position of the wheels (as stored
     // in wheelInfo) is actually outdated, since the chassis was moved
     // according to the force acting from the wheels. So the center of the
