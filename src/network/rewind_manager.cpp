@@ -110,8 +110,6 @@ void RewindManager::addNextTimeStep(float time, float dt)
           World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE    )
 
     {
-        Log::info("RewindManager", "Adding new timestamp %f dt %f at %lf",
-                  time, dt, StkTime::getRealTime());
         m_rewind_queue.addNewTimeStep(time, dt);
     }
 }   // addNextTimeStep
@@ -134,8 +132,6 @@ void RewindManager::addEvent(EventRewinder *event_rewinder,
         return;
     }
 
-    Log::verbose("RewindManager", "Time world %f self-event",
-                 World::getWorld()->getTime());
     if (time < 0)
         time = World::getWorld()->getTime();
     m_rewind_queue.addLocalEvent(event_rewinder, buffer, confirmed, time);
@@ -153,8 +149,6 @@ void RewindManager::addNetworkEvent(EventRewinder *event_rewinder,
                                     BareNetworkString *buffer, float time)
 {
     m_rewind_queue.addNetworkEvent(event_rewinder, buffer, time);
-    Log::verbose("RewindManager", "Time world %f network-event %f",
-                 World::getWorld()->getTime(), time);
 }   // addNetworkEvent
 
 // ----------------------------------------------------------------------------
@@ -173,8 +167,6 @@ void RewindManager::addNetworkState(int rewinder_index, BareNetworkString *buffe
     // its own dt information (using TimeEvents).
     m_rewind_queue.addNetworkState(m_all_rewinder[rewinder_index], buffer,
                                    time, -99);
-    Log::verbose("RewindManager", "Time world %f network-state %f",
-                 World::getWorld()->getTime(), time);
 }   // addNetworkState
 
 // ----------------------------------------------------------------------------
@@ -244,7 +236,7 @@ void RewindManager::playEventsTill(float time, float *dt)
     if (needs_rewind)
     {
         Log::setPrefix("Rewind");
-        PROFILER_POP_CPU_MARKER("Rewind", 128, 128, 128);
+        PROFILER_PUSH_CPU_MARKER("Rewind", 128, 128, 128);
         rewindTo(rewind_time);
         PROFILER_POP_CPU_MARKER();
         Log::setPrefix("");
@@ -262,9 +254,6 @@ void RewindManager::playEventsTill(float time, float *dt)
     //assert(m_rewind_queue.getLast() == m_rewind_queue.getCurrent());
 
     TimeStepInfo *tsi = m_rewind_queue.getLast();
-    Log::verbose("rewindmanager", "Time diff world %f stamp %f",
-                 World::getWorld()->getTime(),
-                 tsi->getTime());
 
    // ++m_rewind_queue;   // Point to end of queue now
     tsi->replayAllEvents();
@@ -287,8 +276,6 @@ void RewindManager::playEventsTill(float time, float *dt)
 void RewindManager::rewindTo(float rewind_time)
 {
     assert(!m_is_rewinding);
-    Log::info("rewind", "Rewinding to %f at %f %f", rewind_time,
-               World::getWorld()->getTime(), StkTime::getRealTime());
     history->doReplayHistory(History::HISTORY_NONE);
 
     // Then undo the rewind infos going backwards in time
@@ -350,9 +337,6 @@ void RewindManager::rewindTo(float rewind_time)
     }   // while (world->getTime() < current_time)
 
     m_is_rewinding = false;
-    Log::info("RewindManager", "Rewind from %f to %f finished at %f.",
-              rewind_time, World::getWorld()->getTime(),
-              StkTime::getRealTime());
 }   // rewindTo
 
 // ----------------------------------------------------------------------------
