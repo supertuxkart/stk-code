@@ -86,7 +86,11 @@ float MainLoop::getLimitedDt()
     {
         m_curr_time = device->getTimer()->getRealTime();
         dt = (float)(m_curr_time - m_prev_time);
-        if (dt <= 0) break;    // should not really happen
+        if (dt <= 0)
+        {
+            dt = 1;   // at least 1 ms, otherwise with dt=0 bad things happen
+            break;    // should not really happen
+        }
         const World* const world = World::getWorld();
         if (UserConfigParams::m_fps_debug && world)
         {
