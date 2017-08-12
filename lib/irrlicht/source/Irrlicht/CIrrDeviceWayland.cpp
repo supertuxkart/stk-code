@@ -537,6 +537,7 @@ public:
             device->m_seat = static_cast<wl_seat*>(wl_registry_bind(registry,
                                                    name, &wl_seat_interface,
                                                    version < 4 ? version : 4));
+            wl_seat_add_listener(device->m_seat, &seat_listener, device);
         }
         else if (interface_str == "wl_shm")
         {
@@ -547,6 +548,7 @@ public:
         {
             device->m_output = static_cast<wl_output*>(wl_registry_bind(registry,
                                                 name, &wl_output_interface, 2));
+            wl_output_add_listener(device->m_output, &output_listener, device);
         }
     }
 
@@ -699,9 +701,6 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
         if (!createWindow())
             return;
     }
-
-    wl_seat_add_listener(m_seat, &WaylandCallbacks::seat_listener, this);
-    wl_output_add_listener(m_output, &WaylandCallbacks::output_listener, this);
 
     createDriver();
 
