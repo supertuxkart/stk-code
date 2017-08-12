@@ -48,6 +48,12 @@ DeviceManager::DeviceManager()
 }   // DeviceManager
 
 // -----------------------------------------------------------------------------
+DeviceManager::~DeviceManager()
+{
+    delete m_multitouch_device;
+}   // ~DeviceManager
+
+// -----------------------------------------------------------------------------
 bool DeviceManager::initialize()
 {
     GamepadConfig *gamepadConfig = NULL;
