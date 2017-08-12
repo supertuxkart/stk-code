@@ -59,12 +59,9 @@ void ShaderBasedRenderer::setRTT(RTT* rtts)
                                  rtts->getDepthStencilTexture());
         m_geometry_passes->setFirstPassRenderTargets(prefilled_textures,
             rtts->getPrefilledHandles());
-        m_rtts = rtts;
     }
-    else if (rtts == NULL)
-    {
-        m_rtts = NULL;
-    }
+    
+    m_rtts = rtts;
 } //setRTT
 
 // ----------------------------------------------------------------------------
