@@ -93,7 +93,7 @@ COGLES2MaterialRenderer::~COGLES2MaterialRenderer()
 	if (Program)
 	{
 		GLuint shaders[8];
-		GLint count;
+		GLint count = 0;
 		glGetAttachedShaders(Program, 8, &count, shaders);
 
 		count=core::min_(count,8);

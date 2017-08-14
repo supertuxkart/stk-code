@@ -10,6 +10,7 @@
 * Hardware skinning
 * New smoother camera by Auria
 * New grand prix win scene
+* Gamepad configuration bugfixes
 * Various improvements (wall driving fixes, parachutes, GP points, cannon fixes, colorization shader)
 
 ## SuperTuxKart 0.9.2

@@ -537,6 +537,7 @@ public:
             device->m_seat = static_cast<wl_seat*>(wl_registry_bind(registry,
                                                    name, &wl_seat_interface,
                                                    version < 4 ? version : 4));
+            wl_seat_add_listener(device->m_seat, &seat_listener, device);
         }
         else if (interface_str == "wl_shm")
         {
@@ -547,6 +548,7 @@ public:
         {
             device->m_output = static_cast<wl_output*>(wl_registry_bind(registry,
                                                 name, &wl_output_interface, 2));
+            wl_output_add_listener(device->m_output, &output_listener, device);
         }
     }
 
@@ -700,9 +702,6 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
             return;
     }
 
-    wl_seat_add_listener(m_seat, &WaylandCallbacks::seat_listener, this);
-    wl_output_add_listener(m_output, &WaylandCallbacks::output_listener, this);
-
     createDriver();
 
     if (VideoDriver)
@@ -715,6 +714,9 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
 CIrrDeviceWayland::~CIrrDeviceWayland()
 {
     delete m_egl_context;
+    
+    if (m_egl_window)
+        wl_egl_window_destroy(m_egl_window);
 
     if (m_keyboard)
         wl_keyboard_destroy(m_keyboard);
@@ -730,14 +732,45 @@ CIrrDeviceWayland::~CIrrDeviceWayland()
 
     if (m_shell_surface)
         wl_shell_surface_destroy(m_shell_surface);
+        
+    if (m_surface)
+        wl_surface_destroy(m_surface);
+        
+    if (m_shell)
+        wl_shell_destroy(m_shell);
+        
+    if (m_shm)
+        wl_shm_destroy(m_shm);
+        
+    if (m_compositor)
+        wl_compositor_destroy(m_compositor);
 
-    wl_output_destroy(m_output);
-    wl_seat_destroy(m_seat);
-    wl_registry_destroy(m_registry);
+    if (m_output)
+        wl_output_destroy(m_output);
+
+    if (m_seat)
+        wl_seat_destroy(m_seat);
+
+    if (m_registry)
+        wl_registry_destroy(m_registry);
+
+    if (m_xkb_state)
+        xkb_state_unref(m_xkb_state);
+        
+    if (m_xkb_keymap)
+        xkb_keymap_unref(m_xkb_keymap);
+        
+    if (m_xkb_compose_state)
+        xkb_compose_state_unref(m_xkb_compose_state);
+        
+    if (m_xkb_compose_table)
+        xkb_compose_table_unref(m_xkb_compose_table);
+
+    if (m_xkb_context)
+        xkb_context_unref(m_xkb_context);
+
     wl_display_flush(m_display);
     wl_display_disconnect(m_display);
-
-    xkb_context_unref(m_xkb_context);
 
     closeJoysticks();
 }

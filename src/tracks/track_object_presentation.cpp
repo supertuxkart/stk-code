@@ -358,11 +358,13 @@ void TrackObjectPresentationLOD::reset()
                 dynamic_cast<scene::IAnimatedMeshSceneNode*>(node);
             if (a_node)
             {
+                a_node->setLoopMode(true);
+                a_node->setAnimationEndCallback(NULL);
                 RandomGenerator rg;
                 int animation_set = 0;
                 if (a_node->getAnimationSetNum() > 0)
                     animation_set = rg.get(a_node->getAnimationSetNum());
-                 a_node->useAnimationSet(animation_set);
+                a_node->useAnimationSet(animation_set);
             }
         }
     }
@@ -642,6 +644,7 @@ void TrackObjectPresentationMesh::reset()
         a_node->setRotation(m_init_hpr);
         a_node->setScale(m_init_scale);
         a_node->setLoopMode(m_is_looped);
+        a_node->setAnimationEndCallback(NULL);
         a_node->setCurrentFrame((float)(a_node->getStartFrame()));
 
         // trick to reset the animation AND also the timer inside it
@@ -657,49 +660,6 @@ void TrackObjectPresentationMesh::reset()
         a_node->useAnimationSet(animation_set);
     }
 }   // reset
-
-// ----------------------------------------------------------------------------
-int TrackObjectPresentationMesh::getCurrentFrame()
-{
-    if (m_node->getType() == scene::ESNT_ANIMATED_MESH)
-    {
-        scene::IAnimatedMeshSceneNode *a_node =
-            (scene::IAnimatedMeshSceneNode*)m_node;
-
-        return (int)a_node->getFrameNr();
-    }
-    return -1; //Not a skeletal animation
-}   // getCurrentFrame
-
-// ----------------------------------------------------------------------------
-void TrackObjectPresentationMesh::setCurrentFrame(int frame)
-{
-    if (m_node->getType() == scene::ESNT_ANIMATED_MESH)
-    {
-        scene::IAnimatedMeshSceneNode *a_node =
-            (scene::IAnimatedMeshSceneNode*)m_node;
-
-        a_node->setCurrentFrame((f32)frame);
-    }
-}   // setCurrentFrame
-
-// ----------------------------------------------------------------------------
-/** Set custom loops, as well as pause by scripts.
- *  \param start Start frame.
- *  \param end End frame.
- */
-void TrackObjectPresentationMesh::setLoop(int start, int end)
-{
-    if (m_node->getType() == scene::ESNT_ANIMATED_MESH)
-    {
-        scene::IAnimatedMeshSceneNode *a_node =
-            (scene::IAnimatedMeshSceneNode*)m_node;
-
-        // irrlicht's "setFrameLoop" is a misnomer, it just sets the first and
-        // last frame, even if looping is disabled
-        a_node->setFrameLoop(start, end);
-    }
-}   // setLoop
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationSound::TrackObjectPresentationSound(
@@ -1094,7 +1054,8 @@ void TrackObjectPresentationLight::setEnergy(float energy)
 }
 // ----------------------------------------------------------------------------
 TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
-                                                       const XMLNode& xml_node)
+                                                     const XMLNode& xml_node,
+                                                     TrackObject* parent)
                                     :  TrackObjectPresentation(xml_node)
 {
     float trigger_distance = 1.0f;
@@ -1115,11 +1076,36 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
     {
         assert(false);
     }
+    m_xml_reenable_timeout = 999999.9f;
+    xml_node.get("reenable-timeout", &m_xml_reenable_timeout);
+    m_reenable_timeout = 0.0f;
 
-    m_action_active = true;
-
-    if (m_action.size() == 0)
+    if (m_action.empty())
+    {
         Log::warn("TrackObject", "Action-trigger has no action defined.");
+        return;
+    }
+
+    if (parent != NULL)
+    {
+        core::vector3df parent_xyz = parent->getInitXYZ();
+        core::vector3df parent_rot = parent->getInitRotation();
+        core::vector3df parent_scale = parent->getInitScale();
+        core::matrix4 lm, sm, rm;
+        lm.setTranslation(parent_xyz);
+        sm.setScale(parent_scale);
+        rm.setRotationDegrees(parent_rot);
+        core::matrix4 abs_trans = lm * rm * sm;
+
+        m_library_id = parent->getID();
+        m_library_name = parent->getName();
+        xml_node.get("triggered-object", &m_triggered_object);
+        if (!m_library_id.empty() && !m_triggered_object.empty() &&
+            !m_library_name.empty())
+        {
+            abs_trans.transformVect(m_init_xyz);
+        }
+    }
 
     if (m_type == TRIGGER_TYPE_POINT)
     {
@@ -1149,7 +1135,8 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
     m_init_scale           = core::vector3df(1, 1, 1);
     float trigger_distance = distance;
     m_action               = script_name;
-    m_action_active        = true;
+    m_xml_reenable_timeout = 999999.9f;
+    m_reenable_timeout     = 0.0f;
     m_type                 = TRIGGER_TYPE_POINT;
     ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
 }   // TrackObjectPresentationActionTrigger
@@ -1157,13 +1144,36 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationActionTrigger::onTriggerItemApproached()
 {
-    if (!m_action_active) return;
+    if (m_reenable_timeout > 0.0f)
+    {
+        return;
+    }
+    m_reenable_timeout = m_xml_reenable_timeout;
 
-    m_action_active = false; // TODO: allow auto re-activating?
-    int idKart = 0;
+    int kart_id = 0;
     Camera* camera = Camera::getActiveCamera();
     if (camera != NULL && camera->getKart() != NULL)
-        idKart = camera->getKart()->getWorldKartId();
-    Scripting::ScriptEngine::getInstance()->runFunction(true, "void " + m_action + "(int)",
-                               [=](asIScriptContext* ctx) { ctx->SetArgDWord(0, idKart); });
+    {
+        kart_id = camera->getKart()->getWorldKartId();
+    }
+    if (!m_library_id.empty() && !m_triggered_object.empty() &&
+        !m_library_name.empty())
+    {
+        Scripting::ScriptEngine::getInstance()->runFunction(true, "void "
+            + m_library_name + "::" + m_action +
+            "(int, const string, const string)", [=](asIScriptContext* ctx)
+            {
+                ctx->SetArgDWord(0, kart_id);
+                ctx->SetArgObject(1, &m_library_id);
+                ctx->SetArgObject(2, &m_triggered_object);
+            });
+    }
+    else
+    {
+        Scripting::ScriptEngine::getInstance()->runFunction(true,
+            "void " + m_action + "(int)", [=](asIScriptContext* ctx)
+            {
+                ctx->SetArgDWord(0, kart_id);
+            });
+    }
 }   // onTriggerItemApproached

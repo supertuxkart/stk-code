@@ -80,26 +80,6 @@ void InstanceFiller<GlowInstanceData>::add(GLMesh* mesh,
     instance.Color = nd->getGlowColor().color;
 }
 
-// ----------------------------------------------------------------------------
-template<>
-void expandTexSecondPass<GrassMat>(const GLMesh &mesh,
-                                   const std::vector<GLuint> &prefilled_tex)
-{
-    TexExpander<typename GrassMat::InstancedSecondPassShader>::
-        expandTex(mesh, GrassMat::SecondPassTextures, prefilled_tex[0],
-                  prefilled_tex[1], prefilled_tex[2], prefilled_tex[3]);
-}
-
-// ----------------------------------------------------------------------------
-template<>
-void expandHandlesSecondPass<GrassMat>(const std::vector<uint64_t> &handles)
-{
-    uint64_t nulltex[10] = {};
-    HandleExpander<GrassMat::InstancedSecondPassShader>::
-        expand(nulltex, GrassMat::SecondPassTextures,
-               handles[0], handles[1], handles[2], handles[3]);
-}
-
 #if !defined(USE_GLES2)
 // ----------------------------------------------------------------------------
 template<int N>

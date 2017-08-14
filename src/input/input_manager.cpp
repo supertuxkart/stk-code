@@ -488,11 +488,13 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
         // We have to save the direction in which the axis was moved.
         // This is done by storing it as a sign (and since button can
         // be zero, we add one before changing the sign).
-        int input_id = value>=0 ? 1+button : -(1+button);
+        int input_button_id = value>=0 ? 1+button : -(1+button);
+        std::tuple<int, int> input_id(deviceID, input_button_id);
+        std::tuple<int, int> input_id_inv(deviceID, -input_button_id);
 
         bool id_was_high         = m_sensed_input_high_gamepad.find(input_id)
                                    != m_sensed_input_high_gamepad.end();
-        bool inverse_id_was_high = m_sensed_input_high_gamepad.find(-input_id)
+        bool inverse_id_was_high = m_sensed_input_high_gamepad.find(input_id_inv)
                                    != m_sensed_input_high_gamepad.end();
         bool id_was_zero         = m_sensed_input_zero_gamepad.find(button)
                                    != m_sensed_input_zero_gamepad.end();

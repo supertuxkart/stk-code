@@ -1218,6 +1218,9 @@ bool CIrrDeviceLinux::createInputContext()
 		return false;
 	}
 
+	// It's showed as memory leak, but we shouldn't delete it. From the xlib
+	// documentation: "The returned modifiers string is owned by Xlib and 
+	// should not be modified or freed by the client."
 	char* p = XSetLocaleModifiers("");
 	if (p == NULL)
 	{
