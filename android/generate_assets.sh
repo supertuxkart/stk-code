@@ -250,6 +250,92 @@ convert_sound()
    rm -f tmp.wav tmp.ogg
 }
 
+convert_model()
+{
+   if [ -z "$1" ]; then
+      echo "No texture path provided"
+      return
+   fi
+
+   TEXTURE_PATH="$1"
+   
+   echo "  Texture: $TEXTURE_NAME"
+
+   ALREADY_CONVERTED=0
+
+   if [ -s "./converted_textures" ]; then
+      while read -r CONVERTED_TEXTURE; do
+         if [ "$TEXTURE_PATH" = "$CONVERTED_TEXTURE" ]; then
+            ALREADY_CONVERTED=1
+            break
+         fi
+      done < "./converted_textures"
+   fi
+
+   if [ $ALREADY_CONVERTED -eq 0 ]; then
+      if [ ! -f "$TEXTURE_PATH" ]; then
+         echo "  Couldn't find texture file. Ignore..."
+         continue
+      fi
+
+      FILE_EXTENSION=`echo "$TEXTURE_PATH" | tail -c 5`
+
+      if [ `echo "$FILE_EXTENSION" | head -c 1` != "." ]; then
+         echo "  Unsupported file extension. Ignore..."
+         continue
+      fi
+
+      FILE_FORMAT=`identify -format %m "$TEXTURE_PATH"`
+
+      if [ "$FILE_FORMAT" = "JPEG" ]; then
+         echo "  File is already JPEG. Ignore..."
+         continue
+      fi
+
+      #IS_OPAQUE=`identify -format '%[opaque]' "$TEXTURE_PATH"`
+      HAS_ALPHA=`identify -format '%A' "$TEXTURE_PATH"`
+
+      if [ "$HAS_ALPHA" = "True" ] || [ "$HAS_ALPHA" = "true" ]; then
+         echo "  File has alpha channel. Ignore..."
+         continue
+      fi
+
+      NEW_TEXTURE_NAME="`echo $TEXTURE_NAME | head -c -5`.jpg"
+      NEW_TEXTURE_PATH="`echo $TEXTURE_PATH | head -c -5`.jpg"
+
+      if [ -f "$NEW_TEXTURE_PATH" ]; then
+         echo "  There is already a file with .jpg extension. Ignore..."
+         continue
+      fi
+
+      convert -quality $JPEG_QUALITY "$TEXTURE_PATH" "$NEW_TEXTURE_PATH"
+      rm -f "$TEXTURE_PATH"
+
+      if [ -s "$DIRNAME/materials.xml" ]; then
+         sed -i "s/name=\"$TEXTURE_NAME\"/name=\"$NEW_TEXTURE_NAME\"/g" \
+                                                   "$DIRNAME/materials.xml"
+      fi
+
+      if [ -s "$DIRNAME/scene.xml" ]; then
+         sed -i "s/name=\"$TEXTURE_NAME\"/name=\"$NEW_TEXTURE_NAME\"/g" \
+                                                   "$DIRNAME/scene.xml"
+      fi
+
+      echo "$TEXTURE_PATH" >> "./converted_textures"
+   fi
+
+   echo -n ".jpg" | dd of=./tmp bs=1 seek=$(($TEXNAME_END - 4)) \
+                                                   conv=notrunc 2> /dev/null
+                                                   
+   SIZE_OLD=`du -b "$FILE" | cut -f1`
+   SIZE_NEW=`du -b "tmp" | cut -f1`
+
+   if [ $SIZE_NEW -ne $SIZE_OLD ]; then
+      echo "  Something went wrong..."
+      exit
+   fi
+}
+
 convert_b3d()
 {
    if [ -z "$1" ]; then
@@ -296,7 +382,7 @@ convert_b3d()
    HEX_TEXS=`echo $HEX_FILE | head -c $TEXS_END | tail -c +$(($TEXS_BEGIN+1))`
    CURR_POS=0
 
-   cp "$FILE" tmp.b3d
+   cp "$FILE" tmp
 
    while [ $CURR_POS -lt $TEXS_END ]; do
       NULL_POS=`echo $HEX_TEXS | tail -c +$(($CURR_POS+1)) | grep -b -o "00" \
@@ -320,85 +406,11 @@ convert_b3d()
                      count=$(($TEXNAME_END - $TEXNAME_BEGIN)) 2> /dev/null`
       DIRNAME=`dirname "$FILE"`
       TEXTURE_PATH="$DIRNAME/$TEXTURE_NAME"
-
-      echo "  Texture: $TEXTURE_NAME"
-
-      ALREADY_CONVERTED=0
-
-      if [ -s "./converted_textures" ]; then
-         while read -r CONVERTED_TEXTURE; do
-            if [ "$TEXTURE_PATH" = "$CONVERTED_TEXTURE" ]; then
-               ALREADY_CONVERTED=1
-               break
-            fi
-         done < "./converted_textures"
-      fi
-
-      if [ $ALREADY_CONVERTED -eq 0 ]; then
-         if [ ! -f "$TEXTURE_PATH" ]; then
-            echo "  Couldn't find texture file. Ignore..."
-            continue
-         fi
-
-         FILE_EXTENSION=`echo "$TEXTURE_PATH" | tail -c 5`
-
-         if [ `echo "$FILE_EXTENSION" | head -c 1` != "." ]; then
-            echo "  Unsupported file extension. Ignore..."
-            continue
-         fi
-
-         FILE_FORMAT=`identify -format %m "$TEXTURE_PATH"`
-
-         if [ "$FILE_FORMAT" = "JPEG" ]; then
-            echo "  File is already JPEG. Ignore..."
-            continue
-         fi
-
-         #IS_OPAQUE=`identify -format '%[opaque]' "$TEXTURE_PATH"`
-         HAS_ALPHA=`identify -format '%A' "$TEXTURE_PATH"`
-
-         if [ "$HAS_ALPHA" = "True" ] || [ "$HAS_ALPHA" = "true" ]; then
-            echo "  File has alpha channel. Ignore..."
-            continue
-         fi
-
-         NEW_TEXTURE_NAME="`echo $TEXTURE_NAME | head -c -5`.jpg"
-         NEW_TEXTURE_PATH="`echo $TEXTURE_PATH | head -c -5`.jpg"
-
-         if [ -f "$NEW_TEXTURE_PATH" ]; then
-            echo "  There is already a file with .jpg extension. Ignore..."
-            continue
-         fi
-
-         convert -quality $JPEG_QUALITY "$TEXTURE_PATH" "$NEW_TEXTURE_PATH"
-         rm -f "$TEXTURE_PATH"
-
-         if [ -s "$DIRNAME/materials.xml" ]; then
-            sed -i "s/name=\"$TEXTURE_NAME\"/name=\"$NEW_TEXTURE_NAME\"/g" \
-                                                      "$DIRNAME/materials.xml"
-         fi
-
-         if [ -s "$DIRNAME/scene.xml" ]; then
-            sed -i "s/name=\"$TEXTURE_NAME\"/name=\"$NEW_TEXTURE_NAME\"/g" \
-                                                      "$DIRNAME/scene.xml"
-         fi
-
-         echo "$TEXTURE_PATH" >> "./converted_textures"
-      fi
-
-      echo -n ".jpg" | dd of=./tmp.b3d bs=1 seek=$(($TEXNAME_END - 4)) \
-                                                      conv=notrunc 2> /dev/null
+      
+      convert_model "$TEXTURE_PATH"
    done
 
-   SIZE_OLD=`du -b "$FILE" | cut -f1`
-   SIZE_NEW=`du -b "tmp.b3d" | cut -f1`
-
-   if [ $SIZE_NEW -ne $SIZE_OLD ]; then
-      echo "  Something went wrong..."
-      exit
-   fi
-
-   mv tmp.b3d "$FILE"
+   mv tmp "$FILE"
 }
 
 convert_spm()
@@ -441,7 +453,7 @@ convert_spm()
 
    CURR_POS=$(($TEXS_BEGIN + 2))
 
-   cp "$FILE" tmp.spm
+   cp "$FILE" tmp
 
    while [ $TEXS_COUNT_CONVERTED -gt 0 ]; do
       TEXS_COUNT_CONVERTED=$(($TEXS_COUNT_CONVERTED - 1))
@@ -463,85 +475,11 @@ convert_spm()
                      
       DIRNAME=`dirname "$FILE"`
       TEXTURE_PATH="$DIRNAME/$TEXTURE_NAME"
-
-      echo "  Texture: $TEXTURE_NAME"
-
-      ALREADY_CONVERTED=0
-
-      if [ -s "./converted_textures" ]; then
-         while read -r CONVERTED_TEXTURE; do
-            if [ "$TEXTURE_PATH" = "$CONVERTED_TEXTURE" ]; then
-               ALREADY_CONVERTED=1
-               break
-            fi
-         done < "./converted_textures"
-      fi
-
-      if [ $ALREADY_CONVERTED -eq 0 ]; then
-         if [ ! -f "$TEXTURE_PATH" ]; then
-            echo "  Couldn't find texture file. Ignore..."
-            continue
-         fi
-
-         FILE_EXTENSION=`echo "$TEXTURE_PATH" | tail -c 5`
-
-         if [ `echo "$FILE_EXTENSION" | head -c 1` != "." ]; then
-            echo "  Unsupported file extension. Ignore..."
-            continue
-         fi
-
-         FILE_FORMAT=`identify -format %m "$TEXTURE_PATH"`
-
-         if [ "$FILE_FORMAT" = "JPEG" ]; then
-            echo "  File is already JPEG. Ignore..."
-            continue
-         fi
-
-         #IS_OPAQUE=`identify -format '%[opaque]' "$TEXTURE_PATH"`
-         HAS_ALPHA=`identify -format '%A' "$TEXTURE_PATH"`
-
-         if [ "$HAS_ALPHA" = "True" ] || [ "$HAS_ALPHA" = "true" ]; then
-            echo "  File has alpha channel. Ignore..."
-            continue
-         fi
-
-         NEW_TEXTURE_NAME="`echo $TEXTURE_NAME | head -c -5`.jpg"
-         NEW_TEXTURE_PATH="`echo $TEXTURE_PATH | head -c -5`.jpg"
-
-         if [ -f "$NEW_TEXTURE_PATH" ]; then
-            echo "  There is already a file with .jpg extension. Ignore..."
-            continue
-         fi
-
-         convert -quality $JPEG_QUALITY "$TEXTURE_PATH" "$NEW_TEXTURE_PATH"
-         rm -f "$TEXTURE_PATH"
-
-         if [ -s "$DIRNAME/materials.xml" ]; then
-            sed -i "s/name=\"$TEXTURE_NAME\"/name=\"$NEW_TEXTURE_NAME\"/g" \
-                                                      "$DIRNAME/materials.xml"
-         fi
-
-         if [ -s "$DIRNAME/scene.xml" ]; then
-            sed -i "s/name=\"$TEXTURE_NAME\"/name=\"$NEW_TEXTURE_NAME\"/g" \
-                                                      "$DIRNAME/scene.xml"
-         fi
-
-         echo "$TEXTURE_PATH" >> "./converted_textures"
-      fi
-
-      echo -n ".jpg" | dd of=./tmp.spm bs=1 seek=$(($TEXNAME_END - 4)) \
-                                                      conv=notrunc 2> /dev/null
+      
+      convert_model "$TEXTURE_PATH"
    done
-   
-   SIZE_OLD=`du -b "$FILE" | cut -f1`
-   SIZE_NEW=`du -b "tmp.spm" | cut -f1`
 
-   if [ $SIZE_NEW -ne $SIZE_OLD ]; then
-      echo "  Something went wrong..."
-      exit
-   fi
-
-   mv tmp.spm "$FILE"
+   mv tmp "$FILE"
 }
 
 
