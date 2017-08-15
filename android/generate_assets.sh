@@ -292,10 +292,10 @@ convert_model()
          continue
       fi
 
-      #IS_OPAQUE=`identify -format '%[opaque]' "$TEXTURE_PATH"`
-      HAS_ALPHA=`identify -format '%A' "$TEXTURE_PATH"`
+      IS_OPAQUE=`identify -format '%[opaque]' "$TEXTURE_PATH"`
+      #HAS_ALPHA=`identify -format '%A' "$TEXTURE_PATH"`
 
-      if [ "$HAS_ALPHA" = "True" ] || [ "$HAS_ALPHA" = "true" ]; then
+      if [ "$IS_OPAQUE" = "False" ] || [ "$IS_OPAQUE" = "false" ]; then
          #echo "  File has alpha channel. Ignore..."
          continue
       fi
@@ -312,13 +312,22 @@ convert_model()
       rm -f "$TEXTURE_PATH"
 
       if [ -s "$DIRNAME/materials.xml" ]; then
-         sed -i "s/name=\"$TEXTURE_NAME\"/name=\"$NEW_TEXTURE_NAME\"/g" \
-                                                   "$DIRNAME/materials.xml"
+         sed -i "s/\"$TEXTURE_NAME\"/\"$NEW_TEXTURE_NAME\"/g" \
+                                                        "$DIRNAME/materials.xml"
+         sed -i "s/\"$TEXTURE_NAME /\"$NEW_TEXTURE_NAME /g" \
+                                                        "$DIRNAME/materials.xml"
+         sed -i "s/ $TEXTURE_NAME\"/ $NEW_TEXTURE_NAME\"/g" \
+                                                        "$DIRNAME/materials.xml"
+         sed -i "s/ $TEXTURE_NAME / $NEW_TEXTURE_NAME /g" \
+                                                        "$DIRNAME/materials.xml"
       fi
 
       if [ -s "$DIRNAME/scene.xml" ]; then
-         sed -i "s/name=\"$TEXTURE_NAME\"/name=\"$NEW_TEXTURE_NAME\"/g" \
-                                                   "$DIRNAME/scene.xml"
+         sed -i "s/\"$TEXTURE_NAME\"/\"$NEW_TEXTURE_NAME\"/g" \
+                                                            "$DIRNAME/scene.xml"
+         sed -i "s/\"$TEXTURE_NAME /\"$NEW_TEXTURE_NAME /g" "$DIRNAME/scene.xml"
+         sed -i "s/ $TEXTURE_NAME\"/ $NEW_TEXTURE_NAME\"/g" "$DIRNAME/scene.xml"
+         sed -i "s/ $TEXTURE_NAME / $NEW_TEXTURE_NAME /g" "$DIRNAME/scene.xml"
       fi
 
       echo "$TEXTURE_PATH" >> "./converted_textures"
