@@ -259,7 +259,7 @@ convert_model()
 
    TEXTURE_PATH="$1"
    
-   echo "  Texture: $TEXTURE_NAME"
+   #echo "  Texture: $TEXTURE_NAME"
 
    ALREADY_CONVERTED=0
 
@@ -274,21 +274,21 @@ convert_model()
 
    if [ $ALREADY_CONVERTED -eq 0 ]; then
       if [ ! -f "$TEXTURE_PATH" ]; then
-         echo "  Couldn't find texture file. Ignore..."
+         #echo "  Couldn't find texture file. Ignore..."
          continue
       fi
 
       FILE_EXTENSION=`echo "$TEXTURE_PATH" | tail -c 5`
 
       if [ `echo "$FILE_EXTENSION" | head -c 1` != "." ]; then
-         echo "  Unsupported file extension. Ignore..."
+         #echo "  Unsupported file extension. Ignore..."
          continue
       fi
 
       FILE_FORMAT=`identify -format %m "$TEXTURE_PATH"`
 
       if [ "$FILE_FORMAT" = "JPEG" ]; then
-         echo "  File is already JPEG. Ignore..."
+         #echo "  File is already JPEG. Ignore..."
          continue
       fi
 
@@ -296,7 +296,7 @@ convert_model()
       HAS_ALPHA=`identify -format '%A' "$TEXTURE_PATH"`
 
       if [ "$HAS_ALPHA" = "True" ] || [ "$HAS_ALPHA" = "true" ]; then
-         echo "  File has alpha channel. Ignore..."
+         #echo "  File has alpha channel. Ignore..."
          continue
       fi
 
@@ -304,7 +304,7 @@ convert_model()
       NEW_TEXTURE_PATH="`echo $TEXTURE_PATH | head -c -5`.jpg"
 
       if [ -f "$NEW_TEXTURE_PATH" ]; then
-         echo "  There is already a file with .jpg extension. Ignore..."
+         #echo "  There is already a file with .jpg extension. Ignore..."
          continue
       fi
 
@@ -389,7 +389,7 @@ convert_b3d()
                                        | head -n 1 | cut -f1 -d":"`
 
       if [ -z $NULL_POS ]; then
-         echo "  Done."
+         #echo "  Done."
          break
       fi
 
@@ -466,7 +466,7 @@ convert_spm()
       CURR_POS=$(($CURR_POS + 2 + $TEX_LEN * 2))
       
       if [ $TEX_LEN -eq 0 ]; then
-         echo "  Empty texture name, ignore..."
+         #echo "  Empty texture name, ignore..."
          continue
       fi
 
