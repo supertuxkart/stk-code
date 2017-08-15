@@ -193,8 +193,8 @@
                 }
 
                 // Only keep the directory
-                char* last_separator = strchr(filepath, '/');
-                if(!last_separator) last_separator = strchr(filepath, '\\');
+                char* last_separator = strrchr(filepath, '/');
+                if(!last_separator) last_separator = strrchr(filepath, '\\');
                 if(last_separator)
                     last_separator[0] = '\0';
 
