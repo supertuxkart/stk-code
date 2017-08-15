@@ -401,6 +401,149 @@ convert_b3d()
    mv tmp.b3d "$FILE"
 }
 
+convert_spm()
+{
+   if [ -z "$1" ]; then
+      echo "No file to convert"
+      return
+   fi
+
+   FILE="$1"
+   echo "Convert file: $FILE"
+
+   if [ ! -f "$FILE" ]; then
+      echo "  File doesn't exist."
+      return
+   fi
+
+   HEX_FILE=`hexdump -ve '1/1 "%.2x"' "$FILE"`
+   
+   SP_HEADER="5350"
+   SP_FOUND=`echo $HEX_FILE | head -c 4`
+
+   if [ -z "$SP_FOUND" ] || [ "$SP_FOUND" != "$SP_HEADER" ]; then
+      echo "  Unsupported format."
+      return
+   fi
+
+   TEXS_BEGIN=60
+   TEXS_COUNT=`echo $HEX_FILE | head -c $TEXS_BEGIN | tail -c 4`
+   
+   TEXS_COUNT_CONVERTED=`echo $TEXS_COUNT | cut -c3-4`
+   TEXS_COUNT_CONVERTED=$TEXS_COUNT_CONVERTED`echo $TEXS_COUNT | cut -c1-2`
+   TEXS_COUNT_CONVERTED=`echo $((0x$TEXS_COUNT_CONVERTED))`
+   TEXS_COUNT_CONVERTED=$(($TEXS_COUNT_CONVERTED * 2))
+   
+   if [ $TEXS_COUNT_CONVERTED -le 0 ]; then
+      echo "  Invalid textures count value."
+      return
+   fi
+
+   CURR_POS=$(($TEXS_BEGIN + 2))
+
+   cp "$FILE" tmp.spm
+
+   while [ $TEXS_COUNT_CONVERTED -gt 0 ]; do
+      TEXS_COUNT_CONVERTED=$(($TEXS_COUNT_CONVERTED - 1))
+
+      TEX_LEN=`echo $HEX_FILE | head -c $(($CURR_POS)) | tail -c 2`
+      TEX_LEN=`echo $((0x$TEX_LEN))`
+
+      TEXNAME_BEGIN=$(($CURR_POS / 2))
+      TEXNAME_END=$(($CURR_POS / 2 + $TEX_LEN))
+      CURR_POS=$(($CURR_POS + 2 + $TEX_LEN * 2))
+      
+      if [ $TEX_LEN -eq 0 ]; then
+         echo "  Empty texture name, ignore..."
+         continue
+      fi
+
+      TEXTURE_NAME=`dd if="$FILE" bs=1 skip=$TEXNAME_BEGIN \
+                     count=$(($TEXNAME_END - $TEXNAME_BEGIN)) 2> /dev/null`
+                     
+      DIRNAME=`dirname "$FILE"`
+      TEXTURE_PATH="$DIRNAME/$TEXTURE_NAME"
+
+      echo "  Texture: $TEXTURE_NAME"
+
+      ALREADY_CONVERTED=0
+
+      if [ -s "./converted_textures" ]; then
+         while read -r CONVERTED_TEXTURE; do
+            if [ "$TEXTURE_PATH" = "$CONVERTED_TEXTURE" ]; then
+               ALREADY_CONVERTED=1
+               break
+            fi
+         done < "./converted_textures"
+      fi
+
+      if [ $ALREADY_CONVERTED -eq 0 ]; then
+         if [ ! -f "$TEXTURE_PATH" ]; then
+            echo "  Couldn't find texture file. Ignore..."
+            continue
+         fi
+
+         FILE_EXTENSION=`echo "$TEXTURE_PATH" | tail -c 5`
+
+         if [ `echo "$FILE_EXTENSION" | head -c 1` != "." ]; then
+            echo "  Unsupported file extension. Ignore..."
+            continue
+         fi
+
+         FILE_FORMAT=`identify -format %m "$TEXTURE_PATH"`
+
+         if [ "$FILE_FORMAT" = "JPEG" ]; then
+            echo "  File is already JPEG. Ignore..."
+            continue
+         fi
+
+         #IS_OPAQUE=`identify -format '%[opaque]' "$TEXTURE_PATH"`
+         HAS_ALPHA=`identify -format '%A' "$TEXTURE_PATH"`
+
+         if [ "$HAS_ALPHA" = "True" ] || [ "$HAS_ALPHA" = "true" ]; then
+            echo "  File has alpha channel. Ignore..."
+            continue
+         fi
+
+         NEW_TEXTURE_NAME="`echo $TEXTURE_NAME | head -c -5`.jpg"
+         NEW_TEXTURE_PATH="`echo $TEXTURE_PATH | head -c -5`.jpg"
+
+         if [ -f "$NEW_TEXTURE_PATH" ]; then
+            echo "  There is already a file with .jpg extension. Ignore..."
+            continue
+         fi
+
+         convert -quality $JPEG_QUALITY "$TEXTURE_PATH" "$NEW_TEXTURE_PATH"
+         rm -f "$TEXTURE_PATH"
+
+         if [ -s "$DIRNAME/materials.xml" ]; then
+            sed -i "s/name=\"$TEXTURE_NAME\"/name=\"$NEW_TEXTURE_NAME\"/g" \
+                                                      "$DIRNAME/materials.xml"
+         fi
+
+         if [ -s "$DIRNAME/scene.xml" ]; then
+            sed -i "s/name=\"$TEXTURE_NAME\"/name=\"$NEW_TEXTURE_NAME\"/g" \
+                                                      "$DIRNAME/scene.xml"
+         fi
+
+         echo "$TEXTURE_PATH" >> "./converted_textures"
+      fi
+
+      echo -n ".jpg" | dd of=./tmp.spm bs=1 seek=$(($TEXNAME_END - 4)) \
+                                                      conv=notrunc 2> /dev/null
+   done
+   
+   SIZE_OLD=`du -b "$FILE" | cut -f1`
+   SIZE_NEW=`du -b "tmp.spm" | cut -f1`
+
+   if [ $SIZE_NEW -ne $SIZE_OLD ]; then
+      echo "  Something went wrong..."
+      exit
+   fi
+
+   mv tmp.spm "$FILE"
+}
+
 
 if [ $DECREASE_QUALITY -gt 0 ]; then
    find assets/data -iname "*.png" | while read f; do convert_image "$f" "png"; done
@@ -411,6 +554,7 @@ fi
 
 if [ $CONVERT_TO_JPG -gt 0 ]; then
    find assets/data -iname "*.b3d" | while read f; do convert_b3d "$f"; done
+   find assets/data -iname "*.spm" | while read f; do convert_spm "$f"; done
 
    if [ -s "./converted_textures" ]; then
       echo "Converted textures:"
