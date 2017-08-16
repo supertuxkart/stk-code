@@ -1,4 +1,3 @@
-
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2017 Steve Baker <sjbaker1@airmail.net>
@@ -1697,11 +1696,6 @@ int main(int argc, char *argv[] )
         }
 #endif
 
-        // Alert the user if there are any updates available
-        if (Online::UpdateManager::UpdateAvailable() && UserConfigParams::m_update_popup) {
-            new UpdateDialog();
-        }
-
         // Note that on the very first run of STK internet status is set to
         // "not asked", so the report will only be sent in the next run.
         if(UserConfigParams::m_internet_status==Online::RequestManager::IPERM_ALLOWED)
@@ -1806,6 +1800,12 @@ int main(int argc, char *argv[] )
             race_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
         }
+#ifndef ANDROID
+        // Alert the user if there are any updates available
+        if (UserConfigParams::m_update_popup && !GUIEngine::ModalDialog::isADialogActive() && Online::UpdateManager::UpdateAvailable()) {
+            new UpdateDialog();
+        }
+#endif
         main_loop->run();
 
     }  // try

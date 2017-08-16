@@ -33,23 +33,18 @@ using namespace irr::gui;
 
 // -----------------------------------------------------------------------------
 
-UpdateDialog::UpdateDialog() :
-        ModalDialog(0.6f,0.6f)
+UpdateDialog::UpdateDialog() : ModalDialog(0.6f,0.6f)
 {
+    doInit();
     loadFromFile("online/update_dialog.stkgui");
-}
-
-// -----------------------------------------------------------------------------
-
-UpdateDialog::~UpdateDialog()
-{
+    doInit();
 }
 
 // -----------------------------------------------------------------------------
 /** Process input events.
  *  \event_source name of the widget that triggered the event.
  */
-EventPropagation UpdateDialog::processEvent(const std::string& event_source)
+GUIEngine::EventPropagation UpdateDialog::processEvent(const std::string& event_source)
 {
     if (event_source == "options")
     {

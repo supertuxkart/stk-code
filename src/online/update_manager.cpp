@@ -17,9 +17,9 @@
 #include "online/update_manager.hpp"
 
 #include "config/user_config.hpp"
+#include "online/http_request.hpp"
 #include "online/request_manager.hpp"
 #include "utils/constants.hpp"
-#include "curl/curl.h"
 
 //#include <cstdio>
 #include <string>
@@ -74,36 +74,32 @@ namespace Online
         int major, minor, revision, build;
     };
 
-    static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
-    {
-        ((std::string*)userp)->append((char*)contents, size * nmemb);
-        return size * nmemb;
-    }
-
     bool UpdateManager::UpdateAvailable() {
         if (UserConfigParams::m_internet_status != Online::RequestManager::IPERM_ALLOWED || strcmp(STK_VERSION, "git") == 0)
         {
             return false;
         }
 
-        CURL *curl;
-        CURLcode result;
-        std::string readBuffer;
-
-        curl = curl_easy_init();
-        if (curl) { // Make sure curl initialized properly
-            curl_easy_setopt(curl, CURLOPT_URL, "http://addons.supertuxkart.net/CurrVer.php");
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
-            result = curl_easy_perform(curl);
-            curl_easy_cleanup(curl);
-
-            if (Version(STK_VERSION) < Version(readBuffer) && result == 0) {
-                return true;
-            } else {
-                return false;
-            }
+        Log::info("Updater", "Checking for updates.");
+        Online::HTTPRequest *download_request = new Online::HTTPRequest();
+        download_request->setURL("https://jacobspctuneup.tk/CurrVer.php");
+        download_request->executeNow();
+        if(download_request->hadDownloadError())
+        {
+            Log::error("Updater", "Error downloading CurrVer.php: %s.",
+                       download_request->getDownloadErrorMessage());
+            delete download_request;
+            return false;
         }
-        return false; // Return false if curl failed
+
+        if (Version(STK_VERSION) < Version(download_request->getData())) {
+            delete download_request;
+            Log::info("Updater", "New version available!");
+            return true;
+        } else {
+            delete download_request;
+            Log::info("Updater", "No new version.");
+            return false;
+        }
     }
 }

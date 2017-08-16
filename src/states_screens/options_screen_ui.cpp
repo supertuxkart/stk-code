@@ -154,11 +154,11 @@ void OptionsScreenUI::init()
         stats_label->setVisible(false);
         stats->setVisible(false);
     }
-
+#ifndef ANDROID
     CheckBoxWidget* update = getWidget<CheckBoxWidget>("enable-update-popup");
     assert( update != NULL );
     update->setState( UserConfigParams::m_update_popup );
-
+#endif
     CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
     assert( difficulty != NULL );
     difficulty->setState( UserConfigParams::m_per_player_difficulty );
@@ -269,12 +269,14 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         assert( fps != NULL );
         UserConfigParams::m_display_fps = fps->getState();
     }
+#ifndef ANDROID
     else if (name == "enable-update-popup")
     {
         CheckBoxWidget* update = getWidget<CheckBoxWidget>("enable-update-popup");
         assert( update != NULL );
         UserConfigParams::m_update_popup = update->getState();
     }
+#endif
     else if (name=="enable-internet")
     {
         CheckBoxWidget* internet = getWidget<CheckBoxWidget>("enable-internet");

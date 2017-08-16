@@ -29,9 +29,8 @@ class UpdateDialog : public GUIEngine::ModalDialog
 {
 public:
     UpdateDialog();
-    ~UpdateDialog();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-};   // class RegistrationDialog
+};   // class UpdateDialog
 
 #endif
