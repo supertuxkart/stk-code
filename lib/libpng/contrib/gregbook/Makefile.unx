@@ -59,14 +59,16 @@ INCS = $(PNGINC) $(ZINC) $(XINC)
 RLIBSd = $(PNGLIBd) $(ZLIBd) $(XLIB) -lm
 RLIBSs = $(PNGLIBs) $(ZLIBs) $(XLIB) -lm
 WLIBSd = $(PNGLIBd) $(ZLIBd) -lm
-WLIBSs = $(PNGLIBs) $(ZLIBs)
+WLIBSs = $(PNGLIBs) $(ZLIBs) -lm
 
 CC = gcc
 LD = gcc
 RM = rm -f
-CFLAGS = -O -Wall $(INCS) -DFEATURE_LOOP
+CPPFLAGS = $(INCS) -DFEATURE_LOOP
+CFLAGS = -O -Wall
+#CFLAGS = -O -W -Wall -Wextra -pedantic -ansi
 # [note that -Wall is a gcc-specific compilation flag ("most warnings on")]
-# [-ansi, -pedantic and -W can also be used]
+# [-ansi, -pedantic, -Wextra, and -W can also be used]
 LDFLAGS =
 O = .o
 E =
@@ -92,7 +94,7 @@ EXES = $(STATIC_EXES) $(DYNAMIC_EXES)
 # implicit make rules -------------------------------------------------------
 
 .c$(O):
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
 
 
 # dependencies --------------------------------------------------------------

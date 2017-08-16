@@ -245,8 +245,7 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, unsigned int w,
         for (unsigned i = 0; i < RTTs.size(); i++)
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, RTTs[i], 0);
     }
-    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
+    assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE_EXT);
 }
 
 FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, unsigned int w,
@@ -270,8 +269,7 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, unsigned in
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, RTTs[i], 0);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DS, 0);
     }
-    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
+    assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE_EXT);
     if (layered)
         glGenFramebuffers(1, &fbolayer);
 }

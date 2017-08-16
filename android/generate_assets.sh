@@ -5,22 +5,25 @@
 # A script that generates data files for Android apk
 
 
-# Below are simple configuration variables
+# Below you can find some simple configuration variables.
 # It's allowed to set "all" for KARTS and TRACKS if it's intended to create
 # package with full data.
 # The karts and tracks directories shouldn't exist in ASSETS_DIRS variable
-# because they are handled separately
+# because they are handled separately.
 # The TEXTURE_SIZE and SOUND_QUALITY take effect only if DECREASE_QUALITY has
-# value greater than 0
+# value greater than 0.
+# The CONVERT_TO_JPG variable enables converting all images that are safe to 
+# convert and keeps other images untouched.
 # The script needs imagemagick and ogg utils installed to use DECREASE_QUALITY
 # feature
 
 ################################################################################
 
-export KARTS="tux nolok xue"
+export KARTS="elephpant gnu nolok pidgin suzanne tux xue"
 export TRACKS="battleisland cornfield_crossing featunlocked gplose gpwin   \
                hacienda introcutscene introcutscene2 lighthouse olivermath \
-               overworld snowmountain snowtuxpeak soccer_field tutorial"
+               overworld sandtrack scotland snowmountain snowtuxpeak       \
+               soccer_field tutorial"
 
 export ASSETS_PATHS="../data                    \
                      ../../stk-assets           \
@@ -29,12 +32,17 @@ export ASSETS_PATHS="../data                    \
 export ASSETS_DIRS="library models music sfx textures"
 
 export TEXTURE_SIZE=256
+export JPEG_QUALITY=85
+export PNG_QUALITY=95
 export SOUND_QUALITY=42
 export SOUND_MONO=1
 export SOUND_SAMPLE=32000
 
 export RUN_OPTIMIZE_SCRIPT=0
 export DECREASE_QUALITY=1
+export CONVERT_TO_JPG=1
+
+export BLACKLIST_FILES="data/music/cocoa_river_fast.ogg2"
 
 ################################################################################
 
@@ -158,6 +166,7 @@ convert_image()
    fi
 
    FILE="$1"
+   FILE_TYPE="$2"
 
    W=`identify -format "%[fx:w]" "$FILE"`
    H=`identify -format "%[fx:h]" "$FILE"`
@@ -167,19 +176,36 @@ convert_image()
       return
    fi
 
-   if [ $W -le $TEXTURE_SIZE ] && [ $H -le $TEXTURE_SIZE ]; then
-      return
+   if [ $W -gt $TEXTURE_SIZE ] || [ $H -gt $TEXTURE_SIZE ]; then
+      if [ $W -gt $H ]; then
+         SCALED_W=$TEXTURE_SIZE
+         SCALED_H=$(($TEXTURE_SIZE * $H / $W))
+      else
+         SCALED_W=$(($TEXTURE_SIZE * $W / $H))
+         SCALED_H=$TEXTURE_SIZE
+      fi
+
+      SCALE_CMD="-scale ${SCALED_W}x${SCALED_H}"
    fi
 
-   if [ $W -gt $H ]; then
-      SCALED_W=$TEXTURE_SIZE
-      SCALED_H=$(($TEXTURE_SIZE * $H / $W))
-   else
-      SCALED_W=$(($TEXTURE_SIZE * $W / $H))
-      SCALED_H=$TEXTURE_SIZE
+   if [ "$FILE_TYPE" = "jpg" ]; then
+      QUALITY_CMD="-quality $JPEG_QUALITY"
+   elif [ "$FILE_TYPE" = "png" ]; then
+      QUALITY_CMD="-quality $PNG_QUALITY"
    fi
 
-   convert -scale $SCALED_WE\x$SCALED_H "$FILE" "$FILE"
+   convert $SCALE_CMD $QUALITY_CMD "$FILE" "tmp.$FILE_TYPE"
+
+   if [ -s "tmp.$FILE_TYPE" ]; then
+      SIZE_OLD=`du -k "$FILE" | cut -f1`
+      SIZE_NEW=`du -k "tmp.$FILE_TYPE" | cut -f1`
+
+      if [ $SIZE_NEW -lt $SIZE_OLD ]; then
+         mv "tmp.$FILE_TYPE" "$FILE"
+      fi
+   fi
+
+   rm -f "tmp.$FILE_TYPE"
 }
 
 convert_sound()
@@ -195,20 +221,20 @@ convert_sound()
 
    if [ -s tmp.wav ]; then
       OGGENC_CMD=""
-      
+
       if [ "$SOUND_MONO" -gt 0 ]; then
          OGGENC_CMD="$OGGENC_CMD --downmix"
       fi
-      
+
       OGG_RATE=`ogginfo "$FILE" | grep "Rate: " | cut -f 2 -d " " \
                                                             | grep -o '[0-9]*'`
-      
-      if [ ! -z "$OGG_RATE" ] && [ "$OGG_RATE" -gt "32000" ]; then
-         OGGENC_CMD="$OGGENC_CMD --resample 32000"
+
+      if [ ! -z "$OGG_RATE" ] && [ "$OGG_RATE" -gt "$SOUND_SAMPLE" ]; then
+         OGGENC_CMD="$OGGENC_CMD --resample $SOUND_SAMPLE"
       fi
-      
+
       OGGENC_CMD="$OGGENC_CMD -b $SOUND_QUALITY"
-      
+
       oggenc $OGGENC_CMD tmp.wav -o tmp.ogg
    fi
 
@@ -224,16 +250,267 @@ convert_sound()
    rm -f tmp.wav tmp.ogg
 }
 
+convert_model()
+{
+   if [ -z "$1" ]; then
+      echo "No texture path provided"
+      return
+   fi
+
+   TEXTURE_PATH="$1"
+   
+   #echo "  Texture: $TEXTURE_NAME"
+
+   ALREADY_CONVERTED=0
+
+   if [ -s "./converted_textures" ]; then
+      while read -r CONVERTED_TEXTURE; do
+         if [ "$TEXTURE_PATH" = "$CONVERTED_TEXTURE" ]; then
+            ALREADY_CONVERTED=1
+            break
+         fi
+      done < "./converted_textures"
+   fi
+
+   if [ $ALREADY_CONVERTED -eq 0 ]; then
+      if [ ! -f "$TEXTURE_PATH" ]; then
+         #echo "  Couldn't find texture file. Ignore..."
+         continue
+      fi
+
+      FILE_EXTENSION=`echo "$TEXTURE_PATH" | tail -c 5`
+
+      if [ `echo "$FILE_EXTENSION" | head -c 1` != "." ]; then
+         #echo "  Unsupported file extension. Ignore..."
+         continue
+      fi
+
+      FILE_FORMAT=`identify -format %m "$TEXTURE_PATH"`
+
+      if [ "$FILE_FORMAT" = "JPEG" ]; then
+         #echo "  File is already JPEG. Ignore..."
+         continue
+      fi
+
+      #IS_OPAQUE=`identify -format '%[opaque]' "$TEXTURE_PATH"`
+      HAS_ALPHA=`identify -format '%A' "$TEXTURE_PATH"`
+
+      if [ "$HAS_ALPHA" = "True" ] || [ "$HAS_ALPHA" = "true" ]; then
+         #echo "  File has alpha channel. Ignore..."
+         continue
+      fi
+
+      NEW_TEXTURE_NAME="`echo $TEXTURE_NAME | head -c -5`.jpg"
+      NEW_TEXTURE_PATH="`echo $TEXTURE_PATH | head -c -5`.jpg"
+
+      if [ -f "$NEW_TEXTURE_PATH" ]; then
+         #echo "  There is already a file with .jpg extension. Ignore..."
+         continue
+      fi
+
+      convert -quality $JPEG_QUALITY "$TEXTURE_PATH" "$NEW_TEXTURE_PATH"
+      rm -f "$TEXTURE_PATH"
+
+      if [ -s "$DIRNAME/materials.xml" ]; then
+         sed -i "s/name=\"$TEXTURE_NAME\"/name=\"$NEW_TEXTURE_NAME\"/g" \
+                                                   "$DIRNAME/materials.xml"
+      fi
+
+      if [ -s "$DIRNAME/scene.xml" ]; then
+         sed -i "s/name=\"$TEXTURE_NAME\"/name=\"$NEW_TEXTURE_NAME\"/g" \
+                                                   "$DIRNAME/scene.xml"
+      fi
+
+      echo "$TEXTURE_PATH" >> "./converted_textures"
+   fi
+
+   echo -n ".jpg" | dd of=./tmp bs=1 seek=$(($TEXNAME_END - 4)) \
+                                                   conv=notrunc 2> /dev/null
+                                                   
+   SIZE_OLD=`du -b "$FILE" | cut -f1`
+   SIZE_NEW=`du -b "tmp" | cut -f1`
+
+   if [ $SIZE_NEW -ne $SIZE_OLD ]; then
+      echo "  Something went wrong..."
+      exit
+   fi
+}
+
+convert_b3d()
+{
+   if [ -z "$1" ]; then
+      echo "No file to convert"
+      return
+   fi
+
+   FILE="$1"
+   echo "Convert file: $FILE"
+
+   if [ ! -f "$FILE" ]; then
+      echo "  File doesn't exist."
+      return
+   fi
+
+   HEX_FILE=`hexdump -ve '1/1 "%.2x"' "$FILE"`
+
+   TEXS_CHUNK="54455853"
+   TEXS_CHUNK_POS=24
+
+   FOUND_CHUNK=`echo $HEX_FILE | head -c $(($TEXS_CHUNK_POS + 8)) \
+                              | tail -c +$(($TEXS_CHUNK_POS + 1))`
+
+   if [ -z "$FOUND_CHUNK" ] || [ "$FOUND_CHUNK" != "$TEXS_CHUNK" ]; then
+      echo "  Unsupported format."
+      return
+   fi
+
+   TEXS_SIZE=`echo $HEX_FILE | head -c $(($TEXS_CHUNK_POS + 16)) | tail -c 8`
+
+   TEXS_SIZE_CONVERTED=`echo $TEXS_SIZE | cut -c7-8`
+   TEXS_SIZE_CONVERTED=$TEXS_SIZE_CONVERTED`echo $TEXS_SIZE | cut -c5-6`
+   TEXS_SIZE_CONVERTED=$TEXS_SIZE_CONVERTED`echo $TEXS_SIZE | cut -c3-4`
+   TEXS_SIZE_CONVERTED=$TEXS_SIZE_CONVERTED`echo $TEXS_SIZE | cut -c1-2`
+   TEXS_SIZE_CONVERTED=`echo $((0x$TEXS_SIZE_CONVERTED))`
+
+   if [ $TEXS_SIZE_CONVERTED -le 0 ]; then
+      echo "  Invalid TEXS size value."
+      return
+   fi
+
+   TEXS_BEGIN=$(($TEXS_CHUNK_POS + 16))
+   TEXS_END=$(($TEXS_BEGIN + $TEXS_SIZE_CONVERTED * 2))
+   HEX_TEXS=`echo $HEX_FILE | head -c $TEXS_END | tail -c +$(($TEXS_BEGIN+1))`
+   CURR_POS=0
+
+   cp "$FILE" tmp
+
+   while [ $CURR_POS -lt $TEXS_END ]; do
+      NULL_POS=`echo $HEX_TEXS | tail -c +$(($CURR_POS+1)) | grep -b -o "00" \
+                                       | head -n 1 | cut -f1 -d":"`
+
+      if [ -z $NULL_POS ]; then
+         #echo "  Done."
+         break
+      fi
+
+      if [ $NULL_POS -lt 4 ]; then
+         echo "  Something went wrong..."
+         break
+      fi
+
+      TEXNAME_BEGIN=$((($TEXS_BEGIN + $CURR_POS) / 2))
+      TEXNAME_END=$((($TEXS_BEGIN + $CURR_POS + $NULL_POS) / 2))
+      CURR_POS=$(($CURR_POS + $NULL_POS + 58))
+
+      TEXTURE_NAME=`dd if="$FILE" bs=1 skip=$TEXNAME_BEGIN \
+                     count=$(($TEXNAME_END - $TEXNAME_BEGIN)) 2> /dev/null`
+      DIRNAME=`dirname "$FILE"`
+      TEXTURE_PATH="$DIRNAME/$TEXTURE_NAME"
+      
+      convert_model "$TEXTURE_PATH"
+   done
+
+   mv tmp "$FILE"
+}
+
+convert_spm()
+{
+   if [ -z "$1" ]; then
+      echo "No file to convert"
+      return
+   fi
+
+   FILE="$1"
+   echo "Convert file: $FILE"
+
+   if [ ! -f "$FILE" ]; then
+      echo "  File doesn't exist."
+      return
+   fi
+
+   HEX_FILE=`hexdump -ve '1/1 "%.2x"' "$FILE"`
+   
+   SP_HEADER="5350"
+   SP_FOUND=`echo $HEX_FILE | head -c 4`
+
+   if [ -z "$SP_FOUND" ] || [ "$SP_FOUND" != "$SP_HEADER" ]; then
+      echo "  Unsupported format."
+      return
+   fi
+
+   TEXS_BEGIN=60
+   TEXS_COUNT=`echo $HEX_FILE | head -c $TEXS_BEGIN | tail -c 4`
+   
+   TEXS_COUNT_CONVERTED=`echo $TEXS_COUNT | cut -c3-4`
+   TEXS_COUNT_CONVERTED=$TEXS_COUNT_CONVERTED`echo $TEXS_COUNT | cut -c1-2`
+   TEXS_COUNT_CONVERTED=`echo $((0x$TEXS_COUNT_CONVERTED))`
+   TEXS_COUNT_CONVERTED=$(($TEXS_COUNT_CONVERTED * 2))
+   
+   if [ $TEXS_COUNT_CONVERTED -le 0 ]; then
+      echo "  Invalid textures count value."
+      return
+   fi
+
+   CURR_POS=$(($TEXS_BEGIN + 2))
+
+   cp "$FILE" tmp
+
+   while [ $TEXS_COUNT_CONVERTED -gt 0 ]; do
+      TEXS_COUNT_CONVERTED=$(($TEXS_COUNT_CONVERTED - 1))
+
+      TEX_LEN=`echo $HEX_FILE | head -c $(($CURR_POS)) | tail -c 2`
+      TEX_LEN=`echo $((0x$TEX_LEN))`
+
+      TEXNAME_BEGIN=$(($CURR_POS / 2))
+      TEXNAME_END=$(($CURR_POS / 2 + $TEX_LEN))
+      CURR_POS=$(($CURR_POS + 2 + $TEX_LEN * 2))
+      
+      if [ $TEX_LEN -eq 0 ]; then
+         #echo "  Empty texture name, ignore..."
+         continue
+      fi
+
+      TEXTURE_NAME=`dd if="$FILE" bs=1 skip=$TEXNAME_BEGIN \
+                     count=$(($TEXNAME_END - $TEXNAME_BEGIN)) 2> /dev/null`
+                     
+      DIRNAME=`dirname "$FILE"`
+      TEXTURE_PATH="$DIRNAME/$TEXTURE_NAME"
+      
+      convert_model "$TEXTURE_PATH"
+   done
+
+   mv tmp "$FILE"
+}
+
+
 if [ $DECREASE_QUALITY -gt 0 ]; then
-   find assets/data -iname "*.png" | while read f; do convert_image "$f"; done
-   find assets/data -iname "*.jpg" | while read f; do convert_image "$f"; done
+   find assets/data -iname "*.png" | while read f; do convert_image "$f" "png"; done
+   find assets/data -iname "*.jpg" | while read f; do convert_image "$f" "jpg"; done
    find assets/data -iname "*.ogg" | while read f; do convert_sound "$f"; done
+fi
+
+
+if [ $CONVERT_TO_JPG -gt 0 ]; then
+   find assets/data -iname "*.b3d" | while read f; do convert_b3d "$f"; done
+   find assets/data -iname "*.spm" | while read f; do convert_spm "$f"; done
+
+   if [ -s "./converted_textures" ]; then
+      echo "Converted textures:"
+      cat "./converted_textures"
+      rm -f "./converted_textures"
+   fi
 fi
 
 
 # Copy data directory
 echo "Copy data directory"
 cp -a ../data/* assets/data/
+
+
+# Remove unused files
+for BLACKLIST_FILE in $BLACKLIST_FILES; do
+   rm -f "assets/$BLACKLIST_FILE"
+done
 
 
 # Run optimize_data.sh script

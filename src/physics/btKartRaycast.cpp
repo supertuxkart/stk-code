@@ -73,8 +73,19 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
             result.m_triangle_index = -1;
             const TriangleMesh &tm =
                 Track::getCurrentTrack()->getTriangleMesh();
+            // FIXME: this code assumes atm that the object the kart is
+            // driving on is the main track (and not e.g. a physical object).
+            // If this should not be the case (i.e. the object hit by the
+            // raycast is not the object of the main track mesh, don't smooth
+            // the normals (since the index of the triangle is meant for a
+            // different triangle mesh). TODO: Add a mapping from bullet
+            // objects back to triangle meshes, so that it's easy to pick up
+            // the right triangle mesh for smoothing
+            TriangleMesh::RigidBodyTriangleMesh *rbtm =
+                dynamic_cast<TriangleMesh::RigidBodyTriangleMesh*>(body);
             if(m_smooth_normals &&
-                rayCallback.getTriangleIndex()>-1)
+                rayCallback.getTriangleIndex()>-1 &&
+                rbtm != NULL                         )
             {
 #undef DEBUG_NORMALS
 #ifdef DEBUG_NORMALS
@@ -82,7 +93,7 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
 #endif
                 result.m_triangle_index = rayCallback.getTriangleIndex();
                 result.m_hitNormalInWorld =
-                    tm.getInterpolatedNormal(rayCallback.getTriangleIndex(),
+                    rbtm->m_triangle_mesh->getInterpolatedNormal(rayCallback.getTriangleIndex(),
                                              result.m_hitPointInWorld);
 #ifdef DEBUG_NORMALS
                 printf("old %f %f %f new %f %f %f\n",

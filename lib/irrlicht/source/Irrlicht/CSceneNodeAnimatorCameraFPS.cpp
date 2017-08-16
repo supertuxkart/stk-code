@@ -37,11 +37,11 @@ CSceneNodeAnimatorCameraFPS::CSceneNodeAnimatorCameraFPS(gui::ICursorControl* cu
 	if (!keyMapArray || !keyMapSize)
 	{
 		// create default key map
-		KeyMap.push_back(SKeyMap(EKA_MOVE_FORWARD, irr::KEY_UP));
-		KeyMap.push_back(SKeyMap(EKA_MOVE_BACKWARD, irr::KEY_DOWN));
-		KeyMap.push_back(SKeyMap(EKA_STRAFE_LEFT, irr::KEY_LEFT));
-		KeyMap.push_back(SKeyMap(EKA_STRAFE_RIGHT, irr::KEY_RIGHT));
-		KeyMap.push_back(SKeyMap(EKA_JUMP_UP, irr::KEY_KEY_J));
+		KeyMap.push_back(SKeyMap(EKA_MOVE_FORWARD, irr::IRR_KEY_UP));
+		KeyMap.push_back(SKeyMap(EKA_MOVE_BACKWARD, irr::IRR_KEY_DOWN));
+		KeyMap.push_back(SKeyMap(EKA_STRAFE_LEFT, irr::IRR_KEY_LEFT));
+		KeyMap.push_back(SKeyMap(EKA_STRAFE_RIGHT, irr::IRR_KEY_RIGHT));
+		KeyMap.push_back(SKeyMap(EKA_JUMP_UP, irr::IRR_KEY_J));
 	}
 	else
 	{

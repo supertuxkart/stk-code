@@ -103,6 +103,7 @@ public:
 
 
     DeviceManager();
+    ~DeviceManager();
 
     // ---- Assign mode ----
     PlayerAssignMode    getAssignMode() const               { return m_assign_mode; }

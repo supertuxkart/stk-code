@@ -172,6 +172,7 @@ static const LanguageSpec languages[] = {
   { "kn", 0,    0, "Kannada"                     },
   { "ko", 0,    0, "Korean"                      },
   { "ko", "KR", 0, "Korean (Korea)"              },
+  { "krl",0,    0, "Karelian"                    },
   { "ku", 0,    0, "Kurdish"                     },
   { "kw", 0,    0, "Cornish"                     },
   { "ky", 0,    0, "Kirghiz"                     },

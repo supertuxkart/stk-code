@@ -57,7 +57,6 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
-#include "recorder/recorder_common.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
 #include "states_screens/state_manager.hpp"
@@ -68,6 +67,11 @@
 #include "utils/vs.hpp"
 
 #include <irrlicht.h>
+
+#ifdef ENABLE_RECORDER
+#include <chrono>
+#include <openglrecorder.h>
+#endif
 
 /* Build-time check that the Irrlicht we're building against works for us.
  * Should help prevent distros building against an incompatible library.
@@ -93,10 +97,6 @@ using namespace irr;
 #if defined(__linux__) && !defined(ANDROID)
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#endif
-
-#ifdef ANDROID
-struct android_app* global_android_app;
 #endif
 
 /** singleton */
@@ -156,6 +156,9 @@ IrrDriver::IrrDriver()
  */
 IrrDriver::~IrrDriver()
 {
+#ifdef ENABLE_RECORDER
+    ogrDestroy();
+#endif
     assert(m_device != NULL);
     m_device->drop();
     m_device = NULL;
@@ -169,9 +172,6 @@ IrrDriver::~IrrDriver()
 #endif
     delete m_wind;
     delete m_renderer;
-#ifdef ENABLE_RECORDER
-    Recorder::destroyRecorder();
-#endif
 }   // ~IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -308,22 +308,26 @@ void IrrDriver::updateConfigIfRelevant()
             Log::warn("irr_driver", "Could not retrieve window location\n");
         }
 #elif defined(__linux__) && !defined(ANDROID)
-        const video::SExposedVideoData& videoData =
-            m_device->getVideoDriver()->getExposedVideoData();
-        Display* display = (Display*)videoData.OpenGLLinux.X11Display;
-        XWindowAttributes xwa;
-        XGetWindowAttributes(display, get_toplevel_parent(display,
-                                       videoData.OpenGLLinux.X11Window), &xwa);
-        int wx = xwa.x;
-        int wy = xwa.y;
-        Log::verbose("irr_driver",
-                     "Retrieved window location for config : %i %i\n", wx, wy);
-
-
-        if (UserConfigParams::m_window_x != wx || UserConfigParams::m_window_y != wy)
+        if (m_device->getType() == EIDT_X11)
         {
-            UserConfigParams::m_window_x = wx;
-            UserConfigParams::m_window_y = wy;
+            const video::SExposedVideoData& videoData =
+                m_device->getVideoDriver()->getExposedVideoData();
+            Display* display = (Display*)videoData.OpenGLLinux.X11Display;
+            XWindowAttributes xwa;
+            XGetWindowAttributes(display, get_toplevel_parent(display,
+                                       videoData.OpenGLLinux.X11Window), &xwa);
+            int wx = xwa.x;
+            int wy = xwa.y;
+            Log::verbose("irr_driver",
+                    "Retrieved window location for config : %i %i\n", wx, wy);
+    
+    
+            if (UserConfigParams::m_window_x != wx || 
+                UserConfigParams::m_window_y != wy)
+            {
+                UserConfigParams::m_window_x = wx;
+                UserConfigParams::m_window_y = wy;
+            }
         }
 #endif
     }
@@ -603,6 +607,54 @@ void IrrDriver::initDevice()
     sml->drop();
 
     m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
+
+#ifdef ENABLE_RECORDER
+    ogrRegGeneralCallback(OGR_CBT_START_RECORDING,
+        [] (void* user_data) { MessageQueue::add
+        (MessageQueue::MT_GENERIC, _("Video recording started.")); }, NULL);
+    ogrRegStringCallback(OGR_CBT_ERROR_RECORDING,
+        [](const char* s, void* user_data)
+        { Log::error("openglrecorder", "%s", s); }, NULL);
+    ogrRegStringCallback(OGR_CBT_SAVED_RECORDING,
+        [] (const char* s, void* user_data) { MessageQueue::add
+        (MessageQueue::MT_GENERIC, _("Video saved in \"%s\".", s));
+        }, NULL);
+    ogrRegIntCallback(OGR_CBT_PROGRESS_RECORDING,
+        [] (const int i, void* user_data)
+        { MessageQueue::showProgressBar(i, _("Encoding progress:")); }, NULL);
+
+    RecorderConfig cfg;
+    cfg.m_triple_buffering = 1;
+    cfg.m_record_audio = 1;
+    cfg.m_width = m_actual_screen_size.Width;
+    cfg.m_height = m_actual_screen_size.Height;
+    int vf = UserConfigParams::m_video_format;
+    cfg.m_video_format = (VideoFormat)vf;
+    cfg.m_audio_format = OGR_AF_VORBIS;
+    cfg.m_audio_bitrate = UserConfigParams::m_audio_bitrate;
+    cfg.m_video_bitrate = UserConfigParams::m_video_bitrate;
+    cfg.m_record_fps = UserConfigParams::m_record_fps;
+    cfg.m_record_jpg_quality = UserConfigParams::m_recorder_jpg_quality;
+    if (ogrInitConfig(&cfg) == 0)
+    {
+        Log::error("irr_driver",
+            "RecorderConfig is invalid, use the default one.");
+    }
+
+    ogrRegReadPixelsFunction([]
+        (int x, int y, int w, int h, unsigned int f, unsigned int t, void* d)
+        { glReadPixels(x, y, w, h, f, t, d); });
+
+    ogrRegPBOFunctions([](int n, unsigned int* b) { glGenBuffers(n, b); },
+        [](unsigned int t, unsigned int b) { glBindBuffer(t, b); },
+        [](unsigned int t, ptrdiff_t s, const void* d, unsigned int u)
+        { glBufferData(t, s, d, u); },
+        [](int n, const unsigned int* b) { glDeleteBuffers(n, b); },
+        [](unsigned int t, unsigned int a) { return glMapBuffer(t, a); },
+        [](unsigned int t) { return glUnmapBuffer(t); });
+
+#endif
+
 #ifndef SERVER_ONLY
     if(CVS->isGLSL())
         m_renderer = new ShaderBasedRenderer();
@@ -660,18 +712,7 @@ void IrrDriver::initDevice()
     // Only change video driver settings if we are showing graphics
     if (!ProfileWorld::isNoGraphics())
     {
-#if defined(__linux__) && !defined(ANDROID) && !defined(SERVER_ONLY)
-        // Set class hints on Linux, used by Window Managers.
-        const video::SExposedVideoData& videoData = m_video_driver
-                                                ->getExposedVideoData();
-        XClassHint* classhint = XAllocClassHint();
-        classhint->res_name = (char*)"SuperTuxKart";
-        classhint->res_class = (char*)"SuperTuxKart";
-        XSetClassHint((Display*)videoData.OpenGLLinux.X11Display,
-                           videoData.OpenGLLinux.X11Window,
-                           classhint);
-        XFree(classhint);
-#endif
+        m_device->setWindowClass("SuperTuxKart");
         m_device->setWindowCaption(L"SuperTuxKart");
         m_device->getVideoDriver()
             ->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, true);
@@ -841,25 +882,29 @@ bool IrrDriver::moveWindow(int x, int y)
         return false;
     }
 #elif defined(__linux__) && !defined(ANDROID)
-    const video::SExposedVideoData& videoData = m_video_driver->getExposedVideoData();
-
-    Display* display = (Display*)videoData.OpenGLLinux.X11Display;
-    int screen = DefaultScreen(display);
-    int screen_w = DisplayWidth(display, screen);
-    int screen_h = DisplayHeight(display, screen);
-
-    if (x + UserConfigParams::m_width > screen_w)
+    if (m_device->getType() == EIDT_X11)
     {
-        x = screen_w - UserConfigParams::m_width;
+        const video::SExposedVideoData& videoData = 
+                                        m_video_driver->getExposedVideoData();
+    
+        Display* display = (Display*)videoData.OpenGLLinux.X11Display;
+        int screen = DefaultScreen(display);
+        int screen_w = DisplayWidth(display, screen);
+        int screen_h = DisplayHeight(display, screen);
+    
+        if (x + UserConfigParams::m_width > screen_w)
+        {
+            x = screen_w - UserConfigParams::m_width;
+        }
+    
+        if (y + UserConfigParams::m_height > screen_h)
+        {
+            y = screen_h - UserConfigParams::m_height;
+        }
+    
+        // TODO: Actually handle possible failure
+        XMoveWindow(display, videoData.OpenGLLinux.X11Window, x, y);
     }
-
-    if (y + UserConfigParams::m_height > screen_h)
-    {
-        y = screen_h - UserConfigParams::m_height;
-    }
-
-    // TODO: Actually handle possible failure
-    XMoveWindow(display, videoData.OpenGLLinux.X11Window, x, y);
 #endif
 #endif
     return true;
@@ -927,7 +972,7 @@ void IrrDriver::applyResolutionSettings()
     VAOManager::getInstance()->kill();
     STKTexManager::getInstance()->kill();
 #ifdef ENABLE_RECORDER
-    Recorder::destroyRecorder();
+    ogrDestroy();
     m_recording = false;
 #endif
     // initDevice will drop the current device.
@@ -1896,7 +1941,11 @@ void IrrDriver::update(float dt)
     //    printRenderStats();
 #ifdef ENABLE_RECORDER
     if (m_recording)
-        Recorder::captureFrameBufferImage();
+    {
+        PROFILER_PUSH_CPU_MARKER("- Recording", 0x0, 0x50, 0x40);
+        ogrCapture();
+        PROFILER_POP_CPU_MARKER();
+    }
 #endif
 }   // update
 
@@ -1909,25 +1958,28 @@ void IrrDriver::setRecording(bool val)
         Log::warn("irr_driver", "PBO extension missing, can't record video.");
         return;
     }
-    if (m_recording == val)
+    if (val == (ogrCapturing() == 1))
         return;
+    m_recording = val;
     if (val == true)
     {
-        if (!Recorder::isRecording())
-            return;
-        m_recording = val;
         std::string track_name = World::getWorld() != NULL ?
             race_manager->getTrackName() : "menu";
-        Recorder::setRecordingName(file_manager->getScreenshotDir() +
-            track_name);
-        Recorder::prepareCapture();
-        MessageQueue::add(MessageQueue::MT_GENERIC,
-            _("Video recording started."));
+        time_t rawtime;
+        time(&rawtime);
+        tm* timeInfo = localtime(&rawtime);
+        char time_buffer[256];
+        sprintf(time_buffer, "%i.%02i.%02i_%02i.%02i.%02i",
+            timeInfo->tm_year + 1900, timeInfo->tm_mon + 1,
+            timeInfo->tm_mday, timeInfo->tm_hour,
+            timeInfo->tm_min, timeInfo->tm_sec);
+        ogrSetSavedName((file_manager->getScreenshotDir() +
+            track_name + "_" + time_buffer).c_str());
+        ogrPrepareCapture();
     }
     else
     {
-        m_recording = val;
-        Recorder::stopRecording();
+        ogrStopCapture();
     }
 #endif
 }   // setRecording

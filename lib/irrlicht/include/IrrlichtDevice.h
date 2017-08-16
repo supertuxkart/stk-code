@@ -152,6 +152,10 @@ namespace irr
 		/** \param text: New text of the window caption. */
 		virtual void setWindowCaption(const wchar_t* text) = 0;
 
+		//! Sets the class of the window.
+		/** \param text: New text of the window class. */
+		virtual void setWindowClass(const char* text) = 0;
+
 		//! Returns if the window is active.
 		/** If the window is inactive,
 		nothing needs to be drawn. So if you don't want to draw anything

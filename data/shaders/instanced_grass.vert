@@ -41,7 +41,7 @@ flat out sampler2D thirdhandle;
 
 void main()
 {
-    vec3 test = sin(windDir * (Position.y* 0.5)) * 0.5;
+    vec3 test = sin(windDir * (Position.y * 0.1)) * 1.;
     test += cos(windDir) * 0.7;
     mat4 ModelMatrix = getWorldMatrix(Origin + test * Color.r, Orientation, Scale);
     mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin + test * Color.r, Orientation, Scale) * InverseViewMatrix);

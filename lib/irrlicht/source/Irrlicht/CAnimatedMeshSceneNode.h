@@ -161,13 +161,14 @@ namespace scene
 		virtual ISceneNode* clone(ISceneNode* newParent=0, ISceneManager* newManager=0);
 
 		virtual u32 getAnimationSetNum() { return m_animation_set.size() / 2; }
+		virtual s32 getAnimationSet() const;
 		virtual void addAnimationSet(u32 start, u32 end)
 		{
 			m_animation_set.push_back(start);
 			m_animation_set.push_back(end);
 		}
 		virtual void useAnimationSet(u32 set_num);
-
+		virtual void setFrameLoopOnce(s32 begin, s32 end);
 	protected:
 
 		//! Get a static mesh for the current frame of this animated mesh

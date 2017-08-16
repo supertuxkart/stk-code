@@ -1,6 +1,6 @@
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
-set(PROJECT_VERSION "0.9.1")
+set(PROJECT_VERSION "git")
 
 cmake_minimum_required(VERSION 2.8.4)
 if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
@@ -27,14 +27,10 @@ option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
-option(ENABLE_NETWORK_MULTIPLAYER "Enable network multiplayer. This will replace the online profile GUI in the main menu with the network multiplayer GUI" OFF)
+option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" OFF)
 
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT USE_GLES2;NOT APPLE" OFF)
-CMAKE_DEPENDENT_OPTION(BUILD_RECORDER_WITH_SOUND "Build opengl recorder with sound" ON
-    BUILD_RECORDER OFF)
-CMAKE_DEPENDENT_OPTION(BUILD_PULSE_WO_DL "If pulseaudio in your distro / system is optional, turn this off to load pulse with libdl"
-    ON "BUILD_RECORDER_WITH_SOUND;UNIX" OFF)
 
 if (UNIX AND NOT APPLE)
     option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
@@ -93,16 +89,6 @@ if(DISABLE_VPX)
     add_definitions(-DNO_VPX)
 endif()
 
-if(BUILD_RECORDER)
-    add_definitions(-DENABLE_RECORDER)
-    if(BUILD_RECORDER_WITH_SOUND)
-        add_definitions(-DENABLE_REC_SOUND)
-        if(BUILD_PULSE_WO_DL)
-            add_definitions(-DENABLE_PULSE_WO_DL)
-        endif()
-    endif()
-endif()
-
 # Build the Bullet physics library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
@@ -118,7 +104,7 @@ if(NOT USE_GLES2 AND NOT SERVER_ONLY)
     include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
 endif()
 
-if((WIN32 AND NOT MINGW) OR APPLE)
+if(MSVC OR APPLE)
     if (NOT APPLE)
     # Build zlib library
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/zlib")
@@ -129,15 +115,15 @@ if((WIN32 AND NOT MINGW) OR APPLE)
     endif()
 
     # Build png library
-    set (SKIP_INSTALL_ALL TRUE)
-    set (PNG_STATIC TRUE)
-    set (PNG_TESTS FALSE)
-    set (PNG_SHARED FALSE)
+    set(SKIP_INSTALL_ALL TRUE)
+    set(PNG_STATIC TRUE CACHE BOOL "Build static lib")
+    set(PNG_TESTS FALSE CACHE BOOL "Build libpng tests")
+    set(PNG_SHARED FALSE CACHE BOOL "Build shared lib")
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libpng")
     include_directories("${PROJECT_SOURCE_DIR}/lib/libpng")
 
     set(PNG_PNG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/libpng/")
-    set(PNG_LIBRARY png15_static)
+    set(PNG_LIBRARY png_static)
 endif()
 
 # Add jpeg library
@@ -151,23 +137,25 @@ else()
     include_directories(${JPEG_INCLUDE_DIR})
 endif()
 
-if(BUILD_RECORDER)
-    find_library(TURBOJPEG_LIBRARY NAMES turbojpeg libturbojpeg PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib")
-    mark_as_advanced(TURBOJPEG_LIBRARY)
-    if(UNIX)
-        include(FindPkgConfig)
-        pkg_check_modules(VPX vpx)
+if (BUILD_RECORDER)
+    find_library(OPENGLRECORDER_LIBRARY NAMES openglrecorder libopenglrecorder PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
+    find_path(OPENGLRECORDER_INCLUDEDIR NAMES openglrecorder.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
+    if (NOT OPENGLRECORDER_LIBRARY OR NOT OPENGLRECORDER_INCLUDEDIR)
+        if(PROJECT_VERSION STREQUAL "git")
+            message(WARNING "libopenglrecorder not found, disabling in-game recorder. "
+                "To use recorder, install libopenglrecorder.")
+            set(OPENGLRECORDER_LIBRARY CACHE INTERNAL "")
+            set(OPENGLRECORDER_INCLUDEDIR CACHE INTERNAL "")
+            set(BUILD_RECORDER OFF)
+        else()
+            message(FATAL_ERROR "libopenglrecorder not found. "
+            "Either install libopenglrecorder or disable in-game recorder with -DBUILD_RECORDER=0")
+        endif()
     else()
-        find_path(VPX_INCLUDEDIR NAMES vpx/vpx_codec.h PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/include")
-        find_library(VPX_LIBRARIES NAMES libvpx PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib")
+        include_directories(${OPENGLRECORDER_INCLUDEDIR})
+        mark_as_advanced(OPENGLRECORDER_LIBRARY OPENGLRECORDER_INCLUDEDIR)
+        add_definitions(-DENABLE_RECORDER)
     endif()
-    include_directories(${VPX_INCLUDEDIR})
-    if(BUILD_RECORDER_WITH_SOUND AND UNIX)
-        pkg_check_modules(PULSEAUDIO libpulse)
-        include_directories(${PULSEAUDIO_INCLUDEDIR})
-    endif()
-    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libwebm")
-    include_directories("${PROJECT_SOURCE_DIR}/lib/libwebm")
 endif()
 
 if(NOT SERVER_ONLY AND NOT USE_GLES2)
@@ -301,11 +289,6 @@ if(MINGW AND CMAKE_BUILD_TYPE MATCHES Release)
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--subsystem,windows")
 endif()
 
-# Netwowk Multiplayer
-if(ENABLE_NETWORK_MULTIPLAYER)
-  add_definitions(-DENABLE_NETWORK_MULTIPLAYER_SCREEN)
-endif()
-
 if(WIN32)
     # By default windows.h has macros defined for min and max that screw up everything
     add_definitions(-DNOMINMAX)
@@ -436,9 +419,9 @@ target_link_libraries(supertuxkart
 
 if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
-        target_link_libraries(supertuxkart ${OPENGL_LIBRARIES} glew graphics_utils)
+        target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} glew graphics_utils)
     else()
-        target_link_libraries(supertuxkart EGL GLESv2)
+        target_link_libraries(supertuxkart GLESv2)
     endif()
 endif()
 
@@ -454,14 +437,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 if(BUILD_RECORDER)
-    target_link_libraries(supertuxkart webm ${TURBOJPEG_LIBRARY} ${VPX_LIBRARIES})
-    if(BUILD_RECORDER_WITH_SOUND AND UNIX)
-        if(BUILD_PULSE_WO_DL)
-            target_link_libraries(supertuxkart ${PULSEAUDIO_LIBRARIES})
-        else()
-            target_link_libraries(supertuxkart dl)
-        endif()
-    endif()
+    target_link_libraries(supertuxkart ${OPENGLRECORDER_LIBRARY})
 endif()
 
 # FreeBSD does not search in /usr/local/lib, but at least Freetype is installed there :(
@@ -564,9 +540,9 @@ if(STK_ASSETS_DIR AND CHECK_ASSETS)
   install(DIRECTORY ${STK_ASSETS_DIR} DESTINATION ${STK_INSTALL_DATA_DIR}/data PATTERN ".svn" EXCLUDE PATTERN ".git" EXCLUDE)
 endif()
 install(FILES ${STK_DATA_DIR}/supertuxkart.desktop DESTINATION share/applications)
-install(FILES data/supertuxkart_32.png DESTINATION share/icons/hicolor/32x32/apps RENAME supertuxkart.png)
+install(FILES data/supertuxkart_48.png DESTINATION share/icons/hicolor/48x48/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128/apps RENAME supertuxkart.png)
-install(FILES data/supertuxkart_32.png data/supertuxkart_128.png DESTINATION share/pixmaps)
+install(FILES data/supertuxkart_48.png DESTINATION share/pixmaps RENAME supertuxkart.png)
 install(FILES data/supertuxkart.appdata.xml DESTINATION share/appdata)
 
 if(MINGW)

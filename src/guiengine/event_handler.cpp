@@ -237,7 +237,7 @@ bool EventHandler::OnEvent (const SEvent &event)
         const EventPropagation blockPropagation = input_manager->input(event);
 
         if (event.EventType == EET_KEY_INPUT_EVENT &&
-            event.KeyInput.Key == irr::KEY_TAB)
+            event.KeyInput.Key == irr::IRR_KEY_TAB)
         {
             // block all tab events, if we let them go, irrlicht will try
             // to apply its own focus code

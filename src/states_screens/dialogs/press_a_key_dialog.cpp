@@ -52,7 +52,8 @@ GUIEngine::EventPropagation PressAKeyDialog::processEvent(const std::string& eve
     }
     else if (eventSource == "assignEsc")
     {
-        Input simulatedInput(Input::IT_KEYBOARD, 0 /* deviceID */, KEY_ESCAPE);
+        Input simulatedInput(Input::IT_KEYBOARD, 0 /* deviceID */, 
+                             IRR_KEY_ESCAPE);
         OptionsScreenDevice::getInstance()->gotSensedInput(simulatedInput);
         return GUIEngine::EVENT_BLOCK;
     }

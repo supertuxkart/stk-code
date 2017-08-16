@@ -25,6 +25,10 @@
 #include "utils/string_utils.hpp"
 #include "utils/types.hpp"
 
+#ifdef ANDROID
+#include "main_android.hpp"
+#endif
+
 #include <algorithm>
 #include <array>
 
@@ -40,7 +44,7 @@ namespace GraphicsRestrictions
         /** The list of names used in the XML file for the graphics
          *  restriction types. They must be in the same order as the types. */
 
-        std::array<std::string, 27> m_names_of_restrictions = {
+        std::array<std::string, 28> m_names_of_restrictions = {
             "UniformBufferObject",
             "GeometryShader",
             "DrawIndirect",
@@ -67,7 +71,8 @@ namespace GraphicsRestrictions
             "FramebufferSRGBWorking",
             "FramebufferSRGBCapable",
             "GI",
-            "ForceLegacyDevice"
+            "ForceLegacyDevice",
+            "VertexIdWorking"
         };
     }   // namespace Private
     using namespace Private;
@@ -130,6 +135,18 @@ public:
     Version(const std::string &driver_version, const std::string &card_name)
     {
         m_version.clear();
+        
+#ifdef ANDROID
+        // Android version should be enough to disable certain features on this
+        // platform
+        int version = AConfiguration_getSdkVersion(global_android_app->config);
+        
+        if (version > 0)
+        {
+            m_version.push_back(version);
+            return;
+        }
+#endif
 
         // Mesa needs to be tested first, otherwise (if testing for card name
         // further down) it would be detected as a non-mesa driver.

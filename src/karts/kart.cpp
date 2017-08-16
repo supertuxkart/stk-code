@@ -173,6 +173,8 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_engine_sound  = SFXManager::get()->createSoundSource(m_kart_properties->getEngineSfxType());
     m_beep_sound    = SFXManager::get()->createSoundSource( "horn"  );
     m_crash_sound   = SFXManager::get()->createSoundSource( "crash" );
+    m_crash_sound2  = SFXManager::get()->createSoundSource( "crash2");
+    m_crash_sound3  = SFXManager::get()->createSoundSource( "crash3");
     m_boing_sound   = SFXManager::get()->createSoundSource( "boing" );
     m_goo_sound     = SFXManager::get()->createSoundSource( "goo"   );
     m_skid_sound    = SFXManager::get()->createSoundSource( "skid"  );
@@ -202,6 +204,8 @@ void Kart::init(RaceManager::KartType type)
         m_goo_sound->setVolume(factor);
         m_skid_sound->setVolume(factor);
         m_crash_sound->setVolume(factor);
+        m_crash_sound2->setVolume(factor);
+        m_crash_sound3->setVolume(factor);
         m_boing_sound->setVolume(factor);
         m_beep_sound->setVolume(factor);
         m_nitro_sound->setVolume(factor);
@@ -254,6 +258,8 @@ Kart::~Kart()
 
     m_engine_sound->deleteSFX();
     m_crash_sound ->deleteSFX();
+    m_crash_sound2->deleteSFX();
+    m_crash_sound3->deleteSFX();
     m_skid_sound  ->deleteSFX();
     m_goo_sound   ->deleteSFX();
     m_beep_sound  ->deleteSFX();
@@ -1357,6 +1363,8 @@ void Kart::update(float dt)
 
     m_beep_sound->setPosition   ( getXYZ() );
     m_crash_sound->setPosition  ( getXYZ() );
+    m_crash_sound2->setPosition ( getXYZ() );
+    m_crash_sound3->setPosition ( getXYZ() );
     m_skid_sound->setPosition   ( getXYZ() );
     m_boing_sound->setPosition  ( getXYZ() );
     m_nitro_sound->setPosition  ( getXYZ() );
@@ -2163,9 +2171,17 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
             }
             else
             {
-                if (m_crash_sound->getStatus() != SFXBase::SFX_PLAYING)
+                if (m_crash_sound->getStatus() != SFXBase::SFX_PLAYING
+                    && m_crash_sound2->getStatus() != SFXBase::SFX_PLAYING
+                    && m_crash_sound3->getStatus() != SFXBase::SFX_PLAYING)
                 {
-                    m_crash_sound->play(getXYZ());
+                    int idx = rand() % 3;
+                    if (idx == 0)
+                        m_crash_sound->play(getXYZ());
+                    else if (idx == 1)
+                        m_crash_sound2->play(getXYZ());
+                    else
+                        m_crash_sound3->play(getXYZ());
                 }
             }
         }    // if lin_vel > 0.555

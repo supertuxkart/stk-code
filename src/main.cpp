@@ -305,8 +305,9 @@ void gamepadVisualisation()
 
                     if (evt.PressedDown)
                     {
-                        if (evt.Key == KEY_RETURN || evt.Key == KEY_ESCAPE ||
-                            evt.Key == KEY_SPACE)
+                        if (evt.Key == IRR_KEY_RETURN || 
+                            evt.Key == IRR_KEY_ESCAPE ||
+                            evt.Key == IRR_KEY_SPACE)
                         {
                             exit(0);
                         }
@@ -527,43 +528,45 @@ void cmdLineHelp()
 {
     fprintf(stdout,
     "Usage: %s [OPTIONS]\n\n"
-    "Run SuperTuxKart, a racing game with go-kart that features"
-    " the Tux and friends.\n\n"
+    "Run SuperTuxKart, a go-kart racing game that features "
+    "Tux and friends.\n\n"
     "Options:\n"
     "  -N,  --no-start-screen  Immediately start race without showing a "
                               "menu.\n"
     "  -R,  --race-now         Same as -N but also skip the ready-set-go phase"
                               " and the music.\n"
-    "  -t,  --track=NAME       Start at track NAME.\n"
+    "  -t,  --track=NAME       Start track NAME.\n"
     "       --gp=NAME          Start the specified Grand Prix.\n"
-    "       --add-gp-dir=DIR   Load Grand Prix in DIR. Setting will be saved "
-                              "inconfig.xml under additional_gp_directory. Use "
+    "       --add-gp-dir=DIR   Load Grand Prix files in DIR. Setting will be saved "
+                              "in config.xml under additional_gp_directory. Use "
                               "--add-gp-dir=\"\" to unset.\n"
     "       --stk-config=FILE  use ./data/FILE instead of "
                               "./data/stk_config.xml\n"
-    "  -k,  --numkarts=NUM     Number of karts on the racetrack.\n"
-    "       --kart=NAME        Use kart number NAME.\n"
+    "  -k,  --numkarts=NUM     Set number of karts on the racetrack.\n"
+    "       --kart=NAME        Use kart NAME.\n"
     "       --ai=a,b,...       Use the karts a, b, ... for the AI.\n"
     "       --laps=N           Define number of laps to N.\n"
-    "       --mode=N           N=1 novice, N=2 driver, N=3 racer.\n"
-    "       --type=N           N=0 Normal, N=1 Time trial, N=2 FTL\n"
+    "       --mode=N           N=1 Beginner, N=2 Intermediate, N=3 Expert, N=4 SuperTux.\n"
+    "       --type=N           N=0 Normal, N=1 Time trial, N=2 Follow The Leader\n"
     "       --reverse          Play track in reverse (if allowed)\n"
-    "  -f,  --fullscreen       Select fullscreen display.\n"
-    "  -w,  --windowed         Windowed display (default).\n"
-    "  -s,  --screensize=WxH   Set the screen size (e.g. 320x200).\n"
-    "  -v,  --version          Show version of SuperTuxKart.\n"
+    "  -f,  --fullscreen       Use fullscreen display.\n"
+    "  -w,  --windowed         Use windowed display (default).\n"
+    "  -s,  --screensize=WxH   Set the display size (e.g. 320x200).\n"
+    "  -v,  --version          Print version of SuperTuxKart.\n"
     "       --trackdir=DIR     A directory from which additional tracks are "
                               "loaded.\n"
     "       --profile-laps=n   Enable automatic driven profile mode for n "
                               "laps.\n"
     "       --profile-time=n   Enable automatic driven profile mode for n "
                               "seconds.\n"
+    "       --unlock-all       Permanently unlock all karts and tracks for testing.\n"
+    "       --no-unlock-all    Disable unlock-all (i.e. base unlocking on player achievement).\n"
     "       --no-graphics      Do not display the actual race.\n"
-    "       --demo-mode=t      Enables demo mode after t seconds idle time in "
+    "       --demo-mode=t      Enables demo mode after t seconds of idle time in "
                                "main menu.\n"
-    "       --demo-tracks=t1,t2 List of tracks to be used in demo mode. No\n"
+    "       --demo-tracks=t1,t2 List of tracks to be used in demo mode. No"
     "                          spaces are allowed in the track names.\n"
-    "       --demo-laps=n      Number of laps in a demo.\n"
+    "       --demo-laps=n      Number of laps to use in a demo.\n"
     "       --demo-karts=n     Number of karts to use in a demo.\n"
     // "       --history          Replay history file 'history.dat'.\n"
     // "       --history=n        Replay history file 'history.dat' using:\n"
@@ -596,8 +599,8 @@ void cmdLineHelp()
     "                          This is for internal debugging use only.\n"
     "       --enable-glow      Enable glow effect.\n"
     "       --disable-glow     Disable glow effect.\n"
-    "       --enable-bloom     Enable bloom graphical effect.\n"
-    "       --disable-bloom    Disable bloom graphical effect.\n"
+    "       --enable-bloom     Enable bloom effect.\n"
+    "       --disable-bloom    Disable bloom effect.\n"
     "       --enable-light-shaft Enable light shafts (God rays).\n"
     "       --disable-light-shaft Disable light shafts (God rays).\n"
     "       --enable-dof       Enable depth of field.\n"
@@ -618,17 +621,17 @@ void cmdLineHelp()
     "       --disable-ibl      Disable image based lighting.\n"
     "       --enable-hd-textures Enable high definition textures.\n"
     "       --disable-hd-textures Disable high definition textures.\n"
-    "       --enable-dynamic-lights Enable advanced pipline graphical options.\n"
-    "       --disable-dynamic-lights Disable advanced pipline graphical options.\n"
-    "       --enable-trilinear Enable trilinear texture filtering.\n"
+    "       --enable-dynamic-lights Enable advanced pipline.\n"
+    "       --disable-dynamic-lights Disable advanced pipline.\n"
+    "       --enable-trilinear  Use trilinear texture filtering.\n"
     "       --disable-trilinear Use bilinear texture filtering.\n"
-    "       --anisotropic=n    Anisotropic filtering quality (0 to disable).\n"
-    "                          Takes precedence over trilinear or bilinear\n"
-    "                          texture filtering.\n"
-    "       --shadows=n        Set shadow quality (0 to disable shadows).\n"
+    "       --anisotropic=n     Anisotropic filtering quality (0 to disable).\n"
+    "                           Takes precedence over trilinear or bilinear\n"
+    "                           texture filtering.\n"
+    "       --shadows=n         Set resolution of shadows (0 to disable).\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
-    "http://supertuxkart.net\n\n",
+    "https://supertuxkart.net\n\n",
     CommandLine::getExecName().c_str()
     );
 }   // cmdLineHelp
@@ -651,10 +654,6 @@ int handleCmdLineOutputModifier()
     {
         Log::info("main", "==============================");
         Log::info("main", "SuperTuxKart, %s.", STK_VERSION ) ;
-        // IRRLICHT_VERSION_SVN
-        Log::info("main", "Irrlicht version %i.%i.%i (%s)",
-                          IRRLICHT_VERSION_MAJOR , IRRLICHT_VERSION_MINOR,
-                          IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
         Log::info("main", "==============================");
         cleanUserConfig();
         exit(0);
@@ -1164,6 +1163,7 @@ int handleCmdLine()
     // used only for debugging/testing
     if (CommandLine::has("--cutscene", &s))
     {
+        UserConfigParams::m_no_start_screen = true; // Purple menu background otherwise
         race_manager->setTrack(s);
         StateManager::get()->enterGameState();
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
@@ -1238,7 +1238,17 @@ int handleCmdLine()
             race_manager->setNumLaps(n);
         }
     }   // --profile-laps
-
+    
+    if(CommandLine::has("--unlock-all"))
+    {
+        UserConfigParams::m_everything_unlocked = true;
+    } // --unlock-all
+    
+    if(CommandLine::has("--no-unlock-all"))
+    {
+        UserConfigParams::m_everything_unlocked = false;
+    } // --no-unlock-all
+    
     if(CommandLine::has("--profile-time",  &n))
     {
         Log::verbose("main", "Profiling: %d seconds.", n);
@@ -1631,37 +1641,57 @@ int main(int argc, char *argv[] )
             exit(0);
         }
 
-        if (!ProfileWorld::isNoGraphics() &&
-            GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
-        {
-            if (UserConfigParams::m_old_driver_popup)
-            {
-                MessageDialog *dialog =
-                    new MessageDialog(_("Your driver version is too old. Please install "
-                    "the latest video drivers."),
-                    /*from queue*/ true);
-                GUIEngine::DialogQueue::get()->pushDialog(dialog);
-            }
-            Log::warn("OpenGL", "Driver is too old!");
-        }
 #ifndef SERVER_ONLY
-        else if (!CVS->isGLSL())
+        if (!ProfileWorld::isNoGraphics())
         {
-            if (UserConfigParams::m_old_driver_popup)
+            // Some Android devices have only 320x240 and height >= 480 is bare
+            // minimum to make the GUI working as expected.
+            if (irr_driver->getActualScreenSize().Height < 480)
             {
-                #ifdef USE_GLES2
-                irr::core::stringw version = "OpenGL ES 3.0";
-                #else
-                irr::core::stringw version = "OpenGL 3.1";
-                #endif
-                MessageDialog *dialog =
-                    new MessageDialog(_("Your OpenGL version appears to be too old. Please verify "
-                    "if an update for your video driver is available. SuperTuxKart requires %s or better.",
-                    version),
-                    /*from queue*/ true);
-                GUIEngine::DialogQueue::get()->pushDialog(dialog);
+                if (UserConfigParams::m_old_driver_popup)
+                {
+                    MessageDialog *dialog =
+                        new MessageDialog(_("Your screen resolution is too "
+                                            "small to run STK."),
+                                            /*from queue*/ true);
+                    GUIEngine::DialogQueue::get()->pushDialog(dialog);
+                }
+                Log::warn("main", "Screen size is too small!");
             }
-            Log::warn("OpenGL", "OpenGL version is too old!");
+
+            if (GraphicsRestrictions::isDisabled(
+                GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
+            {
+                if (UserConfigParams::m_old_driver_popup)
+                {
+                    MessageDialog *dialog =
+                        new MessageDialog(_("Your driver version is too old. "
+                                            "Please install the latest video "
+                                            "drivers."), /*from queue*/ true);
+                    GUIEngine::DialogQueue::get()->pushDialog(dialog);
+                }
+                Log::warn("OpenGL", "Driver is too old!");
+            }
+            else if (!CVS->isGLSL())
+            {
+                if (UserConfigParams::m_old_driver_popup)
+                {
+                    #ifdef USE_GLES2
+                    irr::core::stringw version = "OpenGL ES 3.0";
+                    #else
+                    irr::core::stringw version = "OpenGL 3.1";
+                    #endif
+                    MessageDialog *dialog =
+                        new MessageDialog(_("Your OpenGL version appears to be "
+                                            "too old. Please verify if an "
+                                            "update for your video driver is "
+                                            "available. SuperTuxKart requires "
+                                            "%s or better.", version), 
+                                            /*from queue*/ true);
+                    GUIEngine::DialogQueue::get()->pushDialog(dialog);
+                }
+                Log::warn("OpenGL", "OpenGL version is too old!");
+            }
         }
 #endif
         // Note that on the very first run of STK internet status is set to

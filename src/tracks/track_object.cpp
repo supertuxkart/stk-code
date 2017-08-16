@@ -20,6 +20,7 @@
 
 #include "animations/three_d_animation.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/lod_node.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/render_info.hpp"
@@ -32,6 +33,7 @@
 #include "scriptengine/script_engine.hpp"
 #include "tracks/model_definition_loader.hpp"
 
+#include <IAnimatedMeshSceneNode.h>
 #include <ISceneManager.h>
 
 /** A track object: any additional object on the track. This object implements
@@ -156,6 +158,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     }
     else if (xml_node.getName() == "library")
     {
+        xml_node.get("name", &m_name);
         m_presentation = new TrackObjectPresentationLibraryNode(this, xml_node, model_def_loader);
     }
     else if (type == "sfx-emitter")
@@ -170,7 +173,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         std::string action;
         xml_node.get("action", &action);
         m_name = action; //adds action as name so that it can be found by using getName()
-        m_presentation = new TrackObjectPresentationActionTrigger(xml_node);
+        m_presentation = new TrackObjectPresentationActionTrigger(xml_node, parent_library);
     }
     else if (type == "billboard")
     {
@@ -661,3 +664,35 @@ void TrackObject::moveTo(const Scripting::SimpleVec3* pos, bool isAbsoluteCoord)
             isAbsoluteCoord);
     }
 }
+
+// ----------------------------------------------------------------------------
+scene::IAnimatedMeshSceneNode* TrackObject::getMesh()
+{
+    if (getPresentation<TrackObjectPresentationLOD>())
+    {
+        LODNode* ln = dynamic_cast<LODNode*>
+            (getPresentation<TrackObjectPresentationLOD>()->getNode());
+        if (ln && !ln->getAllNodes().empty())
+        {
+            scene::IAnimatedMeshSceneNode* an =
+                dynamic_cast<scene::IAnimatedMeshSceneNode*>
+                (ln->getFirstNode());
+            if (an)
+            {
+                return an;
+            }
+        }
+    }
+    else if (getPresentation<TrackObjectPresentationMesh>())
+    {
+        scene::IAnimatedMeshSceneNode* an =
+            dynamic_cast<scene::IAnimatedMeshSceneNode*>
+            (getPresentation<TrackObjectPresentationMesh>()->getNode());
+        if (an)
+        {
+            return an;
+        }
+    }
+    Log::debug("TrackObject", "No animated mesh");
+    return NULL;
+}   // getMesh

@@ -63,6 +63,7 @@ void CentralVideoSettings::init()
     m_need_rh_workaround = false;
     m_need_srgb_workaround = false;
     m_need_srgb_visual_workaround = false;
+    m_need_vertex_id_workaround = false;
 
     // Call to glGetIntegerv should not be made if --no-graphics is used
     if (!ProfileWorld::isNoGraphics())
@@ -266,6 +267,11 @@ void CentralVideoSettings::init()
             hasColorBufferFloat = true;
             Log::info("GLDriver", "EXT Color Buffer Float Present");
         }
+        
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_VERTEX_ID_WORKING))
+        {
+            m_need_vertex_id_workaround = true;
+        }
 #endif
     }
 }
@@ -305,6 +311,11 @@ bool CentralVideoSettings::needsRGBBindlessWorkaround() const
 bool CentralVideoSettings::needsSRGBCapableVisualWorkaround() const
 {
     return m_need_srgb_visual_workaround;
+}
+
+bool CentralVideoSettings::needsVertexIdWorkaround() const
+{
+    return m_need_vertex_id_workaround;
 }
 
 bool CentralVideoSettings::isARBGeometryShadersUsable() const

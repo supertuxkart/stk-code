@@ -56,10 +56,13 @@ android/android-ndk*
 android/android-sdk*
 android/assets
 android/bin
-android/obj
+android/build
 android/libs
+android/obj
+android/.gradle
 android-*
 *.apk
+*.keystore
 
 lib/curl
 lib/freetype

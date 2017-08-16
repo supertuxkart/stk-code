@@ -112,11 +112,7 @@ void expandTexSecondPass(const GLMesh &mesh,
         expandTex(mesh, T::SecondPassTextures, prefilled_tex[0],
                   prefilled_tex[1], prefilled_tex[2]);
 }
-
-template<>
-void expandTexSecondPass<GrassMat>(const GLMesh &mesh,
-                                   const std::vector<GLuint> &prefilled_tex);
-                                   
+                   
 // ----------------------------------------------------------------------------
 /** Give acces textures for second rendering pass in shaders 
  * without first binding them in order to reduce driver overhead.
@@ -132,10 +128,6 @@ void expandHandlesSecondPass(const std::vector<uint64_t> &handles)
         expand(nulltex, T::SecondPassTextures,
                handles[0], handles[1], handles[2]);
 }
-
-template<>
-void expandHandlesSecondPass<GrassMat>(const std::vector<uint64_t> &handles);
-
 
 #if !defined(USE_GLES2)
 // ----------------------------------------------------------------------------

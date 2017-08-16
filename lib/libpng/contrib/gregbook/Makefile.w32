@@ -53,7 +53,8 @@ WLIBS = $(PNGLIB) $(ZLIB)
 CC = cl
 LD = link
 RM = del
-CFLAGS = -nologo -O -W3 $(INCS) $(cvars)
+CPPFLAGS = $(INCS)
+CFLAGS = -nologo -O -W3 $(cvars)
 # [note that -W3 is an MSVC-specific compilation flag ("all warnings on")]
 # [see %devstudio%\vc\include\win32.mak for cvars macro definition]
 O = .obj
@@ -76,7 +77,7 @@ EXES = $(RPNG)$(E) $(RPNG2)$(E) $(WPNG)$(E)
 # implicit make rules -------------------------------------------------------
 
 .c$(O):
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
 
 
 # dependencies --------------------------------------------------------------

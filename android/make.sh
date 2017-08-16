@@ -22,16 +22,19 @@ export NDK_ABI_ARMV7=armeabi-v7a
 export ARCH_ARMV7=arm
 export HOST_ARMV7=arm-linux-androideabi
 export NDK_PLATFORM_ARMV7=android-19
+export SDK_VERSION_ARMV7=19
 
 export NDK_ABI_X86=x86
 export ARCH_X86=x86
 export HOST_X86=i686-linux-android
 export NDK_PLATFORM_X86=android-19
+export SDK_VERSION_X86=19
 
 export NDK_ABI_AARCH64=arm64-v8a
 export ARCH_AARCH64=arm64
 export HOST_AARCH64=aarch64-linux-android
 export NDK_PLATFORM_AARCH64=android-21
+export SDK_VERSION_AARCH64=21
 
 
 # A helper function that checks if error ocurred
@@ -46,8 +49,10 @@ check_error()
 # Handle clean command
 if [ ! -z "$1" ] && [ "$1" = "clean" ]; then
     rm -rf bin
+    rm -rf build
     rm -rf libs
     rm -rf obj
+    rm -rf .gradle
     exit
 fi
 
@@ -75,16 +80,19 @@ if [ "$COMPILE_ARCH" = "armv7" ]; then
     export NDK_ABI=$NDK_ABI_ARMV7
     export ARCH=$ARCH_ARMV7
     export HOST=$HOST_ARMV7
+    export SDK_VERSION=$SDK_VERSION_ARMV7
 elif [ "$COMPILE_ARCH" = "x86" ]; then
     export NDK_PLATFORM=$NDK_PLATFORM_X86
     export NDK_ABI=$NDK_ABI_X86
     export ARCH=$ARCH_X86
     export HOST=$HOST_X86
+    export SDK_VERSION=$SDK_VERSION_X86
 elif [ "$COMPILE_ARCH" = "aarch64" ]; then
     export NDK_PLATFORM=$NDK_PLATFORM_AARCH64
     export NDK_ABI=$NDK_ABI_AARCH64
     export ARCH=$ARCH_AARCH64
     export HOST=$HOST_AARCH64
+    export SDK_VERSION=$SDK_VERSION_AARCH64
 else
     echo "Unknow COMPILE_ARCH: $COMPILE_ARCH. Possible values are: " \
          "armv7, aarch64, x86"
@@ -97,14 +105,27 @@ if [ -z "$BUILD_TYPE" ]; then
 fi
 
 if [ "$BUILD_TYPE" = "debug" ] || [ "$BUILD_TYPE" = "Debug" ]; then
-    export BUILD_TYPE="debug"
+    export ANT_BUILD_TYPE="debug"
+    export GRADLE_BUILD_TYPE="assembleDebug"
     export IS_DEBUG_BUILD=1
 elif [ "$BUILD_TYPE" = "release" ] || [ "$BUILD_TYPE" = "Release" ]; then
-    export BUILD_TYPE="release"
+    export ANT_BUILD_TYPE="release"
+    export GRADLE_BUILD_TYPE="assembleRelease"
     export IS_DEBUG_BUILD=0
 else
     echo "Unsupported BUILD_TYPE: $BUILD_TYPE. Possible values are: " \
          "debug, release"
+    exit
+fi
+
+# Check selected build tool
+if [ -z "$BUILD_TOOL" ]; then
+    BUILD_TOOL="gradle"
+fi
+
+if [ "$BUILD_TOOL" != "gradle" ] && [ "$BUILD_TOOL" != "ant" ]; then
+    echo "Unsupported BUILD_TOOL: $BUILD_TOOL. Possible values are: " \
+         "gradle, ant"
     exit
 fi
 
@@ -133,6 +154,24 @@ if [ ! -d "$SDK_PATH" ]; then
          "proper path in the SDK_PATH variable"
     exit
 fi
+
+# Find newest build-tools version
+if [ -z "$BUILD_TOOLS_VER" ]; then
+    BUILD_TOOLS_DIRS=`ls -1 "$SDK_PATH/build-tools" | sort -V -r`
+   
+    for DIR in $BUILD_TOOLS_DIRS; do
+        if [ "$DIR" = `echo $DIR | sed 's/[^0-9,.]//g'` ]; then
+            BUILD_TOOLS_VER="$DIR"
+            break
+        fi
+    done
+fi
+
+if [ -z "$BUILD_TOOLS_VER" ] || [ ! -d "$SDK_PATH/build-tools/$BUILD_TOOLS_VER" ]; then
+    echo "Error: Couldn't detect build-tools version."
+    exit
+fi
+
 
 # Standalone toolchain
 if [ ! -f "$DIRNAME/obj/make_standalone_toolchain.stamp" ]; then
@@ -302,5 +341,16 @@ check_error
 
 # Build apk
 echo "Building APK"
-ant $BUILD_TYPE -Dsdk.dir="$SDK_PATH" -Dtarget=$NDK_PLATFORM
+
+if [ "$BUILD_TOOL" = "gradle" ]; then
+    export ANDROID_HOME="$SDK_PATH"
+    gradle -Psdk_version=$SDK_VERSION           \
+           -Pbuild_tools_ver="$BUILD_TOOLS_VER" \
+           $GRADLE_BUILD_TYPE
+elif [ "$BUILD_TOOL" = "ant" ]; then
+    ant -Dsdk.dir="$SDK_PATH"  \
+        -Dtarget=$NDK_PLATFORM \
+        $ANT_BUILD_TYPE
+fi
+
 check_error

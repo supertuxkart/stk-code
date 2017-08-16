@@ -378,7 +378,8 @@ void PhysicalObject::init(const PhysicalObject::Settings& settings)
                 return;
         }   // switch node->getType()
 
-        std::unique_ptr<TriangleMesh> triangle_mesh(new TriangleMesh());
+        std::unique_ptr<TriangleMesh> 
+                   triangle_mesh(new TriangleMesh(/*can_be_transformed*/true));
 
         for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
         {
@@ -522,7 +523,10 @@ void PhysicalObject::init(const PhysicalObject::Settings& settings)
     btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state,
                                                   m_shape, inertia);
 
-    m_body = new btRigidBody(info);
+    if(m_triangle_mesh)
+        m_body = new TriangleMesh::RigidBodyTriangleMesh(m_triangle_mesh, info);
+    else
+        m_body = new btRigidBody(info);
     m_user_pointer.set(this);
     m_body->setUserPointer(&m_user_pointer);
 

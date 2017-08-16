@@ -222,6 +222,14 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
     unsigned int internal_format = m_single_channel ? GL_R8 : isSrgb() ? 
                                                     GL_SRGB8_ALPHA8 : GL_RGBA8;
 
+// GLES 2.0 specs doesn't allow GL_RGBA8 internal format
+#if defined(USE_GLES2)
+    if (!CVS->isGLSL())
+    {
+        internal_format = GL_RGBA;
+    }
+#endif
+
 #if !defined(USE_GLES2)
     if (isMeshTexture() && CVS->isTextureCompressionEnabled())
     {

@@ -273,7 +273,6 @@ KartModel::~KartModel()
     for (size_t i = 0; i < m_headlight_objects.size(); i++)
     {
         HeadlightObject& obj = m_headlight_objects[i];
-        obj.setNode(NULL);
         if (obj.getNode())
         {
             // Master KartModels should never have a headlight attached.
