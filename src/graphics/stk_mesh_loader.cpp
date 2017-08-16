@@ -41,7 +41,6 @@ scene::IAnimatedMesh* STKMeshLoader::createMesh(io::IReadFile* f)
 
     B3DFile = f;
     AnimatedMesh = new scene::CSkinnedMesh();
-    AnimatedMesh->setTransposedMatrix(true);
     ShowWarning = true; // If true a warning is issued if too many textures are used
     VerticesStart=0;
 

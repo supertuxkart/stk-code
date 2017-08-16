@@ -326,7 +326,7 @@ private:
             core::matrix4 lm, sm, rm;
             lm.setTranslation(m_loc);
             sm.setScale(m_scale);
-            m_rot.getMatrix(rm);
+            m_rot.getMatrix_transposed(rm);
             return lm * rm * sm;
         }
         // --------------------------------------------------------------------

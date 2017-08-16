@@ -544,7 +544,7 @@ void SPMeshLoader::LocRotScale::read(irr::io::IReadFile* spm)
     float tmp[10];
     spm->read(&tmp, 40);
     m_loc = core::vector3df(tmp[0], tmp[1], tmp[2]);
-    m_rot = core::quaternion(tmp[3], tmp[4], tmp[5], tmp[6]);
+    m_rot = core::quaternion(-tmp[3], -tmp[4], -tmp[5], tmp[6]);
     m_rot.normalize();
     m_scale = core::vector3df(tmp[7], tmp[8], tmp[9]);
 }   // LocRotScale::read

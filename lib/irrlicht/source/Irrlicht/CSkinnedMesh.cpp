@@ -21,7 +21,7 @@ namespace scene
 CSkinnedMesh::CSkinnedMesh()
 : SkinningBuffers(0), AnimationFrames(0.f), FramesPerSecond(25.f),
 	LastAnimatedFrame(-1), SkinnedLastFrame(false),
-	InterpolationMode(EIM_LINEAR), TransposedMatrix(false),
+	InterpolationMode(EIM_LINEAR),
 	HasAnimation(false), PreparedForSkinning(false),
 	AnimateNormals(true), HardwareSkinning(false), m_total_joints(0),
 	m_current_joint(0)
@@ -89,13 +89,6 @@ IMesh* CSkinnedMesh::getMesh(s32 frame, s32 detailLevel, s32 startFrameLoop, s32
 		HardwareSkinning = true;
 
 	return this;
-}
-
-
-//! For loader usage.
-void CSkinnedMesh::setTransposedMatrix(bool val)
-{
-	TransposedMatrix = val;
 }
 
 
@@ -190,14 +183,7 @@ void CSkinnedMesh::buildAllLocalAnimatedMatrices()
 
 			// IRR_TEST_BROKEN_QUATERNION_USE: TODO - switched to getMatrix_transposed instead of getMatrix for downward compatibility. 
 			//								   Not tested so far if this was correct or wrong before quaternion fix!
-			if (TransposedMatrix)
-			{
-				joint->Animatedrotation.getMatrix_transposed(joint->LocalAnimatedMatrix);
-			}
-			else
-			{
-				joint->LocalAnimatedMatrix=joint->Animatedrotation.getMatrix();
-			}
+			joint->Animatedrotation.getMatrix_transposed(joint->LocalAnimatedMatrix);
 
 			// --- joint->LocalAnimatedMatrix *= joint->Animatedrotation.getMatrix() ---
 			f32 *m1 = joint->LocalAnimatedMatrix.pointer();

@@ -155,8 +155,6 @@ namespace scene
 
 		virtual void updateBoundingBox(void);
 
-		void setTransposedMatrix(bool);
-
 		//! Recovers the joints from the mesh
 		void recoverJointsFromMesh(core::array<IBoneSceneNode*> &jointChildSceneNodes);
 
@@ -225,7 +223,6 @@ private:
 
 		E_INTERPOLATION_MODE InterpolationMode:8;
 
-		bool TransposedMatrix;
 		bool HasAnimation;
 		bool PreparedForSkinning;
 		bool AnimateNormals;
