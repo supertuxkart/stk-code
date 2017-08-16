@@ -37,6 +37,7 @@
 #include "graphics/stk_animated_mesh.hpp"
 #include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_loader.hpp"
+#include "graphics/sp_mesh_loader.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/stk_texture.hpp"
@@ -605,6 +606,9 @@ void IrrDriver::initDevice()
     STKMeshLoader* sml = new STKMeshLoader(m_scene_manager);
     m_scene_manager->addExternalMeshLoader(sml);
     sml->drop();
+    SPMeshLoader* spml = new SPMeshLoader(m_scene_manager);
+    m_scene_manager->addExternalMeshLoader(spml);
+    spml->drop();
 
     m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
 
