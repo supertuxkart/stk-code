@@ -26,14 +26,14 @@ using namespace Online;
 namespace Online
 {
     void LinkHelper::OpenURL (std::string url) {
-#ifdef WIN32
+#ifdef _WIN32
         ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
 #else 
-# ifdef APPLE
+#ifdef APPLE
         std::string op = std::string("open ").append(url);
-# else
+#else
         std::string op = std::string("xdg-open ").append(url);
-# endif
+#endif
         system(op.c_str());
 #endif
     }
