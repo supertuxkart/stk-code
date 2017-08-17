@@ -637,7 +637,10 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
 #endif
         // Update min/max
         Vec3 obj_min, obj_max;
-        MeshTools::minMax3D(obj.m_model, &obj_min, &obj_max);
+        int frame = m_animation_frame[AF_SPEED_WEIGHTED_START];
+        if (frame < 0)
+            frame = 0;
+        MeshTools::minMax3D(obj.m_model->getMesh(frame), &obj_min, &obj_max);
         obj_min += obj.m_position;
         obj_max += obj.m_position;
         kart_min.min(obj_min);
@@ -1026,15 +1029,6 @@ void KartModel::update(float dt, float distance, float steer, float speed,
         m_wheel_node[i]->setRotation(wheel_rotation);
     } // for (i < 4)
 
-    // If animations are disabled, stop here
-    if (m_animated_node == NULL) return;
-
-    if (m_play_non_loop && m_animated_node->getLoopMode() == true)
-    {
-        m_play_non_loop = false;
-        this->setAnimation(AF_DEFAULT);
-    }
-
     // Update the speed-weighted objects' animations
     if (m_kart != NULL)
     {
@@ -1086,6 +1080,15 @@ void KartModel::update(float dt, float distance, float steer, float speed,
             }
 #undef GET_VALUE
         }
+    }
+
+    // If animations are disabled, stop here
+    if (m_animated_node == NULL) return;
+
+    if (m_play_non_loop && m_animated_node->getLoopMode() == true)
+    {
+        m_play_non_loop = false;
+        this->setAnimation(AF_DEFAULT);
     }
 
     // Check if the end animation is being played, if so, don't
