@@ -71,6 +71,11 @@ script:
   - wget -O ../data/models/thunderbird.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/thunderbird.b3d?format=raw
   - wget -O ../data/models/thunderbird.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/thunderbird.png?format=raw
   - wget -O ../data/models/traffic_light.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/traffic_light.png?format=raw
+  - wget -O ../data/models/gift-box-low.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/gift-box-low.b3d?format=raw
+  - wget -O ../data/models/gift-box.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/gift-box.b3d?format=raw
+  - wget -O ../data/models/gift-box.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/gift-box.png?format=raw
+  - wget -O ../data/models/gift-loop-gloss.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/gift-loop-gloss.png?format=raw
+  - wget -O ../data/models/gift-loop.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/gift-loop.png?format=raw
   - ./bin/supertuxkart --unit-testing
 
 notifications:
