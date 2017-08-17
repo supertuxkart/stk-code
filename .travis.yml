@@ -67,8 +67,8 @@ script:
   - mkdir ../data/textures
   - echo "<?xml version="1.0"?><sfx-config></sfx-config>" > ../data/sfx/sfx.xml
   - echo "<?xml version="1.0"?><sfx-config></sfx-config>" > ../data/textures/materials.xml
-  - wget -O https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/referee.xml?format=raw ../data/models/referee.xml
-  - wget -O https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/thunderbird.b3d?format=raw ../data/models/thunderbird.b3d
+  - wget -O ../data/models/referee.xml https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/referee.xml?format=raw
+  - wget -O ../data/models/thunderbird.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/thunderbird.b3d?format=raw
   - ./bin/supertuxkart --unit-testing
 
 notifications:
