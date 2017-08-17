@@ -40,6 +40,9 @@ addons:
     - zlib1g-dev
 
 before_script:
+  - "export DISPLAY=:99.0" # For unit testing
+  - "sh -e /etc/init.d/xvfb start" # For unit testing
+  - sleep 3 # give xvfb some time to start
   # Unfortunately using all threads crashes g++: "g++: internal compiler error: Killed (program cc1plus)"
   # Use half of the available threads, gcc is memory hungry
   - 'if [ ${CC} = "gcc" ]; then
