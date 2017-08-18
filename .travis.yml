@@ -40,6 +40,7 @@ addons:
     - zlib1g-dev
 
 before_script:
+  - svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets ../stk-assets
   - "export DISPLAY=:99.0" # For unit testing
   - "sh -e /etc/init.d/xvfb start" # For unit testing
   - sleep 3 # give xvfb some time to start
@@ -56,47 +57,8 @@ before_script:
 script:
   - mkdir "build"
   - cd "build"
-  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off
+  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DBUILD_RECORDER=off
   - make VERBOSE=1 -j $THREADS
-  - echo "Adding dummy folders to allow unit testing"
-  - mkdir ../data/library
-  - mkdir ../data/models
-  - mkdir ../data/music
-  - mkdir ../data/tracks
-  - mkdir ../data/sfx
-  - mkdir ../data/textures
-  - echo "<?xml version="1.0"?><sfx-config></sfx-config>" > ../data/sfx/sfx.xml
-  - echo "<?xml version="1.0"?><sfx-config></sfx-config>" > ../data/textures/materials.xml
-  - wget -O ../data/models/referee.xml https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/referee.xml?format=raw
-  - wget -O ../data/models/thunderbird.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/thunderbird.b3d?format=raw
-  - wget -O ../data/models/gift-box-low.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/gift-box-low.b3d?format=raw
-  - wget -O ../data/models/gift-box.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/gift-box.b3d?format=raw
-  - wget -O ../data/models/gift-loop-gloss.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/gift-loop-gloss.png?format=raw
-  - wget -O ../data/models/banana-low.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/banana-low.b3d?format=raw
-  - wget -O ../data/models/banana.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/banana.b3d?format=raw
-  - wget -O ../data/models/bowling.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/bowling.b3d?format=raw
-  - wget -O ../data/models/cake.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/cake.b3d?format=raw
-  - wget -O ../data/models/anchor.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/anchor.b3d?format=raw
-  - wget -O ../data/models/rubber_ball.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/rubber_ball.b3d?format=raw
-  - wget -O ../data/models/parachute.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/parachute.b3d?format=raw
-  - wget -O ../data/models/plunger.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/plunger.b3d?format=raw
-  - wget -O ../data/models/nitrotank-big.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/nitrotank-big.b3d?format=raw
-  - wget -O ../data/models/nitrotank-small.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/nitrotank-small.b3d?format=raw
-  - wget -O ../data/models/nitrotank-small-low.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/nitrotank-small-low.b3d?format=raw
-  - wget -O ../data/models/bubblegum.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/bubblegum.b3d?format=raw
-  - wget -O ../data/models/bubblegum-nolok.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/bubblegum-nolok.b3d?format=raw
-  - wget -O ../data/models/easter_egg.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/easter_egg.b3d?format=raw
-  - wget -O ../data/models/bomb.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/bomb.b3d?format=raw
-  - wget -O ../data/models/swatter.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/swatter.b3d?format=raw
-  - wget -O ../data/models/swatter_nolok.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/swatter_nolok.b3d?format=raw
-  - wget -O ../data/models/reset-button.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/reset-button.b3d?format=raw
-  - wget -O ../data/models/bubblegum_shield.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/bubblegum_shield.b3d?format=raw
-  - wget -O ../data/models/bubblegum_shield_nolok.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/bubblegum_shield_nolok.b3d?format=raw
-  - wget -O ../data/models/thunderbird.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/thunderbird.png?format=raw
-  - wget -O ../data/models/traffic_light.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/traffic_light.png?format=raw
-  - wget -O ../data/models/gift-box.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/gift-box.png?format=raw 
-  - wget -O ../data/models/gift-loop.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/gift-loop.png?format=raw 
-  - wget -O ../data/models/banana.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/banana.png?format=raw 
   - ./bin/supertuxkart --unit-testing
 
 notifications:
