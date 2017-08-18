@@ -14,10 +14,10 @@ matrix:
 
 env:
   matrix:
-    - BUILD_TYPE="Debug" SERVER_ONLY="OFF"
-    - BUILD_TYPE="Debug" SERVER_ONLY="ON"
-    - BUILD_TYPE="Release" SERVER_ONLY="OFF"
-    - BUILD_TYPE="Release" SERVER_ONLY="ON"
+    - BUILD_TYPE="Debug" SERVER_ONLY="OFF" UNITTEST="./bin/supertuxkart --unit-testing"
+    - BUILD_TYPE="Debug" SERVER_ONLY="ON" UNITTEST="true"
+    - BUILD_TYPE="Release" SERVER_ONLY="OFF" UNITTEST="true"
+    - BUILD_TYPE="Release" SERVER_ONLY="ON" UNITTEST="true"
 
 addons:
   apt:
@@ -59,7 +59,7 @@ script:
   - cd "build"
   - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DBUILD_RECORDER=off
   - make VERBOSE=1 -j $THREADS
-  - ./bin/supertuxkart --unit-testing
+  - $UNITTEST
 
 notifications:
   irc:
