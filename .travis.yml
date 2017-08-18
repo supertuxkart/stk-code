@@ -92,6 +92,11 @@ script:
   - wget -O ../data/models/reset-button.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/reset-button.b3d?format=raw
   - wget -O ../data/models/bubblegum_shield.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/bubblegum_shield.b3d?format=raw
   - wget -O ../data/models/bubblegum_shield_nolok.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/bubblegum_shield_nolok.b3d?format=raw
+  - wget -O ../data/models/thunderbird.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/thunderbird.png?format=raw
+  - wget -O ../data/models/traffic_light.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/traffic_light.png?format=raw
+  - wget -O ../data/models/gift-box.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/gift-box.png?format=raw 
+  - wget -O ../data/models/gift-loop.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/gift-loop.png?format=raw 
+  - wget -O ../data/models/banana.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/banana.png?format=raw 
   - ./bin/supertuxkart --unit-testing
 
 notifications:
