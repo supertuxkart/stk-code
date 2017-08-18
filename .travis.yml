@@ -76,6 +76,9 @@ script:
   - wget -O ../data/models/gift-box.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/gift-box.png?format=raw
   - wget -O ../data/models/gift-loop-gloss.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/gift-loop-gloss.png?format=raw
   - wget -O ../data/models/gift-loop.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/gift-loop.png?format=raw
+  - wget -O ../data/models/banana-low.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/banana-low.b3d?format=raw
+  - wget -O ../data/models/banana.b3d https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/banana.b3d?format=raw
+  - wget -O ../data/models/banana.png https://sourceforge.net/p/supertuxkart/code/HEAD/tree/stk-assets/models/banana.png?format=raw
   - ./bin/supertuxkart --unit-testing
 
 notifications:
