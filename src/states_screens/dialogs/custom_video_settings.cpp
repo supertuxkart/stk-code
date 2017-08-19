@@ -163,7 +163,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             advanced_pipeline && getWidget<CheckBoxWidget>("lightshaft")->getState();
 
         UserConfigParams::m_degraded_IBL =
-            !getWidget<CheckBoxWidget>("ibl")->getState();
+            !advanced_pipeline || !getWidget<CheckBoxWidget>("ibl")->getState();
 
         UserConfigParams::m_gi =
             advanced_pipeline && CVS->supportsGlobalIllumination() &&
