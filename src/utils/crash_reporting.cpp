@@ -17,7 +17,10 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "crash_reporting.hpp"
-#include "log.hpp"
+
+#include "utils/log.hpp"
+#include "utils/string_utils.hpp"
+
 #include <string.h>
 
 #if defined(WIN32) && !defined(DEBUG) && !defined(__MINGW32__)
@@ -161,8 +164,8 @@
             // ----- Per-thread handlers -----
             // TODO
         }   // installHandlers
-        // --------------------------------------------------------------------
 
+        // --------------------------------------------------------------------
         void getCallStackWithContext(std::string& callstack, PCONTEXT pContext)
         {
             HINSTANCE hDbgHelpDll = LoadLibraryA("DbgHelp.dll");
@@ -176,10 +179,12 @@
             // Retrieve the DLL functions
 #define GET_FUNC_PTR(FuncName)  \
     t##FuncName _##FuncName = (t##FuncName)GetProcAddress(hDbgHelpDll, #FuncName); \
-    if(!_##FuncName) {    \
-    Log::warn("CrashReporting", "Failed to import symbol " #FuncName " from hDbgHelpDll"); \
-            FreeLibrary(hDbgHelpDll);  \
-            return; \
+    if(!_##FuncName)                                                               \
+     {                                                                             \
+         Log::warn("CrashReporting", "Failed to import symbol " #FuncName          \
+                   " from hDbgHelpDll");                                           \
+            FreeLibrary(hDbgHelpDll);                                              \
+            return;                                                                \
     } 
 
                 GET_FUNC_PTR(SymCleanup)
@@ -192,50 +197,45 @@
                 GET_FUNC_PTR(UnDecorateSymbolName)
                 GET_FUNC_PTR(SymFromAddr);
                 GET_FUNC_PTR(StackWalk64);
-
 #undef GET_FUNC_PTR
-
 
             const HANDLE  hProcess  = GetCurrentProcess();
             const HANDLE  hThread   = GetCurrentThread();
 
+            // Since the stack trace can also be used for leak checks, don't
+            // initialise this all the time.
+            static bool first_time = true;
+
             // Initialize the symbol hander for the process
+            if (first_time)
             {
                 // Get the file path of the executable
-                char    filepath[512];
+                char filepath[512];
                 GetModuleFileNameA(NULL, filepath, sizeof(filepath));
-                if(!filepath)
+                if (!filepath)
                 {
                     Log::warn("CrashReporting", "GetModuleFileNameA failed");
                     FreeLibrary(hDbgHelpDll);
                     return;
                 }
-
                 // Only keep the directory
-                char* last_separator = strrchr(filepath, '/');
-                if(!last_separator) last_separator = strrchr(filepath, '\\');
-                if(last_separator)
-                    last_separator[0] = '\0';
+                std::string s(filepath);
+                std::string path = StringUtils::getPath(s);
 
-                // Since the stack trace can also be used for leak checks, don't
-                // initialise this all the time.
-                static bool first_time = true;
-
-                if (first_time)
+                // Finally initialize the symbol handler.
+                BOOL bOk = _SymInitialize(hProcess,
+                                          path.empty() ? NULL : path.c_str(),
+                                          TRUE);
+                if (!bOk)
                 {
-                    // Finally initialize the symbol handler.
-                    BOOL    bOk = _SymInitialize(hProcess, filepath ? filepath : NULL, TRUE);
-                    if (!bOk)
-                    {
-                        Log::warn("CrashReporting", "SymInitialize() failed");
-                        FreeLibrary(hDbgHelpDll);
-                        return;
-                    }
-
-                    _SymSetOptions(SYMOPT_LOAD_LINES);
-                    first_time = false;
+                    Log::warn("CrashReporting", "SymInitialize() failed");
+                    FreeLibrary(hDbgHelpDll);
+                    return;
                 }
-            }
+
+                _SymSetOptions(SYMOPT_LOAD_LINES);
+                first_time = false;
+            }   // if first_time
 
             // Get the stack trace
             {
@@ -263,63 +263,43 @@
                 const int   max_nb_calls = 32;
                 for(int i=0 ; i < max_nb_calls ; i++)
                 {
-                    const BOOL stackframe_ok = _StackWalk64(   machine_type,
-                                                               hProcess,
-                                                               hThread,
-                                                               &stackframe,
-                                                               pContext,
-                                                               NULL,
-                                                               _SymFunctionTableAccess64,
-                                                               _SymGetModuleBase64,
-                                                               NULL);
-                    if(stackframe_ok)
+                    const BOOL stackframe_ok =
+                         _StackWalk64(machine_type, hProcess, hThread,
+                                      &stackframe, pContext, NULL,
+                                      _SymFunctionTableAccess64,
+                                      _SymGetModuleBase64, NULL       );
+                    if (!stackframe_ok) break;
+
+                    // Decode the symbol and add it to the call stack
+                    DWORD64 sym_displacement;
+                    char buffer[ sizeof(SYMBOL_INFO) + 
+                                 MAX_SYM_NAME * sizeof(TCHAR) ];
+                    PSYMBOL_INFO symbol = (PSYMBOL_INFO)buffer;
+                    symbol->MaxNameLen = MAX_SYM_NAME;
+                    symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+                    if (!_SymFromAddr(hProcess, stackframe.AddrPC.Offset,
+                        &sym_displacement, symbol))
                     {
-                        // Decode the symbol and add it to the call stack
-                        DWORD64 sym_displacement;
-                        char buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
-                        PSYMBOL_INFO symbol = (PSYMBOL_INFO)buffer;
-                        symbol->MaxNameLen = MAX_SYM_NAME;
-                        symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
-                        if(_SymFromAddr(hProcess, stackframe.AddrPC.Offset,
-                                        &sym_displacement, symbol)         )
-                        {
-                            IMAGEHLP_LINE64 line64;
-                            DWORD   dwDisplacement = (DWORD)sym_displacement;
-                            if(_SymGetLineFromAddr64(hProcess, stackframe.AddrPC.Offset, &dwDisplacement, &line64))
-                            {
-                                callstack += "\n ";
-
-                                // Directory + filename -> filename only
-                                const char* filename = line64.FileName;
-                                const char* ptr = line64.FileName;
-                                while(*ptr)
-                                {
-                                    if(*ptr == '\\' || *ptr == '/')
-                                        filename = ptr+1;
-                                    ptr++;
-                                }
-                                callstack += filename;
-                                callstack += ":";
-                                callstack += symbol->Name;
-
-                                char str[128];
-                                _itoa(line64.LineNumber, str, 10);
-                                callstack += ":";
-                                callstack += str;
-                            }
-                            else
-                            {
-                                callstack += "\n ";
-                                callstack += symbol->Name;
-                            }
-                        }
-                        else
-                            callstack += "\n <no symbol available>";
+                        callstack += "\n <no symbol available>";
+                        continue;
                     }
+                    IMAGEHLP_LINE64 line64;
+                    DWORD   dwDisplacement = (DWORD)sym_displacement;
+                    if (_SymGetLineFromAddr64(hProcess,
+                        stackframe.AddrPC.Offset,
+                        &dwDisplacement, &line64))
+                    {
+                        std::string s(line64.FileName);
+                        callstack += "\n " + StringUtils::getBasename(s)
+                                  + ":" + symbol->Name + ":"
+                                  + StringUtils::toString(line64.LineNumber);
+                    }   // if SymGetLineFromAddr64
                     else
-                        break;  // done
-                }
-            }
+                    {
+                        callstack += std::string("\n ") + symbol->Name;
+                    }
+                }   // for i < max_calls
+            }   // get the stack trace
 
             FreeLibrary(hDbgHelpDll);
         }   //   // getCallStackWithContext
