@@ -20,7 +20,7 @@
 #include "log.hpp"
 #include <string.h>
 
-#if defined(WIN32) && !defined(DEBUG) && !defined(__MINGW32__) && !defined(_WIN64)
+#if defined(WIN32) && !defined(DEBUG) && !defined(__MINGW32__)
     // --------------------- Windows version -----------------
     #include <Windows.h>
     #include <DbgHelp.h>
@@ -76,11 +76,19 @@
         _In_ DWORD maxStringLength,
         _In_ DWORD flags
     );
+    typedef BOOL (__stdcall *tSymFromAddr) (
+        _In_ HANDLE hProcess,
+        _In_ DWORD64 Address,
+        _Out_opt_ PDWORD64 Displacement,
+        _Inout_ PSYMBOL_INFO Symbol
+        );
+
 
     namespace CrashReporting
     {
         void getCallStackWithContext(std::string& callstack, PCONTEXT pContext);
 
+        // --------------------------------------------------------------------
         void winCrashHandler(PCONTEXT pContext=NULL)
         {
             std::string callstack;
@@ -95,35 +103,43 @@
                                 "\n"
                                 "Call stack:\n";
             msg += callstack;
+            Log::error("StackTrace", "%s", msg.c_str());
             MessageBoxA(NULL, msg.c_str(), "SuperTuxKart crashed :/", MB_OK);
-        }
+        }   // winCrashHandler
 
+        // --------------------------------------------------------------------
         LONG WINAPI sehHandler(_In_ struct _EXCEPTION_POINTERS *ExceptionInfo)
         {
             winCrashHandler(ExceptionInfo->ContextRecord);
             return EXCEPTION_EXECUTE_HANDLER;
-        }
+        }   // sehHandler
 
+        // --------------------------------------------------------------------
         void pureCallHandler()
         {
             winCrashHandler();
-        }
+        }   // pureCallHandler
 
+        // --------------------------------------------------------------------
         int newHandler( size_t )
         {
             winCrashHandler();
             return 0;
-        }
+        }   // newHandler
 
-        void invalidParameterHandler(const wchar_t *, const wchar_t *, const wchar_t *, unsigned int, uintptr_t)
+        // --------------------------------------------------------------------
+        void invalidParameterHandler(const wchar_t *, const wchar_t *,
+                                     const wchar_t *, unsigned int, uintptr_t)
         {
             winCrashHandler();
-        }
+        }   // invalidParameterHandler
 
+        // --------------------------------------------------------------------
         void signalHandler(int code)
         {
             winCrashHandler();
-        }
+        }   // signalHandler
+        // --------------------------------------------------------------------
 
         void installHandlers()
         {
@@ -144,38 +160,41 @@
 
             // ----- Per-thread handlers -----
             // TODO
-        }
+        }   // installHandlers
+        // --------------------------------------------------------------------
 
         void getCallStackWithContext(std::string& callstack, PCONTEXT pContext)
         {
-            HINSTANCE hImageHlpDll = LoadLibraryA("imagehlp.dll");
-            if(!hImageHlpDll)
+            HINSTANCE hDbgHelpDll = LoadLibraryA("DbgHelp.dll");
+            if (!hDbgHelpDll)
             {
-                Log::warn("CrashReporting", "Failed to load DLL imagehlp.dll");
-                callstack = "Crash reporting failed to load DLL imagehlp.dll";
+                Log::warn("CrashReporting", "Failed to load DLL dbghelp.dll");
+                callstack = "Crash reporting failed to load DLL dbghelp.dll";
                 return;
             }
 
             // Retrieve the DLL functions
 #define GET_FUNC_PTR(FuncName)  \
-    t##FuncName _##FuncName = (t##FuncName)GetProcAddress(hImageHlpDll, #FuncName); \
+    t##FuncName _##FuncName = (t##FuncName)GetProcAddress(hDbgHelpDll, #FuncName); \
     if(!_##FuncName) {    \
-    Log::warn("CrashReporting", "Failed to import symbol " #FuncName " from imagehlp.dll"); \
-            FreeLibrary(hImageHlpDll);  \
+    Log::warn("CrashReporting", "Failed to import symbol " #FuncName " from hDbgHelpDll"); \
+            FreeLibrary(hDbgHelpDll);  \
             return; \
-    }
+    } 
 
-            GET_FUNC_PTR(SymCleanup                 )
-            GET_FUNC_PTR(SymFunctionTableAccess64   )
-            GET_FUNC_PTR(SymGetLineFromAddr64       )
-            GET_FUNC_PTR(SymGetModuleBase64         )
-            GET_FUNC_PTR(SymGetSymFromAddr64        )
-            GET_FUNC_PTR(SymInitialize              )
-            GET_FUNC_PTR(SymSetOptions              )
-            GET_FUNC_PTR(StackWalk64                )
-            GET_FUNC_PTR(UnDecorateSymbolName       )
+                GET_FUNC_PTR(SymCleanup)
+                GET_FUNC_PTR(SymFunctionTableAccess64)
+                GET_FUNC_PTR(SymGetLineFromAddr64)
+                GET_FUNC_PTR(SymGetModuleBase64)
+                GET_FUNC_PTR(SymGetSymFromAddr64)
+                GET_FUNC_PTR(SymInitialize)
+                GET_FUNC_PTR(SymSetOptions)
+                GET_FUNC_PTR(UnDecorateSymbolName)
+                GET_FUNC_PTR(SymFromAddr);
+                GET_FUNC_PTR(StackWalk64);
 
 #undef GET_FUNC_PTR
+
 
             const HANDLE  hProcess  = GetCurrentProcess();
             const HANDLE  hThread   = GetCurrentThread();
@@ -188,7 +207,7 @@
                 if(!filepath)
                 {
                     Log::warn("CrashReporting", "GetModuleFileNameA failed");
-                    FreeLibrary(hImageHlpDll);
+                    FreeLibrary(hDbgHelpDll);
                     return;
                 }
 
@@ -209,7 +228,7 @@
                     if (!bOk)
                     {
                         Log::warn("CrashReporting", "SymInitialize() failed");
-                        FreeLibrary(hImageHlpDll);
+                        FreeLibrary(hDbgHelpDll);
                         return;
                     }
 
@@ -220,24 +239,25 @@
 
             // Get the stack trace
             {
-                // Initialize the IMAGEHLP_SYMBOL64 structure
-                const size_t    MaxNameLength = 256;
-                IMAGEHLP_SYMBOL64*  sym = (IMAGEHLP_SYMBOL64*)_malloca(sizeof(IMAGEHLP_SYMBOL64) + MaxNameLength);
-                sym->SizeOfStruct = sizeof(IMAGEHLP_SYMBOL64);
-                sym->MaxNameLength = MaxNameLength;
-
                 // Initialize the STACKFRAME structure so that it
                 // corresponds to the current function call
                 STACKFRAME64    stackframe;
                 memset(&stackframe, 0, sizeof(stackframe));
-                stackframe.AddrPC.Offset    = pContext->Eip;
                 stackframe.AddrPC.Mode      = AddrModeFlat;
-                stackframe.AddrStack.Offset = pContext->Esp;
                 stackframe.AddrStack.Mode   = AddrModeFlat;
-                stackframe.AddrFrame.Offset = pContext->Ebp;
                 stackframe.AddrFrame.Mode   = AddrModeFlat;
+#ifdef _WIN64
+                stackframe.AddrPC.Offset    = pContext->Rip;
+                stackframe.AddrStack.Offset = pContext->Rsp;
+                stackframe.AddrFrame.Offset = pContext->Rsp;
+                const DWORD machine_type    = IMAGE_FILE_MACHINE_AMD64;
+#else
+                stackframe.AddrPC.Offset    = pContext->Eip;
+                stackframe.AddrStack.Offset = pContext->Esp;
+                stackframe.AddrFrame.Offset = pContext->Ebp;
+                const DWORD machine_type = IMAGE_FILE_MACHINE_I386;
+#endif
 
-                const DWORD machine_type    = IMAGE_FILE_MACHINE_I386;
 
                 // Walk the stack
                 const int   max_nb_calls = 32;
@@ -256,10 +276,12 @@
                     {
                         // Decode the symbol and add it to the call stack
                         DWORD64 sym_displacement;
-                        if(_SymGetSymFromAddr64(    hProcess,
-                                                    stackframe.AddrPC.Offset,
-                                                    &sym_displacement,
-                                                    sym))
+                        char buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
+                        PSYMBOL_INFO symbol = (PSYMBOL_INFO)buffer;
+                        symbol->MaxNameLen = MAX_SYM_NAME;
+                        symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+                        if(_SymFromAddr(hProcess, stackframe.AddrPC.Offset,
+                                        &sym_displacement, symbol)         )
                         {
                             IMAGEHLP_LINE64 line64;
                             DWORD   dwDisplacement = (DWORD)sym_displacement;
@@ -278,7 +300,7 @@
                                 }
                                 callstack += filename;
                                 callstack += ":";
-                                callstack += sym->Name;
+                                callstack += symbol->Name;
 
                                 char str[128];
                                 _itoa(line64.LineNumber, str, 10);
@@ -288,7 +310,7 @@
                             else
                             {
                                 callstack += "\n ";
-                                callstack += sym->Name;
+                                callstack += symbol->Name;
                             }
                         }
                         else
@@ -299,26 +321,22 @@
                 }
             }
 
-            FreeLibrary(hImageHlpDll);
-        }
+            FreeLibrary(hDbgHelpDll);
+        }   //   // getCallStackWithContext
 
-
+        // --------------------------------------------------------------------
         void getCallStack(std::string& callstack)
         {
-            // Get the current CONTEXT
-            // NB: this code is ONLY VALID FOR X86 (32 bit)!
-            CONTEXT ctx;
-            memset(&ctx, '\0', sizeof(ctx));
-            ctx.ContextFlags = CONTEXT_FULL;
-            __asm    call x
-            __asm x: pop eax    // get eip (can't directly use mov)
-            __asm    mov ctx.Eip, eax
-            __asm    mov ctx.Ebp, ebp
-            __asm    mov ctx.Esp, esp
+            CONTEXT context;
+            memset(&context, 0, sizeof(CONTEXT));
+            context.ContextFlags = CONTEXT_FULL;
+            RtlCaptureContext(&context);
+            getCallStackWithContext(callstack, &context);
+        }   // getCallStack
 
-            getCallStackWithContext(callstack, &ctx);
-        }
     }   // end namespace CrashReporting
+
+// ============================================================================
 
 #elif ENABLE_LIBBFD
     // --------------------- Unix version -----------------------
