@@ -421,7 +421,7 @@ void handleXmasMode()
     }   // switch m_xmas_mode
 
     if(xmas)
-        kart_properties_manager->setHatMeshName("christmas_hat.b3d");
+        kart_properties_manager->setHatMeshName("christmas_hat.spm");
 }   // handleXmasMode
 // ============================================================================
 /** Determines if Easter Ears should be used
@@ -478,7 +478,7 @@ void handleEasterEarMode()
     int day, month, year;
     StkTime::getDate(&day, &month, &year);
     if (isEasterMode(day, month, year, /*before_after_days*/5))
-        kart_properties_manager->setHatMeshName("easter_ears.b3d");
+        kart_properties_manager->setHatMeshName("easter_ears.spm");
 }   // handleEasterMode
 
 // ============================================================================

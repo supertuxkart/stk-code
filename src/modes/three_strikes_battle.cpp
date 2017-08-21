@@ -51,7 +51,7 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
     m_insert_tire = 0;
 
     m_tire = irr_driver->getMesh(file_manager->getAsset(FileManager::MODEL,
-                                 "tire.b3d") );
+                                 "tire.spm") );
     irr_driver->grabAllTextures(m_tire);
 
     m_total_rescue = 0;
@@ -375,7 +375,7 @@ void ThreeStrikesBattle::update(float dt)
         if(m_insert_tire == 1)
         {
             tire_offset = core::vector3df(0.0f, 0.0f, 0.0f);
-            tire = file_manager->getAsset(FileManager::MODEL,"tire.b3d");
+            tire = file_manager->getAsset(FileManager::MODEL,"tire.spm");
             scale = 0.5f;
             radius = 0.5f;
             body_shape = PhysicalObject::MP_CYLINDER_Y;
@@ -387,13 +387,13 @@ void ThreeStrikesBattle::update(float dt)
             radius = m_tire_radius[m_insert_tire-2];
             tire_offset = m_tire_offsets[m_insert_tire-2];
             if     (m_insert_tire == 2)
-                tire = m_tire_dir+"/wheel-rear-left.b3d";
+                tire = m_tire_dir+"/wheel-rear-left.spm";
             else if(m_insert_tire == 3)
-                tire = m_tire_dir+"/wheel-front-left.b3d";
+                tire = m_tire_dir+"/wheel-front-left.spm";
             else if(m_insert_tire == 4)
-                tire = m_tire_dir+"/wheel-front-right.b3d";
+                tire = m_tire_dir+"/wheel-front-right.spm";
             else if(m_insert_tire == 5)
-                tire = m_tire_dir+"/wheel-rear-right.b3d";
+                tire = m_tire_dir+"/wheel-rear-right.spm";
             if(!file_manager->fileExists(tire))
             {
                 m_insert_tire--;

@@ -770,7 +770,7 @@ void KartModel::loadHeadlights(const XMLNode &node)
         const XMLNode* child = node.getNode(i);
         if (child->getName() == "object")
         {
-            // <object position="-0.168000 0.151288 0.917929" model="TuxHeadlight.b3d"/>
+            // <object position="-0.168000 0.151288 0.917929" model="TuxHeadlight.spm"/>
             core::vector3df position;
             child->get("position", &position);
 
