@@ -21,12 +21,6 @@
 
 #include <string>
 
-#include <Windows.h>
-#include <DbgHelp.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <new.h>
-
 namespace CrashReporting
 {
     void installHandlers();
