@@ -256,7 +256,7 @@ void MainLoop::run()
         // enabled.
         if (!m_abort && !ProfileWorld::isNoGraphics())
         {
-            PROFILER_PUSH_CPU_MARKER("Music/input/GUI", 0x7F, 0x00, 0x00);
+            PROFILER_PUSH_CPU_MARKER("Input/GUI", 0x7F, 0x00, 0x00);
             input_manager->update(dt);
 
             #ifdef ENABLE_WIIUSE
@@ -269,7 +269,7 @@ void MainLoop::run()
             // Update sfx and music after graphics, so that graphics code
             // can use as many threads as possible without interfering
             // with audio
-            PROFILER_PUSH_CPU_MARKER("Music/input/GUI", 0x7F, 0x00, 0x00);
+            PROFILER_PUSH_CPU_MARKER("Music", 0x7F, 0x00, 0x00);
             SFXManager::get()->update();
             PROFILER_POP_CPU_MARKER();
 

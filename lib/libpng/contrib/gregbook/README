@@ -15,7 +15,7 @@ of PBMPLUS/NetPBM) and converts them to PNG.
 
 The source code for all three demo programs currently compiles under
 Unix, OpenVMS, and 32-bit Windows.  (Special thanks to Martin Zinser,
-zinser@decus.de, for making the necessary changes for OpenVMS and for
+zinser at decus.de, for making the necessary changes for OpenVMS and for
 providing an appropriate build script.)  Build instructions can be found
 below.
 

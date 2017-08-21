@@ -18,6 +18,8 @@
 #include "IImagePresenter.h"
 #include "ICursorControl.h"
 
+#include <map>
+
 
 namespace irr
 {
@@ -35,6 +37,7 @@ namespace irr
 		virtual void yield();
 		virtual void sleep(u32 timeMs, bool pauseTimer=false);
 		virtual void setWindowCaption(const wchar_t* text);
+		virtual void setWindowClass(const char* text) {}
 		virtual bool present(video::IImage* surface, void* windowId, core::rect<s32>* srcClip);
 		virtual bool isWindowActive() const;
 		virtual bool isWindowFocused() const;
@@ -53,7 +56,6 @@ namespace irr
 		virtual bool deactivateGyroscope();
 		virtual bool isGyroscopeActive();
 		virtual bool isGyroscopeAvailable();
-		video::IVideoModeList* getVideoModeList();
 		
 		class CCursorControl : public gui::ICursorControl
 		{
@@ -103,16 +105,16 @@ namespace irr
 		static bool IsPaused;
 		static bool IsFocused;
 		static bool IsStarted;
-		static bool IsClosing;
 		
 		bool IsMousePressed;
 
 		video::SExposedVideoData ExposedVideoData;
 
-		core::array<EKEY_CODE> KeyMap;
+		std::map<int, EKEY_CODE> KeyMap;
 		
 		void createDriver();
 		void createKeyMap();
+		void createVideoModeList();
 		void getKeyChar(SEvent& event);
 		video::SExposedVideoData& getExposedVideoData();
 		

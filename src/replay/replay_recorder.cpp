@@ -31,6 +31,7 @@
 #include <algorithm>
 #include <stdio.h>
 #include <string>
+#include <karts/controller/player_controller.hpp>
 
 ReplayRecorder *ReplayRecorder::m_replay_recorder = NULL;
 
@@ -222,9 +223,12 @@ void ReplayRecorder::save()
     fprintf(fd, "version: %d\n",    getReplayVersion());
     for (unsigned int real_karts = 0; real_karts < num_karts; real_karts++)
     {
-        if (world->getKart(real_karts)->isGhostKart()) continue;
-        fprintf(fd, "kart: %s\n",
-            world->getKart(real_karts)->getIdent().c_str());
+        const AbstractKart *kart = world->getKart(real_karts);
+        if (kart->isGhostKart()) continue;
+
+        // XML encode the username to handle Unicode
+        fprintf(fd, "kart: %s %s\n", kart->getIdent().c_str(),
+                StringUtils::xmlEncode(kart->getController()->getName()).c_str());
     }
 
     fprintf(fd, "kart_list_end\n");

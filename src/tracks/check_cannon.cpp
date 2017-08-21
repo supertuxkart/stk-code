@@ -141,7 +141,10 @@ void CheckCannon::changeDebugColor(bool is_active)
 void CheckCannon::trigger(unsigned int kart_index)
 {
     AbstractKart *kart = World::getWorld()->getKart(kart_index);
-    if(kart->getKartAnimation()) return;
+    if (kart->getKartAnimation() || kart->isGhostKart())
+    {
+        return;
+    }
 
     // The constructor AbstractKartAnimation resets the skidding to 0. So in
     // order to smooth rotate the kart, we need to keep the current visual

@@ -317,8 +317,9 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
+    video::E_VERTEX_TYPE cur_dis_type = video::EVT_2TCOORDS;
     if (CVS->isARBBaseInstanceUsable())
-        glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_2TCOORDS));
+        glBindVertexArray(VAOManager::getInstance()->getVAO(cur_dis_type));
     // Generate displace mask
     // Use RTT_TMP4 as displace mask
     if (ListDisplacement::getInstance()->size() > 0)
@@ -334,12 +335,10 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
             glBindVertexArray(mesh.vao);
         const core::matrix4 &AbsoluteTransformation
             = std::get<1>(ListDisplacement::getInstance()->at(i));
-        if (mesh.VAOType != video::EVT_2TCOORDS)
+        if (mesh.VAOType != cur_dis_type && CVS->isARBBaseInstanceUsable())
         {
-#ifdef DEBUG
-            Log::error("Materials", "Displacement has wrong vertex type");
-#endif
-            continue;
+            cur_dis_type = mesh.VAOType;
+            glBindVertexArray(VAOManager::getInstance()->getVAO(cur_dis_type));
         }
 
         GLenum ptype = mesh.PrimitiveType;
@@ -357,6 +356,9 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
         displace_framebuffer.bind();
         glClear(GL_COLOR_BUFFER_BIT);
     }
+    cur_dis_type = video::EVT_2TCOORDS;
+    if (CVS->isARBBaseInstanceUsable())
+        glBindVertexArray(VAOManager::getInstance()->getVAO(cur_dis_type));
     for (unsigned i = 0; i < ListDisplacement::getInstance()->size(); i++)
     {
         const GLMesh &mesh = 
@@ -365,8 +367,11 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
             glBindVertexArray(mesh.vao);
         const core::matrix4 &AbsoluteTransformation =
             std::get<1>(ListDisplacement::getInstance()->at(i));
-        if (mesh.VAOType != video::EVT_2TCOORDS)
-            continue;
+        if (mesh.VAOType != cur_dis_type && CVS->isARBBaseInstanceUsable())
+        {
+            cur_dis_type = mesh.VAOType;
+            glBindVertexArray(VAOManager::getInstance()->getVAO(cur_dis_type));
+        }
 
         GLenum ptype = mesh.PrimitiveType;
         GLenum itype = mesh.IndexType;

@@ -12,10 +12,11 @@
 ## Where zlib.h, zconf.h and zlib_MODEL.lib are
 ZLIB_DIR=..\zlib
 
-## Compiler, linker and lib stuff
+## Compiler, linker, librarian and other tools
 CC=bcc
 LD=bcc
 LIB=tlib
+CP=copy
 
 !ifndef MODEL
 MODEL=l
@@ -51,10 +52,17 @@ LDEBUG=$(LDEBUG) -N
 # -w  set all warnings on
 # -O2 optimize for speed
 # -Z  global optimization
-CFLAGS=-O2 -Z -X- -w -I$(ZLIB_DIR) -$(TARGET_CPU) $(MODEL_ARG) $(CDEBUG)
+CPPFLAGS=-I$(ZLIB_DIR)
+CFLAGS=-O2 -Z -X- -w -$(TARGET_CPU) $(MODEL_ARG) $(CDEBUG)
 
 # -M  generate map file
 LDFLAGS=-M -L$(ZLIB_DIR) $(MODEL_ARG) $(LDEBUG)
+
+# Pre-built configuration
+# See scripts\pnglibconf.mak for more options
+!ifndef PNGLIBCONF_H_PREBUILT
+PNGLIBCONF_H_PREBUILT = scripts\pnglibconf.h.prebuilt
+!endif
 
 ## Variables
 
@@ -99,18 +107,19 @@ LIBNAME=libpng$(MODEL).lib
 # Braces let make "batch" calls to the compiler,
 # 2 calls instead of 12; space is important.
 .c.obj:
-	$(CC) $(CFLAGS) -c {$*.c }
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c {$*.c }
 
 .c.exe:
-	$(CC) $(CFLAGS) $(LDFLAGS) $*.c $(LIBNAME) zlib_$(MODEL).lib $(NOEHLIB)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $*.c \
+	  $(LIBNAME) zlib_$(MODEL).lib $(NOEHLIB)
 
 ## Major targets
 
 all: libpng pngtest
 
-# try !inlude scripts\pnglibconf.mak for more options
-pnglibconf.h: scripts\pnglibconf.h.prebuilt
-	copy scripts\pnglibconf.h.prebuilt $@
+# try !include scripts\pnglibconf.mak for more options
+pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
+	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
 
 libpng: $(LIBNAME)
 

@@ -13,6 +13,7 @@
 #include <commdlg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <zlib.h>
 
 #include "png.h"
 #include "pngfile.h"

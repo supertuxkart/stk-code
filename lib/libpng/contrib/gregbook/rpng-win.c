@@ -182,7 +182,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, PSTR cmd, int showmode)
 #ifndef __CYGWIN__
     /* First reenable console output, which normally goes to the bit bucket
      * for windowed apps.  Closing the console window will terminate the
-     * app.  Thanks to David.Geldreich@realviz.com for supplying the magical
+     * app.  Thanks to David.Geldreich at realviz.com for supplying the magical
      * incantation. */
 
     AllocConsole();

@@ -129,6 +129,12 @@ void AbstractKart::setKartAnimation(AbstractKartAnimation *ka)
         else   Log::debug("Abstract_Kart", "Current kart animation is NULL.");
     }
 #endif
+    if (ka != NULL && m_kart_animation != NULL)
+    {
+        delete m_kart_animation;
+        m_kart_animation = NULL;
+    }
+
     // Make sure that the either the current animation is NULL and a new (!=0)
     // is set, or there is a current animation, then it must be set to 0. This
     // makes sure that the calling logic of this function is correct.

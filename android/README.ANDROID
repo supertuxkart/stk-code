@@ -31,7 +31,8 @@ after some tweaks, but atm. only linux is supported.
 
 Dependencies list (may be incomplete):
 
-    autoconf, automake, make, python, ant, imagemagick, cmake, vorbis-tools
+    autoconf, automake, make, python, gradle, ant, imagemagick, cmake, 
+    vorbis-tools
 
 Additionally some dependencies for optimize_data script:
 
@@ -43,13 +44,12 @@ and extract it to stk-code/lib. It contains sources of libraries that are used
 in STK, but are not availiable in stk-code repository (curl, freetype, openal).
 
 You need also Android SDK for android-19 platform (the API for Android 4.4) and
-Android NDK (versions r12b and r13b have been tested).
+Android NDK r12b.
 
 You need to create proper "android-sdk" and "android-ndk" symlinks in the
 directory with Android project, so that the compilation script will have access
-to the SDK and NDK.
-
-These paths can be also set in SDK_PATH and NDK_PATH environmental variables.
+to the SDK and NDK. These paths can be also set in SDK_PATH and NDK_PATH 
+environmental variables.
 
 Before running the compilation, run the generate_assets script, so that
 selected assets will be copied to "assets" directory, and then included in the
@@ -74,6 +74,14 @@ You can choose build type by setting BUILD_TYPE environment variable to "debug"
 or "release". The default is debug build. Note that if you choose release build,
 you have to manually sign the apk with your key and run zipalign.
 
+Additionally you can choose the build tool by setting BUILD_TOOL environment
+variable to "gradle" or "ant". Note that ant has been already removed from
+Android SDK, so you have to use SDK <= 25.2.5 for building with ant. By default 
+the BUILD_TOOL is set to "gradle".
+
+You can override the SDK build-tools version by setting the BUILD_TOOLS_VER
+environment variable.
+
 Basically if all dependencies are installed in the system, it should be enough
 to just run:
 
@@ -81,6 +89,59 @@ to just run:
     export NDK_PATH=/path/to/your/android/ndk
     ./generate_assets.sh
     ./make.sh -j5
+
+
+
+--------------------------------------------------------------------------------
+ RELEASE BUILD
+--------------------------------------------------------------------------------
+
+Making a release build is similar to typical compilation, but there are few
+additional things to do. 
+
+You have to change version numbers. This is important, because assets manager
+in STK checks these numbers and detects if already extracted data files are
+up to date. So that when you will install new STK version, this will force new 
+data extraction automatically.
+
+So that you have to:
+
+1. Change "data/supertuxkart.git" to "data/supertuxkart.VERSION_NUMBER"
+
+2. Open "src/utils/constants.cpp" and change:
+
+    const char STK_VERSION[] = "git";
+      
+   to
+    
+    const char STK_VERSION[] = "VERSION_NUMBER";
+      
+   where "VERSION_NUMBER" is for example "0.9.3" or "git20170409" or whatever.
+    
+3. You can also update these lines in "android/AndroidManifest.xml":
+    android:versionCode="1"
+    android:versionName="1.0"
+
+
+Before compilation you have to set:
+
+    export BUILD_TYPE=release
+
+and then you make standard compilation with:
+
+    ./generate_assets.sh
+    ./make.sh -j5
+    
+
+The compiled apk is unsigned, so you have to sign it with your key. To sign it,
+you have to run:
+
+    jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore \
+        my-release-key.keystore SuperTuxKart-release-unsigned.apk alias_name
+        
+and then:
+
+    zipalign -v 4 SuperTuxKart-release-unsigned.apk SuperTuxKart-release.apk
 
 
 
@@ -105,18 +166,14 @@ to just run:
     It seems to affect only Android 5.0. More information about the crash:
     https://code.google.com/p/android/issues/detail?id=160824
 
-4.  STK crashes on Qualcomm with Adreno 305 when trying to draw menu interface.
-    Backtrace shows glDrawElements function, and internally crashed in vbo
-    allocation.
-
-5.  STK crashes on startup on some devices when aarch64 build is made using
+4.  STK crashes on startup on some devices when aarch64 build is made using
     Android r13 NDK. The r13 version has rather big modifications (it uses clang
     instead of gcc by default). This is probably a bug in NDK/compiler/OS, but
     for this reason using NDK r12 for 64-bit arm compilation is preferred.
 
-6.  Angelscript doesn't have full support for aarch64 builds, so that scripting
+5.  Angelscript doesn't have full support for aarch64 builds, so that scripting
     won't work on this platform.
     
-7.  Turning left/right using accelerometer is available, but at this stage the
+6.  Turning left/right using accelerometer is available, but at this stage the
     default screen orientation is not automatically detected and user must 
     manually choose if he needs "phone" or "tablet" accelerometer.

@@ -95,7 +95,7 @@ namespace
     {
         v *= (1.0f/255.0f);
         if( v <= 0.04045f )
-            v = v * (1.0f/12.92);
+            v = v * (1.0f/12.92f);
         else
             v = pow( ( v + 0.055f ) * (1.0f/1.055f), 2.4f );
         return v;

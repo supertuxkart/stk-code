@@ -164,6 +164,8 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
         code << "#define VSLayer\n";
     if (CVS->needsRGBBindlessWorkaround())
         code << "#define SRGBBindlessFix\n";
+    if (CVS->needsVertexIdWorkaround())
+        code << "#define Needs_Vertex_Id_Workaround\n";
     if (CVS->isDefferedEnabled())
         code << "#define Advanced_Lighting_Enabled\n";
 

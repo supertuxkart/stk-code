@@ -10,16 +10,12 @@
 
 #include "IrrCompileConfig.h"
 
-#if defined(_IRR_WINDOWS_API_)
-// include windows headers for HWND
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
-#elif defined(_IRR_COMPILE_WITH_OSX_DEVICE_)
+#if defined(_IRR_COMPILE_WITH_OSX_DEVICE_)
 #include "MacOSX/CIrrDeviceMacOSX.h"
 #elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 #include "iOS/CIrrDeviceiOS.h"
+#elif _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#include "CIrrDeviceWayland.h"
 #endif
 
 #include "SIrrCreationParameters.h"
@@ -30,11 +26,8 @@
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
-#include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #include "android_native_app_glue.h"
-#else
-#include <EGL/eglplatform.h>
 #endif
 
 #include "CNullDriver.h"
@@ -43,10 +36,11 @@
 #include "fast_atof.h"
 
 #ifdef _MSC_VER
-#pragma comment(lib, "libEGL.lib")
 #pragma comment(lib, "libGLESv2.lib")
 #endif
 #include "COGLES2ExtensionHandler.h"
+
+class ContextManagerEGL;
 
 namespace irr
 {
@@ -69,6 +63,11 @@ namespace video
 		COGLES2Driver(const SIrrlichtCreationParameters& params,
 					const SExposedVideoData& data,
 					io::IFileSystem* io);
+#endif
+
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+		COGLES2Driver(const SIrrlichtCreationParameters& params, 
+					io::IFileSystem* io, CIrrDeviceWayland* device);
 #endif
 
 #ifdef _IRR_COMPILE_WITH_OSX_DEVICE_
@@ -340,9 +339,6 @@ namespace video
 		//! checks if an OpenGL error has happend and prints it
 		bool testGLError();
 
-		//! checks if an OGLES1 error has happend and prints it
-		bool testEGLError();
-
 		//! Set/unset a clipping plane.
 		virtual bool setClipPlane(u32 index, const core::plane3df& plane, bool enable = false);
 
@@ -381,8 +377,10 @@ namespace video
 
 		//! Get bridge calls.
         COGLES2CallBridge* getBridgeCalls() const;
-
-		void reloadEGLSurface(void* window);
+        
+#if defined(_IRR_COMPILE_WITH_EGL_)
+		ContextManagerEGL* getEGLContext() {return EglContext;}
+#endif
 
 	private:
 		// Bridge calls.
@@ -466,21 +464,19 @@ namespace video
 		SColorf AmbientLight;
 
 		COGLES2Renderer2D* MaterialRenderer2D;
-
-#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-		HDC HDc;
+		
+#if defined(_IRR_COMPILE_WITH_EGL_)
+		ContextManagerEGL* EglContext;
+		bool EglContextExternal;
 #endif
 #if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 		CIrrDeviceIPhone* Device;
 		GLuint ViewFramebuffer;
 		GLuint ViewRenderbuffer;
 		GLuint ViewDepthRenderbuffer;
-#else
-		NativeWindowType EglWindow;
-		void* EglDisplay;
-		void* EglSurface;
-		void* EglContext;
-		EGLConfig EglConfig;
+#endif
+#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+		HDC HDc;
 #endif
 
 		SIrrlichtCreationParameters Params;

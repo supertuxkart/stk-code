@@ -561,7 +561,7 @@ bool CGUIEnvironment::postEventFromUser(const SEvent& event)
 			// Send focus changing event
 			if (event.EventType == EET_KEY_INPUT_EVENT &&
 				event.KeyInput.PressedDown &&
-				event.KeyInput.Key == KEY_TAB)
+				event.KeyInput.Key == IRR_KEY_TAB)
 			{
 				IGUIElement *next = getNextElement(event.KeyInput.Shift, event.KeyInput.Control);
 				if (next && next != Focus)

@@ -33,6 +33,7 @@
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/skybox.hpp"
+#include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/spherical_harmonics.hpp"
 #include "items/item_manager.hpp"
@@ -58,12 +59,9 @@ void ShaderBasedRenderer::setRTT(RTT* rtts)
                                  rtts->getDepthStencilTexture());
         m_geometry_passes->setFirstPassRenderTargets(prefilled_textures,
             rtts->getPrefilledHandles());
-        m_rtts = rtts;
     }
-    else if (rtts == NULL)
-    {
-        m_rtts = NULL;
-    }
+    
+    m_rtts = rtts;
 } //setRTT
 
 // ----------------------------------------------------------------------------
@@ -659,6 +657,7 @@ ShaderBasedRenderer::~ShaderBasedRenderer()
     delete m_skybox;
     delete m_rtts;
     ShaderFilesManager::kill();
+    STKBillboard::destroyBillboardVAO();
 }
 
 // ----------------------------------------------------------------------------

@@ -193,10 +193,29 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         scale = 30.0f;
     }
 
+    const bool has_win_anime =
+        UserConfigParams::m_show_steering_animations != 0 &&
+        (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
+        kart_model.getFrame(KartModel::AF_WIN_START) > -1) &&
+        kart_model.getFrame(KartModel::AF_WIN_END) > -1) ||
+        (kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 &&
+        kart_model.getFrame(KartModel::AF_SELECTION_END) > -1));
     m_model_view->addModel( kart_model.getModel(), Vec3(0,0,0),
-                            Vec3(scale, scale, scale),
-                            kart_model.getBaseFrame(),
-                            kart_model.getBaseFrame() );
+        Vec3(scale, scale, scale),
+        has_win_anime ?
+        kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 ?
+        kart_model.getFrame(KartModel::AF_SELECTION_START) :
+        kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ?
+        kart_model.getFrame(KartModel::AF_WIN_LOOP_START) :
+        kart_model.getFrame(KartModel::AF_WIN_START) :
+        kart_model.getBaseFrame(),
+        has_win_anime ?
+        kart_model.getFrame(KartModel::AF_SELECTION_END) > -1 ?
+        kart_model.getFrame(KartModel::AF_SELECTION_END) :
+        kart_model.getFrame(KartModel::AF_WIN_END) :
+        kart_model.getBaseFrame(),
+        false/*all_parts_colorized*/,
+        kart_model.getAnimationSpeed());
     m_model_view->addModel( kart_model.getWheelModel(0),
                             kart_model.getWheelGraphicsPosition(0) );
     m_model_view->addModel( kart_model.getWheelModel(1),

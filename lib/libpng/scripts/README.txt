@@ -1,9 +1,9 @@
 
-Makefiles for  libpng version 1.5.9 - February 18, 2012
+Makefiles for  libpng version 1.5.28 - December 29, 2016
 
 pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.linux    =>  Linux/ELF makefile
-                       (gcc, creates libpng15.so.15.1.5.9)
+                       (gcc, creates libpng15.so.15.1.5.28)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
                        ansi2knr (Requires ansi2knr.c from
@@ -15,12 +15,11 @@ pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.bc32     =>  32-bit Borland C++ (all modules compiled in C mode)
  makefile.beos     =>  beos makefile
  makefile.bor      =>  Borland makefile (uses bcc)
- makefile.cegcc    =>  minge32ce for Windows CE makefile
+ makefile.cegcc    =>  minge32ce for Windows CE makefile (only included in the
+                       tar distributions, because it depends on "configure")
  makefile.darwin   =>  Darwin makefile, can use on MacosX
  makefile.dec      =>  DEC Alpha UNIX makefile
  makefile.dj2      =>  DJGPP 2 makefile
- makefile.elf      =>  Linux/ELF makefile symbol versioning,
-                       (gcc, creates libpng15.so.15.1.5.9)
  makefile.freebsd  =>  FreeBSD makefile
  makefile.gcc      =>  Generic gcc makefile
  makefile.hpgcc    =>  HPUX makefile using gcc
@@ -35,12 +34,12 @@ pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.os2      =>  OS/2 Makefile (gcc and emx, requires libpng.def)
  makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc
  makefile.sggcc    =>  Silicon Graphics (gcc,
-                       creates libpng15.so.15.1.5.9)
+                       creates libpng15.so.15.1.5.28)
  makefile.sgi      =>  Silicon Graphics IRIX makefile (cc, creates static lib)
  makefile.solaris  =>  Solaris 2.X makefile (gcc,
-                       creates libpng15.so.15.1.5.9)
+                       creates libpng15.so.15.1.5.28)
  makefile.so9      =>  Solaris 9 makefile (gcc,
-                       creates libpng15.so.15.1.5.9)
+                       creates libpng15.so.15.1.5.28)
  makefile.std      =>  Generic UNIX makefile (cc, creates static libpng.a)
  makefile.sunos    =>  Sun makefile
  makefile.32sunu   =>  Sun Ultra 32-bit makefile
@@ -57,7 +56,7 @@ Other supporting scripts:
  libpng-config-body.in => used by several makefiles to create libpng-config
  libpng-config-head.in => used by several makefiles to create libpng-config
  libpng.pc.in      =>  Used by several makefiles to create libpng.pc
- pngwin.rc         =>  Used by the visualc71 project.
+ pngwin.rc         =>  Used by the visualc71 and vstudio projects.
  pngwin.def        =>  Used by makefile.os2
  pngwin.dfn        =>  Used to maintain pngwin.def
  SCOPTIONS.ppc     =>  Used with smakefile.ppc

@@ -22,6 +22,7 @@
 #include "input/input_device.hpp"
 #include "utils/cpp2011.hpp"
 
+#include <vector>
 class GamepadConfig;
 
 /**
@@ -31,9 +32,9 @@ class GamepadConfig;
 class GamePadDevice : public InputDevice
 {
     void resetAxisDirection(const int axis, Input::AxisDirection direction);
-    bool* m_buttonPressed;
+    std::vector<bool> m_button_pressed;
 
-    Input::AxisDirection *m_prev_axis_directions;
+    std::vector<Input::AxisDirection> m_prev_axis_directions;
 
     /** used to determine if an axis is valid; an axis is considered valid
       * when at least 2 different values are read from this axis (if an axis
@@ -43,10 +44,10 @@ class GamePadDevice : public InputDevice
       * on linux some hard disks may be reported as gamepads with
       * uninteresting axis values)
       */
-    int                  *m_prev_axis_value;
+    std::vector<int> m_prev_axis_value;
 
     /** \see m_prev_axis_value */
-    bool                 *m_axis_ok;
+    std::vector<bool> m_axis_ok;
 
     /** Irrlicht index of this gamepad. */
     int                   m_irr_index;

@@ -260,7 +260,7 @@ public:
 };   // InstancedGrassShadowShader
 
 // ============================================================================
-class GrassPass2Shader : public TextureShader<GrassPass2Shader, 7,
+class GrassPass2Shader : public TextureShader<GrassPass2Shader, 6,
                                               core::matrix4, core::vector3df,
                                               core::vector2df>
 {
@@ -270,7 +270,7 @@ public:
 
 // ============================================================================
 class InstancedGrassPass2Shader
-          : public TextureShader<InstancedGrassPass2Shader, 7, core::vector3df>
+          : public TextureShader<InstancedGrassPass2Shader, 6, core::vector3df>
 {
 public:
     InstancedGrassPass2Shader();
