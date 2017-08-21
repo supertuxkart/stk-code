@@ -18,13 +18,12 @@
 #ifndef HEADER_SP_MESH_LOADER_HPP
 #define HEADER_SP_MESH_LOADER_HPP
 
-#include "../lib/irrlicht/source/Irrlicht/CSkinnedMesh.h"
-#include "utils/types.hpp"
-
 #include <IMeshLoader.h>
 #include <ISceneManager.h>
+#include <ISkinnedMesh.h>
 #include <IReadFile.h>
 #include <array>
+#include <cstdint>
 #include <vector>
 
 using namespace irr;
@@ -382,7 +381,7 @@ private:
     // ------------------------------------------------------------------------
     void convertIrrlicht();
 
-    scene::CSkinnedMesh* m_mesh;
+    scene::ISkinnedMesh* m_mesh;
 
     scene::ISceneManager* m_scene_manager;
 

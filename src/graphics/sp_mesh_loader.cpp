@@ -48,7 +48,7 @@ scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
     m_joint_count = 0;
     //m_frame_count = 0;
     m_mesh = NULL;
-    m_mesh = new scene::CSkinnedMesh();
+    m_mesh = m_scene_manager->createSkinnedMesh();
     io::IFileSystem* fs = m_scene_manager->getFileSystem();
     std::string base_path = fs->getFileDir(f->getFileName()).c_str();
     std::string header;
@@ -325,6 +325,23 @@ void SPMeshLoader::decompress(irr::io::IReadFile* spm, unsigned vertices_count,
             mb->Indices[i] = tmp_idx[i];
         }
     }
+
+    if (!read_normal)
+    {
+        for (unsigned i = 0; i < mb->Indices.size(); i += 3)
+        {
+            core::plane3df p(mb->getVertex(mb->Indices[i])->Pos,
+                mb->getVertex(mb->Indices[i + 1])->Pos,
+                mb->getVertex(mb->Indices[i + 2])->Pos);
+            mb->getVertex(mb->Indices[i])->Normal += p.Normal;
+            mb->getVertex(mb->Indices[i + 1])->Normal += p.Normal;
+            mb->getVertex(mb->Indices[i + 2])->Normal += p.Normal;
+        }
+        for (unsigned i = 0; i < mb->getVertexCount(); i++)
+        {
+            mb->getVertex(i)->Normal.normalize();
+        }
+    }
 }   // decompress
 
 // ----------------------------------------------------------------------------
@@ -408,7 +425,7 @@ void SPMeshLoader::convertIrrlicht()
     {
         m_mesh->addJoint(NULL);
     }
-    core::array<scene::CSkinnedMesh::SJoint*>& joints = m_mesh->getAllJoints();
+    core::array<scene::ISkinnedMesh::SJoint*>& joints = m_mesh->getAllJoints();
     std::vector<int> used_joints_map;
     used_joints_map.resize(m_joint_count);
     total_joints = 0;
@@ -468,7 +485,7 @@ void SPMeshLoader::convertIrrlicht()
                 {
                     break;
                 }
-                scene::CSkinnedMesh::SWeight* w = m_mesh->addWeight
+                scene::ISkinnedMesh::SWeight* w = m_mesh->addWeight
                     (joints[used_joints_map[m_joints[i][j].first[k]]]);
                 w->buffer_id = (uint16_t)i;
                 w->vertex_id = j;
