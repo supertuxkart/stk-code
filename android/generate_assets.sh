@@ -19,7 +19,7 @@
 
 ################################################################################
 
-export KARTS="elephpant gnu nolok pidgin suzanne tux xue"
+export KARTS="all"
 export TRACKS="battleisland cornfield_crossing featunlocked gplose gpwin   \
                hacienda introcutscene introcutscene2 lighthouse olivermath \
                overworld sandtrack scotland snowmountain snowtuxpeak       \
@@ -41,6 +41,8 @@ export SOUND_SAMPLE=32000
 export RUN_OPTIMIZE_SCRIPT=0
 export DECREASE_QUALITY=1
 export CONVERT_TO_JPG=1
+
+export CONVERT_TO_JPG_BLACKLIST="data/karts/hexley/hexley_kart_diffuse.png"
 
 export BLACKLIST_FILES="data/music/cocoa_river_fast.ogg2"
 
@@ -276,9 +278,18 @@ convert_to_jpg()
     if [ $ALREADY_CONVERTED -eq 1 ]; then
         return
     fi
-
-    if [ ! -f "$FILE" ]; then
-        #echo "  Couldn't find texture file. Ignore..."
+    
+    BLACKLISTED=0
+    
+    for BLACKLIST_FILE in $CONVERT_TO_JPG_BLACKLIST; do
+        if [ "$FILE" = "assets/$BLACKLIST_FILE" ]; then
+            BLACKLISTED=1
+            break
+        fi
+    done
+    
+    if [ $BLACKLISTED -eq 1 ]; then
+        #echo "  File is blacklisted. Ignore..."
         continue
     fi
 
@@ -301,6 +312,16 @@ convert_to_jpg()
 
     if [ "$IS_OPAQUE" = "False" ] || [ "$IS_OPAQUE" = "false" ]; then
         #echo "  File has alpha channel. Ignore..."
+        continue
+    fi
+
+    DIRNAME="`dirname "$FILE"`"
+    BASENAME="`basename "$FILE"`"     
+    IS_GLOSS_MAP=`find "$DIRNAME" -iname "*.xml" -exec cat {} \; \
+                                            | grep -c "gloss-map=\"$BASENAME\""`
+    
+    if [ $IS_GLOSS_MAP -gt 0 ]; then
+        #echo "  File is a gloss-map. Ignore..."
         continue
     fi
 
@@ -526,6 +547,8 @@ fi
 
 
 if [ $CONVERT_TO_JPG -gt 0 ]; then
+    rm -f "./converted_textures"
+    
     find assets/data -not -path "assets/data/textures/*" -iname "*.png" | while read f; do convert_to_jpg "$f"; done
 
     find assets/data -iname "*.b3dz" | while read f; do convert_to_jpg_extract_b3dz "$f"; done
