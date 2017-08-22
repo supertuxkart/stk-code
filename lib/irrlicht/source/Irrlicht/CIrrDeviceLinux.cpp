@@ -719,6 +719,39 @@ bool CIrrDeviceLinux::createWindow()
 						}
 					}
 				}
+				// Try to disable sRGB framebuffer
+				if (!configList && CreationParams.HandleSRGB)
+				{
+					os::Printer::log("No sRGB framebuffer available.", ELL_WARNING);
+					CreationParams.HandleSRGB=false;
+					visualAttrBuffer[21] = GLX_DONT_CARE;
+					configList=glxChooseFBConfig(display, screennr, visualAttrBuffer,&nitems);
+					if (!configList && CreationParams.AntiAlias)
+					{
+						while (!configList && (visualAttrBuffer[19]>1))
+						{
+							visualAttrBuffer[19] -= 1;
+							configList=glxChooseFBConfig(display, screennr, visualAttrBuffer,&nitems);
+						}
+						if (!configList)
+						{
+							visualAttrBuffer[17] = 0;
+							visualAttrBuffer[19] = 0;
+							configList=glxChooseFBConfig(display, screennr, visualAttrBuffer,&nitems);
+							if (configList)
+							{
+								os::Printer::log("No FSAA available.", ELL_WARNING);
+								CreationParams.AntiAlias=0;
+							}
+							else
+							{
+								//reenable multisampling
+								visualAttrBuffer[17] = 1;
+								visualAttrBuffer[19] = CreationParams.AntiAlias;
+							}
+						}
+					}
+				}
 				// Next try with flipped stencil buffer value
 				// If the first round was with stencil flag it's now without
 				// Other way round also makes sense because some configs
