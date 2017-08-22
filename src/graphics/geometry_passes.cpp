@@ -384,6 +384,7 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
             mesh.textures[0]->getOpenGLTextureName());
         DisplaceShader::getInstance()->use();
         DisplaceShader::getInstance()->setUniforms(AbsoluteTransformation,
+            mesh.texture_trans,
             core::vector2df(cb->getDirX(), cb->getDirY()),
             core::vector2df(cb->getDir2X(), cb->getDir2Y()));
 

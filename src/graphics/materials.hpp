@@ -212,7 +212,8 @@ public:
 
 // ============================================================================
 class DisplaceShader : public TextureShader<DisplaceShader, 4, core::matrix4,
-                                            core::vector2df, core::vector2df>
+                                            core::vector2df, core::vector2df,
+                                            core::vector2df>
 {
 public:
     DisplaceShader();

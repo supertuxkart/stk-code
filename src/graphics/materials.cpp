@@ -329,7 +329,7 @@ InstancedRefShadowShader::InstancedRefShadowShader()
 // ============================================================================
 DisplaceMaskShader::DisplaceMaskShader()
 {
-    loadProgram(OBJECT, GL_VERTEX_SHADER, "displace.vert",
+    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                         GL_FRAGMENT_SHADER, "white.frag");
     assignUniforms("ModelMatrix");
 }   // DisplaceMaskShader
@@ -337,9 +337,9 @@ DisplaceMaskShader::DisplaceMaskShader()
 // ============================================================================
 DisplaceShader::DisplaceShader()
 {
-    loadProgram(OBJECT, GL_VERTEX_SHADER, "displace.vert",
+    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                         GL_FRAGMENT_SHADER, "displace.frag");
-    assignUniforms("ModelMatrix", "dir", "dir2");
+    assignUniforms("ModelMatrix", "texture_trans", "dir", "dir2");
     assignSamplerNames(0, "displacement_tex", ST_BILINEAR_FILTERED,
                        1, "color_tex", ST_BILINEAR_FILTERED,
                        2, "mask_tex", ST_BILINEAR_FILTERED,
