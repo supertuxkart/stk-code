@@ -673,11 +673,15 @@ bool CIrrDeviceLinux::createWindow()
 #elif defined(GLX_SGIS_multisample)
 					GLX_SAMPLE_BUFFERS_SGIS, 1,
 					GLX_SAMPLES_SGIS, CreationParams.AntiAlias, // 18,19
+#else
+#error
 #endif
 #ifdef GLX_ARB_framebuffer_sRGB
 					GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB, CreationParams.HandleSRGB,
 #elif defined(GLX_EXT_framebuffer_sRGB)
 					GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, CreationParams.HandleSRGB,
+#else
+#error
 #endif
 					GLX_STEREO, CreationParams.Stereobuffer?True:False,
 					None
