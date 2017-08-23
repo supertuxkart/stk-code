@@ -2,7 +2,7 @@
 * Reduced RAM and VRAM usage, reducing load times by Auria and Benau
 * New kart Wilbert by Jymis
 * New kart Hexley by Jymis
-* New track Cornfield Crossing by samuncle
+* New tracks Cornfield Crossing and Candela City by samuncle
 * Physics improvements and various physics bugfixes by hiker
 * Kart GFX improvements (exhaust and headlight)
 * In-game screen recording feature by Benau and Stragus
