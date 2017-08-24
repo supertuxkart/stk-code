@@ -1,22 +1,22 @@
 ## SuperTuxKart 0.9.3
 * Reduced RAM and VRAM usage, reducing load times by Auria and Benau
-* New kart Wilbert by Jymis
-* New kart Hexley by Jymis
+* New karts Wilber and Hexley by Jymis
 * New tracks Cornfield Crossing and Candela City by samuncle
+* Ability for tracks to have vertical and upside-down sections
 * Physics improvements and various physics bugfixes by hiker
-* Kart GFX improvements (exhaust and headlight)
+* Kart GFX improvements (exhaust and headlights)
 * In-game screen recording feature by Benau and Stragus
-* Bug fixes on the old render pipeline by Benau and Stragus
+* Bug fixes on the old render pipeline and non-advanced pipeline by Benau and Stragus
 * Hardware skinning
-* New smoother camera by Auria
+* New smooth camera by Auria (no gitter with incocsistent framerates)
 * New grand prix win scene
 * Gamepad configuration bugfixes
-* Various improvements (wall driving fixes, parachutes, GP points, cannon fixes, colorization shader)
+* OpenGL code refactoring
+* Various improvements & bugfixes (Cocoa temple reset fix, parachutes tweaks, new GP point system, cannon fixes, colorization shader)
 
 ## SuperTuxKart 0.9.2
 * Ghost replay races by Benau
-* Battle mode AI by Benau
-* Soccer mode AI by Benau
+* Battle and Soccer mode AIs by Benau
 * New icy soccer field by samuncle and Benau
 * New subsea track by samuncle
 * New volcano track by Ponzino
@@ -24,33 +24,33 @@
 * Kart properties refactor by Flakebi
 * Scripting work under the hood
 * Work on the track editor by mhp
-* Tweak to challenges
+* Tweaks to challenges
 * New farm track song by 0zone0ne and Krobonil
-* Bugfixes
+* Various improvements and bugfixes
 
 ## SuperTuxKart 0.9.1
 * Many bug fixes
 * Started to use scripting in tracks
 * Significant audio performance improvements
 * Smaller tweaks and improvements to several tracks including 
-** Math class
-** XR591
-** Fort Magma
-** Gran Paradiso
-** Subsea
-* Tweak to challenges
+ - Math class
+ - XR591
+ - Fort Magma
+ - Gran Paradiso
+ - Subsea
+* Tweaks to challenges
 * Better support for driving tracks in reverse
 
 ## SupertTuxKart 0.9 (April 2015)
 * Fully shader-based rendering engine
 * New tracks Cocoa Temple and Gran Paradiso
 * Graphical improvements to many other tracks
-* New karts amanda and gavroche
-* New and improved tux, adiumy, sara the wizard and the racer, xue kart
-* Online login which allows to:
-** connect with friends and see when they are playing
-** vote for addons
-** collect online achievements
+* New karts Amanda and Gavroche
+* Improved karts Tux, Adiumy, Sara the Wizard/Racer, and Xue
+* Online login which allows you to:
+ - Connect with friends and see when they are playing
+ - Vote for addons
+ - Collect online achievements
 * Grand Prix editor, including creation of random GPs 
 * Different kart physics
 
@@ -58,14 +58,14 @@
 ## SuperTuxKart 0.8.1 (26. November 2013)
 * New track STK Enterprise
 * Updated track The old mines
-* Updated Lighthouse track
-* Updated Zen Garden track
+* Updated track Lighthouse
+* Updated track Zen Garden
 * New Soccer mode
 * New Egg Hunt mode
 * New karts Xue and Sara
 * Updated Beastie kart
 * Added Tutorial
-* Added new Supertux difficulty
+* Added new SuperTux difficulty
 * New bubblegum shield weapon
 * New Speedometer and nitro meter
 * Add ability to filter addons
@@ -80,12 +80,12 @@
 * Improved AI
 * Skidding and better collision physics
 * Reverse mode
-* New green valley track
+* New Green Valley track
 * New Blackhill Mansion track
 * Updated XR591 track
 * Updated Fort Magma track
 * Updated jungle track
-* Updates Sand track
+* Updated Sand track
 * Updated menus
 * New music
 
@@ -121,7 +121,7 @@
 * Updated translations
 
 ## SuperTuxKart 0.7.1 (15. April 2011)
-* Particle  (smoke, splash, fire) and weather effects
+* Particle (smoke, splash, fire) and weather effects
 * New Fort Magma by Samuncle, new Shiny Suburbs track by Horace
 * New Beagle kart by wolterh
 * Added internet news
@@ -143,7 +143,7 @@
 Too many to list them all. Main points:
 
 * Irrlicht:
-  - Ported from plib to irrlicht
+  - Ported from plib to Irrlicht
   - Added animations to karts and some tracks
 * GUI
   - Completely new designed GUI
@@ -151,7 +151,7 @@ Too many to list them all. Main points:
   - Allowed alternative ways/shortcuts in tracks
   - New item 'switch'
 * New art:
-  - New tracks farm, hacienda, scotland, secret garden
+  - New tracks Farm, Hacienda, Scotland, Secret garden
 
 ## SuperTuxKart 0.6.2a (October 2009)
 * Bugfix: STK would crash while trying to save the config file
@@ -165,7 +165,7 @@ Too many to list them all. Main points:
 * Bugfix: Items explode over void.
 * Bugfix: Grass in castle arena slowed down the kart.
 * Bugfix: GP result showed kart identifier instead of name.
-* Improvement: there is now 1 1 sec. wait period for the race result screen, avoiding the problem that someone presses space/enter at the end of a race, immediately quitting the menu before it can be read.
+* Improvement: There is now 1 sec. wait period for the race result screen, avoiding the problem that someone presses space/enter at the end of a race, immediately quitting the menu before it can be read.
 
 ## SuperTuxKart 0.6.1a (February 2009)
 * Bugfix: battle mode would not display track groups.
@@ -184,7 +184,7 @@ Too many to list them all. Main points:
 * New improved physics and kart handling
 * Added sharp turns and nitro speed boost (replacing wheelies and jump)
 * Totally rewrote powerups (plunger, bowling ball, cake, bubblegum) and new look for bananas
-* New and improved tracks  : skyline, snow mountain, race track, space track, old mine, XR591
+* New and improved tracks  : Skyline, Snow mountain, Race track, Space track, Old Mine, XR591
 * New game mode : 3-Strikes Battle
 * Major improvements to AI
 * New/improved karts (and removed some old ones) : wilber, eviltux, hexley
@@ -213,13 +213,13 @@ Too many to list them all. Main points:
 * German, French, Dutch, Spanish, Italian and Swedish translations
 * Additional music
 * Many Bugfixes including:
-	- a memory leak fix (Charlie Head)
-	- an AI crash fix (Chris Morris)
+  - a memory leak fix (Charlie Head)
+  - an AI crash fix (Chris Morris)
 
 
 ## SuperTuxKart 0.4 (February 2008)
 * New physics handling using the bullet physics engine
-* New kart: wilber
+* New kart: Wilber
 * Improved 'Shifting Sands' and 'Lighthouse' tracks
 * Improved AI
 * New GUI handling, including resolution switching GUI
@@ -233,7 +233,7 @@ Too many to list them all. Main points:
 * Shortcut detection 	
 * Improved AI
 * Fullscreen support
-* New track: the island
+* New track: The Island
 * New penalty: bomb
 * MacOSX support
 * OpenAL and ogg-vorbis support
@@ -258,7 +258,7 @@ Too many to list them all. Main points:
   - Fixed keyboard keys unable to work on the first key press bug
   - And others
 
-##SuperTuxKart 0.2 (22. Sep 2006)
+## SuperTuxKart 0.2 (22. Sep 2006)
   * Significant performance improvement by using display lists
   * Improved AI
   * Support for different grand prixs
@@ -276,7 +276,7 @@ Too many to list them all. Main points:
   * Added help and about screens, added credits to track designer
   * Items were added to all tracks
 
-##SuperTuxKart 0.1 (04. May 2006)  (not officially released)
+## SuperTuxKart 0.1 (04. May 2006)  (not officially released)
   * Significant speedup by using a new HOT and collision algorithm --> all tracks are now playable
   * Removed all SDL dependencies, only plib is needed
   * Single and multi-window menu can be used
@@ -284,53 +284,53 @@ Too many to list them all. Main points:
   * Some bug fixes and small improvements
   * Added profile option to support automatic profiling
 
-##SuperTuxKart 0.0.0 (22. Dec 2004)
-  * new tracks
-  * new characters and karts
-  * new user-interface
-  * some additional effects (skid-marks, smoke)
+## SuperTuxKart 0.0.0 (22. Dec 2004)
+  * New tracks
+  * New characters and karts
+  * New user-interface
+  * Some additional effects (skid-marks, smoke)
 
-##TuxKart v0.4.0 (March 19th 2004)
+## TuxKart v0.4.0 (March 19th 2004)
   * Changes for compatibility with PLIB 1.8.0 and later.
   * Removed some features that were only there to support
     truly ancient graphics cards like 3Dfx Voodoo-1/2.
 
-##TuxKart v0.3.0 (??)
+## TuxKart v0.3.0 (??)
   * Converted to use the new PLIB/PW library and thus
     avoid the need to link to GLUT.
 
-##TuxKart v0.2.0 (Sept 3rd 2002)
+## TuxKart v0.2.0 (Sept 3rd 2002)
   * Changes for compatibility with PLIB 1.6.0 and later.
 
-##TuxKart v0.0.5 (??)
+## TuxKart v0.0.5 (??)
   * Changes for compatibility with PLIB 1.4.0 and later.
 
-##TuxKart v0.0.4 (??)
+## TuxKart v0.0.4 (??)
   * Changes to suit rassin-frassin-Windoze-junk.
   * Steady-cam camera - courtesy of cowtan@ysbl.york.ac.uk
   * Changes for compatibility with PLIB 1.3.1 and later.
   * Added new music courtesy of Matt Thomas.
 
-##TuxKart v0.0.3 (July 4th 2000)
+## TuxKart v0.0.3 (July 4th 2000)
   * Fixed bug in Keyboard driver when no
     joystick driver is installed.
   * More CygWin fixes.
   * Started new feature to allow you to be
     rescued from lava, etc.
 
-##TuxKart v0.0.2 (July 2nd 2000)
+## TuxKart v0.0.2 (July 2nd 2000)
   * Added ability to add new tracks without
     recompiling.
   * Can now drive using keyboard only - no joystick
     required.
   * Should compile and run under Windoze using CygWin.
 
-##TuxKart v0.0.1 (July 1st 2000)
+## TuxKart v0.0.1 (July 1st 2000)
   * Fixed a couple of files missing in initial
     Distro.
 
-##TuxKart v0.0.0 (June 29th 2000)
+## TuxKart v0.0.0 (June 29th 2000)
   * First CVS release.
 
-##TuxKart (unnumbered) (April 13th 2000)
+## TuxKart (unnumbered) (April 13th 2000)
   * First hack.
