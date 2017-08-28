@@ -2509,13 +2509,18 @@ void Kart::updateSliding()
     // Now test for each wheel if it should be sliding
     // -----------------------------------------------
     bool enable_sliding = false;
+
+    // We need the 'up' vector, which can be affected by material
+    // with gravity. So use the body's gravity to determine up:
+    Vec3 up = -m_body->getGravity();
+    up.normalize();
     for (int i = 0; i < m_vehicle->getNumWheels(); i++)
     {
         const btWheelInfo &wheel = m_vehicle->getWheelInfo(i);
         if (!wheel.m_raycastInfo.m_isInContact) continue;
 
         const btVector3 &norm = m_vehicle->getWheelInfo(i).m_raycastInfo.m_contactNormalWS;
-        float distanceFromUp = norm.dot(getNormal());
+        float distanceFromUp = norm.dot(up);
         float friction;
         if (distanceFromUp < 0.85f)
         {

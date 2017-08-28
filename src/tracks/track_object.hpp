@@ -190,7 +190,7 @@ public:
     /** Should only be used on mesh track objects.
     * On the script side, the returned object is of type : @ref Scripting_Mesh
     */
-    TrackObjectPresentationMesh* getMesh() { return getPresentation<TrackObjectPresentationMesh>(); }
+    scene::IAnimatedMeshSceneNode* getMesh();
     /** Should only be used on particle emitter track objects.
     * On the script side, the returned object is of type : @ref Scripting_ParticleEmitter
     */

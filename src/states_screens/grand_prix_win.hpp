@@ -60,6 +60,8 @@ class GrandPrixWin :
     float m_kart_x[3], m_kart_y[3], m_kart_z[3];
     float m_kart_rotation[3];
 
+    float m_podium_x[3], m_podium_y[3], m_podium_z[3];
+
 public:
     // implement callbacks from parent class GUIEngine::Screen
     void init() OVERRIDE;

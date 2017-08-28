@@ -618,10 +618,10 @@ void Material::initCustomSFX(const XMLNode *sfx)
     {
 
         // The directory for the track was added to the model search path
-        // so just misuse the getModelFile function
-        const std::string full_path = file_manager->getAsset(FileManager::MODEL,
-                                                             filename);
-        SFXBuffer* buffer = SFXManager::get()->loadSingleSfx(sfx, full_path);
+        // so just misuse the searchModel function
+        std::string path = file_manager->searchModel(filename);
+        path = StringUtils::getPath(path);
+        SFXBuffer* buffer = SFXManager::get()->loadSingleSfx(sfx, path);
 
         if (buffer != NULL)
         {

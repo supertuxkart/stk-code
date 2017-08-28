@@ -1,10 +1,19 @@
-// Copyright (C) 2013      Patryk Nadrowski
-// Copyright (C) 2016-2017 Dawid Gan
-// Heavily based on the OpenGL driver implemented by Nikolaus Gebhardt
-// OpenGL ES driver implemented by Christian Stehno and first OpenGL ES 2.0
-// driver implemented by Amundis.
-// This file is part of the "Irrlicht Engine".
-// For conditions of distribution and use, see copyright notice in Irrlicht.h
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2016-2017 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "IrrCompileConfig.h"
 
@@ -182,10 +191,10 @@ bool ContextManagerEGL::chooseConfig()
     config_attribs.push_back(8);
     config_attribs.push_back(EGL_ALPHA_SIZE);
     config_attribs.push_back(m_creation_params.with_alpha_channel ? 8 : 0);
-    // config_attribs.push_back(EGL_BUFFER_SIZE);
-    // config_attribs.push_back(24);
     config_attribs.push_back(EGL_DEPTH_SIZE);
     config_attribs.push_back(16);
+    // config_attribs.push_back(EGL_BUFFER_SIZE);
+    // config_attribs.push_back(24);
     // config_attribs.push_back(EGL_STENCIL_SIZE);
     // config_attribs.push_back(stencil_buffer);
     // config_attribs.push_back(EGL_SAMPLE_BUFFERS);
@@ -223,7 +232,19 @@ bool ContextManagerEGL::chooseConfig()
     bool success = eglChooseConfig(m_egl_display, &config_attribs[0],
                                    &m_egl_config, 1, &num_configs);
 
-    if (!success || num_configs == 0)
+    if (!success || m_egl_config == NULL || num_configs < 1)
+    {
+        config_attribs[1] = 5; //EGL_RED_SIZE
+        config_attribs[3] = 6; //EGL_GREEN_SIZE
+        config_attribs[5] = 5; //EGL_BLUE_SIZE
+        config_attribs[7] = 0; //EGL_ALPHA_SIZE
+        config_attribs[9] = 1; //EGL_DEPTH_SIZE
+        
+        success = eglChooseConfig(m_egl_display, &config_attribs[0],
+                                           &m_egl_config, 1, &num_configs);
+    }
+
+    if (!success || m_egl_config == NULL || num_configs < 1)
     {
         return false;
     }
@@ -449,8 +470,20 @@ bool ContextManagerEGL::swapBuffers()
 }
 
 
+bool ContextManagerEGL::makeCurrent()
+{
+    bool success = eglMakeCurrent(m_egl_display, m_egl_surface, m_egl_surface,
+                             m_egl_context);
+
+    return success;
+}
+
+
 void ContextManagerEGL::reloadEGLSurface(void* window)
 {
+    if (!m_initialized)
+        return;
+
 #ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
     m_egl_window = (ANativeWindow*)window;
 

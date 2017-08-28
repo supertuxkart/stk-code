@@ -127,8 +127,16 @@
 #endif
 #define _IRR_POSIX_API_
 #define _IRR_COMPILE_WITH_X11_DEVICE_
+//#define _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 #endif
 
+#ifdef NO_IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#undef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#endif
+
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#define _IRR_COMPILE_WITH_EGL_
+#endif
 
 //! Define _IRR_COMPILE_WITH_JOYSTICK_SUPPORT_ if you want joystick events.
 #define _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
@@ -160,7 +168,7 @@ headers, e.g. Summer 2004.  This is a Microsoft issue, not an Irrlicht one.
 //! Define _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_ if you want to use DirectInput for joystick handling.
 /** This only applies to Windows devices, currently only supported under Win32 device.
 If not defined, Windows Multimedia library is used, which offers also broad support for joystick devices. */
-#undef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
+#define _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
 #ifdef NO_IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
 #undef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
 #endif

@@ -194,7 +194,6 @@ private:
     void displayPostRaceInfo();
     void displaySoccerResults();
     void displayScreenShots();
-    irr::core::stringw getKartDisplayName(const AbstractKart *kart) const;
 
     int  getFontHeight () const;
 

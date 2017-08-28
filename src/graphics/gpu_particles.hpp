@@ -33,7 +33,8 @@ using namespace irr;
 class ParticleSystemProxy : public scene::CParticleSystemSceneNode
 {
 protected:
-    GLuint tfb_buffers[2], initial_values_buffer, heighmapbuffer, heightmaptexture, quaternionsbuffer;
+    GLuint tfb_buffers[2], initial_values_buffer, heighmapbuffer, 
+           heightmaptexture, quaternionsbuffer, vertex_id_buffer;
     GLuint current_simulation_vao, non_current_simulation_vao;
     GLuint current_rendering_vao, non_current_rendering_vao;
     bool m_alpha_additive, has_height_map, flip;
@@ -55,7 +56,9 @@ protected:
 
     static void CommonRenderingVAO(GLuint PositionBuffer);
     static void AppendQuaternionRenderingVAO(GLuint QuaternionBuffer);
-    static void CommonSimulationVAO(GLuint position_vbo, GLuint initialValues_vbo);
+    static void CommonSimulationVAO(GLuint position_vbo, 
+                                    GLuint initialValues_vbo, 
+                                    GLuint vertex_id_buffer);
 
     void generateVAOs();
     void cleanGL();
@@ -80,6 +83,7 @@ protected:
 private:
 
     ParticleData *ParticleParams, *InitialValues;
+    int* m_vertex_id_values;
     void generateParticlesFromPointEmitter(scene::IParticlePointEmitter *);
     void generateParticlesFromBoxEmitter(scene::IParticleBoxEmitter *);
     void generateParticlesFromSphereEmitter(scene::IParticleSphereEmitter *);

@@ -236,6 +236,14 @@ void World::init()
     {
         Weather::getInstance<Weather>();   // create Weather instance
     }
+    if((NetworkConfig::get()->isServer() && !ProfileWorld::isNoGraphics()) ||
+        race_manager->isWatchingReplay())
+    {
+        // In case that the server is running with gui or watching replay,
+        // create a camera and attach it to the first kart.
+        Camera::createCamera(World::getWorld()->getKart(0));
+
+    }
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -299,14 +307,6 @@ void World::reset()
     {
         Log::info("World", "Start Recording race.");
         ReplayRecorder::get()->init();
-    }
-    if((NetworkConfig::get()->isServer() && !ProfileWorld::isNoGraphics()) ||
-        race_manager->isWatchingReplay())
-    {
-        // In case that the server is running with gui or watching replay,
-        // create a camera and attach it to the first kart.
-        Camera::createCamera(World::getWorld()->getKart(0));
-
     }
 
     // Reset all data structures that depend on number of karts.

@@ -269,19 +269,19 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
     }
     else if (eventSource == "Back")
     {
-        event.KeyInput.Key = KEY_BACK;
+        event.KeyInput.Key = IRR_KEY_BACK;
         event.KeyInput.Char = 0;
         send_event = true;
     }
     else if (eventSource == "Space")
     {
-        event.KeyInput.Key = KEY_UNKNOWN;
+        event.KeyInput.Key = IRR_KEY_UNKNOWN;
         event.KeyInput.Char = ' ';
         send_event = true;
     }
     else if (eventSource.size() > 0)
     {
-        event.KeyInput.Key = KEY_UNKNOWN;
+        event.KeyInput.Key = IRR_KEY_UNKNOWN;
         event.KeyInput.Char = eventSource.at(0);
         send_event = true;
     }

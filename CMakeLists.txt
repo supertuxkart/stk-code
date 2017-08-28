@@ -1,6 +1,6 @@
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
-set(PROJECT_VERSION "0.9.1")
+set(PROJECT_VERSION "git")
 
 cmake_minimum_required(VERSION 2.8.4)
 if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
@@ -20,7 +20,7 @@ option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
-option(ENABLE_NETWORK_MULTIPLAYER "Enable network multiplayer. This will replace the online profile GUI in the main menu with the network multiplayer GUI" OFF)
+option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" OFF)
 
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT USE_GLES2;NOT APPLE" OFF)
@@ -82,10 +82,6 @@ if(DISABLE_VPX)
     add_definitions(-DNO_VPX)
 endif()
 
-if(BUILD_RECORDER)
-    add_definitions(-DENABLE_RECORDER)
-endif()
-
 # Build the Bullet physics library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
@@ -101,7 +97,7 @@ if(NOT USE_GLES2 AND NOT SERVER_ONLY)
     include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
 endif()
 
-if((WIN32 AND NOT MINGW) OR APPLE)
+if(MSVC OR APPLE)
     if (NOT APPLE)
     # Build zlib library
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/zlib")
@@ -112,15 +108,15 @@ if((WIN32 AND NOT MINGW) OR APPLE)
     endif()
 
     # Build png library
-    set (SKIP_INSTALL_ALL TRUE)
-    set (PNG_STATIC TRUE)
-    set (PNG_TESTS FALSE)
-    set (PNG_SHARED FALSE)
+    set(SKIP_INSTALL_ALL TRUE)
+    set(PNG_STATIC TRUE CACHE BOOL "Build static lib")
+    set(PNG_TESTS FALSE CACHE BOOL "Build libpng tests")
+    set(PNG_SHARED FALSE CACHE BOOL "Build shared lib")
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libpng")
     include_directories("${PROJECT_SOURCE_DIR}/lib/libpng")
 
     set(PNG_PNG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/libpng/")
-    set(PNG_LIBRARY png15_static)
+    set(PNG_LIBRARY png_static)
 endif()
 
 # Add jpeg library
@@ -138,11 +134,21 @@ if (BUILD_RECORDER)
     find_library(OPENGLRECORDER_LIBRARY NAMES openglrecorder libopenglrecorder PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
     find_path(OPENGLRECORDER_INCLUDEDIR NAMES openglrecorder.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
     if (NOT OPENGLRECORDER_LIBRARY OR NOT OPENGLRECORDER_INCLUDEDIR)
-        message(FATAL_ERROR "libopenglrecorder not found. "
-            "Either install libopenglrecorder or disable ingame recorder with -DBUILD_RECORDER=0")
+        if(PROJECT_VERSION STREQUAL "git")
+            message(WARNING "libopenglrecorder not found, disabling in-game recorder. "
+                "To use recorder, install libopenglrecorder.")
+            set(OPENGLRECORDER_LIBRARY CACHE INTERNAL "")
+            set(OPENGLRECORDER_INCLUDEDIR CACHE INTERNAL "")
+            set(BUILD_RECORDER OFF)
+        else()
+            message(FATAL_ERROR "libopenglrecorder not found. "
+            "Either install libopenglrecorder or disable in-game recorder with -DBUILD_RECORDER=0")
+        endif()
+    else()
+        include_directories(${OPENGLRECORDER_INCLUDEDIR})
+        mark_as_advanced(OPENGLRECORDER_LIBRARY OPENGLRECORDER_INCLUDEDIR)
+        add_definitions(-DENABLE_RECORDER)
     endif()
-    include_directories(${OPENGLRECORDER_INCLUDEDIR})
-    mark_as_advanced(OPENGLRECORDER_LIBRARY OPENGLRECORDER_INCLUDEDIR)
 endif()
 
 if(NOT SERVER_ONLY AND NOT USE_GLES2)
@@ -274,11 +280,6 @@ endif()
 
 if(MINGW AND CMAKE_BUILD_TYPE MATCHES Release)
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--subsystem,windows")
-endif()
-
-# Netwowk Multiplayer
-if(ENABLE_NETWORK_MULTIPLAYER)
-  add_definitions(-DENABLE_NETWORK_MULTIPLAYER_SCREEN)
 endif()
 
 if(WIN32)
@@ -413,7 +414,7 @@ if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
         target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} glew graphics_utils)
     else()
-        target_link_libraries(supertuxkart EGL GLESv2)
+        target_link_libraries(supertuxkart GLESv2)
     endif()
 endif()
 
@@ -532,9 +533,9 @@ if(STK_ASSETS_DIR AND CHECK_ASSETS)
   install(DIRECTORY ${STK_ASSETS_DIR} DESTINATION ${STK_INSTALL_DATA_DIR}/data PATTERN ".svn" EXCLUDE PATTERN ".git" EXCLUDE)
 endif()
 install(FILES ${STK_DATA_DIR}/supertuxkart.desktop DESTINATION share/applications)
-install(FILES data/supertuxkart_32.png DESTINATION share/icons/hicolor/32x32/apps RENAME supertuxkart.png)
+install(FILES data/supertuxkart_48.png DESTINATION share/icons/hicolor/48x48/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128/apps RENAME supertuxkart.png)
-install(FILES data/supertuxkart_32.png data/supertuxkart_128.png DESTINATION share/pixmaps)
+install(FILES data/supertuxkart_48.png DESTINATION share/pixmaps RENAME supertuxkart.png)
 install(FILES data/supertuxkart.appdata.xml DESTINATION share/appdata)
 
 if(MINGW)

@@ -507,7 +507,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                      irr_driver->getActualScreenSize().Height - GUIEngine::getFontHeight()*2,
                                      irr_driver->getActualScreenSize().Width,
                                      irr_driver->getActualScreenSize().Height);
-                GUIEngine::getOutlineFont()->draw(_("Press fire to play the tutorial"), pos2,
+                GUIEngine::getOutlineFont()->draw(_("Press fire to start the tutorial"), pos2,
                                            GUIEngine::getSkin()->getColor("font::normal"),
                                            true, true /* vcenter */, NULL);
                 continue;

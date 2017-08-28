@@ -413,7 +413,12 @@ namespace UserConfigParams
             PARAM_DEFAULT( IntUserConfigParam(1, "multitouch_mode",
             &m_multitouch_group,
             "Steering mode: 0 = off, 1 = buttons"));
-            
+
+    PARAM_PREFIX BoolUserConfigParam         m_multitouch_inverted
+            PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_inverted",
+            &m_multitouch_group,
+            "Draw steering wheel on right side.") );
+
     PARAM_PREFIX IntUserConfigParam         m_multitouch_accelerometer
             PARAM_DEFAULT( IntUserConfigParam(0, "multitouch_accelerometer",
             &m_multitouch_group,
@@ -426,13 +431,13 @@ namespace UserConfigParams
             "considered as centered in steering button."));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_edge
-            PARAM_DEFAULT( FloatUserConfigParam(0.25f, "multitouch_deadzone_edge",
+            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone_edge",
             &m_multitouch_group,
             "A parameter in range [0, 0.5] that determines the zone that is "
             "considered as max value in steering button."));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_scale
-            PARAM_DEFAULT( FloatUserConfigParam(1.0f, "multitouch_scale",
+            PARAM_DEFAULT( FloatUserConfigParam(1.1f, "multitouch_scale",
             &m_multitouch_group,
             "A parameter in range [0.5, 1.5] that determines the scale of the "
             "multitouch interface."));
@@ -654,6 +659,10 @@ namespace UserConfigParams
 
     /** True if graphical profiler should be displayed */
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
+
+    /** How many seconds worth of data the circular profile buffer
+     *  can store. */
+    PARAM_PREFIX float m_profiler_buffer_duration PARAM_DEFAULT(20.0f);
 
     // not saved to file
 

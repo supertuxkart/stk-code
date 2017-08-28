@@ -5,12 +5,17 @@ find_package(JPEG REQUIRED)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
                     "${JPEG_INCLUDE_DIR}"
                     "${PNG_INCLUDE_DIRS}"
-                    "${ZLIB_INCLUDE_DIR}"
-                    "${CMAKE_CURRENT_BINARY_DIR}/../zlib/") # For zconf.h on WIN32
+                    "${ZLIB_INCLUDE_DIR}")
+
+if(MSVC OR APPLE)
+    include_directories("${CMAKE_CURRENT_BINARY_DIR}/../zlib/" # For zconf.h on WIN32
+                        "${CMAKE_CURRENT_BINARY_DIR}/../libpng/")
+endif()
 
 if (SERVER_ONLY)
     add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
 else()
     if(NOT USE_GLES2)
         find_package(OpenGL REQUIRED)
@@ -21,6 +26,10 @@ endif()
 if (UNIX AND NOT APPLE)
     find_package(X11 REQUIRED)
     include_directories(${X11_INCLUDE_DIR})
+endif()
+
+if(ENABLE_WAYLAND_DEVICE)
+    add_definitions(-D_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
 endif()
 
 if(APPLE)
@@ -53,7 +62,7 @@ else()
 endif()
 
 if(USE_GLES2)
-    add_definitions(-D_IRR_COMPILE_WITH_OGLES2_ -DNO_IRR_COMPILE_WITH_SOFTWARE_ -DNO_IRR_COMPILE_WITH_BURNINGSVIDEO_ -DNO_IRR_COMPILE_WITH_OGLES1_ -DNO_IRR_COMPILE_WITH_OPENGL_ -DNO_IRR_USE_NON_SYSTEM_JPEG_LIB_ -DNO_IRR_USE_NON_SYSTEM_LIB_PNG_ -DNO_IRR_USE_NON_SYSTEM_ZLIB_)
+    add_definitions(-D_IRR_COMPILE_WITH_OGLES2_ -DNO_IRR_COMPILE_WITH_OPENGL_)
 endif()
 
 if(CYGWIN)
@@ -119,6 +128,7 @@ source/Irrlicht/CIrrDeviceFB.cpp
 source/Irrlicht/CIrrDeviceLinux.cpp
 source/Irrlicht/CIrrDeviceSDL.cpp
 source/Irrlicht/CIrrDeviceStub.cpp
+source/Irrlicht/CIrrDeviceWayland.cpp
 source/Irrlicht/CIrrDeviceWin32.cpp
 source/Irrlicht/CLightSceneNode.cpp
 source/Irrlicht/CLimitReadFile.cpp
@@ -252,6 +262,7 @@ source/Irrlicht/CIrrDeviceFB.h
 source/Irrlicht/CIrrDeviceLinux.h
 source/Irrlicht/CIrrDeviceSDL.h
 source/Irrlicht/CIrrDeviceStub.h
+source/Irrlicht/CIrrDeviceWayland.h
 source/Irrlicht/CIrrDeviceWin32.h
 source/Irrlicht/CLightSceneNode.h
 source/Irrlicht/CLimitReadFile.h
@@ -550,6 +561,14 @@ endif()
 add_library(stkirrlicht STATIC ${IRRLICHT_SOURCES})
 target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY} ${ZLIB_LIBRARY})
 
+if(USE_GLES2 OR ENABLE_WAYLAND_DEVICE)
+    target_link_libraries(stkirrlicht EGL)
+endif()
+
+if(ENABLE_WAYLAND_DEVICE)
+    target_link_libraries(stkirrlicht wayland-client wayland-egl wayland-cursor xkbcommon)
+endif()
+
 if(WIN32)
-    target_link_libraries(stkirrlicht imm32)
+    target_link_libraries(stkirrlicht imm32 xinput9_1_0)
 endif()

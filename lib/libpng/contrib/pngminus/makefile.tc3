@@ -7,7 +7,8 @@ LB=tlib
 RM=del
 CP=copy
 MODEL=l
-CCFLAGS=-O -m$(MODEL) -I..\libpng -I..\zlib
+CPPFLAGS=-I..\libpng -I..\zlib
+CFLAGS=-O -m$(MODEL)
 LDFLAGS=-m$(MODEL) -L..\libpng -L..\zlib
 C=.c
 O=.obj
@@ -19,13 +20,13 @@ E=.exe
 all: png2pnm$(E) pnm2png$(E)
 
 png2pnm$(O): png2pnm$(C)
-        $(CC) -c $(CCFLAGS) png2pnm$(C)
+        $(CC) -c $(CPPFLAGS) $(CFLAGS) png2pnm$(C)
 
 png2pnm$(E): png2pnm$(O)
         $(LD) $(LDFLAGS) png2pnm$(O) libpng$(L) zlib$(L)
 
 pnm2png$(O): pnm2png$(C)
-        $(CC) -c $(CCFLAGS) pnm2png$(C)
+        $(CC) -c $(CPPFLAGS) $(CFLAGS) pnm2png$(C)
 
 pnm2png$(E): pnm2png$(O)
         $(LD) $(LDFLAGS) pnm2png$(O) libpng$(L) zlib$(L)
@@ -35,4 +36,3 @@ clean:
         $(RM) *$(E)
 
 # End of makefile for png2pnm / pnm2png
-

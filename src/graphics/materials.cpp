@@ -329,7 +329,7 @@ InstancedRefShadowShader::InstancedRefShadowShader()
 // ============================================================================
 DisplaceMaskShader::DisplaceMaskShader()
 {
-    loadProgram(OBJECT, GL_VERTEX_SHADER, "displace.vert",
+    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                         GL_FRAGMENT_SHADER, "white.frag");
     assignUniforms("ModelMatrix");
 }   // DisplaceMaskShader
@@ -337,9 +337,9 @@ DisplaceMaskShader::DisplaceMaskShader()
 // ============================================================================
 DisplaceShader::DisplaceShader()
 {
-    loadProgram(OBJECT, GL_VERTEX_SHADER, "displace.vert",
+    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                         GL_FRAGMENT_SHADER, "displace.frag");
-    assignUniforms("ModelMatrix", "dir", "dir2");
+    assignUniforms("ModelMatrix", "texture_trans", "dir", "dir2");
     assignSamplerNames(0, "displacement_tex", ST_BILINEAR_FILTERED,
                        1, "color_tex", ST_BILINEAR_FILTERED,
                        2, "mask_tex", ST_BILINEAR_FILTERED,
@@ -432,10 +432,9 @@ GrassPass2Shader::GrassPass2Shader()
     assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                        1, "SpecularMap", ST_NEAREST_FILTERED,
                        2, "SSAO", ST_BILINEAR_FILTERED,
-                       3, "dtex", ST_NEAREST_FILTERED,
-                       4, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                       5, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                       6, "colorization_mask",
+                       3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                       4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                       5, "colorization_mask",
                        ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // GrassPass2Shader
 
@@ -448,10 +447,9 @@ InstancedGrassPass2Shader::InstancedGrassPass2Shader()
     assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                        1, "SpecularMap", ST_NEAREST_FILTERED,
                        2, "SSAO", ST_BILINEAR_FILTERED,
-                       3, "dtex", ST_NEAREST_FILTERED,
-                       4, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                       5, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                       6, "colorization_mask",
+                       3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                       4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                       5, "colorization_mask",
                        ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // InstancedGrassPass2Shader
 

@@ -1,6 +1,6 @@
 # pngminim/encoder/pngusr.dfa
 #
-# Copyright (c) 2010-2011 Glenn Randers-Pehrson
+# Copyright (c) 2010-2013 Glenn Randers-Pehrson
 #
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -13,6 +13,10 @@ everything = off
 # Switch on the write code - this makes a minimalist encoder
 
 option WRITE on
+
+# These 2 options are required if you need to read PBM (P1 or P4) files.
+option WRITE_INVERT on
+option WRITE_PACK on
 
 # You must choose fixed or floating point arithmetic:
 # option FLOATING_POINT on

@@ -177,8 +177,9 @@ namespace scene
 		\param newManager An optional new scene manager.
 		\return The newly created clone of this node. */
 		virtual ISceneNode* clone(ISceneNode* newParent=0, ISceneManager* newManager=0) = 0;
-
+		virtual void setFrameLoopOnce(s32 begin, s32 end) = 0;
 		virtual u32 getAnimationSetNum() = 0;
+		virtual s32 getAnimationSet() const = 0;
 		virtual void addAnimationSet(u32 start, u32 end) = 0;
 		virtual void useAnimationSet(u32 set_num) = 0;
 	};

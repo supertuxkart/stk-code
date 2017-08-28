@@ -844,7 +844,7 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
     {
         w3->clearModels();
         w3->addModel(irr_driver->getAnimatedMesh(
-                         file_manager->getAsset(FileManager::MODEL, "chest.b3d") )->getMesh(20),
+                         file_manager->getAsset(FileManager::MODEL, "chest.spm") )->getMesh(20),
                      Vec3(0,0,0), Vec3(15.0f, 15.0f, 15.0f) );
         w3->update(0);
 

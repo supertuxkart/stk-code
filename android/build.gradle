@@ -1,0 +1,31 @@
+buildscript
+{
+    repositories
+    {
+        jcenter()
+    }
+
+    dependencies
+    {
+        classpath 'com.android.tools.build:gradle:2.2.3'
+    }
+}
+
+apply plugin: 'com.android.application'
+
+android
+{
+    compileSdkVersion sdk_version.toInteger()
+    buildToolsVersion build_tools_ver
+
+    sourceSets
+    {
+        main
+        {
+            manifest.srcFile 'AndroidManifest.xml'
+            jniLibs.srcDirs = ['libs']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+    }
+}

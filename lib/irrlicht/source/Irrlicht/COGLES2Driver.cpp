@@ -47,6 +47,7 @@ namespace video
 		RenderTargetTexture(0), CurrentRendertargetSize(0, 0), ColorFormat(ECF_R8G8B8)
 #if defined(_IRR_COMPILE_WITH_EGL_)
 		, EglContext(0)
+		, EglContextExternal(false)
 #elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 		, ViewFramebuffer(0)
 		, ViewRenderbuffer(0)
@@ -77,7 +78,7 @@ namespace video
 		HDc = GetDC(data.OpenGLWin32.HWnd);
 		egl_params.display = (NativeDisplayType)(HDc);
 #elif defined(_IRR_COMPILE_WITH_X11_DEVICE_)
-		egl_params.window = data.OpenGLLinux.X11Window;
+		egl_params.window = (EGLNativeWindowType)(data.OpenGLLinux.X11Window);
 		egl_params.display = (EGLNativeDisplayType)(data.OpenGLLinux.X11Display);
 #elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
 		egl_params.window =	((struct android_app *)(params.PrivateData))->window;
@@ -133,6 +134,22 @@ namespace video
 #endif
 	}
 
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+	COGLES2Driver::COGLES2Driver(const SIrrlichtCreationParameters& params, 
+				  io::IFileSystem* io, CIrrDeviceWayland* device)
+		: CNullDriver(io, params.WindowSize), COGLES2ExtensionHandler(),
+		BridgeCalls(0), CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
+		Transformation3DChanged(true), AntiAlias(params.AntiAlias),
+		RenderTargetTexture(0), CurrentRendertargetSize(0, 0), 
+		ColorFormat(ECF_R8G8B8), EglContext(0), EglContextExternal(false), 
+		Params(params)
+	{
+		EglContext = device->getEGLContext();
+		EglContextExternal = true;
+		genericDriverInit(params.WindowSize, params.Stencilbuffer);
+	}
+#endif
+				  
 
 	//! destructor
 	COGLES2Driver::~COGLES2Driver()
@@ -145,7 +162,8 @@ namespace video
 			delete BridgeCalls;
 
 #if defined(_IRR_COMPILE_WITH_EGL_)
-		delete EglContext;
+		if (!EglContextExternal)
+			delete EglContext;
 		
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
 		if (HDc)
@@ -414,6 +432,13 @@ namespace video
 		addAndDropMaterialRenderer(new COGLES2ParallaxMapRenderer(PMVSData, PMFSData, EMT_PARALLAX_MAP_TRANSPARENT_VERTEX_ALPHA, this));
 
 		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_ONETEXTURE_BLEND, this));
+		
+		delete[] FPVSData;
+		delete[] FPFSData;
+		delete[] NMVSData;
+		delete[] NMFSData;
+		delete[] PMVSData;
+		delete[] PMFSData;
 
 		// Create 2D material renderer.
 
@@ -458,16 +483,18 @@ namespace video
 			R2DFSFile->drop();
 
 		MaterialRenderer2D = new COGLES2Renderer2D(R2DVSData, R2DFSData, this);
+
+		delete[] R2DVSData;
+		delete[] R2DFSData;
 	}
 
 
 	//! presents the rendered scene on the screen, returns false if failed
 	bool COGLES2Driver::endScene()
 	{
-        CNullDriver::endScene();
+		CNullDriver::endScene();
 
 #if defined(_IRR_COMPILE_WITH_EGL_)
-
 		bool res = EglContext->swapBuffers();
 		
 		if (!res)
@@ -475,11 +502,10 @@ namespace video
 			os::Printer::log("Could not swap buffers for OpenGL-ES2 driver.");
 			return false;
 		}
-
 #elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
-        glFlush();
-        glBindRenderbuffer(GL_RENDERBUFFER, ViewRenderbuffer);
-        Device->displayEnd();
+		glFlush();
+		glBindRenderbuffer(GL_RENDERBUFFER, ViewRenderbuffer);
+		Device->displayEnd();
 #endif
 
 		return true;
@@ -2869,6 +2895,22 @@ namespace video
 		return 0;
 #endif // _IRR_COMPILE_WITH_OGLES2_
 	}
+#endif
+
+// -----------------------------------
+// WAYLAND VERSION
+// -----------------------------------
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+	IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params, 
+			io::IFileSystem* io, CIrrDeviceWayland* device)
+	{
+#ifdef _IRR_COMPILE_WITH_OGLES2_
+		return new COGLES2Driver(params, io, device);
+#else
+		return 0;
+#endif // _IRR_COMPILE_WITH_OGLES2_
+	}
+		
 #endif
 
 // -----------------------------------

@@ -20,7 +20,7 @@ out vec2 uv;
 void main()
 {
 
-    vec3 test = sin(windDir * (Position.y* 0.5)) * 0.5;
+    vec3 test = sin(windDir * (Position.y * 0.1)) * 1.;
     test += cos(windDir) * 0.7;
 
     mat4 new_model_matrix = ModelMatrix;

@@ -37,6 +37,7 @@
 #include "graphics/stk_animated_mesh.hpp"
 #include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_loader.hpp"
+#include "graphics/sp_mesh_loader.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/stk_texture.hpp"
@@ -97,10 +98,6 @@ using namespace irr;
 #if defined(__linux__) && !defined(ANDROID)
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#endif
-
-#ifdef ANDROID
-struct android_app* global_android_app;
 #endif
 
 /** singleton */
@@ -312,22 +309,26 @@ void IrrDriver::updateConfigIfRelevant()
             Log::warn("irr_driver", "Could not retrieve window location\n");
         }
 #elif defined(__linux__) && !defined(ANDROID)
-        const video::SExposedVideoData& videoData =
-            m_device->getVideoDriver()->getExposedVideoData();
-        Display* display = (Display*)videoData.OpenGLLinux.X11Display;
-        XWindowAttributes xwa;
-        XGetWindowAttributes(display, get_toplevel_parent(display,
-                                       videoData.OpenGLLinux.X11Window), &xwa);
-        int wx = xwa.x;
-        int wy = xwa.y;
-        Log::verbose("irr_driver",
-                     "Retrieved window location for config : %i %i\n", wx, wy);
-
-
-        if (UserConfigParams::m_window_x != wx || UserConfigParams::m_window_y != wy)
+        if (m_device->getType() == EIDT_X11)
         {
-            UserConfigParams::m_window_x = wx;
-            UserConfigParams::m_window_y = wy;
+            const video::SExposedVideoData& videoData =
+                m_device->getVideoDriver()->getExposedVideoData();
+            Display* display = (Display*)videoData.OpenGLLinux.X11Display;
+            XWindowAttributes xwa;
+            XGetWindowAttributes(display, get_toplevel_parent(display,
+                                       videoData.OpenGLLinux.X11Window), &xwa);
+            int wx = xwa.x;
+            int wy = xwa.y;
+            Log::verbose("irr_driver",
+                    "Retrieved window location for config : %i %i\n", wx, wy);
+    
+    
+            if (UserConfigParams::m_window_x != wx || 
+                UserConfigParams::m_window_y != wy)
+            {
+                UserConfigParams::m_window_x = wx;
+                UserConfigParams::m_window_y = wy;
+            }
         }
 #endif
     }
@@ -605,6 +606,9 @@ void IrrDriver::initDevice()
     STKMeshLoader* sml = new STKMeshLoader(m_scene_manager);
     m_scene_manager->addExternalMeshLoader(sml);
     sml->drop();
+    SPMeshLoader* spml = new SPMeshLoader(m_scene_manager);
+    m_scene_manager->addExternalMeshLoader(spml);
+    spml->drop();
 
     m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
 
@@ -712,18 +716,7 @@ void IrrDriver::initDevice()
     // Only change video driver settings if we are showing graphics
     if (!ProfileWorld::isNoGraphics())
     {
-#if defined(__linux__) && !defined(ANDROID) && !defined(SERVER_ONLY)
-        // Set class hints on Linux, used by Window Managers.
-        const video::SExposedVideoData& videoData = m_video_driver
-                                                ->getExposedVideoData();
-        XClassHint* classhint = XAllocClassHint();
-        classhint->res_name = (char*)"SuperTuxKart";
-        classhint->res_class = (char*)"SuperTuxKart";
-        XSetClassHint((Display*)videoData.OpenGLLinux.X11Display,
-                           videoData.OpenGLLinux.X11Window,
-                           classhint);
-        XFree(classhint);
-#endif
+        m_device->setWindowClass("SuperTuxKart");
         m_device->setWindowCaption(L"SuperTuxKart");
         m_device->getVideoDriver()
             ->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, true);
@@ -893,25 +886,29 @@ bool IrrDriver::moveWindow(int x, int y)
         return false;
     }
 #elif defined(__linux__) && !defined(ANDROID)
-    const video::SExposedVideoData& videoData = m_video_driver->getExposedVideoData();
-
-    Display* display = (Display*)videoData.OpenGLLinux.X11Display;
-    int screen = DefaultScreen(display);
-    int screen_w = DisplayWidth(display, screen);
-    int screen_h = DisplayHeight(display, screen);
-
-    if (x + UserConfigParams::m_width > screen_w)
+    if (m_device->getType() == EIDT_X11)
     {
-        x = screen_w - UserConfigParams::m_width;
+        const video::SExposedVideoData& videoData = 
+                                        m_video_driver->getExposedVideoData();
+    
+        Display* display = (Display*)videoData.OpenGLLinux.X11Display;
+        int screen = DefaultScreen(display);
+        int screen_w = DisplayWidth(display, screen);
+        int screen_h = DisplayHeight(display, screen);
+    
+        if (x + UserConfigParams::m_width > screen_w)
+        {
+            x = screen_w - UserConfigParams::m_width;
+        }
+    
+        if (y + UserConfigParams::m_height > screen_h)
+        {
+            y = screen_h - UserConfigParams::m_height;
+        }
+    
+        // TODO: Actually handle possible failure
+        XMoveWindow(display, videoData.OpenGLLinux.X11Window, x, y);
     }
-
-    if (y + UserConfigParams::m_height > screen_h)
-    {
-        y = screen_h - UserConfigParams::m_height;
-    }
-
-    // TODO: Actually handle possible failure
-    XMoveWindow(display, videoData.OpenGLLinux.X11Window, x, y);
 #endif
 #endif
     return true;

@@ -37,5 +37,7 @@
   <card contains="ATI"            os="windows"  version="<=3.1.8787" disable="ForceLegacyDevice"/>
   <card                           os="android"                     disable="TextureFormatBGRA8888"/>
   <card                           os="android"                     disable="ColorBufferFloat"/>
+  <card contains="Adreno"         os="android"  version="<=19"     disable="VertexIdWorking"/>
   <card contains="Android Emulator" os="android"                   disable="ForceLegacyDevice"/>
+  <card                           os="android"                     disable="UniformBufferObject"/>
 </graphical-restrictions>

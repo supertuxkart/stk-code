@@ -6,7 +6,6 @@ uniform vec2 dir;
 uniform vec2 dir2;
 
 in vec2 uv;
-in vec2 uv_bis;
 in float camdist;
 
 out vec4 FragColor;
