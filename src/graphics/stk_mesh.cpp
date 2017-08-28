@@ -84,8 +84,10 @@ TransparentMaterial getTransparentMaterialFromType(video::E_MATERIAL_TYPE type,
     {
         if (CVS->isDefferedEnabled())
             return TM_DISPLACEMENT;
-        else
+        else if (tp == video::EVT_2TCOORDS)
             return TM_TRANSLUCENT_2TC;
+        else
+            return TM_TRANSLUCENT_STD;
     }
     if (material->getShaderType() == Material::SHADERTYPE_ADDITIVE)
         return TM_ADDITIVE;
