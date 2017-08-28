@@ -114,19 +114,21 @@ void RaceGUIMultitouch::initMultitouchSteering()
 
     float first_column_x = w - 2 * col_size;
     float second_column_x = w - 1 * col_size;
-    float steering_btn_x = 0.5f * margin;
+    float steering_btn_margin = 0.6f * margin;
+    float steering_btn_x = steering_btn_margin;
+    float steering_btn_y = h - steering_btn_margin - btn2_size;
     
     if (UserConfigParams::m_multitouch_inverted)
     {
         first_column_x = margin + 1 * col_size;
         second_column_x = margin;
-        steering_btn_x = w - btn2_size - 0.5f * margin;
+        steering_btn_x = w - btn2_size - steering_btn_margin;
     }
 
     m_minimap_bottom = (unsigned int)(h - 2 * col_size);
 
     m_device->addButton(BUTTON_STEERING,
-                        int(steering_btn_x), int(h - 0.5f * margin - btn2_size),
+                        int(steering_btn_x), int(steering_btn_y),
                         int(btn2_size), int(btn2_size));
     m_device->addButton(BUTTON_ESCAPE,
                         int(margin_top), int(margin_small),

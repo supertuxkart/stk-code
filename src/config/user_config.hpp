@@ -431,13 +431,13 @@ namespace UserConfigParams
             "considered as centered in steering button."));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_edge
-            PARAM_DEFAULT( FloatUserConfigParam(0.25f, "multitouch_deadzone_edge",
+            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone_edge",
             &m_multitouch_group,
             "A parameter in range [0, 0.5] that determines the zone that is "
             "considered as max value in steering button."));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_scale
-            PARAM_DEFAULT( FloatUserConfigParam(1.0f, "multitouch_scale",
+            PARAM_DEFAULT( FloatUserConfigParam(1.1f, "multitouch_scale",
             &m_multitouch_group,
             "A parameter in range [0.5, 1.5] that determines the scale of the "
             "multitouch interface."));
