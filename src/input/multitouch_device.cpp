@@ -157,7 +157,6 @@ void MultitouchDevice::addButton(MultitouchButtonType type, int x, int y,
                 m_accelerometer_active = true;
             }
         }
-
     }
 #endif
 } // addButton
@@ -193,32 +192,38 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
 {
     assert(event_id < m_events.size());
 
-    MultitouchEvent event = m_events[event_id];
+    MultitouchButton* pressed_button = NULL;
+    
+    for (MultitouchButton* button : m_buttons)
+    {
+        if (button->pressed && button->event_id == event_id) 
+        {
+            pressed_button = button;
+            break;
+        }
+    }
 
     for (MultitouchButton* button : m_buttons)
     {
+        if (pressed_button != NULL && button != pressed_button)
+            continue;
+            
         bool update_controls = false;
         bool prev_button_state = button->pressed;
-        float prev_axis_x = button->axis_x;
-        float prev_axis_y = button->axis_y;
+        MultitouchEvent event = m_events[event_id];
 
-        if (event.x < button->x || event.x > button->x + button->width ||
-            event.y < button->y || event.y > button->y + button->height)
-        {
-            if (button->event_id == event_id)
-            {
-                button->pressed = false;
-                button->event_id = 0;
-                updateButtonAxes(button, 0.0f, 0.0f);
-            }
-        }
-        else
+        if (pressed_button != NULL ||
+            (event.x >= button->x && event.x <= button->x + button->width &&
+            event.y >= button->y && event.y <= button->y + button->height))
         {
             button->pressed = event.touched;
             button->event_id = event_id;
 
             if (button->type == MultitouchButtonType::BUTTON_STEERING)
             {
+                float prev_axis_x = button->axis_x;
+                float prev_axis_y = button->axis_y;
+                
                 if (button->pressed == true)
                 {
                     updateButtonAxes(button,
