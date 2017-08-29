@@ -1132,7 +1132,7 @@ int handleCmdLine()
     if(CommandLine::has("--track", &s) || CommandLine::has("-t", &s))
     {
         race_manager->setTrack(s);
-        Log::verbose("main", "You choose to start in track '%s'.",
+        Log::verbose("main", "You chose to start in track '%s'.",
                      s.c_str());
 
         Track* t = track_manager->getTrack(s);
@@ -1142,7 +1142,7 @@ int handleCmdLine()
         }
         else if (t->isArena())
         {
-            //if it's arena, don't create ai karts
+            //if it's arena, don't create AI karts
             const std::vector<std::string> l;
             race_manager->setDefaultAIKartList(l);
             // Add 1 for the player kart
@@ -1151,7 +1151,7 @@ int handleCmdLine()
         }
         else if (t->isSoccer())
         {
-            //if it's soccer, don't create ai karts
+            //if it's soccer, don't create AI karts
             const std::vector<std::string> l;
             race_manager->setDefaultAIKartList(l);
             // Add 1 for the player kart
@@ -1218,7 +1218,7 @@ int handleCmdLine()
         }
         else
         {
-            Log::verbose("main", "You choose to have %d laps.", laps);
+            Log::verbose("main", "You chose to have %d laps.", laps);
             race_manager->setNumLaps(laps);
         }
     }   // --laps
@@ -1330,7 +1330,7 @@ int handleCmdLine()
 
         if (request->isSuccess())
         {
-            Log::info("Main", "Logged in from command line.");
+            Log::info("Main", "Logged in from command-line.");
         }
     }
 
@@ -1390,9 +1390,9 @@ void initRest()
     font_manager->loadFonts();
     GUIEngine::init(device, driver, StateManager::get());
 
-    // This only initialises the non-network part of the addons manager. The
-    // online section of the addons manager will be initialised from a
-    // separate thread running in network http.
+    // This only initialises the non-network part of the add-ons manager. The
+    // online section of the add-ons manager will be initialised from a
+    // separate thread running in network HTTP.
     addons_manager          = new AddonsManager();
     Online::ProfileManager::create();
 
@@ -1477,7 +1477,7 @@ void askForInternetPermission()
             // Typically internet is disabled here (just better safe
             // than sorry). If internet should be allowed, the news
             // manager needs to be started (which in turn activates
-            // the addons manager).
+            // the add-ons manager).
             bool need_to_start_news_manager =
                 UserConfigParams::m_internet_status !=
                                   Online::RequestManager::IPERM_ALLOWED;
@@ -1615,8 +1615,8 @@ int main(int argc, char *argv[] )
 
         addons_manager->checkInstalledAddons();
 
-        // Load addons.xml to get info about addons even when not
-        // allowed to access the internet
+        // Load addons.xml to get info about add-ons even when not
+        // allowed to access the Internet
         if (UserConfigParams::m_internet_status !=
             Online::RequestManager::IPERM_ALLOWED)
         {
@@ -1630,7 +1630,7 @@ int main(int argc, char *argv[] )
                 }
                 catch (std::runtime_error& e)
                 {
-                    Log::warn("Addons", "Exception thrown when initializing addons manager : %s", e.what());
+                    Log::warn("Addons", "Exception thrown when initializing add-ons manager : %s", e.what());
                 }
             }
         }
@@ -1652,7 +1652,7 @@ int main(int argc, char *argv[] )
                 {
                     MessageDialog *dialog =
                         new MessageDialog(_("Your screen resolution is too "
-                                            "small to run STK."),
+                                            "low to run STK."),
                                             /*from queue*/ true);
                     GUIEngine::DialogQueue::get()->pushDialog(dialog);
                 }
@@ -1898,7 +1898,7 @@ static void cleanSuperTuxKart()
     // But still give them some additional time to finish. It avoids a
     // race condition where a thread might access the file manager after it
     // was deleted (in cleanUserConfig below), but before STK finishes and
-    // the os takes all threads down.
+    // the OS takes all threads down.
 
     if(!NewsManager::get()->waitForReadyToDeleted(2.0f))
     {
@@ -1918,12 +1918,12 @@ static void cleanSuperTuxKart()
     }
     SFXManager::destroy();
 
-    // Music manager can not be deleted before the sfx thread is stopped
-    // (since sfx commands can contain music information, which are
+    // Music manager can not be deleted before the SFX thread is stopped
+    // (since SFX commands can contain music information, which are
     // deleted by the music manager).
     delete music_manager;
 
-    // The addons manager might still be called from a currenty running request
+    // The add-ons manager might still be called from a currenty running request
     // in the request manager, so it can not be deleted earlier.
     if(addons_manager)  delete addons_manager;
 
