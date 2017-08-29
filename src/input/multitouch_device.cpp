@@ -43,14 +43,7 @@ MultitouchDevice::MultitouchDevice()
     assert(m_android_device != NULL);
 #endif
 
-    for (MultitouchEvent& event : m_events)
-    {
-        event.id = 0;
-        event.touched = false;
-        event.x = 0;
-        event.y = 0;
-    }
-
+    reset();
     updateConfigParams();
 }   // MultitouchDevice
 
@@ -182,6 +175,28 @@ void MultitouchDevice::clearButtons()
 
     m_buttons.clear();
 } // clearButtons
+
+// ----------------------------------------------------------------------------
+/** Sets all buttons and events to default state
+ */
+void MultitouchDevice::reset()
+{
+    for (MultitouchButton* button : m_buttons)
+    {
+        button->pressed = false;
+        button->event_id = 0;
+        button->axis_x = 0.0f;
+        button->axis_y = 0.0f;
+    }
+
+    for (MultitouchEvent& event : m_events)
+    {
+        event.id = 0;
+        event.touched = false;
+        event.x = 0;
+        event.y = 0;
+    }
+} // reset
 
 // ----------------------------------------------------------------------------
 /** The function that is executed when touch event occurs. It updates the

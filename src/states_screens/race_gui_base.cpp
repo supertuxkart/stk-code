@@ -154,6 +154,11 @@ void RaceGUIBase::reset()
     m_plunger_speed     = core::vector2df(0,0);
     m_plunger_state     = PLUNGER_STATE_INIT;
     clearAllMessages();
+    
+    if (m_multitouch_gui != NULL)
+    {
+        m_multitouch_gui->reset();
+    }
 }   // reset
 
 //-----------------------------------------------------------------------------

@@ -77,6 +77,18 @@ RaceGUIMultitouch::~RaceGUIMultitouch()
 
 
 //-----------------------------------------------------------------------------
+/** Sets the multitouch race gui to its initial state
+ */
+void RaceGUIMultitouch::reset()
+{
+    if (m_device != NULL)
+    {
+        m_device->reset();
+    }
+}   // reset
+
+
+//-----------------------------------------------------------------------------
 /** Clears all previously created buttons in the multitouch device
  */
 void RaceGUIMultitouch::closeMultitouchSteering()

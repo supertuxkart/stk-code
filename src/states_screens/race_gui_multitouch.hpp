@@ -62,6 +62,7 @@ public:
                                 
     unsigned int getMinimapBottom() {return m_minimap_bottom;}
     void setGuiAction(bool enabled = true) {m_gui_action = enabled;}
+    void reset();
                                  
 };   // RaceGUIMultitouch
 
