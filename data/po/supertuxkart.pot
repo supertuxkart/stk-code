@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-28 19:28-0400\n"
+"POT-Creation-Date: 2017-08-29 19:48-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -868,7 +868,7 @@ msgstr ""
 
 #. I18N: ./data/gui/main_menu.stkgui
 #. I18N: In the main screen
-#: src/states_screens/race_gui_overworld.cpp:503
+#: src/states_screens/race_gui_overworld.cpp:511
 msgid "Tutorial"
 msgstr ""
 
@@ -2749,7 +2749,7 @@ msgid ""
 msgstr ""
 
 #: src/main.cpp:1654
-msgid "Your screen resolution is too small to run STK."
+msgid "Your screen resolution is too low to run STK."
 msgstr ""
 
 #: src/main.cpp:1668
@@ -3761,7 +3761,7 @@ msgstr ""
 msgid "Rendered image quality: %s"
 msgstr ""
 
-#: src/states_screens/race_gui.cpp:350 src/states_screens/race_gui.cpp:352
+#: src/states_screens/race_gui.cpp:358 src/states_screens/race_gui.cpp:360
 msgid "Challenge Failed"
 msgstr ""
 
@@ -3786,42 +3786,42 @@ msgid "GOAL!"
 msgstr ""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/race_gui_base.cpp:520
+#: src/states_screens/race_gui_base.cpp:517
 msgid "by"
 msgstr ""
 
-#: src/states_screens/race_gui_base.cpp:629
+#: src/states_screens/race_gui_base.cpp:626
 msgid "Collect nitro!"
 msgstr ""
 
-#: src/states_screens/race_gui_base.cpp:631
+#: src/states_screens/race_gui_base.cpp:628
 msgid "Follow the leader!"
 msgstr ""
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:809
+#: src/states_screens/race_gui_base.cpp:806
 #, c-format
 msgid "Top %i"
 msgstr ""
 
 #. I18N: Shown at the end of a race
-#: src/states_screens/race_gui_overworld.cpp:136
+#: src/states_screens/race_gui_overworld.cpp:143
 msgid "Lap"
 msgstr ""
 
-#: src/states_screens/race_gui_overworld.cpp:137
+#: src/states_screens/race_gui_overworld.cpp:144
 msgid "Rank"
 msgstr ""
 
-#: src/states_screens/race_gui_overworld.cpp:510
+#: src/states_screens/race_gui_overworld.cpp:518
 msgid "Press fire to start the tutorial"
 msgstr ""
 
-#: src/states_screens/race_gui_overworld.cpp:549
+#: src/states_screens/race_gui_overworld.cpp:557
 msgid "Type: Grand Prix"
 msgstr ""
 
-#: src/states_screens/race_gui_overworld.cpp:586
+#: src/states_screens/race_gui_overworld.cpp:594
 msgid "Press fire to start the challenge"
 msgstr ""
 
