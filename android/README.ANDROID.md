@@ -1,13 +1,9 @@
 ================================================================================
-
- SUPERTUXKART
-
+# SuperTuxKart for Android
 ================================================================================
 
-
-
 --------------------------------------------------------------------------------
- SYSTEM REQUIREMENTS
+### SYSTEM REQUIREMENTS
 --------------------------------------------------------------------------------
 
 To run SuperTuxKart on Android, you need a device that meets following
@@ -20,10 +16,8 @@ requirements:
 - 300 MB of free space on internal storage
 - Touch screen or external keyboard
 
-
-
 --------------------------------------------------------------------------------
- COMPILATION
+### COMPILATION
 --------------------------------------------------------------------------------
 
 The build scripts are designed to run under linux. They may work under cygwin
@@ -92,9 +86,8 @@ to just run:
     ./make.sh -j5
 
 
-
 --------------------------------------------------------------------------------
- RELEASE BUILD
+### RELEASE BUILD
 --------------------------------------------------------------------------------
 
 Making a release build is similar to typical compilation, but there are few
@@ -123,7 +116,6 @@ So that you have to:
     android:versionCode="1"
     android:versionName="1.0"
 
-
 Before compilation you have to set:
 
     export BUILD_TYPE=release
@@ -132,7 +124,6 @@ and then you make standard compilation with:
 
     ./generate_assets.sh
     ./make.sh -j5
-    
 
 The compiled apk is unsigned, so you have to sign it with your key. To sign it,
 you have to run:
@@ -145,9 +136,8 @@ and then:
     zipalign -v 4 SuperTuxKart-release-unsigned.apk SuperTuxKart-release.apk
 
 
-
 --------------------------------------------------------------------------------
- KNOWN ISSUES
+### KNOWN ISSUES
 --------------------------------------------------------------------------------
 
 1.  It's not possible to compile STK for Android < 4.4 due to missing GLES 3.0
