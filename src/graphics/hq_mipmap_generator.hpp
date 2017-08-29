@@ -53,7 +53,7 @@ public:
                       const core::dimension2d<u32>& size, GLuint texture_name,
                       TexConfig* tc);
     // ------------------------------------------------------------------------
-    virtual ~HQMipmapGenerator() {}
+    ~HQMipmapGenerator();
     // ------------------------------------------------------------------------
     virtual void* lock(video::E_TEXTURE_LOCK_MODE mode =
                        video::ETLM_READ_WRITE, u32 mipmap_level = 0)

@@ -57,6 +57,10 @@ HQMipmapGenerator::HQMipmapGenerator(const io::path& name, uint8_t* data,
     m_mipmap_data = malloc(sizeof(imMipmapCascade));
 }   // HQMipmapGenerator
 
+HQMipmapGenerator::~HQMipmapGenerator() {
+    delete m_mipmap_data
+}
+
 // ----------------------------------------------------------------------------
 void HQMipmapGenerator::threadedReload(void* ptr, void* param) const
 {
