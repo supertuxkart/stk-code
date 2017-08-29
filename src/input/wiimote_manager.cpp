@@ -39,7 +39,7 @@ WiimoteManager*  wiimote_manager;
 
 bool WiimoteManager::m_enabled      = false;
 
-/** Irrlicht device IDs for the wiimotes start at this value */
+/** Irrlicht device IDs for the Wiimotes start at this value */
 static const int    WIIMOTE_START_IRR_ID   = 32;
 
 WiimoteManager::WiimoteManager()
@@ -64,9 +64,9 @@ WiimoteManager::~WiimoteManager()
  */
 void WiimoteManager::launchDetection(int timeout)
 {
-  // It's only needed on systems with bluez, because wiiuse_find does not find alredy connected wiimotes
+  // It's only needed on systems with BlueZ, because wiiuse_find does not find alredy connected Wiimotes
 #ifdef WIIUSE_BLUEZ
-    //Cleans up the config and the disconnected wiimotes
+    //Cleans up the config and the disconnected Wiimotes
     int number_previous_wiimotes = 0;
     wiimote_t** previous_wiimotes = (wiimote_t**) malloc(sizeof(struct wiimote_t*) * MAX_WIIMOTES);
     memset(previous_wiimotes,0,sizeof(struct wiimote_t*) * MAX_WIIMOTES);
@@ -96,7 +96,7 @@ void WiimoteManager::launchDetection(int timeout)
 
 #endif
 
-    // Stop WiiUse, remove wiimotes, gamepads, gamepad configs.
+    // Stop WiiUse, remove Wiimotes, gamepads, gamepad configs.
     cleanup();
 
     m_all_wiimote_handles = wiiuse_init(MAX_WIIMOTES);
@@ -111,26 +111,26 @@ void WiimoteManager::launchDetection(int timeout)
 #endif
 
 #ifdef WIIUSE_BLUEZ
-    // Couldn't find any wiimote?
+    // Couldn't find any Wiimote?
     if(nb_found_wiimotes + number_previous_wiimotes == 0)
         return;
 #endif
 
-    // Try to connect to all found wiimotes
+    // Try to connect to all found Wiimotes
     int nb_wiimotes = wiiuse_connect(m_all_wiimote_handles, nb_found_wiimotes);
 
 #ifndef WIIUSE_BLUEZ
-    // Couldn't connect to any wiimote?
+    // Couldn't connect to any Wiimote?
     if(nb_wiimotes == 0)
         return;
 #endif
 
 #ifdef WIIUSE_BLUEZ
-    // Couldn't connect to any wiimote?
+    // Couldn't connect to any Wiimote?
     if(nb_wiimotes + number_previous_wiimotes == 0)
         return;
 
-    //Merges previous and new wiimote's list
+    //Merges previous and new Wiimote's list
     int number_merged_wiimotes = 0;
     for (int i = 0; i < number_previous_wiimotes && i + nb_wiimotes < MAX_WIIMOTES; i++)
     {
@@ -158,7 +158,7 @@ void WiimoteManager::launchDetection(int timeout)
 #endif
 
     // ---------------------------------------------------
-    // Create or find a GamepadConfig for all wiimotes
+    // Create or find a GamepadConfig for all Wiimotes
     DeviceManager* device_manager = input_manager->getDeviceManager();
     GamepadConfig* gamepad_config = NULL;
 
@@ -256,7 +256,7 @@ void WiimoteManager::cleanup()
                                       first_gamepad_device->getConfiguration();
         assert(gamepad_config);
 
-        // Remove the wiimote configuration -> automatically removes all
+        // Remove the Wiimote configuration -> automatically removes all
         // linked gamepad devices;
         device_manager->deleteConfig(gamepad_config);
 
@@ -385,12 +385,12 @@ int WiimoteManager::askUserToConnectWiimotes()
 {
     new MessageDialog(
 #ifdef WIN32
-        _("Connect your wiimote to the Bluetooth manager, then click on Ok. "
-                  "Detailed instructions at supertuxkart.net/Wiimote"),
+        _("Connect your Wiimote to the Bluetooth manager, then click on OK. "
+                  "Detailed instructions at https://supertuxkart.net/Wiimote"),
 #else
-        _("Press the buttons 1+2 simultaneously on your wiimote to put "
-          "it in discovery mode, then click on Ok. "
-                  "Detailed instructions at supertuxkart.net/Wiimote"),
+        _("Press the 1 and 2 buttons on your Wiimote simultaneously to put "
+          "it in discovery mode, then click on OK. "
+                  "Detailed instructions at https://supertuxkart.net/Wiimote"),
 #endif
         MessageDialog::MESSAGE_DIALOG_OK_CANCEL,
         new WiimoteDialogListener(), true);
@@ -411,12 +411,12 @@ void WiimoteManager::WiimoteDialogListener::onConfirm()
     int nb_wiimotes = wiimote_manager->getNumberOfWiimotes();
     if(nb_wiimotes > 0)
     {
-        new MessageDialog(_P("Found %d wiimote", "Found %d wiimotes",
+        new MessageDialog(_P("Found %d Wiimote", "Found %d Wiimotes",
                              nb_wiimotes));
     }
     else
     {
-        new MessageDialog( _("Could not detect any wiimote :/") );
+        new MessageDialog( _("Could not detect any Wiimote :/") );
     }
 }   // WiimoteDialogListeneronConfirm
 #endif // ENABLE_WIIUSE
