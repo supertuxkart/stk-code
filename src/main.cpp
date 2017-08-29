@@ -1500,7 +1500,7 @@ void askForInternetPermission()
     new MessageDialog(_("SuperTuxKart may connect to a server "
         "to download add-ons and notify you of updates. We also collect "
         "anonymous hardware statistics to help with the development of STK. "
-        "Please read our privacy policy at https://privacy.supertuxkart.net. "
+        "Please read our privacy policy at http://privacy.supertuxkart.net. "
         "Would you like this feature to be enabled? (To change this setting "
         "at a later time, go to options, select tab "
         "'User Interface', and edit \"Connect to the "
