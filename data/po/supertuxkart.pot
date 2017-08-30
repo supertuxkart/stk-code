@@ -1,6 +1,6 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the supertuxkart package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-29 19:48-0400\n"
+"POT-Creation-Date: 2017-08-30 06:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1403,7 +1403,7 @@ msgstr ""
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
 #: src/states_screens/options_screen_device.cpp:86
-#: src/states_screens/options_screen_input.cpp:150
+#: src/states_screens/options_screen_input.cpp:151
 #: src/states_screens/options_screen_ui.cpp:123
 #: src/states_screens/options_screen_video.cpp:238
 #: src/states_screens/user_screen.cpp:660
@@ -1479,7 +1479,7 @@ msgstr ""
 #: src/states_screens/ghost_replay_selection.cpp:78
 #: src/states_screens/options_screen_audio.cpp:67
 #: src/states_screens/options_screen_device.cpp:88
-#: src/states_screens/options_screen_input.cpp:152
+#: src/states_screens/options_screen_input.cpp:153
 #: src/states_screens/options_screen_ui.cpp:124
 #: src/states_screens/options_screen_video.cpp:240
 #: src/states_screens/server_selection.cpp:103
@@ -1504,7 +1504,7 @@ msgstr ""
 #. I18N: Section in the settings menu
 #: src/states_screens/options_screen_audio.cpp:66
 #: src/states_screens/options_screen_device.cpp:87
-#: src/states_screens/options_screen_input.cpp:151
+#: src/states_screens/options_screen_input.cpp:152
 #: src/states_screens/options_screen_video.cpp:239
 #: src/states_screens/user_screen.cpp:661
 msgid "User Interface"
@@ -1544,7 +1544,7 @@ msgstr ""
 #. I18N: Section in the settings menu
 #: src/states_screens/options_screen_audio.cpp:65
 #: src/states_screens/options_screen_device.cpp:85
-#: src/states_screens/options_screen_input.cpp:149
+#: src/states_screens/options_screen_input.cpp:150
 #: src/states_screens/options_screen_ui.cpp:122
 #: src/states_screens/user_screen.cpp:659
 msgid "Graphics"
@@ -3197,7 +3197,13 @@ msgid "Username and/or email address invalid."
 msgstr ""
 
 #: src/states_screens/dialogs/registration_dialog.cpp:42
-msgid "Please read the terms and conditions "
+#, c-format
+msgid ""
+"Please read the terms and conditions for SuperTuxKart at '%s'. You must "
+"agree to these terms in order to register an account for STK. By checking "
+"the box below, you are confirming that you understand these terms. If you "
+"have any questions or comments regarding these terms, one of the members of "
+"the development team would gladly assist you."
 msgstr ""
 
 #: src/states_screens/dialogs/select_challenge.cpp:52
@@ -3648,6 +3654,10 @@ msgstr ""
 #: src/states_screens/options_screen_input.cpp:100
 #, c-format
 msgid "Keyboard %i"
+msgstr ""
+
+#: src/states_screens/options_screen_input.cpp:138
+msgid "Touch Device"
 msgstr ""
 
 #: src/states_screens/options_screen_ui.cpp:159
