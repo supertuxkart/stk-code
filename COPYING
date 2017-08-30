@@ -1,13 +1,13 @@
+The SuperTuxKart code is released under the GNU GPL version 3 (see full text below), or at your option, any later version.
+SuperTuxKart data files (textures, models, sounds, music, etc.) are released under various licenses, see 'licenses.txt' files
+through the various data subdirectories. Data files are released under a mixture of licenses including, but not limited to the following:
 
-The SuperTuxKart code is released under GNU GPL (see full text below).
-SuperTuxKart data files (textures, models, sounds, music, etc.) are released under various licenses, see 'license.txt' files
-through the various data subdirectories. Data files are released under a mixture of the following licenses :
-
-Gnu GPL 2.0 and 3.0+
-Creative-Commons-BY(-SA) 3.0
+GNU GPL 2.0 and 3.0+
+Creative Commons BY(-SA) 3.0/4.0
 Public Domain
 
-_______________________________________________________________________
+_____________________________________________________________________
+
 GNU GENERAL PUBLIC LICENSE
 
 Version 3, 29 June 2007
@@ -46,7 +46,7 @@ TERMS AND CONDITIONS
 
 "Copyright" also means copyright-like laws that apply to other kinds of works, such as semiconductor masks.
 
-"The Program!" refers to any copyrightable work licensed under this License. Each licensee is addressed as "you". "Licensees" and "recipients" may be individuals or organizations.
+"The Program" refers to any copyrightable work licensed under this License. Each licensee is addressed as "you". "Licensees" and "recipients" may be individuals or organizations.
 
 To "modify" a work means to copy from or adapt all or part of the work in a fashion requiring copyright permission, other than the making of an exact copy. The resulting work is called a "modified version" of the earlier work or a work "based on" the earlier work.
 
@@ -215,5 +215,3 @@ You may convey a work based on the Program, or the modifications to produce it f
 17. Interpretation of Sections 15 and 16.
 
     If the disclaimer of warranty and limitation of liability provided above cannot be given local legal effect according to their terms, reviewing courts shall apply local law that most closely approximates an absolute waiver of all civil liability in connection with the Program, unless a warranty or assumption of liability accompanies a copy of the Program in return for a fee.
-
-END OF TERMS AND CONDITIONS
