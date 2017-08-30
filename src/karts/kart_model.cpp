@@ -904,7 +904,7 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
     if(m_current_animation==AF_DEFAULT ||
         m_animation_frame[m_current_animation]<=-1)
     {
-        Log::debug("Kart_Model", "OnAnimationEnd for '%s': current %d frame %d",
+        Log::error("Kart_Model", "OnAnimationEnd for '%s': current %d frame %d",
                m_model_filename.c_str(),
                m_current_animation, m_animation_frame[m_current_animation]);
         assert(false);
