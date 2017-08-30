@@ -70,6 +70,7 @@ SFXOpenAL::~SFXOpenAL()
     if (m_status!=SFX_UNKNOWN && m_status!=SFX_NOT_INITIALISED)
     {
         alDeleteSources(1, &m_sound_source);
+        SFXManager::checkError("deleting a source");
     }
 
     if (m_owns_buffer && m_sound_buffer)
