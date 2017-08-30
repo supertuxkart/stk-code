@@ -132,6 +132,37 @@ void CheckManager::resetAfterKartMove(AbstractKart *kart)
 }   // resetAfterKartMove
 
 // ----------------------------------------------------------------------------
+/** Adds a flyable object to be tested against cannons. This will allow
+ *  bowling- and rubber-balls to fly in a cannon.
+ *  \param flyable Pointer to the flyable to be added.
+ */
+void CheckManager::addFlyableToCannons(Flyable *flyable)
+{
+    for (unsigned int i = 0; i < m_all_checks.size(); i++)
+    {
+        CheckCannon *cc = dynamic_cast<CheckCannon*>(m_all_checks[i]);
+        if (cc)
+            cc->addFlyable(flyable);
+    }
+}   // addFlyable
+
+// ----------------------------------------------------------------------------
+/** Removes a flyable from all cannons. Used when this flyable is removed
+ *  (e.g. explodes).
+ *  \param flyable Pointer to the flyable to be removed.
+ */
+void CheckManager::removeFlyableFromCannons(Flyable *flyable)
+{
+    for (unsigned int i = 0; i < m_all_checks.size(); i++)
+    {
+        CheckCannon *cc = dynamic_cast<CheckCannon*>(m_all_checks[i]);
+        if (cc)
+            cc->removeFlyable(flyable);
+    }
+
+}   // addFlyable
+
+// ----------------------------------------------------------------------------
 /** Updates all animations. Called one per time step.
  *  \param dt Time since last call.
  */

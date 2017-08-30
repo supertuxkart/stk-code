@@ -83,12 +83,12 @@ VAOManager::~VAOManager()
 }
 
 static void
-resizeBufferIfNecessary(size_t &lastIndex, size_t newLastIndex, size_t bufferSize, size_t stride, GLenum type, GLuint &id, void *&Pointer)
+resizeBufferIfNecessary(size_t &lastIndex, size_t newLastIndex, size_t& bufferSize, size_t stride, GLenum type, GLuint &id, void *&Pointer)
 {
-    if (newLastIndex * stride >= bufferSize)
+    if (newLastIndex >= bufferSize)
     {
         while (newLastIndex >= bufferSize)
-            bufferSize = 2 * bufferSize + 1;
+            bufferSize = bufferSize == 0 ? 1 : bufferSize * 2;
         GLuint newVBO;
         glGenBuffers(1, &newVBO);
         glBindBuffer(type, newVBO);

@@ -21,8 +21,10 @@
 
 #include "animations/animation_base.hpp"
 #include "tracks/check_line.hpp"
+#include "utils/cpp2011.hpp"
 
 class CheckManager;
+class Flyable;
 class Ipo;
 class ShowCurve;
 class XMLNode;
@@ -51,12 +53,18 @@ private:
     /** Used to display debug information about checklines. */
     scene::IMeshSceneNode *m_debug_target_node;
 #endif
+    std::vector<Flyable*> m_all_flyables;
+    std::vector<Vec3>     m_flyable_previous_position;
 
 public:
              CheckCannon(const XMLNode &node, unsigned int index);
     virtual ~CheckCannon();
-    virtual void trigger(unsigned int kart_index);
-    virtual void changeDebugColor(bool is_active);
+    virtual void trigger(unsigned int kart_index) OVERRIDE;
+    virtual void changeDebugColor(bool is_active) OVERRIDE;
+    virtual void update(float dt) OVERRIDE;
+
+    void addFlyable(Flyable *flyable);
+    void removeFlyable(Flyable *flyable);
 };   // CheckLine
 
 #endif

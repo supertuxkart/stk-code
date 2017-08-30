@@ -25,6 +25,7 @@
 #include "graphics/show_curve.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "io/xml_node.hpp"
+#include "items/flyable.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/cannon_animation.hpp"
 #include "karts/skidding.hpp"
@@ -88,9 +89,12 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
                 : video::SColor(128, 128, 128, 128);
         }
         buffer->recalculateBoundingBox();
-        buffer->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(128, 255, 105, 180)));
-        buffer->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-        buffer->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        buffer->getMaterial().setTexture(0, STKTexManager::getInstance()
+                            ->getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+        buffer->getMaterial().setTexture(1, STKTexManager::getInstance()
+                            ->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        buffer->getMaterial().setTexture(2, STKTexManager::getInstance()
+                            ->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
         buffer->getMaterial().BackfaceCulling = false;
         //mesh->setBoundingBox(buffer->getBoundingBox());
         m_debug_target_node = irr_driver->addMesh(mesh, "checkdebug");
@@ -114,6 +118,8 @@ CheckCannon::~CheckCannon()
 }   // ~CheckCannon
 
 // ----------------------------------------------------------------------------
+/** Changes the colour of a check cannon depending on state.
+ */
 void CheckCannon::changeDebugColor(bool is_active)
 {
 #if defined(DEBUG) && !defined(SERVER_ONLY)
@@ -133,6 +139,55 @@ void CheckCannon::changeDebugColor(bool is_active)
 #endif
 }   // changeDebugColor
 
+// ----------------------------------------------------------------------------
+/** Adds a flyable to be tested for crossing a cannon checkline.
+ *  \param flyable The flyable to be tested.
+ */
+void CheckCannon::addFlyable(Flyable *flyable)
+{
+    m_all_flyables.push_back(flyable);
+    m_flyable_previous_position.push_back(flyable->getXYZ());
+}   // addFlyable
+
+// ----------------------------------------------------------------------------
+/** Removes a flyable from the tests if it crosses a checkline. Used when
+ *  the flyable is removed (e.g. explodes).
+ */
+void CheckCannon::removeFlyable(Flyable *flyable)
+{
+    std::vector<Flyable*>::iterator i = std::find(m_all_flyables.begin(),
+                                                  m_all_flyables.end(),
+                                                  flyable);
+    assert(i != m_all_flyables.end());
+    int index = i - m_all_flyables.begin();   // get the index
+    m_all_flyables.erase(i);
+    m_flyable_previous_position.erase(m_flyable_previous_position.begin() + index);
+}   // removeFlyable
+
+// ----------------------------------------------------------------------------
+/** Overriden to also check all flyables registered with the cannon.
+ */
+void CheckCannon::update(float dt)
+{
+    CheckLine::update(dt);
+    for (unsigned int i = 0; i < m_all_flyables.size(); i++)
+    {
+        setIgnoreHeight(true);
+        bool triggered = isTriggered(m_flyable_previous_position[i],
+                                     m_all_flyables[i]->getXYZ(),
+                                     /*kart index - ignore*/ -1     );
+        setIgnoreHeight(false);
+        m_flyable_previous_position[i] = m_all_flyables[i]->getXYZ();
+        if(!triggered) continue;
+
+        // Cross the checkline - add the cannon animation
+        CannonAnimation *animation =
+            new CannonAnimation(m_all_flyables[i], m_curve->clone(),
+                                getLeftPoint(), getRightPoint(),
+                                m_target_left, m_target_right);
+        m_all_flyables[i]->setAnimation(animation);
+    }   // for i in all flyables
+}   // update
 // ----------------------------------------------------------------------------
 /** Called when the check line is triggered. This function  creates a cannon
  *  animation object and attaches it to the kart.

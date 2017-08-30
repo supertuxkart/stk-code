@@ -204,6 +204,7 @@ public:
     static  void init(const XMLNode &node, scene::IMesh *rubberball);
     virtual bool updateAndDelete(float dt);
     virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL);
+    virtual void setAnimation(AbstractKartAnimation *animation);
     static float getTimeBetweenRubberBalls()    {return m_time_between_balls;}
     // ------------------------------------------------------------------------
     /** This object does not create an explosion, all affects on
