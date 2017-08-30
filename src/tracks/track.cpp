@@ -2030,11 +2030,6 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
                 m_sky_particles =
                     ParticleKindManager::get()->getParticles(weather_particles);
             }
-            else
-            {
-                Log::error("track", "Bad weather node found - ignored.\n");
-                continue;
-            }
         }
         else if (name == "sun")
         {
