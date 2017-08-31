@@ -325,6 +325,11 @@ void Powerup::use()
                 }
             }
 
+            if (m_sound_use != NULL)
+            {
+                m_sound_use->deleteSFX();
+                m_sound_use = NULL;
+            }
             m_sound_use = SFXManager::get()->createSoundSource("inflate");//Extraordinary. Usually sounds are set in Powerup::set()
             //In this case this is a workaround, since the bubblegum item has two different sounds.
 
