@@ -82,7 +82,7 @@ namespace Online
 
         Log::info("Updater", "Checking for updates.");
         Online::HTTPRequest *download_request = new Online::HTTPRequest();
-        download_request->setURL("https://jacobspctuneup.tk/CurrVer.php");
+        download_request->setURL("https://addons.supertuxkart.net/CurrVer.php");
         download_request->executeNow();
         if(download_request->hadDownloadError())
         {
