@@ -881,6 +881,7 @@ void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
     {
         // Special animation not found, revert to default
         m_current_animation = AF_DEFAULT;
+        m_animated_node->setAnimationEndCallback(NULL);
     }
 }   // setAnimation
 
@@ -898,17 +899,6 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
     // It should only be called for the animated node of this
     // kart_model
     assert(node==m_animated_node);
-
-    // It should be a non-default type of animation, and should have
-    // a non negative frame (i.e. the animation is indeed defined).
-    if(m_current_animation==AF_DEFAULT ||
-        m_animation_frame[m_current_animation]<=-1)
-    {
-        Log::error("Kart_Model", "OnAnimationEnd for '%s': current %d frame %d",
-               m_model_filename.c_str(),
-               m_current_animation, m_animation_frame[m_current_animation]);
-        assert(false);
-    }
 
     // 'type' is the start frame of the animation, type + 1 the frame
     // to begin the loop with, type + 2 to end the frame with
