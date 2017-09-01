@@ -97,14 +97,22 @@ void DriveGraph::load(const std::string &quad_file_name,
         return;
     }
 
+    float min_height_testing = Graph::MIN_HEIGHT_TESTING;
+    float max_height_testing = Graph::MAX_HEIGHT_TESTING;
     // Each quad is part of the graph exactly once now.
     for (unsigned int i = 0; i < quad->getNumNodes(); i++)
     {
         const XMLNode *xml_node = quad->getNode(i);
-        if (xml_node->getName() != "quad")
+        if (!(xml_node->getName() == "quad" || xml_node->getName() == "height-testing"))
         {
             Log::warn("DriveGraph: Unsupported node type '%s' found in '%s' - ignored.",
                 xml_node->getName().c_str(), filename.c_str());
+            continue;
+        }
+        if (xml_node->getName() == "height-testing")
+        {
+            xml_node->get("min", &min_height_testing);
+            xml_node->get("max", &max_height_testing);
             continue;
         }
 
@@ -140,6 +148,11 @@ void DriveGraph::load(const std::string &quad_file_name,
 
         createQuad(p0, p1, p2, p3, m_all_nodes.size(), invisible, ai_ignore,
                    false/*is_arena*/, ignored);
+    }
+    for (unsigned i = 0; i < m_all_nodes.size(); i++)
+    {
+        m_all_nodes[i]->setHeightTesting(min_height_testing,
+            max_height_testing);
     }
     delete quad;
 
