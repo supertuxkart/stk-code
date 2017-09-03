@@ -11,6 +11,7 @@
 * New smoother camera by Auria
 * New grand prix win scene
 * Gamepad configuration bugfixes
+* 3 Strikes Battles : added spare tire karts
 * Various improvements (wall driving fixes, parachutes, GP points, cannon fixes, colorization shader)
 
 ## SuperTuxKart 0.9.2
