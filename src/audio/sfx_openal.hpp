@@ -29,6 +29,7 @@
 #endif
 #include "audio/sfx_base.hpp"
 #include "utils/leak_check.hpp"
+#include "utils/cpp2011.hpp"
 
 /**
   * \brief OpenAL implementation of the abstract SFXBase interface
@@ -75,19 +76,17 @@ private:
     /** How long the sfx has been playing. */
     float m_play_time;
 
-    bool m_sound_buffer_changed;
-
 public:
               SFXOpenAL(SFXBuffer* buffer, bool positional, float volume,
                         bool owns_buffer = false);
     virtual  ~SFXOpenAL();
 
     virtual void      updatePlayingSFX(float dt);
-    virtual bool      init();
-    virtual void      play();
-    virtual void      reallyPlayNow();
-    virtual void      play(const Vec3 &xyz);
-    virtual void      reallyPlayNow(const Vec3 &xyz);
+    virtual bool      init() OVERRIDE;
+    virtual void      play() OVERRIDE;
+    virtual void      reallyPlayNow(SFXBuffer* buffer = NULL) OVERRIDE;
+    virtual void      play(const Vec3 &xyz, SFXBuffer* buffer = NULL) OVERRIDE;
+    virtual void      reallyPlayNow(const Vec3 &xyz, SFXBuffer* buffer = NULL) OVERRIDE;
     virtual void      setLoop(bool status);
     virtual void      reallySetLoop(bool status);
     virtual void      stop();
@@ -119,8 +118,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the buffer associated with this sfx. */
     virtual const SFXBuffer* getBuffer() const { return m_sound_buffer; }
-    // ------------------------------------------------------------------------
-    virtual void setBuffer(SFXBuffer* buffer, bool owns_buffer);
 
 };   // SFXOpenAL
 

@@ -170,6 +170,13 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
         }
     }*/
 
+    m_horn_sound = SFXManager::get()->getBuffer("horn");
+    m_crash_sound = SFXManager::get()->getBuffer("crash");
+    m_crash_sound2 = SFXManager::get()->getBuffer("crash2");
+    m_crash_sound3 = SFXManager::get()->getBuffer("crash3");
+    m_goo_sound = SFXManager::get()->getBuffer("goo");
+    m_boing_sound = SFXManager::get()->getBuffer("boing");
+
     m_engine_sound  = SFXManager::get()->createSoundSource(m_kart_properties->getEngineSfxType());
     m_emitter_1 = SFXManager::get()->createSoundSource("crash");
     m_emitter_2 = SFXManager::get()->createSoundSource("crash");
@@ -1020,11 +1027,8 @@ void Kart::collectedItem(Item *item, int add_info)
                                  m_kart_properties->getBubblegumSpeedFraction() ,
                                  m_kart_properties->getBubblegumFadeInTime(),
                                  m_bubblegum_time);
-        {
-            SFXBase* emitter = getNextEmitter();
-            emitter->setBuffer(SFXManager::get()->getBuffer("goo"), false);
-            emitter->play(getXYZ());
-        }
+        getNextEmitter()->play(getXYZ(), m_goo_sound);
+
         // Play appropriate custom character sound
         playCustomSFX(SFXManager::CUSTOM_GOO);
         break;
@@ -2158,22 +2162,20 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
             // it's not already playing.
             if (isShielded() || (k != NULL && k->isShielded()))
             {
-                SFXBase* emitter = getNextEmitter();
-                emitter->setBuffer(SFXManager::get()->getBuffer("boing"), false);
-                emitter->play(getXYZ());
+                getNextEmitter()->play(getXYZ(), m_boing_sound);
             }
             else
             {
                 int idx = rand() % 3;
-
-                SFXBase* emitter = getNextEmitter();
+                SFXBuffer* buffer;
                 if (idx == 0)
-                    emitter->setBuffer(SFXManager::get()->getBuffer("crash"), false);
+                    buffer = m_crash_sound;
                 else if (idx == 1)
-                    emitter->setBuffer(SFXManager::get()->getBuffer("crash2"), false);
+                    buffer = m_crash_sound2;
                 else
-                    emitter->setBuffer(SFXManager::get()->getBuffer("crash3"), false);
-                emitter->play(getXYZ());
+                    buffer = m_crash_sound3;
+
+                getNextEmitter()->play(getXYZ(), buffer);
             }
         }    // if lin_vel > 0.555
     }   // if m_bounce_back_time <= 0
@@ -2187,9 +2189,7 @@ void Kart::beep()
     // If the custom horn can't play (isn't defined) then play the default one
     if (!playCustomSFX(SFXManager::CUSTOM_HORN))
     {
-        SFXBase* emitter = getNextEmitter();
-        emitter->setBuffer(SFXManager::get()->getBuffer("horn"), false);
-        emitter->play(getXYZ());
+        getNextEmitter()->play(getXYZ(), m_horn_sound);
     }
 
 } // beep

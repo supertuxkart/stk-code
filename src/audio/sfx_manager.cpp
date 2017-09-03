@@ -218,6 +218,15 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p)
 }   // queue (Vec3)
 
 //----------------------------------------------------------------------------
+
+void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p, SFXBuffer* buffer)
+{
+    SFXCommand *sfx_command = new SFXCommand(command, sfx, p);
+    sfx_command->m_buffer = buffer;
+    queueCommand(sfx_command);
+}   // queue (Vec3)
+
+//----------------------------------------------------------------------------
 /** Adds a sound effect command with a float and a Vec3 parameter to the queue
  *  of the sfx manager. Openal commands can sometimes cause a 5ms delay, so it
  *   is done in a separate thread.
@@ -340,7 +349,7 @@ void* SFXManager::mainLoop(void *obj)
         {
         case SFX_PLAY:     current->m_sfx->reallyPlayNow();       break;
         case SFX_PLAY_POSITION:
-            current->m_sfx->reallyPlayNow(current->m_parameter);  break;
+            current->m_sfx->reallyPlayNow(current->m_parameter, current->m_buffer);  break;
         case SFX_STOP:     current->m_sfx->reallyStopNow();       break;
         case SFX_PAUSE:    current->m_sfx->reallyPauseNow();      break;
         case SFX_RESUME:   current->m_sfx->reallyResumeNow();     break;

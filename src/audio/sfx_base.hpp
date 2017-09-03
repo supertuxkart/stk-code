@@ -64,9 +64,9 @@ public:
     virtual void       setLoop(bool status)                 = 0;
     virtual void       reallySetLoop(bool status)           = 0;
     virtual void       play()                               = 0;
-    virtual void       reallyPlayNow()                      = 0;
-    virtual void       play(const Vec3 &xyz)                = 0;
-    virtual void       reallyPlayNow(const Vec3 &xyz)       = 0;
+    virtual void       reallyPlayNow(SFXBuffer* buffer = NULL) = 0;
+    virtual void       play(const Vec3 &xyz, SFXBuffer* buffer = NULL) = 0;
+    virtual void       reallyPlayNow(const Vec3 &xyz, SFXBuffer* buffer = NULL) = 0;
     virtual void       stop()                               = 0;
     virtual void       reallyStopNow()                      = 0;
     virtual void       pause()                              = 0;
@@ -83,7 +83,6 @@ public:
     virtual void       onSoundEnabledBack()                 = 0;
     virtual void       setRolloff(float rolloff)            = 0;
     virtual const SFXBuffer* getBuffer() const              = 0;
-    virtual void setBuffer(SFXBuffer* buffer, bool owns_buffer) = 0;
     virtual SFXStatus  getStatus()                          = 0;
 
 };   // SFXBase

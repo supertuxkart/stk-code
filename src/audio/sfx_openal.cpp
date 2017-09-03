@@ -52,7 +52,6 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float volume,
     m_master_gain  = 1.0f;
     m_owns_buffer  = owns_buffer;
     m_play_time    = 0.0f;
-    m_sound_buffer_changed = false;
 
     // Don't initialise anything else if the sfx manager was not correctly
     // initialised. First of all the initialisation will not work, and it
@@ -366,7 +365,7 @@ void SFXOpenAL::play()
 //-----------------------------------------------------------------------------
 /** Plays this sound effect.
  */
-void SFXOpenAL::reallyPlayNow()
+void SFXOpenAL::reallyPlayNow(SFXBuffer* buffer)
 {
     if (!SFXManager::get()->sfxAllowed()) return;
     if (m_status==SFX_NOT_INITIALISED)
@@ -378,13 +377,13 @@ void SFXOpenAL::reallyPlayNow()
         if (m_status==SFX_UNKNOWN) return;
     }
 
-    if (m_sound_buffer_changed)
+    if (buffer != NULL)
     {
         if (m_status == SFX_PLAYING || m_status == SFX_PAUSED)
             reallyStopNow();
 
+        m_sound_buffer = buffer;
         alSourcei(m_sound_source, AL_BUFFER, m_sound_buffer->getBufferID());
-        m_sound_buffer_changed = false;
 
         if (!SFXManager::checkError("attaching the buffer to the source"))
             return;
@@ -405,8 +404,11 @@ void SFXOpenAL::reallyPlayNow()
 /** This actually queues up the sfx in the sfx manager. It will be started
  *  from a separate thread later (in this frame).
  */
-void SFXOpenAL::play(const Vec3 &position)
+void SFXOpenAL::play(const Vec3 &position, SFXBuffer* buffer)
 {
+    if (m_owns_buffer && buffer != NULL)
+        assert(false); // sources that own a buffer cannot play any other buffer
+
     if (m_status == SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
 
     if(m_status==SFX_STOPPED || m_status==SFX_NOT_INITIALISED)
@@ -418,16 +420,15 @@ void SFXOpenAL::play(const Vec3 &position)
     // - which can happen if the sfx thread had no time to actually start
     // it yet.
     m_status = SFX_PLAYING;
-    SFXManager::get()->queue(SFXManager::SFX_PLAY_POSITION, this, position);
+    SFXManager::get()->queue(SFXManager::SFX_PLAY_POSITION, this, position, buffer);
 }   // play(Vec3)
-
 //-----------------------------------------------------------------------------
 /** Plays this sound effect.
  */
-void SFXOpenAL::reallyPlayNow(const Vec3 &position)
+void SFXOpenAL::reallyPlayNow(const Vec3 &position, SFXBuffer* buffer)
 {
     reallySetPosition(position);
-    reallyPlayNow();
+    reallyPlayNow(buffer);
 }   // reallyPlayNow(Vec3)
 
 //-----------------------------------------------------------------------------
@@ -542,19 +543,5 @@ void SFXOpenAL::setRolloff(float rolloff)
 }
 
 //-----------------------------------------------------------------------------
-
-// TODO: make this thread-safe
-void SFXOpenAL::setBuffer(SFXBuffer* buffer, bool owns_buffer)
-{
-    if (m_owns_buffer && m_sound_buffer)
-    {
-        m_sound_buffer->unload();
-        delete m_sound_buffer;
-    }
-
-    m_sound_buffer = buffer;
-    m_owns_buffer = owns_buffer;
-    m_sound_buffer_changed = true;
-}
 
 #endif //if HAVE_OGGVORBIS
