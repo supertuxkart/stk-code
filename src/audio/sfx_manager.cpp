@@ -676,6 +676,22 @@ SFXBase* SFXManager::createSoundSource(const std::string &name,
 }  // createSoundSource
 
 //----------------------------------------------------------------------------
+
+SFXBuffer* SFXManager::getBuffer(const std::string &name)
+{
+    std::map<std::string, SFXBuffer*>::iterator i = m_all_sfx_types.find(name);
+    if (i == m_all_sfx_types.end())
+    {
+        Log::error("SFXManager",
+            "SFXManager::getBuffer could not find the "
+            "requested sound effect : '%s'.", name.c_str());
+        return NULL;
+    }
+
+    return i->second;
+}
+
+//----------------------------------------------------------------------------
 /** Returns true if a sfx with the given name exists.
  *  \param name The internal name of the sfx (not the name of the ogg file)
  */

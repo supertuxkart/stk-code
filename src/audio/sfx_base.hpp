@@ -83,6 +83,7 @@ public:
     virtual void       onSoundEnabledBack()                 = 0;
     virtual void       setRolloff(float rolloff)            = 0;
     virtual const SFXBuffer* getBuffer() const              = 0;
+    virtual void setBuffer(SFXBuffer* buffer, bool owns_buffer) = 0;
     virtual SFXStatus  getStatus()                          = 0;
 
 };   // SFXBase

@@ -206,19 +206,23 @@ protected:
     float         m_last_factor_engine_sound;
 
     std::vector<SFXBase*> m_custom_sounds;
-    SFXBase      *m_beep_sound;
+    int m_emitter_id = 0;
+    SFXBase      *m_emitter_1;
+    SFXBase      *m_emitter_2;
+    SFXBase      *m_emitter_3;
+    //SFXBase      *m_beep_sound;
     SFXBase      *m_engine_sound;
-    SFXBase      *m_crash_sound;
-    SFXBase      *m_crash_sound2;
-    SFXBase      *m_crash_sound3;
+    //SFXBase      *m_crash_sound;
+    //SFXBase      *m_crash_sound2;
+    //SFXBase      *m_crash_sound3;
     SFXBase      *m_terrain_sound;
     SFXBase      *m_nitro_sound;
     /** A pointer to the previous terrain sound needs to be saved so that an
      *  'older' sfx can be finished and an abrupt end of the sfx is avoided. */
     SFXBase      *m_previous_terrain_sound;
     SFXBase      *m_skid_sound;
-    SFXBase      *m_goo_sound;
-    SFXBase      *m_boing_sound;
+    //SFXBase      *m_goo_sound;
+    //SFXBase      *m_boing_sound;
     float         m_time_last_crash;
     RaceManager::KartType m_type;
 
@@ -237,6 +241,7 @@ protected:
     float         getActualWheelForce();
     void          playCrashSFX(const Material* m, AbstractKart *k);
     void          loadData(RaceManager::KartType type, bool animatedModel);
+    SFXBase*      getNextEmitter();
 
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,

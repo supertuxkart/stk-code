@@ -296,6 +296,9 @@ public:
     /** Returns the current position of the listener. */
     Vec3 getListenerPos() const { return m_listener_position.getData(); }
 
+    // ------------------------------------------------------------------------
+
+    SFXBuffer* getBuffer(const std::string &name);
 };
 
 #endif // HEADER_SFX_MANAGER_HPP

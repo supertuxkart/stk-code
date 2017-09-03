@@ -75,6 +75,8 @@ private:
     /** How long the sfx has been playing. */
     float m_play_time;
 
+    bool m_sound_buffer_changed;
+
 public:
               SFXOpenAL(SFXBuffer* buffer, bool positional, float volume,
                         bool owns_buffer = false);
@@ -117,6 +119,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the buffer associated with this sfx. */
     virtual const SFXBuffer* getBuffer() const { return m_sound_buffer; }
+    // ------------------------------------------------------------------------
+    virtual void setBuffer(SFXBuffer* buffer, bool owns_buffer);
 
 };   // SFXOpenAL
 

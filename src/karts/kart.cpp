@@ -171,12 +171,9 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     }*/
 
     m_engine_sound  = SFXManager::get()->createSoundSource(m_kart_properties->getEngineSfxType());
-    m_beep_sound    = SFXManager::get()->createSoundSource( "horn"  );
-    m_crash_sound   = SFXManager::get()->createSoundSource( "crash" );
-    m_crash_sound2  = SFXManager::get()->createSoundSource( "crash2");
-    m_crash_sound3  = SFXManager::get()->createSoundSource( "crash3");
-    m_boing_sound   = SFXManager::get()->createSoundSource( "boing" );
-    m_goo_sound     = SFXManager::get()->createSoundSource( "goo"   );
+    m_emitter_1 = SFXManager::get()->createSoundSource("crash");
+    m_emitter_2 = SFXManager::get()->createSoundSource("crash");
+    m_emitter_3 = SFXManager::get()->createSoundSource("crash");
     m_skid_sound    = SFXManager::get()->createSoundSource( "skid"  );
     m_nitro_sound   = SFXManager::get()->createSoundSource( "nitro" );
     m_terrain_sound          = NULL;
@@ -201,13 +198,10 @@ void Kart::init(RaceManager::KartType type)
         if (type == RaceManager::KT_PLAYER)
             factor = std::min(1.0f, race_manager->getNumLocalPlayers()/2.0f);
 
-        m_goo_sound->setVolume(factor);
+        m_emitter_1->setVolume(factor);
+        m_emitter_2->setVolume(factor);
+        m_emitter_3->setVolume(factor);
         m_skid_sound->setVolume(factor);
-        m_crash_sound->setVolume(factor);
-        m_crash_sound2->setVolume(factor);
-        m_crash_sound3->setVolume(factor);
-        m_boing_sound->setVolume(factor);
-        m_beep_sound->setVolume(factor);
         m_nitro_sound->setVolume(factor);
     }   // if getNumLocalPlayers > 1
 
@@ -257,13 +251,10 @@ Kart::~Kart()
     }*/
 
     m_engine_sound->deleteSFX();
-    m_crash_sound ->deleteSFX();
-    m_crash_sound2->deleteSFX();
-    m_crash_sound3->deleteSFX();
     m_skid_sound  ->deleteSFX();
-    m_goo_sound   ->deleteSFX();
-    m_beep_sound  ->deleteSFX();
-    m_boing_sound ->deleteSFX();
+    m_emitter_1->deleteSFX();
+    m_emitter_2->deleteSFX();
+    m_emitter_3->deleteSFX();
     m_nitro_sound ->deleteSFX();
     delete m_kart_gfx;
     if(m_terrain_sound)          m_terrain_sound->deleteSFX();
@@ -1029,8 +1020,11 @@ void Kart::collectedItem(Item *item, int add_info)
                                  m_kart_properties->getBubblegumSpeedFraction() ,
                                  m_kart_properties->getBubblegumFadeInTime(),
                                  m_bubblegum_time);
-        m_goo_sound->setPosition(getXYZ());
-        m_goo_sound->play();
+        {
+            SFXBase* emitter = getNextEmitter();
+            emitter->setBuffer(SFXManager::get()->getBuffer("goo"), false);
+            emitter->play(getXYZ());
+        }
         // Play appropriate custom character sound
         playCustomSFX(SFXManager::CUSTOM_GOO);
         break;
@@ -1361,12 +1355,10 @@ void Kart::update(float dt)
     }
      */
 
-    m_beep_sound->setPosition   ( getXYZ() );
-    m_crash_sound->setPosition  ( getXYZ() );
-    m_crash_sound2->setPosition ( getXYZ() );
-    m_crash_sound3->setPosition ( getXYZ() );
+    m_emitter_1->setPosition(getXYZ());
+    m_emitter_2->setPosition(getXYZ());
+    m_emitter_3->setPosition(getXYZ());
     m_skid_sound->setPosition   ( getXYZ() );
-    m_boing_sound->setPosition  ( getXYZ() );
     m_nitro_sound->setPosition  ( getXYZ() );
 
     // Check if a kart is (nearly) upside down and not moving much -->
@@ -2166,23 +2158,22 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
             // it's not already playing.
             if (isShielded() || (k != NULL && k->isShielded()))
             {
-                if (m_boing_sound->getStatus() != SFXBase::SFX_PLAYING)
-                    m_boing_sound->play(getXYZ());
+                SFXBase* emitter = getNextEmitter();
+                emitter->setBuffer(SFXManager::get()->getBuffer("boing"), false);
+                emitter->play(getXYZ());
             }
             else
             {
-                if (m_crash_sound->getStatus() != SFXBase::SFX_PLAYING
-                    && m_crash_sound2->getStatus() != SFXBase::SFX_PLAYING
-                    && m_crash_sound3->getStatus() != SFXBase::SFX_PLAYING)
-                {
-                    int idx = rand() % 3;
-                    if (idx == 0)
-                        m_crash_sound->play(getXYZ());
-                    else if (idx == 1)
-                        m_crash_sound2->play(getXYZ());
-                    else
-                        m_crash_sound3->play(getXYZ());
-                }
+                int idx = rand() % 3;
+
+                SFXBase* emitter = getNextEmitter();
+                if (idx == 0)
+                    emitter->setBuffer(SFXManager::get()->getBuffer("crash"), false);
+                else if (idx == 1)
+                    emitter->setBuffer(SFXManager::get()->getBuffer("crash2"), false);
+                else
+                    emitter->setBuffer(SFXManager::get()->getBuffer("crash3"), false);
+                emitter->play(getXYZ());
             }
         }    // if lin_vel > 0.555
     }   // if m_bounce_back_time <= 0
@@ -2196,7 +2187,9 @@ void Kart::beep()
     // If the custom horn can't play (isn't defined) then play the default one
     if (!playCustomSFX(SFXManager::CUSTOM_HORN))
     {
-        m_beep_sound->play(getXYZ());
+        SFXBase* emitter = getNextEmitter();
+        emitter->setBuffer(SFXManager::get()->getBuffer("horn"), false);
+        emitter->play(getXYZ());
     }
 
 } // beep
@@ -2689,6 +2682,23 @@ void Kart::kartIsInRestNow()
 
     m_kart_model->setDefaultSuspension();
 }   // kartIsInRestNow
+
+//-----------------------------------------------------------------------------
+
+SFXBase* Kart::getNextEmitter()
+{
+    m_emitter_id = (m_emitter_id + 1) % 3;
+
+    SFXBase* next_emitter;
+    if (m_emitter_id == 0)
+        next_emitter = m_emitter_1;
+    else if (m_emitter_id == 1)
+        next_emitter = m_emitter_2;
+    else
+        next_emitter = m_emitter_3;
+
+    return next_emitter;
+}
 
 //-----------------------------------------------------------------------------
 /** Updates the graphics model. It is responsible for positioning the graphical

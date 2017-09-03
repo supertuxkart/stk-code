@@ -52,6 +52,7 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float volume,
     m_master_gain  = 1.0f;
     m_owns_buffer  = owns_buffer;
     m_play_time    = 0.0f;
+    m_sound_buffer_changed = false;
 
     // Don't initialise anything else if the sfx manager was not correctly
     // initialised. First of all the initialisation will not work, and it
@@ -377,6 +378,18 @@ void SFXOpenAL::reallyPlayNow()
         if (m_status==SFX_UNKNOWN) return;
     }
 
+    if (m_sound_buffer_changed)
+    {
+        if (m_status == SFX_PLAYING || m_status == SFX_PAUSED)
+            reallyStopNow();
+
+        alSourcei(m_sound_source, AL_BUFFER, m_sound_buffer->getBufferID());
+        m_sound_buffer_changed = false;
+
+        if (!SFXManager::checkError("attaching the buffer to the source"))
+            return;
+    }
+
     alSourcePlay(m_sound_source);
     SFXManager::checkError("playing");
     // Esp. with terrain sounds it can (very likely) happen that the status
@@ -526,6 +539,22 @@ void SFXOpenAL::onSoundEnabledBack()
 void SFXOpenAL::setRolloff(float rolloff)
 {
     alSourcef (m_sound_source, AL_ROLLOFF_FACTOR,  rolloff);
+}
+
+//-----------------------------------------------------------------------------
+
+// TODO: make this thread-safe
+void SFXOpenAL::setBuffer(SFXBuffer* buffer, bool owns_buffer)
+{
+    if (m_owns_buffer && m_sound_buffer)
+    {
+        m_sound_buffer->unload();
+        delete m_sound_buffer;
+    }
+
+    m_sound_buffer = buffer;
+    m_owns_buffer = owns_buffer;
+    m_sound_buffer_changed = true;
 }
 
 #endif //if HAVE_OGGVORBIS
