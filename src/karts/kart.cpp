@@ -2994,4 +2994,11 @@ const Vec3& Kart::getNormal() const
     return m_terrain_info->getNormal();
 }   // getNormal
 
+// ------------------------------------------------------------------------
+
+void Kart::playSound(SFXBuffer* buffer)
+{
+    getNextEmitter()->play(getXYZ(), buffer);
+}
+
 /* EOF */

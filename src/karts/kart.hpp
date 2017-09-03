@@ -241,7 +241,6 @@ protected:
     float         getActualWheelForce();
     void          playCrashSFX(const Material* m, AbstractKart *k);
     void          loadData(RaceManager::KartType type, bool animatedModel);
-    SFXBase*      getNextEmitter();
 
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
@@ -478,7 +477,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns whether this kart is jumping. */
     virtual bool isJumping() const { return m_is_jumping; };
-
+    // ------------------------------------------------------------------------
+    SFXBase* getNextEmitter();
+    // ------------------------------------------------------------------------
+    virtual void playSound(SFXBuffer* buffer);
 };   // Kart
 
 
