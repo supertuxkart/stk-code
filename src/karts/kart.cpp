@@ -606,7 +606,6 @@ void Kart::createPhysics()
 
     const Vec3 &bevel = m_kart_properties->getBevelFactor();
     Vec3 wheel_pos[4];
-    assert(bevel.getX() || bevel.getY() || bevel.getZ());
 
     Vec3 orig_factor(1, 1, 1 - bevel.getZ());
     Vec3 bevel_factor(1.0f - bevel.getX(), 1.0f - bevel.getY(), 1.0f);
@@ -622,9 +621,9 @@ void Kart::createPhysics()
                        z*kart_length *0.5f);
 
                 hull->addPoint(p*orig_factor);
-                hull->addPoint(p*bevel_factor);
-                // Store the x/z position for the wheels as a weighted average
-                // of the two bevelled points.
+                // Only add bevelled point if bevel is defined (i.e.!=0)
+                if(bevel.length2()>0)
+                    hull->addPoint(p*bevel_factor);
                 if (y == -1)
                 {
                     int index = (x + 1) / 2 + 1 - z;  // get index of wheel
@@ -636,19 +635,19 @@ void Kart::createPhysics()
                         // All wheel positions are relative to the center of
                         // the collision shape.
                         wheel_pos[index].setX(x*0.5f*kart_width);
-                        // The y position of the wheels (i.e. the points where
-                        // the suspension is attached to) is just at the
-                        // bottom of the kart. That is half the kart height
-                        // down.
-                        wheel_pos[index].setY(- 0.5f*kart_height);
                         wheel_pos[index].setZ((0.5f*kart_length-0.25f)* z);
-
                     }
                     else
                     {
+                        // Store the x/z position for the wheels as a weighted average
+                        // of the two bevelled points (y is set below).
                         wheel_pos[index] = p*(orig_factor*(1.0f - f) + bevel_factor*f);
-                        wheel_pos[index].setY(0);
                     }
+                    // The y position of the wheels (i.e. the points where
+                    // the suspension is attached to) is just at the
+                    // bottom of the kart (independent of collision shape). 
+                    // That is half the kart height down.
+                    wheel_pos[index].setY(-0.5f*kart_height);
                 }  // if y==-1
             }   // for x
         }   // for z
