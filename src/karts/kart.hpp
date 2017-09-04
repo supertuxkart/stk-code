@@ -207,9 +207,8 @@ protected:
 
     std::vector<SFXBase*> m_custom_sounds;
     int m_emitter_id = 0;
-    SFXBase      *m_emitter_1;
-    SFXBase      *m_emitter_2;
-    SFXBase      *m_emitter_3;
+    static const int EMITTER_COUNT = 3;
+    SFXBase      *m_emitters[EMITTER_COUNT];
     SFXBase      *m_engine_sound;
     SFXBase      *m_terrain_sound;
     SFXBase      *m_nitro_sound;
@@ -218,9 +217,8 @@ protected:
     SFXBase      *m_previous_terrain_sound;
     SFXBase      *m_skid_sound;
     SFXBuffer    *m_horn_sound;
-    SFXBuffer    *m_crash_sound;
-    SFXBuffer    *m_crash_sound2;
-    SFXBuffer    *m_crash_sound3;
+    static const int CRASH_SOUND_COUNT = 3;
+    SFXBuffer    *m_crash_sounds[CRASH_SOUND_COUNT];
     SFXBuffer    *m_goo_sound;
     SFXBuffer    *m_boing_sound;
     float         m_time_last_crash;

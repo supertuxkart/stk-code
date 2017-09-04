@@ -171,16 +171,17 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     }*/
 
     m_horn_sound = SFXManager::get()->getBuffer("horn");
-    m_crash_sound = SFXManager::get()->getBuffer("crash");
-    m_crash_sound2 = SFXManager::get()->getBuffer("crash2");
-    m_crash_sound3 = SFXManager::get()->getBuffer("crash3");
+    m_crash_sounds[0] = SFXManager::get()->getBuffer("crash");
+    m_crash_sounds[1] = SFXManager::get()->getBuffer("crash2");
+    m_crash_sounds[2] = SFXManager::get()->getBuffer("crash3");
     m_goo_sound = SFXManager::get()->getBuffer("goo");
     m_boing_sound = SFXManager::get()->getBuffer("boing");
 
     m_engine_sound  = SFXManager::get()->createSoundSource(m_kart_properties->getEngineSfxType());
-    m_emitter_1 = SFXManager::get()->createSoundSource("crash");
-    m_emitter_2 = SFXManager::get()->createSoundSource("crash");
-    m_emitter_3 = SFXManager::get()->createSoundSource("crash");
+    
+    for (int i = 0; i < EMITTER_COUNT; i++)
+        m_emitters[i] = SFXManager::get()->createSoundSource("crash");
+
     m_skid_sound    = SFXManager::get()->createSoundSource( "skid"  );
     m_nitro_sound   = SFXManager::get()->createSoundSource( "nitro" );
     m_terrain_sound          = NULL;
@@ -205,9 +206,9 @@ void Kart::init(RaceManager::KartType type)
         if (type == RaceManager::KT_PLAYER)
             factor = std::min(1.0f, race_manager->getNumLocalPlayers()/2.0f);
 
-        m_emitter_1->setVolume(factor);
-        m_emitter_2->setVolume(factor);
-        m_emitter_3->setVolume(factor);
+        for (int i = 0; i < EMITTER_COUNT; i++)
+            m_emitters[i]->setVolume(factor);
+
         m_skid_sound->setVolume(factor);
         m_nitro_sound->setVolume(factor);
     }   // if getNumLocalPlayers > 1
@@ -259,9 +260,10 @@ Kart::~Kart()
 
     m_engine_sound->deleteSFX();
     m_skid_sound  ->deleteSFX();
-    m_emitter_1->deleteSFX();
-    m_emitter_2->deleteSFX();
-    m_emitter_3->deleteSFX();
+
+    for (int i = 0; i < EMITTER_COUNT; i++)
+        m_emitters[i]->deleteSFX();
+
     m_nitro_sound ->deleteSFX();
     delete m_kart_gfx;
     if(m_terrain_sound)          m_terrain_sound->deleteSFX();
@@ -1359,9 +1361,9 @@ void Kart::update(float dt)
     }
      */
 
-    m_emitter_1->setPosition(getXYZ());
-    m_emitter_2->setPosition(getXYZ());
-    m_emitter_3->setPosition(getXYZ());
+    for (int i = 0; i < EMITTER_COUNT; i++)
+        m_emitters[i]->setPosition(getXYZ());
+
     m_skid_sound->setPosition   ( getXYZ() );
     m_nitro_sound->setPosition  ( getXYZ() );
 
@@ -2166,15 +2168,8 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
             }
             else
             {
-                int idx = rand() % 3;
-                SFXBuffer* buffer;
-                if (idx == 0)
-                    buffer = m_crash_sound;
-                else if (idx == 1)
-                    buffer = m_crash_sound2;
-                else
-                    buffer = m_crash_sound3;
-
+                int idx = rand() % CRASH_SOUND_COUNT;
+                SFXBuffer* buffer = m_crash_sounds[idx];
                 getNextEmitter()->play(getXYZ(), buffer);
             }
         }    // if lin_vel > 0.555
@@ -2688,16 +2683,7 @@ void Kart::kartIsInRestNow()
 SFXBase* Kart::getNextEmitter()
 {
     m_emitter_id = (m_emitter_id + 1) % 3;
-
-    SFXBase* next_emitter;
-    if (m_emitter_id == 0)
-        next_emitter = m_emitter_1;
-    else if (m_emitter_id == 1)
-        next_emitter = m_emitter_2;
-    else
-        next_emitter = m_emitter_3;
-
-    return next_emitter;
+    return m_emitters[m_emitter_id];
 }
 
 //-----------------------------------------------------------------------------
