@@ -17,7 +17,7 @@ To run SuperTuxKart, make sure that your computer's specifications are equal or 
 * Ideally, you'll want a joystick with at least 6 buttons.
 
 ## License
-The software is released under the GNU General Public License (GPL) which can be found in the file [`COPYING`](/COPYING) in the same directory as this file. Information about the licenses for the artwork is contained in [`data/CREDITS`](data/CREDITS).
+The software is released under the GNU General Public License (GPL) which can be found in the file [`COPYING`](/COPYING) in the same directory as this file. Information about the licenses for the artwork is contained in the 'licenses.txt' files throughout the various data subdirectories.
 
 ## 3D coordinates
 A reminder for those who are looking at the code and 3D models:
@@ -73,12 +73,12 @@ Compilation instruction is explained there. If you don't need this feature, pass
 Run the following commands to compile SuperTuxKart:
 
 ```bash
-mkdir build
-cd build
+mkdir cmake_build
+cd cmake_build
 cmake ..
 make -j4
 ```
-STK can then be run from the build directory with `bin/supertuxkart`.
+STK can then be run from the `cmake_build` directory with `bin/supertuxkart`.
 
 ### Further options
 
@@ -135,8 +135,8 @@ or [SuperTuxKart on GitHub - Dependencies](https://github.com/supertuxkart/depen
 and unpack the archive; once unpacked, copy the `dependencies` directory from either the `windows` or the `windows_64bit` directories into the `stk-code` directory
 4. [Download CMake from here](https://cmake.org/download/) and install it. Navigate to the `stk-code` directory, and create an directory called `build`:
 ```cmd
-mkdir build
-cd build
+mkdir cmake_build
+cd cmake_build
 ```
 5. Once inside the build directory, run CMake to start the compilation process:
 ```cmd
@@ -188,24 +188,24 @@ You'll have to run these commands inside your stk-code directory.
 With clang:
 
 ```bash
-mkdir build
-cd build
+mkdir cmake_build
+cd cmake_build
 cmake ..
 make -j4
 ```
 
 With GCC:
 ```bash
-mkdir build
-cd build
+mkdir cmake_build
+cd cmake_build
 cmake .. -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_C_COMPILER=/usr/bin/gcc
 make -j4
 ```
 
 Building on 10.10 with 10.9 compatibility:
 ```bash
-mkdir build
-cd build
+mkdir cmake_build
+cd cmake_build
 cmake .. -DCMAKE_OSX_SYSROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk  -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9
 make -j4
 ```
