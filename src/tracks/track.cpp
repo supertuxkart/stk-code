@@ -573,7 +573,10 @@ void Track::loadTrackInfo()
     if(xml_node) loadCurves(*xml_node);
 
     // Set the correct paths
-    m_screenshot = m_root+m_screenshot;
+    if (m_screenshot.length() > 0)
+    {
+        m_screenshot = m_root+m_screenshot;
+    }
     delete root;
 
     std::string dir = StringUtils::getPath(m_filename);

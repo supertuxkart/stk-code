@@ -19,13 +19,16 @@ in vec2 quadcorner;
 
 out float lf;
 out vec2 tc;
-out vec3 pc;
+out vec4 pc;
 
 void main(void)
 {
     tc = Texcoord;
     lf = lifetime;
-    pc = color_from + (color_to - color_from) * lifetime;
+    pc = vec4(vec3(color_from + (color_to - color_from) * lf), 1.0) * smoothstep(1., 0.8, lf);
+#if defined(GL_ES) && !defined(Advanced_Lighting_Enabled)
+    pc.rgb = pow(pc.rgb, vec3(1. / 2.2));
+#endif
     vec3 newposition = Position;
 
     vec4 viewpos = ViewMatrix * vec4(newposition, 1.0);

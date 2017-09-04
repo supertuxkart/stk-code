@@ -147,6 +147,12 @@ video::ITexture* STKTexManager::getTexture(const std::string& path,
                                            TexConfig* tc, bool no_upload,
                                            bool create_if_unfound)
 {
+    if (path.empty())
+    {
+        Log::error("STKTexManager", "Texture name is empty.");
+        return NULL;
+    }
+
     auto ret = m_all_textures.find(path);
     if (!no_upload && ret != m_all_textures.end())
         return ret->second;

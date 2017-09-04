@@ -4,7 +4,7 @@ uniform mat4 invproj;
 
 in float lf;
 in vec2 tc;
-in vec3 pc;
+in vec4 pc;
 out vec4 FragColor;
 
 #stk_include "utils/getPosFromUVDepth.frag"
@@ -17,6 +17,5 @@ void main(void)
     float EnvZ = texture(dtex, xy).x;
     vec4 EnvPos = getPosFromUVDepth(vec3(xy, EnvZ), InverseProjectionMatrix);
     float alpha = clamp((EnvPos.z - FragmentPos.z) * 0.3, 0., 1.);
-    vec4 color = texture(tex, tc) * vec4(pc, 1.0);
-    FragColor = color * alpha * smoothstep(1., 0.8, lf);
+    FragColor = texture(tex, tc) * pc * alpha;
 }

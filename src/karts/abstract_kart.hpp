@@ -45,6 +45,7 @@ class KartModel;
 class KartProperties;
 class Material;
 class Powerup;
+class SFXBuffer;
 class Skidding;
 class SlipStream;
 class TerrainInfo;
@@ -472,7 +473,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns whether this kart is jumping. */
     virtual bool isJumping() const = 0;
-
+    // ------------------------------------------------------------------------
+    virtual void playSound(SFXBuffer* buffer) = 0;
 };   // AbstractKart
 
 

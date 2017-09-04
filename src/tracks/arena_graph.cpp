@@ -158,6 +158,18 @@ void ArenaGraph::loadNavmesh(const std::string &navmesh)
             }
         }
     }
+    const XMLNode* ht = xml->getNode("height-testing");
+    if (ht)
+    {
+        float min = Graph::MIN_HEIGHT_TESTING;
+        float max = Graph::MAX_HEIGHT_TESTING;
+        ht->get("min", &min);
+        ht->get("max", &max);
+        for (unsigned i = 0; i < m_all_nodes.size(); i++)
+        {
+            m_all_nodes[i]->setHeightTesting(min, max);
+        }
+    }
     delete xml;
 
 }   // loadNavmesh
