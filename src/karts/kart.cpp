@@ -377,6 +377,8 @@ void Kart::reset()
     if(m_body)
         m_body->setDamping(m_kart_properties->getStabilityChassisLinearDamping(),
                            m_kart_properties->getStabilityChassisAngularDamping());
+    for (unsigned int i = 0; i < 4; i++)
+        m_vehicle->getWheelInfo(i).m_steering = 0;
 
     if(m_terrain_sound)
     {
