@@ -1,11 +1,11 @@
 # SuperTuxKart
 [![Build Status](https://travis-ci.org/supertuxkart/stk-code.svg?branch=master)](https://travis-ci.org/supertuxkart/stk-code)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/supertuxkart/stk-code?svg=true&branch=master)](https://ci.appveyor.com/project/supertuxkart/stk-code)
-[![#supertuxkart on the freenode IRC network](https://img.shields.io/badge/freenode-%23supertuxkart-brightgreen.svg)](https://webchat.freenode.net/?channels=supertuxkart)
+[![#supertuxkart on the freenode IRC network](https://img.shields.io/badge/freenode-%23supertuxkart-brightgreen.svg)](https://kiwiirc.com/client/irc.freenode.net/#supertuxkart)
 
 SuperTuxKart is a free kart racing game. It focuses on fun and not on realistic kart physics. Instructions can be found on the in-game help page.
 
-The SuperTuxKart homepage can be found at <https://supertuxkart.net/>. There is also our [FAQ](https://supertuxkart.net/FAQ) and information on how get in touch with the [community](https://supertuxkart.net/Community)
+The SuperTuxKart homepage can be found at <https://supertuxkart.net/>. There is also our [FAQ](https://supertuxkart.net/FAQ) and information on how get in touch with the [community](https://supertuxkart.net/Community).
 
 ## Hardware Requirements
 To run SuperTuxKart, make sure that your computer's specifications are equal or higher than the following specifications:
@@ -17,7 +17,7 @@ To run SuperTuxKart, make sure that your computer's specifications are equal or 
 * Ideally, you'll want a joystick with at least 6 buttons.
 
 ## License
-The software is released under the GNU General Public License (GPL) which can be found in the file [`COPYING`](/COPYING) in the same directory as this file. Information about the licenses for the artwork is contained in `data/licenses`.
+The software is released under the GNU General Public License (GPL) which can be found in the file [`COPYING`](/COPYING) in the same directory as this file. Information about the licenses for the artwork is contained in [`data/CREDITS`](data/CREDITS).
 
 ## 3D coordinates
 A reminder for those who are looking at the code and 3D models:
@@ -73,12 +73,12 @@ Compilation instruction is explained there. If you don't need this feature, pass
 Run the following commands to compile SuperTuxKart:
 
 ```bash
-mkdir cmake_build
-cd cmake_build
+mkdir build
+cd build
 cmake ..
 make -j4
 ```
-STK can then be run from the build directory with `bin/supertuxkart`
+STK can then be run from the build directory with `bin/supertuxkart`.
 
 ### Further options
 
@@ -95,7 +95,7 @@ sudo make install
 ```
 
 The default install location is `/usr/local`, i.e. the data files will
-be written to `/usr/local/share/games/supertuxkart`, the executable
+be written to `/usr/local/share/games/supertuxkart`, and the executable
 will be copied to `/usr/local/bin`. To change the default installation
 location, specify `CMAKE_INSTALL_PREFIX` when running cmake, e.g.:
 `cmake .. -DCMAKE_INSTALL_PREFIX=/opt/stk`
@@ -110,13 +110,12 @@ To Build SuperTuxKart on Windows, follow these instructions:
 *Note: If you downloaded the source package from here: [SuperTuxKart.net - Source Control](https://supertuxkart.net/Source_control), then both `stk-code` and `stk-assets` **must** be in the same directory, otherwise the build can result in failure*
 3. Download the Windows dependencies package from either [SuperTuxKart download area: Dependecies - SourceForge.net](https://sourceforge.net/projects/supertuxkart/files/SuperTuxKart%20Dependencies/Windows/)
 or [SuperTuxKart on GitHub - Dependencies](https://github.com/supertuxkart/dependencies), and unpack it; then, copy the `dependencies` directory from either the `windows` or the `windows_64bit` directories into the `stk-code` directory
-4. Download CMake from here: [CMake - download page](https://cmake.org/download/), install it; once CMake is installed, double click on the CMake icon on your desktop, and point it towards your `stk-code` directory in the 'Where is the source code' field, and point it to a directory called `build` or `bld`
-5. Press 'Configure'; CMake will ask you if it is OK to create the aformentioned directory, press `Yes`. CMake will then ask you about your version of Visual Studio. 
-Confirm your selection; *Please look at the table below to avoid confusion between version numbers and releases of Visual Studio*;
-CMake will begin creating the required files for the build in the directory.
-6. Navigate to your build directory and open the `SuperTuxKart.sln` file; Visual Studio will now load the solution. 
+4. Download CMake from here: [CMake - download page](https://cmake.org/download/), install it; once CMake is installed, double click on the CMake icon on your desktop, and point it towards your `stk-code` directory in the 'Where is the source code' field, and point it to a directory called `build`.
+5. Press 'Configure'. CMake will ask you if it is OK to create the aformentioned directory, press `Yes`. CMake will then ask you about your version of Visual Studio. 
+Confirm your selection. *Please look at the table below to avoid confusion between version numbers and releases of Visual Studio.* CMake will begin creating the required files for the build in the directory.
+6. Navigate to your build directory and open the `SuperTuxKart.sln` file, and Visual Studio will load the solution. 
 7. In the 'Solution Explorer', right click on the `supertuxkart` project and select "Set as StartUp project"
-8. Open the 'Build' menu and select 'Build Solution'; or, press the default keyboard shortcut: `CTRL + SHIFT + B` to build the solution.
+8. Open the 'Build' menu and select 'Build Solution', or press the default keyboard shortcut: `CTRL + SHIFT + B` to build the solution.
 
 *Note: To avoid confusion between releases and versions, refer to this table:*
 
@@ -134,12 +133,12 @@ NOTE: the `stk-code` and `stk-assets` directories **must** be in the same direct
 3. Download the Windows dependencies package from either [SuperTuxKart download area - SourceForge.net](https://sourceforge.net/projects/supertuxkart/files/SuperTuxKart%20Dependencies/Windows/)
 or [SuperTuxKart on GitHub - Dependencies](https://github.com/supertuxkart/dependencies)
 and unpack the archive; once unpacked, copy the `dependencies` directory from either the `windows` or the `windows_64bit` directories into the `stk-code` directory
-4. Download CMake from here: [CMake - download page](https://cmake.org/download/); and install it. Navigate to the `stk-code` directory; and create an directory called "build":
+4. [Download CMake from here](https://cmake.org/download/) and install it. Navigate to the `stk-code` directory, and create an directory called `build`:
 ```cmd
 mkdir build
 cd build
 ```
-5. Once inside the build directory; run CMake to start the compilation process:
+5. Once inside the build directory, run CMake to start the compilation process:
 ```cmd
 cmake ..
 ```
@@ -147,7 +146,7 @@ cmake ..
 ```cmd
 msbuild.exe SuperTuxKart.sln 
 ``` 
-SuperTuxKart can now be run as `bin\Debug\supertuxkart.exe` or `bin\Release\supertuxkart.exe` 
+SuperTuxKart can now be run as `bin\Debug\supertuxkart.exe` or `bin\Release\supertuxkart.exe`, depending on whether a debug or release build was made.
 
 ## Building SuperTuxKart on macOS
 
@@ -189,23 +188,26 @@ You'll have to run these commands inside your stk-code directory.
 With clang:
 
 ```bash
-mkdir cmake_build
-cd cmake_build
+mkdir build
+cd build
 cmake ..
-make
+make -j4
 ```
 
 With GCC:
 ```bash
-mkdir cmake_build
-cd cmake_build
+mkdir build
+cd build
 cmake .. -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_C_COMPILER=/usr/bin/gcc
-make
+make -j4
 ```
 
 Building on 10.10 with 10.9 compatibility:
 ```bash
+mkdir build
+cd build
 cmake .. -DCMAKE_OSX_SYSROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk  -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9
+make -j4
 ```
 
 ### Xcode
