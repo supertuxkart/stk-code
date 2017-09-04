@@ -255,8 +255,7 @@ if(UNIX AND NOT APPLE AND NOT SERVER_ONLY)
     find_package(X11 REQUIRED)
     include_directories(${X11_INCLUDE_DIR})
 
-    find_package(Xrandr REQUIRED)
-    if(NOT XRANDR_FOUND)
+    if(NOT X11_Xrandr_FOUND)
         message(FATAL_ERROR "XRANDR not found.")
     endif()
 
@@ -419,7 +418,7 @@ if(NOT SERVER_ONLY)
 endif()
 
 if(UNIX AND NOT APPLE)
-    target_link_libraries(supertuxkart ${X11_LIBRARIES} ${XRANDR_LIBRARIES})
+    target_link_libraries(supertuxkart ${X11_X11_LIB} ${X11_Xrandr_LIB})
     if(USE_LIBBFD)
         target_link_libraries(supertuxkart ${LIBBFD_LIBRARIES})
     endif()
