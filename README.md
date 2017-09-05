@@ -133,7 +133,7 @@ NOTE: the `stk-code` and `stk-assets` directories **must** be in the same direct
 3. Download the Windows dependencies package from either [SuperTuxKart download area - SourceForge.net](https://sourceforge.net/projects/supertuxkart/files/SuperTuxKart%20Dependencies/Windows/)
 or [SuperTuxKart on GitHub - Dependencies](https://github.com/supertuxkart/dependencies)
 and unpack the archive; once unpacked, copy the `dependencies` directory from either the `windows` or the `windows_64bit` directories into the `stk-code` directory
-4. [Download CMake from here](https://cmake.org/download/) and install it. Navigate to the `stk-code` directory, and create an directory called `build`:
+4. [Download CMake from here](https://cmake.org/download/) and install it. Navigate to the `stk-code` directory, and create an directory called `cmake_build`:
 ```cmd
 mkdir cmake_build
 cd cmake_build
