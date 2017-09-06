@@ -1603,9 +1603,8 @@ int main(int argc, char *argv[] )
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "gift.png")       );
 
-        file_manager->popTextureSearchPath();
-
         attachment_manager->loadModels();
+        file_manager->popTextureSearchPath();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "banana.png")    );

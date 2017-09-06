@@ -1022,11 +1022,11 @@ void IrrDriver::applyResolutionSettings()
     GUIEngine::addLoadingIcon(
         irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gift.png")) );
 
-    file_manager->popTextureSearchPath();
 
     kart_properties_manager->loadAllKarts();
 
     attachment_manager->loadModels();
+    file_manager->popTextureSearchPath();
     std::string banana = file_manager->getAsset(FileManager::GUI, "banana.png");
     GUIEngine::addLoadingIcon(irr_driver->getTexture(banana) );
     // No need to reload cached track data (track_manager->cleanAllCachedData
