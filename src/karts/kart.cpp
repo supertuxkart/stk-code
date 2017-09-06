@@ -1445,7 +1445,7 @@ void Kart::update(float dt)
     }
 
     PROFILER_PUSH_CPU_MARKER("Kart::Update (material)", 0x60, 0x34, 0x7F);
-    handleMaterialGFX();
+    handleMaterialGFX(dt);
     const Material* material=m_terrain_info->getMaterial();
     if (!material)   // kart falling off the track
     {
@@ -1764,7 +1764,7 @@ void Kart::handleMaterialSFX(const Material *material)
  *  kart is falling, or if the surface the kart is driving on has
  *  the 'isBelowSurface' property set.
  */
-void Kart::handleMaterialGFX()
+void Kart::handleMaterialGFX(float dt)
 {
     const Material *material = getMaterial();
 
@@ -1798,12 +1798,22 @@ void Kart::handleMaterialGFX()
     // --------------------------------------------------------------
     if (m_controller->isLocalPlayerController() && !hasFinishedRace())
     {
+        bool falling = material && material->hasFallingEffect() && !m_flying;
+        if (falling)
+        {
+            m_falling_time -= dt;
+            if (m_falling_time < 0.0f)
+                m_falling_time = 0.0f;
+        }
+        else
+            m_falling_time = 0.35f;
+
         for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
             Camera *camera = Camera::getCamera(i);
             if(camera->getKart()!=this) continue;
 
-            if (material && material->hasFallingEffect() && !m_flying)
+            if (falling && m_falling_time <= 0.0f)
             {
                 camera->setMode(Camera::CM_FALLING);
             }
