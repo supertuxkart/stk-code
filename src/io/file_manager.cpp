@@ -960,7 +960,8 @@ void FileManager::checkAndCreateScreenshotDir()
     m_screenshot_dir  = getenv("HOME");
     m_screenshot_dir += "/Library/Application Support/SuperTuxKart/Screenshots/";
 #else
-    m_screenshot_dir = checkAndCreateLinuxDir("XDG_CACHE_HOME", "supertuxkart", ".cache/", ".");
+    m_screenshot_dir  = checkAndCreateLinuxDir("XDG_DATA_HOME", "supertuxkart",
+                                          ".local/share", ".stkscreenshots");
     m_screenshot_dir += "screenshots/";
 #endif
 
