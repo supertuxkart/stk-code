@@ -401,7 +401,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         m_is_in_skybox = true;
     }
 
-    bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
+    bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects > 1 ||
                      World::getWorld()->getIdent() == IDENT_CUTSCENE);
     bool displacing = false;
     xml_node.get("displacing", &displacing);
@@ -467,7 +467,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     m_node         = NULL;
     m_is_in_skybox = false;
     m_render_info  = NULL;
-    bool animated  = (UserConfigParams::m_graphical_effects ||
+    bool animated  = (UserConfigParams::m_graphical_effects > 1 ||
                       World::getWorld()->getIdent() == IDENT_CUTSCENE);
 
     m_model_file = model_file;
@@ -512,7 +512,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
     if(xml_node)
         xml_node->get("skeletal-animation", &skeletal_animation);
 
-    bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
+    bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects > 1 ||
              World::getWorld()->getIdent() == IDENT_CUTSCENE);
     bool displacing = false;
     std::string interaction;

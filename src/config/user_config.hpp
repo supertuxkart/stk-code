@@ -727,9 +727,9 @@ namespace UserConfigParams
 #define FBO_DEFAULT true
 #endif
 
-    PARAM_PREFIX BoolUserConfigParam        m_graphical_effects
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "anim_gfx",
-                            &m_graphics_quality, "Scenery animations") );
+    PARAM_PREFIX IntUserConfigParam        m_graphical_effects
+            PARAM_DEFAULT(  IntUserConfigParam(2, "anim_gfx",
+                            &m_graphics_quality, "Scenery animations: 0 disabled, 1 only important, 2 enabled") );
 
     // This saves the actual user preference.
     PARAM_PREFIX IntUserConfigParam        m_xmas_mode

@@ -45,13 +45,6 @@ KartGFX::KartGFX(const AbstractKart *kart, RaceManager::KartType type, bool is_d
     m_kart = kart;
     m_wheel_toggle = 0;
     m_skid_level = 0;
-    
-    //if(!UserConfigParams::m_graphical_effects)
-    //{
-    //    for(unsigned int i=0; i<KGFX_COUNT; i++)
-    //        m_all_emitters.push_back(NULL);
-    //    return;
-    //}
 
     const KartModel *km = m_kart->getKartModel();
     const float length = km->getLength();
@@ -173,9 +166,10 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
                         const Vec3 &position, bool important)
 {
 #ifndef SERVER_ONLY
-    if ((!UserConfigParams::m_graphical_effects || !CVS->isGLSL()) &&
+    if (((UserConfigParams::m_graphical_effects < 2 || !CVS->isGLSL()) &&
         (!important || m_kart->getType() == RaceManager::KT_AI ||
-        m_kart->getType() == RaceManager::KT_SPARE_TIRE))
+        m_kart->getType() == RaceManager::KT_SPARE_TIRE)) ||
+        UserConfigParams::m_graphical_effects < 1)
     {
         m_all_emitters.push_back(NULL);
         return;

@@ -805,9 +805,9 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_gi = false;
     // animated scenery
     if (CommandLine::has("--enable-gfx"))
-        UserConfigParams::m_graphical_effects = true;
+        UserConfigParams::m_graphical_effects = 2;
     else if (CommandLine::has("--disable-gfx"))
-        UserConfigParams::m_graphical_effects = false;
+        UserConfigParams::m_graphical_effects = 0;
     if (CommandLine::has("--enable-motion-blur"))
         UserConfigParams::m_motionblur = true;
     else if (CommandLine::has("--disable-motion-blur"))

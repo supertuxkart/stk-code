@@ -1773,7 +1773,7 @@ void Kart::handleMaterialGFX(float dt)
     // something with the wheels, and the material has not the
     // below surface property set.
     if (material && isOnGround() && !material->isBelowSurface() &&
-        !getKartAnimation()      && UserConfigParams::m_graphical_effects)
+        !getKartAnimation()      && UserConfigParams::m_graphical_effects > 1)
     {
 
         // Get the appropriate particle data depending on
@@ -1825,7 +1825,7 @@ void Kart::handleMaterialGFX(float dt)
         }   // for i in all cameras for this kart
     }   // camera != final camera
 
-    if (!UserConfigParams::m_graphical_effects)
+    if (UserConfigParams::m_graphical_effects < 2)
         return;
 
     // Use the middle of the contact points of the two rear wheels
@@ -2108,7 +2108,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
     {
 #ifndef SERVER_ONLY
         std::string particles = m->getCrashResetParticles();
-        if (particles.size() > 0)
+        if (particles.size() > 0 && UserConfigParams::m_graphical_effects > 0)
         {
             ParticleKind* kind =
                 ParticleKindManager::get()->getParticles(particles);

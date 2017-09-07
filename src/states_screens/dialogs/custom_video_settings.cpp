@@ -58,9 +58,15 @@ CustomVideoSettingsDialog::~CustomVideoSettingsDialog()
 void CustomVideoSettingsDialog::beforeAddingWidgets()
 {
 #ifndef SERVER_ONLY
-    getWidget<CheckBoxWidget>("anim_gfx")->setState(UserConfigParams::m_graphical_effects);
     getWidget<CheckBoxWidget>("weather_gfx")->setState(UserConfigParams::m_weather_effects);
     getWidget<CheckBoxWidget>("dof")->setState(UserConfigParams::m_dof);
+    
+    SpinnerWidget* anim_gfx = getWidget<SpinnerWidget>("anim_gfx");
+    assert(anim_gfx != NULL);
+    anim_gfx->addLabel(_("Disabled"));
+    anim_gfx->addLabel(_("Important only"));
+    anim_gfx->addLabel(_("Enabled"));
+    anim_gfx->setValue(UserConfigParams::m_graphical_effects);
 
     SpinnerWidget* kart_anim = getWidget<SpinnerWidget>("steering_animations");
     kart_anim->addLabel(_("Disabled")); // 0
@@ -179,7 +185,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             getWidget<CheckBoxWidget>("texture_compression")->getState();
 
         UserConfigParams::m_graphical_effects =
-            getWidget<CheckBoxWidget>("anim_gfx")->getState();
+            getWidget<SpinnerWidget>("anim_gfx")->getValue();
 
         UserConfigParams::m_weather_effects =
             getWidget<CheckBoxWidget>("weather_gfx")->getState();
