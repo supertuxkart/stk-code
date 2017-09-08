@@ -47,7 +47,7 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound, const char 
     ParticleKind* particles = pkm->getParticles(particle_file);
     m_emitter = NULL;
     
-    if (UserConfigParams::m_graphical_effects > 0)
+    if (UserConfigParams::m_graphical_effects > 1)
     {
         m_emitter = new ParticleEmitter(particles, coord,  NULL);
     }
