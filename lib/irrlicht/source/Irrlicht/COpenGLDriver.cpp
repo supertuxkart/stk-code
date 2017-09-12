@@ -809,7 +809,7 @@ bool COpenGLDriver::genericDriverInit()
 	u32 i;
 	CurrentTexture.clear();
 	// load extensions
-	initExtensions(Params.Stencilbuffer);
+	initExtensions(Params.Stencilbuffer, useCoreContext);
 	if (queryFeature(EVDF_ARB_GLSL))
 	{
 		char buf[32];
@@ -872,9 +872,11 @@ bool COpenGLDriver::genericDriverInit()
 
 	glClearDepth(1.0);
 	if (!useCoreContext)
+	{
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+		glHint(GL_POINT_SMOOTH_HINT, GL_FASTEST);
+	}
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	glHint(GL_POINT_SMOOTH_HINT, GL_FASTEST);
 	glDepthFunc(GL_LEQUAL);
 	glFrontFace(GL_CW);
 	// adjust flat coloring scheme to DirectX version

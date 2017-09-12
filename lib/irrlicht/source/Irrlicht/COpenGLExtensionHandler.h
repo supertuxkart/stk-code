@@ -924,7 +924,7 @@ class COpenGLExtensionHandler
 	COpenGLExtensionHandler();
 
 	// deferred initialization
-	void initExtensions(bool stencilBuffer);
+	void initExtensions(bool stencilBuffer, bool useCoreContext);
 
 	//! queries the features of the driver, returns true if feature is available
 	bool queryFeature(E_VIDEO_DRIVER_FEATURE feature) const;
