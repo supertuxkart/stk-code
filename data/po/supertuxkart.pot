@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-30 06:48+0200\n"
+"POT-Creation-Date: 2017-09-13 06:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -181,7 +181,7 @@ msgstr ""
 #. I18N: track group
 #. I18N: ./data/gui/easter_egg.stkgui
 #. I18N: track group
-#: src/states_screens/grand_prix_editor_screen.cpp:330
+#: src/states_screens/grand_prix_editor_screen.cpp:337
 msgid "Standard"
 msgstr ""
 
@@ -195,7 +195,7 @@ msgstr ""
 #. I18N: track group name
 #: src/states_screens/arenas_screen.cpp:83
 #: src/states_screens/easter_egg_screen.cpp:145
-#: src/states_screens/grand_prix_editor_screen.cpp:332
+#: src/states_screens/grand_prix_editor_screen.cpp:339
 #: src/states_screens/kart_selection.cpp:286
 #: src/states_screens/tracks_and_gp_screen.cpp:148
 msgid "Add-Ons"
@@ -215,7 +215,7 @@ msgstr ""
 #: src/states_screens/easter_egg_screen.cpp:137
 #: src/states_screens/edit_track_screen.cpp:147
 #: src/states_screens/gp_info_screen.cpp:76
-#: src/states_screens/grand_prix_editor_screen.cpp:329
+#: src/states_screens/grand_prix_editor_screen.cpp:336
 #: src/states_screens/kart_selection.cpp:278
 #: src/states_screens/options_screen_video.cpp:456
 #: src/states_screens/tracks_and_gp_screen.cpp:138
@@ -333,12 +333,12 @@ msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Animated Scenery"
+msgid "Texture compression"
 msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Texture compression"
+msgid "Animated Scenery"
 msgstr ""
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
@@ -926,12 +926,12 @@ msgstr ""
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
-msgid "Deadzone center"
+msgid "Deadzone"
 msgstr ""
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
-msgid "Deadzone edge"
+msgid "Sensitivity"
 msgstr ""
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
@@ -1419,6 +1419,7 @@ msgstr ""
 #. I18N: In the audio options screen
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
+#: src/states_screens/dialogs/custom_video_settings.cpp:68
 #: src/states_screens/options_screen_video.cpp:451
 msgid "Enabled"
 msgstr ""
@@ -2714,11 +2715,11 @@ msgstr[1] ""
 msgid "Could not detect any wiimote :/"
 msgstr ""
 
-#: src/karts/controller/local_player_controller.cpp:244
+#: src/karts/controller/local_player_controller.cpp:241
 msgid "Penalty time!!"
 msgstr ""
 
-#: src/karts/controller/local_player_controller.cpp:246
+#: src/karts/controller/local_player_controller.cpp:243
 msgid "Don't accelerate before go"
 msgstr ""
 
@@ -2730,11 +2731,11 @@ msgstr ""
 msgid "+1 life."
 msgstr ""
 
-#: src/karts/kart.cpp:903 src/karts/kart.cpp:908
+#: src/karts/kart.cpp:908 src/karts/kart.cpp:913
 msgid "You won the race!"
 msgstr ""
 
-#: src/karts/kart.cpp:908
+#: src/karts/kart.cpp:913
 msgid "You finished the race!"
 msgstr ""
 
@@ -2748,16 +2749,16 @@ msgid ""
 "edit \"Connect to the Internet\" and \"Send anonymous HW statistics\")."
 msgstr ""
 
-#: src/main.cpp:1654
+#: src/main.cpp:1653
 msgid "Your screen resolution is too low to run STK."
 msgstr ""
 
-#: src/main.cpp:1668
+#: src/main.cpp:1667
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr ""
 
-#: src/main.cpp:1685
+#: src/main.cpp:1684
 #, c-format
 msgid ""
 "Your OpenGL version appears to be too old. Please verify if an update for "
@@ -3128,53 +3129,60 @@ msgstr[1] ""
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/dialogs/custom_video_settings.cpp:78
-#: src/states_screens/dialogs/custom_video_settings.cpp:95
+#: src/states_screens/dialogs/custom_video_settings.cpp:72
+#: src/states_screens/dialogs/custom_video_settings.cpp:84
+#: src/states_screens/dialogs/custom_video_settings.cpp:101
 #: src/states_screens/dialogs/multitouch_settings_dialog.cpp:59
 #: src/states_screens/options_screen_video.cpp:454
 msgid "Disabled"
 msgstr ""
 
+#. I18N: if only important animated scenery is enabled
+#: src/states_screens/dialogs/custom_video_settings.cpp:67
+#: src/states_screens/options_screen_video.cpp:462
+msgid "Important only"
+msgstr ""
+
 #. I18N: animations setting (only karts with human players are animated)
-#: src/states_screens/dialogs/custom_video_settings.cpp:68
+#: src/states_screens/dialogs/custom_video_settings.cpp:74
 msgid "Human players only"
 msgstr ""
 
-#: src/states_screens/dialogs/custom_video_settings.cpp:71
+#: src/states_screens/dialogs/custom_video_settings.cpp:77
 msgid "Enabled for all"
 msgstr ""
 
 #. I18N: Geometry level low : few details are displayed
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is low
-#: src/states_screens/dialogs/custom_video_settings.cpp:80
-#: src/states_screens/dialogs/custom_video_settings.cpp:89
-#: src/states_screens/dialogs/custom_video_settings.cpp:96
-#: src/states_screens/options_screen_video.cpp:467
+#: src/states_screens/dialogs/custom_video_settings.cpp:86
+#: src/states_screens/dialogs/custom_video_settings.cpp:95
+#: src/states_screens/dialogs/custom_video_settings.cpp:102
+#: src/states_screens/options_screen_video.cpp:469
 msgid "Low"
 msgstr ""
 
 #. I18N: Geometry level high : everything is displayed
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is high
-#: src/states_screens/dialogs/custom_video_settings.cpp:82
-#: src/states_screens/dialogs/custom_video_settings.cpp:90
-#: src/states_screens/dialogs/custom_video_settings.cpp:97
-#: src/states_screens/options_screen_video.cpp:470
+#: src/states_screens/dialogs/custom_video_settings.cpp:88
+#: src/states_screens/dialogs/custom_video_settings.cpp:96
+#: src/states_screens/dialogs/custom_video_settings.cpp:103
+#: src/states_screens/options_screen_video.cpp:472
 msgid "High"
 msgstr ""
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
-#: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/options_screen_video.cpp:464
+#: src/states_screens/dialogs/custom_video_settings.cpp:94
+#: src/states_screens/options_screen_video.cpp:466
 msgid "Very Low"
 msgstr ""
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very high
-#: src/states_screens/dialogs/custom_video_settings.cpp:91
-#: src/states_screens/options_screen_video.cpp:473
+#: src/states_screens/dialogs/custom_video_settings.cpp:97
+#: src/states_screens/options_screen_video.cpp:475
 msgid "Very High"
 msgstr ""
 
@@ -3405,19 +3413,19 @@ msgstr ""
 msgid "Please select a Grand Prix"
 msgstr ""
 
-#: src/states_screens/grand_prix_editor_screen.cpp:331
+#: src/states_screens/grand_prix_editor_screen.cpp:338
 msgid "User defined"
 msgstr ""
 
-#: src/states_screens/grand_prix_editor_screen.cpp:344
+#: src/states_screens/grand_prix_editor_screen.cpp:351
 msgid "Name is empty."
 msgstr ""
 
-#: src/states_screens/grand_prix_editor_screen.cpp:352
+#: src/states_screens/grand_prix_editor_screen.cpp:359
 msgid "Another grand prix with this name already exists."
 msgstr ""
 
-#: src/states_screens/grand_prix_editor_screen.cpp:358
+#: src/states_screens/grand_prix_editor_screen.cpp:365
 msgid "Name is too long."
 msgstr ""
 
@@ -3685,88 +3693,88 @@ msgstr ""
 #. tooltip = tooltip + L"\n" + _("Pixel shaders: %s",
 #. UserConfigParams::m_pixel_shaders ? enabled : disabled);
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:479
+#: src/states_screens/options_screen_video.cpp:481
 #, c-format
 msgid "Animated Scenery: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:482
+#: src/states_screens/options_screen_video.cpp:487
 #, c-format
 msgid "Weather Effects: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:485
+#: src/states_screens/options_screen_video.cpp:490
 #, c-format
 msgid "Animated Characters: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:490
+#: src/states_screens/options_screen_video.cpp:495
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:493
+#: src/states_screens/options_screen_video.cpp:498
 #, c-format
 msgid "Motion blur: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:496
+#: src/states_screens/options_screen_video.cpp:501
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:499
+#: src/states_screens/options_screen_video.cpp:504
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr ""
 
-#: src/states_screens/options_screen_video.cpp:503
+#: src/states_screens/options_screen_video.cpp:508
 #, c-format
 msgid "Shadows: %s"
 msgstr ""
 
-#: src/states_screens/options_screen_video.cpp:505
+#: src/states_screens/options_screen_video.cpp:510
 #, c-format
 msgid "Shadows: %i"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:508
+#: src/states_screens/options_screen_video.cpp:513
 #, c-format
 msgid "Bloom: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:512
+#: src/states_screens/options_screen_video.cpp:517
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:516
+#: src/states_screens/options_screen_video.cpp:521
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:520
+#: src/states_screens/options_screen_video.cpp:525
 #, c-format
 msgid "Depth of field: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options_screen_video.cpp:524
+#: src/states_screens/options_screen_video.cpp:529
 #, c-format
 msgid "Global illumination: %s"
 msgstr ""
 
-#: src/states_screens/options_screen_video.cpp:529
+#: src/states_screens/options_screen_video.cpp:534
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr ""
