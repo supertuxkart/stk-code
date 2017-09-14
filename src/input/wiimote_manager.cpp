@@ -386,7 +386,7 @@ int WiimoteManager::askUserToConnectWiimotes()
     new MessageDialog(
 #ifdef WIN32
         _("Connect your Wiimote to the Bluetooth manager, then click on OK. "
-                  "Detailed instructions at https://supertuxkart.net/Wiimote"),
+                  "Detailed instructions at supertuxkart.net/Wiimote"),
 #else
         _("Press the 1 and 2 buttons on your Wiimote simultaneously to put "
           "it in discovery mode, then click on OK. "
