@@ -1,4 +1,4 @@
-#if __VERSION__ >= 330
+#ifdef Explicit_Attrib_Location_Usable
 layout(location=0) in vec3 Position;
 layout(location = 1) in float lifetime;
 layout(location = 2) in float size;
@@ -22,7 +22,7 @@ float anglespeed;
 
 out float lf;
 out vec2 tc;
-out vec3 pc;
+out vec4 pc;
 
 void main(void)
 {
@@ -68,5 +68,5 @@ void main(void)
 
 	vec4 viewpos = ViewMatrix * vec4(newposition + newquadcorner, 1.0);
 	gl_Position = ProjectionMatrix * viewpos;
-	pc = vec3(1.);
+	pc = vec4(1.);
 }

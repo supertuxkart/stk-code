@@ -86,6 +86,16 @@ void MainMenuScreen::loadedFromFile()
 {
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     w->setScrollSpeed(15);
+    
+    RibbonWidget* rw_top = getWidget<RibbonWidget>("menu_toprow");
+    assert(rw_top != NULL);
+    
+    if (track_manager->getTrack("overworld") == NULL ||
+        track_manager->getTrack("introcutscene") == NULL ||
+        track_manager->getTrack("introcutscene2") == NULL)
+    {
+        rw_top->removeChildNamed("story");
+    }
 
 #if DEBUG_MENU_ITEM != 1
     RibbonWidget* rw = getWidget<RibbonWidget>("menu_bottomrow");
@@ -97,6 +107,13 @@ void MainMenuScreen::loadedFromFile()
     rw->removeChildNamed("test_outro");
 #endif
 }   // loadedFromFile
+
+// ----------------------------------------------------------------------------
+
+void MainMenuScreen::beforeAddingWidget()
+{
+
+}
 
 // ----------------------------------------------------------------------------
 //

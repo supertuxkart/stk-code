@@ -21,9 +21,10 @@
 #include "karts/controller/kart_control.hpp"
 #include "modes/world.hpp"
 
-GhostController::GhostController(AbstractKart *kart)
+GhostController::GhostController(AbstractKart *kart, core::stringw display_name)
                 : Controller(kart)
 {
+    m_display_name = display_name;
 }   // GhostController
 
 //-----------------------------------------------------------------------------
@@ -54,7 +55,7 @@ void GhostController::update(float dt)
         if(camera->getKart()!=m_kart) continue;
         if (camera->getType() != Camera::CM_TYPE_END)
         {
-            if (m_controls->m_look_back)
+            if (m_controls->getLookBack())
             {
                 camera->setMode(Camera::CM_REVERSE);
             }
@@ -85,5 +86,5 @@ void GhostController::action(PlayerAction action, int value)
 {
     // Watching replay use only
     if (action == PA_LOOK_BACK)
-        m_controls->m_look_back = (value!=0);
+        m_controls->setLookBack(value!=0);
 }   // action

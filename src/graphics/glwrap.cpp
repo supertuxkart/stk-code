@@ -15,12 +15,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/glwrap.hpp"
+#ifndef SERVER_ONLY
 
+#include "graphics/glwrap.hpp"
 
 #include "config/hardware_stats.hpp"
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stk_mesh.hpp"
 #include "utils/profiler.hpp"
@@ -243,8 +245,7 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h,
         for (unsigned i = 0; i < RTTs.size(); i++)
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, RTTs[i], 0);
     }
-    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
+    assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE_EXT);
 }
 
 FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w,
@@ -268,8 +269,7 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w,
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, RTTs[i], 0);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DS, 0);
     }
-    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
+    assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE_EXT);
     if (layered)
         glGenFramebuffers(1, &fbolayer);
 }
@@ -289,17 +289,18 @@ void FrameBuffer::bind() const
     glDrawBuffers((int)RenderTargets.size(), bufs);
 }
 
-void FrameBuffer::bindLayer(unsigned i)
+void FrameBuffer::bindLayer(unsigned i) const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbolayer);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, RenderTargets[0], 0, i);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, DepthTexture, 0, i);
+    assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE_EXT);
     glViewport(0, 0, (int)width, (int)height);
     GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
     glDrawBuffers((int)RenderTargets.size(), bufs);
 }
 
-void FrameBuffer::Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask, GLenum filter)
+void FrameBuffer::Blit(const FrameBuffer &Src, const FrameBuffer &Dst, GLbitfield mask, GLenum filter)
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, Src.fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Dst.fbo);
@@ -346,6 +347,7 @@ void draw3DLine(const core::vector3df& start,
 
 bool hasGLExtension(const char* extension) 
 {
+#if !defined(USE_GLES2)
     if (glGetStringi != NULL)
     {
         GLint numExtensions = 0;
@@ -361,6 +363,7 @@ bool hasGLExtension(const char* extension)
         }
     }
     else
+#endif
     {
         const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
         if (extensions && strstr(extensions, extension) != NULL)
@@ -378,6 +381,7 @@ bool hasGLExtension(const char* extension)
 const std::string getGLExtensions()
 {
     std::string result;
+#if !defined(USE_GLES2)
     if (glGetStringi != NULL)
     {
         GLint num_extensions = 0;
@@ -391,6 +395,7 @@ const std::string getGLExtensions()
         }
     }
     else
+#endif
     {
         const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
         result = extensions;
@@ -757,3 +762,50 @@ else \
 
 #endif  // ifdef XX
 }   // getGLLimits
+
+
+// ----------------------------------------------------------------------------
+/** Executes glGetError and prints error to the console
+ * \return True if error ocurred
+ */
+bool checkGLError()
+{
+    GLenum err = glGetError();
+    
+    switch (err)
+    {
+    case GL_NO_ERROR:
+        break;
+    case GL_INVALID_ENUM:
+        Log::warn("GLWrap", "glGetError: GL_INVALID_ENUM");
+        break;
+    case GL_INVALID_VALUE:
+        Log::warn("GLWrap", "glGetError: GL_INVALID_VALUE");
+        break;
+    case GL_INVALID_OPERATION:
+        Log::warn("GLWrap", "glGetError: GL_INVALID_OPERATION");
+        break;
+    case GL_INVALID_FRAMEBUFFER_OPERATION:
+        Log::warn("GLWrap", "glGetError: GL_INVALID_FRAMEBUFFER_OPERATION");
+        break;
+    case GL_OUT_OF_MEMORY:
+        Log::warn("GLWrap", "glGetError: GL_OUT_OF_MEMORY");
+        break;
+#if !defined(USE_GLES2)
+    case GL_STACK_UNDERFLOW:
+        Log::warn("GLWrap", "glGetError: GL_STACK_UNDERFLOW");
+        break;
+    case GL_STACK_OVERFLOW:
+        Log::warn("GLWrap", "glGetError: GL_STACK_OVERFLOW");
+        break;
+#endif
+    default:
+        Log::warn("GLWrap", "glGetError: %i", (int)err);
+        break;
+    }
+    
+    return err != GL_NO_ERROR;
+}
+
+#endif   // !SERVER_ONLY
+

@@ -72,12 +72,12 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
         Controller *controller = World::getWorld()->getKart(kart_id)
                                                   ->getController();
         KartControl *controls  = controller->getControls();
-        controls->m_brake      = (serialized_1 & 0x40)!=0;
-        controls->m_nitro      = (serialized_1 & 0x20)!=0;
-        controls->m_rescue     = (serialized_1 & 0x10)!=0;
-        controls->m_fire       = (serialized_1 & 0x08)!=0;
-        controls->m_look_back  = (serialized_1 & 0x04)!=0;
-        controls->m_skid       = KartControl::SkidControl(serialized_1 & 0x03);
+        controls->setBrake(   (serialized_1 & 0x40)!=0);
+        controls->setNitro(   (serialized_1 & 0x20)!=0);
+        controls->setRescue(  (serialized_1 & 0x10)!=0);
+        controls->setFire(    (serialized_1 & 0x08)!=0);
+        controls->setLookBack((serialized_1 & 0x04)!=0);
+        controls->setSkidControl(KartControl::SkidControl(serialized_1 & 0x03));
 
         controller->action(action, action_value);
     }
@@ -110,19 +110,19 @@ void ControllerEventsProtocol::controllerAction(Controller* controller,
 
     KartControl* controls = controller->getControls();
     uint8_t serialized_1 = 0;
-    serialized_1 |= (controls->m_brake==true);
+    serialized_1 |= (controls->getBrake()==true);
     serialized_1 <<= 1;
-    serialized_1 |= (controls->m_nitro==true);
+    serialized_1 |= (controls->getNitro()==true);
     serialized_1 <<= 1;
-    serialized_1 |= (controls->m_rescue==true);
+    serialized_1 |= (controls->getRescue()==true);
     serialized_1 <<= 1;
-    serialized_1 |= (controls->m_fire==true);
+    serialized_1 |= (controls->getFire()==true);
     serialized_1 <<= 1;
-    serialized_1 |= (controls->m_look_back==true);
+    serialized_1 |= (controls->getLookBack()==true);
     serialized_1 <<= 2;
-    serialized_1 += controls->m_skid;
-    uint8_t serialized_2 = (uint8_t)(controls->m_accel*255.0);
-    uint8_t serialized_3 = (uint8_t)(controls->m_steer*127.0);
+    serialized_1 += controls->getSkidControl();
+    uint8_t serialized_2 = (uint8_t)(controls->getAccel()*255.0);
+    uint8_t serialized_3 = (uint8_t)(controls->getSteer()*127.0);
 
     NetworkString *ns = getNetworkString(13);
     ns->addFloat(World::getWorld()->getTime());

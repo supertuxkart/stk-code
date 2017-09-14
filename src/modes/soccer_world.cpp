@@ -25,18 +25,18 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/render_info.hpp"
-#include "karts/abstract_kart.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
 #include "karts/controller/local_player_controller.hpp"
-#include "karts/controller/soccer_ai.hpp"
+#include "karts/controller/network_player_controller.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
-#include "tracks/battle_graph.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
+#include "tracks/track_sector.hpp"
 #include "utils/constants.hpp"
 
 #include <IMeshSceneNode.h>
@@ -61,6 +61,7 @@ SoccerWorld::SoccerWorld() : WorldWithRank()
     m_use_highscores = false;
     m_red_ai = 0;
     m_blue_ai = 0;
+    m_ball_track_sector = NULL;
 }   // SoccerWorld
 
 //-----------------------------------------------------------------------------
@@ -69,6 +70,9 @@ SoccerWorld::SoccerWorld() : WorldWithRank()
 SoccerWorld::~SoccerWorld()
 {
     m_goal_sound->deleteSFX();
+
+    delete m_ball_track_sector;
+    m_ball_track_sector = NULL;
 }   // ~SoccerWorld
 
 //-----------------------------------------------------------------------------
@@ -88,7 +92,14 @@ void SoccerWorld::init()
     m_goal_target = race_manager->getMaxGoal();
     m_goal_sound = SFXManager::get()->createSoundSource("goal_scored");
 
-    TrackObjectManager* tom = getTrack()->getTrackObjectManager();
+    Track *track = Track::getCurrentTrack();
+    if (track->hasNavMesh())
+    {
+        // Init track sector for ball if navmesh is found
+        m_ball_track_sector = new TrackSector();
+    }
+
+    TrackObjectManager* tom = track->getTrackObjectManager();
     assert(tom);
     PtrVector<TrackObject>& objects = tom->getObjects();
     for (unsigned int i = 0; i < objects.size(); i++)
@@ -141,10 +152,15 @@ void SoccerWorld::reset()
         m_goal_sound->stop();
     }
 
+    if (Track::getCurrentTrack()->hasNavMesh())
+    {
+        m_ball_track_sector->reset();
+    }
+
     initKartList();
-    resetAllPosition();
     m_ball->reset();
     m_bgd.reset();
+
     // Make the player kart in profiling mode up
     // ie make this kart less likely to affect gaming result
     if (UserConfigParams::m_arena_ai_stats)
@@ -167,9 +183,9 @@ const std::string& SoccerWorld::getIdent() const
 void SoccerWorld::update(float dt)
 {
     updateBallPosition(dt);
-    if (m_track->hasNavMesh())
+    if (Track::getCurrentTrack()->hasNavMesh())
     {
-        updateKartNodes();
+        updateSectorForKarts();
         updateAIData();
     }
 
@@ -306,13 +322,21 @@ void SoccerWorld::countdownReachedZero()
 //-----------------------------------------------------------------------------
 void SoccerWorld::initKartList()
 {
+#ifndef SERVER_ONLY
     const unsigned int kart_amount = (unsigned int)m_karts.size();
 
     //Loading the indicator textures
-    irr::video::ITexture *red =
-            irr_driver->getTexture(FileManager::GUI, "soccer_player_red.png");
-    irr::video::ITexture *blue =
-            irr_driver->getTexture(FileManager::GUI, "soccer_player_blue.png");
+    std::string red_path =
+            file_manager->getAsset(FileManager::GUI, "soccer_player_red.png");
+    std::string blue_path =
+            file_manager->getAsset(FileManager::GUI, "soccer_player_blue.png");
+
+    TexConfig btc(true/*srgb*/, true/*premul_alpha*/);
+    video::ITexture* red = STKTexManager::getInstance()->getTexture
+        (red_path, &btc);
+
+    video::ITexture* blue = STKTexManager::getInstance()->getTexture
+        (blue_path, &btc);
 
     //Assigning indicators
     for(unsigned int i = 0; i < kart_amount; i++)
@@ -326,13 +350,14 @@ void SoccerWorld::initKartList()
         float arrow_pos_height = km->getHeight() + 0.5f;
         SoccerTeam team = getKartTeam(i);
 
-        arrow_node = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,
-            0.3f), team == SOCCER_TEAM_BLUE ? blue : red, m_karts[i]
-            ->getNode(), true);
+        arrow_node = irr_driver->addBillboard(
+                                        core::dimension2d<irr::f32>(0.3f,0.3f),
+                                        team == SOCCER_TEAM_BLUE ? blue : red, 
+                                        m_karts[i]->getNode(), true);
 
         arrow_node->setPosition(core::vector3df(0, arrow_pos_height, 0));
     }
-
+#endif
 }   // initKartList
 
 //-----------------------------------------------------------------------------
@@ -408,11 +433,9 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
         m_num_players ++;
         break;
     case RaceManager::KT_NETWORK_PLAYER:
-        break;  // Avoid compiler warning about enum not handled.
-        //controller = new NetworkController(kart_ident, position, init_pos,
-        //                          global_player_id);
-        //m_num_players++;
-        //break;
+        controller = new NetworkPlayerController(new_kart);
+        m_num_players++;
+        break;
     case RaceManager::KT_AI:
         controller = loadAIController(new_kart);
         break;
@@ -420,30 +443,14 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
         break;
     case RaceManager::KT_LEADER:
         break;
+    case RaceManager::KT_SPARE_TIRE:
+        break;
     }
 
     new_kart->setController(controller);
 
     return new_kart;
 }   // createKart
-
-//-----------------------------------------------------------------------------
-/** Updates the m_kart_on_node value of each kart to localize it
- *  on the navigation mesh.
- */
-void SoccerWorld::updateKartNodes()
-{
-    if (isRaceOver()) return;
-
-    const unsigned int n = getNumKarts();
-    for (unsigned int i = 0; i < n; i++)
-    {
-        if (m_karts[i]->isEliminated()) continue;
-
-        m_kart_on_node[i] = BattleGraph::get()->pointToNode(m_kart_on_node[i],
-                            m_karts[i]->getXYZ(), false/*ignore_vertical*/);
-    }
-}   // updateKartNodes
 
 //-----------------------------------------------------------------------------
 /** Localize the ball on the navigation mesh.
@@ -459,13 +466,11 @@ void SoccerWorld::updateBallPosition(float dt)
             m_ball_body->getLinearVelocity().getZ());
     }
 
-    if (m_track->hasNavMesh())
+    if (Track::getCurrentTrack()->hasNavMesh())
     {
-        m_ball_on_node  = BattleGraph::get()->pointToNode(m_ball_on_node,
-                          getBallPosition(), true/*ignore_vertical*/);
-
-        if (m_ball_on_node == BattleGraph::UNKNOWN_POLY &&
-            getPhase() == RACE_PHASE)
+        m_ball_track_sector
+            ->update(getBallPosition(), true/*ignore_vertical*/);
+        if (!m_ball_track_sector->isOnRoad() && getPhase() == RACE_PHASE)
         {
             m_ball_invalid_timer += dt;
             // Reset the ball and karts if out of navmesh after 2 seconds
@@ -486,12 +491,12 @@ void SoccerWorld::updateBallPosition(float dt)
 }   // updateBallPosition
 
 //-----------------------------------------------------------------------------
-void SoccerWorld::resetAllPosition()
+int SoccerWorld::getBallNode() const
 {
-    m_kart_on_node.clear();
-    m_kart_on_node.resize(m_karts.size(), BattleGraph::UNKNOWN_POLY);
-    m_ball_on_node = BattleGraph::UNKNOWN_POLY;
-}   // resetAllPosition
+    assert(m_ball_track_sector != NULL);
+    return m_ball_track_sector->getCurrentGraphNode();
+}   // getBallNode
+
 //-----------------------------------------------------------------------------
 SoccerTeam SoccerWorld::getKartTeam(unsigned int kart_id) const
 {

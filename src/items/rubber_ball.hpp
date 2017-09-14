@@ -25,7 +25,6 @@
 #include "tracks/track_sector.hpp"
 
 class AbstractKart;
-class QuadGraph;
 class SFXBase;
 
 /**
@@ -196,7 +195,8 @@ private:
     void         interpolate(Vec3 *next_xyz, float dt);
     void         moveTowardsTarget(Vec3 *next_xyz, float dt);
     void         initializeControlPoints(const Vec3 &xyz);
-    float        getMaxTerrainHeight(const Vec3 &vertical_offset) const;
+    float        getTunnelHeight(const Vec3 &next_xyz, 
+                                     const float vertical_offset) const;
     bool         checkTunneling();
 public:
                  RubberBall  (AbstractKart* kart);
@@ -204,6 +204,7 @@ public:
     static  void init(const XMLNode &node, scene::IMesh *rubberball);
     virtual bool updateAndDelete(float dt);
     virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL);
+    virtual void setAnimation(AbstractKartAnimation *animation);
     static float getTimeBetweenRubberBalls()    {return m_time_between_balls;}
     // ------------------------------------------------------------------------
     /** This object does not create an explosion, all affects on

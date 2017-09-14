@@ -147,7 +147,7 @@ Referee::Referee()
     m_scene_node->setScale(m_st_scale.toIrrVector());
     m_scene_node->setFrameLoop(m_st_first_start_frame,
                                m_st_last_start_frame);
-
+#ifndef SERVER_ONLY
     irr_driver->applyObjectPassShader(m_scene_node);
 
     if (CVS->isGLSL() && CVS->isDefferedEnabled())
@@ -156,6 +156,7 @@ Referee::Referee()
             0.7f /* r */, 0.0 /* g */, 0.0f /* b */, false /* sun */, m_scene_node);
     }
     else
+#endif
     {
         m_light = NULL;
     }
@@ -184,7 +185,9 @@ Referee::Referee(const AbstractKart &kart)
     m_scene_node->setFrameLoop(m_st_first_rescue_frame,
                                m_st_last_rescue_frame);
 
+#ifndef SERVER_ONLY
     irr_driver->applyObjectPassShader(m_scene_node);
+#endif
 }   // Referee
 
 // ----------------------------------------------------------------------------
@@ -234,7 +237,7 @@ void Referee::selectReadySetGo(int rsg)
         return;
     video::SMaterial &m = m_scene_node->getMaterial(m_st_traffic_buffer); // m_scene_node->getMesh()->getMeshBuffer(m_st_traffic_buffer)->getMaterial();
 
-    //if (irr_driver->isGLSL() && UserConfigParams::m_dynamic_lights)
+    //if (irr_driver->isGLSL() && CVS->isDefferedEnabled())
     //    m.MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
 
     core::matrix4* matrix = &m.getTextureMatrix(0);

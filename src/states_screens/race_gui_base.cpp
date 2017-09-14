@@ -28,7 +28,6 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
@@ -43,6 +42,7 @@
 #include "karts/rescue_animation.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
+#include "states_screens/race_gui_multitouch.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
@@ -100,6 +100,7 @@ RaceGUIBase::RaceGUIBase()
     m_icons_inertia         = 2;
 
     m_referee               = NULL;
+    m_multitouch_gui        = NULL;
 }   // RaceGUIBase
 
 // ----------------------------------------------------------------------------
@@ -137,18 +138,27 @@ void RaceGUIBase::reset()
     {
         const AbstractKart *kart = World::getWorld()->getKart(i);
         m_referee_pos[i] = kart->getTrans()(Referee::getStartOffset());
-        m_referee_rotation[i] = Referee::getStartRotation()
-                              + Vec3(0, kart->getHeading()*RAD_TO_DEGREE, 0);
+        Vec3 hpr;
+        btQuaternion q = btQuaternion(kart->getTrans().getBasis().getColumn(1),
+            Referee::getStartRotation().getY() * DEGREE_TO_RAD) *
+            kart->getTrans().getRotation();
+        hpr.setHPR(q);
+        m_referee_rotation[i] = hpr.toIrrHPR();
     }
-
 
     m_referee_height = 10.0f;
     m_referee->attachToSceneNode();
+    m_referee->selectReadySetGo(0); // set red color
     m_plunger_move_time = 0;
     m_plunger_offset    = core::vector2di(0,0);
     m_plunger_speed     = core::vector2df(0,0);
     m_plunger_state     = PLUNGER_STATE_INIT;
     clearAllMessages();
+    
+    if (m_multitouch_gui != NULL)
+    {
+        m_multitouch_gui->reset();
+    }
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -303,6 +313,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
                                    const core::recti &viewport,
                                    const core::vector2df &scaling)
 {
+#ifndef SERVER_ONLY
     // If player doesn't have any powerups or has completed race, do nothing.
     const Powerup* powerup = kart->getPowerup();
     if (powerup->getType() == PowerupManager::POWERUP_NOTHING
@@ -352,6 +363,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
             pos, video::SColor(255, 255, 255, 255));
         font->setScale(1.0f);
     }
+#endif
 }   // drawPowerupIcons
 
 // ----------------------------------------------------------------------------
@@ -419,8 +431,8 @@ void RaceGUIBase::preRenderCallback(const Camera *camera)
     if(m_referee && camera->getKart())
     {
         unsigned int world_id = camera->getKart()->getWorldKartId();
-        Vec3 xyz = m_referee_pos[world_id];
-        xyz.setY(xyz.getY()+m_referee_height);
+        Vec3 xyz = m_referee_pos[world_id] +
+            camera->getKart()->getNormal() * m_referee_height;
         m_referee->setPosition(xyz);
         m_referee->setRotation(m_referee_rotation[world_id]);
     }
@@ -429,7 +441,15 @@ void RaceGUIBase::preRenderCallback(const Camera *camera)
 // ----------------------------------------------------------------------------
 void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
 {
-
+    const core::recti &viewport = camera->getViewport();
+    const core::vector2df scaling = camera->getScaling();
+    const AbstractKart* kart = camera->getKart();
+    if(!kart) return;
+    
+    if (m_multitouch_gui != NULL)
+    {
+        m_multitouch_gui->drawMultitouchSteering(kart, viewport, scaling);
+    }
 }   // renderPlayerView
 
 
@@ -452,6 +472,7 @@ void RaceGUIBase::addMessage(const core::stringw &msg,
  */
 void RaceGUIBase::drawGlobalMusicDescription()
 {
+#ifndef SERVER_ONLY
      // show no music description when it's off
     if (!UserConfigParams::m_music) return;
 
@@ -548,6 +569,7 @@ void RaceGUIBase::drawGlobalMusicDescription()
 
     draw2DImage(t, dest, source,
                                               NULL, NULL, true);
+#endif
 }   // drawGlobalMusicDescription
 
 //-----------------------------------------------------------------------------
@@ -619,6 +641,7 @@ void RaceGUIBase::drawGlobalReadySetGo()
  */
 void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 {
+#ifndef SERVER_ONLY
     // For now, don't draw player icons when in soccer mode
     const RaceManager::MinorRaceModeType  minor_mode = race_manager->getMinorMode();
     if(minor_mode == RaceManager::MINOR_MODE_SOCCER)
@@ -635,8 +658,11 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         y_space = irr_driver->getActualScreenSize().Height - y_base;
     }
 
+    unsigned int sta = race_manager->getNumSpareTireKarts();
+    const unsigned int num_karts = race_manager->getNumberOfKarts() - sta;
+
     // -2 because that's the spacing further on
-    int ICON_PLAYER_WIDTH = y_space / race_manager->getNumberOfKarts() - 2;
+    int ICON_PLAYER_WIDTH = y_space / num_karts - 2;
 
     int icon_width_max = (int)(50*(irr_driver->getActualScreenSize().Width/800.0f));
     int icon_width_min = (int)(35*(irr_driver->getActualScreenSize().Height/600.0f));
@@ -661,10 +687,11 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     int ICON_WIDTH = ICON_PLAYER_WIDTH * 4 / 5;
 
     WorldWithRank *world    = (WorldWithRank*)(World::getWorld());
+
     //initialize m_previous_icons_position
     if(m_previous_icons_position.size()==0)
     {
-        for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
+        for(unsigned int i=0; i<num_karts; i++)
         {
             const AbstractKart *kart = world->getKart(i);
             int position = kart->getPosition();
@@ -683,12 +710,19 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     int previous_y=y_base-ICON_PLAYER_WIDTH-2;
 
     gui::ScalableFont* font = GUIEngine::getFont();
-    const unsigned int kart_amount = world->getNumKarts();
+    const unsigned int kart_amount = world->getNumKarts() - sta;
 
     //where is the limit to hide last icons
-    int y_icons_limit=irr_driver->getActualScreenSize().Height-bottom_margin-ICON_PLAYER_WIDTH;
+    int y_icons_limit = irr_driver->getActualScreenSize().Height - 
+                                            bottom_margin - ICON_PLAYER_WIDTH;
     if (race_manager->getNumLocalPlayers() == 3)
-        y_icons_limit=irr_driver->getActualScreenSize().Height-ICON_WIDTH;
+    {
+        y_icons_limit = irr_driver->getActualScreenSize().Height - ICON_WIDTH;
+    }
+    else if (m_multitouch_gui != NULL)
+    {
+        y_icons_limit = irr_driver->getActualScreenSize().Height / 2;
+    }
 
     world->getKartsDisplayInfo(&m_kart_display_infos);
 
@@ -722,7 +756,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             LinearWorld *linear_world = (LinearWorld*)(World::getWorld());
 
             float distance = linear_world->getDistanceDownTrackForKart(kart_id)
-                           + linear_world->getTrack()->getTrackLength()*lap;
+                           + Track::getCurrentTrack()->getTrackLength()*lap;
             if ((position>1) &&
                 (previous_distance-distance<m_dist_show_overlap) &&
                 (!kart->hasFinishedRace())                          )
@@ -921,6 +955,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         }
 
     } //next position
+#endif
 }   // drawGlobalPlayerIcons
 
 // ----------------------------------------------------------------------------
@@ -930,6 +965,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
  */
 void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
 {
+#ifndef SERVER_ONLY
     const AbstractKart *kart = camera->getKart();
     if (kart->getBlockedByPlungerTime()<=0)
     {
@@ -1016,4 +1052,5 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
                                               &viewport /* clip */,
                                               NULL /* color */,
                                               true /* alpha */     );
+#endif   // !SERVER_ONLY
 }   // drawPlungerInFace

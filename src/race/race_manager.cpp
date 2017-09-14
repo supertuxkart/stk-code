@@ -45,7 +45,7 @@
 #include "modes/soccer_world.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/network_config.hpp"
-#include "network/protocols/start_game_protocol.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "scriptengine/property_animator.hpp"
@@ -84,6 +84,7 @@ RaceManager::RaceManager()
     setTrack("jungle");
     m_default_ai_list.clear();
     setNumPlayers(0);
+    setSpareTireKartNum(0);
 }   // RaceManager
 
 //-----------------------------------------------------------------------------
@@ -288,7 +289,7 @@ void RaceManager::computeRandomKartList()
     }
 
     if(n>0)
-        kart_properties_manager->getRandomKartList(n, m_player_karts,
+        kart_properties_manager->getRandomKartList(n, &m_player_karts,
                                                    &m_ai_kart_list   );
 
     if (m_ai_kart_override != "")
@@ -559,10 +560,9 @@ void RaceManager::startNextRace()
     // the world has been setup
     if(NetworkConfig::get()->isNetworking())
     {
-        StartGameProtocol* protocol = static_cast<StartGameProtocol*>(
-            ProtocolManager::getInstance()->getProtocol(PROTOCOL_START_GAME));
-        if (protocol)
-            protocol->ready();
+        LobbyProtocol *lobby = LobbyProtocol::get();
+        assert(lobby);
+        lobby->finishedLoadingWorld();
     }
 }   // startNextRace
 

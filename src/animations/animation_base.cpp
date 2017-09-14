@@ -107,3 +107,36 @@ void AnimationBase::update(float dt, Vec3 *xyz, Vec3 *hpr, Vec3 *scale)
     }
 }   // update
 
+// ----------------------------------------------------------------------------
+/** Return the time, position and rotation at the specified time. It does not
+ *  update the internal timer as update() does.
+ *  \param dt Time since last call.
+ *  \param xyz Position to be updated.
+ *  \param hpr Rotation to be updated.
+ */
+void AnimationBase::getAt(float time, Vec3 *xyz, Vec3 *hpr, Vec3 *scale)
+{
+    assert(!std::isnan(time));
+
+    // Don't do anything if the animation is disabled
+    if (!m_playing) return;
+
+    for_var_in(Ipo*, curr, m_all_ipos)
+    {
+        curr->update(time, xyz, hpr, scale);
+    }
+}   // getAt
+
+// ----------------------------------------------------------------------------
+/** Returns the derivative at the specified point.
+ *  \param time The time for which to determine the derivative.
+ *  \param xyz Float pointer to store the result.
+ */
+void AnimationBase::getDerivativeAt(float time, Vec3 *xyz)
+{
+    for_var_in(Ipo*, curr, m_all_ipos)
+    {
+        curr->getDerivative(time, xyz);
+    }
+    xyz->normalize();
+}

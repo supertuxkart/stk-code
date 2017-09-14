@@ -26,13 +26,13 @@
 #ifdef WIN32
 #  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
-#  include <time.h>
 #else
 #  include <stdint.h>
 #  include <sys/time.h>
 #  include <unistd.h>
 #endif
 
+#include <time.h>
 #include <string>
 #include <stdio.h>
 
@@ -136,18 +136,10 @@ public:
     class ScopeProfiler
     {
         float m_time;
+        std::string m_name;
     public:
-        ScopeProfiler(const char* name)
-        {
-            printf("%s {\n", name);
-            m_time = (float)getRealTime();
-        }
-
-        ~ScopeProfiler()
-        {
-            float f2 = (float)getRealTime();
-            printf("} // took %f s\n", (f2 - m_time));
-        }
+        ScopeProfiler(const char* name);
+        ~ScopeProfiler();
     };   // class ScopeProfiler
 
 };   // namespace time

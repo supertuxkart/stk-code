@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #ifndef HEADER_GPU_PARTICLES_HPP
 #define HEADER_GPU_PARTICLES_HPP
 
@@ -31,7 +33,8 @@ using namespace irr;
 class ParticleSystemProxy : public scene::CParticleSystemSceneNode
 {
 protected:
-    GLuint tfb_buffers[2], initial_values_buffer, heighmapbuffer, heightmaptexture, quaternionsbuffer;
+    GLuint tfb_buffers[2], initial_values_buffer, heighmapbuffer, 
+           heightmaptexture, quaternionsbuffer, vertex_id_buffer;
     GLuint current_simulation_vao, non_current_simulation_vao;
     GLuint current_rendering_vao, non_current_rendering_vao;
     bool m_alpha_additive, has_height_map, flip;
@@ -41,7 +44,7 @@ protected:
     bool m_first_execution;
     bool m_randomize_initial_y;
     
-    GLuint texture;
+    GLuint m_texture_name;
     
     /** Previous frame particles emitter source matrix */
     core::matrix4 m_previous_frame_matrix;
@@ -53,7 +56,9 @@ protected:
 
     static void CommonRenderingVAO(GLuint PositionBuffer);
     static void AppendQuaternionRenderingVAO(GLuint QuaternionBuffer);
-    static void CommonSimulationVAO(GLuint position_vbo, GLuint initialValues_vbo);
+    static void CommonSimulationVAO(GLuint position_vbo, 
+                                    GLuint initialValues_vbo, 
+                                    GLuint vertex_id_buffer);
 
     void generateVAOs();
     void cleanGL();
@@ -78,6 +83,7 @@ protected:
 private:
 
     ParticleData *ParticleParams, *InitialValues;
+    int* m_vertex_id_values;
     void generateParticlesFromPointEmitter(scene::IParticlePointEmitter *);
     void generateParticlesFromBoxEmitter(scene::IParticleBoxEmitter *);
     void generateParticlesFromSphereEmitter(scene::IParticleSphereEmitter *);
@@ -109,3 +115,5 @@ public:
 };
 
 #endif // GPUPARTICLES_H
+
+#endif  // !SERVER_ONLY

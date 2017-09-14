@@ -117,16 +117,26 @@
 #define _IRR_COMPILE_ANDROID_ASSET_READER_
 #endif
 
+#if defined(_IRR_COMPILE_WITH_OGLES2_) && !defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
+#define _IRR_COMPILE_WITH_EGL_
+#endif
+
 #if !defined(_IRR_WINDOWS_API_) && !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_)
 #ifndef _IRR_SOLARIS_PLATFORM_
-#if !defined(__linux__) && !defined(__FreeBSD__)
 #define _IRR_LINUX_PLATFORM_
-#endif
 #endif
 #define _IRR_POSIX_API_
 #define _IRR_COMPILE_WITH_X11_DEVICE_
+//#define _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 #endif
 
+#ifdef NO_IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#undef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#endif
+
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#define _IRR_COMPILE_WITH_EGL_
+#endif
 
 //! Define _IRR_COMPILE_WITH_JOYSTICK_SUPPORT_ if you want joystick events.
 #define _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
@@ -158,7 +168,7 @@ headers, e.g. Summer 2004.  This is a Microsoft issue, not an Irrlicht one.
 //! Define _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_ if you want to use DirectInput for joystick handling.
 /** This only applies to Windows devices, currently only supported under Win32 device.
 If not defined, Windows Multimedia library is used, which offers also broad support for joystick devices. */
-#undef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
+#define _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
 #ifdef NO_IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
 #undef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
 #endif
@@ -232,8 +242,8 @@ define out. */
 //! to remove the dependencies such that Irrlicht will compile on those systems, too.
 //! If you don't need colored cursors you can also disable the Xcursor extension
 #if defined(_IRR_LINUX_PLATFORM_) && defined(_IRR_COMPILE_WITH_X11_)
-#define _IRR_LINUX_X11_VIDMODE_
-//#define _IRR_LINUX_X11_RANDR_
+//#define _IRR_LINUX_X11_VIDMODE_
+#define _IRR_LINUX_X11_RANDR_
 #ifdef NO_IRR_LINUX_X11_VIDMODE_
 #undef _IRR_LINUX_X11_VIDMODE_
 #endif
@@ -248,6 +258,10 @@ define out. */
 #ifdef NO_IRR_LINUX_XCURSOR_
 #undef _IRR_LINUX_XCURSOR_
 #endif
+#else
+
+#undef _IRR_LINUX_X11_VIDMODE_
+#undef _IRR_LINUX_X11_RANDR_
 
 #endif
 
@@ -307,7 +321,7 @@ tool <http://developer.nvidia.com/object/nvperfhud_home.html>. */
 #undef _IRR_USE_NVIDIA_PERFHUD_
 
 //! Uncomment the following line if you want to ignore the deprecated warnings
-//#define IGNORE_DEPRECATED_WARNING
+#define IGNORE_DEPRECATED_WARNING
 
 //! Define _IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_ if you want to use bone based
 /** animated meshes. If you compile without this, you will be unable to load

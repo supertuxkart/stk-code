@@ -14,7 +14,7 @@ void main(void)
     float   gz = int(gl_VertexID >> 9) & (resolution.z - 1);
     uvw = vec3(gx, gy, gz) / vec3(resolution);
     vec3 WorldPos = (2. * uvw - 1.) * extents;
-    gl_Position = ProjectionMatrix * ViewMatrix * RHMatrix * vec4(WorldPos, 1.);
+    gl_Position = ProjectionViewMatrix * RHMatrix * vec4(WorldPos, 1.);
     gl_PointSize = 500. / gl_Position.w;
 
 }

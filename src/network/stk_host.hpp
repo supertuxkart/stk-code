@@ -109,7 +109,7 @@ private:
              STKHost(const irr::core::stringw &server_name);
     virtual ~STKHost();
     void init();
-    void handleLANRequests();
+    void handleDirectSocketRequest();
 
 public:
     /** If a network console should be started. Note that the console can cause

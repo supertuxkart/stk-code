@@ -45,7 +45,8 @@
 #include "modes/linear_world.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/race_result_gui.hpp"
-#include "tracks/quad_graph.hpp"
+#include "tracks/drive_graph.hpp"
+#include "tracks/drive_node.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
@@ -62,14 +63,14 @@ EndController::EndController(AbstractKart *kart,
         // with a path that always picks the first branch (i.e. it follows
         // the main driveline).
         std::vector<unsigned int> next;
-        for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
+        for(unsigned int i=0; i<DriveGraph::get()->getNumNodes(); i++)
         {
             // 0 is always a valid successor - so even if the kart should end
             // up by accident on a non-selected path, it will keep on working.
             m_successor_index[i] = 0;
 
             next.clear();
-            QuadGraph::get()->getSuccessors(i, next);
+            DriveGraph::get()->getSuccessors(i, next);
             m_next_node_index[i] = next[0];
         }
 
@@ -77,11 +78,11 @@ EndController::EndController(AbstractKart *kart,
         // Now compute for each node in the graph the list of the next 'look_ahead'
         // graph nodes. This is the list of node that is tested in checkCrashes.
         // If the look_ahead is too big, the AI can skip loops (see
-        // QuadGraph::findRoadSector for details), if it's too short the AI won't
+        // DriveGraph::findRoadSector for details), if it's too short the AI won't
         // find too good a driveline. Note that in general this list should
         // be computed recursively, but since the AI for now is using only
         // (randomly picked) path this is fine
-        for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
+        for(unsigned int i=0; i<DriveGraph::get()->getNumNodes(); i++)
         {
             std::vector<int> l;
             int current = i;
@@ -94,7 +95,7 @@ EndController::EndController(AbstractKart *kart,
         }
     }   // if not battle mode
 
-    // Reset must be called after QuadGraph::get() etc. is set up
+    // Reset must be called after DriveGraph::get() etc. is set up
     reset();
 
     m_max_handicap_accel = 1.0f;
@@ -129,18 +130,18 @@ void EndController::reset()
     m_crash_time       = 0.0f;
     m_time_since_stuck = 0.0f;
 
-    m_track_node       = QuadGraph::UNKNOWN_SECTOR;
+    m_track_node       = Graph::UNKNOWN_SECTOR;
     // In battle mode there is no quad graph, so nothing to do in this case
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
-        QuadGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node);
+        DriveGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node);
 
         // Node that this can happen quite easily, e.g. an AI kart is
         // taken over by the end controller while it is off track.
-        if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
+        if(m_track_node==Graph::UNKNOWN_SECTOR)
         {
-            m_track_node = QuadGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
+            m_track_node = DriveGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
         }
     }
 }   // reset
@@ -174,10 +175,10 @@ void EndController::action(PlayerAction action, int value)
 void EndController::update(float dt)
 {
     // This is used to enable firing an item backwards.
-    m_controls->m_look_back = false;
-    m_controls->m_nitro     = false;
-    m_controls->m_brake     = false;
-    m_controls->m_accel     = 1.0f;
+    m_controls->setLookBack(false);
+    m_controls->setNitro(false);
+    m_controls->setBrake(false);
+    m_controls->setAccel(1.0f);
 
     AIBaseLapController::update(dt);
 
@@ -186,10 +187,10 @@ void EndController::update(float dt)
        race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER  ||
        race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG)
     {
-        m_controls->m_accel = 0.0f;
+        m_controls->setAccel(0.0f);
         // Brake while we are still driving forwards (if we keep
         // on braking, the kart will reverse otherwise)
-        m_controls->m_brake = m_kart->getSpeed()>0;
+        m_controls->setBrake(m_kart->getSpeed()>0);
         return;
     }
     /*Get information that is needed by more than 1 of the handling funcs*/
@@ -211,10 +212,10 @@ void EndController::handleSteering(float dt)
      */
     //Reaction to being outside of the road
     if( fabsf(m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() ))  >
-       0.5f* QuadGraph::get()->getNode(m_track_node).getPathWidth()+0.5f )
+       0.5f* DriveGraph::get()->getNode(m_track_node)->getPathWidth()+0.5f )
     {
         const int next = m_next_node_index[m_track_node];
-        target_point = QuadGraph::get()->getQuadOfNode(next).getCenter();
+        target_point = DriveGraph::get()->getNode(next)->getCenter();
 #ifdef AI_DEBUG
         Log::debug("end_controller.cpp", "- Outside of road: steer to center point.");
 #endif
@@ -259,26 +260,24 @@ void EndController::handleRescue(const float DELTA)
 void EndController::findNonCrashingPoint(Vec3 *result)
 {
     unsigned int sector = m_next_node_index[m_track_node];
-    int target_sector;
 
     Vec3 direction;
     Vec3 step_track_coord;
     float distance;
-    int steps;
 
     //We exit from the function when we have found a solution
     while( 1 )
     {
         //target_sector is the sector at the longest distance that we can drive
         //to without crashing with the track.
-        target_sector = m_next_node_index[sector];
+        int target_sector = m_next_node_index[sector];
 
         //direction is a vector from our kart to the sectors we are testing
-        direction = QuadGraph::get()->getQuadOfNode(target_sector).getCenter()
+        direction = DriveGraph::get()->getNode(target_sector)->getCenter()
                   - m_kart->getXYZ();
 
-        float len=direction.length_2d();
-        steps = int( len / m_kart_length );
+        float len=direction.length();
+        int steps = int( len / m_kart_length );
         if( steps < 3 ) steps = 3;
 
         //Protection against having vel_normal with nan values
@@ -292,16 +291,16 @@ void EndController::findNonCrashingPoint(Vec3 *result)
         {
             step_coord = m_kart->getXYZ()+direction*m_kart_length * float(i);
 
-            QuadGraph::get()->spatialToTrack(&step_track_coord, step_coord,
+            DriveGraph::get()->spatialToTrack(&step_track_coord, step_coord,
                                                    sector );
 
             distance = fabsf(step_track_coord[0]);
 
             //If we are outside, the previous sector is what we are looking for
             if ( distance + m_kart_width * 0.5f
-                 > QuadGraph::get()->getNode(sector).getPathWidth()*0.5f )
+                 > DriveGraph::get()->getNode(sector)->getPathWidth()*0.5f )
             {
-                *result = QuadGraph::get()->getQuadOfNode(sector).getCenter();
+                *result = DriveGraph::get()->getNode(sector)->getCenter();
                 return;
             }
         }

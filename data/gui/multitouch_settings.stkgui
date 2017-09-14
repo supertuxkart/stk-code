@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="2%" y="1%" width="96%" height="98%" layout="vertical-row" >
+        <header id="title" width="100%" height="fit" text_align="center" word_wrap="true" text="Touch Device Settings" />
+
+        <spacer height="35" width="10" />
+
+        <label width="100%" I18N="In the multitouch settings screen" text="General"/>
+
+        <div width="75%" layout="horizontal-row" proportion="1">
+            <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Device enabled"/>
+            <div proportion="1" align="center" height="fit" layout="horizontal-row" >
+                <spacer width="40" height="10" />
+                <checkbox id="buttons_enabled"/>
+            </div>
+        </div>
+
+        <div width="75%" layout="horizontal-row" proportion="1">
+            <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Inverted buttons"/>
+            <div proportion="1" align="center" height="fit" layout="horizontal-row" >
+                <spacer width="40" height="10" />
+                <checkbox id="buttons_inverted"/>
+            </div>
+        </div>
+
+        <div width="75%" layout="horizontal-row" proportion="1">
+            <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Buttons scale"/>
+            <div proportion="1" align="center" height="fit" layout="horizontal-row" >
+                <spacer width="40" height="10" />
+                <gauge id="scale" proportion="1" min_value="50" max_value="150"/>
+            </div>
+        </div>
+
+        <div width="75%" layout="horizontal-row" proportion="1">
+            <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Accelerometer"/>
+            <div proportion="1" align="center" height="fit" layout="horizontal-row" >
+                <spacer width="40" height="10" />
+                <spinner id="accelerometer" proportion="1"/>
+            </div>
+        </div>
+
+        <label width="100%" I18N="In the multitouch settings screen" text="Advanced"/>
+
+        <div width="75%" layout="horizontal-row" proportion="1">
+            <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Deadzone"/>
+            <div proportion="1" align="center" height="fit" layout="horizontal-row" >
+                <spacer width="40" height="10" />
+                <gauge id="deadzone_center" proportion="1" min_value="0" max_value="50"/>
+            </div>
+        </div>
+
+        <div width="75%" layout="horizontal-row" proportion="1">
+            <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Sensitivity"/>
+            <div proportion="1" align="center" height="fit" layout="horizontal-row" >
+                <spacer width="40" height="10" />
+                <gauge id="deadzone_edge" proportion="1" min_value="0" max_value="50"/>
+            </div>
+        </div>
+
+        <spacer height="35" width="10"/>
+
+        <div width="fit" height="fit" layout="horizontal-row" align="center" proportion="1">
+            <button id="restore" text="Restore defaults"/>
+            <spacer width="40" height="10" />
+            <button id="close" text="Apply"/>
+        </div>
+    </div>
+</stkgui>

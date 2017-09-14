@@ -33,20 +33,27 @@ GamePadDevice::GamePadDevice(const int irr_index, const std::string &name,
                              GamepadConfig *configuration)
 {
     m_type                  = DT_GAMEPAD;
-    m_prev_axis_directions  = NULL;
     m_configuration         = configuration;
     GamepadConfig *config = static_cast<GamepadConfig*>(m_configuration);
     if(m_configuration->getNumberOfButtons()<button_count)
     {
         config->setNumberOfButtons(button_count);
     }
-    if(m_configuration->getNumberOfAxes()<axis_count)
+
+    // HAT/POV buttons will be reported as additional axis with the values
+    // HAT_V_ID > HAT_H_ID. So increase the number of axis to be large
+    // enough to handle HAT_V/H_ID as axis number.
+    assert(Input::HAT_V_ID > Input::HAT_H_ID);
+    int adj_axis_count = axis_count > Input::HAT_V_ID ? axis_count 
+                                                      : Input::HAT_V_ID+1;
+
+    if(m_configuration->getNumberOfAxes()<adj_axis_count)
     {
-        config->setNumberOfAxis(axis_count);
+        config->setNumberOfAxis(adj_axis_count);
     }
-    m_prev_axis_directions  = new Input::AxisDirection[axis_count];
-    m_prev_axis_value       = new int[axis_count];
-    m_axis_ok               = new bool[axis_count];
+    m_prev_axis_directions.resize(adj_axis_count);
+    m_prev_axis_value.resize(adj_axis_count);
+    m_axis_ok.resize(adj_axis_count);
     m_irr_index             = irr_index;
     m_name                  = name;
 
@@ -57,9 +64,9 @@ GamePadDevice::GamePadDevice(const int irr_index, const std::string &name,
         m_axis_ok[i] = false;
     }
 
-    m_buttonPressed = new bool[button_count];
+    m_button_pressed.resize(button_count);
     for(int n=0; n<button_count; n++)
-        m_buttonPressed[n] = false;
+        m_button_pressed[n] = false;
 }   // GamePadDevice
 
 // ----------------------------------------------------------------------------
@@ -67,12 +74,6 @@ GamePadDevice::GamePadDevice(const int irr_index, const std::string &name,
  */
 GamePadDevice::~GamePadDevice()
 {
-    delete[] m_buttonPressed;
-    delete[] m_prev_axis_directions;
-    delete[] m_prev_axis_value;
-    delete[] m_axis_ok;
-
-    // FIXME - any need to close devices?
 }   // ~GamePadDevice
 
 // ----------------------------------------------------------------------------
@@ -93,14 +94,14 @@ int GamePadDevice::getNumberOfButtons() const
 // ----------------------------------------------------------------------------
 bool GamePadDevice::isButtonPressed(const int i)
 {
-    return m_buttonPressed[i];
+    return m_button_pressed[i];
 }   // isButtonPressed
 
 // ----------------------------------------------------------------------------
 
 void GamePadDevice::setButtonPressed(const int i, bool isButtonPressed)
 {
-    m_buttonPressed[i] = isButtonPressed;
+    m_button_pressed[i] = isButtonPressed;
 }   // setButtonPressed
 
 // ----------------------------------------------------------------------------
@@ -182,7 +183,7 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
     }
 
     bool success = false;
-    if(m_prev_axis_directions == NULL) return false; // device not open
+    if(m_prev_axis_directions.size() == 0) return false; // device not open
 
     if (type == Input::IT_STICKMOTION)
     {

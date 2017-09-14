@@ -78,7 +78,9 @@ public:
 	virtual u32 getPitch() const;
 
 	//! return open gl texture name
-	GLuint getOpenGLTextureName() const;
+	virtual u32 getOpenGLTextureName() const;
+
+	virtual u64 getHandle() { return 0; }
 
 	//! return whether this texture has mipmaps
 	virtual bool hasMipMaps() const;
@@ -102,6 +104,13 @@ public:
 
 	//! sets whether this texture is intended to be used as a render target.
 	void setIsRenderTarget(bool isTarget);
+
+	void setImage(IImage* new_image)
+	{
+		if (Image)
+			Image->drop();
+		Image = new_image;
+	}
 
 protected:
 

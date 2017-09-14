@@ -29,6 +29,14 @@ extern bool GLContextDebugBit;
 #include <X11/XKBlib.h>
 #include <X11/Xatom.h>
 
+#ifdef _IRR_COMPILE_WITH_OPENGL_
+#include <GL/gl.h>
+#ifdef _IRR_OPENGL_USE_EXTPOINTER_
+#define GLX_GLXEXT_PROTOTYPES
+#include "glxext.h"
+#endif
+#endif
+
 #ifdef _IRR_LINUX_XCURSOR_
 #include <X11/Xcursor/Xcursor.h>
 #endif
@@ -68,13 +76,14 @@ namespace irr
 	}
 } // end namespace irr
 
+#if defined(_IRR_COMPILE_WITH_X11_)
 namespace
 {
 	Atom X_ATOM_CLIPBOARD;
 	Atom X_ATOM_TARGETS;
 	Atom X_ATOM_UTF8_STRING;
-	Atom X_ATOM_TEXT;
 };
+#endif
 
 namespace irr
 {
@@ -86,7 +95,8 @@ CIrrDeviceLinux::CIrrDeviceLinux(const SIrrlichtCreationParameters& param)
 	: CIrrDeviceStub(param),
 #ifdef _IRR_COMPILE_WITH_X11_
 	display(0), visual(0), screennr(0), window(0), StdHints(0), SoftwareImage(0),
-	XInputMethod(0), XInputContext(0),
+	XInputMethod(0), XInputContext(0), m_font_set(0), numlock_mask(0),
+	m_ime_enabled(false),
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 	glxWin(0),
 	Context(0),
@@ -139,7 +149,12 @@ CIrrDeviceLinux::CIrrDeviceLinux(const SIrrlichtCreationParameters& param)
 		return;
 
 #ifdef _IRR_COMPILE_WITH_X11_
+	m_ime_position.x = 0;
+	m_ime_position.y = 0;
 	createInputContext();
+	numlock_mask = getNumlockMask(display);
+	// Get maximum 16 characters from input method
+	m_ime_char_holder.reallocate(16);
 #endif
 
 	createGUIAndScene();
@@ -509,6 +524,7 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 #endif
 
 #ifdef _IRR_COMPILE_WITH_OPENGL_
+#ifdef _IRR_COMPILE_WITH_X11_
 static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, bool force_legacy_context)
 {
 	GLXContext Context;
@@ -561,30 +577,30 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, boo
 	PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = 0;
 	glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
 						glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
-  
-    if(!force_legacy_context)
-    {
-        // create core 4.3 context
-        os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
-        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
-        if (!XErrorSignaled)
-            return Context;
-        
-        XErrorSignaled = false;
-        // create core 3.3 context
-        os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
-        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
-        if (!XErrorSignaled)
-            return Context;
 
-        XErrorSignaled = false;
-        // create core 3.1 context (for older mesa)
-        os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
-        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
-        if (!XErrorSignaled)
-            return Context;
+	if(!force_legacy_context)
+	{
+		// create core 4.3 context
+		os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
+		Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
+		if (!XErrorSignaled)
+			return Context;
 
-    }   // if(force_legacy_context)
+		XErrorSignaled = false;
+		// create core 3.3 context
+		os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
+		Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
+		if (!XErrorSignaled)
+			return Context;
+
+		XErrorSignaled = false;
+		// create core 3.1 context (for older mesa)
+		os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
+		Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
+		if (!XErrorSignaled)
+			return Context;
+
+	}   // if(force_legacy_context)
 
 	XErrorSignaled = false;
 	irr::video::useCoreContext = false;
@@ -593,6 +609,7 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, boo
 	Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
 	return Context;
 }
+#endif
 #endif
 
 bool CIrrDeviceLinux::createWindow()
@@ -618,7 +635,7 @@ bool CIrrDeviceLinux::createWindow()
 
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 
-	GLXFBConfig glxFBConfig;
+	GLXFBConfig glxFBConfig = NULL;
 	int major, minor;
 	bool isAvailableGLX=false;
 	if (CreationParams.DriverType==video::EDT_OPENGL)
@@ -656,11 +673,15 @@ bool CIrrDeviceLinux::createWindow()
 #elif defined(GLX_SGIS_multisample)
 					GLX_SAMPLE_BUFFERS_SGIS, 1,
 					GLX_SAMPLES_SGIS, CreationParams.AntiAlias, // 18,19
+#else
+#error
 #endif
 #ifdef GLX_ARB_framebuffer_sRGB
 					GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB, CreationParams.HandleSRGB,
 #elif defined(GLX_EXT_framebuffer_sRGB)
 					GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, CreationParams.HandleSRGB,
+#else
+#error
 #endif
 					GLX_STEREO, CreationParams.Stereobuffer?True:False,
 					None
@@ -675,6 +696,39 @@ bool CIrrDeviceLinux::createWindow()
 				}
 				// first round with unchanged values
 				{
+					configList=glxChooseFBConfig(display, screennr, visualAttrBuffer,&nitems);
+					if (!configList && CreationParams.AntiAlias)
+					{
+						while (!configList && (visualAttrBuffer[19]>1))
+						{
+							visualAttrBuffer[19] -= 1;
+							configList=glxChooseFBConfig(display, screennr, visualAttrBuffer,&nitems);
+						}
+						if (!configList)
+						{
+							visualAttrBuffer[17] = 0;
+							visualAttrBuffer[19] = 0;
+							configList=glxChooseFBConfig(display, screennr, visualAttrBuffer,&nitems);
+							if (configList)
+							{
+								os::Printer::log("No FSAA available.", ELL_WARNING);
+								CreationParams.AntiAlias=0;
+							}
+							else
+							{
+								//reenable multisampling
+								visualAttrBuffer[17] = 1;
+								visualAttrBuffer[19] = CreationParams.AntiAlias;
+							}
+						}
+					}
+				}
+				// Try to disable sRGB framebuffer
+				if (!configList && CreationParams.HandleSRGB)
+				{
+					os::Printer::log("No sRGB framebuffer available.", ELL_WARNING);
+					CreationParams.HandleSRGB=false;
+					visualAttrBuffer[21] = GLX_DONT_CARE;
 					configList=glxChooseFBConfig(display, screennr, visualAttrBuffer,&nitems);
 					if (!configList && CreationParams.AntiAlias)
 					{
@@ -898,7 +952,7 @@ bool CIrrDeviceLinux::createWindow()
 									  WMCheck, 0L, 1L, False, XA_WINDOW,
 									  &type, &form, &len, &remain,
 									  (unsigned char **)&list);
-
+		XFree(list);
 		bool netWM = (s == Success) && len;
 		attributes.override_redirect = !netWM && CreationParams.Fullscreen;
 
@@ -1036,7 +1090,9 @@ bool CIrrDeviceLinux::createWindow()
 		glxWin=glXCreateWindow(display,glxFBConfig,window,NULL);
 		if (glxWin)
 		{
+			getLogger()->setLogLevel(ELL_NONE);
 			Context = getMeAGLContext(display, glxFBConfig, CreationParams.ForceLegacyDevice);
+			getLogger()->setLogLevel(CreationParams.LoggingLevel);
 			if (Context)
 			{
 				if (!glXMakeContextCurrent(display, glxWin, glxWin, Context))
@@ -1182,12 +1238,15 @@ void CIrrDeviceLinux::createDriver()
 #ifdef _IRR_COMPILE_WITH_X11_
 bool CIrrDeviceLinux::createInputContext()
 {
+	if (!display)
+		return false;
+
 	// One one side it would be nicer to let users do that - on the other hand
 	// not setting the environment locale will not work when using i18n X11 functions.
 	// So users would have to call it always or their input is broken badly.
 	// We can restore immediately - so won't mess with anything in users apps.
 	core::stringc oldLocale(setlocale(LC_CTYPE, NULL));
-	setlocale(LC_CTYPE, "");	// use environment locale
+	setlocale(LC_CTYPE, "");        // use environment locale
 
 	if ( !XSupportsLocale() )
 	{
@@ -1196,31 +1255,59 @@ bool CIrrDeviceLinux::createInputContext()
 		return false;
 	}
 
-	XInputMethod = XOpenIM(display, NULL, NULL, NULL);
-	if ( !XInputMethod )
+	// It's showed as memory leak, but we shouldn't delete it. From the xlib
+	// documentation: "The returned modifiers string is owned by Xlib and 
+	// should not be modified or freed by the client."
+	char* p = XSetLocaleModifiers("");
+	if (p == NULL)
 	{
+		os::Printer::log("Could not set locale modifiers. Falling back to non-i18n input.", ELL_WARNING);
 		setlocale(LC_CTYPE, oldLocale.c_str());
-		os::Printer::log("XOpenIM failed to create an input method. Falling back to non-i18n input.", ELL_WARNING);
 		return false;
 	}
 
-	XIMStyles *im_supported_styles;
-	XGetIMValues(XInputMethod, XNQueryInputStyle, &im_supported_styles, (char*)NULL);
-	XIMStyle bestStyle = 0;
-	// TODO: If we want to support languages like chinese or japanese as well we probably have to work with callbacks here.
-	XIMStyle supportedStyle = XIMPreeditNone | XIMStatusNone;
-	for (int i=0; i < im_supported_styles->count_styles; ++i)
+	XInputMethod = XOpenIM(display, NULL, NULL, NULL);
+	if ( !XInputMethod )
 	{
-		XIMStyle style = im_supported_styles->supported_styles[i];
-		if ((style & supportedStyle) == style) /* if we can handle it */
+		os::Printer::log("XOpenIM failed to create an input method. Falling back to non-i18n input.", ELL_WARNING);
+		setlocale(LC_CTYPE, oldLocale.c_str());
+		return false;
+	}
+
+	XIMStyles *im_supported_styles = NULL;
+	XGetIMValues(XInputMethod, XNQueryInputStyle, &im_supported_styles, (void*)NULL);
+	if (!im_supported_styles)
+	{
+		os::Printer::log("XGetIMValues failed to get supported styles. Falling back to non-i18n input.", ELL_WARNING);
+		setlocale(LC_CTYPE, oldLocale.c_str());
+		return false;
+	}
+
+	// Only OverTheSpot and Root pre-edit type are implemented for now
+	core::array<unsigned long> supported_style;
+	//supported_style.push_back(XIMPreeditPosition | XIMStatusNothing);
+	supported_style.push_back(XIMPreeditNothing | XIMStatusNothing);
+	XIMStyle best_style = 0;
+	bool found = false;
+	int supported_style_start = -1;
+
+	while (!found && supported_style_start < (int)supported_style.size())
+	{
+		supported_style_start++;
+		for (int i = 0; i < im_supported_styles->count_styles; i++)
 		{
-			bestStyle = style;
-			break;
+			XIMStyle cur_style = im_supported_styles->supported_styles[i];
+			if (cur_style == supported_style[supported_style_start])
+			{
+				best_style = cur_style;
+				found = true;
+				break;
+			}
 		}
 	}
 	XFree(im_supported_styles);
 
-	if ( !bestStyle )
+	if (!found)
 	{
 		XDestroyIC(XInputContext);
 		XInputContext = 0;
@@ -1230,16 +1317,50 @@ bool CIrrDeviceLinux::createInputContext()
 		return false;
 	}
 
-	XInputContext = XCreateIC(XInputMethod,
-							XNInputStyle, bestStyle,
-							XNClientWindow, window,
-							(char*)NULL);
+	// Only use root preedit type for now
+	/*if (best_style != (XIMPreeditNothing | XIMStatusNothing))
+	{
+		char **list = NULL;
+		int count = 0;
+		m_font_set = XCreateFontSet(display, "fixed", &list, &count, NULL);
+		if (!m_font_set)
+		{
+			os::Printer::log("XInputContext failed to create font set. Falling back to non-i18n input.", ELL_WARNING);
+			setlocale(LC_CTYPE, oldLocale.c_str());
+			return false;
+		}
+		if (count > 0)
+		{
+			XFreeStringList(list);
+		}
+
+		XPoint spot = {0, 0};
+		XVaNestedList p_list = XVaCreateNestedList(0, XNSpotLocation, &spot,
+												XNFontSet, m_font_set, (void*)NULL);
+		XInputContext = XCreateIC(XInputMethod,
+								XNInputStyle, best_style,
+								XNClientWindow, window,
+								XNFocusWindow, window,
+								XNPreeditAttributes, p_list,
+								(void*)NULL);
+		XFree(p_list);
+	}
+	else*/
+	{
+		XInputContext = XCreateIC(XInputMethod,
+								XNInputStyle, best_style,
+								XNClientWindow, window,
+								XNFocusWindow, window,
+								(void*)NULL);
+	}
+
 	if (!XInputContext )
 	{
 		os::Printer::log("XInputContext failed to create an input context. Falling back to non-i18n input.", ELL_WARNING);
 		setlocale(LC_CTYPE, oldLocale.c_str());
 		return false;
 	}
+
 	XSetICFocus(XInputContext);
 	setlocale(LC_CTYPE, oldLocale.c_str());
 	return true;
@@ -1258,15 +1379,89 @@ void CIrrDeviceLinux::destroyInputContext()
 		XCloseIM(XInputMethod);
 		XInputMethod = 0;
 	}
+	if (display && m_font_set)
+	{
+		XFreeFontSet(display, m_font_set);
+		m_font_set = 0;
+	}
+}
+
+void CIrrDeviceLinux::setIMELocation(const irr::core::position2di& pos)
+{
+	if (!XInputContext || !m_ime_enabled) return;
+	m_ime_position.x = pos.X;
+	m_ime_position.y = pos.Y;
+	updateIMELocation();
+}
+
+void CIrrDeviceLinux::updateIMELocation()
+{
+	if (!XInputContext || !m_ime_enabled) return;
+	XVaNestedList list;
+	list = XVaCreateNestedList(0, XNSpotLocation, &m_ime_position, (void*)NULL);
+	XSetICValues(XInputContext, XNPreeditAttributes, list, (void*)NULL);
+	XFree(list);
+}
+
+void CIrrDeviceLinux::setIMEEnable(bool enable)
+{
+	if (!XInputContext) return;
+	m_ime_enabled = enable;
+}
+
+int CIrrDeviceLinux::getNumlockMask(Display* display)
+{
+	int mask_table[8] = {ShiftMask, LockMask, ControlMask, Mod1Mask,
+						 Mod2Mask, Mod3Mask, Mod4Mask, Mod5Mask};
+
+	if (!display)
+		return 0;		
+
+	KeyCode numlock_keycode = XKeysymToKeycode(display, XK_Num_Lock);
+
+	if (numlock_keycode == NoSymbol)
+		return 0;
+
+	XModifierKeymap* map = XGetModifierMapping(display);
+	if (!map)
+		return 0;
+
+	int mask = 0;
+	for (int i = 0; i < 8 * map->max_keypermod; i++) 
+	{
+		if (map->modifiermap[i] != numlock_keycode)
+			continue;
+
+		mask = mask_table[i/map->max_keypermod];
+		break;
+	}
+
+	XFreeModifiermap(map);
+
+	return mask;
 }
 
 EKEY_CODE CIrrDeviceLinux::getKeyCode(XEvent &event)
 {
 	EKEY_CODE keyCode = (EKEY_CODE)0;
-
 	SKeyMap mp;
-	mp.X11Key = XkbKeycodeToKeysym(display, event.xkey.keycode, 0, 0);
-	// mp.X11Key = XKeycodeToKeysym(XDisplay, event.xkey.keycode, 0);	// deprecated, if we still find platforms which need that we have to use some define
+	
+	// First check for numpad keys
+	bool is_numpad_key = false;
+	if (event.xkey.state & numlock_mask)
+	{
+		mp.X11Key = XkbKeycodeToKeysym(display, event.xkey.keycode, 0, 1);
+		
+		if (mp.X11Key >=XK_KP_0 && mp.X11Key <= XK_KP_9)
+			is_numpad_key = true;
+	}
+	
+	// If it's not numpad key, then get keycode in typical way
+	if (!is_numpad_key)
+	{
+		mp.X11Key = XkbKeycodeToKeysym(display, event.xkey.keycode, 0, 0);
+	}
+		
 	const s32 idx = KeyMap.binary_search(mp);
 	if (idx != -1)
 	{
@@ -1314,12 +1509,30 @@ bool CIrrDeviceLinux::run()
 
 		while (XPending(display) > 0 && !Close)
 		{
+			if (!m_ime_char_holder.empty())
+			{
+				irrevent.KeyInput.Char = m_ime_char_holder[0];
+				irrevent.EventType = irr::EET_KEY_INPUT_EVENT;
+				irrevent.KeyInput.PressedDown = true;
+				irrevent.KeyInput.Control = false;
+				irrevent.KeyInput.Shift = false;
+				irrevent.KeyInput.Key = (irr::EKEY_CODE)0;
+				postEventFromUser(irrevent);
+				m_ime_char_holder.erase(0);
+				continue;
+			}
+
 			XEvent event;
 			XNextEvent(display, &event);
-
+			if (m_ime_enabled && XFilterEvent(&event, None))
+			{
+				updateIMELocation();
+				continue;
+			}
 			switch (event.type)
 			{
 			case ConfigureNotify:
+				updateIMELocation();
 				// check for changed window size
 				if ((event.xconfigure.width != (int) Width) ||
 					(event.xconfigure.height != (int) Height))
@@ -1492,9 +1705,8 @@ bool CIrrDeviceLinux::run()
 					SKeyMap mp;
 					if ( XInputContext )
 					{
-						wchar_t buf[8]={0};
 						Status status;
-						int strLen = XwcLookupString(XInputContext, &event.xkey, buf, sizeof(buf), &mp.X11Key, &status);
+						int strLen = XwcLookupString(XInputContext, &event.xkey, m_ime_char_holder.pointer(), 16 * sizeof(wchar_t), &mp.X11Key, &status);
 						if ( status == XBufferOverflow )
 						{
 							os::Printer::log("XwcLookupString needs a larger buffer", ELL_INFORMATION);
@@ -1502,8 +1714,14 @@ bool CIrrDeviceLinux::run()
 						if ( strLen > 0 && (status == XLookupChars || status == XLookupBoth) )
 						{
 							if ( strLen > 1 )
-								os::Printer::log("Additional returned characters dropped", ELL_INFORMATION);
-							irrevent.KeyInput.Char = buf[0];
+							{
+								m_ime_char_holder.set_used(strLen > 16 ? 16 : strLen);
+								continue;
+							}
+							else
+							{
+								irrevent.KeyInput.Char = m_ime_char_holder[0];
+							}
 						}
 						else
 						{
@@ -1516,7 +1734,7 @@ bool CIrrDeviceLinux::run()
 						{
 							char buf[8];
 							wchar_t wbuf[2];
-						} tmp = {0};
+						} tmp = {{0}};
 						XLookupString(&event.xkey, tmp.buf, sizeof(tmp.buf), &mp.X11Key, NULL);
 						irrevent.KeyInput.Char = tmp.wbuf[0];
 					}
@@ -1555,7 +1773,7 @@ bool CIrrDeviceLinux::run()
 				{
 					XEvent respond;
 					XSelectionRequestEvent *req = &(event.xselectionrequest);
-					if (  req->target == XA_STRING)
+					if (  req->target == X_ATOM_UTF8_STRING)
 					{
 						XChangeProperty (display,
 								req->requestor,
@@ -1568,14 +1786,13 @@ bool CIrrDeviceLinux::run()
 					}
 					else if ( req->target == X_ATOM_TARGETS )
 					{
-						long data[2];
+						long data[1];
 
-						data[0] = X_ATOM_TEXT;
-						data[1] = XA_STRING;
+						data[0] = X_ATOM_UTF8_STRING;
 
 						XChangeProperty (display, req->requestor,
-								req->property, req->target,
-								8, PropModeReplace,
+								req->property, XA_ATOM,
+								32, PropModeReplace,
 								(unsigned char *) &data,
 								sizeof (data));
 						respond.xselection.property = req->property;
@@ -1652,6 +1869,22 @@ void CIrrDeviceLinux::setWindowCaption(const wchar_t* text)
 		XSetWMIconName(display, window, &txt);
 		XFree(txt.value);
 	}
+#endif
+}
+
+//! sets the class of the window
+void CIrrDeviceLinux::setWindowClass(const char* text)
+{
+#ifdef _IRR_COMPILE_WITH_X11_
+	if (CreationParams.DriverType == video::EDT_NULL)
+		return;
+
+	// Set class hints on Linux, used by Window Managers.
+	XClassHint* classhint = XAllocClassHint();
+	classhint->res_name = (char*)text;
+	classhint->res_class = (char*)text;
+	XSetClassHint(display, window, classhint);
+	XFree(classhint);
 #endif
 }
 
@@ -1970,194 +2203,194 @@ void CIrrDeviceLinux::createKeyMap()
 
 #ifdef _IRR_COMPILE_WITH_X11_
 	KeyMap.reallocate(190);
-	KeyMap.push_back(SKeyMap(XK_BackSpace, KEY_BACK));
-	KeyMap.push_back(SKeyMap(XK_Tab, KEY_TAB));
-	KeyMap.push_back(SKeyMap(XK_ISO_Left_Tab, KEY_TAB));
+	KeyMap.push_back(SKeyMap(XK_BackSpace, IRR_KEY_BACK));
+	KeyMap.push_back(SKeyMap(XK_Tab, IRR_KEY_TAB));
+	KeyMap.push_back(SKeyMap(XK_ISO_Left_Tab, IRR_KEY_TAB));
 	KeyMap.push_back(SKeyMap(XK_Linefeed, 0)); // ???
-	KeyMap.push_back(SKeyMap(XK_Clear, KEY_CLEAR));
-	KeyMap.push_back(SKeyMap(XK_Return, KEY_RETURN));
-	KeyMap.push_back(SKeyMap(XK_Pause, KEY_PAUSE));
-	KeyMap.push_back(SKeyMap(XK_Scroll_Lock, KEY_SCROLL));
+	KeyMap.push_back(SKeyMap(XK_Clear, IRR_KEY_CLEAR));
+	KeyMap.push_back(SKeyMap(XK_Return, IRR_KEY_RETURN));
+	KeyMap.push_back(SKeyMap(XK_Pause, IRR_KEY_PAUSE));
+	KeyMap.push_back(SKeyMap(XK_Scroll_Lock, IRR_KEY_SCROLL));
 	KeyMap.push_back(SKeyMap(XK_Sys_Req, 0)); // ???
-	KeyMap.push_back(SKeyMap(XK_Escape, KEY_ESCAPE));
-	KeyMap.push_back(SKeyMap(XK_Insert, KEY_INSERT));
-	KeyMap.push_back(SKeyMap(XK_Delete, KEY_DELETE));
-	KeyMap.push_back(SKeyMap(XK_Home, KEY_HOME));
-	KeyMap.push_back(SKeyMap(XK_Left, KEY_LEFT));
-	KeyMap.push_back(SKeyMap(XK_Up, KEY_UP));
-	KeyMap.push_back(SKeyMap(XK_Right, KEY_RIGHT));
-	KeyMap.push_back(SKeyMap(XK_Down, KEY_DOWN));
-	KeyMap.push_back(SKeyMap(XK_Prior, KEY_PRIOR));
-	KeyMap.push_back(SKeyMap(XK_Page_Up, KEY_PRIOR));
-	KeyMap.push_back(SKeyMap(XK_Next, KEY_NEXT));
-	KeyMap.push_back(SKeyMap(XK_Page_Down, KEY_NEXT));
-	KeyMap.push_back(SKeyMap(XK_End, KEY_END));
-	KeyMap.push_back(SKeyMap(XK_Begin, KEY_HOME));
-	KeyMap.push_back(SKeyMap(XK_Num_Lock, KEY_NUMLOCK));
-	KeyMap.push_back(SKeyMap(XK_KP_Space, KEY_SPACE));
-	KeyMap.push_back(SKeyMap(XK_KP_Tab, KEY_TAB));
-	KeyMap.push_back(SKeyMap(XK_KP_Enter, KEY_RETURN));
-	KeyMap.push_back(SKeyMap(XK_KP_F1, KEY_F1));
-	KeyMap.push_back(SKeyMap(XK_KP_F2, KEY_F2));
-	KeyMap.push_back(SKeyMap(XK_KP_F3, KEY_F3));
-	KeyMap.push_back(SKeyMap(XK_KP_F4, KEY_F4));
-	KeyMap.push_back(SKeyMap(XK_KP_Home, KEY_HOME));
-	KeyMap.push_back(SKeyMap(XK_KP_Left, KEY_LEFT));
-	KeyMap.push_back(SKeyMap(XK_KP_Up, KEY_UP));
-	KeyMap.push_back(SKeyMap(XK_KP_Right, KEY_RIGHT));
-	KeyMap.push_back(SKeyMap(XK_KP_Down, KEY_DOWN));
-	KeyMap.push_back(SKeyMap(XK_Print, KEY_PRINT));
-	KeyMap.push_back(SKeyMap(XK_KP_Prior, KEY_PRIOR));
-	KeyMap.push_back(SKeyMap(XK_KP_Page_Up, KEY_PRIOR));
-	KeyMap.push_back(SKeyMap(XK_KP_Next, KEY_NEXT));
-	KeyMap.push_back(SKeyMap(XK_KP_Page_Down, KEY_NEXT));
-	KeyMap.push_back(SKeyMap(XK_KP_End, KEY_END));
-	KeyMap.push_back(SKeyMap(XK_KP_Begin, KEY_HOME));
-	KeyMap.push_back(SKeyMap(XK_KP_Insert, KEY_INSERT));
-	KeyMap.push_back(SKeyMap(XK_KP_Delete, KEY_DELETE));
+	KeyMap.push_back(SKeyMap(XK_Escape, IRR_KEY_ESCAPE));
+	KeyMap.push_back(SKeyMap(XK_Insert, IRR_KEY_INSERT));
+	KeyMap.push_back(SKeyMap(XK_Delete, IRR_KEY_DELETE));
+	KeyMap.push_back(SKeyMap(XK_Home, IRR_KEY_HOME));
+	KeyMap.push_back(SKeyMap(XK_Left, IRR_KEY_LEFT));
+	KeyMap.push_back(SKeyMap(XK_Up, IRR_KEY_UP));
+	KeyMap.push_back(SKeyMap(XK_Right, IRR_KEY_RIGHT));
+	KeyMap.push_back(SKeyMap(XK_Down, IRR_KEY_DOWN));
+	KeyMap.push_back(SKeyMap(XK_Prior, IRR_KEY_PRIOR));
+	KeyMap.push_back(SKeyMap(XK_Page_Up, IRR_KEY_PRIOR));
+	KeyMap.push_back(SKeyMap(XK_Next, IRR_KEY_NEXT));
+	KeyMap.push_back(SKeyMap(XK_Page_Down, IRR_KEY_NEXT));
+	KeyMap.push_back(SKeyMap(XK_End, IRR_KEY_END));
+	KeyMap.push_back(SKeyMap(XK_Begin, IRR_KEY_HOME));
+	KeyMap.push_back(SKeyMap(XK_Num_Lock, IRR_KEY_NUMLOCK));
+	KeyMap.push_back(SKeyMap(XK_KP_Space, IRR_KEY_SPACE));
+	KeyMap.push_back(SKeyMap(XK_KP_Tab, IRR_KEY_TAB));
+	KeyMap.push_back(SKeyMap(XK_KP_Enter, IRR_KEY_RETURN));
+	KeyMap.push_back(SKeyMap(XK_KP_F1, IRR_KEY_F1));
+	KeyMap.push_back(SKeyMap(XK_KP_F2, IRR_KEY_F2));
+	KeyMap.push_back(SKeyMap(XK_KP_F3, IRR_KEY_F3));
+	KeyMap.push_back(SKeyMap(XK_KP_F4, IRR_KEY_F4));
+	KeyMap.push_back(SKeyMap(XK_KP_Home, IRR_KEY_HOME));
+	KeyMap.push_back(SKeyMap(XK_KP_Left, IRR_KEY_LEFT));
+	KeyMap.push_back(SKeyMap(XK_KP_Up, IRR_KEY_UP));
+	KeyMap.push_back(SKeyMap(XK_KP_Right, IRR_KEY_RIGHT));
+	KeyMap.push_back(SKeyMap(XK_KP_Down, IRR_KEY_DOWN));
+	KeyMap.push_back(SKeyMap(XK_Print, IRR_KEY_PRINT));
+	KeyMap.push_back(SKeyMap(XK_KP_Prior, IRR_KEY_PRIOR));
+	KeyMap.push_back(SKeyMap(XK_KP_Page_Up, IRR_KEY_PRIOR));
+	KeyMap.push_back(SKeyMap(XK_KP_Next, IRR_KEY_NEXT));
+	KeyMap.push_back(SKeyMap(XK_KP_Page_Down, IRR_KEY_NEXT));
+	KeyMap.push_back(SKeyMap(XK_KP_End, IRR_KEY_END));
+	KeyMap.push_back(SKeyMap(XK_KP_Begin, IRR_KEY_HOME));
+	KeyMap.push_back(SKeyMap(XK_KP_Insert, IRR_KEY_INSERT));
+	KeyMap.push_back(SKeyMap(XK_KP_Delete, IRR_KEY_DELETE));
 	KeyMap.push_back(SKeyMap(XK_KP_Equal, 0)); // ???
-	KeyMap.push_back(SKeyMap(XK_KP_Multiply, KEY_MULTIPLY));
-	KeyMap.push_back(SKeyMap(XK_KP_Add, KEY_ADD));
-	KeyMap.push_back(SKeyMap(XK_KP_Separator, KEY_SEPARATOR));
-	KeyMap.push_back(SKeyMap(XK_KP_Subtract, KEY_SUBTRACT));
-	KeyMap.push_back(SKeyMap(XK_KP_Decimal, KEY_DECIMAL));
-	KeyMap.push_back(SKeyMap(XK_KP_Divide, KEY_DIVIDE));
-	KeyMap.push_back(SKeyMap(XK_KP_0, KEY_NUMPAD0));
-	KeyMap.push_back(SKeyMap(XK_KP_1, KEY_NUMPAD1));
-	KeyMap.push_back(SKeyMap(XK_KP_2, KEY_NUMPAD2));
-	KeyMap.push_back(SKeyMap(XK_KP_3, KEY_NUMPAD3));
-	KeyMap.push_back(SKeyMap(XK_KP_4, KEY_NUMPAD4));
-	KeyMap.push_back(SKeyMap(XK_KP_5, KEY_NUMPAD5));
-	KeyMap.push_back(SKeyMap(XK_KP_6, KEY_NUMPAD6));
-	KeyMap.push_back(SKeyMap(XK_KP_7, KEY_NUMPAD7));
-	KeyMap.push_back(SKeyMap(XK_KP_8, KEY_NUMPAD8));
-	KeyMap.push_back(SKeyMap(XK_KP_9, KEY_NUMPAD9));
-	KeyMap.push_back(SKeyMap(XK_F1, KEY_F1));
-	KeyMap.push_back(SKeyMap(XK_F2, KEY_F2));
-	KeyMap.push_back(SKeyMap(XK_F3, KEY_F3));
-	KeyMap.push_back(SKeyMap(XK_F4, KEY_F4));
-	KeyMap.push_back(SKeyMap(XK_F5, KEY_F5));
-	KeyMap.push_back(SKeyMap(XK_F6, KEY_F6));
-	KeyMap.push_back(SKeyMap(XK_F7, KEY_F7));
-	KeyMap.push_back(SKeyMap(XK_F8, KEY_F8));
-	KeyMap.push_back(SKeyMap(XK_F9, KEY_F9));
-	KeyMap.push_back(SKeyMap(XK_F10, KEY_F10));
-	KeyMap.push_back(SKeyMap(XK_F11, KEY_F11));
-	KeyMap.push_back(SKeyMap(XK_F12, KEY_F12));
-	KeyMap.push_back(SKeyMap(XK_Shift_L, KEY_LSHIFT));
-	KeyMap.push_back(SKeyMap(XK_Shift_R, KEY_RSHIFT));
-	KeyMap.push_back(SKeyMap(XK_Control_L, KEY_LCONTROL));
-	KeyMap.push_back(SKeyMap(XK_Control_R, KEY_RCONTROL));
-	KeyMap.push_back(SKeyMap(XK_Caps_Lock, KEY_CAPITAL));
-	KeyMap.push_back(SKeyMap(XK_Shift_Lock, KEY_CAPITAL));
-	KeyMap.push_back(SKeyMap(XK_Meta_L, KEY_LWIN));
-	KeyMap.push_back(SKeyMap(XK_Meta_R, KEY_RWIN));
-	KeyMap.push_back(SKeyMap(XK_Alt_L, KEY_LMENU));
-	KeyMap.push_back(SKeyMap(XK_Alt_R, KEY_RMENU));
-	KeyMap.push_back(SKeyMap(XK_ISO_Level3_Shift, KEY_RMENU));
-	KeyMap.push_back(SKeyMap(XK_Menu, KEY_MENU));
-	KeyMap.push_back(SKeyMap(XK_space, KEY_SPACE));
+	KeyMap.push_back(SKeyMap(XK_KP_Multiply, IRR_KEY_MULTIPLY));
+	KeyMap.push_back(SKeyMap(XK_KP_Add, IRR_KEY_ADD));
+	KeyMap.push_back(SKeyMap(XK_KP_Separator, IRR_KEY_SEPARATOR));
+	KeyMap.push_back(SKeyMap(XK_KP_Subtract, IRR_KEY_SUBTRACT));
+	KeyMap.push_back(SKeyMap(XK_KP_Decimal, IRR_KEY_DECIMAL));
+	KeyMap.push_back(SKeyMap(XK_KP_Divide, IRR_KEY_DIVIDE));
+	KeyMap.push_back(SKeyMap(XK_KP_0, IRR_KEY_NUMPAD0));
+	KeyMap.push_back(SKeyMap(XK_KP_1, IRR_KEY_NUMPAD1));
+	KeyMap.push_back(SKeyMap(XK_KP_2, IRR_KEY_NUMPAD2));
+	KeyMap.push_back(SKeyMap(XK_KP_3, IRR_KEY_NUMPAD3));
+	KeyMap.push_back(SKeyMap(XK_KP_4, IRR_KEY_NUMPAD4));
+	KeyMap.push_back(SKeyMap(XK_KP_5, IRR_KEY_NUMPAD5));
+	KeyMap.push_back(SKeyMap(XK_KP_6, IRR_KEY_NUMPAD6));
+	KeyMap.push_back(SKeyMap(XK_KP_7, IRR_KEY_NUMPAD7));
+	KeyMap.push_back(SKeyMap(XK_KP_8, IRR_KEY_NUMPAD8));
+	KeyMap.push_back(SKeyMap(XK_KP_9, IRR_KEY_NUMPAD9));
+	KeyMap.push_back(SKeyMap(XK_F1, IRR_KEY_F1));
+	KeyMap.push_back(SKeyMap(XK_F2, IRR_KEY_F2));
+	KeyMap.push_back(SKeyMap(XK_F3, IRR_KEY_F3));
+	KeyMap.push_back(SKeyMap(XK_F4, IRR_KEY_F4));
+	KeyMap.push_back(SKeyMap(XK_F5, IRR_KEY_F5));
+	KeyMap.push_back(SKeyMap(XK_F6, IRR_KEY_F6));
+	KeyMap.push_back(SKeyMap(XK_F7, IRR_KEY_F7));
+	KeyMap.push_back(SKeyMap(XK_F8, IRR_KEY_F8));
+	KeyMap.push_back(SKeyMap(XK_F9, IRR_KEY_F9));
+	KeyMap.push_back(SKeyMap(XK_F10, IRR_KEY_F10));
+	KeyMap.push_back(SKeyMap(XK_F11, IRR_KEY_F11));
+	KeyMap.push_back(SKeyMap(XK_F12, IRR_KEY_F12));
+	KeyMap.push_back(SKeyMap(XK_Shift_L, IRR_KEY_LSHIFT));
+	KeyMap.push_back(SKeyMap(XK_Shift_R, IRR_KEY_RSHIFT));
+	KeyMap.push_back(SKeyMap(XK_Control_L, IRR_KEY_LCONTROL));
+	KeyMap.push_back(SKeyMap(XK_Control_R, IRR_KEY_RCONTROL));
+	KeyMap.push_back(SKeyMap(XK_Caps_Lock, IRR_KEY_CAPITAL));
+	KeyMap.push_back(SKeyMap(XK_Shift_Lock, IRR_KEY_CAPITAL));
+	KeyMap.push_back(SKeyMap(XK_Meta_L, IRR_KEY_LWIN));
+	KeyMap.push_back(SKeyMap(XK_Meta_R, IRR_KEY_RWIN));
+	KeyMap.push_back(SKeyMap(XK_Alt_L, IRR_KEY_LMENU));
+	KeyMap.push_back(SKeyMap(XK_Alt_R, IRR_KEY_RMENU));
+	KeyMap.push_back(SKeyMap(XK_ISO_Level3_Shift, IRR_KEY_RMENU));
+	KeyMap.push_back(SKeyMap(XK_Menu, IRR_KEY_MENU));
+	KeyMap.push_back(SKeyMap(XK_space, IRR_KEY_SPACE));
 	KeyMap.push_back(SKeyMap(XK_exclam, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_quotedbl, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_section, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_numbersign, KEY_OEM_2));
+	KeyMap.push_back(SKeyMap(XK_numbersign, IRR_KEY_OEM_2));
 	KeyMap.push_back(SKeyMap(XK_dollar, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_percent, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_ampersand, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_apostrophe, KEY_OEM_7));
+	KeyMap.push_back(SKeyMap(XK_apostrophe, IRR_KEY_OEM_7));
 	KeyMap.push_back(SKeyMap(XK_parenleft, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_parenright, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_asterisk, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_plus, KEY_PLUS)); //?
-	KeyMap.push_back(SKeyMap(XK_comma, KEY_COMMA)); //?
-	KeyMap.push_back(SKeyMap(XK_minus, KEY_MINUS)); //?
-	KeyMap.push_back(SKeyMap(XK_period, KEY_PERIOD)); //?
-	KeyMap.push_back(SKeyMap(XK_slash, KEY_OEM_2)); //?
-	KeyMap.push_back(SKeyMap(XK_0, KEY_KEY_0));
-	KeyMap.push_back(SKeyMap(XK_1, KEY_KEY_1));
-	KeyMap.push_back(SKeyMap(XK_2, KEY_KEY_2));
-	KeyMap.push_back(SKeyMap(XK_3, KEY_KEY_3));
-	KeyMap.push_back(SKeyMap(XK_4, KEY_KEY_4));
-	KeyMap.push_back(SKeyMap(XK_5, KEY_KEY_5));
-	KeyMap.push_back(SKeyMap(XK_6, KEY_KEY_6));
-	KeyMap.push_back(SKeyMap(XK_7, KEY_KEY_7));
-	KeyMap.push_back(SKeyMap(XK_8, KEY_KEY_8));
-	KeyMap.push_back(SKeyMap(XK_9, KEY_KEY_9));
+	KeyMap.push_back(SKeyMap(XK_plus, IRR_KEY_PLUS)); //?
+	KeyMap.push_back(SKeyMap(XK_comma, IRR_KEY_COMMA)); //?
+	KeyMap.push_back(SKeyMap(XK_minus, IRR_KEY_MINUS)); //?
+	KeyMap.push_back(SKeyMap(XK_period, IRR_KEY_PERIOD)); //?
+	KeyMap.push_back(SKeyMap(XK_slash, IRR_KEY_OEM_2)); //?
+	KeyMap.push_back(SKeyMap(XK_0, IRR_KEY_0));
+	KeyMap.push_back(SKeyMap(XK_1, IRR_KEY_1));
+	KeyMap.push_back(SKeyMap(XK_2, IRR_KEY_2));
+	KeyMap.push_back(SKeyMap(XK_3, IRR_KEY_3));
+	KeyMap.push_back(SKeyMap(XK_4, IRR_KEY_4));
+	KeyMap.push_back(SKeyMap(XK_5, IRR_KEY_5));
+	KeyMap.push_back(SKeyMap(XK_6, IRR_KEY_6));
+	KeyMap.push_back(SKeyMap(XK_7, IRR_KEY_7));
+	KeyMap.push_back(SKeyMap(XK_8, IRR_KEY_8));
+	KeyMap.push_back(SKeyMap(XK_9, IRR_KEY_9));
 	KeyMap.push_back(SKeyMap(XK_colon, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_semicolon, KEY_OEM_1));
-	KeyMap.push_back(SKeyMap(XK_less, KEY_OEM_102));
-	KeyMap.push_back(SKeyMap(XK_equal, KEY_PLUS));
+	KeyMap.push_back(SKeyMap(XK_semicolon, IRR_KEY_OEM_1));
+	KeyMap.push_back(SKeyMap(XK_less, IRR_KEY_OEM_102));
+	KeyMap.push_back(SKeyMap(XK_equal, IRR_KEY_PLUS));
 	KeyMap.push_back(SKeyMap(XK_greater, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_question, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_at, KEY_KEY_2)); //?
+	KeyMap.push_back(SKeyMap(XK_at, IRR_KEY_2)); //?
 	KeyMap.push_back(SKeyMap(XK_mu, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_EuroSign, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_A, KEY_KEY_A));
-	KeyMap.push_back(SKeyMap(XK_B, KEY_KEY_B));
-	KeyMap.push_back(SKeyMap(XK_C, KEY_KEY_C));
-	KeyMap.push_back(SKeyMap(XK_D, KEY_KEY_D));
-	KeyMap.push_back(SKeyMap(XK_E, KEY_KEY_E));
-	KeyMap.push_back(SKeyMap(XK_F, KEY_KEY_F));
-	KeyMap.push_back(SKeyMap(XK_G, KEY_KEY_G));
-	KeyMap.push_back(SKeyMap(XK_H, KEY_KEY_H));
-	KeyMap.push_back(SKeyMap(XK_I, KEY_KEY_I));
-	KeyMap.push_back(SKeyMap(XK_J, KEY_KEY_J));
-	KeyMap.push_back(SKeyMap(XK_K, KEY_KEY_K));
-	KeyMap.push_back(SKeyMap(XK_L, KEY_KEY_L));
-	KeyMap.push_back(SKeyMap(XK_M, KEY_KEY_M));
-	KeyMap.push_back(SKeyMap(XK_N, KEY_KEY_N));
-	KeyMap.push_back(SKeyMap(XK_O, KEY_KEY_O));
-	KeyMap.push_back(SKeyMap(XK_P, KEY_KEY_P));
-	KeyMap.push_back(SKeyMap(XK_Q, KEY_KEY_Q));
-	KeyMap.push_back(SKeyMap(XK_R, KEY_KEY_R));
-	KeyMap.push_back(SKeyMap(XK_S, KEY_KEY_S));
-	KeyMap.push_back(SKeyMap(XK_T, KEY_KEY_T));
-	KeyMap.push_back(SKeyMap(XK_U, KEY_KEY_U));
-	KeyMap.push_back(SKeyMap(XK_V, KEY_KEY_V));
-	KeyMap.push_back(SKeyMap(XK_W, KEY_KEY_W));
-	KeyMap.push_back(SKeyMap(XK_X, KEY_KEY_X));
-	KeyMap.push_back(SKeyMap(XK_Y, KEY_KEY_Y));
-	KeyMap.push_back(SKeyMap(XK_Z, KEY_KEY_Z));
-	KeyMap.push_back(SKeyMap(XK_bracketleft, KEY_OEM_4));
-	KeyMap.push_back(SKeyMap(XK_backslash, KEY_OEM_5));
-	KeyMap.push_back(SKeyMap(XK_bracketright, KEY_OEM_6));
-	KeyMap.push_back(SKeyMap(XK_asciicircum, KEY_OEM_5));
+	KeyMap.push_back(SKeyMap(XK_A, IRR_KEY_A));
+	KeyMap.push_back(SKeyMap(XK_B, IRR_KEY_B));
+	KeyMap.push_back(SKeyMap(XK_C, IRR_KEY_C));
+	KeyMap.push_back(SKeyMap(XK_D, IRR_KEY_D));
+	KeyMap.push_back(SKeyMap(XK_E, IRR_KEY_E));
+	KeyMap.push_back(SKeyMap(XK_F, IRR_KEY_F));
+	KeyMap.push_back(SKeyMap(XK_G, IRR_KEY_G));
+	KeyMap.push_back(SKeyMap(XK_H, IRR_KEY_H));
+	KeyMap.push_back(SKeyMap(XK_I, IRR_KEY_I));
+	KeyMap.push_back(SKeyMap(XK_J, IRR_KEY_J));
+	KeyMap.push_back(SKeyMap(XK_K, IRR_KEY_K));
+	KeyMap.push_back(SKeyMap(XK_L, IRR_KEY_L));
+	KeyMap.push_back(SKeyMap(XK_M, IRR_KEY_M));
+	KeyMap.push_back(SKeyMap(XK_N, IRR_KEY_N));
+	KeyMap.push_back(SKeyMap(XK_O, IRR_KEY_O));
+	KeyMap.push_back(SKeyMap(XK_P, IRR_KEY_P));
+	KeyMap.push_back(SKeyMap(XK_Q, IRR_KEY_Q));
+	KeyMap.push_back(SKeyMap(XK_R, IRR_KEY_R));
+	KeyMap.push_back(SKeyMap(XK_S, IRR_KEY_S));
+	KeyMap.push_back(SKeyMap(XK_T, IRR_KEY_T));
+	KeyMap.push_back(SKeyMap(XK_U, IRR_KEY_U));
+	KeyMap.push_back(SKeyMap(XK_V, IRR_KEY_V));
+	KeyMap.push_back(SKeyMap(XK_W, IRR_KEY_W));
+	KeyMap.push_back(SKeyMap(XK_X, IRR_KEY_X));
+	KeyMap.push_back(SKeyMap(XK_Y, IRR_KEY_Y));
+	KeyMap.push_back(SKeyMap(XK_Z, IRR_KEY_Z));
+	KeyMap.push_back(SKeyMap(XK_bracketleft, IRR_KEY_OEM_4));
+	KeyMap.push_back(SKeyMap(XK_backslash, IRR_KEY_OEM_5));
+	KeyMap.push_back(SKeyMap(XK_bracketright, IRR_KEY_OEM_6));
+	KeyMap.push_back(SKeyMap(XK_asciicircum, IRR_KEY_OEM_5));
 	KeyMap.push_back(SKeyMap(XK_degree, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_underscore, KEY_MINUS)); //?
-	KeyMap.push_back(SKeyMap(XK_grave, KEY_OEM_3));
-	KeyMap.push_back(SKeyMap(XK_acute, KEY_OEM_6));
-	KeyMap.push_back(SKeyMap(XK_a, KEY_KEY_A));
-	KeyMap.push_back(SKeyMap(XK_b, KEY_KEY_B));
-	KeyMap.push_back(SKeyMap(XK_c, KEY_KEY_C));
-	KeyMap.push_back(SKeyMap(XK_d, KEY_KEY_D));
-	KeyMap.push_back(SKeyMap(XK_e, KEY_KEY_E));
-	KeyMap.push_back(SKeyMap(XK_f, KEY_KEY_F));
-	KeyMap.push_back(SKeyMap(XK_g, KEY_KEY_G));
-	KeyMap.push_back(SKeyMap(XK_h, KEY_KEY_H));
-	KeyMap.push_back(SKeyMap(XK_i, KEY_KEY_I));
-	KeyMap.push_back(SKeyMap(XK_j, KEY_KEY_J));
-	KeyMap.push_back(SKeyMap(XK_k, KEY_KEY_K));
-	KeyMap.push_back(SKeyMap(XK_l, KEY_KEY_L));
-	KeyMap.push_back(SKeyMap(XK_m, KEY_KEY_M));
-	KeyMap.push_back(SKeyMap(XK_n, KEY_KEY_N));
-	KeyMap.push_back(SKeyMap(XK_o, KEY_KEY_O));
-	KeyMap.push_back(SKeyMap(XK_p, KEY_KEY_P));
-	KeyMap.push_back(SKeyMap(XK_q, KEY_KEY_Q));
-	KeyMap.push_back(SKeyMap(XK_r, KEY_KEY_R));
-	KeyMap.push_back(SKeyMap(XK_s, KEY_KEY_S));
-	KeyMap.push_back(SKeyMap(XK_t, KEY_KEY_T));
-	KeyMap.push_back(SKeyMap(XK_u, KEY_KEY_U));
-	KeyMap.push_back(SKeyMap(XK_v, KEY_KEY_V));
-	KeyMap.push_back(SKeyMap(XK_w, KEY_KEY_W));
-	KeyMap.push_back(SKeyMap(XK_x, KEY_KEY_X));
-	KeyMap.push_back(SKeyMap(XK_y, KEY_KEY_Y));
-	KeyMap.push_back(SKeyMap(XK_z, KEY_KEY_Z));
-	KeyMap.push_back(SKeyMap(XK_ssharp, KEY_OEM_4));
-	KeyMap.push_back(SKeyMap(XK_adiaeresis, KEY_OEM_7));
-	KeyMap.push_back(SKeyMap(XK_odiaeresis, KEY_OEM_3));
-	KeyMap.push_back(SKeyMap(XK_udiaeresis, KEY_OEM_1));
-	KeyMap.push_back(SKeyMap(XK_Super_L, KEY_LWIN));
-	KeyMap.push_back(SKeyMap(XK_Super_R, KEY_RWIN));
+	KeyMap.push_back(SKeyMap(XK_underscore, IRR_KEY_MINUS)); //?
+	KeyMap.push_back(SKeyMap(XK_grave, IRR_KEY_OEM_3));
+	KeyMap.push_back(SKeyMap(XK_acute, IRR_KEY_OEM_6));
+	KeyMap.push_back(SKeyMap(XK_a, IRR_KEY_A));
+	KeyMap.push_back(SKeyMap(XK_b, IRR_KEY_B));
+	KeyMap.push_back(SKeyMap(XK_c, IRR_KEY_C));
+	KeyMap.push_back(SKeyMap(XK_d, IRR_KEY_D));
+	KeyMap.push_back(SKeyMap(XK_e, IRR_KEY_E));
+	KeyMap.push_back(SKeyMap(XK_f, IRR_KEY_F));
+	KeyMap.push_back(SKeyMap(XK_g, IRR_KEY_G));
+	KeyMap.push_back(SKeyMap(XK_h, IRR_KEY_H));
+	KeyMap.push_back(SKeyMap(XK_i, IRR_KEY_I));
+	KeyMap.push_back(SKeyMap(XK_j, IRR_KEY_J));
+	KeyMap.push_back(SKeyMap(XK_k, IRR_KEY_K));
+	KeyMap.push_back(SKeyMap(XK_l, IRR_KEY_L));
+	KeyMap.push_back(SKeyMap(XK_m, IRR_KEY_M));
+	KeyMap.push_back(SKeyMap(XK_n, IRR_KEY_N));
+	KeyMap.push_back(SKeyMap(XK_o, IRR_KEY_O));
+	KeyMap.push_back(SKeyMap(XK_p, IRR_KEY_P));
+	KeyMap.push_back(SKeyMap(XK_q, IRR_KEY_Q));
+	KeyMap.push_back(SKeyMap(XK_r, IRR_KEY_R));
+	KeyMap.push_back(SKeyMap(XK_s, IRR_KEY_S));
+	KeyMap.push_back(SKeyMap(XK_t, IRR_KEY_T));
+	KeyMap.push_back(SKeyMap(XK_u, IRR_KEY_U));
+	KeyMap.push_back(SKeyMap(XK_v, IRR_KEY_V));
+	KeyMap.push_back(SKeyMap(XK_w, IRR_KEY_W));
+	KeyMap.push_back(SKeyMap(XK_x, IRR_KEY_X));
+	KeyMap.push_back(SKeyMap(XK_y, IRR_KEY_Y));
+	KeyMap.push_back(SKeyMap(XK_z, IRR_KEY_Z));
+	KeyMap.push_back(SKeyMap(XK_ssharp, IRR_KEY_OEM_4));
+	KeyMap.push_back(SKeyMap(XK_adiaeresis, IRR_KEY_OEM_7));
+	KeyMap.push_back(SKeyMap(XK_odiaeresis, IRR_KEY_OEM_3));
+	KeyMap.push_back(SKeyMap(XK_udiaeresis, IRR_KEY_OEM_1));
+	KeyMap.push_back(SKeyMap(XK_Super_L, IRR_KEY_LWIN));
+	KeyMap.push_back(SKeyMap(XK_Super_R, IRR_KEY_RWIN));
 
 	KeyMap.sort();
 #endif
@@ -2224,7 +2457,7 @@ bool CIrrDeviceLinux::activateJoysticks(core::array<SJoystickInfo> & joystickInf
 		returnInfo.Axes = info.axes;
 		returnInfo.Buttons = info.buttons;
 
-#if !defined(__FreeBSD__) && !defined(__OpenBSD__)
+#if !defined(__FreeBSD__) && !defined(__OpenBSD__) && !defined(__NetBSD__)
 		char name[80];
 		ioctl( info.fd, JSIOCGNAME(80), name);
 		returnInfo.Name = name;
@@ -2417,7 +2650,7 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
 		os::Printer::log("Couldn't access X clipboard", ELL_WARNING);
 		return 0;
 	}
-	
+
 	Window ownerWindow = XGetSelectionOwner(display, X_ATOM_CLIPBOARD);
 	if (ownerWindow == window)
 	{
@@ -2430,8 +2663,8 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
 		return 0;
 
 	Atom selection = XInternAtom(display, "IRR_SELECTION", False);
-	XConvertSelection(display, X_ATOM_CLIPBOARD, XA_STRING, selection, window, CurrentTime);
-	
+	XConvertSelection(display, X_ATOM_CLIPBOARD, X_ATOM_UTF8_STRING, selection, window, CurrentTime);
+
 	const int SELECTION_RETRIES = 500;
 	int i = 0;
 	for (i = 0; i < SELECTION_RETRIES; i++)
@@ -2444,13 +2677,13 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
 
 		usleep(1000);
 	}
-	
+
 	if (i == SELECTION_RETRIES)
 	{
 		os::Printer::log("Timed out waiting for SelectionNotify event", ELL_WARNING);
 		return 0;
 	}
-	
+
 	Atom type;
 	int format;
 	unsigned long numItems, dummy;
@@ -2462,7 +2695,7 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
 
 	if (result == Success)
 		Clipboard = (irr::c8*)data;
-		
+
 	XFree (data);
 	return Clipboard.c_str();
 #else
@@ -2522,7 +2755,6 @@ void CIrrDeviceLinux::initXAtoms()
 	X_ATOM_CLIPBOARD = XInternAtom(display, "CLIPBOARD", False);
 	X_ATOM_TARGETS = XInternAtom(display, "TARGETS", False);
 	X_ATOM_UTF8_STRING = XInternAtom (display, "UTF8_STRING", False);
-	X_ATOM_TEXT = XInternAtom (display, "TEXT", False);
 #endif
 }
 

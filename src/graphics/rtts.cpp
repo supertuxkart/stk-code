@@ -15,14 +15,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/rtts.hpp"
-#include "central_settings.hpp"
+
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
-#include "graphics/irr_driver.hpp"
-#include "graphics/post_processing.hpp"
+#include "graphics/materials.hpp"
 #include "utils/log.hpp"
-#include <ISceneManager.h>
 
 static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint internalFormat, GLint format, GLint type, unsigned mipmaplevel = 1)
 {
@@ -48,10 +49,10 @@ static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, G
     return result;
 }
 
-RTT::RTT(size_t width, size_t height)
+RTT::RTT(size_t width, size_t height, float rtt_scale)
 {
-    m_width = width;
-    m_height = height;
+    m_width = size_t(width * rtt_scale);
+    m_height = size_t(height  * rtt_scale);
     m_shadow_FBO = NULL;
     m_RH_FBO = NULL;
     m_RSM = NULL;
@@ -59,14 +60,13 @@ RTT::RTT(size_t width, size_t height)
     using namespace video;
     using namespace core;
     
-    dimension2du res(width * UserConfigParams::m_scale_rtts_factor, 
-                     height * UserConfigParams::m_scale_rtts_factor);
+    dimension2du res(m_width, m_height);
     
     const dimension2du half = res/2;
     const dimension2du quarter = res/4;
     const dimension2du eighth = res/8;
 
-    const u16 shadowside = 1024 * UserConfigParams::m_scale_rtts_factor;
+    const u16 shadowside = u16(1024 * rtt_scale);
     const dimension2du shadowsize0(shadowside, shadowside);
     const dimension2du shadowsize1(shadowside / 2, shadowside / 2);
     const dimension2du shadowsize2(shadowside / 4, shadowside / 4);
@@ -87,6 +87,7 @@ RTT::RTT(size_t width, size_t height)
     GLint rgb_format = GL_BGR;
     GLint diffuse_specular_internal_format = GL_R11F_G11F_B10F;
     GLint type = GL_FLOAT;
+    GLint srgb_internal_format = GL_SRGB8_ALPHA8;
     
 #if defined(USE_GLES2)
     if (!CVS->isEXTColorBufferFloatUsable())
@@ -100,6 +101,8 @@ RTT::RTT(size_t width, size_t height)
         diffuse_specular_internal_format = GL_RGBA8;
         type = GL_UNSIGNED_BYTE;
     }
+    
+    srgb_internal_format = GL_RGBA8;
 #endif
 
     RenderTargetTextures[RTT_TMP1] = generateRTT(res, rgba_internal_format, rgba_format, type);
@@ -109,9 +112,9 @@ RTT::RTT(size_t width, size_t height)
     RenderTargetTextures[RTT_LINEAR_DEPTH] = generateRTT(res, red32_internal_format, red_format, type, linear_depth_mip_levels);
     RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, rgba_internal_format, GL_RGBA, type);
     RenderTargetTextures[RTT_COLOR] = generateRTT(res, rgba_internal_format, rgba_format, type);
-    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_SRGB8_ALPHA8, rgb_format, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_MLAA_TMP] = generateRTT(res, GL_SRGB8_ALPHA8, rgb_format, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_MLAA_BLEND] = generateRTT(res, GL_SRGB8_ALPHA8, rgb_format, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, srgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_TMP] = generateRTT(res, srgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_BLEND] = generateRTT(res, srgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
     RenderTargetTextures[RTT_SSAO] = generateRTT(res, red_internal_format, red_format, type);
     RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, rgba_internal_format, rgba_format, type);
     RenderTargetTextures[RTT_DIFFUSE] = generateRTT(res, diffuse_specular_internal_format, rgb_format, type);
@@ -290,13 +293,51 @@ RTT::RTT(size_t width, size_t height)
     glClear(GL_COLOR_BUFFER_BIT);
 
     getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
-    glClearColor(.5, .5, .5, .5);
+    float color = 0.5;
+#if defined(USE_GLES2)
+    if (!CVS->isDefferedEnabled())
+        color = pow(color, 1. / 2.2);
+#endif
+    glClearColor(color, color, color, color);
     glClear(GL_COLOR_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#if !defined(USE_GLES2)
+    if (CVS->isAZDOEnabled())
+    {
+        uint64_t handle =
+            glGetTextureSamplerHandleARB(getRenderTarget(RTT_DIFFUSE),
+            ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
+        glMakeTextureHandleResidentARB(handle);
+        m_prefilled_handles.push_back(handle);
+        handle =
+            glGetTextureSamplerHandleARB(getRenderTarget(RTT_SPECULAR),
+            ObjectPass2Shader::getInstance()->m_sampler_ids[1]);
+        glMakeTextureHandleResidentARB(handle);
+        m_prefilled_handles.push_back(handle);
+        handle =
+            glGetTextureSamplerHandleARB(getRenderTarget(RTT_HALF1_R),
+            ObjectPass2Shader::getInstance()->m_sampler_ids[2]);
+        glMakeTextureHandleResidentARB(handle);
+        m_prefilled_handles.push_back(handle);
+        handle =
+            glGetTextureSamplerHandleARB(getDepthStencilTexture(),
+            ObjectPass2Shader::getInstance()->m_sampler_ids[3]);
+        glMakeTextureHandleResidentARB(handle);
+        m_prefilled_handles.push_back(handle);
+    }
+#endif
 }
 
 RTT::~RTT()
 {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#if !defined(USE_GLES2)
+    if (CVS->isAZDOEnabled())
+    {
+        for (uint64_t& handle : m_prefilled_handles)
+            glMakeTextureHandleNonResidentARB(handle);
+    }
+#endif
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
     if (CVS->isShadowEnabled())
@@ -318,33 +359,5 @@ RTT::~RTT()
     }
 }
 
-void RTT::prepareRender(scene::ICameraSceneNode* camera)
-{
-    irr_driver->setRTT(this);
-    irr_driver->getSceneManager()->setActiveCamera(camera);
 
-}
-
-FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
-{
-    irr_driver->setRTT(this);
-
-    irr_driver->getSceneManager()->setActiveCamera(camera);
-
-    std::vector<IrrDriver::GlowData> glows;
-    irr_driver->computeMatrixesAndCameras(camera, m_width, m_height);
-    unsigned plc = irr_driver->updateLightsInfo(camera, dt);
-    irr_driver->uploadLightingData();
-    irr_driver->renderScene(camera, plc, glows, dt, false, true);
-    FrameBuffer* frame_buffer = irr_driver->getPostProcessing()->render(camera, false);
-
-    // reset
-    glViewport(0, 0,
-        irr_driver->getActualScreenSize().Width,
-        irr_driver->getActualScreenSize().Height);
-    irr_driver->setRTT(NULL);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    irr_driver->getSceneManager()->setActiveCamera(NULL);
-    return frame_buffer;
-}
+#endif   // !SERVER_ONLY

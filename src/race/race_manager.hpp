@@ -236,9 +236,10 @@ public:
                           DIFFICULTY_COUNT};
 
     /** Different kart types: A local player, a player connected via network,
-     *  an AI kart, the leader kart (currently not used), a ghost kart. */
+     *  an AI kart, the leader kart (currently not used), a ghost kart and
+     *  spare tire karts which allow gain life in battle mode */
     enum KartType       { KT_PLAYER, KT_NETWORK_PLAYER, KT_AI, KT_LEADER,
-                          KT_GHOST };
+                          KT_GHOST, KT_SPARE_TIRE };
 private:
 
     bool m_started_from_overworld;
@@ -329,6 +330,7 @@ private:
     GrandPrixData                    m_grand_prix;
     SavedGrandPrix*                  m_saved_gp;
     int                              m_num_karts;
+    unsigned int                     m_num_spare_tire_karts;
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
     int                              m_coin_target;
@@ -751,6 +753,24 @@ public:
     {
         return m_watching_replay;
     }   // isWatchingReplay
+    // ------------------------------------------------------------------------
+    void addSpareTireKart(const std::string& name)
+    {
+        m_kart_status.push_back(KartStatus(name, 0, -1, -1,
+            -1, KT_SPARE_TIRE, PLAYER_DIFFICULTY_NORMAL));
+        m_num_spare_tire_karts++;
+        m_num_karts++;
+    }   // addSpareTireKart
+    // ------------------------------------------------------------------------
+    void setSpareTireKartNum(unsigned int i)
+    {
+        m_num_spare_tire_karts = i;
+    }   // setSpareTireKartNum
+    // ------------------------------------------------------------------------
+    unsigned int getNumSpareTireKarts() const
+    {
+        return m_num_spare_tire_karts;
+    }   // getNumSpareTireKarts
 
 };   // RaceManager
 

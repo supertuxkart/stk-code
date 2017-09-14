@@ -34,6 +34,7 @@ using namespace irr;
 #include "tracks/terrain_info.hpp"
 
 class AbstractKart;
+class AbstractKartAnimation;
 class HitEffect;
 class PhysicalObject;
 class XMLNode;
@@ -64,6 +65,11 @@ private:
      *  terrain yourself (e.g. order of operations is important)
      *  set this to false with a call do setDoTerrainInfo(). */
     bool              m_do_terrain_info;
+
+    /** If the flyable is in a cannon, this is the pointer to the cannon
+     *  animation. NULL otherwise. */
+    AbstractKartAnimation *m_animation;
+
 protected:
     /** Kart which shot this flyable. */
     AbstractKart*     m_owner;
@@ -149,7 +155,7 @@ protected:
                                     const Vec3 &velocity,
                                     btCollisionShape *shape,
                                     float restitution,
-                                    const float gravity=0.0f,
+                                    const btVector3& gravity=btVector3(0.0f,0.0f,0.0f),
                                     const bool rotates=false,
                                     const bool turn_around=false,
                                     const btTransform* customDirection=NULL);
@@ -162,11 +168,16 @@ public:
     static void  init        (const XMLNode &node, scene::IMesh *model,
                               PowerupManager::PowerupType type);
     virtual bool              updateAndDelete(float);
+    virtual void              setAnimation(AbstractKartAnimation *animation);
     virtual HitEffect*        getHitEffect() const;
     bool                      isOwnerImmunity(const AbstractKart *kart_hit) const;
     virtual bool              hit(AbstractKart* kart, PhysicalObject* obj=NULL);
     void                      explode(AbstractKart* kart, PhysicalObject* obj=NULL,
                                       bool secondary_hits=true);
+    unsigned int              getOwnerId();
+    // ------------------------------------------------------------------------
+    /** Returns if this flyable has an animation playing (e.g. cannon). */
+    bool hasAnimation() const { return m_animation != NULL;  }
     // ------------------------------------------------------------------------
     /** If true the up velocity of the flyable will be adjust so that the
      *  flyable stays at a height close to the average height.
@@ -194,15 +205,16 @@ public:
     void         reset       () { Moveable::reset();          }
     // ------------------------------------------------------------------------
     /** Returns the type of flyable. */
-    PowerupManager::PowerupType
-                  getType() const {return m_type;}
+    PowerupManager::PowerupType getType() const {return m_type;}
     // ------------------------------------------------------------------------
     /** Sets wether Flyable should update TerrainInfo as part of its update
      *  call, or if the inheriting object will update TerrainInfo itself
      *  (or perhaps not at all if it is not needed). */
     void setDoTerrainInfo(bool d) { m_do_terrain_info = d; }
     // ------------------------------------------------------------------------
-    unsigned int getOwnerId();
+    /** Returns the size (extend) of the mesh. */
+    const Vec3 &getExtend() const { return m_extend;  }
+    // ------------------------------------------------------------------------
 };   // Flyable
 
 #endif

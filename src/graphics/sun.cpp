@@ -18,21 +18,7 @@
 
 #include "graphics/sun.hpp"
 
-#include "graphics/callbacks.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/material_manager.hpp"
-#include "graphics/material.hpp"
-#include "graphics/rtts.hpp"
-#include "graphics/screen_quad.hpp"
-#include "graphics/shaders.hpp"
-#include "io/file_manager.hpp"
-#include "modes/world.hpp"
-#include "tracks/track.hpp"
-
-using namespace video;
-using namespace scene;
-using namespace core;
 
 SunNode::SunNode(scene::ISceneManager* mgr, scene::ISceneNode* parent,
                  float r, float g, float b)

@@ -19,13 +19,13 @@
 #ifndef HEADER_WEATHER_HPP
 #define HEADER_WEATHER_HPP
 
+#include "utils/singleton.hpp"
 #include <vector3d.h>
 
 class SFXBase;
 
-class Weather
+class Weather : public AbstractSingleton<Weather>
 {
-    bool m_lightning_enabled;
     float m_next_lightning;
     float m_lightning;
 
@@ -33,7 +33,7 @@ class Weather
     SFXBase* m_weather_sound;
 
 public:
-    Weather(bool lightning, std::string sound);
+             Weather();
     virtual ~Weather();
 
     void update(float dt);

@@ -809,15 +809,10 @@ void KartSelectionScreen::updateKartStats(uint8_t widget_id,
 
     const KartProperties *kp =
                     kart_properties_manager->getKart(selection);
+
     if (kp != NULL)
     {
-        // Scale the values so they look better
-        w->setValue(KartStatsWidget::SKILL_MASS, (int)
-            ((kp->getCombinedCharacteristic()->getMass() - 20) / 4));
-        w->setValue(KartStatsWidget::SKILL_SPEED, (int)
-            ((kp->getCombinedCharacteristic()->getEngineMaxSpeed() - 15) * 6));
-        w->setValue(KartStatsWidget::SKILL_POWER, (int)
-            ((kp->getAvgPower() - 30) / 20));
+        w->setValues(kp);
         w->update(0);
     }
 }
@@ -849,7 +844,7 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
     {
         w3->clearModels();
         w3->addModel(irr_driver->getAnimatedMesh(
-                         file_manager->getAsset(FileManager::MODEL, "chest.b3d") )->getMesh(20),
+                         file_manager->getAsset(FileManager::MODEL, "chest.spm") )->getMesh(20),
                      Vec3(0,0,0), Vec3(15.0f, 15.0f, 15.0f) );
         w3->update(0);
 
@@ -880,9 +875,29 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
             }
 
             w3->clearModels();
+            const bool has_win_anime =
+                UserConfigParams::m_show_steering_animations != 0 &&
+                (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
+                kart_model.getFrame(KartModel::AF_WIN_START) > -1) &&
+                kart_model.getFrame(KartModel::AF_WIN_END) > -1) ||
+                (kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 &&
+                kart_model.getFrame(KartModel::AF_SELECTION_END) > -1));
             w3->addModel( kart_model.getModel(), Vec3(0,0,0),
                 Vec3(scale, scale, scale),
-                          kart_model.getBaseFrame() );
+                has_win_anime ?
+                kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 ?
+                kart_model.getFrame(KartModel::AF_SELECTION_START) :
+                kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ?
+                kart_model.getFrame(KartModel::AF_WIN_LOOP_START) :
+                kart_model.getFrame(KartModel::AF_WIN_START) :
+                kart_model.getBaseFrame(),
+                has_win_anime ?
+                kart_model.getFrame(KartModel::AF_SELECTION_END) > -1 ?
+                kart_model.getFrame(KartModel::AF_SELECTION_END) :
+                kart_model.getFrame(KartModel::AF_WIN_END) :
+                kart_model.getBaseFrame(),
+                false/*all_parts_colorized*/,
+                kart_model.getAnimationSpeed());
             w3->addModel( kart_model.getWheelModel(0),
                           kart_model.getWheelGraphicsPosition(0) );
             w3->addModel( kart_model.getWheelModel(1),
@@ -1158,13 +1173,12 @@ void KartSelectionScreen::allPlayersDone()
         if (selected_kart == RANDOM_KART_ID)
         {
             // don't select an already selected kart
-            int random_id;
             // to prevent infinite loop in case they are all locked
             int count = 0;
             bool done = false;
             do
             {
-                random_id = random.get(item_count);
+                int random_id = random.get(item_count);
                 // valid kart if it can bt used, and is either not locked,
                 // or it's a multiplayer race.
                 if (items[random_id].m_code_name != ID_DONT_USE &&

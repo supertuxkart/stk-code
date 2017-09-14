@@ -18,9 +18,10 @@
 
 #include "font/digit_face.hpp"
 
-#include "font/face_ttf.hpp"
-
 // ----------------------------------------------------------------------------
+/** Constructor of DigitFace.
+ *  \param ttf \ref FaceTTF for DigitFace to use.
+ */
 DigitFace::DigitFace(FaceTTF* ttf) : FontWithFace("DigitFace", ttf)
 {
 }   // DigitFace

@@ -34,10 +34,17 @@ private:
     static NetworkConfig *m_network_config;
 
     enum NetworkType
-    { NETWORK_NONE, NETWORK_WAN, NETWORK_LAN };
+    {
+        NETWORK_NONE, NETWORK_WAN, NETWORK_LAN
+    };
 
     /** Keeps the type of network connection: none (yet), LAN or WAN. */
     NetworkType m_network_type;
+
+    /** If set it allows clients to connect directly to this server without
+     *  using the stk server in between. It requires obviously that this
+     *  server is accessible (through the firewall) from the outside. */
+    bool m_is_public_server;
 
     /** True if this host is a server, false otherwise. */
     bool m_is_server;
@@ -50,10 +57,14 @@ private:
      *  be updated from a separate thread. */
     Synchronised<TransportAddress> m_my_address;
 
-    /** Even if this is a WAN server, we also store the private (LAN)
-     *  port number, to allow direct connection to clients on the same
-     *  LAN. */
-    uint16_t m_private_port;
+    /** The port number to which the server listens to detect LAN requests. */
+    uint16_t m_server_discovery_port;
+
+    /** The port on which the server listens for connection requests from LAN. */
+    uint16_t m_server_port;
+
+    /** The LAN port on which a client is waiting for a server connection. */
+    uint16_t m_client_port;
 
     /** Maximum number of players on the server. */
     int m_max_players;
@@ -68,10 +79,14 @@ private:
     NetworkConfig();
 
 public:
+    /** Stores the command line flag to disable lan detection (i.e. force
+     *  WAN code to be used when connection client and server). */
+    static bool m_disable_lan;
+
     /** Singleton get, which creates this object if necessary. */
     static NetworkConfig *get()
     {
-        if(!m_network_config)
+        if (!m_network_config)
             m_network_config = new NetworkConfig();
         return m_network_config;
     }   // get
@@ -85,13 +100,40 @@ public:
 
     // ------------------------------------------------------------------------
     void setMyAddress(const TransportAddress& addr);
-
+    void setIsServer(bool b);
+    // ------------------------------------------------------------------------
+    /** Sets the port for server discovery. */
+    void setServerDiscoveryPort(uint16_t port)
+    {
+        m_server_discovery_port = port;
+    }   // setServerDiscoveryPort
+    // ------------------------------------------------------------------------
+    /** Sets the port on which this server listens. */
+    void setServerPort(uint16_t port) { m_server_port = port; }
+    // ------------------------------------------------------------------------
+    /** Sets the port on which a client listens for server connection. */
+    void setClientPort(uint16_t port) { m_client_port = port; }
+    // ------------------------------------------------------------------------
+    /** Returns the port on which this server listenes. */
+    uint16_t getServerPort() const { return m_server_port; }
+    // ------------------------------------------------------------------------
+    /** Returns the port for LAN server discovery. */
+    uint16_t getServerDiscoveryPort() const { return m_server_discovery_port; }
+    // ------------------------------------------------------------------------
+    /** Returns the port on which a client listens for server connections. */
+    uint16_t getClientPort() const { return m_client_port; }
     // ------------------------------------------------------------------------
     /** Sets the password for a server. */
     void setPassword(const std::string &password) { m_password = password; }
     // ------------------------------------------------------------------------
     /** Returns the password. */
     const std::string& getPassword() const { return m_password; }
+    // ------------------------------------------------------------------------
+    /** Sets that this server can be contacted directly. */
+    void setIsPublicServer() { m_is_public_server = true; }
+    // ------------------------------------------------------------------------
+    /** Returns if connections directly to the server are to be accepted. */
+    bool isPublicServer() const { return m_is_public_server; }
     // ------------------------------------------------------------------------
     /** Return if a network setting is happening. A network setting is active
      *  if a host (server or client) exists. */
@@ -117,9 +159,6 @@ public:
     // --------------------------------------------------------------------
     /** Returns the maximum number of players for this server. */
     int getMaxPlayers() const { return m_max_players; }
-    // --------------------------------------------------------------------
-    /** Sets if this instance is a server or client. */
-    void setIsServer(bool b) { m_is_server = b; }
     // --------------------------------------------------------------------
     /** Returns if this instance is a server. */
     bool isServer() const { return m_is_server;  }
@@ -158,6 +197,7 @@ public:
     /** Returns the IP address of this host. We need to return a copy
      *  to make sure the address is thread safe (otherwise it could happen
      *  that e.g. data is taken when the IP address was written, but not
+        return a;
      *  yet the port). */
     const TransportAddress getMyAddress() const
     {
@@ -167,12 +207,6 @@ public:
         m_my_address.unlock();
         return a;
     }   // getMyAddress
-    // ------------------------------------------------------------------------
-    /** Sets the private (LAN) port for this instance. */
-    void setPrivatePort(uint16_t port) { m_private_port = port; }
-    // ------------------------------------------------------------------------
-    /** Returns the private (LAN) port. */
-    uint16_t getPrivatePort() const { return m_private_port; }
 
 };   // class NetworkConfig
 

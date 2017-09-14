@@ -18,13 +18,8 @@
 #ifdef _IRR_COMPILE_WITH_X11_
 
 #ifdef _IRR_COMPILE_WITH_OPENGL_
-#include <GL/gl.h>
 #define GLX_GLXEXT_LEGACY 1
 #include <GL/glx.h>
-#ifdef _IRR_OPENGL_USE_EXTPOINTER_
-#define GLX_GLXEXT_PROTOTYPES
-#include "glxext.h"
-#endif
 #endif
 
 #include <X11/Xlib.h>
@@ -67,6 +62,9 @@ namespace irr
 
 		//! sets the caption of the window
 		virtual void setWindowCaption(const wchar_t* text);
+
+		//! sets the class of the window
+		virtual void setWindowClass(const char* text);
 
 		//! returns if window is active. if not, nothing need to be drawn
 		virtual bool isWindowActive() const;
@@ -129,6 +127,8 @@ namespace irr
 		}
 
 #ifdef _IRR_COMPILE_WITH_X11_
+		void setIMELocation(const irr::core::position2di& pos);
+		void setIMEEnable(bool enable);
 		// convert an Irrlicht texture to a X11 cursor
 		Cursor TextureToCursor(irr::video::ITexture * tex, const core::rect<s32>& sourceRect, const core::position2d<s32> &hotspot);
 		Cursor TextureToMonochromeCursor(irr::video::ITexture * tex, const core::rect<s32>& sourceRect, const core::position2d<s32> &hotspot);
@@ -156,7 +156,9 @@ namespace irr
 #ifdef _IRR_COMPILE_WITH_X11_
 		bool createInputContext();
 		void destroyInputContext();
+		int getNumlockMask(Display* display);
 		EKEY_CODE getKeyCode(XEvent &event);
+		void updateIMELocation();
 #endif
 
 		//! Implementation of the linux cursor control
@@ -398,7 +400,12 @@ namespace irr
 		XImage* SoftwareImage;
 		XIM XInputMethod;
 		XIC XInputContext;
+		XFontSet m_font_set;
+		core::array<wchar_t> m_ime_char_holder;
+		XPoint m_ime_position;
 		mutable core::stringc Clipboard;
+		int numlock_mask;
+		bool m_ime_enabled;
 		#ifdef _IRR_LINUX_X11_VIDMODE_
 		XF86VidModeModeInfo oldVideoMode;
 		#endif

@@ -18,15 +18,20 @@
 #ifndef PROFILER_HPP
 #define PROFILER_HPP
 
-#include <irrlicht.h>
-#include <list>
-#include <vector>
-#include <stack>
-#include <string>
-#include <streambuf>
-#include <ostream>
-#include <iostream>
+#include "utils/synchronised.hpp"
 
+#include <irrlicht.h>
+#include <pthread.h>
+
+#include <assert.h>
+#include <iostream>
+#include <list>
+#include <map>
+#include <ostream>
+#include <stack>
+#include <streambuf>
+#include <string>
+#include <vector>
 
 enum QueryPerf
 {
@@ -70,10 +75,10 @@ double getTimeMilliseconds();
 
 #ifdef ENABLE_PROFILER
     #define PROFILER_PUSH_CPU_MARKER(name, r, g, b) \
-        profiler.pushCpuMarker(name, video::SColor(0xFF, r, g, b))
+        profiler.pushCPUMarker(name, video::SColor(0xFF, r, g, b))
 
     #define PROFILER_POP_CPU_MARKER()  \
-        profiler.popCpuMarker()
+        profiler.popCPUMarker()
 
     #define PROFILER_SYNC_FRAME()   \
         profiler.synchronizeFrame()
@@ -89,84 +94,177 @@ double getTimeMilliseconds();
 
 using namespace irr;
 
-/** For profiling reports, we need a custom strijng stream that writes to a large
-    pre-allocated buffer, to avoid allocating as much as possible durign profiling */
-template <typename char_type>
-struct ostreambuf : public std::basic_streambuf<char_type, std::char_traits<char_type> >
-{
-    ostreambuf(char_type* buffer, std::streamsize bufferLength)
-    {
-        // set the "put" pointer the start of the buffer and record it's length.
-        this->setp(buffer, buffer + bufferLength);
-    }
-};
-
-
-class StringBuffer
-{
-private:
-    char* m_buffer;
-    ostreambuf<char> ostreamBuffer;
-    std::ostream messageStream;
-
-public:
-
-    StringBuffer(unsigned int size) : m_buffer((char*)calloc(size, 1)), ostreamBuffer(m_buffer, size), messageStream(&ostreamBuffer)
-    {
-    }
-
-    ~StringBuffer()
-    {
-        free(m_buffer);
-    }
-
-    std::ostream& getStdStream() { return messageStream; }
-
-    char* getRawBuffer() { return m_buffer; }
-};
-
-/**
-  * \brief class that allows run-time graphical profiling through the use of markers
-  * \ingroup utils
-  */
+// ============================================================================
+/** \brief class that allows run-time graphical profiling through the use 
+ *  of markers.
+ * \ingroup utils
+ */
 class Profiler
 {
 private:
-    struct Marker
+    // ------------------------------------------------------------------------
+    class Marker
     {
-        double  start;  // Times of start and end, in milliseconds,
-        double  end;    // relatively to the time of last synchronization
-        size_t  layer;
+    private:
+        /** An event that is started (pushed) stores the start time in this
+         *  variable. */
+        double  m_start;
 
-        std::string     name;
-        video::SColor   color;
+        /** Duration of the event in this frame (accumulated if this event
+         *  should be recorded more than once). */
 
-        Marker(double start, double end, const char* name="N/A", const video::SColor& color=video::SColor(), size_t layer=0)
-            : start(start), end(end), layer(layer), name(name), color(color)
+        double  m_duration;
+        /** Distance of marker from root (for nested events), used to
+         *  adjust vertical height when drawing. */
+        size_t  m_layer;
+    public:
+        // --------------------------------------------------------------------
+        Marker() { m_start = 0; m_duration = 0; m_layer = 0; }
+
+        // --------------------------------------------------------------------
+        Marker(double start, size_t layer=0)
+           : m_start(start), m_duration(0), m_layer(layer)
         {
         }
-
+        // --------------------------------------------------------------------
         Marker(const Marker& ref)
-            : start(ref.start), end(ref.end), layer(ref.layer), name(ref.name), color(ref.color)
+            : m_start(ref.m_start), m_duration(ref.m_duration), 
+              m_layer(ref.m_layer)
         {
         }
-    };
+        // --------------------------------------------------------------------
+        /** Returns the start time of this event marker. */
+        double getStart() const { return m_start;  }
+        // --------------------------------------------------------------------
+        /** Returns the end time of this event marker. */
+        double getEnd() const { return m_start+m_duration; }
+        // --------------------------------------------------------------------
+        /** Returns the duration of this event. */
+        double getDuration() const { return m_duration;  }
+        // --------------------------------------------------------------------
+        size_t getLayer() const { return m_layer;  }
+        // --------------------------------------------------------------------
+        /** Called when an entry in the cyclic buffer is reused. Makes sure
+         *  that time for a new event can be accumulated. */
+        void clear() { m_duration = 0; }
+        // --------------------------------------------------------------------
+        /** Sets start time and layer for this event. */
+        void setStart(double start, size_t layer = 0)
+        {
+            m_start = start; m_layer = layer;
+        }   // setStart
+        // --------------------------------------------------------------------
+        /** Sets the end time of this event. */
+        void setEnd(double end)
+        {
+            m_duration += (end - m_start);
+        }   // setEnd
 
-    typedef    std::list<Marker>   MarkerList;
-    typedef    std::stack<Marker>  MarkerStack;
+    };   // class Marker
 
-    struct ThreadInfo
+    // ========================================================================
+    /** The data for one event. It contains the events colours, all markers
+     * for the buffer period and a stack to detect nesting of markers.
+     */
+    class EventData
     {
-        MarkerList   markers_done[2];
-        MarkerStack  markers_stack[2];
-    };
+    private:
+        /** Colour to use in the on-screen display */
+        video::SColor m_colour;
 
-    typedef    std::vector<ThreadInfo>  ThreadInfoList;
+        /** Vector of all buffered markers. */
+        std::vector<Marker> m_all_markers;
 
-    ThreadInfoList  m_thread_infos;
-    int             m_write_id;
-    double          m_time_last_sync;
-    double          m_time_between_sync;
+    public:
+        EventData() {}
+        EventData(video::SColor colour, int max_size)
+        {
+            m_all_markers.resize(max_size);
+            m_colour = colour;
+        }   // EventData
+        // --------------------------------------------------------------------
+        /** Records the start of an event for a given frame. */
+        void setStart(size_t frame, double start, int layer)
+        {
+            assert(frame < m_all_markers.capacity());
+            m_all_markers[frame].setStart(start, layer);
+        }   // setStart
+        // --------------------------------------------------------------------
+        /** Records the end of an event for a given frame. */
+        void setEnd(size_t frame, double end)
+        {
+            assert(frame < m_all_markers.capacity());
+            m_all_markers[frame].setEnd(end);
+        }   // setEnd
+        // --------------------------------------------------------------------
+        const Marker& getMarker(int n) const { return m_all_markers[n]; }
+        Marker& getMarker(int n) { return m_all_markers[n]; }
+        // --------------------------------------------------------------------
+        /** Returns the colour for this event. */
+        video::SColor getColour() const { return m_colour;  }
+        // --------------------------------------------------------------------
+    };   // EventData
+
+    // ========================================================================
+    /** The mapping of event names to the corresponding EventData. */
+    typedef std::map<std::string, EventData> AllEventData;
+    // ========================================================================
+    struct ThreadData
+    {
+        /** Stack of events to detect nesting. */
+        std::vector< std::string > m_event_stack;
+
+        /** This stores the event names in the order in which they occur.
+        *  This means that 'outer' events occur here before any child
+        *  events. This list is then used to determine the order in which the
+        *  bar graphs are drawn, which results in the proper nesting of events.*/
+        std::vector<std::string> m_ordered_headings;
+
+        AllEventData m_all_event_data;
+    };   // class ThreadData
+
+    // ========================================================================
+
+    /** Data structure containing all currently buffered markers. The index
+     *  is the thread id. */
+    std::vector< ThreadData> m_all_threads_data;
+
+    /** A mapping of thread_t pointers to a unique integer (starting from 0).*/
+    std::vector<pthread_t> m_thread_mapping;
+
+    /** Buffer for the GPU times (in ms). */
+    std::vector<int> m_gpu_times;
+
+    /** Counts the threads used, i.e. registered in m_thread_mapping. */
+    int m_threads_used;
+
+    /** Index of the current frame in the buffer. */
+    int m_current_frame;
+
+    /** We don't need the bool, but easiest way to get a lock for the whole
+     *  instance (since we need to avoid that a synch is done which changes
+     *  the current frame while another threaded uses this variable, or
+     *  while a new thread is added. */
+    Synchronised<bool> m_lock;
+
+    /** True if the circular buffer has wrapped around. */
+    bool m_has_wrapped_around;
+
+    /** The maximum number of frames to be buffered. Used to minimise
+     *  reallocations. */
+    int m_max_frames;
+
+    /** Time of last sync. All start/end times are stored relative
+     *  to this time. */
+    double m_time_last_sync;
+
+    /** Time between now and last sync, used to scale the GUI bar. */
+    double m_time_between_sync;
+
+    /** List of all event names. This list is sorted to make sure
+     *  if the circular buffer is dumped more than once the order
+     *  of events remains the same. */
+    std::vector<std::string> m_all_event_names;
 
     // Handling freeze/unfreeze by clicking on the display
     enum FreezeState
@@ -179,34 +277,25 @@ private:
 
     FreezeState     m_freeze_state;
 
-    bool m_capture_report;
-    bool m_first_capture_sweep;
-    bool m_first_gpu_capture_sweep;
-    StringBuffer* m_capture_report_buffer;
-    StringBuffer* m_gpu_capture_report_buffer;
+private:
+    int  getThreadID();
+    void drawBackground();
 
 public:
-    Profiler();
+             Profiler();
     virtual ~Profiler();
 
-    void    pushCpuMarker(const char* name="N/A", const video::SColor& color=video::SColor());
-    void    popCpuMarker();
-    void    synchronizeFrame();
+    void     pushCPUMarker(const char* name="N/A",
+                           const video::SColor& color=video::SColor());
+    void     popCPUMarker();
+    void     toggleStatus(); 
+    void     synchronizeFrame();
+    void     draw();
+    void     onClick(const core::vector2di& mouse_pos);
+    void     writeToFile();
 
-    void    draw();
-
-    void    onClick(const core::vector2di& mouse_pos);
-
-    bool getCaptureReport() const { return m_capture_report; }
-    void setCaptureReport(bool captureReport);
-
+    // ------------------------------------------------------------------------
     bool isFrozen() const { return m_freeze_state == FROZEN; }
-
-protected:
-    // TODO: detect on which thread this is called to support multithreading
-    ThreadInfo& getThreadInfo() { return m_thread_infos[0]; }
-    void        drawBackground();
-
 
 };
 

@@ -1,5 +1,6 @@
 # CMakeLists.txt - glew
 
+if (NOT SERVER_ONLY)
 include_directories("include")
 
 if(APPLE)
@@ -16,3 +17,7 @@ add_library(glew STATIC
     include/GL/glew.h  include/GL/glxew.h  include/GL/wglew.h
     src/glew.c         src/glewinfo.c
 )
+
+target_link_libraries(glew ${OPENGL_gl_LIBRARY})
+
+endif()

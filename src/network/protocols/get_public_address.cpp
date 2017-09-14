@@ -24,6 +24,7 @@
 #include "network/network_string.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
 
 #include <assert.h>
 #include <string>
@@ -43,8 +44,35 @@
 #include <sys/types.h>
 
 // make the linker happy
-const uint32_t GetPublicAddress::m_stun_magic_cookie = 0x2112A442;
+const uint32_t   GetPublicAddress::m_stun_magic_cookie = 0x2112A442;
+TransportAddress GetPublicAddress::m_my_address(0, 0);
 
+void GetPublicAddress::setMyIPAddress(const std::string &s)
+{
+    std::vector<std::string> l = StringUtils::split(s, ':');
+    if (l.size() != 2)
+    {
+        Log::fatal("Invalid IP address '%s'.", s.c_str());
+    }
+    std::vector<std::string> ip = StringUtils::split(l[0], '.');
+    if (ip.size() != 4)
+    {
+        Log::fatal("Invalid IP address '%s'.", s.c_str());
+    }
+    uint32_t u = 0;
+    for (unsigned int i = 0; i < 4; i++)
+    {
+        int k;
+        StringUtils::fromString(ip[i], k);
+        u = (u << 8) + k;
+    }
+    m_my_address.setIP(u);
+    int p;
+    StringUtils::fromString(l[1], p);
+    m_my_address.setPort(p);
+}   // setMyIPAddress
+
+// ============================================================================
 GetPublicAddress::GetPublicAddress(CallbackObject *callback)
                 : Protocol(PROTOCOL_SILENT, callback)
 {
@@ -203,6 +231,22 @@ std::string GetPublicAddress::parseStunResponse()
  * selected STUN server and then parsing and validating the response */
 void GetPublicAddress::asynchronousUpdate()
 {
+    // If the user has specified an address, use it instead of the stun protocol.
+    if (m_my_address.getIP() != 0 && m_my_address.getPort() != 0)
+    {
+        NetworkConfig::get()->setMyAddress(m_my_address);
+        m_state = EXITING;
+        requestTerminate();
+    }
+//#define LAN_TEST
+#ifdef LAN_TEST
+    TransportAddress address(0x7f000001, 4);
+    NetworkConfig::get()->setMyAddress(address);
+    m_state = EXITING;
+    requestTerminate();
+    return;
+#endif
+
     if (m_state == NOTHING_DONE)
     {
         createStunRequest();

@@ -25,7 +25,12 @@
 #include "utils/string_utils.hpp"
 #include "utils/types.hpp"
 
+#ifdef ANDROID
+#include "main_android.hpp"
+#endif
+
 #include <algorithm>
+#include <array>
 
 namespace GraphicsRestrictions
 {
@@ -39,7 +44,7 @@ namespace GraphicsRestrictions
         /** The list of names used in the XML file for the graphics
          *  restriction types. They must be in the same order as the types. */
 
-        const char *m_names_of_restrictions[] = {
+        std::array<std::string, 28> m_names_of_restrictions = {
             "UniformBufferObject",
             "GeometryShader",
             "DrawIndirect",
@@ -57,17 +62,17 @@ namespace GraphicsRestrictions
             "TextureCompressionS3TC",
             "AMDVertexShaderLayer",
             "ExplicitAttribLocation",
-#if defined(USE_GLES2)
+            "TextureFilterAnisotropic",
             "TextureFormatBGRA8888",
             "ColorBufferFloat",
-#endif
             "DriverRecentEnough",
             "HighDefinitionTextures",
             "AdvancedPipeline",
             "FramebufferSRGBWorking",
             "FramebufferSRGBCapable",
             "GI",
-            "ForceLegacyDevice"
+            "ForceLegacyDevice",
+            "VertexIdWorking"
         };
     }   // namespace Private
     using namespace Private;
@@ -76,12 +81,10 @@ namespace GraphicsRestrictions
      *  GR_COUNT if the name is not found. */
 GraphicsRestrictionsType getTypeForName(const std::string &name)
 {
-    unsigned int i = 0;
-    while (m_names_of_restrictions[i] != NULL)
+    for (unsigned int i = 0; i < m_names_of_restrictions.size(); i++)
     {
         if (name == m_names_of_restrictions[i])
             return (GraphicsRestrictionsType)i;
-        i++;
     }
     return GR_COUNT;
 }   // getTypeForName
@@ -132,6 +135,18 @@ public:
     Version(const std::string &driver_version, const std::string &card_name)
     {
         m_version.clear();
+        
+#ifdef ANDROID
+        // Android version should be enough to disable certain features on this
+        // platform
+        int version = AConfiguration_getSdkVersion(global_android_app->config);
+        
+        if (version > 0)
+        {
+            m_version.push_back(version);
+            return;
+        }
+#endif
 
         // Mesa needs to be tested first, otherwise (if testing for card name
         // further down) it would be detected as a non-mesa driver.
@@ -197,7 +212,8 @@ public:
 
         // AMD: driver_version = "4.3.13283 Core Profile/Debug Context 14.501.1003.0"
         // ----------------------------------------------
-        if (card_name.find("AMD") != std::string::npos)
+        if (card_name.find("AMD") != std::string::npos
+            || card_name.find("Radeon") != std::string::npos)
         {
             std::vector<std::string> s = StringUtils::split(driver_version, ' ');
             if (s.size() == 5)
@@ -215,7 +231,7 @@ public:
             convertVersionString(s[0]);
             return;
         }
-        
+
         Log::warn("Graphics", "Can not find version for '%s' '%s' - ignored.",
             driver_version.c_str(), card_name.c_str());
 
@@ -299,7 +315,7 @@ public:
     {
         m_version_test = VERSION_IGNORE;
         m_card_test = CARD_IGNORE;
-        
+
         if(rule->get("is", &m_card_name))
         {
             m_card_test = CARD_IS;
@@ -349,18 +365,16 @@ public:
         {
 #if defined(__linux__) && !defined(ANDROID)
             if(m_os!="linux") return false;
-#endif
-#ifdef WIN32
+#elif defined(WIN32)
             if(m_os!="windows") return false;
-#endif
-#ifdef __APPLE__
+#elif defined(__APPLE__)
             if(m_os!="osx") return false;
-#endif
-#ifdef BSD
+#elif defined(BSD)
             if(m_os!="bsd") return false;
-#endif
-#ifdef ANDROID
+#elif defined(ANDROID)
             if(m_os!="android") return false;
+#else
+            return false;
 #endif
         }   // m_os.size()>0
 
@@ -368,6 +382,7 @@ public:
         // -------------
         switch(m_card_test)
         {
+        case CARD_IGNORE: break;   // always true
         case CARD_IS:
             if(card!=m_card_name) return false;
             break;

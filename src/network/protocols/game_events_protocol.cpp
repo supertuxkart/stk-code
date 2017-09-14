@@ -34,17 +34,28 @@ GameEventsProtocol::~GameEventsProtocol()
 }   // ~GameEventsProtocol
 
 // ----------------------------------------------------------------------------
+/** Once the GameEventsProtocol is ready, signal the world that the timer
+ *  can start.
+*/
+void GameEventsProtocol::setup()
+{
+    m_count_ready_clients = 0;
+}   // setup
+
+// ----------------------------------------------------------------------------
 bool GameEventsProtocol::notifyEvent(Event* event)
 {
-    if (event->getType() != EVENT_TYPE_MESSAGE)
+    // Avoid crash in case that we still receive race events when
+    // the race is actually over.
+    if (event->getType() != EVENT_TYPE_MESSAGE || !World::getWorld())
         return true;
     NetworkString &data = event->data();
-    if (data.size() < 5) // for token and type
+    if (data.size() < 1) // for token and type
     {
         Log::warn("GameEventsProtocol", "Too short message.");
         return true;
     }
-    if ( event->getPeer()->getClientServerToken() != data.getUInt32())
+    if ( event->getPeer()->getClientServerToken() != data.getToken())
     {
         Log::warn("GameEventsProtocol", "Bad token.");
         return true;
@@ -52,13 +63,16 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     int8_t type = data.getUInt8();
     switch (type)
     {
-        case GE_ITEM_COLLECTED:
-            collectedItem(data);      break;
-        case GE_KART_FINISHED_RACE:
-            kartFinishedRace(data);   break;
-        default:
-            Log::warn("GameEventsProtocol", "Unkown message type.");
-            break;
+    case GE_CLIENT_STARTED_RSG:
+        receivedClientHasStarted(event); break;
+    case GE_ITEM_COLLECTED:
+        collectedItem(data);        break;
+    case GE_KART_FINISHED_RACE:
+        kartFinishedRace(data);     break;
+
+    default:
+        Log::warn("GameEventsProtocol", "Unkown message type.");
+        break;
     }
     return true;
 }   // notifyEvent
@@ -101,18 +115,18 @@ void GameEventsProtocol::collectedItem(const NetworkString &data)
 {
     if (data.size() < 6)
     {
-            Log::warn("GameEventsProtocol", "Too short message.");
-        }
-        uint32_t item_id = data.getUInt32();
-        uint8_t powerup_type = data.getUInt8();
-        uint8_t kart_id = data.getUInt8();
-        // now set the kart powerup
-        AbstractKart* kart = World::getWorld()->getKart(kart_id);
-        ItemManager::get()->collectedItem(ItemManager::get()->getItem(item_id),
-                                          kart, powerup_type);
-        Log::info("GameEventsProtocol", "Item %d picked by a player.",
-                  powerup_type);
-    }   // collectedItem
+        Log::warn("GameEventsProtocol", "collectedItem: Too short message.");
+    }
+    uint32_t item_id = data.getUInt32();
+    uint8_t powerup_type = data.getUInt8();
+    uint8_t kart_id = data.getUInt8();
+    // now set the kart powerup
+    AbstractKart* kart = World::getWorld()->getKart(kart_id);
+    ItemManager::get()->collectedItem(ItemManager::get()->getItem(item_id),
+                                      kart, powerup_type);
+    Log::info("GameEventsProtocol", "Item %d picked by a player.",
+               powerup_type);
+}   // collectedItem
 
 // ----------------------------------------------------------------------------
 /** This function is called from the server when a kart finishes a race. It
@@ -137,8 +151,50 @@ void GameEventsProtocol::kartFinishedRace(AbstractKart *kart, float time)
  */
 void GameEventsProtocol::kartFinishedRace(const NetworkString &ns)
 {
+    if (ns.size() < 5) // for token and type
+    {
+        Log::warn("GameEventsProtocol", "kartFinisheRace: Too short message.");
+        return;
+    }
+
     uint8_t kart_id = ns.getUInt8();
     float time      = ns.getFloat();
     World::getWorld()->getKart(kart_id)->finishedRace(time,
                                                       /*from_server*/true);
 }   // kartFinishedRace
+
+// ----------------------------------------------------------------------------
+/** Called on a client when it has started its ready-set-go. The client will
+ *  inform the server anout this. The server will wait for all clients to
+ *  have started before it will start its own countdown.
+ */
+void GameEventsProtocol::clientHasStarted()
+{
+    assert(NetworkConfig::get()->isClient());
+    NetworkString *ns = getNetworkString(1);
+    ns->setSynchronous(true);
+    ns->addUInt8(GE_CLIENT_STARTED_RSG);
+    sendToServer(ns, /*reliable*/true);
+    delete ns;
+}   // clientHasStarted
+// ----------------------------------------------------------------------------
+/** Called on the server when a client has signaled that it has started ready
+*  set go. The server waits for the last client before it starts its own
+*  ready set go. */
+void GameEventsProtocol::receivedClientHasStarted(Event *event)
+{
+    assert(NetworkConfig::get()->isServer());
+    m_count_ready_clients++;
+    Log::verbose("GameEvent",
+                 "Host %d has started ready-set-go: %d out of %d done",
+                 event->getPeer()->getHostId(), m_count_ready_clients, 
+                 STKHost::get()->getGameSetup()->getPlayerCount()        );
+    if (m_count_ready_clients==STKHost::get()->getGameSetup()->getPlayerCount())
+    {
+        Log::verbose("GameEvent", "All %d clients have started.",
+                     STKHost::get()->getGameSetup()->getPlayerCount());
+        // SIgnal the server to start now - since it is now behind the client
+        // times by the latency of the 'slowest' client.
+        World::getWorld()->startReadySetGo();
+    }
+}   // receivedClientHasStarted

@@ -18,22 +18,29 @@
 
 #include "font/face_ttf.hpp"
 
+#include "font/font_manager.hpp"
 #include "io/file_manager.hpp"
 
 // ----------------------------------------------------------------------------
+/** Constructor. Load all TTFs from a list.
+ *  \param ttf_list List of TTFs to be loaded.
+ */
 FaceTTF::FaceTTF(const std::vector<std::string>& ttf_list)
 {
     for (const std::string& font : ttf_list)
     {
         FT_Face face = NULL;
+        const std::string loc = file_manager
+            ->getAssetChecked(FileManager::TTF, font.c_str(), true);
         font_manager->checkFTError(FT_New_Face(font_manager->getFTLibrary(),
-            (file_manager->getAssetChecked(FileManager::TTF,
-            font.c_str(), true)).c_str(), 0, &face), "loading fonts");
+            loc.c_str(), 0, &face), loc + " is loaded");
         m_faces.push_back(face);
     }
 }   // FaceTTF
 
 // ----------------------------------------------------------------------------
+/** Destructor. Clears all TTFs.
+ */
 FaceTTF::~FaceTTF()
 {
     for (unsigned int i = 0; i < m_faces.size(); i++)
@@ -42,6 +49,9 @@ FaceTTF::~FaceTTF()
     }
 }   // ~FaceTTF
 // ----------------------------------------------------------------------------
+/** Return a TTF in \ref m_faces.
+ *  \param i index of TTF file in \ref m_faces.
+ */
 FT_Face FaceTTF::getFace(unsigned int i) const
 {
     assert(i < m_faces.size());

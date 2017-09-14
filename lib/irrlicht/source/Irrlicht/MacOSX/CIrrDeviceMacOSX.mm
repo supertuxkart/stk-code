@@ -719,7 +719,7 @@ bool CIrrDeviceMacOSX::createWindow()
 					if (!CreationParams.WindowId)
 					{
 						[Window center];
-						[(NSFileManager *)Window setDelegate:[NSApp delegate]];
+						[(NSFileManager *)Window setDelegate:[(NSFileManager *)NSApp delegate]];
 
 						if(CreationParams.DriverType == video::EDT_OPENGL)
 							[OGLContext setView:[Window contentView]];
@@ -1019,8 +1019,8 @@ bool CIrrDeviceMacOSX::run()
 
 				if (IsShiftDown != ievent.KeyInput.Shift)
 				{
-					ievent.KeyInput.Char = irr::KEY_SHIFT;
-					ievent.KeyInput.Key = irr::KEY_SHIFT;
+					ievent.KeyInput.Char = irr::IRR_KEY_SHIFT;
+					ievent.KeyInput.Key = irr::IRR_KEY_SHIFT;
 					ievent.KeyInput.PressedDown = ievent.KeyInput.Shift;
 
 					IsShiftDown = ievent.KeyInput.Shift;
@@ -1030,8 +1030,8 @@ bool CIrrDeviceMacOSX::run()
 
 				if (IsControlDown != ievent.KeyInput.Control)
 				{
-					ievent.KeyInput.Char = irr::KEY_CONTROL;
-					ievent.KeyInput.Key = irr::KEY_CONTROL;
+					ievent.KeyInput.Char = irr::IRR_KEY_CONTROL;
+					ievent.KeyInput.Key = irr::IRR_KEY_CONTROL;
 					ievent.KeyInput.PressedDown = ievent.KeyInput.Control;
 
 					IsControlDown = ievent.KeyInput.Control;
@@ -1220,7 +1220,7 @@ void CIrrDeviceMacOSX::postKeyEvent(void *event,irr::SEvent &ievent,bool pressed
 			// workaround for period character
 			if (c == 0x2E)
 			{
-				mkey = irr::KEY_PERIOD;
+				mkey = irr::IRR_KEY_PERIOD;
 				mchar = '.';
 			}
 			else
@@ -1378,115 +1378,114 @@ void CIrrDeviceMacOSX::setCursorVisible(bool visible)
 
 void CIrrDeviceMacOSX::initKeycodes()
 {
-	KeyCodes[kVK_UpArrow] = irr::KEY_UP;
-	KeyCodes[kVK_DownArrow] = irr::KEY_DOWN;
-	KeyCodes[kVK_LeftArrow] = irr::KEY_LEFT;
-	KeyCodes[kVK_RightArrow] = irr::KEY_RIGHT;
-	KeyCodes[kVK_F1]	= irr::KEY_F1;
-	KeyCodes[kVK_F2]	= irr::KEY_F2;
-	KeyCodes[kVK_F3]	= irr::KEY_F3;
-	KeyCodes[kVK_F4]	= irr::KEY_F4;
-	KeyCodes[kVK_F5]	= irr::KEY_F5;
-	KeyCodes[kVK_F6]	= irr::KEY_F6;
-	KeyCodes[kVK_F7]	= irr::KEY_F7;
-	KeyCodes[kVK_F8]	= irr::KEY_F8;
-	KeyCodes[kVK_F9]	= irr::KEY_F9;
-	KeyCodes[kVK_F10]	= irr::KEY_F10;
-	KeyCodes[kVK_F11]	= irr::KEY_F11;
-	KeyCodes[kVK_F12]	= irr::KEY_F12;
-	KeyCodes[kVK_F13]	= irr::KEY_F13;
-	KeyCodes[kVK_F14]	= irr::KEY_F14;
-	KeyCodes[kVK_F15]	= irr::KEY_F15;
-	KeyCodes[kVK_F16]	= irr::KEY_F16;
-	KeyCodes[kVK_F17]	= irr::KEY_F17;
-	KeyCodes[kVK_F18]	= irr::KEY_F18;
-	KeyCodes[kVK_F19]	= irr::KEY_F19;
-	KeyCodes[kVK_F20]	= irr::KEY_F20;
-	KeyCodes[kVK_Home]	= irr::KEY_HOME;
-	KeyCodes[kVK_End]	= irr::KEY_END;
-	KeyCodes[NSInsertFunctionKey] = irr::KEY_INSERT;
-	KeyCodes[kVK_ForwardDelete] = irr::KEY_DELETE;
-	KeyCodes[kVK_Help] = irr::KEY_HELP;
-	KeyCodes[NSSelectFunctionKey] = irr::KEY_SELECT;
-	KeyCodes[NSPrintFunctionKey] = irr::KEY_PRINT;
-	KeyCodes[NSExecuteFunctionKey] = irr::KEY_EXECUT;
-	KeyCodes[NSPrintScreenFunctionKey] = irr::KEY_SNAPSHOT;
-	KeyCodes[NSPauseFunctionKey] = irr::KEY_PAUSE;
-	KeyCodes[NSScrollLockFunctionKey] = irr::KEY_SCROLL;
-	KeyCodes[kVK_Delete] = irr::KEY_BACK;
-	KeyCodes[kVK_Tab] = irr::KEY_TAB;
-	KeyCodes[kVK_Return] = irr::KEY_RETURN;
-	KeyCodes[kVK_Escape] = irr::KEY_ESCAPE;
-	KeyCodes[kVK_Control] = irr::KEY_CONTROL;
-	KeyCodes[kVK_RightControl] = irr::KEY_RCONTROL;
-	KeyCodes[kVK_Command] = irr::KEY_MENU;
-	KeyCodes[kVK_Shift] = irr::KEY_SHIFT;
-	KeyCodes[kVK_RightShift] = irr::KEY_RSHIFT;
-	KeyCodes[kVK_Space] = irr::KEY_SPACE;
+	KeyCodes[kVK_UpArrow] = irr::IRR_KEY_UP;
+	KeyCodes[kVK_DownArrow] = irr::IRR_KEY_DOWN;
+	KeyCodes[kVK_LeftArrow] = irr::IRR_KEY_LEFT;
+	KeyCodes[kVK_RightArrow] = irr::IRR_KEY_RIGHT;
+	KeyCodes[kVK_F1]	= irr::IRR_KEY_F1;
+	KeyCodes[kVK_F2]	= irr::IRR_KEY_F2;
+	KeyCodes[kVK_F3]	= irr::IRR_KEY_F3;
+	KeyCodes[kVK_F4]	= irr::IRR_KEY_F4;
+	KeyCodes[kVK_F5]	= irr::IRR_KEY_F5;
+	KeyCodes[kVK_F6]	= irr::IRR_KEY_F6;
+	KeyCodes[kVK_F7]	= irr::IRR_KEY_F7;
+	KeyCodes[kVK_F8]	= irr::IRR_KEY_F8;
+	KeyCodes[kVK_F9]	= irr::IRR_KEY_F9;
+	KeyCodes[kVK_F10]	= irr::IRR_KEY_F10;
+	KeyCodes[kVK_F11]	= irr::IRR_KEY_F11;
+	KeyCodes[kVK_F12]	= irr::IRR_KEY_F12;
+	KeyCodes[kVK_F13]	= irr::IRR_KEY_F13;
+	KeyCodes[kVK_F14]	= irr::IRR_KEY_F14;
+	KeyCodes[kVK_F15]	= irr::IRR_KEY_F15;
+	KeyCodes[kVK_F16]	= irr::IRR_KEY_F16;
+	KeyCodes[kVK_F17]	= irr::IRR_KEY_F17;
+	KeyCodes[kVK_F18]	= irr::IRR_KEY_F18;
+	KeyCodes[kVK_F19]	= irr::IRR_KEY_F19;
+	KeyCodes[kVK_F20]	= irr::IRR_KEY_F20;
+	KeyCodes[kVK_Home]	= irr::IRR_KEY_HOME;
+	KeyCodes[kVK_End]	= irr::IRR_KEY_END;
+	KeyCodes[NSInsertFunctionKey] = irr::IRR_KEY_INSERT;
+	KeyCodes[kVK_ForwardDelete] = irr::IRR_KEY_DELETE;
+	KeyCodes[kVK_Help] = irr::IRR_KEY_HELP;
+	KeyCodes[NSSelectFunctionKey] = irr::IRR_KEY_SELECT;
+	KeyCodes[NSPrintFunctionKey] = irr::IRR_KEY_PRINT;
+	KeyCodes[NSExecuteFunctionKey] = irr::IRR_KEY_EXECUT;
+	KeyCodes[NSPrintScreenFunctionKey] = irr::IRR_KEY_SNAPSHOT;
+	KeyCodes[NSPauseFunctionKey] = irr::IRR_KEY_PAUSE;
+	KeyCodes[NSScrollLockFunctionKey] = irr::IRR_KEY_SCROLL;
+	KeyCodes[kVK_Delete] = irr::IRR_KEY_BACK;
+	KeyCodes[kVK_Tab] = irr::IRR_KEY_TAB;
+	KeyCodes[kVK_Return] = irr::IRR_KEY_RETURN;
+	KeyCodes[kVK_Escape] = irr::IRR_KEY_ESCAPE;
+	KeyCodes[kVK_Control] = irr::IRR_KEY_CONTROL;
+	KeyCodes[kVK_RightControl] = irr::IRR_KEY_RCONTROL;
+	KeyCodes[kVK_Command] = irr::IRR_KEY_MENU;
+	KeyCodes[kVK_Shift] = irr::IRR_KEY_SHIFT;
+	KeyCodes[kVK_RightShift] = irr::IRR_KEY_RSHIFT;
+	KeyCodes[kVK_Space] = irr::IRR_KEY_SPACE;
 
-	KeyCodes[kVK_ANSI_A] = irr::KEY_KEY_A;
-	KeyCodes[kVK_ANSI_B] = irr::KEY_KEY_B;
-	KeyCodes[kVK_ANSI_C] = irr::KEY_KEY_C;
-	KeyCodes[kVK_ANSI_D] = irr::KEY_KEY_D;
-	KeyCodes[kVK_ANSI_E] = irr::KEY_KEY_E;
-	KeyCodes[kVK_ANSI_F] = irr::KEY_KEY_F;
-	KeyCodes[kVK_ANSI_G] = irr::KEY_KEY_G;
-	KeyCodes[kVK_ANSI_H] = irr::KEY_KEY_H;
-	KeyCodes[kVK_ANSI_I] = irr::KEY_KEY_I;
-	KeyCodes[kVK_ANSI_J] = irr::KEY_KEY_J;
-	KeyCodes[kVK_ANSI_K] = irr::KEY_KEY_K;
-	KeyCodes[kVK_ANSI_L] = irr::KEY_KEY_L;
-	KeyCodes[kVK_ANSI_M] = irr::KEY_KEY_M;
-	KeyCodes[kVK_ANSI_N] = irr::KEY_KEY_N;
-	KeyCodes[kVK_ANSI_O] = irr::KEY_KEY_O;
-	KeyCodes[kVK_ANSI_P] = irr::KEY_KEY_P;
-	KeyCodes[kVK_ANSI_Q] = irr::KEY_KEY_Q;
-	KeyCodes[kVK_ANSI_R] = irr::KEY_KEY_R;
-	KeyCodes[kVK_ANSI_S] = irr::KEY_KEY_S;
-	KeyCodes[kVK_ANSI_T] = irr::KEY_KEY_T;
-	KeyCodes[kVK_ANSI_U] = irr::KEY_KEY_U;
-	KeyCodes[kVK_ANSI_V] = irr::KEY_KEY_V;
-	KeyCodes[kVK_ANSI_W] = irr::KEY_KEY_W;
-	KeyCodes[kVK_ANSI_X] = irr::KEY_KEY_X;
-	KeyCodes[kVK_ANSI_X] = irr::KEY_KEY_X;
-	KeyCodes[kVK_ANSI_Y] = irr::KEY_KEY_Y;
-	KeyCodes[kVK_ANSI_Z] = irr::KEY_KEY_Z;
+	KeyCodes[kVK_ANSI_A] = irr::IRR_KEY_A;
+	KeyCodes[kVK_ANSI_B] = irr::IRR_KEY_B;
+	KeyCodes[kVK_ANSI_C] = irr::IRR_KEY_C;
+	KeyCodes[kVK_ANSI_D] = irr::IRR_KEY_D;
+	KeyCodes[kVK_ANSI_E] = irr::IRR_KEY_E;
+	KeyCodes[kVK_ANSI_F] = irr::IRR_KEY_F;
+	KeyCodes[kVK_ANSI_G] = irr::IRR_KEY_G;
+	KeyCodes[kVK_ANSI_H] = irr::IRR_KEY_H;
+	KeyCodes[kVK_ANSI_I] = irr::IRR_KEY_I;
+	KeyCodes[kVK_ANSI_J] = irr::IRR_KEY_J;
+	KeyCodes[kVK_ANSI_K] = irr::IRR_KEY_K;
+	KeyCodes[kVK_ANSI_L] = irr::IRR_KEY_L;
+	KeyCodes[kVK_ANSI_M] = irr::IRR_KEY_M;
+	KeyCodes[kVK_ANSI_N] = irr::IRR_KEY_N;
+	KeyCodes[kVK_ANSI_O] = irr::IRR_KEY_O;
+	KeyCodes[kVK_ANSI_P] = irr::IRR_KEY_P;
+	KeyCodes[kVK_ANSI_Q] = irr::IRR_KEY_Q;
+	KeyCodes[kVK_ANSI_R] = irr::IRR_KEY_R;
+	KeyCodes[kVK_ANSI_S] = irr::IRR_KEY_S;
+	KeyCodes[kVK_ANSI_T] = irr::IRR_KEY_T;
+	KeyCodes[kVK_ANSI_U] = irr::IRR_KEY_U;
+	KeyCodes[kVK_ANSI_V] = irr::IRR_KEY_V;
+	KeyCodes[kVK_ANSI_W] = irr::IRR_KEY_W;
+	KeyCodes[kVK_ANSI_X] = irr::IRR_KEY_X;
+	KeyCodes[kVK_ANSI_Y] = irr::IRR_KEY_Y;
+	KeyCodes[kVK_ANSI_Z] = irr::IRR_KEY_Z;
 
-	KeyCodes[kVK_ANSI_0] = irr::KEY_KEY_0;
-	KeyCodes[kVK_ANSI_1] = irr::KEY_KEY_1;
-	KeyCodes[kVK_ANSI_2] = irr::KEY_KEY_2;
-	KeyCodes[kVK_ANSI_3] = irr::KEY_KEY_3;
-	KeyCodes[kVK_ANSI_4] = irr::KEY_KEY_4;
-	KeyCodes[kVK_ANSI_5] = irr::KEY_KEY_5;
-	KeyCodes[kVK_ANSI_6] = irr::KEY_KEY_6;
-	KeyCodes[kVK_ANSI_7] = irr::KEY_KEY_7;
-	KeyCodes[kVK_ANSI_8] = irr::KEY_KEY_8;
-	KeyCodes[kVK_ANSI_9] = irr::KEY_KEY_9;
+	KeyCodes[kVK_ANSI_0] = irr::IRR_KEY_0;
+	KeyCodes[kVK_ANSI_1] = irr::IRR_KEY_1;
+	KeyCodes[kVK_ANSI_2] = irr::IRR_KEY_2;
+	KeyCodes[kVK_ANSI_3] = irr::IRR_KEY_3;
+	KeyCodes[kVK_ANSI_4] = irr::IRR_KEY_4;
+	KeyCodes[kVK_ANSI_5] = irr::IRR_KEY_5;
+	KeyCodes[kVK_ANSI_6] = irr::IRR_KEY_6;
+	KeyCodes[kVK_ANSI_7] = irr::IRR_KEY_7;
+	KeyCodes[kVK_ANSI_8] = irr::IRR_KEY_8;
+	KeyCodes[kVK_ANSI_9] = irr::IRR_KEY_9;
 
-	KeyCodes[kVK_ANSI_Slash] = irr::KEY_DIVIDE;
-	KeyCodes[kVK_ANSI_Comma] = irr::KEY_COMMA;
-	KeyCodes[kVK_ANSI_Period] = irr::KEY_PERIOD;
-	KeyCodes[kVK_PageUp] = irr::KEY_PRIOR;
-	KeyCodes[kVK_PageDown] = irr::KEY_NEXT;
+	KeyCodes[kVK_ANSI_Slash] = irr::IRR_KEY_DIVIDE;
+	KeyCodes[kVK_ANSI_Comma] = irr::IRR_KEY_COMMA;
+	KeyCodes[kVK_ANSI_Period] = irr::IRR_KEY_PERIOD;
+	KeyCodes[kVK_PageUp] = irr::IRR_KEY_PRIOR;
+	KeyCodes[kVK_PageDown] = irr::IRR_KEY_NEXT;
 
-	KeyCodes[kVK_ANSI_Keypad0] = irr::KEY_NUMPAD0;
-	KeyCodes[kVK_ANSI_Keypad1] = irr::KEY_NUMPAD1;
-	KeyCodes[kVK_ANSI_Keypad2] = irr::KEY_NUMPAD2;
-	KeyCodes[kVK_ANSI_Keypad3] = irr::KEY_NUMPAD3;
-	KeyCodes[kVK_ANSI_Keypad4] = irr::KEY_NUMPAD4;
-	KeyCodes[kVK_ANSI_Keypad5] = irr::KEY_NUMPAD5;
-	KeyCodes[kVK_ANSI_Keypad6] = irr::KEY_NUMPAD6;
-	KeyCodes[kVK_ANSI_Keypad7] = irr::KEY_NUMPAD7;
-	KeyCodes[kVK_ANSI_Keypad8] = irr::KEY_NUMPAD8;
-	KeyCodes[kVK_ANSI_Keypad9] = irr::KEY_NUMPAD9;
+	KeyCodes[kVK_ANSI_Keypad0] = irr::IRR_KEY_NUMPAD0;
+	KeyCodes[kVK_ANSI_Keypad1] = irr::IRR_KEY_NUMPAD1;
+	KeyCodes[kVK_ANSI_Keypad2] = irr::IRR_KEY_NUMPAD2;
+	KeyCodes[kVK_ANSI_Keypad3] = irr::IRR_KEY_NUMPAD3;
+	KeyCodes[kVK_ANSI_Keypad4] = irr::IRR_KEY_NUMPAD4;
+	KeyCodes[kVK_ANSI_Keypad5] = irr::IRR_KEY_NUMPAD5;
+	KeyCodes[kVK_ANSI_Keypad6] = irr::IRR_KEY_NUMPAD6;
+	KeyCodes[kVK_ANSI_Keypad7] = irr::IRR_KEY_NUMPAD7;
+	KeyCodes[kVK_ANSI_Keypad8] = irr::IRR_KEY_NUMPAD8;
+	KeyCodes[kVK_ANSI_Keypad9] = irr::IRR_KEY_NUMPAD9;
 
-	KeyCodes[kVK_ANSI_KeypadDecimal] = irr::KEY_DECIMAL;
-	KeyCodes[kVK_ANSI_KeypadMultiply] = irr::KEY_MULTIPLY;
-	KeyCodes[kVK_ANSI_KeypadPlus] = irr::KEY_PLUS;
-	KeyCodes[kVK_ANSI_KeypadClear] = irr::KEY_OEM_CLEAR;
-	KeyCodes[kVK_ANSI_KeypadDivide] = irr::KEY_DIVIDE;
-	KeyCodes[kVK_ANSI_KeypadEnter] = irr::KEY_RETURN;
-	KeyCodes[kVK_ANSI_KeypadMinus] = irr::KEY_SUBTRACT;
+	KeyCodes[kVK_ANSI_KeypadDecimal] = irr::IRR_KEY_DECIMAL;
+	KeyCodes[kVK_ANSI_KeypadMultiply] = irr::IRR_KEY_MULTIPLY;
+	KeyCodes[kVK_ANSI_KeypadPlus] = irr::IRR_KEY_PLUS;
+	KeyCodes[kVK_ANSI_KeypadClear] = irr::IRR_KEY_OEM_CLEAR;
+	KeyCodes[kVK_ANSI_KeypadDivide] = irr::IRR_KEY_DIVIDE;
+	KeyCodes[kVK_ANSI_KeypadEnter] = irr::IRR_KEY_RETURN;
+	KeyCodes[kVK_ANSI_KeypadMinus] = irr::IRR_KEY_SUBTRACT;
 }
 
 

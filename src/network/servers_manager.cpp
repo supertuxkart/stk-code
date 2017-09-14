@@ -153,7 +153,8 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             Network *broadcast = new Network(1, 1, 0, 0);
 
             BareNetworkString s(std::string("stk-server"));
-            TransportAddress broadcast_address(-1, 2757);
+            TransportAddress broadcast_address(-1, 
+                               NetworkConfig::get()->getServerDiscoveryPort());
             broadcast->sendRawPacket(s, broadcast_address);
 
             Log::info("ServersManager", "Sent broadcast message.");

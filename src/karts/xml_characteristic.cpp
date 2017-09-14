@@ -343,6 +343,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[STABILITY_DOWNWARD_IMPULSE_FACTOR]);
         sub_node->get("track-connection-accel",
             &m_values[STABILITY_TRACK_CONNECTION_ACCEL]);
+        sub_node->get("angular-factor",
+            &m_values[STABILITY_ANGULAR_FACTOR]);
         sub_node->get("smooth-flying-impulse",
             &m_values[STABILITY_SMOOTH_FLYING_IMPULSE]);
     }
@@ -435,12 +437,22 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[PARACHUTE_DURATION]);
         sub_node->get("duration-other",
             &m_values[PARACHUTE_DURATION_OTHER]);
+        sub_node->get("duration-rank-mult",
+            &m_values[PARACHUTE_DURATION_RANK_MULT]);
+        sub_node->get("duration-speed-mult",
+            &m_values[PARACHUTE_DURATION_SPEED_MULT]);
         sub_node->get("lbound-fraction",
             &m_values[PARACHUTE_LBOUND_FRACTION]);
         sub_node->get("ubound-fraction",
             &m_values[PARACHUTE_UBOUND_FRACTION]);
         sub_node->get("max-speed",
             &m_values[PARACHUTE_MAX_SPEED]);
+    }
+
+    if (const XMLNode *sub_node = node->getNode("friction"))
+    {
+        sub_node->get("kart-friction",
+            &m_values[FRICTION_KART_FRICTION]);
     }
 
     if (const XMLNode *sub_node = node->getNode("bubblegum"))

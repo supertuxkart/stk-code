@@ -20,6 +20,7 @@
 #define GET_PUBLIC_ADDRESS_HPP
 
 #include "network/protocol.hpp"
+#include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
 
 #include <string>
@@ -36,6 +37,10 @@ private:
     static const uint32_t m_stun_magic_cookie;
     static const int m_stun_server_port = 3478;
 
+    /** The user can specify its own IP address to make the use of stun
+     *  unnecessary (though that means that the user has to take care of
+     *  opening the firewall). */
+    static TransportAddress m_my_address;
     enum State
     {
         NOTHING_DONE,
@@ -48,8 +53,9 @@ private:
     Network* m_transaction_host;
 
 public:
-    GetPublicAddress(CallbackObject *callback = NULL);
-    virtual ~GetPublicAddress() {}
+    static void setMyIPAddress(const std::string &s);
+                GetPublicAddress(CallbackObject *callback = NULL);
+    virtual    ~GetPublicAddress() {}
 
     virtual void asynchronousUpdate() OVERRIDE;
     // ------------------------------------------------------------------------
@@ -60,6 +66,7 @@ public:
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE { return true; }
     // ------------------------------------------------------------------------
     virtual void setup() { m_state = NOTHING_DONE; }
+    // ------------------------------------------------------------------------
 
 };   // class GetPublicAddress
 

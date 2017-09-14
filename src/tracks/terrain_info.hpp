@@ -52,6 +52,7 @@ public:
                             const Material **m);
     virtual void update(const btMatrix3x3 &rotation, const Vec3 &from);
     virtual void update(const Vec3 &from);
+    virtual void update(const Vec3 &from, const Vec3 &towards);
 
     // ------------------------------------------------------------------------
     /** Simple wrapper with no offset. */

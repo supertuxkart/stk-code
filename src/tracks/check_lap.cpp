@@ -53,18 +53,18 @@ void CheckLap::reset(const Track &track)
 // ----------------------------------------------------------------------------
 /** True if going from old_pos to new_pos crosses this checkline. This function
  *  is called from update (of the checkline structure).
- *  \param old_pos  Position in previous frame.
- *  \param new_pos  Position in current frame.
+ *  \param old_pos    Position in previous frame.
+ *  \param new_pos    Position in current frame.
  *  \param kart_index Index of the kart, can be used to store kart specific
- *                  additional data.
+ *                    additional data.
  */
 bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
-    unsigned int kart_index)
+                           int kart_index)
 {
     World* w = World::getWorld();
     LinearWorld* lin_world = dynamic_cast<LinearWorld*>(w);
 
-    float track_length = w->getTrack()->getTrackLength();
+    float track_length = Track::getCurrentTrack()->getTrackLength();
     // Can happen if a non-lap based race mode is used with a scene file that
     // has check defined.
     if(!lin_world)

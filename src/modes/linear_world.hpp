@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "modes/world_with_rank.hpp"
-#include "tracks/track_sector.hpp"
 #include "utils/aligned_array.hpp"
 
 class SFXBase;
@@ -78,9 +77,6 @@ private:
          *  track-length plus distance-along-track). */
         float       m_overall_distance;
 
-        /** Stores the current graph node and track coordinates etc. */
-        TrackSector m_track_sector;
-
         /** Initialises all fields. */
         KartInfo()  { reset(); }
         // --------------------------------------------------------------------
@@ -92,14 +88,7 @@ private:
             m_time_at_last_lap = 99999.9f;
             m_estimated_finish = -1.0f;
             m_overall_distance = 0.0f;
-            m_track_sector.reset();
         }   // reset
-        // --------------------------------------------------------------------
-        /** Returns a pointer to the current node object. */
-        TrackSector *getTrackSector() {return &m_track_sector; }
-        // --------------------------------------------------------------------
-        /** Returns a pointer to the current node object. */
-        const TrackSector *getTrackSector() const {return &m_track_sector; }
     };
     // ------------------------------------------------------------------------
 
@@ -124,7 +113,6 @@ public:
     virtual      ~LinearWorld();
 
     virtual void  update(float delta) OVERRIDE;
-    int           getSectorForKart(const AbstractKart *kart) const;
     float         getDistanceDownTrackForKart(const int kart_id) const;
     float         getDistanceToCenterForKart(const int kart_id) const;
     float         getEstimatedFinishTime(const int kart_id) const;
@@ -150,14 +138,6 @@ public:
     /** Override settings from base class */
     virtual bool useChecklineRequirements() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
-    /** Returns true if the kart is on a valid driveline quad.
-     *  \param kart_index  Index of the kart. */
-    bool isOnRoad(unsigned int kart_index) const
-    {
-        return m_kart_info[kart_index].getTrackSector()->isOnRoad();
-    }   // isOnRoad
-
-    // ------------------------------------------------------------------------
     /** Returns the number of laps a kart has completed.
      *  \param kart_index World index of the kart. */
     int getKartLaps(unsigned int kart_index) const OVERRIDE
@@ -165,21 +145,8 @@ public:
         assert(kart_index < m_kart_info.size());
         return m_kart_info[kart_index].m_race_lap;
     }   // getkartLap
-
     // ------------------------------------------------------------------------
-    /** Returns the track_sector object for the specified kart.
-     *  \param kart_index World index of the kart. */
-    TrackSector& getTrackSector(unsigned int kart_index)
-    {
-        return m_kart_info[kart_index].m_track_sector;
-    }   // getTrackSector
-    // ------------------------------------------------------------------------
-    void setLastTriggeredCheckline(unsigned int kart_index, int index)
-    {
-        if (m_kart_info.size() == 0)
-            return;
-        m_kart_info[kart_index].m_track_sector.setLastTriggeredCheckline(index);
-    }
+    void setLastTriggeredCheckline(unsigned int kart_index, int index);
     // ------------------------------------------------------------------------
     /** Returns how far the kart has driven so far (i.e.
      *  number-of-laps-finished times track-length plus distance-on-track.

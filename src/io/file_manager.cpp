@@ -29,6 +29,10 @@
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
+#ifdef ANDROID
+#include "io/assets_android.hpp"
+#endif
+
 #include <irrlicht.h>
 
 #include <stdio.h>
@@ -144,6 +148,11 @@ FileManager::FileManager()
 #endif
 
     m_file_system = irr::io::createFileSystem();
+
+#ifdef ANDROID
+    AssetsAndroid android_assets(this);
+    android_assets.init();
+#endif
 
     std::string exe_path;
 
@@ -300,11 +309,11 @@ void FileManager::init()
     // Note that we can't push the texture search path in the constructor
     // since this also adds a file archive to the file system - and
     // m_file_system is deleted (in irr_driver)
-    pushTextureSearchPath(m_subdir_name[TEXTURE]);
-    if(fileExists(m_subdir_name[TEXTURE]+"deprecated/"))
-        pushTextureSearchPath(m_subdir_name[TEXTURE]+"deprecated/");
+    pushTextureSearchPath(m_subdir_name[TEXTURE], "textures");
+    if (fileExists(m_subdir_name[TEXTURE]+"deprecated/"))
+        pushTextureSearchPath(m_subdir_name[TEXTURE]+"deprecated/", "deprecatedtex");
 
-    pushTextureSearchPath(m_subdir_name[GUI]);
+    pushTextureSearchPath(m_subdir_name[GUI], "gui");
 
     pushModelSearchPath  (m_subdir_name[MODEL]);
     pushMusicSearchPath  (m_subdir_name[MUSIC]);
@@ -508,9 +517,9 @@ void FileManager::pushModelSearchPath(const std::string& path)
 /** Adds a texture search path to the list of texture search paths.
  *  This path will be searched before any other existing paths.
  */
-void FileManager::pushTextureSearchPath(const std::string& path)
+void FileManager::pushTextureSearchPath(const std::string& path, const std::string& container_id)
 {
-    m_texture_search_path.push_back(path);
+    m_texture_search_path.push_back(TextureSearchPath(path, container_id));
     const int n=m_file_system->getFileArchiveCount();
     m_file_system->addFileArchive(createAbsoluteFilename(path),
                                   /*ignoreCase*/false,
@@ -539,9 +548,9 @@ void FileManager::popTextureSearchPath()
 {
     if(!m_texture_search_path.empty())
     {
-        std::string dir = m_texture_search_path.back();
+        TextureSearchPath dir = m_texture_search_path.back();
         m_texture_search_path.pop_back();
-        m_file_system->removeFileArchive(createAbsoluteFilename(dir));
+        m_file_system->removeFileArchive(createAbsoluteFilename(dir.m_texture_search_path));
     }
 }   // popTextureSearchPath
 
@@ -589,6 +598,29 @@ bool FileManager::findFile(std::string& full_path,
         if(m_file_system->existFile(full_path.c_str())) return true;
     }
     full_path="";
+    return false;
+}   // findFile
+
+//-----------------------------------------------------------------------------
+/** Tries to find the specified file in any of the given search paths.
+*  \param full_path On return contains the full path of the file, or
+*         "" if the file is not found.
+*  \param file_name The name of the file to look for.
+*  \param search_path The list of paths to search for the file.
+*  \return True if the file is found, false otherwise.
+*/
+bool FileManager::findFile(std::string& full_path,
+    const std::string& file_name,
+    const std::vector<TextureSearchPath>& search_path) const
+{
+    for (std::vector<TextureSearchPath>::const_reverse_iterator
+        i = search_path.rbegin();
+        i != search_path.rend(); ++i)
+    {
+        full_path = i->m_texture_search_path + file_name;
+        if (m_file_system->existFile(full_path.c_str())) return true;
+    }
+    full_path = "";
     return false;
 }   // findFile
 
@@ -685,6 +717,27 @@ std::string FileManager::searchTexture(const std::string& file_name) const
 }   // searchTexture
 
 //-----------------------------------------------------------------------------
+
+bool FileManager::searchTextureContainerId(std::string& container_id,
+    const std::string& file_name) const
+{
+    std::string full_path;
+    for (std::vector<TextureSearchPath>::const_reverse_iterator
+        i = m_texture_search_path.rbegin();
+        i != m_texture_search_path.rend(); ++i)
+    {
+        full_path = i->m_texture_search_path + file_name;
+        if (m_file_system->existFile(full_path.c_str()))
+        {
+            container_id = i->m_container_id;
+            return true;
+        }
+    }
+    full_path = "";
+    return false;
+}   // findFile
+
+//-----------------------------------------------------------------------------
 /** Returns the list of all directories in which music files are searched.
  */
 std::vector<std::string> FileManager::getMusicDirs() const
@@ -738,7 +791,7 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
     for (unsigned int i=0; i<split.size(); i++)
     {
         current_path += split[i] + "/";
-        Log::info("[FileManager]", "Checking for: '%s",
+        Log::verbose("[FileManager]", "Checking for: '%s",
                     current_path.c_str());
         if (!m_file_system->existFile(io::path(current_path.c_str())))
         {
@@ -907,7 +960,8 @@ void FileManager::checkAndCreateScreenshotDir()
     m_screenshot_dir  = getenv("HOME");
     m_screenshot_dir += "/Library/Application Support/SuperTuxKart/Screenshots/";
 #else
-    m_screenshot_dir = checkAndCreateLinuxDir("XDG_CACHE_HOME", "supertuxkart", ".cache/", ".");
+    m_screenshot_dir  = checkAndCreateLinuxDir("XDG_DATA_HOME", "supertuxkart",
+                                          ".local/share", ".stkscreenshots");
     m_screenshot_dir += "screenshots/";
 #endif
 
@@ -1129,35 +1183,6 @@ void FileManager::redirectOutput()
 }   // redirectOutput
 
 //-----------------------------------------------------------------------------
-/** Returns the theoretical location of the cached version of a texture
-*   depending of the current config. (This function also works for directories:
-*   in this case the returned directory will be the cache location for all
-*   textures that you will find in the specified directory. The specified
-*   directory must end with '/')
-*   \note The returned location is where the cached data should be read or
-*   written but the file itseft does not necessarity exist. However, the
-*   directory structure is automatically created if it does not exist.
-*/
-std::string FileManager::getTextureCacheLocation(const std::string& filename)
-{
-    std::string file = StringUtils::getBasename(filename);
-
-    std::string parent_dir = StringUtils::getPath(filename);
-    if (StringUtils::hasSuffix(parent_dir, "/"))
-        parent_dir = parent_dir.substr(0, parent_dir.size() - 1);
-    parent_dir = StringUtils::getBasename(parent_dir);
-
-    std::string cache_subdir = (UserConfigParams::m_high_definition_textures & 0x01) == 0x01
-                               ? "hd/"
-                               : "resized/";
-    std::string cached_file =
-        getCachedTexturesDir() + cache_subdir + parent_dir + "/";
-    checkAndCreateDirectoryP(cached_file);
-    cached_file += file;
-    return cached_file;
-}   // getTextureCacheLocation
-
-//-----------------------------------------------------------------------------
 /** Returns the directory for addon files. */
 const std::string &FileManager::getAddonsDir() const
 {
@@ -1208,6 +1233,24 @@ std::string FileManager::searchMusic(const std::string& file_name) const
 }   // searchMusic
 
 //-----------------------------------------------------------------------------
+/** Returns the full path of a model file by searching all model search paths.
+ *  It throws an exception if the file is not found.
+ *  \param file_name File name to search for.
+ */
+std::string FileManager::searchModel(const std::string& file_name) const
+{
+    std::string path;
+    bool success = findFile(path, file_name, m_model_search_path);
+    if (!success)
+    {
+        throw std::runtime_error(
+            "[FileManager::searchModel] Cannot find model file '"
+            +file_name+"'.");
+    }
+    return path;
+}   // searchModel
+
+//-----------------------------------------------------------------------------
 /** Returns true if the given name is a directory.
  *  \param path File name to test.
  */
@@ -1236,10 +1279,8 @@ void FileManager::listFiles(std::set<std::string>& result,
 {
     result.clear();
 
-#ifndef ANDROID
     if(!isDirectory(dir))
         return;
-#endif
 
     io::path previous_cwd = m_file_system->getWorkingDirectory();
 
@@ -1306,26 +1347,37 @@ bool FileManager::removeDirectory(const std::string &name) const
 {
     std::set<std::string> files;
     listFiles(files, name, /*is full path*/ true);
-    for(std::set<std::string>::iterator i=files.begin(); i!=files.end(); i++)
+
+    for (std::string file : files)
     {
-        if((*i)=="." || (*i)=="..") continue;
-        if(UserConfigParams::logMisc())
+        if (file == "." || file == ".." || file == name + "/." || 
+            file == name + "/..") 
+            continue;
+
+        if (UserConfigParams::logMisc())
             Log::verbose("FileManager", "Deleting directory '%s'.",
-                         (*i).c_str());
-        if(isDirectory(*i))
+                         file.c_str());
+
+        if (isDirectory(file))
         {
             // This should not be necessary (since this function is only
             // used to remove addons), and it limits the damage in case
             // of any bugs - i.e. if name should be "/" or so.
-            // removeDirectory(full_path);
+            // We need to remove whole data directory on Android though, i.e.
+            // when we install newer STK version and new assets are extracted.
+            // So enable it only for Android for now.
+            #ifdef ANDROID
+            removeDirectory(file);
+            #endif
         }
         else
         {
-            removeFile(*i);
+            removeFile(file);
         }
     }
+    
 #if defined(WIN32)
-        return RemoveDirectory(name.c_str())==TRUE;
+    return RemoveDirectory(name.c_str())==TRUE;
 #else
     return remove(name.c_str())==0;
 #endif

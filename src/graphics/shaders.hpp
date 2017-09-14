@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #ifndef HEADER_SHADERS_HPP
 #define HEADER_SHADERS_HPP
 
@@ -120,7 +122,8 @@ public:
 
     // ========================================================================
     class TransparentShader : public TextureShader<TransparentShader, 1,
-                                                   core::matrix4, core::matrix4 >
+                                                   core::matrix4, core::vector2df,
+                                                   float >
     {
     public:
         TransparentShader();
@@ -128,34 +131,20 @@ public:
 
     // ========================================================================
     class TransparentFogShader : public TextureShader<TransparentFogShader, 1,
-                                     core::matrix4, core::matrix4, float, float,
+                                     core::matrix4, core::vector2df, float, float,
                                      float, float, float, video::SColorf >
     {
     public:
         TransparentFogShader();
     };   // TransparentFogShader
     // ========================================================================
-    class ObjectPass1Shader : public TextureShader<ObjectPass1Shader, 1,
-                                                  core::matrix4, core::matrix4>
+    class SkinnedTransparentShader : public TextureShader<SkinnedTransparentShader, 1,
+                                                 core::matrix4, core::vector2df,
+                                                 int, float >
     {
     public:
-        ObjectPass1Shader();
-    };   // ObjectPass1Shader
-
-    // ========================================================================
-    class ObjectPass2Shader : public TextureShader < ObjectPass2Shader, 6,
-                                                 core::matrix4, core::matrix4 >
-    {
-    private:
-        GLint m_color_change_location;
-    public:
-        ObjectPass2Shader();
-        virtual bool changeableColor(float hue = 0.0f, float min_sat = 0.0f) const OVERRIDE
-        {
-            glUniform2f(m_color_change_location, hue, min_sat);
-            return true;
-        }   // changeableColor
-    };   // ObjectPass2Shader
+        SkinnedTransparentShader();
+    };   // SkinnedTransparentShader
 
     // ========================================================================
 
@@ -163,3 +152,5 @@ public:
 };   // class Shaders
 
 #endif
+
+#endif   // SHADER_ONLY

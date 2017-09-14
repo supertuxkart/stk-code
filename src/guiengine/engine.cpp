@@ -659,15 +659,21 @@ namespace GUIEngine
 #include "config/user_config.hpp"
 #include "font/bold_face.hpp"
 #include "font/digit_face.hpp"
+#include "font/font_manager.hpp"
+#include "font/font_settings.hpp"
 #include "font/regular_face.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#ifndef SERVER_ONLY
 #include "graphics/2dutils.hpp"
+#endif
+#include "graphics/irr_driver.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "guiengine/skin.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/dialog_queue.hpp"
@@ -679,7 +685,6 @@ namespace GUIEngine
 #include <iostream>
 #include <assert.h>
 #include <irrlicht.h>
-#include "graphics/glwrap.hpp"
 
 using namespace irr::gui;
 using namespace irr::video;
@@ -963,6 +968,7 @@ namespace GUIEngine
         g_current_screen = NULL;
         needsUpdate.clearWithoutDeleting();
 
+        if (ScreenKeyboard::isActive()) ScreenKeyboard::dismiss();
         if (ModalDialog::isADialogActive()) ModalDialog::dismiss();
 
         //delete g_font;
@@ -1119,6 +1125,7 @@ namespace GUIEngine
 
     void render(float elapsed_time)
     {
+#ifndef SERVER_ONLY
         GUIEngine::dt = elapsed_time;
 
         // Not yet initialized, or already cleaned up
@@ -1206,7 +1213,6 @@ namespace GUIEngine
                                                   y_from - count*text_height),
                                 core::dimension2d<s32>(screen_size.Width,
                                                        text_height) );
-
                     GL32_draw2DRectangle(SColor(255,252,248,230),
                                                        msgRect);
                     Private::g_font->draw((*it).m_message.c_str(),
@@ -1242,7 +1248,7 @@ namespace GUIEngine
             DemoWorld::resetIdleTime();
         }
 
-
+#endif
     }   // render
 
     // -----------------------------------------------------------------------
@@ -1250,6 +1256,7 @@ namespace GUIEngine
 
     void renderLoading(bool clearIcons)
     {
+#ifndef SERVER_ONLY
         if (clearIcons) g_loading_icons.clear();
 
         g_skin->drawBgImage();
@@ -1313,7 +1320,7 @@ namespace GUIEngine
                 x = ICON_MARGIN;
             }
         }
-
+#endif
     } // renderLoading
 
     // -----------------------------------------------------------------------
@@ -1340,12 +1347,19 @@ namespace GUIEngine
 
     Widget* getWidget(const char* name)
     {
+        if (ScreenKeyboard::isActive())
+        {
+            Widget* widget = ScreenKeyboard::getCurrent()->getWidget(name);
+            if (widget != NULL) 
+                return widget;
+        }
+        
         // if a modal dialog is shown, search within it too
         if (ModalDialog::isADialogActive())
         {
-            Widget* widgetWithinDialog =
-                ModalDialog::getCurrent()->getWidget(name);
-            if (widgetWithinDialog != NULL) return widgetWithinDialog;
+            Widget* widget = ModalDialog::getCurrent()->getWidget(name);
+            if (widget != NULL) 
+                return widget;
         }
 
         Screen* screen = getCurrentScreen();
@@ -1358,12 +1372,19 @@ namespace GUIEngine
     // -----------------------------------------------------------------------
     Widget* getWidget(const int id)
     {
+        if (ScreenKeyboard::isActive())
+        {
+            Widget* widget = ScreenKeyboard::getCurrent()->getWidget(id);
+            if (widget != NULL) 
+                return widget;
+        }
+        
         // if a modal dialog is shown, search within it too
         if (ModalDialog::isADialogActive())
         {
-            Widget* widgetWithinDialog =
-                ModalDialog::getCurrent()->getWidget(id);
-            if (widgetWithinDialog != NULL) return widgetWithinDialog;
+            Widget* widget = ModalDialog::getCurrent()->getWidget(id);
+            if (widget != NULL) 
+                return widget;
         }
 
         Screen* screen = getCurrentScreen();

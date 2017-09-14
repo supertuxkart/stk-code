@@ -436,7 +436,7 @@ bool ChallengeData::isChallengeFulfilled() const
     // Single races
     // ------------
     World *world = World::getWorld();
-    std::string track_name = world->getTrack()->getIdent();
+    std::string track_name = Track::getCurrentTrack()->getIdent();
 
     int d = race_manager->getDifficulty();
 
@@ -516,7 +516,6 @@ const irr::core::stringw
             if (track == NULL) return irr::core::stringw( L"????" );
 
             return _("New track '%s' now available", track->getName());
-            break;
         }
         case UNLOCK_MODE:
         {

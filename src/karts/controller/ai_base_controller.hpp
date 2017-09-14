@@ -64,22 +64,20 @@ protected:
      *  for AI testing only. */
     static int m_test_ai;
 
-    /** Position info structure of targets. */
-    struct posData {bool behind; bool lhs; float angle; float distance;};
-
     void         setControllerName(const std::string &name);
     float        steerToPoint(const Vec3 &point);
     float        normalizeAngle(float angle);
-    virtual void update      (float delta);
-    virtual void setSteering   (float angle, float dt);
-    virtual bool canSkid(float steer_fraction) = 0;
     // ------------------------------------------------------------------------
     /** This can be called to detect if the kart is stuck (i.e. repeatedly
     *  hitting part of the track). */
     bool         isStuck() const { return m_stuck; }
-    void         checkPosition(const Vec3&, posData*,
-                               Vec3* lc = NULL,
-                               bool use_front_xyz = false) const;
+    void         determineTurnRadius(const Vec3 &end, Vec3 *center,
+                                     float *radius) const;
+    virtual void update      (float delta);
+    virtual void setSteering   (float angle, float dt);
+    // ------------------------------------------------------------------------
+    /** Return true if AI can skid now. */
+    virtual bool canSkid(float steer_fraction) = 0;
 
 public:
              AIBaseController(AbstractKart *kart);

@@ -174,6 +174,7 @@ void STKModifiedSpriteBank::draw2DSprite(u32 index,
         const core::rect<s32>* clip, const video::SColor& color,
         u32 starttime, u32 currenttime, bool loop, bool center)
 {
+#ifndef SERVER_ONLY
     assert( m_magic_number == 0xCAFEC001 );
     if (index >= Sprites.size() || Sprites[index].Frames.empty() )
         return;
@@ -221,7 +222,7 @@ void STKModifiedSpriteBank::draw2DSprite(u32 index,
      */
     draw2DImage(tex, dest, r /* source rect */, clip,
                         NULL /* colors */, true);
-
+#endif
 }   // draw2DSprite
 
 // ----------------------------------------------------------------------------

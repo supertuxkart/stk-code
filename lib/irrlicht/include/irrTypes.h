@@ -195,6 +195,20 @@ For functions:		template<class T> _IRR_DEPRECATED_ void test4(void) {}
 #define _IRR_DEPRECATED_
 #endif
 
+//! Defines an override macro, to protect virtual functions from typos and other mismatches
+/** Usage in a derived class:
+virtual void somefunc() _IRR_OVERRIDE_;
+*/
+#if ( ((__GNUC__ > 4 ) || ((__GNUC__ == 4 ) && (__GNUC_MINOR__ >= 7))) && (defined(__GXX_EXPERIMENTAL_CXX0X) || __cplusplus >= 201103L) )
+#define _IRR_OVERRIDE_ override
+#elif (_MSC_VER >= 1600 ) /* supported since MSVC 2010 */
+#define _IRR_OVERRIDE_ override
+#elif (__clang_major__ >= 3)
+#define _IRR_OVERRIDE_ override
+#else
+#define _IRR_OVERRIDE_
+#endif
+
 //! Defines a small statement to work around a microsoft compiler bug.
 /** The microsoft compiler 7.0 - 7.1 has a bug:
 When you call unmanaged code that returns a bool type value of false from managed code,

@@ -49,7 +49,13 @@ Server::Server(const XMLNode & xml, bool is_lan)
     xml.get("hostid", &m_host_id);
     xml.get("max_players", &m_max_players);
     xml.get("current_players", &m_current_players);
-
+    uint32_t ip;
+    xml.get("ip", &ip);
+    m_address.setIP(ip);
+    uint16_t port;
+    xml.get("port", &port);
+    m_address.setPort(port);
+    xml.get("private_port", &m_private_port);
 } // Server(const XML&)
 
 // ----------------------------------------------------------------------------

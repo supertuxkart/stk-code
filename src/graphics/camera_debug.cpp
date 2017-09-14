@@ -92,9 +92,7 @@ void CameraDebug::update(float dt)
 {
     Camera::update(dt);
 
-    // To view inside tunnels in top mode, increase near value
-    m_camera->setNearValue(m_default_debug_Type==CM_DEBUG_TOP_OF_KART 
-                           ? 27.0f : 1.0f);
+    m_camera->setNearValue(1.0f);
 
     float above_kart, cam_angle, side_way, distance;
 
@@ -104,8 +102,17 @@ void CameraDebug::update(float dt)
     {
         core::vector3df xyz = m_kart->getXYZ().toIrrVector();
         m_camera->setTarget(xyz);
+#define CLOSE_TO_KART
+#ifdef CLOSE_TO_KART
+        // Better for debugging physics/collision issues
+        xyz.Y = xyz.Y+7;
+        m_camera->setNearValue(7.0f);
+#else
+        // Very high few, better for debugging AI behaviour
         xyz.Y = xyz.Y+55;
         xyz.Z -= 5.0f;
+        m_camera->setNearValue(27.0f);
+#endif
         m_camera->setPosition(xyz);
     }
     else if (m_default_debug_Type==CM_DEBUG_SIDE_OF_KART)

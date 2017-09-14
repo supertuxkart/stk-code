@@ -25,7 +25,6 @@
 
 class Camera;
 class LinearWorld;
-class QuadGraph;
 class Track;
 class Vec3;
 

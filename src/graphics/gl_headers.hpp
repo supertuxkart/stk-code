@@ -18,6 +18,8 @@
 #ifndef GL_HEADER_HPP
 #define GL_HEADER_HPP
 
+#ifndef SERVER_ONLY
+
 #define GLEW_STATIC
 
 extern "C" {
@@ -41,6 +43,7 @@ extern "C" {
 #        define GL_TEXTURE_SWIZZLE_RGBA 0x8E46
 #    endif
 #elif defined(USE_GLES2)
+#    define __gl2_h_
 #    include <GLES3/gl3.h>
 #    include <GLES3/gl3ext.h>
 #    include <GLES2/gl2ext.h>
@@ -79,5 +82,12 @@ struct DrawElementsIndirectCommand{
     GLuint baseVertex;
     GLuint baseInstance;
 };
+#else
+  typedef unsigned int GLuint;
+  typedef unsigned int GLsync;
+  typedef unsigned int GLenum;
+
+#endif   // server only
 
 #endif
+

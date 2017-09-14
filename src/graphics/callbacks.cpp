@@ -158,10 +158,10 @@ void DisplaceProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void DisplaceProvider::update()
 {
-    if (World::getWorld() == NULL) return;
+    if (!Track::getCurrentTrack()) return;
 
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-    const float speed = World::getWorld()->getTrack()->getDisplacementSpeed();
+    const float speed = Track::getCurrentTrack()->getDisplacementSpeed();
 
     float strength = time;
     strength = fabsf(noise2d(strength / 10.0f)) * 0.006f + 0.002f;

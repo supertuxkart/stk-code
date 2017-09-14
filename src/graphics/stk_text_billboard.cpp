@@ -15,14 +15,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/stk_text_billboard.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
-#include "guiengine/engine.hpp"
-#include "glwrap.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include <SMesh.h>
 #include <SMeshBuffer.h>
 #include <ISceneManager.h>
@@ -50,14 +50,28 @@ STKTextBillboard::STKTextBillboard(core::stringw text, FontWithFace* font,
 
 void STKTextBillboard::updateAbsolutePosition()
 {
+    // Make billboard always face the camera
+    scene::ICameraSceneNode* curr_cam =
+        irr_driver->getSceneManager()->getActiveCamera();
+    if (!curr_cam) return;
+    core::quaternion q(curr_cam->getViewMatrix());
+    q.W = -q.W;
+
     if (Parent)
     {
         // Override to not use the parent's rotation
-        AbsoluteTransformation = getRelativeTransformation();
-        AbsoluteTransformation.setTranslation(AbsoluteTransformation.getTranslation() + Parent->getAbsolutePosition());
+        core::vector3df wc = RelativeTranslation;
+        Parent->getAbsoluteTransformation().transformVect(wc);
+        AbsoluteTransformation.setTranslation(wc);
+        q.getMatrix(AbsoluteTransformation, wc);
     }
     else
-        AbsoluteTransformation = getRelativeTransformation();
+    {
+        q.getMatrix(AbsoluteTransformation, RelativeTranslation);
+    }
+    core::matrix4 m;
+    m.setScale(RelativeScale);
+    AbsoluteTransformation *= m;
 }
 
 scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, FontWithFace* font)
@@ -109,8 +123,8 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, FontWithFace* fo
         {
             buffer = new scene::SMeshBuffer();
             buffer->getMaterial().setTexture(0, m_chars[i].m_texture);
-            buffer->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-            buffer->getMaterial().setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+            buffer->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+            buffer->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
             buffer->getMaterial().MaterialType = Shaders::getShader(ES_OBJECT_UNLIT);
             buffers[m_chars[i].m_texture] = buffer;
         }
@@ -171,18 +185,6 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, FontWithFace* fo
     return Mesh;
 }
 
-void STKTextBillboard::updateNoGL()
-{
-    scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
-    core::vector3df cam_pos = curr_cam->getPosition();
-    core::vector3df text_pos = this->getAbsolutePosition();
-    float angle = atan2(text_pos.X - cam_pos.X, text_pos.Z - cam_pos.Z);
-    this->setRotation(core::vector3df(0.0f, angle * 180.0f / M_PI, 0.0f));
-    updateAbsolutePosition();
-
-    STKMeshSceneNode::updateNoGL();
-}
-
 void STKTextBillboard::collectChar(video::ITexture* texture,
     const core::rect<float>& destRect,
     const core::rect<s32>& sourceRect,
@@ -190,3 +192,6 @@ void STKTextBillboard::collectChar(video::ITexture* texture,
 {
     m_chars.push_back(STKTextBillboardChar(texture, destRect, sourceRect, colors));
 }
+
+#endif   // !SERVER_ONLY
+

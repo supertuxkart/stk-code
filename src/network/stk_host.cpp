@@ -26,7 +26,7 @@
 #include "network/network_string.hpp"
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/connect_to_server.hpp"
-#include "network/protocols/server_lobby_room_protocol.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_peer.hpp"
@@ -47,7 +47,7 @@
 #include <signal.h>
 
 STKHost *STKHost::m_stk_host       = NULL;
-bool     STKHost::m_enable_console = true;
+bool     STKHost::m_enable_console = false;
 
 void STKHost::create()
 {
@@ -101,7 +101,7 @@ void STKHost::create()
  *
  *  Server:
  *
- *    1. ServerLobbyRoomProtocol:
+ *    1. ServerLobby:
  *       Spawns the following sub-protocols:
  *       1. GetPublicAddress: Use STUN to discover the public ip address
  *          and port number of this host.
@@ -141,7 +141,7 @@ void STKHost::create()
  *
  * Server:
  *
- *   The ServerLobbyRoomProtocol (SLR) will the detect the above client
+ *   The ServerLobby (SLR) will then detect the above client
  *   requests, and start a ConnectToPeer protocol for each incoming client.
  *   The ConnectToPeer protocol uses:
  *         1. GetPeerAddress to get the ip address and port of the client.
@@ -151,7 +151,7 @@ void STKHost::create()
  *            destination (unless if it is a LAN connection, then UDP
  *            broadcasts will be used). 
  *
- *  Each client will run a ClientLobbyRoomProtocol (CLR) to handle the further
+ *  Each client will run a ClientLobbyProtocol (CLR) to handle the further
  *  interaction with the server. The client will first request a connection
  *  with the server (this is for the 'logical' connection to the server; so
  *  far it was mostly about the 'physical' connection, i.e. being able to send
@@ -162,7 +162,7 @@ void STKHost::create()
  *  each received message to the protocol with the same id. So any message
  *  sent by protocol X on the server will be received by protocol X on the
  *  client and vice versa. The only exception are the client- and server-lobby:
- *  They share the same id (set in LobbyRoomProtocol), so a message sent by
+ *  They share the same id (set in LobbyProtocol), so a message sent by
  *  the SLR will be received by the CLR, and a message from the CLR will be
  *  received by the SLR.
  *
@@ -184,7 +184,7 @@ void STKHost::create()
  *  This triggers the creation of the kart selection screen in 
  *  CLR::startSelection / CLR::update for all clients. The clients create
  *  the ActivePlayer object (which stores which device is used by which
- *  plauyer).  The kart selection in a client calls
+ *  player).  The kart selection in a client calls
  *  (NetworkKartSelection::playerConfirm) which calls CLR::requestKartSelection.
  *  This sends a message to SLR::kartSelectionRequested, which verifies the
  *  selected kart and sends this information to all clients (including the
@@ -206,19 +206,33 @@ void STKHost::create()
  *  stored in RaceConfig of GameSetup.
  * 
  *  The server will detect when the track votes from each client have been
- *  received and will trigger the start of the race (SLR::startGame, called
- *  from playerTrackVote). In SLR::startGame the server will start the 
- *  StartGameProtocol and the clients will be informed to start the game.
- *  In a client the StartGame protocol will be started in CLR::startGame. 
+ *  received and will inform all clients to load the world (playerTrackVote).
+ *  Then (state LOAD_GAME) the server will load the world and wait for all
+ *  clients to finish loading (WAIT_FOR_WORLD_LOADED).
  *  
- *  The StartGame protocol will create the ActivePlayers for all non-local
- *  players: on a server, all karts are non-local. On a client, the
- *  ActivePlayer objects for each local players have been created (to store
- *  the device used by each player when joining), so they are used to create
- *  the LocalPlayerController for each kart. Each remote player gets a
+ *  In LR::loadWorld all ActivePlayers for all non-local players are created.
+ *  (on a server all karts are non-local). On a client, the ActivePlayer
+ *  objects for each local players have been created (to store the device
+ *  used by each player when joining), so they are used to create the 
+ *  LocalPlayerController for each kart. Each remote player gets a
  *  NULL ActivePlayer (the ActivePlayer is only used for assigning the input
  *  device to each kart, achievements and highscores, so it's not needed for
- *  remote players).
+ *  remote players). It will also start the LatencyProtocol, 
+ *  RaceEventManager and then load the world.
+
+ * TODO:
+ *  Once the server has received all
+ *  messages in notifyEventAsynchronous(), it will call startCountdown()
+ *  in the LatencyProtocol. The LatencyProtocol is 
+ *  sending regular (once per second) pings to the clients and measure
+ *  the averate latency. Upon starting the countdown this information
+ *  is included in the ping request, so the clients can start the countdown
+ *  at that stage as well.
+ * 
+ *  Once the countdown is 0 (or below), the Synchronization Protocol will
+ *  start the protocols: KartUpdateProtocol, ControllerEventsProtocol,
+ *  GameEventsProtocol. Then the LatencyProtocol is terminated
+ *  which indicates to the main loop to start the actual game.
  */
 
 // ============================================================================
@@ -231,9 +245,13 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
     // server is made.
     m_host_id = 0;
     init();
+    TransportAddress a;
+    a.setIP(0);
+    a.setPort(NetworkConfig::get()->getClientPort());
+    ENetAddress ea = a.toEnetAddress();
 
     m_network = new Network(/*peer_count*/1,       /*channel_limit*/2,
-                            /*max_in_bandwidth*/0, /*max_out_bandwidth*/0);
+                            /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &ea);
     if (!m_network)
     {
         Log::fatal ("STKHost", "An error occurred while trying to create "
@@ -246,7 +264,7 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
 
 // ----------------------------------------------------------------------------
 /** The constructor for a server.
- *  The server control flow starts with the ServerLobbyRoomProtocol.
+ *  The server control flow starts with the ServerLobby.
  */
 STKHost::STKHost(const irr::core::stringw &server_name)
 {
@@ -258,7 +276,7 @@ STKHost::STKHost(const irr::core::stringw &server_name)
 
     ENetAddress addr;
     addr.host = STKHost::HOST_ANY;
-    addr.port = 2758;
+    addr.port = NetworkConfig::get()->getServerPort();
 
     m_network= new Network(NetworkConfig::get()->getMaxPlayers(),
                            /*channel_limit*/2,
@@ -271,7 +289,8 @@ STKHost::STKHost(const irr::core::stringw &server_name)
     }
 
     startListening();
-    ProtocolManager::getInstance()->requestStart(new ServerLobbyRoomProtocol());
+    Protocol *p = LobbyProtocol::create<ServerLobby>();
+    ProtocolManager::getInstance()->requestStart(p);
 
 }   // STKHost(server_name)
 
@@ -304,6 +323,7 @@ void STKHost::init()
     ProtocolManager::getInstance<ProtocolManager>();
 
     // Optional: start the network console
+    m_network_console = NULL;
     if(m_enable_console)
     {
         m_network_console = new NetworkConsole();
@@ -509,9 +529,9 @@ void* STKHost::mainLoop(void* self)
     ENetHost* host = myself->m_network->getENetHost();
 
     if(NetworkConfig::get()->isServer() && 
-        NetworkConfig::get()->isLAN()      )
+        (NetworkConfig::get()->isLAN() || NetworkConfig::get()->isPublicServer()) )
     {
-        TransportAddress address(0, 2757);
+        TransportAddress address(0, NetworkConfig::get()->getServerDiscoveryPort());
         ENetAddress eaddr = address.toEnetAddress();
         myself->m_lan_network = new Network(1, 1, 0, 0, &eaddr);
     }
@@ -520,7 +540,7 @@ void* STKHost::mainLoop(void* self)
     {
         if(myself->m_lan_network)
         {
-            myself->handleLANRequests();
+            myself->handleDirectSocketRequest();
         }   // if discovery host
 
         while (enet_host_service(host, &event, 20) != 0)
@@ -565,7 +585,15 @@ void* STKHost::mainLoop(void* self)
 }   // mainLoop
 
 // ----------------------------------------------------------------------------
-void STKHost::handleLANRequests()
+/** Handles a direct request given to a socket. This is typically a LAN 
+ *  request, but can also be used if the server is public (i.e. not behind
+ *  a fire wall) to allow direct connection to the server (without using the
+ *  STK server). It checks for any messages (i.e. a LAN broadcast requesting
+ *  server details or a connection request) and if a valid LAN server-request
+ *  message is received, will answer with a message containing server details
+ *  (and sender IP address and port).
+ */
+void STKHost::handleDirectSocketRequest()
 {
     const int LEN=2048;
     char buffer[LEN];
@@ -576,6 +604,7 @@ void STKHost::handleLANRequests()
     BareNetworkString message(buffer, len);
     std::string command;
     message.decodeString(&command);
+
     if (command == "stk-server")
     {
         Log::verbose("STKHost", "Received LAN server query");
@@ -601,6 +630,15 @@ void STKHost::handleLANRequests()
     }   // if message is server-requested
     else if (command == "connection-request")
     {
+        // In case of a LAN connection, we only allow connections from
+        // a LAN address (192.168*, ..., and 127.*).
+        if (NetworkConfig::get()->isLAN() && !sender.isLAN())
+        {
+            Log::error("STKHost", "Client trying to connect from '%s'",
+                       sender.toString().c_str());
+            Log::error("STKHost", "which is outside of LAN - rejected.");
+            return;
+        }
         Protocol *c = new ConnectToPeer(sender);
         c->requestStart();
     }
@@ -608,7 +646,7 @@ void STKHost::handleLANRequests()
         Log::info("STKHost", "Received unknown command '%s'",
                   std::string(buffer, len).c_str());
 
-}   // handleLANRequests
+}   // handleDirectSocketRequest
 
 // ----------------------------------------------------------------------------
 /** \brief Tells if a peer is known.

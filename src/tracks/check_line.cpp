@@ -20,7 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/glwrap.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
@@ -30,6 +30,7 @@
 #include "irrlicht.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <string>
 
 /** Constructor for a checkline.
@@ -39,6 +40,7 @@
 CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
          : CheckStructure(node, index)
 {
+    m_ignore_height = false;
     // Note that when this is called the karts have not been allocated
     // in world, so we can't call world->getNumKarts()
     m_previous_sign.resize(race_manager->getNumberOfKarts());
@@ -71,6 +73,7 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
     m_line.setLine(p1, p2);
     if(UserConfigParams::m_check_debug)
     {
+#ifndef SERVER_ONLY
         video::SMaterial material;
         material.setFlag(video::EMF_BACK_FACE_CULLING, false);
         material.setFlag(video::EMF_LIGHTING, false);
@@ -101,13 +104,14 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
                               : video::SColor(128, 128, 128, 128);
         }
         buffer->recalculateBoundingBox();
-        buffer->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
-        buffer->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-        buffer->getMaterial().setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        buffer->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+        buffer->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        buffer->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
         buffer->getMaterial().BackfaceCulling = false;
         //mesh->setBoundingBox(buffer->getBoundingBox());
         m_debug_node = irr_driver->addMesh(mesh, "checkdebug");
         mesh->drop();
+#endif
     }
     else
     {
@@ -135,6 +139,14 @@ void CheckLine::reset(const Track &track)
 }   // reset
 
 // ----------------------------------------------------------------------------
+void CheckLine::resetAfterKartMove(unsigned int kart_index)
+{
+    if (m_previous_position.empty()) return;
+    AbstractKart *kart = World::getWorld()->getKart(kart_index);
+    m_previous_position[kart_index] = kart->getXYZ();
+}   // resetAfterKartMove
+
+// ----------------------------------------------------------------------------
 void CheckLine::changeDebugColor(bool is_active)
 {
     assert(m_debug_node);
@@ -149,20 +161,23 @@ void CheckLine::changeDebugColor(bool is_active)
     {
         vertices[i].Color = color;
     }
-    buffer->getMaterial().setTexture(0, getUnicolorTexture(color));
+#ifndef SERVER_ONLY
+    buffer->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(color));
+#endif
 
 }   // changeDebugColor
 
 // ----------------------------------------------------------------------------
 /** True if going from old_pos to new_pos crosses this checkline. This function
  *  is called from update (of the checkline structure).
- *  \param old_pos  Position in previous frame.
- *  \param new_pos  Position in current frame.
- *  \param indx     Index of the kart, can be used to store kart specific
- *                  additional data.
+ *  \param old_pos   Position in previous frame.
+ *  \param new_pos   Position in current frame.
+ *  \param kart_indx Index of the kart, can be used to store kart specific
+ *                   additional data. If set to a negative number it will
+ *                   be ignored (used for e.g. soccer ball, and basket ball).
  */
 bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
-    unsigned int kart_index)
+                            int kart_index)
 {
     World* w = World::getWorld();
     core::vector2df p=new_pos.toIrrVector2d();
@@ -171,7 +186,7 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
 
     bool previous_sign;
 
-    if (kart_index == -1)
+    if (kart_index < 0)
     {
         core::vector2df p = old_pos.toIrrVector2d();
         previous_sign = (m_line.getPointOrientation(p) >= 0);
@@ -183,18 +198,20 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
 
     // If the sign has changed, i.e. the infinite line was crossed somewhere,
     // check if the finite line was actually crossed:
+    core::vector2df cross_point;
     if (sign != previous_sign &&
         m_line.intersectWith(core::line2df(old_pos.toIrrVector2d(),
                                            new_pos.toIrrVector2d()),
-                             m_cross_point) )
+                             cross_point) )
     {
         // Now check the minimum height: the kart position must be within a
         // reasonable distance in the Z axis - 'reasonable' for now to be
         // between -1 and 4 units (negative numbers are unlikely, but help
         // in case that the kart is 'somewhat' inside of the track, or the
         // checklines are a bit off in Z direction.
-        result = new_pos.getY()-m_min_height<m_over_min_height   &&
-                 new_pos.getY()-m_min_height>-m_under_min_height;
+        result = m_ignore_height || 
+                        (new_pos.getY()-m_min_height<m_over_min_height   &&
+                         new_pos.getY()-m_min_height>-m_under_min_height     );
         if(UserConfigParams::m_check_debug && !result)
         {
             if(World::getWorld()->getNumKarts()>0)
@@ -206,20 +223,20 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                 Log::info("CheckLine", "Kart %d crosses line, but wrong height "
                           "(%f vs %f).",
                           kart_index, new_pos.getY(), m_min_height);
-
         }
     }
     else
         result = false;
 
-    if (kart_index != -1)
-        m_previous_sign[kart_index] = sign;
-
-    if (result && kart_index != -1)
+    if (kart_index >= 0)
     {
-        LinearWorld* lw = dynamic_cast<LinearWorld*>(w);
-        if (lw != NULL)
-            lw->setLastTriggeredCheckline(kart_index, m_index);
+        m_previous_sign[kart_index] = sign;
+        if (result)
+        {
+            LinearWorld* lw = dynamic_cast<LinearWorld*>(w);
+            if (lw != NULL)
+                lw->setLastTriggeredCheckline(kart_index, m_index);
+        }
     }
     return result;
 }   // isTriggered

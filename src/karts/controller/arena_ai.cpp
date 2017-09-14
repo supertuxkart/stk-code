@@ -23,27 +23,21 @@
 #include "items/powerup.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
-#include "karts/controller/player_controller.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_properties.hpp"
-#include "tracks/battle_graph.hpp"
-#include "tracks/quad.hpp"
-#include "utils/log.hpp"
+#include "karts/rescue_animation.hpp"
+#include "tracks/arena_graph.hpp"
+#include "tracks/arena_node.hpp"
 
-int ArenaAI::m_test_node_for_banana = BattleGraph::UNKNOWN_POLY;
-
-bool isNodeWithBanana(const std::pair<const Item*, int>& item_pair)
-{
-    return item_pair.second == ArenaAI::m_test_node_for_banana &&
-        item_pair.first->getType() == Item::ITEM_BANANA &&
-        !item_pair.first->wasCollected();
-}
+#include <algorithm>
 
 ArenaAI::ArenaAI(AbstractKart *kart)
        : AIBaseController(kart)
 {
     m_debug_sphere = NULL;
     m_debug_sphere_next = NULL;
+    m_graph = ArenaGraph::get();
+    assert(m_graph != NULL);
 }   // ArenaAI
 
 //-----------------------------------------------------------------------------
@@ -51,28 +45,26 @@ ArenaAI::ArenaAI(AbstractKart *kart)
  */
 void ArenaAI::reset()
 {
-    m_target_node = BattleGraph::UNKNOWN_POLY;
-    m_current_forward_node = BattleGraph::UNKNOWN_POLY;
+    m_target_node = Graph::UNKNOWN_SECTOR;
+    m_current_forward_node = Graph::UNKNOWN_SECTOR;
     m_current_forward_point = Vec3(0, 0, 0);
-    m_adjusting_side = false;
     m_closest_kart = NULL;
-    m_closest_kart_node = BattleGraph::UNKNOWN_POLY;
+    m_closest_kart_node = Graph::UNKNOWN_SECTOR;
     m_closest_kart_point = Vec3(0, 0, 0);
-    m_closest_kart_pos_data = {0};
-    m_cur_kart_pos_data = {0};
     m_is_stuck = false;
     m_is_uturn = false;
-    m_avoiding_banana = false;
+    m_mini_skid = false;
     m_target_point = Vec3(0, 0, 0);
+    m_target_point_lc = Vec3(0, 0, 0);
+    m_reverse_point = Vec3(0, 0, 0);
     m_time_since_last_shot = 0.0f;
     m_time_since_driving = 0.0f;
+    m_time_since_off_road = 0.0f;
     m_time_since_reversing = 0.0f;
     m_time_since_uturn = 0.0f;
     m_turn_radius = 0.0f;
-    m_turn_angle = 0.0f;
+    m_steering_angle = 0.0f;
     m_on_node.clear();
-    m_aiming_points.clear();
-    m_aiming_nodes.clear();
 
     m_cur_difficulty = race_manager->getDifficulty();
     AIBaseController::reset();
@@ -82,18 +74,41 @@ void ArenaAI::reset()
 /** This is the main entry point for the AI.
  *  It is called once per frame for each AI and determines the behaviour of
  *  the AI, e.g. steering, accelerating/braking, firing.
+ *  \param dt Time step size.
  */
 void ArenaAI::update(float dt)
 {
     // This is used to enable firing an item backwards.
-    m_controls->m_look_back = false;
-    m_controls->m_nitro     = false;
-    m_avoiding_banana = false;
+    m_controls->setLookBack(false);
+    m_controls->setNitro(false);
+
+    // Let the function below to reset it later
+    m_controls->setAccel(0.0f);
+    m_controls->setBrake(false);
+    m_mini_skid = false;
 
     // Don't do anything if there is currently a kart animations shown.
     if (m_kart->getKartAnimation())
     {
         resetAfterStop();
+        return;
+    }
+
+    if (!isKartOnRoad() && m_kart->isOnGround())
+    {
+        m_time_since_off_road += dt;
+    }
+    else if (m_time_since_off_road != 0.0f)
+    {
+        m_time_since_off_road = 0.0f;
+    }
+
+    // If the kart needs to be rescued, do it now (and nothing else)
+    if (m_time_since_off_road > 5.0f && m_kart->isOnGround())
+    {
+        m_time_since_off_road = 0.0f;
+        new RescueAnimation(m_kart);
+        AIBaseController::update(dt);
         return;
     }
 
@@ -104,29 +119,41 @@ void ArenaAI::update(float dt)
     }
 
     checkIfStuck(dt);
-    if (handleArenaUnstuck(dt))
+    if (gettingUnstuck(dt))
         return;
 
-    findClosestKart(true);
     findTarget();
-    handleArenaItems(dt);
 
-    if (m_kart->getSpeed() > 15.0f && m_turn_angle < 20)
+    // After found target, convert it to local coordinate, used for skidding or
+    // u-turn
+    if (!m_is_uturn)
+    {
+        m_target_point_lc = m_kart->getTrans().inverse()(m_target_point);
+        doSkiddingTest();
+        configSteering();
+    }
+    else
+    {
+        m_target_point_lc = m_kart->getTrans().inverse()(m_reverse_point);
+    }
+    useItems(dt);
+
+    if (m_kart->getSpeed() > 15.0f && !m_is_uturn && m_turn_radius > 30.0f &&
+        !ignorePathFinding())
     {
         // Only use nitro when turn angle is big (180 - angle)
-        m_controls->m_nitro = true;
+        m_controls->setNitro(true);
     }
 
     if (m_is_uturn)
     {
         resetAfterStop();
-        handleArenaUTurn(dt);
+        doUTurn(dt);
     }
     else
     {
-        handleArenaAcceleration(dt);
-        handleArenaSteering(dt);
-        handleArenaBraking();
+        configSpeed();
+        setSteering(m_steering_angle, dt);
     }
 
     AIBaseController::update(dt);
@@ -134,129 +161,142 @@ void ArenaAI::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-bool ArenaAI::updateAimingPosition()
+/** Update aiming position, use path finding if necessary.
+ *  \param[out] target_point Suitable target point.
+ *  \return True if found a suitable target point.
+ */
+bool ArenaAI::updateAimingPosition(Vec3* target_point)
 {
-    // Notice: we use the point ahead of kart to determine next node,
-    // to compensate the time difference between steering
-    m_current_forward_point =
-        m_kart->getTrans()(Vec3(0, 0, m_kart->getKartLength()));
-    m_current_forward_node = BattleGraph::get()->pointToNode
-        (m_current_forward_node, m_current_forward_point,
-        false/*ignore_vertical*/);
+#ifdef AI_DEBUG
+        m_debug_sphere_next->setVisible(false);
+#endif
+
+    m_current_forward_point = m_kart->getTrans()(Vec3(0, 0, m_kart_length));
+
+    m_turn_radius = 0.0f;
+    std::vector<int>* test_nodes = NULL;
+    if (m_current_forward_node != Graph::UNKNOWN_SECTOR)
+    {
+        test_nodes =
+            m_graph->getNode(m_current_forward_node)->getNearbyNodes();
+    }
+    m_graph->findRoadSector(m_current_forward_point, &m_current_forward_node,
+        test_nodes);
 
     // Use current node if forward node is unknown, or near the target
-    const int forward = (m_current_forward_node == BattleGraph::UNKNOWN_POLY ||
+    const int forward =
+        m_current_forward_node == Graph::UNKNOWN_SECTOR ||
         m_current_forward_node == m_target_node ||
-        getCurrentNode() == m_target_node ? getCurrentNode() :
-        m_current_forward_node);
+        getCurrentNode() == m_target_node ?
+        getCurrentNode() : m_current_forward_node;
 
-    if (forward == BattleGraph::UNKNOWN_POLY ||
-        m_target_node == BattleGraph::UNKNOWN_POLY)
+    if (forward == Graph::UNKNOWN_SECTOR ||
+        m_target_node == Graph::UNKNOWN_SECTOR)
+    {
+        Log::error("ArenaAI", "Next node is unknown, path finding failed!");
         return false;
+    }
 
     if (forward == m_target_node)
     {
-        m_aiming_points.push_back(BattleGraph::get()
-            ->getQuadOfNode(forward).getCenter());
-        m_aiming_points.push_back(m_target_point);
-
-        m_aiming_nodes.insert(forward);
-        m_aiming_nodes.insert(getCurrentNode());
+        determineTurnRadius(m_target_point, NULL, &m_turn_radius);
+        *target_point = m_target_point;
         return true;
     }
 
-    const int next_node = BattleGraph::get()
-        ->getNextShortestPathPoly(forward, m_target_node);
-    if (next_node == BattleGraph::UNKNOWN_POLY)
+    std::vector<int> path;
+    int next_node = m_graph->getNextNode(forward, m_target_node);
+
+    if (next_node == Graph::UNKNOWN_SECTOR)
     {
         Log::error("ArenaAI", "Next node is unknown, did you forget to link"
-                   "adjacent face in navmesh?");
+                   " adjacent face in navmesh?");
         return false;
     }
 
-    m_aiming_points.push_back(BattleGraph::get()
-        ->getQuadOfNode(forward).getCenter());
-    m_aiming_points.push_back(BattleGraph::get()
-        ->getQuadOfNode(next_node).getCenter());
+    path.push_back(next_node);
+    while (m_target_node != next_node)
+    {
+        int previous_node = next_node;
+        next_node = m_graph->getNextNode(previous_node, m_target_node);
+        if (next_node == Graph::UNKNOWN_SECTOR)
+        {
+            Log::error("ArenaAI", "Next node is unknown, did you forget to"
+                       " link adjacent face in navmesh?");
+            return false;
+        }
+        path.push_back(next_node);
+    }
 
-    m_aiming_nodes.insert(forward);
-    m_aiming_nodes.insert(next_node);
-    m_aiming_nodes.insert(getCurrentNode());
+    determinePath(forward, &path);
+    *target_point = m_graph->getNode(path.front())->getCenter();
 
     return true;
+
 }   // updateAimingPosition
 
 //-----------------------------------------------------------------------------
-/** This function sets the steering.
- *  \param dt Time step size.
+/** This function config the steering (\ref m_steering_angle) of AI.
  */
-void ArenaAI::handleArenaSteering(const float dt)
+void ArenaAI::configSteering()
 {
+    m_steering_angle = 0.0f;
     const int current_node = getCurrentNode();
 
-    if (current_node == BattleGraph::UNKNOWN_POLY ||
-        m_target_node == BattleGraph::UNKNOWN_POLY)
+    if (current_node == Graph::UNKNOWN_SECTOR ||
+        m_target_node == Graph::UNKNOWN_SECTOR)
     {
         return;
     }
 
-    m_aiming_points.clear();
-    m_aiming_nodes.clear();
-    const bool found_position = updateAimingPosition();
     if (ignorePathFinding())
     {
-        // Steer directly
-        checkPosition(m_target_point, &m_cur_kart_pos_data);
+        // Steer directly, don't brake
+        m_turn_radius = 100.0f;
 #ifdef AI_DEBUG
         m_debug_sphere->setPosition(m_target_point.toIrrVector());
 #endif
-        if (m_cur_kart_pos_data.behind)
+        if (m_target_point_lc.z() < 0)
         {
-            m_adjusting_side = m_cur_kart_pos_data.lhs;
             m_is_uturn = true;
+            m_reverse_point = m_target_point;
         }
         else
         {
-            float target_angle = steerToPoint(m_target_point);
-            setSteering(target_angle, dt);
+            m_steering_angle = steerToPoint(m_target_point);
         }
         return;
     }
-    else if (found_position)
+
+    // Otherwise use path finding to get target point
+    Vec3 target_point;
+    const bool found_position = updateAimingPosition(&target_point);
+    if (found_position)
     {
-        updateBananaLocation();
-        assert(m_aiming_points.size() == 2);
-        updateTurnRadius(m_kart->getXYZ(), m_aiming_points[0],
-            m_aiming_points[1]);
-        m_target_point = m_aiming_points[1];
-        checkPosition(m_target_point, &m_cur_kart_pos_data);
+        m_target_point = target_point;
+        m_target_point_lc = m_kart->getTrans().inverse()(m_target_point);
 #ifdef AI_DEBUG
         m_debug_sphere->setVisible(true);
-        m_debug_sphere_next->setVisible(true);
-        m_debug_sphere->setPosition(m_aiming_points[0].toIrrVector());
-        m_debug_sphere_next->setPosition(m_aiming_points[1].toIrrVector());
+        m_debug_sphere->setPosition(m_target_point.toIrrVector());
 #endif
-        if (m_cur_kart_pos_data.behind)
+        if (m_target_point_lc.z() < 0)
         {
-            m_adjusting_side = m_cur_kart_pos_data.lhs;
             m_is_uturn = true;
+            m_reverse_point = m_target_point;
         }
         else
         {
-            float target_angle = steerToPoint(m_target_point);
-            setSteering(target_angle, dt);
+            m_steering_angle = steerToPoint(m_target_point);
         }
-        return;
     }
-    else
-    {
-        // Do nothing (go straight) if no targets found
-        setSteering(0.0f, dt);
-        return;
-    }
-}   // handleSteering
+}   // configSteering
 
 //-----------------------------------------------------------------------------
+/** Determine whether AI is stuck, by checking if it stays on the same node for
+ *  a long period of time (see \ref m_on_node), or \ref isStuck() is true.
+ *  \param dt Time step size.
+ *  \return True if AI is stuck
+ */
 void ArenaAI::checkIfStuck(const float dt)
 {
     if (m_is_stuck) return;
@@ -275,8 +315,7 @@ void ArenaAI::checkIfStuck(const float dt)
         && m_on_node.size() < 2 && !m_is_uturn &&
         fabsf(m_kart->getSpeed()) < 3.0f) || isStuck() == true)
     {
-        // Check whether a kart stay on the same node for a period of time
-        // Or crashed 3 times
+        // AI is stuck, reset now and try to get unstuck at next frame
         m_on_node.clear();
         m_time_since_driving = 0.0f;
         AIBaseController::reset();
@@ -292,68 +331,67 @@ void ArenaAI::checkIfStuck(const float dt)
 }   //  checkIfStuck
 
 //-----------------------------------------------------------------------------
-/** Handles acceleration.
- *  \param dt Time step size.
+/** Configure a suitable speed depends on current turn radius.
  */
-void ArenaAI::handleArenaAcceleration(const float dt)
+void ArenaAI::configSpeed()
 {
+    // A kart will not brake when the speed is already slower than this
+    // value. This prevents a kart from going too slow (or even backwards)
+    // in tight curves.
+    const float MIN_SPEED = 5.0f;
+    const float handicap = (m_cur_difficulty == RaceManager::DIFFICULTY_EASY 
+                            ? 0.7f : 1.0f                                   );
 
-    if (m_controls->m_brake)
+    const float max_turn_speed = m_kart->getSpeedForTurnRadius(m_turn_radius);
+    if ((m_kart->getSpeed() > max_turn_speed || forceBraking()) &&
+        m_kart->getSpeed() > MIN_SPEED * handicap)
     {
-        m_controls->m_accel = 0.0f;
-        return;
+        // Brake if necessary
+        m_controls->setBrake(true);
     }
-
-    const float handicap =
-        (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 0.7f : 1.0f);
-    m_controls->m_accel = stk_config->m_ai_acceleration * handicap;
-
-}   // handleArenaAcceleration
+    else
+    {
+        // Otherwise accelerate
+        m_controls->setAccel(stk_config->m_ai_acceleration * handicap);
+    }
+}   // configSpeed
 
 //-----------------------------------------------------------------------------
-void ArenaAI::handleArenaUTurn(const float dt)
+/** Make AI reverse so that it faces in front of the last target point.
+ */
+void ArenaAI::doUTurn(const float dt)
 {
-    const float turn_side = (m_adjusting_side ? 1.0f : -1.0f);
-
-    if (fabsf(m_kart->getSpeed()) >
-        (m_kart->getKartProperties()->getEngineMaxSpeed() / 5)
-        && m_kart->getSpeed() < 0) // Try to emulate reverse like human players
-        m_controls->m_accel = -0.06f;
-    else
-        m_controls->m_accel = -5.0f;
-
-    if (m_time_since_uturn >=
-        (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 2.0f : 1.5f))
-        setSteering(-(turn_side), dt); // Preventing keep going around circle
-    else
-        setSteering(turn_side, dt);
+    float turn_angle = atan2f(m_target_point_lc.x(),
+        fabsf(m_target_point_lc.z()));
+    m_controls->setBrake(true);
+    setSteering(turn_angle > 0.0f ? -1.0f : 1.0f, dt);
     m_time_since_uturn += dt;
 
-    checkPosition(m_target_point, &m_cur_kart_pos_data);
-    if (!m_cur_kart_pos_data.behind || m_time_since_uturn >
-        (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 3.5f : 3.0f))
+    if ((m_target_point_lc.z() > 0 && fabsf(turn_angle) < 0.2f) ||
+        m_time_since_uturn > 1.5f)
     {
+        // End U-turn until target point is in front of this AI
         m_is_uturn = false;
         m_time_since_uturn = 0.0f;
+        m_time_since_driving = 0.0f;
+        m_reverse_point = Vec3(0, 0, 0);
     }
     else
         m_is_uturn = true;
-}   // handleArenaUTurn
+}   // doUTurn
 
 //-----------------------------------------------------------------------------
-bool ArenaAI::handleArenaUnstuck(const float dt)
+/** Function to let AI get unstuck.
+ *  \param dt Time step size.
+ *  \return True if getting stuck is needed to be done.
+ */
+bool ArenaAI::gettingUnstuck(const float dt)
 {
     if (!m_is_stuck || m_is_uturn) return false;
 
     resetAfterStop();
     setSteering(0.0f, dt);
-
-    if (fabsf(m_kart->getSpeed()) >
-        (m_kart->getKartProperties()->getEngineMaxSpeed() / 5)
-        && m_kart->getSpeed() < 0)
-        m_controls->m_accel = -0.06f;
-    else
-        m_controls->m_accel = -4.0f;
+    m_controls->setBrake(true);
 
     m_time_since_reversing += dt;
 
@@ -365,152 +403,26 @@ bool ArenaAI::handleArenaUnstuck(const float dt)
     AIBaseController::update(dt);
     return true;
 
-}   // handleArenaUnstuck
+}   // gettingUnstuck
 
 //-----------------------------------------------------------------------------
-void ArenaAI::updateBananaLocation()
-{
-    std::vector<std::pair<const Item*, int>>& item_list =
-        BattleGraph::get()->getItemList();
-
-    std::set<int>::iterator node = m_aiming_nodes.begin();
-    while (node != m_aiming_nodes.end())
-    {
-        m_test_node_for_banana = *node;
-        std::vector<std::pair<const Item*, int>>::iterator it =
-            std::find_if(item_list.begin(), item_list.end(), isNodeWithBanana);
-
-        if (it != item_list.end())
-        {
-            Vec3 banana_lc;
-            checkPosition(it->first->getXYZ(), NULL, &banana_lc,
-                true/*use_front_xyz*/);
-
-            // If satisfy the below condition, AI should not eat banana:
-            // banana_lc.z() < 0.0f, behind the kart
-            if (banana_lc.z() < 0.0f)
-            {
-                node++;
-                continue;
-            }
-
-            // If the node AI will pass has a banana, adjust the aim position
-            banana_lc = (banana_lc.x() < 0 ? banana_lc + Vec3(5, 0, 0) :
-                        banana_lc - Vec3(5, 0, 0));
-            m_aiming_points[1] = m_kart->getTrans()(banana_lc);
-            m_avoiding_banana = true;
-            // Handle one banana only
-            return;
-        }
-        node++;
-    }
-
-}   // updateBananaLocation
-
-//-----------------------------------------------------------------------------
-/** This function handles braking. It used the turn radius found by
- *  updateTurnRadius(). Depending on the turn radius, it finds out the maximum
- *  speed. If the current speed is greater than the max speed and a set minimum
- *  speed, brakes are applied.
+/** Determine how AI should use its item, different \ref m_cur_difficulty will
+ *  have a corresponding strategy.
+ *  \param dt Time step size.
  */
-void ArenaAI::handleArenaBraking()
+void ArenaAI::useItems(const float dt)
 {
-    // A kart will not brake when the speed is already slower than this
-    // value. This prevents a kart from going too slow (or even backwards)
-    // in tight curves.
-    const float MIN_SPEED = 5.0f;
-
-    if (forceBraking() && m_kart->getSpeed() > MIN_SPEED)
-    {
-        // Brake now
-        m_controls->m_brake = true;
-        return;
-    }
-
-    m_controls->m_brake = false;
-
-    if (getCurrentNode() == BattleGraph::UNKNOWN_POLY ||
-        m_target_node    == BattleGraph::UNKNOWN_POLY) return;
-
-    if (m_aiming_points.empty()) return;
-
-    const float max_turn_speed = m_kart->getSpeedForTurnRadius(m_turn_radius);
-
-    if (m_kart->getSpeed() > 1.25f * max_turn_speed &&
-        fabsf(m_controls->m_steer) > 0.95f &&
-        m_kart->getSpeed() > MIN_SPEED)
-    {
-        m_controls->m_brake = true;
-    }
-
-}   // handleArenaBraking
-
-//-----------------------------------------------------------------------------
-void ArenaAI::updateTurnRadius(const Vec3& p1, const Vec3& p2,
-                               const Vec3& p3)
-{
-    // First use cosine formula to find out the angle made by the distance
-    // between kart (point one) to point two and point two between point three
-    const float a = (p1 - p2).length();
-    const float b = (p2 - p3).length();
-    const float c = (p1 - p3).length();
-    const float angle = 180 - findAngleFrom3Edges(a, b, c);
-
-    // Only calculate radius if not almost straight line
-    if (angle > 1 && angle < 179)
-    {
-        //     angle
-        //      ^
-        //  a /   \ b
-        // 90/\   /\90
-        //  \ /   \ /
-        //   \     /
-        //    \   /
-        //     \ /
-        //      |
-        // Try to estimate the turn radius with the help of a kite-like
-        // polygon as shown, find out the lowest angle which is
-        // (4 - 2) * 180  - 90 - 90 - angle (180 - angle from above)
-        // Then we use this value as the angle of a sector of circle,
-        // a + b as the arc length, then the radius can be calculated easily
-        m_turn_radius = ((a + b) / (angle / 360)) / M_PI / 2;
-    }
-    else
-    {
-        // Return large radius so no braking is needed otherwise
-        m_turn_radius = 45.0f;
-    }
-    m_turn_angle = angle;
-
-}   // updateTurnRadius
-
-//-----------------------------------------------------------------------------
-float ArenaAI::findAngleFrom3Edges(float a, float b, float c)
-{
-    // Cosine forumla : c2 = a2 + b2 - 2ab cos C
-    float test_value = ((c * c) - (a * a) - (b * b)) / (-(2 * a * b));
-    // Prevent error
-    if (test_value < -1)
-        test_value = -1;
-    else if (test_value > 1)
-        test_value = 1;
-
-    return acosf(test_value) * RAD_TO_DEGREE;
-
-}   // findAngleFrom3Edges
-
-//-----------------------------------------------------------------------------
-void ArenaAI::handleArenaItems(const float dt)
-{
-    m_controls->m_fire = false;
+    m_controls->setFire(false);
     if (m_kart->getKartAnimation() ||
         m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING)
         return;
 
     // Find a closest kart again, this time we ignore difficulty
-    findClosestKart(false);
-
+    findClosestKart(false/*consider_difficulty*/, false/*find_sta*/);
     if (!m_closest_kart) return;
+
+    Vec3 closest_kart_point_lc =
+        m_kart->getTrans().inverse()(m_closest_kart_point);
 
     m_time_since_last_shot += dt;
 
@@ -518,9 +430,16 @@ void ArenaAI::handleArenaItems(const float dt)
     const bool difficulty = m_cur_difficulty == RaceManager::DIFFICULTY_EASY ||
                             m_cur_difficulty == RaceManager::DIFFICULTY_MEDIUM;
 
-    const bool fire_behind = m_closest_kart_pos_data.behind && !difficulty;
+    const bool fire_behind = closest_kart_point_lc.z() < 0 && !difficulty;
 
-    const bool perfect_aim = m_closest_kart_pos_data.angle < 0.2f;
+    const float abs_angle = atan2f(fabsf(closest_kart_point_lc.x()),
+        fabsf(closest_kart_point_lc.z()));
+    const bool perfect_aim = abs_angle < 0.2f;
+
+    // Compensate the distance because this distance is straight to straight
+    // in graph node, so if kart to kart are not facing like so as, their real
+    // distance maybe smaller
+    const float dist_to_kart = getKartDistance(m_closest_kart) * 0.8f;
 
     switch(m_kart->getPowerup()->getType())
     {
@@ -528,38 +447,33 @@ void ArenaAI::handleArenaItems(const float dt)
         {
             Attachment::AttachmentType type = m_kart->getAttachment()->getType();
             // Don't use shield when we have a swatter.
-            if (type == Attachment::ATTACH_SWATTER       ||
-                type == Attachment::ATTACH_NOLOKS_SWATTER)
+            if (type == Attachment::ATTACH_SWATTER)
                 break;
 
             // Check if a flyable (cake, ...) is close or a kart nearby
             // has a swatter attachment. If so, use bubblegum
             // as shield
-            if ((!m_kart->isShielded() &&
-                projectile_manager->projectileIsClose(m_kart,
-                                    m_ai_properties->m_shield_incoming_radius)) ||
-               (m_closest_kart_pos_data.distance < 15.0f &&
-               ((m_closest_kart->getAttachment()->
-                getType() == Attachment::ATTACH_SWATTER) ||
-               (m_closest_kart->getAttachment()->
-                getType() == Attachment::ATTACH_NOLOKS_SWATTER))))
+            if ( (!m_kart->isShielded() &&
+                   projectile_manager->projectileIsClose(m_kart,
+                                    m_ai_properties->m_shield_incoming_radius)  ) ||
+                 (dist_to_kart < 15.0f &&
+                  (m_closest_kart->getAttachment()->
+                                       getType() == Attachment::ATTACH_SWATTER)  )    )
             {
-                m_controls->m_fire      = true;
-                m_controls->m_look_back = false;
+                m_controls->setFire(true);
+                m_controls->setLookBack(false);
                 break;
             }
 
             // Avoid dropping all bubble gums one after another
             if (m_time_since_last_shot < 3.0f) break;
 
-            // Use bubblegum if the next kart behind is 'close' but not too close,
+            // Use bubblegum if the kart around is close,
             // or can't find a close kart for too long time
-            if ((m_closest_kart_pos_data.distance < 15.0f &&
-                m_closest_kart_pos_data.distance > 3.0f) ||
-                m_time_since_last_shot > 15.0f)
+            if (dist_to_kart < 15.0f || m_time_since_last_shot > 15.0f)
             {
-                m_controls->m_fire      = true;
-                m_controls->m_look_back = true;
+                m_controls->setFire(true);
+                m_controls->setLookBack(true);
                 break;
             }
 
@@ -574,11 +488,11 @@ void ArenaAI::handleArenaItems(const float dt)
             // Leave some time between shots
             if (m_time_since_last_shot < 1.0f) break;
 
-            if (m_closest_kart_pos_data.distance < 25.0f &&
+            if (dist_to_kart < 25.0f &&
                 !m_closest_kart->isInvulnerable())
             {
-                m_controls->m_fire      = true;
-                m_controls->m_look_back = fire_behind;
+                m_controls->setFire(true);
+                m_controls->setLookBack(fire_behind);
                 break;
             }
 
@@ -594,12 +508,12 @@ void ArenaAI::handleArenaItems(const float dt)
             // Leave some time between shots
             if (m_time_since_last_shot < 1.0f) break;
 
-            if (m_closest_kart_pos_data.distance < 6.0f &&
+            if (dist_to_kart < 6.0f &&
                 (difficulty || perfect_aim) &&
                 !m_closest_kart->isInvulnerable())
             {
-                m_controls->m_fire      = true;
-                m_controls->m_look_back = fire_behind;
+                m_controls->setFire(true);
+                m_controls->setLookBack(fire_behind);
                 break;
             }
 
@@ -615,11 +529,11 @@ void ArenaAI::handleArenaItems(const float dt)
                 break;
 
             if (!m_closest_kart->isSquashed()          &&
-                 m_closest_kart_pos_data.distance < d2 &&
+                 dist_to_kart * dist_to_kart < d2 &&
                  m_closest_kart->getSpeed() < m_kart->getSpeed())
             {
-                m_controls->m_fire      = true;
-                m_controls->m_look_back = false;
+                m_controls->setFire(true);
+                m_controls->setLookBack(false);
                 break;
             }
             break;
@@ -633,7 +547,7 @@ void ArenaAI::handleArenaItems(const float dt)
         break;   // POWERUP_PLUNGER
 
     case PowerupManager::POWERUP_SWITCH: // Don't handle switch
-        m_controls->m_fire = true;       // (use it no matter what) for now
+        m_controls->setFire(true);       // (use it no matter what) for now
         break;   // POWERUP_SWITCH
 
     case PowerupManager::POWERUP_PARACHUTE:
@@ -651,62 +565,62 @@ void ArenaAI::handleArenaItems(const float dt)
                 m_kart->getPowerup()->getType());
         assert(false);
     }
-    if (m_controls->m_fire)
+    if (m_controls->getFire())
         m_time_since_last_shot  = 0.0f;
-}   // handleArenaItems
+}   // useItems
 
 //-----------------------------------------------------------------------------
-void ArenaAI::collectItemInArena(Vec3* aim_point, int* target_node) const
+/** Try to collect item in arena, if no suitable item is found, like they are
+ *  swapped, it will follow closest kart instead.
+ *  \param[out] aim_point Location of item.
+ *  \param[out] target_node The node which item lied on.
+ */
+void ArenaAI::tryCollectItem(Vec3* aim_point, int* target_node) const
 {
-    float distance = 99999.9f;
-    const std::vector< std::pair<const Item*, int> >& item_list =
-        BattleGraph::get()->getItemList();
-    const unsigned int items_count = item_list.size();
+    float distance = 999999.9f;
+    Item* selected = (*target_node == Graph::UNKNOWN_SECTOR ? NULL :
+        ItemManager::get()->getFirstItemInQuad(*target_node));
 
-    if (item_list.empty())
+    // Don't look for a new item unless it's collected or swapped
+    if (selected && !(selected->wasCollected() ||
+        selected->getType() == Item::ITEM_BANANA ||
+        selected->getType() == Item::ITEM_BUBBLEGUM ||
+        selected->getType() == Item::ITEM_BUBBLEGUM_NOLOK))
     {
-        // Notice: this should not happen, as it makes no sense
-        // for an arean without items, if so how can attack happen?
-        Log::fatal ("ArenaAI",
-                    "AI can't find any items in the arena, "
-                    "maybe there is something wrong with the navmesh, "
-                    "make sure it lies closely to the ground.");
+        *aim_point = selected->getXYZ();
         return;
     }
 
-    unsigned int closest_item_num = 0;
-
-    for (unsigned int i = 0; i < items_count; ++i)
+    for (unsigned int i = 0; i < m_graph->getNumNodes(); i++)
     {
-        const Item* item = item_list[i].first;
+        Item* cur_item = ItemManager::get()->getFirstItemInQuad(i);
+        if (cur_item == NULL) continue;
+        if (cur_item->wasCollected() ||
+            cur_item->getType() == Item::ITEM_BANANA ||
+            cur_item->getType() == Item::ITEM_BUBBLEGUM ||
+            cur_item->getType() == Item::ITEM_BUBBLEGUM_NOLOK)
+            continue;
 
-        if (item->wasCollected()) continue;
-
-        if ((item->getType() == Item::ITEM_NITRO_BIG ||
-             item->getType() == Item::ITEM_NITRO_SMALL) &&
+        if ((cur_item->getType() == Item::ITEM_NITRO_BIG ||
+             cur_item->getType() == Item::ITEM_NITRO_SMALL) &&
             (m_kart->getEnergy() >
              m_kart->getKartProperties()->getNitroSmallContainer()))
                 continue; // Ignore nitro when already has some
 
-        float test_distance = BattleGraph::get()
-            ->getDistance(item_list[i].second, getCurrentNode());
-        if (test_distance <= distance               &&
-           (item->getType() == Item::ITEM_BONUS_BOX ||
-            item->getType() == Item::ITEM_NITRO_BIG ||
-            item->getType() == Item::ITEM_NITRO_SMALL))
+        const int cur_node = cur_item->getGraphNode();
+        assert(cur_node != Graph::UNKNOWN_SECTOR);
+        float test_distance = m_graph->getDistance(cur_node, getCurrentNode());
+        if (test_distance <= distance)
         {
-            closest_item_num = i;
+            selected = cur_item;
             distance = test_distance;
         }
     }
 
-    const Item *item_selected = item_list[closest_item_num].first;
-    if (item_selected->getType() == Item::ITEM_BONUS_BOX ||
-        item_selected->getType() == Item::ITEM_NITRO_BIG ||
-        item_selected->getType() == Item::ITEM_NITRO_SMALL)
+    if (selected != NULL)
     {
-        *aim_point = item_selected->getXYZ();
-        *target_node = item_list[closest_item_num].second;
+        *aim_point = selected->getXYZ();
+        *target_node = selected->getGraphNode();
     }
     else
     {
@@ -714,4 +628,119 @@ void ArenaAI::collectItemInArena(Vec3* aim_point, int* target_node) const
         *aim_point = m_closest_kart_point;
         *target_node = m_closest_kart_node;
     }
-}   // collectItemInArena
+}   // tryCollectItem
+
+//-----------------------------------------------------------------------------
+/** Determine if AI should skid: When it's close to target, but not straight
+ *  ahead, in front of it, same steering side and with suitable difficulties
+ *  which are in expert and supertux only.
+ */
+void ArenaAI::doSkiddingTest()
+{
+    const float abs_angle = atan2f(fabsf(m_target_point_lc.x()),
+        fabsf(m_target_point_lc.z()));
+    if ((m_cur_difficulty == RaceManager::DIFFICULTY_HARD ||
+        m_cur_difficulty == RaceManager::DIFFICULTY_BEST) &&
+        m_target_point_lc.z() > 0 && abs_angle > 0.15f &&
+        m_target_point_lc.length() < 10.0f &&
+        ((m_steering_angle < 0 && m_target_point_lc.x() < 0) ||
+        (m_steering_angle > 0 && m_target_point_lc.x() > 0)))
+    {
+        m_mini_skid = true;
+    }
+
+}   // doSkiddingTest
+
+//-----------------------------------------------------------------------------
+/** Determine if the path to target needs to be changed to avoid bad items, it
+ *  will also set the turn radius based on the new path if necessary.
+ *  \param forward Forward node of current AI position.
+ *  \param[in,out] path Default path to follow, will be changed if needed.
+ */
+void ArenaAI::determinePath(int forward, std::vector<int>* path)
+{
+    std::vector<int> bad_item_nodes;
+    // First, test if the nodes AI will cross contain bad item
+    for (unsigned int i = 0; i < path->size(); i++)
+    {
+        // Only test few nodes ahead
+        if (i == 6) break;
+        const int node = (*path)[i];
+        Item* selected = ItemManager::get()->getFirstItemInQuad(node);
+
+        if (selected && !selected->wasCollected() &&
+            (selected->getType() == Item::ITEM_BANANA ||
+            selected->getType() == Item::ITEM_BUBBLEGUM ||
+            selected->getType() == Item::ITEM_BUBBLEGUM_NOLOK))
+        {
+            bad_item_nodes.push_back(node);
+        }
+    }
+
+    // If so try to avoid
+    if (!bad_item_nodes.empty())
+    {
+        bool failed_avoid = false;
+        for (unsigned int i = 0; i < path->size(); i++)
+        {
+            if (failed_avoid) break;
+            if (i == 6) break;
+            // Choose any adjacent node that is in front of the AI to prevent
+            // hitting bad item
+            ArenaNode* cur_node =
+                m_graph->getNode(i == 0 ? forward : (*path)[i - 1]);
+            float dist = 99999.9f;
+            const std::vector<int>& adj_nodes = cur_node->getAdjacentNodes();
+            int chosen_node = Graph::UNKNOWN_SECTOR;
+            for (const int& adjacent : adj_nodes)
+            {
+                if (std::find(bad_item_nodes.begin(), bad_item_nodes.end(),
+                    adjacent) != bad_item_nodes.end())
+                    continue;
+
+                Vec3 lc = m_kart->getTrans().inverse()
+                    (m_graph->getNode(adjacent)->getCenter());
+                const float dist_to_target =
+                    m_graph->getDistance(adjacent, m_target_node);
+                if (lc.z() > 0 && dist > dist_to_target)
+                {
+                    chosen_node = adjacent;
+                    dist = dist_to_target;
+                }
+                if (chosen_node == Graph::UNKNOWN_SECTOR)
+                {
+                    Log::debug("ArenaAI", "Too many bad items to avoid!");
+                    failed_avoid = true;
+                    break;
+                }
+                (*path)[i] = chosen_node;
+            }
+        }
+    }
+
+    // Now find the first turning corner to determine turn radius
+    for (unsigned int i = 0; i < path->size() - 1; i++)
+    {
+        const Vec3& p1 = m_kart->getXYZ();
+        const Vec3& p2 = m_graph->getNode((*path)[i])->getCenter();
+        const Vec3& p3 = m_graph->getNode((*path)[i + 1])->getCenter();
+        float edge1 = (p1 - p2).length();
+        float edge2 = (p2 - p3).length();
+        float to_target = (p1 - p3).length();
+
+        // Triangle test
+        if (fabsf(edge1 + edge2 - to_target) > 0.1f)
+        {
+            determineTurnRadius(p3, NULL, &m_turn_radius);
+#ifdef AI_DEBUG
+            m_debug_sphere_next->setVisible(true);
+            m_debug_sphere_next->setPosition(p3.toIrrVector());
+#endif
+            return;
+        }
+    }
+
+    // Fallback calculation
+    determineTurnRadius(m_target_point, NULL, &m_turn_radius);
+
+}   // determinePath

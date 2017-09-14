@@ -21,6 +21,7 @@
 #include "config/user_config.hpp"
 #include "font/bold_face.hpp"
 #include "font/digit_face.hpp"
+#include "font/font_manager.hpp"
 #include "font/regular_face.hpp"
 #include "graphics/camera_debug.hpp"
 #include "graphics/camera_fps.hpp"
@@ -28,19 +29,25 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/stk_tex_manager.hpp"
+#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/controller.hpp"
+#include "modes/cutscene_world.hpp"
 #include "modes/world.hpp"
 #include "physics/irr_debug_drawer.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "main_loop.hpp"
 #include "replay/replay_recorder.hpp"
+#include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/debug_slider.hpp"
-#include "states_screens/dialogs/scripting_console.hpp"
+#include "states_screens/dialogs/general_text_field_dialog.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
@@ -81,7 +88,7 @@ enum DebugMenuCommand
     DEBUG_GRAPHICS_BULLET_2,
     DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ,
     DEBUG_PROFILER,
-    DEBUG_PROFILER_GENERATE_REPORT,
+    DEBUG_PROFILER_WRITE_REPORT,
     DEBUG_FONT_DUMP_GLYPH_PAGE,
     DEBUG_FONT_RELOAD,
     DEBUG_FPS,
@@ -124,7 +131,11 @@ enum DebugMenuCommand
     DEBUG_VISUAL_VALUES,
     DEBUG_PRINT_START_POS,
     DEBUG_ADJUST_LIGHTS,
-    DEBUG_SCRIPT_CONSOLE
+    DEBUG_SCRIPT_CONSOLE,
+    DEBUG_RUN_CUTSCENE,
+    DEBUG_TEXTURE_CONSOLE,
+    DEBUG_START_RECORDING,
+    DEBUG_STOP_RECORDING
 };   // DebugMenuCommand
 
 // -----------------------------------------------------------------------------
@@ -182,12 +193,9 @@ void changeCameraTarget(u32 num)
     {
         AbstractKart* kart = world->getKart(num - 1);
         if (kart == NULL) return;
-        if (kart->isEliminated()) return;
         cam->setMode(Camera::CM_NORMAL);
         cam->setKart(kart);
     }
-    else
-        return;
 
 }   // changeCameraTarget
 
@@ -232,13 +240,16 @@ bool handleContextMenuAction(s32 cmd_id)
 {
 
     World *world = World::getWorld();
-    Physics *physics = world ? world->getPhysics() : NULL;
+    Physics *physics = Physics::getInstance();
     switch(cmd_id)
     {
     case DEBUG_GRAPHICS_RELOAD_SHADERS:
-            Log::info("Debug", "Reloading shaders...");
-            ShaderBase::updateShaders();
-            break;
+#ifndef SERVER_ONLY
+        Log::info("Debug", "Reloading shaders...");
+        ShaderFilesManager::getInstance()->clean();
+        ShaderBase::updateShaders();
+#endif
+        break;
     case DEBUG_GRAPHICS_RESET:
         if (physics)
             physics->setDebugMode(IrrDebugDrawer::DM_NONE);
@@ -325,8 +336,8 @@ bool handleContextMenuAction(s32 cmd_id)
     {
         irr_driver->resetDebugModes();
 
-        if (!world) return false;
-        Physics *physics = world->getPhysics();
+        Physics *physics = Physics::getInstance();
+        if (!physics) return false;
         physics->setDebugMode(IrrDebugDrawer::DM_NO_KARTS_GRAPHICS);
         break;
     }
@@ -335,11 +346,10 @@ bool handleContextMenuAction(s32 cmd_id)
         irr_driver->toggleBoundingBoxesViz();
         break;
     case DEBUG_PROFILER:
-        UserConfigParams::m_profiler_enabled =
-            !UserConfigParams::m_profiler_enabled;
+        profiler.toggleStatus();
         break;
-    case DEBUG_PROFILER_GENERATE_REPORT:
-        profiler.setCaptureReport(!profiler.getCaptureReport());
+    case DEBUG_PROFILER_WRITE_REPORT:
+        profiler.writeToFile();
         break;
     case DEBUG_THROTTLE_FPS:
         main_loop->setThrottleFPS(false);
@@ -348,6 +358,7 @@ bool handleContextMenuAction(s32 cmd_id)
         font_manager->getFont<BoldFace>()->dumpGlyphPage("bold");
         font_manager->getFont<DigitFace>()->dumpGlyphPage("digit");
         font_manager->getFont<RegularFace>()->dumpGlyphPage("regular");
+        break;
     case DEBUG_FONT_RELOAD:
         font_manager->getFont<BoldFace>()->reset();
         font_manager->getFont<DigitFace>()->reset();
@@ -531,7 +542,6 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     case DEBUG_VISUAL_VALUES:
     {
-#if !defined(__APPLE__)
         DebugSliderDialog *dsd = new DebugSliderDialog();
         dsd->setSliderHook("red_slider", 0, 255,
             [](){ return int(irr_driver->getAmbientLight().r * 255.f); },
@@ -566,12 +576,10 @@ bool handleContextMenuAction(s32 cmd_id)
             [](){ return int(irr_driver->getSSAOSigma() * 10.f); },
             [](int v){irr_driver->setSSAOSigma(v / 10.f); }
         );
-#endif
     }
     break;
     case DEBUG_ADJUST_LIGHTS:
     {
-#if !defined(__APPLE__)
         // Some sliders use multipliers because the spinner widget
         // only supports integers
         DebugSliderDialog *dsd = new DebugSliderDialog();
@@ -625,11 +633,86 @@ bool handleContextMenuAction(s32 cmd_id)
             [](int v){        findNearestLight()->setRadius(float(v)); }
         );
         dsd->changeLabel("SSAO Sigma", "[None]");
-#endif
         break;
     }
     case DEBUG_SCRIPT_CONSOLE:
-        new ScriptingConsole();
+        new GeneralTextFieldDialog(L"Run Script", []
+            (const irr::core::stringw& text) {},
+            [] (GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
+            {
+                Scripting::ScriptEngine* engine =
+                    Scripting::ScriptEngine::getInstance();
+                if (engine == NULL)
+                {
+                    Log::warn("Debug", "No scripting engine loaded!");
+                    return true;
+                }
+                engine->evalScript(StringUtils::wideToUtf8(tb->getText()));
+                tb->setText(L"");
+                // Don't close the console after each run
+                return false;
+            });
+        break;
+    case DEBUG_RUN_CUTSCENE:
+        new GeneralTextFieldDialog(
+            L"Enter the cutscene names (separate parts by space)", []
+            (const irr::core::stringw& text)
+            {
+                if (World::getWorld())
+                {
+                    Log::warn("Debug", "Please run cutscene in main menu");
+                    return;
+                }
+                if (text.empty()) return;
+                std::vector<std::string> parts =
+                    StringUtils::split(StringUtils::wideToUtf8(text), ' ');
+                for (const std::string& track : parts)
+                {
+                    Track* t = track_manager->getTrack(track);
+                    if (t == NULL)
+                    {
+                        Log::warn("Debug", "Cutscene %s not found!",
+                            track.c_str());
+                        return;
+                    }
+                }
+                CutsceneWorld::setUseDuration(true);
+                StateManager::get()->enterGameState();
+                race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+                race_manager->setNumKarts(0);
+                race_manager->setNumPlayers(0);
+                race_manager->startSingleRace(parts.front(), 999, false);
+                ((CutsceneWorld*)World::getWorld())->setParts(parts);
+            });
+        break;
+        case DEBUG_TEXTURE_CONSOLE:
+        new GeneralTextFieldDialog(
+            L"Enter the texture filename(s) (separate names by ;)"
+            " to be reloaded (empty to reload all)\n"
+            "Press tus; for texture usage stats (shown in console)", []
+            (const irr::core::stringw& text) {},
+            [] (GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
+            {
+#ifndef SERVER_ONLY
+                core::stringw t = tb->getText();
+                STKTexManager* stktm = STKTexManager::getInstance();
+                if (t == "tus;")
+                {
+                    stktm->dumpAllTexture(false/*mesh_texture*/);
+                    stktm->dumpTextureUsage();
+                    return false;
+                }
+                lw->setText(stktm->reloadTexture(t), true);
+#endif
+                // Don't close the dialog after each run
+                return false;
+            });
+        break;
+        case DEBUG_START_RECORDING:
+            irr_driver->setRecording(true);
+        break;
+        case DEBUG_STOP_RECORDING:
+            irr_driver->setRecording(false);
         break;
     }   // switch
     return false;
@@ -643,11 +726,15 @@ bool onEvent(const SEvent &event)
     if(!UserConfigParams::m_artist_debug_mode)
         return true;    // keep handling the events
 
-    if(event.EventType == EET_MOUSE_INPUT_EVENT)
+    if (event.EventType == EET_MOUSE_INPUT_EVENT)
     {
         // Create the menu (only one menu at a time)
-        if(event.MouseInput.Event == EMIE_RMOUSE_PRESSED_DOWN &&
-             !g_debug_menu_visible)
+        #ifdef ANDROID
+        if (event.MouseInput.X < 30 && event.MouseInput.Y < 30 &&
+        #else
+        if (event.MouseInput.Event == EMIE_RMOUSE_PRESSED_DOWN &&
+        #endif
+            !g_debug_menu_visible)
         {
             irr_driver->getDevice()->getCursorControl()->setVisible(true);
 
@@ -709,8 +796,13 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Toggle smooth camera", DEBUG_GUI_CAM_SMOOTH);
             sub->addItem(L"Attach fps camera to kart", DEBUG_GUI_CAM_ATTACH);
 
-            mnu->addItem(L"Change camera target >",-1,true, true);
+            mnu->addItem(L"Recording >",-1,true, true);
             sub = mnu->getSubMenu(4);
+            sub->addItem(L"Start recording", DEBUG_START_RECORDING);
+            sub->addItem(L"Stop recording", DEBUG_STOP_RECORDING);
+
+            mnu->addItem(L"Change camera target >",-1,true, true);
+            sub = mnu->getSubMenu(5);
             sub->addItem(L"To kart one", DEBUG_VIEW_KART_ONE);
             sub->addItem(L"To kart two", DEBUG_VIEW_KART_TWO);
             sub->addItem(L"To kart three", DEBUG_VIEW_KART_THREE);
@@ -721,7 +813,7 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"To kart eight", DEBUG_VIEW_KART_EIGHT);
 
             mnu->addItem(L"Font >",-1,true, true);
-            sub = mnu->getSubMenu(5);
+            sub = mnu->getSubMenu(6);
             sub->addItem(L"Dump glyph pages of fonts", DEBUG_FONT_DUMP_GLYPH_PAGE);
             sub->addItem(L"Reload all fonts", DEBUG_FONT_RELOAD);
 
@@ -729,8 +821,8 @@ bool onEvent(const SEvent &event)
 
             mnu->addItem(L"Profiler", DEBUG_PROFILER);
             if (UserConfigParams::m_profiler_enabled)
-                mnu->addItem(L"Toggle capture profiler report",
-                             DEBUG_PROFILER_GENERATE_REPORT);
+                mnu->addItem(L"Save profiler report",
+                             DEBUG_PROFILER_WRITE_REPORT);
             mnu->addItem(L"Do not limit FPS", DEBUG_THROTTLE_FPS);
             mnu->addItem(L"Toggle FPS", DEBUG_FPS);
             mnu->addItem(L"Save replay", DEBUG_SAVE_REPLAY);
@@ -738,6 +830,8 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"Print position", DEBUG_PRINT_START_POS);
             mnu->addItem(L"Adjust Lights", DEBUG_ADJUST_LIGHTS);
             mnu->addItem(L"Scripting console", DEBUG_SCRIPT_CONSOLE);
+            mnu->addItem(L"Run cutscene(s)", DEBUG_RUN_CUTSCENE);
+            mnu->addItem(L"Texture console", DEBUG_TEXTURE_CONSOLE);
 
             g_debug_menu_visible = true;
             irr_driver->showPointer();
@@ -775,13 +869,18 @@ bool onEvent(const SEvent &event)
 
 bool handleStaticAction(int key)
 {
-    if (key == KEY_F1)
+    if (key == IRR_KEY_F1)
     {
         handleContextMenuAction(DEBUG_GUI_CAM_FREE);
     }
-    else if (key == KEY_F2)
+    else if (key == IRR_KEY_F2)
     {
         handleContextMenuAction(DEBUG_GUI_CAM_NORMAL);
+    }
+    else if (key == IRR_KEY_F3)
+    {
+        STKTexManager::getInstance()->reloadTexture("");
+        return true;
     }
     // TODO: create more keyboard shortcuts
 

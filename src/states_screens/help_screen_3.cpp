@@ -23,6 +23,7 @@
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/help_screen_2.hpp"
 #include "states_screens/help_screen_4.hpp"
+#include "states_screens/help_screen_5.hpp"
 #include "states_screens/state_manager.hpp"
 
 using namespace GUIEngine;
@@ -59,6 +60,8 @@ void HelpScreen3::eventCallback(Widget* widget, const std::string& name, const i
         //    screen = HelpScreen3::getInstance();
         else if (selection == "page4")
             screen = HelpScreen4::getInstance();
+        else if (selection == "page5")
+            screen = HelpScreen5::getInstance();
         if(screen)
             StateManager::get()->replaceTopMostScreen(screen);
     }

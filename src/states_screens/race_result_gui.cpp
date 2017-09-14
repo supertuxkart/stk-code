@@ -45,7 +45,7 @@
 #include "modes/soccer_world.hpp"
 #include "modes/world_with_rank.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/protocols/client_lobby_room_protocol.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "race/highscores.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/feature_unlocked.hpp"
@@ -341,10 +341,9 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         if (name == "middle") // Continue button (return to server lobby)
         {
             // Signal to the server that this client is back in the lobby now.
-            Protocol* protocol =
-                ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM);
-            ClientLobbyRoomProtocol* clrp =
-                static_cast<ClientLobbyRoomProtocol*>(protocol);
+            Protocol* protocol = LobbyProtocol::get();
+            ClientLobby* clrp =
+                dynamic_cast<ClientLobby*>(protocol);
             if(clrp)
                 clrp->doneWithResults();
             backToLobby();
@@ -374,8 +373,10 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 MessageDialog::MESSAGE_DIALOG_CONFIRM, this, false);
         }
         else if (!getWidget(name.c_str())->isVisible())
-            Log::fatal("RaceResultGUI", "Incorrect event '%s' when things are unlocked.",
+        {
+            Log::warn("RaceResultGUI", "Incorrect event '%s' when things are unlocked.",
                 name.c_str());
+        }
         return;
     }
 
@@ -460,16 +461,16 @@ void RaceResultGUI::backToLobby()
         WorldWithRank *rank_world = (WorldWithRank*)World::getWorld();
 
         unsigned int first_position = 1;
+        unsigned int sta = race_manager->getNumSpareTireKarts();
         if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
             first_position = 2;
 
         // Use only the karts that are supposed to be displayed (and
         // ignore e.g. the leader in a FTL race).
-        unsigned int num_karts = race_manager->getNumberOfKarts() - first_position + 1;
+        unsigned int num_karts = race_manager->getNumberOfKarts() - first_position + 1 - sta;
 
         // In FTL races the leader kart is not displayed
         m_all_row_infos.resize(num_karts);
-
 
         // Determine the kart to display in the right order,
         // and the maximum width for the kart name column
@@ -478,14 +479,14 @@ void RaceResultGUI::backToLobby()
         float max_finish_time = 0;
 
         for (unsigned int position = first_position;
-        position <= race_manager->getNumberOfKarts(); position++)
+        position <= race_manager->getNumberOfKarts() - sta; position++)
         {
             const AbstractKart *kart = rank_world->getKartAtPosition(position);
 
             // Save a pointer to the current row_info entry
             RowInfo *ri = &(m_all_row_infos[position - first_position]);
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
-            ri->m_kart_name = getKartDisplayName(kart);
+            ri->m_kart_name = kart->getController()->getName();
 
             video::ITexture *icon =
                 kart->getKartProperties()->getIconMaterial()->getTexture();
@@ -659,6 +660,7 @@ void RaceResultGUI::backToLobby()
      */
     void RaceResultGUI::renderGlobal(float dt)
     {
+#ifndef SERVER_ONLY
         bool isSoccerWorld = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
 
         m_timer += dt;
@@ -830,6 +832,7 @@ void RaceResultGUI::backToLobby()
         {
             displayPostRaceInfo();
         }
+#endif
     }   // renderGlobal
 
     //-----------------------------------------------------------------------------
@@ -838,6 +841,7 @@ void RaceResultGUI::backToLobby()
      */
     void RaceResultGUI::determineGPLayout()
     {
+#ifndef SERVER_ONLY
         unsigned int num_karts = race_manager->getNumberOfKarts();
         std::vector<int> old_rank(num_karts, 0);
         for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
@@ -851,7 +855,7 @@ void RaceResultGUI::backToLobby()
             ri->m_kart_icon =
                 kart->getKartProperties()->getIconMaterial()->getTexture();
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
-            ri->m_kart_name = getKartDisplayName(kart);
+            ri->m_kart_name = kart->getController()->getName();
 
             // In FTL karts do have a time, which is shown even when the kart
             // is eliminated
@@ -900,30 +904,8 @@ void RaceResultGUI::backToLobby()
             int p = race_manager->getKartScore(i);
             ri->m_new_overall_points = p;
         }   // i < num_karts
+#endif
     }   // determineGPLayout
-
-    //-----------------------------------------------------------------------------
-    /** Returns a string to display next to a kart. For a player that's the name
-     *  of the player, for an AI kart it's the name of the driver.
-     */
-    core::stringw RaceResultGUI::getKartDisplayName(const AbstractKart *kart) const
-    {
-        const EndController *ec =
-            dynamic_cast<const EndController*>(kart->getController());
-        // If the race was given up, there is no end controller for the
-        // players, so this case needs to be handled separately
-        if(ec && ec->isLocalPlayerController())
-            return ec->getName();
-        else
-        {
-            // No end controller, check explicitely for a player controller
-            const PlayerController *pc =
-                dynamic_cast<const PlayerController*>(kart->getController());
-            // Check if the kart is a player controller to get the real name
-            if(pc) return pc->getName();
-        }
-        return translations->fribidize(kart->getName());
-    }   // getKartDisplayName
 
     //-----------------------------------------------------------------------------
     /** Displays the race results for a single kart.
@@ -933,6 +915,7 @@ void RaceResultGUI::backToLobby()
     void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
         unsigned int n, bool display_points)
     {
+#ifndef SERVER_ONLY
         RowInfo *ri = &(m_all_row_infos[n]);
         video::SColor color = ri->m_is_player_kart
             ? video::SColor(255, 255, 0, 0)
@@ -1003,12 +986,13 @@ void RaceResultGUI::backToLobby()
             m_font->draw(point_inc_string, dest_rect, color, false, false, NULL,
                 true /* ignoreRTL */);
         }
+#endif
     }   // displayOneEntry
 
     //-----------------------------------------------------------------------------
     void RaceResultGUI::displaySoccerResults()
     {
-
+#ifndef SERVER_ONLY
         //Draw win text
         core::stringw result_text;
         static video::SColor color = video::SColor(255, 255, 255, 255);
@@ -1081,7 +1065,15 @@ void RaceResultGUI::backToLobby()
         current_y += rect.Height / 2 + rect.Height / 4;
         font = GUIEngine::getSmallFont();
         std::vector<SoccerWorld::ScorerData> scorers = sw->getScorers(SOCCER_TEAM_RED);
+        while (scorers.size() > 10)
+        {
+            scorers.erase(scorers.begin());
+        }
         std::vector<float> score_times = sw->getScoreTimes(SOCCER_TEAM_RED);
+        while (score_times.size() > 10)
+        {
+            score_times.erase(score_times.begin());
+        }
         irr::video::ITexture* scorer_icon;
 
         int prev_y = current_y;
@@ -1133,7 +1125,15 @@ void RaceResultGUI::backToLobby()
         current_y = prev_y;
         current_x += UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
         scorers = sw->getScorers(SOCCER_TEAM_BLUE);
+        while (scorers.size() > 10)
+        {
+            scorers.erase(scorers.begin());
+        }
         score_times = sw->getScoreTimes(SOCCER_TEAM_BLUE);
+        while (score_times.size() > 10)
+        {
+            score_times.erase(score_times.begin());
+        }
         for (unsigned int i = 0; i < scorers.size(); i++)
         {
             const bool own_goal = !(scorers.at(i).m_correct_goal);
@@ -1177,6 +1177,7 @@ void RaceResultGUI::backToLobby()
             draw2DImage(scorer_icon, dest_rect, source_rect,
                 NULL, NULL, true);
         }
+#endif
     }
 
     //-----------------------------------------------------------------------------
@@ -1324,6 +1325,7 @@ void RaceResultGUI::backToLobby()
     // ----------------------------------------------------------------------------
     void RaceResultGUI::displayPostRaceInfo()
     {
+#ifndef SERVER_ONLY
         // This happens in demo world
         if (!World::getWorld())
             return;
@@ -1441,8 +1443,9 @@ void RaceResultGUI::backToLobby()
                 GUIEngine::getFont()->draw(best_lap_string,
                     core::recti(x, current_y, 0, 0), white_color, false, false,
                     nullptr, true);
-            }
-        }
+            }   // if mode has laps
+        }   // if not soccer mode
+#endif
     }
 
     // ----------------------------------------------------------------------------

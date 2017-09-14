@@ -47,7 +47,8 @@ CC = gcc
 #CC = i386-mingw32msvc-gcc #	e.g., Linux -> Win32 cross-compilation
 LD = $(CC)
 RM = rm -f
-CFLAGS = -O -Wall $(INCS) $(MINGW_CCFLAGS)
+CPPFLAGS = $(INCS)
+CFLAGS = -O -Wall $(MINGW_CCFLAGS)
 # [note that -Wall is a gcc-specific compilation flag ("most warnings on")]
 # [-ansi, -pedantic and -W can also be used]
 LDFLAGS = $(MINGW_LDFLAGS)
@@ -85,10 +86,10 @@ EXES = $(STATIC_EXES) $(DYNAMIC_EXES)
 # implicit make rules -------------------------------------------------------
 
 .c$(O):
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
 
 %.pic$(O): %.c
-	$(CC) -c $(CFLAGS) -DPNG_BUILD_DLL -o $@ $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -DPNG_BUILD_DLL -o $@ $<
 
 
 # dependencies --------------------------------------------------------------

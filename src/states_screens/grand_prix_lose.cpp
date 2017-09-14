@@ -161,7 +161,7 @@ void GrandPrixLose::onUpdate(float dt)
 
 void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
 {
-    TrackObjectManager* tobjman = World::getWorld()->getTrack()->getTrackObjectManager();
+    TrackObjectManager* tobjman = Track::getCurrentTrack()->getTrackObjectManager();
 
     assert(ident_arg.size() > 0);
     if ((int)ident_arg.size() > MAX_KART_COUNT)

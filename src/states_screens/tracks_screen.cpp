@@ -20,14 +20,13 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
 #include "network/network_player_profile.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/client_lobby_room_protocol.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/track_info_screen.hpp"
@@ -90,10 +89,10 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         {
             if(STKHost::existHost())
             {
-                Protocol* protocol = ProtocolManager::getInstance()
-                                   ->getProtocol(PROTOCOL_LOBBY_ROOM);
-                ClientLobbyRoomProtocol* clrp =
-                              static_cast<ClientLobbyRoomProtocol*>(protocol);
+                Protocol* protocol = LobbyProtocol::get();
+                ClientLobby* clrp =
+                              dynamic_cast<ClientLobby*>(protocol);
+                assert(clrp);   // server never shows the track screen.
                 // FIXME SPLITSCREEN: we need to supply the global player id of the
                 // player selecting the track here. For now ... just vote the same
                 // track for each local player.
@@ -163,7 +162,7 @@ void TracksScreen::init()
     buildTrackList();
 
     // select old track for the game master (if found)
-    irr_driver->setTextureErrorMessage(
+    STKTexManager::getInstance()->setTextureErrorMessage(
               "While loading screenshot in track screen for last track '%s':",
               UserConfigParams::m_last_track);
     if (!tracks_widget->setSelection(UserConfigParams::m_last_track,
@@ -171,7 +170,7 @@ void TracksScreen::init()
     {
         tracks_widget->setSelection(0, PLAYER_ID_GAME_MASTER, true);
     }
-    irr_driver->unsetTextureErrorMessage();
+    STKTexManager::getInstance()->unsetTextureErrorMessage();
 }   // init
 
 // -----------------------------------------------------------------------------

@@ -26,6 +26,8 @@
     - 1.14:  added support for X resources (thanks to Gerhard Niklasch)
     - 2.00:  dual-licensed (added GNU GPL)
     - 2.01:  fixed improper display of usage screen on PNG error(s)
+    - 2.02:  Added "void(argc);" statement to quiet pedantic compiler warnings
+             about unused variable (GR-P)
 
   ---------------------------------------------------------------------------
 
@@ -80,7 +82,7 @@
 
 #define PROGNAME  "rpng-x"
 #define LONGNAME  "Simple PNG Viewer for X"
-#define VERSION   "2.01 of 16 March 2008"
+#define VERSION   "2.02 of 15 June 2014"
 #define RESNAME   "rpng"        /* our X resource application name */
 #define RESCLASS  "Rpng"        /* our X resource class name */
 
@@ -279,15 +281,17 @@ int main(int argc, char **argv)
           "Usage:  %s [-display xdpy] [-gamma exp] [-bgcolor bg] file.png\n"
           "    xdpy\tname of the target X display (e.g., ``hostname:0'')\n"
           "    exp \ttransfer-function exponent (``gamma'') of the display\n"
-          "\t\t  system in floating-point format (e.g., ``%.1f''); equal\n"
+          "\t\t  system in floating-point format (e.g., ``%.1f''); equal\n",
+          PROGNAME, default_display_exponent);
+
+        fprintf(stderr, "\n"
           "\t\t  to the product of the lookup-table exponent (varies)\n"
           "\t\t  and the CRT exponent (usually 2.2); must be positive\n"
           "    bg  \tdesired background color in 7-character hex RGB format\n"
           "\t\t  (e.g., ``#ff7700'' for orange:  same as HTML colors);\n"
           "\t\t  used with transparent images\n"
           "\nPress Q, Esc or mouse button 1 (within image window, after image\n"
-          "is displayed) to quit.\n"
-          "\n", PROGNAME, default_display_exponent);
+          "is displayed) to quit.\n");
         exit(1);
     }
 
@@ -418,6 +422,8 @@ int main(int argc, char **argv)
     /* OK, we're done:  clean up all image and X resources and go away */
 
     rpng_x_cleanup();
+
+    (void)argc; /* Unused */
 
     return 0;
 }

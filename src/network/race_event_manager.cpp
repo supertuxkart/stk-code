@@ -5,7 +5,6 @@
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/protocols/synchronization_protocol.hpp"
 #include "network/protocols/controller_events_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 
@@ -22,9 +21,7 @@ RaceEventManager::~RaceEventManager()
 
 // ----------------------------------------------------------------------------
 /** In network games this update function is called instead of
- *  World::updateWorld(). This allow this function to postpone calling
- *  the worl update while the countdown from the SynchronisationProtocol is
- *  running.
+ *  World::updateWorld(). 
  */
 void RaceEventManager::update(float dt)
 {
@@ -33,18 +30,6 @@ void RaceEventManager::update(float dt)
     if(!ProtocolManager::getInstance())
         return;
 
-    SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(
-            ProtocolManager::getInstance()->getProtocol(PROTOCOL_SYNCHRONIZATION));
-    if (protocol) // The existance of this protocol indicates that we play online
-    {
-        Log::debug("RaceEventManager", "Countdown value is %f",
-                   protocol->getCountdown());
-        if (protocol->getCountdown() > 0.0)
-        {
-            return;
-        }
-        World::getWorld()->setNetworkWorld(true);
-    }
     World::getWorld()->updateWorld(dt);
 
     // if the race is over

@@ -7,7 +7,7 @@ uniform sampler2D SpecMap;
 #ifdef Use_Bindless_Texture
 flat in sampler2D handle;
 flat in sampler2D secondhandle;
-flat in sampler2D thirdhandle;
+flat in sampler2D fourthhandle;
 #endif
 in vec2 uv;
 in vec2 uv_bis;
@@ -23,12 +23,13 @@ void main(void)
 #ifdef SRGBBindlessFix
     color.xyz = pow(color.xyz, vec3(2.2));
 #endif
-    vec4 detail = texture(thirdhandle, uv_bis);
+    vec4 detail = texture(fourthhandle, uv_bis);
 #else
     vec4 color = texture(Albedo, uv);
     vec4 detail = texture(Detail, uv_bis);
     float specmap = texture(SpecMap, uv).g;
 #endif
-    color *= detail;
+    detail.rgb = detail.a * detail.rgb;
+    color.rgb = detail.rgb + color.rgb * (1. - detail.a);
     FragColor = vec4(getLightFactor(color.xyz, vec3(1.), specmap, 0.), 1.);
 }

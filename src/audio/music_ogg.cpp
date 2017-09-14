@@ -333,11 +333,10 @@ bool MusicOggStream::streamIntoBuffer(ALuint buffer)
 
     int  size = 0;
     int  portion;
-    int  result;
 
     while(size < m_buffer_size)
     {
-        result = ov_read(&m_oggStream, pcm + size, m_buffer_size - size,
+        int result = ov_read(&m_oggStream, pcm + size, m_buffer_size - size,
                          isBigEndian, 2, 1, &portion);
 
         if(result > 0)

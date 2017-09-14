@@ -28,15 +28,22 @@
 
 FontManager *font_manager = NULL;
 // ----------------------------------------------------------------------------
+/** Constructor. It will initialize the \ref m_ft_library.
+ */
 FontManager::FontManager()
 {
     checkFTError(FT_Init_FreeType(&m_ft_library), "loading freetype library");
 }   // FontManager
 
 // ----------------------------------------------------------------------------
+/** Destructor. Clears all fonts and related stuff.
+ */
 FontManager::~FontManager()
 {
-    m_fonts.clearAndDeleteAll();
+    for (unsigned int i = 0; i < m_fonts.size(); i++)
+        delete m_fonts[i];
+    m_fonts.clear();
+
     delete m_normal_ttf;
     m_normal_ttf = NULL;
     delete m_digit_ttf;
@@ -47,6 +54,8 @@ FontManager::~FontManager()
 }   // ~FontManager
 
 // ----------------------------------------------------------------------------
+/** Initialize all \ref FaceTTF and \ref FontWithFace members.
+ */
 void FontManager::loadFonts()
 {
     // First load the TTF files required by each font
@@ -72,15 +81,10 @@ void FontManager::loadFonts()
 }   // loadFonts
 
 // ----------------------------------------------------------------------------
-void FontManager::checkFTError(FT_Error err, const std::string& desc) const
-{
-    if (err > 0)
-    {
-        Log::error("FontManager", "Something wrong when %s!", desc.c_str());
-    }
-}   // checkFTError
-
-// ----------------------------------------------------------------------------
+/** Unit testing that will try to load all translations in STK, and discover if
+ *  there is any characters required by it are not supported in \ref
+ *  m_normal_ttf.
+ */
 void FontManager::unitTesting()
 {
     std::vector<std::string> list = *(translations->getLanguageList());

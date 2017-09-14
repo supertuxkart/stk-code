@@ -20,24 +20,25 @@
 #include "audio/sfx_manager.hpp"
 #include "graphics/weather.hpp"
 #include "modes/world.hpp"
+#include "tracks/track.hpp"
 #include "utils/random_generator.hpp"
 
 
-// The weather manager
-
-Weather::Weather(bool lightning, std::string sound)
+/**  The weather manager stores information about the weather.
+ */
+Weather::Weather()
 {
-    m_lightning_enabled = lightning;
     m_thunder_sound = NULL;
     m_weather_sound = NULL;
     m_lightning = 0.0f;
     
-    if (m_lightning_enabled)
+    if (Track::getCurrentTrack()->getWeatherLightning())
     {
         m_thunder_sound = SFXManager::get()->createSoundSource("thunder");
     }
 
-    if (sound != "")
+    const std::string &sound = Track::getCurrentTrack()->getWeatherSound();
+    if (!sound.empty())
     {
         m_weather_sound = SFXManager::get()->createSoundSource(sound);
     }
@@ -61,7 +62,7 @@ Weather::~Weather()
 
 void Weather::update(float dt)
 {
-    if (!m_lightning_enabled)
+    if (!Track::getCurrentTrack()->getWeatherLightning())
         return;
         
     if (World::getWorld()->getRaceGUI() == NULL)

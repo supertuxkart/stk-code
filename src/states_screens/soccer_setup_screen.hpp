@@ -76,10 +76,14 @@ public:
                                                        Input::InputType type,
                                                        int playerId) OVERRIDE;
 
+    virtual bool onEscapePressed() OVERRIDE;
+
 private:
     bool areAllKartsConfirmed() const;
     int getNumConfirmedKarts();
     void updateKartViewsLayout();
+    void changeTeam(int player_id, SoccerTeam team);
+    void prepareGame();
 };
 
 #endif // HEADER_SOCCER_SETUP_SCREEN_HPP

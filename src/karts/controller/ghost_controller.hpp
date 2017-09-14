@@ -37,27 +37,30 @@ private:
     /** The current world time. */
     float m_current_time;
 
+    /** Player name of the ghost kart. */
+    core::stringw m_display_name;
+
     /** The list of the times at which the events of kart were reached. */
     std::vector<float> m_all_times;
 
 public:
-             GhostController(AbstractKart *kart);
+             GhostController(AbstractKart *kart, core::stringw display_name);
     virtual ~GhostController() {};
-    virtual void reset();
-    virtual void update (float dt);
-    virtual bool disableSlipstreamBonus() const { return true; }
-    virtual void crashed(const Material *m) {};
-    virtual void crashed(const AbstractKart *k) {};
-    virtual void handleZipper(bool play_sound) {};
-    virtual void finishedRace(float time) {};
+    virtual void reset() OVERRIDE;
+    virtual void update (float dt) OVERRIDE;
+    virtual bool disableSlipstreamBonus() const OVERRIDE { return true; }
+    virtual void crashed(const Material *m) OVERRIDE {}
+    virtual void crashed(const AbstractKart *k) OVERRIDE {}
+    virtual void handleZipper(bool play_sound) OVERRIDE {}
+    virtual void finishedRace(float time) OVERRIDE {}
     virtual void collectedItem(const Item &item, int add_info=-1,
-                               float previous_energy=0) {};
-    virtual void setPosition(int p) {};
-    virtual bool isPlayerController() const { return false; }
-    virtual bool isLocalPlayerController() const { return false; }
+                               float previous_energy=0) OVERRIDE {}
+    virtual void setPosition(int p) OVERRIDE {}
+    virtual bool isPlayerController() const OVERRIDE { return false; }
+    virtual bool isLocalPlayerController() const OVERRIDE { return false; }
     virtual void action(PlayerAction action, int value) OVERRIDE;
-    virtual void skidBonusTriggered() {};
-    virtual void newLap(int lap) {};
+    virtual void skidBonusTriggered() OVERRIDE {}
+    virtual void newLap(int lap) OVERRIDE {}
     void         addReplayTime(float time);
     // ------------------------------------------------------------------------
     bool         isReplayEnd() const
@@ -73,6 +76,11 @@ public:
     unsigned int getCurrentReplayIndex() const
                                                    { return m_current_index; }
     // ------------------------------------------------------------------------
+    /** Return the display name; if not set, use default display name (kart name) */
+    core::stringw getName() const OVERRIDE
+    {
+        return m_display_name.empty() ? Controller::getName() : m_display_name;
+    }
 };   // GhostController
 
 #endif

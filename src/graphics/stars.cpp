@@ -18,10 +18,10 @@
 
 #include "graphics/stars.hpp"
 
-
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
 #include "utils/constants.hpp"
@@ -40,7 +40,10 @@ Stars::Stars(AbstractKart *kart)
     m_parent_kart_node = kart->getNode();
     m_enabled = false;
 
-    video::ITexture* texture = irr_driver->getTexture("starparticle.png");
+    TexConfig stc(true/*srgb*/, true/*premul_alpha*/);
+    video::ITexture* texture = STKTexManager::getInstance()->getTexture
+        ("starparticle.png", &stc);
+
     Material* star_material =
         material_manager->getMaterial("starparticle.png");
 

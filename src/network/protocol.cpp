@@ -118,8 +118,7 @@ void Protocol::findAndTerminateProtocol(ProtocolType type)
     if (protocol)
         protocol->requestTerminate();
     else
-        Log::error("ClientLobbyRoomProtocol",
-                    "No protocol %d registered.", type);
+        Log::error("Protocol", "No protocol %d registered.", type);
 }   // findAndTerminateProtocol
 
 // ----------------------------------------------------------------------------

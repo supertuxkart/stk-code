@@ -144,8 +144,8 @@ void RibbonWidget::add()
     //int biggest_y = 0;
     const int button_y = 10;
 
-    const int one_button_space =
-        int(roundf((float)m_w / (float)subbuttons_amount));
+    const int one_button_space = (subbuttons_amount == 0 ? m_w :
+        int(roundf((float)m_w / (float)subbuttons_amount)));
 
     int widget_x = -1;
 

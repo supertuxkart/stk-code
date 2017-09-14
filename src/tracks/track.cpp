@@ -29,15 +29,18 @@
 #include "graphics/camera_end.hpp"
 #include "graphics/CBatchingMesh.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
+#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/moving_texture.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/render_target.hpp"
+#include "graphics/stk_tex_manager.hpp"
+#include "graphics/vao_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
@@ -51,13 +54,14 @@
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
+#include "scriptengine/script_engine.hpp"
+#include "tracks/arena_graph.hpp"
 #include "tracks/bezier_curve.hpp"
-#include "tracks/battle_graph.hpp"
 #include "tracks/check_manager.hpp"
+#include "tracks/drive_graph.hpp"
+#include "tracks/drive_node.hpp"
 #include "tracks/model_definition_loader.hpp"
 #include "tracks/track_manager.hpp"
-#include "tracks/quad_graph.hpp"
-#include "tracks/quad_set.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
@@ -82,6 +86,7 @@ using namespace irr;
 
 const float Track::NOHIT               = -99999.9f;
 bool        Track::m_dont_load_navmesh = false;
+Track      *Track::m_current_track = NULL;
 
 // ----------------------------------------------------------------------------
 Track::Track(const std::string &filename)
@@ -120,9 +125,8 @@ Track::Track(const std::string &filename)
     m_is_soccer             = false;
     m_is_cutscene           = false;
     m_camera_far            = 1000.0f;
-    m_old_rtt_mini_map      = NULL;
-    m_new_rtt_mini_map      = NULL;
     m_bloom                 = true;
+    m_is_day                = true;
     m_bloom_threshold       = 0.75f;
     m_color_inlevel         = core::vector3df(0.0,1.0, 255.0);
     m_color_outlevel        = core::vector2df(0.0, 255.0);
@@ -140,10 +144,12 @@ Track::Track(const std::string &filename)
     m_weather_sound         = "";
     m_cache_track           = UserConfigParams::m_cache_overworld &&
                               m_ident=="overworld";
+    m_render_target         = NULL;
     m_minimap_x_scale       = 1.0f;
     m_minimap_y_scale       = 1.0f;
-    m_startup_run = false;
-    m_default_number_of_laps= 3;
+    m_force_disable_fog     = false;
+    m_startup_run           = false;
+    m_default_number_of_laps = 3;
     m_all_nodes.clear();
     m_static_physics_only_nodes.clear();
     m_all_cached_meshes.clear();
@@ -275,16 +281,21 @@ void Track::reset()
  */
 void Track::cleanup()
 {
-    QuadGraph::destroy();
-    BattleGraph::destroy();
-    ItemManager::destroy();
-    VAOManager::kill();
+#ifdef USE_RESIZE_CACHE
+    if (!UserConfigParams::m_high_definition_textures)
+    {
+        file_manager->popTextureSearchPath();
+    }
+#endif
+    file_manager->popTextureSearchPath();
+    file_manager->popModelSearchPath();
 
+    Graph::destroy();
+    ItemManager::destroy();
+#ifndef SERVER_ONLY
+    VAOManager::kill();
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
-    // Clear reminder of transformed textures
-    resetTextureTable();
-    // Clear reminder of the link between textures and file names.
-    irr_driver->clearTexturesFileName();
+#endif
 
     for (unsigned int i = 0; i < m_animated_textures.size(); i++)
     {
@@ -318,16 +329,20 @@ void Track::cleanup()
     m_object_physics_only_nodes.clear();
 
     irr_driver->removeNode(m_sun);
+#ifndef SERVER_ONLY
     if (CVS->isGLSL())
         m_sun->drop();
+#endif
     delete m_track_mesh;
     m_track_mesh = NULL;
 
     delete m_gfx_effect_mesh;
     m_gfx_effect_mesh = NULL;
 
+#ifndef SERVER_ONLY
     if (CVS->isGLSL())
         irr_driver->cleanSunInterposer();
+#endif
 
 
     // The m_all_cached_mesh contains each mesh loaded from a file, which
@@ -364,17 +379,6 @@ void Track::cleanup()
     }
     m_detached_cached_meshes.clear();
 
-    if (m_old_rtt_mini_map)
-    {
-        assert(m_old_rtt_mini_map->getReferenceCount() == 1);
-        irr_driver->removeTexture(m_old_rtt_mini_map);
-        m_old_rtt_mini_map = NULL;
-    }
-    if (m_new_rtt_mini_map)
-    {
-        m_new_rtt_mini_map = NULL; // already deleted by QuadGraph::~QuadGraph
-    }
-
     for(unsigned int i=0; i<m_sky_textures.size(); i++)
     {
         m_sky_textures[i]->drop();
@@ -403,6 +407,7 @@ void Track::cleanup()
     irr_driver->clearLights();
     irr_driver->clearForcedBloom();
     irr_driver->clearBackgroundNodes();
+    STKTexManager::getInstance()->reset();
 
     if(UserConfigParams::logMemory())
     {
@@ -459,9 +464,9 @@ void Track::cleanup()
     }
 #endif
 
-    Scripting::ScriptEngine* script_engine =
-        World::getWorld()->getScriptEngine();
-    script_engine->cleanupCache();
+    Scripting::ScriptEngine::getInstance()->cleanupCache();
+
+    m_current_track = NULL;
 }   // cleanup
 
 //-----------------------------------------------------------------------------
@@ -475,6 +480,7 @@ void Track::loadTrackInfo()
     m_fog_height_start      = 0.0f;
     m_fog_height_end        = 100.0f;
     m_gravity               = 9.80665f;
+    m_friction              = stk_config->m_default_track_friction;
     m_smooth_normals        = false;
     m_godrays               = false;
     m_godrays_opacity       = 1.0f;
@@ -509,6 +515,7 @@ void Track::loadTrackInfo()
     getMusicInformation(filenames, m_music);
     root->get("screenshot",            &m_screenshot);
     root->get("gravity",               &m_gravity);
+    root->get("friction",              &m_friction);
     root->get("soccer",                &m_is_soccer);
     root->get("arena",                 &m_is_arena);
     root->get("max-arena-players",     &m_max_arena_players);
@@ -522,6 +529,7 @@ void Track::loadTrackInfo()
     root->get("bloom",                 &m_bloom);
     root->get("bloom-threshold",       &m_bloom_threshold);
     root->get("shadows",               &m_shadows);
+    root->get("is-during-day",         &m_is_day);
     root->get("displacement-speed",    &m_displacement_speed);
     root->get("caustics-speed",        &m_caustics_speed);
     root->get("color-level-in",        &m_color_inlevel);
@@ -565,7 +573,10 @@ void Track::loadTrackInfo()
     if(xml_node) loadCurves(*xml_node);
 
     // Set the correct paths
-    m_screenshot = m_root+m_screenshot;
+    if (m_screenshot.length() > 0)
+    {
+        m_screenshot = m_root+m_screenshot;
+    }
     delete root;
 
     std::string dir = StringUtils::getPath(m_filename);
@@ -599,6 +610,9 @@ void Track::loadTrackInfo()
         // Currently only max eight players in soccer mode
         m_max_arena_players = 8;
     }
+    // Max 10 players supported in arena
+    if (m_max_arena_players > 10)
+        m_max_arena_players = 10;
 
 }   // loadTrackInfo
 
@@ -665,14 +679,15 @@ void Track::startMusic() const
 }   // startMusic
 
 //-----------------------------------------------------------------------------
-/** Loads the polygon graph for battle, i.e. the definition of all polys, and the way
- *  they are connected to each other. Input file name is hardcoded for now
+/** Loads the quad graph for arena, i.e. the definition of all quads, and the
+ *  way they are connected to each other. Input file name is hardcoded for now
  */
-void Track::loadBattleGraph(const XMLNode &node)
+void Track::loadArenaGraph(const XMLNode &node)
 {
-    BattleGraph::create(m_root+"navmesh.xml", &node);
+    ArenaGraph* graph = new ArenaGraph(m_root+"navmesh.xml", &node);
+    Graph::setGraph(graph);
 
-    if(BattleGraph::get()->getNumNodes()==0)
+    if(Graph::get()->getNumNodes()==0)
     {
         Log::warn("track", "No graph nodes defined for track '%s'\n",
                 m_filename.c_str());
@@ -681,27 +696,52 @@ void Track::loadBattleGraph(const XMLNode &node)
     {
         loadMinimap();
     }
-}   // loadBattleGraph
+}   // loadArenaGraph
 
 //-----------------------------------------------------------------------------
-/** Loads the quad graph, i.e. the definition of all quads, and the way
+btQuaternion Track::getArenaStartRotation(const Vec3& xyz, float heading)
+{
+    btQuaternion def_pos(Vec3(0, 1, 0), heading * DEGREE_TO_RAD);
+    if (!ArenaGraph::get())
+        return def_pos;
+
+    // Set the correct axis based on normal of the starting position
+    int node = Graph::UNKNOWN_SECTOR;
+    Graph::get()->findRoadSector(xyz, &node);
+    if (node == Graph::UNKNOWN_SECTOR)
+    {
+        Log::warn("track", "Starting position is not on ArenaGraph");
+        return def_pos;
+    }
+
+    const Vec3& normal = Graph::get()->getQuad(node)->getNormal();
+    btQuaternion q = shortestArcQuat(Vec3(0, 1, 0), normal);
+    btMatrix3x3 m;
+    m.setRotation(q);
+    return btQuaternion(m.getColumn(1), heading * DEGREE_TO_RAD) * q;
+
+}   // getArenaStartRotation
+
+//-----------------------------------------------------------------------------
+/** Loads the drive graph, i.e. the definition of all quads, and the way
  *  they are connected to each other.
  */
-void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
+void Track::loadDriveGraph(unsigned int mode_id, const bool reverse)
 {
-    QuadGraph::create(m_root+m_all_modes[mode_id].m_quad_name,
-                      m_root+m_all_modes[mode_id].m_graph_name,
-                      reverse);
+    new DriveGraph(m_root+m_all_modes[mode_id].m_quad_name,
+        m_root+m_all_modes[mode_id].m_graph_name, reverse);
 
-    QuadGraph::get()->setupPaths();
+    // setGraph is done in DriveGraph constructor
+    assert(DriveGraph::get());
+    DriveGraph::get()->setupPaths();
 #ifdef DEBUG
-    for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
+    for(unsigned int i=0; i<DriveGraph::get()->getNumNodes(); i++)
     {
-        assert(QuadGraph::get()->getNode(i).getPredecessor(0)!=-1);
+        assert(DriveGraph::get()->getNode(i)->getPredecessor(0)!=-1);
     }
 #endif
 
-    if(QuadGraph::get()->getNumNodes()==0)
+    if(DriveGraph::get()->getNumNodes()==0)
     {
         Log::warn("track", "No graph nodes defined for track '%s'\n",
                 m_filename.c_str());
@@ -715,16 +755,13 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
     {
         loadMinimap();
     }
-}   // loadQuadGraph
+}   // loadDriveGraph
 
 // -----------------------------------------------------------------------------
 
 void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
 {
-    if ((m_is_arena || m_is_soccer) && m_has_navmesh)
-        BattleGraph::get()->mapPoint2MiniMap(xyz, draw_at);
-    else
-        QuadGraph::get()->mapPoint2MiniMap(xyz, draw_at);
+    Graph::get()->mapPoint2MiniMap(xyz, draw_at);
     draw_at->setX(draw_at->getX() * m_minimap_x_scale);
     draw_at->setY(draw_at->getY() * m_minimap_y_scale);
 }
@@ -773,12 +810,16 @@ void Track::createPhysicsModel(unsigned int main_track_count)
             }
 
             // Color
-            mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 105, 180)));
+#ifndef SERVER_ONLY
+            mb->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 255, 105, 180)));
+#endif
             irr_driver->grabAllTextures(mesh);
             // Gloss
-            mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+#ifndef SERVER_ONLY
+            mb->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
             // Colorization mask
-            mb->getMaterial().setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+            mb->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+#endif
         }
         else
             irr_driver->removeNode(m_static_physics_only_nodes[i]);
@@ -800,7 +841,7 @@ void Track::createPhysicsModel(unsigned int main_track_count)
     {
         convertTrackToBullet(m_all_nodes[i]);
     }
-    m_track_mesh->createPhysicalBody();
+    m_track_mesh->createPhysicalBody(m_friction);
     m_gfx_effect_mesh->createCollisionShape();
 }   // createPhysicsModel
 
@@ -905,7 +946,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         TriangleMesh *tmesh = m_track_mesh;
         if(t)
         {
-            std::string image = std::string(core::stringc(t->getName()).c_str());
+            std::string image = t->getName().getPtr();
 
             // the third boolean argument is false because at this point we're
             // dealing physics, so it's useless to warn about missing textures,
@@ -1015,6 +1056,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 
 void Track::loadMinimap()
 {
+#ifndef SERVER_ONLY
     //Check whether the hardware can do nonsquare or
     // non power-of-two textures
     video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
@@ -1027,32 +1069,21 @@ void Track::loadMinimap()
     core::dimension2du size = m_mini_map_size
                              .getOptimalSize(!nonpower,!nonsquare);
 
-    if ((m_is_arena || m_is_soccer) && m_has_navmesh)
-    {
-        BattleGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
-            &m_old_rtt_mini_map, &m_new_rtt_mini_map);
-    }
-    else
-    {
-        QuadGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
-            &m_old_rtt_mini_map, &m_new_rtt_mini_map);
-    }
+    m_render_target = Graph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255));
+    if (!m_render_target) return;
 
-    if (m_old_rtt_mini_map)
-    {
-        m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_old_rtt_mini_map->getSize().Width);
-        m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_old_rtt_mini_map->getSize().Height);
-    }
-    else if (m_new_rtt_mini_map)
-    {
-        m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_new_rtt_mini_map->getWidth());
-        m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_new_rtt_mini_map->getHeight());
-    }
+    core::dimension2du mini_map_texture_size = m_render_target->getTextureSize();
+
+    if(mini_map_texture_size.Width) 
+        m_minimap_x_scale = float(m_mini_map_size.Width) / float(mini_map_texture_size.Width);
     else
-    {
         m_minimap_x_scale = 0;
+
+    if(mini_map_texture_size.Height) 
+        m_minimap_y_scale = float(m_mini_map_size.Height) / float(mini_map_texture_size.Height);
+    else
         m_minimap_y_scale = 0;
-    }
+#endif
 }   // loadMinimap
 
 // ----------------------------------------------------------------------------
@@ -1067,40 +1098,14 @@ bool Track::loadMainTrack(const XMLNode &root)
 
     m_challenges.clear();
 
-    m_track_mesh      = new TriangleMesh();
-    m_gfx_effect_mesh = new TriangleMesh();
+    m_track_mesh      = new TriangleMesh(/*can_be_transformed*/false);
+    m_gfx_effect_mesh = new TriangleMesh(/*can_be_transformed*/false);
 
     const XMLNode *track_node = root.getNode("track");
     std::string model_name;
     track_node->get("model", &model_name);
     std::string full_path = m_root+model_name;
-
-    scene::IMesh *mesh;
-    // If the hd texture option is disabled, we generate smaller textures
-    // and configure the path to them before loading the mesh.
-    if ( (UserConfigParams::m_high_definition_textures & 0x01) == 0x00)
-    {
-#undef USE_RESIZE_CACHE
-#ifdef USE_RESIZE_CACHE
-        std::string cached_textures_dir =
-            irr_driver->generateSmallerTextures(m_root);
-
-        irr::io::IAttributes* scene_params =
-            irr_driver->getSceneManager()->getParameters();
-        // Before changing the texture path, we retrieve the older one to restore it later
-        std::string texture_default_path =
-            scene_params->getAttributeAsString(scene::B3D_TEXTURE_PATH).c_str();
-        scene_params->setAttribute(scene::B3D_TEXTURE_PATH, cached_textures_dir.c_str());
-#endif
-        mesh = irr_driver->getMesh(full_path);
-#ifdef USE_RESIZE_CACHE
-        scene_params->setAttribute(scene::B3D_TEXTURE_PATH, texture_default_path.c_str());
-#endif
-    }
-    else // Load mesh with default (hd) textures
-    {
-        mesh = irr_driver->getMesh(full_path);
-    }
+    scene::IMesh *mesh = irr_driver->getMesh(full_path);
 
     if(!mesh)
     {
@@ -1109,35 +1114,51 @@ bool Track::loadMainTrack(const XMLNode &root)
                    track_node->getName().c_str(), model_name.c_str());
     }
 
-    // The mesh as returned does not have all mesh buffers with the same
-    // texture combined. This can result in a _HUGE_ overhead. E.g. instead
-    // of 46 different mesh buffers over 500 (for some tracks even >1000)
-    // were created. This means less effect from hardware support, less
-    // vertices per opengl operation, more overhead on CPU, ...
-    // So till we have a better b3d exporter which can combine the different
-    // meshes which use the same texture when exporting, the meshes are
-    // combined using CBatchingMesh.
-    scene::CBatchingMesh *merged_mesh = new scene::CBatchingMesh();
-    merged_mesh->addMesh(mesh);
-    merged_mesh->finalize();
+    scene::ISceneNode* scene_node = NULL;
+    scene::IMesh* tangent_mesh = NULL;
+    if (m_version < 7)
+    {
+        // The mesh as returned does not have all mesh buffers with the same
+        // texture combined. This can result in a _HUGE_ overhead. E.g. instead
+        // of 46 different mesh buffers over 500 (for some tracks even >1000)
+        // were created. This means less effect from hardware support, less
+        // vertices per opengl operation, more overhead on CPU, ...
+        // So till we have a better b3d exporter which can combine the different
+        // meshes which use the same texture when exporting, the meshes are
+        // combined using CBatchingMesh.
+        scene::CBatchingMesh *merged_mesh = new scene::CBatchingMesh();
+        merged_mesh->addMesh(mesh);
+        merged_mesh->finalize();
+#ifndef SERVER_ONLY
+        tangent_mesh = MeshTools::createMeshWithTangents(merged_mesh, &MeshTools::isNormalMap);
 
-    scene::IMesh* tangent_mesh = MeshTools::createMeshWithTangents(merged_mesh, &MeshTools::isNormalMap);
-
-    adjustForFog(tangent_mesh, NULL);
-
+        adjustForFog(tangent_mesh, NULL);
+#else
+        tangent_mesh = merged_mesh;
+#endif
+        // The reference count of the mesh is 1, since it is in irrlicht's
+        // cache. So we only have to remove it from the cache.
+        irr_driver->removeMeshFromCache(mesh);
+    }
+    else
+    {
+        // SPM does the combine for you
+#ifndef SERVER_ONLY
+        tangent_mesh = MeshTools::createMeshWithTangents(mesh, &MeshTools::isNormalMap);
+        adjustForFog(tangent_mesh, NULL);
+        tangent_mesh->grab();
+#else
+        tangent_mesh = mesh;
+#endif
+    }
     // The merged mesh is grabbed by the octtree, so we don't need
     // to keep a reference to it.
-    scene::ISceneNode *scene_node = irr_driver->addMesh(tangent_mesh, "track_main");
-    //scene::IMeshSceneNode *scene_node = irr_driver->addOctTree(merged_mesh);
+    scene_node = irr_driver->addMesh(tangent_mesh, "track_main");
     // We should drop the merged mesh (since it's now referred to in the
     // scene node), but then we need to grab it since it's in the
     // m_all_cached_meshes.
     m_all_cached_meshes.push_back(tangent_mesh);
     irr_driver->grabAllTextures(tangent_mesh);
-
-    // The reference count of the mesh is 1, since it is in irrlicht's
-    // cache. So we only have to remove it from the cache.
-    irr_driver->removeMeshFromCache(mesh);
 
 #ifdef DEBUG
     std::string debug_name=model_name+" (main track, octtree)";
@@ -1154,7 +1175,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     handleAnimatedTextures(scene_node, *track_node);
     m_all_nodes.push_back(scene_node);
 
-    MeshTools::minMax3D(merged_mesh, &m_aabb_min, &m_aabb_max);
+    MeshTools::minMax3D(tangent_mesh, &m_aabb_min, &m_aabb_max);
     // Increase the maximum height of the track: since items that fly
     // too high explode, e.g. cakes can not be show when being at the
     // top of the track (since they will explode when leaving the AABB
@@ -1162,7 +1183,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     // could be relaxed to fix this, it is not certain how the physics
     // will handle items that are out of the AABB
     m_aabb_max.setY(m_aabb_max.getY()+30.0f);
-    World::getWorld()->getPhysics()->init(m_aabb_min, m_aabb_max);
+    Physics::getInstance()->init(m_aabb_min, m_aabb_max);
 
     ModelDefinitionLoader lodLoader(this);
 
@@ -1241,8 +1262,9 @@ bool Track::loadMainTrack(const XMLNode &root)
                            full_path.c_str());
                 continue;
             }
-
+#ifndef SERVER_ONLY
             a_mesh = MeshTools::createMeshWithTangents(a_mesh, &MeshTools::isNormalMap);
+#endif
 
             // The meshes loaded here are in irrlicht's mesh cache. So we
             // have to keep track of them in order to properly remove them
@@ -1402,7 +1424,7 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
                 video::ITexture* t=irrMaterial.getTexture(j);
                 if(!t) continue;
                 std::string texture_name =
-                    StringUtils::getBasename(core::stringc(t->getName()).c_str());
+                    StringUtils::getBasename(t->getName().getPtr());
 
                 // to lower case, for case-insensitive comparison
                 texture_name = StringUtils::toLowerCase(texture_name);
@@ -1427,8 +1449,7 @@ void Track::update(float dt)
 {
     if (!m_startup_run) // first time running update = good point to run startup script
     {
-        Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-        script_engine->runFunction(false, "void onStart()");
+        Scripting::ScriptEngine::getInstance()->runFunction(false, "void onStart()");
         m_startup_run = true;
     }
     m_track_object_manager->update(dt);
@@ -1501,7 +1522,7 @@ void Track::createWater(const XMLNode &node)
     */
     scene::ISceneNode* scene_node = NULL;
     /*
-    if (UserConfigParams::m_graphical_effects)
+    if (UserConfigParams::m_graphical_effects > 1)
     {
         scene::IMesh *welded;
         scene_node = irr_driver->addWaterNode(mesh, &welded,
@@ -1559,9 +1580,11 @@ void Track::createWater(const XMLNode &node)
  */
 void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 {
+    assert(!m_current_track);
+
     // Use m_filename to also get the path, not only the identifier
-    irr_driver->setTextureErrorMessage("While loading track '%s'",
-                                       m_filename                  );
+    STKTexManager::getInstance()
+        ->setTextureErrorMessage("While loading track '%s'", m_filename);
     if(!m_reverse_available)
     {
         reverse_track = false;
@@ -1599,23 +1622,12 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     m_sky_type             = SKY_NONE;
     m_track_object_manager = new TrackObjectManager();
 
-    // Add the track directory to the texture search path
-    file_manager->pushTextureSearchPath(m_root);
-    file_manager->pushModelSearchPath  (m_root);
+    std::string unique_id = StringUtils::insertValues("tracks/%s", m_ident.c_str());
 
-    // For now ignore the resize cache, since atm it only handles texturs in
-    // the track directory.
-#undef USE_RESIZE_CACHE
-#ifdef USE_RESIZE_CACHE
-    // If the hd texture option is disabled, we generate smaller textures
-    // and we also add the cache directory to the texture search path
-    if ( (UserConfigParams::m_high_definition_textures & 0x01) == 0x00)
-    {
-        std::string cached_textures_dir =
-            irr_driver->generateSmallerTextures(m_root);
-        file_manager->pushTextureSearchPath(cached_textures_dir);
-    }
-#endif
+    // Add the track directory to the texture search path
+    file_manager->pushTextureSearchPath(m_root, unique_id);
+    file_manager->pushModelSearchPath(m_root);
+
     // First read the temporary materials.xml file if it exists
     try
     {
@@ -1651,13 +1663,16 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         throw std::runtime_error(msg.str());
     }
 
+    m_current_track = this;
+
     // Load the graph only now: this function is called from world, after
     // the race gui was created. The race gui is needed since it stores
     // the information about the size of the texture to render the mini
     // map to.
-    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
+    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) 
+        loadDriveGraph(mode_id, reverse_track);
     else if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
-        loadBattleGraph(*root);
+        loadArenaGraph(*root);
 
     ItemManager::create();
 
@@ -1687,7 +1702,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }
         else
             m_start_transforms.resize(race_manager->getNumberOfKarts());
-        QuadGraph::get()->setDefaultStartPositions(&m_start_transforms,
+        DriveGraph::get()->setDefaultStartPositions(&m_start_transforms,
                                                    karts_per_row,
                                                    forwards_distance,
                                                    sidewards_distance,
@@ -1719,6 +1734,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     loadMainTrack(*root);
+
     unsigned int main_track_count = (unsigned int)m_all_nodes.size();
 
     ModelDefinitionLoader model_def_loader(this);
@@ -1741,7 +1757,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     model_def_loader.cleanLibraryNodesAfterLoad();
 
-    World::getWorld()->getScriptEngine()->compileLoadedScripts();
+    Scripting::ScriptEngine::getInstance()->compileLoadedScripts();
 
     // Init all track objects
     m_track_object_manager->init();
@@ -1751,7 +1767,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // It's important to execute this BEFORE the code that creates the skycube,
     // otherwise the skycube node could be modified to have fog enabled, which
     // we don't want
-    if (m_use_fog && Camera::getDefaultCameraType()!=Camera::CM_TYPE_DEBUG && 
+#ifndef SERVER_ONLY
+    if (m_use_fog && Camera::getDefaultCameraType()!=Camera::CM_TYPE_DEBUG &&
         !CVS->isGLSL())
     {
         /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start
@@ -1761,6 +1778,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
                                              m_fog_start, m_fog_end,
                                              1.0f);
     }
+#endif
 
     // Enable for for all track nodes if fog is used
     const unsigned int count = (int)m_all_nodes.size();
@@ -1773,7 +1791,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // Sky dome and boxes support
     // --------------------------
     irr_driver->suppressSkyBox();
-    if(m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
+#ifndef SERVER_ONLY
+    if(!CVS->isGLSL() && m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
     {
         scene::ISceneNode *node = irr_driver->addSkyDome(m_sky_textures[0],
                                                          m_sky_hori_segments,
@@ -1803,24 +1822,15 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
     else if(m_sky_type==SKY_COLOR)
     {
-        World::getWorld()->setClearbackBufferColor(m_sky_color);
-    }
-
-#ifdef USE_RESIZE_CACHE
-    if (!UserConfigParams::m_high_definition_textures)
-    {
-        file_manager->popTextureSearchPath();
+        irr_driver->setClearbackBufferColor(m_sky_color);
     }
 #endif
-    file_manager->popTextureSearchPath();
-    file_manager->popModelSearchPath  ();
 
     // ---- Set ambient color
     m_ambient_color = m_default_ambient_color;
-    irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
-    if (m_spherical_harmonics_textures.size() != 6)
-        irr_driver->getSphericalHarmonics()->setAmbientLight(m_ambient_color);
-    
+    irr_driver->setAmbientLight(m_ambient_color,
+        m_spherical_harmonics_textures.size() != 6/*force_SH_computation*/);
+
     // ---- Create sun (non-ambient directional light)
     if (m_sun_position.getLengthSQ() < 0.03f)
     {
@@ -1830,6 +1840,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     const video::SColorf tmpf(m_sun_diffuse_color);
     m_sun = irr_driver->addLight(m_sun_position, 0., 0., tmpf.r, tmpf.g, tmpf.b, true);
 
+#ifndef SERVER_ONLY
     if (!CVS->isGLSL())
     {
         scene::ILightSceneNode *sun = (scene::ILightSceneNode *) m_sun;
@@ -1848,8 +1859,11 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         sun->getLightData().SpecularColor = m_sun_specular_color;
     }
     else
+    {
         irr_driver->createSunInterposer();
-
+        m_sun->grab();
+    }
+#endif
 
     createPhysicsModel(main_track_count);
 
@@ -1873,20 +1887,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     delete root;
 
-    if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh && !arena_random_item_created)
-        BattleGraph::get()->findItemsOnGraphNodes();
-
-    if (UserConfigParams::m_track_debug &&
-        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
-        !m_is_cutscene)
-    {
-        QuadGraph::get()->createDebugMesh();
-    }
-
-    if (UserConfigParams::m_track_debug && m_has_navmesh &&
-        race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
-        !m_is_cutscene)
-        BattleGraph::get()->createDebugMesh();
+    if (UserConfigParams::m_track_debug && Graph::get() && !m_is_cutscene)
+        Graph::get()->createDebugMesh();
 
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
@@ -1910,7 +1912,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     World *world = World::getWorld();
     if (world->useChecklineRequirements())
     {
-        QuadGraph::get()->computeChecklineRequirements();
+        DriveGraph::get()->computeChecklineRequirements();
     }
 
     EasterEggHunt *easter_world = dynamic_cast<EasterEggHunt*>(world);
@@ -1920,7 +1922,22 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         easter_world->readData(dir+"/easter_eggs.xml");
     }
 
-    irr_driver->unsetTextureErrorMessage();
+    STKTexManager::getInstance()->unsetTextureErrorMessage();
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        for (video::ITexture* t : m_sky_textures)
+        {
+            t->drop();
+        }
+        m_sky_textures.clear();
+        for (video::ITexture* t : m_spherical_harmonics_textures)
+        {
+            t->drop();
+        }
+        m_spherical_harmonics_textures.clear();
+    }
+#endif   // !SERVER_ONLY
 }   // loadTrackModel
 
 //-----------------------------------------------------------------------------
@@ -1941,6 +1958,10 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         if (name == "track" || name == "default-start") continue;
         if (name == "object" || name == "library")
         {
+            int geo_level = 0;
+            node->get("geometry-level", &geo_level);
+            if (UserConfigParams::m_geometry_level + geo_level - 2 > 0)
+                continue;
             m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
         }
         else if (name == "water")
@@ -1969,9 +1990,8 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
             }
 
             m_start_transforms[position].setOrigin(xyz);
-            m_start_transforms[position].setRotation(
-                                           btQuaternion(btVector3(0,1,0),
-                                                        h*DEGREE_TO_RAD ) );
+            m_start_transforms[position]
+                .setRotation(getArenaStartRotation(xyz, h));
         }
         else if (name == "camera")
         {
@@ -1983,7 +2003,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         }
         else if (name == "particle-emitter")
         {
-            if (UserConfigParams::m_graphical_effects)
+            if (UserConfigParams::m_graphical_effects > 1)
             {
                 m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
             }
@@ -2012,11 +2032,6 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
             {
                 m_sky_particles =
                     ParticleKindManager::get()->getParticles(weather_particles);
-            }
-            else
-            {
-                Log::error("track", "Bad weather node found - ignored.\n");
-                continue;
             }
         }
         else if (name == "sun")
@@ -2169,10 +2184,24 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         std::vector<std::string> v = StringUtils::split(s, ' ');
         for(unsigned int i=0; i<v.size(); i++)
         {
-            video::ITexture *t = irr_driver->getTexture(v[i]);
-            if(t)
+            video::ITexture* t = NULL;
+#ifndef SERVER_ONLY
+            if (CVS->isGLSL())
             {
-                t->grab();
+                t = STKTexManager::getInstance()->getTexture(v[i],
+                    (TexConfig*)NULL/*tex_config*/, true/*no_upload*/);
+            }
+            else
+#endif   // !SERVER_ONLY
+            {
+                t = irr_driver->getTexture(v[i]);
+            }
+            if (t)
+            {
+#ifndef SERVER_ONLY
+                if (!CVS->isGLSL())
+#endif   // !SERVER_ONLY
+                    t->grab();
                 m_sky_textures.push_back(t);
             }
             else
@@ -2199,10 +2228,24 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         v = StringUtils::split(sh_textures, ' ');
         for (unsigned int i = 0; i<v.size(); i++)
         {
-            video::ITexture *t = irr_driver->getTexture(v[i]);
+            video::ITexture* t = NULL;
+#ifndef SERVER_ONLY
+            if (CVS->isGLSL())
+            {
+                t = STKTexManager::getInstance()->getTexture(v[i],
+                    (TexConfig*)NULL/*tex_config*/, true/*no_upload*/);
+            }
+            else
+#endif   // !SERVER_ONLY
+            {
+                t = irr_driver->getTexture(v[i]);
+            }
             if (t)
             {
-                t->grab();
+#ifndef SERVER_ONLY
+                if (!CVS->isGLSL())
+#endif   // !SERVER_ONLY
+                    t->grab();
                 m_spherical_harmonics_textures.push_back(t);
             }
             else
@@ -2260,19 +2303,38 @@ void Track::itemCommand(const XMLNode *node)
     }
 
     Vec3 loc(xyz);
-    // if only 2d coordinates are given, let the item fall from very high
-    if(drop)
+
+    // Test if the item lies on a 3d node, if so adjust the normal
+    // Also do a raycast if drop item is given
+    Vec3 normal(0, 1, 0);
+    Vec3 quad_normal = normal;
+    Vec3 hit_point = loc;
+    if (Graph::get())
     {
+        int road_sector = Graph::UNKNOWN_SECTOR;
+        Graph::get()->findRoadSector(xyz, &road_sector);
+        // Only do custom direction of raycast if item is on quad graph
+        if (road_sector != Graph::UNKNOWN_SECTOR)
+        {
+            quad_normal = Graph::get()->getQuad(road_sector)->getNormal();
+        }
+    }
+
+    if (drop)
+    {
+        const Material *m;
         // If raycast is used, increase the start position slightly
         // in case that the point is too close to the actual surface
         // (e.g. floating point errors can cause a problem here).
-        loc += Vec3(0,0.1f,0);
+        loc += quad_normal * 0.1f;
+
 #ifndef DEBUG
-        // Avoid unused variable warning in case of non-debug compilation.
-        setTerrainHeight(&loc);
+        m_track_mesh->castRay(loc, loc + (-10000 * quad_normal), &hit_point,
+            &m, &normal);
 #else
-        bool drop_success = setTerrainHeight(&loc);
-        if(!drop_success)
+        bool drop_success = m_track_mesh->castRay(loc, loc +
+            (-10000 * quad_normal), &hit_point, &m, &normal);
+        if (!drop_success)
         {
             Log::warn("track",
                       "Item at position (%f,%f,%f) can not be dropped",
@@ -2282,37 +2344,8 @@ void Track::itemCommand(const XMLNode *node)
 #endif
     }
 
-    // Don't tilt the items, since otherwise the rotation will look odd,
-    // i.e. the items will not rotate around the normal, but 'wobble'
-    // around.
-    //Vec3 normal(0.7071f, 0, 0.7071f);
-    Vec3 normal(0, 1, 0);
-    ItemManager::get()->newItem(type, loc, normal);
+    ItemManager::get()->newItem(type, drop ? hit_point : loc, normal);
 }   // itemCommand
-
-// ----------------------------------------------------------------------------
-/** Does a raycast from the given position, and if terrain was found
- *  adjust the Y position of the given vector to the actual terrain
- *  height. If no terrain is found, false is returned and the
- *  y position is not modified.
- *  \param pos Pointer to the position at which to determine the
- *         height. If terrain is found, its Y position will be
- *         set to the actual height.
- *  \return True if terrain was found and the height was adjusted.
- */
-bool Track::setTerrainHeight(Vec3 *pos) const
-{
-    Vec3  hit_point;
-    Vec3  normal;
-    const Material *m;
-    Vec3 to=*pos+Vec3(0,-10000,0);
-    if(m_track_mesh->castRay(*pos, to, &hit_point, &m, &normal))
-    {
-        pos->setY(hit_point.getY());
-        return true;
-    }
-    return false;
-}   // setTerrainHeight
 
 // ----------------------------------------------------------------------------
 
@@ -2354,6 +2387,15 @@ std::vector< std::vector<float> > Track::buildHeightMap()
 }   // buildHeightMap
 
 // ----------------------------------------------------------------------------
+void Track::drawMiniMap(const core::rect<s32>& dest_rect) const
+{
+    if(m_render_target)
+        m_render_target->draw2DImage(dest_rect, NULL,
+                                     video::SColor(127, 255, 255, 255),
+                                     true);
+}
+
+// ----------------------------------------------------------------------------
 /** Returns the rotation of the sun. */
 const core::vector3df& Track::getSunRotation()
 {
@@ -2368,15 +2410,14 @@ const core::vector3df& Track::getSunRotation()
 
 bool Track::findGround(AbstractKart *kart)
 {
-    btVector3 to(kart->getXYZ());
-    to.setY(-100000.f);
+    const Vec3 &xyz = kart->getXYZ();
+    Vec3 down = kart->getTrans().getBasis() * Vec3(0, -10000.0f, 0);
 
     // Material and hit point are not needed;
     const Material *m;
     Vec3 hit_point, normal;
-    bool over_ground = m_track_mesh->castRay(kart->getXYZ(), to, &hit_point,
+    bool over_ground = m_track_mesh->castRay(xyz, down, &hit_point,
                                              &m, &normal);
-    const Vec3 &xyz = kart->getXYZ();
     if(!over_ground)
     {
         Log::warn("physics", "Kart at (%f %f %f) can not be dropped.",
@@ -2405,7 +2446,6 @@ bool Track::findGround(AbstractKart *kart)
         return false;
     }
 
-
     btTransform t = kart->getBody()->getCenterOfMassTransform();
     // The computer offset is slightly too large, it should take
     // the default suspension rest instead of suspension rest (i.e. the
@@ -2413,9 +2453,21 @@ bool Track::findGround(AbstractKart *kart)
     // it). On the other hand this initial bouncing looks nice imho
     // - so I'll leave it in for now.
     float offset = kart->getKartProperties()->getSuspensionRest();
-    t.setOrigin(hit_point+Vec3(0, offset, 0) );
+    t.setOrigin(hit_point + normal * offset);
     kart->getBody()->setCenterOfMassTransform(t);
     kart->setTrans(t);
 
     return true;
 }   // findGround
+
+//-----------------------------------------------------------------------------
+float Track::getTrackLength() const
+{
+    return DriveGraph::get()->getLapLength();
+}   // getTrackLength
+
+//-----------------------------------------------------------------------------
+float Track::getAngle(int n) const
+{
+    return DriveGraph::get()->getAngleToNext(n, 0);
+}   // getAngle

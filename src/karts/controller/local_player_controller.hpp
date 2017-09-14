@@ -24,8 +24,9 @@
 #include "karts/controller/player_controller.hpp"
 
 class AbstractKart;
-class Player;
+class ParticleEmitter;
 class SFXBase;
+class SFXBuffer;
 
 /** PlayerKart manages control events from the player and moves
   * them to the Kart
@@ -41,16 +42,17 @@ private:
 
     bool           m_sound_schedule;
 
+    ParticleEmitter* m_sky_particles_emitter;
 
     /** The index of the camera attached to the kart for this controller. The
      *  camera object is managed in the Camera class, so no need to free it. */
     int  m_camera_index;
 
-    SFXBase       *m_bzzt_sound;
-    SFXBase       *m_wee_sound;
-    SFXBase       *m_ugh_sound;
-    SFXBase       *m_grab_sound;
-    SFXBase       *m_full_sound;
+    SFXBase     *m_wee_sound;
+    SFXBuffer   *m_bzzt_sound;
+    SFXBuffer   *m_ugh_sound;
+    SFXBuffer   *m_grab_sound;
+    SFXBuffer   *m_full_sound;
 
     virtual void steer(float, int) OVERRIDE;
     virtual void displayPenaltyWarning() OVERRIDE;

@@ -22,7 +22,6 @@
 
 class AIProperties;
 class LinearWorld;
-class QuadGraph;
 class Track;
 class Vec3;
 

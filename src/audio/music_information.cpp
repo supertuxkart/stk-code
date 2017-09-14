@@ -145,10 +145,23 @@ void MusicInformation::startMusic()
     m_time_since_faster  = 0.0f;
     m_mode               = SOUND_NORMAL;
 
-    if (m_normal_filename== "") return;
-
+    if (m_normal_music)
+    {
+        delete m_normal_music;
+        m_normal_music = NULL;
+    }
+    
+    if (m_fast_music)
+    {
+        delete m_fast_music;
+        m_fast_music = NULL;
+    }
+    
     // First load the 'normal' music
     // -----------------------------
+    if (m_normal_filename.empty())
+        return;
+    
     if (StringUtils::getExtension(m_normal_filename) != "ogg")
     {
         Log::warn("MusicInformation", "Music file %s is not found or file "
@@ -156,15 +169,13 @@ void MusicInformation::startMusic()
         return;
     }
 
-    if (m_normal_music) delete m_normal_music;
-
 #if HAVE_OGGVORBIS
     m_normal_music = new MusicOggStream(m_normal_loop_start);
 #else
     m_normal_music = new MusicDummy();
 #endif
 
-    if((m_normal_music->load(m_normal_filename)) == false)
+    if (m_normal_music->load(m_normal_filename) == false)
     {
         delete m_normal_music;
         m_normal_music = NULL;
@@ -178,18 +189,14 @@ void MusicInformation::startMusic()
 
     // Then (if available) load the music for the last track
     // -----------------------------------------------------
-    if (m_fast_music) delete m_fast_music;
-    if (m_fast_filename == "")
+    if (m_fast_filename.empty())
+        return;
+    
+    if (StringUtils::getExtension(m_fast_filename) != "ogg")
     {
-        m_fast_music = NULL;
-        return;   // no fast music
-    }
-
-    if(StringUtils::getExtension(m_fast_filename)!="ogg")
-    {
-        Log::warn(
-                "Music file %s format not recognized, fast music is ignored",
-                m_fast_filename.c_str());
+        Log::warn("MusicInformation",
+                  "Music file %s format not recognized, fast music is ignored",
+                  m_fast_filename.c_str());
         return;
     }
 
@@ -199,10 +206,10 @@ void MusicInformation::startMusic()
     m_fast_music = new MusicDummy();
 #endif
 
-    if((m_fast_music->load(m_fast_filename)) == false)
+    if (m_fast_music->load(m_fast_filename) == false)
     {
         delete m_fast_music;
-        m_fast_music=0;
+        m_fast_music = NULL;
         Log::warn("MusicInformation", "Unabled to load fast music %s, not "
                   "supported or not found.\n", m_fast_filename.c_str());
         return;

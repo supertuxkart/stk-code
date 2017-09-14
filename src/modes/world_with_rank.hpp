@@ -23,6 +23,7 @@
 #include "modes/world.hpp"
 
 class AbstractKart;
+class TrackSector;
 
 /**
  *  A WorldWithRank is a world where the karts are ranked. This is the base
@@ -60,28 +61,42 @@ protected:
 
     unsigned int getClosestStartPoint(AbstractKart *kart);
 
+    /** Stores the current graph node and track coordinates for each kart. */
+    std::vector<TrackSector*> m_kart_track_sector;
+
+    // ------------------------------------------------------------------------
+    void updateSectorForKarts();
+
 public:
                   WorldWithRank() : World() {}
+    virtual      ~WorldWithRank();
     /** call just after instanciating. can't be moved to the contructor as child
         classes must be instanciated, otherwise polymorphism will fail and the
         results will be incorrect */
     virtual void  init() OVERRIDE;
+    virtual void  reset() OVERRIDE;
 
     bool          displayRank() const { return m_display_rank; }
 
     void          beginSetKartPositions();
     bool          setKartPosition(unsigned int kart_id,
-                                 unsigned int position);
+                                  unsigned int position);
     void          endSetKartPositions();
     AbstractKart* getKartAtPosition(unsigned int p) const;
     virtual int   getScoreForPosition(int p);
-
-
-    virtual unsigned int getNumberOfRescuePositions() const OVERRIDE;
     virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
-    virtual btTransform  getRescueTransform(unsigned int index) const OVERRIDE;
-
-
+    // ------------------------------------------------------------------------
+    /** Returns the track_sector object for the specified kart.
+     *  \param kart_index World index of the kart. */
+    TrackSector* getTrackSector(unsigned int kart_index) const
+    {
+        assert(kart_index < m_kart_track_sector.size());
+        return m_kart_track_sector[kart_index];
+    }   // getTrackSector
+    // ------------------------------------------------------------------------
+    bool isOnRoad(unsigned int kart_index) const;
+    // ------------------------------------------------------------------------
+    int getSectorForKart(const AbstractKart *kart) const;
 
 };   // WorldWithRank
 

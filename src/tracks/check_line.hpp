@@ -46,7 +46,10 @@ private:
     /** The line that is tested for being crossed. */
     core::line2df   m_line;
 
-    core::vector2df m_cross_point;
+    /** True if this line should ignore the height test. This is required
+     *  e.g. for basketball cannons, since the ball can be too height to
+     *  otherwise trigger the cannon. */
+    bool            m_ignore_height;
 
     /** The minimum height of the checkline. */
     float           m_min_height;
@@ -71,20 +74,26 @@ private:
     /** How much a kart is allowed to be over the minimum height of a
      *  quad and still considered to be able to cross it. */
     static const int m_over_min_height  = 4;
+protected:
+    const Vec3 &getLeftPoint() const { return m_left_point;  }
+    const Vec3 &getRightPoint() const { return m_right_point; }
+
 public:
                  CheckLine(const XMLNode &node, unsigned int index);
     virtual     ~CheckLine();
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
-                             unsigned int indx);
+                             int indx);
     virtual void reset(const Track &track);
+    virtual void resetAfterKartMove(unsigned int kart_index);
     virtual void changeDebugColor(bool is_active);
+    // ------------------------------------------------------------------------
     /** Returns the actual line data for this checkpoint. */
     const core::line2df &getLine2D() const {return m_line;}
     // ------------------------------------------------------------------------
-    /** Returns the 2d point at which the line was crossed. Note that this
-     *  value is ONLY valid after isTriggered is called and inside of
-     *  trigger(). */
-    const core::vector2df &getCrossPoint() const { return m_cross_point; }
+    /** Sets if this check line should not do a height test for testing
+     *  if a line is crossed. Used for basket calls in cannon (the ball can
+     *  be too heigh to otherwise trigger he cannon). */
+    void setIgnoreHeight(bool b) { m_ignore_height = b;  }
 };   // CheckLine
 
 #endif

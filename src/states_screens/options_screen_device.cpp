@@ -434,6 +434,10 @@ void OptionsScreenDevice::gotSensedInput(const Input& sensed_input)
             // refresh display
             updateInputButtons();
         }
+        else
+        {
+            return;
+        }
     }
     else if (sensed_input.m_type == Input::IT_NONE)
     {
@@ -460,9 +464,9 @@ void OptionsScreenDevice::gotSensedInput(const Input& sensed_input)
     ModalDialog::dismiss();
     input_manager->setMode(InputManager::MENU);
 
-    if (keyboard && (sensed_input.m_button_id == irr::KEY_SHIFT ||
-                     sensed_input.m_button_id == irr::KEY_LSHIFT ||
-                     sensed_input.m_button_id == irr::KEY_RSHIFT))
+    if (keyboard && (sensed_input.m_button_id == irr::IRR_KEY_SHIFT ||
+                     sensed_input.m_button_id == irr::IRR_KEY_LSHIFT ||
+                     sensed_input.m_button_id == irr::IRR_KEY_RSHIFT))
     {
         new MessageDialog(_("Warning: The 'Shift' is not a recommended key. When "
                             "'Shift' is pressed down, all keys that contain a "
@@ -621,11 +625,10 @@ bool OptionsScreenDevice::conflictsBetweenKbdConfig(PlayerAction action,
                                                    PlayerAction from,
                                                    PlayerAction to)
 {
-    KeyboardConfig* other_kbd_config;
     int id = m_config->getBinding(action).getId();
     for (int i=0; i < input_manager->getDeviceManager()->getKeyboardAmount(); i++)
     {
-        other_kbd_config =
+        KeyboardConfig* other_kbd_config =
             input_manager->getDeviceManager()->getKeyboardConfig(i);
 
         if (m_config != other_kbd_config  &&

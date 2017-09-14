@@ -20,7 +20,6 @@
 
 #include "graphics/stk_mesh.hpp"
 
-#include "graphics/shaders.hpp"
 #include "utils/ptr_vector.hpp"
 
 class RenderInfo;
@@ -29,6 +28,7 @@ class STKMeshSceneNode : public irr::scene::CMeshSceneNode, public STKMeshCommon
 {
 protected:
     PtrVector<RenderInfo> m_static_render_info;
+    bool m_got_animated_matrix;
     std::vector<GLMesh> GLmeshes;
     core::matrix4 ModelViewProjectionMatrix;
     core::vector3df windDir;
@@ -64,17 +64,7 @@ public:
     virtual void OnRegisterSceneNode();
     virtual ~STKMeshSceneNode();
     virtual bool isImmediateDraw() const { return immediate_draw; }
-    void setIsDisplacement(bool v) {
-        isDisplacement = v;
-        for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
-        {
-            scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-            if (!mb)
-                continue;
-            if (isDisplacement)
-                mb->getMaterial().MaterialType = Shaders::getShader(ES_DISPLACE);
-        }
-    }
+    void setIsDisplacement(bool v);
     virtual bool glow() const { return isGlow; }
     void setGlowColors(const video::SColor &c) { isGlow = true; glowcolor = c; }
     video::SColor getGlowColor() const { return glowcolor; }

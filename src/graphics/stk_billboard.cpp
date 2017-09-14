@@ -15,24 +15,25 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/stk_billboard.hpp"
 
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
+#include "graphics/texture_shader.hpp"
 
 #include <ISceneManager.h>
 
 using namespace irr;
 
 
-static GLuint billboardvao = 0;
+GLuint STKBillboard::m_billboard_vao = 0;
 
 
-class BillboardShader : public TextureShader<BillboardShader, 1, core::matrix4,
+class BillboardShader : public TextureShader<BillboardShader, 1,
                                       core::matrix4, core::vector3df,
                                       core::dimension2df>
 {
@@ -42,18 +43,16 @@ public:
         loadProgram(OBJECT, GL_VERTEX_SHADER, "billboard.vert",
                             GL_FRAGMENT_SHADER, "billboard.frag");
 
-        assignUniforms("ModelViewMatrix", "ProjectionMatrix", "Position",
-                       "Size");
+        assignUniforms("color_matrix", "Position", "Size");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // BillboardShader
 };   // BillboardShader
 
 // ============================================================================
-
-static void createBillboardVAO()
+void STKBillboard::createBillboardVAO()
 {
-    glGenVertexArrays(1, &billboardvao);
-    glBindVertexArray(billboardvao);
+    glGenVertexArrays(1, &m_billboard_vao);
+    glBindVertexArray(m_billboard_vao);
     glBindBuffer(GL_ARRAY_BUFFER, SharedGPUObjects::getBillboardVBO());
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(3);
@@ -62,6 +61,16 @@ static void createBillboardVAO()
                           (GLvoid*) (2 * sizeof(float)));
     glBindVertexArray(0);
 }   // createBillboardVAO
+
+// ----------------------------------------------------------------------------
+void STKBillboard::destroyBillboardVAO()
+{
+    if (m_billboard_vao != 0)
+    {
+        glDeleteVertexArrays(1, &m_billboard_vao);
+        m_billboard_vao = 0;
+    }
+}   // destroyBillboardVAO
 
 // ----------------------------------------------------------------------------
 STKBillboard::STKBillboard(irr::scene::ISceneNode* parent,
@@ -74,7 +83,7 @@ STKBillboard::STKBillboard(irr::scene::ISceneNode* parent,
               CBillboardSceneNode(parent, mgr, id, position, size, 
                                   colorTop, colorBottom)
 {
-    if (!billboardvao)
+    if (!m_billboard_vao)
         createBillboardVAO();
 }   // STKBillboard
 
@@ -96,9 +105,9 @@ void STKBillboard::render()
         return;
 
     core::vector3df pos = getAbsolutePosition();
-    glBindVertexArray(billboardvao);
+    glBindVertexArray(m_billboard_vao);
     video::ITexture *tex = Material.getTexture(0);
-    if (!tex )
+    if (!tex)
         return;
 
     ::Material* material = material_manager->getMaterialFor(tex, 
@@ -108,13 +117,27 @@ void STKBillboard::render()
     else
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    compressTexture(tex, true, true);
-    GLuint texid = getTextureGLuint(tex);
+    video::SColor col[2];
+    getColor(col[0], col[1]);
+    const float colors[] =
+    {
+        col[1].getRed() / 255.f, col[1].getGreen() / 255.f,
+        col[1].getBlue() / 255.f, col[1].getAlpha() / 255.f,
+        col[0].getRed() / 255.f, col[0].getGreen() / 255.f,
+        col[0].getBlue() / 255.f, col[0].getAlpha() / 255.f,
+        col[1].getRed() / 255.f, col[1].getGreen() / 255.f,
+        col[1].getBlue() / 255.f, col[1].getAlpha() / 255.f,
+        col[0].getRed() / 255.f, col[0].getGreen() / 255.f,
+        col[0].getBlue() / 255.f, col[0].getAlpha() / 255.f,
+    };
+    core::matrix4 color_matrix;
+    color_matrix.setM(colors);
     BillboardShader::getInstance()->use();
-    BillboardShader::getInstance()->setTextureUnits(texid);
-    BillboardShader::getInstance()->setUniforms(irr_driver->getViewMatrix(), 
-                                                irr_driver->getProjMatrix(),
-                                                pos, Size);
+    BillboardShader::getInstance()->setTextureUnits(tex->getOpenGLTextureName());
+    BillboardShader::getInstance()->setUniforms(color_matrix, pos, Size);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
 }   // render
+
+#endif   // !SERVER_ONLY
+

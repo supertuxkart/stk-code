@@ -24,10 +24,6 @@
 #include "CSkinnedMesh.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_B3D_LOADER_
-#include "CB3DMeshFileLoader.h"
-#endif
-
 #include "CCubeSceneNode.h"
 #include "CSphereSceneNode.h"
 #include "CAnimatedMeshSceneNode.h"
@@ -120,13 +116,6 @@ CSceneManager::CSceneManager(video::IVideoDriver* driver, io::IFileSystem* fs,
 
 	// create geometry creator
 	GeometryCreator = new CGeometryCreator();
-
-	// add file format loaders. add the least commonly used ones first,
-	// as these are checked last
-	#ifdef _IRR_COMPILE_WITH_B3D_LOADER_
-	MeshLoaderList.push_back(new CB3DMeshFileLoader(this));
-	#endif
-
 
 	// factories
 	ISceneNodeFactory* factory = new CDefaultSceneNodeFactory(this);
@@ -1427,11 +1416,6 @@ void CSceneManager::drawAll(u32 flags)
 
 void CSceneManager::setLightManager(ILightManager* lightManager)
 {
-    if (lightManager)
-        lightManager->grab();
-	if (LightManager)
-		LightManager->drop();
-
 	LightManager = lightManager;
 }
 

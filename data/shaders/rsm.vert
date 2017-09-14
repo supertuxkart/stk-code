@@ -1,13 +1,8 @@
 uniform mat4 ModelMatrix;
 uniform mat4 RSMMatrix;
+uniform vec2 texture_trans = vec2(0., 0.);
 
-uniform mat4 TextureMatrix =
-    mat4(1., 0., 0., 0.,
-         0., 1., 0., 0.,
-         0., 0., 1., 0.,
-         0., 0., 0., 1.);
-
-#if __VERSION__ >= 330
+#ifdef Explicit_Attrib_Location_Usable
 layout(location = 0) in vec3 Position;
 layout(location = 1) in vec3 Normal;
 layout(location = 2) in vec4 Color;
@@ -33,7 +28,7 @@ void main(void)
     mat4 TransposeInverseModel = transpose(inverse(ModelMatrix));
     gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
     nor = (TransposeInverseModel * vec4(Normal, 0.)).xyz;
-    uv = (TextureMatrix * vec4(Texcoord, 1., 1.)).xy;
+    uv = vec2(Texcoord.x + texture_trans.x, Texcoord.y + texture_trans.y);
     uv_bis = SecondTexcoord;
     color = Color.zyxw;
 }

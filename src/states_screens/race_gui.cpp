@@ -27,19 +27,22 @@ using namespace irr;
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/2dutils.hpp"
+#ifndef SERVER_ONLY
 #include "graphics/glwrap.hpp"
+#endif
+#include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
-#include "input/input.hpp"
-#include "input/input_manager.hpp"
 #include "items/attachment.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/controller/spare_tire_ai.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/follow_the_leader.hpp"
@@ -47,6 +50,7 @@ using namespace irr;
 #include "modes/world.hpp"
 #include "modes/soccer_world.hpp"
 #include "race/race_manager.hpp"
+#include "states_screens/race_gui_multitouch.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
@@ -60,35 +64,9 @@ using namespace irr;
 RaceGUI::RaceGUI()
 {
     m_enabled = true;
-
-    // Originally m_map_height was 100, and we take 480 as minimum res
-    const float scaling = irr_driver->getFrameSize().Height / 480.0f;
-    // Marker texture has to be power-of-two for (old) OpenGL compliance
-    //m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
-    m_minimap_ai_size       = (int)( 14.0f * scaling);
-    m_minimap_player_size   = (int)( 16.0f * scaling);
-    m_map_width             = (int)(100.0f * scaling);
-    m_map_height            = (int)(100.0f * scaling);
-    m_map_left              = (int)( 10.0f * scaling);
-    m_map_bottom            = (int)( 10.0f * scaling);
-
-    // Minimap is also rendered bigger via OpenGL, so find power-of-two again
-    const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
-    m_map_rendered_width    = map_texture;
-    m_map_rendered_height   = map_texture;
-
-
-    // special case : when 3 players play, use available 4th space for such things
-    if (race_manager->getNumLocalPlayers() == 3)
-    {
-        m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
-    }
-
-    m_is_tutorial = (race_manager->getTrackName() == "tutorial");
-
-    m_speed_meter_icon = material_manager->getMaterial("speedback.png");
-    m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
-    //createMarkerTexture();
+    
+    if (UserConfigParams::m_artist_debug_mode && UserConfigParams::m_hide_gui)
+        m_enabled = false;
 
     // Determine maximum length of the rank/lap text, in order to
     // align those texts properly on the right side of the viewport.
@@ -104,6 +82,78 @@ RaceGUI::RaceGUI()
     else
         m_lap_width = font->getDimension(L"9/9").Width;
 
+    // Originally m_map_height was 100, and we take 480 as minimum res
+    float scaling = irr_driver->getFrameSize().Height / 480.0f;
+    const float map_size = 100.0f;
+    const float top_margin = 3.5f * m_font_height;
+    
+    if (UserConfigParams::m_multitouch_enabled && 
+        UserConfigParams::m_multitouch_mode != 0 &&
+        race_manager->getNumLocalPlayers() == 1)
+    {
+        m_multitouch_gui = new RaceGUIMultitouch(this);
+    }
+    
+    // Check if we have enough space for minimap when touch steering is enabled
+    if (m_multitouch_gui != NULL)
+    {
+        const float map_bottom = (float)(m_multitouch_gui->getMinimapBottom());
+        
+        if ((map_size + 20.0f) * scaling > map_bottom - top_margin)
+        {
+            scaling = (map_bottom - top_margin) / (map_size + 20.0f);
+        }
+    }
+    
+    // Marker texture has to be power-of-two for (old) OpenGL compliance
+    //m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
+    m_minimap_ai_size       = (int)( 14.0f * scaling);
+    m_minimap_player_size   = (int)( 16.0f * scaling);
+    m_map_width             = (int)(map_size * scaling);
+    m_map_height            = (int)(map_size * scaling);
+    m_map_left              = (int)( 10.0f * scaling);
+    m_map_bottom            = (int)( 10.0f * scaling);
+
+    // Minimap is also rendered bigger via OpenGL, so find power-of-two again
+    const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
+    m_map_rendered_width    = map_texture;
+    m_map_rendered_height   = map_texture;
+
+
+    // special case : when 3 players play, use available 4th space for such things
+    if (race_manager->getNumLocalPlayers() == 3)
+    {
+        m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
+    }
+    else if (m_multitouch_gui != NULL)
+    {
+        m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
+                                                        m_map_width) * 0.95f);
+        m_map_bottom = (int)(irr_driver->getActualScreenSize().Height - 
+                                                    top_margin - m_map_height);
+    }
+
+    m_is_tutorial = (race_manager->getTrackName() == "tutorial");
+
+    // Load speedmeter texture before rendering the first frame
+    m_speed_meter_icon = material_manager->getMaterial("speedback.png");
+    m_speed_meter_icon->getTexture();
+    m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
+    m_speed_bar_icon->getTexture();
+    //createMarkerTexture();
+}   // RaceGUI
+
+//-----------------------------------------------------------------------------
+RaceGUI::~RaceGUI()
+{
+    delete m_multitouch_gui;
+}   // ~Racegui
+
+
+//-----------------------------------------------------------------------------
+void RaceGUI::init()
+{
+    RaceGUIBase::init();
     // Technically we only need getNumLocalPlayers, but using the
     // global kart id to find the data for a specific kart.
     int n = race_manager->getNumberOfKarts();
@@ -111,12 +161,7 @@ RaceGUI::RaceGUI()
     m_animation_states.resize(n);
     m_rank_animation_duration.resize(n);
     m_last_ranks.resize(n);
-}   // RaceGUI
-
-//-----------------------------------------------------------------------------
-RaceGUI::~RaceGUI()
-{
-}   // ~Racegui
+}   // init
 
 //-----------------------------------------------------------------------------
 /** Reset the gui before a race. It initialised all rank animation related
@@ -139,6 +184,7 @@ void RaceGUI::reset()
  */
 void RaceGUI::renderGlobal(float dt)
 {
+#ifndef SERVER_ONLY
     RaceGUIBase::renderGlobal(dt);
     cleanupMessages(dt);
 
@@ -175,7 +221,7 @@ void RaceGUI::renderGlobal(float dt)
         //stop displaying timer as soon as race is over
         if (world->getPhase()<WorldStatus::DELAY_FINISH_PHASE)
            drawGlobalTimer();
-        
+
         if(world->getPhase() == WorldStatus::GO_PHASE ||
            world->getPhase() == WorldStatus::MUSIC_PHASE)
         {
@@ -186,7 +232,8 @@ void RaceGUI::renderGlobal(float dt)
     drawGlobalMiniMap();
 
     if (!m_is_tutorial)               drawGlobalPlayerIcons(m_map_height);
-    if(world->getTrack()->isSoccer()) drawScores();
+    if(Track::getCurrentTrack()->isSoccer()) drawScores();
+#endif
 }   // renderGlobal
 
 //-----------------------------------------------------------------------------
@@ -198,6 +245,8 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
 {
     if (!m_enabled) return;
 
+    RaceGUIBase::renderPlayerView(camera, dt);
+    
     const core::recti &viewport = camera->getViewport();
 
     core::vector2df scaling = camera->getScaling();
@@ -211,13 +260,14 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
 
     if(!World::getWorld()->isRacePhase()) return;
 
-    drawPowerupIcons   (kart, viewport, scaling);
-    drawSpeedEnergyRank(kart, viewport, scaling, dt);
+    if (m_multitouch_gui == NULL)
+    {
+        drawPowerupIcons(kart, viewport, scaling);
+        drawSpeedEnergyRank(kart, viewport, scaling, dt);
+    }
 
     if (!m_is_tutorial)
         drawLap(kart, viewport, scaling);
-
-    RaceGUIBase::renderPlayerView(camera, dt);
 }   // renderPlayerView
 
 //-----------------------------------------------------------------------------
@@ -225,6 +275,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
  */
 void RaceGUI::drawScores()
 {
+#ifndef SERVER_ONLY
     SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
     int offset_y = 5;
     int offset_x = 5;
@@ -266,6 +317,7 @@ void RaceGUI::drawScores()
             NULL,NULL,true);
         offset_x += position.LowerRightCorner.X + 30;
     }
+#endif
 }   // drawScores
 
 //-----------------------------------------------------------------------------
@@ -335,14 +387,11 @@ void RaceGUI::drawGlobalTimer()
  */
 void RaceGUI::drawGlobalMiniMap()
 {
-    World *world = World::getWorld();
+#ifndef SERVER_ONLY
     // draw a map when arena has a navigation mesh.
-    if ((world->getTrack()->isArena() || world->getTrack()->isSoccer()) &&
-        !(world->getTrack()->hasNavMesh()))
+    Track *track = Track::getCurrentTrack();
+    if ( (track->isArena() || track->isSoccer()) && !(track->hasNavMesh()) )
         return;
-
-    const video::ITexture *old_rtt_mini_map = world->getTrack()->getOldRttMiniMap();
-    const FrameBuffer* new_rtt_mini_map = world->getTrack()->getNewRttMiniMap();
 
     int upper_y = irr_driver->getActualScreenSize().Height - m_map_bottom - m_map_height;
     int lower_y = irr_driver->getActualScreenSize().Height - m_map_bottom;
@@ -350,32 +399,23 @@ void RaceGUI::drawGlobalMiniMap()
     core::rect<s32> dest(m_map_left, upper_y,
                          m_map_left + m_map_width, lower_y);
 
-    if (old_rtt_mini_map != NULL)
-    {
-        core::rect<s32> source(core::position2di(0, 0),
-                               old_rtt_mini_map->getSize());
-        draw2DImage(old_rtt_mini_map, dest, source,
-                    NULL, NULL, true);
-    }
-    else if (new_rtt_mini_map != NULL)
-    {
-        core::rect<s32> source(0, 0, (int)new_rtt_mini_map->getWidth(),
-                               (int)new_rtt_mini_map->getHeight());
-        draw2DImageFromRTT(new_rtt_mini_map->getRTT()[0],
-            new_rtt_mini_map->getWidth(), new_rtt_mini_map->getHeight(),
-            dest, source, NULL, video::SColor(127, 255, 255, 255), true);
-    }
+    track->drawMiniMap(dest);
 
+    World *world = World::getWorld();
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
         const AbstractKart *kart = world->getKart(i);
-        if(kart->isEliminated()) continue;   // don't draw eliminated kart
+        const SpareTireAI* sta =
+            dynamic_cast<const SpareTireAI*>(kart->getController());
+        // don't draw eliminated kart
+        if(kart->isEliminated() && !(sta && sta->isMoving())) continue;
         const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
-        world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
-        draw_at *= UserConfigParams::m_scale_rtts_factor;
-
-        video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
+        track->mapPoint2MiniMap(xyz, &draw_at);
+        
+        video::ITexture* icon = sta ?
+            irr_driver->getTexture(FileManager::GUI, "heart.png") :
+            kart->getKartProperties()->getMinimapIcon();
 
         // int marker_height = m_marker->getSize().Height;
         core::rect<s32> source(core::position2di(0, 0), icon->getSize());
@@ -393,8 +433,8 @@ void RaceGUI::drawGlobalMiniMap()
     if (sw)
     {
         Vec3 draw_at;
-        world->getTrack()->mapPoint2MiniMap(sw->getBallPosition(), &draw_at);
-        draw_at *= UserConfigParams::m_scale_rtts_factor;
+        track->mapPoint2MiniMap(sw->getBallPosition(), &draw_at);
+        
         video::ITexture* icon =
             irr_driver->getTexture(FileManager::GUI, "soccer_ball_normal.png");
 
@@ -405,7 +445,7 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.5f)));
         draw2DImage(icon, position, source, NULL, NULL, true);
     }
-
+#endif
 }   // drawGlobalMiniMap
 
 //-----------------------------------------------------------------------------
@@ -421,6 +461,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
                               const core::recti &viewport,
                               const core::vector2df &scaling)
 {
+#ifndef SERVER_ONLY
     float min_ratio        = std::min(scaling.X, scaling.Y);
     const int GAUGEWIDTH   = 78;
     int gauge_width        = (int)(GAUGEWIDTH*min_ratio);
@@ -441,7 +482,8 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
                                                (int)offset.Y-gauge_height,
                                                (int)offset.X + gauge_width,
                                                (int)offset.Y) /* dest rect */,
-                core::rect<s32>(0, 0, 256, 256) /* source rect */,
+                core::rect<s32>(core::position2d<s32>(0,0),
+                                m_gauge_empty->getSize()) /* source rect */,
                 NULL /* clip rect */, NULL /* colors */,
                 true /* alpha */);
 
@@ -604,7 +646,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
 
         video::SMaterial m;
-        if(kart->getControls().m_nitro || kart->isOnMinNitroTime())
+        if(kart->getControls().getNitro() || kart->isOnMinNitroTime())
             m.setTexture(0, m_gauge_full_bright);
         else
             m.setTexture(0, m_gauge_full);
@@ -614,7 +656,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
 
     }
-
+#endif
 }   // drawEnergyMeter
 
 //-----------------------------------------------------------------------------
@@ -714,6 +756,7 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
                                  const core::vector2df &scaling,
                                  float dt)
 {
+#ifndef SERVER_ONLY
     float min_ratio         = std::min(scaling.X, scaling.Y);
     const int SPEEDWIDTH   = 128;
     int meter_width        = (int)(SPEEDWIDTH*min_ratio);
@@ -820,7 +863,7 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
     irr_driver->getVideoDriver()->setMaterial(m);
     draw2DVertexPrimitiveList(m_speed_bar_icon->getTexture(), vertices, count,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
-
+#endif
 }   // drawSpeedEnergyRank
 
 //-----------------------------------------------------------------------------
@@ -833,7 +876,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
 {
     // Don't display laps or ranks if the kart has already finished the race.
     if (kart->hasFinishedRace()) return;
-        
+
     World *world = World::getWorld();
     if (!world->raceHasLaps()) return;
     const int lap = world->getKartLaps(kart->getWorldKartId());

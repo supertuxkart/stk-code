@@ -15,13 +15,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/gpu_particles.hpp"
 
 #include "config/user_config.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_emitter.hpp"
-#include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/texture_shader.hpp"
 #include "guiengine/engine.hpp"
@@ -91,13 +91,14 @@ public:
 
 // ============================================================================
 /** */
-class HeightmapSimulationShader : public Shader <HeightmapSimulationShader,
-                                                 core::matrix4, int, int,
-                                                 float,float,float,float,float>
+#if !defined(USE_GLES2)
+class HeightmapSimulationShader :
+                             public TextureShader<HeightmapSimulationShader, 1,
+                                                  core::matrix4, int, int,
+                                                  float, float, float, float,
+                                                  float>
 {
 public:
-    GLuint m_TU_heightmap;
-
     HeightmapSimulationShader()
     {
         const char *varyings[] = {"new_particle_position", "new_lifetime",
@@ -105,12 +106,12 @@ public:
         loadTFBProgram("particlesimheightmap.vert", varyings, 4);
         assignUniforms("sourcematrix", "dt", "level", "size_increase_factor",
                        "track_x", "track_x_len", "track_z", "track_z_len");
-        m_TU_heightmap = 2;
-        assignTextureUnit(m_TU_heightmap, "heightmap");
+        assignSamplerNames(0, "heightmap",  ST_TEXTURE_BUFFER);
     }   // HeightmapSimulationShader
 
 
 };   // class HeightmapSimulationShader
+#endif
 
 // ============================================================================
 
@@ -144,6 +145,7 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     size_increase_factor = 0.;
     ParticleParams = NULL;
     InitialValues = NULL;
+    m_vertex_id_values = NULL;
 
     m_color_from[0] = m_color_from[1] = m_color_from[2] = 1.0;
     m_color_to[0] = m_color_to[1] = m_color_to[2] = 1.0;
@@ -157,11 +159,13 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     track_z = 0;
     track_x_len = 0;
     track_z_len = 0;
-    texture = 0;
+    m_texture_name = 0;
 }
 
 ParticleSystemProxy::~ParticleSystemProxy()
 {
+    delete[] m_vertex_id_values;
+    
     if (InitialValues)
         free(InitialValues);
     if (ParticleParams)
@@ -203,6 +207,7 @@ void ParticleSystemProxy::setHeightmap(const std::vector<std::vector<float> > &h
     glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
     glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, heighmapbuffer);
     glBindBuffer(GL_TEXTURE_BUFFER, 0);
+    glBindTexture(GL_TEXTURE_BUFFER, 0);
 
     delete[] hm_array;
 #endif
@@ -378,6 +383,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 
     m_previous_count = m_count;   // save to handle out of memory errors
     m_count = emitter->getMaxParticlesPerSecond() * emitter->getMaxLifeTime() / 1000;
+    
     switch (emitter->getType())
     {
     case scene::EPET_POINT:
@@ -392,10 +398,27 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
     default:
         assert(0 && "Wrong particle type");
     }
+    
+    if (CVS->needsVertexIdWorkaround())
+    {
+        if (m_count != m_previous_count)
+        {
+            delete[] m_vertex_id_values;
+            m_vertex_id_values = NULL;
+        }
+        
+        if (m_vertex_id_values == NULL && m_count > 0)
+        {
+            m_vertex_id_values = new int[m_count];
+    
+            for (unsigned int i = 0; i < m_count; i++)
+            {
+                m_vertex_id_values[i] = i;
+            }
+        }
+    }
 
-    video::ITexture *tex = getMaterial(0).getTexture(0);
-    compressTexture(tex, true, true);
-    texture = getTextureGLuint(getMaterial(0).getTexture(0));
+    m_texture_name = getMaterial(0).getTexture(0)->getOpenGLTextureName();
 }
 
 void ParticleSystemProxy::cleanGL()
@@ -443,7 +466,7 @@ void ParticleSystemProxy::AppendQuaternionRenderingVAO(GLuint QuaternionBuffer)
     glVertexAttribDivisorARB(6, 1);
 }
 
-void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initialValues_vbo)
+void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initialValues_vbo, GLuint vertex_id_buffer)
 {
     glBindBuffer(GL_ARRAY_BUFFER, position_vbo);
     glEnableVertexAttribArray(0);
@@ -464,6 +487,13 @@ void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initia
     glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(4 * sizeof(float)));
     glEnableVertexAttribArray(7);
     glVertexAttribPointer(7, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(7 * sizeof(float)));
+
+    if (CVS->needsVertexIdWorkaround())
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, vertex_id_buffer);
+        glEnableVertexAttribArray(8);
+        glVertexAttribIPointer(8, 1, GL_INT, sizeof(int), (GLvoid*)0);
+    }
 }
 
 void ParticleSystemProxy::simulate()
@@ -477,10 +507,9 @@ void ParticleSystemProxy::simulate()
     {
 #if !defined(USE_GLES2)
         HeightmapSimulationShader::getInstance()->use();
-        glActiveTexture(GL_TEXTURE0 + HeightmapSimulationShader::getInstance()->m_TU_heightmap);
-        glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
+        HeightmapSimulationShader::getInstance()->setTextureUnits(heightmaptexture);
         HeightmapSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor, track_x, track_x_len, track_z, track_z_len);
-#endif        
+#endif
     }
     else
     {
@@ -496,6 +525,7 @@ void ParticleSystemProxy::simulate()
     glDrawArrays(GL_POINTS, 0, m_count);
     glEndTransformFeedback();
     glBindVertexArray(0);
+    glActiveTexture(GL_TEXTURE0);
 
     glDisable(GL_RASTERIZER_DISCARD);
 #ifdef DEBUG_PARTICLES
@@ -526,7 +556,7 @@ void ParticleSystemProxy::drawFlip()
     glBlendFunc(GL_ONE, GL_ONE);
     FlipParticleRender::getInstance()->use();
 
-    FlipParticleRender::getInstance()->setTextureUnits(texture, irr_driver->getDepthStencilTexture());
+    FlipParticleRender::getInstance()->setTextureUnits(m_texture_name, irr_driver->getDepthStencilTexture());
     FlipParticleRender::getInstance()->setUniforms();
 
     glBindVertexArray(current_rendering_vao);
@@ -541,7 +571,7 @@ void ParticleSystemProxy::drawNotFlip()
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     SimpleParticleRender::getInstance()->use();
 
-    SimpleParticleRender::getInstance()->setTextureUnits(texture, irr_driver->getDepthStencilTexture());
+    SimpleParticleRender::getInstance()->setTextureUnits(m_texture_name, irr_driver->getDepthStencilTexture());
     video::SColorf ColorFrom = video::SColorf(getColorFrom()[0], getColorFrom()[1], getColorFrom()[2]);
     video::SColorf ColorTo = video::SColorf(getColorTo()[0], getColorTo()[1], getColorTo()[2]);
 
@@ -570,6 +600,15 @@ void ParticleSystemProxy::generateVAOs()
     glBufferData(GL_ARRAY_BUFFER, m_count * sizeof(ParticleData), InitialValues, GL_STREAM_COPY);
     glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
     glBufferData(GL_ARRAY_BUFFER, m_count * sizeof(ParticleData), 0, GL_STREAM_COPY);
+    
+    if (CVS->needsVertexIdWorkaround())
+    {
+        glGenBuffers(1, &vertex_id_buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, vertex_id_buffer);
+        glBufferData(GL_ARRAY_BUFFER, m_count * sizeof(int), 
+                     m_vertex_id_values, GL_STATIC_DRAW);
+    }
+    
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glGenVertexArrays(1, &current_rendering_vao);
@@ -577,10 +616,12 @@ void ParticleSystemProxy::generateVAOs()
     glGenVertexArrays(1, &current_simulation_vao);
     glGenVertexArrays(1, &non_current_simulation_vao);
 
+    // TODO: Don't execute CommonSimulationVAO twice because it unnecessarily
+    // initializes initial_values_buffer and vertex_id_buffer twice.
     glBindVertexArray(current_simulation_vao);
-    CommonSimulationVAO(tfb_buffers[0], initial_values_buffer);
+    CommonSimulationVAO(tfb_buffers[0], initial_values_buffer, vertex_id_buffer);
     glBindVertexArray(non_current_simulation_vao);
-    CommonSimulationVAO(tfb_buffers[1], initial_values_buffer);
+    CommonSimulationVAO(tfb_buffers[1], initial_values_buffer, vertex_id_buffer);
 
 
     glBindVertexArray(0);
@@ -612,6 +653,7 @@ void ParticleSystemProxy::generateVAOs()
     if (flip)
         AppendQuaternionRenderingVAO(quaternionsbuffer);
     glBindVertexArray(0);
+    
 }
 
 void ParticleSystemProxy::render() {
@@ -632,3 +674,5 @@ void ParticleSystemProxy::render() {
         draw();
     }
 }
+
+#endif   // SERVER_ONLY

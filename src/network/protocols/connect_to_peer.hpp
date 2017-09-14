@@ -39,10 +39,17 @@ protected:
     /** True if this is a LAN connection. */
     bool m_is_lan;
 
+    /** We might need to broadcast several times (in case the client is not
+     *  ready in time). This keep track of broadcastst. */
+    float m_time_last_broadcast;
+
+    int m_broadcast_count;
+
     enum STATE
     {
         NONE,
         RECEIVED_PEER_ADDRESS,
+        WAIT_FOR_LAN,
         CONNECTING,
         CONNECTED,
         DONE,

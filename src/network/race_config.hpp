@@ -110,7 +110,7 @@ public:
     void setPlayerLapsVote(uint8_t player_id, uint8_t lap_count,
                            uint8_t track_nb = 0);
 
-    void setRaceData();
+    void loadWorld();
 
     const TrackInfo* getNextTrackInfo() const;
     bool getReverse() const;

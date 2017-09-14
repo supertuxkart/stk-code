@@ -24,6 +24,7 @@
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
+#include "utils/profiler.hpp"
 #include "utils/vs.hpp"
 
 #include <pthread.h>
@@ -44,6 +45,17 @@
 #    include <AL/al.h>
 #    include <AL/alc.h>
 #  endif
+#endif
+
+// Define this if the profiler should also collect data of the sfx manager
+#undef ENABLE_PROFILING_FOR_SFX_MANAGER
+#ifndef ENABLE_PROFILING_FOR_SFX_MANAGER
+     // Otherwise ignore the profiler push/pop events
+     // Use undef to remove preprocessor warning
+#    undef PROFILER_PUSH_CPU_MARKER
+#    undef  PROFILER_POP_CPU_MARKER
+#    define PROFILER_PUSH_CPU_MARKER(name, r, g, b)
+#    define PROFILER_POP_CPU_MARKER()
 #endif
 
 SFXManager *SFXManager::m_sfx_manager;
@@ -90,9 +102,6 @@ SFXManager::SFXManager()
     pthread_attr_t  attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
-    // Should be the default, but just in case:
-    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
     m_thread_id.setAtomic(new pthread_t());
     // The thread is created even if there atm sfx are disabled
@@ -209,6 +218,15 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p)
 }   // queue (Vec3)
 
 //----------------------------------------------------------------------------
+
+void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p, SFXBuffer* buffer)
+{
+    SFXCommand *sfx_command = new SFXCommand(command, sfx, p);
+    sfx_command->m_buffer = buffer;
+    queueCommand(sfx_command);
+}   // queue (Vec3)
+
+//----------------------------------------------------------------------------
 /** Adds a sound effect command with a float and a Vec3 parameter to the queue
  *  of the sfx manager. Openal commands can sometimes cause a 5ms delay, so it
  *   is done in a separate thread.
@@ -299,14 +317,13 @@ void* SFXManager::mainLoop(void *obj)
     VS::setThreadName("SFXManager");
     SFXManager *me = (SFXManager*)obj;
 
-    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-
     me->m_sfx_commands.lock();
 
     // Wait till we have an empty sfx in the queue
     while (me->m_sfx_commands.getData().empty() ||
            me->m_sfx_commands.getData().front()->m_command!=SFX_EXIT)
     {
+        PROFILER_PUSH_CPU_MARKER("Wait", 255, 0, 0);
         bool empty = me->m_sfx_commands.getData().empty();
 
         // Wait in cond_wait for a request to arrive. The 'while' is necessary
@@ -326,11 +343,13 @@ void* SFXManager::mainLoop(void *obj)
             break;
         }
         me->m_sfx_commands.unlock();
+        PROFILER_POP_CPU_MARKER();
+        PROFILER_PUSH_CPU_MARKER("Execute", 0, 255, 0);
         switch (current->m_command)
         {
         case SFX_PLAY:     current->m_sfx->reallyPlayNow();       break;
         case SFX_PLAY_POSITION:
-            current->m_sfx->reallyPlayNow(current->m_parameter);  break;
+            current->m_sfx->reallyPlayNow(current->m_parameter, current->m_buffer);  break;
         case SFX_STOP:     current->m_sfx->reallyStopNow();       break;
         case SFX_PAUSE:    current->m_sfx->reallyPauseNow();      break;
         case SFX_RESUME:   current->m_sfx->reallyResumeNow();     break;
@@ -388,6 +407,8 @@ void* SFXManager::mainLoop(void *obj)
         }
         delete current;
         current = NULL;
+        PROFILER_POP_CPU_MARKER();
+        PROFILER_PUSH_CPU_MARKER("yield", 0, 0, 255);
         // We access the size without lock, doesn't matter if we
         // should get an incorrect value because of concurrent read/writes
         if (me->m_sfx_commands.getData().size() == 0)
@@ -400,7 +421,7 @@ void* SFXManager::mainLoop(void *obj)
             me->queue(SFX_UPDATE, (SFXBase*)NULL, float(t));
         }
         me->m_sfx_commands.lock();
-
+        PROFILER_POP_CPU_MARKER();
     }   // while
 
     // Signal that the sfx manager can now be deleted.
@@ -519,7 +540,6 @@ void SFXManager::loadSfx()
         array[i++] = buffer;
     }
 
-    #pragma omp parallel for private(i)
     for (i = 0; i < max; i++)
     {
         array[i]->load();
@@ -598,7 +618,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
     // to load terrain specific sfx.
     const std::string full_path = (path == "")
                                 ? file_manager->getAsset(FileManager::SFX,filename)
-                                : path;
+                                : path+"/"+filename;
 
     SFXBuffer tmpbuffer(full_path, node);
 
@@ -663,6 +683,22 @@ SFXBase* SFXManager::createSoundSource(const std::string &name,
 
     return createSoundSource( i->second, add_to_SFXList );
 }  // createSoundSource
+
+//----------------------------------------------------------------------------
+
+SFXBuffer* SFXManager::getBuffer(const std::string &name)
+{
+    std::map<std::string, SFXBuffer*>::iterator i = m_all_sfx_types.find(name);
+    if (i == m_all_sfx_types.end())
+    {
+        Log::error("SFXManager",
+            "SFXManager::getBuffer could not find the "
+            "requested sound effect : '%s'.", name.c_str());
+        return NULL;
+    }
+
+    return i->second;
+}
 
 //----------------------------------------------------------------------------
 /** Returns true if a sfx with the given name exists.

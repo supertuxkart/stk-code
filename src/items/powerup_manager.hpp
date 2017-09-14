@@ -19,20 +19,19 @@
 #ifndef HEADER_POWERUPMANAGER_HPP
 #define HEADER_POWERUPMANAGER_HPP
 
-namespace irr
-{
-    namespace scene { class IMesh; }
-}
+#include "utils/no_copy.hpp"
+
+#include "btBulletDynamicsCommon.h"
 
 #include <string>
 #include <vector>
 
-#include "btBulletDynamicsCommon.h"
-
-#include "utils/no_copy.hpp"
-
 class Material;
 class XMLNode;
+namespace irr
+{
+    namespace scene { class IMesh; }
+}
 
 /**
   * \ingroup items

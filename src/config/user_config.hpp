@@ -279,6 +279,16 @@ enum AnimType {ANIMS_NONE         = 0,
                ANIMS_PLAYERS_ONLY = 1,
                ANIMS_ALL          = 2 };
 
+enum GeometryLevel
+{
+    /** Display everything */
+    GEOLEVEL_0    = 0,
+    /** a few details are displayed */
+    GEOLEVEL_1    = 1,
+    /** Lowest level, no details are displayed. */
+    GEOLEVEL_2    = 2
+};
+
 /** Using X-macros for setting-possible values is not very pretty, but it's a
  *  no-maintenance case :
  *  when you want to add a new parameter, just add one signle line below and
@@ -389,6 +399,59 @@ namespace UserConfigParams
             &m_wiimote_group,
             "A weight applied to the sin component of mapping wiimote angle to steering angle"));
 
+    // ---- Multitouch device
+    PARAM_PREFIX GroupUserConfigParam        m_multitouch_group
+        PARAM_DEFAULT( GroupUserConfigParam("Multitouch",
+                                            "Settings for the multitouch device") );
+
+    PARAM_PREFIX BoolUserConfigParam         m_multitouch_enabled
+            PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_enabled",
+            &m_multitouch_group,
+            "Enable multitouch support.") );
+            
+    PARAM_PREFIX IntUserConfigParam         m_multitouch_mode
+            PARAM_DEFAULT( IntUserConfigParam(1, "multitouch_mode",
+            &m_multitouch_group,
+            "Steering mode: 0 = off, 1 = buttons"));
+
+    PARAM_PREFIX BoolUserConfigParam         m_multitouch_inverted
+            PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_inverted",
+            &m_multitouch_group,
+            "Draw steering wheel on right side.") );
+
+    PARAM_PREFIX IntUserConfigParam         m_multitouch_accelerometer
+            PARAM_DEFAULT( IntUserConfigParam(0, "multitouch_accelerometer",
+            &m_multitouch_group,
+            "Accelerometer mode: 0 = off, 1 = tablet, 2 = phone"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_center
+            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone_center",
+            &m_multitouch_group,
+            "A parameter in range [0, 0.5] that determines the zone that is "
+            "considered as centered in steering button."));
+
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_edge
+            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone_edge",
+            &m_multitouch_group,
+            "A parameter in range [0, 0.5] that determines the zone that is "
+            "considered as max value in steering button."));
+            
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_tilt_factor
+            PARAM_DEFAULT( FloatUserConfigParam(4.0f, "multitouch_tilt_factor",
+            &m_multitouch_group,
+            "A parameter that determines general accelerometer sensitivity."));
+
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_scale
+            PARAM_DEFAULT( FloatUserConfigParam(1.1f, "multitouch_scale",
+            &m_multitouch_group,
+            "A parameter in range [0.5, 1.5] that determines the scale of the "
+            "multitouch interface."));
+
+    PARAM_PREFIX BoolUserConfigParam         m_screen_keyboard
+            PARAM_DEFAULT( BoolUserConfigParam(false, "screen_keyboard",
+            &m_multitouch_group,
+            "Enable screen keyboard.") );
+
     // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
             PARAM_DEFAULT( GroupUserConfigParam("GpStartOrder",
@@ -453,7 +516,7 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_texture_compression
         PARAM_DEFAULT(BoolUserConfigParam(true, "enable_texture_compression",
         &m_video_group, "Enable Texture Compression"));
-    /** This is a bit flag: bit 0: enabled (1) or disabled(0). 
+    /** This is a bit flag: bit 0: enabled (1) or disabled(0).
      *  Bit 1: setting done by default(0), or by user choice (2). This allows
      *  to e.g. disable h.d. textures on hd3000 as default, but still allow the
      *  user to enable it. */
@@ -499,6 +562,44 @@ namespace UserConfigParams
         PARAM_DEFAULT(IntUserConfigParam(512, "max_texture_size",
         &m_video_group, "Max texture size when high definition textures are "
                         "disabled"));
+
+    PARAM_PREFIX BoolUserConfigParam        m_hq_mipmap
+        PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
+        &m_video_group, "Generate mipmap for textures using "
+                        "high quality method with SSE"));
+                        
+    // ---- Recording
+    PARAM_PREFIX GroupUserConfigParam        m_recording_group
+        PARAM_DEFAULT(GroupUserConfigParam("Recording",
+                            "Recording Settings"));
+
+    PARAM_PREFIX BoolUserConfigParam        m_limit_game_fps
+        PARAM_DEFAULT(BoolUserConfigParam(true, "limit_game_fps",
+        &m_recording_group, "Limit game framerate not beyond the fps of"
+                            " recording video."));
+
+    PARAM_PREFIX IntUserConfigParam         m_video_format
+        PARAM_DEFAULT(IntUserConfigParam(0, "video_format",
+        &m_recording_group, "Specify the video for record, which is the enum"
+                            " of VideoFormat in libopenglrecorder. It will"
+                            " auto fallback to MJPEG if libopenglrecorder was"
+                            " not compiled with such video encoder."));
+
+    PARAM_PREFIX IntUserConfigParam         m_audio_bitrate
+        PARAM_DEFAULT(IntUserConfigParam(112000, "audio_bitrate",
+        &m_recording_group, "Specify the bitrate for audio"));
+
+    PARAM_PREFIX IntUserConfigParam         m_video_bitrate
+        PARAM_DEFAULT(IntUserConfigParam(20000, "video_bitrate",
+        &m_recording_group, "Specify the bitrate for video"));
+
+    PARAM_PREFIX IntUserConfigParam         m_recorder_jpg_quality
+        PARAM_DEFAULT(IntUserConfigParam(90, "recorder_jpg_quality",
+        &m_recording_group, "Specify the jpg compression level of recorder"));
+
+    PARAM_PREFIX IntUserConfigParam         m_record_fps
+        PARAM_DEFAULT(IntUserConfigParam(30, "record_fps",
+        &m_recording_group, "Specify the fps of recording video"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
@@ -555,6 +656,8 @@ namespace UserConfigParams
 
     PARAM_PREFIX bool m_race_now          PARAM_DEFAULT( false );
 
+    PARAM_PREFIX bool m_enforce_current_player PARAM_DEFAULT( false );
+
     /** True to test funky ambient/diffuse/specularity in RGB &
      *  all anisotropic */
     PARAM_PREFIX bool m_rendering_debug   PARAM_DEFAULT( false );
@@ -562,8 +665,9 @@ namespace UserConfigParams
     /** True if graphical profiler should be displayed */
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
 
-    /** True if hardware skinning should be enabled */
-    PARAM_PREFIX bool m_hw_skinning_enabled  PARAM_DEFAULT( false );
+    /** How many seconds worth of data the circular profile buffer
+     *  can store. */
+    PARAM_PREFIX float m_profiler_buffer_duration PARAM_DEFAULT(20.0f);
 
     // not saved to file
 
@@ -623,9 +727,9 @@ namespace UserConfigParams
 #define FBO_DEFAULT true
 #endif
 
-    PARAM_PREFIX BoolUserConfigParam        m_graphical_effects
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "anim_gfx",
-                            &m_graphics_quality, "Scenery animations") );
+    PARAM_PREFIX IntUserConfigParam        m_graphical_effects
+            PARAM_DEFAULT(  IntUserConfigParam(2, "anim_gfx",
+                            &m_graphics_quality, "Scenery animations: 0 disabled, 1 only important, 2 enabled") );
 
     // This saves the actual user preference.
     PARAM_PREFIX IntUserConfigParam        m_xmas_mode
@@ -645,6 +749,13 @@ namespace UserConfigParams
                             "steering_animations", &m_graphics_quality,
                 "Whether to display kart animations (0=disabled for all; "
                 "1=enabled for humans, disabled for AIs; 2=enabled for all") );
+
+    PARAM_PREFIX IntUserConfigParam        m_geometry_level
+            PARAM_DEFAULT(  IntUserConfigParam(GEOLEVEL_0,
+                            "geometry_level", &m_graphics_quality,
+                "Geometry quality 0=everything is displayed; "
+                "1=a few details are displayed; 2=lowest level, no details") );
+
     PARAM_PREFIX IntUserConfigParam         m_anisotropic
             PARAM_DEFAULT( IntUserConfigParam(4, "anisotropic",
                            &m_graphics_quality,
@@ -863,6 +974,14 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_artist_debug_mode
             PARAM_DEFAULT( BoolUserConfigParam(false, "artist_debug_mode",
                                "Whether to enable track debugging features") );
+
+    PARAM_PREFIX BoolUserConfigParam        m_hide_gui
+        PARAM_DEFAULT(BoolUserConfigParam(false, "debug_hide_gui",
+            "Whether to hide the GUI (artist debug mode)"));
+
+    PARAM_PREFIX BoolUserConfigParam        m_everything_unlocked
+            PARAM_DEFAULT( BoolUserConfigParam(false, "everything_unlocked",
+                               "Enable all karts and tracks") );
 
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;

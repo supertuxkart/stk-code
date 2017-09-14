@@ -23,6 +23,9 @@
 
 class FaceTTF;
 
+/** A font which uses a more cartonish style TTF to render big numbers in STK.
+ *  \ingroup font
+ */
 class DigitFace : public FontWithFace
 {
 private:
@@ -38,8 +41,6 @@ public:
     LEAK_CHECK()
     // ------------------------------------------------------------------------
     DigitFace(FaceTTF* ttf);
-    // ------------------------------------------------------------------------
-    virtual ~DigitFace() {}
     // ------------------------------------------------------------------------
     virtual void init() OVERRIDE;
     // ------------------------------------------------------------------------

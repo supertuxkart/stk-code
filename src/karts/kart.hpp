@@ -28,19 +28,21 @@
 
 #include "LinearMath/btTransform.h"
 
-#include "items/powerup.hpp"
+#include "graphics/render_info.hpp"
+#include "items/powerup_manager.hpp"    // For PowerupType
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "utils/no_copy.hpp"
 
-class btKart;
-
-class Attachment;
-class Controller;
-class Item;
 class AbstractKartAnimation;
+class Attachment;
+class btKart;
+class btUprightConstraint;
+class Controller;
 class HitEffect;
+class Item;
 class KartGFX;
+class KartRewinder;
 class MaxSpeed;
 class ParticleEmitter;
 class ParticleKind;
@@ -51,8 +53,6 @@ class SkidMarks;
 class SlipStream;
 class Stars;
 class TerrainInfo;
-
-enum KartRenderType: unsigned int;
 
 /** The main kart class. All type of karts are of this object, but with
  *  different controllers. The controllers are what turn a kart into a
@@ -77,7 +77,7 @@ protected:
     /** Is time flying activated */
     bool m_is_jumping;
 
-private:
+protected:
     /** Handles speed increase and capping due to powerup, terrain, ... */
     MaxSpeed *m_max_speed;
 
@@ -178,8 +178,6 @@ private:
     /** The shadow of a kart. */
     Shadow          *m_shadow;
 
-    ParticleEmitter *m_sky_particles_emitter;
-
     /** All particle effects. */
     KartGFX         *m_kart_gfx;
 
@@ -195,23 +193,36 @@ private:
     float           m_finish_time;
     bool            m_finished_race;
 
+    float           m_falling_time = 0.35f;
+
     /** When a kart has its view blocked by the plunger, this variable will be
      *  > 0 the number it contains is the time left before removing plunger. */
     float         m_view_blocked_by_plunger;
+    /** The current speed (i.e. length of velocity vector) of this kart. */
     float         m_speed;
+    /** For camera handling an exponentially smoothened value is used, which
+     *  reduces stuttering of the camera. */
+    float         m_smoothed_speed;
+    
+    /** For smoothing engine sound**/
+    float         m_last_factor_engine_sound;
 
     std::vector<SFXBase*> m_custom_sounds;
-    SFXBase      *m_beep_sound;
+    int m_emitter_id = 0;
+    static const int EMITTER_COUNT = 3;
+    SFXBase      *m_emitters[EMITTER_COUNT];
     SFXBase      *m_engine_sound;
-    SFXBase      *m_crash_sound;
     SFXBase      *m_terrain_sound;
     SFXBase      *m_nitro_sound;
     /** A pointer to the previous terrain sound needs to be saved so that an
      *  'older' sfx can be finished and an abrupt end of the sfx is avoided. */
     SFXBase      *m_previous_terrain_sound;
     SFXBase      *m_skid_sound;
-    SFXBase      *m_goo_sound;
-    SFXBase      *m_boing_sound;
+    SFXBuffer    *m_horn_sound;
+    static const int CRASH_SOUND_COUNT = 3;
+    SFXBuffer    *m_crash_sounds[CRASH_SOUND_COUNT];
+    SFXBuffer    *m_goo_sound;
+    SFXBuffer    *m_boing_sound;
     float         m_time_last_crash;
     RaceManager::KartType m_type;
 
@@ -220,11 +231,12 @@ private:
 
     void          updatePhysics(float dt);
     void          handleMaterialSFX(const Material *material);
-    void          handleMaterialGFX();
+    void          handleMaterialGFX(float dt);
     void          updateFlying();
     void          updateSliding();
     void          updateEnginePowerAndBrakes(float dt);
-    void          updateEngineSFX();
+    void          updateEngineSFX(float dt);
+    void          updateSpeed();
     void          updateNitro(float dt);
     float         getActualWheelForce();
     void          playCrashSFX(const Material* m, AbstractKart *k);
@@ -234,7 +246,7 @@ public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
                         PerPlayerDifficulty difficulty,
-                        KartRenderType krt);
+                        KartRenderType krt = KRT_DEFAULT);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
     virtual void   kartIsInRestNow();
@@ -283,6 +295,7 @@ public:
 
     virtual bool   playCustomSFX    (unsigned int type);
     virtual void   setController(Controller *controller);
+    virtual void   setXYZ(const Vec3& a);
 
     // ========================================================================
     // Powerup related functions.
@@ -364,6 +377,9 @@ public:
     /** Returns the speed of the kart in meters/second. */
     virtual float        getSpeed() const {return m_speed;                 }
     // ------------------------------------------------------------------------
+    /** Returns the speed of the kart in meters/second. */
+    virtual float        getSmoothedSpeed() const { return m_smoothed_speed; }
+    // ------------------------------------------------------------------------
     /** This is used on the client side only to set the speed of the kart
      *  from the server information.                                       */
     virtual void         setSpeed(float s) {m_speed = s;                   }
@@ -393,7 +409,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if the kart is close to the ground, used to dis/enable
      *  the upright constraint to allow for more realistic explosions. */
-    bool           isNearGround     () const;
+    bool isNearGround() const;
     // ------------------------------------------------------------------------
     /** Returns true if the kart is eliminated.  */
     virtual bool isEliminated() const { return m_eliminated; }
@@ -438,6 +454,10 @@ public:
     // ------------------------------------------------------------------------
     virtual void setOnScreenText(const wchar_t *text);
     // ------------------------------------------------------------------------
+    /** Returns the normal of the terrain the kart is over atm. This is
+     *  defined even if the kart is flying. */
+    virtual const Vec3& getNormal() const;
+    // ------------------------------------------------------------------------
     /** For debugging only: check if a kart is flying. */
     bool isFlying() const { return m_flying;  }
     // ------------------------------------------------------------------------
@@ -457,7 +477,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns whether this kart is jumping. */
     virtual bool isJumping() const { return m_is_jumping; };
-
+    // ------------------------------------------------------------------------
+    SFXBase* getNextEmitter();
+    // ------------------------------------------------------------------------
+    virtual void playSound(SFXBuffer* buffer);
 };   // Kart
 
 

@@ -13,6 +13,8 @@
                     I18N="Tab in help menu" text="Game Modes"/>
             <icon-button id="page4" width="128" height="128" icon="gui/options_input.png"
                     I18N="Tab in help menu" text="Multi-player"/>
+            <icon-button id="page5" width="128" height="128" icon="gui/banana.png"
+                    I18N="Tab in help menu" text="Bananas"/>
         </tabs>
 
         <box proportion="1" width="100%" layout="vertical-row">

@@ -74,6 +74,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case STABILITY_TRACK_CONNECTION_ACCEL:
         return TYPE_FLOAT;
+    case STABILITY_ANGULAR_FACTOR:
+        return TYPE_FLOAT_VECTOR;
     case STABILITY_SMOOTH_FLYING_IMPULSE:
         return TYPE_FLOAT;
     case TURN_RADIUS:
@@ -126,11 +128,17 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case PARACHUTE_DURATION_OTHER:
         return TYPE_FLOAT;
+    case PARACHUTE_DURATION_RANK_MULT:
+        return TYPE_FLOAT;
+    case PARACHUTE_DURATION_SPEED_MULT:
+        return TYPE_FLOAT;
     case PARACHUTE_LBOUND_FRACTION:
         return TYPE_FLOAT;
     case PARACHUTE_UBOUND_FRACTION:
         return TYPE_FLOAT;
     case PARACHUTE_MAX_SPEED:
+        return TYPE_FLOAT;
+    case FRICTION_KART_FRICTION:
         return TYPE_FLOAT;
     case BUBBLEGUM_DURATION:
         return TYPE_FLOAT;
@@ -298,6 +306,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "STABILITY_DOWNWARD_IMPULSE_FACTOR";
     case STABILITY_TRACK_CONNECTION_ACCEL:
         return "STABILITY_TRACK_CONNECTION_ACCEL";
+    case STABILITY_ANGULAR_FACTOR:
+        return "STABILITY_ANGULAR_FACTOR";
     case STABILITY_SMOOTH_FLYING_IMPULSE:
         return "STABILITY_SMOOTH_FLYING_IMPULSE";
     case TURN_RADIUS:
@@ -350,12 +360,18 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "PARACHUTE_DURATION";
     case PARACHUTE_DURATION_OTHER:
         return "PARACHUTE_DURATION_OTHER";
+    case PARACHUTE_DURATION_RANK_MULT:
+        return "PARACHUTE_DURATION_RANK_MULT";
+    case PARACHUTE_DURATION_SPEED_MULT:
+        return "PARACHUTE_DURATION_SPEED_MULT";
     case PARACHUTE_LBOUND_FRACTION:
         return "PARACHUTE_LBOUND_FRACTION";
     case PARACHUTE_UBOUND_FRACTION:
         return "PARACHUTE_UBOUND_FRACTION";
     case PARACHUTE_MAX_SPEED:
         return "PARACHUTE_MAX_SPEED";
+    case FRICTION_KART_FRICTION:
+        return "FRICTION_KART_FRICTION";
     case BUBBLEGUM_DURATION:
         return "BUBBLEGUM_DURATION";
     case BUBBLEGUM_SPEED_FRACTION:
@@ -613,6 +629,18 @@ float AbstractCharacteristic::getStabilityTrackConnectionAccel() const
                     getName(STABILITY_TRACK_CONNECTION_ACCEL).c_str());
     return result;
 }  // getStabilityTrackConnectionAccel
+
+// ----------------------------------------------------------------------------
+std::vector<float> AbstractCharacteristic::getStabilityAngularFactor() const
+{
+    std::vector<float> result;
+    bool is_set = false;
+    process(STABILITY_ANGULAR_FACTOR, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(STABILITY_ANGULAR_FACTOR).c_str());
+    return result;
+}  // getStabilityAngularFactor
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getStabilitySmoothFlyingImpulse() const
@@ -927,6 +955,30 @@ float AbstractCharacteristic::getParachuteDurationOther() const
 }  // getParachuteDurationOther
 
 // ----------------------------------------------------------------------------
+float AbstractCharacteristic::getParachuteDurationRankMult() const
+{
+    float result;
+    bool is_set = false;
+    process(PARACHUTE_DURATION_RANK_MULT, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(PARACHUTE_DURATION_RANK_MULT).c_str());
+    return result;
+}  // getParachuteDurationRankMult
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getParachuteDurationSpeedMult() const
+{
+    float result;
+    bool is_set = false;
+    process(PARACHUTE_DURATION_SPEED_MULT, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(PARACHUTE_DURATION_SPEED_MULT).c_str());
+    return result;
+}  // getParachuteDurationSpeedMult
+
+// ----------------------------------------------------------------------------
 float AbstractCharacteristic::getParachuteLboundFraction() const
 {
     float result;
@@ -961,6 +1013,18 @@ float AbstractCharacteristic::getParachuteMaxSpeed() const
                     getName(PARACHUTE_MAX_SPEED).c_str());
     return result;
 }  // getParachuteMaxSpeed
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getFrictionKartFriction() const
+{
+    float result;
+    bool is_set = false;
+    process(FRICTION_KART_FRICTION, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(FRICTION_KART_FRICTION).c_str());
+    return result;
+}  // getFrictionKartFriction
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getBubblegumDuration() const

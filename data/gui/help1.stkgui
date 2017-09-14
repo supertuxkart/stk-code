@@ -13,12 +13,14 @@
                     I18N="Tab in help menu" text="Game Modes"/>
             <icon-button id="page4" width="128" height="128" icon="gui/options_input.png"
                     I18N="Tab in help menu" text="Multi-player"/>
+            <icon-button id="page5" width="128" height="128" icon="gui/banana.png"
+                    I18N="Tab in help menu" text="Bananas"/>
         </tabs>
 
         <box proportion="1" width="100%" layout="vertical-row">
 
             <spacer width="5" height="15"/>
-            <button id="startTutorial" text="Click here to play the tutorial" align="center"/>
+            <button id="startTutorial" text="Start the tutorial" align="center"/>
             <spacer width="5" height="15"/>
 
             <div width="100%" proportion="2" layout="horizontal-row">

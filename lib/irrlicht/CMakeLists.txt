@@ -5,17 +5,31 @@ find_package(JPEG REQUIRED)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
                     "${JPEG_INCLUDE_DIR}"
                     "${PNG_INCLUDE_DIRS}"
-                    "${ZLIB_INCLUDE_DIR}"
-                    "${CMAKE_CURRENT_BINARY_DIR}/../zlib/") # For zconf.h on WIN32
+                    "${ZLIB_INCLUDE_DIR}")
 
-if(NOT USE_GLES2)
-    find_package(OpenGL REQUIRED)
-    include_directories(${OPENGL_INCLUDE_DIR})
+if(MSVC OR APPLE)
+    include_directories("${CMAKE_CURRENT_BINARY_DIR}/../zlib/" # For zconf.h on WIN32
+                        "${CMAKE_CURRENT_BINARY_DIR}/../libpng/")
+endif()
+
+if (SERVER_ONLY)
+    add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
+else()
+    if(NOT USE_GLES2)
+        find_package(OpenGL REQUIRED)
+        include_directories(${OPENGL_INCLUDE_DIR})
+    endif()
 endif()
 
 if (UNIX AND NOT APPLE)
     find_package(X11 REQUIRED)
     include_directories(${X11_INCLUDE_DIR})
+endif()
+
+if(ENABLE_WAYLAND_DEVICE)
+    add_definitions(-D_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
 endif()
 
 if(APPLE)
@@ -25,6 +39,11 @@ if(APPLE)
 endif()
 
 add_definitions(-DNDEBUG=1 -DIRRLICHT_EXPORTS=1 -DPNG_THREAD_UNSAFE_OK -DPNG_NO_MMX_CODE -DPNG_NO_MNG_FEATURES)
+
+if(UNIX OR MINGW)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
+endif()
+
 if(MSVC)
   add_definitions(/D_IRR_STATIC_LIB_)
   add_definitions(/D_CRT_SECURE_NO_WARNINGS) # Shut up about unsafe stuff
@@ -43,13 +62,7 @@ else()
 endif()
 
 if(USE_GLES2)
-    add_definitions(-D_IRR_COMPILE_WITH_OGLES2_ -DNO_IRR_COMPILE_WITH_SOFTWARE_ -DNO_IRR_COMPILE_WITH_BURNINGSVIDEO_ -DNO_IRR_COMPILE_WITH_OGLES1_ -DNO_IRR_COMPILE_WITH_OPENGL_ -DNO_IRR_USE_NON_SYSTEM_JPEG_LIB_ -DNO_IRR_USE_NON_SYSTEM_LIB_PNG_ -DNO_IRR_USE_NON_SYSTEM_ZLIB_)
-endif()
-
-# Xrandr
-if(UNIX AND NOT APPLE)
-    add_definitions(-DNO_IRR_LINUX_X11_VIDMODE_)
-    add_definitions(-D_IRR_LINUX_X11_RANDR_)
+    add_definitions(-D_IRR_COMPILE_WITH_OGLES2_ -DNO_IRR_COMPILE_WITH_OPENGL_)
 endif()
 
 if(CYGWIN)
@@ -60,10 +73,10 @@ endif()
 set(IRRLICHT_SOURCES
 source/Irrlicht/CAnimatedMeshSceneNode.cpp
 source/Irrlicht/CAttributes.cpp
-source/Irrlicht/CB3DMeshFileLoader.cpp
 source/Irrlicht/CBillboardSceneNode.cpp
 source/Irrlicht/CBoneSceneNode.cpp
 source/Irrlicht/CCameraSceneNode.cpp
+source/Irrlicht/CContextEGL.cpp
 source/Irrlicht/CColorConverter.cpp
 source/Irrlicht/CCubeSceneNode.cpp
 source/Irrlicht/CDefaultGUIElementFactory.cpp
@@ -109,11 +122,13 @@ source/Irrlicht/CImageLoaderPNG.cpp
 source/Irrlicht/CImageWriterBMP.cpp
 source/Irrlicht/CImageWriterJPG.cpp
 source/Irrlicht/CImageWriterPNG.cpp
+source/Irrlicht/CIrrDeviceAndroid.cpp
 source/Irrlicht/CIrrDeviceConsole.cpp
 source/Irrlicht/CIrrDeviceFB.cpp
 source/Irrlicht/CIrrDeviceLinux.cpp
 source/Irrlicht/CIrrDeviceSDL.cpp
 source/Irrlicht/CIrrDeviceStub.cpp
+source/Irrlicht/CIrrDeviceWayland.cpp
 source/Irrlicht/CIrrDeviceWin32.cpp
 source/Irrlicht/CLightSceneNode.cpp
 source/Irrlicht/CLimitReadFile.cpp
@@ -187,15 +202,15 @@ source/Irrlicht/CZipReader.cpp
 source/Irrlicht/Irrlicht.cpp
 source/Irrlicht/irrXML.cpp
 source/Irrlicht/os.cpp
-source/Irrlicht/BuiltInFont.h
+source/Irrlicht/COpenGLNormalMapRenderer.cpp
 source/Irrlicht/CAnimatedMeshSceneNode.h
 source/Irrlicht/CAttributeImpl.h
 source/Irrlicht/CAttributes.h
-source/Irrlicht/CB3DMeshFileLoader.h
 source/Irrlicht/CBillboardSceneNode.h
 source/Irrlicht/CBlit.h
 source/Irrlicht/CBoneSceneNode.h
 source/Irrlicht/CCameraSceneNode.h
+source/Irrlicht/CContextEGL.h
 source/Irrlicht/CColorConverter.h
 source/Irrlicht/CCubeSceneNode.h
 source/Irrlicht/CDefaultGUIElementFactory.h
@@ -241,11 +256,13 @@ source/Irrlicht/CImageLoaderPNG.h
 source/Irrlicht/CImageWriterBMP.h
 source/Irrlicht/CImageWriterJPG.h
 source/Irrlicht/CImageWriterPNG.h
+source/Irrlicht/CIrrDeviceAndroid.h
 source/Irrlicht/CIrrDeviceConsole.h
 source/Irrlicht/CIrrDeviceFB.h
 source/Irrlicht/CIrrDeviceLinux.h
 source/Irrlicht/CIrrDeviceSDL.h
 source/Irrlicht/CIrrDeviceStub.h
+source/Irrlicht/CIrrDeviceWayland.h
 source/Irrlicht/CIrrDeviceWin32.h
 source/Irrlicht/CLightSceneNode.h
 source/Irrlicht/CLimitReadFile.h
@@ -339,6 +356,7 @@ source/Irrlicht/S4DVertex.h
 source/Irrlicht/SoftwareDriver2_compile_config.h
 source/Irrlicht/SoftwareDriver2_helper.h
 source/Irrlicht/wglext.h
+source/Irrlicht/COpenGLNormalMapRenderer.h
 
 include/aabbox3d.h
 include/CDynamicMeshBuffer.h
@@ -543,6 +561,14 @@ endif()
 add_library(stkirrlicht STATIC ${IRRLICHT_SOURCES})
 target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY} ${ZLIB_LIBRARY})
 
+if(USE_GLES2 OR ENABLE_WAYLAND_DEVICE)
+    target_link_libraries(stkirrlicht EGL)
+endif()
+
+if(ENABLE_WAYLAND_DEVICE)
+    target_link_libraries(stkirrlicht wayland-client wayland-egl wayland-cursor xkbcommon)
+endif()
+
 if(WIN32)
-    target_link_libraries(stkirrlicht imm32)
+    target_link_libraries(stkirrlicht imm32 xinput9_1_0)
 endif()

@@ -18,17 +18,12 @@
 
 #include "physics/physical_object.hpp"
 
-#include <memory>
-#include <string>
-#include <vector>
-
-using namespace irr;
-
+#include "config/stk_config.hpp"
+#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
-#include "modes/world.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
@@ -39,6 +34,11 @@ using namespace irr;
 #include <ISceneManager.h>
 #include <IMeshSceneNode.h>
 #include <ITexture.h>
+using namespace irr;
+
+#include <memory>
+#include <string>
+#include <vector>
 
 /** Creates a physical Settings object with the given type, radius and mass.
  */
@@ -179,7 +179,7 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
 // ----------------------------------------------------------------------------
 PhysicalObject::~PhysicalObject()
 {
-    World::getWorld()->getPhysics()->removeBody(m_body);
+    Physics::getInstance()->removeBody(m_body);
     delete m_body;
     delete m_motion_state;
 
@@ -378,7 +378,8 @@ void PhysicalObject::init(const PhysicalObject::Settings& settings)
                 return;
         }   // switch node->getType()
 
-        std::unique_ptr<TriangleMesh> triangle_mesh(new TriangleMesh());
+        std::unique_ptr<TriangleMesh> 
+                   triangle_mesh(new TriangleMesh(/*can_be_transformed*/true));
 
         for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
         {
@@ -522,7 +523,10 @@ void PhysicalObject::init(const PhysicalObject::Settings& settings)
     btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state,
                                                   m_shape, inertia);
 
-    m_body = new btRigidBody(info);
+    if(m_triangle_mesh)
+        m_body = new TriangleMesh::RigidBodyTriangleMesh(m_triangle_mesh, info);
+    else
+        m_body = new btRigidBody(info);
     m_user_pointer.set(this);
     m_body->setUserPointer(&m_user_pointer);
 
@@ -539,7 +543,7 @@ void PhysicalObject::init(const PhysicalObject::Settings& settings)
         m_body->setActivationState(DISABLE_DEACTIVATION);
     }
 
-    World::getWorld()->getPhysics()->addBody(m_body);
+    Physics::getInstance()->addBody(m_body);
     m_body_added = true;
     if(m_triangle_mesh)
         m_triangle_mesh->setBody(m_body);
@@ -671,7 +675,7 @@ void PhysicalObject::removeBody()
 {
     if (m_body_added)
     {
-        World::getWorld()->getPhysics()->removeBody(m_body);
+        Physics::getInstance()->removeBody(m_body);
         m_body_added = false;
     }
 }   // Remove body
@@ -683,7 +687,7 @@ void PhysicalObject::addBody()
     if (!m_body_added)
     {
         m_body_added = true;
-        World::getWorld()->getPhysics()->addBody(m_body);
+        Physics::getInstance()->addBody(m_body);
     }
 }   // Add body
 

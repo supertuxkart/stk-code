@@ -75,9 +75,6 @@ void NewsManager::init(bool force_refresh)
         pthread_attr_t  attr;
         pthread_attr_init(&attr);
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-        // Should be the default, but just in case:
-        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-        //pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
         pthread_t thread_id;
         int error = pthread_create(&thread_id, &attr,
             &NewsManager::downloadNews, this);
@@ -322,7 +319,7 @@ void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
         // a new read on the next start, instead of waiting
         // for some time).
         file_manager->removeFile(filename);
-        NewsMessage n(_("Can't access stkaddons server..."), -1);
+        NewsMessage n(_("Failed to connect to the SuperTuxKart add-ons server."), -1);
         m_news.lock();
         m_news.getData().push_back(n);
 

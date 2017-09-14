@@ -18,23 +18,38 @@
 #ifndef VAOMANAGER_HPP
 #define VAOMANAGER_HPP
 
-#include "gl_headers.hpp"
+#include "graphics/gl_headers.hpp"
 #include "utils/singleton.hpp"
+#include <tuple>
 #include <S3DVertex.h>
 #include <IMeshBuffer.h>
+#include <ISceneNode.h>
 #include <vector>
 #include <map>
 #include <unordered_map>
 
-enum InstanceType
+using namespace irr;
+
+enum InstanceType : unsigned int
 {
-    InstanceTypeDualTex,
     InstanceTypeThreeTex,
+    InstanceTypeFourTex,
     InstanceTypeShadow,
     InstanceTypeRSM,
     InstanceTypeGlow,
     InstanceTypeCount,
 };
+
+typedef std::tuple<scene::ISceneNode*, core::vector2df, core::vector2df,
+    int32_t> InstanceSettings;
+
+struct GLMesh;
+struct InstanceList
+{
+    GLMesh* m_mesh;
+    std::vector<InstanceSettings> m_instance_settings;
+};
+typedef std::unordered_map <scene::IMeshBuffer *, InstanceList> MeshMap;
 
 #ifdef WIN32
 #pragma pack(push, 1)
@@ -60,34 +75,7 @@ struct InstanceDataSingleTex
         float Z;
     } Scale;
     uint64_t Texture;
-#ifdef WIN32
-};
-#else
-} __attribute__((packed));
-#endif
-
-struct InstanceDataDualTex
-{
-    struct
-    {
-        float X;
-        float Y;
-        float Z;
-    } Origin;
-    struct
-    {
-        float X;
-        float Y;
-        float Z;
-    } Orientation;
-    struct
-    {
-        float X;
-        float Y;
-        float Z;
-    } Scale;
-    uint64_t Texture;
-    uint64_t SecondTexture;
+    int32_t skinning_offset;
 #ifdef WIN32
 };
 #else
@@ -114,9 +102,55 @@ struct InstanceDataThreeTex
         float Y;
         float Z;
     } Scale;
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+        float W;
+    } MiscData;
     uint64_t Texture;
     uint64_t SecondTexture;
     uint64_t ThirdTexture;
+    int32_t skinning_offset;
+#ifdef WIN32
+};
+#else
+} __attribute__((packed));
+#endif
+
+struct InstanceDataFourTex
+{
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Origin;
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Orientation;
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Scale;
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+        float W;
+    } MiscData;
+    uint64_t Texture;
+    uint64_t SecondTexture;
+    uint64_t ThirdTexture;
+    uint64_t FourthTexture;
+    int32_t skinning_offset;
 #ifdef WIN32
 };
 #else
@@ -155,7 +189,7 @@ struct GlowInstanceData
 
 class VAOManager : public Singleton<VAOManager>
 {
-    enum VTXTYPE { VTXTYPE_STANDARD, VTXTYPE_TCOORD, VTXTYPE_TANGENT, VTXTYPE_COUNT };
+    enum VTXTYPE { VTXTYPE_STANDARD, VTXTYPE_TCOORD, VTXTYPE_TANGENT, VTXTYPE_SKINNED_MESH, VTXTYPE_COUNT };
     GLuint vbo[VTXTYPE_COUNT], ibo[VTXTYPE_COUNT], vao[VTXTYPE_COUNT];
     GLuint instance_vbo[InstanceTypeCount];
     void *Ptr[InstanceTypeCount];

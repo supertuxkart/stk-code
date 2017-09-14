@@ -18,23 +18,24 @@
 
 #include "physics/triangle_mesh.hpp"
 
-#include "btBulletDynamicsCommon.h"
-
-#include "modes/world.hpp"
+#include "config/stk_config.hpp"
 #include "physics/physics.hpp"
 #include "utils/constants.hpp"
 #include "utils/time.hpp"
+
+#include "btBulletDynamicsCommon.h"
 
 #include <fstream>
 
 // -----------------------------------------------------------------------------
 /** Constructor: Initialises all data structures with zero.
  */
-TriangleMesh::TriangleMesh() : m_mesh()
+TriangleMesh::TriangleMesh(bool can_be_transformed) : m_mesh()
 {
-    m_body             = NULL;
-    m_free_body        = true;
-    m_motion_state     = NULL;
+    m_body               = NULL;
+    m_free_body          = true;
+    m_motion_state       = NULL;
+    m_can_be_transformed = can_be_transformed;
     // FIXME: on VS in release mode this statement actually overwrites
     // part of the data of m_mesh, causing a crash later. Debugging
     // shows that apparently m_collision_shape is at the same address
@@ -174,10 +175,13 @@ void TriangleMesh::createCollisionShape(bool create_collision_object, const char
  *  removed and all objects together with the track is converted again into
  *  a single rigid body. This avoids using irrlicht (or the graphics engine)
  *  for height of terrain detection).
- *  @param serializedBhv if non-NULL, the bhv is deserialized instead of
+ *  \param friction Friction to be used for this TriangleMesh.
+ *  \param flags Additional collision flags (default 0).
+ *  \param serializedBhv if non-NULL, the bhv is deserialized instead of
  *                       being calculated on the fly
  */
-void TriangleMesh::createPhysicalBody(btCollisionObject::CollisionFlags flags,
+void TriangleMesh::createPhysicalBody(float friction,
+                                      btCollisionObject::CollisionFlags flags,
                                       const char* serializedBhv)
 {
     // We need the collision shape, but not the collision object (since
@@ -189,8 +193,10 @@ void TriangleMesh::createPhysicalBody(btCollisionObject::CollisionFlags flags,
     btRigidBody::btRigidBodyConstructionInfo info(0.0f, m_motion_state,
                                                   m_collision_shape);
     info.m_restitution = 0.8f;
-    m_body=new btRigidBody(info);
-    World::getWorld()->getPhysics()->addBody(m_body);
+    info.m_friction    = friction;
+
+    m_body=new RigidBodyTriangleMesh(this, info);
+    Physics::getInstance()->addBody(m_body);
 
     m_body->setUserPointer(&m_user_pointer);
     m_body->setCollisionFlags(m_body->getCollisionFlags()  |
@@ -210,7 +216,7 @@ void TriangleMesh::removeAll()
     // Don't free the physical body if it was created outside this object.
     if(m_body && m_free_body)
     {
-        World::getWorld()->getPhysics()->removeBody(m_body);
+        Physics::getInstance()->removeBody(m_body);
         delete m_body;
         delete m_motion_state;
         m_body         = NULL;
@@ -234,22 +240,43 @@ void TriangleMesh::removeAll()
 btVector3 TriangleMesh::getInterpolatedNormal(unsigned int index,
                                               const btVector3 &position) const
 {
-    btVector3 *p1, *p2, *p3;
-    getTriangle(index, &p1, &p2, &p3);
-    const btVector3 *n1, *n2, *n3;
-    getNormals(index, &n1, &n2, &n3);
+    btVector3 p1, p2, p3;
+    btVector3 n1, n2, n3;
+    if(m_can_be_transformed)
+    {
+        // If the object of this mesh can be transformed, we need to compute
+        // the updated positions and normals before interpolating.
+        btVector3 q1, q2, q3;
+        getTriangle(index, &q1, &q2, &q3);
+        const btTransform &tf = m_body->getWorldTransform();
+        // The triangle verteces must be moved according to the transform of the body
+        p1 = tf(q1);
+        p2 = tf(q2);
+        p3 = tf(q3);
+        // The normals must be rotated according to the transform of the body
+        btVector3 m1, m2, m3;
+        getNormals(index, &m1, &m2, &m3);
+        n1 = tf.getBasis() * m1;
+        n2 = tf.getBasis() * m2;
+        n3 = tf.getBasis() * m3;
+    }
+    else
+    {
+        getTriangle(index, &p1, &p2, &p3);
+        getNormals(index, &n1, &n2, &n3);
+    }
 
     // Compute the Barycentric coordinates of position inside  triangle
     // p1, p2, p3.
 
-    btScalar p1p2p3 = getP1P2P3(index);
+    float p1p2p3 = getP1P2P3(index);
 
     // Area of BCP
-    btScalar p2p3p = (*p3 - *p2).cross(position - *p2).length2();
+    btScalar p2p3p = (p3 - p2).cross(position - p2).length2();
 
     // Area of CAP
-    btVector3 edge2 = *p3 - *p1;
-    btScalar p3p1p = edge2.cross(position - *p3).length2();
+    btVector3 edge2 = p3 - p1;
+    btScalar p3p1p = edge2.cross(position - p3).length2();
     btScalar s = btSqrt(p2p3p / p1p2p3);
     btScalar t = btSqrt(p3p1p / p1p2p3);
     btScalar w = 1.0f - s - t;
@@ -270,7 +297,7 @@ btVector3 TriangleMesh::getInterpolatedNormal(unsigned int index,
     }
 #endif
 
-    return s*(*n1) + t*(*n2) + w*(*n3);
+    return s*n1 + t*n2 + w*n3;
 }   // getInterpolatedNormal
 
 // ----------------------------------------------------------------------------

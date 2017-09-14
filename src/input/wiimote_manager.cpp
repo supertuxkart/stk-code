@@ -143,7 +143,6 @@ void WiimoteManager::launchDetection(int timeout)
 
     //To prevent segmentation fault, have to delete NULLs
     number_deletables = 0;
-    number_deletables = 0;
     deletable_wiimotes = (wiimote_t**) malloc(sizeof(struct wiimote_t*) * (number_previous_wiimotes-number_merged_wiimotes));
     memset(deletable_wiimotes,0,sizeof(struct wiimote_t*) * (number_previous_wiimotes-number_merged_wiimotes));
     for (int i = 0; i < number_previous_wiimotes; i++)
