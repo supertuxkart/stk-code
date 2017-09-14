@@ -127,8 +127,8 @@ void SkillLevelWidget::setSize(const int x, const int y, const int w, const int 
     m_iconbutton_w = iconbox_w * 3 / 4; 
 
     // -- sizes
-    m_bar_w = m_w - iconbox_w;  //leaving just enough space for icon + its margin  
-    m_bar_h = h;    
+    m_bar_w = m_w - iconbox_w - 25;  //leaving just enough space for icon + its margin  
+    m_bar_h = h;
 
     // for shrinking effect
     if (h < 175)
