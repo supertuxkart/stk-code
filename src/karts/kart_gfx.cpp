@@ -36,12 +36,11 @@
 
 #include <iostream>
 
-KartGFX::KartGFX(const AbstractKart *kart, RaceManager::KartType type, bool is_day)
+KartGFX::KartGFX(const AbstractKart *kart, bool is_day)
 {
     m_nitro_light = NULL;
     m_skidding_light_1 = NULL;
     m_skidding_light_2 = NULL;
-    m_head_light = NULL;
     m_kart = kart;
     m_wheel_toggle = 0;
     m_skid_level = 0;
@@ -80,22 +79,11 @@ KartGFX::KartGFX(const AbstractKart *kart, RaceManager::KartType type, bool is_d
                                  0.05f), /* force */0.4f, /*radius*/4.0f,
                                  1.0f, 0.0f, 0.0f, false, node);
         m_skidding_light_2->setVisible(false);
-        m_skidding_light_2->setName(("skidding emitter 2 (" + m_kart->getIdent() 
-                                                             + ")").c_str() );
-    
-        m_head_light = 
-            irr_driver->addLight(core::vector3df(0.0f, 0.2f, 1.5f * length),
-                                 /* force */ 0.5f, /*radius*/5.0f, 1.0f, 1.0f, 
-                                 1.0f, false, node);
-        m_head_light->setName( ("head light " + m_kart->getIdent() 
-                                                             + ")").c_str() );
-    
-        m_head_light->setVisible(type == RaceManager::KT_PLAYER && !is_day);
-    
+        m_skidding_light_2->setName(("skidding emitter 2 (" + m_kart->getIdent()
+                                                            + ")").c_str() );
         m_nitro_light->grab();
         m_skidding_light_1->grab();
         m_skidding_light_2->grab();
-        m_head_light->grab();
     }
 #endif
 
@@ -149,7 +137,6 @@ KartGFX::~KartGFX()
         m_nitro_light->drop();
         m_skidding_light_1->drop();
         m_skidding_light_2->drop();
-        m_head_light->drop();
     }
 #endif
 
@@ -560,7 +547,7 @@ void KartGFX::setGFXInvisible()
         m_nitro_light->setVisible(false);
         m_skidding_light_1->setVisible(false);
         m_skidding_light_2->setVisible(false);
-        m_head_light->setVisible(false);
+        m_kart->getKartModel()->turnOffHeadlights();
     }
 #endif
 }   // setGFXInvisible

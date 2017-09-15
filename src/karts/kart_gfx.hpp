@@ -24,7 +24,6 @@
 
 #include <vector>
 #include <string>
-#include "race/race_manager.hpp"
 
 class AbstractKart;
 class ParticleEmitter;
@@ -90,15 +89,12 @@ private:
     /** A light that's shown on the second skid-level with another color. */
     irr::scene::ISceneNode* m_skidding_light_2;
 
-    /** A light that's shown on the second skid-level with another color. */
-    irr::scene::ISceneNode* m_head_light;
-
     void addEffect(KartGFXType type, const std::string &file_name,
                    const Vec3 &position, bool important);
     void resizeBox(const KartGFXType type, float new_size);
 
 public:
-         KartGFX(const AbstractKart *kart, RaceManager::KartType type, bool is_day);
+         KartGFX(const AbstractKart *kart, bool is_day);
         ~KartGFX();
     void reset();
     void setSkidLevel(const unsigned int level);

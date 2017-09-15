@@ -92,13 +92,15 @@ class HeadlightObject
 private:
     /** The filename of the headlight model. */
     std::string m_filename;
-    /** The position relative to the parent kart scene node where the
-     *  headlight mesh is attached to. */
-    core::vector3df m_position;
+    /** The relative matrix to the parent kart scene node
+     *  or bone where the headlight mesh is attached to. */
+    core::matrix4 m_location;
     /** The mesh for the headlight. */
     scene::IMesh* m_model;
     /** The scene node of the headlight. */
     scene::ISceneNode* m_node;
+
+    std::string m_bone_name;
 
 public:
 
@@ -106,16 +108,16 @@ public:
     {
         m_model    = NULL;
         m_node     = NULL;
-        m_filename = "";
-        m_position.set(0, 0, 0);
     }   // HeadlightObject
     // ------------------------------------------------------------------------
-    HeadlightObject(const std::string& filename, core::vector3df &pos)
+    HeadlightObject(const std::string& filename, const core::matrix4& location,
+                    const std::string& bone_name)
     {
         m_filename = filename;
-        m_position = pos;
+        m_location = location;
         m_model    = NULL;
         m_node     = NULL;
+        m_bone_name = bone_name;
     }   // HeadlightObjects
     // ------------------------------------------------------------------------
     const std::string& getFilename() const { return m_filename; }
@@ -123,12 +125,10 @@ public:
     /** Sets the mesh for this headlight object. */
     void setModel(scene::IMesh *mesh) { m_model = mesh; }
     // ------------------------------------------------------------------------
-    /** Sets the node of the headlight, and (if not NULL) also sets the
-     *  position of this scene node to be the position of the headlight. */
+    /** Sets the node of the headlight. */
     void setNode(scene::ISceneNode *node)
     {
-        m_node = node; 
-        if (m_node) m_node->setPosition(m_position);
+        m_node = node;
     }   // setNode
     // ------------------------------------------------------------------------
     const scene::ISceneNode *getNode() const { return m_node;  }
@@ -138,6 +138,10 @@ public:
     const scene::IMesh *getModel() const { return m_model;  }
     // ------------------------------------------------------------------------
     scene::IMesh *getModel() { return m_model; }
+    // ------------------------------------------------------------------------
+    const core::matrix4& getLocation() const { return m_location; }
+    // ------------------------------------------------------------------------
+    const std::string& getBoneName() const { return m_bone_name; }
     // ------------------------------------------------------------------------
 };   // class HeadlightObject
 
@@ -198,11 +202,11 @@ private:
      *  (i.e. neither read nor written) if animations are disabled. */
     scene::IAnimatedMeshSceneNode *m_animated_node;
 
-    /** The scene node for a hat the driver is wearing. */
-    scene::IMeshSceneNode *m_hat_node;
+    /** Location of hat in object space. */
+    core::matrix4* m_hat_location;
 
-    /** Offset of the hat relative to the bone called 'head'. */
-    core::vector3df m_hat_offset;
+    /** Name of the bone for hat attachment. */
+    std::string m_hat_bone;
 
     /** Name of the hat to use for this kart. "" if no hat. */
     std::string m_hat_name;
@@ -307,6 +311,23 @@ private:
 
     bool m_support_colorization;
 
+    unsigned m_version;
+
+    // ------------------------------------------------------------------------
+    core::matrix4 getInverseBoneMatrix(const char* bone_name);
+    // ------------------------------------------------------------------------
+    void configNode(scene::ISceneNode* node, const core::matrix4& global_mat,
+                    const core::matrix4& inv_mat)
+    {
+        const core::matrix4 mat = inv_mat * global_mat;
+        const core::vector3df position = mat.getTranslation();
+        const core::vector3df rotation = mat.getRotationDegrees();
+        const core::vector3df scale = mat.getScale();
+        node->setPosition(position);
+        node->setRotation(rotation);
+        node->setScale(scale);
+    }
+
 public:
                   KartModel(bool is_master);
                  ~KartModel();
@@ -321,7 +342,7 @@ public:
     void          finishedRace();
     void          resetVisualWheelPosition();
     scene::ISceneNode*
-                  attachModel(bool animatedModels, bool always_animated);
+                  attachModel(bool animatedModels, bool human_player);
     // ------------------------------------------------------------------------
     /** Returns the animated mesh of this kart model. */
     scene::IAnimatedMesh*
@@ -403,18 +424,16 @@ public:
     /**  Name of the hat mesh to use. */
     void setHatMeshName(const std::string &name) {m_hat_name = name; }
     // ------------------------------------------------------------------------
-    void attachHat();
-    // ------------------------------------------------------------------------
     /** Returns the array of wheel nodes. */
     scene::ISceneNode** getWheelNodes() { return m_wheel_node; }
     // ------------------------------------------------------------------------
     scene::IAnimatedMeshSceneNode* getAnimatedNode(){ return m_animated_node; }
     // ------------------------------------------------------------------------
-    core::vector3df getHatOffset() { return m_hat_offset; }
-    // ------------------------------------------------------------------------
     RenderInfo* getRenderInfo();
     // ------------------------------------------------------------------------
     bool supportColorization() const         { return m_support_colorization; }
+    // ------------------------------------------------------------------------
+    void turnOffHeadlights();
 
 };   // KartModel
 #endif

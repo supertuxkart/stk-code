@@ -154,13 +154,6 @@ void ShaderBasedRenderer::prepareForwardRenderer()
 }
 
 // ----------------------------------------------------------------------------
-void ShaderBasedRenderer::updateLightsInfo(scene::ICameraSceneNode * const camnode,
-                                           float dt)
-{
-    m_lighting_passes.updateLightsInfo(camnode, dt);
-}
-
-// ----------------------------------------------------------------------------
 /** Upload lighting info to the dedicated uniform buffer
  */
 void ShaderBasedRenderer::uploadLightingData() const
@@ -256,6 +249,10 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     m_draw_calls.prepareDrawCalls(m_shadow_matrices, camnode, solid_poly_count, shadow_poly_count);
     m_poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += solid_poly_count;
     m_poly_count[SHADOW_PASS] += shadow_poly_count;
+    PROFILER_POP_CPU_MARKER();
+    // For correct position of headlight in karts
+    PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);
+    m_lighting_passes.updateLightsInfo(camnode, dt);
     PROFILER_POP_CPU_MARKER();
 
 #if !defined(USE_GLES2)    
@@ -806,9 +803,6 @@ void ShaderBasedRenderer::render(float dt)
         if (!CVS->isDefferedEnabled())
             glEnable(GL_FRAMEBUFFER_SRGB);
         
-        PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);
-        m_lighting_passes.updateLightsInfo(camnode, dt);
-        PROFILER_POP_CPU_MARKER();
         PROFILER_PUSH_CPU_MARKER("UBO upload", 0x0, 0xFF, 0x0);
         computeMatrixesAndCameras(camnode, m_rtts->getWidth(), m_rtts->getHeight());
         m_shadow_matrices.updateSunOrthoMatrices();
@@ -920,7 +914,6 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     irr_driver->getSceneManager()->setActiveCamera(camera);
 
     computeMatrixesAndCameras(camera, m_rtts->getWidth(), m_rtts->getHeight());
-    updateLightsInfo(camera, dt);
     if (CVS->isARBUniformBufferObjectUsable())
         uploadLightingData();
 

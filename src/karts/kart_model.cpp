@@ -117,9 +117,7 @@ KartModel::KartModel(bool is_master)
     m_is_master  = is_master;
     m_kart       = NULL;
     m_mesh       = NULL;
-    m_hat_name   = "";
-    m_hat_node   = NULL;
-    m_hat_offset = core::vector3df(0,0,0);
+    m_hat_location = NULL;
     m_render_info = NULL;
 
     for(unsigned int i=0; i<4; i++)
@@ -159,6 +157,7 @@ KartModel::KartModel(bool is_master)
  */
 void KartModel::loadInfo(const XMLNode &node)
 {
+    node.get("version", &m_version);
     node.get("model-file", &m_model_filename);
     if(const XMLNode *animation_node=node.getNode("animations"))
     {
@@ -195,11 +194,6 @@ void KartModel::loadInfo(const XMLNode &node)
         loadWheelInfo(*wheels_node, "rear-right",  2);
         loadWheelInfo(*wheels_node, "rear-left",   3);
     }
-    
-    if (const XMLNode *headlights_node = node.getNode("headlights"))
-    {
-        loadHeadlights(*headlights_node);
-    }
 
     m_nitro_emitter_position[0] = Vec3 (0,0.1f,0);
     m_nitro_emitter_position[1] = Vec3 (0,0.1f,0);
@@ -223,10 +217,27 @@ void KartModel::loadInfo(const XMLNode &node)
         }
     }
 
-    if(const XMLNode *hat_node=node.getNode("hat"))
+    if (m_version > 2)
     {
-        hat_node->get("offset", &m_hat_offset);
+        if (const XMLNode* headlights_node = node.getNode("headlights"))
+        {
+            loadHeadlights(*headlights_node);
+        }
+        if (const XMLNode* hat_node = node.getNode("hat"))
+        {
+            core::vector3df position, rotation, scale;
+            hat_node->get("position", &position);
+            hat_node->get("rotation", &rotation);
+            hat_node->get("scale", &scale);
+            core::matrix4 lm, sm, rm;
+            lm.setTranslation(position);
+            sm.setScale(scale);
+            rm.setRotationDegrees(rotation);
+            m_hat_location = new core::matrix4(lm * rm * sm);
+            hat_node->get("bone", &m_hat_bone);
+        }
     }
+
 }   // loadInfo
 
 // ----------------------------------------------------------------------------
@@ -298,6 +309,7 @@ KartModel::~KartModel()
         }
     }
 
+    delete m_hat_location;
     delete m_render_info;
 #ifdef DEBUG
 #if SKELETON_DEBUG
@@ -322,6 +334,7 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
     assert(m_render_info == NULL);
     assert(!m_animated_node);
     KartModel *km              = new KartModel(/*is master*/ false);
+    km->m_version              = m_version;
     km->m_kart_width           = m_kart_width;
     km->m_kart_length          = m_kart_length;
     km->m_kart_height          = m_kart_height;
@@ -332,8 +345,8 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
     km->m_animation_speed      = m_animation_speed;
     km->m_current_animation    = AF_DEFAULT;
     km->m_animated_node        = NULL;
-    km->m_hat_offset           = m_hat_offset;
     km->m_hat_name             = m_hat_name;
+    km->m_hat_bone             = m_hat_bone;
     km->m_krt                  = krt;
     km->m_support_colorization = m_support_colorization;
     km->m_render_info          = new RenderInfo();
@@ -342,6 +355,11 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
     km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
     km->m_nitro_emitter_position[1] = m_nitro_emitter_position[1];
     km->m_has_nitro_emitter = m_has_nitro_emitter;
+    if (m_hat_location)
+    {
+        km->m_hat_location = new core::matrix4();
+        *(km->m_hat_location) = *m_hat_location;
+    }
 
     for(unsigned int i=0; i<4; i++)
     {
@@ -383,7 +401,7 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
 /** Attach the kart model and wheels to the scene node.
  *  \return the node with the model attached
  */
-scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_animated)
+scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_player)
 {
     assert(!m_is_master);
 
@@ -401,7 +419,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
                NULL/*parent*/, getRenderInfo());
         node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
 #endif
-        if (always_animated)
+        if (human_player)
         {
             // give a huge LOD distance for the player's kart. the reason is that it should
             // use its animations for the shadow pass too, where the camera can be quite far
@@ -417,8 +435,6 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
             lod_node->add(100, static_model, true);
             m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(node);
         }
-
-        attachHat();
 
 #ifdef DEBUG
         std::string debug_name = m_model_filename+" (animated-kart-model)";
@@ -443,12 +459,6 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
         {
             if(!m_speed_weighted_objects[i].m_node) continue;
             m_speed_weighted_objects[i].m_node->setParent(lod_node);
-        }
-
-        for (size_t i = 0; i<m_headlight_objects.size(); i++)
-        {
-            if (!m_headlight_objects[i].getNode()) continue;
-            m_headlight_objects[i].getNode()->setParent(lod_node);
         }
 
 #ifndef SERVER_ONLY
@@ -528,28 +538,48 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
                 obj.m_node->setPosition(obj.m_position.toIrrVector());
             }
         }
-
-        for (unsigned int i = 0; i < m_headlight_objects.size(); i++)
-        {
-            HeadlightObject& obj = m_headlight_objects[i];
-
-            obj.setNode(NULL);
-            if (obj.getModel())
-            {
-                scene::ISceneNode *new_node =
-                    irr_driver->addMesh(obj.getModel(), "kart_headlight",
-                                        node, getRenderInfo()            );
-
-                new_node->grab();
-                obj.setNode(new_node);
-                
-                Track* track = Track::getCurrentTrack();
-                if (track == NULL || track->getIsDuringDay())
-                    obj.getNode()->setVisible(false);
-            }
-        }
-
     }
+    const float each_energy = 0.2f / m_headlight_objects.size();
+    const float each_radius = 2.0f / m_headlight_objects.size();
+    for (unsigned int i = 0; i < m_headlight_objects.size(); i++)
+    {
+        HeadlightObject& obj = m_headlight_objects[i];
+        Track* track = Track::getCurrentTrack();
+        if (obj.getModel() && !(track == NULL || track->getIsDuringDay()))
+        {
+            const bool bone_attachment =
+                m_animated_node && !obj.getBoneName().empty();
+            scene::ISceneNode* parent = bone_attachment ?
+                m_animated_node->getJointNode(obj.getBoneName().c_str()) : node;
+            scene::ISceneNode* new_node =
+                irr_driver->addMesh(obj.getModel(), "kart_headlight",
+                parent, getRenderInfo());
+#ifndef SERVER_ONLY
+            if (human_player && CVS->isGLSL() && CVS->isDefferedEnabled())
+            {
+                obj.setNode(irr_driver->addLight(core::vector3df
+                    (0.0f, 0.0f, 0.0f), each_energy, each_radius,
+                    1.0f, 1.0f, 1.0f, false, new_node));
+                obj.getNode()->grab();
+            }
+#endif
+            configNode(new_node, obj.getLocation(), bone_attachment ?
+                getInverseBoneMatrix(obj.getBoneName().c_str()) : core::matrix4());
+        }
+    }
+
+    if (m_hat_location && !m_hat_name.empty())
+    {
+        const bool bone_attachment = m_animated_node && !m_hat_bone.empty();
+        scene::ISceneNode* parent = bone_attachment ?
+            m_animated_node->getJointNode(m_hat_bone.c_str()) : node;
+        scene::IMesh* hat_mesh = irr_driver->getAnimatedMesh
+            (file_manager->getAsset(FileManager::MODEL, m_hat_name));
+        scene::ISceneNode* node = irr_driver->addMesh(hat_mesh, "hat", parent);
+        configNode(node, *m_hat_location, bone_attachment ?
+                getInverseBoneMatrix(m_hat_bone.c_str()) : core::matrix4());
+    }
+
     return node;
 }   // attachModel
 
@@ -770,14 +800,20 @@ void KartModel::loadHeadlights(const XMLNode &node)
         const XMLNode* child = node.getNode(i);
         if (child->getName() == "object")
         {
-            // <object position="-0.168000 0.151288 0.917929" model="TuxHeadlight.spm"/>
-            core::vector3df position;
+            core::vector3df position, rotation, scale;
             child->get("position", &position);
-
+            child->get("rotation", &rotation);
+            child->get("scale", &scale);
+            core::matrix4 lm, sm, rm;
+            lm.setTranslation(position);
+            sm.setScale(scale);
+            rm.setRotationDegrees(rotation);
+            core::matrix4 location = lm * rm * sm;
+            std::string bone_name;
+            child->get("bone", &bone_name);
             std::string model;
             child->get("model", &model);
-
-            m_headlight_objects.push_back(HeadlightObject(model, position));
+            m_headlight_objects.push_back(HeadlightObject(model, location, bone_name));
         }
         else
         {
@@ -809,6 +845,15 @@ void KartModel::reset()
     LODNode *lod = dynamic_cast<LODNode*>(m_kart->getNode());
     if (lod)
         lod->forceLevelOfDetail(-1);
+
+    for (unsigned int i = 0; i < m_headlight_objects.size(); i++)
+    {
+        HeadlightObject& obj = m_headlight_objects[i];
+        if (obj.getNode())
+        {
+            obj.getNode()->setVisible(true);
+        }
+    }
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -1124,54 +1169,46 @@ void KartModel::resetVisualWheelPosition()
 }   // resetVisualSuspension
 
 //-----------------------------------------------------------------------------
-void KartModel::attachHat()
-{
-    m_hat_node = NULL;
-    if(m_hat_name.size()>0)
-    {
-        scene::IBoneSceneNode *bone = m_animated_node->getJointNode("Head");
-        if(!bone)
-            bone = m_animated_node->getJointNode("head");
-        if(bone)
-        {
-            // Till we have all models fixed, accept Head and head as bone name
-            scene::IMesh *hat_mesh =
-                irr_driver->getAnimatedMesh(
-                           file_manager->getAsset(FileManager::MODEL, m_hat_name));
-            m_hat_node = irr_driver->addMesh(hat_mesh, "hat");
-            bone->addChild(m_hat_node);
-            m_animated_node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);
-#ifndef SERVER_ONLY
-            STKAnimatedMesh* am = dynamic_cast<STKAnimatedMesh*>(m_animated_node);
-            if (am)
-            {
-                am->setHardwareSkinning(false);
-                am->OnAnimate(0);
-                am->setHardwareSkinning(true);
-            }
-            else
-#endif
-                m_animated_node->OnAnimate(0);
-            bone->updateAbsolutePosition();
-             // With the hat node attached to the head bone, we have to
-            // reverse the transformation of the bone, so that the hat
-            // is still properly placed. Esp. the hat offset needs
-            // to be rotated.
-            const core::matrix4 mat = bone->getAbsoluteTransformation();
-            core::matrix4 inv;
-            mat.getInverse(inv);
-            core::vector3df rotated_offset;
-            inv.rotateVect(rotated_offset, m_hat_offset);
-            m_hat_node->setPosition(rotated_offset);
-            m_hat_node->setScale(inv.getScale());
-            m_hat_node->setRotation(inv.getRotationDegrees());
-        }   // if bone
-    }   // if(m_hat_name)
-}   // attachHat
-
-//-----------------------------------------------------------------------------
 RenderInfo* KartModel::getRenderInfo()
 {
     return m_support_colorization || m_krt == KRT_TRANSPARENT ?
         m_render_info : NULL;
 }   // getRenderInfo
+
+//-----------------------------------------------------------------------------
+void KartModel::turnOffHeadlights()
+{
+    for (unsigned int i = 0; i < m_headlight_objects.size(); i++)
+    {
+        HeadlightObject& obj = m_headlight_objects[i];
+        if (obj.getNode())
+        {
+            obj.getNode()->setVisible(false);
+        }
+    }
+}   // turnOffHeadlights
+
+//-----------------------------------------------------------------------------
+core::matrix4 KartModel::getInverseBoneMatrix(const char* bone_name)
+{
+    assert(m_animated_node);
+    scene::IBoneSceneNode* bone = m_animated_node->getJointNode(bone_name);
+    assert(bone);
+    m_animated_node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);
+#ifndef SERVER_ONLY
+    STKAnimatedMesh* am = dynamic_cast<STKAnimatedMesh*>(m_animated_node);
+    if (am)
+    {
+        am->setHardwareSkinning(false);
+        am->OnAnimate(0);
+        am->setHardwareSkinning(true);
+    }
+    else
+#endif
+        m_animated_node->OnAnimate(0);
+    bone->updateAbsolutePosition();
+    const core::matrix4 mat = bone->getAbsoluteTransformation();
+    core::matrix4 inv;
+    mat.getInverse(inv);
+    return inv;
+}   // getInverseBoneMatrix
