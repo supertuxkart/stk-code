@@ -92,14 +92,21 @@ class HeadlightObject
 private:
     /** The filename of the headlight model. */
     std::string m_filename;
+
     /** The relative matrix to the parent kart scene node
      *  or bone where the headlight mesh is attached to. */
     core::matrix4 m_location;
+
     /** The mesh for the headlight. */
     scene::IMesh* m_model;
-    /** The scene node of the headlight. */
+
+    /** The scene node of the headlight (real light). */
     scene::ISceneNode* m_node;
 
+    /** The color of the real light. */
+    video::SColor m_headlight_color;
+
+    /** Attach to which bone in kart model if not empty. */
     std::string m_bone_name;
 
 public:
@@ -111,13 +118,14 @@ public:
     }   // HeadlightObject
     // ------------------------------------------------------------------------
     HeadlightObject(const std::string& filename, const core::matrix4& location,
-                    const std::string& bone_name)
+                    const std::string& bone_name, const video::SColor& color)
     {
         m_filename = filename;
         m_location = location;
         m_model    = NULL;
         m_node     = NULL;
         m_bone_name = bone_name;
+        m_headlight_color = color;
     }   // HeadlightObjects
     // ------------------------------------------------------------------------
     const std::string& getFilename() const { return m_filename; }
@@ -125,15 +133,11 @@ public:
     /** Sets the mesh for this headlight object. */
     void setModel(scene::IMesh *mesh) { m_model = mesh; }
     // ------------------------------------------------------------------------
-    /** Sets the node of the headlight. */
-    void setNode(scene::ISceneNode *node)
-    {
-        m_node = node;
-    }   // setNode
+    void setLight(scene::ISceneNode* parent, float energy, float radius);
     // ------------------------------------------------------------------------
-    const scene::ISceneNode *getNode() const { return m_node;  }
+    const scene::ISceneNode *getLightNode() const { return m_node;  }
     // ------------------------------------------------------------------------
-    scene::ISceneNode *getNode() { return m_node; }
+    scene::ISceneNode *getLightNode() { return m_node; }
     // ------------------------------------------------------------------------
     const scene::IMesh *getModel() const { return m_model;  }
     // ------------------------------------------------------------------------
@@ -433,7 +437,7 @@ public:
     // ------------------------------------------------------------------------
     bool supportColorization() const         { return m_support_colorization; }
     // ------------------------------------------------------------------------
-    void turnOffHeadlights();
+    void toggleHeadlights(bool on);
 
 };   // KartModel
 #endif

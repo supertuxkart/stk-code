@@ -547,7 +547,7 @@ void KartGFX::setGFXInvisible()
         m_nitro_light->setVisible(false);
         m_skidding_light_1->setVisible(false);
         m_skidding_light_2->setVisible(false);
-        m_kart->getKartModel()->turnOffHeadlights();
+        m_kart->getKartModel()->toggleHeadlights(false);
     }
 #endif
 }   // setGFXInvisible

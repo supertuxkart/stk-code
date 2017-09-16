@@ -284,16 +284,20 @@ KartModel::~KartModel()
     for (size_t i = 0; i < m_headlight_objects.size(); i++)
     {
         HeadlightObject& obj = m_headlight_objects[i];
-        if (obj.getNode())
+        if (obj.getLightNode())
         {
             // Master KartModels should never have a headlight attached.
             assert(!m_is_master);
-            obj.getNode()->drop();
+            obj.getLightNode()->drop();
         }
         if (m_is_master && obj.getModel())
         {
+            obj.getModel()->drop();
             irr_driver->dropAllTextures(obj.getModel());
-            irr_driver->removeMeshFromCache(obj.getModel());
+            if (obj.getModel()->getReferenceCount() == 1)
+            {
+                irr_driver->removeMeshFromCache(obj.getModel());
+            }
         }
     }
 
@@ -386,7 +390,7 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
     for (size_t i = 0; i<m_headlight_objects.size(); i++)
     {
         // Master should not have any headlight nodes.
-        assert(!m_headlight_objects[i].getNode());
+        assert(!m_headlight_objects[i].getLightNode());
         km->m_headlight_objects[i] = m_headlight_objects[i];
     }
 
@@ -551,19 +555,16 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
                 m_animated_node && !obj.getBoneName().empty();
             scene::ISceneNode* parent = bone_attachment ?
                 m_animated_node->getJointNode(obj.getBoneName().c_str()) : node;
-            scene::ISceneNode* new_node =
+            scene::ISceneNode* headlight_model =
                 irr_driver->addMesh(obj.getModel(), "kart_headlight",
                 parent, getRenderInfo());
 #ifndef SERVER_ONLY
             if (human_player && CVS->isGLSL() && CVS->isDefferedEnabled())
             {
-                obj.setNode(irr_driver->addLight(core::vector3df
-                    (0.0f, 0.0f, 0.0f), each_energy, each_radius,
-                    1.0f, 1.0f, 1.0f, false, new_node));
-                obj.getNode()->grab();
+                obj.setLight(headlight_model, each_energy, each_radius);
             }
 #endif
-            configNode(new_node, obj.getLocation(), bone_attachment ?
+            configNode(headlight_model, obj.getLocation(), bone_attachment ?
                 getInverseBoneMatrix(obj.getBoneName().c_str()) : core::matrix4());
         }
     }
@@ -583,6 +584,18 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
     return node;
 }   // attachModel
 
+// ----------------------------------------------------------------------------
+/** Add a light node emitted from the center mass the headlight.
+ */
+void HeadlightObject::setLight(scene::ISceneNode* parent,
+                                          float energy, float radius)
+{
+    m_node = irr_driver->addLight(core::vector3df(0.0f, 0.0f, 0.0f),
+        energy, radius, m_headlight_color.getRed() / 255.f,
+        m_headlight_color.getGreen() / 255.f,
+        m_headlight_color.getBlue() / 255.f, false/*sun*/, parent);
+    m_node->grab();
+}   // setLight
 
 // ----------------------------------------------------------------------------
 /** Loads the 3d model and all wheels.
@@ -682,6 +695,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         HeadlightObject& obj = m_headlight_objects[i];
         std::string full_name = kart_properties.getKartDir() + obj.getFilename();
         obj.setModel(irr_driver->getMesh(full_name));
+        obj.getModel()->grab();
         irr_driver->grabAllTextures(obj.getModel());
     }
 
@@ -813,7 +827,10 @@ void KartModel::loadHeadlights(const XMLNode &node)
             child->get("bone", &bone_name);
             std::string model;
             child->get("model", &model);
-            m_headlight_objects.push_back(HeadlightObject(model, location, bone_name));
+            video::SColor headlight_color(-1);
+            child->get("color", &headlight_color);
+            m_headlight_objects.push_back(HeadlightObject(model, location,
+                bone_name, headlight_color));
         }
         else
         {
@@ -846,14 +863,7 @@ void KartModel::reset()
     if (lod)
         lod->forceLevelOfDetail(-1);
 
-    for (unsigned int i = 0; i < m_headlight_objects.size(); i++)
-    {
-        HeadlightObject& obj = m_headlight_objects[i];
-        if (obj.getNode())
-        {
-            obj.getNode()->setVisible(true);
-        }
-    }
+    toggleHeadlights(true);
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -1176,17 +1186,17 @@ RenderInfo* KartModel::getRenderInfo()
 }   // getRenderInfo
 
 //-----------------------------------------------------------------------------
-void KartModel::turnOffHeadlights()
+void KartModel::toggleHeadlights(bool on)
 {
     for (unsigned int i = 0; i < m_headlight_objects.size(); i++)
     {
         HeadlightObject& obj = m_headlight_objects[i];
-        if (obj.getNode())
+        if (obj.getLightNode())
         {
-            obj.getNode()->setVisible(false);
+            obj.getLightNode()->setVisible(on);
         }
     }
-}   // turnOffHeadlights
+}   // toggleHeadlights
 
 //-----------------------------------------------------------------------------
 core::matrix4 KartModel::getInverseBoneMatrix(const char* bone_name)
