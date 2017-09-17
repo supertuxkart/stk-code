@@ -69,6 +69,7 @@ namespace video
 		ContextEGLParams egl_params;
 		egl_params.opengl_api = CEGL_API_OPENGL_ES;
 		egl_params.surface_type = CEGL_SURFACE_WINDOW;
+		egl_params.handle_srgb = Params.HandleSRGB;
 		egl_params.force_legacy_device = Params.ForceLegacyDevice;
 		egl_params.with_alpha_channel = Params.WithAlphaChannel;
 		egl_params.vsync_enabled = Params.Vsync;

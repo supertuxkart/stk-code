@@ -262,52 +262,75 @@ bool ContextManagerEGL::chooseConfig()
 
 bool ContextManagerEGL::createSurface()
 {
-    if (m_creation_params.surface_type == CEGL_SURFACE_WINDOW)
-    {
-        if (m_egl_surface == EGL_NO_SURFACE)
-        {
-            m_egl_surface = eglCreateWindowSurface(m_egl_display, m_egl_config,
-                                                   m_egl_window, NULL);
-        }
+    unsigned int colorspace_attr_pos = 0;
+    unsigned int largest_pbuffer_attr_pos = 0;
+    
+    std::vector<EGLint> attribs;
 
-        if (m_egl_surface == EGL_NO_SURFACE)
+    if (m_creation_params.opengl_api == CEGL_API_OPENGL)
+    {
+        if (hasEGLExtension("EGL_KHR_gl_colorspace") || m_egl_version >= 150)
         {
-            m_egl_surface = eglCreateWindowSurface(m_egl_display, m_egl_config,
-                                                   0, NULL);
+            attribs.push_back(EGL_GL_COLORSPACE);
+            attribs.push_back(m_creation_params.handle_srgb ? 
+                             EGL_GL_COLORSPACE_SRGB : EGL_GL_COLORSPACE_LINEAR);
+            colorspace_attr_pos = attribs.size() - 1;
         }
     }
-    else if (m_creation_params.surface_type == CEGL_SURFACE_PBUFFER)
+    
+    if (m_creation_params.surface_type == CEGL_SURFACE_PBUFFER)
     {
-        if (m_egl_surface == EGL_NO_SURFACE)
+        attribs.push_back(EGL_WIDTH);
+        attribs.push_back(m_creation_params.pbuffer_width);
+        attribs.push_back(EGL_HEIGHT);
+        attribs.push_back(m_creation_params.pbuffer_height);
+        attribs.push_back(EGL_LARGEST_PBUFFER);
+        attribs.push_back(EGL_FALSE);
+        largest_pbuffer_attr_pos = attribs.size() - 1;
+    }
+    
+    attribs.push_back(EGL_NONE);
+    attribs.push_back(0);
+    
+    if (m_egl_surface == EGL_NO_SURFACE)
+    {
+        if (m_creation_params.surface_type == CEGL_SURFACE_WINDOW)
         {
-            std::vector<EGLint> pbuffer_attribs;
-            pbuffer_attribs.push_back(EGL_WIDTH);
-            pbuffer_attribs.push_back(m_creation_params.pbuffer_width);
-            pbuffer_attribs.push_back(EGL_HEIGHT);
-            pbuffer_attribs.push_back(m_creation_params.pbuffer_height);
-            pbuffer_attribs.push_back(EGL_NONE);
-            pbuffer_attribs.push_back(0);
-
-            m_egl_surface = eglCreatePbufferSurface(m_egl_display,
-                                                    m_egl_config,
-                                                    &pbuffer_attribs[0]);
+            m_egl_surface = eglCreateWindowSurface(m_egl_display, m_egl_config,
+                                                   m_egl_window, &attribs[0]);
         }
-
-        if (m_egl_surface == EGL_NO_SURFACE)
+        else if (m_creation_params.surface_type == CEGL_SURFACE_PBUFFER)
         {
-            std::vector<EGLint> pbuffer_attribs;
-            pbuffer_attribs.push_back(EGL_WIDTH);
-            pbuffer_attribs.push_back(m_creation_params.pbuffer_width);
-            pbuffer_attribs.push_back(EGL_HEIGHT);
-            pbuffer_attribs.push_back(m_creation_params.pbuffer_height);
-            pbuffer_attribs.push_back(EGL_LARGEST_PBUFFER);
-            pbuffer_attribs.push_back(EGL_TRUE);
-            pbuffer_attribs.push_back(EGL_NONE);
-            pbuffer_attribs.push_back(0);
-
-            m_egl_surface = eglCreatePbufferSurface(m_egl_display,
-                                                    m_egl_config,
-                                                    &pbuffer_attribs[0]);
+            m_egl_surface = eglCreatePbufferSurface(m_egl_display, m_egl_config,
+                                                    &attribs[0]);
+        }
+    }
+        
+    if (m_egl_surface == EGL_NO_SURFACE && colorspace_attr_pos > 0 &&
+        m_creation_params.handle_srgb == true)
+    {
+        attribs[colorspace_attr_pos] = EGL_GL_COLORSPACE_LINEAR;
+        
+        if (m_creation_params.surface_type == CEGL_SURFACE_WINDOW)
+        {
+            m_egl_surface = eglCreateWindowSurface(m_egl_display, m_egl_config,
+                                                   m_egl_window, &attribs[0]);
+        }
+        else if (m_creation_params.surface_type == CEGL_SURFACE_PBUFFER)
+        {
+            m_egl_surface = eglCreatePbufferSurface(m_egl_display, m_egl_config,
+                                                    &attribs[0]);
+        }
+    }
+    
+    if (m_egl_surface == EGL_NO_SURFACE && largest_pbuffer_attr_pos > 0)
+    {
+        attribs[largest_pbuffer_attr_pos] = EGL_TRUE;
+        
+        if (m_creation_params.surface_type == CEGL_SURFACE_PBUFFER)
+        {
+            m_egl_surface = eglCreatePbufferSurface(m_egl_display, m_egl_config,
+                                                    &attribs[0]);
         }
     }
 
