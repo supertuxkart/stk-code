@@ -543,8 +543,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
             }
         }
     }
-    const float each_energy = 0.2f / m_headlight_objects.size();
-    const float each_radius = 2.0f / m_headlight_objects.size();
+    const float each_energy = 0.5f / m_headlight_objects.size();
+    const float each_radius = 5.0f / m_headlight_objects.size();
     for (unsigned int i = 0; i < m_headlight_objects.size(); i++)
     {
         HeadlightObject& obj = m_headlight_objects[i];
