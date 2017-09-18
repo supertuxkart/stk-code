@@ -12,36 +12,44 @@ if(MSVC OR APPLE)
                         "${CMAKE_CURRENT_BINARY_DIR}/../libpng/")
 endif()
 
-if (NOT SERVER_ONLY)
+if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
         find_package(OpenGL REQUIRED)
         include_directories(${OPENGL_INCLUDE_DIR})
     endif()
         
-        if(UNIX AND NOT APPLE)
-                find_package(X11 REQUIRED)
-                include_directories(${X11_INCLUDE_DIR})
+    if(UNIX AND NOT APPLE)
+        find_package(X11 REQUIRED)
+        include_directories(${X11_INCLUDE_DIR})
+        
+        if(NOT X11_FOUND)
+            message(FATAL_ERROR "X11 not found.")
         endif()
+        
+        if(NOT X11_Xrandr_FOUND)
+            message(FATAL_ERROR "XRANDR not found.")
+        endif()
+    endif()
 
-        if(ENABLE_WAYLAND_DEVICE)
-                find_package(Wayland REQUIRED)
-                include_directories(${WAYLAND_INCLUDE_DIR})
-                
-                if(NOT WAYLAND_FOUND)
-                        message(FATAL_ERROR "Wayland not found.")
-                endif()
-                
-                add_definitions(-D_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
+    if(ENABLE_WAYLAND_DEVICE)
+        find_package(Wayland REQUIRED)
+        include_directories(${WAYLAND_INCLUDE_DIR})
+        
+        if(NOT WAYLAND_FOUND)
+            message(FATAL_ERROR "Wayland not found.")
         endif()
+        
+        add_definitions(-D_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
+    endif()
 
-        if(USE_GLES2 OR ENABLE_WAYLAND_DEVICE)
-                find_package(EGL REQUIRED)
-                include_directories(${EGL_INCLUDE_DIR})
-                
-                if(NOT EGL_FOUND)
-                        message(FATAL_ERROR "EGL not found.")
-                endif()
+    if(USE_GLES2 OR ENABLE_WAYLAND_DEVICE)
+        find_package(EGL REQUIRED)
+        include_directories(${EGL_INCLUDE_DIR})
+        
+        if(NOT EGL_FOUND)
+            message(FATAL_ERROR "EGL not found.")
         endif()
+    endif()
 else()
     add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
@@ -572,14 +580,21 @@ if(APPLE)
 endif()
 
 add_library(stkirrlicht STATIC ${IRRLICHT_SOURCES})
+
 target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY} ${ZLIB_LIBRARY})
 
-if(USE_GLES2 OR ENABLE_WAYLAND_DEVICE)
-    target_link_libraries(stkirrlicht ${EGL_LIBRARY})
-endif()
-
-if(ENABLE_WAYLAND_DEVICE)
-    target_link_libraries(stkirrlicht ${WAYLAND_LIBRARIES})
+if(NOT SERVER_ONLY)
+    if(UNIX AND NOT APPLE)
+        target_link_libraries(stkirrlicht ${X11_X11_LIB} ${X11_Xrandr_LIB})
+    endif()
+        
+    if(USE_GLES2 OR ENABLE_WAYLAND_DEVICE)
+        target_link_libraries(stkirrlicht ${EGL_LIBRARY})
+    endif()
+    
+    if(ENABLE_WAYLAND_DEVICE)
+        target_link_libraries(stkirrlicht ${WAYLAND_LIBRARIES})
+    endif()
 endif()
 
 if(WIN32)
