@@ -202,6 +202,7 @@
 #include "items/projectile_manager.hpp"
 #include "karts/combined_characteristic.hpp"
 #include "karts/controller/ai_base_lap_controller.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/cutscene_world.hpp"

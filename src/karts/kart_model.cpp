@@ -52,14 +52,12 @@ float KartModel::UNDEFINED = -99.9f;
 // ------------------------------------------------------------
 // SpeedWeightedObject implementation
 
-#define SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED -99.f
-
 SpeedWeightedObject::Properties::Properties()
 {
-    m_strength_factor = SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED;
-    m_speed_factor    = SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED;
-    m_texture_speed.X = SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED;
-    m_texture_speed.Y = SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED;
+    m_strength_factor = -1.0f;
+    m_speed_factor    = 0.0f;
+    m_texture_speed.X = 0.0f;
+    m_texture_speed.Y = 0.0f;
 }   // SpeedWeightedObject::Properties::Properties
 
 // ----------------------------------------------------------------------------
@@ -70,22 +68,6 @@ void SpeedWeightedObject::Properties::loadFromXMLNode(const XMLNode* xml_node)
     xml_node->get("texture-speed-x", &m_texture_speed.X);
     xml_node->get("texture-speed-y", &m_texture_speed.Y);
 }   // SpeedWeightedObject::Properties::loadFromXMLNode
-
-// ----------------------------------------------------------------------------
-void SpeedWeightedObject::Properties::checkAllSet()
-{
-#define CHECK_NEG(  a,strA) if(a<=SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED)  \
-        {                                                                    \
-            Log::fatal("SpeedWeightedObject",                                \
-                       "Missing default value for '%s'.",                    \
-                       strA);                                                \
-        }
-    CHECK_NEG(m_strength_factor,  "speed-weighted strength-factor"    );
-    CHECK_NEG(m_speed_factor,     "speed-weighted speed-factor"       );
-    CHECK_NEG(m_texture_speed.X,  "speed-weighted texture speed X"    );
-    CHECK_NEG(m_texture_speed.Y,  "speed-weighted texture speed Y"    );
-#undef CHECK_NEG
-}   // SpeedWeightedObject::Properties::checkAllSet
 
 // ============================================================================
 /** Default constructor which initialises all variables with defaults.
@@ -157,7 +139,6 @@ KartModel::KartModel(bool is_master)
  */
 void KartModel::loadInfo(const XMLNode &node)
 {
-    node.get("version", &m_version);
     node.get("model-file", &m_model_filename);
     if(const XMLNode *animation_node=node.getNode("animations"))
     {
@@ -177,13 +158,11 @@ void KartModel::loadInfo(const XMLNode &node)
         animation_node->get("start-jump",     &m_animation_frame[AF_JUMP_START]);
         animation_node->get("start-jump-loop",&m_animation_frame[AF_JUMP_LOOP] );
         animation_node->get("end-jump",       &m_animation_frame[AF_JUMP_END]  );
+        animation_node->get("selection-start", &m_animation_frame[AF_SELECTION_START]);
+        animation_node->get("selection-end",   &m_animation_frame[AF_SELECTION_END]  );
         animation_node->get("backpedal-left", &m_animation_frame[AF_BACK_LEFT]);
         animation_node->get("backpedal",      &m_animation_frame[AF_BACK_STRAIGHT]);
         animation_node->get("backpedal-right",&m_animation_frame[AF_BACK_RIGHT]);
-        animation_node->get("start-speed-weighted", &m_animation_frame[AF_SPEED_WEIGHTED_START]);
-        animation_node->get("end-speed-weighted",   &m_animation_frame[AF_SPEED_WEIGHTED_END]  );
-        animation_node->get("selection-start", &m_animation_frame[AF_SELECTION_START]);
-        animation_node->get("selection-end",   &m_animation_frame[AF_SELECTION_END]  );
         animation_node->get("speed",          &m_animation_speed               );
     }
 
@@ -206,19 +185,17 @@ void KartModel::loadInfo(const XMLNode &node)
         m_has_nitro_emitter = true;
     }
 
-    if(const XMLNode *speed_weighted_objects_node=node.getNode("speed-weighted-objects"))
+    unsigned kart_version;
+    node.get("version", &kart_version);
+    if (kart_version > 2)
     {
-        SpeedWeightedObject::Properties   fallback_properties;
-        fallback_properties.loadFromXMLNode(speed_weighted_objects_node);
-
-        for(unsigned int i=0 ; i < speed_weighted_objects_node->getNumNodes() ; i++)
+        if (const XMLNode *speed_weighted_objects_node = node.getNode("speed-weighted-objects"))
         {
-            loadSpeedWeightedInfo(speed_weighted_objects_node->getNode(i), fallback_properties);
+            for (unsigned int i = 0 ;i < speed_weighted_objects_node->getNumNodes() ; i++)
+            {
+                loadSpeedWeightedInfo(speed_weighted_objects_node->getNode(i));
+            }
         }
-    }
-
-    if (m_version > 2)
-    {
         if (const XMLNode* headlights_node = node.getNode("headlights"))
         {
             loadHeadlights(*headlights_node);
@@ -274,10 +251,14 @@ KartModel::~KartModel()
             assert(!m_is_master);
             m_speed_weighted_objects[i].m_node->drop();
         }
-        if(m_is_master && m_speed_weighted_objects[i].m_model)
+        if (m_is_master && m_speed_weighted_objects[i].m_model)
         {
+            m_speed_weighted_objects[i].m_model->drop();
             irr_driver->dropAllTextures(m_speed_weighted_objects[i].m_model);
-            irr_driver->removeMeshFromCache(m_speed_weighted_objects[i].m_model);
+            if (m_speed_weighted_objects[i].m_model->getReferenceCount() == 1)
+            {
+                irr_driver->removeMeshFromCache(m_speed_weighted_objects[i].m_model);
+            }
         }
     }
 
@@ -337,23 +318,23 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
     assert(m_is_master);
     assert(m_render_info == NULL);
     assert(!m_animated_node);
-    KartModel *km              = new KartModel(/*is master*/ false);
-    km->m_version              = m_version;
-    km->m_kart_width           = m_kart_width;
-    km->m_kart_length          = m_kart_length;
-    km->m_kart_height          = m_kart_height;
-    km->m_kart_highest_point   = m_kart_highest_point;
-    km->m_kart_lowest_point    = m_kart_lowest_point;
-    km->m_mesh                 = m_mesh;
-    km->m_model_filename       = m_model_filename;
-    km->m_animation_speed      = m_animation_speed;
-    km->m_current_animation    = AF_DEFAULT;
-    km->m_animated_node        = NULL;
-    km->m_hat_name             = m_hat_name;
-    km->m_hat_bone             = m_hat_bone;
-    km->m_krt                  = krt;
-    km->m_support_colorization = m_support_colorization;
-    km->m_render_info          = new RenderInfo();
+    KartModel *km               = new KartModel(/*is master*/ false);
+    km->m_kart_width            = m_kart_width;
+    km->m_kart_length           = m_kart_length;
+    km->m_kart_height           = m_kart_height;
+    km->m_kart_highest_point    = m_kart_highest_point;
+    km->m_kart_lowest_point     = m_kart_lowest_point;
+    km->m_mesh                  = m_mesh;
+    km->m_model_filename        = m_model_filename;
+    km->m_animation_speed       = m_animation_speed;
+    km->m_current_animation     = AF_DEFAULT;
+    km->m_animated_node         = NULL;
+    km->m_hat_name              = m_hat_name;
+    km->m_hat_bone              = m_hat_bone;
+    km->m_krt                   = krt;
+    km->m_support_colorization  = m_support_colorization;
+    km->m_render_info           = new RenderInfo();
+    km->m_inverse_bone_matrices = m_inverse_bone_matrices;
     km->m_render_info->setKartModelRenderInfo(krt);
 
     km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
@@ -458,13 +439,6 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
             m_wheel_node[i]->setParent(lod_node);
         }
 
-        // Become the owner of the speed weighted objects
-        for(size_t i=0; i<m_speed_weighted_objects.size(); i++)
-        {
-            if(!m_speed_weighted_objects[i].m_node) continue;
-            m_speed_weighted_objects[i].m_node->setParent(lod_node);
-        }
-
 #ifndef SERVER_ONLY
         // Enable rim lighting for the kart
         irr_driver->applyObjectPassShader(lod_node, true);
@@ -513,36 +487,51 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
 
             m_wheel_node[i]->grab();
             ((scene::IMeshSceneNode *) m_wheel_node[i])->setReadOnlyMaterials(true);
-    #ifdef DEBUG
+#ifdef DEBUG
             std::string debug_name = m_wheel_filename[i]+" (wheel)";
             m_wheel_node[i]->setName(debug_name.c_str());
-    #endif
+#endif
             m_wheel_node[i]->setPosition(m_wheel_graphics_position[i].toIrrVector());
         }
 
-        // Attach the speed weighted objects + set the animation state
-        for(size_t i=0 ; i < m_speed_weighted_objects.size() ; i++)
+    }
+
+    // Attach the speed weighted objects + set the animation state
+    for (unsigned int i = 0; i < m_speed_weighted_objects.size() ;i++)
+    {
+        SpeedWeightedObject& obj = m_speed_weighted_objects[i];
+        obj.m_node = NULL;
+        if (obj.m_model)
         {
-            SpeedWeightedObject&    obj = m_speed_weighted_objects[i];
-            obj.m_node = NULL;
-            if(obj.m_model)
+            const bool bone_attachment =
+                m_animated_node && !obj.m_bone_name.empty();
+            scene::ISceneNode* parent = bone_attachment ?
+                m_animated_node->getJointNode(obj.m_bone_name.c_str()) : node;
+            scene::ISceneNode* swo = NULL;
+            if (animated_models)
             {
+                // Only need to keep track of animated node for speed setting
                 obj.m_node = irr_driver->addAnimatedMesh(obj.m_model, 
-                             "speedweighted", node, getRenderInfo(),
-                             true/*all_parts_colorized*/);
+                    "speedweighted", parent, getRenderInfo(),
+                    true/*all_parts_colorized*/);
+                swo = obj.m_node;
                 obj.m_node->grab();
-
-                obj.m_node->setFrameLoop(m_animation_frame[AF_SPEED_WEIGHTED_START],
-                                         m_animation_frame[AF_SPEED_WEIGHTED_END]);
-
-        #ifdef DEBUG
-                std::string debug_name = obj.m_name+" (speed-weighted)";
-                obj.m_node->setName(debug_name.c_str());
-        #endif
-                obj.m_node->setPosition(obj.m_position.toIrrVector());
+                obj.m_node->setFrameLoop(0, obj.m_model->getFrameCount() - 1);
             }
+            else
+            {
+                swo = irr_driver->addMesh(obj.m_model, "speedweighted",
+                    parent, getRenderInfo(), true/*all_parts_colorized*/);
+            }
+#ifdef DEBUG
+            std::string debug_name = obj.m_name + " (speed-weighted)";
+            swo->setName(debug_name.c_str());
+#endif
+            configNode(swo, obj.m_location, bone_attachment ?
+                getInverseBoneMatrix(obj.m_bone_name) : core::matrix4());
         }
     }
+
     const float each_energy = 0.5f / m_headlight_objects.size();
     const float each_radius = 5.0f / m_headlight_objects.size();
     for (unsigned int i = 0; i < m_headlight_objects.size(); i++)
@@ -565,7 +554,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
             }
 #endif
             configNode(headlight_model, obj.getLocation(), bone_attachment ?
-                getInverseBoneMatrix(obj.getBoneName().c_str()) : core::matrix4());
+                getInverseBoneMatrix(obj.getBoneName()) : core::matrix4());
         }
     }
 
@@ -578,7 +567,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
             (file_manager->getAsset(FileManager::MODEL, m_hat_name));
         scene::ISceneNode* node = irr_driver->addMesh(hat_mesh, "hat", parent);
         configNode(node, *m_hat_location, bone_attachment ?
-                getInverseBoneMatrix(m_hat_bone.c_str()) : core::matrix4());
+                getInverseBoneMatrix(m_hat_bone) : core::matrix4());
     }
 
     return node;
@@ -657,6 +646,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
 #endif
     m_kart_highest_point = kart_max.getY();
     m_kart_lowest_point  = kart_min.getY();
+    initInverseBoneMatrices();
 
     // Load the speed weighted object models. We need to do that now because it can affect the dimensions of the kart
     for(size_t i=0 ; i < m_speed_weighted_objects.size() ; i++)
@@ -676,18 +666,18 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
             MeshTools::createSkinnedMeshWithTangents(sm,
                 &MeshTools::isNormalMap);
         }
-        irr_driver->grabAllTextures(obj.m_model);
 #endif
-        // Update min/max
+        obj.m_model->grab();
+        irr_driver->grabAllTextures(obj.m_model);
+
+        // Update min/max, speed weight can be scaled
         Vec3 obj_min, obj_max;
-        int frame = m_animation_frame[AF_SPEED_WEIGHTED_START];
-        if (frame < 0)
-            frame = 0;
-        MeshTools::minMax3D(obj.m_model->getMesh(frame), &obj_min, &obj_max);
-        obj_min += obj.m_position;
-        obj_max += obj.m_position;
-        kart_min.min(obj_min);
-        kart_max.max(obj_max);
+        MeshTools::minMax3D(obj.m_model->getMesh(0), &obj_min, &obj_max);
+        core::vector3df transformed_min, transformed_max;
+        obj.m_location.transformVect(transformed_min, obj_min.toIrrVector());
+        obj.m_location.transformVect(transformed_max, obj_max.toIrrVector());
+        kart_min.min(transformed_min);
+        kart_max.max(transformed_max);
     }
 
     for (unsigned int i = 0; i < m_headlight_objects.size(); i++)
@@ -771,18 +761,33 @@ void KartModel::loadNitroEmitterInfo(const XMLNode &node,
 // ----------------------------------------------------------------------------
 
 /** Loads a single speed weighted node. */
-void KartModel::loadSpeedWeightedInfo(const XMLNode* speed_weighted_node,
-                    const SpeedWeightedObject::Properties& fallback_properties)
+void KartModel::loadSpeedWeightedInfo(const XMLNode* speed_weighted_node)
 {
     SpeedWeightedObject obj;
-    obj.m_properties    = fallback_properties;
-    obj.m_properties.loadFromXMLNode(speed_weighted_node);
-    
-    speed_weighted_node->get("position", &obj.m_position);
-    speed_weighted_node->get("model",    &obj.m_name);
-
-    if(!obj.m_name.empty())
+    if (speed_weighted_node->getName() == "object")
+    {
+        core::vector3df position, rotation, scale;
+        speed_weighted_node->get("position", &position);
+        speed_weighted_node->get("rotation", &rotation);
+        speed_weighted_node->get("scale", &scale);
+        core::matrix4 lm, sm, rm;
+        lm.setTranslation(position);
+        sm.setScale(scale);
+        rm.setRotationDegrees(rotation);
+        obj.m_location = lm * rm * sm;
+        speed_weighted_node->get("bone", &obj.m_bone_name);
+        speed_weighted_node->get("model", &obj.m_name);
+        obj.m_properties.loadFromXMLNode(speed_weighted_node);
+    }
+    else
+    {
+        Log::warn("KartModel",
+            "Unknown XML node in the speed weighted objects section");
+    }
+    if (!obj.m_name.empty())
+    {
         m_speed_weighted_objects.push_back(obj);
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -1081,20 +1086,21 @@ void KartModel::update(float dt, float distance, float steer, float speed,
         {
             SpeedWeightedObject&    obj = m_speed_weighted_objects[i];
 
-#define GET_VALUE(obj, value_name)   \
-    obj.m_properties.value_name > SPEED_WEIGHTED_OBJECT_PROPERTY_UNDEFINED ? obj.m_properties.value_name : \
-    m_kart->getKartProperties()->getSpeedWeightedObjectProperties().value_name
-
+            if (obj.m_node == NULL)
+            {
+                continue;
+            }
             // Animation strength
-            const float strength_factor = GET_VALUE(obj, m_strength_factor);
+            const float strength_factor = obj.m_properties.m_strength_factor;
             if (strength_factor >= 0.0f)
             {
                 float strength = speed * strength_factor;
                 btClamp<float>(strength, 0.0f, 1.0f);
+                obj.m_node->setAnimationStrength(strength);
             }
 
             // Animation speed
-            const float speed_factor = GET_VALUE(obj, m_speed_factor);
+            const float speed_factor = obj.m_properties.m_speed_factor;
             if (speed_factor >= 0.0f)
             {
                 float anim_speed = speed * speed_factor;
@@ -1103,8 +1109,8 @@ void KartModel::update(float dt, float distance, float steer, float speed,
 
             // Texture animation
             core::vector2df tex_speed;
-            tex_speed.X = GET_VALUE(obj, m_texture_speed.X);
-            tex_speed.Y = GET_VALUE(obj, m_texture_speed.Y);
+            tex_speed.X = obj.m_properties.m_texture_speed.X;
+            tex_speed.Y = obj.m_properties.m_texture_speed.Y;
             if (tex_speed != core::vector2df(0.0f, 0.0f))
             {
                 obj.m_texture_cur_offset += speed * tex_speed * dt;
@@ -1123,7 +1129,6 @@ void KartModel::update(float dt, float distance, float steer, float speed,
                     }   // for j<MATERIAL_MAX_TEXTURES
                 }   // for i<getMaterialCount
             }
-#undef GET_VALUE
         }
     }
 
@@ -1199,26 +1204,41 @@ void KartModel::toggleHeadlights(bool on)
 }   // toggleHeadlights
 
 //-----------------------------------------------------------------------------
-core::matrix4 KartModel::getInverseBoneMatrix(const char* bone_name)
+void KartModel::initInverseBoneMatrices()
 {
-    assert(m_animated_node);
-    scene::IBoneSceneNode* bone = m_animated_node->getJointNode(bone_name);
-    assert(bone);
-    m_animated_node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);
-#ifndef SERVER_ONLY
-    STKAnimatedMesh* am = dynamic_cast<STKAnimatedMesh*>(m_animated_node);
-    if (am)
+    // Due to irrlicht mesh doesn't expose bone name, we have to create a
+    // dummy aniamted node
+    // All bone matrices are configured in straight frame (as in exporting)
+    scene::IAnimatedMeshSceneNode* node = irr_driver->getSceneManager()
+        ->addAnimatedMeshSceneNode(m_mesh);
+    node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);
+    const unsigned total_joint = node->getJointCount();
+    for (unsigned i = 0; i < total_joint; i++)
     {
-        am->setHardwareSkinning(false);
-        am->OnAnimate(0);
-        am->setHardwareSkinning(true);
+        node->OnAnimate(0);
+        scene::IBoneSceneNode* bone = node->getJointNode(i);
+        bone->updateAbsolutePosition();
+        const core::matrix4 mat = bone->getAbsoluteTransformation();
+        core::matrix4 inv;
+        mat.getInverse(inv);
+        const std::string bone_name = bone->getName();
+        auto ret = m_inverse_bone_matrices.find(bone_name);
+        if (ret != m_inverse_bone_matrices.end())
+        {
+            Log::warn("KartModel", "%s has duplicated bone, name: %s,"
+                " attachment may not work correctly.",
+                m_model_filename.c_str(), bone_name.c_str());
+        }
+        m_inverse_bone_matrices[bone_name] = inv;
     }
-    else
-#endif
-        m_animated_node->OnAnimate(0);
-    bone->updateAbsolutePosition();
-    const core::matrix4 mat = bone->getAbsoluteTransformation();
-    core::matrix4 inv;
-    mat.getInverse(inv);
-    return inv;
+    node->remove();
+}   // initInverseBoneMatrices
+
+//-----------------------------------------------------------------------------
+const core::matrix4& KartModel::getInverseBoneMatrix
+                                           (const std::string& bone_name) const
+{
+    auto ret = m_inverse_bone_matrices.find(bone_name);
+    assert(ret != m_inverse_bone_matrices.end());
+    return ret->second;
 }   // getInverseBoneMatrix

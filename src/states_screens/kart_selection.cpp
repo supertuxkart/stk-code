@@ -32,6 +32,7 @@
 #include "input/device_manager.hpp"
 #include "items/item_manager.hpp"
 #include "karts/abstract_characteristic.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
@@ -833,8 +834,10 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
             ItemManager::getItemModel(Item::ITEM_BONUS_BOX);
 
         w3->clearModels();
-        w3->addModel( model, Vec3(0.0f, -12.0f, 0.0f),
-                      Vec3(35.0f, 35.0f, 35.0f) );
+        core::matrix4 model_location;
+        model_location.setTranslation(core::vector3df(0.0f, -12.0f, 0.0f));
+        model_location.setScale(core::vector3df(35.0f, 35.0f, 35.0f));
+        w3->addModel(model, model_location);
         w3->update(0);
         m_kart_widgets[widget_id].m_kart_name
         ->setText( _("Random Kart"), false );
@@ -843,9 +846,11 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
     else if (StringUtils::startsWith(selection, ID_LOCKED) && !m_multiplayer)
     {
         w3->clearModels();
+        core::matrix4 model_location;
+        model_location.setScale(core::vector3df(15.0f, 15.0f, 15.0f));
         w3->addModel(irr_driver->getAnimatedMesh(
-                         file_manager->getAsset(FileManager::MODEL, "chest.spm") )->getMesh(20),
-                     Vec3(0,0,0), Vec3(15.0f, 15.0f, 15.0f) );
+            file_manager->getAsset(FileManager::MODEL, "chest.spm"))
+            ->getMesh(20), model_location);
         w3->update(0);
 
         if (m_multiplayer)
@@ -874,6 +879,8 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
                 scale = 30.0f;
             }
 
+            core::matrix4 model_location;
+            model_location.setScale(core::vector3df(scale, scale, scale));
             w3->clearModels();
             const bool has_win_anime =
                 UserConfigParams::m_show_steering_animations != 0 &&
@@ -882,8 +889,7 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
                 kart_model.getFrame(KartModel::AF_WIN_END) > -1) ||
                 (kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 &&
                 kart_model.getFrame(KartModel::AF_SELECTION_END) > -1));
-            w3->addModel( kart_model.getModel(), Vec3(0,0,0),
-                Vec3(scale, scale, scale),
+            w3->addModel( kart_model.getModel(), model_location,
                 has_win_anime ?
                 kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 ?
                 kart_model.getFrame(KartModel::AF_SELECTION_START) :
@@ -898,18 +904,29 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
                 kart_model.getBaseFrame(),
                 false/*all_parts_colorized*/,
                 kart_model.getAnimationSpeed());
-            w3->addModel( kart_model.getWheelModel(0),
-                          kart_model.getWheelGraphicsPosition(0) );
-            w3->addModel( kart_model.getWheelModel(1),
-                          kart_model.getWheelGraphicsPosition(1) );
-            w3->addModel( kart_model.getWheelModel(2),
-                          kart_model.getWheelGraphicsPosition(2) );
-            w3->addModel( kart_model.getWheelModel(3),
-                          kart_model.getWheelGraphicsPosition(3) );
-            for (size_t i = 0; i < kart_model.getSpeedWeightedObjectsCount(); i++)
+
+            model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+            for (unsigned i = 0; i < 4; i++)
             {
-                const SpeedWeightedObject&  obj = kart_model.getSpeedWeightedObject((int)i);
-                w3->addModel(obj.m_model, obj.m_position);
+                model_location.setTranslation(kart_model
+                    .getWheelGraphicsPosition(i).toIrrVector());
+                w3->addModel(kart_model.getWheelModel(i), model_location);
+            }
+
+            for (unsigned i = 0;
+                 i < kart_model.getSpeedWeightedObjectsCount(); i++)
+            {
+                const SpeedWeightedObject& obj =
+                    kart_model.getSpeedWeightedObject(i);
+                core::matrix4 swol = obj.m_location;
+                if (!obj.m_bone_name.empty())
+                {
+                    core::matrix4 inv =
+                        kart_model.getInverseBoneMatrix(obj.m_bone_name);
+                    swol = inv * obj.m_location;
+                }
+                w3->addModel(obj.m_model, swol, -1, -1, false, 0.0f,
+                    obj.m_bone_name);
             }
             //w3->update(0);
 

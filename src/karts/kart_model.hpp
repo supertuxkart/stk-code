@@ -20,6 +20,7 @@
 #define HEADER_KART_MODEL_HPP
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <IAnimatedMeshSceneNode.h>
@@ -59,21 +60,24 @@ struct SpeedWeightedObject
 
         void    loadFromXMLNode(const XMLNode* xml_node);
 
-        void    checkAllSet();
     };
 
-    SpeedWeightedObject() : m_model(NULL), m_node(NULL), m_position(), m_name() {}
+    SpeedWeightedObject() : m_model(NULL), m_node(NULL), m_name() {}
     /** Model */
     scene::IAnimatedMesh *              m_model;
 
     /** The scene node the speed weighted model is attached to */
     scene::IAnimatedMeshSceneNode *     m_node;
 
-    /** The position of the "speed weighted" objects relative to the kart */
-    Vec3                                m_position;
+    /** The relative matrix to the parent kart scene node
+     *  where the speed weighted object is attached to. */
+    core::matrix4                       m_location;
 
     /** Filename of the "speed weighted" object */
     std::string                         m_name;
+
+    /** Attach to which bone in kart model if not empty. */
+    std::string                         m_bone_name;
 
     /** Current uv translation in the texture matrix for speed-weighted texture animations */
     core::vector2df                     m_texture_cur_offset;
@@ -94,7 +98,7 @@ private:
     std::string m_filename;
 
     /** The relative matrix to the parent kart scene node
-     *  or bone where the headlight mesh is attached to. */
+     *  where the headlight mesh is attached to. */
     core::matrix4 m_location;
 
     /** The mesh for the headlight. */
@@ -186,9 +190,7 @@ public:
             AF_BACK_LEFT,          // Going back left
             AF_BACK_STRAIGHT,      // Going back straight
             AF_BACK_RIGHT,         // Going back right
-            AF_SPEED_WEIGHTED_START,        // Start of speed-weighted animation
-            AF_SPEED_WEIGHTED_END,          // End of speed-weighted animation
-            AF_END=AF_SPEED_WEIGHTED_END,   // Last animation frame
+            AF_END=AF_BACK_RIGHT,  // Last animation frame
             AF_COUNT};             // Number of entries here
 
 private:
@@ -299,8 +301,7 @@ private:
     void  loadNitroEmitterInfo(const XMLNode &node,
                         const std::string &emitter_name, int index);
 
-    void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node,
-                                const SpeedWeightedObject::Properties& fallback_properties);
+    void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node);
 
     void  loadHeadlights(const XMLNode &node);
 
@@ -315,10 +316,10 @@ private:
 
     bool m_support_colorization;
 
-    unsigned m_version;
+    std::unordered_map<std::string, core::matrix4> m_inverse_bone_matrices;
 
     // ------------------------------------------------------------------------
-    core::matrix4 getInverseBoneMatrix(const char* bone_name);
+    void initInverseBoneMatrices();
     // ------------------------------------------------------------------------
     void configNode(scene::ISceneNode* node, const core::matrix4& global_mat,
                     const core::matrix4& inv_mat)
@@ -438,6 +439,9 @@ public:
     bool supportColorization() const         { return m_support_colorization; }
     // ------------------------------------------------------------------------
     void toggleHeadlights(bool on);
+    // ------------------------------------------------------------------------
+    const core::matrix4&
+                      getInverseBoneMatrix(const std::string& bone_name) const;
 
 };   // KartModel
 #endif

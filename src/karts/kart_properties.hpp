@@ -32,7 +32,6 @@ namespace irr
 using namespace irr;
 
 #include "audio/sfx_manager.hpp"
-#include "karts/kart_model.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
 #include "utils/interpolation_array.hpp"
@@ -42,6 +41,7 @@ class AbstractCharacteristic;
 class AIProperties;
 class CachedCharacteristic;
 class CombinedCharacteristic;
+class KartModel;
 class Material;
 class XMLNode;
 
@@ -176,9 +176,6 @@ private:
     // -------------------
     float m_friction_slip;
 
-    /** Parameters for the speed-weighted objects */
-    SpeedWeightedObject::Properties   m_speed_weighted_object_properties;
-
     /** Shift of center of gravity. */
     Vec3  m_gravity_center_shift;
 
@@ -244,26 +241,13 @@ public:
     video::ITexture *getMinimapIcon  () const {return m_minimap_icon;         }
 
     // ------------------------------------------------------------------------
-    /** Returns a pointer to the KartModel object.
-     *  \param krt The KartRenderType, like default, red, blue or transparent.
-     *  see the RenderInfo include for details
-     */
-    KartModel*    getKartModelCopy(KartRenderType krt) const
-                                         {return m_kart_model->makeCopy(krt); }
-
+    KartModel*    getKartModelCopy(KartRenderType krt) const;
     // ------------------------------------------------------------------------
     /** Returns a pointer to the main KartModel object. This copy
      *  should not be modified, not attachModel be called on it. */
     const KartModel& getMasterKartModel() const {return *m_kart_model;        }
-
     // ------------------------------------------------------------------------
-    /** Sets the name of a mesh to be used for this kart.
-     *  \param hat_name Name of the mesh.
-     */
-    void setHatMeshName(const std::string &hat_name)
-    {
-        m_kart_model->setHatMeshName(hat_name);
-    }   // setHatMeshName
+    void setHatMeshName(const std::string &hat_name);
     // ------------------------------------------------------------------------
     /** Returns the name of this kart.
         \note Pass it through fridibi as needed, this is the LTR name
@@ -323,13 +307,6 @@ public:
     //-----------------------------
     /** Returns friction slip. */
     float getFrictionSlip           () const {return m_friction_slip;         }
-
-    // ------------------------------------------------------------------------
-    /** Returns parameters for the speed-weighted objects */
-    const SpeedWeightedObject::Properties& getSpeedWeightedObjectProperties() const
-    {
-        return m_speed_weighted_object_properties;
-    }
 
     // ------------------------------------------------------------------------
     /** Returns the wheel base (distance front to rear axis). */
