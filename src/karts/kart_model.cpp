@@ -520,8 +520,9 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
             }
             else
             {
-                swo = irr_driver->addMesh(obj.m_model, "speedweighted",
-                    parent, getRenderInfo(), true/*all_parts_colorized*/);
+                swo = irr_driver->addMesh(obj.m_model->getMesh(0),
+                    "speedweighted", parent, getRenderInfo(),
+                    true/*all_parts_colorized*/);
             }
 #ifdef DEBUG
             std::string debug_name = obj.m_name + " (speed-weighted)";
@@ -1211,7 +1212,13 @@ void KartModel::initInverseBoneMatrices()
     // All bone matrices are configured in straight frame (as in exporting)
     scene::IAnimatedMeshSceneNode* node = irr_driver->getSceneManager()
         ->addAnimatedMeshSceneNode(m_mesh);
-    node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);
+    float striaght_frame = (float)m_animation_frame[AF_STRAIGHT];
+    if (m_animation_frame[AF_STRAIGHT] == -1)
+    {
+        Log::warn("KartModel", "%s has no striaght frame defined.");
+        striaght_frame = 0.0f;
+    }
+    node->setCurrentFrame(striaght_frame);
     const unsigned total_joint = node->getJointCount();
     for (unsigned i = 0; i < total_joint; i++)
     {
