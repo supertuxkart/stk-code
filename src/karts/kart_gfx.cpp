@@ -506,7 +506,7 @@ void KartGFX::setGFXFromReplay(int nitro, bool zipper,
     if (zipper)
         setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 800.0f);
 
-    if (skidding > 0)
+    if (skidding > 0 && m_kart->isOnGround())
     {
         const ParticleKind* skid_kind = red_skidding ? m_skid_kind2 
                                                      : m_skid_kind1;
