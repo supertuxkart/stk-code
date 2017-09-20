@@ -318,6 +318,8 @@ private:
 
     std::unordered_map<std::string, core::matrix4> m_inverse_bone_matrices;
 
+    unsigned m_version;
+
     // ------------------------------------------------------------------------
     void initInverseBoneMatrices();
     // ------------------------------------------------------------------------

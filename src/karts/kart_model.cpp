@@ -96,6 +96,7 @@ void SpeedWeightedObject::Properties::loadFromXMLNode(const XMLNode* xml_node)
  */
 KartModel::KartModel(bool is_master)
 {
+    m_version    = 0;
     m_is_master  = is_master;
     m_kart       = NULL;
     m_mesh       = NULL;
@@ -185,9 +186,8 @@ void KartModel::loadInfo(const XMLNode &node)
         m_has_nitro_emitter = true;
     }
 
-    unsigned kart_version;
-    node.get("version", &kart_version);
-    if (kart_version > 2)
+    node.get("version", &m_version);
+    if (m_version > 2)
     {
         if (const XMLNode *speed_weighted_objects_node = node.getNode("speed-weighted-objects"))
         {
@@ -335,6 +335,7 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
     km->m_support_colorization  = m_support_colorization;
     km->m_render_info           = new RenderInfo();
     km->m_inverse_bone_matrices = m_inverse_bone_matrices;
+    km->m_version               = m_version;
     km->m_render_info->setKartModelRenderInfo(krt);
 
     km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
@@ -1207,6 +1208,11 @@ void KartModel::toggleHeadlights(bool on)
 //-----------------------------------------------------------------------------
 void KartModel::initInverseBoneMatrices()
 {
+    if (m_version < 3)
+    {
+        // Only need for >= 3 version of kart
+        return;
+    }
     // Due to irrlicht mesh doesn't expose bone name, we have to create a
     // dummy aniamted node
     // All bone matrices are configured in straight frame (as in exporting)
@@ -1215,7 +1221,8 @@ void KartModel::initInverseBoneMatrices()
     float striaght_frame = (float)m_animation_frame[AF_STRAIGHT];
     if (m_animation_frame[AF_STRAIGHT] == -1)
     {
-        Log::warn("KartModel", "%s has no striaght frame defined.");
+        Log::warn("KartModel", "%s has no striaght frame defined.",
+            m_model_filename.c_str());
         striaght_frame = 0.0f;
     }
     node->setCurrentFrame(striaght_frame);
@@ -1245,6 +1252,7 @@ void KartModel::initInverseBoneMatrices()
 const core::matrix4& KartModel::getInverseBoneMatrix
                                            (const std::string& bone_name) const
 {
+    assert(m_version >= 3);
     auto ret = m_inverse_bone_matrices.find(bone_name);
     assert(ret != m_inverse_bone_matrices.end());
     return ret->second;
