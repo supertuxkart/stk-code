@@ -277,7 +277,7 @@ bool CIrrDeviceLinux::restoreResolution()
 	}
 	#endif
 	#ifdef _IRR_LINUX_X11_RANDR_
-	if (UseXRandR && CreationParams.Fullscreen && old_mode != BadRRMode)
+	if (UseXRandR && CreationParams.Fullscreen && old_mode != 0)
 	{
 		XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
 		if (!res)
@@ -385,7 +385,7 @@ bool CIrrDeviceLinux::changeResolution()
 	#ifdef _IRR_LINUX_X11_RANDR_
 	while (XRRQueryExtension(display, &eventbase, &errorbase))
 	{
-		if (output_id == BadRROutput)
+		if (output_id == 0)
 			break;
 
 		XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
@@ -2057,8 +2057,8 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 			}
 			#endif
 			#ifdef _IRR_LINUX_X11_RANDR_
-			output_id = BadRROutput;
-			old_mode = BadRRMode;
+			output_id = 0;
+			old_mode = 0;
 			
 			while (XRRQueryExtension(display, &eventbase, &errorbase))
 			{
@@ -2089,7 +2089,7 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 					}
 					
 					if (res->outputs[i] == primary_id ||
-						output_id == BadRROutput || crtc_tmp->x < crtc->x ||
+						output_id == 0 || crtc_tmp->x < crtc->x ||
 						(crtc_tmp->x == crtc->x && crtc_tmp->y < crtc->y))
 					{
 						XRRFreeCrtcInfo(crtc);
@@ -2109,7 +2109,7 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 						break;
 				}
 				
-				if (output_id == BadRROutput)
+				if (output_id == 0)
 				{
 					os::Printer::log("Could not get video output.", ELL_WARNING);
 					break;
