@@ -88,6 +88,12 @@ namespace irr
 
 		//! Restores the window size.
 		virtual void restoreWindow();
+		
+		//! Move window to requested position
+		virtual bool moveWindow(int x, int y);
+
+		//! Get current window position.
+		virtual bool getWindowPosition(int* x, int* y);
 
 		//! Get the device type
 		virtual E_DEVICE_TYPE getType() const

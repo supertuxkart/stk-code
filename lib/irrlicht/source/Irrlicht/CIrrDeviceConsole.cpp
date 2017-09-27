@@ -446,6 +446,17 @@ void CIrrDeviceConsole::restoreWindow()
 	// do nothing
 }
 
+//! Move window to requested position
+bool CIrrDeviceConsole::moveWindow(int x, int y)
+{
+    return false;
+}
+
+//! Get current window position.
+bool CIrrDeviceConsole::getWindowPosition(int* x, int* y)
+{
+    return false;
+}
 
 void CIrrDeviceConsole::setTextCursorPos(s16 x, s16 y)
 {

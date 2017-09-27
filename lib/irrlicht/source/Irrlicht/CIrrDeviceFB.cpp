@@ -391,6 +391,18 @@ void CIrrDeviceFB::restoreWindow()
 {
 }
 
+//! Move window to requested position
+bool CIrrDeviceFB::moveWindow(int x, int y)
+{
+    return false;
+}
+
+//! Get current window position.
+bool CIrrDeviceFB::getWindowPosition(int* x, int* y)
+{
+    return false;
+}
+
 
 //! Returns the type of this device
 E_DEVICE_TYPE CIrrDeviceFB::getType() const

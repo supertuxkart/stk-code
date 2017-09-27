@@ -65,6 +65,12 @@ namespace irr
 
 		//! Restores original window size
 		virtual void restoreWindow();
+		
+		//! Move window to requested position
+		virtual bool moveWindow(int x, int y);
+
+		//! Get current window position.
+		virtual bool getWindowPosition(int* x, int* y);
 
 		//! presents a surface in the client area
 		virtual bool present(video::IImage* surface, void* windowId = 0, core::rect<s32>* src=0 );

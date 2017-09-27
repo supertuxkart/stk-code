@@ -2194,6 +2194,101 @@ void CIrrDeviceLinux::restoreWindow()
 #endif
 }
 
+/*
+Returns the parent window of "window" (i.e. the ancestor of window
+that is a direct child of the root, or window itself if it is a direct child).
+If window is the root window, returns window.
+*/
+bool get_toplevel_parent(Display* display, Window window, Window* tp_window)
+{
+#ifdef _IRR_COMPILE_WITH_X11_
+	Window current_window = window;
+	Window parent;
+	Window root;
+	Window* children;
+	unsigned int num_children;
+	
+	while (true)
+	{
+		bool success = XQueryTree(display, current_window, &root,
+									&parent, &children, &num_children);
+		
+		if (!success)
+		{
+			os::Printer::log("XQueryTree error", ELL_ERROR);
+			return false;
+		}
+		
+		if (children) 
+		{
+			XFree(children);
+		}
+		
+		if (current_window == root || parent == root) 
+		{
+			*tp_window = current_window;
+			return true;
+		}
+		else
+		{
+			current_window = parent;
+		}
+	}
+#endif
+
+	return false;
+}
+
+
+//! Move window to requested position
+bool CIrrDeviceLinux::moveWindow(int x, int y)
+{
+#ifdef _IRR_COMPILE_WITH_X11_
+	if (CreationParams.DriverType == video::EDT_NULL || CreationParams.Fullscreen)
+		return false;
+		
+	int display_width = XDisplayWidth(display, screennr);
+	int display_height = XDisplayHeight(display, screennr);
+
+	core::min_(x, display_width - (int)Width);
+	core::min_(y, display_height - (int)Height);
+    
+	XMoveWindow(display, window, x, y);
+	return true;
+#endif
+
+	return false;
+}
+
+//! Get current window position.
+bool CIrrDeviceLinux::getWindowPosition(int* x, int* y)
+{
+#ifdef _IRR_COMPILE_WITH_X11_
+	if (CreationParams.DriverType == video::EDT_NULL || CreationParams.Fullscreen)
+		return false;
+		
+	Window tp_window;
+	
+	bool success = get_toplevel_parent(display, window, &tp_window);
+	
+	if (!success)
+		return false;
+
+	XWindowAttributes xwa;
+	success = XGetWindowAttributes(display, tp_window, &xwa);
+	
+	if (!success)
+		return false;
+		
+	*x = xwa.x;
+	*y = xwa.y;
+
+	return true;
+#endif
+
+	return false;
+}
+
 
 void CIrrDeviceLinux::createKeyMap()
 {

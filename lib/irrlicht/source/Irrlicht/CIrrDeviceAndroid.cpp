@@ -276,6 +276,18 @@ void CIrrDeviceAndroid::restoreWindow()
 {
 }
 
+bool CIrrDeviceAndroid::moveWindow(int x, int y)
+{
+	return true;
+}
+
+bool CIrrDeviceAndroid::getWindowPosition(int* x, int* y)
+{
+	*x = 0;
+	*y = 0;
+	return true;
+}
+
 E_DEVICE_TYPE CIrrDeviceAndroid::getType() const
 {
 	return EIDT_ANDROID;
