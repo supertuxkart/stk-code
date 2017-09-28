@@ -77,7 +77,10 @@ IMesh* CSkinnedMesh::getMesh(s32 frame, s32 detailLevel, s32 startFrameLoop, s32
 {
 	const bool is_hw_skinning_before = HardwareSkinning;
 	if (is_hw_skinning_before)
+	{
 		HardwareSkinning = false;
+		LastAnimatedFrame = -1;
+	}
 	//animate(frame,startFrameLoop, endFrameLoop);
 	if (frame==-1)
 		return this;

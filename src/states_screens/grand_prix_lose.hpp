@@ -20,13 +20,13 @@
 #define HEADER_GRAND_PRIX_LOSE_HPP
 
 #include "guiengine/screen.hpp"
-#include "karts/kart_model.hpp"
 #include "states_screens/grand_prix_cutscene.hpp"
 
 #include <vector>
 #include <string>
 
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; class IMeshSceneNode; } }
+class KartModel;
 class KartProperties;
 class TrackObject;
 

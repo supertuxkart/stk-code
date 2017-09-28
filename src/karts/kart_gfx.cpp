@@ -28,6 +28,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
@@ -547,7 +548,7 @@ void KartGFX::setGFXInvisible()
         m_nitro_light->setVisible(false);
         m_skidding_light_1->setVisible(false);
         m_skidding_light_2->setVisible(false);
-        m_kart->getKartModel()->turnOffHeadlights();
+        m_kart->getKartModel()->toggleHeadlights(false);
     }
 #endif
 }   // setGFXInvisible

@@ -12,24 +12,48 @@ if(MSVC OR APPLE)
                         "${CMAKE_CURRENT_BINARY_DIR}/../libpng/")
 endif()
 
-if (SERVER_ONLY)
-    add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
-    add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
-    add_definitions(-DNO_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
-else()
+if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
         find_package(OpenGL REQUIRED)
         include_directories(${OPENGL_INCLUDE_DIR})
     endif()
-endif()
+        
+    if(UNIX AND NOT APPLE)
+        find_package(X11 REQUIRED)
+        include_directories(${X11_INCLUDE_DIR})
+        
+        if(NOT X11_FOUND)
+            message(FATAL_ERROR "X11 not found.")
+        endif()
+        
+        if(NOT X11_Xrandr_FOUND)
+            message(FATAL_ERROR "XRANDR not found.")
+        endif()
+    endif()
 
-if (UNIX AND NOT APPLE)
-    find_package(X11 REQUIRED)
-    include_directories(${X11_INCLUDE_DIR})
-endif()
+    if(ENABLE_WAYLAND_DEVICE)
+        find_package(Wayland REQUIRED)
+        include_directories(${WAYLAND_INCLUDE_DIR})
+        
+        if(NOT WAYLAND_FOUND)
+            message(FATAL_ERROR "Wayland not found.")
+        endif()
+        
+        add_definitions(-D_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
+    endif()
 
-if(ENABLE_WAYLAND_DEVICE)
-    add_definitions(-D_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
+    if(USE_GLES2 OR ENABLE_WAYLAND_DEVICE)
+        find_package(EGL REQUIRED)
+        include_directories(${EGL_INCLUDE_DIR})
+        
+        if(NOT EGL_FOUND)
+            message(FATAL_ERROR "EGL not found.")
+        endif()
+    endif()
+else()
+    add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
 endif()
 
 if(APPLE)
@@ -44,21 +68,18 @@ if(UNIX OR MINGW)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
 endif()
 
-if(MSVC)
-  add_definitions(/D_IRR_STATIC_LIB_)
-  add_definitions(/D_CRT_SECURE_NO_WARNINGS) # Shut up about unsafe stuff
-elseif(MINGW)
-  add_definitions(-D_IRR_STATIC_LIB_)
-  add_definitions(-D_CRT_SECURE_NO_WARNINGS) # Shut up about unsafe stuff
+if(WIN32)
+    add_definitions(-D_IRR_STATIC_LIB_)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS) # Shut up about unsafe stuff
 else()
-  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing")
-  if(CMAKE_COMPILER_IS_GNUCC)
-	  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -fexpensive-optimizations")
-  endif()
-  if(CMAKE_COMPILER_IS_GNUCXX)
-	  set(CMAKE_CXX_FLAGS   "${CMAKE_CXX_FLAGS} -fexpensive-optimizations")
-  endif()
+    set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing")
+    if(CMAKE_COMPILER_IS_GNUCC)
+        set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -fexpensive-optimizations")
+    endif()
+    if(CMAKE_COMPILER_IS_GNUCXX)
+        set(CMAKE_CXX_FLAGS   "${CMAKE_CXX_FLAGS} -fexpensive-optimizations")
+    endif()
 endif()
 
 if(USE_GLES2)
@@ -123,8 +144,6 @@ source/Irrlicht/CImageWriterBMP.cpp
 source/Irrlicht/CImageWriterJPG.cpp
 source/Irrlicht/CImageWriterPNG.cpp
 source/Irrlicht/CIrrDeviceAndroid.cpp
-source/Irrlicht/CIrrDeviceConsole.cpp
-source/Irrlicht/CIrrDeviceFB.cpp
 source/Irrlicht/CIrrDeviceLinux.cpp
 source/Irrlicht/CIrrDeviceSDL.cpp
 source/Irrlicht/CIrrDeviceStub.cpp
@@ -257,8 +276,6 @@ source/Irrlicht/CImageWriterBMP.h
 source/Irrlicht/CImageWriterJPG.h
 source/Irrlicht/CImageWriterPNG.h
 source/Irrlicht/CIrrDeviceAndroid.h
-source/Irrlicht/CIrrDeviceConsole.h
-source/Irrlicht/CIrrDeviceFB.h
 source/Irrlicht/CIrrDeviceLinux.h
 source/Irrlicht/CIrrDeviceSDL.h
 source/Irrlicht/CIrrDeviceStub.h
@@ -559,14 +576,21 @@ if(APPLE)
 endif()
 
 add_library(stkirrlicht STATIC ${IRRLICHT_SOURCES})
+
 target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY} ${ZLIB_LIBRARY})
 
-if(USE_GLES2 OR ENABLE_WAYLAND_DEVICE)
-    target_link_libraries(stkirrlicht EGL)
-endif()
-
-if(ENABLE_WAYLAND_DEVICE)
-    target_link_libraries(stkirrlicht wayland-client wayland-egl wayland-cursor xkbcommon)
+if(NOT SERVER_ONLY)
+    if(UNIX AND NOT APPLE)
+        target_link_libraries(stkirrlicht ${X11_X11_LIB} ${X11_Xrandr_LIB})
+    endif()
+        
+    if(USE_GLES2 OR ENABLE_WAYLAND_DEVICE)
+        target_link_libraries(stkirrlicht ${EGL_LIBRARY})
+    endif()
+    
+    if(ENABLE_WAYLAND_DEVICE)
+        target_link_libraries(stkirrlicht ${WAYLAND_LIBRARIES})
+    endif()
 endif()
 
 if(WIN32)

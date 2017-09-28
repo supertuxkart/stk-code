@@ -65,15 +65,15 @@ void IconButtonWidget::add()
     // ---- Icon
     if (m_texture == NULL)
     {
-        if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
+        // Avoid warning about missing texture in case of e.g.
+        // screenshot widget
+        if (m_properties[PROP_ICON] != "")
         {
-            setTexture(irr_driver->getTexture(m_properties[PROP_ICON]));
-        }
-        else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
-        {
-            // Avoid warning about missing texture in case of e.g.
-            // screenshot widget
-            if(m_properties[PROP_ICON] != "")
+            if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
+            {
+                setTexture(irr_driver->getTexture(m_properties[PROP_ICON]));
+            }
+            else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
             {
                 std::string file = file_manager->getAsset(m_properties[PROP_ICON]);
                 setTexture(irr_driver->getTexture(file));

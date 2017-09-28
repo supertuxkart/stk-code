@@ -23,6 +23,7 @@
 #include "animations/three_d_animation.hpp"
 #include "items/flyable.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
 

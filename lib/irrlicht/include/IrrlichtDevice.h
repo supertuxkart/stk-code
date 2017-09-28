@@ -240,6 +240,15 @@ namespace irr
 		//! Restore the window to normal size if possible.
 		virtual void restoreWindow() =0;
 
+		//! Move window to requested position
+		/** \return true if success */
+		virtual bool moveWindow(int x, int y) = 0;
+
+		//! Get current window position.
+		/** \return true if success */
+		virtual bool getWindowPosition(int* x, int* y) = 0;
+
+
 		//! Activate any joysticks, and generate events for them.
 		/** Irrlicht contains support for joysticks, but does not generate joystick events by default,
 		as this would consume joystick info that 3rd party libraries might rely on. Call this method to

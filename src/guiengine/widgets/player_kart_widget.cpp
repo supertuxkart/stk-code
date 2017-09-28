@@ -24,6 +24,7 @@
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/widgets/player_name_spinner.hpp"
 #include "input/input_device.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "network/network_player_profile.hpp"
@@ -193,6 +194,8 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         scale = 30.0f;
     }
 
+    core::matrix4 model_location;
+    model_location.setScale(core::vector3df(scale, scale, scale));
     const bool has_win_anime =
         UserConfigParams::m_show_steering_animations != 0 &&
         (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
@@ -200,8 +203,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         kart_model.getFrame(KartModel::AF_WIN_END) > -1) ||
         (kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 &&
         kart_model.getFrame(KartModel::AF_SELECTION_END) > -1));
-    m_model_view->addModel( kart_model.getModel(), Vec3(0,0,0),
-        Vec3(scale, scale, scale),
+    m_model_view->addModel( kart_model.getModel(), model_location,
         has_win_anime ?
         kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 ?
         kart_model.getFrame(KartModel::AF_SELECTION_START) :
@@ -216,18 +218,27 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         kart_model.getBaseFrame(),
         false/*all_parts_colorized*/,
         kart_model.getAnimationSpeed());
-    m_model_view->addModel( kart_model.getWheelModel(0),
-                            kart_model.getWheelGraphicsPosition(0) );
-    m_model_view->addModel( kart_model.getWheelModel(1),
-                            kart_model.getWheelGraphicsPosition(1) );
-    m_model_view->addModel( kart_model.getWheelModel(2),
-                            kart_model.getWheelGraphicsPosition(2) );
-    m_model_view->addModel( kart_model.getWheelModel(3),
-                            kart_model.getWheelGraphicsPosition(3) );
-    for(size_t i=0 ; i < kart_model.getSpeedWeightedObjectsCount() ; i++)
+
+    model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+    for (unsigned i = 0; i < 4; i++)
     {
-        const SpeedWeightedObject& obj = kart_model.getSpeedWeightedObject((int)i);
-        m_model_view->addModel(obj.m_model, obj.m_position);
+        model_location.setTranslation(kart_model
+            .getWheelGraphicsPosition(i).toIrrVector());
+        m_model_view->addModel(kart_model.getWheelModel(i), model_location);
+    }
+
+    for (unsigned i = 0; i < kart_model.getSpeedWeightedObjectsCount(); i++)
+    {
+        const SpeedWeightedObject& obj = kart_model.getSpeedWeightedObject(i);
+        core::matrix4 swol = obj.m_location;
+        if (!obj.m_bone_name.empty())
+        {
+            core::matrix4 inv =
+                kart_model.getInverseBoneMatrix(obj.m_bone_name);
+            swol = inv * obj.m_location;
+        }
+        m_model_view->addModel(obj.m_model, swol, -1, -1, false, 0.0f,
+            obj.m_bone_name);
     }
     m_model_view->setRotateContinuously( 35.0f );
 

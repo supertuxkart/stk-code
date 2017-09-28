@@ -2,7 +2,7 @@
 <achievements>
   <achievement id="1" check-type="all-at-least" reset-type="never"
                name="Christoffel Columbus" description="Play every official track at least once." >
-      <city goal="1"/>
+      <candela_city goal="1"/>
       <cocoa_temple goal="1"/>
       <cornfield_crossing goal="1"/>
       <fortmagma goal="1"/>
@@ -22,6 +22,7 @@
       <abyss goal="1"/>
       <xr591 goal="1"/>
       <zengarden goal="1"/>      
+      <volcano_island goal="1"/>
   </achievement>
   <achievement id="2" check-type="all-at-least" reset-type="never"
                name="Strike!" description="Hit 10 karts with a bowling-ball.">

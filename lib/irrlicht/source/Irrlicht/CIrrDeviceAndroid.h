@@ -47,6 +47,8 @@ namespace irr
 		virtual void minimizeWindow();
 		virtual void maximizeWindow();
 		virtual void restoreWindow();
+		virtual bool moveWindow(int x, int y);
+		virtual bool getWindowPosition(int* x, int* y);
 		virtual E_DEVICE_TYPE getType() const;
 		virtual bool activateAccelerometer(float updateInterval);
 		virtual bool deactivateAccelerometer();

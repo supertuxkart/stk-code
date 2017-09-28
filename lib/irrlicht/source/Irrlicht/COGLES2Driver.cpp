@@ -69,6 +69,7 @@ namespace video
 		ContextEGLParams egl_params;
 		egl_params.opengl_api = CEGL_API_OPENGL_ES;
 		egl_params.surface_type = CEGL_SURFACE_WINDOW;
+		egl_params.handle_srgb = Params.HandleSRGB;
 		egl_params.force_legacy_device = Params.ForceLegacyDevice;
 		egl_params.with_alpha_channel = Params.WithAlphaChannel;
 		egl_params.vsync_enabled = Params.Vsync;
@@ -2885,7 +2886,7 @@ namespace irr
 namespace video
 {
 
-#if !defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_) && (defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_SDL_DEVICE_) || defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_CONSOLE_DEVICE_))
+#if !defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_) && (defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_SDL_DEVICE_) || defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_))
 	IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
 			video::SExposedVideoData& data, io::IFileSystem* io)
 	{

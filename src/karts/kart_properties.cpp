@@ -306,6 +306,25 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 
 }   // load
 
+// ----------------------------------------------------------------------------
+/** Returns a pointer to the KartModel object.
+ *  \param krt The KartRenderType, like default, red, blue or transparent.
+ *  see the RenderInfo include for details
+ */
+KartModel* KartProperties::getKartModelCopy(KartRenderType krt) const
+{
+    return m_kart_model->makeCopy(krt);
+}  // getKartModelCopy
+
+// ----------------------------------------------------------------------------
+/** Sets the name of a mesh to be used for this kart.
+ *  \param hat_name Name of the mesh.
+ */
+void KartProperties::setHatMeshName(const std::string &hat_name)
+{
+    m_kart_model->setHatMeshName(hat_name);
+}  // setHatMeshName
+
 //-----------------------------------------------------------------------------
 void KartProperties::combineCharacteristics()
 {
@@ -370,11 +389,6 @@ void KartProperties::getAllData(const XMLNode * root)
         m_ai_properties[RaceManager::DIFFICULTY_HARD]->load(hard);
         const XMLNode *best = ai_node->getNode("best");
         m_ai_properties[RaceManager::DIFFICULTY_BEST]->load(best);
-    }
-
-    if(const XMLNode *speed_weighted_objects_node = root->getNode("speed-weighted-objects"))
-    {
-        m_speed_weighted_object_properties.loadFromXMLNode(speed_weighted_objects_node);
     }
 
     if(const XMLNode *friction_node = root->getNode("friction"))
@@ -479,8 +493,6 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_collision_impulse_time,     "collision impulse-time"        );
     CHECK_NEG(m_restitution,                "collision restitution"         );
     CHECK_NEG(m_physical_wheel_position,    "collision physical-wheel-position");
-
-    m_speed_weighted_object_properties.checkAllSet();
 
     for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
         m_ai_properties[i]->checkAllSet(filename);
@@ -1172,7 +1184,6 @@ bool KartProperties::getSkidEnabled() const
 {
     return m_cached_characteristic->getSkidEnabled();
 }  // getSkidEnabled
-
 
 /* <characteristics-end kpgetter> */
 

@@ -22,6 +22,7 @@
 #include "graphics/render_info.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart_animation.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "utils/log.hpp"

@@ -2131,6 +2131,38 @@ void CIrrDeviceWin32::restoreWindow()
     SetWindowPlacement(HWnd, &wndpl);
 }
 
+//! Move window to requested position
+bool CIrrDeviceWin32::moveWindow(int x, int y)
+{
+    if (CreationParams.DriverType == video::EDT_NULL || CreationParams.Fullscreen)
+        return false;
+		
+    bool success = SetWindowPos(HWnd, HWND_TOP, x, y, -1, -1,
+                                SWP_NOOWNERZORDER | SWP_NOSIZE);
+    
+    return success;
+}
+
+//! Get current window position.
+bool CIrrDeviceWin32::getWindowPosition(int* x, int* y)
+{
+    if (CreationParams.DriverType == video::EDT_NULL || CreationParams.Fullscreen)
+        return false;
+    
+    WINDOWPLACEMENT placement;
+    placement.length = sizeof(WINDOWPLACEMENT);
+    
+    bool success = GetWindowPlacement(HWnd, &placement);
+    
+    if (!success)
+        return false;
+    
+    *x = (int)placement.rcNormalPosition.left;
+    *y = (int)placement.rcNormalPosition.top;
+    
+    return true;
+}
+
 
 bool CIrrDeviceWin32::activateJoysticks(core::array<SJoystickInfo> & joystickInfo)
 {

@@ -161,46 +161,36 @@ void SoccerSetupScreen::beforeAddingWidget()
                 (info.team == SOCCER_TEAM_BLUE ? KRT_BLUE : KRT_RED);
         }
 
+        core::matrix4 model_location;
+        model_location.setScale(core::vector3df(35.0f, 35.0f, 35.0f));
         // Add the kart model (including wheels and speed weight objects)
-        kart_view->addModel(kart_model.getModel(), Vec3(0, 0, 0),
-            Vec3(35.0f, 35.0f, 35.0f), kart_model.getBaseFrame(),
-            kart_model.getBaseFrame());
+        kart_view->addModel(kart_model.getModel(), model_location,
+            kart_model.getBaseFrame(), kart_model.getBaseFrame());
 
-        kart_view->addModel( kart_model.getWheelModel(0),
-                                kart_model.getWheelGraphicsPosition(0),
-                                Vec3(1, 1, 1), /*scale*/
-                                -1, /*start_loop_frame*/
-                                -1, /*end_loop_frame*/
-                                true /*all_parts_colorized*/);
-
-        kart_view->addModel( kart_model.getWheelModel(1),
-                                kart_model.getWheelGraphicsPosition(1),
-                                Vec3(1, 1, 1), /*scale*/
-                                -1, /*start_loop_frame*/
-                                -1, /*end_loop_frame*/
-                                true /*all_parts_colorized*/);
-        kart_view->addModel( kart_model.getWheelModel(2),
-                                kart_model.getWheelGraphicsPosition(2),
-                                Vec3(1, 1, 1), /*scale*/
-                                -1, /*start_loop_frame*/
-                                -1, /*end_loop_frame*/
-                                true /*all_parts_colorized*/);
-
-        kart_view->addModel( kart_model.getWheelModel(3),
-                                kart_model.getWheelGraphicsPosition(3),
-                                Vec3(1, 1, 1), /*scale*/
-                                -1, /*start_loop_frame*/
-                                -1, /*end_loop_frame*/
-                                true /*all_parts_colorized*/);
-
-        for (size_t i = 0; i < kart_model.getSpeedWeightedObjectsCount(); i++)
+        model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+        for (unsigned i = 0; i < 4; i++)
         {
-            const SpeedWeightedObject& obj = kart_model.getSpeedWeightedObject((int)i);
-            kart_view->addModel(obj.m_model, obj.m_position,
-                                Vec3(1, 1, 1), /*scale*/
-                                -1, /*start_loop_frame*/
-                                -1, /*end_loop_frame*/
-                                true /*all_parts_colorized*/);
+            model_location.setTranslation(kart_model
+                .getWheelGraphicsPosition(i).toIrrVector());
+            kart_view->addModel(kart_model.getWheelModel(i), model_location,
+                -1/*start_loop_frame*/ -1/*end_loop_frame*/,
+                true/*all_parts_colorized*/);
+        }
+
+        for (unsigned i = 0; i < kart_model.getSpeedWeightedObjectsCount();
+            i++)
+        {
+            const SpeedWeightedObject& obj =
+                kart_model.getSpeedWeightedObject(i);
+            core::matrix4 swol = obj.m_location;
+            if (!obj.m_bone_name.empty())
+            {
+                core::matrix4 inv =
+                    kart_model.getInverseBoneMatrix(obj.m_bone_name);
+                swol = inv * obj.m_location;
+            }
+            kart_view->addModel(obj.m_model, swol, -1, -1, true, 0.0f,
+                obj.m_bone_name);
         }
 
         kart_view->setRotateContinuously( KART_CONTINUOUS_ROTATION_SPEED );

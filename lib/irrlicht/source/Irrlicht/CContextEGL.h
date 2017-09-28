@@ -30,6 +30,15 @@
 #ifndef EGL_CONTEXT_MINOR_VERSION
 #define EGL_CONTEXT_MINOR_VERSION 0x30FB
 #endif
+#ifndef EGL_GL_COLORSPACE
+#define EGL_GL_COLORSPACE 0x309D
+#endif
+#ifndef EGL_GL_COLORSPACE_SRGB
+#define EGL_GL_COLORSPACE_SRGB 0x3089
+#endif
+#ifndef EGL_GL_COLORSPACE_LINEAR
+#define EGL_GL_COLORSPACE_LINEAR 0x308A
+#endif
 
 enum ContextEGLOpenGLAPI
 {
@@ -50,6 +59,7 @@ struct ContextEGLParams
     EGLNativeWindowType window;
     EGLNativeDisplayType display;
     bool force_legacy_device;
+    bool handle_srgb;
     bool with_alpha_channel;
     bool vsync_enabled;
     int pbuffer_width;
