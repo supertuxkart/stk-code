@@ -96,6 +96,8 @@ namespace irr
 		private:
 			core::position2d<s32> CursorPos;
 		};
+		
+		static void onCreate();
 
 	private:
 		android_app* Android;

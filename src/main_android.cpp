@@ -21,6 +21,8 @@
 #include "graphics/irr_driver.hpp"
 #include "utils/log.hpp"
 
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
+
 extern int main(int argc, char *argv[]);
 
 struct android_app* global_android_app;
@@ -61,6 +63,9 @@ void android_main(struct android_app* app)
     Log::info("AndroidMain", "Loading application...");
         
     app_dummy();
+    
+    // Initialize global Android window state variables
+    CIrrDeviceAndroid::onCreate();
     
     override_default_params();
 

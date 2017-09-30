@@ -33,6 +33,16 @@ bool CIrrDeviceAndroid::IsPaused = true;
 bool CIrrDeviceAndroid::IsFocused = false;
 bool CIrrDeviceAndroid::IsStarted = false;
 
+// Execution of android_main() function is a kind of "onCreate" event, so this
+// function should be used there to make sure that global window state variables
+// have their default values on startup.
+void CIrrDeviceAndroid::onCreate()
+{
+	IsPaused = true;
+	IsFocused = false;
+	IsStarted = false;
+}
+
 //! constructor
 CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
 	: CIrrDeviceStub(param),
