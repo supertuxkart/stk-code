@@ -1225,16 +1225,19 @@ void KartModel::initInverseBoneMatrices()
             m_model_filename.c_str());
         striaght_frame = 0.0f;
     }
-    node->setCurrentFrame(striaght_frame);
+
     const unsigned total_joint = node->getJointCount();
     for (unsigned i = 0; i < total_joint; i++)
     {
+        node->setCurrentFrame(striaght_frame);
         node->OnAnimate(0);
         scene::IBoneSceneNode* bone = node->getJointNode(i);
         bone->updateAbsolutePosition();
-        const core::matrix4 mat = bone->getAbsoluteTransformation();
+        node->setCurrentFrame(striaght_frame);
+        node->OnAnimate(0);
+        bone->updateAbsolutePosition();
         core::matrix4 inv;
-        mat.getInverse(inv);
+        bone->getAbsoluteTransformation().getInverse(inv);
         const std::string bone_name = bone->getName();
         auto ret = m_inverse_bone_matrices.find(bone_name);
         if (ret != m_inverse_bone_matrices.end())
