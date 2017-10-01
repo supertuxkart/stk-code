@@ -1577,7 +1577,9 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
         return in_fbo;
 
+#if !defined(USE_GLES2)
     glEnable(GL_FRAMEBUFFER_SRGB);
+#endif
     out_fbo = &rtts->getFBO(FBO_MLAA_COLORS);
     out_fbo->bind();
     renderPassThrough(in_fbo->getRTT()[0],
@@ -1593,7 +1595,9 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
                   *out_fbo);
         PROFILER_POP_CPU_MARKER();
     }
+#if !defined(USE_GLES2)
     glDisable(GL_FRAMEBUFFER_SRGB);
+#endif
 
     return out_fbo;
 }   // render
