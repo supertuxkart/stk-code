@@ -1,6 +1,6 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the supertuxkart package.
+# This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-13 06:18+0200\n"
+"POT-Creation-Date: 2017-10-03 18:58-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -196,7 +196,7 @@ msgstr ""
 #: src/states_screens/arenas_screen.cpp:83
 #: src/states_screens/easter_egg_screen.cpp:145
 #: src/states_screens/grand_prix_editor_screen.cpp:339
-#: src/states_screens/kart_selection.cpp:286
+#: src/states_screens/kart_selection.cpp:287
 #: src/states_screens/tracks_and_gp_screen.cpp:148
 msgid "Add-Ons"
 msgstr ""
@@ -216,7 +216,7 @@ msgstr ""
 #: src/states_screens/edit_track_screen.cpp:147
 #: src/states_screens/gp_info_screen.cpp:76
 #: src/states_screens/grand_prix_editor_screen.cpp:336
-#: src/states_screens/kart_selection.cpp:278
+#: src/states_screens/kart_selection.cpp:279
 #: src/states_screens/options_screen_video.cpp:456
 #: src/states_screens/tracks_and_gp_screen.cpp:138
 #: src/states_screens/tracks_screen.cpp:141
@@ -1894,10 +1894,6 @@ msgstr ""
 msgid "Beastie"
 msgstr ""
 
-#. I18N: ../stk-assets/karts/elephpant/kart.xml
-msgid "Elephpant"
-msgstr ""
-
 #. I18N: ../stk-assets/karts/emule/kart.xml
 msgid "Emule"
 msgstr ""
@@ -1912,6 +1908,10 @@ msgstr ""
 
 #. I18N: ../stk-assets/karts/hexley/kart.xml
 msgid "Hexley"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/kiki/kart.xml
+msgid "Kiki"
 msgstr ""
 
 #. I18N: ../stk-assets/karts/konqi/kart.xml
@@ -2031,20 +2031,20 @@ msgid ""
 "created."
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:618
+#: src/graphics/irr_driver.cpp:535
 msgid "Video recording started."
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:624
+#: src/graphics/irr_driver.cpp:541
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:628
+#: src/graphics/irr_driver.cpp:545
 msgid "Encoding progress:"
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:1801
+#: src/graphics/irr_driver.cpp:1682
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris"
 msgstr ""
@@ -2053,26 +2053,14 @@ msgstr ""
 msgid "Loading"
 msgstr ""
 
-#: src/guiengine/widgets/kart_stats_widget.cpp:108
-msgid "WEIGHT"
-msgstr ""
-
-#: src/guiengine/widgets/kart_stats_widget.cpp:113
-msgid "SPEED"
-msgstr ""
-
-#: src/guiengine/widgets/kart_stats_widget.cpp:117
-msgid "POWER"
-msgstr ""
-
 #. I18N: 'handicapped' indicates that per-player handicaps are
 #. activated for this kart (i.e. it will drive slower)
-#: src/guiengine/widgets/player_kart_widget.cpp:381
+#: src/guiengine/widgets/player_kart_widget.cpp:392
 #, c-format
 msgid "%s (handicapped)"
 msgstr ""
 
-#: src/guiengine/widgets/player_kart_widget.cpp:440
+#: src/guiengine/widgets/player_kart_widget.cpp:451
 #, c-format
 msgid "%s is ready"
 msgstr ""
@@ -2739,7 +2727,7 @@ msgstr ""
 msgid "You finished the race!"
 msgstr ""
 
-#: src/main.cpp:1500
+#: src/main.cpp:1501
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -2749,16 +2737,16 @@ msgid ""
 "edit \"Connect to the Internet\" and \"Send anonymous HW statistics\")."
 msgstr ""
 
-#: src/main.cpp:1653
+#: src/main.cpp:1654
 msgid "Your screen resolution is too low to run STK."
 msgstr ""
 
-#: src/main.cpp:1667
+#: src/main.cpp:1668
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr ""
 
-#: src/main.cpp:1684
+#: src/main.cpp:1685
 #, c-format
 msgid ""
 "Your OpenGL version appears to be too old. Please verify if an update for "
@@ -2972,7 +2960,7 @@ msgstr ""
 #. I18N: track group name
 #: src/states_screens/arenas_screen.cpp:81
 #: src/states_screens/easter_egg_screen.cpp:143
-#: src/states_screens/kart_selection.cpp:284
+#: src/states_screens/kart_selection.cpp:285
 #: src/states_screens/tracks_and_gp_screen.cpp:146
 msgid "standard"
 msgstr ""
@@ -2981,8 +2969,8 @@ msgstr ""
 #: src/states_screens/arenas_screen.cpp:327
 #: src/states_screens/easter_egg_screen.cpp:225
 #: src/states_screens/easter_egg_screen.cpp:256
-#: src/states_screens/kart_selection.cpp:859
-#: src/states_screens/kart_selection.cpp:1464
+#: src/states_screens/kart_selection.cpp:864
+#: src/states_screens/kart_selection.cpp:1481
 #: src/states_screens/race_setup_screen.cpp:99
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr ""
@@ -3347,32 +3335,32 @@ msgstr ""
 msgid "Select a track"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:200
+#: src/states_screens/feature_unlocked.cpp:201
 #, c-format
 msgid "You completed the easy challenge! Points earned on this level: %i/%i"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:204
+#: src/states_screens/feature_unlocked.cpp:205
 #, c-format
 msgid ""
 "You completed the intermediate challenge! Points earned on this level: %i/%i"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:208
+#: src/states_screens/feature_unlocked.cpp:209
 #, c-format
 msgid ""
 "You completed the difficult challenge! Points earned on this level: %i/%i"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:493
+#: src/states_screens/feature_unlocked.cpp:494
 msgid "Challenge Completed"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:530
+#: src/states_screens/feature_unlocked.cpp:531
 msgid "You unlocked track %0"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:568
+#: src/states_screens/feature_unlocked.cpp:569
 msgid "You unlocked grand prix %0"
 msgstr ""
 
@@ -3430,7 +3418,7 @@ msgid "Name is too long."
 msgstr ""
 
 #. I18N: when failing a GP
-#: src/states_screens/grand_prix_lose.cpp:154
+#: src/states_screens/grand_prix_lose.cpp:155
 msgid "Better luck next time!"
 msgstr ""
 
@@ -3443,16 +3431,16 @@ msgstr ""
 msgid "You completed the Grand Prix!"
 msgstr ""
 
-#: src/states_screens/kart_selection.cpp:840
-#: src/states_screens/kart_selection.cpp:1482
+#: src/states_screens/kart_selection.cpp:843
+#: src/states_screens/kart_selection.cpp:1499
 msgid "Random Kart"
 msgstr ""
 
-#: src/states_screens/kart_selection.cpp:854
+#: src/states_screens/kart_selection.cpp:859
 msgid "Locked"
 msgstr ""
 
-#: src/states_screens/kart_selection.cpp:944
+#: src/states_screens/kart_selection.cpp:961
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
