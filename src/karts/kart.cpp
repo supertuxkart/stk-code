@@ -2304,9 +2304,9 @@ void Kart::updatePhysics(float dt)
     m_skidding->update(dt, isOnGround(), m_controls.getSteer(),
                        m_controls.getSkidControl());
     m_vehicle->setVisualRotation(m_skidding->getVisualSkidRotation());
-    if(( m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_LEFT ||
-         m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
-        m_skidding->getGraphicalJumpOffset()==0)
+    if( (m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_LEFT ||
+         m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT) &&
+        m_skidding->getGraphicalJumpOffset()==0 && isOnGround())
     {
         if(m_skid_sound->getStatus()!=SFXBase::SFX_PLAYING && !isWheeless())
             m_skid_sound->play(getXYZ());
