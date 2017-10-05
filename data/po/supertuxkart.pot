@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-03 18:58-0400\n"
+"POT-Creation-Date: 2017-10-04 20:58-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1816,6 +1816,10 @@ msgstr ""
 msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
+msgstr ""
+
+#. I18N: ../stk-assets/tracks/lasdunasarena/track.xml
+msgid "Las Dunas Arena"
 msgstr ""
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
