@@ -111,14 +111,24 @@ KartGFX::KartGFX(const AbstractKart *kart, bool is_day)
     addEffect(KGFX_NITRO2,      "nitro.xml",       rear_nitro_left,  true );
     addEffect(KGFX_NITROSMOKE1, "nitro-smoke.xml", rear_nitro_left,  false);
     addEffect(KGFX_NITROSMOKE2, "nitro-smoke.xml", rear_nitro_right, false);
-    addEffect(KGFX_EXHAUST1,    "kart_exhaust.xml",rear_nitro_right, false );
-    addEffect(KGFX_EXHAUST2,    "kart_exhaust.xml",rear_nitro_left,  false );
     addEffect(KGFX_ZIPPER,      "zipper_fire.xml", rear_center,      true );
     addEffect(KGFX_TERRAIN,     "smoke.xml",       Vec3(0, 0, 0),    false);
     addEffect(KGFX_SKID1L,      "skid1.xml",       rear_left,        true );
     addEffect(KGFX_SKID1R,      "skid1.xml",       rear_right,       true );
     addEffect(KGFX_SKID2L,      "skid2.xml",       rear_left,        true );
     addEffect(KGFX_SKID2R,      "skid2.xml",       rear_right,       true );
+    if (!kart->getKartModel()->getExhaustXML().empty())
+    {
+        const std::string& ex = kart->getKartModel()->getExhaustXML();
+        addEffect(KGFX_EXHAUST1, ex, rear_nitro_right, false);
+        addEffect(KGFX_EXHAUST2, ex, rear_nitro_left, false);
+    }
+    else
+    {
+        m_all_emitters.push_back(NULL);
+        m_all_emitters.push_back(NULL);
+    }
+
 }   // KartGFX
 
 // ----------------------------------------------------------------------------

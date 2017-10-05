@@ -49,8 +49,6 @@ public:
                        KGFX_NITRO2,
                        KGFX_NITROSMOKE1,
                        KGFX_NITROSMOKE2,
-                       KGFX_EXHAUST1,
-                       KGFX_EXHAUST2,
                        KGFX_ZIPPER,
                        KGFX_TERRAIN,
                        KGFX_SKIDL,
@@ -59,6 +57,8 @@ public:
                        KGFX_SKID1R = KGFX_SKIDR,
                        KGFX_SKID2L,
                        KGFX_SKID2R,
+                       KGFX_EXHAUST1,
+                       KGFX_EXHAUST2,
                        KGFX_COUNT};
 
 private:
