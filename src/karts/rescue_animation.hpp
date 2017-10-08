@@ -34,20 +34,17 @@ protected:
     /** The coordinates where the kart was hit originally. */
     Vec3 m_xyz;
 
-    /** The kart's current rotation. */
-    Vec3 m_curr_rotation;
+    /** Column 1 of btTransform of kart. */
+    Vec3 m_up_vector;
 
-    /** The artificial rotation to toss the kart around. It's in units
-     *  of rotation per second. */
-    Vec3 m_add_rotation;
+    /** The kart's original rotation. */
+    btQuaternion m_orig_rotation;
+
+    /** Desired rotation for rescue determined by last valid quad. */
+    btQuaternion m_des_rotation;
 
     /** The velocity with which the kart is moved. */
     float m_velocity;
-
-    /** Duration for the animation. This can potentially be set
-     *  with different values for different karts, or depending
-     *  on difficulty (so that on easy you can drive again earlier. */
-    float m_duration;
 
     /** The referee during a rescue operation. */
     Referee      *m_referee;
