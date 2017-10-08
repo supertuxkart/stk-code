@@ -304,8 +304,10 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     else
     {
         // We need a cleared depth buffer for some effect (eg particles depth blending)
+#if !defined(USE_GLES2)
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
             glDisable(GL_FRAMEBUFFER_SRGB);
+#endif
         m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
         // Bind() modifies the viewport. In order not to affect anything else,
         // the viewport is just reset here and not removed in Bind().
@@ -315,8 +317,10 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
                    vp.LowerRightCorner.X - vp.UpperLeftCorner.X,
                    vp.LowerRightCorner.Y - vp.UpperLeftCorner.Y);
         glClear(GL_DEPTH_BUFFER_BIT);
+#if !defined(USE_GLES2)
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
             glEnable(GL_FRAMEBUFFER_SRGB);
+#endif
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     PROFILER_POP_CPU_MARKER();
@@ -490,7 +494,9 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     }
     if (!CVS->isDefferedEnabled() && !forceRTT)
     {
+#if !defined(USE_GLES2)
         glDisable(GL_FRAMEBUFFER_SRGB);
+#endif
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
         return;
@@ -596,11 +602,15 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
     }
     else
     {
+#if !defined(USE_GLES2)
         glEnable(GL_FRAMEBUFFER_SRGB);
+#endif
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         camera->activate();
         m_post_processing->renderPassThrough(fbo->getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
+#if !defined(USE_GLES2)
         glDisable(GL_FRAMEBUFFER_SRGB);
+#endif
     }
 } //renderPostProcessing
 
@@ -800,8 +810,10 @@ void ShaderBasedRenderer::render(float dt)
         rg->preRenderCallback(camera);   // adjusts start referee
         irr_driver->getSceneManager()->setActiveCamera(camnode);
 
+#if !defined(USE_GLES2)
         if (!CVS->isDefferedEnabled())
             glEnable(GL_FRAMEBUFFER_SRGB);
+#endif
         
         PROFILER_PUSH_CPU_MARKER("UBO upload", 0x0, 0xFF, 0x0);
         computeMatrixesAndCameras(camnode, m_rtts->getWidth(), m_rtts->getHeight());

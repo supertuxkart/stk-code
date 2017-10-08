@@ -1185,6 +1185,8 @@ EventPropagation InputManager::input(const SEvent& event)
 
         if (device && device->isAccelerometerActive())
         {
+            m_device_manager->updateMultitouchDevice();
+
             for (unsigned int i = 0; i < device->getButtonsCount(); i++)
             {
                 MultitouchButton* button = device->getButton(i);

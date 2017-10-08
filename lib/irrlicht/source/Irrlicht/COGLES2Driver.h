@@ -59,7 +59,7 @@ namespace video
 		friend class COGLES2Texture;
 
 	public:
-#if defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_SDL_DEVICE_) || defined(_IRR_WINDOWS_API_) || defined(_IRR_COMPILE_WITH_CONSOLE_DEVICE_)
+#if defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_SDL_DEVICE_) || defined(_IRR_WINDOWS_API_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
 		COGLES2Driver(const SIrrlichtCreationParameters& params,
 					const SExposedVideoData& data,
 					io::IFileSystem* io);

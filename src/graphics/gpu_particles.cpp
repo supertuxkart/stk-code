@@ -91,7 +91,6 @@ public:
 
 // ============================================================================
 /** */
-#if !defined(USE_GLES2)
 class HeightmapSimulationShader :
                              public TextureShader<HeightmapSimulationShader, 1,
                                                   core::matrix4, int, int,
@@ -106,12 +105,15 @@ public:
         loadTFBProgram("particlesimheightmap.vert", varyings, 4);
         assignUniforms("sourcematrix", "dt", "level", "size_increase_factor",
                        "track_x", "track_x_len", "track_z", "track_z_len");
+#if !defined(USE_GLES2)
         assignSamplerNames(0, "heightmap",  ST_TEXTURE_BUFFER);
+#else
+        assignSamplerNames(0, "heightmap",  ST_NEAREST_FILTERED);
+#endif
     }   // HeightmapSimulationShader
 
 
 };   // class HeightmapSimulationShader
-#endif
 
 // ============================================================================
 
@@ -186,7 +188,6 @@ void ParticleSystemProxy::setFlip()
 void ParticleSystemProxy::setHeightmap(const std::vector<std::vector<float> > &hm,
     float f1, float f2, float f3, float f4)
 {
-#if !defined(USE_GLES2)
     track_x = f1, track_z = f2, track_x_len = f3, track_z_len = f4;
 
     unsigned width  = (unsigned)hm.size();
@@ -200,6 +201,8 @@ void ParticleSystemProxy::setHeightmap(const std::vector<std::vector<float> > &h
         }
     }
     has_height_map = true;
+    
+#if !defined(USE_GLES2)
     glGenBuffers(1, &heighmapbuffer);
     glBindBuffer(GL_TEXTURE_BUFFER, heighmapbuffer);
     glBufferData(GL_TEXTURE_BUFFER, width * height * sizeof(float), hm_array, GL_STREAM_COPY);
@@ -208,9 +211,14 @@ void ParticleSystemProxy::setHeightmap(const std::vector<std::vector<float> > &h
     glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, heighmapbuffer);
     glBindBuffer(GL_TEXTURE_BUFFER, 0);
     glBindTexture(GL_TEXTURE_BUFFER, 0);
+#else
+    glGenTextures(1, &heightmaptexture);
+    glBindTexture(GL_TEXTURE_2D, heightmaptexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, hm_array);
+    glBindTexture(GL_TEXTURE_2D, 0);
+#endif
 
     delete[] hm_array;
-#endif
 }
 
 static
@@ -505,11 +513,9 @@ void ParticleSystemProxy::simulate()
     glEnable(GL_RASTERIZER_DISCARD);
     if (has_height_map)
     {
-#if !defined(USE_GLES2)
         HeightmapSimulationShader::getInstance()->use();
         HeightmapSimulationShader::getInstance()->setTextureUnits(heightmaptexture);
         HeightmapSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor, track_x, track_x_len, track_z, track_z_len);
-#endif
     }
     else
     {

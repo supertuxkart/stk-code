@@ -7,7 +7,12 @@ uniform float track_x;
 uniform float track_z;
 uniform float track_x_len;
 uniform float track_z_len;
+
+#ifndef GL_ES
 uniform samplerBuffer heightmap;
+#else
+uniform sampler2D heightmap;
+#endif
 
 #ifdef Explicit_Attrib_Location_Usable
 layout (location = 4) in vec3 particle_position_initial;
@@ -45,7 +50,12 @@ void main(void)
   int i = int(i_as_float);
   int j = int(j_as_float);
 
+#ifndef GL_ES
   float h = particle_position.y - texelFetch(heightmap, i * 256 + j).r;
+#else
+  float h = particle_position.y - texelFetch(heightmap, ivec2(j, i), 0).r;
+#endif
+
   reset = h < 0.;
 
   vec4 initialposition = sourcematrix * vec4(particle_position_initial, 1.0);

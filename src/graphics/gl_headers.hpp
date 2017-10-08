@@ -61,7 +61,6 @@ extern "C" {
 #if defined(USE_GLES2)
 #define GL_BGRA 0x80E1
 #define GL_BGR 0x80E0
-#define GL_FRAMEBUFFER_SRGB 0x8DB9
 #define GL_FRAMEBUFFER_COMPLETE_EXT GL_FRAMEBUFFER_COMPLETE
 
 // The glDrawElementsBaseVertex is available only in OpenGL ES 3.2. At this

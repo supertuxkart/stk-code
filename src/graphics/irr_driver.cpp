@@ -91,15 +91,6 @@ please use the included version."
 
 using namespace irr;
 
-#ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
-#if defined(__linux__) && !defined(ANDROID)
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#endif
-
 /** singleton */
 IrrDriver *irr_driver = NULL;
 
@@ -229,45 +220,6 @@ std::unique_ptr<RenderTarget> IrrDriver::createRenderTarget(const irr::core::dim
 #endif   // ~SERVER_ONLY
 
 // ----------------------------------------------------------------------------
-
-#if defined(__linux__) && !defined(ANDROID)
-/*
-Returns the parent window of "window" (i.e. the ancestor of window
-that is a direct child of the root, or window itself if it is a direct child).
-If window is the root window, returns window.
-*/
-Window get_toplevel_parent(Display* display, Window window)
-{
-#ifndef SERVER_ONLY
-     Window parent;
-     Window root;
-     Window * children;
-     unsigned int num_children;
-
-     while (true)
-     {
-         if (0 == XQueryTree(display, window, &root,
-                   &parent, &children, &num_children))
-         {
-             Log::fatal("irr_driver", "XQueryTree error\n");
-         }
-         if (children) { //must test for null
-             XFree(children);
-         }
-         if (window == root || parent == root) {
-             return window;
-         }
-         else {
-             window = parent;
-         }
-     }
-#else
-    return NULL;
-#endif
-}
-#endif
-
-// ----------------------------------------------------------------------------
 /** If the position of the window should be remembered, store it in the config
  *  file.
  *  \post The user config file must still be saved!
@@ -278,61 +230,26 @@ void IrrDriver::updateConfigIfRelevant()
     if (!UserConfigParams::m_fullscreen &&
          UserConfigParams::m_remember_window_location)
     {
-#ifdef WIN32
-        const video::SExposedVideoData& videoData = m_device->getVideoDriver()
-                                                     ->getExposedVideoData();
-        // this should work even if using DirectX in theory because the HWnd is
-        // always third pointer in the struct, no matter which union is used
-        HWND window = (HWND)videoData.OpenGLWin32.HWnd;
-        WINDOWPLACEMENT placement;
-        placement.length = sizeof(WINDOWPLACEMENT);
-        if (GetWindowPlacement(window, &placement))
+        int x = 0;
+        int y = 0;
+        
+        bool success = m_device->getWindowPosition(&x, &y);
+        
+        if (!success)
         {
-            int x = (int)placement.rcNormalPosition.left;
-            int y = (int)placement.rcNormalPosition.top;
-            // If the windows position is saved, it must be a non-negative
-            // number. So if the window is partly off screen, move it to the
-            // corresponding edge.
-            if(x<0) x = 0;
-            if(y<0) y = 0;
-            Log::verbose("irr_driver",
-                       "Retrieved window location for config : %i %i\n", x, y);
-
-            if (UserConfigParams::m_window_x != x || UserConfigParams::m_window_y != y)
-            {
-                UserConfigParams::m_window_x = x;
-                UserConfigParams::m_window_y = y;
-            }
+            Log::warn("irr_driver", "Could not retrieve window location");
+            return;
         }
-        else
-        {
-            Log::warn("irr_driver", "Could not retrieve window location\n");
-        }
-#elif defined(__linux__) && !defined(ANDROID)
-        if (m_device->getType() == EIDT_X11)
-        {
-            const video::SExposedVideoData& videoData =
-                m_device->getVideoDriver()->getExposedVideoData();
-            Display* display = (Display*)videoData.OpenGLLinux.X11Display;
-            XWindowAttributes xwa;
-            XGetWindowAttributes(display, get_toplevel_parent(display,
-                                       videoData.OpenGLLinux.X11Window), &xwa);
-            int wx = xwa.x;
-            int wy = xwa.y;
-            Log::verbose("irr_driver",
-                    "Retrieved window location for config : %i %i\n", wx, wy);
-    
-    
-            if (UserConfigParams::m_window_x != wx || 
-                UserConfigParams::m_window_y != wy)
-            {
-                UserConfigParams::m_window_x = wx;
-                UserConfigParams::m_window_y = wy;
-            }
-        }
-#endif
+        
+        Log::verbose("irr_driver", "Retrieved window location for config: "
+                                   "%i %i", x, y);
+                                   
+        // If the windows position is saved, it must be a non-negative
+        // number. So if the window is partly off screen, move it to the
+        // corresponding edge.
+        UserConfigParams::m_window_x = std::max(0, x);
+        UserConfigParams::m_window_y = std::max(0, y);
     }
-
 #endif   // !SERVER_ONLY
 }   // updateConfigIfRelevant
 
@@ -867,49 +784,13 @@ core::position2di IrrDriver::getMouseLocation()
 bool IrrDriver::moveWindow(int x, int y)
 {
 #ifndef SERVER_ONLY
-#ifdef WIN32
-    const video::SExposedVideoData& videoData =
-                    m_video_driver->getExposedVideoData();
-    // this should work even if using DirectX in theory,
-    // because the HWnd is always third pointer in the struct,
-    // no matter which union is used
-    HWND window = (HWND)videoData.OpenGLWin32.HWnd;
-    if (SetWindowPos(window, HWND_TOP, x, y, -1, -1,
-                     SWP_NOOWNERZORDER | SWP_NOSIZE))
-    {
-        // everything OK
-        return true;
-    }
-    else
+    bool success = m_device->moveWindow(x, y);
+    
+    if (!success)
     {
         Log::warn("irr_driver", "Could not set window location\n");
         return false;
     }
-#elif defined(__linux__) && !defined(ANDROID)
-    if (m_device->getType() == EIDT_X11)
-    {
-        const video::SExposedVideoData& videoData = 
-                                        m_video_driver->getExposedVideoData();
-    
-        Display* display = (Display*)videoData.OpenGLLinux.X11Display;
-        int screen = DefaultScreen(display);
-        int screen_w = DisplayWidth(display, screen);
-        int screen_h = DisplayHeight(display, screen);
-    
-        if (x + UserConfigParams::m_width > screen_w)
-        {
-            x = screen_w - UserConfigParams::m_width;
-        }
-    
-        if (y + UserConfigParams::m_height > screen_h)
-        {
-            y = screen_h - UserConfigParams::m_height;
-        }
-    
-        // TODO: Actually handle possible failure
-        XMoveWindow(display, videoData.OpenGLLinux.X11Window, x, y);
-    }
-#endif
 #endif
     return true;
 }

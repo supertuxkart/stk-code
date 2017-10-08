@@ -32,12 +32,9 @@
 //! DEVICE is the windowing system used, several PLATFORMs support more than one DEVICE
 //! Irrlicht can be compiled with more than one device
 //! _IRR_COMPILE_WITH_WINDOWS_DEVICE_ for Windows API based device
-//! _IRR_COMPILE_WITH_WINDOWS_CE_DEVICE_ for Windows CE API based device
 //! _IRR_COMPILE_WITH_OSX_DEVICE_ for Cocoa native windowing on OSX
 //! _IRR_COMPILE_WITH_X11_DEVICE_ for Linux X11 based device
 //! _IRR_COMPILE_WITH_SDL_DEVICE_ for platform independent SDL framework
-//! _IRR_COMPILE_WITH_CONSOLE_DEVICE_ for no windowing system, used as a fallback
-//! _IRR_COMPILE_WITH_FB_DEVICE_ for framebuffer systems
 
 //! Passing defines to the compiler which have NO in front of the _IRR definename is an alternative
 //! way which can be used to disable defines (instead of outcommenting them in this header).
@@ -52,11 +49,6 @@
 #undef _IRR_COMPILE_WITH_SDL_DEVICE_
 #endif
 
-//! Comment this line to compile without the fallback console device.
-#define _IRR_COMPILE_WITH_CONSOLE_DEVICE_
-#ifdef NO_IRR_COMPILE_WITH_CONSOLE_DEVICE_
-#undef _IRR_COMPILE_WITH_CONSOLE_DEVICE_
-#endif
 
 //! WIN32 for Windows32
 //! WIN64 for Windows64
@@ -67,13 +59,6 @@
 #define _IRR_COMPILE_WITH_WINDOWS_DEVICE_
 #endif
 
-//! WINCE is a very restricted environment for mobile devices
-#if defined(_WIN32_WCE)
-#define _IRR_WINDOWS_
-#define _IRR_WINDOWS_API_
-#define _IRR_WINDOWS_CE_PLATFORM_
-#define _IRR_COMPILE_WITH_WINDOWS_CE_DEVICE_
-#endif
 
 #if defined(_MSC_VER) && (_MSC_VER < 1300)
 #  error "Only Microsoft Visual Studio 7.0 and later are supported."

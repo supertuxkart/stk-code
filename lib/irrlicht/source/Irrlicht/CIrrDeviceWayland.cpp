@@ -1073,6 +1073,18 @@ void CIrrDeviceWayland::restoreWindow()
 {
 }
 
+//! Move window to requested position
+bool CIrrDeviceWayland::moveWindow(int x, int y)
+{
+    return false;
+}
+
+//! Get current window position.
+bool CIrrDeviceWayland::getWindowPosition(int* x, int* y)
+{
+    return false;
+}
+
 //! Set the current Gamma Value for the Display
 bool CIrrDeviceWayland::setGammaRamp(f32 red, f32 green, f32 blue,
                                      f32 brightness, f32 contrast)

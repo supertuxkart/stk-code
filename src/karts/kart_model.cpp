@@ -215,6 +215,10 @@ void KartModel::loadInfo(const XMLNode &node)
         }
     }
 
+    if (const XMLNode* exhaust = node.getNode("exhaust"))
+    {
+        exhaust->get("file", &m_exhaust_xml);
+    }
 }   // loadInfo
 
 // ----------------------------------------------------------------------------
@@ -336,6 +340,7 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
     km->m_render_info           = new RenderInfo();
     km->m_inverse_bone_matrices = m_inverse_bone_matrices;
     km->m_version               = m_version;
+    km->m_exhaust_xml           = m_exhaust_xml;
     km->m_render_info->setKartModelRenderInfo(krt);
 
     km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
@@ -1206,6 +1211,12 @@ void KartModel::toggleHeadlights(bool on)
 }   // toggleHeadlights
 
 //-----------------------------------------------------------------------------
+/** Called when a kart is load. this will load all the inverse bone matrices
+ *  for each bone in straight frame. The location, rotation and scale in
+ *  kart.xml for attachments (speedweighted objects, headlight, hat...) are in
+ *  object space, so if you use a inverse bone matrix * that matrix, it will be
+ *  relative to the bone, and you can use the result to set parent.
+ */
 void KartModel::initInverseBoneMatrices()
 {
     if (m_version < 3)
@@ -1225,16 +1236,19 @@ void KartModel::initInverseBoneMatrices()
             m_model_filename.c_str());
         striaght_frame = 0.0f;
     }
-    node->setCurrentFrame(striaght_frame);
+
     const unsigned total_joint = node->getJointCount();
     for (unsigned i = 0; i < total_joint; i++)
     {
+        node->setCurrentFrame(striaght_frame);
         node->OnAnimate(0);
         scene::IBoneSceneNode* bone = node->getJointNode(i);
         bone->updateAbsolutePosition();
-        const core::matrix4 mat = bone->getAbsoluteTransformation();
+        node->setCurrentFrame(striaght_frame);
+        node->OnAnimate(0);
+        bone->updateAbsolutePosition();
         core::matrix4 inv;
-        mat.getInverse(inv);
+        bone->getAbsoluteTransformation().getInverse(inv);
         const std::string bone_name = bone->getName();
         auto ret = m_inverse_bone_matrices.find(bone_name);
         if (ret != m_inverse_bone_matrices.end())
