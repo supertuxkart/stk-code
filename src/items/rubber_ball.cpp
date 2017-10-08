@@ -377,8 +377,10 @@ bool RubberBall::updateAndDelete(float dt)
     float height    = updateHeight()+m_extend.getY()*0.5f;
     
     if(UserConfigParams::logFlyable())
-        Log::debug("[RubberBall]", "ball %d: %f %f %f height %f gethot %f ",
-                m_id, next_xyz.getX(), next_xyz.getY(), next_xyz.getZ(), height, getHoT());
+        Log::debug("[RubberBall]", "ball %d: %f %f %f height %f gethot %f terrain %d aim %d",
+                m_id, next_xyz.getX(), next_xyz.getY(), next_xyz.getZ(), height, getHoT(),
+			    isOnRoad(),
+            m_aiming_at_target);
 
     // No need to check for terrain height if the ball is low to the ground
     if(height > 0.5f)
@@ -442,17 +444,6 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
     else
         *next_xyz = getXYZ() - getNormal()*m_previous_height +(dt*m_speed / diff.length())*diff;
 
-    Vec3 old_vec = getXYZ()-m_previous_xyz;
-    Vec3 new_vec = *next_xyz - getXYZ();
-    //float angle  = atan2(new_vec.getZ(), new_vec.getX())
-    //             - atan2(old_vec.getZ(), old_vec.getX());
-    float angle = new_vec.angle(old_vec);
-    
-    // Adjust angle to be between -180 and 180 degrees
-    if(angle < -M_PI)
-        angle += 2*M_PI;
-    else if(angle > M_PI)
-        angle -= 2*M_PI;
     // If ball is close to the target, then explode
     if (diff.length() < m_target->getKartLength()) 
         hit((AbstractKart*)m_target);
