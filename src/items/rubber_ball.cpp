@@ -403,7 +403,7 @@ bool RubberBall::updateAndDelete(float dt)
         Log::verbose("RubberBall", "newy2 %f gmth %f", height,
                      getTunnelHeight(next_xyz,vertical_offset));
 
-    next_xyz = next_xyz + getNormal()*(height);
+    next_xyz = getHitPoint() + getNormal()*(height);
     m_previous_xyz = getXYZ();
     m_previous_height = (getXYZ() - getHitPoint()).length();
     setXYZ(next_xyz);
