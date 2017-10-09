@@ -40,11 +40,12 @@ void main(void)
         col = vec4(new_color.r, new_color.g, new_color.b, col.a);
     }
 
-#if defined(GL_ES) && !defined(Advanced_Lighting_Enabled)
-    col.xyz *= color.xyz;
-#else
+#if defined(sRGB_Framebuffer_Usable) || defined(Advanced_Lighting_Enabled)
     col.xyz *= pow(color.xyz, vec3(2.2));
+#else
+    col.xyz *= color.xyz;
 #endif
+
     float specmap = texture(SpecMap, uv).g;
     float emitmap = texture(SpecMap, uv).b;
     FragColor = vec4(getLightFactor(col.xyz, vec3(1.), specmap, emitmap), 1.);

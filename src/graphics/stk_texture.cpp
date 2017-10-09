@@ -50,12 +50,14 @@ STKTexture::STKTexture(const std::string& path, TexConfig* tc, bool no_upload)
             m_material = material_manager->getMaterialFor(this);
     }
 #ifndef SERVER_ONLY
-    if (m_tex_config && !CVS->isGLSL())
-        m_tex_config->m_srgb = false;
-#ifdef USE_GLES2
-    if (m_tex_config && !CVS->isDefferedEnabled())
-        m_tex_config->m_srgb = false;
-#endif
+    if (m_tex_config)
+    {
+        if ((!CVS->isARBSRGBFramebufferUsable() && !CVS->isDefferedEnabled()) ||
+            !CVS->isGLSL())
+        {
+            m_tex_config->m_srgb = false;
+        }
+    }
     if (!CVS->isARBTextureSwizzleUsable())
         m_single_channel = false;
 #endif
@@ -332,10 +334,12 @@ void STKTexture::formatConversion(uint8_t* data, unsigned int* format,
             if (alpha > 0.0f)
             {
                 alpha /= 255.0f;
-#if defined(USE_GLES2)
-                if (CVS->isDefferedEnabled())
-#endif
+
+                if (CVS->isARBSRGBFramebufferUsable() || 
+                    CVS->isDefferedEnabled())
+                {
                     alpha = pow(alpha, 1.0f / 2.2f);
+                }
             }
             data[i * 4] = (uint8_t)(data[i * 4] * alpha);
             data[i * 4 + 1] = (uint8_t)(data[i * 4 + 1] * alpha);

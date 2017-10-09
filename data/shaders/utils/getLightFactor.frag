@@ -19,7 +19,7 @@ vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapVa
     vec3 emitCol = diffuseMatColor.xyz * diffuseMatColor.xyz * diffuseMatColor.xyz * 15.;
     return tmp * ao + (emitMapValue * emitCol);
 #else
-#if defined(GL_ES)
+#if !defined(sRGB_Framebuffer_Usable)
     return diffuseMatColor * 0.73; // 0.5 ^ (1. / 2.2)
 #else
     return diffuseMatColor * 0.5;
