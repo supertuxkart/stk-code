@@ -490,8 +490,7 @@ void IrrDriver::initDevice()
     // Though we are able to force to use the proper format on mesa side by
     // setting WithAlphaChannel parameter.
 #ifndef SERVER_ONLY
-    else if (CVS->isARBSRGBFramebufferUsable() &&
-             CVS->needsSRGBCapableVisualWorkaround())
+    else if (CVS->needsSRGBCapableVisualWorkaround())
     {
         Log::warn("irr_driver", "Created visual is not sRGB-capable. "
                                 "Re-creating device to workaround the issue.");

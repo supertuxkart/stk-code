@@ -238,13 +238,19 @@ void CentralVideoSettings::init()
         }
 
         // Check if visual is sRGB-capable
-        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKAROUND2) &&
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB) &&
+            GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKAROUND2) &&
             m_glsl == true)
         {
             GLint param = GL_SRGB;
             glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT,
                               GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &param);
             m_need_srgb_visual_workaround = (param != GL_SRGB);
+            
+            if (m_need_srgb_visual_workaround)
+            {
+                hasSRGBFramebuffer = false;
+            }
         }
 #else
         if (m_glsl == true)
