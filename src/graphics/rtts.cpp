@@ -101,9 +101,10 @@ RTT::RTT(size_t width, size_t height, float rtt_scale)
         diffuse_specular_internal_format = GL_RGBA8;
         type = GL_UNSIGNED_BYTE;
     }
-    
-    srgb_internal_format = GL_RGBA8;
 #endif
+
+    if (!CVS->isARBSRGBFramebufferUsable())
+        srgb_internal_format = GL_RGBA8;
 
     RenderTargetTextures[RTT_TMP1] = generateRTT(res, rgba_internal_format, rgba_format, type);
     RenderTargetTextures[RTT_TMP2] = generateRTT(res, rgba_internal_format, rgba_format, type);
