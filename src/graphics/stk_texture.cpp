@@ -313,6 +313,7 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
 void STKTexture::formatConversion(uint8_t* data, unsigned int* format,
                                   unsigned int w, unsigned int h) const
 {
+#ifndef SERVER_ONLY
 #if defined(USE_GLES2)
     if (!m_single_channel)
     {
@@ -346,6 +347,7 @@ void STKTexture::formatConversion(uint8_t* data, unsigned int* format,
             data[i * 4 + 2] = (uint8_t)(data[i * 4 + 2] * alpha);
         }
     }
+#endif   // !SERVER_ONLY
 }   // formatConversion
 
 // ----------------------------------------------------------------------------
