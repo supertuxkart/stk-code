@@ -1573,11 +1573,6 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         PROFILER_POP_CPU_MARKER();
     }
 
-    // Workaround a bug with srgb fbo on sandy bridge windows
-    if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKAROUND1) &&
-        CVS->isARBSRGBFramebufferUsable())
-        return in_fbo;
-
 #if !defined(USE_GLES2)
     if (CVS->isARBSRGBFramebufferUsable())
         glEnable(GL_FRAMEBUFFER_SRGB);
