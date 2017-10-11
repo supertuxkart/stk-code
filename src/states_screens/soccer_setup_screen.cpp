@@ -172,9 +172,7 @@ void SoccerSetupScreen::beforeAddingWidget()
         {
             model_location.setTranslation(kart_model
                 .getWheelGraphicsPosition(i).toIrrVector());
-            kart_view->addModel(kart_model.getWheelModel(i), model_location,
-                -1/*start_loop_frame*/ -1/*end_loop_frame*/,
-                true/*all_parts_colorized*/);
+            kart_view->addModel(kart_model.getWheelModel(i), model_location);
         }
 
         for (unsigned i = 0; i < kart_model.getSpeedWeightedObjectsCount();
@@ -189,8 +187,8 @@ void SoccerSetupScreen::beforeAddingWidget()
                     kart_model.getInverseBoneMatrix(obj.m_bone_name);
                 swol = inv * obj.m_location;
             }
-            kart_view->addModel(obj.m_model, swol, -1, -1, true, 0.0f,
-                obj.m_bone_name);
+            kart_view->addModel(obj.m_model, swol, -1, -1,
+                false/*all_parts_colorized*/, 0.0f, obj.m_bone_name);
         }
 
         kart_view->setRotateContinuously( KART_CONTINUOUS_ROTATION_SPEED );

@@ -486,7 +486,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
         {
             if(!m_wheel_model[i]) continue;
             m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], "wheel",
-                              node, getRenderInfo(), true/*all_parts_colorized*/);
+                              node, getRenderInfo());
             Vec3 wheel_min, wheel_max;
             MeshTools::minMax3D(m_wheel_model[i], &wheel_min, &wheel_max);
             m_wheel_graphics_radius[i] = 0.5f*(wheel_max.getY() - wheel_min.getY());
@@ -518,8 +518,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
             {
                 // Only need to keep track of animated node for speed setting
                 obj.m_node = irr_driver->addAnimatedMesh(obj.m_model, 
-                    "speedweighted", parent, getRenderInfo(),
-                    true/*all_parts_colorized*/);
+                    "speedweighted", parent, getRenderInfo());
                 swo = obj.m_node;
                 obj.m_node->grab();
                 obj.m_node->setFrameLoop(0, obj.m_model->getFrameCount() - 1);
@@ -527,8 +526,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
             else
             {
                 swo = irr_driver->addMesh(obj.m_model->getMesh(0),
-                    "speedweighted", parent, getRenderInfo(),
-                    true/*all_parts_colorized*/);
+                    "speedweighted", parent, getRenderInfo());
             }
 #ifdef DEBUG
             std::string debug_name = obj.m_name + " (speed-weighted)";
