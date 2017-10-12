@@ -26,7 +26,7 @@ void main(void)
     tc = Texcoord;
     lf = lifetime;
     pc = vec4(vec3(color_from + (color_to - color_from) * lf), 1.0) * smoothstep(1., 0.8, lf);
-#if defined(GL_ES) && !defined(Advanced_Lighting_Enabled)
+#if !defined(sRGB_Framebuffer_Usable) && !defined(Advanced_Lighting_Enabled)
     pc.rgb = pow(pc.rgb, vec3(1. / 2.2));
 #endif
     vec3 newposition = Position;
