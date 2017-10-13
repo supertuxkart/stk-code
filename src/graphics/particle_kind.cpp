@@ -261,7 +261,11 @@ Material* ParticleKind::getMaterial() const
     if (material_manager->hasMaterial(m_material_file))
     {
         Material* material = material_manager->getMaterial(m_material_file);
-        if (material == NULL || material->getTexture(true/*srgb*/, true/*premul_alpha*/) == NULL)
+        if (material == NULL ||
+            material->getTexture(true/*srgb*/,
+            material->getShaderType() == Material::SHADERTYPE_ADDITIVE ||
+            material->getShaderType() == Material::SHADERTYPE_ALPHA_BLEND ?
+            true : false/*premul_alpha*/) == NULL)
         {
             throw std::runtime_error("[ParticleKind] Cannot locate file " + m_material_file);
         }

@@ -512,13 +512,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::renderParticles()
 {
-    glDepthMask(GL_FALSE);
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
     m_draw_calls.renderParticlesList();
-
-//    m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
 } //renderParticles
 
 // ----------------------------------------------------------------------------
@@ -971,9 +965,10 @@ void ShaderBasedRenderer::preloadShaderFiles()
 
     sfm->addShaderFile("billboard.vert", GL_VERTEX_SHADER);
     sfm->addShaderFile("billboard.frag", GL_FRAGMENT_SHADER);
-    sfm->addShaderFile("pointemitter.vert", GL_VERTEX_SHADER);
-    sfm->addShaderFile("particle.vert", GL_VERTEX_SHADER);
-    sfm->addShaderFile("particle.frag", GL_FRAGMENT_SHADER);
+    sfm->addShaderFile("alphatest_particle.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("alphatest_particle.frag", GL_FRAGMENT_SHADER);
+    sfm->addShaderFile("simple_particle.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("simple_particle.frag", GL_FRAGMENT_SHADER);
 
     if (CVS->supportsIndirectInstancingRendering())
     {

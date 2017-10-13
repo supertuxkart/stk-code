@@ -97,7 +97,6 @@
 #include "graphics/callbacks.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
-#include "graphics/gpu_particles.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "io/file_manager.hpp"

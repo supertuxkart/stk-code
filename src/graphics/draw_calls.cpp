@@ -20,8 +20,8 @@
 
 #include "config/user_config.hpp"
 #include "graphics/command_buffer.hpp"
+#include "graphics/cpu_particle_manager.hpp"
 #include "graphics/draw_tools.hpp"
-#include "graphics/gpu_particles.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/materials.hpp"
 #include "graphics/render_info.hpp"
@@ -30,6 +30,7 @@
 #include "graphics/stk_animated_mesh.hpp"
 #include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh.hpp"
+#include "graphics/stk_particle.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
 
@@ -64,6 +65,7 @@ void DrawCalls::clearLists()
     m_immediate_draw_list.clear();
     m_billboard_list.clear();
     m_particles_list.clear();
+    CPUParticleManager::getInstance()->reset();
 }
 
 // ----------------------------------------------------------------------------
@@ -562,10 +564,10 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
         if (!(*I)->isVisible())
             continue;
 
-        if (ParticleSystemProxy *node = dynamic_cast<ParticleSystemProxy *>(*I))
+        if (STKParticle *node = dynamic_cast<STKParticle *>(*I))
         {
-            if (!isCulledPrecise(cam, *I))
-                m_particles_list.push_back(node);
+            if (!isCulledPrecise(cam, *I, irr_driver->getBoundingBoxesViz()))
+                CPUParticleManager::getInstance()->addParticleNode(node);
             continue;
         }
 
@@ -604,7 +606,7 @@ DrawCalls::DrawCalls()
 
 DrawCalls::~DrawCalls()
 {
-
+    CPUParticleManager::kill();
 #if !defined(USE_GLES2)
     delete m_solid_cmd_buffer;
     delete m_shadow_cmd_buffer;
@@ -646,6 +648,9 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
     PROFILER_POP_CPU_MARKER();
 
     irr_driver->setSkinningJoint(getSkinningOffset());
+    PROFILER_PUSH_CPU_MARKER("- cpu particle generation", 0x2F, 0x1F, 0x11);
+    CPUParticleManager::getInstance()->generateAll();
+    PROFILER_POP_CPU_MARKER();
     // Add a 1 s timeout
     if (!m_sync)
         m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
@@ -682,6 +687,10 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
     PROFILER_PUSH_CPU_MARKER("- Animations/Buffer upload", 0x0, 0x0, 0x0);
     for (unsigned i = 0; i < m_deferred_update.size(); i++)
         m_deferred_update[i]->updateGL();
+    PROFILER_POP_CPU_MARKER();
+
+    PROFILER_PUSH_CPU_MARKER("- cpu particle upload", 0x3F, 0x03, 0x61);
+    CPUParticleManager::getInstance()->uploadAll();
     PROFILER_POP_CPU_MARKER();
 
     if (!CVS->supportsIndirectInstancingRendering())
@@ -726,9 +735,7 @@ void DrawCalls::renderBillboardList() const
 // ----------------------------------------------------------------------------
 void DrawCalls::renderParticlesList() const
 {
-    glActiveTexture(GL_TEXTURE0);
-    for(auto particles: m_particles_list)
-        particles->render();
+    CPUParticleManager::getInstance()->drawAll();
 }
 
 #if !defined(USE_GLES2)

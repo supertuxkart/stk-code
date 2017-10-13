@@ -21,11 +21,11 @@
 #include "graphics/particle_emitter.hpp"
 
 #include "graphics/central_settings.hpp"
-#include "graphics/gpu_particles.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind.hpp"
+#include "graphics/stk_particle.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track.hpp"
@@ -271,7 +271,9 @@ public:
         {
             const u32 maxdiff = particlearray[i].endTime - particlearray[i].startTime;
             const u32 curdiff = now - particlearray[i].startTime;
-            const f32 timefraction = (f32)curdiff / maxdiff;
+            f32 timefraction = 0.0f;
+            if (maxdiff > 0)
+                timefraction = (f32)curdiff / maxdiff;
             core::vector3df curr_color = m_color_from + (m_color_to - m_color_from)* timefraction;
             particlearray[i].color = video::SColor(255, (int)curr_color.X, (int)curr_color.Y, (int)curr_color.Z);
         }
@@ -464,19 +466,9 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         else
         {
             if (m_is_glsl)
-                m_node = ParticleSystemProxy::addParticleNode(m_is_glsl, type->randomizeInitialY());
+                m_node = STKParticle::addParticleNode(m_is_glsl, type->randomizeInitialY());
             else
                 m_node = irr_driver->addParticleNode();
-            
-            if (m_is_glsl)
-            {
-                Material* material = type->getMaterial();
-                if (material != nullptr)
-                {
-                    bool additive = (material->getShaderType() == Material::SHADERTYPE_ADDITIVE);
-                    static_cast<ParticleSystemProxy *>(m_node)->setAlphaAdditive(additive);
-                }
-            }
         }
 
         if (m_parent != NULL)
@@ -645,7 +637,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         {
             if (m_is_glsl)
             {
-                static_cast<ParticleSystemProxy *>(m_node)->setIncreaseFactor(type->getScaleAffectorFactorX());
+                static_cast<STKParticle*>(m_node)->setIncreaseFactor(type->getScaleAffectorFactorX());
             }
             else
             {
@@ -662,12 +654,12 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             if (m_is_glsl)
             {
                 video::SColor color_from = type->getMinColor();
-                static_cast<ParticleSystemProxy *>(m_node)->setColorFrom(color_from.getRed() / 255.0f,
+                static_cast<STKParticle*>(m_node)->setColorFrom(color_from.getRed() / 255.0f,
                     color_from.getGreen() / 255.0f,
                     color_from.getBlue() / 255.0f);
 
                 video::SColor color_to = type->getMaxColor();
-                static_cast<ParticleSystemProxy *>(m_node)->setColorTo(color_to.getRed() / 255.0f,
+                static_cast<STKParticle*>(m_node)->setColorTo(color_to.getRed() / 255.0f,
                     color_to.getGreen() / 255.0f,
                     color_to.getBlue() / 255.0f);
             }
@@ -704,7 +696,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         if (flips)
         {
             if (m_is_glsl)
-                static_cast<ParticleSystemProxy *>(m_node)->setFlip();
+                static_cast<STKParticle*>(m_node)->setFlips();
         }
     }
 }   // setParticleType
@@ -722,7 +714,8 @@ void ParticleEmitter::addHeightMapAffector(Track* t)
         float track_z = aabb_min->getZ();
         const float track_x_len = aabb_max->getX() - aabb_min->getX();
         const float track_z_len = aabb_max->getZ() - aabb_min->getZ();
-        static_cast<ParticleSystemProxy *>(m_node)->setHeightmap(t->buildHeightMap(),
+        std::vector<std::vector<float> > array = t->buildHeightMap();
+        static_cast<STKParticle*>(m_node)->setHeightmap(array,
             track_x, track_z, track_x_len, track_z_len);
     }
     else
