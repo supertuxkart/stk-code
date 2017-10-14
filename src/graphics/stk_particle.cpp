@@ -517,6 +517,7 @@ void STKParticle::OnRegisterSceneNode()
     }
     generate(NULL);
     Particles.clear();
+    Buffer->BoundingBox.reset(AbsoluteTransformation.getTranslation());
     for (unsigned i = 0; i < m_particles_generating.size(); i++)
     {
         if (m_particles_generating[i].m_size == 0.0f)
@@ -536,6 +537,8 @@ void STKParticle::OnRegisterSceneNode()
         p.color.setAlpha(255);
         Particles.push_back(p);
     }
+    core::matrix4 inv(AbsoluteTransformation, core::matrix4::EM4CONST_INVERSE);
+    inv.transformBoxEx(Buffer->BoundingBox);
     if (IsVisible && (!Particles.empty()))
     {
         SceneManager->registerNodeForRendering(this);
