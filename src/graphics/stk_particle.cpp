@@ -18,6 +18,7 @@
 #ifndef SERVER_ONLY
 
 #include "graphics/stk_particle.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/cpu_particle_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
@@ -505,5 +506,41 @@ void STKParticle::updateFlips(unsigned maximum_particle_count)
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 }   // updateFlips
+
+// ----------------------------------------------------------------------------
+void STKParticle::OnRegisterSceneNode()
+{
+    if (CVS->isGLSL())
+    {
+        Log::warn("STKParticle", "Don't call OnRegisterSceneNode with GLSL");
+        return;
+    }
+    generate(NULL);
+    Particles.clear();
+    for (unsigned i = 0; i < m_particles_generating.size(); i++)
+    {
+        if (m_particles_generating[i].m_size == 0.0f)
+        {
+            continue;
+        }
+        scene::SParticle p;
+        p.pos = m_particles_generating[i].m_position;
+        Buffer->BoundingBox.addInternalPoint(p.pos);
+        p.size = core::dimension2df(m_particles_generating[i].m_size,
+            m_particles_generating[i].m_size);
+        core::vector3df ret = m_color_from + (m_color_to - m_color_from) *
+            m_particles_generating[i].m_lifetime;
+        p.color.setRed(core::clamp((int)(ret.X * 255.0f), 0, 255));
+        p.color.setBlue(core::clamp((int)(ret.Y * 255.0f), 0, 255));
+        p.color.setGreen(core::clamp((int)(ret.Z * 255.0f), 0, 255));
+        p.color.setAlpha(255);
+        Particles.push_back(p);
+    }
+    if (IsVisible && (!Particles.empty()))
+    {
+        SceneManager->registerNodeForRendering(this);
+        ISceneNode::OnRegisterSceneNode();
+    }
+}   // OnRegisterSceneNode
 
 #endif   // SERVER_ONLY

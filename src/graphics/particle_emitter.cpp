@@ -304,7 +304,7 @@ ParticleEmitter::ParticleEmitter(const ParticleKind* type,
     m_particle_type       = NULL;
     m_parent              = parent;
     m_emission_decay_rate = 0;
-    m_is_glsl = CVS->isGLSL();
+    m_is_glsl = true;//CVS->isGLSL();
     m_randomize_initial_y = randomize_initial_y;
     m_important = important;
 

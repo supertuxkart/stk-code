@@ -123,7 +123,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void setEmitter(scene::IParticleEmitter* emitter);
     // ------------------------------------------------------------------------
-    virtual void render() {}
+    virtual void OnRegisterSceneNode();
     // ------------------------------------------------------------------------
     void setIncreaseFactor(float val)         { m_size_increase_factor = val; }
     // ------------------------------------------------------------------------
