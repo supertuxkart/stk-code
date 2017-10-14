@@ -32,8 +32,7 @@
 // ============================================================================
 /** A Shader to render particles.
 */
-class ParticleRenderer : public TextureShader
-    <ParticleRenderer, 2, video::SColorf, video::SColorf, int>
+class ParticleRenderer : public TextureShader<ParticleRenderer, 2, int>
 {
 public:
     ParticleRenderer()
@@ -41,7 +40,7 @@ public:
         loadProgram(PARTICLES_RENDERING,
                     GL_VERTEX_SHADER,   "simple_particle.vert",
                     GL_FRAGMENT_SHADER, "simple_particle.frag");
-        assignUniforms("color_from", "color_to", "flips");
+        assignUniforms("flips");
         assignSamplerNames(0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "dtex", ST_NEAREST_FILTERED);
     }   // ParticleRenderer
@@ -51,7 +50,7 @@ public:
 /** A Shader to render alpha-test particles.
 */
 class AlphaTestParticleRenderer : public TextureShader
-    <AlphaTestParticleRenderer, 1, video::SColorf, video::SColorf, int>
+    <AlphaTestParticleRenderer, 1, int>
 {
 public:
     AlphaTestParticleRenderer()
@@ -59,7 +58,7 @@ public:
         loadProgram(PARTICLES_RENDERING,
                     GL_VERTEX_SHADER,   "alphatest_particle.vert",
                     GL_FRAGMENT_SHADER, "alphatest_particle.frag");
-        assignUniforms("color_from", "color_to", "flips");
+        assignUniforms("flips");
         assignSamplerNames(0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // AlphaTestParticleRenderer
 };   // AlphaTestParticleRenderer
@@ -164,10 +163,12 @@ void CPUParticleManager::uploadAll()
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 20, 0);
             glVertexAttribDivisorARB(0, 1);
             glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 20, (void*)12);
+            glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, 20,
+                (void*)12);
             glVertexAttribDivisorARB(1, 1);
             glEnableVertexAttribArray(2);
-            glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 20, (void*)16);
+            glVertexAttribPointer(2, 2, GL_HALF_FLOAT, GL_FALSE, 20,
+                (void*)16);
             glVertexAttribDivisorARB(2, 1);
             bool flips = false;
             for (unsigned i = 0; i < m_particles_queue[p.first].size(); i++)
@@ -282,17 +283,13 @@ void CPUParticleManager::drawAll()
             ParticleRenderer::getInstance()->setTextureUnits
                 (cur_mat->getTexture()->getOpenGLTextureName(),
                 irr_driver->getDepthStencilTexture());
-            ParticleRenderer::getInstance()->setUniforms(
-                m_particles_queue.at(p.second)[0]->getColorFrom(),
-                m_particles_queue.at(p.second)[0]->getColorTo(), flips);
+            ParticleRenderer::getInstance()->setUniforms(flips);
         }
         else
         {
             AlphaTestParticleRenderer::getInstance()->setTextureUnits
                 (cur_mat->getTexture()->getOpenGLTextureName());
-            AlphaTestParticleRenderer::getInstance()->setUniforms(
-                m_particles_queue.at(p.second)[0]->getColorFrom(),
-                m_particles_queue.at(p.second)[0]->getColorTo(), flips);
+            AlphaTestParticleRenderer::getInstance()->setUniforms(flips);
         }
         glBindVertexArray(std::get<0>(m_gl_particles[p.second]));
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4,

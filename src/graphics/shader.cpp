@@ -156,15 +156,16 @@ void ShaderBase::setAttribute(AttributeType type)
         glBindAttribLocation(m_program, 5, "lifetime_initial");
         glBindAttribLocation(m_program, 6, "particle_velocity_initial");
         glBindAttribLocation(m_program, 7, "size_initial");
-        
         if (CVS->needsVertexIdWorkaround())
         {
             glBindAttribLocation(m_program, 8, "vertex_id");
         }
         break;
     case PARTICLES_RENDERING:
-        glBindAttribLocation(m_program, 1, "lifetime");
-        glBindAttribLocation(m_program, 2, "size");
+        glBindAttribLocation(m_program, 0, "Position");
+        glBindAttribLocation(m_program, 1, "mixed_color");
+        glBindAttribLocation(m_program, 2, "lifetime_and_size");
+        glBindAttribLocation(m_program, 3, "Texcoord");
         glBindAttribLocation(m_program, 4, "quadcorner");
         glBindAttribLocation(m_program, 5, "rotationvec");
         glBindAttribLocation(m_program, 6, "anglespeed");

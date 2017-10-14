@@ -21,6 +21,7 @@
 #ifndef SERVER_ONLY
 
 #include "graphics/gl_headers.hpp"
+#include "utils/mini_glm.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/singleton.hpp"
 
@@ -39,11 +40,21 @@ using namespace irr;
 struct CPUParticle
 {
     core::vector3df m_position;
-    float m_lifetime;
-    float m_size;
+    video::SColor m_mixed_color;
+    short m_lifetime_and_size[2];
     // ------------------------------------------------------------------------
-    CPUParticle(const core::vector3df& position, float lifetime, float size)
-         : m_position(position), m_lifetime(lifetime), m_size(size) {}
+    CPUParticle(const core::vector3df& position,
+                const core::vector3df& color_from,
+                const core::vector3df& color_to, float lifetime, float size)
+         : m_position(position), m_mixed_color(-1)
+    {
+        core::vector3df ret = color_from + (color_to - color_from) * lifetime;
+        m_mixed_color.setRed(core::clamp((int)(ret.X * 255.0f), 0, 255));
+        m_mixed_color.setBlue(core::clamp((int)(ret.Y * 255.0f), 0, 255));
+        m_mixed_color.setGreen(core::clamp((int)(ret.Z * 255.0f), 0, 255));
+        m_lifetime_and_size[0] = MiniGLM::toFloat16(lifetime);
+        m_lifetime_and_size[1] = MiniGLM::toFloat16(size);
+    }
 };
 
 class STKParticle;

@@ -59,7 +59,7 @@ private:
 
     std::vector<ParticleData> m_particles_generating, m_initial_particles;
 
-    video::SColorf m_color_from, m_color_to;
+    core::vector3df m_color_from, m_color_to;
 
     float m_size_increase_factor;
 
@@ -109,21 +109,17 @@ public:
     // ------------------------------------------------------------------------
     void setColorFrom(float r, float g, float b)
     {
-        m_color_from.r = r;
-        m_color_from.g = g;
-        m_color_from.b = b;
+        m_color_from.X = r;
+        m_color_from.Y = g;
+        m_color_from.Z = b;
     }
     // ------------------------------------------------------------------------
     void setColorTo(float r, float g, float b)
     {
-        m_color_to.r = r;
-        m_color_to.g = g;
-        m_color_to.b = b;
+        m_color_to.X = r;
+        m_color_to.Y = g;
+        m_color_to.Z = b;
     }
-    // ------------------------------------------------------------------------
-    const video::SColorf getColorFrom() const          { return m_color_from; }
-    // ------------------------------------------------------------------------
-    const video::SColorf getColorTo() const              { return m_color_to; }
     // ------------------------------------------------------------------------
     virtual void setEmitter(scene::IParticleEmitter* emitter);
     // ------------------------------------------------------------------------

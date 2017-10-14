@@ -57,7 +57,7 @@ STKParticle::STKParticle(bool createDefaultEmitter,
                                       position, rotation, scale)
 {
     m_hm = NULL;
-    m_color_to = video::SColorf(video::SColor(-1));
+    m_color_to = core::vector3df(1.0f);
     m_color_from = m_color_to;
     m_size_increase_factor = 0.0f;
     m_first_execution = true;
@@ -358,8 +358,8 @@ void STKParticle::stimulateHeightMap(float dt, unsigned int active_count,
             }
             if (out != NULL)
             {
-                out->emplace_back(new_particle_position, new_lifetime,
-                    new_size);
+                out->emplace_back(new_particle_position, m_color_from,
+                    m_color_to, new_lifetime, new_size);
             }
         }
     }
@@ -463,8 +463,8 @@ void STKParticle::stimulateNormal(float dt, unsigned int active_count,
             }
             if (out != NULL)
             {
-                out->emplace_back(new_particle_position, new_lifetime,
-                    new_size);
+                out->emplace_back(new_particle_position, m_color_from,
+                    m_color_to, new_lifetime, new_size);
             }
         }
     }
