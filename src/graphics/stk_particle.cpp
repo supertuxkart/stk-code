@@ -255,16 +255,26 @@ void STKParticle::generate(std::vector<CPUParticle>* out)
     }
 
     Buffer->BoundingBox.reset(AbsoluteTransformation.getTranslation());
+    int active_count = getEmitter()->getMaxLifeTime() *
+        getEmitter()->getMaxParticlesPerSecond() / 1000;
     if (m_first_execution)
     {
         m_previous_frame_matrix = AbsoluteTransformation;
+        for (int i = 0; i < (m_max_count > 5000 ? 5 : 100); i++)
+        {
+            if (m_hm != NULL)
+            {
+                stimulateHeightMap(i, active_count, NULL);
+            }
+            else
+            {
+                stimulateNormal(i, active_count, NULL);
+            }
+        }
         m_first_execution = false;
     }
 
     float dt = GUIEngine::getLatestDt() * 1000.f;
-    int active_count = getEmitter()->getMaxLifeTime() *
-        getEmitter()->getMaxParticlesPerSecond() / 1000;
-
     if (m_hm != NULL)
     {
         stimulateHeightMap(dt, active_count, out);
@@ -350,14 +360,15 @@ void STKParticle::stimulateHeightMap(float dt, unsigned int active_count,
         m_particles_generating[i].m_lifetime = new_lifetime;
         m_particles_generating[i].m_direction = new_particle_direction;
         m_particles_generating[i].m_size = new_size;
-        if (m_flips || new_size != 0.0f)
+        if (out != NULL)
         {
-            if (new_size != 0.0f)
+            if (m_flips || new_size != 0.0f)
             {
-                Buffer->BoundingBox.addInternalPoint(new_particle_position);
-            }
-            if (out != NULL)
-            {
+                if (new_size != 0.0f)
+                {
+                    Buffer->BoundingBox.addInternalPoint
+                        (new_particle_position);
+                }
                 out->emplace_back(new_particle_position, m_color_from,
                     m_color_to, new_lifetime, new_size);
             }
@@ -455,14 +466,15 @@ void STKParticle::stimulateNormal(float dt, unsigned int active_count,
         m_particles_generating[i].m_lifetime = new_lifetime;
         m_particles_generating[i].m_direction = new_particle_direction;
         m_particles_generating[i].m_size = new_size;
-        if (m_flips || new_size != 0.0f)
+        if (out != NULL)
         {
-            if (new_size != 0.0f)
+            if (m_flips || new_size != 0.0f)
             {
-                Buffer->BoundingBox.addInternalPoint(new_particle_position);
-            }
-            if (out != NULL)
-            {
+                if (new_size != 0.0f)
+                {
+                    Buffer->BoundingBox.addInternalPoint
+                        (new_particle_position);
+                }
                 out->emplace_back(new_particle_position, m_color_from,
                     m_color_to, new_lifetime, new_size);
             }

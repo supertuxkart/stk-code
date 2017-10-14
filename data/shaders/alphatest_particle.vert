@@ -19,7 +19,7 @@ in vec2 lifetime_and_size;
 in vec2 Texcoord;
 in vec2 quadcorner;
 
-float anglespeed;
+in float anglespeed;
 #endif
 
 out vec2 tc;

@@ -67,7 +67,7 @@ private:
 
     /** Previous frame particles emitter source matrix */
     core::matrix4 m_previous_frame_matrix;
-    
+
     /** Maximum count of particles. */
     unsigned m_max_count;
 
