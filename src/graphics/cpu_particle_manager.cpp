@@ -72,7 +72,6 @@ CPUParticleManager::~CPUParticleManager()
         glDeleteVertexArrays(1, &std::get<0>(p.second));
         glDeleteBuffers(1, &std::get<1>(p.second));
     }
-    STKParticle::destroyFlipsBuffer();
 }   // ~CPUParticleManager
 
 // ----------------------------------------------------------------------------
@@ -182,11 +181,8 @@ void CPUParticleManager::uploadAll()
             if (flips)
             {
                 glBindBuffer(GL_ARRAY_BUFFER, STKParticle::getFlipsBuffer());
-                glEnableVertexAttribArray(5);
-                glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, 16, 0);
-                glVertexAttribDivisorARB(5, 1);
                 glEnableVertexAttribArray(6);
-                glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, 16, (void*)12);
+                glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, 4, 0);
                 glVertexAttribDivisorARB(6, 1);
             }
             glBindVertexArray(0);
@@ -249,7 +245,8 @@ void CPUParticleManager::drawAll()
             if (cur_mat->getShaderType() == Material::SHADERTYPE_ADDITIVE)
             {
                 ParticleRenderer::getInstance()->use();
-                glDisable(GL_DEPTH_TEST);
+                glEnable(GL_DEPTH_TEST);
+                glDepthFunc(GL_LEQUAL);
                 glDepthMask(GL_FALSE);
                 glDisable(GL_CULL_FACE);
                 glEnable(GL_BLEND);
@@ -260,7 +257,8 @@ void CPUParticleManager::drawAll()
                 ->getShaderType() == Material::SHADERTYPE_ALPHA_BLEND)
             {
                 ParticleRenderer::getInstance()->use();
-                glDisable(GL_DEPTH_TEST);
+                glEnable(GL_DEPTH_TEST);
+                glDepthFunc(GL_LEQUAL);
                 glDepthMask(GL_FALSE);
                 glDisable(GL_CULL_FACE);
                 glEnable(GL_BLEND);

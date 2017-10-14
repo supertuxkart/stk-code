@@ -21,7 +21,6 @@
 #define HEADER_STK_PARTICLE_HPP
 
 #include "graphics/gl_headers.hpp"
-#include "utils/vec3.hpp"
 #include "../lib/irrlicht/source/Irrlicht/CParticleSystemSceneNode.h"
 #include <vector>
 
@@ -72,7 +71,7 @@ private:
     /** Maximum count of particles. */
     unsigned m_max_count;
 
-    static std::vector<Vec3> m_flips_data;
+    static std::vector<float> m_flips_data;
 
     static GLuint m_flips_buffer;
 
@@ -151,8 +150,11 @@ public:
     // ------------------------------------------------------------------------
     static void destroyFlipsBuffer()
     {
-        glDeleteBuffers(1, &m_flips_buffer);
-        m_flips_buffer = 0;
+        if (m_flips_buffer != 0)
+        {
+            glDeleteBuffers(1, &m_flips_buffer);
+            m_flips_buffer = 0;
+        }
     }
     // ------------------------------------------------------------------------
     static GLuint getFlipsBuffer()                   { return m_flips_buffer; }

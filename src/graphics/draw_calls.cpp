@@ -607,6 +607,7 @@ DrawCalls::DrawCalls()
 DrawCalls::~DrawCalls()
 {
     CPUParticleManager::kill();
+    STKParticle::destroyFlipsBuffer();
 #if !defined(USE_GLES2)
     delete m_solid_cmd_buffer;
     delete m_shadow_cmd_buffer;

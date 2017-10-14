@@ -26,7 +26,7 @@
 #include "../../lib/irrlicht/source/Irrlicht/os.h"
 
 // ----------------------------------------------------------------------------
-std::vector<Vec3> STKParticle::m_flips_data;
+std::vector<float> STKParticle::m_flips_data;
 GLuint STKParticle::m_flips_buffer = 0;
 // ----------------------------------------------------------------------------
 scene::IParticleSystemSceneNode* STKParticle::addParticleNode(
@@ -354,10 +354,13 @@ void STKParticle::stimulateHeightMap(float dt, unsigned int active_count,
         {
             if (new_size != 0.0f)
             {
+                Buffer->BoundingBox.addInternalPoint(new_particle_position);
+            }
+            if (out != NULL)
+            {
                 out->emplace_back(new_particle_position, new_lifetime,
                     new_size);
             }
-            Buffer->BoundingBox.addInternalPoint(new_particle_position);
         }
     }
 }   // stimulateHeightMap
@@ -423,7 +426,8 @@ void STKParticle::stimulateNormal(float dt, unsigned int active_count,
                 // artifacts when the framerate is low, and a more accurate
                 // formula would need more complex computations.
 
-                new_particle_position = updated_position + dt_from_last_frame * updated_direction;
+                new_particle_position = updated_position + dt_from_last_frame *
+                    updated_direction;
                 new_particle_direction = updated_direction;
 
                 new_lifetime = glslFract(updated_lifetime);
@@ -455,10 +459,13 @@ void STKParticle::stimulateNormal(float dt, unsigned int active_count,
         {
             if (new_size != 0.0f)
             {
+                Buffer->BoundingBox.addInternalPoint(new_particle_position);
+            }
+            if (out != NULL)
+            {
                 out->emplace_back(new_particle_position, new_lifetime,
                     new_size);
             }
-            Buffer->BoundingBox.addInternalPoint(new_particle_position);
         }
     }
 }   // stimulateNormal
@@ -475,13 +482,13 @@ void STKParticle::updateFlips(unsigned maximum_particle_count)
         }
         updated = true;
         // 3 half rotation during lifetime at max
-        m_flips_data.emplace_back(0.0f, 1.0f, 0.0f,
-            3.14f * 3.0f * (2.0f * os::Randomizer::frand() - 1.0f));
+        m_flips_data.push_back(3.14f * 3.0f * (2.0f * os::Randomizer::frand()
+            - 1.0f));
     }
     if (updated)
     {
         glBindBuffer(GL_ARRAY_BUFFER, m_flips_buffer);
-        glBufferData(GL_ARRAY_BUFFER, m_flips_data.size() * 16,
+        glBufferData(GL_ARRAY_BUFFER, m_flips_data.size() * 4,
             m_flips_data.data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
