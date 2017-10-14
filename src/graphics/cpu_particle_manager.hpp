@@ -70,7 +70,7 @@ private:
         m_particles_generated;
 
     std::unordered_map<std::string, std::tuple<GLuint/*VAO*/,
-        GLuint/*VBO*/, unsigned/*VBO*/> > m_gl_particles;
+        GLuint/*VBO*/, unsigned/*VBO size*/> > m_gl_particles;
 
     std::unordered_map<std::string, Material*> m_material_map;
 

@@ -138,17 +138,19 @@ void CPUParticleManager::uploadAll()
             continue;
         }
         bool first_upload = false;
+        unsigned vbo_size = (unsigned)(m_particles_generated[p.first].size());
         if (m_gl_particles.find(p.first) == m_gl_particles.end())
         {
             first_upload = true;
-            m_gl_particles[p.first] = std::make_tuple(0, 0, 100);
+            m_gl_particles[p.first] = std::make_tuple(0, 0, vbo_size * 2);
         }
         if (first_upload)
         {
             glGenBuffers(1, &std::get<1>(m_gl_particles[p.first]));
             glBindBuffer(GL_ARRAY_BUFFER,
                 std::get<1>(m_gl_particles[p.first]));
-            glBufferData(GL_ARRAY_BUFFER, 2000, NULL, GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, vbo_size * 2 * 20, NULL,
+                GL_DYNAMIC_DRAW);
             glGenVertexArrays(1, &std::get<0>(m_gl_particles[p.first]));
             glBindVertexArray(std::get<0>(m_gl_particles[p.first]));
             glBindBuffer(GL_ARRAY_BUFFER,
@@ -190,20 +192,16 @@ void CPUParticleManager::uploadAll()
         }
         glBindBuffer(GL_ARRAY_BUFFER, std::get<1>(m_gl_particles[p.first]));
         // Check "real" particle buffer size in opengl
-        if (std::get<2>(m_gl_particles[p.first]) <
-            m_particles_generated[p.first].size())
+        if (std::get<2>(m_gl_particles[p.first]) < vbo_size)
         {
-            std::get<2>(m_gl_particles[p.first]) =
-                m_particles_generated[p.first].size() * 2;
-            glBufferData(GL_ARRAY_BUFFER,
-                m_particles_generated[p.first].size() * 2 * 20, NULL,
+            std::get<2>(m_gl_particles[p.first]) = vbo_size * 2;
+            glBufferData(GL_ARRAY_BUFFER, vbo_size * 2 * 20, NULL,
                 GL_DYNAMIC_DRAW);
         }
-        void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, 0,
-            m_particles_generated[p.first].size() * 20, GL_MAP_WRITE_BIT |
-            GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-        memcpy(ptr, m_particles_generated[p.first].data(),
-            m_particles_generated[p.first].size() * 20);
+        void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, 0, vbo_size * 20,
+            GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT |
+            GL_MAP_INVALIDATE_BUFFER_BIT);
+        memcpy(ptr, m_particles_generated[p.first].data(), vbo_size * 20);
         glUnmapBuffer(GL_ARRAY_BUFFER);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
