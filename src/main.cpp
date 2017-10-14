@@ -236,6 +236,7 @@
 #include "utils/crash_reporting.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/log.hpp"
+#include "utils/mini_glm.hpp"
 #include "utils/translation.hpp"
 
 static void cleanSuperTuxKart();
@@ -1963,6 +1964,8 @@ void runUnitTests()
 {
     Log::info("UnitTest", "Starting unit testing");
     Log::info("UnitTest", "=====================");
+    Log::info("UnitTest", "MiniGLM");
+    MiniGLM::unitTesting();
     Log::info("UnitTest", "GraphicsRestrictions");
     GraphicsRestrictions::unitTesting();
     Log::info("UnitTest", "NetworkString");
