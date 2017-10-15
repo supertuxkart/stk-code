@@ -91,15 +91,39 @@ private:
 
     std::unordered_set<std::string> m_flips_material;
 
+    GLuint m_particle_quad;
+
     // ------------------------------------------------------------------------
     bool isFlipsMaterial(const std::string& name)
               { return m_flips_material.find(name) != m_flips_material.end(); }
 
 public:
     // ------------------------------------------------------------------------
-    CPUParticleManager() {}
+    CPUParticleManager()
+    {
+        const float vertices[] =
+        {
+            -0.5f, 0.5f, 0.0f, 0.0f,
+            0.5f, 0.5f, 1.0f, 0.0f,
+            -0.5f, -0.5f, 0.0f, 1.0f,
+            0.5f, -0.5f, 1.0f, 1.0f,
+        };
+        glGenBuffers(1, &m_particle_quad);
+        glBindBuffer(GL_ARRAY_BUFFER, m_particle_quad);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,
+            GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
     // ------------------------------------------------------------------------
-    ~CPUParticleManager();
+    ~CPUParticleManager()
+    {
+        for (auto& p : m_gl_particles)
+        {
+            glDeleteVertexArrays(1, &std::get<0>(p.second));
+            glDeleteBuffers(1, &std::get<1>(p.second));
+        }
+        glDeleteBuffers(1, &m_particle_quad);
+    }
     // ------------------------------------------------------------------------
     void addParticleNode(STKParticle* node);
     // ------------------------------------------------------------------------

@@ -21,7 +21,6 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/shared_gpu_objects.hpp"
 #include "utils/log.hpp"
 
 #include <algorithm>
@@ -64,16 +63,6 @@ public:
 };   // AlphaTestParticleRenderer
 
 // ============================================================================
-CPUParticleManager::~CPUParticleManager()
-{
-    for (auto& p : m_gl_particles)
-    {
-        glDeleteVertexArrays(1, &std::get<0>(p.second));
-        glDeleteBuffers(1, &std::get<1>(p.second));
-    }
-}   // ~CPUParticleManager
-
-// ----------------------------------------------------------------------------
 void CPUParticleManager::addParticleNode(STKParticle* node)
 {
     if (node->getMaterialCount() != 1)
@@ -193,12 +182,6 @@ void CPUParticleManager::uploadAll()
             glGenVertexArrays(1, &std::get<0>(m_gl_particles[p.first]));
             glBindVertexArray(std::get<0>(m_gl_particles[p.first]));
             glBindBuffer(GL_ARRAY_BUFFER,
-                SharedGPUObjects::getParticleQuadVBO());
-            glEnableVertexAttribArray(4);
-            glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 16, 0);
-            glEnableVertexAttribArray(3);
-            glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 16, (void*)8);
-            glBindBuffer(GL_ARRAY_BUFFER,
                 std::get<1>(m_gl_particles[p.first]));
             glEnableVertexAttribArray(0);
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 20, 0);
@@ -211,6 +194,11 @@ void CPUParticleManager::uploadAll()
             glVertexAttribPointer(2, 2, GL_HALF_FLOAT, GL_FALSE, 20,
                 (void*)16);
             glVertexAttribDivisorARB(2, 1);
+            glBindBuffer(GL_ARRAY_BUFFER, m_particle_quad);
+            glEnableVertexAttribArray(4);
+            glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, 16, 0);
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 16, (void*)8);
             if (isFlipsMaterial(p.first))
             {
                 glBindBuffer(GL_ARRAY_BUFFER, STKParticle::getFlipsBuffer());
