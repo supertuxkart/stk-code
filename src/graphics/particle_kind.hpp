@@ -69,25 +69,13 @@ private:
     video::SColor m_min_start_color;
     video::SColor m_max_start_color;
 
-    /** Strength of gravity, not sure what the units are. Make it 0 to disable */
-    float    m_gravity_strength;
-
-    /** Time it takes for gravity to completely replace the emission force */
-    int      m_force_lost_to_gravity_time;
-
     /** For box emitters only */
     float m_box_x, m_box_y, m_box_z;
 
     /** For sphere emitters only */
     float m_sphere_radius;
 
-    /** Distance from camera at which particles start fading out, or negative if disabled */
-    float m_fade_away_start, m_fade_away_end;
-
     int m_emission_decay_rate;
-
-    /** Wind. < 0.01 if disabled. */
-    float m_wind_speed;
 
     bool m_flips;
 
@@ -147,15 +135,6 @@ public:
     float     getVelocityY   () const { return m_velocity_y;      }
     float     getVelocityZ   () const { return m_velocity_z;      }
 
-    /** Get the strength of gravity, not sure what the units are. Will be 0 if disabled. */
-    float     getGravityStrength() const { return m_gravity_strength; }
-
-    /** Get the time it takes for gravity to completely replace the emission force. Meaningless if gravity is disabled. */
-    int       getForceLostToGravityTime() const { return m_force_lost_to_gravity_time; }
-
-    float     getFadeAwayStart() const { return m_fade_away_start; }
-    float     getFadeAwayEnd  () const { return m_fade_away_end;   }
-
     void      setBoxSizeXZ    (float x, float z) { m_box_x = x; m_box_z = z;   }
 
     int       getEmissionDecayRate() const { return m_emission_decay_rate; }
@@ -163,8 +142,6 @@ public:
     bool      hasScaleAffector() const { return m_has_scale_affector; }
     float     getScaleAffectorFactorX() const { return m_scale_affector_factor_x; }
     float     getScaleAffectorFactorY() const { return m_scale_affector_factor_y; };
-
-    float     getWindSpeed() const { return m_wind_speed; }
 
     bool      getFlips() const { return m_flips; }
 

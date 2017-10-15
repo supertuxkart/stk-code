@@ -24,6 +24,4 @@
     <color     min="255 255 255"
                max="255 255 255" />
 
-  <fadeout time="300" />
-
 </particles>

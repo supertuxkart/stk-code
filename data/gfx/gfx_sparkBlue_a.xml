@@ -18,7 +18,7 @@
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
     <lifetime  min="1000"
                max="1500"          />    
-  
+
     <!-- Size of the particles -->
     <size min="0.08"
          max="0.15"
@@ -27,11 +27,5 @@
     
     <color     min="40 40 255"
                max="255 255 255"   />
-    
-    <!-- How much time in milliseconds before the particle is fully faded out  -->
-    <fadeout   time="100"          />
-
-    <wind      speed="0.16"
-               flips="Y"           />
 
 </particles>
