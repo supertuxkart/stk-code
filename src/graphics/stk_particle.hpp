@@ -63,7 +63,7 @@ private:
 
     float m_size_increase_factor;
 
-    bool m_first_execution, m_randomize_initial_y, m_flips;
+    bool m_first_execution, m_randomize_initial_y, m_flips, m_pre_generating;
 
     /** Previous frame particles emitter source matrix */
     core::matrix4 m_previous_frame_matrix;
@@ -88,19 +88,11 @@ private:
 
 public:
     // ------------------------------------------------------------------------
-    static IParticleSystemSceneNode *addParticleNode(
-        bool withDefaultEmitter = true, bool randomize_initial_y = false,
+    STKParticle(bool randomize_initial_y = false,
         ISceneNode* parent = 0, s32 id = -1,
         const core::vector3df& position = core::vector3df(0, 0, 0),
         const core::vector3df& rotation = core::vector3df(0, 0, 0),
         const core::vector3df& scale = core::vector3df(1.0f, 1.0f, 1.0f));
-    // ------------------------------------------------------------------------
-    STKParticle(bool createDefaultEmitter,
-        ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
-        const core::vector3df& position,
-        const core::vector3df& rotation,
-        const core::vector3df& scale,
-        bool randomize_initial_y);
     // ------------------------------------------------------------------------
     ~STKParticle()
     {
@@ -141,6 +133,8 @@ public:
     bool getFlips() const                                   { return m_flips; }
     // ------------------------------------------------------------------------
     unsigned getMaxCount() const                        { return m_max_count; }
+    // ------------------------------------------------------------------------
+    void setPreGenerating(bool val)                 { m_pre_generating = val; }
     // ------------------------------------------------------------------------
     static void updateFlips(unsigned maximum_particle_count);
     // ------------------------------------------------------------------------

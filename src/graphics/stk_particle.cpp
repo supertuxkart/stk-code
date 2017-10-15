@@ -30,31 +30,15 @@
 std::vector<float> STKParticle::m_flips_data;
 GLuint STKParticle::m_flips_buffer = 0;
 // ----------------------------------------------------------------------------
-scene::IParticleSystemSceneNode* STKParticle::addParticleNode(
-    bool withDefaultEmitter, bool randomize_initial_y, ISceneNode* parent,
-    s32 id, const core::vector3df& position, const core::vector3df& rotation,
-    const core::vector3df& scale)
-{
-    if (!parent)
-    {
-        parent = irr_driver->getSceneManager()->getRootSceneNode();
-    }
-    IParticleSystemSceneNode* node = new STKParticle(withDefaultEmitter,
-        parent, irr_driver->getSceneManager(), id, position, rotation, scale,
-        randomize_initial_y);
-    node->drop();
-
-    return node;
-}   // addParticleNode
-
-// ----------------------------------------------------------------------------
-STKParticle::STKParticle(bool createDefaultEmitter,
-    ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
-    const core::vector3df& position,
-    const core::vector3df& rotation,
-    const core::vector3df& scale,
-    bool randomize_initial_y)
-           : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id,
+STKParticle::STKParticle(bool randomize_initial_y, ISceneNode* parent, s32 id,
+                         const core::vector3df& position,
+                         const core::vector3df& rotation,
+                         const core::vector3df& scale)
+           : CParticleSystemSceneNode(true,
+                                      parent ? parent :
+                                      irr_driver->getSceneManager()
+                                      ->getRootSceneNode(),
+                                      irr_driver->getSceneManager(), id,
                                       position, rotation, scale)
 {
     m_hm = NULL;
@@ -62,9 +46,11 @@ STKParticle::STKParticle(bool createDefaultEmitter,
     m_color_from = m_color_to;
     m_size_increase_factor = 0.0f;
     m_first_execution = true;
+    m_pre_generating = true;
     m_randomize_initial_y = randomize_initial_y;
     m_flips = false;
     m_max_count = 0;
+    drop();
 }   // STKParticle
 
 // ----------------------------------------------------------------------------
@@ -226,6 +212,7 @@ void STKParticle::setEmitter(scene::IParticleEmitter* emitter)
     delete m_hm;
     m_hm = NULL;
     m_first_execution = true;
+    m_pre_generating = true;
     m_flips = false;
     m_max_count = emitter->getMaxParticlesPerSecond() * emitter->getMaxLifeTime() / 1000;
 
@@ -261,7 +248,8 @@ void STKParticle::generate(std::vector<CPUParticle>* out)
     if (m_first_execution)
     {
         m_previous_frame_matrix = AbsoluteTransformation;
-        for (int i = 0; i < (m_max_count > 5000 ? 5 : 100); i++)
+        for (int i = 0; i <
+            (m_max_count > 5000 ? 5 : m_pre_generating ? 100 : 0); i++)
         {
             if (m_hm != NULL)
             {

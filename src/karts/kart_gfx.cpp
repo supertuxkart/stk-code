@@ -225,7 +225,6 @@ void KartGFX::reset()
         if(m_all_emitters[i])
         {
             m_all_emitters[i]->setCreationRateAbsolute(0);
-            m_all_emitters[i]->clearParticles();
         }
     }
 #endif

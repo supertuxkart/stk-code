@@ -31,6 +31,7 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
+#include "graphics/stk_particle.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/render_info.hpp"
 #include "io/file_manager.hpp"
@@ -987,7 +988,6 @@ void TrackObjectPresentationParticles::stop()
     if (m_emitter != NULL)
     {
         m_emitter->setCreationRateAbsolute(0.0f);
-        m_emitter->clearParticles();
     }
 #endif
 }
