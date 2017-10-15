@@ -163,8 +163,8 @@ void ShaderBase::setAttribute(AttributeType type)
         break;
     case PARTICLES_RENDERING:
         glBindAttribLocation(m_program, 0, "Position");
-        glBindAttribLocation(m_program, 1, "mixed_color");
-        glBindAttribLocation(m_program, 2, "lifetime_and_size");
+        glBindAttribLocation(m_program, 1, "color_lifetime");
+        glBindAttribLocation(m_program, 2, "size");
         glBindAttribLocation(m_program, 3, "Texcoord");
         glBindAttribLocation(m_program, 4, "quadcorner");
         glBindAttribLocation(m_program, 5, "rotationvec");

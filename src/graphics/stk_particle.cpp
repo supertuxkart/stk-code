@@ -333,8 +333,8 @@ void STKParticle::stimulateHeightMap(float dt, unsigned int active_count,
         core::vector3df adjusted_initial_direction =
             initial_new_position - initial_position;
         float adjusted_lifetime = lifetime + (dt / lifetime_initial);
-        reset = reset || ((adjusted_lifetime > 1.0f) && (i <= active_count));
-        reset = reset || (lifetime < 0.0f);
+        reset = reset || adjusted_lifetime > 1.0f;
+        reset = reset || lifetime < 0.0f;
 
         new_particle_position = !reset ?
             (particle_position + particle_direction * dt) : initial_position;

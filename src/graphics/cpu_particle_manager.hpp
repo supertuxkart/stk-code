@@ -40,20 +40,21 @@ using namespace irr;
 struct CPUParticle
 {
     core::vector3df m_position;
-    video::SColor m_mixed_color;
-    short m_lifetime_and_size[2];
+    video::SColor m_color_lifetime;
+    short m_size[2];
     // ------------------------------------------------------------------------
     CPUParticle(const core::vector3df& position,
                 const core::vector3df& color_from,
-                const core::vector3df& color_to, float lifetime, float size)
-         : m_position(position), m_mixed_color(-1)
+                const core::vector3df& color_to, float lf_time, float size)
+         : m_position(position)
     {
-        core::vector3df ret = color_from + (color_to - color_from) * lifetime;
-        m_mixed_color.setRed(core::clamp((int)(ret.X * 255.0f), 0, 255));
-        m_mixed_color.setBlue(core::clamp((int)(ret.Y * 255.0f), 0, 255));
-        m_mixed_color.setGreen(core::clamp((int)(ret.Z * 255.0f), 0, 255));
-        m_lifetime_and_size[0] = MiniGLM::toFloat16(lifetime);
-        m_lifetime_and_size[1] = MiniGLM::toFloat16(size);
+        core::vector3df ret = color_from + (color_to - color_from) * lf_time;
+        m_color_lifetime.setRed(core::clamp((int)(ret.X * 255.0f), 0, 255));
+        m_color_lifetime.setBlue(core::clamp((int)(ret.Y * 255.0f), 0, 255));
+        m_color_lifetime.setGreen(core::clamp((int)(ret.Z * 255.0f), 0, 255));
+        m_color_lifetime.setAlpha(core::clamp((int)(lf_time * 255.0f), 0, 255));
+        m_size[0] = MiniGLM::toFloat16(size);
+        m_size[1] = m_size[0];
     }
 };
 
