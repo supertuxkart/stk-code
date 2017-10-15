@@ -26,6 +26,7 @@
 #include "utils/singleton.hpp"
 
 #include <dimension2d.h>
+#include <IBillboardSceneNode.h>
 #include <vector3d.h>
 #include <SColor.h>
 
@@ -57,6 +58,15 @@ struct CPUParticle
         m_size[0] = MiniGLM::toFloat16(size);
         m_size[1] = m_size[0];
     }
+    // ------------------------------------------------------------------------
+    CPUParticle(scene::IBillboardSceneNode* node)
+    {
+        m_position = node->getAbsolutePosition();
+        video::SColor unused_bottom;
+        node->getColor(m_color_lifetime, unused_bottom);
+        m_size[0] = MiniGLM::toFloat16(node->getSize().Width);
+        m_size[1] = MiniGLM::toFloat16(node->getSize().Height);
+    }
 };
 
 class STKParticle;
@@ -67,6 +77,9 @@ class CPUParticleManager : public Singleton<CPUParticleManager>, NoCopy
 private:
     std::unordered_map<std::string, std::vector<STKParticle*> >
         m_particles_queue;
+
+    std::unordered_map<std::string, std::vector<scene::IBillboardSceneNode*> >
+        m_billboards_queue;
 
     std::unordered_map<std::string, std::vector<CPUParticle> >
         m_particles_generated;
@@ -90,6 +103,8 @@ public:
     // ------------------------------------------------------------------------
     void addParticleNode(STKParticle* node);
     // ------------------------------------------------------------------------
+    void addBillboardNode(scene::IBillboardSceneNode* node);
+    // ------------------------------------------------------------------------
     void generateAll();
     // ------------------------------------------------------------------------
     void uploadAll();
@@ -99,6 +114,10 @@ public:
     void reset()
     {
         for (auto& p : m_particles_queue)
+        {
+            p.second.clear();
+        }
+        for (auto& p : m_billboards_queue)
         {
             p.second.clear();
         }

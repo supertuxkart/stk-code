@@ -32,7 +32,7 @@
 // ============================================================================
 /** A Shader to render particles.
 */
-class ParticleRenderer : public TextureShader<ParticleRenderer, 2, int>
+class ParticleRenderer : public TextureShader<ParticleRenderer, 2, int, float>
 {
 public:
     ParticleRenderer()
@@ -40,7 +40,7 @@ public:
         loadProgram(PARTICLES_RENDERING,
                     GL_VERTEX_SHADER,   "simple_particle.vert",
                     GL_FRAGMENT_SHADER, "simple_particle.frag");
-        assignUniforms("flips");
+        assignUniforms("flips", "billboard");
         assignSamplerNames(0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "dtex", ST_NEAREST_FILTERED);
     }   // ParticleRenderer
@@ -91,7 +91,7 @@ void CPUParticleManager::addParticleNode(STKParticle* node)
         m_material_map[tex_name] = m;
         if (m == NULL)
         {
-            Log::error("CPUParticleManager", "Missing material");
+            Log::error("CPUParticleManager", "Missing material for particle");
         }
     }
     m = m_material_map.at(tex_name);
@@ -105,6 +105,34 @@ void CPUParticleManager::addParticleNode(STKParticle* node)
     }
     m_particles_queue[tex_name].push_back(node);
 }   // addParticleNode
+
+// ----------------------------------------------------------------------------
+void CPUParticleManager::addBillboardNode(scene::IBillboardSceneNode* node)
+{
+    video::ITexture* t = node->getMaterial(0).getTexture(0);
+    if (t == NULL)
+    {
+        return;
+    }
+    std::string tex_name = t->getName().getPtr();
+    tex_name = std::string("_bb_") + tex_name;
+    Material* m = NULL;
+    if (m_material_map.find(tex_name) == m_material_map.end())
+    {
+        m = material_manager->getMaterialFor(t);
+        m_material_map[tex_name] = m;
+        if (m == NULL)
+        {
+            Log::error("CPUParticleManager", "Missing material for billboard");
+        }
+    }
+    m = m_material_map.at(tex_name);
+    if (m == NULL)
+    {
+        return;
+    }
+    m_billboards_queue[tex_name].push_back(node);
+}   // addBillboardNode
 
 // ----------------------------------------------------------------------------
 void CPUParticleManager::generateAll()
@@ -124,6 +152,17 @@ void CPUParticleManager::generateAll()
             STKParticle::updateFlips(unsigned
                 (m_particles_queue.at(p.first).size() *
                 m_particles_queue.at(p.first)[0]->getMaxCount()));
+        }
+    }
+    for (auto& p : m_billboards_queue)
+    {
+        if (p.second.empty())
+        {
+            continue;
+        }
+        for (auto& q : p.second)
+        {
+            m_particles_generated[p.first].emplace_back(q);
         }
     }
 }   // generateAll
@@ -220,6 +259,7 @@ void CPUParticleManager::drawAll()
     for (auto& p : particle_drawn)
     {
         const bool flips = isFlipsMaterial(p.second);
+        const float billboard = p.second.substr(0, 4) == "_bb_" ? 1.0f : 0.0f;
         Material* cur_mat = p.first;
         if (cur_mat->getShaderType() != st)
         {
@@ -264,7 +304,7 @@ void CPUParticleManager::drawAll()
             ParticleRenderer::getInstance()->setTextureUnits
                 (cur_mat->getTexture()->getOpenGLTextureName(),
                 irr_driver->getDepthStencilTexture());
-            ParticleRenderer::getInstance()->setUniforms(flips);
+            ParticleRenderer::getInstance()->setUniforms(flips, billboard);
         }
         else
         {

@@ -35,7 +35,6 @@
 #include "graphics/shader_based_renderer.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stk_animated_mesh.hpp"
-#include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_loader.hpp"
 #include "graphics/sp_mesh_loader.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
@@ -1203,33 +1202,36 @@ PerCameraNode *IrrDriver::addPerCameraNode(scene::ISceneNode* node,
                              m_scene_manager, -1, camera, node);
 }   // addNode
 
-
 // ----------------------------------------------------------------------------
 /** Adds a billboard node to scene.
  */
 scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
-                                           video::ITexture *texture,
-                                           scene::ISceneNode* parent,
-                                           bool alphaTesting)
+                                           const std::string& tex_name,
+                                           scene::ISceneNode* parent)
 {
     scene::IBillboardSceneNode* node;
-#ifndef SERVER_ONLY
-    if (CVS->isGLSL())
-    {
-        if (!parent)
-            parent = m_scene_manager->getRootSceneNode();
+    node = m_scene_manager->addBillboardSceneNode(parent, size);
 
-        node = new STKBillboard(parent, m_scene_manager, -1,
-                                vector3df(0., 0., 0.), size);
-        node->drop();
-    }
-    else
-#endif
-        node = m_scene_manager->addBillboardSceneNode(parent, size);
+    const bool full_path = tex_name.find('/') != std::string::npos;
+
+    Material* m = material_manager->getMaterial(tex_name, full_path,
+        /*make_permanent*/false, /*complain_if_not_found*/true,
+        /*strip_path*/full_path, /*install*/false);
+
+    video::ITexture* tex = m->getTexture(true/*srgb*/,
+        m->getShaderType() == Material::SHADERTYPE_ADDITIVE ||
+        m->getShaderType() == Material::SHADERTYPE_ALPHA_BLEND ?
+        true : false/*premul_alpha*/);
+
     assert(node->getMaterialCount() > 0);
-    node->setMaterialTexture(0, texture);
-    if(alphaTesting)
-        node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF);
+    node->setMaterialTexture(0, tex);
+    if (!(m->getShaderType() == Material::SHADERTYPE_ADDITIVE ||
+        m->getShaderType() == Material::SHADERTYPE_ALPHA_BLEND))
+    {
+        // Alpha test for billboard otherwise
+        m->setShaderType(Material::SHADERTYPE_ALPHA_TEST);
+    }
+    m->setMaterialProperties(&(node->getMaterial(0)), NULL);
     return node;
 }   // addBillboard
 

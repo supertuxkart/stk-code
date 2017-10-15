@@ -3,6 +3,7 @@ uniform sampler2D dtex;
 
 in vec2 tc;
 in vec4 pc;
+flat in float billboard_mix;
 out vec4 FragColor;
 
 #stk_include "utils/getPosFromUVDepth.frag"
@@ -15,5 +16,6 @@ void main(void)
     float EnvZ = texture(dtex, xy).x;
     vec4 EnvPos = getPosFromUVDepth(vec3(xy, EnvZ), InverseProjectionMatrix);
     float alpha = clamp((EnvPos.z - FragmentPos.z) * 0.3, 0., 1.);
-    FragColor = texture(tex, tc) * pc * alpha;
+    float billboard_alpha = mix(1.0, texture(tex, tc).a, billboard_mix);
+    FragColor = texture(tex, tc) * billboard_alpha * pc * alpha;
 }

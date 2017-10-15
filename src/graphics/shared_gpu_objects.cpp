@@ -199,10 +199,10 @@ void SharedGPUObjects::initParticleQuadVBO()
 {
     static const GLfloat QUAD_VERTEX[] =
     {
-        -.5, -.5, 0., 0.,
-         .5, -.5, 1., 0.,
-        -.5,  .5, 0., 1.,
-         .5,  .5, 1., 1.,
+        -.5, .5, 0., 0.,
+         .5, .5, 1., 0.,
+        -.5, -.5, 0., 1.,
+         .5, -.5, 1., 1.,
     };
     glGenBuffers(1, &m_particle_quad_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_particle_quad_vbo);

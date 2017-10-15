@@ -299,8 +299,6 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
                                       ListAdditiveTransparent::getInstance());
     }
 
-    draw_calls.renderBillboardList();
-
     if (!CVS->isDefferedEnabled())
         return;
 

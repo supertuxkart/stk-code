@@ -25,7 +25,6 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/render_info.hpp"
-#include "graphics/stk_tex_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
@@ -331,13 +330,6 @@ void SoccerWorld::initKartList()
     std::string blue_path =
             file_manager->getAsset(FileManager::GUI, "soccer_player_blue.png");
 
-    TexConfig btc(true/*srgb*/, true/*premul_alpha*/);
-    video::ITexture* red = STKTexManager::getInstance()->getTexture
-        (red_path, &btc);
-
-    video::ITexture* blue = STKTexManager::getInstance()->getTexture
-        (blue_path, &btc);
-
     //Assigning indicators
     for(unsigned int i = 0; i < kart_amount; i++)
     {
@@ -351,9 +343,9 @@ void SoccerWorld::initKartList()
         SoccerTeam team = getKartTeam(i);
 
         arrow_node = irr_driver->addBillboard(
-                                        core::dimension2d<irr::f32>(0.3f,0.3f),
-                                        team == SOCCER_TEAM_BLUE ? blue : red, 
-                                        m_karts[i]->getNode(), true);
+            core::dimension2d<irr::f32>(0.3f,0.3f),
+            team == SOCCER_TEAM_BLUE ? blue_path : red_path,
+            m_karts[i]->getNode());
 
         arrow_node->setPosition(core::vector3df(0, arrow_pos_height, 0));
     }

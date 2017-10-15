@@ -32,7 +32,6 @@
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/stk_particle.hpp"
-#include "graphics/stk_tex_manager.hpp"
 #include "graphics/render_info.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -823,20 +822,8 @@ TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(
         xml_node.get("start",  &m_fade_out_start);
         xml_node.get("end",    &m_fade_out_end  );
     }
-    TexConfig tc(true/*srgb*/, true/*premul_alpha*/);
-    video::ITexture* texture = STKTexManager::getInstance()->getTexture
-        (file_manager->searchTexture(texture_name), &tc);
-
-    if (texture == NULL)
-    {
-        Log::warn("TrackObjectPresentation", "Billboard texture '%s' not found",
-                  texture_name.c_str());
-    }
     m_node = irr_driver->addBillboard(core::dimension2df(width, height),
-                                      texture, parent);
-    Material *stk_material = material_manager->getMaterial(texture_name);
-    stk_material->setMaterialProperties(&(m_node->getMaterial(0)), NULL);
-
+                                      texture_name, parent);
     m_node->setPosition(m_init_xyz);
 }   // TrackObjectPresentationBillboard
 
