@@ -33,7 +33,6 @@
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/skybox.hpp"
-#include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/spherical_harmonics.hpp"
 #include "items/item_manager.hpp"
@@ -663,7 +662,6 @@ ShaderBasedRenderer::~ShaderBasedRenderer()
     delete m_skybox;
     delete m_rtts;
     ShaderFilesManager::kill();
-    STKBillboard::destroyBillboardVAO();
 }
 
 // ----------------------------------------------------------------------------
@@ -963,8 +961,6 @@ void ShaderBasedRenderer::preloadShaderFiles()
         (GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKAROUND1))
         sfm->addShaderFile("passthrough.frag", GL_FRAGMENT_SHADER);
 
-    sfm->addShaderFile("billboard.vert", GL_VERTEX_SHADER);
-    sfm->addShaderFile("billboard.frag", GL_FRAGMENT_SHADER);
     sfm->addShaderFile("alphatest_particle.vert", GL_VERTEX_SHADER);
     sfm->addShaderFile("alphatest_particle.frag", GL_FRAGMENT_SHADER);
     sfm->addShaderFile("simple_particle.vert", GL_VERTEX_SHADER);

@@ -28,7 +28,6 @@
 #include "graphics/shadow_matrices.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stk_animated_mesh.hpp"
-#include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh.hpp"
 #include "graphics/stk_particle.hpp"
 #include "tracks/track.hpp"
@@ -63,8 +62,6 @@ void DrawCalls::clearLists()
     ListMatSplatting::getInstance()->clear();
 
     m_immediate_draw_list.clear();
-    m_billboard_list.clear();
-    m_particles_list.clear();
     CPUParticleManager::getInstance()->reset();
 }
 
@@ -571,10 +568,11 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
             continue;
         }
 
-        if (STKBillboard *node = dynamic_cast<STKBillboard *>(*I))
+        if (scene::IBillboardSceneNode *node =
+            dynamic_cast<scene::IBillboardSceneNode *>(*I))
         {
             if (!isCulledPrecise(cam, *I))
-                m_billboard_list.push_back(node);
+                CPUParticleManager::getInstance()->addBillboardNode(node);
             continue;
         }
 
@@ -723,14 +721,6 @@ void DrawCalls::renderImmediateDrawList() const
     glActiveTexture(GL_TEXTURE0);
     for(auto node: m_immediate_draw_list)
         node->render();
-}
-
-// ----------------------------------------------------------------------------
-void DrawCalls::renderBillboardList() const
-{
-    glActiveTexture(GL_TEXTURE0);
-    for(auto billboard: m_billboard_list)
-        billboard->render();
 }
 
 // ----------------------------------------------------------------------------

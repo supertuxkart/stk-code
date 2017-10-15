@@ -26,6 +26,7 @@
 #include "utils/singleton.hpp"
 
 #include <dimension2d.h>
+#include <IBillboardSceneNode.h>
 #include <vector3d.h>
 #include <SColor.h>
 
@@ -57,6 +58,15 @@ struct CPUParticle
         m_size[0] = MiniGLM::toFloat16(size);
         m_size[1] = m_size[0];
     }
+    // ------------------------------------------------------------------------
+    CPUParticle(scene::IBillboardSceneNode* node)
+    {
+        m_position = node->getAbsolutePosition();
+        video::SColor unused_bottom;
+        node->getColor(m_color_lifetime, unused_bottom);
+        m_size[0] = MiniGLM::toFloat16(node->getSize().Width);
+        m_size[1] = MiniGLM::toFloat16(node->getSize().Height);
+    }
 };
 
 class STKParticle;
@@ -68,6 +78,9 @@ private:
     std::unordered_map<std::string, std::vector<STKParticle*> >
         m_particles_queue;
 
+    std::unordered_map<std::string, std::vector<scene::IBillboardSceneNode*> >
+        m_billboards_queue;
+
     std::unordered_map<std::string, std::vector<CPUParticle> >
         m_particles_generated;
 
@@ -78,17 +91,43 @@ private:
 
     std::unordered_set<std::string> m_flips_material;
 
+    GLuint m_particle_quad;
+
     // ------------------------------------------------------------------------
     bool isFlipsMaterial(const std::string& name)
               { return m_flips_material.find(name) != m_flips_material.end(); }
 
 public:
     // ------------------------------------------------------------------------
-    CPUParticleManager() {}
+    CPUParticleManager()
+    {
+        const float vertices[] =
+        {
+            -0.5f, 0.5f, 0.0f, 0.0f,
+            0.5f, 0.5f, 1.0f, 0.0f,
+            -0.5f, -0.5f, 0.0f, 1.0f,
+            0.5f, -0.5f, 1.0f, 1.0f,
+        };
+        glGenBuffers(1, &m_particle_quad);
+        glBindBuffer(GL_ARRAY_BUFFER, m_particle_quad);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,
+            GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
     // ------------------------------------------------------------------------
-    ~CPUParticleManager();
+    ~CPUParticleManager()
+    {
+        for (auto& p : m_gl_particles)
+        {
+            glDeleteVertexArrays(1, &std::get<0>(p.second));
+            glDeleteBuffers(1, &std::get<1>(p.second));
+        }
+        glDeleteBuffers(1, &m_particle_quad);
+    }
     // ------------------------------------------------------------------------
     void addParticleNode(STKParticle* node);
+    // ------------------------------------------------------------------------
+    void addBillboardNode(scene::IBillboardSceneNode* node);
     // ------------------------------------------------------------------------
     void generateAll();
     // ------------------------------------------------------------------------
@@ -99,6 +138,10 @@ public:
     void reset()
     {
         for (auto& p : m_particles_queue)
+        {
+            p.second.clear();
+        }
+        for (auto& p : m_billboards_queue)
         {
             p.second.clear();
         }

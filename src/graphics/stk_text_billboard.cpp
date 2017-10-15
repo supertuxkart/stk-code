@@ -20,7 +20,6 @@
 #include "graphics/stk_text_billboard.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include <SMesh.h>

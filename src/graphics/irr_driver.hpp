@@ -245,9 +245,8 @@ public:
                                            scene::ICameraSceneNode* cam,
                                            scene::ISceneNode *parent = NULL);
     scene::ISceneNode    *addBillboard(const core::dimension2d< f32 > size,
-                                       video::ITexture *texture,
-                                       scene::ISceneNode* parent=NULL, bool alphaTesting = false);
-
+                                       const std::string& tex_name,
+                                       scene::ISceneNode* parent=NULL);
     scene::IParticleSystemSceneNode
                          *addParticleNode(bool default_emitter=true);
     scene::ISceneNode    *addSkyDome(video::ITexture *texture, int hori_res,

@@ -24,11 +24,9 @@
 #include "matrix4.h"
 #include <algorithm>
 
-GLuint SharedGPUObjects::m_billboard_vbo;
 GLuint SharedGPUObjects::m_sky_tri_vbo;
 GLuint SharedGPUObjects::m_frustrum_vbo;
 GLuint SharedGPUObjects::m_frustrum_indices;
-GLuint SharedGPUObjects::m_particle_quad_vbo;
 GLuint SharedGPUObjects::m_View_projection_matrices_ubo;
 GLuint SharedGPUObjects::m_lighting_data_ubo;
 GLuint SharedGPUObjects::m_full_screen_quad_vao;
@@ -102,21 +100,6 @@ void SharedGPUObjects::initQuadBuffer()
                           (GLvoid *)(2 * sizeof(float)));
     glBindVertexArray(0);
 }   // initQuadBuffer
-
-// ----------------------------------------------------------------------------
-void SharedGPUObjects::initBillboardVBO()
-{
-    float QUAD[] = 
-    {
-        -.5, -.5, 0., 1.,
-        -.5,  .5, 0., 0.,
-         .5, -.5, 1., 1.,
-         .5,  .5, 1., 0.,
-    };
-    glGenBuffers(1, &m_billboard_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_billboard_vbo);
-    glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), QUAD, GL_STATIC_DRAW);
-}   // initBillboardVBO
 
 // ----------------------------------------------------------------------------
 void SharedGPUObjects::initSkyTriVBO()
@@ -195,34 +178,15 @@ void SharedGPUObjects::initSkinningUBO()
 }   // initSkinningUBO
 
 // ----------------------------------------------------------------------------
-void SharedGPUObjects::initParticleQuadVBO()
-{
-    static const GLfloat QUAD_VERTEX[] =
-    {
-        -.5, -.5, 0., 0.,
-         .5, -.5, 1., 0.,
-        -.5,  .5, 0., 1.,
-         .5,  .5, 1., 1.,
-    };
-    glGenBuffers(1, &m_particle_quad_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_particle_quad_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(QUAD_VERTEX), QUAD_VERTEX,
-                 GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}   // initParticleQuadVBO
-
-// ----------------------------------------------------------------------------
 void SharedGPUObjects::init()
 {
     if (m_has_been_initialised)
         return;
     initQuadVBO();
     initQuadBuffer();
-    initBillboardVBO();
     initSkyTriVBO();
     initFrustrumVBO();
-    initParticleQuadVBO();
-    
+
     if (CVS->isARBUniformBufferObjectUsable())
     {
         initShadowVPMUBO();

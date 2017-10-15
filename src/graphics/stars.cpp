@@ -19,9 +19,6 @@
 #include "graphics/stars.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "graphics/material.hpp"
-#include "graphics/material_manager.hpp"
-#include "graphics/stk_tex_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
 #include "utils/constants.hpp"
@@ -39,14 +36,6 @@ Stars::Stars(AbstractKart *kart)
 {
     m_parent_kart_node = kart->getNode();
     m_enabled = false;
-
-    TexConfig stc(true/*srgb*/, true/*premul_alpha*/);
-    video::ITexture* texture = STKTexManager::getInstance()->getTexture
-        ("starparticle.png", &stc);
-
-    Material* star_material =
-        material_manager->getMaterial("starparticle.png");
-
     m_center = core::vector3df(0.0f,
                                kart->getKartModel()->getModel()
                                    ->getBoundingBox().MaxEdge.Y,
@@ -56,12 +45,10 @@ Stars::Stars(AbstractKart *kart)
     {
         scene::ISceneNode* billboard =
             irr_driver->addBillboard(core::dimension2df(STAR_SIZE, STAR_SIZE),
-                                     texture, kart->getNode());
+                                     "starparticle.png", kart->getNode());
 #ifdef DEBUG
         billboard->setName("star");
 #endif
-        star_material->setMaterialProperties(&(billboard->getMaterial(0)), NULL);
-        billboard->setMaterialTexture(0, star_material->getTexture());
 
         billboard->setVisible(false);
 

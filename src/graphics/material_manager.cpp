@@ -330,7 +330,7 @@ Material *MaterialManager::getMaterial(const std::string& fname,
                                        bool is_full_path,
                                        bool make_permanent,
                                        bool complain_if_not_found,
-                                       bool strip_path)
+                                       bool strip_path, bool install)
 {
     if(fname=="")
     {
@@ -361,7 +361,7 @@ Material *MaterialManager::getMaterial(const std::string& fname,
     }
 
     // Add the new material
-    Material* m = new Material(fname, is_full_path, complain_if_not_found);
+    Material* m = new Material(fname, is_full_path, complain_if_not_found, install);
     m_materials.push_back(m);
     if(make_permanent)
     {
