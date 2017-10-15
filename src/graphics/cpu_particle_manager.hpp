@@ -33,6 +33,7 @@
 #include <string>
 #include <tuple>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 using namespace irr;
@@ -75,6 +76,12 @@ private:
 
     std::unordered_map<std::string, Material*> m_material_map;
 
+    std::unordered_set<std::string> m_flips_material;
+
+    // ------------------------------------------------------------------------
+    bool isFlipsMaterial(const std::string& name)
+              { return m_flips_material.find(name) != m_flips_material.end(); }
+
 public:
     // ------------------------------------------------------------------------
     CPUParticleManager() {}
@@ -104,6 +111,7 @@ public:
     void cleanMaterialMap()
     {
         m_material_map.clear();
+        m_flips_material.clear();
     }
 
 };

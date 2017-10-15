@@ -99,6 +99,10 @@ void CPUParticleManager::addParticleNode(STKParticle* node)
     {
         return;
     }
+    if (node->getFlips())
+    {
+        m_flips_material.insert(tex_name);
+    }
     m_particles_queue[tex_name].push_back(node);
 }   // addParticleNode
 
@@ -111,19 +115,15 @@ void CPUParticleManager::generateAll()
         {
             continue;
         }
-        bool flips = false;
         for (auto& q : p.second)
         {
-            if (q->getFlips() && !flips)
-            {
-                flips = q->getFlips();
-            }
             q->generate(&m_particles_generated[p.first]);
         }
-        if (flips)
+        if (isFlipsMaterial(p.first))
         {
-            STKParticle::updateFlips(m_particles_queue[p.first].size() *
-                m_particles_queue[p.first][0]->getMaxCount());
+            STKParticle::updateFlips(unsigned
+                (m_particles_queue.at(p.first).size() *
+                m_particles_queue.at(p.first)[0]->getMaxCount()));
         }
     }
 }   // generateAll
@@ -172,16 +172,7 @@ void CPUParticleManager::uploadAll()
             glVertexAttribPointer(2, 2, GL_HALF_FLOAT, GL_FALSE, 20,
                 (void*)16);
             glVertexAttribDivisorARB(2, 1);
-            bool flips = false;
-            for (unsigned i = 0; i < m_particles_queue[p.first].size(); i++)
-            {
-                if (m_particles_queue[p.first][i]->getFlips())
-                {
-                    flips = true;
-                    break;
-                }
-            }
-            if (flips)
+            if (isFlipsMaterial(p.first))
             {
                 glBindBuffer(GL_ARRAY_BUFFER, STKParticle::getFlipsBuffer());
                 glEnableVertexAttribArray(6);
@@ -221,22 +212,14 @@ void CPUParticleManager::drawAll()
     std::sort(particle_drawn.begin(), particle_drawn.end(),
         [](const std::pair<Material*, std::string>& a,
            const std::pair<Material*, std::string>& b)->bool
-        { 
+        {
             return a.first->getShaderType() > b.first->getShaderType(); 
         });
 
     Material::ShaderType st = Material::SHADERTYPE_COUNT;
     for (auto& p : particle_drawn)
     {
-        bool flips = false;
-        for (unsigned i = 0; i < m_particles_queue[p.second].size(); i++)
-        {
-            if (m_particles_queue[p.second][i]->getFlips())
-            {
-                flips = true;
-                break;
-            }
-        }
+        const bool flips = isFlipsMaterial(p.second);
         Material* cur_mat = p.first;
         if (cur_mat->getShaderType() != st)
         {
