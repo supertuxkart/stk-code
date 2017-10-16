@@ -194,16 +194,16 @@ class VAOManager : public Singleton<VAOManager>
     GLuint instance_vbo[InstanceTypeCount];
     void *Ptr[InstanceTypeCount];
     void *VBOPtr[VTXTYPE_COUNT], *IBOPtr[VTXTYPE_COUNT];
-    size_t RealVBOSize[VTXTYPE_COUNT], RealIBOSize[VTXTYPE_COUNT];
-    size_t last_vertex[VTXTYPE_COUNT], last_index[VTXTYPE_COUNT];
+    unsigned int RealVBOSize[VTXTYPE_COUNT], RealIBOSize[VTXTYPE_COUNT];
+    unsigned int last_vertex[VTXTYPE_COUNT], last_index[VTXTYPE_COUNT];
     std::unordered_map<irr::scene::IMeshBuffer*, unsigned> mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
     std::map<std::pair<irr::video::E_VERTEX_TYPE, InstanceType>, GLuint> InstanceVAO;
 
     void cleanInstanceVAOs();
-    void regenerateBuffer(enum VTXTYPE, size_t, size_t);
+    void regenerateBuffer(enum VTXTYPE, unsigned int, unsigned int);
     void regenerateVAO(enum VTXTYPE);
     void regenerateInstancedVAO();
-    size_t getVertexPitch(enum VTXTYPE) const;
+    unsigned int getVertexPitch(enum VTXTYPE) const;
     VTXTYPE getVTXTYPE(irr::video::E_VERTEX_TYPE type);
     irr::video::E_VERTEX_TYPE getVertexType(enum VTXTYPE tp);
     void append(irr::scene::IMeshBuffer *, VTXTYPE tp);

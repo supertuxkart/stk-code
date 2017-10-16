@@ -172,7 +172,7 @@ unsigned int RewindManager::findFirstIndex(float target_time) const
 #ifdef REWIND_SEARCH_STATS
     m_count_of_searches++;
 #endif
-    int index = m_rewind_info.size()-1;
+    int index = (int)m_rewind_info.size()-1;
     int index_last_state = -1;
     while(index>=0)
     {
@@ -294,7 +294,7 @@ void RewindManager::rewindTo(float rewind_time)
 
     // Then undo the rewind infos going backwards in time
     // --------------------------------------------------
-    for(int i=m_rewind_info.size()-1; i>=(int)index; i--)
+    for(int i=(int)m_rewind_info.size()-1; i>=(int)index; i--)
     {
         m_rewind_info[i]->undo();
 

@@ -499,9 +499,9 @@ bool GrandPrixData::isEditable() const
 unsigned int GrandPrixData::getNumberOfTracks(bool includeLocked) const
 {
     if (includeLocked)
-        return m_tracks.size();
+        return (unsigned int)m_tracks.size();
     else
-        return getTrackNames(false).size();
+        return (unsigned int)getTrackNames(false).size();
 }   // getNumberOfTracks
 
 // ----------------------------------------------------------------------------

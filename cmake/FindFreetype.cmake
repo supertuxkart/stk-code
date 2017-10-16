@@ -10,8 +10,8 @@
 #     Freetype library list
 
 if(WIN32)
-    find_path(FREETYPE_INCLUDE_DIRS NAMES freetype/freetype.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
-    find_library(FREETYPE_LIBRARY NAMES freetype PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
+    find_path(FREETYPE_INCLUDE_DIRS NAMES freetype/freetype.h PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/include")
+    find_library(FREETYPE_LIBRARY NAMES freetype PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib")
     set(FREETYPE_FOUND 1)
     set(FREETYPE_LIBRARIES ${FREETYPE_LIBRARY})
 elseif(APPLE)

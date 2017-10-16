@@ -76,7 +76,10 @@ public:
       */
     bool isStatic() const                    { return m_dynamic_hue.empty(); }
     // ------------------------------------------------------------------------
-    unsigned int getNumberOfHue() const       { return m_dynamic_hue.size(); }
+    unsigned int getNumberOfHue() const 
+    {
+        return (unsigned int)m_dynamic_hue.size(); 
+    }   // getNumberOfHue
     // ------------------------------------------------------------------------
     float getDynamicHue(unsigned int hue) const
     {

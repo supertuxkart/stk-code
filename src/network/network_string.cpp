@@ -75,7 +75,7 @@ void NetworkString::unitTesting()
  *  the characters of the given string. */
 BareNetworkString& BareNetworkString::encodeString(const std::string &value)
 {
-    int len = value.size();
+    int len = (int)value.size();
     if(len<=255)
         return this->addUInt8(len).addString(value);
     else
