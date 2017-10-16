@@ -1461,8 +1461,6 @@ void initRest()
 
     race_manager->setTrack(UserConfigParams::m_last_track);
 
-    // Preload the explosion effects (explode.png)
-    ParticleKindManager::get()->getParticles("explosion.xml");
 }   // initRest
 
 //=============================================================================
@@ -1563,6 +1561,9 @@ int main(int argc, char *argv[] )
         input_manager->setMode(InputManager::MENU);
         main_loop = new MainLoop();
         material_manager->loadMaterial();
+
+        // Preload the explosion effects (explode.png)
+        ParticleKindManager::get()->getParticles("explosion.xml");
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "options_video.png"));

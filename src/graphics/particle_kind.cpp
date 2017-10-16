@@ -200,6 +200,8 @@ ParticleKind::ParticleKind(const std::string &file)
     {
         material_manager->pushTempMaterial(materials, file);
         m_material_file = material_manager->getLatestMaterial()->getTexFname();
+        // Preload textures
+        getMaterial();
     }
 
     // ------------------------------------------------------------------------

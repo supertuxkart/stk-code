@@ -174,8 +174,11 @@ Material::Material(const XMLNode *node, bool deprecated)
             // backwards compatibility
             node->get("crash-reset-particles", &m_collision_particles);
         }
+        if (!m_collision_particles.empty())
+        {
+            ParticleKindManager::get()->getParticles(m_collision_particles);
+        }
     }
-
 
     s = "";
     if (node->get("shader", &s))
