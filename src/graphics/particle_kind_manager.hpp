@@ -24,6 +24,8 @@
 #include <string>
 #include <map>
 
+class Material;
+
 /**
  * \brief Holds and manages a list of all types of particles
  * \ingroup graphics
@@ -45,6 +47,7 @@ public:
 
     ParticleKind* getParticles(const std::string &name);
 
+    bool   isGlobalParticleMaterial(Material* m) const;
     void   cleanUpTrackSpecificGfx();
     void   cleanup();
 
