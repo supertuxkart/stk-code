@@ -134,6 +134,8 @@ ParticleKind::ParticleKind(const std::string &file)
             delete xml;
             throw std::runtime_error("[ParticleKind] <material> tag has invalid 'file' attribute");
         }
+        // Preload textures
+        getMaterial();
     }
 
     // ------------------------------------------------------------------------

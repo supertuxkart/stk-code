@@ -1461,6 +1461,8 @@ void initRest()
 
     race_manager->setTrack(UserConfigParams::m_last_track);
 
+    // Preload the explosion effects (explode.png)
+    ParticleKindManager::get()->getParticles("explosion.xml");
 }   // initRest
 
 //=============================================================================

@@ -913,6 +913,8 @@ void IrrDriver::applyResolutionSettings()
     // above) - this happens dynamically when the tracks are loaded.
     GUIEngine::reshowCurrentScreen();
     MessageQueue::updatePosition();
+    // Preload the explosion effects (explode.png)
+    ParticleKindManager::get()->getParticles("explosion.xml");
 #endif   // !SERVER_ONLY
 }   // applyResolutionSettings
 
