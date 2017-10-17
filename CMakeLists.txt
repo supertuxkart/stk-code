@@ -78,6 +78,7 @@ endif()
 
 if(USE_GLES2)
     add_definitions(-DUSE_GLES2)
+    add_definitions(-D_IRR_COMPILE_WITH_OGLES2_ -DNO_IRR_COMPILE_WITH_OPENGL_)
 endif()
 
 if(SERVER_ONLY)
