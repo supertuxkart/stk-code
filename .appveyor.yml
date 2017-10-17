@@ -47,7 +47,7 @@ install:
         #Get-ChildItem $env:ASSETS_DIR | Measure-Object -property length -sum
 
 before_build:
-    - ps: Copy-Item "${env:DEPS_DIR}\windows_64bit\dependencies" c:\projects\stk-code\dependencies –Recurse
+    - ps: Copy-Item "${env:DEPS_DIR}\windows_64bit\dependencies" c:\projects\stk-code\dependencies-64bit –Recurse
     - cmd: |
         md build
         cd build
