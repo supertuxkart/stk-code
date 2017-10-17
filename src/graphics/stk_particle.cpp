@@ -253,11 +253,11 @@ void STKParticle::generate(std::vector<CPUParticle>* out)
         {
             if (m_hm != NULL)
             {
-                stimulateHeightMap(i, active_count, NULL);
+                stimulateHeightMap((float)i, active_count, NULL);
             }
             else
             {
-                stimulateNormal(i, active_count, NULL);
+                stimulateNormal((float)i, active_count, NULL);
             }
         }
         m_first_execution = false;

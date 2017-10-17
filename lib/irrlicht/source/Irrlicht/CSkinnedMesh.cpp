@@ -1488,7 +1488,7 @@ void CSkinnedMesh::computeWeightInfluence(SJoint *joint, size_t &index, WeightIn
 		{
 			SWeight& weight = joint->Weights[i];
 			JointInfluence tmp;
-			tmp.joint_idx = index;
+			tmp.joint_idx = (int)index;
 			tmp.weight = weight.strength;
 			wi[weight.buffer_id][weight.vertex_id].push_back(tmp);
 		}

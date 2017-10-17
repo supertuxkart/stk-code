@@ -159,7 +159,7 @@ void CheckCannon::removeFlyable(Flyable *flyable)
                                                   m_all_flyables.end(),
                                                   flyable);
     assert(i != m_all_flyables.end());
-    int index = i - m_all_flyables.begin();   // get the index
+    size_t index = i - m_all_flyables.begin();   // get the index
     m_all_flyables.erase(i);
     m_flyable_previous_position.erase(m_flyable_previous_position.begin() + index);
 }   // removeFlyable
