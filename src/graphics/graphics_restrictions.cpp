@@ -309,6 +309,9 @@ private:
     /** For which OS this rule applies. */
     std::string m_os;
 
+    /** For which vendor this rule applies. */
+    std::string m_vendor;
+
     /** Which options to disable. */
     std::vector<std::string> m_disable_options;
 public:
@@ -327,6 +330,7 @@ public:
         }
 
         rule->get("os", &m_os);
+        rule->get("vendor", &m_vendor);
 
         std::string s;
         if(rule->get("version", &s) && s.size()>1)
@@ -358,7 +362,8 @@ public:
             m_disable_options = StringUtils::split(s, ' ');
     }   // Rule
     // ------------------------------------------------------------------------
-    bool applies(const std::string &card, const Version &version) const
+    bool applies(const std::string &card, const Version &version,
+                 const std::string &vendor) const
     {
         // Test for OS
         // -----------
@@ -378,6 +383,14 @@ public:
             return false;
 #endif
         }   // m_os.size()>0
+        
+        // Test for vendor
+        // ---------------
+        if (m_vendor.size() > 0)
+        {
+            if (m_vendor != vendor)
+                return false;
+        }
 
         // Test for card
         // -------------
@@ -482,9 +495,11 @@ void unitTesting()
  *  \param driver_version The GL_VERSION string (i.e. opengl and version
  *         number).
  *  \param card_name The GL_RENDERER string (i.e. graphics card).
+ *  \param vendor The GL_VENDOR string
  */
 void init(const std::string &driver_version,
-          const std::string &card_name)
+          const std::string &card_name,
+          const std::string &vendor)
 {
     for (unsigned int i = 0; i < GR_COUNT; i++)
         m_all_graphics_restriction.push_back(false);
@@ -518,7 +533,7 @@ void init(const std::string &driver_version,
             continue;
         }
         Rule rule(xml_rule);
-        if (rule.applies(card_name, version))
+        if (rule.applies(card_name, version, vendor))
         {
             std::vector<std::string> restrictions = rule.getRestrictions();
             std::vector<std::string>::iterator p;

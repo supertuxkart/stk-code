@@ -93,7 +93,8 @@ void CentralVideoSettings::init()
     {
         std::string driver((char*)(glGetString(GL_VERSION)));
         std::string card((char*)(glGetString(GL_RENDERER)));
-        GraphicsRestrictions::init(driver, card);
+        std::string vendor((char*)(glGetString(GL_VENDOR)));
+        GraphicsRestrictions::init(driver, card, vendor);
 
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE))
         {

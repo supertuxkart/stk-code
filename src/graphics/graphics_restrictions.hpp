@@ -67,7 +67,8 @@ namespace GraphicsRestrictions
     } ;
 
     void init(const std::string &driver_version,
-              const std::string &card_name       );
+              const std::string &card_name,
+              const std::string &vendor       );
     bool isDisabled(GraphicsRestrictionsType type);
 
     void unitTesting();
