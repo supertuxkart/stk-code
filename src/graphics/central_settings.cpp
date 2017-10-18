@@ -211,13 +211,6 @@ void CentralVideoSettings::init()
             hasSRGBFramebuffer = true;
             Log::info("GLDriver", "ARB framebuffer sRGB Present");
         }
-        // Only unset the high def textures if they are set as default. If the
-        // user has enabled them (bit 1 set), then leave them enabled.
-        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HIGHDEFINITION_TEXTURES) &&
-            (UserConfigParams::m_high_definition_textures & 0x02) == 0)
-        {
-            UserConfigParams::m_high_definition_textures = 0x00;
-        }
 
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GI))
         {
@@ -294,6 +287,24 @@ void CentralVideoSettings::init()
             m_need_vertex_id_workaround = true;
         }
 #endif
+
+        // Only unset the high def textures if they are set as default. If the
+        // user has enabled them (bit 1 set), then leave them enabled.
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HIGHDEFINITION_TEXTURES) &&
+            (UserConfigParams::m_high_definition_textures & 0x02) == 0)
+        {
+            UserConfigParams::m_high_definition_textures = 0x00;
+        }
+        
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HIGHDEFINITION_TEXTURES_256))
+        {
+            UserConfigParams::m_high_definition_textures = 0;
+            
+            if (UserConfigParams::m_max_texture_size > 256)
+            {
+                UserConfigParams::m_max_texture_size = 256;
+            }
+        }
     }
 }
 
