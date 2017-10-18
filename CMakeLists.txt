@@ -86,9 +86,9 @@ if(SERVER_ONLY)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
 endif()
 
-if(DISABLE_VPX)
-    add_definitions(-DNO_VPX)
-endif()
+#if(DISABLE_VPX)
+#    add_definitions(-DNO_VPX)
+#endif()
 
 # Build the Bullet physics library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
@@ -404,7 +404,7 @@ target_link_libraries(supertuxkart
     ${FREETYPE_LIBRARIES}
     ${JPEG_LIBRARIES}
     ${TURBOJPEG_LIBRARY}
-    ${VPX_LIBRARIES}
+    #${VPX_LIBRARIES}
     )
 
 if(NOT SERVER_ONLY)
