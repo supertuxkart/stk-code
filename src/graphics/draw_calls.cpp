@@ -685,19 +685,30 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
 
     PROFILER_PUSH_CPU_MARKER("- Animations/Buffer upload", 0x0, 0x0, 0x0);
     shadow_matrices.updateUBO();
+    if (CVS->supportsHardwareSkinning())
+    {
 #ifdef USE_GLES2
-    glBindTexture(GL_TEXTURE_2D, SharedGPUObjects::getSkinningTexture());
+        glBindTexture(GL_TEXTURE_2D, SharedGPUObjects::getSkinningTexture());
 #else
-    glBindBuffer(GL_TEXTURE_BUFFER, SharedGPUObjects::getSkinningBuffer());
+        glBindBuffer(CVS->isARBShaderStorageBufferObjectUsable() ?
+            GL_SHADER_STORAGE_BUFFER : GL_TEXTURE_BUFFER,
+            SharedGPUObjects::getSkinningBuffer());
 #endif
+    }
     for (unsigned i = 0; i < m_deferred_update.size(); i++)
+    {
         m_deferred_update[i]->updateGL();
-    PROFILER_POP_CPU_MARKER();
+    }
+    if (CVS->supportsHardwareSkinning())
+    {
 #ifdef USE_GLES2
-    glBindTexture(GL_TEXTURE_2D, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
 #else
-    glBindBuffer(GL_TEXTURE_BUFFER, 0);
+        glBindBuffer(CVS->isARBShaderStorageBufferObjectUsable() ?
+            GL_SHADER_STORAGE_BUFFER : GL_TEXTURE_BUFFER, 0);
 #endif
+    }
+    PROFILER_POP_CPU_MARKER();
 
     PROFILER_PUSH_CPU_MARKER("- cpu particle upload", 0x3F, 0x03, 0x61);
     CPUParticleManager::getInstance()->uploadAll();

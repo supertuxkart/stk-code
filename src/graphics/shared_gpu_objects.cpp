@@ -174,14 +174,19 @@ void SharedGPUObjects::initSkinning()
     glBindTexture(GL_TEXTURE_2D, 0);
 #else
     glGenBuffers(1, &m_skinning_buf);
-    glBindBuffer(GL_TEXTURE_BUFFER, m_skinning_buf);
-    glBufferData(GL_TEXTURE_BUFFER, 65536, NULL, GL_DYNAMIC_DRAW);
-    glBindTexture(GL_TEXTURE_BUFFER, m_skinning_tex);
-    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, m_skinning_buf);
-    glBindTexture(GL_TEXTURE_BUFFER, 0);
-    glBindBuffer(GL_TEXTURE_BUFFER, 0);
+    const bool ssbo = CVS->isARBShaderStorageBufferObjectUsable();
+    const GLenum buffer = ssbo ? GL_SHADER_STORAGE_BUFFER : GL_TEXTURE_BUFFER;
+    glBindBuffer(buffer, m_skinning_buf);
+    glBufferData(buffer, 65536, NULL, GL_DYNAMIC_DRAW);
+    if (!ssbo)
+    {
+        glBindTexture(GL_TEXTURE_BUFFER, m_skinning_tex);
+        glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, m_skinning_buf);
+        glBindTexture(GL_TEXTURE_BUFFER, 0);
+    }
+    glBindBuffer(buffer, 0);
 #endif
-}   // initSkinningTBO
+}   // initSkinning
 
 // ----------------------------------------------------------------------------
 void SharedGPUObjects::init()

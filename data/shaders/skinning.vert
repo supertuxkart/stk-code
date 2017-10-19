@@ -75,7 +75,9 @@ void main(void)
             {
                 break;
             }
-#ifdef GL_ES
+#ifdef SSBO_SKINNING
+            mat4 joint_matrix = joint_matrices[Joint[i] + skinning_offset];
+#elif defined(GL_ES)
             mat4 joint_matrix = mat4(
                 texelFetch(skinning_tex, ivec2(0, skinning_offset + Joint[i]), 0),
                 texelFetch(skinning_tex, ivec2(1, skinning_offset + Joint[i]), 0),

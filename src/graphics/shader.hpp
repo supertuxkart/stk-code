@@ -146,9 +146,8 @@ private:
     /** End of recursive implementation of assignUniforms. */
     void assignUniformsImpl()
     {
-        bindPoint("MatrixData",   0);
+        bindPoint("MatrixesData", 0);
         bindPoint("LightingData", 1);
-        bindPoint("SkinningData", 2);
     }   // assignUniformsImpl
 
     // ------------------------------------------------------------------------
@@ -384,28 +383,44 @@ public:
 class SkinnedMeshShader
 {
 private:
-    GLuint m_skinning_tex_location;
+    GLuint m_skinning_location;
 public:
-    SkinnedMeshShader() : m_skinning_tex_location(0) {}
+    SkinnedMeshShader() : m_skinning_location(0) {}
     // ------------------------------------------------------------------------
     template <typename Shader>
     void init(Shader* s)
     {
         s->use();
-        m_skinning_tex_location = s->getUniformLocation("skinning_tex");
-        glUniform1i(m_skinning_tex_location, 15);
+#ifndef USE_GLES2
+        if (CVS->isARBShaderStorageBufferObjectUsable() &&
+            CVS->supportsHardwareSkinning())
+        {
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0,
+                SharedGPUObjects::getSkinningBuffer());
+        }
+        else
+#endif
+        {
+            m_skinning_location = s->getUniformLocation("skinning_tex");
+            glUniform1i(m_skinning_location, 15);
+        }
     }
     // ------------------------------------------------------------------------
     void bindSkinningTexture()
     {
-        glActiveTexture(GL_TEXTURE0 + 15);
 #ifdef USE_GLES2
+        glActiveTexture(GL_TEXTURE0 + 15);
         glBindTexture(GL_TEXTURE_2D, SharedGPUObjects::getSkinningTexture());
-#else
-        glBindTexture(GL_TEXTURE_BUFFER,
-            SharedGPUObjects::getSkinningTexture());
-#endif
         glBindSampler(15, 0);
+#else
+        if (!CVS->isARBShaderStorageBufferObjectUsable())
+        {
+            glActiveTexture(GL_TEXTURE0 + 15);
+            glBindTexture(GL_TEXTURE_BUFFER,
+                SharedGPUObjects::getSkinningTexture());
+            glBindSampler(15, 0);
+        }
+#endif
     }
 };
 

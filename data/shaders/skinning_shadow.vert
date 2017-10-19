@@ -38,11 +38,21 @@ void main(void)
             {
                 break;
             }
+#ifdef SSBO_SKINNING
+            mat4 joint_matrix = joint_matrices[Joint[i] + skinning_offset];
+#elif defined(GL_ES)
+            mat4 joint_matrix = mat4(
+                texelFetch(skinning_tex, ivec2(0, skinning_offset + Joint[i]), 0),
+                texelFetch(skinning_tex, ivec2(1, skinning_offset + Joint[i]), 0),
+                texelFetch(skinning_tex, ivec2(2, skinning_offset + Joint[i]), 0),
+                texelFetch(skinning_tex, ivec2(3, skinning_offset + Joint[i]), 0));
+#else
             mat4 joint_matrix = mat4(
                 texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4),
                 texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4 + 1),
                 texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4 + 2),
                 texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4 + 3));
+#endif
             skinned_position += Weight[i] * joint_matrix * idle_position;
         }
     }
