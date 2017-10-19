@@ -45,7 +45,13 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound, const char 
     std::string filename = particle_file;
     
 #ifdef ANDROID
-    filename = "explosion_low.xml";
+    // Use a lower quality effect on Android for better performance
+    if (filename == "explosion.xml" || 
+        filename == "explosion_bomb.xml" ||
+        filename == "explosion_cake.xml")
+    {
+        filename = "explosion_low.xml";
+    }
 #endif
     
     ParticleKindManager* pkm = ParticleKindManager::get();
