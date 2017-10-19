@@ -11,6 +11,55 @@
 #include "os.h"
 #include "irrMap.h"
 
+inline irr::s16 float_16(irr::f32 in)
+{
+	irr::s32 i;
+	memcpy(&i, &in, 4);
+	irr::s32 s = (i >> 16) & 0x00008000;
+	irr::s32 e = ((i >> 23) & 0x000000ff) - (127 - 15);
+	irr::s32 m = i & 0x007fffff;
+	if (e <= 0)
+	{
+		if (e < -10)
+		{
+			return irr::s16(s);
+		}
+		m = (m | 0x00800000) >> (1 - e);
+		if (m & 0x00001000)
+			m += 0x00002000;
+		return irr::s16(s | (m >> 13));
+	}
+	else if (e == 0xff - (127 - 15))
+	{
+		if (m == 0)
+		{
+			return irr::s16(s | 0x7c00);
+		}
+		else
+		{
+			m >>= 13;
+			return irr::s16(s | 0x7c00 | m | (m == 0));
+		}
+	}
+	else
+	{
+		if (m &  0x00001000)
+		{
+			m += 0x00002000;
+			if (m & 0x00800000)
+			{
+				m =  0;     // overflow in significand,
+				e += 1;     // adjust exponent
+			}
+		}
+		if (e > 30)
+		{
+            return irr::s16(s | 0x7c00);
+		}
+		return irr::s16(s | (e << 10) | (m >> 13));
+	}
+}
+
 namespace irr
 {
 namespace scene
@@ -1450,28 +1499,34 @@ void CSkinnedMesh::convertForSkinning()
 				core::array<JointInfluence> this_influence;
 				core::array<JointInfluence> reported_weight = wi[b][i];
 				reported_weight.sort(sortJointInfluenceFunc);
-				float remaining_weight = 1.0f;
 				for (u32 j = 0; j < 4; j++)
 				{
 					JointInfluence influence;
-					if (reported_weight.size() > j)
-						influence = reported_weight[j];
-					else
-					{
-						influence.joint_idx = -100000;
-						influence.weight = remaining_weight;
-					}
-					remaining_weight -= influence.weight;
+					influence.joint_idx = -100000;
+					influence.weight = 0.0f;
 					this_influence.push_back(influence);
 				}
-				LocalBuffers[b]->Vertices_SkinnedMesh[i].m_joint_idx1 = this_influence[0].joint_idx;
-				LocalBuffers[b]->Vertices_SkinnedMesh[i].m_joint_idx2 = this_influence[1].joint_idx;
-				LocalBuffers[b]->Vertices_SkinnedMesh[i].m_joint_idx3 = this_influence[2].joint_idx;
-				LocalBuffers[b]->Vertices_SkinnedMesh[i].m_joint_idx4 = this_influence[3].joint_idx;
-				LocalBuffers[b]->Vertices_SkinnedMesh[i].m_weight1 = this_influence[0].weight;
-				LocalBuffers[b]->Vertices_SkinnedMesh[i].m_weight2 = this_influence[1].weight;
-				LocalBuffers[b]->Vertices_SkinnedMesh[i].m_weight3 = this_influence[2].weight;
-				LocalBuffers[b]->Vertices_SkinnedMesh[i].m_weight4 = this_influence[3].weight;
+				float total_weight = 0.0f;
+				for (u32 j = 0; j < reported_weight.size(); j++)
+				{
+					total_weight += reported_weight[j].weight;
+					this_influence[j].joint_idx = reported_weight[j].joint_idx;
+					this_influence[j].weight = reported_weight[j].weight;
+				}
+				if (!reported_weight.empty())
+				{
+					for (u32 j = 0; j < reported_weight.size(); j++)
+					{
+						this_influence[j].weight =
+							this_influence[j].weight / total_weight;
+					}
+				}
+				for (int j = 0; j < 4; j++)
+				{
+					LocalBuffers[b]->Vertices_SkinnedMesh[i].m_joint_idx[j] = (s16)this_influence[j].joint_idx;
+					LocalBuffers[b]->Vertices_SkinnedMesh[i].m_weight[j] = float_16
+						(this_influence[j].weight);
+				}
 			}
 		}
 	}

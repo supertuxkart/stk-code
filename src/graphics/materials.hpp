@@ -296,7 +296,8 @@ public:
 // ============================================================================
 class SkinnedPass1Shader : public TextureShader<SkinnedPass1Shader, 1,
                                                 core::matrix4, core::matrix4,
-                                                int>
+                                                int>,
+                          public SkinnedMeshShader
 {
 public:
     SkinnedPass1Shader();
@@ -304,7 +305,8 @@ public:
 
 // ============================================================================
 class InstancedSkinnedPass1Shader
-                         : public TextureShader<InstancedSkinnedPass1Shader, 1>
+                        : public TextureShader<InstancedSkinnedPass1Shader, 1>,
+                          public SkinnedMeshShader
 {
 public:
     InstancedSkinnedPass1Shader();
@@ -313,7 +315,8 @@ public:
 // ============================================================================
 class SkinnedPass2Shader : public TextureShader<SkinnedPass2Shader, 6,
                                                 core::matrix4, core::vector2df,
-                                                core::vector2df, int >
+                                                core::vector2df, int >,
+                           public SkinnedMeshShader
 {
 public:
     SkinnedPass2Shader();
@@ -321,7 +324,8 @@ public:
 
 // ============================================================================
 class InstancedSkinnedPass2Shader
-                         : public TextureShader<InstancedSkinnedPass2Shader, 6>
+                        : public TextureShader<InstancedSkinnedPass2Shader, 6>,
+                          public SkinnedMeshShader
 {
 public:
     InstancedSkinnedPass2Shader();
@@ -331,7 +335,8 @@ public:
 class SkinnedRefPass1Shader : public TextureShader<SkinnedRefPass1Shader, 2,
                                                    core::matrix4,
                                                    core::matrix4,
-                                                   core::vector2df, int>
+                                                   core::vector2df, int>,
+                              public SkinnedMeshShader
 {
 public:
     SkinnedRefPass1Shader();
@@ -339,7 +344,8 @@ public:
 
 // ============================================================================
 class InstancedSkinnedRefPass1Shader
-                      : public TextureShader<InstancedSkinnedRefPass1Shader, 2>
+                     : public TextureShader<InstancedSkinnedRefPass1Shader, 2>,
+                       public SkinnedMeshShader
 {
 public:
     InstancedSkinnedRefPass1Shader();
@@ -349,7 +355,8 @@ public:
 class SkinnedRefPass2Shader : public TextureShader<SkinnedRefPass2Shader, 6,
                                                    core::matrix4,
                                                    core::vector2df,
-                                                   core::vector2df, int>
+                                                   core::vector2df, int>,
+                              public SkinnedMeshShader
 {
 public:
     SkinnedRefPass2Shader();
@@ -357,7 +364,8 @@ public:
 
 // ============================================================================
 class InstancedSkinnedRefPass2Shader
-                      : public TextureShader<InstancedSkinnedRefPass2Shader, 6>
+                     : public TextureShader<InstancedSkinnedRefPass2Shader, 6>,
+                       public SkinnedMeshShader
 {
 public:
     InstancedSkinnedRefPass2Shader();
@@ -366,7 +374,8 @@ public:
 // ============================================================================
 class SkinnedUnlitShader : public TextureShader<SkinnedUnlitShader, 4,
                                                 core::matrix4, core::vector2df,
-                                                int>
+                                                int>,
+                           public SkinnedMeshShader
 {
 public:
     SkinnedUnlitShader();
@@ -374,7 +383,8 @@ public:
 
 // ============================================================================
 class InstancedSkinnedUnlitShader
-                         : public TextureShader<InstancedSkinnedUnlitShader, 4>
+                        : public TextureShader<InstancedSkinnedUnlitShader, 4>,
+                          public SkinnedMeshShader
 {
 public:
     InstancedSkinnedUnlitShader();
@@ -383,7 +393,8 @@ public:
 // ============================================================================
 class SkinnedNormalMapShader : public TextureShader<SkinnedNormalMapShader, 2,
                                                     core::matrix4,
-                                                    core::matrix4, int>
+                                                    core::matrix4, int>,
+                               public SkinnedMeshShader
 {
 public:
     SkinnedNormalMapShader();
@@ -391,7 +402,8 @@ public:
 
 // ============================================================================
 class InstancedSkinnedNormalMapShader
-                     : public TextureShader<InstancedSkinnedNormalMapShader, 2>
+                    : public TextureShader<InstancedSkinnedNormalMapShader, 2>,
+                      public SkinnedMeshShader
 {
 public:
     InstancedSkinnedNormalMapShader();
@@ -399,7 +411,8 @@ public:
 
 // ============================================================================
 class SkinnedShadowShader : public TextureShader<SkinnedShadowShader, 0,
-                                                 core::matrix4, int, int>
+                                                 core::matrix4, int, int>,
+                            public SkinnedMeshShader
 {
 public:
     SkinnedShadowShader();
@@ -407,7 +420,8 @@ public:
 
 // ============================================================================
 class InstancedSkinnedShadowShader
-                   : public TextureShader<InstancedSkinnedShadowShader, 0, int>
+                  : public TextureShader<InstancedSkinnedShadowShader, 0, int>,
+                    public SkinnedMeshShader
 {
 public:
     InstancedSkinnedShadowShader();
@@ -415,7 +429,8 @@ public:
 
 // ============================================================================
 class SkinnedRefShadowShader : public TextureShader<SkinnedRefShadowShader, 1,
-                                                    core::matrix4, int, int>
+                                                    core::matrix4, int, int>,
+                               public SkinnedMeshShader
 {
 public:
     SkinnedRefShadowShader();
@@ -423,7 +438,8 @@ public:
 
 // ============================================================================
 class InstancedSkinnedRefShadowShader
-                : public TextureShader<InstancedSkinnedRefShadowShader, 1, int>
+               : public TextureShader<InstancedSkinnedRefShadowShader, 1, int>,
+                 public SkinnedMeshShader
 {
 public:
     InstancedSkinnedRefShadowShader();

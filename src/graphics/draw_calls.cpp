@@ -258,7 +258,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
         (!culled_for_cams[0] || !culled_for_cams[1] || !culled_for_cams[2] ||
         !culled_for_cams[3] || !culled_for_cams[4] || !culled_for_cams[5]))
     {
-        skinning_offset = getSkinningOffset() + 1/*reserved identity matrix*/;
+        skinning_offset = getSkinningOffset();
         if (skinning_offset + am->getTotalJoints() >
             SharedGPUObjects::getMaxMat4Size())
         {
@@ -684,9 +684,20 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
     }*/
 
     PROFILER_PUSH_CPU_MARKER("- Animations/Buffer upload", 0x0, 0x0, 0x0);
+    shadow_matrices.updateUBO();
+#ifdef USE_GLES2
+    glBindTexture(GL_TEXTURE_2D, SharedGPUObjects::getSkinningTexture());
+#else
+    glBindBuffer(GL_TEXTURE_BUFFER, SharedGPUObjects::getSkinningBuffer());
+#endif
     for (unsigned i = 0; i < m_deferred_update.size(); i++)
         m_deferred_update[i]->updateGL();
     PROFILER_POP_CPU_MARKER();
+#ifdef USE_GLES2
+    glBindTexture(GL_TEXTURE_2D, 0);
+#else
+    glBindBuffer(GL_TEXTURE_BUFFER, 0);
+#endif
 
     PROFILER_PUSH_CPU_MARKER("- cpu particle upload", 0x3F, 0x03, 0x61);
     CPUParticleManager::getInstance()->uploadAll();

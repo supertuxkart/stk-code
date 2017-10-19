@@ -263,7 +263,7 @@ public:
     {
         T::InstancedFirstPassShader::getInstance()->use();
         T::InstancedFirstPassShader::getInstance()->setUniforms(uniforms...);
-        
+        handleSkinning(T::InstancedFirstPassShader::getInstance());
         glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                                     T::Instance));
         for (unsigned i = 0; i < m_meshes[T::MaterialType].size(); i++)
@@ -303,7 +303,7 @@ public:
         {
             T::InstancedFirstPassShader::getInstance()->use();
             T::InstancedFirstPassShader::getInstance()->setUniforms(uniforms...);
-
+            handleSkinning(T::InstancedFirstPassShader::getInstance());
             glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                                         T::Instance));
             glMultiDrawElementsIndirect(GL_TRIANGLES,
@@ -329,7 +329,7 @@ public:
     {
         T::InstancedSecondPassShader::getInstance()->use();
         T::InstancedSecondPassShader::getInstance()->setUniforms(uniforms...);
-
+        handleSkinning(T::InstancedSecondPassShader::getInstance());
         glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                                     T::Instance));
         for (unsigned i = 0; i < m_meshes[T::MaterialType].size(); i++)
@@ -364,7 +364,7 @@ public:
         {
             T::InstancedSecondPassShader::getInstance()->use();
             T::InstancedSecondPassShader::getInstance()->setUniforms(uniforms...);
-            
+            handleSkinning(T::InstancedSecondPassShader::getInstance());
             glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                                         T::Instance));
             expandHandlesSecondPass<T>(handles);
@@ -451,7 +451,7 @@ public:
     {
         T::InstancedShadowPassShader::getInstance()->use();
         T::InstancedShadowPassShader::getInstance()->setUniforms(cascade, uniforms...);
-        
+        handleSkinning(T::InstancedShadowPassShader::getInstance());
         glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                                     InstanceTypeShadow));
                                                                     
@@ -488,7 +488,7 @@ public:
         {
             T::InstancedShadowPassShader::getInstance()->use();
             T::InstancedShadowPassShader::getInstance()->setUniforms(cascade, uniforms...);
-            
+            handleSkinning(T::InstancedShadowPassShader::getInstance());
             glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                                         InstanceTypeShadow));
             glMultiDrawElementsIndirect(GL_TRIANGLES,
