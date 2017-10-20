@@ -181,6 +181,7 @@ void STKConfig::init_defaults()
     m_disable_steer_while_unskid = false;
     m_camera_follow_skid         = false;
     m_cutscene_fov               = 0.61f;
+    m_max_skinning_bones         = 1024;
 
     m_score_increase.clear();
     m_leader_intervals.clear();
@@ -362,6 +363,11 @@ void STKConfig::getAllData(const XMLNode * root)
     {
         fonts_list->get("normal-ttf", &m_normal_ttf);
         fonts_list->get("digit-ttf",  &m_digit_ttf );
+    }
+
+    if (const XMLNode *skinning = root->getNode("skinning"))
+    {
+        skinning->get("max-bones", &m_max_skinning_bones);
     }
 
     // Get the default KartProperties

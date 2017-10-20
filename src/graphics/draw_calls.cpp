@@ -18,6 +18,7 @@
 #ifndef SERVER_ONLY
 #include "graphics/draw_calls.hpp"
 
+#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/command_buffer.hpp"
 #include "graphics/cpu_particle_manager.hpp"
@@ -260,12 +261,12 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
     {
         skinning_offset = getSkinningOffset();
         if (skinning_offset + am->getTotalJoints() >
-            SharedGPUObjects::getMaxMat4Size())
+            stk_config->m_max_skinning_bones)
         {
             Log::error("DrawCalls", "Don't have enough space to render skinned"
                 " mesh %s! Max joints can hold: %d",
                 am->getMeshDebugName().c_str(),
-                SharedGPUObjects::getMaxMat4Size());
+                stk_config->m_max_skinning_bones);
             return;
         }
         m_mesh_for_skinning.insert(am);

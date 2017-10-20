@@ -37,7 +37,6 @@ private:
     static GLuint m_quad_vbo;
     static GLuint m_skinning_tex;
     static GLuint m_skinning_buf;
-    static int m_max_mat4_size;
 
     static void initQuadVBO();
     static void initQuadBuffer();
@@ -109,18 +108,14 @@ public:
     {
         assert(m_has_been_initialised);
         return m_skinning_tex;
-    }   // getSkinningTex
+    }   // getSkinningTexture
     // ------------------------------------------------------------------------
     static GLuint getSkinningBuffer()
     {
         assert(m_has_been_initialised);
         return m_skinning_buf;
     }   // getSkinningBuffer
-    // ------------------------------------------------------------------------
-    static int getMaxMat4Size()
-    {
-        return m_max_mat4_size;
-    }   // getMaxMat4Size
+
 };   // class SharedGPUObjects
 
 
