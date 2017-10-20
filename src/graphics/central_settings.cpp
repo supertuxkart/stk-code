@@ -246,6 +246,11 @@ void CentralVideoSettings::init()
                 hasSRGBFramebuffer = false;
             }
         }
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HARDWARE_SKINNING))
+        {
+            Log::info("GLDriver", "Hardware Skinning enabled, method: %s",
+                isARBShaderStorageBufferObjectUsable() ? "SSBO" : "TBO");
+        }
 #else
         if (m_glsl == true)
         {
@@ -285,6 +290,10 @@ void CentralVideoSettings::init()
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_VERTEX_ID_WORKING))
         {
             m_need_vertex_id_workaround = true;
+        }
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HARDWARE_SKINNING))
+        {
+            Log::info("GLDriver", "Hardware Skinning enabled, method: 1024 * 16 RGBA float texture");
         }
 #endif
 
@@ -527,7 +536,7 @@ bool CentralVideoSettings::isDefferedEnabled() const
 
 bool CentralVideoSettings::supportsHardwareSkinning() const
 {
-    return true;
+    return !GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HARDWARE_SKINNING);
 }
 
 bool CentralVideoSettings::isARBTextureSwizzleUsable() const

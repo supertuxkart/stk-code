@@ -64,6 +64,7 @@ namespace GraphicsRestrictions
         GR_GI,
         GR_FORCE_LEGACY_DEVICE,
         GR_VERTEX_ID_WORKING,
+        GR_HARDWARE_SKINNING,
         GR_COUNT  /** MUST be last entry. */
     } ;
 
