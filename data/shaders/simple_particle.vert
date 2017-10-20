@@ -41,12 +41,13 @@ void main(void)
     float lifetime = color_lifetime.w;
     float alpha = mix(smoothstep(1.0, 0.8, lifetime), lifetime, billboard);
     billboard_mix = billboard;
-    pc = vec4(color_lifetime.zyx, 1.0) * alpha;
+    vec4 particle_color = vec4(color_lifetime.zyx, 1.0) * alpha;
     tc = Texcoord;
 
 #if !defined(sRGB_Framebuffer_Usable) && !defined(Advanced_Lighting_Enabled)
-    pc.rgb = pow(pc.rgb, vec3(1.0 / 2.2));
+    particle_color.rgb = pow(particle_color.rgb, vec3(1.0 / 2.2));
 #endif
+    pc = particle_color;
 
     vec4 viewpos = vec4(0.);
     if (flips == 1)
