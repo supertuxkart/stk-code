@@ -1616,7 +1616,11 @@ void Kart::updateSpeed()
         chassisTrans.getBasis()[1][2],
         chassisTrans.getBasis()[2][2]);
 
-    if (forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) < btScalar(0.))
+    // In theory <0 should be sufficient, but floating point errors can cause
+    // flipping from +eps to -eps and back, resulting in animation flickering
+    // if the kart has backpedal animations.
+    if (forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) 
+        < btScalar(-0.01f))
     {
         m_speed = -m_speed;
     }
