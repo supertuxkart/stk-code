@@ -19,10 +19,10 @@
 
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/shared_gpu_objects.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -88,7 +88,7 @@ void OptionsScreenVideo::initPresets()
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
         2 /* animatedScenery */,
 #ifndef SERVER_ONLY
-        (SharedGPUObjects::getMaxMat4Size() > 512 || !CVS->supportsHardwareSkinning() ? 2 : 1),
+        (stk_config->m_max_skinning_bones > 512 || !CVS->supportsHardwareSkinning() ? 2 : 1),
 #else
         2 /* animatedCharacters */,
 #endif
@@ -102,7 +102,7 @@ void OptionsScreenVideo::initPresets()
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
         2 /* animatedScenery */,
 #ifndef SERVER_ONLY
-        (SharedGPUObjects::getMaxMat4Size() > 512 || !CVS->supportsHardwareSkinning() ? 2 : 1),
+        (stk_config->m_max_skinning_bones > 512 || !CVS->supportsHardwareSkinning() ? 2 : 1),
 #else
         2 /* animatedCharacters */,
 #endif

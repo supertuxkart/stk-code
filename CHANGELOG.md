@@ -4,7 +4,7 @@
 * Code refactoring of both render pipeline by Benau and Elderme
 * New kart Wilber and Hexley by Jymis
 * New kart Kiki by Benau
-* New tracks Cornfield Crossing and Candela City by samuncle
+* New tracks Candela City, Cornfield Crossing and Las Dunas Arena by samuncle
 * Physics improvements and various physics bugfixes by hiker
 * Kart GFX improvements (exhaust and headlight)
 * In-game screen recording powered by libopenglrecorder

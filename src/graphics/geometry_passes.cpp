@@ -202,6 +202,7 @@ void renderTransparenPass(const std::vector<RenderGeometry::TexUnit> &TexUnits,
                           std::vector<std::tuple<TupleType...> > *meshes)
 {
     Shader::getInstance()->use();
+    handleSkinning(Shader::getInstance());
     if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
     for (unsigned i = 0; i < meshes->size(); i++)

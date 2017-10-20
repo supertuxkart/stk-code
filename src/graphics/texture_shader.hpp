@@ -177,6 +177,7 @@ public:
     template<int N, typename... TexIds>
     void setTextureUnitsImpl(GLuint tex_id, TexIds... args)
     {
+        static_assert(N != 15, "15 is reserved for skinning texture");
 #if defined(USE_GLES2)
         if (CVS->getGLSLVersion() >= 300)
 #else

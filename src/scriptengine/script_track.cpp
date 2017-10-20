@@ -270,7 +270,7 @@ namespace Scripting
             {
                 if (memory)
                 {
-                    return ((scene::IAnimatedMeshSceneNode*)(memory))->getFrameNr();
+                    return (int)((scene::IAnimatedMeshSceneNode*)(memory))->getFrameNr();
                 }
                 return -1;
             }
@@ -290,7 +290,7 @@ namespace Scripting
             {
                 if (memory)
                 {
-                    ((scene::IAnimatedMeshSceneNode*)(memory))->setCurrentFrame(frame);
+                    ((scene::IAnimatedMeshSceneNode*)(memory))->setCurrentFrame((float)frame);
                 }
             }
 

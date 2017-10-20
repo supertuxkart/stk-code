@@ -302,7 +302,7 @@ void CPUParticleManager::drawAll()
         }
         glBindVertexArray(std::get<0>(m_gl_particles[p.second]));
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4,
-            m_particles_generated.at(p.second).size());
+            (unsigned)m_particles_generated.at(p.second).size());
     }
 
 }   // drawAll

@@ -18,8 +18,8 @@
 #ifndef SERVER_ONLY
 
 #include "graphics/shader_files_manager.hpp"
+#include "config/stk_config.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/shared_gpu_objects.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
 
@@ -170,7 +170,9 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
         code << "#define Advanced_Lighting_Enabled\n";
     if (CVS->isARBSRGBFramebufferUsable())
         code << "#define sRGB_Framebuffer_Usable\n";
-
+    if (CVS->isARBShaderStorageBufferObjectUsable() &&
+        CVS->supportsHardwareSkinning())
+        code << "#define SSBO_SKINNING\n";
 #if !defined(USE_GLES2)
     // shader compilation fails with some drivers if there is no precision
     // qualifier
@@ -186,7 +188,7 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
     else
         code << "precision mediump float;\n";
 #endif
-    code << "#define MAX_BONES " << SharedGPUObjects::getMaxMat4Size() << "\n";
+    code << "#define MAX_BONES " << stk_config->m_max_skinning_bones << "\n";
 
     code << getHeader();
 
@@ -195,7 +197,7 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
     Log::info("ShaderFilesManager", "Compiling shader : %s", file.c_str());
     const std::string &source  = code.str();
     char const *source_pointer = source.c_str();
-    int len                    = source.size();
+    int len                    = (int)source.size();
     glShaderSource(id, 1, &source_pointer, &len);
     glCompileShader(id);
 

@@ -22,6 +22,7 @@ void main(void)
 #ifdef Use_Bindless_Texture
     vec4 col = texture(handle, uv);
     float specmap = texture(secondhandle, uv).g;
+    float emitmap = texture(secondhandle, uv).b;
     float mask = texture(thirdhandle, uv).a;
 #ifdef SRGBBindlessFix
     col.xyz = pow(col.xyz, vec3(2.2));

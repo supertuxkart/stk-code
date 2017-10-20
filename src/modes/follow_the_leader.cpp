@@ -251,7 +251,7 @@ void FollowTheLeaderRace::terminateRace()
     endSetKartPositions();
 
     // Mark all still racing karts to be finished.
-    for (int i = m_karts.size(); i>0; i--)
+    for (int i = (int)m_karts.size(); i>0; i--)
     {
         AbstractKart *kart = getKartAtPosition(i);
         if (kart->isEliminated() || kart->hasFinishedRace())

@@ -488,6 +488,10 @@ SkinnedPass1Shader::SkinnedPass1Shader()
     if (!CVS->supportsHardwareSkinning()) return;
     loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning.vert",
                               GL_FRAGMENT_SHADER, "object_pass1.frag");
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
+    }
     assignUniforms("ModelMatrix", "InverseModelMatrix", "skinning_offset");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // SkinnedPass1Shader
@@ -499,6 +503,10 @@ InstancedSkinnedPass1Shader::InstancedSkinnedPass1Shader()
     loadProgram(SKINNED_MESH,
                 GL_VERTEX_SHADER, "instanced_skinning.vert",
                 GL_FRAGMENT_SHADER, "instanced_object_pass1.frag");
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
+    }
     assignUniforms();
     assignSamplerNames(0, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // InstancedSkinnedPass1Shader
@@ -509,6 +517,10 @@ SkinnedPass2Shader::SkinnedPass2Shader()
     if (!CVS->supportsHardwareSkinning()) return;
     loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning.vert",
                               GL_FRAGMENT_SHADER, "object_pass2.frag");
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
+    }
     assignUniforms("ModelMatrix", "texture_trans", "color_change",
                    "skinning_offset");
     assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -527,6 +539,10 @@ InstancedSkinnedPass2Shader::InstancedSkinnedPass2Shader()
     loadProgram(SKINNED_MESH,
                 GL_VERTEX_SHADER, "instanced_skinning.vert",
                 GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
+    }
     assignUniforms();
     assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                        1, "SpecularMap", ST_NEAREST_FILTERED,
@@ -543,6 +559,10 @@ SkinnedRefPass1Shader::SkinnedRefPass1Shader()
     if (!CVS->supportsHardwareSkinning()) return;
     loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning.vert",
                               GL_FRAGMENT_SHADER, "objectref_pass1.frag");
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
+    }
     assignUniforms("ModelMatrix", "InverseModelMatrix", "texture_trans",
                    "skinning_offset");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -556,6 +576,10 @@ InstancedSkinnedRefPass1Shader::InstancedSkinnedRefPass1Shader()
     loadProgram(SKINNED_MESH,
                 GL_VERTEX_SHADER, "instanced_skinning.vert",
                 GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
+    }
     assignUniforms();
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                        1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -567,6 +591,10 @@ SkinnedRefPass2Shader::SkinnedRefPass2Shader()
     if (!CVS->supportsHardwareSkinning()) return;
     loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning.vert",
                               GL_FRAGMENT_SHADER, "objectref_pass2.frag");
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
+    }
     assignUniforms("ModelMatrix", "texture_trans", "color_change",
                    "skinning_offset");
     assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -585,6 +613,10 @@ InstancedSkinnedRefPass2Shader::InstancedSkinnedRefPass2Shader()
     loadProgram(SKINNED_MESH,
                 GL_VERTEX_SHADER, "instanced_skinning.vert",
                 GL_FRAGMENT_SHADER, "instanced_objectref_pass2.frag");
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
+    }
     assignUniforms();
     assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                        1, "SpecularMap", ST_NEAREST_FILTERED,
@@ -601,6 +633,10 @@ SkinnedUnlitShader::SkinnedUnlitShader()
     if (!CVS->supportsHardwareSkinning()) return;
     loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning.vert",
                               GL_FRAGMENT_SHADER, "object_unlit.frag");
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
+    }
     assignUniforms("ModelMatrix", "texture_trans", "skinning_offset");
     assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                        1, "SpecularMap", ST_NEAREST_FILTERED,
@@ -615,6 +651,10 @@ InstancedSkinnedUnlitShader::InstancedSkinnedUnlitShader()
     loadProgram(SKINNED_MESH,
                 GL_VERTEX_SHADER, "instanced_skinning.vert",
                 GL_FRAGMENT_SHADER, "instanced_object_unlit.frag");
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
+    }
     assignUniforms();
     assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                        1, "SpecularMap", ST_NEAREST_FILTERED,
@@ -628,6 +668,10 @@ SkinnedNormalMapShader::SkinnedNormalMapShader()
     if (!CVS->supportsHardwareSkinning()) return;
     loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning.vert",
                               GL_FRAGMENT_SHADER, "normalmap.frag");
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
+    }
     assignUniforms("ModelMatrix", "InverseModelMatrix", "skinning_offset");
     assignSamplerNames(0, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                        1, "glossMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -639,6 +683,10 @@ InstancedSkinnedNormalMapShader::InstancedSkinnedNormalMapShader()
     if (!CVS->supportsHardwareSkinning()) return;
     loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "instanced_skinning.vert",
                               GL_FRAGMENT_SHADER, "instanced_normalmap.frag");
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
+    }
     assignUniforms();
     assignSamplerNames(0, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                        1, "glossMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -661,6 +709,10 @@ SkinnedShadowShader::SkinnedShadowShader()
         loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning_shadow.vert",
                                   GL_GEOMETRY_SHADER, "shadow.geom",
                                   GL_FRAGMENT_SHADER, "shadow.frag");
+    }
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
     }
     assignUniforms("ModelMatrix", "skinning_offset", "layer");
 #endif
@@ -686,6 +738,10 @@ InstancedSkinnedShadowShader::InstancedSkinnedShadowShader()
                     GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                     GL_FRAGMENT_SHADER, "shadow.frag");
     }
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
+    }
     assignUniforms("layer");
 #endif
 }   // InstancedSkinnedShadowShader
@@ -707,6 +763,10 @@ SkinnedRefShadowShader::SkinnedRefShadowShader()
         loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning_shadow.vert",
                                   GL_GEOMETRY_SHADER, "shadow.geom",
                                   GL_FRAGMENT_SHADER, "shadowref.frag");
+    }
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
     }
     assignUniforms("ModelMatrix", "skinning_offset", "layer");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -732,6 +792,10 @@ InstancedSkinnedRefShadowShader::InstancedSkinnedRefShadowShader()
                     GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
                     GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                     GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
+    }
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
     }
     assignUniforms("layer");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);

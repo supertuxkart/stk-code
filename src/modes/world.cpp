@@ -1202,10 +1202,15 @@ void World::eliminateKart(int kart_id, bool notify_of_elimination)
                 m_race_gui->addMessage(_("You have been eliminated!"), kart,
                                        2.0f);
             else
+            {
+                // Store the temporary string because clang would mess this up
+                // (remove the stringw before the wchar_t* is used).
+                const core::stringw &kart_name = kart->getName();
                 m_race_gui->addMessage(_("'%s' has been eliminated.",
-                                       kart->getName()),
+                                       kart_name),
                                        camera->getKart(),
                                        2.0f);
+            }
         }  // for i < number of cameras
     }   // if notify_of_elimination
 

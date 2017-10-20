@@ -180,12 +180,12 @@ void Profiler::pushCPUMarker(const char* name, const video::SColor& colour)
     double  start = getTimeMilliseconds() - m_time_last_sync;
     if (i != td.m_all_event_data.end())
     {
-        i->second.setStart(m_current_frame, start, td.m_event_stack.size());
+        i->second.setStart(m_current_frame, start, (int)td.m_event_stack.size());
     }
     else
     {
         EventData ed(colour, m_max_frames);
-        ed.setStart(m_current_frame, start, td.m_event_stack.size());
+        ed.setStart(m_current_frame, start, (int)td.m_event_stack.size());
         td.m_all_event_data[name] = ed;
         // Ordered headings is used to determine the order in which the
         // bar graph is drawn. Outer profiling events will be added first,
@@ -392,8 +392,8 @@ void Profiler::draw()
                 start_xpos += factor*marker.getDuration();
 
             // Reduce vertically the size of the markers according to their layer
-            pos.UpperLeftCorner.Y  += 2 * marker.getLayer();
-            pos.LowerRightCorner.Y -= 2 * marker.getLayer();
+            pos.UpperLeftCorner.Y  += 2 * (int)marker.getLayer();
+            pos.LowerRightCorner.Y -= 2 * (int)marker.getLayer();
 
             GL32_draw2DRectangle(j->second.getColour(), pos);
             // If the mouse cursor is over the marker, get its information
