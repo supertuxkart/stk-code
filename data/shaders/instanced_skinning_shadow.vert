@@ -53,10 +53,13 @@ void main(void)
     {
         for (int i = 0; i < 4; i++)
         {
-            if (Weight[i] < 0.01)
-            {
-                break;
-            }
+            // Logically we should break if the weight is (almost) zero
+            // given the fact that it's sorted from high to low,
+            // but GT240 will cause glitches
+            //if (Weight[i] < 0.01)
+            //{
+            //    break;
+            //}
             mat4 joint_matrix = mat4(
                 texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4),
                 texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4 + 1),

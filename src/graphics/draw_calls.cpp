@@ -261,7 +261,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
     {
         skinning_offset = getSkinningOffset();
         if (skinning_offset + am->getTotalJoints() >
-            stk_config->m_max_skinning_bones)
+            (int)stk_config->m_max_skinning_bones)
         {
             Log::error("DrawCalls", "Don't have enough space to render skinned"
                 " mesh %s! Max joints can hold: %d",
