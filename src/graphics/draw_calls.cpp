@@ -685,7 +685,6 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
     }*/
 
     PROFILER_PUSH_CPU_MARKER("- Animations/Buffer upload", 0x0, 0x0, 0x0);
-    shadow_matrices.updateUBO();
 #ifdef USE_GLES2
     glBindTexture(GL_TEXTURE_2D, SharedGPUObjects::getSkinningTexture());
 #else

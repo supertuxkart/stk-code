@@ -26,7 +26,6 @@
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shared_gpu_objects.hpp"
-#include "graphics/spherical_harmonics.hpp"
 #include "graphics/texture_shader.hpp"
 #include "modes/world.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -312,55 +311,6 @@ void ShadowMatrices::updateSplitAndLightcoordRangeFromComputeShaders(unsigned in
 #endif
 }   // updateSplitAndLightcoordRangeFromComputeShaders
 
-    // ----------------------------------------------------------------------------
-
-void ShadowMatrices::updateUBO()
-{
-    if (!CVS->isARBUniformBufferObjectUsable())
-    {
-        return;
-    }
-    float lighting[36] = {};
-    core::vector3df sun_direction = irr_driver->getSunDirection();
-    video::SColorf sun_color = irr_driver->getSunColor();
-
-    lighting[0] = sun_direction.X;
-    lighting[1] = sun_direction.Y;
-    lighting[2] = sun_direction.Z;
-    lighting[4] = sun_color.getRed();
-    lighting[5] = sun_color.getGreen();
-    lighting[6] = sun_color.getBlue();
-    lighting[7] = 0.54f;
-
-    const SHCoefficients* sh_coeff = irr_driver->getSHCoefficients();
-
-    if (sh_coeff)
-    {
-        memcpy(&lighting[8], sh_coeff->blue_SH_coeff, 9 * sizeof(float));
-        memcpy(&lighting[17], sh_coeff->green_SH_coeff, 9 * sizeof(float));
-        memcpy(&lighting[26], sh_coeff->red_SH_coeff, 9 * sizeof(float));
-    }
-    glBindBuffer(GL_UNIFORM_BUFFER, SharedGPUObjects::getLightingDataUBO());
-    void* ptr = glMapBufferRange(GL_UNIFORM_BUFFER, 0, 36 * 4,
-        GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT |
-        GL_MAP_INVALIDATE_BUFFER_BIT);
-    memcpy(ptr, lighting, 36 * 4);
-    glUnmapBuffer(GL_UNIFORM_BUFFER);
-
-    if (CVS->isSDSMEnabled())
-    {
-        return;
-    }
-    glBindBuffer(GL_UNIFORM_BUFFER,
-    SharedGPUObjects::getViewProjectionMatricesUBO());
-    ptr = glMapBufferRange(GL_UNIFORM_BUFFER, 0, (16 * 9 + 2) * 4,
-        GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT |
-        GL_MAP_INVALIDATE_BUFFER_BIT);
-    memcpy(ptr, m_ubo_data, (16 * 9 + 2) * 4);
-    glUnmapBuffer(GL_UNIFORM_BUFFER);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-}   // updateUBO
-
 // ----------------------------------------------------------------------------
 /** Generate View, Projection, Inverse View, Inverse Projection, ViewProjection
  *  and InverseProjection matrixes and matrixes and cameras for the four shadow
@@ -388,11 +338,12 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
     const float oldfar = camnode->getFarValue();
     const float oldnear = camnode->getNearValue();
 
-    memcpy(m_ubo_data, irr_driver->getViewMatrix().pointer(),          16 * sizeof(float));
-    memcpy(&m_ubo_data[16], irr_driver->getProjMatrix().pointer(),     16 * sizeof(float));
-    memcpy(&m_ubo_data[32], irr_driver->getInvViewMatrix().pointer(),  16 * sizeof(float));
-    memcpy(&m_ubo_data[48], irr_driver->getInvProjMatrix().pointer(),  16 * sizeof(float));
-    memcpy(&m_ubo_data[64], irr_driver->getProjViewMatrix().pointer(), 16 * sizeof(float));
+    float tmp[16 * 9 + 2];
+    memcpy(tmp, irr_driver->getViewMatrix().pointer(),          16 * sizeof(float));
+    memcpy(&tmp[16], irr_driver->getProjMatrix().pointer(),     16 * sizeof(float));
+    memcpy(&tmp[32], irr_driver->getInvViewMatrix().pointer(),  16 * sizeof(float));
+    memcpy(&tmp[48], irr_driver->getInvProjMatrix().pointer(),  16 * sizeof(float));
+    memcpy(&tmp[64], irr_driver->getProjViewMatrix().pointer(), 16 * sizeof(float));
 
     m_sun_cam->render();
     for (unsigned i = 0; i < 4; i++)
@@ -518,23 +469,27 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
 
         size_t size = m_sun_ortho_matrices.size();
         for (unsigned i = 0; i < size; i++)
-            memcpy(&m_ubo_data[16 * i + 80],
+            memcpy(&tmp[16 * i + 80],
                    m_sun_ortho_matrices[i].pointer(),
                    16 * sizeof(float));
     }
 
-    m_ubo_data[144] = float(width);
-    m_ubo_data[145] = float(height);
+    if(!CVS->isARBUniformBufferObjectUsable())
+        return;
+
+    tmp[144] = float(width);
+    tmp[145] = float(height);
+    glBindBuffer(GL_UNIFORM_BUFFER,
+                 SharedGPUObjects::getViewProjectionMatricesUBO());
     if (CVS->isSDSMEnabled())
     {
-        glBindBuffer(GL_UNIFORM_BUFFER,
-        SharedGPUObjects::getViewProjectionMatricesUBO());
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 5) * sizeof(float),
-            m_ubo_data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 5) * sizeof(float), tmp);
         glBufferSubData(GL_UNIFORM_BUFFER, (16 * 9) * sizeof(float),
-            2 * sizeof(float), &m_ubo_data[144]);
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+                        2 * sizeof(float), &tmp[144]);
     }
+    else
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 9 + 2) * sizeof(float),
+                        tmp);
 }   // computeMatrixesAndCameras
 
 // ----------------------------------------------------------------------------

@@ -153,6 +153,39 @@ void ShaderBasedRenderer::prepareForwardRenderer()
 }
 
 // ----------------------------------------------------------------------------
+/** Upload lighting info to the dedicated uniform buffer
+ */
+void ShaderBasedRenderer::uploadLightingData() const
+{
+    assert(CVS->isARBUniformBufferObjectUsable());
+
+    float Lighting[36];
+
+    core::vector3df sun_direction = irr_driver->getSunDirection();
+    video::SColorf sun_color = irr_driver->getSunColor();
+
+    Lighting[0] = sun_direction.X;
+    Lighting[1] = sun_direction.Y;
+    Lighting[2] = sun_direction.Z;
+    Lighting[4] = sun_color.getRed();
+    Lighting[5] = sun_color.getGreen();
+    Lighting[6] = sun_color.getBlue();
+    Lighting[7] = 0.54f;
+
+    const SHCoefficients* sh_coeff = m_spherical_harmonics->getCoefficients();
+
+    if(sh_coeff) {
+        memcpy(&Lighting[8], sh_coeff->blue_SH_coeff, 9 * sizeof(float));
+        memcpy(&Lighting[17], sh_coeff->green_SH_coeff, 9 * sizeof(float));
+        memcpy(&Lighting[26], sh_coeff->red_SH_coeff, 9 * sizeof(float));
+    }
+
+    glBindBuffer(GL_UNIFORM_BUFFER, SharedGPUObjects::getLightingDataUBO());
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 36 * sizeof(float), Lighting);
+}   // uploadLightingData
+
+
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
                                                     unsigned int width, unsigned int height)
 {
@@ -778,9 +811,11 @@ void ShaderBasedRenderer::render(float dt)
             glEnable(GL_FRAMEBUFFER_SRGB);
 #endif
         
-        PROFILER_PUSH_CPU_MARKER("Update camera matrices", 0x0, 0xFF, 0x0);
+        PROFILER_PUSH_CPU_MARKER("UBO upload", 0x0, 0xFF, 0x0);
         computeMatrixesAndCameras(camnode, m_rtts->getWidth(), m_rtts->getHeight());
         m_shadow_matrices.updateSunOrthoMatrices();
+        if(CVS->isARBUniformBufferObjectUsable())
+            uploadLightingData();
         PROFILER_POP_CPU_MARKER();
         renderScene(camnode, dt, track->hasShadows(), false); 
         
@@ -887,6 +922,9 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     irr_driver->getSceneManager()->setActiveCamera(camera);
 
     computeMatrixesAndCameras(camera, m_rtts->getWidth(), m_rtts->getHeight());
+    if (CVS->isARBUniformBufferObjectUsable())
+        uploadLightingData();
+
     renderScene(camera, dt, false, true);
     render_target->setFrameBuffer(m_post_processing
         ->render(camera, false, m_rtts));
