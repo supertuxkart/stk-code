@@ -1,7 +1,11 @@
 uniform mat4 ModelMatrix;
 uniform int skinning_offset;
 uniform int layer;
+#ifdef GL_ES
+uniform sampler2D skinning_tex;
+#else
 uniform samplerBuffer skinning_tex;
+#endif
 
 #ifdef Explicit_Attrib_Location_Usable
 layout(location = 0) in vec3 Position;
@@ -38,9 +42,7 @@ void main(void)
             {
                 break;
             }
-#ifdef SSBO_SKINNING
-            mat4 joint_matrix = joint_matrices[Joint[i] + skinning_offset];
-#elif defined(GL_ES)
+ifdef GL_ES
             mat4 joint_matrix = mat4(
                 texelFetch(skinning_tex, ivec2(0, skinning_offset + Joint[i]), 0),
                 texelFetch(skinning_tex, ivec2(1, skinning_offset + Joint[i]), 0),

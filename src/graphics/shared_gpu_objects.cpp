@@ -184,32 +184,25 @@ void SharedGPUObjects::initSkinning()
 #else
 
     glGenBuffers(1, &m_skinning_buf);
-    const bool ssbo = CVS->isARBShaderStorageBufferObjectUsable();
-    glGetIntegerv(ssbo ? GL_MAX_SHADER_STORAGE_BLOCK_SIZE :
-        GL_MAX_TEXTURE_BUFFER_SIZE, &max_size);
-
+    glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &max_size);
     if (stk_config->m_max_skinning_bones * 64 > (unsigned)max_size)
     {
         Log::warn("SharedGPUObjects", "Too many bones for skinning, max: %d",
             max_size >> 6);
         stk_config->m_max_skinning_bones = max_size >> 6;
     }
-    Log::info("SharedGPUObjects", "Hardware Skinning enabled, method: %s, "
-        "max bones: %u", CVS->isARBShaderStorageBufferObjectUsable() ?
-        "SSBO" : "TBO", stk_config->m_max_skinning_bones);
+    Log::info("SharedGPUObjects", "Hardware Skinning enabled, method: TBO, "
+        "max bones: %u", stk_config->m_max_skinning_bones);
 
-    const GLenum buffer = ssbo ? GL_SHADER_STORAGE_BUFFER : GL_TEXTURE_BUFFER;
-    glBindBuffer(buffer, m_skinning_buf);
-    glBufferData(buffer, stk_config->m_max_skinning_bones * 64, NULL,
+    glBindBuffer(GL_TEXTURE_BUFFER, m_skinning_buf);
+    glBufferData(GL_TEXTURE_BUFFER, stk_config->m_max_skinning_bones * 64, NULL,
         GL_DYNAMIC_DRAW);
-    if (!ssbo)
-    {
-        glBindTexture(GL_TEXTURE_BUFFER, m_skinning_tex);
-        glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, m_skinning_buf);
-        glBindTexture(GL_TEXTURE_BUFFER, 0);
-    }
-    glBindBuffer(buffer, 0);
+    glBindTexture(GL_TEXTURE_BUFFER, m_skinning_tex);
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, m_skinning_buf);
+    glBindTexture(GL_TEXTURE_BUFFER, 0);
+    glBindBuffer(GL_TEXTURE_BUFFER, 0);
 #endif
+
 }   // initSkinning
 
 // ----------------------------------------------------------------------------

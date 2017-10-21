@@ -78,15 +78,11 @@ void main(void)
             {
                 break;
             }
-#ifdef SSBO_SKINNING
-            mat4 joint_matrix = joint_matrices[Joint[i] + skinning_offset];
-#else
             mat4 joint_matrix = mat4(
                 texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4),
                 texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4 + 1),
                 texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4 + 2),
                 texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4 + 3));
-#endif
             skinned_position += Weight[i] * joint_matrix * idle_position;
             skinned_normal += Weight[i] * joint_matrix * idle_normal;
             skinned_tangent += Weight[i] * joint_matrix * idle_tangent;
