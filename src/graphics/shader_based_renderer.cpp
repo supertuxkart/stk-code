@@ -449,8 +449,6 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         PROFILER_POP_CPU_MARKER();
     }
 
-    m_draw_calls.setFenceSync();
-
     // Render particles
     {
         PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0xFF, 0x00);
@@ -458,6 +456,9 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         renderParticles();
         PROFILER_POP_CPU_MARKER();
     }
+    
+    m_draw_calls.setFenceSync();
+    
     if (!CVS->isDefferedEnabled() && !forceRTT)
     {
 #if !defined(USE_GLES2)
