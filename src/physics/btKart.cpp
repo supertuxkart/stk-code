@@ -705,7 +705,9 @@ btScalar btKart::calcRollingFriction(btWheelContactPoint& contactPoint)
     btScalar vrel = contactPoint.m_frictionDirectionWorld.dot(vel);
 
     // calculate j that moves us to zero relative velocity
-    btScalar j1 = -vrel * contactPoint.m_jacDiagABInv;
+    // Note that num_wheels_on_ground > 0 since this function is called
+    // for wheels that touch the ground/
+    btScalar j1 = -vrel * contactPoint.m_jacDiagABInv / m_num_wheels_on_ground;
     btSetMin(j1, maxImpulse);
     btSetMax(j1, -maxImpulse);
 
