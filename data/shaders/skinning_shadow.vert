@@ -1,7 +1,11 @@
 uniform mat4 ModelMatrix;
 uniform int skinning_offset;
 uniform int layer;
+#ifdef GL_ES
+uniform sampler2D skinning_tex;
+#else
 uniform samplerBuffer skinning_tex;
+#endif
 
 #ifdef Explicit_Attrib_Location_Usable
 layout(location = 0) in vec3 Position;
@@ -26,35 +30,23 @@ void main(void)
 {
     vec4 idle_position = vec4(Position, 1.);
     vec4 skinned_position = vec4(0.);
-    if (Weight[0] < 0.01)
+
+    for (int i = 0; i < 4; i++)
     {
-        skinned_position = idle_position;
-    }
-    else
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            if (Weight[i] < 0.01)
-            {
-                break;
-            }
-#ifdef SSBO_SKINNING
-            mat4 joint_matrix = joint_matrices[Joint[i] + skinning_offset];
-#elif defined(GL_ES)
-            mat4 joint_matrix = mat4(
-                texelFetch(skinning_tex, ivec2(0, skinning_offset + Joint[i]), 0),
-                texelFetch(skinning_tex, ivec2(1, skinning_offset + Joint[i]), 0),
-                texelFetch(skinning_tex, ivec2(2, skinning_offset + Joint[i]), 0),
-                texelFetch(skinning_tex, ivec2(3, skinning_offset + Joint[i]), 0));
+#ifdef GL_ES
+        mat4 joint_matrix = mat4(
+            texelFetch(skinning_tex, ivec2(0, clamp(Joint[i] + skinning_offset, 0, MAX_BONES)), 0),
+            texelFetch(skinning_tex, ivec2(1, clamp(Joint[i] + skinning_offset, 0, MAX_BONES)), 0),
+            texelFetch(skinning_tex, ivec2(2, clamp(Joint[i] + skinning_offset, 0, MAX_BONES)), 0),
+            texelFetch(skinning_tex, ivec2(3, clamp(Joint[i] + skinning_offset, 0, MAX_BONES)), 0));
 #else
-            mat4 joint_matrix = mat4(
-                texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4),
-                texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4 + 1),
-                texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4 + 2),
-                texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4 + 3));
+        mat4 joint_matrix = mat4(
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4),
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 1),
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 2),
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 3));
 #endif
             skinned_position += Weight[i] * joint_matrix * idle_position;
-        }
     }
 
 #ifdef VSLayer

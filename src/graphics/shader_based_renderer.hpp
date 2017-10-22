@@ -61,6 +61,8 @@ private:
     
     void prepareForwardRenderer();
 
+    void uploadLightingData() const;
+
     void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode,
                                    unsigned int width, unsigned int height);
     

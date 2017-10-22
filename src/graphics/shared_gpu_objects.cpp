@@ -35,6 +35,8 @@ GLuint SharedGPUObjects::m_skinning_tex;
 GLuint SharedGPUObjects::m_skinning_buf;
 bool   SharedGPUObjects::m_has_been_initialised = false;
 
+#include "matrix4.h"
+
 /** Initialises m_full_screen_quad_vbo.
  */
 void SharedGPUObjects::initQuadVBO()
@@ -159,6 +161,8 @@ void SharedGPUObjects::initLightingDataUBO()
 void SharedGPUObjects::initSkinning()
 {
     glGenTextures(1, &m_skinning_tex);
+    // Reserve 1 identity matrix for non-weighted vertices
+    const irr::core::matrix4 m;
     int max_size = 0;
 #ifdef USE_GLES2
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_size);
@@ -180,36 +184,32 @@ void SharedGPUObjects::initSkinning()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 16,
         stk_config->m_max_skinning_bones, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 16, 1, GL_RGBA, GL_FLOAT,
+        m.pointer());
     glBindTexture(GL_TEXTURE_2D, 0);
 #else
 
     glGenBuffers(1, &m_skinning_buf);
-    const bool ssbo = CVS->isARBShaderStorageBufferObjectUsable();
-    glGetIntegerv(ssbo ? GL_MAX_SHADER_STORAGE_BLOCK_SIZE :
-        GL_MAX_TEXTURE_BUFFER_SIZE, &max_size);
-
+    glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &max_size);
     if (stk_config->m_max_skinning_bones * 64 > (unsigned)max_size)
     {
         Log::warn("SharedGPUObjects", "Too many bones for skinning, max: %d",
             max_size >> 6);
         stk_config->m_max_skinning_bones = max_size >> 6;
     }
-    Log::info("SharedGPUObjects", "Hardware Skinning enabled, method: %s, "
-        "max bones: %u", CVS->isARBShaderStorageBufferObjectUsable() ?
-        "SSBO" : "TBO", stk_config->m_max_skinning_bones);
+    Log::info("SharedGPUObjects", "Hardware Skinning enabled, method: TBO, "
+        "max bones: %u", stk_config->m_max_skinning_bones);
 
-    const GLenum buffer = ssbo ? GL_SHADER_STORAGE_BUFFER : GL_TEXTURE_BUFFER;
-    glBindBuffer(buffer, m_skinning_buf);
-    glBufferData(buffer, stk_config->m_max_skinning_bones * 64, NULL,
-        GL_DYNAMIC_DRAW);
-    if (!ssbo)
-    {
-        glBindTexture(GL_TEXTURE_BUFFER, m_skinning_tex);
-        glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, m_skinning_buf);
-        glBindTexture(GL_TEXTURE_BUFFER, 0);
-    }
-    glBindBuffer(buffer, 0);
+    glBindBuffer(GL_TEXTURE_BUFFER, m_skinning_buf);
+    glBufferData(GL_TEXTURE_BUFFER, stk_config->m_max_skinning_bones * 64,
+        NULL, GL_DYNAMIC_DRAW);
+    glBufferSubData(GL_TEXTURE_BUFFER, 0, 16 * sizeof(float), m.pointer());
+    glBindTexture(GL_TEXTURE_BUFFER, m_skinning_tex);
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, m_skinning_buf);
+    glBindTexture(GL_TEXTURE_BUFFER, 0);
+    glBindBuffer(GL_TEXTURE_BUFFER, 0);
 #endif
+
 }   // initSkinning
 
 // ----------------------------------------------------------------------------

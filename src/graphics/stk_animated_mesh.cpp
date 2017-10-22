@@ -382,9 +382,7 @@ void STKAnimatedMesh::uploadJoints(const irr::core::matrix4& m,
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (offset >> 6) + joint, 16, 1, GL_RGBA,
         GL_FLOAT, m.pointer());
 #else
-    glBufferSubData(CVS->isARBShaderStorageBufferObjectUsable() ?
-        GL_SHADER_STORAGE_BUFFER : GL_TEXTURE_BUFFER,
-        offset + joint * 16 * sizeof(float),
+    glBufferSubData(GL_TEXTURE_BUFFER, offset + joint * 16 * sizeof(float),
         16 * sizeof(float), m.pointer());
 #endif
 }

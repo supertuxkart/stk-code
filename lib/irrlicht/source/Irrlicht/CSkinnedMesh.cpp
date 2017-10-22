@@ -1502,8 +1502,8 @@ void CSkinnedMesh::convertForSkinning()
 				for (u32 j = 0; j < 4; j++)
 				{
 					JointInfluence influence;
-					influence.joint_idx = -100000;
-					influence.weight = 0.0f;
+					influence.joint_idx = -32768;
+					influence.weight = j == 0 ? 1.0f : 0.0f;
 					this_influence.push_back(influence);
 				}
 				float total_weight = 0.0f;

@@ -63,35 +63,17 @@ void main(void)
     vec4 skinned_normal = vec4(0.);
     vec4 skinned_tangent = vec4(0.);
     vec4 skinned_bitangent = vec4(0.);
-    if (Weight[0] < 0.01)
+    for (int i = 0; i < 4; i++)
     {
-        skinned_position = idle_position;
-        skinned_normal = idle_normal;
-        skinned_tangent = idle_tangent;
-        skinned_bitangent = idle_bitangent;
-    }
-    else
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            if (Weight[i] < 0.01)
-            {
-                break;
-            }
-#ifdef SSBO_SKINNING
-            mat4 joint_matrix = joint_matrices[Joint[i] + skinning_offset];
-#else
-            mat4 joint_matrix = mat4(
-                texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4),
-                texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4 + 1),
-                texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4 + 2),
-                texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4 + 3));
-#endif
-            skinned_position += Weight[i] * joint_matrix * idle_position;
-            skinned_normal += Weight[i] * joint_matrix * idle_normal;
-            skinned_tangent += Weight[i] * joint_matrix * idle_tangent;
-            skinned_bitangent += Weight[i] * joint_matrix * idle_bitangent;
-        }
+        mat4 joint_matrix = mat4(
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4),
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 1),
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 2),
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 3));
+        skinned_position += Weight[i] * joint_matrix * idle_position;
+        skinned_normal += Weight[i] * joint_matrix * idle_normal;
+        skinned_tangent += Weight[i] * joint_matrix * idle_tangent;
+        skinned_bitangent += Weight[i] * joint_matrix * idle_bitangent;
     }
 
     gl_Position = ProjectionViewMatrix *  ModelMatrix * skinned_position;

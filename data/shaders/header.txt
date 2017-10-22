@@ -64,12 +64,5 @@ layout (std140) uniform LightingData
     float rL22;
 };
 
-#ifdef SSBO_SKINNING
-layout (std140, binding = 0) readonly buffer SkinningData
-{
-    mat4 joint_matrices[MAX_BONES];
-};
-#endif
-
 #endif
 #endif // HEADER_TXT

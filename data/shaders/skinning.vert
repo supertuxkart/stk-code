@@ -60,41 +60,26 @@ void main(void)
     vec4 skinned_normal = vec4(0.);
     vec4 skinned_tangent = vec4(0.);
     vec4 skinned_bitangent = vec4(0.);
-    if (Weight[0] < 0.01)
+
+    for (int i = 0; i < 4; i++)
     {
-        skinned_position = idle_position;
-        skinned_normal = idle_normal;
-        skinned_tangent = idle_tangent;
-        skinned_bitangent = idle_bitangent;
-    }
-    else
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            if (Weight[i] < 0.01)
-            {
-                break;
-            }
-#ifdef SSBO_SKINNING
-            mat4 joint_matrix = joint_matrices[Joint[i] + skinning_offset];
-#elif defined(GL_ES)
-            mat4 joint_matrix = mat4(
-                texelFetch(skinning_tex, ivec2(0, skinning_offset + Joint[i]), 0),
-                texelFetch(skinning_tex, ivec2(1, skinning_offset + Joint[i]), 0),
-                texelFetch(skinning_tex, ivec2(2, skinning_offset + Joint[i]), 0),
-                texelFetch(skinning_tex, ivec2(3, skinning_offset + Joint[i]), 0));
+#ifdef GL_ES
+        mat4 joint_matrix = mat4(
+            texelFetch(skinning_tex, ivec2(0, clamp(Joint[i] + skinning_offset, 0, MAX_BONES)), 0),
+            texelFetch(skinning_tex, ivec2(1, clamp(Joint[i] + skinning_offset, 0, MAX_BONES)), 0),
+            texelFetch(skinning_tex, ivec2(2, clamp(Joint[i] + skinning_offset, 0, MAX_BONES)), 0),
+            texelFetch(skinning_tex, ivec2(3, clamp(Joint[i] + skinning_offset, 0, MAX_BONES)), 0));
 #else
-            mat4 joint_matrix = mat4(
-                texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4),
-                texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4 + 1),
-                texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4 + 2),
-                texelFetch(skinning_tex, (Joint[i] + skinning_offset) * 4 + 3));
+        mat4 joint_matrix = mat4(
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4),
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 1),
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 2),
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 3));
 #endif
-            skinned_position += Weight[i] * joint_matrix * idle_position;
-            skinned_normal += Weight[i] * joint_matrix * idle_normal;
-            skinned_tangent += Weight[i] * joint_matrix * idle_tangent;
-            skinned_bitangent += Weight[i] * joint_matrix * idle_bitangent;
-        }
+        skinned_position += Weight[i] * joint_matrix * idle_position;
+        skinned_normal += Weight[i] * joint_matrix * idle_normal;
+        skinned_tangent += Weight[i] * joint_matrix * idle_tangent;
+        skinned_bitangent += Weight[i] * joint_matrix * idle_bitangent;
     }
 
     gl_Position = ProjectionViewMatrix * ModelMatrix * skinned_position;

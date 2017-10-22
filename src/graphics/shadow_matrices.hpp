@@ -49,7 +49,6 @@ private:
     core::matrix4              m_rsm_matrix;
     bool                       m_rsm_matrix_initialized;
     float                      m_shadows_cam[4][24];
-    float                      m_ubo_data[16 * 9 + 2];
     bool                       m_rsm_map_available;
     core::vector3df            m_rh_extend;
     core::matrix4              m_rh_matrix;
@@ -105,7 +104,6 @@ public:
         return m_shadow_scales;
     }
     // ------------------------------------------------------------------------
-    void updateUBO();
 
 };   // class ShadowMatrices
 
