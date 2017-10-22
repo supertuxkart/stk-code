@@ -259,7 +259,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
         (!culled_for_cams[0] || !culled_for_cams[1] || !culled_for_cams[2] ||
         !culled_for_cams[3] || !culled_for_cams[4] || !culled_for_cams[5]))
     {
-        skinning_offset = getSkinningOffset();
+        skinning_offset = getSkinningOffset() + 1/*reserved identity matrix*/;
         if (skinning_offset + am->getTotalJoints() >
             (int)stk_config->m_max_skinning_bones)
         {

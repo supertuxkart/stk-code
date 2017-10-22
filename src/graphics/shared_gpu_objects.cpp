@@ -35,6 +35,8 @@ GLuint SharedGPUObjects::m_skinning_tex;
 GLuint SharedGPUObjects::m_skinning_buf;
 bool   SharedGPUObjects::m_has_been_initialised = false;
 
+#include "matrix4.h"
+
 /** Initialises m_full_screen_quad_vbo.
  */
 void SharedGPUObjects::initQuadVBO()
@@ -159,6 +161,8 @@ void SharedGPUObjects::initLightingDataUBO()
 void SharedGPUObjects::initSkinning()
 {
     glGenTextures(1, &m_skinning_tex);
+    // Reserve 1 identity matrix for non-weighted vertices
+    const irr::core::matrix4 m;
     int max_size = 0;
 #ifdef USE_GLES2
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_size);
@@ -180,6 +184,8 @@ void SharedGPUObjects::initSkinning()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 16,
         stk_config->m_max_skinning_bones, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 16, 1, GL_RGBA, GL_FLOAT,
+        m.pointer());
     glBindTexture(GL_TEXTURE_2D, 0);
 #else
 
@@ -195,8 +201,9 @@ void SharedGPUObjects::initSkinning()
         "max bones: %u", stk_config->m_max_skinning_bones);
 
     glBindBuffer(GL_TEXTURE_BUFFER, m_skinning_buf);
-    glBufferData(GL_TEXTURE_BUFFER, stk_config->m_max_skinning_bones * 64, NULL,
-        GL_DYNAMIC_DRAW);
+    glBufferData(GL_TEXTURE_BUFFER, stk_config->m_max_skinning_bones * 64,
+        NULL, GL_DYNAMIC_DRAW);
+    glBufferSubData(GL_TEXTURE_BUFFER, 0, 16 * sizeof(float), m.pointer());
     glBindTexture(GL_TEXTURE_BUFFER, m_skinning_tex);
     glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, m_skinning_buf);
     glBindTexture(GL_TEXTURE_BUFFER, 0);
