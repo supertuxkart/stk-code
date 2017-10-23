@@ -2167,6 +2167,8 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 {
     if(World::getWorld()->getTimeSinceStart()-m_time_last_crash < 0.5f) return;
 
+	
+	
     m_time_last_crash = World::getWorld()->getTimeSinceStart();
     // After a collision disable the engine for a short time so that karts
     // can 'bounce back' a bit (without this the engine force will prevent
@@ -2175,17 +2177,26 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
     {
         if (m_body->getLinearVelocity().length()> 0.555f)
         {
+			
+			float PercentageOfMaxSpeed = m_speed / m_max_speed->getCurrentMaxSpeed();
+			
             // In case that the sfx is longer than 0.5 seconds, only play it if
             // it's not already playing.
             if (isShielded() || (k != NULL && k->isShielded()))
             {
-                getNextEmitter()->play(getXYZ(), m_boing_sound);
+				getNextEmitter()->reallySetVolume(PercentageOfMaxSpeed);
+				m_emitters[m_emitter_id]->reallySetMasterVolumeNow(PercentageOfMaxSpeed);
+				m_emitters[m_emitter_id]->play(getXYZ(), m_boing_sound);
             }
             else
             {
                 int idx = rand() % CRASH_SOUND_COUNT;
+				
                 SFXBuffer* buffer = m_crash_sounds[idx];
-                getNextEmitter()->play(getXYZ(), buffer);
+				
+				getNextEmitter()->reallySetVolume(PercentageOfMaxSpeed);
+				m_emitters[m_emitter_id]->reallySetMasterVolumeNow(PercentageOfMaxSpeed);
+				m_emitters[m_emitter_id]->play(getXYZ(), buffer);
             }
         }    // if lin_vel > 0.555
     }   // if m_bounce_back_time <= 0
@@ -2694,6 +2705,7 @@ void Kart::kartIsInRestNow()
 }   // kartIsInRestNow
 
 //-----------------------------------------------------------------------------
+
 
 SFXBase* Kart::getNextEmitter()
 {
