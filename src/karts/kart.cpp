@@ -2184,12 +2184,13 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 
 			if (k == NULL) //Collision with wall
 			{
-				Volume = (m_speed / SpeedForMaxVolume) / 2;
+				Volume = (m_speed / SpeedForMaxVolume);
 			}
 			else
 			{
 				btVector3 ThisKartRotation = getVelocity();
 				btVector3 OtherKartRotation = k->getVelocity();
+				
 				
 				btScalar ScaledRotationDifference = ThisKartRotation.angle(OtherKartRotation) / 3.14159; //Difference in angles of karts in collision, Scaled by PI
 				
@@ -2206,6 +2207,7 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 				//Full speed orthogonal = 0.5
 				//Half Speed difference orthogonal = 0.25
 				//Half speed orthogonal = 0.25
+				//Full Speed same direction = 0.5
 
 				//Worth noting that when colliding to a wall at Max Speed, the volume is 0.5, similar to a stationary kart  0.5
 				//This is something to consider changing
