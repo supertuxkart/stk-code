@@ -479,6 +479,7 @@ public:
     virtual bool isJumping() const { return m_is_jumping; };
     // ------------------------------------------------------------------------
     SFXBase* getNextEmitter();
+	SFXBase * getCurrentEmitter();
     // ------------------------------------------------------------------------
     virtual void playSound(SFXBuffer* buffer);
 };   // Kart
