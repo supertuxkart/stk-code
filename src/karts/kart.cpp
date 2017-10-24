@@ -2209,8 +2209,7 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 				//Half speed orthogonal = 0.25
 				//Full Speed same direction = 0.5
 
-				//Worth noting that when colliding to a wall at Max Speed, the volume is 0.5, similar to a stationary kart  0.5
-				//This is something to consider changing
+				
 
 				if(ScaledSpeedDifference > ScaledRotationDifference && ((SpeedDifference > 0.5) & (ScaledRotationDifference < 0.5)))
 				{ //When speed difference is 1 and directional difference is 0, this limits the maximum volume to 0.5	
@@ -2226,7 +2225,7 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 			{
 				Volume = MaxVolume;
 			}
-			std::cout << "Volume is: " << Volume << std::endl;
+			
 			getNextEmitter()->reallySetVolume(Volume);
 
             // In case that the sfx is longer than 0.5 seconds, only play it if
