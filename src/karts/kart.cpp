@@ -2178,47 +2178,53 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
         if (m_body->getLinearVelocity().length()> 0.555f)
         {
 			
-			float SpeedUpperBound = 15; //The speed at which the sound plays at maximum volume
+			float SpeedForMaxVolume = 15; //The speed at which the sound plays at maximum volume
 			float Volume;
 			float MaxVolume = 1; //The maximum volume a sound is played at 
 
 			if (k == NULL) //Collision with wall
 			{
-				Volume = m_speed / SpeedUpperBound;
+				Volume = (m_speed / SpeedForMaxVolume) / 2;
 			}
 			else
 			{
 				btVector3 ThisKartRotation = getVelocity();
 				btVector3 OtherKartRotation = k->getVelocity();
 				
-				btScalar ScaledRotationDifference = ThisKartRotation.angle(OtherKartRotation) / 3.14159; //Scaled by PI
+				btScalar ScaledRotationDifference = ThisKartRotation.angle(OtherKartRotation) / 3.14159; //Difference in angles of karts in collision, Scaled by PI
 				
 				
 				btScalar SpeedDifference = getSpeed() - k->getSpeed();
-				SpeedDifference = (SpeedDifference * SpeedDifference) / SpeedDifference; //Make it absolute
 				
-				//This has the potential to be higher than 1 however, needs fixing by changing upper bound
+				SpeedDifference = fabs(SpeedDifference);
+				 
 				
-				float ScaledSpeedDifference = SpeedDifference / SpeedUpperBound;
-				
+				float ScaledSpeedDifference = SpeedDifference / SpeedForMaxVolume; //Scaled by the Speed For Max Volume
+				std::cout << "Speed Diff is: " << ScaledSpeedDifference <<  "Rot Diff is: " << ScaledRotationDifference << std::endl;
 				//Ensure that both direction AND difference in speed is taken into account when calculating sound
-				if (ScaledSpeedDifference > ScaledRotationDifference)
+				//Full speed opposite directions = 1
+				//Full speed orthogonal = 0.5
+				//Half Speed difference orthogonal = 0.25
+				//Half speed orthogonal = 0.25
+
+				//Worth noting that when colliding to a wall at Max Speed, the volume is 0.5, similar to a stationary kart  0.5
+				//This is something to consider changing
+
+				if(ScaledSpeedDifference > ScaledRotationDifference && ((SpeedDifference > 0.5) & (ScaledRotationDifference < 0.5)))
+				{ //When speed difference is 1 and directional difference is 0, this limits the maximum volume to 0.5	
+					Volume = (ScaledSpeedDifference + 0.25) * (((MaxVolume / 2) - ScaledRotationDifference) / 2);
+				}
+				else
 				{
 					Volume = (ScaledSpeedDifference + ScaledRotationDifference) * ScaledRotationDifference;
 				}
-				else
-				{ //When speed difference is 1 and directional difference is 0, this limits the maximum volume to 0.5	
-					Volume = (ScaledSpeedDifference + ScaledRotationDifference) * ( ( (MaxVolume / 2) - ScaledRotationDifference) / 2 );
-				}
-
-				
 			}
 			
 			if (Volume > MaxVolume)
 			{
 				Volume = MaxVolume;
 			}
-
+			std::cout << "Volume is: " << Volume << std::endl;
 			getNextEmitter()->reallySetVolume(Volume);
 
             // In case that the sfx is longer than 0.5 seconds, only play it if
