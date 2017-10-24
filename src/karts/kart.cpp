@@ -2178,14 +2178,54 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
         if (m_body->getLinearVelocity().length()> 0.555f)
         {
 			
-			float PercentageOfMaxSpeed = m_speed / m_max_speed->getCurrentMaxSpeed();
+			float SpeedUpperBound = 15; //The speed at which the sound plays at maximum volume
+			float Volume;
+			float MaxVolume = 1;
+
+			if (k == NULL) //Collide with wall
+			{
+				Volume = m_speed / SpeedUpperBound;
+			}
+			else
+			{
+				//Code needs to be optimised as this will be running frequently
+				
+				btVector3 ThisKartRotation = getVelocity();
+				btVector3 OtherKartRotation = k->getVelocity();
+				
+				btScalar RotationDifference = ThisKartRotation.angle(OtherKartRotation) / 3.14159; //Scaled by PI
+				
+				
+				btScalar SpeedDifference = getSpeed() - k->getSpeed();
+				SpeedDifference = (SpeedDifference * SpeedDifference) / SpeedDifference; //Make it absolute
+				
+				//This has the potential to be higher than 1 however, needs fixing by changing upper bound
+				
+				float speedpercentage = SpeedDifference / SpeedUpperBound;
+				
+				//Ensure that both direction AND difference in speed is taken into account when calculating sound
+				if (speedpercentage > RotationDifference)
+				{
+					Volume = (speedpercentage + RotationDifference) * RotationDifference;
+				}
+				else
+				{ //When speed is 1 and Rot is 0, this limits the maximum volume to 0.5
+					Volume = (speedpercentage + RotationDifference) * ( ( (MaxVolume / 2) - RotationDifference) /2 );
+				}
+
+				if (Volume > MaxVolume)
+				{
+					Volume = MaxVolume;
+				}
+			}
 			
+			
+			log(Volume);
             // In case that the sfx is longer than 0.5 seconds, only play it if
             // it's not already playing.
             if (isShielded() || (k != NULL && k->isShielded()))
             {
-				getNextEmitter()->reallySetVolume(PercentageOfMaxSpeed);
-				m_emitters[m_emitter_id]->reallySetMasterVolumeNow(PercentageOfMaxSpeed);
+				getNextEmitter()->reallySetVolume(Volume);
 				m_emitters[m_emitter_id]->play(getXYZ(), m_boing_sound);
             }
             else
@@ -2194,8 +2234,10 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 				
                 SFXBuffer* buffer = m_crash_sounds[idx];
 				
-				getNextEmitter()->reallySetVolume(PercentageOfMaxSpeed);
-				m_emitters[m_emitter_id]->reallySetMasterVolumeNow(PercentageOfMaxSpeed);
+				getNextEmitter()->reallySetVolume(Volume);
+				//TODO Reduce the following two lines
+				//TODO getCurrentEmitter() sounds like an appropriate edition to this class, allowing a modification before playing, and keeping
+				//The layers of abstraction intact
 				m_emitters[m_emitter_id]->play(getXYZ(), buffer);
             }
         }    // if lin_vel > 0.555
