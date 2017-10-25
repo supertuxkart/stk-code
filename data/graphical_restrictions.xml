@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <graphical-restrictions>
-  <card is="Intel(R) HD Graphics"      os="windows" version="<9.0" disable="ForceLegacyDevice"/>
-  <card is="Intel(R) HD Graphics"      os="windows"                disable="HighDefinitionTextures"/>
-  <card is="Intel(R) HD Graphics"      os="windows"                disable="UniformBufferObject"/>
-  <card is="Intel(R) HD Graphics"      os="windows"                disable="FramebufferSRGB"/>
-  <card is="Intel(R) HD Graphics"      os="windows"                disable="AdvancedPipeline"/>
+  <card is="Intel(R) HD Graphics"      os="windows" version="<9.0"  disable="ForceLegacyDevice"/>
+  <card is="Intel(R) HD Graphics"      os="windows" version="<10.0" disable="HighDefinitionTextures"/>
+  <card is="Intel(R) HD Graphics"      os="windows" version="<10.0" disable="UniformBufferObject"/>
+  <card is="Intel(R) HD Graphics"      os="windows" version="<10.0" disable="FramebufferSRGB"/>
+  <card is="Intel(R) HD Graphics"      os="windows" version="<10.0" disable="AdvancedPipeline"/>
   <card is="Intel(R) HD Graphics 2000" os="windows"                disable="UniformBufferObject"/>
   <card is="Intel(R) HD Graphics 2000" os="windows"                disable="FramebufferSRGB"/>
   <card is="Intel(R) HD Graphics 2000" os="windows"                disable="HighDefinitionTextures"/>
