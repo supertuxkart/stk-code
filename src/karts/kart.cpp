@@ -2187,11 +2187,11 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 			}
 			else
 			{
-				const Vec3 ThisKartVelocity = getVelocity();
-				const Vec3 OtherKartVelocity = k->getVelocity();
-				
-				const Vec3 VelocityDifference = ThisKartVelocity - OtherKartVelocity;
-				const float LengthOfDifference = VelocityDifference.length();
+			    const Vec3 ThisKartVelocity = getVelocity();
+			    const Vec3 OtherKartVelocity = k->getVelocity();
+			    const Vec3 VelocityDifference = ThisKartVelocity - OtherKartVelocity;
+			    const float LengthOfDifference = VelocityDifference.length();
+
 			    volume = LengthOfDifference / speed_for_max_volume;
 			}
 
@@ -2205,15 +2205,14 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
             // it's not already playing.
             if (isShielded() || (k != NULL && k->isShielded()))
             {
-				crash_sound_emitter->play(getXYZ(), m_boing_sound);
+			    crash_sound_emitter->play(getXYZ(), m_boing_sound);
             }
             else
             {
                 int idx = rand() % CRASH_SOUND_COUNT;
-				
                 SFXBuffer* buffer = m_crash_sounds[idx];
 				
-				crash_sound_emitter->play(getXYZ(), buffer);
+			    crash_sound_emitter->play(getXYZ(), buffer);
             }
         }    // if lin_vel > 0.555
     }   // if m_bounce_back_time <= 0
