@@ -69,28 +69,27 @@ RaceGUIBase::RaceGUIBase()
     m_string_go             = _("Go!");
     //I18N: Shown when a goal is scored
     m_string_goal           = _("GOAL!");
-    // Make the two materials permanent (in case that they are not listed
-    // in the textures/materials.xml file).
-    m_music_icon            = material_manager->getMaterial("notes.png",
-                                                            /*full path*/false,
-                                                            /*permanent*/true);
-    if(!m_music_icon->getTexture())
-        Log::fatal("RaceGuiBase", "Can't find 'notes.png' texture, aborting.");
 
-    m_plunger_face          = material_manager->getMaterial("plungerface.png",
-                                                            /*full path*/false,
-                                                            /*permanent*/true);
-    if(!m_plunger_face->getTexture())
+    m_music_icon = irr_driver->getTexture("notes.png");
+    if (!m_music_icon)
+    {
+        Log::fatal("RaceGuiBase", "Can't find 'notes.png' texture, aborting.");
+    }
+
+    m_plunger_face = irr_driver->getTexture("plungerface.png");
+    if (!m_plunger_face)
+    {
         Log::fatal("RaceGuiBase",
                    "Can't find 'plungerface.png' texture, aborting.");
+    }
 
     //read frame picture for icons in the mini map.
-    m_icons_frame           = material_manager->getMaterial("icons-frame.png",
-                                                            /*full_path*/false,
-                                                            /*permanent*/true);
-    if(!m_icons_frame->getTexture())
+    m_icons_frame = irr_driver->getTexture("icons-frame.png");
+    if (!m_icons_frame)
+    {
         Log::fatal("RaceGuiBase",
                    "Can't find 'icons-frame.png' texture, aborting.");
+    }
 
     m_gauge_full            = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gauge_full.png"));
     m_gauge_full_bright     = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gauge_full_bright.png"));
@@ -559,16 +558,14 @@ void RaceGUIBase::drawGlobalMusicDescription()
     int iconSizeX = (int)(ICON_SIZE*resize + x_pulse*resize*resize);
     int iconSizeY = (int)(ICON_SIZE*resize + y_pulse*resize*resize);
 
-    video::ITexture *t = m_music_icon->getTexture();
     core::rect<s32> dest(noteX-iconSizeX/2+20,
                          noteY-iconSizeY/2+ICON_SIZE/2,
                          noteX+iconSizeX/2+20,
                          noteY+iconSizeY/2+ICON_SIZE/2);
     const core::rect<s32> source(core::position2d<s32>(0,0),
-                                 t->getSize());
+                                 m_music_icon->getSize());
 
-    draw2DImage(t, dest, source,
-                                              NULL, NULL, true);
+    draw2DImage(m_music_icon, dest, source, NULL, NULL, true);
 #endif
 }   // drawGlobalMusicDescription
 
@@ -846,9 +843,8 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
                                    100+(int)(100*cos(M_PI/2*i+World::getWorld()->getTime()*2)));
             }
             const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                       m_icons_frame->getTexture()->getSize());
-            draw2DImage(
-                                                      m_icons_frame->getTexture(), pos, rect,NULL, colors, true);
+                                       m_icons_frame->getSize());
+            draw2DImage(m_icons_frame, pos, rect,NULL, colors, true);
         }
 
         // Fixes crash bug, why are certain icons not showing up?
@@ -1040,15 +1036,14 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
     int plunger_x = viewport.UpperLeftCorner.X + screen_width/2
                   - plunger_size/2;
 
-    video::ITexture *t=m_plunger_face->getTexture();
     plunger_x += (int)m_plunger_offset.X;
     core::rect<s32> dest(plunger_x,              offset_y,
                          plunger_x+plunger_size, offset_y+plunger_size);
 
     const core::rect<s32> source(core::position2d<s32>(0,0),
-                                 t->getSize());
+                                 m_plunger_face->getSize());
 
-    draw2DImage(t, dest, source,
+    draw2DImage(m_plunger_face, dest, source,
                                               &viewport /* clip */,
                                               NULL /* color */,
                                               true /* alpha */     );

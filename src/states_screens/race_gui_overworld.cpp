@@ -423,10 +423,9 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                     colors[i]=kart->getKartProperties()->getColor();
                 }
                 const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                           m_icons_frame->getTexture()->getSize());
+                                           m_icons_frame->getSize());
 
-                draw2DImage(m_icons_frame->getTexture(), position,
-                                                          rect, NULL, colors, true);
+                draw2DImage(m_icons_frame, position, rect, NULL, colors, true);
             }   // if isPlayerController
 
             draw2DImage(icon, position, source, NULL, NULL, true);
