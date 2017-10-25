@@ -123,6 +123,7 @@ km_KH=0
 kn=ಕನ್ನಡ
 ko=한국어
 ko_KR=0
+krl=Karjalan kieli
 ku=Kurdî
 kw=Kernowek
 ky=кыргызча
