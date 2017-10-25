@@ -369,7 +369,22 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam m_last_used_kart_group
             PARAM_DEFAULT( StringUserConfigParam("all", "last_kart_group",
                                                  "Last selected kart group") );
-
+	// ---- Gamemode setup
+	
+	PARAM_PREFIX StringListUserConfigParam m_karts_per_gamemode
+	    PARAM_DEFAULT(StringListUserConfigParam("karts_per_gamemode",
+            "Number of karts per gamemode. Order corresponds to Enum value",
+			10,
+			"3",
+			"3",
+			"3",
+			"3",
+			"3",
+			"3",
+			"3",
+			"3",
+			"3",
+			"3"));
     // ---- Wiimote data
     PARAM_PREFIX GroupUserConfigParam        m_wiimote_group
         PARAM_DEFAULT( GroupUserConfigParam("WiiMote",
