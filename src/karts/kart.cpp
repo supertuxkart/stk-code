@@ -2213,7 +2213,7 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 
                 SFXBuffer* buffer = m_crash_sounds[idx];
                 crash_sound_emitter->play(getXYZ(), buffer);
-			}
+            }
         }    // if lin_vel > 0.555
     }   // if m_bounce_back_time <= 0
 }   // playCrashSFX
