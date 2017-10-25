@@ -1507,15 +1507,17 @@ void CSkinnedMesh::convertForSkinning()
 					this_influence.push_back(influence);
 				}
 				float total_weight = 0.0f;
-				for (u32 j = 0; j < reported_weight.size(); j++)
+				const unsigned max_weight =
+					reported_weight.size() > 4 ? 4 : reported_weight.size();
+				for (u32 j = 0; j < max_weight; j++)
 				{
 					total_weight += reported_weight[j].weight;
 					this_influence[j].joint_idx = reported_weight[j].joint_idx;
 					this_influence[j].weight = reported_weight[j].weight;
 				}
-				if (!reported_weight.empty())
+				if (total_weight != 0.0f)
 				{
-					for (u32 j = 0; j < reported_weight.size(); j++)
+					for (u32 j = 0; j < max_weight; j++)
 					{
 						this_influence[j].weight =
 							this_influence[j].weight / total_weight;
