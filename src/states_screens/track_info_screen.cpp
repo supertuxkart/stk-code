@@ -245,8 +245,10 @@ void TrackInfoScreen::init()
         m_ai_kart_spinner->setValue(0);
         m_ai_kart_spinner->setActive(false);
         race_manager->setNumKarts(race_manager->getNumLocalPlayers());
-		karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers();
-		UserConfigParams::m_karts_per_gamemode = karts_per_gamemode;
+
+		//This is causing an error
+		karts_per_gamemode[race_manager->getMinorMode()] = std::to_string(race_manager->getNumLocalPlayers());
+		UserConfigParams::m_karts_per_gamemode = karts_per_gamemode; //Causes error
         UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers();
     }
     else if (record_available)
