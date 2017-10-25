@@ -2167,72 +2167,45 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 {
     if(World::getWorld()->getTimeSinceStart()-m_time_last_crash < 0.5f) return;
 
-	
-	
     m_time_last_crash = World::getWorld()->getTimeSinceStart();
     // After a collision disable the engine for a short time so that karts
     // can 'bounce back' a bit (without this the engine force will prevent
     // karts from bouncing back, they will instead stuck towards the obstable).
     if(m_bounce_back_time<=0.0f)
     {
-        if (m_body->getLinearVelocity().length()> 0.555f)
+        if (getVelocity().length()> 0.555f)
         {
+			const float speed_for_max_volume = 15; //The speed at which the sound plays at maximum volume
+			const float max_volume = 1; //The maximum volume a sound is played at 
+			const float min_volume = 1; //The minimum volume a sound is played at 
 			
-			float SpeedForMaxVolume = 15; //The speed at which the sound plays at maximum volume
-			float Volume;
-			float MaxVolume = 1; //The maximum volume a sound is played at 
+			float volume; //The volume the crash sound will be played at
 
 			if (k == NULL) //Collision with wall
 			{
-				Volume = (m_speed / SpeedForMaxVolume);
+			    volume = (m_speed / speed_for_max_volume);
 			}
 			else
 			{
-				btVector3 ThisKartRotation = getVelocity();
-				btVector3 OtherKartRotation = k->getVelocity();
+				const Vec3 ThisKartVelocity = getVelocity();
+				const Vec3 OtherKartVelocity = k->getVelocity();
 				
-				
-				btScalar ScaledRotationDifference = ThisKartRotation.angle(OtherKartRotation) / 3.14159; //Difference in angles of karts in collision, Scaled by PI
-				
-				
-				btScalar SpeedDifference = getSpeed() - k->getSpeed();
-				
-				SpeedDifference = fabs(SpeedDifference);
-				 
-				
-				float ScaledSpeedDifference = SpeedDifference / SpeedForMaxVolume; //Scaled by the Speed For Max Volume
-				std::cout << "Speed Diff is: " << ScaledSpeedDifference <<  "Rot Diff is: " << ScaledRotationDifference << std::endl;
-				//Ensure that both direction AND difference in speed is taken into account when calculating sound
-				//Full speed opposite directions = 1
-				//Full speed orthogonal = 0.5
-				//Half Speed difference orthogonal = 0.25
-				//Half speed orthogonal = 0.25
-				//Full Speed same direction = 0.5
-
-				
-
-				if(ScaledSpeedDifference > ScaledRotationDifference && ((SpeedDifference > 0.5) & (ScaledRotationDifference < 0.5)))
-				{ //When speed difference is 1 and directional difference is 0, this limits the maximum volume to 0.5	
-					Volume = (ScaledSpeedDifference + 0.25) * (((MaxVolume / 2) - ScaledRotationDifference) / 2);
-				}
-				else
-				{
-					Volume = (ScaledSpeedDifference + ScaledRotationDifference) * ScaledRotationDifference;
-				}
+				const Vec3 VelocityDifference = ThisKartVelocity - OtherKartVelocity;
+				const float LengthOfDifference = VelocityDifference.length();
+			    volume = LengthOfDifference / speed_for_max_volume;
 			}
+
+			if (volume > max_volume) {  volume = max_volume; }
+			if (volume < min_volume) {  volume = min_volume; }
 			
-			if (Volume > MaxVolume)
-			{
-				Volume = MaxVolume;
-			}
-			
-			getNextEmitter()->reallySetVolume(Volume);
+			SFXBase* crash_sound_emitter = getNextEmitter();
+			crash_sound_emitter->reallySetVolume(volume);
 
             // In case that the sfx is longer than 0.5 seconds, only play it if
             // it's not already playing.
             if (isShielded() || (k != NULL && k->isShielded()))
             {
-				getCurrentEmitter()->play(getXYZ(), m_boing_sound);
+				crash_sound_emitter->play(getXYZ(), m_boing_sound);
             }
             else
             {
@@ -2240,7 +2213,7 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 				
                 SFXBuffer* buffer = m_crash_sounds[idx];
 				
-				getCurrentEmitter()->play(getXYZ(), buffer);
+				crash_sound_emitter->play(getXYZ(), buffer);
             }
         }    // if lin_vel > 0.555
     }   // if m_bounce_back_time <= 0
@@ -2750,16 +2723,10 @@ void Kart::kartIsInRestNow()
 
 //-----------------------------------------------------------------------------
 
-
 SFXBase* Kart::getNextEmitter()
 {
     m_emitter_id = (m_emitter_id + 1) % 3;
     return m_emitters[m_emitter_id];
-}
-
-SFXBase* Kart::getCurrentEmitter()
-{
-	return m_emitters[m_emitter_id];
 }
 
 //-----------------------------------------------------------------------------
