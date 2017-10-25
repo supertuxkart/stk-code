@@ -2174,46 +2174,46 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
     if(m_bounce_back_time<=0.0f)
     {
         if (getVelocity().length()> 0.555f)
-        {
-			const float speed_for_max_volume = 15; //The speed at which the sound plays at maximum volume
-			const float max_volume = 1; //The maximum volume a sound is played at 
-			const float min_volume = 0.2; //The minimum volume a sound is played at 
-			
-			float volume; //The volume the crash sound will be played at
-
-			if (k == NULL) //Collision with wall
-			{
-			    volume = (m_speed / speed_for_max_volume);
-			}
-			else
-			{
-			    const Vec3 ThisKartVelocity = getVelocity();
-			    const Vec3 OtherKartVelocity = k->getVelocity();
-			    const Vec3 VelocityDifference = ThisKartVelocity - OtherKartVelocity;
-			    const float LengthOfDifference = VelocityDifference.length();
-
-			    volume = LengthOfDifference / speed_for_max_volume;
-			}
-
-			if (volume > max_volume) {  volume = max_volume; }
-			if (volume < min_volume) {  volume = min_volume; }
-			
-			SFXBase* crash_sound_emitter = getNextEmitter();
-			crash_sound_emitter->reallySetVolume(volume);
-
+		{
+            const float speed_for_max_volume = 15; //The speed at which the sound plays at maximum volume
+            const float max_volume = 1; //The maximum volume a sound is played at 
+            const float min_volume = 0.2; //The minimum volume a sound is played at 
+            
+            float volume; //The volume the crash sound will be played at
+            
+            if (k == NULL) //Collision with wall
+            {
+                volume = (m_speed / speed_for_max_volume);
+            }
+            else
+            {
+                const Vec3 ThisKartVelocity = getVelocity();
+                const Vec3 OtherKartVelocity = k->getVelocity();
+                const Vec3 VelocityDifference = ThisKartVelocity - OtherKartVelocity;
+                const float LengthOfDifference = VelocityDifference.length();
+            
+                volume = LengthOfDifference / speed_for_max_volume;
+            }
+            
+            if (volume > max_volume) { volume = max_volume; }
+            if (volume < min_volume) { volume = min_volume; }
+            
+            SFXBase* crash_sound_emitter = getNextEmitter();
+            crash_sound_emitter->reallySetVolume(volume);
+            
             // In case that the sfx is longer than 0.5 seconds, only play it if
             // it's not already playing.
             if (isShielded() || (k != NULL && k->isShielded()))
             {
-			    crash_sound_emitter->play(getXYZ(), m_boing_sound);
-            }
-            else
-            {
+                crash_sound_emitter->play(getXYZ(), m_boing_sound);
+			}
+			else
+			{
                 int idx = rand() % CRASH_SOUND_COUNT;
+
                 SFXBuffer* buffer = m_crash_sounds[idx];
-				
-			    crash_sound_emitter->play(getXYZ(), buffer);
-            }
+                crash_sound_emitter->play(getXYZ(), buffer);
+			}
         }    // if lin_vel > 0.555
     }   // if m_bounce_back_time <= 0
 }   // playCrashSFX
