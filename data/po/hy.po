@@ -3020,7 +3020,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:180
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Aram Palyan https://launchpad.net/~ararat-info"
+msgstr "Launchpad Contributions:\nAram Palyan https://launchpad.net/~ararat-info"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

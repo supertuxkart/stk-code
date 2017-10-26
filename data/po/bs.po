@@ -4154,3 +4154,7 @@ msgstr "Sakupljajte boce nitro-a (koristićemo ih posle skretanja)."
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Ups! Kada ste u problemu, pritisnite <%s> kako biste bili spašeni."
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nNikola Kantarević, 2016-2017"

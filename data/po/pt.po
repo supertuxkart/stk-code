@@ -4150,3 +4150,7 @@ msgstr "Recolhe garrafas nitro (vamos usã-las depois da curva)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Aiii! Quando estiveres com problemas carrega na tecla <%s> para chamar o reboque"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nBruno Ramalhete, 2015\nRui, 2016\nRui, 2016-2017"
