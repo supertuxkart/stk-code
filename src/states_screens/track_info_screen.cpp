@@ -169,8 +169,8 @@ void TrackInfoScreen::init()
     if (has_AI)
     {
         m_ai_kart_spinner->setActive(true);
-		
-		int num_ai = stoi(karts_per_gamemode[race_manager->getMinorMode()]) - local_players;
+		int gamemode = race_manager->getMinorMode();
+		int num_ai = stoi(karts_per_gamemode[gamemode]) - local_players; //TODO error caused by enums not being sequential
         // Avoid negative numbers (which can happen if e.g. the number of karts
         // in a previous race was lower than the number of players now.
 			
@@ -248,7 +248,7 @@ void TrackInfoScreen::init()
 
 		//This is causing an error
 		karts_per_gamemode[race_manager->getMinorMode()] = std::to_string(race_manager->getNumLocalPlayers());
-		UserConfigParams::m_karts_per_gamemode = karts_per_gamemode; //Causes error
+	//	UserConfigParams::m_karts_per_gamemode = karts_per_gamemode; //TODO Causes error
         UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers();
     }
     else if (record_available)
