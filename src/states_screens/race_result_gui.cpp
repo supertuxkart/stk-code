@@ -408,7 +408,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         }
     }
     else
-        Log::fatal("RaceResultGUI", "Incorrect event '%s' for normal race.",
+        Log::warn("RaceResultGUI", "Incorrect event '%s' for normal race.",
             name.c_str());
     return;
 }   // eventCallback
