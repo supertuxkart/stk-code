@@ -2174,7 +2174,7 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
     if(m_bounce_back_time<=0.0f)
     {
         if (getVelocity().length()> 0.555f)
-		{
+        {
             const float speed_for_max_volume = 15; //The speed at which the sound plays at maximum volume
             const float max_volume = 1; //The maximum volume a sound is played at 
             const float min_volume = 0.2; //The minimum volume a sound is played at 
@@ -2199,14 +2199,14 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
             if (volume < min_volume) { volume = min_volume; }
             
             SFXBase* crash_sound_emitter = getNextEmitter();
-            crash_sound_emitter->reallySetVolume(volume);
+            crash_sound_emitter->setVolume(volume);
             
             // In case that the sfx is longer than 0.5 seconds, only play it if
             // it's not already playing.
             if (isShielded() || (k != NULL && k->isShielded()))
             {
                 crash_sound_emitter->play(getXYZ(), m_boing_sound);
-			}
+            }
 			else
 			{
                 int idx = rand() % CRASH_SOUND_COUNT;
