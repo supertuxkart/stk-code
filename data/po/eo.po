@@ -3024,7 +3024,7 @@ msgstr "La maksimuma nombro de ludistoj estu inter 2 kaj 12."
 
 #: src/states_screens/credits.cpp:180
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Rubén https://launchpad.net/~sleepwalkdroid\n  STK-team https://launchpad.net/~stk\n  Éfrit https://launchpad.net/~efrit"
+msgstr "Launchpad Contributions:\nJonas Marx, 2017\nRobin van der Vliet, 2015\nRubén https://launchpad.net/~sleepwalkdroid\nSTK-team https://launchpad.net/~stk\nÉfrit https://launchpad.net/~efrit\nЛюбомир Василев, 2016\nЛюбомир Василев, 2016-2017"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

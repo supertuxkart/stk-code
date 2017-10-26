@@ -4147,3 +4147,7 @@ msgstr "Keriä nitrobutilkua (voit käyttiä niidy kiännälmyksen jälles)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "A voi voi! Puuttunet hädäh, paina <%s> ku sinuu pellastettas"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nC C, 2017"

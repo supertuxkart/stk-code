@@ -4160,3 +4160,7 @@ msgstr "Збірайце бутэлькі з нітра (выкарыстаем 
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Ой! Калі ў вас праблемы, націсніце <%s> для выратавання."
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\n, 2015\nViktar Vauchkevich, 2017"
