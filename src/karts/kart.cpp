@@ -2183,7 +2183,7 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
             
             if (k == NULL) //Collision with wall
             {
-                volume = (m_speed / speed_for_max_volume);
+                volume = sqrt( abs(m_speed / speed_for_max_volume));
             }
             else
             {
@@ -2192,12 +2192,12 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
                 const Vec3 VelocityDifference = ThisKartVelocity - OtherKartVelocity;
                 const float LengthOfDifference = VelocityDifference.length();
             
-                volume = LengthOfDifference / speed_for_max_volume;
+                volume = sqrt( abs(LengthOfDifference / speed_for_max_volume));
             }
             
             if (volume > max_volume) { volume = max_volume; }
-            if (volume < min_volume) { volume = min_volume; }
-            
+            else if (volume < min_volume) { volume = min_volume; }
+
             SFXBase* crash_sound_emitter = getNextEmitter();
             crash_sound_emitter->setVolume(volume);
             
