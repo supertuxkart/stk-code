@@ -2207,8 +2207,8 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
             {
                 crash_sound_emitter->play(getXYZ(), m_boing_sound);
             }
-			else
-			{
+            else
+            {
                 int idx = rand() % CRASH_SOUND_COUNT;
 
                 SFXBuffer* buffer = m_crash_sounds[idx];
