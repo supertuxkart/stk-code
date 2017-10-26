@@ -330,7 +330,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             }
             return;
         }
-        Log::fatal("RaceResultGUI", "Incorrect event '%s' when things are unlocked.",
+        Log::warn("RaceResultGUI", "Incorrect event '%s' when things are unlocked.",
             name.c_str());
     }
 
