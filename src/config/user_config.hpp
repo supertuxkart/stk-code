@@ -136,6 +136,50 @@ public:
 };   // ListUserConfigParam
 typedef ListUserConfigParam<std::string, const char*>    StringListUserConfigParam;
 
+template<typename T, typename U>
+class MapUserConfigParam : public UserConfigParam
+{
+	std::map<T, U> m_elements;
+
+public:
+	MapUserConfigParam(const char* param_name,
+		const char* comment = NULL);
+	MapUserConfigParam(const char* param_name,
+		const char* comment,
+		int nb_elts,
+		...);
+	MapUserConfigParam(const char* param_name,
+		GroupUserConfigParam* group,
+		const char* comment = NULL);
+	MapUserConfigParam(const char* param_name,
+		GroupUserConfigParam* group,
+		const char* comment,
+		int nb_elts,
+		...);
+
+	void write(std::ofstream& stream) const;
+	void findYourDataInAChildOf(const XMLNode* node);
+	void findYourDataInAnAttributeOf(const XMLNode* node);
+
+	void addElement(T element, U value);
+
+	irr::core::stringc toString() const;
+
+	operator std::map<T,U>() const
+	{
+		return m_elements;
+	}
+	float& operator=(const std::map<T,U>& v)
+	{
+		m_elements = std::map<T, U>(v); return m_elements;
+	}
+	float& operator=(const MapUserConfigParam& v)
+	{
+		m_elements = std::map<T,U>(v); return m_elements;
+	}
+};   // ListUserConfigParam
+typedef MapUserConfigParam<std::string, const char*>    StringToStringUserConfigParam;
+
 // ============================================================================
 class IntUserConfigParam : public UserConfigParam
 {
@@ -372,12 +416,12 @@ namespace UserConfigParams
 	// ---- Gamemode setup
 	
 
-	PARAM_PREFIX StringListUserConfigParam m_karts_per_gamemode
-	    PARAM_DEFAULT(StringListUserConfigParam("karts_per_gamemode", "The karts per gamemode"
+	PARAM_PREFIX StringToStringUserConfigParam m_karts_per_gamemode
+	    PARAM_DEFAULT(StringToStringUserConfigParam("karts_per_gamemode", "The karts per gamemode"
             "Number of karts per gamemode. Order corresponds to Enum value",
 			10,
-			"3",
-			"3",
+			"3", 
+			"3", 
 			"3",
 			"3",
 			"3",

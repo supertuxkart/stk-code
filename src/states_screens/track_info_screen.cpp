@@ -164,7 +164,7 @@ void TrackInfoScreen::init()
     m_ai_kart_spinner->setVisible(has_AI);
     getWidget<LabelWidget>("ai-text")->setVisible(has_AI);
 
-	std::vector<std::string> karts_per_gamemode = UserConfigParams::m_karts_per_gamemode;
+	std::vector<std::string> karts_per_gamemode;//UserConfigParams::m_karts_per_gamemode;
 
     if (has_AI)
     {
