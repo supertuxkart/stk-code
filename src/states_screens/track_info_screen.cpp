@@ -164,14 +164,19 @@ void TrackInfoScreen::init()
     m_ai_kart_spinner->setVisible(has_AI);
     getWidget<LabelWidget>("ai-text")->setVisible(has_AI);
 
-	std::vector<std::string> karts_per_gamemode;//UserConfigParams::m_karts_per_gamemode;
+	UserConfigParams::m_num_karts;
+	std::map<const char* , const char*> karts_per_gamemode = UserConfigParams::m_karts_per_gamemode;
+	auto data = UserConfigParams::m_karts_per_gamemode;
 
     if (has_AI)
     {
         m_ai_kart_spinner->setActive(true);
 		int gamemode = race_manager->getMinorMode();
-		int num_ai = stoi(karts_per_gamemode[gamemode]) - local_players; //TODO error caused by enums not being sequential
-        // Avoid negative numbers (which can happen if e.g. the number of karts
+		//Temp fix
+		//int num_ai = stoi(karts_per_gamemode[ "3"/*gamemode*/]) - local_players; //TODO error caused by enums not being sequential
+		int num_ai = 1;
+																				 
+																				 // Avoid negative numbers (which can happen if e.g. the number of karts
         // in a previous race was lower than the number of players now.
 			
         if (num_ai < 0) num_ai = 0;
@@ -247,7 +252,7 @@ void TrackInfoScreen::init()
         race_manager->setNumKarts(race_manager->getNumLocalPlayers());
 
 		//This is causing an error
-		karts_per_gamemode[race_manager->getMinorMode()] = std::to_string(race_manager->getNumLocalPlayers());
+///		karts_per_gamemode[race_manager->getMinorMode()] = std::to_string(race_manager->getNumLocalPlayers());
 	//	UserConfigParams::m_karts_per_gamemode = karts_per_gamemode; //TODO Causes error
         UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers();
     }

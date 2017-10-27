@@ -178,7 +178,7 @@ public:
 		m_elements = std::map<T,U>(v); return m_elements;
 	}
 };   // ListUserConfigParam
-typedef MapUserConfigParam<std::string, const char*>    StringToStringUserConfigParam;
+typedef MapUserConfigParam<const char*, const char*>    StringToStringUserConfigParam;
 
 // ============================================================================
 class IntUserConfigParam : public UserConfigParam
@@ -416,20 +416,7 @@ namespace UserConfigParams
 	// ---- Gamemode setup
 	
 
-	PARAM_PREFIX StringToStringUserConfigParam m_karts_per_gamemode
-	    PARAM_DEFAULT(StringToStringUserConfigParam("karts_per_gamemode", "The karts per gamemode"
-            "Number of karts per gamemode. Order corresponds to Enum value",
-			10,
-			"3", 
-			"3", 
-			"3",
-			"3",
-			"3",
-			"3",
-			"3",
-			"3",
-			"3",
-			"3"));
+	
 
     // ---- Wiimote data
     PARAM_PREFIX GroupUserConfigParam        m_wiimote_group
@@ -766,7 +753,15 @@ namespace UserConfigParams
                             "stun.voxalot.com",
                             "stun.voxgratia.org",
                             "stun.xten.com") );
-
+	PARAM_PREFIX StringToStringUserConfigParam m_karts_per_gamemode
+		PARAM_DEFAULT(StringToStringUserConfigParam("karts_per_gamemode", "The karts per gamemode"
+			"Number of karts per gamemode. Order corresponds to Enum value",
+			4,
+			std::make_pair("3", "1"),
+			std::make_pair("f", "2"),
+			std::make_pair("e", "4"),
+			std::make_pair("te", "5")
+		));
     PARAM_PREFIX BoolUserConfigParam m_log_packets
             PARAM_DEFAULT( BoolUserConfigParam(false, "log-network-packets",
                                                  "If all network packets should be logged") );

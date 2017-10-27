@@ -29,6 +29,7 @@ static PtrVector<UserConfigParam, REF> all_params;
 // X-macros
 #define PARAM_PREFIX
 #define PARAM_DEFAULT(X) = X
+
 #include "config/user_config.hpp"
 
 #include "config/saved_grand_prix.hpp"
@@ -345,8 +346,11 @@ MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
 	// add the default list
 	va_list arguments;
 	va_start(arguments, nb_elements);
-	for (int i = 0; i < nb_elements; i++)
-		m_elements.push_back(T(va_arg(arguments, U)));
+	typedef std::pair<T, U> DictThing;
+	for (int i = 0; i < nb_elements; i++) {
+		std::pair<T, U> key_value_pair = va_arg(arguments, DictThing);
+		m_elements.insert(key_value_pair);
+	}
 	va_end(arguments);                  // Cleans up the list
 }   // MapUserConfigParam
 
@@ -376,8 +380,11 @@ MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
 	// add the default list
 	va_list arguments;
 	va_start(arguments, nb_elements);
-	for (int i = 0; i < nb_elements; i++)
-		m_elements.push_back(va_arg(arguments, T));
+	
+	for (int i = 0; i < nb_elements; i++) {
+		std::pair<T, U> key_value_pair = va_arg(arguments, DictThing);
+		m_elements.insert(key_value_pair);
+	}
 	va_end(arguments);                  // Cleans up the list
 }   // MapUserConfigParam
 
@@ -395,9 +402,8 @@ void MapUserConfigParam<T, U>::write(std::ofstream& stream) const
 	// actual elements
 	//for (int n = 0; n<elts_amount; n++)
 	
-	for (std::map<T, U>::iterator it = m_elements.begin(); it != m_elements.end(); ++it)
-	{
-		stream << "        " << it->first << "=\"" << it->second << "\"\n";
+	for (const auto& kv : m_elements) {
+		stream << "        " << kv.first << "=\"" << kv.second << "\"\n";
 	}
 	stream << "    >\n";
 	stream << "    </" << m_param_name.c_str() << ">\n\n";
@@ -417,29 +423,29 @@ void MapUserConfigParam<T, U>::findYourDataInAChildOf(const XMLNode* node)
 
 	int attr_count = 0;
 	child->get("Size", &attr_count);
-	for (int n = 0; n<attr_count; n++)
-	{
-		T elt;
+	
+	for (const auto& kv : m_elements) {
+		std::pair<T,U> elt;
 		std::string str;
-		child->get(StringUtils::toString(n), &str);
-		StringUtils::fromString<T>(str, elt);
-
-		// check if the element is already there :
+		child->get(kv.first, &str);
+		elt.first = kv.first;
+		elt.second = str.c_str();
+		
 		bool there = false;
-		for (unsigned int i = 0; i < m_elements.size(); i++)
-		{
-			if (elt == m_elements[i])
+
+		for (const auto& kvRHS : m_elements) {
+			if (elt.second == kvRHS.second)
 			{
 				there = true;
 				break;
 			}
+
 		}
 		if (!there)
 		{
-			m_elements.push_back(elt);
+			m_elements.insert(elt);
 		}
 	}
-
 }   // findYourDataInAChildOf
 
 	// ----------------------------------------------------------------------------
