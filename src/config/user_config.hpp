@@ -183,7 +183,6 @@ public:
         return m_elements[key];
     }
 };   // ListUserConfigParam
-typedef MapUserConfigParam<const char*, const char*>    StringToStringUserConfigParam;
 typedef MapUserConfigParam<int, int>    IntToIntUserConfigParam;
 // ============================================================================
 class IntUserConfigParam : public UserConfigParam
@@ -418,11 +417,7 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam m_last_used_kart_group
             PARAM_DEFAULT( StringUserConfigParam("all", "last_kart_group",
                                                  "Last selected kart group") );
-    // ---- Gamemode setup
     
-
-    
-
     // ---- Wiimote data
     PARAM_PREFIX GroupUserConfigParam        m_wiimote_group
         PARAM_DEFAULT( GroupUserConfigParam("WiiMote",
@@ -758,12 +753,15 @@ namespace UserConfigParams
                             "stun.voxalot.com",
                             "stun.voxgratia.org",
                             "stun.xten.com") );
+
+	// ---- Gamemode setup
     PARAM_PREFIX IntToIntUserConfigParam m_karts_per_gamemode
         PARAM_DEFAULT(IntToIntUserConfigParam("karts_per_gamemode",
             "The Number of karts per gamemode.",
             1,
             std::make_pair(1100, 4)
         ));
+
     PARAM_PREFIX BoolUserConfigParam m_log_packets
             PARAM_DEFAULT( BoolUserConfigParam(false, "log-network-packets",
                                                  "If all network packets should be logged") );

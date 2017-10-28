@@ -29,7 +29,6 @@ static PtrVector<UserConfigParam, REF> all_params;
 // X-macros
 #define PARAM_PREFIX
 #define PARAM_DEFAULT(X) = X
-
 #include "config/user_config.hpp"
 
 #include "config/saved_grand_prix.hpp"
