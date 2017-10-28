@@ -345,7 +345,8 @@ MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
     // add the default list
     va_list arguments;
     va_start(arguments, nb_elements);
-    typedef std::pair<T, U> pair_type; //Necessary to prevent compile error below
+    typedef std::pair<T, U> pair_type; //Necessary to prevent compile error below. Causes errors on some compilers though
+
     for (int i = 0; i < nb_elements; i++) {
         std::pair<T, U> key_value_pair = va_arg(arguments, pair_type);
         m_elements.insert(key_value_pair);
