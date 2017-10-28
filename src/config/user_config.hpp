@@ -384,7 +384,7 @@ namespace UserConfigParams
         PARAM_DEFAULT( GroupUserConfigParam("RaceSetup",
                                             "Race Setup Settings") );
 
-    PARAM_PREFIX IntUserConfigParam          m_num_karts
+    PARAM_PREFIX IntUserConfigParam          m_default_num_karts
             PARAM_DEFAULT(  IntUserConfigParam(4, "numkarts",
                             &m_race_setup_group,
                             "Default number of karts. -1 means use all") );
@@ -759,13 +759,10 @@ namespace UserConfigParams
                             "stun.voxgratia.org",
                             "stun.xten.com") );
     PARAM_PREFIX IntToIntUserConfigParam m_karts_per_gamemode
-        PARAM_DEFAULT(IntToIntUserConfigParam("karts_per_gamemode", "The karts per gamemode"
-            "Number of karts per gamemode. Order corresponds to Enum value",
-            4,
-            std::make_pair(0, 1),
-            std::make_pair(1, 2),
-            std::make_pair(3, 4),
-            std::make_pair(4, 5)
+        PARAM_DEFAULT(IntToIntUserConfigParam("karts_per_gamemode",
+            "The Number of karts per gamemode.",
+            1,
+            std::make_pair(1100, 4)
         ));
     PARAM_PREFIX BoolUserConfigParam m_log_packets
             PARAM_DEFAULT( BoolUserConfigParam(false, "log-network-packets",
