@@ -426,10 +426,9 @@ void MapUserConfigParam<T, U>::findYourDataInAChildOf(const XMLNode* node)
 	
 	for (const auto& kv : m_elements) {
 		std::pair<T,U> elt;
-		std::string str;
-		child->get(kv.first, &str);
 		elt.first = kv.first;
-		elt.second = str.c_str();
+		elt.second = kv.second;
+
 		
 		bool there = false;
 

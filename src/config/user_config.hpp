@@ -169,17 +169,19 @@ public:
 	{
 		return m_elements;
 	}
-	float& operator=(const std::map<T,U>& v)
+	std::map<T, U>& operator=(const std::map<T,U>& v)
 	{
-		m_elements = std::map<T, U>(v); return m_elements;
+		m_elements = std::map<T, U>(v); 
+		return m_elements;
 	}
-	float& operator=(const MapUserConfigParam& v)
+	std::map<T, U>& operator=(const MapUserConfigParam& v)
 	{
-		m_elements = std::map<T,U>(v); return m_elements;
+		m_elements = std::map<T,U>(v); 
+		return m_elements;
 	}
 };   // ListUserConfigParam
 typedef MapUserConfigParam<const char*, const char*>    StringToStringUserConfigParam;
-
+typedef MapUserConfigParam<int, int>    IntToIntUserConfigParam;
 // ============================================================================
 class IntUserConfigParam : public UserConfigParam
 {
@@ -753,14 +755,14 @@ namespace UserConfigParams
                             "stun.voxalot.com",
                             "stun.voxgratia.org",
                             "stun.xten.com") );
-	PARAM_PREFIX StringToStringUserConfigParam m_karts_per_gamemode
-		PARAM_DEFAULT(StringToStringUserConfigParam("karts_per_gamemode", "The karts per gamemode"
+	PARAM_PREFIX IntToIntUserConfigParam m_karts_per_gamemode
+		PARAM_DEFAULT(IntToIntUserConfigParam("karts_per_gamemode", "The karts per gamemode"
 			"Number of karts per gamemode. Order corresponds to Enum value",
 			4,
-			std::make_pair("3", "1"),
-			std::make_pair("f", "2"),
-			std::make_pair("e", "4"),
-			std::make_pair("te", "5")
+			std::make_pair(0, 1),
+			std::make_pair(1, 2),
+			std::make_pair(3, 4),
+			std::make_pair(4, 5)
 		));
     PARAM_PREFIX BoolUserConfigParam m_log_packets
             PARAM_DEFAULT( BoolUserConfigParam(false, "log-network-packets",
