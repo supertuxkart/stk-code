@@ -28,7 +28,8 @@ float getShadowFactor(vec3 pos, int index)
     vec4 shadowcoord = (ShadowViewProjMatrixes[index] * InverseViewMatrix * vec4(pos, 1.0));
     shadowcoord.xy /= shadowcoord.w;
     vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
-    float d = .5 * shadowcoord.z + .5;
+    //float d = .5 * shadowcoord.z + .5;
+    float d = .5 * shadowcoord.z + .5 - 1. / (shadow_res * 5.);
 
     float result = 0.;
 
