@@ -217,7 +217,7 @@ void RaceResultGUI::enableAllButtons()
 
         middle->setText(_("Restart"));
         middle->setVisible(true);
-
+        middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
         if (race_manager->raceWasStartedFromOverworld())
         {
             top->setVisible(false);
@@ -230,8 +230,6 @@ void RaceResultGUI::enableAllButtons()
             bottom->setText(_("Back to the menu"));
         }
         bottom->setVisible(true);
-
-        bottom->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
 }   // enableAllButtons
 
