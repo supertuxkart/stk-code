@@ -355,7 +355,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                 track_manager->getTrack("lighthouse")
                              ->getScreenshotFile().c_str()));
             textures.push_back(irr_driver->getTexture(
-                track_manager->getTrack("startrack")
+                track_manager->getTrack("snowtuxpeak")
                              ->getScreenshotFile().c_str()));
             textures.push_back(irr_driver->getTexture(
                 track_manager->getTrack("sandtrack")
