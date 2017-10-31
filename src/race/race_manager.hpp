@@ -613,6 +613,8 @@ public:
     // ------------------------------------------------------------------------
     int getTrackNumber() const { return m_track_number; }
     // ------------------------------------------------------------------------
+    int getNumOfTracks() const { return (int)m_tracks.size(); }
+    // ------------------------------------------------------------------------
     /** Returns the list of AI karts to use. Used for networking, and for
     *  the --ai= command line option. */
     const std::vector<std::string>& getAIKartList() const

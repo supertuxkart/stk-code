@@ -205,8 +205,11 @@ void RaceResultGUI::enableAllButtons()
         middle->setText(_("Continue"));
         middle->setVisible(true);
 
-        bottom->setText(_("Abort Grand Prix"));
-        bottom->setVisible(true);
+        if (race_manager->getTrackNumber() + 1 < race_manager->getNumOfTracks()) 
+        {
+            bottom->setText(_("Abort Grand Prix"));
+            bottom->setVisible(true);
+        }
 
         middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
