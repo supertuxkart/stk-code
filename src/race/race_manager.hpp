@@ -329,7 +329,7 @@ private:
     int                              m_track_number;
     GrandPrixData                    m_grand_prix;
     SavedGrandPrix*                  m_saved_gp;
-    int                              m_default_num_karts;
+    int                              m_num_karts;
     unsigned int                     m_num_spare_tire_karts;
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
@@ -469,7 +469,7 @@ public:
     // ------------------------------------------------------------------------
     void setNumKarts(int num)
     {
-        m_default_num_karts = num;
+        m_num_karts = num;
         m_ai_kart_override = "";
         m_ai_superpower = SUPERPOWER_NONE;
     }   // setNumKarts
@@ -492,7 +492,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the selected number of karts (selected number of players and
      *  AI karts. */
-    unsigned int getNumberOfKarts() const {return m_default_num_karts; }
+    unsigned int getNumberOfKarts() const {return m_num_karts; }
     // ------------------------------------------------------------------------
     MajorRaceModeType getMajorMode() const { return m_major_mode; }
     // ------------------------------------------------------------------------
@@ -759,7 +759,7 @@ public:
         m_kart_status.push_back(KartStatus(name, 0, -1, -1,
             -1, KT_SPARE_TIRE, PLAYER_DIFFICULTY_NORMAL));
         m_num_spare_tire_karts++;
-        m_default_num_karts++;
+        m_num_karts++;
     }   // addSpareTireKart
     // ------------------------------------------------------------------------
     void setSpareTireKartNum(unsigned int i)

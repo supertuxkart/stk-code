@@ -66,7 +66,7 @@ RaceManager::RaceManager()
 {
     // Several code depends on this, e.g. kart_properties
     assert(DIFFICULTY_FIRST == 0);
-    m_default_num_karts  = UserConfigParams::m_default_num_karts;
+    m_num_karts          = UserConfigParams::m_default_num_karts;
     m_difficulty         = DIFFICULTY_HARD;
     m_major_mode         = MAJOR_MODE_SINGLE;
     m_minor_mode         = MINOR_MODE_NORMAL_RACE;
@@ -266,16 +266,16 @@ void RaceManager::setTrack(const std::string& track)
  */
 void RaceManager::computeRandomKartList()
 {
-    int n = m_default_num_karts - (int)m_player_karts.size();
+    int n = m_num_karts - (int)m_player_karts.size();
     if(UserConfigParams::logMisc())
-        Log::info("RaceManager", "AI karts count = %d for m_default_num_karts = %d and "
-            "m_player_karts.size() = %d", n, m_default_num_karts, m_player_karts.size());
+        Log::info("RaceManager", "AI karts count = %d for m_num_karts = %d and "
+            "m_player_karts.size() = %d", n, m_num_karts, m_player_karts.size());
 
     // If less kart selected than there are player karts, adjust the number of
     // karts to the minimum
     if(n<0)
     {
-        m_default_num_karts -= n;
+        m_num_karts -= n;
         n = 0;
     }
 
@@ -363,20 +363,20 @@ void RaceManager::startNew(bool from_overworld)
     }   // if grand prix
 
     // command line parameters: negative numbers=all karts
-    if(m_default_num_karts < 0 ) m_default_num_karts = stk_config->m_max_karts;
-    if((size_t)m_default_num_karts < m_player_karts.size())
-        m_default_num_karts = (int)m_player_karts.size();
+    if(m_num_karts < 0 ) m_num_karts = stk_config->m_max_karts;
+    if((size_t)m_num_karts < m_player_karts.size())
+        m_num_karts = (int)m_player_karts.size();
 
     // Create the kart status data structure to keep track of scores, times, ...
     // ==========================================================================
     m_kart_status.clear();
     if (gk > 0)
-        m_default_num_karts += gk;
+        m_num_karts += gk;
 
     Log::verbose("RaceManager", "Nb of karts=%u, ghost karts:%u ai:%lu players:%lu\n",
-        (unsigned int) m_default_num_karts, gk, m_ai_kart_list.size(), m_player_karts.size());
+        (unsigned int) m_num_karts, gk, m_ai_kart_list.size(), m_player_karts.size());
 
-    assert((unsigned int)m_default_num_karts == gk+m_ai_kart_list.size()+m_player_karts.size());
+    assert((unsigned int)m_num_karts == gk+m_ai_kart_list.size()+m_player_karts.size());
 
     // First add the ghost karts (if any)
     // ----------------------------------------
@@ -550,7 +550,7 @@ void RaceManager::startNextRace()
     // The race is rerun, and the points and scores get reset ... but if
     // a kart hasn't finished the race at this stage, last_score and time
     // would be undefined.
-    for(int i=0; i<m_default_num_karts; i++)
+    for(int i=0; i<m_num_karts; i++)
     {
         m_kart_status[i].m_last_score = m_kart_status[i].m_score;
         m_kart_status[i].m_last_time  = 0;
@@ -881,7 +881,7 @@ void RaceManager::kartFinishedRace(const AbstractKart *kart, float time)
 void RaceManager::rerunRace()
 {
     // Subtract last score from all karts:
-    for(int i=0; i<m_default_num_karts; i++)
+    for(int i=0; i<m_num_karts; i++)
     {
         m_kart_status[i].m_score         = m_kart_status[i].m_last_score;
         m_kart_status[i].m_overall_time -= m_kart_status[i].m_last_time;
@@ -956,15 +956,15 @@ void RaceManager::startWatchingReplay(const std::string &track_ident,
     setNumLaps(num_laps);
     setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
     setCoinTarget(0);
-    m_default_num_karts = ReplayPlay::get()->getNumGhostKart();
+    m_num_karts = ReplayPlay::get()->getNumGhostKart();
     m_kart_status.clear();
 
     Log::verbose("RaceManager", "%u ghost kart(s) for watching replay only\n",
-        (unsigned int)m_default_num_karts);
+        (unsigned int)m_num_karts);
 
     int init_gp_rank = 0;
 
-    for(int i = 0; i < m_default_num_karts; i++)
+    for(int i = 0; i < m_num_karts; i++)
     {
         m_kart_status.push_back(KartStatus(ReplayPlay::get()->getGhostKartName(i),
             i, -1, -1, init_gp_rank, KT_GHOST, PLAYER_DIFFICULTY_NORMAL));
