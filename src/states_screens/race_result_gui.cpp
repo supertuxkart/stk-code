@@ -205,7 +205,7 @@ void RaceResultGUI::enableAllButtons()
         middle->setText(_("Continue"));
         middle->setVisible(true);
 
-        if (race_manager->getTrackNumber() < race_manager->getNumOfTracks()) 
+        if (race_manager->getTrackNumber() + 1 < race_manager->getNumOfTracks()) 
         {
             bottom->setText(_("Abort Grand Prix"));
             bottom->setVisible(true);
