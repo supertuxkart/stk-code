@@ -168,7 +168,7 @@ void TrackInfoScreen::init()
     {
         m_ai_kart_spinner->setActive(true);
         
-        int num_ai = UserConfigParams::m_karts_per_gamemode[race_manager->getMinorMode()] - local_players;
+        int num_ai = UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] - local_players;
         
         // Avoid negative numbers (which can happen if e.g. the number of karts
         // in a previous race was lower than the number of players now.
@@ -245,7 +245,7 @@ void TrackInfoScreen::init()
         m_ai_kart_spinner->setActive(false);
         race_manager->setNumKarts(race_manager->getNumLocalPlayers());
         
-        UserConfigParams::m_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers();
+        UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers();
     }
     else if (record_available)
     {
@@ -373,10 +373,10 @@ void TrackInfoScreen::onEnterPressedInternal()
        num_ai = m_ai_kart_spinner->getValue();
 
 
-    if (UserConfigParams::m_karts_per_gamemode[race_manager->getMinorMode()] != (local_players + num_ai))
+    if (UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] != (local_players + num_ai))
     {
         race_manager->setNumKarts(local_players + num_ai);
-        UserConfigParams::m_karts_per_gamemode[race_manager->getMinorMode()] = local_players + num_ai;
+        UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = local_players + num_ai;
     }
 
     // Disable accidentally unlocking of a challenge
@@ -426,7 +426,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         {
             m_ai_kart_spinner->setActive(false);
             race_manager->setNumKarts(race_manager->getNumLocalPlayers());
-            UserConfigParams::m_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers();
+            UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers();
         }
         else
         {
@@ -445,7 +445,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     {
         const int num_ai = m_ai_kart_spinner->getValue();
         race_manager->setNumKarts( race_manager->getNumLocalPlayers() + num_ai );
-        UserConfigParams::m_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers() + num_ai;
+        UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers() + num_ai;
         updateHighScores();
     }
 }   // eventCallback

@@ -756,8 +756,8 @@ namespace UserConfigParams
                             "stun.xten.com") );
 
 	// ---- Gamemode setup
-    PARAM_PREFIX IntToIntUserConfigParam m_karts_per_gamemode
-        PARAM_DEFAULT(IntToIntUserConfigParam("karts_per_gamemode",
+    PARAM_PREFIX IntToIntUserConfigParam m_num_karts_per_gamemode
+        PARAM_DEFAULT(IntToIntUserConfigParam("num_karts_per_gamemode",
             "The Number of karts per gamemode.",
             1,
             std::make_pair(1100, 4)
