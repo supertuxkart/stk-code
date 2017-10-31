@@ -235,7 +235,7 @@ void GPInfoScreen::init()
 
         // Avoid negative numbers (which can happen if e.g. the number of karts
         // in a previous race was lower than the number of players now.
-        int num_ai = UserConfigParams::m_default_num_karts - race_manager->getNumLocalPlayers();
+        int num_ai = UserConfigParams::m_karts_per_gamemode[RaceManager::MAJOR_MODE_GRAND_PRIX] - race_manager->getNumLocalPlayers();
         if (num_ai < 0) num_ai = 0;
         m_ai_kart_spinner->setValue(num_ai);
         race_manager->setNumKarts(num_ai + race_manager->getNumLocalPlayers());
@@ -345,7 +345,7 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
     {
         const int num_ai = m_ai_kart_spinner->getValue();
         race_manager->setNumKarts( race_manager->getNumLocalPlayers() + num_ai );
-        UserConfigParams::m_default_num_karts = race_manager->getNumLocalPlayers() + num_ai;
+        UserConfigParams::m_karts_per_gamemode[RaceManager::MAJOR_MODE_GRAND_PRIX] = race_manager->getNumLocalPlayers() + num_ai;
     }
     else if(name=="back")
     {
