@@ -348,7 +348,8 @@ MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
    
     struct pair_type { T key; U value; };
 
-    for (int i = 0; i < nb_elements; i++) {
+    for (int i = 0; i < nb_elements; i++) 
+    {
         pair_type key_value_pair = va_arg(arguments, pair_type);
         m_elements.insert(std::pair<T, U>(key_value_pair.key, key_value_pair.value));
     }
@@ -405,7 +406,8 @@ void MapUserConfigParam<T, U>::write(std::ofstream& stream) const
     // actual elements
     //for (int n = 0; n<elts_amount; n++)
     
-    for (const auto& kv : m_elements) {
+    for (const auto& kv : m_elements) 
+    {
         stream << "        " << kv.first << "=\"" << kv.second << "\"\n";
     }
     stream << "    >\n";
@@ -427,7 +429,8 @@ void MapUserConfigParam<T, U>::findYourDataInAChildOf(const XMLNode* node)
     int attr_count = 0;
     child->get("Size", &attr_count);
     
-    for (const auto& kv : m_elements) {
+    for (const auto& kv : m_elements) 
+    {
         std::pair<T,U> elt;
         elt.first = kv.first;
         elt.second = kv.second;
@@ -435,7 +438,8 @@ void MapUserConfigParam<T, U>::findYourDataInAChildOf(const XMLNode* node)
         
         bool there = false;
 
-        for (const auto& kvRHS : m_elements) {
+        for (const auto& kvRHS : m_elements) 
+        {
             if (elt.second == kvRHS.second)
             {
                 there = true;

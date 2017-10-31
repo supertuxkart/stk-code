@@ -179,7 +179,8 @@ public:
         m_elements = std::map<T,U>(v); 
         return m_elements;
     }
-    U& operator[] (const T key) {
+    U& operator[] (const T key) 
+    {
         return m_elements[key];
     }
 };   // ListUserConfigParam
