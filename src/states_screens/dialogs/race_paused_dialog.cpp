@@ -178,4 +178,15 @@ GUIEngine::EventPropagation
 
 // ----------------------------------------------------------------------------
 
+void RacePausedDialog::beforeAddingWidgets()
+{
+    GUIEngine::RibbonWidget* choice_ribbon =
+        getWidget<GUIEngine::RibbonWidget>("choiceribbon");
 
+    bool showSetupNewRace = race_manager->raceWasStartedFromOverworld();
+    int index = choice_ribbon->findItemNamed("newrace");
+    if (index != -1)
+        choice_ribbon->setItemVisible(index, !showSetupNewRace);
+}
+
+// ----------------------------------------------------------------------------
