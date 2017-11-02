@@ -378,9 +378,13 @@ void STKAnimatedMesh::uploadJoints(const irr::core::matrix4& m,
                                    int joint, int offset)
 {
     assert(offset != -1);
-    glBindBuffer(GL_UNIFORM_BUFFER, SharedGPUObjects::getSkinningUBO());
-    glBufferSubData(GL_UNIFORM_BUFFER, offset + joint * 16 * sizeof(float),
+#ifdef USE_GLES2
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (offset >> 6) + joint, 16, 1, GL_RGBA,
+        GL_FLOAT, m.pointer());
+#else
+    glBufferSubData(GL_TEXTURE_BUFFER, offset + joint * 16 * sizeof(float),
         16 * sizeof(float), m.pointer());
+#endif
 }
 
 #endif   // !SERVER_ONLY

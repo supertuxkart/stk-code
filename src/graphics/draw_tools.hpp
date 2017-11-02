@@ -183,5 +183,14 @@ struct HandleExpander
     }   // Expand
 };   // HandleExpander
 
+// ----------------------------------------------------------------------------
+template <typename Shader>
+inline void handleSkinning(Shader* s)
+{
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(s))
+    {
+        sms->bindSkinningTexture();
+    }
+}
 
 #endif //HEADER_DRAW_TOOLS_HPP

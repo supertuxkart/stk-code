@@ -253,11 +253,11 @@ void STKParticle::generate(std::vector<CPUParticle>* out)
         {
             if (m_hm != NULL)
             {
-                stimulateHeightMap(i, active_count, NULL);
+                stimulateHeightMap((float)i, active_count, NULL);
             }
             else
             {
-                stimulateNormal(i, active_count, NULL);
+                stimulateNormal((float)i, active_count, NULL);
             }
         }
         m_first_execution = false;
@@ -513,6 +513,10 @@ void STKParticle::OnRegisterSceneNode()
             continue;
         }
         scene::SParticle p;
+        p.startTime = 0;
+        p.endTime = 0;
+        p.color = 0;
+        p.startColor = 0;
         p.pos = m_particles_generating[i].m_position;
         Buffer->BoundingBox.addInternalPoint(p.pos);
         p.size = core::dimension2df(m_particles_generating[i].m_size,

@@ -146,7 +146,7 @@ void DriveGraph::load(const std::string &quad_file_name,
             ai_ignore = true;
         }
 
-        createQuad(p0, p1, p2, p3, m_all_nodes.size(), invisible, ai_ignore,
+        createQuad(p0, p1, p2, p3, (unsigned int)m_all_nodes.size(), invisible, ai_ignore,
                    false/*is_arena*/, ignored);
     }
     for (unsigned i = 0; i < m_all_nodes.size(); i++)
@@ -167,8 +167,8 @@ void DriveGraph::load(const std::string &quad_file_name,
 
         if (m_all_nodes.size() > 0)
         {
-            m_lap_length = getNode(m_all_nodes.size()-1)->getDistanceFromStart()
-                         + getNode(m_all_nodes.size()-1)->getDistanceToSuccessor(0);
+            m_lap_length = getNode((int)m_all_nodes.size()-1)->getDistanceFromStart()
+                         + getNode((int)m_all_nodes.size()-1)->getDistanceToSuccessor(0);
         }
         else
         {

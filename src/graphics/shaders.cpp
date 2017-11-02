@@ -277,6 +277,10 @@ Shaders::SkinnedTransparentShader::SkinnedTransparentShader()
     if (!CVS->supportsHardwareSkinning()) return;
     loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning.vert",
                         GL_FRAGMENT_SHADER, "transparent.frag");
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
+    }
     assignUniforms("ModelMatrix", "texture_trans", "skinning_offset",  "custom_alpha");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // SkinnedTransparentShader

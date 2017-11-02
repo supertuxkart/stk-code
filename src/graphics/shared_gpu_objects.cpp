@@ -18,11 +18,9 @@
 #ifndef SERVER_ONLY
 
 #include "graphics/shared_gpu_objects.hpp"
+#include "config/stk_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "utils/log.hpp"
-
-#include "matrix4.h"
-#include <algorithm>
 
 GLuint SharedGPUObjects::m_sky_tri_vbo;
 GLuint SharedGPUObjects::m_frustrum_vbo;
@@ -33,9 +31,11 @@ GLuint SharedGPUObjects::m_full_screen_quad_vao;
 GLuint SharedGPUObjects::m_ui_vao;
 GLuint SharedGPUObjects::m_quad_buffer;
 GLuint SharedGPUObjects::m_quad_vbo;
-GLuint SharedGPUObjects::m_skinning_ubo;
-int    SharedGPUObjects::m_max_mat4_size = 1024;
+GLuint SharedGPUObjects::m_skinning_tex;
+GLuint SharedGPUObjects::m_skinning_buf;
 bool   SharedGPUObjects::m_has_been_initialised = false;
+
+#include "matrix4.h"
 
 /** Initialises m_full_screen_quad_vbo.
  */
@@ -158,24 +158,59 @@ void SharedGPUObjects::initLightingDataUBO()
 }   // initLightingDataUBO
 
 // ----------------------------------------------------------------------------
-void SharedGPUObjects::initSkinningUBO()
+void SharedGPUObjects::initSkinning()
 {
-    assert(CVS->isARBUniformBufferObjectUsable());
-    irr::core::matrix4 m;
-    glGenBuffers(1, &m_skinning_ubo);
-    glBindBuffer(GL_UNIFORM_BUFFER, m_skinning_ubo);
+    glGenTextures(1, &m_skinning_tex);
+    // Reserve 1 identity matrix for non-weighted vertices
+    const irr::core::matrix4 m;
     int max_size = 0;
-    glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &max_size);
-    max_size = std::min(max_size, 65536);
-    m_max_mat4_size = max_size / 16 / sizeof(float);
-    Log::info("SharedGPUObjects", "Hardware skinning supported, max joints"
-        " support: %d", m_max_mat4_size);
-    glBufferData(GL_UNIFORM_BUFFER, max_size, 0, GL_STREAM_DRAW);
-    // Reserve a identity matrix for non moving mesh in animated model used by
-    // vertex shader calculation
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * sizeof(float), m.pointer());
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-}   // initSkinningUBO
+#ifdef USE_GLES2
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_size);
+
+    if (stk_config->m_max_skinning_bones > (unsigned)max_size)
+    {
+        Log::warn("SharedGPUObjects", "Too many bones for skinning, max: %d",
+            max_size);
+        stk_config->m_max_skinning_bones = max_size;
+    }
+    Log::info("SharedGPUObjects", "Hardware Skinning enabled, method: %u"
+        " (max bones) * 16 RGBA float texture",
+        stk_config->m_max_skinning_bones);
+
+    glBindTexture(GL_TEXTURE_2D, m_skinning_tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 16,
+        stk_config->m_max_skinning_bones, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 16, 1, GL_RGBA, GL_FLOAT,
+        m.pointer());
+    glBindTexture(GL_TEXTURE_2D, 0);
+#else
+
+    glGenBuffers(1, &m_skinning_buf);
+    glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &max_size);
+    if (stk_config->m_max_skinning_bones * 64 > (unsigned)max_size)
+    {
+        Log::warn("SharedGPUObjects", "Too many bones for skinning, max: %d",
+            max_size >> 6);
+        stk_config->m_max_skinning_bones = max_size >> 6;
+    }
+    Log::info("SharedGPUObjects", "Hardware Skinning enabled, method: TBO, "
+        "max bones: %u", stk_config->m_max_skinning_bones);
+
+    glBindBuffer(GL_TEXTURE_BUFFER, m_skinning_buf);
+    glBufferData(GL_TEXTURE_BUFFER, stk_config->m_max_skinning_bones * 64,
+        NULL, GL_DYNAMIC_DRAW);
+    glBufferSubData(GL_TEXTURE_BUFFER, 0, 16 * sizeof(float), m.pointer());
+    glBindTexture(GL_TEXTURE_BUFFER, m_skinning_tex);
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, m_skinning_buf);
+    glBindTexture(GL_TEXTURE_BUFFER, 0);
+    glBindBuffer(GL_TEXTURE_BUFFER, 0);
+#endif
+
+}   // initSkinning
 
 // ----------------------------------------------------------------------------
 void SharedGPUObjects::init()
@@ -186,13 +221,14 @@ void SharedGPUObjects::init()
     initQuadBuffer();
     initSkyTriVBO();
     initFrustrumVBO();
-
+    if (CVS->supportsHardwareSkinning())
+    {
+        initSkinning();
+    }
     if (CVS->isARBUniformBufferObjectUsable())
     {
         initShadowVPMUBO();
         initLightingDataUBO();
-        if (CVS->supportsHardwareSkinning())
-            initSkinningUBO();
     }
 
     m_has_been_initialised = true;

@@ -193,9 +193,9 @@ GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
         glEnableVertexAttribArray(4);
         glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)44);
         glEnableVertexAttribArray(5);
-        glVertexAttribIPointer(5, 4, GL_INT, getVertexPitchFromType(type), (GLvoid*)60);
+        glVertexAttribIPointer(5, 4, GL_SHORT, getVertexPitchFromType(type), (GLvoid*)60);
         glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)76);
+        glVertexAttribPointer(6, 4, GL_HALF_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)68);
         break;
     default:
         assert(0 && "Wrong vertex type");

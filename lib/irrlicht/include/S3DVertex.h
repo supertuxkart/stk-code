@@ -255,14 +255,8 @@ struct S3DVertexTangents : public S3DVertex
 
 struct S3DVertexSkinnedMesh : public S3DVertexTangents
 {
-	s32 m_joint_idx1;
-	s32 m_joint_idx2;
-	s32 m_joint_idx3;
-	s32 m_joint_idx4;
-	f32 m_weight1;
-	f32 m_weight2;
-	f32 m_weight3;
-	f32 m_weight4;
+	s16 m_joint_idx[4];
+	s16 m_weight[4];
 
 	E_VERTEX_TYPE getType() const
 	{

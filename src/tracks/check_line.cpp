@@ -234,7 +234,7 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
         if (result)
         {
             LinearWorld* lw = dynamic_cast<LinearWorld*>(w);
-            if (lw != NULL)
+            if (triggeringCheckline() && lw != NULL)
                 lw->setLastTriggeredCheckline(kart_index, m_index);
         }
     }

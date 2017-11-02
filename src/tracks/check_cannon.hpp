@@ -62,7 +62,7 @@ public:
     virtual void trigger(unsigned int kart_index) OVERRIDE;
     virtual void changeDebugColor(bool is_active) OVERRIDE;
     virtual void update(float dt) OVERRIDE;
-
+    virtual bool triggeringCheckline() const { return false; }
     void addFlyable(Flyable *flyable);
     void removeFlyable(Flyable *flyable);
 };   // CheckLine

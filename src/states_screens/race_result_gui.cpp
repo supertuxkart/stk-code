@@ -135,7 +135,7 @@ void RaceResultGUI::init()
     else
     {
         m_start_track = 0;
-        m_end_track = tracks.size();
+        m_end_track = (int)tracks.size();
     }
 }   // init
 
@@ -226,7 +226,7 @@ void RaceResultGUI::enableAllButtons()
 
         middle->setText(_("Restart"));
         middle->setVisible(true);
-
+        middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
         if (race_manager->raceWasStartedFromOverworld())
         {
             top->setVisible(false);
@@ -239,8 +239,6 @@ void RaceResultGUI::enableAllButtons()
             bottom->setText(_("Back to the menu"));
         }
         bottom->setVisible(true);
-
-        bottom->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
 }   // enableAllButtons
 
@@ -339,7 +337,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             }
             return;
         }
-        Log::fatal("RaceResultGUI", "Incorrect event '%s' when things are unlocked.",
+        Log::warn("RaceResultGUI", "Incorrect event '%s' when things are unlocked.",
             name.c_str());
     }
 
@@ -417,7 +415,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         }
     }
     else
-        Log::fatal("RaceResultGUI", "Incorrect event '%s' for normal race.",
+        Log::warn("RaceResultGUI", "Incorrect event '%s' for normal race.",
             name.c_str());
     return;
 }   // eventCallback
@@ -1326,7 +1324,7 @@ void RaceResultGUI::backToLobby()
     // ----------------------------------------------------------------------------
     void RaceResultGUI::cleanupGPProgress()
     {
-        for (size_t i = 0; i < m_gp_progress_widgets.size(); i++)
+        for (unsigned int i = 0; i < m_gp_progress_widgets.size(); i++)
             m_widgets.remove(m_gp_progress_widgets.get(i));
         m_gp_progress_widgets.clearAndDeleteAll();
     }   // cleanupGPProgress

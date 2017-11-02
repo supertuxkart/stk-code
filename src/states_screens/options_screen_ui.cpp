@@ -165,11 +165,12 @@ void OptionsScreenUI::init()
     // --- select the right skin in the spinner
     bool currSkinFound = false;
     const int skinCount = (int) m_skins.size();
+    std::string user_skin = StringUtils::toLowerCase(UserConfigParams::m_skin_file.c_str());
     for (int n=0; n<skinCount; n++)
     {
-        const std::string skinFileName = StringUtils::getBasename(m_skins[n]);
+        const std::string skinFileName = StringUtils::toLowerCase(StringUtils::getBasename(m_skins[n]));
 
-        if (UserConfigParams::m_skin_file.c_str() == skinFileName)
+        if (user_skin == skinFileName)
         {
             skinSelector->setValue(n);
             currSkinFound = true;

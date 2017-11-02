@@ -28,6 +28,7 @@ void renderMeshes1stPass()
 {
     auto &meshes = T::List::getInstance()->SolidPass;
     T::FirstPassShader::getInstance()->use();
+    handleSkinning(T::FirstPassShader::getInstance());
     if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
@@ -58,6 +59,7 @@ void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
 {
     auto &meshes = T::List::getInstance()->SolidPass;
     T::SecondPassShader::getInstance()->use();
+    handleSkinning(T::SecondPassShader::getInstance());
     if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
@@ -95,6 +97,7 @@ void renderShadow(unsigned cascade)
 {
     auto &t = T::List::getInstance()->Shadows[cascade];
     T::ShadowPassShader::getInstance()->use();
+    handleSkinning(T::ShadowPassShader::getInstance());
     if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
     for (unsigned i = 0; i < t.size(); i++)

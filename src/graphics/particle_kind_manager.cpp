@@ -124,3 +124,14 @@ ParticleKind* ParticleKindManager::getParticles(const std::string &name)
 }
 
 // ----------------------------------------------------------------------------
+bool ParticleKindManager::isGlobalParticleMaterial(Material* m) const
+{
+    for (auto& p : m_kinds)
+    {
+        if (p.second->getMaterial() == m)
+        {
+            return true;
+        }
+    }
+    return false;
+}

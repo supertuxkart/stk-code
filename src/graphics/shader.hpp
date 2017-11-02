@@ -146,9 +146,8 @@ private:
     /** End of recursive implementation of assignUniforms. */
     void assignUniformsImpl()
     {
-        bindPoint("MatrixData",   0);
+        bindPoint("MatrixesData", 0);
         bindPoint("LightingData", 1);
-        bindPoint("SkinningData", 2);
     }   // assignUniformsImpl
 
     // ------------------------------------------------------------------------
@@ -368,6 +367,8 @@ public:
     }   // loadProgram
 
     // ------------------------------------------------------------------------
+    virtual void bindCustomTextures() {}
+    // ------------------------------------------------------------------------
     void drawFullScreenEffect(Args...args)
     {
         use();
@@ -379,6 +380,34 @@ public:
 };   // Shader
 
 // ============================================================================
+class SkinnedMeshShader
+{
+private:
+    GLuint m_skinning_tex_location;
+public:
+    SkinnedMeshShader() : m_skinning_tex_location(0) {}
+    // ------------------------------------------------------------------------
+    template <typename Shader>
+    void init(Shader* s)
+    {
+        s->use();
+        m_skinning_tex_location = s->getUniformLocation("skinning_tex");
+        glUniform1i(m_skinning_tex_location, 15);
+    }
+    // ------------------------------------------------------------------------
+    void bindSkinningTexture()
+    {
+        glActiveTexture(GL_TEXTURE0 + 15);
+#ifdef USE_GLES2
+        glBindTexture(GL_TEXTURE_2D, SharedGPUObjects::getSkinningTexture());
+#else
+        glBindTexture(GL_TEXTURE_BUFFER,
+            SharedGPUObjects::getSkinningTexture());
+#endif
+        glBindSampler(15, 0);
+    }
+};
+
 
 #endif
 

@@ -170,7 +170,10 @@ namespace GUIEngine
         // --------------------------------------------------------------------
         /** Returns the number of screens on the stack. Is used to decide
          *  if exiting a screen would cause STK to end or not. */
-        unsigned int getMenuStackSize() const { return m_menu_stack.size(); }
+        unsigned int getMenuStackSize() const
+        { 
+            return (unsigned int)m_menu_stack.size();
+        }
     };   // Class AbstractStateManager
 
 }   // GUIEngine
