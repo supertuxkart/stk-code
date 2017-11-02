@@ -24,6 +24,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/material.hpp"
+#include "graphics/particle_kind_manager.hpp"
 #include "graphics/shaders.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -381,14 +382,26 @@ void MaterialManager::makeMaterialsPermanent()
 }   // makeMaterialsPermanent
 
 // ----------------------------------------------------------------------------
-
 void MaterialManager::unloadAllTextures()
 {
-    std::string texture_folder = file_manager->getAssetDirectory(FileManager::TEXTURE);
+    std::string texture_folder =
+        file_manager->getAssetDirectory(FileManager::TEXTURE);
+    texture_folder = file_manager->getFileSystem()->getAbsolutePath
+        (texture_folder.c_str()).c_str();
+    core::stringc texfname(texture_folder.c_str());
+    texfname.make_lower();
+    texture_folder = texfname.c_str();
     for (int i = 0; i < m_shared_material_index; i++)
     {
-        if (m_materials[i]->getTexFullPath().find(texture_folder) != std::string::npos)
-            m_materials[i]->unloadTexture();
+        // Global particle textures will stay until exit
+        // STK, which avoid hangs when lazy-loading the texture when being
+        // triggered.
+        Material* m = m_materials[i];
+        if (!ParticleKindManager::get()->isGlobalParticleMaterial(m)
+            && m->getTexFullPath().find(texture_folder) != std::string::npos)
+        {
+            m->unloadTexture();
+        }
     }
 }
 

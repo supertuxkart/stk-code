@@ -18,6 +18,7 @@
 #ifndef SERVER_ONLY
 #include "graphics/draw_calls.hpp"
 
+#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/command_buffer.hpp"
 #include "graphics/cpu_particle_manager.hpp"
@@ -260,12 +261,12 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
     {
         skinning_offset = getSkinningOffset() + 1/*reserved identity matrix*/;
         if (skinning_offset + am->getTotalJoints() >
-            SharedGPUObjects::getMaxMat4Size())
+            (int)stk_config->m_max_skinning_bones)
         {
             Log::error("DrawCalls", "Don't have enough space to render skinned"
                 " mesh %s! Max joints can hold: %d",
                 am->getMeshDebugName().c_str(),
-                SharedGPUObjects::getMaxMat4Size());
+                stk_config->m_max_skinning_bones);
             return;
         }
         m_mesh_for_skinning.insert(am);
@@ -684,9 +685,19 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
     }*/
 
     PROFILER_PUSH_CPU_MARKER("- Animations/Buffer upload", 0x0, 0x0, 0x0);
+#ifdef USE_GLES2
+    glBindTexture(GL_TEXTURE_2D, SharedGPUObjects::getSkinningTexture());
+#else
+    glBindBuffer(GL_TEXTURE_BUFFER, SharedGPUObjects::getSkinningBuffer());
+#endif
     for (unsigned i = 0; i < m_deferred_update.size(); i++)
         m_deferred_update[i]->updateGL();
     PROFILER_POP_CPU_MARKER();
+#ifdef USE_GLES2
+    glBindTexture(GL_TEXTURE_2D, 0);
+#else
+    glBindBuffer(GL_TEXTURE_BUFFER, 0);
+#endif
 
     PROFILER_PUSH_CPU_MARKER("- cpu particle upload", 0x3F, 0x03, 0x61);
     CPUParticleManager::getInstance()->uploadAll();
@@ -964,7 +975,7 @@ int32_t DrawCalls::getSkinningOffset() const
 {
     return std::accumulate(m_mesh_for_skinning.begin(),
         m_mesh_for_skinning.end(), 0, []
-        (const size_t previous, const STKAnimatedMesh* m)
+        (const unsigned int previous, const STKAnimatedMesh* m)
         { return previous + m->getTotalJoints(); });
 }   // getSkinningOffset
 #endif   // !SERVER_ONLY

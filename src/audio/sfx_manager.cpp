@@ -529,7 +529,7 @@ void SFXManager::loadSfx()
     delete root;
 
     // Now load them in parallel
-    const int max = m_all_sfx_types.size();
+    const int max = (int)m_all_sfx_types.size();
     SFXBuffer **array = new SFXBuffer *[max];
     i = 0;
 

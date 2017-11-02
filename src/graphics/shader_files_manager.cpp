@@ -18,8 +18,8 @@
 #ifndef SERVER_ONLY
 
 #include "graphics/shader_files_manager.hpp"
+#include "config/stk_config.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/shared_gpu_objects.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
 
@@ -186,7 +186,7 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
     else
         code << "precision mediump float;\n";
 #endif
-    code << "#define MAX_BONES " << SharedGPUObjects::getMaxMat4Size() << "\n";
+    code << "#define MAX_BONES " << stk_config->m_max_skinning_bones << "\n";
 
     code << getHeader();
 
@@ -195,7 +195,7 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
     Log::info("ShaderFilesManager", "Compiling shader : %s", file.c_str());
     const std::string &source  = code.str();
     char const *source_pointer = source.c_str();
-    int len                    = source.size();
+    int len                    = (int)source.size();
     glShaderSource(id, 1, &source_pointer, &len);
     glCompileShader(id);
 

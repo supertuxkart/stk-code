@@ -152,6 +152,8 @@ public:
 
     float m_cutscene_fov;
 
+    unsigned m_max_skinning_bones;
+
     /** Lists of TTF files used in STK. */
     std::vector<std::string> m_normal_ttf;
     std::vector<std::string> m_digit_ttf;

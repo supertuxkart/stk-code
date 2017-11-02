@@ -293,7 +293,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->startSingleRace("gpwin", 999, false);
         GrandPrixWin* scene = GrandPrixWin::getInstance();
         scene->push();
-        const std::string winners[] = { "elephpant", "nolok", "pidgin" };
+        const std::string winners[] = { "kiki", "nolok", "pidgin" };
         scene->setKarts(winners);
     }
     else if (selection == "test_gplose")
@@ -308,7 +308,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         scene->push();
         std::vector<std::string> losers;
         losers.push_back("nolok");
-        losers.push_back("elephpant");
+        losers.push_back("kiki");
         //losers.push_back("wilber");
         //losers.push_back("tux");
         scene->setKarts(losers);
@@ -355,7 +355,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                 track_manager->getTrack("lighthouse")
                              ->getScreenshotFile().c_str()));
             textures.push_back(irr_driver->getTexture(
-                track_manager->getTrack("startrack")
+                track_manager->getTrack("snowtuxpeak")
                              ->getScreenshotFile().c_str()));
             textures.push_back(irr_driver->getTexture(
                 track_manager->getTrack("sandtrack")

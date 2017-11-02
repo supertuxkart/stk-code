@@ -19,6 +19,7 @@
 #define HEADER_RACE_PAUSED_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "utils/cpp2011.hpp"
 
 namespace GUIEngine
 {
@@ -45,6 +46,7 @@ public:
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
     
+    virtual void beforeAddingWidgets() OVERRIDE;
 };
 
 #endif

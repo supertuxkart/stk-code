@@ -38,6 +38,8 @@ flat out uvec2 hdle;
 
 #stk_include "utils/getworldmatrix.vert"
 
+uniform samplerBuffer skinning_tex;
+
 void main(void)
 {
     mat4 ModelMatrix = getWorldMatrix(Origin, Orientation, Scale);
@@ -45,9 +47,12 @@ void main(void)
     vec4 skinned_position = vec4(0.);
     for (int i = 0; i < 4; i++)
     {
-        vec4 single_bone_influenced_position = joint_matrices[clamp(Joint[i] + skinning_offset, 0, MAX_BONES)] * idle_position;
-        single_bone_influenced_position /= single_bone_influenced_position.w;
-        skinned_position += Weight[i] * single_bone_influenced_position;
+        mat4 joint_matrix = mat4(
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4),
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 1),
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 2),
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 3));
+        skinned_position += Weight[i] * joint_matrix * idle_position;
     }
 
 #ifdef VSLayer

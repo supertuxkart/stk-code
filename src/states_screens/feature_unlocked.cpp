@@ -324,7 +324,7 @@ void FeatureUnlockedCutScene::init()
         {
             video::SMaterial m;
             //m.MaterialType    = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-            m.BackfaceCulling = false;
+            m.BackfaceCulling = true;
             m.setTexture(0, m_unlocked_stuff[n].m_pictures[0]);
             m.AmbientColor  = video::SColor(255, 255, 255, 255);
             m.DiffuseColor  = video::SColor(255, 255, 255, 255);
@@ -342,7 +342,7 @@ void FeatureUnlockedCutScene::init()
             m_unlocked_stuff[n].m_root_gift_node = irr_driver->getSceneManager()->addEmptySceneNode();
             irr_driver->setAllMaterialFlags(mesh);
             m_unlocked_stuff[n].m_side_1 = irr_driver->addMesh(mesh, "unlocked_picture", m_unlocked_stuff[n].m_root_gift_node);
-            //mesh->drop();
+            mesh->drop();
 
             mesh = irr_driver->createTexturedQuadMesh(&m,
                 m_unlocked_stuff[n].m_w,
@@ -350,7 +350,7 @@ void FeatureUnlockedCutScene::init()
             irr_driver->setAllMaterialFlags(mesh);
             m_unlocked_stuff[n].m_side_2 = irr_driver->addMesh(mesh, "unlocked_picture",  m_unlocked_stuff[n].m_root_gift_node);
             m_unlocked_stuff[n].m_side_2->setRotation(core::vector3df(0.0f, 180.0f, 0.0f));
-            //mesh->drop();
+            mesh->drop();
 #ifdef DEBUG
             m_unlocked_stuff[n].m_root_gift_node->setName("unlocked track picture");
 #endif

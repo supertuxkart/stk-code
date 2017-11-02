@@ -122,7 +122,7 @@ private:
     int              m_max_font_height;
 
     /** Musical notes icon (for music description and credits) */
-    Material        *m_music_icon;
+        video::ITexture* m_music_icon;
 
     /** Translated strings 'ready', 'set', 'go'. */
     core::stringw    m_string_ready, m_string_set, m_string_go, m_string_goal;
@@ -143,8 +143,8 @@ private:
     
 
 protected:
-    /** Material for the 'plunger in the face' texture. */
-    Material        *m_plunger_face;
+    /** Texture for the 'plunger in the face' texture. */
+    video::ITexture* m_plunger_face;
 
     /** State of the plunger: From the 'init' states the plunger switches
      *  between two slow moving states ('shakily moving') till the end of
@@ -178,7 +178,7 @@ protected:
     video::ITexture *m_gauge_goal;
 
     /** The frame around player karts in the mini map. */
-    Material         *m_icons_frame;
+    video::ITexture* m_icons_frame;
     
     RaceGUIMultitouch* m_multitouch_gui;
 

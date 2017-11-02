@@ -1562,6 +1562,9 @@ int main(int argc, char *argv[] )
         main_loop = new MainLoop();
         material_manager->loadMaterial();
 
+        // Preload the explosion effects (explode.png)
+        ParticleKindManager::get()->getParticles("explosion.xml");
+
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();

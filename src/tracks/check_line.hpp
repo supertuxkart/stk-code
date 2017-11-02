@@ -86,6 +86,7 @@ public:
     virtual void reset(const Track &track);
     virtual void resetAfterKartMove(unsigned int kart_index);
     virtual void changeDebugColor(bool is_active);
+    virtual bool triggeringCheckline() const { return true; }
     // ------------------------------------------------------------------------
     /** Returns the actual line data for this checkpoint. */
     const core::line2df &getLine2D() const {return m_line;}

@@ -22,6 +22,7 @@
 
 #include "graphics/gl_headers.hpp"
 #include "../lib/irrlicht/source/Irrlicht/CParticleSystemSceneNode.h"
+#include <cassert>
 #include <vector>
 
 using namespace irr;
@@ -145,9 +146,14 @@ public:
             glDeleteBuffers(1, &m_flips_buffer);
             m_flips_buffer = 0;
         }
+        m_flips_data.clear();
     }
     // ------------------------------------------------------------------------
-    static GLuint getFlipsBuffer()                   { return m_flips_buffer; }
+    static GLuint getFlipsBuffer()
+    {
+        assert(m_flips_buffer != 0);
+        return m_flips_buffer;
+    }
 };
 
 #endif

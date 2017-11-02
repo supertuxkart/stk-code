@@ -211,14 +211,33 @@ FileManager::FileManager()
                    "Set $SUPERTUXKART_DATADIR to point to the data directory.");
         // fatal will exit the application
     }
-
+    
     addRootDirs(root_dir);
-    if( fileExists(root_dir+"../../stk-assets"))
-        addRootDirs(root_dir+"../../stk-assets");
-    if( fileExists(root_dir+"../../supertuxkart-assets"))
-        addRootDirs(root_dir+"../../supertuxkart-assets");
-    if ( getenv ( "SUPERTUXKART_ROOT_PATH" ) != NULL )
-        addRootDirs(getenv("SUPERTUXKART_ROOT_PATH"));
+    
+    std::string assets_dir;
+    
+    if (getenv("SUPERTUXKART_ASSETS_DIR") != NULL)
+    {
+        assets_dir = std::string(getenv("SUPERTUXKART_ASSETS_DIR"));
+    }
+    else if (fileExists(root_dir + "../../stk-assets"))
+    {
+        assets_dir = root_dir + "../../stk-assets";
+    }
+    else if (fileExists(root_dir + "../../supertuxkart-assets"))
+    {
+        assets_dir = root_dir + "../../supertuxkart-assets";
+    }
+    else if (getenv("SUPERTUXKART_ROOT_PATH") != NULL)
+    {
+        //is this needed?
+        assets_dir = std::string(getenv("SUPERTUXKART_ROOT_PATH"));
+    }
+    
+    if (!assets_dir.empty() && assets_dir != root_dir)
+    {
+        addRootDirs(assets_dir);
+    }
 
     checkAndCreateConfigDir();
     checkAndCreateAddonsDir();

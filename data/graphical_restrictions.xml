@@ -38,4 +38,5 @@
   <card contains="Adreno"         os="android"  version="<=19"     disable="VertexIdWorking"/>
   <card contains="Android Emulator" os="android"                   disable="ForceLegacyDevice"/>
   <card                           os="android"                     disable="UniformBufferObject"/>
+  <card vendor="Broadcom"         os="linux"                       disable="HighDefinitionTextures256"/>
 </graphical-restrictions>
