@@ -1,0 +1,9 @@
+<resources>
+
+    <!-- Credit: https://stackoverflow.com/a/37324030 -->
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+</resources>

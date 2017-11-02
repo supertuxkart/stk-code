@@ -122,11 +122,34 @@ void CIrrDeviceAndroid::createVideoModeList()
 		
 	int width = ANativeWindow_getWidth(Android->window);
 	int height = ANativeWindow_getHeight(Android->window);
-	
+	int widthReduced = width;
+	int heightReduced = height;
+
+	if (width == 1440 && height == 2560)
+	{
+		widthReduced = 1080;
+		heightReduced = 1920;
+	}
+	else if (width == 1200 && height == 1920)
+	{
+		widthReduced = 900;
+		heightReduced = 1440;
+	}
+	else if (width == 1080 && height == 1920)
+	{
+		widthReduced = 720;
+		heightReduced = 1280;
+	}
+	else if (width == 768 && height == 1280)
+	{
+		widthReduced = 576;
+		heightReduced = 960;
+	}
+
 	if (width > 0 && height > 0)
 	{
-		CreationParams.WindowSize.Width = width;
-		CreationParams.WindowSize.Height = height;
+		CreationParams.WindowSize.Width = widthReduced;
+		CreationParams.WindowSize.Height = heightReduced;
 	}
 
 	core::dimension2d<u32> size = core::dimension2d<u32>(
