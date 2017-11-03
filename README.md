@@ -70,7 +70,7 @@ Compilation instruction is explained there. If you don't need this feature, pass
 
 ### Compiling
 
-Run the following commands to compile SuperTuxKart:
+Run the following commands inside `stk-code` directory to compile SuperTuxKart:
 
 ```bash
 mkdir cmake_build
