@@ -728,7 +728,7 @@ namespace UserConfigParams
 #endif
 
     PARAM_PREFIX IntUserConfigParam        m_graphical_effects
-            PARAM_DEFAULT(  IntUserConfigParam(2, "anim_gfx",
+            PARAM_DEFAULT(  IntUserConfigParam(2, "animate_graphics",
                             &m_graphics_quality, "Scenery animations: 0 disabled, 1 only important, 2 enabled") );
 
     // This saves the actual user preference.
