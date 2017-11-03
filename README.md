@@ -75,7 +75,7 @@ Run the following commands to compile SuperTuxKart:
 ```bash
 mkdir cmake_build
 cd cmake_build
-cmake ..
+cmake ../stk-code
 make -j4
 ```
 STK can then be run from the build directory with `bin/supertuxkart`
