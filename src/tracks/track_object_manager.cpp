@@ -184,6 +184,11 @@ void TrackObjectManager::castRay(const btVector3 &from,
     }
     for (const TrackObject* curr : m_driveable_objects)
     {
+        if (!curr->isEnabled())
+        {
+            // For example jumping pad in cocoa temple
+            continue;
+        }
         btVector3 new_hit_point;
         const Material *new_material;
         btVector3 new_normal;
