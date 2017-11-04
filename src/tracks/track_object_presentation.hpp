@@ -360,6 +360,7 @@ public:
                                  scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationLight();
     float getEnergy() const { return m_energy; }
+    virtual void setEnable(bool enabled) OVERRIDE;
     void setEnergy(float energy);
 };   // TrackObjectPresentationLight
 

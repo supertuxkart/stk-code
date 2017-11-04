@@ -1040,6 +1040,13 @@ void TrackObjectPresentationLight::setEnergy(float energy)
     }
 }
 // ----------------------------------------------------------------------------
+void TrackObjectPresentationLight::setEnable(bool enabled)
+{
+    if (m_node != NULL)
+        m_node->setVisible(enabled);
+}   // setEnable
+
+// ----------------------------------------------------------------------------
 TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
                                                      const XMLNode& xml_node,
                                                      TrackObject* parent)
