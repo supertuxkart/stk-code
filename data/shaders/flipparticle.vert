@@ -22,7 +22,7 @@ float anglespeed;
 
 out float lf;
 out vec2 tc;
-out vec3 pc;
+out vec4 pc;
 
 void main(void)
 {
@@ -68,5 +68,5 @@ void main(void)
 
 	vec4 viewpos = ViewMatrix * vec4(newposition + newquadcorner, 1.0);
 	gl_Position = ProjectionMatrix * viewpos;
-	pc = vec3(1.);
+	pc = vec4(1.);
 }

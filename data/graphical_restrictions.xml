@@ -39,4 +39,5 @@
   <card                           os="android"                     disable="ColorBufferFloat"/>
   <card contains="Adreno"         os="android"  version="<=19"     disable="VertexIdWorking"/>
   <card contains="Android Emulator" os="android"                   disable="ForceLegacyDevice"/>
+  <card                           os="android"                     disable="UniformBufferObject"/>
 </graphical-restrictions>

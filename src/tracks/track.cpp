@@ -573,7 +573,10 @@ void Track::loadTrackInfo()
     if(xml_node) loadCurves(*xml_node);
 
     // Set the correct paths
-    m_screenshot = m_root+m_screenshot;
+    if (m_screenshot.length() > 0)
+    {
+        m_screenshot = m_root+m_screenshot;
+    }
     delete root;
 
     std::string dir = StringUtils::getPath(m_filename);
@@ -1111,38 +1114,51 @@ bool Track::loadMainTrack(const XMLNode &root)
                    track_node->getName().c_str(), model_name.c_str());
     }
 
-    // The mesh as returned does not have all mesh buffers with the same
-    // texture combined. This can result in a _HUGE_ overhead. E.g. instead
-    // of 46 different mesh buffers over 500 (for some tracks even >1000)
-    // were created. This means less effect from hardware support, less
-    // vertices per opengl operation, more overhead on CPU, ...
-    // So till we have a better b3d exporter which can combine the different
-    // meshes which use the same texture when exporting, the meshes are
-    // combined using CBatchingMesh.
-    scene::CBatchingMesh *merged_mesh = new scene::CBatchingMesh();
-    merged_mesh->addMesh(mesh);
-    merged_mesh->finalize();
+    scene::ISceneNode* scene_node = NULL;
+    scene::IMesh* tangent_mesh = NULL;
+    if (m_version < 7)
+    {
+        // The mesh as returned does not have all mesh buffers with the same
+        // texture combined. This can result in a _HUGE_ overhead. E.g. instead
+        // of 46 different mesh buffers over 500 (for some tracks even >1000)
+        // were created. This means less effect from hardware support, less
+        // vertices per opengl operation, more overhead on CPU, ...
+        // So till we have a better b3d exporter which can combine the different
+        // meshes which use the same texture when exporting, the meshes are
+        // combined using CBatchingMesh.
+        scene::CBatchingMesh *merged_mesh = new scene::CBatchingMesh();
+        merged_mesh->addMesh(mesh);
+        merged_mesh->finalize();
 #ifndef SERVER_ONLY
-    scene::IMesh* tangent_mesh = MeshTools::createMeshWithTangents(merged_mesh, &MeshTools::isNormalMap);
+        tangent_mesh = MeshTools::createMeshWithTangents(merged_mesh, &MeshTools::isNormalMap);
 
-    adjustForFog(tangent_mesh, NULL);
+        adjustForFog(tangent_mesh, NULL);
 #else
-    scene::IMesh* tangent_mesh = merged_mesh;
+        tangent_mesh = merged_mesh;
 #endif
-
+        // The reference count of the mesh is 1, since it is in irrlicht's
+        // cache. So we only have to remove it from the cache.
+        irr_driver->removeMeshFromCache(mesh);
+    }
+    else
+    {
+        // SPM does the combine for you
+#ifndef SERVER_ONLY
+        tangent_mesh = MeshTools::createMeshWithTangents(mesh, &MeshTools::isNormalMap);
+        adjustForFog(tangent_mesh, NULL);
+        tangent_mesh->grab();
+#else
+        tangent_mesh = mesh;
+#endif
+    }
     // The merged mesh is grabbed by the octtree, so we don't need
     // to keep a reference to it.
-    scene::ISceneNode *scene_node = irr_driver->addMesh(tangent_mesh, "track_main");
-    //scene::IMeshSceneNode *scene_node = irr_driver->addOctTree(merged_mesh);
+    scene_node = irr_driver->addMesh(tangent_mesh, "track_main");
     // We should drop the merged mesh (since it's now referred to in the
     // scene node), but then we need to grab it since it's in the
     // m_all_cached_meshes.
     m_all_cached_meshes.push_back(tangent_mesh);
     irr_driver->grabAllTextures(tangent_mesh);
-
-    // The reference count of the mesh is 1, since it is in irrlicht's
-    // cache. So we only have to remove it from the cache.
-    irr_driver->removeMeshFromCache(mesh);
 
 #ifdef DEBUG
     std::string debug_name=model_name+" (main track, octtree)";
@@ -1506,7 +1522,7 @@ void Track::createWater(const XMLNode &node)
     */
     scene::ISceneNode* scene_node = NULL;
     /*
-    if (UserConfigParams::m_graphical_effects)
+    if (UserConfigParams::m_graphical_effects > 1)
     {
         scene::IMesh *welded;
         scene_node = irr_driver->addWaterNode(mesh, &welded,
@@ -1987,7 +2003,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         }
         else if (name == "particle-emitter")
         {
-            if (UserConfigParams::m_graphical_effects)
+            if (UserConfigParams::m_graphical_effects > 1)
             {
                 m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
             }
@@ -2016,11 +2032,6 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
             {
                 m_sky_particles =
                     ParticleKindManager::get()->getParticles(weather_particles);
-            }
-            else
-            {
-                Log::error("track", "Bad weather node found - ignored.\n");
-                continue;
             }
         }
         else if (name == "sun")

@@ -32,7 +32,7 @@
 #include <functional>
 
 #if !defined(USE_GLES2)
-static const uint8_t CACHE_VERSION = 1;
+static const uint8_t CACHE_VERSION = 2;
 #endif
 // ----------------------------------------------------------------------------
 STKTexture::STKTexture(const std::string& path, TexConfig* tc, bool no_upload)
@@ -443,10 +443,10 @@ bool STKTexture::loadCompressedTexture(const std::string& file_name)
     ifs.read((char*)&cache_verison, sizeof(uint8_t));
     if (cache_verison != CACHE_VERSION)
     {
-        Log::warn("STKTexture", "%s version %d is not supported!",
+        Log::debug("STKTexture", "%s version %d is not supported!",
             file_name.c_str(), cache_verison);
         ifs.close();
-        // Remove the file later if we have more version
+        std::remove(file_name.c_str());
         return false;
     }
     ifs.read((char*)&internal_format, sizeof(int));
@@ -459,8 +459,9 @@ bool STKTexture::loadCompressedTexture(const std::string& file_name)
     if (ifs.fail() || m_texture_size == 0)
         return false;
 
-    char *data = new char[m_texture_size];
-    ifs.read(data, m_texture_size);
+    std::vector<char> compressed;
+    compressed.resize(m_texture_size);
+    ifs.read(compressed.data(), m_texture_size);
     if (!ifs.fail())
     {
         // No on the fly reload is supported for compressed texture
@@ -475,14 +476,38 @@ bool STKTexture::loadCompressedTexture(const std::string& file_name)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_RED);
         }
         glCompressedTexImage2D(GL_TEXTURE_2D, 0, internal_format,
-            m_size.Width, m_size.Height, 0, m_texture_size, (GLvoid*)data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+            m_size.Width, m_size.Height, 0, m_texture_size, compressed.data());
+        unsigned width = m_size.Width;
+        unsigned height = m_size.Height;
+        std::vector<std::pair<unsigned, unsigned> > mipmap_sizes;
+        while (true)
+        {
+            width = width < 2 ? 1 : width >> 1;
+            height = height < 2 ? 1 : height >> 1;
+            mipmap_sizes.emplace_back(width, height);
+            if (width == 1 && height == 1)
+                break;
+        }
+        for (unsigned i = 0; i < mipmap_sizes.size(); i++)
+        {
+            unsigned cur_mipmap_size = 0;
+            ifs.read((char*)&cur_mipmap_size, sizeof(unsigned int));
+            ifs.read(compressed.data(), cur_mipmap_size);
+            if (cur_mipmap_size == 0 || ifs.fail())
+            {
+                ifs.close();
+                std::remove(file_name.c_str());
+                return false;
+            }
+            glCompressedTexImage2D(GL_TEXTURE_2D, i + 1, internal_format,
+                mipmap_sizes[i].first, mipmap_sizes[i].second, 0,
+                cur_mipmap_size, compressed.data());
+        }
         glBindTexture(GL_TEXTURE_2D, 0);
-        delete[] data;
-        ifs.close();
         return true;
     }
-    delete[] data;
+    ifs.close();
+    std::remove(file_name.c_str());
 #endif
     return false;
 }   // loadCompressedTexture
@@ -515,8 +540,9 @@ void STKTexture::saveCompressedTexture(const std::string& compressed_tex)
         GL_TEXTURE_COMPRESSED_IMAGE_SIZE, (GLint *)&m_texture_size);
     if (m_texture_size == 0) return;
 
-    char *data = new char[m_texture_size];
-    glGetCompressedTexImage(GL_TEXTURE_2D, 0, (GLvoid*)data);
+    std::vector<char> compressed;
+    compressed.resize(m_texture_size);
+    glGetCompressedTexImage(GL_TEXTURE_2D, 0, compressed.data());
     std::ofstream ofs(compressed_tex.c_str(),
         std::ios::out | std::ios::binary);
     if (ofs.is_open())
@@ -528,10 +554,33 @@ void STKTexture::saveCompressedTexture(const std::string& compressed_tex)
         ofs.write((char*)&m_orig_size.Width, sizeof(unsigned int));
         ofs.write((char*)&m_orig_size.Height, sizeof(unsigned int));
         ofs.write((char*)&m_texture_size, sizeof(unsigned int));
-        ofs.write(data, m_texture_size);
-        ofs.close();
+        ofs.write(compressed.data(), m_texture_size);
+        unsigned width = m_size.Width;
+        unsigned height = m_size.Height;
+        std::vector<std::pair<unsigned, unsigned> > mipmap_sizes;
+        while (true)
+        {
+            width = width < 2 ? 1 : width >> 1;
+            height = height < 2 ? 1 : height >> 1;
+            mipmap_sizes.emplace_back(width, height);
+            if (width == 1 && height == 1)
+                break;
+        }
+        for (unsigned i = 0; i < mipmap_sizes.size(); i++)
+        {
+            GLint cur_mipmap_size = 0;
+            glGetTexLevelParameteriv(GL_TEXTURE_2D, i + 1,
+                GL_TEXTURE_COMPRESSED_IMAGE_SIZE, &cur_mipmap_size);
+            if (cur_mipmap_size == 0)
+            {
+                ofs.close();
+                std::remove(compressed_tex.c_str());
+            }
+            glGetCompressedTexImage(GL_TEXTURE_2D, i + 1, compressed.data());
+            ofs.write((char*)&cur_mipmap_size, sizeof(unsigned int));
+            ofs.write(compressed.data(), cur_mipmap_size);
+        }
     }
-    delete[] data;
 #endif
 }   // saveCompressedTexture
 

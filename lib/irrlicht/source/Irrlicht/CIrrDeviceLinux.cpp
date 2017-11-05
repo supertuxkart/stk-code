@@ -673,11 +673,15 @@ bool CIrrDeviceLinux::createWindow()
 #elif defined(GLX_SGIS_multisample)
 					GLX_SAMPLE_BUFFERS_SGIS, 1,
 					GLX_SAMPLES_SGIS, CreationParams.AntiAlias, // 18,19
+#else
+#error
 #endif
 #ifdef GLX_ARB_framebuffer_sRGB
 					GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB, CreationParams.HandleSRGB,
 #elif defined(GLX_EXT_framebuffer_sRGB)
 					GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, CreationParams.HandleSRGB,
+#else
+#error
 #endif
 					GLX_STEREO, CreationParams.Stereobuffer?True:False,
 					None
@@ -692,6 +696,39 @@ bool CIrrDeviceLinux::createWindow()
 				}
 				// first round with unchanged values
 				{
+					configList=glxChooseFBConfig(display, screennr, visualAttrBuffer,&nitems);
+					if (!configList && CreationParams.AntiAlias)
+					{
+						while (!configList && (visualAttrBuffer[19]>1))
+						{
+							visualAttrBuffer[19] -= 1;
+							configList=glxChooseFBConfig(display, screennr, visualAttrBuffer,&nitems);
+						}
+						if (!configList)
+						{
+							visualAttrBuffer[17] = 0;
+							visualAttrBuffer[19] = 0;
+							configList=glxChooseFBConfig(display, screennr, visualAttrBuffer,&nitems);
+							if (configList)
+							{
+								os::Printer::log("No FSAA available.", ELL_WARNING);
+								CreationParams.AntiAlias=0;
+							}
+							else
+							{
+								//reenable multisampling
+								visualAttrBuffer[17] = 1;
+								visualAttrBuffer[19] = CreationParams.AntiAlias;
+							}
+						}
+					}
+				}
+				// Try to disable sRGB framebuffer
+				if (!configList && CreationParams.HandleSRGB)
+				{
+					os::Printer::log("No sRGB framebuffer available.", ELL_WARNING);
+					CreationParams.HandleSRGB=false;
+					visualAttrBuffer[21] = GLX_DONT_CARE;
 					configList=glxChooseFBConfig(display, screennr, visualAttrBuffer,&nitems);
 					if (!configList && CreationParams.AntiAlias)
 					{
@@ -1218,6 +1255,9 @@ bool CIrrDeviceLinux::createInputContext()
 		return false;
 	}
 
+	// It's showed as memory leak, but we shouldn't delete it. From the xlib
+	// documentation: "The returned modifiers string is owned by Xlib and 
+	// should not be modified or freed by the client."
 	char* p = XSetLocaleModifiers("");
 	if (p == NULL)
 	{

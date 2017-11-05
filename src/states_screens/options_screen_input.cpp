@@ -134,7 +134,8 @@ void OptionsScreenInput::buildDeviceList()
                                                         
     if (touch_device != NULL)
     {
-        devices->addItem("touch_device", "   Touch device", 1);
+        devices->addItem("touch_device", (core::stringw("   ") + 
+                                                _("Touch Device")).c_str(), 1);
     }
 }   // buildDeviceList
 

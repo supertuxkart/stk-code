@@ -315,8 +315,15 @@ void GrandPrixEditorScreen::onConfirm()
     {
         grand_prix_manager->remove(m_selection->getId());
         loadGPList();
+        
         if (grand_prix_manager->getNumberOfGrandPrix() > 0)
-            setSelection (grand_prix_manager->getGrandPrix(0));
+        {
+            setSelection(grand_prix_manager->getGrandPrix(0));
+        }
+        else
+        {
+            setSelection(NULL);
+        }
     }
     ModalDialog::dismiss();
 }

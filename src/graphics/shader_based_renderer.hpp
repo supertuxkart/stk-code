@@ -60,10 +60,7 @@ private:
     void removeItemsInGlowingList();
     
     void prepareForwardRenderer();
-    
-    void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
-                          float dt);
-                          
+
     void uploadLightingData() const;
 
     void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode,

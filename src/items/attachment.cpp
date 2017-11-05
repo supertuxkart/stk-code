@@ -153,7 +153,7 @@ void Attachment::set(AttachmentType type, float time,
         break;
     }   // switch(type)
 
-    if (!UserConfigParams::m_graphical_effects)
+    if (UserConfigParams::m_graphical_effects < 2)
     {
         m_node->setAnimationSpeed(0);
         m_node->setCurrentFrame(0);
@@ -190,7 +190,7 @@ void Attachment::set(AttachmentType type, float time,
 
         m_time_left = m_time_left * speed_mult;
 
-        if (UserConfigParams::m_graphical_effects)
+        if (UserConfigParams::m_graphical_effects > 1)
         {
             // .blend was created @25 (<10 real, slow computer), make it faster
             m_node->setAnimationSpeed(50);

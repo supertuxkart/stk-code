@@ -431,13 +431,18 @@ namespace UserConfigParams
             "considered as centered in steering button."));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_edge
-            PARAM_DEFAULT( FloatUserConfigParam(0.25f, "multitouch_deadzone_edge",
+            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone_edge",
             &m_multitouch_group,
             "A parameter in range [0, 0.5] that determines the zone that is "
             "considered as max value in steering button."));
+            
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_tilt_factor
+            PARAM_DEFAULT( FloatUserConfigParam(4.0f, "multitouch_tilt_factor",
+            &m_multitouch_group,
+            "A parameter that determines general accelerometer sensitivity."));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_scale
-            PARAM_DEFAULT( FloatUserConfigParam(1.0f, "multitouch_scale",
+            PARAM_DEFAULT( FloatUserConfigParam(1.1f, "multitouch_scale",
             &m_multitouch_group,
             "A parameter in range [0.5, 1.5] that determines the scale of the "
             "multitouch interface."));
@@ -722,9 +727,9 @@ namespace UserConfigParams
 #define FBO_DEFAULT true
 #endif
 
-    PARAM_PREFIX BoolUserConfigParam        m_graphical_effects
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "anim_gfx",
-                            &m_graphics_quality, "Scenery animations") );
+    PARAM_PREFIX IntUserConfigParam        m_graphical_effects
+            PARAM_DEFAULT(  IntUserConfigParam(2, "anim_gfx",
+                            &m_graphics_quality, "Scenery animations: 0 disabled, 1 only important, 2 enabled") );
 
     // This saves the actual user preference.
     PARAM_PREFIX IntUserConfigParam        m_xmas_mode

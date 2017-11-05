@@ -55,7 +55,8 @@ void CheckGoal::update(float dt)
 
     if (world)
     {
-        if (isTriggered(m_previous_ball_position, world->getBallPosition(), -1))
+        if (isTriggered(m_previous_ball_position, world->getBallPosition(), 
+                        /*kart index - ignore*/-1)                         )
         {
             if (UserConfigParams::m_check_debug)
             {
@@ -86,7 +87,7 @@ void CheckGoal::trigger(unsigned int i)
 
 // ----------------------------------------------------------------------------
 bool CheckGoal::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
-                            unsigned int kartIndex)
+                            int kart_index)
 {
     core::vector2df cross_point;
 

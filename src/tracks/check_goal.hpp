@@ -65,7 +65,7 @@ public:
     virtual void update(float dt) OVERRIDE;
     virtual void trigger(unsigned int kart_index) OVERRIDE;
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
-                             unsigned int indx) OVERRIDE;
+                             int indx) OVERRIDE;
     virtual void reset(const Track &track) OVERRIDE;
 
     // ------------------------------------------------------------------------

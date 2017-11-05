@@ -31,6 +31,8 @@
 #include "utils/log.hpp"
 
 const int Graph::UNKNOWN_SECTOR = -1;
+const float Graph::MIN_HEIGHT_TESTING = -1.0f;
+const float Graph::MAX_HEIGHT_TESTING = 5.0f;
 Graph *Graph::m_graph = NULL;
 // -----------------------------------------------------------------------------
 Graph::Graph()

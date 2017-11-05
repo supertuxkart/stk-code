@@ -69,6 +69,7 @@ namespace video
 		ContextEGLParams egl_params;
 		egl_params.opengl_api = CEGL_API_OPENGL_ES;
 		egl_params.surface_type = CEGL_SURFACE_WINDOW;
+		egl_params.handle_srgb = Params.HandleSRGB;
 		egl_params.force_legacy_device = Params.ForceLegacyDevice;
 		egl_params.with_alpha_channel = Params.WithAlphaChannel;
 		egl_params.vsync_enabled = Params.Vsync;
@@ -432,6 +433,13 @@ namespace video
 		addAndDropMaterialRenderer(new COGLES2ParallaxMapRenderer(PMVSData, PMFSData, EMT_PARALLAX_MAP_TRANSPARENT_VERTEX_ALPHA, this));
 
 		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_ONETEXTURE_BLEND, this));
+		
+		delete[] FPVSData;
+		delete[] FPFSData;
+		delete[] NMVSData;
+		delete[] NMFSData;
+		delete[] PMVSData;
+		delete[] PMFSData;
 
 		// Create 2D material renderer.
 
@@ -476,6 +484,9 @@ namespace video
 			R2DFSFile->drop();
 
 		MaterialRenderer2D = new COGLES2Renderer2D(R2DVSData, R2DFSData, this);
+
+		delete[] R2DVSData;
+		delete[] R2DFSData;
 	}
 
 

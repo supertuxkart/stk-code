@@ -41,7 +41,7 @@ out vec3 bitangent;
 out vec2 uv;
 out vec2 uv_bis;
 out vec4 color;
-
+out float camdist;
 
 void main(void)
 {
@@ -56,4 +56,5 @@ void main(void)
     bitangent = (ViewMatrix * ModelMatrix * vec4(Bitangent, 0.)).xyz;
     uv = vec2(Texcoord.x + texture_trans.x, Texcoord.y + texture_trans.y);
     uv_bis = SecondTexcoord;
+    camdist = length(ViewMatrix * ModelMatrix * vec4(Position, 1.));
 }

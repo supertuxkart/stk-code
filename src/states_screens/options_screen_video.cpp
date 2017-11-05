@@ -54,7 +54,7 @@ void OptionsScreenVideo::initPresets()
     ({
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
-        false /* animatedScenery */, 0 /* animatedCharacters */, 0 /* image_quality */,
+        1 /* animatedScenery */, 0 /* animatedCharacters */, 0 /* image_quality */,
         false /* depth of field */, false /* global illumination */, true /* degraded IBL */
     });
 
@@ -62,7 +62,7 @@ void OptionsScreenVideo::initPresets()
     ({
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
-        true /* animatedScenery */, 1 /* animatedCharacters */, 1 /* image_quality */,
+        2 /* animatedScenery */, 1 /* animatedCharacters */, 1 /* image_quality */,
         false /* depth of field */, false /* global illumination */, true /* degraded IBL */
     });
 
@@ -70,7 +70,7 @@ void OptionsScreenVideo::initPresets()
     ({
         true /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, true /* weather */,
-        true /* animatedScenery */, 1 /* animatedCharacters */, 2 /* image_quality */,
+        2 /* animatedScenery */, 1 /* animatedCharacters */, 2 /* image_quality */,
         false /* depth of field */, false /* global illumination */, true /* degraded IBL */
     });
 
@@ -78,7 +78,7 @@ void OptionsScreenVideo::initPresets()
     ({
         true /* light */, 0 /* shadow */, false /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, false /* ssao */, true /* weather */,
-        true /* animatedScenery */, 1 /* animatedCharacters */, 2 /* image_quality */,
+        2 /* animatedScenery */, 1 /* animatedCharacters */, 2 /* image_quality */,
         false /* depth of field */, false /* global illumination */, false /* degraded IBL */
     });
 
@@ -86,7 +86,7 @@ void OptionsScreenVideo::initPresets()
     ({
         true /* light */, 512 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
-        true /* animatedScenery */,
+        2 /* animatedScenery */,
 #ifndef SERVER_ONLY
         (SharedGPUObjects::getMaxMat4Size() > 512 || !CVS->supportsHardwareSkinning() ? 2 : 1),
 #else
@@ -100,7 +100,7 @@ void OptionsScreenVideo::initPresets()
     ({
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
-        true /* animatedScenery */,
+        2 /* animatedScenery */,
 #ifndef SERVER_ONLY
         (SharedGPUObjects::getMaxMat4Size() > 512 || !CVS->supportsHardwareSkinning() ? 2 : 1),
 #else
@@ -458,6 +458,8 @@ void OptionsScreenVideo::updateTooltip()
     const core::stringw me = _LTR("Me Only");
     //I18N: if no kart animations are enabled
     const core::stringw none = _LTR("None");
+    //I18N: if only important animated scenery is enabled
+    const core::stringw important_only = _LTR("Important only");
 
     //I18N: in the graphical options tooltip;
     // indicates the rendered image quality is very low
@@ -477,7 +479,10 @@ void OptionsScreenVideo::updateTooltip()
 //                                  UserConfigParams::m_pixel_shaders ? enabled : disabled);
     //I18N: in graphical options
     tooltip = _("Animated Scenery: %s",
-        UserConfigParams::m_graphical_effects ? enabled : disabled);
+        UserConfigParams::m_graphical_effects == 2 ? enabled : 
+        UserConfigParams::m_graphical_effects == 1 ? important_only : 
+        disabled);
+        
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Weather Effects: %s",
         UserConfigParams::m_weather_effects ? enabled : disabled);

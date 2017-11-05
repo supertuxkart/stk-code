@@ -10,7 +10,7 @@ SET(CMAKE_CXX_COMPILER i686-w64-mingw32-g++-posix)
 SET(CMAKE_RC_COMPILER i686-w64-mingw32-windres)
 
 # figure out folder to look in
-execute_process(COMMAND sh -c "ls /usr/lib/gcc/x86_64-w64-mingw32/ | grep posix | tr -d '\n'" OUTPUT_VARIABLE MINGW_DEPS_FOLDER)
+execute_process(COMMAND sh -c "ls /usr/lib/gcc/i686-w64-mingw32/ | grep posix | tr -d '\n'" OUTPUT_VARIABLE MINGW_DEPS_FOLDER)
 
 # here is the target environment located
 SET(CMAKE_FIND_ROOT_PATH /usr/i686-w64-mingw32 /usr/lib/gcc/i686-w64-mingw32/${MINGW_DEPS_FOLDER}/ ${PROJECT_SOURCE_DIR}/dependencies)

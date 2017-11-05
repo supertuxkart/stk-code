@@ -86,6 +86,13 @@ RaceGUIOverworld::RaceGUIOverworld()
 
     float scaling = irr_driver->getFrameSize().Height / 420.0f;
     const float map_size = 250.0f;
+    
+    if (UserConfigParams::m_multitouch_enabled && 
+        UserConfigParams::m_multitouch_mode != 0 &&
+        race_manager->getNumLocalPlayers() == 1)
+    {
+        m_multitouch_gui = new RaceGUIMultitouch(this);
+    }
 
     // Check if we have enough space for minimap when touch steering is enabled
     if (m_multitouch_gui != NULL)
@@ -156,6 +163,7 @@ RaceGUIOverworld::RaceGUIOverworld()
 //-----------------------------------------------------------------------------
 RaceGUIOverworld::~RaceGUIOverworld()
 {
+    delete m_multitouch_gui;
 }   // ~RaceGUIOverworld
 
 //-----------------------------------------------------------------------------

@@ -26,6 +26,7 @@
 
 class AbstractKart;
 class AnimationBase;
+class Flyable;
 class Ipo;
 
 
@@ -46,6 +47,10 @@ protected:
     /** Stores the curve interpolation for the cannon. */
     AnimationBase *m_curve;
 
+    /** If this animation is used for a flyable (e.g. basket ball) instead
+     *  of a kart, m_flyable is defined and m_kart is NULL. */
+    Flyable *m_flyable;
+
     /** Length of the (adjusted, i.e. taking kart width into account)
      *  start line. */
     float m_start_line_length;
@@ -61,12 +66,19 @@ protected:
     /** The initial heading of the kart when crossing the line. This is
      *  used to smoothly orient the kart towards the normal of the cuve. */
     btQuaternion m_delta_heading;
+
+    void init(Ipo *ipo, const Vec3 &start_left, const Vec3 &start_right,
+              const Vec3 &end_left, const Vec3 &end_right, float skid_rot);
+
 public:
              CannonAnimation(AbstractKart *kart, Ipo *ipo,
                              const Vec3 &start_left, const Vec3 &start_right,
                              const Vec3 &end_left, const Vec3 &end_right,
                              float skid_rot);
-    virtual ~CannonAnimation();
+             CannonAnimation(Flyable *flyable, Ipo *ipo,
+                             const Vec3 &start_left, const Vec3 &start_right,
+                             const Vec3 &end_left, const Vec3 &end_right);
+             virtual ~CannonAnimation();
     virtual void  update(float dt);
 
 };   // CannonAnimation

@@ -20,6 +20,7 @@
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
@@ -44,7 +45,12 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound, const char 
 #ifndef SERVER_ONLY
     ParticleKindManager* pkm = ParticleKindManager::get();
     ParticleKind* particles = pkm->getParticles(particle_file);
-    m_emitter = new ParticleEmitter(particles, coord,  NULL);
+    m_emitter = NULL;
+    
+    if (UserConfigParams::m_graphical_effects > 1)
+    {
+        m_emitter = new ParticleEmitter(particles, coord,  NULL);
+    }
 #endif
 }   // Explosion
 
@@ -76,7 +82,8 @@ bool Explosion::updateAndDelete(float dt)
     m_remaining_time -= dt;
 
 #ifndef SERVER_ONLY
-    if (m_remaining_time < 0.0f && m_remaining_time >= -explosion_time)
+    if (m_remaining_time < 0.0f && m_remaining_time >= -explosion_time &&
+        m_emitter != NULL)
     {
         scene::ISceneNode* node = m_emitter->getNode();
         
@@ -106,7 +113,7 @@ bool Explosion::updateAndDelete(float dt)
 #ifndef SERVER_ONLY
         // if framerate is very low, emit for at least a few frames, in case
         // burst time is lower than the time of 1 frame
-        if (m_emission_frames > 2)
+        if (m_emission_frames > 2 && m_emitter != NULL)
         {
             // Stop the emitter and wait a little while for all particles to have time to fade out
             m_emitter->getNode()->getEmitter()->setMinParticlesPerSecond(0);

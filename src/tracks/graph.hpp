@@ -103,6 +103,9 @@ private:
 
 public:
     static const int UNKNOWN_SECTOR;
+    // For 2d Quad
+    static const float MIN_HEIGHT_TESTING;
+    static const float MAX_HEIGHT_TESTING;
     // ------------------------------------------------------------------------
     /** Returns the one instance of this object. It is possible that there
      *  is no instance created (e.g. arena without navmesh) so we don't assert

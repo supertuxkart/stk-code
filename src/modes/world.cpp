@@ -440,6 +440,8 @@ World::~World()
 
     irr_driver->onUnloadWorld();
 
+    projectile_manager->cleanup();
+
     // In case that a race is aborted (e.g. track not found) track is 0.
     if(Track::getCurrentTrack())
         Track::getCurrentTrack()->cleanup();
@@ -489,8 +491,6 @@ World::~World()
     race_manager->setSpareTireKartNum(0);
 
     Camera::removeAllCameras();
-
-    projectile_manager->cleanup();
 
     // In case that the track is not found, Physics was not instantiated,
     // but kill handles this correctly.
@@ -1007,7 +1007,7 @@ void World::update(float dt)
     }
 
     PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
-    if (UserConfigParams::m_graphical_effects && Weather::getInstance())
+    if (UserConfigParams::m_graphical_effects > 1 && Weather::getInstance())
     {
         Weather::getInstance()->update(dt);
     }

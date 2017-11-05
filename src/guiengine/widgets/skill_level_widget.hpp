@@ -26,7 +26,7 @@
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
-#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/progress_bar_widget.hpp"
 
 
@@ -48,22 +48,22 @@ namespace GUIEngine
         
         /** widget coordinates */
         int m_bar_x, m_bar_y, m_bar_h, m_bar_w;
-        int m_label_x, m_label_y, m_label_h, m_label_w;
-
-        std::string m_label_name;
+        int m_iconbutton_x, m_iconbutton_y, m_iconbutton_h, m_iconbutton_w;
         
         int m_player_id;
-        bool m_display_text;
+        //shall icon be display left of the skill bar?
+        bool m_display_icon;
 
     public:
         
         LEAK_CHECK()
         
-        LabelWidget* m_label;
+        IconButtonWidget* m_iconbutton;
         ProgressBarWidget* m_bar;
 
-        SkillLevelWidget(core::recti area, const int player_id, bool multiplayer, bool display_text,
-                         const int value = 0, const irr::core::stringw& label = "default");
+        SkillLevelWidget(core::recti area, const int player_id,
+                         bool multiplayer, bool display_text,
+                         const int value = 0);
 
         virtual ~SkillLevelWidget() {};
 
@@ -89,15 +89,18 @@ namespace GUIEngine
 
         /** Change the label of the widget */
         void setLabel(const irr::core::stringw& label);
+        
+        /** Change the image for the icon. Expects an absolute file path*/
+        void setIcon(const irr::core::stringc& filepath);
 
         /** Get the current label of the widget. */
         const irr::core::stringw getLabel()
         {
-            return m_label->getText();
+            return m_iconbutton->getText();
         }
 
         /** If the label should be displayed. */
-        void setDisplayText(bool display_text);
+        void setDisplayIcon(bool display_icon);
     };
 }
 

@@ -45,6 +45,7 @@ class KartModel;
 class KartProperties;
 class Material;
 class Powerup;
+class SFXBuffer;
 class Skidding;
 class SlipStream;
 class TerrainInfo;
@@ -166,10 +167,7 @@ public:
     // Access to the graphical kart model.
     // ------------------------------------------------------------------------
     /** Returns this kart's kart model. */
-    KartModel* getKartModel() { return m_kart_model;      }
-    // ------------------------------------------------------------------------
-    /** Returns this kart's kart model. */
-    const KartModel* getKartModel() const { return m_kart_model;      }
+    KartModel* getKartModel() const { return m_kart_model;      }
     // ------------------------------------------------------------------------
     /** Returns the length of the kart. */
     float getKartLength() const { return m_kart_length; }
@@ -472,7 +470,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns whether this kart is jumping. */
     virtual bool isJumping() const = 0;
-
+    // ------------------------------------------------------------------------
+    virtual void playSound(SFXBuffer* buffer) = 0;
 };   // AbstractKart
 
 

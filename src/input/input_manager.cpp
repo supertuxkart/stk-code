@@ -488,11 +488,13 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
         // We have to save the direction in which the axis was moved.
         // This is done by storing it as a sign (and since button can
         // be zero, we add one before changing the sign).
-        int input_id = value>=0 ? 1+button : -(1+button);
+        int input_button_id = value>=0 ? 1+button : -(1+button);
+        std::tuple<int, int> input_id(deviceID, input_button_id);
+        std::tuple<int, int> input_id_inv(deviceID, -input_button_id);
 
         bool id_was_high         = m_sensed_input_high_gamepad.find(input_id)
                                    != m_sensed_input_high_gamepad.end();
-        bool inverse_id_was_high = m_sensed_input_high_gamepad.find(-input_id)
+        bool inverse_id_was_high = m_sensed_input_high_gamepad.find(input_id_inv)
                                    != m_sensed_input_high_gamepad.end();
         bool id_was_zero         = m_sensed_input_zero_gamepad.find(button)
                                    != m_sensed_input_zero_gamepad.end();
@@ -1189,15 +1191,18 @@ EventPropagation InputManager::input(const SEvent& event)
 
                 if (button->type != BUTTON_STEERING)
                     continue;
+                    
+                float factor = UserConfigParams::m_multitouch_tilt_factor;
+                factor = std::max(factor, 0.1f);
 
                 if (UserConfigParams::m_multitouch_accelerometer == 1)
                 {
-                    button->axis_x = (float)-event.AccelerometerEvent.X / 5.0f;
+                    button->axis_x = (float)-event.AccelerometerEvent.X / factor;
                     device->handleControls(button);
                 }
                 else if (UserConfigParams::m_multitouch_accelerometer == 2)
                 {
-                    button->axis_x = (float)event.AccelerometerEvent.Y / 5.0f;
+                    button->axis_x = (float)event.AccelerometerEvent.Y / factor;
                     device->handleControls(button);
                 }
             }

@@ -48,11 +48,11 @@ namespace GUIEngine
         float m_rotation_target;
 
         PtrVector<scene::IMesh, REF> m_models;
-        AlignedArray<Vec3> m_model_location;
-        AlignedArray<Vec3> m_model_scale;
+        std::vector<core::matrix4> m_model_location;
         std::vector<std::pair<int, int> > m_model_frames;
         std::vector<bool> m_model_render_info_affected;
         std::vector<float> m_model_animation_speed;
+        std::vector<std::string> m_bone_attached;
         std::unique_ptr<RenderTarget> m_render_target;
         float m_angle;
 
@@ -76,12 +76,12 @@ namespace GUIEngine
         void add();
         void clearModels();
         void addModel(irr::scene::IMesh* mesh,
-                      const Vec3& location = Vec3(0,0,0),
-                      const Vec3& scale = Vec3(1,1,1),
+                      const core::matrix4& location = core::matrix4(),
                       const int start_loop_frame=-1,
                       const int end_loop_frame=-1,
                       bool all_parts_colorized = false,
-                      float animation_speed=0.0f);
+                      float animation_speed = 0.0f,
+                      const std::string& bone_name = std::string());
 
         void update(float delta);
 

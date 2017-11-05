@@ -33,6 +33,7 @@
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/skybox.hpp"
+#include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/spherical_harmonics.hpp"
 #include "items/item_manager.hpp"
@@ -58,12 +59,9 @@ void ShaderBasedRenderer::setRTT(RTT* rtts)
                                  rtts->getDepthStencilTexture());
         m_geometry_passes->setFirstPassRenderTargets(prefilled_textures,
             rtts->getPrefilledHandles());
-        m_rtts = rtts;
     }
-    else if (rtts == NULL)
-    {
-        m_rtts = NULL;
-    }
+    
+    m_rtts = rtts;
 } //setRTT
 
 // ----------------------------------------------------------------------------
@@ -153,13 +151,6 @@ void ShaderBasedRenderer::prepareForwardRenderer()
     glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
         clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);    
-}
-
-// ----------------------------------------------------------------------------
-void ShaderBasedRenderer::updateLightsInfo(scene::ICameraSceneNode * const camnode,
-                                           float dt)
-{
-    m_lighting_passes.updateLightsInfo(camnode, dt);
 }
 
 // ----------------------------------------------------------------------------
@@ -258,6 +249,10 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     m_draw_calls.prepareDrawCalls(m_shadow_matrices, camnode, solid_poly_count, shadow_poly_count);
     m_poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += solid_poly_count;
     m_poly_count[SHADOW_PASS] += shadow_poly_count;
+    PROFILER_POP_CPU_MARKER();
+    // For correct position of headlight in karts
+    PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);
+    m_lighting_passes.updateLightsInfo(camnode, dt);
     PROFILER_POP_CPU_MARKER();
 
 #if !defined(USE_GLES2)    
@@ -659,6 +654,7 @@ ShaderBasedRenderer::~ShaderBasedRenderer()
     delete m_skybox;
     delete m_rtts;
     ShaderFilesManager::kill();
+    STKBillboard::destroyBillboardVAO();
 }
 
 // ----------------------------------------------------------------------------
@@ -807,9 +803,6 @@ void ShaderBasedRenderer::render(float dt)
         if (!CVS->isDefferedEnabled())
             glEnable(GL_FRAMEBUFFER_SRGB);
         
-        PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);
-        m_lighting_passes.updateLightsInfo(camnode, dt);
-        PROFILER_POP_CPU_MARKER();
         PROFILER_PUSH_CPU_MARKER("UBO upload", 0x0, 0xFF, 0x0);
         computeMatrixesAndCameras(camnode, m_rtts->getWidth(), m_rtts->getHeight());
         m_shadow_matrices.updateSunOrthoMatrices();
@@ -921,7 +914,6 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     irr_driver->getSceneManager()->setActiveCamera(camera);
 
     computeMatrixesAndCameras(camera, m_rtts->getWidth(), m_rtts->getHeight());
-    updateLightsInfo(camera, dt);
     if (CVS->isARBUniformBufferObjectUsable())
         uploadLightingData();
 

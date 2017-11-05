@@ -29,6 +29,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/cutscene_world.hpp"
@@ -216,13 +217,13 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty)
     switch (difficulty)
     {
         case RaceManager::DIFFICULTY_EASY:
-            model = file_manager->getAsset(FileManager::MODEL,"trophy_bronze.b3d");
+            model = file_manager->getAsset(FileManager::MODEL,"trophy_bronze.spm");
             break;
         case RaceManager::DIFFICULTY_MEDIUM:
-            model = file_manager->getAsset(FileManager::MODEL,"trophy_silver.b3d");
+            model = file_manager->getAsset(FileManager::MODEL,"trophy_silver.spm");
             break;
         case RaceManager::DIFFICULTY_HARD:
-            model = file_manager->getAsset(FileManager::MODEL,"trophy_gold.b3d");
+            model = file_manager->getAsset(FileManager::MODEL,"trophy_gold.spm");
             break;
         default:
             assert(false);

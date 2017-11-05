@@ -21,10 +21,14 @@
 #include "../lib/irrlicht/source/Irrlicht/CBillboardSceneNode.h"
 #include <IBillboardSceneNode.h>
 #include <irrTypes.h>
+#include "graphics/gl_headers.hpp"
 #include "utils/cpp2011.hpp"
 
 class STKBillboard : public irr::scene::CBillboardSceneNode
 {
+private:
+    static GLuint m_billboard_vao;
+    static void createBillboardVAO();
 public:
     STKBillboard(irr::scene::ISceneNode* parent, irr::scene::ISceneManager* mgr,
                  irr::s32 id, const irr::core::vector3df& position, 
@@ -35,6 +39,7 @@ public:
     virtual void OnRegisterSceneNode() OVERRIDE;
 
     virtual void render() OVERRIDE;
+    static void destroyBillboardVAO();
 };   // STKBillboard
 
 #endif

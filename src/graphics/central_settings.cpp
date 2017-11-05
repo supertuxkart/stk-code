@@ -252,6 +252,13 @@ void CentralVideoSettings::init()
             Log::info("GLDriver", "Explicit Attrib Location Present");
             hasExplicitAttribLocation = true;
         }
+        
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_UNIFORM_BUFFER_OBJECT) &&
+            m_glsl == true) 
+        {
+            hasUBO = true;
+            Log::info("GLDriver", "ARB Uniform Buffer Object Present");
+        }
 
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_TEXTURE_FORMAT_BGRA8888) &&
             (hasGLExtension("GL_IMG_texture_format_BGRA8888") ||

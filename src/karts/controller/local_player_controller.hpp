@@ -26,6 +26,7 @@
 class AbstractKart;
 class ParticleEmitter;
 class SFXBase;
+class SFXBuffer;
 
 /** PlayerKart manages control events from the player and moves
   * them to the Kart
@@ -47,11 +48,11 @@ private:
      *  camera object is managed in the Camera class, so no need to free it. */
     int  m_camera_index;
 
-    SFXBase       *m_bzzt_sound;
-    SFXBase       *m_wee_sound;
-    SFXBase       *m_ugh_sound;
-    SFXBase       *m_grab_sound;
-    SFXBase       *m_full_sound;
+    SFXBase     *m_wee_sound;
+    SFXBuffer   *m_bzzt_sound;
+    SFXBuffer   *m_ugh_sound;
+    SFXBuffer   *m_grab_sound;
+    SFXBuffer   *m_full_sound;
 
     virtual void steer(float, int) OVERRIDE;
     virtual void displayPenaltyWarning() OVERRIDE;

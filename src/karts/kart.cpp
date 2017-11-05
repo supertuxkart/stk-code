@@ -169,13 +169,18 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
         }
     }*/
 
+    m_horn_sound = SFXManager::get()->getBuffer("horn");
+    m_crash_sounds[0] = SFXManager::get()->getBuffer("crash");
+    m_crash_sounds[1] = SFXManager::get()->getBuffer("crash2");
+    m_crash_sounds[2] = SFXManager::get()->getBuffer("crash3");
+    m_goo_sound = SFXManager::get()->getBuffer("goo");
+    m_boing_sound = SFXManager::get()->getBuffer("boing");
+
     m_engine_sound  = SFXManager::get()->createSoundSource(m_kart_properties->getEngineSfxType());
-    m_beep_sound    = SFXManager::get()->createSoundSource( "horn"  );
-    m_crash_sound   = SFXManager::get()->createSoundSource( "crash" );
-    m_crash_sound2  = SFXManager::get()->createSoundSource( "crash2");
-    m_crash_sound3  = SFXManager::get()->createSoundSource( "crash3");
-    m_boing_sound   = SFXManager::get()->createSoundSource( "boing" );
-    m_goo_sound     = SFXManager::get()->createSoundSource( "goo"   );
+    
+    for (int i = 0; i < EMITTER_COUNT; i++)
+        m_emitters[i] = SFXManager::get()->createSoundSource("crash");
+
     m_skid_sound    = SFXManager::get()->createSoundSource( "skid"  );
     m_nitro_sound   = SFXManager::get()->createSoundSource( "nitro" );
     m_terrain_sound          = NULL;
@@ -200,13 +205,10 @@ void Kart::init(RaceManager::KartType type)
         if (type == RaceManager::KT_PLAYER)
             factor = std::min(1.0f, race_manager->getNumLocalPlayers()/2.0f);
 
-        m_goo_sound->setVolume(factor);
+        for (int i = 0; i < EMITTER_COUNT; i++)
+            m_emitters[i]->setVolume(factor);
+
         m_skid_sound->setVolume(factor);
-        m_crash_sound->setVolume(factor);
-        m_crash_sound2->setVolume(factor);
-        m_crash_sound3->setVolume(factor);
-        m_boing_sound->setVolume(factor);
-        m_beep_sound->setVolume(factor);
         m_nitro_sound->setVolume(factor);
     }   // if getNumLocalPlayers > 1
 
@@ -232,7 +234,7 @@ void Kart::init(RaceManager::KartType type)
     }
     loadData(type, animations);
 
-    m_kart_gfx = new KartGFX(this, m_type, Track::getCurrentTrack()->getIsDuringDay());
+    m_kart_gfx = new KartGFX(this, Track::getCurrentTrack()->getIsDuringDay());
     m_skidding = new Skidding(this);
     // Create the stars effect
     m_stars_effect = new Stars(this);
@@ -256,13 +258,11 @@ Kart::~Kart()
     }*/
 
     m_engine_sound->deleteSFX();
-    m_crash_sound ->deleteSFX();
-    m_crash_sound2->deleteSFX();
-    m_crash_sound3->deleteSFX();
     m_skid_sound  ->deleteSFX();
-    m_goo_sound   ->deleteSFX();
-    m_beep_sound  ->deleteSFX();
-    m_boing_sound ->deleteSFX();
+
+    for (int i = 0; i < EMITTER_COUNT; i++)
+        m_emitters[i]->deleteSFX();
+
     m_nitro_sound ->deleteSFX();
     delete m_kart_gfx;
     if(m_terrain_sound)          m_terrain_sound->deleteSFX();
@@ -393,8 +393,14 @@ void Kart::reset()
 
     m_controls.reset();
     m_slipstream->reset();
+    
     if(m_vehicle)
     {
+        for (unsigned int i = 0; i < 4; i++)
+        {
+            m_vehicle->getWheelInfo(i).m_steering = 0;
+        }
+            
         m_vehicle->reset();
     }
 
@@ -605,7 +611,6 @@ void Kart::createPhysics()
 
     const Vec3 &bevel = m_kart_properties->getBevelFactor();
     Vec3 wheel_pos[4];
-    assert(bevel.getX() || bevel.getY() || bevel.getZ());
 
     Vec3 orig_factor(1, 1, 1 - bevel.getZ());
     Vec3 bevel_factor(1.0f - bevel.getX(), 1.0f - bevel.getY(), 1.0f);
@@ -621,9 +626,9 @@ void Kart::createPhysics()
                        z*kart_length *0.5f);
 
                 hull->addPoint(p*orig_factor);
-                hull->addPoint(p*bevel_factor);
-                // Store the x/z position for the wheels as a weighted average
-                // of the two bevelled points.
+                // Only add bevelled point if bevel is defined (i.e.!=0)
+                if(bevel.length2()>0)
+                    hull->addPoint(p*bevel_factor);
                 if (y == -1)
                 {
                     int index = (x + 1) / 2 + 1 - z;  // get index of wheel
@@ -635,19 +640,19 @@ void Kart::createPhysics()
                         // All wheel positions are relative to the center of
                         // the collision shape.
                         wheel_pos[index].setX(x*0.5f*kart_width);
-                        // The y position of the wheels (i.e. the points where
-                        // the suspension is attached to) is just at the
-                        // bottom of the kart. That is half the kart height
-                        // down.
-                        wheel_pos[index].setY(- 0.5f*kart_height);
                         wheel_pos[index].setZ((0.5f*kart_length-0.25f)* z);
-
                     }
                     else
                     {
+                        // Store the x/z position for the wheels as a weighted average
+                        // of the two bevelled points (y is set below).
                         wheel_pos[index] = p*(orig_factor*(1.0f - f) + bevel_factor*f);
-                        wheel_pos[index].setY(0);
                     }
+                    // The y position of the wheels (i.e. the points where
+                    // the suspension is attached to) is just at the
+                    // bottom of the kart (independent of collision shape). 
+                    // That is half the kart height down.
+                    wheel_pos[index].setY(-0.5f*kart_height);
                 }  // if y==-1
             }   // for x
         }   // for z
@@ -1028,8 +1033,8 @@ void Kart::collectedItem(Item *item, int add_info)
                                  m_kart_properties->getBubblegumSpeedFraction() ,
                                  m_kart_properties->getBubblegumFadeInTime(),
                                  m_bubblegum_time);
-        m_goo_sound->setPosition(getXYZ());
-        m_goo_sound->play();
+        getNextEmitter()->play(getXYZ(), m_goo_sound);
+
         // Play appropriate custom character sound
         playCustomSFX(SFXManager::CUSTOM_GOO);
         break;
@@ -1359,12 +1364,10 @@ void Kart::update(float dt)
     }
      */
 
-    m_beep_sound->setPosition   ( getXYZ() );
-    m_crash_sound->setPosition  ( getXYZ() );
-    m_crash_sound2->setPosition ( getXYZ() );
-    m_crash_sound3->setPosition ( getXYZ() );
+    for (int i = 0; i < EMITTER_COUNT; i++)
+        m_emitters[i]->setPosition(getXYZ());
+
     m_skid_sound->setPosition   ( getXYZ() );
-    m_boing_sound->setPosition  ( getXYZ() );
     m_nitro_sound->setPosition  ( getXYZ() );
 
     // Check if a kart is (nearly) upside down and not moving much -->
@@ -1460,7 +1463,7 @@ void Kart::update(float dt)
     }
 
     PROFILER_PUSH_CPU_MARKER("Kart::Update (material)", 0x60, 0x34, 0x7F);
-    handleMaterialGFX();
+    handleMaterialGFX(dt);
     const Material* material=m_terrain_info->getMaterial();
     if (!material)   // kart falling off the track
     {
@@ -1779,7 +1782,7 @@ void Kart::handleMaterialSFX(const Material *material)
  *  kart is falling, or if the surface the kart is driving on has
  *  the 'isBelowSurface' property set.
  */
-void Kart::handleMaterialGFX()
+void Kart::handleMaterialGFX(float dt)
 {
     const Material *material = getMaterial();
 
@@ -1788,7 +1791,7 @@ void Kart::handleMaterialGFX()
     // something with the wheels, and the material has not the
     // below surface property set.
     if (material && isOnGround() && !material->isBelowSurface() &&
-        !getKartAnimation()      && UserConfigParams::m_graphical_effects)
+        !getKartAnimation()      && UserConfigParams::m_graphical_effects > 1)
     {
 
         // Get the appropriate particle data depending on
@@ -1813,12 +1816,22 @@ void Kart::handleMaterialGFX()
     // --------------------------------------------------------------
     if (m_controller->isLocalPlayerController() && !hasFinishedRace())
     {
+        bool falling = material && material->hasFallingEffect() && !m_flying;
+        if (falling)
+        {
+            m_falling_time -= dt;
+            if (m_falling_time < 0.0f)
+                m_falling_time = 0.0f;
+        }
+        else
+            m_falling_time = 0.35f;
+
         for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
             Camera *camera = Camera::getCamera(i);
             if(camera->getKart()!=this) continue;
 
-            if (material && material->hasFallingEffect() && !m_flying)
+            if (falling && m_falling_time <= 0.0f)
             {
                 camera->setMode(Camera::CM_FALLING);
             }
@@ -1830,7 +1843,7 @@ void Kart::handleMaterialGFX()
         }   // for i in all cameras for this kart
     }   // camera != final camera
 
-    if (!UserConfigParams::m_graphical_effects)
+    if (UserConfigParams::m_graphical_effects < 2)
         return;
 
     // Use the middle of the contact points of the two rear wheels
@@ -2113,7 +2126,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
     {
 #ifndef SERVER_ONLY
         std::string particles = m->getCrashResetParticles();
-        if (particles.size() > 0)
+        if (particles.size() > 0 && UserConfigParams::m_graphical_effects > 0)
         {
             ParticleKind* kind =
                 ParticleKindManager::get()->getParticles(particles);
@@ -2180,23 +2193,13 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
             // it's not already playing.
             if (isShielded() || (k != NULL && k->isShielded()))
             {
-                if (m_boing_sound->getStatus() != SFXBase::SFX_PLAYING)
-                    m_boing_sound->play(getXYZ());
+                getNextEmitter()->play(getXYZ(), m_boing_sound);
             }
             else
             {
-                if (m_crash_sound->getStatus() != SFXBase::SFX_PLAYING
-                    && m_crash_sound2->getStatus() != SFXBase::SFX_PLAYING
-                    && m_crash_sound3->getStatus() != SFXBase::SFX_PLAYING)
-                {
-                    int idx = rand() % 3;
-                    if (idx == 0)
-                        m_crash_sound->play(getXYZ());
-                    else if (idx == 1)
-                        m_crash_sound2->play(getXYZ());
-                    else
-                        m_crash_sound3->play(getXYZ());
-                }
+                int idx = rand() % CRASH_SOUND_COUNT;
+                SFXBuffer* buffer = m_crash_sounds[idx];
+                getNextEmitter()->play(getXYZ(), buffer);
             }
         }    // if lin_vel > 0.555
     }   // if m_bounce_back_time <= 0
@@ -2210,7 +2213,7 @@ void Kart::beep()
     // If the custom horn can't play (isn't defined) then play the default one
     if (!playCustomSFX(SFXManager::CUSTOM_HORN))
     {
-        m_beep_sound->play(getXYZ());
+        getNextEmitter()->play(getXYZ(), m_horn_sound);
     }
 
 } // beep
@@ -2523,13 +2526,18 @@ void Kart::updateSliding()
     // Now test for each wheel if it should be sliding
     // -----------------------------------------------
     bool enable_sliding = false;
+
+    // We need the 'up' vector, which can be affected by material
+    // with gravity. So use the body's gravity to determine up:
+    Vec3 up = -m_body->getGravity();
+    up.normalize();
     for (int i = 0; i < m_vehicle->getNumWheels(); i++)
     {
         const btWheelInfo &wheel = m_vehicle->getWheelInfo(i);
         if (!wheel.m_raycastInfo.m_isInContact) continue;
 
         const btVector3 &norm = m_vehicle->getWheelInfo(i).m_raycastInfo.m_contactNormalWS;
-        float distanceFromUp = norm.dot(getNormal());
+        float distanceFromUp = norm.dot(up);
         float friction;
         if (distanceFromUp < 0.85f)
         {
@@ -2698,6 +2706,14 @@ void Kart::kartIsInRestNow()
 
     m_kart_model->setDefaultSuspension();
 }   // kartIsInRestNow
+
+//-----------------------------------------------------------------------------
+
+SFXBase* Kart::getNextEmitter()
+{
+    m_emitter_id = (m_emitter_id + 1) % 3;
+    return m_emitters[m_emitter_id];
+}
 
 //-----------------------------------------------------------------------------
 /** Updates the graphics model. It is responsible for positioning the graphical
@@ -2992,5 +3008,12 @@ const Vec3& Kart::getNormal() const
 {
     return m_terrain_info->getNormal();
 }   // getNormal
+
+// ------------------------------------------------------------------------
+
+void Kart::playSound(SFXBuffer* buffer)
+{
+    getNextEmitter()->play(getXYZ(), buffer);
+}
 
 /* EOF */

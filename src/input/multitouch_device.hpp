@@ -111,6 +111,7 @@ public:
     void addButton(MultitouchButtonType type, int x, int y, int width,
                    int height);
     void clearButtons();
+    void reset();
 
     /** Returns the number of created buttons */
     unsigned int getButtonsCount() {return m_buttons.size();}

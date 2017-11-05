@@ -43,14 +43,7 @@ MultitouchDevice::MultitouchDevice()
     assert(m_android_device != NULL);
 #endif
 
-    for (MultitouchEvent& event : m_events)
-    {
-        event.id = 0;
-        event.touched = false;
-        event.x = 0;
-        event.y = 0;
-    }
-
+    reset();
     updateConfigParams();
 }   // MultitouchDevice
 
@@ -157,7 +150,6 @@ void MultitouchDevice::addButton(MultitouchButtonType type, int x, int y,
                 m_accelerometer_active = true;
             }
         }
-
     }
 #endif
 } // addButton
@@ -185,6 +177,28 @@ void MultitouchDevice::clearButtons()
 } // clearButtons
 
 // ----------------------------------------------------------------------------
+/** Sets all buttons and events to default state
+ */
+void MultitouchDevice::reset()
+{
+    for (MultitouchButton* button : m_buttons)
+    {
+        button->pressed = false;
+        button->event_id = 0;
+        button->axis_x = 0.0f;
+        button->axis_y = 0.0f;
+    }
+
+    for (MultitouchEvent& event : m_events)
+    {
+        event.id = 0;
+        event.touched = false;
+        event.x = 0;
+        event.y = 0;
+    }
+} // reset
+
+// ----------------------------------------------------------------------------
 /** The function that is executed when touch event occurs. It updates the
  *  buttons state when it's needed.
  *  \param event_id The id of touch event that should be processed.
@@ -193,32 +207,38 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
 {
     assert(event_id < m_events.size());
 
-    MultitouchEvent event = m_events[event_id];
+    MultitouchButton* pressed_button = NULL;
+    
+    for (MultitouchButton* button : m_buttons)
+    {
+        if (button->pressed && button->event_id == event_id) 
+        {
+            pressed_button = button;
+            break;
+        }
+    }
 
     for (MultitouchButton* button : m_buttons)
     {
+        if (pressed_button != NULL && button != pressed_button)
+            continue;
+            
         bool update_controls = false;
         bool prev_button_state = button->pressed;
-        float prev_axis_x = button->axis_x;
-        float prev_axis_y = button->axis_y;
+        MultitouchEvent event = m_events[event_id];
 
-        if (event.x < button->x || event.x > button->x + button->width ||
-            event.y < button->y || event.y > button->y + button->height)
-        {
-            if (button->event_id == event_id)
-            {
-                button->pressed = false;
-                button->event_id = 0;
-                updateButtonAxes(button, 0.0f, 0.0f);
-            }
-        }
-        else
+        if (pressed_button != NULL ||
+            (event.x >= button->x && event.x <= button->x + button->width &&
+            event.y >= button->y && event.y <= button->y + button->height))
         {
             button->pressed = event.touched;
             button->event_id = event_id;
 
             if (button->type == MultitouchButtonType::BUTTON_STEERING)
             {
+                float prev_axis_x = button->axis_x;
+                float prev_axis_y = button->axis_y;
+                
                 if (button->pressed == true)
                 {
                     updateButtonAxes(button,

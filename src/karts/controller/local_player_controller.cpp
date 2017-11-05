@@ -66,11 +66,11 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
     // the right camera once per frame later.
     Camera *camera = Camera::createCamera(kart);
     m_camera_index = camera->getIndex();
-    m_bzzt_sound   = SFXManager::get()->createSoundSource("bzzt");
     m_wee_sound    = SFXManager::get()->createSoundSource("wee");
-    m_ugh_sound    = SFXManager::get()->createSoundSource("ugh");
-    m_grab_sound   = SFXManager::get()->createSoundSource("grab_collectable");
-    m_full_sound   = SFXManager::get()->createSoundSource("energy_bar_full");
+    m_bzzt_sound   = SFXManager::get()->getBuffer("bzzt");
+    m_ugh_sound    = SFXManager::get()->getBuffer("ugh");
+    m_grab_sound   = SFXManager::get()->getBuffer("grab_collectable");
+    m_full_sound   = SFXManager::get()->getBuffer("energy_bar_full");
 
     // Attach Particle System
     Track *track = Track::getCurrentTrack();
@@ -98,11 +98,8 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
  */
 LocalPlayerController::~LocalPlayerController()
 {
-    m_bzzt_sound->deleteSFX();
-    m_wee_sound ->deleteSFX();
-    m_ugh_sound ->deleteSFX();
-    m_grab_sound->deleteSFX();
-    m_full_sound->deleteSFX();
+    m_wee_sound->deleteSFX();
+
     if (m_sky_particles_emitter)
         delete m_sky_particles_emitter;
 }   // ~LocalPlayerController
@@ -239,7 +236,7 @@ void LocalPlayerController::update(float dt)
     else if (!m_kart->getKartAnimation() && m_sound_schedule == true)
     {
         m_sound_schedule = false;
-        m_bzzt_sound->play();
+        m_kart->playSound(m_bzzt_sound);
     }
 }   // update
 
@@ -257,7 +254,7 @@ void LocalPlayerController::displayPenaltyWarning()
         m->addMessage(_("Don't accelerate before go"), m_kart, 2.0f,
                       GUIEngine::getSkin()->getColor("font::normal"));
     }
-    m_bzzt_sound->play();
+    m_kart->playSound(m_bzzt_sound);
 }   // displayPenaltyWarning
 
 //-----------------------------------------------------------------------------
@@ -337,31 +334,31 @@ void LocalPlayerController::collectedItem(const Item &item, int add_info,
     if (old_energy < m_kart->getKartProperties()->getNitroMax() &&
         m_kart->getEnergy() == m_kart->getKartProperties()->getNitroMax())
     {
-        m_full_sound->play();
+        m_kart->playSound(m_full_sound);
     }
     else if (race_manager->getCoinTarget() > 0 &&
              old_energy < race_manager->getCoinTarget() &&
              m_kart->getEnergy() == race_manager->getCoinTarget())
     {
-        m_full_sound->play();
+        m_kart->playSound(m_full_sound);
     }
     else
     {
         switch(item.getType())
         {
         case Item::ITEM_BANANA:
-            m_ugh_sound->play();
+            m_kart->playSound(m_ugh_sound);
             break;
         case Item::ITEM_BUBBLEGUM:
             //More sounds are played by the kart class
             //See Kart::collectedItem()
-            m_ugh_sound->play();
+            m_kart->playSound(m_ugh_sound);
             break;
         case Item::ITEM_TRIGGER:
             // no default sound for triggers
             break;
         default:
-            m_grab_sound->play();
+            m_kart->playSound(m_grab_sound);
             break;
         }
     }

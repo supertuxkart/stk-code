@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tracks/quad.hpp"
+#include "tracks/graph.hpp"
 #include "utils/log.hpp"
 
 #include <algorithm>
@@ -36,6 +37,8 @@ Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
                               std::min(p2.getY(), p3.getY())  );
     m_max_height = std::max ( std::max(p0.getY(), p1.getY()),
                               std::max(p2.getY(), p3.getY())  );
+    m_min_height_testing = Graph::MIN_HEIGHT_TESTING;
+    m_max_height_testing = Graph::MAX_HEIGHT_TESTING;
 }   // Quad
 
 // ----------------------------------------------------------------------------
@@ -77,8 +80,8 @@ bool Quad::pointInside(const Vec3& p, bool ignore_vertical) const
     // with the minimum height of the quad (and not with the actual
     // height of the quad at the point where the kart is).
     if(!ignore_vertical                &&
-       (p.getY() - m_max_height > 5.0f ||
-       p.getY() - m_min_height < -1.0f   ))
+       (p.getY() - m_max_height > m_max_height_testing ||
+       p.getY() - m_min_height < m_min_height_testing   ))
        return false;
 
     // If a point is exactly on the line of two quads (e.g. between points

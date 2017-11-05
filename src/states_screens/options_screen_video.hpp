@@ -36,7 +36,7 @@ struct GFXPreset
     bool mlaa;
     bool ssao;
     bool weather;
-    bool animatedScenery;
+    int animatedScenery;
     int animatedCharacters;
     int image_quality;
     /** Depth of field */

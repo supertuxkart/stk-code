@@ -42,7 +42,7 @@
         <label width="100%" I18N="In the multitouch settings screen" text="Advanced"/>
 
         <div width="75%" layout="horizontal-row" proportion="1">
-            <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Deadzone center"/>
+            <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Deadzone"/>
             <div proportion="1" align="center" height="fit" layout="horizontal-row" >
                 <spacer width="40" height="10" />
                 <gauge id="deadzone_center" proportion="1" min_value="0" max_value="50"/>
@@ -50,7 +50,7 @@
         </div>
 
         <div width="75%" layout="horizontal-row" proportion="1">
-            <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Deadzone edge"/>
+            <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Sensitivity"/>
             <div proportion="1" align="center" height="fit" layout="horizontal-row" >
                 <spacer width="40" height="10" />
                 <gauge id="deadzone_edge" proportion="1" min_value="0" max_value="50"/>

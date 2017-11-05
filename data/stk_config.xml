@@ -3,11 +3,11 @@
 <config>
   <!--  Minimum and maximum kart versions that can be used by this binary.
         Older version will be ignored. -->
-  <kart-version min="2" max="2"/>
+  <kart-version min="2" max="3"/>
 
   <!-- Minimum and maxium track versions that be be read by this binary.
        Older versions will be ignored. -->
-  <track-version min="6" max="6"/>
+  <track-version min="6" max="7"/>
 
   <!-- Maximum number of karts to be used at the same time. This limit
        can easily be increased, but some tracks might not have valid start
@@ -406,8 +406,8 @@
            behaviour of the karts. -->
     <collision impulse-type="normal"
                impulse="3000" impulse-time="0.1" terrain-impulse="160"
-               restitution="1.0" bevel-factor="0.5 0.0 0.7"
-               physical-wheel-position="-1" />
+               restitution="1.0" bevel-factor="0.5 0.0 0.3"
+               physical-wheel-position="0" />
 
      <!-- Skidding: increase: multiplicative increase of skidding factor in each frame.
               decrease: multiplicative decrease of skidding factor in each frame.

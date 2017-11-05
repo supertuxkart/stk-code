@@ -376,11 +376,11 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
         TrackObjectPresentationMesh* meshPresentation = currObj->getPresentation<TrackObjectPresentationMesh>();
         if (meshPresentation != NULL)
         {
-            if (meshPresentation->getModelFile() == "gpwin_podium1.b3d")
+            if (meshPresentation->getModelFile() == "gpwin_podium1.spm")
                 m_podium_steps[0] = currObj;
-            else if (meshPresentation->getModelFile() == "gpwin_podium2.b3d")
+            else if (meshPresentation->getModelFile() == "gpwin_podium2.spm")
                 m_podium_steps[1] = currObj;
-            else if (meshPresentation->getModelFile() == "gpwin_podium3.b3d")
+            else if (meshPresentation->getModelFile() == "gpwin_podium3.spm")
                 m_podium_steps[2] = currObj;
         }
     }

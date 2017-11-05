@@ -101,13 +101,6 @@ RaceGUIBase::RaceGUIBase()
 
     m_referee               = NULL;
     m_multitouch_gui        = NULL;
-
-    if (UserConfigParams::m_multitouch_enabled && 
-        UserConfigParams::m_multitouch_mode != 0 &&
-        race_manager->getNumLocalPlayers() == 1)
-    {
-        m_multitouch_gui = new RaceGUIMultitouch(this);
-    }
 }   // RaceGUIBase
 
 // ----------------------------------------------------------------------------
@@ -161,6 +154,11 @@ void RaceGUIBase::reset()
     m_plunger_speed     = core::vector2df(0,0);
     m_plunger_state     = PLUNGER_STATE_INIT;
     clearAllMessages();
+    
+    if (m_multitouch_gui != NULL)
+    {
+        m_multitouch_gui->reset();
+    }
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -173,7 +171,6 @@ RaceGUIBase::~RaceGUIBase()
     // If the referee is currently being shown,
     // remove it from the scene graph.
     delete m_referee;
-    delete m_multitouch_gui;
 }   // ~RaceGUIBase
 
 //-----------------------------------------------------------------------------

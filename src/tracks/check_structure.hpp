@@ -115,7 +115,7 @@ public:
      *                  additional data.
      */
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
-                             unsigned int indx)=0;
+                             int indx)=0;
     virtual void trigger(unsigned int kart_index);
     virtual void reset(const Track &track);
 

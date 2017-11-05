@@ -365,18 +365,16 @@ public:
         {
 #if defined(__linux__) && !defined(ANDROID)
             if(m_os!="linux") return false;
-#endif
-#ifdef WIN32
+#elif defined(WIN32)
             if(m_os!="windows") return false;
-#endif
-#ifdef __APPLE__
+#elif defined(__APPLE__)
             if(m_os!="osx") return false;
-#endif
-#ifdef BSD
+#elif defined(BSD)
             if(m_os!="bsd") return false;
-#endif
-#ifdef ANDROID
+#elif defined(ANDROID)
             if(m_os!="android") return false;
+#else
+            return false;
 #endif
         }   // m_os.size()>0
 

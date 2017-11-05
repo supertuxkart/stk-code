@@ -87,6 +87,13 @@ RaceGUI::RaceGUI()
     const float map_size = 100.0f;
     const float top_margin = 3.5f * m_font_height;
     
+    if (UserConfigParams::m_multitouch_enabled && 
+        UserConfigParams::m_multitouch_mode != 0 &&
+        race_manager->getNumLocalPlayers() == 1)
+    {
+        m_multitouch_gui = new RaceGUIMultitouch(this);
+    }
+    
     // Check if we have enough space for minimap when touch steering is enabled
     if (m_multitouch_gui != NULL)
     {
@@ -139,6 +146,7 @@ RaceGUI::RaceGUI()
 //-----------------------------------------------------------------------------
 RaceGUI::~RaceGUI()
 {
+    delete m_multitouch_gui;
 }   // ~Racegui
 
 
