@@ -77,6 +77,7 @@ FollowTheLeaderRace::~FollowTheLeaderRace()
 void FollowTheLeaderRace::reset()
 {
     LinearWorld::reset();
+    m_last_eliminated_time = 0.0f;
     m_leader_intervals.clear();
     m_leader_intervals    = stk_config->m_leader_intervals;
     for(unsigned int i=0; i<m_leader_intervals.size(); i++)
