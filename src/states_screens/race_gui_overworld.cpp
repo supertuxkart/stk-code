@@ -443,6 +443,19 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         const ChallengeData* challenge = unlock_manager->getChallengeData(challenges[n].m_challenge_id);
         const unsigned int val = challenge->getNumTrophies();
         bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
+        if (challenges[n].m_challenge_id == "fortmagma")
+        {
+            // For each track, check whether any difficulty has been completed ; fortmagma will not affect our decision (`n == m`) ; tutorial is ignored because it has no completion level
+            for (unsigned int m = 0; unlocked && m < challenges.size(); m++)
+            {
+                if (challenges[m].m_challenge_id == "tutorial") continue;
+                    unlocked = unlocked &&
+                        (PlayerManager::getCurrentPlayer()
+                            ->getChallengeStatus(challenges[m].m_challenge_id)
+                            ->isSolvedAtAnyDifficulty() || n == m);
+            }
+        }
+
         int state = (unlocked ? OPEN : LOCKED);
         
         if (UserConfigParams::m_everything_unlocked)
