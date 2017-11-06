@@ -170,6 +170,16 @@ namespace Scripting
             return race_manager->getReverseTrack();
         }
 
+        int getMajorRaceMode()
+        {
+            return race_manager->getMajorMode();
+        }
+
+        int getMinorRaceMode()
+        {
+            return race_manager->getMinorMode();
+        }
+
         bool isDuringDay()
         {
             return ::Track::getCurrentTrack()->getIsDuringDay();
@@ -440,6 +450,8 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("int getNumberOfKarts()", asFUNCTION(getNumberOfKarts), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("int getNumLocalPlayers()", asFUNCTION(getNumLocalPlayers), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("bool isReverse()", asFUNCTION(isTrackReverse), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("int getMajorRaceMode()", asFUNCTION(getMajorRaceMode), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("int getMinorRaceMode()", asFUNCTION(getMinorRaceMode), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("bool isDuringDay()", asFUNCTION(isDuringDay), asCALL_CDECL); assert(r >= 0);
 
             // TrackObject
