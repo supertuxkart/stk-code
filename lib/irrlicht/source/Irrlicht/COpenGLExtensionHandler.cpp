@@ -329,6 +329,8 @@ void COpenGLExtensionHandler::dumpFramebufferFormats() const
 
 void COpenGLExtensionHandler::initExtensions(bool stencilBuffer, bool useCoreContext)
 {
+	memset(FeatureAvailable, 0, sizeof(FeatureAvailable));
+
 	const f32 ogl_ver = core::fast_atof(reinterpret_cast<const c8*>(glGetString(GL_VERSION)));
 	Version = static_cast<u16>(core::floor32(ogl_ver)*100+core::round32(core::fract(ogl_ver)*10.0f));
 	if ( Version >= 102)
