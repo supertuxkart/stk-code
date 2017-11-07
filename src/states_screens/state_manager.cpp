@@ -152,8 +152,12 @@ void StateManager::resetActivePlayers()
 
 bool StateManager::throttleFPS()
 {
+#ifndef SERVER_ONLY
     return m_game_mode != GUIEngine::GAME  &&
            GUIEngine::getCurrentScreen()->throttleFPS();
+#else
+    return true;
+#endif
 }   // throttleFPS
 
 // ----------------------------------------------------------------------------
