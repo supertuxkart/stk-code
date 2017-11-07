@@ -932,8 +932,6 @@ class COpenGLExtensionHandler
 	//! queries the features of the driver, returns true if feature is available
 	bool queryOpenGLFeature(EOpenGLFeatures feature) const
 	{
-	  if (COpenGLExtensionHandler::IRR_EXT_packed_depth_stencil)
-		 return true;
 		return FeatureAvailable[feature];
 	}
 
