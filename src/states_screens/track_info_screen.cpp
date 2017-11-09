@@ -184,7 +184,7 @@ void TrackInfoScreen::init()
         // A ftl reace needs at least three karts to make any sense
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
-            m_ai_kart_spinner->setMin(3 - local_players);
+            m_ai_kart_spinner->setMin(std::max(0, 3 - local_players));
         }
         // Make sure in battle and soccer mode at least 1 ai for single player
         else if((race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
