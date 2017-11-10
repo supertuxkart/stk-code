@@ -1528,6 +1528,18 @@ void CIrrDeviceMacOSX::restoreWindow()
 	[Window deminiaturize:[NSApp self]];
 }
 
+//! Move window to requested position
+bool CIrrDeviceMacOSX::moveWindow(int x, int y)
+{
+	return false;
+}
+
+//! Get current window position.
+bool CIrrDeviceMacOSX::getWindowPosition(int* x, int* y)
+{
+	return false;
+}
+
 
 bool CIrrDeviceMacOSX::present(video::IImage* surface, void* windowId, core::rect<s32>* src )
 {

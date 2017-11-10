@@ -16,4 +16,6 @@
         <karts number="3"/>
         <requirements position="1"/>
     </easy>
+
+    <unlock kart="sara_the_wizard"/>
 </challenge>

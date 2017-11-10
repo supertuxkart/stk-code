@@ -64,10 +64,5 @@ layout (std140) uniform LightingData
     float rL22;
 };
 
-layout (std140) uniform SkinningData
-{
-    mat4 joint_matrices[MAX_BONES];
-};
-
 #endif
 #endif // HEADER_TXT

@@ -243,14 +243,14 @@ struct SSkinMeshBuffer : public IMeshBuffer
 				Vertex.TCoords=Vertices_Standard[n].TCoords;
 				Vertex.Tangent=core::vector3df(0.0f, 0.0f, 0.0f);
 				Vertex.Binormal=core::vector3df(0.0f, 0.0f, 0.0f);
-				Vertex.m_joint_idx1 = 0;
-				Vertex.m_joint_idx2 = 0;
-				Vertex.m_joint_idx3 = 0;
-				Vertex.m_joint_idx4 = 0;
-				Vertex.m_weight1 = 0;
-				Vertex.m_weight2 = 0;
-				Vertex.m_weight3 = 0;
-				Vertex.m_weight4 = 0;
+				Vertex.m_joint_idx[0] = 0;
+				Vertex.m_joint_idx[1] = 0;
+				Vertex.m_joint_idx[2] = 0;
+				Vertex.m_joint_idx[3] = 0;
+				Vertex.m_weight[0] = 0;
+				Vertex.m_weight[1] = 0;
+				Vertex.m_weight[2] = 0;
+				Vertex.m_weight[3] = 0;
 				Vertices_SkinnedMesh.push_back(Vertex);
 			}
 		}
@@ -265,14 +265,14 @@ struct SSkinMeshBuffer : public IMeshBuffer
 				Vertex.TCoords=Vertices_Tangents[n].TCoords;
 				Vertex.Tangent=Vertices_Tangents[n].Tangent;
 				Vertex.Binormal=Vertices_Tangents[n].Binormal;
-				Vertex.m_joint_idx1 = 0;
-				Vertex.m_joint_idx2 = 0;
-				Vertex.m_joint_idx3 = 0;
-				Vertex.m_joint_idx4 = 0;
-				Vertex.m_weight1 = 0;
-				Vertex.m_weight2 = 0;
-				Vertex.m_weight3 = 0;
-				Vertex.m_weight4 = 0;
+				Vertex.m_joint_idx[0] = 0;
+				Vertex.m_joint_idx[1] = 0;
+				Vertex.m_joint_idx[2] = 0;
+				Vertex.m_joint_idx[3] = 0;
+				Vertex.m_weight[0] = 0;
+				Vertex.m_weight[1] = 0;
+				Vertex.m_weight[2] = 0;
+				Vertex.m_weight[3] = 0;
 				Vertices_SkinnedMesh.push_back(Vertex);
 			}
 		}

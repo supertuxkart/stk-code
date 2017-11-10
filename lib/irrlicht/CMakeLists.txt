@@ -144,8 +144,6 @@ source/Irrlicht/CImageWriterBMP.cpp
 source/Irrlicht/CImageWriterJPG.cpp
 source/Irrlicht/CImageWriterPNG.cpp
 source/Irrlicht/CIrrDeviceAndroid.cpp
-source/Irrlicht/CIrrDeviceConsole.cpp
-source/Irrlicht/CIrrDeviceFB.cpp
 source/Irrlicht/CIrrDeviceLinux.cpp
 source/Irrlicht/CIrrDeviceSDL.cpp
 source/Irrlicht/CIrrDeviceStub.cpp
@@ -278,8 +276,6 @@ source/Irrlicht/CImageWriterBMP.h
 source/Irrlicht/CImageWriterJPG.h
 source/Irrlicht/CImageWriterPNG.h
 source/Irrlicht/CIrrDeviceAndroid.h
-source/Irrlicht/CIrrDeviceConsole.h
-source/Irrlicht/CIrrDeviceFB.h
 source/Irrlicht/CIrrDeviceLinux.h
 source/Irrlicht/CIrrDeviceSDL.h
 source/Irrlicht/CIrrDeviceStub.h

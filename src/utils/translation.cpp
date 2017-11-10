@@ -451,7 +451,7 @@ bool Translations::isRTLText(const wchar_t *in_ptr)
     FriBidiChar *fribidiInput = toFribidiChar(in_ptr);
 
     FriBidiCharType *types = new FriBidiCharType[length];
-    fribidi_get_bidi_types(fribidiInput, length, types);
+    fribidi_get_bidi_types(fribidiInput, (FriBidiStrIndex)length, types);
     freeFribidiChar(fribidiInput);
 
     // Declare as RTL if one character is RTL
@@ -608,7 +608,7 @@ core::stringw Translations::fribidizeLine(const core::stringw &str)
     FriBidiChar *fribidiOutput = new FriBidiChar[length + 1];
     memset(fribidiOutput, 0, (length + 1) * sizeof(FriBidiChar));
     fribidi_boolean result = fribidi_log2vis(fribidiInput,
-                                                length,
+                                                (FriBidiStrIndex)length,
                                                 &pbase_dir,
                                                 fribidiOutput,
             /* gint   *position_L_to_V_list */ NULL,

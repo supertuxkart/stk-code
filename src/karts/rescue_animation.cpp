@@ -25,10 +25,17 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
-#include "modes/world.hpp"
+#include "modes/world_with_rank.hpp"
 #include "physics/physics.hpp"
+#include "physics/triangle_mesh.hpp"
+#include "tracks/drive_graph.hpp"
+#include "tracks/quad.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_sector.hpp"
 
 #include "ISceneNode.h"
+
+#include <algorithm>
 
 /** The constructor stores a pointer to the kart this object is animating,
  *  and initialised the timer.
@@ -40,28 +47,52 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     m_referee     = new Referee(*m_kart);
     m_kart->getNode()->addChild(m_referee->getSceneNode());
     m_timer       = m_kart->getKartProperties()->getRescueDuration();
-    m_velocity    = m_kart->getKartProperties()->getRescueHeight() / m_timer;
+    m_up_vector   = m_kart->getTrans().getBasis().getColumn(1);
     m_xyz         = m_kart->getXYZ();
-
+    m_orig_rotation = m_kart->getRotation();
     m_kart->getAttachment()->clear();
 
-    // Get the current rotation of the kart
-    m_curr_rotation = m_kart->getNode()->getRotation() * DEGREE_TO_RAD;
+    // Determine maximum rescue height with up-raycast
+    float max_height = m_kart->getKartProperties()->getRescueHeight();
+    float hit_dest = 9999999.9f;
+    Vec3 hit;
+    const Material* m = NULL;
+    Vec3 to = m_up_vector * 10000.0f;
+    const TriangleMesh &tm = Track::getCurrentTrack()->getTriangleMesh();
+    if (tm.castRay(m_xyz, to, &hit, &m, NULL/*normal*/, /*interpolate*/true))
+    {
+        hit_dest = (hit - m_xyz).length();
+        hit_dest -= Referee::getHeight();
+        if (hit_dest < 1.0f)
+        {
+            hit_dest = 1.0f;
+        }
+    }
+    max_height = std::min(hit_dest, max_height);
+    m_velocity = max_height / m_timer;
 
     // Determine the rotation that will rotate the kart from the current
     // up direction to the right up direction it should have according to
-    // the normal at the kart's location
-    Vec3 up = m_kart->getTrans().getBasis().getColumn(1);
-    btQuaternion q = shortestArcQuat(up, m_kart->getNormal());
-   
-    // Store this rotation as 'delta HPR', which is added over time to the
-    // current rotation to end up (after m_timer seconds) with the right up
-    // rotation
-    m_add_rotation.setHPR(q);
-    m_add_rotation /= m_timer;
+    // the last vaild quad of the kart
+    WorldWithRank* wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
+    if (DriveGraph::get() && wwr)
+    {
+        const int sector = wwr->getTrackSector(m_kart->getWorldKartId())
+            ->getCurrentGraphNode();
+        const Vec3& quad_normal = DriveGraph::get()->getQuad(sector)
+            ->getNormal();
+        btQuaternion angle_rot(btVector3(0, 1, 0),
+            Track::getCurrentTrack()->getAngle(sector));
+        m_des_rotation = shortestArcQuat(Vec3(0, 1, 0), quad_normal) * angle_rot;
+        m_des_rotation.normalize();
+    }
+    else
+    {
+        m_des_rotation = m_orig_rotation;
+    }
 
     // Add a hit unless it was auto-rescue
-    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
+    if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
         !is_auto_rescue)
     {
         ThreeStrikesBattle *world=(ThreeStrikesBattle*)World::getWorld();
@@ -107,14 +138,12 @@ RescueAnimation::~RescueAnimation()
  */
 void RescueAnimation::update(float dt)
 {
-    m_xyz += dt*m_velocity * m_kart->getNormal();
+    m_xyz += dt * m_velocity * m_up_vector;
     m_kart->setXYZ(m_xyz);
-    m_curr_rotation += dt*m_add_rotation;
-    btMatrix3x3 m;
-    m.setEulerZYX(m_curr_rotation.getPitch(), m_curr_rotation.getHeading(),
-                   m_curr_rotation.getRoll());
-    m_kart->setRotation(m);
-
+    btQuaternion result = m_des_rotation.slerp(m_orig_rotation,
+        m_timer / m_kart->getKartProperties()->getRescueDuration());
+    result.normalize();
+    m_kart->setRotation(result);
     AbstractKartAnimation::update(dt);
 
 }   // update

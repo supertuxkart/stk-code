@@ -17,6 +17,7 @@
 
 #include "states_screens/dialogs/custom_video_settings.hpp"
 
+#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
@@ -24,7 +25,6 @@
 #include "utils/translation.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/shared_gpu_objects.hpp"
 
 #include <IGUIEnvironment.h>
 
@@ -40,7 +40,7 @@ CustomVideoSettingsDialog::CustomVideoSettingsDialog(const float w, const float 
         ModalDialog(w, h), m_all_kart_animated(true)
 {
 #ifndef SERVER_ONLY
-    m_all_kart_animated = SharedGPUObjects::getMaxMat4Size() > 512 ||
+    m_all_kart_animated = stk_config->m_max_skinning_bones > 512 ||
         !CVS->supportsHardwareSkinning();
 #endif
     loadFromFile("custom_video_settings.stkgui");

@@ -202,6 +202,7 @@ void renderTransparenPass(const std::vector<RenderGeometry::TexUnit> &TexUnits,
                           std::vector<std::tuple<TupleType...> > *meshes)
 {
     Shader::getInstance()->use();
+    handleSkinning(Shader::getInstance());
     if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
     for (unsigned i = 0; i < meshes->size(); i++)
@@ -298,8 +299,6 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
                              TexUnits(RenderGeometry::TexUnit(0, true)),
                                       ListAdditiveTransparent::getInstance());
     }
-
-    draw_calls.renderBillboardList();
 
     if (!CVS->isDefferedEnabled())
         return;

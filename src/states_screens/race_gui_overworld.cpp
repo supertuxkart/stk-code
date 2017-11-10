@@ -423,10 +423,9 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                     colors[i]=kart->getKartProperties()->getColor();
                 }
                 const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                           m_icons_frame->getTexture()->getSize());
+                                           m_icons_frame->getSize());
 
-                draw2DImage(m_icons_frame->getTexture(), position,
-                                                          rect, NULL, colors, true);
+                draw2DImage(m_icons_frame, position, rect, NULL, colors, true);
             }   // if isPlayerController
 
             draw2DImage(icon, position, source, NULL, NULL, true);
@@ -444,6 +443,19 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         const ChallengeData* challenge = unlock_manager->getChallengeData(challenges[n].m_challenge_id);
         const unsigned int val = challenge->getNumTrophies();
         bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
+        if (challenges[n].m_challenge_id == "fortmagma")
+        {
+            // For each track, check whether any difficulty has been completed ; fortmagma will not affect our decision (`n == m`) ; tutorial is ignored because it has no completion level
+            for (unsigned int m = 0; unlocked && m < challenges.size(); m++)
+            {
+                if (challenges[m].m_challenge_id == "tutorial") continue;
+                    unlocked = unlocked &&
+                        (PlayerManager::getCurrentPlayer()
+                            ->getChallengeStatus(challenges[m].m_challenge_id)
+                            ->isSolvedAtAnyDifficulty() || n == m);
+            }
+        }
+
         int state = (unlocked ? OPEN : LOCKED);
         
         if (UserConfigParams::m_everything_unlocked)

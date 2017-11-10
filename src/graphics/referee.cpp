@@ -36,6 +36,7 @@ int                   Referee::m_st_traffic_buffer     = -1;
 Vec3                  Referee::m_st_start_offset       = Vec3(-2, 2, 2);
 Vec3                  Referee::m_st_start_rotation     = Vec3(0, 180, 0);
 Vec3                  Referee::m_st_scale              = Vec3(1, 1, 1);
+float                 Referee::m_height                = 0.0f;
 scene::IAnimatedMesh *Referee::m_st_referee_mesh       = NULL;
 
 // ----------------------------------------------------------------------------
@@ -72,6 +73,7 @@ void Referee::init()
     // and for y the lowest point are at 0,0,0:
     Vec3 min,max;
     MeshTools::minMax3D(m_st_referee_mesh, &min, &max);
+    m_height = max.y() - min.y();
     Vec3 offset_from_center = -0.5f*(max+min);
     offset_from_center.setY(0);
     scene::IMeshManipulator *mani =

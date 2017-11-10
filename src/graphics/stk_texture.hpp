@@ -90,7 +90,7 @@ public:
     // ------------------------------------------------------------------------
     STKTexture(const std::string& path, TexConfig* tc, bool no_upload = false);
     // ------------------------------------------------------------------------
-    STKTexture(uint8_t* data, const std::string& name, size_t size,
+    STKTexture(uint8_t* data, const std::string& name, unsigned int size,
                bool single_channel = false, bool delete_ttl = false);
     // ------------------------------------------------------------------------
     STKTexture(video::IImage* img, const std::string& name);

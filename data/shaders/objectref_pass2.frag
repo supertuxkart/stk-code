@@ -27,10 +27,10 @@ void main(void)
 #endif
     if (col.a * color.a < 0.5) discard;
     
-#if defined(GL_ES) && !defined(Advanced_Lighting_Enabled)
-    col.xyz *= color.xyz;
-#else
+#if defined(sRGB_Framebuffer_Usable) || defined(Advanced_Lighting_Enabled)
     col.xyz *= pow(color.xyz, vec3(2.2));
+#else
+    col.xyz *= color.xyz;
 #endif
 
     float mask = texture(colorization_mask, uv).a;

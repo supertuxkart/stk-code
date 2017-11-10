@@ -22,7 +22,6 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/stk_tex_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
@@ -179,15 +178,11 @@ void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
         // Add heart billboard above it
         std::string heart_path =
             file_manager->getAsset(FileManager::GUI, "heart.png");
-        TexConfig btc(true/*srgb*/, true/*premul_alpha*/);
-        video::ITexture* heart = STKTexManager::getInstance()->getTexture
-            (heart_path, &btc);
-
         float height = kart->getKartHeight() + 0.5f;
 
         scene::ISceneNode* billboard = irr_driver->addBillboard
-            (core::dimension2d<irr::f32>(0.8f, 0.8f), heart, kart->getNode(),
-            true);
+            (core::dimension2d<irr::f32>(0.8f, 0.8f), heart_path,
+            kart->getNode());
         billboard->setPosition(core::vector3df(0, height, 0));
         return;
     }
@@ -660,7 +655,7 @@ void ThreeStrikesBattle::spawnSpareTireKarts()
     if (ratio < 1.5f) return;
     unsigned int spawn_sta = unsigned(ratio);
     if (spawn_sta > m_spare_tire_karts.size())
-        spawn_sta = m_spare_tire_karts.size();
+        spawn_sta = (int)m_spare_tire_karts.size();
     m_race_gui->addMessage(_P("%i spare tire kart has been spawned!",
                               "%i spare tire karts have been spawned!",
                               spawn_sta), NULL, 2.0f);
@@ -719,15 +714,15 @@ void ThreeStrikesBattle::loadCustomModels()
 
             // Compute a random kart list
             std::vector<std::string> sta_list;
-            kart_properties_manager->getRandomKartList(pos.size(), NULL,
-                &sta_list);
+            kart_properties_manager->getRandomKartList((int)pos.size(), NULL,
+                                                       &sta_list);
 
             assert(sta_list.size() == pos.size());
             // Now add them
             for (unsigned int i = 0; i < pos.size(); i++)
             {
-                AbstractKart* sta = new Kart(sta_list[i], m_karts.size(),
-                    m_karts.size() + 1, pos[i], PLAYER_DIFFICULTY_NORMAL,
+                AbstractKart* sta = new Kart(sta_list[i], (int)m_karts.size(),
+                    (int)m_karts.size() + 1, pos[i], PLAYER_DIFFICULTY_NORMAL,
                     KRT_RED);
                 sta->init(RaceManager::KartType::KT_SPARE_TIRE);
                 sta->setController(new SpareTireAI(sta));

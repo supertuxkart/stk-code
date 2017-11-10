@@ -26,13 +26,11 @@
 #include <unordered_map>
 
 class GlowCommandBuffer;
-class ParticleSystemProxy;
 class ReflectiveShadowMapCommandBuffer;
 class ShadowMatrices;
 class ShadowCommandBuffer;
 class SolidCommandBuffer;
 class STKAnimatedMesh;
-class STKBillboard;
 class STKMeshCommon;
 
 class DrawCalls
@@ -43,8 +41,6 @@ private:
     GLsync                                m_sync;
 
     std::vector<irr::scene::ISceneNode *> m_immediate_draw_list;
-    std::vector<STKBillboard *>           m_billboard_list;
-    std::vector<ParticleSystemProxy *>    m_particles_list;
     std::set<STKAnimatedMesh*>            m_mesh_for_skinning;
 
     std::vector<float>                    m_bounding_boxes;
@@ -96,7 +92,6 @@ public:
     void setFenceSync() { m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0); }
 
     void renderImmediateDrawList() const;
-    void renderBillboardList() const;
     void renderParticlesList() const;
 
     void drawIndirectSolidFirstPass() const;

@@ -22,6 +22,7 @@ void main(void)
 #ifdef Use_Bindless_Texture
     vec4 col = texture(handle, uv);
     float specmap = texture(secondhandle, uv).g;
+    float emitmap = texture(secondhandle, uv).b;
     float mask = texture(thirdhandle, uv).a;
 #ifdef SRGBBindlessFix
     col.xyz = pow(col.xyz, vec3(2.2));
@@ -32,8 +33,13 @@ void main(void)
     float emitmap = texture(SpecMap, uv).b;
     float mask = texture(colorization_mask, uv).a;
 #endif
-    col.xyz *= pow(color.xyz, vec3(2.2));
     if (col.a * color.a < 0.5) discard;
+    
+#if defined(sRGB_Framebuffer_Usable) || defined(Advanced_Lighting_Enabled)
+    col.xyz *= pow(color.xyz, vec3(2.2));
+#else
+    col.xyz *= color.xyz;
+#endif
 
     if (color_change.x > 0.0)
     {

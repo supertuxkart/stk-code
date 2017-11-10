@@ -10,6 +10,13 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 include(CMakeDependentOption)
 
+set(DEPENDENCIES "dependencies")
+# In case of 64-bit windows, use a different path for dependencies
+# so that both dependencies can be installed next to each other
+if ( WIN32 AND (CMAKE_SIZEOF_VOID_P EQUAL 8 ) )
+    set(DEPENDENCIES "dependencies-64bit")
+endif()
+
 include(BuildTypeSTKRelease)
 if (NOT CMAKE_BUILD_TYPE)
     message(STATUS "No build type selected, default to STKRelease")
@@ -62,15 +69,16 @@ set(STK_INSTALL_DATA_DIR "share/supertuxkart" CACHE
 
 # These variables enable MSVC to find libraries located in "dependencies"
 if(WIN32)
-    set(ENV{PATH} "$ENV{PATH};${PROJECT_SOURCE_DIR}/dependencies/include")
-    set(ENV{LIB} ${PROJECT_SOURCE_DIR}/dependencies/lib)
-    set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/dependencies)
+    set(ENV{PATH} "$ENV{PATH};${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/include")
+    set(ENV{LIB} ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib)
+    set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/${DEPENDENCIES})
     add_definitions(-D_IRR_STATIC_LIB_)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
 endif()
 
 if(USE_GLES2)
     add_definitions(-DUSE_GLES2)
+    add_definitions(-D_IRR_COMPILE_WITH_OGLES2_ -DNO_IRR_COMPILE_WITH_OPENGL_)
 endif()
 
 if(SERVER_ONLY)
@@ -78,9 +86,9 @@ if(SERVER_ONLY)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
 endif()
 
-if(DISABLE_VPX)
-    add_definitions(-DNO_VPX)
-endif()
+#if(DISABLE_VPX)
+#    add_definitions(-DNO_VPX)
+#endif()
 
 # Build the Bullet physics library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
@@ -131,8 +139,8 @@ else()
 endif()
 
 if (BUILD_RECORDER)
-    find_library(OPENGLRECORDER_LIBRARY NAMES openglrecorder libopenglrecorder PATHS "${PROJECT_SOURCE_DIR}/dependencies/lib")
-    find_path(OPENGLRECORDER_INCLUDEDIR NAMES openglrecorder.h PATHS "${PROJECT_SOURCE_DIR}/dependencies/include")
+    find_library(OPENGLRECORDER_LIBRARY NAMES openglrecorder libopenglrecorder PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib")
+    find_path(OPENGLRECORDER_INCLUDEDIR NAMES openglrecorder.h PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/include")
     if (NOT OPENGLRECORDER_LIBRARY OR NOT OPENGLRECORDER_INCLUDEDIR)
         if(PROJECT_VERSION STREQUAL "git")
             message(WARNING "libopenglrecorder not found, disabling in-game recorder. "
@@ -250,20 +258,14 @@ if(NOT USE_GLES2 AND NOT SERVER_ONLY)
     include_directories(${OPENGL_INCLUDE_DIR})
 endif()
 
-
-if(UNIX AND NOT APPLE AND NOT SERVER_ONLY)
-    find_package(X11 REQUIRED)
-    include_directories(${X11_INCLUDE_DIR})
-
-    if(USE_LIBBFD)
-        find_package(Libbfd)
-        if(LIBBFD_FOUND)
-            add_definitions(-DENABLE_LIBBFD)
-            include_directories(${LIBBFD_INCLUDE_DIRS})
-        else()
-            set(USE_LIBBFD OFF CACHE BOOL "Use libbfd for crash reporting and leak check" FORCE)
-            message(WARNING "Libbfd not found, disable integrated stack trace.")
-        endif()
+if(USE_LIBBFD)
+    find_package(Libbfd)
+    if(LIBBFD_FOUND)
+        add_definitions(-DENABLE_LIBBFD)
+        include_directories(${LIBBFD_INCLUDE_DIRS})
+    else()
+        set(USE_LIBBFD OFF CACHE BOOL "Use libbfd for crash reporting and leak check" FORCE)
+        message(WARNING "Libbfd not found, disable integrated stack trace.")
     endif()
 endif()
 
@@ -358,7 +360,7 @@ else()
     elseif(MINGW)
         set(PTHREAD_NAMES "winpthread-1" "libwinpthread-1" "pthreadGC2")
     endif()
-    find_library(PTHREAD_LIBRARY NAMES pthread ${PTHREAD_NAMES} PATHS ${PROJECT_SOURCE_DIR}/dependencies/lib)
+    find_library(PTHREAD_LIBRARY NAMES pthread ${PTHREAD_NAMES} PATHS ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib)
     mark_as_advanced(PTHREAD_LIBRARY)
 
     # Set data dir (absolute or relative to CMAKE_INSTALL_PREFIX)
@@ -380,9 +382,9 @@ endif()
 
 # CURL
 if(MSVC)
-    target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/dependencies/lib/libcurl.lib)
+    target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libcurl.lib)
 elseif(MINGW)
-    target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/dependencies/lib/libcurldll.a)
+    target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libcurldll.a)
 else()
     find_package(CURL REQUIRED)
     include_directories(${CURL_INCLUDE_DIRS})
@@ -402,7 +404,7 @@ target_link_libraries(supertuxkart
     ${FREETYPE_LIBRARIES}
     ${JPEG_LIBRARIES}
     ${TURBOJPEG_LIBRARY}
-    ${VPX_LIBRARIES}
+    #${VPX_LIBRARIES}
     )
 
 if(NOT SERVER_ONLY)
@@ -414,7 +416,6 @@ if(NOT SERVER_ONLY)
 endif()
 
 if(UNIX AND NOT APPLE)
-    target_link_libraries(supertuxkart ${X11_X11_LIB})
     if(USE_LIBBFD)
         target_link_libraries(supertuxkart ${LIBBFD_LIBRARIES})
     endif()
@@ -458,7 +459,7 @@ if(USE_WIIUSE)
         if(WIIUSE_BUILD)
             target_link_libraries(supertuxkart wiiuse)
         else()
-            target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/dependencies/lib/wiiuse.lib)
+            target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/wiiuse.lib)
         endif()
     else()
         target_link_libraries(supertuxkart wiiuse bluetooth)
@@ -471,7 +472,7 @@ if(MSVC OR MINGW)
   target_link_libraries(supertuxkart iphlpapi.lib)
   add_custom_command(TARGET supertuxkart POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${PROJECT_SOURCE_DIR}/dependencies/dll"
+        "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/dll"
         $<TARGET_FILE_DIR:supertuxkart>)
   add_custom_target(stkshaders SOURCES ${STK_SHADERS})
 endif()

@@ -49,6 +49,8 @@ flat out sampler2D fourthhandle;
 
 #stk_include "utils/getworldmatrix.vert"
 
+uniform samplerBuffer skinning_tex;
+
 void main(void)
 {
     mat4 ModelMatrix = getWorldMatrix(Origin, Orientation, Scale);
@@ -61,18 +63,17 @@ void main(void)
     vec4 skinned_normal = vec4(0.);
     vec4 skinned_tangent = vec4(0.);
     vec4 skinned_bitangent = vec4(0.);
-    // Note : For normal we assume no scale factor in bone (otherwise we'll have to compute inversematrix for each bones...)
     for (int i = 0; i < 4; i++)
     {
-        vec4 single_bone_influenced_position = joint_matrices[clamp(Joint[i] + skinning_offset, 0, MAX_BONES)] * idle_position;
-        single_bone_influenced_position /= single_bone_influenced_position.w;
-        vec4 single_bone_influenced_normal = joint_matrices[clamp(Joint[i] + skinning_offset, 0, MAX_BONES)] * idle_normal;
-        vec4 single_bone_influenced_tangent = joint_matrices[clamp(Joint[i] + skinning_offset, 0, MAX_BONES)] * idle_tangent;
-        vec4 single_bone_influenced_bitangent = joint_matrices[clamp(Joint[i] + skinning_offset, 0, MAX_BONES)] * idle_bitangent;
-        skinned_position += Weight[i] * single_bone_influenced_position;
-        skinned_normal += Weight[i] * single_bone_influenced_normal;
-        skinned_tangent += Weight[i] * single_bone_influenced_tangent;
-        skinned_bitangent += Weight[i] * single_bone_influenced_bitangent;
+        mat4 joint_matrix = mat4(
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4),
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 1),
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 2),
+            texelFetch(skinning_tex, clamp(Joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 3));
+        skinned_position += Weight[i] * joint_matrix * idle_position;
+        skinned_normal += Weight[i] * joint_matrix * idle_normal;
+        skinned_tangent += Weight[i] * joint_matrix * idle_tangent;
+        skinned_bitangent += Weight[i] * joint_matrix * idle_bitangent;
     }
 
     gl_Position = ProjectionViewMatrix *  ModelMatrix * skinned_position;

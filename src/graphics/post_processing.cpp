@@ -998,7 +998,7 @@ void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo,
 // ----------------------------------------------------------------------------
 void PostProcessing::renderGaussian6BlurLayer(const FrameBuffer &in_fbo,
                                               const FrameBuffer &scalar_fbo,
-                                              size_t layer, float sigma_h,
+                                              unsigned int layer, float sigma_h,
                                               float sigma_v) const
 {
 #if !defined(USE_GLES2)
@@ -1573,11 +1573,10 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         PROFILER_POP_CPU_MARKER();
     }
 
-    // Workaround a bug with srgb fbo on sandy bridge windows
-    if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
-        return in_fbo;
-
-    glEnable(GL_FRAMEBUFFER_SRGB);
+#if !defined(USE_GLES2)
+    if (CVS->isARBSRGBFramebufferUsable())
+        glEnable(GL_FRAMEBUFFER_SRGB);
+#endif
     out_fbo = &rtts->getFBO(FBO_MLAA_COLORS);
     out_fbo->bind();
     renderPassThrough(in_fbo->getRTT()[0],
@@ -1593,7 +1592,10 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
                   *out_fbo);
         PROFILER_POP_CPU_MARKER();
     }
-    glDisable(GL_FRAMEBUFFER_SRGB);
+#if !defined(USE_GLES2)
+    if (CVS->isARBSRGBFramebufferUsable())
+        glDisable(GL_FRAMEBUFFER_SRGB);
+#endif
 
     return out_fbo;
 }   // render

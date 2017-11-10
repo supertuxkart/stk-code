@@ -18,6 +18,7 @@
 #include "graphics/sp_mesh_loader.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/mini_glm.hpp"
 
 const uint8_t VERSION_NOW = 1;
 
@@ -230,7 +231,7 @@ void SPMeshLoader::decompress(irr::io::IReadFile* spm, unsigned vertices_count,
             // 3 10 + 2 bits normal
             uint32_t packed;
             spm->read(&packed, 4);
-            vertex.Normal = extract3Int10Bit(packed);
+            vertex.Normal = decompressVector3(packed);
         }
         if (read_vcolor)
         {

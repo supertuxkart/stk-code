@@ -97,7 +97,6 @@
 #include "graphics/callbacks.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
-#include "graphics/gpu_particles.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "io/file_manager.hpp"
@@ -278,6 +277,10 @@ Shaders::SkinnedTransparentShader::SkinnedTransparentShader()
     if (!CVS->supportsHardwareSkinning()) return;
     loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning.vert",
                         GL_FRAGMENT_SHADER, "transparent.frag");
+    if (SkinnedMeshShader* sms = dynamic_cast<SkinnedMeshShader*>(this))
+    {
+        sms->init(this);
+    }
     assignUniforms("ModelMatrix", "texture_trans", "skinning_offset",  "custom_alpha");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // SkinnedTransparentShader

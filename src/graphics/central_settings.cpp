@@ -53,6 +53,7 @@ void CentralVideoSettings::init()
     hasTextureFilterAnisotropic = false;
     hasTextureSwizzle = false;
     hasPixelBufferObject = false;
+    hasSRGBFramebuffer = false;
 
 #if defined(USE_GLES2)
     hasBGRA = false;
@@ -92,7 +93,8 @@ void CentralVideoSettings::init()
     {
         std::string driver((char*)(glGetString(GL_VERSION)));
         std::string card((char*)(glGetString(GL_RENDERER)));
-        GraphicsRestrictions::init(driver, card);
+        std::string vendor((char*)(glGetString(GL_VENDOR)));
+        GraphicsRestrictions::init(driver, card, vendor);
 
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE))
         {
@@ -203,12 +205,11 @@ void CentralVideoSettings::init()
             hasPixelBufferObject = true;
             Log::info("GLDriver", "ARB Pixel Buffer Object Present");
         }
-        // Only unset the high def textures if they are set as default. If the
-        // user has enabled them (bit 1 set), then leave them enabled.
-        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HIGHDEFINITION_TEXTURES) &&
-            (UserConfigParams::m_high_definition_textures & 0x02) == 0)
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB) &&
+            (hasGLExtension("GL_ARB_framebuffer_sRGB") || m_glsl == true))
         {
-            UserConfigParams::m_high_definition_textures = 0x00;
+            hasSRGBFramebuffer = true;
+            Log::info("GLDriver", "ARB framebuffer sRGB Present");
         }
 
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GI))
@@ -231,13 +232,19 @@ void CentralVideoSettings::init()
         }
 
         // Check if visual is sRGB-capable
-        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_CAPABLE) &&
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB) &&
+            GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKAROUND2) &&
             m_glsl == true)
         {
             GLint param = GL_SRGB;
             glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT,
                               GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &param);
             m_need_srgb_visual_workaround = (param != GL_SRGB);
+            
+            if (m_need_srgb_visual_workaround)
+            {
+                hasSRGBFramebuffer = false;
+            }
         }
 #else
         if (m_glsl == true)
@@ -280,6 +287,24 @@ void CentralVideoSettings::init()
             m_need_vertex_id_workaround = true;
         }
 #endif
+
+        // Only unset the high def textures if they are set as default. If the
+        // user has enabled them (bit 1 set), then leave them enabled.
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HIGHDEFINITION_TEXTURES) &&
+            (UserConfigParams::m_high_definition_textures & 0x02) == 0)
+        {
+            UserConfigParams::m_high_definition_textures = 0x00;
+        }
+        
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HIGHDEFINITION_TEXTURES_256))
+        {
+            UserConfigParams::m_high_definition_textures = 0;
+            
+            if (UserConfigParams::m_max_texture_size > 256)
+            {
+                UserConfigParams::m_max_texture_size = 256;
+            }
+        }
     }
 }
 
@@ -415,6 +440,11 @@ bool CentralVideoSettings::isEXTTextureFilterAnisotropicUsable() const
     return hasTextureFilterAnisotropic;
 }
 
+bool CentralVideoSettings::isARBSRGBFramebufferUsable() const
+{
+    return hasSRGBFramebuffer;
+}
+
 #if defined(USE_GLES2)
 bool CentralVideoSettings::isEXTTextureFormatBGRA8888Usable() const
 {
@@ -452,6 +482,11 @@ bool CentralVideoSettings::supportsAsyncInstanceUpload() const
     return isARBBufferStorageUsable() && isARBImageLoadStoreUsable();
 }
 
+bool CentralVideoSettings::supportsTextureCompression() const
+{
+    return isEXTTextureCompressionS3TCUsable() && isARBSRGBFramebufferUsable();
+}
+
 bool CentralVideoSettings::isShadowEnabled() const
 {
     return supportsShadows() && (UserConfigParams::m_shadows_resolution > 0);
@@ -464,7 +499,7 @@ bool CentralVideoSettings::isGlobalIlluminationEnabled() const
 
 bool CentralVideoSettings::isTextureCompressionEnabled() const
 {
-    return isEXTTextureCompressionS3TCUsable() && UserConfigParams::m_texture_compression;
+    return supportsTextureCompression() && UserConfigParams::m_texture_compression;
 }
 
 // See http://visual-computing.intel-research.net/art/publications/sdsm/
@@ -492,7 +527,7 @@ bool CentralVideoSettings::isDefferedEnabled() const
 
 bool CentralVideoSettings::supportsHardwareSkinning() const
 {
-    return isARBUniformBufferObjectUsable();
+    return !GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HARDWARE_SKINNING);
 }
 
 bool CentralVideoSettings::isARBTextureSwizzleUsable() const

@@ -35,7 +35,6 @@
 #include "graphics/shader_based_renderer.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stk_animated_mesh.hpp"
-#include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_loader.hpp"
 #include "graphics/sp_mesh_loader.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
@@ -90,15 +89,6 @@ please use the included version."
 #endif
 
 using namespace irr;
-
-#ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
-#if defined(__linux__) && !defined(ANDROID)
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#endif
 
 /** singleton */
 IrrDriver *irr_driver = NULL;
@@ -229,45 +219,6 @@ std::unique_ptr<RenderTarget> IrrDriver::createRenderTarget(const irr::core::dim
 #endif   // ~SERVER_ONLY
 
 // ----------------------------------------------------------------------------
-
-#if defined(__linux__) && !defined(ANDROID)
-/*
-Returns the parent window of "window" (i.e. the ancestor of window
-that is a direct child of the root, or window itself if it is a direct child).
-If window is the root window, returns window.
-*/
-Window get_toplevel_parent(Display* display, Window window)
-{
-#ifndef SERVER_ONLY
-     Window parent;
-     Window root;
-     Window * children;
-     unsigned int num_children;
-
-     while (true)
-     {
-         if (0 == XQueryTree(display, window, &root,
-                   &parent, &children, &num_children))
-         {
-             Log::fatal("irr_driver", "XQueryTree error\n");
-         }
-         if (children) { //must test for null
-             XFree(children);
-         }
-         if (window == root || parent == root) {
-             return window;
-         }
-         else {
-             window = parent;
-         }
-     }
-#else
-    return NULL;
-#endif
-}
-#endif
-
-// ----------------------------------------------------------------------------
 /** If the position of the window should be remembered, store it in the config
  *  file.
  *  \post The user config file must still be saved!
@@ -278,61 +229,26 @@ void IrrDriver::updateConfigIfRelevant()
     if (!UserConfigParams::m_fullscreen &&
          UserConfigParams::m_remember_window_location)
     {
-#ifdef WIN32
-        const video::SExposedVideoData& videoData = m_device->getVideoDriver()
-                                                     ->getExposedVideoData();
-        // this should work even if using DirectX in theory because the HWnd is
-        // always third pointer in the struct, no matter which union is used
-        HWND window = (HWND)videoData.OpenGLWin32.HWnd;
-        WINDOWPLACEMENT placement;
-        placement.length = sizeof(WINDOWPLACEMENT);
-        if (GetWindowPlacement(window, &placement))
+        int x = 0;
+        int y = 0;
+        
+        bool success = m_device->getWindowPosition(&x, &y);
+        
+        if (!success)
         {
-            int x = (int)placement.rcNormalPosition.left;
-            int y = (int)placement.rcNormalPosition.top;
-            // If the windows position is saved, it must be a non-negative
-            // number. So if the window is partly off screen, move it to the
-            // corresponding edge.
-            if(x<0) x = 0;
-            if(y<0) y = 0;
-            Log::verbose("irr_driver",
-                       "Retrieved window location for config : %i %i\n", x, y);
-
-            if (UserConfigParams::m_window_x != x || UserConfigParams::m_window_y != y)
-            {
-                UserConfigParams::m_window_x = x;
-                UserConfigParams::m_window_y = y;
-            }
+            Log::warn("irr_driver", "Could not retrieve window location");
+            return;
         }
-        else
-        {
-            Log::warn("irr_driver", "Could not retrieve window location\n");
-        }
-#elif defined(__linux__) && !defined(ANDROID)
-        if (m_device->getType() == EIDT_X11)
-        {
-            const video::SExposedVideoData& videoData =
-                m_device->getVideoDriver()->getExposedVideoData();
-            Display* display = (Display*)videoData.OpenGLLinux.X11Display;
-            XWindowAttributes xwa;
-            XGetWindowAttributes(display, get_toplevel_parent(display,
-                                       videoData.OpenGLLinux.X11Window), &xwa);
-            int wx = xwa.x;
-            int wy = xwa.y;
-            Log::verbose("irr_driver",
-                    "Retrieved window location for config : %i %i\n", wx, wy);
-    
-    
-            if (UserConfigParams::m_window_x != wx || 
-                UserConfigParams::m_window_y != wy)
-            {
-                UserConfigParams::m_window_x = wx;
-                UserConfigParams::m_window_y = wy;
-            }
-        }
-#endif
+        
+        Log::verbose("irr_driver", "Retrieved window location for config: "
+                                   "%i %i", x, y);
+                                   
+        // If the windows position is saved, it must be a non-negative
+        // number. So if the window is partly off screen, move it to the
+        // corresponding edge.
+        UserConfigParams::m_window_x = std::max(0, x);
+        UserConfigParams::m_window_y = std::max(0, y);
     }
-
 #endif   // !SERVER_ONLY
 }   // updateConfigIfRelevant
 
@@ -867,49 +783,13 @@ core::position2di IrrDriver::getMouseLocation()
 bool IrrDriver::moveWindow(int x, int y)
 {
 #ifndef SERVER_ONLY
-#ifdef WIN32
-    const video::SExposedVideoData& videoData =
-                    m_video_driver->getExposedVideoData();
-    // this should work even if using DirectX in theory,
-    // because the HWnd is always third pointer in the struct,
-    // no matter which union is used
-    HWND window = (HWND)videoData.OpenGLWin32.HWnd;
-    if (SetWindowPos(window, HWND_TOP, x, y, -1, -1,
-                     SWP_NOOWNERZORDER | SWP_NOSIZE))
-    {
-        // everything OK
-        return true;
-    }
-    else
+    bool success = m_device->moveWindow(x, y);
+    
+    if (!success)
     {
         Log::warn("irr_driver", "Could not set window location\n");
         return false;
     }
-#elif defined(__linux__) && !defined(ANDROID)
-    if (m_device->getType() == EIDT_X11)
-    {
-        const video::SExposedVideoData& videoData = 
-                                        m_video_driver->getExposedVideoData();
-    
-        Display* display = (Display*)videoData.OpenGLLinux.X11Display;
-        int screen = DefaultScreen(display);
-        int screen_w = DisplayWidth(display, screen);
-        int screen_h = DisplayHeight(display, screen);
-    
-        if (x + UserConfigParams::m_width > screen_w)
-        {
-            x = screen_w - UserConfigParams::m_width;
-        }
-    
-        if (y + UserConfigParams::m_height > screen_h)
-        {
-            y = screen_h - UserConfigParams::m_height;
-        }
-    
-        // TODO: Actually handle possible failure
-        XMoveWindow(display, videoData.OpenGLLinux.X11Window, x, y);
-    }
-#endif
 #endif
     return true;
 }
@@ -1033,6 +913,8 @@ void IrrDriver::applyResolutionSettings()
     // above) - this happens dynamically when the tracks are loaded.
     GUIEngine::reshowCurrentScreen();
     MessageQueue::updatePosition();
+    // Preload the explosion effects (explode.png)
+    ParticleKindManager::get()->getParticles("explosion.xml");
 #endif   // !SERVER_ONLY
 }   // applyResolutionSettings
 
@@ -1322,33 +1204,36 @@ PerCameraNode *IrrDriver::addPerCameraNode(scene::ISceneNode* node,
                              m_scene_manager, -1, camera, node);
 }   // addNode
 
-
 // ----------------------------------------------------------------------------
 /** Adds a billboard node to scene.
  */
 scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
-                                           video::ITexture *texture,
-                                           scene::ISceneNode* parent,
-                                           bool alphaTesting)
+                                           const std::string& tex_name,
+                                           scene::ISceneNode* parent)
 {
     scene::IBillboardSceneNode* node;
-#ifndef SERVER_ONLY
-    if (CVS->isGLSL())
-    {
-        if (!parent)
-            parent = m_scene_manager->getRootSceneNode();
+    node = m_scene_manager->addBillboardSceneNode(parent, size);
 
-        node = new STKBillboard(parent, m_scene_manager, -1,
-                                vector3df(0., 0., 0.), size);
-        node->drop();
-    }
-    else
-#endif
-        node = m_scene_manager->addBillboardSceneNode(parent, size);
+    const bool full_path = tex_name.find('/') != std::string::npos;
+
+    Material* m = material_manager->getMaterial(tex_name, full_path,
+        /*make_permanent*/false, /*complain_if_not_found*/true,
+        /*strip_path*/full_path, /*install*/false);
+
+    video::ITexture* tex = m->getTexture(true/*srgb*/,
+        m->getShaderType() == Material::SHADERTYPE_ADDITIVE ||
+        m->getShaderType() == Material::SHADERTYPE_ALPHA_BLEND ?
+        true : false/*premul_alpha*/);
+
     assert(node->getMaterialCount() > 0);
-    node->setMaterialTexture(0, texture);
-    if(alphaTesting)
-        node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF);
+    node->setMaterialTexture(0, tex);
+    if (!(m->getShaderType() == Material::SHADERTYPE_ADDITIVE ||
+        m->getShaderType() == Material::SHADERTYPE_ALPHA_BLEND))
+    {
+        // Alpha test for billboard otherwise
+        m->setShaderType(Material::SHADERTYPE_ALPHA_TEST);
+    }
+    m->setMaterialProperties(&(node->getMaterial(0)), NULL);
     return node;
 }   // addBillboard
 
@@ -1410,25 +1295,25 @@ scene::IMesh *IrrDriver::createTexturedQuadMesh(const video::SMaterial *material
 
     video::S3DVertex v1;
     v1.Pos    = core::vector3df(-w_2,-h_2,0);
-    v1.Normal = core::vector3df(0, 0, -1.0f);
+    v1.Normal = core::vector3df(0, 0, 1);
     v1.TCoords = core::vector2d<f32>(1,1);
     v1.Color = video::SColor(255, 255, 255, 255);
 
     video::S3DVertex v2;
     v2.Pos    = core::vector3df(w_2,-h_2,0);
-    v2.Normal = core::vector3df(0, 0, -1.0f);
+    v2.Normal = core::vector3df(0, 0, 1);
     v2.TCoords = core::vector2d<f32>(0,1);
-    v1.Color = video::SColor(255, 255, 255, 255);
+    v2.Color = video::SColor(255, 255, 255, 255);
 
     video::S3DVertex v3;
     v3.Pos    = core::vector3df(w_2,h_2,0);
-    v3.Normal = core::vector3df(0, 0, -1.0f);
+    v3.Normal = core::vector3df(0, 0, 1);
     v3.TCoords = core::vector2d<f32>(0,0);
     v3.Color = video::SColor(255, 255, 255, 255);
 
     video::S3DVertex v4;
     v4.Pos    = core::vector3df(-w_2,h_2,0);
-    v4.Normal = core::vector3df(0, 0, -1.0f);
+    v4.Normal = core::vector3df(0, 0, 1);
     v4.TCoords = core::vector2d<f32>(1,0);
     v4.Color = video::SColor(255, 255, 255, 255);
 

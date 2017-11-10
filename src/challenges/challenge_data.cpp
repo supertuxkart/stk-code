@@ -392,7 +392,11 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
 
         if (m_time[d] >= 0.0f)
         {
-          race_manager->setTimeTarget(m_time[d]);
+            race_manager->setTimeTarget(m_time[d]);
+        }
+        else
+        {
+            race_manager->setTimeTarget(0.0f);
         }
     }
     else if(m_mode==CM_GRAND_PRIX)

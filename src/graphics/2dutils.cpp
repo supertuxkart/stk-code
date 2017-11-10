@@ -70,7 +70,7 @@ public:
                             GL_FRAGMENT_SHADER, "texturedquad.frag");
         assignUniforms("center", "size", "texcenter", "texsize");
 
-        assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
+        assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }   // TextureRectShader
 };   // TextureRectShader
 

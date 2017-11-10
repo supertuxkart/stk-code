@@ -18,18 +18,19 @@
 #ifndef SERVER_ONLY
 #include "graphics/draw_calls.hpp"
 
+#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/command_buffer.hpp"
+#include "graphics/cpu_particle_manager.hpp"
 #include "graphics/draw_tools.hpp"
-#include "graphics/gpu_particles.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/materials.hpp"
 #include "graphics/render_info.hpp"
 #include "graphics/shadow_matrices.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stk_animated_mesh.hpp"
-#include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh.hpp"
+#include "graphics/stk_particle.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
 
@@ -62,8 +63,7 @@ void DrawCalls::clearLists()
     ListMatSplatting::getInstance()->clear();
 
     m_immediate_draw_list.clear();
-    m_billboard_list.clear();
-    m_particles_list.clear();
+    CPUParticleManager::getInstance()->reset();
 }
 
 // ----------------------------------------------------------------------------
@@ -261,12 +261,12 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
     {
         skinning_offset = getSkinningOffset() + 1/*reserved identity matrix*/;
         if (skinning_offset + am->getTotalJoints() >
-            SharedGPUObjects::getMaxMat4Size())
+            (int)stk_config->m_max_skinning_bones)
         {
             Log::error("DrawCalls", "Don't have enough space to render skinned"
                 " mesh %s! Max joints can hold: %d",
                 am->getMeshDebugName().c_str(),
-                SharedGPUObjects::getMaxMat4Size());
+                stk_config->m_max_skinning_bones);
             return;
         }
         m_mesh_for_skinning.insert(am);
@@ -562,17 +562,18 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
         if (!(*I)->isVisible())
             continue;
 
-        if (ParticleSystemProxy *node = dynamic_cast<ParticleSystemProxy *>(*I))
+        if (STKParticle *node = dynamic_cast<STKParticle *>(*I))
         {
-            if (!isCulledPrecise(cam, *I))
-                m_particles_list.push_back(node);
+            if (!isCulledPrecise(cam, *I, irr_driver->getBoundingBoxesViz()))
+                CPUParticleManager::getInstance()->addParticleNode(node);
             continue;
         }
 
-        if (STKBillboard *node = dynamic_cast<STKBillboard *>(*I))
+        if (scene::IBillboardSceneNode *node =
+            dynamic_cast<scene::IBillboardSceneNode *>(*I))
         {
             if (!isCulledPrecise(cam, *I))
-                m_billboard_list.push_back(node);
+                CPUParticleManager::getInstance()->addBillboardNode(node);
             continue;
         }
 
@@ -604,7 +605,8 @@ DrawCalls::DrawCalls()
 
 DrawCalls::~DrawCalls()
 {
-
+    CPUParticleManager::kill();
+    STKParticle::destroyFlipsBuffer();
 #if !defined(USE_GLES2)
     delete m_solid_cmd_buffer;
     delete m_shadow_cmd_buffer;
@@ -646,6 +648,9 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
     PROFILER_POP_CPU_MARKER();
 
     irr_driver->setSkinningJoint(getSkinningOffset());
+    PROFILER_PUSH_CPU_MARKER("- cpu particle generation", 0x2F, 0x1F, 0x11);
+    CPUParticleManager::getInstance()->generateAll();
+    PROFILER_POP_CPU_MARKER();
     // Add a 1 s timeout
     if (!m_sync)
         m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
@@ -680,8 +685,22 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
     }*/
 
     PROFILER_PUSH_CPU_MARKER("- Animations/Buffer upload", 0x0, 0x0, 0x0);
+#ifdef USE_GLES2
+    glBindTexture(GL_TEXTURE_2D, SharedGPUObjects::getSkinningTexture());
+#else
+    glBindBuffer(GL_TEXTURE_BUFFER, SharedGPUObjects::getSkinningBuffer());
+#endif
     for (unsigned i = 0; i < m_deferred_update.size(); i++)
         m_deferred_update[i]->updateGL();
+    PROFILER_POP_CPU_MARKER();
+#ifdef USE_GLES2
+    glBindTexture(GL_TEXTURE_2D, 0);
+#else
+    glBindBuffer(GL_TEXTURE_BUFFER, 0);
+#endif
+
+    PROFILER_PUSH_CPU_MARKER("- cpu particle upload", 0x3F, 0x03, 0x61);
+    CPUParticleManager::getInstance()->uploadAll();
     PROFILER_POP_CPU_MARKER();
 
     if (!CVS->supportsIndirectInstancingRendering())
@@ -716,19 +735,9 @@ void DrawCalls::renderImmediateDrawList() const
 }
 
 // ----------------------------------------------------------------------------
-void DrawCalls::renderBillboardList() const
-{
-    glActiveTexture(GL_TEXTURE0);
-    for(auto billboard: m_billboard_list)
-        billboard->render();
-}
-
-// ----------------------------------------------------------------------------
 void DrawCalls::renderParticlesList() const
 {
-    glActiveTexture(GL_TEXTURE0);
-    for(auto particles: m_particles_list)
-        particles->render();
+    CPUParticleManager::getInstance()->drawAll();
 }
 
 #if !defined(USE_GLES2)
@@ -966,7 +975,7 @@ int32_t DrawCalls::getSkinningOffset() const
 {
     return std::accumulate(m_mesh_for_skinning.begin(),
         m_mesh_for_skinning.end(), 0, []
-        (const size_t previous, const STKAnimatedMesh* m)
+        (const unsigned int previous, const STKAnimatedMesh* m)
         { return previous + m->getTotalJoints(); });
 }   // getSkinningOffset
 #endif   // !SERVER_ONLY

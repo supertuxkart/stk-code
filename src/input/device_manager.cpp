@@ -425,7 +425,7 @@ void DeviceManager::updateMultitouchDevice()
         if (m_multitouch_device->getPlayer() != m_single_player)
             m_multitouch_device->setPlayer(m_single_player);
     }
-    else if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
+    else
     {
         m_multitouch_device->setPlayer(NULL);
     }

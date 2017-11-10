@@ -22,10 +22,6 @@
 #include "MacOSX/CIrrDeviceMacOSX.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_WINDOWS_CE_DEVICE_
-#include "CIrrDeviceWinCE.h"
-#endif
-
 #ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 #include "CIrrDeviceWayland.h"
 #endif
@@ -36,14 +32,6 @@
 
 #ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
 #include "CIrrDeviceSDL.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_FB_DEVICE_
-#include "CIrrDeviceFB.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_CONSOLE_DEVICE_
-#include "CIrrDeviceConsole.h"
 #endif
 
 #ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
@@ -94,12 +82,6 @@ namespace irr
 			device_type = EIDT_OSX;
 		}
 #endif
-#ifdef _IRR_COMPILE_WITH_WINDOWS_CE_DEVICE_
-		if (strcmp(irr_device_type, "wince") == 0)
-		{
-			device_type = EIDT_WINCE;
-		}
-#endif
 #ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 		if (strcmp(irr_device_type, "wayland") == 0)
 		{
@@ -118,22 +100,10 @@ namespace irr
 			device_type = EIDT_SDL;
 		}
 #endif
-#ifdef _IRR_COMPILE_WITH_FB_DEVICE_
-		if (strcmp(irr_device_type, "framebuffer") == 0)
-		{
-			device_type = EIDT_FRAMEBUFFER;
-		}
-#endif
 #ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
 		if (strcmp(irr_device_type, "android") == 0)
 		{
 			device_type = EIDT_ANDROID;
-		}
-#endif
-#ifdef _IRR_COMPILE_WITH_CONSOLE_DEVICE_
-		if (strcmp(irr_device_type, "console") == 0)
-		{
-			device_type = EIDT_CONSOLE;
 		}
 #endif
 	}
@@ -156,11 +126,6 @@ namespace irr
 			dev = new CIrrDeviceMacOSX(creation_params);
 #endif
 
-#ifdef _IRR_COMPILE_WITH_WINDOWS_CE_DEVICE_
-		if (creation_params.DeviceType == EIDT_WINCE || (!dev && creation_params.DeviceType == EIDT_BEST))
-			dev = new CIrrDeviceWinCE(creation_params);
-#endif
-
 #ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 		if (creation_params.DeviceType == EIDT_WAYLAND || (!dev && creation_params.DeviceType == EIDT_BEST))
 		{
@@ -181,19 +146,9 @@ namespace irr
 			dev = new CIrrDeviceSDL(creation_params);
 #endif
 
-#ifdef _IRR_COMPILE_WITH_FB_DEVICE_
-		if (creation_params.DeviceType == EIDT_FRAMEBUFFER || (!dev && creation_params.DeviceType == EIDT_BEST))
-			dev = new CIrrDeviceFB(creation_params);
-#endif
-
 #ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
 		if (creation_params.DeviceType == EIDT_ANDROID || (!dev && creation_params.DeviceType == EIDT_BEST))
 			dev = new CIrrDeviceAndroid(creation_params);
-#endif
-
-#ifdef _IRR_COMPILE_WITH_CONSOLE_DEVICE_
-		if (creation_params.DeviceType == EIDT_CONSOLE || (!dev && creation_params.DeviceType == EIDT_BEST))
-			dev = new CIrrDeviceConsole(creation_params);
 #endif
 
 		if (dev && !dev->getVideoDriver() && creation_params.DriverType != video::EDT_NULL)

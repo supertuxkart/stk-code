@@ -53,7 +53,7 @@ namespace Scripting
         /** Get total number of challenges */
         int getChallengeCount()
         {
-            return ::Track::getCurrentTrack()->getChallengeList().size();
+            return (int)::Track::getCurrentTrack()->getChallengeList().size();
         }   // getChallengeCount
 
         // --------------------------------------------------------------------

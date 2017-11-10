@@ -108,7 +108,6 @@ void RewindManager::addNextTimeStep(float time, float dt)
     // at which time is 0 - we add only one entry there
     if (  ( time>0 || m_rewind_queue.isEmpty()                           ) &&
           World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE    )
-
     {
         m_rewind_queue.addNewTimeStep(time, dt);
     }

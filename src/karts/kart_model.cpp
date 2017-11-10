@@ -215,6 +215,10 @@ void KartModel::loadInfo(const XMLNode &node)
         }
     }
 
+    if (const XMLNode* exhaust = node.getNode("exhaust"))
+    {
+        exhaust->get("file", &m_exhaust_xml);
+    }
 }   // loadInfo
 
 // ----------------------------------------------------------------------------
@@ -336,6 +340,7 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
     km->m_render_info           = new RenderInfo();
     km->m_inverse_bone_matrices = m_inverse_bone_matrices;
     km->m_version               = m_version;
+    km->m_exhaust_xml           = m_exhaust_xml;
     km->m_render_info->setKartModelRenderInfo(krt);
 
     km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
@@ -481,7 +486,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
         {
             if(!m_wheel_model[i]) continue;
             m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], "wheel",
-                              node, getRenderInfo(), true/*all_parts_colorized*/);
+                              node, getRenderInfo());
             Vec3 wheel_min, wheel_max;
             MeshTools::minMax3D(m_wheel_model[i], &wheel_min, &wheel_max);
             m_wheel_graphics_radius[i] = 0.5f*(wheel_max.getY() - wheel_min.getY());
@@ -513,8 +518,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
             {
                 // Only need to keep track of animated node for speed setting
                 obj.m_node = irr_driver->addAnimatedMesh(obj.m_model, 
-                    "speedweighted", parent, getRenderInfo(),
-                    true/*all_parts_colorized*/);
+                    "speedweighted", parent, getRenderInfo());
                 swo = obj.m_node;
                 obj.m_node->grab();
                 obj.m_node->setFrameLoop(0, obj.m_model->getFrameCount() - 1);
@@ -522,8 +526,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
             else
             {
                 swo = irr_driver->addMesh(obj.m_model->getMesh(0),
-                    "speedweighted", parent, getRenderInfo(),
-                    true/*all_parts_colorized*/);
+                    "speedweighted", parent, getRenderInfo());
             }
 #ifdef DEBUG
             std::string debug_name = obj.m_name + " (speed-weighted)";
@@ -567,7 +570,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
             m_animated_node->getJointNode(m_hat_bone.c_str()) : node;
         scene::IMesh* hat_mesh = irr_driver->getAnimatedMesh
             (file_manager->getAsset(FileManager::MODEL, m_hat_name));
-        scene::ISceneNode* node = irr_driver->addMesh(hat_mesh, "hat", parent);
+        scene::ISceneNode* node = irr_driver->addMesh(hat_mesh, "hat", parent,
+            getRenderInfo());
         configNode(node, *m_hat_location, bone_attachment ?
                 getInverseBoneMatrix(m_hat_bone) : core::matrix4());
     }
@@ -1206,6 +1210,12 @@ void KartModel::toggleHeadlights(bool on)
 }   // toggleHeadlights
 
 //-----------------------------------------------------------------------------
+/** Called when a kart is load. this will load all the inverse bone matrices
+ *  for each bone in straight frame. The location, rotation and scale in
+ *  kart.xml for attachments (speedweighted objects, headlight, hat...) are in
+ *  object space, so if you use a inverse bone matrix * that matrix, it will be
+ *  relative to the bone, and you can use the result to set parent.
+ */
 void KartModel::initInverseBoneMatrices()
 {
     if (m_version < 3)
@@ -1225,16 +1235,19 @@ void KartModel::initInverseBoneMatrices()
             m_model_filename.c_str());
         striaght_frame = 0.0f;
     }
-    node->setCurrentFrame(striaght_frame);
+
     const unsigned total_joint = node->getJointCount();
     for (unsigned i = 0; i < total_joint; i++)
     {
+        node->setCurrentFrame(striaght_frame);
         node->OnAnimate(0);
         scene::IBoneSceneNode* bone = node->getJointNode(i);
         bone->updateAbsolutePosition();
-        const core::matrix4 mat = bone->getAbsoluteTransformation();
+        node->setCurrentFrame(striaght_frame);
+        node->OnAnimate(0);
+        bone->updateAbsolutePosition();
         core::matrix4 inv;
-        mat.getInverse(inv);
+        bone->getAbsoluteTransformation().getInverse(inv);
         const std::string bone_name = bone->getName();
         auto ret = m_inverse_bone_matrices.find(bone_name);
         if (ret != m_inverse_bone_matrices.end())

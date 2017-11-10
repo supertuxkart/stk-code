@@ -33,7 +33,6 @@
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/skybox.hpp"
-#include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/spherical_harmonics.hpp"
 #include "items/item_manager.hpp"
@@ -159,9 +158,9 @@ void ShaderBasedRenderer::prepareForwardRenderer()
 void ShaderBasedRenderer::uploadLightingData() const
 {
     assert(CVS->isARBUniformBufferObjectUsable());
-    
+
     float Lighting[36];
-    
+
     core::vector3df sun_direction = irr_driver->getSunDirection();
     video::SColorf sun_color = irr_driver->getSunColor();
 
@@ -188,7 +187,7 @@ void ShaderBasedRenderer::uploadLightingData() const
 
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
-                                                    size_t width, size_t height)
+                                                    unsigned int width, unsigned int height)
 {
     m_current_screen_size = core::vector2df((float)width, (float)height);
     m_shadow_matrices.computeMatrixesAndCameras(camnode, width, height,
@@ -238,8 +237,6 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     {
         glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedGPUObjects::getViewProjectionMatricesUBO());
         glBindBufferBase(GL_UNIFORM_BUFFER, 1, SharedGPUObjects::getLightingDataUBO());
-        if (CVS->supportsHardwareSkinning())
-            glBindBufferBase(GL_UNIFORM_BUFFER, 2, SharedGPUObjects::getSkinningUBO());
     }
     irr_driver->getSceneManager()->setActiveCamera(camnode);
 
@@ -304,8 +301,11 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     else
     {
         // We need a cleared depth buffer for some effect (eg particles depth blending)
-        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
+#if !defined(USE_GLES2)
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKAROUND1) &&
+            CVS->isARBSRGBFramebufferUsable())
             glDisable(GL_FRAMEBUFFER_SRGB);
+#endif
         m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
         // Bind() modifies the viewport. In order not to affect anything else,
         // the viewport is just reset here and not removed in Bind().
@@ -315,8 +315,11 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
                    vp.LowerRightCorner.X - vp.UpperLeftCorner.X,
                    vp.LowerRightCorner.Y - vp.UpperLeftCorner.Y);
         glClear(GL_DEPTH_BUFFER_BIT);
-        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
+#if !defined(USE_GLES2)
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKAROUND1) &&
+            CVS->isARBSRGBFramebufferUsable())
             glEnable(GL_FRAMEBUFFER_SRGB);
+#endif
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     PROFILER_POP_CPU_MARKER();
@@ -479,8 +482,6 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         PROFILER_POP_CPU_MARKER();
     }
 
-    m_draw_calls.setFenceSync();
-
     // Render particles
     {
         PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0xFF, 0x00);
@@ -488,9 +489,15 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         renderParticles();
         PROFILER_POP_CPU_MARKER();
     }
+    
+    m_draw_calls.setFenceSync();
+    
     if (!CVS->isDefferedEnabled() && !forceRTT)
     {
-        glDisable(GL_FRAMEBUFFER_SRGB);
+#if !defined(USE_GLES2)
+        if (CVS->isARBSRGBFramebufferUsable())
+            glDisable(GL_FRAMEBUFFER_SRGB);
+#endif
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
         return;
@@ -503,13 +510,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::renderParticles()
 {
-    glDepthMask(GL_FALSE);
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
     m_draw_calls.renderParticlesList();
-
-//    m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
 } //renderParticles
 
 // ----------------------------------------------------------------------------
@@ -596,11 +597,17 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
     }
     else
     {
-        glEnable(GL_FRAMEBUFFER_SRGB);
+#if !defined(USE_GLES2)
+        if (CVS->isARBSRGBFramebufferUsable())
+            glEnable(GL_FRAMEBUFFER_SRGB);
+#endif
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         camera->activate();
         m_post_processing->renderPassThrough(fbo->getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
-        glDisable(GL_FRAMEBUFFER_SRGB);
+#if !defined(USE_GLES2)
+        if (CVS->isARBSRGBFramebufferUsable())
+            glDisable(GL_FRAMEBUFFER_SRGB);
+#endif
     }
 } //renderPostProcessing
 
@@ -654,15 +661,14 @@ ShaderBasedRenderer::~ShaderBasedRenderer()
     delete m_skybox;
     delete m_rtts;
     ShaderFilesManager::kill();
-    STKBillboard::destroyBillboardVAO();
 }
 
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::onLoadWorld()
 {
     const core::recti &viewport = Camera::getCamera(0)->getViewport();
-    size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
-    size_t height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
+    unsigned int width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
+    unsigned int height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
     RTT* rtts = new RTT(width, height, CVS->isDefferedEnabled() ?
                         UserConfigParams::m_scale_rtts_factor : 1.0f);
     setRTT(rtts);
@@ -800,8 +806,10 @@ void ShaderBasedRenderer::render(float dt)
         rg->preRenderCallback(camera);   // adjusts start referee
         irr_driver->getSceneManager()->setActiveCamera(camnode);
 
-        if (!CVS->isDefferedEnabled())
+#if !defined(USE_GLES2)
+        if (!CVS->isDefferedEnabled() && CVS->isARBSRGBFramebufferUsable())
             glEnable(GL_FRAMEBUFFER_SRGB);
+#endif
         
         PROFILER_PUSH_CPU_MARKER("UBO upload", 0x0, 0xFF, 0x0);
         computeMatrixesAndCameras(camnode, m_rtts->getWidth(), m_rtts->getHeight());
@@ -949,14 +957,13 @@ void ShaderBasedRenderer::preloadShaderFiles()
     sfm->addShaderFile("screenquad.vert", GL_VERTEX_SHADER);
     sfm->addShaderFile("tonemap.frag", GL_FRAGMENT_SHADER);
     if (!GraphicsRestrictions::isDisabled
-        (GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
+        (GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKAROUND1))
         sfm->addShaderFile("passthrough.frag", GL_FRAGMENT_SHADER);
 
-    sfm->addShaderFile("billboard.vert", GL_VERTEX_SHADER);
-    sfm->addShaderFile("billboard.frag", GL_FRAGMENT_SHADER);
-    sfm->addShaderFile("pointemitter.vert", GL_VERTEX_SHADER);
-    sfm->addShaderFile("particle.vert", GL_VERTEX_SHADER);
-    sfm->addShaderFile("particle.frag", GL_FRAGMENT_SHADER);
+    sfm->addShaderFile("alphatest_particle.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("alphatest_particle.frag", GL_FRAGMENT_SHADER);
+    sfm->addShaderFile("simple_particle.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("simple_particle.frag", GL_FRAGMENT_SHADER);
 
     if (CVS->supportsIndirectInstancingRendering())
     {

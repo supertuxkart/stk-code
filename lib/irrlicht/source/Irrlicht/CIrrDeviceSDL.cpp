@@ -761,6 +761,18 @@ void CIrrDeviceSDL::restoreWindow()
 	// do nothing
 }
 
+//! Move window to requested position
+bool CIrrDeviceSDL::moveWindow(int x, int y)
+{
+    return false;
+}
+
+//! Get current window position.
+bool CIrrDeviceSDL::getWindowPosition(int* x, int* y)
+{
+    return false;
+}
+
 
 //! returns if window is active. if not, nothing need to be drawn
 bool CIrrDeviceSDL::isWindowActive() const

@@ -48,15 +48,10 @@ ParticleKind::ParticleKind(const std::string &file)
     m_velocity_x     = 0.001f;
     m_velocity_y     = 0.001f;
     m_velocity_z     = 0.001f;
-    m_gravity_strength = 0.0f;
-    m_fade_away_start  = -1.0f;
-    m_fade_away_end    = -1.0f;
-    m_force_lost_to_gravity_time = 1000;
     m_emission_decay_rate = 0;
     m_has_scale_affector = false;
     m_scale_affector_factor_x = 0.0f;
     m_scale_affector_factor_y = 0.0f;
-    m_wind_speed = 0;
     m_flips = false;
     m_vertical_particles = false;
     m_randomize_initial_y = false;
@@ -139,6 +134,8 @@ ParticleKind::ParticleKind(const std::string &file)
             delete xml;
             throw std::runtime_error("[ParticleKind] <material> tag has invalid 'file' attribute");
         }
+        // Preload textures
+        getMaterial();
     }
 
     // ------------------------------------------------------------------------
@@ -198,40 +195,13 @@ ParticleKind::ParticleKind(const std::string &file)
 
     // ------------------------------------------------------------------------
 
-    const XMLNode* fadeout = xml->getNode("fadeout");
-    if (fadeout != NULL)
-    {
-        fadeout->get("time", &m_fadeout_time);
-    }
-
-    //std::cout << "m_fadeout_time = " << m_fadeout_time << "\n";
-
-    // ------------------------------------------------------------------------
-
-    const XMLNode* gravity = xml->getNode("gravity");
-    if (gravity != NULL)
-    {
-        gravity->get("strength",        &m_gravity_strength);
-        gravity->get("only-force-time", &m_force_lost_to_gravity_time);
-    }
-
-    // ------------------------------------------------------------------------
-
-    const XMLNode* fadeaway = xml->getNode("fade-away");
-    if (fadeaway != NULL)
-    {
-        fadeaway->get("start", &m_fade_away_start);
-        fadeaway->get("end",   &m_fade_away_end);
-    }
-
-
-    // ------------------------------------------------------------------------
-
     const XMLNode* materials = xml->getNode("materials");
     if (materials != NULL)
     {
         material_manager->pushTempMaterial(materials, file);
         m_material_file = material_manager->getLatestMaterial()->getTexFname();
+        // Preload textures
+        getMaterial();
     }
 
     // ------------------------------------------------------------------------
@@ -239,7 +209,6 @@ ParticleKind::ParticleKind(const std::string &file)
     const XMLNode* wind = xml->getNode("wind");
     if (wind != NULL)
     {
-        wind->get("speed", &m_wind_speed);
         wind->get("flips", &m_flips);
     }
 
@@ -261,7 +230,11 @@ Material* ParticleKind::getMaterial() const
     if (material_manager->hasMaterial(m_material_file))
     {
         Material* material = material_manager->getMaterial(m_material_file);
-        if (material == NULL || material->getTexture(true/*srgb*/, true/*premul_alpha*/) == NULL)
+        if (material == NULL ||
+            material->getTexture(true/*srgb*/,
+            material->getShaderType() == Material::SHADERTYPE_ADDITIVE ||
+            material->getShaderType() == Material::SHADERTYPE_ALPHA_BLEND ?
+            true : false/*premul_alpha*/) == NULL)
         {
             throw std::runtime_error("[ParticleKind] Cannot locate file " + m_material_file);
         }

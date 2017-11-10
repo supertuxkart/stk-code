@@ -50,12 +50,14 @@ STKTexture::STKTexture(const std::string& path, TexConfig* tc, bool no_upload)
             m_material = material_manager->getMaterialFor(this);
     }
 #ifndef SERVER_ONLY
-    if (m_tex_config && !CVS->isGLSL())
-        m_tex_config->m_srgb = false;
-#ifdef USE_GLES2
-    if (m_tex_config && !CVS->isDefferedEnabled())
-        m_tex_config->m_srgb = false;
-#endif
+    if (m_tex_config)
+    {
+        if ((!CVS->isARBSRGBFramebufferUsable() && !CVS->isDefferedEnabled()) ||
+            !CVS->isGLSL())
+        {
+            m_tex_config->m_srgb = false;
+        }
+    }
     if (!CVS->isARBTextureSwizzleUsable())
         m_single_channel = false;
 #endif
@@ -63,7 +65,7 @@ STKTexture::STKTexture(const std::string& path, TexConfig* tc, bool no_upload)
 }   // STKTexture
 
 // ----------------------------------------------------------------------------
-STKTexture::STKTexture(uint8_t* data, const std::string& name, size_t size,
+STKTexture::STKTexture(uint8_t* data, const std::string& name, unsigned int size,
                        bool single_channel, bool delete_ttl)
           : video::ITexture(name.c_str()), m_texture_handle(0),
             m_single_channel(single_channel), m_tex_config(NULL),
@@ -311,6 +313,7 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
 void STKTexture::formatConversion(uint8_t* data, unsigned int* format,
                                   unsigned int w, unsigned int h) const
 {
+#ifndef SERVER_ONLY
 #if defined(USE_GLES2)
     if (!m_single_channel)
     {
@@ -332,16 +335,19 @@ void STKTexture::formatConversion(uint8_t* data, unsigned int* format,
             if (alpha > 0.0f)
             {
                 alpha /= 255.0f;
-#if defined(USE_GLES2)
-                if (CVS->isDefferedEnabled())
-#endif
+
+                if (CVS->isARBSRGBFramebufferUsable() || 
+                    CVS->isDefferedEnabled())
+                {
                     alpha = pow(alpha, 1.0f / 2.2f);
+                }
             }
             data[i * 4] = (uint8_t)(data[i * 4] * alpha);
             data[i * 4 + 1] = (uint8_t)(data[i * 4 + 1] * alpha);
             data[i * 4 + 2] = (uint8_t)(data[i * 4 + 2] * alpha);
         }
     }
+#endif   // !SERVER_ONLY
 }   // formatConversion
 
 // ----------------------------------------------------------------------------

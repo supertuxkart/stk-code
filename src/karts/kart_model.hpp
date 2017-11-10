@@ -310,15 +310,26 @@ private:
     /** Pointer to the kart object belonging to this kart model. */
     AbstractKart* m_kart;
 
+    /** Tell the render type of this kart model, either colorized (red / blue now)
+     *  or transparent (ghost kart). */
     KartRenderType m_krt;
 
+    /** For our engine to get the desired hue / saturation for colorization. */
     RenderInfo* m_render_info;
 
+    /** True if this kart model can be colorization in red / blue (now only
+     *  used in soccer mode). */
     bool m_support_colorization;
 
+    /** Used to cache inverse bone matrices for each bone in straight frame
+     *  for attachment. */
     std::unordered_map<std::string, core::matrix4> m_inverse_bone_matrices;
 
+    /** Version of kart model (in kart.xml).  */
     unsigned m_version;
+
+    /** Exhaust particle file (xml) for the kart, empty if disabled.  */
+    std::string m_exhaust_xml;
 
     // ------------------------------------------------------------------------
     void initInverseBoneMatrices();
@@ -444,6 +455,8 @@ public:
     // ------------------------------------------------------------------------
     const core::matrix4&
                       getInverseBoneMatrix(const std::string& bone_name) const;
+    // ------------------------------------------------------------------------
+    const std::string& getExhaustXML() const          { return m_exhaust_xml; }
 
 };   // KartModel
 #endif

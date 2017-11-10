@@ -1038,7 +1038,7 @@ EventPropagation InputManager::input(const SEvent& event)
     else if (event.EventType == EET_TOUCH_INPUT_EVENT)
     {
         MultitouchDevice* device = m_device_manager->getMultitouchDevice();
-        unsigned int id = event.TouchInput.ID;
+        unsigned int id = (unsigned int)event.TouchInput.ID;
 
         if (device != NULL && id < device->m_events.size())
         {
@@ -1185,6 +1185,8 @@ EventPropagation InputManager::input(const SEvent& event)
 
         if (device && device->isAccelerometerActive())
         {
+            m_device_manager->updateMultitouchDevice();
+
             for (unsigned int i = 0; i < device->getButtonsCount(); i++)
             {
                 MultitouchButton* button = device->getButton(i);

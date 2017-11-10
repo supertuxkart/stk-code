@@ -342,6 +342,10 @@ check_error
 # Build apk
 echo "Building APK"
 
+sed -i "s/minSdkVersion=\".*\"/minSdkVersion=\"$SDK_VERSION\"/g" \
+       "$DIRNAME/AndroidManifest.xml"
+
+
 if [ "$BUILD_TOOL" = "gradle" ]; then
     export ANDROID_HOME="$SDK_PATH"
     gradle -Psdk_version=$SDK_VERSION           \

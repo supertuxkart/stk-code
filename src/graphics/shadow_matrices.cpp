@@ -476,7 +476,7 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
 
     if(!CVS->isARBUniformBufferObjectUsable())
         return;
-    
+
     tmp[144] = float(width);
     tmp[145] = float(height);
     glBindBuffer(GL_UNIFORM_BUFFER,

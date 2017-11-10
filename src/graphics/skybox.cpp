@@ -178,14 +178,17 @@ void Skybox::generateCubeMapFromTextures()
         }
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_cube_map);
-#if !defined(USE_GLES2)
-        GLint internal_format = CVS->isTextureCompressionEnabled() ?
-                                    GL_COMPRESSED_SRGB_ALPHA : GL_SRGB_ALPHA;
-        GLint format = GL_BGRA;
-#else
-        GLint internal_format = CVS->isDefferedEnabled() ? GL_SRGB8_ALPHA8
-                                                         : GL_RGBA8;
+
+        bool needs_srgb_format = CVS->isARBSRGBFramebufferUsable() || 
+                                 CVS->isDefferedEnabled();
+
         GLint format = GL_RGBA;
+        GLint internal_format = needs_srgb_format ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+#if !defined(USE_GLES2)
+        if (CVS->isTextureCompressionEnabled())
+            internal_format = needs_srgb_format ? GL_COMPRESSED_SRGB_ALPHA
+                                                : GL_COMPRESSED_RGBA;
+        format = GL_BGRA;
 #endif
 
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
@@ -203,7 +206,7 @@ void Skybox::generateSpecularCubemap()
 {
     glGenTextures(1, &m_specular_probe);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_specular_probe);
-    size_t cubemap_size = 256;
+    unsigned int cubemap_size = 256;
     for (int i = 0; i < 6; i++)
     {
 #if !defined(USE_GLES2)

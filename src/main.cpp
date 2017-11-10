@@ -237,6 +237,7 @@
 #include "utils/crash_reporting.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/log.hpp"
+#include "utils/mini_glm.hpp"
 #include "utils/translation.hpp"
 
 static void cleanSuperTuxKart();
@@ -1566,6 +1567,9 @@ int main(int argc, char *argv[] )
         main_loop = new MainLoop();
         material_manager->loadMaterial();
 
+        // Preload the explosion effects (explode.png)
+        ParticleKindManager::get()->getParticles("explosion.xml");
+
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
@@ -1968,6 +1972,8 @@ void runUnitTests()
 {
     Log::info("UnitTest", "Starting unit testing");
     Log::info("UnitTest", "=====================");
+    Log::info("UnitTest", "MiniGLM");
+    MiniGLM::unitTesting();
     Log::info("UnitTest", "GraphicsRestrictions");
     GraphicsRestrictions::unitTesting();
     Log::info("UnitTest", "NetworkString");
