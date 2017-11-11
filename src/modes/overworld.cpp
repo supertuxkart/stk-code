@@ -43,6 +43,7 @@ OverWorld::OverWorld() : World()
 {
     m_return_to_garage            = false;
     m_stop_music_when_dialog_open = false;
+    m_play_track_intro_sound      = false;
 }   // Overworld
 
 //-----------------------------------------------------------------------------
