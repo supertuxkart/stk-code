@@ -36,6 +36,10 @@ if (UNIX AND NOT APPLE)
     option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
 endif()
 
+if(UNIX OR MINGW)
+    option(DEBUG_SYMBOLS "Compile with debug symbols" OFF)
+endif()
+
 if(MSVC AND (MSVC_VERSION LESS 1900))
     # Normally hide the option to build wiiuse on VS, since it depends
     # on the installation of the Windows DDK (Driver Developer Kit),
@@ -89,6 +93,13 @@ endif()
 #if(DISABLE_VPX)
 #    add_definitions(-DNO_VPX)
 #endif()
+
+if(UNIX OR MINGW)
+    if(DEBUG_SYMBOLS)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+    endif()
+endif()
 
 # Build the Bullet physics library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
