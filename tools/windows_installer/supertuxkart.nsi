@@ -1,4 +1,5 @@
 ; Before you start you will need the shelllink plugin for NSIS
+; http://nsis.sourceforge.net/ShellLink_plug-in
 ; Download it from the nsis webpage, and unzip it in the NSIS
 ; install dir.
 ;
@@ -15,26 +16,51 @@
 
 ;--------------------------------
 ;Include Modern UI
-
   !include "MUI2.nsh"
+
+;--------------------------------
+;Include LogicLib http://nsis.sourceforge.net/LogicLib
+  !include 'LogicLib.nsh'
+
+;--------------------------------
+;Include FileFunc lib
+  !include "FileFunc.nsh"
 
 ;--------------------------------
 ;General
 
+  ; Version information
+  ; TOOD get these from the source code directly
+  !define VERSION_MAJOR 0
+  !define VERSION_MINOR 9
+  !define VERSION_REVISION 3
+  ; Empty means stable, could be -git, -rc1
+  !define VERSION_BUILD "-rc1"
+  
   ;Name and file
-  Name "SuperTuxKart"
-  OutFile "supertuxkart-installer.exe"
+  !define APPNAME "SuperTuxKart"
+  !define APPNAMEANDVERSION "${APPNAME} ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}${VERSION_BUILD}"
+  !define DESCRIPTION "3D open-source arcade racer with a variety characters, tracks, and modes to play"
+
+  Name "${APPNAMEANDVERSION}"
+  OutFile "${APPNAMEANDVERSION} installer.exe"
+
+  # These will be displayed by the "Click here for support information" link in "Add/Remove Programs"
+  # It is possible to use "mailto:" links in here to open the email client
+  !define HELPURL "https://supertuxkart.net/" # "Support Information" link
+  !define UPDATEURL "https://supertuxkart.net/" # "Product Updates" link
+  !define ABOUTURL "https://supertuxkart.net/" # "Publisher" link
 
   RequestExecutionLevel admin
 
   ;Default installation folder
-  InstallDir "$PROGRAMFILES\SuperTuxKart"
+  InstallDir "$PROGRAMFILES\${APPNAMEANDVERSION}"
 
   ;Get installation folder from registry if available
-  InstallDirRegKey HKCU "Software\SuperTuxKart" ""
+  InstallDirRegKey HKCU "Software\${APPNAMEANDVERSION}" ""
 
   ;Sets the text in the bottom corner
-  BrandingText "SuperTuxKart Installer"
+  BrandingText "${APPNAMEANDVERSION} Installer"
 
   ;Set the icon
   !define MUI_ICON "install.ico"
@@ -46,11 +72,15 @@
   ;!define MUI_TEXT_INSTALLING_SUBTITLE "Please vote for SuperTuxKart to become SourceForge's Project of the month at vote.supertuxkart.net"
   ;!define MUI_TEXT_FINISH_INFO_TEXT "Please vote for SuperTuxKart to become $\"Project of the Month$\" at vote.supertuxkart.net"
 
-  ;Sets the compressor to /SOLID lzma which when I tested was the best
-  SetCompressor /SOLID lzma
+  ; Sets the compressor to /SOLID lzma which when I (hiker) tested was the best.
+  ; Between LZMA and zlib there is only a 20 MB difference.
+  SetCompressor /SOLID zlib
 
   ;Vista redirects $SMPROGRAMS to all users without this
   RequestExecutionLevel admin
+
+  ; For the uninstaller in the remove programs
+  !define ADD_REMOVE_KEY_NAME "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAMEANDVERSION}"
 
 ;--------------------------------
 ;Variables
@@ -67,14 +97,14 @@
 Function validate_dir
   IfFileExists $INSTDIR\data\*.* 0 return
     IfFileExists $INSTDIR\Uninstall.exe 0 dont_uninstall
-      MessageBox MB_YESNO "You can't install SuperTuxKart in an existing directory. Do you wish to run the uninstaller in $INSTDIR?"  IDNO dont_uninstall
+      MessageBox MB_YESNO "You can't install ${APPNAMEANDVERSION} in an existing directory. Do you wish to run the uninstaller in $INSTDIR?"  IDNO dont_uninstall
 	; -?=$INSTDIR makes sure that this installer waits for the uninstaller
 	; to finish. The uninstaller (and directory) are not removed, but the
 	; uninstaller will be overwritten by our installer anyway.
         ExecWait '"$INSTDIR\Uninstall.exe" _?=$INSTDIR'
         goto return
     dont_uninstall:
-      MessageBox MB_OK "You can't install SuperTuxKart in an existing directory. Please select a new directory."
+      MessageBox MB_OK "You can't install ${APPNAMEANDVERSION} in an existing directory. Please select a new directory."
       abort
   return:
 FunctionEnd
@@ -90,7 +120,7 @@ FunctionEnd
 
   ;Start Menu Folder Page Configuration
   !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKCU"
-  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\SuperTuxKart"
+  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\${APPNAMEANDVERSION}"
   !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
   !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
 
@@ -137,7 +167,7 @@ FunctionEnd
 
 ;Installer Sections
 
-Section "Main Section" SecMain
+Section "Install" SecMain
 
   SetOutPath "$INSTDIR"
   ; files in root dir
@@ -169,23 +199,23 @@ Section "Main Section" SecMain
   ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\supertuxkart-editor\build\Release
 
   !ifdef EDITOR_PATH
-      File ${EDITOR_PATH}\supertuxkart-editor.exe ${EDITOR_PATH}\supertuxkart-editor.pdb
-      File ${EDITOR_PATH}\..\..\supertuxkart-editor.ico
+    File ${EDITOR_PATH}\supertuxkart-editor.exe ${EDITOR_PATH}\supertuxkart-editor.pdb
+    File ${EDITOR_PATH}\..\..\supertuxkart-editor.ico
   !endif
  
   File *.ico 
   ; prereqs
   SetOutPath "$INSTDIR\prerequisites"
   File /r prerequisites\*.*
+
   ; data + assets
   SetOutPath "$INSTDIR\data\"
   File /r /x .svn /x wip-* ..\..\..\stk-assets\*.*
   File /r /x *.sh ..\..\data\*.*
 
     
-
   ;Store installation folder
-  WriteRegStr HKCU "Software\SuperTuxKart" "" $INSTDIR
+  WriteRegStr HKCU "Software\${APPNAMEANDVERSION}" "" $INSTDIR
 
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
@@ -195,12 +225,34 @@ Section "Main Section" SecMain
     ;Create shortcuts
     SetShellVarContext all
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\uninstall.ico"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\SuperTuxKart.lnk" "$INSTDIR\supertuxkart.exe" "" "$INSTDIR\icon.ico"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart-editor (beta).lnk" "$INSTDIR\supertuxkart-editor.exe" "" "$INSTDIR\supertuxkart-editor.ico"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall ${APPNAMEANDVERSION}.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\uninstall.ico"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\${APPNAMEANDVERSION}.lnk" "$INSTDIR\supertuxkart.exe" "" "$INSTDIR\icon.ico"
+    !ifdef EDITOR_PATH
+      CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart-editor (beta).lnk" "$INSTDIR\supertuxkart-editor.exe" "" "$INSTDIR\supertuxkart-editor.ico"
+    !endif
     ShellLink::SetShortCutShowMode $SMPROGRAMS\$STARTMENU_FOLDER\SuperTuxKart.lnk 0
 
   !insertmacro MUI_STARTMENU_WRITE_END
+
+  ; Registry information for add/remove programs
+  ; See http://nsis.sourceforge.net/Add_uninstall_information_to_Add/Remove_Programs
+  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" \
+                 "DisplayName" "${APPNAMEANDVERSION} - ${DESCRIPTION}"
+  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "Publisher" "${APPNAME}"
+  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
+  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "DisplayIcon" "$\"$INSTDIR\icon.ico$\""
+  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "HelpLink" "$\"${HELPURL}$\""
+  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "URLUpdateInfo" "$\"${UPDATEURL}$\""
+  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "URLInfoAbout" "$\"${ABOUTURL}$\""
+  # There is no option for modifying or repairing the install
+  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "NoModify" 1
+  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "NoRepair" 1
+
+  ; Write size 
+  ; [...copy all files here, before GetSize...]
+  ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+  IntFmt $0 "0x%08X" $0
+  WriteRegDWORD HKLM "${ADD_REMOVE_KEY_NAME}" "EstimatedSize" "$0"
 
 SectionEnd
 
@@ -215,7 +267,7 @@ SectionEnd
 ;--------------------------------
 ;Uninstaller Section
 
-Section "Uninstall"redist
+Section "Uninstall" redist
 
   ;Removes all the supertuxkart data files
   ; DO NOT USE RMDIR ... $INSTDIR\*.*  - if someone should e.g.
@@ -234,7 +286,7 @@ Section "Uninstall"redist
   DELETE /REBOOTOK "$INSTDIR\libidn-11.dll"
   DELETE /REBOOTOK "$INSTDIR\License.txt"
   DELETE /REBOOTOK "$INSTDIR\freetype6.dll"
-  DELETE /REBOOTOK "$INSTDIR\ogg.dll"
+  DELETE /REBOOTOK "$INSTDIR\libogg.dll"
   DELETE /REBOOTOK "$INSTDIR\OpenAL32.dll"
   DELETE /REBOOTOK "$INSTDIR\physfs.dll"
   DELETE /REBOOTOK "$INSTDIR\pthreadVC2.dll"
@@ -247,11 +299,17 @@ Section "Uninstall"redist
   DELETE /REBOOTOK "$INSTDIR\supertuxkart-editor.ico"
   DELETE /REBOOTOK "$INSTDIR\supertuxkart-editor.pdb"
   DELETE /REBOOTOK "$INSTDIR\uninstall.ico"
-  DELETE /REBOOTOK "$INSTDIR\vorbis.dll"
+  DELETE /REBOOTOK "$INSTDIR\libvorbis.dll"
+  DELETE /REBOOTOK "$INSTDIR\libvorbisenc.dll"
+  DELETE /REBOOTOK "$INSTDIR\libvorbisfile.dll"
   DELETE /REBOOTOK "$INSTDIR\wrap_oal.dll"
   DELETE /REBOOTOK "$INSTDIR\zlib.dll"
   DELETE /REBOOTOK "$INSTDIR\zlib.pdb"
   DELETE /REBOOTOK "$INSTDIR\zlib1.dll"
+  DELETE /REBOOTOK "$INSTDIR\libjpeg-62.dll"
+  DELETE /REBOOTOK "$INSTDIR\libturbojpeg.dll"
+  DELETE /REBOOTOK "$INSTDIR\libvpx.dll"
+  DELETE /REBOOTOK "$INSTDIR\openglrecorder.dll"
 
   Delete /REBOOTOK "$INSTDIR\Uninstall.exe"
   RMDir "$INSTDIR"
@@ -261,8 +319,8 @@ Section "Uninstall"redist
   ;Remove start menu items
   !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
 
-  Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"
-  Delete "$SMPROGRAMS\$MUI_TEMP\supertuxkart.lnk"
+  Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall ${APPNAMEANDVERSION}.lnk"
+  Delete "$SMPROGRAMS\$MUI_TEMP\${APPNAMEANDVERSION}.lnk"
   Delete "$SMPROGRAMS\$MUI_TEMP\supertuxkart-editor (beta).lnk"
 
   ;Delete empty start menu parent diretories
@@ -278,7 +336,7 @@ Section "Uninstall"redist
     StrCmp $MUI_TEMP $SMPROGRAMS startMenuDeleteLoopDone startMenuDeleteLoop
   startMenuDeleteLoopDone:
 
-
-  DeleteRegKey /ifempty HKCU "Software\SuperTuxKart"
+  DeleteRegKey /ifempty HKCU "Software\${APPNAMEANDVERSION}"
+  DeleteRegKey HKLM "${ADD_REMOVE_KEY_NAME}"
 
 SectionEnd
