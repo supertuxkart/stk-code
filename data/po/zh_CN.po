@@ -3016,10 +3016,6 @@ msgstr "名称须为 4至 30 个字符！"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "最大玩家数须为 2 到 12 个！"
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  STK-team https://launchpad.net/~stk\n  Sizhuang Liu https://launchpad.net/~lsz\n  Xhacker Liu https://launchpad.net/~xhacker\n  acme_pjz https://launchpad.net/~acme-pjz\n  jin https://launchpad.net/~zhangj\n  lks https://launchpad.net/~lks\n  luojie-dune https://launchpad.net/~luojie-dune\n  sohey https://launchpad.net/~sohey33"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "更新"
@@ -4144,3 +4140,7 @@ msgstr "收集氮气瓶（转弯后将会用上）"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "哎呀呀！当你被困住了，按 <%s> 可以恢复哦"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nBen Au, 2015\nBenau, 2016\nBenau, 2015-2016\nJin Zhang, 2015\nDawid Gan\nSTK-team\nSizhuang Liu\nXhacker Liu\nacme_pjz\njin\nlks\nluojie-dune\nsohey"

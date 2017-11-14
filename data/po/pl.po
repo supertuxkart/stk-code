@@ -3031,10 +3031,6 @@ msgstr "Imię musi zawierać od 4 do 30 znaków!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Maksymalna ilość graczy musi mieścić się w zakresie od 2 do 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Auria https://launchpad.net/~auria-mg\n  Bill https://launchpad.net/~cges30901\n  Dawid Gan https://launchpad.net/~deveee\n  Kuba Polankowski https://launchpad.net/~tux4-b\n  Kuba Polankowski https://launchpad.net/~tux4-wp\n  Patryk Wychowaniec https://launchpad.net/~p98\n  STK-team https://launchpad.net/~stk\n  Twojwujaszek https://launchpad.net/~twojwujaszek-gmail"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Aktualizacja"
@@ -4162,3 +4158,7 @@ msgstr "Zbierz butelki z nitro (użyjemy ich za zakrętem)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Ups! Mamy kłopoty, wciśnij <%s> aby zawołać pomoc"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nDeve, 2015\nDeve, 2016-2017\nYogitex, 2016\nPatryk Wychowaniec, 2015-2016\nAuria\nBill\nDawid Gan\nKuba Polankowski\nPatryk Wychowaniec\nSTK-team\nTwojwujaszek"

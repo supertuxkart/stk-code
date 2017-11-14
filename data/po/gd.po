@@ -3030,10 +3030,6 @@ msgstr "Feumaidh an t-ainm a bhith eadar 4 is 30 caractar a dh’fhaid!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Feumaidh an àireamh as motha de chluicheadairean a bhith eadar 2 is 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  GunChleoc https://launchpad.net/~gunchleoc\n  STK-team https://launchpad.net/~stk"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Ùrachadh"
@@ -4161,3 +4157,7 @@ msgstr "Tog botalan naidhtreo (cleachdaidh sinn taobh thall na lùib iad)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Oich! Ma tha thu ann an staing, brùth air <%s> gus cobhair fhaighinn"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nGunChleoc, 2015-2017\nGunChleoc, 2012-2015\nDawid Gan\nGunChleoc\nSTK-team"

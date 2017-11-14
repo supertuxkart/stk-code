@@ -3023,10 +3023,6 @@ msgstr "Nosaukumam jābūt garumā no 4 līdz 30 rakstzīmēm!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Maksimālajam spēlētāju skaitam jābūt no 2 līdz 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "tulkotāja titri"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Atjaunināt"
@@ -4153,3 +4149,7 @@ msgstr "Savāc nitro pudeles (mēs tās izmantosim pēc līkuma)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Ak vai! Kad tu esi ķezā, nospied <%s>, lai tiktu izglābts!"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nLauris Lemhens, 2015-2016"

@@ -3019,10 +3019,6 @@ msgstr "El nom ha de tenir entre 4 i 30 caràcters!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "El nombre màxim de jugadors ha d'estar entre 2 i 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Aljullu https://launchpad.net/~aljullu\n  Dawid Gan https://launchpad.net/~deveee\n  Marc Coll Carrillo https://launchpad.net/~marc-coll-carrillo\n  STK-team https://launchpad.net/~stk\n  Tae-Wong SEO https://launchpad.net/~seotaewong40\n  VPablo https://launchpad.net/~villumar"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Actualitza"
@@ -4148,3 +4144,7 @@ msgstr "Recull ampolles de nitro (les farem servir després de la corba)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Ups! Quan tinguis problemes, prem <%s> per ser rescatat"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nMarc Coll Carrillo, 2012\nMarc Coll Carrillo, 2015-2017\nAljullu\nDawid Gan\nMarc Coll Carrillo\nSTK-team\nTae-Wong SEO\nVPablo"

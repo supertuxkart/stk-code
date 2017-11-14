@@ -3018,10 +3018,6 @@ msgstr "Namnet må vera mellom 4 og 30 teikn langt."
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Maksgrensa på talet på spelarar må vera mellom 2 og 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Karl Ove Hufthammer"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Oppdater"
@@ -4147,3 +4143,7 @@ msgstr "Plukk opp nitroflasker (me skal bruka dei etter svingen)."
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Oi sann! Når du får problem, kan du trykkja <%s> for å verta redda."
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nKarl Ove Hufthammer, 2011,2015-2016"

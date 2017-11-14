@@ -3021,10 +3021,6 @@ msgstr "¡El nombre debe tener entre 4 y 30 caracteres!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "El número máximo de jugadores debe estar entre 2 y 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Adolfo Jayme https://launchpad.net/~fitojb\n  Alejandro Pérez https://launchpad.net/~alexperezalonso\n  Alvaro Ortiz https://launchpad.net/~kirtash1197\n  CaArRi https://launchpad.net/~caarri91\n  David Ballesteros Mayo https://launchpad.net/~dividio\n  Dawid Gan https://launchpad.net/~deveee\n  DiegoJ https://launchpad.net/~diegojromerolopez\n  Eduardo Battaglia https://launchpad.net/~eduardo-battaglia\n  Eugenio M. Vigo https://launchpad.net/~evigo\n  Felipe Hommen https://launchpad.net/~felihommen\n  Jonay https://launchpad.net/~jonay-santana\n  Jose https://launchpad.net/~jose-medina-moreno\n  José Luis Bandala Pérez https://launchpad.net/~luis449bp\n  Leo Juszkiewicz https://launchpad.net/~juszr\n  LinuxNerdo https://launchpad.net/~catastro1\n  Louis DC https://launchpad.net/~1109558-y\n  Marc Coll Carrillo https://launchpad.net/~marc-coll-carrillo\n  Mariano Agüero https://launchpad.net/~nero1000000\n  Morgan w c. https://launchpad.net/~bunk-v\n  STK-team https://launchpad.net/~stk\n  Simón Roca https://launchpad.net/~simonaaf\n  Tae-Wong SEO https://launchpad.net/~seotaewong40\n  VPablo https://launchpad.net/~villumar\n  elhoir https://launchpad.net/~jfarroyo82\n  juanman https://launchpad.net/~juanmalbye\n  raven2286 https://launchpad.net/~r-casola\n  simon https://launchpad.net/~sianhulo\n  zer berros https://launchpad.net/~cerverros\n  Ángel https://launchpad.net/~pikapikan"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Actualizar"
@@ -4150,3 +4146,7 @@ msgstr "Recoge botellas de nitro (las usaremos después de la curva)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "¡Ups! Cuando tengas problemas, pulsa <%s> para que te rescaten"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nMarc Coll Carrillo, 2015-2017\nVeronica Sanchez, 2017\nWilliam Beltrán, 2016\nWilliam Beltrán, 2017\nAdolfo Jayme\nAlejandro Pérez\nAlvaro Ortiz\nCaArRi\nDavid Ballesteros Mayo\nDawid Gan\nDiegoJ\nEduardo Battaglia\nEugenio M. Vigo\nFelipe Hommen\nJonay\nJose\nJosé Luis Bandala Pérez\nLeo Juszkiewicz\nLinuxNerdo\nLouis DC\nMarc Coll Carrillo\nMariano Agüero\nMorgan w c.\nSTK-team\nSimón Roca\nTae-Wong SEO\nVPablo\nelhoir\njuanman\nraven2286\nsimon\nzer berros\nÁngel"

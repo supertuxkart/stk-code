@@ -3029,10 +3029,6 @@ msgstr "Res yw dhe'n hanow bos yntra 4 ha 30 lytheren yn hirder!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Res yw dhe'n niver ughella a warioryon bos ynter 2 ha 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  STK-team https://launchpad.net/~stk\n  kernow https://launchpad.net/~kernow"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Nowedhi"
@@ -4160,3 +4156,7 @@ msgstr "Kuntell botellow nitro (ni a wra devnydh anedha wosa an grommen)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Oups! Pan esos yn kaletter, gwask <%s> dhe vos sawyes"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nNicky Rowe, 2015-2016\nSTK-team\nkernow"

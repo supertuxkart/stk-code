@@ -3024,10 +3024,6 @@ msgstr "Ime treba sadržati od 4 do 30 karaktera!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Maksimalan broj igrača mora biti od 2 do 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Translator: Nikola Kantarević\nhttps://www.transifex.com/user/profile/Zonx/"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Ažuriranje"
@@ -4154,3 +4150,7 @@ msgstr "Sakupljajte boce nitro-a (koristićemo ih posle skretanja)."
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Ups! Kada ste u problemu, pritisnite <%s> kako biste bili spašeni."
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nNikola Kantarević, 2016-2017\n"

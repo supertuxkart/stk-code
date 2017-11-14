@@ -3022,10 +3022,6 @@ msgstr "Το όνομα πρέπει να εχει μήκος μεταξύ 4 κ�
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Ο μεγιστος αριθμός παικτών πρέπει να είναι μεταξύ 2 και 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  Konstantinos Thermos https://launchpad.net/~subdee\n  Nefeli Stylla https://launchpad.net/~nefeli-st\n  STK-team https://launchpad.net/~stk\n  Vangelis Skarmoutsos https://launchpad.net/~skarmoutsosv\n  Yannis Kaskamanidis https://launchpad.net/~ttnfy17\n  tzem https://launchpad.net/~athmakrigiannis"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Ενημέρωση"
@@ -4151,3 +4147,7 @@ msgstr "Συλλέξτε μπουκάλια νίτρου (θα τα χρησιμ
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Ουπς! Όταν είσαι σε μπελάδες πάτα το <%s> για να διασωθείς"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nGreekLUG, 2016\nGrigoris Pavlakis, 2016\nVangelis Skarmoutsos, 2015-2017\nWasilis Mandratzis-Walz, 2015\nDawid Gan\nKonstantinos Thermos\nNefeli Stylla\nSTK-team\nVangelis Skarmoutsos\nYannis Kaskamanidis\ntzem"

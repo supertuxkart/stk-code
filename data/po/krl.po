@@ -3018,10 +3018,6 @@ msgstr "Nimen piduhuon pidäy olla  4-30 merkii!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Kižuajien enimmäislugu pidäy olla 2-12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "#-#-#-#-#  0catalog.po (SuperTuxKart)  #-#-#-#-#\nMK\n\nLaunchpad Contributions:\n  MK\n  STK-team https://launchpad.net/~stk\n#-#-#-#-#  0catalog.po (SuperTuxKart)  #-#-#-#-#\nLaunchpad Contributions:\nMK, 2017"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Päivitä"
@@ -4147,3 +4143,7 @@ msgstr "Keriä nitrobutilkua (voit käyttiä niidy kiännälmyksen jälles)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "A voi voi! Puuttunet hädäh, paina <%s> ku sinuu pellastettas"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nC C, 2017\nMK\nLaunchpad Contributions:\nSTK-team\n#-#-#-#-#  0catalog.po (SuperTuxKart)  #-#-#-#-#\nMK, 2017"

@@ -3014,10 +3014,6 @@ msgstr "Исем кимендә 4, ә иң күбе 30 билгедән тоа �
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Уенчылар саны кимендә 2, ә иң күбе 12 була ала."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Яңартырга"
@@ -4142,3 +4138,7 @@ msgstr "Нитро баллоннарын җыегыз (без аларны бо
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Әгәр дә бәлага эләксәгез, сезне коткарсыннар өчен, <%s> төймәсенә басыгыз"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nБулат Ибраһим, 2015-2017\nDawid Gan"

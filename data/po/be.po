@@ -3029,10 +3029,6 @@ msgstr "Назва мае быць даўжынёй ад 4 да 30 сімвал�
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Максімальная колькасць гульцоў мае быць ад 2 да 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Mikhas Varantsou <meequz@gmail.com>, 2015"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Абнавіць"
@@ -4160,3 +4156,7 @@ msgstr "Збірайце бутэлькі з нітра (выкарыстаем 
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Ой! Калі ў вас праблемы, націсніце <%s> для выратавання."
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\n, 2015\nViktar Vauchkevich, 2017"

@@ -3021,10 +3021,6 @@ msgstr "A névnek 4 és 30 karakter közötti hosszúnak kell lennie!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "A játékosok legnagyobb számának 2 és 12 között kell lennie."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Balint https://launchpad.net/~lbekefi\n  Gyönki Bendegúz https://launchpad.net/~gyonkibendeguz\n  Jacob https://launchpad.net/~jacob11\n  Jf. Tasz https://launchpad.net/~jftatsz\n  Molditz György https://launchpad.net/~molditz\n  Papp Bence https://launchpad.net/~sclegnrbs\n  STK-team https://launchpad.net/~stk\n  Úr Balázs https://launchpad.net/~urbalazs"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Frissítés"
@@ -4150,3 +4146,7 @@ msgstr "Gyűjts nitrós üvegeket (a kanyar után fogjuk használni)."
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Hoppá! Amikor bajban vagy, nyomd meg ezt a kimentéshez: <%s>."
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nBalázs Úr, 2016-2017\nBangó Máté, 2016\nViktor Busanszki, 2015\nBalint\nGyönki Bendegúz\nJacob\nJf. Tasz\nMolditz György\nPapp Bence\nSTK-team\nÚr Balázs"

@@ -3022,10 +3022,6 @@ msgstr "Nomo estu longa inter 4 kaj 30 literoj!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "La maksimuma nombro de ludistoj estu inter 2 kaj 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Rubén https://launchpad.net/~sleepwalkdroid\n  STK-team https://launchpad.net/~stk\n  Éfrit https://launchpad.net/~efrit"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Ĝisdatigi"
@@ -4151,3 +4147,7 @@ msgstr "Kolektu nitrobotelojn (ni uzos ilin post kurvoj)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Ups! Kiam vi havos malfacilaĵojn, premu <%s> por esti savita."
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nJonas Marx, 2017\nRobin van der Vliet, 2015\nЛюбомир Василев, 2016\nЛюбомир Василев, 2016-2017\nRubén\nSTK-team\nÉfrit"

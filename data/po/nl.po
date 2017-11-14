@@ -3021,10 +3021,6 @@ msgstr "De naam moet tussen de 4 en 30 tekens lang zijn!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Het maximum aantal spelers moet tussen 2 en 12 liggen."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Amy Smile Kerkhof https://launchpad.net/~amy\n  Asciimonster https://launchpad.net/~asciimonster-myrealbox\n  Dawid Gan https://launchpad.net/~deveee\n  Foppe Benedictus https://launchpad.net/~foppe-benedictus\n  Guus https://launchpad.net/~guus-verbeek\n  Heimen Stoffels https://launchpad.net/~vistaus\n  Kaj-Ivar https://launchpad.net/~kaj-ivar\n  Koen_VL https://launchpad.net/~koenvl\n  STK-team https://launchpad.net/~stk\n  Ward Muylaert https://launchpad.net/~ward-muylaert\n  Willem Sonke https://launchpad.net/~willem-sonke\n  Wim Champagne https://launchpad.net/~fng-deactivatedaccount-deactivatedaccount\n  plutgamer https://launchpad.net/~plutgamer\n  toams https://launchpad.net/~toams"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Bijwerken"
@@ -4150,3 +4146,7 @@ msgstr "Verzamel flessen lachgas (we gebruiken ze na de bocht)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Oeps! Bij problemen druk <%s>"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nDennis Holierhoek, 2016\nFrans van Rijn, 2015-2016\nWard Muylaert, 2015-2017\nDavid Blaszyk, 2017\nAmy Smile Kerkhof\nAsciimonster\nDawid Gan\nFoppe Benedictus\nGuus\nHeimen Stoffels\nKaj-Ivar\nKoen_VL\nSTK-team\nWard Muylaert\nWillem Sonke\nWim Champagne\nplutgamer\ntoams"

@@ -3020,10 +3020,6 @@ msgstr "Navnet skal være imellem 4 og 30 tegn langt!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Det maksimale antal spillere skal være imellem 2 og 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  1001sd https://launchpad.net/~siadyhr\n  Aputsiaĸ Niels Janussen https://launchpad.net/~aj\n  Auria https://launchpad.net/~auria-mg\n  J https://launchpad.net/~rumbukken\n  Marcus Møller https://launchpad.net/~marcusmoller\n  STK-team https://launchpad.net/~stk\n\nscootergrisen"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Opdatér"
@@ -4149,3 +4145,7 @@ msgstr "Saml nitroflasker (vi bruger dem efter svinget)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Ups! Når du er i problemer, kan du trykke på <%s> for at blive reddet"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nJoe Hansen, 2009,2015\nscootergrisen, 2015-2017\nSøren Dyhr, 2015-2016\n1001sd\nAputsiaĸ Niels Janussen\nAuria\nJ\nMarcus Møller\nSTK-team\nscootergrisen"

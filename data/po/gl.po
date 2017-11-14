@@ -3021,10 +3021,6 @@ msgstr "O nome debe ter unha lonxitude entre 4 e 30 caracteres!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "O número máximo de xogadores debe estar entre 2 e 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Adrián Chaves Fernández https://launchpad.net/~gallaecio\n  Auria https://launchpad.net/~auria-mg\n  Miguel Anxo Bouzada https://launchpad.net/~mbouzada\n  Trutxo64 https://launchpad.net/~celestino-freire"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Actualizar"
@@ -4150,3 +4146,7 @@ msgstr "Recolle botellas de nitro (usaralas despois da curva)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Ups! Cando esteas en apuros, preme <%s> para que te rescaten."
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nAdrián Chaves Fernández, 2010,2015\nAdrián Chaves Fernández, 2015-2016\nAdrián Chaves Fernández, 2010\nAdrián Chaves Fernández, 2010-2011,2013\nAdrián Chaves Fernández\nAuria\nMiguel Anxo Bouzada\nTrutxo64"

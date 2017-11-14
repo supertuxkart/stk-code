@@ -3017,10 +3017,6 @@ msgstr ""
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr ""
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Arief Setiadi Wibowo https://launchpad.net/~q-thrynx\n  Aziz Rahmad https://launchpad.net/~azayrahmad\n  Dawid Gan https://launchpad.net/~deveee\n  Ega Zulfikar https://launchpad.net/~ega-bulb\n  Icho Y. Chandra https://launchpad.net/~project-zero\n  Muhammad Radifar https://launchpad.net/~m-radifar05\n  STK-team https://launchpad.net/~stk"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Perbarui"
@@ -4145,3 +4141,7 @@ msgstr "Kumpulkan botol nitro (kita akan menggunakannya setelah tikungan)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Ups! Ketika anda dalam masalah, tekan <%s> untuk diselamatkan"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nChristian "crse" Elbrianno, 2017\nIcho Yulian Chandra, 2016\nRaja Sulaiman, 2017\nArief Setiadi Wibowo\nAziz Rahmad\nDawid Gan\nEga Zulfikar\nIcho Y. Chandra\nMuhammad Radifar\nSTK-team"

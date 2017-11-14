@@ -3020,10 +3020,6 @@ msgstr "Navnet må være mellom 4 og 30 tegn langt."
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Maks antall spillere må være mellom 2 og 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Oversettelse ved:\nKarl Ove Hufthammer http://huftis.org/\nAllan Nordhøy epost@anotheragency.no\n\nTidligere:\nDawid Gan https://launchpad.net/~deveee\nEigil Iversen https://launchpad.net/~eig-iv\nMagne Djupvik https://launchpad.net/~magnedj\noyvindln https://launchpad.net/~oyvindln\nSTK-team https://launchpad.net/~stk\nTore Bergebakken https://launchpad.net/~toreb"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Oppdater"
@@ -4149,3 +4145,7 @@ msgstr "Plukk opp nitroflasker (vi skal bruke dem etter svingen)."
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Oi sann! Når du får problemer, kan du trykke <%s> for å bli reddet."
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nAllan Nordhøy, 2016-2017\nKarl Ove Hufthammer, 2015\nMagne Djupvik, 2017\nKarl Ove Hufthammer\nAllan Nordhøy, \nTidligere:\nDawid Gan\nEigil Iversen\nMagne Djupvik\noyvindln\nSTK-team\nTore Bergebakken"

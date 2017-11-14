@@ -3024,10 +3024,6 @@ msgstr "La taille du nom doit être comprise entre 4 et 30 caractères !"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Le nombre maximum de joueurs doit être compris entre 2 et 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Alexis Lavaud https://launchpad.net/~alexislavaud191\n  Audiger Jeremy https://launchpad.net/~tankypon\n  Auria https://launchpad.net/~auria-mg\n  Baptiste Fontaine https://launchpad.net/~bfontaine\n  Florent (LSc) https://launchpad.net/~lorkscorguar\n  Juju Croco https://launchpad.net/~juju-croco\n  Kalsan https://launchpad.net/~info-kalsan\n  Louis-Philippe Breton https://launchpad.net/~bf5man\n  MCMic https://launchpad.net/~come-bernigaud\n  Marwane K. https://launchpad.net/~marwane-ka\n  Max Perkins https://launchpad.net/~maxperkinstoki\n  Nicolas Delvaux https://launchpad.net/~malizor\n  Otourly https://launchpad.net/~otourly\n  STK-team https://launchpad.net/~stk\n  Syl https://launchpad.net/~syl-\n  Thomas P T https://launchpad.net/~thomaspt\n  londumas https://launchpad.net/~helion331990\n  math07 https://launchpad.net/~mathlaprise\n  noname120 https://launchpad.net/~devnoname120\n  tipiak https://launchpad.net/~tipiak\n  xapantu https://launchpad.net/~xapantu\n  xemard.nicolas https://launchpad.net/~xemard.nicolas\n  Éfrit https://launchpad.net/~efrit"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Mettre à jour"
@@ -4153,3 +4149,7 @@ msgstr "Récolte des bouteilles de nitro (nous allons les utiliser après le vir
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Oups ! Quand tu es en difficulté, appuie sur <%s> pour être secouru"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nadrien vigneron, 2015\nAuria, 2015-2017\ndevnoname120, 2015\nÉfrit, 2015\nnad0, 2015\nSylvain St-Amand, 2016-2017\nAlexis Lavaud\nAudiger Jeremy\nAuria\nBaptiste Fontaine\nFlorent (LSc)\nJuju Croco\nKalsan\nLouis-Philippe Breton\nMCMic\nMarwane K.\nMax Perkins\nNicolas Delvaux\nOtourly\nSTK-team\nSyl\nThomas P T\nlondumas\nmath07\nnoname120\ntipiak\nxapantu\nxemard.nicolas\nÉfrit"

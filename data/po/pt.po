@@ -3021,10 +3021,6 @@ msgstr "O nome tem de ter entre 4 e 30 caracteres!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "O número máximo de jogadores tem de ser entre 2 e 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Tradutores no Launchpad:\n  Auria https://launchpad.net/~auria-mg\n  Dawid Gan https://launchpad.net/~deveee\n  Bruno Ramalhete  https://launchpad.net/~bram-512\n  Douglas Moura https://launchpad.net/~araujodemoura\n  Evandro P. Alves https://launchpad.net/~evandro-pa\n  Fátima de Menezes Dantas https://launchpad.net/~fatima-menezes19\n  João Frade / 100 NOME https://launchpad.net/~100nome-portugal\n  Ricardo Conde https://launchpad.net/~turotulco\n  STK-team https://launchpad.net/~stk\n  Sérgio Marques https://launchpad.net/~sergio+marques"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Atualizar"
@@ -4150,3 +4146,7 @@ msgstr "Recolhe garrafas nitro (vamos usã-las depois da curva)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Aiii! Quando estiveres com problemas carrega na tecla <%s> para chamar o reboque"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nBruno Ramalhete, 2015\nRui, 2016-2017\nRui, 2016\nAuria\nDawid Gan\nBruno Ramalhete\nDouglas Moura\nEvandro P. Alves\nFátima de Menezes Dantas\nJoão Frade / 100 NOME\nRicardo Conde\nSTK-team\nSérgio Marques"

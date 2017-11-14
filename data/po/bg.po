@@ -3020,10 +3020,6 @@ msgstr "Дължината на името трябва да бъде между
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Максималният брой играчи трябва да бъде между 2 и 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Принос от Launchpad:\nDawid Gan https://launchpad.net/~deveee\nSvetoslav Stefanov https://launchpad.net/~svetlisashkov\nТрансифекс:\nЛюбомир Василев https://www.transifex.com/user/profile/lyubomirv/"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Обновяване"
@@ -4149,3 +4145,7 @@ msgstr "Събирай бутилки с азот (ще ги използвам�
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Опа! Когато си загазил, натисни <%s>, за да се спасиш"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nЛюбомир Василев, 2015-2016\nЛюбомир Василев, 2016-2017\nDawid Gan\nSvetoslav Stefanov\nТрансифекс:\nЛюбомир Василев"

@@ -3021,10 +3021,6 @@ msgstr "O nome deve ter entre 4 e 30 caracteres!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "O número máximo de jogadores deve ser entre 2 e 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Adevair Heleno https://launchpad.net/~adevairhpj\n  Average John https://launchpad.net/~averagejohn\n  Eberval Oliveira Castro https://launchpad.net/~eberval-gmail\n  Edvaldo de Souza Cruz https://launchpad.net/~edvaldoscruz\n  Felipe Menezes https://launchpad.net/~felipe-fmc1\n  Flávio Zavan https://launchpad.net/~flaviozavan\n  Guilherme Marçal https://launchpad.net/~ogabiefofo\n  Marcelo R. de Sa https://launchpad.net/~marcelo-jambu\n  Mateus Ferreira Silva https://launchpad.net/~mtsferreirasilva\n  Mihailov https://launchpad.net/~mihailov\n  Neliton Pereira Jr. https://launchpad.net/~nelitonpjr\n  Paulo Roberto de Oliveira Castro https://launchpad.net/~p-oliveira-castro\n  Pedro Folha https://launchpad.net/~pedrovi\n  Rafael Neri https://launchpad.net/~rafepel\n  Rodrigo Borges https://launchpad.net/~rbm0407\n  Rubens Bueno https://launchpad.net/~rubensvsbueno-l\n  STK-team https://launchpad.net/~stk\n  Teylo Laundos Aguiar https://launchpad.net/~teylo.aguiar\n  Vitor da Silva Gonçalves https://launchpad.net/~vitorsgoncalves\n  farrer https://launchpad.net/~farrer"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Atualizar"
@@ -4150,3 +4146,7 @@ msgstr "Colete os cilindros de nitro (nós os usaremos após a curva)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Ops! Se estiver em apuros, clique <%s> para ser salvo"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nAndré Marcelo Alvarenga, 2017\nflaviozavan, 2015-2017\nLaete Meireles, 2015\nPablo do Amaral Ferreira, 2015\nAdevair Heleno\nAverage John\nEberval Oliveira Castro\nEdvaldo de Souza Cruz\nFelipe Menezes\nFlávio Zavan\nGuilherme Marçal\nMarcelo R. de Sa\nMateus Ferreira Silva\nMihailov\nNeliton Pereira Jr.\nPaulo Roberto de Oliveira Castro\nPedro Folha\nRafael Neri\nRodrigo Borges\nRubens Bueno\nSTK-team\nTeylo Laundos Aguiar\nVitor da Silva Gonçalves\nfarrer"

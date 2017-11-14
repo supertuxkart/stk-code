@@ -3024,10 +3024,6 @@ msgstr "Ім’я має містити від 4 до 30 символів!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Максимальна кількість гравців має бути між 2 та 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  Helen Antonova https://launchpad.net/~vigonett\n  JOker https://launchpad.net/~spenser26\n  Maks Lyashuk aka Ma)(imuM https://launchpad.net/~probel\n  Pasha Sydoryshyn https://launchpad.net/~pandorrarv\n  Pavlo Bilyak https://launchpad.net/~pavlo1997\n  STK-team https://launchpad.net/~stk\n  Volodymyr Bodenchuk https://launchpad.net/~bodenchuk\n  Сергій Дубик https://launchpad.net/~dubyk-library"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Оновлення"
@@ -4154,3 +4150,7 @@ msgstr "Збирайте балони з нітро (використовуйт�
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Упс! Якщо у вас проблеми, тисніть <%s> для порятунку"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nfedik, 2015-2017\nMax Lyashuk, 2015-2016\nDawid Gan\nHelen Antonova\nJOker\nMaks Lyashuk aka Ma)(imuM\nPasha Sydoryshyn\nPavlo Bilyak\nSTK-team\nVolodymyr Bodenchuk\nСергій Дубик"

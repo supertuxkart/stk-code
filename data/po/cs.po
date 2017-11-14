@@ -3026,10 +3026,6 @@ msgstr "Je třeba, aby délka názvu byla 4 až 30 znaků!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Je třeba, aby hráči museli být nejméně 2 a nejvíce 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\nAri Green https://launchpad.net/~ariyoyah\nDavid Kolibáč https://launchpad.net/~david-kolibac\nDawid Gan https://launchpad.net/~deveee\ndonny https://launchpad.net/~michal-donat\ndtfjgk https://launchpad.net/~dtfjgk-deactivatedaccount\nFrantišek Zatloukal https://launchpad.net/~zatloukal-frantisek\nH0ff1 https://launchpad.net/~stefhoff\nJakub Talich https://launchpad.net/~jakub.talich-deactivatedaccount\nJakub Vaněk, 2015-2016\nJan Srb https://launchpad.net/~j-srb\nJirka Folta https://launchpad.net/~pholta-cz\nLukáš Machyán https://launchpad.net/~phobulos\nMichal Kundrát https://launchpad.net/~dreit\nMightyPork https://launchpad.net/~mighty-pork\nOndřej Holý https://launchpad.net/~ondrej-holy\nPavel Borecki, 2015\nPetr Wudi https://launchpad.net/~petr-wudi\nSTK-team https://launchpad.net/~stk\nTadeáš Pařík https://launchpad.net/~pariktadeas\nToMáš Marný, 2015\nToMáš Marný, 2015-2016\nTomáš Velecký https://launchpad.net/~elektron112"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Aktualizovat"
@@ -4156,3 +4152,7 @@ msgstr "Sbírejte láhve s nitrem (použijeme je za zatáčkou)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Jejda! Když jste v potížích, zachraňte se stisknutím <%s>"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nJakub Vaněk, 2015-2016\nPavel Borecki, 2015-2017\nToMáš Marný, 2015\nToMáš Marný, 2015-2016\nAri Green\nDavid Kolibáč\nDawid Gan\ndonny\ndtfjgk\nFrantišek Zatloukal\nH0ff1\nJakub Talich\nJan Srb\nJirka Folta\nLukáš Machyán\nMichal Kundrát\nMightyPork\nOndřej Holý\nPavel Borecki, 2015\nPetr Wudi\nSTK-team\nTadeáš Pařík\nTomáš Velecký"

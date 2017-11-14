@@ -3042,10 +3042,6 @@ msgstr "يجب أن يكون طول الاسم بين 4 محارف و30 محرف
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "يجب أن يكون أكبر عدد للاعبين بين 2 و12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "فريق عربآيز للتّرجمة http://www.arabeyes.org:\nصفا الفليج <safa1996alfulaij@gmail.com>\nالمترجمون السابقون (منصّة لنشباد):\nBenjamin Kerensa - Dawid Gan - Hichem Razgallah - Majid Al-Dharrab\nSAKOUM Yassine - STK-team - abdXelrhman - محمد الحرقان"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "حدّث"
@@ -4175,3 +4171,7 @@ msgstr "اجمع قنّينات النّيترو (سنستخدمها بعد ال
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "آخ! أنت في ورطة، اضغط <%s> لتُنقذ"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nBenamara Mohamed, 2015\nIbrahim Al-Darra, 2017\nMoaaz Mohamed, 2017\nصفا الفليج, 2015\nصفا الفليج, \nالمترجمون السابقون (منصّة لنشباد):\nBenjamin Kerensa - Dawid Gan - Hichem Razgallah - Majid Al-Dharrab\nSAKOUM Yassine - STK-team - abdXelrhman - محمد الحرقان"

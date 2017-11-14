@@ -3023,10 +3023,6 @@ msgstr "Etre 4 ha 30 arouezenn e rank bezañ hirder un anv !"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "An niver uc'hek a c'hoarierion a rank bezañ etre 2 ha 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Alan https://launchpad.net/~alan-m.\n  Dawid Gan https://launchpad.net/~deveee\n  STK-team https://launchpad.net/~stk"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Hizivaat"
@@ -4152,3 +4148,7 @@ msgstr "Dastum boutailhadoù nitro (ganto e vo graet goude ar gammdro)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Hopala ! Mar teuy kudennoù ouzhit, pouez war  <%s> da vezañ sikouret"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nAlan Monfort, 2015-2016\nGwenn M, 2015\nIrriep Nala Novram, 2017\nIrriep Nala Novram, 2016\nAlan\nDawid Gan\nSTK-team"

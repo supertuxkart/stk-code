@@ -3020,10 +3020,6 @@ msgstr "Nomen debet esse inter 4 et 30 litteras!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Numerus lusorum debet esse inter 2 et 12."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Gratiae translationis"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Renovatio"
@@ -4149,3 +4145,7 @@ msgstr "Collige nitrorum lagoenas (post flexum viae utimur)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Si in periculo sis, prem <%s> ut voces auxilium."
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nAlisa P, 2016\nAndré Lippok, 2016-2017\nSupernova 888, 2016"

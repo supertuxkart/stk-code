@@ -3027,10 +3027,6 @@ msgstr "Der Name muss zwischen 4 und 30 Zeichen lang sein!"
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Die Höchstanzahl der Spieler muss zwischen 2 und 12 liegen."
 
-#: src/states_screens/credits.cpp:180
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Auria https://launchpad.net/~auria-mg\n  Bendetto https://launchpad.net/~biengo\n  DHermit https://launchpad.net/~dhermit\n  DaBASCHT https://launchpad.net/~dabascht\n  David Roth https://launchpad.net/~davidroth9\n  Dawid Gan https://launchpad.net/~deveee\n  Dennis https://launchpad.net/~theradialactive\n  Evolution https://launchpad.net/~marcken-ritter\n  Felix https://launchpad.net/~felixk\n  Gerjet Kleine-Weischede https://launchpad.net/~gerjet-deactivatedaccount-deactivatedaccount\n  Gregor Santner https://launchpad.net/~gregi94\n  H0ff1 https://launchpad.net/~stefhoff\n  John Doe https://launchpad.net/~kulok1493-deactivatedaccount\n  Matthias Lange https://launchpad.net/~lange-matthias\n  Robert Kurz https://launchpad.net/~e-robert-kurz-hd\n  STK-team https://launchpad.net/~stk\n  Salesome https://launchpad.net/~xaver-bastiani-deactivatedaccount\n  Simeon https://launchpad.net/~simeon5\n  Tobias Bannert https://launchpad.net/~toba\n  Wolfs https://launchpad.net/~pizzaservice\n  Wuzzy https://launchpad.net/~wuzzy\n  cmdrhenner https://launchpad.net/~cmdrhenner\n  e https://launchpad.net/~e-blosz\n  enz https://launchpad.net/~markus-enzenberger\n  hiker https://launchpad.net/~hiker-luding\n  konstin https://launchpad.net/~konstin\n  pert7 https://launchpad.net/~pert7-deactivatedaccount"
-
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Aktualisieren"
@@ -4156,3 +4152,7 @@ msgstr "Sammle Nitro-Flaschen (wir werden sie nach der Kurve brauchen)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Upps! Wenn du ein Problem hast, drücke <%s>, um gerettet zu werden"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nWuzzy, 2015-2017\nbonifarz, 2015\nEttore Atalan, 2015-2017\nFlakebi, 2015\nhiker, 2015\nkonstin, 2015\nMaximilian Wagenbach, 2016\nTobias Markus, 2015-2016\nWasilis Mandratzis-Walz, 2015\nwesen, 2016\nAuria\nBendetto\nDHermit\nDaBASCHT\nDavid Roth\nDawid Gan\nDennis\nEvolution\nFelix\nGerjet Kleine-Weischede\nGregor Santner\nH0ff1\nJohn Doe\nMatthias Lange\nRobert Kurz\nSTK-team\nSalesome\nSimeon\nTobias Bannert\nWolfs\nWuzzy\ncmdrhenner\ne\nenz\nhiker\nkonstin\npert7"
