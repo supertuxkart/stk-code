@@ -35,7 +35,7 @@
   !define VERSION_MINOR 9
   !define VERSION_REVISION 3
   ; Empty means stable, could be -git, -rc1
-  !define VERSION_BUILD "-rc1"
+  !define VERSION_BUILD "-git"
   
   ;Name and file
   !define APPNAME "SuperTuxKart"
