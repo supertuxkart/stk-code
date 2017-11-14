@@ -6,13 +6,13 @@
 # lindwurm, 2015
 # Sugahara Masayuki <brindflontia@gmail.com>, 2015
 # lip_of_cygnus <Shinya1248@gmail.com>, 2015
-# 洩矢 諏訪子 <david@sudomail.ne.jp>, 2017
+# David Blaszyk <david@sudomail.ne.jp>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-10-24 10:06+0000\n"
+"PO-Revision-Date: 2017-11-13 00:19+0000\n"
 "Last-Translator: Auria <auria.mg@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/supertuxkart/supertuxkart/language/ja/)\n"
 "MIME-Version: 1.0\n"
@@ -3018,7 +3018,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:180
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nAuria https://launchpad.net/~auria-mg\nDawid Gan https://launchpad.net/~deveee\nlindwurm https://launchpad.net/~lindwurm\nlindwurm, 2015\nlip_of_cygnus, 2015\nSTK-team https://launchpad.net/~stk\nSugahara Masayuki, 2015\nTae-Wong SEO https://launchpad.net/~seotaewong40\ntkbd https://launchpad.net/~arolf\nxapantu https://launchpad.net/~xapantu\nYuki Shira https://launchpad.net/~shirayuking\n洩矢 諏訪子, 2017"
+msgstr "Launchpad Contributions:\n  Auria https://launchpad.net/~auria-mg\n  Dawid Gan https://launchpad.net/~deveee\n  STK-team https://launchpad.net/~stk\n  Tae-Wong SEO https://launchpad.net/~seotaewong40\n  Yuki Shira https://launchpad.net/~shirayuking\n  lindwurm https://launchpad.net/~lindwurm\n  tkbd https://launchpad.net/~arolf\n  xapantu https://launchpad.net/~xapantu"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

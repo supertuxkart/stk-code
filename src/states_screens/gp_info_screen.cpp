@@ -229,25 +229,27 @@ void GPInfoScreen::init()
     const bool has_AI = race_manager->hasAI();
     m_ai_kart_spinner->setVisible(has_AI);
     getWidget<LabelWidget>("ai-text")->setVisible(has_AI);
+
     if (has_AI)
     {
-        m_ai_kart_spinner->setActive(true);
-
-        // Avoid negative numbers (which can happen if e.g. the number of karts
-        // in a previous race was lower than the number of players now.
-        int num_ai = UserConfigParams::m_num_karts - race_manager->getNumLocalPlayers();
-        if (num_ai < 0) num_ai = 0;
-        m_ai_kart_spinner->setValue(num_ai);
-        race_manager->setNumKarts(num_ai + race_manager->getNumLocalPlayers());
-        m_ai_kart_spinner->setMax(stk_config->m_max_karts - race_manager->getNumLocalPlayers());
+        const int local_players = race_manager->getNumLocalPlayers();
+        int min_ai = 0;
+        int num_ai = UserConfigParams::m_num_karts - local_players;
+            
         // A ftl reace needs at least three karts to make any sense
-        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
-            m_ai_kart_spinner->setMin(3-race_manager->getNumLocalPlayers());
+            min_ai = std::max(0, 3 - local_players);
         }
-        else
-            m_ai_kart_spinner->setMin(0);
-
+        
+        num_ai = std::max(min_ai, num_ai);
+        UserConfigParams::m_num_karts = num_ai + local_players;
+        race_manager->setNumKarts(num_ai + local_players);
+            
+        m_ai_kart_spinner->setActive(true);
+        m_ai_kart_spinner->setValue(num_ai);
+        m_ai_kart_spinner->setMax(stk_config->m_max_karts - local_players);
+        m_ai_kart_spinner->setMin(min_ai);
     }   // has_AI
 
     addTracks();

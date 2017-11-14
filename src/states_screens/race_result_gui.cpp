@@ -201,6 +201,7 @@ void RaceResultGUI::enableAllButtons()
         // In case of a GP:
         // ----------------
         top->setVisible(false);
+        top->setFocusable(false);
 
         middle->setText(_("Continue"));
         middle->setVisible(true);
@@ -209,6 +210,11 @@ void RaceResultGUI::enableAllButtons()
         {
             bottom->setText(_("Abort Grand Prix"));
             bottom->setVisible(true);
+            bottom->setFocusable(true);
+        }
+        else
+        {
+            bottom->setFocusable(false);
         }
 
         middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);

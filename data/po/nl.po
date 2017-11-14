@@ -6,13 +6,13 @@
 # Dennis Holierhoek <dennis.hh@hotmail.com>, 2016
 # Frans van Rijn <asciimonster@yahoo.co.uk>, 2015-2016
 # Ward Muylaert <ward.muylaert@gmail.com>, 2015-2017
-# 洩矢 諏訪子 <david@sudomail.ne.jp>, 2017
+# David Blaszyk <david@sudomail.ne.jp>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-10-24 10:06+0000\n"
+"PO-Revision-Date: 2017-11-13 00:19+0000\n"
 "Last-Translator: Ward Muylaert <ward.muylaert@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/supertuxkart/supertuxkart/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -3023,7 +3023,7 @@ msgstr "Het maximum aantal spelers moet tussen 2 en 12 liggen."
 
 #: src/states_screens/credits.cpp:180
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nAmy Smile Kerkhof https://launchpad.net/~amy\nAsciimonster https://launchpad.net/~asciimonster-myrealbox\nDawid Gan https://launchpad.net/~deveee\nDennis Holierhoek, 2016\nFoppe Benedictus https://launchpad.net/~foppe-benedictus\nFrans van Rijn, 2015-2016\nGuus https://launchpad.net/~guus-verbeek\nHeimen Stoffels https://launchpad.net/~vistaus\nKaj-Ivar https://launchpad.net/~kaj-ivar\nKoen_VL https://launchpad.net/~koenvl\nplutgamer https://launchpad.net/~plutgamer\nSTK-team https://launchpad.net/~stk\ntoams https://launchpad.net/~toams\nWard Muylaert https://launchpad.net/~ward-muylaert\nWard Muylaert, 2015-2017\nWillem Sonke https://launchpad.net/~willem-sonke\nWim Champagne https://launchpad.net/~fng-deactivatedaccount-deactivatedaccount\n洩矢 諏訪子, 2017"
+msgstr "Launchpad Contributions:\n  Amy Smile Kerkhof https://launchpad.net/~amy\n  Asciimonster https://launchpad.net/~asciimonster-myrealbox\n  Dawid Gan https://launchpad.net/~deveee\n  Foppe Benedictus https://launchpad.net/~foppe-benedictus\n  Guus https://launchpad.net/~guus-verbeek\n  Heimen Stoffels https://launchpad.net/~vistaus\n  Kaj-Ivar https://launchpad.net/~kaj-ivar\n  Koen_VL https://launchpad.net/~koenvl\n  STK-team https://launchpad.net/~stk\n  Ward Muylaert https://launchpad.net/~ward-muylaert\n  Willem Sonke https://launchpad.net/~willem-sonke\n  Wim Champagne https://launchpad.net/~fng-deactivatedaccount-deactivatedaccount\n  plutgamer https://launchpad.net/~plutgamer\n  toams https://launchpad.net/~toams"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-10-24 10:06+0000\n"
+"PO-Revision-Date: 2017-11-13 00:19+0000\n"
 "Last-Translator: scootergrisen\n"
 "Language-Team: Danish (http://www.transifex.com/supertuxkart/supertuxkart/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -42,7 +42,7 @@ msgstr "Ærkefjende"
 
 #. I18N: ./data/achievements.xml
 msgid "Hit the same kart at least 5 times in one race."
-msgstr "Ram den samme kart mindst 5 gange i det samme løb."
+msgstr "Ram den samme kart mindst 5 gange i samme løb."
 
 #. I18N: ./data/achievements.xml
 msgid "Marathoner"
@@ -54,7 +54,7 @@ msgstr "Kør et løb med mindst 5 omgange."
 
 #. I18N: ./data/achievements.xml
 msgid "Skid-row"
-msgstr "Drifterkongen"
+msgstr "Drifter"
 
 #. I18N: ./data/achievements.xml
 msgid "Make 5 skidding in a single lap."
@@ -66,7 +66,7 @@ msgstr "Guldfører"
 
 #. I18N: ./data/achievements.xml
 msgid "Win against at least 3 opponents in all single player modes."
-msgstr "Vind over mindst 3 modstandere i alle enkelspillertilstande."
+msgstr "Vind over mindst 3 modstandere i alle tilstande med en spiller."
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
@@ -74,7 +74,7 @@ msgstr "Vild med powerup"
 
 #. I18N: ./data/achievements.xml
 msgid "Use 10 or more powerups in a race."
-msgstr "Brug 10 eller flere powerups i ét løb."
+msgstr "Brug 10 eller flere powerups i samme løb."
 
 #. I18N: ./data/achievements.xml
 msgid "Unstoppable"
@@ -108,7 +108,7 @@ msgstr "Myggejæger"
 msgid ""
 "Take your opponents for mosquitos! With the swatter, squash at least 5 of "
 "them in a race."
-msgstr "Opfat dine modstandere som myg! Med fluesmækkeren skal du knuse mindst 5 i et løb."
+msgstr "Lad dine modstandere være myg! Brug fluesmækkeren til at smaske mindst 5 af dem i et løb."
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 msgid "Penguin Playground"
@@ -271,7 +271,7 @@ msgstr "Behold denne opløsning"
 #. I18N: ./data/gui/credits.stkgui
 #. I18N: Title in credits screen
 msgid "Credits"
-msgstr "Rulletekster"
+msgstr "Anerkendelser"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -300,7 +300,7 @@ msgstr "Bloom"
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Light shaft (God rays)"
-msgstr "Crepuscularstråler (tusmørkestråler)"
+msgstr "Tusmørkestråler"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -464,12 +464,12 @@ msgstr "Fortsæt"
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Record the race for ghost replay"
-msgstr "Optag løbet for spøgelsesgenafspilning"
+msgstr "Optag løbet for spøgelsesgengivelse"
 
 #. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
 msgid "Watch replay only"
-msgstr "Vis kun genafspilning"
+msgstr "Vis kun gengivelse"
 
 #. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info screen action
@@ -485,17 +485,17 @@ msgstr "Start løb"
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Ghost Replay Selection"
-msgstr "Valg for spøgelsesgenafspilning"
+msgstr "Valg for spøgelsesgengivelse"
 
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Only show replays matching the current difficulty"
-msgstr "Vis kun genafspilninger med den aktuelle sværhedsgrad"
+msgstr "Vis kun gengivelser med den nuværende sværhedsgrad"
 
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Record ghost replay"
-msgstr "Optag spøgelsesgenafspilning"
+msgstr "Optag spøgelsesgengivelse"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -621,7 +621,7 @@ msgstr "Flere spillere"
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: Tab in help menu
 msgid "Bananas"
-msgstr "Bananas"
+msgstr "Bananaer"
 
 #. I18N: ./data/gui/help1.stkgui
 msgid "Start the tutorial"
@@ -645,7 +645,7 @@ msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key. You can see your current level of nitro in the"
 " bar at the right of the game screen."
-msgstr "Indsamling af nitro gør, at du får hastighedsboosts, når du ønsker det, ved at trykke på den korrekte tast. Du kan se din aktuelle nitrobeholdning i bjælken til højre på spilskærmen."
+msgstr "Indsamling af nitro gør, at du får hastighedsboosts, når du ønsker det, ved at trykke på den korrekte tast. Du kan se din nuværende nitrobeholdning i bjælken til højre på spilskærmen."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -662,7 +662,7 @@ msgstr "Med drift-tasten kan du dreje skarpt i sving og få et boost."
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
 msgid "* Current key bindings can be seen/changed in menu Options"
-msgstr "* Aktuelle tastaturindstillinger kan ses/ændres i indstillingsmenuen"
+msgstr "* Nuværende tastebindinger kan ses/ændres i indstillingsmenuen"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
@@ -706,7 +706,7 @@ msgstr "Bytter - gaveæsker bliver, i en kort periode, lavet om til bananer og o
 msgid ""
 "Basket Ball - bounces after the leader, and might squash and slow down karts"
 " down on the way."
-msgstr "Basketball - hopper efter den førende spiller og kan også smaske andre spiller undervejs."
+msgstr "Basketball - hopper efter den førende spiller og smasker måske andre karts undervejs så de kører langsommere."
 
 #. I18N: ./data/gui/help2.stkgui
 msgid "Swatter - will squash karts close by, slowing them down."
@@ -721,14 +721,14 @@ msgstr "SuperTuxKart har flere forskellige spiltilstande"
 msgid ""
 "Regular Race: All blows allowed, so catch weapons and make clever use of "
 "them!"
-msgstr "Normalt løb: Alt er tilladt, så skaf nogle våben og brug dem klogt!"
+msgstr "Normalt løb: Alt er tilladt, så grib nogle våben og brug dem klogt!"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 msgid ""
 "Time Trial: Contains no powerups, so only your driving skills matter! This "
 "mode allows you to record the race for replaying."
-msgstr "Tidskørsel: Har ingen powerups, så det er kun ens kørefærdigheder, der har betydning! Med denne tilstand kan du optage løbet for genafspilning."
+msgstr "Tidskørsel: Ingen powerups, så det er kun dine kørefærdigheder, der har betydning! I denne tilstand kan du optage løbet for gengivelse."
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -780,7 +780,7 @@ msgid ""
 "keyboard(s), however each player will need a different set of keys, and keep"
 " in mind that most keyboards are not appropriate for multiplayer gameplay "
 "because they do not support large number of keypresses."
-msgstr "Først skal du bruge flere input-enheder (flere gamepads eller joysticks er den bedste måde at spille med mange personer). Gå ind i skærmen input-konfigurationen og indstil gamepads. Man kan også spille på tastatur(er), men så skal hver spiller bruge unikke taster, og husk på, at de fleste tastaturer ikke er velegnede til spil med flere spillere, da de ikke understøtter mange samtidige tastetryk."
+msgstr "Først skal du bruge flere inputenheder (flere gamepads eller joysticks er den bedste måde at spille med mange personer). Gå ind i skærmen input-konfigurationen og indstil gamepads. Man kan også spille på tastatur(er), men så skal hver spiller bruge unikke taster, og husk på, at de fleste tastaturer ikke er velegnede til spil med flere spillere, da de ikke understøtter mange samtidige tastetryk."
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -791,7 +791,7 @@ msgid ""
 " the game. Each player can use their input device to select their kart. The "
 "game continues when everyone selected their kart. Note that the mouse may "
 "not be used for this operation."
-msgstr "Når inputenhederne er indstillet er du klar til at spille. Vælg \"flere spillere\"-ikonet i hovedmenuen. Når det bliver tid til at vælge kart, kan hver spiller trykke på \"skyd\"-tasten på deres joystick/controller/tastatur for at deltage. Hver spiller bruger sin inputenhed til at vælge bil. Spillet fortsætter, når alle har valgt deres kart. Bemærk at, musen ikke kan benyttes til dette."
+msgstr "Når inputenhederne er konfigureret er du klar til at spille. Vælg \"flere spillere\"-ikonet i hovedmenuen. Når det bliver tid til at vælge kart, kan hver spiller trykke på \"skyd\"-tasten på deres joystick/controller/tastatur for at deltage. Hver spiller bruger deres inputenhed til at vælge kart. Spillet fortsætter, når alle har valgt deres kart. Bemærk at, musen ikke kan bruges."
 
 #. I18N: ./data/gui/help5.stkgui
 msgid ""
@@ -1005,7 +1005,7 @@ msgstr "Servernavn"
 #. I18N: ./data/gui/online/lobby_settings.stkgui
 #. I18N: In the lobby settings screen
 msgid "Max. number of players"
-msgstr "Maksimalt antal spillere"
+msgstr "Maks. antal spillere"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -1242,7 +1242,7 @@ msgstr "Adgangskode:"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "Change"
-msgstr "Ændr"
+msgstr "Skift"
 
 #. I18N: ./data/gui/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
@@ -1465,7 +1465,7 @@ msgstr "Tilbage til enhedslisten"
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
 msgid "Press enter or double-click on a device to configure it"
-msgstr "Tryk på <enter> eller dobbeltklik på en enhed for at indstille den"
+msgstr "Tryk på <enter> eller dobbeltklik på en enhed for at konfigurere den"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: In the input configuration screen
@@ -1477,7 +1477,7 @@ msgstr "Tilføj en enhed"
 msgid ""
 "* Which config to use will be inferred from which 'Select' key is pressed to"
 " join the game."
-msgstr "* Hvilken tastaturindstilling der vil blive benyttet, vil blive bestemt ud fra hvilken \"Vælg\"-tast, der bliver trykket, for at deltage i spillet."
+msgstr "* Hvilken konfiguration der bruges, bestemmes ud fra hvilken \"Vælg\"-tast der bliver trykket på, for at deltage i spillet."
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: Section in the settings menu
@@ -1565,12 +1565,12 @@ msgstr "Grafikeffektniveau"
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Custom settings..."
-msgstr "Brugerdefinerede indstillinger..."
+msgstr "Tilpasset indstillinger..."
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Vertical Sync (requires restart)"
-msgstr "VSync (kræver genstart)"
+msgstr "Lodret synkronisering (kræver genstart)"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
@@ -1585,7 +1585,7 @@ msgstr "Fuldskærm"
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Remember window location"
-msgstr "Husk vinduesplacering"
+msgstr "Husk vinduets placering"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
@@ -2033,13 +2033,13 @@ msgstr "Gæst %d"
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
-msgstr "Din indstillingsfil var gået i stykket, så den er blevet slettet og en ny oprettet."
+msgstr "Din konfigurationsfil var udformet forkert, så den blev slettet og en ny oprettet."
 
 #: src/config/user_config.cpp:711
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
-msgstr "Din indstillingsfil var for gammel, så den er blevet slettet og en ny oprettet."
+msgstr "Din konfigurationsfil var for gammel, så den blev slettet og en ny oprettet."
 
 #: src/graphics/irr_driver.cpp:535
 msgid "Video recording started."
@@ -2052,7 +2052,7 @@ msgstr "Video gemt i \"%s\"."
 
 #: src/graphics/irr_driver.cpp:545
 msgid "Encoding progress:"
-msgstr "Kodningsfremgang:"
+msgstr "Kodningsforløb:"
 
 #: src/graphics/irr_driver.cpp:1682
 #, c-format
@@ -2566,11 +2566,11 @@ msgstr "Museakse %d %s"
 #. I18N: shown when config file is too old
 #: src/input/device_manager.cpp:543
 msgid "Please re-configure your key bindings."
-msgstr "Genindstil dine tastaturindstillinger."
+msgstr "Konfigurer dine tastebindinger igen."
 
 #: src/input/device_manager.cpp:544
 msgid "Your input config file is not compatible with this version of STK."
-msgstr "Din input-indstillingsfil er ikke kompatibel med denne STK-version."
+msgstr "Din input-konfigurationsfil er ikke kompatibel med denne STK-version."
 
 #. I18N: Name of the black button on xbox controller
 #: src/input/gamepad_config.cpp:167
@@ -2721,7 +2721,7 @@ msgstr "Straftid!!"
 
 #: src/karts/controller/local_player_controller.cpp:243
 msgid "Don't accelerate before go"
-msgstr "Accellerér ikke før startsignalet er givet"
+msgstr "Accellerér ikke før løbet er sat i gang"
 
 #: src/karts/controller/spare_tire_ai.cpp:147
 msgid "You can have at most 3 lives!"
@@ -2895,12 +2895,12 @@ msgstr "Fodbold"
 
 #: src/replay/replay_recorder.cpp:183
 msgid "Incomplete replay file will not be saved."
-msgstr "Ufuldstændig genafspilningsfil vil ikke blive gemt."
+msgstr "Ufuldstændig gengivelsesfil vil ikke blive gemt."
 
 #: src/replay/replay_recorder.cpp:219
 #, c-format
 msgid "Replay saved in \"%s\"."
-msgstr "Genafspilning gemt i \"%s\"."
+msgstr "Gengivelse gemt i \"%s\"."
 
 #: src/states_screens/addons_screen.cpp:50
 msgid "1 week"
@@ -2997,7 +2997,7 @@ msgstr "Tilfældig arena"
 msgid "%d arena unavailable in single player."
 msgid_plural "%d arenas unavailable in single player."
 msgstr[0] "%d utilgængelig arena i en spiller."
-msgstr[1] "%d utilgængelige arenaer i enspiller."
+msgstr[1] "%d utilgængelige arenaer i en spiller."
 
 #: src/states_screens/create_server_screen.cpp:82
 msgid "Create LAN Server"
@@ -3022,7 +3022,7 @@ msgstr "Det maksimale antal spillere skal være imellem 2 og 12."
 
 #: src/states_screens/credits.cpp:180
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n\n1001sd https://launchpad.net/~siadyhr\nAputsiaĸ Niels Janussen https://launchpad.net/~aj\nAuria https://launchpad.net/~auria-mg\nJ https://launchpad.net/~rumbukken\nJoe Hansen, 2009,2015\nMarcus Møller https://launchpad.net/~marcusmoller\nscootergrisen\nscootergrisen, 2015-2017\nSTK-team https://launchpad.net/~stk\nSøren Dyhr, 2015-2016"
+msgstr "Launchpad Contributions:\n  1001sd https://launchpad.net/~siadyhr\n  Aputsiaĸ Niels Janussen https://launchpad.net/~aj\n  Auria https://launchpad.net/~auria-mg\n  J https://launchpad.net/~rumbukken\n  Marcus Møller https://launchpad.net/~marcusmoller\n  STK-team https://launchpad.net/~stk\n\nscootergrisen"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
@@ -3077,7 +3077,7 @@ msgid ""
 "To add a new Gamepad/Joystick device, simply start SuperTuxKart with it connected and it will appear in the list.\n"
 "\n"
 "To add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to the computer. Remember that everyone still needs different keybindings in this case.)"
-msgstr "For at tilføje en ny controller/joystick, skal du bare starte SuperTuxKart, mens det er tilsluttet, og den vil vise sig i listen.\n\nFor at tilføje en tastaturindstilling, kan du bruge nedenstående knap, men vær opmærksom på, at mange tastaturer kun understøtter et begrænset antal samtidige tryk, og er derfor upassende til spil med flere spillere. (du kan dog forbinde flere tastaturer til samme computer. Husk blot at alle spillere stadig har brug for unikke tastaturindstillinger)."
+msgstr "For at tilføje en ny controller/joystick, skal du bare starte SuperTuxKart, mens det er tilsluttet, og den vil vise sig i listen.\n\nFor at tilføje en tastaturkonfiguration, kan du bruge nedenstående knap, men vær opmærksom på, at mange tastaturer kun understøtter et begrænset antal samtidige tryk, og er derfor upassende til spil med flere spillere. (du kan dog forbinde flere tastaturer til samme computer. Husk blot at alle spillere stadig har brug for unikke tastebindinger)."
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:90
@@ -3238,7 +3238,7 @@ msgstr "Nitroudfordring"
 #: src/states_screens/dialogs/select_challenge.cpp:151
 #: src/states_screens/race_setup_screen.cpp:136
 msgid "Ghost replay race"
-msgstr "Spøgelsesgenafspilningsløb"
+msgstr "Løb med spøgelsesgengivelse"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:75
 msgid "Server successfully created. You can now join it."
@@ -3279,7 +3279,7 @@ msgstr "Arbejder"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:171
 msgid "Fetching last vote"
-msgstr "Får fat i sidste stemme"
+msgstr "Henter sidste stemme"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:190
 msgid "You can adapt your previous rating by clicking the stars beneath."
@@ -3479,7 +3479,7 @@ msgstr "Vent venligst mens udvidelserne indlæses"
 
 #: src/states_screens/online_profile_achievements.cpp:79
 msgid "Progress"
-msgstr "Fremgang"
+msgstr "Forløb"
 
 #: src/states_screens/online_profile_achievements.cpp:131
 #: src/states_screens/online_profile_achievements.cpp:171
@@ -3532,7 +3532,7 @@ msgstr "Handling"
 
 #: src/states_screens/options_screen_device.cpp:72
 msgid "Key binding"
-msgstr "Tastaturindstillling"
+msgstr "Tastebinding"
 
 #. I18N: button to disable a gamepad configuration
 #: src/states_screens/options_screen_device.cpp:96
@@ -3674,7 +3674,7 @@ msgstr "I flere spillere-tilstand kan spillere vælge profiler med handikap (sv�
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options_screen_ui.cpp:191
 msgid "System Language"
-msgstr "Systemsprog"
+msgstr "Systemets sprog"
 
 #. I18N: custom video settings
 #: src/states_screens/options_screen_video.cpp:433
@@ -3757,7 +3757,7 @@ msgstr "Glød (omrids): %s"
 #: src/states_screens/options_screen_video.cpp:521
 #, c-format
 msgid "Light shaft (God rays): %s"
-msgstr "Crepuscularstråler (tusmørkestråler): %s"
+msgstr "Tusmørkestråler: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:525
@@ -3903,7 +3903,7 @@ msgstr "Bane %i/%i"
 
 #: src/states_screens/race_result_gui.cpp:1304
 msgid "Grand Prix progress:"
-msgstr "Grandprix-fremgang:"
+msgstr "Grandprix-forløb:"
 
 #: src/states_screens/race_result_gui.cpp:1346
 msgid "Highscores"
@@ -3925,7 +3925,7 @@ msgstr "Alt er tilladt, så grib nogle våben og brug dem klogt!"
 
 #: src/states_screens/race_setup_screen.cpp:94
 msgid "Contains no powerups, so only your driving skills matter!"
-msgstr "Har ingen powerups, så det er kun ens kørefærdigheder der har betydning!"
+msgstr "Ingen powerups, så det er kun dine kørefærdigheder, der har betydning!"
 
 #. I18N: short definition for follow-the-leader game mode
 #: src/states_screens/race_setup_screen.cpp:107
@@ -3988,7 +3988,7 @@ msgstr "Internetadgang er slået fra. Du kan slå det til i indstillingerne"
 #: src/states_screens/server_selection.cpp:79
 #: src/states_screens/server_selection.cpp:247
 msgid "Fetching servers"
-msgstr "Får fat i servere"
+msgstr "Henter servere"
 
 #. I18N: track group name
 #: src/states_screens/tracks_and_gp_screen.cpp:144
@@ -4042,12 +4042,12 @@ msgstr "Du skal indtaste en adgangskode."
 #: src/states_screens/user_screen.cpp:505
 #, c-format
 msgid "Logging out '%s'"
-msgstr "Logger \"%s\" ud"
+msgstr "Logger ud som \"%s\""
 
 #: src/states_screens/user_screen.cpp:506
 #, c-format
 msgid "Logging in '%s'"
-msgstr "Logger \"%s\" ind"
+msgstr "Logger ind som \"%s\""
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/user_screen.cpp:595

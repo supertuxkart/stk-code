@@ -7,7 +7,7 @@
 # Capri <musicsuse@gmx.com>, 2015
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
 # GenghisKhan <genghiskhan@gmx.ca>, 2015-2016
-# Liran <liranvaknin@gmail.com>, 2016
+# Liran <liranvaknin@gmail.com>, 2016-2017
 # Yevgney Sliosarenko, 2015
 # ‫רואי לוי‬‎ <roei1234567@gmail.com>, 2016
 msgid ""
@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-10-24 10:06+0000\n"
-"Last-Translator: Auria <auria.mg@gmail.com>\n"
+"PO-Revision-Date: 2017-11-13 00:19+0000\n"
+"Last-Translator: Liran <liranvaknin@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/supertuxkart/supertuxkart/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -942,7 +942,7 @@ msgstr ""
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Sensitivity"
-msgstr ""
+msgstr "רגישות"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 msgid "Restore defaults"
@@ -3026,7 +3026,7 @@ msgstr "המספר המרבי של שחקנים חייב להיות בין 2 ל1
 
 #: src/states_screens/credits.cpp:180
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nAsael https://launchpad.net/~asaelr\nAuria https://launchpad.net/~auria-mg\nBLooperZ, 2016-2017\nCapri, 2015\nDdorda https://launchpad.net/~ddorda\nGenghisKhan https://launchpad.net/~genghiskhan\nGenghisKhan, 2015-2016\nJorge Mariano https://launchpad.net/~jmariano\nLeo Juszkiewicz https://launchpad.net/~juszr\nLiran, 2016\nNiv Baehr https://launchpad.net/~rzil\nReuma Mordechai https://launchpad.net/~reumamordechai\nShai Shapira https://launchpad.net/~shayshap\nShimi Chen https://launchpad.net/~shimi-chen\nSTK-team https://launchpad.net/~stk\nYaron https://launchpad.net/~sh-yaron\nYevgney Sliosarenko, 2015\n‫רואי לוי‬‎, 2016"
+msgstr "Launchpad Contributions:\n  Asael https://launchpad.net/~asaelr\n  Auria https://launchpad.net/~auria-mg\n  Ddorda https://launchpad.net/~ddorda\n  GenghisKhan https://launchpad.net/~genghiskhan\n  Jorge Mariano https://launchpad.net/~jmariano\n  Leo Juszkiewicz https://launchpad.net/~juszr\n  Niv Baehr https://launchpad.net/~rzil\n  Reuma Mordechai https://launchpad.net/~reumamordechai\n  STK-team https://launchpad.net/~stk\n  Shai Shapira https://launchpad.net/~shayshap\n  Shimi Chen https://launchpad.net/~shimi-chen\n  Yaron https://launchpad.net/~sh-yaron"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

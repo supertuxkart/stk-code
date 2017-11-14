@@ -939,21 +939,22 @@ bool CIrrDeviceLinux::createWindow()
 		attributes.event_mask |= PointerMotionMask |
 				ButtonPressMask | KeyPressMask |
 				ButtonReleaseMask | KeyReleaseMask;
+				
+	Atom *list;
+	Atom type;
+	int form;
+	unsigned long remain, len;
+
+	Atom WMCheck = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", false);
+	Status s = XGetWindowProperty(display, DefaultRootWindow(display),
+								  WMCheck, 0L, 1L, False, XA_WINDOW,
+								  &type, &form, &len, &remain,
+								  (unsigned char **)&list);
+	XFree(list);
+	bool netWM = (s == Success) && len;		
 
 	if (!CreationParams.WindowId)
 	{
-		Atom *list;
-		Atom type;
-		int form;
-		unsigned long remain, len;
-
-		Atom WMCheck = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", false);
-		Status s = XGetWindowProperty(display, DefaultRootWindow(display),
-									  WMCheck, 0L, 1L, False, XA_WINDOW,
-									  &type, &form, &len, &remain,
-									  (unsigned char **)&list);
-		XFree(list);
-		bool netWM = (s == Success) && len;
 		attributes.override_redirect = !netWM && CreationParams.Fullscreen;
 
 		// create new Window
@@ -1139,6 +1140,18 @@ bool CIrrDeviceLinux::createWindow()
 	CreationParams.Bits = bits;
 	CreationParams.WindowSize.Width = Width;
 	CreationParams.WindowSize.Height = Height;
+	
+	if (netWM == true)
+	{
+		Atom opaque_region = XInternAtom(display, "_NET_WM_OPAQUE_REGION", true);
+		
+		if (opaque_region != None)
+		{
+			unsigned long window_rect[4] = {0, 0, Width, Height};
+			XChangeProperty(display, window, opaque_region, XA_CARDINAL, 32,
+							PropModeReplace, (unsigned char*)window_rect, 4);
+		}
+	}
 
 	StdHints = XAllocSizeHints();
 	long num;

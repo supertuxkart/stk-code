@@ -107,10 +107,14 @@ void GhostReplaySelection::loadList()
             (RaceManager::Difficulty)rd.m_difficulty)
             continue;
 
+        Track* track = track_manager->getTrack(rd.m_track_name);
+        
+        if (track == NULL)
+            continue;
+
         std::vector<GUIEngine::ListWidget::ListCell> row;
-        Track* t = track_manager->getTrack(rd.m_track_name);
         row.push_back(GUIEngine::ListWidget::ListCell
-            (translations->fribidize(t->getName()) , -1, 3));
+            (translations->fribidize(track->getName()) , -1, 3));
         row.push_back(GUIEngine::ListWidget::ListCell
             (StringUtils::toWString(rd.m_kart_list.size()), -1, 1, true));
         row.push_back(GUIEngine::ListWidget::ListCell
