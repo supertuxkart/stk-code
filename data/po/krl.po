@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-10-24 10:06+0000\n"
+"PO-Revision-Date: 2017-11-13 00:19+0000\n"
 "Last-Translator: Auria <auria.mg@gmail.com>\n"
 "Language-Team: Karelian (http://www.transifex.com/supertuxkart/supertuxkart/language/krl/)\n"
 "MIME-Version: 1.0\n"
@@ -4147,7 +4147,3 @@ msgstr "Keriä nitrobutilkua (voit käyttiä niidy kiännälmyksen jälles)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "A voi voi! Puuttunet hädäh, paina <%s> ku sinuu pellastettas"
-
-#: src/states_screens/credits.cpp:209
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\nC C, 2017"
