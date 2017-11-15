@@ -235,7 +235,7 @@ void GPInfoScreen::init()
         const int local_players = race_manager->getNumLocalPlayers();
         int min_ai = 0;
         int num_ai = UserConfigParams::m_num_karts - local_players;
-            
+        
         // A ftl reace needs at least three karts to make any sense
         if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
@@ -243,9 +243,7 @@ void GPInfoScreen::init()
         }
         
         num_ai = std::max(min_ai, num_ai);
-        UserConfigParams::m_num_karts = num_ai + local_players;
-        race_manager->setNumKarts(num_ai + local_players);
-            
+        
         m_ai_kart_spinner->setActive(true);
         m_ai_kart_spinner->setValue(num_ai);
         m_ai_kart_spinner->setMax(stk_config->m_max_karts - local_players);
@@ -315,11 +313,24 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
                                 /*new tracks*/ true );
             addTracks();
         }
-        else if (button == "start" || button == "continue")
+        else if (button == "start")
         {
-            // Normal GP: start/continue a saved GP
+            // Normal GP: start GP
+            const int local_players = race_manager->getNumLocalPlayers();
+            const bool has_AI = race_manager->hasAI();
+            const int num_ai = has_AI ? m_ai_kart_spinner->getValue() : 0;
+            
+            race_manager->setNumKarts(local_players + num_ai);
+            UserConfigParams::m_num_karts = local_players + num_ai;
+            
             m_gp.changeReverse(getReverse());
-            race_manager->startGP(m_gp, false, (button == "continue"));
+            race_manager->startGP(m_gp, false, false);
+        }
+        else if (button == "continue")
+        {
+            // Normal GP: continue a saved GP
+            m_gp.changeReverse(getReverse());
+            race_manager->startGP(m_gp, false, true);
         }
     }   // name=="buttons"
     else if (name=="group-spinner")
