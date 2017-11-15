@@ -87,10 +87,48 @@ public:
  *  This class is in charge of storing and managing protocols.
  *  It is a singleton as there can be only one protocol manager per game
  *  instance. Any game object that wants to start a protocol must create a
- *  protocol and give it to this singleton. The protocols are updated in a
- *  special thread, to ensure that they are processed independently from the
- *  frames per second. Then, the management of protocols is thread-safe: any
- *  object can start/pause/... protocols whithout problems.
+ *  protocol and give it to this singleton. The protocols are updated in two
+ *  different ways:
+ *  1) Asynchronous updates:
+ *     A separate threads runs that delivers asynchronous events 
+ *     (i.e. messages), updates each protocol, and handles new requests
+ *     (start/stop protocol etc). Protocols are updated using the
+ *     Protocol::asynchronousUpdate() function.
+ 
+ *  2) Synchronous updates:
+ *     This is called from the main game thread, and will deliver synchronous
+ *     events (i.e. messages), and updates each protocol using
+ *     Protocol::update(). 
+ *
+ *  Since the STK main loop is not thread safe, any game changing events must
+ *  (e.g. events that push a new screen, ...) be processed synchronoysly.
+ *  On the other hand, asynchronous updates will be handled much more
+ *  frequently, so synchronous updates should be avoided as much as possible.
+ *  The sender selects if a message is synchronous or asynchronous. The
+ *  network layer (separate thread) calls propagateEvent in the
+ *  ProtocolManager, which will add the event to the synchronous or
+ *  asynchornous queue.
+ *  Protocol start/pause/... requests are also stored in a separate queue,
+ *  which is thread-safe, and requests will be handled by the ProtocolManager
+ *  thread, to ensure that they are processed independently from the
+ *  frames per second.
+ *
+ *  Events received by ENET are queried and then handled by STKHost::mainLoop.
+ *  Besides messages these events also include connection and disconnection
+ *  notifications. Protocols can decide to receives those notifications or
+ *  not. The Enet events are converted into STK events, which store e.g. the
+ *  sender as STKPeer info, and the message data is converted into a
+ *  NetworkString. This STK event is then forwarded to the corresponding
+ *  protocols.
+ *
+ *  There are some protocols that can have more than one instance running at
+ *  a time (e.g. on the server a connect to peer protocol). The Protocol
+ *  Manager stores each protocol with the same protocol id in a OneProtocol
+ *  structure (so in most cases this is just one protocol instance in one
+ *  OneProtocol structure, but e.g. several connect_to_peer instances would
+ *  be stored in one OneProtocoll instance. The OneProtocol instance is 
+ *  responsible to forward events to all protocols with the same id.
+ *  
  */ 
 class ProtocolManager : public AbstractSingleton<ProtocolManager>,
                         public NoCopy

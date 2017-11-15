@@ -70,7 +70,7 @@ void STKHost::create()
 /** \class STKHost
  *  \brief Represents the local host. It is the main managing point for 
  *  networking. It is responsible for sending and receiving messages,
- *  and keeping track of onnected peers. It also provides some low
+ *  and keeping track of connected peers. It also provides some low
  *  level socket functions (i.e. to avoid that enet adds its headers
  *  to messages, useful for broadcast in LAN and for stun). It can be
  *  either instantiated as server, or as client. 
@@ -141,7 +141,7 @@ void STKHost::create()
  *
  * Server:
  *
- *   The ServerLobby (SLR) will then detect the above client
+ *   The ServerLobbyProtocol (SLP) will then detect the above client
  *   requests, and start a ConnectToPeer protocol for each incoming client.
  *   The ConnectToPeer protocol uses:
  *         1. GetPeerAddress to get the ip address and port of the client.
@@ -151,7 +151,7 @@ void STKHost::create()
  *            destination (unless if it is a LAN connection, then UDP
  *            broadcasts will be used). 
  *
- *  Each client will run a ClientLobbyProtocol (CLR) to handle the further
+ *  Each client will run a ClientLobbyProtocol (CLP) to handle the further
  *  interaction with the server. The client will first request a connection
  *  with the server (this is for the 'logical' connection to the server; so
  *  far it was mostly about the 'physical' connection, i.e. being able to send
@@ -163,8 +163,8 @@ void STKHost::create()
  *  sent by protocol X on the server will be received by protocol X on the
  *  client and vice versa. The only exception are the client- and server-lobby:
  *  They share the same id (set in LobbyProtocol), so a message sent by
- *  the SLR will be received by the CLR, and a message from the CLR will be
- *  received by the SLR.
+ *  the SLP will be received by the CLP, and a message from the CLP will be
+ *  received by the SLP.
  *
  *  The server will reply with either a reject message (e.g. too many clients
  *  already connected), or an accept message. The accept message will contain
@@ -179,17 +179,17 @@ void STKHost::create()
  *  of all connected clients. This information is stored in an array of
  *  NetworkPlayerProfile managed in GameSetup (which is stored in STKHost).
  *
- *  When the authorised clients starts the kart selection, the SLR
- *  informs all clients to start the kart selection (SLR::startSelection).
+ *  When the authorised clients starts the kart selection, the SLP
+ *  informs all clients to start the kart selection (SLP::startSelection).
  *  This triggers the creation of the kart selection screen in 
- *  CLR::startSelection / CLR::update for all clients. The clients create
+ *  CLP::startSelection / CLP::update for all clients. The clients create
  *  the ActivePlayer object (which stores which device is used by which
  *  player).  The kart selection in a client calls
- *  (NetworkKartSelection::playerConfirm) which calls CLR::requestKartSelection.
- *  This sends a message to SLR::kartSelectionRequested, which verifies the
+ *  (NetworkKartSelection::playerConfirm) which calls CLP::requestKartSelection.
+ *  This sends a message to SLP::kartSelectionRequested, which verifies the
  *  selected kart and sends this information to all clients (including the
  *  client selecting the kart in the first place). This message is handled
- *  by CLR::kartSelectionUpdate. Server and all clients store this information
+ *  by CLP::kartSelectionUpdate. Server and all clients store this information
  *  in the NetworkPlayerProfile for the corresponding player, so server and
  *  all clients now have identical information about global player id, player
  *  name and selected kart. The authorised client will set some default votes
@@ -198,9 +198,9 @@ void STKHost::create()
  *
  *  After selecting a kart, the track selection screen is shown. On selecting
  *  a track, a vote for the track is sent to the client
- *  (TrackScreen::eventCallback, using CLR::voteTrack). The server will send
- *  all votes (track, #laps, ...) to all clients (see e.g. SLR::playerTrackVote
- *  etc), which are handled in e.g. CLR::playerTrackVote().
+ *  (TrackScreen::eventCallback, using CLP::voteTrack). The server will send
+ *  all votes (track, #laps, ...) to all clients (see e.g. SLP::playerTrackVote
+ *  etc), which are handled in e.g. CLP::playerTrackVote().
  *
  *  --> Server and all clients have identical information about all votes
  *  stored in RaceConfig of GameSetup.
