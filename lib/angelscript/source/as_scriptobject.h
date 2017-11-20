@@ -1,24 +1,24 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
-   This software is provided 'as-is', without any express or implied 
-   warranty. In no event will the authors be held liable for any 
+   This software is provided 'as-is', without any express or implied
+   warranty. In no event will the authors be held liable for any
    damages arising from the use of this software.
 
-   Permission is granted to anyone to use this software for any 
-   purpose, including commercial applications, and to alter it and 
+   Permission is granted to anyone to use this software for any
+   purpose, including commercial applications, and to alter it and
    redistribute it freely, subject to the following restrictions:
 
-   1. The origin of this software must not be misrepresented; you 
+   1. The origin of this software must not be misrepresented; you
       must not claim that you wrote the original software. If you use
-      this software in a product, an acknowledgment in the product 
+      this software in a product, an acknowledgment in the product
       documentation would be appreciated but is not required.
 
-   2. Altered source versions must be plainly marked as such, and 
+   2. Altered source versions must be plainly marked as such, and
       must not be misrepresented as being the original software.
 
-   3. This notice may not be removed or altered from any source 
+   3. This notice may not be removed or altered from any source
       distribution.
 
    The original version of this library can be located at:
@@ -60,14 +60,14 @@ public:
 
 	bool Get() const;
 	void Set(bool);
-	
+
 	void Lock() const;
 	void Unlock() const;
 
 protected:
 	mutable asCAtomic refCount;
 	bool      value;
-	DECLARECRITICALSECTION(mutable lock);
+	DECLARECRITICALSECTION(mutable lock)
 };
 
 class asCScriptObject : public asIScriptObject
@@ -84,7 +84,7 @@ public:
 
 	// Type info
 	int            GetTypeId() const;
-	asIObjectType *GetObjectType() const;
+	asITypeInfo   *GetObjectType() const;
 
 	// Class properties
 	asUINT      GetPropertyCount() const;
@@ -137,7 +137,7 @@ protected:
 	bool              isDestructCalled;
 
 	// Most script classes instances won't have neither the weakRefFlags nor
-	// userData so we only allocate this if requested. Even when used it is 
+	// userData so we only allocate this if requested. Even when used it is
 	// not something that will be accessed all the time so having the extra
 	// indirection will not affect the performance significantly.
 	struct SExtra

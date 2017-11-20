@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2016 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -155,6 +155,7 @@
 //
 // How to identify different compilers
 //-----------------------------------------
+// Ref: http://nadeausoftware.com/articles/2012/10/c_c_tip_how_detect_compiler_name_and_version_using_compiler_predefined_macros
 
 // MS Visual C++
 //  _MSC_VER   is defined
@@ -167,10 +168,13 @@
 // GNU C based compilers
 //  __GNUC__   is defined
 
+// CLang/LLVM 
+// __clang__ is defined
+
 // Embarcadero C++Builder
 //  __BORLANDC__ is defined
 
-// Sun CC compiler
+// Oracle Solaris Studio (previously known as Sun CC compiler)
 // __SUNPRO_CC is defined
 
 
@@ -602,7 +606,8 @@
 
 // GNU C (and MinGW or Cygwin on Windows)
 // Use the following command to determine predefined macros: echo . | g++ -dM -E -
-#if (defined(__GNUC__) && !defined(__SNC__)) || defined(EPPC) || defined(__CYGWIN__) // JWC -- use this instead for Wii
+// MSVC2015 can now use CLang too, but it shouldn't go in here
+#if (defined(__GNUC__) && !defined(__SNC__) && !defined(_MSC_VER)) || defined(EPPC) || defined(__CYGWIN__) // JWC -- use this instead for Wii
 	#define GNU_STYLE_VIRTUAL_METHOD
 	#define MULTI_BASE_OFFSET(x) (*((asPWORD*)(&x)+1))
 	#define asVSNPRINTF(a, b, c, d) vsnprintf(a, b, c, d)
@@ -836,6 +841,7 @@
 		#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR | asOBJ_APP_ARRAY)
 
 		#if (defined(i386) || defined(__i386) || defined(__i386__)) && !defined(__LP64__)
+			// x86 32bit
 			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
 			#define CDECL_RETURN_SIMPLE_IN_MEMORY
 			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
@@ -845,6 +851,7 @@
 			#define AS_X86
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
 		#elif defined(__x86_64__)
+			// x86 64bit
 			#define AS_X64_GCC
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
 			#define HAS_128_BIT_PRIMITIVES
@@ -854,49 +861,56 @@
 			// STDCALL is not available on 64bit Linux
 			#undef STDCALL
 			#define STDCALL
-		#elif (defined(__ARMEL__) || defined(__arm__)) && !(defined(__ARM_ARCH_4__) || defined(__ARM_ARCH_4T__))
-			#define AS_ARM
+		#elif defined(__ARMEL__) || defined(__arm__) || defined(__aarch64__) || defined(__AARCH64EL__)
+			// arm 
 
-			// TODO: The stack unwind on exceptions currently fails due to the assembler code in as_callfunc_arm_gcc.S
-			#define AS_NO_EXCEPTIONS
+			// The assembler code currently doesn't support arm v4, nor 64bit (v8)
+			#if !defined(__ARM_ARCH_4__) && !defined(__ARM_ARCH_4T__) && !defined(__LP64__)
+				#define AS_ARM
 
-			#undef STDCALL
-			#define STDCALL
+				// TODO: The stack unwind on exceptions currently fails due to the assembler code in as_callfunc_arm_gcc.S
+				#define AS_NO_EXCEPTIONS
 
-			#define CDECL_RETURN_SIMPLE_IN_MEMORY
-			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
-			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
+				#undef STDCALL
+				#define STDCALL
 
-			#undef THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
-			#undef CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
-			#undef STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
+				#define CDECL_RETURN_SIMPLE_IN_MEMORY
+				#define STDCALL_RETURN_SIMPLE_IN_MEMORY
+				#define THISCALL_RETURN_SIMPLE_IN_MEMORY
 
-			#define THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
-			#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
-			#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
+				#undef THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
+				#undef CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
+				#undef STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
 
-			#ifndef AS_MAX_PORTABILITY
-			// Make a few checks against incompatible ABI combinations
-			#if defined(__FAST_MATH__) && __FAST_MATH__ == 1
-				#error -ffast-math is not supported with native calling conventions
+				#define THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
+				#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
+				#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
+
+				#ifndef AS_MAX_PORTABILITY
+				// Make a few checks against incompatible ABI combinations
+				#if defined(__FAST_MATH__) && __FAST_MATH__ == 1
+					#error -ffast-math is not supported with native calling conventions
+				#endif
+				#endif
+
+				// Verify if soft-float or hard-float ABI is used
+				#if defined(__SOFTFP__) && __SOFTFP__ == 1
+					// -ffloat-abi=softfp or -ffloat-abi=soft
+					#define AS_SOFTFP
+				#endif
+
+				// Tested with both hard float and soft float abi
+				#undef AS_NO_THISCALL_FUNCTOR_METHOD
 			#endif
-			#endif
-
-			// Verify if soft-float or hard-float ABI is used
-			#if defined(__SOFTFP__) && __SOFTFP__ == 1
-				// -ffloat-abi=softfp or -ffloat-abi=soft
-				#define AS_SOFTFP
-			#endif
-
-			// Tested with both hard float and soft float abi
-			#undef AS_NO_THISCALL_FUNCTOR_METHOD
 
 		#elif defined(__mips__)
+			// mips
 			#define AS_MIPS
 			#undef STDCALL
 			#define STDCALL
 
 			#ifdef _ABIO32
+				// 32bit O32 ABI
 				#define AS_MIPS
 
 				// All structures are returned in memory regardless of size or complexity
@@ -911,6 +925,13 @@
 				// For other ABIs the native calling convention is not available (yet)
 				#define AS_MAX_PORTABILITY
 			#endif
+		#elif defined(__PPC64__)
+			// PPC 64bit
+
+			// The code in as_callfunc_ppc_64.cpp was built for PS3 and XBox 360, that 
+			// although use 64bit PPC only uses 32bit pointers.
+			// TODO: Add support for native calling conventions on Linux with PPC 64bit
+			#define AS_MAX_PORTABILITY
 		#else
 			#define AS_MAX_PORTABILITY
 		#endif
@@ -923,7 +944,7 @@
 		#endif
 
 	// Free BSD
-	#elif defined(__FreeBSD__) || defined(__DragonFly__) || defined(__OpenBSD__) || defined(__NetBSD__)
+	#elif defined(__FreeBSD__) || defined(__DragonFly__) || defined(__OpenBSD__)
 		#define AS_BSD
 		#if (defined(i386) || defined(__i386) || defined(__i386__)) && !defined(__LP64__)
 			#undef COMPLEX_MASK
@@ -1153,23 +1174,20 @@
 // Detect target hardware
 //------------------------------------------------
 
-// X86, Intel, AMD, etc, i.e. most PCs
-#if defined(__i386__) || defined(_M_IX86)
-	// Nothing special here
+// Big endian CPU target?
+// see: http://sourceforge.net/p/predef/wiki/Endianness/
+#if !defined(AS_BIG_ENDIAN) && \
+	defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN || \
+	defined(__BIG_ENDIAN__) || \
+	defined(__ARMEB__) || \
+	defined(__THUMBEB__) || \
+	defined(__AARCH64EB__) || \
+	defined(_MIBSEB) || defined(__MIBSEB) || defined(__MIBSEB__)
+		#define AS_BIG_ENDIAN
 #endif
 
-// PowerPC, e.g. Mac, GameCube, PS3, XBox 360, Wii
-#if defined(__PPC__) || defined(__ppc__) || defined(_PPC_) || defined(EPPC)
-	#define AS_BIG_ENDIAN
-
-	// Gamecube
-	#if defined(_GC)
-		#define AS_USE_DOUBLE_AS_FLOAT
-	#endif
-#endif
-
-// Dreamcast console
-#ifdef __SH4_SINGLE_ONLY__
+// Dreamcast and Gamecube use only 32bit floats, so treat doubles as floats
+#if defined(__SH4_SINGLE_ONLY__) || defined(_GC)
 	#define AS_USE_DOUBLE_AS_FLOAT	// use 32bit floats instead of doubles
 #endif
 

@@ -222,7 +222,7 @@ namespace Scripting
     /*
     void ScriptEngine::runMethod(asIScriptObject* obj, std::string methodName)
     {
-        asIObjectType* type = obj->GetObjectType();
+        asITypeInfo* type = obj->GetObjectType();
         asIScriptFunction* method = type->GetMethodByName(methodName.c_str());
         if (method == NULL)
             Log::error("Scripting", ("runMethod: object does not implement method " + methodName).c_str());
