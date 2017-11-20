@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -171,17 +171,24 @@ static int asCharToNbr(char ch, int radix)
 }
 
 // If base is 0 the string should be prefixed by 0x, 0d, 0o, or 0b to allow the function to automatically determine the radix
-asQWORD asStringScanUInt64(const char *string, int base, size_t *numScanned)
+asQWORD asStringScanUInt64(const char *string, int base, size_t *numScanned, bool *overflow)
 {
 	asASSERT(base == 10 || base == 16 || base == 0);
 
+	if (overflow)
+		*overflow = false;
+
 	const char *end = string;
+
+	static const asQWORD QWORD_MAX = (~asQWORD(0));
 
 	asQWORD res = 0;
 	if( base == 10 )
 	{
 		while( *end >= '0' && *end <= '9' )
 		{
+			if( overflow && ((res > QWORD_MAX / 10) || ((asUINT(*end - '0') > (QWORD_MAX - (QWORD_MAX / 10) * 10)) && res == QWORD_MAX / 10)) )
+				*overflow = true;
 			res *= 10;
 			res += *end++ - '0';
 		}
@@ -205,8 +212,13 @@ asQWORD asStringScanUInt64(const char *string, int base, size_t *numScanned)
 
 		if( base )
 		{
-			for( int nbr; (nbr = asCharToNbr(*end, base)) >= 0; end++ )
+			for (int nbr; (nbr = asCharToNbr(*end, base)) >= 0; end++)
+			{
+				if (overflow && ((res > QWORD_MAX / base) || ((asUINT(nbr) > (QWORD_MAX - (QWORD_MAX / base) * base)) && res == QWORD_MAX / base)) )
+					*overflow = true;
+
 				res = res * base + nbr;
+			}
 		}
 	}
 

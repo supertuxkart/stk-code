@@ -1,24 +1,24 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
-   This software is provided 'as-is', without any express or implied 
-   warranty. In no event will the authors be held liable for any 
+   This software is provided 'as-is', without any express or implied
+   warranty. In no event will the authors be held liable for any
    damages arising from the use of this software.
 
-   Permission is granted to anyone to use this software for any 
-   purpose, including commercial applications, and to alter it and 
+   Permission is granted to anyone to use this software for any
+   purpose, including commercial applications, and to alter it and
    redistribute it freely, subject to the following restrictions:
 
-   1. The origin of this software must not be misrepresented; you 
+   1. The origin of this software must not be misrepresented; you
       must not claim that you wrote the original software. If you use
-      this software in a product, an acknowledgment in the product 
+      this software in a product, an acknowledgment in the product
       documentation would be appreciated but is not required.
 
-   2. Altered source versions must be plainly marked as such, and 
+   2. Altered source versions must be plainly marked as such, and
       must not be misrepresented as being the original software.
 
-   3. This notice may not be removed or altered from any source 
+   3. This notice may not be removed or altered from any source
       distribution.
 
    The original version of this library can be located at:
@@ -244,7 +244,7 @@ sTokenWord const tokenWords[] =
 	asTokenDef("auto"      , ttAuto),
 	asTokenDef("bool"      , ttBool),
 	asTokenDef("break"     , ttBreak),
-	asTokenDef("case"      , ttCase), 
+	asTokenDef("case"      , ttCase),
 	asTokenDef("cast"      , ttCast),
 	asTokenDef("class"     , ttClass),
 	asTokenDef("const"     , ttConst),
@@ -269,7 +269,7 @@ sTokenWord const tokenWords[] =
 	asTokenDef("int"       , ttInt),
 	asTokenDef("int8"      , ttInt8),
 	asTokenDef("int16"     , ttInt16),
-	asTokenDef("int32"     , ttInt),  
+	asTokenDef("int32"     , ttInt),
 	asTokenDef("int64"     , ttInt64),
 	asTokenDef("interface" , ttInterface),
 	asTokenDef("is"        , ttIs),
@@ -302,16 +302,18 @@ const char * const whiteSpace = " \t\r\n";
 // Some keywords that are not considered tokens by the parser
 // These only have meaning in specific situations. Outside these
 // situations they are treated as normal identifiers.
-const char * const THIS_TOKEN     = "this";
-const char * const FROM_TOKEN     = "from";
-const char * const SUPER_TOKEN    = "super";
-const char * const SHARED_TOKEN   = "shared";
-const char * const FINAL_TOKEN    = "final";
-const char * const OVERRIDE_TOKEN = "override";
-const char * const GET_TOKEN      = "get";
-const char * const SET_TOKEN      = "set";
-const char * const ABSTRACT_TOKEN = "abstract";
-const char * const FUNCTION_TOKEN = "function";
+const char * const THIS_TOKEN      = "this";
+const char * const FROM_TOKEN      = "from";
+const char * const SUPER_TOKEN     = "super";
+const char * const SHARED_TOKEN    = "shared";
+const char * const FINAL_TOKEN     = "final";
+const char * const OVERRIDE_TOKEN  = "override";
+const char * const GET_TOKEN       = "get";
+const char * const SET_TOKEN       = "set";
+const char * const ABSTRACT_TOKEN  = "abstract";
+const char * const FUNCTION_TOKEN  = "function";
+const char * const IF_HANDLE_TOKEN = "if_handle_then_const";
+const char * const EXTERNAL_TOKEN  = "external";
 
 END_AS_NAMESPACE
 

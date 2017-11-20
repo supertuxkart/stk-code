@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -120,13 +120,13 @@ void *asCGlobalProperty::GetRegisteredAddress() const
 	return realAddress;
 }
 
-void asCGlobalProperty::SetInitFunc(asCScriptFunction *initFunc)
+void asCGlobalProperty::SetInitFunc(asCScriptFunction *in_initFunc)
 {
 	// This should only be done once
-	asASSERT( this->initFunc == 0 );
+	asASSERT( initFunc == 0 );
 
-	this->initFunc = initFunc;
-	this->initFunc->AddRefInternal();
+	initFunc = in_initFunc;
+	initFunc->AddRefInternal();
 }
 
 asCScriptFunction *asCGlobalProperty::GetInitFunc()
