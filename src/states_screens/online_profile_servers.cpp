@@ -57,6 +57,12 @@ OnlineProfileServers::OnlineProfileServers() : OnlineProfileBase("online/profile
 void OnlineProfileServers::loadedFromFile()
 {
     OnlineProfileBase::loadedFromFile();
+    if (!PlayerManager::getCurrentOnlineId())
+    {
+        getWidget<IconButtonWidget>("find_wan_server")->setActive(false);
+        getWidget<IconButtonWidget>("create_wan_server")->setActive(false);
+        getWidget<IconButtonWidget>("quick_wan_play")->setActive(false);
+    }
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------

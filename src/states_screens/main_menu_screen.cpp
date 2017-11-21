@@ -513,16 +513,22 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                 "\"Connect to the Internet\"."));
             return;
         }
-        
+        // Define this to require a login to the stk server (default behaviour)
+        // Undefine for testing LAN only.
+#undef REQUIRE_LOGIN
+#ifdef REQUIRE_LOGIN
         if (PlayerManager::getCurrentOnlineId())
+#endif
         {
             ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
             OnlineProfileServers::getInstance()->push();
         }
+#ifdef REQUIRE_LOGIN
         else
         {
             UserScreen::getInstance()->push();
         }
+#endif
     }
     else if (selection == "addons")
     {
