@@ -62,7 +62,7 @@ public:
     /** This is called while going forwards in time again to reach current
      *  time. */
     virtual void rewind() = 0;
-
+    void setTime(float time);
     // ------------------------------------------------------------------------
     virtual ~RewindInfo() { }
     // ------------------------------------------------------------------------

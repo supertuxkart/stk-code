@@ -18,6 +18,7 @@
 
 #include "network/rewind_info.hpp"
 
+#include "network/network_config.hpp"
 #include "physics/physics.hpp"
 
 /** Constructor for a state: it only takes the size, and allocates a buffer
@@ -29,6 +30,18 @@ RewindInfo::RewindInfo(float time, bool is_confirmed)
     m_time         = time;
     m_is_confirmed = is_confirmed;
 }   // RewindInfo
+
+// ----------------------------------------------------------------------------
+/** Adjusts the time of this RewindInfo. This is only called on the server
+ *  in case that an event is received in the past - in this case the server
+ *  needs to avoid a Rewind by moving this event forward to the current time.
+ */
+void RewindInfo::setTime(float time)
+{
+    assert(NetworkConfig::get()->isServer());
+    assert(m_time < time);
+    m_time = time;
+}   // setTime
 
 // ============================================================================
 RewindInfoState::RewindInfoState(float time, Rewinder *rewinder, 

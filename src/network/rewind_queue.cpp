@@ -20,6 +20,7 @@
 
 #include "config/stk_config.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/time_step_info.hpp"
@@ -231,13 +232,16 @@ void RewindQueue::addNetworkState(Rewinder *rewinder, BareNetworkString *buffer,
 // ----------------------------------------------------------------------------
 /** Merges thread-safe all data received from the network with the current
  *  local rewind information.
- *  \param world_time Current world time up to which network events will be
+ *  \param world_time[in] Current world time up to which network events will be
  *         merged in.
- *  \param needs_rewind True if network rewind information was received which
- *         was in the past (of this simulation), so a rewind must be performed.
- *  \param rewind_time If needs_rewind is true, the time to which a rewind must
- *         be performed (at least). Otherwise undefined, but the value might
- *         be modified in this function.
+ *  \param dt[in] Time step size. The current frame will cover events between
+ *         world_time and world_time+dt.
+ *  \param needs_rewind[out] True if network rewind information was received
+ *         which was in the past (of this simulation), so a rewind must be
+ *         performed.
+ *  \param rewind_time[out] If needs_rewind is true, the time to which a rewind
+ *         must be performed (at least). Otherwise undefined, but the value
+ *         might be modified in this function.
  */
 void RewindQueue::mergeNetworkData(float world_time, float dt,
                                    bool *needs_rewind, float *rewind_time)
@@ -266,6 +270,19 @@ void RewindQueue::mergeNetworkData(float world_time, float dt,
             i++;
             continue;
         }
+        // A server never rewinds (otherwise we would have to handle 
+        // duplicated states, which in the best case would then have
+        // a negative effect for every player, when in fact only one
+        // player might have a network hickup).
+        if (NetworkConfig::get()->isServer() && (*i)->getTime() < world_time)
+        {
+            Log::warn("RewindQueue", "At %f received message from %f",
+                      world_time, (*i)->getTime());
+            // Server received an event in the past. Adjust this event
+            // to be done now - at least we get a bit closer to the
+            // client state.
+            (*i)->setTime(world_time);
+        }
 
         // Find closest previous time step.
         AllTimeStepInfo::iterator prev =
@@ -279,7 +296,7 @@ void RewindQueue::mergeNetworkData(float world_time, float dt,
 
         // Assign this event to the closest of the two existing timesteps
         // prev and next (inserting an additional event in the past would
-        // mean more CPU work in the rewind this will very likely trigger.
+        // mean more CPU work in the rewind this will very likely trigger).
         if (next == m_time_step_info.end())
             tsi = *prev;
         else if ( (*next)->getTime()-event_time < event_time-(*prev)->getTime() )
