@@ -234,7 +234,8 @@ void GPInfoScreen::init()
     {
         const int local_players = race_manager->getNumLocalPlayers();
         int min_ai = 0;
-        int num_ai = UserConfigParams::m_num_karts - local_players;
+        int num_ai = UserConfigParams::m_num_karts_per_gamemode[RaceManager::MAJOR_MODE_GRAND_PRIX]
+            - local_players;
         
         // A ftl reace needs at least three karts to make any sense
         if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
@@ -321,7 +322,7 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
             const int num_ai = has_AI ? m_ai_kart_spinner->getValue() : 0;
             
             race_manager->setNumKarts(local_players + num_ai);
-            UserConfigParams::m_num_karts = local_players + num_ai;
+            UserConfigParams::m_num_karts_per_gamemode[RaceManager::MAJOR_MODE_GRAND_PRIX] = local_players + num_ai;
             
             m_gp.changeReverse(getReverse());
             race_manager->startGP(m_gp, false, false);
@@ -358,7 +359,7 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
     {
         const int num_ai = m_ai_kart_spinner->getValue();
         race_manager->setNumKarts( race_manager->getNumLocalPlayers() + num_ai );
-        UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers() + num_ai;
+        UserConfigParams::m_num_karts_per_gamemode[RaceManager::MAJOR_MODE_GRAND_PRIX] = race_manager->getNumLocalPlayers() + num_ai;
     }
     else if(name=="back")
     {
