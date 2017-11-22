@@ -27,6 +27,7 @@ option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
+option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
 option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" OFF)
 
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
@@ -109,11 +110,24 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 
-# Build glew library
+# Find system GLEW library or build it if missing
 if(NOT USE_GLES2 AND NOT SERVER_ONLY)
     add_definitions(-DGLEW_NO_GLU)
-    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
-    include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
+    if(USE_SYSTEM_GLEW)
+        find_package(PkgConfig)
+        if(PKGCONFIG_FOUND)
+            pkg_check_modules(GLEW glew>=2.0)
+        endif()
+    endif()
+
+    if(GLEW_FOUND)
+        include_directories(${GLEW_INCLUDE_DIRS})
+    else()
+        # Fallback to built-in version silently
+        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
+        include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
+        set(GLEW_LIBRARIES "glew")
+    endif()
 endif()
 
 if(MSVC OR APPLE)
@@ -420,7 +434,7 @@ target_link_libraries(supertuxkart
 
 if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
-        target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} glew graphics_utils)
+        target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES} graphics_utils)
     else()
         target_link_libraries(supertuxkart GLESv2)
     endif()
