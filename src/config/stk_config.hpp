@@ -82,10 +82,8 @@ public:
     bool  m_smooth_normals;            /**< If normals for raycasts for wheels
                                            should be interpolated.             */
 
-    /** Network events that are less than this value apart will be executed
-     *  at the same time (instead of adding a new time step, which causes
-     *  one more time step to be simulated). */
-    float m_network_combine_threshold;
+    /** How many state updates per second the server will send. */
+    int m_network_state_frequeny;
 
     /** If the angle between a normal on a vertex and the normal of the
      *  triangle are more than this value, the physics will use the normal
@@ -110,7 +108,6 @@ public:
           m_max_track_version;       /**<version supported by this binary.   */
     int   m_max_display_news;        /**<How often a news message is displayed
                                          before it is ignored. */
-    bool  m_enable_networking;
 
     /** Disable steering if skidding is stopped. This can help in making
      *  skidding more controllable (since otherwise when trying to steer while

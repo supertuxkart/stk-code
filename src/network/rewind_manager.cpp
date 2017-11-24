@@ -77,7 +77,7 @@ void RewindManager::reset()
     m_is_rewinding         = false;
     m_not_rewound_time     = 0;
     m_overall_state_size   = 0;
-    m_state_frequency      = 0.1f;   // save 10 states a second
+    m_state_frequency      = 1.0f / stk_config->m_network_state_frequeny;
     m_last_saved_state     = -9999.9f;  // forces initial state save
 
     if(!m_enable_rewind_manager) return;

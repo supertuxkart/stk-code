@@ -158,16 +158,10 @@
        away if there is an explosion. -->
   <explosion impulse-objects="500.0" />
 
-  <!-- Networking - the current networking code is outdated and will not
-      work anymore - so for now don't enable this.
-      For the new networking code:
-      combine-threshold: Maximum time a network event can be different
-        from an existing time step info to be combined into one. This
-        reduces the number of time steps necessary (for slightly larger
-        inaccuracies).
+  <!-- Networking 
+       state-frequency: how many states the server will send per second.
   -->
-  <networking enable="false"
-              combine-threshold="0.05" />
+  <networking state-frequency="10" />
 
   <!-- The field od views for 1-4 player split screen. fov-3 is
        actually not used (since 3 player split screen uses the
