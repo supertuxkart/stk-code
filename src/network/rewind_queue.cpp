@@ -305,9 +305,10 @@ void RewindQueue::mergeNetworkData(float world_time, float dt,
             tsi = *prev;
 
         tsi->insert(*i);
-
-        Log::info("Rewind", "Inserting event from time %f to timstepinfo %f prev %f next %f",
-                  (*i)->getTime(), tsi->getTime(),
+        Log::info("Rewind", "Inserting event from time %f type %c to timstepinfo %f prev %f next %f",
+                  (*i)->getTime(), 
+                  (*i)->isEvent() ? 'E' : ((*i)->isState() ? 'S' : 'T'),
+                  tsi->getTime(),
                   (*prev)->getTime(), 
                   next != m_time_step_info.end() ? (*next)->getTime() : 9999 );
 
