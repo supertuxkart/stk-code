@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2015 Glenn De Jonghe
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,36 +15,46 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
-#ifndef __HEADER_ONLINE_PROFILE_SERVERS_HPP__
-#define __HEADER_ONLINE_PROFILE_SERVERS_HPP__
-
-#include <string>
-#include <irrString.h>
+#ifndef HEADER_ONLINE_SCREEN_HPP
+#define HEADER_ONLINE_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets.hpp"
-#include "states_screens/online_profile_base.hpp"
 
-namespace GUIEngine { class Widget; }
-
+namespace GUIEngine { class Widget;       class ListWidget; 
+                      class ButtonWidget; class IconButtonWidget; }
 
 /**
-  * \brief Online profiel overview screen
+  * \brief Handles the networking main menu
   * \ingroup states_screens
   */
-class OnlineProfileServers : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OnlineProfileServers>
+class OnlineScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OnlineScreen>
 {
-protected:
-    OnlineProfileServers();
+private:
+    friend class GUIEngine::ScreenSingleton<OnlineScreen>;
 
-    void doQuickPlay();
+    core::stringw m_online_string;
+
+    core::stringw m_login_string;
+
+    /** Keep the widget to to the user name. */
+    GUIEngine::ButtonWidget *m_user_id;
+
+    /** Keep the widget to avoid looking it up every frame. */
+    GUIEngine::IconButtonWidget* m_online;
+
+    OnlineScreen();
 
 public:
-    friend class GUIEngine::ScreenSingleton<OnlineProfileServers>;
+    /** Temporary disable the online menu while it is being worked at. */
+    static bool m_enable_online;
+
+    virtual void onUpdate(float delta) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void beforeAddingWidget() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
@@ -52,8 +62,12 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
-    virtual bool onEscapePressed() OVERRIDE;
 
-};   // class OnlineProfileServers
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void tearDown() OVERRIDE;
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void onDisabledItemClicked(const std::string& item) OVERRIDE;
+};
 
 #endif

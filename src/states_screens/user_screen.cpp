@@ -400,6 +400,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
  */
 void BaseUserScreen::closeScreen()
 {
+    // TODO: return user to where they come from
     StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
 }   // closeScreen
 
