@@ -51,8 +51,6 @@ using namespace Online;
 
 DEFINE_SCREEN_SINGLETON( OnlineScreen );
 
-bool OnlineScreen::m_enable_online = true;
-
 // ----------------------------------------------------------------------------
 
 OnlineScreen::OnlineScreen() : Screen("online/online.stkgui")
@@ -93,7 +91,7 @@ void OnlineScreen::init()
 
     m_online = getWidget<IconButtonWidget>("online");
 
-    if (!m_enable_online)
+    if (!MainMenuScreen::m_enable_online)
         m_online->setActive(false);
 
     m_user_id = getWidget<ButtonWidget>("user-id");

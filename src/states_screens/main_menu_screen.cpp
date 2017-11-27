@@ -70,7 +70,7 @@ using namespace Online;
 
 DEFINE_SCREEN_SINGLETON( MainMenuScreen );
 
-bool MainMenuScreen::m_enable_online = true;
+bool MainMenuScreen::m_enable_online = false;
 
 // ----------------------------------------------------------------------------
 
@@ -150,9 +150,6 @@ void MainMenuScreen::init()
     }
 
     IconButtonWidget* online = getWidget<IconButtonWidget>("online");
-
-    if (!m_enable_online)
-        online->setActive(false);
 
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
@@ -497,25 +494,30 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "online")
     {
-        //OnlineScreen::getInstance()->push();
-
-        if (UserConfigParams::m_internet_status != RequestManager::IPERM_ALLOWED)
+        if (MainMenuScreen::m_enable_online)
         {
-            new MessageDialog(_("You can not play online without internet access. "
-                "If you want to play online, go to options, select "
-                " tab 'User Interface', and edit "
-                "\"Connect to the Internet\"."));
-            return;
-        }
-
-        if (PlayerManager::getCurrentOnlineId())
-        {
-            ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
-            TabOnlineProfileAchievements::getInstance()->push();
+            OnlineScreen::getInstance()->push();
         }
         else
         {
-            UserScreen::getInstance()->push();
+            if (UserConfigParams::m_internet_status != RequestManager::IPERM_ALLOWED)
+            {
+                new MessageDialog(_("You can not play online without internet access. "
+                    "If you want to play online, go to options, select "
+                    " tab 'User Interface', and edit "
+                    "\"Connect to the Internet\"."));
+                return;
+            }
+
+            if (PlayerManager::getCurrentOnlineId())
+            {
+                ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
+                TabOnlineProfileAchievements::getInstance()->push();
+            }
+            else
+            {
+                UserScreen::getInstance()->push();
+            }
         }
     }
     else if (selection == "addons")
