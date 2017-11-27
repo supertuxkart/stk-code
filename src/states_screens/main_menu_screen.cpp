@@ -497,7 +497,26 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "online")
     {
-        OnlineScreen::getInstance()->push();
+        //OnlineScreen::getInstance()->push();
+
+        if (UserConfigParams::m_internet_status != RequestManager::IPERM_ALLOWED)
+        {
+            new MessageDialog(_("You can not play online without internet access. "
+                "If you want to play online, go to options, select "
+                " tab 'User Interface', and edit "
+                "\"Connect to the Internet\"."));
+            return;
+        }
+
+        if (PlayerManager::getCurrentOnlineId())
+        {
+            ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
+            TabOnlineProfileAchievements::getInstance()->push();
+        }
+        else
+        {
+            UserScreen::getInstance()->push();
+        }
     }
     else if (selection == "addons")
     {
