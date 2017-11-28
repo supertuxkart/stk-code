@@ -254,9 +254,10 @@ void RewindQueue::mergeNetworkData(float world_time, float dt,
         return;
     }
 
-    /* Merge all newly received network events into the main event list. */
-
-    *rewind_time = 99999.9f;
+    // Merge all newly received network events into the main event list.
+    // Only a client ever rewinds. So the rewind time should be the latest
+    // received state before current world time (if any)
+    *rewind_time = -99999.9f;
     bool adjust_next = false;
 
     // FIXME: making m_network_events sorted would prevent the need to 
@@ -279,7 +280,7 @@ void RewindQueue::mergeNetworkData(float world_time, float dt,
             Log::warn("RewindQueue", "At %f received message from %f",
                       world_time, (*i)->getTime());
             // Server received an event in the past. Adjust this event
-            // to be done now - at least we get a bit closer to the
+            // to be executed now - at least we get a bit closer to the
             // client state.
             (*i)->setTime(world_time);
         }
@@ -312,13 +313,15 @@ void RewindQueue::mergeNetworkData(float world_time, float dt,
                   (*prev)->getTime(), 
                   next != m_time_step_info.end() ? (*next)->getTime() : 9999 );
 
-
-        // Check if a rewind is necessary
+        // Check if a rewind is necessary: either an message arrived in the past
+        // or if the time is between world_time and world_time+dt (otherwise
+        // the message would have been ignored further up), 'rewind' to this new
+        // state anyway
         if (tsi->getTime() < world_time ||
             (*i)->isState() && tsi == m_time_step_info.back())
         {
             *needs_rewind = true;
-            if (tsi->getTime() < *rewind_time) *rewind_time = tsi->getTime();
+            if (tsi->getTime() > *rewind_time) *rewind_time = tsi->getTime();
         }
         i = m_network_events.getData().erase(i);
     }   // for i in m_network_events
