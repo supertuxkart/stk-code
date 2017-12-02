@@ -68,7 +68,7 @@ namespace scene
 
 //! constructor
 CSkinnedMesh::CSkinnedMesh()
-: SkinningBuffers(0), AnimationFrames(0.f), FramesPerSecond(25.f),
+: AnimationFrames(0.f), SkinningBuffers(0), FramesPerSecond(25.f),
 	LastAnimatedFrame(-1), SkinnedLastFrame(false),
 	InterpolationMode(EIM_LINEAR),
 	HasAnimation(false), PreparedForSkinning(false),
