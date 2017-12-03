@@ -79,7 +79,7 @@ private:
                                      unsigned id);
     };
     // ------------------------------------------------------------------------
-    unsigned m_bind_frame, m_joint_count;//, m_frame_count;
+    unsigned m_bind_frame, m_joint_count, m_frame_count;
     // ------------------------------------------------------------------------
     std::vector<Armature> m_all_armatures;
     // ------------------------------------------------------------------------

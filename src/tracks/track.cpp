@@ -466,6 +466,7 @@ void Track::cleanup()
     }
 #endif
 
+    m_meta_library.clear();
     Scripting::ScriptEngine::getInstance()->cleanupCache();
 
     m_current_track = NULL;
@@ -1756,6 +1757,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     loadObjects(root, path, model_def_loader, true, NULL, NULL);
+
+    // Correct the parenting of meta library
+    for (auto& p : m_meta_library)
+    {
+        auto* ln = p.first->getPresentation<TrackObjectPresentationLibraryNode>();
+        assert(ln);
+        p.second->setParent(ln->getNode());
+    }
 
     model_def_loader.cleanLibraryNodesAfterLoad();
 

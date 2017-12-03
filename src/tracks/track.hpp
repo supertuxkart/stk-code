@@ -374,6 +374,8 @@ private:
     /** List of all bezier curves in the track - for e.g. camera, ... */
     std::vector<BezierCurve*> m_all_curves;
 
+    std::vector<std::pair<TrackObject*, scene::ISceneNode*> > m_meta_library;
+
     /** The number of laps the track will be raced in a random GP.
      * m_actual_number_of_laps is initialised with this value.*/
     int m_default_number_of_laps;
@@ -672,6 +674,10 @@ public:
     // ------------------------------------------------------------------------
     /** Adds mesh to cleanup list */
     void addCachedMesh(scene::IMesh* mesh) { m_all_cached_meshes.push_back(mesh); }
+    // ------------------------------------------------------------------------
+    /** Adds the parent of the meta library for correction later */
+    void addMetaLibrary(TrackObject* parent, scene::ISceneNode* meta_library)
+                         { m_meta_library.emplace_back(parent, meta_library); }
 };   // class Track
 
 #endif
