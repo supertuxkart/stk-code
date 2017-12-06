@@ -163,8 +163,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         m_presentation = new TrackObjectPresentationLibraryNode(this, xml_node, model_def_loader);
         if (parent_library != NULL)
         {
-            Track::getCurrentTrack()->addMetaLibrary(parent_library,
-                (dynamic_cast<TrackObjectPresentationLibraryNode*>(m_presentation))->getNode());
+            Track::getCurrentTrack()->addMetaLibrary(parent_library, this);
         }
     }
     else if (type == "sfx-emitter")
