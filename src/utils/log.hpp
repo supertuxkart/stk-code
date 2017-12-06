@@ -20,11 +20,15 @@
 #ifndef HEADER_LOG_HPP
 #define HEADER_LOG_HPP
 
+#include "utils/synchronised.hpp"
+
 #include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <vector>
+
 
 #ifdef __GNUC__
 #  define VALIST __gnuc_va_list
@@ -59,16 +63,30 @@ private:
     /** The file where stdout output will be written */
     static FILE* m_file_stdout;
 
+    /** An optional buffer for lines to be output. */
+    struct LineInfo
+    {
+        std::string m_line;
+        int m_level;
+    };
+    static Synchronised<std::vector<struct LineInfo> > m_line_buffer;
+    
+    /** <0 if no buffered logging is to be used, otherwise this is
+     ** the maximum number of lines the buffer should hold. */
+    static size_t m_buffer_size;
+
     /** An optional prefix to be printed. */
     static std::string m_prefix;
 
     static void setTerminalColor(LogLevel level);
     static void resetTerminalColor();
-
-public:
+    static void writeLine(const char *line, int level);
 
     static void printMessage(int level, const char *component,
                              const char *format, VALIST va_list);
+
+public:
+
     // ------------------------------------------------------------------------
     /** A simple macro to define the various log functions.
      *  Note that an assert is added so that a debugger is triggered
@@ -98,7 +116,12 @@ public:
     static void openOutputFiles(const std::string &logout);
 
     static void closeOutputFiles();
+    static void flushBuffers();
 
+    // ------------------------------------------------------------------------
+    /** Sets the number of lines to buffer. Setting the buffer size to a 
+     *  a value <=1 means no buffering, lines will be immediately printed. */
+    static void setBufferSize(size_t n) { m_buffer_size = n;  }
     // ------------------------------------------------------------------------
     /** Defines the minimum log level to be displayed. */
     static void setLogLevel(int n)
