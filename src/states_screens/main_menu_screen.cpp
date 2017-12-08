@@ -504,26 +504,12 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         }
         // Define this to require a login to the stk server (default behaviour)
         // Undefine for testing LAN only.
-#undef REQUIRE_LOGIN
-#ifdef REQUIRE_LOGIN
-        if (PlayerManager::getCurrentOnlineId())
-#endif
         if (MainMenuScreen::m_enable_online)
         {
             OnlineScreen::getInstance()->push();
         }
-#ifdef REQUIRE_LOGIN
         else
         {
-            if (UserConfigParams::m_internet_status != RequestManager::IPERM_ALLOWED)
-            {
-                new MessageDialog(_("You can not play online without internet access. "
-                    "If you want to play online, go to options, select "
-                    " tab 'User Interface', and edit "
-                    "\"Connect to the Internet\"."));
-                return;
-            }
-
             if (PlayerManager::getCurrentOnlineId())
             {
                 ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
@@ -534,7 +520,6 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                 UserScreen::getInstance()->push();
             }
         }
-#endif
     }
     else if (selection == "addons")
     {
