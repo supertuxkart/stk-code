@@ -43,7 +43,7 @@
   !define DESCRIPTION "3D open-source arcade racer with a variety characters, tracks, and modes to play"
 
   Name "${APPNAMEANDVERSION}"
-  OutFile "${APPNAMEANDVERSION} installer.exe"
+  OutFile "${APPNAMEANDVERSION} installer-64bit.exe"
 
   # These will be displayed by the "Click here for support information" link in "Add/Remove Programs"
   # It is possible to use "mailto:" links in here to open the email client
@@ -174,12 +174,12 @@ Section "Install" SecMain
 
   ; Try to find the binary directory in a list of 'typical' names:
   ; The first found directory is used
-  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\bld\bin\RelWithDebInfo\*.*
-  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\bld\bin\Release\*.*
-  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\build\bin\RelWithDebInfo\*.*
-  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\build\bin\Release\*.*
-  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\cmake_build\bin\RelWithDebInfo\*.*
-  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\cmake_build\bin\Release\*.*
+  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\bld-64\bin\RelWithDebInfo\*.*
+  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\bld-64\bin\Release\*.*
+  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\build-64\bin\RelWithDebInfo\*.*
+  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\build-64\bin\Release\*.*
+  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\cmake_build-64\bin\RelWithDebInfo\*.*
+  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\cmake_build-64\bin\Release\*.*
 
   File /x *.ilk ${EXEC_PATH}
 
@@ -206,7 +206,7 @@ Section "Install" SecMain
   File *.ico 
   ; prereqs
   SetOutPath "$INSTDIR\prerequisites"
-  File /r prerequisites\*.*
+  File /r prerequisites\vcredist_x64.exe
 
   ; data + assets
   SetOutPath "$INSTDIR\data\"
@@ -281,7 +281,6 @@ Section "Uninstall" redist
   DELETE /REBOOTOK "$INSTDIR\icon.ico"
   DELETE /REBOOTOK "$INSTDIR\libcurl-4.dll"
   DELETE /REBOOTOK "$INSTDIR\libeay32.dll"
-  DELETE /REBOOTOK "$INSTDIR\libidn-11.dll"
   DELETE /REBOOTOK "$INSTDIR\License.txt"
   DELETE /REBOOTOK "$INSTDIR\libfreetype.dll"
   DELETE /REBOOTOK "$INSTDIR\libfribidi-0.dll"

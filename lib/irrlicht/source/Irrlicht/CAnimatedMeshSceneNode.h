@@ -167,6 +167,7 @@ namespace scene
 			m_animation_set.push_back(start);
 			m_animation_set.push_back(end);
 		}
+		virtual void removeAllAnimationSet() { m_animation_set.clear(); }
 		virtual void useAnimationSet(u32 set_num);
 		virtual void setFrameLoopOnce(s32 begin, s32 end);
 	protected:

@@ -596,6 +596,7 @@ void cmdLineHelp()
     "  -h,  --help             Show this help.\n"
     "       --log=N            Set the verbosity to a value between\n"
     "                          0 (Debug) and 5 (Only Fatal messages)\n"
+    "       --logbuffer=N      Buffers up to N lines log lines before writing.\n"
     "       --root=DIR         Path to add to the list of STK root directories.\n"
     "                          You can specify more than one by separating them\n"
     "                          with colons (:).\n"
@@ -666,6 +667,8 @@ int handleCmdLineOutputModifier()
     int n;
     if(CommandLine::has("--log", &n))
         Log::setLogLevel(n);
+    if (CommandLine::has("--logbuffer", &n))
+        Log::setBufferSize(n);
 
     if(CommandLine::has("--log=nocolor"))
     {
@@ -1194,16 +1197,16 @@ int handleCmdLine()
 
     if(CommandLine::has("--numkarts", &n) ||CommandLine::has("-k", &n))
     {
-        UserConfigParams::m_num_karts = n;
-        if(UserConfigParams::m_num_karts > stk_config->m_max_karts)
+        UserConfigParams::m_default_num_karts = n;
+        if(UserConfigParams::m_default_num_karts > stk_config->m_max_karts)
         {
             Log::warn("main", "Number of karts reset to maximum number %d.",
                       stk_config->m_max_karts);
-            UserConfigParams::m_num_karts = stk_config->m_max_karts;
+            UserConfigParams::m_default_num_karts = stk_config->m_max_karts;
         }
-        race_manager->setNumKarts( UserConfigParams::m_num_karts );
+        race_manager->setNumKarts( UserConfigParams::m_default_num_karts );
         Log::verbose("main", "%d karts will be used.",
-                     (int)UserConfigParams::m_num_karts);
+                     (int)UserConfigParams::m_default_num_karts);
     }   // --numkarts
 
     if(CommandLine::has( "--no-start-screen") ||
@@ -1812,8 +1815,10 @@ int main(int argc, char *argv[] )
     }  // try
     catch (std::exception &e)
     {
+        Log::flushBuffers();
         Log::error("main", "Exception caught : %s.",e.what());
         Log::error("main", "Aborting SuperTuxKart.");
+        Log::flushBuffers();
     }
 
     /* Program closing...*/
@@ -1836,6 +1841,8 @@ int main(int argc, char *argv[] )
 #ifdef DEBUG
     MemoryLeaks::checkForLeaks();
 #endif
+
+    Log::flushBuffers();
 
 #ifndef WIN32
     if (user_config) //close logfiles

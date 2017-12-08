@@ -31,6 +31,7 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/create_server_screen.hpp"
 #include "states_screens/networking_lobby.hpp"
+#include "states_screens/online_lan.hpp"
 #include "states_screens/server_selection.hpp"
 #include "utils/translation.hpp"
 
@@ -44,128 +45,68 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( OnlineProfileServers );
+DEFINE_SCREEN_SINGLETON( OnlineLanScreen );
 
 // -----------------------------------------------------------------------------
 
-OnlineProfileServers::OnlineProfileServers() : GUIEngine::Screen("online/profile_servers.stkgui")
+OnlineLanScreen::OnlineLanScreen() : GUIEngine::Screen("online/lan.stkgui")
 {
-}   // OnlineProfileServers
+}   // OnlineLanScreen
 
 // -----------------------------------------------------------------------------
 
-void OnlineProfileServers::loadedFromFile()
+void OnlineLanScreen::loadedFromFile()
 {
-    if (!PlayerManager::getCurrentOnlineId())
-    {
-        getWidget<IconButtonWidget>("find_wan_server")->setActive(false);
-        getWidget<IconButtonWidget>("create_wan_server")->setActive(false);
-        getWidget<IconButtonWidget>("quick_wan_play")->setActive(false);
-    }
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
 
-void OnlineProfileServers::init()
+void OnlineLanScreen::init()
 {
-    RibbonWidget* ribbon = getWidget<RibbonWidget>("wan");
+    RibbonWidget* ribbon = getWidget<RibbonWidget>("lan");
     assert(ribbon != NULL);
-    ribbon->select("find_wan_server", PLAYER_ID_GAME_MASTER);
+    ribbon->select("find_lan_server", PLAYER_ID_GAME_MASTER);
     ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // init
 
 // -----------------------------------------------------------------------------
 
-void OnlineProfileServers::eventCallback(Widget* widget, const std::string& name, const int playerID)
+void OnlineLanScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     if (name == "back")
     {
         StateManager::get()->popMenu();
         return;
     }
-    if (name == "wan")
+    if (name == "lan")
     {
         RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
         std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        if (selection == "find_wan_server")
+        if (selection == "create_lan_server")
         {
-            NetworkConfig::get()->setIsWAN();
+            NetworkConfig::get()->setIsLAN();
+            NetworkConfig::get()->setIsServer(true);
+            CreateServerScreen::getInstance()->push();
+            // TODO: create lan server
+        }
+        else if (selection == "find_lan_server")
+        {
+            NetworkConfig::get()->setIsLAN();
             NetworkConfig::get()->setIsServer(false);
             ServerSelection::getInstance()->push();
         }
-        else if (selection == "create_wan_server")
-        {
-            NetworkConfig::get()->setIsWAN();
-            NetworkConfig::get()->setIsServer(true);
-            CreateServerScreen::getInstance()->push();
-        }
-        else if (selection == "quick_wan_play")
-        {
-            doQuickPlay();
-        }
     }
-
+    
 }   // eventCallback
-
-// ----------------------------------------------------------------------------
-
-void OnlineProfileServers::doQuickPlay()
-{
-    // Refresh server list.
-    HTTPRequest* refresh_request = ServersManager::get()->getRefreshRequest(false);
-    if (refresh_request != NULL) // consider request done
-    {
-        refresh_request->executeNow();
-        delete refresh_request;
-    }
-    else
-    {
-        Log::error("OnlineScreen", "Could not get the server list.");
-        return;
-    }
-
-    // select first one
-    const Server *server = ServersManager::get()->getQuickPlay();
-    if(!server)
-    {
-        Log::error("OnlineProfileServers", "Can not find quick play server.");
-        return;
-    }
-
-    // do a join request
-    XMLRequest *join_request = new RequestConnection::ServerJoinRequest();
-    if (!join_request)
-    {
-        SFXManager::get()->quickSound("anvil");
-        return;
-    }
-
-    PlayerManager::setUserDetails(join_request, "request-connection",
-        Online::API::SERVER_PATH);
-    join_request->addParameter("server_id", server->getServerId());
-
-    join_request->executeNow();
-    if (join_request->isSuccess())
-    {
-        delete join_request;
-        NetworkingLobby::getInstance()->push();
-        ConnectToServer *cts = new ConnectToServer(server->getServerId(),
-            server->getHostId());
-        ProtocolManager::getInstance()->requestStart(cts);
-    }
-    else
-    {
-        SFXManager::get()->quickSound("anvil");
-    }
-}   // doQuickPlay
 
 // ----------------------------------------------------------------------------
 /** Also called when pressing the back button. It resets the flags to indicate
  *  a networked game.
  */
-bool OnlineProfileServers::onEscapePressed()
+bool OnlineLanScreen::onEscapePressed()
 {
     NetworkConfig::get()->unsetNetworking();
+    //StateManager::get()->popMenu();
     return true;
 }   // onEscapePressed
 

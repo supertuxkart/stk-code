@@ -29,7 +29,7 @@
 #include "tracks/track_manager.hpp"
 
 std::vector<std::string> DemoWorld::m_demo_tracks;
-int                      DemoWorld::m_num_karts         = 2;
+int                      DemoWorld::m_default_num_karts = 2;
 float                    DemoWorld::m_max_idle_time     = 99999.0f;
 float                    DemoWorld::m_current_idle_time = 0;
 bool                     DemoWorld::m_do_demo           = false;
@@ -49,7 +49,7 @@ DemoWorld::DemoWorld()
     race_manager->setReverseTrack(false);
     race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
     race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
-    race_manager->setNumKarts(m_num_karts);
+    race_manager->setNumKarts(m_default_num_karts);
     race_manager->setNumPlayers(1);
     race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
 
@@ -149,7 +149,7 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 
     m_do_demo = true;
-    race_manager->setNumKarts(m_num_karts);
+    race_manager->setNumKarts(m_default_num_karts);
     race_manager->setPlayerKart(0, "tux");
     race_manager->setupPlayerKartInfo();
     race_manager->startSingleRace(m_demo_tracks[0], m_num_laps, false);

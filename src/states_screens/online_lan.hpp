@@ -16,55 +16,42 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef __HEADER_ONLINE_PROFILE_BASE_HPP__
-#define __HEADER_ONLINE_PROFILE_BASE_HPP__
+#ifndef __HEADER_OLAN_HPP__
+#define __HEADER_OLAN_HPP__
 
 #include <string>
 #include <irrString.h>
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
-#include "online/profile_manager.hpp"
+#include "states_screens/online_profile_base.hpp"
 
 namespace GUIEngine { class Widget; }
 
 
-/** Online profile base screen. Used for displaying friends, achievements,
- *  and settings. It handles the tabs which are common to each
- *  of those screens, and keeps track of the profile to display.
- * \ingroup states_screens
- */
-class OnlineProfileBase : public GUIEngine::Screen
+/**
+  * \brief Online profiel overview screen
+  * \ingroup states_screens
+  */
+class OnlineLanScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OnlineLanScreen>
 {
 protected:
-    OnlineProfileBase(const std::string &filename);
-
-    /** Pointer to the various widgets on the screen. */
-    GUIEngine::LabelWidget * m_header;
-    GUIEngine::RibbonWidget* m_profile_tabs;
-    GUIEngine::IconButtonWidget * m_friends_tab;
-    GUIEngine::IconButtonWidget * m_achievements_tab;
-    GUIEngine::IconButtonWidget * m_settings_tab;
-
-    /** The profile that should be shown. */
-    Online::OnlineProfile *m_visiting_profile;
+    OnlineLanScreen();
 
 public:
+    friend class GUIEngine::ScreenSingleton<OnlineLanScreen>;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget,
-                               const std::string& name,
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                                const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
-
     virtual bool onEscapePressed() OVERRIDE;
 
-    virtual void beforeAddingWidget() OVERRIDE;
-};
+};   // class OnlineProfileServers
 
 #endif

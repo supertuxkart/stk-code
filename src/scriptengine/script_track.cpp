@@ -295,6 +295,33 @@ namespace Scripting
                 return -1;
             }
 
+            /** Remove all animation set for a skeletal animation */
+            void removeAllAnimationSet(/** \cond DOXYGEN_IGNORE */void *memory /** \endcond */)
+            {
+                if (memory)
+                {
+                    ((scene::IAnimatedMeshSceneNode*)(memory))->removeAllAnimationSet();
+                }
+            }
+
+            /** Add an animation set for a skeletal animation */
+            void addAnimationSet(int start/** \cond DOXYGEN_IGNORE */, int end/** \cond DOXYGEN_IGNORE */, /** \cond DOXYGEN_IGNORE */void *memory /** \endcond */)
+            {
+                if (memory)
+                {
+                    ((scene::IAnimatedMeshSceneNode*)(memory))->addAnimationSet(start, end);
+                }
+            }
+
+            /** use an current frame for a skeletal animation */
+            void useAnimationSet(int set_num /** \cond DOXYGEN_IGNORE */, void *memory /** \endcond */)
+            {
+                if (memory)
+                {
+                    ((scene::IAnimatedMeshSceneNode*)(memory))->useAnimationSet(set_num);
+                }
+            }
+
             /** Sets the current frame for a skeletal animation */
             void setCurrentFrame(int frame /** \cond DOXYGEN_IGNORE */, void *memory /** \endcond */)
             {
@@ -465,6 +492,8 @@ namespace Scripting
             r = engine->RegisterObjectMethod("TrackObject", "void moveTo(const Vec3 &in, bool)", asMETHOD(::TrackObject, moveTo), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "Vec3 getCenterPosition()", asFUNCTION(TrackObject::getCenterPosition), asCALL_CDECL_OBJLAST); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "Vec3 getOrigin()", asFUNCTION(TrackObject::getOrigin), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("TrackObject", "TrackObject@ getParentLibrary()", asMETHOD(::TrackObject, getParentLibrary), asCALL_THISCALL); assert(r >= 0);
+            r = engine->RegisterObjectMethod("TrackObject", "string getName()", asMETHOD(::TrackObject, getName), asCALL_THISCALL); assert(r >= 0);
 
             // PhysicalObject
             r = engine->RegisterObjectMethod("PhysicalObject", "bool isFlattenKartObject()", asMETHOD(PhysicalObject, isFlattenKartObject), asCALL_THISCALL); assert(r >= 0);
@@ -476,6 +505,9 @@ namespace Scripting
             r = engine->RegisterObjectMethod("Mesh", "void setFrameLoopOnce(int start, int end)", asFUNCTION(Mesh::setFrameLoopOnce), asCALL_CDECL_OBJLAST); assert(r >= 0);
             r = engine->RegisterObjectMethod("Mesh", "int getFrameNr()", asFUNCTION(Mesh::getFrameNr), asCALL_CDECL_OBJLAST); assert(r >= 0);
             r = engine->RegisterObjectMethod("Mesh", "int getAnimationSet()", asFUNCTION(Mesh::getAnimationSet), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("Mesh", "void useAnimationSet(int set_num)", asFUNCTION(Mesh::useAnimationSet), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("Mesh", "void addAnimationSet(int start, int end)", asFUNCTION(Mesh::addAnimationSet), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("Mesh", "void removeAllAnimationSet()", asFUNCTION(Mesh::removeAllAnimationSet), asCALL_CDECL_OBJLAST); assert(r >= 0);
             r = engine->RegisterObjectMethod("Mesh", "void setCurrentFrame(int frame)", asFUNCTION(Mesh::setCurrentFrame), asCALL_CDECL_OBJLAST); assert(r >= 0);
             //r = engine->RegisterObjectMethod("Mesh", "void move(Vec3 &in)", asFUNCTION(movePresentation), asCALL_CDECL_OBJLAST); assert(r >= 0);
 
