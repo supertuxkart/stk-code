@@ -218,10 +218,6 @@ protected:
                           mesh_map,
                           instance_buffer);
         }
-                    /*glBindBuffer(GL_ARRAY_BUFFER,
-                         VAOManager::getInstance()->getInstanceBuffer(instance_type));
-                         glFlushMappedBufferRange(GL_ARRAY_BUFFER, 0,10000 * sizeof(InstanceDataThreeTex));
-                                             glBindBuffer(GL_ARRAY_BUFFER,0);*/
         if (!CVS->supportsAsyncInstanceUpload())
         {
             glUnmapBuffer(GL_ARRAY_BUFFER);

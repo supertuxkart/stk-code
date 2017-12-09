@@ -166,9 +166,6 @@ void SolidCommandBuffer::fill(MeshMap *mesh_map)
 
     fillInstanceData<InstanceDataFourTex, MeshMap>
         (mesh_map, four_tex_material_list, InstanceTypeFourTex);
-                   /* glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_draw_indirect_cmd_id);
-                         glFlushMappedBufferRange(GL_DRAW_INDIRECT_BUFFER, 0,10000 * 20);
-                                             glBindBuffer(GL_DRAW_INDIRECT_BUFFER,0);*/
     if (!CVS->supportsAsyncInstanceUpload())
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 } //SolidCommandBuffer::fill
