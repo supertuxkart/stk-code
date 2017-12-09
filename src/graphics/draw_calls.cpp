@@ -721,8 +721,8 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
     solid_poly_count = m_solid_cmd_buffer->getPolyCount();
     shadow_poly_count = m_shadow_cmd_buffer->getPolyCount();    
 
-    if (CVS->supportsAsyncInstanceUpload())
-        glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
+    //if (CVS->supportsAsyncInstanceUpload())
+    //    glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
 #endif // !defined(USE_GLES2)
 }
 
