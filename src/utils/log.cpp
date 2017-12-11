@@ -115,7 +115,7 @@ void Log::resetTerminalColor()
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
                             /*TERM_BLACK*/0 << 4 | /*TERM_LIGHTGRAY*/7);
 #else
-    printf("%c[0;;m\n", 0x1B);
+    printf("%c[0;;m", 0x1B);
 #endif
 }   // resetTerminalColor
 
