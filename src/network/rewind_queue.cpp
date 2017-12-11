@@ -317,12 +317,25 @@ void RewindQueue::mergeNetworkData(float world_time, float dt,
         // or if the time is between world_time and world_time+dt (otherwise
         // the message would have been ignored further up), 'rewind' to this new
         // state anyway
-        if (tsi->getTime() < world_time ||
-            (*i)->isState() && tsi == m_time_step_info.back())
+        if (NetworkConfig::get()->isClient())
         {
-            *needs_rewind = true;
-            if (tsi->getTime() > *rewind_time) *rewind_time = tsi->getTime();
-        }
+            // We need rewind if we either receive an event in the past
+            // (FIXME: maybe we can just ignore this since we will also get
+            // a state update??), or receive a state from the current time
+            // (i.e. between world_time and world_time+dt). In the latter
+            // case we can just 'rewind' to this stage instead of doing a
+            // full simulation - though this client should potentially 
+            // speed up a bit: if it receives a state from the server
+            // at the time the client is currently simulating (instead of
+            // triggering a rollback) it is not ahead enough of the server
+            // which will trigger a time adjustment from the server anyway.
+            if (tsi->getTime() < world_time ||
+                (*i)->isState() && tsi == m_time_step_info.back())
+            {
+                *needs_rewind = true;
+                if (tsi->getTime() > *rewind_time) *rewind_time = tsi->getTime();
+            }
+        }   // if client
         i = m_network_events.getData().erase(i);
     }   // for i in m_network_events
 
