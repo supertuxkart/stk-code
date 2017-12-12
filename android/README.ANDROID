@@ -177,4 +177,4 @@ and then:
     
 6.  Turning left/right using accelerometer is available, but at this stage the
     default screen orientation is not automatically detected and user must 
-    manually choose if he needs "phone" or "tablet" accelerometer.
+    manually choose if they need "phone" or "tablet" accelerometer.
