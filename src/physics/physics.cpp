@@ -31,6 +31,7 @@
 #include "karts/controller/local_player_controller.hpp"
 #include "modes/soccer_world.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "karts/explosion_animation.hpp"
 #include "physics/btKart.hpp"
 #include "physics/irr_debug_drawer.hpp"
@@ -152,7 +153,14 @@ void Physics::update(float dt)
 
     // Maximum of three substeps. This will work for framerate down to
     // 20 FPS (bullet default frequency is 60 HZ).
-    m_dynamics_world->stepSimulation(dt, 6, 1.0f/120.0f);
+    int max_num_steps = 6;
+    if (NetworkConfig::get()->isNetworking())
+    {
+        // In networking we have to make sure that we run the right number
+        // of physics step, otherwise the results diverge too much
+        max_num_steps = 999;
+    }
+    m_dynamics_world->stepSimulation(dt, max_num_steps, 1.0f/120.0f);
 
     // Now handle the actual collision. Note: flyables can not be removed
     // inside of this loop, since the same flyables might hit more than one
