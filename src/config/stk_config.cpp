@@ -117,6 +117,15 @@ void STKConfig::load(const std::string &filename)
         Log::fatal("StkConfig", "Wrong number of item switches defined in stk_config");
     }
 
+    if (m_positional_smoothing.size() == 0)
+    {
+        Log::fatal("StkConfig", "No positional smoothing defined in stk_config.");
+    }
+    if (m_rotational_smoothing.size() == 0)
+    {
+        Log::fatal("StkConfig", "No rotationalsmoothing defined in stk_config.");
+    }
+
     CHECK_NEG(m_max_karts,                 "<karts max=..."             );
     CHECK_NEG(m_item_switch_time,          "item-switch-time"           );
     CHECK_NEG(m_bubblegum_counter,         "bubblegum disappear counter");
@@ -350,7 +359,9 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if (const XMLNode *networking_node = root->getNode("networking"))
     {
-        networking_node->get("state-frequency", &m_network_state_frequeny);
+        networking_node->get("state-frequency",      &m_network_state_frequeny);
+        networking_node->get("positional-smoothing", &m_positional_smoothing  );
+        networking_node->get("rotational-smoothing", &m_rotational_smoothing  );
     }
 
     if(const XMLNode *replay_node = root->getNode("replay"))

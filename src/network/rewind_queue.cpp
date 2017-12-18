@@ -435,6 +435,8 @@ void RewindQueue::unitTesting()
         virtual void undoState(BareNetworkString *s) {}
         virtual void undo(BareNetworkString *s) {}
         virtual void rewind(BareNetworkString *s) {}
+        virtual void saveTransform() {}
+        virtual void computeError() {}
         DummyRewinder() : Rewinder(true) {}
     };
     DummyRewinder *dummy_rewinder = new DummyRewinder();

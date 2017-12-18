@@ -40,7 +40,8 @@ class Material;
 class Moveable: public NoCopy
 {
 private:
-    btVector3              m_velocityLC;      /**<Velocity in kart coordinates. */
+    Vec3                   m_velocityLC;      /**<Velocity in kart coordinates. */
+    /** The bullet transform of this rigid body. */
     btTransform            m_transform;
     /** The 'real' heading between -180 to 180 degrees. */
     float                  m_heading;
@@ -48,6 +49,14 @@ private:
     float                  m_pitch;
     /** The roll between -180 and 180 degrees. */
     float                  m_roll;
+
+    /** Client prediction in networked games might cause the visual
+     *  and physical position to be different. For visual smoothing
+     *  this variable accumulates the error and reduces it over time. */
+    Vec3                   m_positional_error;
+
+    /** Similar to m_positional_error for rotation. */
+    btQuaternion           m_rotational_error;
 
 protected:
     UserPointer            m_user_pointer;
@@ -119,7 +128,8 @@ public:
                  &getTrans() const {return m_transform;}
     void          setTrans(const btTransform& t);
     void          updatePosition();
-}
-;   // class Moveable
+    void          addError(const Vec3& pos_error,
+                           const btQuaternion &rot_error);
+};   // class Moveable
 
 #endif

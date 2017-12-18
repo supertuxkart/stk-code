@@ -52,6 +52,26 @@ void KartRewinder::reset()
 }   // reset
 
 // ----------------------------------------------------------------------------
+/** This function is called immediately before a rewind is done and saves
+ *  the current transform for the kart. The difference between this saved
+ *  transform and the new transform after rewind is the error that needs
+ *  (smoothly) be applied to the graphical position of the kart. 
+ */
+void KartRewinder::saveTransform()
+{
+    m_saved_transform = getTrans();
+}   // saveTransform
+
+// ----------------------------------------------------------------------------
+void KartRewinder::computeError()
+{
+    //btTransform error = getTrans() - m_saved_transform;
+    Vec3 pos_error = getTrans().getOrigin() - m_saved_transform.getOrigin();
+    btQuaternion rot_error(0, 0, 0, 1);
+    Kart::addError(pos_error, rot_error);
+}   // computeError
+
+// ----------------------------------------------------------------------------
 /** Saves all state information for a kart in a memory buffer. The memory
  *  is allocated here and the address returned. It will then be managed
  *  by the RewindManager. The size is used to keep track of memory usage
@@ -114,6 +134,15 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
     t.setRotation(buffer->getQuat());
     btRigidBody *body = getBody();
     body->setLinearVelocity(buffer->getVec3());
+    Log::info("KartRewinder", "t %f xyz %f %f %f v %f %f %f",
+        World::getWorld()->getTime(),
+        t.getOrigin().getX(),
+        t.getOrigin().getY(),
+        t.getOrigin().getZ(),
+        body->getLinearVelocity().getX(),
+        body->getLinearVelocity().getY(),
+        body->getLinearVelocity().getZ());
+
     body->setAngularVelocity(buffer->getVec3());
     // This function also reads the velocity, so it must be called
     // after the velocities are set

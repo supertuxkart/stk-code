@@ -34,6 +34,9 @@ private:
     // Flags to indicate the different event types
     enum { EVENT_CONTROL = 0x01,
            EVENT_ATTACH  = 0x02 };
+
+    /** The transform of the kart before a rewind starts. */
+    btTransform m_saved_transform;
 public:
 	             KartRewinder(const std::string& ident,
                               unsigned int world_kart_id,
@@ -41,6 +44,8 @@ public:
                               PerPlayerDifficulty difficulty,
                               KartRenderType krt = KRT_DEFAULT);
    virtual      ~KartRewinder() {};
+   virtual void  saveTransform() OVERRIDE;
+   virtual void  computeError() OVERRIDE;
    virtual BareNetworkString* saveState() const;
    void          reset();
    virtual void  rewindToState(BareNetworkString *p) OVERRIDE;

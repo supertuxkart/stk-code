@@ -27,6 +27,7 @@
  */
 
 #include "network/remote_kart_info.hpp"
+#include "utils/interpolation_array.hpp"
 #include "utils/no_copy.hpp"
 
 #include <vector>
@@ -84,6 +85,13 @@ public:
 
     /** How many state updates per second the server will send. */
     int m_network_state_frequeny;
+
+    /** Smoothing of prediction errors for position, defined as an
+     *  InterpolationArray. */
+    InterpolationArray m_positional_smoothing;
+    /** Smoothing of prediction errors for rotations, defined as an
+     *  InterpolationArray. */
+    InterpolationArray m_rotational_smoothing;
 
     /** If the angle between a normal on a vertex and the normal of the
      *  triangle are more than this value, the physics will use the normal

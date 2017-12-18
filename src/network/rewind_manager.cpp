@@ -277,6 +277,16 @@ void RewindManager::rewindTo(float rewind_time)
     assert(!m_is_rewinding);
     history->doReplayHistory(History::HISTORY_NONE);
 
+    // First save all current transforms so that the error
+    // can be computed between the transforms before and after
+    // the rewind.
+    AllRewinder::iterator rewinder;
+    for (rewinder = m_all_rewinder.begin(); 
+         rewinder != m_all_rewinder.end(); ++rewinder)
+    {
+        (*rewinder)->saveTransform();
+    }
+
     // Then undo the rewind infos going backwards in time
     // --------------------------------------------------
     m_is_rewinding = true;
@@ -334,6 +344,14 @@ void RewindManager::rewindTo(float rewind_time)
         current = m_rewind_queue.getCurrent();
         world->setTime(current->getTime());
     }   // while (world->getTime() < current_time)
+
+    // Now compute the errors which need to be visually smoothed
+    for (rewinder = m_all_rewinder.begin();
+        rewinder != m_all_rewinder.end(); ++rewinder)
+    {
+        (*rewinder)->computeError();
+    }
+
 
     m_is_rewinding = false;
 }   // rewindTo
