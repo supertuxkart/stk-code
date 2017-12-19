@@ -321,7 +321,7 @@ core::stringc ListUserConfigParam<T, U>::toString() const
     return "";
 }   // toString
 
-    // ============================================================================
+// ----------------------------------------------------------------------------
 template<typename T, typename U>
 MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
     const char* comment)
@@ -331,7 +331,7 @@ MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
     if (comment != NULL) m_comment = comment;
 }   // MapUserConfigParam
 
-    // ============================================================================
+// ----------------------------------------------------------------------------
 template<typename T, typename U>
 MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
     const char* comment,
@@ -345,7 +345,7 @@ MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
     // add the default list
     va_list arguments;
     va_start(arguments, nb_elements);
-   
+
     struct pair_type { T key; U value; };
 
     for (int i = 0; i < nb_elements; i++) 
@@ -356,7 +356,7 @@ MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
     va_end(arguments);                  // Cleans up the list
 }   // MapUserConfigParam
 
-    // ============================================================================
+// ----------------------------------------------------------------------------
 template<typename T, typename U>
 MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
     GroupUserConfigParam* group,
@@ -367,7 +367,7 @@ MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
     if (comment != NULL) m_comment = comment;
 }   // MapUserConfigParam
 
-    // ============================================================================
+// ----------------------------------------------------------------------------
 template<typename T, typename U>
 MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
     GroupUserConfigParam* group,
@@ -382,30 +382,25 @@ MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
     // add the default list
     va_list arguments;
     va_start(arguments, nb_elements);
-    
+
     struct pair_type { T key; U value; };
 
-    for (int i = 0; i < nb_elements; i++) {
+    for (int i = 0; i < nb_elements; i++)
+    {
         pair_type key_value_pair = va_arg(arguments, pair_type);
         m_elements.insert(std::pair<T, U>(key_value_pair.key, key_value_pair.value));
     }
     va_end(arguments);                  // Cleans up the list
 }   // MapUserConfigParam
 
-    // ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 template<typename T, typename U>
 void MapUserConfigParam<T, U>::write(std::ofstream& stream) const
 {
-    const int elts_amount = m_elements.size();
-
     // comment
     if (m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str();
     stream << " -->\n    <" << m_param_name.c_str() << "\n";
 
-    stream << "        Size=\"" << elts_amount << "\"\n";
-    // actual elements
-    //for (int n = 0; n<elts_amount; n++)
-    
     for (const auto& kv : m_elements) 
     {
         stream << "        " << kv.first << "=\"" << kv.second << "\"\n";
@@ -414,7 +409,7 @@ void MapUserConfigParam<T, U>::write(std::ofstream& stream) const
     stream << "    </" << m_param_name.c_str() << ">\n\n";
 }   // write
 
-    // ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 template<typename T, typename U>
 void MapUserConfigParam<T, U>::findYourDataInAChildOf(const XMLNode* node)
@@ -425,56 +420,30 @@ void MapUserConfigParam<T, U>::findYourDataInAChildOf(const XMLNode* node)
         //Log::error("User Config", "Couldn't find parameter group %s", m_param_name.c_str());
         return;
     }
-
-    int attr_count = 0;
-    child->get("Size", &attr_count);
-    
-    for (const auto& kv : m_elements) 
-    {
-        std::pair<T,U> elt;
-        elt.first = kv.first;
-        elt.second = kv.second;
-
-        
-        bool there = false;
-
-        for (const auto& kvRHS : m_elements) 
-        {
-            if (elt.second == kvRHS.second)
-            {
-                there = true;
-                break;
-            }
-
-        }
-        if (!there)
-        {
-            m_elements.insert(elt);
-        }
-    }
+    child->get(&m_elements);
 }   // findYourDataInAChildOf
 
-    // ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 template<typename T, typename U>
 void MapUserConfigParam<T, U>::findYourDataInAnAttributeOf(const XMLNode* node)
 {
 }   // findYourDataInAnAttributeOf
 
-    // ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 template<typename T, typename U>
 void MapUserConfigParam<T, U>::addElement(T element, U value)
 {
     m_elements[element] = value;
 }   // findYourDataInAnAttributeOf
 
-    // ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 template<typename T, typename U>
 core::stringc MapUserConfigParam<T, U>::toString() const
 {
     return "";
 }   // toString
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 IntUserConfigParam::IntUserConfigParam(int default_value,
                                        const char* param_name,
                                        const char* comment)
