@@ -265,8 +265,12 @@ void RewindQueue::mergeNetworkData(float world_time, float dt,
     AllNetworkRewindInfo::iterator i = m_network_events.getData().begin();
     while( i!=m_network_events.getData().end() )
     {
-        // Ignore any events that will happen in the future.
-        if ((*i)->getTime() > world_time+dt)
+        // Ignore any events that will happen in the future. An event needs
+        // to be handled at the closest time to its original time. The current
+        // time step id world_time, the next will be world_time+dt. So if the
+        // event is later than world_time+0.5*dt, it will be closer to a
+        // future time stamp and is ignored now.
+        if ((*i)->getTime() > world_time+0.5f*dt)
         {
             i++;
             continue;
