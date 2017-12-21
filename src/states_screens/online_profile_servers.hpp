@@ -33,7 +33,7 @@ namespace GUIEngine { class Widget; }
   * \brief Online profiel overview screen
   * \ingroup states_screens
   */
-class OnlineProfileServers : public OnlineProfileBase, public GUIEngine::ScreenSingleton<OnlineProfileServers>
+class OnlineProfileServers : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OnlineProfileServers>
 {
 protected:
     OnlineProfileServers();

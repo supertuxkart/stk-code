@@ -31,6 +31,7 @@
 #include "physics/physical_object.hpp"
 #include "race/race_manager.hpp"
 #include "scriptengine/script_engine.hpp"
+#include "tracks/track.hpp"
 #include "tracks/model_definition_loader.hpp"
 
 #include <IAnimatedMeshSceneNode.h>
@@ -160,6 +161,10 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     {
         xml_node.get("name", &m_name);
         m_presentation = new TrackObjectPresentationLibraryNode(this, xml_node, model_def_loader);
+        if (parent_library != NULL)
+        {
+            Track::getCurrentTrack()->addMetaLibrary(parent_library, this);
+        }
     }
     else if (type == "sfx-emitter")
     {

@@ -175,6 +175,8 @@ namespace scene
 
 		u32 getTotalJoints() const { return m_total_joints; }
 
+		f32 AnimationFrames;
+
 private:
 		void toStaticPose();
 
@@ -215,7 +217,6 @@ private:
 
 		core::aabbox3d<f32> BoundingBox;
 
-		f32 AnimationFrames;
 		f32 FramesPerSecond;
 
 		f32 LastAnimatedFrame;

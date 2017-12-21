@@ -2181,7 +2181,7 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
         {
             const float speed_for_max_volume = 15; //The speed at which the sound plays at maximum volume
             const float max_volume = 1; //The maximum volume a sound is played at 
-            const float min_volume = 0.2; //The minimum volume a sound is played at 
+            const float min_volume = 0.2f; //The minimum volume a sound is played at 
             
             float volume; //The volume the crash sound will be played at
             
