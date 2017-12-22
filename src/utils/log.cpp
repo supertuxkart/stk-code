@@ -210,7 +210,7 @@ void Log::writeLine(const char *line, int level)
         case LL_FATAL:   alp = ANDROID_LOG_FATAL;   break;
         default:         alp = ANDROID_LOG_FATAL;
         }
-        __android_log_vprint(alp, "SuperTuxKart", line);
+        __android_log_print(alp, "SuperTuxKart", "%s", line);
 #else
         printf(line);
 #endif
@@ -221,7 +221,7 @@ void Log::writeLine(const char *line, int level)
     OutputDebugString(line);
 #endif
 
-    if (m_file_stdout) fprintf(m_file_stdout, line);
+    if (m_file_stdout) fprintf(m_file_stdout, "%s", line);
 
 #ifdef WIN32
     if (level >= LL_FATAL)
