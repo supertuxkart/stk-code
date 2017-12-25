@@ -28,7 +28,6 @@
 
 #include "LinearMath/btTransform.h"
 
-#include "graphics/render_info.hpp"
 #include "items/powerup_manager.hpp"    // For PowerupType
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
@@ -53,6 +52,8 @@ class SkidMarks;
 class SlipStream;
 class Stars;
 class TerrainInfo;
+
+enum KartRenderType: unsigned int;
 
 /** The main kart class. All type of karts are of this object, but with
  *  different controllers. The controllers are what turn a kart into a
@@ -246,7 +247,7 @@ public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
                         PerPlayerDifficulty difficulty,
-                        KartRenderType krt = KRT_DEFAULT);
+                        KartRenderType krt);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
     virtual void   kartIsInRestNow();

@@ -46,15 +46,15 @@ out float camdist;
 void main(void)
 {
     color = Color.zyxw;
-    mat4 ModelViewProjectionMatrix = ProjectionViewMatrix * ModelMatrix;
-    mat4 TransposeInverseModelView = transpose(InverseModelMatrix * InverseViewMatrix);
+    mat4 ModelViewProjectionMatrix = u_projection_view_matrix * ModelMatrix;
+    mat4 TransposeInverseModelView = transpose(InverseModelMatrix * u_inverse_view_matrix);
     gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
     // Keep orthogonality
     nor = (TransposeInverseModelView * vec4(Normal, 0.)).xyz;
     // Keep direction
-    tangent = (ViewMatrix * ModelMatrix * vec4(Tangent, 0.)).xyz;
-    bitangent = (ViewMatrix * ModelMatrix * vec4(Bitangent, 0.)).xyz;
+    tangent = (u_view_matrix * ModelMatrix * vec4(Tangent, 0.)).xyz;
+    bitangent = (u_view_matrix * ModelMatrix * vec4(Bitangent, 0.)).xyz;
     uv = vec2(Texcoord.x + texture_trans.x, Texcoord.y + texture_trans.y);
     uv_bis = SecondTexcoord;
-    camdist = length(ViewMatrix * ModelMatrix * vec4(Position, 1.));
+    camdist = length(u_view_matrix * ModelMatrix * vec4(Position, 1.));
 }

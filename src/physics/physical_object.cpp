@@ -19,9 +19,11 @@
 #include "physics/physical_object.hpp"
 
 #include "config/stk_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
+#include "graphics/sp/sp_mesh_buffer.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "physics/physics.hpp"
@@ -29,6 +31,7 @@
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "utils/constants.hpp"
+#include "utils/mini_glm.hpp"
 #include "utils/string_utils.hpp"
 
 #include <ISceneManager.h>
@@ -384,104 +387,130 @@ void PhysicalObject::init(const PhysicalObject::Settings& settings)
         for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
         {
             scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-            // FIXME: take translation/rotation into account
-            if (mb->getVertexType() != video::EVT_STANDARD &&
-                mb->getVertexType() != video::EVT_2TCOORDS &&
-                mb->getVertexType() != video::EVT_TANGENTS)
-            {
-                Log::warn("PhysicalObject",
-                          "createPhysicsBody: Ignoring type '%d'!",
-                          mb->getVertexType());
-                continue;
-            }
-
-            // Handle readonly materials correctly: mb->getMaterial can return
-            // NULL if the node is not using readonly materials. E.g. in case
-            // of a water scene node, the mesh (which is the animated copy of
-            // the original mesh) does not contain any material information,
-            // the material is only available in the node.
-            const video::SMaterial &irrMaterial =
-                is_readonly_material ? mb->getMaterial()
-                : presentation->getNode()->getMaterial(i);
-            video::ITexture* t=irrMaterial.getTexture(0);
-
-            const Material* material=0;
-            if(t)
-            {
-                std::string image =
-                              std::string(core::stringc(t->getName()).c_str());
-                material = material_manager
-                         ->getMaterial(StringUtils::getBasename(image));
-                if(material->isIgnore())
-                    continue;
-            }
-
             u16 *mbIndices = mb->getIndices();
             Vec3 vertices[3];
             Vec3 normals[3];
+#ifndef SERVER_ONLY
+            if (CVS->isGLSL())
+            {
+                SP::SPMeshBuffer* spmb = static_cast<SP::SPMeshBuffer*>(mb);
+                video::S3DVertexSkinnedMesh* mbVertices = (video::S3DVertexSkinnedMesh*)mb->getVertices();
+                for (unsigned int j = 0; j < mb->getIndexCount(); j += 3)
+                {
+                    Material* material = spmb->getSTKMaterial(j);
+                    if (material->isIgnore())
+                    {
+                        continue;
+                    }
+                    for (unsigned int k = 0; k < 3; k++)
+                    {
+                        int indx = mbIndices[j + k];
+                        core::vector3df v = mbVertices[indx].m_position;
+                        vertices[k] = v;
+                        normals[k] = MiniGLM::decompressVector3(mbVertices[indx].m_normal);
+                    }   // for k
+                    triangle_mesh->addTriangle(vertices[0], vertices[1],
+                        vertices[2], normals[0], normals[1], normals[2],
+                        material);
+                }   // for j
+            } // for matrix_index
+            else
+#endif
+            {
+                // FIXME: take translation/rotation into account
+                if (mb->getVertexType() != video::EVT_STANDARD &&
+                    mb->getVertexType() != video::EVT_2TCOORDS &&
+                    mb->getVertexType() != video::EVT_TANGENTS &&
+                    mb->getVertexType() != video::EVT_SKINNED_MESH)
+                {
+                    Log::warn("PhysicalObject",
+                              "createPhysicsBody: Ignoring type '%d'!",
+                              mb->getVertexType());
+                    continue;
+                }
 
-            if (mb->getVertexType() == video::EVT_STANDARD)
-            {
-                irr::video::S3DVertex* mbVertices =
-                                          (video::S3DVertex*)mb->getVertices();
-                for(unsigned int j=0; j<mb->getIndexCount(); j+=3)
-                {
-                    for(unsigned int k=0; k<3; k++)
-                    {
-                        int indx=mbIndices[j+k];
-                        core::vector3df v = mbVertices[indx].Pos;
-                        //mat.transformVect(v);
-                        vertices[k]=v;
-                        normals[k]=mbVertices[indx].Normal;
-                    }   // for k
-                    triangle_mesh->addTriangle(vertices[0], vertices[1],
-                                               vertices[2], normals[0],
-                                               normals[1],  normals[2],
-                                               material                 );
-                }   // for j
-            }
-            else if (mb->getVertexType() == video::EVT_2TCOORDS)
-            {
-                irr::video::S3DVertex2TCoords* mbVertices =
-                    (video::S3DVertex2TCoords*)mb->getVertices();
-                for(unsigned int j=0; j<mb->getIndexCount(); j+=3)
-                {
-                    for(unsigned int k=0; k<3; k++)
-                    {
-                        int indx=mbIndices[j+k];
-                        core::vector3df v = mbVertices[indx].Pos;
-                        //mat.transformVect(v);
-                        vertices[k]=v;
-                        normals[k]=mbVertices[indx].Normal;
-                    }   // for k
-                    triangle_mesh->addTriangle(vertices[0], vertices[1],
-                                               vertices[2], normals[0],
-                                               normals[1],  normals[2],
-                                               material                 );
-                }   // for j
-            }
-            else if (mb->getVertexType() == video::EVT_TANGENTS)
-            {
-                irr::video::S3DVertexTangents* mbVertices =
-                    (video::S3DVertexTangents*)mb->getVertices();
-                for(unsigned int j=0; j<mb->getIndexCount(); j+=3)
-                {
-                    for(unsigned int k=0; k<3; k++)
-                    {
-                        int indx=mbIndices[j+k];
-                        core::vector3df v = mbVertices[indx].Pos;
-                        //mat.transformVect(v);
-                        vertices[k]=v;
-                        normals[k]=mbVertices[indx].Normal;
-                    }   // for k
-                    triangle_mesh->addTriangle(vertices[0], vertices[1],
-                                               vertices[2], normals[0],
-                                               normals[1],  normals[2],
-                                               material                 );
-                }   // for j
-            }
+                // Handle readonly materials correctly: mb->getMaterial can return
+                // NULL if the node is not using readonly materials. E.g. in case
+                // of a water scene node, the mesh (which is the animated copy of
+                // the original mesh) does not contain any material information,
+                // the material is only available in the node.
+                const video::SMaterial &irrMaterial =
+                    is_readonly_material ? mb->getMaterial()
+                    : presentation->getNode()->getMaterial(i);
+                video::ITexture* t=irrMaterial.getTexture(0);
 
-        }   // for i<getMeshBufferCount
+                const Material* material=0;
+                if(t)
+                {
+                    std::string image =
+                                  std::string(core::stringc(t->getName()).c_str());
+                    material = material_manager
+                             ->getMaterial(StringUtils::getBasename(image));
+                    if(material->isIgnore())
+                        continue;
+                }
+                if (mb->getVertexType() == video::EVT_STANDARD)
+                {
+                    irr::video::S3DVertex* mbVertices =
+                                              (video::S3DVertex*)mb->getVertices();
+                    for(unsigned int j=0; j<mb->getIndexCount(); j+=3)
+                    {
+                        for(unsigned int k=0; k<3; k++)
+                        {
+                            int indx=mbIndices[j+k];
+                            core::vector3df v = mbVertices[indx].Pos;
+                            //mat.transformVect(v);
+                            vertices[k]=v;
+                            normals[k]=mbVertices[indx].Normal;
+                        }   // for k
+                        triangle_mesh->addTriangle(vertices[0], vertices[1],
+                                                   vertices[2], normals[0],
+                                                   normals[1],  normals[2],
+                                                   material                 );
+                    }   // for j
+                }
+                else if (mb->getVertexType() == video::EVT_2TCOORDS)
+                {
+                    irr::video::S3DVertex2TCoords* mbVertices =
+                        (video::S3DVertex2TCoords*)mb->getVertices();
+                    for(unsigned int j=0; j<mb->getIndexCount(); j+=3)
+                    {
+                        for(unsigned int k=0; k<3; k++)
+                        {
+                            int indx=mbIndices[j+k];
+                            core::vector3df v = mbVertices[indx].Pos;
+                            //mat.transformVect(v);
+                            vertices[k]=v;
+                            normals[k]=mbVertices[indx].Normal;
+                        }   // for k
+                        triangle_mesh->addTriangle(vertices[0], vertices[1],
+                                                   vertices[2], normals[0],
+                                                   normals[1],  normals[2],
+                                                   material                 );
+                    }   // for j
+                }
+                else if (mb->getVertexType() == video::EVT_TANGENTS)
+                {
+                    irr::video::S3DVertexTangents* mbVertices =
+                        (video::S3DVertexTangents*)mb->getVertices();
+                    for(unsigned int j=0; j<mb->getIndexCount(); j+=3)
+                    {
+                        for(unsigned int k=0; k<3; k++)
+                        {
+                            int indx=mbIndices[j+k];
+                            core::vector3df v = mbVertices[indx].Pos;
+                            //mat.transformVect(v);
+                            vertices[k]=v;
+                            normals[k]=mbVertices[indx].Normal;
+                        }   // for k
+                        triangle_mesh->addTriangle(vertices[0], vertices[1],
+                                                   vertices[2], normals[0],
+                                                   normals[1],  normals[2],
+                                                   material                 );
+                    }   // for j
+                }
+            }   // for i<getMeshBufferCount
+        }
         triangle_mesh->createCollisionShape();
         m_shape = &triangle_mesh->getCollisionShape();
         m_triangle_mesh = triangle_mesh.release();

@@ -1470,7 +1470,7 @@ bool CSkinnedMesh::sortJointInfluenceFunc(const JointInfluence& a,
 
 void CSkinnedMesh::convertForSkinning()
 {
-	if (HardwareSkinning) return;
+/*	if (HardwareSkinning) return;
 
 	setHardwareSkinning(true);
 	WeightInfluence wi;
@@ -1534,7 +1534,7 @@ void CSkinnedMesh::convertForSkinning()
 	}
 	SkinnedLastFrame = false;
 	skinMesh();
-	m_total_joints = m_current_joint;
+	m_total_joints = m_current_joint;*/
 }
 
 void CSkinnedMesh::computeWeightInfluence(SJoint *joint, size_t &index, WeightInfluence& wi)
@@ -1558,7 +1558,7 @@ void CSkinnedMesh::computeWeightInfluence(SJoint *joint, size_t &index, WeightIn
 
 void CSkinnedMesh::convertMeshToTangents(bool(*predicate)(IMeshBuffer*))
 {
-	bool recalculate_animation = false;
+/*	bool recalculate_animation = false;
 	toStaticPose();
 	for (u32 b = 0; b < LocalBuffers.size(); b++)
 	{
@@ -1568,6 +1568,21 @@ void CSkinnedMesh::convertMeshToTangents(bool(*predicate)(IMeshBuffer*))
 		if (ssmb)
 		{
 			if (!predicate(ssmb)) continue;
+            ssmb->Vertices_Tangents.set_used(ssmb->Vertices_Standard.size());
+            for (unsigned i = 0; i < ssmb->Vertices_Tangents.size(); i++)
+            {
+                ssmb->Vertices_Tangents[i] = video::S3DVertexTangents(ssmb->Vertices_Standard[i].Pos,
+                ssmb->Vertices_Standard[i].Normal,ssmb->Vertices_Standard[i].Color,
+                ssmb->Vertices_Standard[i].TCoords);
+                if (!ssmb->m_tangents_map.empty())
+			{
+					ssmb->Vertices_Tangents[i].Tangent = ssmb->m_tangents_map.find(i)->getValue().first;
+					ssmb->Vertices_Tangents[i].Binormal = ssmb->m_tangents_map.find(i)->getValue().second.first;
+					ssmb->Vertices_Tangents[i].m_bitangent_sign = ssmb->m_tangents_map.find(i)->getValue().second.second;
+            }
+            }
+
+
 
 			recalculate_joints = true;
 			recalculate_animation = true;
@@ -1597,42 +1612,61 @@ void CSkinnedMesh::convertMeshToTangents(bool(*predicate)(IMeshBuffer*))
 			u16* idx = tmp_indices.pointer();
 			video::S3DVertexTangents* v = ssmb->Vertices_Tangents.pointer();
 			core::vector3df local_normal;
-			for (s32 i = 0; i < index_count; i += 3)
+			if (!ssmb->m_tangents_map.empty())
 			{
-				calculateTangents(
-					local_normal,
-					v[idx[i+0]].Tangent,
-					v[idx[i+0]].Binormal,
-					v[idx[i+0]].Pos,
-					v[idx[i+1]].Pos,
-					v[idx[i+2]].Pos,
-					v[idx[i+0]].TCoords,
-					v[idx[i+1]].TCoords,
-					v[idx[i+2]].TCoords);
-
-				calculateTangents(
-					local_normal,
-					v[idx[i+1]].Tangent,
-					v[idx[i+1]].Binormal,
-					v[idx[i+1]].Pos,
-					v[idx[i+2]].Pos,
-					v[idx[i+0]].Pos,
-					v[idx[i+1]].TCoords,
-					v[idx[i+2]].TCoords,
-					v[idx[i+0]].TCoords);
-
-				calculateTangents(
-					local_normal,
-					v[idx[i+2]].Tangent,
-					v[idx[i+2]].Binormal,
-					v[idx[i+2]].Pos,
-					v[idx[i+0]].Pos,
-					v[idx[i+1]].Pos,
-					v[idx[i+2]].TCoords,
-					v[idx[i+0]].TCoords,
-					v[idx[i+1]].TCoords);
+				for (unsigned i = 0; i < ssmb->Vertices_Tangents.size(); i++)
+				{
+				    auto a = ssmb->m_tangents_map.find(v[i].Pos);
+				    if (a)
+				    {
+					v[i].Tangent = a->getValue().first;
+					v[i].Binormal = a->getValue().second.first;
+					v[i].m_bitangent_sign = a->getValue().second.second;
+					}
+					else
+					{
+					    printf("ddd\n");
+					}
+				}
 			}
-			ssmb->Indices = tmp_indices;
+			else
+			{
+				for (s32 i = 0; i < index_count; i += 3)
+				{
+					calculateTangents(
+						local_normal,
+						v[idx[i+0]].Tangent,
+						v[idx[i+0]].Binormal,
+						v[idx[i+0]].Pos,
+						v[idx[i+1]].Pos,
+						v[idx[i+2]].Pos,
+						v[idx[i+0]].TCoords,
+						v[idx[i+1]].TCoords,
+						v[idx[i+2]].TCoords);
+
+					calculateTangents(
+						local_normal,
+						v[idx[i+1]].Tangent,
+						v[idx[i+1]].Binormal,
+						v[idx[i+1]].Pos,
+						v[idx[i+2]].Pos,
+						v[idx[i+0]].Pos,
+						v[idx[i+1]].TCoords,
+						v[idx[i+2]].TCoords,
+						v[idx[i+0]].TCoords);
+
+					calculateTangents(
+						local_normal,
+						v[idx[i+2]].Tangent,
+						v[idx[i+2]].Binormal,
+						v[idx[i+2]].Pos,
+						v[idx[i+0]].Pos,
+						v[idx[i+1]].Pos,
+						v[idx[i+2]].TCoords,
+						v[idx[i+0]].TCoords,
+						v[idx[i+1]].TCoords);
+				}
+
 			ssmb->Vertices_Standard.clear();
 			ssmb->VertexType = video::EVT_TANGENTS;
 		}
@@ -1661,7 +1695,7 @@ void CSkinnedMesh::convertMeshToTangents(bool(*predicate)(IMeshBuffer*))
 	{
 		PreparedForSkinning = false;
 		checkForAnimation();
-	}
+	}*/
 }
 
 void CSkinnedMesh::calculateTangents(

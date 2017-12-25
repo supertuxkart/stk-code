@@ -151,7 +151,7 @@ void CheckLine::changeDebugColor(bool is_active)
 {
     assert(m_debug_node);
 
-    scene::IMesh *mesh         = m_debug_node->getMesh();
+    /*scene::IMesh *mesh         = m_debug_node->getMesh();
     scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
     irr::video::S3DVertex* vertices
                                = (video::S3DVertex*)buffer->getVertices();
@@ -164,7 +164,7 @@ void CheckLine::changeDebugColor(bool is_active)
 #ifndef SERVER_ONLY
     buffer->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(color));
 #endif
-
+*/
 }   // changeDebugColor
 
 // ----------------------------------------------------------------------------

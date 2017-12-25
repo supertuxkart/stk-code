@@ -41,8 +41,6 @@ CAnimatedMeshSceneNode::CAnimatedMeshSceneNode(IAnimatedMesh* mesh,
 	#ifdef _DEBUG
 	setDebugName("CAnimatedMeshSceneNode");
 	#endif
-
-	setMesh(mesh);
 }
 
 

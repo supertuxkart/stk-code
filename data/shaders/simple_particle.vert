@@ -59,12 +59,12 @@ void main(void)
         vec3 newquadcorner = vec3(size * quadcorner, 0.0);
         newquadcorner = newquadcorner + 2.0 * cross(cross(newquadcorner,
             quat.xyz) + quat.w * newquadcorner, quat.xyz);
-        viewpos = ViewMatrix * vec4(Position + newquadcorner, 1.0);
+        viewpos = u_view_matrix * vec4(Position + newquadcorner, 1.0);
     }
     else
     {
-        viewpos = ViewMatrix * vec4(Position, 1.0);
+        viewpos = u_view_matrix * vec4(Position, 1.0);
         viewpos += vec4(size * quadcorner, 0.0, 0.0);
     }
-    gl_Position = ProjectionMatrix * viewpos;
+    gl_Position = u_projection_matrix * viewpos;
 }

@@ -253,8 +253,13 @@ struct S3DVertexTangents : public S3DVertex
 	}
 };
 
-struct S3DVertexSkinnedMesh : public S3DVertexTangents
+struct S3DVertexSkinnedMesh
 {
+	core::vector3df m_position;
+	u32 m_normal;
+	SColor m_color;
+	s16 m_all_uvs[4];
+	u32 m_tangent;
 	s16 m_joint_idx[4];
 	s16 m_weight[4];
 

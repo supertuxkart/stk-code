@@ -22,7 +22,6 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/render_target.hpp"
 #include "graphics/stk_tex_manager.hpp"
-#include "graphics/vao_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "tracks/arena_node_3d.hpp"
 #include "tracks/drive_node_2d.hpp"
@@ -335,7 +334,6 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
     Track::getCurrentTrack()->forceFogDisabled(false);
 
     irr_driver->getSceneManager()->clear();
-    VAOManager::kill();
     irr_driver->clearGlowingNodes();
     irr_driver->clearLights();
     irr_driver->clearForcedBloom();

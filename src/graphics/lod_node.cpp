@@ -109,10 +109,23 @@ void LODNode::OnAnimate(u32 timeMs)
         // update absolute position
         updateAbsolutePosition();
 
-        int level = getLevel();
-        // Assume all the scene node have the same bouding box
-        if(level>=0)
-            m_nodes[level]->OnAnimate(timeMs);
+#ifndef SERVER_ONLY
+        if (CVS->isGLSL())
+        {
+            for (size_t i = 0; i < m_nodes.size(); i++)
+            {
+                m_nodes[i]->setVisible(true);
+                m_nodes[i]->OnAnimate(timeMs);
+            }
+        }
+        else
+#endif
+        {
+            int level = getLevel();
+            // Assume all the scene node have the same bouding box
+            if(level>=0)
+                m_nodes[level]->OnAnimate(timeMs);
+        }
 
         Box = m_nodes[m_detail.size()-1]->getBoundingBox();
 
@@ -151,6 +164,13 @@ void LODNode::OnRegisterSceneNode()
 {
     bool shown = false;
     updateVisibility(&shown);
+
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        return;
+    }
+#endif
 
     const u32 now = irr_driver->getDevice()->getTimer()->getTime();
 

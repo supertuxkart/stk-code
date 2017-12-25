@@ -26,8 +26,8 @@
 #include <SMeshBuffer.h>
 namespace irr
 {
-    namespace video { class SMaterial;      }
-    namespace scene { class IMeshSceneNode; }
+    namespace video { class SMaterial;  }
+    namespace scene { class ISceneNode; }
 }
 using namespace irr;
 
@@ -102,7 +102,7 @@ private:
     std::vector<SkidMarkQuads *>     m_left, m_right;
 
     /** The nodes where each left/right pair is attached to. */
-    std::vector<scene::IMeshSceneNode *> m_nodes;
+    std::vector<scene::ISceneNode *> m_nodes;
 
     /** Shared static so that consecutive skidmarks are at a slightly
      *  different height. */

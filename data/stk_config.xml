@@ -3,11 +3,11 @@
 <config>
   <!--  Minimum and maximum kart versions that can be used by this binary.
         Older version will be ignored. -->
-  <kart-version min="2" max="3"/>
+  <kart-version min="3" max="3"/>
 
   <!-- Minimum and maxium track versions that be be read by this binary.
        Older versions will be ignored. -->
-  <track-version min="6" max="7"/>
+  <track-version min="7" max="7"/>
 
   <!-- Maximum number of karts to be used at the same time. This limit
        can easily be increased, but some tracks might not have valid start
@@ -466,5 +466,16 @@
        TBO in desktop at least 65536 (max buffer size) / 64, SSBO at least 2^24 / 64,
        so 1024 will work everywhere. -->
   <skinning max-bones="1024"/>
+
+  <!-- For users with libsquish:
+    Use a slow but high quality colour compressor.
+    kColourClusterFit = (32),
+    Use a fast but low quality colour compressor.
+    kColourRangeFit	= (64),
+    Use a very slow but very high quality colour compressor.
+    kColourIterativeClusterFit = (256),
+    STK default the low quality.
+  -->
+  <texture-compression quality="64"/>
 
 </config>

@@ -175,6 +175,9 @@ if(NOT SERVER_ONLY AND NOT USE_GLES2)
     include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
 endif()
 
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libsquish")
+include_directories("${PROJECT_SOURCE_DIR}/lib/libsquish")
+
 # Build the irrlicht library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
 include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
@@ -426,6 +429,10 @@ if(NOT SERVER_ONLY)
     endif()
 endif()
 
+if(NOT SERVER_ONLY AND NOT USE_GLES2)
+    target_link_libraries(supertuxkart squish)
+endif()
+
 if(UNIX AND NOT APPLE)
     if(USE_LIBBFD)
         target_link_libraries(supertuxkart ${LIBBFD_LIBRARIES})
@@ -438,6 +445,10 @@ endif()
 
 if(BUILD_RECORDER)
     target_link_libraries(supertuxkart ${OPENGLRECORDER_LIBRARY})
+endif()
+
+if(TEX_COMPRESS)
+    target_link_libraries(supertuxkart ${TC_LIBRARY})
 endif()
 
 # FreeBSD does not search in /usr/local/lib, but at least Freetype is installed there :(

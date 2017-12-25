@@ -347,9 +347,10 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     AbstractKart *new_kart;
     if (RewindManager::get()->isEnabled())
         new_kart = new KartRewinder(kart_ident, index, position, init_pos,
-                                    difficulty);
+                                    difficulty, KRT_DEFAULT);
     else
-        new_kart = new Kart(kart_ident, index, position, init_pos, difficulty);
+        new_kart = new Kart(kart_ident, index, position, init_pos, difficulty,
+                            KRT_DEFAULT);
 
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;

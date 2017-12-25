@@ -31,7 +31,10 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/render_info.hpp"
-#include "graphics/stk_animated_mesh.hpp"
+#include "graphics/sp/sp_animation.hpp"
+#include "graphics/sp/sp_mesh.hpp"
+#include "graphics/sp/sp_mesh_buffer.hpp"
+#include "graphics/sp/sp_mesh_node.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
@@ -101,7 +104,6 @@ KartModel::KartModel(bool is_master)
     m_kart       = NULL;
     m_mesh       = NULL;
     m_hat_location = NULL;
-    m_render_info = NULL;
 
     for(unsigned int i=0; i<4; i++)
     {
@@ -299,7 +301,6 @@ KartModel::~KartModel()
     }
 
     delete m_hat_location;
-    delete m_render_info;
 #ifdef DEBUG
 #if SKELETON_DEBUG
     irr_driver->clearDebugMeshes();
@@ -320,7 +321,7 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
     // that there is indeed no animated node defined here ...
     // just in case.
     assert(m_is_master);
-    assert(m_render_info == NULL);
+    assert(!m_render_info);
     assert(!m_animated_node);
     KartModel *km               = new KartModel(/*is master*/ false);
     km->m_kart_width            = m_kart_width;
@@ -337,7 +338,7 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
     km->m_hat_bone              = m_hat_bone;
     km->m_krt                   = krt;
     km->m_support_colorization  = m_support_colorization;
-    km->m_render_info           = new RenderInfo();
+    km->m_render_info           = std::make_shared<RenderInfo>();
     km->m_inverse_bone_matrices = m_inverse_bone_matrices;
     km->m_version               = m_version;
     km->m_exhaust_xml           = m_exhaust_xml;
@@ -400,61 +401,15 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
 
     if (animated_models)
     {
-        LODNode* lod_node = new LODNode("kart",
-                                        irr_driver->getSceneManager()->getRootSceneNode(),
-                                        irr_driver->getSceneManager()                    );
-
-#ifndef SERVER_ONLY
-
-        node = irr_driver->addAnimatedMesh(m_mesh, "kartmesh",
+        m_animated_node = irr_driver->addAnimatedMesh(m_mesh, "kartmesh",
                NULL/*parent*/, getRenderInfo());
-        node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
-#endif
-        if (human_player)
-        {
-            // give a huge LOD distance for the player's kart. the reason is that it should
-            // use its animations for the shadow pass too, where the camera can be quite far
-            lod_node->add(10000, node, true);
-            scene::ISceneNode* static_model = attachModel(false, false);
-            lod_node->add(10001, static_model, true);
-            m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(node);
-        }
-        else
-        {
-            lod_node->add(20, node, true);
-            scene::ISceneNode* static_model = attachModel(false, false);
-            lod_node->add(100, static_model, true);
-            m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(node);
-        }
-
+        node = m_animated_node;
 #ifdef DEBUG
         std::string debug_name = m_model_filename+" (animated-kart-model)";
         node->setName(debug_name.c_str());
-#if SKELETON_DEBUG
-        irr_driver->addDebugMesh(m_animated_node);
-#endif
 #endif
         m_animated_node->setLoopMode(false);
         m_animated_node->grab();
-        node = lod_node;
-
-        // Become the owner of the wheels
-        for(unsigned int i=0; i<4; i++)
-        {
-            if (!m_wheel_model[i] || !m_wheel_node[i]) continue;
-            m_wheel_node[i]->setParent(lod_node);
-        }
-
-#ifndef SERVER_ONLY
-        // Enable rim lighting for the kart
-        irr_driver->applyObjectPassShader(lod_node, true);
-        std::vector<scene::ISceneNode*> &lodnodes = lod_node->getAllNodes();
-        const u32 max = (u32)lodnodes.size();
-        for (u32 i = 0; i < max; i++)
-        {
-            irr_driver->applyObjectPassShader(lodnodes[i], true);
-        }
-#endif
     }
     else
     {
@@ -480,26 +435,25 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
         node->setName(debug_name.c_str());
 #endif
 
+    }
 
-        // Attach the wheels
-        for(unsigned int i=0; i<4; i++)
-        {
-            if(!m_wheel_model[i]) continue;
-            m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], "wheel",
-                              node, getRenderInfo());
-            Vec3 wheel_min, wheel_max;
-            MeshTools::minMax3D(m_wheel_model[i], &wheel_min, &wheel_max);
-            m_wheel_graphics_radius[i] = 0.5f*(wheel_max.getY() - wheel_min.getY());
+    // Attach the wheels
+    for (unsigned int i = 0; i < 4; i++)
+    {
+        if(!m_wheel_model[i]) continue;
+        m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], "wheel",
+                          node, getRenderInfo());
+        Vec3 wheel_min, wheel_max;
+        MeshTools::minMax3D(m_wheel_model[i], &wheel_min, &wheel_max);
+        m_wheel_graphics_radius[i] = 0.5f*(wheel_max.getY() - wheel_min.getY());
 
-            m_wheel_node[i]->grab();
-            ((scene::IMeshSceneNode *) m_wheel_node[i])->setReadOnlyMaterials(true);
+        m_wheel_node[i]->grab();
+        ((scene::IMeshSceneNode *) m_wheel_node[i])->setReadOnlyMaterials(true);
 #ifdef DEBUG
-            std::string debug_name = m_wheel_filename[i]+" (wheel)";
-            m_wheel_node[i]->setName(debug_name.c_str());
+        std::string debug_name = m_wheel_filename[i]+" (wheel)";
+        m_wheel_node[i]->setName(debug_name.c_str());
 #endif
-            m_wheel_node[i]->setPosition(m_wheel_graphics_position[i].toIrrVector());
-        }
-
+        m_wheel_node[i]->setPosition(m_wheel_graphics_position[i].toIrrVector());
     }
 
     // Attach the speed weighted objects + set the animation state
@@ -565,6 +519,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
 
     if (m_hat_location && !m_hat_name.empty())
     {
+        file_manager->pushTextureSearchPath
+            (file_manager->getAsset(FileManager::MODEL,""), "models");
         const bool bone_attachment = m_animated_node && !m_hat_bone.empty();
         scene::ISceneNode* parent = bone_attachment ?
             m_animated_node->getJointNode(m_hat_bone.c_str()) : node;
@@ -574,6 +530,16 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
             getRenderInfo());
         configNode(node, *m_hat_location, bone_attachment ?
                 getInverseBoneMatrix(m_hat_bone) : core::matrix4());
+        file_manager->popTextureSearchPath();
+    }
+
+    if (animated_models)
+    {
+        LODNode* lod_node = new LODNode("kart",
+            irr_driver->getSceneManager()->getRootSceneNode(),
+            irr_driver->getSceneManager());
+        lod_node->add(human_player ? 10000: 100, node, true);
+        return lod_node;
     }
 
     return node;
@@ -609,11 +575,6 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     }
 
 #ifndef SERVER_ONLY
-    scene::ISkinnedMesh* sm = dynamic_cast<scene::ISkinnedMesh*>(m_mesh);
-    if (sm)
-    {
-        MeshTools::createSkinnedMeshWithTangents(sm, &MeshTools::isNormalMap);
-    }
 #endif
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
@@ -622,15 +583,25 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]),
                         &kart_min, &kart_max);
 
+#ifndef SERVER_ONLY
     // Test if kart model support colorization
-    for (u32 i = 0; i < m_mesh->getMeshBufferCount(); i++)
+    if (CVS->isGLSL())
     {
-        scene::IMeshBuffer* mb = m_mesh->getMeshBuffer(i);
-        Material* material = material_manager->getMaterialFor(mb
-            ->getMaterial().getTexture(0), mb);
-        m_support_colorization =
-            m_support_colorization || material->isColorizable();
+        for (u32 i = 0; i < m_mesh->getMeshBufferCount(); i++)
+        {
+            SP::SPMeshBuffer* mb =
+                static_cast<SP::SPMeshBuffer*>(m_mesh->getMeshBuffer(i));
+            // Pre-upload gl meshes and textures for kart screen
+            mb->uploadGLMesh();
+            std::vector<Material*> mbs = mb->getAllSTKMaterials();
+            for (Material* m : mbs)
+            {
+                m_support_colorization =
+                    m_support_colorization || m->isColorizable();
+            }
+        }
     }
+#endif
 
 #undef MOVE_KART_MESHES
 #ifdef MOVE_KART_MESHES
@@ -665,12 +636,24 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         // the destructor will only free the textures if a master
         // copy is freed.
 #ifndef SERVER_ONLY
-        scene::ISkinnedMesh* sm =
-            dynamic_cast<scene::ISkinnedMesh*>(obj.m_model);
-        if (sm)
+        if (CVS->isGLSL())
         {
-            MeshTools::createSkinnedMeshWithTangents(sm,
-                &MeshTools::isNormalMap);
+            for (u32 j = 0; j < obj.m_model->getMeshBufferCount(); j++)
+            {
+                SP::SPMeshBuffer* mb = static_cast<SP::SPMeshBuffer*>
+                    (obj.m_model->getMeshBuffer(j));
+                // Pre-upload gl meshes and textures for kart screen
+                mb->uploadGLMesh();
+                if (obj.m_properties.m_texture_speed !=
+                    core::vector2df(0.0f, 0.0f))
+                {
+                    for (unsigned k = 0; k < mb->getAllSTKMaterials().size();
+                        k++)
+                    {
+                        mb->enableTextureMatrix(k);
+                    }
+                }
+            }
         }
 #endif
         obj.m_model->grab();
@@ -691,6 +674,18 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         HeadlightObject& obj = m_headlight_objects[i];
         std::string full_name = kart_properties.getKartDir() + obj.getFilename();
         obj.setModel(irr_driver->getMesh(full_name));
+#ifndef SERVER_ONLY
+        if (CVS->isGLSL())
+        {
+            for (u32 j = 0; j < obj.getModel()->getMeshBufferCount(); j++)
+            {
+                SP::SPMeshBuffer* mb = static_cast<SP::SPMeshBuffer*>
+                    (obj.getModel()->getMeshBuffer(j));
+                // Pre-upload gl meshes and textures for kart screen
+                mb->uploadGLMesh();
+            }
+        }
+#endif
         obj.getModel()->grab();
         irr_driver->grabAllTextures(obj.getModel());
     }
@@ -727,8 +722,16 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
             kart_properties.getKartDir()+m_wheel_filename[i];
         m_wheel_model[i] = irr_driver->getMesh(full_wheel);
 #ifndef SERVER_ONLY
-        m_wheel_model[i] = MeshTools::createMeshWithTangents(m_wheel_model[i],
-                                                      &MeshTools::isNormalMap);
+        if (CVS->isGLSL())
+        {
+            for (u32 j = 0; j < m_wheel_model[i]->getMeshBufferCount(); j++)
+            {
+                SP::SPMeshBuffer* mb = static_cast<SP::SPMeshBuffer*>
+                    (m_wheel_model[i]->getMeshBuffer(j));
+                // Pre-upload gl meshes and textures for kart screen
+                mb->uploadGLMesh();
+            }
+        }
 #endif
         // Grab all textures. This is done for the master only, so
         // the destructor will only free the textures if a master
@@ -1123,17 +1126,40 @@ void KartModel::update(float dt, float distance, float steer, float speed,
                 if (obj.m_texture_cur_offset.X > 1.0f) obj.m_texture_cur_offset.X = fmod(obj.m_texture_cur_offset.X, 1.0f);
                 if (obj.m_texture_cur_offset.Y > 1.0f) obj.m_texture_cur_offset.Y = fmod(obj.m_texture_cur_offset.Y, 1.0f);
 
-                for (unsigned int i = 0; i < obj.m_node->getMaterialCount(); i++)
+                SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(obj.m_node);
+                if (spmn)
                 {
-                    video::SMaterial &irrMaterial = obj.m_node->getMaterial(i);
-                    for (unsigned int j = 0; j < video::MATERIAL_MAX_TEXTURES; j++)
+                    for (unsigned i = 0; i < spmn->getSPM()->getMeshBufferCount(); i++)
                     {
-                        video::ITexture* t = irrMaterial.getTexture(j);
-                        if (!t) continue;
-                        core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
-                        m->setTextureTranslate(obj.m_texture_cur_offset.X, obj.m_texture_cur_offset.Y);
-                    }   // for j<MATERIAL_MAX_TEXTURES
-                }   // for i<getMaterialCount
+                        auto& ret = spmn->getTextureMatrix(i);
+                        if (!ret[0] || !ret[1])
+                        {
+                            ret[0].reset(new float);
+                            ret[1].reset(new float);
+                        }
+                        *ret[0] = obj.m_texture_cur_offset.X;
+                        *ret[1] = obj.m_texture_cur_offset.Y;
+                    }
+                }
+                else
+                {
+                    for (unsigned int i = 0;
+                        i < obj.m_node->getMaterialCount(); i++)
+                    {
+                        video::SMaterial &irrMaterial =
+                            obj.m_node->getMaterial(i);
+                        for (unsigned int j = 0; j < video::MATERIAL_MAX_TEXTURES;
+                            j++)
+                        {
+                            video::ITexture* t = irrMaterial.getTexture(j);
+                            if (!t) continue;
+                            core::matrix4 *m =
+                                &irrMaterial.getTextureMatrix(j);
+                            m->setTextureTranslate(obj.m_texture_cur_offset.X,
+                                obj.m_texture_cur_offset.Y);
+                        }   // for j<MATERIAL_MAX_TEXTURES
+                    }   // for i<getMaterialCount
+                }
             }
         }
     }
@@ -1190,7 +1216,7 @@ void KartModel::resetVisualWheelPosition()
 }   // resetVisualSuspension
 
 //-----------------------------------------------------------------------------
-RenderInfo* KartModel::getRenderInfo()
+std::shared_ptr<RenderInfo> KartModel::getRenderInfo()
 {
     return m_support_colorization || m_krt == KRT_TRANSPARENT ?
         m_render_info : NULL;
@@ -1223,11 +1249,6 @@ void KartModel::initInverseBoneMatrices()
         // Only need for >= 3 version of kart
         return;
     }
-    // Due to irrlicht mesh doesn't expose bone name, we have to create a
-    // dummy aniamted node
-    // All bone matrices are configured in straight frame (as in exporting)
-    scene::IAnimatedMeshSceneNode* node = irr_driver->getSceneManager()
-        ->addAnimatedMeshSceneNode(m_mesh);
     float striaght_frame = (float)m_animation_frame[AF_STRAIGHT];
     if (m_animation_frame[AF_STRAIGHT] == -1)
     {
@@ -1235,30 +1256,57 @@ void KartModel::initInverseBoneMatrices()
             m_model_filename.c_str());
         striaght_frame = 0.0f;
     }
-
-    const unsigned total_joint = node->getJointCount();
-    for (unsigned i = 0; i < total_joint; i++)
+    using namespace SP;
+    SPMesh* spm = dynamic_cast<SPMesh*>(m_mesh);
+    if (spm)
     {
-        node->setCurrentFrame(striaght_frame);
-        node->OnAnimate(0);
-        scene::IBoneSceneNode* bone = node->getJointNode(i);
-        bone->updateAbsolutePosition();
-        node->setCurrentFrame(striaght_frame);
-        node->OnAnimate(0);
-        bone->updateAbsolutePosition();
-        core::matrix4 inv;
-        bone->getAbsoluteTransformation().getInverse(inv);
-        const std::string bone_name = bone->getName();
-        auto ret = m_inverse_bone_matrices.find(bone_name);
-        if (ret != m_inverse_bone_matrices.end())
+        for (Armature& arm : spm->getArmatures())
         {
-            Log::warn("KartModel", "%s has duplicated bone, name: %s,"
-                " attachment may not work correctly.",
-                m_model_filename.c_str(), bone_name.c_str());
+            arm.getInterpolatedMatrices(striaght_frame);
+            for (auto& p : arm.m_world_matrices)
+            {
+                p.second = false;
+            }
+            for (unsigned i = 0; i < arm.m_joint_names.size(); i++)
+            {
+                core::matrix4 m;
+                arm.getWorldMatrix(arm.m_interpolated_matrices, i)
+                    .getInverse(m);
+                m_inverse_bone_matrices[arm.m_joint_names[i]] = m;
+            }
         }
-        m_inverse_bone_matrices[bone_name] = inv;
     }
-    node->remove();
+    else
+    {
+        // Due to irrlicht mesh doesn't expose bone name, we have to create a
+        // dummy aniamted node
+        // All bone matrices are configured in straight frame (as in exporting)
+        scene::IAnimatedMeshSceneNode* node = irr_driver->getSceneManager()
+            ->addAnimatedMeshSceneNode(m_mesh);
+        const unsigned total_joint = node->getJointCount();
+        for (unsigned i = 0; i < total_joint; i++)
+        {
+            node->setCurrentFrame(striaght_frame);
+            node->OnAnimate(0);
+            scene::IBoneSceneNode* bone = node->getJointNode(i);
+            bone->updateAbsolutePosition();
+            node->setCurrentFrame(striaght_frame);
+            node->OnAnimate(0);
+            bone->updateAbsolutePosition();
+            core::matrix4 inv;
+            bone->getAbsoluteTransformation().getInverse(inv);
+            const std::string bone_name = bone->getName();
+            auto ret = m_inverse_bone_matrices.find(bone_name);
+            if (ret != m_inverse_bone_matrices.end())
+            {
+                Log::warn("KartModel", "%s has duplicated bone, name: %s,"
+                    " attachment may not work correctly.",
+                    m_model_filename.c_str(), bone_name.c_str());
+            }
+            m_inverse_bone_matrices[bone_name] = inv;
+        }
+        node->remove();
+    }
 }   // initInverseBoneMatrices
 
 //-----------------------------------------------------------------------------

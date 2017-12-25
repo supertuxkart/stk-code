@@ -19,7 +19,6 @@
 #ifndef HEADER_RENDER_INFO_HPP
 #define HEADER_RENDER_INFO_HPP
 
-#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 
 #include <assert.h>
@@ -34,7 +33,12 @@ enum KartRenderType: unsigned int
 {
     KRT_DEFAULT,
     KRT_RED,
+    KRT_ORANGE,
+    KRT_YELLOW,
+    KRT_GREEN,
+    KRT_PALE_BLUE,
     KRT_BLUE,
+    KRT_PURPLE,
     KRT_TRANSPARENT,
 };
 
@@ -48,12 +52,13 @@ private:
 
     bool m_transparent;
 
-    std::vector<float> m_dynamic_hue;
-
 public:
-    LEAK_CHECK();
     // ------------------------------------------------------------------------
-    RenderInfo(float hue = 0.0f, bool transparent = false);
+    RenderInfo(float hue = 0.0f, bool transparent = false)
+    {
+        m_static_hue = hue;
+        m_transparent = transparent;
+    }
     // ------------------------------------------------------------------------
     ~RenderInfo() {}
     // ------------------------------------------------------------------------
@@ -67,27 +72,15 @@ public:
     // ------------------------------------------------------------------------
     void setKartModelRenderInfo(KartRenderType krt)
     {
-        setHue(krt == KRT_BLUE ? 0.66f : krt == KRT_RED ? 1.0f : 0.0f);
+        setHue(krt == KRT_RED ? 1.0f :
+            krt == KRT_ORANGE ? 0.06f :
+            krt == KRT_YELLOW ? 0.17f :
+            krt == KRT_GREEN ? 0.35f :
+            krt == KRT_PALE_BLUE ? 0.5f :
+            krt == KRT_BLUE ? 0.66f :
+            krt == KRT_PURPLE ? 0.8f : 0.0f);
         setTransparent(krt == KRT_TRANSPARENT ? true : false);
     }
-    // ------------------------------------------------------------------------
-    /** Returns true if this render info is static. ie affect all material
-      * using the same hue. (like the kart colorization in soccer game)
-      */
-    bool isStatic() const                    { return m_dynamic_hue.empty(); }
-    // ------------------------------------------------------------------------
-    unsigned int getNumberOfHue() const 
-    {
-        return (unsigned int)m_dynamic_hue.size(); 
-    }   // getNumberOfHue
-    // ------------------------------------------------------------------------
-    float getDynamicHue(unsigned int hue) const
-    {
-        assert(hue < m_dynamic_hue.size());
-        return m_dynamic_hue[hue];
-    }
-    // ------------------------------------------------------------------------
-    void setDynamicHue(irr::scene::IMesh* mesh);
 
 };   // RenderInfo
 

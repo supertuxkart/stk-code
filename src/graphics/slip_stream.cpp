@@ -289,7 +289,7 @@ void SlipStream::setIntensity(float f, const AbstractKart *kart)
     int c = (int)(f*255);
     if (c > 255) c = 255;
 
-    const unsigned int bcount = m_node->getMesh()->getMeshBufferCount();
+    /*const unsigned int bcount = m_node->getMesh()->getMeshBufferCount();
     for (unsigned int b=0; b<bcount; b++)
     {
         scene::IMeshBuffer* mb = m_node->getMesh()->getMeshBuffer(b);
@@ -301,7 +301,7 @@ void SlipStream::setIntensity(float f, const AbstractKart *kart)
             vertices[i].Color.setGreen( color );
             vertices[i].Color.setBlue( color );
         }
-    }
+    }*/
 
     return;
     // For debugging: make the slip stream effect visible all the time

@@ -19,11 +19,14 @@
 #include "tracks/track_object.hpp"
 
 #include "animations/three_d_animation.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/render_info.hpp"
+#include "graphics/sp/sp_mesh_buffer.hpp"
+#include "graphics/sp/sp_mesh_node.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
@@ -193,67 +196,74 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         // Colorization settings
         std::string model_name;
         xml_node.get("model", &model_name);
-        bool colorizable = false;
-        scene::IMesh* mesh = NULL;
-        // Only non-lod groups can use dynamic hue for different parts of mesh
-        bool use_dynamic_hue = true;
-        float static_hue = 0.0f;
-        if (model_name.size() > 0)
+#ifndef SERVER_ONLY
+        if (CVS->isGLSL())
         {
-            mesh = irr_driver->getMesh(model_name);
-            if (mesh != NULL)
+            scene::IMesh* mesh = NULL;
+            // Use the first material in mesh to determine hue
+            Material* colorized = NULL;
+            if (model_name.size() > 0)
             {
-                unsigned int n = mesh->getMeshBufferCount();
-                for (unsigned int i = 0; i < n; i++)
+                mesh = irr_driver->getMesh(model_name);
+                if (mesh != NULL)
                 {
-                    scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-                    Material* m = material_manager->getMaterialFor(mb
-                        ->getMaterial().getTexture(0), mb);
-                    colorizable = colorizable || m->isColorizable();
-                    if (colorizable) break;
-                }
-            }
-        }
-        else
-        {
-            std::string group_name = "";
-            xml_node.get("lod_group", &group_name);
-            // Try to get the first mesh from lod groups
-            mesh = model_def_loader.getFirstMeshFor(group_name);
-            if (mesh != NULL)
-            {
-                use_dynamic_hue = false;
-                unsigned int n = mesh->getMeshBufferCount();
-                for (unsigned int i = 0; i < n; i++)
-                {
-                    scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-                    Material* m = material_manager->getMaterialFor(mb
-                        ->getMaterial().getTexture(0), mb);
-                    if (m->isColorizable())
+                    for (u32 j = 0; j < mesh->getMeshBufferCount(); j++)
                     {
-                        // Use the first texture to determine static hue
-                        // Other texture that is non-colorizable will be
-                        // untouched, otherwise they will be colorized the
-                        // same hue
-                        colorizable = true;
-                        static_hue = m->getRandomHue();
-                        break;
+                        SP::SPMeshBuffer* mb = static_cast<SP::SPMeshBuffer*>
+                            (mesh->getMeshBuffer(j));
+                        std::vector<Material*> mbs = mb->getAllSTKMaterials();
+                        for (Material* m : mbs)
+                        {
+                            if (m->isColorizable())
+                            {
+                                colorized = m;
+                                break;
+                            }
+                        }
+                        if (colorized != NULL)
+                        {
+                            break;
+                        }
                     }
                 }
             }
-        }
-
-
-        // If at least one material is colorizable, add RenderInfo for it
-        if (colorizable)
-        {
-            m_render_info = new RenderInfo();
-            if (use_dynamic_hue)
-                m_render_info->setDynamicHue(mesh);
             else
-                m_render_info->setHue(static_hue);
-        }
+            {
+                std::string group_name = "";
+                xml_node.get("lod_group", &group_name);
+                // Try to get the first mesh from lod groups
+                mesh = model_def_loader.getFirstMeshFor(group_name);
+                if (mesh != NULL)
+                {
+                    for (u32 j = 0; j < mesh->getMeshBufferCount(); j++)
+                    {
+                        SP::SPMeshBuffer* mb = static_cast<SP::SPMeshBuffer*>
+                            (mesh->getMeshBuffer(j));
+                        std::vector<Material*> mbs = mb->getAllSTKMaterials();
+                        for (Material* m : mbs)
+                        {
+                            if (m->isColorizable())
+                            {
+                                colorized = m;
+                                break;
+                            }
+                        }
+                        if (colorized != NULL)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
 
+            // If at least one material is colorizable, add RenderInfo for it
+            if (colorized != NULL)
+            {
+                m_render_info = std::make_shared<RenderInfo>();
+                m_render_info->setHue(colorized->getRandomHue());
+            }
+        }
+#endif
         scene::ISceneNode *glownode = NULL;
         bool is_movable = false;
         if (lod_instance)
@@ -331,8 +341,11 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
             r = glow.getRed() / 255.0f;
             g = glow.getGreen() / 255.0f;
             b = glow.getBlue() / 255.0f;
-
-            irr_driver->addGlowingNode(glownode, r, g, b);
+            SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(glownode);
+            if (spmn)
+            {
+                spmn->setGlowColor(video::SColorf(r, g, b));
+            }
         }
 
         bool forcedbloom = false;
@@ -432,7 +445,6 @@ TrackObject::~TrackObject()
     delete m_presentation;
     delete m_animator;
     delete m_physical_object;
-    delete m_render_info;
 }   // ~TrackObject
 
 // ----------------------------------------------------------------------------

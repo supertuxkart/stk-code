@@ -5,7 +5,7 @@ layout(location = 2) in vec4 Color;
 layout(location = 3) in vec2 Texcoord;
 layout(location = 4) in vec2 SecondTexcoord;
 layout(location = 5) in vec3 Tangent;
-layout(location = 6) in vec3 Bitangent;
+layout(location = 6) in vec4 Bitangent;
 
 layout(location = 7) in vec3 Origin;
 layout(location = 8) in vec3 Orientation;
@@ -33,9 +33,11 @@ in vec3 Scale;
 in vec4 misc_data;
 #endif
 
+out vec3 nort;
 out vec3 nor;
 out vec3 tangent;
 out vec3 bitangent;
+flat out float bitangent_sign;
 out vec2 uv;
 out vec2 uv_bis;
 out vec4 color;
@@ -52,13 +54,14 @@ flat out sampler2D fourthhandle;
 void main(void)
 {
     mat4 ModelMatrix = getWorldMatrix(Origin, Orientation, Scale);
-    mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin, Orientation, Scale) * InverseViewMatrix);
-    gl_Position = ProjectionViewMatrix *  ModelMatrix * vec4(Position, 1.);
+    mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin, Orientation, Scale) * u_inverse_view_matrix);
+    gl_Position = u_projection_view_matrix *  ModelMatrix * vec4(Position, 1.);
     // Keep orthogonality
     nor = (TransposeInverseModelView * vec4(Normal, 0.)).xyz;
     // Keep direction
-    tangent = (ViewMatrix * ModelMatrix * vec4(Tangent, 0.)).xyz;
-    bitangent = (ViewMatrix * ModelMatrix * vec4(Bitangent, 0.)).xyz;
+    tangent = (TransposeInverseModelView * vec4(Tangent, 0.)).xyz;
+    bitangent = (TransposeInverseModelView * vec4(Bitangent.xyz, 0.)).xyz;
+    bitangent_sign = Bitangent.w;
     uv = vec2(Texcoord.x + misc_data.x, Texcoord.y + misc_data.y);
     uv_bis = SecondTexcoord;
     color = Color.zyxw;
@@ -69,4 +72,5 @@ void main(void)
     thirdhandle = ThirdHandle;
     fourthhandle = FourthHandle;
 #endif
+//bitangent = Bitangent;
 }

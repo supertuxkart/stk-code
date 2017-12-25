@@ -57,14 +57,14 @@ void main(void)
 
 #ifdef VSLayer
     gl_Layer = layer;
-    gl_Position = ShadowViewProjMatrixes[gl_Layer] * ModelMatrix * skinned_position;
+    gl_Position = u_shadow_projection_view_matrices[gl_Layer] * ModelMatrix * skinned_position;
     uv = Data1.xy;
 #ifdef Use_Bindless_Texture
     handle = Handle;
 #endif
 #else
     layerId = layer;
-    gl_Position = ShadowViewProjMatrixes[layerId] * ModelMatrix * skinned_position;
+    gl_Position = u_shadow_projection_view_matrices[layerId] * ModelMatrix * skinned_position;
     tc = Data1.xy;
 #ifdef Use_Bindless_Texture
     hdle = Handle;

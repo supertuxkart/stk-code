@@ -30,8 +30,8 @@
 #include <IMeshBuffer.h>
 #include <SSkinMeshBuffer.h>
 
-void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max) {
-
+void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max)
+{
     Vec3 extend;
     *min = Vec3( 999999.9f);
     *max = Vec3(-999999.9f);
@@ -77,6 +77,20 @@ void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max) {
                 Vec3 c(mbVertices[indx].Pos.X,
                        mbVertices[indx].Pos.Y,
                        mbVertices[indx].Pos.Z  );
+                min->min(c);
+                max->max(c);
+            }   // for j
+        }
+        else if (mb->getVertexType() == video::EVT_SKINNED_MESH)
+        {
+            u16 *mbIndices = mb->getIndices();
+            video::S3DVertexSkinnedMesh* mbVertices=(irr::video::S3DVertexSkinnedMesh*)mb->getVertices();
+            for (unsigned int j=0; j<mb->getIndexCount(); j+=1)
+            {
+                int indx=mbIndices[j];
+                Vec3 c(mbVertices[indx].m_position.X,
+                       mbVertices[indx].m_position.Y,
+                       mbVertices[indx].m_position.Z  );
                 min->min(c);
                 max->max(c);
             }   // for j
@@ -345,8 +359,16 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh,
                                                 bool angle_weighted,
                                                 bool calculate_tangents)
 {
+    return mesh;
     if (!mesh)
         return 0;
+
+    scene::ISkinnedMesh* sm = dynamic_cast<scene::ISkinnedMesh*>(mesh);
+    if (sm)
+    {
+        createSkinnedMeshWithTangents(sm, predicate);
+        return sm;
+    }
 
     // copy mesh and fill data into SMeshBufferTangents
 
@@ -482,5 +504,6 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh,
 void MeshTools::createSkinnedMeshWithTangents(scene::ISkinnedMesh* mesh,
                                               bool(*predicate)(scene::IMeshBuffer*))
 {
+    return;
     mesh->convertMeshToTangents(predicate);
 }

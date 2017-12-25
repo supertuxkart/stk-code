@@ -51,7 +51,7 @@ private:
     ShowCurve * m_show_curve;
 
     /** Used to display debug information about checklines. */
-    scene::IMeshSceneNode *m_debug_target_node;
+    scene::ISceneNode *m_debug_target_node;
 #endif
     std::vector<Flyable*> m_all_flyables;
     std::vector<Vec3>     m_flyable_previous_position;

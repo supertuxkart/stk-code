@@ -145,11 +145,11 @@ void ShowCurve::addPoint(const Vec3 &pnt)
 // ----------------------------------------------------------------------------
 void ShowCurve::clear()
 {
-    m_scene_node->setMesh(NULL);
-    m_mesh->drop();
-    addEmptyMesh();
-    m_scene_node->setMesh(m_mesh);
-    m_mesh->setDirty();
+    //m_scene_node->setMesh(NULL);
+    //m_mesh->drop();
+    //addEmptyMesh();
+    //m_scene_node->setMesh(m_mesh);
+    //m_mesh->setDirty();
 }   // clear
 
 // ----------------------------------------------------------------------------

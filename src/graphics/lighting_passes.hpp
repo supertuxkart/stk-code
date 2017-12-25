@@ -61,7 +61,6 @@ public:
                         GLuint depth_stencil_texture,
                         const FrameBuffer& shadow_framebuffer,
                         GLuint specular_probe);
-    void renderAmbientScatter(GLuint depth_stencil_texture);
     void renderLightsScatter(GLuint depth_stencil_texture,
                              const FrameBuffer& half1_framebuffer,
                              const FrameBuffer& half2_framebuffer,

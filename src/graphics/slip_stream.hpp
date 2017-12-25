@@ -23,7 +23,7 @@
 namespace irr
 {
     namespace video { class SMaterial; class SColor; }
-    namespace scene { class IMeshSceneNode; class IMesh; class IMesh; }
+    namespace scene { class ISceneNode; class IMesh; class IMesh; }
 }
 using namespace irr;
 
@@ -44,13 +44,13 @@ private:
     AbstractKart *m_kart;
 
     /** The scene node. */
-    scene::IMeshSceneNode *m_node;
+    scene::ISceneNode *m_node;
 
     /** The actual mesh. */
     scene::IMesh      *m_mesh;
 
     /** For debugging: display where slipstream works. */
-    scene::IMeshSceneNode *m_debug_node;
+    scene::ISceneNode *m_debug_node;
 
     /** For debugging: a simple quad to display where slipstream works. */
     scene::IMesh      *m_debug_mesh;

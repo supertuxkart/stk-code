@@ -20,7 +20,8 @@
 #define MOVING_TEXTURE_HPP
 
 #include "utils/no_copy.hpp"
-
+#include <array>
+#include <memory>
 #include <string>
 #include <matrix4.h>
 using namespace irr;
@@ -47,6 +48,9 @@ private:
     /** The texture matrix of this texture. */
     core::matrix4       *m_matrix;
 
+    // For sp
+    std::array<std::shared_ptr<float>, 2> m_sp_tm;
+
 public:
                  MovingTexture(core::matrix4 *matrix, const XMLNode &node);
                  MovingTexture(core::matrix4 *matrix, float dx, float dy);
@@ -57,6 +61,7 @@ public:
     void         setSpeed(float dx, float dy) {m_dx = dx; m_dy = dy;}
     /** Sets the texture matrix. */
     void         setTextureMatrix(core::matrix4 *matrix) {m_matrix=matrix;}
+    std::array<std::shared_ptr<float>, 2> getSPTM() const { return m_sp_tm; }
     virtual void update  (float dt);
     virtual void reset   ();
 }

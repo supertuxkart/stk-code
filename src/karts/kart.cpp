@@ -1221,13 +1221,16 @@ void Kart::update(float dt)
         if(m_squash_time<=0)
         {
             m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+            scene::ISceneNode* node =
+                m_kart_model->getAnimatedNode() ?
+                m_kart_model->getAnimatedNode() : m_node;
             if (m_vehicle->getNumWheels() > 0)
             {
                 scene::ISceneNode **wheels = m_kart_model->getWheelNodes();
                 for (int i = 0; i < 4 && i < m_vehicle->getNumWheels(); ++i)
                 {
                     if (wheels[i])
-                        wheels[i]->setParent(m_node);
+                        wheels[i]->setParent(node);
                 }
             }
         }
@@ -2537,7 +2540,7 @@ void Kart::updateSliding()
             wheel.m_frictionSlip = m_kart_properties->getFrictionSlip();
         }
         m_vehicle->setSliding(false);
-        return;
+
     }
 
     // Now test for each wheel if it should be sliding

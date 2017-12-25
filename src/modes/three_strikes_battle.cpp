@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/render_info.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
@@ -189,7 +190,7 @@ void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
 
     float coord = -kart->getKartLength()*0.5f;
 
-    scene::IMeshSceneNode* tire_node = irr_driver->addMesh(m_tire, "3strikestire", node);
+    scene::ISceneNode* tire_node = irr_driver->addMesh(m_tire, "3strikestire", node);
     tire_node->setPosition(core::vector3df(-0.16f, 0.3f, coord - 0.25f));
     tire_node->setScale(core::vector3df(0.4f, 0.4f, 0.4f));
     tire_node->setRotation(core::vector3df(90.0f, 0.0f, 0.0f));

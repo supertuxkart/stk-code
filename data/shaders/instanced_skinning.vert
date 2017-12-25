@@ -2,8 +2,9 @@
 layout(location = 0) in vec3 Position;
 layout(location = 1) in vec3 Normal;
 layout(location = 2) in vec4 Color;
-layout(location = 3) in vec4 Data1;
-layout(location = 4) in vec4 Data2;
+layout(location = 3) in vec2 Texcoord;
+layout(location = 4) in vec3 Tangent;
+layout(location = 11) in vec4 Bitangent;
 layout(location = 5) in ivec4 Joint;
 layout(location = 6) in vec4 Weight;
 
@@ -35,8 +36,10 @@ in int skinning_offset;
 #endif
 
 out vec3 nor;
+out vec3 nort;
 out vec3 tangent;
 out vec3 bitangent;
+flat out float bitangent_sign;
 out vec2 uv;
 out vec4 color;
 flat out vec2 color_change;
@@ -54,11 +57,11 @@ uniform samplerBuffer skinning_tex;
 void main(void)
 {
     mat4 ModelMatrix = getWorldMatrix(Origin, Orientation, Scale);
-    mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin, Orientation, Scale) * InverseViewMatrix);
+    mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin, Orientation, Scale) * u_inverse_view_matrix);
     vec4 idle_position = vec4(Position, 1.);
     vec4 idle_normal = vec4(Normal, 0.);
-    vec4 idle_tangent = vec4(Data1.z, Data1.w, Data2.x, 0.);
-    vec4 idle_bitangent = vec4(Data2.y, Data2.z, Data2.w, 0.);
+    vec4 idle_tangent = vec4(Tangent, 0.);
+    vec4 idle_bitangent = vec4(Bitangent.xyz, 0.);
     vec4 skinned_position = vec4(0.);
     vec4 skinned_normal = vec4(0.);
     vec4 skinned_tangent = vec4(0.);
@@ -76,13 +79,14 @@ void main(void)
         skinned_bitangent += Weight[i] * joint_matrix * idle_bitangent;
     }
 
-    gl_Position = ProjectionViewMatrix *  ModelMatrix * skinned_position;
+    gl_Position = u_projection_view_matrix *  ModelMatrix * skinned_position;
     // Keep orthogonality
     nor = (TransposeInverseModelView * skinned_normal).xyz;
     // Keep direction
-    tangent = (ViewMatrix * ModelMatrix * skinned_tangent).xyz;
-    bitangent = (ViewMatrix * ModelMatrix * skinned_bitangent).xyz;
-    uv = vec2(Data1.x + misc_data.x, Data1.y + misc_data.y);
+    tangent = (TransposeInverseModelView * skinned_tangent).xyz;
+    bitangent = (TransposeInverseModelView * skinned_bitangent).xyz;
+    bitangent_sign = Bitangent.w;
+    uv = vec2(Texcoord.x + misc_data.x, Texcoord.y + misc_data.y);
     color = Color.zyxw;
     color_change = misc_data.zw;
 #ifdef Use_Bindless_Texture
@@ -91,4 +95,5 @@ void main(void)
     thirdhandle = ThirdHandle;
     fourthhandle = FourthHandle;
 #endif
+//bitangent = skinned_bitangent.xyz;
 }

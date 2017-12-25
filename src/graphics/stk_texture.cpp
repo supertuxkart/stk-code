@@ -22,7 +22,6 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/materials.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "utils/log.hpp"
@@ -623,31 +622,12 @@ void* STKTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
 //-----------------------------------------------------------------------------
 u64 STKTexture::getHandle()
 {
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    assert(CVS->isAZDOEnabled());
-    if (m_texture_handle != 0) return m_texture_handle;
-
-    m_texture_handle =
-        glGetTextureSamplerHandleARB( m_texture_name,
-        ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
-
-    if (!glIsTextureHandleResidentARB(m_texture_handle))
-        glMakeTextureHandleResidentARB(m_texture_handle);
-#endif
     return m_texture_handle;
 }   // getHandle
 
 //-----------------------------------------------------------------------------
 void STKTexture::unloadHandle()
 {
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    if (CVS->isAZDOEnabled())
-    {
-        if (m_texture_handle == 0) return;
-        glMakeTextureHandleNonResidentARB(m_texture_handle);
-        m_texture_handle = 0;
-    }
-#endif
 }   // unloadHandle
 
 //-----------------------------------------------------------------------------

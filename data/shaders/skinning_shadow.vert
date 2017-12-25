@@ -52,10 +52,10 @@ void main(void)
 #ifdef VSLayer
     gl_Layer = layer;
     uv = Data1.xy;
-    gl_Position = ShadowViewProjMatrixes[gl_Layer] * ModelMatrix * skinned_position;
+    gl_Position = u_shadow_projection_view_matrices[gl_Layer] * ModelMatrix * skinned_position;
 #else
     layerId = layer;
     tc = Data1.xy;
-    gl_Position = ShadowViewProjMatrixes[layerId] * ModelMatrix * skinned_position;
+    gl_Position = u_shadow_projection_view_matrices[layerId] * ModelMatrix * skinned_position;
 #endif
 }

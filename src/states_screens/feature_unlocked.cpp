@@ -445,7 +445,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
 
                 if (textureID != previousTextureID)
                 {
-                    scene::IMesh* mesh = m_unlocked_stuff[n].m_side_1->getMesh();
+                    /*                    scene::IMesh* mesh = m_unlocked_stuff[n].m_side_1->getMesh();
 
                     assert(mesh->getMeshBufferCount() == 1);
 
@@ -472,7 +472,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
                     // to force irrLicht to refresh the display, now that Material has changed.
                     m_unlocked_stuff[n].m_side_2->setMesh(mesh);
 
-                    m_unlocked_stuff[n].m_curr_image = textureID;
+                    m_unlocked_stuff[n].m_curr_image = textureID;*/
                 }   // textureID != previousTextureID
             }   // if picture_count>1
         }   // if !m_unlocked_stuff[n].m_pictures.empty()

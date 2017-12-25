@@ -34,9 +34,11 @@
 #include "graphics/render_target.hpp"
 #include "graphics/shader_based_renderer.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/stk_animated_mesh.hpp"
-#include "graphics/stk_mesh_loader.hpp"
 #include "graphics/sp_mesh_loader.hpp"
+#include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_mesh.hpp"
+#include "graphics/sp/sp_mesh_node.hpp"
+#include "graphics/sp/sp_texture_manager.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/stk_texture.hpp"
@@ -398,7 +400,7 @@ void IrrDriver::initDevice()
             params.WindowSize    =
                 core::dimension2du(UserConfigParams::m_width,
                                    UserConfigParams::m_height);
-            params.HandleSRGB    = true;
+            params.HandleSRGB    = false;
             params.ShadersPath   = (file_manager->getShadersDir() +
                                                            "irrlicht/").c_str();
 
@@ -483,21 +485,7 @@ void IrrDriver::initDevice()
     }
 #endif
 
-    // This is the ugly hack for intel driver on linux, which doesn't
-    // use sRGB-capable visual, even if we request it. This causes
-    // the screen to be darker than expected. It affects mesa 10.6 and newer.
-    // Though we are able to force to use the proper format on mesa side by
-    // setting WithAlphaChannel parameter.
 #ifndef SERVER_ONLY
-    else if (CVS->needsSRGBCapableVisualWorkaround())
-    {
-        Log::warn("irr_driver", "Created visual is not sRGB-capable. "
-                                "Re-creating device to workaround the issue.");
-
-        params.WithAlphaChannel = true;
-        recreate_device = true;
-    }
-
     if (!ProfileWorld::isNoGraphics() && recreate_device)
     {
         m_device->closeDevice();
@@ -519,9 +507,6 @@ void IrrDriver::initDevice()
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
-    STKMeshLoader* sml = new STKMeshLoader(m_scene_manager);
-    m_scene_manager->addExternalMeshLoader(sml);
-    sml->drop();
     SPMeshLoader* spml = new SPMeshLoader(m_scene_manager);
     m_scene_manager->addExternalMeshLoader(spml);
     spml->drop();
@@ -853,7 +838,6 @@ void IrrDriver::applyResolutionSettings()
     // FIXME: this load sequence is (mostly) duplicated from main.cpp!!
     // That's just error prone
     // (we're sure to update main.cpp at some point and forget this one...)
-    VAOManager::getInstance()->kill();
     STKTexManager::getInstance()->kill();
 #ifdef ENABLE_RECORDER
     ogrDestroy();
@@ -1028,6 +1012,12 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
  */
 void IrrDriver::setAllMaterialFlags(scene::IMesh *mesh) const
 {
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        return;
+    }
+#endif
     unsigned int n=mesh->getMeshBufferCount();
     for(unsigned int i=0; i<n; i++)
     {
@@ -1164,11 +1154,11 @@ scene::IParticleSystemSceneNode *IrrDriver::addParticleNode(bool default_emitter
  *  since the node is not optimised.
  *  \param mesh The mesh to add.
  */
-scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
-                                          const std::string& debug_name,
-                                          scene::ISceneNode *parent,
-                                          RenderInfo* render_info,
-                                          bool all_parts_colorized)
+scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
+                                      const std::string& debug_name,
+                                      scene::ISceneNode *parent,
+                                      std::shared_ptr<RenderInfo> render_info,
+                                      bool all_parts_colorized)
 {
 #ifdef SERVER_ONLY
     return m_scene_manager->addMeshSceneNode(mesh, parent);
@@ -1179,14 +1169,23 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
     if (!parent)
       parent = m_scene_manager->getRootSceneNode();
 
-    scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent,
-                                                       m_scene_manager, -1,
-                                                       debug_name,
-                                                       core::vector3df(0, 0, 0),
-                                                       core::vector3df(0, 0, 0),
-                                                       core::vector3df(1.0f, 1.0f, 1.0f),
-                                                       true, render_info,
-                                                       all_parts_colorized);
+    scene::ISceneNode* node = NULL;
+    SP::SPMesh* spm = dynamic_cast<SP::SPMesh*>(mesh);
+    if (spm || mesh == NULL)
+    {
+        SP::SPMeshNode* spmn = new SP::SPMeshNode(spm, parent, m_scene_manager,
+            -1, debug_name, core::vector3df(0, 0, 0), core::vector3df(0, 0, 0),
+            core::vector3df(1.0f, 1.0f, 1.0f), render_info);
+        spmn->setMesh(spm);
+        spmn->setAnimationState(false);
+        node = spmn;
+    }
+    else
+    {
+        node = new STKMeshSceneNode(mesh, parent, m_scene_manager, -1,
+            debug_name, core::vector3df(0, 0, 0), core::vector3df(0, 0, 0),
+            core::vector3df(1.0f, 1.0f, 1.0f), true);
+    }
     node->drop();
 
     return node;
@@ -1381,29 +1380,35 @@ void IrrDriver::removeTexture(video::ITexture *t)
  */
 scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh,
     const std::string& debug_name, scene::ISceneNode* parent,
-    RenderInfo* render_info, bool all_parts_colorized)
+    std::shared_ptr<RenderInfo> render_info, bool all_parts_colorized)
 {
+    scene::IAnimatedMeshSceneNode* node;
 #ifndef SERVER_ONLY
-    if (!CVS->isGLSL())
+    SP::SPMesh* spm = dynamic_cast<SP::SPMesh*>(mesh);
+    if (CVS->isGLSL() && (spm || mesh == NULL))
     {
+        if (!parent)
+        {
+            parent = m_scene_manager->getRootSceneNode();
+        }
+        SP::SPMeshNode* spmn = new SP::SPMeshNode(spm, parent, m_scene_manager,
+            -1, debug_name, core::vector3df(0, 0, 0), core::vector3df(0, 0, 0),
+            core::vector3df(1.0f, 1.0f, 1.0f), render_info);
+        spmn->drop();
+        spmn->setMesh(mesh);
+        node = spmn;
+    }
+    else
 #endif
-        return m_scene_manager->addAnimatedMeshSceneNode(mesh, parent, -1,
+    {
+        node = m_scene_manager->addAnimatedMeshSceneNode(mesh, parent, -1,
             core::vector3df(0, 0, 0),
             core::vector3df(0, 0, 0),
             core::vector3df(1, 1, 1),
             /*addIfMeshIsZero*/true);
-#ifndef SERVER_ONLY
     }
-
-    if (!parent)
-        parent = m_scene_manager->getRootSceneNode();
-    scene::IAnimatedMeshSceneNode* node =
-        new STKAnimatedMesh(mesh, parent, m_scene_manager, -1, debug_name,
-        core::vector3df(0, 0, 0), core::vector3df(0, 0, 0),
-        core::vector3df(1, 1, 1), render_info, all_parts_colorized);
-    node->drop();
     return node;
-#endif
+
 }   // addAnimatedMesh
 
 // ----------------------------------------------------------------------------
@@ -1530,6 +1535,13 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
  */
 void IrrDriver::grabAllTextures(const scene::IMesh *mesh)
 {
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        // SPM files has shared_ptr auto-delete texture 
+        return;
+    }
+#endif
     const unsigned int n = mesh->getMeshBufferCount();
 
     for(unsigned int i=0; i<n; i++)
@@ -1552,6 +1564,13 @@ void IrrDriver::grabAllTextures(const scene::IMesh *mesh)
  */
 void IrrDriver::dropAllTextures(const scene::IMesh *mesh)
 {
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        // SPM files has shared_ptr auto-delete texture 
+        return;
+    }
+#endif
     const unsigned int n = mesh->getMeshBufferCount();
 
     for(unsigned int i=0; i<n; i++)
@@ -1678,8 +1697,8 @@ void IrrDriver::displayFPS()
         fps_string = StringUtils::insertValues
                     (L"FPS: %d/%d/%d  - PolyCount: %d Solid, "
                       "%d Shadows - LightDist : %d, Total skinning joints: %d",
-                    min, fps, max, m_renderer->getPolyCount(SOLID_NORMAL_AND_DEPTH_PASS),
-                    m_renderer->getPolyCount(SHADOW_PASS), m_last_light_bucket_distance,
+                    min, fps, max, SP::sp_solid_poly_count,
+                    SP::sp_shadow_poly_count, m_last_light_bucket_distance,
                     m_skinning_joint);
     }
     else
@@ -1782,9 +1801,7 @@ void IrrDriver::update(float dt)
     m_wind->update();
 
     PropertyAnimator::get()->update(dt);
-
-    STKTexManager::getInstance()
-        ->checkThreadedLoadTextures(true/*util_queue_empty*/);
+    SP::SPTextureManager::get()->checkForGLCommand();
 
     World *world = World::getWorld();
 

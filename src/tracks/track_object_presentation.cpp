@@ -30,7 +30,6 @@
 #include "graphics/mesh_tools.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/stk_particle.hpp"
 #include "graphics/render_info.hpp"
 #include "io/file_manager.hpp"
@@ -346,7 +345,7 @@ void TrackObjectPresentationLibraryNode::move(const core::vector3df& xyz, const 
 TrackObjectPresentationLOD::TrackObjectPresentationLOD(const XMLNode& xml_node,
                                        scene::ISceneNode* parent,
                                        ModelDefinitionLoader& model_def_loader,
-                                       RenderInfo* ri)
+                                       std::shared_ptr<RenderInfo> ri)
                           : TrackObjectPresentationSceneNode(xml_node)
 {
     m_node = model_def_loader.instanciateAsLOD(&xml_node, parent, ri);
@@ -392,7 +391,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
                                                      const XMLNode& xml_node,
                                                      bool enabled,
                                                      scene::ISceneNode* parent,
-                                                     RenderInfo* render_info)
+                                                     std::shared_ptr<RenderInfo> render_info)
                            : TrackObjectPresentationSceneNode(xml_node)
 {
     m_is_looped  = false;
@@ -614,13 +613,6 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
             xml_node->get("displacing", &displacing);
 
         m_node = irr_driver->addMesh(m_mesh, m_model_file, parent, m_render_info);
-
-#ifndef SERVER_ONLY
-        STKMeshSceneNode* stkmesh = dynamic_cast<STKMeshSceneNode*>(m_node);
-        if (displacing && stkmesh != NULL)
-            stkmesh->setIsDisplacement(displacing);
-#endif
-
         Track *track = Track::getCurrentTrack();
         if (track && xml_node)
             track->handleAnimatedTextures(m_node, *xml_node);

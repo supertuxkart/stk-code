@@ -18,6 +18,8 @@
 #ifndef CENTRAL_SETTINGS_HPP
 #define CENTRAL_SETTINGS_HPP
 
+#include <string>
+
 class CentralVideoSettings
 {
 private:
@@ -25,7 +27,7 @@ private:
     bool                  m_glsl;
 
     int m_gl_major_version, m_gl_minor_version;
-    bool hasVSLayer;
+    std::string m_vs_layer_extension;
     bool hasBaseInstance;
     bool hasDrawIndirect;
     bool hasBufferStorage;
@@ -46,6 +48,9 @@ private:
     bool hasTextureSwizzle;
     bool hasPixelBufferObject;
     bool hasSRGBFramebuffer;
+    bool hasSamplerObjects;
+    bool hasVertexType2101010Rev;
+    bool hasNVGPUShader5;
 
 #if defined(USE_GLES2)
     bool hasBGRA;
@@ -74,7 +79,6 @@ public:
     bool isARBTextureViewUsable() const;
     bool isARBGeometryShadersUsable() const;
     bool isARBTextureStorageUsable() const;
-    bool isAMDVertexShaderLayerUsable() const;
     bool isARBComputeShaderUsable() const;
     bool isARBArraysOfArraysUsable() const;
     bool isARBBindlessTextureUsable() const;
@@ -90,6 +94,12 @@ public:
     bool isARBTextureSwizzleUsable() const;
     bool isARBPixelBufferObjectUsable() const;
     bool isARBSRGBFramebufferUsable() const;
+    bool isARBSamplerObjectsUsable() const;
+    bool isARBVertexType2101010RevUsable() const;
+    bool useArrayTextures() const;
+    bool isNVGPUShader5Usable() const;
+
+    const std::string& getVSLayerExtension() const { return m_vs_layer_extension; }
 
 #if defined(USE_GLES2)
     bool isEXTTextureFormatBGRA8888Usable() const;
@@ -106,6 +116,8 @@ public:
     bool supportsHardwareSkinning() const;
     bool supportsThreadedTextureLoading() const;
     bool supportsTextureCompression() const;
+
+    bool supportsGLLayerInVertexShader() const;
 
     // "Macro" around feature support and user config
     bool isShadowEnabled() const;

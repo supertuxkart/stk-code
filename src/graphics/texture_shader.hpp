@@ -178,11 +178,7 @@ public:
     void setTextureUnitsImpl(GLuint tex_id, TexIds... args)
     {
         static_assert(N != 15, "15 is reserved for skinning texture");
-#if defined(USE_GLES2)
-        if (CVS->getGLSLVersion() >= 300)
-#else
-        if (CVS->getGLSLVersion() >= 330)
-#endif
+        if (CVS->isARBSamplerObjectsUsable())
         {
             glActiveTexture(GL_TEXTURE0 + m_texture_units[N]);
             glBindTexture(m_texture_type[N], tex_id);

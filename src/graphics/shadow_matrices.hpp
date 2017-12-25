@@ -52,7 +52,7 @@ private:
     bool                       m_rsm_map_available;
     core::vector3df            m_rh_extend;
     core::matrix4              m_rh_matrix;
-
+    float                      m_mat_ubo[16 * 9 + 2];
 
     void updateSplitAndLightcoordRangeFromComputeShaders(unsigned int width,
                                                          unsigned int height,
@@ -104,6 +104,7 @@ public:
         return m_shadow_scales;
     }
     // ------------------------------------------------------------------------
+    const float* getMatricesData() const { return m_mat_ubo; }
 
 };   // class ShadowMatrices
 

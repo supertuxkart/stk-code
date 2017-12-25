@@ -168,6 +168,7 @@ private:
 
     void          initItem(ItemType type, const Vec3 &xyz);
     void          setType(ItemType type);
+    void          setMesh(scene::IMesh* mesh, scene::IMesh* lowres_mesh);
 
 public:
                   Item(ItemType type, const Vec3& xyz, const Vec3& normal,

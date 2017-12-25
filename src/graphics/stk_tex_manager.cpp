@@ -19,7 +19,6 @@
 #include "config/hardware_stats.hpp"
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/materials.hpp"
 #include "graphics/threaded_tex_loader.hpp"
 #include "graphics/stk_texture.hpp"
 #include "io/file_manager.hpp"
@@ -345,17 +344,6 @@ core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
 // ----------------------------------------------------------------------------
 void STKTexManager::reset()
 {
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    if (!CVS->isAZDOEnabled()) return;
-    for (auto p : m_all_textures)
-    {
-        if (p.second == NULL)
-            continue;
-        p.second->unloadHandle();
-    }
-    // Driver seems to crash if texture handles are not cleared...
-    ObjectPass1Shader::getInstance()->recreateTrilinearSampler(0);
-#endif
 }   // reset
 
 // ----------------------------------------------------------------------------

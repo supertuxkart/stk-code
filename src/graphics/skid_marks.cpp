@@ -161,11 +161,11 @@ void SkidMarks::update(float dt, bool force_skid_marks,
                                 m_kart.getNormal(), distance);
         // Adjust the boundary box of the mesh to include the
         // adjusted aabb of its buffers.
-        core::aabbox3df aabb=m_nodes[m_current]->getMesh()
-                            ->getBoundingBox();
-        aabb.addInternalBox(m_left[m_current]->getAABB());
-        aabb.addInternalBox(m_right[m_current]->getAABB());
-        m_nodes[m_current]->getMesh()->setBoundingBox(aabb);
+        //core::aabbox3df aabb=m_nodes[m_current]->getMesh()
+        //                    ->getBoundingBox();
+        //aabb.addInternalBox(m_left[m_current]->getAABB());
+        //aabb.addInternalBox(m_right[m_current]->getAABB());
+        //m_nodes[m_current]->getMesh()->setBoundingBox(aabb);
         return;
     }
 
@@ -194,7 +194,7 @@ void SkidMarks::update(float dt, bool force_skid_marks,
                           m_kart.getNormal(), m_material, m_avoid_z_fighting,
                           custom_color);
     new_mesh->addMeshBuffer(smq_right);
-    scene::IMeshSceneNode *new_node = irr_driver->addMesh(new_mesh, "skidmark");
+    scene::ISceneNode *new_node = irr_driver->addMesh(new_mesh, "skidmark");
 #ifndef SERVER_ONLY
     if (STKMeshSceneNode* stkm = dynamic_cast<STKMeshSceneNode*>(new_node))
         stkm->setReloadEachFrame(true);

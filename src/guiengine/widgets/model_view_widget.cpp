@@ -48,7 +48,7 @@ IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, 
     m_type = WTYPE_MODEL_VIEW;
     m_render_target = NULL;
     m_rotation_mode = ROTATE_OFF;
-    m_render_info = new RenderInfo();
+    m_render_info.reset(new RenderInfo());
     m_angle = 0;
 
     // so that the base class doesn't complain there is no icon defined
@@ -62,9 +62,6 @@ ModelViewWidget::~ModelViewWidget()
 {
     clearModels();
     GUIEngine::needsUpdate.remove(this);
-#ifndef SERVER_ONLY    
-    delete m_render_info;
-#endif
 }   // ~ModelViewWidget
 
 // -----------------------------------------------------------------------------

@@ -8,7 +8,7 @@ out vec4 FragColor;
 
 void main()
 {
-    vec2 uv = gl_FragCoord.xy / screen;
+    vec2 uv = gl_FragCoord.xy / u_screen;
     vec4 col = texture(tex, uv);
 
     // Uncharted2 tonemap with Auria's custom coefficients

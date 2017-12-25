@@ -19,7 +19,7 @@
 #ifndef HEADER_CHECK_LINE_HPP
 #define HEADER_CHECK_LINE_HPP
 
-#include <IMeshSceneNode.h>
+#include <ISceneNode.h>
 #include <line2d.h>
 #include <vector2d.h>
 using namespace irr;
@@ -65,7 +65,7 @@ private:
     std::vector<bool> m_previous_sign;
 
     /** Used to display debug information about checklines. */
-    scene::IMeshSceneNode *m_debug_node;
+    scene::ISceneNode *m_debug_node;
 
     /** How much a kart is allowed to be under the minimum height of a
      *  quad and still considered to be able to cross it. */

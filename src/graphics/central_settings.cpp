@@ -24,7 +24,6 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/graphics_restrictions.hpp"
 
-
 CentralVideoSettings *CVS = new CentralVideoSettings();
 
 void CentralVideoSettings::init()
@@ -33,7 +32,6 @@ void CentralVideoSettings::init()
     m_gl_minor_version = 1;
 
     // Parse extensions
-    hasVSLayer = false;
     hasBaseInstance = false;
     hasBufferStorage = false;
     hasDrawIndirect = false;
@@ -54,6 +52,9 @@ void CentralVideoSettings::init()
     hasTextureSwizzle = false;
     hasPixelBufferObject = false;
     hasSRGBFramebuffer = false;
+    hasSamplerObjects = false;
+    hasVertexType2101010Rev = false;
+    hasNVGPUShader5 = false;
 
 #if defined(USE_GLES2)
     hasBGRA = false;
@@ -102,9 +103,15 @@ void CentralVideoSettings::init()
         }
 
 #if !defined(USE_GLES2)
-        if (hasGLExtension("GL_AMD_vertex_shader_layer")) {
-            hasVSLayer = true;
+        if (hasGLExtension("GL_AMD_vertex_shader_layer"))
+        {
+            m_vs_layer_extension = "GL_AMD_vertex_shader_layer";
             Log::info("GLDriver", "AMD Vertex Shader Layer Present");
+        }
+        if (hasGLExtension("GL_ARB_shader_viewport_layer_array"))
+        {
+            m_vs_layer_extension = "GL_ARB_shader_viewport_layer_array";
+            Log::info("GLDriver", "ARB Shader Viewport Layer Array Present");
         }
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_BUFFER_STORAGE) &&
             hasGLExtension("GL_ARB_buffer_storage")  )
@@ -205,13 +212,21 @@ void CentralVideoSettings::init()
             hasPixelBufferObject = true;
             Log::info("GLDriver", "ARB Pixel Buffer Object Present");
         }
-        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB) &&
-            (hasGLExtension("GL_ARB_framebuffer_sRGB") || m_glsl == true))
+        if (hasGLExtension("GL_ARB_sampler_objects"))
         {
-            hasSRGBFramebuffer = true;
-            Log::info("GLDriver", "ARB framebuffer sRGB Present");
+            hasSamplerObjects = true;
+            Log::info("GLDriver", "ARB Sampler Objects Present");
         }
-
+        if (hasGLExtension("GL_ARB_vertex_type_2_10_10_10_rev"))
+        {
+            hasVertexType2101010Rev = true;
+            Log::info("GLDriver", "ARB Vertex Type 2_10_10_10_rev Present");
+        }
+        if (hasGLExtension("GL_NV_gpu_shader5"))
+        {
+            hasNVGPUShader5 = true;
+            Log::info("GLDriver", "GL_NV_gpu_shader5 Present");
+        }
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GI))
         {
             m_GI_has_artifact = true;
@@ -231,26 +246,13 @@ void CentralVideoSettings::init()
             m_need_srgb_workaround = true;
         }
 
-        // Check if visual is sRGB-capable
-        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB) &&
-            GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKAROUND2) &&
-            m_glsl == true)
-        {
-            GLint param = GL_SRGB;
-            glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT,
-                              GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &param);
-            m_need_srgb_visual_workaround = (param != GL_SRGB);
-            
-            if (m_need_srgb_visual_workaround)
-            {
-                hasSRGBFramebuffer = false;
-            }
-        }
 #else
         if (m_glsl == true)
         {
             hasTextureStorage = true;
             hasTextureSwizzle = true;
+            hasSamplerObjects = true;
+            hasVertexType2101010Rev = true;
         }
 
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXPLICIT_ATTRIB_LOCATION) &&
@@ -259,7 +261,7 @@ void CentralVideoSettings::init()
             Log::info("GLDriver", "Explicit Attrib Location Present");
             hasExplicitAttribLocation = true;
         }
-        
+
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_UNIFORM_BUFFER_OBJECT) &&
             m_glsl == true) 
         {
@@ -281,7 +283,7 @@ void CentralVideoSettings::init()
             hasColorBufferFloat = true;
             Log::info("GLDriver", "EXT Color Buffer Float Present");
         }
-        
+
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_VERTEX_ID_WORKING))
         {
             m_need_vertex_id_workaround = true;
@@ -295,11 +297,10 @@ void CentralVideoSettings::init()
         {
             UserConfigParams::m_high_definition_textures = 0x00;
         }
-        
+
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HIGHDEFINITION_TEXTURES_256))
         {
             UserConfigParams::m_high_definition_textures = 0;
-            
             if (UserConfigParams::m_max_texture_size > 256)
             {
                 UserConfigParams::m_max_texture_size = 256;
@@ -337,7 +338,7 @@ bool CentralVideoSettings::needRHWorkaround() const
 
 bool CentralVideoSettings::needsRGBBindlessWorkaround() const
 {
-    return m_need_srgb_workaround;
+    return false;
 }
 
 bool CentralVideoSettings::needsSRGBCapableVisualWorkaround() const
@@ -357,7 +358,8 @@ bool CentralVideoSettings::isARBGeometryShadersUsable() const
 
 bool CentralVideoSettings::isARBUniformBufferObjectUsable() const
 {
-    return hasUBO;
+    return hasUBO ||
+        (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 3));
 }
 
 bool CentralVideoSettings::isARBExplicitAttribLocationUsable() const
@@ -380,9 +382,9 @@ bool CentralVideoSettings::isARBDrawIndirectUsable() const
     return hasDrawIndirect;
 }
 
-bool CentralVideoSettings::isAMDVertexShaderLayerUsable() const
+bool CentralVideoSettings::supportsGLLayerInVertexShader() const
 {
-    return hasVSLayer;
+    return !m_vs_layer_extension.empty();
 }
 
 bool CentralVideoSettings::isARBBufferStorageUsable() const
@@ -412,7 +414,7 @@ bool CentralVideoSettings::isARBTextureViewUsable() const
 
 bool CentralVideoSettings::isARBBindlessTextureUsable() const
 {
-    return hasBindlessTexture;
+    return hasBindlessTexture && hasNVGPUShader5;
 }
 
 bool CentralVideoSettings::isARBShaderAtomicCountersUsable() const
@@ -442,7 +444,7 @@ bool CentralVideoSettings::isEXTTextureFilterAnisotropicUsable() const
 
 bool CentralVideoSettings::isARBSRGBFramebufferUsable() const
 {
-    return hasSRGBFramebuffer;
+    return false;
 }
 
 #if defined(USE_GLES2)
@@ -459,12 +461,12 @@ bool CentralVideoSettings::isEXTColorBufferFloatUsable() const
 
 bool CentralVideoSettings::supportsShadows() const
 {
-    return isARBGeometryShadersUsable() && isARBUniformBufferObjectUsable() && isARBExplicitAttribLocationUsable();
+    return isARBExplicitAttribLocationUsable();
 }
 
 bool CentralVideoSettings::supportsGlobalIllumination() const
 {
-    return isARBGeometryShadersUsable() && isARBUniformBufferObjectUsable() && isARBExplicitAttribLocationUsable() && !m_GI_has_artifact;
+    return false;
 }
 
 bool CentralVideoSettings::supportsIndirectInstancingRendering() const
@@ -484,7 +486,7 @@ bool CentralVideoSettings::supportsAsyncInstanceUpload() const
 
 bool CentralVideoSettings::supportsTextureCompression() const
 {
-    return isEXTTextureCompressionS3TCUsable() && isARBSRGBFramebufferUsable();
+    return isEXTTextureCompressionS3TCUsable();
 }
 
 bool CentralVideoSettings::isShadowEnabled() const
@@ -494,7 +496,7 @@ bool CentralVideoSettings::isShadowEnabled() const
 
 bool CentralVideoSettings::isGlobalIlluminationEnabled() const
 {
-    return supportsGlobalIllumination() && UserConfigParams::m_gi;
+    return false;
 }
 
 bool CentralVideoSettings::isTextureCompressionEnabled() const
@@ -540,9 +542,32 @@ bool CentralVideoSettings::isARBPixelBufferObjectUsable() const
     return hasPixelBufferObject;
 }
 
+bool CentralVideoSettings::isARBSamplerObjectsUsable() const
+{
+    return hasSamplerObjects ||
+        (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 3));
+}
+
+bool CentralVideoSettings::isARBVertexType2101010RevUsable() const
+{
+    return hasVertexType2101010Rev ||
+        (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 3));
+}
+
+bool CentralVideoSettings::isNVGPUShader5Usable() const
+{
+    return hasNVGPUShader5;
+}
+
 bool CentralVideoSettings::supportsThreadedTextureLoading() const
 {
-    return isARBPixelBufferObjectUsable() && isARBBufferStorageUsable() && isARBTextureStorageUsable();
+    return false;
+}
+
+bool CentralVideoSettings::useArrayTextures() const
+{
+    return (UserConfigParams::m_high_definition_textures & 0x01) == 0 &&
+        UserConfigParams::m_max_texture_size <= 256;
 }
 
 #endif   // !SERVER_ONLY

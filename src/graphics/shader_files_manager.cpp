@@ -20,6 +20,7 @@
 #include "graphics/shader_files_manager.hpp"
 #include "config/stk_config.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/graphics_restrictions.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
 
@@ -141,8 +142,8 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
     }
 #endif
 
-    if (CVS->isAMDVertexShaderLayerUsable())
-        code << "#extension GL_AMD_vertex_shader_layer : enable\n";
+    if (CVS->supportsGLLayerInVertexShader())
+        code << "#extension " << CVS->getVSLayerExtension() << " : enable\n";
 
     if (CVS->isARBExplicitAttribLocationUsable())
     {
@@ -152,18 +153,28 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
         code << "#define Explicit_Attrib_Location_Usable\n";
     }
 
-    if (CVS->isAZDOEnabled())
+    if (CVS->useArrayTextures())
+    {
+        code << "#define Use_Array_Texture\n";
+    }
+    else if (CVS->isARBBindlessTextureUsable())
     {
         code << "#extension GL_ARB_bindless_texture : enable\n";
+        code << "#extension GL_NV_gpu_shader5 : require\n";
         code << "#define Use_Bindless_Texture\n";
     }
+
+    if (GraphicsRestrictions::isDisabled
+        (GraphicsRestrictions::GR_10BIT_VECTOR))
+    {
+        code << "#define Converts_10bit_Vector\n";
+    }
+
     code << "//" << file << "\n";
     if (!CVS->isARBUniformBufferObjectUsable())
         code << "#define UBO_DISABLED\n";
-    if (CVS->isAMDVertexShaderLayerUsable())
+    if (CVS->supportsGLLayerInVertexShader())
         code << "#define VSLayer\n";
-    if (CVS->needsRGBBindlessWorkaround())
-        code << "#define SRGBBindlessFix\n";
     if (CVS->needsVertexIdWorkaround())
         code << "#define Needs_Vertex_Id_Workaround\n";
     if (CVS->isDefferedEnabled())
@@ -182,9 +193,17 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
         &precision);
 
     if (precision > 0)
+    {
         code << "precision highp float;\n";
+        code << "precision highp sampler2DArrayShadow;\n";
+        code << "precision highp sampler2DArray;\n";
+    }
     else
+    {
         code << "precision mediump float;\n";
+        code << "precision mediump sampler2DArrayShadow;\n";
+        code << "precision mediump sampler2DArray;\n";
+    }
 #endif
     code << "#define MAX_BONES " << stk_config->m_max_skinning_bones << "\n";
 

@@ -125,7 +125,7 @@ void CheckCannon::changeDebugColor(bool is_active)
 #if defined(DEBUG) && !defined(SERVER_ONLY)
     CheckLine::changeDebugColor(is_active);
 
-    scene::IMesh *mesh = m_debug_target_node->getMesh();
+/*    scene::IMesh *mesh = m_debug_target_node->getMesh();
     scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
     irr::video::S3DVertex* vertices
         = (video::S3DVertex*)buffer->getVertices();
@@ -136,6 +136,7 @@ void CheckCannon::changeDebugColor(bool is_active)
         vertices[i].Color = color;
     }
     buffer->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(color));
+*/
 #endif
 }   // changeDebugColor
 

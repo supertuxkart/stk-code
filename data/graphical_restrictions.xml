@@ -2,19 +2,17 @@
 <graphical-restrictions>
   <card is="Intel(R) HD Graphics"      os="windows" version="<9.0" disable="ForceLegacyDevice"/>
   <card is="Intel(R) HD Graphics"      os="windows" version="<9.0" disable="HighDefinitionTextures"/>
-  <card is="Intel(R) HD Graphics 2000" os="windows"                disable="UniformBufferObject"/>
-  <card is="Intel(R) HD Graphics 2000" os="windows"                disable="FramebufferSRGB"/>
+  <card is="Intel(R) HD Graphics 2000" os="windows"                disable="10BitVector"/>
   <card is="Intel(R) HD Graphics 2000" os="windows"                disable="HighDefinitionTextures"/>
-  <card is="Intel(R) HD Graphics 3000" os="windows"                disable="UniformBufferObject"/>
-  <card is="Intel(R) HD Graphics 3000" os="windows"                disable="FramebufferSRGB"/>
+  <card is="Intel(R) HD Graphics 3000" os="windows"                disable="10BitVector"/>
   <card is="Intel(R) HD Graphics 3000" os="windows"                disable="HighDefinitionTextures"/>
   <card is="Intel(R) HD Graphics 4600" os="windows"                disable="ComputeShader"/>
   <card contains="Intel"          os="osx"                         disable="GI"/>
   <card contains="Intel"          os="linux"    version="<11.2"    disable="ComputeShader"/>
   <card contains="Intel"          os="linux"    version="<11.2"    disable="GeometryShader"/>
-  <card contains="Intel"          os="linux"                       disable="FramebufferSRGBWorkaround2"/>
+  <card contains="Ivybridge"      os="linux"                       disable="10BitVector"/>
+  <card contains="Sandybridge"    os="linux"                       disable="10BitVector"/>
   <card contains="Intel"          os="linux"    version="<11.2"    disable="TextureCompressionS3TC"/>
-  <card contains="Intel"          os="windows"                     disable="TextureCompressionS3TC"/>
   <card contains="Intel"          os="osx"                         disable="TextureCompressionS3TC"/>
   <card contains="NVIDIA"         os="windows"  version="<344.65"  disable="BufferStorage"/>
   <card contains="NVIDIA"         os="linux"    version="<343.22"  disable="BufferStorage"/>
@@ -37,6 +35,5 @@
   <card                           os="android"                     disable="ColorBufferFloat"/>
   <card contains="Adreno"         os="android"  version="<=19"     disable="VertexIdWorking"/>
   <card contains="Android Emulator" os="android"                   disable="ForceLegacyDevice"/>
-  <card                           os="android"                     disable="UniformBufferObject"/>
   <card vendor="Broadcom"         os="linux"                       disable="HighDefinitionTextures256"/>
 </graphical-restrictions>

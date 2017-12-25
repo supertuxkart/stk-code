@@ -22,10 +22,9 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/draw_policies.hpp"
-#include "graphics/geometry_passes.hpp"
+#include "graphics/cpu_particle_manager.hpp"
+#include "graphics/frame_buffer_layer.hpp"
 #include "graphics/glwrap.hpp"
-#include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/post_processing.hpp"
@@ -35,6 +34,8 @@
 #include "graphics/skybox.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/spherical_harmonics.hpp"
+#include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_shader.hpp"
 #include "items/item_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "modes/world.hpp"
@@ -43,99 +44,18 @@
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
 
+#include "../../lib/irrlicht/source/Irrlicht/CSceneManager.h"
+#include "../../lib/irrlicht/source/Irrlicht/os.h"
 #include <algorithm> 
 
 // ----------------------------------------------------------------------------
+
+
+
 void ShaderBasedRenderer::setRTT(RTT* rtts)
 {
-    if (m_rtts != rtts && rtts != NULL)
-    {
-        // Update prefilled textures if new RTT is used
-        std::vector<GLuint> prefilled_textures =
-            createVector<GLuint>(rtts->getRenderTarget(RTT_DIFFUSE),
-                                 rtts->getRenderTarget(RTT_SPECULAR),
-                                 rtts->getRenderTarget(RTT_HALF1_R),
-                                 rtts->getDepthStencilTexture());
-        m_geometry_passes->setFirstPassRenderTargets(prefilled_textures,
-            rtts->getPrefilledHandles());
-    }
-    
     m_rtts = rtts;
 } //setRTT
-
-// ----------------------------------------------------------------------------
-void ShaderBasedRenderer::setOverrideMaterial()
-{
-    video::SOverrideMaterial &overridemat = irr_driver->getVideoDriver()->getOverrideMaterial();
-    overridemat.EnablePasses = scene::ESNRP_SOLID | scene::ESNRP_TRANSPARENT;
-    overridemat.EnableFlags = 0;
-
-    if (irr_driver->getWireframe())
-    {
-        overridemat.Material.Wireframe = 1;
-        overridemat.EnableFlags |= video::EMF_WIREFRAME;
-    }
-    if (irr_driver->getMipViz())
-    {
-        overridemat.Material.MaterialType = Shaders::getShader(ES_MIPVIZ);
-        overridemat.EnableFlags |= video::EMF_MATERIAL_TYPE;
-        overridemat.EnablePasses = scene::ESNRP_SOLID;
-    }       
-} //setOverrideMaterial
-
-// ----------------------------------------------------------------------------
-/** Add glowing items, they may appear or disappear each frame. */
-void ShaderBasedRenderer::addItemsInGlowingList()
-{
-    ItemManager * const items = ItemManager::get();
-    const u32 itemcount = items->getNumberOfItems();
-    u32 i;
-
-    for (i = 0; i < itemcount; i++)
-    {
-        Item * const item = items->getItem(i);
-        if (!item) continue;
-        const Item::ItemType type = item->getType();
-
-        if (type != Item::ITEM_NITRO_BIG && type != Item::ITEM_NITRO_SMALL &&
-            type != Item::ITEM_BONUS_BOX && type != Item::ITEM_BANANA && type != Item::ITEM_BUBBLEGUM)
-            continue;
-
-        LODNode * const lod = (LODNode *) item->getSceneNode();
-        if (!lod->isVisible()) continue;
-
-        const int level = lod->getLevel();
-        if (level < 0) continue;
-
-        scene::ISceneNode * const node = lod->getAllNodes()[level];
-        node->updateAbsolutePosition();
-
-        GlowData dat;
-        dat.node = node;
-
-        dat.r = 1.0f;
-        dat.g = 1.0f;
-        dat.b = 1.0f;
-
-        const video::SColorf &c = ItemManager::getGlowColor(type);
-        dat.r = c.getRed();
-        dat.g = c.getGreen();
-        dat.b = c.getBlue();
-
-        STKMeshSceneNode *stk_node = static_cast<STKMeshSceneNode *>(node);
-        stk_node->setGlowColors(irr::video::SColor(0, (unsigned) (dat.r * 255.f), (unsigned)(dat.g * 255.f), (unsigned)(dat.b * 255.f)));
-
-        m_glowing.push_back(dat);
-    }    
-} //addItemsInGlowingList
-
-// ----------------------------------------------------------------------------
-/** Remove all non static glowing things */
-void ShaderBasedRenderer::removeItemsInGlowingList()
-{
-    while(m_glowing.size() > m_nb_static_glowing)
-        m_glowing.pop_back();    
-}
 
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::prepareForwardRenderer()
@@ -218,7 +138,7 @@ void ShaderBasedRenderer::renderSSAO() const
                                   m_rtts->getFBO(FBO_SSAO),
                                   m_rtts->getDepthStencilTexture());
     // Blur it to reduce noise.
-    FrameBuffer::Blit(m_rtts->getFBO(FBO_SSAO),
+    FrameBuffer::blit(m_rtts->getFBO(FBO_SSAO),
                       m_rtts->getFBO(FBO_HALF1_R), 
                       GL_COLOR_BUFFER_BIT, GL_LINEAR);
     m_post_processing->renderGaussian17TapBlur(m_rtts->getFBO(FBO_HALF1_R), 
@@ -228,143 +148,156 @@ void ShaderBasedRenderer::renderSSAO() const
 }   // renderSSAO
 
 // ----------------------------------------------------------------------------
-void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
-                                      float dt,
-                                      bool hasShadow,
-                                      bool forceRTT)
+void ShaderBasedRenderer::renderGlow() const
+{
+    irr_driver->getSceneManager()->setCurrentRendertime(scene::ESNRP_SOLID);
+    m_rtts->getFBO(FBO_TMP1_WITH_DS).bind();
+    glClearStencil(0);
+    glClearColor(0, 0, 0, 0);
+    glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glStencilFunc(GL_ALWAYS, 1, ~0);
+    glEnable(GL_STENCIL_TEST);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_BLEND);
+
+    SP::drawGlow();
+
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    glDisable(GL_STENCIL_TEST);
+}   // renderGlow
+
+// ----------------------------------------------------------------------------
+void ShaderBasedRenderer::renderShadows()
+{
+    PROFILER_PUSH_CPU_MARKER("- Shadow Pass", 0xFF, 0x00, 0x00);
+    glDepthFunc(GL_LEQUAL);
+    glDepthMask(GL_TRUE);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+
+    if (!CVS->isESMEnabled())
+    {
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(1.5, 50.);
+    }
+    if (CVS->supportsGLLayerInVertexShader())
+    {
+        m_rtts->getShadowFrameBuffer().bindDepthOnly();
+        glClearColor(1., 1., 1., 1.);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glClearColor(0., 0., 0., 0.);
+    }
+    for (unsigned cascade = 0; cascade < 4; cascade++)
+    {
+        if (!CVS->supportsGLLayerInVertexShader())
+        {
+            m_rtts->getShadowFrameBuffer().bindLayerDepthOnly(cascade);
+            glClearColor(1., 1., 1., 1.);
+            glClear(GL_DEPTH_BUFFER_BIT);
+            glClearColor(0., 0., 0., 0.);
+        }
+        SP::sp_cur_shadow_cascade = cascade;
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SHADOWS_CASCADE0 + cascade));
+        SP::draw(SP::RP_SHADOW, (SP::DrawCallType)(SP::DCT_SHADOW1 + cascade));
+    }
+    glDisable(GL_POLYGON_OFFSET_FILL);
+    PROFILER_POP_CPU_MARKER();
+}
+
+// ============================================================================
+class CombineDiffuseColor : public TextureShader<CombineDiffuseColor, 6>
+{
+public:
+    CombineDiffuseColor()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "combine_diffuse_color.frag");
+        assignUniforms();
+        assignSamplerNames(0, "diffuse_map", ST_NEAREST_FILTERED,
+                           1, "specular_map", ST_NEAREST_FILTERED,
+                           2, "ssao_tex", ST_NEAREST_FILTERED,
+                           3, "gloss_map", ST_NEAREST_FILTERED,
+                           4, "diffuse_color", ST_NEAREST_FILTERED,
+                           5, "depth_stencil", ST_NEAREST_FILTERED);
+    }   // CombineDiffuseColor
+    // ------------------------------------------------------------------------
+    void render(GLuint dm, GLuint sm, GLuint st, GLuint gm, GLuint dc,
+                GLuint ds)
+    {
+        setTextureUnits(dm, sm, st, gm, dc, ds);
+        drawFullScreenEffect();
+    }   // render
+};   // CombineDiffuseColor
+
+// ----------------------------------------------------------------------------
+void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const camnode,
+                                              float dt,
+                                              bool hasShadow,
+                                              bool forceRTT)
 {
     if (CVS->isARBUniformBufferObjectUsable())
     {
-        glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedGPUObjects::getViewProjectionMatricesUBO());
+        glBindBufferBase(GL_UNIFORM_BUFFER, 0,
+            SP::sp_mat_ubo[SP::sp_cur_player][SP::sp_cur_buf_id[SP::sp_cur_player]]);
         glBindBufferBase(GL_UNIFORM_BUFFER, 1, SharedGPUObjects::getLightingDataUBO());
+        glBindBufferBase(GL_UNIFORM_BUFFER, 2, SP::sp_fog_ubo);
     }
     irr_driver->getSceneManager()->setActiveCamera(camnode);
 
     PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
     unsigned solid_poly_count = 0;
     unsigned shadow_poly_count = 0;
-    m_draw_calls.prepareDrawCalls(m_shadow_matrices, camnode, solid_poly_count, shadow_poly_count);
+    m_draw_calls.prepareDrawCalls(camnode);
     m_poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += solid_poly_count;
     m_poly_count[SHADOW_PASS] += shadow_poly_count;
     PROFILER_POP_CPU_MARKER();
-    // For correct position of headlight in karts
     PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);
     m_lighting_passes.updateLightsInfo(camnode, dt);
     PROFILER_POP_CPU_MARKER();
 
-#if !defined(USE_GLES2)    
     // Shadows
+    if (CVS->isShadowEnabled() && hasShadow)
     {
-        // To avoid wrong culling, use the largest view possible
-        irr_driver->getSceneManager()->setActiveCamera(m_shadow_matrices.getSunCam());
-        if (CVS->isDefferedEnabled() &&
-            CVS->isShadowEnabled() && hasShadow)
-        {
-            PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
-            m_geometry_passes->renderShadows(m_draw_calls,
-                                             m_shadow_matrices,
-                                             m_rtts->getShadowFrameBuffer(),
-                                             m_rtts->getFBO(FBO_SCALAR_1024),
-                                             m_post_processing);
-            PROFILER_POP_CPU_MARKER();
-            if (CVS->isGlobalIlluminationEnabled())
-            {
-                if (!m_shadow_matrices.isRSMMapAvail())
-                {
-                    PROFILER_PUSH_CPU_MARKER("- RSM", 0xFF, 0x0, 0xFF);
-                    m_geometry_passes->renderReflectiveShadowMap(m_draw_calls,
-                                                                 m_shadow_matrices, 
-                                                                 m_rtts->getReflectiveShadowMapFrameBuffer()); //TODO: move somewhere else as RSM are computed only once per track
-                    m_shadow_matrices.setRSMMapAvail(true);
-                    PROFILER_POP_CPU_MARKER();
-                }
-            }
-        }
-        irr_driver->getSceneManager()->setActiveCamera(camnode);
+        renderShadows();
     }
-#endif // !defined(USE_GLES2)
 
-    PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
-    
-    if (CVS->isDefferedEnabled() || forceRTT)
+
     {
-        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
-        glClearColor(0., 0., 0., 0.);
+        m_rtts->getFBO(FBO_SP).bind();
+        glClearColor(1., 1., 1., 0.);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        m_geometry_passes->renderSolidFirstPass(m_draw_calls);
+        glClearColor(0., 0., 0., 0.);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS1));
+        SP::draw(SP::RP_1ST, SP::DCT_NORMAL);
     }
-    else
-    {
-        // We need a cleared depth buffer for some effect (eg particles depth blending)
-#if !defined(USE_GLES2)
-        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKAROUND1) &&
-            CVS->isARBSRGBFramebufferUsable())
-            glDisable(GL_FRAMEBUFFER_SRGB);
-#endif
-        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
-        // Bind() modifies the viewport. In order not to affect anything else,
-        // the viewport is just reset here and not removed in Bind().
-        const core::recti &vp = Camera::getActiveCamera()->getViewport();
-        glViewport(vp.UpperLeftCorner.X,
-                   irr_driver->getActualScreenSize().Height - vp.LowerRightCorner.Y,
-                   vp.LowerRightCorner.X - vp.UpperLeftCorner.X,
-                   vp.LowerRightCorner.Y - vp.UpperLeftCorner.Y);
-        glClear(GL_DEPTH_BUFFER_BIT);
-#if !defined(USE_GLES2)
-        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKAROUND1) &&
-            CVS->isARBSRGBFramebufferUsable())
-            glEnable(GL_FRAMEBUFFER_SRGB);
-#endif
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-    PROFILER_POP_CPU_MARKER();
-
-
 
     // Lights
     {
         PROFILER_PUSH_CPU_MARKER("- Light", 0x00, 0xFF, 0x00);
-        if (CVS->isDefferedEnabled())
+        m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
+        glClear(GL_COLOR_BUFFER_BIT);
+        GLuint specular_probe = 0;
+        if (m_skybox)
         {
-            if (CVS->isGlobalIlluminationEnabled() && hasShadow)
-            {
-                ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
-                m_lighting_passes.renderRadianceHints( m_shadow_matrices,
-                                                       m_rtts->getRadianceHintFrameBuffer(),
-                                                       m_rtts->getReflectiveShadowMapFrameBuffer());
-            }
-
-            m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
-            glClear(GL_COLOR_BUFFER_BIT);
-            m_rtts->getFBO(FBO_DIFFUSE).bind();
-
-            if (CVS->isGlobalIlluminationEnabled() && hasShadow)
-            {
-                ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
-                m_lighting_passes.renderGlobalIllumination( m_shadow_matrices,
-                                                            m_rtts->getRadianceHintFrameBuffer(),
-                                                            m_rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
-                                                            m_rtts->getDepthStencilTexture());
-            }
-
-            m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
-            GLuint specular_probe = 0;
-            if (m_skybox)
-            {
-                specular_probe = m_skybox->getSpecularProbe();
-            }
-
-            m_lighting_passes.renderLights( hasShadow,
-                                            m_rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
-                                            m_rtts->getDepthStencilTexture(),
-                                            m_rtts->getShadowFrameBuffer(),
-                                            specular_probe);
+            specular_probe = m_skybox->getSpecularProbe();
         }
+
+        m_lighting_passes.renderLights( hasShadow,
+                                        m_rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
+                                        m_rtts->getDepthStencilTexture(),
+                                        m_rtts->getShadowFrameBuffer(),
+                                        specular_probe);
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -377,40 +310,38 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         PROFILER_POP_CPU_MARKER();
     }
 
-    PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
-    if (CVS->isDefferedEnabled() || forceRTT)
+    m_rtts->getFBO(FBO_COLORS).bind();
+    video::SColor clearColor(0, 150, 150, 150);
+    if (World::getWorld() != NULL)
+        clearColor = irr_driver->getClearColor();
+
+    glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
+        clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
     {
-        m_rtts->getFBO(FBO_COLORS).bind();
-        video::SColor clearColor(0, 150, 150, 150);
-        if (World::getWorld() != NULL)
-            clearColor = irr_driver->getClearColor();
-
-        glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
-            clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        PROFILER_PUSH_CPU_MARKER("- Combine diffuse color", 0x2F, 0x77, 0x33);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS2));
+        glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
+        glDisable(GL_BLEND);
+        CombineDiffuseColor::getInstance()->render(
+            m_rtts->getRenderTarget(RTT_DIFFUSE),
+            m_rtts->getRenderTarget(RTT_SPECULAR),
+            m_rtts->getRenderTarget(RTT_HALF1_R),
+            m_rtts->getRenderTarget(RTT_SP_GLOSS),
+            m_rtts->getRenderTarget(RTT_SP_DIFF_COLOR),
+            m_rtts->getDepthStencilTexture());
+        PROFILER_POP_CPU_MARKER();
     }
-
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-    m_geometry_passes->renderSolidSecondPass(m_draw_calls);
-    PROFILER_POP_CPU_MARKER();
 
     if (irr_driver->getNormals())
     {
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_TRUE);
         m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
-        m_geometry_passes->renderNormalsVisualisation(m_draw_calls);
+        SP::drawNormal();
         m_rtts->getFBO(FBO_COLORS).bind();
-    }
-
-    // Render ambient scattering
-    const Track * const track = Track::getCurrentTrack();
-    if (CVS->isDefferedEnabled() && track && track->isFogEnabled())
-    {
-        PROFILER_PUSH_CPU_MARKER("- Ambient scatter", 0xFF, 0x00, 0x00);
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_FOG));
-        m_lighting_passes.renderAmbientScatter(m_rtts->getDepthStencilTexture());
-        PROFILER_POP_CPU_MARKER();
     }
 
     {
@@ -420,6 +351,146 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         PROFILER_POP_CPU_MARKER();
     }
 
+    const Track * const track = Track::getCurrentTrack();
+    // Render discrete lights scattering
+    if (track && track->isFogEnabled())
+    {
+        PROFILER_PUSH_CPU_MARKER("- PointLight Scatter", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_FOG));
+        m_lighting_passes.renderLightsScatter(m_rtts->getDepthStencilTexture(),
+                                              m_rtts->getFBO(FBO_HALF1),
+                                              m_rtts->getFBO(FBO_HALF2),
+                                              m_rtts->getFBO(FBO_COLORS),
+                                              m_post_processing);
+        PROFILER_POP_CPU_MARKER();
+    }
+
+    PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
+    // Render anything glowing.
+    if (UserConfigParams::m_glow)
+    {
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GLOW));
+        irr_driver->setPhase(GLOW_PASS);
+        renderGlow();
+        m_post_processing->renderGlow(m_rtts->getFBO(FBO_TMP1_WITH_DS),
+                                      m_rtts->getFBO(FBO_HALF1),
+                                      m_rtts->getFBO(FBO_QUARTER1),
+                                      m_rtts->getFBO(FBO_COLORS));
+    } // end glow
+    PROFILER_POP_CPU_MARKER();
+
+    // Render transparent
+    {
+        PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TRANSPARENT));
+        SP::draw(SP::RP_1ST, SP::DCT_TRANSPARENT);
+        SP::draw(SP::RP_2ND, SP::DCT_TRANSPARENT);
+        PROFILER_POP_CPU_MARKER();
+    }
+
+    // Render particles
+    {
+        PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0xFF, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_PARTICLES));
+        CPUParticleManager::getInstance()->drawAll();
+        PROFILER_POP_CPU_MARKER();
+    }
+
+    // Now all instancing data from mesh and particle are done drawing
+    m_draw_calls.setFenceSync();
+
+    if (!forceRTT)
+    {
+#if !defined(USE_GLES2)
+        if (CVS->isARBSRGBFramebufferUsable())
+            glDisable(GL_FRAMEBUFFER_SRGB);
+#endif
+        glDisable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
+        return;
+    }
+
+    // Ensure that no object will be drawn after that by using invalid pass
+    irr_driver->setPhase(PASS_COUNT);
+} //renderSceneDeferred
+
+// ----------------------------------------------------------------------------
+void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
+                                      float dt,
+                                      bool hasShadow,
+                                      bool forceRTT)
+{
+    if (CVS->isARBUniformBufferObjectUsable())
+    {
+        glBindBufferBase(GL_UNIFORM_BUFFER, 0,
+            SP::sp_mat_ubo[SP::sp_cur_player][SP::sp_cur_buf_id[SP::sp_cur_player]]);
+        glBindBufferBase(GL_UNIFORM_BUFFER, 1, SharedGPUObjects::getLightingDataUBO());
+    }
+    irr_driver->getSceneManager()->setActiveCamera(camnode);
+
+    PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
+    unsigned solid_poly_count = 0;
+    unsigned shadow_poly_count = 0;
+    m_draw_calls.prepareDrawCalls(camnode);
+    m_poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += solid_poly_count;
+    m_poly_count[SHADOW_PASS] += shadow_poly_count;
+    PROFILER_POP_CPU_MARKER();
+
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LEQUAL);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+    glEnable(GL_CULL_FACE);
+
+    if (!forceRTT)
+    {
+        // We need a cleared depth buffer for some effect (eg particles depth blending)
+        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
+        // Bind() modifies the viewport. In order not to affect anything else,
+        // the viewport is just reset here and not removed in Bind().
+        const core::recti &vp = Camera::getActiveCamera()->getViewport();
+        glViewport(vp.UpperLeftCorner.X,
+                   irr_driver->getActualScreenSize().Height - vp.LowerRightCorner.Y,
+                   vp.LowerRightCorner.X - vp.UpperLeftCorner.X,
+                   vp.LowerRightCorner.Y - vp.UpperLeftCorner.Y);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+    else
+    {
+        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
+        glClearColor(0., 0., 0., 0.);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    }
+
+    if (forceRTT)
+    {
+        m_rtts->getFBO(FBO_COLORS).bind();
+        video::SColor clearColor(0, 150, 150, 150);
+        if (World::getWorld() != NULL)
+            clearColor = irr_driver->getClearColor();
+
+        glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
+            clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+
+    {
+        glDepthMask(GL_TRUE);
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL_BLEND);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS1));
+        SP::draw(SP::RP_1ST, SP::DCT_NORMAL);
+    }
+
+    {
+        PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SKYBOX));
+        renderSkybox(camnode);
+        PROFILER_POP_CPU_MARKER();
+    }
+
+    const Track * const track = Track::getCurrentTrack();
     // Render discrete lights scattering
     if (CVS->isDefferedEnabled() && track && track->isFogEnabled())
     {
@@ -433,52 +504,12 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         PROFILER_POP_CPU_MARKER();
     }
 
-    if (irr_driver->getRH())
-    {
-        glDisable(GL_BLEND);
-        m_rtts->getFBO(FBO_COLORS).bind();
-        m_post_processing->renderRHDebug(m_rtts->getRadianceHintFrameBuffer().getRTT()[0],
-                                         m_rtts->getRadianceHintFrameBuffer().getRTT()[1],
-                                         m_rtts->getRadianceHintFrameBuffer().getRTT()[2],
-                                         m_shadow_matrices.getRHMatrix(),
-                                         m_shadow_matrices.getRHExtend());
-    }
-
-    if (irr_driver->getGI())
-    {
-        glDisable(GL_BLEND);
-        m_rtts->getFBO(FBO_COLORS).bind();
-        m_lighting_passes.renderGlobalIllumination(m_shadow_matrices,
-                                                   m_rtts->getRadianceHintFrameBuffer(),
-                                                   m_rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
-                                                   m_rtts->getDepthStencilTexture());
-    }
-
-    PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
-    // Render anything glowing.
-    if (!irr_driver->getWireframe() && !irr_driver->getMipViz() && UserConfigParams::m_glow)
-    {
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GLOW));
-        irr_driver->setPhase(GLOW_PASS);
-        m_geometry_passes->renderGlowingObjects(m_draw_calls, m_glowing,
-                                                m_rtts->getFBO(FBO_TMP1_WITH_DS));
-                                                
-        m_post_processing->renderGlow(m_rtts->getFBO(FBO_TMP1_WITH_DS),
-                                      m_rtts->getFBO(FBO_HALF1),
-                                      m_rtts->getFBO(FBO_QUARTER1),
-                                      m_rtts->getFBO(FBO_COLORS));
-    } // end glow
-    PROFILER_POP_CPU_MARKER();
-
     // Render transparent
     {
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TRANSPARENT));
-        m_geometry_passes->renderTransparent(m_draw_calls,
-                                             m_rtts->getFBO(FBO_TMP1_WITH_DS),
-                                             m_rtts->getFBO(FBO_DISPLACE),
-                                             m_rtts->getFBO(FBO_COLORS),                                             
-                                             m_post_processing);
+        SP::draw(SP::RP_1ST, SP::DCT_TRANSPARENT);
+        SP::draw(SP::RP_2ND, SP::DCT_TRANSPARENT);
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -486,12 +517,13 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0xFF, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_PARTICLES));
-        renderParticles();
+        CPUParticleManager::getInstance()->drawAll();
         PROFILER_POP_CPU_MARKER();
     }
-    
+
+    // Now all instancing data from mesh and particle are done drawing
     m_draw_calls.setFenceSync();
-    
+
     if (!CVS->isDefferedEnabled() && !forceRTT)
     {
 #if !defined(USE_GLES2)
@@ -506,12 +538,6 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     // Ensure that no object will be drawn after that by using invalid pass
     irr_driver->setPhase(PASS_COUNT);
 } //renderScene
-
-// ----------------------------------------------------------------------------
-void ShaderBasedRenderer::renderParticles()
-{
-    m_draw_calls.renderParticlesList();
-} //renderParticles
 
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::debugPhysics()
@@ -573,7 +599,7 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 
     if (irr_driver->getNormals())
     {
-        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(
+        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).blitToDefault(
             viewport.UpperLeftCorner.X, 
             irr_driver->getActualScreenSize().Height - viewport.LowerRightCorner.Y, 
             viewport.LowerRightCorner.X, 
@@ -617,26 +643,9 @@ ShaderBasedRenderer::ShaderBasedRenderer()
     m_rtts                  = NULL;
     m_skybox                = NULL;
     m_spherical_harmonics   = new SphericalHarmonics(irr_driver->getAmbientLight().toSColor());
-    m_nb_static_glowing     = 0;
-    Log::info("ShaderBasedRenderer", "Preloading shaders...");
-    preloadShaderFiles();
-
-    if (CVS->isAZDOEnabled())
-    {
-        m_geometry_passes = new GeometryPasses<MultidrawPolicy>();
-        Log::info("ShaderBasedRenderer", "Geometry will be rendered with multidraw policy.");
-    }
-    else if (CVS->supportsIndirectInstancingRendering())
-    {
-        m_geometry_passes = new GeometryPasses<IndirectDrawPolicy>();
-        Log::info("ShaderBasedRenderer", "Geometry will be rendered with indirect draw policy.");
-    }
-    else
-    {
-        m_geometry_passes = new GeometryPasses<GL3DrawPolicy>();
-        Log::info("ShaderBasedRenderer", "Geometry will be rendered with GL3 policy.");
-    }
-
+    SharedGPUObjects::init();
+    SP::init();
+    SP::initSTKRenderer(this);
     m_post_processing = new PostProcessing(irr_driver->getVideoDriver());    
 }
 
@@ -656,11 +665,11 @@ ShaderBasedRenderer::~ShaderBasedRenderer()
         // check if we createad the OpenGL device by calling initDevice()
         m_post_processing->drop();
     }
-    delete m_geometry_passes;
     delete m_spherical_harmonics;
     delete m_skybox;
     delete m_rtts;
     ShaderFilesManager::kill();
+    SP::destroy();
 }
 
 // ----------------------------------------------------------------------------
@@ -685,6 +694,10 @@ void ShaderBasedRenderer::onUnloadWorld()
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::resetPostProcessing()
 {
+    if (CVS->isARBUniformBufferObjectUsable())
+    {
+        uploadLightingData();
+    }
     m_post_processing->reset();
 }
 
@@ -745,38 +758,11 @@ void ShaderBasedRenderer::addSunLight(const core::vector3df &pos)
 }
 
 // ----------------------------------------------------------------------------
-void ShaderBasedRenderer::addGlowingNode(scene::ISceneNode *n, float r, float g, float b)
-{
-    GlowData dat;
-    dat.node = n;
-    dat.r = r;
-    dat.g = g;
-    dat.b = b;
-    
-    STKMeshSceneNode *node = static_cast<STKMeshSceneNode *>(n);
-    node->setGlowColors(irr::video::SColor(0, (unsigned) (dat.r * 255.f), (unsigned)(dat.g * 255.f), (unsigned)(dat.b * 255.f)));
-    
-    m_glowing.push_back(dat);
-    m_nb_static_glowing++;
-} //addGlowingNode
-
-// ----------------------------------------------------------------------------
-void ShaderBasedRenderer::clearGlowingNodes()
-{
-    m_glowing.clear();
-    m_nb_static_glowing = 0;
-}
-
-// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::render(float dt)
 {
     resetObjectCount();
     resetPolyCount();
 
-    setOverrideMaterial();
-    
-    addItemsInGlowingList();
-    
     // Start the RTT for post-processing.
     // We do this before beginScene() because we want to capture the glClear()
     // because of tracks that do not have skyboxes (generally add-on tracks)
@@ -787,14 +773,24 @@ void ShaderBasedRenderer::render(float dt)
     
     RaceGUIBase *rg = world->getRaceGUI();
     if (rg) rg->update(dt);
-    
+
     if (!CVS->isDefferedEnabled())
     {
         prepareForwardRenderer();
     }
-    
+
+    {
+        PROFILER_PUSH_CPU_MARKER("Update scene", 0x0, 0xFF, 0x0);
+        static_cast<scene::CSceneManager *>(irr_driver->getSceneManager())
+            ->OnAnimate(os::Timer::getTime());
+        PROFILER_POP_CPU_MARKER();
+    }
+
+    assert(Camera::getNumCameras() < MAX_PLAYER_COUNT + 1);
     for(unsigned int cam = 0; cam < Camera::getNumCameras(); cam++)
-    {    
+    {
+        SP::sp_cur_player = cam;
+        SP::sp_cur_buf_id[cam] = (SP::sp_cur_buf_id[cam] + 1) % 3;
         Camera * const camera = Camera::getCamera(cam);
         scene::ICameraSceneNode * const camnode = camera->getCameraSceneNode();
 
@@ -810,15 +806,18 @@ void ShaderBasedRenderer::render(float dt)
         if (!CVS->isDefferedEnabled() && CVS->isARBSRGBFramebufferUsable())
             glEnable(GL_FRAMEBUFFER_SRGB);
 #endif
-        
-        PROFILER_PUSH_CPU_MARKER("UBO upload", 0x0, 0xFF, 0x0);
+
         computeMatrixesAndCameras(camnode, m_rtts->getWidth(), m_rtts->getHeight());
-        m_shadow_matrices.updateSunOrthoMatrices();
-        if(CVS->isARBUniformBufferObjectUsable())
-            uploadLightingData();
-        PROFILER_POP_CPU_MARKER();
-        renderScene(camnode, dt, track->hasShadows(), false); 
-        
+        if (CVS->isDefferedEnabled())
+        {
+            renderSceneDeferred(camnode, dt, track->hasShadows(), false); 
+    
+        }
+        else
+        {
+            renderScene(camnode, dt, track->hasShadows(), false); 
+        }
+
         if (irr_driver->getBoundingBoxesViz())
         {        
             m_draw_calls.renderBoundingBoxes();
@@ -837,19 +836,6 @@ void ShaderBasedRenderer::render(float dt)
         PROFILER_POP_CPU_MARKER();
         
     }  // for i<world->getNumKarts()
-    
-    if(CVS->isARBUniformBufferObjectUsable())
-    {
-        // Use full screen size
-        float tmp[2];
-        tmp[0] = float(irr_driver->getActualScreenSize().Width);
-        tmp[1] = float(irr_driver->getActualScreenSize().Height);
-        glBindBuffer(GL_UNIFORM_BUFFER,
-                     SharedGPUObjects::getViewProjectionMatricesUBO());
-        glBufferSubData(GL_UNIFORM_BUFFER, (16 * 9) * sizeof(float),
-                        2 * sizeof(float), tmp);
-    }
-
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -859,11 +845,11 @@ void ShaderBasedRenderer::render(float dt)
     irr_driver->getVideoDriver()->setViewPort(core::recti(0, 0,
         irr_driver->getActualScreenSize().Width,
         irr_driver->getActualScreenSize().Height));
-        
+
     m_current_screen_size = core::vector2df(
                                     (float)irr_driver->getActualScreenSize().Width, 
                                     (float)irr_driver->getActualScreenSize().Height);
-    
+
     for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {
         Camera *camera = Camera::getCamera(i);
@@ -894,12 +880,11 @@ void ShaderBasedRenderer::render(float dt)
     drawDebugMeshes();
 #endif
 
-    PROFILER_PUSH_CPU_MARKER("EndSccene", 0x45, 0x75, 0x45);
+    PROFILER_PUSH_CPU_MARKER("EndScene", 0x45, 0x75, 0x45);
     irr_driver->getVideoDriver()->endScene();
     PROFILER_POP_CPU_MARKER();
 
     m_post_processing->update(dt);
-    removeItemsInGlowingList();
 } //render
 
 // ----------------------------------------------------------------------------
@@ -915,17 +900,29 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
                                           irr::scene::ICameraSceneNode* camera,
                                           float dt)
 {
+    // For render to texture no triple buffering of ubo is used
+    SP::sp_cur_player = 0;
+    SP::sp_cur_buf_id[0] = 0;
     resetObjectCount();
     resetPolyCount();
     assert(m_rtts != NULL);
 
     irr_driver->getSceneManager()->setActiveCamera(camera);
-
+    static_cast<scene::CSceneManager *>(irr_driver->getSceneManager())
+        ->OnAnimate(os::Timer::getTime());
     computeMatrixesAndCameras(camera, m_rtts->getWidth(), m_rtts->getHeight());
     if (CVS->isARBUniformBufferObjectUsable())
         uploadLightingData();
 
-    renderScene(camera, dt, false, true);
+    if (CVS->isDefferedEnabled())
+    {
+        renderSceneDeferred(camera, dt, false, true);
+    }
+    else
+    {
+        renderScene(camera, dt, false, true);
+    }
+
     render_target->setFrameBuffer(m_post_processing
         ->render(camera, false, m_rtts));
 
@@ -939,61 +936,5 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     irr_driver->getSceneManager()->setActiveCamera(NULL);
 
 } //renderToTexture
-
-// ----------------------------------------------------------------------------
-void ShaderBasedRenderer::preloadShaderFiles()
-{
-    SharedGPUObjects::init();
-    ShaderFilesManager* sfm = ShaderFilesManager::getInstance();
-
-    sfm->addShaderFile("object_pass.vert", GL_VERTEX_SHADER);
-    sfm->addShaderFile("object_pass1.frag", GL_FRAGMENT_SHADER);
-    sfm->addShaderFile("splatting.frag", GL_FRAGMENT_SHADER);
-    if (CVS->supportsHardwareSkinning())
-        sfm->addShaderFile("skinning.vert", GL_VERTEX_SHADER);
-    sfm->addShaderFile("transparent.frag", GL_FRAGMENT_SHADER);
-    sfm->addShaderFile("coloredquad.vert", GL_VERTEX_SHADER);
-    sfm->addShaderFile("coloredquad.frag", GL_FRAGMENT_SHADER);
-    sfm->addShaderFile("screenquad.vert", GL_VERTEX_SHADER);
-    sfm->addShaderFile("tonemap.frag", GL_FRAGMENT_SHADER);
-    if (!GraphicsRestrictions::isDisabled
-        (GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKAROUND1))
-        sfm->addShaderFile("passthrough.frag", GL_FRAGMENT_SHADER);
-
-    sfm->addShaderFile("alphatest_particle.vert", GL_VERTEX_SHADER);
-    sfm->addShaderFile("alphatest_particle.frag", GL_FRAGMENT_SHADER);
-    sfm->addShaderFile("simple_particle.vert", GL_VERTEX_SHADER);
-    sfm->addShaderFile("simple_particle.frag", GL_FRAGMENT_SHADER);
-
-    if (CVS->supportsIndirectInstancingRendering())
-    {
-        sfm->addShaderFile("instanced_object_pass.vert", GL_VERTEX_SHADER);
-        if (CVS->supportsHardwareSkinning())
-            sfm->addShaderFile("instanced_skinning.vert", GL_VERTEX_SHADER);
-        sfm->addShaderFile("instanced_object_pass1.frag", GL_FRAGMENT_SHADER);
-        sfm->addShaderFile("instanced_object_pass2.frag", GL_FRAGMENT_SHADER);
-        sfm->addShaderFile("instanced_objectref_pass1.frag", GL_FRAGMENT_SHADER);
-        sfm->addShaderFile("instanced_objectref_pass2.frag", GL_FRAGMENT_SHADER);
-        sfm->addShaderFile("instanced_object_unlit.frag", GL_FRAGMENT_SHADER);
-        sfm->addShaderFile("instanced_normalmap.frag", GL_FRAGMENT_SHADER);
-        sfm->addShaderFile("instanced_grass.vert", GL_VERTEX_SHADER);
-        sfm->addShaderFile("instanced_grass_pass2.frag", GL_FRAGMENT_SHADER);
-        sfm->addShaderFile("instanced_objectpass_spheremap.frag", GL_FRAGMENT_SHADER);
-        sfm->addShaderFile("instanced_detailed_object_pass2.frag", GL_FRAGMENT_SHADER);
-    }
-    else
-    {
-        sfm->addShaderFile("object_pass2.frag", GL_FRAGMENT_SHADER);
-        sfm->addShaderFile("objectref_pass1.frag", GL_FRAGMENT_SHADER);
-        sfm->addShaderFile("objectref_pass2.frag", GL_FRAGMENT_SHADER);
-        sfm->addShaderFile("object_unlit.frag", GL_FRAGMENT_SHADER);
-        sfm->addShaderFile("normalmap.frag", GL_FRAGMENT_SHADER);
-        sfm->addShaderFile("grass_pass.vert", GL_VERTEX_SHADER);
-        sfm->addShaderFile("grass_pass2.frag", GL_FRAGMENT_SHADER);
-        sfm->addShaderFile("objectpass_spheremap.frag", GL_FRAGMENT_SHADER);
-        sfm->addShaderFile("detailed_object_pass2.frag", GL_FRAGMENT_SHADER);
-    }
-
-} //preloadShaderFiles
 
 #endif   // !SERVER_ONLY

@@ -30,6 +30,8 @@
 #include "graphics/light.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stk_tex_manager.hpp"
+#include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_texture_manager.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "items/powerup_manager.hpp"
@@ -87,6 +89,7 @@ enum DebugMenuCommand
     DEBUG_GRAPHICS_BULLET_1,
     DEBUG_GRAPHICS_BULLET_2,
     DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ,
+    DEBUG_GRAPHICS_TOGGLE_CULLING,
     DEBUG_PROFILER,
     DEBUG_PROFILER_WRITE_REPORT,
     DEBUG_FONT_DUMP_GLYPH_PAGE,
@@ -344,6 +347,9 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ:
         irr_driver->resetDebugModes();
         irr_driver->toggleBoundingBoxesViz();
+        break;
+    case DEBUG_GRAPHICS_TOGGLE_CULLING:
+        SP::sp_culling = !SP::sp_culling;
         break;
     case DEBUG_PROFILER:
         profiler.toggleStatus();
@@ -698,7 +704,7 @@ bool handleContextMenuAction(s32 cmd_id)
                 STKTexManager* stktm = STKTexManager::getInstance();
                 if (t == "tus;")
                 {
-                    stktm->dumpAllTexture(false/*mesh_texture*/);
+                    SP::SPTextureManager::get()->dumpAllTexture();
                     stktm->dumpTextureUsage();
                     return false;
                 }
@@ -761,6 +767,7 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Physics debug", DEBUG_GRAPHICS_BULLET_1);
             sub->addItem(L"Physics debug (no kart)", DEBUG_GRAPHICS_BULLET_2);
             sub->addItem(L"Bounding Boxes viz", DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ);
+            sub->addItem(L"Toggle Culling", DEBUG_GRAPHICS_TOGGLE_CULLING);
             sub->addItem(L"Reset debug views", DEBUG_GRAPHICS_RESET );
 
             mnu->addItem(L"Items >",-1,true,true);

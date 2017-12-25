@@ -848,9 +848,12 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
         w3->clearModels();
         core::matrix4 model_location;
         model_location.setScale(core::vector3df(15.0f, 15.0f, 15.0f));
+        file_manager->pushTextureSearchPath
+            (file_manager->getAsset(FileManager::MODEL,""), "models");
         w3->addModel(irr_driver->getAnimatedMesh(
             file_manager->getAsset(FileManager::MODEL, "chest.spm"))
             ->getMesh(20), model_location);
+        file_manager->popTextureSearchPath();
         w3->update(0);
 
         if (m_multiplayer)

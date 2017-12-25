@@ -23,10 +23,11 @@
 #include "graphics/callbacks.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/frame_buffer.hpp"
 #include "graphics/graphics_restrictions.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/mlaa_areamap.hpp"
+#include "graphics/glwrap.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
@@ -1001,6 +1002,7 @@ void PostProcessing::renderGaussian6BlurLayer(const FrameBuffer &in_fbo,
                                               unsigned int layer, float sigma_h,
                                               float sigma_v) const
 {
+/*
 #if !defined(USE_GLES2)
     GLuint layer_tex;
     glGenTextures(1, &layer_tex);
@@ -1055,7 +1057,7 @@ void PostProcessing::renderGaussian6BlurLayer(const FrameBuffer &in_fbo,
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     }
     glDeleteTextures(1, &layer_tex);
-#endif
+#endif*/
 }   // renderGaussian6BlurLayer
 
 // ----------------------------------------------------------------------------
@@ -1223,10 +1225,10 @@ void PostProcessing::renderGlow(const FrameBuffer& glow_framebuffer,
                                 const FrameBuffer& color_framebuffer   ) const
 {
     // To half
-    FrameBuffer::Blit(glow_framebuffer, half_framebuffer, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    FrameBuffer::blit(glow_framebuffer, half_framebuffer, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
     // To quarter
-    FrameBuffer::Blit(half_framebuffer, quarter_framebuffer, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    FrameBuffer::blit(half_framebuffer, quarter_framebuffer, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
@@ -1397,7 +1399,7 @@ void PostProcessing::applyMLAA(const FrameBuffer& mlaa_tmp_framebuffer,
     MLAABlendWeightSHader::getInstance()->render(m_areamap, PIXEL_SIZE, mlaa_tmp_framebuffer.getRTT()[0]);
 
     // Blit in to tmp1
-    FrameBuffer::Blit(mlaa_colors_framebuffer,
+    FrameBuffer::blit(mlaa_colors_framebuffer,
                       mlaa_tmp_framebuffer);
 
     // Pass 3: gather
@@ -1471,7 +1473,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             glClear(GL_STENCIL_BUFFER_BIT);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
 
-            FrameBuffer::Blit(*in_fbo, rtts->getFBO(FBO_BLOOM_1024),
+            FrameBuffer::blit(*in_fbo, rtts->getFBO(FBO_BLOOM_1024),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
             rtts->getFBO(FBO_BLOOM_512).bind();
@@ -1480,21 +1482,21 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
 
             // Downsample
-            FrameBuffer::Blit(rtts->getFBO(FBO_BLOOM_512),
+            FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_512),
                               rtts->getFBO(FBO_BLOOM_256), 
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
-            FrameBuffer::Blit(rtts->getFBO(FBO_BLOOM_256),
+            FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_256),
                               rtts->getFBO(FBO_BLOOM_128),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
 			// Copy for lens flare
-			FrameBuffer::Blit(rtts->getFBO(FBO_BLOOM_512),
+			FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_512),
                               rtts->getFBO(FBO_LENS_512), 
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
-			FrameBuffer::Blit(rtts->getFBO(FBO_BLOOM_256),
+			FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_256),
                               rtts->getFBO(FBO_LENS_256),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
-			FrameBuffer::Blit(rtts->getFBO(FBO_BLOOM_128),
+			FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_128),
                               rtts->getFBO(FBO_LENS_128),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
 

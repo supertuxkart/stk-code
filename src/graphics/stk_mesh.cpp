@@ -156,47 +156,43 @@ GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
                               getVertexPitchFromType(type), (GLvoid*)36);
         break;
     case video::EVT_TANGENTS:
-        // Position
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                              getVertexPitchFromType(type), 0);
-        // Normal
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
-                              getVertexPitchFromType(type), (GLvoid*)12);
-        // Color
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE,
-                              getVertexPitchFromType(type), (GLvoid*)24);
-        // Texcoord
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE,
-                              getVertexPitchFromType(type), (GLvoid*)28);
-        // Tangent
-        glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE,
-                              getVertexPitchFromType(type), (GLvoid*)36);
-        // Bitangent
-        glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE,
-                              getVertexPitchFromType(type), (GLvoid*)48);
-        break;
-    case video::EVT_SKINNED_MESH:
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), 0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)12);
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(type), (GLvoid*)24);
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)28);
-        glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)44);
-        glEnableVertexAttribArray(5);
-        glVertexAttribIPointer(5, 4, GL_SHORT, getVertexPitchFromType(type), (GLvoid*)60);
-        glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 4, GL_HALF_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)68);
-        break;
+            // Position
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), 0);
+            // Normal
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)12);
+            // Color
+            glEnableVertexAttribArray(2);
+            glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(type), (GLvoid*)24);
+            // Texcoord
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)28);
+            // Tangent
+            glEnableVertexAttribArray(5);
+            glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)36);
+            // Bitangent
+            glEnableVertexAttribArray(6);
+            glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)48);
+            break;
+        case video::EVT_SKINNED_MESH:
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), 0);
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)12);
+            glEnableVertexAttribArray(2);
+            glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(type), (GLvoid*)24);
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)28);
+            glEnableVertexAttribArray(4);
+            glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)36);
+            glEnableVertexAttribArray(11);
+            glVertexAttribPointer(11, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)48);
+            glEnableVertexAttribArray(5);
+            glVertexAttribIPointer(5, 4, GL_SHORT, getVertexPitchFromType(type), (GLvoid*)64);
+            glEnableVertexAttribArray(6);
+            glVertexAttribPointer(6, 4, GL_HALF_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)72);
+            break;
     default:
         assert(0 && "Wrong vertex type");
     }

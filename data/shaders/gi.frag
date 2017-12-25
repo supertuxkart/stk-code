@@ -37,18 +37,18 @@ vec3 resolution = vec3(32, 16, 32);
 
 void main()
 {
-    vec2 uv = gl_FragCoord.xy / screen;
+    vec2 uv = gl_FragCoord.xy / u_screen;
     vec3 GI = vec3(0.);
 
     float depth = texture2D(dtex, uv).x;
     // Discard background fragments
     if (depth==1.0) discard;
 
-    vec4 pos_screen_space = getPosFromUVDepth(vec3(uv, depth), InverseProjectionMatrix);
-    vec4 tmp = (InvRHMatrix * InverseViewMatrix * pos_screen_space);
+    vec4 pos_screen_space = getPosFromUVDepth(vec3(uv, depth), u_inverse_projection_matrix);
+    vec4 tmp = (InvRHMatrix * u_inverse_view_matrix * pos_screen_space);
     vec3 pos = tmp.xyz / tmp.w;
     vec3 normal_screen_space = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
-    vec3 normal = (transpose(ViewMatrix) * vec4(normal_screen_space, 0.)).xyz;
+    vec3 normal = (transpose(u_view_matrix) * vec4(normal_screen_space, 0.)).xyz;
 
     // Convert to grid coordinates
     vec3 uvw = .5 + 0.5 * pos / extents;

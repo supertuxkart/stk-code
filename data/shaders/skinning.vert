@@ -51,7 +51,7 @@ out vec4 color;
 
 void main(void)
 {
-    mat4 TransposeInverseModelView =  transpose(InverseModelMatrix * InverseViewMatrix);
+    mat4 TransposeInverseModelView =  transpose(InverseModelMatrix * u_inverse_view_matrix);
     vec4 idle_position = vec4(Position, 1.);
     vec4 idle_normal = vec4(Normal, 0.);
     vec4 idle_tangent = vec4(Data1.z, Data1.w, Data2.x, 0.);
@@ -82,12 +82,12 @@ void main(void)
         skinned_bitangent += Weight[i] * joint_matrix * idle_bitangent;
     }
 
-    gl_Position = ProjectionViewMatrix * ModelMatrix * skinned_position;
+    gl_Position = u_projection_view_matrix * ModelMatrix * skinned_position;
     // Keep orthogonality
     nor = (TransposeInverseModelView * skinned_normal).xyz;
     // Keep direction
-    tangent = (ViewMatrix * ModelMatrix * skinned_tangent).xyz;
-    bitangent = (ViewMatrix * ModelMatrix * skinned_bitangent).xyz;
+    tangent = (u_view_matrix * ModelMatrix * skinned_tangent).xyz;
+    bitangent = (u_view_matrix * ModelMatrix * skinned_bitangent).xyz;
     uv = vec2(Data1.x + texture_trans.x, Data1.y + texture_trans.y);
     color = Color.zyxw;
 }

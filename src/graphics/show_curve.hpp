@@ -27,7 +27,7 @@ class Vec3;
 
 namespace irr
 {
-    namespace scene { class IMesh; class IMeshSceneNode; class IMeshBuffer; }
+    namespace scene { class IMesh; class ISceneNode; class IMeshBuffer; }
 }
 using namespace irr;
 
@@ -45,7 +45,7 @@ class ShowCurve : public NoCopy
 private:
 
     /** The actual scene node. */
-    scene::IMeshSceneNode *m_scene_node;
+    scene::ISceneNode *m_scene_node;
 
     /** The mesh of the curve. */
     scene::IMesh       *m_mesh;

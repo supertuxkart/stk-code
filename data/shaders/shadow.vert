@@ -21,10 +21,10 @@ void main(void)
 #ifdef VSLayer
     gl_Layer = layer;
     uv = Texcoord;
-    gl_Position = ShadowViewProjMatrixes[gl_Layer] * ModelMatrix * vec4(Position, 1.);
+    gl_Position = u_shadow_projection_view_matrices[gl_Layer] * ModelMatrix * vec4(Position, 1.);
 #else
     layerId = layer;
     tc = Texcoord;
-    gl_Position = ShadowViewProjMatrixes[layerId] * ModelMatrix * vec4(Position, 1.);
+    gl_Position = u_shadow_projection_view_matrices[layerId] * ModelMatrix * vec4(Position, 1.);
 #endif
 }

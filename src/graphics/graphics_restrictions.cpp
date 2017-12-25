@@ -44,7 +44,7 @@ namespace GraphicsRestrictions
         /** The list of names used in the XML file for the graphics
          *  restriction types. They must be in the same order as the types. */
 
-        std::array<std::string, 31> m_names_of_restrictions =
+        std::array<std::string, 29> m_names_of_restrictions =
         {
             {
                 "UniformBufferObject",
@@ -71,9 +71,7 @@ namespace GraphicsRestrictions
                 "HighDefinitionTextures",
                 "HighDefinitionTextures256",
                 "AdvancedPipeline",
-                "FramebufferSRGB",
-                "FramebufferSRGBWorkaround1",
-                "FramebufferSRGBWorkaround2",
+                "10BitVector",
                 "GI",
                 "ForceLegacyDevice",
                 "VertexIdWorking",

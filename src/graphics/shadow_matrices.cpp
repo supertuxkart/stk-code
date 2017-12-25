@@ -21,6 +21,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/frame_buffer.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/post_processing.hpp"
@@ -34,8 +35,6 @@
 #include <limits>
 #include <ICameraSceneNode.h>
 #include <SViewFrustum.h>
-#include "../../lib/irrlicht/source/Irrlicht/CSceneManager.h"
-#include "../../lib/irrlicht/source/Irrlicht/os.h"
 
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
@@ -161,8 +160,9 @@ void ShadowMatrices::addLight(const core::vector3df &pos)
 // ----------------------------------------------------------------------------
 void ShadowMatrices::updateSunOrthoMatrices()
 {
-    for (unsigned i = 0; i < m_sun_ortho_matrices.size(); i++)
-        m_sun_ortho_matrices[i] *= irr_driver->getInvViewMatrix();
+    // Use the original value for culling
+    //for (unsigned i = 0; i < m_sun_ortho_matrices.size(); i++)
+    //    m_sun_ortho_matrices[i] *= irr_driver->getInvViewMatrix();
 }   // updateSunOrthoMatrices
 
 // ============================================================================
@@ -325,8 +325,6 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
 {
     if (CVS->isSDSMEnabled())
         updateSplitAndLightcoordRangeFromComputeShaders(width, height, depth_stencil_texture);
-    static_cast<scene::CSceneManager *>(irr_driver->getSceneManager())
-        ->OnAnimate(os::Timer::getTime());
     camnode->render();
     irr_driver->setProjMatrix(irr_driver->getVideoDriver()
                               ->getTransform(video::ETS_PROJECTION));
@@ -338,12 +336,11 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
     const float oldfar = camnode->getFarValue();
     const float oldnear = camnode->getNearValue();
 
-    float tmp[16 * 9 + 2];
-    memcpy(tmp, irr_driver->getViewMatrix().pointer(),          16 * sizeof(float));
-    memcpy(&tmp[16], irr_driver->getProjMatrix().pointer(),     16 * sizeof(float));
-    memcpy(&tmp[32], irr_driver->getInvViewMatrix().pointer(),  16 * sizeof(float));
-    memcpy(&tmp[48], irr_driver->getInvProjMatrix().pointer(),  16 * sizeof(float));
-    memcpy(&tmp[64], irr_driver->getProjViewMatrix().pointer(), 16 * sizeof(float));
+    memcpy(m_mat_ubo, irr_driver->getViewMatrix().pointer(),          16 * sizeof(float));
+    memcpy(&m_mat_ubo[16], irr_driver->getProjMatrix().pointer(),     16 * sizeof(float));
+    memcpy(&m_mat_ubo[32], irr_driver->getInvViewMatrix().pointer(),  16 * sizeof(float));
+    memcpy(&m_mat_ubo[48], irr_driver->getInvProjMatrix().pointer(),  16 * sizeof(float));
+    memcpy(&m_mat_ubo[64], irr_driver->getProjViewMatrix().pointer(), 16 * sizeof(float));
 
     m_sun_cam->render();
     for (unsigned i = 0; i < 4; i++)
@@ -469,27 +466,13 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
 
         size_t size = m_sun_ortho_matrices.size();
         for (unsigned i = 0; i < size; i++)
-            memcpy(&tmp[16 * i + 80],
+            memcpy(&m_mat_ubo[16 * i + 80],
                    m_sun_ortho_matrices[i].pointer(),
                    16 * sizeof(float));
     }
 
-    if(!CVS->isARBUniformBufferObjectUsable())
-        return;
-
-    tmp[144] = float(width);
-    tmp[145] = float(height);
-    glBindBuffer(GL_UNIFORM_BUFFER,
-                 SharedGPUObjects::getViewProjectionMatricesUBO());
-    if (CVS->isSDSMEnabled())
-    {
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 5) * sizeof(float), tmp);
-        glBufferSubData(GL_UNIFORM_BUFFER, (16 * 9) * sizeof(float),
-                        2 * sizeof(float), &tmp[144]);
-    }
-    else
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 9 + 2) * sizeof(float),
-                        tmp);
+    m_mat_ubo[144] = float(width);
+    m_mat_ubo[145] = float(height);
 }   // computeMatrixesAndCameras
 
 // ----------------------------------------------------------------------------

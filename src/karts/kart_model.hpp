@@ -19,6 +19,7 @@
 #ifndef HEADER_KART_MODEL_HPP
 #define HEADER_KART_MODEL_HPP
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -315,7 +316,7 @@ private:
     KartRenderType m_krt;
 
     /** For our engine to get the desired hue / saturation for colorization. */
-    RenderInfo* m_render_info;
+    std::shared_ptr<RenderInfo> m_render_info;
 
     /** True if this kart model can be colorization in red / blue (now only
      *  used in soccer mode). */
@@ -447,7 +448,7 @@ public:
     // ------------------------------------------------------------------------
     scene::IAnimatedMeshSceneNode* getAnimatedNode(){ return m_animated_node; }
     // ------------------------------------------------------------------------
-    RenderInfo* getRenderInfo();
+    std::shared_ptr<RenderInfo> getRenderInfo();
     // ------------------------------------------------------------------------
     bool supportColorization() const         { return m_support_colorization; }
     // ------------------------------------------------------------------------

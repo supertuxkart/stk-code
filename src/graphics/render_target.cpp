@@ -20,7 +20,7 @@
 
 #include "graphics/2dutils.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/glwrap.hpp"
+#include "graphics/frame_buffer.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shader_based_renderer.hpp"

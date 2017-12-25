@@ -24,6 +24,7 @@
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
+#include "graphics/render_info.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/network_string.hpp"
 #include "physics/btKart.hpp"
