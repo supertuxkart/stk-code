@@ -694,6 +694,12 @@ bool CIrrDeviceLinux::createWindow()
 					visualAttrBuffer[17] = 0;
 					visualAttrBuffer[19] = 0;
 				}
+				
+				if (CreationParams.HandleSRGB == false)
+				{
+					visualAttrBuffer[21] = GLX_DONT_CARE;
+				}
+				
 				// first round with unchanged values
 				{
 					configList=glxChooseFBConfig(display, screennr, visualAttrBuffer,&nitems);
