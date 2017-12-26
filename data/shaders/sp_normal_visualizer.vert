@@ -8,6 +8,12 @@ layout(location = 1) in int i_normal_pked;
 layout(location = 1) in vec4 i_normal;
 #endif
 
+#if defined(Converts_10bit_Vector)
+layout(location = 5) in int i_tangent_pked;
+#else
+layout(location = 5) in vec4 i_tangent;
+#endif
+
 layout(location = 6) in ivec4 i_joint;
 layout(location = 7) in vec4 i_weight;
 layout(location = 8) in vec3 i_origin;
@@ -23,21 +29,25 @@ layout(location = 12) in ivec2 i_misc_data_two;
 
 #stk_include "utils/get_world_location.vert"
 
-out vec2 uv;
-out vec3 normal;
+out vec3 o_tangent;
+out vec3 o_bitangent;
+out vec3 o_normal;
 
 void main()
 {
 
 #if defined(Converts_10bit_Vector)
     vec4 i_normal = convert10BitVector(i_normal_pked);
+    vec4 i_tangent = convert10BitVector(i_tangent_pked);
     vec4 i_rotation = convert10BitVector(i_rotation_pked);
 #endif
 
     vec4 idle_position = vec4(i_position, 1.0);
     vec4 idle_normal = vec4(i_normal.xyz, 0.0);
+    vec4 idle_tangent = vec4(i_tangent.xyz, 0.0);
     vec4 skinned_position = vec4(0.0);
     vec4 skinned_normal = vec4(0.0);
+    vec4 skinned_tangent = vec4(0.0);
     int skinning_offset = i_misc_data_two.x;
 
     for (int i = 0; i < 4; i++)
@@ -53,15 +63,19 @@ void main()
                 clamp(i_joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 3));
         skinned_position += i_weight[i] * joint_matrix * idle_position;
         skinned_normal += i_weight[i] * joint_matrix * idle_normal;
+        skinned_tangent += i_weight[i] * joint_matrix * idle_tangent;
     }
 
-    float step_mix = step(float(skinning_offset), -32769.0);
-    skinned_position = mix(idle_position, skinned_position, step_mix);
-    skinned_normal = mix(idle_normal, skinned_normal, step_mix);
+    float step_mix = step(float(skinning_offset), 0.0);
+    skinned_position = mix(skinned_position, idle_position, step_mix);
+    skinned_normal = mix(skinned_normal, idle_normal, step_mix);
+    skinned_tangent = mix(skinned_tangent, idle_tangent, step_mix);
+    vec4 quaternion = normalize(vec4(i_rotation.xyz, i_scale.w));
 
-    vec4 world_position = getWorldPosition(i_origin, i_rotation, i_scale.xyz,
+    gl_Position = getWorldPosition(i_origin, quaternion, i_scale.xyz,
         skinned_position.xyz);
-    vec3 world_normal = rotateVector(i_rotation, skinned_normal.xyz);
-    normal = (u_view_matrix * vec4(world_normal, 0.0)).xyz;
-    gl_Position = u_projection_view_matrix * world_position;
+    o_normal = normalize(rotateVector(quaternion, skinned_normal.xyz));
+    o_tangent = normalize(rotateVector(quaternion, skinned_tangent.xyz));
+    o_bitangent = cross(o_normal, o_tangent) * i_tangent.w;
+
 }
