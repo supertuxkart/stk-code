@@ -25,12 +25,8 @@ layout(location = 9) in vec4 i_rotation;
 #endif
 
 layout(location = 10) in vec4 i_scale;
-
-#if defined(Converts_10bit_Vector)
-layout(location = 11) in int i_misc_data_pked;
-#else
-layout(location = 11) in vec4 i_misc_data;
-#endif
+layout(location = 11) in vec2 i_misc_data;
+layout(location = 12) in ivec2 i_misc_data_two;
 
 #if defined(Use_Bindless_Texture)
 layout(location = 13) in uvec4 i_bindless_texture_0;
@@ -75,7 +71,6 @@ void main()
     vec4 i_normal = convert10BitVector(i_normal_pked);
     vec4 i_tangent = convert10BitVector(i_tangent_pked);
     vec4 i_rotation = convert10BitVector(i_rotation_pked);
-    vec4 i_misc_data = convert10BitVector(i_misc_data_pked);
 #endif
 
 #if defined(Use_Bindless_Texture)
@@ -113,6 +108,6 @@ void main()
 
     color = i_color.zyxw;
     camdist = length(u_view_matrix * world_position);
-    hue_change = i_misc_data.z;
+    hue_change = float(i_misc_data_two.y) * 0.01;
     gl_Position = u_projection_view_matrix * world_position;
 }

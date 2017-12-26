@@ -19,7 +19,7 @@ layout(location = 9) in vec4 i_rotation;
 #endif
 
 layout(location = 10) in vec4 i_scale;
-layout(location = 12) in int i_skinning_offset;
+layout(location = 12) in ivec2 i_misc_data_two;
 
 #stk_include "utils/get_world_location.vert"
 
@@ -38,23 +38,24 @@ void main()
     vec4 idle_normal = vec4(i_normal.xyz, 0.0);
     vec4 skinned_position = vec4(0.0);
     vec4 skinned_normal = vec4(0.0);
+    int skinning_offset = i_misc_data_two.x;
 
     for (int i = 0; i < 4; i++)
     {
         mat4 joint_matrix = mat4(
             texelFetch(skinning_tex,
-                clamp(i_joint[i] + i_skinning_offset, 0, MAX_BONES) * 4),
+                clamp(i_joint[i] + skinning_offset, 0, MAX_BONES) * 4),
             texelFetch(skinning_tex,
-                clamp(i_joint[i] + i_skinning_offset, 0, MAX_BONES) * 4 + 1),
+                clamp(i_joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 1),
             texelFetch(skinning_tex,
-                clamp(i_joint[i] + i_skinning_offset, 0, MAX_BONES) * 4 + 2),
+                clamp(i_joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 2),
             texelFetch(skinning_tex,
-                clamp(i_joint[i] + i_skinning_offset, 0, MAX_BONES) * 4 + 3));
+                clamp(i_joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 3));
         skinned_position += i_weight[i] * joint_matrix * idle_position;
         skinned_normal += i_weight[i] * joint_matrix * idle_normal;
     }
 
-    float step_mix = step(float(i_skinning_offset), -32769.0);
+    float step_mix = step(float(skinning_offset), -32769.0);
     skinned_position = mix(idle_position, skinned_position, step_mix);
     skinned_normal = mix(idle_normal, skinned_normal, step_mix);
 

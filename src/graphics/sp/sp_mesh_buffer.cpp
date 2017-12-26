@@ -433,22 +433,13 @@ void SPMeshBuffer::recreateVAO(unsigned i)
     glEnableVertexAttribArray(10);
     glVertexAttribPointer(10, 4, GL_HALF_FLOAT, GL_FALSE, 32, (void*)16);
     glVertexAttribDivisorARB(10, 1);
-    // Misc data (texture translation and hue change)
+    // Misc data (texture translation)
     glEnableVertexAttribArray(11);
-    if (GraphicsRestrictions::isDisabled
-        (GraphicsRestrictions::GR_10BIT_VECTOR))
-    {
-        glVertexAttribIPointer(11, 1, GL_INT, 32, (void*)24);
-    }
-    else
-    {
-        glVertexAttribPointer(11, 4, GL_INT_2_10_10_10_REV, GL_TRUE, 32,
-            (void*)24);
-    }
+    glVertexAttribPointer(11, 2, GL_HALF_FLOAT, GL_FALSE, 32, (void*)24);
     glVertexAttribDivisorARB(11, 1);
-    // Skinning offset
+    // Misc data (skinning offset and hue change)
     glEnableVertexAttribArray(12);
-    glVertexAttribIPointer(12, 1, GL_INT, 32, (void*)28);
+    glVertexAttribIPointer(12, 2, GL_SHORT, 32, (void*)28);
     glVertexAttribDivisorARB(12, 1);
 
     glBindVertexArray(0);

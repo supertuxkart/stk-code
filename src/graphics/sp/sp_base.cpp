@@ -1261,7 +1261,7 @@ void addObject(SPMeshNode* node)
         }
         SPInstancedData id = SPInstancedData
             (node->getAbsoluteTransformation(), tm_x, tm_y, hue,
-            node->getSkinningOffset());
+            (short)node->getSkinningOffset());
 
         for (int dc_type = 0; dc_type < (g_handle_shadow ? 5 : 1); dc_type++)
         {

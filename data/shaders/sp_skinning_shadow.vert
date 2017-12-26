@@ -20,7 +20,7 @@ layout(location = 9) in vec4 i_rotation;
 #endif
 
 layout(location = 10) in vec4 i_scale;
-layout(location = 12) in int i_skinning_offset;
+layout(location = 12) in ivec2 i_misc_data_two;
 
 #if defined(Use_Bindless_Texture)
 layout(location = 13) in uvec4 i_bindless_texture_0;
@@ -80,29 +80,30 @@ void main()
 
     vec4 idle_position = vec4(i_position, 1.0);
     vec4 skinned_position = vec4(0.0);
+    int skinning_offset = i_misc_data_two.x;
 
     for (int i = 0; i < 4; i++)
     {
 #ifdef GL_ES
         mat4 joint_matrix = mat4(
             texelFetch(skinning_tex, ivec2
-                (0, clamp(i_joint[i] + i_skinning_offset, 0, MAX_BONES)), 0),
+                (0, clamp(i_joint[i] + skinning_offset, 0, MAX_BONES)), 0),
             texelFetch(skinning_tex, ivec2
-                (1, clamp(i_joint[i] + i_skinning_offset, 0, MAX_BONES)), 0),
+                (1, clamp(i_joint[i] + skinning_offset, 0, MAX_BONES)), 0),
             texelFetch(skinning_tex, ivec2
-                (2, clamp(i_joint[i] + i_skinning_offset, 0, MAX_BONES)), 0),
+                (2, clamp(i_joint[i] + skinning_offset, 0, MAX_BONES)), 0),
             texelFetch(skinning_tex, ivec2
-                (3, clamp(i_joint[i] + i_skinning_offset, 0, MAX_BONES)), 0));
+                (3, clamp(i_joint[i] + skinning_offset, 0, MAX_BONES)), 0));
 #else
         mat4 joint_matrix = mat4(
             texelFetch(skinning_tex,
-                clamp(i_joint[i] + i_skinning_offset, 0, MAX_BONES) * 4),
+                clamp(i_joint[i] + skinning_offset, 0, MAX_BONES) * 4),
             texelFetch(skinning_tex,
-                clamp(i_joint[i] + i_skinning_offset, 0, MAX_BONES) * 4 + 1),
+                clamp(i_joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 1),
             texelFetch(skinning_tex,
-                clamp(i_joint[i] + i_skinning_offset, 0, MAX_BONES) * 4 + 2),
+                clamp(i_joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 2),
             texelFetch(skinning_tex,
-                clamp(i_joint[i] + i_skinning_offset, 0, MAX_BONES) * 4 + 3));
+                clamp(i_joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 3));
 #endif
         skinned_position += i_weight[i] * joint_matrix * idle_position;
     }
