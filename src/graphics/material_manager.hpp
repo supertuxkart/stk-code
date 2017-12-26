@@ -62,8 +62,7 @@ public:
                              scene::IMeshBuffer *mb);
     Material* getMaterialFor(video::ITexture* t,
                              video::E_MATERIAL_TYPE material_type);
-    Material* getMaterialFor(video::ITexture* t,
-                             const std::string& lay_two_tex_lc = "");
+    Material* getMaterialFor(video::ITexture* t);
     Material* getMaterialSPM(std::string lay_one_tex_lc,
                              std::string lay_two_tex_lc);
     void      setAllMaterialFlags(video::ITexture* t,

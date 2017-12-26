@@ -157,6 +157,8 @@ public:
     // ------------------------------------------------------------------------
     s32 getJointIDWithArm(const c8* name, unsigned* arm_id) const;
     // ------------------------------------------------------------------------
+    void addSPMeshBuffer(SPMeshBuffer* spmb)      { m_buffer.push_back(spmb); }
+    // ------------------------------------------------------------------------
     SPMeshBuffer* getSPMeshBuffer(u32 nr) const;
 
 };

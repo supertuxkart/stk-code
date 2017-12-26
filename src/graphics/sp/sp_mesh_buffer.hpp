@@ -264,6 +264,16 @@ public:
         m_vertices.push_back(v);
     }
     // ------------------------------------------------------------------------
+    void addIndex(uint16_t idx)
+    {
+        m_indices.push_back(idx);
+    }
+    // ------------------------------------------------------------------------
+    void setSPMVertices(std::vector<video::S3DVertexSkinnedMesh>& vertices)
+    {
+        m_vertices = std::move(vertices);
+    }
+    // ------------------------------------------------------------------------
     void setIndices(std::vector<uint16_t>& indices)
     {
         m_indices = std::move(indices);

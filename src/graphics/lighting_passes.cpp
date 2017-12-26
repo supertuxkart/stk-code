@@ -412,7 +412,7 @@ void LightingPasses::renderEnvMap(GLuint normal_depth_texture,
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_ONE, GL_ONE);
 
-    if (UserConfigParams::m_degraded_IBL)
+    if (specular_probe == 0 || UserConfigParams::m_degraded_IBL)
     {
         DegradedIBLShader::getInstance()->use();
         glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());

@@ -144,8 +144,7 @@ Material* MaterialManager::getMaterialSPM(std::string lay_one_tex_lc,
 }
 
 //-----------------------------------------------------------------------------
-Material* MaterialManager::getMaterialFor(video::ITexture* t,
-                                          const std::string& lay_two_tex_lc)
+Material* MaterialManager::getMaterialFor(video::ITexture* t)
 {
     const io::path& img_path = t->getName().getInternalName();
 
@@ -156,18 +155,7 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
         {
             if (m_materials[i]->getTexFullPath() == img_path.c_str())
             {
-                const std::string& mat_lay_two = m_materials[i]->getUVTwoTexture();
-                if (mat_lay_two.empty() && lay_two_tex_lc.empty())
-                {
-                    return m_materials[i];
-                }
-                else if (!mat_lay_two.empty() && !lay_two_tex_lc.empty())
-                {
-                    if (mat_lay_two == lay_two_tex_lc)
-                    {
-                        return m_materials[i];
-                    }
-                }
+                return m_materials[i];
             }
         }
     }
@@ -180,18 +168,7 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
         {
             if (m_materials[i]->getTexFname() == image.c_str())
             {
-                const std::string& mat_lay_two = m_materials[i]->getUVTwoTexture();
-                if (mat_lay_two.empty() && lay_two_tex_lc.empty())
-                {
-                    return m_materials[i];
-                }
-                else if (!mat_lay_two.empty() && !lay_two_tex_lc.empty())
-                {
-                    if (mat_lay_two == lay_two_tex_lc)
-                    {
-                        return m_materials[i];
-                    }
-                }
+                return m_materials[i];
             }
         }   // for i
     }
