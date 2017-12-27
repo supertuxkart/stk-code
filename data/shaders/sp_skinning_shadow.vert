@@ -20,7 +20,7 @@ layout(location = 9) in vec4 i_rotation;
 #endif
 
 layout(location = 10) in vec4 i_scale;
-layout(location = 12) in ivec2 i_misc_data_two;
+layout(location = 12) in ivec2 i_misc_data;
 
 #if defined(Use_Bindless_Texture)
 layout(location = 13) in uvec4 i_bindless_texture_0;
@@ -80,7 +80,7 @@ void main()
 
     vec4 idle_position = vec4(i_position, 1.0);
     vec4 skinned_position = vec4(0.0);
-    int skinning_offset = i_misc_data_two.x;
+    int skinning_offset = i_misc_data.x;
 
     for (int i = 0; i < 4; i++)
     {

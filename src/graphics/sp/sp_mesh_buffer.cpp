@@ -415,7 +415,7 @@ void SPMeshBuffer::recreateVAO(unsigned i)
     glEnableVertexAttribArray(10);
     glVertexAttribPointer(10, 4, GL_HALF_FLOAT, GL_FALSE, 32, (void*)16);
     glVertexAttribDivisorARB(10, 1);
-    // Misc data (texture translation)
+    // Texture translation
     glEnableVertexAttribArray(11);
     glVertexAttribPointer(11, 2, GL_HALF_FLOAT, GL_FALSE, 32, (void*)24);
     glVertexAttribDivisorARB(11, 1);

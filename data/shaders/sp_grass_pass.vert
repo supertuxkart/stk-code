@@ -19,7 +19,7 @@ layout(location = 9) in vec4 i_rotation;
 #endif
 
 layout(location = 10) in vec4 i_scale;
-layout(location = 12) in ivec2 i_misc_data_two;
+layout(location = 12) in ivec2 i_misc_data;
 
 #if defined(Use_Bindless_Texture)
 layout(location = 13) in uvec4 i_bindless_texture_0;
@@ -86,6 +86,6 @@ void main()
 
     normal = (u_view_matrix * vec4(world_normal, 0.0)).xyz;
     uv = i_uv;
-    hue_change = float(i_misc_data_two.y) * 0.01;
+    hue_change = float(i_misc_data.y) * 0.01;
     gl_Position = u_projection_view_matrix * world_position;
 }

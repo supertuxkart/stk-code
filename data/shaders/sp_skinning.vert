@@ -32,8 +32,8 @@ layout(location = 9) in vec4 i_rotation;
 #endif
 
 layout(location = 10) in vec4 i_scale;
-layout(location = 11) in vec2 i_misc_data;
-layout(location = 12) in ivec2 i_misc_data_two;
+layout(location = 11) in vec2 i_texture_trans;
+layout(location = 12) in ivec2 i_misc_data;
 
 #if defined(Use_Bindless_Texture)
 layout(location = 13) in uvec4 i_bindless_texture_0;
@@ -102,7 +102,7 @@ void main()
     vec4 skinned_position = vec4(0.0);
     vec4 skinned_normal = vec4(0.0);
     vec4 skinned_tangent = vec4(0.0);
-    int skinning_offset = i_misc_data_two.x;
+    int skinning_offset = i_misc_data.x;
 
     for (int i = 0; i < 4; i++)
     {
@@ -145,12 +145,12 @@ void main()
       ).xyz;
     normal = (u_view_matrix * vec4(world_normal, 0.0)).xyz;
 
-    uv = vec2(i_uv.x + (i_misc_data.x * i_normal.w),
-        i_uv.y + (i_misc_data.y * i_normal.w));
+    uv = vec2(i_uv.x + (i_texture_trans.x * i_normal.w),
+        i_uv.y + (i_texture_trans.y * i_normal.w));
     uv_two = i_uv_two;
 
     color = i_color.zyxw;
     camdist = length(u_view_matrix * world_position);
-    hue_change = float(i_misc_data_two.y) * 0.01;
+    hue_change = float(i_misc_data.y) * 0.01;
     gl_Position = u_projection_view_matrix * world_position;
 }

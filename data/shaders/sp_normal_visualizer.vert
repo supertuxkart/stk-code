@@ -25,7 +25,7 @@ layout(location = 9) in vec4 i_rotation;
 #endif
 
 layout(location = 10) in vec4 i_scale;
-layout(location = 12) in ivec2 i_misc_data_two;
+layout(location = 12) in ivec2 i_misc_data;
 
 #stk_include "utils/get_world_location.vert"
 
@@ -48,7 +48,7 @@ void main()
     vec4 skinned_position = vec4(0.0);
     vec4 skinned_normal = vec4(0.0);
     vec4 skinned_tangent = vec4(0.0);
-    int skinning_offset = i_misc_data_two.x;
+    int skinning_offset = i_misc_data.x;
 
     for (int i = 0; i < 4; i++)
     {
