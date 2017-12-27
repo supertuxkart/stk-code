@@ -249,7 +249,7 @@ void Graph::createMeshSP(bool show_invisible, bool enable_transparency,
 #ifndef SERVER_ONLY
 
     SP::SPMesh* spm = new SP::SPMesh();
-    SP::SPMeshBuffer* spmb = new SP::SPMeshBuffer(true/*vertex_color*/);
+    SP::SPMeshBuffer* spmb = new SP::SPMeshBuffer();
     m_mesh = spm;
     m_mesh_buffer = spmb;
 

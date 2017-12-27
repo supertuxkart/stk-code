@@ -176,8 +176,7 @@ void SPMeshBuffer::uploadGLMesh()
         std::get<2>(m_stk_material[0])->getShaderName() == "normalmap" &&
         CVS->isDefferedEnabled();
     const unsigned pitch = 48 - (use_tangents ? 0 : 4) - (use_2_uv ? 0 : 4) -
-        (m_skinned ? 0 : 16) - (m_vertex_color ? 0 : 4) +
-        (CVS->useArrayTextures() ? 12 :
+        (m_skinned ? 0 : 16) + (CVS->useArrayTextures() ? 12 :
         CVS->isARBBindlessTextureUsable() ? 48 : 0);
     m_pitch = pitch;
 
@@ -204,20 +203,18 @@ void SPMeshBuffer::uploadGLMesh()
         memcpy(ptr + v_size + offset, &m_vertices[i].m_normal, 12);
         offset += 4;
 
-        if (m_vertex_color)
+        video::SColor vc = m_vertices[i].m_color;
+        if (CVS->isDefferedEnabled() ||
+            CVS->isARBSRGBFramebufferUsable())
         {
-            video::SColor vc = m_vertices[i].m_color;
-            if (CVS->isDefferedEnabled() ||
-                CVS->isARBSRGBFramebufferUsable())
-            {
-                video::SColorf tmp(vc);
-                vc.setRed(srgbToLinear(tmp.r));
-                vc.setGreen(srgbToLinear(tmp.g));
-                vc.setBlue(srgbToLinear(tmp.b));
-            }
-            memcpy(ptr + v_size + offset, &vc, 4);
-            offset += 4;
+            video::SColorf tmp(vc);
+            vc.setRed(srgbToLinear(tmp.r));
+            vc.setGreen(srgbToLinear(tmp.g));
+            vc.setBlue(srgbToLinear(tmp.b));
         }
+        memcpy(ptr + v_size + offset, &vc, 4);
+        offset += 4;
+
         memcpy(ptr + v_size + offset, &m_vertices[i].m_all_uvs[0], 4);
         offset += 4;
         if (use_2_uv)
@@ -317,6 +314,7 @@ void SPMeshBuffer::recreateVAO(unsigned i)
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, pitch, (void*)offset);
     offset += 12;
+
     // Normal, if 10bit vector normalization is wrongly done by drivers, use
     // original value and normalize ourselves in shader
     glEnableVertexAttribArray(1);
@@ -325,23 +323,13 @@ void SPMeshBuffer::recreateVAO(unsigned i)
         (GraphicsRestrictions::GR_10BIT_VECTOR) ? GL_FALSE : GL_TRUE, pitch,
         (void*)offset);
     offset += 4;
+
     // Vertex color
-    if (m_vertex_color)
-    {
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, pitch,
-            (void*)offset);
-        offset += 4;
-    }
-    else
-    {
-        glDisableVertexAttribArray(2);
-#ifdef USE_GLES2
-        glVertexAttrib4f(2, 1.0f, 1.0f, 1.0f, 1.0f);
-#else
-        glVertexAttrib4Nub(2, 255, 255, 255, 255);
-#endif
-    }
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, pitch,
+        (void*)offset);
+    offset += 4;
+
     // 1st texture coordinates
     glEnableVertexAttribArray(3);
     glVertexAttribPointer(3, 2, GL_HALF_FLOAT, GL_FALSE, pitch, (void*)offset);
@@ -354,6 +342,11 @@ void SPMeshBuffer::recreateVAO(unsigned i)
             (void*)offset);
         offset += 4;
     }
+    else
+    {
+        glDisableVertexAttribArray(4);
+    }
+
     if (use_tangents)
     {
         // Tangent and bi-tanget sign
@@ -364,6 +357,11 @@ void SPMeshBuffer::recreateVAO(unsigned i)
             pitch, (void*)offset);
             offset += 4;
     }
+    else
+    {
+        glDisableVertexAttribArray(5);
+    }
+
     if (m_skinned)
     {
         // 4 Joint indices
@@ -376,6 +374,12 @@ void SPMeshBuffer::recreateVAO(unsigned i)
             (void*)offset);
         offset += 8; 
     }
+    else
+    {
+        glDisableVertexAttribArray(6);
+        glDisableVertexAttribArray(7);
+    }
+
     if (CVS->useArrayTextures())
     {
         // uvec4 + uvec2 for 6 texture array indices
@@ -385,6 +389,7 @@ void SPMeshBuffer::recreateVAO(unsigned i)
         glEnableVertexAttribArray(14);
         glVertexAttribIPointer(14, 2, GL_UNSIGNED_SHORT, pitch, (void*)offset);
         offset += 4;
+        glDisableVertexAttribArray(15);
     }
     else if (CVS->isARBBindlessTextureUsable())
     {
@@ -398,6 +403,13 @@ void SPMeshBuffer::recreateVAO(unsigned i)
         glEnableVertexAttribArray(15);
         glVertexAttribIPointer(15, 4, GL_UNSIGNED_INT, pitch, (void*)offset);
     }
+    else
+    {
+        glDisableVertexAttribArray(13);
+        glDisableVertexAttribArray(14);
+        glDisableVertexAttribArray(15);
+    }
+
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
     glBindBuffer(GL_ARRAY_BUFFER, m_ins_array[i]);
     // Origin

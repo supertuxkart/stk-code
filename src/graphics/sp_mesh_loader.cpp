@@ -277,7 +277,7 @@ void SPMeshLoader::decompressSPM(irr::io::IReadFile* spm,
     assert(indices_count != 0);
 
     using namespace SP;
-    SPMeshBuffer* mb = new SPMeshBuffer(read_vcolor);
+    SPMeshBuffer* mb = new SPMeshBuffer();
     static_cast<SPMesh*>(m_mesh)->m_buffer.push_back(mb);
     const unsigned idx_size = vertices_count > 255 ? 2 : 1;
     for (unsigned i = 0; i < vertices_count; i++)

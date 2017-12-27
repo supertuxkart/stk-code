@@ -78,13 +78,11 @@ private:
 
     bool m_skinned;
 
-    const bool m_vertex_color;
-
     // ------------------------------------------------------------------------
     bool initTexture();
 
 public:
-    SPMeshBuffer(bool vertex_color = true) : m_vertex_color(vertex_color)
+    SPMeshBuffer()
     {
 #ifdef _DEBUG
         setDebugName("SMeshBuffer");
