@@ -3,13 +3,13 @@ uniform samplerBuffer skinning_tex;
 layout(location = 0) in vec3 i_position;
 
 #if defined(Converts_10bit_Vector)
-layout(location = 1) in int i_normal_pked;
+layout(location = 1) in vec4 i_normal_orig;
 #else
 layout(location = 1) in vec4 i_normal;
 #endif
 
 #if defined(Converts_10bit_Vector)
-layout(location = 5) in int i_tangent_pked;
+layout(location = 5) in vec4 i_tangent_orig;
 #else
 layout(location = 5) in vec4 i_tangent;
 #endif
@@ -19,7 +19,7 @@ layout(location = 7) in vec4 i_weight;
 layout(location = 8) in vec3 i_origin;
 
 #if defined(Converts_10bit_Vector)
-layout(location = 9) in int i_rotation_pked;
+layout(location = 9) in vec4 i_rotation_orig;
 #else
 layout(location = 9) in vec4 i_rotation;
 #endif
@@ -37,9 +37,9 @@ void main()
 {
 
 #if defined(Converts_10bit_Vector)
-    vec4 i_normal = convert10BitVector(i_normal_pked);
-    vec4 i_tangent = convert10BitVector(i_tangent_pked);
-    vec4 i_rotation = convert10BitVector(i_rotation_pked);
+    vec4 i_normal = convert10BitVector(i_normal_orig);
+    vec4 i_tangent = convert10BitVector(i_tangent_orig);
+    vec4 i_rotation = convert10BitVector(i_rotation_orig);
 #endif
 
     vec4 idle_position = vec4(i_position, 1.0);

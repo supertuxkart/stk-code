@@ -21,7 +21,7 @@ void main()
     vec3 V1 = gl_in[2].gl_Position.xyz - gl_in[1].gl_Position.xyz;
     // calculate normal as perpendicular to two vectors of the triangle
     vec3 V0_V1_crossed = cross(V1, V0);
-    float normal_scale = clamp(length(V0_V1_crossed) * 10.0, 0.0, 0.25);
+    float normal_scale = min(length(V0_V1_crossed) * 10.0, 0.25);
     vec3 N = normalize(V0_V1_crossed);
 
     // normals of each vertex of the triangle

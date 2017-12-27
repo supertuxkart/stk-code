@@ -14,7 +14,7 @@ layout(location = 7) in vec4 i_weight;
 layout(location = 8) in vec3 i_origin;
 
 #if defined(Converts_10bit_Vector)
-layout(location = 9) in int i_rotation_pked;
+layout(location = 9) in vec4 i_rotation_orig;
 #else
 layout(location = 9) in vec4 i_rotation;
 #endif
@@ -55,7 +55,7 @@ void main()
 {
 
 #if defined(Converts_10bit_Vector)
-    vec4 i_rotation = convert10BitVector(i_rotation_pked);
+    vec4 i_rotation = convert10BitVector(i_rotation_orig);
 #endif
 
 #if defined(Use_Bindless_Texture)

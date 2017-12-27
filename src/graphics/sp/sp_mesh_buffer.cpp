@@ -317,18 +317,13 @@ void SPMeshBuffer::recreateVAO(unsigned i)
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, pitch, (void*)offset);
     offset += 12;
-    // Normal
+    // Normal, if 10bit vector normalization is wrongly done by drivers, use
+    // original value and normalize ourselves in shader
     glEnableVertexAttribArray(1);
-    if (GraphicsRestrictions::isDisabled
-        (GraphicsRestrictions::GR_10BIT_VECTOR))
-    {
-        glVertexAttribIPointer(1, 1, GL_INT, pitch, (void*)offset);
-    }
-    else
-    {
-        glVertexAttribPointer(1, 4, GL_INT_2_10_10_10_REV, GL_TRUE, pitch,
-            (void*)offset);
-    }
+    glVertexAttribPointer(1, 4, GL_INT_2_10_10_10_REV,
+        GraphicsRestrictions::isDisabled
+        (GraphicsRestrictions::GR_10BIT_VECTOR) ? GL_FALSE : GL_TRUE, pitch,
+        (void*)offset);
     offset += 4;
     // Vertex color
     if (m_vertex_color)
@@ -363,18 +358,11 @@ void SPMeshBuffer::recreateVAO(unsigned i)
     {
         // Tangent and bi-tanget sign
         glEnableVertexAttribArray(5);
-        if (GraphicsRestrictions::isDisabled
-            (GraphicsRestrictions::GR_10BIT_VECTOR))
-        {
-            glVertexAttribIPointer(5, 1, GL_INT, pitch,
-                (void*)offset);
-        }
-        else
-        {
-            glVertexAttribPointer(5, 4, GL_INT_2_10_10_10_REV, GL_TRUE, pitch,
-                (void*)offset);
-        }
-        offset += 4;
+        glVertexAttribPointer(5, 4, GL_INT_2_10_10_10_REV,
+            GraphicsRestrictions::isDisabled
+            (GraphicsRestrictions::GR_10BIT_VECTOR) ? GL_FALSE : GL_TRUE,
+            pitch, (void*)offset);
+            offset += 4;
     }
     if (m_skinned)
     {
@@ -418,16 +406,10 @@ void SPMeshBuffer::recreateVAO(unsigned i)
     glVertexAttribDivisorARB(8, 1);
     // Rotation (quaternion .xyz)
     glEnableVertexAttribArray(9);
-    if (GraphicsRestrictions::isDisabled
-        (GraphicsRestrictions::GR_10BIT_VECTOR))
-    {
-        glVertexAttribIPointer(9, 1, GL_INT, 32, (void*)12);
-    }
-    else
-    {
-        glVertexAttribPointer(9, 4, GL_INT_2_10_10_10_REV, GL_TRUE, 32,
-            (void*)12);
-    }
+    glVertexAttribPointer(9, 4, GL_INT_2_10_10_10_REV,
+        GraphicsRestrictions::isDisabled
+        (GraphicsRestrictions::GR_10BIT_VECTOR) ? GL_FALSE : GL_TRUE, 32,
+        (void*)12);
     glVertexAttribDivisorARB(9, 1);
     // Scale (3 half floats and .w for quaternion .w)
     glEnableVertexAttribArray(10);

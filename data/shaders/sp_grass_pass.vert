@@ -3,7 +3,7 @@ uniform vec3 wind_direction;
 layout(location = 0) in vec3 i_position;
 
 #if defined(Converts_10bit_Vector)
-layout(location = 1) in int i_normal_pked;
+layout(location = 1) in vec4 i_normal_orig;
 #else
 layout(location = 1) in vec4 i_normal;
 #endif
@@ -13,7 +13,7 @@ layout(location = 3) in vec2 i_uv;
 layout(location = 8) in vec3 i_origin;
 
 #if defined(Converts_10bit_Vector)
-layout(location = 9) in int i_rotation_pked;
+layout(location = 9) in vec4 i_rotation_orig;
 #else
 layout(location = 9) in vec4 i_rotation;
 #endif
@@ -56,8 +56,8 @@ void main()
 {
 
 #if defined(Converts_10bit_Vector)
-    vec4 i_normal = convert10BitVector(i_normal_pked);
-    vec4 i_rotation = convert10BitVector(i_rotation_pked);
+    vec4 i_normal = convert10BitVector(i_normal_orig);
+    vec4 i_rotation = convert10BitVector(i_rotation_orig);
 #endif
 
 #if defined(Use_Bindless_Texture)

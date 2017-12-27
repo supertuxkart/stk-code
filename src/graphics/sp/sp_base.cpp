@@ -1,5 +1,4 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2017 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
