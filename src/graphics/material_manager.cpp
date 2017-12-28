@@ -86,7 +86,8 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
 
 //-----------------------------------------------------------------------------
 Material* MaterialManager::getMaterialSPM(std::string lay_one_tex_lc,
-                                          std::string lay_two_tex_lc)
+                                          std::string lay_two_tex_lc,
+                                          const std::string& def_shader_name)
 {
     std::string orignal_layer_one = lay_one_tex_lc;
     core::stringc lc(lay_one_tex_lc.c_str());
@@ -140,7 +141,8 @@ Material* MaterialManager::getMaterialSPM(std::string lay_one_tex_lc,
             }
         }   // for i
     }
-    return getSPMaterial("solid", StringUtils::getBasename(orignal_layer_one));
+    return getSPMaterial(def_shader_name,
+        StringUtils::getBasename(orignal_layer_one));
 }
 
 //-----------------------------------------------------------------------------

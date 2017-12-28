@@ -30,6 +30,7 @@
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stk_tex_manager.hpp"
+#include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "graphics/sp/sp_instanced_data.hpp"
 #include "graphics/sp/sp_per_object_uniform.hpp"
 #include "graphics/sp/sp_mesh.hpp"
@@ -75,7 +76,7 @@ SPShader* g_glow_shader = NULL;
 typedef std::unordered_map<SPShader*, std::unordered_map<std::string,
     std::unordered_set<SPMeshBuffer*> > > DrawCall;
 
-DrawCall g_draw_calls[DCT_COUNT];
+DrawCall g_draw_calls[DCT_FOR_VAO];
 // ----------------------------------------------------------------------------
 std::vector<std::pair<SPShader*, std::vector<std::pair<std::array<GLuint, 6>,
     std::vector<std::pair<SPMeshBuffer*, int/*material_id*/> > > > > >
@@ -94,7 +95,7 @@ std::vector<float> g_bounding_boxes;
 // ----------------------------------------------------------------------------
 core::vector3df g_wind_dir;
 // ----------------------------------------------------------------------------
-//std::unordered_set<SPDynamicDrawCall*> g_dy_dc;
+std::unordered_set<SPDynamicDrawCall*> g_dy_dc;
 // ----------------------------------------------------------------------------
 float g_frustums[5][24] = { { } };
 // ----------------------------------------------------------------------------
@@ -148,6 +149,12 @@ void fogUniformAssigner(SPUniformAssigner* ua)
         Track::getCurrentTrack()->isFogEnabled() ? 1 : 0 : 0;
     ua->setValue(fog_enable);
 }   // fogUniformAssigner
+
+// ----------------------------------------------------------------------------
+void zeroAlphaUniformAssigner(SPUniformAssigner* ua)
+{
+    ua->setValue(0.0f);
+}   // zeroAlphaUniformAssigner
 
 // ----------------------------------------------------------------------------
 void ghostAlphaAssigner(SPUniformAssigner* ua)
@@ -417,7 +424,7 @@ void loadShaders()
     addShader(shader);
 
     // ========================================================================
-    shader = new SPShader("alphatest", 4, false, 0, true);
+    shader = new SPShader("alphatest", 3, false, 0, true);
 
     shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_1ST);
     shader->addShaderFile("sp_alpha_test.frag", GL_FRAGMENT_SHADER, RP_1ST);
@@ -438,7 +445,7 @@ void loadShaders()
 
     addShader(shader);
 
-    shader = new SPShader("alphatest_skinned", 4, false, 0, true);
+    shader = new SPShader("alphatest_skinned", 3, false, 0, true);
 
     shader->addShaderFile("sp_skinning.vert", GL_VERTEX_SHADER, RP_1ST);
     shader->addShaderFile("sp_alpha_test.frag", GL_FRAGMENT_SHADER, RP_1ST);
@@ -460,7 +467,7 @@ void loadShaders()
     addShader(shader);
 
     // ========================================================================
-    shader = new SPShader("unlit", 4, false, 0, true);
+    shader = new SPShader("unlit", 3, false, 0, true);
 
     shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_1ST);
     shader->addShaderFile("sp_unlit.frag", GL_FRAGMENT_SHADER, RP_1ST);
@@ -481,7 +488,7 @@ void loadShaders()
 
     addShader(shader);
 
-    shader = new SPShader("unlit_skinned", 4, false, 0, true);
+    shader = new SPShader("unlit_skinned", 3, false, 0, true);
 
     shader->addShaderFile("sp_skinning.vert", GL_VERTEX_SHADER, RP_1ST);
     shader->addShaderFile("sp_unlit.frag", GL_FRAGMENT_SHADER, RP_1ST);
@@ -524,7 +531,7 @@ void loadShaders()
 
     addShader(shader);
 
-    shader = new SPShader("normalmap_skinned", 4, false);
+    shader = new SPShader("normalmap_skinned", 3, false);
 
     shader->addShaderFile("sp_skinning.vert", GL_VERTEX_SHADER, RP_1ST);
     shader->addShaderFile("sp_normal_map.frag", GL_FRAGMENT_SHADER, RP_1ST);
@@ -546,7 +553,7 @@ void loadShaders()
     addShader(shader);
 
     // ========================================================================
-    shader = new SPShader("grass", 4, false, 0, true);
+    shader = new SPShader("grass", 3, false, 0, true);
     shader->addShaderFile("sp_grass_pass.vert", GL_VERTEX_SHADER, RP_1ST);
     shader->addShaderFile("sp_grass.frag", GL_FRAGMENT_SHADER,
         RP_1ST);
@@ -590,10 +597,7 @@ void loadShaders()
     static_cast<SPPerObjectUniform*>(shader)
         ->addAssignerFunction("fog_enabled", fogUniformAssigner);
     static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("custom_alpha", [](SPUniformAssigner* ua)
-        {
-            ua->setValue(0.0f);
-        });
+        ->addAssignerFunction("custom_alpha", zeroAlphaUniformAssigner);
     addShader(shader);
 
     shader = new SPShader("alphablend", 1, true);
@@ -609,10 +613,7 @@ void loadShaders()
     static_cast<SPPerObjectUniform*>(shader)
         ->addAssignerFunction("fog_enabled", fogUniformAssigner);
     static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("custom_alpha", [](SPUniformAssigner* ua)
-        {
-            ua->setValue(0.0f);
-        });
+        ->addAssignerFunction("custom_alpha", zeroAlphaUniformAssigner);
     addShader(shader);
 
     shader = new SPShader("additive_skinned", 1, true);
@@ -628,10 +629,7 @@ void loadShaders()
     static_cast<SPPerObjectUniform*>(shader)
         ->addAssignerFunction("fog_enabled", fogUniformAssigner);
     static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("custom_alpha", [](SPUniformAssigner* ua)
-        {
-            ua->setValue(0.0f);
-        });
+        ->addAssignerFunction("custom_alpha", zeroAlphaUniformAssigner);
     addShader(shader);
 
     shader = new SPShader("additive", 1, true);
@@ -647,10 +645,7 @@ void loadShaders()
     static_cast<SPPerObjectUniform*>(shader)
         ->addAssignerFunction("fog_enabled", fogUniformAssigner);
     static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("custom_alpha", [](SPUniformAssigner* ua)
-        {
-            ua->setValue(0.0f);
-        });
+        ->addAssignerFunction("custom_alpha", zeroAlphaUniformAssigner);
     addShader(shader);
 
     shader = new SPShader("ghost_skinned", 1, true/*transparent_shader*/,
@@ -1345,6 +1340,120 @@ void addObject(SPMeshNode* node)
 }
 
 // ----------------------------------------------------------------------------
+void handleDynamicDrawCall()
+{
+    for (SPDynamicDrawCall* dydc : g_dy_dc)
+    {
+        if (!dydc->isVisible())
+        {
+            continue;
+        }
+        dydc->resetCullingResult();
+        SPShader* shader = dydc->getShader();
+        core::aabbox3df bb = dydc->getBoundingBox();
+        dydc->getAbsoluteTransformation().transformBoxEx(bb);
+        std::vector<bool> discard;
+        discard.resize((g_handle_shadow ? 5 : 1), false);
+        for (int dc_type = 0; dc_type < (g_handle_shadow ? 5 : 1); dc_type++)
+        {
+            for (int i = 0; i < 24; i += 4)
+            {
+                bool outside = true;
+                for (int j = 0; j < 8; j++)
+                {
+                    const float dist =
+                        getCorner(bb, j).X * g_frustums[dc_type][i] +
+                        getCorner(bb, j).Y * g_frustums[dc_type][i + 1] +
+                        getCorner(bb, j).Z * g_frustums[dc_type][i + 2] +
+                        g_frustums[dc_type][i + 3];
+                    outside = outside && dist < 0.0f;
+                    if (!outside)
+                    {
+                        break;
+                    }
+                }
+                if (outside)
+                {
+                    discard[dc_type] = true;
+                    break;
+                }
+            }
+        }
+        if (g_handle_shadow ?
+            (discard[0] && discard[1] && discard[2] && discard[3] &&
+            discard[4]) : discard[0])
+        {
+            continue;
+        }
+
+        for (int dc_type = 0; dc_type < (g_handle_shadow ? 5 : 1); dc_type++)
+        {
+            if (discard[dc_type])
+            {
+                continue;
+            }
+            if (dc_type == 0)
+            {
+                sp_solid_poly_count += dydc->getVertexCount();
+            }
+            else
+            {
+                sp_shadow_poly_count += dydc->getVertexCount();
+            }
+            if (shader->isTransparent())
+            {
+                // Transparent shader should always uses mesh samplers
+                // All transparent draw calls go DCT_TRANSPARENT
+                if (dc_type == 0)
+                {
+                    auto& ret = g_draw_calls[DCT_TRANSPARENT][shader];
+                    if (CVS->isARBBindlessTextureUsable() ||
+                        CVS->useArrayTextures())
+                    {
+                        ret[""].insert(dydc);
+                    }
+                    else
+                    {
+                        for (auto& p : dydc->getTextureCompare())
+                        {
+                            ret[p.first].insert(dydc);
+                        }
+                    }
+                    dydc->setCullingResult(DCT_TRANSPARENT, false);
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                dydc->setCullingResult((DrawCallType)dc_type, false);
+                // Check if shader for render pass uses mesh samplers
+                const RenderPass check_pass =
+                    dc_type == DCT_NORMAL ? RP_1ST : RP_SHADOW;
+                const bool sampler_less = shader->samplerLess(check_pass) ||
+                    CVS->isARBBindlessTextureUsable() ||
+                    CVS->useArrayTextures();
+                auto& ret = g_draw_calls[dc_type][shader];
+                if (sampler_less)
+                {
+                    ret[""].insert(dydc);
+                }
+                else
+                {
+                    for (auto& p : dydc->getTextureCompare())
+                    {
+                        ret[p.first].insert(dydc);
+                    }
+                }
+            }
+            g_instances.insert(dydc);
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------
 void updateModelMatrix()
 {
     // Make sure all textures (with handles) are loaded
@@ -1557,8 +1666,8 @@ void draw(RenderPass rp, DrawCallType dct)
     std::stringstream profiler_name;
     profiler_name << "SP::Draw " << dct << " with " << rp;
     PROFILER_PUSH_CPU_MARKER(profiler_name.str().c_str(),
-        (uint8_t)(float(dct + rp + 2) / float(DCT_COUNT + RP_COUNT) * 255.0f),
-        (uint8_t)(float(dct + 1) / (float)DCT_COUNT * 255.0f) ,
+        (uint8_t)(float(dct + rp + 2) / float(DCT_FOR_VAO + RP_COUNT) * 255.0f),
+        (uint8_t)(float(dct + 1) / (float)DCT_FOR_VAO * 255.0f) ,
         (uint8_t)(float(rp + 1) / (float)RP_COUNT * 255.0f));
 
     assert(dct < DCT_FOR_VAO);
@@ -1570,7 +1679,7 @@ void draw(RenderPass rp, DrawCallType dct)
             continue;
         }
         p.first->use(rp);
-        std::vector<SPUniformAssigner*> shader_uniforms;
+        static std::vector<SPUniformAssigner*> shader_uniforms;
         p.first->setUniformsPerObject(static_cast<SPPerObjectUniform*>
             (p.first), &shader_uniforms, rp);
         p.first->bindPrefilledTextures(rp);
@@ -1583,49 +1692,30 @@ void draw(RenderPass rp, DrawCallType dct)
             }
             for (unsigned k = 0; k < p.second[j].second.size(); k++)
             {
-                /*std::vector<SPUniformAssigner*> draw_call_uniforms;
-                p.first->setUniformsPerObject(static_cast<SPPerObjectUniform*>
-                    (draw_call), &draw_call_uniforms, rp);
-                sp_draw_call_count++;*/
+                static std::vector<SPUniformAssigner*> draw_call_uniforms;
+                p.first->setUniformsPerObject(dynamic_cast<SPPerObjectUniform*>
+                    (p.second[j].second[k].first), &draw_call_uniforms, rp);
                 p.second[j].second[k].first->draw(dct,
                     p.second[j].second[k].second/*material_id*/,
                     CVS->isARBBindlessTextureUsable() ||
                     CVS->useArrayTextures());
-                /*for (SPUniformAssigner* ua : draw_call_uniforms)
+                for (SPUniformAssigner* ua : draw_call_uniforms)
                 {
                     ua->reset();
-                }*/
+                }
+                draw_call_uniforms.clear();
             }
         }
         for (SPUniformAssigner* ua : shader_uniforms)
         {
             ua->reset();
         }
+        shader_uniforms.clear();
         p.first->unuse(rp);
     }
     PROFILER_POP_CPU_MARKER();
 #endif
 }   // draw
-
-//-----------------------------------------------------------------------------
-
-// ----------------------------------------------------------------------------
-void d()
-{
-/*
-
-*/
-}
-
-/*
-// ----------------------------------------------------------------------------
-void unsynchronisedUpdate()
-{
-    for (SPDynamicDrawCall* dy_dc : g_dy_dc)
-    {
-        dy_dc->update(true);
-    }
-}   // unsynchronisedUpdate
 
 // ----------------------------------------------------------------------------
 void addDynamicDrawCall(SPDynamicDrawCall* dy_dc)
@@ -1638,6 +1728,5 @@ void removeDynamicDrawCall(SPDynamicDrawCall* dy_dc)
 {
     g_dy_dc.erase(dy_dc);
 }   // removeDynamicDrawCall
-*/
 
 }

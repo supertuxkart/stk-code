@@ -20,7 +20,6 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/material.hpp"
-#include "graphics/material_manager.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "race/race_manager.hpp"
 #include "utils/mini_glm.hpp"
@@ -372,7 +371,7 @@ void SPMeshBuffer::recreateVAO(unsigned i)
         glEnableVertexAttribArray(7);
         glVertexAttribPointer(7, 4, GL_HALF_FLOAT, GL_FALSE, pitch,
             (void*)offset);
-        offset += 8; 
+        offset += 8;
     }
     else
     {

@@ -8,6 +8,7 @@
 #include "vector3d.h"
 #include "vector2d.h"
 #include "SColor.h"
+#include <cstring>
 
 namespace irr
 {
@@ -253,6 +254,7 @@ struct S3DVertexTangents : public S3DVertex
 	}
 };
 
+//! SPM usage. */
 struct S3DVertexSkinnedMesh
 {
 	core::vector3df m_position;
@@ -263,12 +265,21 @@ struct S3DVertexSkinnedMesh
 	s16 m_joint_idx[4];
 	s16 m_weight[4];
 
+	S3DVertexSkinnedMesh()
+	{
+		m_normal = 0;
+		m_color.color = -1;
+		memset(m_all_uvs, 0, 8);
+		m_tangent = 0;
+		memset(m_joint_idx, 0, 8);
+		memset(m_weight, 0, 8);
+	}
+
 	E_VERTEX_TYPE getType() const
 	{
 		return EVT_SKINNED_MESH;
 	}
 };
-
 
 inline u32 getVertexPitchFromType(E_VERTEX_TYPE vertexType)
 {

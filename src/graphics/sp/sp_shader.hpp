@@ -55,7 +55,6 @@ enum RenderPass: unsigned int
     RP_1ST = 0,
     RP_2ND,
     RP_SHADOW,
-    RP_RSM,
     RP_COUNT
 };
 
@@ -67,6 +66,8 @@ inline std::ostream& operator<<(std::ostream& os, const RenderPass& rp)
             return os << "first pass";
         case RP_2ND:
             return os << "second pass";
+        case RP_SHADOW:
+            return os << "shadow pass";
         default:
             return os;
     }
@@ -102,14 +103,14 @@ private:
 
 public:
     // ------------------------------------------------------------------------
-    SPShader(const std::string& name, unsigned pass_count = 4,
+    SPShader(const std::string& name, unsigned pass_count = 3,
              bool transparent_shader = false, int drawing_priority = 0,
              bool use_alpha_channel = false)
            : m_name(name), m_drawing_priority(drawing_priority),
              m_transparent_shader(transparent_shader),
              m_use_alpha_channel(use_alpha_channel || transparent_shader)
     {
-        memset(m_program, 0, sizeof(GLuint) * 4);
+        memset(m_program, 0, 12);
 #ifndef SERVER_ONLY
         for (unsigned rp = RP_1ST; rp < pass_count; rp++)
         {

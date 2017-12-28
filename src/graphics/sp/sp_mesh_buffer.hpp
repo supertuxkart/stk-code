@@ -44,7 +44,7 @@ class SPTexture;
 
 class SPMeshBuffer : public IMeshBuffer
 {
-private:
+protected:
     std::vector<std::tuple<size_t/*first_index_id*/,
         unsigned/*indices_count*/, Material*> > m_stk_material;
 
@@ -54,6 +54,13 @@ private:
 
     std::vector<video::S3DVertexSkinnedMesh> m_vertices;
 
+    GLuint m_ibo, m_vbo;
+
+    GLuint m_vao[DCT_FOR_VAO];
+
+    unsigned m_pitch;
+
+private:
     std::vector<uint16_t> m_indices;
 
     core::aabbox3d<f32> m_bounding_box;
@@ -62,15 +69,9 @@ private:
 
     void* m_ins_dat_mapped_ptr[DCT_FOR_VAO];
 
-    GLuint m_ibo, m_vbo;
-
     unsigned m_gl_instance_size[DCT_FOR_VAO];
 
-    GLuint m_vao[DCT_FOR_VAO];
-
     GLuint m_ins_array[DCT_FOR_VAO];
-
-    unsigned m_pitch;
 
     bool m_uploaded_gl;
 
@@ -107,31 +108,8 @@ public:
     // ------------------------------------------------------------------------
     ~SPMeshBuffer();
     // ------------------------------------------------------------------------
-    bool combineMeshBuffer(SPMeshBuffer* spmb)
-    {
-        // We only use 16bit vertices
-        if (spmb->m_vertices.size() + m_vertices.size() > 65536)
-        {
-            return false;
-        }
-        const uint16_t old_vtx_count = (uint16_t)m_vertices.size();
-        m_vertices.insert(m_vertices.end(), spmb->m_vertices.begin(),
-            spmb->m_vertices.end());
-        for (uint16_t& idx : spmb->m_indices)
-        {
-            idx += old_vtx_count;
-        }
-        m_stk_material.emplace_back(getIndexCount(), spmb->getIndexCount(),
-            std::get<2>(spmb->m_stk_material[0]));
-        m_indices.insert(m_indices.end(), spmb->m_indices.begin(),
-            spmb->m_indices.end());
-        return true;
-    }
-    // ------------------------------------------------------------------------
-    void bindVAO(DrawCallType dct) const     { glBindVertexArray(m_vao[dct]); }
-    // ------------------------------------------------------------------------
-    void draw(DrawCallType dct, int material_id = -1,
-              bool bindless_texture = false) const
+    virtual void draw(DrawCallType dct, int material_id = -1,
+                      bool bindless_texture = false) const
     {
         glBindVertexArray(m_vao[dct]);
         if (material_id == -1 || bindless_texture)
@@ -165,11 +143,34 @@ public:
         }
     }
     // ------------------------------------------------------------------------
+    virtual void uploadGLMesh();
+    // ------------------------------------------------------------------------
+    virtual void uploadInstanceData();
+    // ------------------------------------------------------------------------
+    bool combineMeshBuffer(SPMeshBuffer* spmb)
+    {
+        // We only use 16bit vertices
+        if (spmb->m_vertices.size() + m_vertices.size() > 65536)
+        {
+            return false;
+        }
+        const uint16_t old_vtx_count = (uint16_t)m_vertices.size();
+        m_vertices.insert(m_vertices.end(), spmb->m_vertices.begin(),
+            spmb->m_vertices.end());
+        for (uint16_t& idx : spmb->m_indices)
+        {
+            idx += old_vtx_count;
+        }
+        m_stk_material.emplace_back(getIndexCount(), spmb->getIndexCount(),
+            std::get<2>(spmb->m_stk_material[0]));
+        m_indices.insert(m_indices.end(), spmb->m_indices.begin(),
+            spmb->m_indices.end());
+        return true;
+    }
+    // ------------------------------------------------------------------------
     void initDrawMaterial();
     // ------------------------------------------------------------------------
     void enableSkinningData()                             { m_skinned = true; }
-    // ------------------------------------------------------------------------
-    void uploadGLMesh();
     // ------------------------------------------------------------------------
     Material* getSTKMaterial(unsigned first_index = 0) const
     {
@@ -247,8 +248,6 @@ public:
         }
         m_ins_dat[dct].push_back(id);
     }
-    // ------------------------------------------------------------------------
-    void uploadInstanceData();
     // ------------------------------------------------------------------------
     void recreateVAO(unsigned i);
     // ------------------------------------------------------------------------

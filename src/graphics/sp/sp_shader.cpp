@@ -218,6 +218,10 @@ void SPShader::setUniformsPerObject(SPPerObjectUniform* sppou,
                                     RenderPass rp)
 {
 #ifndef SERVER_ONLY
+    if (sppou == NULL)
+    {
+        return;
+    }
     for (auto& p : m_uniforms[rp])
     {
         if (sppou->assignUniform(p.first, p.second))

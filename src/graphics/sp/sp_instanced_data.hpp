@@ -35,6 +35,11 @@ private:
 
 public:
     // ------------------------------------------------------------------------
+    SPInstancedData()
+    {
+        memset(m_data, 0, 32);
+    }
+    // ------------------------------------------------------------------------
     SPInstancedData(const core::matrix4& model_mat,
                     float texture_trans_x, float texture_trans_y, float hue,
                     short skinning_offset)

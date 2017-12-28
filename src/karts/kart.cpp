@@ -413,9 +413,6 @@ void Kart::reset()
     if (m_skidmarks)
     {
         m_skidmarks->reset();
-        const Track *track =
-            track_manager->getTrack( race_manager->getTrackName() );
-        m_skidmarks->adjustFog(track->isFogEnabled() );
     }
 
     Vec3 front(0, 0, getKartLength()*0.5f);
@@ -1529,7 +1526,7 @@ void Kart::update(float dt)
     static video::SColor green(255, 61, 87, 23);
 
     // draw skidmarks if relevant (we force pink skidmarks on when hitting a bubblegum)
-    if(m_kart_properties->getSkidEnabled())
+    if(m_kart_properties->getSkidEnabled() && m_skidmarks)
     {
         m_skidmarks->update(dt,
                             m_bubblegum_time > 0,
@@ -2644,14 +2641,12 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
 
     m_slipstream = new SlipStream(this);
 
-    if (m_kart_properties->getSkidEnabled())
+#ifndef SERVER_ONLY
+    if (m_kart_properties->getSkidEnabled() && CVS->isGLSL())
     {
         m_skidmarks = new SkidMarks(*this);
-        m_skidmarks->adjustFog(
-            track_manager->getTrack(race_manager->getTrackName())
-                         ->isFogEnabled() );
     }
-#ifndef SERVER_ONLY
+
     bool create_shadow = m_kart_properties->getShadowTexture() != NULL &&
                          !CVS->supportsShadows();
                          

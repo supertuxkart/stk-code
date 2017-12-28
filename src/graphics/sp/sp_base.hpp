@@ -52,8 +52,7 @@ enum DrawCallType: unsigned int
     DCT_SHADOW3,
     DCT_SHADOW4,
     DCT_TRANSPARENT,
-    DCT_FOR_VAO,
-    DCT_COUNT = DCT_FOR_VAO
+    DCT_FOR_VAO
 };
 
 inline std::ostream& operator<<(std::ostream& os, const DrawCallType& dct)
@@ -118,21 +117,13 @@ void drawGlow();
 // ----------------------------------------------------------------------------
 void drawNormal();
 // ----------------------------------------------------------------------------
-void drawBoundingBoxes();
-// ----------------------------------------------------------------------------
 void addObject(SPMeshNode*);
-// ----------------------------------------------------------------------------
-void removeObject(SPMeshNode*);
-// ----------------------------------------------------------------------------
-void cleanAllMeshBuffer();
-// ----------------------------------------------------------------------------
-void updateTransformation();
 // ----------------------------------------------------------------------------
 void initSTKRenderer(ShaderBasedRenderer*);
 // ----------------------------------------------------------------------------
 void prepareScene();
 // ----------------------------------------------------------------------------
-void unsynchronisedUpdate();
+void handleDynamicDrawCall();
 // ----------------------------------------------------------------------------
 void addDynamicDrawCall(SPDynamicDrawCall*);
 // ----------------------------------------------------------------------------

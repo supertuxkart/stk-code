@@ -204,6 +204,7 @@ void DrawCalls::prepareDrawCalls(scene::ICameraSceneNode *camnode)
     parseSceneManager(
         irr_driver->getSceneManager()->getRootSceneNode()->getChildren(),
         camnode);
+    SP::handleDynamicDrawCall();
     SP::updateModelMatrix();
     PROFILER_POP_CPU_MARKER();
 
@@ -221,7 +222,7 @@ void DrawCalls::prepareDrawCalls(scene::ICameraSceneNode *camnode)
             do
             {
                 reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 1000000);
-            } 
+            }
             while (reason == GL_TIMEOUT_EXPIRED);
         }
         glDeleteSync(m_sync);
