@@ -114,7 +114,7 @@ private:
                                        *   for this kart.*/
     float m_shadow_z_offset;          /**< Z offset of the shadow plane
                                        *   for this kart.*/
-    video::ITexture *m_shadow_texture;/**< The texture with the shadow. */
+    Material* m_shadow_material;      /**< The texture with the shadow. */
     video::SColor m_color;            /**< Color the represents the kart in the
                                        *   status bar and on the track-view. */
     int  m_shape;                     /**< Number of vertices in polygon when
@@ -270,7 +270,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the shadow texture to use. */
-    video::ITexture *getShadowTexture() const {return m_shadow_texture;       }
+    Material* getShadowMaterial() const           { return m_shadow_material; }
 
     // ------------------------------------------------------------------------
     /** Returns the absolute path of the icon file of this kart. */
@@ -342,21 +342,6 @@ public:
     float getRestitution            () const { return m_restitution; }
 
     // ------------------------------------------------------------------------
-    /** Returns the scale factor by which the shadow plane
-     *  had to be set. */
-    float getShadowScale            () const {return m_shadow_scale;          }
-
-    // ------------------------------------------------------------------------
-    /** Returns the scale factor by which the shadow plane
-     *  had to be set. */
-    float getShadowXOffset          () const {return m_shadow_x_offset;       }
-
-    // ------------------------------------------------------------------------
-    /** Returns the scale factor by which the shadow plane
-     *  had to be set. */
-    float getShadowZOffset          () const {return m_shadow_z_offset;       }
-
-    // ------------------------------------------------------------------------
     /** Returns a pointer to the AI properties. */
     const AIProperties *getAIPropertiesForDifficulty() const
     {
@@ -367,7 +352,6 @@ public:
     /** Returns the full path where the files for this kart are stored. */
     const std::string& getKartDir   () const {return m_root;                  }
 
-    // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------
     /** Returns minimum time during which nitro is consumed when pressing nitro
      *  key, to prevent using nitro in very short bursts

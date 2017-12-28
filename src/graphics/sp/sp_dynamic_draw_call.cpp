@@ -46,7 +46,6 @@ SPDynamicDrawCall::SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt,
     }
     m_tex_cmp[m_textures[0][0]->getPath() + m_textures[0][1]->getPath()] = 0;
     m_pitch = 48;
-    resetCullingResult();
 
     // Rerserve 4 vertices, and use m_ibo buffer for instance array
     glGenBuffers(1, &m_vbo);

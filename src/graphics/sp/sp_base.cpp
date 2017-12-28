@@ -1348,7 +1348,7 @@ void handleDynamicDrawCall()
         {
             continue;
         }
-        dydc->resetCullingResult();
+
         SPShader* shader = dydc->getShader();
         core::aabbox3df bb = dydc->getBoundingBox();
         dydc->getAbsoluteTransformation().transformBoxEx(bb);
@@ -1419,7 +1419,6 @@ void handleDynamicDrawCall()
                             ret[p.first].insert(dydc);
                         }
                     }
-                    dydc->setCullingResult(DCT_TRANSPARENT, false);
                 }
                 else
                 {
@@ -1428,7 +1427,6 @@ void handleDynamicDrawCall()
             }
             else
             {
-                dydc->setCullingResult((DrawCallType)dc_type, false);
                 // Check if shader for render pass uses mesh samplers
                 const RenderPass check_pass =
                     dc_type == DCT_NORMAL ? RP_1ST : RP_SHADOW;

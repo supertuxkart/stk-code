@@ -2647,19 +2647,9 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
         m_skidmarks = new SkidMarks(*this);
     }
 
-    bool create_shadow = m_kart_properties->getShadowTexture() != NULL &&
-                         !CVS->supportsShadows();
-                         
-#ifdef USE_GLES2
-    // Disable kart shadow for legacy pipeline in GLES renderer because it's 
-    // broken
-    create_shadow = create_shadow && CVS->isGLSL();
-#endif
-
-    if (create_shadow)
+    if (CVS->isGLSL() && !CVS->isShadowEnabled())
     {
-        m_shadow = new Shadow(m_kart_properties.get(), m_node,
-                              -m_kart_model->getLowestPoint());
+        m_shadow = new Shadow(m_kart_properties->getShadowMaterial(), *this);
     }
 #endif
     World::getWorld()->kartAdded(this, m_node);
@@ -2929,11 +2919,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     if (m_shadow)
     {
         const bool emergency = getKartAnimation() != NULL;
-        m_shadow->update(isOnGround() && !emergency,
-            getTrans().inverse()(m_terrain_info->getHitPoint()).getY()
-            - m_skidding->getGraphicalJumpOffset()
-            - m_graphical_y_offset
-            - m_kart_model->getLowestPoint());
+        m_shadow->update(isOnGround() && !emergency);
     }
 #ifdef XX
     // cheap wheelie effect

@@ -403,8 +403,12 @@ void RaceGUIOverworld::drawGlobalMiniMap()
             kart_xyz= kart->getXYZ();
             Vec3 draw_at;
             track->mapPoint2MiniMap(kart_xyz, &draw_at);
-            
+
             video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
+            if (icon == NULL)
+            {
+                continue;
+            }
             core::rect<s32> source(core::position2di(0, 0), icon->getSize());
             int marker_half_size = (kart->getController()->isLocalPlayerController()
                                     ? m_minimap_player_size

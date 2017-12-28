@@ -55,8 +55,6 @@ private:
 
     int m_update_offset = -1;
 
-    std::vector<bool> m_culling_result;
-
     bool m_visible = true;
 
     bool m_update_trans = false;
@@ -76,10 +74,6 @@ public:
                       bool bindless_texture = false) const
     {
 #ifndef SERVER_ONLY
-        if (m_culling_result[dct])
-        {
-            return;
-        }
         glBindVertexArray(m_vao[0]);
         glDrawArraysInstanced(
             m_primitive_type == EPT_TRIANGLES ? GL_TRIANGLES :
@@ -136,15 +130,6 @@ public:
     core::vector2df& getTextureTrans()              { return m_texture_trans; }
     // ------------------------------------------------------------------------
     void setUpdateOffset(int offset)              { m_update_offset = offset; }
-    // ------------------------------------------------------------------------
-    void resetCullingResult()
-    {
-        m_culling_result.clear();
-        m_culling_result.resize(DCT_FOR_VAO, true);
-    }
-    // ------------------------------------------------------------------------
-    void setCullingResult(DrawCallType dct, bool ret)
-                                               { m_culling_result[dct] = ret; }
     // ------------------------------------------------------------------------
     bool isVisible() const                                { return m_visible; }
     // ------------------------------------------------------------------------

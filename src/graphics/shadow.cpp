@@ -17,75 +17,90 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/shadow.hpp"
-#include "graphics/irr_driver.hpp"
-#include "karts/kart_properties.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/skidding.hpp"
+#include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_dynamic_draw_call.hpp"
+#include "physics/btKart.hpp"
+#include "utils/mini_glm.hpp"
+#include "utils/vec3.hpp"
 
-#include <IMesh.h>
-#include <IMeshSceneNode.h>
-#include <ISceneNode.h>
+#ifndef SERVER_ONLY
 
-Shadow::Shadow(const KartProperties *kart_properties,
-               scene::ISceneNode *node,
-               float y_offset = 0.0)
+Shadow::Shadow(Material* shadow_mat, const AbstractKart& kart)
+      : m_dy_dc(NULL), m_shadow_enabled(false), m_kart(kart)
 {
-    m_shadow_enabled = false;
-    video::SMaterial m;
-    m.setTexture(0, kart_properties->getShadowTexture());
-    m.BackfaceCulling = false;
-    m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-    m.setFlag(video::EMF_ZWRITE_ENABLE , false);
-    m_mesh   = irr_driver->createQuadMesh(&m, /*create_one_quad*/true);
-    scene::IMeshBuffer *buffer = m_mesh->getMeshBuffer(0);
-    irr::video::S3DVertex* v=(video::S3DVertex*)buffer->getVertices();
-    float scale = kart_properties->getShadowScale();
-    float x_offset = kart_properties->getShadowXOffset();
-    float z_offset = kart_properties->getShadowXOffset();
-    v[0].Pos.X = -scale+x_offset; v[0].Pos.Z =  scale+z_offset; v[0].Pos.Y = 0.01f-y_offset;
-    v[1].Pos.X =  scale+x_offset; v[1].Pos.Z =  scale+z_offset; v[1].Pos.Y = 0.01f-y_offset;
-    v[2].Pos.X =  scale+x_offset; v[2].Pos.Z = -scale+z_offset; v[2].Pos.Y = 0.01f-y_offset;
-    v[3].Pos.X = -scale+x_offset; v[3].Pos.Z = -scale+z_offset; v[3].Pos.Y = 0.01f-y_offset;
-    v[0].TCoords = core::vector2df(0,0);
-    v[1].TCoords = core::vector2df(1,0);
-    v[2].TCoords = core::vector2df(1,1);
-    v[3].TCoords = core::vector2df(0,1);
-    core::vector3df normal(0, 0, 1.0f);
-    v[0].Normal  = normal;
-    v[1].Normal  = normal;
-    v[2].Normal  = normal;
-    v[3].Normal  = normal;
-    buffer->recalculateBoundingBox();
+    m_dy_dc = new SP::SPDynamicDrawCall(scene::EPT_TRIANGLE_STRIP,
+        SP::getSPShader("alphablend"), shadow_mat);
 
-    m_node   = irr_driver->addMesh(m_mesh, "shadow");
-#ifdef DEBUG
-    m_node->setName("shadow");
-#endif
-
-    m_mesh->drop();   // the node grabs the mesh, so we can drop this reference
-    m_node->setAutomaticCulling(scene::EAC_OFF);
-    m_parent_kart_node = node;
-    m_parent_kart_node->addChild(m_node);
+    m_dy_dc->getVerticesVector().resize(4);
+    video::S3DVertexSkinnedMesh* v = m_dy_dc->getVerticesVector().data();
+    v[0].m_all_uvs[0] = 0;
+    v[0].m_all_uvs[1] = 0;
+    v[1].m_all_uvs[0] = 15360;
+    v[1].m_all_uvs[1] = 0;
+    v[3].m_all_uvs[0] = 15360;
+    v[3].m_all_uvs[1] = 15360;
+    v[2].m_all_uvs[0] = 0;
+    v[2].m_all_uvs[1] = 15360;
 }   // Shadow
 
 // ----------------------------------------------------------------------------
 Shadow::~Shadow()
 {
-    // Note: the mesh was not loaded from disk, so it is not cached,
-    // and does not need to be removed. It's clean up when removing the node
-    m_parent_kart_node->removeChild(m_node);
+    if (m_shadow_enabled)
+    {
+        SP::removeDynamicDrawCall(m_dy_dc);
+    }
+    delete m_dy_dc;
 }   // ~Shadow
 
 // ----------------------------------------------------------------------------
-/** Updates the simulated shadow. It takes the offset (distance from visual
- *  chassis to ground) to position the shadow quad exactly on the ground.
+/** Updates the simulated shadow. It takes the 4 suspension lengths of vehicle
+ *  from ground to position the shadow quad exactly on the ground.
  *  It also disables the shadow if requested (e.g. if the kart is in the air).
  *  \param enabled If the shadow should be shown or not.
- *  \param offset Distance from visual chassis to ground = position of the
- *         shadow to make sure it is exactly on the ground.
  */
-void Shadow::update(bool enabled, float offset)
+void Shadow::update(bool enabled)
 {
-    m_node->setVisible(enabled);
-    core::vector3df pos = m_node->getPosition();
-    pos.Y = offset;
-    m_node->setPosition(pos);
+    if (enabled != m_shadow_enabled)
+    {
+        m_shadow_enabled = enabled;
+        if (m_shadow_enabled)
+        {
+            SP::addDynamicDrawCall(m_dy_dc);
+        }
+        else
+        {
+            SP::removeDynamicDrawCall(m_dy_dc);
+        }
+    }
+    if (m_shadow_enabled)
+    {
+        video::S3DVertexSkinnedMesh* v = m_dy_dc->getVerticesVector().data();
+        v[0].m_position.X = -1; v[0].m_position.Z =  1; v[0].m_position.Y = 0;
+        v[1].m_position.X =  1; v[1].m_position.Z =  1; v[1].m_position.Y = 0;
+        v[2].m_position.X = -1; v[2].m_position.Z = -1; v[2].m_position.Y = 0;
+        v[3].m_position.X =  1; v[3].m_position.Z = -1; v[3].m_position.Y = 0;
+        btTransform kart_trans = m_kart.getTrans();
+        btTransform skidding_rotation;
+        skidding_rotation.setOrigin(Vec3(0, 0, 0));
+        skidding_rotation.setRotation
+            (btQuaternion(m_kart.getSkidding()->getVisualSkidRotation(), 0, 0));
+        kart_trans *= skidding_rotation;
+        for (unsigned i = 0; i < 4; i++)
+        {
+            const btWheelInfo& wi = m_kart.getVehicle()->getWheelInfo(i);
+            Vec3 up_vector = kart_trans.getBasis().getColumn(1);
+            up_vector = up_vector * (wi.m_raycastInfo.m_suspensionLength - 0.02f);
+            v[i].m_position =
+                Vec3(kart_trans(Vec3(v[i].m_position)) - up_vector).toIrrVector();
+            v[i].m_normal = MiniGLM::compressVector3
+                (Vec3(wi.m_raycastInfo.m_contactNormalWS).toIrrVector());
+        }
+        m_dy_dc->recalculateBoundingBox();
+        m_dy_dc->setUpdateOffset(0);
+    }
 }   // update
+
+#endif

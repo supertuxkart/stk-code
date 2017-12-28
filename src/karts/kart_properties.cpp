@@ -252,13 +252,6 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     else
         m_minimap_icon = NULL;
 
-#ifndef SERVER_ONLY
-    if (m_minimap_icon == NULL)
-    {
-        m_minimap_icon = STKTexManager::getInstance()->getUnicolorTexture(m_color);
-    }
-#endif
-
     // Only load the model if the .kart file has the appropriate version,
     // otherwise warnings are printed.
     if (m_version >= 1)
@@ -298,7 +291,8 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // used.
     m_wheel_base = fabsf(m_kart_model->getLength() - 2*0.25f);
 
-    m_shadow_texture = STKTexManager::getInstance()->getTexture(m_shadow_file);
+    m_shadow_material = material_manager->getMaterialSPM(m_shadow_file, "",
+        "alphablend");
 
     STKTexManager::getInstance()->unsetTextureErrorMessage();
     file_manager->popTextureSearchPath();
@@ -369,11 +363,6 @@ void KartProperties::getAllData(const XMLNode * root)
     m_color.set(255, (int)(255*c.getX()), (int)(255*c.getY()), (int)(255*c.getZ()));
 
     root->get("groups",            &m_groups           );
-
-    root->get("shadow-scale",      &m_shadow_scale     );
-    root->get("shadow-x-offset",   &m_shadow_x_offset  );
-    root->get("shadow-z-offset",   &m_shadow_z_offset  );
-
     root->get("type",              &m_kart_type        );
 
     if(const XMLNode *dimensions_node = root->getNode("center"))
