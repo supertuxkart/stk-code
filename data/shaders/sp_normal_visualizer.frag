@@ -1,4 +1,4 @@
-in vec4 o_color;
+flat in vec4 o_color;
 
 out vec4 o_frag_color;
 
