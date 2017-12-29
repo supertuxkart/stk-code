@@ -1,24 +1,3 @@
-#ifdef Use_Bindless_Texture
-flat in sampler2D tex_layer_0;
-flat in sampler2D tex_layer_2;
-flat in sampler2D tex_layer_3;
-#else
-// spm layer 1 texture
-uniform sampler2D tex_layer_0;
-// gloss map
-uniform sampler2D tex_layer_2;
-// normal map
-uniform sampler2D tex_layer_3;
-#endif
-
-
-#ifdef Use_Array_Texture
-uniform sampler2DArray tex_array;
-flat in float array_0;
-flat in float array_2;
-flat in float array_3;
-#endif
-
 flat in float hue_change;
 
 in vec4 color;
@@ -33,15 +12,11 @@ layout(location = 2) out vec2 o_gloss_map;
 
 #stk_include "utils/encode_normal.frag"
 #stk_include "utils/rgb_conversion.frag"
+#stk_include "utils/sp_texture_sampling.frag"
 
 void main()
 {
-#ifdef Use_Array_Texture
-    vec4 col = texture(tex_array, vec3(uv, array_0));
-#else
-    vec4 col = texture(tex_layer_0, uv);
-#endif
-
+    vec4 col = sampleTextureSlot0(uv);
     if (hue_change > 0.0)
     {
         float mask = col.a;
@@ -68,13 +43,7 @@ void main()
 #endif
     o_diffuse_color = vec4(final_color, 1.0);
 
-#if defined(Advanced_Lighting_Enabled)
-#ifdef Use_Array_Texture
-    vec4 layer_3 = texture(tex_array, vec3(uv, array_3));
-#else
-    vec4 layer_3 = texture(tex_layer_3, uv);
-#endif
-
+    vec4 layer_3 = sampleTextureSlot3(uv);
     vec3 tangent_space_normal = 2.0 * layer_3.xyz - 1.0;
     vec3 frag_tangent = normalize(tangent);
     vec3 frag_bitangent = normalize(bitangent);
@@ -82,15 +51,8 @@ void main()
     mat3 t_b_n = mat3(frag_tangent, frag_bitangent, frag_normal);
     vec3 world_normal = t_b_n * tangent_space_normal;
 
-#ifdef Use_Array_Texture
-    vec4 layer_2 = texture(tex_array, vec3(uv, array_2));
-#else
-    vec4 layer_2 = texture(tex_layer_2, uv);
-#endif
-
+    vec4 layer_2 = sampleTextureSlot2(uv);
     o_normal_depth.xy = 0.5 * EncodeNormal(normalize(world_normal)) + 0.5;
     o_normal_depth.z = layer_2.x;
     o_gloss_map = layer_2.yz;
-
-#endif
 }
