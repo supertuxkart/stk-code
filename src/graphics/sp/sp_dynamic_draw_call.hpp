@@ -61,8 +61,6 @@ private:
 
     // ------------------------------------------------------------------------
     bool initTextureDyDc();
-    // ------------------------------------------------------------------------
-    void recreateDynamicVAO();
 
 public:
     SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt, SPShader* shader,
@@ -93,28 +91,29 @@ public:
                 m_texture_trans.X, m_texture_trans.Y, 0.0f, 0);
             glBindBuffer(GL_ARRAY_BUFFER, m_ibo);
             glBufferSubData(GL_ARRAY_BUFFER, 0, 32, &id);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
         if (m_update_offset >= 0 && !m_vertices.empty())
         {
+            glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
             if ((unsigned)m_vertices.capacity() > m_gl_vbo_size)
             {
                 m_update_offset = 0;
-                glDeleteBuffers(1, &m_vbo);
-                glGenBuffers(1, &m_vbo);
-                glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
                 m_gl_vbo_size = (unsigned)m_vertices.capacity();
-                glBufferData(GL_ARRAY_BUFFER, m_gl_vbo_size * 48, NULL,
-                    GL_DYNAMIC_DRAW);
-                recreateDynamicVAO();
+                glBufferData(GL_ARRAY_BUFFER, m_gl_vbo_size * 48,
+                    m_vertices.data(), GL_DYNAMIC_DRAW);
             }
-            glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-            const int length = ((int)m_vertices.size() - m_update_offset) * 48;
-            assert(length > 0);
-            glBufferSubData(GL_ARRAY_BUFFER, m_update_offset * 48, length,
-                m_vertices.data() + m_update_offset);
+            else
+            {
+                const int length =
+                    ((int)m_vertices.size() - m_update_offset) * 48;
+                assert(length > 0);
+                glBufferSubData(GL_ARRAY_BUFFER, m_update_offset * 48, length,
+                    m_vertices.data() + m_update_offset);
+            }
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
             m_update_offset = -1;
         }
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
 #endif
     }
     // ------------------------------------------------------------------------

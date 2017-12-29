@@ -62,59 +62,7 @@ SPDynamicDrawCall::SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt,
     SPTextureManager::get()->addGLCommandFunction
         (std::bind(&SPDynamicDrawCall::initTextureDyDc, this));
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    recreateDynamicVAO();
-#endif
-}   // SPDynamicDrawCall
 
-// ----------------------------------------------------------------------------
-bool SPDynamicDrawCall::initTextureDyDc()
-{
-#ifndef SERVER_ONLY
-    for (unsigned i = 0; i < m_stk_material.size(); i++)
-    {
-        for (unsigned j = 0; j < 6; j++)
-        {
-            if (!m_textures[i][j]->initialized())
-            {
-                return false;
-            }
-        }
-    }
-    if (!(CVS->useArrayTextures() || CVS->isARBBindlessTextureUsable()))
-    {
-        return true;
-    }
-    glBindBuffer(GL_ARRAY_BUFFER, m_ibo);
-    if (CVS->useArrayTextures())
-    {
-        for (unsigned i = 0; i < 6; i++)
-        {
-            uint16_t array_index = (uint16_t)
-                m_textures[0][i]->getTextureArrayIndex();
-            glBufferSubData(GL_ARRAY_BUFFER, 32 + (i * 2), 2, &array_index);
-        }
-    }
-    else
-    {
-        for (unsigned i = 0; i < 6; i++)
-        {
-            glBufferSubData(GL_ARRAY_BUFFER, 32 + (i * 8), 8,
-                m_textures[0][i]->getTextureHandlePointer());
-        }
-    }
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-#endif
-    return true;
-}   // initTextureDyDc
-
-// ----------------------------------------------------------------------------
-void SPDynamicDrawCall::recreateDynamicVAO()
-{
-#ifndef SERVER_ONLY
-    if (m_vao[0] != 0)
-    {
-        glDeleteVertexArrays(1, &m_vao[0]);
-    }
     glGenVertexArrays(1, &m_vao[0]);
     glBindVertexArray(m_vao[0]);
 
@@ -220,8 +168,48 @@ void SPDynamicDrawCall::recreateDynamicVAO()
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
 #endif
-}   // recreateVAO
+}   // SPDynamicDrawCall
+
+// ----------------------------------------------------------------------------
+bool SPDynamicDrawCall::initTextureDyDc()
+{
+#ifndef SERVER_ONLY
+    for (unsigned i = 0; i < m_stk_material.size(); i++)
+    {
+        for (unsigned j = 0; j < 6; j++)
+        {
+            if (!m_textures[i][j]->initialized())
+            {
+                return false;
+            }
+        }
+    }
+    if (!(CVS->useArrayTextures() || CVS->isARBBindlessTextureUsable()))
+    {
+        return true;
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, m_ibo);
+    if (CVS->useArrayTextures())
+    {
+        for (unsigned i = 0; i < 6; i++)
+        {
+            uint16_t array_index = (uint16_t)
+                m_textures[0][i]->getTextureArrayIndex();
+            glBufferSubData(GL_ARRAY_BUFFER, 32 + (i * 2), 2, &array_index);
+        }
+    }
+    else
+    {
+        for (unsigned i = 0; i < 6; i++)
+        {
+            glBufferSubData(GL_ARRAY_BUFFER, 32 + (i * 8), 8,
+                m_textures[0][i]->getTextureHandlePointer());
+        }
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+#endif
+    return true;
+}   // initTextureDyDc
 
 }
