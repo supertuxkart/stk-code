@@ -25,6 +25,7 @@
 #include "io/xml_node.hpp"
 #include "items/rubber_band.hpp"
 #include "items/projectile_manager.hpp"
+#include "graphics/central_settings.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
@@ -92,14 +93,16 @@ Plunger::Plunger(AbstractKart *kart)
     //adjust height according to terrain
     setAdjustUpVelocity(false);
 
+    m_rubber_band = NULL;
+
+#ifndef SERVER_ONLY
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
-    if( m_reverse_mode || race_manager->isBattleMode() )
-        m_rubber_band = NULL;
-    else
+    if (!(m_reverse_mode || race_manager->isBattleMode() || !CVS->isGLSL()))
     {
         m_rubber_band = new RubberBand(this, kart);
     }
+#endif
     m_keep_alive = -1;
 }   // Plunger
 

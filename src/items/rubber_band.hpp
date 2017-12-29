@@ -22,11 +22,10 @@
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
-namespace irr
+namespace SP
 {
-    namespace scene { class ISceneNode; class IMesh; class IMeshBuffer; }
+    class SPDynamicDrawCall;
 }
-using namespace irr;
 
 class AbstractKart;
 class Plunger;
@@ -50,12 +49,8 @@ private:
     /** The kart who shot this plunger. */
     AbstractKart       *m_owner;
 
-    /** The scene node for the rubber band. */
-    scene::ISceneNode  *m_node;
-    /** The mesh of the rubber band. */
-    scene::IMesh       *m_mesh;
-    /** The mesh buffer containing the actual vertices of the rubber band. */
-    scene::IMeshBuffer *m_buffer;
+    /** The dynamic draw call of the rubber band. */
+    SP::SPDynamicDrawCall *m_dy_dc;
 
     /** The kart a plunger might have hit. */
     AbstractKart       *m_hit_kart;
