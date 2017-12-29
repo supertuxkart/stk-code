@@ -81,9 +81,11 @@ void SkidMarks::update(float dt, bool force_skid_marks,
 
     float f = dt / stk_config->m_skid_fadeout_time;
     auto it = m_left.begin();
+    // Don't clean the current skidmarking
     while (it != m_left.end())
     {
-        if ((*it)->fade(f))
+        if ((it + 1 != m_left.end() || !m_skid_marking)
+            && (*it)->fade(f))
         {
             it = m_left.erase(it);
             continue;
@@ -93,7 +95,8 @@ void SkidMarks::update(float dt, bool force_skid_marks,
     it = m_right.begin();
     while (it != m_right.end())
     {
-        if ((*it)->fade(f))
+        if ((it + 1 != m_right.end() || !m_skid_marking)
+            && (*it)->fade(f))
         {
             it = m_right.erase(it);
             continue;
