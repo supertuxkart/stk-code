@@ -218,8 +218,11 @@ void CPUParticleManager::uploadAll()
         if (m_gl_particles.at(p.first)->m_size < vbo_size)
         {
             m_gl_particles.at(p.first)->m_size = vbo_size * 2;
-            glBufferData(GL_ARRAY_BUFFER, vbo_size * 2 * 20, NULL,
-                GL_DYNAMIC_DRAW);
+            m_particles_generated.at(p.first).reserve(vbo_size * 2);
+            glBufferData(GL_ARRAY_BUFFER, vbo_size * 2 * 20,
+                m_particles_generated.at(p.first).data(), GL_DYNAMIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            continue;
         }
         void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, 0, vbo_size * 20,
             GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT |
