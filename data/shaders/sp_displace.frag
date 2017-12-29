@@ -2,24 +2,14 @@ uniform sampler2D displacement_tex;
 uniform sampler2D mask_tex;
 uniform sampler2D color_tex;
 
-#ifdef Use_Bindless_Texture
-flat in sampler2D tex_layer_0;
-#else
-// spm layer 1 texture
-uniform sampler2D tex_layer_0;
-#endif
-
-#ifdef Use_Array_Texture
-uniform sampler2DArray tex_array;
-flat in float array_0;
-#endif
+#stk_include "utils/sp_texture_sampling.frag"
 
 uniform vec4 direction;
 
 in vec2 uv;
 in float camdist;
 
-out vec4 o_frag_color;
+out vec4 o_diffuse_color;
 
 const float maxlen = 0.02;
 
@@ -51,13 +41,7 @@ void main()
     tc += (mask < 1.) ? vec2(0.) : shift;
 
     vec4 col = texture(color_tex, tc);
-
-#ifdef Use_Array_Texture
-    vec4 blend_tex = texture(tex_array, vec3(uv, array_0));
-#else
-    vec4 blend_tex = texture(tex_layer_0, uv);
-#endif
-
+    vec4 blend_tex = sampleTextureSlot0(uv);
     col.rgb = blend_tex.rgb * blend_tex.a + (1. - blend_tex.a) * col.rgb;
-    o_frag_color = vec4(col.rgb, 1.);
+    o_diffuse_color = vec4(col.rgb, 1.);
 }

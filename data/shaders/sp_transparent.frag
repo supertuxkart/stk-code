@@ -1,15 +1,3 @@
-#ifdef Use_Bindless_Texture
-flat in sampler2D tex_layer_0;
-#else
-// spm layer 1 texture
-uniform sampler2D tex_layer_0;
-#endif
-
-#ifdef Use_Array_Texture
-uniform sampler2DArray tex_array;
-flat in float array_0;
-#endif
-
 uniform int fog_enabled;
 uniform float custom_alpha;
 
@@ -17,15 +5,11 @@ in vec2 uv;
 in vec4 color;
 out vec4 o_diffuse_color;
 
+#stk_include "utils/sp_texture_sampling.frag"
+
 void main()
 {
-
-#ifdef Use_Array_Texture
-    vec4 diffusecolor = texture(tex_array, vec3(uv, array_0));
-#else
-    vec4 diffusecolor = texture(tex_layer_0, uv);
-#endif
-
+    vec4 diffusecolor = sampleTextureSlot0(uv);
     vec4 finalcolor = vec4(0.);
     if (fog_enabled == 0)
     {

@@ -1,16 +1,3 @@
-#ifdef Use_Bindless_Texture
-flat in sampler2D tex_layer_0;
-#else
-// spm layer 1 texture
-uniform sampler2D tex_layer_0;
-#endif
-
-#ifdef Use_Array_Texture
-uniform sampler2DArray tex_array;
-flat in float array_0;
-flat in float array_2;
-#endif
-
 in vec4 color;
 in vec3 normal;
 in vec2 uv;
@@ -20,17 +7,11 @@ layout(location = 1) out vec3 o_normal_depth;
 layout(location = 2) out vec2 o_gloss_map;
 
 #stk_include "utils/encode_normal.frag"
-#stk_include "utils/rgb_conversion.frag"
+#stk_include "utils/sp_texture_sampling.frag"
 
 void main(void)
 {
-
-#ifdef Use_Array_Texture
-    vec4 col = texture(tex_array, vec3(uv, array_0));
-#else
-    vec4 col = texture(tex_layer_0, uv);
-#endif
-
+    vec4 col = sampleTextureSlot0(uv);
     if (col.a < 0.5)
     {
         discard;

@@ -43,6 +43,7 @@ void main()
 #endif
     o_diffuse_color = vec4(final_color, 1.0);
 
+#if defined(Advanced_Lighting_Enabled)
     vec4 layer_3 = sampleTextureSlot3(uv);
     vec3 tangent_space_normal = 2.0 * layer_3.xyz - 1.0;
     vec3 frag_tangent = normalize(tangent);
@@ -55,4 +56,5 @@ void main()
     o_normal_depth.xy = 0.5 * EncodeNormal(normalize(world_normal)) + 0.5;
     o_normal_depth.z = layer_2.x;
     o_gloss_map = layer_2.yz;
+#endif
 }

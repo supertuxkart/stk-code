@@ -37,8 +37,10 @@ void main(void)
 #endif
     o_diffuse_color = vec4(final_color, 1.0);
 
+#if defined(Advanced_Lighting_Enabled)
     vec4 layer_2 = sampleTextureSlot2(uv);
     o_normal_depth.xy = 0.5 * EncodeNormal(normalize(normal)) + 0.5;
     o_normal_depth.z = layer_2.x;
     o_gloss_map = 0.1 * layer_2.yz;
+#endif
 }
