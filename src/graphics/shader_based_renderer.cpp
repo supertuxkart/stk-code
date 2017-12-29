@@ -275,13 +275,17 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
 
     {
         m_rtts->getFBO(FBO_SP).bind();
-        glClearColor(1., 1., 1., 0.);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        glClearColor(0., 0., 0., 0.);
+        float clear_color_white[4] = { 1.0f, 1.0f, 1.0f, 0.0f };
+        float clear_color_normal[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        glClearBufferfv(GL_COLOR, 0, clear_color_white);
+        glClearBufferfv(GL_COLOR, 1, clear_color_normal);
+        glClearBufferfv(GL_COLOR, 2, clear_color_white);
+        glClearBufferfi(GL_DEPTH_STENCIL, 0, 1.0f, 0);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS1));
         SP::draw(SP::RP_1ST, SP::DCT_NORMAL);
     }
 
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     // Lights
     {
         PROFILER_PUSH_CPU_MARKER("- Light", 0x00, 0xFF, 0x00);

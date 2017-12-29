@@ -29,7 +29,6 @@
 #include "graphics/render_info.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/stk_tex_manager.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "graphics/sp/sp_instanced_data.hpp"
 #include "graphics/sp/sp_per_object_uniform.hpp"
