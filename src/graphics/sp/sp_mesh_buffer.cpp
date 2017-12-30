@@ -203,8 +203,7 @@ void SPMeshBuffer::uploadGLMesh()
         offset += 4;
 
         video::SColor vc = m_vertices[i].m_color;
-        if (CVS->isDefferedEnabled() ||
-            CVS->isARBSRGBFramebufferUsable())
+        if (CVS->isDefferedEnabled())
         {
             video::SColorf tmp(vc);
             vc.setRed(srgbToLinear(tmp.r));

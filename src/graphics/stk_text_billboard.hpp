@@ -18,73 +18,134 @@
 #ifndef STK_TEXT_BILLBOARD_HPP
 #define STK_TEXT_BILLBOARD_HPP
 
-#include "graphics/stk_mesh_scene_node.hpp"
 #include "font/font_with_face.hpp"
-#include "utils/cpp2011.hpp"
+#include "graphics/gl_headers.hpp"
+#include "graphics/sp/sp_instanced_data.hpp"
+#include "utils/no_copy.hpp"
 
-#include "../lib/irrlicht/source/Irrlicht/CBillboardSceneNode.h"
-#include <IBillboardSceneNode.h>
-#include <irrTypes.h>
-#include <IMesh.h>
+#include <ISceneNode.h>
+#include <array>
+#include <unordered_map>
+#include <vector>
 
-class STKTextBillboardChar
+using namespace irr;
+using namespace scene;
+
+class STKTextBillboard : public ISceneNode, public NoCopy,
+                         FontWithFace::FontCharCollector
 {
-public:
-    irr::video::ITexture* m_texture;
-    irr::core::rect<float> m_destRect;
-    irr::core::rect<irr::s32> m_sourceRect;
-    //irr::video::SColor m_colors[4];
-
-    STKTextBillboardChar(irr::video::ITexture* texture,
-        const irr::core::rect<float>& destRect,
-        const irr::core::rect<irr::s32>& sourceRect,
-        const irr::video::SColor* const colors)
+private:
+    struct STKTextBillboardChar
     {
-        m_texture = texture;
-        m_destRect = destRect;
-        m_sourceRect = sourceRect;
-        //if (colors == NULL)
-        //{
-        //    m_colors[0] = m_colors[1] = m_colors[2] = m_colors[3] = NULL;
-        //}
-        //else
-        //{
-        //    m_colors[0] = colors[0];
-        //    m_colors[1] = colors[1];
-        //    m_colors[2] = colors[2];
-        //    m_colors[3] = colors[3];
-        //}
-    }
-};
+        video::ITexture* m_texture;
 
-class STKTextBillboard : public STKMeshSceneNode, FontWithFace::FontCharCollector
-{
-    std::vector<STKTextBillboardChar> m_chars;
-    irr::video::SColor m_color_top;
-    irr::video::SColor m_color_bottom;
+        core::rect<float> m_dest_rect;
 
-    irr::scene::IMesh* getTextMesh(irr::core::stringw text, FontWithFace* font);
+        core::rect<s32> m_source_rect;
+
+        // ------------------------------------------------------------------------
+        STKTextBillboardChar(video::ITexture* texture,
+                             const core::rect<float>& dest_rect,
+                             const core::rect<irr::s32>& source_rect,
+                             const video::SColor* const colors)
+        {
+            m_texture = texture;
+            m_dest_rect = dest_rect;
+            m_source_rect = source_rect;
+        }
+    };
+
+    struct GLTB
+    {
+        core::vector3df m_position;
+        video::SColor m_color;
+        short m_uv[2];
+    };
+
+    SP::SPInstancedData m_instanced_data;
+
+    GLuint m_instanced_array = 0;
+
+    std::vector<STKTextBillboardChar>* m_chars = NULL;
+
+    video::SColor m_color_top;
+
+    video::SColor m_color_bottom;
+
+    std::unordered_map<video::ITexture*, std::vector<std::array<GLTB, 4> > >
+        m_gl_tbs;
+
+    std::unordered_map<video::ITexture*, std::pair<GLuint, GLuint> >
+        m_vao_vbos;
+
+    core::aabbox3df m_bbox;
 
 public:
-    STKTextBillboard(irr::core::stringw text, FontWithFace* font,
-        const irr::video::SColor& color_top,
-        const irr::video::SColor& color_bottom,
-        irr::scene::ISceneNode* parent,
-        irr::scene::ISceneManager* mgr, irr::s32 id,
-        const irr::core::vector3df& position,
-        const irr::core::vector3df& size);
-
-    virtual scene::ESCENE_NODE_TYPE getType() const OVERRIDE
+    // ------------------------------------------------------------------------
+    STKTextBillboard(const video::SColor& color_top,
+                     const video::SColor& color_bottom, ISceneNode* parent,
+                     ISceneManager* mgr, s32 id,
+                     const core::vector3df& position,
+                     const core::vector3df& size);
+    // ------------------------------------------------------------------------
+    ~STKTextBillboard()
     {
-        return scene::ESNT_TEXT;
+#ifndef SERVER_ONLY
+        if (m_instanced_array != 0)
+        {
+            glDeleteBuffers(1, &m_instanced_array);
+        }
+        for (auto& p : m_vao_vbos)
+        {
+            glDeleteVertexArrays(1, &p.second.first);
+            glDeleteBuffers(1, &p.second.second);
+        }
+        m_vao_vbos.clear();
+#endif
     }
-
-    virtual void collectChar(irr::video::ITexture* texture,
-        const irr::core::rect<float>& destRect,
-        const irr::core::rect<irr::s32>& sourceRect,
-        const irr::video::SColor* const colors) OVERRIDE;
-
-    virtual void updateAbsolutePosition() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void collectChar(video::ITexture* texture,
+                             const core::rect<float>& dest_rect,
+                             const core::rect<irr::s32>& source_rect,
+                             const video::SColor* const colors);
+    // ------------------------------------------------------------------------
+    virtual void updateAbsolutePosition();
+    // ------------------------------------------------------------------------
+    virtual void render() {}
+    // ------------------------------------------------------------------------
+    virtual const core::aabbox3df& getBoundingBox() const    { return m_bbox; }
+    // ------------------------------------------------------------------------
+    void init(core::stringw text, FontWithFace* face);
+    // ------------------------------------------------------------------------
+    void draw(video::ITexture* tex) const
+    {
+#ifndef SERVER_ONLY
+        glBindVertexArray(m_vao_vbos.at(tex).first);
+        for (unsigned i = 0; i < m_gl_tbs.at(tex).size(); i++)
+        {
+            glDrawArraysInstanced(GL_TRIANGLE_STRIP, i * 4, 4, 1);
+        }
+#endif
+    }
+    // ------------------------------------------------------------------------
+    std::vector<video::ITexture*> getAllTBTextures() const
+    {
+        std::vector<video::ITexture*> ret;
+        for (auto& p : m_vao_vbos)
+        {
+            ret.push_back(p.first);
+        }
+        return ret;
+    }
+    // ------------------------------------------------------------------------
+    void updateGLInstanceData() const
+    {
+#ifndef SERVER_ONLY
+        glBindBuffer(GL_ARRAY_BUFFER, m_instanced_array);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, 24, m_instanced_data.getData());
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+#endif
+    }
 };
 
 #endif

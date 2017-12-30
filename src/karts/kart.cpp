@@ -31,6 +31,7 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
@@ -2971,13 +2972,14 @@ void Kart::setOnScreenText(const wchar_t *text)
 
     if (CVS->isGLSL())
     {
-        scene::ISceneNode* tb =
-            new STKTextBillboard(text, bold_face,
+        STKTextBillboard* tb =
+            new STKTextBillboard(
             GUIEngine::getSkin()->getColor("font::bottom"),
             GUIEngine::getSkin()->getColor("font::top"),
             getNode(), irr_driver->getSceneManager(), -1,
             core::vector3df(0.0f, 1.5f, 0.0f),
             core::vector3df(1.0f, 1.0f, 1.0f));
+        tb->init(text, bold_face);
         tb->drop();
     }
     else

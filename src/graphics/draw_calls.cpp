@@ -25,6 +25,8 @@
 #include "graphics/lod_node.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stk_particle.hpp"
+#include "graphics/stk_text_billboard.hpp"
+#include "graphics/text_billboard_drawer.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_mesh_node.hpp"
 #include "tracks/track.hpp"
@@ -155,7 +157,7 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
         if (!(*I)->isVisible())
             continue;
 
-        if (STKParticle *node = dynamic_cast<STKParticle *>(*I))
+        if (STKParticle *node = dynamic_cast<STKParticle*>(*I))
         {
             if (!isCulledPrecise(cam, *I, irr_driver->getBoundingBoxesViz()) ||
                 SP::sp_first_frame)
@@ -164,10 +166,19 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
         }
 
         if (scene::IBillboardSceneNode *node =
-            dynamic_cast<scene::IBillboardSceneNode *>(*I))
+            dynamic_cast<scene::IBillboardSceneNode*>(*I))
         {
             if (!isCulledPrecise(cam, *I) || SP::sp_first_frame)
                 CPUParticleManager::getInstance()->addBillboardNode(node);
+            continue;
+        }
+
+        if (STKTextBillboard *tb =
+            dynamic_cast<STKTextBillboard*>(*I))
+        {
+            if (!isCulledPrecise(cam, *I, irr_driver->getBoundingBoxesViz()) ||
+                SP::sp_first_frame)
+                TextBillboardDrawer::addTextBillboard(tb);
             continue;
         }
 
@@ -199,6 +210,7 @@ DrawCalls::~DrawCalls()
 void DrawCalls::prepareDrawCalls(scene::ICameraSceneNode *camnode)
 {
     CPUParticleManager::getInstance()->reset();
+    TextBillboardDrawer::reset();
     PROFILER_PUSH_CPU_MARKER("- culling", 0xFF, 0xFF, 0x0);
     SP::prepareDrawCalls();
     parseSceneManager(
@@ -246,8 +258,10 @@ void DrawCalls::prepareDrawCalls(scene::ICameraSceneNode *camnode)
     break;
     }*/
 
-    PROFILER_PUSH_CPU_MARKER("- cpu particle upload", 0x3F, 0x03, 0x61);
+    PROFILER_PUSH_CPU_MARKER("- particle and text billboard upload", 0x3F,
+        0x03, 0x61);
     CPUParticleManager::getInstance()->uploadAll();
+    TextBillboardDrawer::updateAll();
     PROFILER_POP_CPU_MARKER();
 
     PROFILER_PUSH_CPU_MARKER("- SP::upload instance and skinning matrices",

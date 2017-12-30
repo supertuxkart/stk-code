@@ -77,6 +77,8 @@ public:
         short hue_packed = short(core::clamp(int(hue * 100.0f), 0, 100));
         memcpy(m_data + 30, &hue_packed, 2);
     }
+    // ------------------------------------------------------------------------
+    const void* getData() const                              { return m_data; }
 
 };
 

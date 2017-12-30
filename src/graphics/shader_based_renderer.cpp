@@ -36,6 +36,7 @@
 #include "graphics/spherical_harmonics.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_shader.hpp"
+#include "graphics/text_billboard_drawer.hpp"
 #include "items/item_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "modes/world.hpp"
@@ -392,11 +393,13 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         PROFILER_POP_CPU_MARKER();
     }
 
-    // Render particles
+    // Render particles and text billboard
     {
-        PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0xFF, 0x00);
+        PROFILER_PUSH_CPU_MARKER("- Particles and text billboard", 0xFF, 0xFF,
+            0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_PARTICLES));
         CPUParticleManager::getInstance()->drawAll();
+        TextBillboardDrawer::drawAll();
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -494,20 +497,6 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         PROFILER_POP_CPU_MARKER();
     }
 
-    const Track * const track = Track::getCurrentTrack();
-    // Render discrete lights scattering
-    if (CVS->isDefferedEnabled() && track && track->isFogEnabled())
-    {
-        PROFILER_PUSH_CPU_MARKER("- PointLight Scatter", 0xFF, 0x00, 0x00);
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_FOG));
-        m_lighting_passes.renderLightsScatter(m_rtts->getDepthStencilTexture(),
-                                              m_rtts->getFBO(FBO_HALF1),
-                                              m_rtts->getFBO(FBO_HALF2),
-                                              m_rtts->getFBO(FBO_COLORS),
-                                              m_post_processing);
-        PROFILER_POP_CPU_MARKER();
-    }
-
     // Render transparent
     {
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
@@ -517,11 +506,13 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         PROFILER_POP_CPU_MARKER();
     }
 
-    // Render particles
+    // Render particles and text billboard
     {
-        PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0xFF, 0x00);
+        PROFILER_PUSH_CPU_MARKER("- Particles and text billboard", 0xFF, 0xFF,
+            0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_PARTICLES));
         CPUParticleManager::getInstance()->drawAll();
+        TextBillboardDrawer::drawAll();
         PROFILER_POP_CPU_MARKER();
     }
 
