@@ -814,7 +814,10 @@ void ShaderBasedRenderer::render(float dt)
         }
 
         if (irr_driver->getBoundingBoxesViz())
-        {        
+        {
+            glEnable(GL_DEPTH_TEST);
+            glDepthMask(GL_TRUE);
+            SP::drawBoundingBoxes();
             m_draw_calls.renderBoundingBoxes();
         }
         

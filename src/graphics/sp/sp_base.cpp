@@ -1120,12 +1120,24 @@ inline core::vector3df getCorner(const core::aabbox3df& bbox, unsigned n)
 }   // getCorner
 
 // ----------------------------------------------------------------------------
+void addEdgeForViz(const core::vector3df& p0, const core::vector3df& p1)
+{
+    g_bounding_boxes.push_back(p0.X);
+    g_bounding_boxes.push_back(p0.Y);
+    g_bounding_boxes.push_back(p0.Z);
+    g_bounding_boxes.push_back(p1.X);
+    g_bounding_boxes.push_back(p1.Y);
+    g_bounding_boxes.push_back(p1.Z);
+}   // addEdgeForViz
+
+// ----------------------------------------------------------------------------
 void prepareDrawCalls()
 {
     if (!sp_culling)
     {
         return;
     }
+    g_bounding_boxes.clear();
     g_wind_dir = core::vector3df(1.0f, 0.0f, 0.0f) *
         (irr_driver->getDevice()->getTimer()->getTime() / 1000.0f) * 1.5f;
     sp_solid_poly_count = sp_shadow_poly_count = 0;
@@ -1221,6 +1233,22 @@ void addObject(SPMeshNode* node)
             discard[4]) : discard[0])
         {
             continue;
+        }
+
+        if (irr_driver->getBoundingBoxesViz())
+        {
+            addEdgeForViz(getCorner(bb, 0), getCorner(bb, 1));
+            addEdgeForViz(getCorner(bb, 1), getCorner(bb, 5));
+            addEdgeForViz(getCorner(bb, 5), getCorner(bb, 4));
+            addEdgeForViz(getCorner(bb, 4), getCorner(bb, 0));
+            addEdgeForViz(getCorner(bb, 2), getCorner(bb, 3));
+            addEdgeForViz(getCorner(bb, 3), getCorner(bb, 7));
+            addEdgeForViz(getCorner(bb, 7), getCorner(bb, 6));
+            addEdgeForViz(getCorner(bb, 6), getCorner(bb, 2));
+            addEdgeForViz(getCorner(bb, 0), getCorner(bb, 2));
+            addEdgeForViz(getCorner(bb, 1), getCorner(bb, 3));
+            addEdgeForViz(getCorner(bb, 5), getCorner(bb, 7));
+            addEdgeForViz(getCorner(bb, 4), getCorner(bb, 6));
         }
 
         mb->uploadGLMesh();
@@ -1341,9 +1369,13 @@ void addObject(SPMeshNode* node)
 // ----------------------------------------------------------------------------
 void handleDynamicDrawCall()
 {
+    if (!sp_culling)
+    {
+        return;
+    }
     for (SPDynamicDrawCall* dydc : g_dy_dc)
     {
-        if (!dydc->isVisible())
+        if (!dydc->isVisible() || dydc->getVertexCount() < 3)
         {
             continue;
         }
@@ -1383,6 +1415,22 @@ void handleDynamicDrawCall()
             discard[4]) : discard[0])
         {
             continue;
+        }
+
+        if (irr_driver->getBoundingBoxesViz())
+        {
+            addEdgeForViz(getCorner(bb, 0), getCorner(bb, 1));
+            addEdgeForViz(getCorner(bb, 1), getCorner(bb, 5));
+            addEdgeForViz(getCorner(bb, 5), getCorner(bb, 4));
+            addEdgeForViz(getCorner(bb, 4), getCorner(bb, 0));
+            addEdgeForViz(getCorner(bb, 2), getCorner(bb, 3));
+            addEdgeForViz(getCorner(bb, 3), getCorner(bb, 7));
+            addEdgeForViz(getCorner(bb, 7), getCorner(bb, 6));
+            addEdgeForViz(getCorner(bb, 6), getCorner(bb, 2));
+            addEdgeForViz(getCorner(bb, 0), getCorner(bb, 2));
+            addEdgeForViz(getCorner(bb, 1), getCorner(bb, 3));
+            addEdgeForViz(getCorner(bb, 5), getCorner(bb, 7));
+            addEdgeForViz(getCorner(bb, 4), getCorner(bb, 6));
         }
 
         for (int dc_type = 0; dc_type < (g_handle_shadow ? 5 : 1); dc_type++)
@@ -1713,6 +1761,27 @@ void draw(RenderPass rp, DrawCallType dct)
     PROFILER_POP_CPU_MARKER();
 #endif
 }   // draw
+
+// ----------------------------------------------------------------------------
+void drawBoundingBoxes()
+{
+#ifndef SERVER_ONLY
+    Shaders::ColoredLine *line = Shaders::ColoredLine::getInstance();
+    line->use();
+    line->bindVertexArray();
+    line->bindBuffer();
+    line->setUniforms(irr::video::SColor(255, 255, 0, 0));
+    const float *tmp = g_bounding_boxes.data();
+    for (unsigned int i = 0; i < g_bounding_boxes.size(); i += 1024 * 6)
+    {
+        unsigned count = std::min((unsigned)g_bounding_boxes.size() - i,
+            (unsigned)1024 * 6);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(float), &tmp[i]);
+
+        glDrawArrays(GL_LINES, 0, count / 3);
+    }
+#endif
+}   // drawBoundingBoxes
 
 // ----------------------------------------------------------------------------
 void addDynamicDrawCall(SPDynamicDrawCall* dy_dc)
