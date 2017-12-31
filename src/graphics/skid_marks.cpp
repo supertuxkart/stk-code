@@ -258,7 +258,7 @@ void SkidMarks::SkidMarkQuads::add(const Vec3 &left,
     // then when adding a new set of vertices, make the previous 2 opaque.
     // this ensures that the last two vertices are always at alpha=0,
     // producing a fade-out effect
-    if (n > 2)
+    if (n > 3)
     {
         m_dy_dc->getSPMVertex()[n - 1].m_color.setAlpha(m_start_alpha);
         m_dy_dc->getSPMVertex()[n - 2].m_color.setAlpha(m_start_alpha);
@@ -275,7 +275,7 @@ void SkidMarks::SkidMarkQuads::add(const Vec3 &left,
     v.m_all_uvs[0] = 0;
     v.m_all_uvs[1] = MiniGLM::toFloat16(distance * 0.5f);
     m_dy_dc->addSPMVertex(v);
-    m_dy_dc->setUpdateOffset(n > 2 ? n - 2 : n);
+    m_dy_dc->setUpdateOffset(n > 3 ? n - 2 : n);
     m_dy_dc->recalculateBoundingBox();
 
 }   // add
