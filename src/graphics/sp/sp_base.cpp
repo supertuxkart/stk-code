@@ -49,7 +49,6 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
-#include <numeric>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -94,7 +93,7 @@ std::vector<float> g_bounding_boxes;
 // ----------------------------------------------------------------------------
 core::vector3df g_wind_dir;
 // ----------------------------------------------------------------------------
-std::unordered_set<SPDynamicDrawCall*> g_dy_dc;
+std::vector<std::shared_ptr<SPDynamicDrawCall> > g_dy_dc;
 // ----------------------------------------------------------------------------
 float g_frustums[5][24] = { { } };
 // ----------------------------------------------------------------------------
@@ -1373,9 +1372,11 @@ void handleDynamicDrawCall()
     {
         return;
     }
-    for (SPDynamicDrawCall* dydc : g_dy_dc)
+    for (unsigned dc_num = 0; dc_num < g_dy_dc.size(); dc_num++)
     {
-        if (!dydc->isVisible() || dydc->getVertexCount() < 3)
+        SPDynamicDrawCall* dydc = g_dy_dc[dc_num].get();
+        if (!dydc->isVisible() || dydc->notReadyFromDrawing() ||
+            dydc->isRemoving())
         {
             continue;
         }
@@ -1640,6 +1641,12 @@ void uploadAll()
         g_stk_sbr->getShadowMatrices()->getMatricesData());
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+    g_dy_dc.erase(std::remove_if(g_dy_dc.begin(), g_dy_dc.end(),
+        [] (std::shared_ptr<SPDynamicDrawCall> dc)
+        {
+            return dc->isRemoving();
+        }), g_dy_dc.end());
+
     if (!sp_culling)
     {
         return;
@@ -1784,15 +1791,9 @@ void drawBoundingBoxes()
 }   // drawBoundingBoxes
 
 // ----------------------------------------------------------------------------
-void addDynamicDrawCall(SPDynamicDrawCall* dy_dc)
+void addDynamicDrawCall(std::shared_ptr<SPDynamicDrawCall> dy_dc)
 {
-    g_dy_dc.insert(dy_dc);
+    g_dy_dc.push_back(dy_dc);
 }   // addDynamicDrawCall
-
-// ----------------------------------------------------------------------------
-void removeDynamicDrawCall(SPDynamicDrawCall* dy_dc)
-{
-    g_dy_dc.erase(dy_dc);
-}   // removeDynamicDrawCall
 
 }

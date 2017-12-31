@@ -20,6 +20,7 @@
 #define HEADER_SHADOW_HPP
 
 #include "utils/no_copy.hpp"
+#include <memory>
 
 class AbstractKart;
 class Material;
@@ -39,7 +40,7 @@ class Shadow : public NoCopy
 {
 private:
     /** The dynamic draw call of the shadow. */
-    SP::SPDynamicDrawCall* m_dy_dc;
+    std::shared_ptr<SP::SPDynamicDrawCall> m_dy_dc;
 
     /** If a kart is flying, the shadow is disabled (since it is
      *  stuck to the kart, i.e. the shadow would be flying, too). */

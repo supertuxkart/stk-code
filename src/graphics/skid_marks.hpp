@@ -83,7 +83,7 @@ private:
         /** Vector marking the start of the skidmarks (located between left and right wheel) */
         Vec3 m_center_start;
 
-        SP::SPDynamicDrawCall* m_dy_dc;
+        std::shared_ptr<SP::SPDynamicDrawCall> m_dy_dc;
 
     public:
             SkidMarkQuads (const Vec3 &left, const Vec3 &right,

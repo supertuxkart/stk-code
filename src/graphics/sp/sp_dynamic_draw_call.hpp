@@ -59,6 +59,8 @@ private:
 
     bool m_update_trans = false;
 
+    bool m_removing = false;
+
     // ------------------------------------------------------------------------
     bool initTextureDyDc();
 
@@ -135,6 +137,12 @@ public:
     void setVisible(bool val)                              { m_visible = val; }
     // ------------------------------------------------------------------------
     const core::matrix4& getAbsoluteTransformation() const  { return m_trans; }
+    // ------------------------------------------------------------------------
+    void removeFromSP()                                  { m_removing = true; }
+    // ------------------------------------------------------------------------
+    bool isRemoving() const                              { return m_removing; }
+    // ------------------------------------------------------------------------
+    bool notReadyFromDrawing() const          { return m_vertices.size() < 3; }
     // ------------------------------------------------------------------------
     void setAbsoluteTransformation(core::matrix4& mat)
     {

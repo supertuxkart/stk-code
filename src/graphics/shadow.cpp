@@ -30,8 +30,8 @@
 Shadow::Shadow(Material* shadow_mat, const AbstractKart& kart)
       : m_dy_dc(NULL), m_shadow_enabled(false), m_kart(kart)
 {
-    m_dy_dc = new SP::SPDynamicDrawCall(scene::EPT_TRIANGLE_STRIP,
-        SP::getSPShader("alphablend"), shadow_mat);
+    m_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
+        (scene::EPT_TRIANGLE_STRIP, SP::getSPShader("alphablend"), shadow_mat);
 
     m_dy_dc->getVerticesVector().resize(4);
     video::S3DVertexSkinnedMesh* v = m_dy_dc->getVerticesVector().data();
@@ -43,16 +43,15 @@ Shadow::Shadow(Material* shadow_mat, const AbstractKart& kart)
     v[3].m_all_uvs[1] = 15360;
     v[2].m_all_uvs[0] = 0;
     v[2].m_all_uvs[1] = 15360;
+
+    m_dy_dc->setVisible(false);
+    SP::addDynamicDrawCall(m_dy_dc);
 }   // Shadow
 
 // ----------------------------------------------------------------------------
 Shadow::~Shadow()
 {
-    if (m_shadow_enabled)
-    {
-        SP::removeDynamicDrawCall(m_dy_dc);
-    }
-    delete m_dy_dc;
+    m_dy_dc->removeFromSP();
 }   // ~Shadow
 
 // ----------------------------------------------------------------------------
@@ -68,11 +67,11 @@ void Shadow::update(bool enabled)
         m_shadow_enabled = enabled;
         if (m_shadow_enabled)
         {
-            SP::addDynamicDrawCall(m_dy_dc);
+            m_dy_dc->setVisible(true);
         }
         else
         {
-            SP::removeDynamicDrawCall(m_dy_dc);
+            m_dy_dc->setVisible(false);
         }
     }
     if (m_shadow_enabled)

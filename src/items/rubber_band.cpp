@@ -54,8 +54,9 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
         color.setGreen(SP::srgbToLinear(tmp.g));
         color.setBlue(SP::srgbToLinear(tmp.b));
     }
-    m_dy_dc = new SP::SPDynamicDrawCall(scene::EPT_TRIANGLE_STRIP,
-        SP::getSPShader("unlit"), material_manager->getSPMaterial("unlit"));
+    m_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
+        (scene::EPT_TRIANGLE_STRIP, SP::getSPShader("unlit"),
+        material_manager->getSPMaterial("unlit"));
     m_dy_dc->getVerticesVector().resize(4);
     // Set the vertex colors properly, as the new pipeline doesn't use the old
     // light values
@@ -72,8 +73,7 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
 RubberBand::~RubberBand()
 {
 #ifndef SERVER_ONLY
-    SP::removeDynamicDrawCall(m_dy_dc);
-    delete m_dy_dc;
+    m_dy_dc->removeFromSP();
 #endif
 }   // RubberBand
 

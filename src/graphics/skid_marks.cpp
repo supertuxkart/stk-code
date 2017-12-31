@@ -208,9 +208,9 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
     m_center_start = (left + right)/2;
     m_z_offset = z_offset;
     m_fade_out = 0.0f;
-    m_dy_dc = new SP::SPDynamicDrawCall(scene::EPT_TRIANGLE_STRIP,
-        shader, material);
-    static_cast<SP::SPPerObjectUniform*>(m_dy_dc)->addAssignerFunction
+    m_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
+        (scene::EPT_TRIANGLE_STRIP, shader, material);
+    static_cast<SP::SPPerObjectUniform*>(m_dy_dc.get())->addAssignerFunction
         ("custom_alpha", [this](SP::SPUniformAssigner* ua)->void
         {
             // SP custom_alpha is assigned 1 - x, so this is correct
@@ -235,8 +235,7 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
 //-----------------------------------------------------------------------------
 SkidMarks::SkidMarkQuads::~SkidMarkQuads()
 {
-    SP::removeDynamicDrawCall(m_dy_dc);
-    delete m_dy_dc;
+    m_dy_dc->removeFromSP();
 }   // ~SkidMarkQuads
 
 //-----------------------------------------------------------------------------

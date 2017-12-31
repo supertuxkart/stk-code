@@ -125,9 +125,7 @@ void prepareScene();
 // ----------------------------------------------------------------------------
 void handleDynamicDrawCall();
 // ----------------------------------------------------------------------------
-void addDynamicDrawCall(SPDynamicDrawCall*);
-// ----------------------------------------------------------------------------
-void removeDynamicDrawCall(SPDynamicDrawCall*);
+void addDynamicDrawCall(std::shared_ptr<SPDynamicDrawCall>);
 // ----------------------------------------------------------------------------
 void updateModelMatrix();
 // ----------------------------------------------------------------------------

@@ -22,6 +22,8 @@
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
+#include <memory>
+
 namespace SP
 {
     class SPDynamicDrawCall;
@@ -50,7 +52,7 @@ private:
     AbstractKart       *m_owner;
 
     /** The dynamic draw call of the rubber band. */
-    SP::SPDynamicDrawCall *m_dy_dc;
+    std::shared_ptr<SP::SPDynamicDrawCall> m_dy_dc;
 
     /** The kart a plunger might have hit. */
     AbstractKart       *m_hit_kart;
