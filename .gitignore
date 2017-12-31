@@ -60,6 +60,7 @@ android/bin
 android/build
 android/libs
 android/obj
+android/res
 android/.gradle
 android-*
 *.apk

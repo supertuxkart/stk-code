@@ -218,7 +218,6 @@ protected:
                           mesh_map,
                           instance_buffer);
         }
-        
         if (!CVS->supportsAsyncInstanceUpload())
         {
             glUnmapBuffer(GL_ARRAY_BUFFER);

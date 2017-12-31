@@ -136,6 +136,55 @@ public:
 };   // ListUserConfigParam
 typedef ListUserConfigParam<std::string, const char*>    StringListUserConfigParam;
 
+template<typename T, typename U>
+class MapUserConfigParam : public UserConfigParam
+{
+    std::map<T, U> m_elements;
+
+public:
+    MapUserConfigParam(const char* param_name,
+        const char* comment = NULL);
+    MapUserConfigParam(const char* param_name,
+        const char* comment,
+        int nb_elts,
+        ...);
+    MapUserConfigParam(const char* param_name,
+        GroupUserConfigParam* group,
+        const char* comment = NULL);
+    MapUserConfigParam(const char* param_name,
+        GroupUserConfigParam* group,
+        const char* comment,
+        int nb_elts,
+        ...);
+
+    void write(std::ofstream& stream) const;
+    void findYourDataInAChildOf(const XMLNode* node);
+    void findYourDataInAnAttributeOf(const XMLNode* node);
+
+    void addElement(T element, U value);
+
+    irr::core::stringc toString() const;
+
+    operator std::map<T,U>() const
+    {
+        return m_elements;
+    }
+    std::map<T, U>& operator=(const std::map<T,U>& v)
+    {
+        m_elements = std::map<T, U>(v); 
+        return m_elements;
+    }
+    std::map<T, U>& operator=(const MapUserConfigParam& v)
+    {
+        m_elements = std::map<T,U>(v); 
+        return m_elements;
+    }
+    U& operator[] (const T key) 
+    {
+        return m_elements[key];
+    }
+};   // ListUserConfigParam
+typedef MapUserConfigParam<int, int>    IntToIntUserConfigParam;
 // ============================================================================
 class IntUserConfigParam : public UserConfigParam
 {
@@ -335,7 +384,7 @@ namespace UserConfigParams
         PARAM_DEFAULT( GroupUserConfigParam("RaceSetup",
                                             "Race Setup Settings") );
 
-    PARAM_PREFIX IntUserConfigParam          m_num_karts
+    PARAM_PREFIX IntUserConfigParam          m_default_num_karts
             PARAM_DEFAULT(  IntUserConfigParam(4, "numkarts",
                             &m_race_setup_group,
                             "Default number of karts. -1 means use all") );
@@ -369,7 +418,7 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam m_last_used_kart_group
             PARAM_DEFAULT( StringUserConfigParam("all", "last_kart_group",
                                                  "Last selected kart group") );
-
+    
     // ---- Wiimote data
     PARAM_PREFIX GroupUserConfigParam        m_wiimote_group
         PARAM_DEFAULT( GroupUserConfigParam("WiiMote",
@@ -705,6 +754,14 @@ namespace UserConfigParams
                             "stun.voxalot.com",
                             "stun.voxgratia.org",
                             "stun.xten.com") );
+
+	// ---- Gamemode setup
+    PARAM_PREFIX IntToIntUserConfigParam m_num_karts_per_gamemode
+        PARAM_DEFAULT(IntToIntUserConfigParam("num_karts_per_gamemode",
+            "The Number of karts per gamemode.",
+            1,
+            std::make_pair(1100, 4)
+        ));
 
     PARAM_PREFIX BoolUserConfigParam m_log_packets
             PARAM_DEFAULT( BoolUserConfigParam(false, "log-network-packets",

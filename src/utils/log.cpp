@@ -35,6 +35,9 @@
 Log::LogLevel Log::m_min_log_level = Log::LL_VERBOSE;
 bool          Log::m_no_colors     = false;
 FILE*         Log::m_file_stdout   = NULL;
+std::string   Log::m_prefix        = "";
+size_t        Log::m_buffer_size = 1;
+Synchronised<std::vector<struct Log::LineInfo> > Log::m_line_buffer;
 
 // ----------------------------------------------------------------------------
 /** Selects background/foreground colors for the message depending on
@@ -106,25 +109,22 @@ void Log::setTerminalColor(LogLevel level)
  */
 void Log::resetTerminalColor()
 {
-    if(m_no_colors)
-    {
-        printf("\n");
-        return;
-    }
-
+    if(m_no_colors) return;
 
 #ifdef WIN32
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
                             /*TERM_BLACK*/0 << 4 | /*TERM_LIGHTGRAY*/7);
-    printf("\n");
 #else
-    printf("%c[0;;m\n", 0x1B);
+    printf("%c[0;;m", 0x1B);
 #endif
 }   // resetTerminalColor
 
 // ----------------------------------------------------------------------------
-/** This actually prints the log message. If log messages are not redirected
- *  to a file, it tries to select a terminal colour.
+/** This actually creates a log message. If the messages are to be buffered,
+ *  it will be appended to the output buffer. If the buffer is full, it will
+ *  be flushed. If the message is not to be buffered, it will be immediately
+ *  written using writeLine().
+
  *  \param level Log level of the message to print.
  *  \param format A printf-like format string.
  *  \param va_list The values to be printed for the format.
@@ -132,105 +132,119 @@ void Log::resetTerminalColor()
 void Log::printMessage(int level, const char *component, const char *format,
                        VALIST args)
 {
-    assert(level>=0 && level <=LL_FATAL);
+    assert(level >= 0 && level <= LL_FATAL);
 
-    if(level<m_min_log_level) return;
+    if (level < m_min_log_level) return;
 
-#ifdef ANDROID
-    android_LogPriority alp;
-    switch (level)
+    static const char *names[] = { "debug", "verbose  ", "info   ",
+                                  "warn   ", "error  ", "fatal  " };
+    const int MAX_LENGTH = 2048;
+    char line[MAX_LENGTH + 1];
+    int index = 0;
+    if (!m_prefix.empty())
+        index += snprintf(line+index, MAX_LENGTH-index, "%s ", m_prefix.c_str());
+
+    index += snprintf (line + index, MAX_LENGTH - index, "[%s] %s: ", names[level], component);
+    index += vsnprintf(line + index, MAX_LENGTH - index, format, args);
+    va_end(args);
+    index = snprintf (line + index, MAX_LENGTH - index, "\n");
+
+    // If the data is not buffered, immediately print it:
+    if (m_buffer_size <= 1)
     {
-    // STK is using the levels slightly different from android
-    // (debug lowest, verbose above it; while android reverses
-    // this order. So to get the same behaviour (e.g. filter
-    // out debug message, but still get verbose, we swap
-    // the order here.
-    case LL_VERBOSE: alp = ANDROID_LOG_DEBUG;   break;
-    case LL_DEBUG:   alp = ANDROID_LOG_VERBOSE; break;
-    case LL_INFO:    alp = ANDROID_LOG_INFO;    break;
-    case LL_WARN :   alp = ANDROID_LOG_WARN;    break;
-    case LL_ERROR:   alp = ANDROID_LOG_ERROR;   break;
-    case LL_FATAL:   alp = ANDROID_LOG_FATAL;   break;
-    default:         alp = ANDROID_LOG_FATAL;
+        writeLine(line, level);
+        return;
     }
-#endif
 
-    static const char *names[] = {"debug", "verbose  ", "info   ",
-                                  "warn   ", "error  ", "fatal  "};
-
-    // Using a va_list twice produces undefined results, ie crash.
-    // So make a copy if we're going to use it twice.
-    VALIST copy;
-    if (m_file_stdout)
+    // Now the data needs to be buffered. Add an entry to the buffer,
+    // and if necessary flush the buffers.
+    struct LineInfo li;
+    li.m_level = level;
+    li.m_line  = std::string(line);
+    m_line_buffer.lock();
+    m_line_buffer.getData().push_back(li);
+    if (m_line_buffer.getData().size() < m_buffer_size)
     {
-        va_copy(copy, args);
+        // Buffer not yet full, don't flush data.
+        m_line_buffer.unlock();
+        return;
     }
-#if defined(_MSC_FULL_VER) && defined(_DEBUG)
-    VALIST copy2;
-    va_copy(copy2, args);
-#endif
+    m_line_buffer.unlock();
+    // Because of the unlock above it can happen that another thread adds
+    // another line and calls flushBuffers() first before this thread can
+    // call it, but that doesn't really matter, when this thread will finally
+    // call flushBuffer() it will then just print nothing if another thread
+    // had been actively flushing it in between.
+    flushBuffers();
+}   // printMessage
+
+// ----------------------------------------------------------------------------
+/** Writes the specified line to the various output devices, e.g. terminal,
+ *  log file etc. If log messages are not redirected to a file, it tries to
+ *  select a terminal colour.
+ *  \param line The line to write.
+ *  \param level Message level. Only used to select terminal colour.
+ */
+void Log::writeLine(const char *line, int level)
+{
 
     // If we don't have a console file, write to stdout and hope for the best
-    if(!m_file_stdout || level >= LL_WARN ||
+    if (!m_file_stdout || level >= LL_WARN ||
         UserConfigParams::m_log_errors_to_console) // log to console & file
     {
-        VALIST out;
-        va_copy(out, args);
-
         setTerminalColor((LogLevel)level);
-        #ifdef ANDROID
-        __android_log_vprint(alp, "SuperTuxKart", format, out);
-        #else
-        printf("[%s] %s: ", names[level], component);
-        vprintf(format, out);
-        #endif
+#ifdef ANDROID
+        android_LogPriority alp;
+        switch (level)
+        {
+            // STK is using the levels slightly different from android
+            // (debug lowest, verbose above it; while android reverses
+            // this order. So to get the same behaviour (e.g. filter
+            // out debug message, but still get verbose, we swap
+            // the order here.
+        case LL_VERBOSE: alp = ANDROID_LOG_DEBUG;   break;
+        case LL_DEBUG:   alp = ANDROID_LOG_VERBOSE; break;
+        case LL_INFO:    alp = ANDROID_LOG_INFO;    break;
+        case LL_WARN:    alp = ANDROID_LOG_WARN;    break;
+        case LL_ERROR:   alp = ANDROID_LOG_ERROR;   break;
+        case LL_FATAL:   alp = ANDROID_LOG_FATAL;   break;
+        default:         alp = ANDROID_LOG_FATAL;
+        }
+        __android_log_print(alp, "SuperTuxKart", "%s", line);
+#else
+        printf(line);
+#endif
         resetTerminalColor();  // this prints a \n
-
-        va_end(out);
     }
 
 #if defined(_MSC_FULL_VER) && defined(_DEBUG)
-    static char szBuff[2048];
-    vsnprintf(szBuff, sizeof(szBuff), format, copy2);
-
-    OutputDebugString("[");
-    OutputDebugString(names[level]);
-    OutputDebugString("] ");
-    OutputDebugString(component);
-    OutputDebugString(": ");
-    OutputDebugString(szBuff);
-    OutputDebugString("\r\n");
+    OutputDebugString(line);
 #endif
 
-
-    if(m_file_stdout)
-    {
-        fprintf (m_file_stdout, "[%s] %s: ", names[level], component);
-        vfprintf(m_file_stdout, format, copy);
-        fprintf (m_file_stdout, "\n");
-        va_end(copy);
-    }
+    if (m_file_stdout) fprintf(m_file_stdout, "%s", line);
 
 #ifdef WIN32
     if (level >= LL_FATAL)
     {
-        std::string message;
-
-        char tmp[2048];
-        sprintf(tmp, "[%s] %s: ", names[level], component);
-        message += tmp;
-
-        VALIST out;
-        va_copy(out, args);
-        vsprintf(tmp, format, out);
-        message += tmp;
-        va_end(out);
-
-        MessageBoxA(NULL, message.c_str(), "SuperTuxKart - Fatal error", MB_OK);
+        MessageBoxA(NULL, line, "SuperTuxKart - Fatal error", MB_OK);
     }
 #endif
-}   // printMessage
+}   // _fluhBuffers
 
+// ----------------------------------------------------------------------------
+/** Flushes all stored log messages to the various output devices (thread safe).
+ */
+void Log::flushBuffers()
+{
+    m_line_buffer.lock();
+    for (unsigned int i = 0; i < m_line_buffer.getData().size(); i++)
+    {
+        const LineInfo &li = m_line_buffer.getData()[i];
+        writeLine(li.m_line.c_str(), li.m_level);
+    }
+    m_line_buffer.getData().clear();
+    m_line_buffer.unlock();
+}   // flushBuffers
 
 // ----------------------------------------------------------------------------
 /** This function opens the files that will contain the output.

@@ -182,6 +182,7 @@ namespace scene
 		virtual s32 getAnimationSet() const = 0;
 		virtual void addAnimationSet(u32 start, u32 end) = 0;
 		virtual void useAnimationSet(u32 set_num) = 0;
+		virtual void removeAllAnimationSet() = 0;
 	};
 
 } // end namespace scene

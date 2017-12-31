@@ -187,13 +187,18 @@ class TrackObjectPresentationLibraryNode : public TrackObjectPresentationSceneNo
     TrackObject* m_parent;
     using TrackObjectPresentationSceneNode::move;
     std::string m_name;
-    bool m_start_executed;
+    bool m_start_executed, m_reset_executed;
 public:
     TrackObjectPresentationLibraryNode(TrackObject* parent,
         const XMLNode& xml_node,
         ModelDefinitionLoader& model_def_loader);
     virtual ~TrackObjectPresentationLibraryNode();
-    virtual void update(float dt);
+    virtual void update(float dt) OVERRIDE;
+    virtual void reset() OVERRIDE
+    {
+        m_reset_executed = false;
+        TrackObjectPresentationSceneNode::reset();
+    }
     void move(const core::vector3df& xyz, const core::vector3df& hpr,
         const core::vector3df& scale, bool isAbsoluteCoord, bool moveChildrenPhysicalBodies);
 };   // TrackObjectPresentationLibraryNode
