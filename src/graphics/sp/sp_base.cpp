@@ -1368,15 +1368,18 @@ void addObject(SPMeshNode* node)
 // ----------------------------------------------------------------------------
 void handleDynamicDrawCall()
 {
-    if (!sp_culling)
-    {
-        return;
-    }
+#ifndef SERVER_ONLY
     for (unsigned dc_num = 0; dc_num < g_dy_dc.size(); dc_num++)
     {
         SPDynamicDrawCall* dydc = g_dy_dc[dc_num].get();
+        if (!dydc->isRemoving())
+        {
+            // They need to be updated independent of culling result
+            // otherwise some data will be missed if offset update is used
+            g_instances.insert(dydc);
+        }
         if (!dydc->isVisible() || dydc->notReadyFromDrawing() ||
-            dydc->isRemoving())
+            dydc->isRemoving() || !sp_culling)
         {
             continue;
         }
@@ -1494,9 +1497,9 @@ void handleDynamicDrawCall()
                     }
                 }
             }
-            g_instances.insert(dydc);
         }
     }
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -1641,21 +1644,16 @@ void uploadAll()
         g_stk_sbr->getShadowMatrices()->getMatricesData());
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+    for (SPMeshBuffer* spmb : g_instances)
+    {
+        spmb->uploadInstanceData();
+    }
+
     g_dy_dc.erase(std::remove_if(g_dy_dc.begin(), g_dy_dc.end(),
         [] (std::shared_ptr<SPDynamicDrawCall> dc)
         {
             return dc->isRemoving();
         }), g_dy_dc.end());
-
-    if (!sp_culling)
-    {
-        return;
-    }
-
-    for (SPMeshBuffer* spmb : g_instances)
-    {
-        spmb->uploadInstanceData();
-    }
 
 #endif
 }
