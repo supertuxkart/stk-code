@@ -110,7 +110,7 @@ void RubberBand::updatePosition()
     v[3].m_position.X = k.getX()+hh; v[3].m_position.Y=k.getY(); v[3].m_position.Z = k.getZ()+hh;
     core::vector3df normal = (v[1].m_position - v[0].m_position)
         .crossProduct(v[2].m_position - v[0].m_position);
-    core::vector3df kart_pos = Vec3(m_owner->getTrans()(Vec3(0, 0, -1))).toIrrVector();
+    core::vector3df kart_pos = Vec3(m_owner->getTrans()(Vec3(0, 5.0f, -2.0f))).toIrrVector();
     float dot_product = (v[0].m_position - kart_pos).dotProduct(normal);
     // For avoiding cull face
     if (dot_product >= 0.0f)
