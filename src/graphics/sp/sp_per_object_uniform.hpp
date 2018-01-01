@@ -60,6 +60,8 @@ public:
     }
     // ------------------------------------------------------------------------
     bool assignUniform(const std::string& name, SPUniformAssigner* ua) const;
+    // ------------------------------------------------------------------------
+    bool isEmpty() const                     { return m_all_uniforms.empty(); }
 
 };
 

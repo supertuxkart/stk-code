@@ -218,7 +218,7 @@ void SPShader::setUniformsPerObject(SPPerObjectUniform* sppou,
                                     RenderPass rp)
 {
 #ifndef SERVER_ONLY
-    if (sppou == NULL)
+    if (sppou->isEmpty())
     {
         return;
     }

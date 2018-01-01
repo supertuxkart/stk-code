@@ -21,6 +21,7 @@
 #include "graphics/gl_headers.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_instanced_data.hpp"
+#include "graphics/sp/sp_per_object_uniform.hpp"
 #include "utils/types.hpp"
 
 #include <IMeshBuffer.h>
@@ -42,7 +43,7 @@ namespace SP
 {
 class SPTexture;
 
-class SPMeshBuffer : public IMeshBuffer
+class SPMeshBuffer : public IMeshBuffer, public SPPerObjectUniform
 {
 protected:
     std::vector<std::tuple<size_t/*first_index_id*/,

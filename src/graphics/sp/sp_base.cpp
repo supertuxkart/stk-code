@@ -1743,7 +1743,7 @@ void draw(RenderPass rp, DrawCallType dct)
             for (unsigned k = 0; k < p.second[j].second.size(); k++)
             {
                 static std::vector<SPUniformAssigner*> draw_call_uniforms;
-                p.first->setUniformsPerObject(dynamic_cast<SPPerObjectUniform*>
+                p.first->setUniformsPerObject(static_cast<SPPerObjectUniform*>
                     (p.second[j].second[k].first), &draw_call_uniforms, rp);
                 p.second[j].second[k].first->draw(dct,
                     p.second[j].second[k].second/*material_id*/,

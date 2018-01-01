@@ -19,7 +19,6 @@
 #define HEADER_SP_DYNAMIC_DRAW_CALL_HPP
 
 #include "graphics/sp/sp_mesh_buffer.hpp"
-#include "graphics/sp/sp_per_object_uniform.hpp"
 
 #include <IMeshBuffer.h>
 
@@ -40,7 +39,7 @@ namespace SP
 class SPShader;
 
 
-class SPDynamicDrawCall : public SPMeshBuffer, public SPPerObjectUniform
+class SPDynamicDrawCall : public SPMeshBuffer
 {
 private:
     core::matrix4 m_trans;
@@ -128,7 +127,11 @@ public:
     std::vector<video::S3DVertexSkinnedMesh>& getVerticesVector()
                                                          { return m_vertices; }
     // ------------------------------------------------------------------------
-    core::vector2df& getTextureTrans()              { return m_texture_trans; }
+    core::vector2df& getTextureTrans()
+    {
+        m_update_trans = true;
+        return m_texture_trans;
+    }
     // ------------------------------------------------------------------------
     void setUpdateOffset(int offset)              { m_update_offset = offset; }
     // ------------------------------------------------------------------------
