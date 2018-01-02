@@ -1685,6 +1685,22 @@ void drawNormal()
             }
         }
     }
+    for (unsigned i = 0; i < g_final_draw_calls[5].size(); i++)
+    {
+        auto& p = g_final_draw_calls[5][i];
+        for (unsigned j = 0; j < p.second.size(); j++)
+        {
+            for (unsigned k = 0; k < p.second[j].second.size(); k++)
+            {
+                // Make sure tangents and joints are not drawn undefined
+                glVertexAttrib4f(5, 0.0f, 0.0f, 0.0f, 0.0f);
+                glVertexAttribI4i(6, 0, 0, 0, 0);
+                glVertexAttrib4f(7, 0.0f, 0.0f, 0.0f, 0.0f);
+                p.second[j].second[k].first->draw(DCT_TRANSPARENT,
+                    -1/*material_id*/);
+            }
+        }
+    }
     nv->unuse();
 #endif
 }

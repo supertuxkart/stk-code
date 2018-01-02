@@ -21,6 +21,7 @@
 #include "graphics/sp/sp_mesh_buffer.hpp"
 
 #include <IMeshBuffer.h>
+#include <ISceneNode.h>
 
 #include <array>
 #include <cassert>
@@ -30,14 +31,12 @@
 #include <vector>
 
 using namespace irr;
-using namespace scene;
 
 class Material;
 
 namespace SP
 {
 class SPShader;
-
 
 class SPDynamicDrawCall : public SPMeshBuffer
 {
@@ -46,13 +45,15 @@ private:
 
     SPShader* m_shader;
 
+    scene::ISceneNode* m_parent = NULL;
+
     core::vector2df m_texture_trans;
 
     scene::E_PRIMITIVE_TYPE m_primitive_type;
 
     unsigned m_gl_vbo_size = 4;
 
-    int m_update_offset = -1;
+    int m_update_offset = 0;
 
     bool m_visible = true;
 
@@ -85,10 +86,10 @@ public:
     {
 #ifndef SERVER_ONLY
         if (m_texture_trans.X != 0.0f || m_texture_trans.Y != 0.0f ||
-            m_update_trans)
+            m_update_trans || m_parent != NULL)
         {
             m_update_trans = false;
-            SPInstancedData id = SPInstancedData(m_trans,
+            SPInstancedData id = SPInstancedData(getAbsoluteTransformation(),
                 m_texture_trans.X, m_texture_trans.Y, 0.0f, 0);
             glBindBuffer(GL_ARRAY_BUFFER, m_ibo);
             glBufferSubData(GL_ARRAY_BUFFER, 0, 32, &id);
@@ -139,7 +140,15 @@ public:
     // ------------------------------------------------------------------------
     void setVisible(bool val)                              { m_visible = val; }
     // ------------------------------------------------------------------------
-    const core::matrix4& getAbsoluteTransformation() const  { return m_trans; }
+    core::matrix4 getAbsoluteTransformation() const
+    {
+        core::matrix4 trans = m_trans;
+        if (m_parent != NULL)
+        {
+            trans = m_parent->getAbsoluteTransformation() * trans;
+        }
+        return trans;
+    }
     // ------------------------------------------------------------------------
     void removeFromSP()                                  { m_removing = true; }
     // ------------------------------------------------------------------------
@@ -147,7 +156,7 @@ public:
     // ------------------------------------------------------------------------
     bool notReadyFromDrawing() const          { return m_vertices.size() < 3; }
     // ------------------------------------------------------------------------
-    void setAbsoluteTransformation(core::matrix4& mat)
+    void setTransformation(const core::matrix4& mat)
     {
         m_trans = mat;
         m_update_trans = true;
@@ -176,6 +185,8 @@ public:
         m_trans.setScale(scale);
         m_update_trans = true;
     }
+    // ------------------------------------------------------------------------
+    void setParent(scene::ISceneNode* parent)            { m_parent = parent; }
 
 };
 
