@@ -1196,6 +1196,11 @@ void Kart::eliminate()
 
     m_eliminated = true;
 
+    if (m_shadow)
+    {
+        m_shadow->update(false);
+    }
+
     m_node->setVisible(false);
 }   // eliminate
 
