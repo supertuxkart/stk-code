@@ -108,6 +108,10 @@ void RubberBand::updatePosition()
     v[1].m_position.X = p.getX()+hh; v[1].m_position.Y=p.getY(); v[1].m_position.Z = p.getZ()+hh;
     v[2].m_position.X = k.getX()-hh; v[2].m_position.Y=k.getY(); v[2].m_position.Z = k.getZ()-hh;
     v[3].m_position.X = k.getX()+hh; v[3].m_position.Y=k.getY(); v[3].m_position.Z = k.getZ()+hh;
+    v[0].m_normal = 0x1FF << 10;
+    v[1].m_normal = 0x1FF << 10;
+    v[2].m_normal = 0x1FF << 10;
+    v[3].m_normal = 0x1FF << 10;
     core::vector3df normal = (v[1].m_position - v[0].m_position)
         .crossProduct(v[2].m_position - v[0].m_position);
     core::vector3df kart_pos = Vec3(m_owner->getTrans()(Vec3(0, 5.0f, -2.0f))).toIrrVector();
