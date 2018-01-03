@@ -19,60 +19,31 @@
 #ifndef SERVER_ONLY
 
 #include "graphics/show_curve.hpp"
-
-#include "graphics/irr_driver.hpp"
-#include "graphics/stk_tex_manager.hpp"
+#include "graphics/material_manager.hpp"
+#include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_dynamic_draw_call.hpp"
+#include "utils/mini_glm.hpp"
 #include "utils/vec3.hpp"
 
-#include <IMeshSceneNode.h>
-#include <IMesh.h>
-
-
-/** ShowCurve constructor. It just creates an empty scene node.
+/** ShowCurve constructor. It just creates an empty dynamic draw call.
  */
 ShowCurve::ShowCurve(float width, float height,
                      const irr::video::SColor &color)
-         : m_width(width), m_height(height)
+         : m_width(width), m_height(height), m_color(color),
+           m_first_vertices(true), m_visible(true)
 {
-    m_color = color;
-    addEmptyMesh();
-    m_scene_node      = irr_driver->addMesh(m_mesh, "showcurve");
-    // After addMesh ref count is 1 (for the attachment to the
-    // scene). We keep a copy here, so increase the ref count.
-    m_scene_node->grab();
-#ifdef DEBUG
-    std::string debug_name = " (show-curve)";
-    m_scene_node->setName(debug_name.c_str());
-#endif
-
+    m_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
+        (irr::scene::EPT_TRIANGLES, SP::getSPShader("alphablend"),
+        material_manager->getSPMaterial("alphablend"));
+    SP::addDynamicDrawCall(m_dy_dc);
 }   // ShowCurve
 
 // ----------------------------------------------------------------------------
 /** The destructor removes this scene node and frees the mesh. */
 ShowCurve::~ShowCurve()
 {
-    m_mesh->drop();
-    m_scene_node->drop();
-    irr_driver->removeNode(m_scene_node);
+    m_dy_dc->removeFromSP();
 }   // ShowCurve
-
-// ----------------------------------------------------------------------------
-void ShowCurve::addEmptyMesh()
-{
-    video::SMaterial m;
-    m.AmbientColor    = m_color;
-    m.DiffuseColor    = m_color;
-    m.EmissiveColor   = m_color;
-    m.BackfaceCulling = false;
-    m_mesh            = irr_driver->createQuadMesh(&m,
-                                                   /*create_one_quad*/ false);
-    m_buffer          = m_mesh->getMeshBuffer(0);
-    m_buffer->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(128, 255, 105, 180)));
-    m_buffer->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-    m_buffer->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-
-    assert(m_buffer->getVertexType()==video::EVT_STANDARD);
-}   // addEmptyMesh
 
 // ----------------------------------------------------------------------------
 /** Adds a point to the curve ('tunnel'). This adds 4 vertices, and it creates
@@ -81,75 +52,65 @@ void ShowCurve::addEmptyMesh()
  */
 void ShowCurve::addPoint(const Vec3 &pnt)
 {
-    // Check (again) that buffer is indeed the right type, otherwise the
-    // cast to vertices would be incorrect.
-    assert(m_buffer->getVertexType()==video::EVT_STANDARD);
-    video::S3DVertex vertices[4];
-
+    if (!m_first_vertices)
+    {
+        m_previous_vertices = m_current_vertices;
+    }
     // 1. Append the four new vertices
     // -------------------------------
     const float w2 = 0.5f*m_width, h2 = 0.5f*m_height;
-    vertices[0].Pos = Vec3(pnt + Vec3(-w2, -h2, 0)).toIrrVector();
-    vertices[1].Pos = Vec3(pnt + Vec3( w2, -h2, 0)).toIrrVector();
-    vertices[2].Pos = Vec3(pnt + Vec3( w2,  h2, 0)).toIrrVector();
-    vertices[3].Pos = Vec3(pnt + Vec3(-w2,  h2, 0)).toIrrVector();
-    vertices[0].Normal = core::vector3df(-w2, -h2, 0).normalize();
-    vertices[1].Normal = core::vector3df( w2, -h2, 0).normalize();
-    vertices[2].Normal = core::vector3df( w2,  h2, 0).normalize();
-    vertices[3].Normal = core::vector3df(-w2,  h2, 0).normalize();
+    m_current_vertices[0].m_position = Vec3(pnt + Vec3(-w2, -h2, 0)).toIrrVector();
+    m_current_vertices[1].m_position = Vec3(pnt + Vec3( w2, -h2, 0)).toIrrVector();
+    m_current_vertices[2].m_position = Vec3(pnt + Vec3( w2,  h2, 0)).toIrrVector();
+    m_current_vertices[3].m_position = Vec3(pnt + Vec3(-w2,  h2, 0)).toIrrVector();
+    m_current_vertices[0].m_normal =
+        MiniGLM::compressVector3(core::vector3df(-w2, -h2, 0).normalize());
+    m_current_vertices[1].m_normal =
+        MiniGLM::compressVector3(core::vector3df( w2, -h2, 0).normalize());
+    m_current_vertices[2].m_normal =
+        MiniGLM::compressVector3(core::vector3df( w2,  h2, 0).normalize());
+    m_current_vertices[3].m_normal =
+        MiniGLM::compressVector3(core::vector3df(-w2,  h2, 0).normalize());
+    m_current_vertices[0].m_color = m_color;
+    m_current_vertices[1].m_color = m_color;
+    m_current_vertices[2].m_color = m_color;
+    m_current_vertices[3].m_color = m_color;
 
     // 2. Handle the first point, which does not define any triangles.
     // ----------------------------------------------------------------
 
     // The first point does not create any triangles.
-    unsigned int n = m_buffer->getVertexCount();
-    if(n==0)
+    if (m_first_vertices)
     {
-        m_buffer->append(vertices, 4, NULL, 0);
-        m_mesh->setDirty();
+        m_first_vertices = false;
         return;
     }
 
-    // 3. Connect to previous indices
+    // 3. Connect to previous vertices
     // ------------------------------
-    // Appending the vertices to an existing mesh buffer is complicated by the
-    // fact that irrlicht adjust the indices by the number of current vertices
-    // (which means that the data added can not use any previous vertex).
-    // So we first add empty indices (so that irrlicht reallocates the
-    // index data), then we set the actual index data.
-
-    // Create space for the indices: we need 2 triangles for each of the
-    // 4 sides of the 'tunnel', so all in all 24 indices.
-    irr::u16 *indices = new irr::u16[24];
-    m_buffer->append(vertices, 4, indices, 24);
-    delete[] indices;
-    indices = m_buffer->getIndices();
-
-    // index = first newly added index
-    unsigned int index = m_buffer->getIndexCount()-24;
-    for(unsigned int i=0; i<4; i++)
+    // Create space for the vertices: we need 2 triangles for each of the
+    // 4 sides of the 'tunnel', so all in all 24 vertices.
+    for (unsigned int i = 0; i < 4; i++)
     {
-        indices[index  ] = n-4 + i;
-        indices[index+1] = n   + i;
-        indices[index+2] = n   + (i+1)%4;
-        indices[index+3] = n-4 + i;
-        indices[index+4] = n   + (i+1)%4;
-        indices[index+5] = n-4 + (i+1)%4;
-        index += 6;
+        m_dy_dc->addSPMVertex(m_previous_vertices[i]);
+        m_dy_dc->addSPMVertex(m_current_vertices[i]);
+        m_dy_dc->addSPMVertex(m_current_vertices[(i + 1) % 4]);
+        m_dy_dc->addSPMVertex(m_previous_vertices[i]);
+        m_dy_dc->addSPMVertex(m_current_vertices[(i + 1) % 4]);
+        m_dy_dc->addSPMVertex(m_previous_vertices[(i + 1) % 4]);
     }
-    m_buffer->recalculateBoundingBox();
-    m_mesh->setBoundingBox(m_buffer->getBoundingBox());
-    m_mesh->setDirty();
+    // addPoint can be called more than once per frame, so reload it from the
+    // beginning every time
+    m_dy_dc->setUpdateOffset(0);
+    m_dy_dc->recalculateBoundingBox();
 }   // addPoint
 
 // ----------------------------------------------------------------------------
 void ShowCurve::clear()
 {
-    //m_scene_node->setMesh(NULL);
-    //m_mesh->drop();
-    //addEmptyMesh();
-    //m_scene_node->setMesh(m_mesh);
-    //m_mesh->setDirty();
+    m_first_vertices = true;
+    m_dy_dc->setUpdateOffset(-1);
+    m_dy_dc->getVerticesVector().clear();
 }   // clear
 
 // ----------------------------------------------------------------------------
@@ -176,8 +137,7 @@ void ShowCurve::makeCircle(const Vec3 &center, float radius)
  */
 void ShowCurve::setHeading(float heading)
 {
-    core::vector3df rotation(0, heading*180.0f/3.1415f, 0);
-    m_scene_node->setRotation(rotation);
+    m_dy_dc->setRotationRadians(core::vector3df(0, heading, 0));
 }   // setHeading
 
 // ----------------------------------------------------------------------------
@@ -185,13 +145,14 @@ void ShowCurve::setHeading(float heading)
  */
 void ShowCurve::setVisible(bool isVisible)
 {
-    m_scene_node->setVisible(isVisible);
+    m_visible = isVisible;
+    m_dy_dc->setVisible(m_visible);
 }   // setVisible
 
 // ----------------------------------------------------------------------------
 bool ShowCurve::isVisible() const
 {
-    return m_scene_node->isVisible();
+    return m_visible;
 }   // isVisible
 
 // ----------------------------------------------------------------------------
@@ -199,7 +160,7 @@ bool ShowCurve::isVisible() const
  */
 void ShowCurve::setPosition(const Vec3 &xyz)
 {
-    m_scene_node->setPosition(xyz.toIrrVector());
+    m_dy_dc->setPosition(xyz.toIrrVector());
 }   // setPosition
 // ----------------------------------------------------------------------------
 
