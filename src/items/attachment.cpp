@@ -498,7 +498,7 @@ void Attachment::update(float dt)
     bool is_shield = (m_type == ATTACH_BUBBLEGUM_SHIELD|| m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD);
     float m_wanted_node_scale = is_shield ? std::max(1.0f, m_kart->getHighestPoint()*1.1f) : 1.0f;
     int slow_flashes = 3;
-    if (is_shield & m_time_left < slow_flashes)
+    if (is_shield && m_time_left < slow_flashes)
     {
         int flashes_per_second = 4;
         int divisor = 2;
