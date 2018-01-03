@@ -816,18 +816,6 @@ void Track::createPhysicsModel(unsigned int main_track_count)
             {
                 verts[i].Color = color;
             }
-
-            // Color
-#ifndef SERVER_ONLY
-            mb->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 255, 105, 180)));
-#endif
-            irr_driver->grabAllTextures(mesh);
-            // Gloss
-#ifndef SERVER_ONLY
-            mb->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-            // Colorization mask
-            mb->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-#endif
         }
         else
             irr_driver->removeNode(m_static_physics_only_nodes[i]);

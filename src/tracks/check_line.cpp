@@ -20,7 +20,9 @@
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/stk_tex_manager.hpp"
+#include "graphics/material_manager.hpp"
+#include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
@@ -74,56 +76,38 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
     if(UserConfigParams::m_check_debug)
     {
 #ifndef SERVER_ONLY
-        video::SMaterial material;
-        material.setFlag(video::EMF_BACK_FACE_CULLING, false);
-        material.setFlag(video::EMF_LIGHTING, false);
-        material.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
-        scene::IMesh *mesh = irr_driver->createQuadMesh(&material,
-                                                        /*create mesh*/true);
-        scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
-
-        assert(buffer->getVertexType()==video::EVT_STANDARD);
-        irr::video::S3DVertex* vertices
-            = (video::S3DVertex*)buffer->getVertices();
-        vertices[0].Pos = core::vector3df(p1.X,
-                                          m_min_height-m_under_min_height,
-                                          p1.Y);
-        vertices[1].Pos = core::vector3df(p2.X,
-                                          m_min_height-m_under_min_height,
-                                          p2.Y);
-        vertices[2].Pos = core::vector3df(p2.X,
-                                          m_min_height+m_over_min_height,
-                                          p2.Y);
-        vertices[3].Pos = core::vector3df(p1.X,
-                                          m_min_height+m_over_min_height,
-                                          p1.Y);
-        for(unsigned int i=0; i<4; i++)
+        m_debug_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
+            (scene::EPT_TRIANGLE_STRIP, SP::getSPShader("additive"),
+            material_manager->getSPMaterial("additive"));
+        SP::addDynamicDrawCall(m_debug_dy_dc);
+        m_debug_dy_dc->getVerticesVector().resize(4);
+        auto& vertices = m_debug_dy_dc->getVerticesVector();
+        vertices[0].m_position = core::vector3df(p1.X,
+            m_min_height - m_under_min_height, p1.Y);
+        vertices[1].m_position = core::vector3df(p2.X,
+            m_min_height - m_under_min_height, p2.Y);
+        vertices[2].m_position = core::vector3df(p1.X,
+            m_min_height + m_over_min_height, p1.Y);
+        vertices[3].m_position = core::vector3df(p2.X,
+            m_min_height + m_over_min_height, p2.Y);
+        for(unsigned int i = 0; i < 4; i++)
         {
-            vertices[i].Color = m_active_at_reset
-                              ? video::SColor(128, 255, 0, 0)
-                              : video::SColor(128, 128, 128, 128);
+            vertices[i].m_color = m_active_at_reset
+                               ? video::SColor(128, 255, 0, 0)
+                               : video::SColor(128, 128, 128, 128);
         }
-        buffer->recalculateBoundingBox();
-        buffer->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(128, 255, 105, 180)));
-        buffer->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-        buffer->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-        buffer->getMaterial().BackfaceCulling = false;
-        //mesh->setBoundingBox(buffer->getBoundingBox());
-        m_debug_node = irr_driver->addMesh(mesh, "checkdebug");
-        mesh->drop();
+        m_debug_dy_dc->recalculateBoundingBox();
 #endif
-    }
-    else
-    {
-        m_debug_node = NULL;
     }
 }   // CheckLine
 
 // ----------------------------------------------------------------------------
 CheckLine::~CheckLine()
 {
-    if(m_debug_node)
-        irr_driver->removeNode(m_debug_node);
+    if (m_debug_dy_dc)
+    {
+        m_debug_dy_dc->removeFromSP();
+    }
 
 }   // CheckLine
 // ----------------------------------------------------------------------------
@@ -149,22 +133,14 @@ void CheckLine::resetAfterKartMove(unsigned int kart_index)
 // ----------------------------------------------------------------------------
 void CheckLine::changeDebugColor(bool is_active)
 {
-    assert(m_debug_node);
-
-    /*scene::IMesh *mesh         = m_debug_node->getMesh();
-    scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
-    irr::video::S3DVertex* vertices
-                               = (video::S3DVertex*)buffer->getVertices();
+    assert(m_debug_dy_dc);
     video::SColor color = is_active ? video::SColor(192, 255, 0, 0)
                                     : video::SColor(192, 128, 128, 128);
-    for(unsigned int i=0; i<4; i++)
+    for(unsigned int i = 0; i < 4; i++)
     {
-        vertices[i].Color = color;
+        m_debug_dy_dc->getVerticesVector()[i].m_color = color;
     }
-#ifndef SERVER_ONLY
-    buffer->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(color));
-#endif
-*/
+    m_debug_dy_dc->setUpdateOffset(0);
 }   // changeDebugColor
 
 // ----------------------------------------------------------------------------

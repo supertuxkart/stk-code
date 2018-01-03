@@ -29,6 +29,11 @@ class Ipo;
 class ShowCurve;
 class XMLNode;
 
+namespace SP
+{
+    class SPDynamicDrawCall;
+}
+
 /**
  *  \brief Implements a simple checkline that will cause a kart to be
  *         shot to a specified point.
@@ -48,10 +53,10 @@ private:
 #ifdef DEBUG
     /** If track debugging is enabled, this will show the the curve of
      *  the cannon in the race. */
-    ShowCurve * m_show_curve;
+    ShowCurve* m_show_curve;
 
     /** Used to display debug information about checklines. */
-    scene::ISceneNode *m_debug_target_node;
+    std::shared_ptr<SP::SPDynamicDrawCall> m_debug_target_dy_dc;
 #endif
     std::vector<Flyable*> m_all_flyables;
     std::vector<Vec3>     m_flyable_previous_position;
