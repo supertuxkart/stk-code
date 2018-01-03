@@ -234,7 +234,7 @@ public:
                                        float wave_height,
                                        float wave_speed, float wave_length);
     scene::IMeshSceneNode*addOctTree(scene::IMesh *mesh);
-    scene::IMeshSceneNode*addSphere(float radius,
+    scene::ISceneNode* addSphere(float radius,
                  const video::SColor &color=video::SColor(128, 255, 255, 255));
     scene::ISceneNode* addMesh(scene::IMesh *mesh,
                                const std::string& debug_name,

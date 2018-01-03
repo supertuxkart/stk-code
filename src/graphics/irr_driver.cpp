@@ -1108,8 +1108,8 @@ scene::IMeshSceneNode *IrrDriver::addOctTree(scene::IMesh *mesh)
  *  \param radius The radius of the sphere.
  *  \param color The color to use (default (0,0,0,0)
  */
-scene::IMeshSceneNode *IrrDriver::addSphere(float radius,
-                                            const video::SColor &color)
+scene::ISceneNode *IrrDriver::addSphere(float radius,
+                                        const video::SColor &color)
 {
     scene::IMesh *mesh = m_scene_manager->getGeometryCreator()
                        ->createSphereMesh(radius);
@@ -1122,22 +1122,21 @@ scene::IMeshSceneNode *IrrDriver::addSphere(float radius,
     m.BackfaceCulling = false;
     m.MaterialType    = video::EMT_SOLID;
 #ifndef SERVER_ONLY
-    //m.setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(128, 255, 105, 180)));
-    m.setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(color));
-    m.setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-    m.setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-
     if (CVS->isGLSL())
     {
-        STKMeshSceneNode *node =
-            new STKMeshSceneNode(mesh,
-                                m_scene_manager->getRootSceneNode(),
-                                NULL, -1, "sphere");
-        return node;
+        SP::SPMesh* spm = SP::convertEVTStandard(mesh, &color);
+        SP::SPMeshNode* spmn = new SP::SPMeshNode(spm,
+            m_scene_manager->getRootSceneNode(), m_scene_manager, -1,
+            "sphere");
+        spmn->setMesh(spm);
+        spm->drop();
+        spmn->drop();
+        return spmn;
     }
 #endif
 
     scene::IMeshSceneNode *node = m_scene_manager->addMeshSceneNode(mesh);
+    mesh->drop();
     return node;
 }   // addSphere
 

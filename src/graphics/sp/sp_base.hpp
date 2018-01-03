@@ -34,15 +34,15 @@
 
 namespace irr
 {
-    namespace scene { class ICameraSceneNode; }
-    namespace video { class ITexture; }
+    namespace scene { class ICameraSceneNode; class IMesh; }
+    namespace video { class SColor; }
 }
-
 
 class ShaderBasedRenderer;
 
 namespace SP
 {
+class SPMesh;
 
 enum DrawCallType: unsigned int
 {
@@ -134,6 +134,9 @@ void uploadAll();
 void resetEmptyFogColor();
 // ----------------------------------------------------------------------------
 void drawBoundingBoxes();
+// ----------------------------------------------------------------------------
+SPMesh* convertEVTStandard(irr::scene::IMesh* mesh,
+                           const irr::video::SColor* color = NULL);
 // ----------------------------------------------------------------------------
 inline uint8_t srgbToLinear(float color_srgb)
 {

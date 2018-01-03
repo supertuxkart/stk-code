@@ -806,7 +806,6 @@ void ShaderBasedRenderer::render(float dt)
         if (CVS->isDefferedEnabled())
         {
             renderSceneDeferred(camnode, dt, track->hasShadows(), false); 
-    
         }
         else
         {
@@ -820,19 +819,19 @@ void ShaderBasedRenderer::render(float dt)
             SP::drawBoundingBoxes();
             m_draw_calls.renderBoundingBoxes();
         }
-        
+
         debugPhysics();
         
         if (CVS->isDefferedEnabled())
         {
             renderPostProcessing(camera);
         }
-        
+
         // Save projection-view matrix for the next frame
         camera->setPreviousPVMatrix(irr_driver->getProjViewMatrix());
 
         PROFILER_POP_CPU_MARKER();
-        
+
     }  // for i<world->getNumKarts()
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

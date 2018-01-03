@@ -87,7 +87,7 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
             m_debug_dc->getVerticesVector().data();
         video::SColor red(128, 255, 0, 0);
         unsigned idx[] = { 0, 3, 1, 2 };
-        for (unsigned i; i < 4; i++)
+        for (unsigned i = 0; i < 4; i++)
         {
             v[i].m_position = p[idx[i]].toIrrVector();
             v[i].m_normal = 0x1FF << 10;

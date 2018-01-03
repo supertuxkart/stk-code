@@ -21,7 +21,7 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/frame_buffer.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/shader_based_renderer.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/shader_based_renderer.hpp"
@@ -1798,7 +1798,6 @@ void drawBoundingBoxes()
         unsigned count = std::min((unsigned)g_bounding_boxes.size() - i,
             (unsigned)1024 * 6);
         glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(float), &tmp[i]);
-
         glDrawArrays(GL_LINES, 0, count / 3);
     }
 #endif
@@ -1809,5 +1808,39 @@ void addDynamicDrawCall(std::shared_ptr<SPDynamicDrawCall> dy_dc)
 {
     g_dy_dc.push_back(dy_dc);
 }   // addDynamicDrawCall
+// ----------------------------------------------------------------------------
+SPMesh* convertEVTStandard(irr::scene::IMesh* mesh,
+                           const irr::video::SColor* color)
+{
+    SPMesh* spm = new SPMesh();
+    Material* material = material_manager->getSPMaterial("solid");
+    for (unsigned i = 0; i < mesh->getMeshBufferCount(); i++)
+    {
+        std::vector<video::S3DVertexSkinnedMesh> vertices;
+        scene::IMeshBuffer* mb = mesh->getMeshBuffer(i);
+        assert(mb->getVertexType() == video::EVT_STANDARD);
+        video::S3DVertex* v_ptr = (video::S3DVertex*)mb->getVertices();
+        for (unsigned j = 0; j < mb->getVertexCount(); j++)
+        {
+            video::S3DVertexSkinnedMesh sp;
+            sp.m_position = v_ptr[j].Pos;
+            sp.m_normal = MiniGLM::compressVector3(v_ptr[j].Normal);
+            sp.m_color = color ? *color : v_ptr[j].Color;
+            sp.m_all_uvs[0] = MiniGLM::toFloat16(v_ptr[j].TCoords.X);
+            sp.m_all_uvs[1] = MiniGLM::toFloat16(v_ptr[j].TCoords.Y);
+            vertices.push_back(sp);
+        }
+        uint16_t* idx_ptr = mb->getIndices();
+        std::vector<uint16_t> indices(idx_ptr, idx_ptr + mb->getIndexCount());
+        SPMeshBuffer* buffer = new SPMeshBuffer();
+        buffer->setSPMVertices(vertices);
+        buffer->setIndices(indices);
+        buffer->setSTKMaterial(material);
+        spm->addSPMeshBuffer(buffer);
+    }
+    mesh->drop();
+    spm->updateBoundingBox();
+    return spm;
+}   // convertEVTStandard
 
 }
