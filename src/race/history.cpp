@@ -131,8 +131,18 @@ float History::updateReplayAndGetDT(float world_time, float dt)
     if (m_history_time >= world_time) return dt;
     World *world = World::getWorld();
 
-    do
+    // In non-networked history races, we need to do at least one timestep
+    // to get the right DT. The while loop is exited at the bottom in this
+    // case/
+    Log::verbose("history", "Begin %f %f %f %f current %d event %d",
+        m_history_time, world_time, dt, world_time + dt,
+        m_current, m_event_index);
+    while (m_history_time < world_time + dt     ||
+           !NetworkConfig::get()->isNetworking()   )
     {
+        Log::verbose("history", "Inner %f %f %f %f current %d event %d",
+            m_history_time, world_time,dt, world_time + dt,
+            m_current, m_event_index);
         m_current++;
         if (m_current >= (int)m_all_deltas.size())
         {
@@ -169,6 +179,8 @@ float History::updateReplayAndGetDT(float world_time, float dt)
                 {
                     const InputEvent &ie = m_all_input_events[m_event_index];
                     AbstractKart *kart = world->getKart(ie.m_kart_index);
+                    Log::verbose("history", "time %f action %d %d",
+                        world->getTime(), ie.m_action, ie.m_value);
                     kart->getController()->action(ie.m_action, ie.m_value);
                     m_event_index++;
                 }
@@ -184,7 +196,7 @@ float History::updateReplayAndGetDT(float world_time, float dt)
         if(!NetworkConfig::get()->isNetworking())
             return m_all_deltas[m_current];
 
-    } while (m_history_time < world_time + dt);
+    }
 
     // In network mode, don't adjust dt, just return the input value
     return dt;
