@@ -23,6 +23,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/lod_node.hpp"
 #include "graphics/render_info.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -346,7 +347,26 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
 
         KartModel* kart_model = kp->getKartModelCopy(KRT_DEFAULT);
         m_all_kart_models.push_back(kart_model);
-        scene::ISceneNode* kart_main_node = kart_model->attachModel(false, false);
+        scene::ISceneNode* kart_main_node = kart_model->attachModel(true, false);
+        LODNode* lnode = dynamic_cast<LODNode*>(kart_main_node);
+        if (lnode)
+        {
+            // Lod node has to be animated
+            auto* a_node = static_cast<scene::IAnimatedMeshSceneNode*>
+                (lnode->getAllNodes()[0]);
+            const unsigned start_frame =
+                kart_model->getFrame(KartModel::AF_WIN_LOOP_START) > -1 ?
+                kart_model->getFrame(KartModel::AF_WIN_LOOP_START) :
+                kart_model->getFrame(KartModel::AF_WIN_START) > -1 ?
+                kart_model->getFrame(KartModel::AF_WIN_START) :
+                kart_model->getFrame(KartModel::AF_STRAIGHT);
+            const unsigned end_frame =
+                kart_model->getFrame(KartModel::AF_WIN_END) > -1 ?
+                kart_model->getFrame(KartModel::AF_WIN_END) :
+                kart_model->getFrame(KartModel::AF_STRAIGHT);
+            a_node->setLoopMode(true);
+            a_node->setFrameLoop(start_frame, end_frame);
+        }
 
         m_kart_x[i] = KARTS_INITIAL_X[i];
         m_kart_y[i] = KARTS_INITIAL_Y[i];

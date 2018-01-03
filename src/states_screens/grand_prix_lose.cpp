@@ -23,6 +23,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/lod_node.hpp"
 #include "graphics/render_info.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -185,7 +186,26 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
         {
             KartModel* kart_model = kart->getKartModelCopy(KRT_DEFAULT);
             m_all_kart_models.push_back(kart_model);
-            scene::ISceneNode* kart_main_node = kart_model->attachModel(false, false);
+            scene::ISceneNode* kart_main_node = kart_model->attachModel(true, false);
+            LODNode* lnode = dynamic_cast<LODNode*>(kart_main_node);
+            if (lnode)
+            {
+                // Lod node has to be animated
+                auto* a_node = static_cast<scene::IAnimatedMeshSceneNode*>
+                    (lnode->getAllNodes()[0]);
+                const unsigned start_frame =
+                    kart_model->getFrame(KartModel::AF_LOSE_LOOP_START) > -1 ?
+                    kart_model->getFrame(KartModel::AF_LOSE_LOOP_START) :
+                    kart_model->getFrame(KartModel::AF_LOSE_START) > -1 ?
+                    kart_model->getFrame(KartModel::AF_LOSE_START) :
+                    kart_model->getFrame(KartModel::AF_STRAIGHT);
+                const unsigned end_frame =
+                    kart_model->getFrame(KartModel::AF_LOSE_END) > -1 ?
+                    kart_model->getFrame(KartModel::AF_LOSE_END) :
+                    kart_model->getFrame(KartModel::AF_STRAIGHT);
+                a_node->setLoopMode(true);
+                a_node->setFrameLoop(start_frame, end_frame);
+            }
 
             core::vector3df kart_pos(m_kart_x + n*DISTANCE_BETWEEN_KARTS,
                 m_kart_y,
