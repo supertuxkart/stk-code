@@ -1262,7 +1262,7 @@ void Kart::update(float dt)
     // is used furthermore for engine power, camera distance etc
     updateSpeed();
 
-    if(!history->replayHistory())
+    if(!history->replayHistory() || !history->dontDoPhysics())
         m_controller->update(dt);
 
 #undef DEBUG_CAMERA_SHAKE

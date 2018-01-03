@@ -211,7 +211,6 @@ void RewindManager::update(float dt)
     PROFILER_PUSH_CPU_MARKER("RewindManager - send state", 0x20, 0x7F, 0x40);
     GameProtocol::getInstance()->sendState();
     PROFILER_POP_CPU_MARKER();
-
     m_last_saved_state = time;
 }   // update
 
@@ -241,6 +240,7 @@ void RewindManager::playEventsTill(float time, float *dt)
         Log::setPrefix("");
         TimeStepInfo *tsi = m_rewind_queue.getCurrent();
         World::getWorld()->setTime(tsi->getTime());
+        Physics::getInstance()->getPhysicsWorld()->resetLocalTime();
     }
 
     // This is necessary to avoid that rewinding an event will store the 
@@ -275,6 +275,7 @@ void RewindManager::playEventsTill(float time, float *dt)
 void RewindManager::rewindTo(float rewind_time)
 {
     assert(!m_is_rewinding);
+    bool is_history = history->replayHistory();
     history->doReplayHistory(History::HISTORY_NONE);
 
     // First save all current transforms so that the error
@@ -316,6 +317,7 @@ void RewindManager::rewindTo(float rewind_time)
     if (World::getWorld()->getPhase() == WorldStatus::IN_GAME_MENU_PHASE)
     {
         m_is_rewinding = false;
+        history->doReplayHistory(History::HISTORY_PHYSICS);
         return;
     }
 
@@ -351,8 +353,8 @@ void RewindManager::rewindTo(float rewind_time)
     {
         (*rewinder)->computeError();
     }
-
-
+    if(is_history)
+        history->doReplayHistory(History::HISTORY_PHYSICS);
     m_is_rewinding = false;
 }   // rewindTo
 

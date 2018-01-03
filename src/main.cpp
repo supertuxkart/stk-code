@@ -1272,7 +1272,8 @@ int handleCmdLine()
         history->doReplayHistory( (History::HistoryReplayMode)n);
         // Force the no-start screen flag, since this initialises
         // the player structures correctly.
-        UserConfigParams::m_no_start_screen = true;
+        if(!MainMenuScreen::m_enable_online)
+            UserConfigParams::m_no_start_screen = true;
     }   // --history=%d
 
     if(CommandLine::has("--history"))  // handy default for --history=1
@@ -1780,13 +1781,17 @@ int main(int argc, char *argv[] )
         {
             // This will setup the race manager etc.
             history->Load();
-            race_manager->setupPlayerKartInfo();
-            race_manager->startNew(false);
-            main_loop->run();
-            // well, actually run() will never return, since
-            // it exits after replaying history (see history::GetNextDT()).
-            // So the next line is just to make this obvious here!
-            exit(-3);
+            if (!MainMenuScreen::m_enable_online)
+            {
+                race_manager->setupPlayerKartInfo();
+                race_manager->startNew(false);
+                main_loop->run();
+                // well, actually run() will never return, since
+                // it either loops or exits after replaying history (see
+                // history::updateReplayAndGetDT()).
+                // So the next line is just to make this obvious here!
+                exit(-3);
+            }   // if !online
         }
 
         // Not replaying

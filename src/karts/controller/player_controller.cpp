@@ -318,7 +318,7 @@ void PlayerController::update(float dt)
     // Don't do steering if it's replay. In position only replay it doesn't
     // matter, but if it's physics replay the gradual steering causes
     // incorrect results, since the stored values are already adjusted.
-    if (!history->replayHistory())
+    if (!history->replayHistory() || !history->dontDoPhysics())
         steer(dt, m_steer_val);
 
     if (World::getWorld()->getPhase() == World::GOAL_PHASE)

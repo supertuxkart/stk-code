@@ -149,6 +149,10 @@ bool LocalPlayerController::action(PlayerAction action, int value,
     // optimises traffic to the server and other clients.
     if (!PlayerController::action(action, value, /*dry_run*/true)) return false;
 
+    // Register event with history
+    if(!history->replayHistory())
+        history->addEvent(m_kart->getWorldKartId(), action, value);
+
     // If this is a client, send the action to networking layer
     if (World::getWorld()->isNetworkWorld() && 
         NetworkConfig::get()->isClient()    &&

@@ -64,13 +64,6 @@ MainLoop::~MainLoop()
 float MainLoop::getLimitedDt()
 {
     float dt = 0;
-    // If we are doing a replay, use the dt from the history file
-    if (World::getWorld() && history->replayHistory() )
-    {
-        dt = history->updateReplayAndGetDT();
-        return dt;
-    }
-
 
     // In profile mode without graphics, run with a fixed dt of 1/60
     if ((ProfileWorld::isProfileMode() && ProfileWorld::isNoGraphics()) ||
@@ -154,6 +147,14 @@ float MainLoop::getLimitedDt()
         !RewindManager::get()->isRewinding()   )
     {
         dt = World::getWorld()->adjustDT(dt);
+    }
+
+    // If we are doing a replay, use the dt from the history file if this
+    // is not networked, otherwise history will use current time and dt
+    // to findout which events to replay
+    if (World::getWorld() && history->replayHistory() )
+    {
+        dt = history->updateReplayAndGetDT(World::getWorld()->getTime(), dt);
     }
     return dt;
 }   // getLimitedDt
