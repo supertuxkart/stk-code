@@ -24,7 +24,6 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/stk_mesh.hpp"
 #include "utils/profiler.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/string_utils.hpp"

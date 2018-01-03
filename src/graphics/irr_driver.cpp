@@ -27,6 +27,7 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/light.hpp"
+#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/per_camera_node.hpp"
@@ -40,7 +41,6 @@
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_node.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
-#include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/stk_texture.hpp"
 #include "graphics/sun.hpp"
@@ -1186,9 +1186,8 @@ scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
     }
     else
     {
-        node = new STKMeshSceneNode(mesh, parent, m_scene_manager, -1,
-            debug_name, core::vector3df(0, 0, 0), core::vector3df(0, 0, 0),
-            core::vector3df(1.0f, 1.0f, 1.0f), true);
+        Log::warn("IrrDriver", "Use only spm in glsl");
+        return NULL;
     }
     node->drop();
 
