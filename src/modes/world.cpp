@@ -849,7 +849,9 @@ void World::updateWorld(float dt)
         getPhase() == IN_GAME_MENU_PHASE      )
         return;
 
-    if (!history->replayHistory())
+    if (!history->replayHistory()                 && 
+        ! (NetworkConfig::get()->isClient() &&
+           RewindManager::get()->isRewinding() )    )
     {
         history->updateSaving(dt);   // updating the saved state
     }
