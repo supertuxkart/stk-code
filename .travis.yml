@@ -21,9 +21,14 @@ env:
 
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-trusty-5.0
     packages:
     - build-essential
     - cmake
+    - g++-7
+    - clang-5.0
     - libbluetooth-dev
     - libcurl4-gnutls-dev
     - libfreetype6-dev
@@ -44,8 +49,12 @@ before_script:
   # Use half of the available threads, gcc is memory hungry
   - 'if [ ${CC} = "gcc" ]; then
         export THREADS=$((`nproc` / 2));
+        export CC=gcc-7;
+        export CXX=g++-7;
     else
         export THREADS=$((`nproc` + 1));
+        export CC=clang-5.0;
+        export CXX=clang++-5.0;
     fi'
   - echo "THREADS = $THREADS"
   - free -mt
