@@ -31,10 +31,12 @@
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
-#include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/stk_texture.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/weather.hpp"
+#include "graphics/sp/sp_dynamic_draw_call.hpp"
+#include "graphics/sp/sp_shader.hpp"
+#include "graphics/sp/sp_uniform_assigner.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
@@ -1316,12 +1318,17 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
     const SColor col = track->getGodRaysColor();
 
     // The sun interposer
-    STKMeshSceneNode *sun = irr_driver->getSunInterposer();
-    sun->setGlowColors(col);
-    sun->setPosition(track->getGodRaysPosition());
-    sun->updateAbsolutePosition();
-    irr_driver->setPhase(GLOW_PASS);
-    sun->render();
+    SP::SPDynamicDrawCall* sun = irr_driver->getSunInterposer();
+    // This will only do thing when you update the sun position
+    sun->uploadInstanceData();
+    SP::SPShader* glow_shader = SP::getGlowShader();
+    glow_shader->use();
+    SP::SPUniformAssigner* glow_color_assigner = glow_shader
+        ->getUniformAssigner("col");
+    assert(glow_color_assigner != NULL);
+    glow_color_assigner->setValue(video::SColorf(track->getGodRaysColor()));
+    sun->draw();
+    glow_shader->unuse();
     glDisable(GL_DEPTH_TEST);
 
     // Fade to quarter

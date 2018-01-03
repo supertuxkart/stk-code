@@ -1808,6 +1808,7 @@ void addDynamicDrawCall(std::shared_ptr<SPDynamicDrawCall> dy_dc)
 {
     g_dy_dc.push_back(dy_dc);
 }   // addDynamicDrawCall
+
 // ----------------------------------------------------------------------------
 SPMesh* convertEVTStandard(irr::scene::IMesh* mesh,
                            const irr::video::SColor* color)
@@ -1818,6 +1819,10 @@ SPMesh* convertEVTStandard(irr::scene::IMesh* mesh,
     {
         std::vector<video::S3DVertexSkinnedMesh> vertices;
         scene::IMeshBuffer* mb = mesh->getMeshBuffer(i);
+        if (!mb)
+        {
+            continue;
+        }
         assert(mb->getVertexType() == video::EVT_STANDARD);
         video::S3DVertex* v_ptr = (video::S3DVertex*)mb->getVertices();
         for (unsigned j = 0; j < mb->getVertexCount(); j++)

@@ -109,7 +109,7 @@ public:
     // ------------------------------------------------------------------------
     ~SPMeshBuffer();
     // ------------------------------------------------------------------------
-    virtual void draw(DrawCallType dct, int material_id = -1,
+    virtual void draw(DrawCallType dct = DCT_NORMAL, int material_id = -1,
                       bool bindless_texture = false) const
     {
         glBindVertexArray(m_vao[dct]);

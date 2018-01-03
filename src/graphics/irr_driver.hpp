@@ -50,6 +50,12 @@
 #endif
 
 
+namespace SP
+{
+    class SPDynamicDrawCall;
+}
+
+
 namespace irr
 {
     namespace scene { class ISceneManager; class IMesh; class IAnimatedMeshSceneNode; class IAnimatedMesh;
@@ -170,7 +176,7 @@ private:
     unsigned             m_last_light_bucket_distance;
     unsigned             m_skinning_joint;
     u32                  m_renderpass;
-    class STKMeshSceneNode *m_sun_interposer;
+    SP::SPDynamicDrawCall* m_sun_interposer;
     core::vector3df m_sun_direction;
     video::SColorf m_suncolor;
 
@@ -462,7 +468,7 @@ public:
     // ------------------------------------------------------------------------
     void clearLights();
     // ------------------------------------------------------------------------
-    class STKMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
+    SP::SPDynamicDrawCall* getSunInterposer() { return m_sun_interposer; }
     // ------------------------------------------------------------------------
     
     void cleanSunInterposer();

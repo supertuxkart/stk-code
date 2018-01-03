@@ -36,6 +36,7 @@
 #include "graphics/shaders.hpp"
 #include "graphics/sp_mesh_loader.hpp"
 #include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_node.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
@@ -63,6 +64,7 @@
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
+#include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
@@ -141,6 +143,7 @@ IrrDriver::IrrDriver()
     m_clear_color                = video::SColor(255, 100, 101, 140);
     m_skinning_joint             = 0;
     m_recording = false;
+    m_sun_interposer = NULL;
 
 }   // IrrDriver
 
@@ -678,6 +681,7 @@ void IrrDriver::setMaxTextureSize()
 void IrrDriver::cleanSunInterposer()
 {
     delete m_sun_interposer;
+    m_sun_interposer = NULL;
 }   // cleanSunInterposer
 
 // ----------------------------------------------------------------------------
@@ -685,32 +689,33 @@ void IrrDriver::createSunInterposer()
 {
 #ifndef SERVER_ONLY
     scene::IMesh * sphere = m_scene_manager->getGeometryCreator()
-                                           ->createSphereMesh(1, 16, 16);
-    for (unsigned i = 0; i < sphere->getMeshBufferCount(); ++i)
+        ->createSphereMesh(1, 16, 16);
+    Material* material = material_manager->getSPMaterial("solid");
+    m_sun_interposer = new SP::SPDynamicDrawCall
+        (scene::EPT_TRIANGLES, NULL/*shader*/, material);
+    for (unsigned i = 0; i < sphere->getMeshBufferCount(); i++)
     {
-        scene::IMeshBuffer *mb = sphere->getMeshBuffer(i);
+        scene::IMeshBuffer* mb = sphere->getMeshBuffer(i);
         if (!mb)
+        {
             continue;
-        mb->getMaterial().setTexture(0,
-                        STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 255, 255, 255)));
-        mb->getMaterial().setTexture(1,
-                                STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-        mb->getMaterial().setTexture(2,
-                                STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        }
+        assert(mb->getVertexType() == video::EVT_STANDARD);
+        video::S3DVertex* v_ptr = (video::S3DVertex*)mb->getVertices();
+        uint16_t* idx_ptr = mb->getIndices();
+        for (unsigned j = 0; j < mb->getIndexCount(); j++)
+        {
+            // For sun interposer we only need position for glow shader
+            video::S3DVertexSkinnedMesh sp;
+            const unsigned v_idx = idx_ptr[j];
+            sp.m_position = v_ptr[v_idx].Pos;
+            m_sun_interposer->addSPMVertex(sp);
+        }
     }
-    m_sun_interposer = new STKMeshSceneNode(sphere,
-                                            m_scene_manager->getRootSceneNode(),
-                                            NULL, -1, "sun_interposer");
-
-    m_sun_interposer->grab();
-    m_sun_interposer->setParent(NULL);
+    m_sun_interposer->recalculateBoundingBox();
+    m_sun_interposer->setPosition(Track::getCurrentTrack()
+        ->getGodRaysPosition());
     m_sun_interposer->setScale(core::vector3df(20));
-
-    m_sun_interposer->getMaterial(0).Lighting = false;
-    m_sun_interposer->getMaterial(0).ColorMask = video::ECP_NONE;
-    m_sun_interposer->getMaterial(0).ZWriteEnable = false;
-    m_sun_interposer->getMaterial(0).MaterialType = Shaders::getShader(ES_OBJECTPASS);
-
     sphere->drop();
 #endif
 }
