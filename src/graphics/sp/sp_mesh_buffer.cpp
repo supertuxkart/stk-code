@@ -515,4 +515,17 @@ void SPMeshBuffer::enableTextureMatrix(unsigned mat_id)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }   // enableTextureMatrix
 
+// ----------------------------------------------------------------------------
+void SPMeshBuffer::reloadTextureCompare()
+{
+    assert(!m_textures.empty());
+    m_tex_cmp.clear();
+    for (unsigned i = 0; i < m_stk_material.size(); i++)
+    {
+        const std::string name =
+            m_textures[i][0]->getPath() + m_textures[i][1]->getPath();
+        m_tex_cmp[name] = i;
+    }
+}   // reloadTextureCompare
+
 }

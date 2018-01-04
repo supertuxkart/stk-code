@@ -24,10 +24,18 @@
 #include "race/race_manager.hpp"
 #include "utils/ptr_vector.hpp"
 
+#include <memory>
+
 namespace irr {
     namespace scene { class ISceneNode; class ICameraSceneNode;
                       class ILightSceneNode;                       }
 }
+
+namespace SP
+{
+    class SPTexture;
+}
+
 class KartModel;
 class KartProperties;
 class ChallengeData;
@@ -52,6 +60,9 @@ class FeatureUnlockedCutScene : public GUIEngine::CutsceneScreen, public GUIEngi
 
         /** Will be non-empty if this unlocked thing is one or many pictures */
         std::vector<irr::video::ITexture*> m_pictures;
+
+        std::vector<std::shared_ptr<SP::SPTexture> > m_sp_pictures;
+
         /** Will be set if this unlocked thing is a picture */
         float m_w, m_h;
         /** used for slideshows */

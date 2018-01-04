@@ -190,8 +190,8 @@ public:
     // ------------------------------------------------------------------------
     void enableTextureMatrix(unsigned mat_id);
     // ------------------------------------------------------------------------
-    std::array<std::shared_ptr<SPTexture>, 6>
-        getSPTextures(unsigned first_index = 0) const
+    std::array<std::shared_ptr<SPTexture>, 6>&
+        getSPTextures(unsigned first_index = 0)
     {
         assert(m_stk_material.size() == m_textures.size());
         for (unsigned i = 0; i < m_stk_material.size(); i++)
@@ -204,7 +204,7 @@ public:
             }
         }
         assert(false);
-        return std::array<std::shared_ptr<SPTexture>, 6> ();
+        return m_textures[0];
     }
     // ------------------------------------------------------------------------
     std::array<std::shared_ptr<SPTexture>, 6>
@@ -281,6 +281,8 @@ public:
     {
         m_stk_material[0] = std::make_tuple(0u, getIndexCount(), m);
     }
+    // ------------------------------------------------------------------------
+    void reloadTextureCompare();
     // ------------------------------------------------------------------------
     virtual const video::SMaterial& getMaterial() const
     {

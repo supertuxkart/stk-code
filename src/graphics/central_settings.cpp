@@ -414,7 +414,8 @@ bool CentralVideoSettings::isARBTextureViewUsable() const
 
 bool CentralVideoSettings::isARBBindlessTextureUsable() const
 {
-    return hasBindlessTexture && hasNVGPUShader5;
+    return false;
+    //return hasBindlessTexture && hasNVGPUShader5;
 }
 
 bool CentralVideoSettings::isARBShaderAtomicCountersUsable() const
@@ -566,8 +567,9 @@ bool CentralVideoSettings::supportsThreadedTextureLoading() const
 
 bool CentralVideoSettings::useArrayTextures() const
 {
-    return (UserConfigParams::m_high_definition_textures & 0x01) == 0 &&
-        UserConfigParams::m_max_texture_size <= 256;
+    return false;
+    //return (UserConfigParams::m_high_definition_textures & 0x01) == 0 &&
+    //    UserConfigParams::m_max_texture_size <= 256;
 }
 
 #endif   // !SERVER_ONLY
