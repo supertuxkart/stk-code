@@ -401,6 +401,7 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         TextBillboardDrawer::drawAll();
         PROFILER_POP_CPU_MARKER();
     }
+    glDisable(GL_CULL_FACE);
 
     // Now all instancing data from mesh and particle are done drawing
     m_draw_calls.setFenceSync();
@@ -514,6 +515,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         TextBillboardDrawer::drawAll();
         PROFILER_POP_CPU_MARKER();
     }
+    glDisable(GL_CULL_FACE);
 
     // Now all instancing data from mesh and particle are done drawing
     m_draw_calls.setFenceSync();

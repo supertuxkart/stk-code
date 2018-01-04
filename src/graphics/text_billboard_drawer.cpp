@@ -59,6 +59,10 @@ void addTextBillboard(STKTextBillboard* tb)
 // ----------------------------------------------------------------------------
 void drawAll()
 {
+    if (g_tbs.empty())
+    {
+        return;
+    }
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
     glEnable(GL_CULL_FACE);
