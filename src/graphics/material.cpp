@@ -262,24 +262,36 @@ Material::Material(const XMLNode *node, bool deprecated)
         bool b = false;
         node->get("additive", &b);
         if (b)
+        {
+            m_shader_name = "alphablend";
             m_shader_type = SHADERTYPE_ADDITIVE;
+        }
 
         b = false;
         node->get("transparency", &b);
         if (b)
+        {
+            m_shader_name = "alphatest";
             m_shader_type = SHADERTYPE_ALPHA_TEST;
+        }
 
         //node->get("lightmap", &m_lightmap);
 
         b = false;
         node->get("alpha", &b);
         if (b)
+        {
+            m_shader_name = "alphablend";
             m_shader_type = SHADERTYPE_ALPHA_BLEND;
+        }
 
         b = true;
         node->get("light", &b);
         if (!b)
+        {
+            m_shader_name = "unlit";
             m_shader_type = SHADERTYPE_SOLID_UNLIT;
+        }
 
         b = false;
         node->get("smooth-reflection", &b);
@@ -289,10 +301,26 @@ Material::Material(const XMLNode *node, bool deprecated)
 
         if (node->get("compositing", &s))
         {
-            if (s == "blend")         m_shader_type = SHADERTYPE_ALPHA_BLEND;
-            else if (s == "test")     m_shader_type = SHADERTYPE_ALPHA_TEST;
-            else if (s == "additive") m_shader_type = SHADERTYPE_ADDITIVE;
-            else if (s == "coverage") m_shader_type = SHADERTYPE_ALPHA_TEST;
+            if (s == "blend")
+            {
+                m_shader_name = "alphablend";
+                m_shader_type = SHADERTYPE_ALPHA_BLEND;
+            }
+            else if (s == "test")
+            {
+                m_shader_name = "alphatest";
+                m_shader_type = SHADERTYPE_ALPHA_TEST;
+            }
+            else if (s == "additive")
+            {
+                m_shader_name = "additive";
+                m_shader_type = SHADERTYPE_ADDITIVE;
+            }
+            else if (s == "coverage")
+            {
+                m_shader_name = "alphatest";
+                m_shader_type = SHADERTYPE_ALPHA_TEST;
+            }
             else if (s != "none")
                 Log::warn("material", "Unknown compositing mode '%s'", s.c_str());
         }
@@ -380,7 +408,10 @@ Material::Material(const XMLNode *node, bool deprecated)
         // ---- End backwards compatibility
     }
 
-    m_shader_name = s.empty() ? "solid" : s;
+    if (m_shader_name == "solid" && !s.empty())
+    {
+        m_shader_name = s;
+    }
     if (m_shader_name == "solid")
     {
         if (!normal_map_tex.empty())
