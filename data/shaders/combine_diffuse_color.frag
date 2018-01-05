@@ -14,15 +14,18 @@ void main()
     vec2 tc = gl_FragCoord.xy / u_screen;
     vec4 diffuseMatColor = texture(diffuse_color, tc);
 
-    // Gloss map here is stored in red and green for spec and emit map
+    // Gloss map here is stored in red and green for metallic and emit map
     // Real gloss channel is stored in normal and depth framebuffer .z
-    float specMapValue = texture(gloss_map, tc).x;
+    float metallicMapValue = texture(gloss_map, tc).x;
     float emitMapValue = texture(gloss_map, tc).y;
 
     float ao = texture(ssao_tex, tc).x;
     vec3 DiffuseComponent = texture(diffuse_map, tc).xyz;
     vec3 SpecularComponent = texture(specular_map, tc).xyz;
-    vec3 tmp = diffuseMatColor.xyz * DiffuseComponent * (1. - specMapValue) + SpecularComponent * specMapValue;
+
+    vec3 metallicMatColor = mix(vec3(0.04), diffuseMatColor.xyz * 4, metallicMapValue);
+    vec3 tmp = DiffuseComponent * mix(diffuseMatColor.xyz, vec3(0.0), metallicMapValue) + (metallicMatColor * SpecularComponent);
+
     vec3 emitCol = diffuseMatColor.xyz * diffuseMatColor.xyz * diffuseMatColor.xyz * 15.;
     vec4 color_1 = vec4(tmp * ao + (emitMapValue * emitCol), diffuseMatColor.a);
 
