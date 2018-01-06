@@ -797,6 +797,7 @@ bool CIrrDeviceWayland::initEGL()
     egl_params.handle_srgb = CreationParams.HandleSRGB;
     egl_params.with_alpha_channel = CreationParams.WithAlphaChannel;
     egl_params.vsync_enabled = CreationParams.Vsync;
+    egl_params.platform = CEGL_PLATFORM_WAYLAND;
     egl_params.window = m_egl_window;
     egl_params.display = m_display;
 

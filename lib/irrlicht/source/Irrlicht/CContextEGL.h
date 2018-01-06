@@ -39,6 +39,18 @@
 #ifndef EGL_GL_COLORSPACE_LINEAR
 #define EGL_GL_COLORSPACE_LINEAR 0x308A
 #endif
+#ifndef EGL_PLATFORM_ANDROID
+#define EGL_PLATFORM_ANDROID 0x3141
+#endif
+#ifndef EGL_PLATFORM_GBM
+#define EGL_PLATFORM_GBM 0x31D7
+#endif
+#ifndef EGL_PLATFORM_WAYLAND
+#define EGL_PLATFORM_WAYLAND 0x31D8
+#endif
+#ifndef EGL_PLATFORM_X11
+#define EGL_PLATFORM_X11 0x31D5
+#endif
 
 enum ContextEGLOpenGLAPI
 {
@@ -52,10 +64,20 @@ enum ContextEGLSurfaceType
     CEGL_SURFACE_PBUFFER
 };
 
+enum ContextEGLPlatform
+{
+    CEGL_PLATFORM_ANDROID,
+    CEGL_PLATFORM_GBM,
+    CEGL_PLATFORM_WAYLAND,
+    CEGL_PLATFORM_X11,
+    CEGL_PLATFORM_DEFAULT
+};
+
 struct ContextEGLParams
 {
     ContextEGLOpenGLAPI opengl_api;
     ContextEGLSurfaceType surface_type;
+    ContextEGLPlatform platform;
     EGLNativeWindowType window;
     EGLNativeDisplayType display;
     bool force_legacy_device;

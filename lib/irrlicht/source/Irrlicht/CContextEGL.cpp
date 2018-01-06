@@ -150,12 +150,56 @@ bool ContextManagerEGL::initDisplay()
     display = EGL_DEFAULT_DISPLAY;
 #endif
 
-    if (display != EGL_DEFAULT_DISPLAY)
+    bool use_default_platform = false;
+    EGLenum platform = 0;
+    
+    switch (m_creation_params.platform)
+    {
+    case CEGL_PLATFORM_ANDROID:
+        platform = EGL_PLATFORM_ANDROID;
+        break;
+    case CEGL_PLATFORM_GBM:
+        platform = EGL_PLATFORM_GBM;
+        break;
+    case CEGL_PLATFORM_WAYLAND:
+        platform = EGL_PLATFORM_WAYLAND;
+        break;
+    case CEGL_PLATFORM_X11:
+        platform = EGL_PLATFORM_X11;
+        break;
+    case CEGL_PLATFORM_DEFAULT:
+        use_default_platform = true;
+        break;
+    }
+
+    if (use_default_platform == false)
+    {
+        typedef EGLDisplay (*getPlatformDisp_t) (EGLenum, void*, const EGLint*);
+        getPlatformDisp_t getPlatformDisplay = NULL;
+        
+        if (hasEGLExtension("EGL_KHR_platform_base"))
+        {
+            getPlatformDisplay = 
+                  (getPlatformDisp_t)eglGetProcAddress("eglGetPlatformDisplay");
+        }
+        else if (hasEGLExtension("EGL_EXT_platform_base"))
+        {
+            getPlatformDisplay = 
+               (getPlatformDisp_t)eglGetProcAddress("eglGetPlatformDisplayEXT");
+        }
+        
+        if (getPlatformDisplay != NULL)
+        {
+            m_egl_display = getPlatformDisplay(platform, display, NULL);
+        }
+    }
+
+    if (m_egl_display == EGL_NO_DISPLAY)
     {
         m_egl_display = eglGetDisplay(display);
     }
 
-    if (m_egl_display == EGL_NO_DISPLAY)
+    if (m_egl_display == EGL_NO_DISPLAY && display != EGL_DEFAULT_DISPLAY)
     {
         m_egl_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     }
