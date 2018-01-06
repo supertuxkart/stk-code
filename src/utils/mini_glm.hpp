@@ -461,6 +461,28 @@ namespace MiniGLM
         }
         return core::quaternion(q[0], q[1], q[2], q[3]).normalize();
     }
+    // ------------------------------------------------------------------------
+    inline uint32_t quickTangent(uint32_t packed_normal)
+    {
+        core::vector3df normal = decompressVector3(packed_normal);
+        core::vector3df tangent;
+        core::vector3df c1 =
+            normal.crossProduct(core::vector3df(0.0f, 0.0f, 1.0f));
+        core::vector3df c2 =
+            normal.crossProduct(core::vector3df(0.0f, 1.0f, 0.0f));
+        if (c1.getLengthSQ() > c2.getLengthSQ())
+        {
+            tangent = c1;
+        }
+        else
+        {
+            tangent = c2;
+        }
+        tangent.normalize();
+        // Assume bitangent sign is positive 1.0f
+        return compressVector3(tangent) | 1 << 30;
+    }   // quickTangent
+    // ------------------------------------------------------------------------
     void unitTesting();
 }
 

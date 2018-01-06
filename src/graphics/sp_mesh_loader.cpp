@@ -329,8 +329,7 @@ void SPMeshLoader::decompressSPM(irr::io::IReadFile* spm,
             }
             else
             {
-                // 0, 0, 1, 1 (bitangent sign)
-                vertex.m_tangent = 0x1FF << 20 | 1 << 30;
+                vertex.m_tangent = MiniGLM::quickTangent(vertex.m_normal);
             }
         }
         if (vt == SPVT_SKINNED)

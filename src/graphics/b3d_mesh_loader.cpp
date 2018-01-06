@@ -143,8 +143,8 @@ SP::SPMesh* B3DMeshLoader::toSPM(scene::CSkinnedMesh* mesh)
                 vertex.m_all_uvs[3] = MiniGLM::toFloat16
                     (all_buf[b]->Vertices_2TCoords[i].TCoords2.Y);
             }
-            // Dummy tangent, please use spm for correct tangent export
-            vertex.m_tangent = 0x1FF << 20 | 1 << 30;
+            // Please use spm for correct tangent export
+            vertex.m_tangent = MiniGLM::quickTangent(vertex.m_normal);
             if (!skinned_mesh)
             {
                 spmb->addSPMVertex(vertex);
