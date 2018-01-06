@@ -311,13 +311,13 @@ bool ContextManagerEGL::createSurface()
     
     std::vector<EGLint> attribs;
 
-    if (m_creation_params.opengl_api == CEGL_API_OPENGL)
+    if (m_creation_params.opengl_api == CEGL_API_OPENGL &&
+        m_creation_params.handle_srgb == true)
     {
         if (hasEGLExtension("EGL_KHR_gl_colorspace") || m_egl_version >= 150)
         {
             attribs.push_back(EGL_GL_COLORSPACE);
-            attribs.push_back(m_creation_params.handle_srgb ? 
-                             EGL_GL_COLORSPACE_SRGB : EGL_GL_COLORSPACE_LINEAR);
+            attribs.push_back(EGL_GL_COLORSPACE_SRGB);
             colorspace_attr_pos = attribs.size() - 1;
         }
     }
@@ -350,8 +350,7 @@ bool ContextManagerEGL::createSurface()
         }
     }
         
-    if (m_egl_surface == EGL_NO_SURFACE && colorspace_attr_pos > 0 &&
-        m_creation_params.handle_srgb == true)
+    if (m_egl_surface == EGL_NO_SURFACE && colorspace_attr_pos > 0)
     {
         attribs[colorspace_attr_pos] = EGL_GL_COLORSPACE_LINEAR;
         
