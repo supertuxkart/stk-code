@@ -28,6 +28,7 @@
 using namespace irr;
 using namespace scene;
 
+class B3DMeshLoader;
 class SPMeshLoader;
 
 namespace SP
@@ -37,6 +38,7 @@ struct Armature;
 
 class SPMesh : public ISkinnedMesh
 {
+friend class ::B3DMeshLoader;
 friend class ::SPMeshLoader;
 private:
     std::vector<SPMeshBuffer*> m_buffer;

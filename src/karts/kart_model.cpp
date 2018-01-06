@@ -25,6 +25,7 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/b3d_mesh_loader.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/material.hpp"
@@ -565,7 +566,13 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
 {
     assert(m_is_master);
     std::string  full_path = kart_properties.getKartDir()+m_model_filename;
+    // For b3d loader only
+    if (m_animation_frame[AF_STRAIGHT] > -1)
+    {
+        B3DMeshLoader::m_straight_frame = m_animation_frame[AF_STRAIGHT];
+    }
     m_mesh                 = irr_driver->getAnimatedMesh(full_path);
+    B3DMeshLoader::m_straight_frame = 0;
     if(!m_mesh)
     {
         Log::error("Kart_Model", "Problems loading mesh '%s' - kart '%s' will"

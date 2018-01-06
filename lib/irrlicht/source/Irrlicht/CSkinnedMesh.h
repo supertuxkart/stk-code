@@ -173,9 +173,13 @@ namespace scene
 
 		void computeWeightInfluence(SJoint *joint, size_t &index, WeightInfluence& wi);
 
+		void buildAllGlobalAnimatedMatrices(SJoint *Joint=0, SJoint *ParentJoint=0);
+
 		u32 getTotalJoints() const { return m_total_joints; }
 
 		f32 AnimationFrames;
+
+		core::array<SJoint*> RootJoints;
 
 private:
 		void toStaticPose();
@@ -185,8 +189,6 @@ private:
 		void normalizeWeights();
 
 		void buildAllLocalAnimatedMatrices();
-
-		void buildAllGlobalAnimatedMatrices(SJoint *Joint=0, SJoint *ParentJoint=0);
 
 		void getFrameData(f32 frame, SJoint *Node,
 				core::vector3df &position, s32 &positionHint,
@@ -211,7 +213,6 @@ private:
 		core::array<SSkinMeshBuffer*> LocalBuffers;
 
 		core::array<SJoint*> AllJoints;
-		core::array<SJoint*> RootJoints;
 
 		core::array< core::array<bool> > Vertices_Moved;
 

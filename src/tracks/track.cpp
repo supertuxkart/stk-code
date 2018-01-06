@@ -1152,7 +1152,11 @@ bool Track::loadMainTrack(const XMLNode &root)
 
     scene::ISceneNode* scene_node = NULL;
     scene::IMesh* tangent_mesh = NULL;
-    if (m_version < 7)
+#ifdef SERVER_ONLY
+    if (false)
+#else
+    if (m_version < 7 && !CVS->isGLSL())
+#endif
     {
         // The mesh as returned does not have all mesh buffers with the same
         // texture combined. This can result in a _HUGE_ overhead. E.g. instead

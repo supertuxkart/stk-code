@@ -20,7 +20,6 @@
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "utils/constants.hpp"

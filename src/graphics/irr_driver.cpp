@@ -35,6 +35,7 @@
 #include "graphics/render_target.hpp"
 #include "graphics/shader_based_renderer.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/b3d_mesh_loader.hpp"
 #include "graphics/sp_mesh_loader.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
@@ -510,6 +511,11 @@ void IrrDriver::initDevice()
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
+
+    B3DMeshLoader* b3dl = new B3DMeshLoader(m_scene_manager);
+    m_scene_manager->addExternalMeshLoader(b3dl);
+    b3dl->drop();
+
     SPMeshLoader* spml = new SPMeshLoader(m_scene_manager);
     m_scene_manager->addExternalMeshLoader(spml);
     spml->drop();

@@ -148,7 +148,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void uploadInstanceData();
     // ------------------------------------------------------------------------
-    bool combineMeshBuffer(SPMeshBuffer* spmb)
+    bool combineMeshBuffer(SPMeshBuffer* spmb, bool different_material = true)
     {
         // We only use 16bit vertices
         if (spmb->m_vertices.size() + m_vertices.size() > 65536)
@@ -162,8 +162,15 @@ public:
         {
             idx += old_vtx_count;
         }
-        m_stk_material.emplace_back(getIndexCount(), spmb->getIndexCount(),
-            std::get<2>(spmb->m_stk_material[0]));
+        if (different_material)
+        {
+            m_stk_material.emplace_back(getIndexCount(), spmb->getIndexCount(),
+                std::get<2>(spmb->m_stk_material[0]));
+        }
+        else
+        {
+            std::get<1>(m_stk_material[0]) += spmb->m_indices.size();
+        }
         m_indices.insert(m_indices.end(), spmb->m_indices.begin(),
             spmb->m_indices.end());
         return true;
