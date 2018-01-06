@@ -275,11 +275,24 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
 
     {
         m_rtts->getFBO(FBO_SP).bind();
-        float clear_color_white[4] = { 1.0f, 1.0f, 1.0f, 0.0f };
-        float clear_color_normal[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-        glClearBufferfv(GL_COLOR, 0, clear_color_white);
-        glClearBufferfv(GL_COLOR, 1, clear_color_normal);
-        glClearBufferfv(GL_COLOR, 2, clear_color_white);
+        std::array<float, 4> clear_color_world = {{ 1.0f, 1.0f, 1.0f, 0.0f }};
+        if (World::getWorld() != NULL)
+        {
+            clear_color_world[0] =
+                irr_driver->getClearColor().getRed() / 255.0f;
+            clear_color_world[1] =
+                irr_driver->getClearColor().getGreen() / 255.0f;
+            clear_color_world[2] =
+                irr_driver->getClearColor().getBlue() / 255.0f;
+            clear_color_world[3] =
+                irr_driver->getClearColor().getAlpha() / 255.0f;
+        }
+
+        float clear_color_empty[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        float clear_color_gloss[4] = { 0.1f, 0.1f, 0.0f, 0.0f };
+        glClearBufferfv(GL_COLOR, 0, clear_color_world.data());
+        glClearBufferfv(GL_COLOR, 1, clear_color_empty);
+        glClearBufferfv(GL_COLOR, 2, clear_color_gloss);
         glClearBufferfi(GL_DEPTH_STENCIL, 0, 1.0f, 0);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS1));
         SP::draw(SP::RP_1ST, SP::DCT_NORMAL);
@@ -315,12 +328,6 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
     }
 
     m_rtts->getFBO(FBO_COLORS).bind();
-    video::SColor clearColor(0, 150, 150, 150);
-    if (World::getWorld() != NULL)
-        clearColor = irr_driver->getClearColor();
-
-    glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
-        clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     {
