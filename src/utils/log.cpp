@@ -212,7 +212,7 @@ void Log::writeLine(const char *line, int level)
         }
         __android_log_print(alp, "SuperTuxKart", "%s", line);
 #else
-        printf(line);
+        printf("%s", line);
 #endif
         resetTerminalColor();  // this prints a \n
     }
