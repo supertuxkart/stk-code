@@ -34,6 +34,14 @@ using namespace scene;
 class STKTextBillboard : public ISceneNode, public NoCopy,
                          FontWithFace::FontCharCollector
 {
+public:
+    struct GLTB
+    {
+        core::vector3df m_position;
+        video::SColor m_color;
+        short m_uv[2];
+    };
+
 private:
     struct STKTextBillboardChar
     {
@@ -53,13 +61,6 @@ private:
             m_dest_rect = dest_rect;
             m_source_rect = source_rect;
         }
-    };
-
-    struct GLTB
-    {
-        core::vector3df m_position;
-        video::SColor m_color;
-        short m_uv[2];
     };
 
     SP::SPInstancedData m_instanced_data;
