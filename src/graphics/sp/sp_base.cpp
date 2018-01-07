@@ -969,12 +969,14 @@ void destroy()
         return;
     }
 
-    SPTextureManager::destroy();
+    g_dy_dc.clear();
     for (auto& p : g_shaders)
     {
         delete p.second;
     }
     g_shaders.clear();
+
+    SPTextureManager::destroy();
 #ifndef SERVER_ONLY
 
 #ifndef USE_GLES2

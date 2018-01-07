@@ -156,10 +156,6 @@ IrrDriver::~IrrDriver()
 #ifdef ENABLE_RECORDER
     ogrDestroy();
 #endif
-    assert(m_device != NULL);
-    m_device->drop();
-    m_device = NULL;
-    m_modes.clear();
     STKTexManager::getInstance()->kill();
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
@@ -169,6 +165,10 @@ IrrDriver::~IrrDriver()
 #endif
     delete m_wind;
     delete m_renderer;
+    assert(m_device != NULL);
+    m_device->drop();
+    m_device = NULL;
+    m_modes.clear();
 }   // ~IrrDriver
 
 // ----------------------------------------------------------------------------
