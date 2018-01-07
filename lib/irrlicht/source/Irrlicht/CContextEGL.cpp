@@ -43,6 +43,7 @@ ContextManagerEGL::ContextManagerEGL()
     m_egl_version = 0;
     m_is_legacy_device = false;
     m_initialized = false;
+    eglGetPlatformDisplay = NULL;
 
     memset(&m_creation_params, 0, sizeof(ContextEGLParams));
 }
@@ -61,8 +62,17 @@ bool ContextManagerEGL::init(const ContextEGLParams& params)
 
     m_creation_params = params;
     m_egl_window = m_creation_params.window;
+    
+    bool success = initExtensions();
+    
+    if (!success)
+    {
+        os::Printer::log("Error: Could not initialize EGL extensions.\n");
+        close();
+        return false;
+    }
 
-    bool success = initDisplay();
+    success = initDisplay();
 
     if (!success)
     {
@@ -142,6 +152,23 @@ bool ContextManagerEGL::init(const ContextEGLParams& params)
 }
 
 
+bool ContextManagerEGL::initExtensions()
+{
+    if (hasEGLExtension("EGL_KHR_platform_base"))
+    {
+        eglGetPlatformDisplay = (eglGetPlatformDisplay_t)
+                                     eglGetProcAddress("eglGetPlatformDisplay");
+    }
+    else if (hasEGLExtension("EGL_EXT_platform_base"))
+    {
+        eglGetPlatformDisplay = (eglGetPlatformDisplay_t)
+                                  eglGetProcAddress("eglGetPlatformDisplayEXT");
+    }
+    
+    return true;
+}
+
+
 bool ContextManagerEGL::initDisplay()
 {
     EGLNativeDisplayType display = m_creation_params.display;
@@ -150,7 +177,6 @@ bool ContextManagerEGL::initDisplay()
     display = EGL_DEFAULT_DISPLAY;
 #endif
 
-    bool use_default_platform = false;
     EGLenum platform = 0;
     
     switch (m_creation_params.platform)
@@ -168,30 +194,13 @@ bool ContextManagerEGL::initDisplay()
         platform = EGL_PLATFORM_X11;
         break;
     case CEGL_PLATFORM_DEFAULT:
-        use_default_platform = true;
         break;
     }
-
-    if (use_default_platform == false)
+    
+    if (m_creation_params.platform != CEGL_PLATFORM_DEFAULT &&
+        eglGetPlatformDisplay != NULL)
     {
-        typedef EGLDisplay (*getPlatformDisp_t) (EGLenum, void*, const EGLint*);
-        getPlatformDisp_t getPlatformDisplay = NULL;
-        
-        if (hasEGLExtension("EGL_KHR_platform_base"))
-        {
-            getPlatformDisplay = 
-                  (getPlatformDisp_t)eglGetProcAddress("eglGetPlatformDisplay");
-        }
-        else if (hasEGLExtension("EGL_EXT_platform_base"))
-        {
-            getPlatformDisplay = 
-               (getPlatformDisp_t)eglGetProcAddress("eglGetPlatformDisplayEXT");
-        }
-        
-        if (getPlatformDisplay != NULL)
-        {
-            m_egl_display = getPlatformDisplay(platform, display, NULL);
-        }
+        m_egl_display = eglGetPlatformDisplay(platform, (void*)display, NULL);
     }
 
     if (m_egl_display == EGL_NO_DISPLAY)
@@ -285,7 +294,7 @@ bool ContextManagerEGL::chooseConfig()
         config_attribs[9] = 1; //EGL_DEPTH_SIZE
         
         success = eglChooseConfig(m_egl_display, &config_attribs[0],
-                                           &m_egl_config, 1, &num_configs);
+                                  &m_egl_config, 1, &num_configs);
     }
 
     if (!success || m_egl_config == NULL || num_configs < 1)

@@ -103,6 +103,10 @@ private:
     bool m_initialized;
     int m_egl_version;
 
+    typedef EGLDisplay (*eglGetPlatformDisplay_t) (EGLenum, void*, const EGLint*);
+    eglGetPlatformDisplay_t eglGetPlatformDisplay;
+    
+    bool initExtensions();
     bool initDisplay();
     bool chooseConfig();
     bool createSurface();
