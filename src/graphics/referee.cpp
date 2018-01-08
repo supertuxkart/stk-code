@@ -137,6 +137,7 @@ void Referee::cleanup()
 {
     irr_driver->removeMeshFromCache(m_st_referee_mesh);
     m_st_referee_mesh = NULL;
+    m_st_traffic_buffer = -1;
 }   // cleanup
 
 // ----------------------------------------------------------------------------
