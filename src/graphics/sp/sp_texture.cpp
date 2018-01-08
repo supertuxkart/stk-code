@@ -18,6 +18,7 @@
 #include "graphics/sp/sp_texture.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "io/file_manager.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_shader.hpp"
@@ -39,6 +40,12 @@ extern "C"
 }
 #endif
 
+#include <numeric>
+
+#if !defined(USE_GLES2)
+static const uint8_t CACHE_VERSION = 1;
+#endif
+
 namespace SP
 {
 // ----------------------------------------------------------------------------
@@ -53,8 +60,33 @@ SPTexture::SPTexture(const std::string& path, Material* m, bool undo_srgb,
         return;
     }
     glGenTextures(1, &m_texture_name);
-#endif
+
     createWhite(false/*private_init*/);
+
+    if (!CVS->isTextureCompressionEnabled())
+    {
+        return;
+    }
+    std::string basename = StringUtils::getBasename(m_path);
+    std::string container_id;
+    if (file_manager->searchTextureContainerId(container_id, basename))
+    {
+        std::string cache_subdir = "hd/";
+        if ((UserConfigParams::m_high_definition_textures & 0x01) == 0x01)
+        {
+            cache_subdir = "hd/";
+        }
+        else
+        {
+            cache_subdir = StringUtils::insertValues("resized_%i/",
+                (int)UserConfigParams::m_max_texture_size);
+        }
+
+        m_cache_directory = file_manager->getCachedTexturesDir() +
+            cache_subdir + container_id;
+        file_manager->checkAndCreateDirectoryP(m_cache_directory);
+    }
+#endif
 }   // SPTexture
 
 // ----------------------------------------------------------------------------
@@ -392,9 +424,128 @@ bool SPTexture::texImage2d(std::shared_ptr<video::IImage> texture,
 }   // texImage2d
 
 // ----------------------------------------------------------------------------
+bool SPTexture::saveCompressedTexture(std::shared_ptr<video::IImage> texture,
+                                      const std::vector<std::pair
+                                      <core::dimension2du, unsigned> >& sizes,
+                                      const std::string& cache_location)
+{
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+    const unsigned total_size = std::accumulate(sizes.begin(), sizes.end(), 0,
+        [] (const unsigned int previous, const std::pair
+        <core::dimension2du, unsigned>& cur_sizes)
+       { return previous + cur_sizes.second; });
+    io::IWriteFile* file = irr::io::createWriteFile(cache_location.c_str(),
+        false);
+    file->write(&CACHE_VERSION, 1);
+    const unsigned mm_sizes = (unsigned)sizes.size();
+    file->write(&mm_sizes, 4);
+    for (auto& p : sizes)
+    {
+        file->write(&p.first.Width, 4);
+        file->write(&p.first.Height, 4);
+        file->write(&p.second, 4);
+    }
+    file->write(texture->lock(), total_size);
+#endif
+    file->drop();
+    return true;
+}   // saveCompressedTexture
+
+// ----------------------------------------------------------------------------
+bool SPTexture::useTextureCache(const std::string& full_path,
+                                std::string* cache_loc)
+{
+    if (!CVS->isTextureCompressionEnabled() && m_cache_directory.empty())
+    {
+        return false;
+    }
+    std::string basename = StringUtils::getBasename(m_path);
+    std::string container_id;
+
+    *cache_loc = m_cache_directory + "/" + basename + ".sptz";
+
+    if (file_manager->fileExists(*cache_loc) &&
+        file_manager->fileIsNewer(*cache_loc, m_path))
+    {
+        if (m_material && (!m_material->getColorizationMask().empty() ||
+            m_material->getAlphaMask().empty()))
+        {
+            std::string mask_path = StringUtils::getPath(m_path) + "/" +
+                (!m_material->getColorizationMask().empty() ?
+                m_material->getColorizationMask() :
+                m_material->getAlphaMask());
+            if (!file_manager->fileIsNewer(*cache_loc, mask_path))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}   // useTextureCache
+
+// ----------------------------------------------------------------------------
+std::shared_ptr<video::IImage> SPTexture::getTextureCache(const std::string& p,
+    std::vector<std::pair<core::dimension2du, unsigned> >* sizes)
+{
+    std::shared_ptr<video::IImage> cache;
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+    io::IReadFile* file = irr::io::createReadFile(p.c_str());
+    if (file == NULL)
+    {
+        return cache;
+    }
+
+    uint8_t cache_version;
+    file->read(&cache_version, 1);
+    if (cache_version != CACHE_VERSION)
+    {
+        return cache;
+    }
+
+    unsigned mm_sizes;
+    file->read(&mm_sizes, 4);
+    sizes->resize(mm_sizes);
+    for (unsigned i = 0; i < mm_sizes; i++)
+    {
+        file->read(&((*sizes)[i].first.Width), 4);
+        file->read(&((*sizes)[i].first.Height), 4);
+        file->read(&((*sizes)[i].second), 4);
+    }
+
+    const unsigned total_cache_size = std::accumulate(sizes->begin(),
+        sizes->end(), 0,[] (const unsigned int previous, const std::pair
+        <core::dimension2du, unsigned>& cur_sizes)
+       { return previous + cur_sizes.second; });
+    cache.reset(irr_driver->getVideoDriver()->createImage(video::ECF_A8R8G8B8,
+        (*sizes)[0].first));
+    assert(cache->getReferenceCount() == 1);
+    file->read(cache->lock(), total_cache_size);
+    file->drop();
+#endif
+    return cache;
+}   // getTextureCache
+
+// ----------------------------------------------------------------------------
 bool SPTexture::threadedLoad()
 {
 #ifndef SERVER_ONLY
+    std::string cache_loc;
+    if (useTextureCache(m_path, &cache_loc))
+    {
+        std::vector<std::pair<core::dimension2du, unsigned> > sizes;
+        std::shared_ptr<video::IImage> cache = getTextureCache(cache_loc,
+            &sizes);
+        if (cache)
+        {
+            SPTextureManager::get()->increaseGLCommandFunctionCount(1);
+            SPTextureManager::get()->addGLCommandFunction(
+                [this, cache, sizes]()->bool
+                { return compressedTexImage2d(cache, sizes); });
+            return true;
+        }
+    }
+
     std::shared_ptr<video::IImage> image = getTextureImage();
     std::shared_ptr<video::IImage> mask = getMask(image->getDimension());
     if (mask && image)
@@ -451,6 +602,14 @@ bool SPTexture::threadedLoad()
             SPTextureManager::get()->addGLCommandFunction(
                 [this, image, r]()->bool
                 { return compressedTexImage2d(image, r); });
+            if (!cache_loc.empty())
+            {
+                SPTextureManager::get()->addThreadedFunction(
+                    [this, image, r, cache_loc]()->bool
+                    {
+                        return saveCompressedTexture(image, r, cache_loc);
+                    });
+            }
         }
         else
         {

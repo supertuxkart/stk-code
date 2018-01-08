@@ -46,6 +46,8 @@ class SPTexture : public NoCopy
 private:
     std::string m_path;
 
+    std::string m_cache_directory;
+
     int m_texture_array_idx;
 
     GLuint m_texture_name = 0;
@@ -155,8 +157,18 @@ private:
                               const std::vector<std::pair<core::dimension2du,
                               unsigned> >& mipmap_sizes);
     // ------------------------------------------------------------------------
+    bool saveCompressedTexture(std::shared_ptr<video::IImage> texture,
+                              const std::vector<std::pair<core::dimension2du,
+                              unsigned> >& sizes,
+                              const std::string& cache_location);
+    // ------------------------------------------------------------------------
     std::vector<std::pair<core::dimension2du, unsigned> >
                        compressTexture(std::shared_ptr<video::IImage> texture);
+    // ------------------------------------------------------------------------
+    bool useTextureCache(const std::string& full_path, std::string* cache_loc);
+    // ------------------------------------------------------------------------
+    std::shared_ptr<video::IImage> getTextureCache(const std::string& path,
+        std::vector<std::pair<core::dimension2du, unsigned> >* sizes);
 
 public:
     // ------------------------------------------------------------------------
