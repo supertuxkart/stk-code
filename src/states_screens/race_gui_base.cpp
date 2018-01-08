@@ -225,9 +225,19 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
                 if (msg.m_kart && msg.m_kart!=kart) continue;
 
                 core::rect<s32> pos(x - w/2, y, x + w/2, y + m_max_font_height);
-                GUIEngine::getSmallFont()->draw(
+
+                gui::ScalableFont* font = GUIEngine::getSmallFont();
+
+                if (msg.m_outline)
+                    font->setBlackBorder(true);
+
+                font->draw(
                     core::stringw(msg.m_message.c_str()).c_str(),
                     pos, msg.m_color, true /* hcenter */, true /* vcenter */);
+
+                if (msg.m_outline)
+                    font->setBlackBorder(false);
+
                 y -= m_small_font_max_height;
             }
         }
@@ -273,9 +283,16 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
         }
         else
         {
+            if (msg.m_outline)
+                font->setBlackBorder(true);
+
             font->draw(core::stringw(msg.m_message.c_str()).c_str(),
                        pos, msg.m_color, true /* hcenter */,
                        true /* vcenter */);
+
+            if (msg.m_outline)
+                font->setBlackBorder(false);
+
             y += font_height;
         }
     }   // for i in all messages
@@ -460,9 +477,9 @@ void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
 void RaceGUIBase::addMessage(const core::stringw &msg,
                              const AbstractKart *kart,
                              float time, const video::SColor &color,
-                             bool important, bool big_font)
+                             bool important, bool big_font, bool outline)
 {
-    m_messages.push_back(TimedMessage(msg, kart, time, color, important, big_font));
+    m_messages.push_back(TimedMessage(msg, kart, time, color, important, big_font, outline));
 }   // addMessage
 
 //-----------------------------------------------------------------------------

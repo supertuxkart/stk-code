@@ -239,9 +239,11 @@ void LocalPlayerController::displayPenaltyWarning()
     if (m)
     {
         m->addMessage(_("Penalty time!!"), m_kart, 2.0f,
-                      GUIEngine::getSkin()->getColor("font::top"));
+                      GUIEngine::getSkin()->getColor("font::top"), true /* important */,
+            false /*  big font */, true /* outline */);
         m->addMessage(_("Don't accelerate before go"), m_kart, 2.0f,
-                      GUIEngine::getSkin()->getColor("font::normal"));
+            GUIEngine::getSkin()->getColor("font::normal"), true /* important */,
+            false /*  big font */, true /* outline */);
     }
     m_kart->playSound(m_bzzt_sound);
 }   // displayPenaltyWarning
