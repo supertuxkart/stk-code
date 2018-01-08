@@ -164,35 +164,35 @@ float History::updateReplayAndGetDT(float world_time, float dt)
             world->reset();
 #endif
         }
-
-        unsigned int num_karts = world->getNumKarts();
-        for (unsigned k = 0; k < num_karts; k++)
+        if (m_replay_mode == HISTORY_POSITION)
         {
-            AbstractKart *kart = world->getKart(k);
-            unsigned int index = m_current*num_karts + k;
-            if (m_replay_mode == HISTORY_POSITION)
+            unsigned int num_karts = world->getNumKarts();
+            for (unsigned k = 0; k < num_karts; k++)
             {
+                AbstractKart *kart = world->getKart(k);
+                unsigned int index = m_current*num_karts + k;
                 kart->setXYZ(m_all_xyz[index]);
                 kart->setRotation(m_all_rotations[index]);
             }
-            else   // HISTORY_PHYSICS
+        }
+        else   // HISTORY_PHYSICS
+        {
+            while (m_event_index < m_all_input_events.size() &&
+                m_all_input_events[m_event_index].m_index == m_current)
             {
-                while (m_event_index < m_all_input_events.size() &&
-                    m_all_input_events[m_event_index].m_index == m_current)
-                {
-                    const InputEvent &ie = m_all_input_events[m_event_index];
-                    AbstractKart *kart = world->getKart(ie.m_kart_index);
-                    Log::verbose("history", "time %f action %d %d",
-                        world->getTime(), ie.m_action, ie.m_value);
-                    kart->getController()->action(ie.m_action, ie.m_value);
-                    m_event_index++;
-                }
-
-                //kart->getControls().set(m_all_controls[index]);
+                const InputEvent &ie = m_all_input_events[m_event_index];
+                AbstractKart *kart = world->getKart(ie.m_kart_index);
+                Log::verbose("history", "time %f action %d %d",
+                    world->getTime(), ie.m_action, ie.m_value);
+                kart->getController()->action(ie.m_action, ie.m_value);
+                m_event_index++;
             }
-        }   // for k < num_karts
 
-        m_history_time += m_all_deltas[m_current];
+            //kart->getControls().set(m_all_controls[index]);
+        }   // if HISTORY_PHYSICS
+
+        if (World::getWorld()->isRacePhase())
+            m_history_time += m_all_deltas[m_current];
 
         // If this is not networked, exit the loop after one iteration
         // and return the new dt
