@@ -147,9 +147,9 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
             node->updateVisibility();
             if (SP::sp_first_frame)
             {
-                for (auto* node : node->getAllNodes())
+                for (auto* child_node : node->getAllNodes())
                 {
-                    node->setVisible(true);
+                    child_node->setVisible(true);
                 }
             }
         }
