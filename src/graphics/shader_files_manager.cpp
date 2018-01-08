@@ -165,7 +165,7 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
     }
 
     if (GraphicsRestrictions::isDisabled
-        (GraphicsRestrictions::GR_10BIT_VECTOR))
+        (GraphicsRestrictions::GR_CORRECT_10BIT_NORMALIZATION))
     {
         code << "#define Converts_10bit_Vector\n";
     }

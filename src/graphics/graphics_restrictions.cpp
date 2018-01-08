@@ -71,7 +71,7 @@ namespace GraphicsRestrictions
                 "HighDefinitionTextures",
                 "HighDefinitionTextures256",
                 "AdvancedPipeline",
-                "10BitVector",
+                "Correct10bitNormalization",
                 "GI",
                 "ForceLegacyDevice",
                 "VertexIdWorking",

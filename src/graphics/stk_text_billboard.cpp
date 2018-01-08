@@ -220,8 +220,8 @@ void STKTextBillboard::init(core::stringw text, FontWithFace* face)
         glEnableVertexAttribArray(9);
         glVertexAttribPointer(9, 4, GL_INT_2_10_10_10_REV,
             GraphicsRestrictions::isDisabled
-            (GraphicsRestrictions::GR_10BIT_VECTOR) ? GL_FALSE : GL_TRUE, 24,
-            (void*)12);
+            (GraphicsRestrictions::GR_CORRECT_10BIT_NORMALIZATION) ?
+            GL_FALSE : GL_TRUE, 24, (void*)12);
         glVertexAttribDivisorARB(9, 1);
 
         // Scale (3 half floats and .w for quaternion .w)

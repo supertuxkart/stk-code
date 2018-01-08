@@ -78,8 +78,8 @@ SPDynamicDrawCall::SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt,
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 4, GL_INT_2_10_10_10_REV,
         GraphicsRestrictions::isDisabled
-        (GraphicsRestrictions::GR_10BIT_VECTOR) ? GL_FALSE : GL_TRUE, 48,
-        (void*)offset);
+        (GraphicsRestrictions::GR_CORRECT_10BIT_NORMALIZATION) ?
+        GL_FALSE : GL_TRUE, 48, (void*)offset);
     offset += 4;
 
     // Vertex color
@@ -102,8 +102,8 @@ SPDynamicDrawCall::SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt,
     glEnableVertexAttribArray(5);
     glVertexAttribPointer(5, 4, GL_INT_2_10_10_10_REV,
         GraphicsRestrictions::isDisabled
-        (GraphicsRestrictions::GR_10BIT_VECTOR) ? GL_FALSE : GL_TRUE,
-        48, (void*)offset);
+        (GraphicsRestrictions::GR_CORRECT_10BIT_NORMALIZATION) ?
+        GL_FALSE : GL_TRUE, 48, (void*)offset);
         offset += 4;
 
     // 4 Joint indices
@@ -125,8 +125,8 @@ SPDynamicDrawCall::SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt,
     glEnableVertexAttribArray(9);
     glVertexAttribPointer(9, 4, GL_INT_2_10_10_10_REV,
         GraphicsRestrictions::isDisabled
-        (GraphicsRestrictions::GR_10BIT_VECTOR) ? GL_FALSE : GL_TRUE, 32 + 48,
-        (void*)12);
+        (GraphicsRestrictions::GR_CORRECT_10BIT_NORMALIZATION) ?
+        GL_FALSE : GL_TRUE, 32 + 48, (void*)12);
     glVertexAttribDivisorARB(9, 1);
     // Scale (3 half floats and .w for quaternion .w)
     glEnableVertexAttribArray(10);

@@ -318,8 +318,8 @@ void SPMeshBuffer::recreateVAO(unsigned i)
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 4, GL_INT_2_10_10_10_REV,
         GraphicsRestrictions::isDisabled
-        (GraphicsRestrictions::GR_10BIT_VECTOR) ? GL_FALSE : GL_TRUE, pitch,
-        (void*)offset);
+        (GraphicsRestrictions::GR_CORRECT_10BIT_NORMALIZATION) ?
+        GL_FALSE : GL_TRUE, pitch, (void*)offset);
     offset += 4;
 
     // Vertex color
@@ -351,8 +351,8 @@ void SPMeshBuffer::recreateVAO(unsigned i)
         glEnableVertexAttribArray(5);
         glVertexAttribPointer(5, 4, GL_INT_2_10_10_10_REV,
             GraphicsRestrictions::isDisabled
-            (GraphicsRestrictions::GR_10BIT_VECTOR) ? GL_FALSE : GL_TRUE,
-            pitch, (void*)offset);
+            (GraphicsRestrictions::GR_CORRECT_10BIT_NORMALIZATION) ?
+            GL_FALSE : GL_TRUE, pitch, (void*)offset);
             offset += 4;
     }
     else
@@ -418,7 +418,7 @@ void SPMeshBuffer::recreateVAO(unsigned i)
     glEnableVertexAttribArray(9);
     glVertexAttribPointer(9, 4, GL_INT_2_10_10_10_REV,
         GraphicsRestrictions::isDisabled
-        (GraphicsRestrictions::GR_10BIT_VECTOR) ? GL_FALSE : GL_TRUE, 32,
+        (GraphicsRestrictions::GR_CORRECT_10BIT_NORMALIZATION) ? GL_FALSE : GL_TRUE, 32,
         (void*)12);
     glVertexAttribDivisorARB(9, 1);
     // Scale (3 half floats and .w for quaternion .w)
