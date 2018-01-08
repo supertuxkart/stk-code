@@ -425,7 +425,7 @@ public:
     {
         CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
 
-        device->m_repeat_rate = 1000 / rate;
+        device->m_repeat_rate = rate == 0 ? 0 : 1000 / rate;
         device->m_repeat_delay = delay;
     }
 
