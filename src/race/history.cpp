@@ -53,9 +53,10 @@ void History::initRecording()
                                              / stk_config->m_replay_dt      );
     allocateMemory(max_frames);
     m_current     = -1;
-    m_event_index = 0;
     m_wrapped     = false;
     m_size        = 0;
+    m_event_index = 0;
+    m_all_input_events.clear();
 }   // initRecording
 
 //-----------------------------------------------------------------------------
@@ -128,7 +129,9 @@ void History::updateSaving(float dt)
  */
 float History::updateReplayAndGetDT(float world_time, float dt)
 {
-    if (m_history_time >= world_time) return dt;
+    if (m_history_time > world_time && NetworkConfig::get()->isNetworking())
+        return dt;
+
     World *world = World::getWorld();
 
     // In non-networked history races, we need to do at least one timestep
