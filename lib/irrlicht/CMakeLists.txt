@@ -561,6 +561,12 @@ include/vector2d.h
 include/vector3d.h
 )
 
+if(ENABLE_WAYLAND_DEVICE)
+    set(IRRLICHT_SOURCES 
+        ${IRRLICHT_SOURCES} 
+        source/Irrlicht/server_decoration_client_protocol.c)
+endif()
+
 
 if(APPLE)
     set(IRRLICHT_SOURCES

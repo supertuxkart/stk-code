@@ -26,6 +26,7 @@
 #include "CIrrDeviceStub.h"
 #include "IImagePresenter.h"
 #include "ICursorControl.h"
+#include "server_decoration_client_protocol.h"
 
 #include <wayland-client.h>
 #include <wayland-cursor.h>
@@ -177,6 +178,9 @@ namespace irr
         wl_surface* m_cursor_surface;
         wl_surface* m_surface;
         uint32_t m_enter_serial;
+        
+        org_kde_kwin_server_decoration_manager* m_decoration_manager;
+        org_kde_kwin_server_decoration* m_decoration;
 
         xkb_context* m_xkb_context;
         xkb_compose_table* m_xkb_compose_table;

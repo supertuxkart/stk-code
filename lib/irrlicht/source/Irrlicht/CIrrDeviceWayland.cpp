@@ -550,6 +550,13 @@ public:
                                                 name, &wl_output_interface, 2));
             wl_output_add_listener(device->m_output, &output_listener, device);
         }
+        else if (interface_str == "org_kde_kwin_server_decoration_manager")
+        {
+            device->m_decoration_manager = 
+                        static_cast<org_kde_kwin_server_decoration_manager*>(
+                        wl_registry_bind(registry, name, 
+                        &org_kde_kwin_server_decoration_manager_interface, 1));
+        }
     }
 
     static void registry_global_remove(void* data, wl_registry* registry,
@@ -644,6 +651,9 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     m_cursor_surface = NULL;
     m_surface = NULL;
     m_enter_serial = 0;
+    
+    m_decoration_manager = NULL;
+    m_decoration = NULL;
 
     m_xkb_context = NULL;
     m_xkb_compose_table = NULL;
@@ -714,6 +724,12 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
 CIrrDeviceWayland::~CIrrDeviceWayland()
 {
     delete m_egl_context;
+    
+    if (m_decoration)
+        org_kde_kwin_server_decoration_destroy(m_decoration);
+        
+    if (m_decoration_manager)
+        org_kde_kwin_server_decoration_manager_destroy(m_decoration_manager);
     
     if (m_egl_window)
         wl_egl_window_destroy(m_egl_window);
@@ -838,6 +854,18 @@ bool CIrrDeviceWayland::createWindow()
     else
     {
         wl_shell_surface_set_toplevel(m_shell_surface);
+    }
+    
+    if (m_decoration_manager != NULL)
+    {
+        m_decoration = org_kde_kwin_server_decoration_manager_create(
+                                               m_decoration_manager, m_surface);
+    }
+                                                   
+    if (m_decoration != NULL)
+    {
+        org_kde_kwin_server_decoration_request_mode(m_decoration, 
+                                    ORG_KDE_KWIN_SERVER_DECORATION_MODE_SERVER);
     }
 
     wl_display_flush(m_display);
