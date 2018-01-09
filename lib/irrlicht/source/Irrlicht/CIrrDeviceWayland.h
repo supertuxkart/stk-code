@@ -27,6 +27,7 @@
 #include "IImagePresenter.h"
 #include "ICursorControl.h"
 #include "server_decoration_client_protocol.h"
+#include "xdg-shell-unstable-v6-client-protocol.h"
 
 #include <wayland-client.h>
 #include <wayland-cursor.h>
@@ -172,12 +173,16 @@ namespace irr
         wl_pointer* m_pointer;
         wl_registry* m_registry;
         wl_seat* m_seat;
-        wl_shell* m_shell;
-        wl_shell_surface* m_shell_surface;
+        //~ wl_shell* m_shell;
+        //~ wl_shell_surface* m_shell_surface;
         wl_shm* m_shm;
         wl_surface* m_cursor_surface;
         wl_surface* m_surface;
         uint32_t m_enter_serial;
+        
+        zxdg_shell_v6* m_xdg_shell;
+        zxdg_surface_v6* m_xdg_surface;
+        zxdg_toplevel_v6* m_xdg_toplevel;
         
         org_kde_kwin_server_decoration_manager* m_decoration_manager;
         org_kde_kwin_server_decoration* m_decoration;

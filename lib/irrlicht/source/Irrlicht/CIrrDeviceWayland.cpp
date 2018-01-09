@@ -73,6 +73,9 @@ public:
     static const wl_output_listener output_listener;
     static const wl_shell_surface_listener shell_surface_listener;
     static const wl_registry_listener registry_listener;
+    static const zxdg_shell_v6_listener xdg_shell_listener;
+    static const zxdg_surface_v6_listener xdg_surface_listener;
+    static const zxdg_toplevel_v6_listener xdg_toplevel_listener;
 
     static void pointer_enter(void* data, wl_pointer* pointer, uint32_t serial,
                               wl_surface* surface, wl_fixed_t sx, wl_fixed_t sy)
@@ -510,6 +513,48 @@ public:
                                          wl_shell_surface* shell_surface)
     {
     }
+    
+    static void xdg_shell_ping(void* data, zxdg_shell_v6* shell, 
+                               uint32_t serial)
+    {
+        zxdg_shell_v6_pong(shell, serial);
+    }
+    
+    static void xdg_surface_configure(void* data, zxdg_surface_v6* surface,
+                                      uint32_t serial)
+    {
+        zxdg_surface_v6_ack_configure(surface, serial);
+    }
+    
+    static void xdg_toplevel_configure(void* data, zxdg_toplevel_v6* toplevel,
+                                       int32_t width, int32_t height,
+                                       wl_array* states)
+    {
+        void* state_p;
+        
+        wl_array_for_each(state_p, states) 
+        {
+            uint32_t state = *(uint32_t*)state_p;
+            
+            switch (state) 
+            {
+            case ZXDG_TOPLEVEL_V6_STATE_FULLSCREEN:
+            case ZXDG_TOPLEVEL_V6_STATE_MAXIMIZED:
+            case ZXDG_TOPLEVEL_V6_STATE_ACTIVATED:
+            case ZXDG_TOPLEVEL_V6_STATE_RESIZING:
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    
+    static void xdg_toplevel_close(void* data, zxdg_toplevel_v6* xdg_toplevel)
+    {
+        CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
+        
+        device->closeDevice();
+    }
 
     static void registry_global(void* data, wl_registry* registry,
                                 uint32_t name, const char* interface,
@@ -521,17 +566,18 @@ public:
             return;
 
         std::string interface_str = interface;
+        printf("interface: %s\n", interface_str.c_str());
 
         if (interface_str == "wl_compositor")
         {
             device->m_compositor = static_cast<wl_compositor*>(wl_registry_bind(
                                   registry, name, &wl_compositor_interface, 1));
         }
-        else if (interface_str == "wl_shell")
-        {
-            device->m_shell = static_cast<wl_shell*>(wl_registry_bind(registry,
-                                                 name, &wl_shell_interface, 1));
-        }
+        //~ else if (interface_str == "wl_shell")
+        //~ {
+            //~ device->m_shell = static_cast<wl_shell*>(wl_registry_bind(registry,
+                                                 //~ name, &wl_shell_interface, 1));
+        //~ }
         else if (interface_str == "wl_seat")
         {
             device->m_seat = static_cast<wl_seat*>(wl_registry_bind(registry,
@@ -556,6 +602,14 @@ public:
                         static_cast<org_kde_kwin_server_decoration_manager*>(
                         wl_registry_bind(registry, name, 
                         &org_kde_kwin_server_decoration_manager_interface, 1));
+        }
+        else if (interface_str == "zxdg_shell_v6")
+        {
+            device->m_xdg_shell = static_cast<zxdg_shell_v6*>(wl_registry_bind(
+                                  registry, name, &zxdg_shell_v6_interface, 1));
+                                                 
+            zxdg_shell_v6_add_listener(device->m_xdg_shell, &xdg_shell_listener, 
+                                       device);
         }
     }
 
@@ -611,6 +665,22 @@ const wl_registry_listener WaylandCallbacks::registry_listener =
     WaylandCallbacks::registry_global_remove
 };
 
+const zxdg_shell_v6_listener WaylandCallbacks::xdg_shell_listener = 
+{
+    WaylandCallbacks::xdg_shell_ping
+};
+
+const zxdg_surface_v6_listener WaylandCallbacks::xdg_surface_listener = 
+{
+    WaylandCallbacks::xdg_surface_configure
+};
+
+const zxdg_toplevel_v6_listener WaylandCallbacks::xdg_toplevel_listener = 
+{
+    WaylandCallbacks::xdg_toplevel_configure,
+    WaylandCallbacks::xdg_toplevel_close
+};
+
 
 
 bool CIrrDeviceWayland::isWaylandDeviceWorking()
@@ -645,12 +715,16 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     m_pointer = NULL;
     m_registry = NULL;
     m_seat = NULL;
-    m_shell = NULL;
-    m_shell_surface = NULL;
+    //~ m_shell = NULL;
+    //~ m_shell_surface = NULL;
     m_shm = NULL;
     m_cursor_surface = NULL;
     m_surface = NULL;
     m_enter_serial = 0;
+    
+    m_xdg_shell = NULL;
+    m_xdg_surface = NULL;
+    m_xdg_toplevel = NULL;
     
     m_decoration_manager = NULL;
     m_decoration = NULL;
@@ -745,15 +819,24 @@ CIrrDeviceWayland::~CIrrDeviceWayland()
 
     if (m_cursor_theme)
         wl_cursor_theme_destroy(m_cursor_theme);
+        
+    if (m_xdg_toplevel)
+        zxdg_toplevel_v6_destroy(m_xdg_toplevel);
 
-    if (m_shell_surface)
-        wl_shell_surface_destroy(m_shell_surface);
+    if (m_xdg_surface)
+        zxdg_surface_v6_destroy(m_xdg_surface);
+        
+    if (m_xdg_shell)
+        zxdg_shell_v6_destroy(m_xdg_shell);
+        
+    //~ if (m_shell_surface)
+        //~ wl_shell_surface_destroy(m_shell_surface);
+        
+    //~ if (m_shell)
+        //~ wl_shell_destroy(m_shell);
         
     if (m_surface)
         wl_surface_destroy(m_surface);
-        
-    if (m_shell)
-        wl_shell_destroy(m_shell);
         
     if (m_shm)
         wl_shm_destroy(m_shm);
@@ -841,19 +924,36 @@ bool CIrrDeviceWayland::initEGL()
 bool CIrrDeviceWayland::createWindow()
 {
     m_surface = wl_compositor_create_surface(m_compositor);
-    m_shell_surface = wl_shell_get_shell_surface(m_shell, m_surface);
+    //~ m_shell_surface = wl_shell_get_shell_surface(m_shell, m_surface);
 
-    wl_shell_surface_add_listener(m_shell_surface,
-                               &WaylandCallbacks::shell_surface_listener, this);
+    //~ wl_shell_surface_add_listener(m_shell_surface,
+                               //~ &WaylandCallbacks::shell_surface_listener, this);
 
+    //~ if (CreationParams.Fullscreen)
+    //~ {
+        //~ wl_shell_surface_set_fullscreen(m_shell_surface,
+                       //~ WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT, 0, m_output);
+    //~ }
+    //~ else
+    //~ {
+        //~ wl_shell_surface_set_toplevel(m_shell_surface);
+    //~ }
+    
+    m_xdg_surface = zxdg_shell_v6_get_xdg_surface(m_xdg_shell, m_surface);
+    
+    zxdg_surface_v6_add_listener(m_xdg_surface, 
+                                 &WaylandCallbacks::xdg_surface_listener, this);
+                                 
+    m_xdg_toplevel = zxdg_surface_v6_get_toplevel(m_xdg_surface);
+
+    zxdg_toplevel_v6_add_listener(m_xdg_toplevel,
+                                &WaylandCallbacks::xdg_toplevel_listener, this);
+                                
+    wl_surface_commit(m_surface);
+                                    
     if (CreationParams.Fullscreen)
     {
-        wl_shell_surface_set_fullscreen(m_shell_surface,
-                       WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT, 0, m_output);
-    }
-    else
-    {
-        wl_shell_surface_set_toplevel(m_shell_surface);
+        zxdg_toplevel_v6_set_fullscreen(m_xdg_toplevel, NULL);
     }
     
     if (m_decoration_manager != NULL)
@@ -877,6 +977,8 @@ bool CIrrDeviceWayland::createWindow()
         os::Printer::log("Couldn't create OpenGL context.", ELL_ERROR);
         return false;
     }
+    
+    zxdg_surface_v6_set_window_geometry(m_xdg_surface, 0, 0, m_width, m_height);
 
     wl_region* region = wl_compositor_create_region(m_compositor);
     wl_region_add(region, 0, 0, m_width, m_height);
@@ -1020,23 +1122,31 @@ void CIrrDeviceWayland::sleep(u32 timeMs, bool pauseTimer=false)
 //! sets the caption of the window
 void CIrrDeviceWayland::setWindowCaption(const wchar_t* text)
 {
-    if (!m_shell_surface)
+    //~ if (!m_shell_surface)
+        //~ return;
+        
+    if (!m_xdg_toplevel)
         return;
 
     char title[1024];
     wcstombs(title, text, sizeof(title));
     title[1023] = '\0';
 
-    wl_shell_surface_set_title(m_shell_surface, title);
+    //~ wl_shell_surface_set_title(m_shell_surface, title);
+    zxdg_toplevel_v6_set_title(m_xdg_toplevel, title);
 }
 
 //! sets the class of the window
 void CIrrDeviceWayland::setWindowClass(const char* text)
 {
-    if (!m_shell_surface)
+    //~ if (!m_shell_surface)
+        //~ return;
+
+    if (!m_xdg_toplevel)
         return;
 
-    wl_shell_surface_set_class(m_shell_surface, text);
+    //~ wl_shell_surface_set_class(m_shell_surface, text);
+    zxdg_toplevel_v6_set_app_id(m_xdg_toplevel, text);
 }
 
 //! presents a surface in the client area

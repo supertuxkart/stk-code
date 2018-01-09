@@ -563,8 +563,9 @@ include/vector3d.h
 
 if(ENABLE_WAYLAND_DEVICE)
     set(IRRLICHT_SOURCES 
-        ${IRRLICHT_SOURCES} 
-        source/Irrlicht/server_decoration_client_protocol.c)
+        ${IRRLICHT_SOURCES}
+        source/Irrlicht/server_decoration_client_protocol.c
+        source/Irrlicht/xdg-shell-unstable-v6-protocol.c)
 endif()
 
 
