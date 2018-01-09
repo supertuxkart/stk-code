@@ -32,7 +32,7 @@ option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angels
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT USE_GLES2;NOT APPLE" OFF)
 
-if (UNIX AND NOT APPLE)
+if ((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
     option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" ON)
     option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
 endif()
