@@ -5,41 +5,35 @@ import sys
 
 def usage():
     print "Usage:"
-    print "compute_client_error.py server-data[,time,x,z] client-data[time,x,z]"
+    print "compute_client_error.py -f time,x1[,x2,x3....] server-data client-data"
     print "The files are expected to contain space separated fields. The"
-    print "option time,x,z specification is the field number of the STK world"
-    print "time, x and z coordinate."
-    print "The location of the kart in each field are specified by the"
-    print "field attribute. It is the field number (space separated fields)"
-    print "of the x coordinate, with the z coordinate being field+2"
+    print "-f options specifies first the column in which the world time"
+    print "is, followed by the list of columns to be compared."
     print "It computes for each data point in the client file the closest"
     print "the two data points with the closest time stamp in the server"
     print "and then interpolates the server position based on the client"
     print "time between these positions. The difference between the"
     print "intepolated position"
-
+    print
+    print "Example:"
+    print "compute_client_error.py-multi -f 6,16,17,18 debug.server debug.client"
+    print "   to compute the differences between client and server for the"
+    print "   fields 16,17,18 (which atm is the velocity)"
     sys.exit()
 
 # -----------------------------------------------------------------------------
-def splitArg(s):
-    l = s.split()
-    if len(l)==1:
-        return s,5,8,10   # Default for current debug output
-    if len(l)!=4:
-        print "Incorrect specification: '%s'"%s
-        usage()
-    return l[0], int(l[1]), int(l[2]), int(l[3])
-# -----------------------------------------------------------------------------
-def readFile(name, time, x, z):
+def readFile(name, fields):
     f = open(name, "r")
     result = []
     for i in f.readlines():
         if i[:6] == "Rewind":
             continue
         l = i.split()
-        result.append( (float(l[time]),
-                        float(l[x]   ),
-                        float(l[z]   ) ) )
+        try:
+            l_values = [ float(l[index]) for index in fields ]
+        except ValueError:
+            pass
+        result.append(l_values)
     f.close()
     return result
         
@@ -54,7 +48,8 @@ def computeDifferences(server, client):
     sum   = 0.0
     min   = 999999.9
     max   = -1.0
-    for (time, x, z) in client:
+    for items in client:
+        time, x = items[0], items[1:]
         # Find largest entry in server data that is <= client's time:
         while index_s<len(server)-2:
             t1 = server[index_s+1][0]
@@ -63,13 +58,17 @@ def computeDifferences(server, client):
 
         #print "time", time, server[index_s][0], server[index_s+1][0]
 
-        t1,x1,z1 = server[index_s  ]
-        t2,x2,z2 = server[index_s+1]
+        t1,x1 = server[index_s  ][0],server[index_s  ][1:]
+        t2,x2 = server[index_s+1][0],server[index_s+1][1:]
         f = (time-t1)/(t2-t1)
-        x_i = x1 + f * (x2-x1)
-        z_i = z1 + f * (z2-z1)
-        error = math.sqrt((x-x_i)**2 + (z-z_i)**2)
-        #print t1,x1,t2,x2,time,x_i
+        interp = []
+        error  = 0
+        for i, x1_val in enumerate(x1):
+            x2_val = x2[i]
+            x_i = x1_val + f * (x2_val-x1_val)
+            interp.append(x_i)
+            error = error + (x[i]-x_i)**2
+        error = math.sqrt(error)
         print time, error
         if (error < min): min=error
         if (error > max): max=error
@@ -81,12 +80,23 @@ def computeDifferences(server, client):
 # -----------------------------------------------------------------------------
 
 if __name__=="__main__":
+    if len(sys.argv)==5 and sys.argv[1]=="-f":
+        fields = sys.argv[2]
+        del sys.argv[1:3]
+    else:
+        fields = ["6", "9", "11"]
+    
     if len(sys.argv)!=3:
         usage()
-    server_name, time_s, x_s, z_s = splitArg(sys.argv[1])
-    client_name, time_c, x_c, z_c = splitArg(sys.argv[2])
 
-    server = readFile(server_name, time_s, x_s, z_s)
-    client = readFile(client_name, time_c, x_c, z_c)
+    # -1 to convert awk/gnuplot indices (starting with 1) to
+    # python indices (starting with 0)
+    field_indices = [int(item)-1 for item in fields.split(",")]
+    
+    server_name = sys.argv[1]
+    client_name = sys.argv[2]
+
+    server = readFile(server_name, field_indices)
+    client = readFile(client_name, field_indices)
     
     computeDifferences(server, client)
