@@ -251,7 +251,7 @@ void History::Save()
     int index = m_wrapped ? m_current : 0;
     for(int i=0; i<m_size; i++)
     {
-        fprintf(fd, "delta: %f\n",m_all_deltas[index]);
+        fprintf(fd, "delta: %12.9f\n",m_all_deltas[index]);
         index=(index+1)%m_size;
     }
 
