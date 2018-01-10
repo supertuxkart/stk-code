@@ -84,7 +84,9 @@ void History::allocateMemory(int number_of_frames)
 void History::addEvent(int kart_id, PlayerAction pa, int value)
 {
     InputEvent ie;
-    ie.m_index = m_current;
+    // The event is added before m_current is increased. So in order to
+    // save the right index for this event, we need to use m_current+1.
+    ie.m_index      = m_current+1;
     ie.m_action     = pa;
     ie.m_value      = value;
     ie.m_kart_index = kart_id;
