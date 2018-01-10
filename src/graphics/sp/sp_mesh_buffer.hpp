@@ -112,6 +112,7 @@ public:
     virtual void draw(DrawCallType dct = DCT_NORMAL, int material_id = -1,
                       bool bindless_texture = false) const
     {
+#ifndef SERVER_ONLY
         glBindVertexArray(m_vao[dct]);
         if (material_id == -1 || bindless_texture)
         {
@@ -142,6 +143,7 @@ public:
                 (void*)(std::get<0>(m_stk_material[material_id]) << 1),
                 (unsigned)m_ins_dat[dct].size());
         }
+#endif
     }
     // ------------------------------------------------------------------------
     virtual void uploadGLMesh();

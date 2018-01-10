@@ -69,7 +69,7 @@ void Graph::createDebugMesh()
 {
     if (getNumNodes() <= 0) return;  // no debug output if not graph
 
-#ifndef SERVER_ONY
+#ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
         createMeshSP(/*show_invisible*/true,
@@ -374,7 +374,7 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
     irr_driver->getSceneManager()
         ->setAmbientLight(video::SColor(255, 255, 255, 255));
 
-#ifndef SERVER_ONY
+#ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
         createMeshSP(/*show_invisible part of the track*/ false,

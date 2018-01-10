@@ -91,7 +91,6 @@ extern std::vector<GLuint> sp_prefilled_tex;
 extern unsigned sp_solid_poly_count;
 extern unsigned sp_shadow_poly_count;
 extern int sp_cur_shadow_cascade;
-extern bool sp_null_device;
 extern bool sp_culling;
 extern unsigned sp_cur_player;
 extern unsigned sp_cur_buf_id[MAX_PLAYER_COUNT];

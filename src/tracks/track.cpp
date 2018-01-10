@@ -299,8 +299,14 @@ void Track::cleanup()
     Graph::destroy();
     ItemManager::destroy();
 #ifndef SERVER_ONLY
-    CPUParticleManager::getInstance()->cleanMaterialMap();
-    SP::resetEmptyFogColor();
+    if (!ProfileWorld::isNoGraphics())
+    {
+        CPUParticleManager::getInstance()->cleanMaterialMap();
+    }
+    if (CVS->isGLSL())
+    {
+        SP::resetEmptyFogColor();
+    }
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
 #endif
 
@@ -335,8 +341,8 @@ void Track::cleanup()
     }
     m_object_physics_only_nodes.clear();
 
-    irr_driver->removeNode(m_sun);
 #ifndef SERVER_ONLY
+    irr_driver->removeNode(m_sun);
     if (CVS->isGLSL())
         m_sun->drop();
 #endif
@@ -410,12 +416,17 @@ void Track::cleanup()
         material_manager->popTempMaterial();
     }
 
+#ifndef SERVER_ONLY
     irr_driver->clearGlowingNodes();
     irr_driver->clearLights();
     irr_driver->clearForcedBloom();
     irr_driver->clearBackgroundNodes();
-    SP::SPTextureManager::get()->removeUnusedTextures();
 
+    if (CVS->isGLSL())
+    {
+        SP::SPTextureManager::get()->removeUnusedTextures();
+    }
+#endif
     if(UserConfigParams::logMemory())
     {
         Log::debug("track",
@@ -1851,7 +1862,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         glBufferSubData(GL_UNIFORM_BUFFER, 28, 4, &val);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
-    else
+    else if (CVS->isGLSL())
     {
         SP::resetEmptyFogColor();
     }

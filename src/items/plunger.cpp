@@ -94,15 +94,12 @@ Plunger::Plunger(AbstractKart *kart)
     setAdjustUpVelocity(false);
 
     m_rubber_band = NULL;
-
-#ifndef SERVER_ONLY
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
-    if (!(m_reverse_mode || race_manager->isBattleMode() || !CVS->isGLSL()))
+    if (!(m_reverse_mode || race_manager->isBattleMode()))
     {
         m_rubber_band = new RubberBand(this, kart);
     }
-#endif
     m_keep_alive = -1;
 }   // Plunger
 
@@ -175,7 +172,9 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
 
         m_keep_alive = 0;
         // Make this object invisible.
+#ifndef SERVER_ONLY
         getNode()->setVisible(false);
+#endif
         Physics::getInstance()->removeBody(getBody());
     }
     else

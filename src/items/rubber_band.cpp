@@ -28,6 +28,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
+#include "modes/profile_world.hpp"
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
 #include "utils/mini_glm.hpp"
@@ -46,6 +47,10 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
 {
     m_attached_state = RB_TO_PLUNGER;
 #ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+    {
+        return;
+    }
     video::SColor color(77, 179, 0, 0);
     if (CVS->isDefferedEnabled())
     {
@@ -73,7 +78,10 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
 RubberBand::~RubberBand()
 {
 #ifndef SERVER_ONLY
-    m_dy_dc->removeFromSP();
+    if (m_dy_dc)
+    {
+        m_dy_dc->removeFromSP();
+    }
 #endif
 }   // RubberBand
 
@@ -97,6 +105,10 @@ void RubberBand::updatePosition()
     }   // switch(m_attached_state);
 
 #ifndef SERVER_ONLY
+    if (!m_dy_dc)
+    {
+        return;
+    }
     // Update the rubber band positions
     // --------------------------------
     // Todo: make height dependent on length (i.e. rubber band gets

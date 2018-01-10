@@ -18,6 +18,8 @@
 #ifndef HEADER_SP_TEXTURE_MANAGER_HPP
 #define HEADER_SP_TEXTURE_MANAGER_HPP
 
+#ifndef SERVER_ONLY
+
 #include "graphics/gl_headers.hpp"
 #include "utils/log.hpp"
 #include "utils/no_copy.hpp"
@@ -131,5 +133,7 @@ public:
 };
 
 }
+
+#endif
 
 #endif

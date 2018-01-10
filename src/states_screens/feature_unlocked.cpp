@@ -125,6 +125,7 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(std::vector<irr::video::IT
                                                       irr::core::stringw msg)
 {
     m_unlocked_kart = NULL;
+#ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
         for (auto* pict : picts)
@@ -134,6 +135,7 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(std::vector<irr::video::IT
         }
     }
     else
+#endif
     {
         m_pictures = picts;
     }
@@ -353,6 +355,7 @@ void FeatureUnlockedCutScene::init()
             m_avoid_irrlicht_bug = irr_driver->addMesh(mesh);
 #endif
         }
+#ifndef SERVER_ONLY
         else if (!m_unlocked_stuff[n].m_sp_pictures.empty())
         {
             scene::IMesh* mesh = irr_driver->createTexturedQuadMesh(NULL,
@@ -383,6 +386,7 @@ void FeatureUnlockedCutScene::init()
             m_unlocked_stuff[n].m_root_gift_node->setName("unlocked track picture");
 #endif
         }
+#endif
         else if (!m_unlocked_stuff[n].m_pictures.empty())
         {
             video::SMaterial m;

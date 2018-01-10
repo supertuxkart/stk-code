@@ -905,7 +905,6 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
                 kart_model.getFrame(KartModel::AF_SELECTION_END) :
                 kart_model.getFrame(KartModel::AF_WIN_END) :
                 kart_model.getBaseFrame(),
-                false/*all_parts_colorized*/,
                 kart_model.getAnimationSpeed());
 
             model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
@@ -928,8 +927,7 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
                         kart_model.getInverseBoneMatrix(obj.m_bone_name);
                     swol = inv * obj.m_location;
                 }
-                w3->addModel(obj.m_model, swol, -1, -1, false, 0.0f,
-                    obj.m_bone_name);
+                w3->addModel(obj.m_model, swol, -1, -1, 0.0f, obj.m_bone_name);
             }
             //w3->update(0);
 

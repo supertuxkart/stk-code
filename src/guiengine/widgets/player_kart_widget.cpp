@@ -216,7 +216,6 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         kart_model.getFrame(KartModel::AF_SELECTION_END) :
         kart_model.getFrame(KartModel::AF_WIN_END) :
         kart_model.getBaseFrame(),
-        false/*all_parts_colorized*/,
         kart_model.getAnimationSpeed());
 
     model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
@@ -237,7 +236,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
                 kart_model.getInverseBoneMatrix(obj.m_bone_name);
             swol = inv * obj.m_location;
         }
-        m_model_view->addModel(obj.m_model, swol, -1, -1, false, 0.0f,
+        m_model_view->addModel(obj.m_model, swol, -1, -1, 0.0f,
             obj.m_bone_name);
     }
     m_model_view->setRotateContinuously( 35.0f );

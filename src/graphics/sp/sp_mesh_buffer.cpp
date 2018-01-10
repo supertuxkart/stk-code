@@ -484,6 +484,7 @@ void SPMeshBuffer::uploadInstanceData()
 // ----------------------------------------------------------------------------
 void SPMeshBuffer::enableTextureMatrix(unsigned mat_id)
 {
+#ifndef SERVER_ONLY
     assert(mat_id < m_stk_material.size());
     // Make the 31 bit in normal to be 1
     uploadGLMesh();
@@ -513,6 +514,7 @@ void SPMeshBuffer::enableTextureMatrix(unsigned mat_id)
         }
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+#endif
 }   // enableTextureMatrix
 
 // ----------------------------------------------------------------------------

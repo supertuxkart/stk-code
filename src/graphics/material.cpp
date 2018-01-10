@@ -28,23 +28,22 @@
 #include "config/user_config.hpp"
 #include "config/stk_config.hpp"
 #include "guiengine/engine.hpp"
-#include "graphics/callbacks.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "io/file_manager.hpp"
-#include "race/race_manager.hpp"
 #include "io/xml_node.hpp"
-#include "utils/string_utils.hpp"
+#include "modes/profile_world.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/log.hpp"
 #include "utils/vs.hpp"
 
 #include <IMaterialRendererServices.h>
 #include <ISceneNode.h>
-#include <IShaderConstantSetCallBack.h>
 
 using namespace irr::video;
 
@@ -465,7 +464,7 @@ Material::Material(const XMLNode *node, bool deprecated)
     }
 
 #ifndef SERVER_ONLY
-    if (!CVS->isDefferedEnabled())
+    if (ProfileWorld::isNoGraphics() || !CVS->isDefferedEnabled())
     {
         for (int i = 2; i < 6; i++)
         {

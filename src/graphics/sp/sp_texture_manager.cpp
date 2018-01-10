@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_texture.hpp"
@@ -26,7 +28,7 @@
 #include <string>
 
 const int MAX_TA = 256;
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+#ifndef USE_GLES2
 #include <squish.h>
 #endif
 
@@ -74,7 +76,7 @@ SPTextureManager::SPTextureManager()
                 }
             });
     }
-#ifndef SERVER_ONLY
+
     if (CVS->useArrayTextures())
     {
         Log::info("SPTextureManager", "Enable array textures, size %d",
@@ -84,7 +86,7 @@ SPTextureManager::SPTextureManager()
         sp_prefilled_tex[0] = m_all_textures_array;
         initTextureArray();
     }
-#endif
+
     m_textures["unicolor_white"] = SPTexture::getWhiteTexture();
     m_textures[""] = SPTexture::getTransparentTexture();
 }   // SPTextureManager
@@ -111,7 +113,6 @@ SPTextureManager::~SPTextureManager()
 // ----------------------------------------------------------------------------
 void SPTextureManager::initTextureArray()
 {
-#ifndef SERVER_ONLY
 #ifdef USE_GLES2
     unsigned upload_format = GL_RGBA;
 #else
@@ -176,7 +177,6 @@ void SPTextureManager::initTextureArray()
         glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
     }
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-#endif
 }   // initTextureArray
 
 // ----------------------------------------------------------------------------
@@ -234,7 +234,7 @@ std::shared_ptr<SPTexture> SPTextureManager::getTexture(const std::string& p,
         return ret->second;
     }
     int ta_idx = -1;
-#ifndef SERVER_ONLY
+
     if (CVS->useArrayTextures())
     {
         ta_idx = getTextureArrayIndex();
@@ -245,7 +245,7 @@ std::shared_ptr<SPTexture> SPTextureManager::getTexture(const std::string& p,
             return m_textures.at("");
         }
     }
-#endif
+
     std::shared_ptr<SPTexture> t =
         std::make_shared<SPTexture>(p, m, undo_srgb, ta_idx);
     addThreadedFunction(std::bind(&SPTexture::threadedLoad, t));
@@ -286,3 +286,5 @@ void SPTextureManager::dumpAllTexture()
 
 // ----------------------------------------------------------------------------
 }
+
+#endif

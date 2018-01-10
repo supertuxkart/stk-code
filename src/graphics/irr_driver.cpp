@@ -1167,8 +1167,7 @@ scene::IParticleSystemSceneNode *IrrDriver::addParticleNode(bool default_emitter
 scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
                                       const std::string& debug_name,
                                       scene::ISceneNode *parent,
-                                      std::shared_ptr<RenderInfo> render_info,
-                                      bool all_parts_colorized)
+                                      std::shared_ptr<RenderInfo> render_info)
 {
 #ifdef SERVER_ONLY
     return m_scene_manager->addMeshSceneNode(mesh, parent);
@@ -1389,7 +1388,7 @@ void IrrDriver::removeTexture(video::ITexture *t)
  */
 scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh,
     const std::string& debug_name, scene::ISceneNode* parent,
-    std::shared_ptr<RenderInfo> render_info, bool all_parts_colorized)
+    std::shared_ptr<RenderInfo> render_info)
 {
     scene::IAnimatedMeshSceneNode* node;
 #ifndef SERVER_ONLY
@@ -1610,7 +1609,9 @@ void IrrDriver::onLoadWorld()
     // ----------------------------------------------------------------------------
 void IrrDriver::onUnloadWorld()
 {
+#ifndef SERVER_ONLY
     m_renderer->onUnloadWorld();
+#endif
 }   // onUnloadWorld
 
 // ----------------------------------------------------------------------------
@@ -1810,8 +1811,12 @@ void IrrDriver::update(float dt)
     m_wind->update();
 
     PropertyAnimator::get()->update(dt);
-    SP::SPTextureManager::get()->checkForGLCommand();
-
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        SP::SPTextureManager::get()->checkForGLCommand();
+    }
+#endif
     World *world = World::getWorld();
 
     if (world)

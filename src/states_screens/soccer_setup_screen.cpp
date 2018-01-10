@@ -187,8 +187,8 @@ void SoccerSetupScreen::beforeAddingWidget()
                     kart_model.getInverseBoneMatrix(obj.m_bone_name);
                 swol = inv * obj.m_location;
             }
-            kart_view->addModel(obj.m_model, swol, -1, -1,
-                false/*all_parts_colorized*/, 0.0f, obj.m_bone_name);
+            kart_view->addModel(obj.m_model, swol, -1, -1, 0.0f,
+                obj.m_bone_name);
         }
 
         kart_view->setRotateContinuously( KART_CONTINUOUS_ROTATION_SPEED );

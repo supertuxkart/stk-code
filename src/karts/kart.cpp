@@ -274,9 +274,12 @@ Kart::~Kart()
     if(m_attachment)             delete m_attachment;
     if(m_stars_effect)          delete m_stars_effect;
 
+#ifndef SERVER_ONLY
     delete m_shadow;
-    if (m_wheel_box) m_wheel_box->remove();
     if(m_skidmarks) delete m_skidmarks ;
+#endif
+
+    if (m_wheel_box) m_wheel_box->remove();
 
     // Ghost karts don't have a body
     if(m_body)
@@ -411,10 +414,12 @@ void Kart::reset()
     applyEngineForce (0.0f);
 
     AbstractKart::reset();
+#ifndef SERVER_ONLY
     if (m_skidmarks)
     {
         m_skidmarks->reset();
     }
+#endif
 
     Vec3 front(0, 0, getKartLength()*0.5f);
     m_xyz_front = getTrans()(front);
@@ -1196,11 +1201,12 @@ void Kart::eliminate()
 
     m_eliminated = true;
 
+#ifndef SERVER_ONLY
     if (m_shadow)
     {
         m_shadow->update(false);
     }
-
+#endif
     m_node->setVisible(false);
 }   // eliminate
 
@@ -1531,6 +1537,7 @@ void Kart::update(float dt)
     static video::SColor pink(255, 255, 133, 253);
     static video::SColor green(255, 61, 87, 23);
 
+#ifndef SERVER_ONLY
     // draw skidmarks if relevant (we force pink skidmarks on when hitting a bubblegum)
     if(m_kart_properties->getSkidEnabled() && m_skidmarks)
     {
@@ -1538,6 +1545,7 @@ void Kart::update(float dt)
                             m_bubblegum_time > 0,
                             (m_bubblegum_time > 0 ? (m_has_caught_nolok_bubblegum ? &green : &pink) : NULL) );
     }
+#endif
 
     const bool emergency = getKartAnimation()!=NULL;
 
@@ -2919,6 +2927,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     // how much the wheels need to rotate.
     m_kart_model->update(dt, m_speed*dt, getSteerPercent(), m_speed, lean_height);
 
+#ifndef SERVER_ONLY
     // Determine the shadow position from the terrain Y position. This
     // leaves the shadow on the ground even if the kart is jumping because
     // of skidding (shadows are disabled when wheel are not on the track).
@@ -2927,6 +2936,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         const bool emergency = getKartAnimation() != NULL;
         m_shadow->update(isOnGround() && !emergency);
     }
+#endif
+
 #ifdef XX
     // cheap wheelie effect
     if (m_controls.getNitro())

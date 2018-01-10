@@ -51,7 +51,8 @@ STKTexture::STKTexture(const std::string& path, TexConfig* tc, bool no_upload)
 #ifndef SERVER_ONLY
     if (m_tex_config)
     {
-        if ((!CVS->isARBSRGBFramebufferUsable() && !CVS->isDefferedEnabled()) ||
+        if (ProfileWorld::isNoGraphics() || (!CVS->isARBSRGBFramebufferUsable()
+            && !CVS->isDefferedEnabled()) ||
             !CVS->isGLSL())
         {
             m_tex_config->m_srgb = false;
@@ -109,6 +110,9 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
 {
     if (ProfileWorld::isNoGraphics())
     {
+        m_orig_size.Width = 2;
+        m_orig_size.Height = 2;
+        m_size = m_orig_size;
         m_texture_name = 1;
         if (preload_data)
             delete[] preload_data;

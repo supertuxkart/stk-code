@@ -178,6 +178,7 @@ int SPMeshNode::getTotalJoints() const
 // ----------------------------------------------------------------------------
 SPShader* SPMeshNode::getShader(unsigned mesh_buffer_id) const
 {
+#ifndef SERVER_ONLY
     if (!m_mesh || mesh_buffer_id < m_mesh->getMeshBufferCount())
     {
         const std::string sn = (m_shader_override.empty() ?
@@ -197,6 +198,7 @@ SPShader* SPMeshNode::getShader(unsigned mesh_buffer_id) const
         }
         return shader;
     }
+#endif
     return NULL;
 }   // getShader
 

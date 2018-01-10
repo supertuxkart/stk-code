@@ -42,7 +42,11 @@ bool SPMeshLoader::isALoadableFileExtension(const io::path& filename) const
 // ----------------------------------------------------------------------------
 scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
 {
+#ifndef SERVER_ONLY
     const bool real_spm = CVS->isGLSL();
+#else
+    const bool real_spm = false;
+#endif
     if (!IS_LITTLE_ENDIAN)
     {
         Log::error("SPMeshLoader", "Not little endian machine.");

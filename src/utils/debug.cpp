@@ -349,7 +349,9 @@ bool handleContextMenuAction(s32 cmd_id)
         irr_driver->toggleBoundingBoxesViz();
         break;
     case DEBUG_GRAPHICS_TOGGLE_CULLING:
+#ifndef SERVER_ONLY
         SP::sp_culling = !SP::sp_culling;
+#endif
         break;
     case DEBUG_PROFILER:
         profiler.toggleStatus();
