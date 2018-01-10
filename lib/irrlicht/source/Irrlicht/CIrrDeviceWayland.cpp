@@ -774,14 +774,14 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
 
     m_display = wl_display_connect(NULL);
     
+    m_xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
+    
     m_registry = wl_display_get_registry(m_display);
     wl_registry_add_listener(m_registry, &WaylandCallbacks::registry_listener, 
                              this);
     
     wl_display_dispatch(m_display);
     wl_display_roundtrip(m_display);
-
-    m_xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
 
     if (CreationParams.DriverType != video::EDT_NULL)
     {
