@@ -182,6 +182,8 @@ void WorldStatus::update(float dt)
  */
 void WorldStatus::updateTime(const float dt)
 {
+    Log::verbose("updateTime", "phase %d time %f dt %f aux %f",
+        m_phase, m_time, dt, m_auxiliary_timer);
     switch (m_phase)
     {
         // Note: setup phase must be a separate phase, since the race_manager
