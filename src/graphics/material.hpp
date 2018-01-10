@@ -95,13 +95,16 @@ private:
 
     ShaderType       m_shader_type;
 
+    /** Either ' ' (no mirroring), 'U' or 'V' if a texture needs to be
+     *  mirrored when driving in reverse. Typically used for arrows indicating
+     *  the direction. */
+    char             m_mirror_axis_when_reverse;
+
     /** Set if being on this surface means being under some other mesh.
      *  This is used to simulate that a kart is in water: the ground under
      *  the water is marked as 'm_below_surface', which will then trigger a raycast
      *  up to find the position of the actual water surface. */
     bool             m_below_surface;
-
-    bool             m_water_splash;
 
     /** If a kart is falling over a material with this flag set, it
      *  will trigger the special camera fall effect. */
@@ -128,34 +131,38 @@ private:
      *  upside down. */
     bool             m_has_gravity;
 
-    /** Speed of the 'main' wave in the water shader. Only used if
-        m_shader_type == SHDERTYPE_WATER */
-    float            m_water_shader_speed_1;
-
-    /** Speed of the 'secondary' waves in the water shader. Only used if
-        m_shader_type == SHADERTYPE_WATER */
-    float            m_water_shader_speed_2;
-
-    /** If a kart is rescued when crashing into this surface. */
-    CollisionReaction m_collision_reaction;
-
-    /** Particles to show on touch */
-    std::string      m_collision_particles;
-
-    /** If m_shader_type == SHADERTYPE_VEGETATION */
-    float            m_grass_speed;
-    float            m_grass_amplitude;
-
     /** If the property should be ignored in the physics. Example would be
      *  plants that a kart can just drive through. */
     bool             m_ignore;
 
     bool             m_fog;
 
-    /** Either ' ' (no mirroring), 'U' or 'V' if a texture needs to be 
-     *  mirrored when driving in reverse. Typically used for arrows indicating
-     *  the direction. */
-    char             m_mirror_axis_when_reverse;
+    /** True if backface culliing should be enabled. */
+    bool             m_backface_culling;
+
+    /** Set to true to disable writing to the Z buffer. Usually to be used with alpha blending */
+    bool             m_disable_z_write;
+
+    /** True if the material shouldn't be "slippy" at an angle */
+    bool             m_high_tire_adhesion;
+
+    bool  m_complain_if_not_found;
+
+    bool  m_deprecated;
+
+    bool  m_installed;
+
+    /** True if this material can be colorized (like red/blue in team game). */
+    bool             m_colorizable;
+
+    /** Minimum resulting saturation when colorized (from 0 to 1) */
+    float            m_colorization_factor;
+
+    /** If a kart is rescued when crashing into this surface. */
+    CollisionReaction m_collision_reaction;
+
+    /** Particles to show on touch */
+    std::string      m_collision_particles;
 
     /** 
     * Associated with m_mirror_axis_when_reverse, to avoid mirroring the same material twice
@@ -168,34 +175,11 @@ private:
     /** Texture clamp bitmask */
     unsigned int     m_clamp_tex;
 
-    /** True if backface culliing should be enabled. */
-    bool             m_backface_culling;
-
-    /** Set to true to disable writing to the Z buffer. Usually to be used with alpha blending */
-    bool             m_disable_z_write;
-
-    /** True if this material can be colorized (like red/blue in team game). */
-    bool             m_colorizable;
-
-    /** Minimum resulting saturation when colorized (from 0 to 1) */
-    float            m_colorization_factor;
-
     /** List of hue pre-defined for colorization (from 0 to 1) */
     std::vector<float> m_hue_settings;
 
     /** Random generator for getting pre-defined hue */
     RandomGenerator m_random_hue;
-
-    /** Some textures need to be pre-multiplied, some divided to give
-     *  the intended effect. */
-    //enum             {ADJ_NONE, ADJ_PREMUL, ADJ_DIV}
-    //                 m_adjust_image;
-
-    /** True if lightmapping is enabled for this material. */
-    //bool             m_lightmap;
-
-    /** True if the material shouldn't be "slippy" at an angle */
-    bool             m_high_tire_adhesion;
 
     /** How much the top speed is reduced per second. */
     float            m_slowdown_time;
@@ -240,12 +224,6 @@ private:
 
     std::string      m_colorization_mask;
 
-    bool  m_complain_if_not_found;
-
-    bool  m_deprecated;
-
-    bool  m_installed;
-
     void  init    ();
     void  install (bool srgb = false, bool premul_alpha = false);
     void  initCustomSFX(const XMLNode *sfx);
@@ -256,6 +234,8 @@ private:
     std::string      m_uv_two_tex;
     // Full path for textures in sp shader
     std::string      m_sampler_path[6];
+    std::string      m_container_id;
+    void loadContainerId();
 
 public:
           Material(const XMLNode *node, bool deprecated);
@@ -426,6 +406,8 @@ public:
         assert(layer < 6);
         return m_sampler_path[layer];
     }
+    // ------------------------------------------------------------------------
+    const std::string& getContainerId() const        { return m_container_id; }
 };
 
 

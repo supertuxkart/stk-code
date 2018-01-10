@@ -225,7 +225,8 @@ void SPTextureManager::checkForGLCommand(bool before_scene)
 // ----------------------------------------------------------------------------
 std::shared_ptr<SPTexture> SPTextureManager::getTexture(const std::string& p,
                                                         Material* m,
-                                                        bool undo_srgb)
+                                                        bool undo_srgb,
+                                                        const std::string& cid)
 {
     checkForGLCommand();
     auto ret = m_textures.find(p);
@@ -247,7 +248,7 @@ std::shared_ptr<SPTexture> SPTextureManager::getTexture(const std::string& p,
     }
 
     std::shared_ptr<SPTexture> t =
-        std::make_shared<SPTexture>(p, m, undo_srgb, ta_idx);
+        std::make_shared<SPTexture>(p, m, undo_srgb, ta_idx, cid);
     addThreadedFunction(std::bind(&SPTexture::threadedLoad, t));
     m_textures[p] = t;
     return t;

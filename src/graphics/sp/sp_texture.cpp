@@ -50,7 +50,7 @@ namespace SP
 {
 // ----------------------------------------------------------------------------
 SPTexture::SPTexture(const std::string& path, Material* m, bool undo_srgb,
-                     int ta_idx)
+                     int ta_idx, const std::string& container_id)
          : m_path(path), m_texture_array_idx(ta_idx), m_width(0), m_height(0),
            m_material(m), m_undo_srgb(undo_srgb)
 {
@@ -63,34 +63,25 @@ SPTexture::SPTexture(const std::string& path, Material* m, bool undo_srgb,
 
     createWhite(false/*private_init*/);
 
-    if (!CVS->isTextureCompressionEnabled())
+    if (!CVS->isTextureCompressionEnabled() || container_id.empty())
     {
         return;
     }
-    std::string basename = StringUtils::getBasename(m_path);
-    std::string container_id;
-    if (file_manager->searchTextureContainerId(container_id, basename))
-    {
-        std::string cache_subdir = "hd/";
-        if ((UserConfigParams::m_high_definition_textures & 0x01) == 0x01)
-        {
-            cache_subdir = "hd/";
-        }
-        else
-        {
-            cache_subdir = StringUtils::insertValues("resized_%i/",
-                (int)UserConfigParams::m_max_texture_size);
-        }
 
-        m_cache_directory = file_manager->getCachedTexturesDir() +
-            cache_subdir + container_id;
-        file_manager->checkAndCreateDirectoryP(m_cache_directory);
-    }
-    if (m_cache_directory.empty())
+    std::string cache_subdir = "hd/";
+    if ((UserConfigParams::m_high_definition_textures & 0x01) == 0x01)
     {
-        Log::warn("SPTexture", "Missing container info for %s, no texture"
-            " compression cache.", m_path.c_str());
+        cache_subdir = "hd/";
     }
+    else
+    {
+        cache_subdir = StringUtils::insertValues("resized_%i/",
+            (int)UserConfigParams::m_max_texture_size);
+    }
+    m_cache_directory = file_manager->getCachedTexturesDir() +
+        cache_subdir + container_id;
+    file_manager->checkAndCreateDirectoryP(m_cache_directory);
+
 #endif
 }   // SPTexture
 
@@ -609,7 +600,8 @@ bool SPTexture::threadedLoad()
     }
     else
     {
-        if (CVS->isTextureCompressionEnabled() && image &&
+        if (!m_cache_directory.empty() &&
+            CVS->isTextureCompressionEnabled() && image &&
             image->getDimension().Width >= 4 &&
             image->getDimension().Height >= 4)
         {

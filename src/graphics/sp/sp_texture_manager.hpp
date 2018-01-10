@@ -112,7 +112,8 @@ public:
     void checkForGLCommand(bool before_scene = false);
     // ------------------------------------------------------------------------
     std::shared_ptr<SPTexture> getTexture(const std::string& p,
-                                          Material* m, bool undo_srgb);
+                                          Material* m, bool undo_srgb,
+                                          const std::string& container_id);
     // ------------------------------------------------------------------------
     int dumpTextureUsage();
     // ------------------------------------------------------------------------

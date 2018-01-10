@@ -696,7 +696,7 @@ void IrrDriver::createSunInterposer()
 #ifndef SERVER_ONLY
     scene::IMesh * sphere = m_scene_manager->getGeometryCreator()
         ->createSphereMesh(1, 16, 16);
-    Material* material = material_manager->getSPMaterial("solid");
+    Material* material = material_manager->getDefaultSPMaterial("solid");
     m_sun_interposer = new SP::SPDynamicDrawCall
         (scene::EPT_TRIANGLES, NULL/*shader*/, material);
     for (unsigned i = 0; i < sphere->getMeshBufferCount(); i++)

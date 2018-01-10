@@ -348,7 +348,7 @@ void Graph::createMeshSP(bool show_invisible, bool enable_transparency,
     spmb->setSPMVertices(vertices);
     spmb->setIndices(indices);
     spmb->recalculateBoundingBox();
-    spmb->setSTKMaterial(material_manager->getSPMaterial(
+    spmb->setSTKMaterial(material_manager->getDefaultSPMaterial(
         enable_transparency ? "alphablend" : "unlit"));
     spm->addSPMeshBuffer(spmb);
     spm->setBoundingBox(spmb->getBoundingBox());

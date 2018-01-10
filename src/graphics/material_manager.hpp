@@ -51,7 +51,7 @@ private:
     std::vector<Material*> m_materials;
 
     std::map<video::E_MATERIAL_TYPE, Material*> m_default_materials;
-    std::map<std::string, Material*> m_sp_materials;
+    std::map<std::string, Material*> m_default_sp_materials;
     Material* getDefaultMaterial(video::E_MATERIAL_TYPE material_type);
 
 public:
@@ -90,7 +90,7 @@ public:
 
     void      unloadAllTextures();
 
-    Material* getSPMaterial(const std::string& shader_name, const std::string& layer_one_lc = "");
+    Material* getDefaultSPMaterial(const std::string& shader_name, const std::string& layer_one_lc = "");
     Material* getLatestMaterial() { return m_materials[m_materials.size()-1]; }
 };   // MaterialManager
 

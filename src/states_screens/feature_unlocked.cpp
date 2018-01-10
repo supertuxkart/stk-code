@@ -104,7 +104,8 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(irr::video::ITexture* pict
     if (CVS->isGLSL())
     {
         m_sp_pictures.push_back(SP::SPTextureManager::get()
-            ->getTexture(pict->getName().getPtr(), NULL, true));
+            ->getTexture(pict->getName().getPtr(), NULL, true,
+            ""/*container_id*/));
     }
     else
     {
@@ -131,7 +132,8 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(std::vector<irr::video::IT
         for (auto* pict : picts)
         {
             m_sp_pictures.push_back(SP::SPTextureManager::get()
-                ->getTexture(pict->getName().getPtr(), NULL, true));
+                ->getTexture(pict->getName().getPtr(), NULL, true,
+                ""/*container_id*/));
         }
     }
     else

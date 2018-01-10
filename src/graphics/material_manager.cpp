@@ -68,12 +68,13 @@ MaterialManager::~MaterialManager()
         delete it->second;
     }
     for (std::map<std::string, Material*> ::iterator it =
-         m_sp_materials.begin(); it != m_sp_materials.end(); it++)
+         m_default_sp_materials.begin(); it != m_default_sp_materials.end();
+         it++)
     {
         delete it->second;
     }
     m_default_materials.clear();
-    m_sp_materials.clear();
+    m_default_sp_materials.clear();
 }   // ~MaterialManager
 
 //-----------------------------------------------------------------------------
@@ -141,7 +142,7 @@ Material* MaterialManager::getMaterialSPM(std::string lay_one_tex_lc,
             }
         }   // for i
     }
-    return getSPMaterial(def_shader_name,
+    return getDefaultSPMaterial(def_shader_name,
         StringUtils::getBasename(orignal_layer_one));
 }
 
@@ -212,22 +213,22 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
 }   // setAllMaterialFlags
 
 //-----------------------------------------------------------------------------
-Material* MaterialManager::getSPMaterial(const std::string& shader_name,
-                                         const std::string& layer_one_lc)
+Material* MaterialManager::getDefaultSPMaterial(const std::string& shader_name,
+                                                const std::string& l1_lc)
 {
-    core::stringc lc(layer_one_lc.c_str());
+    core::stringc lc(l1_lc.c_str());
     lc.make_lower();
     const std::string key = shader_name + lc.c_str();
-    auto ret = m_sp_materials.find(key);
-    if (ret != m_sp_materials.end())
+    auto ret = m_default_sp_materials.find(key);
+    if (ret != m_default_sp_materials.end())
     {
         return ret->second;
     }
-    Material* m = new Material(layer_one_lc.empty() ? "unicolor_white" :
-        layer_one_lc, false, false, false, shader_name);
-    m_sp_materials[key] = m;
+    Material* m = new Material(l1_lc.empty() ? "unicolor_white" :
+        l1_lc, false, false, false, shader_name);
+    m_default_sp_materials[key] = m;
     return m;
-}   // getSPMaterial
+}   // getDefaultSPMaterial
 
 //-----------------------------------------------------------------------------
 Material* MaterialManager::getDefaultMaterial(video::E_MATERIAL_TYPE shader_type)

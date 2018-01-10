@@ -61,7 +61,7 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
     }
     m_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
         (scene::EPT_TRIANGLE_STRIP, SP::getSPShader("unlit"),
-        material_manager->getSPMaterial("unlit"));
+        material_manager->getDefaultSPMaterial("unlit"));
     m_dy_dc->getVerticesVector().resize(4);
     // Set the vertex colors properly, as the new pipeline doesn't use the old
     // light values

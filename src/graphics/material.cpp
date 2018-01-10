@@ -82,10 +82,6 @@ Material::Material(const XMLNode *node, bool deprecated)
             (relative_path.c_str()).c_str();
     }
 
-    core::stringc texfname(m_texname.c_str());
-    texfname.make_lower();
-    m_texname = texfname.c_str();
-
     if (m_full_path.size() > 0)
     {
         core::stringc texfname2(m_full_path.c_str());
@@ -170,7 +166,6 @@ Material::Material(const XMLNode *node, bool deprecated)
     node->get("colorization-mask",   &m_colorization_mask  );
     std::string gloss_map;
     node->get("gloss-map",           &gloss_map            );
-    node->get("water-splash",        &m_water_splash       );
     node->get("jump",                &m_is_jump_texture    );
     node->get("has-gravity",         &m_has_gravity        );
     node->get("uv-two-tex",          &m_uv_two_tex         );
@@ -230,16 +225,10 @@ Material::Material(const XMLNode *node, bool deprecated)
         else if (s == "water_shader")
         {
             m_shader_type = SHADERTYPE_WATER;
-            node->get("water-shader-speed-1", &m_water_shader_speed_1);
-            node->get("water-shader-speed-2", &m_water_shader_speed_2);
         }
         else if (s == "grass")
         {
             m_shader_type = SHADERTYPE_VEGETATION;
-            m_grass_speed = 1.5f;
-            m_grass_amplitude = 0.25f;
-            node->get("grass-speed", &m_grass_speed);
-            node->get("grass-amplitude", &m_grass_amplitude);
         }
         else if (s == "splatting")
         {
@@ -249,10 +238,6 @@ Material::Material(const XMLNode *node, bool deprecated)
             node->get("splatting-texture-3", &m_sampler_path[4]);
             node->get("splatting-texture-4", &m_sampler_path[5]);
         }
-        //else
-        //{
-        //    Log::warn("Material", "Unknown shader type <%s> for <%s>", s.c_str(), m_texname.c_str());
-        //}
     }
     else
     {
@@ -327,23 +312,13 @@ Material::Material(const XMLNode *node, bool deprecated)
         s = "";
         node->get("graphical-effect", &s);
 
-        if (s == "water")
-        {
-            m_water_splash = true;
-        }
-        else if (s == "grass")
+        if (s == "grass")
         {
             m_shader_type = SHADERTYPE_VEGETATION;
-            m_grass_speed = 1.5f;
-            m_grass_amplitude = 0.25f;
-            node->get("grass-speed", &m_grass_speed);
-            node->get("grass-amplitude", &m_grass_amplitude);
         }
         else if (s == "water_shader")
         {
             m_shader_type = SHADERTYPE_WATER;
-            node->get("water-shader-speed-1", &m_water_shader_speed_1);
-            node->get("water-shader-speed-2", &m_water_shader_speed_2);
         }
         else if (s == "normal_map")
         {
@@ -400,8 +375,6 @@ Material::Material(const XMLNode *node, bool deprecated)
         if (water_shader)
         {
             m_shader_type = SHADERTYPE_WATER;
-            node->get("water-shader-speed-1", &m_water_shader_speed_1);
-            node->get("water-shader-speed-2", &m_water_shader_speed_2);
         }
 
         // ---- End backwards compatibility
@@ -473,6 +446,11 @@ Material::Material(const XMLNode *node, bool deprecated)
         }
     }
 #endif
+    loadContainerId();
+
+    core::stringc texfname(m_texname.c_str());
+    texfname.make_lower();
+    m_texname = texfname.c_str();
 
     if (m_disable_z_write && m_shader_type != SHADERTYPE_ALPHA_BLEND && m_shader_type != SHADERTYPE_ADDITIVE)
     {
@@ -523,6 +501,7 @@ Material::Material(const XMLNode *node, bool deprecated)
     if(m_has_gravity)
         m_high_tire_adhesion = true;
 }   // Material
+
 //-----------------------------------------------------------------------------
 video::ITexture* Material::getTexture(bool srgb, bool premul_alpha)
 {
@@ -532,6 +511,19 @@ video::ITexture* Material::getTexture(bool srgb, bool premul_alpha)
     }
     return m_texture;
 }   // getTexture
+
+//-----------------------------------------------------------------------------
+void Material::loadContainerId()
+{
+    if (m_sampler_path[0] != "unicolor_white")
+    {
+        if (!file_manager->searchTextureContainerId(m_container_id, m_texname))
+        {
+            Log::warn("Material", "Missing container id for %s, no texture"
+                " compression for it will be done", m_texname.c_str());
+        }
+    }
+}   // loadContainerId
 
 //-----------------------------------------------------------------------------
 /** Create a standard material using the default settings for materials.
@@ -573,6 +565,7 @@ Material::Material(const std::string& fname, bool is_full_path,
             }
         }
     }
+    loadContainerId();
 
     core::stringc texfname(m_texname.c_str());
     texfname.make_lower();
@@ -609,8 +602,6 @@ void Material::init()
     m_colorizable               = false;
     m_colorization_factor       = 0.0f;
     m_colorization_mask         = "";
-    m_water_shader_speed_1      = 6.6667f;
-    m_water_shader_speed_2      = 4.0f;
     m_fog                       = true;
     m_max_speed_fraction        = 1.0f;
     m_slowdown_time             = 1.0f;
@@ -627,7 +618,6 @@ void Material::init()
     m_zipper_speed_gain         = -1.0f;
     m_zipper_engine_force       = -1.0f;
     m_zipper_min_speed          = -1.0f;
-    m_water_splash              = false;
     m_is_jump_texture           = false;
     m_has_gravity               = false;
     m_complain_if_not_found     = true;

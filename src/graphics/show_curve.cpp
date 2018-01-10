@@ -34,7 +34,7 @@ ShowCurve::ShowCurve(float width, float height,
 {
     m_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
         (irr::scene::EPT_TRIANGLES, SP::getSPShader("alphablend"),
-        material_manager->getSPMaterial("alphablend"));
+        material_manager->getDefaultSPMaterial("alphablend"));
     SP::addDynamicDrawCall(m_dy_dc);
 }   // ShowCurve
 

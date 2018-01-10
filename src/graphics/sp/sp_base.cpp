@@ -1785,7 +1785,7 @@ SPMesh* convertEVTStandard(irr::scene::IMesh* mesh,
                            const irr::video::SColor* color)
 {
     SPMesh* spm = new SPMesh();
-    Material* material = material_manager->getSPMaterial("solid");
+    Material* material = material_manager->getDefaultSPMaterial("solid");
     for (unsigned i = 0; i < mesh->getMeshBufferCount(); i++)
     {
         std::vector<video::S3DVertexSkinnedMesh> vertices;

@@ -163,7 +163,8 @@ void SPMeshBuffer::uploadGLMesh()
             m_textures[i][j] = SPTextureManager::get()->getTexture
                 (std::get<2>(m_stk_material[i])->getSamplerPath(j),
                 j == 0 ? std::get<2>(m_stk_material[i]) : NULL,
-                j < 2 && CVS->isDefferedEnabled());
+                j < 2 && CVS->isDefferedEnabled(),
+                std::get<2>(m_stk_material[i])->getContainerId());
         }
         // Use .spm uv texture 1 and 2 for compare in scene manager
         m_tex_cmp[m_textures[i][0]->getPath() + m_textures[i][1]->getPath()] =

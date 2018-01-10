@@ -42,7 +42,8 @@ SPDynamicDrawCall::SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt,
         m_textures[0][j] = SPTextureManager::get()->getTexture
             (std::get<2>(m_stk_material[0])->getSamplerPath(j),
             j == 0 ? std::get<2>(m_stk_material[0]) : NULL,
-            j < 2 && CVS->isDefferedEnabled());
+            j < 2 && CVS->isDefferedEnabled(),
+            std::get<2>(m_stk_material[0])->getContainerId());
     }
     m_tex_cmp[m_textures[0][0]->getPath() + m_textures[0][1]->getPath()] = 0;
     m_pitch = 48;

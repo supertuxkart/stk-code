@@ -81,7 +81,7 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
     {
         m_debug_dc = std::make_shared<SP::SPDynamicDrawCall>
             (scene::EPT_TRIANGLE_STRIP, SP::getSPShader("additive"),
-            material_manager->getSPMaterial("additive"));
+            material_manager->getDefaultSPMaterial("additive"));
         m_debug_dc->getVerticesVector().resize(4);
         video::S3DVertexSkinnedMesh* v =
             m_debug_dc->getVerticesVector().data();

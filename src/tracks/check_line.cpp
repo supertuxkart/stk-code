@@ -78,7 +78,7 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
 #ifndef SERVER_ONLY
         m_debug_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
             (scene::EPT_TRIANGLE_STRIP, SP::getSPShader("additive"),
-            material_manager->getSPMaterial("additive"));
+            material_manager->getDefaultSPMaterial("additive"));
         SP::addDynamicDrawCall(m_debug_dy_dc);
         m_debug_dy_dc->getVerticesVector().resize(4);
         auto& vertices = m_debug_dy_dc->getVerticesVector();
