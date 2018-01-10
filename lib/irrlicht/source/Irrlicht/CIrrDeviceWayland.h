@@ -173,8 +173,8 @@ namespace irr
         wl_pointer* m_pointer;
         wl_registry* m_registry;
         wl_seat* m_seat;
-        //~ wl_shell* m_shell;
-        //~ wl_shell_surface* m_shell_surface;
+        wl_shell* m_shell;
+        wl_shell_surface* m_shell_surface;
         wl_shm* m_shm;
         wl_surface* m_cursor_surface;
         wl_surface* m_surface;
