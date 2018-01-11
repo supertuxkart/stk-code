@@ -28,8 +28,6 @@ private:
 
     int m_gl_major_version, m_gl_minor_version;
     std::string m_vs_layer_extension;
-    bool hasBaseInstance;
-    bool hasDrawIndirect;
     bool hasBufferStorage;
     bool hasComputeShaders;
     bool hasArraysOfArrays;
@@ -43,14 +41,13 @@ private:
     bool hasAtomics;
     bool hasSSBO;
     bool hasImageLoadStore;
-    bool hasMultiDrawIndirect;
     bool hasTextureFilterAnisotropic;
     bool hasTextureSwizzle;
     bool hasPixelBufferObject;
     bool hasSRGBFramebuffer;
     bool hasSamplerObjects;
     bool hasVertexType2101010Rev;
-    bool hasNVGPUShader5;
+    bool hasInstancedArrays;
 
 #if defined(USE_GLES2)
     bool hasBGRA;
@@ -58,8 +55,6 @@ private:
 #endif
 
     bool m_need_rh_workaround;
-    bool m_need_srgb_workaround;
-    bool m_need_srgb_visual_workaround;
     bool m_need_vertex_id_workaround;
     bool m_GI_has_artifact;
 public:
@@ -69,8 +64,6 @@ public:
 
     // Needs special handle ?
     bool needRHWorkaround() const;
-    bool needsRGBBindlessWorkaround() const;
-    bool needsSRGBCapableVisualWorkaround() const;
     bool needsVertexIdWorkaround() const;
 
     // Extension is available and safe to use
@@ -83,12 +76,9 @@ public:
     bool isARBArraysOfArraysUsable() const;
     bool isARBBindlessTextureUsable() const;
     bool isARBBufferStorageUsable() const;
-    bool isARBBaseInstanceUsable() const;
-    bool isARBDrawIndirectUsable() const;
     bool isARBShaderAtomicCountersUsable() const;
     bool isARBShaderStorageBufferObjectUsable() const;
     bool isARBImageLoadStoreUsable() const;
-    bool isARBMultiDrawIndirectUsable() const;
     bool isARBExplicitAttribLocationUsable() const;
     bool isEXTTextureFilterAnisotropicUsable() const;
     bool isARBTextureSwizzleUsable() const;
@@ -97,7 +87,7 @@ public:
     bool isARBSamplerObjectsUsable() const;
     bool isARBVertexType2101010RevUsable() const;
     bool useArrayTextures() const;
-    bool isNVGPUShader5Usable() const;
+    bool isARBInstancedArraysUsable() const;
 
     const std::string& getVSLayerExtension() const { return m_vs_layer_extension; }
 
@@ -110,12 +100,10 @@ public:
     // Are all required extensions available for feature support
     bool supportsShadows() const;
     bool supportsGlobalIllumination() const;
-    bool supportsIndirectInstancingRendering() const;
     bool supportsComputeShadersFiltering() const;
-    bool supportsAsyncInstanceUpload() const;
     bool supportsHardwareSkinning() const;
-    bool supportsThreadedTextureLoading() const;
     bool supportsTextureCompression() const;
+    bool supportsSP() const;
 
     bool supportsGLLayerInVertexShader() const;
 
@@ -124,7 +112,6 @@ public:
     bool isGlobalIlluminationEnabled() const;
     bool isTextureCompressionEnabled() const;
     bool isSDSMEnabled() const;
-    bool isAZDOEnabled() const;
     bool isESMEnabled() const;
     bool isDefferedEnabled() const;
 };

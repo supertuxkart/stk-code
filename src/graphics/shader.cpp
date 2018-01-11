@@ -19,6 +19,7 @@
 #ifndef SERVER_ONLY
 
 #include "graphics/shader.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/spherical_harmonics.hpp"
 #include "utils/log.hpp"

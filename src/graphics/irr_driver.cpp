@@ -479,13 +479,15 @@ void IrrDriver::initDevice()
     // support only GLSL 1.3 and it causes STK to crash. We should force to use
     // fixed pipeline in this case.
     if (!ProfileWorld::isNoGraphics() &&
-        GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE))
+        (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE) ||
+        !CVS->supportsSP()))
     {
         Log::warn("irr_driver", "Driver doesn't support shader-based pipeline. "
                                 "Re-creating device to workaround the issue.");
 
         params.ForceLegacyDevice = true;
         recreate_device = true;
+        UserConfigParams::m_force_legacy_device = true;
     }
 #endif
 

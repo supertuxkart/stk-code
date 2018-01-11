@@ -20,7 +20,6 @@
 #ifndef HEADER_SHADER_HPP
 #define HEADER_SHADER_HPP
 
-#include "graphics/central_settings.hpp"
 #include "graphics/gl_headers.hpp"
 #include "graphics/shader_files_manager.hpp"
 #include "graphics/shared_gpu_objects.hpp"
@@ -171,8 +170,6 @@ public:
     /** Sets the uniforms for this shader. */
     void setUniforms(const Args & ... args) const
     {
-        if (!CVS->isARBUniformBufferObjectUsable())
-            bypassUBO();
         setUniformsImpl(args...);
     }   // setUniforms
     // ------------------------------------------------------------------------
@@ -349,8 +346,6 @@ public:
     {
         m_program = glCreateProgram();
         loadAndAttachShader(args...);
-        if (!CVS->isARBExplicitAttribLocationUsable())
-            setAttribute(type);
         glLinkProgram(m_program);
 
         GLint Result = GL_FALSE;
