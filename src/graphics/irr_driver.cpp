@@ -463,6 +463,8 @@ void IrrDriver::initDevice()
     }
 #ifndef SERVER_ONLY 
 
+    // Assume sp is supported
+    CentralVideoSettings::m_supports_sp = true;
     CVS->init();
 
     bool recreate_device = false;
@@ -473,7 +475,7 @@ void IrrDriver::initDevice()
     // fixed pipeline in this case.
     if (!ProfileWorld::isNoGraphics() &&
         (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE) ||
-        !CVS->supportsSP()))
+        !CentralVideoSettings::m_supports_sp))
     {
         Log::warn("irr_driver", "Driver doesn't support shader-based pipeline. "
                                 "Re-creating device to workaround the issue.");

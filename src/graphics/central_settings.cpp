@@ -24,6 +24,8 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/graphics_restrictions.hpp"
 
+bool CentralVideoSettings::m_supports_sp = true;
+
 CentralVideoSettings *CVS = new CentralVideoSettings();
 
 void CentralVideoSettings::init()
@@ -214,6 +216,12 @@ void CentralVideoSettings::init()
             // Compiler crashes with a big loop in RH or GI shaders
             m_need_rh_workaround = true;
         }
+
+        // Check all extensions required by SP
+        m_supports_sp = isARBInstancedArraysUsable() &&
+            isARBVertexType2101010RevUsable() && isARBSamplerObjectsUsable() &&
+            isARBExplicitAttribLocationUsable();
+
 #else
         if (m_glsl == true)
         {
@@ -487,16 +495,6 @@ bool CentralVideoSettings::isARBInstancedArraysUsable() const
 {
     return hasInstancedArrays ||
         (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 2));
-}
-
-bool CentralVideoSettings::supportsSP() const
-{
-#ifdef USE_GLES2
-    return true;
-#else
-    return isARBInstancedArraysUsable() && isARBVertexType2101010RevUsable() &&
-        isARBSamplerObjectsUsable() && isARBExplicitAttribLocationUsable();
-#endif
 }
 
 bool CentralVideoSettings::useArrayTextures() const

@@ -58,6 +58,8 @@ private:
     bool m_need_vertex_id_workaround;
     bool m_GI_has_artifact;
 public:
+    static bool m_supports_sp;
+
     void init();
     bool isGLSL() const;
     unsigned getGLSLVersion() const;
@@ -103,7 +105,6 @@ public:
     bool supportsComputeShadersFiltering() const;
     bool supportsHardwareSkinning() const;
     bool supportsTextureCompression() const;
-    bool supportsSP() const;
 
     bool supportsGLLayerInVertexShader() const;
 
