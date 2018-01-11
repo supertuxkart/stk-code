@@ -27,7 +27,6 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/mesh_tools.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/stk_particle.hpp"
@@ -433,23 +432,6 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         throw std::runtime_error("Model '" + model_name + "' cannot be found");
     }
 
-#ifndef SERVER_ONLY
-    if (!animated)
-    {
-        m_mesh = MeshTools::createMeshWithTangents(m_mesh,
-                                                   &MeshTools::isNormalMap);
-    }
-    else
-    {
-        scene::ISkinnedMesh* sm =
-            dynamic_cast<scene::ISkinnedMesh*>(m_mesh);
-        if (sm)
-        {
-            MeshTools::createSkinnedMeshWithTangents(sm,
-                &MeshTools::isNormalMap);
-        }
-    }
-#endif
     init(&xml_node, parent, enabled);
 }   // TrackObjectPresentationMesh
 
@@ -494,18 +476,10 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         if (animated)
         {
             m_mesh = irr_driver->getAnimatedMesh(model_file);
-            scene::ISkinnedMesh* sm =
-                dynamic_cast<scene::ISkinnedMesh*>(m_mesh);
-            if (sm)
-            {
-                MeshTools::createSkinnedMeshWithTangents(sm,
-                    &MeshTools::isNormalMap);
-            }
         }
         else
         {
-            m_mesh = MeshTools::createMeshWithTangents(
-                irr_driver->getMesh(model_file), &MeshTools::isNormalMap);
+            m_mesh = irr_driver->getMesh(model_file);
         }
     }
 #endif

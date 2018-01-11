@@ -69,8 +69,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void animateMesh(f32 frame, f32 blend) {}
     // ------------------------------------------------------------------------
-    virtual void skinMesh(f32 strength=1.f, SkinningCallback sc = NULL,
-                          int offset = -1) {}
+    virtual void skinMesh(f32 strength = 1.0f) {}
     // ------------------------------------------------------------------------
     virtual u32 getMeshBufferCount() const
                                           { return (unsigned)m_buffer.size(); }
@@ -109,8 +108,6 @@ public:
     virtual void updateNormalsWhenAnimating(bool on) {}
     // ------------------------------------------------------------------------
     virtual void setInterpolationMode(E_INTERPOLATION_MODE mode) {}
-    // ------------------------------------------------------------------------
-    virtual void convertMeshToTangents(bool(*predicate)(IMeshBuffer*)) {}
     // ------------------------------------------------------------------------
     virtual bool isStatic() { return m_all_armatures.empty(); }
     // ------------------------------------------------------------------------

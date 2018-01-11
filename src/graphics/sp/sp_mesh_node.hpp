@@ -90,8 +90,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void animateJoints(bool calculate_absolute_positions = true) {}
     // ------------------------------------------------------------------------
-    virtual irr::scene::IMesh* getMeshForCurrentFrame(SkinningCallback sc = NULL,
-                                                      int offset = -1);
+    virtual irr::scene::IMesh* getMeshForCurrentFrame();
     // ------------------------------------------------------------------------
     virtual IBoneSceneNode* getJointNode(const c8* joint_name);
     // ------------------------------------------------------------------------

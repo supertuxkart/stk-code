@@ -22,7 +22,6 @@ using namespace irr;
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
-#include "graphics/mesh_tools.hpp"
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
@@ -87,14 +86,6 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
                     continue;
                 }
 
-                scene::ISkinnedMesh* sm =
-                    dynamic_cast<scene::ISkinnedMesh*>(a_mesh);
-                if (sm)
-                {
-                    MeshTools::createSkinnedMeshWithTangents(sm,
-                        &MeshTools::isNormalMap);
-                }
-
                 a_mesh->grab();
                 //cache.push_back(a_mesh);
                 irr_driver->grabAllTextures(a_mesh);
@@ -134,7 +125,6 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
                     continue;
                 }
 
-                a_mesh = MeshTools::createMeshWithTangents(a_mesh, &MeshTools::isNormalMap);
                 irr_driver->setAllMaterialFlags(a_mesh);
 
                 a_mesh->grab();

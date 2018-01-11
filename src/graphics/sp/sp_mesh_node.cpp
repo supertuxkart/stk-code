@@ -149,7 +149,7 @@ void SPMeshNode::OnAnimate(u32 time_ms)
 }   // OnAnimate
 
 // ----------------------------------------------------------------------------
-IMesh* SPMeshNode::getMeshForCurrentFrame(SkinningCallback sc, int offset)
+IMesh* SPMeshNode::getMeshForCurrentFrame()
 {
     if (m_mesh->isStatic() || !m_animated)
     {

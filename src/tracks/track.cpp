@@ -1181,8 +1181,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         merged_mesh->addMesh(mesh);
         merged_mesh->finalize();
 #ifndef SERVER_ONLY
-        tangent_mesh = MeshTools::createMeshWithTangents(merged_mesh, &MeshTools::isNormalMap);
-
+        tangent_mesh = merged_mesh;
         adjustForFog(tangent_mesh, NULL);
 #else
         tangent_mesh = merged_mesh;
@@ -1310,9 +1309,6 @@ bool Track::loadMainTrack(const XMLNode &root)
                            full_path.c_str());
                 continue;
             }
-#ifndef SERVER_ONLY
-            a_mesh = MeshTools::createMeshWithTangents(a_mesh, &MeshTools::isNormalMap);
-#endif
 
             // The meshes loaded here are in irrlicht's mesh cache. So we
             // have to keep track of them in order to properly remove them
