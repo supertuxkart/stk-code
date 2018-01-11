@@ -455,10 +455,6 @@ public:
         m_background.push_back(n);
     }
     // ------------------------------------------------------------------------
-    void applyObjectPassShader();
-    void applyObjectPassShader(scene::ISceneNode * const node,
-                               bool rimlit = false);
-    // ------------------------------------------------------------------------
     scene::ISceneNode *addLight(const core::vector3df &pos, float energy,
                                 float radius, float r, float g, float b,
                                 bool sun = false, 

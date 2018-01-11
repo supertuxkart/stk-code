@@ -25,7 +25,6 @@
 #include "config/user_config.hpp"
 #include "graphics/material.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/shaders.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "modes/profile_world.hpp"
@@ -62,18 +61,12 @@ MaterialManager::~MaterialManager()
     }
     m_materials.clear();
 
-    for (std::map<video::E_MATERIAL_TYPE, Material*> ::iterator it =
-         m_default_materials.begin(); it != m_default_materials.end(); it++)
-    {
-        delete it->second;
-    }
     for (std::map<std::string, Material*> ::iterator it =
          m_default_sp_materials.begin(); it != m_default_sp_materials.end();
          it++)
     {
         delete it->second;
     }
-    m_default_materials.clear();
     m_default_sp_materials.clear();
 }   // ~MaterialManager
 
@@ -183,13 +176,13 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
     video::E_MATERIAL_TYPE material_type)
 {
     if (t == NULL)
-        return getDefaultMaterial(material_type);
+        return getDefaultSPMaterial("solid");
 
     Material* m = getMaterialFor(t);
     if (m != NULL)
         return m;
 
-    return getDefaultMaterial(material_type);
+    return getDefaultSPMaterial("solid");
 }
 
 //-----------------------------------------------------------------------------
@@ -207,9 +200,6 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
         mat->setMaterialProperties(&(mb->getMaterial()), mb);
         return;
     }
-
-    Material* default_material = getDefaultMaterial(mb->getMaterial().MaterialType);
-    default_material->setMaterialProperties(&(mb->getMaterial()), mb);
 }   // setAllMaterialFlags
 
 //-----------------------------------------------------------------------------
@@ -230,39 +220,6 @@ Material* MaterialManager::getDefaultSPMaterial(const std::string& shader_name,
     return m;
 }   // getDefaultSPMaterial
 
-//-----------------------------------------------------------------------------
-Material* MaterialManager::getDefaultMaterial(video::E_MATERIAL_TYPE shader_type)
-{
-    auto it = m_default_materials.find(shader_type);
-    if (it == m_default_materials.end())
-    {
-        Material* default_material = new Material("unicolor_white", false, false, false);
-
-        // TODO: workaround, should not hardcode these material types here?
-        // Try to find a cleaner way
-        // If graphics are disabled, shaders should not be accessed (getShader
-        // asserts that shaders are initialised).
-#ifndef SERVER_ONLY
-        if(!ProfileWorld::isNoGraphics() && CVS->isGLSL() &&
-            shader_type == Shaders::getShader(ShaderType::ES_OBJECT_UNLIT))
-            default_material->setShaderType(Material::SHADERTYPE_SOLID_UNLIT);
-        else if (!ProfileWorld::isNoGraphics() && CVS->isGLSL() &&
-                 shader_type == Shaders::getShader(ShaderType::ES_OBJECTPASS_REF))
-            default_material->setShaderType(Material::SHADERTYPE_ALPHA_TEST);
-        //else if (!ProfileWorld::isNoGraphics() && CVS->isGLSL() &&
-        //         shader_type == Shaders::getShader(ShaderType::ES_OBJECTPASS))
-        //    default_material->setShaderType(Material::SHADERTYPE_ALPHA_BLEND);
-        else
-            default_material->setShaderType(Material::SHADERTYPE_SOLID);
-#endif
-        m_default_materials[shader_type] = default_material;
-        return default_material;
-    }
-    else
-    {
-        return it->second;
-    }
-}
 
 //-----------------------------------------------------------------------------
 
@@ -299,8 +256,6 @@ void MaterialManager::setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb)
         material.MaterialType = irr::video::EMT_SOLID;
     }
 
-    Material* default_material = getDefaultMaterial(mb->getMaterial().MaterialType);
-    default_material->setMaterialProperties(&(mb->getMaterial()), mb);
 }
 //-----------------------------------------------------------------------------
 int MaterialManager::addEntity(Material *m)

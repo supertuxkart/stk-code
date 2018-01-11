@@ -20,7 +20,6 @@
 #include "graphics/post_processing.hpp"
 
 #include "config/user_config.hpp"
-#include "graphics/callbacks.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/frame_buffer.hpp"
@@ -29,10 +28,10 @@
 #include "graphics/mlaa_areamap.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/rtts.hpp"
-#include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/stk_texture.hpp"
 #include "graphics/stk_tex_manager.hpp"
+#include "graphics/texture_shader.hpp"
 #include "graphics/weather.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "graphics/sp/sp_shader.hpp"
@@ -763,19 +762,6 @@ public:
 
 PostProcessing::PostProcessing(IVideoDriver* video_driver)
 {
-    // Initialization
-    m_material.Wireframe = false;
-    m_material.Lighting = false;
-    m_material.ZWriteEnable = false;
-    m_material.ZBuffer = ECFN_ALWAYS;
-    m_material.setFlag(EMF_TRILINEAR_FILTER, true);
-
-    for (u32 i = 0; i < MATERIAL_MAX_TEXTURES; ++i)
-    {
-        m_material.TextureLayer[i].TextureWrapU =
-        m_material.TextureLayer[i].TextureWrapV = ETC_CLAMP_TO_EDGE;
-    }
-
     // Load the MLAA area map
     io::IReadFile *areamap = irr_driver->getDevice()->getFileSystem()->
                          createMemoryReadFile((void *) AreaMap33, sizeof(AreaMap33),
@@ -807,11 +793,6 @@ void PostProcessing::reset()
     const u32 n = Camera::getNumCameras();
     m_boost_time.resize(n);
     m_vertices.resize(n);
-    m_center.resize(n);
-    m_direction.resize(n);
-
-    MotionBlurProvider * const cb =
-        (MotionBlurProvider *) Shaders::getCallback(ES_MOTIONBLUR);
 
     for(unsigned int i=0; i<n; i++)
     {
@@ -850,45 +831,8 @@ void PostProcessing::reset()
         SColor white(0xFF, 0xFF, 0xFF, 0xFF);
         m_vertices[i].v0.Color  = m_vertices[i].v1.Color  =
         m_vertices[i].v2.Color  = m_vertices[i].v3.Color  = white;
-
-        m_center[i].X=(m_vertices[i].v0.TCoords.X
-                      +m_vertices[i].v2.TCoords.X) * 0.5f;
-
-        // Center is around 20 percent from bottom of screen:
-        const float tex_height = m_vertices[i].v1.TCoords.Y
-                         - m_vertices[i].v0.TCoords.Y;
-        m_direction[i].X = m_center[i].X;
-        m_direction[i].Y = m_vertices[i].v0.TCoords.Y + 0.7f*tex_height;
-
-        setMotionBlurCenterY(i, 0.2f);
-
-        cb->setDirection(i, m_direction[i].X, m_direction[i].Y);
-        cb->setMaxHeight(i, m_vertices[i].v1.TCoords.Y);
     }  // for i <number of cameras
 }   // reset
-
-// ----------------------------------------------------------------------------
-void PostProcessing::setMotionBlurCenterY(const u32 num, const float y)
-{
-    MotionBlurProvider * const cb =
-        (MotionBlurProvider *) Shaders::getCallback(ES_MOTIONBLUR);
-
-    const float tex_height =
-                m_vertices[num].v1.TCoords.Y - m_vertices[num].v0.TCoords.Y;
-    m_center[num].Y = m_vertices[num].v0.TCoords.Y + y * tex_height;
-
-    cb->setCenter(num, m_center[num].X, m_center[num].Y);
-}   // setMotionBlurCenterY
-
-// ----------------------------------------------------------------------------
-/** Setup some PP data.
-  */
-void PostProcessing::begin()
-{
-    m_any_boost = false;
-    for (u32 i = 0; i < m_boost_time.size(); i++)
-        m_any_boost |= m_boost_time[i] > 0.01f;
-}   // begin
 
 // ----------------------------------------------------------------------------
 /** Set the boost amount according to the speed of the camera */
@@ -896,11 +840,7 @@ void PostProcessing::giveBoost(unsigned int camera_index)
 {
     if (CVS->isGLSL())
     {
-        m_boost_time[camera_index] = 0.75f;
-
-        MotionBlurProvider * const cb =
-            (MotionBlurProvider *)Shaders::getCallback(ES_MOTIONBLUR);
-        cb->setBoostTime(camera_index, m_boost_time[camera_index]);
+        m_boost_time.at(camera_index) = 0.75f;
     }
 }   // giveBoost
 
@@ -912,12 +852,6 @@ void PostProcessing::update(float dt)
 {
     if (!CVS->isGLSL())
         return;
-
-    MotionBlurProvider* const cb =
-        (MotionBlurProvider*) Shaders::getCallback(ES_MOTIONBLUR);
-
-    if (cb == NULL) return;
-
     for (unsigned int i=0; i<m_boost_time.size(); i++)
     {
         if (m_boost_time[i] > 0.0f)
@@ -925,8 +859,6 @@ void PostProcessing::update(float dt)
             m_boost_time[i] -= dt;
             if (m_boost_time[i] < 0.0f) m_boost_time[i] = 0.0f;
         }
-
-        cb->setBoostTime(i, m_boost_time[i]);
     }
 }   // update
 
@@ -1263,32 +1195,11 @@ void PostProcessing::renderMotionBlur(unsigned , const FrameBuffer &in_fbo,
                                       FrameBuffer &out_fbo,
                                       GLuint depth_stencil_texture)
 {
-    MotionBlurProvider * const cb =
-                      (MotionBlurProvider *)Shaders::getCallback(ES_MOTIONBLUR);
     Camera *cam = Camera::getActiveCamera();
-    unsigned camID = cam->getIndex();
-
-    scene::ICameraSceneNode * const camnode = cam->getCameraSceneNode();
-
-    // Calculate the kart's Y position on screen
-    if (cam->getKart())
-    {
-        const core::vector3df pos = cam->getKart()->getNode()->getPosition();
-        float ndc[4];
-        core::matrix4 trans = camnode->getProjectionMatrix();
-        trans *= camnode->getViewMatrix();
-
-        trans.transformVect(ndc, pos);
-        const float karty = (ndc[1] / ndc[3]) * 0.5f + 0.5f;
-        setMotionBlurCenterY(camID, karty);
-    }
-    else
-        setMotionBlurCenterY(camID, 0.5f);
-
     out_fbo.bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    float boost_time = cb->getBoostTime(cam->getIndex()) * 10;
+    float boost_time = m_boost_time.at(cam->getIndex()) * 10.0f;
     MotionBlurShader::getInstance()->render(in_fbo, boost_time, depth_stencil_texture);
 }   // renderMotionBlur
 
@@ -1558,11 +1469,9 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MOTIONBLUR));
-        MotionBlurProvider * const cb =
-            (MotionBlurProvider *)Shaders::getCallback(ES_MOTIONBLUR);
 
         if (isRace && UserConfigParams::m_motionblur && World::getWorld() &&
-            cb->getBoostTime(Camera::getActiveCamera()->getIndex()) > 0.) // motion blur
+            m_boost_time.at(Camera::getActiveCamera()->getIndex()) > 0.0f) // motion blur
         {
             renderMotionBlur(0, *in_fbo, *out_fbo, irr_driver->getDepthStencilTexture());
             std::swap(in_fbo, out_fbo);

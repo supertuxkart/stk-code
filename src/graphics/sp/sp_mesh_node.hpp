@@ -18,7 +18,7 @@
 #ifndef HEADER_SP_MESH_NODE_HPP
 #define HEADER_SP_MESH_NODE_HPP
 
-#include "../../lib/irrlicht/source/Irrlicht/CAnimatedMeshSceneNode.h"
+#include "../../../lib/irrlicht/source/Irrlicht/CAnimatedMeshSceneNode.h"
 #include <array>
 #include <cassert>
 #include <string>

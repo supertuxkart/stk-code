@@ -35,6 +35,7 @@
 #include "graphics/spherical_harmonics.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_shader.hpp"
+#include "graphics/texture_shader.hpp"
 #include "graphics/text_billboard_drawer.hpp"
 #include "items/item_manager.hpp"
 #include "items/powerup_manager.hpp"
@@ -561,6 +562,7 @@ void ShaderBasedRenderer::debugPhysics()
                                                        debug_drawer->getLines();
             std::map<video::SColor, std::vector<float> >::const_iterator it;
 
+            glEnable(GL_DEPTH_TEST);
             Shaders::ColoredLine *line = Shaders::ColoredLine::getInstance();
             line->use();
             line->bindVertexArray();
@@ -578,6 +580,7 @@ void ShaderBasedRenderer::debugPhysics()
                     glDrawArrays(GL_LINES, 0, count / 3);
                 }
             }
+            glDisable(GL_DEPTH_TEST);
             glUseProgram(0);
             glBindVertexArray(0);
         }
@@ -672,6 +675,7 @@ ShaderBasedRenderer::~ShaderBasedRenderer()
     delete m_skybox;
     delete m_rtts;
     ShaderFilesManager::kill();
+    ShaderBase::killShaders();
     SP::destroy();
 }
 

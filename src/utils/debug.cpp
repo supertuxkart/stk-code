@@ -28,7 +28,7 @@
 #include "karts/explosion_animation.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
-#include "graphics/shaders.hpp"
+#include "graphics/shader.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
@@ -250,7 +250,7 @@ bool handleContextMenuAction(s32 cmd_id)
 #ifndef SERVER_ONLY
         Log::info("Debug", "Reloading shaders...");
         ShaderFilesManager::getInstance()->clean();
-        ShaderBase::updateShaders();
+        ShaderBase::killShaders();
 #endif
         break;
     case DEBUG_GRAPHICS_RESET:

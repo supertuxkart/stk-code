@@ -22,7 +22,7 @@
 
 #include <IReferenceCounted.h>
 #include <S3DVertex.h>
-#include <SMaterial.h>
+#include <matrix4.h>
 #include <vector>
 
 class FrameBuffer;
@@ -31,7 +31,7 @@ class STKTexture;
 
 namespace irr
 {
-    namespace video { class IVideoDriver;   class ITexture; }
+    namespace video { class IVideoDriver; }
     namespace scene { class ICameraSceneNode; }
 }
 
@@ -43,20 +43,10 @@ using namespace irr;
 class PostProcessing: public IReferenceCounted
 {
 private:
-    video::SMaterial    m_material;
-
     /** Boost time, how long the boost should be displayed. This also
      *  affects the strength of the effect: longer boost time will
      *  have a stronger effect. */
     std::vector<float>  m_boost_time;
-
-    bool m_any_boost;
-
-    /** The center of blurring, in texture coordinates [0,1]).*/
-    std::vector<core::vector2df> m_center;
-
-    /** The center to which the blurring is aimed at, in [0,1]. */
-    std::vector<core::vector2df> m_direction;
 
     struct Quad { video::S3DVertex v0, v1, v2, v3; };
 
@@ -66,8 +56,6 @@ private:
 
     STKTexture* m_areamap;
 
-    void setMotionBlurCenterY(const u32 num, const float y);
-
 public:
                  PostProcessing(video::IVideoDriver* video_driver);
     virtual     ~PostProcessing();
@@ -75,7 +63,7 @@ public:
     void         reset();
     /** Those should be called around the part where we render the scene to be
      *  post-processed */
-    void         begin();
+    void         begin() {}
     void         update(float dt);
 
     void renderBloom(GLuint in);

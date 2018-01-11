@@ -50,9 +50,7 @@ private:
 
     std::vector<Material*> m_materials;
 
-    std::map<video::E_MATERIAL_TYPE, Material*> m_default_materials;
     std::map<std::string, Material*> m_default_sp_materials;
-    Material* getDefaultMaterial(video::E_MATERIAL_TYPE material_type);
 
 public:
               MaterialManager();

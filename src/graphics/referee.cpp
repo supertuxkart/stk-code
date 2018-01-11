@@ -162,8 +162,6 @@ Referee::Referee()
     m_scene_node->setFrameLoop(m_st_first_start_frame,
                                m_st_last_start_frame);
 #ifndef SERVER_ONLY
-    irr_driver->applyObjectPassShader(m_scene_node);
-
     if (CVS->isGLSL() && CVS->isDefferedEnabled())
     {
         m_light = irr_driver->addLight(core::vector3df(0.0f, 0.0f, 0.6f), 0.7f, 2.0f,
@@ -199,9 +197,6 @@ Referee::Referee(const AbstractKart &kart)
     m_scene_node->setFrameLoop(m_st_first_rescue_frame,
                                m_st_last_rescue_frame);
 
-#ifndef SERVER_ONLY
-    irr_driver->applyObjectPassShader(m_scene_node);
-#endif
 }   // Referee
 
 // ----------------------------------------------------------------------------

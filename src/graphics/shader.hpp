@@ -55,8 +55,6 @@ protected:
     /** OpenGL's program id. */
     GLuint m_program;
 
-    void bypassUBO() const;
-
     // ========================================================================
     /** Ends recursion. */
     template<typename ... Types>
@@ -86,15 +84,13 @@ protected:
     {
         loadAndAttachShader(shader_type, std::string(name), args...);
     }   // loadAndAttachShader
-    // ------------------------------------------------------------------------
-    void setAttribute(AttributeType type);
 
 public:
         ShaderBase();
     int loadTFBProgram(const std::string &vertex_file_path,
                        const char **varyings,
                        unsigned varyingscount);
-    static void updateShaders();
+    static void killShaders();
     GLuint createVAO();
     // ------------------------------------------------------------------------
     /** Activates the shader calling glUseProgram. */
@@ -374,27 +370,6 @@ public:
     }   // drawFullScreenEffect
 
 };   // Shader
-
-// ============================================================================
-class SkinnedMeshShader
-{
-private:
-    GLuint m_skinning_tex_location;
-public:
-    SkinnedMeshShader() : m_skinning_tex_location(0) {}
-    // ------------------------------------------------------------------------
-    template <typename Shader>
-    void init(Shader* s)
-    {
-        s->use();
-        m_skinning_tex_location = s->getUniformLocation("skinning_tex");
-        glUniform1i(m_skinning_tex_location, 15);
-    }
-    // ------------------------------------------------------------------------
-    void bindSkinningTexture()
-    {
-    }
-};
 
 
 #endif

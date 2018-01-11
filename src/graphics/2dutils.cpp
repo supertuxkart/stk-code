@@ -22,7 +22,6 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shader.hpp"
-#include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/texture_shader.hpp"
 #include "utils/cpp2011.hpp"

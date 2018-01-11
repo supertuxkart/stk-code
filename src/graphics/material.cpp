@@ -31,7 +31,6 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/shaders.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"

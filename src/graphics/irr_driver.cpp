@@ -19,10 +19,10 @@
 
 #include "config/user_config.hpp"
 #include "font/font_manager.hpp"
-#include "graphics/callbacks.hpp"
+#include "graphics/2dutils.hpp"
+#include "graphics/b3d_mesh_loader.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/2dutils.hpp"
 #include "graphics/fixed_pipeline_renderer.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/graphics_restrictions.hpp"
@@ -34,8 +34,7 @@
 #include "graphics/referee.hpp"
 #include "graphics/render_target.hpp"
 #include "graphics/shader_based_renderer.hpp"
-#include "graphics/shaders.hpp"
-#include "graphics/b3d_mesh_loader.hpp"
+#include "graphics/shared_gpu_objects.hpp"
 #include "graphics/sp_mesh_loader.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
@@ -157,12 +156,6 @@ IrrDriver::~IrrDriver()
     ogrDestroy();
 #endif
     STKTexManager::getInstance()->kill();
-#ifndef SERVER_ONLY
-    if (CVS->isGLSL())
-    {
-        Shaders::destroy();
-    }
-#endif
     delete m_wind;
     delete m_renderer;
     assert(m_device != NULL);
@@ -612,11 +605,8 @@ void IrrDriver::initDevice()
     // m_glsl might be reset in rtt if an error occurs.
     if (CVS->isGLSL())
     {
-        Shaders::init();
-
         m_mrt.clear();
         m_mrt.reallocate(2);
-
     }
     else
     {
@@ -857,13 +847,9 @@ void IrrDriver::applyResolutionSettings()
     m_recording = false;
 #endif
     // initDevice will drop the current device.
-    if (CVS->isGLSL())
-    {
-        Shaders::destroy();
-    }
     delete m_renderer;
+    SharedGPUObjects::reset();
     initDevice();
-    ShaderBase::updateShaders();
 
     font_manager = new FontManager();
     font_manager->loadFonts();
@@ -1961,89 +1947,6 @@ bool IrrDriver::supportsSplatting()
 }   // supportsSplatting
 
 // ----------------------------------------------------------------------------
-
-#ifndef SERVER_ONLY
-void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimlit)
-{
-    if (!CVS->isGLSL())
-        return;
-
-    // Don't override sky
-    if (node->getType() == scene::ESNT_SKY_DOME ||
-        node->getType() == scene::ESNT_SKY_BOX)
-        return;
-
-    const u32 mcount = node->getMaterialCount();
-    u32 i;
-    const video::E_MATERIAL_TYPE ref =
-        Shaders::getShader(rimlit ? ES_OBJECTPASS_RIMLIT : ES_OBJECTPASS_REF);
-    const video::E_MATERIAL_TYPE pass =
-        Shaders::getShader(rimlit ? ES_OBJECTPASS_RIMLIT : ES_OBJECTPASS);
-
-    const video::E_MATERIAL_TYPE origref = Shaders::getShader(ES_OBJECTPASS_REF);
-    const video::E_MATERIAL_TYPE origpass = Shaders::getShader(ES_OBJECTPASS);
-
-    bool viamb = false;
-    scene::IMesh *mesh = NULL;
-    if (node->getType() == scene::ESNT_ANIMATED_MESH)
-    {
-        viamb = ((scene::IAnimatedMeshSceneNode *) node)->isReadOnlyMaterials();
-        mesh = ((scene::IAnimatedMeshSceneNode *) node)->getMesh();
-    }
-    else if (node->getType() == scene::ESNT_MESH)
-    {
-        viamb = ((scene::IMeshSceneNode *) node)->isReadOnlyMaterials();
-        mesh = ((scene::IMeshSceneNode *) node)->getMesh();
-    }
-    //else if (node->getType() == scene::ESNT_WATER_SURFACE)
-    //{
-    //    viamb = (dynamic_cast<scene::IMeshSceneNode*>(node))->isReadOnlyMaterials();
-    //    mesh = (dynamic_cast<scene::IMeshSceneNode*>(node))->getMesh();
-    //}
-
-    for (i = 0; i < mcount; i++)
-    {
-        video::SMaterial &nodemat = node->getMaterial(i);
-        video::SMaterial &mbmat = mesh ? mesh->getMeshBuffer(i)->getMaterial()
-                                       : nodemat;
-        video::SMaterial *mat = &nodemat;
-
-        if (viamb)
-            mat = &mbmat;
-
-        if (mat->MaterialType == video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF ||
-            mat->MaterialType == origref)
-            mat->MaterialType = ref;
-        else if (mat->MaterialType == video::EMT_SOLID ||
-                 mat->MaterialType == origpass ||
-                 (mat->MaterialType >= video::EMT_LIGHTMAP &&
-                 mat->MaterialType <= video::EMT_LIGHTMAP_LIGHTING_M4))
-            mat->MaterialType = pass;
-    }
-
-
-    core::list<scene::ISceneNode*> kids = node->getChildren();
-    scene::ISceneNodeList::Iterator it = kids.begin();
-    for (; it != kids.end(); ++it)
-    {
-        applyObjectPassShader(*it, rimlit);
-    }
-}
-
-// ----------------------------------------------------------------------------
-
-void IrrDriver::applyObjectPassShader()
-{
-    if (!CVS->isGLSL())
-        return;
-
-    applyObjectPassShader(m_scene_manager->getRootSceneNode());
-}
-
-#endif   // !SERVER_ONLY
-
-// ----------------------------------------------------------------------------
-
 scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
                                        float energy, float radius,
                                        float r, float g, float b,
@@ -2068,14 +1971,8 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
 
         if (sun)
         {
-            //m_sun_interposer->setPosition(pos);
-            //m_sun_interposer->updateAbsolutePosition();
             m_renderer->addSunLight(pos);
-
-            ((WaterShaderProvider *) Shaders::getCallback(ES_WATER) )
-                                                         ->setSunPosition(pos);
         }
-
         return light;
     }
     else

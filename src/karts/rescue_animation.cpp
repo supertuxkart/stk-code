@@ -18,7 +18,7 @@
 
 #include "karts/rescue_animation.hpp"
 
-#include "graphics/callbacks.hpp"
+#include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/referee.hpp"
 #include "items/attachment.hpp"
