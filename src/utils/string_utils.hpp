@@ -230,6 +230,7 @@ namespace StringUtils
     irr::core::stringw utf8ToWide(const std::string &input);
     std::string wideToUtf8(const wchar_t* input);
     std::string wideToUtf8(const irr::core::stringw& input);
+    std::string findAndReplace(const std::string& source, const std::string& find, const std::string& replace);
 
 } // namespace StringUtils
 
