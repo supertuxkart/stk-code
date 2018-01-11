@@ -21,7 +21,6 @@
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/material.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
-#include "race/race_manager.hpp"
 #include "utils/mini_glm.hpp"
 #include "utils/string_utils.hpp"
 

@@ -94,7 +94,7 @@ public:
         for (unsigned i = 0; i < DCT_FOR_VAO; i++)
         {
             m_ins_dat_mapped_ptr[i] = NULL;
-            m_gl_instance_size[i] = 1;
+            m_gl_instance_size[i] = 0;
             m_vao[i] = 0;
             m_ins_array[i] = 0;
         }
@@ -171,7 +171,7 @@ public:
         }
         else
         {
-            std::get<1>(m_stk_material[0]) += spmb->m_indices.size();
+            std::get<1>(m_stk_material[0]) += (unsigned)spmb->m_indices.size();
         }
         m_indices.insert(m_indices.end(), spmb->m_indices.begin(),
             spmb->m_indices.end());
@@ -216,7 +216,7 @@ public:
         return m_textures[0];
     }
     // ------------------------------------------------------------------------
-    std::array<std::shared_ptr<SPTexture>, 6>
+    const std::array<std::shared_ptr<SPTexture>, 6>&
         getSPTexturesByMaterialID(int material_id) const
     {
         assert((size_t)material_id < m_textures.size());
@@ -292,6 +292,12 @@ public:
     }
     // ------------------------------------------------------------------------
     void reloadTextureCompare();
+    // ------------------------------------------------------------------------
+    void shrinkToFit()
+    {
+        m_vertices.shrink_to_fit();
+        m_indices.shrink_to_fit();
+    }
     // ------------------------------------------------------------------------
     virtual const video::SMaterial& getMaterial() const
     {

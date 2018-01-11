@@ -1333,9 +1333,8 @@ void addObject(SPMeshNode* node)
                 }
                 mb->addInstanceData(id, (DrawCallType)dc_type);
                 if (UserConfigParams::m_glow && node->hasGlowColor() &&
-                    CVS->isDefferedEnabled())
+                    CVS->isDefferedEnabled() && dc_type == DCT_NORMAL)
                 {
-
                     video::SColorf gc = node->getGlowColor();
                     unsigned key = gc.toSColor().color;
                     auto ret = g_glow_meshes.find(key);
@@ -1539,7 +1538,7 @@ void updateModelMatrix()
 
                 if (material_id != -1)
                 {
-                    std::array<std::shared_ptr<SPTexture>, 6> textures =
+                    const std::array<std::shared_ptr<SPTexture>, 6>& textures =
                         (*(q.second.begin()))->getSPTexturesByMaterialID
                         (material_id);
                     texture_names =

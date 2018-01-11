@@ -98,10 +98,16 @@ public:
         if (m_update_offset >= 0 && !m_vertices.empty())
         {
             glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-            if ((unsigned)m_vertices.capacity() > m_gl_vbo_size)
+            unsigned new_size = m_gl_vbo_size;
+            while (m_vertices.size() > new_size)
+            {
+                // Power of 2 allocation strategy, like std::vector in gcc
+                new_size <<= 1;
+            }
+            if (new_size != m_gl_vbo_size)
             {
                 m_update_offset = 0;
-                m_gl_vbo_size = (unsigned)m_vertices.capacity();
+                m_gl_vbo_size = new_size;
                 glBufferData(GL_ARRAY_BUFFER, m_gl_vbo_size * 48,
                     m_vertices.data(), GL_DYNAMIC_DRAW);
             }
@@ -193,5 +199,3 @@ public:
 }
 
 #endif
-
-#include <S3DVertex.h>

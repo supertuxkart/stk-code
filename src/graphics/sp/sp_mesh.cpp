@@ -198,6 +198,11 @@ void SPMesh::finalize()
         itr++;
     }
 
+    for (unsigned i = 0; i < m_buffer.size(); i++)
+    {
+        m_buffer[i]->shrinkToFit();
+    }
+
 }   // finalize
 
 }

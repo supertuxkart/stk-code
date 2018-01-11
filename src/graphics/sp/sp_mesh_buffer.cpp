@@ -249,10 +249,6 @@ void SPMeshBuffer::uploadGLMesh()
         m_indices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    for (unsigned i = 0; i < DCT_FOR_VAO; i++)
-    {
-        recreateVAO(i);
-    }
 #endif
 }   // uploadGLMesh
 
@@ -451,7 +447,9 @@ void SPMeshBuffer::uploadInstanceData()
         {
             continue;
         }
-        unsigned new_size = m_gl_instance_size[i];
+
+        unsigned new_size =
+            m_gl_instance_size[i] == 0 ? 1 : m_gl_instance_size[i];
         while (m_ins_dat[i].size() > new_size)
         {
             // Power of 2 allocation strategy, like std::vector in gcc
