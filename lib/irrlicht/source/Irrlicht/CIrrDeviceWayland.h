@@ -183,6 +183,7 @@ namespace irr
         zxdg_shell_v6* m_xdg_shell;
         zxdg_surface_v6* m_xdg_surface;
         zxdg_toplevel_v6* m_xdg_toplevel;
+        bool m_surface_configured;
         
         org_kde_kwin_server_decoration_manager* m_decoration_manager;
         org_kde_kwin_server_decoration* m_decoration;

@@ -523,7 +523,11 @@ public:
     static void xdg_surface_configure(void* data, zxdg_surface_v6* surface,
                                       uint32_t serial)
     {
+        CIrrDeviceWayland* device = static_cast<CIrrDeviceWayland*>(data);
+        
         zxdg_surface_v6_ack_configure(surface, serial);
+        
+        device->m_surface_configured = true;
     }
     
     static void xdg_toplevel_configure(void* data, zxdg_toplevel_v6* toplevel,
@@ -724,6 +728,7 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     m_xdg_shell = NULL;
     m_xdg_surface = NULL;
     m_xdg_toplevel = NULL;
+    m_surface_configured = false;
     
     m_decoration_manager = NULL;
     m_decoration = NULL;
@@ -773,6 +778,9 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     createKeyMap();
 
     m_display = wl_display_connect(NULL);
+    
+    if (m_display == NULL)
+        return;
     
     m_xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
     
@@ -869,8 +877,11 @@ CIrrDeviceWayland::~CIrrDeviceWayland()
     if (m_xkb_context)
         xkb_context_unref(m_xkb_context);
 
-    wl_display_flush(m_display);
-    wl_display_disconnect(m_display);
+    if (m_display)
+    {
+        wl_display_flush(m_display);
+        wl_display_disconnect(m_display);
+    }
 
     closeJoysticks();
 }
@@ -957,6 +968,12 @@ bool CIrrDeviceWayland::createWindow()
         
         zxdg_surface_v6_set_window_geometry(m_xdg_surface, 0, 0, m_width, 
                                             m_height);
+                                    
+        while (!m_surface_configured)
+        {
+            wl_display_dispatch(m_display);
+            usleep(1000);
+        }
     }
     else if (m_shell != NULL)
     {
@@ -981,9 +998,6 @@ bool CIrrDeviceWayland::createWindow()
         os::Printer::log("Couldn't create shell surface.", ELL_ERROR);
         return false;
     }
-
-    wl_display_dispatch(m_display);
-    wl_display_roundtrip(m_display);
 
     if (m_decoration_manager != NULL)
     {
@@ -1203,6 +1217,14 @@ video::ECOLOR_FORMAT CIrrDeviceWayland::getColorFormat() const
 //! Sets if the window should be resizable in windowed mode.
 void CIrrDeviceWayland::setResizable(bool resize)
 {
+    if (m_xdg_toplevel)
+    {
+        int width = resize ? 0 : m_width;
+        int height = resize ? 0 : m_height;
+        
+        zxdg_toplevel_v6_set_min_size(m_xdg_toplevel, width, height);
+        zxdg_toplevel_v6_set_max_size(m_xdg_toplevel, width, height);
+    }
 }
 
 //! Return pointer to a list with all video modes supported by the gfx adapter.
@@ -1214,16 +1236,28 @@ video::IVideoModeList* CIrrDeviceWayland::getVideoModeList()
 //! Minimize window
 void CIrrDeviceWayland::minimizeWindow()
 {
+    if (m_xdg_toplevel)
+    {
+        zxdg_toplevel_v6_set_minimized(m_xdg_toplevel);
+    }
 }
 
 //! Maximize window
 void CIrrDeviceWayland::maximizeWindow()
 {
+    if (m_xdg_toplevel)
+    {
+        zxdg_toplevel_v6_set_maximized(m_xdg_toplevel);
+    }
 }
 
 //! Restore original window size
 void CIrrDeviceWayland::restoreWindow()
 {
+    if (m_xdg_toplevel)
+    {
+        zxdg_toplevel_v6_unset_maximized(m_xdg_toplevel);
+    }
 }
 
 //! Move window to requested position
