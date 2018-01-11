@@ -218,8 +218,10 @@ std::shared_ptr<video::IImage> SPTexture::getTextureImage() const
     for (unsigned int i = 0; i < image->getDimension().Width *
         image->getDimension().Height; i++)
     {
+        const bool use_tex_compress = CVS->isTextureCompressionEnabled() &&
+            !m_cache_directory.empty();
 #ifndef USE_GLES2
-        if (CVS->isTextureCompressionEnabled())
+        if (use_tex_compress)
         {
 #endif
             // to RGBA for libsquish or for gles it's always true
@@ -229,7 +231,7 @@ std::shared_ptr<video::IImage> SPTexture::getTextureImage() const
 #ifndef USE_GLES2
         }
 #endif
-        if (m_undo_srgb && !CVS->isTextureCompressionEnabled())
+        if (m_undo_srgb && !use_tex_compress)
         {
             data[i * 4] = srgbToLinear(data[i * 4] / 255.0f);
             data[i * 4 + 1] = srgbToLinear(data[i * 4 + 1] / 255.0f);
@@ -927,8 +929,8 @@ std::vector<std::pair<core::dimension2du, unsigned> >
         }
     }
     // For array textures all textures need to have a same internal format
-    const unsigned tc_flag = squish::kDxt5 | stk_config->m_tc_quality |
-        (m_undo_srgb && CVS->useArrayTextures() ? squish::kToLinear : 0);
+    const unsigned tc_flag = squish::kDxt5 | stk_config->m_tc_quality;
+//        | (m_undo_srgb && CVS->useArrayTextures() ? squish::kToLinear : 0);
     const unsigned compressed_size = squish::GetStorageRequirements(
         mipmap_sizes[0].first.Width, mipmap_sizes[0].first.Height,
         tc_flag);

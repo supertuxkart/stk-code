@@ -23,7 +23,6 @@
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/stk_tex_manager.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
@@ -649,8 +648,6 @@ void OptionsScreenVideo::tearDown()
     else if (m_prev_img_quality != getImageQuality())
     {
         irr_driver->setMaxTextureSize();
-        STKTexManager::getInstance()->destroyThreadedTexLoaders();
-        STKTexManager::getInstance()->createThreadedTexLoaders();
     }
     Screen::tearDown();
     // save changes when leaving screen

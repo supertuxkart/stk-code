@@ -19,7 +19,6 @@
 #include "config/hardware_stats.hpp"
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/threaded_tex_loader.hpp"
 #include "graphics/stk_texture.hpp"
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -28,93 +27,10 @@
 #include <algorithm>
 
 // ----------------------------------------------------------------------------
-STKTexManager::STKTexManager() : m_pbo(0), m_thread_size(0),
-                                 m_threaded_load_textures_counter(0)
-{
-    createThreadedTexLoaders();
-}   // STKTexManager
-
-// ----------------------------------------------------------------------------
 STKTexManager::~STKTexManager()
 {
     removeTexture(NULL/*texture*/, true/*remove_all*/);
-    destroyThreadedTexLoaders();
 }   // ~STKTexManager
-
-// ----------------------------------------------------------------------------
-void STKTexManager::createThreadedTexLoaders()
-{
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    if (CVS->supportsThreadedTextureLoading())
-    {
-        pthread_mutex_init(&m_threaded_load_textures_mutex, NULL);
-        pthread_cond_init(&m_cond_request, NULL);
-        m_thread_size = HardwareStats::getNumProcessors();
-        if (m_thread_size == 0)
-            m_thread_size = 1;
-        m_thread_size = core::clamp(m_thread_size, 1,
-            UserConfigParams::m_hq_mipmap ? m_thread_size : 3);
-        const unsigned max_tex_size =
-            (UserConfigParams::m_high_definition_textures & 0x01) == 0 ?
-            UserConfigParams::m_max_texture_size : 2048;
-        const unsigned each_capacity = max_tex_size * max_tex_size * 4;
-        const unsigned pbo_size = each_capacity * m_thread_size;
-        Log::info("STKTexManager", "%d thread(s) for texture loading,"
-            " each capacity %d MB.", m_thread_size,
-            each_capacity / 1024 / 1024);
-        if (UserConfigParams::m_hq_mipmap)
-            Log::info("STKTexManager", "High quality mipmap enabled.");
-        glGenBuffers(1, &m_pbo);
-        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pbo);
-        glBufferStorage(GL_PIXEL_UNPACK_BUFFER, pbo_size, NULL,
-            GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT |
-            GL_MAP_COHERENT_BIT);
-        uint8_t* pbo_ptr = (uint8_t*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER,
-            0, pbo_size, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT |
-            GL_MAP_COHERENT_BIT);
-        size_t offset = 0;
-        for (int i = 0; i < m_thread_size; i++)
-        {
-            m_all_tex_loaders.push_back(new ThreadedTexLoader(each_capacity,
-                offset, pbo_ptr + offset, &m_threaded_load_textures_mutex,
-                &m_cond_request, this));
-            offset += each_capacity;
-        }
-        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-    }
-#endif
-}   // createThreadedTexLoaders
-
-// ----------------------------------------------------------------------------
-void STKTexManager::destroyThreadedTexLoaders()
-{
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    if (CVS->supportsThreadedTextureLoading())
-    {
-        STKTexture* delete_ttl = new STKTexture((uint8_t*)NULL, "delete_ttl",
-            0, false, true);
-        for (int i = 0; i < m_thread_size; i++)
-            addThreadedLoadTexture(delete_ttl);
-        for (int i = 0; i < m_thread_size; i++)
-        {
-            if (!m_all_tex_loaders[i]->waitForReadyToDeleted(2.0f))
-            {
-                Log::info("STKTexManager", "ThreadedTexLoader %d not stopping,"
-                    "exiting anyway.", i);
-            }
-            delete m_all_tex_loaders[i];
-        }
-        delete delete_ttl;
-        glDeleteBuffers(1, &m_pbo);
-        pthread_mutex_destroy(&m_threaded_load_textures_mutex);
-        pthread_cond_destroy(&m_cond_request);
-        m_pbo = 0;
-        m_thread_size = 0;
-        m_threaded_load_textures_counter = 0;
-        m_all_tex_loaders.clear();
-    }
-#endif
-}   // destroyThreadedTexLoaders
 
 // ----------------------------------------------------------------------------
 STKTexture* STKTexManager::findTextureInFileSystem(const std::string& filename,
@@ -184,11 +100,6 @@ video::ITexture* STKTexManager::getTexture(const std::string& path,
             m_all_textures[name] = NULL;
             delete new_texture;
             return NULL;
-        }
-        if (new_texture->useThreadedLoading())
-        {
-            addThreadedLoadTexture(new_texture);
-            checkThreadedLoadTextures(false/*util_queue_empty*/);
         }
     }
 
@@ -268,23 +179,6 @@ int STKTexManager::dumpTextureUsage()
 }   // dumpAllTexture
 
 // ----------------------------------------------------------------------------
-video::ITexture* STKTexManager::getUnicolorTexture(const irr::video::SColor &c)
-{
-    std::string name = StringUtils::toString(c.color) + "unic";
-    auto ret = m_all_textures.find(name);
-    if (ret != m_all_textures.end())
-        return ret->second;
-
-    uint8_t* data = new uint8_t[2 * 2 * 4];
-    memcpy(data, &c.color, sizeof(video::SColor));
-    memcpy(data + 4, &c.color, sizeof(video::SColor));
-    memcpy(data + 8, &c.color, sizeof(video::SColor));
-    memcpy(data + 12, &c.color, sizeof(video::SColor));
-    return addTexture(new STKTexture(data, name, 2));
-
-}   // getUnicolorTexture
-
-// ----------------------------------------------------------------------------
 core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
 {
     core::stringw result;
@@ -299,10 +193,6 @@ core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
             if (p.second == NULL || !p.second->isMeshTexture())
                 continue;
             p.second->reload();
-            if (p.second->useThreadedLoading())
-            {
-                addThreadedLoadTexture(p.second);
-            }
             Log::info("STKTexManager", "%s reloaded",
                 p.second->getName().getPtr());
         }
@@ -325,10 +215,6 @@ core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
             if (fname == tex_name || fname == tex_path)
             {
                 p.second->reload();
-                if (p.second->useThreadedLoading())
-                {
-                    addThreadedLoadTexture(p.second);
-                }
                 result += tex_name.c_str();
                 result += L" ";
                 break;
@@ -340,11 +226,6 @@ core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
 #endif   // !SERVER_ONLY
     return result + "reloaded.";
 }   // reloadTexture
-
-// ----------------------------------------------------------------------------
-void STKTexManager::reset()
-{
-}   // reset
 
 // ----------------------------------------------------------------------------
 /** Sets an error message to be displayed when a texture is not found. This
@@ -363,78 +244,3 @@ void STKTexManager::setTextureErrorMessage(const std::string &error,
     else
         m_texture_error_message = StringUtils::insertValues(error, detail);
 }   // setTextureErrorMessage
-
-// ----------------------------------------------------------------------------
-void STKTexManager::checkThreadedLoadTextures(bool util_queue_empty)
-{
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    if (!CVS->supportsThreadedTextureLoading()) return;
-    bool uploaded = false;
-    bool empty_queue = false;
-    if (util_queue_empty)
-    {
-        while (true)
-        {
-            pthread_mutex_lock(&m_threaded_load_textures_mutex);
-            empty_queue = m_threaded_load_textures_counter == 0;
-            pthread_mutex_unlock(&m_threaded_load_textures_mutex);
-            if (empty_queue)
-            {
-                for (ThreadedTexLoader* ttl : m_all_tex_loaders)
-                {
-                    if (ttl->lastQueueReady())
-                    {
-                        ttl->lock();
-                        ttl->setFinishLoading();
-                        uploaded = true;
-                        ttl->unlock(false/*finish_it*/);
-                    }
-                }
-                break;
-            }
-            else
-            {
-                checkThreadedLoadTextures(false/*util_queue_empty*/);
-            }
-        }
-    }
-    if (empty_queue && !uploaded)
-        return;
-    uploaded = false;
-    for (ThreadedTexLoader* ttl : m_all_tex_loaders)
-    {
-        ttl->lock();
-        if (ttl->finishedLoading())
-        {
-            if (!uploaded)
-            {
-                glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pbo);
-                uploaded = true;
-            }
-            ttl->handleCompletedTextures();
-        }
-        else
-        {
-            ttl->unlock(false/*finish_it*/);
-        }
-    }
-    if (uploaded)
-    {
-        GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-        GLenum reason = glClientWaitSync(sync, GL_SYNC_FLUSH_COMMANDS_BIT, 0);
-        if (reason != GL_ALREADY_SIGNALED)
-        {
-            do
-            {
-                reason = glClientWaitSync(sync, GL_SYNC_FLUSH_COMMANDS_BIT,
-                    1000000);
-            }
-            while (reason == GL_TIMEOUT_EXPIRED);
-        }
-        glDeleteSync(sync);
-        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-        for (ThreadedTexLoader* ttl : m_all_tex_loaders)
-            ttl->unlock(true/*finish_it*/);
-    }
-#endif
-}   // checkThreadedLoadTextures

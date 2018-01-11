@@ -69,37 +69,12 @@ private:
      *  This is used to specify details like: "while loading kart '...'" */
     std::string m_texture_error_message;
 
-    std::vector<ThreadedTexLoader*> m_all_tex_loaders;
-
-    GLuint m_pbo;
-
-    int m_thread_size;
-
-    class SmallestTexture
-    {
-    public:
-        inline bool operator()(const irr::video::ITexture* a,
-            const irr::video::ITexture* b) const
-        {
-            return a->getTextureSize() > b->getTextureSize();
-        }
-    };
-    std::priority_queue<irr::video::ITexture*,
-        std::vector<irr::video::ITexture*>, SmallestTexture>
-        m_threaded_load_textures;
-
-    int m_threaded_load_textures_counter;
-
-    pthread_mutex_t m_threaded_load_textures_mutex;
-
-    pthread_cond_t m_cond_request;
-
     // ------------------------------------------------------------------------
     STKTexture* findTextureInFileSystem(const std::string& filename,
                                         std::string* full_path);
 public:
     // ------------------------------------------------------------------------
-    STKTexManager();
+    STKTexManager() {}
     // ------------------------------------------------------------------------
     ~STKTexManager();
     // ------------------------------------------------------------------------
@@ -107,8 +82,6 @@ public:
                                      TexConfig* tc = NULL,
                                      bool no_upload = false,
                                      bool create_if_unfound = true);
-    // ------------------------------------------------------------------------
-    irr::video::ITexture* getUnicolorTexture(const irr::video::SColor &c);
     // ------------------------------------------------------------------------
     irr::video::ITexture* addTexture(STKTexture* texture);
     // ------------------------------------------------------------------------
@@ -119,8 +92,6 @@ public:
     int dumpTextureUsage();
     // ------------------------------------------------------------------------
     irr::core::stringw reloadTexture(const irr::core::stringw& name);
-    // ------------------------------------------------------------------------
-    void reset();
     // ------------------------------------------------------------------------
     /** Returns the currently defined texture error message, which is used
      *  by event_handler.cpp to print additional info about irrlicht
@@ -174,35 +145,6 @@ public:
         return getTexture(filename, std::string(error_message),
                           std::string(detail));
     }   // getTexture
-    // ------------------------------------------------------------------------
-    void checkThreadedLoadTextures(bool util_queue_empty);
-    // ------------------------------------------------------------------------
-    irr::video::ITexture* getThreadedLoadTexture()
-                                     { return m_threaded_load_textures.top(); }
-    // ------------------------------------------------------------------------
-    void setThreadedLoadTextureCounter(int val)
-    {
-        m_threaded_load_textures_counter += val;
-        assert(m_threaded_load_textures_counter >= 0);
-    }
-    // ------------------------------------------------------------------------
-    void addThreadedLoadTexture(irr::video::ITexture* t)
-    {
-        pthread_mutex_lock(&m_threaded_load_textures_mutex);
-        m_threaded_load_textures.push(t);
-        setThreadedLoadTextureCounter(t->getThreadedLoadTextureCounter());
-        pthread_cond_signal(&m_cond_request);
-        pthread_mutex_unlock(&m_threaded_load_textures_mutex);
-    }
-    // ------------------------------------------------------------------------
-    void removeThreadedLoadTexture()        { m_threaded_load_textures.pop(); }
-    // ------------------------------------------------------------------------
-    bool isThreadedLoadTexturesEmpty()
-                                   { return m_threaded_load_textures.empty(); }
-    // ------------------------------------------------------------------------
-    void createThreadedTexLoaders();
-    // ------------------------------------------------------------------------
-    void destroyThreadedTexLoaders();
 
 };   // STKTexManager
 
