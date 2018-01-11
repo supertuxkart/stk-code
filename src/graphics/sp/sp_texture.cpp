@@ -30,6 +30,9 @@
 
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
 #include <squish.h>
+static_assert(squish::kColourClusterFit == (1 << 5), "Wrong header");
+static_assert(squish::kColourRangeFit == (1 << 6), "Wrong header");
+static_assert(squish::kColourIterativeClusterFit == (1 << 8), "Wrong header");
 #endif
 
 #if !(defined(SERVER_ONLY) || defined(USE_GLES2))
