@@ -117,7 +117,7 @@ if(NOT USE_GLES2 AND NOT SERVER_ONLY)
     if(USE_SYSTEM_GLEW)
         find_package(PkgConfig)
         if(PKGCONFIG_FOUND)
-            pkg_check_modules(GLEW glew>=2.0)
+            pkg_check_modules(GLEW glew>=2.1)
         endif()
     endif()
 
