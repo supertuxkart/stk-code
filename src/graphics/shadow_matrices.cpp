@@ -291,45 +291,6 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
                   irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION)
                 * irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW)       );
         }
-
-        // Rsm Matrix and camera
-        if (!m_rsm_matrix_initialized && track->getPtrTriangleMesh())
-        {
-            // Compute track extent
-            Vec3 vmin, vmax;
-            track->getTriangleMesh().getCollisionShape()
-                  .getAabb(btTransform::getIdentity(), vmin, vmax);
-            core::aabbox3df trackbox(vmin.toIrrVector(), vmax.toIrrVector() -
-                core::vector3df(0, 30, 0));
-
-            if (trackbox.MinEdge.X != trackbox.MaxEdge.X &&
-                trackbox.MinEdge.Y != trackbox.MaxEdge.Y &&
-                // Cover the case where sun_cam_view_matrix is null
-                sun_cam_view_matrix.getScale() != core::vector3df(0., 0., 0.))
-            {
-                sun_cam_view_matrix.transformBoxEx(trackbox);
-                core::matrix4 tmp_matrix;
-                tmp_matrix.buildProjectionMatrixOrthoLH(trackbox.MinEdge.X,
-                                                        trackbox.MaxEdge.X,
-                                                        trackbox.MaxEdge.Y,
-                                                        trackbox.MinEdge.Y,
-                                                        30, trackbox.MaxEdge.Z);
-                m_sun_cam->setProjectionMatrix(tmp_matrix, true);
-                m_sun_cam->render();
-            }
-            m_rsm_matrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION)
-                         * irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-            m_rsm_matrix_initialized = true;
-            m_rsm_map_available = false;
-        }
-        m_rh_extend = core::vector3df(128, 64, 128);
-        core::vector3df campos = camnode->getAbsolutePosition();
-        core::vector3df translation(8 * floor(campos.X / 8),
-                                    8 * floor(campos.Y / 8),
-                                    8 * floor(campos.Z / 8));
-        m_rh_matrix.setTranslation(translation);
-
-
         assert(m_sun_ortho_matrices.size() == 4);
         // reset normal camera
         camnode->setNearValue(oldnear);

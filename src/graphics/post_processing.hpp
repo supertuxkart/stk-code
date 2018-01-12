@@ -70,9 +70,6 @@ public:
     void renderSSAO(const FrameBuffer& linear_depth_framebuffer,
                     const FrameBuffer& ssao_framebuffer,
                     GLuint depth_stencil_texture);
-    void renderRHDebug(unsigned SHR, unsigned SHG, unsigned SHB, 
-                       const core::matrix4 &rh_matrix,
-                       const core::vector3df &rh_extend);
     /** Blur the in texture */
     void renderGaussian3Blur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary) const;
 

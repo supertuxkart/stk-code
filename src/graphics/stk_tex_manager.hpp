@@ -24,16 +24,12 @@
 
 #include "irrString.h"
 #include "ITexture.h"
-#include <pthread.h>
 
 #include <cassert>
 #include <string>
-#include <queue>
 #include <unordered_map>
-#include <vector>
 
 class STKTexture;
-class ThreadedTexLoader;
 namespace irr
 {
     namespace video { class SColor; }

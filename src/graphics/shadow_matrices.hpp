@@ -50,8 +50,6 @@ private:
     bool                       m_rsm_matrix_initialized;
     float                      m_shadows_cam[4][24];
     bool                       m_rsm_map_available;
-    core::vector3df            m_rh_extend;
-    core::matrix4              m_rh_matrix;
     float                      m_mat_ubo[16 * 9 + 2];
 
     core::matrix4 getTighestFitOrthoProj(const core::matrix4 &transform,
@@ -81,20 +79,10 @@ public:
     // ------------------------------------------------------------------------
     scene::ICameraSceneNode* getSunCam() { return m_sun_cam; }
     // ------------------------------------------------------------------------
-    const core::matrix4& getRHMatrix() const { return m_rh_matrix;  }
-    // ------------------------------------------------------------------------
-    const core::vector3df& getRHExtend() const { return m_rh_extend;  }
-    // ------------------------------------------------------------------------
-    const core::matrix4& getRSMMatrix() const { return m_rsm_matrix; }
-    // ------------------------------------------------------------------------
     std::vector<core::matrix4>& getSunOrthoMatrices()
     {
         return m_sun_ortho_matrices;
     }
-    // ------------------------------------------------------------------------
-    void setRSMMapAvail(bool b) { m_rsm_map_available = b; }
-    // ------------------------------------------------------------------------
-    bool isRSMMapAvail() const { return m_rsm_map_available; }
     // ------------------------------------------------------------------------
     const std::pair<float, float>* getShadowScales() const
     {

@@ -227,40 +227,6 @@ public:
 };   // ShadowedSunLightShaderPCF
 
 // ============================================================================
-class ShadowedSunLightShaderESM : public TextureShader<ShadowedSunLightShaderESM,
-                                                       3, float, float, float,
-                                                       float>
-{
-public:
-    ShadowedSunLightShaderESM()
-    {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "sunlightshadowesm.frag");
-
-        // Use 8 to circumvent a catalyst bug when binding sampler
-        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
-                           1, "dtex", ST_NEAREST_FILTERED,
-                           8, "shadowtex", ST_TRILINEAR_CLAMPED_ARRAY2D);
-
-        assignUniforms("split0", "split1", "split2", "splitmax");
-    }   // ShadowedSunLightShaderESM
-    // ------------------------------------------------------------------------
-    void render(GLuint normal_depth_texture,
-                GLuint depth_stencil_texture,
-                const FrameBuffer& shadow_framebuffer)
-    {
-        setTextureUnits(normal_depth_texture,
-                        depth_stencil_texture,
-                        shadow_framebuffer.getRTT()[0]);
-        drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
-                             ShadowMatrices::m_shadow_split[2],
-                             ShadowMatrices::m_shadow_split[3],
-                             ShadowMatrices::m_shadow_split[4]);
-    }   // render
-};   // ShadowedSunLightShaderESM
-
-
-// ============================================================================
 class SunLightShader : public TextureShader<SunLightShader, 2,
                                             core::vector3df, video::SColorf>
 {

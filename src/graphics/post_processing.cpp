@@ -460,25 +460,6 @@ public:
 };   // DepthOfFieldShader
 
 // ============================================================================
-class RHDebug : public Shader<RHDebug, core::matrix4, core::vector3df>
-{
-public:
-    GLuint m_tu_shr, m_tu_shg, m_tu_shb;
-
-    RHDebug()
-    {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "rhdebug.vert",
-                            GL_FRAGMENT_SHADER, "rhdebug.frag");
-        assignUniforms("rh_matrix", "extents");
-        m_tu_shr = 0;
-        m_tu_shg = 1;
-        m_tu_shb = 2;
-        assignTextureUnit(m_tu_shr, "SHR",  m_tu_shg, "SHG",
-                          m_tu_shb, "SHB");
-    }   // RHDebug
-};   // RHDebug
-
-// ============================================================================
 class PassThroughShader : public TextureShader<PassThroughShader, 1, int, int>
 {
 public:
@@ -867,26 +848,6 @@ void PostProcessing::renderBloom(GLuint in)
 {
     BloomShader::getInstance()->render(in);
 }   // renderBloom
-
-// ----------------------------------------------------------------------------
-void PostProcessing::renderRHDebug(unsigned SHR, unsigned SHG, unsigned SHB,
-                                   const core::matrix4 &rh_matrix,
-                                   const core::vector3df &rh_extend)
-{
-#if !defined(USE_GLES2)
-    glEnable(GL_PROGRAM_POINT_SIZE);
-    RHDebug::getInstance()->use();
-    glActiveTexture(GL_TEXTURE0 + RHDebug::getInstance()->m_tu_shr);
-    glBindTexture(GL_TEXTURE_3D, SHR);
-    glActiveTexture(GL_TEXTURE0 + RHDebug::getInstance()->m_tu_shg);
-    glBindTexture(GL_TEXTURE_3D, SHG);
-    glActiveTexture(GL_TEXTURE0 + RHDebug::getInstance()->m_tu_shb);
-    glBindTexture(GL_TEXTURE_3D, SHB);
-    RHDebug::getInstance()->setUniforms(rh_matrix, rh_extend);
-    glDrawArrays(GL_POINTS, 0, 32 * 16 * 32);
-    glDisable(GL_PROGRAM_POINT_SIZE);
-#endif
-}   // renderRHDebug
 
 // ----------------------------------------------------------------------------
 static std::vector<float> getGaussianWeight(float sigma, size_t count)

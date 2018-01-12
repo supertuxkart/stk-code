@@ -62,7 +62,6 @@ public:
     unsigned getGLSLVersion() const;
 
     // Needs special handle ?
-    bool needRHWorkaround() const;
     bool needsVertexIdWorkaround() const;
 
     // Extension is available and safe to use
