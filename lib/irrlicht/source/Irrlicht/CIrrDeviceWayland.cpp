@@ -578,25 +578,28 @@ public:
         }
         else if (interface_str == "wl_shell")
         {
-            device->m_shell = static_cast<wl_shell*>(wl_registry_bind(registry,
-                                                 name, &wl_shell_interface, 1));
+            device->m_has_wl_shell = true;
+            device->m_wl_shell_name = name;
         }
         else if (interface_str == "wl_seat")
         {
             device->m_seat = static_cast<wl_seat*>(wl_registry_bind(registry,
                                                    name, &wl_seat_interface,
                                                    version < 4 ? version : 4));
+                                                   
             wl_seat_add_listener(device->m_seat, &seat_listener, device);
         }
         else if (interface_str == "wl_shm")
         {
-            device->m_shm = static_cast<wl_shm*>(wl_registry_bind(registry, name,
-                                                         &wl_shm_interface, 1));
+            device->m_shm = static_cast<wl_shm*>(wl_registry_bind(registry, 
+                                                   name, &wl_shm_interface, 1));
         }
         else if (interface_str == "wl_output")
         {
-            device->m_output = static_cast<wl_output*>(wl_registry_bind(registry,
-                                                name, &wl_output_interface, 2));
+            device->m_output = static_cast<wl_output*>(wl_registry_bind(
+                                           registry, name, &wl_output_interface,
+                                           version < 2 ? version : 2));
+                                           
             wl_output_add_listener(device->m_output, &output_listener, device);
         }
         else if (interface_str == "org_kde_kwin_server_decoration_manager")
@@ -608,11 +611,8 @@ public:
         }
         else if (interface_str == "zxdg_shell_v6")
         {
-            device->m_xdg_shell = static_cast<zxdg_shell_v6*>(wl_registry_bind(
-                                  registry, name, &zxdg_shell_v6_interface, 1));
-                                                 
-            zxdg_shell_v6_add_listener(device->m_xdg_shell, &xdg_shell_listener, 
-                                       device);
+            device->m_has_xdg_shell = true;
+            device->m_xdg_shell_name = name;
         }
     }
 
@@ -704,10 +704,6 @@ bool CIrrDeviceWayland::isWaylandDeviceWorking()
 CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     : CIrrDeviceStub(params)
 {
-    #ifdef _DEBUG
-    setDebugName("CIrrDeviceWayland");
-    #endif
-
     m_compositor = NULL;
     m_cursor = NULL;
     m_cursor_theme = NULL;
@@ -718,17 +714,22 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     m_pointer = NULL;
     m_registry = NULL;
     m_seat = NULL;
-    m_shell = NULL;
-    m_shell_surface = NULL;
     m_shm = NULL;
     m_cursor_surface = NULL;
     m_surface = NULL;
     m_enter_serial = 0;
+
+    m_shell = NULL;
+    m_shell_surface = NULL;
+    m_has_wl_shell = false;
+    m_wl_shell_name = 0;
     
     m_xdg_shell = NULL;
     m_xdg_surface = NULL;
     m_xdg_toplevel = NULL;
+    m_has_xdg_shell = false;
     m_surface_configured = false;
+    m_xdg_shell_name = 0;
     
     m_decoration_manager = NULL;
     m_decoration = NULL;
@@ -757,6 +758,10 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     m_height = params.WindowSize.Height;
     m_window_has_focus = false;
     m_window_minimized = false;
+    
+    #ifdef _DEBUG
+    setDebugName("CIrrDeviceWayland");
+    #endif
 
     utsname LinuxInfo;
     uname(&LinuxInfo);
@@ -776,34 +781,20 @@ CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     CursorControl = new CCursorControl(this);
 
     createKeyMap();
-
-    m_display = wl_display_connect(NULL);
     
-    if (m_display == NULL)
+    bool success = initWayland();
+    
+    if (!success)
         return;
-    
-    m_xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
-    
-    m_registry = wl_display_get_registry(m_display);
-    wl_registry_add_listener(m_registry, &WaylandCallbacks::registry_listener, 
-                             this);
-    
-    wl_display_dispatch(m_display);
-    wl_display_roundtrip(m_display);
-
-    if (CreationParams.DriverType != video::EDT_NULL)
-    {
-        if (!createWindow())
-            return;
-    }
 
     createDriver();
 
     if (VideoDriver)
+    {
         createGUIAndScene();
+    }
 }
 
-//! destructor
 CIrrDeviceWayland::~CIrrDeviceWayland()
 {
     delete m_egl_context;
@@ -884,6 +875,71 @@ CIrrDeviceWayland::~CIrrDeviceWayland()
     }
 
     closeJoysticks();
+}
+
+bool CIrrDeviceWayland::initWayland()
+{
+    m_display = wl_display_connect(NULL);
+    
+    if (m_display == NULL)
+    {
+        os::Printer::log("Coudn't open display.", ELL_ERROR);
+        return false;
+    }
+    
+    m_xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
+    
+    if (m_xkb_context == NULL)
+    {
+        os::Printer::log("Coudn't create xkb context.", ELL_ERROR);
+        return false;
+    }
+    
+    m_registry = wl_display_get_registry(m_display);
+    wl_registry_add_listener(m_registry, &WaylandCallbacks::registry_listener, 
+                             this);
+    
+    wl_display_dispatch(m_display);
+    wl_display_roundtrip(m_display);
+    
+    if (m_compositor == NULL || m_seat == NULL || m_output == NULL)
+    {
+        os::Printer::log("Important protocols are not available.", ELL_ERROR);
+        return false;
+    }
+    
+    if (!m_has_wl_shell && !m_has_xdg_shell)
+    {
+        os::Printer::log("Shell protocol is not available.", ELL_ERROR);
+        return false;
+    }
+
+    if (CreationParams.DriverType != video::EDT_NULL)
+    {
+        if (m_has_xdg_shell)
+        {
+            m_xdg_shell = static_cast<zxdg_shell_v6*>(wl_registry_bind(
+                    m_registry, m_xdg_shell_name, &zxdg_shell_v6_interface, 1));
+                                                 
+            zxdg_shell_v6_add_listener(m_xdg_shell, 
+                                   &WaylandCallbacks::xdg_shell_listener, this);
+        }
+        else if (m_has_wl_shell)
+        {
+            m_shell = static_cast<wl_shell*>(wl_registry_bind(m_registry, 
+                                      m_wl_shell_name, &wl_shell_interface, 1));
+        }
+        
+        bool success = createWindow();
+        
+        if (!success)
+        {
+            os::Printer::log("Couldn't create window.", ELL_ERROR);
+            return false;
+        }
+    }
+    
+    return true;
 }
 
 bool CIrrDeviceWayland::initEGL()
@@ -995,7 +1051,7 @@ bool CIrrDeviceWayland::createWindow()
     }
     else
     {
-        os::Printer::log("Couldn't create shell surface.", ELL_ERROR);
+        os::Printer::log("Cannot create shell surface.", ELL_ERROR);
         return false;
     }
 
@@ -1016,8 +1072,11 @@ bool CIrrDeviceWayland::createWindow()
     wl_surface_set_opaque_region(m_surface, region);
     wl_region_destroy(region);
 
-    m_cursor_surface = wl_compositor_create_surface(m_compositor);
-    m_cursor_theme = wl_cursor_theme_load(NULL, 32, m_shm);
+    if (m_shm)
+    {
+        m_cursor_surface = wl_compositor_create_surface(m_compositor);
+        m_cursor_theme = wl_cursor_theme_load(NULL, 32, m_shm);
+    }
 
     if (!m_cursor_theme)
     {
@@ -1116,7 +1175,9 @@ bool CIrrDeviceWayland::run()
     }
 
     if (!Close)
+    {
         pollJoysticks();
+    }
 
     return !Close;
 }
@@ -1130,7 +1191,7 @@ void CIrrDeviceWayland::yield()
 }
 
 //! Pause execution and let other processes to run for a specified amount of time.
-void CIrrDeviceWayland::sleep(u32 timeMs, bool pauseTimer=false)
+void CIrrDeviceWayland::sleep(u32 timeMs, bool pauseTimer = false)
 {
     const bool wasStopped = Timer ? Timer->isStopped() : true;
 
@@ -1139,12 +1200,16 @@ void CIrrDeviceWayland::sleep(u32 timeMs, bool pauseTimer=false)
     ts.tv_nsec = (long) (timeMs % 1000)*  1000000;
 
     if (pauseTimer && !wasStopped)
+    {
         Timer->stop();
+    }
 
     nanosleep(&ts, NULL);
 
     if (pauseTimer && !wasStopped)
+    {
         Timer->start();
+    }
 }
 
 //! sets the caption of the window

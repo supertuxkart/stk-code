@@ -132,6 +132,12 @@ namespace irr
 			if (CIrrDeviceWayland::isWaylandDeviceWorking())
 			{
 				dev = new CIrrDeviceWayland(creation_params);
+				
+				if (!dev->getVideoDriver())
+				{
+					delete dev;
+					dev = NULL;
+				}
 			}
 		}
 #endif
