@@ -160,6 +160,7 @@ void initGL()
 {
     if (is_gl_init)
         return;
+        
     is_gl_init = true;
     // For Mesa extension reporting
 #if !defined(USE_GLES2)
@@ -167,8 +168,15 @@ void initGL()
     glewExperimental = GL_TRUE;
 #endif
     GLenum err = glewInit();
-    if (GLEW_OK != err)
-        Log::fatal("GLEW", "Glew initialisation failed with error %s", glewGetErrorString(err));
+    
+    if (err == GLEW_ERROR_NO_GLX_DISPLAY)
+    {
+        Log::info("GLEW", "Glew couldn't open glx display.");
+    }
+    else if (err != GLEW_OK)
+    {
+        Log::fatal("GLEW", "Glew initialization failed with error %s", glewGetErrorString(err));
+    }
 #else
 #ifdef ARB_DEBUG_OUTPUT
     glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKKHRPROC)eglGetProcAddress("glDebugMessageCallbackKHR");
