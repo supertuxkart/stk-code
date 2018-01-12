@@ -474,8 +474,8 @@
     kColourRangeFit	= (64),
     Use a very slow but very high quality colour compressor.
     kColourIterativeClusterFit = (256),
-    STK default the low quality.
+    STK default the high quality.
   -->
-  <texture-compression quality="64"/>
+  <texture-compression quality="32"/>
 
 </config>
