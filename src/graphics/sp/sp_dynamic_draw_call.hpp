@@ -108,6 +108,7 @@ public:
             {
                 m_update_offset = 0;
                 m_gl_vbo_size = new_size;
+                m_vertices.reserve(m_gl_vbo_size);
                 glBufferData(GL_ARRAY_BUFFER, m_gl_vbo_size * 48,
                     m_vertices.data(), GL_DYNAMIC_DRAW);
             }

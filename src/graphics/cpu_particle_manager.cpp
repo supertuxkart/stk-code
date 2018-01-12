@@ -18,7 +18,6 @@
 
 #include "graphics/cpu_particle_manager.hpp"
 #include "graphics/stk_particle.hpp"
-#include "graphics/sp/sp_base.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
@@ -199,7 +198,6 @@ void CPUParticleManager::generateAll()
 // ----------------------------------------------------------------------------
 void CPUParticleManager::uploadAll()
 {
-    using namespace SP;
     for (auto& p : m_particles_generated)
     {
         if (p.second.empty())

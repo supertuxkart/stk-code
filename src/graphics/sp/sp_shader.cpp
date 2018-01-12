@@ -105,7 +105,7 @@ void SPShader::addAllTextures(RenderPass rp)
         {
             continue;
         }
-        const unsigned i = m_prefilled_samplers[rp].size();
+        const unsigned i = (unsigned)m_prefilled_samplers[rp].size();
         glUniform1i(loc, i);
 #ifdef USE_GLES2
         m_prefilled_samplers[rp].emplace_back(i, p.first, p.second.second,
@@ -153,7 +153,8 @@ void SPShader::addCustomPrefilledTextures(SamplerType st, GLuint texture_type,
             " files.", s);
         return;
     }
-    const unsigned i = m_samplers[rp].size() + m_prefilled_samplers[rp].size();
+    const unsigned i =
+        unsigned(m_samplers[rp].size() + m_prefilled_samplers[rp].size());
     glUniform1i(loc, i);
     m_prefilled_samplers[rp].emplace_back(i, name, st, texture_type);
     m_custom_prefilled_getter[rp][name] = func;
