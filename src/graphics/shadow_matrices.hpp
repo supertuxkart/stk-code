@@ -54,9 +54,6 @@ private:
     core::matrix4              m_rh_matrix;
     float                      m_mat_ubo[16 * 9 + 2];
 
-    void updateSplitAndLightcoordRangeFromComputeShaders(unsigned int width,
-                                                         unsigned int height,
-                                                         GLuint depth_stencil_texture);
     core::matrix4 getTighestFitOrthoProj(const core::matrix4 &transform,
                               const std::vector<core::vector3df> &pointsInside,
                               std::pair<float, float> &size);

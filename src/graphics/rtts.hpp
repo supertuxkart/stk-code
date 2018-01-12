@@ -150,27 +150,20 @@ public:
     unsigned int getHeight() const { return m_height; }
 
     FrameBufferLayer &getShadowFrameBuffer() { return *m_shadow_FBO; }
-    FrameBufferLayer &getRadianceHintFrameBuffer() { return *m_RH_FBO; }
-    FrameBufferLayer &getReflectiveShadowMapFrameBuffer() { return *m_RSM; }
-
     unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
     unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }
     FrameBuffer& getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
-    const std::vector<uint64_t>& getPrefilledHandles() { return m_prefilled_handles; }
 
 private:
     unsigned RenderTargetTextures[RTT_COUNT];
     PtrVector<FrameBuffer> FrameBuffers;
-    std::vector<uint64_t> m_prefilled_handles;
     unsigned DepthStencilTexture;
 
     unsigned int m_width;
     unsigned int m_height;
 
     unsigned shadowDepthTex;
-    unsigned RSM_Color, RSM_Normal, RSM_Depth;
-    unsigned RH_Red, RH_Green, RH_Blue;
-    FrameBufferLayer* m_shadow_FBO, *m_RSM, *m_RH_FBO;
+    FrameBufferLayer* m_shadow_FBO;
 
     LEAK_CHECK();
 };

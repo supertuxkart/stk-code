@@ -50,7 +50,6 @@ void CentralVideoSettings::init()
     hasTextureFilterAnisotropic = false;
     hasTextureSwizzle = false;
     hasPixelBufferObject = false;
-    hasSRGBFramebuffer = false;
     hasSamplerObjects = false;
     hasVertexType2101010Rev = false;
     hasInstancedArrays = false;
@@ -59,9 +58,6 @@ void CentralVideoSettings::init()
     hasBGRA = false;
     hasColorBufferFloat = false;
 #endif
-
-    m_GI_has_artifact = false;
-    m_need_rh_workaround = false;
     m_need_vertex_id_workaround = false;
 
     // Call to glGetIntegerv should not be made if --no-graphics is used
@@ -202,18 +198,6 @@ void CentralVideoSettings::init()
             hasInstancedArrays = true;
             Log::info("GLDriver", "ARB Instanced Arrays Present");
         }
-        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GI))
-        {
-            m_GI_has_artifact = true;
-        }
-
-        // Specific disablement
-        if (strstr((const char *)glGetString(GL_VENDOR), "NVIDIA") != NULL)
-        {
-            // Fix for Nvidia and instanced RH
-            // Compiler crashes with a big loop in RH or GI shaders
-            m_need_rh_workaround = true;
-        }
 
         // Check all extensions required by SP
         m_supports_sp = isARBInstancedArraysUsable() &&
@@ -306,11 +290,6 @@ bool CentralVideoSettings::isGLSL() const
     return m_glsl;
 }
 
-bool CentralVideoSettings::needRHWorkaround() const
-{
-    return m_need_rh_workaround;
-}
-
 bool CentralVideoSettings::needsVertexIdWorkaround() const
 {
     return m_need_vertex_id_workaround;
@@ -393,11 +372,6 @@ bool CentralVideoSettings::isEXTTextureFilterAnisotropicUsable() const
     return hasTextureFilterAnisotropic;
 }
 
-bool CentralVideoSettings::isARBSRGBFramebufferUsable() const
-{
-    return false;
-}
-
 #if defined(USE_GLES2)
 bool CentralVideoSettings::isEXTTextureFormatBGRA8888Usable() const
 {
@@ -409,11 +383,6 @@ bool CentralVideoSettings::isEXTColorBufferFloatUsable() const
     return hasColorBufferFloat;
 }
 #endif
-
-bool CentralVideoSettings::supportsGlobalIllumination() const
-{
-    return false;
-}
 
 bool CentralVideoSettings::supportsComputeShadersFiltering() const
 {
@@ -430,26 +399,9 @@ bool CentralVideoSettings::isShadowEnabled() const
     return UserConfigParams::m_shadows_resolution > 0;
 }
 
-bool CentralVideoSettings::isGlobalIlluminationEnabled() const
-{
-    return false;
-}
-
 bool CentralVideoSettings::isTextureCompressionEnabled() const
 {
     return supportsTextureCompression() && UserConfigParams::m_texture_compression;
-}
-
-// See http://visual-computing.intel-research.net/art/publications/sdsm/
-bool CentralVideoSettings::isSDSMEnabled() const
-{
-    return isShadowEnabled() && isARBShaderAtomicCountersUsable() && isARBShaderStorageBufferObjectUsable() && isARBComputeShaderUsable() && isARBImageLoadStoreUsable() && UserConfigParams::m_sdsm;
-}
-
-// Switch between Exponential Shadow Map (better but slower filtering) and Percentage Closer Filtering (faster but with some stability issue)
-bool CentralVideoSettings::isESMEnabled() const
-{
-    return UserConfigParams::m_esm;
 }
 
 bool CentralVideoSettings::isDefferedEnabled() const

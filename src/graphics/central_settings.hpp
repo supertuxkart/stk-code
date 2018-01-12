@@ -44,7 +44,6 @@ private:
     bool hasTextureFilterAnisotropic;
     bool hasTextureSwizzle;
     bool hasPixelBufferObject;
-    bool hasSRGBFramebuffer;
     bool hasSamplerObjects;
     bool hasVertexType2101010Rev;
     bool hasInstancedArrays;
@@ -54,9 +53,7 @@ private:
     bool hasColorBufferFloat;
 #endif
 
-    bool m_need_rh_workaround;
     bool m_need_vertex_id_workaround;
-    bool m_GI_has_artifact;
 public:
     static bool m_supports_sp;
 
@@ -85,7 +82,6 @@ public:
     bool isEXTTextureFilterAnisotropicUsable() const;
     bool isARBTextureSwizzleUsable() const;
     bool isARBPixelBufferObjectUsable() const;
-    bool isARBSRGBFramebufferUsable() const;
     bool isARBSamplerObjectsUsable() const;
     bool isARBVertexType2101010RevUsable() const;
     bool useArrayTextures() const;
@@ -98,9 +94,7 @@ public:
     bool isEXTColorBufferFloatUsable() const;
 #endif
 
-
     // Are all required extensions available for feature support
-    bool supportsGlobalIllumination() const;
     bool supportsComputeShadersFiltering() const;
     bool supportsHardwareSkinning() const;
     bool supportsTextureCompression() const;
@@ -109,10 +103,7 @@ public:
 
     // "Macro" around feature support and user config
     bool isShadowEnabled() const;
-    bool isGlobalIlluminationEnabled() const;
     bool isTextureCompressionEnabled() const;
-    bool isSDSMEnabled() const;
-    bool isESMEnabled() const;
     bool isDefferedEnabled() const;
 };
 

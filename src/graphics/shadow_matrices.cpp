@@ -42,50 +42,6 @@
 float ShadowMatrices:: m_shadow_split[5] = { 1., 5., 20., 50., 150 };
 
 // ============================================================================
-class LightspaceBoundingBoxShader
-    : public TextureShader<LightspaceBoundingBoxShader, 1,
-                           core::matrix4, float, float, float, float>
-{
-public:
-    LightspaceBoundingBoxShader()
-    {
-#if !defined(USE_GLES2)
-        loadProgram(OBJECT, GL_COMPUTE_SHADER, "Lightspaceboundingbox.comp");
-        assignSamplerNames(0, "depth", ST_NEAREST_FILTERED);
-        assignUniforms("SunCamMatrix", "split0", "split1", "split2", "splitmax");
-        GLuint block_idx =
-            glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK,
-                                      "BoundingBoxes");
-        glShaderStorageBlockBinding(m_program, block_idx, 2);
-#endif
-    }   // LightspaceBoundingBoxShader
-};   // LightspaceBoundingBoxShader
-
-// ============================================================================
-class ShadowMatricesGenerationShader
-    : public Shader <ShadowMatricesGenerationShader, core::matrix4>
-{
-public:
-    ShadowMatricesGenerationShader()
-    {
-#if !defined(USE_GLES2)
-        loadProgram(OBJECT,  GL_COMPUTE_SHADER, "shadowmatrixgeneration.comp");
-        assignUniforms("SunCamMatrix");
-        GLuint block_idx =
-            glGetProgramResourceIndex(m_program,
-                                      GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
-        glShaderStorageBlockBinding(m_program, block_idx, 2);
-        block_idx =
-            glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK,
-                                      "NewMatrixData");
-        glShaderStorageBlockBinding(m_program, block_idx, 1);
-#endif
-    }
-
-
-};   // ShadowMatricesGenerationShader
-
-// ============================================================================
 class ViewFrustrumShader : public Shader<ViewFrustrumShader, video::SColor, int>
 {
 private:
@@ -230,88 +186,6 @@ core::matrix4 ShadowMatrices::getTighestFitOrthoProj(const core::matrix4 &transf
 }   // getTighestFitOrthoProj
 
 // ----------------------------------------------------------------------------
-/** Update shadowSplit values and make Cascade Bounding Box pointer valid.
- *  The function aunches two compute kernel that generates an histogram of the
- *  depth buffer value (between 0 and 250 with increment of 0.25) and get an
- *  axis aligned bounding box (from SunCamMatrix view) containing all depth
- *  buffer value. It also retrieves the result from the previous computations
- *  (in a Round Robin fashion) and update CBB pointer.
- *  \param width of the depth buffer
- *  \param height of the depth buffer
- *  TODO : The depth histogram part is commented out, needs to tweak it when
- *         I have some motivation
- */
-void ShadowMatrices::updateSplitAndLightcoordRangeFromComputeShaders(unsigned int width,
-                                                                     unsigned int height,
-                                                                     GLuint depth_stencil_texture)
-{
-#if !defined(USE_GLES2)
-    struct CascadeBoundingBox
-    {
-        int xmin;
-        int xmax;
-        int ymin;
-        int ymax;
-        int zmin;
-        int zmax;
-    };   // struct CascadeBoundingBox
-
-    // Value that should be kept between multiple calls
-    static bool ssboInit = false;
-    static GLuint CBBssbo, tempShadowMatssbo;
-    CascadeBoundingBox InitialCBB[4];
-
-    for (unsigned i = 0; i < 4; i++)
-    {
-        InitialCBB[i].xmin = InitialCBB[i].ymin = InitialCBB[i].zmin = 1000;
-        InitialCBB[i].xmax = InitialCBB[i].ymax = InitialCBB[i].zmax = -1000;
-    }
-
-    if (!ssboInit)
-    {
-        glGenBuffers(1, &CBBssbo);
-        glGenBuffers(1, &tempShadowMatssbo);
-        ssboInit = true;
-    }
-
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, CBBssbo);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, 4 * sizeof(CascadeBoundingBox),
-                 InitialCBB, GL_STATIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, CBBssbo);
-
-    LightspaceBoundingBoxShader::getInstance()->use();
-    LightspaceBoundingBoxShader::getInstance()
-        ->setTextureUnits(depth_stencil_texture);
-    LightspaceBoundingBoxShader::getInstance()
-        ->setUniforms(m_sun_cam->getViewMatrix(),
-                      ShadowMatrices::m_shadow_split[1],
-                      ShadowMatrices::m_shadow_split[2],
-                      ShadowMatrices::m_shadow_split[3],
-                      ShadowMatrices::m_shadow_split[4]);
-    glDispatchCompute((int)width / 64, (int)height / 64, 1);
-
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, tempShadowMatssbo);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, 4 * 16 * sizeof(float), 0,
-                 GL_STATIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, tempShadowMatssbo);
-
-    ShadowMatricesGenerationShader::getInstance()->use();
-    ShadowMatricesGenerationShader::getInstance()
-        ->setUniforms(m_sun_cam->getViewMatrix());
-    glDispatchCompute(4, 1, 1);
-
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-    glBindBuffer(GL_COPY_READ_BUFFER, tempShadowMatssbo);
-    glBindBuffer(GL_COPY_WRITE_BUFFER,
-                 SharedGPUObjects::getViewProjectionMatricesUBO());
-    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0,
-                        80 * sizeof(float), 4 * 16 * sizeof(float));
-#endif
-}   // updateSplitAndLightcoordRangeFromComputeShaders
-
-// ----------------------------------------------------------------------------
 /** Generate View, Projection, Inverse View, Inverse Projection, ViewProjection
  *  and InverseProjection matrixes and matrixes and cameras for the four shadow
  *   cascade and RSM.
@@ -323,8 +197,6 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
                                                unsigned int width, unsigned int height,
                                                GLuint depth_stencil_texture)
 {
-    if (CVS->isSDSMEnabled())
-        updateSplitAndLightcoordRangeFromComputeShaders(width, height, depth_stencil_texture);
     camnode->render();
     irr_driver->setProjMatrix(irr_driver->getVideoDriver()
                               ->getTransform(video::ETS_PROJECTION));

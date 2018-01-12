@@ -181,12 +181,9 @@ void ShaderBasedRenderer::renderShadows()
     glDisable(GL_BLEND);
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(1.5, 50.);
 
-    if (!CVS->isESMEnabled())
-    {
-        glEnable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(1.5, 50.);
-    }
     if (CVS->supportsGLLayerInVertexShader())
     {
         m_rtts->getShadowFrameBuffer().bindDepthOnly();
@@ -416,10 +413,6 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
 
     if (!forceRTT)
     {
-#if !defined(USE_GLES2)
-        if (CVS->isARBSRGBFramebufferUsable())
-            glDisable(GL_FRAMEBUFFER_SRGB);
-#endif
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
         return;
@@ -530,10 +523,6 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
 
     if (!CVS->isDefferedEnabled() && !forceRTT)
     {
-#if !defined(USE_GLES2)
-        if (CVS->isARBSRGBFramebufferUsable())
-            glDisable(GL_FRAMEBUFFER_SRGB);
-#endif
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
         return;
@@ -617,29 +606,15 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
         camera->activate();
         m_post_processing->renderPassThrough(m_rtts->getFBO(FBO_HALF1_R).getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
     }
-    else if (irr_driver->getRSM())
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        camera->activate();
-        m_post_processing->renderPassThrough(m_rtts->getReflectiveShadowMapFrameBuffer().getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
-    }
     else if (irr_driver->getShadowViz())
     {
         m_shadow_matrices.renderShadowsDebug(m_rtts->getShadowFrameBuffer(), m_post_processing);
     }
     else
     {
-#if !defined(USE_GLES2)
-        if (CVS->isARBSRGBFramebufferUsable())
-            glEnable(GL_FRAMEBUFFER_SRGB);
-#endif
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         camera->activate();
         m_post_processing->renderPassThrough(fbo->getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
-#if !defined(USE_GLES2)
-        if (CVS->isARBSRGBFramebufferUsable())
-            glDisable(GL_FRAMEBUFFER_SRGB);
-#endif
     }
 } //renderPostProcessing
 
@@ -808,11 +783,6 @@ void ShaderBasedRenderer::render(float dt)
         camera->activate(!CVS->isDefferedEnabled());
         rg->preRenderCallback(camera);   // adjusts start referee
         irr_driver->getSceneManager()->setActiveCamera(camnode);
-
-#if !defined(USE_GLES2)
-        if (!CVS->isDefferedEnabled() && CVS->isARBSRGBFramebufferUsable())
-            glEnable(GL_FRAMEBUFFER_SRGB);
-#endif
 
         computeMatrixesAndCameras(camnode, m_rtts->getWidth(), m_rtts->getHeight());
         if (CVS->isDefferedEnabled())

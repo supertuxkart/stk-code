@@ -179,8 +179,6 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
         code << "#define Needs_Vertex_Id_Workaround\n";
     if (CVS->isDefferedEnabled())
         code << "#define Advanced_Lighting_Enabled\n";
-    if (CVS->isARBSRGBFramebufferUsable())
-        code << "#define sRGB_Framebuffer_Usable\n";
 
 #if !defined(USE_GLES2)
     // shader compilation fails with some drivers if there is no precision

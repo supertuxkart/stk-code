@@ -931,70 +931,6 @@ void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo,
 }   // renderGaussian3Blur
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderGaussian6BlurLayer(const FrameBuffer &in_fbo,
-                                              const FrameBuffer &scalar_fbo,
-                                              unsigned int layer, float sigma_h,
-                                              float sigma_v) const
-{
-/*
-#if !defined(USE_GLES2)
-    GLuint layer_tex;
-    glGenTextures(1, &layer_tex);
-    glTextureView(layer_tex, GL_TEXTURE_2D, in_fbo.getRTT()[0],
-                  GL_R32F, 0, 1, layer, 1);
-    if (!CVS->supportsComputeShadersFiltering())
-    {
-        // Used as temp
-        scalar_fbo.bind();
-        Gaussian6VBlurShader::getInstance()
-            ->render(layer_tex, UserConfigParams::m_shadows_resolution,
-                     UserConfigParams::m_shadows_resolution, sigma_v);
-
-        in_fbo.bindLayer(layer);
-        Gaussian6HBlurShader::getInstance()
-            ->render(scalar_fbo,
-                     UserConfigParams::m_shadows_resolution, 
-                     UserConfigParams::m_shadows_resolution, sigma_h);
-    }
-    else
-    {
-        const std::vector<float> &weightsV = getGaussianWeight(sigma_v, 7);
-        glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
-        ComputeShadowBlurVShader::getInstance()->use();
-        ComputeShadowBlurVShader::getInstance()->setTextureUnits(layer_tex);
-        glBindSampler(ComputeShadowBlurVShader::getInstance()->m_dest_tu, 0);
-        glBindImageTexture(ComputeShadowBlurVShader::getInstance()->m_dest_tu,
-                           scalar_fbo.getRTT()[0], 0,
-                           false, 0, GL_WRITE_ONLY, GL_R32F);
-        ComputeShadowBlurVShader::getInstance()->setUniforms
-            (core::vector2df(1.f / UserConfigParams::m_shadows_resolution,
-                             1.f / UserConfigParams::m_shadows_resolution),
-             weightsV);
-        glDispatchCompute((int)UserConfigParams::m_shadows_resolution / 8 + 1,
-                          (int)UserConfigParams::m_shadows_resolution / 8 + 1, 1);
-
-        const std::vector<float> &weightsH = getGaussianWeight(sigma_h, 7);
-        glMemoryBarrier(  GL_TEXTURE_FETCH_BARRIER_BIT
-                        | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-        ComputeShadowBlurHShader::getInstance()->use();
-        ComputeShadowBlurHShader::getInstance()
-            ->setTextureUnits(scalar_fbo.getRTT()[0]);
-        glBindSampler(ComputeShadowBlurHShader::getInstance()->m_dest_tu, 0);
-        glBindImageTexture(ComputeShadowBlurHShader::getInstance()->m_dest_tu,
-                           layer_tex, 0, false, 0, GL_WRITE_ONLY, GL_R32F);
-        ComputeShadowBlurHShader::getInstance()->setUniforms
-            (core::vector2df(1.f / UserConfigParams::m_shadows_resolution,
-                            1.f / UserConfigParams::m_shadows_resolution),
-              weightsH);
-        glDispatchCompute((int)UserConfigParams::m_shadows_resolution / 8 + 1,
-                          (int)UserConfigParams::m_shadows_resolution / 8 + 1, 1);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-    }
-    glDeleteTextures(1, &layer_tex);
-#endif*/
-}   // renderGaussian6BlurLayer
-
-// ----------------------------------------------------------------------------
 void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
                                          const FrameBuffer &auxiliary, float sigma_v,
                                          float sigma_h) const
@@ -1491,10 +1427,6 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         PROFILER_POP_CPU_MARKER();
     }
 
-#if !defined(USE_GLES2)
-    if (CVS->isARBSRGBFramebufferUsable())
-        glEnable(GL_FRAMEBUFFER_SRGB);
-#endif
     out_fbo = &rtts->getFBO(FBO_MLAA_COLORS);
     out_fbo->bind();
     renderPassThrough(in_fbo->getRTT()[0],
@@ -1510,10 +1442,6 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
                   *out_fbo);
         PROFILER_POP_CPU_MARKER();
     }
-#if !defined(USE_GLES2)
-    if (CVS->isARBSRGBFramebufferUsable())
-        glDisable(GL_FRAMEBUFFER_SRGB);
-#endif
 
     return out_fbo;
 }   // render

@@ -38,9 +38,8 @@ STKTexture::STKTexture(const std::string& path, TexConfig* tc, bool no_upload)
 #ifndef SERVER_ONLY
     if (m_tex_config)
     {
-        if (ProfileWorld::isNoGraphics() || (!CVS->isARBSRGBFramebufferUsable()
-            && !CVS->isDefferedEnabled()) ||
-            !CVS->isGLSL())
+        if (ProfileWorld::isNoGraphics() ||
+            (!CVS->isDefferedEnabled()) || !CVS->isGLSL())
         {
             m_tex_config->m_srgb = false;
         }
@@ -214,8 +213,7 @@ void STKTexture::formatConversion(uint8_t* data, unsigned int* format,
             {
                 alpha /= 255.0f;
 
-                if (CVS->isARBSRGBFramebufferUsable() || 
-                    CVS->isDefferedEnabled())
+                if (CVS->isDefferedEnabled())
                 {
                     alpha = pow(alpha, 1.0f / 2.2f);
                 }

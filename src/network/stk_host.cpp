@@ -632,7 +632,7 @@ void STKHost::handleDirectSocketRequest()
     {
         // In case of a LAN connection, we only allow connections from
         // a LAN address (192.168*, ..., and 127.*).
-        if (NetworkConfig::get()->isLAN() && !sender.isLAN() && false)
+        if (NetworkConfig::get()->isLAN() && !sender.isLAN())
         {
             Log::error("STKHost", "Client trying to connect from '%s'",
                        sender.toString().c_str());

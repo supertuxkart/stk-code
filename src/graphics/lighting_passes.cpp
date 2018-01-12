@@ -159,92 +159,6 @@ public:
     }   // PointLightScatterShader
 };
 
-#if !defined(USE_GLES2)
-// ============================================================================
-class RadianceHintsConstructionShader
-    : public TextureShader<RadianceHintsConstructionShader, 3, core::matrix4,
-                          core::matrix4, core::vector3df, video::SColorf>
-{
-public:
-    RadianceHintsConstructionShader()
-    {
-        if (CVS->supportsGLLayerInVertexShader())
-        {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "slicedscreenquad.vert",
-                                GL_FRAGMENT_SHADER, "rh.frag");
-        }
-        else
-        {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "slicedscreenquad.vert",
-                                GL_GEOMETRY_SHADER, "rhpassthrough.geom",
-                                GL_FRAGMENT_SHADER, "rh.frag");
-        }
-
-        assignUniforms("RSMMatrix", "RHMatrix", "extents", "suncol");
-        assignSamplerNames(0, "ctex", ST_BILINEAR_FILTERED,
-                           1, "ntex", ST_BILINEAR_FILTERED,
-                           2, "dtex", ST_BILINEAR_FILTERED);
-    }   // RadianceHintsConstructionShader
-};   // RadianceHintsConstructionShader
-
-// ============================================================================
-// Workaround for a bug found in kepler nvidia linux and fermi nvidia windows
-class NVWorkaroundRadianceHintsConstructionShader
-    : public TextureShader<NVWorkaroundRadianceHintsConstructionShader,
-                           3, core::matrix4, core::matrix4, core::vector3df,
-                           int, video::SColorf >
-{
-public:
-    NVWorkaroundRadianceHintsConstructionShader()
-    {
-        loadProgram(OBJECT,GL_VERTEX_SHADER,"slicedscreenquad_nvworkaround.vert",
-                           GL_GEOMETRY_SHADER, "rhpassthrough.geom",
-                           GL_FRAGMENT_SHADER, "rh.frag");
-
-        assignUniforms("RSMMatrix", "RHMatrix", "extents", "slice", "suncol");
-
-        assignSamplerNames(0, "ctex", ST_BILINEAR_FILTERED,
-                           1, "ntex", ST_BILINEAR_FILTERED,
-                           2, "dtex", ST_BILINEAR_FILTERED);
-    }   // NVWorkaroundRadianceHintsConstructionShader
-};   // NVWorkaroundRadianceHintsConstructionShader
-#endif // !defined(USE_GLES2)
-
-// ============================================================================
-class GlobalIlluminationReconstructionShader
-    : public TextureShader<GlobalIlluminationReconstructionShader, 5,
-                           core::matrix4, core::matrix4, core::vector3df >
-{
-public:
-    GlobalIlluminationReconstructionShader()
-    {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "gi.frag");
-
-        assignUniforms("rh_matrix", "inv_rh_matrix", "extents");
-        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
-                           1, "dtex", ST_NEAREST_FILTERED,
-                           2, "SHR", ST_VOLUME_LINEAR_FILTERED,
-                           3, "SHG", ST_VOLUME_LINEAR_FILTERED,
-                           4, "SHB", ST_VOLUME_LINEAR_FILTERED);
-    }   // GlobalIlluminationReconstructionShader
-
-    // ------------------------------------------------------------------------
-    void render(const core::matrix4 &rh_matrix,
-                const core::vector3df &rh_extend, const FrameBuffer &fb,
-                GLuint normal_depth_texture,
-                GLuint depth_stencil_texture)
-    {
-        core::matrix4 inv_rh_matrix;
-        rh_matrix.getInverse(inv_rh_matrix);
-        glDisable(GL_DEPTH_TEST);
-        setTextureUnits(normal_depth_texture,
-                        depth_stencil_texture,
-                        fb.getRTT()[0], fb.getRTT()[1], fb.getRTT()[2]);
-        drawFullScreenEffect(rh_matrix, inv_rh_matrix, rh_extend);
-    }   // render
-};   // GlobalIlluminationReconstructionShader
-
 // ============================================================================
 class IBLShader : public TextureShader<IBLShader, 3>
 {
@@ -535,64 +449,6 @@ void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
 }   // updateLightsInfo
 
 // ----------------------------------------------------------------------------
-void LightingPasses::renderRadianceHints(  const ShadowMatrices& shadow_matrices,
-                                           const FrameBuffer& radiance_hint_framebuffer,
-                                           const FrameBuffer& reflective_shadow_map_framebuffer)
-{
-#if !defined(USE_GLES2)
-    glDisable(GL_BLEND);
-    radiance_hint_framebuffer.bind();
-    glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
-    if (CVS->needRHWorkaround())
-    {
-        NVWorkaroundRadianceHintsConstructionShader::getInstance()->use();
-        NVWorkaroundRadianceHintsConstructionShader::getInstance()
-            ->setTextureUnits(
-                reflective_shadow_map_framebuffer.getRTT()[0],
-                reflective_shadow_map_framebuffer.getRTT()[1],
-                reflective_shadow_map_framebuffer.getDepthTexture());
-        for (unsigned i = 0; i < 32; i++)
-        {
-            NVWorkaroundRadianceHintsConstructionShader::getInstance()
-                ->setUniforms(shadow_matrices.getRSMMatrix(),
-                              shadow_matrices.getRHMatrix(),
-                              shadow_matrices.getRHExtend(), i,
-                              irr_driver->getSunColor());
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        }
-    }
-    else
-    {
-        RadianceHintsConstructionShader::getInstance()->use();
-        RadianceHintsConstructionShader::getInstance()
-            ->setTextureUnits(
-                reflective_shadow_map_framebuffer.getRTT()[0],
-                reflective_shadow_map_framebuffer.getRTT()[1],
-                reflective_shadow_map_framebuffer.getDepthTexture()
-        );
-        RadianceHintsConstructionShader::getInstance()
-            ->setUniforms(shadow_matrices.getRSMMatrix(),
-                          shadow_matrices.getRHMatrix(),
-                          shadow_matrices.getRHExtend(),
-                          irr_driver->getSunColor());
-        glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
-    }
-#endif //!defined(USE_GLES2)
-}   // renderRadianceHints
-
-// ----------------------------------------------------------------------------
-void LightingPasses::renderGlobalIllumination(  const ShadowMatrices& shadow_matrices,
-                                                const FrameBuffer& radiance_hint_framebuffer,
-                                                GLuint normal_depth_texture,
-                                                GLuint depth_stencil_texture)
-{
-    GlobalIlluminationReconstructionShader::getInstance()
-        ->render(shadow_matrices.getRHMatrix(), shadow_matrices.getRHExtend(),
-                 radiance_hint_framebuffer, normal_depth_texture,
-                 depth_stencil_texture);
-}
-
-// ----------------------------------------------------------------------------
 void LightingPasses::renderLights(  bool has_shadow,
                                     GLuint normal_depth_texture,
                                     GLuint depth_stencil_texture,
@@ -617,22 +473,11 @@ void LightingPasses::renderLights(  bool has_shadow,
             glDisable(GL_DEPTH_TEST);
             glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
-
-
-            if (CVS->isESMEnabled())
-            {
-                ShadowedSunLightShaderESM::getInstance()->render(normal_depth_texture,
-                                                                 depth_stencil_texture,
-                                                                 shadow_framebuffer);
-            }
-            else
-            {
-                ShadowedSunLightShaderPCF::getInstance()->render(normal_depth_texture,
-                                                                 depth_stencil_texture,
-                                                                 shadow_framebuffer,
-                                                                 irr_driver->getSunDirection(),
-                                                                 irr_driver->getSunColor());
-            }
+            ShadowedSunLightShaderPCF::getInstance()->render(normal_depth_texture,
+                                                             depth_stencil_texture,
+                                                             shadow_framebuffer,
+                                                             irr_driver->getSunDirection(),
+                                                             irr_driver->getSunColor());
         }
         else
             renderSunlight(irr_driver->getSunDirection(),

@@ -588,18 +588,6 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_dof
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dof",
         &m_video_group, "Enable Depth of Field"));
-    PARAM_PREFIX BoolUserConfigParam        m_gi
-        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_gi",
-        &m_video_group, "Enable Global Illumination"));
-    PARAM_PREFIX BoolUserConfigParam        m_azdo
-        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_azdo",
-        &m_video_group, "Enable 'Approaching Zero Driver Overhead' mode (very experimental !)"));
-    PARAM_PREFIX BoolUserConfigParam        m_sdsm
-        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_sdsm",
-        &m_video_group, "Enable Sampled Distribued Shadow Map (buggy atm)"));
-    PARAM_PREFIX BoolUserConfigParam        m_esm
-        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_esm",
-        &m_video_group, "Enable Exponential Shadow Map (better but slower)"));
     PARAM_PREFIX BoolUserConfigParam        m_old_driver_popup
         PARAM_DEFAULT(BoolUserConfigParam(true, "old_driver_popup",
         &m_video_group, "Determines if popup message about too old drivers should be displayed."));

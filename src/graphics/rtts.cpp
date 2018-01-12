@@ -58,12 +58,9 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale)
     m_width = (unsigned int)(width * rtt_scale);
     m_height = (unsigned int)(height  * rtt_scale);
     m_shadow_FBO = NULL;
-    m_RH_FBO = NULL;
-    m_RSM = NULL;
-    m_RH_FBO = NULL;
     using namespace video;
     using namespace core;
-    
+
     dimension2du res(m_width, m_height);
     
     const dimension2du half = res/2;
@@ -91,7 +88,7 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale)
     GLint rgb_format = GL_BGR;
     GLint diffuse_specular_internal_format = GL_R11F_G11F_B10F;
     GLint type = GL_FLOAT;
-    GLint srgb_internal_format = GL_SRGB8_ALPHA8;
+    GLint rgb_internal_format = GL_RGBA8;
     
 #if defined(USE_GLES2)
     if (!CVS->isEXTColorBufferFloatUsable())
@@ -107,9 +104,6 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale)
     }
 #endif
 
-    if (!CVS->isARBSRGBFramebufferUsable())
-        srgb_internal_format = GL_RGBA8;
-
     RenderTargetTextures[RTT_TMP1] = generateRTT(res, rgba_internal_format, rgba_format, type);
     RenderTargetTextures[RTT_TMP2] = generateRTT(res, rgba_internal_format, rgba_format, type);
     RenderTargetTextures[RTT_TMP3] = generateRTT(res, rgba_internal_format, rgba_format, type);
@@ -117,9 +111,9 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale)
     RenderTargetTextures[RTT_LINEAR_DEPTH] = generateRTT(res, red32_internal_format, red_format, type, linear_depth_mip_levels);
     RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RGB10_A2, GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV);
     RenderTargetTextures[RTT_COLOR] = generateRTT(res, rgba_internal_format, rgba_format, type);
-    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, srgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_MLAA_TMP] = generateRTT(res, srgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_MLAA_BLEND] = generateRTT(res, srgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, rgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_TMP] = generateRTT(res, rgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_BLEND] = generateRTT(res, rgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
     RenderTargetTextures[RTT_SSAO] = generateRTT(res, red_internal_format, red_format, type);
     RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, rgba_internal_format, rgba_format, type);
     RenderTargetTextures[RTT_DIFFUSE] = generateRTT(res, diffuse_specular_internal_format, rgb_format, type);
@@ -294,18 +288,6 @@ RTT::~RTT()
         delete m_shadow_FBO;
         glDeleteTextures(1, &shadowDepthTex);
     }
-    if (CVS->isGlobalIlluminationEnabled())
-    {
-        delete m_RH_FBO;
-        delete m_RSM;
-        glDeleteTextures(1, &RSM_Color);
-        glDeleteTextures(1, &RSM_Normal);
-        glDeleteTextures(1, &RSM_Depth);
-        glDeleteTextures(1, &RH_Red);
-        glDeleteTextures(1, &RH_Green);
-        glDeleteTextures(1, &RH_Blue);
-    }
 }
-
 
 #endif   // !SERVER_ONLY
