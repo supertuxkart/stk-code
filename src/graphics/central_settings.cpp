@@ -80,7 +80,7 @@ void CentralVideoSettings::init()
     }
 #if !defined(USE_GLES2)
     m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1))
-           && !UserConfigParams::m_force_legacy_device;
+           && !UserConfigParams::m_force_legacy_device && m_supports_sp;
 #else
     m_glsl = m_gl_major_version >= 3 && !UserConfigParams::m_force_legacy_device;
 #endif
@@ -152,12 +152,10 @@ void CentralVideoSettings::init()
             Log::info("GLDriver", "ARB Shader Storage Buffer Object Present");
         }
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXT_TEXTURE_COMPRESSION_S3TC) &&
-            hasGLExtension("GL_EXT_texture_compression_s3tc") &&
-            hasGLExtension("GL_ARB_texture_compression_rgtc"))
+            hasGLExtension("GL_EXT_texture_compression_s3tc"))
         {
             hasTextureCompression = true;
             Log::info("GLDriver", "EXT Texture Compression S3TC Present");
-            Log::info("GLDriver", "ARB Texture Compression RGTC Present");
         }
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_UNIFORM_BUFFER_OBJECT) &&
             hasGLExtension("GL_ARB_uniform_buffer_object")) {
@@ -412,11 +410,6 @@ bool CentralVideoSettings::isEXTColorBufferFloatUsable() const
 }
 #endif
 
-bool CentralVideoSettings::supportsShadows() const
-{
-    return isARBExplicitAttribLocationUsable();
-}
-
 bool CentralVideoSettings::supportsGlobalIllumination() const
 {
     return false;
@@ -434,7 +427,7 @@ bool CentralVideoSettings::supportsTextureCompression() const
 
 bool CentralVideoSettings::isShadowEnabled() const
 {
-    return supportsShadows() && (UserConfigParams::m_shadows_resolution > 0);
+    return UserConfigParams::m_shadows_resolution > 0;
 }
 
 bool CentralVideoSettings::isGlobalIlluminationEnabled() const

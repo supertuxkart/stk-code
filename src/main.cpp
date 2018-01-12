@@ -803,16 +803,16 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_dof = true;
     else if (CommandLine::has("--disable-dof"))
         UserConfigParams::m_dof = false;
-    // global illumination
-    if (CommandLine::has("--enable-gi"))
-        UserConfigParams::m_gi = true;
-    else if (CommandLine::has("--disable-gi"))
-        UserConfigParams::m_gi = false;
-    // animated scenery
-    if (CommandLine::has("--enable-gfx"))
-        UserConfigParams::m_graphical_effects = 2;
-    else if (CommandLine::has("--disable-gfx"))
-        UserConfigParams::m_graphical_effects = 0;
+    // particles effects
+    if (CommandLine::has("--enable-particles"))
+        UserConfigParams::m_particles_effects = 2;
+    else if (CommandLine::has("--disable-particles"))
+        UserConfigParams::m_particles_effects = 0;
+    // animated characters
+    if (CommandLine::has("--enable-animated-characters"))
+        UserConfigParams::m_animated_characters = true;
+    else if (CommandLine::has("--disable-animated-characters"))
+        UserConfigParams::m_animated_characters = false;
     if (CommandLine::has("--enable-motion-blur"))
         UserConfigParams::m_motionblur = true;
     else if (CommandLine::has("--disable-motion-blur"))
@@ -841,11 +841,6 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_high_definition_textures =  2 | 1;
     else if (CommandLine::has("--disable-hd-textures"))
         UserConfigParams::m_high_definition_textures = 2;
-    if (CommandLine::has("--enable-trilinear"))
-        UserConfigParams::m_trilinear = true;
-    else if (CommandLine::has("--disable-trilinear"))
-        UserConfigParams::m_trilinear = false;
-
 
     // Enable loading grand prix from local directory
     if(CommandLine::has("--add-gp-dir", &s))

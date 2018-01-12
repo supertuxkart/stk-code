@@ -25,7 +25,7 @@
 #include "graphics/material.hpp"
 #include "graphics/render_info.hpp"
 
-#include "../../lib/irrlicht/source/Irrlicht/CBoneSceneNode.h"
+#include "../../../lib/irrlicht/source/Irrlicht/CBoneSceneNode.h"
 #include <algorithm>
 
 namespace SP

@@ -886,7 +886,7 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
             model_location.setScale(core::vector3df(scale, scale, scale));
             w3->clearModels();
             const bool has_win_anime =
-                UserConfigParams::m_show_steering_animations != 0 &&
+                UserConfigParams::m_animated_characters &&
                 (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
                 kart_model.getFrame(KartModel::AF_WIN_START) > -1) &&
                 kart_model.getFrame(KartModel::AF_WIN_END) > -1) ||

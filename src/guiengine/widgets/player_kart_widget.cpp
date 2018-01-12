@@ -197,7 +197,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     core::matrix4 model_location;
     model_location.setScale(core::vector3df(scale, scale, scale));
     const bool has_win_anime =
-        UserConfigParams::m_show_steering_animations != 0 &&
+        UserConfigParams::m_animated_characters &&
         (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
         kart_model.getFrame(KartModel::AF_WIN_START) > -1) &&
         kart_model.getFrame(KartModel::AF_WIN_END) > -1) ||

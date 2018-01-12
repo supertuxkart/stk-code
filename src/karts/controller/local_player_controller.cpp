@@ -74,7 +74,7 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
     // Attach Particle System
     Track *track = Track::getCurrentTrack();
 #ifndef SERVER_ONLY
-    if (UserConfigParams::m_weather_effects &&
+    if (UserConfigParams::m_particles_effects > 1 &&
         track->getSkyParticles() != NULL)
     {
         track->getSkyParticles()->setBoxSizeXZ(150.0f, 150.0f);

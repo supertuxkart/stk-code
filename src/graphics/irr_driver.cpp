@@ -482,7 +482,6 @@ void IrrDriver::initDevice()
 
         params.ForceLegacyDevice = true;
         recreate_device = true;
-        UserConfigParams::m_force_legacy_device = true;
     }
 #endif
 
@@ -595,14 +594,6 @@ void IrrDriver::initDevice()
     {
         Log::info("irr_driver", "GLSL supported.");
     }
-
-/*    if (!supportGeometryShader())
-    {
-        // these options require geometry shaders
-        UserConfigParams::m_shadows = 0;
-        UserConfigParams::m_gi = false;
-    }*/
-
 
     // m_glsl might be reset in rtt if an error occurs.
     if (CVS->isGLSL())

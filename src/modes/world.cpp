@@ -227,7 +227,7 @@ void World::init()
 
     powerup_manager->updateWeightsForRace(race_manager->getNumberOfKarts());
 
-    if (UserConfigParams::m_weather_effects)
+    if (UserConfigParams::m_particles_effects > 1)
     {
         Weather::getInstance<Weather>();   // create Weather instance
     }
@@ -1003,7 +1003,7 @@ void World::update(float dt)
     }
 
     PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
-    if (UserConfigParams::m_graphical_effects > 1 && Weather::getInstance())
+    if (UserConfigParams::m_particles_effects > 1 && Weather::getInstance())
     {
         Weather::getInstance()->update(dt);
     }

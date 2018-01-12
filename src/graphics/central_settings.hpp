@@ -100,7 +100,6 @@ public:
 
 
     // Are all required extensions available for feature support
-    bool supportsShadows() const;
     bool supportsGlobalIllumination() const;
     bool supportsComputeShadersFiltering() const;
     bool supportsHardwareSkinning() const;

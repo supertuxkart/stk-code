@@ -223,17 +223,8 @@ void Kart::init(RaceManager::KartType type)
 #ifdef SERVER_ONLY
     bool animations = false;  // server never animates
 #else
-    bool animations = true;
+    bool animations = UserConfigParams::m_animated_characters;
 #endif
-    const int anims = UserConfigParams::m_show_steering_animations;
-    if (anims == ANIMS_NONE)
-    {
-        animations = false;
-    }
-    else if (anims == ANIMS_PLAYERS_ONLY && type != RaceManager::KT_PLAYER)
-    {
-        animations = false;
-    }
     loadData(type, animations);
 
     m_kart_gfx = new KartGFX(this, Track::getCurrentTrack()->getIsDuringDay());
@@ -1795,7 +1786,7 @@ void Kart::handleMaterialGFX(float dt)
     // something with the wheels, and the material has not the
     // below surface property set.
     if (material && isOnGround() && !material->isBelowSurface() &&
-        !getKartAnimation()      && UserConfigParams::m_graphical_effects > 1)
+        !getKartAnimation()      && UserConfigParams::m_particles_effects > 1)
     {
 
         // Get the appropriate particle data depending on
@@ -1847,7 +1838,7 @@ void Kart::handleMaterialGFX(float dt)
         }   // for i in all cameras for this kart
     }   // camera != final camera
 
-    if (UserConfigParams::m_graphical_effects < 2)
+    if (UserConfigParams::m_particles_effects < 2)
         return;
 
     // Use the middle of the contact points of the two rear wheels
@@ -2130,7 +2121,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
     {
 #ifndef SERVER_ONLY
         std::string particles = m->getCrashResetParticles();
-        if (particles.size() > 0 && UserConfigParams::m_graphical_effects > 0)
+        if (particles.size() > 0 && UserConfigParams::m_particles_effects > 0)
         {
             ParticleKind* kind =
                 ParticleKindManager::get()->getParticles(particles);

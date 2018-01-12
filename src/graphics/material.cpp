@@ -1002,10 +1002,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                     UserConfigParams::m_anisotropic;
         }
     }
-    else if (UserConfigParams::m_trilinear)
-    {
-        m->setFlag(video::EMF_TRILINEAR_FILTER, true);
-    }
+    m->setFlag(video::EMF_TRILINEAR_FILTER, true);
 
     // UV clamping
     if ( (m_clamp_tex & UCLAMP) != 0)

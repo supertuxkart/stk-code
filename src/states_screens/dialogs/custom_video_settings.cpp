@@ -17,7 +17,6 @@
 
 #include "states_screens/dialogs/custom_video_settings.hpp"
 
-#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
@@ -37,12 +36,8 @@ using namespace irr::gui;
 // -----------------------------------------------------------------------------
 
 CustomVideoSettingsDialog::CustomVideoSettingsDialog(const float w, const float h) :
-        ModalDialog(w, h), m_all_kart_animated(true)
+        ModalDialog(w, h)
 {
-#ifndef SERVER_ONLY
-    m_all_kart_animated = stk_config->m_max_skinning_bones > 512 ||
-        !CVS->supportsHardwareSkinning();
-#endif
     loadFromFile("custom_video_settings.stkgui");
     updateActivation();
 }
@@ -58,26 +53,16 @@ CustomVideoSettingsDialog::~CustomVideoSettingsDialog()
 void CustomVideoSettingsDialog::beforeAddingWidgets()
 {
 #ifndef SERVER_ONLY
-    getWidget<CheckBoxWidget>("weather_gfx")->setState(UserConfigParams::m_weather_effects);
+    getWidget<CheckBoxWidget>("animated_characters")
+        ->setState(UserConfigParams::m_animated_characters);
     getWidget<CheckBoxWidget>("dof")->setState(UserConfigParams::m_dof);
     
-    SpinnerWidget* anim_gfx = getWidget<SpinnerWidget>("anim_gfx");
-    assert(anim_gfx != NULL);
-    anim_gfx->addLabel(_("Disabled"));
-    anim_gfx->addLabel(_("Important only"));
-    anim_gfx->addLabel(_("Enabled"));
-    anim_gfx->setValue(UserConfigParams::m_graphical_effects);
-
-    SpinnerWidget* kart_anim = getWidget<SpinnerWidget>("steering_animations");
-    kart_anim->addLabel(_("Disabled")); // 0
-    //I18N: animations setting (only karts with human players are animated)
-    kart_anim->addLabel(_("Human players only")); // 1
-    //I18N: animations setting (all karts are animated)
-    if (m_all_kart_animated)
-        kart_anim->addLabel(_("Enabled for all")); // 2
-    kart_anim->setValue(!m_all_kart_animated &&
-        UserConfigParams::m_show_steering_animations == 2 ?
-        1 : UserConfigParams::m_show_steering_animations);
+    SpinnerWidget* particles_effects = getWidget<SpinnerWidget>("particles_effects");
+    assert(particles_effects != NULL);
+    particles_effects->addLabel(_("Disabled"));
+    particles_effects->addLabel(_("Important only"));
+    particles_effects->addLabel(_("Enabled"));
+    particles_effects->setValue(UserConfigParams::m_particles_effects);
 
     SpinnerWidget* geometry_level = getWidget<SpinnerWidget>("geometry_detail");
     //I18N: Geometry level disabled : lowest level, no details
@@ -94,21 +79,17 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     filtering->addLabel(_("Very Low"));
     filtering->addLabel(_("Low"));
     filtering->addLabel(_("High"));
-    filtering->addLabel(_("Very High"));
     filtering->setValue(OptionsScreenVideo::getImageQuality());
 
     SpinnerWidget* shadows = getWidget<SpinnerWidget>("shadows");
     shadows->addLabel(_("Disabled"));   // 0
     shadows->addLabel(_("Low"));        // 1
     shadows->addLabel(_("High"));       // 2
-    if (CVS->supportsShadows())
-        shadows->setValue(UserConfigParams::m_shadows_resolution / 512);
-    else
-        shadows->setValue(0);
+    shadows->setValue(UserConfigParams::m_shadows_resolution / 512);
+
     getWidget<CheckBoxWidget>("dynamiclight")->setState(UserConfigParams::m_dynamic_lights);
     getWidget<CheckBoxWidget>("lightshaft")->setState(UserConfigParams::m_light_shaft);
     getWidget<CheckBoxWidget>("ibl")->setState(!UserConfigParams::m_degraded_IBL);
-    getWidget<CheckBoxWidget>("global_illumination")->setState(UserConfigParams::m_gi);
     getWidget<CheckBoxWidget>("motionblur")->setState(UserConfigParams::m_motionblur);
     getWidget<CheckBoxWidget>("mlaa")->setState(UserConfigParams::m_mlaa);
     getWidget<CheckBoxWidget>("glow")->setState(UserConfigParams::m_glow);
@@ -123,12 +104,6 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
         CheckBoxWidget* cb_tex_cmp = getWidget<CheckBoxWidget>("texture_compression");
         cb_tex_cmp->setState(false);
         cb_tex_cmp->setActive(false);
-    }
-
-    if (!CVS->supportsGlobalIllumination())
-    {
-        shadows->setActive(false);
-        getWidget<CheckBoxWidget>("global_illumination")->setActive(false);
     }
 #endif
 }
@@ -149,7 +124,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         UserConfigParams::m_motionblur      =
             advanced_pipeline && getWidget<CheckBoxWidget>("motionblur")->getState();
 
-        if (advanced_pipeline && CVS->supportsShadows())
+        if (advanced_pipeline)
         {
             UserConfigParams::m_shadows_resolution =
                 getWidget<SpinnerWidget>("shadows")->getValue() * 512;
@@ -171,10 +146,6 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         UserConfigParams::m_degraded_IBL =
             !advanced_pipeline || !getWidget<CheckBoxWidget>("ibl")->getState();
 
-        UserConfigParams::m_gi =
-            advanced_pipeline && CVS->supportsGlobalIllumination() &&
-            getWidget<CheckBoxWidget>("global_illumination")->getState();
-
         UserConfigParams::m_glow =
             advanced_pipeline && getWidget<CheckBoxWidget>("glow")->getState();
 
@@ -184,14 +155,11 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         UserConfigParams::m_texture_compression =
             getWidget<CheckBoxWidget>("texture_compression")->getState();
 
-        UserConfigParams::m_graphical_effects =
-            getWidget<SpinnerWidget>("anim_gfx")->getValue();
+        UserConfigParams::m_particles_effects =
+            getWidget<SpinnerWidget>("particles_effects")->getValue();
 
-        UserConfigParams::m_weather_effects =
-            getWidget<CheckBoxWidget>("weather_gfx")->getState();
-
-        UserConfigParams::m_show_steering_animations =
-            getWidget<SpinnerWidget>("steering_animations")->getValue();
+        UserConfigParams::m_animated_characters =
+            getWidget<CheckBoxWidget>("animated_characters")->getState();
 
         const int val =
             getWidget<SpinnerWidget>("geometry_detail")->getValue();
@@ -227,17 +195,8 @@ void CustomVideoSettingsDialog::updateActivation()
     getWidget<CheckBoxWidget>("ssao")->setActive(light);
     getWidget<CheckBoxWidget>("lightshaft")->setActive(light);
     getWidget<CheckBoxWidget>("ibl")->setActive(light);
-    getWidget<CheckBoxWidget>("global_illumination")->setActive(light);
     getWidget<CheckBoxWidget>("glow")->setActive(light);
     getWidget<CheckBoxWidget>("bloom")->setActive(light);
-    getWidget<SpinnerWidget>("steering_animations")
-        ->setMax(m_all_kart_animated ? 2 : 1);
-
-    if (!CVS->supportsShadows() && !CVS->supportsGlobalIllumination())
-    {
-        getWidget<SpinnerWidget>("shadows")->setActive(false);
-        getWidget<CheckBoxWidget>("global_illumination")->setActive(false);
-    }
 #endif
 }   // updateActivation
 

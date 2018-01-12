@@ -784,9 +784,9 @@ namespace UserConfigParams
 #define FBO_DEFAULT true
 #endif
 
-    PARAM_PREFIX IntUserConfigParam        m_graphical_effects
-            PARAM_DEFAULT(  IntUserConfigParam(2, "animate_graphics",
-                            &m_graphics_quality, "Scenery animations: 0 disabled, 1 only important, 2 enabled") );
+    PARAM_PREFIX IntUserConfigParam        m_particles_effects
+            PARAM_DEFAULT(  IntUserConfigParam(2, "particles-effecs",
+                            &m_graphics_quality, "Particles effects: 0 disabled, 1 only important, 2 enabled") );
 
     // This saves the actual user preference.
     PARAM_PREFIX IntUserConfigParam        m_xmas_mode
@@ -798,14 +798,10 @@ namespace UserConfigParams
         PARAM_DEFAULT(IntUserConfigParam(0, "easter-ear-mode",
         &m_graphics_quality, "Easter Bunny Ears: 0 use current date, 1 always on, 2 always off"));
 
-    PARAM_PREFIX BoolUserConfigParam        m_weather_effects
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx",
-                                     &m_graphics_quality, "Weather effects") );
-    PARAM_PREFIX IntUserConfigParam        m_show_steering_animations
-            PARAM_DEFAULT(  IntUserConfigParam(ANIMS_PLAYERS_ONLY,
-                            "steering_animations", &m_graphics_quality,
-                "Whether to display kart animations (0=disabled for all; "
-                "1=enabled for humans, disabled for AIs; 2=enabled for all") );
+    PARAM_PREFIX BoolUserConfigParam       m_animated_characters
+            PARAM_DEFAULT(  BoolUserConfigParam(true,
+                            "animated-characters", &m_graphics_quality,
+                "Whether to display animated characters") );
 
     PARAM_PREFIX IntUserConfigParam        m_geometry_level
             PARAM_DEFAULT(  IntUserConfigParam(GEOLEVEL_0,
@@ -817,17 +813,7 @@ namespace UserConfigParams
             PARAM_DEFAULT( IntUserConfigParam(4, "anisotropic",
                            &m_graphics_quality,
                            "Quality of anisotropic filtering (usual values include 2-4-8-16; 0 to disable)") );
-    PARAM_PREFIX BoolUserConfigParam         m_trilinear
-            PARAM_DEFAULT( BoolUserConfigParam(true, "trilinear",
-                           &m_graphics_quality,
-                           "Whether trilinear filtering is allowed to be "
-                           "used (true or false)") );
-    /*
-    PARAM_PREFIX IntUserConfigParam          m_antialiasing
-            PARAM_DEFAULT( IntUserConfigParam(0,
-                           "antialiasing", &m_graphics_quality,
-                           "Whether antialiasing is enabled (0 = disabled, 1 = 2x, 2 = 4x, 3 = 8x") );
-    */
+
     PARAM_PREFIX BoolUserConfigParam         m_vsync
             PARAM_DEFAULT( BoolUserConfigParam(false, "vsync",
                            &m_graphics_quality,

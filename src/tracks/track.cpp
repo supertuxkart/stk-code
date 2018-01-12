@@ -1602,7 +1602,7 @@ void Track::createWater(const XMLNode &node)
     */
     scene::ISceneNode* scene_node = NULL;
     /*
-    if (UserConfigParams::m_graphical_effects > 1)
+    if (UserConfigParams::m_particles_effects > 1)
     {
         scene::IMesh *welded;
         scene_node = irr_driver->addWaterNode(mesh, &welded,
@@ -2157,7 +2157,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         }
         else if (name == "particle-emitter")
         {
-            if (UserConfigParams::m_graphical_effects > 1)
+            if (UserConfigParams::m_particles_effects > 1)
             {
                 m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
             }
