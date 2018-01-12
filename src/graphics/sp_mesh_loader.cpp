@@ -20,6 +20,7 @@
 #include "utils/constants.hpp"
 #include "utils/mini_glm.hpp"
 
+#include "../../lib/irrlicht/source/Irrlicht/CSkinnedMesh.h"
 const uint8_t VERSION_NOW = 1;
 
 #include <algorithm>
@@ -47,7 +48,7 @@ scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
     }
     m_bind_frame = 0;
     m_joint_count = 0;
-    //m_frame_count = 0;
+    m_frame_count = 0;
     m_mesh = NULL;
     m_mesh = m_scene_manager->createSkinnedMesh();
     io::IFileSystem* fs = m_scene_manager->getFileSystem();
@@ -196,6 +197,9 @@ scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
         f->read(&pre_computed_size, 2);
     }
     m_mesh->finalize();
+    // Because the last frame in spm is usable
+    static_cast<scene::CSkinnedMesh*>(m_mesh)->AnimationFrames =
+        (float)m_frame_count + 1.0f;
     m_all_armatures.clear();
     m_to_bind_pose_matrices.clear();
     m_joints.clear();
@@ -366,8 +370,8 @@ void SPMeshLoader::createAnimationData(irr::io::IReadFile* spm)
     }
     for (unsigned i = 0; i < armature_size; i++)
     {
-        //m_frame_count = std::max(m_frame_count,
-        //    (unsigned)m_all_armatures[i].m_frame_pose_matrices.back().first);
+        m_frame_count = std::max(m_frame_count,
+            (unsigned)m_all_armatures[i].m_frame_pose_matrices.back().first);
         m_joint_count += m_all_armatures[i].m_joint_used;
     }
 

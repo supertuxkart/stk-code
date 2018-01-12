@@ -35,7 +35,7 @@
   !define VERSION_MINOR 9
   !define VERSION_REVISION 3
   ; Empty means stable, could be -git, -rc1
-  !define VERSION_BUILD "-rc1"
+  !define VERSION_BUILD "-git"
   
   ;Name and file
   !define APPNAME "SuperTuxKart"
@@ -43,7 +43,7 @@
   !define DESCRIPTION "3D open-source arcade racer with a variety characters, tracks, and modes to play"
 
   Name "${APPNAMEANDVERSION}"
-  OutFile "${APPNAMEANDVERSION} installer.exe"
+  OutFile "${APPNAMEANDVERSION} installer-32bit.exe"
 
   # These will be displayed by the "Click here for support information" link in "Add/Remove Programs"
   # It is possible to use "mailto:" links in here to open the email client
@@ -206,7 +206,7 @@ Section "Install" SecMain
   File *.ico 
   ; prereqs
   SetOutPath "$INSTDIR\prerequisites"
-  File /r prerequisites\*.*
+  File /r prerequisites\vcredist_x86.exe
 
   ; data + assets
   SetOutPath "$INSTDIR\data\"

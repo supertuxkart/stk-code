@@ -581,20 +581,20 @@ bool FeatureUnlockedCutScene::onEscapePressed()
 
 void FeatureUnlockedCutScene::continueButtonPressed()
 {
-    //if (m_global_time < GIFT_EXIT_TO)
-    //{
-    //    // If animation was not over yet, the button is used to skip the animation
-    //    while (m_global_time < GIFT_EXIT_TO)
-    //    {
-    //        // simulate all the steps of the animation until we reach the end
-    //        onUpdate(0.4f);
-    //        World::getWorld()->updateWorld(0.4f);
-    //    }
-    //}
-    //else
-    //{
+    if (m_global_time < GIFT_EXIT_TO)
+    {
+        // If animation was not over yet, the button is used to skip the animation
+        while (m_global_time < GIFT_EXIT_TO)
+        {
+            // simulate all the steps of the animation until we reach the end
+            onUpdate(0.4f);
+            World::getWorld()->updateWorld(0.4f);
+        }
+    }
+    else
+    {
         ((CutsceneWorld*)World::getWorld())->abortCutscene();
-    //}
+    }
 
 }   // continueButtonPressed
 

@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-10-24 10:06+0000\n"
+"PO-Revision-Date: 2017-11-13 00:19+0000\n"
 "Last-Translator: Auria <auria.mg@gmail.com>\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/supertuxkart/supertuxkart/language/en_GB/)\n"
 "MIME-Version: 1.0\n"
@@ -3020,7 +3020,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:180
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nAndi Chandler https://launchpad.net/~bing\nMichael Torpey https://launchpad.net/~mctorpey\nSTK-team https://launchpad.net/~stk"
+msgstr "Launchpad Contributions:\n  Andi Chandler https://launchpad.net/~bing\n  Michael Torpey https://launchpad.net/~mctorpey\n  STK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

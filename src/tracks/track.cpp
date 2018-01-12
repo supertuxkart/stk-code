@@ -466,6 +466,7 @@ void Track::cleanup()
     }
 #endif
 
+    m_meta_library.clear();
     Scripting::ScriptEngine::getInstance()->cleanupCache();
 
     m_current_track = NULL;
@@ -1571,6 +1572,39 @@ void Track::createWater(const XMLNode &node)
 }   // createWater
 
 // ----------------------------------------------------------------------------
+static void recursiveUpdatePosition(scene::ISceneNode *node)
+{
+    node->updateAbsolutePosition();
+
+    scene::ISceneNodeList::ConstIterator it = node->getChildren().begin();
+    for (; it != node->getChildren().end(); ++it)
+    {
+        recursiveUpdatePosition(*it);
+    }
+}   // recursiveUpdatePosition
+
+// ----------------------------------------------------------------------------
+static void recursiveUpdatePhysics(std::vector<TrackObject*>& tos)
+{
+    for (TrackObject* to : tos)
+    {
+        if (to->getPhysicalObject())
+        {
+            TrackObjectPresentationSceneNode* sn = to
+                ->getPresentation<TrackObjectPresentationSceneNode>();
+            if (sn)
+            {
+                to->getPhysicalObject()->move(
+                    sn->getNode()->getAbsoluteTransformation().getTranslation(),
+                    sn->getNode()->getAbsoluteTransformation()
+                    .getRotationDegrees());
+            }
+        }
+        recursiveUpdatePhysics(to->getChildren());
+    }
+}   // recursiveUpdatePhysics
+
+// ----------------------------------------------------------------------------
 /** This function load the actual scene, i.e. all parts of the track,
  *  animations, items, ... It  is called from world during initialisation.
  *  Track is the first model to be loaded, so at this stage the root scene node
@@ -1756,6 +1790,19 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     loadObjects(root, path, model_def_loader, true, NULL, NULL);
+
+    // Correct the parenting of meta library
+    for (auto& p : m_meta_library)
+    {
+        auto* ln = p.first->getPresentation<TrackObjectPresentationLibraryNode>();
+        assert(ln);
+        TrackObjectPresentationLibraryNode* meta_ln = p.second
+            ->getPresentation<TrackObjectPresentationLibraryNode>();
+        assert(meta_ln);
+        meta_ln->getNode()->setParent(ln->getNode());
+        recursiveUpdatePosition(meta_ln->getNode());
+        recursiveUpdatePhysics(p.second->getChildren());
+    }
 
     model_def_loader.cleanLibraryNodesAfterLoad();
 

@@ -1,8 +1,9 @@
+cmake_minimum_required(VERSION 2.8.4)
+
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
 set(PROJECT_VERSION "git")
 
-cmake_minimum_required(VERSION 2.8.4)
 if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
   cmake_policy(SET CMP0043 OLD)
 endif()
@@ -28,12 +29,12 @@ option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
 option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
-option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" OFF)
 
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT USE_GLES2;NOT APPLE" OFF)
 
-if (UNIX AND NOT APPLE)
+if ((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
+    option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" ON)
     option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
 endif()
 
