@@ -33,21 +33,21 @@ STKTextBillboard::STKTextBillboard(const video::SColor& color_top,
                 : ISceneNode(parent, mgr, id, position,
                              core::vector3df(0.0f, 0.0f, 0.0f), size)
 {
+    using namespace SP;
     m_color_top = color_top;
     if (CVS->isDefferedEnabled())
     {
-        video::SColorf tmp(m_color_top);
-        m_color_top.setRed(SP::srgbToLinear(tmp.r));
-        m_color_top.setGreen(SP::srgbToLinear(tmp.g));
-        m_color_top.setBlue(SP::srgbToLinear(tmp.b));
+        m_color_top.setRed(srgb255ToLinear(m_color_top.getRed()));
+        m_color_top.setGreen(srgb255ToLinear(m_color_top.getGreen()));
+        m_color_top.setBlue(srgb255ToLinear(m_color_top.getBlue()));
     }
     m_color_bottom = color_bottom;
     if (CVS->isDefferedEnabled())
     {
         video::SColorf tmp(m_color_bottom);
-        m_color_bottom.setRed(SP::srgbToLinear(tmp.r));
-        m_color_bottom.setGreen(SP::srgbToLinear(tmp.g));
-        m_color_bottom.setBlue(SP::srgbToLinear(tmp.b));
+        m_color_bottom.setRed(srgb255ToLinear(m_color_bottom.getRed()));
+        m_color_bottom.setGreen(srgb255ToLinear(m_color_bottom.getGreen()));
+        m_color_bottom.setBlue(srgb255ToLinear(m_color_bottom.getBlue()));
     }
     static_assert(sizeof(GLTB) == 20, "Wrong compiler padding");
 }   // STKTextBillboard

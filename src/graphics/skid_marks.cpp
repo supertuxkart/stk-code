@@ -223,10 +223,9 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
 
     if (CVS->isDefferedEnabled())
     {
-        video::SColorf tmp(m_start_color);
-        m_start_color.setRed(SP::srgbToLinear(tmp.r));
-        m_start_color.setGreen(SP::srgbToLinear(tmp.g));
-        m_start_color.setBlue(SP::srgbToLinear(tmp.b));
+        m_start_color.setRed(SP::srgb255ToLinear(m_start_color.getRed()));
+        m_start_color.setGreen(SP::srgb255ToLinear(m_start_color.getGreen()));
+        m_start_color.setBlue(SP::srgb255ToLinear(m_start_color.getBlue()));
     }
 
     add(left, right, normal, 0.0f);

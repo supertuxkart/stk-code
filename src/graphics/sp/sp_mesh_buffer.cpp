@@ -206,10 +206,9 @@ void SPMeshBuffer::uploadGLMesh()
         video::SColor vc = m_vertices[i].m_color;
         if (CVS->isDefferedEnabled())
         {
-            video::SColorf tmp(vc);
-            vc.setRed(srgbToLinear(tmp.r));
-            vc.setGreen(srgbToLinear(tmp.g));
-            vc.setBlue(srgbToLinear(tmp.b));
+            vc.setRed(srgb255ToLinear(vc.getRed()));
+            vc.setGreen(srgb255ToLinear(vc.getGreen()));
+            vc.setBlue(srgb255ToLinear(vc.getBlue()));
         }
         memcpy(ptr + v_size + offset, &vc, 4);
         offset += 4;

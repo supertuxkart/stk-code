@@ -54,10 +54,9 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
     video::SColor color(77, 179, 0, 0);
     if (CVS->isDefferedEnabled())
     {
-        video::SColorf tmp(color);
-        color.setRed(SP::srgbToLinear(tmp.r));
-        color.setGreen(SP::srgbToLinear(tmp.g));
-        color.setBlue(SP::srgbToLinear(tmp.b));
+        color.setRed(SP::srgb255ToLinear(color.getRed()));
+        color.setGreen(SP::srgb255ToLinear(color.getGreen()));
+        color.setBlue(SP::srgb255ToLinear(color.getBlue()));
     }
     m_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
         (scene::EPT_TRIANGLE_STRIP, SP::getSPShader("unlit"),

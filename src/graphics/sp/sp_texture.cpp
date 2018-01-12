@@ -236,9 +236,9 @@ std::shared_ptr<video::IImage> SPTexture::getTextureImage() const
 #endif
         if (m_undo_srgb && !use_tex_compress)
         {
-            data[i * 4] = srgbToLinear(data[i * 4] / 255.0f);
-            data[i * 4 + 1] = srgbToLinear(data[i * 4 + 1] / 255.0f);
-            data[i * 4 + 2] = srgbToLinear(data[i * 4 + 2] / 255.0f);
+            data[i * 4] = srgb255ToLinear(data[i * 4]);
+            data[i * 4 + 1] = srgb255ToLinear(data[i * 4 + 1]);
+            data[i * 4 + 2] = srgb255ToLinear(data[i * 4 + 2]);
         }
     }
 #endif
