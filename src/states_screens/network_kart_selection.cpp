@@ -169,7 +169,8 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
         return;
 
     KartSelectionScreen::updateKartWidgetModel(widget_id, kart_name,
-                                       irr::core::stringw(kart_name.c_str()));
+                                       irr::core::stringw(kart_name.c_str()),
+                                       /*Todo get color*/0.0f);
     KartSelectionScreen::updateKartStats(widget_id, kart_name);
     m_kart_widgets[widget_id].setKartInternalName(kart_name);
     m_kart_widgets[widget_id].markAsReady(); // mark player ready

@@ -65,11 +65,13 @@ namespace GUIEngine
 
         std::shared_ptr<RenderInfo> m_render_info;
 
+        const unsigned m_rtt_size;
+
     public:
 
         LEAK_CHECK()
 
-        ModelViewWidget();
+        ModelViewWidget(unsigned rtt_size = 512);
         virtual ~ModelViewWidget();
 
         void add();

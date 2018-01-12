@@ -39,8 +39,9 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
 
-ModelViewWidget::ModelViewWidget() :
-IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, false)
+ModelViewWidget::ModelViewWidget(unsigned rtt_size) :
+IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, false),
+m_rtt_size(rtt_size)
 {
     m_rtt_main_node = NULL;
     m_camera = NULL;
@@ -48,7 +49,7 @@ IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, 
     m_type = WTYPE_MODEL_VIEW;
     m_render_target = NULL;
     m_rotation_mode = ROTATE_OFF;
-    m_render_info.reset(new RenderInfo());
+    m_render_info = std::make_shared<RenderInfo>();
     m_angle = 0;
 
     // so that the base class doesn't complain there is no icon defined
@@ -84,6 +85,7 @@ void ModelViewWidget::add()
 // -----------------------------------------------------------------------------
 void ModelViewWidget::clearModels()
 {
+    m_render_info->setHue(0.0f);
     m_models.clearWithoutDeleting();
     m_model_location.clear();
     m_model_frames.clear();
@@ -178,7 +180,7 @@ void ModelViewWidget::update(float delta)
     {
         std::string name = "model view ";
         name += m_properties[PROP_ID].c_str();
-        m_render_target = irr_driver->createRenderTarget(irr::core::dimension2du(512,512), name);
+        m_render_target = irr_driver->createRenderTarget(irr::core::dimension2du(m_rtt_size, m_rtt_size), name);
     }
 
     if (m_rtt_main_node == NULL)

@@ -53,8 +53,6 @@ class SlipStream;
 class Stars;
 class TerrainInfo;
 
-enum KartRenderType: unsigned int;
-
 /** The main kart class. All type of karts are of this object, but with
  *  different controllers. The controllers are what turn a kart into a
  *  player kart (i.e. the controller handle input), or an AI kart (the
@@ -247,7 +245,7 @@ public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
                         PerPlayerDifficulty difficulty,
-                        KartRenderType krt);
+                        std::shared_ptr<RenderInfo> ri);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
     virtual void   kartIsInRestNow();

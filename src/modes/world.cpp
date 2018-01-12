@@ -337,36 +337,47 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     if (race_manager->hasGhostKarts())
         gk = ReplayPlay::get()->getNumGhostKart();
 
+    std::shared_ptr<RenderInfo> ri = std::make_shared<RenderInfo>();
     int position           = index+1;
     btTransform init_pos   = getStartTransform(index - gk);
     AbstractKart *new_kart;
     if (RewindManager::get()->isEnabled())
         new_kart = new KartRewinder(kart_ident, index, position, init_pos,
-                                    difficulty, KRT_DEFAULT);
+                                    difficulty, ri);
     else
         new_kart = new Kart(kart_ident, index, position, init_pos, difficulty,
-                            KRT_DEFAULT);
+                            ri);
 
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
     switch(kart_type)
     {
     case RaceManager::KT_PLAYER:
+    {
         controller = new LocalPlayerController(new_kart,
                          StateManager::get()->getActivePlayer(local_player_id));
+        const float hue = StateManager::get()->getActivePlayer(local_player_id)
+            ->getConstProfile()->getDefaultKartColor();
+        if (hue > 0.0f)
+        {
+            ri->setHue(hue);
+        }
         m_num_players ++;
         break;
+    }
     case RaceManager::KT_NETWORK_PLAYER:
+    {
         controller = new NetworkPlayerController(new_kart);
         m_num_players++;
         break;
+    }
     case RaceManager::KT_AI:
+    {
         controller = loadAIController(new_kart);
         break;
+    }
     case RaceManager::KT_GHOST:
-        break;
     case RaceManager::KT_LEADER:
-        break;
     case RaceManager::KT_SPARE_TIRE:
         break;
     }

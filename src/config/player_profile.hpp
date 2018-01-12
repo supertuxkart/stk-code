@@ -106,6 +106,9 @@ private:
     /** True if the login data are saved. */
     bool m_remember_password;
 
+    /** Default kart color (in hue) used in game, 0.0f to use the original. */
+    float m_default_kart_color;
+
     /** The complete challenge state. */
     StoryModeStatus *m_story_mode_status;
 
@@ -300,6 +303,10 @@ public:
     /** Sets if this player was logged in last time it was used. */
     void setRememberPassword(bool b) { m_remember_password = b; }
     // ------------------------------------------------------------------------
+    void setDefaultKartColor(float c) { m_default_kart_color = c; }
+    // ------------------------------------------------------------------------
+    float getDefaultKartColor() const { return m_default_kart_color; }
+
 };   // class PlayerProfile
 
 #endif

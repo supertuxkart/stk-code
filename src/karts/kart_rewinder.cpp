@@ -24,7 +24,6 @@
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
-#include "graphics/render_info.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/network_string.hpp"
 #include "physics/btKart.hpp"
@@ -35,10 +34,10 @@
 KartRewinder::KartRewinder(const std::string& ident,unsigned int world_kart_id,
                            int position, const btTransform& init_transform,
                            PerPlayerDifficulty difficulty,
-                           KartRenderType krt)
+                           std::shared_ptr<RenderInfo> ri)
             : Rewinder(/*can_be_destroyed*/ false)
             , Kart(ident, world_kart_id, position, init_transform, difficulty,
-                   krt)
+                   ri)
 {
 }   // KartRewinder
 

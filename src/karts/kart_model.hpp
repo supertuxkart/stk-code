@@ -40,8 +40,6 @@ class KartProperties;
 class RenderInfo;
 class XMLNode;
 
-enum KartRenderType: unsigned int;
-
 /** A speed-weighted object is an object whose characteristics are influenced by the kart's speed */
 struct SpeedWeightedObject
 {
@@ -311,11 +309,7 @@ private:
     /** Pointer to the kart object belonging to this kart model. */
     AbstractKart* m_kart;
 
-    /** Tell the render type of this kart model, either colorized (red / blue now)
-     *  or transparent (ghost kart). */
-    KartRenderType m_krt;
-
-    /** For our engine to get the desired hue / saturation for colorization. */
+    /** For our engine to get the desired hue for colorization. */
     std::shared_ptr<RenderInfo> m_render_info;
 
     /** True if this kart model can be colorization in red / blue (now only
@@ -350,7 +344,7 @@ private:
 public:
                   KartModel(bool is_master);
                  ~KartModel();
-    KartModel*    makeCopy(KartRenderType krt);
+    KartModel*    makeCopy(std::shared_ptr<RenderInfo> ri);
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);

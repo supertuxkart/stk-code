@@ -19,7 +19,6 @@
 
 #include "karts/abstract_kart.hpp"
 
-#include "graphics/render_info.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart_animation.hpp"
 #include "karts/kart_model.hpp"
@@ -36,7 +35,8 @@
 AbstractKart::AbstractKart(const std::string& ident,
                            int world_kart_id, int position,
                            const btTransform& init_transform,
-                           PerPlayerDifficulty difficulty, KartRenderType krt)
+                           PerPlayerDifficulty difficulty,
+                           std::shared_ptr<RenderInfo> ri)
              : Moveable()
 {
     m_world_kart_id   = world_kart_id;
@@ -60,7 +60,7 @@ AbstractKart::AbstractKart(const std::string& ident,
     // released when the kart is deleted, but since the original
     // kart_model is stored in the kart_properties all the time,
     // there is no risk of a mesh being deleted to early.
-    m_kart_model  = m_kart_properties->getKartModelCopy(krt);
+    m_kart_model  = m_kart_properties->getKartModelCopy(ri);
     m_kart_width  = m_kart_model->getWidth();
     m_kart_height = m_kart_model->getHeight();
     m_kart_length = m_kart_model->getLength();

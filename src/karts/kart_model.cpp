@@ -31,7 +31,6 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
-#include "graphics/render_info.hpp"
 #include "graphics/sp/sp_animation.hpp"
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
@@ -132,7 +131,6 @@ KartModel::KartModel(bool is_master)
     m_animation_speed   = 25;
     m_current_animation = AF_DEFAULT;
     m_play_non_loop     = false;
-    m_krt               = KRT_DEFAULT;
     m_support_colorization = false;
 }   // KartModel
 
@@ -316,7 +314,7 @@ KartModel::~KartModel()
  *  It is also marked not to be a master copy, so attachModel can be called
  *  for this instance.
  */
-KartModel* KartModel::makeCopy(KartRenderType krt)
+KartModel* KartModel::makeCopy(std::shared_ptr<RenderInfo> ri)
 {
     // Make sure that we are copying from a master objects, and
     // that there is indeed no animated node defined here ...
@@ -337,13 +335,11 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
     km->m_animated_node         = NULL;
     km->m_hat_name              = m_hat_name;
     km->m_hat_bone              = m_hat_bone;
-    km->m_krt                   = krt;
     km->m_support_colorization  = m_support_colorization;
-    km->m_render_info           = std::make_shared<RenderInfo>();
+    km->m_render_info           = ri;
     km->m_inverse_bone_matrices = m_inverse_bone_matrices;
     km->m_version               = m_version;
     km->m_exhaust_xml           = m_exhaust_xml;
-    km->m_render_info->setKartModelRenderInfo(krt);
 
     km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
     km->m_nitro_emitter_position[1] = m_nitro_emitter_position[1];
@@ -1225,8 +1221,7 @@ void KartModel::resetVisualWheelPosition()
 //-----------------------------------------------------------------------------
 std::shared_ptr<RenderInfo> KartModel::getRenderInfo()
 {
-    return m_support_colorization || m_krt == KRT_TRANSPARENT ?
-        m_render_info : NULL;
+    return m_support_colorization ? m_render_info : NULL;
 }   // getRenderInfo
 
 //-----------------------------------------------------------------------------

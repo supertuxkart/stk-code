@@ -24,7 +24,6 @@
 #include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
-#include "graphics/render_info.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -184,7 +183,7 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
         const KartProperties* kart = kart_properties_manager->getKart(ident_arg[n]);
         if (kart != NULL)
         {
-            KartModel* kart_model = kart->getKartModelCopy(KRT_DEFAULT);
+            KartModel* kart_model = kart->getKartModelCopy();
             m_all_kart_models.push_back(kart_model);
             scene::ISceneNode* kart_main_node = kart_model->attachModel(true, false);
             LODNode* lnode = dynamic_cast<LODNode*>(kart_main_node);

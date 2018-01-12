@@ -43,9 +43,9 @@ class CachedCharacteristic;
 class CombinedCharacteristic;
 class KartModel;
 class Material;
+class RenderInfo;
 class XMLNode;
 
-enum KartRenderType: unsigned int;
 
 /**
  *  \brief This class stores the properties of a kart.
@@ -241,7 +241,7 @@ public:
     video::ITexture *getMinimapIcon  () const {return m_minimap_icon;         }
 
     // ------------------------------------------------------------------------
-    KartModel*    getKartModelCopy(KartRenderType krt) const;
+    KartModel* getKartModelCopy(std::shared_ptr<RenderInfo> ri=nullptr) const;
     // ------------------------------------------------------------------------
     /** Returns a pointer to the main KartModel object. This copy
      *  should not be modified, not attachModel be called on it. */

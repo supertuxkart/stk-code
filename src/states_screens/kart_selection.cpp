@@ -23,6 +23,7 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/render_info.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/kart_stats_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
@@ -202,7 +203,9 @@ void KartHoverListener::onSelectionChanged(DynamicRibbonWidget* theWidget,
     if (m_parent->m_kart_widgets[player_id].getKartInternalName() == selectionID)
         return; // already selected
 
-    m_parent->updateKartWidgetModel(player_id, selectionID, selectionText);
+    m_parent->updateKartWidgetModel(player_id, selectionID, selectionText,
+        m_parent->m_kart_widgets[player_id].getAssociatedPlayer()->getProfile()
+        ->getDefaultKartColor());
     m_parent->m_kart_widgets[player_id].setKartInternalName(selectionID);
     m_parent->updateKartStats(player_id, selectionID);
     m_parent->validateKartChoices();
@@ -821,7 +824,7 @@ void KartSelectionScreen::updateKartStats(uint8_t widget_id,
 // ----------------------------------------------------------------------------
 void KartSelectionScreen::updateKartWidgetModel(int widget_id,
                 const std::string& selection,
-                const irr::core::stringw& selectionText)
+                const irr::core::stringw& selectionText, float kart_color)
 {
     // Update the displayed model
     ModelViewWidget* w3 = m_kart_widgets[widget_id].m_model_view;
@@ -907,6 +910,7 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
                 kart_model.getBaseFrame(),
                 kart_model.getAnimationSpeed());
 
+            w3->getModelViewRenderInfo()->setHue(kart_color);
             model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
             for (unsigned i = 0; i < 4; i++)
             {
@@ -932,7 +936,7 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
             //w3->update(0);
 
             m_kart_widgets[widget_id].m_kart_name
-            ->setText( selectionText.c_str(), false );
+                ->setText( selectionText.c_str(), false );
         }
         else
             Log::warn("KartSelectionScreen", "could not "

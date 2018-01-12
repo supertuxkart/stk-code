@@ -20,6 +20,7 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/render_info.hpp"
 #include "guiengine/widgets/kart_stats_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/widgets/player_name_spinner.hpp"
@@ -217,7 +218,8 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         kart_model.getFrame(KartModel::AF_WIN_END) :
         kart_model.getBaseFrame(),
         kart_model.getAnimationSpeed());
-
+    m_model_view->getModelViewRenderInfo()->setHue(
+        m_associated_player->getConstProfile()->getDefaultKartColor());
     model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
     for (unsigned i = 0; i < 4; i++)
     {
@@ -642,6 +644,8 @@ GUIEngine::EventPropagation PlayerKartWidget::transmitEvent(Widget* w,
                 m_handicapped = false;
                 m_model_view->unsetBadge(ANCHOR_BADGE);
             }
+            m_model_view->getModelViewRenderInfo()->setHue(
+                m_associated_player->getConstProfile()->getDefaultKartColor());
         }
     }
 

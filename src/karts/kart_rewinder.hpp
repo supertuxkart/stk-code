@@ -26,8 +26,6 @@
 class AbstractKart;
 class BareNetworkString;
 
-enum KartRenderType: unsigned int;
-
 class KartRewinder : public Rewinder, public Kart
 {
 private:
@@ -40,7 +38,7 @@ public:
                               unsigned int world_kart_id,
                               int position, const btTransform& init_transform,
                               PerPlayerDifficulty difficulty,
-                              KartRenderType krt);
+                              std::shared_ptr<RenderInfo> ri);
    virtual      ~KartRewinder() {};
    virtual BareNetworkString* saveState() const;
    void          reset();

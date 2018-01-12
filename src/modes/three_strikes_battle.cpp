@@ -724,7 +724,7 @@ void ThreeStrikesBattle::loadCustomModels()
             {
                 AbstractKart* sta = new Kart(sta_list[i], (int)m_karts.size(),
                     (int)m_karts.size() + 1, pos[i], PLAYER_DIFFICULTY_NORMAL,
-                    KRT_RED);
+                    std::make_shared<RenderInfo>(1.0f));
                 sta->init(RaceManager::KartType::KT_SPARE_TIRE);
                 sta->setController(new SpareTireAI(sta));
 
