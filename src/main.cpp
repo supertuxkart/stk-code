@@ -608,10 +608,10 @@ void cmdLineHelp()
     "       --disable-light-shaft Disable light shafts (God rays).\n"
     "       --enable-dof       Enable depth of field.\n"
     "       --disable-dof      Disable depth of field.\n"
-    "       --enable-gi        Enable global illumination.\n"
-    "       --disable-gi       Disable global illumination.\n"
-    "       --enable-gfx       Enable animated scenery.\n"
-    "       --disable-gfx      Disable animated scenery.\n"
+    "       --enable-particles  Enable particles.\n"
+    "       --disable-particles Disable particles.\n"
+    "       --enable-animated-characters  Enable animated characters.\n"
+    "       --disable-animated-characters Disable animated characters.\n"
     "       --enable-motion-blur Enable motion blur.\n"
     "       --disable-motion-blur Disable motion blur.\n"
     "       --enable-mlaa      Enable anti-aliasing.\n"
@@ -626,8 +626,6 @@ void cmdLineHelp()
     "       --disable-hd-textures Disable high definition textures.\n"
     "       --enable-dynamic-lights Enable advanced pipline.\n"
     "       --disable-dynamic-lights Disable advanced pipline.\n"
-    "       --enable-trilinear  Use trilinear texture filtering.\n"
-    "       --disable-trilinear Use bilinear texture filtering.\n"
     "       --anisotropic=n     Anisotropic filtering quality (0 to disable).\n"
     "                           Takes precedence over trilinear or bilinear\n"
     "                           texture filtering.\n"
@@ -1681,7 +1679,7 @@ int main(int argc, char *argv[] )
                     #ifdef USE_GLES2
                     irr::core::stringw version = "OpenGL ES 3.0";
                     #else
-                    irr::core::stringw version = "OpenGL 3.1";
+                    irr::core::stringw version = "OpenGL 3.3";
                     #endif
                     MessageDialog *dialog =
                         new MessageDialog(_("Your OpenGL version appears to be "
