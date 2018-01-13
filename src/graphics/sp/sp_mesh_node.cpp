@@ -21,6 +21,7 @@
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "graphics/sp/sp_shader.hpp"
+#include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/render_info.hpp"
@@ -68,7 +69,11 @@ void SPMeshNode::setAnimationState(bool val)
     {
         return;
     }
-    m_animated = !m_mesh->isStatic() && val;
+#ifndef SERVER_ONLY
+    m_animated = !m_mesh->isStatic() && val &&
+        !GraphicsRestrictions::isDisabled
+        (GraphicsRestrictions::GR_HARDWARE_SKINNING);
+#endif
 }   // setAnimationState
 
 // ----------------------------------------------------------------------------
@@ -86,7 +91,11 @@ void SPMeshNode::setMesh(irr::scene::IAnimatedMesh* mesh)
         m_texture_matrices.resize(m_mesh->getMeshBufferCount());
         if (!m_mesh->isStatic())
         {
-            m_animated = !m_mesh->isStatic();
+#ifndef SERVER_ONLY
+            m_animated = !m_mesh->isStatic() &&
+                !GraphicsRestrictions::isDisabled
+                (GraphicsRestrictions::GR_HARDWARE_SKINNING);
+#endif
             unsigned bone_idx = 0;
             m_skinning_matrices.resize(m_mesh->getJointCount());
             for (Armature& arm : m_mesh->getArmatures())
