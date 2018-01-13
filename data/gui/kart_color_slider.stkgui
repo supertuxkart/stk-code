@@ -6,7 +6,7 @@
                 <!-- Content is added programmatically -->
             </placeholder>
         </div>
-        <label text="Left-hand side most to use the original color, otherwise pick one from slider."
+        <label text="0 to use the original color, otherwise pick one from slider."
             width="100%" text_align="center" word_wrap="true"
             I18N="In the kart color slider dialog"/>
         <spacer height="30" width="10"/>
