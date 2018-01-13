@@ -28,36 +28,18 @@ FrameBufferLayer::FrameBufferLayer(const std::vector<GLuint> &rtts, unsigned w,
     m_width = w;
     m_height = h;
 
-    // When vertex shader gl_layer issupported, only 1 fbo will be created
-#ifndef USE_GLES2
-    if (CVS->supportsGLLayerInVertexShader())
+    m_fbo_layer.resize(layer_count);
+    glGenFramebuffers(layer_count, m_fbo_layer.data());
+    for (unsigned layer = 0; layer < layer_count; layer++)
     {
-        glGenFramebuffers(1, &m_fbo);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_fbo_layer[layer]);
         for (unsigned i = 0; i < rtts.size(); i++)
         {
-            glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i,
-                rtts[i], 0);
+            glFramebufferTextureLayer(GL_FRAMEBUFFER,
+                GL_COLOR_ATTACHMENT0 + i, rtts[i], 0, layer);
         }
         assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) ==
             GL_FRAMEBUFFER_COMPLETE_EXT);
-    }
-    else
-#endif
-    {
-        m_fbo_layer.resize(layer_count);
-        glGenFramebuffers(layer_count, m_fbo_layer.data());
-        for (unsigned layer = 0; layer < layer_count; layer++)
-        {
-            glBindFramebuffer(GL_FRAMEBUFFER, m_fbo_layer[layer]);
-            for (unsigned i = 0; i < rtts.size(); i++)
-            {
-                glFramebufferTextureLayer(GL_FRAMEBUFFER,
-                    GL_COLOR_ATTACHMENT0 + i, rtts[i], 0, layer);
-            }
-            assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) ==
-                GL_FRAMEBUFFER_COMPLETE_EXT);
-        }
     }
 }   // FrameBufferLayer
 
@@ -72,39 +54,20 @@ FrameBufferLayer::FrameBufferLayer(const std::vector<GLuint> &rtts,
     m_width = w;
     m_height = h;
 
-#ifndef USE_GLES2
-    if (CVS->supportsGLLayerInVertexShader())
+    m_fbo_layer.resize(layer_count);
+    glGenFramebuffers(layer_count, m_fbo_layer.data());
+    for (unsigned layer = 0; layer < layer_count; layer++)
     {
-        glGenFramebuffers(1, &m_fbo);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_fbo_layer[layer]);
         for (unsigned i = 0; i < rtts.size(); i++)
         {
-            glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i,
-                rtts[i], 0);
+            glFramebufferTextureLayer(GL_FRAMEBUFFER,
+                GL_COLOR_ATTACHMENT0 + i, rtts[i], 0, layer);
         }
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-            depth_stencil, 0);
+        glFramebufferTextureLayer(GL_FRAMEBUFFER,
+            GL_DEPTH_STENCIL_ATTACHMENT, depth_stencil, 0, layer);
         assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) ==
             GL_FRAMEBUFFER_COMPLETE_EXT);
-    }
-    else
-#endif
-    {
-        m_fbo_layer.resize(layer_count);
-        glGenFramebuffers(layer_count, m_fbo_layer.data());
-        for (unsigned layer = 0; layer < layer_count; layer++)
-        {
-            glBindFramebuffer(GL_FRAMEBUFFER, m_fbo_layer[layer]);
-            for (unsigned i = 0; i < rtts.size(); i++)
-            {
-                glFramebufferTextureLayer(GL_FRAMEBUFFER,
-                    GL_COLOR_ATTACHMENT0 + i, rtts[i], 0, layer);
-            }
-            glFramebufferTextureLayer(GL_FRAMEBUFFER,
-                GL_DEPTH_STENCIL_ATTACHMENT, depth_stencil, 0, layer);
-            assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) ==
-                GL_FRAMEBUFFER_COMPLETE_EXT);
-        }
     }
 }   // FrameBufferLayer
 

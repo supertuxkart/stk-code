@@ -182,28 +182,18 @@ void ShaderBasedRenderer::renderShadows()
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
     glEnable(GL_POLYGON_OFFSET_FILL);
-    glPolygonOffset(1.5, 50.);
+    glPolygonOffset(1.5f, 50.0f);
 
-    if (CVS->supportsGLLayerInVertexShader())
-    {
-        m_rtts->getShadowFrameBuffer().bindDepthOnly();
-        glClearColor(1., 1., 1., 1.);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glClearColor(0., 0., 0., 0.);
-    }
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     for (unsigned cascade = 0; cascade < 4; cascade++)
     {
-        if (!CVS->supportsGLLayerInVertexShader())
-        {
-            m_rtts->getShadowFrameBuffer().bindLayerDepthOnly(cascade);
-            glClearColor(1., 1., 1., 1.);
-            glClear(GL_DEPTH_BUFFER_BIT);
-            glClearColor(0., 0., 0., 0.);
-        }
+        m_rtts->getShadowFrameBuffer().bindLayerDepthOnly(cascade);
+        glClear(GL_DEPTH_BUFFER_BIT);
         SP::sp_cur_shadow_cascade = cascade;
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SHADOWS_CASCADE0 + cascade));
         SP::draw(SP::RP_SHADOW, (SP::DrawCallType)(SP::DCT_SHADOW1 + cascade));
     }
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glDisable(GL_POLYGON_OFFSET_FILL);
     PROFILER_POP_CPU_MARKER();
 }

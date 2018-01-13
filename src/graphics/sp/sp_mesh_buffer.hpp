@@ -109,31 +109,15 @@ public:
     // ------------------------------------------------------------------------
     ~SPMeshBuffer();
     // ------------------------------------------------------------------------
-    virtual void draw(DrawCallType dct = DCT_NORMAL, int material_id = -1,
-                      bool bindless_texture = false) const
+    virtual void draw(DrawCallType dct = DCT_NORMAL, int material_id = -1) const
     {
 #ifndef SERVER_ONLY
         glBindVertexArray(m_vao[dct]);
-        if (material_id == -1 || bindless_texture)
+        if (material_id == -1)
         {
-            /*if (bindless_texture)
-            // Only nvidia gpu allow texture with non-dynamically-uniform
-            // handles (texture handles that aren't constant within a same draw)
-            {
-                for (unsigned i = 0; i < m_stk_material.size(); i++)
-                {
-                    glDrawElementsInstanced(GL_TRIANGLES,
-                        std::get<1>(m_stk_material[i]),
-                        GL_UNSIGNED_SHORT,
-                        (void*)(std::get<0>(m_stk_material[i]) << 1),
-                        (unsigned)m_ins_dat[dct].size());
-                }
-            }
-            else*/
-            {
-                glDrawElementsInstanced(GL_TRIANGLES, getIndexCount(),
-                    GL_UNSIGNED_SHORT, 0, (unsigned)m_ins_dat[dct].size());
-            }
+            // Draw whole mesh buffer, usually in shadow pass
+            glDrawElementsInstanced(GL_TRIANGLES, getIndexCount(),
+                GL_UNSIGNED_SHORT, 0, (unsigned)m_ins_dat[dct].size());
         }
         else
         {

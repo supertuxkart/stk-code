@@ -70,8 +70,8 @@ public:
     // ------------------------------------------------------------------------
     ~SPDynamicDrawCall() {}
     // ------------------------------------------------------------------------
-    virtual void draw(DrawCallType dct = DCT_NORMAL, int material_id = -1,
-                      bool bindless_texture = false) const
+    virtual void draw(DrawCallType dct = DCT_NORMAL,
+                      int material_id = -1) const
     {
 #ifndef SERVER_ONLY
         glBindVertexArray(m_vao[0]);
@@ -92,7 +92,7 @@ public:
             SPInstancedData id = SPInstancedData(getAbsoluteTransformation(),
                 m_texture_trans.X, m_texture_trans.Y, 0.0f, 0);
             glBindBuffer(GL_ARRAY_BUFFER, m_ibo);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, 32, &id);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, 32, id.getData());
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
         if (m_update_offset >= 0 && !m_vertices.empty())

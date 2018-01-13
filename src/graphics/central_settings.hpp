@@ -27,13 +27,11 @@ private:
     bool                  m_glsl;
 
     int m_gl_major_version, m_gl_minor_version;
-    std::string m_vs_layer_extension;
     bool hasBufferStorage;
     bool hasComputeShaders;
     bool hasArraysOfArrays;
     bool hasTextureStorage;
     bool hasTextureView;
-    bool hasBindlessTexture;
     bool hasUBO;
     bool hasExplicitAttribLocation;
     bool hasGS;
@@ -72,7 +70,6 @@ public:
     bool isARBTextureStorageUsable() const;
     bool isARBComputeShaderUsable() const;
     bool isARBArraysOfArraysUsable() const;
-    bool isARBBindlessTextureUsable() const;
     bool isARBBufferStorageUsable() const;
     bool isARBShaderAtomicCountersUsable() const;
     bool isARBShaderStorageBufferObjectUsable() const;
@@ -83,10 +80,7 @@ public:
     bool isARBPixelBufferObjectUsable() const;
     bool isARBSamplerObjectsUsable() const;
     bool isARBVertexType2101010RevUsable() const;
-    bool useArrayTextures() const;
     bool isARBInstancedArraysUsable() const;
-
-    const std::string& getVSLayerExtension() const { return m_vs_layer_extension; }
 
 #if defined(USE_GLES2)
     bool isEXTTextureFormatBGRA8888Usable() const;
@@ -97,8 +91,6 @@ public:
     bool supportsComputeShadersFiltering() const;
     bool supportsHardwareSkinning() const;
     bool supportsTextureCompression() const;
-
-    bool supportsGLLayerInVertexShader() const;
 
     // "Macro" around feature support and user config
     bool isShadowEnabled() const;

@@ -98,48 +98,6 @@ bool SPMeshBuffer::initTexture()
             }
         }
     }
-    if (!(CVS->useArrayTextures() || CVS->isARBBindlessTextureUsable()))
-    {
-        return true;
-    }
-    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    std::set<uint16_t> used_vertices;
-    for (unsigned int j = 0; j < getIndexCount(); j += 3)
-    {
-        for (unsigned int k = 0; k < 3; k++)
-        {
-            const uint16_t vertex_id = m_indices[j + k];
-            auto ret = used_vertices.find(vertex_id);
-            if (ret == used_vertices.end())
-            {
-                used_vertices.insert(vertex_id);
-                std::array<std::shared_ptr<SPTexture>, 6> textures =
-                    getSPTextures(j);
-                if (CVS->useArrayTextures())
-                {
-                    for (unsigned i = 0; i < 6; i++)
-                    {
-                        uint16_t array_index = (uint16_t)
-                            textures[i]->getTextureArrayIndex();
-                        glBufferSubData(GL_ARRAY_BUFFER,
-                            (vertex_id * m_pitch) + (m_pitch - 12) + (i * 2),
-                            2, &array_index);
-                    }
-                }
-                else
-                {
-                    for (unsigned i = 0; i < 6; i++)
-                    {
-                        glBufferSubData(GL_ARRAY_BUFFER,
-                            (vertex_id * m_pitch) + (m_pitch - 48) + (i * 8),
-                            8, textures[i]->getTextureHandlePointer());
-                    }
-                }
-            }
-        }
-    }
-    assert(used_vertices.size() == m_vertices.size());
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 #endif
     return true;
 }   // initTexture
@@ -176,8 +134,7 @@ void SPMeshBuffer::uploadGLMesh()
         std::get<2>(m_stk_material[0])->getShaderName() == "normalmap" &&
         CVS->isDefferedEnabled();
     const unsigned pitch = 48 - (use_tangents ? 0 : 4) - (use_2_uv ? 0 : 4) -
-        (m_skinned ? 0 : 16) + (CVS->useArrayTextures() ? 12 :
-        CVS->isARBBindlessTextureUsable() ? 48 : 0);
+        (m_skinned ? 0 : 16);
     m_pitch = pitch;
 
     if (m_vbo != 0)
@@ -373,36 +330,9 @@ void SPMeshBuffer::recreateVAO(unsigned i)
         glDisableVertexAttribArray(6);
         glDisableVertexAttribArray(7);
     }
-
-    if (CVS->useArrayTextures())
-    {
-        // uvec4 + uvec2 for 6 texture array indices
-        glEnableVertexAttribArray(13);
-        glVertexAttribIPointer(13, 4, GL_UNSIGNED_SHORT, pitch, (void*)offset);
-        offset += 8;
-        glEnableVertexAttribArray(14);
-        glVertexAttribIPointer(14, 2, GL_UNSIGNED_SHORT, pitch, (void*)offset);
-        offset += 4;
-        glDisableVertexAttribArray(15);
-    }
-    else if (CVS->isARBBindlessTextureUsable())
-    {
-        // 3 * 2 uvec2 for bindless samplers
-        glEnableVertexAttribArray(13);
-        glVertexAttribIPointer(13, 4, GL_UNSIGNED_INT, pitch, (void*)offset);
-        offset += 16;
-        glEnableVertexAttribArray(14);
-        glVertexAttribIPointer(14, 4, GL_UNSIGNED_INT, pitch, (void*)offset);
-        offset += 16;
-        glEnableVertexAttribArray(15);
-        glVertexAttribIPointer(15, 4, GL_UNSIGNED_INT, pitch, (void*)offset);
-    }
-    else
-    {
-        glDisableVertexAttribArray(13);
-        glDisableVertexAttribArray(14);
-        glDisableVertexAttribArray(15);
-    }
+    glDisableVertexAttribArray(13);
+    glDisableVertexAttribArray(14);
+    glDisableVertexAttribArray(15);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
     glBindBuffer(GL_ARRAY_BUFFER, m_ins_array[i]);

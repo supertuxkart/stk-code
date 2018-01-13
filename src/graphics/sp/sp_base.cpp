@@ -89,7 +89,8 @@ std::unordered_set<SPMeshBuffer*> g_instances;
 // ----------------------------------------------------------------------------
 std::array<GLuint, ST_COUNT> g_samplers;
 // ----------------------------------------------------------------------------
-std::vector<GLuint> sp_prefilled_tex (2);
+// Check sp_shader.cpp for the name
+std::array<GLuint, 1> sp_prefilled_tex;
 // ----------------------------------------------------------------------------
 std::vector<float> g_bounding_boxes;
 // ----------------------------------------------------------------------------
@@ -313,7 +314,7 @@ void initSkinning()
 #endif
     resizeSkinning(stk_config->m_max_skinning_bones);
 
-    sp_prefilled_tex[1] = g_skinning_tex;
+    sp_prefilled_tex[0] = g_skinning_tex;
 }   // initSkinning
 
 // ----------------------------------------------------------------------------
@@ -1292,17 +1293,9 @@ void addObject(SPMeshNode* node)
                 if (dc_type == 0)
                 {
                     auto& ret = g_draw_calls[DCT_TRANSPARENT][shader];
-                    if (CVS->isARBBindlessTextureUsable() ||
-                        CVS->useArrayTextures())
+                    for (auto& p : mb->getTextureCompare())
                     {
-                        ret[""].insert(mb);
-                    }
-                    else
-                    {
-                        for (auto& p : mb->getTextureCompare())
-                        {
-                            ret[p.first].insert(mb);
-                        }
+                        ret[p.first].insert(mb);
                     }
                     mb->addInstanceData(id, DCT_TRANSPARENT);
                 }
@@ -1316,9 +1309,7 @@ void addObject(SPMeshNode* node)
                 // Check if shader for render pass uses mesh samplers
                 const RenderPass check_pass =
                     dc_type == DCT_NORMAL ? RP_1ST : RP_SHADOW;
-                const bool sampler_less = shader->samplerLess(check_pass) ||
-                    CVS->isARBBindlessTextureUsable() ||
-                    CVS->useArrayTextures();
+                const bool sampler_less = shader->samplerLess(check_pass);
                 auto& ret = g_draw_calls[dc_type][shader];
                 if (sampler_less)
                 {
@@ -1443,17 +1434,9 @@ void handleDynamicDrawCall()
                 if (dc_type == 0)
                 {
                     auto& ret = g_draw_calls[DCT_TRANSPARENT][shader];
-                    if (CVS->isARBBindlessTextureUsable() ||
-                        CVS->useArrayTextures())
+                    for (auto& p : dydc->getTextureCompare())
                     {
-                        ret[""].insert(dydc);
-                    }
-                    else
-                    {
-                        for (auto& p : dydc->getTextureCompare())
-                        {
-                            ret[p.first].insert(dydc);
-                        }
+                        ret[p.first].insert(dydc);
                     }
                 }
                 else
@@ -1466,9 +1449,7 @@ void handleDynamicDrawCall()
                 // Check if shader for render pass uses mesh samplers
                 const RenderPass check_pass =
                     dc_type == DCT_NORMAL ? RP_1ST : RP_SHADOW;
-                const bool sampler_less = shader->samplerLess(check_pass) ||
-                    CVS->isARBBindlessTextureUsable() ||
-                    CVS->useArrayTextures();
+                const bool sampler_less = shader->samplerLess(check_pass);
                 auto& ret = g_draw_calls[dc_type][shader];
                 if (sampler_less)
                 {
@@ -1724,20 +1705,14 @@ void draw(RenderPass rp, DrawCallType dct)
         p.first->bindPrefilledTextures(rp);
         for (unsigned j = 0; j < p.second.size(); j++)
         {
-            if (!(CVS->isARBBindlessTextureUsable() ||
-                CVS->useArrayTextures()))
-            {
-                p.first->bindTextures(p.second[j].first, rp);
-            }
+            p.first->bindTextures(p.second[j].first, rp);
             for (unsigned k = 0; k < p.second[j].second.size(); k++)
             {
                 static std::vector<SPUniformAssigner*> draw_call_uniforms;
                 p.first->setUniformsPerObject(static_cast<SPPerObjectUniform*>
                     (p.second[j].second[k].first), &draw_call_uniforms, rp);
                 p.second[j].second[k].first->draw(dct,
-                    p.second[j].second[k].second/*material_id*/,
-                    CVS->isARBBindlessTextureUsable() ||
-                    CVS->useArrayTextures());
+                    p.second[j].second[k].second/*material_id*/);
                 for (SPUniformAssigner* ua : draw_call_uniforms)
                 {
                     ua->reset();

@@ -87,7 +87,7 @@ class SPMeshBuffer;
 extern GLuint sp_mat_ubo[MAX_PLAYER_COUNT][3];
 extern GLuint sp_fog_ubo;
 extern bool sp_first_frame;
-extern std::vector<GLuint> sp_prefilled_tex;
+extern std::array<GLuint, 1> sp_prefilled_tex;
 extern unsigned sp_solid_poly_count;
 extern unsigned sp_shadow_poly_count;
 extern int sp_cur_shadow_cascade;

@@ -27,11 +27,6 @@
 
 #include <string>
 
-const int MAX_TA = 256;
-#ifndef USE_GLES2
-#include <squish.h>
-#endif
-
 namespace SP
 {
 SPTextureManager* SPTextureManager::m_sptm = NULL;
@@ -76,17 +71,6 @@ SPTextureManager::SPTextureManager()
                 }
             });
     }
-
-    if (CVS->useArrayTextures())
-    {
-        Log::info("SPTextureManager", "Enable array textures, size %d",
-            irr_driver->getVideoDriver()->getDriverAttributes()
-            .getAttributeAsDimension2d("MAX_TEXTURE_SIZE").Width);
-        glGenTextures(1, &m_all_textures_array);
-        sp_prefilled_tex[0] = m_all_textures_array;
-        initTextureArray();
-    }
-
     m_textures["unicolor_white"] = SPTexture::getWhiteTexture();
     m_textures[""] = SPTexture::getTransparentTexture();
 }   // SPTextureManager
@@ -104,80 +88,7 @@ SPTextureManager::~SPTextureManager()
         t.join();
     }
     m_threaded_load_obj.clear();
-    if (m_all_textures_array != 0)
-    {
-        glDeleteTextures(1, &m_all_textures_array);
-    }
 }   // ~SPTextureManager
-
-// ----------------------------------------------------------------------------
-void SPTextureManager::initTextureArray()
-{
-#ifdef USE_GLES2
-    unsigned upload_format = GL_RGBA;
-#else
-    unsigned upload_format = GL_BGRA;
-#endif
-    const unsigned size = irr_driver->getVideoDriver()->getDriverAttributes()
-        .getAttributeAsDimension2d("MAX_TEXTURE_SIZE").Width;
-    std::vector<unsigned> white, transparent;
-    white.resize(size * size, -1);
-    transparent.resize(size * size, 0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, m_all_textures_array);
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    if (CVS->isTextureCompressionEnabled())
-    {
-        std::vector<std::pair<core::dimension2du, unsigned> > mipmap_sizes;
-        unsigned width = size;
-        unsigned height = size;
-        mipmap_sizes.emplace_back(core::dimension2du(width, height),
-            squish::GetStorageRequirements(width, height, squish::kDxt5));
-        while (true)
-        {
-            width = width < 2 ? 1 : width >> 1;
-            height = height < 2 ? 1 : height >> 1;
-            mipmap_sizes.emplace_back(core::dimension2du(width, height),
-                squish::GetStorageRequirements(width, height, squish::kDxt5));
-            if (width == 1 && height == 1)
-            {
-                break;
-            }
-        }
-        unsigned cur_mipmap_size = 0;
-        for (unsigned i = 0; i < mipmap_sizes.size(); i++)
-        {
-            cur_mipmap_size = mipmap_sizes[i].second;
-            glCompressedTexImage3D(GL_TEXTURE_2D_ARRAY, i,
-                GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,
-                mipmap_sizes[i].first.Width, mipmap_sizes[i].first.Height,
-                MAX_TA, 0, cur_mipmap_size * MAX_TA, NULL);
-            glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, i,
-                0, 0, 0,
-                mipmap_sizes[i].first.Width, mipmap_sizes[i].first.Height, 1,
-                GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, cur_mipmap_size,
-                white.data());
-            glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, i,
-                0, 0, 1,
-                mipmap_sizes[i].first.Width, mipmap_sizes[i].first.Height, 1,
-                GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, cur_mipmap_size,
-                transparent.data());
-        }
-    }
-    else
-#endif
-    {
-        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA,
-            size, size, MAX_TA, 0, upload_format, GL_UNSIGNED_BYTE, NULL);
-        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0,
-            size, size, 1, upload_format, GL_UNSIGNED_BYTE,
-            white.data());
-        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 1,
-            size, size, 1, upload_format, GL_UNSIGNED_BYTE,
-            transparent.data());
-        glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
-    }
-    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-}   // initTextureArray
 
 // ----------------------------------------------------------------------------
 void SPTextureManager::checkForGLCommand(bool before_scene)
@@ -234,21 +145,8 @@ std::shared_ptr<SPTexture> SPTextureManager::getTexture(const std::string& p,
     {
         return ret->second;
     }
-    int ta_idx = -1;
-
-    if (CVS->useArrayTextures())
-    {
-        ta_idx = getTextureArrayIndex();
-        if (ta_idx > MAX_TA)
-        {
-            Log::error("SPTextureManager", "Too many textures");
-            // Give user a transparent texture
-            return m_textures.at("");
-        }
-    }
-
     std::shared_ptr<SPTexture> t =
-        std::make_shared<SPTexture>(p, m, undo_srgb, ta_idx, cid);
+        std::make_shared<SPTexture>(p, m, undo_srgb, cid);
     addThreadedFunction(std::bind(&SPTexture::threadedLoad, t));
     m_textures[p] = t;
     return t;
@@ -261,11 +159,6 @@ void SPTextureManager::removeUnusedTextures()
     {
         if (it->second.use_count() == 1)
         {
-            int ta_idx = it->second->getTextureArrayIndex();
-            if (ta_idx != -1)
-            {
-                m_freed_texture_array_idx.push_back(ta_idx);
-            }
             it = m_textures.erase(it);
         }
         else

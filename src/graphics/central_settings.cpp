@@ -39,7 +39,6 @@ void CentralVideoSettings::init()
     hasArraysOfArrays = false;
     hasTextureStorage = false;
     hasTextureView = false;
-    hasBindlessTexture = false;
     hasAtomics = false;
     hasSSBO = false;
     hasImageLoadStore = false;
@@ -96,16 +95,6 @@ void CentralVideoSettings::init()
         }
 
 #if !defined(USE_GLES2)
-        if (hasGLExtension("GL_AMD_vertex_shader_layer"))
-        {
-            m_vs_layer_extension = "GL_AMD_vertex_shader_layer";
-            Log::info("GLDriver", "AMD Vertex Shader Layer Present");
-        }
-        if (hasGLExtension("GL_ARB_shader_viewport_layer_array"))
-        {
-            m_vs_layer_extension = "GL_ARB_shader_viewport_layer_array";
-            Log::info("GLDriver", "ARB Shader Viewport Layer Array Present");
-        }
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_BUFFER_STORAGE) &&
             hasGLExtension("GL_ARB_buffer_storage")  )
         {
@@ -317,10 +306,6 @@ bool CentralVideoSettings::isEXTTextureCompressionS3TCUsable() const
     return hasTextureCompression;
 }
 
-bool CentralVideoSettings::supportsGLLayerInVertexShader() const
-{
-    return !m_vs_layer_extension.empty();
-}
 
 bool CentralVideoSettings::isARBBufferStorageUsable() const
 {
@@ -345,11 +330,6 @@ bool CentralVideoSettings::isARBTextureStorageUsable() const
 bool CentralVideoSettings::isARBTextureViewUsable() const
 {
     return hasTextureView;
-}
-
-bool CentralVideoSettings::isARBBindlessTextureUsable() const
-{
-    return false;
 }
 
 bool CentralVideoSettings::isARBShaderAtomicCountersUsable() const
@@ -440,13 +420,6 @@ bool CentralVideoSettings::isARBInstancedArraysUsable() const
 {
     return hasInstancedArrays ||
         (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 2));
-}
-
-bool CentralVideoSettings::useArrayTextures() const
-{
-    return false;
-    //return (UserConfigParams::m_high_definition_textures & 0x01) == 0 &&
-    //    UserConfigParams::m_max_texture_size <= 256;
 }
 
 #endif   // !SERVER_ONLY

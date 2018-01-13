@@ -48,15 +48,11 @@ private:
 
     std::string m_cache_directory;
 
-    int m_texture_array_idx;
-
     GLuint m_texture_name = 0;
 
     std::atomic_uint m_width;
 
     std::atomic_uint m_height;
-
-    uint64_t m_texture_handle = 0;
 
     Material* m_material;
 
@@ -141,19 +137,12 @@ private:
 #endif
     }
     // ------------------------------------------------------------------------
-    SPTexture(bool white, int ta_idx);
+    SPTexture(bool white);
     // ------------------------------------------------------------------------
     bool texImage2d(std::shared_ptr<video::IImage> texture,
         std::shared_ptr<video::IImage> mipmaps);
     // ------------------------------------------------------------------------
-    bool texImage3d(std::shared_ptr<video::IImage> texture,
-        std::shared_ptr<video::IImage> mipmaps);
-    // ------------------------------------------------------------------------
     bool compressedTexImage2d(std::shared_ptr<video::IImage> texture,
-                              const std::vector<std::pair<core::dimension2du,
-                              unsigned> >& mipmap_sizes);
-    // ------------------------------------------------------------------------
-    bool compressedTexImage3d(std::shared_ptr<video::IImage> texture,
                               const std::vector<std::pair<core::dimension2du,
                               unsigned> >& mipmap_sizes);
     // ------------------------------------------------------------------------
@@ -174,19 +163,19 @@ public:
     // ------------------------------------------------------------------------
     static std::shared_ptr<SPTexture> getWhiteTexture()
     {
-        SPTexture* tex = new SPTexture(true/*white*/, 0);
+        SPTexture* tex = new SPTexture(true/*white*/);
         tex->m_path = "unicolor_white";
         return std::shared_ptr<SPTexture>(tex);
     }
     // ------------------------------------------------------------------------
     static std::shared_ptr<SPTexture> getTransparentTexture()
     {
-        SPTexture* tex = new SPTexture(false/*white*/, 1);
+        SPTexture* tex = new SPTexture(false/*white*/);
         return std::shared_ptr<SPTexture>(tex);
     }
     // ------------------------------------------------------------------------
     SPTexture(const std::string& path, Material* m, bool undo_srgb,
-              int ta_idx, const std::string& container_id);
+              const std::string& container_id);
     // ------------------------------------------------------------------------
     ~SPTexture();
     // ------------------------------------------------------------------------
@@ -196,14 +185,6 @@ public:
     // ------------------------------------------------------------------------
     GLuint getOpenGLTextureName() const              { return m_texture_name; }
     // ------------------------------------------------------------------------
-    uint64_t getTextureHandle() const              { return m_texture_handle; }
-    // ------------------------------------------------------------------------
-    const uint64_t* getTextureHandlePointer() const
-    {
-        assert(m_texture_handle != 0);
-        return &m_texture_handle;
-    }
-    // ------------------------------------------------------------------------
     bool initialized() const;
     // ------------------------------------------------------------------------
     unsigned getWidth() const                        { return m_width.load(); }
@@ -211,8 +192,7 @@ public:
     unsigned getHeight() const                      { return m_height.load(); }
     // ------------------------------------------------------------------------
     bool threadedLoad();
-    // ------------------------------------------------------------------------
-    int getTextureArrayIndex() const            { return m_texture_array_idx; }
+
 
 };
 

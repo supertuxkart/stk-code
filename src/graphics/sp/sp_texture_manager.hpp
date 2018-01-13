@@ -47,8 +47,6 @@ class SPTextureManager : public NoCopy
 private:
     static SPTextureManager* m_sptm;
 
-    GLuint m_all_textures_array = 0;
-
     std::unordered_map<std::string, std::shared_ptr<SPTexture> > m_textures;
 
     std::atomic_uint m_max_threaded_load_obj;
@@ -64,11 +62,6 @@ private:
     std::condition_variable m_thread_obj_cv;
 
     std::list<std::thread> m_threaded_load_obj;
-
-    std::list<int> m_freed_texture_array_idx;
-
-    // ------------------------------------------------------------------------
-    void initTextureArray();
 
 public:
     // ------------------------------------------------------------------------
@@ -118,19 +111,7 @@ public:
     int dumpTextureUsage();
     // ------------------------------------------------------------------------
     void dumpAllTexture();
-    // ------------------------------------------------------------------------
-    int getTextureArrayIndex()
-    {
-        if (!m_freed_texture_array_idx.empty())
-        {
-            int ret = m_freed_texture_array_idx.front();
-            m_freed_texture_array_idx.pop_front();
-            return ret;
-        }
-        return (int)m_textures.size();
-    }
-    // ------------------------------------------------------------------------
-    GLuint getTextureArrayName() const         { return m_all_textures_array; }
+
 };
 
 }

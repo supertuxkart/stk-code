@@ -142,26 +142,12 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
     }
 #endif
 
-    if (CVS->supportsGLLayerInVertexShader())
-        code << "#extension " << CVS->getVSLayerExtension() << " : enable\n";
-
     if (CVS->isARBExplicitAttribLocationUsable())
     {
 #if !defined(USE_GLES2)
         code << "#extension GL_ARB_explicit_attrib_location : enable\n";
 #endif
         code << "#define Explicit_Attrib_Location_Usable\n";
-    }
-
-    if (CVS->useArrayTextures())
-    {
-        code << "#define Use_Array_Texture\n";
-    }
-    else if (CVS->isARBBindlessTextureUsable())
-    {
-        code << "#extension GL_ARB_bindless_texture : enable\n";
-        code << "#extension GL_NV_gpu_shader5 : require\n";
-        code << "#define Use_Bindless_Texture\n";
     }
 
     if (GraphicsRestrictions::isDisabled
@@ -173,8 +159,6 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
     code << "//" << file << "\n";
     if (!CVS->isARBUniformBufferObjectUsable())
         code << "#define UBO_DISABLED\n";
-    if (CVS->supportsGLLayerInVertexShader())
-        code << "#define VSLayer\n";
     if (CVS->needsVertexIdWorkaround())
         code << "#define Needs_Vertex_Id_Workaround\n";
     if (CVS->isDefferedEnabled())

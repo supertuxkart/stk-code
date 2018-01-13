@@ -30,11 +30,10 @@ namespace SP
 std::unordered_map<std::string, std::pair<unsigned, SamplerType> >
     g_prefilled_names =
     {
-        { "tex_array", { 0, ST_TRILINEAR } }
 #ifdef USE_GLES2
-        ,{ "skinning_tex", { 1, ST_NEAREST_CLAMPED } }
+        { "skinning_tex", { 0, ST_NEAREST_CLAMPED } }
 #else
-        ,{ "skinning_tex", { 1, ST_TEXTURE_BUFFER } }
+        { "skinning_tex", { 0, ST_TEXTURE_BUFFER } }
 #endif
     };
 

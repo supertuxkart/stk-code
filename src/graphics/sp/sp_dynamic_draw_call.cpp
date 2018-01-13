@@ -54,8 +54,7 @@ SPDynamicDrawCall::SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt,
     glBufferData(GL_ARRAY_BUFFER, 4 * 48, NULL, GL_DYNAMIC_DRAW);
     glGenBuffers(1, &m_ibo);
     glBindBuffer(GL_ARRAY_BUFFER, m_ibo);
-    glBufferData(GL_ARRAY_BUFFER, 32 + 48/*Max textures handles*/, NULL,
-        GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 32, NULL, GL_DYNAMIC_DRAW);
     SPInstancedData id = SPInstancedData(m_trans, 0.0f, 0.0f, 0.0f, 0);
     glBufferSubData(GL_ARRAY_BUFFER, 0, 32, &id);
     SPTextureManager::get()->increaseGLCommandFunctionCount(1);
@@ -119,53 +118,27 @@ SPDynamicDrawCall::SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt,
     glBindBuffer(GL_ARRAY_BUFFER, m_ibo);
     // Origin
     glEnableVertexAttribArray(8);
-    glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, 32 + 48, (void*)0);
+    glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, 32, (void*)0);
     glVertexAttribDivisorARB(8, 1);
     // Rotation (quaternion .xyz)
     glEnableVertexAttribArray(9);
     glVertexAttribPointer(9, 4, GL_INT_2_10_10_10_REV,
         GraphicsRestrictions::isDisabled
         (GraphicsRestrictions::GR_CORRECT_10BIT_NORMALIZATION) ?
-        GL_FALSE : GL_TRUE, 32 + 48, (void*)12);
+        GL_FALSE : GL_TRUE, 32, (void*)12);
     glVertexAttribDivisorARB(9, 1);
     // Scale (3 half floats and .w for quaternion .w)
     glEnableVertexAttribArray(10);
-    glVertexAttribPointer(10, 4, GL_HALF_FLOAT, GL_FALSE, 32 + 48, (void*)16);
+    glVertexAttribPointer(10, 4, GL_HALF_FLOAT, GL_FALSE, 32, (void*)16);
     glVertexAttribDivisorARB(10, 1);
     // Texture translation
     glEnableVertexAttribArray(11);
-    glVertexAttribPointer(11, 2, GL_HALF_FLOAT, GL_FALSE, 32 + 48, (void*)24);
+    glVertexAttribPointer(11, 2, GL_HALF_FLOAT, GL_FALSE, 32, (void*)24);
     glVertexAttribDivisorARB(11, 1);
     // Misc data (skinning offset and hue change)
     glEnableVertexAttribArray(12);
-    glVertexAttribIPointer(12, 2, GL_SHORT, 32 + 48, (void*)28);
+    glVertexAttribIPointer(12, 2, GL_SHORT, 32, (void*)28);
     glVertexAttribDivisorARB(12, 1);
-
-    if (CVS->useArrayTextures())
-    {
-        // uvec4 + uvec2 for 6 texture array indices
-        glEnableVertexAttribArray(13);
-        glVertexAttribIPointer(13, 4, GL_UNSIGNED_SHORT, 32 + 48, (void*)32);
-        glVertexAttribDivisorARB(13, 1);
-        glEnableVertexAttribArray(14);
-        glVertexAttribIPointer(14, 2, GL_UNSIGNED_SHORT, 32 + 48, (void*)40);
-        glVertexAttribDivisorARB(14, 1);
-        glDisableVertexAttribArray(15);
-    }
-    else if (CVS->isARBBindlessTextureUsable())
-    {
-        // 3 * 2 uvec2 for bindless samplers
-        glEnableVertexAttribArray(13);
-        glVertexAttribIPointer(13, 4, GL_UNSIGNED_INT, 32 + 48, (void*)32);
-        glVertexAttribDivisorARB(13, 1);
-        glEnableVertexAttribArray(14);
-        glVertexAttribIPointer(14, 4, GL_UNSIGNED_INT, 32 + 48, (void*)48);
-        glVertexAttribDivisorARB(14, 1);
-        glEnableVertexAttribArray(15);
-        glVertexAttribIPointer(15, 4, GL_UNSIGNED_INT, 32 + 48, (void*)64);
-        glVertexAttribDivisorARB(15, 1);
-    }
-
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 #endif
@@ -185,29 +158,6 @@ bool SPDynamicDrawCall::initTextureDyDc()
             }
         }
     }
-    if (!(CVS->useArrayTextures() || CVS->isARBBindlessTextureUsable()))
-    {
-        return true;
-    }
-    glBindBuffer(GL_ARRAY_BUFFER, m_ibo);
-    if (CVS->useArrayTextures())
-    {
-        for (unsigned i = 0; i < 6; i++)
-        {
-            uint16_t array_index = (uint16_t)
-                m_textures[0][i]->getTextureArrayIndex();
-            glBufferSubData(GL_ARRAY_BUFFER, 32 + (i * 2), 2, &array_index);
-        }
-    }
-    else
-    {
-        for (unsigned i = 0; i < 6; i++)
-        {
-            glBufferSubData(GL_ARRAY_BUFFER, 32 + (i * 8), 8,
-                m_textures[0][i]->getTextureHandlePointer());
-        }
-    }
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 #endif
     return true;
 }   // initTextureDyDc

@@ -53,15 +53,11 @@ namespace SP
 {
 // ----------------------------------------------------------------------------
 SPTexture::SPTexture(const std::string& path, Material* m, bool undo_srgb,
-                     int ta_idx, const std::string& container_id)
-         : m_path(path), m_texture_array_idx(ta_idx), m_width(0), m_height(0),
-           m_material(m), m_undo_srgb(undo_srgb)
+                     const std::string& container_id)
+         : m_path(path), m_width(0), m_height(0), m_material(m),
+           m_undo_srgb(undo_srgb)
 {
 #ifndef SERVER_ONLY
-    if (CVS->useArrayTextures())
-    {
-        return;
-    }
     glGenTextures(1, &m_texture_name);
 
     createWhite(false/*private_init*/);
@@ -89,18 +85,10 @@ SPTexture::SPTexture(const std::string& path, Material* m, bool undo_srgb,
 }   // SPTexture
 
 // ----------------------------------------------------------------------------
-SPTexture::SPTexture(bool white, int ta_idx)
-         : m_texture_array_idx(ta_idx), m_width(0), m_height(0),
-           m_undo_srgb(false)
+SPTexture::SPTexture(bool white)
+         : m_width(0), m_height(0), m_undo_srgb(false)
 {
 #ifndef SERVER_ONLY
-    if (CVS->useArrayTextures())
-    {
-        m_width.store(irr_driver->getVideoDriver()->getDriverAttributes()
-            .getAttributeAsDimension2d("MAX_TEXTURE_SIZE").Width);
-        m_height.store(m_width.load());
-        return;
-    }
     glGenTextures(1, &m_texture_name);
     if (white)
     {
@@ -110,7 +98,6 @@ SPTexture::SPTexture(bool white, int ta_idx)
     {
         createTransparent();
     }
-    addTextureHandle();
 #endif
 }   // SPTexture
 
@@ -118,31 +105,12 @@ SPTexture::SPTexture(bool white, int ta_idx)
 SPTexture::~SPTexture()
 {
 #ifndef SERVER_ONLY
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    if (m_texture_handle != 0 && CVS->isARBBindlessTextureUsable())
-    {
-        glMakeTextureHandleNonResidentARB(m_texture_handle);
-    }
-#endif
     if (m_texture_name != 0)
     {
         glDeleteTextures(1, &m_texture_name);
     }
 #endif
 }   // ~SPTexture
-
-// ----------------------------------------------------------------------------
-void SPTexture::addTextureHandle()
-{
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    if (CVS->isARBBindlessTextureUsable())
-    {
-        m_texture_handle = glGetTextureSamplerHandleARB(m_texture_name,
-            getSampler(ST_TRILINEAR));
-        glMakeTextureHandleResidentARB(m_texture_handle);
-    }
-#endif
-}   // addTextureHandle
 
 // ----------------------------------------------------------------------------
 std::shared_ptr<video::IImage> SPTexture::getImageFromPath
@@ -192,11 +160,11 @@ std::shared_ptr<video::IImage> SPTexture::getTextureImage() const
     const core::dimension2du& max_size = irr_driver->getVideoDriver()
         ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
 
-    if (tex_size.Width > max_size.Width || CVS->useArrayTextures())
+    if (tex_size.Width > max_size.Width)
     {
         tex_size.Width = max_size.Width;
     }
-    if (tex_size.Height > max_size.Height || CVS->useArrayTextures())
+    if (tex_size.Height > max_size.Height)
     {
         tex_size.Height = max_size.Height;
     }
@@ -254,7 +222,7 @@ bool SPTexture::compressedTexImage2d(std::shared_ptr<video::IImage> texture,
 #ifndef SERVER_ONLY
     unsigned format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 #ifndef USE_GLES2
-    if (m_undo_srgb && !CVS->useArrayTextures())
+    if (m_undo_srgb)
     {
         format = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
     }
@@ -273,95 +241,11 @@ bool SPTexture::compressedTexImage2d(std::shared_ptr<video::IImage> texture,
         compressed += cur_mipmap_size;
     }
     glBindTexture(GL_TEXTURE_2D, 0);
-    addTextureHandle();
     m_width.store(mipmap_sizes[0].first.Width);
     m_height.store(mipmap_sizes[0].first.Height);
 #endif
     return true;
 }   // compressedTexImage2d
-
-// ----------------------------------------------------------------------------
-bool SPTexture::compressedTexImage3d(std::shared_ptr<video::IImage> texture,
-                                     const std::vector<std::pair
-                                     <core::dimension2du, unsigned> >&
-                                     mipmap_sizes)
-{
-#ifndef SERVER_ONLY
-    assert(m_texture_array_idx != -1);
-    glBindTexture(GL_TEXTURE_2D_ARRAY,
-        SPTextureManager::get()->getTextureArrayName());
-    uint8_t* compressed = (uint8_t*)texture->lock();
-    unsigned cur_mipmap_size = 0;
-    for (unsigned i = 0; i < mipmap_sizes.size(); i++)
-    {
-        cur_mipmap_size = mipmap_sizes[i].second;
-        glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, i,
-            0, 0, m_texture_array_idx,
-            mipmap_sizes[i].first.Width, mipmap_sizes[i].first.Height, 1,
-            GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, cur_mipmap_size, compressed);
-        compressed += cur_mipmap_size;
-    }
-    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-    m_width.store(mipmap_sizes[0].first.Width);
-    m_height.store(mipmap_sizes[0].first.Height);
-#endif
-    return true;
-}   // compressedTexImage3d
-
-// ----------------------------------------------------------------------------
-bool SPTexture::texImage3d(std::shared_ptr<video::IImage> texture,
-                           std::shared_ptr<video::IImage> mipmaps)
-{
-#ifndef SERVER_ONLY
-    assert(m_texture_array_idx != -1);
-    if (texture)
-    {
-#ifdef USE_GLES2
-        unsigned upload_format = GL_RGBA;
-#else
-        unsigned upload_format = GL_BGRA;
-#endif
-        glBindTexture(GL_TEXTURE_2D_ARRAY,
-            SPTextureManager::get()->getTextureArrayName());
-        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, m_texture_array_idx,
-            texture->getDimension().Width, texture->getDimension().Height,
-            1, upload_format, GL_UNSIGNED_BYTE, texture->lock());
-
-        assert(mipmaps);
-        std::vector<std::pair<core::dimension2du, unsigned> >
-            mipmap_sizes;
-        unsigned width = texture->getDimension().Width;
-        unsigned height = texture->getDimension().Height;
-        mipmap_sizes.emplace_back(core::dimension2du(width, height),
-            width * height * 4);
-        while (true)
-        {
-            width = width < 2 ? 1 : width >> 1;
-            height = height < 2 ? 1 : height >> 1;
-            mipmap_sizes.emplace_back
-                (core::dimension2du(width, height), width * height * 4);
-            if (width == 1 && height == 1)
-            {
-                break;
-            }
-        }
-        uint8_t* ptr = (uint8_t*)mipmaps->lock();
-        for (unsigned i = 1; i < mipmap_sizes.size(); i++)
-        {
-            glTexSubImage3D(GL_TEXTURE_2D_ARRAY, i, 0, 0, m_texture_array_idx,
-                mipmap_sizes[i].first.Width, mipmap_sizes[i].first.Height,
-                1, upload_format, GL_UNSIGNED_BYTE, ptr);
-            ptr += mipmap_sizes[i].second;
-        }
-
-        glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-    }
-    m_width.store(irr_driver->getVideoDriver()->getDriverAttributes()
-        .getAttributeAsDimension2d("MAX_TEXTURE_SIZE").Width);
-    m_height.store(m_width.load());
-#endif
-    return true;
-}   // texImage3d
 
 // ----------------------------------------------------------------------------
 bool SPTexture::texImage2d(std::shared_ptr<video::IImage> texture,
@@ -415,7 +299,6 @@ bool SPTexture::texImage2d(std::shared_ptr<video::IImage> texture,
         }
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-    addTextureHandle();
     if (texture)
     {
         m_width.store(texture->getDimension().Width);
@@ -565,29 +448,45 @@ bool SPTexture::threadedLoad()
         applyMask(image.get(), mask.get());
     }
     std::shared_ptr<video::IImage> mipmaps;
-    if (CVS->useArrayTextures())
+
+    if (!m_cache_directory.empty() &&
+        CVS->isTextureCompressionEnabled() && image &&
+        image->getDimension().Width >= 4 &&
+        image->getDimension().Height >= 4)
     {
-        if (CVS->isTextureCompressionEnabled())
+        auto r = compressTexture(image);
+        SPTextureManager::get()->increaseGLCommandFunctionCount(1);
+        SPTextureManager::get()->addGLCommandFunction(
+            [this, image, r]()->bool
+            { return compressedTexImage2d(image, r); });
+        if (!cache_loc.empty())
         {
-            auto r = compressTexture(image);
-            SPTextureManager::get()->increaseGLCommandFunctionCount(1);
-            SPTextureManager::get()->addGLCommandFunction(
-                [this, image, r]()->bool
-                { return compressedTexImage3d(image, r); });
+            SPTextureManager::get()->addThreadedFunction(
+                [this, image, r, cache_loc]()->bool
+                {
+                    return saveCompressedTexture(image, r, cache_loc);
+                });
         }
-        else
+    }
+    else
+    {
+#ifndef USE_GLES2
+        if (UserConfigParams::m_hq_mipmap && image &&
+            image->getDimension().Width > 1 &&
+            image->getDimension().Height > 1)
         {
             std::vector<std::pair<core::dimension2du, unsigned> >
                 mipmap_sizes;
             unsigned width = image->getDimension().Width;
             unsigned height = image->getDimension().Height;
-            mipmap_sizes.emplace_back(core::dimension2du(width, height), 0);
+            mipmap_sizes.emplace_back(core::dimension2du(width, height),
+                0);
             while (true)
             {
                 width = width < 2 ? 1 : width >> 1;
                 height = height < 2 ? 1 : height >> 1;
-                mipmap_sizes.emplace_back(core::dimension2du(width, height),
-                    0);
+                mipmap_sizes.emplace_back
+                    (core::dimension2du(width, height), 0);
                 if (width == 1 && height == 1)
                 {
                     break;
@@ -595,71 +494,16 @@ bool SPTexture::threadedLoad()
             }
             mipmaps.reset(irr_driver->getVideoDriver()->createImage
                 (video::ECF_A8R8G8B8, mipmap_sizes[0].first));
-            generateQuickMipmap(image, mipmap_sizes,
+            generateHQMipmap(image->lock(), mipmap_sizes,
                 (uint8_t*)mipmaps->lock());
-            SPTextureManager::get()->increaseGLCommandFunctionCount(1);
-            SPTextureManager::get()->addGLCommandFunction(
-                [this, image, mipmaps]()->bool
-                { return texImage3d(image, mipmaps); });
         }
-    }
-    else
-    {
-        if (!m_cache_directory.empty() &&
-            CVS->isTextureCompressionEnabled() && image &&
-            image->getDimension().Width >= 4 &&
-            image->getDimension().Height >= 4)
-        {
-            auto r = compressTexture(image);
-            SPTextureManager::get()->increaseGLCommandFunctionCount(1);
-            SPTextureManager::get()->addGLCommandFunction(
-                [this, image, r]()->bool
-                { return compressedTexImage2d(image, r); });
-            if (!cache_loc.empty())
-            {
-                SPTextureManager::get()->addThreadedFunction(
-                    [this, image, r, cache_loc]()->bool
-                    {
-                        return saveCompressedTexture(image, r, cache_loc);
-                    });
-            }
-        }
-        else
-        {
-#ifndef USE_GLES2
-            if (UserConfigParams::m_hq_mipmap && image &&
-                image->getDimension().Width > 1 &&
-                image->getDimension().Height > 1)
-            {
-                std::vector<std::pair<core::dimension2du, unsigned> >
-                    mipmap_sizes;
-                unsigned width = image->getDimension().Width;
-                unsigned height = image->getDimension().Height;
-                mipmap_sizes.emplace_back(core::dimension2du(width, height),
-                    0);
-                while (true)
-                {
-                    width = width < 2 ? 1 : width >> 1;
-                    height = height < 2 ? 1 : height >> 1;
-                    mipmap_sizes.emplace_back
-                        (core::dimension2du(width, height), 0);
-                    if (width == 1 && height == 1)
-                    {
-                        break;
-                    }
-                }
-                mipmaps.reset(irr_driver->getVideoDriver()->createImage
-                    (video::ECF_A8R8G8B8, mipmap_sizes[0].first));
-                generateHQMipmap(image->lock(), mipmap_sizes,
-                    (uint8_t*)mipmaps->lock());
-            }
 #endif
-            SPTextureManager::get()->increaseGLCommandFunctionCount(1);
-            SPTextureManager::get()->addGLCommandFunction(
-                [this, image, mipmaps]()->bool
-                { return texImage2d(image, mipmaps); });
-        }
+        SPTextureManager::get()->increaseGLCommandFunctionCount(1);
+        SPTextureManager::get()->addGLCommandFunction(
+            [this, image, mipmaps]()->bool
+            { return texImage2d(image, mipmaps); });
     }
+
 #endif
     return true;
 }   // threadedLoad
@@ -798,12 +642,6 @@ void SPTexture::applyMask(video::IImage* texture, video::IImage* mask)
 // ----------------------------------------------------------------------------
 bool SPTexture::initialized() const
 {
-#ifndef SERVER_ONLY
-    if (CVS->isARBBindlessTextureUsable())
-    {
-        return m_texture_handle != 0;
-    }
-#endif
     return m_width.load() != 0 && m_height.load() != 0;
 }   // initialized
 
@@ -931,9 +769,8 @@ std::vector<std::pair<core::dimension2du, unsigned> >
             break;
         }
     }
-    // For array textures all textures need to have a same internal format
+
     const unsigned tc_flag = squish::kDxt5 | stk_config->m_tc_quality;
-//        | (m_undo_srgb && CVS->useArrayTextures() ? squish::kToLinear : 0);
     const unsigned compressed_size = squish::GetStorageRequirements(
         mipmap_sizes[0].first.Width, mipmap_sizes[0].first.Height,
         tc_flag);
