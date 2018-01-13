@@ -25,33 +25,48 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/render_info.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/widgets/button_widget.hpp"
-#include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 
-
 using namespace GUIEngine;
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 KartColorSliderDialog::KartColorSliderDialog(PlayerProfile* pp)
                      : ModalDialog(0.75f, 0.75f, MODAL_DIALOG_LOCATION_BOTTOM)
 {
     loadFromFile("kart_color_slider.stkgui");
     m_player_profile = pp;
-    getWidget<SpinnerWidget>("color-slider")->setValue(int(pp->getDefaultKartColor() * 100.0f));
+    getWidget<SpinnerWidget>("color-slider")->setValue(
+        int(pp->getDefaultKartColor() * 100.0f));
     m_model_view->getModelViewRenderInfo()->setHue(
         float(getWidget<SpinnerWidget>("color-slider")->getValue()) / 100.0f);
 }   // KartColorSliderDialog
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+KartColorSliderDialog::~KartColorSliderDialog()
+{
+    if (m_model_view->getIrrlichtElement() != NULL)
+    {
+        m_model_view->getIrrlichtElement()->remove();
+    }
+}   // ~KartColorSliderDialog
+
+// ----------------------------------------------------------------------------
 void KartColorSliderDialog::beforeAddingWidgets()
 {
     Widget* kart_screen = getWidget<Widget>("kart-screen");
-    m_model_view = new ModelViewWidget(irr_driver->getActualScreenSize().Height > 1280 ||
+    m_model_view = new ModelViewWidget(
+        irr_driver->getActualScreenSize().Height > 1280 ||
         irr_driver->getActualScreenSize().Width > 1280 ? 1024 : 512);
 
-    const KartProperties* props = kart_properties_manager->getKart(UserConfigParams::m_default_kart);
+    const KartProperties* props =
+        kart_properties_manager->getKart(UserConfigParams::m_default_kart);
+    if (props == NULL)
+    {
+        Log::warn("KartColorSliderDialog", "Unknown kart %s, fallback to tux",
+            UserConfigParams::m_default_kart.c_str());
+        props = kart_properties_manager->getKart(std::string("tux"));
+    }
     const KartModel& kart_model = props->getMasterKartModel();
 
     core::matrix4 model_location;
@@ -118,17 +133,19 @@ void KartColorSliderDialog::beforeAddingWidgets()
         kart_screen->m_w / 2, kart_screen->m_w / 2);
 }   // beforeAddingWidgets
 
-// ------------------------------------------------------------------------------------------------------
-GUIEngine::EventPropagation KartColorSliderDialog::processEvent(const std::string& eventSource)
+// ----------------------------------------------------------------------------
+GUIEngine::EventPropagation
+            KartColorSliderDialog::processEvent(const std::string& eventSource)
 {
     if (eventSource == "color-slider")
     {
-        m_model_view->getModelViewRenderInfo()->setHue(
-            float(getWidget<SpinnerWidget>("color-slider")->getValue()) / 100.0f);
+        m_model_view->getModelViewRenderInfo()->setHue(float(
+            getWidget<SpinnerWidget>("color-slider")->getValue()) / 100.0f);
     }
     else if (eventSource == "close")
     {
-        float color = float(getWidget<SpinnerWidget>("color-slider")->getValue());
+        float color = float(getWidget<SpinnerWidget>("color-slider")
+            ->getValue());
         m_player_profile->setDefaultKartColor(color / 100.0f);
         ModalDialog::dismiss();
         return GUIEngine::EVENT_BLOCK;

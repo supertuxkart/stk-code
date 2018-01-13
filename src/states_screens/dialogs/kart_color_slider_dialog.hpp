@@ -38,7 +38,7 @@ private:
 public:
     KartColorSliderDialog(PlayerProfile* pp);
 
-    ~KartColorSliderDialog() {}
+    ~KartColorSliderDialog();
 
     virtual void beforeAddingWidgets() OVERRIDE;
 
