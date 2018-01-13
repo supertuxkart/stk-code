@@ -219,14 +219,12 @@ bool SPTexture::compressedTexImage2d(std::shared_ptr<video::IImage> texture,
                                      <core::dimension2du, unsigned> >&
                                      mipmap_sizes)
 {
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && !defined(USE_GLES2)
     unsigned format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-#ifndef USE_GLES2
     if (m_undo_srgb)
     {
         format = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
     }
-#endif
     glDeleteTextures(1, &m_texture_name);
     glGenTextures(1, &m_texture_name);
     glBindTexture(GL_TEXTURE_2D, m_texture_name);
