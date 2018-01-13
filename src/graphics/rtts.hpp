@@ -149,7 +149,7 @@ public:
     unsigned int getWidth () const { return m_width ; }
     unsigned int getHeight() const { return m_height; }
 
-    FrameBufferLayer &getShadowFrameBuffer() { return *m_shadow_FBO; }
+    FrameBufferLayer* getShadowFrameBuffer() { return m_shadow_FBO; }
     unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
     unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }
     FrameBuffer& getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }

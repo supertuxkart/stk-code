@@ -187,7 +187,7 @@ void ShaderBasedRenderer::renderShadows()
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     for (unsigned cascade = 0; cascade < 4; cascade++)
     {
-        m_rtts->getShadowFrameBuffer().bindLayerDepthOnly(cascade);
+        m_rtts->getShadowFrameBuffer()->bindLayerDepthOnly(cascade);
         glClear(GL_DEPTH_BUFFER_BIT);
         SP::sp_cur_shadow_cascade = cascade;
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SHADOWS_CASCADE0 + cascade));
@@ -596,7 +596,7 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
         camera->activate();
         m_post_processing->renderPassThrough(m_rtts->getFBO(FBO_HALF1_R).getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
     }
-    else if (irr_driver->getShadowViz())
+    else if (irr_driver->getShadowViz() && m_rtts->getShadowFrameBuffer())
     {
         m_shadow_matrices.renderShadowsDebug(m_rtts->getShadowFrameBuffer(), m_post_processing);
     }

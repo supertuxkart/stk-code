@@ -50,7 +50,7 @@ public:
     void renderLights(  bool has_shadow,
                         GLuint normal_depth_texture,
                         GLuint depth_stencil_texture,
-                        const FrameBuffer& shadow_framebuffer,
+                        const FrameBuffer* shadow_framebuffer,
                         GLuint specular_probe);
     void renderLightsScatter(GLuint depth_stencil_texture,
                              const FrameBuffer& half1_framebuffer,

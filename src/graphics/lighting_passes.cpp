@@ -209,13 +209,13 @@ public:
     // ------------------------------------------------------------------------
     void render(GLuint normal_depth_texture,
                 GLuint depth_stencil_texture,
-                const FrameBuffer& shadow_framebuffer,
+                const FrameBuffer* shadow_framebuffer,
                 const core::vector3df &direction,
                 const video::SColorf &col)
     {
         setTextureUnits(normal_depth_texture,
                         depth_stencil_texture,
-                        shadow_framebuffer.getDepthTexture()                );
+                        shadow_framebuffer->getDepthTexture()                );
        drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
                             ShadowMatrices::m_shadow_split[2],
                             ShadowMatrices::m_shadow_split[3],
@@ -418,7 +418,7 @@ void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
 void LightingPasses::renderLights(  bool has_shadow,
                                     GLuint normal_depth_texture,
                                     GLuint depth_stencil_texture,
-                                    const FrameBuffer& shadow_framebuffer,
+                                    const FrameBuffer* shadow_framebuffer,
                                     GLuint specular_probe)
 {
     {
