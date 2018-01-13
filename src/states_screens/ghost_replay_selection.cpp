@@ -128,7 +128,7 @@ void GhostReplaySelection::loadList()
         row.push_back(GUIEngine::ListWidget::ListCell
             (StringUtils::toWString(rd.m_min_time) + L"s", -1, 1, true));
         row.push_back(GUIEngine::ListWidget::ListCell
-            (rd.m_user_name, -1, 1, true));
+            (rd.m_user_name.empty() ? " " : rd.m_user_name, -1, 1, true));
         m_replay_list_widget->addItem(StringUtils::toString(i), row);
     }
 }   // loadList

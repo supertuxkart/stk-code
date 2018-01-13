@@ -203,6 +203,7 @@ void GrandPrixWin::init()
 
         m_unlocked_label->add();
         manualAddWidget(m_unlocked_label);
+        m_unlocked_label->setColor(video::SColor(255, 255, 255, 255));
     }
     else
     {

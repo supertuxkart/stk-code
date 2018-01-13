@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-10-24 10:06+0000\n"
+"PO-Revision-Date: 2017-11-13 00:19+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/supertuxkart/supertuxkart/language/gd/)\n"
 "MIME-Version: 1.0\n"
@@ -290,7 +290,7 @@ msgstr "Sgàilean"
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Image-based lighting"
-msgstr "Soillseachadh stèidhichte air dealbhan"
+msgstr "Soillseachadh le taic dhealbhan"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -645,7 +645,7 @@ msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key. You can see your current level of nitro in the"
 " bar at the right of the game screen."
-msgstr "Ma thogas tu naidhtreo, gheibh thu neartachadh air an astar agad nuair a thogras tu is cha leig thu leas ach an iuchair iomchaidh a bhrùthadh. Chì thu cò mheud naidhtreo a th’ agad sa bhàr ri taobh dheas an sgrìn."
+msgstr "Ma thogas tu naidhtreo, gheibh thu neartachadh air an luaths agad nuair a thogras tu is cha leig thu leas ach an iuchair iomchaidh a bhrùthadh. Chì thu cò mheud naidhtreo a th’ agad sa bhàr taobh deas na sgrìn."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -678,7 +678,7 @@ msgstr "BubbleGum - dìon thu fhèin le sgiath no cleachd fear a’ coimhead air
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights."
-msgstr "Cèic - tilg air an fharpaiseach as fhaisge e, as fhearr air amasan faisg ort no air slighean dìreach."
+msgstr "Cèic - tilg air an fharpaiseach as fhaisge e, tha i as fhearr air amasan faisg ort no air slighean dìreach."
 
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
@@ -700,7 +700,7 @@ msgstr "Paraisiut - cuir maille air a h-uile cart air do bheulaibh."
 msgid ""
 "Swapper - gift boxes are transformed into bananas and vice versa for a short"
 " time."
-msgstr "Suaipear - thèid bogsaichean tìodhlaic ’nan bananathan is taobh mu seach fad greiseag."
+msgstr "Suaipear - thèid bogsaichean tìodhlaic ’nam bananathan is taobh mu seach fad greiseag."
 
 #. I18N: ./data/gui/help2.stkgui
 msgid ""
@@ -721,7 +721,7 @@ msgstr "Tha iomadh modh-geama aig SuperTuxKart"
 msgid ""
 "Regular Race: All blows allowed, so catch weapons and make clever use of "
 "them!"
-msgstr "Rèis àbhaisteach: tha a h-uile buille ceadaichte, mar sin tog airm is cleachd gu glic iad!"
+msgstr "Rèis àbhaisteach: Tha gach buille ceadaichte, mar sin tog airm is cleachd gu glic iad!"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -736,7 +736,7 @@ msgid ""
 "Follow the leader: Run for second place, as the last kart will be "
 "disqualified every time the counter hits zero. Beware: going in front of the"
 " leader will get you eliminated too!"
-msgstr "Lean an toisiche: feuch an crìochnaich thu air an dàrna àite on a thèid an cart mu dheireadh a dhì-chòireachadh gach turas a ruigeas an cunntair a neoni. Thoir an aire: thèid do ruaig cuideachd ma thèid thu seachad air an toisiche!"
+msgstr "Lean an toisiche: Feuch an crìochnaich thu air an dàrna àite on a thèid an cart mu dheireadh a dhì-chòireachadh gach turas a ruigeas an cunntair a neoni. Thoir an aire: thèid do ruaig cuideachd ma thèid thu seachad air an toisiche!"
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -752,7 +752,7 @@ msgstr "Ball-coise: Cleachd a’ chart agad gus am bàla a bhrùthadh dhan tadha
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 msgid "Egg hunt: Explore tracks to find all hidden eggs."
-msgstr "Lorg uighean: rùraich slighean gus a h-uile ugh am falach a lorg."
+msgstr "Lorg uighean: Rùraich slighean gus a h-uile ugh am falach a lorg."
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -761,7 +761,7 @@ msgid ""
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
-msgstr "* Faodaidh tu a’ mhòrchuid dhe na modhan-geama seo a chluiche ann an dòigh Grand Prix cuideachd: an àite a bhith a’ cluiche rèis a-mhàin, cluichidh tu sreath dhiubh. Mar as fhearr an rang agad, ’s ann as motha na puingean a gheibh thu. Aig deireadh an latha, ’s e an cluicheadair aig a bheil na puingean as motha a bhuannaicheas a’ chuach."
+msgstr "* Faodaidh tu a’ mhòrchuid dhe na modhan-geama seo a chluiche ann an dòigh Grand Prix cuideachd: Seach a bhith a’ cluiche rèis a-mhàin, cluichidh tu sreath dhiubh. Mar as fhearr an rang agad, ’s ann as motha na puingean a gheibh thu. Mu dheireadh thall, ’s e an cluicheadair aig a bheil na puingean as motha a bhuannaicheas a’ chuach."
 
 #. I18N: ./data/gui/help4.stkgui
 msgid "SuperTuxKart can be played in multiplayer mode on the same computer"
@@ -780,7 +780,7 @@ msgid ""
 "keyboard(s), however each player will need a different set of keys, and keep"
 " in mind that most keyboards are not appropriate for multiplayer gameplay "
 "because they do not support large number of keypresses."
-msgstr "Sa chiad dol a-mach, bidh feum agad air barrachd air aon uidheam ion-chuir (’s e iomadh pada-geama no joysticks an dòigh as fhearr gus cluiche le daoine eile). Rach gu sgrìn nan roghainnean ion-chuir is suidhich na padaichean-geama. ’S urrainn dhut cluiche air meur-chlàr(an) cuideachd, ach bidh feum air buidheann dhe dh’iuchraichean eadar-dhealaichte airson gach cluicheadair. Thoir an aire nach eil a’ mhòrchuid dhe na meur-chlàran freagarrach airson geama ioma-chluicheadair on nach cuir iad taic ri brùthadh air àireamh mhòr de dh’iuchraichean."
+msgstr "Sa chiad dol a-mach, bidh feum agad air barrachd air aon uidheam ion-chuir (’s e iomadh pada-geama no joysticks an dòigh as fhearr gus cluiche le daoine eile). Rach gu sgrìn nan roghainnean ion-chuir is suidhich na padaichean-geama. ’S urrainn dhut cluiche air meur-chlàr(an) cuideachd, ach bidh feum air buidheann dhe dh’iuchraichean eadar-dhealaichte airson gach cluicheadair. Thoir an aire nach eil a’ mhòrchuid dhe na meur-chlàran freagarrach airson geama ioma-chluicheadair o nach cuir iad taic ri brùthadh air àireamh mhòr de dh’iuchraichean."
 
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: In the help menu
@@ -807,14 +807,14 @@ msgstr "Acair – cuiridh e maille air a’ chart."
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
 msgid "Parachute - slows down the kart less than the anchor."
-msgstr "Paraisiut – cuiridh nas lugha de mhaille a’ cart na chuireas an acair."
+msgstr "Paraisiut – cuiridh e nas lugha de mhaille air a’ chart na chuireas an acair."
 
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
 msgid ""
 "Bomb - detonates after a short amount of time to throw the kart up in the "
 "air. Bump into another kart to transfer the bomb to another player."
-msgstr "Boma – spreadhaidh e às dèidh greis ’s thèid a’ chart a thilg dhan adhair. Buail ri cart eile gus am boma a chur air cluicheadair eile."
+msgstr "Boma – spreadhaidh e às dèidh greis ’s thèid a’ chart a thilgeil dhan adhair. Buail ri cart eile gus am boma a chur air cluicheadair eile."
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -1433,7 +1433,7 @@ msgstr "An comas"
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
 msgid "Volume"
-msgstr "Àirde fuaime"
+msgstr "Àirde na fuaime"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: In the audio options screen
@@ -1540,7 +1540,7 @@ msgstr "Cuir stadastaireachd a’ Bh-chr gun ainm"
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Enable per-player handicaps"
-msgstr "Cuir ana-cothrom air cluicheadairean an comas"
+msgstr "Cuir ana-cothrom nan cluicheadairean air"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2078,7 +2078,7 @@ msgstr "Tha %s deiseil"
 #. I18N: Unbound key binding
 #: src/input/binding.cpp:90
 msgid "[none]"
-msgstr "[gin]"
+msgstr "[chan eil gin]"
 
 #. I18N: input configuration screen: mouse button
 #: src/input/binding.cpp:114
@@ -3032,7 +3032,7 @@ msgstr "Feumaidh an àireamh as motha de chluicheadairean a bhith eadar 2 is 12.
 
 #: src/states_screens/credits.cpp:180
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nDawid Gan https://launchpad.net/~deveee\nGunChleoc https://launchpad.net/~gunchleoc\nGunChleoc, 2012-2015\nGunChleoc, 2015-2017\nSTK-team https://launchpad.net/~stk"
+msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  GunChleoc https://launchpad.net/~gunchleoc\n  STK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
@@ -3150,7 +3150,7 @@ msgstr "À comas"
 #: src/states_screens/dialogs/custom_video_settings.cpp:67
 #: src/states_screens/options_screen_video.cpp:462
 msgid "Important only"
-msgstr "Beòthachaidhean cudromach a-mhàin"
+msgstr "Beòthachaidhean cudromach"
 
 #. I18N: animations setting (only karts with human players are animated)
 #: src/states_screens/dialogs/custom_video_settings.cpp:74
@@ -3401,7 +3401,7 @@ msgstr "Bun-roghainn"
 #: src/states_screens/gp_info_screen.cpp:75
 #: src/states_screens/options_screen_video.cpp:460
 msgid "None"
-msgstr "Gin"
+msgstr "Chan eil gin"
 
 #: src/states_screens/gp_info_screen.cpp:77
 msgid "Random"
@@ -3929,7 +3929,7 @@ msgstr "Duilgheas: %s"
 #: src/states_screens/race_result_gui.cpp:1440
 #, c-format
 msgid "Best lap time: %s"
-msgstr "Ùine na cuairte as fhearr: %s"
+msgstr "A’ chuairt as fhearr: %s"
 
 #: src/states_screens/race_setup_screen.cpp:87
 msgid "All blows allowed, so catch weapons and make clever use of them!"

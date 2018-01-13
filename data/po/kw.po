@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-10-24 10:06+0000\n"
+"PO-Revision-Date: 2017-11-13 00:19+0000\n"
 "Last-Translator: Auria <auria.mg@gmail.com>\n"
 "Language-Team: Cornish (http://www.transifex.com/supertuxkart/supertuxkart/language/kw/)\n"
 "MIME-Version: 1.0\n"
@@ -3031,7 +3031,7 @@ msgstr "Res yw dhe'n niver ughella a warioryon bos ynter 2 ha 12."
 
 #: src/states_screens/credits.cpp:180
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nkernow https://launchpad.net/~kernow\nNicky Rowe, 2015-2016\nSTK-team https://launchpad.net/~stk"
+msgstr "Launchpad Contributions:\n  STK-team https://launchpad.net/~stk\n  kernow https://launchpad.net/~kernow"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

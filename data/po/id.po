@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-10-24 10:06+0000\n"
+"PO-Revision-Date: 2017-11-13 00:19+0000\n"
 "Last-Translator: Christian \"crse\" Elbrianno\n"
 "Language-Team: Indonesian (http://www.transifex.com/supertuxkart/supertuxkart/language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -3019,7 +3019,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:180
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nArief Setiadi Wibowo https://launchpad.net/~q-thrynx\nAziz Rahmad https://launchpad.net/~azayrahmad\nChristian "crse" Elbrianno, 2017\nChristian "crse" Elbrianno, 2017\nDawid Gan https://launchpad.net/~deveee\nEga Zulfikar https://launchpad.net/~ega-bulb\nIcho Y. Chandra https://launchpad.net/~project-zero\nIcho Yulian Chandra, 2016\nMuhammad Radifar https://launchpad.net/~m-radifar05\nRaja Sulaiman, 2017\nSTK-team https://launchpad.net/~stk"
+msgstr "Launchpad Contributions:\n  Arief Setiadi Wibowo https://launchpad.net/~q-thrynx\n  Aziz Rahmad https://launchpad.net/~azayrahmad\n  Dawid Gan https://launchpad.net/~deveee\n  Ega Zulfikar https://launchpad.net/~ega-bulb\n  Icho Y. Chandra https://launchpad.net/~project-zero\n  Muhammad Radifar https://launchpad.net/~m-radifar05\n  STK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

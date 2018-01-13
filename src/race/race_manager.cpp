@@ -431,7 +431,9 @@ void RaceManager::startNew(bool from_overworld)
     {
         if (m_continue_saved_gp)
         {
-            m_track_number = m_saved_gp->getNextTrack();
+            int next_track = m_saved_gp->getNextTrack();
+            if (next_track < m_tracks.size())
+                m_track_number = next_track;
             m_saved_gp->loadKarts(m_kart_status);
         }
         else 
