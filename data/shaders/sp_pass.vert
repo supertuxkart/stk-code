@@ -37,6 +37,7 @@ out vec2 uv;
 out vec2 uv_two;
 out vec4 color;
 out float camdist;
+out vec4 world_position;
 flat out float hue_change;
 
 void main()
@@ -49,7 +50,7 @@ void main()
 #endif
 
     vec4 quaternion = normalize(vec4(i_rotation.xyz, i_scale.w));
-    vec4 world_position = getWorldPosition(i_origin, quaternion, i_scale.xyz,
+    world_position = getWorldPosition(i_origin, quaternion, i_scale.xyz,
         i_position);
     vec3 world_normal = rotateVector(quaternion, i_normal.xyz);
     vec3 world_tangent = rotateVector(quaternion, i_tangent.xyz);
