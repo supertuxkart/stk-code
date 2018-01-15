@@ -730,7 +730,8 @@ void World::resetAllKarts()
     for (KartList::iterator i = m_karts.begin(); i != m_karts.end(); i++)
     {
         if ((*i)->isGhostKart()) continue;
-        (*i)->getBody()->setGravity((*i)->getMaterial()->hasGravity() ?
+        (*i)->getBody()->setGravity(
+            (*i)->getMaterial() && (*i)->getMaterial()->hasGravity() ?
             (*i)->getNormal() * -g : Vec3(0, -g, 0));
     }
     for(int i=0; i<60; i++) Physics::getInstance()->update(1.f/60.f);

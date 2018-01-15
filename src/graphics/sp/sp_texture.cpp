@@ -522,7 +522,8 @@ std::shared_ptr<video::IImage>
     {
         // Load colorization mask
         std::shared_ptr<video::IImage> mask;
-        if (SP::getSPShader(m_material->getShaderName())->useAlphaChannel())
+        SPShader* sps = SP::getSPShader(m_material->getShaderName());
+        if (sps && sps->useAlphaChannel())
         {
             Log::debug("SPTexture", "Don't use colorization mask or factor"
                 " with shader using alpha channel for %s", m_path.c_str());
