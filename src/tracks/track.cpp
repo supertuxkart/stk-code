@@ -1182,7 +1182,6 @@ bool Track::loadMainTrack(const XMLNode &root)
         merged_mesh->finalize();
 #ifndef SERVER_ONLY
         tangent_mesh = merged_mesh;
-        adjustForFog(tangent_mesh, NULL);
 #else
         tangent_mesh = merged_mesh;
 #endif
@@ -1932,14 +1931,6 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 #endif
 
-    // Enable for for all track nodes if fog is used
-    const unsigned int count = (int)m_all_nodes.size();
-    for(unsigned int i=0; i<count; i++)
-    {
-        adjustForFog(m_all_nodes[i]);
-    }
-    m_track_object_manager->enableFog(m_use_fog);
-
     // Sky dome and boxes support
     // --------------------------
     irr_driver->suppressSkyBox();
@@ -2230,75 +2221,6 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
 
     }   // for i<root->getNumNodes()
 }
-
-//-----------------------------------------------------------------------------
-/** Changes all materials of the given mesh to use the current fog
- *  setting (true/false).
- *  \param node Scene node for which fog should be en/dis-abled.
- */
-void Track::adjustForFog(scene::IMesh* mesh, scene::ISceneNode* parent_scene_node)
-{
-#ifndef SERVER_ONLY
-    if (CVS->isGLSL())
-    {
-        return;
-    }
-#endif
-    unsigned int n = mesh->getMeshBufferCount();
-    for (unsigned int i=0; i<n; i++)
-    {
-        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-        video::SMaterial &irr_material=mb->getMaterial();
-        for (unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
-        {
-            video::ITexture* t = irr_material.getTexture(j);
-            if (t) material_manager->adjustForFog(t, mb, parent_scene_node, m_use_fog);
-
-        }   // for j<MATERIAL_MAX_TEXTURES
-} // for i<getMeshBufferCount()
-}
-
-//-----------------------------------------------------------------------------
-/** Changes all materials of the given scene node to use the current fog
- *  setting (true/false).
- *  \param node Scene node for which fog should be en/dis-abled.
- */
-void Track::adjustForFog(scene::ISceneNode *node)
-{
-    //irr_driver->setAllMaterialFlags(scene::IMesh *mesh)
-
-
-    if (node->getType() == scene::ESNT_OCTREE)
-    {
-        // do nothing
-    }
-    else if (node->getType() == scene::ESNT_MESH)
-    {
-        scene::IMeshSceneNode* mnode = (scene::IMeshSceneNode*)node;
-        scene::IMesh* mesh = mnode->getMesh();
-        adjustForFog(mesh, mnode);
-    }
-    else if (node->getType() == scene::ESNT_ANIMATED_MESH)
-    {
-        scene::IAnimatedMeshSceneNode* mnode = (scene::IAnimatedMeshSceneNode*)node;
-        scene::IMesh* mesh = mnode->getMesh();
-        adjustForFog(mesh, mnode);
-    }
-    else
-    {
-        node->setMaterialFlag(video::EMF_FOG_ENABLE, m_use_fog);
-    }
-
-    if (node->getType() == scene::ESNT_LOD_NODE)
-    {
-        std::vector<scene::ISceneNode*>& subnodes = ((LODNode*)node)->getAllNodes();
-        for (unsigned int n=0; n<subnodes.size(); n++)
-        {
-            adjustForFog(subnodes[n]);
-            //subnodes[n]->setMaterialFlag(video::EMF_FOG_ENABLE, m_use_fog);
-        }
-    }
-}   // adjustForFog
 
 //-----------------------------------------------------------------------------
 /** Handles a sky-dome or sky-box. It takes the xml node with the

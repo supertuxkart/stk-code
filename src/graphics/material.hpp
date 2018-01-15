@@ -135,14 +135,6 @@ private:
      *  plants that a kart can just drive through. */
     bool             m_ignore;
 
-    bool             m_fog;
-
-    /** True if backface culliing should be enabled. */
-    bool             m_backface_culling;
-
-    /** Set to true to disable writing to the Z buffer. Usually to be used with alpha blending */
-    bool             m_disable_z_write;
-
     /** True if the material shouldn't be "slippy" at an angle */
     bool             m_high_tire_adhesion;
 
@@ -250,11 +242,6 @@ public:
 
     void  setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) const;
     void  setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb);
-    void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, 
-                       bool use_fog) const;
-    void onMadeVisible(scene::IMeshBuffer* who);
-    void onHidden(scene::IMeshBuffer* who);
-    void isInitiallyHidden(scene::IMeshBuffer* who);
 
     /** Returns the ITexture associated with this material. */
     video::ITexture *getTexture(bool srgb = true, bool premul_alpha = false);
@@ -334,11 +321,6 @@ public:
     /** Returns the name of a special sfx to play while a kart is on this
      *  terrain. The string will be "" if no special sfx exists. */
     const std::string &getSFXName() const { return m_sfx_name; }
-
-    // ------------------------------------------------------------------------
-    /** Returns if fog is enabled. */
-    bool isFogEnabled() const { return m_fog; }
-
     // ------------------------------------------------------------------------
     /** \brief Get the kind of particles that are to be used on this material,
      *  in the given conditions.
@@ -396,8 +378,6 @@ public:
     /* This is used for finding correct material for spm*/
     const std::string& getUVTwoTexture() const
                                                       { return m_uv_two_tex; }
-    // ------------------------------------------------------------------------
-    bool backFaceCulling() const                { return m_backface_culling; }
     // ------------------------------------------------------------------------
     bool use2UV() const                      { return !m_uv_two_tex.empty(); }
     // ------------------------------------------------------------------------

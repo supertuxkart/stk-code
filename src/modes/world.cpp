@@ -215,7 +215,6 @@ void World::init()
                                    race_manager->getKartType(i),
                                    race_manager->getPlayerDifficulty(i));
         m_karts.push_back(newkart);
-        track->adjustForFog(newkart->getNode());
 
     }  // for i
 

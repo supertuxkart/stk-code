@@ -20,8 +20,6 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
-#include "graphics/material_manager.hpp"
-#include "graphics/material.hpp"
 #include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
 
@@ -196,19 +194,6 @@ void LODNode::OnRegisterSceneNode()
                 assert(node != NULL);
                 mesh = node->getMesh();
             }
-
-            for (unsigned int n=0; n<mesh->getMeshBufferCount(); n++)
-            {
-                scene::IMeshBuffer* mb = mesh->getMeshBuffer(n);
-                video::ITexture* t = mb->getMaterial().getTexture(0);
-                if (t == NULL) continue;
-
-                Material* m = material_manager->getMaterialFor(t, mb);
-                if (m != NULL)
-                {
-                    m->onMadeVisible(mb);
-                }
-            }
         }
         else if (m_previous_visibility == WAS_SHOWN && !shown)
         {
@@ -228,17 +213,6 @@ void LODNode::OnRegisterSceneNode()
                 mesh = node->getMesh();
             }
 
-            for (unsigned int n=0; n<mesh->getMeshBufferCount(); n++)
-            {
-                scene::IMeshBuffer* mb = mesh->getMeshBuffer(n);
-                video::ITexture* t = mb->getMaterial().getTexture(0);
-                if (t == NULL) continue;
-                Material* m = material_manager->getMaterialFor(t, mb);
-                if (m != NULL)
-                {
-                    m->onHidden(mb);
-                }
-            }
         }
         else if (m_previous_visibility == FIRST_PASS && !shown)
         {
@@ -256,18 +230,6 @@ void LODNode::OnRegisterSceneNode()
                 (scene::IAnimatedMeshSceneNode*)(m_nodes[0]);
                 assert(node != NULL);
                 mesh = node->getMesh();
-            }
-
-            for (unsigned int n=0; n<mesh->getMeshBufferCount(); n++)
-            {
-                scene::IMeshBuffer* mb = mesh->getMeshBuffer(n);
-                video::ITexture* t = mb->getMaterial().getTexture(0);
-                if(!t) continue;
-                Material* m = material_manager->getMaterialFor(t, mb);
-                if (m != NULL)
-                {
-                    m->isInitiallyHidden(mb);
-                }
             }
         }
     }

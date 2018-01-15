@@ -154,12 +154,9 @@ Material::Material(const XMLNode *node, bool deprecated)
 
     node->get("max-speed",           &m_max_speed_fraction );
     node->get("slowdown-time",       &m_slowdown_time      );
-    node->get("backface-culling",    &m_backface_culling   );
-    node->get("disable-z-write",     &m_disable_z_write    );
     node->get("colorizable",         &m_colorizable        );
     node->get("colorization-factor", &m_colorization_factor);
     node->get("hue-settings",        &m_hue_settings       );
-    node->get("fog",                 &m_fog                );
 
     node->get("mask",                &m_mask               );
     node->get("colorization-mask",   &m_colorization_mask  );
@@ -451,12 +448,6 @@ Material::Material(const XMLNode *node, bool deprecated)
     texfname.make_lower();
     m_texname = texfname.c_str();
 
-    if (m_disable_z_write && m_shader_type != SHADERTYPE_ALPHA_BLEND && m_shader_type != SHADERTYPE_ADDITIVE)
-    {
-        Log::debug("material", "Disabling writes to z buffer only makes sense when compositing is blending or additive (for %s)", m_texname.c_str());
-        m_disable_z_write = false;
-    }
-
     // Terrain-specifc sound effect
     const unsigned int children_count = node->getNumNodes();
     for (unsigned int i=0; i<children_count; i++)
@@ -588,7 +579,6 @@ void Material::init()
     m_texture                   = NULL;
     m_clamp_tex                 = 0;
     m_shader_type               = SHADERTYPE_SOLID;
-    m_backface_culling          = true;
     m_high_tire_adhesion        = false;
     m_below_surface             = false;
     m_falling_effect            = false;
@@ -597,11 +587,9 @@ void Material::init()
     m_drive_reset               = false;
     m_mirror_axis_when_reverse  = ' ';
     m_collision_reaction        = NORMAL;
-    m_disable_z_write           = false;
     m_colorizable               = false;
     m_colorization_factor       = 0.0f;
     m_colorization_mask         = "";
-    m_fog                       = true;
     m_max_speed_fraction        = 1.0f;
     m_slowdown_time             = 1.0f;
     m_sfx_name                  = "";
@@ -878,10 +866,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                   m_texname.c_str());
     }
 
-    // Backface culling
-    if(!m_backface_culling)
-        m->setFlag(video::EMF_BACK_FACE_CULLING, false);
-
+    // Default solid
+    m->MaterialType = video::EMT_SOLID;
     if (race_manager->getReverseTrack() &&
         m_mirror_axis_when_reverse != ' ')
     {
@@ -900,20 +886,18 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         }
     }   // reverse track and texture needs mirroring
 
-    if (m_shader_type == SHADERTYPE_SOLID_UNLIT)
+    if (m_shader_name == "unlit")
     {
         m->AmbientColor = video::SColor(255, 255, 255, 255);
         m->DiffuseColor = video::SColor(255, 255, 255, 255);
         m->EmissiveColor = video::SColor(255, 255, 255, 255);
         m->SpecularColor = video::SColor(255, 255, 255, 255);
     }
-
-    if (m_shader_type == SHADERTYPE_ALPHA_TEST)
+    else if (m_shader_name == "alphatest")
     {
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
     }
-
-    if (m_shader_type == SHADERTYPE_ALPHA_BLEND)
+    else if (m_shader_name == "alphablend")
     {
         // EMT_TRANSPARENT_ALPHA_CHANNEL doesn't include vertex color alpha into
         // account, which messes up fading in/out effects. So we use the more
@@ -925,8 +909,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                                   video::EMFN_MODULATE_1X,
                                   video::EAS_TEXTURE | video::EAS_VERTEX_COLOR);
     }
-
-    if (m_shader_type == SHADERTYPE_ADDITIVE)
+    else if (m_shader_name == "additive")
     {
         // EMT_TRANSPARENT_ADD_COLOR doesn't include vertex color alpha into
         // account, which messes up fading in/out effects. So we use the
@@ -938,31 +921,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             video::EAS_TEXTURE |
             video::EAS_VERTEX_COLOR);
     }
-
-    if (m_shader_type == SHADERTYPE_SPHERE_MAP)
-    {
-        m->MaterialType = video::EMT_SPHERE_MAP;
-    }
-
-    if (m_shader_type == SHADERTYPE_SPLATTING)
-    {
-        m->MaterialType = video::EMT_SOLID;
-    }
-
-
-    // Modify lightmap materials so that vertex colors are taken into account.
-    // But disable lighting because we assume all lighting is already part
-    // of the lightmap
-    if (m->MaterialType == video::EMT_LIGHTMAP)
-    {
-        m->MaterialType = video::EMT_LIGHTMAP_LIGHTING;
-        m->AmbientColor  = video::SColor(255, 255, 255, 255);
-        m->DiffuseColor  = video::SColor(255, 255, 255, 255);
-        m->EmissiveColor = video::SColor(255, 255, 255, 255);
-        m->SpecularColor = video::SColor(255, 255, 255, 255);
-    }
-
-    if (m_shader_type == SHADERTYPE_VEGETATION)
+    else if (m_shader_name == "grass")
     {
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
 
@@ -979,7 +938,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 #endif
     }
 
-    if (m_disable_z_write)
+    if (m_shader_name == "alphablend" || m_shader_name == "additive")
     {
         m->ZWriteEnable = false;
     }
@@ -1039,66 +998,3 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 #endif
 
 } // setMaterialProperties
-
-//-----------------------------------------------------------------------------
-
-void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
-                            bool use_fog) const
-{
-#ifndef SERVER_ONLY
-    if (CVS->isGLSL())
-    {
-        // to disable fog in the new pipeline, we slightly abuse the steps :
-        // moving an object into the transparent pass will make it rendered
-        // above fog and thus unaffected by it
-        if (use_fog && !m_fog && m_shader_type != SHADERTYPE_ALPHA_BLEND && m_shader_type != SHADERTYPE_ADDITIVE)
-        {
-            //m->ZWriteEnable = true;
-            //m->MaterialType = video::EMT_ONETEXTURE_BLEND;
-            //m->MaterialTypeParam =
-            //    pack_textureBlendFunc(video::EBF_SRC_ALPHA,
-            //                            video::EBF_ONE_MINUS_SRC_ALPHA,
-            //                            video::EMFN_MODULATE_1X,
-            //                            video::EAS_TEXTURE | video::EAS_VERTEX_COLOR);
-        }
-    }
-    else
-    {
-        m->setFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
-
-        if (parent != NULL)
-            parent->setMaterialFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
-    }
-#endif
-}   // adjustForFog
-
-//-----------------------------------------------------------------------------
-
-/** Callback from LOD nodes to create some effects */
-void Material::onMadeVisible(scene::IMeshBuffer* who)
-{
-#ifndef SERVER_ONLY
-    if (!CVS->isGLSL()) return;
-#endif
-}
-
-//-----------------------------------------------------------------------------
-
-/** Callback from LOD nodes to create some effects */
-void Material::onHidden(scene::IMeshBuffer* who)
-{
-#ifndef SERVER_ONLY
-    if (!CVS->isGLSL()) return;
-#endif
-}
-
-//-----------------------------------------------------------------------------
-
-void Material::isInitiallyHidden(scene::IMeshBuffer* who)
-{
-#ifndef SERVER_ONLY
-    if (!CVS->isGLSL()) return;
-#endif
-}
-
-//-----------------------------------------------------------------------------
