@@ -676,7 +676,7 @@ void SPTexture::generateHQMipmap(void* in,
     imMipmapCascade cascade;
     imReduceOptions options;
     imReduceSetOptions(&options,
-        m_path.find("_nm.") != std::string::npos ?
+        m_path.find("_Normal.") != std::string::npos ?
         IM_REDUCE_FILTER_NORMALMAP: IM_REDUCE_FILTER_LINEAR/*filter*/,
         2/*hopcount*/, 2.0f/*alpha*/, 1.0f/*amplifynormal*/,
         0.0f/*normalsustainfactor*/);
