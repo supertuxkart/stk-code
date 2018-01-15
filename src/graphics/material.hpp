@@ -46,23 +46,6 @@ class ParticleKind;
 class Material : public NoCopy
 {
 public:
-    enum ShaderType
-    {
-        SHADERTYPE_SOLID = 0,
-        SHADERTYPE_ALPHA_TEST,
-        SHADERTYPE_ALPHA_BLEND,
-        SHADERTYPE_ADDITIVE,
-        SHADERTYPE_SOLID_UNLIT,
-        /** Effect that makes grass wave as in the wind */
-        SHADERTYPE_VEGETATION,
-        SHADERTYPE_WATER,
-        SHADERTYPE_SPHERE_MAP,
-        SHADERTYPE_NORMAL_MAP,
-        SHADERTYPE_DETAIL_MAP,
-        SHADERTYPE_SPLATTING,
-        SHADERTYPE_COUNT,
-    };
-
     enum ParticleConditions
     {
         EMIT_ON_DRIVE = 0,
@@ -92,8 +75,6 @@ private:
     /** Name of a special sfx to play when a kart is on this terrain, or
      *  "" if no special sfx exists. */
     std::string      m_sfx_name;
-
-    ShaderType       m_shader_type;
 
     /** Either ' ' (no mirroring), 'U' or 'V' if a texture needs to be
      *  mirrored when driving in reverse. Typically used for arrows indicating
@@ -293,9 +274,8 @@ public:
     // ------------------------------------------------------------------------
     bool  isTransparent      () const
     {
-        return m_shader_type == SHADERTYPE_ADDITIVE ||
-               m_shader_type == SHADERTYPE_ALPHA_BLEND ||
-               m_shader_type == SHADERTYPE_ALPHA_TEST;
+        return m_shader_name == "additive" || m_shader_name == "alphablend" ||
+               m_shader_name == "displace";
     }
 
     // ------------------------------------------------------------------------
@@ -362,9 +342,6 @@ public:
      *  on lower speeds. A negative value indicates no minimum speed. */
     float getZipperMinSpeed() const { return m_zipper_min_speed; }
     // ------------------------------------------------------------------------
-    ShaderType getShaderType() const { return m_shader_type; }
-    void setShaderType(ShaderType st) { m_shader_type = st; }
-    // ------------------------------------------------------------------------
     /** True if this texture should have the U coordinates mirrored. */
     char getMirrorAxisInReverse() const { return m_mirror_axis_when_reverse; }
     // ------------------------------------------------------------------------
@@ -372,6 +349,8 @@ public:
     // ------------------------------------------------------------------------
     const std::string& getColorizationMask() const
                                                { return m_colorization_mask; }
+    // ------------------------------------------------------------------------
+    void setShaderName(const std::string& name)      { m_shader_name = name; }
     // ------------------------------------------------------------------------
     const std::string& getShaderName() const         { return m_shader_name; }
     // ------------------------------------------------------------------------

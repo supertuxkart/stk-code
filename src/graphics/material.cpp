@@ -56,7 +56,6 @@ const unsigned int VCLAMP = 2;
 Material::Material(const XMLNode *node, bool deprecated)
 {
     m_shader_name = "solid";
-    m_shader_type = SHADERTYPE_SOLID;
     m_deprecated = deprecated;
     m_installed = false;
 
@@ -194,41 +193,8 @@ Material::Material(const XMLNode *node, bool deprecated)
     node->get("normal-map", &normal_map_tex);
     if (node->get("shader", &s))
     {
-        if (s == "solid")
+        if (s == "splatting")
         {
-            m_shader_type = SHADERTYPE_SOLID;
-        }
-        else if (s == "unlit")
-        {
-            m_shader_type = SHADERTYPE_SOLID_UNLIT;
-        }
-        else if (s == "additive")
-        {
-            m_shader_type = SHADERTYPE_ADDITIVE;
-        }
-        else if (s == "alphatest")
-        {
-            m_shader_type = SHADERTYPE_ALPHA_TEST;
-        }
-        else if (s == "alphablend")
-        {
-            m_shader_type = SHADERTYPE_ALPHA_BLEND;
-        }
-        else if (s == "spheremap")
-        {
-            m_shader_type = SHADERTYPE_SPHERE_MAP;
-        }
-        else if (s == "water_shader")
-        {
-            m_shader_type = SHADERTYPE_WATER;
-        }
-        else if (s == "grass")
-        {
-            m_shader_type = SHADERTYPE_VEGETATION;
-        }
-        else if (s == "splatting")
-        {
-            m_shader_type = SHADERTYPE_SPLATTING;
             node->get("splatting-texture-1", &m_sampler_path[2]);
             node->get("splatting-texture-2", &m_sampler_path[3]);
             node->get("splatting-texture-3", &m_sampler_path[4]);
@@ -244,7 +210,6 @@ Material::Material(const XMLNode *node, bool deprecated)
         if (b)
         {
             m_shader_name = "alphablend";
-            m_shader_type = SHADERTYPE_ADDITIVE;
         }
 
         b = false;
@@ -252,7 +217,6 @@ Material::Material(const XMLNode *node, bool deprecated)
         if (b)
         {
             m_shader_name = "alphatest";
-            m_shader_type = SHADERTYPE_ALPHA_TEST;
         }
 
         //node->get("lightmap", &m_lightmap);
@@ -262,7 +226,6 @@ Material::Material(const XMLNode *node, bool deprecated)
         if (b)
         {
             m_shader_name = "alphablend";
-            m_shader_type = SHADERTYPE_ALPHA_BLEND;
         }
 
         b = true;
@@ -270,36 +233,24 @@ Material::Material(const XMLNode *node, bool deprecated)
         if (!b)
         {
             m_shader_name = "unlit";
-            m_shader_type = SHADERTYPE_SOLID_UNLIT;
         }
-
-        b = false;
-        node->get("smooth-reflection", &b);
-        if (b)
-            m_shader_type = SHADERTYPE_SPHERE_MAP;
-
-
         if (node->get("compositing", &s))
         {
             if (s == "blend")
             {
                 m_shader_name = "alphablend";
-                m_shader_type = SHADERTYPE_ALPHA_BLEND;
             }
             else if (s == "test")
             {
                 m_shader_name = "alphatest";
-                m_shader_type = SHADERTYPE_ALPHA_TEST;
             }
             else if (s == "additive")
             {
                 m_shader_name = "additive";
-                m_shader_type = SHADERTYPE_ADDITIVE;
             }
             else if (s == "coverage")
             {
                 m_shader_name = "alphatest";
-                m_shader_type = SHADERTYPE_ALPHA_TEST;
             }
             else if (s != "none")
                 Log::warn("material", "Unknown compositing mode '%s'", s.c_str());
@@ -308,26 +259,12 @@ Material::Material(const XMLNode *node, bool deprecated)
         s = "";
         node->get("graphical-effect", &s);
 
-        if (s == "grass")
+        if (s == "normal_map")
         {
-            m_shader_type = SHADERTYPE_VEGETATION;
-        }
-        else if (s == "water_shader")
-        {
-            m_shader_type = SHADERTYPE_WATER;
-        }
-        else if (s == "normal_map")
-        {
-            m_shader_type = SHADERTYPE_SOLID;
             node->get("normal-map", &normal_map_tex);
-        }
-        else if (s == "spheremap")
-        {
-            m_shader_type = SHADERTYPE_SPHERE_MAP;
         }
         else if (s == "splatting")
         {
-            m_shader_type = SHADERTYPE_SPLATTING;
             node->get("splatting-texture-1", &m_sampler_path[2]);
             node->get("splatting-texture-2", &m_sampler_path[3]);
             node->get("splatting-texture-3", &m_sampler_path[4]);
@@ -358,21 +295,6 @@ Material::Material(const XMLNode *node, bool deprecated)
                     "Could not find normal map image in materials.xml");
             }
         }
-
-        bool sphere_map = false;
-        node->get("sphere", &sphere_map);
-        if (sphere_map)
-        {
-            m_shader_type = SHADERTYPE_SPHERE_MAP;
-        }
-
-        bool water_shader = false;
-        node->get("water-shader", &water_shader);
-        if (water_shader)
-        {
-            m_shader_type = SHADERTYPE_WATER;
-        }
-
         // ---- End backwards compatibility
     }
 
@@ -578,7 +500,6 @@ void Material::init()
 {
     m_texture                   = NULL;
     m_clamp_tex                 = 0;
-    m_shader_type               = SHADERTYPE_SOLID;
     m_high_tire_adhesion        = false;
     m_below_surface             = false;
     m_falling_effect            = false;
@@ -897,7 +818,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     {
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
     }
-    else if (m_shader_name == "alphablend")
+    else if (m_shader_name == "alphablend" || m_shader_name == "displace")
     {
         // EMT_TRANSPARENT_ALPHA_CHANNEL doesn't include vertex color alpha into
         // account, which messes up fading in/out effects. So we use the more
@@ -938,7 +859,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 #endif
     }
 
-    if (m_shader_name == "alphablend" || m_shader_name == "additive")
+    if (isTransparent())
     {
         m->ZWriteEnable = false;
     }

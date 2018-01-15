@@ -1015,35 +1015,15 @@ void IrrDriver::setAllMaterialFlags(scene::IMesh *mesh) const
     {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
         video::SMaterial &irr_material = mb->getMaterial();
-
-        // special case : for splatting, the main material is on layer 1.
-        // it was done this way to provide a fallback for computers
-        // where shaders are not supported
-        video::ITexture* t2 = irr_material.getTexture(1);
-        bool is_splatting = false;
-        if (t2)
+        video::ITexture* t = irr_material.getTexture(0);
+        if (t)
         {
-            Material* mat = material_manager->getMaterialFor(t2, mb);
-            if (mat != NULL && mat->getShaderType() == Material::SHADERTYPE_SPLATTING)
-            {
-                material_manager->setAllMaterialFlags(t2, mb);
-                is_splatting = true;
-            }
+            material_manager->setAllMaterialFlags(t, mb);
         }
-
-        if (!is_splatting)
+        else
         {
-            video::ITexture* t = irr_material.getTexture(0);
-            if (t)
-            {
-                material_manager->setAllMaterialFlags(t, mb);
-            }
-            else
-            {
-                material_manager->setAllUntexturedMaterialFlags(mb);
-            }
+            material_manager->setAllUntexturedMaterialFlags(mb);
         }
-
     }  // for i<getMeshBufferCount()
 }   // setAllMaterialFlags
 
@@ -1209,17 +1189,17 @@ scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
         /*strip_path*/full_path, /*install*/false);
 
     video::ITexture* tex = m->getTexture(true/*srgb*/,
-        m->getShaderType() == Material::SHADERTYPE_ADDITIVE ||
-        m->getShaderType() == Material::SHADERTYPE_ALPHA_BLEND ?
+        m->getShaderName() == "additive" ||
+        m->getShaderName() == "alphablend" ?
         true : false/*premul_alpha*/);
 
     assert(node->getMaterialCount() > 0);
     node->setMaterialTexture(0, tex);
-    if (!(m->getShaderType() == Material::SHADERTYPE_ADDITIVE ||
-        m->getShaderType() == Material::SHADERTYPE_ALPHA_BLEND))
+    if (!(m->getShaderName() == "additive" ||
+        m->getShaderName() == "alphablend"))
     {
         // Alpha test for billboard otherwise
-        m->setShaderType(Material::SHADERTYPE_ALPHA_TEST);
+        m->setShaderName("alphatest");
     }
     m->setMaterialProperties(&(node->getMaterial(0)), NULL);
     return node;
@@ -1928,16 +1908,6 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
 
     return false;
 }   // OnEvent
-
-// ----------------------------------------------------------------------------
-bool IrrDriver::supportsSplatting()
-{
-#ifndef SERVER_ONLY
-    return CVS->isGLSL();
-#else
-    return false;
-#endif
-}   // supportsSplatting
 
 // ----------------------------------------------------------------------------
 scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,

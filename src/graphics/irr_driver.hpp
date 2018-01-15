@@ -289,7 +289,6 @@ public:
     core::position2di     getMouseLocation();
 
     void                  printRenderStats();
-    bool                  supportsSplatting();
     void                  requestScreenshot();
     class GPUTimer        &getGPUTimer(unsigned);
 
