@@ -139,8 +139,11 @@ float History::updateReplayAndGetDT(float world_time, float dt)
     // not the recorded time steps.
     if (NetworkConfig::get()->isNetworking())
     {
+        // If the event time is greater than world_time+0.5*dt, then it is
+        // closer to the next timestep. So we only replay events till 
+        // world_time + 0.5f
         while (m_event_index < m_all_input_events.size() &&
-            m_all_input_events[m_event_index].m_time <= world_time+dt)
+            m_all_input_events[m_event_index].m_time <= world_time+0.5f*dt)
         {
             const InputEvent &ie = m_all_input_events[m_event_index];
             AbstractKart *kart = world->getKart(ie.m_kart_index);
