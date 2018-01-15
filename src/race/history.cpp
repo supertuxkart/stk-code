@@ -87,6 +87,7 @@ void History::addEvent(int kart_id, PlayerAction pa, int value)
     // The event is added before m_current is increased. So in order to
     // save the right index for this event, we need to use m_current+1.
     ie.m_index      = m_current+1;
+    ie.m_time       = World::getWorld()->getTime();
     ie.m_action     = pa;
     ie.m_value      = value;
     ie.m_kart_index = kart_id;
@@ -131,72 +132,85 @@ void History::updateSaving(float dt)
  */
 float History::updateReplayAndGetDT(float world_time, float dt)
 {
-    if (m_history_time > world_time && NetworkConfig::get()->isNetworking())
-        return dt;
-
     World *world = World::getWorld();
-
-    // In non-networked history races, we need to do at least one timestep
-    // to get the right DT. The while loop is exited at the bottom in this
-    // case/
-    while (m_history_time < world_time + dt     ||
-           !NetworkConfig::get()->isNetworking()   )
+    // Networking
+    // ----------
+    // Networking is handled differently, it only uses the events,
+    // not the recorded time steps.
+    if (NetworkConfig::get()->isNetworking())
     {
-        m_current++;
-        if (m_current >= (int)m_all_deltas.size())
+        while (m_event_index < m_all_input_events.size() &&
+            m_all_input_events[m_event_index].m_time <= world_time+dt)
         {
-            Log::info("History", "Replay finished");
-            m_current      = 0;
-            m_history_time = 0;
-            // This is useful to use a reproducable rewind problem:
-            // replay it with history, for debugging only
+            const InputEvent &ie = m_all_input_events[m_event_index];
+            AbstractKart *kart = world->getKart(ie.m_kart_index);
+            Log::verbose("history", "time %f event-time %f action %d %d",
+                world->getTime(), ie.m_time, ie.m_action, ie.m_value);
+            kart->getController()->action(ie.m_action, ie.m_value);
+            m_event_index++;
+        }
+        return dt;
+    }
+
+    // Now handle the non-networking case
+    // ----------------------------------
+    Log::verbose("history", "Begin %f %f %f %f current %d event %d",
+        m_history_time, world_time, dt, world_time + dt,
+        m_current, m_event_index);
+
+    m_current++;
+    Log::verbose("history", "Inner %f %f %f %f current %d event %d",
+        m_history_time, world_time, dt, world_time + dt,
+        m_current, m_event_index);
+
+    // Check if we have reached the end of the buffer
+    if (m_current >= (int)m_all_deltas.size())
+    {
+        Log::info("History", "Replay finished");
+        m_current = 0;
+        m_history_time = 0;
+        // This is useful to use a reproducable rewind problem:
+        // replay it with history, for debugging only
 #undef DO_REWIND_AT_END_OF_HISTORY
 #ifdef DO_REWIND_AT_END_OF_HISTORY
-            RewindManager::get()->rewindTo(5.0f);
-            exit(-1);
+        RewindManager::get()->rewindTo(5.0f);
+        exit(-1);
 #else
             // Note that for physics replay all physics parameters
             // need to be reset, e.g. velocity, ...
-            world->reset();
+        world->reset();
 #endif
-        }
-        if (m_replay_mode == HISTORY_POSITION)
+    }
+    if (m_replay_mode == HISTORY_POSITION)
+    {
+        unsigned int num_karts = world->getNumKarts();
+        for (unsigned k = 0; k < num_karts; k++)
         {
-            unsigned int num_karts = world->getNumKarts();
-            for (unsigned k = 0; k < num_karts; k++)
-            {
-                AbstractKart *kart = world->getKart(k);
-                unsigned int index = m_current*num_karts + k;
-                kart->setXYZ(m_all_xyz[index]);
-                kart->setRotation(m_all_rotations[index]);
-            }
-        }
-        else   // HISTORY_PHYSICS
+            AbstractKart *kart = world->getKart(k);
+            unsigned int index = m_current*num_karts + k;
+            kart->setXYZ(m_all_xyz[index]);
+            kart->setRotation(m_all_rotations[index]);
+        }   // for k < karts
+    }   // if HISTORY_POSITION
+    else   // HISTORY_PHYSICS
+    {
+        while (m_event_index < m_all_input_events.size() &&
+            m_all_input_events[m_event_index].m_index == m_current)
         {
-            while (m_event_index < m_all_input_events.size() &&
-                m_all_input_events[m_event_index].m_index == m_current)
-            {
-                const InputEvent &ie = m_all_input_events[m_event_index];
-                AbstractKart *kart = world->getKart(ie.m_kart_index);
-                kart->getController()->action(ie.m_action, ie.m_value);
-                m_event_index++;
-            }
+            const InputEvent &ie = m_all_input_events[m_event_index];
+            AbstractKart *kart = world->getKart(ie.m_kart_index);
+            Log::verbose("history", "time %f event-time %f action %d %d",
+                world->getTime(), ie.m_time, ie.m_action, ie.m_value);
+            kart->getController()->action(ie.m_action, ie.m_value);
+            m_event_index++;
+        }
 
-            //kart->getControls().set(m_all_controls[index]);
-        }   // if HISTORY_PHYSICS
 
         if (World::getWorld()->isRacePhase())
             m_history_time += m_all_deltas[m_current];
-
-        // If this is not networked, exit the loop after one iteration
-        // and return the new dt
-        if(!NetworkConfig::get()->isNetworking())
-            return m_all_deltas[m_current];
-
     }
+    return m_all_deltas[m_current];
 
-    // In network mode, don't adjust dt, just return the input value
-    return dt;
 }   // updateReplayAndGetDT
 
 //-----------------------------------------------------------------------------
@@ -277,10 +291,11 @@ void History::Save()
         fprintf(fd, "%d\n", count);
         for (int k = 0; k < count; k++)
         {
-            fprintf(fd, "%d %d %d\n",
+            fprintf(fd, "%d %d %d %12.9f\n",
                     m_all_input_events[event_index].m_kart_index,
                     m_all_input_events[event_index].m_action,
-                    m_all_input_events[event_index].m_value);
+                    m_all_input_events[event_index].m_value,
+                    m_all_input_events[event_index].m_time);
             event_index++;
         }
         index=(index+1)%m_size;
@@ -421,8 +436,8 @@ void History::Load()
             fgets(s, 1023, fd);
             InputEvent ie;
             ie.m_index = i;
-            if (sscanf(s, "%d %d %d\n", &ie.m_kart_index, &ie.m_action,
-                &ie.m_value) != 3)
+            if (sscanf(s, "%d %d %d %f\n", &ie.m_kart_index, &ie.m_action,
+                       &ie.m_value, &ie.m_time)                           != 4)
             {
                 Log::warn("History", "Problems reading event: '%s'", s);
             }
@@ -431,7 +446,6 @@ void History::Load()
     }   // for i
     RewindManager::setEnable(rewind_manager_was_enabled);
 
-    fprintf(fd, "History file end.\n");
     fclose(fd);
 }   // Load
 

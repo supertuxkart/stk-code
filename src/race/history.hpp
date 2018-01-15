@@ -89,6 +89,8 @@ private:
     {
         /** Index at which the even happened. */
         int m_index;
+        /* Time at which this event occurred. */
+        float m_time;
         /** For which kart the event was. */
         int m_kart_index;
         /** Which action it was. */
