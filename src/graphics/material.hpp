@@ -244,6 +244,8 @@ public:
      */
     float getColorizationFactor () const { return m_colorization_factor;   }
     // ------------------------------------------------------------------------
+    bool hasRandomHue() const            { return !m_hue_settings.empty(); }
+    // ------------------------------------------------------------------------
     /** Returns a random hue when colorized.
      */
     float getRandomHue()

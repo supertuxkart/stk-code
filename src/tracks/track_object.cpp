@@ -76,7 +76,6 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
     m_animator        = NULL;
     m_physical_object = NULL;
     m_parent_library  = NULL;
-    m_render_info     = NULL;
     m_interaction     = interaction;
     m_presentation    = presentation;
     m_is_driveable    = false;
@@ -108,7 +107,6 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     m_init_xyz   = core::vector3df(0,0,0);
     m_init_hpr   = core::vector3df(0,0,0);
     m_init_scale = core::vector3df(1,1,1);
-    m_render_info = NULL;
     m_enabled    = true;
     m_initially_visible = false;
     m_presentation = NULL;
@@ -214,7 +212,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
                         std::vector<Material*> mbs = mb->getAllSTKMaterials();
                         for (Material* m : mbs)
                         {
-                            if (m->isColorizable())
+                            if (m->isColorizable() && m->hasRandomHue())
                             {
                                 colorized = m;
                                 break;
@@ -242,7 +240,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
                         std::vector<Material*> mbs = mb->getAllSTKMaterials();
                         for (Material* m : mbs)
                         {
-                            if (m->isColorizable())
+                            if (m->isColorizable() && m->hasRandomHue())
                             {
                                 colorized = m;
                                 break;
@@ -259,8 +257,11 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
             // If at least one material is colorizable, add RenderInfo for it
             if (colorized != NULL)
             {
-                m_render_info = std::make_shared<RenderInfo>();
-                m_render_info->setHue(colorized->getRandomHue());
+                const float hue = colorized->getRandomHue();
+                if (hue > 0.0f)
+                {
+                    m_render_info = std::make_shared<RenderInfo>(hue);
+                }
             }
         }
 #endif
