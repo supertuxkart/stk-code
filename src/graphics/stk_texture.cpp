@@ -18,6 +18,7 @@
 #include "graphics/stk_texture.hpp"
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/graphics_restrictions.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "modes/profile_world.hpp"
@@ -235,11 +236,18 @@ video::IImage* STKTexture::resizeImage(video::IImage* orig_img,
 #ifndef SERVER_ONLY
     if (image == NULL)
         assert(orig_size && orig_size->Width > 0 && orig_size->Height > 0);
+        
+    video::IVideoDriver* driver = irr_driver->getVideoDriver();
+        
     core::dimension2du img_size = image ? image->getDimension() : *orig_size;
-    core::dimension2du tex_size = img_size.getOptimalSize
-        (!irr_driver->getVideoDriver()->queryFeature(video::EVDF_TEXTURE_NPOT));
-    const core::dimension2du& max_size = irr_driver->getVideoDriver()
-        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
+    
+    bool has_npot = !GraphicsRestrictions::isDisabled(
+                                GraphicsRestrictions::GR_NPOT_TEXTURES) && 
+                                driver->queryFeature(video::EVDF_TEXTURE_NPOT);
+                                
+    core::dimension2du tex_size = img_size.getOptimalSize(!has_npot);
+    const core::dimension2du& max_size = driver->getDriverAttributes().
+                                  getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
 
     if (tex_size.Width > max_size.Width)
         tex_size.Width = max_size.Width;
@@ -257,8 +265,8 @@ video::IImage* STKTexture::resizeImage(video::IImage* orig_img,
     if (image->getColorFormat() != video::ECF_A8R8G8B8 ||
         tex_size != img_size)
     {
-        video::IImage* new_texture = irr_driver
-            ->getVideoDriver()->createImage(video::ECF_A8R8G8B8, tex_size);
+        video::IImage* new_texture = driver->createImage(video::ECF_A8R8G8B8, 
+                                                         tex_size);
         if (tex_size != img_size)
             image->copyToScaling(new_texture);
         else
