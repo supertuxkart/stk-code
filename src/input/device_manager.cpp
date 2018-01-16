@@ -388,6 +388,13 @@ InputDevice *DeviceManager::mapGamepadInput(Input::InputType type,
 
     if (gPad != NULL)
     {
+        // Ignore deadzone events if this isn't the latest used device
+        if (m_latest_used_device != gPad && *value > -250 && *value < 250 /* TODO: use deadzone config */)
+        {
+            *player = NULL;
+            return NULL;
+        }
+
         if (gPad->processAndMapInput(type, button_id, mode, action, value))
         {
             if (m_single_player != NULL)
