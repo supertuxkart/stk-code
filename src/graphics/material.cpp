@@ -862,6 +862,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     if (isTransparent())
     {
         m->ZWriteEnable = false;
+        m->BackfaceCulling = false;
     }
 
 #ifdef DEBUG
