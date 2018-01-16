@@ -353,7 +353,7 @@ void SPMeshBuffer::recreateVAO(unsigned i)
     glVertexAttribDivisorARB(10, 1);
     // Texture translation
     glEnableVertexAttribArray(11);
-    glVertexAttribPointer(11, 2, GL_HALF_FLOAT, GL_FALSE, 32, (void*)24);
+    glVertexAttribPointer(11, 2, GL_SHORT, GL_TRUE, 32, (void*)24);
     glVertexAttribDivisorARB(11, 1);
     // Misc data (skinning offset and hue change)
     glEnableVertexAttribArray(12);
