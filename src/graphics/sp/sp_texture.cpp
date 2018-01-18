@@ -121,6 +121,7 @@ std::shared_ptr<video::IImage> SPTexture::getImageFromPath
     if (img_loader == NULL)
     {
         Log::error("SPTexture", "No image loader for %s", path.c_str());
+        return NULL;
     }
 
     io::IReadFile* file = irr::io::createReadFile(path.c_str());
@@ -440,17 +441,19 @@ bool SPTexture::threadedLoad()
     }
 
     std::shared_ptr<video::IImage> image = getTextureImage();
+    if (!image)
+    {
+        return true;
+    }
     std::shared_ptr<video::IImage> mask = getMask(image->getDimension());
-    if (mask && image)
+    if (mask)
     {
         applyMask(image.get(), mask.get());
     }
     std::shared_ptr<video::IImage> mipmaps;
 
-    if (!m_cache_directory.empty() &&
-        CVS->isTextureCompressionEnabled() && image &&
-        image->getDimension().Width >= 4 &&
-        image->getDimension().Height >= 4)
+    if (!m_cache_directory.empty() && CVS->isTextureCompressionEnabled() &&
+        image->getDimension().Width >= 4 && image->getDimension().Height >= 4)
     {
         auto r = compressTexture(image);
         SPTextureManager::get()->increaseGLCommandFunctionCount(1);
@@ -469,8 +472,7 @@ bool SPTexture::threadedLoad()
     else
     {
 #ifndef USE_GLES2
-        if (UserConfigParams::m_hq_mipmap && image &&
-            image->getDimension().Width > 1 &&
+        if (UserConfigParams::m_hq_mipmap && image->getDimension().Width > 1 &&
             image->getDimension().Height > 1)
         {
             std::vector<std::pair<core::dimension2du, unsigned> >
