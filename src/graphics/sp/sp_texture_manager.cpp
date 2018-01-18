@@ -169,14 +169,68 @@ void SPTextureManager::removeUnusedTextures()
 }   // removeUnusedTextures
 
 // ----------------------------------------------------------------------------
-void SPTextureManager::dumpAllTexture()
+void SPTextureManager::dumpAllTextures()
 {
     for (auto p : m_textures)
     {
-        Log::info("STKTexManager", "%s size: %0.2fK", p.first.c_str(),
-            (p.second->getWidth() * p.second->getHeight() * 4) / 1024.0f);
+        Log::info("SPTextureManager", "%s", p.first.c_str());
     }
-}   // dumpAllTexture
+}   // dumpAllTextures
+
+// ----------------------------------------------------------------------------
+core::stringw SPTextureManager::reloadTexture(const core::stringw& name)
+{
+    core::stringw result;
+#ifndef SERVER_ONLY
+    if (name.empty())
+    {
+        for (auto p : m_textures)
+        {
+            if (p.second->getPath().empty() ||
+                p.second->getPath() == "unicolor_white")
+            {
+                continue;
+            }
+            addThreadedFunction(std::bind(&SPTexture::threadedLoad, p.second));
+            Log::info("SPTextureManager", "%s reloaded",
+                p.second->getPath().c_str());
+        }
+        return L"All textures reloaded.";
+    }
+
+    core::stringw list = name;
+    list.make_lower().replace(L'\u005C', L'\u002F');
+    std::vector<std::string> names =
+        StringUtils::split(StringUtils::wideToUtf8(list), ';');
+    for (const std::string& fname : names)
+    {
+        for (auto p : m_textures)
+        {
+            if (p.second->getPath().empty() ||
+                p.second->getPath() == "unicolor_white")
+            {
+                continue;
+            }
+            std::string tex_path =
+                StringUtils::toLowerCase(p.second->getPath());
+            std::string tex_name = StringUtils::getBasename(tex_path);
+            if (fname == tex_name || fname == tex_path)
+            {
+                addThreadedFunction(std::bind(&SPTexture::threadedLoad,
+                    p.second));
+                result += tex_name.c_str();
+                result += L" ";
+                break;
+            }
+        }
+    }
+    if (result.empty())
+    {
+        return L"Texture(s) not found!";
+    }
+#endif   // !SERVER_ONLY
+    return result + "reloaded.";
+}   // reloadTexture
 
 // ----------------------------------------------------------------------------
 }

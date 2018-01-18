@@ -31,10 +31,11 @@
 #include <list>
 #include <memory>
 #include <mutex>
-#include <set>
 #include <string>
 #include <thread>
 #include <unordered_map>
+
+#include "irrString.h"
 
 class Material;
 
@@ -108,9 +109,9 @@ public:
                                           Material* m, bool undo_srgb,
                                           const std::string& container_id);
     // ------------------------------------------------------------------------
-    int dumpTextureUsage();
+    void dumpAllTextures();
     // ------------------------------------------------------------------------
-    void dumpAllTexture();
+    irr::core::stringw reloadTexture(const irr::core::stringw& name);
 
 };
 

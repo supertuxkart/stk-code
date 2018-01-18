@@ -29,7 +29,6 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
 #include "graphics/shader.hpp"
-#include "graphics/stk_tex_manager.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -697,20 +696,19 @@ bool handleContextMenuAction(s32 cmd_id)
         new GeneralTextFieldDialog(
             L"Enter the texture filename(s) (separate names by ;)"
             " to be reloaded (empty to reload all)\n"
-            "Press tus; for texture usage stats (shown in console)", []
+            "Press tus; for showing all mesh textures (shown in console)", []
             (const irr::core::stringw& text) {},
             [] (GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
             {
 #ifndef SERVER_ONLY
                 core::stringw t = tb->getText();
-                STKTexManager* stktm = STKTexManager::getInstance();
+                SP::SPTextureManager* sptm = SP::SPTextureManager::get();
                 if (t == "tus;")
                 {
-                    SP::SPTextureManager::get()->dumpAllTexture();
-                    stktm->dumpTextureUsage();
+                    sptm->dumpAllTextures();
                     return false;
                 }
-                lw->setText(stktm->reloadTexture(t), true);
+                lw->setText(sptm->reloadTexture(t), true);
 #endif
                 // Don't close the dialog after each run
                 return false;
@@ -888,7 +886,7 @@ bool handleStaticAction(int key)
     }
     else if (key == IRR_KEY_F3)
     {
-        STKTexManager::getInstance()->reloadTexture("");
+        SP::SPTextureManager::get()->reloadTexture("");
         return true;
     }
     // TODO: create more keyboard shortcuts

@@ -83,11 +83,7 @@ public:
     // ------------------------------------------------------------------------
     void removeTexture(STKTexture* texture, bool remove_all = false);
     // ------------------------------------------------------------------------
-    void dumpAllTexture(bool mesh_texture);
-    // ------------------------------------------------------------------------
     int dumpTextureUsage();
-    // ------------------------------------------------------------------------
-    irr::core::stringw reloadTexture(const irr::core::stringw& name);
     // ------------------------------------------------------------------------
     /** Returns the currently defined texture error message, which is used
      *  by event_handler.cpp to print additional info about irrlicht
