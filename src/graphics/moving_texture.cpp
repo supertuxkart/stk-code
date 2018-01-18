@@ -33,6 +33,7 @@ MovingTexture::MovingTexture(core::matrix4 *matrix, const XMLNode &node)
     m_x = 0.0f;
     m_y = 0.0f;
     m_count = 0.0f;
+    m_sp_tm = NULL;
 
     if (m_matrix)
     {
@@ -49,8 +50,6 @@ MovingTexture::MovingTexture(core::matrix4 *matrix, const XMLNode &node)
     node.get("dt", &m_dt);
 
     node.get("animByStep", &m_isAnimatedByStep);
-    m_sp_tm[0].reset(new float(0.0f));
-    m_sp_tm[1].reset(new float(0.0f));
 }   // MovingTexture
 
 //-----------------------------------------------------------------------------
@@ -71,8 +70,8 @@ MovingTexture::MovingTexture(core::matrix4 *matrix, float dx, float dy)
     core::vector3df v = m_matrix->getTranslation();
     m_x = v.X;
     m_y = v.Y;
-    m_sp_tm[0].reset(new float(0.0f));
-    m_sp_tm[1].reset(new float(0.0f));
+    m_count = 0.0f;
+    m_sp_tm = NULL;
 }   // MovingTexture
 
 //-----------------------------------------------------------------------------
@@ -85,9 +84,9 @@ MovingTexture::MovingTexture(float dx, float dy)
     m_dy     = dy;
     m_x      = 0;
     m_y      = 0;
+    m_count = 0.0f;
     m_matrix = NULL;
-    m_sp_tm[0].reset(new float(0.0f));
-    m_sp_tm[1].reset(new float(0.0f));
+    m_sp_tm = NULL;
 }   // MovingTexture
 
 //-----------------------------------------------------------------------------
@@ -103,11 +102,14 @@ MovingTexture::~MovingTexture()
 void MovingTexture::reset()
 {
     m_x = m_y = 0;
-    *m_sp_tm[0] = 0;
-    *m_sp_tm[1] = 0;
     if (m_matrix)
     {
         m_matrix->setTextureTranslate(m_x, m_y);
+    }
+    else if (m_sp_tm)
+    {
+        m_sp_tm[0] = 0.0f;
+        m_sp_tm[1] = 0.0f;
     }
 }   // reset
 
@@ -134,10 +136,10 @@ void MovingTexture::update(float dt)
             {
                 m_matrix->setTextureTranslate(m_x, m_y);
             }
-            else
+            else if (m_sp_tm)
             {
-                *m_sp_tm[0] = m_x;
-                *m_sp_tm[1] = m_y;
+                m_sp_tm[0] = m_x;
+                m_sp_tm[1] = m_y;
             }
         }
     }
@@ -151,10 +153,10 @@ void MovingTexture::update(float dt)
         {
             m_matrix->setTextureTranslate(m_x, m_y);
         }
-        else
+        else if (m_sp_tm)
         {
-            *m_sp_tm[0] = m_x;
-            *m_sp_tm[1] = m_y;
+            m_sp_tm[0] = m_x;
+            m_sp_tm[1] = m_y;
         }
     }
 }   // update

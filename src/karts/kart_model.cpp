@@ -1135,13 +1135,8 @@ void KartModel::update(float dt, float distance, float steer, float speed,
                     for (unsigned i = 0; i < spmn->getSPM()->getMeshBufferCount(); i++)
                     {
                         auto& ret = spmn->getTextureMatrix(i);
-                        if (!ret[0] || !ret[1])
-                        {
-                            ret[0].reset(new float);
-                            ret[1].reset(new float);
-                        }
-                        *ret[0] = obj.m_texture_cur_offset.X;
-                        *ret[1] = obj.m_texture_cur_offset.Y;
+                        ret[0] = obj.m_texture_cur_offset.X;
+                        ret[1] = obj.m_texture_cur_offset.Y;
                     }
                 }
                 else

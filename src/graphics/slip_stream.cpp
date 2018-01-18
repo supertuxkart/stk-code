@@ -59,7 +59,7 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
         m_node->setVisible(false);
         SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(m_node);
         assert(spmn);
-        spmn->setTextureMatrix(0, getSPTM());
+        setSPTM(spmn->getTextureMatrix(0).data());
     }
 #endif
 

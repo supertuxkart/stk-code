@@ -88,7 +88,8 @@ void SPMeshNode::setMesh(irr::scene::IAnimatedMesh* mesh)
     cleanRenderInfo();
     if (m_mesh)
     {
-        m_texture_matrices.resize(m_mesh->getMeshBufferCount());
+        m_texture_matrices.resize(m_mesh->getMeshBufferCount(),
+            {{ 0.0f, 0.0f }});
         if (!m_mesh->isStatic())
         {
 #ifndef SERVER_ONLY

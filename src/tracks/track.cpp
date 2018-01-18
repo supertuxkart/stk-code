@@ -1480,7 +1480,7 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
                         spmb->enableTextureMatrix(j);
                         MovingTexture* mt =
                             new MovingTexture(NULL, *texture_node);
-                        spmn->setTextureMatrix(i, mt->getSPTM());
+                        mt->setSPTM(spmn->getTextureMatrix(i).data());
                         m_animated_textures.push_back(mt);
                         // For spm only 1 texture matrix per mesh buffer is
                         // possible
