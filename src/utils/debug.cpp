@@ -886,7 +886,9 @@ bool handleStaticAction(int key)
     }
     else if (key == IRR_KEY_F3)
     {
+#ifndef SERVER_ONLY
         SP::SPTextureManager::get()->reloadTexture("");
+#endif
         return true;
     }
     // TODO: create more keyboard shortcuts
