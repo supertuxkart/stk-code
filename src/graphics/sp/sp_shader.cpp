@@ -47,11 +47,8 @@ SPShader::~SPShader()
         {
             glDeleteProgram(m_program[rp]);
         }
-        for (auto& p : m_uniforms[rp])
-        {
-            delete p.second;
-        }
     }
+    unload();
 #endif
 }   // ~SPShader
 
@@ -60,12 +57,12 @@ void SPShader::addShaderFile(const std::string& name, GLint shader_type,
                              RenderPass rp)
 {
 #ifndef SERVER_ONLY
-    auto shader_id = ShaderFilesManager::getInstance()
+    auto shader_file = ShaderFilesManager::getInstance()
         ->getShaderFile(name, shader_type);
-    if (shader_id)
+    if (shader_file)
     {
-        m_shaders.insert(shader_id);
-        glAttachShader(m_program[rp], *shader_id);
+        m_shader_files.push_back(shader_file);
+        glAttachShader(m_program[rp], *shader_file);
     }
 #endif
 }   // addShaderFile
@@ -92,7 +89,7 @@ void SPShader::linkShaderFiles(RenderPass rp)
     GLuint shaders[10] = {};
     GLsizei count = 0;
     glGetAttachedShaders(m_program[rp], 10, &count, shaders);
-    for (unsigned i = 0; i < count; i++)
+    for (unsigned i = 0; i < (unsigned)count; i++)
     {
         glDetachShader(m_program[rp], shaders[i]);
     }
@@ -251,5 +248,24 @@ SPUniformAssigner* SPShader::getUniformAssigner(const std::string& name,
     }
     return ret->second;
 }   // getUniformAssigner
+
+// ----------------------------------------------------------------------------
+void SPShader::unload()
+{
+    for (unsigned rp = RP_1ST; rp < RP_COUNT; rp++)
+    {
+        for (auto& p : m_uniforms[rp])
+        {
+            delete p.second;
+        }
+        m_uniforms[rp].clear();
+        m_custom_prefilled_getter[rp].clear();
+        m_prefilled_samplers[rp].clear();
+        m_samplers[rp].clear();
+        m_shader_files.clear();
+        m_use_function[rp] = nullptr;
+        m_unuse_function[rp] = nullptr;
+    }
+}   // unload
 
 }

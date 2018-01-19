@@ -29,7 +29,6 @@
 #include <ostream>
 #include <memory>
 #include <string>
-#include <unordered_set>
 #include <unordered_map>
 #include <vector>
 
@@ -55,8 +54,8 @@ enum SamplerType: unsigned int
 enum RenderPass: unsigned int
 {
     RP_1ST = 0,
-    RP_2ND,
     RP_SHADOW,
+    RP_RESERVED,
     RP_COUNT
 };
 
@@ -66,10 +65,10 @@ inline std::ostream& operator<<(std::ostream& os, const RenderPass& rp)
     {
         case RP_1ST:
             return os << "first pass";
-        case RP_2ND:
-            return os << "second pass";
         case RP_SHADOW:
             return os << "shadow pass";
+        case RP_RESERVED:
+            return os << "reserved pass";
         default:
             return os;
     }
@@ -82,7 +81,7 @@ class SPShader : public NoCopy, public SPPerObjectUniform
 private:
     std::string m_name;
 
-    std::unordered_set<std::shared_ptr<GLuint> > m_shaders;
+    std::vector<std::shared_ptr<GLuint> > m_shader_files;
 
     GLuint m_program[RP_COUNT];
 
@@ -91,13 +90,14 @@ private:
     std::vector<std::tuple<unsigned, std::string, SamplerType,
         GLuint> >m_prefilled_samplers[RP_COUNT];
 
-    std::unordered_map<std::string, SPUniformAssigner*>
-        m_uniforms[RP_COUNT];
+    std::unordered_map<std::string, SPUniformAssigner*> m_uniforms[RP_COUNT];
 
     std::unordered_map<std::string, std::function<GLuint()> >
         m_custom_prefilled_getter[RP_COUNT];
 
     std::function<void()> m_use_function[RP_COUNT], m_unuse_function[RP_COUNT];
+
+    std::function<void(SPShader*)> m_init_function;
 
     const int m_drawing_priority;
 
@@ -107,7 +107,8 @@ private:
 
 public:
     // ------------------------------------------------------------------------
-    SPShader(const std::string& name, unsigned pass_count = 3,
+    SPShader(const std::string& name,
+             const std::array<int, 3>& pass = {{ 0, 1, -1 }},
              bool transparent_shader = false, int drawing_priority = 0,
              bool use_alpha_channel = false)
            : m_name(name), m_drawing_priority(drawing_priority),
@@ -116,9 +117,12 @@ public:
     {
         memset(m_program, 0, 12);
 #ifndef SERVER_ONLY
-        for (unsigned rp = RP_1ST; rp < pass_count; rp++)
+        for (int rp : pass)
         {
-            m_program[rp] = glCreateProgram();
+            if (rp > -1)
+            {
+                m_program[rp] = glCreateProgram();
+            }
         }
 #endif
     }
@@ -174,12 +178,6 @@ public:
         block_index = glGetUniformBlockIndex(m_program[rp], "SPFogData");
         if (block_index != GL_INVALID_INDEX)
             glUniformBlockBinding(m_program[rp], block_index, 2);
-#ifndef USE_GLES2
-        // Assign framebuffer output
-        glBindFragDataLocation(m_program[rp], 0, "o_diffuse_color");
-        glBindFragDataLocation(m_program[rp], 1, "o_normal_depth");
-        glBindFragDataLocation(m_program[rp], 2, "o_gloss_map");
-#endif
 #endif
     }
     // ------------------------------------------------------------------------
@@ -213,6 +211,31 @@ public:
     // ------------------------------------------------------------------------
     bool samplerLess(RenderPass rp = RP_1ST) const
                                              { return m_samplers[rp].empty(); }
+    // ------------------------------------------------------------------------
+    void setInitFunction(std::function<void(SPShader*)> func)
+    {
+        m_init_function = func;
+    }
+    // ------------------------------------------------------------------------
+    void unload();
+    // ------------------------------------------------------------------------
+    void init()
+    {
+        if (!m_shader_files.empty())
+        {
+            Log::error("SPShader",
+                "Please unload the shader before (re)init.");
+            return;
+        }
+        if (m_init_function)
+        {
+            m_init_function(this);
+        }
+        else
+        {
+            Log::error("SPShader", "Missing init function.");
+        }
+    }
 
 };
 
