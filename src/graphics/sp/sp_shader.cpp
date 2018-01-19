@@ -60,13 +60,13 @@ void SPShader::addShaderFile(const std::string& name, GLint shader_type,
                              RenderPass rp)
 {
 #ifndef SERVER_ONLY
-    GLint shader_id = ShaderFilesManager::getInstance()
+    auto shader_id = ShaderFilesManager::getInstance()
         ->getShaderFile(name, shader_type);
-    glAttachShader(m_program[rp], shader_id);
-    GLint is_deleted = GL_TRUE;
-    glGetShaderiv(shader_id, GL_DELETE_STATUS, &is_deleted);
-    if (is_deleted == GL_FALSE)
-        glDeleteShader(shader_id);
+    if (shader_id)
+    {
+        m_shaders.insert(shader_id);
+        glAttachShader(m_program[rp], *shader_id);
+    }
 #endif
 }   // addShaderFile
 
@@ -87,6 +87,14 @@ void SPShader::linkShaderFiles(RenderPass rp)
         glGetProgramInfoLog(m_program[rp], info_length, NULL, error_message);
         Log::error("SPShader", error_message);
         delete[] error_message;
+    }
+    // After linking all shaders can be detached
+    GLuint shaders[10] = {};
+    GLsizei count = 0;
+    glGetAttachedShaders(m_program[rp], 10, &count, shaders);
+    for (unsigned i = 0; i < count; i++)
+    {
+        glDetachShader(m_program[rp], shaders[i]);
     }
 #endif
 }   // linkShaderFiles

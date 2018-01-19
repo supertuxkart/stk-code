@@ -248,8 +248,8 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_GRAPHICS_RELOAD_SHADERS:
 #ifndef SERVER_ONLY
         Log::info("Debug", "Reloading shaders...");
-        ShaderFilesManager::getInstance()->clean();
         ShaderBase::killShaders();
+        ShaderFilesManager::getInstance()->clearAllShaderFiles();
 #endif
         break;
     case DEBUG_GRAPHICS_RESET:

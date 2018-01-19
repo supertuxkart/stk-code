@@ -27,7 +27,9 @@
 #include <cstring>
 #include <functional>
 #include <ostream>
+#include <memory>
 #include <string>
+#include <unordered_set>
 #include <unordered_map>
 #include <vector>
 
@@ -79,6 +81,8 @@ class SPShader : public NoCopy, public SPPerObjectUniform
 {
 private:
     std::string m_name;
+
+    std::unordered_set<std::shared_ptr<GLuint> > m_shaders;
 
     GLuint m_program[RP_COUNT];
 
