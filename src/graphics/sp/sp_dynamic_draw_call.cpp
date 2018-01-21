@@ -16,10 +16,10 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
-#include "graphics/sp/sp_texture.hpp"
-#include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/material.hpp"
+#include "graphics/sp/sp_shader.hpp"
+#include "graphics/sp/sp_texture.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "utils/mini_glm.hpp"
 #include "utils/string_utils.hpp"
@@ -28,12 +28,13 @@ namespace SP
 {
 // ----------------------------------------------------------------------------
 SPDynamicDrawCall::SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt,
-                                     SPShader* shader, Material* m)
+                                     std::shared_ptr<SPShader> shader,
+                                     Material* m)
                  : SPMeshBuffer()
 {
 #ifndef SERVER_ONLY
     m_primitive_type = pt;
-    m_shader = shader;
+    m_shaders[0] = shader;
     m_stk_material[0] = std::make_tuple(0u, 0u, m);
     m_textures.resize(m_stk_material.size());
     for (unsigned j = 0; j < 6; j++)
@@ -41,7 +42,7 @@ SPDynamicDrawCall::SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt,
         m_textures[0][j] = SPTextureManager::get()->getTexture
             (std::get<2>(m_stk_material[0])->getSamplerPath(j),
             j == 0 ? std::get<2>(m_stk_material[0]) : NULL,
-            j < 2 && CVS->isDefferedEnabled(),
+            m_shaders[0] && m_shaders[0]->isSrgbForTextureLayer(j),
             std::get<2>(m_stk_material[0])->getContainerId());
     }
     m_tex_cmp[m_textures[0][0]->getPath() + m_textures[0][1]->getPath()] = 0;

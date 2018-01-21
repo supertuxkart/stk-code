@@ -44,8 +44,8 @@ SkidMarks::SkidMarks(const AbstractKart& kart, float width) : m_kart(kart)
     m_width = width;
     m_material = material_manager->getMaterialSPM("skidmarks.png", "",
         "alphablend");
-    m_shader = SP::SPShaderManager::get()->getSPShaderPtr("alphablend");
-    assert(m_shader != NULL);
+    m_shader = SP::SPShaderManager::get()->getSPShader("alphablend");
+    assert(m_shader);
     m_skid_marking = false;
 }   // SkidMark
 
@@ -200,7 +200,7 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
                                         const Vec3 &right,
                                         const Vec3 &normal,
                                         Material* material,
-                                        SP::SPShader* shader,
+                                        std::shared_ptr<SP::SPShader> shader,
                                         float z_offset,
                                         video::SColor* custom_color)
 {

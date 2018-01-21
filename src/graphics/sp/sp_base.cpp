@@ -69,8 +69,6 @@ bool sp_culling = true;
 // ----------------------------------------------------------------------------
 bool g_handle_shadow = false;
 // ----------------------------------------------------------------------------
-std::unordered_map<std::string, SPShader*> g_shaders;
-// ----------------------------------------------------------------------------
 SPShader* g_normal_visualizer = NULL;
 // ----------------------------------------------------------------------------
 SPShader* g_glow_shader = NULL;
@@ -325,13 +323,6 @@ void initSkinning()
 }   // initSkinning
 
 // ----------------------------------------------------------------------------
-void addShader(SPShader* shader)
-{
-    g_shaders[shader->getName()] = shader;
-}   // addShader
-
-
-// ----------------------------------------------------------------------------
 void loadShaders()
 {
     SPShaderManager::get()->loadSPShaders(file_manager->getShadersDir());
@@ -583,15 +574,9 @@ void init()
 void destroy()
 {
     g_dy_dc.clear();
-    for (auto& p : g_shaders)
-    {
-        delete p.second;
-    }
-    g_shaders.clear();
     SPShaderManager::destroy();
     g_glow_shader = NULL;
     g_normal_visualizer = NULL;
-
     SPTextureManager::destroy();
 
 #ifndef USE_GLES2
@@ -635,17 +620,6 @@ SPShader* getNormalVisualizer()
 {
     return g_normal_visualizer;
 }   // getNormalVisualizer
-
-// ----------------------------------------------------------------------------
-SPShader* getSPShader(const std::string& name)
-{
-    auto ret = g_shaders.find(name);
-    if (ret != g_shaders.end())
-    {
-        return ret->second;
-    }
-    return NULL;
-}   // getSPShader
 
 // ----------------------------------------------------------------------------
 inline void mathPlaneNormf(float *p)

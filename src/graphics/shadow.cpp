@@ -32,8 +32,7 @@ Shadow::Shadow(Material* shadow_mat, const AbstractKart& kart)
 {
     m_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
         (scene::EPT_TRIANGLE_STRIP,
-        SP::SPShaderManager::get()->getSPShaderPtr("alphablend"),
-        shadow_mat);
+        SP::SPShaderManager::get()->getSPShader("alphablend"), shadow_mat);
 
     m_dy_dc->getVerticesVector().resize(4);
     video::S3DVertexSkinnedMesh* v = m_dy_dc->getVerticesVector().data();

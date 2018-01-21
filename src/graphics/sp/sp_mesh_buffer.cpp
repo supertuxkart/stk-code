@@ -20,6 +20,8 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/material.hpp"
+#include "graphics/sp/sp_shader.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "race/race_manager.hpp"
 #include "utils/mini_glm.hpp"
@@ -111,17 +113,22 @@ void SPMeshBuffer::uploadGLMesh()
     }
     m_uploaded_gl = true;
 #ifndef SERVER_ONLY
+    if (!m_shaders[0])
+    {
+        Log::warn("SPMeshBuffer", "%s shader is missing",
+            std::get<2>(m_stk_material[0])->getShaderName().c_str());
+        return;
+    }
+
     m_textures.resize(m_stk_material.size());
     for (unsigned i = 0; i < m_stk_material.size(); i++)
     {
         for (unsigned j = 0; j < 6; j++)
         {
-            // Undo the effect of srgb on 0 and 1 channel of textures
-            // which is the uv textures from .spm when advanced lighting
             m_textures[i][j] = SPTextureManager::get()->getTexture
                 (std::get<2>(m_stk_material[i])->getSamplerPath(j),
                 j == 0 ? std::get<2>(m_stk_material[i]) : NULL,
-                j < 2 && CVS->isDefferedEnabled(),
+                m_shaders[0]->isSrgbForTextureLayer(j),
                 std::get<2>(m_stk_material[i])->getContainerId());
         }
         // Use .spm uv texture 1 and 2 for compare in scene manager
@@ -130,9 +137,7 @@ void SPMeshBuffer::uploadGLMesh()
     }
 
     bool use_2_uv = std::get<2>(m_stk_material[0])->use2UV();
-    bool use_tangents =
-        std::get<2>(m_stk_material[0])->getShaderName() == "normalmap" &&
-        CVS->isDefferedEnabled();
+    bool use_tangents = m_shaders[0]->useTangents();
     const unsigned pitch = 48 - (use_tangents ? 0 : 4) - (use_2_uv ? 0 : 4) -
         (m_skinned ? 0 : 16);
     m_pitch = pitch;
@@ -212,10 +217,12 @@ void SPMeshBuffer::uploadGLMesh()
 void SPMeshBuffer::recreateVAO(unsigned i)
 {
 #ifndef SERVER_ONLY
+    if (!m_shaders[0])
+    {
+        return;
+    }
     bool use_2_uv = std::get<2>(m_stk_material[0])->use2UV();
-    bool use_tangents =
-        std::get<2>(m_stk_material[0])->getShaderName() == "normalmap" &&
-        CVS->isDefferedEnabled();
+    bool use_tangents = m_shaders[0]->useTangents();
     const unsigned pitch = m_pitch;
 
     size_t offset = 0;
@@ -457,5 +464,15 @@ void SPMeshBuffer::reloadTextureCompare()
         m_tex_cmp[name] = i;
     }
 }   // reloadTextureCompare
+
+// ----------------------------------------------------------------------------
+void SPMeshBuffer::setSTKMaterial(Material* m)
+{
+    m_stk_material[0] = std::make_tuple(0u, getIndexCount(), m);
+    m_shaders[0] = SPShaderManager::get()->getSPShader(
+        std::get<2>(m_stk_material[0])->getShaderName());
+    m_shaders[1] = SPShaderManager::get()->getSPShader(
+        std::get<2>(m_stk_material[0])->getShaderName() + "_skinned");
+}   // setSTKMaterial
 
 }

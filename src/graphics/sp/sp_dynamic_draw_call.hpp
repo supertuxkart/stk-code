@@ -43,8 +43,6 @@ class SPDynamicDrawCall : public SPMeshBuffer
 private:
     core::matrix4 m_trans;
 
-    SPShader* m_shader;
-
     scene::ISceneNode* m_parent = NULL;
 
     core::vector2df m_texture_trans;
@@ -65,8 +63,8 @@ private:
     bool initTextureDyDc();
 
 public:
-    SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt, SPShader* shader,
-                      Material* m);
+    SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt,
+                      std::shared_ptr<SPShader> shader, Material* m);
     // ------------------------------------------------------------------------
     ~SPDynamicDrawCall() {}
     // ------------------------------------------------------------------------
@@ -129,8 +127,6 @@ public:
     virtual void uploadGLMesh() {}
     // ------------------------------------------------------------------------
     virtual void enableTextureMatrix(unsigned mat_id) {}
-    // ------------------------------------------------------------------------
-    SPShader* getShader() const                            { return m_shader; }
     // ------------------------------------------------------------------------
     std::vector<video::S3DVertexSkinnedMesh>& getVerticesVector()
                                                          { return m_vertices; }

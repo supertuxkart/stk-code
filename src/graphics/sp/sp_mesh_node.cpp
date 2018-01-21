@@ -192,11 +192,8 @@ SPShader* SPMeshNode::getShader(unsigned mesh_buffer_id) const
 #ifndef SERVER_ONLY
     if (!m_mesh || mesh_buffer_id < m_mesh->getMeshBufferCount())
     {
-        const std::string sn = (m_shader_override.empty() ?
-            m_mesh->getSPMeshBuffer(mesh_buffer_id)->getSTKMaterial()
-            ->getShaderName() : m_shader_override) +
-            (m_animated ? "_skinned" : "");
-        SPShader* shader = SPShaderManager::get()->getSPShaderPtr(sn);
+        SPShader* shader =
+            m_mesh->getSPMeshBuffer(mesh_buffer_id)->getShader(m_animated);
         if (shader && shader->isTransparent())
         {
             // Use real transparent shader first
@@ -204,8 +201,8 @@ SPShader* SPMeshNode::getShader(unsigned mesh_buffer_id) const
         }
         if (m_first_render_info && m_first_render_info->isTransparent())
         {
-            return SPShaderManager::get()->getSPShaderPtr
-                (std::string("ghost") + (m_animated ? "_skinned" : ""));
+            return SPShaderManager::get()->getSPShader
+                (std::string("ghost") + (m_animated ? "_skinned" : "")).get();
         }
         return shader;
     }

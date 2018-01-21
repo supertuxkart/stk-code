@@ -139,11 +139,6 @@ public:
     // ------------------------------------------------------------------------
     ~SPShaderManager();
     // ------------------------------------------------------------------------
-    SPShader* getSPShaderPtr(const std::string& name)
-    {
-        return getSPShader(name).get();
-    }
-    // ------------------------------------------------------------------------
     std::shared_ptr<SPShader> getSPShader(const std::string& name)
     {
         auto ret = m_shaders.find(name);

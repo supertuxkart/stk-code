@@ -52,8 +52,6 @@ private:
 
     std::vector<std::array<float, 16> > m_skinning_matrices;
 
-    std::string m_shader_override;
-
     video::SColorf m_glow_color;
 
     std::vector<std::array<float, 2> > m_texture_matrices;
@@ -118,8 +116,6 @@ public:
     bool getAnimationState() const                       { return m_animated; }
     // ------------------------------------------------------------------------
     SPShader* getShader(unsigned mesh_buffer_id) const;
-    // ------------------------------------------------------------------------
-    void setShaderOverride(const std::string& so)   { m_shader_override = so; }
     // ------------------------------------------------------------------------
     const std::array<float, 16>* getSkinningMatrices() const 
                                          { return m_skinning_matrices.data(); }
