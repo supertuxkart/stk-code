@@ -389,7 +389,13 @@ std::string SPShaderManager::getShaderFullPath(const std::string& name)
     {
         return cur_location;
     }
-    return file_manager->getAssetChecked(FileManager::SHADER, name);
+    cur_location = file_manager->getAssetChecked(FileManager::SHADER, name);
+    if (cur_location.empty())
+    {
+        return "";
+    }
+    return file_manager->getFileSystem()->getAbsolutePath(cur_location.c_str())
+        .c_str();
 }   // getShaderFullPath
 
 // ----------------------------------------------------------------------------
@@ -533,7 +539,7 @@ void SPShaderManager::addPrefilledTexturesToShader(SPShader* s,
 void SPShaderManager::loadSPShaders(const std::string& directory_name)
 {
     std::set<std::string> shaders;
-    file_manager->listFiles(shaders, directory_name, true/*make_full_path*/);
+    file_manager->listFiles(shaders, directory_name);
     for (auto it = shaders.begin(); it != shaders.end();)
     {
         if ((*it).find("sps") == std::string::npos ||
@@ -551,10 +557,11 @@ void SPShaderManager::loadSPShaders(const std::string& directory_name)
         return;
     }
 
-    m_shader_directory = directory_name;
+    m_shader_directory = file_manager->getFileSystem()->getAbsolutePath
+        (directory_name.c_str()).c_str();
     for (const std::string& file_name : shaders)
     {
-        loadEachShader(file_name);
+        loadEachShader(m_shader_directory + file_name);
     }
     m_shader_directory = "";
 }   // loadSPShaders

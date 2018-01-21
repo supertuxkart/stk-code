@@ -264,7 +264,8 @@ ShaderFilesManager::SharedShader ShaderFilesManager::getShaderFile
 {
     const std::string full_path = (file.find('/') != std::string::npos ||
         file.find('\\') != std::string::npos) ?
-        file : file_manager->getShader(file);
+        file : std::string(file_manager->getFileSystem()->getAbsolutePath
+        (file_manager->getShadersDir().c_str()).c_str()) + file;
     // found in cache
     auto it = m_shader_files_loaded.find(full_path);
     if (it != m_shader_files_loaded.end())
