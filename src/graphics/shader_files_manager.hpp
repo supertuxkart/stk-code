@@ -54,16 +54,16 @@ public:
     // ------------------------------------------------------------------------
     ~ShaderFilesManager()
     {
-        clearAllShaderFiles();
+        removeAllShaderFiles();
     }
     // ------------------------------------------------------------------------
-    void clearAllShaderFiles()
+    void removeAllShaderFiles()
     {
-        clearUnusedShaderFiles();
+        removeUnusedShaderFiles();
         assert(m_shader_files_loaded.empty());
     }
     // ------------------------------------------------------------------------
-    void clearUnusedShaderFiles()
+    void removeUnusedShaderFiles()
     {
         for (auto it = m_shader_files_loaded.begin();
              it != m_shader_files_loaded.end();)

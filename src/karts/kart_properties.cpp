@@ -23,6 +23,7 @@
 #include "config/player_manager.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/shader_files_manager.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/sp/sp_shader_manager.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
@@ -112,10 +113,11 @@ KartProperties::KartProperties(const std::string &filename)
 KartProperties::~KartProperties()
 {
 #ifndef SERVER_ONLY
-    m_kart_model = nullptr;
-    if (CVS->isGLSL())
+    if (CVS->isGLSL() && m_kart_model.use_count() == 1)
     {
+        m_kart_model = nullptr;
         SP::SPShaderManager::get()->removeUnusedShaders();
+        ShaderFilesManager::getInstance()->removeUnusedShaderFiles();
         SP::SPTextureManager::get()->removeUnusedTextures();
     }
 #endif

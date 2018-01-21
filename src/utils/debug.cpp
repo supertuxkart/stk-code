@@ -251,7 +251,7 @@ bool handleContextMenuAction(s32 cmd_id)
         Log::info("Debug", "Reloading shaders...");
         SP::SPShaderManager::get()->unloadAll();
         ShaderBase::killShaders();
-        ShaderFilesManager::getInstance()->clearAllShaderFiles();
+        ShaderFilesManager::getInstance()->removeAllShaderFiles();
         SP::SPShaderManager::get()->initAll();
 #endif
         break;
