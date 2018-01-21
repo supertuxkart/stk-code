@@ -54,6 +54,7 @@
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_model.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart_rewinder.hpp"
 #include "karts/max_speed.hpp"
@@ -3019,10 +3020,15 @@ const Vec3& Kart::getNormal() const
 }   // getNormal
 
 // ------------------------------------------------------------------------
-
 void Kart::playSound(SFXBuffer* buffer)
 {
     getNextEmitter()->play(getXYZ(), buffer);
-}
+}   // playSound
+
+// ------------------------------------------------------------------------
+const video::SColor& Kart::getColor() const
+{
+    return m_kart_properties->getColor();
+}   // getColor
 
 /* EOF */

@@ -30,8 +30,9 @@
 
 #include "items/powerup_manager.hpp"    // For PowerupType
 #include "karts/abstract_kart.hpp"
-#include "karts/kart_properties.hpp"
 #include "utils/no_copy.hpp"
+
+#include <SColor.h>
 
 class AbstractKartAnimation;
 class Attachment;
@@ -347,8 +348,7 @@ public:
     virtual btTransform getAlignedTransform(const float customPitch=-1);
     // -------------------------------------------------------------------------
     /** Returns the color used for this kart. */
-    const video::SColor &getColor() const
-                                        {return m_kart_properties->getColor();}
+    const irr::video::SColor &getColor() const;
     // ------------------------------------------------------------------------
     /** Returns the time till full steering is reached for this kart.
      *  \param steer Current steer value (must be >=0), on which the time till

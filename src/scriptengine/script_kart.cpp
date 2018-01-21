@@ -19,6 +19,7 @@
 #include "script_kart.hpp"
 
 #include "karts/kart.hpp"
+#include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
 #include "scriptvec3.hpp"
 
