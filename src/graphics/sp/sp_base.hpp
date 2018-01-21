@@ -23,6 +23,7 @@
 #include "utils/no_copy.hpp"
 
 #include "irrMath.h"
+#include "vector3d.h"
 
 #include <array>
 #include <cmath>
@@ -94,7 +95,7 @@ extern int sp_cur_shadow_cascade;
 extern bool sp_culling;
 extern unsigned sp_cur_player;
 extern unsigned sp_cur_buf_id[MAX_PLAYER_COUNT];
-
+extern irr::core::vector3df sp_wind_dir;
 // ----------------------------------------------------------------------------
 void init();
 // ----------------------------------------------------------------------------

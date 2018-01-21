@@ -19,7 +19,7 @@
 #include "graphics/shadow.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/skidding.hpp"
-#include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "physics/btKart.hpp"
 #include "utils/mini_glm.hpp"
@@ -31,7 +31,9 @@ Shadow::Shadow(Material* shadow_mat, const AbstractKart& kart)
       : m_dy_dc(NULL), m_shadow_enabled(false), m_kart(kart)
 {
     m_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
-        (scene::EPT_TRIANGLE_STRIP, SP::getSPShader("alphablend"), shadow_mat);
+        (scene::EPT_TRIANGLE_STRIP,
+        SP::SPShaderManager::get()->getSPShaderPtr("alphablend"),
+        shadow_mat);
 
     m_dy_dc->getVerticesVector().resize(4);
     video::S3DVertexSkinnedMesh* v = m_dy_dc->getVerticesVector().data();

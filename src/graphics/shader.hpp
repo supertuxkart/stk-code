@@ -368,9 +368,6 @@ public:
             glDetachShader(m_program, *shader);
         }
     }   // loadProgram
-
-    // ------------------------------------------------------------------------
-    virtual void bindCustomTextures() {}
     // ------------------------------------------------------------------------
     void drawFullScreenEffect(Args...args)
     {

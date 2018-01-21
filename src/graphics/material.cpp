@@ -432,7 +432,7 @@ void Material::loadContainerId()
         if (!file_manager->searchTextureContainerId(m_container_id, m_texname))
         {
             Log::warn("Material", "Missing container id for %s, no texture"
-                " compression for it will be done", m_texname.c_str());
+                " compression for it will be done.", m_texname.c_str());
         }
     }
 }   // loadContainerId

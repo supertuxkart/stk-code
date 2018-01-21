@@ -16,14 +16,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/sp/sp_shader.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/shader_files_manager.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_uniform_assigner.hpp"
-#include "utils/no_copy.hpp"
 #include "utils/string_utils.hpp"
-
-#include <ITexture.h>
-#include <string>
 
 namespace SP
 {
@@ -38,25 +35,14 @@ std::unordered_map<std::string, std::pair<unsigned, SamplerType> >
     };
 
 // ----------------------------------------------------------------------------
-SPShader::~SPShader()
-{
-#ifndef SERVER_ONLY
-    for (unsigned rp = RP_1ST; rp < RP_COUNT; rp++)
-    {
-        if (m_program[rp] != 0)
-        {
-            glDeleteProgram(m_program[rp]);
-        }
-    }
-    unload();
-#endif
-}   // ~SPShader
-
-// ----------------------------------------------------------------------------
 void SPShader::addShaderFile(const std::string& name, GLint shader_type,
                              RenderPass rp)
 {
 #ifndef SERVER_ONLY
+    if (m_program[rp] == 0)
+    {
+        m_program[rp] = glCreateProgram();
+    }
     auto shader_file = ShaderFilesManager::getInstance()
         ->getShaderFile(name, shader_type);
     if (shader_file)
@@ -92,6 +78,11 @@ void SPShader::linkShaderFiles(RenderPass rp)
     for (unsigned i = 0; i < (unsigned)count; i++)
     {
         glDetachShader(m_program[rp], shaders[i]);
+    }
+    if (result == GL_FALSE)
+    {
+        glDeleteProgram(m_program[rp]);
+        m_program[rp] = 0;
     }
 #endif
 }   // linkShaderFiles
@@ -166,7 +157,7 @@ void SPShader::addCustomPrefilledTextures(SamplerType st, GLuint texture_type,
 }   // addCustomPrefilledTextures
 
 // ----------------------------------------------------------------------------
-void SPShader::bindPrefilledTextures(RenderPass rp)
+void SPShader::bindPrefilledTextures(RenderPass rp) const
 {
 #ifndef SERVER_ONLY
     for (auto& p : m_prefilled_samplers[rp])
@@ -189,7 +180,8 @@ void SPShader::bindPrefilledTextures(RenderPass rp)
 }   // bindPrefilledTextures
 
 // ----------------------------------------------------------------------------
-void SPShader::bindTextures(const std::array<GLuint, 6>& tex, RenderPass rp)
+void SPShader::bindTextures(const std::array<GLuint, 6>& tex,
+                            RenderPass rp) const
 {
 #ifndef SERVER_ONLY
     for (auto& p : m_samplers[rp])
@@ -239,7 +231,7 @@ void SPShader::setUniformsPerObject(SPPerObjectUniform* sppou,
 
 // ----------------------------------------------------------------------------
 SPUniformAssigner* SPShader::getUniformAssigner(const std::string& name,
-                                                RenderPass rp)
+                                                RenderPass rp) const
 {
     auto ret = m_uniforms[rp].find(name);
     if (ret == m_uniforms[rp].end())
@@ -252,8 +244,14 @@ SPUniformAssigner* SPShader::getUniformAssigner(const std::string& name,
 // ----------------------------------------------------------------------------
 void SPShader::unload()
 {
+#ifndef SERVER_ONLY
     for (unsigned rp = RP_1ST; rp < RP_COUNT; rp++)
     {
+        if (m_program[rp] != 0)
+        {
+            glDeleteProgram(m_program[rp]);
+            m_program[rp] = 0;
+        }
         for (auto& p : m_uniforms[rp])
         {
             delete p.second;
@@ -262,10 +260,24 @@ void SPShader::unload()
         m_custom_prefilled_getter[rp].clear();
         m_prefilled_samplers[rp].clear();
         m_samplers[rp].clear();
-        m_shader_files.clear();
         m_use_function[rp] = nullptr;
         m_unuse_function[rp] = nullptr;
     }
+    m_shader_files.clear();
+#endif
 }   // unload
+
+// ----------------------------------------------------------------------------
+bool SPShader::isSrgbForTextureLayer(unsigned layer) const
+{
+#ifndef SERVER_ONLY
+    if (!CVS->isDefferedEnabled())
+    {
+        return false;
+    }
+#endif
+    assert(layer < 6);
+    return m_srgb[layer];
+}   // isSrgbForTextureLayer
 
 }

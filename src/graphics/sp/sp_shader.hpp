@@ -97,7 +97,7 @@ private:
 
     std::function<void()> m_use_function[RP_COUNT], m_unuse_function[RP_COUNT];
 
-    std::function<void(SPShader*)> m_init_function;
+    const std::function<void(SPShader*)> m_init_function;
 
     const int m_drawing_priority;
 
@@ -105,29 +105,32 @@ private:
 
     const bool m_use_alpha_channel;
 
+    const bool m_use_tangents;
+
+    const std::array<bool, 6> m_srgb;
+
 public:
     // ------------------------------------------------------------------------
     SPShader(const std::string& name,
-             const std::array<int, 3>& pass = {{ 0, 1, -1 }},
+             const std::function<void(SPShader*)>& init_func,
              bool transparent_shader = false, int drawing_priority = 0,
-             bool use_alpha_channel = false)
-           : m_name(name), m_drawing_priority(drawing_priority),
+             bool use_alpha_channel = false, bool use_tangents = false,
+             const std::array<bool, 6>& srgb =
+             {{ true, true, false, false, false, false }})
+           : m_name(name), m_init_function(init_func),
+             m_drawing_priority(drawing_priority),
              m_transparent_shader(transparent_shader),
-             m_use_alpha_channel(use_alpha_channel || transparent_shader)
+             m_use_alpha_channel(use_alpha_channel),
+             m_use_tangents(use_tangents), m_srgb(srgb)
     {
         memset(m_program, 0, 12);
-#ifndef SERVER_ONLY
-        for (int rp : pass)
-        {
-            if (rp > -1)
-            {
-                m_program[rp] = glCreateProgram();
-            }
-        }
-#endif
+        m_init_function(this);
     }
     // ------------------------------------------------------------------------
-    ~SPShader();
+    ~SPShader()
+    {
+        unload();
+    }
     // ------------------------------------------------------------------------
     bool hasShader(RenderPass rp)                { return m_program[rp] != 0; }
     // ------------------------------------------------------------------------
@@ -162,10 +165,10 @@ public:
                                     std::function<GLuint()> func,
                                     RenderPass rp = RP_1ST);
     // ------------------------------------------------------------------------
-    void bindPrefilledTextures(RenderPass rp = RP_1ST);
+    void bindPrefilledTextures(RenderPass rp = RP_1ST) const;
     // ------------------------------------------------------------------------
     void bindTextures(const std::array<GLuint, 6>& tex,
-                      RenderPass rp = RP_1ST);
+                      RenderPass rp = RP_1ST) const;
     // ------------------------------------------------------------------------
     void addBasicUniforms(RenderPass rp = RP_1ST)
     {
@@ -184,7 +187,7 @@ public:
     const std::string& getName() const                       { return m_name; }
     // ------------------------------------------------------------------------
     SPUniformAssigner* getUniformAssigner(const std::string& name,
-                                          RenderPass rp = RP_1ST);
+                                          RenderPass rp = RP_1ST) const;
     // ------------------------------------------------------------------------
     void addUniform(const std::string& name, const std::type_info& ti,
                     RenderPass rp = RP_1ST);
@@ -212,30 +215,20 @@ public:
     bool samplerLess(RenderPass rp = RP_1ST) const
                                              { return m_samplers[rp].empty(); }
     // ------------------------------------------------------------------------
-    void setInitFunction(std::function<void(SPShader*)> func)
-    {
-        m_init_function = func;
-    }
-    // ------------------------------------------------------------------------
     void unload();
     // ------------------------------------------------------------------------
     void init()
     {
         if (!m_shader_files.empty())
         {
-            Log::error("SPShader",
-                "Please unload the shader before (re)init.");
             return;
         }
-        if (m_init_function)
-        {
-            m_init_function(this);
-        }
-        else
-        {
-            Log::error("SPShader", "Missing init function.");
-        }
+        m_init_function(this);
     }
+    // ------------------------------------------------------------------------
+    bool isSrgbForTextureLayer(unsigned layer) const;
+    // ------------------------------------------------------------------------
+    bool useTangents() const                         { return m_use_tangents; }
 
 };
 

@@ -19,9 +19,10 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
-#include "graphics/sp/sp_texture_manager.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_shader.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
+#include "graphics/sp/sp_texture_manager.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -524,7 +525,8 @@ std::shared_ptr<video::IImage>
     {
         // Load colorization mask
         std::shared_ptr<video::IImage> mask;
-        SPShader* sps = SP::getSPShader(m_material->getShaderName());
+        std::shared_ptr<SPShader> sps =
+            SPShaderManager::get()->getSPShader(m_material->getShaderName());
         if (sps && sps->useAlphaChannel())
         {
             Log::debug("SPTexture", "Don't use colorization mask or factor"

@@ -30,6 +30,7 @@
 #include "graphics/light.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
@@ -248,8 +249,10 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_GRAPHICS_RELOAD_SHADERS:
 #ifndef SERVER_ONLY
         Log::info("Debug", "Reloading shaders...");
+        SP::SPShaderManager::get()->unloadAll();
         ShaderBase::killShaders();
         ShaderFilesManager::getInstance()->clearAllShaderFiles();
+        SP::SPShaderManager::get()->initAll();
 #endif
         break;
     case DEBUG_GRAPHICS_RESET:

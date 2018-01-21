@@ -186,6 +186,10 @@ public:
             {
                 glUniform1i(m_location, 0);
             }
+            else if (m_type == typeid(std::array<float, 4>))
+            {
+                glUniform4f(m_location, 0.0f, 0.0f, 0.0f,0.0f);
+            }
 #endif
         }
     }

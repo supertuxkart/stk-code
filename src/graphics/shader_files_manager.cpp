@@ -116,8 +116,8 @@ void ShaderFilesManager::readFile(const std::string& file,
  *  \param file Filename of the shader to load.
  *  \param type Type of the shader.
  */
-SharedShader ShaderFilesManager::loadShader(const std::string& full_path,
-                                            unsigned type)
+ShaderFilesManager::SharedShader ShaderFilesManager::loadShader
+    (const std::string& full_path, unsigned type)
 {
     GLuint* ss_ptr = new GLuint;
     *ss_ptr = glCreateShader(type);
@@ -239,8 +239,8 @@ SharedShader ShaderFilesManager::loadShader(const std::string& full_path,
  *  \param file Filename of the shader to load.
  *  \param type Type of the shader.
  */
-SharedShader ShaderFilesManager::addShaderFile(const std::string& full_path,
-                                               unsigned type)
+ShaderFilesManager::SharedShader ShaderFilesManager::addShaderFile
+    (const std::string& full_path, unsigned type)
 {
 #ifdef DEBUG
     // Make sure no duplicated shader is added somewhere else
@@ -259,8 +259,8 @@ SharedShader ShaderFilesManager::addShaderFile(const std::string& full_path,
  *  \param file Filename of the shader to load.
  *  \param type Type of the shader.
  */
-SharedShader ShaderFilesManager::getShaderFile(const std::string &file,
-                                               unsigned type)
+ShaderFilesManager::SharedShader ShaderFilesManager::getShaderFile
+    (const std::string &file, unsigned type)
 {
     const std::string full_path = (file.find('/') != std::string::npos ||
         file.find('\\') != std::string::npos) ?

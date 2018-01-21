@@ -30,13 +30,13 @@
 #include <memory>
 #include <unordered_map>
 
-typedef std::shared_ptr<GLuint> SharedShader;
-
 class ShaderFilesManager : public Singleton<ShaderFilesManager>, NoCopy
 {
 private:
+    typedef std::shared_ptr<GLuint> SharedShader;
     /**
-     * Map from a filename to a shader indentifier. Used for caching shaders.
+     * Map from a filename in full path to a shader indentifier.
+     * Used for caching shaders.
      */
     std::unordered_map<std::string, SharedShader> m_shader_files_loaded;
 

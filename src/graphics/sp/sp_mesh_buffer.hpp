@@ -41,11 +41,14 @@ class Material;
 
 namespace SP
 {
+class SPShader;
 class SPTexture;
 
 class SPMeshBuffer : public IMeshBuffer, public SPPerObjectUniform
 {
 protected:
+
+
     std::vector<std::tuple<size_t/*first_index_id*/,
         unsigned/*indices_count*/, Material*> > m_stk_material;
 
