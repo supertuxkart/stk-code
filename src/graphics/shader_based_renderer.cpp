@@ -886,14 +886,14 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     if (CVS->isDefferedEnabled())
     {
         renderSceneDeferred(camera, dt, false, true);
+        render_target->setFrameBuffer(m_post_processing
+            ->render(camera, false, m_rtts));
     }
     else
     {
         renderScene(camera, dt, false, true);
+        render_target->setFrameBuffer(&m_rtts->getFBO(FBO_COLORS));
     }
-
-    render_target->setFrameBuffer(m_post_processing
-        ->render(camera, false, m_rtts));
 
     // reset
     glViewport(0, 0,

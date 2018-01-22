@@ -44,7 +44,7 @@ void main(void)
     vec4 particle_color = vec4(color_lifetime.zyx, 1.0) * alpha;
     tc = Texcoord;
 
-#if !defined(sRGB_Framebuffer_Usable) && !defined(Advanced_Lighting_Enabled)
+#if !defined(Advanced_Lighting_Enabled)
     particle_color.rgb = pow(particle_color.rgb, vec3(1.0 / 2.2));
 #endif
     pc = particle_color;

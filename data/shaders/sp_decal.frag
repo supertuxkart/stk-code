@@ -17,11 +17,7 @@ void main(void)
 
     vec3 final_color = layer_two_tex.rgb + color.rgb * (1.0 - layer_two_tex.a);
 #if !defined(Advanced_Lighting_Enabled)
-#if !defined(sRGB_Framebuffer_Usable)
     final_color = final_color * 0.73; // 0.5 ^ (1. / 2.2)
-#else
-    final_color = final_color * 0.5;
-#endif
 #endif
     o_diffuse_color = vec4(final_color, 1.0);
 

@@ -30,11 +30,7 @@ void main()
 
     vec3 final_color = col.xyz * color.xyz;
 #if !defined(Advanced_Lighting_Enabled)
-#if !defined(sRGB_Framebuffer_Usable)
     final_color = final_color * 0.73; // 0.5 ^ (1. / 2.2)
-#else
-    final_color = final_color * 0.5;
-#endif
 #endif
 
     o_diffuse_color = vec4((final_color * custom_alpha), custom_alpha);
