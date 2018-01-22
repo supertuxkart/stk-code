@@ -79,11 +79,22 @@ float MainLoop::getLimitedDt()
     {
         m_curr_time = device->getTimer()->getRealTime();
         dt = (float)(m_curr_time - m_prev_time);
-        if (dt <= 0)
+        // On a server (i.e. without graphics) the frame rate can be under
+        // 1 ms, i.e. dt = 0. Additionally, the resolution of a sleep
+        // statement is not that precise either: if the sleep statement
+        // would be consistent < 1ms, but the stk time would increase by
+        // 1 ms, the stk clock would be desynchronised from real time
+        // (it would go faster), resulting in synchronisation problems
+        // with clients (server time is supposed to be behind client time).
+        // So we play it safe by adding a loop to make sure at least 1ms
+        // (minimum time that can be handled by the integer timer) delay here.
+        while (dt <= 0)
         {
-            dt = 1;   // at least 1 ms, otherwise with dt=0 bad things happen
-            break;    // should not really happen
+            StkTime::sleep(1);
+            m_curr_time = device->getTimer()->getRealTime();
+            dt = (float)(m_curr_time - m_prev_time);
         }
+
         const World* const world = World::getWorld();
         if (UserConfigParams::m_fps_debug && world)
         {
