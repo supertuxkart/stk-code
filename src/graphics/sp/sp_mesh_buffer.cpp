@@ -126,7 +126,8 @@ void SPMeshBuffer::uploadGLMesh()
         for (unsigned j = 0; j < 6; j++)
         {
             m_textures[i][j] = SPTextureManager::get()->getTexture
-                (std::get<2>(m_stk_material[i])->getSamplerPath(j),
+                (m_shaders[0]->hasTextureLayer(j) ?
+                    std::get<2>(m_stk_material[i])->getSamplerPath(j) : "",
                 j == 0 ? std::get<2>(m_stk_material[i]) : NULL,
                 m_shaders[0]->isSrgbForTextureLayer(j),
                 std::get<2>(m_stk_material[i])->getContainerId());

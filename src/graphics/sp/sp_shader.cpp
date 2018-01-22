@@ -127,7 +127,7 @@ void SPShader::addAllTextures(RenderPass rp)
         const unsigned idx =
             unsigned(m_prefilled_samplers[rp].size() + m_samplers[rp].size());
         glUniform1i(loc, idx);
-        m_samplers[rp].emplace_back(i, idx);
+        m_samplers[rp][i] = idx;
     }
 #endif
 }   // addPrefilledTextures

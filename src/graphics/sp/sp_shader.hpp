@@ -27,6 +27,7 @@
 #include <cstring>
 #include <functional>
 #include <ostream>
+#include <map>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -85,7 +86,7 @@ private:
 
     GLuint m_program[RP_COUNT];
 
-    std::vector<std::pair<unsigned, unsigned> > m_samplers[RP_COUNT];
+    std::map<unsigned, unsigned> m_samplers[RP_COUNT];
 
     std::vector<std::tuple<unsigned, std::string, SamplerType,
         GLuint> >m_prefilled_samplers[RP_COUNT];
@@ -229,7 +230,18 @@ public:
     bool isSrgbForTextureLayer(unsigned layer) const;
     // ------------------------------------------------------------------------
     bool useTangents() const                         { return m_use_tangents; }
-
+    // ------------------------------------------------------------------------
+    bool hasTextureLayer(unsigned layer)
+    {
+        for (unsigned rp = RP_1ST; rp < RP_COUNT; rp++)
+        {
+            if (m_samplers[rp].find(layer) != m_samplers[rp].end())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 };
 
 }

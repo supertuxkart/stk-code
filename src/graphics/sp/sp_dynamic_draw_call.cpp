@@ -39,8 +39,9 @@ SPDynamicDrawCall::SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt,
     m_textures.resize(m_stk_material.size());
     for (unsigned j = 0; j < 6; j++)
     {
-        m_textures[0][j] = SPTextureManager::get()->getTexture
-            (std::get<2>(m_stk_material[0])->getSamplerPath(j),
+        m_textures[0][j] = SPTextureManager::get()->getTexture(
+            m_shaders[0] && m_shaders[0]->hasTextureLayer(j) ?
+            std::get<2>(m_stk_material[0])->getSamplerPath(j) : "",
             j == 0 ? std::get<2>(m_stk_material[0]) : NULL,
             m_shaders[0] && m_shaders[0]->isSrgbForTextureLayer(j),
             std::get<2>(m_stk_material[0])->getContainerId());

@@ -353,17 +353,6 @@ Material::Material(const XMLNode *node, bool deprecated)
             m_sampler_path[i] = "";
         }
     }
-
-#ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics() || !CVS->isDefferedEnabled())
-    {
-        for (int i = 2; i < 6; i++)
-        {
-            // When advanced pipeline is off only .spm uv textures are used
-            m_sampler_path[i] = "";
-        }
-    }
-#endif
     loadContainerId();
 
     core::stringc texfname(m_texname.c_str());
