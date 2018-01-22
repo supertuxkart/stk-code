@@ -353,10 +353,12 @@ void SPShaderManager::loadPassInfo(const XMLNode* pass, PassInfo& pi)
                 prefilled_texture->get("name", &name);
                 prefilled_texture->get("file", &file);
                 prefilled_texture->get("srgb", &srgb_props);
+#ifndef SERVER_ONLY
                 if (!srgb_props.empty())
                 {
-                    srgb = srgb_props == "Y";
+                    srgb = srgb_props == "Y" && CVS->isDefferedEnabled();
                 }
+#endif
                 prefilled_texture->get("sampler", &sampler_props);
                 if (!sampler_props.empty() &&
                     m_official_sampler_types.find(sampler_props) !=

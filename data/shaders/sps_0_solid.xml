@@ -31,7 +31,7 @@
                       (default N).
 
         srgb: Sample mesh texture layers in srgb or not (in 6 Ys / Ns), when
-              advanced lighting is off, srgb will always be false
+              advanced lighting is off, srgb will always be false,
               default (Y Y N N N N), even if any texture layer is unused in
               shader, you cannot skip it from the above Y / N array.
 
@@ -85,6 +85,8 @@
                           (cannot be empty).
 
                     srgb: Sample in srgb or not (specify in Y/N, default is N).
+                          When advanced lighting is off, srgb will always be
+                          false.
 
                     sampler: nearest, nearest_clamped, bilinear,
                              bilinear_clamped, trilinear, trilinear_clamped

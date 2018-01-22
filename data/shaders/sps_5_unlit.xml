@@ -1,5 +1,5 @@
 <spshader>
-    <shader-info name="unlit" fallback-shader="solid" use-alpha-channel="Y"/>
+    <shader-info name="unlit" fallback-shader="alphatest" use-alpha-channel="Y"/>
     <first-pass vertex-shader="sp_pass.vert"
         fragment-shader="sp_unlit.frag" skinned-mesh-shader="sp_skinning.vert">
     </first-pass>

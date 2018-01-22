@@ -348,8 +348,14 @@ void Graph::createMeshSP(bool show_invisible, bool enable_transparency,
     spmb->setSPMVertices(vertices);
     spmb->setIndices(indices);
     spmb->recalculateBoundingBox();
-    spmb->setSTKMaterial(material_manager->getDefaultSPMaterial(
-        enable_transparency ? "alphablend" : "unlit"));
+    std::string shader_name = enable_transparency ? "alphablend" : "unlit";
+#ifndef SERVER_ONLY
+    if (!CVS->isDefferedEnabled())
+    {
+        shader_name = "solid";
+    }
+#endif
+    spmb->setSTKMaterial(material_manager->getDefaultSPMaterial(shader_name));
     spm->addSPMeshBuffer(spmb);
     spm->setBoundingBox(spmb->getBoundingBox());
 #endif
