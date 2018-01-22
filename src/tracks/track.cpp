@@ -40,11 +40,13 @@
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/render_target.hpp"
+#include "graphics/shader_files_manager.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "graphics/sp/sp_mesh_node.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -424,6 +426,8 @@ void Track::cleanup()
 
     if (CVS->isGLSL())
     {
+        SP::SPShaderManager::get()->removeUnusedShaders();
+        ShaderFilesManager::getInstance()->removeUnusedShaderFiles();
         SP::SPTextureManager::get()->removeUnusedTextures();
     }
 #endif
@@ -1739,6 +1743,12 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // Add the track directory to the texture search path
     file_manager->pushTextureSearchPath(m_root, unique_id);
     file_manager->pushModelSearchPath(m_root);
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        SP::SPShaderManager::get()->loadSPShaders(m_root);
+    }
+#endif
 
     // First read the temporary materials.xml file if it exists
     try

@@ -30,6 +30,7 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/stk_particle.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
@@ -242,6 +243,12 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
         file_manager->pushTextureSearchPath(lib_path + "/", unique_id);
         file_manager->pushModelSearchPath(lib_path);
         material_manager->pushTempMaterial(lib_path + "/materials.xml");
+#ifndef SERVER_ONLY
+        if (CVS->isGLSL())
+        {
+            SP::SPShaderManager::get()->loadSPShaders(lib_path);
+        }
+#endif
         model_def_loader.addToLibrary(name, libroot);
 
         // Load LOD groups
