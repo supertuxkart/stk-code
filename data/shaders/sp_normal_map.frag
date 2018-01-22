@@ -23,6 +23,7 @@ void main()
         vec3 old_hsv = rgbToHsv(col.rgb);
         float mask_step = step(mask, 0.5);
 #if !defined(Advanced_Lighting_Enabled)
+        // For similar color
         float saturation = mask * 1.825; // 2.5 * 0.5 ^ (1. / 2.2)
 #else
         float saturation = mask * 2.5;
@@ -34,9 +35,6 @@ void main()
     }
 
     vec3 final_color = col.xyz * color.xyz;
-#if !defined(Advanced_Lighting_Enabled)
-    final_color = final_color * 0.73; // 0.5 ^ (1. / 2.2)
-#endif
     o_diffuse_color = vec4(final_color, 1.0);
 
 #if defined(Advanced_Lighting_Enabled)

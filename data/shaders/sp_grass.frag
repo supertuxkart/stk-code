@@ -28,9 +28,6 @@ void main(void)
     }
 
     vec3 final_color = col.xyz;
-#if !defined(Advanced_Lighting_Enabled)
-    final_color = final_color * 0.73; // 0.5 ^ (1. / 2.2)
-#endif
     o_diffuse_color = vec4(final_color, 1.0);
 
 #if defined(Advanced_Lighting_Enabled)
