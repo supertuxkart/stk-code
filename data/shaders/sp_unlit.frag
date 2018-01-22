@@ -11,7 +11,7 @@ layout(location = 2) out vec2 o_gloss_map;
 
 void main(void)
 {
-    vec4 col = sampleTextureSlot0(uv);
+    vec4 col = sampleTextureLayer0(uv);
     if (col.a < 0.5)
     {
         discard;

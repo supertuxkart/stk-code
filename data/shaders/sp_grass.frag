@@ -13,7 +13,7 @@ layout(location = 2) out vec2 o_gloss_map;
 
 void main(void)
 {
-    vec4 col = sampleTextureSlot0(uv);
+    vec4 col = sampleTextureLayer0(uv);
     if (col.a < 0.5)
     {
         discard;
@@ -38,7 +38,7 @@ void main(void)
     o_diffuse_color = vec4(final_color, 1.0);
 
 #if defined(Advanced_Lighting_Enabled)
-    vec4 layer_2 = sampleTextureSlot2(uv);
+    vec4 layer_2 = sampleTextureLayer2(uv);
     o_normal_depth.xy = 0.5 * EncodeNormal(normalize(normal)) + 0.5;
     o_normal_depth.z = layer_2.x;
     o_gloss_map = 0.1 * layer_2.yz;

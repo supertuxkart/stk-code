@@ -11,8 +11,8 @@ layout(location = 2) out vec2 o_gloss_map;
 
 void main(void)
 {
-    vec4 color = sampleTextureSlot0(uv);
-    vec4 layer_two_tex = sampleTextureSlot1(uv_two);
+    vec4 color = sampleTextureLayer0(uv);
+    vec4 layer_two_tex = sampleTextureLayer1(uv_two);
     layer_two_tex.rgb = layer_two_tex.a * layer_two_tex.rgb;
 
     vec3 final_color = layer_two_tex.rgb + color.rgb * (1.0 - layer_two_tex.a);
@@ -26,7 +26,7 @@ void main(void)
     o_diffuse_color = vec4(final_color, 1.0);
 
 #if defined(Advanced_Lighting_Enabled)
-    vec4 layer_2 = sampleTextureSlot2(uv);
+    vec4 layer_2 = sampleTextureLayer2(uv);
     o_normal_depth.xy = 0.5 * EncodeNormal(normalize(normal)) + 0.5;
     o_normal_depth.z = layer_2.x;
     o_gloss_map = layer_2.yz;

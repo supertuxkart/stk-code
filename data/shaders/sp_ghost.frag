@@ -11,7 +11,7 @@ out vec4 o_diffuse_color;
 
 void main()
 {
-    vec4 col = sampleTextureSlot0(uv);
+    vec4 col = sampleTextureLayer0(uv);
     if (hue_change > 0.0)
     {
         float mask = col.a;
