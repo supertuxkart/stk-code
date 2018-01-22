@@ -191,17 +191,7 @@ Material::Material(const XMLNode *node, bool deprecated)
     s = "solid";
     std::string normal_map_tex;
     node->get("normal-map", &normal_map_tex);
-    if (node->get("shader", &s))
-    {
-        if (s == "splatting")
-        {
-            node->get("splatting-texture-1", &m_sampler_path[2]);
-            node->get("splatting-texture-2", &m_sampler_path[3]);
-            node->get("splatting-texture-3", &m_sampler_path[4]);
-            node->get("splatting-texture-4", &m_sampler_path[5]);
-        }
-    }
-    else
+    if (!node->get("shader", &s))
     {
         // BACKWARS COMPATIBILITY, EVENTUALLY REMOVE
 
@@ -262,13 +252,6 @@ Material::Material(const XMLNode *node, bool deprecated)
         if (s == "normal_map")
         {
             node->get("normal-map", &normal_map_tex);
-        }
-        else if (s == "splatting")
-        {
-            node->get("splatting-texture-1", &m_sampler_path[2]);
-            node->get("splatting-texture-2", &m_sampler_path[3]);
-            node->get("splatting-texture-3", &m_sampler_path[4]);
-            node->get("splatting-texture-4", &m_sampler_path[5]);
         }
         else if (s == "none")
         {

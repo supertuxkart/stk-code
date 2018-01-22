@@ -132,9 +132,9 @@ void SPMeshBuffer::uploadGLMesh()
                 m_shaders[0]->isSrgbForTextureLayer(j),
                 std::get<2>(m_stk_material[i])->getContainerId());
         }
-        // Use .spm uv texture 1 and 2 for compare in scene manager
-        m_tex_cmp[m_textures[i][0]->getPath() + m_textures[i][1]->getPath()] =
-            i;
+        // Use the original spm uv texture 1 and 2 for compare in scene manager
+        m_tex_cmp[std::get<2>(m_stk_material[i])->getSamplerPath(0) +
+            std::get<2>(m_stk_material[i])->getSamplerPath(1)] = i;
     }
 
     bool use_2_uv = std::get<2>(m_stk_material[0])->use2UV();
