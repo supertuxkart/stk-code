@@ -165,69 +165,36 @@ void Camera::setupCamera()
 {
     m_aspect = (float)(irr_driver->getActualScreenSize().Width)
              /         irr_driver->getActualScreenSize().Height;
-    switch(race_manager->getNumLocalPlayers())
-    {
-    case 1: m_viewport = core::recti(0, 0,
-                                     irr_driver->getActualScreenSize().Width,
-                                     irr_driver->getActualScreenSize().Height);
-            m_scaling  = core::vector2df(1.0f, 1.0f);
-            m_fov      = DEGREE_TO_RAD*stk_config->m_camera_fov[0];
-            break;
-    case 2: m_viewport = core::recti(0,
-                                     m_index==0 ? 0
-                                                : irr_driver->getActualScreenSize().Height>>1,
-                                     irr_driver->getActualScreenSize().Width,
-                                     m_index==0 ? irr_driver->getActualScreenSize().Height>>1
-                                                : irr_driver->getActualScreenSize().Height);
-            m_scaling  = core::vector2df(1.0f, 0.5f);
-            m_aspect  *= 2.0f;
-            m_fov      = DEGREE_TO_RAD*stk_config->m_camera_fov[1];
-            break;
-    case 3:
-            /*
-            if(m_index<2)
-            {
-                m_viewport = core::recti(m_index==0 ? 0
-                                                    : irr_driver->getActualScreenSize().Width>>1,
-                                         0,
-                                         m_index==0 ? irr_driver->getActualScreenSize().Width>>1
-                                                    : irr_driver->getActualScreenSize().Width,
-                                         irr_driver->getActualScreenSize().Height>>1);
-                m_scaling  = core::vector2df(0.5f, 0.5f);
-                m_fov      = DEGREE_TO_RAD*50.0f;
-            }
-            else
-            {
-                m_viewport = core::recti(0, irr_driver->getActualScreenSize().Height>>1,
-                                         irr_driver->getActualScreenSize().Width,
-                                         irr_driver->getActualScreenSize().Height);
-                m_scaling  = core::vector2df(1.0f, 0.5f);
-                m_fov      = DEGREE_TO_RAD*65.0f;
-                m_aspect  *= 2.0f;
-            }
-            break;*/
-    case 4:
-            { // g++ 4.3 whines about the variables in switch/case if not {}-wrapped (???)
-            const int x1 = (m_index%2==0 ? 0 : irr_driver->getActualScreenSize().Width>>1);
-            const int y1 = (m_index<2    ? 0 : irr_driver->getActualScreenSize().Height>>1);
-            const int x2 = (m_index%2==0 ? irr_driver->getActualScreenSize().Width>>1  : irr_driver->getActualScreenSize().Width);
-            const int y2 = (m_index<2    ? irr_driver->getActualScreenSize().Height>>1 : irr_driver->getActualScreenSize().Height);
-            m_viewport = core::recti(x1, y1, x2, y2);
-            m_scaling  = core::vector2df(0.5f, 0.5f);
-            m_fov      = DEGREE_TO_RAD*stk_config->m_camera_fov[3];
-            }
-            break;
-    default:
-            if(UserConfigParams::logMisc())
-                Log::warn("Camera", "Incorrect number of players: '%d' - assuming 1.",
-                          race_manager->getNumLocalPlayers());
-            m_viewport = core::recti(0, 0,
-                                     irr_driver->getActualScreenSize().Width,
-                                     irr_driver->getActualScreenSize().Height);
-            m_scaling  = core::vector2df(1.0f, 1.0f);
-            m_fov      = DEGREE_TO_RAD*75.0f;
-            break;
-    }   // switch
+
+	const int playernum = race_manager->getNumLocalPlayers();
+	const float Sqrt = sqrt(playernum);
+	const bool MoreRowsThanCols = true;
+	
+	const int rows = MoreRowsThanCols ? ceil(Sqrt) : round(Sqrt);
+	const int cols = MoreRowsThanCols ? round(Sqrt): ceil(Sqrt);
+
+	const int width_of_space = floor(irr_driver->getActualScreenSize().Width / cols);
+	const int height_of_space = floor(irr_driver->getActualScreenSize().Height / rows);
+
+	const int X_Grid_Position = m_index % cols;
+	const int Y_Grid_Position = floor((m_index) / cols);
+
+
+	m_viewport = core::recti(
+		X_Grid_Position * width_of_space, 
+		Y_Grid_Position * height_of_space,
+		width_of_space,
+		height_of_space);
+	m_scaling = core::vector2df(1.0F / cols, 1.0F / rows);
+
+	//TODO Needs to be fixed
+	
+	m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov[m_index % 3];
+	if (playernum == 2) {
+		m_aspect *= 2.0F;
+	}
+
+	
     m_camera->setFOV(m_fov);
     m_camera->setAspectRatio(m_aspect);
     m_camera->setFarValue(Track::getCurrentTrack()->getCameraFar());
