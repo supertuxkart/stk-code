@@ -40,6 +40,26 @@ enum RenderPass: unsigned int;
 
 class SPShaderManager : public NoCopy
 {
+public:
+
+    struct PassInfo
+    {
+        std::function<void()> m_use_function;
+
+        std::function<void()> m_unuse_function;
+
+        std::string m_vertex_shader;
+
+        std::string m_fragment_shader;
+
+        std::string m_skinned_mesh_shader;
+
+        std::vector<std::pair<std::string, std::type_index> > m_uniforms;
+
+        std::vector<std::tuple<std::string, std::string, bool, SamplerType> >
+            m_prefilled_textures;
+    };
+
 private:
     typedef std::vector<std::pair< std::string, std::function<void
         (SPUniformAssigner*)> > > UniformAssigners;
@@ -59,24 +79,6 @@ private:
             {{
                 true, true, false, false, false, false
             }};
-    };
-
-    struct PassInfo
-    {
-        std::function<void()> m_use_function;
-
-        std::function<void()> m_unuse_function;
-
-        std::string m_vertex_shader;
-
-        std::string m_fragment_shader;
-
-        std::string m_skinned_mesh_shader;
-
-        std::vector<std::pair<std::string, std::type_index> > m_uniforms;
-
-        std::vector<std::tuple<std::string, std::string, bool, SamplerType> >
-            m_prefilled_textures;
     };
 
     static SPShaderManager* m_spsm;
