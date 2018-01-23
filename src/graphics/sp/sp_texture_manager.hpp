@@ -29,11 +29,11 @@
 #include <condition_variable>
 #include <functional>
 #include <list>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
-#include <unordered_map>
 
 #include "irrString.h"
 
@@ -48,7 +48,7 @@ class SPTextureManager : public NoCopy
 private:
     static SPTextureManager* m_sptm;
 
-    std::unordered_map<std::string, std::shared_ptr<SPTexture> > m_textures;
+    std::map<std::string, std::shared_ptr<SPTexture> > m_textures;
 
     std::atomic_uint m_max_threaded_load_obj;
 
