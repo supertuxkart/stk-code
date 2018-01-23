@@ -381,7 +381,7 @@ void RaceGUI::drawGlobalTimer()
     {
 		const float Sqrt = sqrt(race_manager->getNumLocalPlayers());
 		const int rows = ceil(Sqrt);
-		const int Y_Grid_Position = floor((race_manager->getNumLocalPlayers()) / rows);
+		const int Y_Grid_Position = floor((race_manager->getNumLocalPlayers()) / rows) + 1;
 		const int height_of_space = floor(irr_driver->getActualScreenSize().Height / rows);
         pos += core::vector2d<s32>(0, Y_Grid_Position * height_of_space);
     }
