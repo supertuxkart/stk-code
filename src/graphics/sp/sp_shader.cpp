@@ -194,7 +194,7 @@ void SPShader::bindTextures(const std::array<GLuint, 6>& tex,
 }   // bindTextures
 
 // ----------------------------------------------------------------------------
-void SPShader::addUniform(const std::string& name, const std::type_info& ti,
+void SPShader::addUniform(const std::string& name, const std::type_index& ti,
                           RenderPass rp)
 {
 #ifndef SERVER_ONLY

@@ -22,6 +22,8 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <typeinfo>
+#include <typeindex>
 #include <unordered_map>
 #include <vector>
 
@@ -71,7 +73,7 @@ private:
 
         std::string m_skinned_mesh_shader;
 
-        std::vector<std::pair<std::string, const std::type_info&> > m_uniforms;
+        std::vector<std::pair<std::string, std::type_index> > m_uniforms;
 
         std::vector<std::tuple<std::string, std::string, bool, SamplerType> >
             m_prefilled_textures;
@@ -83,7 +85,7 @@ private:
 
     std::vector<std::shared_ptr<SPShader> > m_official_shaders;
 
-    std::unordered_map<std::string, const std::type_info&> m_official_types;
+    std::unordered_map<std::string, std::type_index> m_official_types;
 
     std::unordered_map<std::string, SamplerType> m_official_sampler_types;
 
@@ -111,7 +113,7 @@ private:
                                             bool skinned);
     // ------------------------------------------------------------------------
     static void addUniformsToShader(SPShader* s,
-        const std::vector<std::pair<std::string, const std::type_info&> >& u,
+        const std::vector<std::pair<std::string, std::type_index> >& u,
         RenderPass rp);
     // ------------------------------------------------------------------------
     static void addPrefilledTexturesToShader(SPShader* s,

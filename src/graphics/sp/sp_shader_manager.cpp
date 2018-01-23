@@ -39,12 +39,12 @@ SPShaderManager::SPShaderManager()
 #ifndef SERVER_ONLY
     m_official_types =
     {
-        { "int", typeid(int) },
-        { "float", typeid(float) },
-        { "mat4", typeid(irr::core::matrix4) },
-        { "vec4", typeid(std::array<float, 4>) },
-        { "vec3", typeid(irr::core::vector3df) },
-        { "vec2", typeid(irr::core::vector2df) }
+        { "int", std::type_index(typeid(int)) },
+        { "float", std::type_index(typeid(float)) },
+        { "mat4", std::type_index(typeid(irr::core::matrix4)) },
+        { "vec4", std::type_index(typeid(std::array<float, 4>)) },
+        { "vec3", std::type_index(typeid(irr::core::vector3df)) },
+        { "vec2", std::type_index(typeid(irr::core::vector2df)) }
     };
 
     m_official_sampler_types =
@@ -486,7 +486,7 @@ std::shared_ptr<SPShader> SPShaderManager::buildSPShader(const ShaderInfo& si,
 
 // ----------------------------------------------------------------------------
 void SPShaderManager::addUniformsToShader(SPShader* s,
-          const std::vector<std::pair<std::string, const std::type_info&> >& u,
+          const std::vector<std::pair<std::string, std::type_index> >& u,
           RenderPass rp)
 {
     for (auto& p : u)

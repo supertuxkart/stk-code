@@ -30,10 +30,10 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <typeinfo>
+#include <typeindex>
 #include <unordered_map>
 #include <vector>
-
-#include <SMaterial.h>
 
 namespace SP
 {
@@ -190,7 +190,7 @@ public:
     SPUniformAssigner* getUniformAssigner(const std::string& name,
                                           RenderPass rp = RP_1ST) const;
     // ------------------------------------------------------------------------
-    void addUniform(const std::string& name, const std::type_info& ti,
+    void addUniform(const std::string& name, const std::type_index& ti,
                     RenderPass rp = RP_1ST);
     // ------------------------------------------------------------------------
     void setUniformsPerObject(SPPerObjectUniform* sppou,
