@@ -21,6 +21,7 @@
 #define HEADER_SHADER_FILES_MANAGER_HPP
 
 #include "graphics/gl_headers.hpp"
+#include "utils/log.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/singleton.hpp"
 
@@ -60,7 +61,13 @@ public:
     void removeAllShaderFiles()
     {
         removeUnusedShaderFiles();
-        assert(m_shader_files_loaded.empty());
+        if (!m_shader_files_loaded.empty())
+        {
+#ifdef DEBUG
+            Log::error("ShaderFilesManager", "Some shader file > 1 ref_count");
+#endif
+            m_shader_files_loaded.clear();
+        }
     }
     // ------------------------------------------------------------------------
     void removeUnusedShaderFiles()

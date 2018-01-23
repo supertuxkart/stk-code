@@ -139,10 +139,12 @@ SPShaderManager::~SPShaderManager()
 {
     m_official_shaders.clear();
     removeUnusedShaders();
+#ifdef DEBUG
     for (auto p : m_shaders)
     {
         Log::error("SPShaderManager", "%s > 1 ref_count", p.first.c_str());
     }
+#endif
 }   // ~SPShaderManager
 
 // ----------------------------------------------------------------------------
