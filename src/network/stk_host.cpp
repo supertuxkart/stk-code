@@ -562,6 +562,7 @@ void* STKHost::mainLoop(void* self)
             else if (stk_event->getType() == EVENT_TYPE_DISCONNECTED)
             {
                 Log::info("STKHost", "A client has just disconnected.");
+                Log::flushBuffers();
             }   // EVENT_TYPE_CONNECTED
             else if (stk_event->getType() == EVENT_TYPE_MESSAGE)
             {
