@@ -793,8 +793,10 @@ void addObject(SPMeshNode* node)
         core::aabbox3df bb = mb->getBoundingBox();
         model_matrix.transformBoxEx(bb);
         std::vector<bool> discard;
-        discard.resize((g_handle_shadow ? 5 : 1), false);
-        for (int dc_type = 0; dc_type < (g_handle_shadow ? 5 : 1); dc_type++)
+        const bool handle_shadow =
+            g_handle_shadow && shader->hasShader(RP_SHADOW);
+        discard.resize((handle_shadow ? 5 : 1), false);
+        for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
             for (int i = 0; i < 24; i += 4)
             {
@@ -819,7 +821,7 @@ void addObject(SPMeshNode* node)
                 }
             }
         }
-        if (g_handle_shadow ?
+        if (handle_shadow ?
             (discard[0] && discard[1] && discard[2] && discard[3] &&
             discard[4]) : discard[0])
         {
@@ -867,7 +869,7 @@ void addObject(SPMeshNode* node)
             node->getTextureMatrix(m)[1], hue,
             (short)node->getSkinningOffset());
 
-        for (int dc_type = 0; dc_type < (g_handle_shadow ? 5 : 1); dc_type++)
+        for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
             if (discard[dc_type])
             {
@@ -959,8 +961,10 @@ void handleDynamicDrawCall()
         core::aabbox3df bb = dydc->getBoundingBox();
         dydc->getAbsoluteTransformation().transformBoxEx(bb);
         std::vector<bool> discard;
-        discard.resize((g_handle_shadow ? 5 : 1), false);
-        for (int dc_type = 0; dc_type < (g_handle_shadow ? 5 : 1); dc_type++)
+        const bool handle_shadow =
+            g_handle_shadow && shader->hasShader(RP_SHADOW);
+        discard.resize((handle_shadow ? 5 : 1), false);
+        for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
             for (int i = 0; i < 24; i += 4)
             {
@@ -985,7 +989,7 @@ void handleDynamicDrawCall()
                 }
             }
         }
-        if (g_handle_shadow ?
+        if (handle_shadow ?
             (discard[0] && discard[1] && discard[2] && discard[3] &&
             discard[4]) : discard[0])
         {
@@ -1008,7 +1012,7 @@ void handleDynamicDrawCall()
             addEdgeForViz(getCorner(bb, 4), getCorner(bb, 6));
         }
 
-        for (int dc_type = 0; dc_type < (g_handle_shadow ? 5 : 1); dc_type++)
+        for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
             if (discard[dc_type])
             {
