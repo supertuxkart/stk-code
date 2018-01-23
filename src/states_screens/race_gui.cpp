@@ -197,9 +197,15 @@ void RaceGUI::renderGlobal(float dt)
 		const int rows = ceil(Sqrt);
 		const int cols = round(Sqrt);
         static video::SColor black = video::SColor(255,0,0,0);
+		const int X_Grid_Position = race_manager->getNumLocalPlayers() % cols;
+		const int Y_Grid_Position = floor((race_manager->getNumLocalPlayers()) / cols);
+		const int width_of_space = floor(irr_driver->getActualScreenSize().Width / cols);
+		const int height_of_space = floor(irr_driver->getActualScreenSize().Height / rows);
+
         GL32_draw2DRectangle(black,
-                              core::rect<s32>(irr_driver->getActualScreenSize().Width/ rows,
-                                              irr_driver->getActualScreenSize().Height/ cols,
+                              core::rect<s32>(
+												X_Grid_Position * width_of_space,
+												Y_Grid_Position * height_of_space,
                                               irr_driver->getActualScreenSize().Width,
                                               irr_driver->getActualScreenSize().Height));
     }
@@ -258,7 +264,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     
     drawPlungerInFace(camera, dt);
 
-    scaling *= viewport.getWidth()/800.0f; // scale race GUI along screen size
+    scaling *= viewport.getWidth()/200.0f; // scale race GUI along screen size
     drawAllMessages(kart, viewport, scaling);
 
     if(!World::getWorld()->isRacePhase()) return;
@@ -375,7 +381,9 @@ void RaceGUI::drawGlobalTimer()
     {
 		const float Sqrt = sqrt(race_manager->getNumLocalPlayers());
 		const int rows = ceil(Sqrt);
-        pos += core::vector2d<s32>(0, irr_driver->getActualScreenSize().Height/ rows);
+		const int Y_Grid_Position = floor((race_manager->getNumLocalPlayers()) / rows);
+		const int height_of_space = floor(irr_driver->getActualScreenSize().Height / rows);
+        pos += core::vector2d<s32>(0, Y_Grid_Position * height_of_space);
     }
 
     gui::ScalableFont* font = (use_digit_font ? GUIEngine::getHighresDigitFont() : GUIEngine::getFont());

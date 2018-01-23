@@ -653,9 +653,15 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 		const float Sqrt = sqrt(race_manager->getNumLocalPlayers());
 		const int rows = ceil(Sqrt);
 		const int cols = round(Sqrt);
-
-        x_base = irr_driver->getActualScreenSize().Width/ cols + x_base;
-        y_base = irr_driver->getActualScreenSize().Height/ rows + y_base;
+		const int width_of_space = floor(irr_driver->getActualScreenSize().Width / cols);
+		const int height_of_space = floor(irr_driver->getActualScreenSize().Height / rows);
+		
+		const int X_Grid_Position = race_manager->getNumLocalPlayers() % cols;
+		const int Y_Grid_Position = floor((race_manager->getNumLocalPlayers()) / cols);
+		
+		
+		x_base = X_Grid_Position * width_of_space;
+		y_base = Y_Grid_Position * height_of_space;
         y_space = irr_driver->getActualScreenSize().Height - y_base;
     }
 
