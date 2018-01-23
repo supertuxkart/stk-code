@@ -648,10 +648,14 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     int y_base = 20;
     unsigned int y_space = irr_driver->getActualScreenSize().Height - bottom_margin - y_base;
     // Special case : when 3 players play, use 4th window to display such stuff
-    if (race_manager->getNumLocalPlayers() == 3)
+    if (race_manager->getIfEmptyScreenSpaceExists())
     {
-        x_base = irr_driver->getActualScreenSize().Width/2 + x_base;
-        y_base = irr_driver->getActualScreenSize().Height/2 + y_base;
+		const float Sqrt = sqrt(race_manager->getNumLocalPlayers());
+		const int rows = ceil(Sqrt);
+		const int cols = round(Sqrt);
+
+        x_base = irr_driver->getActualScreenSize().Width/ cols + x_base;
+        y_base = irr_driver->getActualScreenSize().Height/ rows + y_base;
         y_space = irr_driver->getActualScreenSize().Height - y_base;
     }
 
@@ -712,7 +716,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     //where is the limit to hide last icons
     int y_icons_limit = irr_driver->getActualScreenSize().Height - 
                                             bottom_margin - ICON_PLAYER_WIDTH;
-    if (race_manager->getNumLocalPlayers() == 3)
+    if (race_manager->getIfEmptyScreenSpaceExists())
     {
         y_icons_limit = irr_driver->getActualScreenSize().Height - ICON_WIDTH;
     }

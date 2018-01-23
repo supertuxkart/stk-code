@@ -121,7 +121,7 @@ RaceGUI::RaceGUI()
 
 
     // special case : when 3 players play, use available 4th space for such things
-    if (race_manager->getNumLocalPlayers() == 3)
+    if (race_manager->getIfEmptyScreenSpaceExists())
     {
         m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
     }
@@ -190,13 +190,16 @@ void RaceGUI::renderGlobal(float dt)
 
     // Special case : when 3 players play, use 4th window to display such
     // stuff (but we must clear it)
-    if (race_manager->getNumLocalPlayers() == 3 &&
+    if (race_manager->getIfEmptyScreenSpaceExists() &&
         !GUIEngine::ModalDialog::isADialogActive())
     {
+		const float Sqrt = sqrt(race_manager->getNumLocalPlayers());
+		const int rows = ceil(Sqrt);
+		const int cols = round(Sqrt);
         static video::SColor black = video::SColor(255,0,0,0);
         GL32_draw2DRectangle(black,
-                              core::rect<s32>(irr_driver->getActualScreenSize().Width/2,
-                                              irr_driver->getActualScreenSize().Height/2,
+                              core::rect<s32>(irr_driver->getActualScreenSize().Width/ rows,
+                                              irr_driver->getActualScreenSize().Height/ cols,
                                               irr_driver->getActualScreenSize().Width,
                                               irr_driver->getActualScreenSize().Height));
     }
@@ -368,9 +371,11 @@ void RaceGUI::drawGlobalTimer()
                         irr_driver->getActualScreenSize().Width                  , 50);
 
     // special case : when 3 players play, use available 4th space for such things
-    if (race_manager->getNumLocalPlayers() == 3)
+    if (race_manager->getIfEmptyScreenSpaceExists())
     {
-        pos += core::vector2d<s32>(0, irr_driver->getActualScreenSize().Height/2);
+		const float Sqrt = sqrt(race_manager->getNumLocalPlayers());
+		const int rows = ceil(Sqrt);
+        pos += core::vector2d<s32>(0, irr_driver->getActualScreenSize().Height/ rows);
     }
 
     gui::ScalableFont* font = (use_digit_font ? GUIEngine::getHighresDigitFont() : GUIEngine::getFont());

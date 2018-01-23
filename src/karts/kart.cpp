@@ -2728,7 +2728,7 @@ void Kart::kartIsInRestNow()
 
 SFXBase* Kart::getNextEmitter()
 {
-    m_emitter_id = (m_emitter_id + 1) % 7;
+    m_emitter_id = (m_emitter_id + 1) % 3;
     return m_emitters[m_emitter_id];
 }
 

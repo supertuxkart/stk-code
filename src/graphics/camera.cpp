@@ -163,8 +163,7 @@ void Camera::setKart(AbstractKart *new_kart)
  */
 void Camera::setupCamera()
 {
-    m_aspect = (float)(irr_driver->getActualScreenSize().Width)
-             /         irr_driver->getActualScreenSize().Height;
+    
 
 	const int playernum = race_manager->getNumLocalPlayers();
 	const float Sqrt = sqrt(playernum);
@@ -175,7 +174,8 @@ void Camera::setupCamera()
 
 	const int width_of_space = floor(irr_driver->getActualScreenSize().Width / cols);
 	const int height_of_space = floor(irr_driver->getActualScreenSize().Height / rows);
-
+	m_aspect = (float)(width_of_space)
+		/ height_of_space;
 	const int X_Grid_Position = m_index % cols;
 	const int Y_Grid_Position = floor((m_index) / cols);
 
@@ -183,16 +183,15 @@ void Camera::setupCamera()
 	m_viewport = core::recti(
 		X_Grid_Position * width_of_space, 
 		Y_Grid_Position * height_of_space,
-		width_of_space,
-		height_of_space);
+		(X_Grid_Position * width_of_space) + width_of_space,
+		height_of_space + (Y_Grid_Position * height_of_space));
+	
 	m_scaling = core::vector2df(1.0F / cols, 1.0F / rows);
 
 	//TODO Needs to be fixed
 	
 	m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov[m_index % 3];
-	if (playernum == 2) {
-		m_aspect *= 2.0F;
-	}
+	
 
 	
     m_camera->setFOV(m_fov);
