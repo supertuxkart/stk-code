@@ -409,6 +409,9 @@ public:
      *  minutes(!) in debug mode to be computed. */
     static bool        m_dont_load_navmesh;
 
+    /** Static helper function to pre-upload vertex buffer in spm. */
+    static void uploadNodeVertexBuffer(scene::ISceneNode *node);
+
     static const float NOHIT;
 
                        Track             (const std::string &filename);

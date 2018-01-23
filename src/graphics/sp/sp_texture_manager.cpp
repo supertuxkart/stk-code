@@ -88,6 +88,11 @@ SPTextureManager::~SPTextureManager()
         t.join();
     }
     m_threaded_load_obj.clear();
+    removeUnusedTextures();
+    for (auto p : m_textures)
+    {
+        Log::error("SPTextureManager", "%s > 1 ref_count", p.first.c_str());
+    }
 }   // ~SPTextureManager
 
 // ----------------------------------------------------------------------------

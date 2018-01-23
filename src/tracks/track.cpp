@@ -851,6 +851,7 @@ void Track::createPhysicsModel(unsigned int main_track_count)
     for(unsigned int i=main_track_count; i<m_all_nodes.size(); i++)
     {
         convertTrackToBullet(m_all_nodes[i]);
+        uploadNodeVertexBuffer(m_all_nodes[i]);
     }
     m_track_mesh->createPhysicalBody(m_friction);
     m_gfx_effect_mesh->createCollisionShape();
@@ -1423,6 +1424,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {
         convertTrackToBullet(m_all_nodes[i]);
+        uploadNodeVertexBuffer(m_all_nodes[i]);
     }
 
     if (m_track_mesh == NULL)
@@ -2090,8 +2092,6 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }
         m_spherical_harmonics_textures.clear();
     }
-    // Draw all object visible in first frame to load all textures
-    SP::sp_first_frame = true;
 #endif   // !SERVER_ONLY
 }   // loadTrackModel
 
@@ -2563,3 +2563,19 @@ float Track::getAngle(int n) const
 {
     return DriveGraph::get()->getAngleToNext(n, 0);
 }   // getAngle
+
+//-----------------------------------------------------------------------------
+void Track::uploadNodeVertexBuffer(scene::ISceneNode *node)
+{
+#ifndef SERVER_ONLY
+    if (!CVS->isGLSL())
+    {
+        return;
+    }
+    SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
+    if (spmn)
+    {
+        SP::uploadSPM(spmn->getSPM());
+    }
+#endif
+}   // uploadNodeVertexBuffer

@@ -120,8 +120,6 @@ void initSTKRenderer(ShaderBasedRenderer* sbr)
 // ----------------------------------------------------------------------------
 GLuint sp_mat_ubo[MAX_PLAYER_COUNT][3] = {};
 // ----------------------------------------------------------------------------
-bool sp_first_frame = false;
-// ----------------------------------------------------------------------------
 GLuint sp_fog_ubo = 0;
 // ----------------------------------------------------------------------------
 core::vector3df sp_wind_dir;
@@ -796,8 +794,7 @@ void addObject(SPMeshNode* node)
         model_matrix.transformBoxEx(bb);
         std::vector<bool> discard;
         discard.resize((g_handle_shadow ? 5 : 1), false);
-        for (int dc_type = 0; dc_type <
-            (g_handle_shadow ? 5 : sp_first_frame ? 0 : 1); dc_type++)
+        for (int dc_type = 0; dc_type < (g_handle_shadow ? 5 : 1); dc_type++)
         {
             for (int i = 0; i < 24; i += 4)
             {
@@ -822,7 +819,7 @@ void addObject(SPMeshNode* node)
                 }
             }
         }
-        if (sp_first_frame || g_handle_shadow ?
+        if (g_handle_shadow ?
             (discard[0] && discard[1] && discard[2] && discard[3] &&
             discard[4]) : discard[0])
         {
@@ -847,8 +844,7 @@ void addObject(SPMeshNode* node)
 
         mb->uploadGLMesh();
         // For first frame only need the vbo to be initialized
-        if (!added_for_skinning && node->getAnimationState() &&
-            !sp_first_frame)
+        if (!added_for_skinning && node->getAnimationState())
         {
             added_for_skinning = true;
             int skinning_offset = g_skinning_offset + node->getTotalJoints();
@@ -873,7 +869,7 @@ void addObject(SPMeshNode* node)
 
         for (int dc_type = 0; dc_type < (g_handle_shadow ? 5 : 1); dc_type++)
         {
-            if (!sp_first_frame && discard[dc_type])
+            if (discard[dc_type])
             {
                 continue;
             }
@@ -1071,7 +1067,6 @@ void updateModelMatrix()
 {
     // Make sure all textures (with handles) are loaded
     SPTextureManager::get()->checkForGLCommand(true/*before_scene*/);
-    SP::sp_first_frame = false;
     if (!sp_culling)
     {
         return;
@@ -1394,6 +1389,24 @@ SPMesh* convertEVTStandard(irr::scene::IMesh* mesh,
     spm->updateBoundingBox();
     return spm;
 }   // convertEVTStandard
+
+// ----------------------------------------------------------------------------
+void uploadSPM(irr::scene::IMesh* mesh)
+{
+    if (!CVS->isGLSL())
+    {
+        return;
+    }
+    SP::SPMesh* spm = dynamic_cast<SP::SPMesh*>(mesh);
+    if (spm)
+    {
+        for (u32 i = 0; i < spm->getMeshBufferCount(); i++)
+        {
+            SP::SPMeshBuffer* mb = spm->getSPMeshBuffer(i);
+            mb->uploadGLMesh();
+        }
+    }
+}   // uploadSPM
 
 }
 

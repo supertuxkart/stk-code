@@ -678,16 +678,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         std::string full_name = kart_properties.getKartDir() + obj.getFilename();
         obj.setModel(irr_driver->getMesh(full_name));
 #ifndef SERVER_ONLY
-        if (CVS->isGLSL())
-        {
-            for (u32 j = 0; j < obj.getModel()->getMeshBufferCount(); j++)
-            {
-                SP::SPMeshBuffer* mb = static_cast<SP::SPMeshBuffer*>
-                    (obj.getModel()->getMeshBuffer(j));
-                // Pre-upload gl meshes and textures for kart screen
-                mb->uploadGLMesh();
-            }
-        }
+        SP::uploadSPM(obj.getModel());
 #endif
         obj.getModel()->grab();
         irr_driver->grabAllTextures(obj.getModel());
@@ -725,16 +716,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
             kart_properties.getKartDir()+m_wheel_filename[i];
         m_wheel_model[i] = irr_driver->getMesh(full_wheel);
 #ifndef SERVER_ONLY
-        if (CVS->isGLSL())
-        {
-            for (u32 j = 0; j < m_wheel_model[i]->getMeshBufferCount(); j++)
-            {
-                SP::SPMeshBuffer* mb = static_cast<SP::SPMeshBuffer*>
-                    (m_wheel_model[i]->getMeshBuffer(j));
-                // Pre-upload gl meshes and textures for kart screen
-                mb->uploadGLMesh();
-            }
-        }
+        SP::uploadSPM(m_wheel_model[i]);
 #endif
         // Grab all textures. This is done for the master only, so
         // the destructor will only free the textures if a master

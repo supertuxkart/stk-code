@@ -217,8 +217,7 @@ void LocalPlayerController::update(float dt)
         }
     }
 #endif
-    if (m_kart->getKartAnimation() && m_sound_schedule == false &&
-        m_kart->getAttachment()->getType() != Attachment::ATTACH_TINYTUX)
+    if (m_kart->getKartAnimation() && m_sound_schedule == false)
     {
         m_sound_schedule = true;
     }

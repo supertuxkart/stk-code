@@ -566,7 +566,8 @@ void Attachment::update(float dt)
         // Everything is done in the plugin.
         break;
     case ATTACH_NOLOKS_SWATTER:
-        // Should never be called, this symbols is only used as an index for
+    case ATTACH_SWATTER_ANIM:
+        // Should never be called, these symbols are only used as an index for
         // the model, Nolok's attachment type is ATTACH_SWATTER
         assert(false);
         break;
@@ -596,9 +597,6 @@ void Attachment::update(float dt)
                 m_bomb_sound = NULL;
             }
         }
-        break;
-    case ATTACH_TINYTUX:
-        // Nothing to do for tinytux, this is all handled in EmergencyAnimation
         break;
     case ATTACH_BUBBLEGUM_SHIELD:
     case ATTACH_NOLOK_BUBBLEGUM_SHIELD:
