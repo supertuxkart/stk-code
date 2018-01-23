@@ -349,6 +349,9 @@ void Skidding::update(float dt, bool is_on_ground,
                          * 0.5f * kp->getSkidGraphicalJumpTime();
             m_remaining_jump_time = kp->getSkidGraphicalJumpTime();
 
+            // Don't "play-sound-than-pause-sound-when-jumping-then-play-sound-when-jump-done"
+            m_gfx_jump_offset = 0.001f;
+
 #ifdef SKID_DEBUG
 #define SPEED 20.0f
             m_real_steering = updateSteering(steering, dt);
@@ -389,6 +392,14 @@ void Skidding::update(float dt, bool is_on_ground,
     case SKID_ACCUMULATE_LEFT:
     case SKID_ACCUMULATE_RIGHT:
         {
+            if (!is_on_ground) {
+                m_kart->getKartGFX()
+                      ->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
+                m_kart->getKartGFX()
+                      ->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
+                m_kart->getKartGFX()->updateSkidLight(0);
+                break;
+            }
 #ifdef SKID_DEBUG
             Vec3 v=m_kart->getVelocity();
             if(v.length()>5)
