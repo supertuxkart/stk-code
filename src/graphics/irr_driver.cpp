@@ -251,7 +251,27 @@ void IrrDriver::updateConfigIfRelevant()
     }
 #endif   // !SERVER_ONLY
 }   // updateConfigIfRelevant
+core::recti IrrDriver::GetSplitscreenWindow(int WindowNum) {
+	const int playernum = race_manager->getNumLocalPlayers();
+	const float Sqrt = sqrt(playernum);
+	const bool MoreRowsThanCols = false;
 
+	const int rows = MoreRowsThanCols ? ceil(Sqrt) : round(Sqrt);
+	const int cols = MoreRowsThanCols ? round(Sqrt) : ceil(Sqrt);
+
+	const int width_of_space = floor(irr_driver->getActualScreenSize().Width / cols);
+	const int height_of_space = floor(irr_driver->getActualScreenSize().Height / rows);
+
+	const int X_Grid_Position = WindowNum % cols;
+	const int Y_Grid_Position = floor((WindowNum) / cols);
+
+	return core::recti(
+		X_Grid_Position * width_of_space,
+		Y_Grid_Position * height_of_space,
+		(X_Grid_Position * width_of_space) + width_of_space,
+		height_of_space + (Y_Grid_Position * height_of_space));
+
+}
 // ----------------------------------------------------------------------------
 /** Gets a list of supported video modes from the irrlicht device. This data
  *  is stored in m_modes.

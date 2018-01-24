@@ -489,6 +489,7 @@ public:
     {
         return m_num_local_players;
     }   // getNumLocalPlayers
+	
     // ------------------------------------------------------------------------
 	bool getIfEmptyScreenSpaceExists() const
 	{

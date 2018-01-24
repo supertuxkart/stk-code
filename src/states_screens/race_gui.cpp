@@ -193,21 +193,10 @@ void RaceGUI::renderGlobal(float dt)
     if (race_manager->getIfEmptyScreenSpaceExists() &&
         !GUIEngine::ModalDialog::isADialogActive())
     {
-		const float Sqrt = sqrt(race_manager->getNumLocalPlayers());
-		const int rows = ceil(Sqrt);
-		const int cols = round(Sqrt);
         static video::SColor black = video::SColor(255,0,0,0);
-		const int X_Grid_Position = race_manager->getNumLocalPlayers() % cols;
-		const int Y_Grid_Position = floor((race_manager->getNumLocalPlayers()) / cols);
-		const int width_of_space = floor(irr_driver->getActualScreenSize().Width / cols);
-		const int height_of_space = floor(irr_driver->getActualScreenSize().Height / rows);
 
-        GL32_draw2DRectangle(black,
-                              core::rect<s32>(
-												X_Grid_Position * width_of_space,
-												Y_Grid_Position * height_of_space,
-                                              irr_driver->getActualScreenSize().Width,
-                                              irr_driver->getActualScreenSize().Height));
+		GL32_draw2DRectangle(black, irr_driver->GetSplitscreenWindow(
+			race_manager->getNumLocalPlayers()));
     }
 
     World *world = World::getWorld();
@@ -379,11 +368,8 @@ void RaceGUI::drawGlobalTimer()
     // special case : when 3 players play, use available 4th space for such things
     if (race_manager->getIfEmptyScreenSpaceExists())
     {
-		const float Sqrt = sqrt(race_manager->getNumLocalPlayers());
-		const int rows = ceil(Sqrt);
-		const int Y_Grid_Position = floor((race_manager->getNumLocalPlayers()) / rows) + 1;
-		const int height_of_space = floor(irr_driver->getActualScreenSize().Height / rows);
-        pos += core::vector2d<s32>(0, rows * height_of_space);
+		pos -= core::vector2d<s32>(0, pos.LowerRightCorner.Y / 2);
+        pos += core::vector2d<s32>(0, irr_driver->getActualScreenSize().Height - irr_driver->GetSplitscreenWindow(0).getHeight());
     }
 
     gui::ScalableFont* font = (use_digit_font ? GUIEngine::getHighresDigitFont() : GUIEngine::getFont());

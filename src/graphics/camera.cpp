@@ -163,29 +163,13 @@ void Camera::setKart(AbstractKart *new_kart)
  */
 void Camera::setupCamera()
 {
-    
+	m_viewport = irr_driver->GetSplitscreenWindow(m_index);
+	m_aspect = (float)((float)(m_viewport.getWidth()) / (float)(m_viewport.getHeight()));
 
-	const int playernum = race_manager->getNumLocalPlayers();
-	const float Sqrt = sqrt(playernum);
-	const bool MoreRowsThanCols = true;
 	
-	const int rows = MoreRowsThanCols ? ceil(Sqrt) : round(Sqrt);
-	const int cols = MoreRowsThanCols ? round(Sqrt): ceil(Sqrt);
-
-	const int width_of_space = floor(irr_driver->getActualScreenSize().Width / cols);
-	const int height_of_space = floor(irr_driver->getActualScreenSize().Height / rows);
-	m_aspect = (float)(width_of_space)
-		/ height_of_space;
-	const int X_Grid_Position = m_index % cols;
-	const int Y_Grid_Position = floor((m_index) / cols);
-
-	m_viewport = core::recti(
-		X_Grid_Position * width_of_space, 
-		Y_Grid_Position * height_of_space,
-		(X_Grid_Position * width_of_space) + width_of_space,
-		height_of_space + (Y_Grid_Position * height_of_space));
-	
-	m_scaling = core::vector2df(1.0F / cols, 1.0F / rows);
+	m_scaling = core::vector2df(
+		irr_driver->getActualScreenSize().Width / m_viewport.getWidth() , 
+		irr_driver->getActualScreenSize().Width / m_viewport.getHeight());
 
 	//TODO Needs to be fixed
 	

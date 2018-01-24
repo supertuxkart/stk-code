@@ -206,9 +206,9 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
                                   const core::vector2df &scaling)
 {
     int y = viewport.LowerRightCorner.Y - m_small_font_max_height - 10;
-
-    const int x = (viewport.LowerRightCorner.X + viewport.UpperLeftCorner.X)/2;
-    const int w = (viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X);
+	
+    const int x = viewport.getCenter().X;
+    const int w = viewport.getWidth();
 
     // Draw less important messages first, at the very bottom of the screen
     // unimportant messages are skipped in multiplayer, they take too much screen space
@@ -234,7 +234,7 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
     }
 
     // First line of text somewhat under the top of the viewport.
-    y = (int)(viewport.UpperLeftCorner.Y + 164*scaling.Y);
+    y = (int)(viewport.UpperLeftCorner.Y + 20);
 
     gui::ScalableFont* font = GUIEngine::getFont();
     gui::ScalableFont* big_font = GUIEngine::getTitleFont();
@@ -650,18 +650,9 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     // Special case : when 3 players play, use 4th window to display such stuff
     if (race_manager->getIfEmptyScreenSpaceExists())
     {
-		const float Sqrt = sqrt(race_manager->getNumLocalPlayers());
-		const int rows = ceil(Sqrt);
-		const int cols = round(Sqrt);
-		const int width_of_space = floor(irr_driver->getActualScreenSize().Width / cols);
-		const int height_of_space = floor(irr_driver->getActualScreenSize().Height / rows);
-		
-		const int X_Grid_Position = race_manager->getNumLocalPlayers() % cols;
-		const int Y_Grid_Position = floor((race_manager->getNumLocalPlayers()) / cols);
-		
-		
-		x_base = X_Grid_Position * width_of_space;
-		y_base = Y_Grid_Position * height_of_space;
+		irr::core::recti Last_Space = irr_driver->GetSplitscreenWindow(race_manager->getNumLocalPlayers());
+		x_base = Last_Space.UpperLeftCorner.X;
+		y_base = Last_Space.UpperLeftCorner.Y;
         y_space = irr_driver->getActualScreenSize().Height - y_base;
     }
 

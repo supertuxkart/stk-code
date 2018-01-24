@@ -186,11 +186,8 @@ void RaceGUIOverworld::renderGlobal(float dt)
 		const int rows = ceil(Sqrt);
 		const int cols = round(Sqrt);
         static video::SColor black = video::SColor(255,0,0,0);
-        GL32_draw2DRectangle(black,
-                          core::rect<s32>(irr_driver->getActualScreenSize().Width/ cols,
-                                          irr_driver->getActualScreenSize().Height/ rows,
-                                          irr_driver->getActualScreenSize().Width,
-                                          irr_driver->getActualScreenSize().Height));
+		GL32_draw2DRectangle(black, irr_driver->GetSplitscreenWindow(
+			race_manager->getNumLocalPlayers()));
     }
 
     World *world = World::getWorld();
