@@ -1,0 +1,70 @@
+#!/bin/bash
+
+# Start an STK client with:
+# --log=0 --stdout=client  --online  --logbuffer=100000
+# Add "--history=2" if you want to use a replay.
+# Start a server with:
+# --log=0 --stdout=server --lan-server=lan-server --no-graphics   --online  --logbuffer=100000
+# Remove --no-graphics if you also want to see the graphics on the server
+
+# Then do a race, and stop/abort on the client. Wait a long time for
+# the log file to be flushed!!! The server will trigger flushing its
+# log buffer when the client disconnects as well. So wait for both
+# 'server' and 'client' files to stay unchanged.
+
+# First extract the phsyicsafter lines, which contain physics
+# information to evaluate client/server consistency.
+
+cat server | grep physicsafter > xx.s
+cat client | grep physicsafter > xx.c
+
+# Each log line done during a rewind will start with 'Rewind '. The
+# space at the beginning changes the column numbers used in gnuplot
+# for each field (as a result rewind lines are not plotted by default)
+# Removing the space means that rewind data will be plotted as well
+cat xx.c   | sed 's/Rewind /Rewind/'  >xx.cc
+
+# Now compute the error per client timestep. The parametrs are:
+# -f which fields to use: first field is the world time, then one
+# or more fields. The script will compute for each client frame the
+# earliest immediate previous and next data from the server at the
+# client time. Based on those two data points it will interpolate
+# the data of the server at the client time, and compute the
+# distance between client and server.
+
+# For column numbers check the xx.s files: each name contains the
+# column numbers in (), e.g.:
+# xyz(9-11) 0.1 0.2 0.3
+# This indicates that the column 9-11 in the file are the xyz position
+# It saves column counting if the heading is kept up to date
+
+# Comparison of (physical) position used in STK:
+~/stk-code/tools/compute_client_error.py -f 6,9,10,11  xx.s xx.cc >pos
+
+# Comparison of physical position at the end of the last full
+# bullet time step (i.e. multple of 1/120).
+~/stk-code/tools/compute_client_error.py -f 6,12,13,14 xx.s xx.cc >phys-pos
+
+# Comparison of velocity
+~/stk-code/tools/compute_client_error.py -f 6,16,17,18 xx.s xx.cc >v
+
+# Comparison of steering
+~/stk-code/tools/compute_client_error.py -f 6,20 xx.s xx.cc >steering
+
+# Useful gnuplot commands:
+# Plot the path taken for client and server (use xx.c instead of xx.cc not
+# remove rewinds):
+# plot "xx.cc" u 9:11  w lp lw 2, "xx.s" u 9:11 w lp, "recorded/xx.c" u 9:11 w lp
+# Plot steering values used:
+# a=20; plot "xx.cc" u 6:a  w lp lw 2, "xx.s" u 6:a w lp, "recorded/xx.c" u 6:a w lp
+# Change a=XX if you want to display a different value
+#
+# It can be useful to plot the time step size:
+# plot "xx.s" u 6:7 w lp, "xx.cc" u 6:7 w lp
+# and also to check that the game time is in sync between client and server:
+# Field 29 is the real time clock, so they can be compared if you are running
+# on the same machine. So this shows what the game clock is at a given real
+# time. Note that the client must be somewhat ahead of the server!
+# plot "xx.cc" u 29:6  w lp lw 2, "xx.s" u 29:6 w lp
+
+
