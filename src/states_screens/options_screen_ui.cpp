@@ -128,7 +128,9 @@ void OptionsScreenUI::init()
     assert( skinSelector != NULL );
 
     // ---- video modes
-
+	CheckBoxWidget* SplitScreen_Method = getWidget<CheckBoxWidget>("Split_Screen_Horizontally");
+	assert(SplitScreen_Method != NULL);
+	SplitScreen_Method->setState(UserConfigParams::Split_Screen_Horizontally);
     CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
     assert( fps != NULL );
     fps->setState( UserConfigParams::m_display_fps );
@@ -258,6 +260,12 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         UserConfigParams::m_skin_file = core::stringc(selectedSkin.c_str()).c_str() + std::string(".stkskin");
         GUIEngine::reloadSkin();
     }
+	else if (name == "Split_Screen_Horizontally")
+	{
+		CheckBoxWidget* Split_Screen_Horizontally = getWidget<CheckBoxWidget>("Split_Screen_Horizontally");
+		assert(Split_Screen_Horizontally != NULL);
+		UserConfigParams::Split_Screen_Horizontally = Split_Screen_Horizontally->getState();
+	}
     else if (name == "showfps")
     {
         CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");

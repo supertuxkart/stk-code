@@ -165,15 +165,12 @@ void Camera::setupCamera()
 {
     m_viewport = irr_driver->GetSplitscreenWindow(m_index);
     m_aspect = (float)((float)(m_viewport.getWidth()) / (float)(m_viewport.getHeight()));
-
-    
+	
     m_scaling = core::vector2df(
         irr_driver->getActualScreenSize().Width / m_viewport.getWidth() , 
-        irr_driver->getActualScreenSize().Width / m_viewport.getHeight());
+        irr_driver->getActualScreenSize().Height / m_viewport.getHeight());
 
-    //TODO Needs to be fixed
-    
-    m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov[m_index % 3];
+    m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov[m_index];
     
     m_camera->setFOV(m_fov);
     m_camera->setAspectRatio(m_aspect);
