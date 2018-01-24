@@ -104,7 +104,8 @@ bool GamePadDevice::isButtonPressed(const int i)
 
 void GamePadDevice::setButtonPressed(const int i, bool isButtonPressed)
 {
-    m_button_pressed[i] = isButtonPressed;
+    if (i < m_button_pressed.size())
+        m_button_pressed[i] = isButtonPressed;
 }   // setButtonPressed
 
 // ----------------------------------------------------------------------------

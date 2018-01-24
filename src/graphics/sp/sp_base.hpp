@@ -23,6 +23,7 @@
 #include "utils/no_copy.hpp"
 
 #include "irrMath.h"
+#include "vector3d.h"
 
 #include <array>
 #include <cmath>
@@ -86,7 +87,6 @@ class SPMeshBuffer;
 
 extern GLuint sp_mat_ubo[MAX_PLAYER_COUNT][3];
 extern GLuint sp_fog_ubo;
-extern bool sp_first_frame;
 extern std::array<GLuint, 1> sp_prefilled_tex;
 extern unsigned sp_solid_poly_count;
 extern unsigned sp_shadow_poly_count;
@@ -94,19 +94,17 @@ extern int sp_cur_shadow_cascade;
 extern bool sp_culling;
 extern unsigned sp_cur_player;
 extern unsigned sp_cur_buf_id[MAX_PLAYER_COUNT];
-
+extern irr::core::vector3df sp_wind_dir;
 // ----------------------------------------------------------------------------
 void init();
-// ----------------------------------------------------------------------------
-void addShader(SPShader*);
 // ----------------------------------------------------------------------------
 void destroy();
 // ----------------------------------------------------------------------------
 GLuint getSampler(SamplerType);
 // ----------------------------------------------------------------------------
-SPShader* getGlowShader();
+SPShader* getNormalVisualizer();
 // ----------------------------------------------------------------------------
-SPShader* getSPShader(const std::string& name);
+SPShader* getGlowShader();
 // ----------------------------------------------------------------------------
 void prepareDrawCalls();
 // ----------------------------------------------------------------------------
@@ -136,6 +134,8 @@ void drawBoundingBoxes();
 // ----------------------------------------------------------------------------
 SPMesh* convertEVTStandard(irr::scene::IMesh* mesh,
                            const irr::video::SColor* color = NULL);
+// ----------------------------------------------------------------------------
+void uploadSPM(irr::scene::IMesh* mesh);
 // ----------------------------------------------------------------------------
 inline uint8_t srgbToLinear(float color_srgb)
 {

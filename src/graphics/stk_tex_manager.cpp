@@ -153,81 +153,6 @@ void STKTexManager::removeTexture(STKTexture* texture, bool remove_all)
 }   // removeTexture
 
 // ----------------------------------------------------------------------------
-void STKTexManager::dumpAllTexture(bool mesh_texture)
-{
-    for (auto p : m_all_textures)
-    {
-        if (!p.second || (mesh_texture && !p.second->isMeshTexture()))
-            continue;
-        Log::info("STKTexManager", "%s size: %0.2fK", p.first.c_str(),
-            float(p.second->getTextureSize()) / 1024);
-    }
-}   // dumpAllTexture
-
-// ----------------------------------------------------------------------------
-int STKTexManager::dumpTextureUsage()
-{
-    int size = 0;
-    for (auto p : m_all_textures)
-    {
-        if (p.second == NULL)
-            continue;
-        size += p.second->getTextureSize() / 1024 / 1024;
-    }
-    Log::info("STKTexManager", "Total %dMB", size);
-    return size;
-}   // dumpAllTexture
-
-// ----------------------------------------------------------------------------
-core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
-{
-    core::stringw result;
-#ifndef SERVER_ONLY
-    if (CVS->isTextureCompressionEnabled())
-        return L"Please disable texture compression for reloading textures.";
-
-    if (name.empty())
-    {
-        for (auto p : m_all_textures)
-        {
-            if (p.second == NULL || !p.second->isMeshTexture())
-                continue;
-            p.second->reload();
-            Log::info("STKTexManager", "%s reloaded",
-                p.second->getName().getPtr());
-        }
-        return L"All textures reloaded.";
-    }
-
-    core::stringw list = name;
-    list.make_lower().replace(L'\u005C', L'\u002F');
-    std::vector<std::string> names =
-        StringUtils::split(StringUtils::wideToUtf8(list), ';');
-    for (const std::string& fname : names)
-    {
-        for (auto p : m_all_textures)
-        {
-            if (p.second == NULL || !p.second->isMeshTexture())
-                continue;
-            std::string tex_path =
-                StringUtils::toLowerCase(p.second->getName().getPtr());
-            std::string tex_name = StringUtils::getBasename(tex_path);
-            if (fname == tex_name || fname == tex_path)
-            {
-                p.second->reload();
-                result += tex_name.c_str();
-                result += L" ";
-                break;
-            }
-        }
-    }
-    if (result.empty())
-        return L"Texture(s) not found!";
-#endif   // !SERVER_ONLY
-    return result + "reloaded.";
-}   // reloadTexture
-
-// ----------------------------------------------------------------------------
 /** Sets an error message to be displayed when a texture is not found. This
  *  error message is shown before the "Texture %s not found or invalid"
  *  message. It can be used to supply additional details like what kart is
@@ -244,3 +169,17 @@ void STKTexManager::setTextureErrorMessage(const std::string &error,
     else
         m_texture_error_message = StringUtils::insertValues(error, detail);
 }   // setTextureErrorMessage
+
+// ----------------------------------------------------------------------------
+int STKTexManager::dumpTextureUsage()
+{
+    int size = 0;
+    for (auto p : m_all_textures)
+    {
+        if (p.second == NULL)
+            continue;
+        size += p.second->getTextureSize() / 1024 / 1024;
+    }
+    Log::info("STKTexManager", "Total %dMB", size);
+    return size;
+}   // dumpTextureUsage

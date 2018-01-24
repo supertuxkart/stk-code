@@ -52,11 +52,9 @@ private:
 
     std::vector<std::array<float, 16> > m_skinning_matrices;
 
-    std::string m_shader_override;
-
     video::SColorf m_glow_color;
 
-    std::vector<std::array<std::shared_ptr<float>, 2> > m_texture_matrices;
+    std::vector<std::array<float, 2> > m_texture_matrices;
 
     // ------------------------------------------------------------------------
     void cleanRenderInfo();
@@ -119,8 +117,6 @@ public:
     // ------------------------------------------------------------------------
     SPShader* getShader(unsigned mesh_buffer_id) const;
     // ------------------------------------------------------------------------
-    void setShaderOverride(const std::string& so)   { m_shader_override = so; }
-    // ------------------------------------------------------------------------
     const std::array<float, 16>* getSkinningMatrices() const 
                                          { return m_skinning_matrices.data(); }
     // ------------------------------------------------------------------------
@@ -143,14 +139,13 @@ public:
             m_glow_color.b == 0.0f);
     }
     // ------------------------------------------------------------------------
-    std::array<std::shared_ptr<float>, 2>& getTextureMatrix(unsigned mb_id)
+    std::array<float, 2>& getTextureMatrix(unsigned mb_id)
     {
         assert(mb_id < m_texture_matrices.size());
         return m_texture_matrices[mb_id];
     }
     // ------------------------------------------------------------------------
-    void setTextureMatrix(unsigned mb_id,
-                          std::array<std::shared_ptr<float>, 2> tm)
+    void setTextureMatrix(unsigned mb_id, const std::array<float, 2>& tm)
     {
         assert(mb_id < m_texture_matrices.size());
         m_texture_matrices[mb_id] = tm;

@@ -21,6 +21,7 @@
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "graphics/sp/sp_shader.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -88,7 +89,8 @@ void SPMeshNode::setMesh(irr::scene::IAnimatedMesh* mesh)
     cleanRenderInfo();
     if (m_mesh)
     {
-        m_texture_matrices.resize(m_mesh->getMeshBufferCount());
+        m_texture_matrices.resize(m_mesh->getMeshBufferCount(),
+            {{ 0.0f, 0.0f }});
         if (!m_mesh->isStatic())
         {
 #ifndef SERVER_ONLY
@@ -190,11 +192,8 @@ SPShader* SPMeshNode::getShader(unsigned mesh_buffer_id) const
 #ifndef SERVER_ONLY
     if (!m_mesh || mesh_buffer_id < m_mesh->getMeshBufferCount())
     {
-        const std::string sn = (m_shader_override.empty() ?
-            m_mesh->getSPMeshBuffer(mesh_buffer_id)->getSTKMaterial()
-            ->getShaderName() : m_shader_override) +
-            (m_animated ? "_skinned" : "");
-        SPShader* shader = SP::getSPShader(sn);
+        SPShader* shader =
+            m_mesh->getSPMeshBuffer(mesh_buffer_id)->getShader(m_animated);
         if (shader && shader->isTransparent())
         {
             // Use real transparent shader first
@@ -202,8 +201,8 @@ SPShader* SPMeshNode::getShader(unsigned mesh_buffer_id) const
         }
         if (m_first_render_info && m_first_render_info->isTransparent())
         {
-            return SP::getSPShader
-                (std::string("ghost") + (m_animated ? "_skinned" : ""));
+            return SPShaderManager::get()->getSPShader
+                (std::string("ghost") + (m_animated ? "_skinned" : "")).get();
         }
         return shader;
     }

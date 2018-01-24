@@ -78,7 +78,6 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     debug_name += m_type;
     m_node->setName(debug_name.c_str());
 #endif
-    Track::getCurrentTrack()->adjustForFog(m_node);
     m_node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
     m_node->setPosition(xyz.toIrrVector());
     Vec3 hpr;
@@ -192,8 +191,6 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
     m_original_type = m_type;
     setMesh(mesh, lowmesh);
     setType(type);
-
-    Track::getCurrentTrack()->adjustForFog(m_node);
 }   // switchTo
 
 //-----------------------------------------------------------------------------
@@ -214,7 +211,6 @@ void Item::switchBack()
     setType(m_original_type);
     m_original_type = ITEM_NONE;
 
-    Track::getCurrentTrack()->adjustForFog(m_node);
     Vec3 hpr;
     hpr.setHPR(m_original_rotation);
     m_node->setRotation(hpr.toIrrHPR());

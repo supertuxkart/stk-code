@@ -41,11 +41,14 @@ class Material;
 
 namespace SP
 {
+class SPShader;
 class SPTexture;
 
 class SPMeshBuffer : public IMeshBuffer, public SPPerObjectUniform
 {
 protected:
+    std::shared_ptr<SPShader> m_shaders[2];
+
     std::vector<std::tuple<size_t/*first_index_id*/,
         unsigned/*indices_count*/, Material*> > m_stk_material;
 
@@ -270,10 +273,7 @@ public:
         m_indices = std::move(indices);
     }
     // ------------------------------------------------------------------------
-    void setSTKMaterial(Material* m)
-    {
-        m_stk_material[0] = std::make_tuple(0u, getIndexCount(), m);
-    }
+    void setSTKMaterial(Material* m);
     // ------------------------------------------------------------------------
     void reloadTextureCompare();
     // ------------------------------------------------------------------------
@@ -282,6 +282,9 @@ public:
         m_vertices.shrink_to_fit();
         m_indices.shrink_to_fit();
     }
+    // ------------------------------------------------------------------------
+    SPShader* getShader(bool skinned = false) const
+                  { return skinned ? m_shaders[1].get() : m_shaders[0].get(); }
     // ------------------------------------------------------------------------
     virtual const video::SMaterial& getMaterial() const
     {

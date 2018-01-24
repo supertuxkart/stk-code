@@ -21,10 +21,10 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_node.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
 #include "graphics/sp/sp_uniform_assigner.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -59,7 +59,7 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
         m_node->setVisible(false);
         SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(m_node);
         assert(spmn);
-        spmn->setTextureMatrix(0, getSPTM());
+        setSPTM(spmn->getTextureMatrix(0).data());
     }
 #endif
 
@@ -80,7 +80,8 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
     if (UserConfigParams::m_slipstream_debug)
     {
         m_debug_dc = std::make_shared<SP::SPDynamicDrawCall>
-            (scene::EPT_TRIANGLE_STRIP, SP::getSPShader("additive"),
+            (scene::EPT_TRIANGLE_STRIP,
+            SP::SPShaderManager::get()->getSPShader("additive"),
             material_manager->getDefaultSPMaterial("additive"));
         m_debug_dc->getVerticesVector().resize(4);
         video::S3DVertexSkinnedMesh* v =

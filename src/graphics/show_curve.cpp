@@ -20,8 +20,8 @@
 
 #include "graphics/show_curve.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
 #include "utils/mini_glm.hpp"
 #include "utils/vec3.hpp"
 
@@ -33,7 +33,8 @@ ShowCurve::ShowCurve(float width, float height,
            m_first_vertices(true), m_visible(true)
 {
     m_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
-        (irr::scene::EPT_TRIANGLES, SP::getSPShader("alphablend"),
+        (irr::scene::EPT_TRIANGLES,
+        SP::SPShaderManager::get()->getSPShader("alphablend"),
         material_manager->getDefaultSPMaterial("alphablend"));
     SP::addDynamicDrawCall(m_dy_dc);
 }   // ShowCurve

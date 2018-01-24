@@ -286,6 +286,7 @@ bool CIrrDeviceLinux::restoreResolution()
 		XRROutputInfo* output = XRRGetOutputInfo(display, res, output_id);
 		if (!output || !output->crtc || output->connection == RR_Disconnected) 
 		{
+			XRRFreeScreenResources(res);
 			XRRFreeOutputInfo(output);
 			return false;
 		}
@@ -293,6 +294,7 @@ bool CIrrDeviceLinux::restoreResolution()
 		XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);
 		if (!crtc) 
 		{
+			XRRFreeScreenResources(res);
 			XRRFreeOutputInfo(output);
 			return false;
 		}
@@ -946,6 +948,8 @@ bool CIrrDeviceLinux::createWindow()
 				ButtonPressMask | KeyPressMask |
 				ButtonReleaseMask | KeyReleaseMask;
 				
+	bool netWM = false;
+	
 	Atom *list;
 	Atom type;
 	int form;
@@ -956,8 +960,13 @@ bool CIrrDeviceLinux::createWindow()
 								  WMCheck, 0L, 1L, False, XA_WINDOW,
 								  &type, &form, &len, &remain,
 								  (unsigned char **)&list);
-	XFree(list);
-	bool netWM = (s == Success) && len;		
+								  
+	
+	if (s == Success)
+	{
+		XFree(list);
+		netWM = (len > 0);
+	}
 
 	if (!CreationParams.WindowId)
 	{
@@ -1014,17 +1023,15 @@ bool CIrrDeviceLinux::createWindow()
 					Atom type;
 					int format;
 					unsigned long numItems, bytesAfter;
-					unsigned char* data = NULL;
+					Atom* atoms = NULL;
 
 					int s = XGetWindowProperty(display, window, WMStateAtom,
 											0l, 1024, False, XA_ATOM, &type, 
 											&format,  &numItems, &bytesAfter, 
-											&data);
+											(unsigned char**)&atoms);
 
 					if (s == Success) 
 					{
-						Atom* atoms = (Atom*)data;
-						
 						for (unsigned int i = 0; i < numItems; ++i) 
 						{
 							if (atoms[i] == WMFullscreenAtom) 
@@ -1033,9 +1040,9 @@ bool CIrrDeviceLinux::createWindow()
 								break;
 							}
 						}
-					}
 						
-					XFree(data);
+						XFree(atoms);
+					}
 					
 					if (fullscreen == true)
 						break;
@@ -1770,13 +1777,20 @@ bool CIrrDeviceLinux::run()
 
 			case ClientMessage:
 				{
-					char *atom = XGetAtomName(display, event.xclient.message_type);
-					if (*atom == *wmDeleteWindow)
+					char* atom = XGetAtomName(display, event.xclient.message_type);
+					
+					if (atom != NULL)
 					{
-						os::Printer::log("Quit message received.", ELL_INFORMATION);
-						Close = true;
+						if (strcmp(atom, "WM_PROTOCOLS") == 0)
+						{
+							os::Printer::log("Quit message received.", ELL_INFORMATION);
+							Close = true;
+						}
+						
+						XFree(atom);
 					}
-					else
+					
+					if (!Close)
 					{
 						// we assume it's a user message
 						irrevent.EventType = irr::EET_USER_EVENT;
@@ -1784,7 +1798,6 @@ bool CIrrDeviceLinux::run()
 						irrevent.UserEvent.UserData2 = (s32)event.xclient.data.l[1];
 						postEventFromUser(irrevent);
 					}
-					XFree(atom);
 				}
 				break;
 
@@ -2808,9 +2821,11 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
 									&numItems, &dummy, &data);
 
 	if (result == Success)
+	{
 		Clipboard = (irr::c8*)data;
+		XFree(data);
+	}
 
-	XFree (data);
 	return Clipboard.c_str();
 #else
 	return 0;

@@ -18,8 +18,11 @@
 #include "graphics/stk_texture.hpp"
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/stk_tex_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/graphics_restrictions.hpp"
+#include "graphics/stk_tex_manager.hpp"
+#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
@@ -122,6 +125,7 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
             return;
         }
         orig_img = resizeImage(orig_img, &m_orig_size, &m_size);
+        applyMask(orig_img);
         data = orig_img ? (uint8_t*)orig_img->lock() : NULL;
     }
 
@@ -235,11 +239,18 @@ video::IImage* STKTexture::resizeImage(video::IImage* orig_img,
 #ifndef SERVER_ONLY
     if (image == NULL)
         assert(orig_size && orig_size->Width > 0 && orig_size->Height > 0);
+        
+    video::IVideoDriver* driver = irr_driver->getVideoDriver();
+        
     core::dimension2du img_size = image ? image->getDimension() : *orig_size;
-    core::dimension2du tex_size = img_size.getOptimalSize
-        (!irr_driver->getVideoDriver()->queryFeature(video::EVDF_TEXTURE_NPOT));
-    const core::dimension2du& max_size = irr_driver->getVideoDriver()
-        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
+    
+    bool has_npot = !GraphicsRestrictions::isDisabled(
+                                GraphicsRestrictions::GR_NPOT_TEXTURES) && 
+                                driver->queryFeature(video::EVDF_TEXTURE_NPOT);
+                                
+    core::dimension2du tex_size = img_size.getOptimalSize(!has_npot);
+    const core::dimension2du& max_size = driver->getDriverAttributes().
+                                  getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
 
     if (tex_size.Width > max_size.Width)
         tex_size.Width = max_size.Width;
@@ -257,8 +268,8 @@ video::IImage* STKTexture::resizeImage(video::IImage* orig_img,
     if (image->getColorFormat() != video::ECF_A8R8G8B8 ||
         tex_size != img_size)
     {
-        video::IImage* new_texture = irr_driver
-            ->getVideoDriver()->createImage(video::ECF_A8R8G8B8, tex_size);
+        video::IImage* new_texture = driver->createImage(video::ECF_A8R8G8B8, 
+                                                         tex_size);
         if (tex_size != img_size)
             image->copyToScaling(new_texture);
         else
@@ -270,6 +281,46 @@ video::IImage* STKTexture::resizeImage(video::IImage* orig_img,
 #endif   // !SERVER_ONLY
     return image;
 }   // resizeImage
+
+// ----------------------------------------------------------------------------
+void STKTexture::applyMask(video::IImage* orig_img)
+{
+#ifndef SERVER_ONLY
+    Material* material = NULL;
+    if (material_manager)
+    {
+        material = material_manager->getMaterialFor(this);
+    }
+    if (material && !material->getAlphaMask().empty())
+    {
+        video::IImage* converted_mask = irr_driver->getVideoDriver()
+            ->createImageFromFile(material->getAlphaMask().c_str());
+        if (converted_mask == NULL)
+        {
+            Log::warn("STKTexture", "Applying mask failed for '%s'!",
+                material->getAlphaMask().c_str());
+            return;
+        }
+        converted_mask = resizeImage(converted_mask);
+        if (converted_mask->lock())
+        {
+            const core::dimension2du& dim = orig_img->getDimension();
+            for (unsigned int x = 0; x < dim.Width; x++)
+            {
+                for (unsigned int y = 0; y < dim.Height; y++)
+                {
+                    video::SColor col = orig_img->getPixel(x, y);
+                    video::SColor alpha = converted_mask->getPixel(x, y);
+                    col.setAlpha(alpha.getRed());
+                    orig_img->setPixel(x, y, col, false);
+                }   // for y
+            }   // for x
+        }
+        converted_mask->unlock();
+        converted_mask->drop();
+    }
+#endif   // !SERVER_ONLY
+}   // applyMask
 
 //-----------------------------------------------------------------------------
 bool STKTexture::hasMipMaps() const

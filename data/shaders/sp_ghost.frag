@@ -11,14 +11,15 @@ out vec4 o_diffuse_color;
 
 void main()
 {
-    vec4 col = sampleTextureSlot0(uv);
+    vec4 col = sampleTextureLayer0(uv);
     if (hue_change > 0.0)
     {
         float mask = col.a;
         vec3 old_hsv = rgbToHsv(col.rgb);
         float mask_step = step(mask, 0.5);
 #if !defined(Advanced_Lighting_Enabled)
-        float saturation = mask * 2.1;
+        // For similar color
+        float saturation = mask * 1.825; // 2.5 * 0.5 ^ (1. / 2.2)
 #else
         float saturation = mask * 2.5;
 #endif
@@ -29,13 +30,5 @@ void main()
     }
 
     vec3 final_color = col.xyz * color.xyz;
-#if !defined(Advanced_Lighting_Enabled)
-#if !defined(sRGB_Framebuffer_Usable)
-    final_color = final_color * 0.73; // 0.5 ^ (1. / 2.2)
-#else
-    final_color = final_color * 0.5;
-#endif
-#endif
-
     o_diffuse_color = vec4((final_color * custom_alpha), custom_alpha);
 }

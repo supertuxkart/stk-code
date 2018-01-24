@@ -19,9 +19,10 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
-#include "graphics/sp/sp_texture_manager.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_shader.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
+#include "graphics/sp/sp_texture_manager.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -121,6 +122,7 @@ std::shared_ptr<video::IImage> SPTexture::getImageFromPath
     if (img_loader == NULL)
     {
         Log::error("SPTexture", "No image loader for %s", path.c_str());
+        return NULL;
     }
 
     io::IReadFile* file = irr::io::createReadFile(path.c_str());
@@ -440,17 +442,19 @@ bool SPTexture::threadedLoad()
     }
 
     std::shared_ptr<video::IImage> image = getTextureImage();
+    if (!image)
+    {
+        return true;
+    }
     std::shared_ptr<video::IImage> mask = getMask(image->getDimension());
-    if (mask && image)
+    if (mask)
     {
         applyMask(image.get(), mask.get());
     }
     std::shared_ptr<video::IImage> mipmaps;
 
-    if (!m_cache_directory.empty() &&
-        CVS->isTextureCompressionEnabled() && image &&
-        image->getDimension().Width >= 4 &&
-        image->getDimension().Height >= 4)
+    if (!m_cache_directory.empty() && CVS->isTextureCompressionEnabled() &&
+        image->getDimension().Width >= 4 && image->getDimension().Height >= 4)
     {
         auto r = compressTexture(image);
         SPTextureManager::get()->increaseGLCommandFunctionCount(1);
@@ -469,8 +473,7 @@ bool SPTexture::threadedLoad()
     else
     {
 #ifndef USE_GLES2
-        if (UserConfigParams::m_hq_mipmap && image &&
-            image->getDimension().Width > 1 &&
+        if (UserConfigParams::m_hq_mipmap && image->getDimension().Width > 1 &&
             image->getDimension().Height > 1)
         {
             std::vector<std::pair<core::dimension2du, unsigned> >
@@ -522,7 +525,9 @@ std::shared_ptr<video::IImage>
     {
         // Load colorization mask
         std::shared_ptr<video::IImage> mask;
-        if (SP::getSPShader(m_material->getShaderName())->useAlphaChannel())
+        std::shared_ptr<SPShader> sps =
+            SPShaderManager::get()->getSPShader(m_material->getShaderName());
+        if (sps && sps->useAlphaChannel())
         {
             Log::debug("SPTexture", "Don't use colorization mask or factor"
                 " with shader using alpha channel for %s", m_path.c_str());
@@ -675,7 +680,7 @@ void SPTexture::generateHQMipmap(void* in,
     imMipmapCascade cascade;
     imReduceOptions options;
     imReduceSetOptions(&options,
-        m_path.find("_nm.") != std::string::npos ?
+        m_path.find("_Normal.") != std::string::npos ?
         IM_REDUCE_FILTER_NORMALMAP: IM_REDUCE_FILTER_LINEAR/*filter*/,
         2/*hopcount*/, 2.0f/*alpha*/, 1.0f/*amplifynormal*/,
         0.0f/*normalsustainfactor*/);

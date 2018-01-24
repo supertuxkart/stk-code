@@ -21,8 +21,8 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
 #include "items/plunger.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -59,8 +59,8 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
         color.setBlue(SP::srgb255ToLinear(color.getBlue()));
     }
     m_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
-        (scene::EPT_TRIANGLE_STRIP, SP::getSPShader("unlit"),
-        material_manager->getDefaultSPMaterial("unlit"));
+        (scene::EPT_TRIANGLE_STRIP, SP::SPShaderManager::get()->getSPShader
+        ("unlit"), material_manager->getDefaultSPMaterial("unlit"));
     m_dy_dc->getVerticesVector().resize(4);
     // Set the vertex colors properly, as the new pipeline doesn't use the old
     // light values

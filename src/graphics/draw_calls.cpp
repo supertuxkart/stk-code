@@ -145,13 +145,6 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
         if (LODNode *node = dynamic_cast<LODNode *>(*I))
         {
             node->updateVisibility();
-            if (SP::sp_first_frame)
-            {
-                for (auto* child_node : node->getAllNodes())
-                {
-                    child_node->setVisible(true);
-                }
-            }
         }
         (*I)->updateAbsolutePosition();
         if (!(*I)->isVisible())
@@ -159,8 +152,7 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
 
         if (STKParticle *node = dynamic_cast<STKParticle*>(*I))
         {
-            if (!isCulledPrecise(cam, *I, irr_driver->getBoundingBoxesViz()) ||
-                SP::sp_first_frame)
+            if (!isCulledPrecise(cam, *I, irr_driver->getBoundingBoxesViz()))
                 CPUParticleManager::getInstance()->addParticleNode(node);
             continue;
         }
@@ -168,7 +160,7 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
         if (scene::IBillboardSceneNode *node =
             dynamic_cast<scene::IBillboardSceneNode*>(*I))
         {
-            if (!isCulledPrecise(cam, *I) || SP::sp_first_frame)
+            if (!isCulledPrecise(cam, *I))
                 CPUParticleManager::getInstance()->addBillboardNode(node);
             continue;
         }
@@ -176,8 +168,7 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
         if (STKTextBillboard *tb =
             dynamic_cast<STKTextBillboard*>(*I))
         {
-            if (!isCulledPrecise(cam, *I, irr_driver->getBoundingBoxesViz()) ||
-                SP::sp_first_frame)
+            if (!isCulledPrecise(cam, *I, irr_driver->getBoundingBoxesViz()))
                 TextBillboardDrawer::addTextBillboard(tb);
             continue;
         }

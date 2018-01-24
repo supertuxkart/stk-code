@@ -38,6 +38,7 @@
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "graphics/sp/sp_mesh_node.hpp"
 #include "graphics/sp/sp_shader.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
 #include "graphics/sp/sp_texture.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "graphics/sp/sp_uniform_assigner.hpp"
@@ -68,7 +69,7 @@ bool sp_culling = true;
 // ----------------------------------------------------------------------------
 bool g_handle_shadow = false;
 // ----------------------------------------------------------------------------
-std::unordered_map<std::string, SPShader*> g_shaders;
+SPShader* g_normal_visualizer = NULL;
 // ----------------------------------------------------------------------------
 SPShader* g_glow_shader = NULL;
 // ----------------------------------------------------------------------------
@@ -93,8 +94,6 @@ std::array<GLuint, ST_COUNT> g_samplers;
 std::array<GLuint, 1> sp_prefilled_tex;
 // ----------------------------------------------------------------------------
 std::vector<float> g_bounding_boxes;
-// ----------------------------------------------------------------------------
-core::vector3df g_wind_dir;
 // ----------------------------------------------------------------------------
 std::vector<std::shared_ptr<SPDynamicDrawCall> > g_dy_dc;
 // ----------------------------------------------------------------------------
@@ -121,82 +120,15 @@ void initSTKRenderer(ShaderBasedRenderer* sbr)
 // ----------------------------------------------------------------------------
 GLuint sp_mat_ubo[MAX_PLAYER_COUNT][3] = {};
 // ----------------------------------------------------------------------------
-bool sp_first_frame = false;
-// ----------------------------------------------------------------------------
 GLuint sp_fog_ubo = 0;
+// ----------------------------------------------------------------------------
+core::vector3df sp_wind_dir;
 // ----------------------------------------------------------------------------
 GLuint g_skinning_tex;
 // ----------------------------------------------------------------------------
 GLuint g_skinning_buf;
 // ----------------------------------------------------------------------------
 unsigned g_skinning_size;
-// ----------------------------------------------------------------------------
-void shadowCascadeUniformAssigner(SPUniformAssigner* ua)
-{
-    ua->setValue(sp_cur_shadow_cascade);
-}   // shadowCascadeUniformAssigner
-
-// ----------------------------------------------------------------------------
-void fogUniformAssigner(SPUniformAssigner* ua)
-{
-    int fog_enable = Track::getCurrentTrack() ?
-        Track::getCurrentTrack()->isFogEnabled() ? 1 : 0 : 0;
-    ua->setValue(fog_enable);
-}   // fogUniformAssigner
-
-// ----------------------------------------------------------------------------
-void zeroAlphaUniformAssigner(SPUniformAssigner* ua)
-{
-    ua->setValue(0.0f);
-}   // zeroAlphaUniformAssigner
-
-// ----------------------------------------------------------------------------
-void ghostAlphaAssigner(SPUniformAssigner* ua)
-{
-    float alpha = 1.0f;
-    if (Track::getCurrentTrack())
-    {
-        const video::SColor& c = Track::getCurrentTrack()->getSunColor();
-        float y = 0.2126f * c.getRed() + 0.7152f * c.getGreen() +
-            0.0722f * c.getBlue();
-        alpha = y > 128.0f ? 0.5f : 0.35f;
-    }
-    ua->setValue(alpha);
-}   // ghostAlphaAssigner
-
-// ----------------------------------------------------------------------------
-void alphaBlendUse()
-{
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_FALSE);
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-}   // alphaBlendUse
-
-// ----------------------------------------------------------------------------
-void additiveUse()
-{
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_FALSE);
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_ONE, GL_ONE);
-}   // additiveUse
-
-// ----------------------------------------------------------------------------
-void ghostUse()
-{
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-}   // ghostUse
-
 // ----------------------------------------------------------------------------
 void displaceUniformAssigner(SP::SPUniformAssigner* ua)
 {
@@ -226,6 +158,77 @@ void displaceUniformAssigner(SP::SPUniformAssigner* ua)
     g_direction[3] += wind.Z;
     ua->setValue(g_direction);
 }   // displaceUniformAssigner
+
+// ----------------------------------------------------------------------------
+void displaceShaderInit(SPShader* shader)
+{
+    shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_1ST);
+    shader->addShaderFile("white.frag", GL_FRAGMENT_SHADER, RP_1ST);
+    shader->linkShaderFiles(RP_1ST);
+    shader->use(RP_1ST);
+    shader->addBasicUniforms(RP_1ST);
+    shader->setUseFunction([]()->void
+        {
+            assert(g_stk_sbr->getRTTs() != NULL);
+            glEnable(GL_DEPTH_TEST);
+            glDepthMask(GL_FALSE);
+            glDisable(GL_CULL_FACE);
+            glDisable(GL_BLEND);
+            glClear(GL_STENCIL_BUFFER_BIT);
+            glEnable(GL_STENCIL_TEST);
+            glStencilFunc(GL_ALWAYS, 1, 0xFF);
+            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+            g_stk_sbr->getRTTs()->getFBO(FBO_TMP1_WITH_DS).bind(),
+            glClear(GL_COLOR_BUFFER_BIT);
+        }, RP_1ST);
+    shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_RESERVED);
+    shader->addShaderFile("sp_displace.frag", GL_FRAGMENT_SHADER, RP_RESERVED);
+    shader->linkShaderFiles(RP_RESERVED);
+    shader->use(RP_RESERVED);
+    shader->addBasicUniforms(RP_RESERVED);
+    shader->addUniform("direction", typeid(std::array<float, 4>), RP_RESERVED);
+    shader->setUseFunction([]()->void
+        {
+            glEnable(GL_DEPTH_TEST);
+            glDepthMask(GL_FALSE);
+            glDisable(GL_CULL_FACE);
+            glDisable(GL_BLEND);
+            glEnable(GL_STENCIL_TEST);
+            glStencilFunc(GL_ALWAYS, 1, 0xFF);
+            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+            g_stk_sbr->getRTTs()->getFBO(FBO_DISPLACE).bind(),
+            glClear(GL_COLOR_BUFFER_BIT);
+        }, RP_RESERVED);
+    shader->addCustomPrefilledTextures(ST_BILINEAR,
+        GL_TEXTURE_2D, "displacement_tex", []()->GLuint
+        {
+            return irr_driver->getTexture(FileManager::TEXTURE,
+                "displace.png")->getOpenGLTextureName();
+        }, RP_RESERVED);
+    shader->addCustomPrefilledTextures(ST_BILINEAR,
+        GL_TEXTURE_2D, "mask_tex", []()->GLuint
+        {
+            return g_stk_sbr->getRTTs()->getFBO(FBO_TMP1_WITH_DS).getRTT()[0];
+        }, RP_RESERVED);
+    shader->addCustomPrefilledTextures(ST_BILINEAR,
+        GL_TEXTURE_2D, "color_tex", []()->GLuint
+        {
+            return g_stk_sbr->getRTTs()->getFBO(FBO_COLORS).getRTT()[0];
+        }, RP_RESERVED);
+    shader->addAllTextures(RP_RESERVED);
+    shader->setUnuseFunction([]()->void
+        {
+            g_stk_sbr->getRTTs()->getFBO(FBO_COLORS).bind();
+            glStencilFunc(GL_EQUAL, 1, 0xFF);
+            g_stk_sbr->getPostProcessing()->renderPassThrough
+                (g_stk_sbr->getRTTs()->getFBO(FBO_DISPLACE).getRTT()[0],
+                g_stk_sbr->getRTTs()->getFBO(FBO_COLORS).getWidth(),
+                g_stk_sbr->getRTTs()->getFBO(FBO_COLORS).getHeight());
+            glDisable(GL_STENCIL_TEST);
+        }, RP_RESERVED);
+    static_cast<SPPerObjectUniform*>(shader)
+        ->addAssignerFunction("direction", displaceUniformAssigner);
+}   // displaceShaderInit
 
 // ----------------------------------------------------------------------------
 void resizeSkinning(unsigned number)
@@ -318,465 +321,74 @@ void initSkinning()
 }   // initSkinning
 
 // ----------------------------------------------------------------------------
-void addShader(SPShader* shader)
-{
-    g_shaders[shader->getName()] = shader;
-}   // addShader
-
-
-// ----------------------------------------------------------------------------
 void loadShaders()
 {
-    // ========================================================================
-    SPShader* shader = new SPShader("solid");
+    SPShaderManager::get()->loadSPShaders(file_manager->getShadersDir());
 
-    shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_solid.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addAllTextures(RP_1ST);
-
-    shader->addShaderFile("sp_shadow.vert", GL_VERTEX_SHADER, RP_SHADOW);
-    shader->addShaderFile("white.frag", GL_FRAGMENT_SHADER, RP_SHADOW);
-    shader->linkShaderFiles(RP_SHADOW);
-    shader->use(RP_SHADOW);
-    shader->addBasicUniforms(RP_SHADOW);
-    shader->addUniform("layer", typeid(int), RP_SHADOW);
-    shader->addAllTextures(RP_SHADOW);
-    static_cast<SPPerObjectUniform*>(shader)->addAssignerFunction("layer",
-        shadowCascadeUniformAssigner);
-
-    addShader(shader);
-
-    shader = new SPShader("solid_skinned");
-
-    shader->addShaderFile("sp_skinning.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_solid.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addAllTextures(RP_1ST);
-
-    shader->addShaderFile("sp_skinning_shadow.vert", GL_VERTEX_SHADER, RP_SHADOW);
-    shader->addShaderFile("white.frag", GL_FRAGMENT_SHADER, RP_SHADOW);
-    shader->linkShaderFiles(RP_SHADOW);
-    shader->use(RP_SHADOW);
-    shader->addBasicUniforms(RP_SHADOW);
-    shader->addUniform("layer", typeid(int), RP_SHADOW);
-    shader->addAllTextures(RP_SHADOW);
-    static_cast<SPPerObjectUniform*>(shader)->addAssignerFunction("layer",
-        shadowCascadeUniformAssigner);
-
-    addShader(shader);
-
-    // ========================================================================
-    shader = new SPShader("decal");
-
-    shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_decal.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addAllTextures(RP_1ST);
-
-    shader->addShaderFile("sp_shadow.vert", GL_VERTEX_SHADER, RP_SHADOW);
-    shader->addShaderFile("white.frag", GL_FRAGMENT_SHADER, RP_SHADOW);
-    shader->linkShaderFiles(RP_SHADOW);
-    shader->use(RP_SHADOW);
-    shader->addBasicUniforms(RP_SHADOW);
-    shader->addUniform("layer", typeid(int), RP_SHADOW);
-    shader->addAllTextures(RP_SHADOW);
-    static_cast<SPPerObjectUniform*>(shader)->addAssignerFunction("layer",
-        shadowCascadeUniformAssigner);
-
-    addShader(shader);
-
-    shader = new SPShader("decal_skinned");
-
-    shader->addShaderFile("sp_skinning.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_decal.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addAllTextures(RP_1ST);
-
-    shader->addShaderFile("sp_skinning_shadow.vert", GL_VERTEX_SHADER, RP_SHADOW);
-    shader->addShaderFile("white.frag", GL_FRAGMENT_SHADER, RP_SHADOW);
-    shader->linkShaderFiles(RP_SHADOW);
-    shader->use(RP_SHADOW);
-    shader->addBasicUniforms(RP_SHADOW);
-    shader->addUniform("layer", typeid(int), RP_SHADOW);
-    shader->addAllTextures(RP_SHADOW);
-    static_cast<SPPerObjectUniform*>(shader)->addAssignerFunction("layer",
-        shadowCascadeUniformAssigner);
-
-    addShader(shader);
-
-    // ========================================================================
-    shader = new SPShader("alphatest", 3, false, 0, true);
-
-    shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_alpha_test.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addAllTextures(RP_1ST);
-
-    shader->addShaderFile("sp_shadow.vert", GL_VERTEX_SHADER, RP_SHADOW);
-    shader->addShaderFile("sp_shadow_alpha_test.frag", GL_FRAGMENT_SHADER, RP_SHADOW);
-    shader->linkShaderFiles(RP_SHADOW);
-    shader->use(RP_SHADOW);
-    shader->addBasicUniforms(RP_SHADOW);
-    shader->addUniform("layer", typeid(int), RP_SHADOW);
-    shader->addAllTextures(RP_SHADOW);
-    static_cast<SPPerObjectUniform*>(shader)->addAssignerFunction("layer",
-        shadowCascadeUniformAssigner);
-
-    addShader(shader);
-
-    shader = new SPShader("alphatest_skinned", 3, false, 0, true);
-
-    shader->addShaderFile("sp_skinning.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_alpha_test.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addAllTextures(RP_1ST);
-
-    shader->addShaderFile("sp_skinning_shadow.vert", GL_VERTEX_SHADER, RP_SHADOW);
-    shader->addShaderFile("sp_shadow_alpha_test.frag", GL_FRAGMENT_SHADER, RP_SHADOW);
-    shader->linkShaderFiles(RP_SHADOW);
-    shader->use(RP_SHADOW);
-    shader->addBasicUniforms(RP_SHADOW);
-    shader->addUniform("layer", typeid(int), RP_SHADOW);
-    shader->addAllTextures(RP_SHADOW);
-    static_cast<SPPerObjectUniform*>(shader)->addAssignerFunction("layer",
-        shadowCascadeUniformAssigner);
-
-    addShader(shader);
-
-    // ========================================================================
-    shader = new SPShader("unlit", 3, false, 0, true);
-
-    shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_unlit.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addAllTextures(RP_1ST);
-
-    shader->addShaderFile("sp_shadow.vert", GL_VERTEX_SHADER, RP_SHADOW);
-    shader->addShaderFile("sp_shadow_alpha_test.frag", GL_FRAGMENT_SHADER, RP_SHADOW);
-    shader->linkShaderFiles(RP_SHADOW);
-    shader->use(RP_SHADOW);
-    shader->addBasicUniforms(RP_SHADOW);
-    shader->addUniform("layer", typeid(int), RP_SHADOW);
-    shader->addAllTextures(RP_SHADOW);
-    static_cast<SPPerObjectUniform*>(shader)->addAssignerFunction("layer",
-        shadowCascadeUniformAssigner);
-
-    addShader(shader);
-
-    shader = new SPShader("unlit_skinned", 3, false, 0, true);
-
-    shader->addShaderFile("sp_skinning.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_unlit.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addAllTextures(RP_1ST);
-
-    shader->addShaderFile("sp_skinning_shadow.vert", GL_VERTEX_SHADER, RP_SHADOW);
-    shader->addShaderFile("sp_shadow_alpha_test.frag", GL_FRAGMENT_SHADER, RP_SHADOW);
-    shader->linkShaderFiles(RP_SHADOW);
-    shader->use(RP_SHADOW);
-    shader->addBasicUniforms(RP_SHADOW);
-    shader->addUniform("layer", typeid(int), RP_SHADOW);
-    shader->addAllTextures(RP_SHADOW);
-    static_cast<SPPerObjectUniform*>(shader)->addAssignerFunction("layer",
-        shadowCascadeUniformAssigner);
-
-    addShader(shader);
-
-    // ========================================================================
-    shader = new SPShader("normalmap");
-
-    shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_normal_map.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addAllTextures(RP_1ST);
-
-    shader->addShaderFile("sp_shadow.vert", GL_VERTEX_SHADER, RP_SHADOW);
-    shader->addShaderFile("white.frag", GL_FRAGMENT_SHADER, RP_SHADOW);
-    shader->linkShaderFiles(RP_SHADOW);
-    shader->use(RP_SHADOW);
-    shader->addBasicUniforms(RP_SHADOW);
-    shader->addUniform("layer", typeid(int), RP_SHADOW);
-    shader->addAllTextures(RP_SHADOW);
-    static_cast<SPPerObjectUniform*>(shader)->addAssignerFunction("layer",
-        shadowCascadeUniformAssigner);
-
-    addShader(shader);
-
-    shader = new SPShader("normalmap_skinned", 3, false);
-
-    shader->addShaderFile("sp_skinning.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_normal_map.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addAllTextures(RP_1ST);
-
-    shader->addShaderFile("sp_skinning_shadow.vert", GL_VERTEX_SHADER, RP_SHADOW);
-    shader->addShaderFile("white.frag", GL_FRAGMENT_SHADER, RP_SHADOW);
-    shader->linkShaderFiles(RP_SHADOW);
-    shader->use(RP_SHADOW);
-    shader->addBasicUniforms(RP_SHADOW);
-    shader->addUniform("layer", typeid(int), RP_SHADOW);
-    shader->addAllTextures(RP_SHADOW);
-    static_cast<SPPerObjectUniform*>(shader)->addAssignerFunction("layer",
-        shadowCascadeUniformAssigner);
-
-    addShader(shader);
-
-    // ========================================================================
-    shader = new SPShader("grass", 3, false, 0, true);
-    shader->addShaderFile("sp_grass_pass.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_grass.frag", GL_FRAGMENT_SHADER,
-        RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addUniform("wind_direction", typeid(core::vector3df), RP_1ST);
-    shader->addAllTextures(RP_1ST);
-
-    shader->addShaderFile("sp_grass_shadow.vert", GL_VERTEX_SHADER, RP_SHADOW);
-    shader->addShaderFile("sp_shadow_alpha_test.frag", GL_FRAGMENT_SHADER, RP_SHADOW);
-    shader->linkShaderFiles(RP_SHADOW);
-    shader->use(RP_SHADOW);
-    shader->addBasicUniforms(RP_SHADOW);
-    shader->addUniform("wind_direction", typeid(core::vector3df), RP_SHADOW);
-    shader->addUniform("layer", typeid(int), RP_SHADOW);
-    shader->addAllTextures(RP_SHADOW);
-    static_cast<SPPerObjectUniform*>(shader)->addAssignerFunction("layer",
-        shadowCascadeUniformAssigner);
-    static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("wind_direction", [](SPUniformAssigner* ua)
-        {
-            ua->setValue(g_wind_dir);
-        });
-
-    addShader(shader);
-
-    // ========================================================================
-    // Transparent shader
-    // ========================================================================
-    shader = new SPShader("alphablend_skinned", 1, true);
-    shader->addShaderFile("sp_skinning.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_transparent.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addUniform("fog_enabled", typeid(int), RP_1ST);
-    shader->addUniform("custom_alpha", typeid(float), RP_1ST);
-    shader->addAllTextures(RP_1ST);
-    shader->setUseFunction(alphaBlendUse);
-    static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("fog_enabled", fogUniformAssigner);
-    static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("custom_alpha", zeroAlphaUniformAssigner);
-    addShader(shader);
-
-    shader = new SPShader("alphablend", 1, true);
-    shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_transparent.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addUniform("fog_enabled", typeid(int), RP_1ST);
-    shader->addUniform("custom_alpha", typeid(float), RP_1ST);
-    shader->addAllTextures(RP_1ST);
-    shader->setUseFunction(alphaBlendUse);
-    static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("fog_enabled", fogUniformAssigner);
-    static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("custom_alpha", zeroAlphaUniformAssigner);
-    addShader(shader);
-
-    shader = new SPShader("additive_skinned", 1, true);
-    shader->addShaderFile("sp_skinning.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_transparent.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addUniform("fog_enabled", typeid(int), RP_1ST);
-    shader->addUniform("custom_alpha", typeid(float), RP_1ST);
-    shader->addAllTextures(RP_1ST);
-    shader->setUseFunction(additiveUse);
-    static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("fog_enabled", fogUniformAssigner);
-    static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("custom_alpha", zeroAlphaUniformAssigner);
-    addShader(shader);
-
-    shader = new SPShader("additive", 1, true);
-    shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_transparent.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addUniform("fog_enabled", typeid(int), RP_1ST);
-    shader->addUniform("custom_alpha", typeid(float), RP_1ST);
-    shader->addAllTextures(RP_1ST);
-    shader->setUseFunction(additiveUse);
-    static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("fog_enabled", fogUniformAssigner);
-    static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("custom_alpha", zeroAlphaUniformAssigner);
-    addShader(shader);
-
-    shader = new SPShader("ghost_skinned", 1, true/*transparent_shader*/,
-        900/*drawing_priority*/);
-    shader->addShaderFile("sp_skinning.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_ghost.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addUniform("custom_alpha", typeid(float), RP_1ST);
-    shader->addAllTextures(RP_1ST);
-    shader->setUseFunction(ghostUse);
-    static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("custom_alpha", ghostAlphaAssigner);
-    addShader(shader);
-
-    shader = new SPShader("ghost", 1, true/*transparent_shader*/,
-        900/*drawing_priority*/);
-    shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("sp_ghost.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    shader->linkShaderFiles(RP_1ST);
-    shader->use(RP_1ST);
-    shader->addBasicUniforms(RP_1ST);
-    shader->addUniform("custom_alpha", typeid(float), RP_1ST);
-    shader->addAllTextures(RP_1ST);
-    shader->setUseFunction(ghostUse);
-    static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("custom_alpha", ghostAlphaAssigner);
-    addShader(shader);
-
+    // Displace shader is not specifiable in XML due to complex callback
+    std::shared_ptr<SPShader> sps;
     if (CVS->isDefferedEnabled())
     {
         // This displace shader will be drawn the last in transparent pass
-        shader = new SPShader("displace", 2, true/*transparent_shader*/,
-            999/*drawing_priority*/);
-        shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER,
-            RP_1ST);
-        shader->addShaderFile("white.frag", GL_FRAGMENT_SHADER,
-            RP_1ST);
-        shader->linkShaderFiles(RP_1ST);
-        shader->use(RP_1ST);
-        shader->addBasicUniforms(RP_1ST);
-        shader->setUseFunction([]()->void
-            {
-                assert(g_stk_sbr->getRTTs() != NULL);
-                glEnable(GL_DEPTH_TEST);
-                glDepthMask(GL_FALSE);
-                glDisable(GL_CULL_FACE);
-                glDisable(GL_BLEND);
-                glClear(GL_STENCIL_BUFFER_BIT);
-                glEnable(GL_STENCIL_TEST);
-                glStencilFunc(GL_ALWAYS, 1, 0xFF);
-                glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-                g_stk_sbr->getRTTs()->getFBO(FBO_TMP1_WITH_DS).bind(),
-                glClear(GL_COLOR_BUFFER_BIT);
-            }, RP_1ST);
-        shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER,
-            RP_2ND);
-        shader->addShaderFile("sp_displace.frag", GL_FRAGMENT_SHADER,
-            RP_2ND);
-        shader->linkShaderFiles(RP_2ND);
-        shader->use(RP_2ND);
-        shader->addBasicUniforms(RP_2ND);
-        shader->addUniform("direction", typeid(std::array<float, 4>),
-            RP_2ND);
-        shader->setUseFunction([]()->void
-            {
-                glEnable(GL_DEPTH_TEST);
-                glDepthMask(GL_FALSE);
-                glDisable(GL_CULL_FACE);
-                glDisable(GL_BLEND);
-                glEnable(GL_STENCIL_TEST);
-                glStencilFunc(GL_ALWAYS, 1, 0xFF);
-                glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-                g_stk_sbr->getRTTs()->getFBO(FBO_DISPLACE).bind(),
-                glClear(GL_COLOR_BUFFER_BIT);
-            }, RP_2ND);
-        shader->addCustomPrefilledTextures(ST_BILINEAR,
-            GL_TEXTURE_2D, "displacement_tex", []()->GLuint
-            {
-                return irr_driver->getTexture(FileManager::TEXTURE,
-                    "displace.png")->getOpenGLTextureName();
-            }, RP_2ND);
-        shader->addCustomPrefilledTextures(ST_BILINEAR,
-            GL_TEXTURE_2D, "mask_tex", []()->GLuint
-            {
-                return g_stk_sbr->getRTTs()->getFBO(FBO_TMP1_WITH_DS).getRTT()[0];
-            }, RP_2ND);
-        shader->addCustomPrefilledTextures(ST_BILINEAR,
-            GL_TEXTURE_2D, "color_tex", []()->GLuint
-            {
-                return g_stk_sbr->getRTTs()->getFBO(FBO_COLORS).getRTT()[0];
-            }, RP_2ND);
-        shader->addAllTextures(RP_2ND);
-        shader->setUnuseFunction([]()->void
-            {
-                g_stk_sbr->getRTTs()->getFBO(FBO_COLORS).bind();
-                glStencilFunc(GL_EQUAL, 1, 0xFF);
-                g_stk_sbr->getPostProcessing()->renderPassThrough
-                    (g_stk_sbr->getRTTs()->getFBO(FBO_DISPLACE).getRTT()[0],
-                    g_stk_sbr->getRTTs()->getFBO(FBO_COLORS).getWidth(),
-                    g_stk_sbr->getRTTs()->getFBO(FBO_COLORS).getHeight());
-                glDisable(GL_STENCIL_TEST);
-            }, RP_2ND);
-        static_cast<SPPerObjectUniform*>(shader)
-            ->addAssignerFunction("direction", displaceUniformAssigner);
-        addShader(shader);
+        sps = std::make_shared<SPShader>("displace", displaceShaderInit,
+            true/*transparent_shader*/, 999/*drawing_priority*/,
+            true/*use_alpha_channel*/);
+        SPShaderManager::get()->addSPShader(sps->getName(), sps);
+    }
+    else
+    {
+        // Fallback shader
+        SPShaderManager::get()->addSPShader("displace",
+            SPShaderManager::get()->getSPShader("alphablend"));
     }
 
     // ========================================================================
     // Glow shader
     // ========================================================================
-    g_glow_shader = new SPShader("sp_glow_shader", 1);
-    g_glow_shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_1ST);
-    g_glow_shader->addShaderFile("colorize.frag", GL_FRAGMENT_SHADER, RP_1ST);
-    g_glow_shader->linkShaderFiles(RP_1ST);
-    g_glow_shader->use(RP_1ST);
-    g_glow_shader->addBasicUniforms(RP_1ST);
-    g_glow_shader->addUniform("col", typeid(irr::video::SColorf), RP_1ST);
-    addShader(g_glow_shader);
-
-    // ========================================================================
-    // Normal visualizer
-    // ========================================================================
-#ifndef USE_GLES2
-    if (CVS->isARBGeometryShadersUsable())
+    if (CVS->isDefferedEnabled())
     {
-        shader = new SPShader("sp_normal_visualizer", 1);
-        shader->addShaderFile("sp_normal_visualizer.vert", GL_VERTEX_SHADER,
-            RP_1ST);
-        shader->addShaderFile("sp_normal_visualizer.geom", GL_GEOMETRY_SHADER,
-            RP_1ST);
-        shader->addShaderFile("sp_normal_visualizer.frag", GL_FRAGMENT_SHADER,
-            RP_1ST);
-        shader->linkShaderFiles(RP_1ST);
-        shader->use(RP_1ST);
-        shader->addBasicUniforms(RP_1ST);
-        shader->addAllTextures(RP_1ST);
-        addShader(shader);
-    }
+        sps = std::make_shared<SPShader>
+            ("sp_glow_shader", [](SPShader* shader)
+            {
+                shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER,
+                    RP_1ST);
+                shader->addShaderFile("colorize.frag", GL_FRAGMENT_SHADER,
+                    RP_1ST);
+                shader->linkShaderFiles(RP_1ST);
+                shader->use(RP_1ST);
+                shader->addBasicUniforms(RP_1ST);
+                shader->addUniform("col", typeid(irr::video::SColorf), RP_1ST);
+            });
+        SPShaderManager::get()->addSPShader(sps->getName(), sps);
+        g_glow_shader = sps.get();
+
+        // ====================================================================
+        // Normal visualizer
+        // ====================================================================
+#ifndef USE_GLES2
+        if (CVS->isARBGeometryShadersUsable())
+        {
+            sps = std::make_shared<SPShader>
+                ("sp_normal_visualizer", [](SPShader* shader)
+                {
+                    shader->addShaderFile("sp_normal_visualizer.vert",
+                        GL_VERTEX_SHADER, RP_1ST);
+                    shader->addShaderFile("sp_normal_visualizer.geom",
+                        GL_GEOMETRY_SHADER, RP_1ST);
+                    shader->addShaderFile("sp_normal_visualizer.frag",
+                        GL_FRAGMENT_SHADER, RP_1ST);
+                    shader->linkShaderFiles(RP_1ST);
+                    shader->use(RP_1ST);
+                    shader->addBasicUniforms(RP_1ST);
+                    shader->addAllTextures(RP_1ST);
+                });
+            SPShaderManager::get()->addSPShader(sps->getName(), sps);
+            g_normal_visualizer = sps.get();
+        }
 #endif
+    }
+
+    SPShaderManager::get()->setOfficialShaders();
 
 }   // loadShaders
 
@@ -960,12 +572,9 @@ void init()
 void destroy()
 {
     g_dy_dc.clear();
-    for (auto& p : g_shaders)
-    {
-        delete p.second;
-    }
-    g_shaders.clear();
-
+    SPShaderManager::destroy();
+    g_glow_shader = NULL;
+    g_normal_visualizer = NULL;
     SPTextureManager::destroy();
 
 #ifndef USE_GLES2
@@ -1005,15 +614,10 @@ SPShader* getGlowShader()
 }   // getGlowShader
 
 // ----------------------------------------------------------------------------
-SPShader* getSPShader(const std::string& name)
+SPShader* getNormalVisualizer()
 {
-    auto ret = g_shaders.find(name);
-    if (ret != g_shaders.end())
-    {
-        return ret->second;
-    }
-    return NULL;
-}   // getSPShader
+    return g_normal_visualizer;
+}   // getNormalVisualizer
 
 // ----------------------------------------------------------------------------
 inline void mathPlaneNormf(float *p)
@@ -1128,7 +732,7 @@ void prepareDrawCalls()
         return;
     }
     g_bounding_boxes.clear();
-    g_wind_dir = core::vector3df(1.0f, 0.0f, 0.0f) *
+    sp_wind_dir = core::vector3df(1.0f, 0.0f, 0.0f) *
         (irr_driver->getDevice()->getTimer()->getTime() / 1000.0f) * 1.5f;
     sp_solid_poly_count = sp_shadow_poly_count = 0;
     // 1st one is identity
@@ -1189,9 +793,10 @@ void addObject(SPMeshNode* node)
         core::aabbox3df bb = mb->getBoundingBox();
         model_matrix.transformBoxEx(bb);
         std::vector<bool> discard;
-        discard.resize((g_handle_shadow ? 5 : 1), false);
-        for (int dc_type = 0; dc_type <
-            (g_handle_shadow ? 5 : sp_first_frame ? 0 : 1); dc_type++)
+        const bool handle_shadow =
+            g_handle_shadow && shader->hasShader(RP_SHADOW);
+        discard.resize((handle_shadow ? 5 : 1), false);
+        for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
             for (int i = 0; i < 24; i += 4)
             {
@@ -1216,7 +821,7 @@ void addObject(SPMeshNode* node)
                 }
             }
         }
-        if (sp_first_frame || g_handle_shadow ?
+        if (handle_shadow ?
             (discard[0] && discard[1] && discard[2] && discard[3] &&
             discard[4]) : discard[0])
         {
@@ -1241,8 +846,7 @@ void addObject(SPMeshNode* node)
 
         mb->uploadGLMesh();
         // For first frame only need the vbo to be initialized
-        if (!added_for_skinning && node->getAnimationState() &&
-            !sp_first_frame)
+        if (!added_for_skinning && node->getAnimationState())
         {
             added_for_skinning = true;
             int skinning_offset = g_skinning_offset + node->getTotalJoints();
@@ -1260,21 +864,14 @@ void addObject(SPMeshNode* node)
 
         float hue = node->getRenderInfo(m) ?
             node->getRenderInfo(m)->getHue() : 0.0f;
-        float tm_x = 0.0f;
-        float tm_y = 0.0f;
-        const auto& ret = node->getTextureMatrix(m);
-        if (ret[0] && ret[1])
-        {
-            tm_x = *ret[0];
-            tm_y = *ret[1];
-        }
         SPInstancedData id = SPInstancedData
-            (node->getAbsoluteTransformation(), tm_x, tm_y, hue,
+            (node->getAbsoluteTransformation(), node->getTextureMatrix(m)[0],
+            node->getTextureMatrix(m)[1], hue,
             (short)node->getSkinningOffset());
 
-        for (int dc_type = 0; dc_type < (g_handle_shadow ? 5 : 1); dc_type++)
+        for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
-            if (!sp_first_frame && discard[dc_type])
+            if (discard[dc_type])
             {
                 continue;
             }
@@ -1364,8 +961,10 @@ void handleDynamicDrawCall()
         core::aabbox3df bb = dydc->getBoundingBox();
         dydc->getAbsoluteTransformation().transformBoxEx(bb);
         std::vector<bool> discard;
-        discard.resize((g_handle_shadow ? 5 : 1), false);
-        for (int dc_type = 0; dc_type < (g_handle_shadow ? 5 : 1); dc_type++)
+        const bool handle_shadow =
+            g_handle_shadow && shader->hasShader(RP_SHADOW);
+        discard.resize((handle_shadow ? 5 : 1), false);
+        for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
             for (int i = 0; i < 24; i += 4)
             {
@@ -1390,7 +989,7 @@ void handleDynamicDrawCall()
                 }
             }
         }
-        if (g_handle_shadow ?
+        if (handle_shadow ?
             (discard[0] && discard[1] && discard[2] && discard[3] &&
             discard[4]) : discard[0])
         {
@@ -1413,7 +1012,7 @@ void handleDynamicDrawCall()
             addEdgeForViz(getCorner(bb, 4), getCorner(bb, 6));
         }
 
-        for (int dc_type = 0; dc_type < (g_handle_shadow ? 5 : 1); dc_type++)
+        for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
             if (discard[dc_type])
             {
@@ -1472,7 +1071,6 @@ void updateModelMatrix()
 {
     // Make sure all textures (with handles) are loaded
     SPTextureManager::get()->checkForGLCommand(true/*before_scene*/);
-    SP::sp_first_frame = false;
     if (!sp_culling)
     {
         return;
@@ -1620,13 +1218,12 @@ void uploadAll()
 // ----------------------------------------------------------------------------
 void drawNormal()
 {
-    SPShader* nv = getSPShader("sp_normal_visualizer");
-    if (nv == NULL)
+    if (g_normal_visualizer == NULL)
     {
         return;
     }
-    nv->use();
-    nv->bindPrefilledTextures();
+    g_normal_visualizer->use();
+    g_normal_visualizer->bindPrefilledTextures();
     for (unsigned i = 0; i < g_final_draw_calls[0].size(); i++)
     {
         auto& p = g_final_draw_calls[0][i];
@@ -1659,12 +1256,16 @@ void drawNormal()
             }
         }
     }
-    nv->unuse();
+    g_normal_visualizer->unuse();
 }
 
 // ----------------------------------------------------------------------------
 void drawGlow()
 {
+    if (g_glow_meshes.empty())
+    {
+        return;
+    }
     g_glow_shader->use();
     SPUniformAssigner* glow_color_assigner =
         g_glow_shader->getUniformAssigner("col");
@@ -1792,6 +1393,24 @@ SPMesh* convertEVTStandard(irr::scene::IMesh* mesh,
     spm->updateBoundingBox();
     return spm;
 }   // convertEVTStandard
+
+// ----------------------------------------------------------------------------
+void uploadSPM(irr::scene::IMesh* mesh)
+{
+    if (!CVS->isGLSL())
+    {
+        return;
+    }
+    SP::SPMesh* spm = dynamic_cast<SP::SPMesh*>(mesh);
+    if (spm)
+    {
+        for (u32 i = 0; i < spm->getMeshBufferCount(); i++)
+        {
+            SP::SPMeshBuffer* mb = spm->getSPMeshBuffer(i);
+            mb->uploadGLMesh();
+        }
+    }
+}   // uploadSPM
 
 }
 

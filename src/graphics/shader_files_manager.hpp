@@ -21,38 +21,74 @@
 #define HEADER_SHADER_FILES_MANAGER_HPP
 
 #include "graphics/gl_headers.hpp"
+#include "utils/log.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/singleton.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <string>
+#include <memory>
 #include <unordered_map>
 
 class ShaderFilesManager : public Singleton<ShaderFilesManager>, NoCopy
 {
 private:
+    typedef std::shared_ptr<GLuint> SharedShader;
     /**
-     * Map from a filename to a shader indentifier. Used for caching shaders.
+     * Map from a filename in full path to a shader indentifier.
+     * Used for caching shaders.
      */
-    std::unordered_map<std::string, GLuint> m_shader_files_loaded;
+    std::unordered_map<std::string, SharedShader> m_shader_files_loaded;
 
     // ------------------------------------------------------------------------
     const std::string& getHeader();
-    void readFile(const std::string& file, std::ostringstream& code);
+    // ------------------------------------------------------------------------
+    void readFile(const std::string& file, std::ostringstream& code,
+                  bool not_header = true);
+    // ------------------------------------------------------------------------
+    SharedShader addShaderFile(const std::string& full_path, unsigned type);
 
 public:
     // ------------------------------------------------------------------------
     ShaderFilesManager() {}
     // ------------------------------------------------------------------------
-    ~ShaderFilesManager()                                          { clean(); }
+    ~ShaderFilesManager()
+    {
+        removeAllShaderFiles();
+    }
     // ------------------------------------------------------------------------
-    void clean()                             { m_shader_files_loaded.clear(); }
+    void removeAllShaderFiles()
+    {
+        removeUnusedShaderFiles();
+        if (!m_shader_files_loaded.empty())
+        {
+#ifdef DEBUG
+            Log::error("ShaderFilesManager", "Some shader file > 1 ref_count");
+#endif
+            m_shader_files_loaded.clear();
+        }
+    }
     // ------------------------------------------------------------------------
-    GLuint loadShader(const std::string &file, unsigned type);
+    void removeUnusedShaderFiles()
+    {
+        for (auto it = m_shader_files_loaded.begin();
+             it != m_shader_files_loaded.end();)
+        {
+            if (it->second.use_count() == 1 || !it->second)
+            {
+                it = m_shader_files_loaded.erase(it);
+            }
+            else
+            {
+                it++;
+            }
+        }
+    }
     // ------------------------------------------------------------------------
-    GLuint addShaderFile(const std::string &file, unsigned type);
+    SharedShader loadShader(const std::string& full_path, unsigned type);
     // ------------------------------------------------------------------------
-    GLuint getShaderFile(const std::string &file, unsigned type);
+    SharedShader getShaderFile(const std::string& file, unsigned type);
 
 };   // ShaderFilesManager
 

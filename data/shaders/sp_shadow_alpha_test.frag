@@ -5,7 +5,7 @@ out vec4 o_frag_color;
 
 void main(void)
 {
-    vec4 col = sampleTextureSlot0(uv);
+    vec4 col = sampleTextureLayer0(uv);
     if (col.a < 0.5)
     {
         discard;

@@ -54,6 +54,7 @@ protected:
 
     /** OpenGL's program id. */
     GLuint m_program;
+    std::vector<std::shared_ptr<GLuint> > m_shaders;
 
     // ========================================================================
     /** Ends recursion. */
@@ -67,13 +68,13 @@ protected:
     void loadAndAttachShader(GLint shader_type, const std::string &name,
                              Types ... args)
     {
-        GLint shader_id = ShaderFilesManager::getInstance()
+        auto shader_id = ShaderFilesManager::getInstance()
             ->getShaderFile(name, shader_type);
-        glAttachShader(m_program, shader_id);
-        GLint is_deleted = GL_TRUE;
-        glGetShaderiv(shader_id, GL_DELETE_STATUS, &is_deleted);
-        if (is_deleted == GL_FALSE)
-            glDeleteShader(shader_id);
+        if (shader_id)
+        {
+            m_shaders.push_back(shader_id);
+            glAttachShader(m_program, *shader_id);
+        }
         loadAndAttachShader(args...);
     }   // loadAndAttachShader
     // ------------------------------------------------------------------------
@@ -87,6 +88,10 @@ protected:
 
 public:
         ShaderBase();
+        ~ShaderBase()
+        {
+            glDeleteProgram(m_program);
+        }
     int loadTFBProgram(const std::string &vertex_file_path,
                        const char **varyings,
                        unsigned varyingscount);
@@ -346,7 +351,8 @@ public:
 
         GLint Result = GL_FALSE;
         glGetProgramiv(m_program, GL_LINK_STATUS, &Result);
-        if (Result == GL_FALSE) {
+        if (Result == GL_FALSE)
+        {
             int info_length;
             Log::error("Shader", "Error when linking these shaders :");
             printFileList(args...);
@@ -356,10 +362,12 @@ public:
             Log::error("Shader", error_message);
             delete[] error_message;
         }
+        // After linking all shaders can be detached
+        for (auto shader : m_shaders)
+        {
+            glDetachShader(m_program, *shader);
+        }
     }   // loadProgram
-
-    // ------------------------------------------------------------------------
-    virtual void bindCustomTextures() {}
     // ------------------------------------------------------------------------
     void drawFullScreenEffect(Args...args)
     {

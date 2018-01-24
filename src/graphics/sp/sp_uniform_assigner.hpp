@@ -25,6 +25,7 @@
 #include "utils/log.hpp"
 #endif
 
+#include <typeinfo>
 #include <typeindex>
 #include <array>
 #include <string>
@@ -49,7 +50,7 @@ private:
 
 public:
     // ------------------------------------------------------------------------
-    SPUniformAssigner(const std::type_info& ti, GLuint location)
+    SPUniformAssigner(const std::type_index& ti, GLuint location)
         : m_location(location), m_type(ti), m_assigned(false) {}
     // ------------------------------------------------------------------------
     bool rumtimeChecking(const std::type_info& ti) const
@@ -185,6 +186,10 @@ public:
             else if (m_type == typeid(int))
             {
                 glUniform1i(m_location, 0);
+            }
+            else if (m_type == typeid(std::array<float, 4>))
+            {
+                glUniform4f(m_location, 0.0f, 0.0f, 0.0f,0.0f);
             }
 #endif
         }

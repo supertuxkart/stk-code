@@ -383,7 +383,7 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TRANSPARENT));
         SP::draw(SP::RP_1ST, SP::DCT_TRANSPARENT);
-        SP::draw(SP::RP_2ND, SP::DCT_TRANSPARENT);
+        SP::draw(SP::RP_RESERVED, SP::DCT_TRANSPARENT);
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -493,7 +493,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TRANSPARENT));
         SP::draw(SP::RP_1ST, SP::DCT_TRANSPARENT);
-        SP::draw(SP::RP_2ND, SP::DCT_TRANSPARENT);
+        SP::draw(SP::RP_RESERVED, SP::DCT_TRANSPARENT);
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -639,9 +639,9 @@ ShaderBasedRenderer::~ShaderBasedRenderer()
     delete m_spherical_harmonics;
     delete m_skybox;
     delete m_rtts;
-    ShaderFilesManager::kill();
     ShaderBase::killShaders();
     SP::destroy();
+    ShaderFilesManager::kill();
 }
 
 // ----------------------------------------------------------------------------
@@ -886,14 +886,14 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     if (CVS->isDefferedEnabled())
     {
         renderSceneDeferred(camera, dt, false, true);
+        render_target->setFrameBuffer(m_post_processing
+            ->render(camera, false, m_rtts));
     }
     else
     {
         renderScene(camera, dt, false, true);
+        render_target->setFrameBuffer(&m_rtts->getFBO(FBO_COLORS));
     }
-
-    render_target->setFrameBuffer(m_post_processing
-        ->render(camera, false, m_rtts));
 
     // reset
     glViewport(0, 0,

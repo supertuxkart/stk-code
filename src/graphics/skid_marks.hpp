@@ -65,7 +65,7 @@ private:
     Material* m_material;
 
     /** Shader(alphablend) to use for the skid marks. */
-    SP::SPShader* m_shader;
+    std::shared_ptr<SP::SPShader> m_shader;
 
     // ------------------------------------------------------------------------
     class SkidMarkQuads : public NoCopy
@@ -88,7 +88,7 @@ private:
     public:
             SkidMarkQuads (const Vec3 &left, const Vec3 &right,
                            const Vec3 &normal, Material* material,
-                           SP::SPShader* shader,
+                           std::shared_ptr<SP::SPShader> shader,
                            float z_offset, video::SColor* custom_color = NULL);
             ~SkidMarkQuads();
         void add          (const Vec3 &left,

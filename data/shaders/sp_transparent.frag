@@ -9,7 +9,7 @@ out vec4 o_diffuse_color;
 
 void main()
 {
-    vec4 diffusecolor = sampleTextureSlot0(uv);
+    vec4 diffusecolor = sampleTextureLayer0(uv);
     vec4 finalcolor = vec4(0.);
     if (fog_enabled == 0)
     {

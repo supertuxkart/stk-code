@@ -248,9 +248,7 @@ void Referee::selectReadySetGo(int rsg)
     SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(m_scene_node);
     if (spmn)
     {
-        spmn->setTextureMatrix(m_st_traffic_buffer,
-            {{ std::make_shared<float>(0.0f),
-            std::make_shared<float>(rsg * 0.333f) }});
+        spmn->setTextureMatrix(m_st_traffic_buffer, {{ 0.0f, rsg * 0.333f }});
     }
     else
     {

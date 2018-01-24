@@ -41,7 +41,7 @@ void main()
     tc += (mask < 1.) ? vec2(0.) : shift;
 
     vec4 col = texture(color_tex, tc);
-    vec4 blend_tex = sampleTextureSlot0(uv);
+    vec4 blend_tex = sampleTextureLayer0(uv);
     col.rgb = blend_tex.rgb * blend_tex.a + (1. - blend_tex.a) * col.rgb;
     o_diffuse_color = vec4(col.rgb, 1.);
 }

@@ -29,12 +29,13 @@
 #include <condition_variable>
 #include <functional>
 #include <list>
+#include <map>
 #include <memory>
 #include <mutex>
-#include <set>
 #include <string>
 #include <thread>
-#include <unordered_map>
+
+#include "irrString.h"
 
 class Material;
 
@@ -47,7 +48,7 @@ class SPTextureManager : public NoCopy
 private:
     static SPTextureManager* m_sptm;
 
-    std::unordered_map<std::string, std::shared_ptr<SPTexture> > m_textures;
+    std::map<std::string, std::shared_ptr<SPTexture> > m_textures;
 
     std::atomic_uint m_max_threaded_load_obj;
 
@@ -108,9 +109,9 @@ public:
                                           Material* m, bool undo_srgb,
                                           const std::string& container_id);
     // ------------------------------------------------------------------------
-    int dumpTextureUsage();
+    void dumpAllTextures();
     // ------------------------------------------------------------------------
-    void dumpAllTexture();
+    irr::core::stringw reloadTexture(const irr::core::stringw& name);
 
 };
 

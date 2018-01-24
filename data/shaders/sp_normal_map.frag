@@ -16,14 +16,15 @@ layout(location = 2) out vec2 o_gloss_map;
 
 void main()
 {
-    vec4 col = sampleTextureSlot0(uv);
+    vec4 col = sampleTextureLayer0(uv);
     if (hue_change > 0.0)
     {
         float mask = col.a;
         vec3 old_hsv = rgbToHsv(col.rgb);
         float mask_step = step(mask, 0.5);
 #if !defined(Advanced_Lighting_Enabled)
-        float saturation = mask * 2.1;
+        // For similar color
+        float saturation = mask * 1.825; // 2.5 * 0.5 ^ (1. / 2.2)
 #else
         float saturation = mask * 2.5;
 #endif
@@ -34,17 +35,10 @@ void main()
     }
 
     vec3 final_color = col.xyz * color.xyz;
-#if !defined(Advanced_Lighting_Enabled)
-#if !defined(sRGB_Framebuffer_Usable)
-    final_color = final_color * 0.73; // 0.5 ^ (1. / 2.2)
-#else
-    final_color = final_color * 0.5;
-#endif
-#endif
     o_diffuse_color = vec4(final_color, 1.0);
 
 #if defined(Advanced_Lighting_Enabled)
-    vec4 layer_3 = sampleTextureSlot3(uv);
+    vec4 layer_3 = sampleTextureLayer3(uv);
     vec3 tangent_space_normal = 2.0 * layer_3.xyz - 1.0;
     vec3 frag_tangent = normalize(tangent);
     vec3 frag_bitangent = normalize(bitangent);
@@ -52,7 +46,7 @@ void main()
     mat3 t_b_n = mat3(frag_tangent, frag_bitangent, frag_normal);
     vec3 world_normal = t_b_n * tangent_space_normal;
 
-    vec4 layer_2 = sampleTextureSlot2(uv);
+    vec4 layer_2 = sampleTextureLayer2(uv);
     o_normal_depth.xy = 0.5 * EncodeNormal(normalize(world_normal)) + 0.5;
     o_normal_depth.z = layer_2.x;
     o_gloss_map = layer_2.yz;

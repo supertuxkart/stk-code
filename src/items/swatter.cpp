@@ -32,7 +32,7 @@
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
-#include "items/attachment.hpp"
+#include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
@@ -74,8 +74,8 @@ Swatter::Swatter(AbstractKart *kart, bool was_bomb,
 
     if (m_removing_bomb)
     {
-        m_scene_node->setMesh(irr_driver->getAnimatedMesh(
-                        file_manager->getAsset(FileManager::MODEL,"swatter_anim.spm") ) );
+        m_scene_node->setMesh(attachment_manager
+            ->getMesh(Attachment::ATTACH_SWATTER_ANIM));
         m_scene_node->setRotation(core::vector3df(0.0, -180.0, 0.0));
         m_scene_node->setAnimationSpeed(0.9f);
         m_scene_node->setCurrentFrame(0.0f);

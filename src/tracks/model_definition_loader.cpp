@@ -113,6 +113,7 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
 
                 m_track->handleAnimatedTextures(scene_node, *group[m].m_xml);
 
+                Track::uploadNodeVertexBuffer(scene_node);
                 lod_node->add(group[m].m_distance, scene_node, true);
             }
             else
@@ -136,6 +137,7 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
 
                 m_track->handleAnimatedTextures(scene_node, *group[m].m_xml);
 
+                Track::uploadNodeVertexBuffer(scene_node);
                 lod_node->add(group[m].m_distance, scene_node, true);
             }
         }

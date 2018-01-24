@@ -730,7 +730,6 @@ void ThreeStrikesBattle::loadCustomModels()
 
                 m_karts.push_back(sta);
                 race_manager->addSpareTireKart(sta_list[i]);
-                Track::getCurrentTrack()->adjustForFog(sta->getNode());
 
                 // Copy STA pointer to m_spare_tire_karts array, allowing them
                 // to respawn easily

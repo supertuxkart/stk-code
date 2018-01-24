@@ -247,19 +247,19 @@ void CPUParticleManager::drawAll()
         [](const std::pair<Material*, std::string>& a,
            const std::pair<Material*, std::string>& b)->bool
         {
-            return a.first->getShaderType() > b.first->getShaderType(); 
+            return a.first->getShaderName() > b.first->getShaderName();
         });
 
-    Material::ShaderType st = Material::SHADERTYPE_COUNT;
+    std::string shader_name;
     for (auto& p : particle_drawn)
     {
         const bool flips = isFlipsMaterial(p.second);
         const float billboard = p.second.substr(0, 4) == "_bb_" ? 1.0f : 0.0f;
         Material* cur_mat = p.first;
-        if (cur_mat->getShaderType() != st)
+        if (cur_mat->getShaderName() != shader_name)
         {
-            st = cur_mat->getShaderType();
-            if (cur_mat->getShaderType() == Material::SHADERTYPE_ADDITIVE)
+            shader_name = cur_mat->getShaderName();
+            if (cur_mat->getShaderName() == "additive")
             {
                 ParticleRenderer::getInstance()->use();
                 glEnable(GL_DEPTH_TEST);
@@ -270,8 +270,7 @@ void CPUParticleManager::drawAll()
                 glBlendEquation(GL_FUNC_ADD);
                 glBlendFunc(GL_ONE, GL_ONE);
             }
-            else if (cur_mat
-                ->getShaderType() == Material::SHADERTYPE_ALPHA_BLEND)
+            else if (cur_mat->getShaderName() == "alphablend")
             {
                 ParticleRenderer::getInstance()->use();
                 glEnable(GL_DEPTH_TEST);
@@ -293,8 +292,8 @@ void CPUParticleManager::drawAll()
             }
         }
 
-        if (cur_mat->getShaderType() == Material::SHADERTYPE_ADDITIVE ||
-            cur_mat->getShaderType() == Material::SHADERTYPE_ALPHA_BLEND)
+        if (cur_mat->getShaderName() == "additive" ||
+            cur_mat->getShaderName() == "alphablend")
         {
             ParticleRenderer::getInstance()->setTextureUnits
                 (cur_mat->getTexture()->getOpenGLTextureName(),

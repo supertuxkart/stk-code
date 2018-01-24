@@ -39,7 +39,6 @@ private:
 public:
                AttachmentManager() {};
               ~AttachmentManager();
-    void       removeTextures   ();
     void       loadModels       ();
     // ------------------------------------------------------------------------
     /** Returns the mest for a certain attachment.

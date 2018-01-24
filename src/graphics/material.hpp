@@ -46,23 +46,6 @@ class ParticleKind;
 class Material : public NoCopy
 {
 public:
-    enum ShaderType
-    {
-        SHADERTYPE_SOLID = 0,
-        SHADERTYPE_ALPHA_TEST,
-        SHADERTYPE_ALPHA_BLEND,
-        SHADERTYPE_ADDITIVE,
-        SHADERTYPE_SOLID_UNLIT,
-        /** Effect that makes grass wave as in the wind */
-        SHADERTYPE_VEGETATION,
-        SHADERTYPE_WATER,
-        SHADERTYPE_SPHERE_MAP,
-        SHADERTYPE_NORMAL_MAP,
-        SHADERTYPE_DETAIL_MAP,
-        SHADERTYPE_SPLATTING,
-        SHADERTYPE_COUNT,
-    };
-
     enum ParticleConditions
     {
         EMIT_ON_DRIVE = 0,
@@ -92,8 +75,6 @@ private:
     /** Name of a special sfx to play when a kart is on this terrain, or
      *  "" if no special sfx exists. */
     std::string      m_sfx_name;
-
-    ShaderType       m_shader_type;
 
     /** Either ' ' (no mirroring), 'U' or 'V' if a texture needs to be
      *  mirrored when driving in reverse. Typically used for arrows indicating
@@ -134,14 +115,6 @@ private:
     /** If the property should be ignored in the physics. Example would be
      *  plants that a kart can just drive through. */
     bool             m_ignore;
-
-    bool             m_fog;
-
-    /** True if backface culliing should be enabled. */
-    bool             m_backface_culling;
-
-    /** Set to true to disable writing to the Z buffer. Usually to be used with alpha blending */
-    bool             m_disable_z_write;
 
     /** True if the material shouldn't be "slippy" at an angle */
     bool             m_high_tire_adhesion;
@@ -250,11 +223,6 @@ public:
 
     void  setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) const;
     void  setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb);
-    void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, 
-                       bool use_fog) const;
-    void onMadeVisible(scene::IMeshBuffer* who);
-    void onHidden(scene::IMeshBuffer* who);
-    void isInitiallyHidden(scene::IMeshBuffer* who);
 
     /** Returns the ITexture associated with this material. */
     video::ITexture *getTexture(bool srgb = true, bool premul_alpha = false);
@@ -275,6 +243,8 @@ public:
     /** Returns the minimum resulting saturation when colorized.
      */
     float getColorizationFactor () const { return m_colorization_factor;   }
+    // ------------------------------------------------------------------------
+    bool hasRandomHue() const            { return !m_hue_settings.empty(); }
     // ------------------------------------------------------------------------
     /** Returns a random hue when colorized.
      */
@@ -306,9 +276,8 @@ public:
     // ------------------------------------------------------------------------
     bool  isTransparent      () const
     {
-        return m_shader_type == SHADERTYPE_ADDITIVE ||
-               m_shader_type == SHADERTYPE_ALPHA_BLEND ||
-               m_shader_type == SHADERTYPE_ALPHA_TEST;
+        return m_shader_name == "additive" || m_shader_name == "alphablend" ||
+               m_shader_name == "displace";
     }
 
     // ------------------------------------------------------------------------
@@ -334,11 +303,6 @@ public:
     /** Returns the name of a special sfx to play while a kart is on this
      *  terrain. The string will be "" if no special sfx exists. */
     const std::string &getSFXName() const { return m_sfx_name; }
-
-    // ------------------------------------------------------------------------
-    /** Returns if fog is enabled. */
-    bool isFogEnabled() const { return m_fog; }
-
     // ------------------------------------------------------------------------
     /** \brief Get the kind of particles that are to be used on this material,
      *  in the given conditions.
@@ -380,9 +344,6 @@ public:
      *  on lower speeds. A negative value indicates no minimum speed. */
     float getZipperMinSpeed() const { return m_zipper_min_speed; }
     // ------------------------------------------------------------------------
-    ShaderType getShaderType() const { return m_shader_type; }
-    void setShaderType(ShaderType st) { m_shader_type = st; }
-    // ------------------------------------------------------------------------
     /** True if this texture should have the U coordinates mirrored. */
     char getMirrorAxisInReverse() const { return m_mirror_axis_when_reverse; }
     // ------------------------------------------------------------------------
@@ -391,13 +352,13 @@ public:
     const std::string& getColorizationMask() const
                                                { return m_colorization_mask; }
     // ------------------------------------------------------------------------
+    void setShaderName(const std::string& name)      { m_shader_name = name; }
+    // ------------------------------------------------------------------------
     const std::string& getShaderName() const         { return m_shader_name; }
     // ------------------------------------------------------------------------
     /* This is used for finding correct material for spm*/
     const std::string& getUVTwoTexture() const
                                                       { return m_uv_two_tex; }
-    // ------------------------------------------------------------------------
-    bool backFaceCulling() const                { return m_backface_culling; }
     // ------------------------------------------------------------------------
     bool use2UV() const                      { return !m_uv_two_tex.empty(); }
     // ------------------------------------------------------------------------

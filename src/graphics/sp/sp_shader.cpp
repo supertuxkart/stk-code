@@ -16,14 +16,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/sp/sp_shader.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/shader_files_manager.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_uniform_assigner.hpp"
-#include "utils/no_copy.hpp"
 #include "utils/string_utils.hpp"
-
-#include <ITexture.h>
-#include <string>
 
 namespace SP
 {
@@ -38,35 +35,21 @@ std::unordered_map<std::string, std::pair<unsigned, SamplerType> >
     };
 
 // ----------------------------------------------------------------------------
-SPShader::~SPShader()
-{
-#ifndef SERVER_ONLY
-    for (unsigned rp = RP_1ST; rp < RP_COUNT; rp++)
-    {
-        if (m_program[rp] != 0)
-        {
-            glDeleteProgram(m_program[rp]);
-        }
-        for (auto& p : m_uniforms[rp])
-        {
-            delete p.second;
-        }
-    }
-#endif
-}   // ~SPShader
-
-// ----------------------------------------------------------------------------
 void SPShader::addShaderFile(const std::string& name, GLint shader_type,
                              RenderPass rp)
 {
 #ifndef SERVER_ONLY
-    GLint shader_id = ShaderFilesManager::getInstance()
+    if (m_program[rp] == 0)
+    {
+        m_program[rp] = glCreateProgram();
+    }
+    auto shader_file = ShaderFilesManager::getInstance()
         ->getShaderFile(name, shader_type);
-    glAttachShader(m_program[rp], shader_id);
-    GLint is_deleted = GL_TRUE;
-    glGetShaderiv(shader_id, GL_DELETE_STATUS, &is_deleted);
-    if (is_deleted == GL_FALSE)
-        glDeleteShader(shader_id);
+    if (shader_file)
+    {
+        m_shader_files.push_back(shader_file);
+        glAttachShader(m_program[rp], *shader_file);
+    }
 #endif
 }   // addShaderFile
 
@@ -87,6 +70,19 @@ void SPShader::linkShaderFiles(RenderPass rp)
         glGetProgramInfoLog(m_program[rp], info_length, NULL, error_message);
         Log::error("SPShader", error_message);
         delete[] error_message;
+    }
+    // After linking all shaders can be detached
+    GLuint shaders[10] = {};
+    GLsizei count = 0;
+    glGetAttachedShaders(m_program[rp], 10, &count, shaders);
+    for (unsigned i = 0; i < (unsigned)count; i++)
+    {
+        glDetachShader(m_program[rp], shaders[i]);
+    }
+    if (result == GL_FALSE)
+    {
+        glDeleteProgram(m_program[rp]);
+        m_program[rp] = 0;
     }
 #endif
 }   // linkShaderFiles
@@ -131,7 +127,7 @@ void SPShader::addAllTextures(RenderPass rp)
         const unsigned idx =
             unsigned(m_prefilled_samplers[rp].size() + m_samplers[rp].size());
         glUniform1i(loc, idx);
-        m_samplers[rp].emplace_back(i, idx);
+        m_samplers[rp][i] = idx;
     }
 #endif
 }   // addPrefilledTextures
@@ -161,7 +157,7 @@ void SPShader::addCustomPrefilledTextures(SamplerType st, GLuint texture_type,
 }   // addCustomPrefilledTextures
 
 // ----------------------------------------------------------------------------
-void SPShader::bindPrefilledTextures(RenderPass rp)
+void SPShader::bindPrefilledTextures(RenderPass rp) const
 {
 #ifndef SERVER_ONLY
     for (auto& p : m_prefilled_samplers[rp])
@@ -184,7 +180,8 @@ void SPShader::bindPrefilledTextures(RenderPass rp)
 }   // bindPrefilledTextures
 
 // ----------------------------------------------------------------------------
-void SPShader::bindTextures(const std::array<GLuint, 6>& tex, RenderPass rp)
+void SPShader::bindTextures(const std::array<GLuint, 6>& tex,
+                            RenderPass rp) const
 {
 #ifndef SERVER_ONLY
     for (auto& p : m_samplers[rp])
@@ -197,7 +194,7 @@ void SPShader::bindTextures(const std::array<GLuint, 6>& tex, RenderPass rp)
 }   // bindTextures
 
 // ----------------------------------------------------------------------------
-void SPShader::addUniform(const std::string& name, const std::type_info& ti,
+void SPShader::addUniform(const std::string& name, const std::type_index& ti,
                           RenderPass rp)
 {
 #ifndef SERVER_ONLY
@@ -234,7 +231,7 @@ void SPShader::setUniformsPerObject(SPPerObjectUniform* sppou,
 
 // ----------------------------------------------------------------------------
 SPUniformAssigner* SPShader::getUniformAssigner(const std::string& name,
-                                                RenderPass rp)
+                                                RenderPass rp) const
 {
     auto ret = m_uniforms[rp].find(name);
     if (ret == m_uniforms[rp].end())
@@ -243,5 +240,44 @@ SPUniformAssigner* SPShader::getUniformAssigner(const std::string& name,
     }
     return ret->second;
 }   // getUniformAssigner
+
+// ----------------------------------------------------------------------------
+void SPShader::unload()
+{
+#ifndef SERVER_ONLY
+    for (unsigned rp = RP_1ST; rp < RP_COUNT; rp++)
+    {
+        if (m_program[rp] != 0)
+        {
+            glDeleteProgram(m_program[rp]);
+            m_program[rp] = 0;
+        }
+        for (auto& p : m_uniforms[rp])
+        {
+            delete p.second;
+        }
+        m_uniforms[rp].clear();
+        m_custom_prefilled_getter[rp].clear();
+        m_prefilled_samplers[rp].clear();
+        m_samplers[rp].clear();
+        m_use_function[rp] = nullptr;
+        m_unuse_function[rp] = nullptr;
+    }
+    m_shader_files.clear();
+#endif
+}   // unload
+
+// ----------------------------------------------------------------------------
+bool SPShader::isSrgbForTextureLayer(unsigned layer) const
+{
+#ifndef SERVER_ONLY
+    if (!CVS->isDefferedEnabled())
+    {
+        return false;
+    }
+#endif
+    assert(layer < 6);
+    return m_srgb[layer];
+}   // isSrgbForTextureLayer
 
 }

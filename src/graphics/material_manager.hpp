@@ -66,11 +66,6 @@ public:
                              const std::string& def_shader_name = "solid");
     void      setAllMaterialFlags(video::ITexture* t,
                                   scene::IMeshBuffer *mb);
-    void      adjustForFog(video::ITexture* t,
-                           scene::IMeshBuffer *mb,
-                           scene::ISceneNode* parent,
-                           bool use_fog) const;
-
     void      setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb);
 
     int       addEntity        (Material *m);

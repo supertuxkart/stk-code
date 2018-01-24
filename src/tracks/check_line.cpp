@@ -21,8 +21,8 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
@@ -77,7 +77,8 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
     {
 #ifndef SERVER_ONLY
         m_debug_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
-            (scene::EPT_TRIANGLE_STRIP, SP::getSPShader("additive"),
+            (scene::EPT_TRIANGLE_STRIP,
+            SP::SPShaderManager::get()->getSPShader("additive"),
             material_manager->getDefaultSPMaterial("additive"));
         SP::addDynamicDrawCall(m_debug_dy_dc);
         m_debug_dy_dc->getVerticesVector().resize(4);

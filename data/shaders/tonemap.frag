@@ -13,10 +13,6 @@ void main()
 
     // Uncharted2 tonemap with Auria's custom coefficients
     vec4 perChannel = (col * (6.9 * col + .5)) / (col * (5.2 * col + 1.7) + 0.06);
-#if !(!defined(sRGB_Framebuffer_Usable) && defined(Advanced_Lighting_Enabled))
-    perChannel = pow(perChannel, vec4(2.2));
-#endif
-
     vec2 inside = uv - 0.5;
     float vignette = 1. - dot(inside, inside) * vignette_weight;
     vignette = clamp(pow(vignette, 0.8), 0., 1.);

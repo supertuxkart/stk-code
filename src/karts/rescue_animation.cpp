@@ -75,7 +75,8 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     // up direction to the right up direction it should have according to
     // the last vaild quad of the kart
     WorldWithRank* wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
-    if (DriveGraph::get() && wwr)
+    if (DriveGraph::get() && wwr &&
+        wwr->getTrackSector(m_kart->getWorldKartId())->getCurrentGraphNode() > -1)
     {
         const int sector = wwr->getTrackSector(m_kart->getWorldKartId())
             ->getCurrentGraphNode();
