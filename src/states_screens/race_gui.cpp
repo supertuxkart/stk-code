@@ -253,7 +253,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     
     drawPlungerInFace(camera, dt);
 
-    scaling *= viewport.getWidth()/800.0f; // scale race GUI along screen size
+    scaling *= float(viewport.getWidth()) / float(irr_driver->getActualScreenSize().Width); // scale race GUI along screen size
     drawAllMessages(kart, viewport, scaling);
 
     if(!World::getWorld()->isRacePhase()) return;
@@ -884,14 +884,18 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     if (lap < 0 ) return;
 
     core::recti pos;
-    pos.UpperLeftCorner.Y   = viewport.UpperLeftCorner.Y + m_font_height;
+    
     // If the time display in the top right is in this viewport,
     // move the lap/rank display down a little bit so that it is
     // displayed under the time.
-    if (viewport.UpperLeftCorner.Y==0 &&
-        viewport.LowerRightCorner.X==(int)(irr_driver->getActualScreenSize().Width) &&
-        race_manager->getNumPlayers()!=3)
-        pos.UpperLeftCorner.Y   += m_font_height;
+	if (viewport.UpperLeftCorner.Y == 0 &&
+		viewport.LowerRightCorner.X == (int)(irr_driver->getActualScreenSize().Width) &&
+		!race_manager->getIfEmptyScreenSpaceExists()) {
+		pos.UpperLeftCorner.Y += m_font_height;
+	}
+	else {
+		pos.UpperLeftCorner.Y = viewport.UpperLeftCorner.Y + m_font_height;
+	}
     pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y+20;
     pos.UpperLeftCorner.X   = viewport.LowerRightCorner.X
                             - m_lap_width - 10;
