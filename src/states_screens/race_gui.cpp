@@ -195,8 +195,8 @@ void RaceGUI::renderGlobal(float dt)
     {
         static video::SColor black = video::SColor(255,0,0,0);
 
-		GL32_draw2DRectangle(black, irr_driver->GetSplitscreenWindow(
-			race_manager->getNumLocalPlayers()));
+        GL32_draw2DRectangle(black, irr_driver->GetSplitscreenWindow(
+            race_manager->getNumLocalPlayers()));
     }
 
     World *world = World::getWorld();
@@ -368,7 +368,7 @@ void RaceGUI::drawGlobalTimer()
     // special case : when 3 players play, use available 4th space for such things
     if (race_manager->getIfEmptyScreenSpaceExists())
     {
-		pos -= core::vector2d<s32>(0, pos.LowerRightCorner.Y / 2);
+        pos -= core::vector2d<s32>(0, pos.LowerRightCorner.Y / 2);
         pos += core::vector2d<s32>(0, irr_driver->getActualScreenSize().Height - irr_driver->GetSplitscreenWindow(0).getHeight());
     }
 
@@ -888,14 +888,14 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     // If the time display in the top right is in this viewport,
     // move the lap/rank display down a little bit so that it is
     // displayed under the time.
-	if (viewport.UpperLeftCorner.Y == 0 &&
-		viewport.LowerRightCorner.X == (int)(irr_driver->getActualScreenSize().Width) &&
-		!race_manager->getIfEmptyScreenSpaceExists()) {
-		pos.UpperLeftCorner.Y += m_font_height;
-	}
-	else {
-		pos.UpperLeftCorner.Y = viewport.UpperLeftCorner.Y + m_font_height;
-	}
+    if (viewport.UpperLeftCorner.Y == 0 &&
+        viewport.LowerRightCorner.X == (int)(irr_driver->getActualScreenSize().Width) &&
+        !race_manager->getIfEmptyScreenSpaceExists()) {
+        pos.UpperLeftCorner.Y += m_font_height;
+    }
+    else {
+        pos.UpperLeftCorner.Y = viewport.UpperLeftCorner.Y + m_font_height;
+    }
     pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y+20;
     pos.UpperLeftCorner.X   = viewport.LowerRightCorner.X
                             - m_lap_width - 10;
