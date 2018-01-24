@@ -50,13 +50,8 @@ private:
     bool                       m_rsm_matrix_initialized;
     float                      m_shadows_cam[4][24];
     bool                       m_rsm_map_available;
-    core::vector3df            m_rh_extend;
-    core::matrix4              m_rh_matrix;
+    float                      m_mat_ubo[16 * 9 + 2];
 
-
-    void updateSplitAndLightcoordRangeFromComputeShaders(unsigned int width,
-                                                         unsigned int height,
-                                                         GLuint depth_stencil_texture);
     core::matrix4 getTighestFitOrthoProj(const core::matrix4 &transform,
                               const std::vector<core::vector3df> &pointsInside,
                               std::pair<float, float> &size);
@@ -71,7 +66,7 @@ public:
                                    GLuint depth_stencil_texture);
     void addLight(const core::vector3df &pos);
     void updateSunOrthoMatrices();
-    void renderShadowsDebug(const FrameBuffer &shadow_framebuffer,
+    void renderShadowsDebug(const FrameBuffer* shadow_framebuffer,
                             const PostProcessing *post_processing);
 
     // ------------------------------------------------------------------------
@@ -84,26 +79,17 @@ public:
     // ------------------------------------------------------------------------
     scene::ICameraSceneNode* getSunCam() { return m_sun_cam; }
     // ------------------------------------------------------------------------
-    const core::matrix4& getRHMatrix() const { return m_rh_matrix;  }
-    // ------------------------------------------------------------------------
-    const core::vector3df& getRHExtend() const { return m_rh_extend;  }
-    // ------------------------------------------------------------------------
-    const core::matrix4& getRSMMatrix() const { return m_rsm_matrix; }
-    // ------------------------------------------------------------------------
     std::vector<core::matrix4>& getSunOrthoMatrices()
     {
         return m_sun_ortho_matrices;
     }
-    // ------------------------------------------------------------------------
-    void setRSMMapAvail(bool b) { m_rsm_map_available = b; }
-    // ------------------------------------------------------------------------
-    bool isRSMMapAvail() const { return m_rsm_map_available; }
     // ------------------------------------------------------------------------
     const std::pair<float, float>* getShadowScales() const
     {
         return m_shadow_scales;
     }
     // ------------------------------------------------------------------------
+    const float* getMatricesData() const { return m_mat_ubo; }
 
 };   // class ShadowMatrices
 

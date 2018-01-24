@@ -173,10 +173,10 @@ namespace scene
 	protected:
 
 		//! Get a static mesh for the current frame of this animated mesh
-		virtual IMesh* getMeshForCurrentFrame(SkinningCallback sc = NULL, int offset = -1);
+		virtual IMesh* getMeshForCurrentFrame();
 
 		void buildFrameNr(u32 timeMs);
-		void checkJoints();
+		virtual void checkJoints();
 		void beginTransition();
 
 		core::array<video::SMaterial> Materials;

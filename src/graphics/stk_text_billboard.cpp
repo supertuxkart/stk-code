@@ -18,35 +18,41 @@
 #ifndef SERVER_ONLY
 
 #include "graphics/stk_text_billboard.hpp"
-#include "graphics/shaders.hpp"
+#include "graphics/sp/sp_base.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/stk_mesh_scene_node.hpp"
-#include "graphics/stk_tex_manager.hpp"
-#include <SMesh.h>
-#include <SMeshBuffer.h>
-#include <ISceneManager.h>
-#include <ICameraSceneNode.h>
+#include "graphics/graphics_restrictions.hpp"
 
-using namespace irr;
-
-STKTextBillboard::STKTextBillboard(core::stringw text, FontWithFace* font,
-    const video::SColor& color_top, const video::SColor& color_bottom,
-    irr::scene::ISceneNode* parent,
-    irr::scene::ISceneManager* mgr, irr::s32 id,
-    const irr::core::vector3df& position, const irr::core::vector3df& size) :
-    STKMeshSceneNode(new scene::SMesh(),
-        parent, irr_driver->getSceneManager(), -1, "text_billboard",
-        position, core::vector3df(0.0f, 0.0f, 0.0f), size, false)
+// ----------------------------------------------------------------------------
+STKTextBillboard::STKTextBillboard(const video::SColor& color_top,
+                                   const video::SColor& color_bottom,
+                                   ISceneNode* parent, ISceneManager* mgr,
+                                   s32 id,
+                                   const core::vector3df& position,
+                                   const core::vector3df& size)
+                : ISceneNode(parent, mgr, id, position,
+                             core::vector3df(0.0f, 0.0f, 0.0f), size)
 {
+    using namespace SP;
     m_color_top = color_top;
+    if (CVS->isDefferedEnabled())
+    {
+        m_color_top.setRed(srgb255ToLinear(m_color_top.getRed()));
+        m_color_top.setGreen(srgb255ToLinear(m_color_top.getGreen()));
+        m_color_top.setBlue(srgb255ToLinear(m_color_top.getBlue()));
+    }
     m_color_bottom = color_bottom;
-    getTextMesh(text, font);
-    createGLMeshes();
-    Mesh->drop();
-    //setAutomaticCulling(0);
-    updateAbsolutePosition();
-}
+    if (CVS->isDefferedEnabled())
+    {
+        video::SColorf tmp(m_color_bottom);
+        m_color_bottom.setRed(srgb255ToLinear(m_color_bottom.getRed()));
+        m_color_bottom.setGreen(srgb255ToLinear(m_color_bottom.getGreen()));
+        m_color_bottom.setBlue(srgb255ToLinear(m_color_bottom.getBlue()));
+    }
+    static_assert(sizeof(GLTB) == 20, "Wrong compiler padding");
+}   // STKTextBillboard
 
+// ----------------------------------------------------------------------------
 void STKTextBillboard::updateAbsolutePosition()
 {
     // Make billboard always face the camera
@@ -71,126 +77,193 @@ void STKTextBillboard::updateAbsolutePosition()
     core::matrix4 m;
     m.setScale(RelativeScale);
     AbsoluteTransformation *= m;
-}
+    m_instanced_data = SP::SPInstancedData(AbsoluteTransformation, 0, 0, 0, 0);
 
-scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, FontWithFace* font)
+}   // updateAbsolutePosition
+
+// ----------------------------------------------------------------------------
+void STKTextBillboard::init(core::stringw text, FontWithFace* face)
 {
-    core::dimension2du size = font->getDimension(text.c_str());
-    font->render(text, core::rect<s32>(0, 0, size.Width, size.Height), video::SColor(255,255,255,255),
-        false, false, NULL, NULL, this);
+    m_chars = new std::vector<STKTextBillboardChar>();
+    core::dimension2du size = face->getDimension(text.c_str());
+    face->render(text, core::rect<s32>(0, 0, size.Width, size.Height),
+        video::SColor(255,255,255,255), false, false, NULL, NULL, this);
 
     const float scale = 0.02f;
-
-    //scene::SMesh* mesh = new scene::SMesh();
-    std::map<video::ITexture*, scene::SMeshBuffer*> buffers;
-
     float max_x = 0;
     float min_y = 0;
     float max_y = 0;
-    for (unsigned int i = 0; i < m_chars.size(); i++)
+    for (unsigned int i = 0; i < m_chars->size(); i++)
     {
-        float char_x = m_chars[i].m_destRect.LowerRightCorner.X;
+        float char_x = (*m_chars)[i].m_dest_rect.LowerRightCorner.X;
         if (char_x > max_x)
+        {
             max_x = char_x;
+        }
 
-        float char_min_y = m_chars[i].m_destRect.UpperLeftCorner.Y;
-        float char_max_y = m_chars[i].m_destRect.LowerRightCorner.Y;
+        float char_min_y = (*m_chars)[i].m_dest_rect.UpperLeftCorner.Y;
+        float char_max_y = (*m_chars)[i].m_dest_rect.LowerRightCorner.Y;
         if (char_min_y < min_y)
+        {
             min_y = char_min_y;
+        }
         if (char_max_y > min_y)
+        {
             max_y = char_max_y;
+        }
     }
     float scaled_center_x = (max_x / 2.0f) * scale;
-    float scaled_y = (max_y / 2.0f) * scale; // -max_y * scale;
+    float scaled_y = (max_y / 2.0f) * scale;
 
-    for (unsigned int i = 0; i < m_chars.size(); i++)
+    for (unsigned int i = 0; i < m_chars->size(); i++)
     {
-        core::vector3df char_pos(m_chars[i].m_destRect.UpperLeftCorner.X,
-            m_chars[i].m_destRect.UpperLeftCorner.Y, 0);
+        core::vector3df char_pos((*m_chars)[i].m_dest_rect.UpperLeftCorner.X,
+            (*m_chars)[i].m_dest_rect.UpperLeftCorner.Y, 0);
         char_pos *= scale;
 
-        core::vector3df char_pos2(m_chars[i].m_destRect.LowerRightCorner.X,
-            m_chars[i].m_destRect.LowerRightCorner.Y, 0);
+        core::vector3df char_pos2((*m_chars)[i].m_dest_rect.LowerRightCorner.X,
+            (*m_chars)[i].m_dest_rect.LowerRightCorner.Y, 0);
         char_pos2 *= scale;
 
-        //core::dimension2di char_size_i = m_chars[i].m_destRect.getSize();
-        //core::dimension2df char_size(char_size_i.Width*scale, char_size_i.Height*scale);
-
-        std::map<video::ITexture*, scene::SMeshBuffer*>::iterator map_itr = buffers.find(m_chars[i].m_texture);
-        scene::SMeshBuffer* buffer;
-        if (map_itr == buffers.end())
-        {
-            buffer = new scene::SMeshBuffer();
-            buffer->getMaterial().setTexture(0, m_chars[i].m_texture);
-            buffer->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-            buffer->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-            buffer->getMaterial().MaterialType = Shaders::getShader(ES_OBJECT_UNLIT);
-            buffers[m_chars[i].m_texture] = buffer;
-        }
-        else
-        {
-            buffer = map_itr->second;
-        }
-
-        float tex_width = (float) m_chars[i].m_texture->getSize().Width;
-        float tex_height = (float)m_chars[i].m_texture->getSize().Height;
-
-
-        video::S3DVertex vertices[] =
-        {
-            video::S3DVertex(char_pos.X - scaled_center_x, char_pos.Y - scaled_y, 0.0f,
-                0.0f, 0.0f, 1.0f,
+        float tex_width = (float)(*m_chars)[i].m_texture->getSize().Width;
+        float tex_height = (float)(*m_chars)[i].m_texture->getSize().Height;
+        using namespace MiniGLM;
+        std::array<GLTB, 4> triangle_strip =
+        {{
+            {
+                core::vector3df
+                    (char_pos.X - scaled_center_x, char_pos.Y - scaled_y, 0),
                 m_color_bottom,
-                m_chars[i].m_sourceRect.UpperLeftCorner.X / tex_width,
-                m_chars[i].m_sourceRect.LowerRightCorner.Y / tex_height),
+                {
+                    toFloat16((*m_chars)
+                        [i].m_source_rect.UpperLeftCorner.X / tex_width),
+                    toFloat16((*m_chars)
+                        [i].m_source_rect.LowerRightCorner.Y / tex_height)
+                }
+            },
 
-            video::S3DVertex(char_pos2.X - scaled_center_x, char_pos.Y - scaled_y, 0.0f,
-                0.0f, 0.0f, 1.0f,
+            {
+                core::vector3df
+                    (char_pos.X - scaled_center_x, char_pos2.Y - scaled_y, 0),
+                m_color_top,
+                {
+                    toFloat16((*m_chars)
+                        [i].m_source_rect.UpperLeftCorner.X / tex_width),
+                    toFloat16((*m_chars)
+                        [i].m_source_rect.UpperLeftCorner.Y / tex_height)
+                }
+            },
+
+            {
+                core::vector3df
+                    (char_pos2.X - scaled_center_x, char_pos.Y - scaled_y, 0),
                 m_color_bottom,
-                m_chars[i].m_sourceRect.LowerRightCorner.X / tex_width,
-                m_chars[i].m_sourceRect.LowerRightCorner.Y / tex_height),
+                {
+                    toFloat16((*m_chars)
+                        [i].m_source_rect.LowerRightCorner.X / tex_width),
+                    toFloat16((*m_chars)
+                        [i].m_source_rect.LowerRightCorner.Y / tex_height)
+                }
+            },
 
-            video::S3DVertex(char_pos2.X - scaled_center_x, char_pos2.Y - scaled_y, 0.0f,
-                0.0f, 0.0f, 1.0f,
+            {
+                core::vector3df
+                    (char_pos2.X - scaled_center_x, char_pos2.Y - scaled_y, 0),
                 m_color_top,
-                m_chars[i].m_sourceRect.LowerRightCorner.X / tex_width,
-                m_chars[i].m_sourceRect.UpperLeftCorner.Y / tex_height),
-
-            video::S3DVertex(char_pos.X - scaled_center_x, char_pos2.Y - scaled_y, 0.0f,
-                0.0f, 0.0f, 1.0f,
-                m_color_top,
-                m_chars[i].m_sourceRect.UpperLeftCorner.X / tex_width,
-                m_chars[i].m_sourceRect.UpperLeftCorner.Y / tex_height)
-        };
-
-        irr::u16 indices[] = { 2, 1, 0, 3, 2, 0 };
-
-        buffer->append(vertices, 4, indices, 6);
+                {
+                    toFloat16((*m_chars)
+                        [i].m_source_rect.LowerRightCorner.X / tex_width),
+                    toFloat16((*m_chars)
+                        [i].m_source_rect.UpperLeftCorner.Y / tex_height)
+                }
+            }
+        }};
+        m_gl_tbs[(*m_chars)[i].m_texture].push_back(triangle_strip);
     }
 
-    for (std::map<video::ITexture*, scene::SMeshBuffer*>::iterator map_itr = buffers.begin();
-        map_itr != buffers.end(); map_itr++)
+    glGenBuffers(1, &m_instanced_array);
+    glBindBuffer(GL_ARRAY_BUFFER, m_instanced_array);
+    glBufferData(GL_ARRAY_BUFFER,
+        12 /*position*/ + 4/*quaternion*/ + 8 /*scale*/, NULL,
+        GL_DYNAMIC_DRAW);
+    for (auto& p : m_gl_tbs)
     {
-        ((scene::SMesh*)Mesh)->addMeshBuffer(map_itr->second);
+        glGenVertexArrays(1, &m_vao_vbos[p.first].first);
+        glGenBuffers(1, &m_vao_vbos[p.first].second);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vao_vbos.at(p.first).second);
+        glBufferData(GL_ARRAY_BUFFER, m_gl_tbs.at(p.first).size() * 4 * 20,
+            m_gl_tbs.at(p.first).data(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(m_vao_vbos.at(p.first).first);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vao_vbos.at(p.first).second);
 
-        map_itr->second->recalculateBoundingBox();
-        Mesh->setBoundingBox(map_itr->second->getBoundingBox()); // TODO: wrong if several buffers
+        // Position
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 20, (void*)0);
 
-        map_itr->second->drop();
+        // Vertex color
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, 20,
+            (void*)12);
+
+        // 1st texture coordinates
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 2, GL_HALF_FLOAT, GL_FALSE, 20, (void*)16);
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_instanced_array);
+        // Origin
+        glEnableVertexAttribArray(8);
+        glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, 24, (void*)0);
+        glVertexAttribDivisorARB(8, 1);
+
+        // Rotation (quaternion .xyz)
+        glEnableVertexAttribArray(9);
+        glVertexAttribPointer(9, 4, GL_INT_2_10_10_10_REV,
+            GraphicsRestrictions::isDisabled
+            (GraphicsRestrictions::GR_CORRECT_10BIT_NORMALIZATION) ?
+            GL_FALSE : GL_TRUE, 24, (void*)12);
+        glVertexAttribDivisorARB(9, 1);
+
+        // Scale (3 half floats and .w for quaternion .w)
+        glEnableVertexAttribArray(10);
+        glVertexAttribPointer(10, 4, GL_HALF_FLOAT, GL_FALSE, 24, (void*)16);
+        glVertexAttribDivisorARB(10, 1);
+
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    getMaterial(0).MaterialType = Shaders::getShader(ES_OBJECT_UNLIT);
+    Vec3 min = Vec3( 999999.9f);
+    Vec3 max = Vec3(-999999.9f);
+    for (auto& p : m_gl_tbs)
+    {
+        for (auto& q : p.second)
+        {
+            for (auto& r : q)
+            {
+                Vec3 c(r.m_position.X, r.m_position.Y, r.m_position.Z);
+                min.min(c);
+                max.max(c);
+            }
+        }
+    }
+    m_bbox.MinEdge = min.toIrrVector();
+    m_bbox.MaxEdge = max.toIrrVector();
 
-    return Mesh;
-}
+    delete m_chars;
+    updateAbsolutePosition();
+}   // init
 
+// ----------------------------------------------------------------------------
 void STKTextBillboard::collectChar(video::ITexture* texture,
-    const core::rect<float>& destRect,
-    const core::rect<s32>& sourceRect,
-    const video::SColor* const colors)
+                                   const core::rect<float>& dest_rect,
+                                   const core::rect<s32>& source_rect,
+                                   const video::SColor* const colors)
 {
-    m_chars.push_back(STKTextBillboardChar(texture, destRect, sourceRect, colors));
-}
+    assert(m_chars != NULL);
+    m_chars->push_back(STKTextBillboardChar(texture, dest_rect, source_rect,
+        colors));
+}   // collectChar
 
 #endif   // !SERVER_ONLY
 

@@ -18,6 +18,8 @@
 #ifndef CENTRAL_SETTINGS_HPP
 #define CENTRAL_SETTINGS_HPP
 
+#include <string>
+
 class CentralVideoSettings
 {
 private:
@@ -25,15 +27,11 @@ private:
     bool                  m_glsl;
 
     int m_gl_major_version, m_gl_minor_version;
-    bool hasVSLayer;
-    bool hasBaseInstance;
-    bool hasDrawIndirect;
     bool hasBufferStorage;
     bool hasComputeShaders;
     bool hasArraysOfArrays;
     bool hasTextureStorage;
     bool hasTextureView;
-    bool hasBindlessTexture;
     bool hasUBO;
     bool hasExplicitAttribLocation;
     bool hasGS;
@@ -41,31 +39,27 @@ private:
     bool hasAtomics;
     bool hasSSBO;
     bool hasImageLoadStore;
-    bool hasMultiDrawIndirect;
     bool hasTextureFilterAnisotropic;
     bool hasTextureSwizzle;
     bool hasPixelBufferObject;
-    bool hasSRGBFramebuffer;
+    bool hasSamplerObjects;
+    bool hasVertexType2101010Rev;
+    bool hasInstancedArrays;
 
 #if defined(USE_GLES2)
     bool hasBGRA;
     bool hasColorBufferFloat;
 #endif
 
-    bool m_need_rh_workaround;
-    bool m_need_srgb_workaround;
-    bool m_need_srgb_visual_workaround;
     bool m_need_vertex_id_workaround;
-    bool m_GI_has_artifact;
 public:
+    static bool m_supports_sp;
+
     void init();
     bool isGLSL() const;
     unsigned getGLSLVersion() const;
 
     // Needs special handle ?
-    bool needRHWorkaround() const;
-    bool needsRGBBindlessWorkaround() const;
-    bool needsSRGBCapableVisualWorkaround() const;
     bool needsVertexIdWorkaround() const;
 
     // Extension is available and safe to use
@@ -74,46 +68,33 @@ public:
     bool isARBTextureViewUsable() const;
     bool isARBGeometryShadersUsable() const;
     bool isARBTextureStorageUsable() const;
-    bool isAMDVertexShaderLayerUsable() const;
     bool isARBComputeShaderUsable() const;
     bool isARBArraysOfArraysUsable() const;
-    bool isARBBindlessTextureUsable() const;
     bool isARBBufferStorageUsable() const;
-    bool isARBBaseInstanceUsable() const;
-    bool isARBDrawIndirectUsable() const;
     bool isARBShaderAtomicCountersUsable() const;
     bool isARBShaderStorageBufferObjectUsable() const;
     bool isARBImageLoadStoreUsable() const;
-    bool isARBMultiDrawIndirectUsable() const;
     bool isARBExplicitAttribLocationUsable() const;
     bool isEXTTextureFilterAnisotropicUsable() const;
     bool isARBTextureSwizzleUsable() const;
     bool isARBPixelBufferObjectUsable() const;
-    bool isARBSRGBFramebufferUsable() const;
+    bool isARBSamplerObjectsUsable() const;
+    bool isARBVertexType2101010RevUsable() const;
+    bool isARBInstancedArraysUsable() const;
 
 #if defined(USE_GLES2)
     bool isEXTTextureFormatBGRA8888Usable() const;
     bool isEXTColorBufferFloatUsable() const;
 #endif
 
-
     // Are all required extensions available for feature support
-    bool supportsShadows() const;
-    bool supportsGlobalIllumination() const;
-    bool supportsIndirectInstancingRendering() const;
     bool supportsComputeShadersFiltering() const;
-    bool supportsAsyncInstanceUpload() const;
     bool supportsHardwareSkinning() const;
-    bool supportsThreadedTextureLoading() const;
     bool supportsTextureCompression() const;
 
     // "Macro" around feature support and user config
     bool isShadowEnabled() const;
-    bool isGlobalIlluminationEnabled() const;
     bool isTextureCompressionEnabled() const;
-    bool isSDSMEnabled() const;
-    bool isAZDOEnabled() const;
-    bool isESMEnabled() const;
     bool isDefferedEnabled() const;
 };
 

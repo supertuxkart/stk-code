@@ -19,10 +19,12 @@
 #include "tracks/graph.hpp"
 
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/render_target.hpp"
-#include "graphics/stk_tex_manager.hpp"
-#include "graphics/vao_manager.hpp"
+#include "graphics/material_manager.hpp"
+#include "graphics/sp/sp_mesh.hpp"
+#include "graphics/sp/sp_mesh_buffer.hpp"
 #include "modes/profile_world.hpp"
 #include "tracks/arena_node_3d.hpp"
 #include "tracks/drive_node_2d.hpp"
@@ -67,15 +69,32 @@ void Graph::createDebugMesh()
 {
     if (getNumNodes() <= 0) return;  // no debug output if not graph
 
-    createMesh(/*show_invisible*/true,
-               /*enable_transparency*/true);
-
-    video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
-    for (unsigned int i = 0; i < m_mesh_buffer->getVertexCount(); i++)
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
     {
-        // Swap the alpha and back
-        v[i].Color.setAlpha((i%2) ? 64 : 255);
+        createMeshSP(/*show_invisible*/true,
+                     /*enable_transparency*/true);
+        video::S3DVertexSkinnedMesh *v =
+            (video::S3DVertexSkinnedMesh*)m_mesh_buffer->getVertices();
+        for (unsigned int i = 0; i < m_mesh_buffer->getVertexCount(); i++)
+        {
+            // Swap the alpha and back
+            v[i].m_color.setAlpha((i%2) ? 64 : 255);
+        }
     }
+    else
+    {
+        createMesh(/*show_invisible*/true,
+                   /*enable_transparency*/true);
+        video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
+        for (unsigned int i = 0; i < m_mesh_buffer->getVertexCount(); i++)
+        {
+            // Swap the alpha and back
+            v[i].Color.setAlpha((i%2) ? 64 : 255);
+        }
+    }
+#endif
+
     m_node = irr_driver->addMesh(m_mesh, "track-debug-mesh");
 #ifdef DEBUG
     m_node->setName("track-debug-mesh");
@@ -110,9 +129,6 @@ void Graph::createMesh(bool show_invisible, bool enable_transparency,
     m.Lighting         = false;
     if (enable_transparency)
         m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-    m.setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 255, 255, 255)));
-    m.setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-    m.setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     m_mesh             = irr_driver->createQuadMesh(&m);
     m_mesh_buffer      = m_mesh->getMeshBuffer(0);
     assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);
@@ -207,18 +223,7 @@ void Graph::createMesh(bool show_invisible, bool enable_transparency,
         // i.e. part of the lap line might not be visible.
         for (unsigned int i = 0; i < 4; i++)
             lap_v[i].Pos.Y += 0.1f;
-#ifndef USE_TEXTURED_LINE
         m_mesh_buffer->append(lap_v, 4, lap_ind, 6);
-#else
-        lap_v[0].TCoords = core::vector2df(0,0);
-        lap_v[1].TCoords = core::vector2df(3,0);
-        lap_v[2].TCoords = core::vector2df(3,1);
-        lap_v[3].TCoords = core::vector2df(0,1);
-        m_mesh_buffer->append(lap_v, 4, lap_ind, 6);
-        video::SMaterial &m = m_mesh_buffer->getMaterial();
-        video::ITexture *t = irr_driver->getTexture("chess.png");
-        m.setTexture(0, t);
-#endif
     }
 
     // Instead of setting the bounding boxes, we could just disable culling,
@@ -234,6 +239,127 @@ void Graph::createMesh(bool show_invisible, bool enable_transparency,
     delete[] new_v;
 #endif
 }   // createMesh
+
+// -----------------------------------------------------------------------------
+/** Creates the actual mesh that is used by createDebugMesh() or makeMiniMap()
+ */
+void Graph::createMeshSP(bool show_invisible, bool enable_transparency,
+                         const video::SColor *track_color)
+{
+#ifndef SERVER_ONLY
+
+    SP::SPMesh* spm = new SP::SPMesh();
+    SP::SPMeshBuffer* spmb = new SP::SPMeshBuffer();
+    m_mesh = spm;
+    m_mesh_buffer = spmb;
+
+    unsigned int n = 0;
+    const unsigned int total_nodes = getNumNodes();
+
+    // Count the number of quads to display (some quads might be invisible)
+    for (unsigned int i = 0; i < total_nodes; i++)
+    {
+        if (show_invisible || !m_all_nodes[i]->isInvisible())
+            n++;
+    }
+
+    // Four vertices for each of the n-1 remaining quads
+    std::vector<video::S3DVertexSkinnedMesh> vertices;
+    vertices.resize(4 * n);
+    // Each quad consists of 2 triangles with 3 elements, so
+    // we need 2*3 indices for each quad.
+    std::vector<uint16_t> indices;
+    indices.resize(6 * n);
+    video::SColor c(255, 255, 0, 0);
+
+    if (track_color)
+        c = *track_color;
+
+    // Now add all quads
+    int i = 0;
+    for (unsigned int count = 0; count < total_nodes; count++)
+    {
+        // Ignore invisible quads
+        if (!show_invisible && m_all_nodes[count]->isInvisible())
+            continue;
+
+        // Swap the colours from red to blue and back
+        if (!track_color)
+        {
+            c.setRed ((i % 2) ? 255 : 0);
+            c.setBlue((i % 2) ? 0 : 255);
+        }
+
+        video::SColor this_color = c;
+        differentNodeColor(count, &this_color);
+        // Transfer the 4 points of the current quad to the list of vertices
+        m_all_nodes[count]->getSPMVertices(vertices.data() + (4 * i), this_color);
+
+        // Set up the indices for the triangles
+        indices[6 * i] = 4 * i + 2;  // First triangle: vertex 0, 1, 2
+        indices[6 * i + 1] = 4 * i + 1;
+        indices[6 * i + 2] = 4 * i;
+        indices[6 * i + 3] = 4 * i + 3;  // second triangle: vertex 0, 1, 3
+        indices[6 * i + 4] = 4 * i + 2;
+        indices[6 * i + 5] = 4 * i;
+        i++;
+    }
+
+    if (hasLapLine())
+    {
+        video::S3DVertexSkinnedMesh lap_v[4];
+        uint16_t lap_ind[6];
+        video::SColor lap_color(128, 255, 0, 0);
+        m_all_nodes[0]->getSPMVertices(lap_v, lap_color);
+
+        // Now scale the length (distance between vertix 0 and 3
+        // and between 1 and 2) to be 'length':
+        // Length of the lap line about 3% of the 'height'
+        // of the track.
+        const float length = (m_bb_max.getZ() - m_bb_min.getZ()) * 0.03f;
+
+        core::vector3df dl = lap_v[3].m_position-lap_v[0].m_position;
+        float ll2 = dl.getLengthSQ();
+        if (ll2 < 0.001)
+            lap_v[3].m_position = lap_v[0].m_position + core::vector3df(0, 0, 1);
+        else
+            lap_v[3].m_position = lap_v[0].m_position + dl * length / sqrt(ll2);
+
+        core::vector3df dr = lap_v[2].m_position - lap_v[1].m_position;
+        float lr2 = dr.getLengthSQ();
+        if (lr2 < 0.001)
+            lap_v[2].m_position = lap_v[1].m_position + core::vector3df(0, 0, 1);
+        else
+            lap_v[2].m_position = lap_v[1].m_position + dr * length / sqrt(lr2);
+        lap_ind[0] = 4 * n + 2;
+        lap_ind[1] = 4 * n + 1;
+        lap_ind[2] = 4 * n;
+        lap_ind[3] = 4 * n + 3;
+        lap_ind[4] = 4 * n + 2;
+        lap_ind[5] = 4 * n;
+        // Set it a bit higher to avoid issued with z fighting,
+        // i.e. part of the lap line might not be visible.
+        for (unsigned int i = 0; i < 4; i++)
+            lap_v[i].m_position.Y += 0.1f;
+        std::copy(lap_v, lap_v + 4, std::back_inserter(vertices));
+        std::copy(lap_ind, lap_ind +6, std::back_inserter(indices));
+    }
+
+    spmb->setSPMVertices(vertices);
+    spmb->setIndices(indices);
+    spmb->recalculateBoundingBox();
+    std::string shader_name = enable_transparency ? "alphablend" : "unlit";
+#ifndef SERVER_ONLY
+    if (!CVS->isDefferedEnabled())
+    {
+        shader_name = "solid";
+    }
+#endif
+    spmb->setSTKMaterial(material_manager->getDefaultSPMaterial(shader_name));
+    spm->addSPMeshBuffer(spmb);
+    spm->setBoundingBox(spmb->getBoundingBox());
+#endif
+}   // createMeshSP
 
 // -----------------------------------------------------------------------------
 /** Takes a snapshot of the graph so they can be used as minimap.
@@ -254,9 +380,20 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
     irr_driver->getSceneManager()
         ->setAmbientLight(video::SColor(255, 255, 255, 255));
 
-    createMesh(/*show_invisible part of the track*/ false,
-               /*enable_transparency*/ false,
-               /*track_color*/    &fill_color);
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        createMeshSP(/*show_invisible part of the track*/ false,
+                     /*enable_transparency*/ false,
+                     /*track_color*/    &fill_color);
+    }
+    else
+    {
+        createMesh(/*show_invisible part of the track*/ false,
+                   /*enable_transparency*/ false,
+                   /*track_color*/    &fill_color);
+    }
+#endif
 
     m_node = irr_driver->addMesh(m_mesh, "mini_map");
 #ifdef DEBUG
@@ -335,7 +472,6 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
     Track::getCurrentTrack()->forceFogDisabled(false);
 
     irr_driver->getSceneManager()->clear();
-    VAOManager::kill();
     irr_driver->clearGlowingNodes();
     irr_driver->clearLights();
     irr_driver->clearForcedBloom();

@@ -24,6 +24,7 @@
 #include <stddef.h>
 
 class FrameBuffer;
+class FrameBufferLayer;
 
 namespace irr {
     namespace video {
@@ -61,9 +62,6 @@ enum TypeFBO
     FBO_EIGHTH2,
     FBO_DISPLACE,
     FBO_BLOOM_1024,
-#if !defined(USE_GLES2)
-    FBO_SCALAR_1024,
-#endif
     FBO_BLOOM_512,
     FBO_TMP_512,
     FBO_LENS_512,
@@ -75,6 +73,7 @@ enum TypeFBO
     FBO_BLOOM_128,
     FBO_TMP_128,
     FBO_LENS_128,
+    FBO_SP,
     FBO_COUNT
 };
 
@@ -125,9 +124,6 @@ enum TypeRTT : unsigned int
     RTT_MLAA_TMP,
 
     RTT_BLOOM_1024,
-#if !defined(USE_GLES2)
-    RTT_SCALAR_1024,
-#endif
     RTT_BLOOM_512,
     RTT_TMP_512,
     RTT_LENS_512,
@@ -137,6 +133,9 @@ enum TypeRTT : unsigned int
     RTT_BLOOM_128,
     RTT_TMP_128,
     RTT_LENS_128,
+
+    RTT_SP_GLOSS,
+    RTT_SP_DIFF_COLOR,
 
     RTT_COUNT
 };
@@ -150,28 +149,21 @@ public:
     unsigned int getWidth () const { return m_width ; }
     unsigned int getHeight() const { return m_height; }
 
-    FrameBuffer &getShadowFrameBuffer() { return *m_shadow_FBO; }
-    FrameBuffer &getRadianceHintFrameBuffer() { return *m_RH_FBO; }
-    FrameBuffer &getReflectiveShadowMapFrameBuffer() { return *m_RSM; }
-
+    FrameBufferLayer* getShadowFrameBuffer() { return m_shadow_FBO; }
     unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
     unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }
     FrameBuffer& getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
-    const std::vector<uint64_t>& getPrefilledHandles() { return m_prefilled_handles; }
 
 private:
     unsigned RenderTargetTextures[RTT_COUNT];
     PtrVector<FrameBuffer> FrameBuffers;
-    std::vector<uint64_t> m_prefilled_handles;
     unsigned DepthStencilTexture;
 
     unsigned int m_width;
     unsigned int m_height;
 
-    unsigned shadowColorTex, shadowDepthTex;
-    unsigned RSM_Color, RSM_Normal, RSM_Depth;
-    unsigned RH_Red, RH_Green, RH_Blue;
-    FrameBuffer* m_shadow_FBO, *m_RSM, *m_RH_FBO;
+    unsigned shadowDepthTex;
+    FrameBufferLayer* m_shadow_FBO;
 
     LEAK_CHECK();
 };

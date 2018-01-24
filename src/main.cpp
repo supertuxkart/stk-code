@@ -610,10 +610,10 @@ void cmdLineHelp()
     "       --disable-light-shaft Disable light shafts (God rays).\n"
     "       --enable-dof       Enable depth of field.\n"
     "       --disable-dof      Disable depth of field.\n"
-    "       --enable-gi        Enable global illumination.\n"
-    "       --disable-gi       Disable global illumination.\n"
-    "       --enable-gfx       Enable animated scenery.\n"
-    "       --disable-gfx      Disable animated scenery.\n"
+    "       --enable-particles  Enable particles.\n"
+    "       --disable-particles Disable particles.\n"
+    "       --enable-animated-characters  Enable animated characters.\n"
+    "       --disable-animated-characters Disable animated characters.\n"
     "       --enable-motion-blur Enable motion blur.\n"
     "       --disable-motion-blur Disable motion blur.\n"
     "       --enable-mlaa      Enable anti-aliasing.\n"
@@ -628,8 +628,6 @@ void cmdLineHelp()
     "       --disable-hd-textures Disable high definition textures.\n"
     "       --enable-dynamic-lights Enable advanced pipline.\n"
     "       --disable-dynamic-lights Disable advanced pipline.\n"
-    "       --enable-trilinear  Use trilinear texture filtering.\n"
-    "       --disable-trilinear Use bilinear texture filtering.\n"
     "       --anisotropic=n     Anisotropic filtering quality (0 to disable).\n"
     "                           Takes precedence over trilinear or bilinear\n"
     "                           texture filtering.\n"
@@ -805,16 +803,16 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_dof = true;
     else if (CommandLine::has("--disable-dof"))
         UserConfigParams::m_dof = false;
-    // global illumination
-    if (CommandLine::has("--enable-gi"))
-        UserConfigParams::m_gi = true;
-    else if (CommandLine::has("--disable-gi"))
-        UserConfigParams::m_gi = false;
-    // animated scenery
-    if (CommandLine::has("--enable-gfx"))
-        UserConfigParams::m_graphical_effects = 2;
-    else if (CommandLine::has("--disable-gfx"))
-        UserConfigParams::m_graphical_effects = 0;
+    // particles effects
+    if (CommandLine::has("--enable-particles"))
+        UserConfigParams::m_particles_effects = 2;
+    else if (CommandLine::has("--disable-particles"))
+        UserConfigParams::m_particles_effects = 0;
+    // animated characters
+    if (CommandLine::has("--enable-animated-characters"))
+        UserConfigParams::m_animated_characters = true;
+    else if (CommandLine::has("--disable-animated-characters"))
+        UserConfigParams::m_animated_characters = false;
     if (CommandLine::has("--enable-motion-blur"))
         UserConfigParams::m_motionblur = true;
     else if (CommandLine::has("--disable-motion-blur"))
@@ -843,11 +841,6 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_high_definition_textures =  2 | 1;
     else if (CommandLine::has("--disable-hd-textures"))
         UserConfigParams::m_high_definition_textures = 2;
-    if (CommandLine::has("--enable-trilinear"))
-        UserConfigParams::m_trilinear = true;
-    else if (CommandLine::has("--disable-trilinear"))
-        UserConfigParams::m_trilinear = false;
-
 
     // Enable loading grand prix from local directory
     if(CommandLine::has("--add-gp-dir", &s))
@@ -1692,7 +1685,7 @@ int main(int argc, char *argv[] )
                     #ifdef USE_GLES2
                     irr::core::stringw version = "OpenGL ES 3.0";
                     #else
-                    irr::core::stringw version = "OpenGL 3.1";
+                    irr::core::stringw version = "OpenGL 3.3";
                     #endif
                     MessageDialog *dialog =
                         new MessageDialog(_("Your OpenGL version appears to be "

@@ -25,6 +25,7 @@
 #include "graphics/material.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
+#include "karts/kart_properties.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/terrain_info.hpp"
 #include "tracks/track.hpp"

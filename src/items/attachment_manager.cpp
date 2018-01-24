@@ -21,6 +21,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/sp/sp_base.hpp"
 #include "io/file_manager.hpp"
 
 AttachmentManager *attachment_manager = 0;
@@ -53,7 +54,7 @@ static const initAttachmentType iat[]=
     {Attachment::ATTACH_ANVIL,            "anchor.spm",           "anchor-attach-icon.png"       },
     {Attachment::ATTACH_SWATTER,          "swatter.spm",          "swatter-icon.png"             },
     {Attachment::ATTACH_NOLOKS_SWATTER,   "swatter_nolok.spm",    "swatter-icon.png"             },
-    {Attachment::ATTACH_TINYTUX,          "reset-button.spm",     "reset-attach-icon.png"        },
+    {Attachment::ATTACH_SWATTER_ANIM,     "swatter_anim.spm",     "swatter-icon.png"             },
     {Attachment::ATTACH_BUBBLEGUM_SHIELD, "bubblegum_shield.spm", "shield-icon.png"              },
     {Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD, "bubblegum_shield_nolok.spm", "shield-icon.png"              },
     {Attachment::ATTACH_MAX,              "",                     ""                             },
@@ -77,22 +78,17 @@ AttachmentManager::~AttachmentManager()
 }   // ~AttachmentManager
 
 //-----------------------------------------------------------------------------
-void AttachmentManager::removeTextures()
-{
-    for(int i=0; iat[i].attachment!=Attachment::ATTACH_MAX; i++)
-    {
-        // FIXME: free attachment textures
-    }   // for
-}   // removeTextures
-
-//-----------------------------------------------------------------------------
 void AttachmentManager::loadModels()
 {
     for(int i=0; iat[i].attachment!=Attachment::ATTACH_MAX; i++)
     {
         std::string full_path = file_manager->getAsset(FileManager::MODEL,iat[i].file);
-        m_attachments[iat[i].attachment]=irr_driver->getAnimatedMesh(full_path);
-        m_attachments[iat[i].attachment]->grab();
+        scene::IAnimatedMesh* mesh = irr_driver->getAnimatedMesh(full_path);
+        mesh->grab();
+#ifndef SERVER_ONLY
+        SP::uploadSPM(mesh);
+#endif
+        m_attachments[iat[i].attachment] = mesh;
         if(iat[i].icon_file)
         {
             std::string full_icon_path     =

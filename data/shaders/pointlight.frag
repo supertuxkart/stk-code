@@ -21,15 +21,15 @@ out vec4 Spec;
 
 void main()
 {
-    vec2 texc = gl_FragCoord.xy / screen;
+    vec2 texc = gl_FragCoord.xy / u_screen;
     float z = texture(dtex, texc).x;
     vec3 norm = normalize(DecodeNormal(2. * texture(ntex, texc).xy - 1.));
     float roughness = texture(ntex, texc).z;
 
-    vec4 xpos = getPosFromUVDepth(vec3(texc, z), InverseProjectionMatrix);
+    vec4 xpos = getPosFromUVDepth(vec3(texc, z), u_inverse_projection_matrix);
     vec3 eyedir = -normalize(xpos.xyz);
 
-    vec4 pseudocenter = ViewMatrix * vec4(center.xyz, 1.0);
+    vec4 pseudocenter = u_view_matrix * vec4(center.xyz, 1.0);
     pseudocenter /= pseudocenter.w;
     vec3 light_pos = pseudocenter.xyz;
     vec3 light_col = col.xyz;

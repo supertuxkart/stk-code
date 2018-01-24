@@ -31,24 +31,31 @@ if(NOT SERVER_ONLY)
         endif()
     endif()
 
-    if(ENABLE_WAYLAND_DEVICE)
-        find_package(Wayland REQUIRED)
-        include_directories(${WAYLAND_INCLUDE_DIR})
+    if(USE_GLES2 OR ENABLE_WAYLAND_DEVICE)
+        find_package(EGL)
         
-        if(NOT WAYLAND_FOUND)
-            message(FATAL_ERROR "Wayland not found.")
+        if(EGL_FOUND)
+            include_directories(${EGL_INCLUDE_DIR})
+        else()
+            if(USE_GLES2)
+                message(FATAL_ERROR "EGL not found.")
+            elseif(ENABLE_WAYLAND_DEVICE)
+                message(WARNING "EGL not found. Disable wayland support.")
+                set(ENABLE_WAYLAND_DEVICE OFF)
+            endif()
         endif()
-        
-        add_definitions(-D_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
     endif()
 
-    if(USE_GLES2 OR ENABLE_WAYLAND_DEVICE)
-        find_package(EGL REQUIRED)
-        include_directories(${EGL_INCLUDE_DIR})
+    if(ENABLE_WAYLAND_DEVICE)
+        find_package(Wayland)
         
-        if(NOT EGL_FOUND)
-            message(FATAL_ERROR "EGL not found.")
-        endif()
+        if(WAYLAND_FOUND)
+            include_directories(${WAYLAND_INCLUDE_DIR})
+            add_definitions(-D_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
+        else()
+            message(WARNING "Wayland not found. Disable wayland support.")
+            set(ENABLE_WAYLAND_DEVICE OFF)
+        endif()        
     endif()
 else()
     add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
@@ -553,6 +560,13 @@ include/utfwrapping.h
 include/vector2d.h
 include/vector3d.h
 )
+
+if(ENABLE_WAYLAND_DEVICE)
+    set(IRRLICHT_SOURCES 
+        ${IRRLICHT_SOURCES}
+        source/Irrlicht/server_decoration_client_protocol.c
+        source/Irrlicht/xdg-shell-unstable-v6-protocol.c)
+endif()
 
 
 if(APPLE)

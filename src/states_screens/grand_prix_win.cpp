@@ -23,7 +23,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/render_info.hpp"
+#include "graphics/lod_node.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -203,6 +203,7 @@ void GrandPrixWin::init()
 
         m_unlocked_label->add();
         manualAddWidget(m_unlocked_label);
+        m_unlocked_label->setColor(video::SColor(255, 255, 255, 255));
     }
     else
     {
@@ -344,9 +345,28 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
         const KartProperties* kp = kart_properties_manager->getKart(idents[i]);
         if (kp == NULL) continue;
 
-        KartModel* kart_model = kp->getKartModelCopy(KRT_DEFAULT);
+        KartModel* kart_model = kp->getKartModelCopy();
         m_all_kart_models.push_back(kart_model);
-        scene::ISceneNode* kart_main_node = kart_model->attachModel(false, false);
+        scene::ISceneNode* kart_main_node = kart_model->attachModel(true, false);
+        LODNode* lnode = dynamic_cast<LODNode*>(kart_main_node);
+        if (lnode)
+        {
+            // Lod node has to be animated
+            auto* a_node = static_cast<scene::IAnimatedMeshSceneNode*>
+                (lnode->getAllNodes()[0]);
+            const unsigned start_frame =
+                kart_model->getFrame(KartModel::AF_WIN_LOOP_START) > -1 ?
+                kart_model->getFrame(KartModel::AF_WIN_LOOP_START) :
+                kart_model->getFrame(KartModel::AF_WIN_START) > -1 ?
+                kart_model->getFrame(KartModel::AF_WIN_START) :
+                kart_model->getFrame(KartModel::AF_STRAIGHT);
+            const unsigned end_frame =
+                kart_model->getFrame(KartModel::AF_WIN_END) > -1 ?
+                kart_model->getFrame(KartModel::AF_WIN_END) :
+                kart_model->getFrame(KartModel::AF_STRAIGHT);
+            a_node->setLoopMode(true);
+            a_node->setFrameLoop(start_frame, end_frame);
+        }
 
         m_kart_x[i] = KARTS_INITIAL_X[i];
         m_kart_y[i] = KARTS_INITIAL_Y[i];

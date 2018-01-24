@@ -24,29 +24,18 @@
 #include <string>
 #include <ITexture.h>
 
-namespace irr
-{
-    namespace io { class IReadFile; }
-    namespace video { class IImageLoader; }
-}
-
 using namespace irr;
 
 struct TexConfig;
-class Material;
 
 class STKTexture : public video::ITexture, NoCopy
 {
 private:
     core::dimension2d<u32> m_size, m_orig_size;
 
-    uint64_t m_texture_handle;
-
     bool m_single_channel;
 
     TexConfig* m_tex_config;
-
-    Material* m_material;
 
     GLuint m_texture_name;
 
@@ -54,33 +43,13 @@ private:
 
     video::IImage* m_texture_image;
 
-    io::IReadFile* m_file;
-
-    video::IImageLoader* m_img_loader;
-
     // ------------------------------------------------------------------------
     video::IImage* resizeImage(video::IImage* orig_img,
                                core::dimension2du* orig_size = NULL,
                                core::dimension2du* final_size = NULL) const;
     // ------------------------------------------------------------------------
-    void applyMask(video::IImage* orig_img);
-    // ------------------------------------------------------------------------
-    bool loadCompressedTexture(const std::string& file_name);
-    // ------------------------------------------------------------------------
-    void saveCompressedTexture(const std::string& file_name);
-    // ------------------------------------------------------------------------
     void formatConversion(uint8_t* data, unsigned int* format, unsigned int w,
                           unsigned int h) const;
-    // ------------------------------------------------------------------------
-    uint8_t* singleChannelConversion(uint8_t* data) const
-    {
-        uint8_t* sc = new uint8_t[m_size.Width * m_size.Height];
-        for (unsigned int i = 0; i < m_size.Width * m_size.Height; i++)
-            sc[i] = data[4 * i + 3];
-        return sc;
-    }
-    // ------------------------------------------------------------------------
-    bool useHQMipmap() const;
     // ------------------------------------------------------------------------
     bool isSrgb() const;
     // ------------------------------------------------------------------------
@@ -91,7 +60,7 @@ public:
     STKTexture(const std::string& path, TexConfig* tc, bool no_upload = false);
     // ------------------------------------------------------------------------
     STKTexture(uint8_t* data, const std::string& name, unsigned int size,
-               bool single_channel = false, bool delete_ttl = false);
+               bool single_channel = false);
     // ------------------------------------------------------------------------
     STKTexture(video::IImage* img, const std::string& name);
     // ------------------------------------------------------------------------
@@ -131,29 +100,12 @@ public:
     // ------------------------------------------------------------------------
     virtual u32 getOpenGLTextureName() const         { return m_texture_name; }
     // ------------------------------------------------------------------------
-    virtual u64 getHandle();
-    // ------------------------------------------------------------------------
-    virtual void unloadHandle();
-    // ------------------------------------------------------------------------
     virtual unsigned int getTextureSize() const      { return m_texture_size; }
     // ------------------------------------------------------------------------
     void reload(bool no_upload = false, uint8_t* preload_data = NULL,
                 video::IImage* preload_img = NULL);
     // ------------------------------------------------------------------------
     video::IImage* getTextureImage()                { return m_texture_image; }
-    // ------------------------------------------------------------------------
-    bool useThreadedLoading() const;
-    // ------------------------------------------------------------------------
-    virtual void threadedReload(void* ptr, void* param) const;
-    // ------------------------------------------------------------------------
-    virtual void threadedSubImage(void* ptr) const;
-    // ------------------------------------------------------------------------
-    virtual void cleanThreadedLoader();
-    // ------------------------------------------------------------------------
-    virtual int getThreadedLoadTextureCounter() const
-    {
-        return useHQMipmap() ? 2 : 1;
-    }
     // ------------------------------------------------------------------------
     bool isMeshTexture() const;
 

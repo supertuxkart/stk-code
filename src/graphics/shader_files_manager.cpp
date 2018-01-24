@@ -20,6 +20,7 @@
 #include "graphics/shader_files_manager.hpp"
 #include "config/stk_config.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/graphics_restrictions.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
 
@@ -53,16 +54,18 @@ const std::string& ShaderFilesManager::getHeader()
 
 // ----------------------------------------------------------------------------
 void ShaderFilesManager::readFile(const std::string& file, 
-                                  std::ostringstream& code)
+                                  std::ostringstream& code, bool not_header)
 {
-    std::ifstream stream(file_manager->getShader(file), std::ios::in);
-    
+    std::ifstream stream(((file.find('/') != std::string::npos ||
+        file.find('\\') != std::string::npos) && not_header) ?
+        file : file_manager->getShader(file), std::ios::in);
+
     if (!stream.is_open())
     {
         Log::error("ShaderFilesManager", "Can not open '%s'.", file.c_str());
         return;
     }
-    
+
     const std::string stk_include = "#stk_include";
     std::string line;
 
@@ -71,6 +74,7 @@ void ShaderFilesManager::readFile(const std::string& file,
         const std::size_t pos = line.find(stk_include);
 
         // load the custom file pointed by the #stk_include directive
+        // we only look for #stk_include in official shader directory
         if (pos != std::string::npos)
         {
             // find the start "
@@ -96,7 +100,7 @@ void ShaderFilesManager::readFile(const std::string& file,
             filename = filename.substr(0, pos);
             
             // read the whole include file
-            readFile(filename, code);
+            readFile(filename, code, false/*not_header*/);
         }
         else
         {
@@ -112,9 +116,16 @@ void ShaderFilesManager::readFile(const std::string& file,
  *  \param file Filename of the shader to load.
  *  \param type Type of the shader.
  */
-GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
+ShaderFilesManager::SharedShader ShaderFilesManager::loadShader
+    (const std::string& full_path, unsigned type)
 {
-    const GLuint id = glCreateShader(type);
+    GLuint* ss_ptr = new GLuint;
+    *ss_ptr = glCreateShader(type);
+    SharedShader ss(ss_ptr, [](GLuint* ss)
+    {
+        glDeleteShader(*ss);
+        delete ss;
+    });
 
     std::ostringstream code;
 #if !defined(USE_GLES2)
@@ -141,9 +152,6 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
     }
 #endif
 
-    if (CVS->isAMDVertexShaderLayerUsable())
-        code << "#extension GL_AMD_vertex_shader_layer : enable\n";
-
     if (CVS->isARBExplicitAttribLocationUsable())
     {
 #if !defined(USE_GLES2)
@@ -152,24 +160,19 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
         code << "#define Explicit_Attrib_Location_Usable\n";
     }
 
-    if (CVS->isAZDOEnabled())
+    if (GraphicsRestrictions::isDisabled
+        (GraphicsRestrictions::GR_CORRECT_10BIT_NORMALIZATION))
     {
-        code << "#extension GL_ARB_bindless_texture : enable\n";
-        code << "#define Use_Bindless_Texture\n";
+        code << "#define Converts_10bit_Vector\n";
     }
-    code << "//" << file << "\n";
+
+    code << "//" << full_path << "\n";
     if (!CVS->isARBUniformBufferObjectUsable())
         code << "#define UBO_DISABLED\n";
-    if (CVS->isAMDVertexShaderLayerUsable())
-        code << "#define VSLayer\n";
-    if (CVS->needsRGBBindlessWorkaround())
-        code << "#define SRGBBindlessFix\n";
     if (CVS->needsVertexIdWorkaround())
         code << "#define Needs_Vertex_Id_Workaround\n";
     if (CVS->isDefferedEnabled())
         code << "#define Advanced_Lighting_Enabled\n";
-    if (CVS->isARBSRGBFramebufferUsable())
-        code << "#define sRGB_Framebuffer_Usable\n";
 
 #if !defined(USE_GLES2)
     // shader compilation fails with some drivers if there is no precision
@@ -182,42 +185,53 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
         &precision);
 
     if (precision > 0)
+    {
         code << "precision highp float;\n";
+        code << "precision highp sampler2DArrayShadow;\n";
+        code << "precision highp sampler2DArray;\n";
+    }
     else
+    {
         code << "precision mediump float;\n";
+        code << "precision mediump sampler2DArrayShadow;\n";
+        code << "precision mediump sampler2DArray;\n";
+    }
 #endif
     code << "#define MAX_BONES " << stk_config->m_max_skinning_bones << "\n";
 
     code << getHeader();
 
-    readFile(file, code);
+    readFile(full_path, code);
 
-    Log::info("ShaderFilesManager", "Compiling shader : %s", file.c_str());
+    Log::info("ShaderFilesManager", "Compiling shader: %s",
+        full_path.c_str());
     const std::string &source  = code.str();
     char const *source_pointer = source.c_str();
     int len                    = (int)source.size();
-    glShaderSource(id, 1, &source_pointer, &len);
-    glCompileShader(id);
+    glShaderSource(*ss, 1, &source_pointer, &len);
+    glCompileShader(*ss);
 
     GLint result = GL_FALSE;
-    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+    glGetShaderiv(*ss, GL_COMPILE_STATUS, &result);
     if (result == GL_FALSE)
     {
         // failed to compile
         int info_length;
-        Log::error("ShaderFilesManager", "Error in shader %s", file.c_str());
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &info_length);
+        Log::error("ShaderFilesManager", "Error in shader %s",
+            full_path.c_str());
+        glGetShaderiv(*ss, GL_INFO_LOG_LENGTH, &info_length);
         if (info_length < 0)
             info_length = 1024;
         char *error_message = new char[info_length];
         error_message[0] = 0;
-        glGetShaderInfoLog(id, info_length, NULL, error_message);
+        glGetShaderInfoLog(*ss, info_length, NULL, error_message);
         Log::error("ShaderFilesManager", error_message);
         delete[] error_message;
+        return NULL;
     }
     glGetError();
 
-    return id;
+    return ss;
 } // loadShader
 
 // ----------------------------------------------------------------------------
@@ -225,34 +239,40 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
  *  \param file Filename of the shader to load.
  *  \param type Type of the shader.
  */
-GLuint ShaderFilesManager::addShaderFile(const std::string &file, unsigned type)
+ShaderFilesManager::SharedShader ShaderFilesManager::addShaderFile
+    (const std::string& full_path, unsigned type)
 {
 #ifdef DEBUG
     // Make sure no duplicated shader is added somewhere else
-    std::unordered_map<std::string, GLuint>::const_iterator i =
-        m_shader_files_loaded.find(file);
+    auto i = m_shader_files_loaded.find(full_path);
     assert(i == m_shader_files_loaded.end());
 #endif
 
-    const GLuint id = loadShader(file, type);
-    m_shader_files_loaded[file] = id;
-    return id;
+    SharedShader ss = loadShader(full_path, type);
+    m_shader_files_loaded[full_path] = ss;
+    return ss;
 }   // addShaderFile
 
 // ----------------------------------------------------------------------------
-/** Get a shader file. If the shader is not already in the cache it will be loaded and cached.
+/** Get a shader file. If the shader is not already in the cache it will be
+ *  loaded and cached.
  *  \param file Filename of the shader to load.
  *  \param type Type of the shader.
  */
-GLuint ShaderFilesManager::getShaderFile(const std::string &file, unsigned type)
+ShaderFilesManager::SharedShader ShaderFilesManager::getShaderFile
+    (const std::string &file, unsigned type)
 {
+    const std::string full_path = (file.find('/') != std::string::npos ||
+        file.find('\\') != std::string::npos) ?
+        file : std::string(file_manager->getFileSystem()->getAbsolutePath
+        (file_manager->getShadersDir().c_str()).c_str()) + file;
     // found in cache
-    auto it = m_shader_files_loaded.find(file);
+    auto it = m_shader_files_loaded.find(full_path);
     if (it != m_shader_files_loaded.end())
         return it->second;
 
-   // add to the cache now
-   return addShaderFile(file, type);
+    // add to the cache now
+    return addShaderFile(full_path, type);
 }   // getShaderFile
 
 #endif   // !SERVER_ONLY

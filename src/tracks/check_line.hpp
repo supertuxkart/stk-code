@@ -19,15 +19,21 @@
 #ifndef HEADER_CHECK_LINE_HPP
 #define HEADER_CHECK_LINE_HPP
 
-#include <IMeshSceneNode.h>
+#include <ISceneNode.h>
 #include <line2d.h>
 #include <vector2d.h>
+#include <memory>
 using namespace irr;
 
 #include "tracks/check_structure.hpp"
 
 class XMLNode;
 class CheckManager;
+
+namespace SP
+{
+    class SPDynamicDrawCall;
+}
 
 /**
  *  \brief Implements a simple checkline.
@@ -65,7 +71,7 @@ private:
     std::vector<bool> m_previous_sign;
 
     /** Used to display debug information about checklines. */
-    scene::IMeshSceneNode *m_debug_node;
+    std::shared_ptr<SP::SPDynamicDrawCall> m_debug_dy_dc;
 
     /** How much a kart is allowed to be under the minimum height of a
      *  quad and still considered to be able to cross it. */

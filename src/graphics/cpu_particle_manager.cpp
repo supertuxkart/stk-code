@@ -95,6 +95,45 @@ void CPUParticleManager::addParticleNode(STKParticle* node)
     m_particles_queue[tex_name].push_back(node);
 }   // addParticleNode
 
+// ============================================================================
+GLuint CPUParticleManager::m_particle_quad = 0;
+// ----------------------------------------------------------------------------
+CPUParticleManager::GLParticle::GLParticle(bool flips)
+{
+    m_size = 1;
+    glGenBuffers(1, &m_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, m_size * 20, NULL,
+        GL_DYNAMIC_DRAW);
+    glGenVertexArrays(1, &m_vao);
+    glBindVertexArray(m_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 20, 0);
+    glVertexAttribDivisorARB(0, 1);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, 20,
+        (void*)12);
+    glVertexAttribDivisorARB(1, 1);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_HALF_FLOAT, GL_FALSE, 20,
+        (void*)16);
+    glVertexAttribDivisorARB(2, 1);
+    glBindBuffer(GL_ARRAY_BUFFER, m_particle_quad);
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, 16, 0);
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 16, (void*)8);
+    if (flips)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, STKParticle::getFlipsBuffer());
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, 4, 0);
+        glVertexAttribDivisorARB(6, 1);
+    }
+    glBindVertexArray(0);
+}   // GLParticle
+
 // ----------------------------------------------------------------------------
 void CPUParticleManager::addBillboardNode(scene::IBillboardSceneNode* node)
 {
@@ -165,56 +204,23 @@ void CPUParticleManager::uploadAll()
         {
             continue;
         }
-        bool first_upload = false;
         unsigned vbo_size = (unsigned)(m_particles_generated[p.first].size());
         if (m_gl_particles.find(p.first) == m_gl_particles.end())
         {
-            first_upload = true;
-            m_gl_particles[p.first] = std::make_tuple(0, 0, vbo_size * 2);
+            m_gl_particles[p.first] = std::unique_ptr<GLParticle>
+                (new GLParticle(isFlipsMaterial(p.first)));
         }
-        if (first_upload)
-        {
-            glGenBuffers(1, &std::get<1>(m_gl_particles[p.first]));
-            glBindBuffer(GL_ARRAY_BUFFER,
-                std::get<1>(m_gl_particles[p.first]));
-            glBufferData(GL_ARRAY_BUFFER, vbo_size * 2 * 20, NULL,
-                GL_DYNAMIC_DRAW);
-            glGenVertexArrays(1, &std::get<0>(m_gl_particles[p.first]));
-            glBindVertexArray(std::get<0>(m_gl_particles[p.first]));
-            glBindBuffer(GL_ARRAY_BUFFER,
-                std::get<1>(m_gl_particles[p.first]));
-            glEnableVertexAttribArray(0);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 20, 0);
-            glVertexAttribDivisorARB(0, 1);
-            glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, 20,
-                (void*)12);
-            glVertexAttribDivisorARB(1, 1);
-            glEnableVertexAttribArray(2);
-            glVertexAttribPointer(2, 2, GL_HALF_FLOAT, GL_FALSE, 20,
-                (void*)16);
-            glVertexAttribDivisorARB(2, 1);
-            glBindBuffer(GL_ARRAY_BUFFER, m_particle_quad);
-            glEnableVertexAttribArray(4);
-            glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, 16, 0);
-            glEnableVertexAttribArray(3);
-            glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 16, (void*)8);
-            if (isFlipsMaterial(p.first))
-            {
-                glBindBuffer(GL_ARRAY_BUFFER, STKParticle::getFlipsBuffer());
-                glEnableVertexAttribArray(6);
-                glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, 4, 0);
-                glVertexAttribDivisorARB(6, 1);
-            }
-            glBindVertexArray(0);
-        }
-        glBindBuffer(GL_ARRAY_BUFFER, std::get<1>(m_gl_particles[p.first]));
+        glBindBuffer(GL_ARRAY_BUFFER, m_gl_particles.at(p.first)->m_vbo);
+
         // Check "real" particle buffer size in opengl
-        if (std::get<2>(m_gl_particles[p.first]) < vbo_size)
+        if (m_gl_particles.at(p.first)->m_size < vbo_size)
         {
-            std::get<2>(m_gl_particles[p.first]) = vbo_size * 2;
-            glBufferData(GL_ARRAY_BUFFER, vbo_size * 2 * 20, NULL,
-                GL_DYNAMIC_DRAW);
+            m_gl_particles.at(p.first)->m_size = vbo_size * 2;
+            m_particles_generated.at(p.first).reserve(vbo_size * 2);
+            glBufferData(GL_ARRAY_BUFFER, vbo_size * 2 * 20,
+                m_particles_generated.at(p.first).data(), GL_DYNAMIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            continue;
         }
         void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, 0, vbo_size * 20,
             GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT |
@@ -228,6 +234,7 @@ void CPUParticleManager::uploadAll()
 // ----------------------------------------------------------------------------
 void CPUParticleManager::drawAll()
 {
+    using namespace SP;
     std::vector<std::pair<Material*, std::string> > particle_drawn;
     for (auto& p : m_particles_generated)
     {
@@ -240,19 +247,19 @@ void CPUParticleManager::drawAll()
         [](const std::pair<Material*, std::string>& a,
            const std::pair<Material*, std::string>& b)->bool
         {
-            return a.first->getShaderType() > b.first->getShaderType(); 
+            return a.first->getShaderName() > b.first->getShaderName();
         });
 
-    Material::ShaderType st = Material::SHADERTYPE_COUNT;
+    std::string shader_name;
     for (auto& p : particle_drawn)
     {
         const bool flips = isFlipsMaterial(p.second);
         const float billboard = p.second.substr(0, 4) == "_bb_" ? 1.0f : 0.0f;
         Material* cur_mat = p.first;
-        if (cur_mat->getShaderType() != st)
+        if (cur_mat->getShaderName() != shader_name)
         {
-            st = cur_mat->getShaderType();
-            if (cur_mat->getShaderType() == Material::SHADERTYPE_ADDITIVE)
+            shader_name = cur_mat->getShaderName();
+            if (cur_mat->getShaderName() == "additive")
             {
                 ParticleRenderer::getInstance()->use();
                 glEnable(GL_DEPTH_TEST);
@@ -263,8 +270,7 @@ void CPUParticleManager::drawAll()
                 glBlendEquation(GL_FUNC_ADD);
                 glBlendFunc(GL_ONE, GL_ONE);
             }
-            else if (cur_mat
-                ->getShaderType() == Material::SHADERTYPE_ALPHA_BLEND)
+            else if (cur_mat->getShaderName() == "alphablend")
             {
                 ParticleRenderer::getInstance()->use();
                 glEnable(GL_DEPTH_TEST);
@@ -286,8 +292,8 @@ void CPUParticleManager::drawAll()
             }
         }
 
-        if (cur_mat->getShaderType() == Material::SHADERTYPE_ADDITIVE ||
-            cur_mat->getShaderType() == Material::SHADERTYPE_ALPHA_BLEND)
+        if (cur_mat->getShaderName() == "additive" ||
+            cur_mat->getShaderName() == "alphablend")
         {
             ParticleRenderer::getInstance()->setTextureUnits
                 (cur_mat->getTexture()->getOpenGLTextureName(),
@@ -300,7 +306,7 @@ void CPUParticleManager::drawAll()
                 (cur_mat->getTexture()->getOpenGLTextureName());
             AlphaTestParticleRenderer::getInstance()->setUniforms(flips);
         }
-        glBindVertexArray(std::get<0>(m_gl_particles[p.second]));
+        glBindVertexArray(m_gl_particles.at(p.second)->m_vao);
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4,
             (unsigned)m_particles_generated.at(p.second).size());
     }

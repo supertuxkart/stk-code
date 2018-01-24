@@ -112,7 +112,7 @@ void CImageLoaderJPG::output_message(j_common_ptr cinfo)
 	(*cinfo->err->format_message)(cinfo, temp1);
 	core::stringc errMsg("JPEG FATAL ERROR in ");
 	errMsg += core::stringc(Filename);
-	os::Printer::log(errMsg.c_str(),temp1, ELL_ERROR);
+	//os::Printer::log(errMsg.c_str(),temp1, ELL_ERROR);
 }
 #endif // _IRR_COMPILE_WITH_LIBJPEG_
 
@@ -138,7 +138,7 @@ bool CImageLoaderJPG::isALoadableFileFormat(io::IReadFile* file) const
 IImage* CImageLoaderJPG::loadImage(io::IReadFile* file, bool skip_checking) const
 {
 	#ifndef _IRR_COMPILE_WITH_LIBJPEG_
-	os::Printer::log("Can't load as not compiled with _IRR_COMPILE_WITH_LIBJPEG_:", file->getFileName(), ELL_DEBUG);
+	//os::Printer::log("Can't load as not compiled with _IRR_COMPILE_WITH_LIBJPEG_:", file->getFileName(), ELL_DEBUG);
 	return 0;
 	#else
 

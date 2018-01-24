@@ -28,6 +28,7 @@ class Track;
 #include <map>
 #include <vector>
 #include <string>
+#include <memory>
 #include <irrlicht.h>
 #include "io/xml_node.hpp"
 
@@ -91,7 +92,7 @@ public:
     void addModelDefinition(const XMLNode* xml);
     LODNode* instanciateAsLOD(const XMLNode* xml_node,
                               scene::ISceneNode* parent,
-                              RenderInfo* ri);
+                              std::shared_ptr<RenderInfo> ri);
 
     void clear();
 

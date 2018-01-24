@@ -8,6 +8,9 @@ uniform float split2;
 uniform float splitmax;
 uniform float shadow_res;
 
+uniform vec3 sundirection;
+uniform vec3 sun_color;
+
 in vec2 uv;
 #ifdef GL_ES
 layout (location = 0) out vec4 Diff;
@@ -25,7 +28,7 @@ out vec4 Spec;
 
 float getShadowFactor(vec3 pos, int index)
 {
-    vec4 shadowcoord = (ShadowViewProjMatrixes[index] * InverseViewMatrix * vec4(pos, 1.0));
+    vec4 shadowcoord = (u_shadow_projection_view_matrices[index] * u_inverse_view_matrix * vec4(pos, 1.0));
     shadowcoord.xy /= shadowcoord.w;
     vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
     //float d = .5 * shadowcoord.z + .5;
@@ -45,9 +48,9 @@ float getShadowFactor(vec3 pos, int index)
 }
 
 void main() {
-    vec2 uv = gl_FragCoord.xy / screen;
+    vec2 uv = gl_FragCoord.xy / u_screen;
     float z = texture(dtex, uv).x;
-    vec4 xpos = getPosFromUVDepth(vec3(uv, z), InverseProjectionMatrix);
+    vec4 xpos = getPosFromUVDepth(vec3(uv, z), u_inverse_projection_matrix);
 
     vec3 norm = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
     float roughness =texture(ntex, uv).z;
@@ -72,6 +75,6 @@ void main() {
     else
         factor = 1.;
 
-    Diff = vec4(factor * NdotL * Diffuse * sun_col, 1.);
-    Spec = vec4(factor * NdotL * Specular * sun_col, 1.);
+    Diff = vec4(factor * NdotL * Diffuse * sun_color, 1.);
+    Spec = vec4(factor * NdotL * Specular * sun_color, 1.);
 }

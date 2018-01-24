@@ -214,24 +214,18 @@ void World::init()
                                    race_manager->getKartType(i),
                                    race_manager->getPlayerDifficulty(i));
         m_karts.push_back(newkart);
-        track->adjustForFog(newkart->getNode());
 
     }  // for i
 
     // Load other custom models if needed
     loadCustomModels();
 
-#ifndef SERVER_ONLY
-    // Now that all models are loaded, apply the overrides
-    irr_driver->applyObjectPassShader();
-#endif
-
     // Must be called after all karts are created
     m_race_gui->init();
 
     powerup_manager->updateWeightsForRace(race_manager->getNumberOfKarts());
 
-    if (UserConfigParams::m_weather_effects)
+    if (UserConfigParams::m_particles_effects > 1)
     {
         Weather::getInstance<Weather>();   // create Weather instance
     }
@@ -346,35 +340,47 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     if (race_manager->hasGhostKarts())
         gk = ReplayPlay::get()->getNumGhostKart();
 
+    std::shared_ptr<RenderInfo> ri = std::make_shared<RenderInfo>();
     int position           = index+1;
     btTransform init_pos   = getStartTransform(index - gk);
     AbstractKart *new_kart;
     if (RewindManager::get()->isEnabled())
         new_kart = new KartRewinder(kart_ident, index, position, init_pos,
-                                    difficulty);
+                                    difficulty, ri);
     else
-        new_kart = new Kart(kart_ident, index, position, init_pos, difficulty);
+        new_kart = new Kart(kart_ident, index, position, init_pos, difficulty,
+                            ri);
 
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
     switch(kart_type)
     {
     case RaceManager::KT_PLAYER:
+    {
         controller = new LocalPlayerController(new_kart,
                          StateManager::get()->getActivePlayer(local_player_id));
+        const float hue = StateManager::get()->getActivePlayer(local_player_id)
+            ->getConstProfile()->getDefaultKartColor();
+        if (hue > 0.0f)
+        {
+            ri->setHue(hue);
+        }
         m_num_players ++;
         break;
+    }
     case RaceManager::KT_NETWORK_PLAYER:
+    {
         controller = new NetworkPlayerController(new_kart);
         m_num_players++;
         break;
+    }
     case RaceManager::KT_AI:
+    {
         controller = loadAIController(new_kart);
         break;
+    }
     case RaceManager::KT_GHOST:
-        break;
     case RaceManager::KT_LEADER:
-        break;
     case RaceManager::KT_SPARE_TIRE:
         break;
     }
@@ -727,7 +733,8 @@ void World::resetAllKarts()
     for (KartList::iterator i = m_karts.begin(); i != m_karts.end(); i++)
     {
         if ((*i)->isGhostKart()) continue;
-        (*i)->getBody()->setGravity((*i)->getMaterial()->hasGravity() ?
+        (*i)->getBody()->setGravity(
+            (*i)->getMaterial() && (*i)->getMaterial()->hasGravity() ?
             (*i)->getNormal() * -g : Vec3(0, -g, 0));
     }
     for(int i=0; i<60; i++) Physics::getInstance()->update(1.f/60.f);
@@ -1009,7 +1016,7 @@ void World::update(float dt)
     }
 
     PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
-    if (UserConfigParams::m_graphical_effects > 1 && Weather::getInstance())
+    if (UserConfigParams::m_particles_effects > 1 && Weather::getInstance())
     {
         Weather::getInstance()->update(dt);
     }

@@ -23,6 +23,7 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/render_info.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/kart_stats_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
@@ -202,7 +203,9 @@ void KartHoverListener::onSelectionChanged(DynamicRibbonWidget* theWidget,
     if (m_parent->m_kart_widgets[player_id].getKartInternalName() == selectionID)
         return; // already selected
 
-    m_parent->updateKartWidgetModel(player_id, selectionID, selectionText);
+    m_parent->updateKartWidgetModel(player_id, selectionID, selectionText,
+        m_parent->m_kart_widgets[player_id].getAssociatedPlayer()->getProfile()
+        ->getDefaultKartColor());
     m_parent->m_kart_widgets[player_id].setKartInternalName(selectionID);
     m_parent->updateKartStats(player_id, selectionID);
     m_parent->validateKartChoices();
@@ -821,7 +824,7 @@ void KartSelectionScreen::updateKartStats(uint8_t widget_id,
 // ----------------------------------------------------------------------------
 void KartSelectionScreen::updateKartWidgetModel(int widget_id,
                 const std::string& selection,
-                const irr::core::stringw& selectionText)
+                const irr::core::stringw& selectionText, float kart_color)
 {
     // Update the displayed model
     ModelViewWidget* w3 = m_kart_widgets[widget_id].m_model_view;
@@ -848,9 +851,12 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
         w3->clearModels();
         core::matrix4 model_location;
         model_location.setScale(core::vector3df(15.0f, 15.0f, 15.0f));
+        file_manager->pushTextureSearchPath
+            (file_manager->getAsset(FileManager::MODEL,""), "models");
         w3->addModel(irr_driver->getAnimatedMesh(
             file_manager->getAsset(FileManager::MODEL, "chest.spm"))
             ->getMesh(20), model_location);
+        file_manager->popTextureSearchPath();
         w3->update(0);
 
         if (m_multiplayer)
@@ -883,7 +889,7 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
             model_location.setScale(core::vector3df(scale, scale, scale));
             w3->clearModels();
             const bool has_win_anime =
-                UserConfigParams::m_show_steering_animations != 0 &&
+                UserConfigParams::m_animated_characters &&
                 (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
                 kart_model.getFrame(KartModel::AF_WIN_START) > -1) &&
                 kart_model.getFrame(KartModel::AF_WIN_END) > -1) ||
@@ -902,9 +908,9 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
                 kart_model.getFrame(KartModel::AF_SELECTION_END) :
                 kart_model.getFrame(KartModel::AF_WIN_END) :
                 kart_model.getBaseFrame(),
-                false/*all_parts_colorized*/,
                 kart_model.getAnimationSpeed());
 
+            w3->getModelViewRenderInfo()->setHue(kart_color);
             model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
             for (unsigned i = 0; i < 4; i++)
             {
@@ -925,13 +931,12 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
                         kart_model.getInverseBoneMatrix(obj.m_bone_name);
                     swol = inv * obj.m_location;
                 }
-                w3->addModel(obj.m_model, swol, -1, -1, false, 0.0f,
-                    obj.m_bone_name);
+                w3->addModel(obj.m_model, swol, -1, -1, 0.0f, obj.m_bone_name);
             }
             //w3->update(0);
 
             m_kart_widgets[widget_id].m_kart_name
-            ->setText( selectionText.c_str(), false );
+                ->setText( selectionText.c_str(), false );
         }
         else
             Log::warn("KartSelectionScreen", "could not "

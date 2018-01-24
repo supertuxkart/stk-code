@@ -22,6 +22,7 @@
 #include "font/digit_face.hpp"
 #include "font/font_manager.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/stk_text_billboard.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "input/device_manager.hpp"
@@ -98,12 +99,13 @@ namespace Scripting
 #ifndef SERVER_ONLY
             if (CVS->isGLSL())
             {
-                STKTextBillboard* tb = new STKTextBillboard(wtext.c_str(), digit_face,
+                STKTextBillboard* tb = new STKTextBillboard(
                     GUIEngine::getSkin()->getColor("font::bottom"),
                     GUIEngine::getSkin()->getColor("font::top"),
                     irr_driver->getSceneManager()->getRootSceneNode(),
                     irr_driver->getSceneManager(), -1, xyz,
                     core::vector3df(1.5f, 1.5f, 1.5f));
+                tb->init(wtext.c_str(), digit_face);
 
                 ::Track::getCurrentTrack()->addNode(tb);
                 tb->drop();

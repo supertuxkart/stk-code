@@ -165,6 +165,8 @@ public:
 
     unsigned m_max_skinning_bones;
 
+    unsigned m_tc_quality;
+
     /** Lists of TTF files used in STK. */
     std::vector<std::string> m_normal_ttf;
     std::vector<std::string> m_digit_ttf;

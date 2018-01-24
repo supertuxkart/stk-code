@@ -179,8 +179,7 @@ void Skybox::generateCubeMapFromTextures()
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_cube_map);
 
-        bool needs_srgb_format = CVS->isARBSRGBFramebufferUsable() || 
-                                 CVS->isDefferedEnabled();
+        bool needs_srgb_format = CVS->isDefferedEnabled();
 
         GLint format = GL_RGBA;
         GLint internal_format = needs_srgb_format ? GL_SRGB8_ALPHA8 : GL_RGBA8;

@@ -18,6 +18,7 @@
 
 #include "tracks/quad.hpp"
 #include "tracks/graph.hpp"
+#include "utils/mini_glm.hpp"
 #include "utils/log.hpp"
 
 #include <algorithm>
@@ -66,6 +67,34 @@ void Quad::getVertices(video::S3DVertex *v, const video::SColor &color) const
     v[1].Color  = color;
     v[2].Color  = color;
     v[3].Color  = color;
+}   // setVertices
+
+// ----------------------------------------------------------------------------
+/** Sets the vertices in an spm vertex array to the 4 points of this quad.
+ *  \param v The vertex array in which to set the vertices.
+ *  \param color The color to use for this quad.
+ */
+void Quad::getSPMVertices(video::S3DVertexSkinnedMesh *v,
+                          const video::SColor &color) const
+{
+    // Eps is used to raise the track debug quads a little bit higher than
+    // the ground, so that they are actually visible.
+    core::vector3df normal = getNormal().toIrrVector();
+    core::vector3df eps = normal * 0.1f;
+    v[0].m_position = m_p[0].toIrrVector()+eps;
+    v[1].m_position = m_p[1].toIrrVector()+eps;
+    v[2].m_position = m_p[2].toIrrVector()+eps;
+    v[3].m_position = m_p[3].toIrrVector()+eps;
+
+    v[0].m_normal = MiniGLM::compressVector3(normal);
+    v[1].m_normal = MiniGLM::compressVector3(normal);
+    v[2].m_normal = MiniGLM::compressVector3(normal);
+    v[3].m_normal = MiniGLM::compressVector3(normal);
+
+    v[0].m_color  = color;
+    v[1].m_color  = color;
+    v[2].m_color  = color;
+    v[3].m_color  = color;
 }   // setVertices
 
 // ----------------------------------------------------------------------------

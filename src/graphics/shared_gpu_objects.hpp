@@ -35,8 +35,6 @@ private:
     static GLuint m_ui_vao;
     static GLuint m_quad_buffer;
     static GLuint m_quad_vbo;
-    static GLuint m_skinning_tex;
-    static GLuint m_skinning_buf;
 
     static void initQuadVBO();
     static void initQuadBuffer();
@@ -44,7 +42,6 @@ private:
     static void initFrustrumVBO();
     static void initShadowVPMUBO();
     static void initLightingDataUBO();
-    static void initSkinning();
 
 public:
     static void init();
@@ -103,18 +100,6 @@ public:
         assert(m_has_been_initialised);
         return m_quad_vbo;
     }   // getQuadVBO
-    // ------------------------------------------------------------------------
-    static GLuint getSkinningTexture()
-    {
-        assert(m_has_been_initialised);
-        return m_skinning_tex;
-    }   // getSkinningTexture
-    // ------------------------------------------------------------------------
-    static GLuint getSkinningBuffer()
-    {
-        assert(m_has_been_initialised);
-        return m_skinning_buf;
-    }   // getSkinningBuffer
 
 };   // class SharedGPUObjects
 

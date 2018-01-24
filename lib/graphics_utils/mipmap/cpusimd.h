@@ -38,11 +38,11 @@
  #include <mmintrin.h>
  #define CPU_MMX_SUPPORT (1)
 #endif
-#if __SSE__ || _M_X64 || _M_IX86_FP >= 1  || CPU_ENABLE_SSE
+#if __SSE__ || defined(_M_X64) || ( defined(_M_IX86_FP) && ( _M_IX86_FP >= 1 ) ) || CPU_ENABLE_SSE
  #include <xmmintrin.h>
  #define CPU_SSE_SUPPORT (1)
 #endif
-#if __SSE2__ || _M_X64 || _M_IX86_FP >= 2  || CPU_ENABLE_SSE2
+#if __SSE2__ || defined(_M_X64) || ( defined(_M_IX86_FP) && ( _M_IX86_FP >= 2 ) ) || CPU_ENABLE_SSE2
  #include <emmintrin.h>
  #define CPU_SSE2_SUPPORT (1)
 #endif
@@ -95,23 +95,23 @@
  #define CPU_POPCNT_SUPPORT (1)
 #endif
 #if __LZCNT__ || CPU_ENABLE_LZCNT
- #include <lzcntintrin.h>
+ #include <x86intrin.h>
  #define CPU_LZCNT_SUPPORT (1)
 #endif
 #if __F16C__ || CPU_ENABLE_F16C
- #include <f16cintrin.h>
+ #include <x86intrin.h>
  #define CPU_F16C_SUPPORT (1)
 #endif
 #if __BMI__ || CPU_ENABLE_BMI
- #include <bmiintrin.h>
+ #include <x86intrin.h>
  #define CPU_BMI_SUPPORT (1)
 #endif
 #if __BMI2__ || CPU_ENABLE_BMI2
- #include <bmi2intrin.h>
+ #include <x86intrin.h>
  #define CPU_BMI2_SUPPORT (1)
 #endif
 #if __TBM__ || CPU_ENABLE_TBM
- #include <tbmintrin.h>
+ #include <x86intrin.h>
  #define CPU_TBM_SUPPORT (1)
 #endif
 

@@ -26,6 +26,8 @@
 #include "CIrrDeviceStub.h"
 #include "IImagePresenter.h"
 #include "ICursorControl.h"
+#include "server_decoration_client_protocol.h"
+#include "xdg-shell-unstable-v6-client-protocol.h"
 
 #include <wayland-client.h>
 #include <wayland-cursor.h>
@@ -171,12 +173,25 @@ namespace irr
         wl_pointer* m_pointer;
         wl_registry* m_registry;
         wl_seat* m_seat;
-        wl_shell* m_shell;
-        wl_shell_surface* m_shell_surface;
         wl_shm* m_shm;
         wl_surface* m_cursor_surface;
         wl_surface* m_surface;
         uint32_t m_enter_serial;
+        
+        wl_shell* m_shell;
+        wl_shell_surface* m_shell_surface;
+        bool m_has_wl_shell;
+        uint32_t m_wl_shell_name;
+
+        zxdg_shell_v6* m_xdg_shell;
+        zxdg_surface_v6* m_xdg_surface;
+        zxdg_toplevel_v6* m_xdg_toplevel;
+        bool m_has_xdg_shell;
+        bool m_surface_configured;
+        uint32_t m_xdg_shell_name;
+        
+        org_kde_kwin_server_decoration_manager* m_decoration_manager;
+        org_kde_kwin_server_decoration* m_decoration;
 
         xkb_context* m_xkb_context;
         xkb_compose_table* m_xkb_compose_table;
@@ -208,6 +223,7 @@ namespace irr
         std::vector<core::dimension2du> m_modes;
         ContextManagerEGL* m_egl_context;
 
+        bool initWayland();
         void createDriver();
         void createKeyMap();
         bool createWindow();

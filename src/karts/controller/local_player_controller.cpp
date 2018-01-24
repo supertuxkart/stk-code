@@ -75,7 +75,7 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
     // Attach Particle System
     Track *track = Track::getCurrentTrack();
 #ifndef SERVER_ONLY
-    if (UserConfigParams::m_weather_effects &&
+    if (UserConfigParams::m_particles_effects > 1 &&
         track->getSkyParticles() != NULL)
     {
         track->getSkyParticles()->setBoxSizeXZ(150.0f, 150.0f);
@@ -232,8 +232,7 @@ void LocalPlayerController::update(float dt)
         }
     }
 #endif
-    if (m_kart->getKartAnimation() && m_sound_schedule == false &&
-        m_kart->getAttachment()->getType() != Attachment::ATTACH_TINYTUX)
+    if (m_kart->getKartAnimation() && m_sound_schedule == false)
     {
         m_sound_schedule = true;
     }
@@ -254,9 +253,11 @@ void LocalPlayerController::displayPenaltyWarning()
     if (m)
     {
         m->addMessage(_("Penalty time!!"), m_kart, 2.0f,
-                      GUIEngine::getSkin()->getColor("font::top"));
+                      GUIEngine::getSkin()->getColor("font::top"), true /* important */,
+            false /*  big font */, true /* outline */);
         m->addMessage(_("Don't accelerate before go"), m_kart, 2.0f,
-                      GUIEngine::getSkin()->getColor("font::normal"));
+            GUIEngine::getSkin()->getColor("font::normal"), true /* important */,
+            false /*  big font */, true /* outline */);
     }
     m_kart->playSound(m_bzzt_sound);
 }   // displayPenaltyWarning

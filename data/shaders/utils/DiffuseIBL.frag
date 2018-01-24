@@ -17,7 +17,7 @@ mat4 getMatrix(float L00, float L1m1, float L10, float L11, float L2m2, float L2
 vec3 DiffuseIBL(vec3 normal)
 {
     // Convert normal in wobLd space (where SH coordinates were computed)
-    vec4 extendednormal = transpose(ViewMatrix) * vec4(normal, 0.);
+    vec4 extendednormal = transpose(u_view_matrix) * vec4(normal, 0.);
     extendednormal.w = 1.;
 
 #ifdef UBO_DISABLED

@@ -73,43 +73,39 @@ ThreeDAnimation::~ThreeDAnimation()
  */
 void ThreeDAnimation::update(float dt)
 {
-    //if (UserConfigParams::m_graphical_effects > 1 || 
-    //    (UserConfigParams::m_graphical_effects > 0 && m_important_animation))
+    Vec3 xyz   = m_object->getPosition();
+    Vec3 scale = m_object->getScale();
+
+    //make the object think no time has passed to pause it's animation
+    if (m_is_paused)dt = 0;
+
+    AnimationBase::update(dt, &xyz, &m_hpr, &scale);     //updates all IPOs
+    //m_node->setPosition(xyz.toIrrVector());
+    //m_node->setScale(scale.toIrrVector());
+
+    if (!m_playing) return;
+
+    // Note that the rotation order of irrlicht is different from the one
+    // in blender. So in order to reproduce the blender IPO rotations
+    // correctly, we have to get the rotations around each axis and combine
+    // them in the right order for irrlicht
+    core::matrix4 m;
+    m.makeIdentity();
+    core::matrix4 mx;
+    assert(!std::isnan(m_hpr.getX()));
+    assert(!std::isnan(m_hpr.getY()));
+    assert(!std::isnan(m_hpr.getZ()));
+    mx.setRotationDegrees(core::vector3df(m_hpr.getX(), 0, 0));
+    core::matrix4 my;
+    my.setRotationDegrees(core::vector3df(0, m_hpr.getY(), 0));
+    core::matrix4 mz;
+    mz.setRotationDegrees(core::vector3df(0, 0, m_hpr.getZ()));
+    m = my*mz*mx;
+    core::vector3df hpr = m.getRotationDegrees();
+    //m_node->setRotation(hpr);
+
+    if (m_object)
     {
-        Vec3 xyz   = m_object->getPosition();
-        Vec3 scale = m_object->getScale();
-
-        //make the object think no time has passed to pause it's animation
-        if (m_is_paused)dt = 0;
-
-        AnimationBase::update(dt, &xyz, &m_hpr, &scale);     //updates all IPOs
-        //m_node->setPosition(xyz.toIrrVector());
-        //m_node->setScale(scale.toIrrVector());
-
-        if (!m_playing) return;
-
-        // Note that the rotation order of irrlicht is different from the one
-        // in blender. So in order to reproduce the blender IPO rotations
-        // correctly, we have to get the rotations around each axis and combine
-        // them in the right order for irrlicht
-        core::matrix4 m;
-        m.makeIdentity();
-        core::matrix4 mx;
-        assert(!std::isnan(m_hpr.getX()));
-        assert(!std::isnan(m_hpr.getY()));
-        assert(!std::isnan(m_hpr.getZ()));
-        mx.setRotationDegrees(core::vector3df(m_hpr.getX(), 0, 0));
-        core::matrix4 my;
-        my.setRotationDegrees(core::vector3df(0, m_hpr.getY(), 0));
-        core::matrix4 mz;
-        mz.setRotationDegrees(core::vector3df(0, 0, m_hpr.getZ()));
-        m = my*mz*mx;
-        core::vector3df hpr = m.getRotationDegrees();
-        //m_node->setRotation(hpr);
-
-        if (m_object)
-        {
-            m_object->move(xyz.toIrrVector(), hpr, scale.toIrrVector(), true, false);
-        }
+        m_object->move(xyz.toIrrVector(), hpr, scale.toIrrVector(), true, false);
     }
 }   // update

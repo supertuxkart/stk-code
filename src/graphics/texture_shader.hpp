@@ -177,12 +177,7 @@ public:
     template<int N, typename... TexIds>
     void setTextureUnitsImpl(GLuint tex_id, TexIds... args)
     {
-        static_assert(N != 15, "15 is reserved for skinning texture");
-#if defined(USE_GLES2)
-        if (CVS->getGLSLVersion() >= 300)
-#else
-        if (CVS->getGLSLVersion() >= 330)
-#endif
+        if (CVS->isARBSamplerObjectsUsable())
         {
             glActiveTexture(GL_TEXTURE0 + m_texture_units[N]);
             glBindTexture(m_texture_type[N], tex_id);
@@ -254,18 +249,6 @@ public:
         for (unsigned i = 0; i < m_sampler_ids.size(); i++)
             glDeleteSamplers(1, &m_sampler_ids[i]);
     }   // ~TextureShader
-    // ------------------------------------------------------------------------
-    /** For AZDO to remove the old texture handles, according to specification,
-     *  they can only be removed when the underlying texture or sampler objects
-     *  are finally deleted. This deletion will happen only when no handle
-     *  using the texture or sampler object is resident on any context.
-     */
-    void recreateTrilinearSampler(int sampler_id)
-    {
-        glDeleteSamplers(1, &m_sampler_ids[sampler_id]);
-        m_sampler_ids[sampler_id] =
-            createSamplers(ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }   // recreateTrilinearSampler
 
 };   // class TextureShader
 

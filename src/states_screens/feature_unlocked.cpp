@@ -24,8 +24,12 @@
 #include "challenges/challenge_data.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
-#include "graphics/material_manager.hpp"
-#include "graphics/render_info.hpp"
+#include "graphics/central_settings.hpp"
+#include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_mesh.hpp"
+#include "graphics/sp/sp_mesh_buffer.hpp"
+#include "graphics/sp/sp_mesh_node.hpp"
+#include "graphics/sp/sp_texture_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
@@ -95,7 +99,18 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(irr::video::ITexture* pict
                                                       irr::core::stringw msg)
 {
     m_unlocked_kart = NULL;
-    m_pictures.push_back(pict);
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        m_sp_pictures.push_back(SP::SPTextureManager::get()
+            ->getTexture(pict->getName().getPtr(), NULL, true,
+            ""/*container_id*/));
+    }
+    else
+    {
+        m_pictures.push_back(pict);
+    }
+#endif
     m_w = w;
     m_h = h;
     m_unlock_message = msg;
@@ -110,6 +125,21 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(std::vector<irr::video::IT
                                                       irr::core::stringw msg)
 {
     m_unlocked_kart = NULL;
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        for (auto* pict : picts)
+        {
+            m_sp_pictures.push_back(SP::SPTextureManager::get()
+                ->getTexture(pict->getName().getPtr(), NULL, true,
+                ""/*container_id*/));
+        }
+    }
+    else
+#endif
+    {
+        m_pictures = picts;
+    }
     m_pictures = picts;
     m_w = w;
     m_h = h;
@@ -158,8 +188,14 @@ void FeatureUnlockedCutScene::onCutsceneEnd()
         irr_driver->removeNode(m_avoid_irrlicht_bug);
     m_avoid_irrlicht_bug = NULL;
 #endif
-    
+
     m_unlocked_stuff.clearAndDeleteAll();
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        SP::SPTextureManager::get()->removeUnusedTextures();
+    }
+#endif
     m_all_kart_models.clearAndDeleteAll();
 
     // update point count and the list of locked/unlocked stuff
@@ -297,7 +333,7 @@ void FeatureUnlockedCutScene::init()
         else if (m_unlocked_stuff[n].m_unlocked_kart != NULL)
         {
             KartModel *kart_model =
-                m_unlocked_stuff[n].m_unlocked_kart->getKartModelCopy(KRT_DEFAULT);
+                m_unlocked_stuff[n].m_unlocked_kart->getKartModelCopy();
             m_all_kart_models.push_back(kart_model);
             m_unlocked_stuff[n].m_root_gift_node = kart_model->attachModel(true, false);
             m_unlocked_stuff[n].m_scale = 5.0f;
@@ -320,6 +356,38 @@ void FeatureUnlockedCutScene::init()
             m_avoid_irrlicht_bug = irr_driver->addMesh(mesh);
 #endif
         }
+#ifndef SERVER_ONLY
+        else if (!m_unlocked_stuff[n].m_sp_pictures.empty())
+        {
+            scene::IMesh* mesh = irr_driver->createTexturedQuadMesh(NULL,
+                m_unlocked_stuff[n].m_w, m_unlocked_stuff[n].m_h);
+            m_unlocked_stuff[n].m_root_gift_node = irr_driver->getSceneManager()->addEmptySceneNode();
+            SP::SPMesh* spm = SP::convertEVTStandard(mesh);
+            m_unlocked_stuff[n].m_side_1 = irr_driver->addMesh(spm,
+                "unlocked_picture", m_unlocked_stuff[n].m_root_gift_node);
+            spm->getSPMeshBuffer(0)->uploadGLMesh();
+            spm->getSPMeshBuffer(0)->getSPTextures()[0] =
+                m_unlocked_stuff[n].m_sp_pictures[0];
+            spm->getSPMeshBuffer(0)->reloadTextureCompare();
+            spm->drop();
+
+            mesh = irr_driver->createTexturedQuadMesh(NULL,
+                m_unlocked_stuff[n].m_w, m_unlocked_stuff[n].m_h);
+            spm = SP::convertEVTStandard(mesh);
+            m_unlocked_stuff[n].m_side_2 = irr_driver->addMesh(spm,
+                "unlocked_picture",  m_unlocked_stuff[n].m_root_gift_node);
+            m_unlocked_stuff[n].m_side_2->setRotation
+                (core::vector3df(0.0f, 180.0f, 0.0f));
+            spm->getSPMeshBuffer(0)->uploadGLMesh();
+            spm->getSPMeshBuffer(0)->getSPTextures()[0] =
+                m_unlocked_stuff[n].m_sp_pictures[0];
+            spm->getSPMeshBuffer(0)->reloadTextureCompare();
+            spm->drop();
+#ifdef DEBUG
+            m_unlocked_stuff[n].m_root_gift_node->setName("unlocked track picture");
+#endif
+        }
+#endif
         else if (!m_unlocked_stuff[n].m_pictures.empty())
         {
             video::SMaterial m;
@@ -445,34 +513,61 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
 
                 if (textureID != previousTextureID)
                 {
-                    scene::IMesh* mesh = m_unlocked_stuff[n].m_side_1->getMesh();
+#ifndef SERVER_ONLY
+                    if (CVS->isGLSL())
+                    {
+                        SP::SPMesh* mesh =
+                            static_cast<SP::SPMeshNode*>(m_unlocked_stuff[n].m_side_1)->getSPM();
 
-                    assert(mesh->getMeshBufferCount() == 1);
+                        assert(mesh->getMeshBufferCount() == 1);
+                        SP::SPMeshBuffer* mb = mesh->getSPMeshBuffer(0);
+                        mb->getSPTextures()[0] =
+                            m_unlocked_stuff[n].m_sp_pictures[textureID];
+                        mb->reloadTextureCompare();
 
-                    scene::IMeshBuffer* mb = mesh->getMeshBuffer(0);
+                        mesh =
+                            static_cast<SP::SPMeshNode*>(m_unlocked_stuff[n].m_side_2)->getSPM();
+                        assert(mesh->getMeshBufferCount() == 1);
+                        mb = mesh->getSPMeshBuffer(0);
+                        mb->getSPTextures()[0] =
+                            m_unlocked_stuff[n].m_sp_pictures[textureID];
+                        mb->reloadTextureCompare();
 
-                    SMaterial& m = mb->getMaterial();
-                    m.setTexture(0, m_unlocked_stuff[n].m_pictures[textureID]);
+                        m_unlocked_stuff[n].m_curr_image = textureID;
+                    }
+                    else
+                    {
+                        scene::IMesh* mesh =
+                            static_cast<scene::IMeshSceneNode*>(m_unlocked_stuff[n].m_side_1)->getMesh();
 
-                    // FIXME: this mesh is already associated with this node. I'm calling this
-                    // to force irrLicht to refresh the display, now that Material has changed.
-                    m_unlocked_stuff[n].m_side_1->setMesh(mesh);
+                        assert(mesh->getMeshBufferCount() == 1);
 
-                    m_unlocked_stuff[n].m_curr_image = textureID;
+                        scene::IMeshBuffer* mb = mesh->getMeshBuffer(0);
+
+                        SMaterial& m = mb->getMaterial();
+                        m.setTexture(0, m_unlocked_stuff[n].m_pictures[textureID]);
+
+                        // FIXME: this mesh is already associated with this node. I'm calling this
+                        // to force irrLicht to refresh the display, now that Material has changed.
+                        static_cast<scene::IMeshSceneNode*>(m_unlocked_stuff[n].m_side_1)->setMesh(mesh);
+
+                        m_unlocked_stuff[n].m_curr_image = textureID;
 
 
-                    mesh = m_unlocked_stuff[n].m_side_2->getMesh();
-                    assert(mesh->getMeshBufferCount() == 1);
-                    mb = mesh->getMeshBuffer(0);
+                        mesh = static_cast<scene::IMeshSceneNode*>(m_unlocked_stuff[n].m_side_2)->getMesh();
+                        assert(mesh->getMeshBufferCount() == 1);
+                        mb = mesh->getMeshBuffer(0);
 
-                    SMaterial& m2 = mb->getMaterial();
-                    m2.setTexture(0, m_unlocked_stuff[n].m_pictures[textureID]);
+                        SMaterial& m2 = mb->getMaterial();
+                        m2.setTexture(0, m_unlocked_stuff[n].m_pictures[textureID]);
 
-                    // FIXME: this mesh is already associated with this node. I'm calling this
-                    // to force irrLicht to refresh the display, now that Material has changed.
-                    m_unlocked_stuff[n].m_side_2->setMesh(mesh);
+                        // FIXME: this mesh is already associated with this node. I'm calling this
+                        // to force irrLicht to refresh the display, now that Material has changed.
+                        static_cast<scene::IMeshSceneNode*>(m_unlocked_stuff[n].m_side_2)->setMesh(mesh);
 
-                    m_unlocked_stuff[n].m_curr_image = textureID;
+                        m_unlocked_stuff[n].m_curr_image = textureID;
+                    }
+#endif
                 }   // textureID != previousTextureID
             }   // if picture_count>1
         }   // if !m_unlocked_stuff[n].m_pictures.empty()

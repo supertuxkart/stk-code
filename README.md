@@ -10,7 +10,7 @@ The SuperTuxKart homepage can be found at <https://supertuxkart.net/>. There is 
 ## Hardware Requirements
 To run SuperTuxKart, make sure that your computer's specifications are equal or higher than the following specifications:
 
-* A graphics card capable of 3D rendering - NVIDIA GeForce 8 series and newer (GeForce 8100 or newer), AMD/ATI Radeon HD 4000 series and newer, Intel HD Graphics 3000 and newer. OpenGL >= 3.1
+* A graphics card capable of 3D rendering - NVIDIA GeForce 8 series and newer (GeForce 8100 or newer), AMD/ATI Radeon HD 4000 series and newer, Intel HD Graphics 3000 and newer. OpenGL >= 3.3
 * You should have a CPU that's running at 1 GHz or faster. 
 * You'll need at least 512 MB of free VRAM (video memory).
 * Minimum disk space: 800 MB 

@@ -31,10 +31,10 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/render_info.hpp"
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
@@ -54,6 +54,7 @@
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_model.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart_rewinder.hpp"
 #include "karts/max_speed.hpp"
@@ -104,9 +105,9 @@
  */
 Kart::Kart (const std::string& ident, unsigned int world_kart_id,
             int position, const btTransform& init_transform,
-            PerPlayerDifficulty difficulty, KartRenderType krt)
+            PerPlayerDifficulty difficulty, std::shared_ptr<RenderInfo> ri)
      : AbstractKart(ident, world_kart_id, position, init_transform,
-             difficulty, krt)
+             difficulty, ri)
 
 #if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
 #  pragma warning(1:4355)
@@ -221,17 +222,8 @@ void Kart::init(RaceManager::KartType type)
 #ifdef SERVER_ONLY
     bool animations = false;  // server never animates
 #else
-    bool animations = true;
+    bool animations = UserConfigParams::m_animated_characters;
 #endif
-    const int anims = UserConfigParams::m_show_steering_animations;
-    if (anims == ANIMS_NONE)
-    {
-        animations = false;
-    }
-    else if (anims == ANIMS_PLAYERS_ONLY && type != RaceManager::KT_PLAYER)
-    {
-        animations = false;
-    }
     loadData(type, animations);
 
     m_kart_gfx = new KartGFX(this, Track::getCurrentTrack()->getIsDuringDay());
@@ -272,9 +264,12 @@ Kart::~Kart()
     if(m_attachment)             delete m_attachment;
     if(m_stars_effect)          delete m_stars_effect;
 
+#ifndef SERVER_ONLY
     delete m_shadow;
-    if (m_wheel_box) m_wheel_box->remove();
     if(m_skidmarks) delete m_skidmarks ;
+#endif
+
+    if (m_wheel_box) m_wheel_box->remove();
 
     // Ghost karts don't have a body
     if(m_body)
@@ -409,13 +404,12 @@ void Kart::reset()
     applyEngineForce (0.0f);
 
     AbstractKart::reset();
+#ifndef SERVER_ONLY
     if (m_skidmarks)
     {
         m_skidmarks->reset();
-        const Track *track =
-            track_manager->getTrack( race_manager->getTrackName() );
-        m_skidmarks->adjustFog(track->isFogEnabled() );
     }
+#endif
 
     Vec3 front(0, 0, getKartLength()*0.5f);
     m_xyz_front = getTrans()(front);
@@ -1197,6 +1191,12 @@ void Kart::eliminate()
 
     m_eliminated = true;
 
+#ifndef SERVER_ONLY
+    if (m_shadow)
+    {
+        m_shadow->update(false);
+    }
+#endif
     m_node->setVisible(false);
 }   // eliminate
 
@@ -1220,13 +1220,16 @@ void Kart::update(float dt)
         if(m_squash_time<=0)
         {
             m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+            scene::ISceneNode* node =
+                m_kart_model->getAnimatedNode() ?
+                m_kart_model->getAnimatedNode() : m_node;
             if (m_vehicle->getNumWheels() > 0)
             {
                 scene::ISceneNode **wheels = m_kart_model->getWheelNodes();
                 for (int i = 0; i < 4 && i < m_vehicle->getNumWheels(); ++i)
                 {
                     if (wheels[i])
-                        wheels[i]->setParent(m_node);
+                        wheels[i]->setParent(node);
                 }
             }
         }
@@ -1541,13 +1544,15 @@ void Kart::update(float dt)
     static video::SColor pink(255, 255, 133, 253);
     static video::SColor green(255, 61, 87, 23);
 
+#ifndef SERVER_ONLY
     // draw skidmarks if relevant (we force pink skidmarks on when hitting a bubblegum)
-    if(m_kart_properties->getSkidEnabled())
+    if(m_kart_properties->getSkidEnabled() && m_skidmarks)
     {
         m_skidmarks->update(dt,
                             m_bubblegum_time > 0,
                             (m_bubblegum_time > 0 ? (m_has_caught_nolok_bubblegum ? &green : &pink) : NULL) );
     }
+#endif
 
     const bool emergency = getKartAnimation()!=NULL;
 
@@ -1797,7 +1802,7 @@ void Kart::handleMaterialGFX(float dt)
     // something with the wheels, and the material has not the
     // below surface property set.
     if (material && isOnGround() && !material->isBelowSurface() &&
-        !getKartAnimation()      && UserConfigParams::m_graphical_effects > 1)
+        !getKartAnimation()      && UserConfigParams::m_particles_effects > 1)
     {
 
         // Get the appropriate particle data depending on
@@ -1849,7 +1854,7 @@ void Kart::handleMaterialGFX(float dt)
         }   // for i in all cameras for this kart
     }   // camera != final camera
 
-    if (UserConfigParams::m_graphical_effects < 2)
+    if (UserConfigParams::m_particles_effects < 2)
         return;
 
     // Use the middle of the contact points of the two rear wheels
@@ -2132,7 +2137,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
     {
 #ifndef SERVER_ONLY
         std::string particles = m->getCrashResetParticles();
-        if (particles.size() > 0 && UserConfigParams::m_graphical_effects > 0)
+        if (particles.size() > 0 && UserConfigParams::m_particles_effects > 0)
         {
             ParticleKind* kind =
                 ParticleKindManager::get()->getParticles(particles);
@@ -2553,7 +2558,7 @@ void Kart::updateSliding()
             wheel.m_frictionSlip = m_kart_properties->getFrictionSlip();
         }
         m_vehicle->setSliding(false);
-        return;
+
     }
 
     // Now test for each wheel if it should be sliding
@@ -2657,27 +2662,15 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
 
     m_slipstream = new SlipStream(this);
 
-    if (m_kart_properties->getSkidEnabled())
+#ifndef SERVER_ONLY
+    if (m_kart_properties->getSkidEnabled() && CVS->isGLSL())
     {
         m_skidmarks = new SkidMarks(*this);
-        m_skidmarks->adjustFog(
-            track_manager->getTrack(race_manager->getTrackName())
-                         ->isFogEnabled() );
     }
-#ifndef SERVER_ONLY
-    bool create_shadow = m_kart_properties->getShadowTexture() != NULL &&
-                         !CVS->supportsShadows();
-                         
-#ifdef USE_GLES2
-    // Disable kart shadow for legacy pipeline in GLES renderer because it's 
-    // broken
-    create_shadow = create_shadow && CVS->isGLSL();
-#endif
 
-    if (create_shadow)
+    if (CVS->isGLSL() && !CVS->isShadowEnabled())
     {
-        m_shadow = new Shadow(m_kart_properties.get(), m_node,
-                              -m_kart_model->getLowestPoint());
+        m_shadow = new Shadow(m_kart_properties->getShadowMaterial(), *this);
     }
 #endif
     World::getWorld()->kartAdded(this, m_node);
@@ -2941,18 +2934,17 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     // how much the wheels need to rotate.
     m_kart_model->update(dt, m_speed*dt, getSteerPercent(), m_speed, lean_height);
 
+#ifndef SERVER_ONLY
     // Determine the shadow position from the terrain Y position. This
     // leaves the shadow on the ground even if the kart is jumping because
     // of skidding (shadows are disabled when wheel are not on the track).
     if (m_shadow)
     {
         const bool emergency = getKartAnimation() != NULL;
-        m_shadow->update(isOnGround() && !emergency,
-            getTrans().inverse()(m_terrain_info->getHitPoint()).getY()
-            - m_skidding->getGraphicalJumpOffset()
-            - m_graphical_y_offset
-            - m_kart_model->getLowestPoint());
+        m_shadow->update(isOnGround() && !emergency);
     }
+#endif
+
 #ifdef XX
     // cheap wheelie effect
     if (m_controls.getNitro())
@@ -3003,13 +2995,14 @@ void Kart::setOnScreenText(const wchar_t *text)
 
     if (CVS->isGLSL())
     {
-        scene::ISceneNode* tb =
-            new STKTextBillboard(text, bold_face,
+        STKTextBillboard* tb =
+            new STKTextBillboard(
             GUIEngine::getSkin()->getColor("font::bottom"),
             GUIEngine::getSkin()->getColor("font::top"),
             getNode(), irr_driver->getSceneManager(), -1,
             core::vector3df(0.0f, 1.5f, 0.0f),
             core::vector3df(1.0f, 1.0f, 1.0f));
+        tb->init(text, bold_face);
         tb->drop();
     }
     else
@@ -3043,10 +3036,15 @@ const Vec3& Kart::getNormal() const
 }   // getNormal
 
 // ------------------------------------------------------------------------
-
 void Kart::playSound(SFXBuffer* buffer)
 {
     getNextEmitter()->play(getXYZ(), buffer);
-}
+}   // playSound
+
+// ------------------------------------------------------------------------
+const video::SColor& Kart::getColor() const
+{
+    return m_kart_properties->getColor();
+}   // getColor
 
 /* EOF */
