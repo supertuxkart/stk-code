@@ -179,7 +179,6 @@ void Camera::setupCamera()
 	const int X_Grid_Position = m_index % cols;
 	const int Y_Grid_Position = floor((m_index) / cols);
 
-
 	m_viewport = core::recti(
 		X_Grid_Position * width_of_space, 
 		Y_Grid_Position * height_of_space,
@@ -191,8 +190,6 @@ void Camera::setupCamera()
 	//TODO Needs to be fixed
 	
 	m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov[m_index % 3];
-	
-
 	
     m_camera->setFOV(m_fov);
     m_camera->setAspectRatio(m_aspect);
