@@ -383,7 +383,7 @@ void RaceGUI::drawGlobalTimer()
 		const int rows = ceil(Sqrt);
 		const int Y_Grid_Position = floor((race_manager->getNumLocalPlayers()) / rows) + 1;
 		const int height_of_space = floor(irr_driver->getActualScreenSize().Height / rows);
-        pos += core::vector2d<s32>(0, Y_Grid_Position * height_of_space);
+        pos += core::vector2d<s32>(0, rows * height_of_space);
     }
 
     gui::ScalableFont* font = (use_digit_font ? GUIEngine::getHighresDigitFont() : GUIEngine::getFont());
