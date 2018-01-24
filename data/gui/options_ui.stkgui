@@ -76,7 +76,7 @@
                 <div layout="horizontal-row" proportion="1" height="fit">
                     <checkbox id="Split_Screen_Horizontally"/>
                     <spacer width="20" height="100%" />
-                    <label height="100%" I18N="In the ui settings" text="Split Screen horizontally (Applies on next race)"/>
+                    <label height="100%" I18N="In the ui settings" text="Split Screen horizontally (At next race)"/>
                 </div>
             </div>
 
