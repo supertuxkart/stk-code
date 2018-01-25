@@ -50,9 +50,6 @@
 #include <algorithm> 
 
 // ----------------------------------------------------------------------------
-
-
-
 void ShaderBasedRenderer::setRTT(RTT* rtts)
 {
     m_rtts = rtts;
@@ -111,8 +108,7 @@ void ShaderBasedRenderer::computeMatrixesAndCameras(scene::ICameraSceneNode *con
                                                     unsigned int width, unsigned int height)
 {
     m_current_screen_size = core::vector2df((float)width, (float)height);
-    m_shadow_matrices.computeMatrixesAndCameras(camnode, width, height,
-        m_rtts->getDepthStencilTexture());
+    m_shadow_matrices.computeMatrixesAndCameras(camnode, width, height);
 }   // computeMatrixesAndCameras
 
 // ----------------------------------------------------------------------------
@@ -440,27 +436,6 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
 
-    if (!forceRTT)
-    {
-        // We need a cleared depth buffer for some effect (eg particles depth blending)
-        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
-        // Bind() modifies the viewport. In order not to affect anything else,
-        // the viewport is just reset here and not removed in Bind().
-        const core::recti &vp = Camera::getActiveCamera()->getViewport();
-        glViewport(vp.UpperLeftCorner.X,
-                   irr_driver->getActualScreenSize().Height - vp.LowerRightCorner.Y,
-                   vp.LowerRightCorner.X - vp.UpperLeftCorner.X,
-                   vp.LowerRightCorner.Y - vp.UpperLeftCorner.Y);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-    else
-    {
-        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
-        glClearColor(0., 0., 0., 0.);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    }
-
     if (forceRTT)
     {
         m_rtts->getFBO(FBO_COLORS).bind();
@@ -471,6 +446,8 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
             clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
         glClear(GL_COLOR_BUFFER_BIT);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
     {
@@ -651,7 +628,8 @@ void ShaderBasedRenderer::onLoadWorld()
     unsigned int width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
     unsigned int height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
     RTT* rtts = new RTT(width, height, CVS->isDefferedEnabled() ?
-                        UserConfigParams::m_scale_rtts_factor : 1.0f);
+                        UserConfigParams::m_scale_rtts_factor : 1.0f,
+                        !CVS->isDefferedEnabled());
     setRTT(rtts);
 }
 
