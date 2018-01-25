@@ -42,7 +42,7 @@ STKTexture::STKTexture(const std::string& path, TexConfig* tc, bool no_upload)
     if (m_tex_config)
     {
         if (ProfileWorld::isNoGraphics() ||
-            (!CVS->isDefferedEnabled()) || !CVS->isGLSL())
+            (!CVS->isDeferredEnabled()) || !CVS->isGLSL())
         {
             m_tex_config->m_srgb = false;
         }
@@ -217,7 +217,7 @@ void STKTexture::formatConversion(uint8_t* data, unsigned int* format,
             {
                 alpha /= 255.0f;
 
-                if (CVS->isDefferedEnabled())
+                if (CVS->isDeferredEnabled())
                 {
                     alpha = pow(alpha, 1.0f / 2.2f);
                 }

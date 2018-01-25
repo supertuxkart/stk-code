@@ -271,7 +271,7 @@ void SPShader::unload()
 bool SPShader::isSrgbForTextureLayer(unsigned layer) const
 {
 #ifndef SERVER_ONLY
-    if (!CVS->isDefferedEnabled())
+    if (!CVS->isDeferredEnabled())
     {
         return false;
     }

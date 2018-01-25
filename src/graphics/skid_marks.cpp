@@ -220,7 +220,7 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
         video::SColor(255, SkidMarks::m_start_grey, SkidMarks::m_start_grey,
         SkidMarks::m_start_grey));
 
-    if (CVS->isDefferedEnabled())
+    if (CVS->isDeferredEnabled())
     {
         m_start_color.setRed(SP::srgb255ToLinear(m_start_color.getRed()));
         m_start_color.setGreen(SP::srgb255ToLinear(m_start_color.getGreen()));

@@ -297,7 +297,7 @@ void CPUParticleManager::drawAll()
         {
             ParticleRenderer::getInstance()->setTextureUnits
                 (cur_mat->getTexture()->getOpenGLTextureName(),
-                CVS->isDefferedEnabled() ?
+                CVS->isDeferredEnabled() ?
                 irr_driver->getDepthStencilTexture() : 0);
             ParticleRenderer::getInstance()->setUniforms(flips, billboard);
         }

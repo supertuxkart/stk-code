@@ -211,7 +211,7 @@ void SPShaderManager::loadEachShader(const std::string& file_name)
 
     std::array<PassInfo, 2> pi;
     loadPassInfo(xml->getNode("first-pass"), pi[0]);
-    if (!si.m_transparent_shader && CVS->isDefferedEnabled())
+    if (!si.m_transparent_shader && CVS->isDeferredEnabled())
     {
         loadPassInfo(xml->getNode("shadow-pass"), pi[1]);
     }
@@ -221,7 +221,7 @@ void SPShaderManager::loadEachShader(const std::string& file_name)
             " file %s", file_name.c_str());
         return;
     }
-    if (!si.m_fallback_name.empty() && !CVS->isDefferedEnabled())
+    if (!si.m_fallback_name.empty() && !CVS->isDeferredEnabled())
     {
         std::shared_ptr<SPShader> fallback_shader =
             getSPShader(si.m_fallback_name);
@@ -362,7 +362,7 @@ void SPShaderManager::loadPassInfo(const XMLNode* pass, PassInfo& pi)
 #ifndef SERVER_ONLY
                 if (!srgb_props.empty())
                 {
-                    srgb = srgb_props == "Y" && CVS->isDefferedEnabled();
+                    srgb = srgb_props == "Y" && CVS->isDeferredEnabled();
                 }
 #endif
                 prefilled_texture->get("sampler", &sampler_props);

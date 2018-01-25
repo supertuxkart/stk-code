@@ -107,7 +107,7 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
         type = GL_UNSIGNED_BYTE;
     }
 #endif
-    if (!CVS->isDefferedEnabled())
+    if (!CVS->isDeferredEnabled())
     {
         // RTT is used in only deferred shading which need hdr framebuffer
         rgba_internal_format = GL_RGBA8;
@@ -118,7 +118,7 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
     {
         m_render_target_textures[RTT_COLOR] = generateRTT(res, rgba_internal_format, rgba_format, type);
     }
-    if (CVS->isDefferedEnabled())
+    if (CVS->isDeferredEnabled())
     {
         m_render_target_textures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RGB10_A2, GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV);
         m_render_target_textures[RTT_TMP1] = generateRTT(res, rgba_internal_format, rgba_format, type);
@@ -169,7 +169,7 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
         m_frame_buffers.push_back(new FrameBuffer(somevector, m_depth_stencil_tex, res.Width, res.Height));
     }
 
-    if (CVS->isDefferedEnabled())
+    if (CVS->isDeferredEnabled())
     {
         somevector.clear();
         somevector.push_back(m_render_target_textures[RTT_NORMAL_AND_DEPTH]);

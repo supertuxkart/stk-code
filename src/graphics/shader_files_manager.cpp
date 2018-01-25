@@ -171,7 +171,7 @@ ShaderFilesManager::SharedShader ShaderFilesManager::loadShader
         code << "#define UBO_DISABLED\n";
     if (CVS->needsVertexIdWorkaround())
         code << "#define Needs_Vertex_Id_Workaround\n";
-    if (CVS->isDefferedEnabled())
+    if (CVS->isDeferredEnabled())
         code << "#define Advanced_Lighting_Enabled\n";
 
 #if !defined(USE_GLES2)

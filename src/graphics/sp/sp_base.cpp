@@ -327,7 +327,7 @@ void loadShaders()
 
     // Displace shader is not specifiable in XML due to complex callback
     std::shared_ptr<SPShader> sps;
-    if (CVS->isDefferedEnabled())
+    if (CVS->isDeferredEnabled())
     {
         // This displace shader will be drawn the last in transparent pass
         sps = std::make_shared<SPShader>("displace", displaceShaderInit,
@@ -345,7 +345,7 @@ void loadShaders()
     // ========================================================================
     // Glow shader
     // ========================================================================
-    if (CVS->isDefferedEnabled())
+    if (CVS->isDeferredEnabled())
     {
         sps = std::make_shared<SPShader>
             ("sp_glow_shader", [](SPShader* shader)
@@ -740,7 +740,7 @@ void prepareDrawCalls()
     g_skinning_mesh.clear();
     mathPlaneFrustumf(g_frustums[0], irr_driver->getProjViewMatrix());
     g_handle_shadow = Track::getCurrentTrack() &&
-        Track::getCurrentTrack()->hasShadows() && CVS->isDefferedEnabled() &&
+        Track::getCurrentTrack()->hasShadows() && CVS->isDeferredEnabled() &&
         CVS->isShadowEnabled();
 
     if (g_handle_shadow)
@@ -921,7 +921,7 @@ void addObject(SPMeshNode* node)
                 }
                 mb->addInstanceData(id, (DrawCallType)dc_type);
                 if (UserConfigParams::m_glow && node->hasGlowColor() &&
-                    CVS->isDefferedEnabled() && dc_type == DCT_NORMAL)
+                    CVS->isDeferredEnabled() && dc_type == DCT_NORMAL)
                 {
                     video::SColorf gc = node->getGlowColor();
                     unsigned key = gc.toSColor().color;

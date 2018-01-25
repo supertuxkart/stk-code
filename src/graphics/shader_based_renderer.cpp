@@ -488,7 +488,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     // Now all instancing data from mesh and particle are done drawing
     m_draw_calls.setFenceSync();
 
-    if (!CVS->isDefferedEnabled() && !forceRTT)
+    if (!CVS->isDeferredEnabled() && !forceRTT)
     {
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
@@ -627,9 +627,9 @@ void ShaderBasedRenderer::onLoadWorld()
     const core::recti &viewport = Camera::getCamera(0)->getViewport();
     unsigned int width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
     unsigned int height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
-    RTT* rtts = new RTT(width, height, CVS->isDefferedEnabled() ?
+    RTT* rtts = new RTT(width, height, CVS->isDeferredEnabled() ?
                         UserConfigParams::m_scale_rtts_factor : 1.0f,
-                        !CVS->isDefferedEnabled());
+                        !CVS->isDeferredEnabled());
     setRTT(rtts);
 }
 
@@ -724,7 +724,7 @@ void ShaderBasedRenderer::render(float dt)
     RaceGUIBase *rg = world->getRaceGUI();
     if (rg) rg->update(dt);
 
-    if (!CVS->isDefferedEnabled())
+    if (!CVS->isDeferredEnabled())
     {
         prepareForwardRenderer();
     }
@@ -748,12 +748,12 @@ void ShaderBasedRenderer::render(float dt)
         oss << "drawAll() for kart " << cam;
         PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (cam+1)*60,
                                  0x00, 0x00);
-        camera->activate(!CVS->isDefferedEnabled());
+        camera->activate(!CVS->isDeferredEnabled());
         rg->preRenderCallback(camera);   // adjusts start referee
         irr_driver->getSceneManager()->setActiveCamera(camnode);
 
         computeMatrixesAndCameras(camnode, m_rtts->getWidth(), m_rtts->getHeight());
-        if (CVS->isDefferedEnabled())
+        if (CVS->isDeferredEnabled())
         {
             renderSceneDeferred(camnode, dt, track->hasShadows(), false); 
         }
@@ -772,7 +772,7 @@ void ShaderBasedRenderer::render(float dt)
 
         debugPhysics();
         
-        if (CVS->isDefferedEnabled())
+        if (CVS->isDeferredEnabled())
         {
             renderPostProcessing(camera);
         }
@@ -861,7 +861,7 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     if (CVS->isARBUniformBufferObjectUsable())
         uploadLightingData();
 
-    if (CVS->isDefferedEnabled())
+    if (CVS->isDeferredEnabled())
     {
         renderSceneDeferred(camera, dt, false, true);
         render_target->setFrameBuffer(m_post_processing
