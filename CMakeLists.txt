@@ -1,8 +1,9 @@
+cmake_minimum_required(VERSION 2.8.4)
+
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
 set(PROJECT_VERSION "git")
 
-cmake_minimum_required(VERSION 2.8.4)
 if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
   cmake_policy(SET CMP0043 OLD)
 endif()
@@ -27,12 +28,13 @@ option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
-option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" OFF)
+option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
 
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT USE_GLES2;NOT APPLE" OFF)
 
-if (UNIX AND NOT APPLE)
+if ((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
+    option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" ON)
     option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
 endif()
 
@@ -109,11 +111,24 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 
-# Build glew library
+# Find system GLEW library or build it if missing
 if(NOT USE_GLES2 AND NOT SERVER_ONLY)
     add_definitions(-DGLEW_NO_GLU)
-    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
-    include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
+    if(USE_SYSTEM_GLEW)
+        find_package(PkgConfig)
+        if(PKGCONFIG_FOUND)
+            pkg_check_modules(GLEW glew>=2.1)
+        endif()
+    endif()
+
+    if(GLEW_FOUND)
+        include_directories(${GLEW_INCLUDE_DIRS})
+    else()
+        # Fallback to built-in version silently
+        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
+        include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
+        set(GLEW_LIBRARIES "glew")
+    endif()
 endif()
 
 if(MSVC OR APPLE)
@@ -173,6 +188,19 @@ endif()
 if(NOT SERVER_ONLY AND NOT USE_GLES2)
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
     include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
+endif()
+
+if(NOT SERVER_ONLY AND NOT USE_GLES2)
+    find_library(SQUISH_LIBRARY NAMES squish libsquish)
+    find_path(SQUISH_INCLUDEDIR NAMES squish.h PATHS)
+    if (NOT SQUISH_LIBRARY OR NOT SQUISH_INCLUDEDIR)
+        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libsquish")
+        include_directories("${PROJECT_SOURCE_DIR}/lib/libsquish")
+        SET(SQUISH_LIBRARY squish)
+    else()
+        include_directories("${SQUISH_INCLUDEDIR}")
+        MESSAGE(STATUS "Use system libsquish: ${SQUISH_LIBRARY}")
+    endif()
 endif()
 
 # Build the irrlicht library
@@ -420,10 +448,14 @@ target_link_libraries(supertuxkart
 
 if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
-        target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} glew graphics_utils)
+        target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES} graphics_utils)
     else()
         target_link_libraries(supertuxkart GLESv2)
     endif()
+endif()
+
+if(NOT SERVER_ONLY AND NOT USE_GLES2)
+    target_link_libraries(supertuxkart ${SQUISH_LIBRARY})
 endif()
 
 if(UNIX AND NOT APPLE)

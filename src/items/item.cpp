@@ -19,8 +19,11 @@
 
 #include "items/item.hpp"
 
+#include "items/item_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
+#include "graphics/sp/sp_mesh.hpp"
+#include "graphics/sp/sp_mesh_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/easter_egg_hunt.hpp"
 #include "modes/three_strikes_battle.hpp"
@@ -52,13 +55,13 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     LODNode* lodnode    = new LODNode("item",
                                       irr_driver->getSceneManager()->getRootSceneNode(),
                                       irr_driver->getSceneManager());
-    scene::IMeshSceneNode* meshnode = 
+    scene::ISceneNode* meshnode = 
         irr_driver->addMesh(mesh, StringUtils::insertValues("item_%i", (int)type));
 
     if (lowres_mesh != NULL)
     {
         lodnode->add(35, meshnode, true);
-        scene::IMeshSceneNode* meshnode = 
+        scene::ISceneNode* meshnode = 
             irr_driver->addMesh(lowres_mesh, 
                                 StringUtils::insertValues("item_lo_%i", (int)type));
         lodnode->add(100, meshnode, true);
@@ -67,16 +70,14 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     {
         lodnode->add(100, meshnode, true);
     }
-
     m_node              = lodnode;
+    setType(type);
 
-    //m_node             = irr_driver->addMesh(mesh);
 #ifdef DEBUG
     std::string debug_name("item: ");
     debug_name += m_type;
     m_node->setName(debug_name.c_str());
 #endif
-    Track::getCurrentTrack()->adjustForFog(m_node);
     m_node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
     m_node->setPosition(xyz.toIrrVector());
     Vec3 hpr;
@@ -167,6 +168,14 @@ void Item::setType(ItemType type)
 {
     m_type   = type;
     m_rotate = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER);
+    for (auto* node : m_node->getAllNodes())
+    {
+        SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
+        if (spmn)
+        {
+            spmn->setGlowColor(ItemManager::get()->getGlowColor(type));
+        }
+    }
 }   // setType
 
 //-----------------------------------------------------------------------------
@@ -180,22 +189,8 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
     if (m_type == ITEM_TRIGGER || m_type == ITEM_EASTER_EGG) return;
 
     m_original_type = m_type;
+    setMesh(mesh, lowmesh);
     setType(type);
-
-    scene::ISceneNode* node = m_node->getAllNodes()[0];
-    ((scene::IMeshSceneNode*)node)->setMesh(mesh);
-#ifndef SERVER_ONLY
-    if (lowmesh != NULL)
-    {
-        node = m_node->getAllNodes()[1];
-        ((scene::IMeshSceneNode*)node)->setMesh(lowmesh);
-        irr_driver->applyObjectPassShader(m_node->getAllNodes()[1]);
-    }
-
-    irr_driver->applyObjectPassShader(m_node->getAllNodes()[0]);
-
-    Track::getCurrentTrack()->adjustForFog(m_node);
-#endif
 }   // switchTo
 
 //-----------------------------------------------------------------------------
@@ -212,22 +207,40 @@ void Item::switchBack()
     if(m_original_type==ITEM_NONE)
         return;
 
+    setMesh(m_original_mesh, m_original_lowmesh);
     setType(m_original_type);
     m_original_type = ITEM_NONE;
 
-    scene::ISceneNode* node = m_node->getAllNodes()[0];
-    ((scene::IMeshSceneNode*)node)->setMesh(m_original_mesh);
-    if (m_original_lowmesh != NULL)
-    {
-        node = m_node->getAllNodes()[1];
-        ((scene::IMeshSceneNode*)node)->setMesh(m_original_lowmesh);
-    }
-
-    Track::getCurrentTrack()->adjustForFog(m_node);
     Vec3 hpr;
     hpr.setHPR(m_original_rotation);
     m_node->setRotation(hpr.toIrrHPR());
 }   // switchBack
+
+//-----------------------------------------------------------------------------
+void Item::setMesh(scene::IMesh* mesh, scene::IMesh* lowres_mesh)
+{
+#ifndef SERVER_ONLY
+    unsigned i = 0;
+    for (auto* node : m_node->getAllNodes())
+    {
+        scene::IMesh* m = i == 0 ? mesh : lowres_mesh;
+        if (m == NULL)
+        {
+            continue;
+        }
+        SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
+        if (spmn)
+        {
+            spmn->setMesh(static_cast<SP::SPMesh*>(m));
+        }
+        else
+        {
+            ((scene::IMeshSceneNode*)node)->setMesh(m);
+        }
+        i++;
+    }
+#endif
+}   // setMesh
 
 //-----------------------------------------------------------------------------
 /** Removes an item.

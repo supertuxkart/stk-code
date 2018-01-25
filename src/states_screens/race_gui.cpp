@@ -416,7 +416,10 @@ void RaceGUI::drawGlobalMiniMap()
         video::ITexture* icon = sta ?
             irr_driver->getTexture(FileManager::GUI, "heart.png") :
             kart->getKartProperties()->getMinimapIcon();
-
+        if (icon == NULL)
+        {
+            continue;
+        }
         // int marker_height = m_marker->getSize().Height;
         core::rect<s32> source(core::position2di(0, 0), icon->getSize());
         int marker_half_size = (kart->getController()->isLocalPlayerController()

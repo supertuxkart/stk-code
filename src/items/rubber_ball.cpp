@@ -405,12 +405,16 @@ bool RubberBall::updateAndDelete(float dt)
 
     // Ball squashing:
     // ===============
+#ifndef SERVER_ONLY
     if (height<1.0f*m_extend.getY())
         m_node->setScale(core::vector3df(1.0f, height / m_extend.getY(), 1.0f));
     else
         m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
-
     next_xyz = getHitPoint() + getNormal()*(height*m_node->getScale().Y);
+
+#else
+    next_xyz = getHitPoint() + getNormal()*(height);
+#endif
     m_previous_xyz = getXYZ();
     m_previous_height = (getXYZ() - getHitPoint()).length();
     setXYZ(next_xyz);

@@ -195,19 +195,8 @@ public:
 	//! return open gl texture name
 	virtual u32 getOpenGLTextureName() const = 0;
 
-	virtual u64 getHandle() = 0;
-
-	virtual void unloadHandle() {}
-
 	virtual u32 getTextureSize() const { return 0; }
 
-	virtual void threadedReload(void* ptr, void* param) const {}
-
-	virtual void threadedSubImage(void* ptr) const {}
-
-	virtual void cleanThreadedLoader() {}
-
-	virtual int getThreadedLoadTextureCounter() const { return 0; }
 protected:
 
 	//! Helper function, helps to get the desired texture creation format from the flags.

@@ -20,20 +20,22 @@
 #include "graphics/post_processing.hpp"
 
 #include "config/user_config.hpp"
-#include "graphics/callbacks.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/frame_buffer.hpp"
 #include "graphics/graphics_restrictions.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/mlaa_areamap.hpp"
+#include "graphics/glwrap.hpp"
 #include "graphics/rtts.hpp"
-#include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
-#include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/stk_texture.hpp"
 #include "graphics/stk_tex_manager.hpp"
+#include "graphics/texture_shader.hpp"
 #include "graphics/weather.hpp"
+#include "graphics/sp/sp_dynamic_draw_call.hpp"
+#include "graphics/sp/sp_shader.hpp"
+#include "graphics/sp/sp_uniform_assigner.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
@@ -458,25 +460,6 @@ public:
 };   // DepthOfFieldShader
 
 // ============================================================================
-class RHDebug : public Shader<RHDebug, core::matrix4, core::vector3df>
-{
-public:
-    GLuint m_tu_shr, m_tu_shg, m_tu_shb;
-
-    RHDebug()
-    {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "rhdebug.vert",
-                            GL_FRAGMENT_SHADER, "rhdebug.frag");
-        assignUniforms("rh_matrix", "extents");
-        m_tu_shr = 0;
-        m_tu_shg = 1;
-        m_tu_shb = 2;
-        assignTextureUnit(m_tu_shr, "SHR",  m_tu_shg, "SHG",
-                          m_tu_shb, "SHB");
-    }   // RHDebug
-};   // RHDebug
-
-// ============================================================================
 class PassThroughShader : public TextureShader<PassThroughShader, 1, int, int>
 {
 public:
@@ -760,19 +743,6 @@ public:
 
 PostProcessing::PostProcessing(IVideoDriver* video_driver)
 {
-    // Initialization
-    m_material.Wireframe = false;
-    m_material.Lighting = false;
-    m_material.ZWriteEnable = false;
-    m_material.ZBuffer = ECFN_ALWAYS;
-    m_material.setFlag(EMF_TRILINEAR_FILTER, true);
-
-    for (u32 i = 0; i < MATERIAL_MAX_TEXTURES; ++i)
-    {
-        m_material.TextureLayer[i].TextureWrapU =
-        m_material.TextureLayer[i].TextureWrapV = ETC_CLAMP_TO_EDGE;
-    }
-
     // Load the MLAA area map
     io::IReadFile *areamap = irr_driver->getDevice()->getFileSystem()->
                          createMemoryReadFile((void *) AreaMap33, sizeof(AreaMap33),
@@ -804,11 +774,6 @@ void PostProcessing::reset()
     const u32 n = Camera::getNumCameras();
     m_boost_time.resize(n);
     m_vertices.resize(n);
-    m_center.resize(n);
-    m_direction.resize(n);
-
-    MotionBlurProvider * const cb =
-        (MotionBlurProvider *) Shaders::getCallback(ES_MOTIONBLUR);
 
     for(unsigned int i=0; i<n; i++)
     {
@@ -847,45 +812,8 @@ void PostProcessing::reset()
         SColor white(0xFF, 0xFF, 0xFF, 0xFF);
         m_vertices[i].v0.Color  = m_vertices[i].v1.Color  =
         m_vertices[i].v2.Color  = m_vertices[i].v3.Color  = white;
-
-        m_center[i].X=(m_vertices[i].v0.TCoords.X
-                      +m_vertices[i].v2.TCoords.X) * 0.5f;
-
-        // Center is around 20 percent from bottom of screen:
-        const float tex_height = m_vertices[i].v1.TCoords.Y
-                         - m_vertices[i].v0.TCoords.Y;
-        m_direction[i].X = m_center[i].X;
-        m_direction[i].Y = m_vertices[i].v0.TCoords.Y + 0.7f*tex_height;
-
-        setMotionBlurCenterY(i, 0.2f);
-
-        cb->setDirection(i, m_direction[i].X, m_direction[i].Y);
-        cb->setMaxHeight(i, m_vertices[i].v1.TCoords.Y);
     }  // for i <number of cameras
 }   // reset
-
-// ----------------------------------------------------------------------------
-void PostProcessing::setMotionBlurCenterY(const u32 num, const float y)
-{
-    MotionBlurProvider * const cb =
-        (MotionBlurProvider *) Shaders::getCallback(ES_MOTIONBLUR);
-
-    const float tex_height =
-                m_vertices[num].v1.TCoords.Y - m_vertices[num].v0.TCoords.Y;
-    m_center[num].Y = m_vertices[num].v0.TCoords.Y + y * tex_height;
-
-    cb->setCenter(num, m_center[num].X, m_center[num].Y);
-}   // setMotionBlurCenterY
-
-// ----------------------------------------------------------------------------
-/** Setup some PP data.
-  */
-void PostProcessing::begin()
-{
-    m_any_boost = false;
-    for (u32 i = 0; i < m_boost_time.size(); i++)
-        m_any_boost |= m_boost_time[i] > 0.01f;
-}   // begin
 
 // ----------------------------------------------------------------------------
 /** Set the boost amount according to the speed of the camera */
@@ -893,11 +821,7 @@ void PostProcessing::giveBoost(unsigned int camera_index)
 {
     if (CVS->isGLSL())
     {
-        m_boost_time[camera_index] = 0.75f;
-
-        MotionBlurProvider * const cb =
-            (MotionBlurProvider *)Shaders::getCallback(ES_MOTIONBLUR);
-        cb->setBoostTime(camera_index, m_boost_time[camera_index]);
+        m_boost_time.at(camera_index) = 0.75f;
     }
 }   // giveBoost
 
@@ -909,12 +833,6 @@ void PostProcessing::update(float dt)
 {
     if (!CVS->isGLSL())
         return;
-
-    MotionBlurProvider* const cb =
-        (MotionBlurProvider*) Shaders::getCallback(ES_MOTIONBLUR);
-
-    if (cb == NULL) return;
-
     for (unsigned int i=0; i<m_boost_time.size(); i++)
     {
         if (m_boost_time[i] > 0.0f)
@@ -922,8 +840,6 @@ void PostProcessing::update(float dt)
             m_boost_time[i] -= dt;
             if (m_boost_time[i] < 0.0f) m_boost_time[i] = 0.0f;
         }
-
-        cb->setBoostTime(i, m_boost_time[i]);
     }
 }   // update
 
@@ -932,26 +848,6 @@ void PostProcessing::renderBloom(GLuint in)
 {
     BloomShader::getInstance()->render(in);
 }   // renderBloom
-
-// ----------------------------------------------------------------------------
-void PostProcessing::renderRHDebug(unsigned SHR, unsigned SHG, unsigned SHB,
-                                   const core::matrix4 &rh_matrix,
-                                   const core::vector3df &rh_extend)
-{
-#if !defined(USE_GLES2)
-    glEnable(GL_PROGRAM_POINT_SIZE);
-    RHDebug::getInstance()->use();
-    glActiveTexture(GL_TEXTURE0 + RHDebug::getInstance()->m_tu_shr);
-    glBindTexture(GL_TEXTURE_3D, SHR);
-    glActiveTexture(GL_TEXTURE0 + RHDebug::getInstance()->m_tu_shg);
-    glBindTexture(GL_TEXTURE_3D, SHG);
-    glActiveTexture(GL_TEXTURE0 + RHDebug::getInstance()->m_tu_shb);
-    glBindTexture(GL_TEXTURE_3D, SHB);
-    RHDebug::getInstance()->setUniforms(rh_matrix, rh_extend);
-    glDrawArrays(GL_POINTS, 0, 32 * 16 * 32);
-    glDisable(GL_PROGRAM_POINT_SIZE);
-#endif
-}   // renderRHDebug
 
 // ----------------------------------------------------------------------------
 static std::vector<float> getGaussianWeight(float sigma, size_t count)
@@ -994,69 +890,6 @@ void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo,
                                                     inv_height);
     }
 }   // renderGaussian3Blur
-
-// ----------------------------------------------------------------------------
-void PostProcessing::renderGaussian6BlurLayer(const FrameBuffer &in_fbo,
-                                              const FrameBuffer &scalar_fbo,
-                                              unsigned int layer, float sigma_h,
-                                              float sigma_v) const
-{
-#if !defined(USE_GLES2)
-    GLuint layer_tex;
-    glGenTextures(1, &layer_tex);
-    glTextureView(layer_tex, GL_TEXTURE_2D, in_fbo.getRTT()[0],
-                  GL_R32F, 0, 1, layer, 1);
-    if (!CVS->supportsComputeShadersFiltering())
-    {
-        // Used as temp
-        scalar_fbo.bind();
-        Gaussian6VBlurShader::getInstance()
-            ->render(layer_tex, UserConfigParams::m_shadows_resolution,
-                     UserConfigParams::m_shadows_resolution, sigma_v);
-
-        in_fbo.bindLayer(layer);
-        Gaussian6HBlurShader::getInstance()
-            ->render(scalar_fbo,
-                     UserConfigParams::m_shadows_resolution, 
-                     UserConfigParams::m_shadows_resolution, sigma_h);
-    }
-    else
-    {
-        const std::vector<float> &weightsV = getGaussianWeight(sigma_v, 7);
-        glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
-        ComputeShadowBlurVShader::getInstance()->use();
-        ComputeShadowBlurVShader::getInstance()->setTextureUnits(layer_tex);
-        glBindSampler(ComputeShadowBlurVShader::getInstance()->m_dest_tu, 0);
-        glBindImageTexture(ComputeShadowBlurVShader::getInstance()->m_dest_tu,
-                           scalar_fbo.getRTT()[0], 0,
-                           false, 0, GL_WRITE_ONLY, GL_R32F);
-        ComputeShadowBlurVShader::getInstance()->setUniforms
-            (core::vector2df(1.f / UserConfigParams::m_shadows_resolution,
-                             1.f / UserConfigParams::m_shadows_resolution),
-             weightsV);
-        glDispatchCompute((int)UserConfigParams::m_shadows_resolution / 8 + 1,
-                          (int)UserConfigParams::m_shadows_resolution / 8 + 1, 1);
-
-        const std::vector<float> &weightsH = getGaussianWeight(sigma_h, 7);
-        glMemoryBarrier(  GL_TEXTURE_FETCH_BARRIER_BIT
-                        | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-        ComputeShadowBlurHShader::getInstance()->use();
-        ComputeShadowBlurHShader::getInstance()
-            ->setTextureUnits(scalar_fbo.getRTT()[0]);
-        glBindSampler(ComputeShadowBlurHShader::getInstance()->m_dest_tu, 0);
-        glBindImageTexture(ComputeShadowBlurHShader::getInstance()->m_dest_tu,
-                           layer_tex, 0, false, 0, GL_WRITE_ONLY, GL_R32F);
-        ComputeShadowBlurHShader::getInstance()->setUniforms
-            (core::vector2df(1.f / UserConfigParams::m_shadows_resolution,
-                            1.f / UserConfigParams::m_shadows_resolution),
-              weightsH);
-        glDispatchCompute((int)UserConfigParams::m_shadows_resolution / 8 + 1,
-                          (int)UserConfigParams::m_shadows_resolution / 8 + 1, 1);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-    }
-    glDeleteTextures(1, &layer_tex);
-#endif
-}   // renderGaussian6BlurLayer
 
 // ----------------------------------------------------------------------------
 void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
@@ -1223,10 +1056,10 @@ void PostProcessing::renderGlow(const FrameBuffer& glow_framebuffer,
                                 const FrameBuffer& color_framebuffer   ) const
 {
     // To half
-    FrameBuffer::Blit(glow_framebuffer, half_framebuffer, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    FrameBuffer::blit(glow_framebuffer, half_framebuffer, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
     // To quarter
-    FrameBuffer::Blit(half_framebuffer, quarter_framebuffer, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    FrameBuffer::blit(half_framebuffer, quarter_framebuffer, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
@@ -1259,32 +1092,11 @@ void PostProcessing::renderMotionBlur(unsigned , const FrameBuffer &in_fbo,
                                       FrameBuffer &out_fbo,
                                       GLuint depth_stencil_texture)
 {
-    MotionBlurProvider * const cb =
-                      (MotionBlurProvider *)Shaders::getCallback(ES_MOTIONBLUR);
     Camera *cam = Camera::getActiveCamera();
-    unsigned camID = cam->getIndex();
-
-    scene::ICameraSceneNode * const camnode = cam->getCameraSceneNode();
-
-    // Calculate the kart's Y position on screen
-    if (cam->getKart())
-    {
-        const core::vector3df pos = cam->getKart()->getNode()->getPosition();
-        float ndc[4];
-        core::matrix4 trans = camnode->getProjectionMatrix();
-        trans *= camnode->getViewMatrix();
-
-        trans.transformVect(ndc, pos);
-        const float karty = (ndc[1] / ndc[3]) * 0.5f + 0.5f;
-        setMotionBlurCenterY(camID, karty);
-    }
-    else
-        setMotionBlurCenterY(camID, 0.5f);
-
     out_fbo.bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    float boost_time = cb->getBoostTime(cam->getIndex()) * 10;
+    float boost_time = m_boost_time.at(cam->getIndex()) * 10.0f;
     MotionBlurShader::getInstance()->render(in_fbo, boost_time, depth_stencil_texture);
 }   // renderMotionBlur
 
@@ -1314,12 +1126,17 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
     const SColor col = track->getGodRaysColor();
 
     // The sun interposer
-    STKMeshSceneNode *sun = irr_driver->getSunInterposer();
-    sun->setGlowColors(col);
-    sun->setPosition(track->getGodRaysPosition());
-    sun->updateAbsolutePosition();
-    irr_driver->setPhase(GLOW_PASS);
-    sun->render();
+    SP::SPDynamicDrawCall* sun = irr_driver->getSunInterposer();
+    // This will only do thing when you update the sun position
+    sun->uploadInstanceData();
+    SP::SPShader* glow_shader = SP::getGlowShader();
+    glow_shader->use();
+    SP::SPUniformAssigner* glow_color_assigner = glow_shader
+        ->getUniformAssigner("col");
+    assert(glow_color_assigner != NULL);
+    glow_color_assigner->setValue(video::SColorf(track->getGodRaysColor()));
+    sun->draw();
+    glow_shader->unuse();
     glDisable(GL_DEPTH_TEST);
 
     // Fade to quarter
@@ -1397,7 +1214,7 @@ void PostProcessing::applyMLAA(const FrameBuffer& mlaa_tmp_framebuffer,
     MLAABlendWeightSHader::getInstance()->render(m_areamap, PIXEL_SIZE, mlaa_tmp_framebuffer.getRTT()[0]);
 
     // Blit in to tmp1
-    FrameBuffer::Blit(mlaa_colors_framebuffer,
+    FrameBuffer::blit(mlaa_colors_framebuffer,
                       mlaa_tmp_framebuffer);
 
     // Pass 3: gather
@@ -1471,7 +1288,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             glClear(GL_STENCIL_BUFFER_BIT);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
 
-            FrameBuffer::Blit(*in_fbo, rtts->getFBO(FBO_BLOOM_1024),
+            FrameBuffer::blit(*in_fbo, rtts->getFBO(FBO_BLOOM_1024),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
             rtts->getFBO(FBO_BLOOM_512).bind();
@@ -1480,21 +1297,21 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
 
             // Downsample
-            FrameBuffer::Blit(rtts->getFBO(FBO_BLOOM_512),
+            FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_512),
                               rtts->getFBO(FBO_BLOOM_256), 
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
-            FrameBuffer::Blit(rtts->getFBO(FBO_BLOOM_256),
+            FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_256),
                               rtts->getFBO(FBO_BLOOM_128),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
 			// Copy for lens flare
-			FrameBuffer::Blit(rtts->getFBO(FBO_BLOOM_512),
+			FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_512),
                               rtts->getFBO(FBO_LENS_512), 
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
-			FrameBuffer::Blit(rtts->getFBO(FBO_BLOOM_256),
+			FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_256),
                               rtts->getFBO(FBO_LENS_256),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
-			FrameBuffer::Blit(rtts->getFBO(FBO_BLOOM_128),
+			FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_128),
                               rtts->getFBO(FBO_LENS_128),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
@@ -1549,11 +1366,9 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MOTIONBLUR));
-        MotionBlurProvider * const cb =
-            (MotionBlurProvider *)Shaders::getCallback(ES_MOTIONBLUR);
 
         if (isRace && UserConfigParams::m_motionblur && World::getWorld() &&
-            cb->getBoostTime(Camera::getActiveCamera()->getIndex()) > 0.) // motion blur
+            m_boost_time.at(Camera::getActiveCamera()->getIndex()) > 0.0f) // motion blur
         {
             renderMotionBlur(0, *in_fbo, *out_fbo, irr_driver->getDepthStencilTexture());
             std::swap(in_fbo, out_fbo);
@@ -1573,10 +1388,6 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         PROFILER_POP_CPU_MARKER();
     }
 
-#if !defined(USE_GLES2)
-    if (CVS->isARBSRGBFramebufferUsable())
-        glEnable(GL_FRAMEBUFFER_SRGB);
-#endif
     out_fbo = &rtts->getFBO(FBO_MLAA_COLORS);
     out_fbo->bind();
     renderPassThrough(in_fbo->getRTT()[0],
@@ -1592,10 +1403,6 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
                   *out_fbo);
         PROFILER_POP_CPU_MARKER();
     }
-#if !defined(USE_GLES2)
-    if (CVS->isARBSRGBFramebufferUsable())
-        glDisable(GL_FRAMEBUFFER_SRGB);
-#endif
 
     return out_fbo;
 }   // render

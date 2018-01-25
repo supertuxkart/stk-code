@@ -20,7 +20,6 @@
 #ifndef HEADER_SHADER_HPP
 #define HEADER_SHADER_HPP
 
-#include "graphics/central_settings.hpp"
 #include "graphics/gl_headers.hpp"
 #include "graphics/shader_files_manager.hpp"
 #include "graphics/shared_gpu_objects.hpp"
@@ -55,8 +54,7 @@ protected:
 
     /** OpenGL's program id. */
     GLuint m_program;
-
-    void bypassUBO() const;
+    std::vector<std::shared_ptr<GLuint> > m_shaders;
 
     // ========================================================================
     /** Ends recursion. */
@@ -70,13 +68,13 @@ protected:
     void loadAndAttachShader(GLint shader_type, const std::string &name,
                              Types ... args)
     {
-        GLint shader_id = ShaderFilesManager::getInstance()
+        auto shader_id = ShaderFilesManager::getInstance()
             ->getShaderFile(name, shader_type);
-        glAttachShader(m_program, shader_id);
-        GLint is_deleted = GL_TRUE;
-        glGetShaderiv(shader_id, GL_DELETE_STATUS, &is_deleted);
-        if (is_deleted == GL_FALSE)
-            glDeleteShader(shader_id);
+        if (shader_id)
+        {
+            m_shaders.push_back(shader_id);
+            glAttachShader(m_program, *shader_id);
+        }
         loadAndAttachShader(args...);
     }   // loadAndAttachShader
     // ------------------------------------------------------------------------
@@ -87,15 +85,17 @@ protected:
     {
         loadAndAttachShader(shader_type, std::string(name), args...);
     }   // loadAndAttachShader
-    // ------------------------------------------------------------------------
-    void setAttribute(AttributeType type);
 
 public:
         ShaderBase();
+        ~ShaderBase()
+        {
+            glDeleteProgram(m_program);
+        }
     int loadTFBProgram(const std::string &vertex_file_path,
                        const char **varyings,
                        unsigned varyingscount);
-    static void updateShaders();
+    static void killShaders();
     GLuint createVAO();
     // ------------------------------------------------------------------------
     /** Activates the shader calling glUseProgram. */
@@ -146,8 +146,9 @@ private:
     /** End of recursive implementation of assignUniforms. */
     void assignUniformsImpl()
     {
-        bindPoint("MatrixesData", 0);
+        bindPoint("Matrices", 0);
         bindPoint("LightingData", 1);
+        bindPoint("SPFogData", 2);
     }   // assignUniformsImpl
 
     // ------------------------------------------------------------------------
@@ -170,8 +171,6 @@ public:
     /** Sets the uniforms for this shader. */
     void setUniforms(const Args & ... args) const
     {
-        if (!CVS->isARBUniformBufferObjectUsable())
-            bypassUBO();
         setUniformsImpl(args...);
     }   // setUniforms
     // ------------------------------------------------------------------------
@@ -348,13 +347,12 @@ public:
     {
         m_program = glCreateProgram();
         loadAndAttachShader(args...);
-        if (!CVS->isARBExplicitAttribLocationUsable())
-            setAttribute(type);
         glLinkProgram(m_program);
 
         GLint Result = GL_FALSE;
         glGetProgramiv(m_program, GL_LINK_STATUS, &Result);
-        if (Result == GL_FALSE) {
+        if (Result == GL_FALSE)
+        {
             int info_length;
             Log::error("Shader", "Error when linking these shaders :");
             printFileList(args...);
@@ -364,10 +362,12 @@ public:
             Log::error("Shader", error_message);
             delete[] error_message;
         }
+        // After linking all shaders can be detached
+        for (auto shader : m_shaders)
+        {
+            glDetachShader(m_program, *shader);
+        }
     }   // loadProgram
-
-    // ------------------------------------------------------------------------
-    virtual void bindCustomTextures() {}
     // ------------------------------------------------------------------------
     void drawFullScreenEffect(Args...args)
     {
@@ -378,35 +378,6 @@ public:
     }   // drawFullScreenEffect
 
 };   // Shader
-
-// ============================================================================
-class SkinnedMeshShader
-{
-private:
-    GLuint m_skinning_tex_location;
-public:
-    SkinnedMeshShader() : m_skinning_tex_location(0) {}
-    // ------------------------------------------------------------------------
-    template <typename Shader>
-    void init(Shader* s)
-    {
-        s->use();
-        m_skinning_tex_location = s->getUniformLocation("skinning_tex");
-        glUniform1i(m_skinning_tex_location, 15);
-    }
-    // ------------------------------------------------------------------------
-    void bindSkinningTexture()
-    {
-        glActiveTexture(GL_TEXTURE0 + 15);
-#ifdef USE_GLES2
-        glBindTexture(GL_TEXTURE_2D, SharedGPUObjects::getSkinningTexture());
-#else
-        glBindTexture(GL_TEXTURE_BUFFER,
-            SharedGPUObjects::getSkinningTexture());
-#endif
-        glBindSampler(15, 0);
-    }
-};
 
 
 #endif

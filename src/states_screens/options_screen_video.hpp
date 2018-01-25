@@ -35,13 +35,11 @@ struct GFXPreset
     bool glow;
     bool mlaa;
     bool ssao;
-    bool weather;
-    int animatedScenery;
-    int animatedCharacters;
+    bool animatedCharacters;
+    int particles;
     int image_quality;
     /** Depth of field */
     bool dof;
-    bool global_illumination;
     bool degraded_ibl;
 };
 

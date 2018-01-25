@@ -28,8 +28,10 @@
 #include "karts/explosion_animation.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
-#include "graphics/shaders.hpp"
-#include "graphics/stk_tex_manager.hpp"
+#include "graphics/shader.hpp"
+#include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
+#include "graphics/sp/sp_texture_manager.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "items/powerup_manager.hpp"
@@ -87,6 +89,7 @@ enum DebugMenuCommand
     DEBUG_GRAPHICS_BULLET_1,
     DEBUG_GRAPHICS_BULLET_2,
     DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ,
+    DEBUG_GRAPHICS_TOGGLE_CULLING,
     DEBUG_PROFILER,
     DEBUG_PROFILER_WRITE_REPORT,
     DEBUG_FONT_DUMP_GLYPH_PAGE,
@@ -246,8 +249,10 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_GRAPHICS_RELOAD_SHADERS:
 #ifndef SERVER_ONLY
         Log::info("Debug", "Reloading shaders...");
-        ShaderFilesManager::getInstance()->clean();
-        ShaderBase::updateShaders();
+        SP::SPShaderManager::get()->unloadAll();
+        ShaderBase::killShaders();
+        ShaderFilesManager::getInstance()->removeAllShaderFiles();
+        SP::SPShaderManager::get()->initAll();
 #endif
         break;
     case DEBUG_GRAPHICS_RESET:
@@ -344,6 +349,11 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ:
         irr_driver->resetDebugModes();
         irr_driver->toggleBoundingBoxesViz();
+        break;
+    case DEBUG_GRAPHICS_TOGGLE_CULLING:
+#ifndef SERVER_ONLY
+        SP::sp_culling = !SP::sp_culling;
+#endif
         break;
     case DEBUG_PROFILER:
         profiler.toggleStatus();
@@ -689,20 +699,19 @@ bool handleContextMenuAction(s32 cmd_id)
         new GeneralTextFieldDialog(
             L"Enter the texture filename(s) (separate names by ;)"
             " to be reloaded (empty to reload all)\n"
-            "Press tus; for texture usage stats (shown in console)", []
+            "Press tus; for showing all mesh textures (shown in console)", []
             (const irr::core::stringw& text) {},
             [] (GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
             {
 #ifndef SERVER_ONLY
                 core::stringw t = tb->getText();
-                STKTexManager* stktm = STKTexManager::getInstance();
+                SP::SPTextureManager* sptm = SP::SPTextureManager::get();
                 if (t == "tus;")
                 {
-                    stktm->dumpAllTexture(false/*mesh_texture*/);
-                    stktm->dumpTextureUsage();
+                    sptm->dumpAllTextures();
                     return false;
                 }
-                lw->setText(stktm->reloadTexture(t), true);
+                lw->setText(sptm->reloadTexture(t), true);
 #endif
                 // Don't close the dialog after each run
                 return false;
@@ -761,6 +770,7 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Physics debug", DEBUG_GRAPHICS_BULLET_1);
             sub->addItem(L"Physics debug (no kart)", DEBUG_GRAPHICS_BULLET_2);
             sub->addItem(L"Bounding Boxes viz", DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ);
+            sub->addItem(L"Toggle Culling", DEBUG_GRAPHICS_TOGGLE_CULLING);
             sub->addItem(L"Reset debug views", DEBUG_GRAPHICS_RESET );
 
             mnu->addItem(L"Items >",-1,true,true);
@@ -879,7 +889,9 @@ bool handleStaticAction(int key)
     }
     else if (key == IRR_KEY_F3)
     {
-        STKTexManager::getInstance()->reloadTexture("");
+#ifndef SERVER_ONLY
+        SP::SPTextureManager::get()->reloadTexture("");
+#endif
         return true;
     }
     // TODO: create more keyboard shortcuts

@@ -50,8 +50,7 @@ private:
 
     std::vector<Material*> m_materials;
 
-    std::map<video::E_MATERIAL_TYPE, Material*> m_default_materials;
-    Material* getDefaultMaterial(video::E_MATERIAL_TYPE material_type);
+    std::map<std::string, Material*> m_default_sp_materials;
 
 public:
               MaterialManager();
@@ -62,13 +61,11 @@ public:
     Material* getMaterialFor(video::ITexture* t,
                              video::E_MATERIAL_TYPE material_type);
     Material* getMaterialFor(video::ITexture* t);
+    Material* getMaterialSPM(std::string lay_one_tex_lc,
+                             std::string lay_two_tex_lc,
+                             const std::string& def_shader_name = "solid");
     void      setAllMaterialFlags(video::ITexture* t,
                                   scene::IMeshBuffer *mb);
-    void      adjustForFog(video::ITexture* t,
-                           scene::IMeshBuffer *mb,
-                           scene::ISceneNode* parent,
-                           bool use_fog) const;
-
     void      setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb);
 
     int       addEntity        (Material *m);
@@ -86,6 +83,7 @@ public:
 
     void      unloadAllTextures();
 
+    Material* getDefaultSPMaterial(const std::string& shader_name, const std::string& layer_one_lc = "");
     Material* getLatestMaterial() { return m_materials[m_materials.size()-1]; }
 };   // MaterialManager
 

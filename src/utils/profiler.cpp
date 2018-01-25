@@ -347,10 +347,11 @@ void Profiler::draw()
     double start = 99999.0f;
     double end   = -1.0f;
 
-    // Use this thread (thread 0) to compute start and end time. All other
+    // Use this thread to compute start and end time. All other
     // threads might have 'unfinished' events, or multiple identical events
-    // in this frame (i.e. start time would be incorrect(.
-    AllEventData &aed = m_all_threads_data[0].m_all_event_data;
+    // in this frame (i.e. start time would be incorrect).
+    int thread_id = getThreadID();
+    AllEventData &aed = m_all_threads_data[thread_id].m_all_event_data;
     AllEventData::iterator j;
     for (j = aed.begin(); j != aed.end(); ++j)
     {
@@ -381,7 +382,7 @@ void Profiler::draw()
         {
             AllEventData::iterator j = aed.find(td.m_ordered_headings[k]);
             const Marker &marker = j->second.getMarker(indx);
-            if (i == 0)
+            if (i == thread_id)
                 start_xpos = factor*marker.getStart();
             core::rect<s32> pos((s32)(x_offset + start_xpos),
                                 (s32)(y_offset + i*line_height),

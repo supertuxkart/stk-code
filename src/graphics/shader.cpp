@@ -19,6 +19,7 @@
 #ifndef SERVER_ONLY
 
 #include "graphics/shader.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/spherical_harmonics.hpp"
 #include "utils/log.hpp"
@@ -40,10 +41,8 @@ int ShaderBase::loadTFBProgram(const std::string &shader_name,
     m_program = glCreateProgram();
     loadAndAttachShader(GL_VERTEX_SHADER, shader_name);
 #ifdef USE_GLES2
-    loadAndAttachShader(GL_FRAGMENT_SHADER, "tfb_dummy.frag");
+    loadAndAttachShader(GL_FRAGMENT_SHADER, "white.frag");
 #endif
-    if (!CVS->isARBExplicitAttribLocationUsable())
-        setAttribute(PARTICLES_SIM);
 
     glTransformFeedbackVaryings(m_program, varying_count, varyings,
                                GL_INTERLEAVED_ATTRIBS);
@@ -67,51 +66,6 @@ int ShaderBase::loadTFBProgram(const std::string &shader_name,
 }   // loadTFBProgram
 
 // ----------------------------------------------------------------------------
-void ShaderBase::bypassUBO() const
-{
-    GLint VM = glGetUniformLocation(m_program, "ViewMatrix");
-    glUniformMatrix4fv(VM, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
-
-    GLint PM = glGetUniformLocation(m_program, "ProjectionMatrix");
-    glUniformMatrix4fv(PM, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
-
-    GLint PVM = glGetUniformLocation(m_program, "ProjectionViewMatrix");
-    glUniformMatrix4fv(PVM, 1, GL_FALSE, irr_driver->getProjViewMatrix().pointer());
-
-    GLint IVM = glGetUniformLocation(m_program, "InverseViewMatrix");
-    glUniformMatrix4fv(IVM, 1, GL_FALSE, irr_driver->getInvViewMatrix().pointer());
-
-    GLint IPM = glGetUniformLocation(m_program, "InverseProjectionMatrix");
-    glUniformMatrix4fv(IPM, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
-
-    GLint Screen = glGetUniformLocation(m_program, "screen");
-    glUniform2f(Screen, irr_driver->getCurrentScreenSize().X,
-                        irr_driver->getCurrentScreenSize().Y);
-
-    const SHCoefficients* sh_coeff = irr_driver->getSHCoefficients();
-
-    GLint bLmn = glGetUniformLocation(m_program, "blueLmn[0]");
-    glUniform1fv(bLmn, 9, sh_coeff->blue_SH_coeff);
-
-    GLint gLmn = glGetUniformLocation(m_program, "greenLmn[0]");
-    glUniform1fv(gLmn, 9, sh_coeff->green_SH_coeff);
-
-    GLint rLmn = glGetUniformLocation(m_program, "redLmn[0]");
-    glUniform1fv(rLmn, 9, sh_coeff->red_SH_coeff);
-
-    GLint sun_dir = glGetUniformLocation(m_program, "sun_direction");
-    const core::vector3df &sd = irr_driver->getSunDirection();
-    glUniform3f(sun_dir, sd.X, sd.Y, sd.Z);
-
-    GLint sun_col = glGetUniformLocation(m_program, "sun_col");
-    const video::SColorf& sc = irr_driver->getSunColor();
-    glUniform3f(sun_col, sc.getRed(), sc.getGreen(), sc.getBlue());
-
-    GLint sun_angle = glGetUniformLocation(m_program, "sun_angle");
-    glUniform1f(sun_angle, 0.54f);
-}   // bypassUBO
-
-// ----------------------------------------------------------------------------
 /** Constructor, which adds the shader to all instantiated shaders (for the
  *  reload-all-shaders debug option).
  */
@@ -120,72 +74,14 @@ ShaderBase::ShaderBase()
 }   // ShaderBase
 
 // ----------------------------------------------------------------------------
-void ShaderBase::updateShaders()
+void ShaderBase::killShaders()
 {
     for (unsigned int i = 0; i < m_all_kill_functions.size(); i++)
     {
         m_all_kill_functions[i]();
     }
     m_all_kill_functions.clear();
-}   // updateShaders
-
-// ----------------------------------------------------------------------------
-void ShaderBase::setAttribute(AttributeType type)
-{
-    switch (type)
-    {
-    case OBJECT:
-        glBindAttribLocation(m_program, 0, "Position");
-        glBindAttribLocation(m_program, 1, "Normal");
-        glBindAttribLocation(m_program, 2, "Color");
-        glBindAttribLocation(m_program, 3, "Texcoord");
-        glBindAttribLocation(m_program, 4, "SecondTexcoord");
-        glBindAttribLocation(m_program, 5, "Tangent");
-        glBindAttribLocation(m_program, 6, "Bitangent");
-        glBindAttribLocation(m_program, 7, "Origin");
-        glBindAttribLocation(m_program, 8, "Orientation");
-        glBindAttribLocation(m_program, 9, "Scale");
-        glBindAttribLocation(m_program, 10, "misc_data");
-        break;
-    case PARTICLES_SIM:
-        glBindAttribLocation(m_program, 0, "particle_position");
-        glBindAttribLocation(m_program, 1, "lifetime");
-        glBindAttribLocation(m_program, 2, "particle_velocity");
-        glBindAttribLocation(m_program, 3, "size");
-        glBindAttribLocation(m_program, 4, "particle_position_initial");
-        glBindAttribLocation(m_program, 5, "lifetime_initial");
-        glBindAttribLocation(m_program, 6, "particle_velocity_initial");
-        glBindAttribLocation(m_program, 7, "size_initial");
-        if (CVS->needsVertexIdWorkaround())
-        {
-            glBindAttribLocation(m_program, 8, "vertex_id");
-        }
-        break;
-    case PARTICLES_RENDERING:
-        glBindAttribLocation(m_program, 0, "Position");
-        glBindAttribLocation(m_program, 1, "color_lifetime");
-        glBindAttribLocation(m_program, 2, "size");
-        glBindAttribLocation(m_program, 3, "Texcoord");
-        glBindAttribLocation(m_program, 4, "quadcorner");
-        glBindAttribLocation(m_program, 5, "rotationvec");
-        glBindAttribLocation(m_program, 6, "anglespeed");
-        break;
-    case SKINNED_MESH:
-        glBindAttribLocation(m_program, 0, "Position");
-        glBindAttribLocation(m_program, 1, "Normal");
-        glBindAttribLocation(m_program, 2, "Color");
-        glBindAttribLocation(m_program, 3, "Data1");
-        glBindAttribLocation(m_program, 4, "Data2");
-        glBindAttribLocation(m_program, 5, "Joint");
-        glBindAttribLocation(m_program, 6, "Weight");
-        glBindAttribLocation(m_program, 7, "Origin");
-        glBindAttribLocation(m_program, 8, "Orientation");
-        glBindAttribLocation(m_program, 9, "Scale");
-        glBindAttribLocation(m_program, 10, "misc_data");
-        glBindAttribLocation(m_program, 15, "skinning_offset");
-        break;
-    }
-}   // setAttribute
+}   // killShaders
 
 // ----------------------------------------------------------------------------
 GLuint ShaderBase::createVAO()
@@ -205,7 +101,5 @@ GLuint ShaderBase::createVAO()
     glBindVertexArray(0);
     return vao;
 }   // createVAO
-
-// ============================================================================
 
 #endif   // !SERVER_ONLY

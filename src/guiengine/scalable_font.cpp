@@ -52,11 +52,15 @@ void ScalableFont::setShadow(const irr::video::SColor &col)
     m_font_settings->setShadow(true);
     m_font_settings->setShadowColor(col);
 }   // setShadow
-
 // ----------------------------------------------------------------------------
 void ScalableFont::disableShadow()
 {
     m_font_settings->setShadow(false);
+}   // setShadow
+// ----------------------------------------------------------------------------
+void ScalableFont::setBlackBorder(bool enabled)
+{
+    m_font_settings->setBlackBorder(enabled);
 }   // setShadow
 
 // ----------------------------------------------------------------------------

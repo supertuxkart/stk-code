@@ -20,6 +20,7 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/render_info.hpp"
 #include "guiengine/widgets/kart_stats_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/widgets/player_name_spinner.hpp"
@@ -197,7 +198,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     core::matrix4 model_location;
     model_location.setScale(core::vector3df(scale, scale, scale));
     const bool has_win_anime =
-        UserConfigParams::m_show_steering_animations != 0 &&
+        UserConfigParams::m_animated_characters &&
         (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
         kart_model.getFrame(KartModel::AF_WIN_START) > -1) &&
         kart_model.getFrame(KartModel::AF_WIN_END) > -1) ||
@@ -216,9 +217,9 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         kart_model.getFrame(KartModel::AF_SELECTION_END) :
         kart_model.getFrame(KartModel::AF_WIN_END) :
         kart_model.getBaseFrame(),
-        false/*all_parts_colorized*/,
         kart_model.getAnimationSpeed());
-
+    m_model_view->getModelViewRenderInfo()->setHue(
+        m_associated_player->getConstProfile()->getDefaultKartColor());
     model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
     for (unsigned i = 0; i < 4; i++)
     {
@@ -237,7 +238,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
                 kart_model.getInverseBoneMatrix(obj.m_bone_name);
             swol = inv * obj.m_location;
         }
-        m_model_view->addModel(obj.m_model, swol, -1, -1, false, 0.0f,
+        m_model_view->addModel(obj.m_model, swol, -1, -1, 0.0f,
             obj.m_bone_name);
     }
     m_model_view->setRotateContinuously( 35.0f );
@@ -643,6 +644,8 @@ GUIEngine::EventPropagation PlayerKartWidget::transmitEvent(Widget* w,
                 m_handicapped = false;
                 m_model_view->unsetBadge(ANCHOR_BADGE);
             }
+            m_model_view->getModelViewRenderInfo()->setHue(
+                m_associated_player->getConstProfile()->getDefaultKartColor());
         }
     }
 

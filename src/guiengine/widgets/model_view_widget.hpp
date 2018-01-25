@@ -50,7 +50,6 @@ namespace GUIEngine
         PtrVector<scene::IMesh, REF> m_models;
         std::vector<core::matrix4> m_model_location;
         std::vector<std::pair<int, int> > m_model_frames;
-        std::vector<bool> m_model_render_info_affected;
         std::vector<float> m_model_animation_speed;
         std::vector<std::string> m_bone_attached;
         std::unique_ptr<RenderTarget> m_render_target;
@@ -64,13 +63,15 @@ namespace GUIEngine
 
         scene::ISceneNode          *m_light;
 
-        RenderInfo                 *m_render_info;
+        std::shared_ptr<RenderInfo> m_render_info;
+
+        const unsigned m_rtt_size;
 
     public:
 
         LEAK_CHECK()
 
-        ModelViewWidget();
+        ModelViewWidget(unsigned rtt_size = 512);
         virtual ~ModelViewWidget();
 
         void add();
@@ -79,7 +80,6 @@ namespace GUIEngine
                       const core::matrix4& location = core::matrix4(),
                       const int start_loop_frame=-1,
                       const int end_loop_frame=-1,
-                      bool all_parts_colorized = false,
                       float animation_speed = 0.0f,
                       const std::string& bone_name = std::string());
 
@@ -105,7 +105,7 @@ namespace GUIEngine
 
         void drawRTTScene(const irr::core::rect<s32>& dest_rect) const;
 
-        RenderInfo* getModelViewRenderInfo() { return m_render_info; }
+        std::shared_ptr<RenderInfo> getModelViewRenderInfo() { return m_render_info; }
     };
 
 }
