@@ -408,7 +408,7 @@ std::shared_ptr<SPShader> SPShaderManager::buildSPShader(const ShaderInfo& si,
     std::shared_ptr<SPShader> sps;
 #ifndef SERVER_ONLY
     sps = std::make_shared<SPShader>(si.m_shader_name,
-        [pi, ua, skinned](SPShader* shader)
+        [this, pi, ua, skinned](SPShader* shader)
         {
             // First pass
             assert(!pi[0].m_vertex_shader.empty() ||
