@@ -210,9 +210,6 @@ void World::init()
                                : race_manager->getKartIdent(i);
         int local_player_id  = race_manager->getKartLocalPlayerId(i);
         int global_player_id = race_manager->getKartGlobalPlayerId(i);
-		//Replace i with local_player_id, see what happens. 
-		//The error is exactly here, the list is ordered by score, and i 
-		//is used for m_index
         AbstractKart* newkart = createKart(kart_ident, i, local_player_id,
                                    global_player_id,
                                    race_manager->getKartType(i),
