@@ -210,6 +210,9 @@ void World::init()
                                : race_manager->getKartIdent(i);
         int local_player_id  = race_manager->getKartLocalPlayerId(i);
         int global_player_id = race_manager->getKartGlobalPlayerId(i);
+		//Replace i with local_player_id, see what happens. 
+		//The error is exactly here, the list is ordered by score, and i 
+		//is used for m_index
         AbstractKart* newkart = createKart(kart_ident, i, local_player_id,
                                    global_player_id,
                                    race_manager->getKartType(i),
@@ -241,7 +244,7 @@ void World::init()
     {
         // In case that the server is running with gui or watching replay,
         // create a camera and attach it to the first kart.
-        Camera::createCamera(World::getWorld()->getKart(0));
+        Camera::createCamera(World::getWorld()->getKart(0), 0);
 
     }
 }   // init
@@ -357,7 +360,7 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     {
     case RaceManager::KT_PLAYER:
         controller = new LocalPlayerController(new_kart,
-                         StateManager::get()->getActivePlayer(local_player_id));
+                         local_player_id);
         m_num_players ++;
         break;
     case RaceManager::KT_NETWORK_PLAYER:
