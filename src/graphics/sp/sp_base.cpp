@@ -793,9 +793,10 @@ void addObject(SPMeshNode* node)
         core::aabbox3df bb = mb->getBoundingBox();
         model_matrix.transformBoxEx(bb);
         std::vector<bool> discard;
-        const bool handle_shadow =
+        const bool handle_shadow = node->isInShadowPass() &&
             g_handle_shadow && shader->hasShader(RP_SHADOW);
         discard.resize((handle_shadow ? 5 : 1), false);
+
         for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
             for (int i = 0; i < 24; i += 4)

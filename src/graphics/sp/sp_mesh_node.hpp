@@ -50,6 +50,8 @@ private:
 
     bool m_animated;
 
+    bool m_is_in_shadowpass;
+
     std::vector<std::array<float, 16> > m_skinning_matrices;
 
     video::SColorf m_glow_color;
@@ -114,6 +116,12 @@ public:
     void setAnimationState(bool val);
     // ------------------------------------------------------------------------
     bool getAnimationState() const                       { return m_animated; }
+    // ------------------------------------------------------------------------
+    bool isInShadowPass() const                  { return m_is_in_shadowpass; }
+    // ------------------------------------------------------------------------
+    void setInShadowPass(const bool is_in_shadowpass){
+        m_is_in_shadowpass = is_in_shadowpass;
+    }
     // ------------------------------------------------------------------------
     SPShader* getShader(unsigned mesh_buffer_id) const;
     // ------------------------------------------------------------------------
