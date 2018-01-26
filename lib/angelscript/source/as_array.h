@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -468,10 +468,10 @@ bool asCArray<T>::Concatenate(const asCArray<T> &other)
 }
 
 template <class T>
-void asCArray<T>::Concatenate(T* array, unsigned int count)
+void asCArray<T>::Concatenate(T* other, unsigned int count)
 {
 	for( unsigned int c = 0; c < count; c++ )
-		PushLast(array[c]);
+		PushLast(other[c]);
 }
 
 template <class T>

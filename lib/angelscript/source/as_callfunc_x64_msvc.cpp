@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -119,7 +119,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		if( dt.IsObject() && !dt.IsObjectHandle() && !dt.IsReference() )
 		{
 			if( dt.GetSizeInMemoryDWords() >= AS_LARGE_OBJ_MIN_SIZE ||
-				(dt.GetObjectType()->flags & COMPLEX_MASK) )
+				(dt.GetTypeInfo()->flags & COMPLEX_MASK) )
 			{
 				allArgBuffer[dpos++] = *(asQWORD*)&args[spos];
 				spos += AS_PTR_SIZE;
