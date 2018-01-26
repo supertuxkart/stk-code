@@ -119,7 +119,8 @@ public:
     // ------------------------------------------------------------------------
     bool isInShadowPass() const                  { return m_is_in_shadowpass; }
     // ------------------------------------------------------------------------
-    void setInShadowPass(const bool is_in_shadowpass){
+    void setInShadowPass(const bool is_in_shadowpass)
+    {
         m_is_in_shadowpass = is_in_shadowpass;
     }
     // ------------------------------------------------------------------------
