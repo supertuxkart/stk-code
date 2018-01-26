@@ -37,16 +37,6 @@ SPShaderManager* SPShaderManager::m_spsm = NULL;
 SPShaderManager::SPShaderManager()
 {
 #ifndef SERVER_ONLY
-    m_official_types =
-    {
-        { "int", std::type_index(typeid(int)) },
-        { "float", std::type_index(typeid(float)) },
-        { "mat4", std::type_index(typeid(irr::core::matrix4)) },
-        { "vec4", std::type_index(typeid(std::array<float, 4>)) },
-        { "vec3", std::type_index(typeid(irr::core::vector3df)) },
-        { "vec2", std::type_index(typeid(irr::core::vector2df)) }
-    };
-
     m_official_sampler_types =
     {
         { "nearest", ST_NEAREST },
@@ -313,32 +303,6 @@ void SPShaderManager::loadPassInfo(const XMLNode* pass, PassInfo& pi)
     pass->get("skinned-mesh-shader", &pi.m_skinned_mesh_shader);
     pi.m_skinned_mesh_shader = getShaderFullPath(pi.m_skinned_mesh_shader);
 
-    const XMLNode* uniforms = pass->getNode("uniforms");
-    if (uniforms)
-    {
-        for (unsigned i = 0; i < uniforms->getNumNodes(); i++)
-        {
-            const XMLNode* uniform = uniforms->getNode(i);
-            if (uniform->getName() == "uniform")
-            {
-                std::string name, type;
-                uniform->get("name", &name);
-                uniform->get("type", &type);
-                if (!name.empty() && !type.empty() &&
-                    m_official_types.find(type) != m_official_types.end())
-                {
-                    pi.m_uniforms.emplace_back(name,
-                        m_official_types.at(type));
-                }
-                else
-                {
-                    Log::error("SPShaderManager", "Invalid uniform type %s",
-                        type.c_str());
-                }
-            }
-        }
-    }
-
     const XMLNode* prefilled_textures = pass->getNode("prefilled-textures");
     if (prefilled_textures)
     {
@@ -431,7 +395,7 @@ std::shared_ptr<SPShader> SPShaderManager::buildSPShader(const ShaderInfo& si,
             shader->linkShaderFiles(RP_1ST);
             shader->use(RP_1ST);
             shader->addBasicUniforms(RP_1ST);
-            addUniformsToShader(shader, pi[0].m_uniforms, RP_1ST);
+            shader->addAllUniforms(RP_1ST);
             if (pi[0].m_use_function)
             {
                 shader->setUseFunction(pi[0].m_use_function, RP_1ST);
@@ -466,7 +430,7 @@ std::shared_ptr<SPShader> SPShaderManager::buildSPShader(const ShaderInfo& si,
             shader->linkShaderFiles(RP_SHADOW);
             shader->use(RP_SHADOW);
             shader->addBasicUniforms(RP_SHADOW);
-            addUniformsToShader(shader, pi[1].m_uniforms, RP_SHADOW);
+            shader->addAllUniforms(RP_SHADOW);
             if (pi[1].m_use_function)
             {
                 shader->setUseFunction(pi[1].m_use_function, RP_SHADOW);
@@ -483,17 +447,6 @@ std::shared_ptr<SPShader> SPShaderManager::buildSPShader(const ShaderInfo& si,
 #endif
     return sps;
 }   // buildSPShader
-
-// ----------------------------------------------------------------------------
-void SPShaderManager::addUniformsToShader(SPShader* s,
-          const std::vector<std::pair<std::string, std::type_index> >& u,
-          RenderPass rp)
-{
-    for (auto& p : u)
-    {
-        s->addUniform(p.first, p.second, rp);
-    }
-}   // addUniformsToShader
 
 // ----------------------------------------------------------------------------
 void SPShaderManager::addPrefilledTexturesToShader(SPShader* s,

@@ -1134,7 +1134,8 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
     SP::SPUniformAssigner* glow_color_assigner = glow_shader
         ->getUniformAssigner("col");
     assert(glow_color_assigner != NULL);
-    glow_color_assigner->setValue(video::SColorf(track->getGodRaysColor()));
+    video::SColorf cf(track->getGodRaysColor());
+    glow_color_assigner->setValue(core::vector3df(cf.r, cf.g, cf.b));
     sun->draw();
     glow_shader->unuse();
     glDisable(GL_DEPTH_TEST);

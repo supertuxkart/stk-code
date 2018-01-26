@@ -83,7 +83,7 @@ std::vector<std::pair<SPShader*, std::vector<std::pair<std::array<GLuint, 6>,
     std::vector<std::pair<SPMeshBuffer*, int/*material_id*/> > > > > >
     g_final_draw_calls[DCT_FOR_VAO];
 // ----------------------------------------------------------------------------
-std::unordered_map<unsigned, std::pair<video::SColorf,
+std::unordered_map<unsigned, std::pair<core::vector3df,
     std::unordered_set<SPMeshBuffer*> > > g_glow_meshes;
 // ----------------------------------------------------------------------------
 std::unordered_set<SPMeshBuffer*> g_instances;
@@ -186,7 +186,7 @@ void displaceShaderInit(SPShader* shader)
     shader->linkShaderFiles(RP_RESERVED);
     shader->use(RP_RESERVED);
     shader->addBasicUniforms(RP_RESERVED);
-    shader->addUniform("direction", typeid(std::array<float, 4>), RP_RESERVED);
+    shader->addAllUniforms(RP_RESERVED);
     shader->setUseFunction([]()->void
         {
             glEnable(GL_DEPTH_TEST);
@@ -357,7 +357,7 @@ void loadShaders()
                 shader->linkShaderFiles(RP_1ST);
                 shader->use(RP_1ST);
                 shader->addBasicUniforms(RP_1ST);
-                shader->addUniform("col", typeid(irr::video::SColorf), RP_1ST);
+                shader->addAllUniforms(RP_1ST);
             });
         SPShaderManager::get()->addSPShader(sps->getName(), sps);
         g_glow_shader = sps.get();
@@ -928,7 +928,8 @@ void addObject(SPMeshNode* node)
                     auto ret = g_glow_meshes.find(key);
                     if (ret == g_glow_meshes.end())
                     {
-                        g_glow_meshes[key] = std::make_pair(gc,
+                        g_glow_meshes[key] = std::make_pair(
+                            core::vector3df(gc.r, gc.g, gc.b),
                             std::unordered_set<SPMeshBuffer*>());
                     }
                     g_glow_meshes.at(key).second.insert(mb);
