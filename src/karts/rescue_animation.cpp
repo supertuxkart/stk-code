@@ -93,6 +93,39 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     Physics::getInstance()->removeKart(m_kart);
 };   // RescueAnimation
 
+
+//-----------------------------------------------------------------------------
+/** This object is automatically destroyed when the timer expires.
+ */
+RescueAnimation::~RescueAnimation()
+{
+    // If m_timer >=0, this object is deleted because the kart
+    // is deleted (at the end of a race), which means that
+    // world is in the process of being deleted. In this case
+    // we can't call removeKartAfterRescue() or getPhysics anymore.
+    if (m_timer < 0)
+    {
+        Physics::getInstance()->addKart(m_kart);
+    }
+
+    m_kart->getNode()->removeChild(m_referee->getSceneNode());
+    delete m_referee;
+    m_referee = NULL;
+    if(m_timer < 0)
+    {
+        m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
+        m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
+
+        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+        {
+            Camera *camera = Camera::getCamera(i);
+            if(camera && camera->getKart()==m_kart &&
+                camera->getType() != Camera::CM_TYPE_END)
+                camera->setMode(Camera::CM_NORMAL);
+        }
+    }
+}   // ~RescueAnimation
+
 // Determine maximum rescue height with up-raycast
 float RescueAnimation::MaximumHeight() {
     float hit_dest = 9999999.9f;
@@ -111,40 +144,8 @@ float RescueAnimation::MaximumHeight() {
     }
     return hit_dest;
 }
-//-----------------------------------------------------------------------------
-/** This object is automatically destroyed when the timer expires.
- */
-RescueAnimation::~RescueAnimation()
-{
-    // If m_timer >=0, this object is deleted because the kart
-    // is deleted (at the end of a race), which means that
-    // world is in the process of being deleted. In this case
-    // we can't call removeKartAfterRescue() or getPhysics anymore.
-    if (m_timer < 0)
-    {
-        //World::getWorld()->moveKartAfterRescue(m_kart);
-    }
-
-    m_kart->getNode()->removeChild(m_referee->getSceneNode());
-    delete m_referee;
-    m_referee = NULL;
-    if(m_timer < 0)
-    {
-        m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
-        m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
-
-        Physics::getInstance()->addKart(m_kart);
-        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
-        {
-            Camera *camera = Camera::getCamera(i);
-            if(camera && camera->getKart()==m_kart &&
-                camera->getType() != Camera::CM_TYPE_END)
-                camera->setMode(Camera::CM_NORMAL);
-        }
-    }
-}   // ~RescueAnimation
-
 // ----------------------------------------------------------------------------
+
 /** Updates the kart animation.
  *  \param dt Time step size.
  *  \return True if the explosion is still shown, false if it has finished.
@@ -160,10 +161,7 @@ void RescueAnimation::update(float dt)
 
             float hit_dest = MaximumHeight();
             float max_height = m_kart->getKartProperties()->getRescueHeight();
-            if (hit_dest < max_height) {
-                max_height = hit_dest;
-            }
-
+           
             max_height = std::min(hit_dest, max_height) * rescue_moment;
             m_xyz += max_height * m_up_vector;
             kart_on_track = true;
