@@ -575,7 +575,7 @@ install(FILES ${STK_DATA_DIR}/supertuxkart.desktop DESTINATION share/application
 install(FILES data/supertuxkart_48.png DESTINATION share/icons/hicolor/48x48/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_48.png DESTINATION share/pixmaps RENAME supertuxkart.png)
-install(FILES data/supertuxkart.appdata.xml DESTINATION share/appdata)
+install(FILES data/supertuxkart.appdata.xml DESTINATION share/metainfo)
 
 if(MINGW)
     install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/ DESTINATION ${STK_INSTALL_BINARY_DIR}
