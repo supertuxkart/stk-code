@@ -179,7 +179,7 @@ void Skybox::generateCubeMapFromTextures()
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_cube_map);
 
-        bool needs_srgb_format = CVS->isDefferedEnabled();
+        bool needs_srgb_format = CVS->isDeferredEnabled();
 
         GLint format = GL_RGBA;
         GLint internal_format = needs_srgb_format ? GL_SRGB8_ALPHA8 : GL_RGBA8;
@@ -218,7 +218,7 @@ void Skybox::generateSpecularCubemap()
     }
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-    if (!CVS->isDefferedEnabled())
+    if (!CVS->isDeferredEnabled())
         return;
 
 #if !defined(USE_GLES2)

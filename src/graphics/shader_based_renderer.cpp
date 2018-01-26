@@ -50,9 +50,6 @@
 #include <algorithm> 
 
 // ----------------------------------------------------------------------------
-
-
-
 void ShaderBasedRenderer::setRTT(RTT* rtts)
 {
     m_rtts = rtts;
@@ -111,8 +108,7 @@ void ShaderBasedRenderer::computeMatrixesAndCameras(scene::ICameraSceneNode *con
                                                     unsigned int width, unsigned int height)
 {
     m_current_screen_size = core::vector2df((float)width, (float)height);
-    m_shadow_matrices.computeMatrixesAndCameras(camnode, width, height,
-        m_rtts->getDepthStencilTexture());
+    m_shadow_matrices.computeMatrixesAndCameras(camnode, width, height);
 }   // computeMatrixesAndCameras
 
 // ----------------------------------------------------------------------------
@@ -440,27 +436,6 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
 
-    if (!forceRTT)
-    {
-        // We need a cleared depth buffer for some effect (eg particles depth blending)
-        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
-        // Bind() modifies the viewport. In order not to affect anything else,
-        // the viewport is just reset here and not removed in Bind().
-        const core::recti &vp = Camera::getActiveCamera()->getViewport();
-        glViewport(vp.UpperLeftCorner.X,
-                   irr_driver->getActualScreenSize().Height - vp.LowerRightCorner.Y,
-                   vp.LowerRightCorner.X - vp.UpperLeftCorner.X,
-                   vp.LowerRightCorner.Y - vp.UpperLeftCorner.Y);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-    else
-    {
-        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
-        glClearColor(0., 0., 0., 0.);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    }
-
     if (forceRTT)
     {
         m_rtts->getFBO(FBO_COLORS).bind();
@@ -471,6 +446,8 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
             clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
         glClear(GL_COLOR_BUFFER_BIT);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
     {
@@ -511,7 +488,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     // Now all instancing data from mesh and particle are done drawing
     m_draw_calls.setFenceSync();
 
-    if (!CVS->isDefferedEnabled() && !forceRTT)
+    if (!CVS->isDeferredEnabled() && !forceRTT)
     {
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
@@ -650,8 +627,9 @@ void ShaderBasedRenderer::onLoadWorld()
     const core::recti &viewport = Camera::getCamera(0)->getViewport();
     unsigned int width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
     unsigned int height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
-    RTT* rtts = new RTT(width, height, CVS->isDefferedEnabled() ?
-                        UserConfigParams::m_scale_rtts_factor : 1.0f);
+    RTT* rtts = new RTT(width, height, CVS->isDeferredEnabled() ?
+                        UserConfigParams::m_scale_rtts_factor : 1.0f,
+                        !CVS->isDeferredEnabled());
     setRTT(rtts);
 }
 
@@ -746,7 +724,7 @@ void ShaderBasedRenderer::render(float dt)
     RaceGUIBase *rg = world->getRaceGUI();
     if (rg) rg->update(dt);
 
-    if (!CVS->isDefferedEnabled())
+    if (!CVS->isDeferredEnabled())
     {
         prepareForwardRenderer();
     }
@@ -770,12 +748,12 @@ void ShaderBasedRenderer::render(float dt)
         oss << "drawAll() for kart " << cam;
         PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (cam+1)*60,
                                  0x00, 0x00);
-        camera->activate(!CVS->isDefferedEnabled());
+        camera->activate(!CVS->isDeferredEnabled());
         rg->preRenderCallback(camera);   // adjusts start referee
         irr_driver->getSceneManager()->setActiveCamera(camnode);
 
         computeMatrixesAndCameras(camnode, m_rtts->getWidth(), m_rtts->getHeight());
-        if (CVS->isDefferedEnabled())
+        if (CVS->isDeferredEnabled())
         {
             renderSceneDeferred(camnode, dt, track->hasShadows(), false); 
         }
@@ -794,7 +772,7 @@ void ShaderBasedRenderer::render(float dt)
 
         debugPhysics();
         
-        if (CVS->isDefferedEnabled())
+        if (CVS->isDeferredEnabled())
         {
             renderPostProcessing(camera);
         }
@@ -883,7 +861,7 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     if (CVS->isARBUniformBufferObjectUsable())
         uploadLightingData();
 
-    if (CVS->isDefferedEnabled())
+    if (CVS->isDeferredEnabled())
     {
         renderSceneDeferred(camera, dt, false, true);
         render_target->setFrameBuffer(m_post_processing

@@ -39,12 +39,10 @@ using irr::video::ITexture;
 
 enum TypeFBO
 {
-    FBO_SSAO,
-    FBO_NORMAL_AND_DEPTHS,
-    FBO_COMBINED_DIFFUSE_SPECULAR,
     FBO_COLORS,
-    FBO_DIFFUSE,
-    FBO_SPECULAR,
+    FBO_NORMAL_AND_DEPTHS,
+    FBO_SSAO,
+    FBO_COMBINED_DIFFUSE_SPECULAR,
     FBO_MLAA_COLORS,
     FBO_MLAA_BLEND,
     FBO_MLAA_TMP,
@@ -79,13 +77,13 @@ enum TypeFBO
 
 enum TypeRTT : unsigned int
 {
-    RTT_TMP1 = 0,
+    RTT_COLOR = 0,
+    RTT_NORMAL_AND_DEPTH,
+    RTT_TMP1,
     RTT_TMP2,
     RTT_TMP3,
     RTT_TMP4,
     RTT_LINEAR_DEPTH,
-    RTT_NORMAL_AND_DEPTH,
-    RTT_COLOR,
     RTT_DIFFUSE,
     RTT_SPECULAR,
 
@@ -143,27 +141,36 @@ enum TypeRTT : unsigned int
 class RTT
 {
 public:
-    RTT(unsigned int width, unsigned int height, float rtt_scale = 1.0f);
+    RTT(unsigned int width, unsigned int height, float rtt_scale = 1.0f,
+        bool use_default_fbo_only = false);
     ~RTT();
-    
+
     unsigned int getWidth () const { return m_width ; }
     unsigned int getHeight() const { return m_height; }
 
-    FrameBufferLayer* getShadowFrameBuffer() { return m_shadow_FBO; }
-    unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
-    unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }
-    FrameBuffer& getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
+    FrameBufferLayer* getShadowFrameBuffer() { return m_shadow_fbo; }
+    unsigned getDepthStencilTexture() const
+    {
+        assert(m_depth_stencil_tex != 0);
+        return m_depth_stencil_tex;
+    }
+    unsigned getRenderTarget(enum TypeRTT target) const
+    {
+        assert(m_render_target_textures[target] != 0);
+        return m_render_target_textures[target];
+    }
+    FrameBuffer& getFBO(enum TypeFBO fbo) { return m_frame_buffers[fbo]; }
 
 private:
-    unsigned RenderTargetTextures[RTT_COUNT];
-    PtrVector<FrameBuffer> FrameBuffers;
-    unsigned DepthStencilTexture;
+    unsigned m_render_target_textures[RTT_COUNT] = {};
+    PtrVector<FrameBuffer> m_frame_buffers;
+    unsigned m_depth_stencil_tex = 0;
 
     unsigned int m_width;
     unsigned int m_height;
 
-    unsigned shadowDepthTex;
-    FrameBufferLayer* m_shadow_FBO;
+    unsigned m_shadow_depth_tex = 0;
+    FrameBufferLayer* m_shadow_fbo;
 
     LEAK_CHECK();
 };

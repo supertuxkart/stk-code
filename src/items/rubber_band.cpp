@@ -52,7 +52,7 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
         return;
     }
     video::SColor color(77, 179, 0, 0);
-    if (CVS->isDefferedEnabled())
+    if (CVS->isDeferredEnabled())
     {
         color.setRed(SP::srgb255ToLinear(color.getRed()));
         color.setGreen(SP::srgb255ToLinear(color.getGreen()));

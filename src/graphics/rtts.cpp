@@ -53,11 +53,12 @@ static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, G
     return result;
 }
 
-RTT::RTT(unsigned int width, unsigned int height, float rtt_scale)
+RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
+         bool use_default_fbo_only)
 {
     m_width = (unsigned int)(width * rtt_scale);
-    m_height = (unsigned int)(height  * rtt_scale);
-    m_shadow_FBO = NULL;
+    m_height = (unsigned int)(height * rtt_scale);
+    m_shadow_fbo = NULL;
     using namespace video;
     using namespace core;
 
@@ -75,7 +76,10 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale)
 
     unsigned linear_depth_mip_levels = int(ceilf(log2f( float(max_(res.Width, res.Height)) )));
 
-    DepthStencilTexture = generateRTT(res, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+    if (!use_default_fbo_only)
+    {
+        m_depth_stencil_tex = generateRTT(res, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+    }
 
     // All RTTs are currently RGBA16F mostly with stencil. The four tmp RTTs are the same size
     // as the screen, for use in post-processing.
@@ -89,7 +93,7 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale)
     GLint diffuse_specular_internal_format = GL_R11F_G11F_B10F;
     GLint type = GL_FLOAT;
     GLint rgb_internal_format = GL_RGBA8;
-    
+
 #if defined(USE_GLES2)
     if (!CVS->isEXTColorBufferFloatUsable())
     {
@@ -103,190 +107,193 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale)
         type = GL_UNSIGNED_BYTE;
     }
 #endif
-
-    RenderTargetTextures[RTT_TMP1] = generateRTT(res, rgba_internal_format, rgba_format, type);
-    RenderTargetTextures[RTT_TMP2] = generateRTT(res, rgba_internal_format, rgba_format, type);
-    RenderTargetTextures[RTT_TMP3] = generateRTT(res, rgba_internal_format, rgba_format, type);
-    RenderTargetTextures[RTT_TMP4] = generateRTT(res, red_internal_format, red_format, type);
-    RenderTargetTextures[RTT_LINEAR_DEPTH] = generateRTT(res, red32_internal_format, red_format, type, linear_depth_mip_levels);
-    RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RGB10_A2, GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV);
-    RenderTargetTextures[RTT_COLOR] = generateRTT(res, rgba_internal_format, rgba_format, type);
-    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, rgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_MLAA_TMP] = generateRTT(res, rgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_MLAA_BLEND] = generateRTT(res, rgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_SSAO] = generateRTT(res, red_internal_format, red_format, type);
-    RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, rgba_internal_format, rgba_format, type);
-    RenderTargetTextures[RTT_DIFFUSE] = generateRTT(res, diffuse_specular_internal_format, rgb_format, type);
-    RenderTargetTextures[RTT_SPECULAR] = generateRTT(res, diffuse_specular_internal_format, rgb_format, type);
-
-    RenderTargetTextures[RTT_HALF1] = generateRTT(half, rgba_internal_format, rgba_format, type);
-    RenderTargetTextures[RTT_QUARTER1] = generateRTT(quarter, rgba_internal_format, rgba_format, type);
-    RenderTargetTextures[RTT_EIGHTH1] = generateRTT(eighth, rgba_internal_format, rgba_format, type);
-    RenderTargetTextures[RTT_HALF1_R] = generateRTT(half, red_internal_format, red_format, type);
-
-    RenderTargetTextures[RTT_HALF2] = generateRTT(half, rgba_internal_format, rgba_format, type);
-    RenderTargetTextures[RTT_QUARTER2] = generateRTT(quarter, rgba_internal_format, rgba_format, type);
-    RenderTargetTextures[RTT_EIGHTH2] = generateRTT(eighth, rgba_internal_format, rgba_format, type);
-    RenderTargetTextures[RTT_HALF2_R] = generateRTT(half, red_internal_format, red_format, type);
-
-    RenderTargetTextures[RTT_BLOOM_1024] = generateRTT(shadowsize0, rgba_internal_format, rgb_format, type);
-
-    RenderTargetTextures[RTT_BLOOM_512] = generateRTT(shadowsize1, rgba_internal_format, rgb_format, type);
-    RenderTargetTextures[RTT_TMP_512] = generateRTT(shadowsize1, rgba_internal_format, rgb_format, type);
-    RenderTargetTextures[RTT_LENS_512] = generateRTT(shadowsize1, rgba_internal_format, rgb_format, type);
-	
-    RenderTargetTextures[RTT_BLOOM_256] = generateRTT(shadowsize2, rgba_internal_format, rgb_format, type);
-    RenderTargetTextures[RTT_TMP_256] = generateRTT(shadowsize2, rgba_internal_format, rgb_format, type);
-    RenderTargetTextures[RTT_LENS_256] = generateRTT(shadowsize2, rgba_internal_format, rgb_format, type);
-	
-    RenderTargetTextures[RTT_BLOOM_128] = generateRTT(shadowsize3, rgba_internal_format, rgb_format, type);
-    RenderTargetTextures[RTT_TMP_128] = generateRTT(shadowsize3, rgba_internal_format, rgb_format, type);
-    RenderTargetTextures[RTT_LENS_128] = generateRTT(shadowsize3, rgba_internal_format, rgb_format, type);
-
-    RenderTargetTextures[RTT_SP_GLOSS] = generateRTT(res, GL_RG8, GL_RG, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_SP_DIFF_COLOR] = generateRTT(res, GL_RGBA8, rgb_format, GL_UNSIGNED_BYTE);
-
-    std::vector<GLuint> somevector;
-    somevector.push_back(RenderTargetTextures[RTT_SSAO]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_NORMAL_AND_DEPTH]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_DIFFUSE]);
-    somevector.push_back(RenderTargetTextures[RTT_SPECULAR]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_COLOR]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_DIFFUSE]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_SPECULAR]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_MLAA_COLORS]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_MLAA_BLEND]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_MLAA_TMP]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_TMP1]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_TMP2]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_TMP4]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_LINEAR_DEPTH]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
-    somevector.clear();
-    
-    somevector.push_back(RenderTargetTextures[RTT_HALF1]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_HALF1_R]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_HALF2]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_HALF2_R]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_QUARTER1]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, quarter.Width, quarter.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_QUARTER2]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, quarter.Width, quarter.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_EIGHTH1]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, eighth.Width, eighth.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_EIGHTH2]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, eighth.Width, eighth.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_DISPLACE]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
-    somevector.clear();
-    
-    somevector.push_back(RenderTargetTextures[RTT_BLOOM_1024]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize0.Width, shadowsize0.Height));
-    somevector.clear();
-
-    somevector.push_back(RenderTargetTextures[RTT_BLOOM_512]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize1.Width, shadowsize1.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_TMP_512]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize1.Width, shadowsize1.Height));
-	somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_LENS_512]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize1.Width, shadowsize1.Height));
-    somevector.clear();
-    
-    somevector.push_back(RenderTargetTextures[RTT_BLOOM_256]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize2.Width, shadowsize2.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_TMP_256]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize2.Width, shadowsize2.Height));
-	somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_LENS_256]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize2.Width, shadowsize2.Height));
-    somevector.clear();
-    
-    somevector.push_back(RenderTargetTextures[RTT_BLOOM_128]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize3.Width, shadowsize3.Height));
-    somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_TMP_128]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize3.Width, shadowsize3.Height));
-	somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_LENS_128]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize3.Width, shadowsize3.Height));
-
-	somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_SP_DIFF_COLOR]);
-    somevector.push_back(RenderTargetTextures[RTT_NORMAL_AND_DEPTH]);
-    somevector.push_back(RenderTargetTextures[RTT_SP_GLOSS]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
-
-    if (CVS->isShadowEnabled())
+    if (!CVS->isDeferredEnabled())
     {
-        shadowDepthTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, UserConfigParams::m_shadows_resolution, UserConfigParams::m_shadows_resolution, 4, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 1);
-        somevector.clear();
-        m_shadow_FBO = new FrameBufferLayer(somevector, shadowDepthTex, UserConfigParams::m_shadows_resolution, UserConfigParams::m_shadows_resolution, 4);
+        // RTT is used in only deferred shading which need hdr framebuffer
+        rgba_internal_format = GL_RGBA8;
+        type = GL_UNSIGNED_BYTE;
     }
 
-    // Clear this FBO to 1s so that if no SSAO is computed we can still use it.
-    getFBO(FBO_HALF1_R).bind();
-    glClearColor(1., 1., 1., 1.);
-    glClear(GL_COLOR_BUFFER_BIT);
+    if (!use_default_fbo_only)
+    {
+        m_render_target_textures[RTT_COLOR] = generateRTT(res, rgba_internal_format, rgba_format, type);
+    }
+    if (CVS->isDeferredEnabled())
+    {
+        m_render_target_textures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RGB10_A2, GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV);
+        m_render_target_textures[RTT_TMP1] = generateRTT(res, rgba_internal_format, rgba_format, type);
+        m_render_target_textures[RTT_TMP2] = generateRTT(res, rgba_internal_format, rgba_format, type);
+        m_render_target_textures[RTT_TMP3] = generateRTT(res, rgba_internal_format, rgba_format, type);
+        m_render_target_textures[RTT_TMP4] = generateRTT(res, red_internal_format, red_format, type);
+        m_render_target_textures[RTT_LINEAR_DEPTH] = generateRTT(res, red32_internal_format, red_format, type, linear_depth_mip_levels);
+        m_render_target_textures[RTT_MLAA_COLORS] = generateRTT(res, rgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
+        m_render_target_textures[RTT_MLAA_TMP] = generateRTT(res, rgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
+        m_render_target_textures[RTT_MLAA_BLEND] = generateRTT(res, rgb_internal_format, rgb_format, GL_UNSIGNED_BYTE);
+        m_render_target_textures[RTT_SSAO] = generateRTT(res, red_internal_format, red_format, type);
+        m_render_target_textures[RTT_DISPLACE] = generateRTT(res, rgba_internal_format, rgba_format, type);
+        m_render_target_textures[RTT_DIFFUSE] = generateRTT(res, diffuse_specular_internal_format, rgb_format, type);
+        m_render_target_textures[RTT_SPECULAR] = generateRTT(res, diffuse_specular_internal_format, rgb_format, type);
 
-    getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
-    float color = 0.5;
-#if defined(USE_GLES2)
-    if (!CVS->isDefferedEnabled())
-        color = pow(color, 1. / 2.2);
-#endif
-    glClearColor(color, color, color, color);
-    glClear(GL_COLOR_BUFFER_BIT);
+        m_render_target_textures[RTT_HALF1] = generateRTT(half, rgba_internal_format, rgba_format, type);
+        m_render_target_textures[RTT_QUARTER1] = generateRTT(quarter, rgba_internal_format, rgba_format, type);
+        m_render_target_textures[RTT_EIGHTH1] = generateRTT(eighth, rgba_internal_format, rgba_format, type);
+        m_render_target_textures[RTT_HALF1_R] = generateRTT(half, red_internal_format, red_format, type);
+
+        m_render_target_textures[RTT_HALF2] = generateRTT(half, rgba_internal_format, rgba_format, type);
+        m_render_target_textures[RTT_QUARTER2] = generateRTT(quarter, rgba_internal_format, rgba_format, type);
+        m_render_target_textures[RTT_EIGHTH2] = generateRTT(eighth, rgba_internal_format, rgba_format, type);
+        m_render_target_textures[RTT_HALF2_R] = generateRTT(half, red_internal_format, red_format, type);
+
+        m_render_target_textures[RTT_BLOOM_1024] = generateRTT(shadowsize0, rgba_internal_format, rgb_format, type);
+
+        m_render_target_textures[RTT_BLOOM_512] = generateRTT(shadowsize1, rgba_internal_format, rgb_format, type);
+        m_render_target_textures[RTT_TMP_512] = generateRTT(shadowsize1, rgba_internal_format, rgb_format, type);
+        m_render_target_textures[RTT_LENS_512] = generateRTT(shadowsize1, rgba_internal_format, rgb_format, type);
+
+        m_render_target_textures[RTT_BLOOM_256] = generateRTT(shadowsize2, rgba_internal_format, rgb_format, type);
+        m_render_target_textures[RTT_TMP_256] = generateRTT(shadowsize2, rgba_internal_format, rgb_format, type);
+        m_render_target_textures[RTT_LENS_256] = generateRTT(shadowsize2, rgba_internal_format, rgb_format, type);
+
+        m_render_target_textures[RTT_BLOOM_128] = generateRTT(shadowsize3, rgba_internal_format, rgb_format, type);
+        m_render_target_textures[RTT_TMP_128] = generateRTT(shadowsize3, rgba_internal_format, rgb_format, type);
+        m_render_target_textures[RTT_LENS_128] = generateRTT(shadowsize3, rgba_internal_format, rgb_format, type);
+
+        m_render_target_textures[RTT_SP_GLOSS] = generateRTT(res, GL_RG8, GL_RG, GL_UNSIGNED_BYTE);
+        m_render_target_textures[RTT_SP_DIFF_COLOR] = generateRTT(res, GL_RGBA8, rgb_format, GL_UNSIGNED_BYTE);
+    }
+
+    std::vector<GLuint> somevector;
+    if (!use_default_fbo_only)
+    {
+        somevector.push_back(m_render_target_textures[RTT_COLOR]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, m_depth_stencil_tex, res.Width, res.Height));
+    }
+
+    if (CVS->isDeferredEnabled())
+    {
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_NORMAL_AND_DEPTH]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, m_depth_stencil_tex, res.Width, res.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_SSAO]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_DIFFUSE]);
+        somevector.push_back(m_render_target_textures[RTT_SPECULAR]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, m_depth_stencil_tex, res.Width, res.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_MLAA_COLORS]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_MLAA_BLEND]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_MLAA_TMP]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_TMP1]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, m_depth_stencil_tex, res.Width, res.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_TMP2]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, m_depth_stencil_tex, res.Width, res.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_TMP4]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_LINEAR_DEPTH]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
+        somevector.clear();
+
+        somevector.push_back(m_render_target_textures[RTT_HALF1]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_HALF1_R]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_HALF2]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_HALF2_R]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_QUARTER1]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, quarter.Width, quarter.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_QUARTER2]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, quarter.Width, quarter.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_EIGHTH1]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, eighth.Width, eighth.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_EIGHTH2]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, eighth.Width, eighth.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_DISPLACE]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, m_depth_stencil_tex, res.Width, res.Height));
+        somevector.clear();
+
+        somevector.push_back(m_render_target_textures[RTT_BLOOM_1024]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, shadowsize0.Width, shadowsize0.Height));
+        somevector.clear();
+
+        somevector.push_back(m_render_target_textures[RTT_BLOOM_512]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, shadowsize1.Width, shadowsize1.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_TMP_512]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, shadowsize1.Width, shadowsize1.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_LENS_512]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, shadowsize1.Width, shadowsize1.Height));
+        somevector.clear();
+
+        somevector.push_back(m_render_target_textures[RTT_BLOOM_256]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, shadowsize2.Width, shadowsize2.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_TMP_256]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, shadowsize2.Width, shadowsize2.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_LENS_256]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, shadowsize2.Width, shadowsize2.Height));
+        somevector.clear();
+
+        somevector.push_back(m_render_target_textures[RTT_BLOOM_128]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, shadowsize3.Width, shadowsize3.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_TMP_128]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, shadowsize3.Width, shadowsize3.Height));
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_LENS_128]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, shadowsize3.Width, shadowsize3.Height));
+
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_SP_DIFF_COLOR]);
+        somevector.push_back(m_render_target_textures[RTT_NORMAL_AND_DEPTH]);
+        somevector.push_back(m_render_target_textures[RTT_SP_GLOSS]);
+        m_frame_buffers.push_back(new FrameBuffer(somevector, m_depth_stencil_tex, res.Width, res.Height));
+
+        if (CVS->isShadowEnabled())
+        {
+            m_shadow_depth_tex = generateRTT3D(GL_TEXTURE_2D_ARRAY, UserConfigParams::m_shadows_resolution, UserConfigParams::m_shadows_resolution, 4, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 1);
+            somevector.clear();
+            m_shadow_fbo = new FrameBufferLayer(somevector, m_shadow_depth_tex, UserConfigParams::m_shadows_resolution, UserConfigParams::m_shadows_resolution, 4);
+        }
+        // Clear this FBO to 1s so that if no SSAO is computed we can still use it.
+        getFBO(FBO_HALF1_R).bind();
+        glClearColor(1., 1., 1., 1.);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 RTT::~RTT()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDeleteTextures(RTT_COUNT, RenderTargetTextures);
-    glDeleteTextures(1, &DepthStencilTexture);
+    glDeleteTextures(RTT_COUNT, m_render_target_textures);
+    glDeleteTextures(1, &m_depth_stencil_tex);
     if (CVS->isShadowEnabled())
     {
-        delete m_shadow_FBO;
-        glDeleteTextures(1, &shadowDepthTex);
+        delete m_shadow_fbo;
+        glDeleteTextures(1, &m_shadow_depth_tex);
     }
 }
 

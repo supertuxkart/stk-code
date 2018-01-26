@@ -83,7 +83,7 @@ std::vector<std::pair<SPShader*, std::vector<std::pair<std::array<GLuint, 6>,
     std::vector<std::pair<SPMeshBuffer*, int/*material_id*/> > > > > >
     g_final_draw_calls[DCT_FOR_VAO];
 // ----------------------------------------------------------------------------
-std::unordered_map<unsigned, std::pair<video::SColorf,
+std::unordered_map<unsigned, std::pair<core::vector3df,
     std::unordered_set<SPMeshBuffer*> > > g_glow_meshes;
 // ----------------------------------------------------------------------------
 std::unordered_set<SPMeshBuffer*> g_instances;
@@ -186,7 +186,7 @@ void displaceShaderInit(SPShader* shader)
     shader->linkShaderFiles(RP_RESERVED);
     shader->use(RP_RESERVED);
     shader->addBasicUniforms(RP_RESERVED);
-    shader->addUniform("direction", typeid(std::array<float, 4>), RP_RESERVED);
+    shader->addAllUniforms(RP_RESERVED);
     shader->setUseFunction([]()->void
         {
             glEnable(GL_DEPTH_TEST);
@@ -199,12 +199,9 @@ void displaceShaderInit(SPShader* shader)
             g_stk_sbr->getRTTs()->getFBO(FBO_DISPLACE).bind(),
             glClear(GL_COLOR_BUFFER_BIT);
         }, RP_RESERVED);
-    shader->addCustomPrefilledTextures(ST_BILINEAR,
-        GL_TEXTURE_2D, "displacement_tex", []()->GLuint
-        {
-            return irr_driver->getTexture(FileManager::TEXTURE,
-                "displace.png")->getOpenGLTextureName();
-        }, RP_RESERVED);
+    SPShaderManager::addPrefilledTexturesToShader(shader,
+        {{ "displacement_tex", "displace.png", false/*srgb*/, ST_BILINEAR }},
+        RP_RESERVED);
     shader->addCustomPrefilledTextures(ST_BILINEAR,
         GL_TEXTURE_2D, "mask_tex", []()->GLuint
         {
@@ -327,7 +324,7 @@ void loadShaders()
 
     // Displace shader is not specifiable in XML due to complex callback
     std::shared_ptr<SPShader> sps;
-    if (CVS->isDefferedEnabled())
+    if (CVS->isDeferredEnabled())
     {
         // This displace shader will be drawn the last in transparent pass
         sps = std::make_shared<SPShader>("displace", displaceShaderInit,
@@ -345,7 +342,7 @@ void loadShaders()
     // ========================================================================
     // Glow shader
     // ========================================================================
-    if (CVS->isDefferedEnabled())
+    if (CVS->isDeferredEnabled())
     {
         sps = std::make_shared<SPShader>
             ("sp_glow_shader", [](SPShader* shader)
@@ -357,7 +354,7 @@ void loadShaders()
                 shader->linkShaderFiles(RP_1ST);
                 shader->use(RP_1ST);
                 shader->addBasicUniforms(RP_1ST);
-                shader->addUniform("col", typeid(irr::video::SColorf), RP_1ST);
+                shader->addAllUniforms(RP_1ST);
             });
         SPShaderManager::get()->addSPShader(sps->getName(), sps);
         g_glow_shader = sps.get();
@@ -740,7 +737,7 @@ void prepareDrawCalls()
     g_skinning_mesh.clear();
     mathPlaneFrustumf(g_frustums[0], irr_driver->getProjViewMatrix());
     g_handle_shadow = Track::getCurrentTrack() &&
-        Track::getCurrentTrack()->hasShadows() && CVS->isDefferedEnabled() &&
+        Track::getCurrentTrack()->hasShadows() && CVS->isDeferredEnabled() &&
         CVS->isShadowEnabled();
 
     if (g_handle_shadow)
@@ -922,14 +919,15 @@ void addObject(SPMeshNode* node)
                 }
                 mb->addInstanceData(id, (DrawCallType)dc_type);
                 if (UserConfigParams::m_glow && node->hasGlowColor() &&
-                    CVS->isDefferedEnabled() && dc_type == DCT_NORMAL)
+                    CVS->isDeferredEnabled() && dc_type == DCT_NORMAL)
                 {
                     video::SColorf gc = node->getGlowColor();
                     unsigned key = gc.toSColor().color;
                     auto ret = g_glow_meshes.find(key);
                     if (ret == g_glow_meshes.end())
                     {
-                        g_glow_meshes[key] = std::make_pair(gc,
+                        g_glow_meshes[key] = std::make_pair(
+                            core::vector3df(gc.r, gc.g, gc.b),
                             std::unordered_set<SPMeshBuffer*>());
                     }
                     g_glow_meshes.at(key).second.insert(mb);

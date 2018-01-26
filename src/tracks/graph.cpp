@@ -350,7 +350,7 @@ void Graph::createMeshSP(bool show_invisible, bool enable_transparency,
     spmb->recalculateBoundingBox();
     std::string shader_name = enable_transparency ? "alphablend" : "unlit";
 #ifndef SERVER_ONLY
-    if (!CVS->isDefferedEnabled())
+    if (!CVS->isDeferredEnabled())
     {
         shader_name = "solid";
     }

@@ -41,7 +41,6 @@ enum RenderPass: unsigned int;
 class SPShaderManager : public NoCopy
 {
 public:
-
     struct PassInfo
     {
         std::function<void()> m_use_function;
@@ -53,8 +52,6 @@ public:
         std::string m_fragment_shader;
 
         std::string m_skinned_mesh_shader;
-
-        std::vector<std::pair<std::string, std::type_index> > m_uniforms;
 
         std::vector<std::tuple<std::string, std::string, bool, SamplerType> >
             m_prefilled_textures;
@@ -87,8 +84,6 @@ private:
 
     std::vector<std::shared_ptr<SPShader> > m_official_shaders;
 
-    std::unordered_map<std::string, std::type_index> m_official_types;
-
     std::unordered_map<std::string, SamplerType> m_official_sampler_types;
 
     std::unordered_map<std::string, std::function<void(SPUniformAssigner*)> >
@@ -113,14 +108,6 @@ private:
                                             const std::array<PassInfo, 2>& pi,
                                             const UniformAssigners& ua,
                                             bool skinned);
-    // ------------------------------------------------------------------------
-    static void addUniformsToShader(SPShader* s,
-        const std::vector<std::pair<std::string, std::type_index> >& u,
-        RenderPass rp);
-    // ------------------------------------------------------------------------
-    static void addPrefilledTexturesToShader(SPShader* s,
-        const std::vector<std::tuple<std::string, std::string, bool,
-        SamplerType> >& t, RenderPass rp);
 
 public:
     // ------------------------------------------------------------------------
@@ -138,6 +125,10 @@ public:
         delete m_spsm;
         m_spsm = NULL;
     }
+    // ------------------------------------------------------------------------
+    static void addPrefilledTexturesToShader(SPShader* s,
+        const std::vector<std::tuple<std::string, std::string, bool,
+        SamplerType> >& t, RenderPass rp);
     // ------------------------------------------------------------------------
     SPShaderManager();
     // ------------------------------------------------------------------------

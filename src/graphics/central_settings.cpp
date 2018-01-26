@@ -384,7 +384,7 @@ bool CentralVideoSettings::isTextureCompressionEnabled() const
     return supportsTextureCompression() && UserConfigParams::m_texture_compression;
 }
 
-bool CentralVideoSettings::isDefferedEnabled() const
+bool CentralVideoSettings::isDeferredEnabled() const
 {
     return UserConfigParams::m_dynamic_lights && !GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_ADVANCED_PIPELINE);
 }

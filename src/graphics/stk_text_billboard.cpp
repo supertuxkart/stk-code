@@ -35,14 +35,14 @@ STKTextBillboard::STKTextBillboard(const video::SColor& color_top,
 {
     using namespace SP;
     m_color_top = color_top;
-    if (CVS->isDefferedEnabled())
+    if (CVS->isDeferredEnabled())
     {
         m_color_top.setRed(srgb255ToLinear(m_color_top.getRed()));
         m_color_top.setGreen(srgb255ToLinear(m_color_top.getGreen()));
         m_color_top.setBlue(srgb255ToLinear(m_color_top.getBlue()));
     }
     m_color_bottom = color_bottom;
-    if (CVS->isDefferedEnabled())
+    if (CVS->isDeferredEnabled())
     {
         video::SColorf tmp(m_color_bottom);
         m_color_bottom.setRed(srgb255ToLinear(m_color_bottom.getRed()));
