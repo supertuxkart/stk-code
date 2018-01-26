@@ -108,10 +108,6 @@ private:
                                             const std::array<PassInfo, 2>& pi,
                                             const UniformAssigners& ua,
                                             bool skinned);
-    // ------------------------------------------------------------------------
-    static void addPrefilledTexturesToShader(SPShader* s,
-        const std::vector<std::tuple<std::string, std::string, bool,
-        SamplerType> >& t, RenderPass rp);
 
 public:
     // ------------------------------------------------------------------------
@@ -129,6 +125,10 @@ public:
         delete m_spsm;
         m_spsm = NULL;
     }
+    // ------------------------------------------------------------------------
+    static void addPrefilledTexturesToShader(SPShader* s,
+        const std::vector<std::tuple<std::string, std::string, bool,
+        SamplerType> >& t, RenderPass rp);
     // ------------------------------------------------------------------------
     SPShaderManager();
     // ------------------------------------------------------------------------

@@ -199,12 +199,9 @@ void displaceShaderInit(SPShader* shader)
             g_stk_sbr->getRTTs()->getFBO(FBO_DISPLACE).bind(),
             glClear(GL_COLOR_BUFFER_BIT);
         }, RP_RESERVED);
-    shader->addCustomPrefilledTextures(ST_BILINEAR,
-        GL_TEXTURE_2D, "displacement_tex", []()->GLuint
-        {
-            return irr_driver->getTexture(FileManager::TEXTURE,
-                "displace.png")->getOpenGLTextureName();
-        }, RP_RESERVED);
+    SPShaderManager::addPrefilledTexturesToShader(shader,
+        {{ "displacement_tex", "displace.png", false/*srgb*/, ST_BILINEAR }},
+        RP_RESERVED);
     shader->addCustomPrefilledTextures(ST_BILINEAR,
         GL_TEXTURE_2D, "mask_tex", []()->GLuint
         {
