@@ -13,7 +13,7 @@
          is used to show that the skidding bonus is now available,
          the maximum is used when the skid bonus is applied to the kart -->
     <rate      min="1250"
-               max="2500"          />
+               max="1250"          />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
     <lifetime  min="55"
