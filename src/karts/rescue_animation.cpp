@@ -89,8 +89,6 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
         if (UserConfigParams::m_arena_ai_stats)
             world->increaseRescueCount();
     }
-    World::getWorld()->moveKartAfterRescue(m_kart);
-    Physics::getInstance()->removeKart(m_kart);
 };   // RescueAnimation
 
 
@@ -99,15 +97,7 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
  */
 RescueAnimation::~RescueAnimation()
 {
-    // If m_timer >=0, this object is deleted because the kart
-    // is deleted (at the end of a race), which means that
-    // world is in the process of being deleted. In this case
-    // we can't call removeKartAfterRescue() or getPhysics anymore.
-    if (m_timer < 0)
-    {
-        Physics::getInstance()->addKart(m_kart);
-    }
-
+    
     m_kart->getNode()->removeChild(m_referee->getSceneNode());
     delete m_referee;
     m_referee = NULL;
@@ -129,6 +119,7 @@ RescueAnimation::~RescueAnimation()
 // Determine maximum rescue height with up-raycast
 float RescueAnimation::MaximumHeight() {
     float hit_dest = 9999999.9f;
+
     Vec3 hit;
     const Material* m = NULL;
     Vec3 to = m_up_vector * 10000.0f;
