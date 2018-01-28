@@ -235,7 +235,7 @@ void World::init()
     {
         // In case that the server is running with gui or watching replay,
         // create a camera and attach it to the first kart.
-        Camera::createCamera(World::getWorld()->getKart(0));
+        Camera::createCamera(World::getWorld()->getKart(0), 0);
 
     }
 }   // init
@@ -354,13 +354,16 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     case RaceManager::KT_PLAYER:
     {
         controller = new LocalPlayerController(new_kart,
-                         StateManager::get()->getActivePlayer(local_player_id));
+
+                         local_player_id);
+
         const float hue = StateManager::get()->getActivePlayer(local_player_id)
             ->getConstProfile()->getDefaultKartColor();
         if (hue > 0.0f)
         {
             ri->setHue(hue);
         }
+
         m_num_players ++;
         break;
     }
