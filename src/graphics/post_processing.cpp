@@ -431,6 +431,7 @@ public:
     void render(const FrameBuffer &fbo, GLuint rtt, float vignette_weight)
     {
         fbo.bind();
+        glClear(GL_COLOR_BUFFER_BIT);
         setTextureUnits(rtt);
         drawFullScreenEffect(vignette_weight);
     }   // render
@@ -1088,7 +1089,7 @@ void PostProcessing::renderSSAO(const FrameBuffer& linear_depth_framebuffer,
 }   // renderSSAO
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderMotionBlur(unsigned , const FrameBuffer &in_fbo,
+void PostProcessing::renderMotionBlur(const FrameBuffer &in_fbo,
                                       FrameBuffer &out_fbo,
                                       GLuint depth_stencil_texture)
 {
@@ -1353,14 +1354,15 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         PROFILER_POP_CPU_MARKER();
     }
 
-    //computeLogLuminance(in_rtt);
     {
         PROFILER_PUSH_CPU_MARKER("- Tonemap", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TONEMAP));
 		// only enable vignette during race
+
+        out_fbo = &rtts->getFBO(FBO_RGBA_1);
         ToneMapShader::getInstance()->render(*out_fbo, in_fbo->getRTT()[0],
                                              isRace ? 1.0f : 0.0f);
-        std::swap(in_fbo, out_fbo);
+        in_fbo = &rtts->getFBO(FBO_RGBA_2);
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -1371,8 +1373,9 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         if (isRace && UserConfigParams::m_motionblur && World::getWorld() &&
             m_boost_time.at(Camera::getActiveCamera()->getIndex()) > 0.0f) // motion blur
         {
-            renderMotionBlur(0, *in_fbo, *out_fbo, irr_driver->getDepthStencilTexture());
-            std::swap(in_fbo, out_fbo);
+            in_fbo = &rtts->getFBO(FBO_RGBA_1);
+            out_fbo = &rtts->getFBO(FBO_RGBA_2);
+            renderMotionBlur(*in_fbo, *out_fbo, irr_driver->getDepthStencilTexture());
         }
         PROFILER_POP_CPU_MARKER();
     }
@@ -1382,25 +1385,19 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         PROFILER_PUSH_CPU_MARKER("- Lightning", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_LIGHTNING));
         Weather* weather = Weather::getInstance();
-        if ( weather && weather->shouldLightning() )
+        if (weather && weather->shouldLightning())
         {
             renderLightning(weather->getIntensity());
         }
         PROFILER_POP_CPU_MARKER();
     }
 
-    out_fbo = &rtts->getFBO(FBO_MLAA_COLORS);
-    out_fbo->bind();
-    renderPassThrough(in_fbo->getRTT()[0],
-                      out_fbo->getWidth(),
-                      out_fbo->getHeight());
-
     if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
     {
         PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MLAA));
-        applyMLAA(rtts->getFBO(FBO_MLAA_TMP),
-                  rtts->getFBO(FBO_MLAA_BLEND),
+        applyMLAA(*in_fbo,
+                  rtts->getFBO(FBO_RGBA_3),
                   *out_fbo);
         PROFILER_POP_CPU_MARKER();
     }

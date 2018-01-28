@@ -96,7 +96,7 @@ public:
                    const FrameBuffer& mlaa_blend_framebuffer,
                    const FrameBuffer& mlaa_colors_framebuffer);
 
-    void renderMotionBlur(unsigned cam, const FrameBuffer &in_fbo,
+    void renderMotionBlur(const FrameBuffer &in_fbo,
                           FrameBuffer &out_fbo,
                           GLuint depth_stencil_texture);
     void renderGlow(const FrameBuffer& glow_framebuffer,
