@@ -148,7 +148,7 @@ void ShaderBasedRenderer::renderSSAO() const
 void ShaderBasedRenderer::renderGlow() const
 {
     irr_driver->getSceneManager()->setCurrentRendertime(scene::ESNRP_SOLID);
-    m_rtts->getFBO(FBO_TMP1_WITH_DS).bind();
+    m_rtts->getFBO(FBO_RGBA_1).bind();
     glClearStencil(0);
     glClearColor(0, 0, 0, 0);
     glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -367,7 +367,7 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GLOW));
         irr_driver->setPhase(GLOW_PASS);
         renderGlow();
-        m_post_processing->renderGlow(m_rtts->getFBO(FBO_TMP1_WITH_DS),
+        m_post_processing->renderGlow(m_rtts->getFBO(FBO_RGBA_1),
                                       m_rtts->getFBO(FBO_HALF1),
                                       m_rtts->getFBO(FBO_QUARTER1),
                                       m_rtts->getFBO(FBO_COLORS));

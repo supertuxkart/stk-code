@@ -1197,17 +1197,11 @@ void PostProcessing::applyMLAA(const FrameBuffer& mlaa_tmp_framebuffer,
                                      1.0f / UserConfigParams::m_height);
 
     mlaa_tmp_framebuffer.bind();
-    glEnable(GL_STENCIL_TEST);
     glClearColor(0.0, 0.0, 0.0, 1.0);
-    glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    glStencilFunc(GL_ALWAYS, 1, ~0);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     // Pass 1: color edge detection
     MLAAColorEdgeDetectionSHader::getInstance()->render(PIXEL_SIZE, mlaa_colors_framebuffer.getRTT()[0]);
-
-    glStencilFunc(GL_EQUAL, 1, ~0);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
     // Pass 2: blend weights
     mlaa_blend_framebuffer.bind();
@@ -1224,8 +1218,6 @@ void PostProcessing::applyMLAA(const FrameBuffer& mlaa_tmp_framebuffer,
     MLAAGatherSHader::getInstance()
         ->render(PIXEL_SIZE, mlaa_blend_framebuffer.getRTT()[0], mlaa_tmp_framebuffer.getRTT()[0]);
 
-    // Done.
-    glDisable(GL_STENCIL_TEST);
 }   // applyMLAA
 
 // ----------------------------------------------------------------------------

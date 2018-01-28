@@ -128,7 +128,6 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
         m_render_target_textures[RTT_HALF1] = generateRTT(half, rgba_internal_format, rgba_format, type);
         m_render_target_textures[RTT_HALF1_R] = generateRTT(half, red_internal_format, red_format, type);
         m_render_target_textures[RTT_HALF2] = generateRTT(half, rgba_internal_format, rgba_format, type);
-        m_render_target_textures[RTT_DISPLACE] = generateRTT(res, rgba_internal_format, rgba_format, type);
 
         if (UserConfigParams::m_mlaa)
         {
@@ -187,7 +186,7 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
 
         somevector.clear();
         somevector.push_back(m_render_target_textures[RTT_SP_DIFF_COLOR]);
-        m_frame_buffers[FBO_RGBA_1] = new FrameBuffer(somevector, res.Width, res.Height);
+        m_frame_buffers[FBO_RGBA_1] = new FrameBuffer(somevector, m_depth_stencil_tex, res.Width, res.Height);
 
         somevector.clear();
         somevector.push_back(m_render_target_textures[RTT_RGBA_2]);
@@ -213,10 +212,6 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
         somevector.clear();
         somevector.push_back(m_render_target_textures[RTT_HALF2]);
         m_frame_buffers[FBO_HALF2] = new FrameBuffer(somevector, half.Width, half.Height);
-
-        somevector.clear();
-        somevector.push_back(m_render_target_textures[RTT_DISPLACE]);
-        m_frame_buffers[FBO_DISPLACE] = new FrameBuffer(somevector, m_depth_stencil_tex, res.Width, res.Height);
 
         if (m_render_target_textures[RTT_RGBA_3] != 0)
         {

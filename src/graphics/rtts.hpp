@@ -36,7 +36,6 @@ enum TypeFBO
     FBO_HALF1_R,
     FBO_HALF1,
     FBO_HALF2,
-    FBO_DISPLACE,
 
     FBO_RGBA_3, // MLAA
 
@@ -75,7 +74,6 @@ enum TypeRTT : unsigned int
     RTT_HALF1,
     RTT_HALF1_R,
     RTT_HALF2,
-    RTT_DISPLACE,
 
     RTT_RGBA_3,
 
