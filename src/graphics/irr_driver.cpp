@@ -253,10 +253,10 @@ void IrrDriver::updateConfigIfRelevant()
 }   // updateConfigIfRelevant
 core::recti IrrDriver::GetSplitscreenWindow(int WindowNum) {
     const int playernum = race_manager->getNumLocalPlayers();
-    const float Sqrt = sqrt(playernum);
+    const float playernum_sqrt = sqrt(playernum);
 	
-    const int rows = UserConfigParams::Split_Screen_Horizontally ? ceil(Sqrt) : round(Sqrt);
-    const int cols = UserConfigParams::Split_Screen_Horizontally ? round(Sqrt) : ceil(Sqrt);
+    const int rows = UserConfigParams::Split_Screen_Horizontally ? ceil(playernum_sqrt) : round(playernum_sqrt);
+    const int cols = UserConfigParams::Split_Screen_Horizontally ? round(playernum_sqrt) : ceil(playernum_sqrt);
 
     const int width_of_space = floor(irr_driver->getActualScreenSize().Width / cols);
     const int height_of_space = floor(irr_driver->getActualScreenSize().Height / rows);
