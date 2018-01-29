@@ -61,7 +61,7 @@ namespace scene
 		virtual void animateMesh(f32 frame, f32 blend);
 
 		//! Preforms a software skin on this mesh based of joint positions
-		virtual void skinMesh(f32 strength=1.f, SkinningCallback sc = NULL, int offset = -1);
+		virtual void skinMesh(f32 strength=1.f);
 
 		//! returns amount of mesh buffers.
 		virtual u32 getMeshBufferCount() const;
@@ -112,9 +112,6 @@ namespace scene
 
 		//! Sets Interpolation Mode
 		virtual void setInterpolationMode(E_INTERPOLATION_MODE mode);
-
-		//! Convertes the mesh to contain tangent information
-		virtual void convertMeshToTangents(bool(*predicate)(IMeshBuffer*));
 
 		//! Does the mesh have no animation
 		virtual bool isStatic();
@@ -173,9 +170,11 @@ namespace scene
 
 		void computeWeightInfluence(SJoint *joint, size_t &index, WeightInfluence& wi);
 
-		u32 getTotalJoints() const { return m_total_joints; }
+		void buildAllGlobalAnimatedMatrices(SJoint *Joint=0, SJoint *ParentJoint=0);
 
 		f32 AnimationFrames;
+
+		core::array<SJoint*> RootJoints;
 
 private:
 		void toStaticPose();
@@ -186,8 +185,6 @@ private:
 
 		void buildAllLocalAnimatedMatrices();
 
-		void buildAllGlobalAnimatedMatrices(SJoint *Joint=0, SJoint *ParentJoint=0);
-
 		void getFrameData(f32 frame, SJoint *Node,
 				core::vector3df &position, s32 &positionHint,
 				core::vector3df &scale, s32 &scaleHint,
@@ -195,8 +192,7 @@ private:
 
 		void calculateGlobalMatrices(SJoint *Joint,SJoint *ParentJoint);
 
-		void skinJoint(SJoint *Joint, SJoint *ParentJoint, f32 strength=1.f,
-						SkinningCallback sc = NULL, int offset = -1);
+		void skinJoint(SJoint *Joint, SJoint *ParentJoint, f32 strength=1.f);
 
 		void calculateTangents(core::vector3df& normal,
 			core::vector3df& tangent, core::vector3df& binormal,
@@ -211,7 +207,6 @@ private:
 		core::array<SSkinMeshBuffer*> LocalBuffers;
 
 		core::array<SJoint*> AllJoints;
-		core::array<SJoint*> RootJoints;
 
 		core::array< core::array<bool> > Vertices_Moved;
 
@@ -228,8 +223,6 @@ private:
 		bool PreparedForSkinning;
 		bool AnimateNormals;
 		bool HardwareSkinning;
-		u32 m_total_joints;
-		u32 m_current_joint;
 	};
 
 } // end namespace scene

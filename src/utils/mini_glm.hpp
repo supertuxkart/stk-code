@@ -19,6 +19,7 @@
 #define HEADER_MINI_GLM_HPP
 
 #include "LinearMath/btQuaternion.h"
+#include "utils/vec3.hpp"
 
 #include <array>
 #include <cassert>
@@ -278,6 +279,53 @@ namespace MiniGLM
         return packed;
     }   // fourFloatsTo1010102
     // ------------------------------------------------------------------------
+    inline std::array<short, 4> vertexType2101010RevTo4HF(uint32_t packed)
+    {
+        std::array<float, 4> ret;
+        int part = packed & 1023;
+        if (part & 512)
+        {
+            ret[0] = (float)(1024 - part) * (-1.0f / 512.0f);
+        }
+        else
+        {
+            ret[0] = (float)part * (1.0f / 511.0f);
+        }
+        part = (packed >> 10) & 1023;
+        if (part & 512)
+        {
+            ret[1] = (float)(1024 - part) * (-1.0f / 512.0f);
+        }
+        else
+        {
+            ret[1] = (float)part * (1.0f / 511.0f);
+        }
+        part = (packed >> 20) & 1023;
+        if (part & 512)
+        {
+            ret[2] = (float)(1024 - part) * (-1.0f / 512.0f);
+        }
+        else
+        {
+            ret[2] = (float)part * (1.0f / 511.0f);
+        }
+        part = (packed >> 30) & 3;
+        if (part & 2)
+        {
+            ret[3] = (float)(4 - part) * (-1.0f / 2.0f);
+        }
+        else
+        {
+            ret[3] = (float)part;
+        }
+        std::array<short, 4> result;
+        for (int i = 0; i < 4; i++)
+        {
+            result[i] = toFloat16(ret[i]);
+        }
+        return result;
+    }   // vertexType2101010RevTo4HF
+    // ------------------------------------------------------------------------
     inline std::array<float, 4> extractNormalizedSignedFloats(uint32_t packed,
         bool calculate_w = false)
     {
@@ -368,6 +416,72 @@ namespace MiniGLM
         btQuaternion ret(out[0], out[1], out[2], out[3]);
         return ret.normalize();
     }   // decompressbtQuaternion
+    // ------------------------------------------------------------------------
+    inline core::quaternion getQuaternion(const core::matrix4& m)
+    {
+        Vec3 row[3];
+        memcpy(&row[0][0], &m[0], 12);
+        memcpy(&row[1][0], &m[4], 12);
+        memcpy(&row[2][0], &m[8], 12);
+        Vec3 q;
+        float root = row[0].x() + row[1].y() + row[2].z();
+        const float trace = root;
+        if (trace > 0.0f)
+        {
+            root = sqrtf(trace + 1.0f);
+            q[3] = 0.5f * root;
+            root = 0.5f / root;
+            q[0] = root * (row[1].z() - row[2].y());
+            q[1] = root * (row[2].x() - row[0].z());
+            q[2] = root * (row[0].y() - row[1].x());
+        }
+        else
+        {
+            static int next[3] = {1, 2, 0};
+            int i = 0;
+            int j = 0;
+            int k = 0;
+            if (row[1].y() > row[0].x())
+            {
+                i = 1;
+            }
+            if (row[2].z() > row[i][i])
+            {
+                i = 2;
+            }
+            j = next[i];
+            k = next[j];
+
+            root = sqrtf(row[i][i] - row[j][j] - row[k][k] + 1.0f);
+            q[i] = 0.5f * root;
+            root = 0.5f / root;
+            q[j] = root * (row[i][j] + row[j][i]);
+            q[k] = root * (row[i][k] + row[k][i]);
+            q[3] = root * (row[j][k] - row[k][j]);
+        }
+        return core::quaternion(q[0], q[1], q[2], q[3]).normalize();
+    }
+    // ------------------------------------------------------------------------
+    inline uint32_t quickTangent(uint32_t packed_normal)
+    {
+        core::vector3df normal = decompressVector3(packed_normal);
+        core::vector3df tangent;
+        core::vector3df c1 =
+            normal.crossProduct(core::vector3df(0.0f, 0.0f, 1.0f));
+        core::vector3df c2 =
+            normal.crossProduct(core::vector3df(0.0f, 1.0f, 0.0f));
+        if (c1.getLengthSQ() > c2.getLengthSQ())
+        {
+            tangent = c1;
+        }
+        else
+        {
+            tangent = c2;
+        }
+        tangent.normalize();
+        // Assume bitangent sign is positive 1.0f
+        return compressVector3(tangent) | 1 << 30;
+    }   // quickTangent
     // ------------------------------------------------------------------------
     void unitTesting();
 }

@@ -416,7 +416,7 @@ IAnimatedMeshSceneNode* CSceneManager::addAnimatedMeshSceneNode(IAnimatedMesh* m
 	IAnimatedMeshSceneNode* node =
 		new CAnimatedMeshSceneNode(mesh, parent, this, id, position, rotation, scale);
 	node->drop();
-
+	node->setMesh(mesh);
 	return node;
 }
 

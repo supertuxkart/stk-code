@@ -409,6 +409,9 @@ public:
      *  minutes(!) in debug mode to be computed. */
     static bool        m_dont_load_navmesh;
 
+    /** Static helper function to pre-upload vertex buffer in spm. */
+    static void uploadNodeVertexBuffer(scene::ISceneNode *node);
+
     static const float NOHIT;
 
                        Track             (const std::string &filename);
@@ -420,9 +423,6 @@ public:
     void               createPhysicsModel(unsigned int main_track_count);
     void               update(float dt);
     void               reset();
-    void               adjustForFog(scene::ISceneNode *node);
-    void               adjustForFog(scene::IMesh* mesh,
-                                    scene::ISceneNode* parent_scene_node);
     void               itemCommand(const XMLNode *node);
     core::stringw      getName() const;
     core::stringw      getSortName() const;

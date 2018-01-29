@@ -43,6 +43,7 @@ ContextManagerEGL::ContextManagerEGL()
     m_egl_version = 0;
     m_is_legacy_device = false;
     m_initialized = false;
+    eglGetPlatformDisplay = NULL;
 
     memset(&m_creation_params, 0, sizeof(ContextEGLParams));
 }
@@ -61,8 +62,17 @@ bool ContextManagerEGL::init(const ContextEGLParams& params)
 
     m_creation_params = params;
     m_egl_window = m_creation_params.window;
+    
+    bool success = initExtensions();
+    
+    if (!success)
+    {
+        os::Printer::log("Error: Could not initialize EGL extensions.\n");
+        close();
+        return false;
+    }
 
-    bool success = initDisplay();
+    success = initDisplay();
 
     if (!success)
     {
@@ -142,6 +152,23 @@ bool ContextManagerEGL::init(const ContextEGLParams& params)
 }
 
 
+bool ContextManagerEGL::initExtensions()
+{
+    if (hasEGLExtension("EGL_KHR_platform_base"))
+    {
+        eglGetPlatformDisplay = (eglGetPlatformDisplay_t)
+                                     eglGetProcAddress("eglGetPlatformDisplay");
+    }
+    else if (hasEGLExtension("EGL_EXT_platform_base"))
+    {
+        eglGetPlatformDisplay = (eglGetPlatformDisplay_t)
+                                  eglGetProcAddress("eglGetPlatformDisplayEXT");
+    }
+    
+    return true;
+}
+
+
 bool ContextManagerEGL::initDisplay()
 {
     EGLNativeDisplayType display = m_creation_params.display;
@@ -150,12 +177,38 @@ bool ContextManagerEGL::initDisplay()
     display = EGL_DEFAULT_DISPLAY;
 #endif
 
-    if (display != EGL_DEFAULT_DISPLAY)
+    EGLenum platform = 0;
+    
+    switch (m_creation_params.platform)
+    {
+    case CEGL_PLATFORM_ANDROID:
+        platform = EGL_PLATFORM_ANDROID;
+        break;
+    case CEGL_PLATFORM_GBM:
+        platform = EGL_PLATFORM_GBM;
+        break;
+    case CEGL_PLATFORM_WAYLAND:
+        platform = EGL_PLATFORM_WAYLAND;
+        break;
+    case CEGL_PLATFORM_X11:
+        platform = EGL_PLATFORM_X11;
+        break;
+    case CEGL_PLATFORM_DEFAULT:
+        break;
+    }
+    
+    if (m_creation_params.platform != CEGL_PLATFORM_DEFAULT &&
+        eglGetPlatformDisplay != NULL)
+    {
+        m_egl_display = eglGetPlatformDisplay(platform, (void*)display, NULL);
+    }
+
+    if (m_egl_display == EGL_NO_DISPLAY)
     {
         m_egl_display = eglGetDisplay(display);
     }
 
-    if (m_egl_display == EGL_NO_DISPLAY)
+    if (m_egl_display == EGL_NO_DISPLAY && display != EGL_DEFAULT_DISPLAY)
     {
         m_egl_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     }
@@ -241,7 +294,7 @@ bool ContextManagerEGL::chooseConfig()
         config_attribs[9] = 1; //EGL_DEPTH_SIZE
         
         success = eglChooseConfig(m_egl_display, &config_attribs[0],
-                                           &m_egl_config, 1, &num_configs);
+                                  &m_egl_config, 1, &num_configs);
     }
 
     if (!success || m_egl_config == NULL || num_configs < 1)
@@ -267,13 +320,13 @@ bool ContextManagerEGL::createSurface()
     
     std::vector<EGLint> attribs;
 
-    if (m_creation_params.opengl_api == CEGL_API_OPENGL)
+    if (m_creation_params.opengl_api == CEGL_API_OPENGL &&
+        m_creation_params.handle_srgb == true)
     {
         if (hasEGLExtension("EGL_KHR_gl_colorspace") || m_egl_version >= 150)
         {
             attribs.push_back(EGL_GL_COLORSPACE);
-            attribs.push_back(m_creation_params.handle_srgb ? 
-                             EGL_GL_COLORSPACE_SRGB : EGL_GL_COLORSPACE_LINEAR);
+            attribs.push_back(EGL_GL_COLORSPACE_SRGB);
             colorspace_attr_pos = attribs.size() - 1;
         }
     }
@@ -306,8 +359,7 @@ bool ContextManagerEGL::createSurface()
         }
     }
         
-    if (m_egl_surface == EGL_NO_SURFACE && colorspace_attr_pos > 0 &&
-        m_creation_params.handle_srgb == true)
+    if (m_egl_surface == EGL_NO_SURFACE && colorspace_attr_pos > 0)
     {
         attribs[colorspace_attr_pos] = EGL_GL_COLORSPACE_LINEAR;
         

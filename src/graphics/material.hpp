@@ -23,6 +23,7 @@
 #include "utils/no_copy.hpp"
 #include "utils/random_generator.hpp"
 
+#include <array>
 #include <assert.h>
 #include <map>
 #include <string>
@@ -45,27 +46,6 @@ class ParticleKind;
 class Material : public NoCopy
 {
 public:
-    enum ShaderType
-    {
-        SHADERTYPE_SOLID = 0,
-        SHADERTYPE_SOLID_SKINNED_MESH,
-        SHADERTYPE_ALPHA_TEST,
-        SHADERTYPE_ALPHA_TEST_SKINNED_MESH,
-        SHADERTYPE_ALPHA_BLEND,
-        SHADERTYPE_ADDITIVE,
-        SHADERTYPE_SOLID_UNLIT,
-        SHADERTYPE_SOLID_UNLIT_SKINNED_MESH,
-        /** Effect that makes grass wave as in the wind */
-        SHADERTYPE_VEGETATION,
-        SHADERTYPE_WATER,
-        SHADERTYPE_SPHERE_MAP,
-        SHADERTYPE_NORMAL_MAP,
-        SHADERTYPE_NORMAL_MAP_SKINNED_MESH,
-        SHADERTYPE_DETAIL_MAP,
-        SHADERTYPE_SPLATTING,
-        SHADERTYPE_COUNT,
-    };
-
     enum ParticleConditions
     {
         EMIT_ON_DRIVE = 0,
@@ -91,22 +71,21 @@ private:
     std::string      m_texname;
 
     std::string      m_full_path;
-    
-    std::string      m_original_full_path;
 
     /** Name of a special sfx to play when a kart is on this terrain, or
      *  "" if no special sfx exists. */
     std::string      m_sfx_name;
 
-    ShaderType       m_shader_type;
+    /** Either ' ' (no mirroring), 'U' or 'V' if a texture needs to be
+     *  mirrored when driving in reverse. Typically used for arrows indicating
+     *  the direction. */
+    char             m_mirror_axis_when_reverse;
 
     /** Set if being on this surface means being under some other mesh.
      *  This is used to simulate that a kart is in water: the ground under
      *  the water is marked as 'm_below_surface', which will then trigger a raycast
      *  up to find the position of the actual water surface. */
     bool             m_below_surface;
-
-    bool             m_water_splash;
 
     /** If a kart is falling over a material with this flag set, it
      *  will trigger the special camera fall effect. */
@@ -133,34 +112,30 @@ private:
      *  upside down. */
     bool             m_has_gravity;
 
-    /** Speed of the 'main' wave in the water shader. Only used if
-        m_shader_type == SHDERTYPE_WATER */
-    float            m_water_shader_speed_1;
+    /** If the property should be ignored in the physics. Example would be
+     *  plants that a kart can just drive through. */
+    bool             m_ignore;
 
-    /** Speed of the 'secondary' waves in the water shader. Only used if
-        m_shader_type == SHADERTYPE_WATER */
-    float            m_water_shader_speed_2;
+    /** True if the material shouldn't be "slippy" at an angle */
+    bool             m_high_tire_adhesion;
+
+    bool  m_complain_if_not_found;
+
+    bool  m_deprecated;
+
+    bool  m_installed;
+
+    /** True if this material can be colorized (like red/blue in team game). */
+    bool             m_colorizable;
+
+    /** Minimum resulting saturation when colorized (from 0 to 1) */
+    float            m_colorization_factor;
 
     /** If a kart is rescued when crashing into this surface. */
     CollisionReaction m_collision_reaction;
 
     /** Particles to show on touch */
     std::string      m_collision_particles;
-
-    /** If m_shader_type == SHADERTYPE_VEGETATION */
-    float            m_grass_speed;
-    float            m_grass_amplitude;
-
-    /** If the property should be ignored in the physics. Example would be
-     *  plants that a kart can just drive through. */
-    bool             m_ignore;
-
-    bool             m_fog;
-
-    /** Either ' ' (no mirroring), 'U' or 'V' if a texture needs to be 
-     *  mirrored when driving in reverse. Typically used for arrows indicating
-     *  the direction. */
-    char             m_mirror_axis_when_reverse;
 
     /** 
     * Associated with m_mirror_axis_when_reverse, to avoid mirroring the same material twice
@@ -170,40 +145,14 @@ private:
 
     ParticleKind*    m_particles_effects[EMIT_KINDS_COUNT];
 
-    /** For normal maps */
-    std::string      m_normal_map_tex;
-
     /** Texture clamp bitmask */
     unsigned int     m_clamp_tex;
-
-    /** True if backface culliing should be enabled. */
-    bool             m_backface_culling;
-
-    /** Set to true to disable writing to the Z buffer. Usually to be used with alpha blending */
-    bool             m_disable_z_write;
-
-    /** True if this material can be colorized (like red/blue in team game). */
-    bool             m_colorizable;
-
-    /** Minimum resulting saturation when colorized (from 0 to 1) */
-    float            m_colorization_factor;
 
     /** List of hue pre-defined for colorization (from 0 to 1) */
     std::vector<float> m_hue_settings;
 
     /** Random generator for getting pre-defined hue */
     RandomGenerator m_random_hue;
-
-    /** Some textures need to be pre-multiplied, some divided to give
-     *  the intended effect. */
-    //enum             {ADJ_NONE, ADJ_PREMUL, ADJ_DIV}
-    //                 m_adjust_image;
-
-    /** True if lightmapping is enabled for this material. */
-    //bool             m_lightmap;
-
-    /** True if the material shouldn't be "slippy" at an angle */
-    bool             m_high_tire_adhesion;
 
     /** How much the top speed is reduced per second. */
     float            m_slowdown_time;
@@ -248,48 +197,32 @@ private:
 
     std::string      m_colorization_mask;
 
-    /** If m_splatting is true, indicates the first splatting texture */
-    std::string      m_splatting_texture_1;
-
-    /** If m_splatting is true, indicates the second splatting texture */
-    std::string      m_splatting_texture_2;
-
-    /** If m_splatting is true, indicates the third splatting texture */
-    std::string      m_splatting_texture_3;
-
-    /** If m_splatting is true, indicates the fourth splatting texture */
-    std::string      m_splatting_texture_4;
-
-    std::string      m_gloss_map;
-
-    bool  m_complain_if_not_found;
-
-    bool  m_deprecated;
-
-    bool  m_installed;
-
     void  init    ();
     void  install (bool srgb = false, bool premul_alpha = false);
     void  initCustomSFX(const XMLNode *sfx);
     void  initParticlesEffect(const XMLNode *node);
+
+    // SP usage
+    std::string      m_shader_name;
+    std::string      m_uv_two_tex;
+    // Full path for textures in sp shader
+    std::string      m_sampler_path[6];
+    std::string      m_container_id;
+    void loadContainerId();
 
 public:
           Material(const XMLNode *node, bool deprecated);
           Material(const std::string& fname,
                    bool is_full_path=false,
                    bool complain_if_not_found=true,
-                   bool load_texture = true);
+                   bool load_texture = true,
+                   const std::string& shader_name = "solid");
          ~Material ();
 
     void unloadTexture();
 
     void  setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) const;
     void  setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb);
-    void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, 
-                       bool use_fog) const;
-    void onMadeVisible(scene::IMeshBuffer* who);
-    void onHidden(scene::IMeshBuffer* who);
-    void isInitiallyHidden(scene::IMeshBuffer* who);
 
     /** Returns the ITexture associated with this material. */
     video::ITexture *getTexture(bool srgb = true, bool premul_alpha = false);
@@ -310,6 +243,8 @@ public:
     /** Returns the minimum resulting saturation when colorized.
      */
     float getColorizationFactor () const { return m_colorization_factor;   }
+    // ------------------------------------------------------------------------
+    bool hasRandomHue() const            { return !m_hue_settings.empty(); }
     // ------------------------------------------------------------------------
     /** Returns a random hue when colorized.
      */
@@ -341,9 +276,8 @@ public:
     // ------------------------------------------------------------------------
     bool  isTransparent      () const
     {
-        return m_shader_type == SHADERTYPE_ADDITIVE ||
-               m_shader_type == SHADERTYPE_ALPHA_BLEND ||
-               m_shader_type == SHADERTYPE_ALPHA_TEST;
+        return m_shader_name == "additive" || m_shader_name == "alphablend" ||
+               m_shader_name == "displace";
     }
 
     // ------------------------------------------------------------------------
@@ -369,11 +303,6 @@ public:
     /** Returns the name of a special sfx to play while a kart is on this
      *  terrain. The string will be "" if no special sfx exists. */
     const std::string &getSFXName() const { return m_sfx_name; }
-
-    // ------------------------------------------------------------------------
-    /** Returns if fog is enabled. */
-    bool isFogEnabled() const { return m_fog; }
-
     // ------------------------------------------------------------------------
     /** \brief Get the kind of particles that are to be used on this material,
      *  in the given conditions.
@@ -415,13 +344,31 @@ public:
      *  on lower speeds. A negative value indicates no minimum speed. */
     float getZipperMinSpeed() const { return m_zipper_min_speed; }
     // ------------------------------------------------------------------------
-    ShaderType getShaderType() const { return m_shader_type; }
-    void setShaderType(ShaderType st) { m_shader_type = st; }
-    // ------------------------------------------------------------------------
     /** True if this texture should have the U coordinates mirrored. */
     char getMirrorAxisInReverse() const { return m_mirror_axis_when_reverse; }
     // ------------------------------------------------------------------------
-    const std::string getAlphaMask() const                 { return m_mask; }
+    const std::string& getAlphaMask() const                 { return m_mask; }
+    // ------------------------------------------------------------------------
+    const std::string& getColorizationMask() const
+                                               { return m_colorization_mask; }
+    // ------------------------------------------------------------------------
+    void setShaderName(const std::string& name)      { m_shader_name = name; }
+    // ------------------------------------------------------------------------
+    const std::string& getShaderName() const         { return m_shader_name; }
+    // ------------------------------------------------------------------------
+    /* This is used for finding correct material for spm*/
+    const std::string& getUVTwoTexture() const
+                                                      { return m_uv_two_tex; }
+    // ------------------------------------------------------------------------
+    bool use2UV() const                      { return !m_uv_two_tex.empty(); }
+    // ------------------------------------------------------------------------
+    const std::string& getSamplerPath(unsigned layer) const
+    {
+        assert(layer < 6);
+        return m_sampler_path[layer];
+    }
+    // ------------------------------------------------------------------------
+    const std::string& getContainerId() const        { return m_container_id; }
 };
 
 

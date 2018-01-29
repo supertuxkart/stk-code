@@ -79,7 +79,6 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
     // Add the graphical model
 #ifndef SERVER_ONLY
     setNode(irr_driver->addMesh(m_st_model[type], StringUtils::insertValues("flyable_%i", (int)type)));
-    irr_driver->applyObjectPassShader(getNode());
 #ifdef DEBUG
     std::string debug_name("flyable: ");
     debug_name += type;

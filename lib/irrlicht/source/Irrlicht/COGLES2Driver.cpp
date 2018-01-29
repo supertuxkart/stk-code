@@ -79,10 +79,12 @@ namespace video
 		HDc = GetDC(data.OpenGLWin32.HWnd);
 		egl_params.display = (NativeDisplayType)(HDc);
 #elif defined(_IRR_COMPILE_WITH_X11_DEVICE_)
+		egl_params.platform = CEGL_PLATFORM_X11;
 		egl_params.window = (EGLNativeWindowType)(data.OpenGLLinux.X11Window);
 		egl_params.display = (EGLNativeDisplayType)(data.OpenGLLinux.X11Display);
 #elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
-		egl_params.window =	((struct android_app *)(params.PrivateData))->window;
+		egl_params.platform = CEGL_PLATFORM_DEFAULT;
+		egl_params.window = ((struct android_app *)(params.PrivateData))->window;
 		egl_params.display = NULL;
 #endif
 		

@@ -8,7 +8,7 @@ out vec4 FragColor;
 
 void main()
 {
-    vec2 uv = gl_FragCoord.xy / screen;
+    vec2 uv = gl_FragCoord.xy / u_screen;
     vec4 col = .125 * texture(tex_128, uv);
     col += .25 * texture(tex_256, uv);
     col += .5 * texture(tex_512, uv);

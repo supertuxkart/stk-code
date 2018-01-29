@@ -27,12 +27,10 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/mesh_tools.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/stk_particle.hpp"
-#include "graphics/render_info.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
@@ -245,6 +243,12 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
         file_manager->pushTextureSearchPath(lib_path + "/", unique_id);
         file_manager->pushModelSearchPath(lib_path);
         material_manager->pushTempMaterial(lib_path + "/materials.xml");
+#ifndef SERVER_ONLY
+        if (CVS->isGLSL())
+        {
+            SP::SPShaderManager::get()->loadSPShaders(lib_path);
+        }
+#endif
         model_def_loader.addToLibrary(name, libroot);
 
         // Load LOD groups
@@ -346,7 +350,7 @@ void TrackObjectPresentationLibraryNode::move(const core::vector3df& xyz, const 
 TrackObjectPresentationLOD::TrackObjectPresentationLOD(const XMLNode& xml_node,
                                        scene::ISceneNode* parent,
                                        ModelDefinitionLoader& model_def_loader,
-                                       RenderInfo* ri)
+                                       std::shared_ptr<RenderInfo> ri)
                           : TrackObjectPresentationSceneNode(xml_node)
 {
     m_node = model_def_loader.instanciateAsLOD(&xml_node, parent, ri);
@@ -392,7 +396,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
                                                      const XMLNode& xml_node,
                                                      bool enabled,
                                                      scene::ISceneNode* parent,
-                                                     RenderInfo* render_info)
+                                                     std::shared_ptr<RenderInfo> render_info)
                            : TrackObjectPresentationSceneNode(xml_node)
 {
     m_is_looped  = false;
@@ -418,7 +422,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         m_is_in_skybox = true;
     }
 
-    bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects > 1 ||
+    bool animated = skeletal_animation && (UserConfigParams::m_animated_characters ||
                      World::getWorld()->getIdent() == IDENT_CUTSCENE);
     bool displacing = false;
     xml_node.get("displacing", &displacing);
@@ -434,23 +438,6 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         throw std::runtime_error("Model '" + model_name + "' cannot be found");
     }
 
-#ifndef SERVER_ONLY
-    if (!animated)
-    {
-        m_mesh = MeshTools::createMeshWithTangents(m_mesh,
-                                                   &MeshTools::isNormalMap);
-    }
-    else
-    {
-        scene::ISkinnedMesh* sm =
-            dynamic_cast<scene::ISkinnedMesh*>(m_mesh);
-        if (sm)
-        {
-            MeshTools::createSkinnedMeshWithTangents(sm,
-                &MeshTools::isNormalMap);
-        }
-    }
-#endif
     init(&xml_node, parent, enabled);
 }   // TrackObjectPresentationMesh
 
@@ -484,7 +471,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     m_node         = NULL;
     m_is_in_skybox = false;
     m_render_info  = NULL;
-    bool animated  = (UserConfigParams::m_graphical_effects > 1 ||
+    bool animated  = (UserConfigParams::m_particles_effects > 1 ||
                       World::getWorld()->getIdent() == IDENT_CUTSCENE);
 
     m_model_file = model_file;
@@ -495,18 +482,10 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         if (animated)
         {
             m_mesh = irr_driver->getAnimatedMesh(model_file);
-            scene::ISkinnedMesh* sm =
-                dynamic_cast<scene::ISkinnedMesh*>(m_mesh);
-            if (sm)
-            {
-                MeshTools::createSkinnedMeshWithTangents(sm,
-                    &MeshTools::isNormalMap);
-            }
         }
         else
         {
-            m_mesh = MeshTools::createMeshWithTangents(
-                irr_driver->getMesh(model_file), &MeshTools::isNormalMap);
+            m_mesh = irr_driver->getMesh(model_file);
         }
     }
 #endif
@@ -529,7 +508,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
     if(xml_node)
         xml_node->get("skeletal-animation", &skeletal_animation);
 
-    bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects > 1 ||
+    bool animated = skeletal_animation && (UserConfigParams::m_particles_effects > 1 ||
              World::getWorld()->getIdent() == IDENT_CUTSCENE);
     bool displacing = false;
     std::string interaction;
@@ -606,24 +585,15 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
         Track *track = Track::getCurrentTrack();
         if (track && track && xml_node)
             track->handleAnimatedTextures(m_node, *xml_node);
+        Track::uploadNodeVertexBuffer(node);
     }
     else
     {
-        bool displacing = false;
-        if (xml_node)
-            xml_node->get("displacing", &displacing);
-
         m_node = irr_driver->addMesh(m_mesh, m_model_file, parent, m_render_info);
-
-#ifndef SERVER_ONLY
-        STKMeshSceneNode* stkmesh = dynamic_cast<STKMeshSceneNode*>(m_node);
-        if (displacing && stkmesh != NULL)
-            stkmesh->setIsDisplacement(displacing);
-#endif
-
         Track *track = Track::getCurrentTrack();
         if (track && xml_node)
             track->handleAnimatedTextures(m_node, *xml_node);
+        Track::uploadNodeVertexBuffer(m_node);
     }
 
     if(!enabled)

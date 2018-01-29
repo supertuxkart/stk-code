@@ -50,6 +50,12 @@
 #endif
 
 
+namespace SP
+{
+    class SPDynamicDrawCall;
+}
+
+
 namespace irr
 {
     namespace scene { class ISceneManager; class IMesh; class IAnimatedMeshSceneNode; class IAnimatedMesh;
@@ -170,7 +176,7 @@ private:
     unsigned             m_last_light_bucket_distance;
     unsigned             m_skinning_joint;
     u32                  m_renderpass;
-    class STKMeshSceneNode *m_sun_interposer;
+    SP::SPDynamicDrawCall* m_sun_interposer;
     core::vector3df m_sun_direction;
     video::SColorf m_suncolor;
 
@@ -234,13 +240,12 @@ public:
                                        float wave_height,
                                        float wave_speed, float wave_length);
     scene::IMeshSceneNode*addOctTree(scene::IMesh *mesh);
-    scene::IMeshSceneNode*addSphere(float radius,
+    scene::ISceneNode* addSphere(float radius,
                  const video::SColor &color=video::SColor(128, 255, 255, 255));
-    scene::IMeshSceneNode*addMesh(scene::IMesh *mesh,
-                                  const std::string& debug_name,
-                                  scene::ISceneNode *parent = NULL,
-                                  RenderInfo* render_info = NULL,
-                                  bool all_parts_colorized = false);
+    scene::ISceneNode* addMesh(scene::IMesh *mesh,
+                               const std::string& debug_name,
+                               scene::ISceneNode *parent = NULL,
+                               std::shared_ptr<RenderInfo> render_info = nullptr);
     PerCameraNode        *addPerCameraNode(scene::ISceneNode* node,
                                            scene::ICameraSceneNode* cam,
                                            scene::ISceneNode *parent = NULL);
@@ -262,8 +267,7 @@ public:
         *addAnimatedMesh(scene::IAnimatedMesh *mesh,
                          const std::string& debug_name,
                          scene::ISceneNode* parent = NULL,
-                         RenderInfo* render_info = NULL,
-                         bool all_parts_colorized = false);
+                         std::shared_ptr<RenderInfo> render_info = nullptr);
     scene::ICameraSceneNode
                          *addCameraSceneNode();
     Camera               *addCamera(unsigned int index, AbstractKart *kart);
@@ -285,7 +289,6 @@ public:
     core::position2di     getMouseLocation();
 
     void                  printRenderStats();
-    bool                  supportsSplatting();
     void                  requestScreenshot();
     class GPUTimer        &getGPUTimer(unsigned);
 
@@ -451,10 +454,6 @@ public:
         m_background.push_back(n);
     }
     // ------------------------------------------------------------------------
-    void applyObjectPassShader();
-    void applyObjectPassShader(scene::ISceneNode * const node,
-                               bool rimlit = false);
-    // ------------------------------------------------------------------------
     scene::ISceneNode *addLight(const core::vector3df &pos, float energy,
                                 float radius, float r, float g, float b,
                                 bool sun = false, 
@@ -462,7 +461,7 @@ public:
     // ------------------------------------------------------------------------
     void clearLights();
     // ------------------------------------------------------------------------
-    class STKMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
+    SP::SPDynamicDrawCall* getSunInterposer() { return m_sun_interposer; }
     // ------------------------------------------------------------------------
     
     void cleanSunInterposer();

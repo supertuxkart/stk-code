@@ -88,6 +88,8 @@ private:
         bool                m_important;
         bool                m_big_font;
 
+        bool                m_outline;
+
         // -----------------------------------------------------
         // std::vector needs standard copy-ctor and std-assignment op.
         // let compiler create defaults .. they'll do the job, no
@@ -95,7 +97,7 @@ private:
         TimedMessage(const irr::core::stringw &message,
                      const AbstractKart *kart, float time,
                      const video::SColor &color, const bool important,
-                     bool big_font)
+                     bool big_font, bool outline)
         {
             m_message        = message;
             m_kart           = kart;
@@ -103,6 +105,7 @@ private:
             m_color          = color;
             m_important      = important;
             m_big_font       = big_font;
+            m_outline        = outline;
         }   // TimedMessage
         // -----------------------------------------------------
         // in follow leader the clock counts backwards
@@ -229,7 +232,7 @@ public:
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
                             bool important=true,
-                            bool big_font=false);
+                            bool big_font=false, bool outline=false);
     virtual void update(float dt);
     virtual void preRenderCallback(const Camera *camera);
     // ------------------------------------------------------------------------

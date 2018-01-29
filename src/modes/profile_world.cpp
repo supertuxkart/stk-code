@@ -123,7 +123,7 @@ AbstractKart *ProfileWorld::createKart(const std::string &kart_ident, int index,
     if (index == (int)race_manager->getNumberOfKarts()-1)
     {
         // The camera keeps track of all cameras and will free them
-        Camera::createCamera(new_kart);
+        Camera::createCamera(new_kart, local_player_id);
     }
     return new_kart;
 }   // createKart

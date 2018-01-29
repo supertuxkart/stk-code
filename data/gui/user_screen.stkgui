@@ -62,6 +62,8 @@
 								 I18N="In the user screen" text="Delete" label_location="bottom"/>
 					<icon-button id="rename" width="64" height="64" icon="gui/rename.png"
 								 I18N="In the user screen" text="Rename" label_location="bottom"/>
+					<icon-button id="default_kart_color" width="64" height="64" icon="gui/edit.png"
+								 I18N="In the user screen" text="Default kart color" label_location="bottom"/>
 					<icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"
 								 I18N="In the user screen" text="Cancel" label_location="bottom"/>
 				</buttonbar>

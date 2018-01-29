@@ -20,6 +20,7 @@
 #include "graphics/lighting_passes.hpp"
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/frame_buffer.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
@@ -55,27 +56,6 @@ const unsigned int LightBaseClass::MAXLIGHT;
 
 // ============================================================================
 LightBaseClass::PointLightInfo m_point_lights_info[LightBaseClass::MAXLIGHT];
-
-
-// ============================================================================
-class FogShader : public TextureShader<FogShader, 1, float, core::vector3df>
-{
-public:
-    FogShader()
-    {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "fog.frag");
-        assignUniforms("density", "col");
-        assignSamplerNames(0, "tex", ST_NEAREST_FILTERED);
-    }   // FogShader
-    // ------------------------------------------------------------------------
-    void render(float start, const core::vector3df &color, GLuint depth_stencil_texture)
-    {
-        setTextureUnits(depth_stencil_texture);
-        drawFullScreenEffect(1.f / (40.f * start), color);
-
-    }   // render
-};   // FogShader
 
 // ============================================================================
 class PointLightShader : public TextureShader < PointLightShader, 2 >
@@ -179,92 +159,6 @@ public:
     }   // PointLightScatterShader
 };
 
-#if !defined(USE_GLES2)
-// ============================================================================
-class RadianceHintsConstructionShader
-    : public TextureShader<RadianceHintsConstructionShader, 3, core::matrix4,
-                          core::matrix4, core::vector3df, video::SColorf>
-{
-public:
-    RadianceHintsConstructionShader()
-    {
-        if (CVS->isAMDVertexShaderLayerUsable())
-        {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "slicedscreenquad.vert",
-                                GL_FRAGMENT_SHADER, "rh.frag");
-        }
-        else
-        {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "slicedscreenquad.vert",
-                                GL_GEOMETRY_SHADER, "rhpassthrough.geom",
-                                GL_FRAGMENT_SHADER, "rh.frag");
-        }
-
-        assignUniforms("RSMMatrix", "RHMatrix", "extents", "suncol");
-        assignSamplerNames(0, "ctex", ST_BILINEAR_FILTERED,
-                           1, "ntex", ST_BILINEAR_FILTERED,
-                           2, "dtex", ST_BILINEAR_FILTERED);
-    }   // RadianceHintsConstructionShader
-};   // RadianceHintsConstructionShader
-
-// ============================================================================
-// Workaround for a bug found in kepler nvidia linux and fermi nvidia windows
-class NVWorkaroundRadianceHintsConstructionShader
-    : public TextureShader<NVWorkaroundRadianceHintsConstructionShader,
-                           3, core::matrix4, core::matrix4, core::vector3df,
-                           int, video::SColorf >
-{
-public:
-    NVWorkaroundRadianceHintsConstructionShader()
-    {
-        loadProgram(OBJECT,GL_VERTEX_SHADER,"slicedscreenquad_nvworkaround.vert",
-                           GL_GEOMETRY_SHADER, "rhpassthrough.geom",
-                           GL_FRAGMENT_SHADER, "rh.frag");
-
-        assignUniforms("RSMMatrix", "RHMatrix", "extents", "slice", "suncol");
-
-        assignSamplerNames(0, "ctex", ST_BILINEAR_FILTERED,
-                           1, "ntex", ST_BILINEAR_FILTERED,
-                           2, "dtex", ST_BILINEAR_FILTERED);
-    }   // NVWorkaroundRadianceHintsConstructionShader
-};   // NVWorkaroundRadianceHintsConstructionShader
-#endif // !defined(USE_GLES2)
-
-// ============================================================================
-class GlobalIlluminationReconstructionShader
-    : public TextureShader<GlobalIlluminationReconstructionShader, 5,
-                           core::matrix4, core::matrix4, core::vector3df >
-{
-public:
-    GlobalIlluminationReconstructionShader()
-    {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "gi.frag");
-
-        assignUniforms("rh_matrix", "inv_rh_matrix", "extents");
-        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
-                           1, "dtex", ST_NEAREST_FILTERED,
-                           2, "SHR", ST_VOLUME_LINEAR_FILTERED,
-                           3, "SHG", ST_VOLUME_LINEAR_FILTERED,
-                           4, "SHB", ST_VOLUME_LINEAR_FILTERED);
-    }   // GlobalIlluminationReconstructionShader
-
-    // ------------------------------------------------------------------------
-    void render(const core::matrix4 &rh_matrix,
-                const core::vector3df &rh_extend, const FrameBuffer &fb,
-                GLuint normal_depth_texture,
-                GLuint depth_stencil_texture)
-    {
-        core::matrix4 inv_rh_matrix;
-        rh_matrix.getInverse(inv_rh_matrix);
-        glDisable(GL_DEPTH_TEST);
-        setTextureUnits(normal_depth_texture,
-                        depth_stencil_texture,
-                        fb.getRTT()[0], fb.getRTT()[1], fb.getRTT()[2]);
-        drawFullScreenEffect(rh_matrix, inv_rh_matrix, rh_extend);
-    }   // render
-};   // GlobalIlluminationReconstructionShader
-
 // ============================================================================
 class IBLShader : public TextureShader<IBLShader, 3>
 {
@@ -296,7 +190,8 @@ public:
 // ============================================================================
 class ShadowedSunLightShaderPCF : public TextureShader<ShadowedSunLightShaderPCF,
                                                        3,  float, float, float,
-                                                       float, float>
+                                                       float, float,
+                                                       core::vector3df, video::SColorf>
 {
 public:
     ShadowedSunLightShaderPCF()
@@ -308,58 +203,28 @@ public:
         assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
                            1, "dtex", ST_NEAREST_FILTERED,
                            8, "shadowtex", ST_SHADOW_SAMPLER);
-        assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res");
+        assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res",
+            "sundirection", "sun_color");
     }   // ShadowedSunLightShaderPCF
     // ------------------------------------------------------------------------
     void render(GLuint normal_depth_texture,
                 GLuint depth_stencil_texture,
-                const FrameBuffer& shadow_framebuffer)
+                const FrameBuffer* shadow_framebuffer,
+                const core::vector3df &direction,
+                const video::SColorf &col)
     {
         setTextureUnits(normal_depth_texture,
                         depth_stencil_texture,
-                        shadow_framebuffer.getDepthTexture()                );
+                        shadow_framebuffer->getDepthTexture()                );
        drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
                             ShadowMatrices::m_shadow_split[2],
                             ShadowMatrices::m_shadow_split[3],
                             ShadowMatrices::m_shadow_split[4],
-                            float(UserConfigParams::m_shadows_resolution)   );
+                            float(UserConfigParams::m_shadows_resolution),
+                            direction, col);
 
     }    // render
 };   // ShadowedSunLightShaderPCF
-
-// ============================================================================
-class ShadowedSunLightShaderESM : public TextureShader<ShadowedSunLightShaderESM,
-                                                       3, float, float, float,
-                                                       float>
-{
-public:
-    ShadowedSunLightShaderESM()
-    {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "sunlightshadowesm.frag");
-
-        // Use 8 to circumvent a catalyst bug when binding sampler
-        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
-                           1, "dtex", ST_NEAREST_FILTERED,
-                           8, "shadowtex", ST_TRILINEAR_CLAMPED_ARRAY2D);
-
-        assignUniforms("split0", "split1", "split2", "splitmax");
-    }   // ShadowedSunLightShaderESM
-    // ------------------------------------------------------------------------
-    void render(GLuint normal_depth_texture,
-                GLuint depth_stencil_texture,
-                const FrameBuffer& shadow_framebuffer)
-    {
-        setTextureUnits(normal_depth_texture,
-                        depth_stencil_texture,
-                        shadow_framebuffer.getRTT()[0]);
-        drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
-                             ShadowMatrices::m_shadow_split[2],
-                             ShadowMatrices::m_shadow_split[3],
-                             ShadowMatrices::m_shadow_split[4]);
-    }   // render
-};   // ShadowedSunLightShaderESM
-
 
 // ============================================================================
 class SunLightShader : public TextureShader<SunLightShader, 2,
@@ -373,7 +238,7 @@ public:
 
         assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
                            1, "dtex", ST_NEAREST_FILTERED);
-        assignUniforms("direction", "col");
+        assignUniforms("sundirection", "sun_color");
     }   // SunLightShader
     // ------------------------------------------------------------------------
     void render(const core::vector3df &direction, const video::SColorf &col,
@@ -402,12 +267,13 @@ static void renderPointLights(unsigned count,
     glDepthMask(GL_FALSE);
 
     PointLightShader::getInstance()->use();
-    glBindVertexArray(PointLightShader::getInstance()->vao);
+
     glBindBuffer(GL_ARRAY_BUFFER, PointLightShader::getInstance()->vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0,
                      count * sizeof(LightBaseClass::PointLightInfo),
                      m_point_lights_info);
 
+    glBindVertexArray(PointLightShader::getInstance()->vao);
     PointLightShader::getInstance()->setTextureUnits(
         normal_depth_rander_target,
         depth_stencil_texture);
@@ -426,7 +292,7 @@ void LightingPasses::renderEnvMap(GLuint normal_depth_texture,
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_ONE, GL_ONE);
 
-    if (UserConfigParams::m_degraded_IBL)
+    if (specular_probe == 0 || UserConfigParams::m_degraded_IBL)
     {
         DegradedIBLShader::getInstance()->use();
         glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
@@ -549,68 +415,10 @@ void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
 }   // updateLightsInfo
 
 // ----------------------------------------------------------------------------
-void LightingPasses::renderRadianceHints(  const ShadowMatrices& shadow_matrices,
-                                           const FrameBuffer& radiance_hint_framebuffer,
-                                           const FrameBuffer& reflective_shadow_map_framebuffer)
-{
-#if !defined(USE_GLES2)
-    glDisable(GL_BLEND);
-    radiance_hint_framebuffer.bind();
-    glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
-    if (CVS->needRHWorkaround())
-    {
-        NVWorkaroundRadianceHintsConstructionShader::getInstance()->use();
-        NVWorkaroundRadianceHintsConstructionShader::getInstance()
-            ->setTextureUnits(
-                reflective_shadow_map_framebuffer.getRTT()[0],
-                reflective_shadow_map_framebuffer.getRTT()[1],
-                reflective_shadow_map_framebuffer.getDepthTexture());
-        for (unsigned i = 0; i < 32; i++)
-        {
-            NVWorkaroundRadianceHintsConstructionShader::getInstance()
-                ->setUniforms(shadow_matrices.getRSMMatrix(),
-                              shadow_matrices.getRHMatrix(),
-                              shadow_matrices.getRHExtend(), i,
-                              irr_driver->getSunColor());
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        }
-    }
-    else
-    {
-        RadianceHintsConstructionShader::getInstance()->use();
-        RadianceHintsConstructionShader::getInstance()
-            ->setTextureUnits(
-                reflective_shadow_map_framebuffer.getRTT()[0],
-                reflective_shadow_map_framebuffer.getRTT()[1],
-                reflective_shadow_map_framebuffer.getDepthTexture()
-        );
-        RadianceHintsConstructionShader::getInstance()
-            ->setUniforms(shadow_matrices.getRSMMatrix(),
-                          shadow_matrices.getRHMatrix(),
-                          shadow_matrices.getRHExtend(),
-                          irr_driver->getSunColor());
-        glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
-    }
-#endif //!defined(USE_GLES2)
-}   // renderRadianceHints
-
-// ----------------------------------------------------------------------------
-void LightingPasses::renderGlobalIllumination(  const ShadowMatrices& shadow_matrices,
-                                                const FrameBuffer& radiance_hint_framebuffer,
-                                                GLuint normal_depth_texture,
-                                                GLuint depth_stencil_texture)
-{
-    GlobalIlluminationReconstructionShader::getInstance()
-        ->render(shadow_matrices.getRHMatrix(), shadow_matrices.getRHExtend(),
-                 radiance_hint_framebuffer, normal_depth_texture,
-                 depth_stencil_texture);
-}
-
-// ----------------------------------------------------------------------------
 void LightingPasses::renderLights(  bool has_shadow,
                                     GLuint normal_depth_texture,
                                     GLuint depth_stencil_texture,
-                                    const FrameBuffer& shadow_framebuffer,
+                                    const FrameBuffer* shadow_framebuffer,
                                     GLuint specular_probe)
 {
     {
@@ -631,20 +439,11 @@ void LightingPasses::renderLights(  bool has_shadow,
             glDisable(GL_DEPTH_TEST);
             glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
-
-
-            if (CVS->isESMEnabled())
-            {
-                ShadowedSunLightShaderESM::getInstance()->render(normal_depth_texture,
-                                                                 depth_stencil_texture,
-                                                                 shadow_framebuffer);
-            }
-            else
-            {
-                ShadowedSunLightShaderPCF::getInstance()->render(normal_depth_texture,
-                                                                 depth_stencil_texture,
-                                                                 shadow_framebuffer);
-            }
+            ShadowedSunLightShaderPCF::getInstance()->render(normal_depth_texture,
+                                                             depth_stencil_texture,
+                                                             shadow_framebuffer,
+                                                             irr_driver->getSunDirection(),
+                                                             irr_driver->getSunColor());
         }
         else
             renderSunlight(irr_driver->getSunDirection(),
@@ -661,28 +460,6 @@ void LightingPasses::renderLights(  bool has_shadow,
                           depth_stencil_texture);
     }
 }   // renderLights
-
-// ----------------------------------------------------------------------------
-void LightingPasses::renderAmbientScatter(GLuint depth_stencil_texture)
-{
-    const Track * const track = Track::getCurrentTrack();
-
-    // This function is only called once per frame - thus no need for setters.
-    float start = track->getFogStart() + .001f;
-    const video::SColor tmpcol = track->getFogColor();
-
-    core::vector3df col(tmpcol.getRed() / 255.0f,
-        tmpcol.getGreen() / 255.0f,
-        tmpcol.getBlue() / 255.0f);
-
-    glDisable(GL_DEPTH_TEST);
-    glDepthMask(GL_FALSE);
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_ONE, GL_ONE);
-
-    FogShader::getInstance()->render(start, col, depth_stencil_texture);
-}   // renderAmbientScatter
 
 // ----------------------------------------------------------------------------
 void LightingPasses::renderLightsScatter(GLuint depth_stencil_texture,

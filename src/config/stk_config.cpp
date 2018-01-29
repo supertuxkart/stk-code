@@ -182,6 +182,7 @@ void STKConfig::init_defaults()
     m_camera_follow_skid         = false;
     m_cutscene_fov               = 0.61f;
     m_max_skinning_bones         = 1024;
+    m_tc_quality                 = 16;
 
     m_score_increase.clear();
     m_leader_intervals.clear();
@@ -368,6 +369,11 @@ void STKConfig::getAllData(const XMLNode * root)
     if (const XMLNode *skinning = root->getNode("skinning"))
     {
         skinning->get("max-bones", &m_max_skinning_bones);
+    }
+
+    if (const XMLNode *tc = root->getNode("texture-compression"))
+    {
+        tc->get("quality", &m_tc_quality);
     }
 
     // Get the default KartProperties

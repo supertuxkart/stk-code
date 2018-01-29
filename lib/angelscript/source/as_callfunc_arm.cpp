@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -150,7 +150,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 			if( descr->parameterTypes[n].IsObject() && !descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() )
 			{
 #ifdef COMPLEX_OBJS_PASSED_BY_REF
-				if( descr->parameterTypes[n].GetObjectType()->flags & COMPLEX_MASK )
+				if( descr->parameterTypes[n].GetTypeInfo()->flags & COMPLEX_MASK )
 				{
 					paramBuffer[dpos++] = args[spos++];
 					paramSize++;
@@ -159,7 +159,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 #endif
 				{
 #if defined(AS_ANDROID) || defined(AS_LINUX)
-					if( (descr->parameterTypes[n].GetObjectType()->flags & asOBJ_APP_CLASS_ALIGN8) &&
+					if( (descr->parameterTypes[n].GetTypeInfo()->flags & asOBJ_APP_CLASS_ALIGN8) &&
 						((dpos & 1) == mask) )
 					{
 						// 64 bit value align
@@ -337,8 +337,8 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	if( sysFunc->hostReturnInMemory )
 	{
 		// TODO: runtime optimize: This check should be done in PrepareSystemFunction
-		if ( !( descr->returnType.GetObjectType()->flags & COMPLEX_RETURN_MASK )		&&
-			  ( descr->returnType.GetObjectType()->flags & asOBJ_APP_CLASS_ALLFLOATS )	&&
+		if ( !( descr->returnType.GetTypeInfo()->flags & COMPLEX_RETURN_MASK )		&&
+			  ( descr->returnType.GetTypeInfo()->flags & asOBJ_APP_CLASS_ALLFLOATS )	&&
 			    descr->returnType.GetSizeInMemoryBytes() <= 8 )
 			callConv--;
 		
@@ -396,10 +396,10 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		{
 			// TODO: runtime optimize: Declare a reference to descr->parameterTypes[n] so the array doesn't have to be access all the time
 			if( descr->parameterTypes[n].IsObject() && !descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() &&
-				!(descr->parameterTypes[n].GetObjectType()->flags & asOBJ_APP_ARRAY) )
+				!(descr->parameterTypes[n].GetTypeInfo()->flags & asOBJ_APP_ARRAY) )
 			{
 #ifdef COMPLEX_OBJS_PASSED_BY_REF
-				if( descr->parameterTypes[n].GetObjectType()->flags & COMPLEX_MASK )
+				if( descr->parameterTypes[n].GetTypeInfo()->flags & COMPLEX_MASK )
 				{
 					paramBuffer[dpos++] = args[spos++];
 					paramSize++;
@@ -407,7 +407,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 				else
 #endif
 				{
-					if( (descr->parameterTypes[n].GetObjectType()->flags & asOBJ_APP_CLASS_ALIGN8) )
+					if( (descr->parameterTypes[n].GetTypeInfo()->flags & asOBJ_APP_CLASS_ALIGN8) )
 					{
 						if ( (dpos & 1) == mask )
 						{
@@ -425,7 +425,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 					}
 
 					// Copy the object's memory to the buffer
-					if (descr->parameterTypes[n].GetObjectType()->flags & asOBJ_APP_CLASS_ALLFLOATS)
+					if (descr->parameterTypes[n].GetTypeInfo()->flags & asOBJ_APP_CLASS_ALLFLOATS)
 					{
 						int target = (freeFloatSlot > freeDoubleSlot) ? freeFloatSlot : freeDoubleSlot;
 
@@ -645,8 +645,8 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		// TODO: runtime optimize: This should be identified with a flag determined in PrepareSystemFunction
 		if ( !descr->returnType.IsObjectHandle()									&&
 			 !descr->returnType.IsReference()										&&
-			 !(descr->returnType.GetObjectType()->flags & COMPLEX_RETURN_MASK)		&&
-			 (descr->returnType.GetObjectType()->flags & asOBJ_APP_CLASS_ALLFLOATS) )
+			 !(descr->returnType.GetTypeInfo()->flags & COMPLEX_RETURN_MASK)		&&
+			 (descr->returnType.GetTypeInfo()->flags & asOBJ_APP_CLASS_ALLFLOATS) )
 			memcpy( retPointer, &paramBuffer[VFP_OFFSET], descr->returnType.GetSizeInMemoryBytes() );
 	}
 

@@ -23,12 +23,19 @@
 namespace irr
 {
     namespace video { class SMaterial; class SColor; }
-    namespace scene { class IMeshSceneNode; class IMesh; class IMesh; }
+    namespace scene { class ISceneNode; }
 }
 using namespace irr;
 
+namespace SP
+{
+    class SPDynamicDrawCall;
+    class SPMesh;
+}
+
 #include "graphics/moving_texture.hpp"
 #include "utils/no_copy.hpp"
+#include <memory>
 
 class AbstractKart;
 class Quad;
@@ -44,16 +51,10 @@ private:
     AbstractKart *m_kart;
 
     /** The scene node. */
-    scene::IMeshSceneNode *m_node;
-
-    /** The actual mesh. */
-    scene::IMesh      *m_mesh;
-
-    /** For debugging: display where slipstream works. */
-    scene::IMeshSceneNode *m_debug_node;
+    scene::ISceneNode *m_node;
 
     /** For debugging: a simple quad to display where slipstream works. */
-    scene::IMesh      *m_debug_mesh;
+    std::shared_ptr<SP::SPDynamicDrawCall> m_debug_dc;
 
     /** The length of the slipstream cylinder. This is used to scale
      *  the actual scene node correctly. */
@@ -73,7 +74,7 @@ private:
      ** overtake the right kart. */
     AbstractKart* m_target_kart;
 
-    void         createMesh(Material* material);
+    SP::SPMesh*  createMesh(Material* material);
     void         setDebugColor(const video::SColor &color);
 public:
                  SlipStream  (AbstractKart* kart);

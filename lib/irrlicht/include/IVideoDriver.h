@@ -1188,6 +1188,8 @@ namespace video
 		See IReferenceCounted::drop() for more information. */
 		virtual IImage* createImageFromFile(io::IReadFile* file, video::IImageLoader** loader = NULL) =0;
 
+		virtual video::IImageLoader* getImageLoaderForFile(const io::path& filename) = 0;
+
 		//! Writes the provided image to a file.
 		/** Requires that there is a suitable image writer registered
 		for writing the image.

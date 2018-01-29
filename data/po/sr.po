@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-10-24 10:06+0000\n"
+"PO-Revision-Date: 2017-11-13 00:19+0000\n"
 "Last-Translator: Саша Петровић <salepetronije@gmail.com>\n"
 "Language-Team: Serbian (http://www.transifex.com/supertuxkart/supertuxkart/language/sr/)\n"
 "MIME-Version: 1.0\n"
@@ -3031,7 +3031,7 @@ msgstr "Највећи број играча мора да буде између
 
 #: src/states_screens/credits.cpp:180
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\ndboki89 https://launchpad.net/~dboki89\nNikola Kantarević, 2016\nSTK-team https://launchpad.net/~stk\nМирослав Николић https://launchpad.net/~lipek\nМирослав Николић, 2011\nСаша Петровић https://launchpad.net/~salepetronije\nСаша Петровић, 2012-2014,2016\nСаша Петровић, 2015-2016\nСаша Петровић, 2016\nСаша Петровић, 2016-2017"
+msgstr "Launchpad Contributions:\n  STK-team https://launchpad.net/~stk\n  dboki89 https://launchpad.net/~dboki89\n  Мирослав Николић https://launchpad.net/~lipek\n  Саша Петровић https://launchpad.net/~salepetronije"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

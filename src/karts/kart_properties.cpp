@@ -21,8 +21,12 @@
 #include "addons/addon.hpp"
 #include "config/stk_config.hpp"
 #include "config/player_manager.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/shader_files_manager.hpp"
 #include "graphics/stk_tex_manager.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
+#include "graphics/sp/sp_texture_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/cached_characteristic.hpp"
 #include "karts/combined_characteristic.hpp"
@@ -97,7 +101,10 @@ KartProperties::KartProperties(const std::string &filename)
     else
     {
         for (unsigned int i = 0; i < RaceManager::DIFFICULTY_COUNT; i++)
-            m_ai_properties[i].reset(new AIProperties((RaceManager::Difficulty) i));
+        {
+            m_ai_properties[i] =
+                std::make_shared<AIProperties>((RaceManager::Difficulty) i);
+        }
     }
 }   // KartProperties
 
@@ -105,6 +112,15 @@ KartProperties::KartProperties(const std::string &filename)
 /** Destructor, dereferences the kart model. */
 KartProperties::~KartProperties()
 {
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL() && m_kart_model.use_count() == 1)
+    {
+        m_kart_model = nullptr;
+        SP::SPShaderManager::get()->removeUnusedShaders();
+        ShaderFilesManager::getInstance()->removeUnusedShaderFiles();
+        SP::SPTextureManager::get()->removeUnusedTextures();
+    }
+#endif
 }   // ~KartProperties
 
 //-----------------------------------------------------------------------------
@@ -125,7 +141,7 @@ void KartProperties::copyForPlayer(const KartProperties *source)
     if (source->m_characteristic)
     {
         // Remove the shared reference by creating a new pointer
-        m_characteristic.reset(new XmlCharacteristic());
+        m_characteristic = std::make_shared<XmlCharacteristic>();
         m_characteristic->copyFrom(source->getCharacteristic());
 
         // Combine the characteristics for this object. We can't copy it because
@@ -149,7 +165,8 @@ void KartProperties::copyFrom(const KartProperties *source)
     // (but not for each player).
     for (unsigned int i = 0; i < RaceManager::DIFFICULTY_COUNT; i++)
     {
-        m_ai_properties[i].reset(new AIProperties((RaceManager::Difficulty) i));
+        m_ai_properties[i] =
+            std::make_shared<AIProperties>((RaceManager::Difficulty) i);
         assert(m_ai_properties);
         *m_ai_properties[i] = *source->m_ai_properties[i];
     }
@@ -186,7 +203,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // m_kart_model must be initialised after assigning the default
     // values from stk_config (otherwise all kart_properties will
     // share the same KartModel
-    m_kart_model.reset(new KartModel(/*is_master*/true));
+    m_kart_model = std::make_shared<KartModel>(/*is_master*/true);
 
     m_root  = StringUtils::getPath(filename)+"/";
     m_ident = StringUtils::getBasename(StringUtils::getPath(filename));
@@ -206,7 +223,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
             throw std::runtime_error(msg.str());
         }
         getAllData(root);
-        m_characteristic.reset(new XmlCharacteristic(root));
+        m_characteristic = std::make_shared<XmlCharacteristic>(root);
         combineCharacteristics();
     }
     catch(std::exception& err)
@@ -227,6 +244,12 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     std::string unique_id = StringUtils::insertValues("karts/%s", m_ident.c_str());
     file_manager->pushModelSearchPath(m_root);
     file_manager->pushTextureSearchPath(m_root, unique_id);
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        SP::SPShaderManager::get()->loadSPShaders(m_root);
+    }
+#endif
 
     STKTexManager::getInstance()
         ->setTextureErrorMessage("Error while loading kart '%s':", m_name);
@@ -251,13 +274,6 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     }
     else
         m_minimap_icon = NULL;
-
-#ifndef SERVER_ONLY
-    if (m_minimap_icon == NULL)
-    {
-        m_minimap_icon = STKTexManager::getInstance()->getUnicolorTexture(m_color);
-    }
-#endif
 
     // Only load the model if the .kart file has the appropriate version,
     // otherwise warnings are printed.
@@ -298,7 +314,8 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // used.
     m_wheel_base = fabsf(m_kart_model->getLength() - 2*0.25f);
 
-    m_shadow_texture = STKTexManager::getInstance()->getTexture(m_shadow_file);
+    m_shadow_material = material_manager->getMaterialSPM(m_shadow_file, "",
+        "alphablend");
 
     STKTexManager::getInstance()->unsetTextureErrorMessage();
     file_manager->popTextureSearchPath();
@@ -311,9 +328,9 @@ void KartProperties::load(const std::string &filename, const std::string &node)
  *  \param krt The KartRenderType, like default, red, blue or transparent.
  *  see the RenderInfo include for details
  */
-KartModel* KartProperties::getKartModelCopy(KartRenderType krt) const
+KartModel* KartProperties::getKartModelCopy(std::shared_ptr<RenderInfo> ri) const
 {
-    return m_kart_model->makeCopy(krt);
+    return m_kart_model->makeCopy(ri);
 }  // getKartModelCopy
 
 // ----------------------------------------------------------------------------
@@ -328,7 +345,7 @@ void KartProperties::setHatMeshName(const std::string &hat_name)
 //-----------------------------------------------------------------------------
 void KartProperties::combineCharacteristics()
 {
-    m_combined_characteristic.reset(new CombinedCharacteristic());
+    m_combined_characteristic = std::make_shared<CombinedCharacteristic>();
     m_combined_characteristic->addCharacteristic(kart_properties_manager->
         getBaseCharacteristic());
     m_combined_characteristic->addCharacteristic(kart_properties_manager->
@@ -346,7 +363,8 @@ void KartProperties::combineCharacteristics()
         m_combined_characteristic->addCharacteristic(characteristic);
 
     m_combined_characteristic->addCharacteristic(m_characteristic.get());
-    m_cached_characteristic.reset(new CachedCharacteristic(m_combined_characteristic.get()));
+    m_cached_characteristic = std::make_shared<CachedCharacteristic>
+        (m_combined_characteristic.get());
 }   // combineCharacteristics
 
 //-----------------------------------------------------------------------------
@@ -369,11 +387,6 @@ void KartProperties::getAllData(const XMLNode * root)
     m_color.set(255, (int)(255*c.getX()), (int)(255*c.getY()), (int)(255*c.getZ()));
 
     root->get("groups",            &m_groups           );
-
-    root->get("shadow-scale",      &m_shadow_scale     );
-    root->get("shadow-x-offset",   &m_shadow_x_offset  );
-    root->get("shadow-z-offset",   &m_shadow_z_offset  );
-
     root->get("type",              &m_kart_type        );
 
     if(const XMLNode *dimensions_node = root->getNode("center"))

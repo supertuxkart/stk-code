@@ -36,6 +36,13 @@ export HOST_AARCH64=aarch64-linux-android
 export NDK_PLATFORM_AARCH64=android-21
 export SDK_VERSION_AARCH64=21
 
+export APP_NAME_RELEASE="SuperTuxKart"
+export APP_NAME_DEBUG="SuperTuxKart Debug"
+export PACKAGE_NAME_RELEASE="org.supertuxkart.stk"
+export PACKAGE_NAME_DEBUG="org.supertuxkart.stk_dev"
+export APP_ICON_RELEASE="$DIRNAME/icon.png"
+export APP_ICON_DEBUG="$DIRNAME/icon-dbg.png"
+
 
 # A helper function that checks if error ocurred
 check_error()
@@ -52,6 +59,7 @@ if [ ! -z "$1" ] && [ "$1" = "clean" ]; then
     rm -rf build
     rm -rf libs
     rm -rf obj
+    rm -rf res
     rm -rf .gradle
     exit
 fi
@@ -108,10 +116,16 @@ if [ "$BUILD_TYPE" = "debug" ] || [ "$BUILD_TYPE" = "Debug" ]; then
     export ANT_BUILD_TYPE="debug"
     export GRADLE_BUILD_TYPE="assembleDebug"
     export IS_DEBUG_BUILD=1
+    export APP_NAME="$APP_NAME_DEBUG"
+    export PACKAGE_NAME="$PACKAGE_NAME_DEBUG"
+    export APP_ICON="$APP_ICON_DEBUG"
 elif [ "$BUILD_TYPE" = "release" ] || [ "$BUILD_TYPE" = "Release" ]; then
     export ANT_BUILD_TYPE="release"
     export GRADLE_BUILD_TYPE="assembleRelease"
     export IS_DEBUG_BUILD=0
+    export APP_NAME="$APP_NAME_RELEASE"
+    export PACKAGE_NAME="$PACKAGE_NAME_RELEASE"
+    export APP_ICON="$APP_ICON_RELEASE"
 else
     echo "Unsupported BUILD_TYPE: $BUILD_TYPE. Possible values are: " \
          "debug, release"
@@ -342,8 +356,31 @@ check_error
 # Build apk
 echo "Building APK"
 
+mkdir -p "$DIRNAME/res/drawable/"
+mkdir -p "$DIRNAME/res/drawable-hdpi/"
+mkdir -p "$DIRNAME/res/drawable-mdpi/"
+mkdir -p "$DIRNAME/res/drawable-xhdpi/"
+mkdir -p "$DIRNAME/res/drawable-xxhdpi/"
+mkdir -p "$DIRNAME/res/values/"
+
+STRINGS_FILE="$DIRNAME/res/values/strings.xml"
+
+echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>"       >  "$STRINGS_FILE"
+echo "<resources>"                                      >> "$STRINGS_FILE"
+echo "    <string name=\"app_name\">$APP_NAME</string>" >> "$STRINGS_FILE"
+echo "</resources>"                                     >> "$STRINGS_FILE"
+
 sed -i "s/minSdkVersion=\".*\"/minSdkVersion=\"$SDK_VERSION\"/g" \
        "$DIRNAME/AndroidManifest.xml"
+       
+sed -i "s/package=\".*\"/package=\"$PACKAGE_NAME\"/g" \
+       "$DIRNAME/AndroidManifest.xml"
+       
+cp "$APP_ICON" "$DIRNAME/res/drawable/icon.png"
+convert -scale 72x72 "$APP_ICON" "$DIRNAME/res/drawable-hdpi/icon.png"
+convert -scale 48x48 "$APP_ICON" "$DIRNAME/res/drawable-mdpi/icon.png"
+convert -scale 96x96 "$APP_ICON" "$DIRNAME/res/drawable-xhdpi/icon.png"
+convert -scale 144x144 "$APP_ICON" "$DIRNAME/res/drawable-xxhdpi/icon.png"
 
 
 if [ "$BUILD_TOOL" = "gradle" ]; then
