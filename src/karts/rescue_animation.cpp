@@ -166,7 +166,7 @@ void RescueAnimation::update(float dt)
         m_xyz += dt * m_velocity * m_up_vector;
         m_kart->setXYZ(m_xyz);
         btQuaternion result = m_des_rotation.slerp(m_orig_rotation,
-            m_timer / m_kart->getKartProperties()->getRescueDuration());
+        m_timer / m_kart->getKartProperties()->getRescueDuration());
         result.normalize();
         m_kart->setRotation(result);
     }
