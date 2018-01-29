@@ -128,9 +128,9 @@ void OptionsScreenUI::init()
     assert( skinSelector != NULL );
 
     // ---- video modes
-	CheckBoxWidget* SplitScreen_Method = getWidget<CheckBoxWidget>("Split_Screen_Horizontally");
-	assert(SplitScreen_Method != NULL);
-	SplitScreen_Method->setState(UserConfigParams::Split_Screen_Horizontally);
+    CheckBoxWidget* SplitScreen_Method = getWidget<CheckBoxWidget>("Split_Screen_Horizontally");
+    assert(SplitScreen_Method != NULL);
+    SplitScreen_Method->setState(UserConfigParams::Split_Screen_Horizontally);
     CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
     assert( fps != NULL );
     fps->setState( UserConfigParams::m_display_fps );
