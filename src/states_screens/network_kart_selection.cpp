@@ -23,6 +23,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/widgets/player_kart_widget.hpp"
+#include "input/device_manager.hpp"
 #include "items/item_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -157,6 +158,7 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
             clrp->requestKartSelection(players[i]->getGlobalPlayerId(),
                                        selection                        );
         }
+        input_manager->getDeviceManager()->setAssignMode(ASSIGN);
     }
 }   // playerConfirm
 
