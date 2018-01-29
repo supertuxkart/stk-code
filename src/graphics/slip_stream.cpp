@@ -20,10 +20,12 @@
 #include "graphics/central_settings.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/stk_mesh_scene_node.hpp"
-#include "graphics/stk_tex_manager.hpp"
+#include "graphics/sp/sp_dynamic_draw_call.hpp"
+#include "graphics/sp/sp_mesh.hpp"
+#include "graphics/sp/sp_mesh_node.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
+#include "graphics/sp/sp_uniform_assigner.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
@@ -32,10 +34,7 @@
 #include "modes/world.hpp"
 #include "tracks/quad.hpp"
 #include "utils/constants.hpp"
-
-#include <SMesh.h>
-#include <SMeshBuffer.h>
-#include <IMeshSceneNode.h>
+#include "utils/mini_glm.hpp"
 
 /** Creates the slip stream object using a moving texture.
  *  \param kart Pointer to the kart to which the slip stream
@@ -43,30 +42,27 @@
  */
 SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
 {
-    Material *material = material_manager->getMaterial("slipstream.png");
-
-    createMesh(material);
-    m_node = irr_driver->addMesh(m_mesh, "splistream");
-
-    scene::IMeshBuffer* buffer = m_mesh->getMeshBuffer(0);
-    material->setMaterialProperties(&buffer->getMaterial(), buffer);
+    m_node = NULL;
 
 #ifndef SERVER_ONLY
-    STKMeshSceneNode* stk_node = dynamic_cast<STKMeshSceneNode*>(m_node);
-    if (stk_node != NULL)
-        stk_node->setReloadEachFrame(true);
-    m_mesh->drop();
+    if (CVS->isGLSL())
+    {
+        Material* material =
+            material_manager->getMaterialSPM("slipstream.png", "");
+        SP::SPMesh* mesh = createMesh(material);
+        m_node = irr_driver->addMesh(mesh, "slipstream");
+        mesh->drop();
+        std::string debug_name = m_kart->getIdent()+" (slip-stream)";
+        m_node->setName(debug_name.c_str());
+        m_node->setPosition(core::vector3df(0, 0 * 0.25f + 2.5f,
+            m_kart->getKartLength()));
+        m_node->setVisible(false);
+        SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(m_node);
+        assert(spmn);
+        setSPTM(spmn->getTextureMatrix(0).data());
+    }
 #endif
 
-#ifdef DEBUG
-    std::string debug_name = m_kart->getIdent()+" (slip-stream)";
-    m_node->setName(debug_name.c_str());
-#endif
-    m_node->setPosition(core::vector3df(0,
-                                        0*0.25f+2.5,
-                                        m_kart->getKartLength()) );
-    m_node->setVisible(false);
-    setTextureMatrix(&(m_node->getMaterial(0).getTextureMatrix(0)));
     m_slipstream_time      = 0.0f;
 
     float length = m_kart->getKartProperties()->getSlipstreamLength();
@@ -80,43 +76,29 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
     p[2]=Vec3( ew*0.5f, 0, -kl*0.5f-length);
     p[3]=Vec3( kw*0.5f, 0, -kl*0.5f       );
     m_slipstream_quad          = new Quad(p[0], p[1], p[2], p[3]);
-    if(UserConfigParams::m_slipstream_debug)
-    {
-        video::SMaterial material;
-        material.MaterialType    = video::EMT_TRANSPARENT_ADD_COLOR;
-        material.setFlag(video::EMF_BACK_FACE_CULLING, false);
-        material.setFlag(video::EMF_LIGHTING, false);
-
-        m_debug_mesh = irr_driver->createQuadMesh(&material, true);
-        scene::IMeshBuffer *buffer = m_debug_mesh->getMeshBuffer(0);
-        assert(buffer->getVertexType()==video::EVT_STANDARD);
-        irr::video::S3DVertex* vertices
-            = (video::S3DVertex*)buffer->getVertices();
-        video::SColor red(128, 255, 0, 0);
-        for(unsigned int i=0; i<4; i++)
-        {
-            vertices[i].Pos   = p[i].toIrrVector();
-            vertices[i].Color = red;
-            vertices[i].TCoords = core::vector2df(0, 0);
-        }
-        video::SMaterial &mat = buffer->getMaterial();
-        // Meshes need a texture, otherwise stk crashes.
 #ifndef SERVER_ONLY
-        video::ITexture *red_texture = STKTexManager::getInstance()->getUnicolorTexture(red);
-        mat.setTexture(0, red_texture);
-#endif
-
-        buffer->recalculateBoundingBox();
-        m_mesh->setBoundingBox(buffer->getBoundingBox());
-        m_debug_node = irr_driver->addMesh(m_debug_mesh, "splistream_debug", m_kart->getNode());
-        m_debug_node->grab();
-    }
-    else
+    if (UserConfigParams::m_slipstream_debug)
     {
-        m_debug_mesh = NULL;
-        m_debug_node = NULL;
+        m_debug_dc = std::make_shared<SP::SPDynamicDrawCall>
+            (scene::EPT_TRIANGLE_STRIP,
+            SP::SPShaderManager::get()->getSPShader("additive"),
+            material_manager->getDefaultSPMaterial("additive"));
+        m_debug_dc->getVerticesVector().resize(4);
+        video::S3DVertexSkinnedMesh* v =
+            m_debug_dc->getVerticesVector().data();
+        video::SColor red(128, 255, 0, 0);
+        unsigned idx[] = { 0, 3, 1, 2 };
+        for (unsigned i = 0; i < 4; i++)
+        {
+            v[i].m_position = p[idx[i]].toIrrVector();
+            v[i].m_normal = 0x1FF << 10;
+            v[i].m_color = red;
+        }
+        m_debug_dc->recalculateBoundingBox();
+        m_debug_dc->setParent(m_kart->getNode());
+        SP::addDynamicDrawCall(m_debug_dc);
     }
-
+#endif
 }   // SlipStream
 
 //-----------------------------------------------------------------------------
@@ -124,11 +106,13 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
  */
 SlipStream::~SlipStream()
 {
-    irr_driver->removeNode(m_node);
-    if(m_debug_node)
+    if (m_node)
     {
-        m_debug_node->drop();
-        m_debug_mesh->drop();
+        irr_driver->removeNode(m_node);
+    }
+    if (m_debug_dc)
+    {
+        m_debug_dc->removeFromSP();
     }
     delete m_slipstream_quad;
 
@@ -152,8 +136,10 @@ void SlipStream::reset()
  *  texture coordniates.
  *  \param material  The material to use.
  */
-void SlipStream::createMesh(Material* material)
+SP::SPMesh* SlipStream::createMesh(Material* material)
 {
+    SP::SPMesh* spm = NULL;
+#ifndef SERVER_ONLY
     // All radius, starting with the one closest to the kart (and
     // widest) to the one furthest away. A 0 indicates the end of the list
     float radius[] = {1.5f, 1.0f, 0.5f, 0.0f};
@@ -196,25 +182,37 @@ void SlipStream::createMesh(Material* material)
     const unsigned int  first_segment  = 0;
     const unsigned int  last_segment   = 14;
     const float         f              = 2*M_PI/float(num_segments);
-    scene::SMeshBuffer *buffer         = new scene::SMeshBuffer();
-    buffer->getMaterial().TextureLayer[0].Texture = material->getTexture();
+    SP::SPMeshBuffer* buffer           = new SP::SPMeshBuffer();
+
+    static_cast<SP::SPPerObjectUniform*>(buffer)->addAssignerFunction
+        ("custom_alpha", [this](SP::SPUniformAssigner* ua)->void
+        {
+            // In sp shader it's assigned reverse by 1.0 - custom_alpha
+            ua->setValue(1.0f - m_slipstream_time);
+        });
+
+    std::vector<uint16_t> indices;
+    std::vector<video::S3DVertexSkinnedMesh> vertices;
     for(unsigned int j=0; j<num_circles; j++)
     {
         float curr_distance = distance[j]-distance[0];
         // Create the vertices for each of the circle
         for(unsigned int i=first_segment; i<=last_segment; i++)
         {
-            video::S3DVertex v;
+            video::S3DVertexSkinnedMesh v;
             // Offset every 2nd circle by one half segment to increase
             // the number of planes so it looks better.
-            v.Pos.X =  sin((i+(j%2)*0.5f)*f)*radius[j];
-            v.Pos.Y = -cos((i+(j%2)*0.5f)*f)*radius[j];
-            v.Pos.Z = distance[j];
-            v.Color = video::SColor(alphas[j], alphas[j], alphas[j], alphas[j]);
-            v.TCoords.X = curr_distance/m_length;
-            v.TCoords.Y = (float)(i-first_segment)/(last_segment-first_segment)
-                          + (j%2)*(.5f/num_segments);
-            buffer->Vertices.push_back(v);
+            v.m_position.X =  sin((i+(j%2)*0.5f)*f)*radius[j];
+            v.m_position.Y = -cos((i+(j%2)*0.5f)*f)*radius[j];
+            v.m_position.Z = distance[j];
+            // Enable texture matrix and dummy normal for visualization
+            v.m_normal = 0x1FF << 10 | 1 << 30;
+            v.m_color = video::SColor(alphas[j], 255, 255, 255);
+            v.m_all_uvs[0] = MiniGLM::toFloat16(curr_distance/m_length);
+            v.m_all_uvs[1] = MiniGLM::toFloat16(
+                (float)(i-first_segment)/(last_segment-first_segment)
+                + (j%2)*(.5f/num_segments));
+            vertices.push_back(v);
         }   // for i<num_segments
     }   // while radius[num_circles]!=0
 
@@ -225,32 +223,23 @@ void SlipStream::createMesh(Material* material)
     {
         for(unsigned int i=first_segment; i<last_segment; i++)
         {
-            buffer->Indices.push_back( j   *diff_segments+i  );
-            buffer->Indices.push_back((j+1)*diff_segments+i  );
-            buffer->Indices.push_back( j   *diff_segments+i+1);
-            buffer->Indices.push_back( j   *diff_segments+i+1);
-            buffer->Indices.push_back((j+1)*diff_segments+i  );
-            buffer->Indices.push_back((j+1)*diff_segments+i+1);
+            indices.push_back(uint16_t( j   *diff_segments+i  ));
+            indices.push_back(uint16_t((j+1)*diff_segments+i  ));
+            indices.push_back(uint16_t( j   *diff_segments+i+1));
+            indices.push_back(uint16_t( j   *diff_segments+i+1));
+            indices.push_back(uint16_t((j+1)*diff_segments+i  ));
+            indices.push_back(uint16_t((j+1)*diff_segments+i+1));
         }
     }   // for j<num_circles-1
+    buffer->setSPMVertices(vertices);
+    buffer->setIndices(indices);
+    buffer->setSTKMaterial(material);
 
-    material->setMaterialProperties(&buffer->getMaterial(), buffer);
-#ifndef SERVER_ONLY
-    if (!CVS->isGLSL())
+    spm = new SP::SPMesh();
+    spm->addSPMeshBuffer(buffer);
+    spm->updateBoundingBox();
 #endif
-    {
-        buffer->Material.setFlag(video::EMF_BACK_FACE_CULLING, false);
-        buffer->Material.setFlag(video::EMF_COLOR_MATERIAL, true);
-        buffer->Material.ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
-        //buffer->Material.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
-    }
-
-    scene::SMesh *mesh = new scene::SMesh();
-    mesh->addMeshBuffer(buffer);
-    mesh->recalculateBoundingBox();
-
-    buffer->drop();
-    m_mesh = mesh;
+    return spm;
 }   // createMesh
 
 //-----------------------------------------------------------------------------
@@ -261,9 +250,12 @@ void SlipStream::createMesh(Material* material)
  */
 void SlipStream::setIntensity(float f, const AbstractKart *kart)
 {
-    if(!kart)
+    if (!kart || !m_node)
     {
-        m_node->setVisible(false);
+        if (m_node)
+        {
+            m_node->setVisible(false);
+        }
         return;
     }
 
@@ -284,24 +276,6 @@ void SlipStream::setIntensity(float f, const AbstractKart *kart)
     // For real testing in game: this needs some tuning!
     m_node->setVisible(f!=0);
     MovingTexture::setSpeed(f, 0);
-
-
-    int c = (int)(f*255);
-    if (c > 255) c = 255;
-
-    const unsigned int bcount = m_node->getMesh()->getMeshBufferCount();
-    for (unsigned int b=0; b<bcount; b++)
-    {
-        scene::IMeshBuffer* mb = m_node->getMesh()->getMeshBuffer(b);
-        irr::video::S3DVertex* vertices = (video::S3DVertex*)mb->getVertices();
-        for (unsigned int i=0; i<mb->getVertexCount(); i++)
-        {
-            const int color = (int)(c*(vertices[i].Color.getAlpha()/255.0f));
-            vertices[i].Color.setRed( color );
-            vertices[i].Color.setGreen( color );
-            vertices[i].Color.setBlue( color );
-        }
-    }
 
     return;
     // For debugging: make the slip stream effect visible all the time
@@ -349,14 +323,18 @@ void SlipStream::updateSlipstreamPower()
  */
 void SlipStream::setDebugColor(const video::SColor &color)
 {
-    if(!UserConfigParams::m_slipstream_debug) return;
-    // FIXME: Does not work anymore - the colour is changed, but
-    // visually there is no change.
-    scene::IMeshBuffer *buffer = m_debug_mesh->getMeshBuffer(0);
-    irr::video::S3DVertex* vertices =
-        (video::S3DVertex*)buffer->getVertices();
-    for(unsigned int i=0; i<4; i++)
-        vertices[i].Color=color;
+    if (!m_debug_dc)
+    {
+        return;
+    }
+
+    video::S3DVertexSkinnedMesh* v = m_debug_dc->getVerticesVector().data();
+    for (unsigned i = 0; i < 4; i++)
+    {
+        v[i].m_color = color;
+    }
+    m_debug_dc->setUpdateOffset(0);
+
 }   // setDebugColor
 
 //-----------------------------------------------------------------------------

@@ -53,10 +53,10 @@ Camera::CameraType   Camera::m_default_type  = Camera::CM_TYPE_NORMAL;
  *  camera index (which determines which viewport to use in split screen)
  *  is set.
  */
-Camera* Camera::createCamera(AbstractKart* kart)
+Camera* Camera::createCamera(AbstractKart* kart, const int index)
 {
-    Camera *camera = createCamera((int)m_all_cameras.size(), 
-                                   m_default_type, kart      );
+
+    Camera *camera = createCamera(index, m_default_type, kart);
     m_all_cameras.push_back(camera);
     return camera;
 }   // createCamera(kart)

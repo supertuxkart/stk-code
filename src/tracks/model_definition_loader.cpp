@@ -22,7 +22,6 @@ using namespace irr;
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
-#include "graphics/mesh_tools.hpp"
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
@@ -58,7 +57,7 @@ void ModelDefinitionLoader::addModelDefinition(const XMLNode* xml)
 
 // ----------------------------------------------------------------------------
 
-LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISceneNode* parent, RenderInfo* ri)
+LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISceneNode* parent, std::shared_ptr<RenderInfo> ri)
 {
 #ifndef SERVER_ONLY
     scene::ISceneManager* sm = irr_driver->getSceneManager();
@@ -76,7 +75,7 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
         for (unsigned int m=0; m<group.size(); m++)
         {
             if (group[m].m_skeletal_animation &&
-                (UserConfigParams::m_graphical_effects > 1 ||
+                (UserConfigParams::m_animated_characters ||
                 World::getWorld()->getIdent() == IDENT_CUTSCENE))
             {
                 scene::IAnimatedMesh* a_mesh = irr_driver->getAnimatedMesh(group[m].m_model_file);
@@ -85,14 +84,6 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
                     Log::warn("LODNodeLoad", "Warning: object model '%s' not found, ignored.\n",
                         group[m].m_model_file.c_str());
                     continue;
-                }
-
-                scene::ISkinnedMesh* sm =
-                    dynamic_cast<scene::ISkinnedMesh*>(a_mesh);
-                if (sm)
-                {
-                    MeshTools::createSkinnedMeshWithTangents(sm,
-                        &MeshTools::isNormalMap);
                 }
 
                 a_mesh->grab();
@@ -122,6 +113,7 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
 
                 m_track->handleAnimatedTextures(scene_node, *group[m].m_xml);
 
+                Track::uploadNodeVertexBuffer(scene_node);
                 lod_node->add(group[m].m_distance, scene_node, true);
             }
             else
@@ -134,18 +126,18 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
                     continue;
                 }
 
-                a_mesh = MeshTools::createMeshWithTangents(a_mesh, &MeshTools::isNormalMap);
                 irr_driver->setAllMaterialFlags(a_mesh);
 
                 a_mesh->grab();
                 //cache.push_back(a_mesh);
                 irr_driver->grabAllTextures(a_mesh);
                 m_track->addCachedMesh(a_mesh);
-                scene::IMeshSceneNode* scene_node = irr_driver
+                scene::ISceneNode* scene_node = irr_driver
                     ->addMesh(a_mesh, group[m].m_model_file, NULL, ri);
 
                 m_track->handleAnimatedTextures(scene_node, *group[m].m_xml);
 
+                Track::uploadNodeVertexBuffer(scene_node);
                 lod_node->add(group[m].m_distance, scene_node, true);
             }
         }

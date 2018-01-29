@@ -17,14 +17,14 @@ const float invSamples = 0.0625; // 1. / SAMPLES
 vec3 getXcYcZc(int x, int y, float zC)
 {
     // We use perspective symetric projection matrix hence P(0,2) = P(1, 2) = 0
-    float xC= (2. * (float(x)) / screen.x - 1.) * zC / ProjectionMatrix[0][0];
-    float yC= (2. * (float(y)) / screen.y - 1.) * zC / ProjectionMatrix[1][1];
+    float xC= (2. * (float(x)) / u_screen.x - 1.) * zC / u_projection_matrix[0][0];
+    float yC= (2. * (float(y)) / u_screen.y - 1.) * zC / u_projection_matrix[1][1];
     return vec3(xC, yC, zC);
 }
 
 void main(void)
 {
-    vec2 uv = gl_FragCoord.xy / screen;
+    vec2 uv = gl_FragCoord.xy / u_screen;
     float lineardepth = textureLod(dtex, uv, 0.).x;
     int x = int(gl_FragCoord.x), y = int(gl_FragCoord.y);
     vec3 FragPos = getXcYcZc(x, y, lineardepth);
@@ -40,7 +40,7 @@ void main(void)
     float m = log2(r) + 6. + log2(invSamples);
 
     float theta = mod(2. * 3.14 * tau * .5 * invSamples + phi, 6.283185307179586);
-    vec2 rotations = vec2(cos(theta), sin(theta)) * screen;
+    vec2 rotations = vec2(cos(theta), sin(theta)) * u_screen;
     vec2 offset = vec2(cos(invSamples), sin(invSamples));
 
     for(int i = 0; i < SAMPLES; ++i) {
@@ -52,9 +52,9 @@ void main(void)
         m = m + .5;
         ivec2 ioccluder_uv = ivec2(x, y) + ivec2(localoffset);
 
-        if (ioccluder_uv.x < 0 || ioccluder_uv.x > int(screen.x) || ioccluder_uv.y < 0 || ioccluder_uv.y > int(screen.y)) continue;
+        if (ioccluder_uv.x < 0 || ioccluder_uv.x > int(u_screen.x) || ioccluder_uv.y < 0 || ioccluder_uv.y > int(u_screen.y)) continue;
 
-        float LinearoccluderFragmentDepth = textureLod(dtex, vec2(ioccluder_uv) / screen, max(m, 0.)).x;
+        float LinearoccluderFragmentDepth = textureLod(dtex, vec2(ioccluder_uv) / u_screen, max(m, 0.)).x;
         vec3 OccluderPos = getXcYcZc(ioccluder_uv.x, ioccluder_uv.y, LinearoccluderFragmentDepth);
 
         vec3 vi = OccluderPos - FragPos;

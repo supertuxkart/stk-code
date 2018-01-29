@@ -130,7 +130,7 @@ int asCGarbageCollector::AddScriptObjectToGC(void *obj, asCObjectType *objType)
 	return ot.seqNbr;
 }
 
-int asCGarbageCollector::GetObjectInGC(asUINT idx, asUINT *seqNbr, void **obj, asIObjectType **type)
+int asCGarbageCollector::GetObjectInGC(asUINT idx, asUINT *seqNbr, void **obj, asITypeInfo **type)
 {
 	if( seqNbr ) *seqNbr = 0;
 	if( obj )    *obj    = 0;

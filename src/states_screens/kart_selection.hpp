@@ -114,7 +114,8 @@ protected:
      *  user validates */
     void updateKartWidgetModel(int widget_id,
                 const std::string& selection,
-                const irr::core::stringw& selectionText);
+                const irr::core::stringw& selectionText,
+                float kart_color);
 
     /** Adds a message to the screen which indicates that players must press fire to join. */
     void addMultiplayerMessage();

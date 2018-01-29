@@ -31,6 +31,8 @@
 #include <string>
 #include "animations/three_d_animation.hpp"
 
+#include <memory>
+
 class ModelDefinitionLoader;
 class RenderInfo;
 class ThreeDAnimation;
@@ -60,7 +62,7 @@ private:
 
     std::string m_id;
 
-    RenderInfo*              m_render_info;
+    std::shared_ptr<RenderInfo>    m_render_info;
 
 protected:
 

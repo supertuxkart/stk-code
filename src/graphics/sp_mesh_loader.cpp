@@ -16,6 +16,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/sp_mesh_loader.hpp"
+
+#include "graphics/sp/sp_mesh.hpp"
+#include "graphics/sp/sp_mesh_buffer.hpp"
+#include "graphics/central_settings.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/mini_glm.hpp"
@@ -37,6 +42,11 @@ bool SPMeshLoader::isALoadableFileExtension(const io::path& filename) const
 // ----------------------------------------------------------------------------
 scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
 {
+#ifndef SERVER_ONLY
+    const bool real_spm = CVS->isGLSL();
+#else
+    const bool real_spm = false;
+#endif
     if (!IS_LITTLE_ENDIAN)
     {
         Log::error("SPMeshLoader", "Not little endian machine.");
@@ -50,7 +60,7 @@ scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
     m_joint_count = 0;
     m_frame_count = 0;
     m_mesh = NULL;
-    m_mesh = m_scene_manager->createSkinnedMesh();
+    m_mesh = real_spm ? new SP::SPMesh() : m_scene_manager->createSkinnedMesh();
     io::IFileSystem* fs = m_scene_manager->getFileSystem();
     std::string base_path = fs->getFileDir(f->getFileName()).c_str();
     std::string header;
@@ -93,6 +103,8 @@ scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
     unsigned id = 0;
     std::unordered_map<unsigned, std::tuple<video::SMaterial, bool,
         bool> > mat_map;
+    std::unordered_map<unsigned, std::tuple<Material*, bool,
+        bool> > sp_mat_map;
     while (size_num != 0)
     {
         uint8_t tex_size;
@@ -109,45 +121,62 @@ scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
             tex_name_2.resize(tex_size);
             f->read(&tex_name_2.front(), tex_size);
         }
-        TexConfig mtc(true/*srgb*/, false/*premul_alpha*/, true/*mesh_tex*/,
-            true/*set_material*/);
-        video::ITexture* textures[2] = { NULL, NULL };
-        if (!tex_name_1.empty())
+        if (real_spm)
         {
-            std::string full_path = base_path + "/" + tex_name_1;
-            if (fs->existFile(full_path.c_str()))
+            if (!tex_name_1.empty())
             {
-                tex_name_1 = full_path;
+                std::string full_path = base_path + "/" + tex_name_1;
+                if (fs->existFile(full_path.c_str()))
+                {
+                    tex_name_1 = full_path;
+                }
             }
-            video::ITexture* tex = STKTexManager::getInstance()
-                ->getTexture(tex_name_1, &mtc);
-            if (tex != NULL)
+            sp_mat_map[id] =
+                std::make_tuple(
+                material_manager->getMaterialSPM(tex_name_1, tex_name_2),
+                !tex_name_1.empty(), !tex_name_2.empty());
+        }
+        else
+        {
+            video::ITexture* textures[2] = { NULL, NULL };
+            if (!tex_name_1.empty())
             {
-                textures[0] = tex;
+                std::string full_path = base_path + "/" + tex_name_1;
+                if (fs->existFile(full_path.c_str()))
+                {
+                    tex_name_1 = full_path;
+                }
+                video::ITexture* tex = STKTexManager::getInstance()
+                    ->getTexture(tex_name_1);
+                if (tex != NULL)
+                {
+                    textures[0] = tex;
+                }
             }
-        }
-        if (!tex_name_2.empty())
-        {
-            std::string full_path = base_path + "/" + tex_name_2;
-            if (fs->existFile(full_path.c_str()))
+            if (!tex_name_2.empty())
             {
-                tex_name_2 = full_path;
+                std::string full_path = base_path + "/" + tex_name_2;
+                if (fs->existFile(full_path.c_str()))
+                {
+                    tex_name_2 = full_path;
+                }
+                textures[1] = STKTexManager::getInstance()->getTexture
+                    (tex_name_2);
             }
-            textures[1] = STKTexManager::getInstance()->getTexture(tex_name_2,
-                &mtc);
+
+            video::SMaterial m;
+            m.MaterialType = video::EMT_SOLID;
+            if (textures[0] != NULL)
+            {
+                m.setTexture(0, textures[0]);
+            }
+            if (textures[1] != NULL)
+            {
+                m.setTexture(1, textures[1]);
+            }
+            mat_map[id] =
+                std::make_tuple(m, !tex_name_1.empty(), !tex_name_2.empty());
         }
-        video::SMaterial m;
-        m.MaterialType = video::EMT_SOLID;
-        if (textures[0] != NULL)
-        {
-            m.setTexture(0, textures[0]);
-        }
-        if (textures[1] != NULL)
-        {
-            m.setTexture(1, textures[1]);
-        }
-        mat_map[id] =
-            std::make_tuple(m, !tex_name_1.empty(), !tex_name_2.empty());
         size_num--;
         id++;
     }
@@ -169,11 +198,22 @@ scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
             }
             f->read(&indices_count, 4);
             f->read(&mat_id, 2);
-            assert(mat_id < mat_map.size());
-            decompress(f, vertices_count, indices_count, read_normal,
-                read_vcolor, read_tangent, std::get<1>(mat_map[mat_id]),
-                std::get<2>(mat_map[mat_id]), vt,
-                std::get<0>(mat_map[mat_id]));
+            if (real_spm)
+            {
+                assert(mat_id < sp_mat_map.size());
+                decompressSPM(f, vertices_count, indices_count, read_normal,
+                    read_vcolor, read_tangent, std::get<1>(sp_mat_map[mat_id]),
+                    std::get<2>(sp_mat_map[mat_id]), vt,
+                    std::get<0>(sp_mat_map[mat_id]));
+            }
+            else
+            {
+                assert(mat_id < mat_map.size());
+                decompress(f, vertices_count, indices_count, read_normal,
+                    read_vcolor, read_tangent, std::get<1>(mat_map[mat_id]),
+                    std::get<2>(mat_map[mat_id]), vt,
+                    std::get<0>(mat_map[mat_id]));
+            }
             mat_size--;
         }
         if (header == "SPMS")
@@ -196,15 +236,143 @@ scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
         uint16_t pre_computed_size = 0;
         f->read(&pre_computed_size, 2);
     }
+    const bool has_armature = !m_all_armatures.empty();
+    if (real_spm)
+    {
+        SP::SPMesh* spm = static_cast<SP::SPMesh*>(m_mesh);
+        spm->m_bind_frame = m_bind_frame;
+        spm->m_joint_using = m_joint_count;
+        // Because the last frame in spm is usable
+        if (has_armature)
+        {
+            spm->m_frame_count = m_frame_count + 1;
+        }
+        for (unsigned i = 0; i < m_all_armatures.size(); i++)
+        {
+            // This is diffferent from m_joint_using
+            spm->m_total_joints +=
+                (unsigned)m_all_armatures[i].m_joint_names.size();
+        }
+        spm->m_all_armatures = std::move(m_all_armatures);
+    }
     m_mesh->finalize();
-    // Because the last frame in spm is usable
-    static_cast<scene::CSkinnedMesh*>(m_mesh)->AnimationFrames =
-        (float)m_frame_count + 1.0f;
+    if (!real_spm && has_armature)
+    {
+        // Because the last frame in spm is usable
+        static_cast<scene::CSkinnedMesh*>(m_mesh)->AnimationFrames =
+            (float)m_frame_count + 1.0f;
+    }
     m_all_armatures.clear();
     m_to_bind_pose_matrices.clear();
     m_joints.clear();
     return m_mesh;
 }   // createMesh
+
+// ----------------------------------------------------------------------------
+void SPMeshLoader::decompressSPM(irr::io::IReadFile* spm,
+                                 unsigned vertices_count,
+                                 unsigned indices_count, bool read_normal,
+                                 bool read_vcolor, bool read_tangent,
+                                 bool uv_one, bool uv_two, SPVertexType vt,
+                                 Material* m)
+{
+    assert(vertices_count != 0);
+    assert(indices_count != 0);
+
+    using namespace SP;
+    SPMeshBuffer* mb = new SPMeshBuffer();
+    static_cast<SPMesh*>(m_mesh)->m_buffer.push_back(mb);
+    const unsigned idx_size = vertices_count > 255 ? 2 : 1;
+    for (unsigned i = 0; i < vertices_count; i++)
+    {
+        video::S3DVertexSkinnedMesh vertex = {};
+        // 3 * float position
+        spm->read(&vertex.m_position, 12);
+        if (read_normal)
+        {
+            spm->read(&vertex.m_normal, 4);
+        }
+        else
+        {
+            // 0, 1, 0
+            vertex.m_normal = 0x1FF << 10;
+        }
+        if (read_vcolor)
+        {
+            // Color identifier
+            uint8_t ci;
+            spm->read(&ci, 1);
+            if (ci == 128)
+            {
+                // All white
+                vertex.m_color = video::SColor(255, 255, 255, 255);
+            }
+            else
+            {
+                uint8_t r, g, b;
+                spm->read(&r, 1);
+                spm->read(&g, 1);
+                spm->read(&b, 1);
+                vertex.m_color = video::SColor(255, r, g, b);
+            }
+        }
+        else
+        {
+            vertex.m_color = video::SColor(255, 255, 255, 255);
+        }
+        if (uv_one)
+        {
+            spm->read(&vertex.m_all_uvs[0], 4);
+            if (uv_two)
+            {
+                spm->read(&vertex.m_all_uvs[2], 4);
+            }
+            if (read_tangent)
+            {
+                spm->read(&vertex.m_tangent, 4);
+            }
+            else
+            {
+                vertex.m_tangent = MiniGLM::quickTangent(vertex.m_normal);
+            }
+        }
+        if (vt == SPVT_SKINNED)
+        {
+            spm->read(&vertex.m_joint_idx[0], 16);
+            if (vertex.m_joint_idx[0] == -1 ||
+                vertex.m_weight[0] == 0 ||
+                // -0.0 in half float (16bit)
+                vertex.m_weight[0] == -32768)
+            {
+                // For the skinned mesh shader
+                vertex.m_joint_idx[0] = -32767;
+                // 1.0 in half float (16bit)
+                vertex.m_weight[0] = 15360;
+            }
+        }
+        mb->addSPMVertex(vertex);
+    }
+
+    std::vector<uint16_t> indices;
+    indices.resize(indices_count);
+    if (idx_size == 2)
+    {
+        spm->read(indices.data(), indices_count * 2);
+    }
+    else
+    {
+        std::vector<uint8_t> tmp_idx;
+        tmp_idx.resize(indices_count);
+        spm->read(tmp_idx.data(), indices_count);
+        for (unsigned i = 0; i < indices_count; i++)
+        {
+            indices[i] = tmp_idx[i];
+        }
+    }
+    mb->setIndices(indices);
+    mb->setSTKMaterial(m);
+
+}   // decompressSPM
 
 // ----------------------------------------------------------------------------
 void SPMeshLoader::decompress(irr::io::IReadFile* spm, unsigned vertices_count,
@@ -278,8 +446,8 @@ void SPMeshLoader::decompress(irr::io::IReadFile* spm, unsigned vertices_count,
             }
             if (read_tangent)
             {
-                // Tangents are re-calculated anyway in 0.9.3
-                spm->read(tmp, 4);
+                uint32_t packed;
+                spm->read(&packed, 4);
             }
         }
         if (vt == SPVT_SKINNED)
@@ -352,12 +520,6 @@ void SPMeshLoader::decompress(irr::io::IReadFile* spm, unsigned vertices_count,
 // ----------------------------------------------------------------------------
 void SPMeshLoader::createAnimationData(irr::io::IReadFile* spm)
 {
-    if (m_joints.empty())
-    {
-        Log::error("SPMeshLoader", "No joints are added.");
-        return;
-    }
-    assert(m_joints.size() == m_mesh->getMeshBufferCount());
     uint8_t armature_size = 0;
     spm->read(&armature_size, 1);
     assert(armature_size > 0);
@@ -383,6 +545,13 @@ void SPMeshLoader::createAnimationData(irr::io::IReadFile* spm)
             &m_to_bind_pose_matrices[accumulated_joints]);
         accumulated_joints += m_all_armatures[i].m_joint_used;
     }
+
+    // Only for legacy device
+    if (m_joints.empty())
+    {
+        return;
+    }
+    assert(m_joints.size() == m_mesh->getMeshBufferCount());
     for (unsigned i = 0; i < m_to_bind_pose_matrices.size(); i++)
     {
         m_to_bind_pose_matrices[i].makeInverse();
@@ -421,6 +590,11 @@ void SPMeshLoader::createAnimationData(irr::io::IReadFile* spm)
 // ----------------------------------------------------------------------------
 void SPMeshLoader::convertIrrlicht()
 {
+    // Only for legacy device
+    if (m_joints.empty())
+    {
+        return;
+    }
     unsigned total_joints = 0;
     for (unsigned i = 0; i < m_all_armatures.size(); i++)
     {
@@ -471,7 +645,9 @@ void SPMeshLoader::convertIrrlicht()
                 core::vector3df scl = m_all_armatures[i]
                     .m_frame_pose_matrices[k].second[j].m_scale;
                 joints[total_joints + j]->PositionKeys.push_back({frame, pos});
-                joints[total_joints + j]->RotationKeys.push_back({frame, q});
+                joints[total_joints + j]->RotationKeys.push_back({frame,
+                    // Reverse for broken irrlicht quaternion
+                    core::quaternion(q.X, q.Y, q.Z, -q.W)});
                 joints[total_joints + j]->ScaleKeys.push_back({frame, scl});
             }
         }
@@ -500,160 +676,3 @@ void SPMeshLoader::convertIrrlicht()
     }
 
 }   // convertIrrlicht
-
-// ----------------------------------------------------------------------------
-void SPMeshLoader::Armature::read(irr::io::IReadFile* spm)
-{
-    LocRotScale lrs;
-    spm->read(&m_joint_used, 2);
-    assert(m_joint_used > 0);
-    unsigned all_joints_size = 0;
-    spm->read(&all_joints_size, 2);
-    assert(all_joints_size > 0);
-    m_joint_names.resize(all_joints_size);
-    for (unsigned i = 0; i < all_joints_size; i++)
-    {
-        unsigned str_len = 0;
-        spm->read(&str_len, 1);
-        m_joint_names[i].resize(str_len);
-        spm->read(&m_joint_names[i].front(), str_len);
-    }
-    m_joint_matrices.resize(all_joints_size);
-    m_interpolated_matrices.resize(all_joints_size);
-    for (unsigned i = 0; i < all_joints_size; i++)
-    {
-        lrs.read(spm);
-        m_joint_matrices[i] = lrs.toMatrix();
-    }
-    m_world_matrices.resize(m_interpolated_matrices.size(),
-        std::make_pair(core::matrix4(), false));
-    m_parent_infos.resize(all_joints_size);
-    bool non_parent_bone = false;
-    for (unsigned i = 0; i < all_joints_size; i++)
-    {
-        int16_t info = 0;
-        spm->read(&info, 2);
-        if (info == -1)
-        {
-            non_parent_bone = true;
-        }
-        m_parent_infos[i] = info;
-    }
-    if (!non_parent_bone)
-    {
-        Log::fatal("SPMeshLoader::Armature", "Non-parent bone missing in"
-            "armature");
-    }
-    unsigned frame_size = 0;
-    spm->read(&frame_size, 2);
-    m_frame_pose_matrices.resize(frame_size);
-    for (unsigned i = 0; i < frame_size; i++)
-    {
-        m_frame_pose_matrices[i].second.resize(all_joints_size);
-        unsigned frame_index = 0;
-        spm->read(&frame_index, 2);
-        m_frame_pose_matrices[i].first = frame_index;
-        for (unsigned j = 0; j < m_frame_pose_matrices[i].second.size(); j++)
-        {
-            m_frame_pose_matrices[i].second[j].read(spm);
-        }
-    }
-}   // Armature::read
-
-// ----------------------------------------------------------------------------
-void SPMeshLoader::LocRotScale::read(irr::io::IReadFile* spm)
-{
-    float tmp[10];
-    spm->read(&tmp, 40);
-    m_loc = core::vector3df(tmp[0], tmp[1], tmp[2]);
-    m_rot = core::quaternion(-tmp[3], -tmp[4], -tmp[5], tmp[6]);
-    m_rot.normalize();
-    m_scale = core::vector3df(tmp[7], tmp[8], tmp[9]);
-}   // LocRotScale::read
-
-// ----------------------------------------------------------------------------
-void SPMeshLoader::Armature::getInterpolatedMatrices(float frame)
-{
-    if (frame < float(m_frame_pose_matrices.front().first) ||
-        frame >= float(m_frame_pose_matrices.back().first))
-    {
-        for (unsigned i = 0; i < m_interpolated_matrices.size(); i++)
-        {
-            m_interpolated_matrices[i] =
-                frame >= float(m_frame_pose_matrices.back().first) ?
-                m_frame_pose_matrices.back().second[i].toMatrix() :
-                m_frame_pose_matrices.front().second[i].toMatrix();
-        }
-        return;
-    }
-    int frame_1 = -1;
-    int frame_2 = -1;
-    float interpolation = 0.0f;
-    for (unsigned i = 0; i < m_frame_pose_matrices.size(); i++)
-    {
-        assert(i + 1 < m_frame_pose_matrices.size());
-        if (frame >= float(m_frame_pose_matrices[i].first) &&
-            frame < float(m_frame_pose_matrices[i + 1].first))
-        {
-            frame_1 = i;
-            frame_2 = i + 1;
-            interpolation =
-                (frame - float(m_frame_pose_matrices[i].first)) /
-                float(m_frame_pose_matrices[i + 1].first -
-                m_frame_pose_matrices[i].first);
-            break;
-        }
-    }
-    assert(frame_1 != -1);
-    assert(frame_2 != -1);
-    for (unsigned i = 0; i < m_interpolated_matrices.size(); i++)
-    {
-        LocRotScale interpolated;
-        interpolated.m_loc =
-            m_frame_pose_matrices[frame_2].second[i].m_loc.getInterpolated
-            (m_frame_pose_matrices[frame_1].second[i].m_loc, interpolation);
-        interpolated.m_rot.slerp
-            (m_frame_pose_matrices[frame_1].second[i].m_rot,
-            m_frame_pose_matrices[frame_2].second[i].m_rot, interpolation);
-        interpolated.m_scale =
-            m_frame_pose_matrices[frame_2].second[i].m_scale.getInterpolated
-            (m_frame_pose_matrices[frame_1].second[i].m_scale, interpolation);
-        m_interpolated_matrices[i] = interpolated.toMatrix();
-    }
-}   // Armature::getInterpolatedMatrices
-
-// ----------------------------------------------------------------------------
-void SPMeshLoader::Armature::getPose(float frame, core::matrix4* dest)
-{
-    getInterpolatedMatrices(frame);
-    for (auto& p : m_world_matrices)
-    {
-        p.second = false;
-    }
-    for (unsigned i = 0; i < m_joint_used; i++)
-    {
-        dest[i] = getWorldMatrix(m_interpolated_matrices, i) *
-            m_joint_matrices[i];
-    }
-}   // Armature::getPose
-
-// ----------------------------------------------------------------------------
-core::matrix4 SPMeshLoader::Armature::getWorldMatrix(
-    const std::vector<core::matrix4>& matrix, unsigned id)
-{
-    core::matrix4 mat = matrix[id];
-    int parent_id = m_parent_infos[id];
-    if (parent_id == -1)
-    {
-        m_world_matrices[id] = std::make_pair(mat, true);
-        return mat;
-    }
-    if (!m_world_matrices[parent_id].second)
-    {
-        m_world_matrices[parent_id] = std::make_pair
-            (getWorldMatrix(matrix, parent_id), true);
-    }
-    m_world_matrices[id] =
-        std::make_pair(m_world_matrices[parent_id].first * mat, true);
-    return m_world_matrices[id].first;
-}   // Armature::getWorldMatrix

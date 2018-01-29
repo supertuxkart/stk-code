@@ -27,8 +27,6 @@
  */
 class CustomVideoSettingsDialog : public GUIEngine::ModalDialog
 {
-private:
-    bool m_all_kart_animated;
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height

@@ -1,0 +1,13 @@
+prefix=@PREFIX@
+exec_prefix=${prefix}
+libdir=${prefix}/@LIB_PATH@
+sharedlibdir=${libdir}
+includedir=${prefix}/include
+
+Name: libsquish
+Description: squish DXT library
+Version: 1.14
+
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -llibsquish
+Cflags: -I${includedir}

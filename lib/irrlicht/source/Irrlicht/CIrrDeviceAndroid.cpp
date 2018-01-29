@@ -453,6 +453,21 @@ s32 CIrrDeviceAndroid::handleInput(android_app* app, AInputEvent* androidEvent)
 				event.TouchInput.X = AMotionEvent_getX(androidEvent, i + idx);
 				event.TouchInput.Y = AMotionEvent_getY(androidEvent, i + idx);
 				
+				if (event.TouchInput.ID >= 32)
+					continue;
+				
+				TouchEventData& event_data = device->TouchEventsData[event.TouchInput.ID];
+				
+				// Don't send move event when nothing changed
+				if (event_data.event == event.TouchInput.Event &&
+					event_data.x == event.TouchInput.X &&
+					event_data.y == event.TouchInput.Y)
+					continue;
+					
+				event_data.event = event.TouchInput.Event;
+				event_data.x = event.TouchInput.X;
+				event_data.y = event.TouchInput.Y;
+				
 				device->postEventFromUser(event);
 				
 				if (event.TouchInput.ID == 0)

@@ -25,8 +25,7 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/material.hpp"
-#include "graphics/material_manager.hpp"
+#include "graphics/sp/sp_base.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
@@ -36,6 +35,7 @@
 #include "tracks/arena_graph.hpp"
 #include "tracks/arena_node.hpp"
 #include "tracks/track.hpp"
+#include "utils/random_generator.hpp"
 #include "utils/string_utils.hpp"
 
 #include <IMesh.h>
@@ -104,6 +104,9 @@ void ItemManager::loadDefaultItemMeshes()
                         "- aborting", name.c_str());
             exit(-1);
         }
+#ifndef SERVER_ONLY
+        SP::uploadSPM(mesh);
+#endif
         mesh->grab();
         m_item_mesh[i]            = mesh;
         node->get("glow", &(m_glow_color[i]));
@@ -114,7 +117,13 @@ void ItemManager::loadDefaultItemMeshes()
                               ? NULL
                               : irr_driver->getMesh(lowres_model_filename);
 
-        if (m_item_lowres_mesh[i]) m_item_lowres_mesh[i]->grab();
+        if (m_item_lowres_mesh[i])
+        {
+#ifndef SERVER_ONLY
+            SP::uploadSPM(m_item_lowres_mesh[i]);
+#endif
+            m_item_lowres_mesh[i]->grab();
+        }
     }   // for i
     delete root;
 }   // loadDefaultItemMeshes

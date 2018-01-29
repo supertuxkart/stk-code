@@ -1,0 +1,14 @@
+<spshader>
+    <shader-info name="unlit" fallback-shader="alphatest" use-alpha-channel="Y"/>
+    <first-pass vertex-shader="sp_pass.vert"
+        fragment-shader="sp_unlit.frag" skinned-mesh-shader="sp_skinning.vert">
+    </first-pass>
+    <shadow-pass vertex-shader="sp_shadow.vert"
+        fragment-shader="sp_shadow_alpha_test.frag"
+        skinned-mesh-shader="sp_skinning_shadow.vert">
+    </shadow-pass>
+    <uniform-assigners>
+        <uniform-assigner name="layer"
+        function="shadowCascadeUniformAssigner"/>
+    </uniform-assigners>
+</spshader>

@@ -39,8 +39,9 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
 
-ModelViewWidget::ModelViewWidget() :
-IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, false)
+ModelViewWidget::ModelViewWidget(unsigned rtt_size) :
+IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, false),
+m_rtt_size(rtt_size)
 {
     m_rtt_main_node = NULL;
     m_camera = NULL;
@@ -48,7 +49,7 @@ IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, 
     m_type = WTYPE_MODEL_VIEW;
     m_render_target = NULL;
     m_rotation_mode = ROTATE_OFF;
-    m_render_info = new RenderInfo();
+    m_render_info = std::make_shared<RenderInfo>();
     m_angle = 0;
 
     // so that the base class doesn't complain there is no icon defined
@@ -62,9 +63,6 @@ ModelViewWidget::~ModelViewWidget()
 {
     clearModels();
     GUIEngine::needsUpdate.remove(this);
-#ifndef SERVER_ONLY    
-    delete m_render_info;
-#endif
 }   // ~ModelViewWidget
 
 // -----------------------------------------------------------------------------
@@ -87,10 +85,10 @@ void ModelViewWidget::add()
 // -----------------------------------------------------------------------------
 void ModelViewWidget::clearModels()
 {
+    m_render_info->setHue(0.0f);
     m_models.clearWithoutDeleting();
     m_model_location.clear();
     m_model_frames.clear();
-    m_model_render_info_affected.clear();
     m_model_animation_speed.clear();
     m_bone_attached.clear();
 
@@ -109,8 +107,7 @@ void ModelViewWidget::clearModels()
 void ModelViewWidget::addModel(irr::scene::IMesh* mesh,
                                const core::matrix4& location,
                                const int start_loop_frame,
-                               const int end_loop_frame,
-                               bool all_parts_colorized, float animation_speed,
+                               const int end_loop_frame, float animation_speed,
                                const std::string& bone_name)
 {
     if(!mesh) return;
@@ -118,7 +115,6 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh,
     m_models.push_back(mesh);
     m_model_location.push_back(location);
     m_model_frames.emplace_back(start_loop_frame, end_loop_frame);
-    m_model_render_info_affected.push_back(all_parts_colorized);
     m_model_animation_speed.push_back(animation_speed);
     m_bone_attached.push_back(bone_name);
 #ifndef SERVER_ONLY
@@ -184,7 +180,7 @@ void ModelViewWidget::update(float delta)
     {
         std::string name = "model view ";
         name += m_properties[PROP_ID].c_str();
-        m_render_target = irr_driver->createRenderTarget(irr::core::dimension2du(512,512), name);
+        m_render_target = irr_driver->createRenderTarget(irr::core::dimension2du(m_rtt_size, m_rtt_size), name);
     }
 
     if (m_rtt_main_node == NULL)
@@ -196,7 +192,7 @@ void ModelViewWidget::update(float delta)
 
     m_rtt_main_node->setVisible(true);
 #ifndef SERVER_ONLY
-    if (UserConfigParams::m_show_steering_animations != 0)
+    if (UserConfigParams::m_animated_characters)
         m_rtt_main_node->OnAnimate(os::Timer::getTime());
 #endif
 
@@ -226,7 +222,7 @@ void ModelViewWidget::setupRTTScene()
     if (m_model_frames[0].first == -1)
     {
         scene::ISceneNode* node = irr_driver->addMesh(m_models.get(0), "rtt_mesh",
-            NULL, m_render_info, m_model_render_info_affected[0]);
+            NULL, m_render_info);
         node->setPosition(m_model_location[0].getTranslation());
         node->setRotation(m_model_location[0].getRotationDegrees());
         node->setScale(m_model_location[0].getScale());
@@ -237,7 +233,7 @@ void ModelViewWidget::setupRTTScene()
     {
         animated_node =
         irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_models.get(0), "rtt_mesh",
-            NULL, m_render_info, m_model_render_info_affected[0]);
+            NULL, m_render_info);
         animated_node->setPosition(m_model_location[0].getTranslation());
         animated_node->setRotation(m_model_location[0].getRotationDegrees());
         animated_node->setScale(m_model_location[0].getScale());
@@ -250,7 +246,6 @@ void ModelViewWidget::setupRTTScene()
     assert(m_rtt_main_node != NULL);
     assert(m_models.size() == m_model_location.size());
     assert(m_models.size() == m_model_frames.size());
-    assert(m_models.size() == m_model_render_info_affected.size());
     assert(m_models.size() == m_model_animation_speed.size());
     assert(m_models.size() == m_bone_attached.size());
     const int mesh_amount = m_models.size();
@@ -266,7 +261,7 @@ void ModelViewWidget::setupRTTScene()
         {
             scene::ISceneNode* node =
             irr_driver->addMesh(m_models.get(n), "rtt_node", parent,
-                m_render_info, m_model_render_info_affected[n]);
+                m_render_info);
             node->setPosition(m_model_location[n].getTranslation());
             node->setRotation(m_model_location[n].getRotationDegrees());
             node->setScale(m_model_location[n].getScale());
@@ -276,8 +271,7 @@ void ModelViewWidget::setupRTTScene()
         {
             scene::IAnimatedMeshSceneNode* node =
             irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_models.get(n),
-                "modelviewrtt", parent, m_render_info,
-                m_model_render_info_affected[n]);
+                "modelviewrtt", parent, m_render_info);
             node->setPosition(m_model_location[n].getTranslation());
             node->setRotation(m_model_location[n].getRotationDegrees());
             node->setScale(m_model_location[n].getScale());

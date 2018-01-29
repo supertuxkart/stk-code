@@ -110,6 +110,16 @@ namespace irr
 		static bool IsFocused;
 		static bool IsStarted;
 		
+		struct TouchEventData
+		{
+			int x;
+			int y;
+			ETOUCH_INPUT_EVENT event;
+			
+			TouchEventData() : x(0), y(0), event(ETIE_COUNT) {};
+		};
+		
+		TouchEventData TouchEventsData[32];
 		bool IsMousePressed;
 
 		video::SExposedVideoData ExposedVideoData;

@@ -210,73 +210,6 @@ void TrackObjectManager::castRay(const btVector3 &from,
 }   // castRay
 
 // ----------------------------------------------------------------------------
-/** Enables or disables fog for a given scene node.
- *  \param node The node to adjust.
- *  \param enable True if fog is enabled, otherwise fog is disabled.
- */
-void adjustForFog(scene::ISceneNode *node, bool enable)
-{
-    if (node->getType() == scene::ESNT_MESH   ||
-        node->getType() == scene::ESNT_OCTREE ||
-        node->getType() == scene::ESNT_ANIMATED_MESH)
-    {
-        scene::IMesh* mesh;
-        if (node->getType() == scene::ESNT_ANIMATED_MESH) {
-            mesh = ((scene::IAnimatedMeshSceneNode*)node)->getMesh();
-        }
-        else {
-            mesh = ((scene::IMeshSceneNode*)node)->getMesh();
-        }
-
-        unsigned int n = mesh->getMeshBufferCount();
-        for (unsigned int i=0; i<n; i++)
-        {
-            scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-            video::SMaterial &irr_material=mb->getMaterial();
-            for (unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
-            {
-                video::ITexture* t = irr_material.getTexture(j);
-                if (t) material_manager->adjustForFog(t, mb, node, enable);
-
-            }   // for j<MATERIAL_MAX_TEXTURES
-        }  // for i<getMeshBufferCount()
-    }
-    else
-    {
-        node->setMaterialFlag(video::EMF_FOG_ENABLE, enable);
-    }
-
-    if (node->getType() == scene::ESNT_LOD_NODE)
-    {
-        std::vector<scene::ISceneNode*>&
-            subnodes = ((LODNode*)node)->getAllNodes();
-        for (unsigned int n=0; n<subnodes.size(); n++)
-        {
-            adjustForFog(subnodes[n], enable);
-        }
-    }
-}   // adjustForFog
-
-
-// ----------------------------------------------------------------------------
-/** Enable or disable fog on objects.
-  */
-void TrackObjectManager::enableFog(bool enable)
-{
-    TrackObject* curr;
-    for_in (curr, m_all_objects)
-    {
-        TrackObjectPresentationMesh* meshPresentation =
-            curr->getPresentation<TrackObjectPresentationMesh>();
-        if (meshPresentation!= NULL)
-        {
-            adjustForFog(meshPresentation->getNode(), enable);
-        }
-    }
-}   // enableFog
-
-// ----------------------------------------------------------------------------
-
 void TrackObjectManager::insertObject(TrackObject* object)
 {
     m_all_objects.push_back(object);
@@ -292,7 +225,3 @@ void TrackObjectManager::removeObject(TrackObject* obj)
     m_all_objects.remove(obj);
     delete obj;
 }   // removeObject
-
-// ----------------------------------------------------------------------------
-
-

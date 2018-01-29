@@ -60,10 +60,10 @@ public:
         ATTACH_BOMB,
         ATTACH_ANVIL,
         ATTACH_SWATTER,
-        // Note that the next symbol is only used as an index into the mesh
+        // Note that the next 2 symbols are only used as an index into the mesh
         // array; it will NEVER be actually assigned as an attachment type
         ATTACH_NOLOKS_SWATTER,
-        ATTACH_TINYTUX,
+        ATTACH_SWATTER_ANIM,
         ATTACH_BUBBLEGUM_SHIELD,
         ATTACH_NOLOK_BUBBLEGUM_SHIELD,
         ATTACH_MAX,

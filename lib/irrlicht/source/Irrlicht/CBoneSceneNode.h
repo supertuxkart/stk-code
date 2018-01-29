@@ -41,6 +41,12 @@ namespace scene
 
 		virtual void OnAnimate(u32 timeMs);
 
+		virtual void updateAbsolutePosition()
+		{
+			if (SkinningSpace == EBSS_GLOBAL) return;
+			IBoneSceneNode::updateAbsolutePosition();
+		}
+
 		virtual void updateAbsolutePositionOfAllChildren();
 
 		//! Writes attributes of the scene node.

@@ -67,9 +67,6 @@ public:
                  const Material **material, btVector3 *normal = NULL,
                  bool interpolate_normal = false) const;
 
-    /** Enable or disable fog on objects */
-    void enableFog(bool enable);
-
     void insertObject(TrackObject* object);
 
     void removeObject(TrackObject* who);

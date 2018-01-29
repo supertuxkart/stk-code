@@ -153,7 +153,7 @@ void Attachment::set(AttachmentType type, float time,
         break;
     }   // switch(type)
 
-    if (UserConfigParams::m_graphical_effects < 2)
+    if (UserConfigParams::m_particles_effects < 2)
     {
         m_node->setAnimationSpeed(0);
         m_node->setCurrentFrame(0);
@@ -190,7 +190,7 @@ void Attachment::set(AttachmentType type, float time,
 
         m_time_left = m_time_left * speed_mult;
 
-        if (UserConfigParams::m_graphical_effects > 1)
+        if (UserConfigParams::m_particles_effects > 1)
         {
             // .blend was created @25 (<10 real, slow computer), make it faster
             m_node->setAnimationSpeed(50);
@@ -198,8 +198,6 @@ void Attachment::set(AttachmentType type, float time,
     }
     m_node->setVisible(true);
 #ifndef SERVER_ONLY
-    irr_driver->applyObjectPassShader(m_node);
-
     // Save event about the new attachment
     RewindManager *rwm = RewindManager::get();
     if(rwm->isEnabled() && !rwm->isRewinding())
@@ -497,6 +495,28 @@ void Attachment::update(float dt)
 
     bool is_shield = (m_type == ATTACH_BUBBLEGUM_SHIELD|| m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD);
     float m_wanted_node_scale = is_shield ? std::max(1.0f, m_kart->getHighestPoint()*1.1f) : 1.0f;
+    int slow_flashes = 3;
+    if (is_shield && m_time_left < slow_flashes)
+    {
+        int flashes_per_second = 4;
+        int divisor = 2;
+        
+        float fast_flashes = 0.5F;
+        if (m_time_left < fast_flashes)
+        {
+            flashes_per_second = 12;
+        }
+
+        float mod = (int)(m_time_left * flashes_per_second * 2) % divisor;
+        if (mod < divisor / 2) 
+        {
+            m_node->setVisible(false);
+        } 
+        else 
+        {
+            m_node->setVisible(true);
+        }
+    }
 
     if (m_node_scale < m_wanted_node_scale)
     {
@@ -546,7 +566,8 @@ void Attachment::update(float dt)
         // Everything is done in the plugin.
         break;
     case ATTACH_NOLOKS_SWATTER:
-        // Should never be called, this symbols is only used as an index for
+    case ATTACH_SWATTER_ANIM:
+        // Should never be called, these symbols are only used as an index for
         // the model, Nolok's attachment type is ATTACH_SWATTER
         assert(false);
         break;
@@ -576,9 +597,6 @@ void Attachment::update(float dt)
                 m_bomb_sound = NULL;
             }
         }
-        break;
-    case ATTACH_TINYTUX:
-        // Nothing to do for tinytux, this is all handled in EmergencyAnimation
         break;
     case ATTACH_BUBBLEGUM_SHIELD:
     case ATTACH_NOLOK_BUBBLEGUM_SHIELD:

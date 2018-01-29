@@ -1328,6 +1328,25 @@ IImage* CNullDriver::createImageFromFile(io::IReadFile* file, video::IImageLoade
 	return 0; // failed to load
 }
 
+video::IImageLoader* CNullDriver::getImageLoaderForFile(const io::path& filename)
+{
+	if (!filename.size())
+		return 0;
+
+	s32 i;
+
+	// try to load file based on file extension
+	for (i=SurfaceLoader.size()-1; i>=0; --i)
+	{
+		if (SurfaceLoader[i]->isALoadableFileExtension(filename))
+		{
+			return SurfaceLoader[i];
+		}
+	}
+	return 0; // failed to load
+}
+
+
 
 //! Writes the provided image to disk file
 bool CNullDriver::writeImageToFile(IImage* image, const io::path& filename,u32 param)

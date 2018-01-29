@@ -157,8 +157,8 @@ void SoccerSetupScreen::beforeAddingWidget()
         info.support_colorization = kart_model.supportColorization();
         if (info.support_colorization)
         {
-            kart_view->getModelViewRenderInfo()->setKartModelRenderInfo
-                (info.team == SOCCER_TEAM_BLUE ? KRT_BLUE : KRT_RED);
+            kart_view->getModelViewRenderInfo()->setHue
+                (info.team == SOCCER_TEAM_BLUE ? 0.66f : 1.0f);
         }
 
         core::matrix4 model_location;
@@ -187,8 +187,8 @@ void SoccerSetupScreen::beforeAddingWidget()
                     kart_model.getInverseBoneMatrix(obj.m_bone_name);
                 swol = inv * obj.m_location;
             }
-            kart_view->addModel(obj.m_model, swol, -1, -1,
-                false/*all_parts_colorized*/, 0.0f, obj.m_bone_name);
+            kart_view->addModel(obj.m_model, swol, -1, -1, 0.0f,
+                obj.m_bone_name);
         }
 
         kart_view->setRotateContinuously( KART_CONTINUOUS_ROTATION_SPEED );
@@ -277,9 +277,9 @@ void SoccerSetupScreen::changeTeam(int player_id, SoccerTeam team)
     // Change the kart color
     if (m_kart_view_info[player_id].support_colorization)
     {
-        KartRenderType krt = team == SOCCER_TEAM_RED ? KRT_RED : KRT_BLUE;
+        const float hue = team == SOCCER_TEAM_RED ? 1.0f : 0.66f;
         m_kart_view_info[player_id].view->getModelViewRenderInfo()
-                                                ->setKartModelRenderInfo(krt);
+            ->setHue(hue);
     }
 
     for (unsigned int i = 0; i < m_kart_view_info.size(); i++)

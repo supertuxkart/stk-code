@@ -48,6 +48,7 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
     m_last_online_name    = "";
     m_last_was_online     = false;
     m_remember_password   = false;
+    m_default_kart_color  = 0.0f;
     initRemainingData();
 }   // PlayerProfile
 
@@ -76,24 +77,25 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     m_remember_password   = false;
     m_story_mode_status   = NULL;
     m_achievements_status = NULL;
+    m_default_kart_color  = 0.0f;
     m_icon_filename       = "";
 
-    node->getAndDecode("name",     &m_local_name);
-    node->get("guest",             &m_is_guest_account );
-    node->get("use-frequency",     &m_use_frequency    );
-    node->get("unique-id",         &m_unique_id        );
-    node->get("saved-session",     &m_saved_session    );
-    node->get("saved-user",        &m_saved_user_id    );
-    node->get("saved-token",       &m_saved_token      );
-    node->get("last-online-name",  &m_last_online_name );
-    node->get("last-was-online",   &m_last_was_online  );
-    node->get("remember-password", &m_remember_password);
-    node->get("icon-filename",     &m_icon_filename    );
-
+    node->getAndDecode("name",      &m_local_name);
+    node->get("guest",              &m_is_guest_account );
+    node->get("use-frequency",      &m_use_frequency    );
+    node->get("unique-id",          &m_unique_id        );
+    node->get("saved-session",      &m_saved_session    );
+    node->get("saved-user",         &m_saved_user_id    );
+    node->get("saved-token",        &m_saved_token      );
+    node->get("last-online-name",   &m_last_online_name );
+    node->get("last-was-online",    &m_last_was_online  );
+    node->get("remember-password",  &m_remember_password);
+    node->get("icon-filename",      &m_icon_filename    );
+    node->get("default-kart-color", &m_default_kart_color);
     #ifdef DEBUG
     m_magic_number = 0xABCD1234;
     #endif
-    
+
 }   // PlayerProfile
 
 //------------------------------------------------------------------------------
@@ -211,7 +213,8 @@ void PlayerProfile::save(UTFWriter &out)
         << L"\" saved-token=\""         << m_saved_token << L"\"\n";
     out << L"            last-online-name=\"" << m_last_online_name
         << L"\" last-was-online=\""           << m_last_was_online << L"\"\n";
-    out << L"            remember-password=\""         << m_remember_password << L"\">\n";
+    out << L"            remember-password=\""         << m_remember_password << L"\"\n";
+    out << L"            default-kart-color=\""        << m_default_kart_color << L"\">\n";
     {
         if(m_story_mode_status)
             m_story_mode_status->save(out);

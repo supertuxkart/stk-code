@@ -2,7 +2,7 @@
 // From "Frostbite going PBR" paper
 vec3 SunMRP(vec3 normal, vec3 eyedir)
 {
-    vec3 local_sundir = normalize((transpose(InverseViewMatrix) * vec4(sun_direction, 0.)).xyz);
+    vec3 local_sundir = normalize((transpose(u_inverse_view_matrix) * vec4(sundirection, 0.)).xyz);
     vec3 R = reflect(-eyedir, normal);
     float angularRadius = 3.14 * sun_angle / 180.;
     vec3 D = local_sundir;
