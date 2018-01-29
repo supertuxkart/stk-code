@@ -114,7 +114,7 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 # Find system GLEW library or build it if missing
 if(NOT USE_GLES2 AND NOT SERVER_ONLY)
     add_definitions(-DGLEW_NO_GLU)
-    if(USE_SYSTEM_GLEW)
+    if((UNIX AND NOT APPLE) AND USE_SYSTEM_GLEW)
         find_package(PkgConfig)
         if(PKGCONFIG_FOUND)
             pkg_check_modules(GLEW glew>=2.1)

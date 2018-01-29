@@ -200,8 +200,8 @@ void displaceShaderInit(SPShader* shader)
             glClear(GL_COLOR_BUFFER_BIT);
         }, RP_RESERVED);
     SPShaderManager::addPrefilledTexturesToShader(shader,
-        {{ "displacement_tex", "displace.png", false/*srgb*/, ST_BILINEAR }},
-        RP_RESERVED);
+        {std::make_tuple("displacement_tex", "displace.png", false/*srgb*/,
+        ST_BILINEAR)}, RP_RESERVED);
     shader->addCustomPrefilledTextures(ST_BILINEAR,
         GL_TEXTURE_2D, "mask_tex", []()->GLuint
         {
