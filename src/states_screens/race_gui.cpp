@@ -893,10 +893,12 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     // displayed under the time.
     if (viewport.UpperLeftCorner.Y == 0 &&
         viewport.LowerRightCorner.X == (int)(irr_driver->getActualScreenSize().Width) &&
-        !race_manager->getIfEmptyScreenSpaceExists()) {
+        !race_manager->getIfEmptyScreenSpaceExists()) 
+    {
         pos.UpperLeftCorner.Y += m_font_height;
     }
-    else {
+    else 
+    {
         pos.UpperLeftCorner.Y = viewport.UpperLeftCorner.Y + m_font_height;
     }
     pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y+20;
