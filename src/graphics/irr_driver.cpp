@@ -250,7 +250,8 @@ void IrrDriver::updateConfigIfRelevant()
     }
 #endif   // !SERVER_ONLY
 }   // updateConfigIfRelevant
-core::recti IrrDriver::GetSplitscreenWindow(int WindowNum) {
+core::recti IrrDriver::GetSplitscreenWindow(int WindowNum) 
+{
     const int playernum = race_manager->getNumLocalPlayers();
     const float playernum_sqrt = sqrt(playernum);
 	
