@@ -905,11 +905,13 @@ void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
     if (!CVS->supportsComputeShadersFiltering())
     {
         auxiliary.bind();
+        glClear(GL_COLOR_BUFFER_BIT);
         Gaussian6VBlurShader::getInstance()
             ->render(in_fbo.getRTT()[0], in_fbo.getWidth(), in_fbo.getHeight(),
                      sigma_v);
 
         in_fbo.bind();
+        glClear(GL_COLOR_BUFFER_BIT);
         Gaussian6HBlurShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0]);
         Gaussian6HBlurShader::getInstance()->render(auxiliary, in_fbo.getWidth(),
                                                    in_fbo.getHeight(), sigma_h);
@@ -959,9 +961,11 @@ void PostProcessing::renderHorizontalBlur(const FrameBuffer &in_fbo,
            in_fbo.getHeight() == auxiliary.getHeight());
 
     auxiliary.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
     Gaussian6HBlurShader::getInstance()->render(in_fbo, in_fbo.getWidth(),
                                                 in_fbo.getHeight(), 2.0f );
     in_fbo.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
     Gaussian6HBlurShader::getInstance()->render(auxiliary, in_fbo.getWidth(),
                                                 in_fbo.getHeight(), 2.0f);
 }   // renderHorizontalBlur

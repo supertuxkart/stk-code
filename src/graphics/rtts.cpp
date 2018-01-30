@@ -303,6 +303,9 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
         getFBO(FBO_HALF1_R).bind();
         glClearColor(1., 1., 1., 1.);
         glClear(GL_COLOR_BUFFER_BIT);
+        getFBO(FBO_HALF1).bind();
+        glClearColor(0., 0., 0., 0.);
+        glClear(GL_COLOR_BUFFER_BIT);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

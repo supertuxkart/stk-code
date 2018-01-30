@@ -195,7 +195,7 @@ void ShaderBasedRenderer::renderShadows()
 }
 
 // ============================================================================
-class CombineDiffuseColor : public TextureShader<CombineDiffuseColor, 6>
+class CombineDiffuseColor : public TextureShader<CombineDiffuseColor, 7>
 {
 public:
     CombineDiffuseColor()
@@ -208,13 +208,14 @@ public:
                            2, "ssao_tex", ST_NEAREST_FILTERED,
                            3, "gloss_map", ST_NEAREST_FILTERED,
                            4, "diffuse_color", ST_NEAREST_FILTERED,
-                           5, "depth_stencil", ST_NEAREST_FILTERED);
+                           5, "depth_stencil", ST_NEAREST_FILTERED,
+                           6, "light_scatter", ST_NEAREST_FILTERED);
     }   // CombineDiffuseColor
     // ------------------------------------------------------------------------
     void render(GLuint dm, GLuint sm, GLuint st, GLuint gm, GLuint dc,
-                GLuint ds)
+                GLuint ds, GLuint lt)
     {
-        setTextureUnits(dm, sm, st, gm, dc, ds);
+        setTextureUnits(dm, sm, st, gm, dc, ds, lt);
         drawFullScreenEffect();
     }   // render
 };   // CombineDiffuseColor
@@ -311,6 +312,19 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         PROFILER_POP_CPU_MARKER();
     }
 
+    const Track * const track = Track::getCurrentTrack();
+    // Render discrete lights scattering
+    if (track && track->isFogEnabled())
+    {
+        PROFILER_PUSH_CPU_MARKER("- PointLight Scatter", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_FOG));
+        m_lighting_passes.renderLightsScatter(m_rtts->getDepthStencilTexture(),
+                                              m_rtts->getFBO(FBO_HALF1),
+                                              m_rtts->getFBO(FBO_HALF2),
+                                              m_post_processing);
+        PROFILER_POP_CPU_MARKER();
+    }
+
     m_rtts->getFBO(FBO_COLORS).bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -326,7 +340,8 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
             m_rtts->getRenderTarget(RTT_HALF1_R),
             m_rtts->getRenderTarget(RTT_SP_GLOSS),
             m_rtts->getRenderTarget(RTT_SP_DIFF_COLOR),
-            m_rtts->getDepthStencilTexture());
+            m_rtts->getDepthStencilTexture(),
+            m_rtts->getRenderTarget(RTT_HALF1));
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -346,19 +361,6 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         PROFILER_POP_CPU_MARKER();
     }
 
-    const Track * const track = Track::getCurrentTrack();
-    // Render discrete lights scattering
-    if (track && track->isFogEnabled())
-    {
-        PROFILER_PUSH_CPU_MARKER("- PointLight Scatter", 0xFF, 0x00, 0x00);
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_FOG));
-        m_lighting_passes.renderLightsScatter(m_rtts->getDepthStencilTexture(),
-                                              m_rtts->getFBO(FBO_HALF1),
-                                              m_rtts->getFBO(FBO_HALF2),
-                                              m_rtts->getFBO(FBO_COLORS),
-                                              m_post_processing);
-        PROFILER_POP_CPU_MARKER();
-    }
 
     PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
     // Render anything glowing.

@@ -55,11 +55,7 @@ public:
     void renderLightsScatter(GLuint depth_stencil_texture,
                              const FrameBuffer& half1_framebuffer,
                              const FrameBuffer& half2_framebuffer,
-                             const FrameBuffer& colors_framebuffer,
                              const PostProcessing* post_processing);
-    
-    
-    
 };
 
 #endif //HEADER_LIGHTING_PASSES_HPP
