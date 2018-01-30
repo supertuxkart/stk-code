@@ -1055,23 +1055,13 @@ void PostProcessing::renderTextureLayer(unsigned tex, unsigned layer) const
 }   // renderTextureLayer
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderGlow(const FrameBuffer& glow_framebuffer,
-                                const FrameBuffer& half_framebuffer,
-                                const FrameBuffer& quarter_framebuffer,
-                                const FrameBuffer& color_framebuffer   ) const
+void PostProcessing::renderGlow(const FrameBuffer& quarter_framebuffer) const
 {
-    // To half
-    FrameBuffer::blit(glow_framebuffer, half_framebuffer, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
-    // To quarter
-    FrameBuffer::blit(half_framebuffer, quarter_framebuffer, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glStencilFunc(GL_EQUAL, 0, ~0);
     glEnable(GL_STENCIL_TEST);
-    color_framebuffer.bind();
     GlowShader::getInstance()->render(quarter_framebuffer.getRTT()[0]);
     glDisable(GL_STENCIL_TEST);
     glDisable(GL_BLEND);

@@ -116,8 +116,7 @@ const bool ALLOW_1280_X_720    = true;
 IrrDriver::IrrDriver()
 {
     m_resolution_changing = RES_CHANGE_NONE;
-    m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
-    
+
     struct irr::SIrrlichtCreationParameters p;
     p.DriverType    = video::EDT_NULL;
     p.WindowSize    = core::dimension2d<u32>(640,480);
@@ -173,24 +172,6 @@ void IrrDriver::reset()
     m_renderer->resetPostProcessing();
 #endif
 }   // reset
-
-// ----------------------------------------------------------------------------
-void IrrDriver::setPhase(STKRenderingPass p)
-{
-    m_phase = p;
-}
-
-// ----------------------------------------------------------------------------
-STKRenderingPass IrrDriver::getPhase() const
-{
-  return m_phase;
-}
-
-#// ----------------------------------------------------------------------------
-void IrrDriver::increaseObjectCount()
-{
-    m_renderer->incObjectCount(m_phase);
-}   // increaseObjectCount
 
 // ----------------------------------------------------------------------------
 core::array<video::IRenderTarget> &IrrDriver::getMainSetup()

@@ -99,10 +99,7 @@ public:
     void renderMotionBlur(const FrameBuffer &in_fbo,
                           FrameBuffer &out_fbo,
                           GLuint depth_stencil_texture);
-    void renderGlow(const FrameBuffer& glow_framebuffer,
-                    const FrameBuffer& half_framebuffer,
-                    const FrameBuffer& quarter_framebuffer,
-                    const FrameBuffer& color_framebuffer) const;
+    void renderGlow(const FrameBuffer& quarter_framebuffer) const;
     void renderLightning(core::vector3df intensity);
 
     /** Use motion blur for a short time */

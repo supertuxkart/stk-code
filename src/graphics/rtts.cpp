@@ -190,7 +190,7 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
 
         somevector.clear();
         somevector.push_back(m_render_target_textures[RTT_RGBA_2]);
-        m_frame_buffers[FBO_RGBA_2] = new FrameBuffer(somevector, res.Width, res.Height);
+        m_frame_buffers[FBO_RGBA_2] = new FrameBuffer(somevector, m_depth_stencil_tex, res.Width, res.Height);
 
         somevector.clear();
         somevector.push_back(m_render_target_textures[RTT_DIFFUSE]);
