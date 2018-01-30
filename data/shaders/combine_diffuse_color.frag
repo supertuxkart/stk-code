@@ -6,6 +6,8 @@ uniform sampler2D diffuse_color;
 uniform sampler2D depth_stencil;
 uniform sampler2D light_scatter;
 
+uniform vec4 bg_color;
+
 out vec4 o_final_color;
 
 #stk_include "utils/getPosFromUVDepth.frag"
@@ -32,8 +34,8 @@ void main()
     vec4 color_1 = vec4(tmp * ao + (emitMapValue * emitCol), diffuseMatColor.a);
 
     // Fog
-    float z = texture(depth_stencil, tc).x;
-    vec4 xpos = getPosFromUVDepth(vec3(tc, z), u_inverse_projection_matrix);
+    float depth = texture(depth_stencil, tc).x;
+    vec4 xpos = getPosFromUVDepth(vec3(tc, depth), u_inverse_projection_matrix);
     float dist = length(xpos.xyz);
     // fog density
     float factor = (1.0 - exp(u_fog_data.w * dist));
@@ -41,6 +43,12 @@ void main()
 
     // Additively blend the color by fog
     color_1 = color_1 + vec4(fog, factor);
+
+    // For skybox blending later
+    if (depth == 1.0)
+    {
+        color_1 = bg_color;
+    }
 
     // Light scatter (alpha blend function: (GL_ONE, GL_ONE_MINUS_SRC_ALPHA))
     vec4 ls = texture(light_scatter, tc);

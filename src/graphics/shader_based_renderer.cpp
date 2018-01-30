@@ -195,14 +195,15 @@ void ShaderBasedRenderer::renderShadows()
 }
 
 // ============================================================================
-class CombineDiffuseColor : public TextureShader<CombineDiffuseColor, 7>
+class CombineDiffuseColor : public TextureShader<CombineDiffuseColor, 7,
+                                                 std::array<float, 4> >
 {
 public:
     CombineDiffuseColor()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "combine_diffuse_color.frag");
-        assignUniforms();
+        assignUniforms("bg_color");
         assignSamplerNames(0, "diffuse_map", ST_NEAREST_FILTERED,
                            1, "specular_map", ST_NEAREST_FILTERED,
                            2, "ssao_tex", ST_NEAREST_FILTERED,
@@ -213,10 +214,10 @@ public:
     }   // CombineDiffuseColor
     // ------------------------------------------------------------------------
     void render(GLuint dm, GLuint sm, GLuint st, GLuint gm, GLuint dc,
-                GLuint ds, GLuint lt)
+                GLuint ds, GLuint lt, const std::array<float, 4> & bg_color)
     {
         setTextureUnits(dm, sm, st, gm, dc, ds, lt);
-        drawFullScreenEffect();
+        drawFullScreenEffect(bg_color);
     }   // render
 };   // CombineDiffuseColor
 
@@ -226,6 +227,7 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
                                               bool hasShadow,
                                               bool forceRTT)
 {
+
     if (CVS->isARBUniformBufferObjectUsable())
     {
         glBindBufferBase(GL_UNIFORM_BUFFER, 0,
@@ -256,22 +258,9 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
 
     {
         m_rtts->getFBO(FBO_SP).bind();
-        std::array<float, 4> clear_color_world = {{ 1.0f, 1.0f, 1.0f, 0.0f }};
-        if (World::getWorld() != NULL)
-        {
-            clear_color_world[0] =
-                irr_driver->getClearColor().getRed() / 255.0f;
-            clear_color_world[1] =
-                irr_driver->getClearColor().getGreen() / 255.0f;
-            clear_color_world[2] =
-                irr_driver->getClearColor().getBlue() / 255.0f;
-            clear_color_world[3] =
-                irr_driver->getClearColor().getAlpha() / 255.0f;
-        }
-
         float clear_color_empty[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
         float clear_color_gloss[4] = { 0.1f, 0.1f, 0.0f, 0.0f };
-        glClearBufferfv(GL_COLOR, 0, clear_color_world.data());
+        glClearBufferfv(GL_COLOR, 0, clear_color_empty);
         glClearBufferfv(GL_COLOR, 1, clear_color_empty);
         glClearBufferfv(GL_COLOR, 2, clear_color_gloss);
         glClearBufferfi(GL_DEPTH_STENCIL, 0, 1.0f, 0);
@@ -346,6 +335,19 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
         glDisable(GL_BLEND);
+        std::array<float, 4> bg_color = {{ 1.0f, 1.0f, 1.0f, 0.0f }};
+        if (World::getWorld() != NULL)
+        {
+            bg_color[0] =
+                irr_driver->getClearColor().getRed() / 255.0f;
+            bg_color[1] =
+                irr_driver->getClearColor().getGreen() / 255.0f;
+            bg_color[2] =
+                irr_driver->getClearColor().getBlue() / 255.0f;
+            bg_color[3] =
+                irr_driver->getClearColor().getAlpha() / 255.0f;
+        }
+
         CombineDiffuseColor::getInstance()->render(
             m_rtts->getRenderTarget(RTT_DIFFUSE),
             m_rtts->getRenderTarget(RTT_SPECULAR),
@@ -353,7 +355,8 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
             m_rtts->getRenderTarget(RTT_SP_GLOSS),
             m_rtts->getRenderTarget(RTT_SP_DIFF_COLOR),
             m_rtts->getDepthStencilTexture(),
-            m_rtts->getRenderTarget(RTT_HALF1));
+            m_rtts->getRenderTarget(RTT_HALF1), !m_skybox ?
+            bg_color : std::array<float, 4>{{0.0f, 0.0f, 0.0f, 0.0f}});
         PROFILER_POP_CPU_MARKER();
     }
 
