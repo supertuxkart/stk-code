@@ -337,7 +337,8 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
     } // end glow
 
     m_rtts->getFBO(FBO_COLORS).bind();
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(UserConfigParams::m_glow ? GL_COLOR_BUFFER_BIT :
+        GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     {
         PROFILER_PUSH_CPU_MARKER("- Combine diffuse color", 0x2F, 0x77, 0x33);
