@@ -269,8 +269,8 @@ core::recti IrrDriver::GetSplitscreenWindow(int WindowNum)
     return core::recti(
         x_grid_Position * width_of_space,
         y_grid_Position * height_of_space,
-        std::min(irr_driver->getActualScreenSize().Width ,(x_grid_Position * width_of_space) + width_of_space),
-        std::min(irr_driver->getActualScreenSize().Height ,(y_grid_Position * height_of_space) + height_of_space));
+        min(irr_driver->getActualScreenSize().Width ,(x_grid_Position * width_of_space) + width_of_space),
+        min(irr_driver->getActualScreenSize().Height ,(y_grid_Position * height_of_space) + height_of_space));
 }
 // ----------------------------------------------------------------------------
 /** Gets a list of supported video modes from the irrlicht device. This data
