@@ -28,6 +28,7 @@ option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
+option(USE_SYSTEM_ENET "Use system ENET instead of the built-in version, when available." ON)
 option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
 
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
@@ -107,9 +108,19 @@ endif()
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 
-# Build the ENet UDP network library
-find_package(ENet REQUIRED)
-include_directories(${ENet_INCLUDE_DIRS})
+# Find system ENet library or build it if missing
+if((UNIX AND NOT APPLE) AND USE_SYSTEM_ENET)
+    find_package(ENet)
+endif()
+
+if(ENET_FOUND)
+    include_directories(${ENet_INCLUDE_DIRS})
+else()
+    # Fallback to built-in version
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
+    set(ENet_LIBRARIES "enet")
+endif()
 
 # Find system GLEW library or build it if missing
 if(NOT USE_GLES2 AND NOT SERVER_ONLY)
