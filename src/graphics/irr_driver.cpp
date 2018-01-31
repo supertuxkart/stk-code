@@ -255,8 +255,8 @@ core::recti IrrDriver::GetSplitscreenWindow(int WindowNum)
     const int playernum = race_manager->getNumLocalPlayers();
     const float playernum_sqrt = sqrt(playernum);
 	
-    const int rows = UserConfigParams::Split_Screen_Horizontally ? ceil(playernum_sqrt) : round(playernum_sqrt);
-    const int cols = UserConfigParams::Split_Screen_Horizontally ? round(playernum_sqrt) : ceil(playernum_sqrt);
+    const int rows = UserConfigParams::split_screen_horizontally ? ceil(playernum_sqrt) : round(playernum_sqrt);
+    const int cols = UserConfigParams::split_screen_horizontally ? round(playernum_sqrt) : ceil(playernum_sqrt);
 
     //This could add a bit of overhang
     const int width_of_space = ceil(irr_driver->getActualScreenSize().Width / cols);
@@ -264,13 +264,13 @@ core::recti IrrDriver::GetSplitscreenWindow(int WindowNum)
 
     const int x_grid_Position = WindowNum % cols;
     const int y_grid_Position = floor((WindowNum) / cols);
-	
+
 //To prevent the viewport going over the right side, we use std::min to ensure the right corners are never larger than the total width
     return core::recti(
         x_grid_Position * width_of_space,
         y_grid_Position * height_of_space,
-        min(irr_driver->getActualScreenSize().Width ,(x_grid_Position * width_of_space) + width_of_space),
-        min(irr_driver->getActualScreenSize().Height ,(y_grid_Position * height_of_space) + height_of_space));
+		std::min((int)irr_driver->getActualScreenSize().Width ,(x_grid_Position * width_of_space) + width_of_space),
+		std::min((int)irr_driver->getActualScreenSize().Height ,(y_grid_Position * height_of_space) + height_of_space));
 }
 // ----------------------------------------------------------------------------
 /** Gets a list of supported video modes from the irrlicht device. This data
