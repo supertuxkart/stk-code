@@ -104,9 +104,6 @@ RescueAnimation::~RescueAnimation()
     m_referee = NULL;
     if(m_timer < 0)
     {
-        m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
-        m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
-
         for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
             Camera *camera = Camera::getCamera(i);
@@ -159,6 +156,7 @@ void RescueAnimation::update(float dt)
             m_kart->setRotation(m_des_rotation);
             kart_on_track = true;
 			m_xyz += max_height * m_up_vector;
+			m_kart->setXYZ(m_xyz);
         }
         else 
         {
