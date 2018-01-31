@@ -302,7 +302,7 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
     if (track && track->isFogEnabled())
     {
         PROFILER_PUSH_CPU_MARKER("- PointLight Scatter", 0xFF, 0x00, 0x00);
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_FOG));
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_LIGHTSCATTER));
         m_lighting_passes.renderLightsScatter(m_rtts->getDepthStencilTexture(),
                                               m_rtts->getFBO(FBO_HALF1),
                                               m_rtts->getFBO(FBO_HALF2),

@@ -46,7 +46,7 @@ static const char* GPU_Phase[Q_LAST] =
     "SunLight",
     "PointLights",
     "SSAO",
-    "Fog",
+    "Light Scatter",
     "Glow",
     "Combine Diffuse Color",
     "Skybox",
