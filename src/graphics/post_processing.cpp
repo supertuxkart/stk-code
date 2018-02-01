@@ -742,7 +742,7 @@ public:
 
 // ============================================================================
 
-PostProcessing::PostProcessing(IVideoDriver* video_driver)
+PostProcessing::PostProcessing()
 {
     // Load the MLAA area map
     io::IReadFile *areamap = irr_driver->getDevice()->getFileSystem()->
@@ -759,12 +759,6 @@ PostProcessing::PostProcessing(IVideoDriver* video_driver)
     areamap->drop();
 
 }   // PostProcessing
-
-// ----------------------------------------------------------------------------
-PostProcessing::~PostProcessing()
-{
-    // TODO: do we have to delete/drop anything?
-}   // ~PostProcessing
 
 // ----------------------------------------------------------------------------
 /** Initialises post processing at the (re-)start of a race. This sets up

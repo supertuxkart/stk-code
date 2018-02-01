@@ -67,7 +67,7 @@ void ShaderBasedRenderer::prepareForwardRenderer()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
         clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);    
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 // ----------------------------------------------------------------------------
@@ -543,7 +543,8 @@ void ShaderBasedRenderer::debugPhysics()
 } //debugPhysics
 
 // ----------------------------------------------------------------------------
-void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
+void ShaderBasedRenderer::renderPostProcessing(Camera * const camera,
+                                               bool first_cam)
 {
     scene::ICameraSceneNode * const camnode = camera->getCameraSceneNode();
     const core::recti &viewport = camera->getViewport();
@@ -569,6 +570,10 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
     else if (irr_driver->getSSAOViz())
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        if (first_cam)
+        {
+             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        }
         camera->activate();
         m_post_processing->renderPassThrough(m_rtts->getFBO(FBO_HALF1_R).getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
     }
@@ -579,6 +584,10 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
     else
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        if (first_cam)
+        {
+             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        }
         camera->activate();
         m_post_processing->renderPassThrough(fbo->getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
     }
@@ -593,25 +602,13 @@ ShaderBasedRenderer::ShaderBasedRenderer()
     SharedGPUObjects::init();
     SP::init();
     SP::initSTKRenderer(this);
-    m_post_processing = new PostProcessing(irr_driver->getVideoDriver());    
+    m_post_processing = new PostProcessing();
 }
 
 // ----------------------------------------------------------------------------
 ShaderBasedRenderer::~ShaderBasedRenderer()
 {
-    // Note that we can not simply delete m_post_processing here:
-    // m_post_processing uses a material that has a reference to
-    // m_post_processing (for a callback). So when the material is
-    // removed it will try to drop the ref count of its callback object,
-    // which is m_post_processing, and which was already deleted. So
-    // instead we just decrease the ref count here. When the material
-    // is deleted, it will trigger the actual deletion of
-    // PostProcessing when decreasing the refcount of its callback object.
-    if(m_post_processing)
-    {
-        // check if we createad the OpenGL device by calling initDevice()
-        m_post_processing->drop();
-    }
+    delete m_post_processing;
     delete m_spherical_harmonics;
     delete m_skybox;
     delete m_rtts;
@@ -770,7 +767,7 @@ void ShaderBasedRenderer::render(float dt)
         
         if (CVS->isDeferredEnabled())
         {
-            renderPostProcessing(camera);
+            renderPostProcessing(camera, cam == 0);
         }
 
         // Save projection-view matrix for the next frame

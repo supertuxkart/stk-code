@@ -20,7 +20,6 @@
 
 #include "graphics/gl_headers.hpp"
 
-#include <IReferenceCounted.h>
 #include <S3DVertex.h>
 #include <matrix4.h>
 #include <vector>
@@ -40,7 +39,7 @@ using namespace irr;
 /** \brief   Handles post processing, eg motion blur
  *  \ingroup graphics
  */
-class PostProcessing: public IReferenceCounted
+class PostProcessing
 {
 private:
     /** Boost time, how long the boost should be displayed. This also
@@ -57,8 +56,8 @@ private:
     STKTexture* m_areamap;
 
 public:
-                 PostProcessing(video::IVideoDriver* video_driver);
-    virtual     ~PostProcessing();
+                 PostProcessing();
+    virtual     ~PostProcessing() {}
 
     void         reset();
     /** Those should be called around the part where we render the scene to be
