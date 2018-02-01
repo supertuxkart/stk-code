@@ -11,15 +11,8 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 include(CMakeDependentOption)
 
-set(DEPENDENCIES "dependencies")
-# In case of 64-bit windows, use a different path for dependencies
-# so that both dependencies can be installed next to each other
-if ( WIN32 AND (CMAKE_SIZEOF_VOID_P EQUAL 8 ) )
-    set(DEPENDENCIES "dependencies-64bit")
-endif()
-
 include(BuildTypeSTKRelease)
-if (NOT CMAKE_BUILD_TYPE)
+if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "No build type selected, default to STKRelease")
     set(CMAKE_BUILD_TYPE "STKRelease")
 endif()
@@ -34,7 +27,7 @@ option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when av
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT USE_GLES2;NOT APPLE" OFF)
 
-if ((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
+if((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
     option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" ON)
     option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
 endif()
@@ -73,6 +66,32 @@ set(STK_INSTALL_BINARY_DIR "bin" CACHE
     STRING "Install executable to this directory, absolute or relative to CMAKE_INSTALL_PREFIX")
 set(STK_INSTALL_DATA_DIR "share/supertuxkart" CACHE
     STRING "Install data folder to this directory, absolute or relative to CMAKE_INSTALL_PREFIX")
+
+# Define dependencies path
+if(MSVC)
+    set(DEPENDENCIES "dependencies-vs")
+elseif(MINGW)
+    set(DEPENDENCIES "dependencies-mingw")
+else()
+    set(DEPENDENCIES "dependencies")
+endif()
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(DEPENDENCIES "${DEPENDENCIES}-64bit")
+endif()
+
+if(WIN32)
+    if(NOT IS_DIRECTORY "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}")
+        set(DEPENDENCIES "dependencies")
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            set(DEPENDENCIES "${DEPENDENCIES}-64bit")
+        endif()
+    endif()
+
+    if(NOT IS_DIRECTORY "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}")
+        message(FATAL_ERROR "Dependencies directory not found.")
+    endif()
+endif()
 
 # These variables enable MSVC to find libraries located in "dependencies"
 if(WIN32)
