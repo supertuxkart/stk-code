@@ -145,19 +145,15 @@ void RescueAnimation::update(float dt)
     if (m_timer < (m_kart->getKartProperties()->getRescueDuration() * rescue_moment))
     {
         if (kart_on_track == false) {
+			kart_on_track = true;
+
             World::getWorld()->moveKartAfterRescue(m_kart);
             m_up_vector = m_kart->getTrans().getBasis().getColumn(1);
             m_xyz = m_kart->getXYZ();
-
+	
             float hit_dest = MaximumHeight();
-            float max_height = m_kart->getKartProperties()->getRescueHeight();
-			btQuaternion result = m_des_rotation.slerp(m_orig_rotation, 0);
-
-			result.normalize();
-			m_kart->setRotation(result);
-
-            max_height = std::min(hit_dest, max_height) * rescue_moment;
-            kart_on_track = true;
+            float max_height = std::min(hit_dest, m_kart->getKartProperties()->getRescueHeight());
+            
 			m_xyz += max_height * m_up_vector;
 
         }
