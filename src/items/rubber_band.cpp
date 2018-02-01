@@ -51,7 +51,7 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
     {
         return;
     }
-    video::SColor color(77, 179, 0, 0);
+    video::SColor color(255, 179, 0, 0);
     if (CVS->isDeferredEnabled())
     {
         color.setRed(SP::srgb255ToLinear(color.getRed()));
