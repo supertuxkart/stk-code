@@ -766,47 +766,10 @@ PostProcessing::PostProcessing()
  */
 void PostProcessing::reset()
 {
-    const u32 n = Camera::getNumCameras();
-    m_boost_time.resize(n);
-    m_vertices.resize(n);
-
-    for(unsigned int i=0; i<n; i++)
+    m_boost_time.resize(Camera::getNumCameras());
+    for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
     {
         m_boost_time[i] = 0.0f;
-
-        const core::recti &vp = Camera::getCamera(i)->getViewport();
-        // Map viewport to [-1,1] x [-1,1]. First define the coordinates
-        // left, right, top, bottom:
-        float right = vp.LowerRightCorner.X < (int)irr_driver->getActualScreenSize().Width
-                     ? 0.0f : 1.0f;
-        float left   = vp.UpperLeftCorner.X  > 0.0f ? 0.0f : -1.0f;
-        float top    = vp.UpperLeftCorner.Y  > 0.0f ? 0.0f : 1.0f;
-        float bottom = vp.LowerRightCorner.Y < (int)irr_driver->getActualScreenSize().Height
-                     ? 0.0f : -1.0f;
-
-        // Use left etc to define 4 vertices on which the rendered screen
-        // will be displayed:
-        m_vertices[i].v0.Pos = core::vector3df(left,  bottom, 0);
-        m_vertices[i].v1.Pos = core::vector3df(left,  top,    0);
-        m_vertices[i].v2.Pos = core::vector3df(right, top,    0);
-        m_vertices[i].v3.Pos = core::vector3df(right, bottom, 0);
-        // Define the texture coordinates of each vertex, which must
-        // be in [0,1]x[0,1]
-        m_vertices[i].v0.TCoords  = core::vector2df(left  ==-1.0f ? 0.0f : 0.5f,
-                                                    bottom==-1.0f ? 0.0f : 0.5f);
-        m_vertices[i].v1.TCoords  = core::vector2df(left  ==-1.0f ? 0.0f : 0.5f,
-                                                    top   == 1.0f ? 1.0f : 0.5f);
-        m_vertices[i].v2.TCoords  = core::vector2df(right == 0.0f ? 0.5f : 1.0f,
-                                                    top   == 1.0f ? 1.0f : 0.5f);
-        m_vertices[i].v3.TCoords  = core::vector2df(right == 0.0f ? 0.5f : 1.0f,
-                                                    bottom==-1.0f ? 0.0f : 0.5f);
-        // Set normal and color:
-        core::vector3df normal(0,0,1);
-        m_vertices[i].v0.Normal = m_vertices[i].v1.Normal =
-        m_vertices[i].v2.Normal = m_vertices[i].v3.Normal = normal;
-        SColor white(0xFF, 0xFF, 0xFF, 0xFF);
-        m_vertices[i].v0.Color  = m_vertices[i].v1.Color  =
-        m_vertices[i].v2.Color  = m_vertices[i].v3.Color  = white;
     }  // for i <number of cameras
 }   // reset
 
@@ -874,16 +837,14 @@ void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo,
            in_fbo.getHeight() == auxiliary.getHeight());
     float inv_width  = 1.0f / in_fbo.getWidth();
     float inv_height = 1.0f / in_fbo.getHeight();
-    {
-        auxiliary.bind();
-        Gaussian3VBlurShader::getInstance()->render(in_fbo, inv_width,
-                                                    inv_height);
-    }
-    {
-        in_fbo.bind();
-        Gaussian3HBlurShader::getInstance()->render(auxiliary, inv_width,
-                                                    inv_height);
-    }
+    auxiliary.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+    Gaussian3VBlurShader::getInstance()->render(in_fbo, inv_width,
+                                                inv_height);
+    in_fbo.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+    Gaussian3HBlurShader::getInstance()->render(auxiliary, inv_width,
+                                                inv_height);
 }   // renderGaussian3Blur
 
 // ----------------------------------------------------------------------------
@@ -1099,7 +1060,7 @@ void PostProcessing::renderDoF(const FrameBuffer &framebuffer, GLuint color_text
 // ----------------------------------------------------------------------------
 void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
                                    const FrameBuffer &in_fbo,
-                                   const FrameBuffer &out_fbo,
+                                   const FrameBuffer &tmp_fbo,
                                    const FrameBuffer &quarter1_fbo,
                                    const FrameBuffer &quarter2_fbo)
 {
@@ -1107,9 +1068,8 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
 
     glEnable(GL_DEPTH_TEST);
     // Grab the sky
-    out_fbo.bind();
+    tmp_fbo.bind();
     glClear(GL_COLOR_BUFFER_BIT);
-//            irr_driver->renderSkybox(camnode);
 
     // Set the sun's color
     const SColor col = track->getGodRaysColor();
@@ -1131,9 +1091,8 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
 
     // Fade to quarter
     quarter1_fbo.bind();
-    glViewport(0, 0, irr_driver->getActualScreenSize().Width / 4,
-                     irr_driver->getActualScreenSize().Height / 4);
-    GodFadeShader::getInstance()->render(out_fbo.getRTT()[0], col);
+    glClear(GL_COLOR_BUFFER_BIT);
+    GodFadeShader::getInstance()->render(tmp_fbo.getRTT()[0], col);
 
     // Blur
     renderGaussian3Blur(quarter1_fbo, quarter2_fbo);
@@ -1145,17 +1104,12 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
     trans *= camnode->getViewMatrix();
 
     trans.transformVect(ndc, pos);
-
-    const float texh = 
-        m_vertices[0].v1.TCoords.Y - m_vertices[0].v0.TCoords.Y;
-    const float texw = 
-        m_vertices[0].v3.TCoords.X - m_vertices[0].v0.TCoords.X;
-
-    const float sunx = ((ndc[0] / ndc[3]) * 0.5f + 0.5f) * texw;
-    const float suny = ((ndc[1] / ndc[3]) * 0.5f + 0.5f) * texh;
+    const float sunx = ((ndc[0] / ndc[3]) * 0.5f + 0.5f);
+    const float suny = ((ndc[1] / ndc[3]) * 0.5f + 0.5f);
 
     // Rays please
     quarter2_fbo.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
     GodRayShader::getInstance()
         ->render(quarter1_fbo.getRTT()[0], core::vector2df(sunx, suny));
 
@@ -1171,7 +1125,7 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
     in_fbo.bind();
     renderPassThrough(quarter2_fbo.getRTT()[0], in_fbo.getWidth(), in_fbo.getHeight());
     glDisable(GL_BLEND);
-    
+
 }
 
 
@@ -1256,7 +1210,8 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GODRAYS));
-        renderGodRays(camnode, *in_fbo, *out_fbo, rtts->getFBO(FBO_QUARTER1), rtts->getFBO(FBO_QUARTER2));
+        renderGodRays(camnode, *in_fbo, rtts->getFBO(FBO_RGBA_1),
+            rtts->getFBO(FBO_QUARTER1), rtts->getFBO(FBO_QUARTER2));
         PROFILER_POP_CPU_MARKER();
     }
 

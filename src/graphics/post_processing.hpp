@@ -47,12 +47,6 @@ private:
      *  have a stronger effect. */
     std::vector<float>  m_boost_time;
 
-    struct Quad { video::S3DVertex v0, v1, v2, v3; };
-
-    /** The vertices for the rectangle used for each camera. This includes
-     *  the vertex position, normal, and texture coordinate. */
-    std::vector<Quad> m_vertices;
-
     STKTexture* m_areamap;
 
 public:
@@ -87,7 +81,7 @@ public:
     void renderDoF(const FrameBuffer &framebuffer, GLuint color_texture, GLuint depth_stencil_texture);
     void renderGodRays(scene::ICameraSceneNode * const camnode,
                        const FrameBuffer &in_fbo,
-                       const FrameBuffer &out_fbo,
+                       const FrameBuffer &tmp_fbo,
                        const FrameBuffer &quarter1_fbo,
                        const FrameBuffer &quarter2_fbo);
 
