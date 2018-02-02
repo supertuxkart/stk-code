@@ -1,4 +1,4 @@
-flat in float hue_change;
+in float hue_change;
 
 in vec3 normal;
 in vec2 uv;

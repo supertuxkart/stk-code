@@ -38,7 +38,7 @@ out vec2 uv_two;
 out vec4 color;
 out vec4 world_position;
 out float camdist;
-flat out float hue_change;
+out float hue_change;
 
 void main()
 {
