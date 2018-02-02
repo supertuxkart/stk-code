@@ -56,6 +56,7 @@ private:
     void getCameraSettings(float *above_kart, float *cam_angle,
                            float *side_way, float *distance,
                            bool *smoothing);
+    
     void positionCamera(float dt, float above_kart, float cam_angle,
                         float side_way, float distance, float smoothing);
 
@@ -70,6 +71,9 @@ private:
                           AbstractKart* kart);
     virtual ~CameraNormal() {}
 public:
+
+    void SnapToPosition();
+     // ------------------------------------------------------------------------
     bool isDebug() { return false; }
     // ------------------------------------------------------------------------
     bool isFPS() { return false; }

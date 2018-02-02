@@ -37,7 +37,7 @@
 
 #include <algorithm>
 
-
+#include "graphics\camera_normal.hpp"
 /** The constructor stores a pointer to the kart this object is animating,
  *  and initialised the timer.
  *  \param kart Pointer to the kart which is animated.
@@ -90,6 +90,7 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
         if (UserConfigParams::m_arena_ai_stats)
             world->increaseRescueCount();
     }
+
 };   // RescueAnimation
 
 
@@ -98,20 +99,11 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
  */
 RescueAnimation::~RescueAnimation()
 {
-    
+    m_kart->getBody()->setLinearVelocity(btVector3(0, 0, 0));
+    m_kart->getBody()->setAngularVelocity(btVector3(0, 0, 0));
     m_kart->getNode()->removeChild(m_referee->getSceneNode());
     delete m_referee;
     m_referee = NULL;
-    if(m_timer < 0)
-    {
-        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
-        {
-            Camera *camera = Camera::getCamera(i);
-            if(camera && camera->getKart()==m_kart &&
-                camera->getType() != Camera::CM_TYPE_END)
-                camera->setMode(Camera::CM_NORMAL);
-        }
-    }
 }   // ~RescueAnimation
 
 // Determine maximum rescue height with up-raycast
@@ -142,41 +134,40 @@ float RescueAnimation::MaximumHeight() {
 void RescueAnimation::update(float dt)
 {
 
-    if (m_timer < (m_kart->getKartProperties()->getRescueDuration() * rescue_moment))
+    if (m_timer <= (m_kart->getKartProperties()->getRescueDuration() * rescue_moment))
     {
-        if (kart_on_track == false) {
-			kart_on_track = true;
+        if (kart_on_track == false) 
+        {
+            kart_on_track = true;
 
             World::getWorld()->moveKartAfterRescue(m_kart);
+
+            for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
+            {
+				CameraNormal* camera = dynamic_cast<CameraNormal*>(Camera::getCamera(i));
+                if (camera && camera->getKart() == m_kart &&
+                    dynamic_cast<CameraNormal*>(camera)) 
+                {
+					camera->setMode(Camera::CM_NORMAL);
+					camera->SnapToPosition();
+                }
+            }
+
             m_up_vector = m_kart->getTrans().getBasis().getColumn(1);
             m_xyz = m_kart->getXYZ();
-	
-            float hit_dest = MaximumHeight();
-            float max_height = std::min(hit_dest, m_kart->getKartProperties()->getRescueHeight());
-            
-			m_xyz += max_height * m_up_vector;
 
+            float hit_dest = MaximumHeight();
+            float max_height = std::min(hit_dest, m_kart->getKartProperties()->getRescueHeight()) * rescue_moment;
+            m_xyz += max_height * m_up_vector;
         }
-		m_xyz -= dt * m_velocity * m_up_vector;
-		m_kart->setXYZ(m_xyz);
+
+        m_xyz -= dt * m_velocity * m_up_vector;
+        m_kart->setXYZ(m_xyz);
     } 
     else 
     {
         m_xyz += dt * m_velocity * m_up_vector;
         m_kart->setXYZ(m_xyz);
-		float animMoment = (m_kart->getKartProperties()->getRescueDuration() * rescue_moment);
-		float scaler = m_timer / animMoment;
-		btQuaternion result = m_des_rotation.slerp(m_orig_rotation, 1 - scaler);
-			
-        result.normalize();
-        m_kart->setRotation(result);
-		for (unsigned int i = 0; i<Camera::getNumCameras(); i++)
-		{
-			Camera *camera = Camera::getCamera(i);
-			if (camera && camera->getKart() == m_kart &&
-				camera->getType() != Camera::CM_TYPE_END)
-				camera->setMode(Camera::CM_NORMAL);
-		}
     }
 
     AbstractKartAnimation::update(dt);
