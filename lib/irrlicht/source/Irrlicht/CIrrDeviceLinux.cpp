@@ -920,6 +920,13 @@ bool CIrrDeviceLinux::createWindow()
 				&visTempl, &visNumber);
 			visTempl.depth -= 8;
 		}
+		
+		if (!visual && !CreationParams.WithAlphaChannel)
+		{
+			visTempl.depth = 32;
+			visual = XGetVisualInfo(display, VisualScreenMask|VisualDepthMask,
+									&visTempl, &visNumber);
+		}
 	}
 
 	if (!visual)
