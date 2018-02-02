@@ -408,8 +408,8 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
     {
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
-        return;
     }
+    glBindVertexArray(0);
 
 } //renderSceneDeferred
 
@@ -489,12 +489,12 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     // Now all instancing data from mesh and particle are done drawing
     m_draw_calls.setFenceSync();
 
-    if (!CVS->isDeferredEnabled() && !forceRTT)
+    if (!forceRTT)
     {
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
-        return;
     }
+    glBindVertexArray(0);
 
 } //renderScene
 
