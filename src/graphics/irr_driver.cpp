@@ -1654,7 +1654,18 @@ void IrrDriver::displayFPS()
                     m_skinning_joint);
     }
     else
-        fps_string = _("FPS: %d/%d/%d - %d KTris", min, fps, max, (int)roundf(kilotris)); 
+    {
+        if (CVS->isGLSL())
+        {
+            fps_string = _("FPS: %d/%d/%d - %d KTris", min, fps, max,
+                SP::sp_solid_poly_count / 1000);
+        }
+        else
+        {
+            fps_string = _("FPS: %d/%d/%d - %d KTris", min, fps, max,
+            (int)roundf(kilotris));
+        }
+    }
 
     static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
 
