@@ -193,8 +193,7 @@ core::matrix4 ShadowMatrices::getTighestFitOrthoProj(const core::matrix4 &transf
  *   \param height of the rendering viewport
  */
 void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
-                                               unsigned int width, unsigned int height,
-                                               GLuint depth_stencil_texture)
+                                               unsigned int width, unsigned int height)
 {
     camnode->render();
     irr_driver->setProjMatrix(irr_driver->getVideoDriver()

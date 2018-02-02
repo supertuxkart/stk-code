@@ -50,9 +50,6 @@
 #include <algorithm> 
 
 // ----------------------------------------------------------------------------
-
-
-
 void ShaderBasedRenderer::setRTT(RTT* rtts)
 {
     m_rtts = rtts;
@@ -70,7 +67,7 @@ void ShaderBasedRenderer::prepareForwardRenderer()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
         clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);    
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 // ----------------------------------------------------------------------------
@@ -111,8 +108,7 @@ void ShaderBasedRenderer::computeMatrixesAndCameras(scene::ICameraSceneNode *con
                                                     unsigned int width, unsigned int height)
 {
     m_current_screen_size = core::vector2df((float)width, (float)height);
-    m_shadow_matrices.computeMatrixesAndCameras(camnode, width, height,
-        m_rtts->getDepthStencilTexture());
+    m_shadow_matrices.computeMatrixesAndCameras(camnode, width, height);
 }   // computeMatrixesAndCameras
 
 // ----------------------------------------------------------------------------
@@ -152,7 +148,7 @@ void ShaderBasedRenderer::renderSSAO() const
 void ShaderBasedRenderer::renderGlow() const
 {
     irr_driver->getSceneManager()->setCurrentRendertime(scene::ESNRP_SOLID);
-    m_rtts->getFBO(FBO_TMP1_WITH_DS).bind();
+    m_rtts->getFBO(FBO_RGBA_2).bind();
     glClearStencil(0);
     glClearColor(0, 0, 0, 0);
     glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -199,27 +195,29 @@ void ShaderBasedRenderer::renderShadows()
 }
 
 // ============================================================================
-class CombineDiffuseColor : public TextureShader<CombineDiffuseColor, 6>
+class CombineDiffuseColor : public TextureShader<CombineDiffuseColor, 7,
+                                                 std::array<float, 4> >
 {
 public:
     CombineDiffuseColor()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "combine_diffuse_color.frag");
-        assignUniforms();
+        assignUniforms("bg_color");
         assignSamplerNames(0, "diffuse_map", ST_NEAREST_FILTERED,
                            1, "specular_map", ST_NEAREST_FILTERED,
                            2, "ssao_tex", ST_NEAREST_FILTERED,
                            3, "gloss_map", ST_NEAREST_FILTERED,
                            4, "diffuse_color", ST_NEAREST_FILTERED,
-                           5, "depth_stencil", ST_NEAREST_FILTERED);
+                           5, "depth_stencil", ST_NEAREST_FILTERED,
+                           6, "light_scatter", ST_NEAREST_FILTERED);
     }   // CombineDiffuseColor
     // ------------------------------------------------------------------------
     void render(GLuint dm, GLuint sm, GLuint st, GLuint gm, GLuint dc,
-                GLuint ds)
+                GLuint ds, GLuint lt, const std::array<float, 4> & bg_color)
     {
-        setTextureUnits(dm, sm, st, gm, dc, ds);
-        drawFullScreenEffect();
+        setTextureUnits(dm, sm, st, gm, dc, ds, lt);
+        drawFullScreenEffect(bg_color);
     }   // render
 };   // CombineDiffuseColor
 
@@ -229,6 +227,7 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
                                               bool hasShadow,
                                               bool forceRTT)
 {
+
     if (CVS->isARBUniformBufferObjectUsable())
     {
         glBindBufferBase(GL_UNIFORM_BUFFER, 0,
@@ -239,11 +238,7 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
     irr_driver->getSceneManager()->setActiveCamera(camnode);
 
     PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
-    unsigned solid_poly_count = 0;
-    unsigned shadow_poly_count = 0;
     m_draw_calls.prepareDrawCalls(camnode);
-    m_poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += solid_poly_count;
-    m_poly_count[SHADOW_PASS] += shadow_poly_count;
     PROFILER_POP_CPU_MARKER();
     PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);
     m_lighting_passes.updateLightsInfo(camnode, dt);
@@ -263,26 +258,13 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
 
     {
         m_rtts->getFBO(FBO_SP).bind();
-        std::array<float, 4> clear_color_world = {{ 1.0f, 1.0f, 1.0f, 0.0f }};
-        if (World::getWorld() != NULL)
-        {
-            clear_color_world[0] =
-                irr_driver->getClearColor().getRed() / 255.0f;
-            clear_color_world[1] =
-                irr_driver->getClearColor().getGreen() / 255.0f;
-            clear_color_world[2] =
-                irr_driver->getClearColor().getBlue() / 255.0f;
-            clear_color_world[3] =
-                irr_driver->getClearColor().getAlpha() / 255.0f;
-        }
-
         float clear_color_empty[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
         float clear_color_gloss[4] = { 0.1f, 0.1f, 0.0f, 0.0f };
-        glClearBufferfv(GL_COLOR, 0, clear_color_world.data());
+        glClearBufferfv(GL_COLOR, 0, clear_color_empty);
         glClearBufferfv(GL_COLOR, 1, clear_color_empty);
         glClearBufferfv(GL_COLOR, 2, clear_color_gloss);
         glClearBufferfi(GL_DEPTH_STENCIL, 0, 1.0f, 0);
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS1));
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS));
         SP::draw(SP::RP_1ST, SP::DCT_NORMAL);
     }
 
@@ -315,22 +297,66 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         PROFILER_POP_CPU_MARKER();
     }
 
+    const Track * const track = Track::getCurrentTrack();
+    // Render discrete lights scattering
+    if (track && track->isFogEnabled())
+    {
+        PROFILER_PUSH_CPU_MARKER("- PointLight Scatter", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_LIGHTSCATTER));
+        m_lighting_passes.renderLightsScatter(m_rtts->getDepthStencilTexture(),
+                                              m_rtts->getFBO(FBO_HALF1),
+                                              m_rtts->getFBO(FBO_HALF2),
+                                              m_post_processing);
+        PROFILER_POP_CPU_MARKER();
+    }
+
+    // Render anything glowing.
+    if (UserConfigParams::m_glow)
+    {
+        PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GLOW));
+        renderGlow();
+        // To half
+        FrameBuffer::blit(m_rtts->getFBO(FBO_RGBA_2),
+            m_rtts->getFBO(FBO_HALF2), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+        // To quarter
+        FrameBuffer::blit(m_rtts->getFBO(FBO_HALF2),
+            m_rtts->getFBO(FBO_QUARTER1), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+        PROFILER_POP_CPU_MARKER();
+    } // end glow
+
     m_rtts->getFBO(FBO_COLORS).bind();
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(UserConfigParams::m_glow ? GL_COLOR_BUFFER_BIT :
+        GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     {
         PROFILER_PUSH_CPU_MARKER("- Combine diffuse color", 0x2F, 0x77, 0x33);
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS2));
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_COMBINE_DIFFUSE_COLOR));
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
         glDisable(GL_BLEND);
+        std::array<float, 4> bg_color = {{ 1.0f, 1.0f, 1.0f, 0.0f }};
+        if (World::getWorld() != NULL)
+        {
+            bg_color[0] =
+                irr_driver->getClearColor().getRed() / 255.0f;
+            bg_color[1] =
+                irr_driver->getClearColor().getGreen() / 255.0f;
+            bg_color[2] =
+                irr_driver->getClearColor().getBlue() / 255.0f;
+            bg_color[3] =
+                irr_driver->getClearColor().getAlpha() / 255.0f;
+        }
+
         CombineDiffuseColor::getInstance()->render(
             m_rtts->getRenderTarget(RTT_DIFFUSE),
             m_rtts->getRenderTarget(RTT_SPECULAR),
             m_rtts->getRenderTarget(RTT_HALF1_R),
             m_rtts->getRenderTarget(RTT_SP_GLOSS),
             m_rtts->getRenderTarget(RTT_SP_DIFF_COLOR),
-            m_rtts->getDepthStencilTexture());
+            m_rtts->getDepthStencilTexture(),
+            m_rtts->getRenderTarget(RTT_HALF1), !m_skybox ?
+            bg_color : std::array<float, 4>{{0.0f, 0.0f, 0.0f, 0.0f}});
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -350,33 +376,10 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         PROFILER_POP_CPU_MARKER();
     }
 
-    const Track * const track = Track::getCurrentTrack();
-    // Render discrete lights scattering
-    if (track && track->isFogEnabled())
-    {
-        PROFILER_PUSH_CPU_MARKER("- PointLight Scatter", 0xFF, 0x00, 0x00);
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_FOG));
-        m_lighting_passes.renderLightsScatter(m_rtts->getDepthStencilTexture(),
-                                              m_rtts->getFBO(FBO_HALF1),
-                                              m_rtts->getFBO(FBO_HALF2),
-                                              m_rtts->getFBO(FBO_COLORS),
-                                              m_post_processing);
-        PROFILER_POP_CPU_MARKER();
-    }
-
-    PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
-    // Render anything glowing.
     if (UserConfigParams::m_glow)
     {
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GLOW));
-        irr_driver->setPhase(GLOW_PASS);
-        renderGlow();
-        m_post_processing->renderGlow(m_rtts->getFBO(FBO_TMP1_WITH_DS),
-                                      m_rtts->getFBO(FBO_HALF1),
-                                      m_rtts->getFBO(FBO_QUARTER1),
-                                      m_rtts->getFBO(FBO_COLORS));
-    } // end glow
-    PROFILER_POP_CPU_MARKER();
+        m_post_processing->renderGlow(m_rtts->getFBO(FBO_QUARTER1));
+    }
 
     // Render transparent
     {
@@ -408,8 +411,6 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         return;
     }
 
-    // Ensure that no object will be drawn after that by using invalid pass
-    irr_driver->setPhase(PASS_COUNT);
 } //renderSceneDeferred
 
 // ----------------------------------------------------------------------------
@@ -427,11 +428,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     irr_driver->getSceneManager()->setActiveCamera(camnode);
 
     PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
-    unsigned solid_poly_count = 0;
-    unsigned shadow_poly_count = 0;
     m_draw_calls.prepareDrawCalls(camnode);
-    m_poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += solid_poly_count;
-    m_poly_count[SHADOW_PASS] += shadow_poly_count;
     PROFILER_POP_CPU_MARKER();
 
     glDepthMask(GL_TRUE);
@@ -439,27 +436,6 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
-
-    if (!forceRTT)
-    {
-        // We need a cleared depth buffer for some effect (eg particles depth blending)
-        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
-        // Bind() modifies the viewport. In order not to affect anything else,
-        // the viewport is just reset here and not removed in Bind().
-        const core::recti &vp = Camera::getActiveCamera()->getViewport();
-        glViewport(vp.UpperLeftCorner.X,
-                   irr_driver->getActualScreenSize().Height - vp.LowerRightCorner.Y,
-                   vp.LowerRightCorner.X - vp.UpperLeftCorner.X,
-                   vp.LowerRightCorner.Y - vp.UpperLeftCorner.Y);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-    else
-    {
-        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
-        glClearColor(0., 0., 0., 0.);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    }
 
     if (forceRTT)
     {
@@ -471,13 +447,15 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
             clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
         glClear(GL_COLOR_BUFFER_BIT);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
     {
         glDepthMask(GL_TRUE);
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS1));
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS));
         SP::draw(SP::RP_1ST, SP::DCT_NORMAL);
     }
 
@@ -511,15 +489,13 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     // Now all instancing data from mesh and particle are done drawing
     m_draw_calls.setFenceSync();
 
-    if (!CVS->isDefferedEnabled() && !forceRTT)
+    if (!CVS->isDeferredEnabled() && !forceRTT)
     {
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
         return;
     }
 
-    // Ensure that no object will be drawn after that by using invalid pass
-    irr_driver->setPhase(PASS_COUNT);
 } //renderScene
 
 // ----------------------------------------------------------------------------
@@ -567,7 +543,8 @@ void ShaderBasedRenderer::debugPhysics()
 } //debugPhysics
 
 // ----------------------------------------------------------------------------
-void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
+void ShaderBasedRenderer::renderPostProcessing(Camera * const camera,
+                                               bool first_cam)
 {
     scene::ICameraSceneNode * const camnode = camera->getCameraSceneNode();
     const core::recti &viewport = camera->getViewport();
@@ -593,6 +570,10 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
     else if (irr_driver->getSSAOViz())
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        if (first_cam)
+        {
+             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        }
         camera->activate();
         m_post_processing->renderPassThrough(m_rtts->getFBO(FBO_HALF1_R).getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
     }
@@ -603,6 +584,10 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
     else
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        if (first_cam)
+        {
+             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        }
         camera->activate();
         m_post_processing->renderPassThrough(fbo->getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
     }
@@ -617,25 +602,13 @@ ShaderBasedRenderer::ShaderBasedRenderer()
     SharedGPUObjects::init();
     SP::init();
     SP::initSTKRenderer(this);
-    m_post_processing = new PostProcessing(irr_driver->getVideoDriver());    
+    m_post_processing = new PostProcessing();
 }
 
 // ----------------------------------------------------------------------------
 ShaderBasedRenderer::~ShaderBasedRenderer()
 {
-    // Note that we can not simply delete m_post_processing here:
-    // m_post_processing uses a material that has a reference to
-    // m_post_processing (for a callback). So when the material is
-    // removed it will try to drop the ref count of its callback object,
-    // which is m_post_processing, and which was already deleted. So
-    // instead we just decrease the ref count here. When the material
-    // is deleted, it will trigger the actual deletion of
-    // PostProcessing when decreasing the refcount of its callback object.
-    if(m_post_processing)
-    {
-        // check if we createad the OpenGL device by calling initDevice()
-        m_post_processing->drop();
-    }
+    delete m_post_processing;
     delete m_spherical_harmonics;
     delete m_skybox;
     delete m_rtts;
@@ -650,8 +623,9 @@ void ShaderBasedRenderer::onLoadWorld()
     const core::recti &viewport = Camera::getCamera(0)->getViewport();
     unsigned int width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
     unsigned int height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
-    RTT* rtts = new RTT(width, height, CVS->isDefferedEnabled() ?
-                        UserConfigParams::m_scale_rtts_factor : 1.0f);
+    RTT* rtts = new RTT(width, height, CVS->isDeferredEnabled() ?
+                        UserConfigParams::m_scale_rtts_factor : 1.0f,
+                        !CVS->isDeferredEnabled());
     setRTT(rtts);
 }
 
@@ -732,9 +706,6 @@ void ShaderBasedRenderer::addSunLight(const core::vector3df &pos)
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::render(float dt)
 {
-    resetObjectCount();
-    resetPolyCount();
-
     // Start the RTT for post-processing.
     // We do this before beginScene() because we want to capture the glClear()
     // because of tracks that do not have skyboxes (generally add-on tracks)
@@ -746,7 +717,7 @@ void ShaderBasedRenderer::render(float dt)
     RaceGUIBase *rg = world->getRaceGUI();
     if (rg) rg->update(dt);
 
-    if (!CVS->isDefferedEnabled())
+    if (!CVS->isDeferredEnabled())
     {
         prepareForwardRenderer();
     }
@@ -770,12 +741,12 @@ void ShaderBasedRenderer::render(float dt)
         oss << "drawAll() for kart " << cam;
         PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (cam+1)*60,
                                  0x00, 0x00);
-        camera->activate(!CVS->isDefferedEnabled());
+        camera->activate(!CVS->isDeferredEnabled());
         rg->preRenderCallback(camera);   // adjusts start referee
         irr_driver->getSceneManager()->setActiveCamera(camnode);
 
         computeMatrixesAndCameras(camnode, m_rtts->getWidth(), m_rtts->getHeight());
-        if (CVS->isDefferedEnabled())
+        if (CVS->isDeferredEnabled())
         {
             renderSceneDeferred(camnode, dt, track->hasShadows(), false); 
         }
@@ -794,9 +765,9 @@ void ShaderBasedRenderer::render(float dt)
 
         debugPhysics();
         
-        if (CVS->isDefferedEnabled())
+        if (CVS->isDeferredEnabled())
         {
-            renderPostProcessing(camera);
+            renderPostProcessing(camera, cam == 0);
         }
 
         // Save projection-view matrix for the next frame
@@ -872,8 +843,6 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     // For render to texture no triple buffering of ubo is used
     SP::sp_cur_player = 0;
     SP::sp_cur_buf_id[0] = 0;
-    resetObjectCount();
-    resetPolyCount();
     assert(m_rtts != NULL);
 
     irr_driver->getSceneManager()->setActiveCamera(camera);
@@ -883,7 +852,7 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     if (CVS->isARBUniformBufferObjectUsable())
         uploadLightingData();
 
-    if (CVS->isDefferedEnabled())
+    if (CVS->isDeferredEnabled())
     {
         renderSceneDeferred(camera, dt, false, true);
         render_target->setFrameBuffer(m_post_processing

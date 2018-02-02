@@ -431,6 +431,7 @@ public:
     void render(const FrameBuffer &fbo, GLuint rtt, float vignette_weight)
     {
         fbo.bind();
+        glClear(GL_COLOR_BUFFER_BIT);
         setTextureUnits(rtt);
         drawFullScreenEffect(vignette_weight);
     }   // render
@@ -741,7 +742,7 @@ public:
 
 // ============================================================================
 
-PostProcessing::PostProcessing(IVideoDriver* video_driver)
+PostProcessing::PostProcessing()
 {
     // Load the MLAA area map
     io::IReadFile *areamap = irr_driver->getDevice()->getFileSystem()->
@@ -760,58 +761,15 @@ PostProcessing::PostProcessing(IVideoDriver* video_driver)
 }   // PostProcessing
 
 // ----------------------------------------------------------------------------
-PostProcessing::~PostProcessing()
-{
-    // TODO: do we have to delete/drop anything?
-}   // ~PostProcessing
-
-// ----------------------------------------------------------------------------
 /** Initialises post processing at the (re-)start of a race. This sets up
  *  the vertices, normals and texture coordinates for each
  */
 void PostProcessing::reset()
 {
-    const u32 n = Camera::getNumCameras();
-    m_boost_time.resize(n);
-    m_vertices.resize(n);
-
-    for(unsigned int i=0; i<n; i++)
+    m_boost_time.resize(Camera::getNumCameras());
+    for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
     {
         m_boost_time[i] = 0.0f;
-
-        const core::recti &vp = Camera::getCamera(i)->getViewport();
-        // Map viewport to [-1,1] x [-1,1]. First define the coordinates
-        // left, right, top, bottom:
-        float right = vp.LowerRightCorner.X < (int)irr_driver->getActualScreenSize().Width
-                     ? 0.0f : 1.0f;
-        float left   = vp.UpperLeftCorner.X  > 0.0f ? 0.0f : -1.0f;
-        float top    = vp.UpperLeftCorner.Y  > 0.0f ? 0.0f : 1.0f;
-        float bottom = vp.LowerRightCorner.Y < (int)irr_driver->getActualScreenSize().Height
-                     ? 0.0f : -1.0f;
-
-        // Use left etc to define 4 vertices on which the rendered screen
-        // will be displayed:
-        m_vertices[i].v0.Pos = core::vector3df(left,  bottom, 0);
-        m_vertices[i].v1.Pos = core::vector3df(left,  top,    0);
-        m_vertices[i].v2.Pos = core::vector3df(right, top,    0);
-        m_vertices[i].v3.Pos = core::vector3df(right, bottom, 0);
-        // Define the texture coordinates of each vertex, which must
-        // be in [0,1]x[0,1]
-        m_vertices[i].v0.TCoords  = core::vector2df(left  ==-1.0f ? 0.0f : 0.5f,
-                                                    bottom==-1.0f ? 0.0f : 0.5f);
-        m_vertices[i].v1.TCoords  = core::vector2df(left  ==-1.0f ? 0.0f : 0.5f,
-                                                    top   == 1.0f ? 1.0f : 0.5f);
-        m_vertices[i].v2.TCoords  = core::vector2df(right == 0.0f ? 0.5f : 1.0f,
-                                                    top   == 1.0f ? 1.0f : 0.5f);
-        m_vertices[i].v3.TCoords  = core::vector2df(right == 0.0f ? 0.5f : 1.0f,
-                                                    bottom==-1.0f ? 0.0f : 0.5f);
-        // Set normal and color:
-        core::vector3df normal(0,0,1);
-        m_vertices[i].v0.Normal = m_vertices[i].v1.Normal =
-        m_vertices[i].v2.Normal = m_vertices[i].v3.Normal = normal;
-        SColor white(0xFF, 0xFF, 0xFF, 0xFF);
-        m_vertices[i].v0.Color  = m_vertices[i].v1.Color  =
-        m_vertices[i].v2.Color  = m_vertices[i].v3.Color  = white;
     }  // for i <number of cameras
 }   // reset
 
@@ -879,16 +837,14 @@ void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo,
            in_fbo.getHeight() == auxiliary.getHeight());
     float inv_width  = 1.0f / in_fbo.getWidth();
     float inv_height = 1.0f / in_fbo.getHeight();
-    {
-        auxiliary.bind();
-        Gaussian3VBlurShader::getInstance()->render(in_fbo, inv_width,
-                                                    inv_height);
-    }
-    {
-        in_fbo.bind();
-        Gaussian3HBlurShader::getInstance()->render(auxiliary, inv_width,
-                                                    inv_height);
-    }
+    auxiliary.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+    Gaussian3VBlurShader::getInstance()->render(in_fbo, inv_width,
+                                                inv_height);
+    in_fbo.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+    Gaussian3HBlurShader::getInstance()->render(auxiliary, inv_width,
+                                                inv_height);
 }   // renderGaussian3Blur
 
 // ----------------------------------------------------------------------------
@@ -904,11 +860,13 @@ void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
     if (!CVS->supportsComputeShadersFiltering())
     {
         auxiliary.bind();
+        glClear(GL_COLOR_BUFFER_BIT);
         Gaussian6VBlurShader::getInstance()
             ->render(in_fbo.getRTT()[0], in_fbo.getWidth(), in_fbo.getHeight(),
                      sigma_v);
 
         in_fbo.bind();
+        glClear(GL_COLOR_BUFFER_BIT);
         Gaussian6HBlurShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0]);
         Gaussian6HBlurShader::getInstance()->render(auxiliary, in_fbo.getWidth(),
                                                    in_fbo.getHeight(), sigma_h);
@@ -958,9 +916,11 @@ void PostProcessing::renderHorizontalBlur(const FrameBuffer &in_fbo,
            in_fbo.getHeight() == auxiliary.getHeight());
 
     auxiliary.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
     Gaussian6HBlurShader::getInstance()->render(in_fbo, in_fbo.getWidth(),
                                                 in_fbo.getHeight(), 2.0f );
     in_fbo.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
     Gaussian6HBlurShader::getInstance()->render(auxiliary, in_fbo.getWidth(),
                                                 in_fbo.getHeight(), 2.0f);
 }   // renderHorizontalBlur
@@ -1050,23 +1010,13 @@ void PostProcessing::renderTextureLayer(unsigned tex, unsigned layer) const
 }   // renderTextureLayer
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderGlow(const FrameBuffer& glow_framebuffer,
-                                const FrameBuffer& half_framebuffer,
-                                const FrameBuffer& quarter_framebuffer,
-                                const FrameBuffer& color_framebuffer   ) const
+void PostProcessing::renderGlow(const FrameBuffer& quarter_framebuffer) const
 {
-    // To half
-    FrameBuffer::blit(glow_framebuffer, half_framebuffer, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
-    // To quarter
-    FrameBuffer::blit(half_framebuffer, quarter_framebuffer, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glStencilFunc(GL_EQUAL, 0, ~0);
     glEnable(GL_STENCIL_TEST);
-    color_framebuffer.bind();
     GlowShader::getInstance()->render(quarter_framebuffer.getRTT()[0]);
     glDisable(GL_STENCIL_TEST);
     glDisable(GL_BLEND);
@@ -1088,7 +1038,7 @@ void PostProcessing::renderSSAO(const FrameBuffer& linear_depth_framebuffer,
 }   // renderSSAO
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderMotionBlur(unsigned , const FrameBuffer &in_fbo,
+void PostProcessing::renderMotionBlur(const FrameBuffer &in_fbo,
                                       FrameBuffer &out_fbo,
                                       GLuint depth_stencil_texture)
 {
@@ -1110,7 +1060,7 @@ void PostProcessing::renderDoF(const FrameBuffer &framebuffer, GLuint color_text
 // ----------------------------------------------------------------------------
 void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
                                    const FrameBuffer &in_fbo,
-                                   const FrameBuffer &out_fbo,
+                                   const FrameBuffer &tmp_fbo,
                                    const FrameBuffer &quarter1_fbo,
                                    const FrameBuffer &quarter2_fbo)
 {
@@ -1118,9 +1068,8 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
 
     glEnable(GL_DEPTH_TEST);
     // Grab the sky
-    out_fbo.bind();
+    tmp_fbo.bind();
     glClear(GL_COLOR_BUFFER_BIT);
-//            irr_driver->renderSkybox(camnode);
 
     // Set the sun's color
     const SColor col = track->getGodRaysColor();
@@ -1134,16 +1083,16 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
     SP::SPUniformAssigner* glow_color_assigner = glow_shader
         ->getUniformAssigner("col");
     assert(glow_color_assigner != NULL);
-    glow_color_assigner->setValue(video::SColorf(track->getGodRaysColor()));
+    video::SColorf cf(track->getGodRaysColor());
+    glow_color_assigner->setValue(core::vector3df(cf.r, cf.g, cf.b));
     sun->draw();
     glow_shader->unuse();
     glDisable(GL_DEPTH_TEST);
 
     // Fade to quarter
     quarter1_fbo.bind();
-    glViewport(0, 0, irr_driver->getActualScreenSize().Width / 4,
-                     irr_driver->getActualScreenSize().Height / 4);
-    GodFadeShader::getInstance()->render(out_fbo.getRTT()[0], col);
+    glClear(GL_COLOR_BUFFER_BIT);
+    GodFadeShader::getInstance()->render(tmp_fbo.getRTT()[0], col);
 
     // Blur
     renderGaussian3Blur(quarter1_fbo, quarter2_fbo);
@@ -1155,17 +1104,12 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
     trans *= camnode->getViewMatrix();
 
     trans.transformVect(ndc, pos);
-
-    const float texh = 
-        m_vertices[0].v1.TCoords.Y - m_vertices[0].v0.TCoords.Y;
-    const float texw = 
-        m_vertices[0].v3.TCoords.X - m_vertices[0].v0.TCoords.X;
-
-    const float sunx = ((ndc[0] / ndc[3]) * 0.5f + 0.5f) * texw;
-    const float suny = ((ndc[1] / ndc[3]) * 0.5f + 0.5f) * texh;
+    const float sunx = ((ndc[0] / ndc[3]) * 0.5f + 0.5f);
+    const float suny = ((ndc[1] / ndc[3]) * 0.5f + 0.5f);
 
     // Rays please
     quarter2_fbo.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
     GodRayShader::getInstance()
         ->render(quarter1_fbo.getRTT()[0], core::vector2df(sunx, suny));
 
@@ -1181,7 +1125,7 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
     in_fbo.bind();
     renderPassThrough(quarter2_fbo.getRTT()[0], in_fbo.getWidth(), in_fbo.getHeight());
     glDisable(GL_BLEND);
-    
+
 }
 
 
@@ -1195,17 +1139,11 @@ void PostProcessing::applyMLAA(const FrameBuffer& mlaa_tmp_framebuffer,
                                      1.0f / UserConfigParams::m_height);
 
     mlaa_tmp_framebuffer.bind();
-    glEnable(GL_STENCIL_TEST);
     glClearColor(0.0, 0.0, 0.0, 1.0);
-    glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    glStencilFunc(GL_ALWAYS, 1, ~0);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     // Pass 1: color edge detection
     MLAAColorEdgeDetectionSHader::getInstance()->render(PIXEL_SIZE, mlaa_colors_framebuffer.getRTT()[0]);
-
-    glStencilFunc(GL_EQUAL, 1, ~0);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
     // Pass 2: blend weights
     mlaa_blend_framebuffer.bind();
@@ -1222,8 +1160,6 @@ void PostProcessing::applyMLAA(const FrameBuffer& mlaa_tmp_framebuffer,
     MLAAGatherSHader::getInstance()
         ->render(PIXEL_SIZE, mlaa_blend_framebuffer.getRTT()[0], mlaa_tmp_framebuffer.getRTT()[0]);
 
-    // Done.
-    glDisable(GL_STENCIL_TEST);
 }   // applyMLAA
 
 // ----------------------------------------------------------------------------
@@ -1274,7 +1210,8 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GODRAYS));
-        renderGodRays(camnode, *in_fbo, *out_fbo, rtts->getFBO(FBO_QUARTER1), rtts->getFBO(FBO_QUARTER2));
+        renderGodRays(camnode, *in_fbo, rtts->getFBO(FBO_RGBA_1),
+            rtts->getFBO(FBO_QUARTER1), rtts->getFBO(FBO_QUARTER2));
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -1352,14 +1289,15 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         PROFILER_POP_CPU_MARKER();
     }
 
-    //computeLogLuminance(in_rtt);
     {
         PROFILER_PUSH_CPU_MARKER("- Tonemap", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TONEMAP));
 		// only enable vignette during race
+
+        out_fbo = &rtts->getFBO(FBO_RGBA_1);
         ToneMapShader::getInstance()->render(*out_fbo, in_fbo->getRTT()[0],
                                              isRace ? 1.0f : 0.0f);
-        std::swap(in_fbo, out_fbo);
+        in_fbo = &rtts->getFBO(FBO_RGBA_2);
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -1370,8 +1308,9 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         if (isRace && UserConfigParams::m_motionblur && World::getWorld() &&
             m_boost_time.at(Camera::getActiveCamera()->getIndex()) > 0.0f) // motion blur
         {
-            renderMotionBlur(0, *in_fbo, *out_fbo, irr_driver->getDepthStencilTexture());
-            std::swap(in_fbo, out_fbo);
+            in_fbo = &rtts->getFBO(FBO_RGBA_1);
+            out_fbo = &rtts->getFBO(FBO_RGBA_2);
+            renderMotionBlur(*in_fbo, *out_fbo, irr_driver->getDepthStencilTexture());
         }
         PROFILER_POP_CPU_MARKER();
     }
@@ -1381,25 +1320,19 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         PROFILER_PUSH_CPU_MARKER("- Lightning", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_LIGHTNING));
         Weather* weather = Weather::getInstance();
-        if ( weather && weather->shouldLightning() )
+        if (weather && weather->shouldLightning())
         {
             renderLightning(weather->getIntensity());
         }
         PROFILER_POP_CPU_MARKER();
     }
 
-    out_fbo = &rtts->getFBO(FBO_MLAA_COLORS);
-    out_fbo->bind();
-    renderPassThrough(in_fbo->getRTT()[0],
-                      out_fbo->getWidth(),
-                      out_fbo->getHeight());
-
     if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
     {
         PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MLAA));
-        applyMLAA(rtts->getFBO(FBO_MLAA_TMP),
-                  rtts->getFBO(FBO_MLAA_BLEND),
+        applyMLAA(*in_fbo,
+                  rtts->getFBO(FBO_RGBA_3),
                   *out_fbo);
         PROFILER_POP_CPU_MARKER();
     }

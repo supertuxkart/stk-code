@@ -175,7 +175,7 @@ private:
 
     unsigned             m_last_light_bucket_distance;
     unsigned             m_skinning_joint;
-    u32                  m_renderpass;
+
     SP::SPDynamicDrawCall* m_sun_interposer;
     core::vector3df m_sun_direction;
     video::SColorf m_suncolor;
@@ -186,8 +186,6 @@ private:
     std::vector<BloomData> m_forcedbloom;
 
     std::vector<scene::ISceneNode *> m_background;
-
-    STKRenderingPass m_phase;
 
     float m_ssao_radius;
     float m_ssao_k;
@@ -209,8 +207,6 @@ public:
     void getOpenGLData(std::string *vendor, std::string *renderer,
                        std::string *version);
 
-    void setPhase(STKRenderingPass);
-    STKRenderingPass getPhase() const;
     void increaseObjectCount();
     core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
@@ -418,8 +414,6 @@ public:
     bool isRecording() const { return m_recording; }
     // ------------------------------------------------------------------------
     void setRecording(bool val);
-    // ------------------------------------------------------------------------
-    u32 getRenderPass() { return m_renderpass; }
     // ------------------------------------------------------------------------
     std::vector<LightNode *> getLights() { return m_lights; }
     // ------------------------------------------------------------------------

@@ -4,6 +4,9 @@ uniform sampler2D ssao_tex;
 uniform sampler2D gloss_map;
 uniform sampler2D diffuse_color;
 uniform sampler2D depth_stencil;
+uniform sampler2D light_scatter;
+
+uniform vec4 bg_color;
 
 out vec4 o_final_color;
 
@@ -31,13 +34,28 @@ void main()
     vec4 color_1 = vec4(tmp * ao + (emitMapValue * emitCol), diffuseMatColor.a);
 
     // Fog
-    float z = texture(depth_stencil, tc).x;
-    vec4 xpos = getPosFromUVDepth(vec3(tc, z), u_inverse_projection_matrix);
+    float depth = texture(depth_stencil, tc).x;
+    vec4 xpos = getPosFromUVDepth(vec3(tc, depth), u_inverse_projection_matrix);
     float dist = length(xpos.xyz);
     // fog density
     float factor = (1.0 - exp(u_fog_data.w * dist));
     vec3 fog = u_fog_color.xyz * factor;
 
     // Additively blend the color by fog
-    o_final_color = color_1 + vec4(fog, factor);
+    color_1 = color_1 + vec4(fog, factor);
+
+    // For skybox blending later
+    if (depth == 1.0)
+    {
+        color_1 = bg_color;
+    }
+
+    // Light scatter (alpha blend function: (GL_ONE, GL_ONE_MINUS_SRC_ALPHA))
+    vec4 ls = texture(light_scatter, tc);
+    vec4 color_2;
+    color_2.r = ls.r + color_1.r * (1.0 - ls.a);
+    color_2.g = ls.g + color_1.g * (1.0 - ls.a);
+    color_2.b = ls.b + color_1.b * (1.0 - ls.a);
+    color_2.a = ls.a + color_1.a * (1.0 - ls.a);
+    o_final_color = color_2;
 }
