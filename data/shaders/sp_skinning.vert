@@ -63,33 +63,55 @@ void main()
     vec4 skinned_tangent = vec4(0.0);
     int skinning_offset = i_misc_data.x;
 
-    for (int i = 0; i < 4; i++)
-    {
 #ifdef GL_ES
-        mat4 joint_matrix = mat4(
-            texelFetch(skinning_tex, ivec2
-                (0 , clamp(i_joint[i] + skinning_offset, 0, MAX_BONES)), 0),
-            texelFetch(skinning_tex, ivec2
-                (1, clamp(i_joint[i] + skinning_offset, 0, MAX_BONES)), 0),
-            texelFetch(skinning_tex, ivec2
-                (2, clamp(i_joint[i] + skinning_offset, 0, MAX_BONES)), 0),
-            texelFetch(skinning_tex, ivec2
-                (3, clamp(i_joint[i] + skinning_offset, 0, MAX_BONES)), 0));
+    mat4 joint_matrix =
+        i_weight[0] * mat4(
+        texelFetch(skinning_tex, ivec2(0, clamp(i_joint[0] + skinning_offset, 0, MAX_BONES)), 0),
+        texelFetch(skinning_tex, ivec2(1, clamp(i_joint[0] + skinning_offset, 0, MAX_BONES)), 0),
+        texelFetch(skinning_tex, ivec2(2, clamp(i_joint[0] + skinning_offset, 0, MAX_BONES)), 0),
+        texelFetch(skinning_tex, ivec2(3, clamp(i_joint[0] + skinning_offset, 0, MAX_BONES)), 0)) +
+        i_weight[1] * mat4(
+        texelFetch(skinning_tex, ivec2(0, clamp(i_joint[1] + skinning_offset, 0, MAX_BONES)), 0),
+        texelFetch(skinning_tex, ivec2(1, clamp(i_joint[1] + skinning_offset, 0, MAX_BONES)), 0),
+        texelFetch(skinning_tex, ivec2(2, clamp(i_joint[1] + skinning_offset, 0, MAX_BONES)), 0),
+        texelFetch(skinning_tex, ivec2(3, clamp(i_joint[1] + skinning_offset, 0, MAX_BONES)), 0)) +
+        i_weight[2] * mat4(
+        texelFetch(skinning_tex, ivec2(0, clamp(i_joint[2] + skinning_offset, 0, MAX_BONES)), 0),
+        texelFetch(skinning_tex, ivec2(1, clamp(i_joint[2] + skinning_offset, 0, MAX_BONES)), 0),
+        texelFetch(skinning_tex, ivec2(2, clamp(i_joint[2] + skinning_offset, 0, MAX_BONES)), 0),
+        texelFetch(skinning_tex, ivec2(3, clamp(i_joint[2] + skinning_offset, 0, MAX_BONES)), 0)) +
+        i_weight[3] * mat4(
+        texelFetch(skinning_tex, ivec2(0, clamp(i_joint[3] + skinning_offset, 0, MAX_BONES)), 0),
+        texelFetch(skinning_tex, ivec2(1, clamp(i_joint[3] + skinning_offset, 0, MAX_BONES)), 0),
+        texelFetch(skinning_tex, ivec2(2, clamp(i_joint[3] + skinning_offset, 0, MAX_BONES)), 0),
+        texelFetch(skinning_tex, ivec2(3, clamp(i_joint[3] + skinning_offset, 0, MAX_BONES)), 0));
 #else
-        mat4 joint_matrix = mat4(
-            texelFetch(skinning_tex,
-                clamp(i_joint[i] + skinning_offset, 0, MAX_BONES) * 4),
-            texelFetch(skinning_tex,
-                clamp(i_joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 1),
-            texelFetch(skinning_tex,
-                clamp(i_joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 2),
-            texelFetch(skinning_tex,
-                clamp(i_joint[i] + skinning_offset, 0, MAX_BONES) * 4 + 3));
+    mat4 joint_matrix =
+        i_weight[0] * mat4(
+        texelFetch(skinning_tex, clamp(i_joint[0] + skinning_offset, 0, MAX_BONES) * 4),
+        texelFetch(skinning_tex, clamp(i_joint[0] + skinning_offset, 0, MAX_BONES) * 4 + 1),
+        texelFetch(skinning_tex, clamp(i_joint[0] + skinning_offset, 0, MAX_BONES) * 4 + 2),
+        texelFetch(skinning_tex, clamp(i_joint[0] + skinning_offset, 0, MAX_BONES) * 4 + 3)) +
+        i_weight[1] * mat4(
+        texelFetch(skinning_tex, clamp(i_joint[1] + skinning_offset, 0, MAX_BONES) * 4),
+        texelFetch(skinning_tex, clamp(i_joint[1] + skinning_offset, 0, MAX_BONES) * 4 + 1),
+        texelFetch(skinning_tex, clamp(i_joint[1] + skinning_offset, 0, MAX_BONES) * 4 + 2),
+        texelFetch(skinning_tex, clamp(i_joint[1] + skinning_offset, 0, MAX_BONES) * 4 + 3)) +
+        i_weight[2] * mat4(
+        texelFetch(skinning_tex, clamp(i_joint[2] + skinning_offset, 0, MAX_BONES) * 4),
+        texelFetch(skinning_tex, clamp(i_joint[2] + skinning_offset, 0, MAX_BONES) * 4 + 1),
+        texelFetch(skinning_tex, clamp(i_joint[2] + skinning_offset, 0, MAX_BONES) * 4 + 2),
+        texelFetch(skinning_tex, clamp(i_joint[2] + skinning_offset, 0, MAX_BONES) * 4 + 3)) +
+        i_weight[3] * mat4(
+        texelFetch(skinning_tex, clamp(i_joint[3] + skinning_offset, 0, MAX_BONES) * 4),
+        texelFetch(skinning_tex, clamp(i_joint[3] + skinning_offset, 0, MAX_BONES) * 4 + 1),
+        texelFetch(skinning_tex, clamp(i_joint[3] + skinning_offset, 0, MAX_BONES) * 4 + 2),
+        texelFetch(skinning_tex, clamp(i_joint[3] + skinning_offset, 0, MAX_BONES) * 4 + 3));
 #endif
-        skinned_position += i_weight[i] * joint_matrix * idle_position;
-        skinned_normal += i_weight[i] * joint_matrix * idle_normal;
-        skinned_tangent += i_weight[i] * joint_matrix * idle_tangent;
-    }
+
+    skinned_position = joint_matrix * idle_position;
+    skinned_normal = joint_matrix * idle_normal;
+    skinned_tangent = joint_matrix * idle_tangent;
 
     vec4 quaternion = normalize(vec4(i_rotation.xyz, i_scale.w));
     vec4 world_position = getWorldPosition(i_origin, quaternion, i_scale.xyz,
