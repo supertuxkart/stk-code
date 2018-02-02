@@ -1256,26 +1256,27 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         }
     }
 
+
+
     BoxRenderParams* params;
     SpinnerWidget* q = dynamic_cast<SpinnerWidget*>(widget);
     if(q->getUseBackgroundColor())
     {
         int player_id=q->getSpinnerWidgetPlayerID();
-        if(player_id==0)
-            params=&SkinConfig::m_render_params["spinner1::neutral"];
-        else if(player_id==1)
-            params=&SkinConfig::m_render_params["spinner2::neutral"];
-        else if(player_id==2)
-            params=&SkinConfig::m_render_params["spinner3::neutral"];
-        else if(player_id==3)
-            params=&SkinConfig::m_render_params["spinner4::neutral"];
-        else
-        {
-            //TODO Add individual spinner skins
-            params = &SkinConfig::m_render_params[
-                "spinner" + std::to_string((player_id + 1) % 4) + "::neutral"];
-            // Silence compiler warning
-        }
+		//TODO Add individual spinner skins
+		std::string id = std::to_string(std::max((player_id + 1) % 4, 1));
+
+		params = &SkinConfig::m_render_params[
+			"spinner" + id + "::neutral"];
+
+		SColorHSL col = { 0,100,50 };
+		col.Hue += (360 / 4) * (player_id % 3);
+		SColorf color_rgb;
+		col.toRGB(color_rgb);
+
+		widget->m_skin_r = color_rgb.r;
+		widget->m_skin_g = color_rgb.g;
+		widget->m_skin_b = color_rgb.b;
     }
     else if (widget->m_deactivated)
     {
@@ -1289,48 +1290,23 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     {
         params=&SkinConfig::m_render_params["spinner::neutral"];
     }
-    if (widget->isFocusedForPlayer(0))
-    {
-        core::recti rect2 = rect;
-        rect2.UpperLeftCorner.X += 2;
-        rect2.UpperLeftCorner.Y -= 3;
-        rect2.LowerRightCorner.X -= 2;
-        rect2.LowerRightCorner.Y += 5;
-        drawBoxFromStretchableTexture(widget, rect2,
-                     SkinConfig::m_render_params["squareFocusHalo::neutral"]);
+	for (int i = 1; i < MAX_PLAYER_COUNT + 1; i++) 
+	{
+		if (widget->isFocusedForPlayer(i - 1)) {
+			core::recti rect2 = rect;
+			rect2.UpperLeftCorner.X += 2;
+			rect2.UpperLeftCorner.Y -= 3;
+			rect2.LowerRightCorner.X -= 2;
+			rect2.LowerRightCorner.Y += 5;
+			
+			
+			drawBoxFromStretchableTexture(widget, rect2,
+				SkinConfig::m_render_params["squareFocusHalo::neutral"]);
+			//TODO add squarefocushalo0
 
-
-    }
-    else if (widget->isFocusedForPlayer(1))
-    {
-        core::recti rect2 = rect;
-        rect2.UpperLeftCorner.X += 2;
-        rect2.UpperLeftCorner.Y -= 3;
-        rect2.LowerRightCorner.X -= 2;
-        rect2.LowerRightCorner.Y += 5;
-        drawBoxFromStretchableTexture(widget, rect2,
-                     SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
-    }
-    else if (widget->isFocusedForPlayer(2))
-    {
-        core::recti rect2 = rect;
-        rect2.UpperLeftCorner.X += 2;
-        rect2.UpperLeftCorner.Y -= 3;
-        rect2.LowerRightCorner.X -= 2;
-        rect2.LowerRightCorner.Y += 5;
-        drawBoxFromStretchableTexture(widget, rect2,
-                     SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
-    }
-    else if (widget->isFocusedForPlayer(3))
-    {
-        core::recti rect2 = rect;
-        rect2.UpperLeftCorner.X += 2;
-        rect2.UpperLeftCorner.Y -= 3;
-        rect2.LowerRightCorner.X -= 2;
-        rect2.LowerRightCorner.Y += 5;
-        drawBoxFromStretchableTexture(widget, rect2,
-                     SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
-    }
+		}
+	}
+	
 
     core::recti sized_rect = rect;
     if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&
