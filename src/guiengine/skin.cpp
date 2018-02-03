@@ -914,16 +914,16 @@ void Skin::drawRibbon(const core::recti &rect, Widget* widget,
 
 SColorf GetPlayerColor(int player_id)
 {
-	
-	SColorHSL col = { 0,100,50 };
-	col.Hue += (360 / 4) * (player_id % 4);
-	int color_id = player_id % 4;
-	SColorf color_rgb = { 0,0,0,1 };
-	
-	
-	col.Saturation = col.Saturation * (1.0F / (floor(player_id / 4) + 1) );
-	col.toRGB(color_rgb);
-	return color_rgb;
+    
+    SColorHSL col = { 0,100,50 };
+    col.Hue += (360 / 4) * (player_id % 4);
+    int color_id = player_id % 4;
+    SColorf color_rgb = { 0,0,0,1 };
+    
+    
+    col.Saturation = col.Saturation * (1.0F / (floor(player_id / 4) + 1) );
+    col.toRGB(color_rgb);
+    return color_rgb;
 }
 // ----------------------------------------------------------------------------
 /**
@@ -1086,108 +1086,108 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
         //Handle drawing for the first player
         int nPlayersOnThisItem = 0;
 
-		if (mark_focused)
-		{
-			if (use_glow)
-			{
-				// don't mark filler items as focused
-				if (widget->m_properties[PROP_ID] == RibbonWidget::NO_ITEM_ID)
-					return;
-
-				int grow = 45;
-				static float glow_effect = 0;
-
-
-				const float dt = GUIEngine::getLatestDt();
-				glow_effect += dt * 3;
-				if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
-				grow = (int)(45 + 10 * sin(glow_effect));
-
-
-
-				const int glow_center_x = rect.UpperLeftCorner.X
-					+ rect.getWidth() / 2;
-				const int glow_center_y = rect.UpperLeftCorner.Y
-					+ rect.getHeight() - 5;
-
-				ITexture* tex_ficonhighlight =
-					SkinConfig::m_render_params["focusHalo::neutral"]
-					.getImage();
-				const int texture_w = tex_ficonhighlight->getSize().Width;
-				const int texture_h = tex_ficonhighlight->getSize().Height;
-
-				core::recti source_area(0, 0, texture_w, texture_h);
-
-
-				const core::recti rect2(glow_center_x - 45 - grow,
-					glow_center_y - 25 - grow / 2,
-					glow_center_x + 45 + grow,
-					glow_center_y + 25 + grow / 2);
-
-				draw2DImage(tex_ficonhighlight, rect2,
-					source_area,
-					/*clipping*/ 0,
-					/*color*/ 0,
-					/*alpha*/true);
-			}
-			// if we're not using glow, draw square focus instead
-			else
-			{
-				const bool show_focus = (focused || parent_focused);
-
-				if (!always_show_selection && !show_focus) return;
-
-				// don't mark filler items as focused
-				if (widget->m_properties[PROP_ID] == RibbonWidget::NO_ITEM_ID)
-					return;
-
-				drawBoxFromStretchableTexture(parentRibbonWidget, rect,
-					SkinConfig::m_render_params["squareFocusHalo::neutral"]);
-				nPlayersOnThisItem++;
-			}
-		} // end if mark_focused
-
-		//Handle drawing for everyone else
-		for (int i = 1; i < MAX_PLAYER_COUNT; i++) 
+        if (mark_focused)
         {
-			// ---- Draw selection for other players than player 1
-			if (parentRibbon->isFocusedForPlayer(i) &&
-				parentRibbon->getSelectionIDString(i) ==
-				widget->m_properties[PROP_ID])
-			{
-				short red_previous = parentRibbonWidget->m_skin_r;
-				short green_previous = parentRibbonWidget->m_skin_g;
-				short blue_previous = parentRibbonWidget->m_skin_b;
+            if (use_glow)
+            {
+                // don't mark filler items as focused
+                if (widget->m_properties[PROP_ID] == RibbonWidget::NO_ITEM_ID)
+                    return;
 
-				SColorf color_rgb = GetPlayerColor(i);
-				
-				parentRibbonWidget->m_skin_r = color_rgb.r * 255.0F;
-				parentRibbonWidget->m_skin_g = color_rgb.g * 255.0F;
-				parentRibbonWidget->m_skin_b = color_rgb.b * 255.0F;
+                int grow = 45;
+                static float glow_effect = 0;
 
-				if (nPlayersOnThisItem > 0)
-				{
-					core::recti rect2 = rect;
-					const int enlarge = nPlayersOnThisItem * 6;
-					rect2.UpperLeftCorner.X -= enlarge;
-					rect2.UpperLeftCorner.Y -= enlarge;
-					rect2.LowerRightCorner.X += enlarge;
-					rect2.LowerRightCorner.Y += enlarge;
 
-					drawBoxFromStretchableTexture(parentRibbonWidget, rect2,
-						SkinConfig::m_render_params["squareFocusHaloBW::neutral"]);
-				}
-				else
-				{
-					drawBoxFromStretchableTexture(parentRibbonWidget, rect,
-						SkinConfig::m_render_params["squareFocusHaloBW::neutral"]);
-				}
-				parentRibbonWidget->m_skin_r = red_previous;
-				parentRibbonWidget->m_skin_g = green_previous;
-				parentRibbonWidget->m_skin_b = blue_previous;
-				nPlayersOnThisItem++;
-			}
-		}
+                const float dt = GUIEngine::getLatestDt();
+                glow_effect += dt * 3;
+                if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
+                grow = (int)(45 + 10 * sin(glow_effect));
+
+
+
+                const int glow_center_x = rect.UpperLeftCorner.X
+                    + rect.getWidth() / 2;
+                const int glow_center_y = rect.UpperLeftCorner.Y
+                    + rect.getHeight() - 5;
+
+                ITexture* tex_ficonhighlight =
+                    SkinConfig::m_render_params["focusHalo::neutral"]
+                    .getImage();
+                const int texture_w = tex_ficonhighlight->getSize().Width;
+                const int texture_h = tex_ficonhighlight->getSize().Height;
+
+                core::recti source_area(0, 0, texture_w, texture_h);
+
+
+                const core::recti rect2(glow_center_x - 45 - grow,
+                    glow_center_y - 25 - grow / 2,
+                    glow_center_x + 45 + grow,
+                    glow_center_y + 25 + grow / 2);
+
+                draw2DImage(tex_ficonhighlight, rect2,
+                    source_area,
+                    /*clipping*/ 0,
+                    /*color*/ 0,
+                    /*alpha*/true);
+            }
+            // if we're not using glow, draw square focus instead
+            else
+            {
+                const bool show_focus = (focused || parent_focused);
+
+                if (!always_show_selection && !show_focus) return;
+
+                // don't mark filler items as focused
+                if (widget->m_properties[PROP_ID] == RibbonWidget::NO_ITEM_ID)
+                    return;
+
+                drawBoxFromStretchableTexture(parentRibbonWidget, rect,
+                    SkinConfig::m_render_params["squareFocusHalo::neutral"]);
+                nPlayersOnThisItem++;
+            }
+        } // end if mark_focused
+
+        //Handle drawing for everyone else
+        for (int i = 1; i < MAX_PLAYER_COUNT; i++) 
+        {
+            // ---- Draw selection for other players than player 1
+            if (parentRibbon->isFocusedForPlayer(i) &&
+                parentRibbon->getSelectionIDString(i) ==
+                widget->m_properties[PROP_ID])
+            {
+                short red_previous = parentRibbonWidget->m_skin_r;
+                short green_previous = parentRibbonWidget->m_skin_g;
+                short blue_previous = parentRibbonWidget->m_skin_b;
+
+                SColorf color_rgb = GetPlayerColor(i);
+                
+                parentRibbonWidget->m_skin_r = color_rgb.r * 255.0F;
+                parentRibbonWidget->m_skin_g = color_rgb.g * 255.0F;
+                parentRibbonWidget->m_skin_b = color_rgb.b * 255.0F;
+
+                if (nPlayersOnThisItem > 0)
+                {
+                    core::recti rect2 = rect;
+                    const int enlarge = nPlayersOnThisItem * 6;
+                    rect2.UpperLeftCorner.X -= enlarge;
+                    rect2.UpperLeftCorner.Y -= enlarge;
+                    rect2.LowerRightCorner.X += enlarge;
+                    rect2.LowerRightCorner.Y += enlarge;
+
+                    drawBoxFromStretchableTexture(parentRibbonWidget, rect2,
+                        SkinConfig::m_render_params["squareFocusHaloBW::neutral"]);
+                }
+                else
+                {
+                    drawBoxFromStretchableTexture(parentRibbonWidget, rect,
+                        SkinConfig::m_render_params["squareFocusHaloBW::neutral"]);
+                }
+                parentRibbonWidget->m_skin_r = red_previous;
+                parentRibbonWidget->m_skin_g = green_previous;
+                parentRibbonWidget->m_skin_b = blue_previous;
+                nPlayersOnThisItem++;
+            }
+        }
 
         drawIconButton(rect, widget, pressed, focused);
 
@@ -1248,20 +1248,20 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     if(q->getUseBackgroundColor())
     {
         int player_id=q->getSpinnerWidgetPlayerID();
-		
-		params = &SkinConfig::m_render_params[
-			"spinner::deactivated"];
+        
+        params = &SkinConfig::m_render_params[
+            "spinner::deactivated"];
 
-		SColorf color_rgb = GetPlayerColor(player_id);
+        SColorf color_rgb = GetPlayerColor(player_id);
 
-		widget->m_skin_r = color_rgb.r * 255.0F;
-		widget->m_skin_g = color_rgb.g * 255.0F;
-		widget->m_skin_b = color_rgb.b * 255.0F;
+        widget->m_skin_r = color_rgb.r * 255.0F;
+        widget->m_skin_g = color_rgb.g * 255.0F;
+        widget->m_skin_b = color_rgb.b * 255.0F;
 
-		if (player_id == 0)
-		{
-			color_rgb = { 1,1,1,1 };
-		}
+        if (player_id == 0)
+        {
+            color_rgb = { 1,1,1,1 };
+        }
 
     }
     else if (widget->m_deactivated)
@@ -1276,23 +1276,23 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     {
         params=&SkinConfig::m_render_params["spinner::neutral"];
     }
-	for (int i = 1; i < MAX_PLAYER_COUNT + 1; i++) 
-	{
-		if (widget->isFocusedForPlayer(i - 1)) {
-			core::recti rect2 = rect;
-			rect2.UpperLeftCorner.X += 2;
-			rect2.UpperLeftCorner.Y -= 3;
-			rect2.LowerRightCorner.X -= 2;
-			rect2.LowerRightCorner.Y += 5;
-			
-			
-			drawBoxFromStretchableTexture(widget, rect2,
-				SkinConfig::m_render_params["squareFocusHaloBW::neutral"]);
-			//TODO add squarefocushalo0
+    for (int i = 1; i < MAX_PLAYER_COUNT + 1; i++) 
+    {
+        if (widget->isFocusedForPlayer(i - 1)) {
+            core::recti rect2 = rect;
+            rect2.UpperLeftCorner.X += 2;
+            rect2.UpperLeftCorner.Y -= 3;
+            rect2.LowerRightCorner.X -= 2;
+            rect2.LowerRightCorner.Y += 5;
+            
+            
+            drawBoxFromStretchableTexture(widget, rect2,
+                SkinConfig::m_render_params["squareFocusHaloBW::neutral"]);
+            //TODO add squarefocushalo0
 
-		}
-	}
-	
+        }
+    }
+    
 
     core::recti sized_rect = rect;
     if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&

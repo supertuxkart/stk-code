@@ -206,7 +206,7 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
                                   const core::vector2df &scaling)
 {
     int y = viewport.LowerRightCorner.Y - m_small_font_max_height - 10;
-	
+    
     const int x = viewport.getCenter().X;
     const int w = viewport.getWidth();
 
@@ -667,9 +667,9 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     // Special case : when 3 players play, use 4th window to display such stuff
     if (race_manager->getIfEmptyScreenSpaceExists())
     {
-		irr::core::recti Last_Space = irr_driver->GetSplitscreenWindow(race_manager->getNumLocalPlayers());
-		x_base = Last_Space.UpperLeftCorner.X;
-		y_base = Last_Space.UpperLeftCorner.Y;
+        irr::core::recti Last_Space = irr_driver->GetSplitscreenWindow(race_manager->getNumLocalPlayers());
+        x_base = Last_Space.UpperLeftCorner.X;
+        y_base = Last_Space.UpperLeftCorner.Y;
         y_space = irr_driver->getActualScreenSize().Height - y_base;
     }
 

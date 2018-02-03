@@ -132,9 +132,9 @@ void OptionsScreenUI::init()
     assert(splitscreen_method != NULL);
     splitscreen_method->setState(UserConfigParams::split_screen_horizontally);
 
-	//Forbid changing this setting in game
-	bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
-	splitscreen_method->setActive(!in_game);
+    //Forbid changing this setting in game
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+    splitscreen_method->setActive(!in_game);
 
     CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
     assert( fps != NULL );
@@ -227,7 +227,7 @@ void OptionsScreenUI::init()
     // Forbid changing language while in-game, since this crashes (changing the language involves
     // tearing down and rebuilding the menu stack. not good when in-game)
     list_widget->setActive(StateManager::get()->getGameState() != GUIEngine::INGAME_MENU);
-	
+    
 
 }   // init
 
