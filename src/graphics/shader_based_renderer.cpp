@@ -409,7 +409,6 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
     }
-    glBindVertexArray(0);
 
 } //renderSceneDeferred
 
@@ -548,10 +547,10 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera,
 {
     scene::ICameraSceneNode * const camnode = camera->getCameraSceneNode();
     const core::recti &viewport = camera->getViewport();
-    
+
     bool isRace = StateManager::get()->getGameState() == GUIEngine::GAME;
     FrameBuffer *fbo = m_post_processing->render(camnode, isRace, m_rtts);
-         
+
     // The viewport has been changed using glViewport function directly
     // during scene rendering, but irrlicht thinks that nothing changed
     // when single camera is used. In this case we set the viewport
@@ -591,6 +590,7 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera,
         camera->activate();
         m_post_processing->renderPassThrough(fbo->getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
     }
+    glBindVertexArray(0);
 } //renderPostProcessing
 
 // ----------------------------------------------------------------------------
