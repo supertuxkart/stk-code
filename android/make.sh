@@ -40,6 +40,8 @@ export APP_NAME_RELEASE="SuperTuxKart"
 export APP_NAME_DEBUG="SuperTuxKart Debug"
 export PACKAGE_NAME_RELEASE="org.supertuxkart.stk"
 export PACKAGE_NAME_DEBUG="org.supertuxkart.stk_dev"
+export APP_DIR_NAME_RELEASE="supertuxkart"
+export APP_DIR_NAME_DEBUG="supertuxkart-dbg"
 export APP_ICON_RELEASE="$DIRNAME/icon.png"
 export APP_ICON_DEBUG="$DIRNAME/icon-dbg.png"
 
@@ -118,6 +120,7 @@ if [ "$BUILD_TYPE" = "debug" ] || [ "$BUILD_TYPE" = "Debug" ]; then
     export IS_DEBUG_BUILD=1
     export APP_NAME="$APP_NAME_DEBUG"
     export PACKAGE_NAME="$PACKAGE_NAME_DEBUG"
+    export APP_DIR_NAME="$APP_DIR_NAME_DEBUG"
     export APP_ICON="$APP_ICON_DEBUG"
 elif [ "$BUILD_TYPE" = "release" ] || [ "$BUILD_TYPE" = "Release" ]; then
     export ANT_BUILD_TYPE="release"
@@ -125,6 +128,7 @@ elif [ "$BUILD_TYPE" = "release" ] || [ "$BUILD_TYPE" = "Release" ]; then
     export IS_DEBUG_BUILD=0
     export APP_NAME="$APP_NAME_RELEASE"
     export PACKAGE_NAME="$PACKAGE_NAME_RELEASE"
+    export APP_DIR_NAME="$APP_DIR_NAME_RELEASE"
     export APP_ICON="$APP_ICON_RELEASE"
 else
     echo "Unsupported BUILD_TYPE: $BUILD_TYPE. Possible values are: " \
