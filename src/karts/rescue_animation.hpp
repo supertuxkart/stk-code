@@ -57,7 +57,7 @@ protected:
 
 public:
                  RescueAnimation(AbstractKart *kart, bool is_auto_rescue=false);
-    float MaximumHeight();
+    float maximumHeight();
     virtual     ~RescueAnimation();
     virtual void update(float dt);
 };   // RescueAnimation

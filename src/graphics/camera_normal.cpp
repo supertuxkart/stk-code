@@ -69,9 +69,9 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
 /** Moves the camera smoothly from the current camera position (and target)
  *  to the new position and target.
  *  \param dt Delta time, 
- *  It's expected in SnapToPosition() that setting DT to 1 snaps to the destination
+ *  \param if false, the camera instantly moves to the endpoint, or else it smoothly moves
  */
-void CameraNormal::smoothMoveCamera(float dt)
+void CameraNormal::moveCamera(float dt, bool smooth)
 {
     if(!m_kart) return;
     
@@ -112,18 +112,22 @@ void CameraNormal::smoothMoveCamera(float dt)
 
 
     //m_smooth_dt = 0.3f * dt + 0.7f * m_smooth_dt;
-    float delta = (dt*5.0f);
-    if (delta < 0.0f)
-        delta = 0.0f;
-    else if (delta > 1.0f)
-        delta = 1.0f;
+    float delta = 1;
+    float delta2 = 1;
+    if (smooth)
+    { 
+        delta = (dt*5.0f);
+        if (delta < 0.0f)
+            delta = 0.0f;
+        else if (delta > 1.0f)
+            delta = 1.0f;
     
-    float delta2 = dt * 8.0f;
-    if (delta2 < 0)
-        delta2 = 0;
-    else if (delta2 > 1)
-        delta2 = 1;
-
+        delta2 = dt * 8.0f;
+        if (delta2 < 0)
+            delta2 = 0;
+        else if (delta2 > 1)
+            delta2 = 1;
+    }
     m_camera_offset += (wanted_camera_offset - m_camera_offset) * delta;
 
     btTransform btt = m_kart->getTrans();
@@ -160,10 +164,10 @@ void CameraNormal::smoothMoveCamera(float dt)
     assert(!std::isnan(m_camera->getPosition().Y));
     assert(!std::isnan(m_camera->getPosition().Z));
 
-}   // smoothMoveCamera
-void CameraNormal::SnapToPosition()
+}   // MoveCamera
+void CameraNormal::snapToPosition()
 {
-    smoothMoveCamera(1);
+    moveCamera(1, false);
 }
 //-----------------------------------------------------------------------------
 /** Determine the camera settings for the current frame.
@@ -301,7 +305,7 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
 
     if (smoothing)
     {
-        smoothMoveCamera(dt);
+        moveCamera(dt, true);
     }
     else
     {

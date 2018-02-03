@@ -55,7 +55,7 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
 
     // Determine maximum rescue height with up-raycast
     float max_height = m_kart->getKartProperties()->getRescueHeight();
-    float hit_dest = MaximumHeight();
+    float hit_dest = maximumHeight();
    
     max_height = std::min(hit_dest, max_height);
     m_velocity = max_height / m_timer;
@@ -107,7 +107,8 @@ RescueAnimation::~RescueAnimation()
 }   // ~RescueAnimation
 
 // Determine maximum rescue height with up-raycast
-float RescueAnimation::MaximumHeight() {
+float RescueAnimation::maximumHeight() 
+{
     float hit_dest = 9999999.9f;
 
     Vec3 hit;
@@ -144,19 +145,19 @@ void RescueAnimation::update(float dt)
 
             for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
             {
-				CameraNormal* camera = dynamic_cast<CameraNormal*>(Camera::getCamera(i));
+                CameraNormal* camera = dynamic_cast<CameraNormal*>(Camera::getCamera(i));
                 if (camera && camera->getKart() == m_kart &&
                     dynamic_cast<CameraNormal*>(camera)) 
                 {
-					camera->setMode(Camera::CM_NORMAL);
-					camera->SnapToPosition();
+                    camera->setMode(Camera::CM_NORMAL);
+                    camera->snapToPosition();
                 }
             }
 
             m_up_vector = m_kart->getTrans().getBasis().getColumn(1);
             m_xyz = m_kart->getXYZ();
 
-            float hit_dest = MaximumHeight();
+            float hit_dest = maximumHeight();
             float max_height = std::min(hit_dest, m_kart->getKartProperties()->getRescueHeight()) * rescue_moment;
             m_xyz += max_height * m_up_vector;
         }
