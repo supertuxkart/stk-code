@@ -53,7 +53,7 @@ public:
     SPUniformAssigner(const std::type_index& ti, GLuint location)
         : m_location(location), m_type(ti), m_assigned(false) {}
     // ------------------------------------------------------------------------
-    bool rumtimeChecking(const std::type_info& ti) const
+    bool runtimeChecking(const std::type_info& ti) const
     {
 #ifdef DEBUG
         if (m_type != ti)
@@ -68,7 +68,7 @@ public:
     // ------------------------------------------------------------------------
     void getValue(const GLuint& p, irr::core::matrix4& mat) const
     {
-        if (rumtimeChecking(typeid(mat)))
+        if (runtimeChecking(typeid(mat)))
         {
 #ifndef SERVER_ONLY
             glGetUniformfv(p, m_location, mat.pointer());
@@ -78,7 +78,7 @@ public:
     // ------------------------------------------------------------------------
     void getValue(const GLuint& p, std::array<float, 4>& v) const
     {
-        if (rumtimeChecking(typeid(v)))
+        if (runtimeChecking(typeid(v)))
         {
 #ifndef SERVER_ONLY
             glGetUniformfv(p, m_location, v.data());
@@ -88,7 +88,7 @@ public:
     // ------------------------------------------------------------------------
     void getValue(const GLuint& p, irr::core::vector3df& v) const
     {
-        if (rumtimeChecking(typeid(v)))
+        if (runtimeChecking(typeid(v)))
         {
 #ifndef SERVER_ONLY
             glGetUniformfv(p, m_location, &v.X);
@@ -98,7 +98,7 @@ public:
     // ------------------------------------------------------------------------
     void getValue(const GLuint& p, irr::core::vector2df& v) const
     {
-        if (rumtimeChecking(typeid(v)))
+        if (runtimeChecking(typeid(v)))
         {
 #ifndef SERVER_ONLY
             glGetUniformfv(p, m_location, &v.X);
@@ -108,7 +108,7 @@ public:
     // ------------------------------------------------------------------------
     void getValue(const GLuint& p, float& v) const
     {
-        if (rumtimeChecking(typeid(v)))
+        if (runtimeChecking(typeid(v)))
         {
 #ifndef SERVER_ONLY
             glGetUniformfv(p, m_location, &v);
@@ -118,7 +118,7 @@ public:
     // ------------------------------------------------------------------------
     void getValue(const GLuint& p, int& v) const
     {
-        if (rumtimeChecking(typeid(v)))
+        if (runtimeChecking(typeid(v)))
         {
 #ifndef SERVER_ONLY
             glGetUniformiv(p, m_location, &v);
@@ -128,7 +128,7 @@ public:
     // ------------------------------------------------------------------------
     void setValue(const irr::core::matrix4& mat) const
     {
-        if (rumtimeChecking(typeid(mat)))
+        if (runtimeChecking(typeid(mat)))
         {
 #ifndef SERVER_ONLY
             glUniformMatrix4fv(m_location, 1, GL_FALSE, mat.pointer());
@@ -139,7 +139,7 @@ public:
     // ------------------------------------------------------------------------
     void setValue(const std::array<float, 4>& v) const
     {
-        if (rumtimeChecking(typeid(v)))
+        if (runtimeChecking(typeid(v)))
         {
 #ifndef SERVER_ONLY
             glUniform4f(m_location, v[0], v[1], v[2], v[3]);
@@ -150,7 +150,7 @@ public:
     // ------------------------------------------------------------------------
     void setValue(const irr::core::vector3df& v) const
     {
-        if (rumtimeChecking(typeid(v)))
+        if (runtimeChecking(typeid(v)))
         {
 #ifndef SERVER_ONLY
             glUniform3f(m_location, v.X, v.Y, v.Z);
@@ -161,7 +161,7 @@ public:
     // ------------------------------------------------------------------------
     void setValue(const irr::core::vector2df& v) const
     {
-        if (rumtimeChecking(typeid(v)))
+        if (runtimeChecking(typeid(v)))
         {
 #ifndef SERVER_ONLY
             glUniform2f(m_location, v.X, v.Y);
@@ -172,7 +172,7 @@ public:
     // ------------------------------------------------------------------------
     void setValue(float v) const
     {
-        if (rumtimeChecking(typeid(v)))
+        if (runtimeChecking(typeid(v)))
         {
 #ifndef SERVER_ONLY
             glUniform1f(m_location, v);
@@ -183,7 +183,7 @@ public:
     // ------------------------------------------------------------------------
     void setValue(int v) const
     {
-        if (rumtimeChecking(typeid(v)))
+        if (runtimeChecking(typeid(v)))
         {
 #ifndef SERVER_ONLY
             glUniform1i(m_location, v);
