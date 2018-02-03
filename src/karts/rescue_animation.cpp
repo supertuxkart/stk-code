@@ -37,7 +37,7 @@
 
 #include <algorithm>
 
-#include "graphics\camera_normal.hpp"
+#include "graphics/camera_normal.hpp"
 /** The constructor stores a pointer to the kart this object is animating,
  *  and initialised the timer.
  *  \param kart Pointer to the kart which is animated.
