@@ -360,12 +360,12 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         PROFILER_POP_CPU_MARKER();
     }
 
-    if (irr_driver->getNormals())
+    if (SP::sp_debug_view)
     {
         glEnable(GL_DEPTH_TEST);
         glDepthMask(GL_TRUE);
         m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
-        SP::drawNormal();
+        SP::drawSPDebugView();
         m_rtts->getFBO(FBO_COLORS).bind();
     }
 
@@ -558,7 +558,7 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera,
     glViewport(0, 0, irr_driver->getActualScreenSize().Width, 
         irr_driver->getActualScreenSize().Height);
 
-    if (irr_driver->getNormals())
+    if (SP::sp_debug_view)
     {
         m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).blitToDefault(
             viewport.UpperLeftCorner.X, 

@@ -67,6 +67,8 @@ std::array<float, 16>* g_joint_ptr = NULL;
 // ----------------------------------------------------------------------------
 bool sp_culling = true;
 // ----------------------------------------------------------------------------
+bool sp_debug_view = false;
+// ----------------------------------------------------------------------------
 bool g_handle_shadow = false;
 // ----------------------------------------------------------------------------
 SPShader* g_normal_visualizer = NULL;
@@ -377,6 +379,7 @@ void loadShaders()
                     shader->linkShaderFiles(RP_1ST);
                     shader->use(RP_1ST);
                     shader->addBasicUniforms(RP_1ST);
+                    shader->addAllUniforms(RP_1ST);
                     shader->addAllTextures(RP_1ST);
                 });
             SPShaderManager::get()->addSPShader(sps->getName(), sps);
@@ -1215,7 +1218,7 @@ void uploadAll()
 }
 
 // ----------------------------------------------------------------------------
-void drawNormal()
+void drawSPDebugView()
 {
     if (g_normal_visualizer == NULL)
     {

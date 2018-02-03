@@ -66,6 +66,66 @@ public:
         return true;
     }
     // ------------------------------------------------------------------------
+    void getValue(const GLuint& p, irr::core::matrix4& mat) const
+    {
+        if (rumtimeChecking(typeid(mat)))
+        {
+#ifndef SERVER_ONLY
+            glGetUniformfv(p, m_location, mat.pointer());
+#endif
+        }
+    }
+    // ------------------------------------------------------------------------
+    void getValue(const GLuint& p, std::array<float, 4>& v) const
+    {
+        if (rumtimeChecking(typeid(v)))
+        {
+#ifndef SERVER_ONLY
+            glGetUniformfv(p, m_location, v.data());
+#endif
+        }
+    }
+    // ------------------------------------------------------------------------
+    void getValue(const GLuint& p, irr::core::vector3df& v) const
+    {
+        if (rumtimeChecking(typeid(v)))
+        {
+#ifndef SERVER_ONLY
+            glGetUniformfv(p, m_location, &v.X);
+#endif
+        }
+    }
+    // ------------------------------------------------------------------------
+    void getValue(const GLuint& p, irr::core::vector2df& v) const
+    {
+        if (rumtimeChecking(typeid(v)))
+        {
+#ifndef SERVER_ONLY
+            glGetUniformfv(p, m_location, &v.X);
+#endif
+        }
+    }
+    // ------------------------------------------------------------------------
+    void getValue(const GLuint& p, float& v) const
+    {
+        if (rumtimeChecking(typeid(v)))
+        {
+#ifndef SERVER_ONLY
+            glGetUniformfv(p, m_location, &v);
+#endif
+        }
+    }
+    // ------------------------------------------------------------------------
+    void getValue(const GLuint& p, int& v) const
+    {
+        if (rumtimeChecking(typeid(v)))
+        {
+#ifndef SERVER_ONLY
+            glGetUniformiv(p, m_location, &v);
+#endif
+        }
+    }
+    // ------------------------------------------------------------------------
     void setValue(const irr::core::matrix4& mat) const
     {
         if (rumtimeChecking(typeid(mat)))

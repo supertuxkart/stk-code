@@ -134,10 +134,9 @@ IrrDriver::IrrDriver()
     m_request_screenshot = false;
     m_renderer            = NULL;
     m_wind                = new Wind();
-
-    m_mipviz = m_wireframe = m_normals = m_ssaoviz = false;
-    m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = false;
-    m_boundingboxesviz           = false;
+    m_ssaoviz = false;
+    m_shadowviz = false;
+    m_boundingboxesviz = false;
     m_last_light_bucket_distance = 0;
     m_clear_color                = video::SColor(255, 100, 101, 140);
     m_skinning_joint             = 0;
@@ -1967,3 +1966,14 @@ GLuint IrrDriver::getDepthStencilTexture()
     return m_renderer->getDepthStencilTexture();
 }   // getDepthStencilTexture
 
+// ----------------------------------------------------------------------------
+void IrrDriver::resetDebugModes()
+{
+    m_ssaoviz = false;
+    m_shadowviz = false;
+    m_lightviz = false;
+    m_boundingboxesviz = false;
+#ifndef SERVER_ONLY
+    SP::sp_debug_view = false;
+#endif
+}

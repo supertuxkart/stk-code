@@ -135,6 +135,8 @@ public:
     // ------------------------------------------------------------------------
     bool hasShader(RenderPass rp)                { return m_program[rp] != 0; }
     // ------------------------------------------------------------------------
+    GLuint getShaderProgram(RenderPass rp)            { return m_program[rp]; }
+    // ------------------------------------------------------------------------
     void use(RenderPass rp = RP_1ST)
     {
         if (m_use_function[rp] != NULL)
