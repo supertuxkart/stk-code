@@ -916,32 +916,13 @@ SColorf GetPlayerColor(int player_id)
 {
 	
 	SColorHSL col = { 0,100,50 };
-	col.Hue += (360 / 4) * (player_id % 3);
+	col.Hue += (360 / 4) * (player_id % 4);
 	int color_id = player_id % 4;
 	SColorf color_rgb = { 0,0,0,1 };
+	
+	
+	col.Saturation = col.Saturation * (1.0F / (floor(player_id / 4) + 1) );
 	col.toRGB(color_rgb);
-	
-	
-	/*
-	else if (color_id == 1)
-	{
-		color_rgb = { 0,0,1,1 };
-	}
-	else if (color_id == 2)
-	{
-		color_rgb = { 0,1,0,1 };
-	}
-	else if (color_id == 3)
-	{
-		color_rgb = { 0,0,1,1 };
-	}
-	if (player_id > 3)
-	{
-		color_rgb.r += 0.5F;
-		color_rgb.g += 0.5F;
-		color_rgb.b += 0.5F;
-	}
-	*/
 	return color_rgb;
 }
 // ----------------------------------------------------------------------------
@@ -1102,8 +1083,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
         }
 
 
-        // if multiple player selected the same ribbon item, we need to know
-        // to make it visible
+        //Handle drawing for the first player
         int nPlayersOnThisItem = 0;
 
 		if (mark_focused)
@@ -1167,19 +1147,20 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 			}
 		} // end if mark_focused
 
-		for (int i = 0; i < MAX_PLAYER_COUNT; i++) 
+		//Handle drawing for everyone else
+		for (int i = 1; i < MAX_PLAYER_COUNT; i++) 
         {
 			// ---- Draw selection for other players than player 1
 			if (parentRibbon->isFocusedForPlayer(i) &&
 				parentRibbon->getSelectionIDString(i) ==
 				widget->m_properties[PROP_ID])
 			{
-				
+				short red_previous = parentRibbonWidget->m_skin_r;
+				short green_previous = parentRibbonWidget->m_skin_g;
+				short blue_previous = parentRibbonWidget->m_skin_b;
+
 				SColorf color_rgb = GetPlayerColor(i);
-				if (i == 0)
-				{
-					color_rgb = { 1,1,1,1 };
-				}
+				
 				parentRibbonWidget->m_skin_r = color_rgb.r * 255.0F;
 				parentRibbonWidget->m_skin_g = color_rgb.g * 255.0F;
 				parentRibbonWidget->m_skin_b = color_rgb.b * 255.0F;
@@ -1194,19 +1175,19 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 					rect2.LowerRightCorner.Y += enlarge;
 
 					drawBoxFromStretchableTexture(parentRibbonWidget, rect2,
-						SkinConfig::m_render_params["squareFocusHalo::neutral"]);
+						SkinConfig::m_render_params["squareFocusHaloBW::neutral"]);
 				}
 				else
 				{
-
 					drawBoxFromStretchableTexture(parentRibbonWidget, rect,
-						SkinConfig::m_render_params["squareFocusHalo::neutral"]);
+						SkinConfig::m_render_params["squareFocusHaloBW::neutral"]);
 				}
-
+				parentRibbonWidget->m_skin_r = red_previous;
+				parentRibbonWidget->m_skin_g = green_previous;
+				parentRibbonWidget->m_skin_b = blue_previous;
 				nPlayersOnThisItem++;
 			}
 		}
-
 
         drawIconButton(rect, widget, pressed, focused);
 
@@ -1306,7 +1287,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
 			
 			
 			drawBoxFromStretchableTexture(widget, rect2,
-				SkinConfig::m_render_params["squareFocusHalo::neutral"]);
+				SkinConfig::m_render_params["squareFocusHaloBW::neutral"]);
 			//TODO add squarefocushalo0
 
 		}
