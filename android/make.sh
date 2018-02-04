@@ -22,27 +22,39 @@ export NDK_ABI_ARMV7=armeabi-v7a
 export ARCH_ARMV7=arm
 export HOST_ARMV7=arm-linux-androideabi
 export NDK_PLATFORM_ARMV7=android-19
-export SDK_VERSION_ARMV7=19
+export MIN_SDK_VERSION_ARMV7=19
+export TARGET_SDK_VERSION_ARMV7=21
+export COMPILE_SDK_VERSION_ARMV7=21
 
 export NDK_ABI_X86=x86
 export ARCH_X86=x86
 export HOST_X86=i686-linux-android
 export NDK_PLATFORM_X86=android-19
-export SDK_VERSION_X86=19
+export MIN_SDK_VERSION_X86=19
+export TARGET_SDK_VERSION_X86=21
+export COMPILE_SDK_VERSION_X86=21
 
 export NDK_ABI_AARCH64=arm64-v8a
 export ARCH_AARCH64=arm64
 export HOST_AARCH64=aarch64-linux-android
 export NDK_PLATFORM_AARCH64=android-21
-export SDK_VERSION_AARCH64=21
+export MIN_SDK_VERSION_AARCH64=21
+export TARGET_SDK_VERSION_AARCH64=21
+export COMPILE_SDK_VERSION_AARCH64=21
 
 export APP_NAME_RELEASE="SuperTuxKart"
-export APP_NAME_DEBUG="SuperTuxKart Debug"
 export PACKAGE_NAME_RELEASE="org.supertuxkart.stk"
-export PACKAGE_NAME_DEBUG="org.supertuxkart.stk_dev"
 export APP_DIR_NAME_RELEASE="supertuxkart"
-export APP_DIR_NAME_DEBUG="supertuxkart-dbg"
 export APP_ICON_RELEASE="$DIRNAME/icon.png"
+
+export APP_NAME_BETA="SuperTuxKart Beta"
+export PACKAGE_NAME_BETA="org.supertuxkart.stk_beta"
+export APP_DIR_NAME_BETA="supertuxkart-beta"
+export APP_ICON_BETA="$DIRNAME/icon-dbg.png"
+
+export APP_NAME_DEBUG="SuperTuxKart Debug"
+export PACKAGE_NAME_DEBUG="org.supertuxkart.stk_dbg"
+export APP_DIR_NAME_DEBUG="supertuxkart-dbg"
 export APP_ICON_DEBUG="$DIRNAME/icon-dbg.png"
 
 
@@ -90,19 +102,25 @@ if [ "$COMPILE_ARCH" = "armv7" ]; then
     export NDK_ABI=$NDK_ABI_ARMV7
     export ARCH=$ARCH_ARMV7
     export HOST=$HOST_ARMV7
-    export SDK_VERSION=$SDK_VERSION_ARMV7
+    export MIN_SDK_VERSION=$MIN_SDK_VERSION_ARMV7
+    export TARGET_SDK_VERSION=$TARGET_SDK_VERSION_ARMV7
+    export COMPILE_SDK_VERSION=$COMPILE_SDK_VERSION_ARMV7
 elif [ "$COMPILE_ARCH" = "x86" ]; then
     export NDK_PLATFORM=$NDK_PLATFORM_X86
     export NDK_ABI=$NDK_ABI_X86
     export ARCH=$ARCH_X86
     export HOST=$HOST_X86
-    export SDK_VERSION=$SDK_VERSION_X86
+    export MIN_SDK_VERSION=$MIN_SDK_VERSION_X86
+    export TARGET_SDK_VERSION=$TARGET_SDK_VERSION_X86
+    export COMPILE_SDK_VERSION=$COMPILE_SDK_VERSION_X86
 elif [ "$COMPILE_ARCH" = "aarch64" ]; then
     export NDK_PLATFORM=$NDK_PLATFORM_AARCH64
     export NDK_ABI=$NDK_ABI_AARCH64
     export ARCH=$ARCH_AARCH64
     export HOST=$HOST_AARCH64
-    export SDK_VERSION=$SDK_VERSION_AARCH64
+    export MIN_SDK_VERSION=$MIN_SDK_VERSION_AARCH64
+    export TARGET_SDK_VERSION=$TARGET_SDK_VERSION_AARCH64
+    export COMPILE_SDK_VERSION=$COMPILE_SDK_VERSION_AARCH64
 else
     echo "Unknow COMPILE_ARCH: $COMPILE_ARCH. Possible values are: " \
          "armv7, aarch64, x86"
@@ -130,6 +148,14 @@ elif [ "$BUILD_TYPE" = "release" ] || [ "$BUILD_TYPE" = "Release" ]; then
     export PACKAGE_NAME="$PACKAGE_NAME_RELEASE"
     export APP_DIR_NAME="$APP_DIR_NAME_RELEASE"
     export APP_ICON="$APP_ICON_RELEASE"
+elif [ "$BUILD_TYPE" = "beta" ] || [ "$BUILD_TYPE" = "Beta" ]; then
+    export ANT_BUILD_TYPE="release"
+    export GRADLE_BUILD_TYPE="assembleRelease"
+    export IS_DEBUG_BUILD=0
+    export APP_NAME="$APP_NAME_BETA"
+    export PACKAGE_NAME="$PACKAGE_NAME_BETA"
+    export APP_DIR_NAME="$APP_DIR_NAME_BETA"
+    export APP_ICON="$APP_ICON_BETA"
 else
     echo "Unsupported BUILD_TYPE: $BUILD_TYPE. Possible values are: " \
          "debug, release"
@@ -374,7 +400,10 @@ echo "<resources>"                                      >> "$STRINGS_FILE"
 echo "    <string name=\"app_name\">$APP_NAME</string>" >> "$STRINGS_FILE"
 echo "</resources>"                                     >> "$STRINGS_FILE"
 
-sed -i "s/minSdkVersion=\".*\"/minSdkVersion=\"$SDK_VERSION\"/g" \
+sed -i "s/minSdkVersion=\".*\"/minSdkVersion=\"$MIN_SDK_VERSION\"/g" \
+       "$DIRNAME/AndroidManifest.xml"
+       
+sed -i "s/targetSdkVersion=\".*\"/targetSdkVersion=\"$TARGET_SDK_VERSION\"/g" \
        "$DIRNAME/AndroidManifest.xml"
        
 sed -i "s/package=\".*\"/package=\"$PACKAGE_NAME\"/g" \
@@ -389,12 +418,12 @@ convert -scale 144x144 "$APP_ICON" "$DIRNAME/res/drawable-xxhdpi/icon.png"
 
 if [ "$BUILD_TOOL" = "gradle" ]; then
     export ANDROID_HOME="$SDK_PATH"
-    gradle -Psdk_version=$SDK_VERSION           \
-           -Pbuild_tools_ver="$BUILD_TOOLS_VER" \
+    gradle -Pcompile_sdk_version=$COMPILE_SDK_VERSION \
+           -Pbuild_tools_ver="$BUILD_TOOLS_VER"       \
            $GRADLE_BUILD_TYPE
 elif [ "$BUILD_TOOL" = "ant" ]; then
     ant -Dsdk.dir="$SDK_PATH"  \
-        -Dtarget=$NDK_PLATFORM \
+        -Dtarget="android-$TARGET_SDK_VERSION" \
         $ANT_BUILD_TYPE
 fi
 
