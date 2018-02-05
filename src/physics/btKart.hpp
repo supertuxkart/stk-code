@@ -124,6 +124,14 @@ private:
      *  for skid marks. */
     float m_visual_rotation;
 
+    /** Minimum speed for the kart. Used e.g. for zippers. Setting this value
+     *  will potentially instantaneously accelerate the kart to the minimum
+     *  speed requested (in the next physics step). */
+    btScalar m_min_speed;
+
+    /** Maximum speed for the kart. */
+    btScalar m_max_speed;
+
     /** True if the visual wheels touch the ground. */
     bool m_visual_wheels_touch_ground;
 
@@ -176,8 +184,8 @@ public:
     virtual void       updateFriction(btScalar timeStep);
 public:
     void               setSliding(bool active);
-    void               instantSpeedIncreaseTo(float speed);
-    void               capSpeed(float max_speed);
+    void               instantSpeedIncreaseTo(btScalar speed);
+    void               adjustSpeed(btScalar min_speed, btScalar max_speed);
     void               updateAllWheelPositions();
     // ------------------------------------------------------------------------
     /** Returns true if both rear visual wheels touch the ground. */
@@ -275,6 +283,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the current zipper speed. */
     float getInstantSpeedIncrease() const { return m_zipper_speed; }
+    // ------------------------------------------------------------------------
+    /** Sets the maximum speed for this kart. */
+    void setMaxSpeed(float s) { m_max_speed = s;  }
+    // ------------------------------------------------------------------------
+    /** Sets the minimum speed for this kart. */
+    void setMinSpeed(float s) { m_min_speed = s; }
     // ------------------------------------------------------------------------
     void resetInstantSpeed() { m_zipper_speed = 0;  }
 };   // class btKart

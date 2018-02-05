@@ -128,6 +128,8 @@ void btKart::reset()
     m_additional_rotation        = btVector3(0,0,0);
     m_time_additional_rotation   = 0;
     m_visual_rotation            = 0;
+    m_max_speed                  = 9999.9f;
+    m_min_speed                  = 0.0f;
 
     // Set the brakes so that karts don't slide downhill
     setAllBrakes(5.0f);
@@ -551,6 +553,7 @@ void btKart::updateVehicle( btScalar step )
         iwt.setRotation(iwt.getRotation()*add_rot);
         m_time_additional_rotation -= dt;
     }
+    adjustSpeed(m_min_speed, m_max_speed);
 }   // updateVehicle
 
 // ----------------------------------------------------------------------------
@@ -1019,7 +1022,7 @@ void btKart::setSliding(bool active)
  *  specified speed.
  *  \param speed The speed to reach.
  */
-void btKart::instantSpeedIncreaseTo(float speed)
+void btKart::instantSpeedIncreaseTo(btScalar speed)
 {
     // Avoid that a speed 'increase' might cause a slowdown
     if (m_chassisBody->getLinearVelocity().length2() > speed*speed)
@@ -1030,18 +1033,35 @@ void btKart::instantSpeedIncreaseTo(float speed)
 }   // activateZipper
 
 // ----------------------------------------------------------------------------
-/** Caps the speed at a given value. If necessary the kart will
- *  instantaneously change its speed. */
-void btKart::capSpeed(float max_speed)
+/** Adjusts the velocity of this kart to be at least the specified minimum,
+ *  and less than or equal to the maximum. If necessary the kart will
+ *  instantaneously change its speed.
+ *  \param min_speed Minimum speed, 0 means no effect.
+ *  \param max_speed Maximum speed the kart is allowed to have.
+ */
+void btKart::adjustSpeed(btScalar min_speed, btScalar max_speed)
 {
     const btVector3 &velocity = m_chassisBody->getLinearVelocity();
     float speed = velocity.length();
-    if(speed!=0)
+    if (speed < min_speed && min_speed > 0)
+    {
+        if (speed == 0)
+        {
+            m_chassisBody->setLinearVelocity(btVector3(0, 0, min_speed));
+        }
+        else
+        {
+
+            const float velocity_ratio = min_speed / speed;
+            m_chassisBody->setLinearVelocity(velocity * velocity_ratio);
+        }
+    }
+    else if (speed >0 && speed>max_speed)
     {
         const float velocity_ratio = max_speed / speed;
         m_chassisBody->setLinearVelocity(velocity * velocity_ratio);
     }
-}   // capSpeed
+}   // adjustSpeed
 
 // ----------------------------------------------------------------------------
 //Shorter version of above raycast function. This is used when projecting

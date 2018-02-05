@@ -133,7 +133,7 @@ void MaxSpeed::instantSpeedIncrease(unsigned int category,
     // the speed might be too low for certain jumps).
     if(speed < m_min_speed) speed = m_min_speed;
 
-    m_kart->getVehicle()->instantSpeedIncreaseTo(speed);
+    m_kart->getVehicle()->setMinSpeed(speed);
 
 }   // instantSpeedIncrease
 
@@ -318,10 +318,15 @@ void MaxSpeed::update(float dt)
     // --------------------------------------
     if(m_min_speed > 0 && m_kart->getSpeed() < m_min_speed)
     {
-        m_kart->getVehicle()->instantSpeedIncreaseTo(m_min_speed);
+        m_kart->getVehicle()->setMinSpeed(m_min_speed);
     }
-    else if ( m_kart->getSpeed()>m_current_max_speed && m_kart->isOnGround() )
-        m_kart->getVehicle()->capSpeed(m_current_max_speed);
+    else 
+        m_kart->getVehicle()->setMinSpeed(0);   // no additional acceleration
+
+    if (m_kart->isOnGround())
+        m_kart->getVehicle()->setMaxSpeed(m_current_max_speed);
+    else
+        m_kart->getVehicle()->setMaxSpeed(9999.9f);
 
 }   // update
 
