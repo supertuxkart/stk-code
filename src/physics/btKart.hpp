@@ -129,7 +129,8 @@ private:
      *  speed requested (in the next physics step). */
     btScalar m_min_speed;
 
-    /** Maximum speed for the kart. */
+    /** Maximum speed for the kart. It is reset to -1 at the end of each
+     *  physics steps, so need to be set again by the application. */
     btScalar m_max_speed;
 
     /** True if the visual wheels touch the ground. */
@@ -285,7 +286,20 @@ public:
     float getInstantSpeedIncrease() const { return m_zipper_speed; }
     // ------------------------------------------------------------------------
     /** Sets the maximum speed for this kart. */
-    void setMaxSpeed(float s) { m_max_speed = s;  }
+    void setMaxSpeed(float new_max_speed) 
+    {
+        // Only change m_max_speed if it has not been set (<0), or
+        // the new value is smaller than the current maximum. For example,
+        // overworld will set the max_speed to 0 in case of teleporting to
+        // a bubble, but set it again later (based on zipper etc activated).
+        // We need to make sure that the 0 is maintained.
+        if(m_max_speed <0 || m_max_speed > new_max_speed)
+            m_max_speed = new_max_speed;
+    }   // setMaxSpeed
+    // ------------------------------------------------------------------------
+    /** Resets the maximum so any new maximum value from the application will
+     *  be accepted. */
+    virtual void resetMaxSpeed() { m_max_speed = -1.0f; }
     // ------------------------------------------------------------------------
     /** Sets the minimum speed for this kart. */
     void setMinSpeed(float s) { m_min_speed = s; }

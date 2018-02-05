@@ -128,7 +128,7 @@ void btKart::reset()
     m_additional_rotation        = btVector3(0,0,0);
     m_time_additional_rotation   = 0;
     m_visual_rotation            = 0;
-    m_max_speed                  = 9999.9f;
+    m_max_speed                  = -1.0f;
     m_min_speed                  = 0.0f;
 
     // Set the brakes so that karts don't slide downhill
@@ -1056,7 +1056,7 @@ void btKart::adjustSpeed(btScalar min_speed, btScalar max_speed)
             m_chassisBody->setLinearVelocity(velocity * velocity_ratio);
         }
     }
-    else if (speed >0 && speed>max_speed)
+    else if (speed >0 && max_speed >= 0 && speed > max_speed)
     {
         const float velocity_ratio = max_speed / speed;
         m_chassisBody->setLinearVelocity(velocity * velocity_ratio);
