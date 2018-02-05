@@ -1209,7 +1209,7 @@ void Kart::eliminate()
 void Kart::update(float dt)
 {
     // Reset any instand speed increase in the bullet kart
-    m_vehicle->resetInstantSpeed();
+    m_vehicle->setMinSpeed(0);
 
     // update star effect (call will do nothing if stars are not activated)
     m_stars_effect->update(dt);

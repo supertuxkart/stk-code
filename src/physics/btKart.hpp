@@ -69,10 +69,6 @@ private:
     btScalar            m_damping;
     btVehicleRaycaster *m_vehicleRaycaster;
 
-    /** The zipper speed (i.e. the velocity the kart should reach in
-     *  the first frame that the zipper is active). */
-    btScalar            m_zipper_speed;
-
     /** The angular velocity to be applied when the kart skids.
      *  0 means no skidding. */
     btScalar            m_skid_angular_velocity;
@@ -282,9 +278,6 @@ public:
         m_time_additional_rotation = t;
     }   // setTimedTorque
     // ------------------------------------------------------------------------
-    /** Returns the current zipper speed. */
-    float getInstantSpeedIncrease() const { return m_zipper_speed; }
-    // ------------------------------------------------------------------------
     /** Sets the maximum speed for this kart. */
     void setMaxSpeed(float new_max_speed) 
     {
@@ -304,7 +297,8 @@ public:
     /** Sets the minimum speed for this kart. */
     void setMinSpeed(float s) { m_min_speed = s; }
     // ------------------------------------------------------------------------
-    void resetInstantSpeed() { m_zipper_speed = 0;  }
+    /** Returns the minimum speed for this kart. */
+    btScalar getMinSpeed() const { return m_min_speed; }
 };   // class btKart
 
 #endif //BT_KART_HPP

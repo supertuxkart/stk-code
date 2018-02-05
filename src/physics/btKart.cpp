@@ -118,7 +118,6 @@ void btKart::reset()
         updateWheelTransform(i, true);
     }
     m_visual_wheels_touch_ground = false;
-    m_zipper_speed               = btScalar(0);
     m_skid_angular_velocity      = 0;
     m_is_skidding                = false;
     m_allow_sliding              = false;
@@ -773,51 +772,35 @@ void btKart::updateFriction(btScalar timeStep)
             (btRigidBody*) wheelInfo.m_raycastInfo.m_groundObject;
         if(!groundObject) continue;
 
-        if(m_zipper_speed > 0)
-        {
-            if (wheel==2 || wheel==3)
-            {
-                // The zipper velocity is the speed that should be
-                // reached. So compute the impulse to accelerate the
-                // kart up to that speed:
-                m_forwardImpulse[wheel] =
-                    0.5f*(m_zipper_speed -
-                          getRigidBody()->getLinearVelocity().length())
-                    / m_chassisBody->getInvMass();
-            }
+        btScalar rollingFriction = 0.f;
 
+        if (wheelInfo.m_engineForce != 0.f)
+        {
+            rollingFriction = wheelInfo.m_engineForce* timeStep;
         }
         else
         {
-            btScalar rollingFriction = 0.f;
-
-            if (wheelInfo.m_engineForce != 0.f)
-            {
-                rollingFriction = wheelInfo.m_engineForce* timeStep;
-            }
-            else
-            {
-                btScalar defaultRollingFrictionImpulse = 0.f;
-                btScalar maxImpulse = wheelInfo.m_brake
-                                    ? wheelInfo.m_brake
-                                    : defaultRollingFrictionImpulse;
-                btWheelContactPoint contactPt(m_chassisBody, groundObject,
-                                     wheelInfo.m_raycastInfo.m_contactPointWS,
-                                     m_forwardWS[wheel],maxImpulse);
-                rollingFriction = calcRollingFriction(contactPt);
-                // This is a work around for the problem that a kart shakes
-                // if it is braking: we get a minor impulse forward, which
-                // bullet then tries to offset by applying a backward
-                // impulse - which is a bit too big, causing a impulse
-                // backwards, ... till the kart is shaking backwards and
-                // forwards. By only applying half of the impulse in case
-                // of low friction this goes away.
-                if(wheelInfo.m_brake && fabsf(rollingFriction)<10)
-                    rollingFriction*=0.5f;
-            }
-
-            m_forwardImpulse[wheel] = rollingFriction;
+            btScalar defaultRollingFrictionImpulse = 0.f;
+            btScalar maxImpulse = wheelInfo.m_brake
+                ? wheelInfo.m_brake
+                : defaultRollingFrictionImpulse;
+            btWheelContactPoint contactPt(m_chassisBody, groundObject,
+                wheelInfo.m_raycastInfo.m_contactPointWS,
+                m_forwardWS[wheel], maxImpulse);
+            rollingFriction = calcRollingFriction(contactPt);
+            // This is a work around for the problem that a kart shakes
+            // if it is braking: we get a minor impulse forward, which
+            // bullet then tries to offset by applying a backward
+            // impulse - which is a bit too big, causing a impulse
+            // backwards, ... till the kart is shaking backwards and
+            // forwards. By only applying half of the impulse in case
+            // of low friction this goes away.
+            if (wheelInfo.m_brake && fabsf(rollingFriction) < 10)
+                rollingFriction *= 0.5f;
         }
+
+        m_forwardImpulse[wheel] = rollingFriction;
+
         if(m_time_additional_impulse>0)
         {
             sliding = true;
@@ -1016,21 +999,6 @@ void btKart::setSliding(bool active)
 {
     m_allow_sliding = active;
 }   // setSliding
-
-// ----------------------------------------------------------------------------
-/** Activates an additional speedup for the kart so that it reaches the
- *  specified speed.
- *  \param speed The speed to reach.
- */
-void btKart::instantSpeedIncreaseTo(btScalar speed)
-{
-    // Avoid that a speed 'increase' might cause a slowdown
-    if (m_chassisBody->getLinearVelocity().length2() > speed*speed)
-    {
-        return;
-    }
-    m_zipper_speed  = speed;
-}   // activateZipper
 
 // ----------------------------------------------------------------------------
 /** Adjusts the velocity of this kart to be at least the specified minimum,
