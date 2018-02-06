@@ -68,10 +68,10 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
 //-----------------------------------------------------------------------------
 /** Moves the camera smoothly from the current camera position (and target)
  *  to the new position and target.
- *  \param wanted_position The position the camera wanted to reach.
- *  \param wanted_target The point the camera wants to point to.
+ *  \param dt Delta time, 
+ *  \param if false, the camera instantly moves to the endpoint, or else it smoothly moves
  */
-void CameraNormal::smoothMoveCamera(float dt)
+void CameraNormal::moveCamera(float dt, bool smooth)
 {
     if(!m_kart) return;
     
@@ -112,19 +112,23 @@ void CameraNormal::smoothMoveCamera(float dt)
 
 
     //m_smooth_dt = 0.3f * dt + 0.7f * m_smooth_dt;
-    float delta = (dt*5.0f);
-    if (delta < 0.0f)
-        delta = 0.0f;
-    else if (delta > 1.0f)
-        delta = 1.0f;
-
+    float delta = 1;
+    float delta2 = 1;
+    if (smooth)
+    { 
+        delta = (dt*5.0f);
+        if (delta < 0.0f)
+            delta = 0.0f;
+        else if (delta > 1.0f)
+            delta = 1.0f;
+    
+        delta2 = dt * 8.0f;
+        if (delta2 < 0)
+            delta2 = 0;
+        else if (delta2 > 1)
+            delta2 = 1;
+    }
     m_camera_offset += (wanted_camera_offset - m_camera_offset) * delta;
-
-    float delta2 = dt * 8.0f;
-    if (delta2 < 0)
-        delta2 = 0;
-    else if (delta2 > 1)
-        delta2 = 1;
 
     btTransform btt = m_kart->getTrans();
     m_kart_position = btt.getOrigin();
@@ -133,6 +137,7 @@ void CameraNormal::smoothMoveCamera(float dt)
     q2 = btt.getRotation().normalized();
     if (dot(q1, q2) < 0.0f)
         q2 = -q2;
+
     m_kart_rotation = q1.slerp(q2, delta2);
 
     btt.setOrigin(m_kart_position);
@@ -159,8 +164,11 @@ void CameraNormal::smoothMoveCamera(float dt)
     assert(!std::isnan(m_camera->getPosition().Y));
     assert(!std::isnan(m_camera->getPosition().Z));
 
-}   // smoothMoveCamera
-
+}   // MoveCamera
+void CameraNormal::snapToPosition()
+{
+    moveCamera(1, false);
+}
 //-----------------------------------------------------------------------------
 /** Determine the camera settings for the current frame.
  *  \param above_kart How far above the camera should aim at.
@@ -257,7 +265,7 @@ void CameraNormal::update(float dt)
                                        +  core::vector3df(0, above_kart, 0));
         m_camera->setTarget(current_target);
     }
-    else   // no kart animation
+    else // no kart animation
     {
         float above_kart, cam_angle, side_way, distance;
         bool  smoothing;
@@ -265,6 +273,7 @@ void CameraNormal::update(float dt)
         positionCamera(dt, above_kart, cam_angle, side_way, distance, smoothing);
     }
 }   // update
+
 
 // ----------------------------------------------------------------------------
 /** Actually sets the camera based on the given parameter.
@@ -296,7 +305,7 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
 
     if (smoothing)
     {
-        smoothMoveCamera(dt);
+        moveCamera(dt, true);
     }
     else
     {
