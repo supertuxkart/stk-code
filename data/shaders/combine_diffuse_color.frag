@@ -30,7 +30,7 @@ void main()
     vec3 metallicMatColor = mix(vec3(0.04), diffuse_color_for_mix, metallicMapValue);
     vec3 tmp = DiffuseComponent * mix(diffuseMatColor.xyz, vec3(0.0), metallicMapValue) + (metallicMatColor * SpecularComponent);
 
-    vec3 emitCol = diffuseMatColor.xyz * diffuseMatColor.xyz * diffuseMatColor.xyz * 15.;
+    vec3 emitCol = diffuseMatColor.xyz + (diffuseMatColor.xyz * diffuseMatColor.xyz * pow(emitMapValue, 2.) * 10.);    
     vec4 color_1 = vec4(tmp * ao + (emitMapValue * emitCol), diffuseMatColor.a);
 
     // Fog
