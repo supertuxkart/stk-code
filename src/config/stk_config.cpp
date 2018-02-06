@@ -269,13 +269,14 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if (const XMLNode *camera = root->getNode("camera"))
     {
-        for (int i = 0; i < 4; i++) 
+        camera->get("fov-1", &m_camera_fov[0]);
+        camera->get("fov-2", &m_camera_fov[1]);
+        camera->get("fov-3", &m_camera_fov[2]);
+        camera->get("fov-4", &m_camera_fov[3]);
+        
+        for (unsigned int i = 4; i < MAX_PLAYER_COUNT; i++) 
         {
-            camera->get("fov-" + std::to_string(i + 1), &m_camera_fov[i]);
-        }
-        for (int i = 4; i < MAX_PLAYER_COUNT; i++) 
-        {
-            camera->get("fov-" + std::to_string(4), &m_camera_fov[i]);
+            camera->get("fov-4", &m_camera_fov[i]);
         }
         camera->get("cutscene-fov", &m_cutscene_fov);
     }

@@ -10,6 +10,7 @@
                  android:icon="@drawable/icon"
                  android:banner="@drawable/banner"
                  android:hasCode="false"
+                 android:isGame="true"
                  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
                  android:hardwareAccelerated="true">
 
@@ -30,8 +31,8 @@
         </activity>
     </application>
 
-    <uses-sdk android:minSdkVersion="19" />
-    <uses-sdk android:targetSdkVersion="21" />
+    <uses-sdk android:minSdkVersion="19" 
+              android:targetSdkVersion="21" />
     <uses-feature android:glEsVersion="0x00020000" />
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
