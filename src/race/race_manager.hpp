@@ -489,7 +489,17 @@ public:
     {
         return m_num_local_players;
     }   // getNumLocalPlayers
+    
     // ------------------------------------------------------------------------
+    bool getIfEmptyScreenSpaceExists() const
+    {
+        const float Sqrt = sqrt(getNumLocalPlayers());
+        const int rows = ceil(Sqrt);
+        const int cols = round(Sqrt);
+        const int total_spaces = rows * cols;
+        return (total_spaces - getNumLocalPlayers() > 0);
+    }   // getNumLocalPlayers
+        // ------------------------------------------------------------------------
     /** Returns the selected number of karts (selected number of players and
      *  AI karts. */
     unsigned int getNumberOfKarts() const {return m_num_karts; }
