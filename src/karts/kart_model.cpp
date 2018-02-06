@@ -504,7 +504,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
                 irr_driver->addMesh(obj.getModel(), "kart_headlight",
                 parent, getRenderInfo());
 #ifndef SERVER_ONLY
-            if (human_player && CVS->isGLSL() && CVS->isDefferedEnabled())
+            if (human_player && CVS->isGLSL() && CVS->isDeferredEnabled())
             {
                 obj.setLight(headlight_model, each_energy, each_radius);
             }

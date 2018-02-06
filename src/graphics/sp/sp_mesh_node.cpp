@@ -48,6 +48,7 @@ SPMeshNode::SPMeshNode(IAnimatedMesh* mesh, ISceneNode* parent,
     m_first_render_info = render_info;
     m_animated = false;
     m_skinning_offset = -32768;
+    m_is_in_shadowpass = true;
 }   // SPMeshNode
 
 // ----------------------------------------------------------------------------

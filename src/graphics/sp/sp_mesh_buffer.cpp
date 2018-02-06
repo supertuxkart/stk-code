@@ -167,7 +167,7 @@ void SPMeshBuffer::uploadGLMesh()
         offset += 4;
 
         video::SColor vc = m_vertices[i].m_color;
-        if (CVS->isDefferedEnabled())
+        if (CVS->isDeferredEnabled())
         {
             vc.setRed(srgb255ToLinear(vc.getRed()));
             vc.setGreen(srgb255ToLinear(vc.getGreen()));

@@ -116,8 +116,7 @@ const bool ALLOW_1280_X_720    = true;
 IrrDriver::IrrDriver()
 {
     m_resolution_changing = RES_CHANGE_NONE;
-    m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
-    
+
     struct irr::SIrrlichtCreationParameters p;
     p.DriverType    = video::EDT_NULL;
     p.WindowSize    = core::dimension2d<u32>(640,480);
@@ -135,10 +134,9 @@ IrrDriver::IrrDriver()
     m_request_screenshot = false;
     m_renderer            = NULL;
     m_wind                = new Wind();
-
-    m_mipviz = m_wireframe = m_normals = m_ssaoviz = false;
-    m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = false;
-    m_boundingboxesviz           = false;
+    m_ssaoviz = false;
+    m_shadowviz = false;
+    m_boundingboxesviz = false;
     m_last_light_bucket_distance = 0;
     m_clear_color                = video::SColor(255, 100, 101, 140);
     m_skinning_joint             = 0;
@@ -173,24 +171,6 @@ void IrrDriver::reset()
     m_renderer->resetPostProcessing();
 #endif
 }   // reset
-
-// ----------------------------------------------------------------------------
-void IrrDriver::setPhase(STKRenderingPass p)
-{
-    m_phase = p;
-}
-
-// ----------------------------------------------------------------------------
-STKRenderingPass IrrDriver::getPhase() const
-{
-  return m_phase;
-}
-
-#// ----------------------------------------------------------------------------
-void IrrDriver::increaseObjectCount()
-{
-    m_renderer->incObjectCount(m_phase);
-}   // increaseObjectCount
 
 // ----------------------------------------------------------------------------
 core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
@@ -1673,7 +1653,18 @@ void IrrDriver::displayFPS()
                     m_skinning_joint);
     }
     else
-        fps_string = _("FPS: %d/%d/%d - %d KTris", min, fps, max, (int)roundf(kilotris)); 
+    {
+        if (CVS->isGLSL())
+        {
+            fps_string = _("FPS: %d/%d/%d - %d KTris", min, fps, max,
+                SP::sp_solid_poly_count / 1000);
+        }
+        else
+        {
+            fps_string = _("FPS: %d/%d/%d - %d KTris", min, fps, max,
+            (int)roundf(kilotris));
+        }
+    }
 
     static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
 
@@ -1975,3 +1966,14 @@ GLuint IrrDriver::getDepthStencilTexture()
     return m_renderer->getDepthStencilTexture();
 }   // getDepthStencilTexture
 
+// ----------------------------------------------------------------------------
+void IrrDriver::resetDebugModes()
+{
+    m_ssaoviz = false;
+    m_shadowviz = false;
+    m_lightviz = false;
+    m_boundingboxesviz = false;
+#ifndef SERVER_ONLY
+    SP::sp_debug_view = false;
+#endif
+}

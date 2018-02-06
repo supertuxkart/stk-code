@@ -11,15 +11,8 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 include(CMakeDependentOption)
 
-set(DEPENDENCIES "dependencies")
-# In case of 64-bit windows, use a different path for dependencies
-# so that both dependencies can be installed next to each other
-if ( WIN32 AND (CMAKE_SIZEOF_VOID_P EQUAL 8 ) )
-    set(DEPENDENCIES "dependencies-64bit")
-endif()
-
 include(BuildTypeSTKRelease)
-if (NOT CMAKE_BUILD_TYPE)
+if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "No build type selected, default to STKRelease")
     set(CMAKE_BUILD_TYPE "STKRelease")
 endif()
@@ -28,12 +21,13 @@ option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
+option(USE_SYSTEM_ENET "Use system ENET instead of the built-in version, when available." ON)
 option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
 
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT USE_GLES2;NOT APPLE" OFF)
 
-if ((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
+if((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
     option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" ON)
     option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
 endif()
@@ -73,6 +67,32 @@ set(STK_INSTALL_BINARY_DIR "bin" CACHE
 set(STK_INSTALL_DATA_DIR "share/supertuxkart" CACHE
     STRING "Install data folder to this directory, absolute or relative to CMAKE_INSTALL_PREFIX")
 
+# Define dependencies path
+if(MSVC)
+    set(DEPENDENCIES "dependencies-vs")
+elseif(MINGW)
+    set(DEPENDENCIES "dependencies-mingw")
+else()
+    set(DEPENDENCIES "dependencies")
+endif()
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(DEPENDENCIES "${DEPENDENCIES}-64bit")
+endif()
+
+if(WIN32)
+    if(NOT IS_DIRECTORY "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}")
+        set(DEPENDENCIES "dependencies")
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            set(DEPENDENCIES "${DEPENDENCIES}-64bit")
+        endif()
+    endif()
+
+    if(NOT IS_DIRECTORY "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}")
+        message(FATAL_ERROR "Dependencies directory not found.")
+    endif()
+endif()
+
 # These variables enable MSVC to find libraries located in "dependencies"
 if(WIN32)
     set(ENV{PATH} "$ENV{PATH};${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/include")
@@ -107,14 +127,24 @@ endif()
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 
-# Build the ENet UDP network library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
-include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
+# Find system ENet library or build it if missing
+if((UNIX AND NOT APPLE) AND USE_SYSTEM_ENET)
+    find_package(ENet)
+endif()
+
+if(ENET_FOUND)
+    include_directories(${ENet_INCLUDE_DIRS})
+else()
+    # Fallback to built-in version
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
+    set(ENet_LIBRARIES "enet")
+endif()
 
 # Find system GLEW library or build it if missing
 if(NOT USE_GLES2 AND NOT SERVER_ONLY)
     add_definitions(-DGLEW_NO_GLU)
-    if(USE_SYSTEM_GLEW)
+    if((UNIX AND NOT APPLE) AND USE_SYSTEM_GLEW)
         find_package(PkgConfig)
         if(PKGCONFIG_FOUND)
             pkg_check_modules(GLEW glew>=2.1)
@@ -434,7 +464,7 @@ target_link_libraries(supertuxkart
     bulletdynamics
     bulletcollision
     bulletmath
-    enet
+    ${ENet_LIBRARIES}
     stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
@@ -575,7 +605,7 @@ install(FILES ${STK_DATA_DIR}/supertuxkart.desktop DESTINATION share/application
 install(FILES data/supertuxkart_48.png DESTINATION share/icons/hicolor/48x48/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_48.png DESTINATION share/pixmaps RENAME supertuxkart.png)
-install(FILES data/supertuxkart.appdata.xml DESTINATION share/appdata)
+install(FILES data/supertuxkart.appdata.xml DESTINATION share/metainfo)
 
 if(MINGW)
     install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/ DESTINATION ${STK_INSTALL_BINARY_DIR}

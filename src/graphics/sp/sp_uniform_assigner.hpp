@@ -53,7 +53,7 @@ public:
     SPUniformAssigner(const std::type_index& ti, GLuint location)
         : m_location(location), m_type(ti), m_assigned(false) {}
     // ------------------------------------------------------------------------
-    bool rumtimeChecking(const std::type_info& ti) const
+    bool runtimeChecking(const std::type_info& ti) const
     {
 #ifdef DEBUG
         if (m_type != ti)
@@ -66,9 +66,69 @@ public:
         return true;
     }
     // ------------------------------------------------------------------------
+    void getValue(const GLuint& p, irr::core::matrix4& mat) const
+    {
+        if (runtimeChecking(typeid(mat)))
+        {
+#ifndef SERVER_ONLY
+            glGetUniformfv(p, m_location, mat.pointer());
+#endif
+        }
+    }
+    // ------------------------------------------------------------------------
+    void getValue(const GLuint& p, std::array<float, 4>& v) const
+    {
+        if (runtimeChecking(typeid(v)))
+        {
+#ifndef SERVER_ONLY
+            glGetUniformfv(p, m_location, v.data());
+#endif
+        }
+    }
+    // ------------------------------------------------------------------------
+    void getValue(const GLuint& p, irr::core::vector3df& v) const
+    {
+        if (runtimeChecking(typeid(v)))
+        {
+#ifndef SERVER_ONLY
+            glGetUniformfv(p, m_location, &v.X);
+#endif
+        }
+    }
+    // ------------------------------------------------------------------------
+    void getValue(const GLuint& p, irr::core::vector2df& v) const
+    {
+        if (runtimeChecking(typeid(v)))
+        {
+#ifndef SERVER_ONLY
+            glGetUniformfv(p, m_location, &v.X);
+#endif
+        }
+    }
+    // ------------------------------------------------------------------------
+    void getValue(const GLuint& p, float& v) const
+    {
+        if (runtimeChecking(typeid(v)))
+        {
+#ifndef SERVER_ONLY
+            glGetUniformfv(p, m_location, &v);
+#endif
+        }
+    }
+    // ------------------------------------------------------------------------
+    void getValue(const GLuint& p, int& v) const
+    {
+        if (runtimeChecking(typeid(v)))
+        {
+#ifndef SERVER_ONLY
+            glGetUniformiv(p, m_location, &v);
+#endif
+        }
+    }
+    // ------------------------------------------------------------------------
     void setValue(const irr::core::matrix4& mat) const
     {
-        if (rumtimeChecking(typeid(mat)))
+        if (runtimeChecking(typeid(mat)))
         {
 #ifndef SERVER_ONLY
             glUniformMatrix4fv(m_location, 1, GL_FALSE, mat.pointer());
@@ -79,7 +139,7 @@ public:
     // ------------------------------------------------------------------------
     void setValue(const std::array<float, 4>& v) const
     {
-        if (rumtimeChecking(typeid(v)))
+        if (runtimeChecking(typeid(v)))
         {
 #ifndef SERVER_ONLY
             glUniform4f(m_location, v[0], v[1], v[2], v[3]);
@@ -88,20 +148,9 @@ public:
         }
     }
     // ------------------------------------------------------------------------
-    void setValue(const irr::video::SColorf& col) const
-    {
-        if (rumtimeChecking(typeid(col)))
-        {
-#ifndef SERVER_ONLY
-            glUniform3f(m_location, col.r, col.g, col.b);
-            m_assigned = true;
-#endif
-        }
-    }
-    // ------------------------------------------------------------------------
     void setValue(const irr::core::vector3df& v) const
     {
-        if (rumtimeChecking(typeid(v)))
+        if (runtimeChecking(typeid(v)))
         {
 #ifndef SERVER_ONLY
             glUniform3f(m_location, v.X, v.Y, v.Z);
@@ -112,7 +161,7 @@ public:
     // ------------------------------------------------------------------------
     void setValue(const irr::core::vector2df& v) const
     {
-        if (rumtimeChecking(typeid(v)))
+        if (runtimeChecking(typeid(v)))
         {
 #ifndef SERVER_ONLY
             glUniform2f(m_location, v.X, v.Y);
@@ -121,20 +170,9 @@ public:
         }
     }
     // ------------------------------------------------------------------------
-    void setValue(const irr::core::dimension2df& v) const
-    {
-        if (rumtimeChecking(typeid(v)))
-        {
-#ifndef SERVER_ONLY
-            glUniform2f(m_location, v.Width, v.Height);
-            m_assigned = true;
-#endif
-        }
-    }
-    // ------------------------------------------------------------------------
     void setValue(float v) const
     {
-        if (rumtimeChecking(typeid(v)))
+        if (runtimeChecking(typeid(v)))
         {
 #ifndef SERVER_ONLY
             glUniform1f(m_location, v);
@@ -145,7 +183,7 @@ public:
     // ------------------------------------------------------------------------
     void setValue(int v) const
     {
-        if (rumtimeChecking(typeid(v)))
+        if (runtimeChecking(typeid(v)))
         {
 #ifndef SERVER_ONLY
             glUniform1i(m_location, v);
@@ -160,36 +198,30 @@ public:
         {
             m_assigned = false;
 #ifndef SERVER_ONLY
-            if (m_type == typeid(irr::core::matrix4))
+            if (m_type == typeid(int))
             {
-                static const char zeroes[64] = {};
-                glUniformMatrix4fv(m_location, 1, GL_FALSE, (float*)zeroes);
-            }
-            else if (m_type == typeid(irr::video::SColor))
-            {
-                glUniform4i(m_location, 0, 0, 0, 0);
-            }
-            else if (m_type == typeid(irr::video::SColorf) ||
-                m_type == typeid(irr::core::vector3df))
-            {
-                glUniform3f(m_location, 0.0f, 0.0f, 0.0f);
-            }
-            else if (m_type == typeid(irr::core::vector2df) ||
-                m_type == typeid(irr::core::dimension2df))
-            {
-                glUniform2f(m_location, 0.0f, 0.0f);
+                glUniform1i(m_location, 0);
             }
             else if (m_type == typeid(float))
             {
                 glUniform1f(m_location, 0.0f);
             }
-            else if (m_type == typeid(int))
+            else if (m_type == typeid(irr::core::matrix4))
             {
-                glUniform1i(m_location, 0);
+                static const char zeroes[64] = {};
+                glUniformMatrix4fv(m_location, 1, GL_FALSE, (float*)zeroes);
             }
             else if (m_type == typeid(std::array<float, 4>))
             {
                 glUniform4f(m_location, 0.0f, 0.0f, 0.0f,0.0f);
+            }
+            else if (m_type == typeid(irr::core::vector3df))
+            {
+                glUniform3f(m_location, 0.0f, 0.0f, 0.0f);
+            }
+            else if (m_type == typeid(irr::core::vector2df))
+            {
+                glUniform2f(m_location, 0.0f, 0.0f);
             }
 #endif
         }

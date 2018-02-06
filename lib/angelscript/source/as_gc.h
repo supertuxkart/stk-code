@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -60,7 +60,7 @@ public:
 	void   GetStatistics(asUINT *currentSize, asUINT *totalDestroyed, asUINT *totalDetected, asUINT *newObjects, asUINT *totalNewDestroyed) const;
 	void   GCEnumCallback(void *reference);
 	int    AddScriptObjectToGC(void *obj, asCObjectType *objType);
-	int    GetObjectInGC(asUINT idx, asUINT *seqNbr, void **obj, asIObjectType **type);
+	int    GetObjectInGC(asUINT idx, asUINT *seqNbr, void **obj, asITypeInfo **type);
 
 	int    ReportAndReleaseUndestroyedObjects();
 

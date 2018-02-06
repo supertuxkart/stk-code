@@ -1,6 +1,6 @@
 uniform float custom_alpha;
 
-flat in float hue_change;
+in float hue_change;
 
 in vec2 uv;
 in vec4 color;

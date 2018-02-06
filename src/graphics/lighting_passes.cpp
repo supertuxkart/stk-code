@@ -106,6 +106,11 @@ public:
         glVertexAttribDivisorARB(attrib_Color, 1);
         glVertexAttribDivisorARB(attrib_Radius, 1);
     }   // PointLightShader
+    ~PointLightShader()
+    {
+        glDeleteBuffers(1, &vbo);
+        glDeleteVertexArrays(1, &vao);
+    }   // PointLightShader
 };   // PointLightShader
 
 
@@ -116,7 +121,6 @@ class PointLightScatterShader : public TextureShader<PointLightScatterShader,
                                                      1, float, core::vector3df>
 {
 public:
-    GLuint vbo;
     GLuint vao;
     PointLightScatterShader()
     {
@@ -157,6 +161,10 @@ public:
         glVertexAttribDivisorARB(attrib_Color, 1);
         glVertexAttribDivisorARB(attrib_Radius, 1);
     }   // PointLightScatterShader
+    ~PointLightScatterShader()
+    {
+        glDeleteVertexArrays(1, &vao);
+    }   // ~PointLightScatterShader
 };
 
 // ============================================================================
@@ -465,7 +473,6 @@ void LightingPasses::renderLights(  bool has_shadow,
 void LightingPasses::renderLightsScatter(GLuint depth_stencil_texture,
                                          const FrameBuffer& half1_framebuffer,
                                          const FrameBuffer& half2_framebuffer,
-                                         const FrameBuffer& colors_framebuffer,
                                          const PostProcessing* post_processing)
 {
     half1_framebuffer.bind();
@@ -505,14 +512,6 @@ void LightingPasses::renderLightsScatter(GLuint depth_stencil_texture,
     glDisable(GL_BLEND);
     post_processing->renderGaussian6Blur(half1_framebuffer,
                                          half2_framebuffer, 5., 5.);
-    glEnable(GL_BLEND);
-
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    colors_framebuffer.bind();
-    post_processing->renderPassThrough(half1_framebuffer.getRTT()[0],
-                                       colors_framebuffer.getWidth(),
-                                       colors_framebuffer.getHeight());
 }   // renderLightsScatter
 
 #endif

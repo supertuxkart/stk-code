@@ -19,49 +19,34 @@
 #define HEADER_RTTS_HPP
 
 #include "utils/leak_check.hpp"
-#include "utils/ptr_vector.hpp"
-#include "utils/types.hpp"
-#include <stddef.h>
+#include <cassert>
 
 class FrameBuffer;
 class FrameBufferLayer;
 
-namespace irr {
-    namespace video {
-        class ITexture;
-    };
-    namespace scene {
-        class ICameraSceneNode;
-    }
-};
-
-using irr::video::ITexture;
-
 enum TypeFBO
 {
-    FBO_SSAO,
-    FBO_NORMAL_AND_DEPTHS,
-    FBO_COMBINED_DIFFUSE_SPECULAR,
     FBO_COLORS,
-    FBO_DIFFUSE,
-    FBO_SPECULAR,
-    FBO_MLAA_COLORS,
-    FBO_MLAA_BLEND,
-    FBO_MLAA_TMP,
+    FBO_NORMAL_AND_DEPTHS,
+    FBO_SP,
+    FBO_RGBA_1,
+    FBO_RGBA_2,
+    FBO_COMBINED_DIFFUSE_SPECULAR,
     FBO_TMP1_WITH_DS,
-    FBO_TMP2_WITH_DS,
-    FBO_TMP4,
-    FBO_LINEAR_DEPTH,
-    FBO_HALF1,
     FBO_HALF1_R,
+    FBO_HALF1,
     FBO_HALF2,
-    FBO_HALF2_R,
-    FBO_QUARTER1,
-    FBO_QUARTER2,
-    FBO_EIGHTH1,
-    FBO_EIGHTH2,
-    FBO_DISPLACE,
-    FBO_BLOOM_1024,
+
+    FBO_RGBA_3, // MLAA
+
+    FBO_SSAO, // SSAO
+    FBO_LINEAR_DEPTH, // SSAO
+    FBO_HALF2_R, // SSAO
+
+    FBO_QUARTER1, // Glow || God Ray
+    FBO_QUARTER2, // God Ray
+
+    FBO_BLOOM_1024, // The reset is for bloom only (may be optimized layer)
     FBO_BLOOM_512,
     FBO_TMP_512,
     FBO_LENS_512,
@@ -73,55 +58,31 @@ enum TypeFBO
     FBO_BLOOM_128,
     FBO_TMP_128,
     FBO_LENS_128,
-    FBO_SP,
     FBO_COUNT
 };
 
 enum TypeRTT : unsigned int
 {
-    RTT_TMP1 = 0,
-    RTT_TMP2,
-    RTT_TMP3,
-    RTT_TMP4,
-    RTT_LINEAR_DEPTH,
+    RTT_COLOR = 0,
     RTT_NORMAL_AND_DEPTH,
-    RTT_COLOR,
+    RTT_SP_GLOSS,
+    RTT_SP_DIFF_COLOR, // RGBA
+    RTT_RGBA_2,
     RTT_DIFFUSE,
     RTT_SPECULAR,
-
-
+    RTT_TMP1,
     RTT_HALF1,
-    RTT_HALF2,
     RTT_HALF1_R,
+    RTT_HALF2,
+
+    RTT_RGBA_3,
+
+    RTT_SSAO,
+    RTT_LINEAR_DEPTH,
     RTT_HALF2_R,
 
     RTT_QUARTER1,
     RTT_QUARTER2,
-    //    RTT_QUARTER3,
-    //    RTT_QUARTER4,
-
-    RTT_EIGHTH1,
-    RTT_EIGHTH2,
-
-    //    RTT_SIXTEENTH1,
-    //    RTT_SIXTEENTH2,
-
-    RTT_SSAO,
-
-    //    RTT_COLLAPSE,
-    //    RTT_COLLAPSEH,
-    //    RTT_COLLAPSEV,
-    //    RTT_COLLAPSEH2,
-    //    RTT_COLLAPSEV2,
-    //    RTT_WARPH,
-    //    RTT_WARPV,
-
-    //    RTT_HALF_SOFT,
-
-    RTT_DISPLACE,
-    RTT_MLAA_COLORS,
-    RTT_MLAA_BLEND,
-    RTT_MLAA_TMP,
 
     RTT_BLOOM_1024,
     RTT_BLOOM_512,
@@ -134,36 +95,46 @@ enum TypeRTT : unsigned int
     RTT_TMP_128,
     RTT_LENS_128,
 
-    RTT_SP_GLOSS,
-    RTT_SP_DIFF_COLOR,
-
     RTT_COUNT
 };
 
 class RTT
 {
 public:
-    RTT(unsigned int width, unsigned int height, float rtt_scale = 1.0f);
+    RTT(unsigned int width, unsigned int height, float rtt_scale = 1.0f,
+        bool use_default_fbo_only = false);
     ~RTT();
-    
+
     unsigned int getWidth () const { return m_width ; }
     unsigned int getHeight() const { return m_height; }
 
-    FrameBufferLayer* getShadowFrameBuffer() { return m_shadow_FBO; }
-    unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
-    unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }
-    FrameBuffer& getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
+    FrameBufferLayer* getShadowFrameBuffer() { return m_shadow_fbo; }
+    unsigned getDepthStencilTexture() const
+    {
+        assert(m_depth_stencil_tex != 0);
+        return m_depth_stencil_tex;
+    }
+    unsigned getRenderTarget(enum TypeRTT target) const
+    {
+        assert(m_render_target_textures[target] != 0);
+        return m_render_target_textures[target];
+    }
+    FrameBuffer& getFBO(enum TypeFBO fbo)
+    {
+        assert(m_frame_buffers[fbo] != NULL);
+        return *m_frame_buffers[fbo];
+    }
 
 private:
-    unsigned RenderTargetTextures[RTT_COUNT];
-    PtrVector<FrameBuffer> FrameBuffers;
-    unsigned DepthStencilTexture;
+    unsigned m_render_target_textures[RTT_COUNT] = {};
+    FrameBuffer* m_frame_buffers[FBO_COUNT] = {};
+    unsigned m_depth_stencil_tex = 0;
 
     unsigned int m_width;
     unsigned int m_height;
 
-    unsigned shadowDepthTex;
-    FrameBufferLayer* m_shadow_FBO;
+    unsigned m_shadow_depth_tex = 0;
+    FrameBufferLayer* m_shadow_fbo;
 
     LEAK_CHECK();
 };
