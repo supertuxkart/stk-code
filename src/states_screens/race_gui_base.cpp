@@ -253,7 +253,7 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
     if (race_manager->getNumLocalPlayers() > 2)
     {
         font = GUIEngine::getSmallFont();
-        font_height = m_small_font_max_height;
+        y = viewport.getCenter().Y;
     }
 
     irr_driver->getVideoDriver()->enableMaterial2D(); // seems like we need to remind irrlicht from time to time to use the Material2D
@@ -348,10 +348,10 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
 
     int nSize = (int)(64.0f * scale);
 
-    int itemSpacing = (int)(scale * 30);
+    int itemSpacing = (int)(scale * 32.0f);
 
-    int x1 = viewport.UpperLeftCorner.X  + viewport.getWidth()/2
-           - (n * itemSpacing)/2;
+    int x1 = viewport.UpperLeftCorner.X  + (viewport.getWidth()/2)
+           - ((n * itemSpacing)/2);
     int y1 = viewport.UpperLeftCorner.Y  + (int)(20 * scaling.Y);
 
     int x2 = 0;
@@ -364,7 +364,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
 
     for ( int i = 0 ; i < n ; i++ )
     {
-        x2 = (int)(x1+i*itemSpacing);
+        x2 = (int)((x1+i*itemSpacing) - (itemSpacing / 2));
         core::rect<s32> pos(x2, y1, x2+nSize, y1+nSize);
         draw2DImage(t, pos, rect, NULL,
                                                   NULL, true);
@@ -667,7 +667,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     // Special case : when 3 players play, use 4th window to display such stuff
     if (race_manager->getIfEmptyScreenSpaceExists())
     {
-        irr::core::recti Last_Space = irr_driver->GetSplitscreenWindow(race_manager->getNumLocalPlayers());
+        irr::core::recti Last_Space = irr_driver->getSplitscreenWindow(race_manager->getNumLocalPlayers());
         x_base = Last_Space.UpperLeftCorner.X;
         y_base = Last_Space.UpperLeftCorner.Y;
         y_space = irr_driver->getActualScreenSize().Height - y_base;
