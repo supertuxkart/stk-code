@@ -164,10 +164,10 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
                         const Vec3 &position, bool important)
 {
 #ifndef SERVER_ONLY
-    if (((UserConfigParams::m_graphical_effects < 2 || !CVS->isGLSL()) &&
+    if (((UserConfigParams::m_particles_effects < 2 || !CVS->isGLSL()) &&
         (!important || m_kart->getType() == RaceManager::KT_AI ||
         m_kart->getType() == RaceManager::KT_SPARE_TIRE)) ||
-        UserConfigParams::m_graphical_effects < 1)
+        UserConfigParams::m_particles_effects < 1)
     {
         m_all_emitters.push_back(NULL);
         return;
@@ -210,6 +210,8 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
         m_skid_kind1 = kind;
     else if (type==KGFX_SKID2L || type==KGFX_SKID2R)
         m_skid_kind2 = kind;
+#else
+    m_all_emitters.push_back(NULL);
 #endif
 }   // addEffect
 

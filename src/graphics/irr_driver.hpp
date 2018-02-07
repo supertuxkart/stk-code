@@ -50,6 +50,12 @@
 #endif
 
 
+namespace SP
+{
+    class SPDynamicDrawCall;
+}
+
+
 namespace irr
 {
     namespace scene { class ISceneManager; class IMesh; class IAnimatedMeshSceneNode; class IAnimatedMesh;
@@ -150,16 +156,9 @@ private:
 
     bool                 m_request_screenshot;
 
-    bool                 m_wireframe;
-    bool                 m_mipviz;
-    bool                 m_normals;
     bool                 m_ssaoviz;
-    bool                 m_rsm;
-    bool                 m_rh;
-    bool                 m_gi;
     bool                 m_shadowviz;
     bool                 m_lightviz;
-    bool                 m_distortviz;
     bool                 m_boundingboxesviz;
     bool                 m_recording;
 
@@ -169,8 +168,8 @@ private:
 
     unsigned             m_last_light_bucket_distance;
     unsigned             m_skinning_joint;
-    u32                  m_renderpass;
-    class STKMeshSceneNode *m_sun_interposer;
+
+    SP::SPDynamicDrawCall* m_sun_interposer;
     core::vector3df m_sun_direction;
     video::SColorf m_suncolor;
 
@@ -180,8 +179,6 @@ private:
     std::vector<BloomData> m_forcedbloom;
 
     std::vector<scene::ISceneNode *> m_background;
-
-    STKRenderingPass m_phase;
 
     float m_ssao_radius;
     float m_ssao_k;
@@ -203,11 +200,10 @@ public:
     void getOpenGLData(std::string *vendor, std::string *renderer,
                        std::string *version);
 
-    void setPhase(STKRenderingPass);
-    STKRenderingPass getPhase() const;
     void increaseObjectCount();
     core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
+    core::recti GetSplitscreenWindow(int WindowNum);
     void setAllMaterialFlags(scene::IMesh *mesh) const;
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
@@ -234,13 +230,12 @@ public:
                                        float wave_height,
                                        float wave_speed, float wave_length);
     scene::IMeshSceneNode*addOctTree(scene::IMesh *mesh);
-    scene::IMeshSceneNode*addSphere(float radius,
+    scene::ISceneNode* addSphere(float radius,
                  const video::SColor &color=video::SColor(128, 255, 255, 255));
-    scene::IMeshSceneNode*addMesh(scene::IMesh *mesh,
-                                  const std::string& debug_name,
-                                  scene::ISceneNode *parent = NULL,
-                                  RenderInfo* render_info = NULL,
-                                  bool all_parts_colorized = false);
+    scene::ISceneNode* addMesh(scene::IMesh *mesh,
+                               const std::string& debug_name,
+                               scene::ISceneNode *parent = NULL,
+                               std::shared_ptr<RenderInfo> render_info = nullptr);
     PerCameraNode        *addPerCameraNode(scene::ISceneNode* node,
                                            scene::ICameraSceneNode* cam,
                                            scene::ISceneNode *parent = NULL);
@@ -262,8 +257,7 @@ public:
         *addAnimatedMesh(scene::IAnimatedMesh *mesh,
                          const std::string& debug_name,
                          scene::ISceneNode* parent = NULL,
-                         RenderInfo* render_info = NULL,
-                         bool all_parts_colorized = false);
+                         std::shared_ptr<RenderInfo> render_info = nullptr);
     scene::ICameraSceneNode
                          *addCameraSceneNode();
     Camera               *addCamera(unsigned int index, AbstractKart *kart);
@@ -285,7 +279,6 @@ public:
     core::position2di     getMouseLocation();
 
     void                  printRenderStats();
-    bool                  supportsSplatting();
     void                  requestScreenshot();
     class GPUTimer        &getGPUTimer(unsigned);
 
@@ -353,60 +346,15 @@ public:
     GLuint getRenderTargetTexture(TypeRTT which);
     GLuint getDepthStencilTexture();
     // ------------------------------------------------------------------------
-    void resetDebugModes()
-    {
-        m_wireframe = false;
-        m_mipviz = false;
-        m_normals = false;
-        m_ssaoviz = false;
-        m_rsm = false;
-        m_rh = false;
-        m_gi = false;
-        m_shadowviz = false;
-        m_lightviz = false;
-        m_distortviz = false;
-        m_boundingboxesviz = false;
-    }
-    // ------------------------------------------------------------------------
-    void toggleWireframe()        { m_wireframe = !m_wireframe;     }
-    // ------------------------------------------------------------------------
-    bool getWireframe()           { return m_wireframe;             }
-    // ------------------------------------------------------------------------
-    void toggleMipVisualization() { m_mipviz = !m_mipviz;           }
-    // ------------------------------------------------------------------------
-    bool getMipViz()              { return m_mipviz;                }
-    // ------------------------------------------------------------------------    
-    void toggleNormals()          { m_normals = !m_normals;         }
-    // ------------------------------------------------------------------------
-    bool getNormals()             { return m_normals;               }
+    void resetDebugModes();
     // ------------------------------------------------------------------------
     void toggleSSAOViz()          { m_ssaoviz = !m_ssaoviz;         }
     // ------------------------------------------------------------------------
-    void toggleLightViz()         { m_lightviz = !m_lightviz;       }
-    // ------------------------------------------------------------------------
-    bool getLightViz()            { return m_lightviz;              }
-    // ------------------------------------------------------------------------
     bool getSSAOViz()             { return m_ssaoviz;               }
-    // ------------------------------------------------------------------------
-    void toggleRSM()              { m_rsm = !m_rsm;                 }
-    // ------------------------------------------------------------------------
-    bool getRSM()                 { return m_rsm;                   }
-    // ------------------------------------------------------------------------
-    void toggleRH()               { m_rh = !m_rh;                   }
-    // ------------------------------------------------------------------------
-    bool getRH()                  { return m_rh;                    }
-    // ------------------------------------------------------------------------
-    void toggleGI()               { m_gi = !m_gi;                   }
-    // ------------------------------------------------------------------------
-    bool getGI()                  { return m_gi;                    }
     // ------------------------------------------------------------------------
     void toggleShadowViz()        { m_shadowviz = !m_shadowviz;     }
     // ------------------------------------------------------------------------
     bool getShadowViz()           { return m_shadowviz;             }
-    // ------------------------------------------------------------------------
-    void toggleDistortViz()       { m_distortviz = !m_distortviz;   }
-    // ------------------------------------------------------------------------
-    bool getDistortViz()          { return m_distortviz;            }
     // ------------------------------------------------------------------------
     void toggleBoundingBoxesViz() { m_boundingboxesviz = !m_boundingboxesviz; }
     // ------------------------------------------------------------------------
@@ -415,8 +363,6 @@ public:
     bool isRecording() const { return m_recording; }
     // ------------------------------------------------------------------------
     void setRecording(bool val);
-    // ------------------------------------------------------------------------
-    u32 getRenderPass() { return m_renderpass; }
     // ------------------------------------------------------------------------
     std::vector<LightNode *> getLights() { return m_lights; }
     // ------------------------------------------------------------------------
@@ -451,10 +397,6 @@ public:
         m_background.push_back(n);
     }
     // ------------------------------------------------------------------------
-    void applyObjectPassShader();
-    void applyObjectPassShader(scene::ISceneNode * const node,
-                               bool rimlit = false);
-    // ------------------------------------------------------------------------
     scene::ISceneNode *addLight(const core::vector3df &pos, float energy,
                                 float radius, float r, float g, float b,
                                 bool sun = false, 
@@ -462,7 +404,7 @@ public:
     // ------------------------------------------------------------------------
     void clearLights();
     // ------------------------------------------------------------------------
-    class STKMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
+    SP::SPDynamicDrawCall* getSunInterposer() { return m_sun_interposer; }
     // ------------------------------------------------------------------------
     
     void cleanSunInterposer();

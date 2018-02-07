@@ -29,6 +29,7 @@
 #include "network/remote_kart_info.hpp"
 #include "utils/no_copy.hpp"
 
+#include "utils/constants.hpp"
 #include <vector>
 #include <string>
 #include <map>
@@ -148,11 +149,13 @@ public:
     float m_replay_delta_angle;
 
     /** The field of view for 1, 2, 3, 4 player split screen. */
-    float m_camera_fov[4];
+    float m_camera_fov[MAX_PLAYER_COUNT];
 
     float m_cutscene_fov;
 
     unsigned m_max_skinning_bones;
+
+    unsigned m_tc_quality;
 
     /** Lists of TTF files used in STK. */
     std::vector<std::string> m_normal_ttf;

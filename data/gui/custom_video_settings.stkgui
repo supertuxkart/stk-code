@@ -23,21 +23,13 @@
 
         <spacer height="4" width="10" />
 
-        <div layout="horizontal-row" width="100%" proportion="1">
+        <div layout="horizontal-row" width="50%" proportion="1">
             <spacer width="70" height="10" />
             
             <div layout="horizontal-row" proportion="1" height="fit">
                 <label text="Shadows" I18N="Video settings"/>
                 <spacer width="10" height="10"/>
                 <gauge id="shadows" min_value="0" max_value="2" proportion="1"/>
-            </div>
-            
-            <spacer height="4" width="10" />
-            
-            <div layout="horizontal-row" proportion="1" height="fit">
-                <checkbox id="ibl"/>
-                <spacer width="10" height="10"/>
-                <label text="Image-based lighting" I18N="Video settings"/>
             </div>
         </div>
 
@@ -75,9 +67,9 @@
             <spacer height="4" width="10" />
 
             <div layout="horizontal-row" proportion="1" height="fit">
-                <checkbox id="global_illumination"/>
+                <checkbox id="dof"/>
                 <spacer width="10" height="10"/>
-                <label text="Global illumination" I18N="Video settings"/>
+                <label text="Depth of field" I18N="Video settings"/>
             </div>
         </div>
 
@@ -115,9 +107,9 @@
             <spacer height="4" width="10" />
 
             <div layout="horizontal-row" proportion="1" height="fit">
-                <checkbox id="dof"/>
+                <checkbox id="ibl"/>
                 <spacer width="10" height="10"/>
-                <label text="Depth of field" I18N="Video settings"/>
+                <label text="Image-based lighting" I18N="Video settings"/>
             </div>
         </div>
         
@@ -125,9 +117,9 @@
 
         <div layout="horizontal-row" width="100%" proportion="1">
             <div layout="horizontal-row" proportion="1" height="fit">
-                <checkbox id="weather_gfx"/>
+                <checkbox id="animated_characters"/>
                 <spacer width="10" height="10"/>
-                <label text="Weather Effects" I18N="Video settings"/>
+                <label text="Animated Characters" I18N="Video settings"/>
             </div>
 
             <spacer height="4" width="10" />
@@ -142,17 +134,9 @@
         <spacer height="20" width="10" />
 
         <div layout="horizontal-row" width="100%" proportion="1">
-            <label text="Animated Scenery" I18N="Video settings" width="40%"/>
+            <label text="Particles Effects" I18N="Video settings" width="40%"/>
             <spacer width="10" height="10"/>
-            <gauge id="anim_gfx" min_value="0" max_value="2" width="50%" />
-        </div>
-
-        <spacer height="4" width="10" />
-
-        <div layout="horizontal-row" width="100%" proportion="1">
-            <label text="Animated Characters" I18N="Video settings" width="40%"/>
-            <spacer width="10" height="10"/>
-            <gauge id="steering_animations" min_value="0" max_value="2" width="50%" />
+            <gauge id="particles_effects" min_value="0" max_value="2" width="50%" />
         </div>
 
         <spacer height="4" width="10" />
@@ -160,7 +144,7 @@
         <div layout="horizontal-row" width="100%" proportion="1">
             <label text="Rendered image quality" I18N="Video settings" width="40%"/>
             <spacer width="10" height="10"/>
-            <gauge id="image_quality" min_value="0" max_value="3" width="50%" />
+            <gauge id="image_quality" min_value="0" max_value="2" width="50%" />
         </div>
 
         <spacer height="4" width="10" />

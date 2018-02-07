@@ -489,6 +489,19 @@ public:
     {
         return m_num_local_players;
     }   // getNumLocalPlayers
+    
+    // ------------------------------------------------------------------------
+    /** Returns true if the split screen display leaves an empty space that
+     *  can be used to display the minimap.
+     */
+    bool getIfEmptyScreenSpaceExists() const
+    {
+        const float sqrt_num_players = sqrtf((float)getNumLocalPlayers());
+        const int rows = (int)ceil(sqrt_num_players);
+        const int cols = (int)round(sqrt_num_players);
+        const int total_spaces = rows * cols;
+        return (total_spaces - getNumLocalPlayers() > 0);
+    }   // getIfEmptyScreenSpaceExists
     // ------------------------------------------------------------------------
     /** Returns the selected number of karts (selected number of players and
      *  AI karts. */

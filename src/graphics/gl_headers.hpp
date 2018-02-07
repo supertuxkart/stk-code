@@ -62,27 +62,11 @@ extern "C" {
 #define GL_BGRA 0x80E1
 #define GL_BGR 0x80E0
 #define GL_FRAMEBUFFER_COMPLETE_EXT GL_FRAMEBUFFER_COMPLETE
-
-// The glDrawElementsBaseVertex is available only in OpenGL ES 3.2. At this
-// stage the 'basevertex' argument is always equal to 0 because features that
-// use it are disabled in OpenGL ES renderer. We can simply use glDrawElements
-// instead.
-inline void glDrawElementsBaseVertex(GLenum mode, GLsizei count, GLenum type,
-                                     GLvoid *indices, GLint basevertex)
-{
-    glDrawElements(mode, count, type, indices);
-}
 #endif
 
-struct DrawElementsIndirectCommand{
-    GLuint count;
-    GLuint instanceCount;
-    GLuint firstIndex;
-    GLuint baseVertex;
-    GLuint baseInstance;
-};
 #else
   typedef unsigned int GLuint;
+  typedef int GLint;
   typedef unsigned int GLsync;
   typedef unsigned int GLenum;
 

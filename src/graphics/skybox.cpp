@@ -179,8 +179,7 @@ void Skybox::generateCubeMapFromTextures()
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_cube_map);
 
-        bool needs_srgb_format = CVS->isARBSRGBFramebufferUsable() || 
-                                 CVS->isDefferedEnabled();
+        bool needs_srgb_format = CVS->isDeferredEnabled();
 
         GLint format = GL_RGBA;
         GLint internal_format = needs_srgb_format ? GL_SRGB8_ALPHA8 : GL_RGBA8;
@@ -219,7 +218,7 @@ void Skybox::generateSpecularCubemap()
     }
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-    if (!CVS->isDefferedEnabled())
+    if (!CVS->isDeferredEnabled())
         return;
 
 #if !defined(USE_GLES2)
@@ -348,7 +347,11 @@ void Skybox::render(const scene::ICameraSceneNode *camera) const
     glDisable(GL_CULL_FACE);
     assert(m_skybox_textures.size() == 6);
 
-    glDisable(GL_BLEND);
+    if (CVS->isDeferredEnabled())
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE);
+    }
 
     SkyboxShader::getInstance()->use();
     SkyboxShader::getInstance()->bindVertexArray();
@@ -358,6 +361,7 @@ void Skybox::render(const scene::ICameraSceneNode *camera) const
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
+    glDisable(GL_BLEND);
 }   // renderSkybox
 
 #endif   // !SERVER_ONLY

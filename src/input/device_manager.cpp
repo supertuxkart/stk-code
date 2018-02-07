@@ -388,6 +388,16 @@ InputDevice *DeviceManager::mapGamepadInput(Input::InputType type,
 
     if (gPad != NULL)
     {
+        // Ignore deadzone events if this isn't the latest used device in
+        // single-player mode (allowing the player to switch device at any time)
+        int dz = static_cast<GamepadConfig*>(gPad->getConfiguration())->getDeadzone();
+        if (m_single_player != NULL && m_latest_used_device != gPad
+            && *value > -dz && *value < dz)
+        {
+            *player = NULL;
+            return NULL;
+        }
+
         if (gPad->processAndMapInput(type, button_id, mode, action, value))
         {
             if (m_single_player != NULL)

@@ -350,6 +350,8 @@ namespace video
 		//! Creates a software image from a file.
 		virtual IImage* createImageFromFile(io::IReadFile* file, video::IImageLoader** loader = NULL);
 
+		virtual video::IImageLoader* getImageLoaderForFile(const io::path& filename);
+
 		//! Creates a software image from a byte array.
 		/** \param useForeignMemory: If true, the image will use the data pointer
 		directly and own it from now on, which means it will also try to delete [] the

@@ -40,8 +40,14 @@
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/render_target.hpp"
+#include "graphics/shader_files_manager.hpp"
 #include "graphics/stk_tex_manager.hpp"
-#include "graphics/vao_manager.hpp"
+#include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_mesh.hpp"
+#include "graphics/sp/sp_mesh_buffer.hpp"
+#include "graphics/sp/sp_mesh_node.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
+#include "graphics/sp/sp_texture_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
@@ -50,7 +56,7 @@
 #include "karts/kart_properties.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/easter_egg_hunt.hpp"
-#include "modes/world.hpp"
+#include "modes/profile_world.hpp"
 #include "physics/physical_object.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -66,6 +72,7 @@
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
+#include "utils/mini_glm.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -294,8 +301,14 @@ void Track::cleanup()
     Graph::destroy();
     ItemManager::destroy();
 #ifndef SERVER_ONLY
-    VAOManager::kill();
-    CPUParticleManager::getInstance()->cleanMaterialMap();
+    if (!ProfileWorld::isNoGraphics())
+    {
+        CPUParticleManager::getInstance()->cleanMaterialMap();
+    }
+    if (CVS->isGLSL())
+    {
+        SP::resetEmptyFogColor();
+    }
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
 #endif
 
@@ -330,8 +343,8 @@ void Track::cleanup()
     }
     m_object_physics_only_nodes.clear();
 
-    irr_driver->removeNode(m_sun);
 #ifndef SERVER_ONLY
+    irr_driver->removeNode(m_sun);
     if (CVS->isGLSL())
         m_sun->drop();
 #endif
@@ -405,12 +418,19 @@ void Track::cleanup()
         material_manager->popTempMaterial();
     }
 
+#ifndef SERVER_ONLY
     irr_driver->clearGlowingNodes();
     irr_driver->clearLights();
     irr_driver->clearForcedBloom();
     irr_driver->clearBackgroundNodes();
-    STKTexManager::getInstance()->reset();
 
+    if (CVS->isGLSL())
+    {
+        SP::SPShaderManager::get()->removeUnusedShaders();
+        ShaderFilesManager::getInstance()->removeUnusedShaderFiles();
+        SP::SPTextureManager::get()->removeUnusedTextures();
+    }
+#endif
     if(UserConfigParams::logMemory())
     {
         Log::debug("track",
@@ -811,18 +831,6 @@ void Track::createPhysicsModel(unsigned int main_track_count)
             {
                 verts[i].Color = color;
             }
-
-            // Color
-#ifndef SERVER_ONLY
-            mb->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 255, 105, 180)));
-#endif
-            irr_driver->grabAllTextures(mesh);
-            // Gloss
-#ifndef SERVER_ONLY
-            mb->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-            // Colorization mask
-            mb->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-#endif
         }
         else
             irr_driver->removeNode(m_static_physics_only_nodes[i]);
@@ -843,6 +851,7 @@ void Track::createPhysicsModel(unsigned int main_track_count)
     for(unsigned int i=main_track_count; i<m_all_nodes.size(); i++)
     {
         convertTrackToBullet(m_all_nodes[i]);
+        uploadNodeVertexBuffer(m_all_nodes[i]);
     }
     m_track_mesh->createPhysicalBody(m_friction);
     m_gfx_effect_mesh->createCollisionShape();
@@ -928,66 +937,44 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         // FIXME: take translation/rotation into account
         if (mb->getVertexType() != video::EVT_STANDARD &&
             mb->getVertexType() != video::EVT_2TCOORDS &&
-            mb->getVertexType() != video::EVT_TANGENTS)
+            mb->getVertexType() != video::EVT_TANGENTS &&
+            mb->getVertexType() != video::EVT_SKINNED_MESH)
         {
             Log::warn("track", "convertTrackToBullet: Ignoring type '%d'!\n",
                 mb->getVertexType());
             continue;
         }
-
-        // Handle readonly materials correctly: mb->getMaterial can return
-        // NULL if the node is not using readonly materials. E.g. in case
-        // of a water scene node, the mesh (which is the animated copy of
-        // the original mesh) does not contain any material information,
-        // the material is only available in the node.
-        const video::SMaterial &irrMaterial =
-            is_readonly_material ? mb->getMaterial()
-                                 : node->getMaterial(i);
-        video::ITexture* t=irrMaterial.getTexture(0);
-
-        const Material* material=0;
-        TriangleMesh *tmesh = m_track_mesh;
-        if(t)
-        {
-            std::string image = t->getName().getPtr();
-
-            // the third boolean argument is false because at this point we're
-            // dealing physics, so it's useless to warn about missing textures,
-            // we'd just get duplicate/useless warnings
-            material=material_manager->getMaterial(StringUtils::getBasename(image),
-                                                   false, false, false);
-            // Special gfx meshes will not be stored as a normal physics body,
-            // but converted to a collision body only, so that ray tests
-            // against them can be done.
-            if(material->isSurface())
-                tmesh = m_gfx_effect_mesh;
-            // A material which is a surface must be converted,
-            // even if it's marked as ignore. So only ignore
-            // non-surface materials.
-            else if(material->isIgnore())
-                continue;
-        }
-
         u16 *mbIndices = mb->getIndices();
         Vec3 vertices[3];
         Vec3 normals[3];
 
-        if (mb->getVertexType() == video::EVT_STANDARD)
+#ifndef SERVER_ONLY
+        if (CVS->isGLSL())
         {
-            irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
+            SP::SPMeshBuffer* spmb = static_cast<SP::SPMeshBuffer*>(mb);
+            video::S3DVertexSkinnedMesh* mbVertices = (video::S3DVertexSkinnedMesh*)mb->getVertices();
             for (unsigned int matrix_index = 0; matrix_index < matrices.size(); matrix_index++)
             {
                 for (unsigned int j = 0; j < mb->getIndexCount(); j += 3)
                 {
+                    TriangleMesh* tmesh = m_track_mesh;
+                    Material* material = spmb->getSTKMaterial(j);
+                    if (material->isSurface())
+                    {
+                        tmesh = m_gfx_effect_mesh;
+                    }
+                    else if (material->isIgnore())
+                    {
+                        continue;
+                    }
                     for (unsigned int k = 0; k < 3; k++)
                     {
                         int indx = mbIndices[j + k];
-                        core::vector3df v = mbVertices[indx].Pos;
+                        core::vector3df v = mbVertices[indx].m_position;
                         matrices[matrix_index].transformVect(v);
                         vertices[k] = v;
-                        normals[k] = mbVertices[indx].Normal;
+                        normals[k] = MiniGLM::decompressVector3(mbVertices[indx].m_normal);
                     }   // for k
-
                     if (tmesh)
                     {
                         tmesh->addTriangle(vertices[0], vertices[1],
@@ -998,59 +985,121 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
                 }   // for j
             } // for matrix_index
         }
-        else if (mb->getVertexType() == video::EVT_2TCOORDS)
+        else
+#endif
         {
-            irr::video::S3DVertex2TCoords* mbVertices = (video::S3DVertex2TCoords*)mb->getVertices();
-            for (unsigned int matrix_index = 0; matrix_index < matrices.size(); matrix_index++)
+            // Handle readonly materials correctly: mb->getMaterial can return
+            // NULL if the node is not using readonly materials. E.g. in case
+            // of a water scene node, the mesh (which is the animated copy of
+            // the original mesh) does not contain any material information,
+            // the material is only available in the node.
+            const video::SMaterial &irrMaterial =
+                is_readonly_material ? mb->getMaterial()
+                                     : node->getMaterial(i);
+            video::ITexture* t=irrMaterial.getTexture(0);
+
+            const Material* material=0;
+            TriangleMesh *tmesh = m_track_mesh;
+            if(t)
             {
-                for (unsigned int j = 0; j < mb->getIndexCount(); j += 3)
-                {
-                    for (unsigned int k = 0; k < 3; k++)
-                    {
-                        int indx = mbIndices[j + k];
-                        core::vector3df v = mbVertices[indx].Pos;
-                        matrices[matrix_index].transformVect(v);
-                        vertices[k] = v;
-                        normals[k] = mbVertices[indx].Normal;
-                    }   // for k
+                std::string image = t->getName().getPtr();
 
-                    if (tmesh)
-                    {
-                        tmesh->addTriangle(vertices[0], vertices[1],
-                            vertices[2], normals[0],
-                            normals[1], normals[2],
-                            material);
-                    }
-                }   // for j
-            } // for matrix_index
-        }
-        else if (mb->getVertexType() == video::EVT_TANGENTS)
-        {
-            irr::video::S3DVertexTangents* mbVertices = (video::S3DVertexTangents*)mb->getVertices();
-            for (unsigned int matrix_index = 0; matrix_index < matrices.size(); matrix_index++)
+                // the third boolean argument is false because at this point we're
+                // dealing physics, so it's useless to warn about missing textures,
+                // we'd just get duplicate/useless warnings
+                material=material_manager->getMaterial(StringUtils::getBasename(image),
+                                                       false, false, false);
+                // Special gfx meshes will not be stored as a normal physics body,
+                // but converted to a collision body only, so that ray tests
+                // against them can be done.
+                if(material->isSurface())
+                    tmesh = m_gfx_effect_mesh;
+                // A material which is a surface must be converted,
+                // even if it's marked as ignore. So only ignore
+                // non-surface materials.
+                else if(material->isIgnore())
+                    continue;
+            }
+
+            if (mb->getVertexType() == video::EVT_STANDARD)
             {
-                for (unsigned int j = 0; j < mb->getIndexCount(); j += 3)
+                irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
+                for (unsigned int matrix_index = 0; matrix_index < matrices.size(); matrix_index++)
                 {
-                    for (unsigned int k = 0; k < 3; k++)
+                    for (unsigned int j = 0; j < mb->getIndexCount(); j += 3)
                     {
-                        int indx = mbIndices[j + k];
-                        core::vector3df v = mbVertices[indx].Pos;
-                        matrices[matrix_index].transformVect(v);
-                        vertices[k] = v;
-                        normals[k] = mbVertices[indx].Normal;
-                    }   // for k
+                        for (unsigned int k = 0; k < 3; k++)
+                        {
+                            int indx = mbIndices[j + k];
+                            core::vector3df v = mbVertices[indx].Pos;
+                            matrices[matrix_index].transformVect(v);
+                            vertices[k] = v;
+                            normals[k] = mbVertices[indx].Normal;
+                        }   // for k
 
-                    if (tmesh)
+                        if (tmesh)
+                        {
+                            tmesh->addTriangle(vertices[0], vertices[1],
+                                vertices[2], normals[0],
+                                normals[1], normals[2],
+                                material);
+                        }
+                    }   // for j
+                } // for matrix_index
+            }
+            else if (mb->getVertexType() == video::EVT_2TCOORDS)
+            {
+                irr::video::S3DVertex2TCoords* mbVertices = (video::S3DVertex2TCoords*)mb->getVertices();
+                for (unsigned int matrix_index = 0; matrix_index < matrices.size(); matrix_index++)
+                {
+                    for (unsigned int j = 0; j < mb->getIndexCount(); j += 3)
                     {
-                        tmesh->addTriangle(vertices[0], vertices[1],
-                            vertices[2], normals[0],
-                            normals[1], normals[2],
-                            material);
-                    }
-                }   // for j
-            } // for matrix_index
+                        for (unsigned int k = 0; k < 3; k++)
+                        {
+                            int indx = mbIndices[j + k];
+                            core::vector3df v = mbVertices[indx].Pos;
+                            matrices[matrix_index].transformVect(v);
+                            vertices[k] = v;
+                            normals[k] = mbVertices[indx].Normal;
+                        }   // for k
+
+                        if (tmesh)
+                        {
+                            tmesh->addTriangle(vertices[0], vertices[1],
+                                vertices[2], normals[0],
+                                normals[1], normals[2],
+                                material);
+                        }
+                    }   // for j
+                } // for matrix_index
+            }
+            else if (mb->getVertexType() == video::EVT_TANGENTS)
+            {
+                irr::video::S3DVertexTangents* mbVertices = (video::S3DVertexTangents*)mb->getVertices();
+                for (unsigned int matrix_index = 0; matrix_index < matrices.size(); matrix_index++)
+                {
+                    for (unsigned int j = 0; j < mb->getIndexCount(); j += 3)
+                    {
+                        for (unsigned int k = 0; k < 3; k++)
+                        {
+                            int indx = mbIndices[j + k];
+                            core::vector3df v = mbVertices[indx].Pos;
+                            matrices[matrix_index].transformVect(v);
+                            vertices[k] = v;
+                            normals[k] = mbVertices[indx].Normal;
+                        }   // for k
+
+                        if (tmesh)
+                        {
+                            tmesh->addTriangle(vertices[0], vertices[1],
+                                vertices[2], normals[0],
+                                normals[1], normals[2],
+                                material);
+                        }
+                    }   // for j
+                } // for matrix_index
+            }
         }
-
     }   // for i<getMeshBufferCount
 
 }   // convertTrackToBullet
@@ -1119,7 +1168,11 @@ bool Track::loadMainTrack(const XMLNode &root)
 
     scene::ISceneNode* scene_node = NULL;
     scene::IMesh* tangent_mesh = NULL;
-    if (m_version < 7)
+#ifdef SERVER_ONLY
+    if (false)
+#else
+    if (m_version < 7 && !CVS->isGLSL())
+#endif
     {
         // The mesh as returned does not have all mesh buffers with the same
         // texture combined. This can result in a _HUGE_ overhead. E.g. instead
@@ -1133,9 +1186,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         merged_mesh->addMesh(mesh);
         merged_mesh->finalize();
 #ifndef SERVER_ONLY
-        tangent_mesh = MeshTools::createMeshWithTangents(merged_mesh, &MeshTools::isNormalMap);
-
-        adjustForFog(tangent_mesh, NULL);
+        tangent_mesh = merged_mesh;
 #else
         tangent_mesh = merged_mesh;
 #endif
@@ -1146,12 +1197,9 @@ bool Track::loadMainTrack(const XMLNode &root)
     else
     {
         // SPM does the combine for you
-#ifndef SERVER_ONLY
-        tangent_mesh = MeshTools::createMeshWithTangents(mesh, &MeshTools::isNormalMap);
-        adjustForFog(tangent_mesh, NULL);
-        tangent_mesh->grab();
-#else
         tangent_mesh = mesh;
+#ifndef SERVER_ONLY
+        tangent_mesh->grab();
 #endif
     }
     // The merged mesh is grabbed by the octtree, so we don't need
@@ -1265,9 +1313,6 @@ bool Track::loadMainTrack(const XMLNode &root)
                            full_path.c_str());
                 continue;
             }
-#ifndef SERVER_ONLY
-            a_mesh = MeshTools::createMeshWithTangents(a_mesh, &MeshTools::isNormalMap);
-#endif
 
             // The meshes loaded here are in irrlicht's mesh cache. So we
             // have to keep track of them in order to properly remove them
@@ -1379,6 +1424,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {
         convertTrackToBullet(m_all_nodes[i]);
+        uploadNodeVertexBuffer(m_all_nodes[i]);
     }
 
     if (m_track_mesh == NULL)
@@ -1419,26 +1465,62 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
         name = StringUtils::toLowerCase(name);
 
         int moving_textures_found = 0;
-        for(unsigned int i=0; i<node->getMaterialCount(); i++)
+        SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
+        if (spmn)
         {
-            video::SMaterial &irrMaterial=node->getMaterial(i);
-            for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+            for (unsigned i = 0; i < spmn->getSPM()->getMeshBufferCount(); i++)
             {
-                video::ITexture* t=irrMaterial.getTexture(j);
-                if(!t) continue;
-                std::string texture_name =
-                    StringUtils::getBasename(t->getName().getPtr());
+                SP::SPMeshBuffer* spmb = spmn->getSPM()->getSPMeshBuffer(i);
+                const std::vector<Material*>& m = spmb->getAllSTKMaterials();
+                bool found = false;
+                for (unsigned j = 0; j < m.size(); j++)
+                {
+                    Material* mat = m[j];
+                    std::string mat_name =
+                        StringUtils::getBasename(mat->getSamplerPath(0));
+                    mat_name = StringUtils::toLowerCase(mat_name);
+                    if (mat_name == name)
+                    {
+                        found = true;
+                        moving_textures_found++;
+                        spmb->enableTextureMatrix(j);
+                        MovingTexture* mt =
+                            new MovingTexture(NULL, *texture_node);
+                        mt->setSPTM(spmn->getTextureMatrix(i).data());
+                        m_animated_textures.push_back(mt);
+                        // For spm only 1 texture matrix per mesh buffer is
+                        // possible
+                        break;
+                    }
+                }
+                if (found)
+                {
+                    break;
+                }
+            }
+        }
+        else
+        {
+            for(unsigned int i=0; i<node->getMaterialCount(); i++)
+            {
+                video::SMaterial &irrMaterial=node->getMaterial(i);
+                for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+                {
+                    video::ITexture* t=irrMaterial.getTexture(j);
+                    if(!t) continue;
+                    std::string texture_name =
+                        StringUtils::getBasename(t->getName().getPtr());
 
-                // to lower case, for case-insensitive comparison
-                texture_name = StringUtils::toLowerCase(texture_name);
+                    // to lower case, for case-insensitive comparison
+                    texture_name = StringUtils::toLowerCase(texture_name);
 
-                if (texture_name != name) continue;
-                core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
-                m_animated_textures.push_back(new MovingTexture(m, *texture_node));
-                moving_textures_found++;
-            }   // for j<MATERIAL_MAX_TEXTURES
-        }   // for i<getMaterialCount
-
+                    if (texture_name != name) continue;
+                    core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
+                    m_animated_textures.push_back(new MovingTexture(m, *texture_node));
+                    moving_textures_found++;
+                }   // for j<MATERIAL_MAX_TEXTURES
+            }   // for i<getMaterialCount
+        }
         if (moving_textures_found == 0)
             Log::warn("AnimTexture", "Did not find animate texture '%s'", name.c_str());
     }   // for node_number < xml->getNumNodes
@@ -1525,7 +1607,7 @@ void Track::createWater(const XMLNode &node)
     */
     scene::ISceneNode* scene_node = NULL;
     /*
-    if (UserConfigParams::m_graphical_effects > 1)
+    if (UserConfigParams::m_particles_effects > 1)
     {
         scene::IMesh *welded;
         scene_node = irr_driver->addWaterNode(mesh, &welded,
@@ -1663,6 +1745,12 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // Add the track directory to the texture search path
     file_manager->pushTextureSearchPath(m_root, unique_id);
     file_manager->pushModelSearchPath(m_root);
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        SP::SPShaderManager::get()->loadSPShaders(m_root);
+    }
+#endif
 
     // First read the temporary materials.xml file if it exists
     try
@@ -1761,6 +1849,32 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         node->get("fog-end-height",   &m_fog_height_end);
     }
 
+#ifndef SERVER_ONLY
+    if (!ProfileWorld::isNoGraphics() && CVS->isGLSL() && m_use_fog)
+    {
+        glBindBuffer(GL_UNIFORM_BUFFER, SP::sp_fog_ubo);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, 4, &m_fog_start);
+        glBufferSubData(GL_UNIFORM_BUFFER, 4, 4, &m_fog_end);
+        glBufferSubData(GL_UNIFORM_BUFFER, 8, 4, &m_fog_max);
+        // Fog density
+        float val = -(1.0f / (40.0f * (m_fog_start + 0.001f)));
+        glBufferSubData(GL_UNIFORM_BUFFER, 12, 4, &val);
+        val = (float)m_fog_color.getRed() / 255.0f;
+        glBufferSubData(GL_UNIFORM_BUFFER, 16, 4, &val);
+        val = (float)m_fog_color.getGreen() / 255.0f;
+        glBufferSubData(GL_UNIFORM_BUFFER, 20, 4, &val);
+        val = (float)m_fog_color.getBlue() / 255.0f;
+        glBufferSubData(GL_UNIFORM_BUFFER, 24, 4, &val);
+        val = 0.0f;
+        glBufferSubData(GL_UNIFORM_BUFFER, 28, 4, &val);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    }
+    else if (CVS->isGLSL())
+    {
+        SP::resetEmptyFogColor();
+    }
+#endif
+
     if (const XMLNode *node = root->getNode("lightshaft"))
     {
         m_godrays = true;
@@ -1828,14 +1942,6 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
                                              1.0f);
     }
 #endif
-
-    // Enable for for all track nodes if fog is used
-    const unsigned int count = (int)m_all_nodes.size();
-    for(unsigned int i=0; i<count; i++)
-    {
-        adjustForFog(m_all_nodes[i]);
-    }
-    m_track_object_manager->enableFog(m_use_fog);
 
     // Sky dome and boxes support
     // --------------------------
@@ -2052,7 +2158,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         }
         else if (name == "particle-emitter")
         {
-            if (UserConfigParams::m_graphical_effects > 1)
+            if (UserConfigParams::m_particles_effects > 1)
             {
                 m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
             }
@@ -2125,69 +2231,6 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
 
     }   // for i<root->getNumNodes()
 }
-
-//-----------------------------------------------------------------------------
-/** Changes all materials of the given mesh to use the current fog
- *  setting (true/false).
- *  \param node Scene node for which fog should be en/dis-abled.
- */
-void Track::adjustForFog(scene::IMesh* mesh, scene::ISceneNode* parent_scene_node)
-{
-    unsigned int n = mesh->getMeshBufferCount();
-    for (unsigned int i=0; i<n; i++)
-    {
-        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-        video::SMaterial &irr_material=mb->getMaterial();
-        for (unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
-        {
-            video::ITexture* t = irr_material.getTexture(j);
-            if (t) material_manager->adjustForFog(t, mb, parent_scene_node, m_use_fog);
-
-        }   // for j<MATERIAL_MAX_TEXTURES
-    }  // for i<getMeshBufferCount()
-}
-
-//-----------------------------------------------------------------------------
-/** Changes all materials of the given scene node to use the current fog
- *  setting (true/false).
- *  \param node Scene node for which fog should be en/dis-abled.
- */
-void Track::adjustForFog(scene::ISceneNode *node)
-{
-    //irr_driver->setAllMaterialFlags(scene::IMesh *mesh)
-
-
-    if (node->getType() == scene::ESNT_OCTREE)
-    {
-        // do nothing
-    }
-    else if (node->getType() == scene::ESNT_MESH)
-    {
-        scene::IMeshSceneNode* mnode = (scene::IMeshSceneNode*)node;
-        scene::IMesh* mesh = mnode->getMesh();
-        adjustForFog(mesh, mnode);
-    }
-    else if (node->getType() == scene::ESNT_ANIMATED_MESH)
-    {
-        scene::IAnimatedMeshSceneNode* mnode = (scene::IAnimatedMeshSceneNode*)node;
-        scene::IMesh* mesh = mnode->getMesh();
-        adjustForFog(mesh, mnode);
-    }
-    else
-    {
-        node->setMaterialFlag(video::EMF_FOG_ENABLE, m_use_fog);
-    }
-
-    if (node->getType() == scene::ESNT_LOD_NODE)
-    {
-        std::vector<scene::ISceneNode*>& subnodes = ((LODNode*)node)->getAllNodes();
-        for (unsigned int n=0; n<subnodes.size(); n++)
-        {
-            adjustForFog(subnodes[n]);
-            //subnodes[n]->setMaterialFlag(video::EMF_FOG_ENABLE, m_use_fog);
-        }
-    }
-}   // adjustForFog
 
 //-----------------------------------------------------------------------------
 /** Handles a sky-dome or sky-box. It takes the xml node with the
@@ -2520,3 +2563,19 @@ float Track::getAngle(int n) const
 {
     return DriveGraph::get()->getAngleToNext(n, 0);
 }   // getAngle
+
+//-----------------------------------------------------------------------------
+void Track::uploadNodeVertexBuffer(scene::ISceneNode *node)
+{
+#ifndef SERVER_ONLY
+    if (!CVS->isGLSL())
+    {
+        return;
+    }
+    SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
+    if (spmn)
+    {
+        SP::uploadSPM(spmn->getSPM());
+    }
+#endif
+}   // uploadNodeVertexBuffer

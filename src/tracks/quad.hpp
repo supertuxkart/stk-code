@@ -27,7 +27,7 @@
 
 namespace irr
 {
-    namespace video { struct S3DVertex; }
+    namespace video { struct S3DVertex;  struct S3DVertexSkinnedMesh; }
 }
 using namespace irr;
 
@@ -74,6 +74,9 @@ public:
     virtual ~Quad() {}
     // ------------------------------------------------------------------------
     void getVertices(video::S3DVertex *v, const video::SColor &color) const;
+    // ------------------------------------------------------------------------
+    void getSPMVertices(video::S3DVertexSkinnedMesh *v,
+                        const video::SColor &color) const;
     // ------------------------------------------------------------------------
     /** Returns the i-th. point of a quad. */
     const Vec3& operator[](int i) const                      { return m_p[i]; }

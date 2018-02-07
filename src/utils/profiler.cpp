@@ -41,22 +41,17 @@ static const char* GPU_Phase[Q_LAST] =
     "Shadows Cascade 1",
     "Shadows Cascade 2",
     "Shadows Cascade 3",
-    "Shadows Postprocess",
-    "Solid Pass 1",
-    "RSM",
-    "RH",
-    "GI",
+    "Solid Pass",
     "Env Map",
     "SunLight",
     "PointLights",
     "SSAO",
-    "Solid Pass 2",
-    "Fog",
-    "Skybox",
+    "Light Scatter",
     "Glow",
+    "Combine Diffuse Color",
+    "Skybox",
     "Transparent",
     "Particles",
-    "Displacement",
     "Depth of Field",
     "Godrays",
     "Bloom",
@@ -347,10 +342,11 @@ void Profiler::draw()
     double start = 99999.0f;
     double end   = -1.0f;
 
-    // Use this thread (thread 0) to compute start and end time. All other
+    // Use this thread to compute start and end time. All other
     // threads might have 'unfinished' events, or multiple identical events
-    // in this frame (i.e. start time would be incorrect(.
-    AllEventData &aed = m_all_threads_data[0].m_all_event_data;
+    // in this frame (i.e. start time would be incorrect).
+    int thread_id = getThreadID();
+    AllEventData &aed = m_all_threads_data[thread_id].m_all_event_data;
     AllEventData::iterator j;
     for (j = aed.begin(); j != aed.end(); ++j)
     {
@@ -381,7 +377,7 @@ void Profiler::draw()
         {
             AllEventData::iterator j = aed.find(td.m_ordered_headings[k]);
             const Marker &marker = j->second.getMarker(indx);
-            if (i == 0)
+            if (i == thread_id)
                 start_xpos = factor*marker.getStart();
             core::rect<s32> pos((s32)(x_offset + start_xpos),
                                 (s32)(y_offset + i*line_height),

@@ -206,9 +206,9 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
                                   const core::vector2df &scaling)
 {
     int y = viewport.LowerRightCorner.Y - m_small_font_max_height - 10;
-
-    const int x = (viewport.LowerRightCorner.X + viewport.UpperLeftCorner.X)/2;
-    const int w = (viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X);
+    
+    const int x = viewport.getCenter().X;
+    const int w = viewport.getWidth();
 
     // Draw less important messages first, at the very bottom of the screen
     // unimportant messages are skipped in multiplayer, they take too much screen space
@@ -225,16 +225,26 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
                 if (msg.m_kart && msg.m_kart!=kart) continue;
 
                 core::rect<s32> pos(x - w/2, y, x + w/2, y + m_max_font_height);
-                GUIEngine::getSmallFont()->draw(
+
+                gui::ScalableFont* font = GUIEngine::getSmallFont();
+
+                if (msg.m_outline)
+                    font->setBlackBorder(true);
+
+                font->draw(
                     core::stringw(msg.m_message.c_str()).c_str(),
                     pos, msg.m_color, true /* hcenter */, true /* vcenter */);
+
+                if (msg.m_outline)
+                    font->setBlackBorder(false);
+
                 y -= m_small_font_max_height;
             }
         }
     }
 
     // First line of text somewhat under the top of the viewport.
-    y = (int)(viewport.UpperLeftCorner.Y + 164*scaling.Y);
+    y = (int)(viewport.UpperLeftCorner.Y + 20);
 
     gui::ScalableFont* font = GUIEngine::getFont();
     gui::ScalableFont* big_font = GUIEngine::getTitleFont();
@@ -273,9 +283,16 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
         }
         else
         {
+            if (msg.m_outline)
+                font->setBlackBorder(true);
+
             font->draw(core::stringw(msg.m_message.c_str()).c_str(),
                        pos, msg.m_color, true /* hcenter */,
                        true /* vcenter */);
+
+            if (msg.m_outline)
+                font->setBlackBorder(false);
+
             y += font_height;
         }
     }   // for i in all messages
@@ -460,9 +477,9 @@ void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
 void RaceGUIBase::addMessage(const core::stringw &msg,
                              const AbstractKart *kart,
                              float time, const video::SColor &color,
-                             bool important, bool big_font)
+                             bool important, bool big_font, bool outline)
 {
-    m_messages.push_back(TimedMessage(msg, kart, time, color, important, big_font));
+    m_messages.push_back(TimedMessage(msg, kart, time, color, important, big_font, outline));
 }   // addMessage
 
 //-----------------------------------------------------------------------------
@@ -648,10 +665,11 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     int y_base = 20;
     unsigned int y_space = irr_driver->getActualScreenSize().Height - bottom_margin - y_base;
     // Special case : when 3 players play, use 4th window to display such stuff
-    if (race_manager->getNumLocalPlayers() == 3)
+    if (race_manager->getIfEmptyScreenSpaceExists())
     {
-        x_base = irr_driver->getActualScreenSize().Width/2 + x_base;
-        y_base = irr_driver->getActualScreenSize().Height/2 + y_base;
+        irr::core::recti Last_Space = irr_driver->GetSplitscreenWindow(race_manager->getNumLocalPlayers());
+        x_base = Last_Space.UpperLeftCorner.X;
+        y_base = Last_Space.UpperLeftCorner.Y;
         y_space = irr_driver->getActualScreenSize().Height - y_base;
     }
 
@@ -712,7 +730,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     //where is the limit to hide last icons
     int y_icons_limit = irr_driver->getActualScreenSize().Height - 
                                             bottom_margin - ICON_PLAYER_WIDTH;
-    if (race_manager->getNumLocalPlayers() == 3)
+    if (race_manager->getIfEmptyScreenSpaceExists())
     {
         y_icons_limit = irr_driver->getActualScreenSize().Height - ICON_WIDTH;
     }

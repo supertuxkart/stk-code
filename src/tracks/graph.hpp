@@ -95,6 +95,10 @@ private:
                     bool enable_transparency=false,
                     const video::SColor *track_color=NULL);
     // ------------------------------------------------------------------------
+    void createMeshSP(bool show_invisible=true,
+                      bool enable_transparency=false,
+                      const video::SColor *track_color=NULL);
+    // ------------------------------------------------------------------------
     void cleanupDebugMesh();
     // ------------------------------------------------------------------------
     virtual bool hasLapLine() const = 0;

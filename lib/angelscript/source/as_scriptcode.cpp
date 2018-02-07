@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -58,41 +58,41 @@ asCScriptCode::~asCScriptCode()
 	}
 }
 
-int asCScriptCode::SetCode(const char *name, const char *code, bool makeCopy)
+int asCScriptCode::SetCode(const char *in_name, const char *in_code, bool in_makeCopy)
 {
-	return SetCode(name, code, 0, makeCopy);
+	return SetCode(in_name, in_code, 0, in_makeCopy);
 }
 
-int asCScriptCode::SetCode(const char *name, const char *code, size_t length, bool makeCopy)
+int asCScriptCode::SetCode(const char *in_name, const char *in_code, size_t in_length, bool in_makeCopy)
 {
-	if( !code ) return asINVALID_ARG;
-	this->name = name ? name : "";
-	if( !sharedCode && this->code ) 
-		asDELETEARRAY(this->code);
+	if( !in_code) return asINVALID_ARG;
+	this->name = in_name ? in_name : "";
+	if( !sharedCode && code ) 
+		asDELETEARRAY(code);
 
-	if( length == 0 )
-		length = strlen(code);
-	if( makeCopy )
+	if( in_length == 0 )
+		in_length = strlen(in_code);
+	if( in_makeCopy )
 	{
-		codeLength = length;
+		codeLength = in_length;
 		sharedCode = false;
-		this->code = asNEWARRAY(char,length);
-		if( this->code == 0 )
+		code = asNEWARRAY(char, in_length);
+		if( code == 0 )
 			return asOUT_OF_MEMORY;
-		memcpy((char*)this->code, code, length);
+		memcpy(code, in_code, in_length);
 	}
 	else
 	{
-		codeLength = length;
-		this->code = const_cast<char*>(code);
+		codeLength = in_length;
+		code = const_cast<char*>(in_code);
 		sharedCode = true;
 	}
 
 	// Find the positions of each line
 	linePositions.PushLast(0);
-	for( size_t n = 0; n < length; n++ )
-		if( code[n] == '\n' ) linePositions.PushLast(n+1);
-	linePositions.PushLast(length);
+	for( size_t n = 0; n < in_length; n++ )
+		if( in_code[n] == '\n' ) linePositions.PushLast(n+1);
+	linePositions.PushLast(in_length);
 
 	return asSUCCESS;
 }

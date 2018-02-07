@@ -189,8 +189,9 @@ void Log::writeLine(const char *line, int level)
 {
 
     // If we don't have a console file, write to stdout and hope for the best
-    if (!m_file_stdout || level >= LL_WARN ||
-        UserConfigParams::m_log_errors_to_console) // log to console & file
+    if ( m_buffer_size <= 1 &&
+           (!m_file_stdout || level >= LL_WARN ||
+            UserConfigParams::m_log_errors_to_console) ) // log to console
     {
         setTerminalColor((LogLevel)level);
 #ifdef ANDROID
@@ -210,18 +211,18 @@ void Log::writeLine(const char *line, int level)
         case LL_FATAL:   alp = ANDROID_LOG_FATAL;   break;
         default:         alp = ANDROID_LOG_FATAL;
         }
-        __android_log_vprint(alp, "SuperTuxKart", line);
+        __android_log_print(alp, "SuperTuxKart", "%s", line);
 #else
-        printf(line);
+        printf("%s", line);
 #endif
         resetTerminalColor();  // this prints a \n
     }
 
 #if defined(_MSC_FULL_VER) && defined(_DEBUG)
-    OutputDebugString(line);
+    if (m_buffer_size <= 1) OutputDebugString(line);
 #endif
 
-    if (m_file_stdout) fprintf(m_file_stdout, line);
+    if (m_file_stdout) fprintf(m_file_stdout, "%s", line);
 
 #ifdef WIN32
     if (level >= LL_FATAL)

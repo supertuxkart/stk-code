@@ -1,0 +1,11 @@
+<spshader>
+    <shader-info name="ghost" transparent="Y" drawing-priority="900"/>
+    <first-pass use-function="ghostUse" vertex-shader="sp_pass.vert"
+        fragment-shader="sp_ghost.frag"
+        skinned-mesh-shader="sp_skinning.vert">
+    </first-pass>
+    <uniform-assigners>
+        <uniform-assigner name="custom_alpha"
+        function="ghostAlphaUniformAssigner"/>
+    </uniform-assigners>
+</spshader>

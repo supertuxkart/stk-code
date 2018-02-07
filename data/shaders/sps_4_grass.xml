@@ -1,0 +1,15 @@
+<spshader>
+    <shader-info name="grass" use-alpha-channel="Y"/>
+    <first-pass vertex-shader="sp_grass_pass.vert"
+        fragment-shader="sp_grass.frag">
+    </first-pass>
+    <shadow-pass vertex-shader="sp_grass_shadow.vert"
+        fragment-shader="sp_shadow_alpha_test.frag">
+    </shadow-pass>
+    <uniform-assigners>
+        <uniform-assigner name="layer"
+            function="shadowCascadeUniformAssigner"/>
+        <uniform-assigner name="wind_direction"
+            function="windDirectionUniformAssigner"/>
+    </uniform-assigners>
+</spshader>

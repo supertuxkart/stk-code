@@ -23,7 +23,6 @@ in vec2 quadcorner;
 in float anglespeed;
 #endif
 
-flat out float billboard_mix;
 out vec2 tc;
 out vec4 pc;
 
@@ -34,17 +33,15 @@ void main(void)
         gl_Position = vec4(0.);
         pc = vec4(0.0);
         tc = vec2(0.0);
-        billboard_mix = 0.0;
         return;
     }
 
     float lifetime = color_lifetime.w;
     float alpha = mix(smoothstep(1.0, 0.8, lifetime), lifetime, billboard);
-    billboard_mix = billboard;
     vec4 particle_color = vec4(color_lifetime.zyx, 1.0) * alpha;
     tc = Texcoord;
 
-#if !defined(sRGB_Framebuffer_Usable) && !defined(Advanced_Lighting_Enabled)
+#if !defined(Advanced_Lighting_Enabled)
     particle_color.rgb = pow(particle_color.rgb, vec3(1.0 / 2.2));
 #endif
     pc = particle_color;
@@ -59,12 +56,12 @@ void main(void)
         vec3 newquadcorner = vec3(size * quadcorner, 0.0);
         newquadcorner = newquadcorner + 2.0 * cross(cross(newquadcorner,
             quat.xyz) + quat.w * newquadcorner, quat.xyz);
-        viewpos = ViewMatrix * vec4(Position + newquadcorner, 1.0);
+        viewpos = u_view_matrix * vec4(Position + newquadcorner, 1.0);
     }
     else
     {
-        viewpos = ViewMatrix * vec4(Position, 1.0);
+        viewpos = u_view_matrix * vec4(Position, 1.0);
         viewpos += vec4(size * quadcorner, 0.0, 0.0);
     }
-    gl_Position = ProjectionMatrix * viewpos;
+    gl_Position = u_projection_matrix * viewpos;
 }

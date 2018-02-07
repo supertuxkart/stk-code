@@ -20,15 +20,15 @@
 #define HEADER_SHADOW_HPP
 
 #include "utils/no_copy.hpp"
+#include <memory>
 
-class KartProperties;
+class AbstractKart;
+class Material;
 
-namespace irr
+namespace SP
 {
-    namespace scene { class ISceneNode; class IMesh; }
-    namespace video { class ITexture; }
+    class SPDynamicDrawCall;
 }
-using namespace irr;
 
 /**
  * \brief This class is used to enable a shadow for a kart.
@@ -39,24 +39,20 @@ using namespace irr;
 class Shadow : public NoCopy
 {
 private:
-    /** The scene node for the shadow. */
-    scene::ISceneNode  *m_node;
-
-    /** The mesh of the shadow. */
-    scene::IMesh       *m_mesh;
-
-    /** The scene node of the kart to which this shadow belongs. */
-    scene::ISceneNode  *m_parent_kart_node;
+    /** The dynamic draw call of the shadow. */
+    std::shared_ptr<SP::SPDynamicDrawCall> m_dy_dc;
 
     /** If a kart is flying, the shadow is disabled (since it is
      *  stuck to the kart, i.e. the shadow would be flying, too). */
     bool             m_shadow_enabled;
 
+    /** A read-only kart object for accessing suspension length. */
+    const AbstractKart& m_kart;
+
 public:
-         Shadow(const KartProperties *kart_properties,
-                scene::ISceneNode *node, float y_offset);
+         Shadow(Material* shadow_mat, const AbstractKart& kart);
         ~Shadow();
-    void update(bool enabled, float hot);
+    void update(bool enabled);
 };   // Shadow
 #endif
 

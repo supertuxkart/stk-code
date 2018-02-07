@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/render_info.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
@@ -189,7 +190,7 @@ void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
 
     float coord = -kart->getKartLength()*0.5f;
 
-    scene::IMeshSceneNode* tire_node = irr_driver->addMesh(m_tire, "3strikestire", node);
+    scene::ISceneNode* tire_node = irr_driver->addMesh(m_tire, "3strikestire", node);
     tire_node->setPosition(core::vector3df(-0.16f, 0.3f, coord - 0.25f));
     tire_node->setScale(core::vector3df(0.4f, 0.4f, 0.4f));
     tire_node->setRotation(core::vector3df(90.0f, 0.0f, 0.0f));
@@ -723,13 +724,12 @@ void ThreeStrikesBattle::loadCustomModels()
             {
                 AbstractKart* sta = new Kart(sta_list[i], (int)m_karts.size(),
                     (int)m_karts.size() + 1, pos[i], PLAYER_DIFFICULTY_NORMAL,
-                    KRT_RED);
+                    std::make_shared<RenderInfo>(1.0f));
                 sta->init(RaceManager::KartType::KT_SPARE_TIRE);
                 sta->setController(new SpareTireAI(sta));
 
                 m_karts.push_back(sta);
                 race_manager->addSpareTireKart(sta_list[i]);
-                Track::getCurrentTrack()->adjustForFog(sta->getNode());
 
                 // Copy STA pointer to m_spare_tire_karts array, allowing them
                 // to respawn easily

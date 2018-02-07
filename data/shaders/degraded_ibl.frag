@@ -15,7 +15,7 @@ out vec4 Spec;
 
 void main(void)
 {
-    vec2 uv = gl_FragCoord.xy / screen;
+    vec2 uv = gl_FragCoord.xy / u_screen;
     vec3 normal = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
 
     Diff = vec4(0.25 * DiffuseIBL(normal), 1.);

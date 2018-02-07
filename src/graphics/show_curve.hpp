@@ -23,13 +23,16 @@
 #include "utils/no_copy.hpp"
 
 #include <SColor.h>
+#include <S3DVertex.h>
+#include <array>
+#include <memory>
+
 class Vec3;
 
-namespace irr
+namespace SP
 {
-    namespace scene { class IMesh; class IMeshSceneNode; class IMeshBuffer; }
+    class SPDynamicDrawCall;
 }
-using namespace irr;
 
 /** This class is used for debugging. It allows to show an arbitrary curve
  *  in the race. The curve is shown as a 'tunnel', i.e. in the constructor
@@ -43,15 +46,8 @@ class ShowCurve : public NoCopy
 {
     LEAK_CHECK();
 private:
-
-    /** The actual scene node. */
-    scene::IMeshSceneNode *m_scene_node;
-
     /** The mesh of the curve. */
-    scene::IMesh       *m_mesh;
-
-    /** The mesh buffer containing the actual vertices of the curve. */
-    scene::IMeshBuffer *m_buffer;
+    std::shared_ptr<SP::SPDynamicDrawCall> m_dy_dc;
 
     /** The width of the graph when it is displayed. */
     float m_width;
@@ -62,10 +58,14 @@ private:
     /** The color to use for the curve. */
     irr::video::SColor m_color;
 
-    void addEmptyMesh();
+    std::array<irr:: video::S3DVertexSkinnedMesh, 4>
+        m_current_vertices, m_previous_vertices;
+
+    bool m_first_vertices, m_visible;
+
 public:
          ShowCurve(float width, float height,
-                   const irr::video::SColor &color = video::SColor(77, 0, 179, 0));
+                   const irr::video::SColor &color = irr::video::SColor(77, 0, 179, 0));
         ~ShowCurve();
     void addPoint(const Vec3 &pnt);
     void makeCircle(const Vec3 &center, float radius);

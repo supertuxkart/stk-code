@@ -453,6 +453,21 @@ s32 CIrrDeviceAndroid::handleInput(android_app* app, AInputEvent* androidEvent)
 				event.TouchInput.X = AMotionEvent_getX(androidEvent, i + idx);
 				event.TouchInput.Y = AMotionEvent_getY(androidEvent, i + idx);
 				
+				if (event.TouchInput.ID >= 32)
+					continue;
+				
+				TouchEventData& event_data = device->TouchEventsData[event.TouchInput.ID];
+				
+				// Don't send move event when nothing changed
+				if (event_data.event == event.TouchInput.Event &&
+					event_data.x == event.TouchInput.X &&
+					event_data.y == event.TouchInput.Y)
+					continue;
+					
+				event_data.event = event.TouchInput.Event;
+				event_data.x = event.TouchInput.X;
+				event_data.y = event.TouchInput.Y;
+				
 				device->postEventFromUser(event);
 				
 				if (event.TouchInput.ID == 0)
@@ -621,7 +636,7 @@ void CIrrDeviceAndroid::createKeyMap()
 	KeyMap[AKEYCODE_DPAD_DOWN] = IRR_KEY_DOWN; 
 	KeyMap[AKEYCODE_DPAD_LEFT] = IRR_KEY_LEFT; 
 	KeyMap[AKEYCODE_DPAD_RIGHT] = IRR_KEY_RIGHT; 
-	KeyMap[AKEYCODE_DPAD_CENTER] = IRR_KEY_SELECT; 
+	KeyMap[AKEYCODE_DPAD_CENTER] = IRR_KEY_RETURN; 
 	KeyMap[AKEYCODE_VOLUME_UP] = IRR_KEY_VOLUME_DOWN; 
 	KeyMap[AKEYCODE_VOLUME_DOWN] = IRR_KEY_VOLUME_UP; 
 	KeyMap[AKEYCODE_POWER] = IRR_KEY_UNKNOWN; 

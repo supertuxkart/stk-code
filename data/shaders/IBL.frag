@@ -16,14 +16,14 @@ out vec4 Spec;
 
 void main(void)
 {
-    vec2 uv = gl_FragCoord.xy / screen;
+    vec2 uv = gl_FragCoord.xy / u_screen;
     vec3 normal = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
 
     Diff = vec4(0.25 * DiffuseIBL(normal), 1.);
 
     float z = texture(dtex, uv).x;
 
-    vec4 xpos = getPosFromUVDepth(vec3(uv, z), InverseProjectionMatrix);
+    vec4 xpos = getPosFromUVDepth(vec3(uv, z), u_inverse_projection_matrix);
     vec3 eyedir = -normalize(xpos.xyz);
     float specval = texture(ntex, uv).z;
 
