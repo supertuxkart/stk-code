@@ -348,10 +348,10 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
 
     int nSize = (int)(64.0f * scale);
 
-    int itemSpacing = (int)(scale * 30);
+    int itemSpacing = (int)(scale * 32.0f);
 
-    int x1 = viewport.UpperLeftCorner.X  + viewport.getWidth()/2
-           - (n * itemSpacing)/2;
+    int x1 = viewport.UpperLeftCorner.X  + (viewport.getWidth()/2)
+           - ((n * itemSpacing)/2);
     int y1 = viewport.UpperLeftCorner.Y  + (int)(20 * scaling.Y);
 
     int x2 = 0;
@@ -364,7 +364,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
 
     for ( int i = 0 ; i < n ; i++ )
     {
-        x2 = (int)(x1+i*itemSpacing);
+        x2 = (int)((x1+i*itemSpacing) - (itemSpacing / 2));
         core::rect<s32> pos(x2, y1, x2+nSize, y1+nSize);
         draw2DImage(t, pos, rect, NULL,
                                                   NULL, true);
