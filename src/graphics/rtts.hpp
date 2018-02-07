@@ -65,7 +65,6 @@ enum TypeRTT : unsigned int
 {
     RTT_COLOR = 0,
     RTT_NORMAL_AND_DEPTH,
-    RTT_SP_GLOSS,
     RTT_SP_DIFF_COLOR, // RGBA
     RTT_RGBA_2,
     RTT_DIFFUSE,

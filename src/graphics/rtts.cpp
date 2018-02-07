@@ -118,8 +118,7 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
     }
     if (CVS->isDeferredEnabled())
     {
-        m_render_target_textures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RGB10_A2, GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV);
-        m_render_target_textures[RTT_SP_GLOSS] = generateRTT(res, GL_RG8, GL_RG, GL_UNSIGNED_BYTE);
+        m_render_target_textures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE);
         m_render_target_textures[RTT_SP_DIFF_COLOR] = generateRTT(res, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE);
         m_render_target_textures[RTT_RGBA_2] = generateRTT(res, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE);
         m_render_target_textures[RTT_DIFFUSE] = generateRTT(res, diffuse_specular_internal_format, rgb_format, type);
@@ -181,7 +180,6 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
         somevector.clear();
         somevector.push_back(m_render_target_textures[RTT_SP_DIFF_COLOR]);
         somevector.push_back(m_render_target_textures[RTT_NORMAL_AND_DEPTH]);
-        somevector.push_back(m_render_target_textures[RTT_SP_GLOSS]);
         m_frame_buffers[FBO_SP] = new FrameBuffer(somevector, m_depth_stencil_tex, res.Width, res.Height);
 
         somevector.clear();
