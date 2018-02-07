@@ -195,7 +195,7 @@ void RaceGUI::renderGlobal(float dt)
     {
         static video::SColor black = video::SColor(255,0,0,0);
 
-        GL32_draw2DRectangle(black, irr_driver->GetSplitscreenWindow(
+        GL32_draw2DRectangle(black, irr_driver->getSplitscreenWindow(
             race_manager->getNumLocalPlayers()));
     }
 
@@ -259,7 +259,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     }
     else
     {
-        scaling *= float(viewport.getWidth()) / 800.0F; // scale race GUI along screen size
+        scaling *= float(viewport.getWidth()) / 800.0f; // scale race GUI along screen size
     }
     
     drawAllMessages(kart, viewport, scaling);
@@ -377,7 +377,7 @@ void RaceGUI::drawGlobalTimer()
     if (race_manager->getIfEmptyScreenSpaceExists())
     {
         pos -= core::vector2d<s32>(0, pos.LowerRightCorner.Y / 2);
-        pos += core::vector2d<s32>(0, irr_driver->getActualScreenSize().Height - irr_driver->GetSplitscreenWindow(0).getHeight());
+        pos += core::vector2d<s32>(0, irr_driver->getActualScreenSize().Height - irr_driver->getSplitscreenWindow(0).getHeight());
     }
 
     gui::ScalableFont* font = (use_digit_font ? GUIEngine::getHighresDigitFont() : GUIEngine::getFont());

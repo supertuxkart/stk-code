@@ -163,7 +163,7 @@ void Camera::setKart(AbstractKart *new_kart)
  */
 void Camera::setupCamera()
 {
-    m_viewport = irr_driver->GetSplitscreenWindow(m_index);
+    m_viewport = irr_driver->getSplitscreenWindow(m_index);
     m_aspect = (float)((float)(m_viewport.getWidth()) / (float)(m_viewport.getHeight()));
 	
     m_scaling = core::vector2df(

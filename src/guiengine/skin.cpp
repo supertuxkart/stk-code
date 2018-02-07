@@ -1270,9 +1270,9 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     {
         params=&SkinConfig::m_render_params["spinner::neutral"];
     }
-    widget->m_skin_r = color_rgb.r * 255.0F;
-    widget->m_skin_g = color_rgb.g * 255.0F;
-    widget->m_skin_b = color_rgb.b * 255.0F;
+    widget->m_skin_r = color_rgb.r * 255.0f;
+    widget->m_skin_g = color_rgb.g * 255.0f;
+    widget->m_skin_b = color_rgb.b * 255.0f;
 
     for (int i = 1; i < MAX_PLAYER_COUNT + 1; i++) 
     {
