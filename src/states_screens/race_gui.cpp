@@ -888,6 +888,8 @@ void RaceGUI::drawLap(const AbstractKart* kart,
 
     core::recti pos;
     
+    pos.UpperLeftCorner.Y = viewport.UpperLeftCorner.Y + m_font_height;
+
     // If the time display in the top right is in this viewport,
     // move the lap/rank display down a little bit so that it is
     // displayed under the time.
@@ -896,10 +898,6 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         !race_manager->getIfEmptyScreenSpaceExists()) 
     {
         pos.UpperLeftCorner.Y += m_font_height;
-    }
-    else 
-    {
-        pos.UpperLeftCorner.Y = viewport.UpperLeftCorner.Y + m_font_height;
     }
     pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y+20;
     pos.UpperLeftCorner.X   = viewport.LowerRightCorner.X

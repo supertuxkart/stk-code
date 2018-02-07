@@ -253,7 +253,7 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
     if (race_manager->getNumLocalPlayers() > 2)
     {
         font = GUIEngine::getSmallFont();
-        font_height = m_small_font_max_height;
+		font_height = viewport.getCenter().Y;
     }
 
     irr_driver->getVideoDriver()->enableMaterial2D(); // seems like we need to remind irrlicht from time to time to use the Material2D
