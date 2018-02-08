@@ -170,8 +170,10 @@ void Camera::setupCamera()
         irr_driver->getActualScreenSize().Width / m_viewport.getWidth() , 
         irr_driver->getActualScreenSize().Height / m_viewport.getHeight());
 
-    m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov[race_manager->getNumLocalPlayers() - 1];
-    
+    m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov
+        [race_manager->getNumLocalPlayers() > 0 ?
+        race_manager->getNumLocalPlayers() - 1 : 0];
+
     m_camera->setFOV(m_fov);
     m_camera->setAspectRatio(m_aspect);
     m_camera->setFarValue(Track::getCurrentTrack()->getCameraFar());
