@@ -189,8 +189,9 @@ void Log::writeLine(const char *line, int level)
 {
 
     // If we don't have a console file, write to stdout and hope for the best
-    if (!m_file_stdout || level >= LL_WARN ||
-        UserConfigParams::m_log_errors_to_console) // log to console & file
+    if ( m_buffer_size <= 1 &&
+           (!m_file_stdout || level >= LL_WARN ||
+            UserConfigParams::m_log_errors_to_console) ) // log to console
     {
         setTerminalColor((LogLevel)level);
 #ifdef ANDROID
@@ -218,7 +219,7 @@ void Log::writeLine(const char *line, int level)
     }
 
 #if defined(_MSC_FULL_VER) && defined(_DEBUG)
-    OutputDebugString(line);
+    if (m_buffer_size <= 1) OutputDebugString(line);
 #endif
 
     if (m_file_stdout) fprintf(m_file_stdout, "%s", line);

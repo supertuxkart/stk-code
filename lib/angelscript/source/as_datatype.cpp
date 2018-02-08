@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -38,6 +38,7 @@
 #include "as_config.h"
 #include "as_datatype.h"
 #include "as_tokendef.h"
+#include "as_typeinfo.h"
 #include "as_objecttype.h"
 #include "as_scriptengine.h"
 #include "as_tokenizer.h"
@@ -47,27 +48,27 @@ BEGIN_AS_NAMESPACE
 asCDataType::asCDataType()
 {
 	tokenType              = ttUnrecognizedToken;
-	objectType             = 0;
+	typeInfo               = 0;
 	isReference            = false;
 	isReadOnly             = false;
 	isAuto                 = false;
 	isObjectHandle         = false;
 	isConstHandle          = false;
-	funcDef                = 0;
 	isHandleToAsHandleType = false;
+	ifHandleThenConst      = false;
 }
 
 asCDataType::asCDataType(const asCDataType &dt)
 {
 	tokenType              = dt.tokenType;
-	objectType             = dt.objectType;
+	typeInfo               = dt.typeInfo;
 	isReference            = dt.isReference;
 	isReadOnly             = dt.isReadOnly;
 	isAuto                 = dt.isAuto;
 	isObjectHandle         = dt.isObjectHandle;
 	isConstHandle          = dt.isConstHandle;
-	funcDef                = dt.funcDef;
 	isHandleToAsHandleType = dt.isHandleToAsHandleType;
+	ifHandleThenConst      = dt.ifHandleThenConst;
 }
 
 asCDataType::~asCDataType()
@@ -83,12 +84,12 @@ bool asCDataType::IsValid() const
 	return true;
 }
 
-asCDataType asCDataType::CreateObject(asCObjectType *ot, bool isConst)
+asCDataType asCDataType::CreateType(asCTypeInfo *ti, bool isConst)
 {
 	asCDataType dt;
 
 	dt.tokenType        = ttIdentifier;
-	dt.objectType       = ot;
+	dt.typeInfo         = ti;
 	dt.isReadOnly       = isConst;
 
 	return dt;
@@ -105,24 +106,16 @@ asCDataType asCDataType::CreateAuto(bool isConst)
 	return dt;
 }
 
-asCDataType asCDataType::CreateObjectHandle(asCObjectType *ot, bool isConst)
+asCDataType asCDataType::CreateObjectHandle(asCTypeInfo *ot, bool isConst)
 {
 	asCDataType dt;
 
+	asASSERT(CastToObjectType(ot));
+
 	dt.tokenType        = ttIdentifier;
-	dt.objectType       = ot;
+	dt.typeInfo         = ot;
 	dt.isObjectHandle   = true;
 	dt.isConstHandle    = isConst;
-
-	return dt;
-}
-
-asCDataType asCDataType::CreateFuncDef(asCScriptFunction *func)
-{
-	asCDataType dt;
-	dt.tokenType        = ttIdentifier;
-	dt.funcDef          = func;
-	dt.objectType       = &func->engine->functionBehaviours;
 
 	return dt;
 }
@@ -152,7 +145,7 @@ asCDataType asCDataType::CreateNullHandle()
 bool asCDataType::IsNullHandle() const
 {
 	if( tokenType == ttUnrecognizedToken &&
-		objectType == 0 &&
+		typeInfo == 0 &&
 		isObjectHandle  )
 		return true;
 
@@ -171,38 +164,40 @@ asCString asCDataType::Format(asSNameSpace *currNs, bool includeNamespace) const
 
 	// If the type is not declared in the current namespace, then the namespace 
 	// must always be informed to guarantee that the correct type is informed
-	if( includeNamespace || (objectType && objectType->nameSpace != currNs) || (funcDef && funcDef->nameSpace != currNs) )
+	if (includeNamespace || (typeInfo && typeInfo->nameSpace != currNs))
 	{
-		if( objectType && objectType->nameSpace->name != "" )
-			str += objectType->nameSpace->name + "::";
-		else if( funcDef && funcDef->nameSpace->name != "" )
-			str += funcDef->nameSpace->name + "::";
+		if (typeInfo && typeInfo->nameSpace && typeInfo->nameSpace->name != "")
+			str += typeInfo->nameSpace->name + "::";
+	}
+	if (typeInfo && typeInfo->nameSpace == 0)
+	{
+		// If funcDef->nameSpace is null it means the funcDef was declared as member of 
+		// another type, in which case the scope should be built with the name of that type
+		str += CastToFuncdefType(typeInfo)->parentClass->name + "::";
 	}
 
 	if( tokenType != ttIdentifier )
 	{
 		str += asCTokenizer::GetDefinition(tokenType);
 	}
-	else if( IsArrayType() && objectType && !objectType->engine->ep.expandDefaultArrayToTemplate )
+	else if( IsArrayType() && typeInfo && !typeInfo->engine->ep.expandDefaultArrayToTemplate )
 	{
-		asASSERT( objectType->templateSubTypes.GetLength() == 1 );
-		str += objectType->templateSubTypes[0].Format(currNs, includeNamespace);
+		asCObjectType *ot = CastToObjectType(typeInfo);
+		asASSERT( ot && ot->templateSubTypes.GetLength() == 1 );
+		str += ot->templateSubTypes[0].Format(currNs, includeNamespace);
 		str += "[]";
 	}
-	else if( funcDef )
+	else if(typeInfo)
 	{
-		str += funcDef->name;
-	}
-	else if( objectType )
-	{
-		str += objectType->name;
-		if( objectType->templateSubTypes.GetLength() > 0 )
+		str += typeInfo->name;
+		asCObjectType *ot = CastToObjectType(typeInfo);
+		if( ot && ot->templateSubTypes.GetLength() > 0 )
 		{
 			str += "<";
-			for( asUINT subtypeIndex = 0; subtypeIndex < objectType->templateSubTypes.GetLength(); subtypeIndex++ )
+			for( asUINT subtypeIndex = 0; subtypeIndex < ot->templateSubTypes.GetLength(); subtypeIndex++ )
 			{
-				str += objectType->templateSubTypes[subtypeIndex].Format(currNs, includeNamespace);
-				if( subtypeIndex != objectType->templateSubTypes.GetLength()-1 )
+				str += ot->templateSubTypes[subtypeIndex].Format(currNs, includeNamespace);
+				if( subtypeIndex != ot->templateSubTypes.GetLength()-1 )
 					str += ",";
 			}
 			str += ">";
@@ -210,10 +205,7 @@ asCString asCDataType::Format(asSNameSpace *currNs, bool includeNamespace) const
 	}
 	else if( isAuto )
 	{
-		if( isObjectHandle )
-			str += "<auto@>";
-		else
-			str += "<auto>";
+		str += "<auto>";
 	}
 	else
 	{
@@ -237,13 +229,13 @@ asCDataType &asCDataType::operator =(const asCDataType &dt)
 {
 	tokenType              = dt.tokenType;
 	isReference            = dt.isReference;
-	objectType             = dt.objectType;
+	typeInfo               = dt.typeInfo;
 	isReadOnly             = dt.isReadOnly;
 	isObjectHandle         = dt.isObjectHandle;
 	isConstHandle          = dt.isConstHandle;
 	isAuto                 = dt.isAuto;
-	funcDef                = dt.funcDef;
 	isHandleToAsHandleType = dt.isHandleToAsHandleType;
+	ifHandleThenConst      = dt.ifHandleThenConst;
 
 	return (asCDataType &)*this;
 }
@@ -269,18 +261,17 @@ int asCDataType::MakeHandle(bool b, bool acceptHandleForScope)
 			// (except when returned from registered function)
 			// funcdefs are special reference types and support handles
 			// value types with asOBJ_ASHANDLE are treated as a handle
-			if( !funcDef && 
-				(!objectType || 
-				!((objectType->flags & asOBJ_REF) || (objectType->flags & asOBJ_TEMPLATE_SUBTYPE) || (objectType->flags & asOBJ_ASHANDLE)) || 
-				(objectType->flags & asOBJ_NOHANDLE) || 
-				((objectType->flags & asOBJ_SCOPED) && !acceptHandleForScope)) )
+			if( (!typeInfo ||
+				!((typeInfo->flags & asOBJ_REF) || (typeInfo->flags & asOBJ_TEMPLATE_SUBTYPE) || (typeInfo->flags & asOBJ_ASHANDLE) || (typeInfo->flags & asOBJ_FUNCDEF)) ||
+				(typeInfo->flags & asOBJ_NOHANDLE) ||
+				((typeInfo->flags & asOBJ_SCOPED) && !acceptHandleForScope)) )
 				return -1;
 
 			isObjectHandle = b;
 			isConstHandle = false;
 
 			// ASHANDLE supports being handle, but as it really is a value type it will not be marked as a handle
-			if( (objectType->flags & asOBJ_ASHANDLE) )
+			if( (typeInfo->flags & asOBJ_ASHANDLE) )
 			{
 				isObjectHandle = false;
 				isHandleToAsHandleType = true;
@@ -306,7 +297,7 @@ int asCDataType::MakeArray(asCScriptEngine *engine, asCModule *module)
 	isObjectHandle = false;
 	isConstHandle = false;
 	
-	objectType = at;
+	typeInfo = at;
 	tokenType = ttIdentifier;
 
 	return 0;
@@ -341,9 +332,9 @@ int asCDataType::MakeHandleToConst(bool b)
 
 bool asCDataType::SupportHandles() const
 {
-	if( objectType &&
-		(objectType->flags & (asOBJ_REF | asOBJ_ASHANDLE)) && 
-		!(objectType->flags & asOBJ_NOHANDLE) &&
+	if( typeInfo &&
+		(typeInfo->flags & (asOBJ_REF | asOBJ_ASHANDLE | asOBJ_FUNCDEF)) &&
+		!(typeInfo->flags & asOBJ_NOHANDLE) &&
 		!isObjectHandle )
 		return true;
 
@@ -355,19 +346,25 @@ bool asCDataType::CanBeInstantiated() const
 	if( GetSizeOnStackDWords() == 0 ) // Void
 		return false;
 
-	if( !IsObject() ) // Primitives
+	if( !IsObject() && !IsFuncdef() ) // Primitives
 		return true; 
 
-	if( IsObjectHandle() && !(objectType->flags & asOBJ_NOHANDLE) ) // Handles
-		return true;
-
-	if( funcDef ) // Funcdefs can be instantiated as delegates
-		 return true;
-
-	if( (objectType->flags & asOBJ_REF) && objectType->beh.factories.GetLength() == 0 ) // ref types without factories
+	if (IsNullHandle()) // null
 		return false;
 
-	if( (objectType->flags & asOBJ_ABSTRACT) && !IsObjectHandle() ) // Can't instantiate abstract classes
+	if( IsObjectHandle() && !(typeInfo->flags & asOBJ_NOHANDLE) ) // Handles
+		return true;
+
+	// Funcdefs cannot be instantiated without being handles
+	// The exception being delegates, but these can only be created as temporary objects
+	if (IsFuncdef())
+		return false;
+
+	asCObjectType *ot = CastToObjectType(typeInfo);
+	if( ot && (ot->flags & asOBJ_REF) && ot->beh.factories.GetLength() == 0 ) // ref types without factories
+		return false;
+
+	if( ot && (ot->flags & asOBJ_ABSTRACT) && !IsObjectHandle() ) // Can't instantiate abstract classes
 		return false;
 
 	return true;
@@ -375,12 +372,16 @@ bool asCDataType::CanBeInstantiated() const
 
 bool asCDataType::IsAbstractClass() const
 {
-	return objectType && (objectType->flags & asOBJ_ABSTRACT) ? true : false;
+	return typeInfo && (typeInfo->flags & asOBJ_ABSTRACT) ? true : false;
 }
 
 bool asCDataType::IsInterface() const
 {
-	return objectType && objectType->IsInterface();
+	if (typeInfo == 0)
+		return false;
+
+	asCObjectType *ot = CastToObjectType(typeInfo);
+	return ot && ot->IsInterface();
 }
 
 bool asCDataType::CanBeCopied() const
@@ -389,19 +390,19 @@ bool asCDataType::CanBeCopied() const
 	if( IsPrimitive() ) return true;
 
 	// Plain-old-data structures can always be copied
-	if( objectType->flags & asOBJ_POD ) return true;
+	if( typeInfo->flags & asOBJ_POD ) return true;
 
 	// It must be possible to instantiate the type
 	if( !CanBeInstantiated() ) return false;
 
-	// It must have a default constructor or factory
-	if( objectType->beh.construct == 0 &&
-		objectType->beh.factory   == 0 ) return false;
+	// It must have a default constructor or factory and the opAssign
+	// Alternatively it must have the copy constructor
+	asCObjectType *ot = CastToObjectType(typeInfo);
+	if (ot && (((ot->beh.construct != 0 || ot->beh.factory != 0) && ot->beh.copy != 0) || 
+		       (ot->beh.copyconstruct != 0 || ot->beh.copyfactory != 0)) )
+		return true;
 
-	// It must be possible to copy the type
-	if( objectType->beh.copy == 0 ) return false;
-
-	return true;
+	return false;
 }
 
 bool asCDataType::IsReadOnly() const
@@ -430,15 +431,15 @@ bool asCDataType::IsObjectConst() const
 bool asCDataType::IsArrayType() const
 {
 	// This is only true if the type used is the default array type, i.e. the one used for the [] syntax form
-	if( objectType && objectType->engine->defaultArrayObjectType )
-		return objectType->name == objectType->engine->defaultArrayObjectType->name;
+	if( typeInfo && typeInfo->engine->defaultArrayObjectType )
+		return typeInfo->name == typeInfo->engine->defaultArrayObjectType->name;
 	
 	return false;
 }
 
 bool asCDataType::IsTemplate() const
 {
-	if( objectType && (objectType->flags & asOBJ_TEMPLATE) )
+	if( typeInfo && (typeInfo->flags & asOBJ_TEMPLATE) )
 		return true;
 
 	return false;
@@ -446,7 +447,7 @@ bool asCDataType::IsTemplate() const
 
 bool asCDataType::IsScriptObject() const
 {
-	if( objectType && (objectType->flags & asOBJ_SCRIPT_OBJECT) )
+	if( typeInfo && (typeInfo->flags & asOBJ_SCRIPT_OBJECT) )
 		return true;
 
 	return false;
@@ -454,8 +455,9 @@ bool asCDataType::IsScriptObject() const
 
 asCDataType asCDataType::GetSubType(asUINT subtypeIndex) const
 {
-	asASSERT(objectType);
-	return objectType->templateSubTypes[subtypeIndex];
+	asASSERT(typeInfo);
+	asCObjectType *ot = CastToObjectType(typeInfo);
+	return ot->templateSubTypes[subtypeIndex];
 }
 
 
@@ -487,11 +489,10 @@ bool asCDataType::IsEqualExceptRefAndConst(const asCDataType &dt) const
 {
 	// Check base type
 	if( tokenType != dt.tokenType ) return false;
-	if( objectType != dt.objectType ) return false;
+	if( typeInfo != dt.typeInfo ) return false;
 	if( isObjectHandle != dt.isObjectHandle ) return false;
 	if( isObjectHandle )
 		if( isReadOnly != dt.isReadOnly ) return false;
-	if( funcDef != dt.funcDef ) return false;
 
 	return true;
 }
@@ -510,11 +511,11 @@ bool asCDataType::IsPrimitive() const
 	if( IsEnumType() )
 		return true;
 
-	// A registered object is never a primitive neither is a pointer, nor an array
-	if( objectType || funcDef )
+	// A registered object is never a primitive neither is a pointer nor an array
+	if( typeInfo )
 		return false;
 
-	// Null handle doesn't have an objectType, but it is not a primitive
+	// Null handle doesn't have a typeInfo, but it is not a primitive
 	if( tokenType == ttUnrecognizedToken )
 		return false;
 
@@ -584,16 +585,25 @@ bool asCDataType::IsObject() const
 		return false;
 
 	// Null handle doesn't have an object type but should still be considered an object
-	if( objectType == 0 ) 
+	if( typeInfo == 0 )
 		return IsNullHandle();
 
-	return true;
+	// Template subtypes shouldn't be considered objects
+	return CastToObjectType(typeInfo) ? true : false;
+}
+
+bool asCDataType::IsFuncdef() const
+{
+	if (typeInfo && (typeInfo->flags & asOBJ_FUNCDEF))
+		return true;
+
+	return false;
 }
 
 int asCDataType::GetSizeInMemoryBytes() const
 {
-	if( objectType != 0 )
-		return objectType->size;
+	if( typeInfo != 0 )
+		return typeInfo->size;
 
 	if( tokenType == ttVoid )
 		return 0;
@@ -640,7 +650,7 @@ int asCDataType::GetSizeOnStackDWords() const
 	int size = tokenType == ttQuestion ? 1 : 0;
 
 	if( isReference ) return AS_PTR_SIZE + size;
-	if( objectType && !IsEnumType() ) return AS_PTR_SIZE + size;
+	if( typeInfo && !IsEnumType() ) return AS_PTR_SIZE + size;
 
 	return GetSizeInMemoryDWords() + size;
 }
@@ -648,27 +658,29 @@ int asCDataType::GetSizeOnStackDWords() const
 #ifdef WIP_16BYTE_ALIGN
 int  asCDataType::GetAlignment() const
 {
-	if( objectType == NULL )
+	if( typeInfo == NULL )
 	{
 		// TODO: Small primitives should not be aligned to 4 byte boundaries
 		return 4; //Default alignment
 	}
 
-	return objectType->alignment;
+	return typeInfo->alignment;
 }
 #endif
 
 asSTypeBehaviour *asCDataType::GetBehaviour() const
-{ 
-	return objectType ? &objectType->beh : 0; 
+{
+	if (!typeInfo) return 0;
+	asCObjectType *ot = CastToObjectType(typeInfo);
+	return ot ? &ot->beh : 0; 
 }
 
 bool asCDataType::IsEnumType() const
 {
 	// Do a sanity check on the objectType, to verify that we aren't trying to access memory after it has been released
-	asASSERT( objectType == 0 || objectType->name.GetLength() < 100 );
+	asASSERT(typeInfo == 0 || typeInfo->name.GetLength() < 100);
 
-	if( objectType && (objectType->flags & asOBJ_ENUM) )
+	if (typeInfo && (typeInfo->flags & asOBJ_ENUM))
 		return true;
 
 	return false;

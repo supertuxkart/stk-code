@@ -23,7 +23,6 @@ in vec2 quadcorner;
 in float anglespeed;
 #endif
 
-flat out float billboard_mix;
 out vec2 tc;
 out vec4 pc;
 
@@ -34,13 +33,11 @@ void main(void)
         gl_Position = vec4(0.);
         pc = vec4(0.0);
         tc = vec2(0.0);
-        billboard_mix = 0.0;
         return;
     }
 
     float lifetime = color_lifetime.w;
     float alpha = mix(smoothstep(1.0, 0.8, lifetime), lifetime, billboard);
-    billboard_mix = billboard;
     vec4 particle_color = vec4(color_lifetime.zyx, 1.0) * alpha;
     tc = Texcoord;
 

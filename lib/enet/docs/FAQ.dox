@@ -1,12 +1,12 @@
 /**
  @page FAQ Frequently Answered Questions
 
-@section Q1 Is ENet thread safe?
+@section Q1 Is ENet thread-safe?
 
 ENet does not use any significant global variables, the vast majority
 of state is encapsulated in the ENetHost structure.  As such, as long
 as the application guards access to this structure, then ENet should
-operate fine in a multithreaded environment.
+operate fine in a multi-threaded environment.
    
 @section Q2 Isn't ENet just re-inventing TCP?!  What's the point?
 

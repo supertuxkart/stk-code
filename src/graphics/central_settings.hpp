@@ -95,7 +95,7 @@ public:
     // "Macro" around feature support and user config
     bool isShadowEnabled() const;
     bool isTextureCompressionEnabled() const;
-    bool isDefferedEnabled() const;
+    bool isDeferredEnabled() const;
 };
 
 extern CentralVideoSettings* CVS;

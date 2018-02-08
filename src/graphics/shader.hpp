@@ -28,6 +28,7 @@
 #include <matrix4.h>
 #include <SColor.h>
 #include <vector3d.h>
+#include <array>
 
 #include <string>
 #include <vector>
@@ -216,6 +217,15 @@ private:
     {
         glUniform4i(m_uniforms[N], col.getRed(), col.getGreen(),
                                    col.getBlue(), col.getAlpha());
+        setUniformsImpl<N + 1>(arg...);
+    }   // setUniformsImpl
+
+    // ------------------------------------------------------------------------
+    /** Implementation for setUniforms for a 4 floats uniform. */
+    template<unsigned N = 0, typename... Args1>
+    void setUniformsImpl(const std::array<float, 4> &ff, Args1... arg) const
+    {
+        glUniform4f(m_uniforms[N], ff[0], ff[1], ff[2], ff[3]);
         setUniformsImpl<N + 1>(arg...);
     }   // setUniformsImpl
 

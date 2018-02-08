@@ -94,7 +94,7 @@ int GamePadDevice::getNumberOfButtons() const
 // ----------------------------------------------------------------------------
 bool GamePadDevice::isButtonPressed(const int i)
 {
-    if (i < m_button_pressed.size())
+    if (i < (int)m_button_pressed.size())
         return m_button_pressed[i];
     else
         return false;
@@ -104,7 +104,7 @@ bool GamePadDevice::isButtonPressed(const int i)
 
 void GamePadDevice::setButtonPressed(const int i, bool isButtonPressed)
 {
-    if (i < m_button_pressed.size())
+    if (i < (int)m_button_pressed.size())
         m_button_pressed[i] = isButtonPressed;
 }   // setButtonPressed
 

@@ -121,6 +121,8 @@ namespace irr
 		
 		TouchEventData TouchEventsData[32];
 		bool IsMousePressed;
+		float GamepadAxisX;
+		float GamepadAxisY;
 
 		video::SExposedVideoData ExposedVideoData;
 
@@ -134,6 +136,10 @@ namespace irr
 		
 		static void handleAndroidCommand(android_app* app, int32_t cmd);
 		static s32 handleInput(android_app* app, AInputEvent* event);
+
+		s32 handleTouch(AInputEvent* androidEvent);
+		s32 handleKeyboard(AInputEvent* androidEvent);
+		s32 handleGamepad(AInputEvent* androidEvent);
 	};
 
 } // end namespace irr

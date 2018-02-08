@@ -206,9 +206,9 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
                                   const core::vector2df &scaling)
 {
     int y = viewport.LowerRightCorner.Y - m_small_font_max_height - 10;
-
-    const int x = (viewport.LowerRightCorner.X + viewport.UpperLeftCorner.X)/2;
-    const int w = (viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X);
+    
+    const int x = viewport.getCenter().X;
+    const int w = viewport.getWidth();
 
     // Draw less important messages first, at the very bottom of the screen
     // unimportant messages are skipped in multiplayer, they take too much screen space
@@ -244,7 +244,7 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
     }
 
     // First line of text somewhat under the top of the viewport.
-    y = (int)(viewport.UpperLeftCorner.Y + 164*scaling.Y);
+    y = viewport.getCenter().Y;
 
     gui::ScalableFont* font = GUIEngine::getFont();
     gui::ScalableFont* big_font = GUIEngine::getTitleFont();
@@ -253,7 +253,6 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
     if (race_manager->getNumLocalPlayers() > 2)
     {
         font = GUIEngine::getSmallFont();
-        font_height = m_small_font_max_height;
     }
 
     irr_driver->getVideoDriver()->enableMaterial2D(); // seems like we need to remind irrlicht from time to time to use the Material2D
@@ -348,10 +347,10 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
 
     int nSize = (int)(64.0f * scale);
 
-    int itemSpacing = (int)(scale * 30);
+    int itemSpacing = (int)(scale * 32.0f);
 
-    int x1 = viewport.UpperLeftCorner.X  + viewport.getWidth()/2
-           - (n * itemSpacing)/2;
+    int x1 = viewport.UpperLeftCorner.X  + (viewport.getWidth()/2)
+           - ((n * itemSpacing)/2);
     int y1 = viewport.UpperLeftCorner.Y  + (int)(20 * scaling.Y);
 
     int x2 = 0;
@@ -364,7 +363,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
 
     for ( int i = 0 ; i < n ; i++ )
     {
-        x2 = (int)(x1+i*itemSpacing);
+        x2 = (int)((x1+i*itemSpacing) - (itemSpacing / 2));
         core::rect<s32> pos(x2, y1, x2+nSize, y1+nSize);
         draw2DImage(t, pos, rect, NULL,
                                                   NULL, true);
@@ -665,10 +664,11 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     int y_base = 20;
     unsigned int y_space = irr_driver->getActualScreenSize().Height - bottom_margin - y_base;
     // Special case : when 3 players play, use 4th window to display such stuff
-    if (race_manager->getNumLocalPlayers() == 3)
+    if (race_manager->getIfEmptyScreenSpaceExists())
     {
-        x_base = irr_driver->getActualScreenSize().Width/2 + x_base;
-        y_base = irr_driver->getActualScreenSize().Height/2 + y_base;
+        irr::core::recti Last_Space = irr_driver->getSplitscreenWindow(race_manager->getNumLocalPlayers());
+        x_base = Last_Space.UpperLeftCorner.X;
+        y_base = Last_Space.UpperLeftCorner.Y;
         y_space = irr_driver->getActualScreenSize().Height - y_base;
     }
 
@@ -729,7 +729,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     //where is the limit to hide last icons
     int y_icons_limit = irr_driver->getActualScreenSize().Height - 
                                             bottom_margin - ICON_PLAYER_WIDTH;
-    if (race_manager->getNumLocalPlayers() == 3)
+    if (race_manager->getIfEmptyScreenSpaceExists())
     {
         y_icons_limit = irr_driver->getActualScreenSize().Height - ICON_WIDTH;
     }

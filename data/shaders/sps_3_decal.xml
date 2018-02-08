@@ -5,9 +5,6 @@
     </first-pass>
     <shadow-pass vertex-shader="sp_shadow.vert" fragment-shader="white.frag"
         skinned-mesh-shader="sp_skinning_shadow.vert">
-        <uniforms>
-            <uniform name="layer" type="int"/>
-        </uniforms>
     </shadow-pass>
     <uniform-assigners>
         <uniform-assigner name="layer"

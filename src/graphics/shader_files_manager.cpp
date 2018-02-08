@@ -18,9 +18,11 @@
 #ifndef SERVER_ONLY
 
 #include "graphics/shader_files_manager.hpp"
+#include "config/user_config.hpp"
 #include "config/stk_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
+#include "guiengine/message_queue.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
 
@@ -171,7 +173,7 @@ ShaderFilesManager::SharedShader ShaderFilesManager::loadShader
         code << "#define UBO_DISABLED\n";
     if (CVS->needsVertexIdWorkaround())
         code << "#define Needs_Vertex_Id_Workaround\n";
-    if (CVS->isDefferedEnabled())
+    if (CVS->isDeferredEnabled())
         code << "#define Advanced_Lighting_Enabled\n";
 
 #if !defined(USE_GLES2)
@@ -227,6 +229,13 @@ ShaderFilesManager::SharedShader ShaderFilesManager::loadShader
         glGetShaderInfoLog(*ss, info_length, NULL, error_message);
         Log::error("ShaderFilesManager", error_message);
         delete[] error_message;
+        if (UserConfigParams::m_artist_debug_mode)
+        {
+            core::stringw err = StringUtils::insertValues(L"Shader file %s"
+                " failed to compile, check stdout.log or console for details",
+                full_path.c_str());
+            MessageQueue::add(MessageQueue::MT_ERROR, err);
+        }
         return NULL;
     }
     glGetError();

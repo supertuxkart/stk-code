@@ -135,6 +135,8 @@ public:
     // ------------------------------------------------------------------------
     bool hasShader(RenderPass rp)                { return m_program[rp] != 0; }
     // ------------------------------------------------------------------------
+    GLuint getShaderProgram(RenderPass rp)            { return m_program[rp]; }
+    // ------------------------------------------------------------------------
     void use(RenderPass rp = RP_1ST)
     {
         if (m_use_function[rp] != NULL)
@@ -160,6 +162,8 @@ public:
     void linkShaderFiles(RenderPass rp = RP_1ST);
     // ------------------------------------------------------------------------
     void addAllTextures(RenderPass rp = RP_1ST);
+    // ------------------------------------------------------------------------
+    void addAllUniforms(RenderPass rp = RP_1ST);
     // ------------------------------------------------------------------------
     void addCustomPrefilledTextures(SamplerType st, GLuint texture_type,
                                     const std::string& name,
@@ -189,9 +193,6 @@ public:
     // ------------------------------------------------------------------------
     SPUniformAssigner* getUniformAssigner(const std::string& name,
                                           RenderPass rp = RP_1ST) const;
-    // ------------------------------------------------------------------------
-    void addUniform(const std::string& name, const std::type_index& ti,
-                    RenderPass rp = RP_1ST);
     // ------------------------------------------------------------------------
     void setUniformsPerObject(SPPerObjectUniform* sppou,
                               std::vector<SPUniformAssigner*>* ua_used,

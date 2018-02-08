@@ -100,18 +100,11 @@
     <shadow-pass use-function="" unuse-function=""
         vertex-shader="sp_shadow.vert" fragment-shader="white.frag"
         skinned-mesh-shader="sp_skinning_shadow.vert">
-        <uniforms>
-            <!--
-                uniforms: Define the uniforms in shader with the name of the
-                          type (int, float, mat4, vec4, vec3, vec2).
-            -->
-            <uniform name="layer" type="int"/>
-        </uniforms>
     </shadow-pass>
     <!--
         uniform-assigners: List of uniform assigners functions to be auto-run
-                           when "use" the shader which set the above uniforms,
-                           currently there are:
+                           when "use" the shader which set the uniform
+                           variables in shader, currently there are:
 
             shadowCascadeUniformAssigner will set the current shadow
             cascade being drawn.
@@ -127,6 +120,9 @@
 
             You have to specify the uniform name in shader together with the
             bundled uniform-assigners.
+
+            Currently you can automatically assign to uniform type int, float,
+            mat4, vec4, vec3 and vec2 only.
     -->
     <uniform-assigners>
         <uniform-assigner name="layer"

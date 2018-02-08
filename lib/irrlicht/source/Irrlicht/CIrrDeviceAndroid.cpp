@@ -48,7 +48,9 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
 	: CIrrDeviceStub(param),
 	Accelerometer(0),
 	Gyroscope(0),
-	IsMousePressed(false)
+	IsMousePressed(false),
+	GamepadAxisX(0),
+	GamepadAxisY(0)
 {
 	#ifdef _DEBUG
 	setDebugName("CIrrDeviceAndroid");
@@ -391,218 +393,378 @@ s32 CIrrDeviceAndroid::handleInput(android_app* app, AInputEvent* androidEvent)
 	
 	s32 status = 0;
 	
-	switch (AInputEvent_getType(androidEvent))
+	int32_t source = AInputEvent_getSource(androidEvent);
+	int32_t type = AInputEvent_getType(androidEvent);
+	
+	if (source == AINPUT_SOURCE_GAMEPAD ||
+		source == AINPUT_SOURCE_JOYSTICK ||
+		source == AINPUT_SOURCE_DPAD)
+	{
+		status = device->handleGamepad(androidEvent);
+	}
+	else
+	{
+		switch (type)
+		{
+		case AINPUT_EVENT_TYPE_MOTION:
+		{
+			status = device->handleTouch(androidEvent);
+			break;
+		}
+		case AINPUT_EVENT_TYPE_KEY:
+		{
+			status = device->handleKeyboard(androidEvent);
+			break;
+		}
+		default:
+			break;
+		}
+	}
+
+	return status;
+}
+
+s32 CIrrDeviceAndroid::handleTouch(AInputEvent* androidEvent)
+{
+	s32 status = 0;
+	
+	SEvent event;
+	event.EventType = EET_TOUCH_INPUT_EVENT;
+
+	s32 eventAction = AMotionEvent_getAction(androidEvent);
+
+#if 0
+	// Useful for debugging. We might have to pass some of those infos on at some point.
+	// but preferably device independent (so iphone can use same irrlicht flags).
+	int32_t flags = AMotionEvent_getFlags(androidEvent);
+	os::Printer::log("flags: ", core::stringc(flags).c_str(), ELL_DEBUG);
+	int32_t metaState = AMotionEvent_getMetaState(androidEvent);
+	os::Printer::log("metaState: ", core::stringc(metaState).c_str(), ELL_DEBUG);
+	int32_t edgeFlags = AMotionEvent_getEdgeFlags(androidEvent);
+	os::Printer::log("edgeFlags: ", core::stringc(flags).c_str(), ELL_DEBUG);
+#endif
+
+	bool touchReceived = true;
+	bool simulate_mouse = false;
+	core::position2d<s32> mouse_pos = core::position2d<s32>(0, 0);
+
+	switch (eventAction & AMOTION_EVENT_ACTION_MASK)
+	{
+	case AMOTION_EVENT_ACTION_DOWN:
+	case AMOTION_EVENT_ACTION_POINTER_DOWN:
+		event.TouchInput.Event = ETIE_PRESSED_DOWN;
+		break;
+	case AMOTION_EVENT_ACTION_MOVE:
+		event.TouchInput.Event = ETIE_MOVED;
+		break;
+	case AMOTION_EVENT_ACTION_UP:
+	case AMOTION_EVENT_ACTION_POINTER_UP:
+	case AMOTION_EVENT_ACTION_CANCEL:
+		event.TouchInput.Event = ETIE_LEFT_UP;
+		break;
+	default:
+		touchReceived = false;
+		break;
+	}
+	
+	if (touchReceived)
+	{
+		s32 count = 1;
+		s32 idx = (eventAction & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK) >> 
+							AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
+		
+		// Process all touches for move action.
+		if (event.TouchInput.Event == ETIE_MOVED)
+		{
+			count = AMotionEvent_getPointerCount(androidEvent);
+			idx = 0;
+		}
+
+		for (s32 i = 0; i < count; ++i)
+		{
+			event.TouchInput.ID = AMotionEvent_getPointerId(androidEvent, i + idx);
+			event.TouchInput.X = AMotionEvent_getX(androidEvent, i + idx);
+			event.TouchInput.Y = AMotionEvent_getY(androidEvent, i + idx);
+			
+			if (event.TouchInput.ID >= 32)
+				continue;
+			
+			TouchEventData& event_data = TouchEventsData[event.TouchInput.ID];
+			
+			// Don't send move event when nothing changed
+			if (event_data.event == event.TouchInput.Event &&
+				event_data.x == event.TouchInput.X &&
+				event_data.y == event.TouchInput.Y)
+				continue;
+				
+			event_data.event = event.TouchInput.Event;
+			event_data.x = event.TouchInput.X;
+			event_data.y = event.TouchInput.Y;
+			
+			postEventFromUser(event);
+			
+			if (event.TouchInput.ID == 0)
+			{
+				simulate_mouse = true;
+				mouse_pos.X = event.TouchInput.X;
+				mouse_pos.Y = event.TouchInput.Y;
+			}
+		}
+
+		status = 1;
+	}
+	
+	// Simulate mouse event for first finger on multitouch device.
+	// This allows to click on GUI elements.		
+	if (simulate_mouse)
+	{
+		CursorControl->setPosition(mouse_pos);
+
+		SEvent irrevent;
+		bool send_event = true;
+		
+		switch (event.TouchInput.Event)
+		{
+		case ETIE_PRESSED_DOWN:
+			irrevent.MouseInput.Event = EMIE_LMOUSE_PRESSED_DOWN;
+			IsMousePressed = true;
+			break;
+		case ETIE_LEFT_UP:
+			irrevent.MouseInput.Event = EMIE_LMOUSE_LEFT_UP;
+			IsMousePressed = false;
+			break;
+		case ETIE_MOVED:
+			irrevent.MouseInput.Event = EMIE_MOUSE_MOVED;
+			break;
+		default:
+			send_event = false;
+			break;
+		}
+		
+		if (send_event)
+		{
+			irrevent.MouseInput.Control = false;
+			irrevent.MouseInput.Shift = false;
+			irrevent.MouseInput.ButtonStates = IsMousePressed ? 
+															irr::EMBSM_LEFT : 0;
+			irrevent.EventType = EET_MOUSE_INPUT_EVENT;
+			irrevent.MouseInput.X = mouse_pos.X;
+			irrevent.MouseInput.Y = mouse_pos.Y;
+
+			postEventFromUser(irrevent);
+		}
+	}
+	
+	return status;
+}
+
+
+s32 CIrrDeviceAndroid::handleKeyboard(AInputEvent* androidEvent)
+{
+	s32 status = 0;
+
+	bool ignore_event = false;
+
+	SEvent event;
+	event.EventType = EET_KEY_INPUT_EVENT;
+	event.KeyInput.Char = 0;
+	event.KeyInput.PressedDown = false;
+	event.KeyInput.Key = IRR_KEY_UNKNOWN;
+
+	int32_t keyCode = AKeyEvent_getKeyCode(androidEvent);
+	int32_t keyAction = AKeyEvent_getAction(androidEvent);
+	int32_t keyMetaState = AKeyEvent_getMetaState(androidEvent);
+	int32_t keyRepeat = AKeyEvent_getRepeatCount(androidEvent);
+
+	if (keyAction == AKEY_EVENT_ACTION_DOWN)
+	{
+		event.KeyInput.PressedDown = true;
+	}
+	else if (keyAction == AKEY_EVENT_ACTION_UP)
+	{
+		event.KeyInput.PressedDown = false;
+	}
+	else if (keyAction == AKEY_EVENT_ACTION_MULTIPLE)
+	{
+		// TODO: Multiple duplicate key events have occurred in a row,
+		// or a complex string is being delivered. The repeat_count
+		// property of the key event contains the number of times the
+		// given key code should be executed.
+		// I guess this might necessary for more complicated i18n key input,
+		// but don't see yet how to handle this correctly.
+	}
+
+	event.KeyInput.Shift = (keyMetaState & AMETA_SHIFT_ON ||
+							keyMetaState & AMETA_SHIFT_LEFT_ON ||
+							keyMetaState & AMETA_SHIFT_RIGHT_ON);
+
+	event.KeyInput.Control = (keyMetaState & AMETA_CTRL_ON ||
+							  keyMetaState & AMETA_CTRL_LEFT_ON ||
+							  keyMetaState & AMETA_CTRL_RIGHT_ON);
+
+	event.KeyInput.SystemKeyCode = (u32)keyCode;
+	event.KeyInput.Key = KeyMap[keyCode];
+
+	if (event.KeyInput.Key > 0)
+	{
+		getKeyChar(event);
+	}
+
+	// Handle an event when back button in pressed just like an escape key
+	// and also avoid repeating the event to avoid some strange behaviour
+	if (event.KeyInput.SystemKeyCode == AKEYCODE_BACK)
+	{
+		status = 1;
+		
+		if (event.KeyInput.PressedDown == false || keyRepeat > 0)
+		{
+			ignore_event = true;
+		}
+	}
+
+	// Mark escape key event as handled by application to avoid receiving
+	// AKEYCODE_BACK key event
+	if (event.KeyInput.SystemKeyCode == AKEYCODE_ESCAPE)
+	{
+		status = 1;
+	}
+
+	if (!ignore_event)
+	{
+		postEventFromUser(event);
+	}
+
+	return status;
+}
+
+s32 CIrrDeviceAndroid::handleGamepad(AInputEvent* androidEvent)
+{
+	s32 status = 0;
+	
+	int32_t type = AInputEvent_getType(androidEvent);
+	
+	switch (type)
 	{
 	case AINPUT_EVENT_TYPE_MOTION:
 	{
+		float axis_x = AMotionEvent_getAxisValue(androidEvent, 
+												 AMOTION_EVENT_AXIS_HAT_X, 0);
+
+		if (axis_x == 0)
+		{
+			axis_x = AMotionEvent_getAxisValue(androidEvent, 
+											   AMOTION_EVENT_AXIS_X, 0);
+		}
+		
+		if (axis_x == 0)
+		{
+			axis_x = AMotionEvent_getAxisValue(androidEvent, 
+											   AMOTION_EVENT_AXIS_Z, 0);
+		}
+
+		float axis_y = AMotionEvent_getAxisValue(androidEvent, 
+												 AMOTION_EVENT_AXIS_HAT_Y, 0);
+												 
+		if (axis_y == 0)
+		{
+			axis_y = AMotionEvent_getAxisValue(androidEvent, 
+											   AMOTION_EVENT_AXIS_Y, 0);
+		}
+		
+		if (axis_y == 0)
+		{
+			axis_y = AMotionEvent_getAxisValue(androidEvent, 
+											   AMOTION_EVENT_AXIS_RZ, 0);
+		}
+												 
 		SEvent event;
-		event.EventType = EET_TOUCH_INPUT_EVENT;
-
-		s32 eventAction = AMotionEvent_getAction(androidEvent);
-
-#if 0
-		// Useful for debugging. We might have to pass some of those infos on at some point.
-		// but preferably device independent (so iphone can use same irrlicht flags).
-		int32_t flags = AMotionEvent_getFlags(androidEvent);
-		os::Printer::log("flags: ", core::stringc(flags).c_str(), ELL_DEBUG);
-		int32_t metaState = AMotionEvent_getMetaState(androidEvent);
-		os::Printer::log("metaState: ", core::stringc(metaState).c_str(), ELL_DEBUG);
-		int32_t edgeFlags = AMotionEvent_getEdgeFlags(androidEvent);
-		os::Printer::log("edgeFlags: ", core::stringc(flags).c_str(), ELL_DEBUG);
-#endif
-
-		bool touchReceived = true;
-		bool simulate_mouse = false;
-		core::position2d<s32> mouse_pos = core::position2d<s32>(0, 0);
-
-		switch (eventAction & AMOTION_EVENT_ACTION_MASK)
-		{
-		case AMOTION_EVENT_ACTION_DOWN:
-		case AMOTION_EVENT_ACTION_POINTER_DOWN:
-			event.TouchInput.Event = ETIE_PRESSED_DOWN;
-			break;
-		case AMOTION_EVENT_ACTION_MOVE:
-			event.TouchInput.Event = ETIE_MOVED;
-			break;
-		case AMOTION_EVENT_ACTION_UP:
-		case AMOTION_EVENT_ACTION_POINTER_UP:
-		case AMOTION_EVENT_ACTION_CANCEL:
-			event.TouchInput.Event = ETIE_LEFT_UP;
-			break;
-		default:
-			touchReceived = false;
-			break;
-		}
+		event.EventType = EET_KEY_INPUT_EVENT;
+		event.KeyInput.Char = 0;
+		event.KeyInput.Shift = false;
+		event.KeyInput.Control = false;
+		event.KeyInput.SystemKeyCode = 0;
 		
-		if (touchReceived)
-		{
-			s32 count = 1;
-			s32 idx = (eventAction & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK) >> 
-								AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
-			
-			// Process all touches for move action.
-			if (event.TouchInput.Event == ETIE_MOVED)
-			{
-				count = AMotionEvent_getPointerCount(androidEvent);
-				idx = 0;
-			}
-
-			for (s32 i = 0; i < count; ++i)
-			{
-				event.TouchInput.ID = AMotionEvent_getPointerId(androidEvent, i + idx);
-				event.TouchInput.X = AMotionEvent_getX(androidEvent, i + idx);
-				event.TouchInput.Y = AMotionEvent_getY(androidEvent, i + idx);
-				
-				if (event.TouchInput.ID >= 32)
-					continue;
-				
-				TouchEventData& event_data = device->TouchEventsData[event.TouchInput.ID];
-				
-				// Don't send move event when nothing changed
-				if (event_data.event == event.TouchInput.Event &&
-					event_data.x == event.TouchInput.X &&
-					event_data.y == event.TouchInput.Y)
-					continue;
-					
-				event_data.event = event.TouchInput.Event;
-				event_data.x = event.TouchInput.X;
-				event_data.y = event.TouchInput.Y;
-				
-				device->postEventFromUser(event);
-				
-				if (event.TouchInput.ID == 0)
-				{
-					simulate_mouse = true;
-					mouse_pos.X = event.TouchInput.X;
-					mouse_pos.Y = event.TouchInput.Y;
-				}
-			}
-
-			status = 1;
-		}
+		float deadzone = 0.3f;
 		
-		// Simulate mouse event for first finger on multitouch device.
-		// This allows to click on GUI elements.		
-		if (simulate_mouse)
+		axis_x = axis_x > deadzone || axis_x < -deadzone ? axis_x : 0;
+		axis_y = axis_y > deadzone || axis_y < -deadzone ? axis_y : 0;
+		
+		if (axis_x != GamepadAxisX)
 		{
-			device->CursorControl->setPosition(mouse_pos);
-
-			SEvent irrevent;
-			bool send_event = true;
-			
-			switch (event.TouchInput.Event)
+			if (GamepadAxisX != 0)
 			{
-			case ETIE_PRESSED_DOWN:
-				irrevent.MouseInput.Event = EMIE_LMOUSE_PRESSED_DOWN;
-				device->IsMousePressed = true;
-				break;
-			case ETIE_LEFT_UP:
-				irrevent.MouseInput.Event = EMIE_LMOUSE_LEFT_UP;
-				device->IsMousePressed = false;
-				break;
-			case ETIE_MOVED:
-				irrevent.MouseInput.Event = EMIE_MOUSE_MOVED;
-				break;
-			default:
-				send_event = false;
-				break;
+				event.KeyInput.PressedDown = false;
+				event.KeyInput.Key = GamepadAxisX < 0 ? IRR_KEY_LEFT
+													  : IRR_KEY_RIGHT;
+				postEventFromUser(event);
 			}
 			
-			if (send_event)
+			if (axis_x != 0)
 			{
-				irrevent.MouseInput.Control = false;
-				irrevent.MouseInput.Shift = false;
-				irrevent.MouseInput.ButtonStates = device->IsMousePressed ? 
-														irr::EMBSM_LEFT : 0;
-				irrevent.EventType = EET_MOUSE_INPUT_EVENT;
-				irrevent.MouseInput.X = mouse_pos.X;
-				irrevent.MouseInput.Y = mouse_pos.Y;
-
-				device->postEventFromUser(irrevent);
+				event.KeyInput.PressedDown = true;
+				event.KeyInput.Key = axis_x < 0 ? IRR_KEY_LEFT : IRR_KEY_RIGHT;
+				postEventFromUser(event);
 			}
+			
+			GamepadAxisX = axis_x;
 		}
 		
+		if (axis_y != GamepadAxisY)
+		{
+			if (GamepadAxisY != 0)
+			{
+				event.KeyInput.PressedDown = false;
+				event.KeyInput.Key = GamepadAxisY < 0 ? IRR_KEY_UP
+													  : IRR_KEY_DOWN;
+				postEventFromUser(event);
+			}
+			
+			if (axis_y != 0)
+			{
+				event.KeyInput.PressedDown = true;
+				event.KeyInput.Key = axis_y < 0 ? IRR_KEY_UP : IRR_KEY_DOWN;
+				postEventFromUser(event);
+			}
+			
+			GamepadAxisY = axis_y;
+		}
+		
+		status = 1;
+
 		break;
 	}
 	case AINPUT_EVENT_TYPE_KEY:
 	{
-		bool ignore_event = false;
-
+		bool ignore = false;
+		
+		int32_t keyCode = AKeyEvent_getKeyCode(androidEvent);
+		int32_t keyAction = AKeyEvent_getAction(androidEvent);
+		int32_t keyRepeat = AKeyEvent_getRepeatCount(androidEvent);
+		
 		SEvent event;
 		event.EventType = EET_KEY_INPUT_EVENT;
 		event.KeyInput.Char = 0;
-		event.KeyInput.PressedDown = false;
-		event.KeyInput.Key = IRR_KEY_UNKNOWN;
-
-		int32_t keyCode = AKeyEvent_getKeyCode(androidEvent);
-		int32_t keyAction = AKeyEvent_getAction(androidEvent);
-		int32_t keyMetaState = AKeyEvent_getMetaState(androidEvent);
-		int32_t keyRepeat = AKeyEvent_getRepeatCount(androidEvent);
-
-		if (keyAction == AKEY_EVENT_ACTION_DOWN)
-		{
-			event.KeyInput.PressedDown = true;
-		}
-		else if (keyAction == AKEY_EVENT_ACTION_UP)
-		{
-			event.KeyInput.PressedDown = false;
-		}
-		else if (keyAction == AKEY_EVENT_ACTION_MULTIPLE)
-		{
-			// TODO: Multiple duplicate key events have occurred in a row,
-			// or a complex string is being delivered. The repeat_count
-			// property of the key event contains the number of times the
-			// given key code should be executed.
-			// I guess this might necessary for more complicated i18n key input,
-			// but don't see yet how to handle this correctly.
-		}
-
-		event.KeyInput.Shift = (keyMetaState & AMETA_SHIFT_ON ||
-								keyMetaState & AMETA_SHIFT_LEFT_ON ||
-								keyMetaState & AMETA_SHIFT_RIGHT_ON);
-
-		event.KeyInput.Control = (keyMetaState & AMETA_CTRL_ON ||
-								  keyMetaState & AMETA_CTRL_LEFT_ON ||
-								  keyMetaState & AMETA_CTRL_RIGHT_ON);
-
+		event.KeyInput.PressedDown = (keyAction == AKEY_EVENT_ACTION_DOWN);
+		event.KeyInput.Shift = false;
+		event.KeyInput.Control = false;
 		event.KeyInput.SystemKeyCode = (u32)keyCode;
-		event.KeyInput.Key = device->KeyMap[keyCode];
-
-		if (event.KeyInput.Key > 0)
-		{
-			device->getKeyChar(event);
-		}
-
+		event.KeyInput.Key = KeyMap[keyCode];
+		
 		// Handle an event when back button in pressed just like an escape key
 		// and also avoid repeating the event to avoid some strange behaviour
 		if (event.KeyInput.SystemKeyCode == AKEYCODE_BACK)
 		{
 			status = 1;
-			
-			if (event.KeyInput.PressedDown == false || keyRepeat > 0)
-			{
-				ignore_event = true;
-			}
+			ignore = (event.KeyInput.PressedDown == false || keyRepeat > 0);
 		}
-
-		// Mark escape key event as handled by application to avoid receiving
-		// AKEYCODE_BACK key event
-		if (event.KeyInput.SystemKeyCode == AKEYCODE_ESCAPE)
-		{
-			status = 1;
-		}
-
-		if (!ignore_event)
-		{
-			device->postEventFromUser(event);
-		}
-
+		
+		postEventFromUser(event);
 		break;
 	}
 	default:
 		break;
 	}
-
+	
 	return status;
 }
 
@@ -636,7 +798,7 @@ void CIrrDeviceAndroid::createKeyMap()
 	KeyMap[AKEYCODE_DPAD_DOWN] = IRR_KEY_DOWN; 
 	KeyMap[AKEYCODE_DPAD_LEFT] = IRR_KEY_LEFT; 
 	KeyMap[AKEYCODE_DPAD_RIGHT] = IRR_KEY_RIGHT; 
-	KeyMap[AKEYCODE_DPAD_CENTER] = IRR_KEY_SELECT; 
+	KeyMap[AKEYCODE_DPAD_CENTER] = IRR_KEY_RETURN; 
 	KeyMap[AKEYCODE_VOLUME_UP] = IRR_KEY_VOLUME_DOWN; 
 	KeyMap[AKEYCODE_VOLUME_DOWN] = IRR_KEY_VOLUME_UP; 
 	KeyMap[AKEYCODE_POWER] = IRR_KEY_UNKNOWN; 
@@ -711,21 +873,21 @@ void CIrrDeviceAndroid::createKeyMap()
 	KeyMap[AKEYCODE_SWITCH_CHARSET] = IRR_KEY_UNKNOWN; 
 
 	// following look like controller inputs
-	KeyMap[AKEYCODE_BUTTON_A] = IRR_KEY_UNKNOWN; 
-	KeyMap[AKEYCODE_BUTTON_B] = IRR_KEY_UNKNOWN; 
-	KeyMap[AKEYCODE_BUTTON_C] = IRR_KEY_UNKNOWN; 
-	KeyMap[AKEYCODE_BUTTON_X] = IRR_KEY_UNKNOWN; 
-	KeyMap[AKEYCODE_BUTTON_Y] = IRR_KEY_UNKNOWN; 
-	KeyMap[AKEYCODE_BUTTON_Z] = IRR_KEY_UNKNOWN; 
-	KeyMap[AKEYCODE_BUTTON_L1] = IRR_KEY_UNKNOWN; 
-	KeyMap[AKEYCODE_BUTTON_R1] = IRR_KEY_UNKNOWN; 
-	KeyMap[AKEYCODE_BUTTON_L2] = IRR_KEY_UNKNOWN; 
-	KeyMap[AKEYCODE_BUTTON_R2] = IRR_KEY_UNKNOWN; 
-	KeyMap[AKEYCODE_BUTTON_THUMBL] = IRR_KEY_UNKNOWN; 
-	KeyMap[AKEYCODE_BUTTON_THUMBR] = IRR_KEY_UNKNOWN; 
-	KeyMap[AKEYCODE_BUTTON_START] = IRR_KEY_UNKNOWN; 
-	KeyMap[AKEYCODE_BUTTON_SELECT] = IRR_KEY_UNKNOWN; 
-	KeyMap[AKEYCODE_BUTTON_MODE] = IRR_KEY_UNKNOWN; 
+	KeyMap[AKEYCODE_BUTTON_A] = IRR_KEY_RETURN; 
+	KeyMap[AKEYCODE_BUTTON_B] = IRR_KEY_BACK; 
+	KeyMap[AKEYCODE_BUTTON_C] = IRR_KEY_2; 
+	KeyMap[AKEYCODE_BUTTON_X] = IRR_KEY_3; 
+	KeyMap[AKEYCODE_BUTTON_Y] = IRR_KEY_4; 
+	KeyMap[AKEYCODE_BUTTON_Z] = IRR_KEY_5; 
+	KeyMap[AKEYCODE_BUTTON_L1] = IRR_KEY_6;  
+	KeyMap[AKEYCODE_BUTTON_R1] = IRR_KEY_7; 
+	KeyMap[AKEYCODE_BUTTON_L2] = IRR_KEY_8; 
+	KeyMap[AKEYCODE_BUTTON_R2] = IRR_KEY_9; 
+	KeyMap[AKEYCODE_BUTTON_THUMBL] = IRR_KEY_RETURN; 
+	KeyMap[AKEYCODE_BUTTON_THUMBR] = IRR_KEY_RETURN;  
+	KeyMap[AKEYCODE_BUTTON_START] = IRR_KEY_RETURN; 
+	KeyMap[AKEYCODE_BUTTON_SELECT] = IRR_KEY_BACK; 
+	KeyMap[AKEYCODE_BUTTON_MODE] = IRR_KEY_MENU; 
 
 	KeyMap[AKEYCODE_ESCAPE] = IRR_KEY_ESCAPE; 
 	KeyMap[AKEYCODE_FORWARD_DEL] = IRR_KEY_DELETE; 

@@ -1,11 +1,10 @@
-flat in float hue_change;
+in float hue_change;
 
 in vec3 normal;
 in vec2 uv;
 
 layout(location = 0) out vec4 o_diffuse_color;
-layout(location = 1) out vec3 o_normal_depth;
-layout(location = 2) out vec2 o_gloss_map;
+layout(location = 1) out vec4 o_normal_color;
 
 #stk_include "utils/encode_normal.frag"
 #stk_include "utils/rgb_conversion.frag"
@@ -26,14 +25,16 @@ void main(void)
         vec3 new_color = hsvToRgb(vec3(new_xy.x, new_xy.y, old_hsv.z));
         col = vec4(new_color.r, new_color.g, new_color.b, col.a);
     }
-
-    vec3 final_color = col.xyz;
-    o_diffuse_color = vec4(final_color, 1.0);
+    o_diffuse_color = vec4(col.xyz, 1.0);
 
 #if defined(Advanced_Lighting_Enabled)
     vec4 layer_2 = sampleTextureLayer2(uv);
-    o_normal_depth.xy = 0.5 * EncodeNormal(normalize(normal)) + 0.5;
-    o_normal_depth.z = layer_2.x;
-    o_gloss_map = 0.1 * layer_2.yz;
+    o_diffuse_color = vec4(col.xyz, layer_2.z);
+
+    o_normal_color.xy = 0.5 * EncodeNormal(normalize(normal)) + 0.5;
+    o_normal_color.zw = layer_2.xy;
+#else
+    o_diffuse_color = vec4(col.xyz, 1.0);
 #endif
+
 }
