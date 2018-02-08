@@ -244,7 +244,7 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
     }
 
     // First line of text somewhat under the top of the viewport.
-    y = (int)(viewport.UpperLeftCorner.Y + 20);
+    y = viewport.getCenter().Y;
 
     gui::ScalableFont* font = GUIEngine::getFont();
     gui::ScalableFont* big_font = GUIEngine::getTitleFont();
@@ -253,7 +253,6 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
     if (race_manager->getNumLocalPlayers() > 2)
     {
         font = GUIEngine::getSmallFont();
-        y = viewport.getCenter().Y;
     }
 
     irr_driver->getVideoDriver()->enableMaterial2D(); // seems like we need to remind irrlicht from time to time to use the Material2D
