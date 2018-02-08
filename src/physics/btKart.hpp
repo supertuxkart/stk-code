@@ -292,10 +292,13 @@ public:
     // ------------------------------------------------------------------------
     /** Resets the maximum so any new maximum value from the application will
      *  be accepted. */
-    virtual void resetMaxSpeed() { m_max_speed = -1.0f; }
+    virtual void resetMaxSpeed() { m_max_speed = -1.0f; m_min_speed = 0.0f; }
     // ------------------------------------------------------------------------
     /** Sets the minimum speed for this kart. */
-    void setMinSpeed(float s) { m_min_speed = s; }
+    void setMinSpeed(float s)
+    {
+        if(s > m_min_speed) m_min_speed = s; 
+    }
     // ------------------------------------------------------------------------
     /** Returns the minimum speed for this kart. */
     btScalar getMinSpeed() const { return m_min_speed; }
