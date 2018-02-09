@@ -83,7 +83,7 @@ public:
 	void PostProcess();
 
 #ifdef AS_DEBUG
-	void DebugOutput(const char *name, asCScriptEngine *engine, asCScriptFunction *func);
+	void DebugOutput(const char *name, asCScriptFunction *func);
 #endif
 
 	int  GetLastInstr();

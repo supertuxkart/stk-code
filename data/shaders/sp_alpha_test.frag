@@ -1,4 +1,4 @@
-flat in float hue_change;
+in float hue_change;
 
 in vec4 color;
 in vec3 normal;
@@ -28,9 +28,7 @@ void main(void)
         vec3 new_color = hsvToRgb(vec3(new_xy.x, new_xy.y, old_hsv.z));
         col = vec4(new_color.r, new_color.g, new_color.b, col.a);
     }
-
-    vec3 final_color = col.xyz * color.xyz;
-    o_diffuse_color = vec4(final_color, 1.0);
+    o_diffuse_color = vec4(col.xyz, 1.0);
 
 #if defined(Advanced_Lighting_Enabled)
     vec4 layer_2 = sampleTextureLayer2(uv);

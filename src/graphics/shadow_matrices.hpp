@@ -62,8 +62,7 @@ public:
     ~ShadowMatrices();
 
     void computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
-                                   unsigned int width, unsigned int height,
-                                   GLuint depth_stencil_texture);
+                                   unsigned int width, unsigned int height);
     void addLight(const core::vector3df &pos);
     void updateSunOrthoMatrices();
     void renderShadowsDebug(const FrameBuffer* shadow_framebuffer,

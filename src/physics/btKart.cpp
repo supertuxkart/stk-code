@@ -118,7 +118,6 @@ void btKart::reset()
         updateWheelTransform(i, true);
     }
     m_visual_wheels_touch_ground = false;
-    m_zipper_speed               = btScalar(0);
     m_skid_angular_velocity      = 0;
     m_is_skidding                = false;
     m_allow_sliding              = false;
@@ -128,6 +127,8 @@ void btKart::reset()
     m_additional_rotation        = btVector3(0,0,0);
     m_time_additional_rotation   = 0;
     m_visual_rotation            = 0;
+    m_max_speed                  = -1.0f;
+    m_min_speed                  = 0.0f;
 
     // Set the brakes so that karts don't slide downhill
     setAllBrakes(5.0f);
@@ -551,6 +552,7 @@ void btKart::updateVehicle( btScalar step )
         iwt.setRotation(iwt.getRotation()*add_rot);
         m_time_additional_rotation -= dt;
     }
+    adjustSpeed(m_min_speed, m_max_speed);
 }   // updateVehicle
 
 // ----------------------------------------------------------------------------
@@ -770,51 +772,35 @@ void btKart::updateFriction(btScalar timeStep)
             (btRigidBody*) wheelInfo.m_raycastInfo.m_groundObject;
         if(!groundObject) continue;
 
-        if(m_zipper_speed > 0)
-        {
-            if (wheel==2 || wheel==3)
-            {
-                // The zipper velocity is the speed that should be
-                // reached. So compute the impulse to accelerate the
-                // kart up to that speed:
-                m_forwardImpulse[wheel] =
-                    0.5f*(m_zipper_speed -
-                          getRigidBody()->getLinearVelocity().length())
-                    / m_chassisBody->getInvMass();
-            }
+        btScalar rollingFriction = 0.f;
 
+        if (wheelInfo.m_engineForce != 0.f)
+        {
+            rollingFriction = wheelInfo.m_engineForce* timeStep;
         }
         else
         {
-            btScalar rollingFriction = 0.f;
-
-            if (wheelInfo.m_engineForce != 0.f)
-            {
-                rollingFriction = wheelInfo.m_engineForce* timeStep;
-            }
-            else
-            {
-                btScalar defaultRollingFrictionImpulse = 0.f;
-                btScalar maxImpulse = wheelInfo.m_brake
-                                    ? wheelInfo.m_brake
-                                    : defaultRollingFrictionImpulse;
-                btWheelContactPoint contactPt(m_chassisBody, groundObject,
-                                     wheelInfo.m_raycastInfo.m_contactPointWS,
-                                     m_forwardWS[wheel],maxImpulse);
-                rollingFriction = calcRollingFriction(contactPt);
-                // This is a work around for the problem that a kart shakes
-                // if it is braking: we get a minor impulse forward, which
-                // bullet then tries to offset by applying a backward
-                // impulse - which is a bit too big, causing a impulse
-                // backwards, ... till the kart is shaking backwards and
-                // forwards. By only applying half of the impulse in case
-                // of low friction this goes away.
-                if(wheelInfo.m_brake && fabsf(rollingFriction)<10)
-                    rollingFriction*=0.5f;
-            }
-
-            m_forwardImpulse[wheel] = rollingFriction;
+            btScalar defaultRollingFrictionImpulse = 0.f;
+            btScalar maxImpulse = wheelInfo.m_brake
+                ? wheelInfo.m_brake
+                : defaultRollingFrictionImpulse;
+            btWheelContactPoint contactPt(m_chassisBody, groundObject,
+                wheelInfo.m_raycastInfo.m_contactPointWS,
+                m_forwardWS[wheel], maxImpulse);
+            rollingFriction = calcRollingFriction(contactPt);
+            // This is a work around for the problem that a kart shakes
+            // if it is braking: we get a minor impulse forward, which
+            // bullet then tries to offset by applying a backward
+            // impulse - which is a bit too big, causing a impulse
+            // backwards, ... till the kart is shaking backwards and
+            // forwards. By only applying half of the impulse in case
+            // of low friction this goes away.
+            if (wheelInfo.m_brake && fabsf(rollingFriction) < 10)
+                rollingFriction *= 0.5f;
         }
+
+        m_forwardImpulse[wheel] = rollingFriction;
+
         if(m_time_additional_impulse>0)
         {
             sliding = true;
@@ -1015,33 +1001,40 @@ void btKart::setSliding(bool active)
 }   // setSliding
 
 // ----------------------------------------------------------------------------
-/** Activates an additional speedup for the kart so that it reaches the
- *  specified speed.
- *  \param speed The speed to reach.
+/** Adjusts the velocity of this kart to be at least the specified minimum,
+ *  and less than or equal to the maximum. If necessary the kart will
+ *  instantaneously change its speed.
+ *  \param min_speed Minimum speed, 0 means no effect.
+ *  \param max_speed Maximum speed the kart is allowed to have.
  */
-void btKart::instantSpeedIncreaseTo(float speed)
-{
-    // Avoid that a speed 'increase' might cause a slowdown
-    if (m_chassisBody->getLinearVelocity().length2() > speed*speed)
-    {
-        return;
-    }
-    m_zipper_speed  = speed;
-}   // activateZipper
-
-// ----------------------------------------------------------------------------
-/** Caps the speed at a given value. If necessary the kart will
- *  instantaneously change its speed. */
-void btKart::capSpeed(float max_speed)
+void btKart::adjustSpeed(btScalar min_speed, btScalar max_speed)
 {
     const btVector3 &velocity = m_chassisBody->getLinearVelocity();
     float speed = velocity.length();
-    if(speed!=0)
+
+
+    if (speed < min_speed && min_speed > 0)
+    {
+        if (speed > 0)
+        {
+            // The speedup is only for the direction of the normal.
+            const btVector3 &normal = m_kart->getNormal();
+            btVector3 upright_component = normal * normal.dot(velocity);
+            // Subtract the upright velocity component,
+            btVector3 v = velocity - upright_component;
+            const float velocity_ratio = min_speed / v.length();
+            // Scale the velocity in the plane, then add the upright component
+            // of the velocity back in.
+            m_chassisBody->setLinearVelocity( v*velocity_ratio 
+                                              + upright_component );
+        }
+    }
+    else if (speed >0 && max_speed >= 0 && speed > max_speed)
     {
         const float velocity_ratio = max_speed / speed;
         m_chassisBody->setLinearVelocity(velocity * velocity_ratio);
     }
-}   // capSpeed
+}   // adjustSpeed
 
 // ----------------------------------------------------------------------------
 //Shorter version of above raycast function. This is used when projecting

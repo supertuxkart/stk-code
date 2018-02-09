@@ -1,6 +1,6 @@
 /*
   AngelCode Scripting Library
-  Copyright (c) 2003-2015 Andreas Jonsson
+  Copyright (c) 2003-2016 Andreas Jonsson
 
   This software is provided 'as-is', without any express or implied
   warranty. In no event will the authors be held liable for any
@@ -717,12 +717,13 @@ nomoreargsarmFuncR0R1:
 
 #endif /* hard float abi */
 
+#endif /* arm */
+
 #if defined(__linux__) && defined(__ELF__)
-/* ref: http://hardened.gentoo.org/gnu-stack.xml */
+/* ref: http://hardened.gentoo.org/gnu-stack.xml 
+   ref: https://wiki.gentoo.org/wiki/Hardened/GNU_stack_quickstart */
 .section .note.GNU-stack,"",%progbits
 #endif
-
-#endif /* arm */
 
 #endif /* !AS_MAX_PORTABILITY */
 

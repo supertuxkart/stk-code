@@ -72,8 +72,12 @@
                 </div>
 
                 <spacer height="4" width="10" />
-
-                <!-- Nothing here yet -->
+                
+                <div layout="horizontal-row" proportion="1" height="fit">
+                    <checkbox id="split_screen_horizontally"/>
+                    <spacer width="20" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Multiplayer splits screen horizontally"/>
+                </div>
             </div>
 
             <spacer height="18" width="4"/>

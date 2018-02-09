@@ -1,24 +1,24 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
-   This software is provided 'as-is', without any express or implied 
-   warranty. In no event will the authors be held liable for any 
+   This software is provided 'as-is', without any express or implied
+   warranty. In no event will the authors be held liable for any
    damages arising from the use of this software.
 
-   Permission is granted to anyone to use this software for any 
-   purpose, including commercial applications, and to alter it and 
+   Permission is granted to anyone to use this software for any
+   purpose, including commercial applications, and to alter it and
    redistribute it freely, subject to the following restrictions:
 
-   1. The origin of this software must not be misrepresented; you 
+   1. The origin of this software must not be misrepresented; you
       must not claim that you wrote the original software. If you use
-      this software in a product, an acknowledgment in the product 
+      this software in a product, an acknowledgment in the product
       documentation would be appreciated but is not required.
 
-   2. Altered source versions must be plainly marked as such, and 
+   2. Altered source versions must be plainly marked as such, and
       must not be misrepresented as being the original software.
 
-   3. This notice may not be removed or altered from any source 
+   3. This notice may not be removed or altered from any source
       distribution.
 
    The original version of this library can be located at:
@@ -53,6 +53,7 @@ class asCModule;
 class asCConfigGroup;
 class asCGlobalProperty;
 class asCScriptNode;
+class asCFuncdefType;
 struct asSNameSpace;
 
 struct asSScriptVariable
@@ -96,17 +97,39 @@ enum asEObjVarInfoOption
 	asBLOCK_END
 };
 
+enum asEFuncTrait
+{
+	asTRAIT_CONSTRUCTOR = 1,
+	asTRAIT_DESTRUCTOR  = 2,
+	asTRAIT_CONST       = 4,
+	asTRAIT_PRIVATE     = 8,
+	asTRAIT_PROTECTED   = 16,
+	asTRAIT_FINAL       = 32,
+	asTRAIT_OVERRIDE    = 64,
+	asTRAIT_SHARED      = 128,
+	asTRAIT_EXTERNAL    = 256
+};
+
+struct asSFunctionTraits
+{
+	asSFunctionTraits() : traits(0) {}
+	void SetTrait(asEFuncTrait trait, bool set) { if (set) traits |= trait; else traits &= ~trait; }
+	bool GetTrait(asEFuncTrait trait) const { return (traits & trait) ? true : false; }
+protected:
+	asDWORD traits;
+};
+
 struct asSObjectVariableInfo
 {
-	asUINT programPos;
-	int    variableOffset;
-	asUINT option;
+	asUINT              programPos;
+	int                 variableOffset;
+	asEObjVarInfoOption option;
 };
 
 struct asSSystemFunctionInterface;
 
-// TODO: Might be interesting to allow enumeration of accessed global variables, and 
-//       also functions/methods that are being called. This could be used to build a 
+// TODO: Might be interesting to allow enumeration of accessed global variables, and
+//       also functions/methods that are being called. This could be used to build a
 //       code database with call graphs, etc.
 
 void RegisterScriptFunction(asCScriptEngine *engine);
@@ -129,9 +152,10 @@ public:
 	const char          *GetScriptSectionName() const;
 	const char          *GetConfigGroup() const;
 	asDWORD              GetAccessMask() const;
+	void                *GetAuxiliary() const;
 
 	// Function signature
-	asIObjectType       *GetObjectType() const;
+	asITypeInfo         *GetObjectType() const;
 	const char          *GetObjectName() const;
 	const char          *GetName() const;
 	const char          *GetNamespace() const;
@@ -144,19 +168,15 @@ public:
 	bool                 IsShared() const;
 	asUINT               GetParamCount() const;
 	int                  GetParam(asUINT index, int *typeId, asDWORD *flags = 0, const char **name = 0, const char **defaultArg = 0) const;
-#ifdef AS_DEPRECATED
-	// Deprecated, since 2.29.0, 2014-04-06
-	int                  GetParamTypeId(asUINT index, asDWORD *flags = 0) const;
-#endif
 	int                  GetReturnTypeId(asDWORD *flags = 0) const;
 
-	// Type id for function pointers 
+	// Type id for function pointers
 	int                  GetTypeId() const;
 	bool                 IsCompatibleWithTypeId(int typeId) const;
 
 	// Delegates
 	void                *GetDelegateObject() const;
-	asIObjectType       *GetDelegateObjectType() const;
+	asITypeInfo         *GetDelegateObjectType() const;
 	asIScriptFunction   *GetDelegateFunction() const;
 
 	// Debug information
@@ -176,10 +196,17 @@ public:
 	//-----------------------------------
 	// Internal methods
 
+	void SetShared(bool set) {traits.SetTrait(asTRAIT_SHARED, set);}
+	void SetReadOnly(bool set) { traits.SetTrait(asTRAIT_CONST, set); }
+	void SetFinal(bool set) { traits.SetTrait(asTRAIT_FINAL, set); }
+	void SetOverride(bool set) { traits.SetTrait(asTRAIT_OVERRIDE, set); }
+	void SetProtected(bool set) { traits.SetTrait(asTRAIT_PROTECTED, set); }
+	void SetPrivate(bool set) { traits.SetTrait(asTRAIT_PRIVATE, set); }
+
 	asCScriptFunction(asCScriptEngine *engine, asCModule *mod, asEFuncType funcType);
 	~asCScriptFunction();
 
-	// Keep an internal reference counter to separate references coming from 
+	// Keep an internal reference counter to separate references coming from
 	// application or script objects and references coming from the script code
 	int AddRefInternal();
 	int ReleaseInternal();
@@ -210,7 +237,7 @@ public:
 	bool      IsSignatureExceptNameAndReturnTypeEqual(const asCArray<asCDataType> &paramTypes, const asCArray<asETypeModifiers> &inOutFlags, const asCObjectType *type, bool isReadOnly) const;
 	bool      IsSignatureExceptNameAndObjectTypeEqual(const asCScriptFunction *func) const;
 
-	asCObjectType *GetObjectTypeOfLocalVar(short varOffset);
+	asCTypeInfo *GetTypeInfoOfLocalVar(short varOffset);
 
 	void      MakeDelegate(asCScriptFunction *func, void *obj);
 
@@ -255,11 +282,7 @@ public:
 	asCArray<asCString>          parameterNames;
 	asCArray<asETypeModifiers>   inOutFlags;
 	asCArray<asCString *>        defaultArgs;
-	bool                         isReadOnly;
-	bool                         isPrivate;
-	bool                         isProtected;
-	bool                         isFinal;
-	bool                         isOverride;
+	asSFunctionTraits            traits;
 	asCObjectType               *objectType;
 	int                          signatureId;
 
@@ -267,9 +290,13 @@ public:
 
 	asEFuncType                  funcType;
 	asDWORD                      accessMask;
-	bool                         isShared;
 
+	// Namespace will be null for funcdefs that are declared as child funcdefs
+	// of a class. In this case the namespace shall be taken from the parentClass
+	// in the funcdefType
 	asSNameSpace                *nameSpace;
+
+	asCFuncdefType              *funcdefType; // Doesn't increase refCount
 
 	// Used by asFUNC_DELEGATE
 	void              *objForDelegate;
@@ -289,8 +316,7 @@ public:
 
 		// These hold information on objects and function pointers, including temporary
 		// variables used by exception handler and when saving bytecode
-		asCArray<asCObjectType*>        objVariableTypes;
-		asCArray<asCScriptFunction*>    funcVariableTypes;
+		asCArray<asCTypeInfo*>          objVariableTypes;
 		asCArray<int>                   objVariablePos;
 
 		// The first variables in above array are allocated on the heap, the rest on the stack.

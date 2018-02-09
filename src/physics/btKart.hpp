@@ -69,10 +69,6 @@ private:
     btScalar            m_damping;
     btVehicleRaycaster *m_vehicleRaycaster;
 
-    /** The zipper speed (i.e. the velocity the kart should reach in
-     *  the first frame that the zipper is active). */
-    btScalar            m_zipper_speed;
-
     /** The angular velocity to be applied when the kart skids.
      *  0 means no skidding. */
     btScalar            m_skid_angular_velocity;
@@ -123,6 +119,15 @@ private:
      *  The physics use this to provide proper wheel contact points
      *  for skid marks. */
     float m_visual_rotation;
+
+    /** Minimum speed for the kart. Used e.g. for zippers. Setting this value
+     *  will potentially instantaneously accelerate the kart to the minimum
+     *  speed requested (in the next physics step). */
+    btScalar m_min_speed;
+
+    /** Maximum speed for the kart. It is reset to -1 at the end of each
+     *  physics steps, so need to be set again by the application. */
+    btScalar m_max_speed;
 
     /** True if the visual wheels touch the ground. */
     bool m_visual_wheels_touch_ground;
@@ -176,8 +181,8 @@ public:
     virtual void       updateFriction(btScalar timeStep);
 public:
     void               setSliding(bool active);
-    void               instantSpeedIncreaseTo(float speed);
-    void               capSpeed(float max_speed);
+    void               instantSpeedIncreaseTo(btScalar speed);
+    void               adjustSpeed(btScalar min_speed, btScalar max_speed);
     void               updateAllWheelPositions();
     // ------------------------------------------------------------------------
     /** Returns true if both rear visual wheels touch the ground. */
@@ -273,10 +278,30 @@ public:
         m_time_additional_rotation = t;
     }   // setTimedTorque
     // ------------------------------------------------------------------------
-    /** Returns the current zipper speed. */
-    float getInstantSpeedIncrease() const { return m_zipper_speed; }
+    /** Sets the maximum speed for this kart. */
+    void setMaxSpeed(float new_max_speed) 
+    {
+        // Only change m_max_speed if it has not been set (<0), or
+        // the new value is smaller than the current maximum. For example,
+        // overworld will set the max_speed to 0 in case of teleporting to
+        // a bubble, but set it again later (based on zipper etc activated).
+        // We need to make sure that the 0 is maintained.
+        if(m_max_speed <0 || m_max_speed > new_max_speed)
+            m_max_speed = new_max_speed;
+    }   // setMaxSpeed
     // ------------------------------------------------------------------------
-    void resetInstantSpeed() { m_zipper_speed = 0;  }
+    /** Resets the maximum so any new maximum value from the application will
+     *  be accepted. */
+    virtual void resetMaxSpeed() { m_max_speed = -1.0f; m_min_speed = 0.0f; }
+    // ------------------------------------------------------------------------
+    /** Sets the minimum speed for this kart. */
+    void setMinSpeed(float s)
+    {
+        if(s > m_min_speed) m_min_speed = s; 
+    }
+    // ------------------------------------------------------------------------
+    /** Returns the minimum speed for this kart. */
+    btScalar getMinSpeed() const { return m_min_speed; }
 };   // class btKart
 
 #endif //BT_KART_HPP

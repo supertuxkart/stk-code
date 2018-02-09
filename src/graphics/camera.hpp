@@ -136,7 +136,7 @@ public:
 
     // ========================================================================
     // Static functions
-    static Camera* createCamera(AbstractKart* kart);
+    static Camera* createCamera(AbstractKart* kart, const int index);
     static void resetAllCameras();
     static void changeCamera(unsigned int camera_index, CameraType type);
 

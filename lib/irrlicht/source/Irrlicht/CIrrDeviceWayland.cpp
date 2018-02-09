@@ -534,23 +534,23 @@ public:
                                        int32_t width, int32_t height,
                                        wl_array* states)
     {
-        void* state_p;
+        //void* state_p;
         
-        wl_array_for_each(state_p, states) 
-        {
-            uint32_t state = *(uint32_t*)state_p;
-            
-            switch (state) 
-            {
-            case ZXDG_TOPLEVEL_V6_STATE_FULLSCREEN:
-            case ZXDG_TOPLEVEL_V6_STATE_MAXIMIZED:
-            case ZXDG_TOPLEVEL_V6_STATE_ACTIVATED:
-            case ZXDG_TOPLEVEL_V6_STATE_RESIZING:
-                break;
-            default:
-                break;
-            }
-        }
+        //wl_array_for_each(state_p, states) 
+        //{
+        //    uint32_t state = *(uint32_t*)state_p;
+        //    
+        //    switch (state) 
+        //    {
+        //    case ZXDG_TOPLEVEL_V6_STATE_FULLSCREEN:
+        //    case ZXDG_TOPLEVEL_V6_STATE_MAXIMIZED:
+        //    case ZXDG_TOPLEVEL_V6_STATE_ACTIVATED:
+        //    case ZXDG_TOPLEVEL_V6_STATE_RESIZING:
+        //        break;
+        //    default:
+        //        break;
+        //    }
+        //}
     }
     
     static void xdg_toplevel_close(void* data, zxdg_toplevel_v6* xdg_toplevel)

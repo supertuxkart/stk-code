@@ -182,7 +182,7 @@ disconnect event and must be explicitly reset.
             break;
            
         case ENET_EVENT_TYPE_DISCONNECT:
-            printf ("%s disconected.\n", event.peer -> data);
+            printf ("%s disconnected.\n", event.peer -> data);
 
             /* Reset the peer's client information. */
 
@@ -204,7 +204,7 @@ Certain flags may also be supplied to enet_packet_create() to control
 various packet features:
 
 ENET_PACKET_FLAG_RELIABLE specifies that the packet must use reliable
-delivery.  A reliable packet is guarenteed to be delivered, and a
+delivery.  A reliable packet is guaranteed to be delivered, and a
 number of retry attempts will be made until an acknowledgement is
 received from the foreign host the packet is sent to. If a certain
 number of retry attempts is reached without any acknowledgement, ENet

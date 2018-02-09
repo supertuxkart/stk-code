@@ -25,7 +25,7 @@ layout(location = 12) in ivec2 i_misc_data;
 
 out vec3 normal;
 out vec2 uv;
-flat out float hue_change;
+out float hue_change;
 
 void main()
 {

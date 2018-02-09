@@ -95,7 +95,7 @@ BareNetworkString* KartRewinder::saveState() const
     buffer->add(body->getLinearVelocity());
     buffer->add(body->getAngularVelocity());
     buffer->addUInt8(m_has_started);   // necessary for startup speed boost
-    buffer->addFloat(m_vehicle->getInstantSpeedIncrease());
+    buffer->addFloat(m_vehicle->getMinSpeed());
 
     // 2) Steering and other player controls
     // -------------------------------------
@@ -151,7 +151,7 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
     // before Moveable::update() is called (which updates the transform)
     setTrans(t);
     m_has_started = buffer->getUInt8()!=0;   // necessary for startup speed boost
-    m_vehicle->instantSpeedIncreaseTo(buffer->getFloat());
+    m_vehicle->setMinSpeed(buffer->getFloat());
 
     // 2) Steering and other controls
     // ------------------------------

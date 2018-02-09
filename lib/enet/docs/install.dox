@@ -12,7 +12,7 @@ by doing the following:
 
 ./configure && make && make install
 
-If you obtained the package from CVS, you must have automake and autoconf
+If you obtained the package from github, you must have automake and autoconf
 available to generate the build system first by doing the following command
 before using the above mentioned build procedure:
 
@@ -26,6 +26,10 @@ When building ENet under Solaris, you must specify the -lsocket and
 is linked in.
 
 @section Windows Microsoft Windows
+
+You may simply use the included "enet.lib" or "enet64.lib" static libraries. 
+However, if you wish to build the library yourself, then the following
+instructions apply:
 
 There is an included MSVC 6 project (enet.dsp) which you may use to
 build a suitable library file. Alternatively, you may simply drag all 

@@ -1779,10 +1779,8 @@ int main(int argc, char *argv[] )
                 race_manager->setupPlayerKartInfo();
                 race_manager->startNew(false);
                 main_loop->run();
-                // well, actually run() will never return, since
-                // it either loops or exits after replaying history (see
-                // history::updateReplayAndGetDT()).
-                // So the next line is just to make this obvious here!
+                // The run() function will only return if the user aborts.
+                Log::flushBuffers();
                 exit(-3);
             }   // if !online
         }

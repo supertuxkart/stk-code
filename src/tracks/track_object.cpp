@@ -349,6 +349,16 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
             }
         }
 
+        bool is_in_shadowpass = true;
+        if (xml_node.get("shadow-pass", &is_in_shadowpass) && glownode)
+        {
+            SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(glownode);
+            if (spmn)
+            {
+                spmn->setInShadowPass(is_in_shadowpass);
+            }
+        }
+
         bool forcedbloom = false;
         if (xml_node.get("forcedbloom", &forcedbloom) && forcedbloom && glownode)
         {

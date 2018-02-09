@@ -561,7 +561,10 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_force_legacy_device
         PARAM_DEFAULT(BoolUserConfigParam(false, "force_legacy_device",
         &m_video_group, "Force OpenGL 2 context, even if OpenGL 3 is available."));
-
+    PARAM_PREFIX BoolUserConfigParam        split_screen_horizontally
+        PARAM_DEFAULT(BoolUserConfigParam(true, "split_screen_horizontally",
+            &m_video_group, "When playing a non-square amount of players (e.g. 2),"
+            " should it split horizontally (top/bottom)"));
     PARAM_PREFIX BoolUserConfigParam        m_texture_compression
         PARAM_DEFAULT(BoolUserConfigParam(true, "enable_texture_compression",
         &m_video_group, "Enable Texture Compression"));
@@ -614,7 +617,6 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(true, "limit_game_fps",
         &m_recording_group, "Limit game framerate not beyond the fps of"
                             " recording video."));
-
     PARAM_PREFIX IntUserConfigParam         m_video_format
         PARAM_DEFAULT(IntUserConfigParam(0, "video_format",
         &m_recording_group, "Specify the video for record, which is the enum"
@@ -743,7 +745,7 @@ namespace UserConfigParams
                             "stun.voxgratia.org",
                             "stun.xten.com") );
 
-	// ---- Gamemode setup
+    // ---- Gamemode setup
     PARAM_PREFIX IntToIntUserConfigParam m_num_karts_per_gamemode
         PARAM_DEFAULT(IntToIntUserConfigParam("num_karts_per_gamemode",
             "The Number of karts per gamemode.",
@@ -845,7 +847,7 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_log_errors_to_console
             PARAM_DEFAULT(  BoolUserConfigParam(
             CONSOLE_DEFAULT, "log_errors", "Enable logging to console.") );
-
+    
     // ---- Camera
     PARAM_PREFIX GroupUserConfigParam        m_camera
             PARAM_DEFAULT( GroupUserConfigParam("camera",

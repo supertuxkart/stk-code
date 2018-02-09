@@ -16,15 +16,19 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/sp/sp_shader.hpp"
+#include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/shader_files_manager.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_uniform_assigner.hpp"
+#include "guiengine/message_queue.hpp"
 #include "utils/string_utils.hpp"
+
+#include <map>
 
 namespace SP
 {
-std::unordered_map<std::string, std::pair<unsigned, SamplerType> >
+const std::map<std::string, std::pair<unsigned, SamplerType> >
     g_prefilled_names =
     {
 #ifdef USE_GLES2
@@ -81,6 +85,13 @@ void SPShader::linkShaderFiles(RenderPass rp)
     }
     if (result == GL_FALSE)
     {
+        if (UserConfigParams::m_artist_debug_mode)
+        {
+            core::stringw err = StringUtils::insertValues(L"Shader %s failed"
+                " to link, check stdout.log or console for details",
+                m_name.c_str());
+            MessageQueue::add(MessageQueue::MT_ERROR, err);
+        }
         glDeleteProgram(m_program[rp]);
         m_program[rp] = 0;
     }
@@ -194,20 +205,49 @@ void SPShader::bindTextures(const std::array<GLuint, 6>& tex,
 }   // bindTextures
 
 // ----------------------------------------------------------------------------
-void SPShader::addUniform(const std::string& name, const std::type_index& ti,
-                          RenderPass rp)
+void SPShader::addAllUniforms(RenderPass rp)
 {
 #ifndef SERVER_ONLY
-    const char* s = name.c_str();
-    GLuint location = glGetUniformLocation(m_program[rp], s);
-    if (location == GL_INVALID_INDEX)
+    GLint total_uniforms;
+    glGetProgramiv(m_program[rp], GL_ACTIVE_UNIFORMS, &total_uniforms);
+    static const std::map<GLenum, std::type_index> supported_types =
+        {
+            { GL_INT, std::type_index(typeid(int)) },
+            { GL_FLOAT, std::type_index(typeid(float)) },
+            { GL_FLOAT_MAT4, std::type_index(typeid(irr::core::matrix4)) },
+            { GL_FLOAT_VEC4, std::type_index(typeid(std::array<float, 4>)) },
+            { GL_FLOAT_VEC3, std::type_index(typeid(irr::core::vector3df)) },
+            { GL_FLOAT_VEC2, std::type_index(typeid(irr::core::vector2df)) }
+        };
+
+    for (int i = 0; i < total_uniforms; i++)
     {
-        Log::warn("SPShader", "Missing uniform %s in shader files.", s);
-        return;
+        GLint size;
+        GLenum type;
+        char name[100] = {};
+        glGetActiveUniform(m_program[rp], i, 99, NULL, &size, &type, name);
+        if (size != 1)
+        {
+            Log::debug("SPShader", "Array of uniforms is not supported in"
+                " shader %s for %s.", m_name.c_str(), name);
+            continue;
+        }
+        auto ret = supported_types.find(type);
+        if (ret == supported_types.end())
+        {
+            Log::debug("SPShader", "%d type not supported", (unsigned)type);
+            continue;
+        }
+        GLuint location = glGetUniformLocation(m_program[rp], name);
+        if (location == GL_INVALID_INDEX)
+        {
+            Log::debug("SPShader", "%s uniform not found", name);
+            continue;
+        }
+        m_uniforms[rp][name] = new SPUniformAssigner(ret->second, location);
     }
-    m_uniforms[rp][name] = new SPUniformAssigner(ti, location);
 #endif
-}   // addUniform
+}   // addAllUniforms
 
 // ----------------------------------------------------------------------------
 void SPShader::setUniformsPerObject(SPPerObjectUniform* sppou,
@@ -271,7 +311,7 @@ void SPShader::unload()
 bool SPShader::isSrgbForTextureLayer(unsigned layer) const
 {
 #ifndef SERVER_ONLY
-    if (!CVS->isDefferedEnabled())
+    if (!CVS->isDeferredEnabled())
     {
         return false;
     }

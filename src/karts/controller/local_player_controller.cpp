@@ -55,16 +55,19 @@
  *  \param init_pos The start coordinates and heading of the kart.
  */
 LocalPlayerController::LocalPlayerController(AbstractKart *kart,
-                                   StateManager::ActivePlayer *player)
+                                   const int local_playerID)
                      : PlayerController(kart), m_sky_particles_emitter(NULL)
 {
-    m_player = player;
-    if(player)
-        player->setKart(kart);
+    
+    m_player = StateManager::get()->getActivePlayer(local_playerID);
+    if(m_player)
+        m_player->setKart(kart);
 
     // Keep a pointer to the camera to remove the need to search for
     // the right camera once per frame later.
-    Camera *camera = Camera::createCamera(kart);
+    
+    Camera *camera = Camera::createCamera(kart, local_playerID);
+    
     m_camera_index = camera->getIndex();
     m_wee_sound    = SFXManager::get()->createSoundSource("wee");
     m_bzzt_sound   = SFXManager::get()->getBuffer("bzzt");
