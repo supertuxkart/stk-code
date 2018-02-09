@@ -1,7 +1,7 @@
 uniform sampler2D diffuse_map;
 uniform sampler2D specular_map;
 uniform sampler2D ssao_tex;
-uniform sampler2D gloss_map;
+uniform sampler2D normal_color;
 uniform sampler2D diffuse_color;
 uniform sampler2D depth_stencil;
 uniform sampler2D light_scatter;
@@ -17,10 +17,11 @@ void main()
     vec2 tc = gl_FragCoord.xy / u_screen;
     vec4 diffuseMatColor = texture(diffuse_color, tc);
 
-    // Gloss map here is stored in red and green for metallic and emit map
-    // Real gloss channel is stored in normal and depth framebuffer .z
-    float metallicMapValue = texture(gloss_map, tc).x;
-    float emitMapValue = texture(gloss_map, tc).y;
+    // Polish map is stored in normal color framebuffer .z
+    // Metallic map is stored in normal color framebuffer .w
+    // Emit map is stored in diffuse color framebuffer.w
+    float metallicMapValue = texture(normal_color, tc).w;
+    float emitMapValue = diffuseMatColor.w;
 
     float ao = texture(ssao_tex, tc).x;
     vec3 DiffuseComponent = texture(diffuse_map, tc).xyz;
@@ -30,8 +31,8 @@ void main()
     vec3 metallicMatColor = mix(vec3(0.04), diffuse_color_for_mix, metallicMapValue);
     vec3 tmp = DiffuseComponent * mix(diffuseMatColor.xyz, vec3(0.0), metallicMapValue) + (metallicMatColor * SpecularComponent);
 
-    vec3 emitCol = diffuseMatColor.xyz * diffuseMatColor.xyz * diffuseMatColor.xyz * 15.;
-    vec4 color_1 = vec4(tmp * ao + (emitMapValue * emitCol), diffuseMatColor.a);
+    vec3 emitCol = diffuseMatColor.xyz + (diffuseMatColor.xyz * diffuseMatColor.xyz * emitMapValue * emitMapValue * 10.0);
+    vec4 color_1 = vec4(tmp * ao + (emitMapValue * emitCol), 1.0);
 
     // Fog
     float depth = texture(depth_stencil, tc).x;

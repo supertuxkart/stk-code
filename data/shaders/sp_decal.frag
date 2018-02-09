@@ -3,8 +3,7 @@ in vec2 uv;
 in vec2 uv_two;
 
 layout(location = 0) out vec4 o_diffuse_color;
-layout(location = 1) out vec3 o_normal_depth;
-layout(location = 2) out vec2 o_gloss_map;
+layout(location = 1) out vec4 o_normal_color;
 
 #stk_include "utils/encode_normal.frag"
 #stk_include "utils/sp_texture_sampling.frag"
@@ -16,12 +15,15 @@ void main(void)
     layer_two_tex.rgb = layer_two_tex.a * layer_two_tex.rgb;
 
     vec3 final_color = layer_two_tex.rgb + color.rgb * (1.0 - layer_two_tex.a);
-    o_diffuse_color = vec4(final_color, 1.0);
 
 #if defined(Advanced_Lighting_Enabled)
     vec4 layer_2 = sampleTextureLayer2(uv);
-    o_normal_depth.xy = 0.5 * EncodeNormal(normalize(normal)) + 0.5;
-    o_normal_depth.z = layer_2.x;
-    o_gloss_map = layer_2.yz;
+    o_diffuse_color = vec4(final_color, layer_2.z);
+
+    o_normal_color.xy = 0.5 * EncodeNormal(normalize(normal)) + 0.5;
+    o_normal_color.zw = layer_2.xy;
+#else
+    o_diffuse_color = vec4(final_color, 1.0);
 #endif
+
 }

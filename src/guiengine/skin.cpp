@@ -1245,6 +1245,8 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
 
     BoxRenderParams* params;
     SpinnerWidget* q = dynamic_cast<SpinnerWidget*>(widget);
+    std::string texture = "squareFocusHalo::neutral";
+    SColorf color_rgb = { 1,1,1,1 };
     if(q->getUseBackgroundColor())
     {
         int player_id=q->getSpinnerWidgetPlayerID();
@@ -1252,17 +1254,9 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         params = &SkinConfig::m_render_params[
             "spinner::deactivated"];
 
-        SColorf color_rgb = GetPlayerColor(player_id);
+        color_rgb = GetPlayerColor(player_id);
 
-        widget->m_skin_r = color_rgb.r * 255.0F;
-        widget->m_skin_g = color_rgb.g * 255.0F;
-        widget->m_skin_b = color_rgb.b * 255.0F;
-
-        if (player_id == 0)
-        {
-            color_rgb = { 1,1,1,1 };
-        }
-
+        texture = "squareFocusHaloBW::neutral";
     }
     else if (widget->m_deactivated)
     {
@@ -1276,6 +1270,10 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     {
         params=&SkinConfig::m_render_params["spinner::neutral"];
     }
+    widget->m_skin_r = color_rgb.r * 255.0f;
+    widget->m_skin_g = color_rgb.g * 255.0f;
+    widget->m_skin_b = color_rgb.b * 255.0f;
+
     for (int i = 1; i < MAX_PLAYER_COUNT + 1; i++) 
     {
         if (widget->isFocusedForPlayer(i - 1)) {
@@ -1287,7 +1285,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
             
             
             drawBoxFromStretchableTexture(widget, rect2,
-                SkinConfig::m_render_params["squareFocusHaloBW::neutral"]);
+                SkinConfig::m_render_params[texture]);
             //TODO add squarefocushalo0
 
         }

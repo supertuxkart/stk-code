@@ -241,7 +241,7 @@ void World::init()
             Camera::createCamera(World::getWorld()->getKart(0), 0);
 
         }   // if server with graphics of is watching replay
-    }   // if getNumCameras()==0
+    } // if getNumCameras()==0
 }   // init
 
 //-----------------------------------------------------------------------------

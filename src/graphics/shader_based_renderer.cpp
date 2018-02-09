@@ -207,16 +207,16 @@ public:
         assignSamplerNames(0, "diffuse_map", ST_NEAREST_FILTERED,
                            1, "specular_map", ST_NEAREST_FILTERED,
                            2, "ssao_tex", ST_NEAREST_FILTERED,
-                           3, "gloss_map", ST_NEAREST_FILTERED,
+                           3, "normal_color", ST_NEAREST_FILTERED,
                            4, "diffuse_color", ST_NEAREST_FILTERED,
                            5, "depth_stencil", ST_NEAREST_FILTERED,
                            6, "light_scatter", ST_NEAREST_FILTERED);
     }   // CombineDiffuseColor
     // ------------------------------------------------------------------------
-    void render(GLuint dm, GLuint sm, GLuint st, GLuint gm, GLuint dc,
+    void render(GLuint dm, GLuint sm, GLuint st, GLuint nt, GLuint dc,
                 GLuint ds, GLuint lt, const std::array<float, 4> & bg_color)
     {
-        setTextureUnits(dm, sm, st, gm, dc, ds, lt);
+        setTextureUnits(dm, sm, st, nt, dc, ds, lt);
         drawFullScreenEffect(bg_color);
     }   // render
 };   // CombineDiffuseColor
@@ -259,10 +259,8 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
     {
         m_rtts->getFBO(FBO_SP).bind();
         float clear_color_empty[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-        float clear_color_gloss[4] = { 0.1f, 0.1f, 0.0f, 0.0f };
         glClearBufferfv(GL_COLOR, 0, clear_color_empty);
         glClearBufferfv(GL_COLOR, 1, clear_color_empty);
-        glClearBufferfv(GL_COLOR, 2, clear_color_gloss);
         glClearBufferfi(GL_DEPTH_STENCIL, 0, 1.0f, 0);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS));
         SP::draw(SP::RP_1ST, SP::DCT_NORMAL);
@@ -352,7 +350,7 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
             m_rtts->getRenderTarget(RTT_DIFFUSE),
             m_rtts->getRenderTarget(RTT_SPECULAR),
             m_rtts->getRenderTarget(RTT_HALF1_R),
-            m_rtts->getRenderTarget(RTT_SP_GLOSS),
+            m_rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
             m_rtts->getRenderTarget(RTT_SP_DIFF_COLOR),
             m_rtts->getDepthStencilTexture(),
             m_rtts->getRenderTarget(RTT_HALF1), !m_skybox ?

@@ -163,15 +163,17 @@ void Camera::setKart(AbstractKart *new_kart)
  */
 void Camera::setupCamera()
 {
-    m_viewport = irr_driver->GetSplitscreenWindow(m_index);
+    m_viewport = irr_driver->getSplitscreenWindow(m_index);
     m_aspect = (float)((float)(m_viewport.getWidth()) / (float)(m_viewport.getHeight()));
 	
     m_scaling = core::vector2df(
         irr_driver->getActualScreenSize().Width / m_viewport.getWidth() , 
         irr_driver->getActualScreenSize().Height / m_viewport.getHeight());
 
-    m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov[race_manager->getNumLocalPlayers() - 1];
-    
+    m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov
+        [race_manager->getNumLocalPlayers() > 0 ?
+        race_manager->getNumLocalPlayers() - 1 : 0];
+
     m_camera->setFOV(m_fov);
     m_camera->setAspectRatio(m_aspect);
     m_camera->setFarValue(Track::getCurrentTrack()->getCameraFar());
