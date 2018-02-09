@@ -182,9 +182,10 @@ void RaceGUIOverworld::renderGlobal(float dt)
     if (race_manager->getIfEmptyScreenSpaceExists() &&
         !GUIEngine::ModalDialog::isADialogActive())
     {
-        const float Sqrt = sqrt(race_manager->getNumLocalPlayers());
-        const int rows = ceil(Sqrt);
-        const int cols = round(Sqrt);
+        const float sqrt_num_players =
+            sqrtf((float)race_manager->getNumLocalPlayers());
+        const int rows = (int)ceil(sqrt_num_players);
+        const int cols = (int)round(sqrt_num_players);
         static video::SColor black = video::SColor(255,0,0,0);
         GL32_draw2DRectangle(black, irr_driver->getSplitscreenWindow(
             race_manager->getNumLocalPlayers()));
