@@ -154,7 +154,14 @@ void RewindQueue::insertRewindInfo(RewindInfo *ri)
 {
     // FIXME: this should always be the last element in the list(??)
     AllTimeStepInfo::iterator bucket = findPreviousTimeStepInfo(ri->getTime());
-    (*bucket)->insert(ri);
+
+    // FIXME: In case of a history replay an element could be inserted in the
+    // very first frame (on very quick recorded start, and if the first frame
+    // takes a long time - e.g. in networking startup), i.e. before a TimeStep
+    // info was added. Since this is mostly for debugging, just ignore this
+    // this for now.
+    if(bucket!=m_time_step_info.end()))
+        (*bucket)->insert(ri);
 }   // insertRewindInfo
 
 // ----------------------------------------------------------------------------
