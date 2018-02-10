@@ -92,6 +92,7 @@
           case (all three normals discarded, the interpolation will just
           return the normal of the triangle (i.e. de facto no interpolation),
           but it helps making smoothing much more useful without fixing tracks.
+      fps: The physics timestep size
       default-track-friction: Default friction to be used for the track and
           any track/library pbject.
       default-moveable-friction: Default friction to be used for any moveable,
@@ -99,6 +100,7 @@
       -->
   <physics smooth-normals="true"
            smooth-angle-limit="0.65"
+           fps="120"
            default-track-friction="0.5"
            default-moveable-friction="0.5" />
 
