@@ -148,7 +148,9 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_replay_dt,                 "replay delta-t"             );
     CHECK_NEG(m_smooth_angle_limit,        "physics smooth-angle-limit" );
     CHECK_NEG(m_default_track_friction,    "physics default-track-friction");
-    CHECK_NEG(m_network_state_frequeny,    "network state-frequency");
+    CHECK_NEG(m_physics_fps,               "physics fps"                );
+    CHECK_NEG(m_network_state_frequeny,    "network state-frequency"    );
+    CHECK_NEG(m_network_state_frequeny,    "network state-frequency"    );
     CHECK_NEG(m_default_moveable_friction, "physics default-moveable-friction");
 
     // Square distance to make distance checks cheaper (no sqrt)
@@ -170,6 +172,7 @@ void STKConfig::init_defaults()
         m_smooth_angle_limit     = m_penalty_time              =
         m_default_track_friction = m_default_moveable_friction =
         UNDEFINED;
+    m_physics_fps                = -100;
     m_bubblegum_counter          = -100;
     m_shield_restrict_weapos     = false;
     m_max_karts                  = -100;
@@ -259,6 +262,7 @@ void STKConfig::getAllData(const XMLNode * root)
         physics_node->get("default-track-friction", &m_default_track_friction);
         physics_node->get("default-moveable-friction",
                                                  &m_default_moveable_friction);
+        physics_node->get("fps",                    &m_physics_fps           );
     }
 
     if (const XMLNode *startup_node= root->getNode("startup"))

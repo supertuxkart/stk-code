@@ -160,7 +160,8 @@ void Physics::update(float dt)
         // of physics step, otherwise the results diverge too much
         max_num_steps = 999;
     }
-    m_dynamics_world->stepSimulation(dt, max_num_steps, 1.0f/120.0f);
+    m_dynamics_world->stepSimulation(dt, max_num_steps,
+                                     1.0f/stk_config->m_physics_fps);
 
     // Now handle the actual collision. Note: flyables can not be removed
     // inside of this loop, since the same flyables might hit more than one
