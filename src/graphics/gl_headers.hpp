@@ -45,6 +45,9 @@ extern "C" {
 #elif defined(USE_GLES2)
 #    define __gl2_h_
 #    include <GLES3/gl3.h>
+#ifndef ANDROID
+#    include <GLES3/gl32.h>
+#endif
 #    include <GLES3/gl3ext.h>
 #    include <GLES2/gl2ext.h>
 #    define glVertexAttribDivisorARB glVertexAttribDivisor

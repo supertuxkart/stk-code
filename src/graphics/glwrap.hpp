@@ -56,9 +56,11 @@ class GPUTimer
     bool initialised;
     unsigned lastResult;
     bool canSubmitQuery;
+    const char* m_name;
 public:
-    GPUTimer();
+    GPUTimer(const char* name);
     unsigned elapsedTimeus();
+    const char* getName() const { return m_name; }
 };
 
 class VertexUtils

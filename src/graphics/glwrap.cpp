@@ -24,6 +24,7 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/sp/sp_base.hpp"
 #include "utils/profiler.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/string_utils.hpp"
@@ -191,6 +192,15 @@ void initGL()
 
 ScopedGPUTimer::ScopedGPUTimer(GPUTimer &t) : timer(t)
 {
+#ifndef ANDROID
+    if (SP::sp_apitrace)
+    {
+        std::string msg = timer.getName();
+        msg += " begin";
+        glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 100,
+            GL_DEBUG_SEVERITY_NOTIFICATION, -1, msg.c_str());
+    }
+#endif
     if (!UserConfigParams::m_profiler_enabled) return;
     if (profiler.isFrozen()) return;
     if (!timer.canSubmitQuery) return;
@@ -205,6 +215,15 @@ ScopedGPUTimer::ScopedGPUTimer(GPUTimer &t) : timer(t)
 }
 ScopedGPUTimer::~ScopedGPUTimer()
 {
+#ifndef ANDROID
+    if (SP::sp_apitrace)
+    {
+        std::string msg = timer.getName();
+        msg += " end";
+        glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 100,
+            GL_DEBUG_SEVERITY_NOTIFICATION, -1, msg.c_str());
+    }
+#endif
     if (!UserConfigParams::m_profiler_enabled) return;
     if (profiler.isFrozen()) return;
     if (!timer.canSubmitQuery) return;
@@ -214,7 +233,8 @@ ScopedGPUTimer::~ScopedGPUTimer()
 #endif
 }
 
-GPUTimer::GPUTimer() : initialised(false), lastResult(0), canSubmitQuery(true)
+GPUTimer::GPUTimer(const char* name)
+        : initialised(false), lastResult(0), canSubmitQuery(true), m_name(name)
 {
 }
 

@@ -281,6 +281,7 @@ public:
     void                  printRenderStats();
     void                  requestScreenshot();
     class GPUTimer        &getGPUTimer(unsigned);
+    const char*           getGPUQueryPhaseName(unsigned);
 
 #ifndef SERVER_ONLY
     std::unique_ptr<RenderTarget> createRenderTarget(const irr::core::dimension2du &dimension,

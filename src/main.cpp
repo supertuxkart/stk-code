@@ -189,6 +189,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/referee.hpp"
+#include "graphics/sp/sp_base.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/dialog_queue.hpp"
@@ -630,6 +631,9 @@ void cmdLineHelp()
     "                           Takes precedence over trilinear or bilinear\n"
     "                           texture filtering.\n"
     "       --shadows=n         Set resolution of shadows (0 to disable).\n"
+    "       --apitrace          This will disable buffer storage and\n"
+    "                           writing gpu query strings to opengl, which\n"
+    "                           can be seen later in apitrace.\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
     "https://supertuxkart.net\n\n",
@@ -708,6 +712,12 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
     if(CommandLine::has("--online"))
         MainMenuScreen::m_enable_online=true;
+#ifndef ANDROID
+    if(CommandLine::has("--apitrace"))
+    {
+        SP::sp_apitrace = true;
+    }
+#endif
 
     std::string s;
     if(CommandLine::has("--stk-config", &s))
