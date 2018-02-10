@@ -172,7 +172,7 @@ IrrDriver::IrrDriver()
 #ifndef SERVER_ONLY
     for (unsigned i = 0; i < Q_LAST; i++)
     {
-         m_perf_query[i] = new GPUTimer(m_perf_query_phase[i]);
+        m_perf_query[i] = new GPUTimer(m_perf_query_phase[i]);
     }
 #endif
 }   // IrrDriver
@@ -191,7 +191,7 @@ IrrDriver::~IrrDriver()
 #ifndef SERVER_ONLY
     for (unsigned i = 0; i < Q_LAST; i++)
     {
-         delete m_perf_query[i];
+        delete m_perf_query[i];
     }
 #endif
     assert(m_device != NULL);
@@ -203,8 +203,12 @@ IrrDriver::~IrrDriver()
 // ----------------------------------------------------------------------------
 const char* IrrDriver::getGPUQueryPhaseName(unsigned q)
 {
+#ifndef SERVER_ONLY
     assert(q < Q_LAST);
     return m_perf_query_phase[q];
+#else
+    return "";
+#endif
 }   // getGPUQueryPhaseName
 
 // ----------------------------------------------------------------------------

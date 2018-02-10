@@ -712,7 +712,7 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
     if(CommandLine::has("--online"))
         MainMenuScreen::m_enable_online=true;
-#ifndef ANDROID
+#if !(defined(SERVER_ONLY) || defined(ANDROID))
     if(CommandLine::has("--apitrace"))
     {
         SP::sp_apitrace = true;
