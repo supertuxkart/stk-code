@@ -62,6 +62,7 @@ MainLoop::~MainLoop()
  */
 float MainLoop::getLimitedDt()
 {
+    m_prev_time = m_curr_time;
     float dt = 0;
     // If we are doing a replay, use the dt from the history file
     if (World::getWorld() && history->replayHistory() )
@@ -79,7 +80,6 @@ float MainLoop::getLimitedDt()
     }
 
     IrrlichtDevice* device = irr_driver->getDevice();
-    m_prev_time = m_curr_time;
 
     while( 1 )
     {
@@ -227,82 +227,69 @@ void MainLoop::run()
     IrrlichtDevice* device = irr_driver->getDevice();
 
     m_curr_time = device->getTimer()->getRealTime();
+    // DT keeps track of the leftover time, since the race update
+    // happens in fixed timesteps
+    float left_over_time = 0;
     while(!m_abort)
     {
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
 
-        m_prev_time = m_curr_time;
-        float dt   = getLimitedDt();
+        left_over_time += getLimitedDt();
+        int num_steps   = int(left_over_time * stk_config->m_physics_fps);
+        float dt        = 1.0f / stk_config->m_physics_fps;
+        left_over_time -= num_steps * dt ;
 
         if (!m_abort && !ProfileWorld::isNoGraphics())
         {
+            float frame_duration = num_steps * dt;
+
             // Render the previous frame, and also handle all user input.
             PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
-            irr_driver->update(dt);
+            irr_driver->update(frame_duration);
             PROFILER_POP_CPU_MARKER();
-        }
 
-        if (World::getWorld())  // race is active if world exists
-        {
-            PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
-            updateRace(dt);
-            PROFILER_POP_CPU_MARKER();
-        }   // if race is active
-
-        // We need to check again because update_race may have requested
-        // the main loop to abort; and it's not a good idea to continue
-        // since the GUI engine is no more to be called then.
-        // Also only do music, input, and graphics update if graphics are
-        // enabled.
-        if (!m_abort && !ProfileWorld::isNoGraphics())
-        {
             PROFILER_PUSH_CPU_MARKER("Input/GUI", 0x7F, 0x00, 0x00);
-            input_manager->update(dt);
-
-            #ifdef ENABLE_WIIUSE
-                wiimote_manager->update();
-            #endif
-            
-            GUIEngine::update(dt);
+#ifdef ENABLE_WIIUSE
+            wiimote_manager->update();
+#endif
+            input_manager->update(frame_duration);
+            GUIEngine::update(frame_duration);
             PROFILER_POP_CPU_MARKER();
 
-            // Update sfx and music after graphics, so that graphics code
-            // can use as many threads as possible without interfering
-            // with audio
             PROFILER_PUSH_CPU_MARKER("Music", 0x7F, 0x00, 0x00);
             SFXManager::get()->update();
             PROFILER_POP_CPU_MARKER();
 
-            PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
-            if (STKHost::existHost())
-            {
-                if (STKHost::get()->requestedShutdown())
-                    STKHost::get()->shutdown();
-                else
-                    ProtocolManager::getInstance()->update(dt);
-            }
-            PROFILER_POP_CPU_MARKER();
-
             PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
-            Online::RequestManager::get()->update(dt);
+            Online::RequestManager::get()->update(frame_duration);
             PROFILER_POP_CPU_MARKER();
         }
-        else if (!m_abort && ProfileWorld::isNoGraphics())
+
+        for(int i=0; i<num_steps; i++)
         {
-            PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
-            if(NetworkConfig::get()->isNetworking())
+            PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
+            if (World::getWorld()) updateRace(dt);
+            PROFILER_POP_CPU_MARKER();
+
+            // We need to check again because update_race may have requested
+            // the main loop to abort; and it's not a good idea to continue
+            // since the GUI engine is no more to be called then.
+            if (m_abort) break;
+
+            if (!ProfileWorld::isNoGraphics() && STKHost::existHost() &&
+                STKHost::get()->requestedShutdown())
+            {
+                STKHost::get()->shutdown();
+            }
+
+            PROFILER_PUSH_CPU_MARKER("Protocol manager update", 
+                                     0x7F, 0x00, 0x7F);
+            if (NetworkConfig::get()->isNetworking())
                 ProtocolManager::getInstance()->update(dt);
             PROFILER_POP_CPU_MARKER();
 
-            PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
-            Online::RequestManager::get()->update(dt);
-            PROFILER_POP_CPU_MARKER();
-        }
-
-        if (World::getWorld() )
-        {
-            World::getWorld()->updateTime(dt);
-        }
+            if (World::getWorld()) World::getWorld()->updateTime(dt);
+        }   // while dt > time_step_size
 
         PROFILER_POP_CPU_MARKER();
         PROFILER_SYNC_FRAME();
