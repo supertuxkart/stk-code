@@ -897,6 +897,13 @@ void IrrDriver::applyResolutionSettings()
     SharedGPUObjects::reset();
     initDevice();
 
+#ifndef SERVER_ONLY
+    for (unsigned i = 0; i < Q_LAST; i++)
+    {
+        m_perf_query[i]->reset();
+    }
+#endif
+
     font_manager = new FontManager();
     font_manager->loadFonts();
     // Re-init GUI engine

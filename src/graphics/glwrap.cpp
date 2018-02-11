@@ -263,8 +263,9 @@ ScopedGPUTimer::~ScopedGPUTimer()
 }
 
 GPUTimer::GPUTimer(const char* name)
-        : initialised(false), lastResult(0), canSubmitQuery(true), m_name(name)
+        : m_name(name)
 {
+    reset();
 }
 
 unsigned GPUTimer::elapsedTimeus()

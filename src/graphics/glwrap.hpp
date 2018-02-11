@@ -61,6 +61,12 @@ public:
     GPUTimer(const char* name);
     unsigned elapsedTimeus();
     const char* getName() const { return m_name; }
+    void reset()
+    {
+        initialised = false;
+        lastResult = 0;
+        canSubmitQuery = true;
+    }
 };
 
 class VertexUtils
