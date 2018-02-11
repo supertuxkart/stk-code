@@ -157,6 +157,17 @@ debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei le
 }
 #endif
 
+#ifdef USE_GLES2
+GL_APICALL void(*GL_APIENTRY glDebugMessageControl)(GLenum source, GLenum type,
+    GLenum severity, GLsizei count, const GLuint *ids, GLboolean enabled);
+GL_APICALL void(*GL_APIENTRY glDebugMessageInsert)(GLenum source, GLenum type,
+    GLuint id, GLenum severity, GLsizei length, const char *message);
+
+#define GL_DEBUG_SOURCE_APPLICATION 0x824A
+#define GL_DEBUG_TYPE_MARKER 0x8268
+#define GL_DEBUG_SEVERITY_NOTIFICATION 0x826B
+#endif
+
 void initGL()
 {
     if (is_gl_init)
@@ -187,6 +198,24 @@ void initGL()
 #ifdef ARB_DEBUG_OUTPUT
     if (glDebugMessageCallbackARB)
         glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
+#endif
+
+#ifndef ANDROID
+    if (SP::sp_apitrace && hasGLExtension("GL_KHR_debug"))
+    {
+#ifdef USE_GLES2
+        glDebugMessageControl = (void(GL_APIENTRY*)(GLenum, GLenum, GLenum, GLsizei,
+            const GLuint*, GLboolean))eglGetProcAddress("glDebugMessageControlKHR");
+        glDebugMessageInsert = (void(GL_APIENTRY*)(GLenum, GLenum, GLuint, GLenum,
+            GLsizei, const char*))eglGetProcAddress("glDebugMessageInsertKHR");
+        assert(glDebugMessageControl && glDebugMessageInsert);
+#endif
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+    }
+    else
+    {
+        SP::sp_apitrace = false;
+    }
 #endif
 }
 

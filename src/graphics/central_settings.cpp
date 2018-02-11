@@ -256,16 +256,11 @@ void CentralVideoSettings::init()
             }
         }
 #ifndef ANDROID
-        if (SP::sp_apitrace && hasGLExtension("GL_KHR_debug"))
+        if (SP::sp_apitrace)
         {
             Log::info("IrrDriver", "Writing GPU query strings to apitrace and"
                 " disable buffer storage");
             hasBufferStorage = false;
-            glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-        }
-        else
-        {
-            SP::sp_apitrace = false;
         }
 #endif
     }
