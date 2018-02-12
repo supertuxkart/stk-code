@@ -138,16 +138,25 @@ void Log::printMessage(int level, const char *component, const char *format,
 
     static const char *names[] = { "debug", "verbose  ", "info   ",
                                   "warn   ", "error  ", "fatal  " };
-    const int MAX_LENGTH = 2048;
+    const int MAX_LENGTH = 4096;
     char line[MAX_LENGTH + 1];
     int index = 0;
-    if (!m_prefix.empty())
-        index += snprintf(line+index, MAX_LENGTH-index, "%s ", m_prefix.c_str());
+    int remaining = MAX_LENGTH;
 
-    index += snprintf (line + index, MAX_LENGTH - index, "[%s] %s: ", names[level], component);
-    index += vsnprintf(line + index, MAX_LENGTH - index, format, args);
+    if (!m_prefix.empty())
+    {
+        index += snprintf(line+index, remaining, "%s ", m_prefix.c_str());
+        remaining = MAX_LENGTH - index > 0 ? MAX_LENGTH - index : 0;
+    }
+
+    index += snprintf (line + index, remaining, "[%s] %s: ", names[level], component);
+    remaining = MAX_LENGTH - index > 0 ? MAX_LENGTH - index : 0;
+    index += vsnprintf(line + index, remaining, format, args);
+    remaining = MAX_LENGTH - index > 0 ? MAX_LENGTH - index : 0;
     va_end(args);
-    index = snprintf (line + index, MAX_LENGTH - index, "\n");
+
+    index = index > MAX_LENGTH - 1 ? MAX_LENGTH - 1 : index;
+    sprintf(line + index, "\n");
 
     // If the data is not buffered, immediately print it:
     if (m_buffer_size <= 1)
