@@ -233,19 +233,27 @@ void IrrDriver::updateConfigIfRelevant()
 core::recti IrrDriver::getSplitscreenWindow(int WindowNum) 
 {
     const int playernum = race_manager->getNumLocalPlayers();
-    const float playernum_sqrt = sqrt(playernum);
+    const float playernum_sqrt = sqrtf((float)playernum);
     
-    int rows = UserConfigParams::split_screen_horizontally ? ceil(playernum_sqrt) : round(playernum_sqrt);
-    int cols = UserConfigParams::split_screen_horizontally ? round(playernum_sqrt) : ceil(playernum_sqrt);
+    int rows = int(  UserConfigParams::split_screen_horizontally
+                   ? ceil(playernum_sqrt)
+                   : round(playernum_sqrt)                       );
+    int cols = int(  UserConfigParams::split_screen_horizontally
+                   ? round(playernum_sqrt)
+                   : ceil(playernum_sqrt)                        );
     
     if (rows == 0){rows = 1;}
     if (cols == 0) {cols = 1;}
     //This could add a bit of overhang
-    const int width_of_space = ceil((float)irr_driver->getActualScreenSize().Width / (float)cols);
-    const int height_of_space = ceil((float)irr_driver->getActualScreenSize().Height / (float)rows);
+    const int width_of_space =
+        int(ceil(   (float)irr_driver->getActualScreenSize().Width
+                  / (float)cols)                                  );
+    const int height_of_space =
+        int (ceil(  (float)irr_driver->getActualScreenSize().Height
+                  / (float)rows)                                   );
 
     const int x_grid_Position = WindowNum % cols;
-    const int y_grid_Position = floor((WindowNum) / cols);
+    const int y_grid_Position = int(floor((WindowNum) / cols));
     int wid = (int)irr_driver->getActualScreenSize().Width;
 
 //To prevent the viewport going over the right side, we use std::min to ensure the right corners are never larger than the total width
