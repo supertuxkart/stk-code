@@ -4,7 +4,7 @@
     <spreading angle="8"          />
     
     <velocity  x="0.0"
-               y="0.006"
+               y="0.008"
                z="-0.015"         />
     
     <material  file="skid-particle1.png"  />
