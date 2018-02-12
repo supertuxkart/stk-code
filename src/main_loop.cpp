@@ -45,9 +45,10 @@ MainLoop* main_loop = 0;
 MainLoop::MainLoop() :
 m_abort(false)
 {
-    m_curr_time = 0;
-    m_prev_time = 0;
-    m_throttle_fps = true;
+    m_curr_time       = 0;
+    m_prev_time       = 0;
+    m_throttle_fps    = true;
+    m_is_last_substep = false;
 }  // MainLoop
 
 //-----------------------------------------------------------------------------
@@ -232,6 +233,7 @@ void MainLoop::run()
     float left_over_time = 0;
     while(!m_abort)
     {
+        m_is_last_substep = false;
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
 
         left_over_time += getLimitedDt();
@@ -267,6 +269,9 @@ void MainLoop::run()
 
         for(int i=0; i<num_steps; i++)
         {
+            // Enable last substep in last iteration
+            m_is_last_substep = (i == num_steps - 1);
+
             PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
             if (World::getWorld()) updateRace(dt);
             PROFILER_POP_CPU_MARKER();
@@ -290,7 +295,7 @@ void MainLoop::run()
 
             if (World::getWorld()) World::getWorld()->updateTime(dt);
         }   // while dt > time_step_size
-
+        m_is_last_substep = false;
         PROFILER_POP_CPU_MARKER();
         PROFILER_SYNC_FRAME();
     }  // while !m_abort

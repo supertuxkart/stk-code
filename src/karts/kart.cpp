@@ -60,6 +60,7 @@
 #include "karts/max_speed.hpp"
 #include "karts/rescue_animation.hpp"
 #include "karts/skidding.hpp"
+#include "main_loop.hpp"
 #include "modes/overworld.hpp"
 #include "modes/soccer_world.hpp"
 #include "modes/world.hpp"
@@ -1755,7 +1756,7 @@ void Kart::handleMaterialSFX(const Material *material)
 
     // terrain sound is not necessarily a looping sound so check its status before
     // setting its speed, to avoid 'ressuscitating' sounds that had already stopped
-    if(m_terrain_sound &&
+    if(m_terrain_sound && main_loop->isLstSubstep() &&
       (m_terrain_sound->getStatus()==SFXBase::SFX_PLAYING ||
        m_terrain_sound->getStatus()==SFXBase::SFX_PAUSED))
     {
@@ -2387,10 +2388,13 @@ void Kart::updatePhysics(float dt)
  */
 void Kart::updateEngineSFX(float dt)
 {
-    // when going faster, use higher pitch for engine
-    if(!m_engine_sound || !SFXManager::get()->sfxAllowed())
+    // Only update SFX during the last substep (otherwise too many SFX commands
+    // in one frame), and if sfx are enabled
+    if(!m_engine_sound || !SFXManager::get()->sfxAllowed() ||
+        !main_loop->isLstSubstep()                              )
         return;
 
+    // when going faster, use higher pitch for engine
     if(isOnGround())
     {
         float max_speed = m_kart_properties->getEngineMaxSpeed();
