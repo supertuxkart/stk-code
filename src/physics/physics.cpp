@@ -151,17 +151,10 @@ void Physics::update(float dt)
     // of objects.
     m_all_collisions.clear();
 
-    // Maximum of three substeps. This will work for framerate down to
-    // 20 FPS (bullet default frequency is 60 HZ).
-    int max_num_steps = 6;
-    if (NetworkConfig::get()->isNetworking())
-    {
-        // In networking we have to make sure that we run the right number
-        // of physics step, otherwise the results diverge too much
-        max_num_steps = 999;
-    }
-    m_dynamics_world->stepSimulation(dt, max_num_steps,
-                                     1.0f/stk_config->m_physics_fps);
+    // Since the world update (which calls physics update) is called at the
+    // fixed frequency necessary for the physics update, we need to do exactly
+    // one physic step only.
+    m_dynamics_world->stepSimulation(dt, 1, 1.0f / stk_config->m_physics_fps);
 
     // Now handle the actual collision. Note: flyables can not be removed
     // inside of this loop, since the same flyables might hit more than one

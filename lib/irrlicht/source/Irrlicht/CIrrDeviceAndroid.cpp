@@ -575,7 +575,8 @@ s32 CIrrDeviceAndroid::handleKeyboard(AInputEvent* androidEvent)
 	int32_t keyAction = AKeyEvent_getAction(androidEvent);
 	int32_t keyMetaState = AKeyEvent_getMetaState(androidEvent);
 	int32_t keyRepeat = AKeyEvent_getRepeatCount(androidEvent);
-
+	int32_t scanCode = AKeyEvent_getScanCode(androidEvent);
+	
 	if (keyAction == AKEY_EVENT_ACTION_DOWN)
 	{
 		event.KeyInput.PressedDown = true;
@@ -609,22 +610,28 @@ s32 CIrrDeviceAndroid::handleKeyboard(AInputEvent* androidEvent)
 	{
 		getKeyChar(event);
 	}
+	
+	// If button doesn't return key code, then at least use device-specific
+	// scan code, because it's better than nothing
+	if (event.KeyInput.Key == 0)
+	{
+		event.KeyInput.Key = (EKEY_CODE)scanCode;
+	}
 
 	// Handle an event when back button in pressed just like an escape key
 	// and also avoid repeating the event to avoid some strange behaviour
-	if (event.KeyInput.SystemKeyCode == AKEYCODE_BACK)
+	if (event.KeyInput.SystemKeyCode == AKEYCODE_BACK &&
+		(event.KeyInput.PressedDown == false || keyRepeat > 0))
 	{
-		status = 1;
-		
-		if (event.KeyInput.PressedDown == false || keyRepeat > 0)
-		{
-			ignore_event = true;
-		}
+		ignore_event = true;
 	}
 
-	// Mark escape key event as handled by application to avoid receiving
-	// AKEYCODE_BACK key event
-	if (event.KeyInput.SystemKeyCode == AKEYCODE_ESCAPE)
+	// Mark escape key and gamepad buttons as handled by application to avoid 
+	// receiving duplicated events
+	if (event.KeyInput.SystemKeyCode == AKEYCODE_ESCAPE ||
+		event.KeyInput.SystemKeyCode == AKEYCODE_BACK ||
+		(event.KeyInput.SystemKeyCode >= AKEYCODE_BUTTON_A &&
+		event.KeyInput.SystemKeyCode <= AKEYCODE_BUTTON_MODE))
 	{
 		status = 1;
 	}
@@ -740,25 +747,30 @@ s32 CIrrDeviceAndroid::handleGamepad(AInputEvent* androidEvent)
 		int32_t keyCode = AKeyEvent_getKeyCode(androidEvent);
 		int32_t keyAction = AKeyEvent_getAction(androidEvent);
 		int32_t keyRepeat = AKeyEvent_getRepeatCount(androidEvent);
+		int32_t scanCode = AKeyEvent_getScanCode(androidEvent);
 		
-		SEvent event;
-		event.EventType = EET_KEY_INPUT_EVENT;
-		event.KeyInput.Char = 0;
-		event.KeyInput.PressedDown = (keyAction == AKEY_EVENT_ACTION_DOWN);
-		event.KeyInput.Shift = false;
-		event.KeyInput.Control = false;
-		event.KeyInput.SystemKeyCode = (u32)keyCode;
-		event.KeyInput.Key = KeyMap[keyCode];
-		
-		// Handle an event when back button in pressed just like an escape key
-		// and also avoid repeating the event to avoid some strange behaviour
-		if (event.KeyInput.SystemKeyCode == AKEYCODE_BACK)
+		if (keyRepeat == 0)
 		{
-			status = 1;
-			ignore = (event.KeyInput.PressedDown == false || keyRepeat > 0);
+			bool ignore_event = false;
+			
+			SEvent event;
+			event.EventType = EET_KEY_INPUT_EVENT;
+			event.KeyInput.Char = 0;
+			event.KeyInput.PressedDown = (keyAction == AKEY_EVENT_ACTION_DOWN);
+			event.KeyInput.Shift = false;
+			event.KeyInput.Control = false;
+			event.KeyInput.SystemKeyCode = (u32)keyCode;
+			event.KeyInput.Key = KeyMap[keyCode];
+			
+			if (event.KeyInput.Key == 0)
+			{
+				event.KeyInput.Key = (EKEY_CODE)scanCode;
+			}
+			
+			postEventFromUser(event);
 		}
 		
-		postEventFromUser(event);
+		status = 1;
 		break;
 	}
 	default:
@@ -874,7 +886,7 @@ void CIrrDeviceAndroid::createKeyMap()
 
 	// following look like controller inputs
 	KeyMap[AKEYCODE_BUTTON_A] = IRR_KEY_RETURN; 
-	KeyMap[AKEYCODE_BUTTON_B] = IRR_KEY_BACK; 
+	KeyMap[AKEYCODE_BUTTON_B] = IRR_KEY_ESCAPE; 
 	KeyMap[AKEYCODE_BUTTON_C] = IRR_KEY_2; 
 	KeyMap[AKEYCODE_BUTTON_X] = IRR_KEY_3; 
 	KeyMap[AKEYCODE_BUTTON_Y] = IRR_KEY_4; 
@@ -886,7 +898,7 @@ void CIrrDeviceAndroid::createKeyMap()
 	KeyMap[AKEYCODE_BUTTON_THUMBL] = IRR_KEY_RETURN; 
 	KeyMap[AKEYCODE_BUTTON_THUMBR] = IRR_KEY_RETURN;  
 	KeyMap[AKEYCODE_BUTTON_START] = IRR_KEY_RETURN; 
-	KeyMap[AKEYCODE_BUTTON_SELECT] = IRR_KEY_BACK; 
+	KeyMap[AKEYCODE_BUTTON_SELECT] = IRR_KEY_ESCAPE; 
 	KeyMap[AKEYCODE_BUTTON_MODE] = IRR_KEY_MENU; 
 
 	KeyMap[AKEYCODE_ESCAPE] = IRR_KEY_ESCAPE; 

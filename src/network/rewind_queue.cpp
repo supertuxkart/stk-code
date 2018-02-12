@@ -160,7 +160,7 @@ void RewindQueue::insertRewindInfo(RewindInfo *ri)
     // takes a long time - e.g. in networking startup), i.e. before a TimeStep
     // info was added. Since this is mostly for debugging, just ignore this
     // this for now.
-    if(bucket!=m_time_step_info.end()))
+    if(bucket!=m_time_step_info.end())
         (*bucket)->insert(ri);
 }   // insertRewindInfo
 

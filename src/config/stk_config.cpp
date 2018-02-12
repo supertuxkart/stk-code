@@ -150,7 +150,6 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_default_track_friction,    "physics default-track-friction");
     CHECK_NEG(m_physics_fps,               "physics fps"                );
     CHECK_NEG(m_network_state_frequeny,    "network state-frequency"    );
-    CHECK_NEG(m_network_state_frequeny,    "network state-frequency"    );
     CHECK_NEG(m_default_moveable_friction, "physics default-moveable-friction");
 
     // Square distance to make distance checks cheaper (no sqrt)

@@ -34,6 +34,10 @@ private:
     /** True if the frame rate should be throttled. */
     bool m_throttle_fps;
 
+    /** True during the last substep of the inner main loop (where world
+     *  is updated). Used to reduce amount of updates (e.g. sfx positions
+      * etc). */
+    bool     m_is_last_substep;
     Uint32   m_curr_time;
     Uint32   m_prev_time;
     float    getLimitedDt();
@@ -47,6 +51,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if STK is to be stoppe. */
     bool isAborted() const { return m_abort; }
+    // ------------------------------------------------------------------------
+    /** Returns if this is the last substep. Used to reduce the amount
+     *  of updates (e.g. to sfx position) to once per rendered frame. */
+    bool isLstSubstep() const { return m_is_last_substep; }
 };   // MainLoop
 
 extern MainLoop* main_loop;
