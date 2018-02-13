@@ -53,6 +53,10 @@ void KartColorSliderDialog::beforeAddingWidgets()
     Widget* kart_screen = getWidget<Widget>("kart-screen");
     m_model_view = getWidget<ModelViewWidget>("model");
 
+    const core::dimension2du screen_size = irr_driver->getActualScreenSize();
+    bool need_hd_rtt = (screen_size.Width > 1280 || screen_size.Height > 1280);
+    m_model_view->setRTTSize(need_hd_rtt ? 1024 : 512);
+
     const KartProperties* props =
         kart_properties_manager->getKart(UserConfigParams::m_default_kart);
     if (props == NULL)
