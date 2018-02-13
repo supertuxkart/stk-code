@@ -32,7 +32,7 @@ using namespace GUIEngine;
 
 // ----------------------------------------------------------------------------
 KartColorSliderDialog::KartColorSliderDialog(PlayerProfile* pp)
-                     : ModalDialog(0.75f, 0.75f, MODAL_DIALOG_LOCATION_BOTTOM)
+                     : ModalDialog(0.75f, 0.75f, MODAL_DIALOG_LOCATION_CENTER)
 {
     loadFromFile("kart_color_slider.stkgui");
     m_player_profile = pp;
@@ -45,19 +45,13 @@ KartColorSliderDialog::KartColorSliderDialog(PlayerProfile* pp)
 // ----------------------------------------------------------------------------
 KartColorSliderDialog::~KartColorSliderDialog()
 {
-    if (m_model_view->getIrrlichtElement() != NULL)
-    {
-        m_model_view->getIrrlichtElement()->remove();
-    }
 }   // ~KartColorSliderDialog
 
 // ----------------------------------------------------------------------------
 void KartColorSliderDialog::beforeAddingWidgets()
 {
     Widget* kart_screen = getWidget<Widget>("kart-screen");
-    m_model_view = new ModelViewWidget(
-        irr_driver->getActualScreenSize().Height > 1280 ||
-        irr_driver->getActualScreenSize().Width > 1280 ? 1024 : 512);
+    m_model_view = getWidget<ModelViewWidget>("model");
 
     const KartProperties* props =
         kart_properties_manager->getKart(UserConfigParams::m_default_kart);
@@ -128,9 +122,6 @@ void KartColorSliderDialog::beforeAddingWidgets()
 
     m_model_view->setRotateContinuously(35.0f);
     m_model_view->update(0);
-    kart_screen->getChildren().push_back(m_model_view);
-    m_model_view->move(kart_screen->m_w / 2, kart_screen->m_h / 2,
-        kart_screen->m_w / 2, kart_screen->m_w / 2);
 }   // beforeAddingWidgets
 
 // ----------------------------------------------------------------------------
