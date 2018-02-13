@@ -243,6 +243,8 @@ void RewindManager::playEventsTill(float time, float *dt)
         Physics::getInstance()->getPhysicsWorld()->resetLocalTime();
     }
 
+    if (m_rewind_queue.isEmpty()) return;
+
     // This is necessary to avoid that rewinding an event will store the 
     // event again as a seemingly new event.
     assert(!m_is_rewinding);
