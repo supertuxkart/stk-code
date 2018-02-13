@@ -50,7 +50,6 @@ KartColorSliderDialog::~KartColorSliderDialog()
 // ----------------------------------------------------------------------------
 void KartColorSliderDialog::beforeAddingWidgets()
 {
-    Widget* kart_screen = getWidget<Widget>("kart-screen");
     m_model_view = getWidget<ModelViewWidget>("model");
 
     const core::dimension2du screen_size = irr_driver->getActualScreenSize();

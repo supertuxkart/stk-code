@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <div x="2%" y="5%" width="96%" height="90%" layout="vertical-row">
-        <div id="kart-screen" layout="horizontal-row" width="100%" height="60%" proportion="10" align="center">
+    <div x="2%" y="0%" width="96%" height="95%" layout="vertical-row">
+        <div id="kart-screen" layout="horizontal-row" width="100%" proportion="1" align="center">
             <model id="model" width="100%" layout="horizontal-row" height="100%">
             </model>
         </div>
@@ -9,7 +9,7 @@
             width="100%" text_align="center" word_wrap="true"
             I18N="In the kart color slider dialog"/>
         <spacer height="30" width="10"/>
-        <div proportion="1" width="100%" layout="horizontal-row">
+        <div height="fit" width="100%" layout="horizontal-row">
             <gauge id="color-slider" min_value="0" max_value="100" proportion="1"/>
         </div>
         <spacer height="30" width="10"/>
