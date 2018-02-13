@@ -58,7 +58,7 @@ void* ProtocolManager::mainLoop(void* data)
         PROFILER_POP_CPU_MARKER();
     }
     return NULL;
-}   // protocolManagerAsynchronousUpdate
+}   // mainLoop
 
 
 // ----------------------------------------------------------------------------
