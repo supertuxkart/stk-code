@@ -303,16 +303,6 @@ void MainLoop::run()
             SFXManager::get()->update();
             PROFILER_POP_CPU_MARKER();
 
-            PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
-            if (STKHost::existHost())
-            {
-                if (STKHost::get()->requestedShutdown())
-                    STKHost::get()->shutdown();
-                else
-                    ProtocolManager::getInstance()->update(dt);
-            }
-            PROFILER_POP_CPU_MARKER();
-
             PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
             Online::RequestManager::get()->update(frame_duration);
             PROFILER_POP_CPU_MARKER();
@@ -333,20 +323,22 @@ void MainLoop::run()
             // since the GUI engine is no more to be called then.
             if (m_abort) break;
 
-            if (!ProfileWorld::isNoGraphics() && STKHost::existHost() &&
-                STKHost::get()->requestedShutdown()                      )
+            if (STKHost::existHost())
             {
-                STKHost::get()->shutdown();
-            }
+                if (!ProfileWorld::isNoGraphics()      &&
+                    STKHost::get()->requestedShutdown()  )
+                {
+                    STKHost::get()->shutdown();
+                }
 
-            PROFILER_PUSH_CPU_MARKER("Protocol manager update", 
-                                     0x7F, 0x00, 0x7F);
-            if (NetworkConfig::get()->isNetworking())
+                PROFILER_PUSH_CPU_MARKER("Protocol manager update",
+                                         0x7F, 0x00, 0x7F);
                 ProtocolManager::getInstance()->update(dt);
-            PROFILER_POP_CPU_MARKER();
-
+                PROFILER_POP_CPU_MARKER();
+            }
             if (World::getWorld()) World::getWorld()->updateTime(dt);
         }   // for i < num_steps
+
         m_is_last_substep = false;
         PROFILER_POP_CPU_MARKER();   // MainLoop pop
         PROFILER_SYNC_FRAME();
