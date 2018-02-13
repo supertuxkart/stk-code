@@ -162,6 +162,7 @@ public:
     void        removePeer(const STKPeer* peer);
     bool        isConnectedTo(const TransportAddress& peer_address);
     STKPeer    *getPeer(ENetPeer *enet_peer);
+    STKPeer    *getServerPeerForClient() const;
     std::vector<NetworkPlayerProfile*> getMyPlayerProfiles();
     int         mustStopListening();
     uint16_t    getPort() const;

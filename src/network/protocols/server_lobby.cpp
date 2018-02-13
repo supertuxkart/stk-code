@@ -283,6 +283,7 @@ void ServerLobby::update(float dt)
             pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
             pm->findAndTerminate(PROTOCOL_KART_UPDATE);
             pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
+            setup();
         }
         break;
     case DONE:

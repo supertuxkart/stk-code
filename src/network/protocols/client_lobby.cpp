@@ -712,6 +712,10 @@ void ClientLobby::raceFinished(Event* event)
 void ClientLobby::exitResultScreen(Event *event)
 {
     RaceResultGUI::getInstance()->backToLobby();
+    // Will be reset to linked if connected to server, see update(float dt)
+    m_game_setup = STKHost::get()->setupNewGame();
+    STKHost::get()->getServerPeerForClient()->unsetClientServerToken();
+    m_state = NONE;
 }   // exitResultScreen
 
 //-----------------------------------------------------------------------------
