@@ -49,6 +49,9 @@ private:
     /** The state of the finite state machine. */
     STATE m_state;
 
+    std::vector<std::string> m_avaliable_karts;
+    std::vector<std::string> m_avaliable_tracks;
+
 public:
              ClientLobby();
     virtual ~ClientLobby();
@@ -66,6 +69,11 @@ public:
     void doneWithResults();
     void startingRaceNow();
     void leave();
+
+    const std::vector<std::string>& getAvaliableKarts() const
+                                                  { return m_avaliable_karts; }
+    const std::vector<std::string>& getAvaliableTracks() const
+                                                 { return m_avaliable_tracks; }
 
     virtual bool notifyEvent(Event* event) OVERRIDE;
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;

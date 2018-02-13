@@ -20,6 +20,7 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
 #include "network/event.hpp"
 #include "network/network_config.hpp"
@@ -36,10 +37,10 @@
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/waiting_for_others.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/random_generator.hpp"
 #include "utils/time.hpp"
-
 
 /** This is the central game setup protocol running in the server. It is
  *  mostly a finite state machine. Note that all nodes in ellipses and light
@@ -83,6 +84,19 @@
 ServerLobby::ServerLobby() : LobbyProtocol(NULL)
 {
     setHandleDisconnections(true);
+    // We use maximum 16bit unsigned limit
+    auto all_k = kart_properties_manager->getAllAvailableKarts();
+    auto all_t = track_manager->getAllTrackIdentifiers();
+    if (all_k.size() > 65536)
+    {
+        all_k.resize(65535);
+    }
+    if (all_t.size() > 65536)
+    {
+        all_t.resize(65535);
+    }
+    m_available_kts.getData().first = { all_k.begin(), all_k.end() };
+    m_available_kts.getData().second = { all_t.begin(), all_t.end() };
 }   // ServerLobby
 
 //-----------------------------------------------------------------------------
@@ -387,6 +401,20 @@ void ServerLobby::startSelection(const Event *event)
     // a new screen, which must be donefrom the main thread.
     ns->setSynchronous(true);
     ns->addUInt8(LE_START_SELECTION);
+    m_available_kts.lock();
+    const auto& all_k = m_available_kts.getData().first;
+    const auto& all_t = m_available_kts.getData().second;
+    ns->addUInt16((uint16_t)all_k.size()).addUInt16((uint16_t)all_t.size());
+    for (const std::string& kart : all_k)
+    {
+        ns->encodeString(kart);
+    }
+    for (const std::string& track : all_t)
+    {
+        ns->encodeString(track);
+    }
+    m_available_kts.unlock();
+
     sendMessageToPeersChangingToken(ns, /*reliable*/true);
     delete ns;
 
@@ -564,11 +592,70 @@ void ServerLobby::connectionRequested(Event* event)
     // Connection accepted.
     // ====================
     std::string name_u8;
-    int len = data.decodeString(&name_u8);
+    data.decodeString(&name_u8);
     core::stringw name = StringUtils::utf8ToWide(name_u8);
     std::string password;
     data.decodeString(&password);
     bool is_authorised = (password==NetworkConfig::get()->getPassword());
+
+    std::vector<std::string> client_karts_v, client_tracks_v;
+    client_karts_v.resize(data.getUInt16());
+    client_tracks_v.resize(data.getUInt16());
+    for (std::string& kart : client_karts_v)
+    {
+        data.decodeString(&kart);
+    }
+    for (std::string& track : client_tracks_v)
+    {
+        data.decodeString(&track);
+    }
+    std::set<std::string> client_karts(client_karts_v.begin(),
+        client_karts_v.end());
+    std::set<std::string> client_tracks(client_tracks_v.begin(),
+        client_tracks_v.end());
+
+    // Remove karts or tracks that do not exist in either client or server
+    m_available_kts.lock();
+    std::vector<std::string> karts_erase, tracks_erase;
+    for (const std::string& client_kart : client_karts)
+    {
+        if (m_available_kts.getData().first.find(client_kart) ==
+            m_available_kts.getData().first.end())
+        {
+            karts_erase.push_back(client_kart);
+        }
+    }
+    for (const std::string& server_kart : m_available_kts.getData().first)
+    {
+        if (client_karts.find(server_kart) == client_karts.end())
+        {
+            karts_erase.push_back(server_kart);
+        }
+    }
+    for (const std::string& client_track : client_tracks)
+    {
+        if (m_available_kts.getData().second.find(client_track) ==
+            m_available_kts.getData().second.end())
+        {
+            tracks_erase.push_back(client_track);
+        }
+    }
+    for (const std::string& server_track : m_available_kts.getData().second)
+    {
+        if (client_tracks.find(server_track) == client_tracks.end())
+        {
+            tracks_erase.push_back(server_track);
+        }
+    }
+    for (const std::string& kart_erase : karts_erase)
+    {
+        m_available_kts.getData().first.erase(kart_erase);
+    }
+    for (const std::string& track_erase : tracks_erase)
+    {
+        m_available_kts.getData().second.erase(track_erase);
+    }
+    m_available_kts.unlock();
 
     // Get the unique global ID for this player.
     m_next_player_id.lock();
