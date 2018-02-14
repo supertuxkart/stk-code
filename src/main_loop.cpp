@@ -311,6 +311,16 @@ void MainLoop::run()
 
         for(int i=0; i<num_steps; i++)
         {
+            // Create the TimeStepInfo structure. For the first iteration
+            // this is done before the irr_driver update (since this needs
+            // to store input events at the event), but for any further
+            // substep another TimeStepInfo needs to be created here.
+            if (World::getWorld() && RewindManager::get()->isEnabled() && i>0)
+            {
+                RewindManager::get()
+                    ->addNextTimeStep(World::getWorld()->getTime(), dt);
+            }
+
             // Enable last substep in last iteration
             m_is_last_substep = (i == num_steps - 1);
 
