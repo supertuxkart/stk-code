@@ -37,16 +37,16 @@ protected:
     virtual void playerConfirm(const int playerID) OVERRIDE;
 
 private:
-    std::set<std::string> m_avaliable_karts;
+    std::set<std::string> m_available_karts;
     virtual bool isIgnored(const std::string& ident) const OVERRIDE
     {
-        return m_avaliable_karts.find(ident) == m_avaliable_karts.end();
+        return m_available_karts.find(ident) == m_available_karts.end();
     }
 
 public:
-    void setAvailableKartsFromServer(const std::vector<std::string>& k)
+    void setAvailableKartsFromServer(const std::set<std::string>& k)
     {
-        m_avaliable_karts = { k.begin(), k.end() };
+        m_available_karts = k;
     }
     virtual void init() OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;

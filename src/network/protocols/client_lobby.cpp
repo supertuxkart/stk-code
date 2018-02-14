@@ -326,14 +326,10 @@ void ClientLobby::update(float dt)
 
         auto all_k = kart_properties_manager->getAllAvailableKarts();
         auto all_t = track_manager->getAllTrackIdentifiers();
-        if (all_k.size() > 65536)
-        {
+        if (all_k.size() >= 65536)
             all_k.resize(65535);
-        }
-        if (all_t.size() > 65536)
-        {
+        if (all_t.size() >= 65536)
             all_t.resize(65535);
-        }
         ns->addUInt16((uint16_t)all_k.size()).addUInt16((uint16_t)all_t.size());
         for (const std::string& kart : all_k)
         {
@@ -357,7 +353,7 @@ void ClientLobby::update(float dt)
     {
         NetworkKartSelectionScreen* screen =
                                      NetworkKartSelectionScreen::getInstance();
-        screen->setAvailableKartsFromServer(m_avaliable_karts);
+        screen->setAvailableKartsFromServer(m_available_karts);
         screen->push();
         m_state = SELECTING_KARTS;
 
@@ -571,6 +567,9 @@ void ClientLobby::connectionRefused(Event* event)
     case 2:
         Log::info("ClientLobby", "Client busy.");
         break;
+    case 3:
+        Log::info("ClientLobby", "Having incompatible karts / tracks.");
+        break;
     default:
         Log::info("ClientLobby", "Connection refused.");
         break;
@@ -683,15 +682,19 @@ void ClientLobby::startSelection(Event* event)
 {
     m_state = KART_SELECTION;
     const NetworkString& data = event->data();
-    m_avaliable_karts.resize(data.getUInt16());
-    m_avaliable_tracks.resize(data.getUInt16());
-    for (std::string& kart : m_avaliable_karts)
+    const unsigned kart_num = data.getUInt16();
+    const unsigned track_num = data.getUInt16();
+    for (unsigned i = 0; i < kart_num; i++)
     {
+        std::string kart;
         data.decodeString(&kart);
+        m_available_karts.insert(kart);
     }
-    for (std::string& track : m_avaliable_tracks)
+    for (unsigned i = 0; i < track_num; i++)
     {
+        std::string track;
         data.decodeString(&track);
+        m_available_tracks.insert(track);
     }
     Log::info("ClientLobby", "Kart selection starts now");
 }   // startSelection

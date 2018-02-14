@@ -87,14 +87,10 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
     // We use maximum 16bit unsigned limit
     auto all_k = kart_properties_manager->getAllAvailableKarts();
     auto all_t = track_manager->getAllTrackIdentifiers();
-    if (all_k.size() > 65536)
-    {
+    if (all_k.size() >= 65536)
         all_k.resize(65535);
-    }
-    if (all_t.size() > 65536)
-    {
+    if (all_t.size() >= 65536)
         all_t.resize(65535);
-    }
     m_available_kts.getData().first = { all_k.begin(), all_k.end() };
     m_available_kts.getData().second = { all_t.begin(), all_t.end() };
 }   // ServerLobby
@@ -598,55 +594,55 @@ void ServerLobby::connectionRequested(Event* event)
     data.decodeString(&password);
     bool is_authorised = (password==NetworkConfig::get()->getPassword());
 
-    std::vector<std::string> client_karts_v, client_tracks_v;
-    client_karts_v.resize(data.getUInt16());
-    client_tracks_v.resize(data.getUInt16());
-    for (std::string& kart : client_karts_v)
+    std::set<std::string> client_karts, client_tracks;
+    const unsigned kart_num = data.getUInt16();
+    const unsigned track_num = data.getUInt16();
+    for (unsigned i = 0; i < kart_num; i++)
     {
+        std::string kart;
         data.decodeString(&kart);
+        client_karts.insert(kart);
     }
-    for (std::string& track : client_tracks_v)
+    for (unsigned i = 0; i < track_num; i++)
     {
+        std::string track;
         data.decodeString(&track);
+        client_tracks.insert(track);
     }
-    std::set<std::string> client_karts(client_karts_v.begin(),
-        client_karts_v.end());
-    std::set<std::string> client_tracks(client_tracks_v.begin(),
-        client_tracks_v.end());
 
-    // Remove karts or tracks that do not exist in either client or server
-    m_available_kts.lock();
-    std::vector<std::string> karts_erase, tracks_erase;
-    for (const std::string& client_kart : client_karts)
-    {
-        if (m_available_kts.getData().first.find(client_kart) ==
-            m_available_kts.getData().first.end())
-        {
-            karts_erase.push_back(client_kart);
-        }
-    }
+    // Remove karts/tracks from server that are not supported on the new client
+    // so that in the end the server has a list of all karts/tracks available
+    // on all clients
+    std::set<std::string> karts_erase, tracks_erase;
     for (const std::string& server_kart : m_available_kts.getData().first)
     {
         if (client_karts.find(server_kart) == client_karts.end())
         {
-            karts_erase.push_back(server_kart);
-        }
-    }
-    for (const std::string& client_track : client_tracks)
-    {
-        if (m_available_kts.getData().second.find(client_track) ==
-            m_available_kts.getData().second.end())
-        {
-            tracks_erase.push_back(client_track);
+            karts_erase.insert(server_kart);
         }
     }
     for (const std::string& server_track : m_available_kts.getData().second)
     {
         if (client_tracks.find(server_track) == client_tracks.end())
         {
-            tracks_erase.push_back(server_track);
+            tracks_erase.insert(server_track);
         }
     }
+
+    // Drop this player if he doesn't have at least 1 kart / track the same
+    // from server
+    if (karts_erase.size() == m_available_kts.getData().first.size() ||
+        tracks_erase.size() == m_available_kts.getData().second.size())
+    {
+        NetworkString *message = getNetworkString(2);
+        message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(3);
+        peer->sendPacket(message);
+        delete message;
+        Log::verbose("ServerLobby", "Player has incompatible karts / tracks");
+        m_available_kts.unlock();
+        return;
+    }
+
     for (const std::string& kart_erase : karts_erase)
     {
         m_available_kts.getData().first.erase(kart_erase);

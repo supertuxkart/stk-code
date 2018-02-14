@@ -200,14 +200,12 @@ void TracksScreen::buildTrackList()
     // First build a list of all tracks to be displayed
     // (e.g. exclude arenas, ...)
 	bool is_network = (STKHost::existHost());
-    std::set<std::string> m_available_tracks_from_server;
+    ClientLobby* clrp = NULL;
     if (is_network)
     {
         Protocol* protocol = LobbyProtocol::get();
-        ClientLobby* clrp = dynamic_cast<ClientLobby*>(protocol);
+        clrp = dynamic_cast<ClientLobby*>(protocol);
         assert(clrp);
-        m_available_tracks_from_server =
-            { clrp->getAvaliableTracks().begin(), clrp->getAvaliableTracks().end() };
     }
     PtrVector<Track, REF> tracks;
     for (int n = 0; n < track_amount; n++)
@@ -221,8 +219,8 @@ void TracksScreen::buildTrackList()
         if (curr_group_name != ALL_TRACK_GROUPS_ID &&
             !curr->isInGroup(curr_group_name)) continue;
         if (is_network &&
-            m_available_tracks_from_server.find(curr->getIdent()) ==
-            m_available_tracks_from_server.end())
+            clrp->getAvailableTracks().find(curr->getIdent()) ==
+            clrp->getAvailableTracks().end())
         {
             continue;
         }
