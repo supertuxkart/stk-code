@@ -1042,7 +1042,7 @@ void ServerLobby::startedRaceOnClient(Event *event)
 void ServerLobby::playerFinishedResult(Event *event)
 {
     m_player_ready_counter++;
-    if(m_player_ready_counter == STKHost::get()->getPeerCount())
+    if(m_player_ready_counter >= STKHost::get()->getPeerCount())
     {
         // We can't trigger the world/race exit here, since this is called
         // from the protocol manager thread. So instead we force the timeout
