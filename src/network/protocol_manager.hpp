@@ -220,7 +220,6 @@ private:
     /*! Single instance of protocol manager.*/
     static std::weak_ptr<ProtocolManager> m_protocol_manager;
 
-    void         startAsynchronousUpdateThread();
     bool         sendEvent(Event* event);
 
     virtual void startProtocol(Protocol *protocol);
@@ -250,6 +249,8 @@ public:
     }   // getThreadID
     // ------------------------------------------------------------------------
     static std::shared_ptr<ProtocolManager> createInstance();
+    // ------------------------------------------------------------------------
+    static bool emptyInstance();
     // ------------------------------------------------------------------------
     static std::shared_ptr<ProtocolManager> lock();
 

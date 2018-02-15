@@ -38,15 +38,24 @@ std::weak_ptr<ProtocolManager> ProtocolManager::m_protocol_manager;
 // ============================================================================
 std::shared_ptr<ProtocolManager> ProtocolManager::createInstance()
 {
-    if (!m_protocol_manager.expired())
+    if (!emptyInstance())
     {
         Log::fatal("ProtocolManager",
             "Create only 1 instance of ProtocolManager!");
         return NULL;
     }
     auto pm = std::make_shared<ProtocolManager>();
-    pm->m_asynchronous_update_thread = std::thread(
-        std::bind(&ProtocolManager::startAsynchronousUpdateThread, pm));
+    pm->m_asynchronous_update_thread = std::thread([pm]()
+        {
+            VS::setThreadName("ProtocolManager");
+            while(!pm->m_exit.load())
+            {
+                pm->asynchronousUpdate();
+                PROFILER_PUSH_CPU_MARKER("sleep", 0, 255, 255);
+                StkTime::sleep(2);
+                PROFILER_POP_CPU_MARKER();
+            }
+        });
     m_protocol_manager = pm;
     return pm;
 }   // createInstance
@@ -58,6 +67,12 @@ std::shared_ptr<ProtocolManager> ProtocolManager::lock()
 }   // lock
 
 // ----------------------------------------------------------------------------
+bool ProtocolManager::emptyInstance()
+{
+    return m_protocol_manager.expired();
+}   // emptyInstance
+
+// ----------------------------------------------------------------------------
 ProtocolManager::ProtocolManager()
 {
     m_exit.store(false);
@@ -67,37 +82,6 @@ ProtocolManager::ProtocolManager()
 // ----------------------------------------------------------------------------
 ProtocolManager::~ProtocolManager()
 {
-}   // ~ProtocolManager
-
-// ----------------------------------------------------------------------------
-void ProtocolManager::startAsynchronousUpdateThread()
-{
-    VS::setThreadName("ProtocolManager");
-    while(!m_exit.load())
-    {
-        asynchronousUpdate();
-        PROFILER_PUSH_CPU_MARKER("sleep", 0, 255, 255);
-        StkTime::sleep(2);
-        PROFILER_POP_CPU_MARKER();
-    }
-}   // startAsynchronousUpdateThread
-
-// ----------------------------------------------------------------------------
-void ProtocolManager::OneProtocolType::abort()
-{
-    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
-        delete m_protocols.getData()[i];
-    m_protocols.getData().clear();
-}   // OneProtocolType::abort
-
-// ----------------------------------------------------------------------------
-/** \brief Stops the protocol manager.
- */
-void ProtocolManager::abort()
-{
-    m_exit.store(true);
-    m_asynchronous_update_thread.join(); // wait the thread to finish
-
     // Now only this main thread is active, no more need for locks
     for (unsigned int i = 0; i < m_all_protocols.size(); i++)
     {
@@ -122,6 +106,24 @@ void ProtocolManager::abort()
     m_requests.getData().clear();
     m_requests.unlock();
 
+}   // ~ProtocolManager
+
+// ----------------------------------------------------------------------------
+void ProtocolManager::OneProtocolType::abort()
+{
+    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
+        delete m_protocols.getData()[i];
+    m_protocols.getData().clear();
+}   // OneProtocolType::abort
+
+// ----------------------------------------------------------------------------
+/** \brief Stops the protocol manager.
+ */
+void ProtocolManager::abort()
+{
+    m_exit.store(true);
+    // wait the thread to finish
+    m_asynchronous_update_thread.join();
 }   // abort
 
 // ----------------------------------------------------------------------------
@@ -477,9 +479,6 @@ void ProtocolManager::update(float dt)
 void ProtocolManager::asynchronousUpdate()
 {
     PROFILER_PUSH_CPU_MARKER("Message delivery", 255, 0, 0);
-    // Update from ProtocolManager thread only:
-    assert(std::this_thread::get_id() == m_asynchronous_update_thread.get_id());
-
     // First deliver asynchronous messages for all protocols
     // =====================================================
     m_async_events_to_process.lock();
