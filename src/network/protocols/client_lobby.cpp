@@ -19,6 +19,7 @@
 #include "network/protocols/client_lobby.hpp"
 
 #include "config/player_manager.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "modes/world_with_rank.hpp"
 #include "network/event.hpp"
 #include "network/network_config.hpp"
@@ -33,6 +34,7 @@
 #include "states_screens/network_kart_selection.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 
 // ============================================================================
@@ -321,6 +323,23 @@ void ClientLobby::update(float dt)
         // 4 (size of id), global id
         ns->addUInt8(LE_CONNECTION_REQUESTED).encodeString(name)
           .encodeString(NetworkConfig::get()->getPassword());
+
+        auto all_k = kart_properties_manager->getAllAvailableKarts();
+        auto all_t = track_manager->getAllTrackIdentifiers();
+        if (all_k.size() >= 65536)
+            all_k.resize(65535);
+        if (all_t.size() >= 65536)
+            all_t.resize(65535);
+        ns->addUInt16((uint16_t)all_k.size()).addUInt16((uint16_t)all_t.size());
+        for (const std::string& kart : all_k)
+        {
+            ns->encodeString(kart);
+        }
+        for (const std::string& track : all_t)
+        {
+            ns->encodeString(track);
+        }
+
         sendToServer(ns);
         delete ns;
         m_state = REQUESTING_CONNECTION;
@@ -334,6 +353,7 @@ void ClientLobby::update(float dt)
     {
         NetworkKartSelectionScreen* screen =
                                      NetworkKartSelectionScreen::getInstance();
+        screen->setAvailableKartsFromServer(m_available_karts);
         screen->push();
         m_state = SELECTING_KARTS;
 
@@ -547,6 +567,9 @@ void ClientLobby::connectionRefused(Event* event)
     case 2:
         Log::info("ClientLobby", "Client busy.");
         break;
+    case 3:
+        Log::info("ClientLobby", "Having incompatible karts / tracks.");
+        break;
     default:
         Log::info("ClientLobby", "Connection refused.");
         break;
@@ -658,6 +681,21 @@ void ClientLobby::startingRaceNow()
 void ClientLobby::startSelection(Event* event)
 {
     m_state = KART_SELECTION;
+    const NetworkString& data = event->data();
+    const unsigned kart_num = data.getUInt16();
+    const unsigned track_num = data.getUInt16();
+    for (unsigned i = 0; i < kart_num; i++)
+    {
+        std::string kart;
+        data.decodeString(&kart);
+        m_available_karts.insert(kart);
+    }
+    for (unsigned i = 0; i < track_num; i++)
+    {
+        std::string track;
+        data.decodeString(&track);
+        m_available_tracks.insert(track);
+    }
     Log::info("ClientLobby", "Kart selection starts now");
 }   // startSelection
 
@@ -712,6 +750,10 @@ void ClientLobby::raceFinished(Event* event)
 void ClientLobby::exitResultScreen(Event *event)
 {
     RaceResultGUI::getInstance()->backToLobby();
+    // Will be reset to linked if connected to server, see update(float dt)
+    m_game_setup = STKHost::get()->setupNewGame();
+    STKHost::get()->getServerPeerForClient()->unsetClientServerToken();
+    m_state = NONE;
 }   // exitResultScreen
 
 //-----------------------------------------------------------------------------

@@ -40,8 +40,6 @@ private:
 
     std::deque<std::string> m_random_track_list;
 
-    bool m_offical_track;
-
 public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
@@ -57,8 +55,6 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
-
-    void setOfficalTrack(bool offical) { m_offical_track = offical; }
 
     void setFocusOnTrack(const std::string& trackName);
 

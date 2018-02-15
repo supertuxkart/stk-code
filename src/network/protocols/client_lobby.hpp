@@ -4,6 +4,7 @@
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
+#include <set>
 
 class STKPeer;
 
@@ -49,6 +50,9 @@ private:
     /** The state of the finite state machine. */
     STATE m_state;
 
+    std::set<std::string> m_available_karts;
+    std::set<std::string> m_available_tracks;
+
 public:
              ClientLobby();
     virtual ~ClientLobby();
@@ -66,6 +70,11 @@ public:
     void doneWithResults();
     void startingRaceNow();
     void leave();
+
+    const std::set<std::string>& getAvailableKarts() const
+                                                  { return m_available_karts; }
+    const std::set<std::string>& getAvailableTracks() const
+                                                 { return m_available_tracks; }
 
     virtual bool notifyEvent(Event* event) OVERRIDE;
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;

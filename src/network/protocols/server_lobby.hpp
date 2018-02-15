@@ -5,6 +5,8 @@
 #include "utils/cpp2011.hpp"
 #include "utils/synchronised.hpp"
 
+#include <set>
+
 class ServerLobby : public LobbyProtocol
                   , public CallbackObject
 {
@@ -26,6 +28,11 @@ private:
         DONE,                     // shutting down server
         EXITING
     } m_state;
+
+    /** Available karts and tracks for all clients, this will be initialized
+     *  with data in server first. */
+    Synchronised<std::pair<std::set<std::string>,
+        std::set<std::string> > > m_available_kts;
 
     /** Next id to assign to a peer. */
     Synchronised<int> m_next_player_id;

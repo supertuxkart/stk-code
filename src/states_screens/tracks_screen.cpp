@@ -195,19 +195,18 @@ void TracksScreen::buildTrackList()
     m_random_track_list.clear();
 
     const std::string& curr_group_name = tabs->getSelectionIDString(0);
-
-    if (!(curr_group_name == DEFAULT_GROUP_NAME ||
-        curr_group_name == ALL_TRACK_GROUPS_ID) && m_offical_track)
-    {
-        tracks_widget->setText(_("Only official tracks are supported."));
-        tracks_widget->updateItemDisplay();
-        return;
-    }
-
     const int track_amount = (int)track_manager->getNumberOfTracks();
 
     // First build a list of all tracks to be displayed
     // (e.g. exclude arenas, ...)
+	bool is_network = (STKHost::existHost());
+    ClientLobby* clrp = NULL;
+    if (is_network)
+    {
+        Protocol* protocol = LobbyProtocol::get();
+        clrp = dynamic_cast<ClientLobby*>(protocol);
+        assert(clrp);
+    }
     PtrVector<Track, REF> tracks;
     for (int n = 0; n < track_amount; n++)
     {
@@ -216,14 +215,18 @@ void TracksScreen::buildTrackList()
             && !curr->hasEasterEggs())
             continue;
         if (curr->isArena() || curr->isSoccer()||curr->isInternal()) continue;
-        if (m_offical_track && !curr->isInGroup(DEFAULT_GROUP_NAME)) continue;
+        if (!curr->isInGroup(DEFAULT_GROUP_NAME)) continue;
         if (curr_group_name != ALL_TRACK_GROUPS_ID &&
             !curr->isInGroup(curr_group_name)) continue;
-
+        if (is_network &&
+            clrp->getAvailableTracks().find(curr->getIdent()) ==
+            clrp->getAvailableTracks().end())
+        {
+            continue;
+        }
         tracks.push_back(curr);
     }   // for n<track_amount
 
-	bool is_network = (STKHost::existHost());
     tracks.insertionSort();
     for (unsigned int i = 0; i < tracks.size(); i++)
     {

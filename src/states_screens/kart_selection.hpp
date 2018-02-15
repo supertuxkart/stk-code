@@ -123,6 +123,8 @@ protected:
     /** Remove the multiplayer message. */
     void removeMultiplayerMessage();
 
+    virtual bool isIgnored(const std::string& ident) const { return false; }
+
     /** Stores a pointer to the current selection screen */
     static KartSelectionScreen* m_instance_ptr;
 public:

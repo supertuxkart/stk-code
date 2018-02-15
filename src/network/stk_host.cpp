@@ -710,6 +710,18 @@ STKPeer* STKHost::getPeer(ENetPeer *enet_peer)
     m_next_unique_host_id ++;
     return peer;
 }   // getPeer
+
+// ----------------------------------------------------------------------------
+/** \brief Return the only server peer for client.
+ *  \return STKPeer the STKPeer of server.
+ */
+STKPeer* STKHost::getServerPeerForClient() const
+{
+    assert(m_peers.size() == 1);
+    assert(NetworkConfig::get()->isClient());
+    return m_peers[0];
+}   // getServerPeerForClient
+
 // ----------------------------------------------------------------------------
 /** \brief Tells if a peer is known and connected.
  *  \return True if the peer is known and connected, false elseway.
