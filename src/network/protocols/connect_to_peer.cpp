@@ -132,7 +132,7 @@ void ConnectToPeer::asynchronousUpdate()
             {
                 m_current_protocol = new PingProtocol(m_peer_address,
                                                       /*time-between-ping*/2.0);
-                ProtocolManager::getInstance()->requestStart(m_current_protocol);
+                ProtocolManager::lock()->requestStart(m_current_protocol);
                 m_state = CONNECTING;
             }
             else

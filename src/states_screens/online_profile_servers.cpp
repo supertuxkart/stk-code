@@ -151,7 +151,7 @@ void OnlineProfileServers::doQuickPlay()
         NetworkingLobby::getInstance()->push();
         ConnectToServer *cts = new ConnectToServer(server->getServerId(),
             server->getHostId());
-        ProtocolManager::getInstance()->requestStart(cts);
+        ProtocolManager::lock()->requestStart(cts);
     }
     else
     {

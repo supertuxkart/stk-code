@@ -135,5 +135,5 @@ void LobbyProtocol::loadWorld()
  */
 void LobbyProtocol::terminateLatencyProtocol()
 {
-    ProtocolManager::getInstance()->findAndTerminate(PROTOCOL_SYNCHRONIZATION);
+    ProtocolManager::lock()->findAndTerminate(PROTOCOL_SYNCHRONIZATION);
 }   // stopLatencyProtocol

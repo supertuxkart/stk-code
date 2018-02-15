@@ -196,7 +196,7 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
     // to the server.
     if(STKHost::get()->isAuthorisedToControl())
     {
-        Protocol* protocol = ProtocolManager::getInstance()
+        Protocol* protocol = ProtocolManager::lock()
                            ->getProtocol(PROTOCOL_LOBBY_ROOM);
         ClientLobby* clrp =
                            dynamic_cast<ClientLobby*>(protocol);

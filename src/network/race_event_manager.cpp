@@ -27,7 +27,7 @@ void RaceEventManager::update(float dt)
 {
     // This can happen in case of disconnects - protocol manager is
     // shut down, but still events to process.
-    if(!ProtocolManager::getInstance())
+    if(!ProtocolManager::lock())
         return;
 
     // Replay all recorded events up to the current time (only if the
@@ -78,7 +78,7 @@ bool RaceEventManager::isRaceOver()
 void RaceEventManager::kartFinishedRace(AbstractKart *kart, float time)
 {
     GameEventsProtocol* protocol = static_cast<GameEventsProtocol*>(
-        ProtocolManager::getInstance()->getProtocol(PROTOCOL_GAME_EVENTS));
+        ProtocolManager::lock()->getProtocol(PROTOCOL_GAME_EVENTS));
     protocol->kartFinishedRace(kart, time);
 }   // kartFinishedRace
 
@@ -94,7 +94,7 @@ void RaceEventManager::collectedItem(Item *item, AbstractKart *kart)
     assert(NetworkConfig::get()->isServer());
 
     GameEventsProtocol* protocol = static_cast<GameEventsProtocol*>(
-        ProtocolManager::getInstance()->getProtocol(PROTOCOL_GAME_EVENTS));
+        ProtocolManager::lock()->getProtocol(PROTOCOL_GAME_EVENTS));
     protocol->collectedItem(item,kart);
 }   // collectedItem
 

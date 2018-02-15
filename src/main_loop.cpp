@@ -343,7 +343,10 @@ void MainLoop::run()
 
                 PROFILER_PUSH_CPU_MARKER("Protocol manager update",
                                          0x7F, 0x00, 0x7F);
-                ProtocolManager::getInstance()->update(dt);
+                if (auto pm = ProtocolManager::lock())
+                {
+                    pm->update(dt);
+                }
                 PROFILER_POP_CPU_MARKER();
             }
             if (World::getWorld()) World::getWorld()->updateTime(dt);

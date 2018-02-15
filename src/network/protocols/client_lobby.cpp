@@ -370,7 +370,7 @@ void ClientLobby::update(float dt)
         break;
     case DONE:
         m_state = EXITING;
-        ProtocolManager::getInstance()->requestTerminate(this);
+        ProtocolManager::lock()->requestTerminate(this);
         break;
     case EXITING:
         break;
@@ -722,7 +722,8 @@ void ClientLobby::raceFinished(Event* event)
                "Server notified that the race is finished.");
 
     // stop race protocols
-    ProtocolManager *pm = ProtocolManager::getInstance();
+    auto pm = ProtocolManager::lock();
+    assert(pm);
     pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
     pm->findAndTerminate(PROTOCOL_KART_UPDATE);
     pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
@@ -756,7 +757,8 @@ void ClientLobby::exitResultScreen(Event *event)
     m_game_setup = STKHost::get()->setupNewGame();
     STKHost::get()->getServerPeerForClient()->unsetClientServerToken();
     // stop race protocols
-    ProtocolManager *pm = ProtocolManager::getInstance();
+    auto pm = ProtocolManager::lock();
+    assert(pm);
     pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
     pm->findAndTerminate(PROTOCOL_KART_UPDATE);
     pm->findAndTerminate(PROTOCOL_GAME_EVENTS);

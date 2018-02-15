@@ -290,7 +290,7 @@ STKHost::STKHost(const irr::core::stringw &server_name)
 
     startListening();
     Protocol *p = LobbyProtocol::create<ServerLobby>();
-    ProtocolManager::getInstance()->requestStart(p);
+    ProtocolManager::lock()->requestStart(p);
 
 }   // STKHost(server_name)
 
@@ -320,7 +320,7 @@ void STKHost::init()
 
     Log::info("STKHost", "Host initialized.");
     Network::openLog();  // Open packet log file
-    ProtocolManager::getInstance<ProtocolManager>();
+    ProtocolManager::createInstance();
 
     // Optional: start the network console
     m_network_console = NULL;
@@ -337,7 +337,6 @@ void STKHost::init()
  */
 STKHost::~STKHost()
 {
-    ProtocolManager::kill();
     // delete the game setup
     if (m_game_setup)
         delete m_game_setup;
@@ -375,7 +374,7 @@ void STKHost::requestShutdown()
 void STKHost::shutdown()
 {
     ServersManager::get()->unsetJoinedServer();
-    ProtocolManager::getInstance()->abort();
+    ProtocolManager::lock()->abort();
     deleteAllPeers();
     destroy();
 }   // shutdown
@@ -414,7 +413,7 @@ void STKHost::abort()
 {
     // Finish protocol manager first, to avoid that it access data
     // in STKHost.
-    ProtocolManager::getInstance()->abort();
+    ProtocolManager::lock()->abort();
     stopListening();
 }   // abort
 
@@ -548,6 +547,13 @@ void* STKHost::mainLoop(void* self)
             if (event.type == ENET_EVENT_TYPE_NONE)
                 continue;
 
+            auto pm = ProtocolManager::lock();
+            if (!pm || pm->isExiting())
+            {
+                // Don't create more event if no protocol manager or it will
+                // be exiting
+                continue;
+            }
             // Create an STKEvent with the event data. This will also
             // create the peer if it doesn't exist already
             Event* stk_event = new Event(&event);
@@ -579,7 +585,7 @@ void* STKHost::mainLoop(void* self)
             }   // if message event
 
             // notify for the event now.
-            ProtocolManager::getInstance()->propagateEvent(stk_event);
+            pm->propagateEvent(stk_event);
             
         }   // while enet_host_service
     }   // while !mustStopListening
@@ -638,13 +644,6 @@ void STKHost::handleDirectSocketRequest()
     {
         // In case of a LAN connection, we only allow connections from
         // a LAN address (192.168*, ..., and 127.*).
-        if (NetworkConfig::get()->isLAN() && !sender.isLAN())
-        {
-            Log::error("STKHost", "Client trying to connect from '%s'",
-                       sender.toString().c_str());
-            Log::error("STKHost", "which is outside of LAN - rejected.");
-            return;
-        }
         Protocol *c = new ConnectToPeer(sender);
         c->requestStart();
     }

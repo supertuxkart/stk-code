@@ -289,7 +289,8 @@ void ServerLobby::update(float dt)
             // notify the network world that it is stopped
             RaceEventManager::getInstance()->stop();
             // stop race protocols
-            ProtocolManager *pm = ProtocolManager::getInstance();
+            auto pm = ProtocolManager::lock();
+            assert(pm);
             pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
             pm->findAndTerminate(PROTOCOL_KART_UPDATE);
             pm->findAndTerminate(PROTOCOL_GAME_EVENTS);

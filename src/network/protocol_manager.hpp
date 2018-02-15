@@ -30,8 +30,11 @@
 #include "utils/synchronised.hpp"
 #include "utils/types.hpp"
 
+#include <atomic>
 #include <list>
+#include <memory>
 #include <vector>
+#include <thread>
 
 class Event;
 class STKPeer;
@@ -130,10 +133,8 @@ public:
  *  responsible to forward events to all protocols with the same id.
  *  
  */ 
-class ProtocolManager : public AbstractSingleton<ProtocolManager>,
-                        public NoCopy
+class ProtocolManager : public NoCopy
 {
-    friend class AbstractSingleton<ProtocolManager>;
 private:
 
     /** A simple class that stores all protocols of a certain type. While
@@ -211,14 +212,15 @@ private:
     Synchronised< std::vector<ProtocolRequest> > m_requests;
 
     /** When set to true, the main thread will exit. */
-    Synchronised<bool> m_exit;
+    std::atomic_bool m_exit;
 
     /*! Asynchronous update thread.*/
-    pthread_t m_asynchronous_update_thread;
+    std::thread m_asynchronous_update_thread;
 
-                 ProtocolManager();
-    virtual     ~ProtocolManager();
-    static void* mainLoop(void *data);
+    /*! Single instance of protocol manager.*/
+    static std::weak_ptr<ProtocolManager> m_protocol_manager;
+
+    void         startAsynchronousUpdateThread();
     bool         sendEvent(Event* event);
 
     virtual void startProtocol(Protocol *protocol);
@@ -228,6 +230,8 @@ private:
     virtual void unpauseProtocol(Protocol *protocol);
 
 public:
+                 ProtocolManager();
+    virtual     ~ProtocolManager();
     void      abort();
     void      propagateEvent(Event* event);
     Protocol* getProtocol(ProtocolType type);
@@ -238,10 +242,16 @@ public:
     void      findAndTerminate(ProtocolType type);
     void      update(float dt);
     // ------------------------------------------------------------------------
-    const pthread_t & getThreadID() const
+    bool isExiting() const                            { return m_exit.load(); }
+    // ------------------------------------------------------------------------
+    const std::thread& getThread() const
     {
         return m_asynchronous_update_thread; 
     }   // getThreadID
+    // ------------------------------------------------------------------------
+    static std::shared_ptr<ProtocolManager> createInstance();
+    // ------------------------------------------------------------------------
+    static std::shared_ptr<ProtocolManager> lock();
 
 };   // class ProtocolManager
 

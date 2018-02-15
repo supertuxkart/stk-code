@@ -30,41 +30,57 @@
 #include <assert.h>
 #include <cstdlib>
 #include <errno.h>
+#include <functional>
 #include <typeinfo>
 
-
-ProtocolManager::ProtocolManager()
+// ============================================================================
+std::weak_ptr<ProtocolManager> ProtocolManager::m_protocol_manager;
+// ============================================================================
+std::shared_ptr<ProtocolManager> ProtocolManager::createInstance()
 {
-    m_exit.setAtomic(false);
-
-    m_all_protocols.resize(PROTOCOL_MAX);
-
-    pthread_create(&m_asynchronous_update_thread, NULL,
-                   ProtocolManager::mainLoop, this);
-}   // ProtocolManager
+    if (!m_protocol_manager.expired())
+    {
+        Log::fatal("ProtocolManager",
+            "Create only 1 instance of ProtocolManager!");
+        return NULL;
+    }
+    auto pm = std::make_shared<ProtocolManager>();
+    pm->m_asynchronous_update_thread = std::thread(
+        std::bind(&ProtocolManager::startAsynchronousUpdateThread, pm));
+    m_protocol_manager = pm;
+    return pm;
+}   // createInstance
 
 // ----------------------------------------------------------------------------
-
-void* ProtocolManager::mainLoop(void* data)
+std::shared_ptr<ProtocolManager> ProtocolManager::lock()
 {
-    VS::setThreadName("ProtocolManager");
+    return m_protocol_manager.lock();
+}   // lock
 
-    ProtocolManager* manager = static_cast<ProtocolManager*>(data);
-    while(manager && !manager->m_exit.getAtomic())
-    {
-        manager->asynchronousUpdate();
-        PROFILER_PUSH_CPU_MARKER("sleep", 0, 255, 255);
-        StkTime::sleep(2);
-        PROFILER_POP_CPU_MARKER();
-    }
-    return NULL;
-}   // mainLoop
-
+// ----------------------------------------------------------------------------
+ProtocolManager::ProtocolManager()
+{
+    m_exit.store(false);
+    m_all_protocols.resize(PROTOCOL_MAX);
+}   // ProtocolManager
 
 // ----------------------------------------------------------------------------
 ProtocolManager::~ProtocolManager()
 {
 }   // ~ProtocolManager
+
+// ----------------------------------------------------------------------------
+void ProtocolManager::startAsynchronousUpdateThread()
+{
+    VS::setThreadName("ProtocolManager");
+    while(!m_exit.load())
+    {
+        asynchronousUpdate();
+        PROFILER_PUSH_CPU_MARKER("sleep", 0, 255, 255);
+        StkTime::sleep(2);
+        PROFILER_POP_CPU_MARKER();
+    }
+}   // startAsynchronousUpdateThread
 
 // ----------------------------------------------------------------------------
 void ProtocolManager::OneProtocolType::abort()
@@ -79,8 +95,8 @@ void ProtocolManager::OneProtocolType::abort()
  */
 void ProtocolManager::abort()
 {
-    m_exit.setAtomic(true);
-    pthread_join(m_asynchronous_update_thread, NULL); // wait the thread to finish
+    m_exit.store(true);
+    m_asynchronous_update_thread.join(); // wait the thread to finish
 
     // Now only this main thread is active, no more need for locks
     for (unsigned int i = 0; i < m_all_protocols.size(); i++)
@@ -218,7 +234,7 @@ void ProtocolManager::requestTerminate(Protocol* protocol)
  */
 void ProtocolManager::startProtocol(Protocol *protocol)
 {
-    assert(pthread_equal(pthread_self(), m_asynchronous_update_thread));
+    assert(std::this_thread::get_id() == m_asynchronous_update_thread.get_id());
     OneProtocolType &opt = m_all_protocols[protocol->getProtocolType()];
     opt.lock();
     opt.addProtocol(protocol);
@@ -238,7 +254,7 @@ void ProtocolManager::startProtocol(Protocol *protocol)
  */
 void ProtocolManager::pauseProtocol(Protocol *protocol)
 {
-    assert(pthread_equal(pthread_self(), m_asynchronous_update_thread));
+    assert(std::this_thread::get_id() == m_asynchronous_update_thread.get_id());
     assert(protocol->getState() == PROTOCOL_STATE_RUNNING);
     // We lock the protocol to avoid that paused() is called at the same
     // time that the main thread delivers an event or calls update
@@ -255,7 +271,7 @@ void ProtocolManager::pauseProtocol(Protocol *protocol)
  */
 void ProtocolManager::unpauseProtocol(Protocol *protocol)
 {
-    assert(pthread_equal(pthread_self(), m_asynchronous_update_thread));
+    assert(std::this_thread::get_id() == m_asynchronous_update_thread.get_id());
     assert(protocol->getState() == PROTOCOL_STATE_PAUSED);
     // No lock necessary, since the protocol is paused, no other thread will
     // be executing 
@@ -292,7 +308,7 @@ void ProtocolManager::OneProtocolType::removeProtocol(Protocol *p)
  */
 void ProtocolManager::terminateProtocol(Protocol *protocol)
 {
-    assert(pthread_equal(pthread_self(), m_asynchronous_update_thread));
+    assert(std::this_thread::get_id() == m_asynchronous_update_thread.get_id());
 
     OneProtocolType &opt = m_all_protocols[protocol->getProtocolType()];
     // Be sure that noone accesses the protocols vector 
@@ -415,7 +431,7 @@ void ProtocolManager::OneProtocolType::update(float dt, bool async)
 void ProtocolManager::update(float dt)
 {
     // Update from main thread only:
-    assert(!pthread_equal(pthread_self(), m_asynchronous_update_thread));
+    assert(std::this_thread::get_id() != m_asynchronous_update_thread.get_id());
 
     // before updating, notify protocols that they have received events
     m_sync_events_to_process.lock();
@@ -462,7 +478,7 @@ void ProtocolManager::asynchronousUpdate()
 {
     PROFILER_PUSH_CPU_MARKER("Message delivery", 255, 0, 0);
     // Update from ProtocolManager thread only:
-    assert(pthread_equal(pthread_self(), m_asynchronous_update_thread));
+    assert(std::this_thread::get_id() == m_asynchronous_update_thread.get_id());
 
     // First deliver asynchronous messages for all protocols
     // =====================================================

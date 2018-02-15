@@ -79,7 +79,7 @@ bool Protocol::checkDataSize(Event* event, unsigned int minimum_size)
  */
 void Protocol::requestStart()
 {
-    ProtocolManager::getInstance()->requestStart(this);
+    ProtocolManager::lock()->requestStart(this);
 }   // requestStart
 
 // ----------------------------------------------------------------------------
@@ -87,7 +87,7 @@ void Protocol::requestStart()
  */
 void Protocol::requestPause()
 {
-    ProtocolManager::getInstance()->requestPause(this);
+    ProtocolManager::lock()->requestPause(this);
 }   // requestPause
 
 // ----------------------------------------------------------------------------
@@ -95,7 +95,7 @@ void Protocol::requestPause()
  */
 void Protocol::requestUnpause()
 {
-    ProtocolManager::getInstance()->requestUnpause(this);
+    ProtocolManager::lock()->requestUnpause(this);
 }   // requestUnpause
 
 // ----------------------------------------------------------------------------
@@ -103,7 +103,7 @@ void Protocol::requestUnpause()
  */
 void Protocol::requestTerminate()
 {
-    ProtocolManager::getInstance()->requestTerminate(this);
+    ProtocolManager::lock()->requestTerminate(this);
 }   // requestTerminate
 
 // ----------------------------------------------------------------------------
