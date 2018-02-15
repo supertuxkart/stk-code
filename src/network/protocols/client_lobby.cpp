@@ -684,6 +684,8 @@ void ClientLobby::startSelection(Event* event)
     const NetworkString& data = event->data();
     const unsigned kart_num = data.getUInt16();
     const unsigned track_num = data.getUInt16();
+    m_available_karts.clear();
+    m_available_tracks.clear();
     for (unsigned i = 0; i < kart_num; i++)
     {
         std::string kart;
