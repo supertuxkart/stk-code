@@ -753,6 +753,11 @@ void ClientLobby::exitResultScreen(Event *event)
     // Will be reset to linked if connected to server, see update(float dt)
     m_game_setup = STKHost::get()->setupNewGame();
     STKHost::get()->getServerPeerForClient()->unsetClientServerToken();
+    // stop race protocols
+    ProtocolManager *pm = ProtocolManager::getInstance();
+    pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
+    pm->findAndTerminate(PROTOCOL_KART_UPDATE);
+    pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
     m_state = NONE;
 }   // exitResultScreen
 
