@@ -107,6 +107,6 @@ void TransportAddress::unitTesting()
 
     TransportAddress t17("128.0.0.0");
     assert(t17.getIP() == (128 << 24));
-    assert(t17.isLAN());
+    assert(!t17.isLAN());
 
 }   // unitTesting
