@@ -38,7 +38,8 @@
 #define WIN32_LEAN_AND_MEAN
 #include <enet/enet.h>
 
-#include <pthread.h>
+#include <atomic>
+#include <thread>
 
 class GameSetup;
 class NetworkConsole;
@@ -88,14 +89,14 @@ private:
     GameSetup* m_game_setup;
 
     /** Id of thread listening to enet events. */
-    pthread_t*  m_listening_thread;
+    std::thread m_listening_thread;
 
     /** Flag which is set from the protocol manager thread which
      *  triggers a shutdown of the STKHost (and the Protocolmanager). */
-    bool m_shutdown;
+    std::atomic_bool m_shutdown;
 
-    /** Mutex used to stop this thread. */
-    pthread_mutex_t m_exit_mutex;
+    /** Atomic flag used to stop this thread. */
+    std::atomic_flag m_exit_flag = ATOMIC_FLAG_INIT;
 
     /** If this is a server, it indicates if this server is registered
      *  with the stk server. */
@@ -110,6 +111,9 @@ private:
     virtual ~STKHost();
     void init();
     void handleDirectSocketRequest();
+
+    // ------------------------------------------------------------------------
+    void mainLoop();
 
 public:
     /** If a network console should be started. Note that the console can cause
@@ -139,15 +143,25 @@ public:
     // ------------------------------------------------------------------------
     /** Checks if the STKHost has been created. */
     static bool existHost() { return m_stk_host != NULL; }
-    // ------------------------------------------------------------------------
-
-    static void* mainLoop(void* self);
 
     virtual GameSetup* setupNewGame();
     void abort();
     void deleteAllPeers();
     bool connect(const TransportAddress& peer);
-    void requestShutdown();
+
+    //-------------------------------------------------------------------------
+    /** Requests that the network infrastructure is to be shut down. This
+    *   function is called from a thread, but the actual shutdown needs to be
+    *   done from the main thread to avoid race conditions (e.g.
+    *   ProtocolManager might still access data structures when the main thread
+    *   tests if STKHost exist (which it does, but ProtocolManager might be
+    *   shut down already.
+    */
+    void requestShutdown()
+    {
+        m_shutdown.store(true);
+    }   // requestExit
+    //-------------------------------------------------------------------------
     void shutdown();
 
     void sendPacketExcept(STKPeer* peer,
@@ -164,7 +178,6 @@ public:
     STKPeer    *getPeer(ENetPeer *enet_peer);
     STKPeer    *getServerPeerForClient() const;
     std::vector<NetworkPlayerProfile*> getMyPlayerProfiles();
-    int         mustStopListening();
     uint16_t    getPort() const;
     void        setErrorMessage(const irr::core::stringw &message);
     bool        isAuthorisedToControl() const;
@@ -174,7 +187,7 @@ public:
     // --------------------------------------------------------------------
     /** Returns true if a shutdown of the network infrastructure was
      *  requested. */
-    bool requestedShutdown() const { return m_shutdown; }
+    bool requestedShutdown() const { return m_shutdown.load(); }
     // --------------------------------------------------------------------
     /** Returns the current game setup. */
     GameSetup* getGameSetup() { return m_game_setup; }

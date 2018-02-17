@@ -43,8 +43,7 @@
 #  include <errno.h>
 #  include <sys/socket.h>
 #endif
-#include <pthread.h>
-#include <signal.h>
+#include <functional>
 
 STKHost *STKHost::m_stk_host       = NULL;
 bool     STKHost::m_enable_console = false;
@@ -303,12 +302,12 @@ void STKHost::init()
     m_shutdown         = false;
     m_network          = NULL;
     m_lan_network      = NULL;
-    m_listening_thread = NULL;
     m_game_setup       = NULL;
     m_is_registered    = false;
     m_error_message    = "";
 
-    pthread_mutex_init(&m_exit_mutex, NULL);
+    m_exit_flag.clear();
+    m_exit_flag.test_and_set();
 
     // Start with initialising ENet
     // ============================
@@ -354,18 +353,6 @@ STKHost::~STKHost()
 
     delete m_network;
 }   // ~STKHost
-
-//-----------------------------------------------------------------------------
-/** Requests that the network infrastructure is to be shut down. This function
- *  is called from a thread, but the actual shutdown needs to be done from 
- *  the main thread to avoid race conditions (e.g. ProtocolManager might still
- *  access data structures when the main thread tests if STKHost exist (which
- *  it does, but ProtocolManager might be shut down already.
- */
-void STKHost::requestShutdown()
-{
-    m_shutdown = true;
-}   // requestExit
 
 //-----------------------------------------------------------------------------
 /** Called from the main thread when the network infrastructure is to be shut
@@ -462,9 +449,9 @@ bool STKHost::connect(const TransportAddress& address)
  */
 void STKHost::startListening()
 {
-    pthread_mutex_lock(&m_exit_mutex); // will let the update function start
-    m_listening_thread = new pthread_t;
-    pthread_create(m_listening_thread, NULL, &STKHost::mainLoop, this);
+    m_exit_flag.clear();
+    m_exit_flag.test_and_set();
+    m_listening_thread = std::thread(std::bind(&STKHost::mainLoop, this));
 }   // startListening
 
 // ----------------------------------------------------------------------------
@@ -473,28 +460,10 @@ void STKHost::startListening()
  */
 void STKHost::stopListening()
 {
-    if (m_listening_thread)
-    {
-        // This will stop the update function on its next update
-        pthread_mutex_unlock(&m_exit_mutex);
-        pthread_join(*m_listening_thread, NULL); // wait for the thread to end
-    }
+    m_exit_flag.clear();
+    if (m_listening_thread.joinable())
+        m_listening_thread.join();
 }   // stopListening
-
-// ---------------------------------------------------------------------------
-/** \brief Returns true when the thread should stop listening.
- */
-int STKHost::mustStopListening()
-{
-    switch (pthread_mutex_trylock(&m_exit_mutex)) {
-    case 0: /* if we got the lock, unlock and return 1 (true) */
-        pthread_mutex_unlock(&m_exit_mutex);
-        return 1;
-    case EBUSY: /* return 0 (false) if the mutex was locked */
-        return 0;
-    }
-    return 1;
-}   // mustStopListening
 
 // ----------------------------------------------------------------------------
 /** Returns true if this client instance is allowed to control the server.
@@ -520,26 +489,25 @@ bool STKHost::isAuthorisedToControl() const
  *  event and passes it to the Network Manager.
  *  \param self : used to pass the ENet host to the function.
  */
-void* STKHost::mainLoop(void* self)
+void STKHost::mainLoop()
 {
     VS::setThreadName("STKHost");
     ENetEvent event;
-    STKHost* myself = (STKHost*)(self);
-    ENetHost* host = myself->m_network->getENetHost();
+    ENetHost* host = m_network->getENetHost();
 
     if(NetworkConfig::get()->isServer() && 
         (NetworkConfig::get()->isLAN() || NetworkConfig::get()->isPublicServer()) )
     {
         TransportAddress address(0, NetworkConfig::get()->getServerDiscoveryPort());
         ENetAddress eaddr = address.toEnetAddress();
-        myself->m_lan_network = new Network(1, 1, 0, 0, &eaddr);
+        m_lan_network = new Network(1, 1, 0, 0, &eaddr);
     }
 
-    while (!myself->mustStopListening())
+    while (m_exit_flag.test_and_set())
     {
-        if(myself->m_lan_network)
+        if(m_lan_network)
         {
-            myself->handleDirectSocketRequest();
+            handleDirectSocketRequest();
         }   // if discovery host
 
         while (enet_host_service(host, &event, 20) != 0)
@@ -561,7 +529,7 @@ void* STKHost::mainLoop(void* self)
             if (stk_event->getType() == EVENT_TYPE_CONNECTED)
             {
                 Log::info("STKHost", "A client has just connected. There are "
-                          "now %lu peers.", myself->m_peers.size());
+                          "now %lu peers.", m_peers.size());
                 Log::debug("STKHost", "Addresses are : %lx, %lx",
                            stk_event->getPeer(), peer);
             }   // EVENT_TYPE_CONNECTED
@@ -588,12 +556,8 @@ void* STKHost::mainLoop(void* self)
             pm->propagateEvent(stk_event);
             
         }   // while enet_host_service
-    }   // while !mustStopListening
-
-    free(myself->m_listening_thread);
-    myself->m_listening_thread = NULL;
+    }   // while m_exit_flag.test_and_set()
     Log::info("STKHost", "Listening has been stopped");
-    return NULL;
 }   // mainLoop
 
 // ----------------------------------------------------------------------------
