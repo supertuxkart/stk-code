@@ -229,8 +229,10 @@ private:
     virtual void unpauseProtocol(Protocol *protocol);
 
 public:
-                 ProtocolManager();
-    virtual     ~ProtocolManager();
+    // ===========================================
+    // Public constructor is required for shared_ptr
+              ProtocolManager();
+    virtual  ~ProtocolManager();
     void      abort();
     void      propagateEvent(Event* event);
     Protocol* getProtocol(ProtocolType type);
@@ -250,9 +252,15 @@ public:
     // ------------------------------------------------------------------------
     static std::shared_ptr<ProtocolManager> createInstance();
     // ------------------------------------------------------------------------
-    static bool emptyInstance();
+    static bool emptyInstance()
+    {
+        return m_protocol_manager.expired();
+    }   // emptyInstance
     // ------------------------------------------------------------------------
-    static std::shared_ptr<ProtocolManager> lock();
+    static std::shared_ptr<ProtocolManager> lock()
+    {
+        return m_protocol_manager.lock();
+    }   // lock
 
 };   // class ProtocolManager
 

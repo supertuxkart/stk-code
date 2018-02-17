@@ -61,18 +61,6 @@ std::shared_ptr<ProtocolManager> ProtocolManager::createInstance()
 }   // createInstance
 
 // ----------------------------------------------------------------------------
-std::shared_ptr<ProtocolManager> ProtocolManager::lock()
-{
-    return m_protocol_manager.lock();
-}   // lock
-
-// ----------------------------------------------------------------------------
-bool ProtocolManager::emptyInstance()
-{
-    return m_protocol_manager.expired();
-}   // emptyInstance
-
-// ----------------------------------------------------------------------------
 ProtocolManager::ProtocolManager()
 {
     m_exit.store(false);
