@@ -25,11 +25,6 @@ RaceEventManager::~RaceEventManager()
  */
 void RaceEventManager::update(float dt)
 {
-    // This can happen in case of disconnects - protocol manager is
-    // shut down, but still events to process.
-    if(!ProtocolManager::lock())
-        return;
-
     // Replay all recorded events up to the current time (only if the
     // timer isn't stopped, otherwise a potential rewind will trigger
     // an infinite loop since world time does not increase)
@@ -42,11 +37,11 @@ void RaceEventManager::update(float dt)
                                              &dt);
         PROFILER_POP_CPU_MARKER();
     }
-
     World::getWorld()->updateWorld(dt);
 
     // if the race is over
-    if (World::getWorld()->getPhase() >= WorldStatus::RESULT_DISPLAY_PHASE)
+    if (World::getWorld()->getPhase() >= WorldStatus::RESULT_DISPLAY_PHASE &&
+        World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE)
     {
         // consider the world finished.
         stop();
@@ -71,7 +66,8 @@ bool RaceEventManager::isRaceOver()
 {
     if(!World::getWorld())
         return false;
-    return (World::getWorld()->getPhase() >  WorldStatus::RACE_PHASE);
+    return (World::getWorld()->getPhase() > WorldStatus::RACE_PHASE &&
+        World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE);
 }   // isRaceOver
 
 // ----------------------------------------------------------------------------

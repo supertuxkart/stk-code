@@ -499,7 +499,8 @@ void WorldStatus::pause(Phase phase)
     m_phase          = phase;
     IrrlichtDevice *device = irr_driver->getDevice();
 
-    if (!device->getTimer()->isStopped())
+    if (!device->getTimer()->isStopped() &&
+        !NetworkConfig::get()->isNetworking())
         device->getTimer()->stop();
 }   // pause
 
@@ -514,6 +515,7 @@ void WorldStatus::unpause()
     m_previous_phase = UNDEFINED_PHASE;
     IrrlichtDevice *device = irr_driver->getDevice();
 
-    if (device->getTimer()->isStopped())
+    if (device->getTimer()->isStopped() &&
+        !NetworkConfig::get()->isNetworking())
         device->getTimer()->start();
 }   // unpause
