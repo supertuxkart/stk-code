@@ -274,6 +274,12 @@ void MainLoop::run()
         float dt        = 1.0f / stk_config->m_physics_fps;
         left_over_time -= num_steps * dt ;
 
+        if (!ProfileWorld::isNoGraphics() && STKHost::existHost() &&
+            STKHost::get()->requestedShutdown())
+        {
+            STKHost::get()->shutdown();
+        }
+
         // Add a Time step entry to the rewind list, which can store all
         // all input ecents being issued during the driver update.
         if (World::getWorld() && RewindManager::get()->isEnabled())
@@ -333,22 +339,14 @@ void MainLoop::run()
             // since the GUI engine is no more to be called then.
             if (m_abort) break;
 
-            if (STKHost::existHost())
+            PROFILER_PUSH_CPU_MARKER("Protocol manager update",
+                                     0x7F, 0x00, 0x7F);
+            if (auto pm = ProtocolManager::lock())
             {
-                if (!ProfileWorld::isNoGraphics()      &&
-                    STKHost::get()->requestedShutdown()  )
-                {
-                    STKHost::get()->shutdown();
-                }
-
-                PROFILER_PUSH_CPU_MARKER("Protocol manager update",
-                                         0x7F, 0x00, 0x7F);
-                if (auto pm = ProtocolManager::lock())
-                {
-                    pm->update(dt);
-                }
-                PROFILER_POP_CPU_MARKER();
+                pm->update(dt);
             }
+            PROFILER_POP_CPU_MARKER();
+
             if (World::getWorld()) World::getWorld()->updateTime(dt);
         }   // for i < num_steps
 
