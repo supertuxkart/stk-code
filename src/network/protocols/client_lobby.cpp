@@ -357,8 +357,7 @@ void ClientLobby::update(float dt)
         screen->push();
         m_state = SELECTING_KARTS;
 
-        Protocol *p = new LatencyProtocol();
-        p->requestStart();
+        std::make_shared<LatencyProtocol>()->requestStart();
         Log::info("LobbyProtocol", "LatencyProtocol started.");
     }
     break;
@@ -370,7 +369,7 @@ void ClientLobby::update(float dt)
         break;
     case DONE:
         m_state = EXITING;
-        ProtocolManager::lock()->requestTerminate(this);
+        ProtocolManager::lock()->requestTerminate(shared_from_this());
         break;
     case EXITING:
         break;

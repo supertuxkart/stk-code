@@ -115,7 +115,7 @@ void ServerLobby::setup()
     m_state             = NetworkConfig::get()->isLAN() ? ACCEPTING_CLIENTS 
                                                         : INIT_WAN;
     m_selection_enabled = false;
-    m_current_protocol  = NULL;
+    m_current_protocol  = nullptr;
     Log::info("ServerLobby", "Starting the protocol.");
 
     // Initialise the data structures to detect if all clients and 
@@ -202,7 +202,7 @@ void ServerLobby::update(float dt)
     {
     case INIT_WAN:
         // Start the protocol to find the public ip address.
-        m_current_protocol = new GetPublicAddress(this);
+        m_current_protocol = std::make_shared<GetPublicAddress>(this);
         m_current_protocol->requestStart();
         m_state = GETTING_PUBLIC_ADDRESS;
         // The callback from GetPublicAddress will wake this protocol up
@@ -212,7 +212,7 @@ void ServerLobby::update(float dt)
     {
         Log::debug("ServerLobby", "Public address known.");
         // Free GetPublicAddress protocol
-        delete m_current_protocol;
+        m_current_protocol = nullptr;
 
         // Register this server with the STK server. This will block
         // this thread, but there is no need for the protocol manager
@@ -420,8 +420,7 @@ void ServerLobby::startSelection(const Event *event)
     m_state = SELECTING;
     WaitingForOthersScreen::getInstance()->push();
 
-    Protocol *p = new LatencyProtocol();
-    p->requestStart();
+    std::make_shared<LatencyProtocol>()->requestStart();
     Log::info("LobbyProtocol", "LatencyProtocol started.");
 
 }   // startSelection
@@ -468,8 +467,7 @@ void ServerLobby::checkIncomingConnectionRequests()
         users_xml->getNode(i)->get("id", &id);
         Log::debug("ServerLobby",
                    "User with id %d wants to connect.", id);
-        Protocol *p = new ConnectToPeer(id);
-        p->requestStart();
+        std::make_shared<ConnectToPeer>(id)->requestStart();
     }        
     delete request;
 }   // checkIncomingConnectionRequests

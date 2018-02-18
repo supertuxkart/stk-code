@@ -34,7 +34,6 @@ class STKPeer;
 
 class GameProtocol : public Protocol
                    , public EventRewinder
-                   , public Singleton<GameProtocol>
 {
 private:
 
@@ -69,6 +68,7 @@ private:
     void handleControllerAction(Event *event);
     void handleState(Event *event);
     void handleAdjustTime(Event *event);
+    static std::weak_ptr<GameProtocol> m_game_protocol;
 public:
              GameProtocol();
     virtual ~GameProtocol();
@@ -90,6 +90,18 @@ public:
     // ------------------------------------------------------------------------
     virtual void asynchronousUpdate() OVERRIDE {}
     // ------------------------------------------------------------------------
+    static std::shared_ptr<GameProtocol> createInstance();
+    // ------------------------------------------------------------------------
+    static bool emptyInstance()
+    {
+        return m_game_protocol.expired();
+    }   // emptyInstance
+    // ------------------------------------------------------------------------
+    static std::shared_ptr<GameProtocol> lock()
+    {
+        return m_game_protocol.lock();
+    }   // lock
+
 };   // class GameProtocol
 
 #endif // GAME_PROTOCOL_HPP

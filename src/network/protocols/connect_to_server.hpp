@@ -32,7 +32,7 @@ private:
     uint32_t m_host_id;
 
     /** Protocol currently being monitored. */
-    Protocol *m_current_protocol;
+    std::shared_ptr<Protocol> m_current_protocol;
     bool m_quick_join;
 
     /** State for finite state machine. */

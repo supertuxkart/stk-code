@@ -34,7 +34,7 @@ protected:
     uint32_t m_peer_id;
 
     /** Pointer to the protocol which is monitored for state changes. */
-    Protocol *m_current_protocol;
+    std::shared_ptr<Protocol> m_current_protocol;
 
     /** True if this is a LAN connection. */
     bool m_is_lan;

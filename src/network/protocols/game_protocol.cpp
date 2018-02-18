@@ -32,6 +32,21 @@
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 
+// ============================================================================
+std::weak_ptr<GameProtocol> GameProtocol::m_game_protocol;
+// ============================================================================
+std::shared_ptr<GameProtocol> GameProtocol::createInstance()
+{
+    if (!emptyInstance())
+    {
+        Log::fatal("GameProtocol", "Create only 1 instance of GameProtocol!");
+        return NULL;
+    }
+    auto gm = std::make_shared<GameProtocol>();
+    m_game_protocol = gm;
+    return gm;
+}   // createInstance
+
 //-----------------------------------------------------------------------------
 /** Constructor. Allocates the buffer for events to send to the server. */
 GameProtocol::GameProtocol()

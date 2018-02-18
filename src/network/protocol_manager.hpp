@@ -67,10 +67,10 @@ public:
     ProtocolRequestType m_type;
 
     /** The concerned protocol information. */
-    Protocol *m_protocol;
+    std::shared_ptr<Protocol> m_protocol;
 
 public:
-    ProtocolRequest(ProtocolRequestType type, Protocol *protocol)
+    ProtocolRequest(ProtocolRequestType type, std::shared_ptr<Protocol> protocol)
     {
         m_type     = type;
         m_protocol = protocol;
@@ -80,7 +80,7 @@ public:
     ProtocolRequestType getType() const { return m_type;  }
     // ------------------------------------------------------------------------
     /** Returns the protocol for this request. */
-    Protocol *getProtocol() { return m_protocol;  }
+    std::shared_ptr<Protocol> getProtocol() { return m_protocol;  }
 };   // class ProtocolRequest;
 
 // ============================================================================
@@ -144,9 +144,9 @@ private:
     class OneProtocolType
     {
     private:
-        Synchronised< std::vector<Protocol*> > m_protocols;
+        Synchronised< std::vector<std::shared_ptr<Protocol> > > m_protocols;
     public:
-        void removeProtocol(Protocol *p);
+        void removeProtocol(std::shared_ptr<Protocol> p);
         void requestTerminateAll();
         bool notifyEvent(Event *event);
         void update(float dt, bool async);
@@ -154,7 +154,8 @@ private:
         // --------------------------------------------------------------------
         /** Returns the first protocol of a given type. It is assumed that
          *  there is a protocol of that type. */
-        Protocol *getFirstProtocol() { return m_protocols.getData()[0]; }
+        std::shared_ptr<Protocol> getFirstProtocol()
+                                           { return m_protocols.getData()[0]; }
         // --------------------------------------------------------------------
         /** Returns if this protocol class handles connect events. Protocols
          *  of the same class either all handle a connect event, or none, so
@@ -180,7 +181,7 @@ private:
         /** Locks access to this list of all protocols of a certain type. */
         void unlock() { m_protocols.unlock(); }
         // --------------------------------------------------------------------
-        void addProtocol(Protocol *p)
+        void addProtocol(std::shared_ptr<Protocol> p)
         {
             m_protocols.getData().push_back(p); 
         }   // addProtocol
@@ -222,11 +223,11 @@ private:
 
     bool         sendEvent(Event* event);
 
-    virtual void startProtocol(Protocol *protocol);
-    virtual void terminateProtocol(Protocol *protocol);
+    virtual void startProtocol(std::shared_ptr<Protocol> protocol);
+    virtual void terminateProtocol(std::shared_ptr<Protocol> protocol);
     virtual void asynchronousUpdate();
-    virtual void pauseProtocol(Protocol *protocol);
-    virtual void unpauseProtocol(Protocol *protocol);
+    virtual void pauseProtocol(std::shared_ptr<Protocol> protocol);
+    virtual void unpauseProtocol(std::shared_ptr<Protocol> protocol);
 
 public:
     // ===========================================
@@ -235,11 +236,11 @@ public:
     virtual  ~ProtocolManager();
     void      abort();
     void      propagateEvent(Event* event);
-    Protocol* getProtocol(ProtocolType type);
-    void      requestStart(Protocol* protocol);
-    void      requestPause(Protocol* protocol);
-    void      requestUnpause(Protocol* protocol);
-    void      requestTerminate(Protocol* protocol);
+    std::shared_ptr<Protocol> getProtocol(ProtocolType type);
+    void      requestStart(std::shared_ptr<Protocol> protocol);
+    void      requestPause(std::shared_ptr<Protocol> protocol);
+    void      requestUnpause(std::shared_ptr<Protocol> protocol);
+    void      requestTerminate(std::shared_ptr<Protocol> protocol);
     void      findAndTerminate(ProtocolType type);
     void      update(float dt);
     // ------------------------------------------------------------------------

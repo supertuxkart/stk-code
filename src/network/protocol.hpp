@@ -27,6 +27,7 @@
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 
+#include <memory>
 #include <stddef.h>
 
 class Event;
@@ -90,7 +91,8 @@ public:
  *  to make any network job.
  * \ingroup network
  */
-class Protocol : public NoCopy
+class Protocol : public std::enable_shared_from_this<Protocol>,
+                 public NoCopy
 {
     LEAK_CHECK()
 protected:

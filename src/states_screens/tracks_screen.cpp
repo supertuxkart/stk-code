@@ -89,10 +89,9 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         {
             if(STKHost::existHost())
             {
-                Protocol* protocol = LobbyProtocol::get();
-                ClientLobby* clrp =
-                              dynamic_cast<ClientLobby*>(protocol);
-                assert(clrp);   // server never shows the track screen.
+                auto clrp = LobbyProtocol::get<ClientLobby>();
+                // server never shows the track screen.
+                assert(clrp);
                 // FIXME SPLITSCREEN: we need to supply the global player id of the
                 // player selecting the track here. For now ... just vote the same
                 // track for each local player.
@@ -200,11 +199,10 @@ void TracksScreen::buildTrackList()
     // First build a list of all tracks to be displayed
     // (e.g. exclude arenas, ...)
 	bool is_network = (STKHost::existHost());
-    ClientLobby* clrp = NULL;
+    std::shared_ptr<ClientLobby> clrp;
     if (is_network)
     {
-        Protocol* protocol = LobbyProtocol::get();
-        clrp = dynamic_cast<ClientLobby*>(protocol);
+        clrp = LobbyProtocol::get<ClientLobby>();
         assert(clrp);
     }
     PtrVector<Track, REF> tracks;

@@ -191,7 +191,7 @@ void RewindManager::update(float dt)
     PROFILER_PUSH_CPU_MARKER("RewindManager - save state", 0x20, 0x7F, 0x20);
 
     // Save state
-    GameProtocol::getInstance()->startNewState();
+    GameProtocol::lock()->startNewState();
     AllRewinder::const_iterator rewinder;
     for(rewinder=m_all_rewinder.begin(); rewinder!=m_all_rewinder.end(); ++rewinder)
     {
@@ -202,14 +202,14 @@ void RewindManager::update(float dt)
             // Add to the previously created container
             m_rewind_queue.addLocalState(*rewinder, buffer, /*confirmed*/true,
                                          World::getWorld()->getTime());
-            GameProtocol::getInstance()->addState(buffer);
+            GameProtocol::lock()->addState(buffer);
         }   // size >= 0
         else
             delete buffer;   // NULL or 0 byte buffer
     }
     PROFILER_POP_CPU_MARKER();
     PROFILER_PUSH_CPU_MARKER("RewindManager - send state", 0x20, 0x7F, 0x40);
-    GameProtocol::getInstance()->sendState();
+    GameProtocol::lock()->sendState();
     PROFILER_POP_CPU_MARKER();
     m_last_saved_state = time;
 }   // update

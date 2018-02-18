@@ -149,7 +149,7 @@ void OnlineProfileServers::doQuickPlay()
     {
         delete join_request;
         NetworkingLobby::getInstance()->push();
-        ConnectToServer *cts = new ConnectToServer(server->getServerId(),
+        auto cts = std::make_shared<ConnectToServer>(server->getServerId(),
             server->getHostId());
         ProtocolManager::lock()->requestStart(cts);
     }

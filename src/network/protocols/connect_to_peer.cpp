@@ -40,7 +40,6 @@ ConnectToPeer::ConnectToPeer(uint32_t peer_id)  : Protocol(PROTOCOL_CONNECTION)
     m_peer_address.clear();
     m_peer_id          = peer_id;
     m_state            = NONE;
-    m_current_protocol = NULL;
     m_is_lan           = false;
     setHandleConnections(true);
 }   // ConnectToPeer(peer_id)
@@ -56,7 +55,6 @@ ConnectToPeer::ConnectToPeer(const TransportAddress &address)
     // We don't need to find the peer address, so we can start
     // with the state when we found the peer address.
     m_state            = RECEIVED_PEER_ADDRESS;
-    m_current_protocol = NULL;
     m_is_lan           = true;
     setHandleConnections(true);
 }   // ConnectToPeers(TransportAddress)
@@ -99,7 +97,7 @@ void ConnectToPeer::asynchronousUpdate()
     {
         case NONE:
         {
-            m_current_protocol = new GetPeerAddress(m_peer_id, this); 
+            m_current_protocol = std::make_shared<GetPeerAddress>(m_peer_id, this);
             m_current_protocol->requestStart();
 
             // Pause this protocol till we receive an answer
@@ -118,8 +116,7 @@ void ConnectToPeer::asynchronousUpdate()
                 m_state = DONE;
                 break;
             }
-            delete m_current_protocol;
-            m_current_protocol = 0;
+            m_current_protocol = nullptr;
 
             // Now we know the peer address. If it's a non-local host, start
             // the Ping protocol to keep the port available. We can't rely on
@@ -130,7 +127,7 @@ void ConnectToPeer::asynchronousUpdate()
                       NetworkConfig::get()->getMyAddress().getIP() ) || 
                   NetworkConfig::m_disable_lan                            )
             {
-                m_current_protocol = new PingProtocol(m_peer_address,
+                m_current_protocol = std::make_shared<PingProtocol>(m_peer_address,
                                                       /*time-between-ping*/2.0);
                 ProtocolManager::lock()->requestStart(m_current_protocol);
                 m_state = CONNECTING;
@@ -202,7 +199,7 @@ void ConnectToPeer::asynchronousUpdate()
             {
                 // Kill the ping protocol because we're connected
                 m_current_protocol->requestTerminate();
-                m_current_protocol = NULL;
+                m_current_protocol = nullptr;
             }
             m_state = DONE;
             break;

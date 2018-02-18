@@ -161,7 +161,7 @@ bool LocalPlayerController::action(PlayerAction action, int value,
         NetworkConfig::get()->isClient()    &&
         !RewindManager::get()->isRewinding()   )
     {
-        GameProtocol::getInstance()
+        GameProtocol::lock()
                     ->controllerAction(m_kart->getWorldKartId(),
                                        action, value,
                                        m_steer_val_l, m_steer_val_r);

@@ -348,9 +348,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         if (name == "middle") // Continue button (return to server lobby)
         {
             // Signal to the server that this client is back in the lobby now.
-            Protocol* protocol = LobbyProtocol::get();
-            ClientLobby* clrp =
-                dynamic_cast<ClientLobby*>(protocol);
+            auto clrp = LobbyProtocol::get<ClientLobby>();
             if(clrp)
                 clrp->doneWithResults();
             backToLobby();

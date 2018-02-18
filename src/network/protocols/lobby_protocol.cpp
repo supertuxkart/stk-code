@@ -33,7 +33,7 @@
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 
-LobbyProtocol *LobbyProtocol::m_lobby = NULL;
+std::weak_ptr<LobbyProtocol> LobbyProtocol::m_lobby;
 
 LobbyProtocol::LobbyProtocol(CallbackObject* callback_object)
                  : Protocol(PROTOCOL_LOBBY_ROOM, callback_object)
@@ -125,8 +125,8 @@ void LobbyProtocol::loadWorld()
     // Load the actual world.
     m_game_setup->getRaceConfig()->loadWorld();
     World::getWorld()->setNetworkWorld(true);
-    GameProtocol::getInstance()->requestStart();
-    (new GameEventsProtocol())->requestStart();
+    GameProtocol::createInstance()->requestStart();
+    std::make_shared<GameEventsProtocol>()->requestStart();
 
 }   // loadWorld
 

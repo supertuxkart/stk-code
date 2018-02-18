@@ -82,7 +82,7 @@ ConnectToServer::~ConnectToServer()
 void ConnectToServer::setup()
 {
     Log::info("ConnectToServer", "SETUP");
-    m_current_protocol = NULL;
+    m_current_protocol = nullptr;
     // In case of LAN we already have the server's and our ip address,
     // so we can immediately start requesting a connection.
     m_state = NetworkConfig::get()->isLAN() ? GOT_SERVER_ADDRESS : NONE;
@@ -108,7 +108,7 @@ void ConnectToServer::asynchronousUpdate()
             Log::info("ConnectToServer", "Protocol starting");
             // This protocol will write the public address of this
             // instance to STKHost.
-            m_current_protocol = new GetPublicAddress(this);
+            m_current_protocol = std::make_shared<GetPublicAddress>(this);
             m_current_protocol->requestStart();
             // This protocol will be unpaused in the callback from 
             // GetPublicAddress
@@ -118,8 +118,8 @@ void ConnectToServer::asynchronousUpdate()
         }
         case GETTING_SELF_ADDRESS:
         {
-            delete m_current_protocol;   // delete GetPublicAddress
-            m_current_protocol = NULL;
+            // drop GetPublicAddress
+            m_current_protocol = nullptr;
 
             registerWithSTKServer();  // Register us with STK server
 
@@ -139,8 +139,7 @@ void ConnectToServer::asynchronousUpdate()
         case GOT_SERVER_ADDRESS:
         {
             assert(!m_quick_join);
-            delete m_current_protocol;
-            m_current_protocol = NULL;
+            m_current_protocol = nullptr;
             Log::info("ConnectToServer", "Server's address known");
 
             // we're in the same lan (same public ip address) !!
@@ -151,7 +150,7 @@ void ConnectToServer::asynchronousUpdate()
                     "Server appears to be in the same LAN.");
             }
             m_state = REQUESTING_CONNECTION;
-            m_current_protocol = new RequestConnection(m_server_id);
+            m_current_protocol = std::make_shared<RequestConnection>(m_server_id);
             m_current_protocol->requestStart();
             break;
         }
@@ -160,8 +159,7 @@ void ConnectToServer::asynchronousUpdate()
             if (!m_current_protocol ||
                 m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
             {
-                delete m_current_protocol;
-                m_current_protocol = NULL;
+                m_current_protocol = nullptr;
                 // Server knows we want to connect
                 Log::info("ConnectToServer", "Connection request made");
                 if (m_server_address.getIP() == 0 ||
@@ -171,7 +169,7 @@ void ConnectToServer::asynchronousUpdate()
                     m_state = HIDING_ADDRESS;
                     Log::error("ConnectToServer", "Server address is %s",
                                m_server_address.toString().c_str());
-                    m_current_protocol = new HidePublicAddress();
+                    m_current_protocol = std::make_shared<HidePublicAddress>();
                     m_current_protocol->requestStart();
                     return;
                 }
@@ -187,7 +185,7 @@ void ConnectToServer::asynchronousUpdate()
                 else
                 {
                     m_state = CONNECTING;
-                    m_current_protocol = new PingProtocol(m_server_address, 2.0);
+                    m_current_protocol = std::make_shared<PingProtocol>(m_server_address, 2.0);
                     m_current_protocol->requestStart();
                 }
             }
@@ -212,12 +210,11 @@ void ConnectToServer::asynchronousUpdate()
                 // Kill the ping protocol because we're connected
                 m_current_protocol->requestTerminate();
             }
-            delete m_current_protocol;
-            m_current_protocol = NULL;
+            m_current_protocol = nullptr;
             // LAN networking does not use the stk server tables.
             if(NetworkConfig::get()->isWAN())
             {
-                m_current_protocol = new HidePublicAddress();
+                m_current_protocol = std::make_shared<HidePublicAddress>();
                 m_current_protocol->requestStart();
             }
             m_state = HIDING_ADDRESS;
@@ -230,18 +227,16 @@ void ConnectToServer::asynchronousUpdate()
             {
                 if(m_current_protocol)
                 {
-                    delete m_current_protocol;
-                    m_current_protocol = NULL;
+                    m_current_protocol = nullptr;
                     Log::info("ConnectToServer", "Address hidden");
                 }
                 m_state = DONE;
                 // lobby room protocol if we're connected only
                 if(STKHost::get()->getPeers()[0]->isConnected())
                 {
-                    ClientLobby *p = 
-                        LobbyProtocol::create<ClientLobby>();
-                    p->setAddress(m_server_address);
-                    p->requestStart();
+                    auto cl = LobbyProtocol::create<ClientLobby>();
+                    cl->setAddress(m_server_address);
+                    cl->requestStart();
                 }
             }
             break;

@@ -79,7 +79,7 @@ bool Protocol::checkDataSize(Event* event, unsigned int minimum_size)
  */
 void Protocol::requestStart()
 {
-    ProtocolManager::lock()->requestStart(this);
+    ProtocolManager::lock()->requestStart(shared_from_this());
 }   // requestStart
 
 // ----------------------------------------------------------------------------
@@ -87,7 +87,7 @@ void Protocol::requestStart()
  */
 void Protocol::requestPause()
 {
-    ProtocolManager::lock()->requestPause(this);
+    ProtocolManager::lock()->requestPause(shared_from_this());
 }   // requestPause
 
 // ----------------------------------------------------------------------------
@@ -95,7 +95,7 @@ void Protocol::requestPause()
  */
 void Protocol::requestUnpause()
 {
-    ProtocolManager::lock()->requestUnpause(this);
+    ProtocolManager::lock()->requestUnpause(shared_from_this());
 }   // requestUnpause
 
 // ----------------------------------------------------------------------------
@@ -103,7 +103,7 @@ void Protocol::requestUnpause()
  */
 void Protocol::requestTerminate()
 {
-    ProtocolManager::lock()->requestTerminate(this);
+    ProtocolManager::lock()->requestTerminate(shared_from_this());
 }   // requestTerminate
 
 // ----------------------------------------------------------------------------

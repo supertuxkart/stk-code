@@ -144,9 +144,7 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
     }
     if(playerID == PLAYER_ID_GAME_MASTER) // self
     {
-
-        LobbyProtocol* protocol = LobbyProtocol::get();
-        ClientLobby *clrp = dynamic_cast<ClientLobby*>(protocol);
+        auto clrp = LobbyProtocol::get<ClientLobby>();
         assert(clrp);
         // FIXME SPLITSCREEN: we need to supply the global player id of the 
         // player selecting the kart here. For now ... just vote the same kart
@@ -196,10 +194,7 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
     // to the server.
     if(STKHost::get()->isAuthorisedToControl())
     {
-        Protocol* protocol = ProtocolManager::lock()
-                           ->getProtocol(PROTOCOL_LOBBY_ROOM);
-        ClientLobby* clrp =
-                           dynamic_cast<ClientLobby*>(protocol);
+        auto clrp = LobbyProtocol::get<ClientLobby>();
         assert(clrp);
         // FIXME: for now we submit a vote from the authorised user
         // for the various modes based on the settings in the race manager. 
@@ -214,7 +209,7 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
             clrp->voteMinor(id, race_manager->getMinorMode());
             clrp->voteReversed(id, race_manager->getReverseTrack());
             clrp->voteRaceCount(id, 1);
-            clrp->voteLaps(id, 3);
+            clrp->voteLaps(id, 1);
         }
         //WaitingForOthersScreen::getInstance()->push();
         //return;
@@ -228,10 +223,8 @@ bool NetworkKartSelectionScreen::onEscapePressed()
     // then remove the lobby screen (you left the server)
     StateManager::get()->popMenu();
     ServerSelection::getInstance()->refresh();
-    Protocol *lobby = LobbyProtocol::get();
     // notify the server that we left
-    ClientLobby* clrp =
-        dynamic_cast<ClientLobby*>(lobby);
+    auto clrp = LobbyProtocol::get<ClientLobby>();
     if (clrp)
         clrp->leave();
     return true; // remove the screen

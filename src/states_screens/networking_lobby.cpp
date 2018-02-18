@@ -162,8 +162,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
     {
         if(NetworkConfig::get()->isServer())
         {
-            Protocol *p = LobbyProtocol::get();
-            ServerLobby* slrp = dynamic_cast<ServerLobby*>(p);
+            auto slrp = LobbyProtocol::get<ServerLobby>();
             slrp->startSelection();
         }
         else // client
@@ -198,10 +197,9 @@ void NetworkingLobby::tearDown()
 bool NetworkingLobby::onEscapePressed()
 {
     // notify the server that we left
-    ClientLobby* protocol =
-        dynamic_cast<ClientLobby*>(LobbyProtocol::get());
-    if (protocol)
-        protocol->leave();
+    auto clrp = LobbyProtocol::get<ClientLobby>();
+    if (clrp)
+        clrp->leave();
     STKHost::get()->shutdown();
     return true; // close the screen
 }   // onEscapePressed

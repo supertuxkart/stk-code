@@ -562,7 +562,7 @@ void RaceManager::startNextRace()
     // the world has been setup
     if(NetworkConfig::get()->isNetworking())
     {
-        LobbyProtocol *lobby = LobbyProtocol::get();
+        auto lobby = LobbyProtocol::get<LobbyProtocol>();
         assert(lobby);
         lobby->finishedLoadingWorld();
     }

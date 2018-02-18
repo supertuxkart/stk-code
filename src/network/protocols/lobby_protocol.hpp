@@ -63,28 +63,33 @@ public:
     };
 
 protected:
-    static LobbyProtocol *m_lobby;
+    static std::weak_ptr<LobbyProtocol> m_lobby;
 
     /** The game setup. */
     GameSetup* m_game_setup;
 
-
 public:
 
     /** Creates either a client or server lobby protocol as a singleton. */
-    template<typename S> static S* create()
+    template<typename singleton> static std::shared_ptr<singleton> create()
     {
-        assert(m_lobby == NULL);
-        m_lobby = new S();
-        return dynamic_cast<S*>(m_lobby);
+        assert(m_lobby.expired());
+        auto ret = std::make_shared<singleton>();
+        m_lobby = ret;
+        return std::dynamic_pointer_cast<singleton>(ret);
     }   // create
 
     // ------------------------------------------------------------------------
     /** Returns the singleton client or server lobby protocol. */
-    static LobbyProtocol *get()
+    template<class T> static std::shared_ptr<T> get()
     {
-        assert(m_lobby);
-        return m_lobby;
+        if (std::shared_ptr<LobbyProtocol> lp = m_lobby.lock())
+        {
+            std::shared_ptr<T> new_type = std::dynamic_pointer_cast<T>(lp);
+            if (new_type)
+                return new_type;
+        }
+        return nullptr;
     }   // get
 
     // ------------------------------------------------------------------------

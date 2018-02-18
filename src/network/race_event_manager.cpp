@@ -73,7 +73,7 @@ bool RaceEventManager::isRaceOver()
 // ----------------------------------------------------------------------------
 void RaceEventManager::kartFinishedRace(AbstractKart *kart, float time)
 {
-    GameEventsProtocol* protocol = static_cast<GameEventsProtocol*>(
+    auto protocol = std::static_pointer_cast<GameEventsProtocol>(
         ProtocolManager::lock()->getProtocol(PROTOCOL_GAME_EVENTS));
     protocol->kartFinishedRace(kart, time);
 }   // kartFinishedRace
@@ -89,7 +89,7 @@ void RaceEventManager::collectedItem(Item *item, AbstractKart *kart)
     // this is only called in the server
     assert(NetworkConfig::get()->isServer());
 
-    GameEventsProtocol* protocol = static_cast<GameEventsProtocol*>(
+    auto protocol = std::static_pointer_cast<GameEventsProtocol>(
         ProtocolManager::lock()->getProtocol(PROTOCOL_GAME_EVENTS));
     protocol->collectedItem(item,kart);
 }   // collectedItem

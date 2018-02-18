@@ -257,8 +257,7 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
                                "an ENet client host.");
     }
 
-    Protocol *connect = new ConnectToServer(server_id, host_id);
-    connect->requestStart();
+    std::make_shared<ConnectToServer>(server_id, host_id)->requestStart();
 }   // STKHost
 
 // ----------------------------------------------------------------------------
@@ -288,8 +287,7 @@ STKHost::STKHost(const irr::core::stringw &server_name)
     }
 
     startListening();
-    Protocol *p = LobbyProtocol::create<ServerLobby>();
-    ProtocolManager::lock()->requestStart(p);
+    ProtocolManager::lock()->requestStart(LobbyProtocol::create<ServerLobby>());
 
 }   // STKHost(server_name)
 
@@ -608,8 +606,7 @@ void STKHost::handleDirectSocketRequest()
     {
         // In case of a LAN connection, we only allow connections from
         // a LAN address (192.168*, ..., and 127.*).
-        Protocol *c = new ConnectToPeer(sender);
-        c->requestStart();
+        std::make_shared<ConnectToPeer>(sender)->requestStart();
     }
     else
         Log::info("STKHost", "Received unknown command '%s'",

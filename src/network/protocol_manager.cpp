@@ -99,8 +99,6 @@ ProtocolManager::~ProtocolManager()
 // ----------------------------------------------------------------------------
 void ProtocolManager::OneProtocolType::abort()
 {
-    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
-        delete m_protocols.getData()[i];
     m_protocols.getData().clear();
 }   // OneProtocolType::abort
 
@@ -143,7 +141,7 @@ void ProtocolManager::propagateEvent(Event* event)
  * \param protocol : A pointer to the protocol to start
  * \return The unique id of the protocol that is being started.
  */
-void ProtocolManager::requestStart(Protocol* protocol)
+void ProtocolManager::requestStart(std::shared_ptr<Protocol> protocol)
 {
     // create the request
     ProtocolRequest req(PROTOCOL_REQUEST_START, protocol);
@@ -159,7 +157,7 @@ void ProtocolManager::requestStart(Protocol* protocol)
  *  thread-safe.
  *  \param protocol : A pointer to the protocol to pause
  */
-void ProtocolManager::requestPause(Protocol* protocol)
+void ProtocolManager::requestPause(std::shared_ptr<Protocol> protocol)
 {
     if (!protocol)
         return;
@@ -177,12 +175,12 @@ void ProtocolManager::requestPause(Protocol* protocol)
  *  thread-safe.
  *  \param protocol : A pointer to the protocol to unpause
  */
-void ProtocolManager::requestUnpause(Protocol* protocol)
+void ProtocolManager::requestUnpause(std::shared_ptr<Protocol> protocol)
 {
     if (!protocol)
         return;
     // create the request
-    ProtocolRequest req(PROTOCOL_REQUEST_UNPAUSE, protocol);;
+    ProtocolRequest req(PROTOCOL_REQUEST_UNPAUSE, protocol);
     // add it to the request stack
     m_requests.lock();
     m_requests.getData().push_back(req);
@@ -195,7 +193,7 @@ void ProtocolManager::requestUnpause(Protocol* protocol)
  *  thread-safe.
  *  \param protocol : A pointer to the protocol that is finished
  */
-void ProtocolManager::requestTerminate(Protocol* protocol)
+void ProtocolManager::requestTerminate(std::shared_ptr<Protocol> protocol)
 {
     if (!protocol)
         return;
@@ -222,7 +220,7 @@ void ProtocolManager::requestTerminate(Protocol* protocol)
  *  Add the protocol info to the m_protocols vector.
  *  \param protocol : ProtocolInfo to start.
  */
-void ProtocolManager::startProtocol(Protocol *protocol)
+void ProtocolManager::startProtocol(std::shared_ptr<Protocol> protocol)
 {
     assert(std::this_thread::get_id() == m_asynchronous_update_thread.get_id());
     OneProtocolType &opt = m_all_protocols[protocol->getProtocolType()];
@@ -242,7 +240,7 @@ void ProtocolManager::startProtocol(Protocol *protocol)
  *  Pauses a protocol and tells it that it's being paused.
  *  \param protocol : Protocol to pause.
  */
-void ProtocolManager::pauseProtocol(Protocol *protocol)
+void ProtocolManager::pauseProtocol(std::shared_ptr<Protocol> protocol)
 {
     assert(std::this_thread::get_id() == m_asynchronous_update_thread.get_id());
     assert(protocol->getState() == PROTOCOL_STATE_RUNNING);
@@ -259,7 +257,7 @@ void ProtocolManager::pauseProtocol(Protocol *protocol)
  *  Unpauses a protocol and notifies it.
  *  \param protocol : Protocol to unpause.
  */
-void ProtocolManager::unpauseProtocol(Protocol *protocol)
+void ProtocolManager::unpauseProtocol(std::shared_ptr<Protocol> protocol)
 {
     assert(std::this_thread::get_id() == m_asynchronous_update_thread.get_id());
     assert(protocol->getState() == PROTOCOL_STATE_PAUSED);
@@ -274,10 +272,9 @@ void ProtocolManager::unpauseProtocol(Protocol *protocol)
  *  Note that the protocol is not deleted.
  *  \param p The protocol to be removed.
 */
-void ProtocolManager::OneProtocolType::removeProtocol(Protocol *p)
+void ProtocolManager::OneProtocolType::removeProtocol(std::shared_ptr<Protocol> p)
 {
-    std::vector<Protocol*>::iterator i =
-        std::find(m_protocols.getData().begin(),
+    auto i = std::find(m_protocols.getData().begin(),
                   m_protocols.getData().end(),   p);
     if (i == m_protocols.getData().end())
     {
@@ -296,7 +293,7 @@ void ProtocolManager::OneProtocolType::removeProtocol(Protocol *p)
  *  Remove a protocol from the protocols vector.
  *  \param protocol : Protocol concerned.
  */
-void ProtocolManager::terminateProtocol(Protocol *protocol)
+void ProtocolManager::terminateProtocol(std::shared_ptr<Protocol> protocol)
 {
     assert(std::this_thread::get_id() == m_asynchronous_update_thread.get_id());
 
@@ -551,7 +548,7 @@ void ProtocolManager::asynchronousUpdate()
  *  \param type : The type of the protocol.
  *  \return The protocol that matches the given type.
  */
-Protocol* ProtocolManager::getProtocol(ProtocolType type)
+std::shared_ptr<Protocol> ProtocolManager::getProtocol(ProtocolType type)
 {
     OneProtocolType &opt = m_all_protocols[type];
     if (opt.isEmpty()) return NULL;

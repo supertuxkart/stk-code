@@ -78,23 +78,19 @@ void* NetworkConsole::mainLoop(void* data)
         }
         else if (str == "start" && NetworkConfig::get()->isServer())
         {
-            ServerLobby* protocol = 
-                dynamic_cast<ServerLobby*>(LobbyProtocol::get());
-            protocol->signalRaceStartToClients();
+            auto sl = LobbyProtocol::get<ServerLobby>();
+            sl->signalRaceStartToClients();
         }
         else if (str == "selection" && NetworkConfig::get()->isServer())
         {
-            ServerLobby* protocol =
-                    dynamic_cast<ServerLobby*>(LobbyProtocol::get());
-            protocol->startSelection();
+            auto sl = LobbyProtocol::get<ServerLobby>();
+            sl->startSelection();
         }
         else if (str == "select" && NetworkConfig::get()->isClient())
         {
             std::string str2;
             getline(std::cin, str2);
-            ServerLobby* protocol =
-                dynamic_cast<ServerLobby*>(LobbyProtocol::get());
-            ClientLobby* clrp = dynamic_cast<ClientLobby*>(protocol);
+            auto clrp = LobbyProtocol::get<ClientLobby>();
             std::vector<NetworkPlayerProfile*> players =
                                          STKHost::get()->getMyPlayerProfiles();
             // For now send a vote for each local player
@@ -109,9 +105,7 @@ void* NetworkConsole::mainLoop(void* data)
             std::cout << "Vote for ? (track/laps/reversed/major/minor/race#) :";
             std::string str2;
             getline(std::cin, str2);
-            LobbyProtocol* protocol = LobbyProtocol::get();
-            ClientLobby* clrp =
-                               dynamic_cast<ClientLobby*>(protocol);
+            auto clrp = LobbyProtocol::get<ClientLobby>();
             std::vector<NetworkPlayerProfile*> players =
                                      STKHost::get()->getMyPlayerProfiles();
             if (str2 == "track")
@@ -164,13 +158,12 @@ void* NetworkConsole::mainLoop(void* data)
         }
     }   // while !stop
 
-    Protocol *p = new StopServer();
+    auto p = std::make_shared<StopServer>();
+    p->requestStart();
     while(p->getState() != PROTOCOL_STATE_TERMINATED)
     {
         StkTime::sleep(1);
     }
-
-    delete p;
 
     main_loop->abort();
 

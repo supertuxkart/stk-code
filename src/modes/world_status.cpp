@@ -262,8 +262,7 @@ void WorldStatus::updateTime(const float dt)
             if (!m_server_is_ready) return;
 
             m_phase = READY_PHASE;
-            Protocol *p = LobbyProtocol::get();
-            ClientLobby *cl = dynamic_cast<ClientLobby*>(p);
+            auto cl = LobbyProtocol::get<ClientLobby>();
             if (cl)
                 cl->startingRaceNow();
             return;   // Don't increase time

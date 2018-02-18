@@ -54,7 +54,7 @@ private:
      *  seconds), which is the real time at which the server should start. */
     double m_server_delay;
 
-    Protocol *m_current_protocol;
+    std::shared_ptr<Protocol> m_current_protocol;
     bool m_selection_enabled;
 
     /** Counts how many players are ready to go on. */
