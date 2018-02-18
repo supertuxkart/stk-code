@@ -227,5 +227,6 @@ bool NetworkKartSelectionScreen::onEscapePressed()
     auto clrp = LobbyProtocol::get<ClientLobby>();
     if (clrp)
         clrp->leave();
+    STKHost::get()->shutdown();
     return true; // remove the screen
 }   // onEscapePressed

@@ -75,7 +75,7 @@ void OnlineLanScreen::eventCallback(Widget* widget, const std::string& name, con
 {
     if (name == "back")
     {
-        StateManager::get()->popMenu();
+        StateManager::get()->escapePressed();
         return;
     }
     if (name == "lan")
@@ -106,7 +106,6 @@ void OnlineLanScreen::eventCallback(Widget* widget, const std::string& name, con
 bool OnlineLanScreen::onEscapePressed()
 {
     NetworkConfig::get()->unsetNetworking();
-    //StateManager::get()->popMenu();
     return true;
 }   // onEscapePressed
 
