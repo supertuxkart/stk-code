@@ -26,6 +26,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/message_queue.hpp"
 #include "input/input_manager.hpp"
 #include "input/wiimote_manager.hpp"
 #include "modes/profile_world.hpp"
@@ -38,6 +39,8 @@
 #include "online/request_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
+#include "states_screens/main_menu_screen.hpp"
+#include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
 
@@ -278,6 +281,17 @@ void MainLoop::run()
             STKHost::get()->requestedShutdown())
         {
             STKHost::get()->shutdown();
+            if (World::getWorld())
+            {
+                race_manager->exitRace();
+            }
+            GUIEngine::Screen* new_stack[] =
+            {
+                MainMenuScreen::getInstance(), OnlineScreen::getInstance(), NULL
+            };
+            StateManager::get()->resetAndSetStack(new_stack);
+            NetworkConfig::get()->unsetNetworking();
+            MessageQueue::add(MessageQueue::MT_ERROR, _("Connection to server is lost."));
         }
 
         // Add a Time step entry to the rewind list, which can store all
