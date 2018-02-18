@@ -23,7 +23,6 @@
 #ifndef PROTOCOL_HPP
 #define PROTOCOL_HPP
 
-#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 
@@ -94,7 +93,6 @@ public:
 class Protocol : public std::enable_shared_from_this<Protocol>,
                  public NoCopy
 {
-    LEAK_CHECK()
 protected:
     /** The type of the protocol. */
     ProtocolType m_type;
