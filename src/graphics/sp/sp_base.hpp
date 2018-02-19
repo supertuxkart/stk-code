@@ -93,6 +93,7 @@ extern unsigned sp_shadow_poly_count;
 extern int sp_cur_shadow_cascade;
 extern bool sp_culling;
 extern bool sp_debug_view;
+extern bool sp_apitrace;
 extern unsigned sp_cur_player;
 extern unsigned sp_cur_buf_id[MAX_PLAYER_COUNT];
 extern irr::core::vector3df sp_wind_dir;

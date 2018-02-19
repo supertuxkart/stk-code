@@ -63,6 +63,7 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
 	Android->onAppCmd = handleAndroidCommand;
 	Android->onInputEvent = handleInput;
 	
+	printConfig();
 	createKeyMap();
 
 	CursorControl = new CCursorControl();
@@ -115,6 +116,46 @@ CIrrDeviceAndroid::~CIrrDeviceAndroid()
 	Android->userData = NULL;
 	Android->onAppCmd = NULL;
 	Android->onInputEvent = NULL;
+}
+
+void CIrrDeviceAndroid::printConfig() 
+{
+	char language[3] = {};
+	char country[3] = {};
+	AConfiguration_getLanguage(Android->config, language);
+	AConfiguration_getCountry(Android->config, country);
+	int32_t mcc = AConfiguration_getMcc(Android->config);
+	int32_t mnc = AConfiguration_getMnc(Android->config);
+	int32_t orientation = AConfiguration_getOrientation(Android->config);
+	int32_t touch = AConfiguration_getTouchscreen(Android->config);
+	int32_t density = AConfiguration_getDensity(Android->config);
+	int32_t keyboard = AConfiguration_getKeyboard(Android->config);
+	int32_t navigation = AConfiguration_getNavigation(Android->config);
+	int32_t keys_hidden = AConfiguration_getKeysHidden(Android->config);
+	int32_t nav_hidden = AConfiguration_getNavHidden(Android->config);
+	int32_t sdk_version = AConfiguration_getSdkVersion(Android->config);
+	int32_t screen_size = AConfiguration_getScreenSize(Android->config);
+	int32_t screen_long = AConfiguration_getScreenLong(Android->config);
+	int32_t ui_mode_type = AConfiguration_getUiModeType(Android->config);
+	int32_t ui_mode_night = AConfiguration_getUiModeNight(Android->config);
+
+	os::Printer::log("Android configuration: ", ELL_DEBUG);
+	os::Printer::log("   country:", country != NULL ? country : "unknown", ELL_DEBUG);
+	os::Printer::log("   density:", core::stringc(density).c_str(), ELL_DEBUG);
+	os::Printer::log("   keyboard:", core::stringc(keyboard).c_str(), ELL_DEBUG);
+	os::Printer::log("   keys_hidden:", core::stringc(keys_hidden).c_str(), ELL_DEBUG);
+	os::Printer::log("   language:", language != NULL ? language : "unknown", ELL_DEBUG);
+	os::Printer::log("   mcc:", core::stringc(mcc).c_str(), ELL_DEBUG);
+	os::Printer::log("   mnc:", core::stringc(mnc).c_str(), ELL_DEBUG);
+	os::Printer::log("   nav_hidden:", core::stringc(nav_hidden).c_str(), ELL_DEBUG);
+	os::Printer::log("   navigation:", core::stringc(navigation).c_str(), ELL_DEBUG);
+	os::Printer::log("   orientation:", core::stringc(orientation).c_str(), ELL_DEBUG);
+	os::Printer::log("   screen_long:", core::stringc(screen_long).c_str(), ELL_DEBUG);
+	os::Printer::log("   screen_size:", core::stringc(screen_size).c_str(), ELL_DEBUG);
+	os::Printer::log("   sdk_version:", core::stringc(sdk_version).c_str(), ELL_DEBUG);
+	os::Printer::log("   touch:", core::stringc(touch).c_str(), ELL_DEBUG);
+	os::Printer::log("   ui_mode_type:", core::stringc(ui_mode_type).c_str(), ELL_DEBUG);
+	os::Printer::log("   ui_mode_night:", core::stringc(ui_mode_night).c_str(), ELL_DEBUG);
 }
 
 void CIrrDeviceAndroid::createVideoModeList()

@@ -98,7 +98,33 @@ using namespace irr;
 IrrDriver *irr_driver = NULL;
 
 #ifndef SERVER_ONLY
-GPUTimer          m_perf_query[Q_LAST];
+GPUTimer* m_perf_query[Q_LAST];
+static const char* m_perf_query_phase[Q_LAST] =
+{
+    "Shadows Cascade 0",
+    "Shadows Cascade 1",
+    "Shadows Cascade 2",
+    "Shadows Cascade 3",
+    "Solid Pass",
+    "Env Map",
+    "SunLight",
+    "PointLights",
+    "SSAO",
+    "Light Scatter",
+    "Glow",
+    "Combine Diffuse Color",
+    "Skybox",
+    "Transparent",
+    "Particles",
+    "Depth of Field",
+    "Godrays",
+    "Bloom",
+    "Tonemap",
+    "Motion Blur",
+    "Lightning",
+    "MLAA",
+    "GUI",
+};
 #endif
 
 const int MIN_SUPPORTED_HEIGHT = 768;
@@ -143,6 +169,12 @@ IrrDriver::IrrDriver()
     m_recording = false;
     m_sun_interposer = NULL;
 
+#ifndef SERVER_ONLY
+    for (unsigned i = 0; i < Q_LAST; i++)
+    {
+        m_perf_query[i] = new GPUTimer(m_perf_query_phase[i]);
+    }
+#endif
 }   // IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -156,11 +188,28 @@ IrrDriver::~IrrDriver()
     STKTexManager::getInstance()->kill();
     delete m_wind;
     delete m_renderer;
+#ifndef SERVER_ONLY
+    for (unsigned i = 0; i < Q_LAST; i++)
+    {
+        delete m_perf_query[i];
+    }
+#endif
     assert(m_device != NULL);
     m_device->drop();
     m_device = NULL;
     m_modes.clear();
 }   // ~IrrDriver
+
+// ----------------------------------------------------------------------------
+const char* IrrDriver::getGPUQueryPhaseName(unsigned q)
+{
+#ifndef SERVER_ONLY
+    assert(q < Q_LAST);
+    return m_perf_query_phase[q];
+#else
+    return "";
+#endif
+}   // getGPUQueryPhaseName
 
 // ----------------------------------------------------------------------------
 /** Called before a race is started, after all cameras are set up.
@@ -184,7 +233,7 @@ core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
 
 GPUTimer &IrrDriver::getGPUTimer(unsigned i)
 {
-    return m_perf_query[i];
+    return *m_perf_query[i];
 }   // getGPUTimer
 #endif
 // ----------------------------------------------------------------------------
@@ -855,6 +904,13 @@ void IrrDriver::applyResolutionSettings()
     delete m_renderer;
     SharedGPUObjects::reset();
     initDevice();
+
+#ifndef SERVER_ONLY
+    for (unsigned i = 0; i < Q_LAST; i++)
+    {
+        m_perf_query[i]->reset();
+    }
+#endif
 
     font_manager = new FontManager();
     font_manager->loadFonts();
