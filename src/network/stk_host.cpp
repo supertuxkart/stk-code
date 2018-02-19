@@ -299,7 +299,6 @@ void STKHost::init()
 {
     m_shutdown         = false;
     m_network          = NULL;
-    m_lan_network      = NULL;
     m_game_setup       = NULL;
     m_is_registered    = false;
     m_error_message    = "";
@@ -350,6 +349,7 @@ STKHost::~STKHost()
     stopListening();
 
     delete m_network;
+    enet_deinitialize();
 }   // ~STKHost
 
 //-----------------------------------------------------------------------------
@@ -493,19 +493,22 @@ void STKHost::mainLoop()
     ENetEvent event;
     ENetHost* host = m_network->getENetHost();
 
-    if(NetworkConfig::get()->isServer() && 
+    // A separate network connection (socket) to handle LAN requests.
+    Network* lan_network = NULL;
+
+    if (NetworkConfig::get()->isServer() &&
         (NetworkConfig::get()->isLAN() || NetworkConfig::get()->isPublicServer()) )
     {
         TransportAddress address(0, NetworkConfig::get()->getServerDiscoveryPort());
         ENetAddress eaddr = address.toEnetAddress();
-        m_lan_network = new Network(1, 1, 0, 0, &eaddr);
+        lan_network = new Network(1, 1, 0, 0, &eaddr);
     }
 
     while (m_exit_flag.test_and_set())
     {
-        if(m_lan_network)
+        if (lan_network)
         {
-            handleDirectSocketRequest();
+            handleDirectSocketRequest(lan_network);
         }   // if discovery host
 
         while (enet_host_service(host, &event, 20) != 0)
@@ -552,9 +555,10 @@ void STKHost::mainLoop()
 
             // notify for the event now.
             pm->propagateEvent(stk_event);
-            
+
         }   // while enet_host_service
     }   // while m_exit_flag.test_and_set()
+    delete lan_network;
     Log::info("STKHost", "Listening has been stopped");
 }   // mainLoop
 
@@ -567,13 +571,13 @@ void STKHost::mainLoop()
  *  message is received, will answer with a message containing server details
  *  (and sender IP address and port).
  */
-void STKHost::handleDirectSocketRequest()
+void STKHost::handleDirectSocketRequest(Network* lan_network)
 {
     const int LEN=2048;
     char buffer[LEN];
 
     TransportAddress sender;
-    int len = m_lan_network->receiveRawPacket(buffer, LEN, &sender, 1);
+    int len = lan_network->receiveRawPacket(buffer, LEN, &sender, 1);
     if(len<=0) return;
     BareNetworkString message(buffer, len);
     std::string command;
@@ -600,7 +604,7 @@ void STKHost::handleDirectSocketRequest()
         s.addUInt16(sender.getPort());
         s.addUInt16((uint16_t)race_manager->getMinorMode());
         s.addUInt8((uint8_t)race_manager->getDifficulty());
-        m_lan_network->sendRawPacket(s, sender);
+        lan_network->sendRawPacket(s, sender);
     }   // if message is server-requested
     else if (command == "connection-request")
     {
