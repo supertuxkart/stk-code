@@ -55,7 +55,8 @@ Network::Network(int peer_count, int channel_limit,
     if (!m_host)
     {
         Log::fatal("Network", "An error occurred while trying to create an "
-                   "ENet client host.");
+                   "ENet client host, maybe you started multiple instance "
+                   "of STK server?");
     }
 }   // Network
 
