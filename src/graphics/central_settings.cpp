@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "modes/profile_world.hpp"
+#include "graphics/sp/sp_base.hpp"
 #include "graphics/gl_headers.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/graphics_restrictions.hpp"
@@ -254,6 +255,14 @@ void CentralVideoSettings::init()
                 UserConfigParams::m_max_texture_size = 256;
             }
         }
+#ifndef ANDROID
+        if (SP::sp_apitrace)
+        {
+            Log::info("IrrDriver", "Writing GPU query strings to apitrace and"
+                " disable buffer storage");
+            hasBufferStorage = false;
+        }
+#endif
     }
 }
 

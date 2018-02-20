@@ -128,6 +128,7 @@ namespace irr
 
 		std::map<int, EKEY_CODE> KeyMap;
 		
+		void printConfig();
 		void createDriver();
 		void createKeyMap();
 		void createVideoModeList();

@@ -35,33 +35,6 @@
 #include <stack>
 #include <sstream>
 
-static const char* GPU_Phase[Q_LAST] =
-{
-    "Shadows Cascade 0",
-    "Shadows Cascade 1",
-    "Shadows Cascade 2",
-    "Shadows Cascade 3",
-    "Solid Pass",
-    "Env Map",
-    "SunLight",
-    "PointLights",
-    "SSAO",
-    "Light Scatter",
-    "Glow",
-    "Combine Diffuse Color",
-    "Skybox",
-    "Transparent",
-    "Particles",
-    "Depth of Field",
-    "Godrays",
-    "Bloom",
-    "Tonemap",
-    "Motion Blur",
-    "Lightning",
-    "MLAA",
-    "GUI",
-};
-
 Profiler profiler;
 
 // Unit is in pencentage of the screen dimensions
@@ -486,7 +459,7 @@ void Profiler::draw()
         if (hovered_gpu_marker != Q_LAST)
         {
             std::ostringstream oss;
-            oss << GPU_Phase[hovered_gpu_marker] << " : "
+            oss << irr_driver->getGPUQueryPhaseName(hovered_gpu_marker) << " : "
                 << hovered_gpu_marker_elapsed << " us";
             font->draw(oss.str().c_str(), GPU_MARKERS_NAMES_POS,
                        video::SColor(0xFF, 0xFF, 0x00, 0x00));
@@ -590,7 +563,7 @@ void Profiler::writeToFile()
 
     for (unsigned i = 0; i < Q_LAST; i++)
     {
-        f_gpu << "\"" << GPU_Phase[i] << "(" << i+1 << ")\"   ";
+        f_gpu << "\"" << irr_driver->getGPUQueryPhaseName(i) << "(" << i+1 << ")\"   ";
     }   // for i < Q_LAST
     f_gpu << std::endl;
 
