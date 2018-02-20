@@ -305,6 +305,8 @@ void ProtocolManager::terminateProtocol(std::shared_ptr<Protocol> protocol)
     opt.unlock();
     protocol->setState(PROTOCOL_STATE_TERMINATED);
     protocol->terminated();
+    Log::info("ProtocolManager",
+        "A %s protocol has been terminated.", typeid(*protocol).name());
 }   // terminateProtocol
 
 // ----------------------------------------------------------------------------
