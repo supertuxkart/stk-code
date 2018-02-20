@@ -198,7 +198,7 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
  */
 void ServerLobby::update(float dt)
 {
-    switch (m_state)
+    switch (m_state.load())
     {
     case INIT_WAN:
         // Start the protocol to find the public ip address.
@@ -382,7 +382,8 @@ void ServerLobby::startSelection(const Event *event)
     if (m_state != ACCEPTING_CLIENTS)
     {
         Log::warn("ServerLobby",
-                  "Received startSelection while being in state %d", m_state);
+                  "Received startSelection while being in state %d",
+                  m_state.load());
         return;
     }
     if(event && !event->getPeer()->isAuthorised())
@@ -730,7 +731,7 @@ void ServerLobby::kartSelectionRequested(Event* event)
     if(m_state!=SELECTING)
     {
         Log::warn("Server", "Received kart selection while in state %d.",
-                  m_state);
+                  m_state.load());
         return;
     }
 

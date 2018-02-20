@@ -5,14 +5,15 @@
 #include "utils/cpp2011.hpp"
 #include "utils/synchronised.hpp"
 
+#include <atomic>
 #include <set>
 
 class ServerLobby : public LobbyProtocol
                   , public CallbackObject
 {
-private:
+public:
     /* The state for a small finite state machine. */
-    enum
+    enum ServerState : unsigned int
     {
         INIT_WAN,                 // Start state for WAN game
         GETTING_PUBLIC_ADDRESS,   // Waiting to receive its public ip address
@@ -27,7 +28,9 @@ private:
         RESULT_DISPLAY,           // Show result screen
         DONE,                     // shutting down server
         EXITING
-    } m_state;
+    };
+private:
+    std::atomic<ServerState> m_state;
 
     /** Available karts and tracks for all clients, this will be initialized
      *  with data in server first. */
@@ -94,7 +97,7 @@ public:
     void checkIncomingConnectionRequests();
     void checkRaceFinished();
     void finishedLoadingWorld();
-
+    ServerState getCurrentState() const { return m_state.load(); }
     virtual void callback(Protocol *protocol) OVERRIDE;
 
 };   // class ServerLobby
