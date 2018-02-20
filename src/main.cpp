@@ -579,7 +579,7 @@ void cmdLineHelp()
     // "       --test-ai=n        Use the test-ai for every n-th AI kart.\n"
     // "                          (so n=1 means all Ais will be the test ai)\n"
     // "
-    "       --server=name      Start a server (not a playing client).\n"
+    "       --wan-server=name  Start a Wan server (not a playing client).\n"
     "       --public-server    Allow direct connection to the server (without stk server)\n"
     "       --lan-server=name  Start a LAN server (not a playing client).\n"
     "       --server-password= Sets a password for a server (both client&server).\n"
@@ -1018,13 +1018,30 @@ int handleCmdLine()
         STKHost::create();
     }
 
-    if(CommandLine::has("--server", &s))
+    if (CommandLine::has("--wan-server", &s))
     {
-        NetworkConfig::get()->setServerName(core::stringw(s.c_str()));
-        NetworkConfig::get()->setIsServer(true);
-        NetworkConfig::get()->setIsWAN();
-        STKHost::create();
-        Log::info("main", "Creating a WAN server '%s'.", s.c_str());
+        PlayerProfile* player = PlayerManager::getCurrentPlayer();
+        if (player && player->wasOnlineLastTime() && player->wasOnlineLastTime() &&
+            player->hasSavedSession())
+        {
+            while (true)
+            {
+                Online::RequestManager::get()->update(0.0f);
+                if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
+                {
+                    break;
+                }
+            }
+            NetworkConfig::get()->setServerName(core::stringw(s.c_str()));
+            NetworkConfig::get()->setIsServer(true);
+            NetworkConfig::get()->setIsWAN();
+            STKHost::create();
+            Log::info("main", "Creating a WAN server '%s'.", s.c_str());
+        }
+        else
+        {
+            Log::warn("main", "No saved online player session to create a wan server");
+        }
     }
     if (CommandLine::has("--lan-server", &s))
     {

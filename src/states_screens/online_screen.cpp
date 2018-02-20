@@ -71,7 +71,6 @@ void OnlineScreen::loadedFromFile()
 void OnlineScreen::beforeAddingWidget()
 {
     bool is_logged_in = false;
-    PlayerProfile *player = PlayerManager::getCurrentPlayer();
     if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST ||
         PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
     {
@@ -79,8 +78,11 @@ void OnlineScreen::beforeAddingWidget()
     }
 
     IconButtonWidget* wan = getWidget<IconButtonWidget>("wan");
-    wan->setActive(is_logged_in);
-    wan->setVisible(is_logged_in);
+    if (wan)
+    {
+        wan->setActive(is_logged_in);
+        wan->setVisible(is_logged_in);
+    }
 } // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
