@@ -167,8 +167,8 @@ void Camera::setupCamera()
     m_aspect = (float)((float)(m_viewport.getWidth()) / (float)(m_viewport.getHeight()));
 	
     m_scaling = core::vector2df(
-        irr_driver->getActualScreenSize().Width / m_viewport.getWidth() , 
-        irr_driver->getActualScreenSize().Height / m_viewport.getHeight());
+        float(irr_driver->getActualScreenSize().Width) / m_viewport.getWidth() , 
+        float(irr_driver->getActualScreenSize().Height) / m_viewport.getHeight());
 
     m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov
         [race_manager->getNumLocalPlayers() > 0 ?

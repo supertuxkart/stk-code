@@ -61,8 +61,9 @@ WorldStatus::WorldStatus()
 void WorldStatus::reset()
 {
     m_time            = 0.0f;
-    m_auxiliary_timer = 0.0f;
-    m_count_up_timer  = 0.0f;
+    m_time_ticks      = 0;
+    m_auxiliary_ticks = 0;
+    m_count_up_ticks  = 0;
 
     m_engines_started = false;
     
@@ -136,6 +137,7 @@ void WorldStatus::startEngines()
 void WorldStatus::setClockMode(const ClockType mode, const float initial_time)
 {
     m_clock_mode = mode;
+    m_time_ticks = initial_time * stk_config->m_physics_fps;
     m_time = initial_time;
 }   // setClockMode
 
@@ -152,7 +154,7 @@ void WorldStatus::enterRaceOverState()
         return;
 
     m_phase = DELAY_FINISH_PHASE;
-    m_auxiliary_timer = 0.0f;
+    m_auxiliary_ticks = 0;
 }   // enterRaceOverState
 
 //-----------------------------------------------------------------------------
@@ -188,7 +190,7 @@ void WorldStatus::updateTime(const float dt)
         // tilt way too much. A separate setup phase for the first frame
         // simplifies this handling
         case SETUP_PHASE:
-            m_auxiliary_timer = 0.0f;
+            m_auxiliary_ticks= 0;
             m_phase = TRACK_INTRO_PHASE;
             
             if (m_play_track_intro_sound)
@@ -203,14 +205,14 @@ void WorldStatus::updateTime(const float dt)
 
             return;   // Do not increase time
         case TRACK_INTRO_PHASE:
-            m_auxiliary_timer += dt;
+            m_auxiliary_ticks++;
 
             if (UserConfigParams::m_artist_debug_mode &&
                 race_manager->getNumberOfKarts() -
                 race_manager->getNumSpareTireKarts() == 1 &&
                 race_manager->getTrackName() != "tutorial")
             {
-                m_auxiliary_timer += dt * 6;
+                m_auxiliary_ticks += 6;
             }
 
             // Work around a bug that occurred on linux once:
@@ -220,21 +222,22 @@ void WorldStatus::updateTime(const float dt)
             // long, we use the aux timer to force the next phase
             // after 3.5 seconds.
             if (m_track_intro_sound->getStatus() == SFXBase::SFX_PLAYING &&
-                m_auxiliary_timer < 3.5f)
+                2*m_auxiliary_ticks < 7*stk_config->m_physics_fps)
                 return;   // Do not increase time
 
             // Wait before ready phase if sounds are disabled
-            if (!UserConfigParams::m_sfx && m_auxiliary_timer < 3.0f)
+            if (!UserConfigParams::m_sfx &&
+                m_auxiliary_ticks < 3*stk_config->m_physics_fps )
                 return;
             
             if (!m_play_track_intro_sound)
             {
                 startEngines();
-                if (m_auxiliary_timer < 3.0f)
+                if (m_auxiliary_ticks < 3*stk_config->m_physics_fps)
                     return;   // Do not increase time
             }
 
-            m_auxiliary_timer = 0.0f;
+            m_auxiliary_ticks = 0;
 
             if (m_play_ready_set_go_sounds)
                 m_prestart_sound->play();
@@ -268,7 +271,7 @@ void WorldStatus::updateTime(const float dt)
         case READY_PHASE:
             startEngines();
 
-            if (m_auxiliary_timer > 1.0)
+            if (m_auxiliary_ticks > stk_config->m_physics_fps)
             {
                 if (m_play_ready_set_go_sounds)
                 {
@@ -278,7 +281,7 @@ void WorldStatus::updateTime(const float dt)
                 m_phase = SET_PHASE;
             }
 
-            m_auxiliary_timer += dt;
+            m_auxiliary_ticks++;
 
             // In artist debug mode, when without opponents, skip the
             // ready/set/go counter faster
@@ -287,12 +290,12 @@ void WorldStatus::updateTime(const float dt)
                 race_manager->getNumSpareTireKarts() == 1 &&
                 race_manager->getTrackName() != "tutorial")
             {
-                m_auxiliary_timer += dt*6;
+                m_auxiliary_ticks += 6;
             }
 
             return;   // Do not increase time
         case SET_PHASE:
-            if (m_auxiliary_timer > 2.0)
+            if (m_auxiliary_ticks > 2*stk_config->m_physics_fps)
             {
                 // set phase is over, go to the next one
                 m_phase = GO_PHASE;
@@ -305,7 +308,7 @@ void WorldStatus::updateTime(const float dt)
                 onGo();
             }
 
-            m_auxiliary_timer += dt;
+            m_auxiliary_ticks++;
 
             // In artist debug mode, when without opponents, 
             // skip the ready/set/go counter faster
@@ -314,24 +317,25 @@ void WorldStatus::updateTime(const float dt)
                 race_manager->getNumSpareTireKarts() == 1 &&
                 race_manager->getTrackName() != "tutorial")
             {
-                m_auxiliary_timer += dt*6;
+                m_auxiliary_ticks += 6;
             }
 
             return;   // Do not increase time
         case GO_PHASE  :
-
-            if (m_auxiliary_timer>2.5f && music_manager->getCurrentMusic() &&
+            // 2.5 seconds
+            if (2*m_auxiliary_ticks>5*stk_config->m_physics_fps && 
+                music_manager->getCurrentMusic() &&
                 !music_manager->getCurrentMusic()->isPlaying())
             {
                 music_manager->startMusic();
             }
-
-            if (m_auxiliary_timer > 3.0f)    // how long to display the 'go' message
+            // how long to display the 'go' message
+            if (m_auxiliary_ticks > 3 * stk_config->m_physics_fps)
             {
                 m_phase = MUSIC_PHASE;
             }
 
-            m_auxiliary_timer += dt;
+            m_auxiliary_ticks++;
 
             // In artist debug mode, when without opponents,
             // skip the ready/set/go counter faster
@@ -340,7 +344,7 @@ void WorldStatus::updateTime(const float dt)
                 race_manager->getNumSpareTireKarts() == 1 &&
                 race_manager->getTrackName() != "tutorial")
             {
-                m_auxiliary_timer += dt*6;
+                m_auxiliary_ticks += 6;
             }
 
             break;   // Now the world time starts
@@ -352,12 +356,13 @@ void WorldStatus::updateTime(const float dt)
                 UserConfigParams::m_race_now = false;
             }
             // how long to display the 'music' message
-            if (m_auxiliary_timer>stk_config->m_music_credit_time)
+            if (m_auxiliary_ticks >   stk_config->m_music_credit_time
+                                    * stk_config->m_physics_fps      )
             {
                 m_phase = RACE_PHASE;
             }
 
-            m_auxiliary_timer += dt;
+            m_auxiliary_ticks++;
             break;
         case RACE_PHASE:
             // Nothing to do for race phase, switch to delay finish phase
@@ -365,10 +370,11 @@ void WorldStatus::updateTime(const float dt)
             break;
         case DELAY_FINISH_PHASE:
         {
-            m_auxiliary_timer += dt;
+            m_auxiliary_ticks++;
 
             // Change to next phase if delay is over
-            if (m_auxiliary_timer > stk_config->m_delay_finish_time)
+            if (m_auxiliary_ticks >   stk_config->m_delay_finish_time
+                                    * stk_config->m_physics_fps      )
             {
                 m_phase = RESULT_DISPLAY_PHASE;
                 terminateRace();
@@ -396,26 +402,29 @@ void WorldStatus::updateTime(const float dt)
         case CLOCK_CHRONO:
             if (!device->getTimer()->isStopped())
             {
-                m_time += dt;
-                m_count_up_timer += dt;
+                m_time_ticks++;
+                m_time  = float(m_time_ticks) / stk_config->m_physics_fps;
+                m_count_up_ticks++;
             }
             break;
         case CLOCK_COUNTDOWN:
             // stop countdown when race is over
             if (m_phase == RESULT_DISPLAY_PHASE || m_phase == FINISH_PHASE)
             {
+                m_time_ticks = 0;
                 m_time = 0.0f;
-                m_count_up_timer = 0.0f;
+                m_count_up_ticks = 0;
                 break;
             }
 
             if (!device->getTimer()->isStopped())
             {
-                m_time -= dt;
-                m_count_up_timer += dt;
+                m_time_ticks--;
+                m_time = float(m_time_ticks) / stk_config->m_physics_fps;
+                m_count_up_ticks++;
             }
 
-            if(m_time <= 0.0)
+            if(m_time_ticks <= 0.0)
             {
                 // event
                 countdownReachedZero();
@@ -445,6 +454,7 @@ void WorldStatus::startReadySetGo()
  */
 void WorldStatus::setTime(const float time)
 {
+    m_time_ticks = time * stk_config->m_physics_fps;
     m_time = time;
 }   // setTime
 

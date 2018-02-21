@@ -48,7 +48,7 @@ AIBaseController::AIBaseController(AbstractKart *kart)
 void AIBaseController::reset()
 {
     m_stuck = false;
-    m_collision_times.clear();
+    m_collision_ticks.clear();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -237,12 +237,12 @@ void AIBaseController::crashed(const Material *m)
     // the track again if it is stuck (i.e. time for the push back plus
     // time for the AI to accelerate and hit the terrain again).
     const unsigned int NUM_COLLISION = 3;
-    const float COLLISION_TIME       = 1.5f;
+    const int COLLISION_TICKS      = 3*stk_config->m_physics_fps/2;
 
-    float time = World::getWorld()->getTimeSinceStart();
-    if(m_collision_times.size()==0)
+    int ticks = World::getWorld()->getTicksSinceStart();
+    if(m_collision_ticks.size()==0)
     {
-        m_collision_times.push_back(time);
+        m_collision_ticks.push_back(ticks);
         return;
     }
 
@@ -252,23 +252,24 @@ void AIBaseController::crashed(const Material *m)
     // collisions to happen). The time of 0.2 seconds was experimentally
     // found, typically it takes 0.5 seconds for a kart to be pushed back
     // from the terrain and accelerate to hit the same terrain again.
-    if(time - m_collision_times.back() < 0.2f)
+    if(5 * (ticks - m_collision_ticks.back()) < stk_config->m_physics_fps)
         return;
 
     // Remove all outdated entries, i.e. entries that are older than the
     // collision time plus 1 second. Older entries must be deleted,
     // otherwise a collision that happened (say) 10 seconds ago could
     // contribute to a stuck condition.
-    while(m_collision_times.size()>0 &&
-           time - m_collision_times[0] > 1.0f+COLLISION_TIME)
-           m_collision_times.erase(m_collision_times.begin());
+    while(m_collision_ticks.size()>0 &&
+           ticks - m_collision_ticks[0] > stk_config->m_physics_fps
+                                         +COLLISION_TICKS          )
+           m_collision_ticks.erase(m_collision_ticks.begin());
 
-    m_collision_times.push_back(time);
+    m_collision_ticks.push_back(ticks);
 
     // Now detect if there are enough collision records in the
     // specified time interval.
-    if(time - m_collision_times.front() > COLLISION_TIME
-        && m_collision_times.size()>=NUM_COLLISION)
+    if(ticks - m_collision_ticks.front() > COLLISION_TICKS &&
+        m_collision_ticks.size()>=NUM_COLLISION               )
     {
         // We can't call m_kart->forceRescue here, since crased() is
         // called during physics processing, and forceRescue() removes the

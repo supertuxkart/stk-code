@@ -625,26 +625,24 @@ void ThreeStrikesBattle::addKartLife(unsigned int id)
 void ThreeStrikesBattle::spawnSpareTireKarts()
 {
     if (m_spare_tire_karts.empty() ||
-        getTimeSinceStart() < m_next_sta_spawn_time)
+        getTicksSinceStart() < m_next_sta_spawn_time)
         return;
 
-    const float period =
-        race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST ? 40.0f :
-        race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ? 30.0f :
-        race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM ?
-        25.0f : 20.0f;
-    const float inc_factor =
-        race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST ? 0.7f :
-        race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ? 0.65f :
-        race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM ?
-        0.6f : 0.55f;
-
-    // Spawn spare tire kart when necessary
     // The lifespan for sta: inc_factor / period * 1000 / 2
     // So in easier mode the sta lasts longer than spawn period
-    const float lifespan = inc_factor / period * 1000;
-    m_next_sta_spawn_time = lifespan + (getTimeSinceStart() * inc_factor) +
-        getTimeSinceStart();
+    float inc_factor, lifespan;
+    switch (race_manager->getDifficulty())
+    {
+    case RaceManager::DIFFICULTY_BEST: inc_factor = 0.7f;  lifespan = 17.5f;  break;
+    case RaceManager::DIFFICULTY_HARD: inc_factor = 0.65f; lifespan = 21.66f; break;
+    case RaceManager::DIFFICULTY_EASY: inc_factor = 0.6f;  lifespan = 24.0f;  break;
+    default:                           inc_factor = 0.55f; lifespan = 27.5f;  break;
+    }
+
+    // Spawn spare tire kart when necessary
+    m_next_sta_spawn_time = lifespan*stk_config->m_physics_fps 
+                          + getTicksSinceStart() * inc_factor
+                          + getTicksSinceStart();
     int kart_has_few_lives = 0;
     for (unsigned int i = 0; i < m_kart_info.size(); i++)
     {

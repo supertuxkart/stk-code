@@ -464,7 +464,7 @@ void Powerup::hitBonusBox(const Item &item, int add_info)
     // Check if rubber ball is the current power up held by the kart. If so,
     // reset the bBallCollectTime to 0 before giving new powerup.
     if(m_type == PowerupManager::POWERUP_RUBBERBALL)
-        powerup_manager->setBallCollectTime(0);
+        powerup_manager->setBallCollectTicks(0);
 
     // Check if two bouncing balls are collected less than getRubberBallTimer()
     //seconds apart. If yes, then call getRandomPowerup again. If no, then break.
@@ -474,8 +474,8 @@ void Powerup::hitBonusBox(const Item &item, int add_info)
         {
             new_powerup = powerup_manager->getRandomPowerup(position, &n);
             if(new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
-                ( World::getWorld()->getTimeSinceStart() - powerup_manager->getBallCollectTime()) >
-                  RubberBall::getTimeBetweenRubberBalls() )
+                ( World::getWorld()->getTicksSinceStart() - powerup_manager->getBallCollectTicks()) >
+                  RubberBall::getTicksBetweenRubberBalls() )
                 break;
         }
     }
@@ -486,7 +486,7 @@ void Powerup::hitBonusBox(const Item &item, int add_info)
     }
 
     if(new_powerup == PowerupManager::POWERUP_RUBBERBALL)
-        powerup_manager->setBallCollectTime(World::getWorld()->getTime());
+        powerup_manager->setBallCollectTicks(World::getWorld()->getTimeTicks());
 
     // Always add a new powerup in ITEM_MODE_NEW (or if the kart
     // doesn't have a powerup atm).

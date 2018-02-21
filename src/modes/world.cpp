@@ -307,7 +307,7 @@ void World::reset()
     irr_driver->reset();
 
     //Reset the Rubber Ball Collect Time to some negative value.
-    powerup_manager->setBallCollectTime(-100);
+    powerup_manager->setBallCollectTicks(-100);
 }   // reset
 
 //-----------------------------------------------------------------------------

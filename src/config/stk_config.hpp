@@ -179,6 +179,7 @@ public:
     void load             (const std::string &filename);
     const std::string &getMainMenuPicture(int n);
     const std::string &getBackgroundPicture(int n);
+
     void  getAllScores(std::vector<int> *all_scores, int num_karts);
     // ------------------------------------------------------------------------
     /** Returns the default kart properties for each kart. */

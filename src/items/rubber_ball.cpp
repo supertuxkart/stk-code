@@ -47,7 +47,7 @@ float RubberBall::m_st_max_height_difference;
 float RubberBall::m_st_fast_ping_distance;
 float RubberBall::m_st_early_target_factor;
 int   RubberBall::m_next_id = 0;
-float RubberBall::m_time_between_balls;
+float RubberBall::m_ticks_between_balls;
 
 
 // Debug only, so that we can get a feel on how well balls are aiming etc.
@@ -272,7 +272,7 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
     m_st_max_height_difference      = 10.0f;
     m_st_fast_ping_distance         = 50.0f;
     m_st_early_target_factor        =  1.0f;
-    m_time_between_balls            = 15;
+    m_ticks_between_balls           = 15 * stk_config->m_physics_fps;
 
     if(!node.get("interval", &m_st_interval))
         Log::warn("powerup", "No interval specified for rubber ball.");
@@ -306,9 +306,10 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
     if(!node.get("early-target-factor", &m_st_early_target_factor))
         Log::warn("powerup",
                   "No early-target-factor specified for rubber ball.");
-    if(!node.get("time-between-balls", &m_time_between_balls))
+    if(!node.get("time-between-balls", &m_ticks_between_balls))
         Log::warn("powerup",
                   "No time-between-balls specified for rubber ball.");
+    m_ticks_between_balls *= stk_config->m_physics_fps;
     Flyable::init(node, rubberball, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
 
