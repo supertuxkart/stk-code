@@ -84,7 +84,7 @@ private:
     /** Timer before another rubber ball can be picked up. This is to ensure
      *  that there are not too many rubber balls on the track in races with many
      *  karts. */
-    static float m_ticks_between_balls;
+    static int m_ticks_between_balls;
 
     /** This factor is used to influence how much the rubber ball should aim
      *  at its target early. It used the 'distance to center of track' of its

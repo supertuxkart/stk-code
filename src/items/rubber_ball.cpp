@@ -47,7 +47,7 @@ float RubberBall::m_st_max_height_difference;
 float RubberBall::m_st_fast_ping_distance;
 float RubberBall::m_st_early_target_factor;
 int   RubberBall::m_next_id = 0;
-float RubberBall::m_ticks_between_balls;
+int   RubberBall::m_ticks_between_balls;
 
 
 // Debug only, so that we can get a feel on how well balls are aiming etc.
