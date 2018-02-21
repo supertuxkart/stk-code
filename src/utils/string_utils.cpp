@@ -20,9 +20,11 @@
 
 #include "utils/string_utils.hpp"
 
+#include "config/stk_config.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 #include "utils/utf8.h"
+
 #include "coreutil.h"
 
 #include <algorithm>
@@ -489,7 +491,12 @@ namespace StringUtils
         }
     }
 
-
+    // ------------------------------------------------------------------------
+    /** Returns the time (in seconds) as string, based on ticks. */
+    std::string ticksTimeToString(int ticks)
+    {
+        return timeToString(float(ticks) / stk_config->m_physics_fps);
+    }   // ticksTimeToString(ticks)
     // ------------------------------------------------------------------------
     /** Converts a time in seconds into a string of the form mm:ss:hh (minutes,
      *  seconds, 1/100 seconds.

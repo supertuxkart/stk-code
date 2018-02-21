@@ -118,7 +118,7 @@ public:
     float         getDistanceToCenterForKart(const int kart_id) const;
     float         getEstimatedFinishTime(const int kart_id) const;
     int           getLapForKart(const int kart_id) const;
-    float         getTimeAtLapForKart(const int kart_id) const;
+    int           getTicksAtLapForKart(const int kart_id) const;
 
     virtual  void getKartsDisplayInfo(
                   std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
