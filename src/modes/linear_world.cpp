@@ -38,6 +38,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <climits>
 #include <iostream>
 
 //-----------------------------------------------------------------------------
@@ -49,7 +50,7 @@ LinearWorld::LinearWorld() : WorldWithRank()
     m_last_lap_sfx         = SFXManager::get()->createSoundSource("last_lap_fanfare");
     m_last_lap_sfx_played  = false;
     m_last_lap_sfx_playing = false;
-    m_fastest_lap          = 9999999.9f;
+    m_fastest_lap_ticks    = INT_MAX;
 }   // LinearWorld
 
 // ----------------------------------------------------------------------------
@@ -87,8 +88,9 @@ LinearWorld::~LinearWorld()
 void LinearWorld::reset()
 {
     WorldWithRank::reset();
-    m_last_lap_sfx_played = false;
+    m_last_lap_sfx_played  = false;
     m_last_lap_sfx_playing = false;
+    m_fastest_lap_ticks    = INT_MAX;
 
     const unsigned int kart_amount = (unsigned int) m_karts.size();
     for(unsigned int i=0; i<kart_amount; i++)
@@ -274,7 +276,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     if(kart_info.m_race_lap+1 <= lap_count)
     {
         assert(kart->getWorldKartId()==kart_index);
-        kart_info.m_time_at_last_lap=getTime();
+        kart_info.m_ticks_at_last_lap=getTimeTicks();
         kart_info.m_race_lap++;
         m_kart_info[kart_index].m_overall_distance =
               m_kart_info[kart_index].m_race_lap 
@@ -342,23 +344,24 @@ void LinearWorld::newLap(unsigned int kart_index)
     {
         kart->finishedRace(getTime());
     }
-    float time_per_lap;
+    int ticks_per_lap;
     if (kart_info.m_race_lap == 1) // just completed first lap
     {
-        time_per_lap=getTime();
+        ticks_per_lap = getTimeTicks();
     }
     else //completing subsequent laps
     {
-        time_per_lap=getTime() - kart_info.m_lap_start_time;
+        ticks_per_lap = getTimeTicks() - kart_info.m_lap_start_ticks;
     }
 
     // if new fastest lap
-    if(time_per_lap < m_fastest_lap && raceHasLaps() &&
-        kart_info.m_race_lap>0)
+    if(ticks_per_lap < m_fastest_lap_ticks && raceHasLaps() &&
+        kart_info.m_race_lap>0                                )
     {
-        m_fastest_lap = time_per_lap;
+        m_fastest_lap_ticks = ticks_per_lap;
 
-        std::string s = StringUtils::timeToString(time_per_lap);
+        std::string s = StringUtils::timeToString( float(ticks_per_lap)
+                                                  / stk_config->m_physics_fps);
 
         // Store the temporary string because clang would mess this up
         // (remove the stringw before the wchar_t* is used).
@@ -376,7 +379,7 @@ void LinearWorld::newLap(unsigned int kart_index)
 
     } // end if new fastest lap
 
-    kart_info.m_lap_start_time = getTime();
+    kart_info.m_lap_start_ticks = getTimeTicks();
     kart->getController()->newLap(kart_info.m_race_lap);
 }   // newLap
 
@@ -422,7 +425,8 @@ float LinearWorld::getEstimatedFinishTime(const int kart_id) const
 float LinearWorld::getTimeAtLapForKart(const int kart_id) const
 {
     assert(kart_id < (int)m_kart_info.size());
-    return m_kart_info[kart_id].m_time_at_last_lap;
+    return float(m_kart_info[kart_id].m_ticks_at_last_lap)
+          / stk_config->m_physics_fps;
 }   // getTimeAtLapForKart
 
 //-----------------------------------------------------------------------------
