@@ -137,8 +137,8 @@ void WorldStatus::startEngines()
 void WorldStatus::setClockMode(const ClockType mode, const float initial_time)
 {
     m_clock_mode = mode;
-    m_time_ticks = initial_time * stk_config->m_physics_fps;
-    m_time = initial_time;
+    m_time_ticks = int(initial_time * stk_config->m_physics_fps);
+    m_time       = float(m_time_ticks) / stk_config->m_physics_fps;
 }   // setClockMode
 
 //-----------------------------------------------------------------------------
@@ -454,8 +454,8 @@ void WorldStatus::startReadySetGo()
  */
 void WorldStatus::setTime(const float time)
 {
-    m_time_ticks = time * stk_config->m_physics_fps;
-    m_time = time;
+    m_time_ticks = int(time * stk_config->m_physics_fps);
+    m_time       = float(time)/stk_config->m_physics_fps;
 }   // setTime
 
 //-----------------------------------------------------------------------------

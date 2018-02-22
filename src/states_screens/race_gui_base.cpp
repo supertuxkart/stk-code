@@ -493,7 +493,7 @@ void RaceGUIBase::drawGlobalMusicDescription()
 
     gui::IGUIFont*       font = GUIEngine::getFont();
 
-    float race_time = World::getWorld()->getTicksSinceStart()
+    float race_time = float(World::getWorld()->getTicksSinceStart())
                     / stk_config->m_physics_fps;
 
     // ---- Manage pulsing effect

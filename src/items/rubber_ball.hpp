@@ -205,7 +205,10 @@ public:
     virtual bool updateAndDelete(float dt);
     virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL);
     virtual void setAnimation(AbstractKartAnimation *animation);
-    static float getTicksBetweenRubberBalls()    {return m_ticks_between_balls;}
+    // ------------------------------------------------------------------------
+    /** Returns time (in ticks) between rubberballs, to avoid that in games
+     *  with many karts too many rubber balls are in play at the same time. */
+    static int   getTicksBetweenRubberBalls() { return m_ticks_between_balls; }
     // ------------------------------------------------------------------------
     /** This object does not create an explosion, all affects on
      *  karts are handled by this hit() function. */

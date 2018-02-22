@@ -267,7 +267,8 @@ void Powerup::use()
 
     case PowerupManager::POWERUP_SWATTER:
         m_kart->getAttachment()
-                ->set(Attachment::ATTACH_SWATTER, kp->getSwatterDuration());
+                ->set(Attachment::ATTACH_SWATTER,
+                      int(kp->getSwatterDuration()*stk_config->m_physics_fps));
         break;
 
     case PowerupManager::POWERUP_BUBBLEGUM:
@@ -302,26 +303,36 @@ void Powerup::use()
             {
                 if (m_kart->getIdent() == "nolok")
                 {
-                    m_kart->getAttachment()->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
-                                                  kp->getBubblegumShieldDuration());
+                    m_kart->getAttachment()
+                           ->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
+                                 int(kp->getBubblegumShieldDuration()
+                                     *stk_config->m_physics_fps)          );
                 }
                 else
                 {
-                    m_kart->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
-                                                  kp->getBubblegumShieldDuration());
+                    m_kart->getAttachment()
+                          ->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
+                                int(kp->getBubblegumShieldDuration()
+                                    *stk_config->m_physics_fps)     );
                 }
             }
             else // using a bubble gum while still having a shield
             {
                 if (m_kart->getIdent() == "nolok")
                 {
-                    m_kart->getAttachment()->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
-                                                  kp->getBubblegumShieldDuration() + m_kart->getShieldTime());
+                    m_kart->getAttachment()
+                          ->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
+                                int( (kp->getBubblegumShieldDuration() 
+                                      + m_kart->getShieldTime()       )
+                                *stk_config->m_physics_fps)               );
                 }
                 else
                 {
-                    m_kart->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
-                                                  kp->getBubblegumShieldDuration() + m_kart->getShieldTime());
+                    m_kart->getAttachment()
+                          ->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
+                                int(kp->getBubblegumShieldDuration()
+                                    + m_kart->getShieldTime()       )
+                                *stk_config->m_physics_fps           );
                 }
             }
 
@@ -350,7 +361,8 @@ void Powerup::use()
             if(kart->getPosition() == 1)
             {
                 kart->getAttachment()->set(Attachment::ATTACH_ANVIL,
-                                           kp->getAnvilDuration());
+                                           int(kp->getAnvilDuration()
+                                               *stk_config->m_physics_fps) );
                 kart->updateWeight();
                 kart->adjustSpeed(kp->getAnvilSpeedFactor() * 0.5f);
 
@@ -397,14 +409,17 @@ void Powerup::use()
                     {
                         float rank_factor;
 
-                        rank_factor = (float)(kart->getPosition() - 1) / (float)(m_kart->getPosition() - 2);
+                        rank_factor = (float)(kart->getPosition()   - 1) 
+                                    / (float)(m_kart->getPosition() - 2);
                         position_factor = 1.0f - rank_factor;
                     }
 
                     rank_mult = 1 + (position_factor * (kp->getParachuteDurationRankMult() - 1));
 
-                    kart->getAttachment()->set(Attachment::ATTACH_PARACHUTE,
-                                               (kp->getParachuteDurationOther() * rank_mult));
+                    kart->getAttachment()
+                        ->set(Attachment::ATTACH_PARACHUTE,
+                              int(kp->getParachuteDurationOther() * rank_mult 
+                                  * stk_config->m_physics_fps)                );
 
                     if(kart->getController()->isLocalPlayerController())
                         player_kart = kart;

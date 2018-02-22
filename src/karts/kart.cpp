@@ -1112,16 +1112,16 @@ bool Kart::isNearGround() const
 }   // isNearGround
 
 // ------------------------------------------------------------------------
-/**
- * Enables a kart shield protection for a certain amount of time.
+/** Enables a kart shield protection for a certain amount of time.
  */
 void Kart::setShieldTime(float t)
 {
     if(isShielded())
     {
-        getAttachment()->setTimeLeft(t);
+        getAttachment()->setTicksLeft(int(t*stk_config->m_physics_fps));
     }
-}
+}   // setShieldTime
+
 // ------------------------------------------------------------------------
 /**
  * Returns true if the kart is protected by a shield.
@@ -1147,7 +1147,8 @@ bool Kart::isShielded() const
 float Kart::getShieldTime() const
 {
     if(isShielded())
-        return getAttachment()->getTimeLeft();
+        return float(getAttachment()->getTicksLeft())
+             / stk_config->m_physics_fps;
     else
         return 0.0f;
 }   // getShieldTime
@@ -1161,7 +1162,7 @@ void Kart::decreaseShieldTime()
 {
     if (isShielded())
     {
-        getAttachment()->setTimeLeft(0.0f);
+        getAttachment()->setTicksLeft(0);
     }
 }   // decreaseShieldTime
 
