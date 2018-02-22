@@ -211,7 +211,8 @@ void ConnectToServer::asynchronousUpdate()
             }
             m_state = DONE;
             // lobby room protocol if we're connected only
-            if (STKHost::get()->getPeers()[0]->isConnected() &&
+            if (STKHost::get()->getPeerCount() > 0 &&
+                STKHost::get()->getPeers()[0]->isConnected() &&
                 !m_server_address.isUnset())
             {
                 auto cl = LobbyProtocol::create<ClientLobby>();
@@ -400,8 +401,8 @@ void ConnectToServer::waitingAloha(bool is_wan)
             }
             delete[] table;
 #endif
-            m_server_address.copy(sender);
         }
+        m_server_address.copy(sender);
         m_state = CONNECTING;
         // Reset timer for next usage
         m_timer = 0.0;

@@ -120,20 +120,6 @@ void ConnectToPeer::asynchronousUpdate()
             if (StkTime::getRealTime() > m_timer + 2.0)
             {
                 m_timer = StkTime::getRealTime();
-                // Now we know the peer address. If it's a non-local host, start
-                // the Ping protocol to keep the port available. We can't rely
-                // on STKHost::isLAN(), since we might get a LAN connection even
-                // if the server itself accepts connections from anywhere.
-                if ((!m_is_lan &&
-                    m_peer_address.getIP() !=
-                    STKHost::get()->getPublicAddress().getIP()) || 
-                    NetworkConfig::m_disable_lan)
-                {
-                    BareNetworkString data;
-                    data.addUInt8(0);
-                    STKHost::get()->sendRawPacket(data, m_peer_address);
-                }
-
                 // Send a broadcast packet with the string aloha_stk inside,
                 // the client will know our ip address and will connect
                 // The wan remote should already start its ping message to us now
