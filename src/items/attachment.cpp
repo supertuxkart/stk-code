@@ -393,9 +393,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         switch (new_attachment)
         {
         case 0:
-            set(ATTACH_PARACHUTE, 
-                int(kp->getParachuteDuration()*stk_config->m_physics_fps)
-                + leftover_ticks                                          );
+            set(ATTACH_PARACHUTE, kp->getParachuteDuration() + leftover_ticks);
             m_initial_speed = m_kart->getSpeed();
 
             // if going very slowly or backwards,

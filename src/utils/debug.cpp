@@ -176,8 +176,7 @@ void addAttachment(Attachment::AttachmentType type)
         else if (type == Attachment::ATTACH_PARACHUTE)
         {
             kart->getAttachment()
-                ->set(type, int(kart->getKartProperties()->getParachuteDuration()
-                               *stk_config->m_physics_fps) );
+                ->set(type, kart->getKartProperties()->getParachuteDuration() );
         }
         else if (type == Attachment::ATTACH_BOMB)
         {

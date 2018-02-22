@@ -414,12 +414,12 @@ void Powerup::use()
                         position_factor = 1.0f - rank_factor;
                     }
 
-                    rank_mult = 1 + (position_factor * (kp->getParachuteDurationRankMult() - 1));
+                    rank_mult = 1 + (position_factor * 
+                                     (kp->getParachuteDurationRankMult() - 1));
 
                     kart->getAttachment()
                         ->set(Attachment::ATTACH_PARACHUTE,
-                              int(kp->getParachuteDurationOther() * rank_mult 
-                                  * stk_config->m_physics_fps)                );
+                              int(kp->getParachuteDurationOther()*rank_mult) );
 
                     if(kart->getController()->isLocalPlayerController())
                         player_kart = kart;
