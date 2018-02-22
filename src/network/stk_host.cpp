@@ -313,10 +313,9 @@ STKHost::STKHost(const irr::core::stringw &server_name)
     }
 
     setPrivatePort();
-    if (NetworkConfig::get()->isWAN())
-    {
-        setPublicAddress();
-    }
+    // We need the public address for server no matter what to determine
+    // local lan connection
+    setPublicAddress();
     // Don't construct server if no public address in WAN game
     if (!m_public_address.isUnset() || NetworkConfig::get()->isLAN())
     {
@@ -717,9 +716,10 @@ void STKHost::mainLoop()
 
     // A separate network connection (socket) to handle LAN requests.
     Network* lan_network = NULL;
-    if (NetworkConfig::get()->isLAN())
+    if (NetworkConfig::get()->isLAN() && NetworkConfig::get()->isServer())
     {
-        TransportAddress address(0, NetworkConfig::get()->getServerDiscoveryPort());
+        TransportAddress address(0,
+            NetworkConfig::get()->getServerDiscoveryPort());
         ENetAddress eaddr = address.toEnetAddress();
         lan_network = new Network(1, 1, 0, 0, &eaddr);
     }
@@ -830,7 +830,7 @@ void STKHost::handleDirectSocketRequest(Network* lan_network)
     {
         // In case of a LAN connection, we only allow connections from
         // a LAN address (192.168*, ..., and 127.*).
-        if (!sender.isLAN())
+        if (!sender.isLAN() && sender.getIP() != m_public_address.getIP())
         {
             Log::error("STKHost", "Client trying to connect from '%s'",
                        sender.toString().c_str());

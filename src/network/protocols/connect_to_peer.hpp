@@ -45,7 +45,7 @@ protected:
     bool m_is_lan;
 
     /** Timer use for tracking broadcast. */
-    std::chrono::system_clock::time_point m_timer;
+    double m_timer = 0.0;
 
     unsigned m_tried_connection = 0;
 
@@ -59,8 +59,6 @@ protected:
         DONE,
         EXITING
     }  m_state;
-
-    void resetTimer() { m_timer = std::chrono::system_clock::now(); }
 
 public:
              ConnectToPeer(uint32_t peer_id);

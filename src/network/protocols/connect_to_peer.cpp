@@ -40,7 +40,6 @@ ConnectToPeer::ConnectToPeer(uint32_t peer_id)  : Protocol(PROTOCOL_CONNECTION)
     m_state            = NONE;
     m_is_lan           = false;
     setHandleConnections(true);
-    resetTimer();
 }   // ConnectToPeer(peer_id)
 
 // ----------------------------------------------------------------------------
@@ -54,7 +53,6 @@ ConnectToPeer::ConnectToPeer(const TransportAddress &address)
     // We don't need to find the peer address, so we can start
     // with the state when we found the peer address.
     m_state            = WAIT_FOR_CONNECTION;
-    resetTimer();
     m_is_lan           = true;
     setHandleConnections(true);
 }   // ConnectToPeers(TransportAddress)
@@ -113,15 +111,15 @@ void ConnectToPeer::asynchronousUpdate()
             }
 
             m_state = WAIT_FOR_CONNECTION;
-            resetTimer();
+            m_timer = 0.0;
             break;
         }
         case WAIT_FOR_CONNECTION:
         {
             // Each 2 second for a ping or broadcast
-            if (m_timer > m_timer + std::chrono::seconds(2))
+            if (StkTime::getRealTime() > m_timer + 2.0)
             {
-                resetTimer();
+                m_timer = StkTime::getRealTime();
                 // Now we know the peer address. If it's a non-local host, start
                 // the Ping protocol to keep the port available. We can't rely
                 // on STKHost::isLAN(), since we might get a LAN connection even
@@ -153,8 +151,8 @@ void ConnectToPeer::asynchronousUpdate()
                 STKHost::get()->sendRawPacket(aloha, broadcast_address);
                 Log::info("ConnectToPeer", "Broadcast aloha to self.");
 
-                // 30 seconds timeout
-                if (m_tried_connection++ > 15)
+                // 10 seconds timeout
+                if (m_tried_connection++ > 5)
                 {
                     // Not much we can do about if we don't receive the client
                     // connection - it could have stopped, lost network, ...

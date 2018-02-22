@@ -22,13 +22,12 @@
 #include "network/protocol.hpp"
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
-#include <chrono>
 #include <string>
 
 class ConnectToServer : public Protocol
 {
 private:
-    std::chrono::system_clock::time_point m_timer;
+    double m_timer = 0.0;
     TransportAddress m_server_address;
     uint32_t m_server_id;
     uint32_t m_host_id;
@@ -54,7 +53,6 @@ private:
     void registerWithSTKServer();
     void handleQuickConnect();
     void waitingAloha(bool is_wan);
-    void resetTimer() { m_timer = std::chrono::system_clock::now(); }
 
 public:
              ConnectToServer();

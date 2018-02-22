@@ -120,7 +120,7 @@ void ConnectToServer::asynchronousUpdate()
             request_connection->requestStart();
             m_current_protocol = request_connection;
             // Reset timer for next usage
-            resetTimer();
+            m_timer = 0.0;
             break;
         }
         case REQUESTING_CONNECTION:
@@ -161,9 +161,9 @@ void ConnectToServer::asynchronousUpdate()
             {
                 // Send a 1-byte datagram,  the remote host can simply ignore
                 // this datagram, to keep the port open (2 second each)
-                if (m_timer > m_timer + std::chrono::seconds(2))
+                if (StkTime::getRealTime() > m_timer + 2.0)
                 {
-                    resetTimer();
+                    m_timer = StkTime::getRealTime();
                     BareNetworkString data;
                     data.addUInt8(0);
                     STKHost::get()->sendRawPacket(data, m_server_address);
@@ -173,10 +173,11 @@ void ConnectToServer::asynchronousUpdate()
             break;
         case CONNECTING: // waiting the server to answer our connection
         {
-            if (m_timer > m_timer + std::chrono::seconds(5)) // every 5 seconds
+            // Every 5 seconds
+            if (StkTime::getRealTime() > m_timer + 5.0)
             {
+                m_timer = StkTime::getRealTime();
                 STKHost::get()->connect(m_server_address);
-                resetTimer();
                 Log::info("ConnectToServer", "Trying to connect to %s",
                     m_server_address.toString().c_str());
                 if (m_tried_connection++ > 3)
@@ -403,7 +404,7 @@ void ConnectToServer::waitingAloha(bool is_wan)
         }
         m_state = CONNECTING;
         // Reset timer for next usage
-        resetTimer();
+        m_timer = 0.0;
         m_tried_connection = 0;
     }
 }  // waitingAloha
