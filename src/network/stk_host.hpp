@@ -103,12 +103,22 @@ private:
      *  in the GUI. */
     irr::core::stringw m_error_message;
 
+    /** The public address found by stun (if WAN is used). */
+    TransportAddress m_public_address;
+
+    /** The private port enet socket is bound. */
+    uint16_t m_private_port;
+
+    /** An error message, which is set by a protocol to be displayed
+     *  in the GUI. */
+
              STKHost(uint32_t server_id, uint32_t host_id);
              STKHost(const irr::core::stringw &server_name);
     virtual ~STKHost();
     void init();
     void handleDirectSocketRequest(Network* lan_network);
-
+    // ------------------------------------------------------------------------
+    void setPublicAddress();
     // ------------------------------------------------------------------------
     void mainLoop();
 
@@ -140,7 +150,15 @@ public:
     // ------------------------------------------------------------------------
     /** Checks if the STKHost has been created. */
     static bool existHost() { return m_stk_host != NULL; }
-
+    // ------------------------------------------------------------------------
+    const TransportAddress& getPublicAddress() const
+                                                   { return m_public_address; }
+    // ------------------------------------------------------------------------
+    uint16_t getPrivatePort() const
+                                                     { return m_private_port; }
+    // ------------------------------------------------------------------------
+    void setPrivatePort();
+    // ------------------------------------------------------------------------
     virtual GameSetup* setupNewGame();
     void abort();
     void deleteAllPeers();
@@ -175,7 +193,6 @@ public:
     STKPeer    *getPeer(ENetPeer *enet_peer);
     STKPeer    *getServerPeerForClient() const;
     std::vector<NetworkPlayerProfile*> getMyPlayerProfiles();
-    uint16_t    getPort() const;
     void        setErrorMessage(const irr::core::stringw &message);
     bool        isAuthorisedToControl() const;
     const irr::core::stringw& 

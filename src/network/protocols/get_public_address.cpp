@@ -19,6 +19,7 @@
 #include "network/protocols/get_public_address.hpp"
 
 #include "config/user_config.hpp"
+#include "guiengine/message_queue.hpp"
 #include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
@@ -28,6 +29,8 @@
 #include "utils/string_utils.hpp"
 
 #include <assert.h>
+#include <algorithm>
+#include <random>
 #include <string>
 
 #ifdef __MINGW32__
@@ -48,36 +51,16 @@
 const uint32_t   GetPublicAddress::m_stun_magic_cookie = 0x2112A442;
 TransportAddress GetPublicAddress::m_my_address(0, 0);
 
-void GetPublicAddress::setMyIPAddress(const std::string &s)
-{
-    std::vector<std::string> l = StringUtils::split(s, ':');
-    if (l.size() != 2)
-    {
-        Log::fatal("Invalid IP address '%s'.", s.c_str());
-    }
-    std::vector<std::string> ip = StringUtils::split(l[0], '.');
-    if (ip.size() != 4)
-    {
-        Log::fatal("Invalid IP address '%s'.", s.c_str());
-    }
-    uint32_t u = 0;
-    for (unsigned int i = 0; i < 4; i++)
-    {
-        int k;
-        StringUtils::fromString(ip[i], k);
-        u = (u << 8) + k;
-    }
-    m_my_address.setIP(u);
-    int p;
-    StringUtils::fromString(l[1], p);
-    m_my_address.setPort(p);
-}   // setMyIPAddress
 
 // ============================================================================
-GetPublicAddress::GetPublicAddress(CallbackObject *callback)
-                : Protocol(PROTOCOL_SILENT, callback)
+GetPublicAddress::GetPublicAddress()
+                : Protocol(PROTOCOL_SILENT, NULL)
 {
-    m_state = NOTHING_DONE;
+    m_untried_server = UserConfigParams::m_stun_servers;
+    // Generate random list of stun servers
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(m_untried_server.begin(), m_untried_server.end(), g);
 }   // GetPublicAddress
 
 // ----------------------------------------------------------------------------
@@ -85,15 +68,22 @@ GetPublicAddress::GetPublicAddress(CallbackObject *callback)
  *  the list stored in the config file. See
  *  https://tools.ietf.org/html/rfc5389#section-6
  *  for details on the message structure.
- *  The request is send through m_transaction_host, from which the answer
+ *  The request is send through transaction_host, from which the answer
  *  will be retrieved by parseStunResponse()
  */
-void GetPublicAddress::createStunRequest()
+Network* GetPublicAddress::createStunRequest()
 {
-    // Pick a random stun server
-    std::vector<std::string> stun_servers = UserConfigParams::m_stun_servers;
+    if (m_untried_server.empty())
+    {
+        // Notice: MessageQueue is thread safe to add
+        MessageQueue::add(MessageQueue::MT_ERROR,
+            _("Failed to get public address from stun server."));
+        requestTerminate();
+        return NULL;
+    }
 
-    const char* server_name = stun_servers[rand() % stun_servers.size()].c_str();
+    // Pick last element in untried servers
+    const char* server_name = m_untried_server.back().c_str();
     Log::debug("GetPublicAddress", "Using STUN server %s", server_name);
 
     struct addrinfo hints, *res;
@@ -106,10 +96,12 @@ void GetPublicAddress::createStunRequest()
     int status = getaddrinfo(server_name, NULL, &hints, &res);
     if (status != 0)
     {
-        Log::error("GetPublicAddress", "Error in getaddrinfo: %s",
-                   gai_strerror(status));
-        return;
+        Log::error("GetPublicAddress", "Error in getaddrinfo for stun server"
+            " %s: %s", server_name, gai_strerror(status));
+        m_untried_server.pop_back();
+        return NULL;
     }
+    m_untried_server.pop_back();
     // documentation says it points to "one or more addrinfo structures"
     assert(res != NULL);
     struct sockaddr_in* current_interface = (struct sockaddr_in*)(res->ai_addr);
@@ -119,7 +111,7 @@ void GetPublicAddress::createStunRequest()
     ENetAddress addr;
     addr.host = STKHost::HOST_ANY;
     addr.port = STKHost::PORT_ANY;
-    m_transaction_host = new Network(1, 1, 0, 0, &addr);
+    Network* transaction_host = new Network(1, 1, 0, 0, &addr);
 
     // Assemble the message for the stun server
     BareNetworkString s(20);
@@ -138,11 +130,11 @@ void GetPublicAddress::createStunRequest()
         m_stun_tansaction_id[i] = random_byte;
     }
 
-    m_transaction_host->sendRawPacket(s,
+    transaction_host->sendRawPacket(s,
                                       TransportAddress(m_stun_server_ip,
                                                        m_stun_server_port) );
     freeaddrinfo(res);
-    m_state = STUN_REQUEST_SENT;
+    return transaction_host;
 }   // createStunRequest
 
 // ----------------------------------------------------------------------------
@@ -151,12 +143,13 @@ void GetPublicAddress::createStunRequest()
  * then parses the answer into address and port
  * \return "" if the address could be parsed or an error message
 */
-std::string GetPublicAddress::parseStunResponse()
+std::string GetPublicAddress::parseStunResponse(Network* transaction_host)
 {
     TransportAddress sender;
     const int LEN = 2048;
     char buffer[LEN];
-    int len = m_transaction_host->receiveRawPacket(buffer, LEN, &sender, 2000);
+    int len = transaction_host->receiveRawPacket(buffer, LEN, &sender, 2000);
+    delete transaction_host;
 
     if(sender.getIP()!=m_stun_server_ip)
     {
@@ -199,7 +192,6 @@ std::string GetPublicAddress::parseStunResponse()
 
     // Those are the port and the address to be detected
     
-    int pos = 20;
     while (true)
     {
         int type = datas.getUInt16();
@@ -239,35 +231,27 @@ void GetPublicAddress::asynchronousUpdate()
     if (m_my_address.getIP() != 0 && m_my_address.getPort() != 0)
     {
         NetworkConfig::get()->setMyAddress(m_my_address);
-        m_state = EXITING;
         requestTerminate();
     }
 //#define LAN_TEST
 #ifdef LAN_TEST
     TransportAddress address(0x7f000001, 4);
     NetworkConfig::get()->setMyAddress(address);
-    m_state = EXITING;
     requestTerminate();
     return;
 #endif
 
-    if (m_state == NOTHING_DONE)
+    Network* transaction_host = createStunRequest();
+    if (transaction_host)
     {
-        createStunRequest();
-    }
-    if (m_state == STUN_REQUEST_SENT)
-    {
-        std::string message = parseStunResponse();
-        delete m_transaction_host;
+        std::string message = parseStunResponse(transaction_host);
         if (message != "")
         {
             Log::warn("GetPublicAddress", "%s", message.c_str());
-            m_state = NOTHING_DONE;  // try again
         }
         else
         {
             // The address and the port are known, so the connection can be closed
-            m_state = EXITING;
             requestTerminate();
         }
     }

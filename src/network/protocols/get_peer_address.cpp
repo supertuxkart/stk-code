@@ -21,13 +21,12 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "network/network_config.hpp"
-#include "network/protocol_manager.hpp"
+#include "network/stk_host.hpp"
 #include "online/request_manager.hpp"
 #include "utils/log.hpp"
 
-GetPeerAddress::GetPeerAddress(uint32_t peer_id,
-                              CallbackObject* callback_object)
-              : Protocol(PROTOCOL_SILENT, callback_object)
+GetPeerAddress::GetPeerAddress(uint32_t peer_id)
+              : Protocol(PROTOCOL_SILENT, NULL)
 {
     m_peer_id = peer_id;
 }   // GetPeerAddress
@@ -41,7 +40,6 @@ GetPeerAddress::~GetPeerAddress()
 void GetPeerAddress::setup()
 {
     m_address.clear();
-
     m_request = new Online::XMLRequest();
     PlayerManager::setUserDetails(m_request, "get",
                                   Online::API::SERVER_PATH);
@@ -65,7 +63,7 @@ void GetPeerAddress::asynchronousUpdate()
             m_address.setIP(ip);
 
             uint16_t port;
-            uint32_t my_ip = NetworkConfig::get()->getMyAddress().getIP();
+            uint32_t my_ip = STKHost::get()->getPublicAddress().getIP();
             if (m_address.getIP() == my_ip && !NetworkConfig::m_disable_lan)
                 result->get("private_port", &port);
             else
@@ -84,9 +82,3 @@ void GetPeerAddress::asynchronousUpdate()
         m_request = NULL;
     }
 }   // asynchronousUpdate
-
-// ----------------------------------------------------------------------------
-void GetPeerAddress::setPeerID(uint32_t peer_id)
-{
-    m_peer_id = peer_id;
-}   // setPeerID

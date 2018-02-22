@@ -23,38 +23,44 @@
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
 
+#include <chrono>
+
 /** One instance of this is started for every peer who tries to
  *  connect to this server.
  */
-class ConnectToPeer : public Protocol, public CallbackObject
+class ConnectToPeer : public Protocol
 {
 protected:
 
     TransportAddress m_peer_address;
     uint32_t m_peer_id;
 
-    /** Pointer to the protocol which is monitored for state changes. */
+    /** Pointer to the protocol which is monitored for state changes, this
+     *  need to be shared_ptr because we need to get the result from
+     *  \ref GetPeerAddress, otherwise when it terminated the result will be
+     *  gone. */
     std::shared_ptr<Protocol> m_current_protocol;
 
     /** True if this is a LAN connection. */
     bool m_is_lan;
 
-    /** We might need to broadcast several times (in case the client is not
-     *  ready in time). This keep track of broadcastst. */
-    float m_time_last_broadcast;
+    /** Timer use for tracking broadcast. */
+    std::chrono::system_clock::time_point m_timer;
 
-    int m_broadcast_count;
+    unsigned m_tried_connection = 0;
 
     enum STATE
     {
         NONE,
         RECEIVED_PEER_ADDRESS,
-        WAIT_FOR_LAN,
+        WAIT_FOR_CONNECTION,
         CONNECTING,
         CONNECTED,
         DONE,
         EXITING
     }  m_state;
+
+    void resetTimer() { m_timer = std::chrono::system_clock::now(); }
 
 public:
              ConnectToPeer(uint32_t peer_id);
@@ -62,10 +68,9 @@ public:
     virtual ~ConnectToPeer();
 
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
-    virtual void setup() OVERRIDE;
+    virtual void setup() OVERRIDE {}
     virtual void update(float dt) OVERRIDE {}
     virtual void asynchronousUpdate() OVERRIDE;
-    virtual void callback(Protocol *protocol) OVERRIDE;
 };   // class ConnectToPeer
 
 #endif // CONNECT_TO_SERVER_HPP

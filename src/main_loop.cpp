@@ -302,31 +302,32 @@ void MainLoop::run()
                 ->addNextTimeStep(World::getWorld()->getTime(), dt);
         }
 
-        if (!m_abort && !ProfileWorld::isNoGraphics())
+        if (!m_abort)
         {
             float frame_duration = num_steps * dt;
+            if (!ProfileWorld::isNoGraphics())
+            {
+                // Render the previous frame, and also handle all user input.
+                PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
+                irr_driver->update(frame_duration);
+                PROFILER_POP_CPU_MARKER();
 
-            // Render the previous frame, and also handle all user input.
-            PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
-            irr_driver->update(frame_duration);
-            PROFILER_POP_CPU_MARKER();
+                PROFILER_PUSH_CPU_MARKER("Input/GUI", 0x7F, 0x00, 0x00);
+    #ifdef ENABLE_WIIUSE
+                wiimote_manager->update();
+    #endif
+                input_manager->update(frame_duration);
+                GUIEngine::update(frame_duration);
+                PROFILER_POP_CPU_MARKER();
 
-            PROFILER_PUSH_CPU_MARKER("Input/GUI", 0x7F, 0x00, 0x00);
-#ifdef ENABLE_WIIUSE
-            wiimote_manager->update();
-#endif
-            input_manager->update(frame_duration);
-            GUIEngine::update(frame_duration);
-            PROFILER_POP_CPU_MARKER();
-
-            PROFILER_PUSH_CPU_MARKER("Music", 0x7F, 0x00, 0x00);
-            SFXManager::get()->update();
-            PROFILER_POP_CPU_MARKER();
-
+                PROFILER_PUSH_CPU_MARKER("Music", 0x7F, 0x00, 0x00);
+                SFXManager::get()->update();
+                PROFILER_POP_CPU_MARKER();
+            }
+            // Some protocols in network will use RequestManager
             PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
             Online::RequestManager::get()->update(frame_duration);
             PROFILER_POP_CPU_MARKER();
-
         }
 
         for(int i=0; i<num_steps; i++)

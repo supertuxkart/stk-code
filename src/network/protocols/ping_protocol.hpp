@@ -16,9 +16,12 @@ private:
 
     /** Time of last ping. */
     double m_last_ping_time;
+
+    /** If longer than this, terminate this protocol. */
+    double m_timeout;
 public:
     PingProtocol(const TransportAddress& ping_dst,
-        double delay_between_pings);
+        double delay_between_pings, double timeout = 60.0);
     virtual ~PingProtocol();
 
     virtual void asynchronousUpdate() OVERRIDE;

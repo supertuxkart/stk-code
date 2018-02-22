@@ -43,7 +43,24 @@
 #  include <errno.h>
 #  include <sys/socket.h>
 #endif
+
+#ifdef __MINGW32__
+#  undef _WIN32_WINNT
+#  define _WIN32_WINNT 0x501
+#endif
+
+#ifdef WIN32
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
+#else
+#  include <netdb.h>
+#endif
+#include <sys/types.h>
+
+#include <algorithm>
 #include <functional>
+#include <random>
+#include <string>
 
 STKHost *STKHost::m_stk_host       = NULL;
 bool     STKHost::m_enable_console = false;
@@ -244,10 +261,10 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
     // server is made.
     m_host_id = 0;
     init();
-    TransportAddress a;
-    a.setIP(0);
-    a.setPort(NetworkConfig::get()->getClientPort());
-    ENetAddress ea = a.toEnetAddress();
+    
+    ENetAddress ea;
+    ea.host = STKHost::HOST_ANY;
+    ea.port = STKHost::PORT_ANY;
 
     m_network = new Network(/*peer_count*/1,       /*channel_limit*/2,
                             /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &ea);
@@ -257,7 +274,16 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
                                "an ENet client host.");
     }
 
-    std::make_shared<ConnectToServer>(server_id, host_id)->requestStart();
+    setPrivatePort();
+    if (NetworkConfig::get()->isWAN())
+    {
+        setPublicAddress();
+    }
+    // Don't connect to server if no public address in WAN game
+    if (!m_public_address.isUnset() || NetworkConfig::get()->isLAN())
+    {
+        std::make_shared<ConnectToServer>(server_id, host_id)->requestStart();
+    }
 }   // STKHost
 
 // ----------------------------------------------------------------------------
@@ -274,7 +300,7 @@ STKHost::STKHost(const irr::core::stringw &server_name)
 
     ENetAddress addr;
     addr.host = STKHost::HOST_ANY;
-    addr.port = NetworkConfig::get()->getServerPort();
+    addr.port = STKHost::PORT_ANY;
 
     m_network= new Network(NetworkConfig::get()->getMaxPlayers(),
                            /*channel_limit*/2,
@@ -286,8 +312,18 @@ STKHost::STKHost(const irr::core::stringw &server_name)
                               "ENet server host.");
     }
 
-    startListening();
-    ProtocolManager::lock()->requestStart(LobbyProtocol::create<ServerLobby>());
+    setPrivatePort();
+    if (NetworkConfig::get()->isWAN())
+    {
+        setPublicAddress();
+    }
+    // Don't construct server if no public address in WAN game
+    if (!m_public_address.isUnset() || NetworkConfig::get()->isLAN())
+    {
+        startListening();
+        ProtocolManager::lock()
+            ->requestStart(LobbyProtocol::create<ServerLobby>());
+    }
 
 }   // STKHost(server_name)
 
@@ -363,6 +399,192 @@ void STKHost::shutdown()
     deleteAllPeers();
     destroy();
 }   // shutdown
+
+//-----------------------------------------------------------------------------
+/** Set the public address using stun protocol.
+ */
+void STKHost::setPublicAddress()
+{
+    std::vector<std::string> untried_server = UserConfigParams::m_stun_servers;
+    // Generate random list of stun servers
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(untried_server.begin(), untried_server.end(), g);
+    while (!untried_server.empty())
+    {
+        // Pick last element in untried servers
+        const char* server_name = untried_server.back().c_str();
+        Log::debug("STKHost", "Using STUN server %s", server_name);
+
+        struct addrinfo hints, *res;
+
+        memset(&hints, 0, sizeof hints);
+        hints.ai_family = AF_UNSPEC; // AF_INET or AF_INET6 to force version
+        hints.ai_socktype = SOCK_STREAM;
+
+        // Resolve the stun server name so we can send it a STUN request
+        int status = getaddrinfo(server_name, NULL, &hints, &res);
+        if (status != 0)
+        {
+            Log::error("STKHost", "Error in getaddrinfo for stun server"
+                " %s: %s", server_name, gai_strerror(status));
+            untried_server.pop_back();
+            continue;
+        }
+        untried_server.pop_back();
+        // documentation says it points to "one or more addrinfo structures"
+        assert(res != NULL);
+        struct sockaddr_in* current_interface = (struct sockaddr_in*)(res->ai_addr);
+        uint32_t stun_server_ip = ntohl(current_interface->sin_addr.s_addr);
+
+        // Assemble the message for the stun server
+        BareNetworkString s(20);
+
+        // bytes 0-1: the type of the message
+        // bytes 2-3: message length added to header (attributes)
+        uint16_t message_type = 0x0001; // binding request
+        uint16_t message_length = 0x0000;
+        s.addUInt16(message_type).addUInt16(message_length)
+                                .addUInt32(0x2112A442);
+        uint8_t stun_tansaction_id[12];
+        // bytes 8-19: the transaction id
+        for (int i = 0; i < 12; i++)
+        {
+            uint8_t random_byte = rand() % 256;
+            s.addUInt8(random_byte);
+            stun_tansaction_id[i] = random_byte;
+        }
+
+        m_network->sendRawPacket(s, TransportAddress(stun_server_ip, 3478));
+        freeaddrinfo(res);
+
+        // Recieve now
+        TransportAddress sender;
+        const int LEN = 2048;
+        char buffer[LEN];
+        int len = m_network->receiveRawPacket(buffer, LEN, &sender, 2000);
+
+        if (sender.getIP() != stun_server_ip)
+        {
+            TransportAddress stun(stun_server_ip, 3478);
+            Log::warn("STKHost", 
+                    "Received stun response from %s instead of %s.",
+                    sender.toString().c_str(), stun.toString().c_str());
+        }
+
+        if (len < 0)
+        {
+            Log::error("STKHost", "STUN response contains no data at all");
+            continue;
+        }
+
+        // Convert to network string.
+        BareNetworkString datas(buffer, len);
+
+        // check that the stun response is a response, contains the magic cookie
+        // and the transaction ID
+        if (datas.getUInt16() != 0x0101)
+        {
+            Log::error("STKHost", "STUN response doesn't contain the magic "
+                "cookie");
+            continue;
+        }
+        int message_size = datas.getUInt16();
+        if (datas.getUInt32() != 0x2112A442)
+        {
+            Log::error("STKHost", "STUN response doesn't contain the magic "
+                "cookie");
+            continue;
+        }
+
+        for (int i = 0; i < 12; i++)
+        {
+            if (datas.getUInt8() != stun_tansaction_id[i])
+            {
+                Log::error("STKHost", "STUN response doesn't contain the "
+                    "transaction ID");
+                continue;
+            }
+        }
+
+        Log::debug("GetPublicAddress",
+                "The STUN server responded with a valid answer");
+
+        // The stun message is valid, so we parse it now:
+        if (message_size == 0)
+        {
+            Log::error("STKHost", "STUN response does not contain any "
+                "information.");
+            continue;
+        }
+        // Cannot even read the size
+        if (message_size < 4)
+        {
+            Log::error("STKHost", "STUN response is too short.");
+            continue;
+        }
+        // Those are the port and the address to be detected
+        bool found = false;
+        while (true)
+        {
+            int type = datas.getUInt16();
+            int size = datas.getUInt16();
+            if (type == 0 || type == 1)
+            {
+                assert(size == 8);
+                datas.getUInt8();    // skip 1 byte
+#ifdef DEBUG
+                uint8_t skip = datas.getUInt8();
+                // Family IPv4 only
+                assert(skip == 0x01);
+#else
+                datas.getUInt8();
+#endif
+                m_public_address.setPort(datas.getUInt16());
+                m_public_address.setIP(datas.getUInt32());
+                // finished parsing, we know our public transport address
+                Log::debug("STKHost",  "The public address has been found: %s",
+                    m_public_address.toString().c_str());
+                found = true;
+                break;
+            }   // type = 0 or 1
+            datas.skip(4 + size);
+            message_size -= 4 + size;
+            if (message_size == 0)
+            {
+                Log::error("STKHost", "STUN response is invalid.");
+                break;
+            }
+            // Cannot even read the size
+            if (message_size < 4)
+            {
+                Log::error("STKHost", "STUN response is invalid.");
+                break;
+            }
+        }   // while true
+        // Found public address and port
+        if (found)
+            untried_server.clear();
+    }
+    // We shutdown next frame if no public address
+    if (m_public_address.isUnset())
+        requestShutdown();
+}   // setPublicAddress
+
+//-----------------------------------------------------------------------------
+void STKHost::setPrivatePort()
+{
+    struct sockaddr_in sin;
+    socklen_t len = sizeof(sin);
+    ENetHost *host = m_network->getENetHost();
+    if (getsockname(host->socket, (struct sockaddr *)&sin, &len) == -1)
+    {
+        Log::error("STKHost", "Error while using getsockname().");
+        m_private_port = 0;
+    }
+    else
+        m_private_port = ntohs(sin.sin_port);
+}   // setPrivatePort
 
 //-----------------------------------------------------------------------------
 /** A previous GameSetup is deletea and a new one is created.
@@ -495,9 +717,7 @@ void STKHost::mainLoop()
 
     // A separate network connection (socket) to handle LAN requests.
     Network* lan_network = NULL;
-
-    if (NetworkConfig::get()->isServer() &&
-        (NetworkConfig::get()->isLAN() || NetworkConfig::get()->isPublicServer()) )
+    if (NetworkConfig::get()->isLAN())
     {
         TransportAddress address(0, NetworkConfig::get()->getServerDiscoveryPort());
         ENetAddress eaddr = address.toEnetAddress();
@@ -610,6 +830,13 @@ void STKHost::handleDirectSocketRequest(Network* lan_network)
     {
         // In case of a LAN connection, we only allow connections from
         // a LAN address (192.168*, ..., and 127.*).
+        if (!sender.isLAN())
+        {
+            Log::error("STKHost", "Client trying to connect from '%s'",
+                       sender.toString().c_str());
+            Log::error("STKHost", "which is outside of LAN - rejected.");
+            return;
+        }
         std::make_shared<ConnectToPeer>(sender)->requestStart();
     }
     else
@@ -741,20 +968,6 @@ void STKHost::removePeer(const STKPeer* peer)
               "Somebody is now disconnected. There are now %lu peers.",
               m_peers.size());
 }   // removePeer
-
-//-----------------------------------------------------------------------------
-
-uint16_t STKHost::getPort() const
-{
-    struct sockaddr_in sin;
-    socklen_t len = sizeof(sin);
-    ENetHost *host = m_network->getENetHost();
-    if (getsockname(host->socket, (struct sockaddr *)&sin, &len) == -1)
-        Log::error("STKHost", "Error while using getsockname().");
-    else
-        return ntohs(sin.sin_port);
-    return 0;
-}   // getPort
 
 //-----------------------------------------------------------------------------
 /** Sends data to all peers except the specified one.

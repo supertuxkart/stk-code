@@ -115,7 +115,6 @@ void ServerLobby::setup()
     m_state             = NetworkConfig::get()->isLAN() ? ACCEPTING_CLIENTS 
                                                         : INIT_WAN;
     m_selection_enabled = false;
-    m_current_protocol  = nullptr;
     Log::info("ServerLobby", "Starting the protocol.");
 
     // Initialise the data structures to detect if all clients and 
@@ -201,27 +200,20 @@ void ServerLobby::update(float dt)
     switch (m_state.load())
     {
     case INIT_WAN:
+    {
         // Start the protocol to find the public ip address.
-        m_current_protocol = std::make_shared<GetPublicAddress>(this);
-        m_current_protocol->requestStart();
         m_state = GETTING_PUBLIC_ADDRESS;
-        // The callback from GetPublicAddress will wake this protocol up
-        requestPause();
         break;
+    }
     case GETTING_PUBLIC_ADDRESS:
     {
-        Log::debug("ServerLobby", "Public address known.");
-        // Free GetPublicAddress protocol
-        m_current_protocol = nullptr;
-
         // Register this server with the STK server. This will block
         // this thread, but there is no need for the protocol manager
         // to react to any requests before the server is registered.
         registerServer();
-        Log::info("ServerLobby", "Server registered.");
         m_state = ACCEPTING_CLIENTS;
+        break;
     }
-    break;
     case ACCEPTING_CLIENTS:
     {
         // Only poll the STK server if this is a WAN server.
@@ -307,15 +299,6 @@ void ServerLobby::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-/** Callback when the GetPublicAddress terminates. It will unpause this
- *  protocol, which triggers the next state of the finite state machine.
- */
-void ServerLobby::callback(Protocol *protocol)
-{
-    requestUnpause();
-}   // callback
-
-//-----------------------------------------------------------------------------
 /** Register this server (i.e. its public address) with the STK server
  *  so that clients can find it. It blocks till a response from the
  *  stk server is received (this function is executed from the 
@@ -325,12 +308,12 @@ void ServerLobby::callback(Protocol *protocol)
 void ServerLobby::registerServer()
 {
     Online::XMLRequest *request = new Online::XMLRequest();
-    const TransportAddress& addr = NetworkConfig::get()->getMyAddress();
+    const TransportAddress& addr = STKHost::get()->getPublicAddress();
     PlayerManager::setUserDetails(request, "create", Online::API::SERVER_PATH);
     request->addParameter("address",      addr.getIP()                    );
     request->addParameter("port",         addr.getPort()                  );
     request->addParameter("private_port",
-                                    NetworkConfig::get()->getServerPort() );
+                                    STKHost::get()->getPrivatePort()      );
     request->addParameter("name",   NetworkConfig::get()->getServerName() );
     request->addParameter("max_players", 
                           UserConfigParams::m_server_max_players          );
@@ -350,9 +333,11 @@ void ServerLobby::registerServer()
     {
         irr::core::stringc error(request->getInfo().c_str());
         Log::error("RegisterServer", "%s", error.c_str());
-        STKHost::get()->setErrorMessage(_("Failed to register server: %s", error.c_str()));
+        STKHost::get()->setErrorMessage(_("Failed to register server: %s",
+            error.c_str()));
+        STKHost::get()->requestShutdown();
     }
-
+    delete request;
 }   // registerServer
 
 //-----------------------------------------------------------------------------
@@ -444,7 +429,7 @@ void ServerLobby::checkIncomingConnectionRequests()
     PlayerManager::setUserDetails(request, "poll-connection-requests",
                                   Online::API::SERVER_PATH);
 
-    const TransportAddress &addr = NetworkConfig::get()->getMyAddress();
+    const TransportAddress &addr = STKHost::get()->getPublicAddress();
     request->addParameter("address", addr.getIP()  );
     request->addParameter("port",    addr.getPort());
 
@@ -469,7 +454,7 @@ void ServerLobby::checkIncomingConnectionRequests()
         Log::debug("ServerLobby",
                    "User with id %d wants to connect.", id);
         std::make_shared<ConnectToPeer>(id)->requestStart();
-    }        
+    }
     delete request;
 }   // checkIncomingConnectionRequests
 

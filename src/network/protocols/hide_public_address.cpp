@@ -56,7 +56,7 @@ void HidePublicAddress::asynchronousUpdate()
         {
             if(rec_success == "yes")
             {
-                Log::debug("HidePublicAddress", "Address hidden successfully.");
+                Log::info("HidePublicAddress", "Address hidden successfully.");
             }
             else
             {

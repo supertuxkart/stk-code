@@ -90,6 +90,8 @@ private:
 public:
     bool isLAN() const;
     // ------------------------------------------------------------------------
+    bool isUnset() const { return m_ip == 0 || m_port == 0; }
+    // ------------------------------------------------------------------------
     /** A copy function (to replace the copy constructor which is disabled
      *  using NoCopy): it copies the data from the argument into this object.*/
     void copy(const TransportAddress &other)

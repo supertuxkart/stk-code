@@ -30,8 +30,10 @@ class Network;
 class GetPublicAddress : public Protocol
 {
 private:
-    void createStunRequest();
-    std::string parseStunResponse();
+    Network* createStunRequest();
+    std::string parseStunResponse(Network* transaction_host);
+
+    std::vector<std::string> m_untried_server;
 
     // Constants
     static const uint32_t m_stun_magic_cookie;
@@ -41,20 +43,13 @@ private:
      *  unnecessary (though that means that the user has to take care of
      *  opening the firewall). */
     static TransportAddress m_my_address;
-    enum State
-    {
-        NOTHING_DONE,
-        STUN_REQUEST_SENT,
-        EXITING
-    } m_state;
 
     uint8_t m_stun_tansaction_id[12];
     uint32_t m_stun_server_ip;
     Network* m_transaction_host;
 
 public:
-    static void setMyIPAddress(const std::string &s);
-                GetPublicAddress(CallbackObject *callback = NULL);
+                GetPublicAddress();
     virtual    ~GetPublicAddress() {}
 
     virtual void asynchronousUpdate() OVERRIDE;
@@ -65,7 +60,7 @@ public:
     // ------------------------------------------------------------------------
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE { return true; }
     // ------------------------------------------------------------------------
-    virtual void setup() { m_state = NOTHING_DONE; }
+    virtual void setup() { }
     // ------------------------------------------------------------------------
 
 };   // class GetPublicAddress

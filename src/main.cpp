@@ -1027,6 +1027,7 @@ int handleCmdLine()
             while (true)
             {
                 Online::RequestManager::get()->update(0.0f);
+                StkTime::sleep(1);
                 if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
                 {
                     break;
@@ -1073,9 +1074,6 @@ int handleCmdLine()
 
     if(CommandLine::has("--password", &s))
         password = s.c_str();
-
-    if (CommandLine::has("--my-address", &s))
-        GetPublicAddress::setMyIPAddress(s);
 
     /** Disable detection of LAN connection when connecting via WAN. This is
      *  mostly a debugging feature to force using WAN connection. */

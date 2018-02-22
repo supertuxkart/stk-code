@@ -22,27 +22,28 @@
 #include "network/protocol.hpp"
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
+#include <chrono>
 #include <string>
 
-class ConnectToServer : public Protocol, public CallbackObject
+class ConnectToServer : public Protocol
 {
 private:
+    std::chrono::system_clock::time_point m_timer;
     TransportAddress m_server_address;
     uint32_t m_server_id;
     uint32_t m_host_id;
+    unsigned m_tried_connection = 0;
 
     /** Protocol currently being monitored. */
-    std::shared_ptr<Protocol> m_current_protocol;
+    std::weak_ptr<Protocol> m_current_protocol;
     bool m_quick_join;
 
     /** State for finite state machine. */
     enum
     {
-        NONE,
-        GETTING_SELF_ADDRESS,
+        REGISTER_SELF_ADDRESS,
         GOT_SERVER_ADDRESS,
         REQUESTING_CONNECTION,
-        QUICK_JOIN,
         CONNECTING,
         CONNECTED,
         HIDING_ADDRESS,
@@ -52,7 +53,8 @@ private:
 
     void registerWithSTKServer();
     void handleQuickConnect();
-    void handleSameLAN();
+    void waitingAloha(bool is_wan);
+    void resetTimer() { m_timer = std::chrono::system_clock::now(); }
 
 public:
              ConnectToServer();
@@ -62,9 +64,7 @@ public:
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
     virtual void setup() OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
-    virtual void callback(Protocol *protocol) OVERRIDE;
     virtual void update(float dt) OVERRIDE {}
-    void setServerAddress(const TransportAddress &address);
 };   // class ConnectToServer
 
 #endif // CONNECT_TO_SERVER_HPP

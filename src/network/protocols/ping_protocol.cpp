@@ -26,11 +26,12 @@
  *  \param delay_between_pings: How often to ping.
  */
 PingProtocol::PingProtocol(const TransportAddress& ping_dst,
-                           double delay_between_pings) 
+                           double delay_between_pings, double timeout)
             : Protocol(PROTOCOL_SILENT)
 {
     m_ping_dst.copy(ping_dst);
     m_delay_between_pings = delay_between_pings;
+    m_timeout = timeout;
 }   // PingProtocol
 
 // ----------------------------------------------------------------------------
@@ -41,7 +42,7 @@ PingProtocol::~PingProtocol()
 // ----------------------------------------------------------------------------
 void PingProtocol::setup()
 {
-    m_last_ping_time = 0;
+    m_last_ping_time = 0.0;
 }   // setup
 
 // ----------------------------------------------------------------------------
@@ -49,6 +50,10 @@ void PingProtocol::asynchronousUpdate()
 {
     if (StkTime::getRealTime() > m_last_ping_time+m_delay_between_pings)
     {
+        if (m_last_ping_time == 0.0)
+            m_timeout = StkTime::getRealTime() + m_timeout;
+        else if (StkTime::getRealTime() > m_timeout)
+            requestTerminate();
         m_last_ping_time = StkTime::getRealTime();
         BareNetworkString data;
         data.addUInt8(0);
