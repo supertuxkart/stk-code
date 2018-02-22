@@ -215,7 +215,6 @@
 #include "network/rewind_queue.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
-#include "network/protocols/get_public_address.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
 #include "race/grand_prix_manager.hpp"

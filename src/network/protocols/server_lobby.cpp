@@ -25,7 +25,6 @@
 #include "network/event.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
-#include "network/protocols/get_public_address.hpp"
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/latency_protocol.hpp"
 #include "network/protocol_manager.hpp"
