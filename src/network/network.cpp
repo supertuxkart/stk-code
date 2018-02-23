@@ -45,19 +45,29 @@ Synchronised<FILE*>Network::m_log_file = NULL;
  *  \param channel_limit : The maximum number of channels per peer.
  *  \param max_incoming_bandwidth : The maximum incoming bandwidth.
  *  \param max_outgoing_bandwidth : The maximum outgoing bandwidth.
+ *  \param change_port_if_bound : Use another port if the prefered port is
+ *                                already bound to a socket.
  */
 Network::Network(int peer_count, int channel_limit,
                  uint32_t max_incoming_bandwidth,
                  uint32_t max_outgoing_bandwidth,
-                 ENetAddress* address)
+                 ENetAddress* address, bool change_port_if_bound)
 {
     m_host = enet_host_create(address, peer_count, channel_limit, 0, 0);
-    if (!m_host)
+    if (m_host)
+        return;
+    if (change_port_if_bound)
     {
-        Log::fatal("Network", "An error occurred while trying to create an "
-                   "ENet client host, maybe you started multiple instance "
-                   "of STK server?");
+        ENetAddress new_addr;
+        new_addr.host = address->host;
+        // Any port
+        new_addr.port = 0;
+        m_host = enet_host_create(&new_addr, peer_count, channel_limit, 0, 0);
+        if (m_host)
+            return;
     }
+    Log::fatal("Network", "An error occurred while trying to create an ENet "
+        "client host, maybe you started multiple instance of STK server?");
 }   // Network
 
 // ----------------------------------------------------------------------------
