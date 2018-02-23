@@ -80,7 +80,7 @@ void OnlineProfileServers::eventCallback(Widget* widget, const std::string& name
 {
     if (name == "back")
     {
-        StateManager::get()->popMenu();
+        StateManager::get()->escapePressed();
         return;
     }
     if (name == "wan")
