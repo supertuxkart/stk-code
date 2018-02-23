@@ -495,8 +495,9 @@ namespace StringUtils
     /** Returns the time (in seconds) as string, based on ticks. */
     std::string ticksTimeToString(int ticks)
     {
-        return timeToString(float(ticks) / stk_config->m_physics_fps);
+        return timeToString(stk_config->ticks2Time(ticks));
     }   // ticksTimeToString(ticks)
+
     // ------------------------------------------------------------------------
     /** Converts a time in seconds into a string of the form mm:ss:hh (minutes,
      *  seconds, 1/100 seconds.

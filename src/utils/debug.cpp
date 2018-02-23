@@ -168,8 +168,9 @@ void addAttachment(Attachment::AttachmentType type)
         if (type == Attachment::ATTACH_ANVIL)
         {
             kart->getAttachment()
-                ->set(type, int(kart->getKartProperties()->getAnvilDuration()
-                               *stk_config->m_physics_fps) );
+                ->set(type, 
+                      stk_config->time2Ticks(kart->getKartProperties()
+                                                 ->getAnvilDuration()) );
             kart->adjustSpeed(kart->getKartProperties()->getAnvilSpeedFactor());
             kart->updateWeight();
         }
@@ -181,8 +182,7 @@ void addAttachment(Attachment::AttachmentType type)
         else if (type == Attachment::ATTACH_BOMB)
         {
             kart->getAttachment()
-                ->set(type, int(stk_config->m_bomb_time
-                                *stk_config->m_physics_fps) );
+                ->set(type, stk_config->time2Ticks(stk_config->m_bomb_time) );
         }
     }
 

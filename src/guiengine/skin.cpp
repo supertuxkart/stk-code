@@ -921,7 +921,7 @@ SColorf GetPlayerColor(int player_id)
     SColorf color_rgb = { 0,0,0,1 };
     
     
-    col.Saturation = col.Saturation * (1.0f / (floorf(player_id / 4) + 1) );
+    col.Saturation = col.Saturation * (1.0f / (floorf(float(player_id / 4)) + 1) );
     col.toRGB(color_rgb);
     return color_rgb;
 }

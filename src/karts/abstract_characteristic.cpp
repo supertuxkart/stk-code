@@ -940,7 +940,7 @@ int AbstractCharacteristic::getParachuteDuration() const
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
                     getName(PARACHUTE_DURATION).c_str());
-    return int(result*stk_config->m_physics_fps);
+    return stk_config->time2Ticks(result);
 }  // getParachuteDuration
 
 // ----------------------------------------------------------------------------
@@ -952,7 +952,7 @@ int AbstractCharacteristic::getParachuteDurationOther() const
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
                     getName(PARACHUTE_DURATION_OTHER).c_str());
-    return int(result*stk_config->m_physics_fps);
+    return stk_config->time2Ticks(result);
 }  // getParachuteDurationOther
 
 // ----------------------------------------------------------------------------

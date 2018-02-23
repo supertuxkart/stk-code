@@ -137,8 +137,8 @@ void WorldStatus::startEngines()
 void WorldStatus::setClockMode(const ClockType mode, const float initial_time)
 {
     m_clock_mode = mode;
-    m_time_ticks = int(initial_time * stk_config->m_physics_fps);
-    m_time       = float(m_time_ticks) / stk_config->m_physics_fps;
+    m_time_ticks = stk_config->time2Ticks(initial_time);
+    m_time       = stk_config->ticks2Time(m_time_ticks);
 }   // setClockMode
 
 //-----------------------------------------------------------------------------
@@ -222,18 +222,18 @@ void WorldStatus::updateTime(const float dt)
             // long, we use the aux timer to force the next phase
             // after 3.5 seconds.
             if (m_track_intro_sound->getStatus() == SFXBase::SFX_PLAYING &&
-                2*m_auxiliary_ticks < 7*stk_config->m_physics_fps)
+                m_auxiliary_ticks < stk_config->time2Ticks(3.5f)           )
                 return;   // Do not increase time
 
             // Wait before ready phase if sounds are disabled
             if (!UserConfigParams::m_sfx &&
-                m_auxiliary_ticks < 3*stk_config->m_physics_fps )
+                m_auxiliary_ticks < stk_config->time2Ticks(3.0f))
                 return;
             
             if (!m_play_track_intro_sound)
             {
                 startEngines();
-                if (m_auxiliary_ticks < 3*stk_config->m_physics_fps)
+                if (m_auxiliary_ticks < stk_config->time2Ticks(3.0f))
                     return;   // Do not increase time
             }
 
@@ -270,8 +270,8 @@ void WorldStatus::updateTime(const float dt)
         }
         case READY_PHASE:
             startEngines();
-
-            if (m_auxiliary_ticks > stk_config->m_physics_fps)
+            // One second
+            if (m_auxiliary_ticks > stk_config->getPhysicsFPS())
             {
                 if (m_play_ready_set_go_sounds)
                 {
@@ -295,7 +295,7 @@ void WorldStatus::updateTime(const float dt)
 
             return;   // Do not increase time
         case SET_PHASE:
-            if (m_auxiliary_ticks > 2*stk_config->m_physics_fps)
+            if (m_auxiliary_ticks > 2*stk_config->getPhysicsFPS())
             {
                 // set phase is over, go to the next one
                 m_phase = GO_PHASE;
@@ -323,14 +323,14 @@ void WorldStatus::updateTime(const float dt)
             return;   // Do not increase time
         case GO_PHASE  :
             // 2.5 seconds
-            if (2*m_auxiliary_ticks>5*stk_config->m_physics_fps && 
+            if (m_auxiliary_ticks>stk_config->time2Ticks(2.5f) && 
                 music_manager->getCurrentMusic() &&
                 !music_manager->getCurrentMusic()->isPlaying())
             {
                 music_manager->startMusic();
             }
             // how long to display the 'go' message
-            if (m_auxiliary_ticks > 3 * stk_config->m_physics_fps)
+            if (m_auxiliary_ticks > 3 * stk_config->getPhysicsFPS())
             {
                 m_phase = MUSIC_PHASE;
             }
@@ -356,8 +356,8 @@ void WorldStatus::updateTime(const float dt)
                 UserConfigParams::m_race_now = false;
             }
             // how long to display the 'music' message
-            if (m_auxiliary_ticks >   stk_config->m_music_credit_time
-                                    * stk_config->m_physics_fps      )
+            if (m_auxiliary_ticks >  
+                stk_config->time2Ticks(stk_config->m_music_credit_time) )
             {
                 m_phase = RACE_PHASE;
             }
@@ -373,8 +373,8 @@ void WorldStatus::updateTime(const float dt)
             m_auxiliary_ticks++;
 
             // Change to next phase if delay is over
-            if (m_auxiliary_ticks >   stk_config->m_delay_finish_time
-                                    * stk_config->m_physics_fps      )
+            if (m_auxiliary_ticks >
+                stk_config->time2Ticks(stk_config->m_delay_finish_time))
             {
                 m_phase = RESULT_DISPLAY_PHASE;
                 terminateRace();
@@ -403,7 +403,7 @@ void WorldStatus::updateTime(const float dt)
             if (!device->getTimer()->isStopped())
             {
                 m_time_ticks++;
-                m_time  = float(m_time_ticks) / stk_config->m_physics_fps;
+                m_time  = stk_config->ticks2Time(m_time_ticks);
                 m_count_up_ticks++;
             }
             break;
@@ -420,7 +420,7 @@ void WorldStatus::updateTime(const float dt)
             if (!device->getTimer()->isStopped())
             {
                 m_time_ticks--;
-                m_time = float(m_time_ticks) / stk_config->m_physics_fps;
+                m_time = stk_config->ticks2Time(m_time_ticks);
                 m_count_up_ticks++;
             }
 
@@ -454,8 +454,8 @@ void WorldStatus::startReadySetGo()
  */
 void WorldStatus::setTime(const float time)
 {
-    m_time_ticks = int(time * stk_config->m_physics_fps);
-    m_time       = float(time)/stk_config->m_physics_fps;
+    m_time_ticks = stk_config->time2Ticks(time);
+    m_time       = stk_config->ticks2Time(m_time_ticks);
 }   // setTime
 
 //-----------------------------------------------------------------------------

@@ -401,8 +401,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
             if(m_initial_speed <= 1.5) m_initial_speed = 1.5;
             break ;
         case 1:
-            set(ATTACH_ANVIL,
-                int(kp->getAnvilDuration()*stk_config->m_physics_fps)
+            set(ATTACH_ANVIL, stk_config->time2Ticks(kp->getAnvilDuration())
                 + leftover_ticks                                      );
             // if ( m_kart == m_kart[0] )
             //   sound -> playSfx ( SOUND_SHOOMF ) ;
@@ -412,9 +411,8 @@ void Attachment::hitBanana(Item *item, int new_attachment)
             m_kart->updateWeight();
             break ;
         case 2:
-            set( ATTACH_BOMB, 
-                 int(stk_config->m_bomb_time*stk_config->m_physics_fps)
-                 + leftover_ticks                                      );
+            set( ATTACH_BOMB, stk_config->time2Ticks(stk_config->m_bomb_time)
+                            + leftover_ticks                                 );
 
             break ;
         }   // switch
@@ -451,11 +449,11 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
             if (getPreviousOwner() != other || World::getWorld()->getNumKarts() <= 2)
             {
                 // Don't move if this bomb was from other kart originally
-                other->getAttachment()->set(ATTACH_BOMB,
-                                            getTicksLeft()+
-                                            int(stk_config->m_bomb_time_increase
-                                               *stk_config->m_physics_fps),
-                                            m_kart);
+                other->getAttachment()
+                    ->set(ATTACH_BOMB, 
+                          getTicksLeft()+stk_config->time2Ticks(
+                                           stk_config->m_bomb_time_increase),
+                          m_kart);
                 other->playCustomSFX(SFXManager::CUSTOM_ATTACH);
                 clear();
             }
@@ -472,7 +470,7 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
         }
         set(ATTACH_BOMB,
             other->getAttachment()->getTicksLeft()+
-               int(stk_config->m_bomb_time_increase*stk_config->m_physics_fps),
+               stk_config->time2Ticks(stk_config->m_bomb_time_increase),
             other);
         other->getAttachment()->clear();
         m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
@@ -503,17 +501,17 @@ void Attachment::update(float dt)
     float m_wanted_node_scale = is_shield 
                               ? std::max(1.0f, m_kart->getHighestPoint()*1.1f)
                               : 1.0f;
-    int slow_flashes = 3*stk_config->m_physics_fps;
+    int slow_flashes = stk_config->time2Ticks(3.0f);
     if (is_shield && m_ticks_left < slow_flashes)
     {
         int flashes_per_second = 4;
-        int ticks_per_flash = stk_config->m_physics_fps / 4;
+        int ticks_per_flash = stk_config->time2Ticks(0.25f);
         
-        int fast_flashes = stk_config->m_physics_fps/2;
+        int fast_flashes = stk_config->time2Ticks(0.5f);
         if (m_ticks_left < fast_flashes)
         {
             flashes_per_second = 12;
-            ticks_per_flash = stk_config->m_physics_fps / 12;
+            ticks_per_flash = stk_config->time2Ticks(1.0f/12);
         }
 
         //int divisor = 2;
@@ -584,7 +582,7 @@ void Attachment::update(float dt)
         // Mesh animation frames are 1 to 61 frames (60 steps)
         // The idea is change second by second, counterclockwise 60 to 0 secs
         // If longer times needed, it should be a surprise "oh! bomb activated!"
-        float time_left = float(m_ticks_left) / stk_config->m_physics_fps;
+        float time_left = stk_config->ticks2Time(m_ticks_left);
         if (time_left <= (m_node->getEndFrame() - m_node->getStartFrame() - 1))
         {
             m_node->setCurrentFrame(m_node->getEndFrame()

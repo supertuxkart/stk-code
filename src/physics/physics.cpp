@@ -152,8 +152,8 @@ void Physics::update(float dt)
 
     // Maximum of three substeps. This will work for framerate down to
     // 20 FPS (bullet default frequency is 60 HZ).
-    m_dynamics_world->stepSimulation(dt, stk_config->m_physics_fps / 20,
-                                     1.0f / stk_config->m_physics_fps);
+    m_dynamics_world->stepSimulation(dt, stk_config->getPhysicsFPS() / 20,
+                                     1.0f / stk_config->getPhysicsFPS());
 
     // Now handle the actual collision. Note: flyables can not be removed
     // inside of this loop, since the same flyables might hit more than one

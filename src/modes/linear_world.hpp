@@ -160,7 +160,7 @@ public:
     /** Returns time for the fastest laps */
     float getFastestLap() const
     {
-        return float(m_fastest_lap_ticks)/stk_config->m_physics_fps;
+        return stk_config->ticks2Time(m_fastest_lap_ticks);
     }
 };   // LinearWorld
 

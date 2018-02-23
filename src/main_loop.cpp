@@ -237,8 +237,8 @@ void MainLoop::run()
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
 
         left_over_time += getLimitedDt();
-        int num_steps   = int(left_over_time * stk_config->m_physics_fps);
-        float dt        = 1.0f / stk_config->m_physics_fps;
+        int num_steps   = stk_config->time2Ticks(left_over_time);
+        float dt = stk_config->ticks2Time(1);
         left_over_time -= num_steps * dt ;
 
         if (!m_abort && !ProfileWorld::isNoGraphics())

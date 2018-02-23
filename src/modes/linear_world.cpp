@@ -360,8 +360,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     {
         m_fastest_lap_ticks = ticks_per_lap;
 
-        std::string s = StringUtils::timeToString( float(ticks_per_lap)
-                                                  / stk_config->m_physics_fps);
+        std::string s = StringUtils::ticksTimeToString(ticks_per_lap);
 
         // Store the temporary string because clang would mess this up
         // (remove the stringw before the wchar_t* is used).

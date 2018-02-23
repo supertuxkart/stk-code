@@ -268,7 +268,7 @@ void Powerup::use()
     case PowerupManager::POWERUP_SWATTER:
         m_kart->getAttachment()
                 ->set(Attachment::ATTACH_SWATTER,
-                      int(kp->getSwatterDuration()*stk_config->m_physics_fps));
+                      stk_config->time2Ticks(kp->getSwatterDuration()));
         break;
 
     case PowerupManager::POWERUP_BUBBLEGUM:
@@ -304,16 +304,16 @@ void Powerup::use()
                 if (m_kart->getIdent() == "nolok")
                 {
                     m_kart->getAttachment()
-                           ->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
-                                 int(kp->getBubblegumShieldDuration()
-                                     *stk_config->m_physics_fps)          );
+                          ->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
+                                stk_config->
+                                  time2Ticks(kp->getBubblegumShieldDuration()));
                 }
                 else
                 {
                     m_kart->getAttachment()
                           ->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
-                                int(kp->getBubblegumShieldDuration()
-                                    *stk_config->m_physics_fps)     );
+                                stk_config->
+                                  time2Ticks(kp->getBubblegumShieldDuration()));
                 }
             }
             else // using a bubble gum while still having a shield
@@ -322,17 +322,16 @@ void Powerup::use()
                 {
                     m_kart->getAttachment()
                           ->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
-                                int( (kp->getBubblegumShieldDuration() 
-                                      + m_kart->getShieldTime()       )
-                                *stk_config->m_physics_fps)               );
+                                stk_config->
+                                 time2Ticks(kp->getBubblegumShieldDuration()));
                 }
                 else
                 {
                     m_kart->getAttachment()
                           ->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
-                                int(kp->getBubblegumShieldDuration()
-                                    + m_kart->getShieldTime()       )
-                                *stk_config->m_physics_fps           );
+                                stk_config->
+                                time2Ticks(kp->getBubblegumShieldDuration()
+                                           + m_kart->getShieldTime()       ) );
                 }
             }
 
@@ -361,8 +360,8 @@ void Powerup::use()
             if(kart->getPosition() == 1)
             {
                 kart->getAttachment()->set(Attachment::ATTACH_ANVIL,
-                                           int(kp->getAnvilDuration()
-                                               *stk_config->m_physics_fps) );
+                                           stk_config->
+                                           time2Ticks(kp->getAnvilDuration()) );
                 kart->updateWeight();
                 kart->adjustSpeed(kp->getAnvilSpeedFactor() * 0.5f);
 

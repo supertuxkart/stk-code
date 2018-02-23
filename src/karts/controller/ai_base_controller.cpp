@@ -237,7 +237,7 @@ void AIBaseController::crashed(const Material *m)
     // the track again if it is stuck (i.e. time for the push back plus
     // time for the AI to accelerate and hit the terrain again).
     const unsigned int NUM_COLLISION = 3;
-    const int COLLISION_TICKS      = 3*stk_config->m_physics_fps/2;
+    const int COLLISION_TICKS        = stk_config->time2Ticks(3.0f);
 
     int ticks = World::getWorld()->getTicksSinceStart();
     if(m_collision_ticks.size()==0)
@@ -252,7 +252,7 @@ void AIBaseController::crashed(const Material *m)
     // collisions to happen). The time of 0.2 seconds was experimentally
     // found, typically it takes 0.5 seconds for a kart to be pushed back
     // from the terrain and accelerate to hit the same terrain again.
-    if(5 * (ticks - m_collision_ticks.back()) < stk_config->m_physics_fps)
+    if(5 * (ticks - m_collision_ticks.back()) < stk_config->time2Ticks(1.0f))
         return;
 
     // Remove all outdated entries, i.e. entries that are older than the
@@ -260,8 +260,8 @@ void AIBaseController::crashed(const Material *m)
     // otherwise a collision that happened (say) 10 seconds ago could
     // contribute to a stuck condition.
     while(m_collision_ticks.size()>0 &&
-           ticks - m_collision_ticks[0] > stk_config->m_physics_fps
-                                         +COLLISION_TICKS          )
+           ticks - m_collision_ticks[0] > stk_config->time2Ticks(1.0f)
+                                        + COLLISION_TICKS              )
            m_collision_ticks.erase(m_collision_ticks.begin());
 
     m_collision_ticks.push_back(ticks);

@@ -1052,8 +1052,7 @@ void Kart::collectedItem(Item *item, int add_info)
  */
 float Kart::getStartupBoost() const
 {
-    float t = float(World::getWorld()->getTicksSinceStart()) 
-            / stk_config->m_physics_fps;
+    float t = stk_config->ticks2Time(World::getWorld()->getTicksSinceStart());
     std::vector<float> startup_times = m_kart_properties->getStartupTime();
     for (unsigned int i = 0; i < startup_times.size(); i++)
     {
@@ -1118,7 +1117,7 @@ void Kart::setShieldTime(float t)
 {
     if(isShielded())
     {
-        getAttachment()->setTicksLeft(int(t*stk_config->m_physics_fps));
+        getAttachment()->setTicksLeft(stk_config->time2Ticks(t));
     }
 }   // setShieldTime
 
@@ -1146,9 +1145,8 @@ bool Kart::isShielded() const
  */
 float Kart::getShieldTime() const
 {
-    if(isShielded())
-        return float(getAttachment()->getTicksLeft())
-             / stk_config->m_physics_fps;
+    if (isShielded())
+        return stk_config->ticks2Time(getAttachment()->getTicksLeft());
     else
         return 0.0f;
 }   // getShieldTime

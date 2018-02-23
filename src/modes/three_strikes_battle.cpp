@@ -640,7 +640,7 @@ void ThreeStrikesBattle::spawnSpareTireKarts()
     }
 
     // Spawn spare tire kart when necessary
-    m_next_sta_spawn_time = lifespan*stk_config->m_physics_fps 
+    m_next_sta_spawn_time = stk_config->time2Ticks(lifespan) 
                           + getTicksSinceStart() * inc_factor
                           + getTicksSinceStart();
     int kart_has_few_lives = 0;
