@@ -1003,11 +1003,8 @@ int handleCmdLine()
     if (CommandLine::has("--connect-now", &s))
     {
         TransportAddress ip(s);
-        TransportAddress me(2130706433/*127.0.0.1*/, 
-                            NetworkConfig::get()->getServerDiscoveryPort() );
         NetworkConfig::get()->setIsLAN();
         NetworkConfig::get()->setIsServer(false);
-        NetworkConfig::get()->setMyAddress(me);
         Log::info("main", "Try to connect to server '%s'.",
                   ip.toString().c_str()                    );
         irr::core::stringw name = StringUtils::utf8ToWide(ip.toString());

@@ -347,9 +347,9 @@ void ConnectToServer::waitingAloha(bool is_wan)
     {
         Log::info("ConnectToServer", "Server found : %s",
                    sender.toString().c_str());
-#ifndef WIN32
         if (!is_wan)
         {
+#ifndef WIN32
             // just check if the ip is ours : if so, 
             // then just use localhost (127.0.0.1)
             struct ifaddrs *ifap, *ifa;

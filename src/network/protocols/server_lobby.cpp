@@ -99,12 +99,17 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
  */
 ServerLobby::~ServerLobby()
 {
+    if (m_server_registered)
+    {
+        unregisterServer();
+    }
 }   // ~ServerLobby
 
 //-----------------------------------------------------------------------------
 
 void ServerLobby::setup()
 {
+    m_server_registered = false;
     m_game_setup = STKHost::get()->setupNewGame();
     m_game_setup->setNumLocalPlayers(0);    // no local players on a server
     m_next_player_id.setAtomic(0);
@@ -316,7 +321,7 @@ void ServerLobby::registerServer()
     request->addParameter("name",   NetworkConfig::get()->getServerName() );
     request->addParameter("max_players", 
                           UserConfigParams::m_server_max_players          );
-    Log::info("RegisterServer", "Showing addr %s", addr.toString().c_str());
+    Log::info("ServerLobby", "Public server addr %s", addr.toString().c_str());
     
     request->executeNow();
 
@@ -325,19 +330,58 @@ void ServerLobby::registerServer()
 
     if (result->get("success", &rec_success) && rec_success == "yes")
     {
-        Log::info("RegisterServer", "Server is now online.");
-        STKHost::get()->setRegistered(true);
+        Log::info("ServerLobby", "Server is now online.");
+        m_server_registered = true;
     }
     else
     {
         irr::core::stringc error(request->getInfo().c_str());
-        Log::error("RegisterServer", "%s", error.c_str());
+        Log::error("ServerLobby", "%s", error.c_str());
         STKHost::get()->setErrorMessage(_("Failed to register server: %s",
             error.c_str()));
         STKHost::get()->requestShutdown();
     }
     delete request;
 }   // registerServer
+
+
+//-----------------------------------------------------------------------------
+/** Unregister this server (i.e. its public address) with the STK server,
+ *  currently when karts enter kart selection screen it will be done.
+ */
+void ServerLobby::unregisterServer()
+{
+    const TransportAddress &addr = STKHost::get()->getPublicAddress();
+    Online::XMLRequest* request = new Online::XMLRequest();
+    PlayerManager::setUserDetails(request, "stop", Online::API::SERVER_PATH);
+
+    request->addParameter("address", addr.getIP());
+    request->addParameter("port", addr.getPort());
+
+    Log::info("ServerLobby", "address %s", addr.toString().c_str());
+    request->executeNow();
+
+    const XMLNode * result = request->getXMLData();
+    std::string rec_success;
+
+    if (result->get("success", &rec_success))
+    {
+        if (rec_success == "yes")
+        {
+            Log::info("ServerLobby", "Server is now unregister.");
+        }
+        else
+        {
+            Log::error("ServerLobby", "Fail to unregister server.");
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Fail to stop server.");
+    }
+    delete request;
+
+}   // unregisterServer
 
 //-----------------------------------------------------------------------------
 /** This function is called when all clients have loaded the world and
@@ -362,6 +406,12 @@ void ServerLobby::signalRaceStartToClients()
  */
 void ServerLobby::startSelection(const Event *event)
 {
+    assert(m_server_registered);
+    if (m_server_registered)
+    {
+        unregisterServer();
+        m_server_registered = false;
+    }
 
     if (m_state != ACCEPTING_CLIENTS)
     {

@@ -52,11 +52,6 @@ private:
     /** The password for a server (or to authenticate to a server). */
     std::string m_password;
 
-    /** This is either this computer's public IP address, or the LAN
-     *  address in case of a LAN game. With lock since it can
-     *  be updated from a separate thread. */
-    Synchronised<TransportAddress> m_my_address;
-
     /** The port number to which the server listens to detect LAN requests. */
     uint16_t m_server_discovery_port;
 
@@ -103,7 +98,6 @@ public:
     }   // destroy
 
     // ------------------------------------------------------------------------
-    void setMyAddress(const TransportAddress& addr);
     void setIsServer(bool b);
     // ------------------------------------------------------------------------
     /** Sets the port for server discovery. */
@@ -182,35 +176,6 @@ public:
         assert(isServer());
         return m_server_name;
     }   // getServerName
-    // --------------------------------------------------------------------
-    /** Sets if this server is registered with the stk server. */
-    void setRegistered(bool registered)
-    {
-        assert(isServer());
-        m_is_registered = registered; 
-    }   // setRegistered
-    // --------------------------------------------------------------------
-    /** Returns if this server is registered with the stk server. */
-    bool isRegistered() const
-    {
-        assert(isServer());
-        return m_is_registered;
-    }   // isRegistered
-
-    // --------------------------------------------------------------------
-    /** Returns the IP address of this host. We need to return a copy
-     *  to make sure the address is thread safe (otherwise it could happen
-     *  that e.g. data is taken when the IP address was written, but not
-        return a;
-     *  yet the port). */
-    const TransportAddress getMyAddress() const
-    {
-        TransportAddress a;
-        m_my_address.lock();
-        a.copy(m_my_address.getData());
-        m_my_address.unlock();
-        return a;
-    }   // getMyAddress
     // --------------------------------------------------------------------
     /** Sets if a client should immediately connect to the first server. */
     void setAutoConnect(bool b) { m_auto_connect = b; }

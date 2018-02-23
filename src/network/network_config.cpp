@@ -46,20 +46,7 @@ NetworkConfig::NetworkConfig()
     m_server_discovery_port = 2757;
     m_server_port           = 2758;
     m_client_port           = 2759;
-    m_my_address.lock();
-    m_my_address.getData().clear();
-    m_my_address.unlock();
 }   // NetworkConfig
-
-//-----------------------------------------------------------------------------
-/** Stores the public address of this host.
- */
-void NetworkConfig::setMyAddress(const TransportAddress& addr)
-{
-    m_my_address.lock();
-    m_my_address.getData().copy(addr);
-    m_my_address.unlock();
-}   // setPublicAddress
 
 // --------------------------------------------------------------------
 /** Sets if this instance is a server or client. It also assigns the

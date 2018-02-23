@@ -95,10 +95,6 @@ private:
     /** Atomic flag used to stop this thread. */
     std::atomic_flag m_exit_flag = ATOMIC_FLAG_INIT;
 
-    /** If this is a server, it indicates if this server is registered
-     *  with the stk server. */
-    bool m_is_registered;
-
     /** An error message, which is set by a protocol to be displayed
      *  in the GUI. */
     irr::core::stringw m_error_message;
@@ -241,18 +237,6 @@ public:
     // --------------------------------------------------------------------
     /** Returns the number of currently connected peers. */
     unsigned int getPeerCount() { return (int)m_peers.size(); }
-    // --------------------------------------------------------------------
-    /** Sets if this server is registered with the stk server. */
-    void setRegistered(bool registered)
-    {
-        m_is_registered = registered; 
-    }   // setRegistered
-    // --------------------------------------------------------------------
-    /** Returns if this server is registered with the stk server. */
-    bool isRegistered() const
-    {
-        return m_is_registered;
-    }   // isRegistered
     // --------------------------------------------------------------------
     /** Sets the global host id of this host. */
     void setMyHostId(uint8_t my_host_id) { m_host_id = my_host_id; }

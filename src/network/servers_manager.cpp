@@ -190,9 +190,6 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     server->setDifficulty((RaceManager::Difficulty)difficulty);
                     server->setRaceMinorMode((RaceManager::MinorRaceModeType)mode);
                     ServersManager::get()->addServer(server);
-
-                    TransportAddress me(my_ip, my_port);
-                    NetworkConfig::get()->setMyAddress(me);
                     m_success = true;
                 }   // if received_data
             }    // while still waiting

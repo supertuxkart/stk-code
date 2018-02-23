@@ -58,6 +58,9 @@ private:
 
     bool m_selection_enabled;
 
+    /** It indicates if this server is registered with the stk server. */
+    std::atomic_bool m_server_registered;
+
     /** Counts how many players are ready to go on. */
     int m_player_ready_counter;
 
@@ -80,6 +83,7 @@ private:
     void registerServer();
     void finishedLoadingWorldClient(Event *event);
     void startedRaceOnClient(Event *event);
+    void unregisterServer();
 public:
              ServerLobby();
     virtual ~ServerLobby();

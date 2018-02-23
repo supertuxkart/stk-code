@@ -24,7 +24,6 @@
 #include "network/stk_host.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/protocols/server_lobby.hpp"
-#include "network/protocols/stop_server.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
@@ -157,14 +156,6 @@ void* NetworkConsole::mainLoop(void* data)
             Log::info("Console", "Unknown command '%s'.", str.c_str());
         }
     }   // while !stop
-
-    auto p = std::make_shared<StopServer>();
-    p->requestStart();
-    while(p->getState() != PROTOCOL_STATE_TERMINATED)
-    {
-        StkTime::sleep(1);
-    }
-
     main_loop->abort();
 
     return NULL;

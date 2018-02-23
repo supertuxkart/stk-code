@@ -335,7 +335,6 @@ void STKHost::init()
     m_shutdown         = false;
     m_network          = NULL;
     m_game_setup       = NULL;
-    m_is_registered    = false;
     m_error_message    = "";
 
     m_exit_flag.clear();

@@ -24,6 +24,7 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "modes/demo_world.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "network/network_config.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
@@ -148,7 +149,7 @@ void CreateServerScreen::onUpdate(float delta)
 
     // Otherwise wait till we get an answer from the server:
     // -----------------------------------------------------
-    if(!STKHost::get()->isRegistered() && !NetworkConfig::get()->isLAN())
+    if (!LobbyProtocol::get<LobbyProtocol>())
     {
         m_info_widget->setDefaultColor();
         m_info_widget->setText(StringUtils::loadingDots(_("Creating server")),

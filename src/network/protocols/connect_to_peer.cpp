@@ -21,7 +21,6 @@
 #include "network/event.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/get_peer_address.hpp"
-#include "network/protocols/hide_public_address.hpp"
 #include "network/protocols/request_connection.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/stk_host.hpp"
