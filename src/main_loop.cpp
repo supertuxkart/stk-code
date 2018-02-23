@@ -277,7 +277,7 @@ void MainLoop::run()
         float dt        = 1.0f / stk_config->m_physics_fps;
         left_over_time -= num_steps * dt ;
 
-        if (!ProfileWorld::isNoGraphics() && STKHost::existHost() &&
+        if (STKHost::existHost() &&
             STKHost::get()->requestedShutdown())
         {
             STKHost::get()->shutdown();
@@ -285,13 +285,18 @@ void MainLoop::run()
             {
                 race_manager->exitRace();
             }
-            GUIEngine::Screen* new_stack[] =
+            if (!ProfileWorld::isNoGraphics())
             {
-                MainMenuScreen::getInstance(), OnlineScreen::getInstance(), NULL
-            };
-            StateManager::get()->resetAndSetStack(new_stack);
+                GUIEngine::Screen* new_stack[] =
+                {
+                    MainMenuScreen::getInstance(),
+                    OnlineScreen::getInstance(), NULL
+                };
+                StateManager::get()->resetAndSetStack(new_stack);
+                MessageQueue::add(MessageQueue::MT_ERROR,
+                    _("Connection to server is lost."));
+            }
             NetworkConfig::get()->unsetNetworking();
-            MessageQueue::add(MessageQueue::MT_ERROR, _("Connection to server is lost."));
         }
 
         // Add a Time step entry to the rewind list, which can store all

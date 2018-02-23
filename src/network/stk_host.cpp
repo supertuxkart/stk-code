@@ -353,12 +353,11 @@ void STKHost::init()
     ProtocolManager::createInstance();
 
     // Optional: start the network console
-    m_network_console = NULL;
-    if(m_enable_console)
+    if (m_enable_console)
     {
-        m_network_console = new NetworkConsole();
-        m_network_console->run();
-    } 
+        m_network_console = std::thread(std::bind(&NetworkConsole::mainLoop,
+            this));
+    }
 }  // STKHost
 
 // ----------------------------------------------------------------------------
@@ -367,6 +366,9 @@ void STKHost::init()
  */
 STKHost::~STKHost()
 {
+    requestShutdown();
+    if (m_network_console.joinable())
+        m_network_console.join();
     // delete the game setup
     if (m_game_setup)
         delete m_game_setup;

@@ -987,6 +987,9 @@ int handleCmdLine()
     }
 
     // Networking command lines
+    if(CommandLine::has("--start-console"))
+        STKHost::m_enable_console = true;
+
     NetworkConfig::get()->
         setMaxPlayers(UserConfigParams::m_server_max_players);
     if (CommandLine::has("--port", &n))
@@ -1040,7 +1043,7 @@ int handleCmdLine()
             Log::warn("main", "No saved online player session to create a wan server");
         }
     }
-    if (CommandLine::has("--lan-server", &s))
+    else if (CommandLine::has("--lan-server", &s))
     {
         NetworkConfig::get()->setServerName(core::stringw(s.c_str()));
         NetworkConfig::get()->setIsServer(true);
@@ -1058,9 +1061,6 @@ int handleCmdLine()
     }
     if(CommandLine::has("--max-players", &n))
         UserConfigParams::m_server_max_players=n;
-
-    if(CommandLine::has("--start-console"))
-        STKHost::m_enable_console = true;
 
     if(CommandLine::has("--login", &s) )
     {

@@ -21,7 +21,7 @@
 #define HEADER_MAIN_LOOP_HPP
 
 typedef unsigned long Uint32;
-
+#include <atomic>
 
 /** Management class for the whole gameflow, this is where the
     main-loop is */
@@ -29,7 +29,7 @@ class MainLoop
 {
 private:
     /** True if the main loop should exit. */
-    bool m_abort;
+    std::atomic_bool m_abort;
 
     /** True if the frame rate should be throttled. */
     bool m_throttle_fps;
