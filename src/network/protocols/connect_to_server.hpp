@@ -22,6 +22,7 @@
 #include "network/protocol.hpp"
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
+#include <atomic>
 #include <string>
 
 class ConnectToServer : public Protocol
@@ -38,7 +39,7 @@ private:
     bool m_quick_join;
 
     /** State for finite state machine. */
-    enum
+    enum ConnectState : unsigned int
     {
         SET_PUBLIC_ADDRESS,
         REGISTER_SELF_ADDRESS,
@@ -49,7 +50,8 @@ private:
         HIDING_ADDRESS,
         DONE,
         EXITING
-    } m_state;
+    };
+    std::atomic<ConnectState> m_state;
 
     void registerWithSTKServer();
     void handleQuickConnect();
@@ -63,7 +65,7 @@ public:
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
     virtual void setup() OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
-    virtual void update(float dt) OVERRIDE {}
+    virtual void update(float dt) OVERRIDE;
 };   // class ConnectToServer
 
 #endif // CONNECT_TO_SERVER_HPP

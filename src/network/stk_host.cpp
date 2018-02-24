@@ -727,7 +727,8 @@ void STKHost::mainLoop()
 
     while (m_exit_flag.test_and_set())
     {
-        if (lan_network)
+        auto sl = LobbyProtocol::get<ServerLobby>();
+        if (lan_network && sl && sl->waitingForPlayers())
         {
             handleDirectSocketRequest(lan_network);
         }   // if discovery host

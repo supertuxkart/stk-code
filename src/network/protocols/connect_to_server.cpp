@@ -84,7 +84,7 @@ void ConnectToServer::setup()
 // ----------------------------------------------------------------------------
 void ConnectToServer::asynchronousUpdate()
 {
-    switch(m_state)
+    switch(m_state.load())
     {
         case SET_PUBLIC_ADDRESS:
         {
@@ -210,19 +210,31 @@ void ConnectToServer::asynchronousUpdate()
                 return;
             }
             m_state = DONE;
+            break;
+        case DONE:
+        case EXITING:
+            break;
+    }
+}   // asynchronousUpdate
+
+// ----------------------------------------------------------------------------
+void ConnectToServer::update(float dt)
+{
+    switch(m_state.load())
+    {
+        case DONE:
+        {
             // lobby room protocol if we're connected only
             if (STKHost::get()->getPeerCount() > 0 &&
                 STKHost::get()->getPeers()[0]->isConnected() &&
                 !m_server_address.isUnset())
             {
+                // Let main thread create ClientLobby for better
+                // synchronization with GUI
                 auto cl = LobbyProtocol::create<ClientLobby>();
                 cl->setAddress(m_server_address);
                 cl->requestStart();
             }
-            break;
-        case DONE:
-            requestTerminate();
-            m_state = EXITING;
             if (STKHost::get()->getPeerCount() == 0)
             {
                 // Shutdown STKHost (go back to online menu too)
@@ -231,11 +243,14 @@ void ConnectToServer::asynchronousUpdate()
                       m_server_address.toString().c_str()));
                 STKHost::get()->requestShutdown();
             }
+            requestTerminate();
+            m_state = EXITING;
             break;
-        case EXITING:
+        }
+        default:
             break;
     }
-}   // asynchronousUpdate
+}   // update
 
 // ----------------------------------------------------------------------------
 /** Register this client with the STK server.

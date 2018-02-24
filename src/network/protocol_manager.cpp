@@ -505,9 +505,12 @@ void ProtocolManager::asynchronousUpdate()
         // The lock is likely not necessary, since this function is only
         // called from the ProtocolManager thread, and this thread is also
         // the only one who changes the number of protocols.
-        opt.lock();
+        // Edit: remove this lock can avoid hanging the GUI when connecting
+        // to or creating server, but you need to make sure async and non-async
+        // update in each protocol will have atomic or mutex write
+        //opt.lock();
         opt.update(0, /*async*/true);  // dt does not matter, so set it to 0
-        opt.unlock();
+        //opt.unlock();
     }
 
     PROFILER_POP_CPU_MARKER();

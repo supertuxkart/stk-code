@@ -99,6 +99,8 @@ public:
     void checkRaceFinished();
     void finishedLoadingWorld();
     ServerState getCurrentState() const { return m_state.load(); }
+    virtual bool waitingForPlayers() const OVERRIDE
+                                { return m_state.load() == ACCEPTING_CLIENTS; }
 
 };   // class ServerLobby
 
