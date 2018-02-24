@@ -24,12 +24,11 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
-#include "graphics/irr_driver.hpp"
-#include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
-#include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
@@ -61,7 +60,6 @@ DEFINE_SCREEN_SINGLETON( NetworkingLobby );
 // ----------------------------------------------------------------------------
 NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
 {
-    m_server      = NULL;
     m_player_list = NULL;
 }   // NetworkingLobby
 
@@ -75,26 +73,16 @@ void NetworkingLobby::loadedFromFile()
     m_start_button= getWidget<IconButtonWidget>("start");
     assert(m_start_button!= NULL);
 
-    m_server_name_widget = getWidget<LabelWidget>("server_name");
-    assert(m_server_name_widget != NULL);
+    m_text_bubble = getWidget<BubbleWidget>("text");
+    assert(m_text_bubble != NULL);
 
-    m_server_difficulty = getWidget<LabelWidget>("server_difficulty");
-    assert(m_server_difficulty != NULL);
-
-    m_server_game_mode = getWidget<LabelWidget>("server_game_mode");
-    assert(m_server_game_mode != NULL);
-
-    m_online_status_widget = getWidget<LabelWidget>("online_status");
-    assert(m_online_status_widget != NULL);
-
-    m_bottom_menu_widget = getWidget<RibbonWidget>("menu_bottomrow");
-    assert(m_bottom_menu_widget != NULL);
+    m_chat_box = getWidget<TextBoxWidget>("chat");
+    assert(m_chat_box != NULL);
 
     m_player_list = getWidget<ListWidget>("players");
     assert(m_player_list!= NULL);
 
-    m_exit_widget = (IconButtonWidget *) m_bottom_menu_widget
-                                         ->findWidgetNamed("exit");
+    m_exit_widget = getWidget<IconButtonWidget>("exit");;
     assert(m_exit_widget != NULL);
 
 }   // loadedFromFile
@@ -112,18 +100,25 @@ void NetworkingLobby::beforeAddingWidget()
  */
 void NetworkingLobby::init()
 {
+    m_server_info.clear();
     Screen::init();
     setInitialFocus();
-    m_server = ServersManager::get()->getJoinedServer();
-    if (m_server)
+    Server* server = ServersManager::get()->getJoinedServer();
+    if (server)
     {
-        m_server_name_widget->setText(m_server->getName(), false);
+        m_server_name = server->getName();
+        core::stringw each_line;
+        each_line = _("Server name: %s", m_server_name);
+        m_server_info.push_back(each_line);
 
-        core::stringw difficulty = race_manager->getDifficultyName(m_server->getDifficulty());
-        m_server_difficulty->setText(difficulty, false);
+        const core::stringw& difficulty_name =
+            race_manager->getDifficultyName(race_manager->getDifficulty());
+        each_line = _("Difficulty: %s", difficulty_name);
+        m_server_info.push_back(each_line);
 
-        core::stringw mode = RaceManager::getNameOf(m_server->getRaceMinorMode());
-        m_server_game_mode->setText(mode, false);
+        core::stringw mode = RaceManager::getNameOf(server->getRaceMinorMode());
+        each_line = _("Game mode: %s", mode);
+        m_server_info.push_back(each_line);
     }
 
     if(!NetworkConfig::get()->isServer())
@@ -137,14 +132,36 @@ void NetworkingLobby::init()
 }   // init
 
 // ----------------------------------------------------------------------------
+void NetworkingLobby::addMoreServerInfo(const core::stringw& info)
+{
+}   // addMoreServerInfo
+
+// ----------------------------------------------------------------------------
 void NetworkingLobby::onUpdate(float delta)
 {
-    // FIXME Network looby should be closed when stkhost is shut down
+    auto lp = LobbyProtocol::get<LobbyProtocol>();
+    if (!lp)
+    {
+        const core::stringw connect_msg = StringUtils::loadingDots(
+            _("Connecting to server %s", m_server_name));
+        m_text_bubble->setText(connect_msg);
+    }
+    else
+    {
+        core::stringw total_msg;
+        for (auto& string : m_server_info)
+        {
+            total_msg += string;
+            total_msg += L"\n";
+        }
+        m_text_bubble->setText(total_msg);
+    }
     if(NetworkConfig::get()->isClient())
     {
         m_start_button->setVisible(STKHost::existHost() &&
                                    STKHost::get()->isAuthorisedToControl());
     }
+
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
