@@ -282,7 +282,7 @@ void LinearWorld::newLap(unsigned int kart_index)
             + getDistanceDownTrackForKart(kart->getWorldKartId());
     }
     // Last lap message (kart_index's assert in previous block already)
-    if (raceHasLaps() && kart_info.m_race_lap+1 == lap_count )
+    if (raceHasLaps() && kart_info.m_race_lap+1 == lap_count)
     {
         if (lap_count > 1)
         {
