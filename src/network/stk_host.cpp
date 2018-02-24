@@ -261,13 +261,14 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
     // server is made.
     m_host_id = 0;
     init();
-    
+
     ENetAddress ea;
     ea.host = STKHost::HOST_ANY;
-    ea.port = STKHost::PORT_ANY;
+    ea.port =  NetworkConfig::get()->getClientPort();
 
     m_network = new Network(/*peer_count*/1,       /*channel_limit*/2,
-                            /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &ea);
+                            /*max_in_bandwidth*/0, /*max_out_bandwidth*/0,
+                            &ea, true/*change_port_if_bound*/);
     if (!m_network)
     {
         Log::fatal ("STKHost", "An error occurred while trying to create "
@@ -275,15 +276,7 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
     }
 
     setPrivatePort();
-    if (NetworkConfig::get()->isWAN())
-    {
-        setPublicAddress();
-    }
-    // Don't connect to server if no public address in WAN game
-    if (!m_public_address.isUnset() || NetworkConfig::get()->isLAN())
-    {
-        std::make_shared<ConnectToServer>(server_id, host_id)->requestStart();
-    }
+    std::make_shared<ConnectToServer>(server_id, host_id)->requestStart();
 }   // STKHost
 
 // ----------------------------------------------------------------------------
@@ -300,12 +293,13 @@ STKHost::STKHost(const irr::core::stringw &server_name)
 
     ENetAddress addr;
     addr.host = STKHost::HOST_ANY;
-    addr.port = STKHost::PORT_ANY;
+    addr.port = NetworkConfig::get()->getServerPort();
 
     m_network= new Network(NetworkConfig::get()->getMaxPlayers(),
                            /*channel_limit*/2,
                            /*max_in_bandwidth*/0,
-                           /*max_out_bandwidth*/ 0, &addr);
+                           /*max_out_bandwidth*/ 0, &addr,
+                           true/*change_port_if_bound*/);
     if (!m_network)
     {
         Log::fatal("STKHost", "An error occurred while trying to create an "
@@ -313,16 +307,8 @@ STKHost::STKHost(const irr::core::stringw &server_name)
     }
 
     setPrivatePort();
-    // We need the public address for server no matter what to determine
-    // local lan connection
-    setPublicAddress();
-    // Don't construct server if no public address in WAN game
-    if (!m_public_address.isUnset() || NetworkConfig::get()->isLAN())
-    {
-        startListening();
-        ProtocolManager::lock()
-            ->requestStart(LobbyProtocol::create<ServerLobby>());
-    }
+    ProtocolManager::lock()
+        ->requestStart(LobbyProtocol::create<ServerLobby>());
 
 }   // STKHost(server_name)
 
@@ -335,7 +321,6 @@ void STKHost::init()
     m_shutdown         = false;
     m_network          = NULL;
     m_game_setup       = NULL;
-    m_error_message    = "";
 
     m_exit_flag.clear();
     m_exit_flag.test_and_set();
@@ -435,17 +420,19 @@ void STKHost::setPublicAddress()
         // documentation says it points to "one or more addrinfo structures"
         assert(res != NULL);
         struct sockaddr_in* current_interface = (struct sockaddr_in*)(res->ai_addr);
-        uint32_t stun_server_ip = ntohl(current_interface->sin_addr.s_addr);
+        m_stun_address.setIP(ntohl(current_interface->sin_addr.s_addr));
+        m_stun_address.setPort(3478);
 
         // Assemble the message for the stun server
         BareNetworkString s(20);
 
+        constexpr uint32_t magic_cookie = 0x2112A442;
         // bytes 0-1: the type of the message
         // bytes 2-3: message length added to header (attributes)
         uint16_t message_type = 0x0001; // binding request
         uint16_t message_length = 0x0000;
         s.addUInt16(message_type).addUInt16(message_length)
-                                .addUInt32(0x2112A442);
+                                .addUInt32(magic_cookie);
         uint8_t stun_tansaction_id[12];
         // bytes 8-19: the transaction id
         for (int i = 0; i < 12; i++)
@@ -455,7 +442,7 @@ void STKHost::setPublicAddress()
             stun_tansaction_id[i] = random_byte;
         }
 
-        m_network->sendRawPacket(s, TransportAddress(stun_server_ip, 3478));
+        m_network->sendRawPacket(s, m_stun_address);
         freeaddrinfo(res);
 
         // Recieve now
@@ -464,33 +451,37 @@ void STKHost::setPublicAddress()
         char buffer[LEN];
         int len = m_network->receiveRawPacket(buffer, LEN, &sender, 2000);
 
-        if (sender.getIP() != stun_server_ip)
+        if (sender.getIP() != m_stun_address.getIP())
         {
-            TransportAddress stun(stun_server_ip, 3478);
             Log::warn("STKHost", 
-                    "Received stun response from %s instead of %s.",
-                    sender.toString().c_str(), stun.toString().c_str());
+                "Received stun response from %s instead of %s.",
+                sender.toString().c_str(), m_stun_address.toString().c_str());
         }
 
-        if (len < 0)
+        if (len <= 0)
         {
             Log::error("STKHost", "STUN response contains no data at all");
             continue;
         }
 
         // Convert to network string.
-        BareNetworkString datas(buffer, len);
-
-        // check that the stun response is a response, contains the magic cookie
-        // and the transaction ID
-        if (datas.getUInt16() != 0x0101)
+        BareNetworkString response(buffer, len);
+        if (response.size() < 20)
         {
-            Log::error("STKHost", "STUN response doesn't contain the magic "
-                "cookie");
+            Log::error("STKHost", "STUN response should be at least 20 bytes.");
             continue;
         }
-        int message_size = datas.getUInt16();
-        if (datas.getUInt32() != 0x2112A442)
+
+        if (response.getUInt16() != 0x0101)
+        {
+            Log::error("STKHost", "STUN has no binding success response.");
+            continue;
+        }
+
+        // Skip message size
+        response.getUInt16();
+
+        if (response.getUInt32() != magic_cookie)
         {
             Log::error("STKHost", "STUN response doesn't contain the magic "
                 "cookie");
@@ -499,7 +490,7 @@ void STKHost::setPublicAddress()
 
         for (int i = 0; i < 12; i++)
         {
-            if (datas.getUInt8() != stun_tansaction_id[i])
+            if (response.getUInt8() != stun_tansaction_id[i])
             {
                 Log::error("STKHost", "STUN response doesn't contain the "
                     "transaction ID");
@@ -511,64 +502,77 @@ void STKHost::setPublicAddress()
                 "The STUN server responded with a valid answer");
 
         // The stun message is valid, so we parse it now:
-        if (message_size == 0)
-        {
-            Log::error("STKHost", "STUN response does not contain any "
-                "information.");
-            continue;
-        }
-        // Cannot even read the size
-        if (message_size < 4)
-        {
-            Log::error("STKHost", "STUN response is too short.");
-            continue;
-        }
         // Those are the port and the address to be detected
         bool found = false;
         while (true)
         {
-            int type = datas.getUInt16();
-            int size = datas.getUInt16();
-            if (type == 0 || type == 1)
-            {
-                assert(size == 8);
-                datas.getUInt8();    // skip 1 byte
-#ifdef DEBUG
-                uint8_t skip = datas.getUInt8();
-                // Family IPv4 only
-                assert(skip == 0x01);
-#else
-                datas.getUInt8();
-#endif
-                m_public_address.setPort(datas.getUInt16());
-                m_public_address.setIP(datas.getUInt32());
-                // finished parsing, we know our public transport address
-                Log::debug("STKHost",  "The public address has been found: %s",
-                    m_public_address.toString().c_str());
-                found = true;
-                break;
-            }   // type = 0 or 1
-            datas.skip(4 + size);
-            message_size -= 4 + size;
-            if (message_size == 0)
+            if (response.size() < 4)
             {
                 Log::error("STKHost", "STUN response is invalid.");
                 break;
             }
-            // Cannot even read the size
-            if (message_size < 4)
+            unsigned type = response.getUInt16();
+            unsigned size = response.getUInt16();
+
+            // Bit determining whether comprehension of an attribute is optional.
+            // Described in section 15 of RFC 5389.
+            constexpr uint16_t comprehension_optional = 0x1 << 15;
+
+            // Bit determining whether the bit was assigned by IETF Review.
+            // Described in section 18.1. of RFC 5389.
+            constexpr uint16_t IETF_review = 0x1 << 14;
+
+            // Defined in section 15.1 of RFC 5389
+            constexpr uint8_t ipv4 = 0x01;
+
+            // Defined in section 18.2 of RFC 5389
+            constexpr uint16_t mapped_address = 0x001;
+            constexpr uint16_t xor_mapped_address = 0x0020;
+            // The first two bits are irrelevant to the type
+            type &= ~(comprehension_optional | IETF_review);
+            if (type == mapped_address || type == xor_mapped_address)
             {
-                Log::error("STKHost", "STUN response is invalid.");
+                if (size != 8 || response.size() < 8)
+                {
+                    Log::error("STKHost", "Invalid STUN mapped address "
+                        "length");
+                    break;
+                }
+                // Ignore the first byte as mentioned in Section 15.1 of RFC
+                // 5389.
+                uint8_t ip_type = response.getUInt8();
+                ip_type = response.getUInt8();
+                if (ip_type != ipv4)
+                {
+                    Log::error("STKHost", "Only IPv4 is supported");
+                    break;
+                }
+
+                uint16_t port = response.getUInt16();
+                uint32_t ip = response.getUInt32();
+                if (type == xor_mapped_address)
+                {
+                    // Obfuscation is described in Section 15.2 of RFC 5389.
+                    port ^= magic_cookie >> 16;
+                    ip ^= magic_cookie;
+                }
+                m_public_address.setPort(port);
+                m_public_address.setIP(ip);
+                found = true;
                 break;
+            }   // type == mapped_address || type == xor_mapped_address
+            else
+            {
+                response.skip(size);
+                int padding = size % 4;
+                if (padding != 0)
+                    response.skip(4 - padding);
             }
         }   // while true
         // Found public address and port
         if (found)
             untried_server.clear();
     }
-    // We shutdown next frame if no public address
-    if (m_public_address.isUnset())
-        requestShutdown();
 }   // setPublicAddress
 
 //-----------------------------------------------------------------------------
@@ -629,17 +633,13 @@ void STKHost::abort()
  */
 void STKHost::setErrorMessage(const irr::core::stringw &message)
 {
-    irr::core::stringc s(message.c_str());
-    Log::error("STKHost", "%s", s.c_str());
+    if (!message.empty())
+    {
+        irr::core::stringc s(message.c_str());
+        Log::error("STKHost", "%s", s.c_str());
+    }
     m_error_message = message;
 }   // setErrorMessage
-
-// --------------------------------------------------------------------
-/** Returns the last error (or "" if no error has happened). */
-const irr::core::stringw& STKHost::getErrorMessage() const
-{
-    return m_error_message; 
-}   // getErrorMessage
 
 // --------------------------------------------------------------------
 /** \brief Try to establish a connection to a given transport address.
@@ -831,7 +831,7 @@ void STKHost::handleDirectSocketRequest(Network* lan_network)
     {
         // In case of a LAN connection, we only allow connections from
         // a LAN address (192.168*, ..., and 127.*).
-        if (!sender.isLAN() && sender.getIP() != m_public_address.getIP())
+        if (!sender.isLAN() && !sender.isPublicAddressLAN())
         {
             Log::error("STKHost", "Client trying to connect from '%s'",
                        sender.toString().c_str());

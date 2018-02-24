@@ -58,6 +58,8 @@ Network::Network(int peer_count, int channel_limit,
         return;
     if (change_port_if_bound)
     {
+        Log::warn("Network", "%d port is in used, use another port",
+            address->port);
         ENetAddress new_addr;
         new_addr.host = address->host;
         // Any port

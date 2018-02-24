@@ -136,27 +136,6 @@ void CreateServerScreen::onUpdate(float delta)
     if(!STKHost::existHost())
         return;
 
-    // First check if an error happened while registering the server:
-    // --------------------------------------------------------------
-    const irr::core::stringw &error = STKHost::get()->getErrorMessage();
-    if(error!="")
-    {
-        SFXManager::get()->quickSound("anvil");
-        m_info_widget->setErrorColor();
-        m_info_widget->setText(error, false);
-        return;
-    }
-
-    // Otherwise wait till we get an answer from the server:
-    // -----------------------------------------------------
-    if (!LobbyProtocol::get<LobbyProtocol>())
-    {
-        m_info_widget->setDefaultColor();
-        m_info_widget->setText(StringUtils::loadingDots(_("Creating server")),
-                               false);
-        return;
-    }
-
     //FIXME If we really want a gui, we need to decide what else to do here
     // For now start the (wrong i.e. client) lobby, to prevent to create
     // a server more than once.

@@ -40,6 +40,7 @@ private:
     /** State for finite state machine. */
     enum
     {
+        SET_PUBLIC_ADDRESS,
         REGISTER_SELF_ADDRESS,
         GOT_SERVER_ADDRESS,
         REQUESTING_CONNECTION,

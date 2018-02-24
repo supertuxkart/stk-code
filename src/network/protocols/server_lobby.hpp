@@ -14,18 +14,17 @@ public:
     /* The state for a small finite state machine. */
     enum ServerState : unsigned int
     {
-        INIT_WAN,                 // Start state for WAN game
-        GETTING_PUBLIC_ADDRESS,   // Waiting to receive its public ip address
+        SET_PUBLIC_ADDRESS,       // Waiting to receive its public ip address
+        REGISTER_SELF_ADDRESS,    // Register with STK online server
         ACCEPTING_CLIENTS,        // In lobby, accepting clients
         SELECTING,                // kart, track, ... selection started
         LOAD_WORLD,               // Server starts loading world
         WAIT_FOR_WORLD_LOADED,    // Wait for clients and server to load world
         WAIT_FOR_RACE_STARTED,    // Wait for all clients to have started the race
-        START_RACE,               // Inform clients to start race
         DELAY_SERVER,             // Additional server delay
         RACING,                   // racing
         RESULT_DISPLAY,           // Show result screen
-        DONE,                     // shutting down server
+        ERROR_LEAVE,              // shutting down server
         EXITING
     };
 private:
@@ -92,7 +91,7 @@ public:
     virtual bool notifyEvent(Event* event) OVERRIDE;
     virtual void setup() OVERRIDE;
     virtual void update(float dt) OVERRIDE;
-    virtual void asynchronousUpdate() OVERRIDE {};
+    virtual void asynchronousUpdate() OVERRIDE;
 
     void signalRaceStartToClients();
     void startSelection(const Event *event=NULL);

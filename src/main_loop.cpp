@@ -280,6 +280,12 @@ void MainLoop::run()
         if (STKHost::existHost() &&
             STKHost::get()->requestedShutdown())
         {
+            SFXManager::get()->quickSound("anvil");
+            core::stringw msg = _("Connection to server is lost.");
+            if (!STKHost::get()->getErrorMessage().empty())
+            {
+                msg = STKHost::get()->getErrorMessage();
+            }
             STKHost::get()->shutdown();
             if (World::getWorld())
             {
@@ -293,8 +299,7 @@ void MainLoop::run()
                     OnlineScreen::getInstance(), NULL
                 };
                 StateManager::get()->resetAndSetStack(new_stack);
-                MessageQueue::add(MessageQueue::MT_ERROR,
-                    _("Connection to server is lost."));
+                MessageQueue::add(MessageQueue::MT_ERROR, msg);
             }
             NetworkConfig::get()->unsetNetworking();
         }

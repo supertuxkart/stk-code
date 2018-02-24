@@ -32,12 +32,6 @@
 #include "utils/time.hpp"
 #include "utils/log.hpp"
 
-#ifdef WIN32
-#  include <iphlpapi.h>
-#else
-#include <ifaddrs.h>
-#endif
-
 // ----------------------------------------------------------------------------
 /** Connects to a server. This is the quick connect constructor, which 
  *  will pick a server randomly.
@@ -84,8 +78,7 @@ void ConnectToServer::setup()
     // In case of LAN we already have the server's and our ip address,
     // so we can immediately start requesting a connection.
     m_state = NetworkConfig::get()->isLAN() ? GOT_SERVER_ADDRESS :
-        REGISTER_SELF_ADDRESS;
-    
+        SET_PUBLIC_ADDRESS;
 }   // setup
 
 // ----------------------------------------------------------------------------
@@ -93,10 +86,17 @@ void ConnectToServer::asynchronousUpdate()
 {
     switch(m_state)
     {
+        case SET_PUBLIC_ADDRESS:
+        {
+            STKHost::get()->setPublicAddress();
+            // Set to DONE will stop STKHost is not connected
+            m_state = STKHost::get()->getPublicAddress().isUnset() ?
+                DONE : REGISTER_SELF_ADDRESS;
+        }
+        break;
         case REGISTER_SELF_ADDRESS:
         {
             registerWithSTKServer();  // Register us with STK server
-
             if (m_quick_join)
             {
                 handleQuickConnect();
@@ -226,6 +226,9 @@ void ConnectToServer::asynchronousUpdate()
             if (STKHost::get()->getPeerCount() == 0)
             {
                 // Shutdown STKHost (go back to online menu too)
+                STKHost::get()->setErrorMessage(
+                    _("Cannot connect to server with address: %s.",
+                      m_server_address.toString().c_str()));
                 STKHost::get()->requestShutdown();
             }
             break;
@@ -266,7 +269,10 @@ void ConnectToServer::registerWithSTKServer()
     }
     else
     {
-        Log::error("ConnectToServer", "Failed to register address.");
+        irr::core::stringc error(request->getInfo().c_str());
+        Log::error("ConnectToServer", "Failed to register client address: %s",
+            error.c_str());
+        m_state = DONE;
     }
     delete request;
 
@@ -349,58 +355,8 @@ void ConnectToServer::waitingAloha(bool is_wan)
                    sender.toString().c_str());
         if (!is_wan)
         {
-#ifndef WIN32
-            // just check if the ip is ours : if so, 
-            // then just use localhost (127.0.0.1)
-            struct ifaddrs *ifap, *ifa;
-            struct sockaddr_in *sa;
-            getifaddrs(&ifap); // get the info
-            for (ifa = ifap; ifa; ifa = ifa->ifa_next)
-            {
-                if (ifa->ifa_addr->sa_family == AF_INET)
-                {
-                    sa = (struct sockaddr_in *) ifa->ifa_addr;
-
-                    // This interface is ours
-                    if (ntohl(sa->sin_addr.s_addr) == sender.getIP())
-                        sender.setIP(0x7f000001); // 127.0.0.1
-                }
-            }
-            freeifaddrs(ifap);
-#else
-            // Query the list of all IP addresses on the local host
-            // First call to GetIpAddrTable with 0 bytes buffer
-            // will return insufficient buffer error, and size
-            // will contain the number of bytes needed for all
-            // data. Repeat the process of querying the size
-            // using GetIpAddrTable in a while loop since it
-            // can happen that an interface comes online between
-            // the previous call to GetIpAddrTable and the next
-            // call.
-            MIB_IPADDRTABLE *table = NULL;
-            unsigned long size = 0;
-            int error = GetIpAddrTable(table, &size, 0);
-            // Also add a count to limit the while loop - in
-            // case that something strange is going on.
-            int count = 0;
-            while (error == ERROR_INSUFFICIENT_BUFFER && count < 10)
-            {
-                delete[] table;   // deleting NULL is legal
-                table = (MIB_IPADDRTABLE*)new char[size];
-                error = GetIpAddrTable(table, &size, 0);
-                count++;
-            }   // while insufficient buffer
-            for (unsigned int i = 0; i < table->dwNumEntries; i++)
-            {
-                unsigned int ip = ntohl(table->table[i].dwAddr);
-                if (sender.getIP() == ip) // this interface is ours
-                {
-                    sender.setIP(0x7f000001); // 127.0.0.1
-                    break;
-                }
-            }
-            delete[] table;
-#endif
+            if (sender.isPublicAddressLAN())
+                sender.setIP(0x7f000001); // 127.0.0.1
         }
         m_server_address.copy(sender);
         m_state = CONNECTING;

@@ -88,6 +88,9 @@ private:
         copy(other);
     }   // TransportAddress(const TransportAddress&)
 public:
+    // ------------------------------------------------------------------------
+    bool isPublicAddressLAN() const;
+    // ------------------------------------------------------------------------
     bool isLAN() const;
     // ------------------------------------------------------------------------
     bool isUnset() const { return m_ip == 0 || m_port == 0; }

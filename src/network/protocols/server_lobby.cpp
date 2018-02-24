@@ -83,6 +83,8 @@
 ServerLobby::ServerLobby() : LobbyProtocol(NULL)
 {
     setHandleDisconnections(true);
+    m_state = SET_PUBLIC_ADDRESS;
+
     // We use maximum 16bit unsigned limit
     auto all_k = kart_properties_manager->getAllAvailableKarts();
     auto all_t = track_manager->getAllTrackIdentifiers();
@@ -113,11 +115,6 @@ void ServerLobby::setup()
     m_game_setup = STKHost::get()->setupNewGame();
     m_game_setup->setNumLocalPlayers(0);    // no local players on a server
     m_next_player_id.setAtomic(0);
-
-    // In case of LAN we don't need our public address or register with the
-    // STK server, so we can directly go to the accepting clients state.
-    m_state             = NetworkConfig::get()->isLAN() ? ACCEPTING_CLIENTS 
-                                                        : INIT_WAN;
     m_selection_enabled = false;
     Log::info("ServerLobby", "Starting the protocol.");
 
@@ -185,7 +182,6 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_VOTE_LAPS:  playerLapsVote(event);                break;
         case LE_RACE_FINISHED_ACK: playerFinishedResult(event);   break;
         }   // switch
-           
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
     else if (event->getType() == EVENT_TYPE_DISCONNECTED)
     {
@@ -195,21 +191,34 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
 }   // notifyEventAsynchronous
 
 //-----------------------------------------------------------------------------
-/** Simple finite state machine. First get the public ip address. Once this
- *  is known, register the server and its address with the stk server so that
- *  client can find it.
- */
-void ServerLobby::update(float dt)
+/** Find out the public IP server or poll STK server asynchronously. */
+void ServerLobby::asynchronousUpdate()
 {
     switch (m_state.load())
     {
-    case INIT_WAN:
+    case SET_PUBLIC_ADDRESS:
     {
-        // Start the protocol to find the public ip address.
-        m_state = GETTING_PUBLIC_ADDRESS;
+        // In case of LAN we don't need our public address or register with the
+        // STK server, so we can directly go to the accepting clients state.
+        if (NetworkConfig::get()->isLAN())
+        {
+            m_state = ACCEPTING_CLIENTS;
+            STKHost::get()->startListening();
+            return;
+        }
+        STKHost::get()->setPublicAddress();
+        if (STKHost::get()->getPublicAddress().isUnset())
+        {
+            m_state = ERROR_LEAVE;
+        }
+        else
+        {
+            STKHost::get()->startListening();
+            m_state = REGISTER_SELF_ADDRESS;
+        }
         break;
     }
-    case GETTING_PUBLIC_ADDRESS:
+    case REGISTER_SELF_ADDRESS:
     {
         // Register this server with the STK server. This will block
         // this thread, but there is no need for the protocol manager
@@ -221,8 +230,37 @@ void ServerLobby::update(float dt)
     case ACCEPTING_CLIENTS:
     {
         // Only poll the STK server if this is a WAN server.
-        if(NetworkConfig::get()->isWAN())
+        if (NetworkConfig::get()->isWAN())
             checkIncomingConnectionRequests();
+        break;
+    }
+    case ERROR_LEAVE:
+    {
+        requestTerminate();
+        m_state = EXITING;
+        STKHost::get()->setErrorMessage(_("Failed to setup server."));
+        STKHost::get()->requestShutdown();
+        break;
+    }
+    default:
+        break;
+    }
+}   // asynchronousUpdate
+
+//-----------------------------------------------------------------------------
+/** Simple finite state machine.  Once this
+ *  is known, register the server and its address with the stk server so that
+ *  client can find it.
+ */
+void ServerLobby::update(float dt)
+{
+    switch (m_state.load())
+    {
+    case SET_PUBLIC_ADDRESS:
+    case REGISTER_SELF_ADDRESS:
+    case ACCEPTING_CLIENTS:
+    {
+        // Waiting for asynchronousUpdate
         break;
     }
     case SELECTING:
@@ -280,7 +318,8 @@ void ServerLobby::update(float dt)
             sendMessageToPeersChangingToken(exit_result_screen,
                                             /*reliable*/true);
             delete exit_result_screen;
-            m_state = ACCEPTING_CLIENTS;
+            m_state = NetworkConfig::get()->isLAN() ?
+                ACCEPTING_CLIENTS : REGISTER_SELF_ADDRESS;
             RaceResultGUI::getInstance()->backToLobby();
             // notify the network world that it is stopped
             RaceEventManager::getInstance()->stop();
@@ -293,10 +332,7 @@ void ServerLobby::update(float dt)
             setup();
         }
         break;
-    case DONE:
-        m_state = EXITING;
-        requestTerminate();
-        break;
+    case ERROR_LEAVE:
     case EXITING:
         break;
     }
@@ -337,13 +373,10 @@ void ServerLobby::registerServer()
     {
         irr::core::stringc error(request->getInfo().c_str());
         Log::error("ServerLobby", "%s", error.c_str());
-        STKHost::get()->setErrorMessage(_("Failed to register server: %s",
-            error.c_str()));
-        STKHost::get()->requestShutdown();
+        m_state = ERROR_LEAVE;
     }
     delete request;
 }   // registerServer
-
 
 //-----------------------------------------------------------------------------
 /** Unregister this server (i.e. its public address) with the STK server,
@@ -471,6 +504,12 @@ void ServerLobby::checkIncomingConnectionRequests()
     static double last_poll_time = 0;
     if (StkTime::getRealTime() < last_poll_time + POLL_INTERVAL)
         return;
+
+    // Keep the port open, it can be sent to anywhere as we will send to the
+    // correct peer later in ConnectToPeer.
+    BareNetworkString data;
+    data.addUInt8(0);
+    STKHost::get()->sendRawPacket(data, STKHost::get()->getStunAddress());
 
     // Now poll the stk server
     last_poll_time = StkTime::getRealTime();

@@ -101,6 +101,9 @@ private:
     /** The public address found by stun (if WAN is used). */
     TransportAddress m_public_address;
 
+    /** The public address stun server used. */
+    TransportAddress m_stun_address;
+
     /** The private port enet socket is bound. */
     uint16_t m_private_port;
 
@@ -112,8 +115,6 @@ private:
     virtual ~STKHost();
     void init();
     void handleDirectSocketRequest(Network* lan_network);
-    // ------------------------------------------------------------------------
-    void setPublicAddress();
     // ------------------------------------------------------------------------
     void mainLoop();
 
@@ -149,10 +150,15 @@ public:
     const TransportAddress& getPublicAddress() const
                                                    { return m_public_address; }
     // ------------------------------------------------------------------------
+    const TransportAddress& getStunAddress() const
+                                                     { return m_stun_address; }
+    // ------------------------------------------------------------------------
     uint16_t getPrivatePort() const
                                                      { return m_private_port; }
     // ------------------------------------------------------------------------
     void setPrivatePort();
+    // ------------------------------------------------------------------------
+    void setPublicAddress();
     // ------------------------------------------------------------------------
     virtual GameSetup* setupNewGame();
     void abort();
@@ -190,9 +196,11 @@ public:
     std::vector<NetworkPlayerProfile*> getMyPlayerProfiles();
     void        setErrorMessage(const irr::core::stringw &message);
     bool        isAuthorisedToControl() const;
-    const irr::core::stringw& 
-                getErrorMessage() const;
 
+    // --------------------------------------------------------------------
+    /** Returns the last error (or "" if no error has happened). */
+    const irr::core::stringw& getErrorMessage() const
+                                                { return m_error_message; }
     // --------------------------------------------------------------------
     /** Returns true if a shutdown of the network infrastructure was
      *  requested. */
@@ -214,15 +222,6 @@ public:
     {
         m_network->sendRawPacket(buffer, dst);
     }  // sendRawPacket
-
-    // --------------------------------------------------------------------
-    /** Returns the IP address of this host. */
-    uint32_t  getAddress() const
-    {
-        return m_network->getENetHost()->address.host;
-    }   // getAddress
-
-
     // --------------------------------------------------------------------
     /** Returns a const reference to the list of peers. */
     const std::vector<STKPeer*> &getPeers() { return m_peers; }
