@@ -369,7 +369,7 @@ void ClientLobby::update(float dt)
         break;
     case DONE:
         m_state = EXITING;
-        ProtocolManager::lock()->requestTerminate(shared_from_this());
+        requestTerminate();
         break;
     case EXITING:
         break;
