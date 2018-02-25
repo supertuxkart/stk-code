@@ -136,8 +136,8 @@ void ConnectToPeer::asynchronousUpdate()
                 STKHost::get()->sendRawPacket(aloha, broadcast_address);
                 Log::info("ConnectToPeer", "Broadcast aloha to self.");
 
-                // 10 seconds timeout
-                if (m_tried_connection++ > 5)
+                // 20 seconds timeout
+                if (m_tried_connection++ > 10)
                 {
                     // Not much we can do about if we don't receive the client
                     // connection - it could have stopped, lost network, ...

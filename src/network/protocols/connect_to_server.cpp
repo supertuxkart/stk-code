@@ -142,7 +142,7 @@ void ConnectToServer::asynchronousUpdate()
                 m_current_protocol = hide_address;
                 return;
             }
-            if (m_tried_connection++ > 5)
+            if (m_tried_connection++ > 10)
             {
                 Log::error("ConnectToServer", "Timeout waiting for aloha");
                 m_state = NetworkConfig::get()->isWAN() ?
