@@ -25,6 +25,8 @@
 #include <atomic>
 #include <string>
 
+class Server;
+
 class ConnectToServer : public Protocol
 {
 private:
@@ -34,6 +36,7 @@ private:
     uint32_t m_host_id;
     unsigned m_tried_connection = 0;
 
+    const Server* m_server = NULL;
     /** Protocol currently being monitored. */
     std::weak_ptr<Protocol> m_current_protocol;
     bool m_quick_join;

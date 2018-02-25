@@ -26,6 +26,7 @@
 #include "config/player_manager.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
@@ -70,10 +71,10 @@ void NetworkingLobby::loadedFromFile()
     m_back_widget = getWidget<IconButtonWidget>("back");
     assert(m_back_widget != NULL);
 
-    m_start_button= getWidget<IconButtonWidget>("start");
+    m_start_button = getWidget<IconButtonWidget>("start");
     assert(m_start_button!= NULL);
 
-    m_text_bubble = getWidget<BubbleWidget>("text");
+    m_text_bubble = getWidget<LabelWidget>("text");
     assert(m_text_bubble != NULL);
 
     m_chat_box = getWidget<TextBoxWidget>("chat");
@@ -82,7 +83,7 @@ void NetworkingLobby::loadedFromFile()
     m_player_list = getWidget<ListWidget>("players");
     assert(m_player_list!= NULL);
 
-    m_exit_widget = getWidget<IconButtonWidget>("exit");;
+    m_exit_widget = getWidget<IconButtonWidget>("exit");
     assert(m_exit_widget != NULL);
 
 }   // loadedFromFile
@@ -90,7 +91,6 @@ void NetworkingLobby::loadedFromFile()
 // ---------------------------------------------------------------------------
 void NetworkingLobby::beforeAddingWidget()
 {
-
 } // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -121,8 +121,7 @@ void NetworkingLobby::init()
         m_server_info.push_back(each_line);
     }
 
-    if(!NetworkConfig::get()->isServer())
-        m_start_button->setVisible(STKHost::get()->isAuthorisedToControl());
+    m_start_button->setVisible(false);
 
     // For now create the active player and bind it to the right
     // input device.
@@ -144,7 +143,8 @@ void NetworkingLobby::onUpdate(float delta)
     {
         const core::stringw connect_msg = StringUtils::loadingDots(
             _("Connecting to server %s", m_server_name));
-        m_text_bubble->setText(connect_msg);
+        m_text_bubble->setText(connect_msg, true);
+        m_start_button->setVisible(false);
     }
     else
     {
@@ -154,12 +154,12 @@ void NetworkingLobby::onUpdate(float delta)
             total_msg += string;
             total_msg += L"\n";
         }
-        m_text_bubble->setText(total_msg);
+        m_text_bubble->setText(total_msg, true);
     }
-    if(NetworkConfig::get()->isClient())
+    if (NetworkConfig::get()->isClient() &&
+        STKHost::get()->isAuthorisedToControl())
     {
-        m_start_button->setVisible(STKHost::existHost() &&
-                                   STKHost::get()->isAuthorisedToControl());
+        m_start_button->setVisible(true);
     }
 
 }   // onUpdate
@@ -175,14 +175,23 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
         return;
     }
 
-    if(name==m_start_button->m_properties[PROP_ID])
+    RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
+    if (ribbon == NULL) return;
+    const std::string &selection =
+                     ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
+    if (selection == m_exit_widget->m_properties[PROP_ID])
     {
-        if(NetworkConfig::get()->isServer())
+        StateManager::get()->escapePressed();
+    }
+    else if (selection == m_start_button->m_properties[PROP_ID])
+    {
+        if (NetworkConfig::get()->isServer())
         {
             auto slrp = LobbyProtocol::get<ServerLobby>();
             slrp->startSelection();
         }
-        else // client
+        else
         {
             // Send a message to the server to start
             NetworkString start(PROTOCOL_LOBBY_ROOM);
@@ -190,16 +199,6 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
             start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
             STKHost::get()->sendToServer(&start, true);
         }
-    }
-
-    RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
-    if (ribbon == NULL) return;
-    const std::string &selection = 
-                     ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-
-    if (selection == m_exit_widget->m_properties[PROP_ID])
-    {
-        StateManager::get()->escapePressed();
     }
 }   // eventCallback
 

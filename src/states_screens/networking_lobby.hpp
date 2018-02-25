@@ -25,9 +25,9 @@ class Server;
 namespace GUIEngine
 { 
     class Widget;
-    class ListWidget; 
+    class LabelWidget;
+    class ListWidget;
     class IconButtonWidget;
-    class BubbleWidget;
     class TextBoxWidget;
 }
 
@@ -49,7 +49,7 @@ private:
     std::vector<core::stringw> m_server_info;
 
     GUIEngine::IconButtonWidget * m_back_widget;
-    GUIEngine::BubbleWidget * m_text_bubble;
+    GUIEngine::LabelWidget * m_text_bubble;
     GUIEngine::IconButtonWidget * m_exit_widget;
     GUIEngine::IconButtonWidget *m_start_button;
     GUIEngine::ListWidget *m_player_list;

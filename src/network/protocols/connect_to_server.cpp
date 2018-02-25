@@ -56,8 +56,8 @@ ConnectToServer::ConnectToServer(uint32_t server_id, uint32_t host_id)
     m_server_id  = server_id;
     m_host_id    = host_id;
     m_quick_join = false;
-    const Server *server = ServersManager::get()->getServerByID(server_id);
-    m_server_address.copy(server->getAddress());
+    m_server = ServersManager::get()->getServerByID(m_server_id);
+    m_server_address.copy(m_server->getAddress());
     setHandleConnections(true);
 }   // ConnectToServer(server, host)
 
@@ -239,8 +239,7 @@ void ConnectToServer::update(float dt)
             {
                 // Shutdown STKHost (go back to online menu too)
                 STKHost::get()->setErrorMessage(
-                    _("Cannot connect to server with address: %s.",
-                      m_server_address.toString().c_str()));
+                    _("Cannot connect to server %s.",  m_server->getName()));
                 STKHost::get()->requestShutdown();
             }
             requestTerminate();
