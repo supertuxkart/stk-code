@@ -98,6 +98,7 @@ namespace GUIEngine
         PROP_ICON,
         PROP_FOCUS_ICON,
         PROP_TEXT_ALIGN,
+        PROP_TEXT_VALIGN,
         PROP_MIN_VALUE,
         PROP_MAX_VALUE,
         PROP_MAX_WIDTH,

@@ -309,11 +309,12 @@ namespace GUIEngine
  For icon buttons. A different icon to show when the item is focused.
 
  \n
- \subsection prop4 PROP_TEXT_ALIGN
- <em> Name in XML files: </em> \c "text_align"
+ \subsection prop4 PROP_TEXT_ALIGN, PROP_TEXT_VALIGN
+ <em> Name in XML files: </em> \c "text_align", "text_valign"
 
  used exclusively by label components. Value can be "right" or "center" (left
- used if not specified).
+ used if not specified) for "text_align", or "top"/"center"/"bottom" for
+ valign.
 
  \n
  \subsection prop5 PROP_WORD_WRAP
