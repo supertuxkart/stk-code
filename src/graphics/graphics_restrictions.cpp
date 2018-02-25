@@ -200,6 +200,11 @@ public:
                 convertVersionString(s[2]);
                 return;
             }
+            else if (s.size() == 5)
+            {
+                convertVersionString(s[4]);
+                return;
+            }
 
         }
 
