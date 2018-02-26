@@ -42,6 +42,7 @@
 #include <thread>
 
 class GameSetup;
+class SeparateProcess;
 
 class STKHost
 {
@@ -62,6 +63,9 @@ public:
 private:
     /** Singleton pointer to the instance. */
     static STKHost* m_stk_host;
+
+    /** Separate process of server instance. */
+    SeparateProcess* m_separate_process;
 
     /** ENet host interfacing sockets. */
     Network* m_network;
@@ -127,7 +131,7 @@ public:
     /** Creates the STKHost. It takes all confifguration parameters from
      *  NetworkConfig. This STKHost can either be a client or a server.
      */
-    static void create();
+    static void create(SeparateProcess* p = NULL);
 
     // ------------------------------------------------------------------------
     /** Returns the instance of STKHost. */

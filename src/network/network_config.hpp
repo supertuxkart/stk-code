@@ -44,7 +44,9 @@ private:
 
     /** If set it allows clients to connect directly to this server without
      *  using the stk server in between. It requires obviously that this
-     *  server is accessible (through the firewall) from the outside. */
+     *  server is accessible (through the firewall) from the outside,
+     *  then you can use the \ref m_server_discovery_port and ip address for
+     *  direct connection. */
     bool m_is_public_server;
 
     /** True if this host is a server, false otherwise. */
@@ -53,7 +55,8 @@ private:
     /** The password for a server (or to authenticate to a server). */
     std::string m_password;
 
-    /** The port number to which the server listens to detect LAN requests. */
+    /** The port number to which the server listens to detect direct socket
+     *  requests. */
     uint16_t m_server_discovery_port;
 
     /** The port on which the server listens for connection requests from LAN. */
@@ -72,6 +75,11 @@ private:
     /** True if a client should connect to the first server it finds and
      *  immediately start a race. */
     bool m_auto_connect;
+
+    /** True if this is a client and server in graphics mode made by server
+     *  creation screen. This is also used by connect-now to bypass stk
+     *  server in wan game. */
+    bool m_client_server;
 
     /** If this is a server, the server name. */
     irr::core::stringw m_server_name;
@@ -164,6 +172,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if this instance is a client. */
     bool isClient() const { return !m_is_server; }
+    // ------------------------------------------------------------------------
+    void setClientServer(bool val) { m_client_server = val; }
+    // ------------------------------------------------------------------------
+    bool isClientServer() const { return m_client_server; }
     // ------------------------------------------------------------------------
     /** Sets the name of this server. */
     void setServerName(const irr::core::stringw &name)

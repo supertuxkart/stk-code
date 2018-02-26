@@ -65,11 +65,7 @@ Network::Network(int peer_count, int channel_limit,
         // Any port
         new_addr.port = 0;
         m_host = enet_host_create(&new_addr, peer_count, channel_limit, 0, 0);
-        if (m_host)
-            return;
     }
-    Log::fatal("Network", "An error occurred while trying to create an ENet "
-        "client host, maybe you started multiple instance of STK server?");
 }   // Network
 
 // ----------------------------------------------------------------------------

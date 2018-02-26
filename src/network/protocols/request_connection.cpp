@@ -75,9 +75,16 @@ void RequestConnection::asynchronousUpdate()
     {
         case NONE:
         {
-            if(NetworkConfig::get()->isLAN())
+            if (NetworkConfig::get()->isLAN() ||
+                NetworkConfig::get()->isClientServer())
             {
-                const Server *server = 
+                if (NetworkConfig::get()->isClientServer())
+                {
+                    // Allow 10 seconds for the separate process to fully
+                    // start-up
+                    StkTime::sleep(10000);
+                }
+                const Server *server =
                     ServersManager::get()->getServerByID(m_server_id);
                 BareNetworkString message(std::string("connection-request"));
                 STKHost::get()->sendRawPacket(message, server->getAddress());

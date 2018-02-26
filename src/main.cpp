@@ -1000,15 +1000,16 @@ int handleCmdLine()
     {
         switch (n)
         {
+        // The order here makes server creation screen easier
         case 0: race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
                 break;
         case 1: race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
                 break;
-        case 2: race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
+        case 2: race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
                 break;
-        case 3: race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+        case 3: race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
                 break;
-        case 4: race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
+        case 4: race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
                 break;
         default:
                 Log::warn("main", "Invalid race type '%d' - ignored.", n);
@@ -1042,7 +1043,8 @@ int handleCmdLine()
 
     if (CommandLine::has("--server-password", &s))
     {
-        NetworkConfig::get()->setPassword(s);
+        core::stringw pw = StringUtils::xmlDecode(s);
+        NetworkConfig::get()->setPassword(StringUtils::wideToUtf8(pw));
     }
 
     if(CommandLine::has("--max-players", &n))
@@ -1063,7 +1065,15 @@ int handleCmdLine()
     if (CommandLine::has("--connect-now", &s))
     {
         TransportAddress ip(s);
-        NetworkConfig::get()->setIsLAN();
+        if (ip.isLAN())
+        {
+            NetworkConfig::get()->setIsLAN();
+        }
+        else
+        {
+            NetworkConfig::get()->setIsWAN();
+            NetworkConfig::get()->setClientServer(true);
+        }
         NetworkConfig::get()->setIsServer(false);
         Log::info("main", "Try to connect to server '%s'.",
                   ip.toString().c_str()                    );
@@ -1089,7 +1099,7 @@ int handleCmdLine()
                     break;
                 }
             }
-            NetworkConfig::get()->setServerName(core::stringw(s.c_str()));
+            NetworkConfig::get()->setServerName(StringUtils::xmlDecode(s));
             NetworkConfig::get()->setIsServer(true);
             NetworkConfig::get()->setIsWAN();
             STKHost::create();
@@ -1102,7 +1112,7 @@ int handleCmdLine()
     }
     else if (CommandLine::has("--lan-server", &s))
     {
-        NetworkConfig::get()->setServerName(core::stringw(s.c_str()));
+        NetworkConfig::get()->setServerName(StringUtils::xmlDecode(s));
         NetworkConfig::get()->setIsServer(true);
         NetworkConfig::get()->setIsLAN();
         STKHost::create();

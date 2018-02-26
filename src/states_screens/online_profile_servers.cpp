@@ -96,7 +96,6 @@ void OnlineProfileServers::eventCallback(Widget* widget, const std::string& name
         else if (selection == "create_wan_server")
         {
             NetworkConfig::get()->setIsWAN();
-            NetworkConfig::get()->setIsServer(true);
             CreateServerScreen::getInstance()->push();
         }
         else if (selection == "quick_wan_play")

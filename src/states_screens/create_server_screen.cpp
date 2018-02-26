@@ -32,6 +32,7 @@
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/dialogs/server_info_dialog.hpp"
+#include "utils/separate_process.hpp"
 #include "utils/translation.hpp"
 
 #include <irrString.h>
@@ -168,6 +169,15 @@ void CreateServerScreen::createServer()
         max_players <= UserConfigParams::m_server_max_players.getDefaultValue());
 
     UserConfigParams::m_server_max_players = max_players;
+    core::stringw password_w = getWidget<TextBoxWidget>("password")->getText();
+    std::string password = StringUtils::xmlEncode(password_w);
+    NetworkConfig::get()->setPassword(StringUtils::wideToUtf8(password_w));
+    if (!password.empty())
+        password = std::string(" --server-password=") + password;
+
+#ifdef USE_GRAPHICS_SERVER
+    NetworkConfig::get()->setIsServer(true);
+
     // In case of a LAN game, we can create the new server object now
     if (NetworkConfig::get()->isLAN())
     {
@@ -197,13 +207,36 @@ void CreateServerScreen::createServer()
     else
         race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
 
-    core::stringw password_w = getWidget<TextBoxWidget>("password")->getText();
-    std::string password(core::stringc(password_w.c_str()).c_str());
-    NetworkConfig::get()->setPassword(password);
-
     race_manager->setReverseTrack(false);
     STKHost::create();
+#else
 
+    NetworkConfig::get()->setIsServer(false);
+    std::string server_string = NetworkConfig::get()->isWAN() ?
+        "--wan-server=" : "--lan-server=";
+    server_string += StringUtils::xmlEncode(name);
+    char option[1024];
+    sprintf(option, " --no-graphics --type=%d --difficulty=%d "
+        "--max-players=%d --start-console --public-server "
+        "--stdout=server.log",
+        gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER),
+        difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER),
+        max_players);
+    SeparateProcess* sp =
+        new SeparateProcess(SeparateProcess::getCurrentExecutableLocation(),
+        server_string + option + password, "quit");
+
+    NetworkConfig::get()->setClientServer(true);
+    ServersManager::get()->cleanUpServers();
+    TransportAddress address(0x7f000001,
+        NetworkConfig::get()->getServerDiscoveryPort());
+    Server *server = new Server(name, /*lan*/true, max_players,
+        /*current_player*/0, address);
+    ServersManager::get()->addServer(server);
+    ServersManager::get()->setJoinedServer(0);
+    STKHost::create(sp);
+
+#endif
 }   // createServer
 
 // ----------------------------------------------------------------------------

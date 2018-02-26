@@ -75,10 +75,11 @@ void ConnectToServer::setup()
 {
     Log::info("ConnectToServer", "SETUP");
     m_current_protocol.reset();
-    // In case of LAN we already have the server's and our ip address,
-    // so we can immediately start requesting a connection.
-    m_state = NetworkConfig::get()->isLAN() ? GOT_SERVER_ADDRESS :
-        SET_PUBLIC_ADDRESS;
+    // In case of LAN or client-server we already have the server's
+    // and our ip address, so we can immediately start requesting a connection.
+    m_state = (NetworkConfig::get()->isLAN() ||
+        NetworkConfig::get()->isClientServer()) ?
+        GOT_SERVER_ADDRESS : SET_PUBLIC_ADDRESS;
 }   // setup
 
 // ----------------------------------------------------------------------------
@@ -151,7 +152,8 @@ void ConnectToServer::asynchronousUpdate()
             if ((!NetworkConfig::m_disable_lan && 
                 m_server_address.getIP() ==
                 STKHost::get()->getPublicAddress().getIP()) ||
-                NetworkConfig::get()->isLAN())
+                (NetworkConfig::get()->isLAN() ||
+                NetworkConfig::get()->isClientServer()))
             {
                 // We're in the same lan (same public ip address).
                 // The state will change to CONNECTING
@@ -194,7 +196,8 @@ void ConnectToServer::asynchronousUpdate()
         {
             Log::info("ConnectToServer", "Connected");
             // LAN networking does not use the stk server tables.
-            if (NetworkConfig::get()->isWAN())
+            if (NetworkConfig::get()->isWAN() &&
+                !NetworkConfig::get()->isClientServer())
             {
                 auto hide_address = std::make_shared<HidePublicAddress>();
                 hide_address->requestStart();
@@ -209,6 +212,8 @@ void ConnectToServer::asynchronousUpdate()
             {
                 return;
             }
+            // We don't need this flag anymore after connect to server
+            NetworkConfig::get()->setClientServer(false);
             m_state = DONE;
             break;
         case DONE:

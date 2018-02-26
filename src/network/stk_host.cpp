@@ -31,6 +31,7 @@
 #include "network/servers_manager.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
+#include "utils/separate_process.hpp"
 #include "utils/time.hpp"
 #include "utils/vs.hpp"
 
@@ -65,7 +66,7 @@
 STKHost *STKHost::m_stk_host       = NULL;
 bool     STKHost::m_enable_console = false;
 
-void STKHost::create()
+void STKHost::create(SeparateProcess* p)
 {
     assert(m_stk_host == NULL);
     if (NetworkConfig::get()->isServer())
@@ -75,6 +76,7 @@ void STKHost::create()
         Server *server = ServersManager::get()->getJoinedServer();
         m_stk_host = new STKHost(server->getServerId(), 0);
     }
+    m_stk_host->m_separate_process = p;
     if (!m_stk_host->m_network)
     {
         delete m_stk_host;
@@ -371,6 +373,7 @@ STKHost::~STKHost()
 
     delete m_network;
     enet_deinitialize();
+    delete m_separate_process;
 }   // ~STKHost
 
 //-----------------------------------------------------------------------------
@@ -717,12 +720,18 @@ void STKHost::mainLoop()
 
     // A separate network connection (socket) to handle LAN requests.
     Network* lan_network = NULL;
-    if (NetworkConfig::get()->isLAN() && NetworkConfig::get()->isServer())
+    if ((NetworkConfig::get()->isLAN() && NetworkConfig::get()->isServer()) ||
+        NetworkConfig::get()->isPublicServer())
     {
         TransportAddress address(0,
             NetworkConfig::get()->getServerDiscoveryPort());
         ENetAddress eaddr = address.toEnetAddress();
         lan_network = new Network(1, 1, 0, 0, &eaddr);
+        if (lan_network->getENetHost() == NULL)
+        {
+            delete lan_network;
+            lan_network = NULL;
+        }
     }
 
     while (m_exit_flag.test_and_set())
