@@ -227,7 +227,7 @@ public:
 #undef BATTLE_ARENA
 
     /** Game difficulty. */
-    enum Difficulty     { DIFFICULTY_EASY,
+    enum Difficulty     { DIFFICULTY_EASY = 0,
                           DIFFICULTY_FIRST = DIFFICULTY_EASY,
                           DIFFICULTY_MEDIUM,
                           DIFFICULTY_HARD,

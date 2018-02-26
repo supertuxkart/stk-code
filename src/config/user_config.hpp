@@ -205,7 +205,7 @@ public:
 
     irr::core::stringc toString() const;
     void revertToDefaults()      { m_value = m_default_value;        }
-
+    int getDefaultValue()        { return  m_default_value;          }
     operator int() const         { return m_value;                   }
     int& operator++(int dummy)   { m_value++; return m_value;        }
     int& operator=(const int& v) { m_value = v; return m_value;      }
@@ -713,7 +713,7 @@ namespace UserConfigParams
     // ---- Networking
 
     PARAM_PREFIX IntUserConfigParam         m_server_max_players
-            PARAM_DEFAULT(  IntUserConfigParam(16, "server_max_players",
+            PARAM_DEFAULT(  IntUserConfigParam(12, "server_max_players",
                                        "Maximum number of players on the server.") );
 
     PARAM_PREFIX StringListUserConfigParam         m_stun_servers

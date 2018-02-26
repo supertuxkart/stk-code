@@ -986,10 +986,67 @@ int handleCmdLine()
             UserConfigParams::m_check_debug=true;
     }
 
+    if (CommandLine::has( "--difficulty", &s))
+    {
+        int n = atoi(s.c_str());
+        if(n<0 || n>RaceManager::DIFFICULTY_LAST)
+            Log::warn("main", "Invalid difficulty '%s' - ignored.\n",
+                      s.c_str());
+        else
+            race_manager->setDifficulty(RaceManager::Difficulty(n));
+    }   // --mode
+
+    if (CommandLine::has("--type", &n))
+    {
+        switch (n)
+        {
+        case 0: race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
+                break;
+        case 1: race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
+                break;
+        case 2: race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
+                break;
+        case 3: race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+                break;
+        case 4: race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
+                break;
+        default:
+                Log::warn("main", "Invalid race type '%d' - ignored.", n);
+        }
+    }   // --type
+
+
+    if(CommandLine::has("--login", &s) )
+    {
+        login = s.c_str();
+        try_login = true;
+    }   // --login
+
+    if(CommandLine::has("--password", &s))
+        password = s.c_str();
+    if (try_login)
+    {
+        irr::core::stringw s;
+        Online::XMLRequest* request =
+                PlayerManager::requestSignIn(login, password);
+
+        if (request->isSuccess())
+        {
+            Log::info("Main", "Logged in from command-line.");
+        }
+    }
+
     // Networking command lines
     if(CommandLine::has("--start-console"))
         STKHost::m_enable_console = true;
 
+    if (CommandLine::has("--server-password", &s))
+    {
+        NetworkConfig::get()->setPassword(s);
+    }
+
+    if(CommandLine::has("--max-players", &n))
+        UserConfigParams::m_server_max_players=n;
     NetworkConfig::get()->
         setMaxPlayers(UserConfigParams::m_server_max_players);
     if (CommandLine::has("--port", &n))
@@ -1051,25 +1108,10 @@ int handleCmdLine()
         STKHost::create();
         Log::info("main", "Creating a LAN server '%s'.", s.c_str());
     }
-    if (CommandLine::has("--server-password", &s))
-    {
-        NetworkConfig::get()->setPassword(s);
-    }
     if (CommandLine::has("--auto-connect"))
     {
         NetworkConfig::get()->setAutoConnect(true);
     }
-    if(CommandLine::has("--max-players", &n))
-        UserConfigParams::m_server_max_players=n;
-
-    if(CommandLine::has("--login", &s) )
-    {
-        login = s.c_str();
-        try_login = true;
-    }   // --login
-
-    if(CommandLine::has("--password", &s))
-        password = s.c_str();
 
     /** Disable detection of LAN connection when connecting via WAN. This is
      *  mostly a debugging feature to force using WAN connection. */
@@ -1127,31 +1169,6 @@ int handleCmdLine()
         // Add 1 for the player kart
         race_manager->setNumKarts((int)l.size()+1);
     }   // --ai
-
-    if(CommandLine::has( "--mode", &s) || CommandLine::has( "--difficulty", &s))
-    {
-        int n = atoi(s.c_str());
-        if(n<0 || n>RaceManager::DIFFICULTY_LAST)
-            Log::warn("main", "Invalid difficulty '%s' - ignored.\n",
-                      s.c_str());
-        else
-            race_manager->setDifficulty(RaceManager::Difficulty(n));
-    }   // --mode
-
-    if(CommandLine::has("--type", &n))
-    {
-        switch (n)
-        {
-        case 0: race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
-                break;
-        case 1: race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
-                break;
-        case 2: race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
-                break;
-        default:
-                Log::warn("main", "Invalid race type '%d' - ignored.", n);
-        }
-    }   // --type
 
     if(CommandLine::has("--track", &s) || CommandLine::has("-t", &s))
     {
@@ -1341,22 +1358,10 @@ int handleCmdLine()
 
     CommandLine::reportInvalidParameters();
 
-    if(ProfileWorld::isProfileMode())
+    if (ProfileWorld::isProfileMode() || ProfileWorld::isNoGraphics())
     {
         UserConfigParams::m_sfx = false;  // Disable sound effects
         UserConfigParams::m_music = false;// and music when profiling
-    }
-
-    if (try_login)
-    {
-        irr::core::stringw s;
-        Online::XMLRequest* request =
-                PlayerManager::requestSignIn(login, password);
-
-        if (request->isSuccess())
-        {
-            Log::info("Main", "Logged in from command-line.");
-        }
     }
 
     return 1;

@@ -33,6 +33,7 @@
 #include "network/stk_peer.hpp"
 #include "online/online_profile.hpp"
 #include "online/request_manager.hpp"
+#include "race/race_manager.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/waiting_for_others.hpp"
@@ -355,10 +356,14 @@ void ServerLobby::registerServer()
     request->addParameter("private_port",
                                     STKHost::get()->getPrivatePort()      );
     request->addParameter("name",   NetworkConfig::get()->getServerName() );
-    request->addParameter("max_players", 
-                          UserConfigParams::m_server_max_players          );
+    request->addParameter("max_players",
+        NetworkConfig::get()->getMaxPlayers());
+    request->addParameter("difficulty", race_manager->getDifficulty());
+    request->addParameter("game_mode",
+        NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
+        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX));
     Log::info("ServerLobby", "Public server addr %s", addr.toString().c_str());
-    
+
     request->executeNow();
 
     const XMLNode * result = request->getXMLData();
@@ -520,6 +525,7 @@ void ServerLobby::checkIncomingConnectionRequests()
     const TransportAddress &addr = STKHost::get()->getPublicAddress();
     request->addParameter("address", addr.getIP()  );
     request->addParameter("port",    addr.getPort());
+    request->addParameter("current_players", STKHost::get()->getPeerCount());
 
     request->executeNow();
     assert(request->isDone());

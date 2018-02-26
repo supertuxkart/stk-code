@@ -44,9 +44,12 @@ public:
     /** Set the sort order used in the comparison function. */
     enum SortOrder
     {
-        SO_SCORE = 1,    // Sorted on satisfaction score
-        SO_NAME = 2,     // Sorted alphabetically by name
-        SO_PLAYERS = 4
+        SO_NAME = 0,     // Sorted alphabetically by name
+        SO_PLAYERS = 1,
+        SO_DIFFICULTY = 2,
+        SO_GAME_MODE = 3,
+        SO_SCORE = 4    // Sorted on satisfaction score (unused)
+
     };
 
 protected:
@@ -141,6 +144,12 @@ public:
             break;
         case SO_PLAYERS:
             return m_current_players < server.m_current_players;
+            break;
+        case SO_DIFFICULTY:
+            return m_difficulty < server.m_difficulty;
+            break;
+        case SO_GAME_MODE:
+            return m_minor_mode < server.m_minor_mode;
             break;
         }   // switch
 

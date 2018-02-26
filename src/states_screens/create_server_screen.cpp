@@ -59,7 +59,9 @@ void CreateServerScreen::loadedFromFile()
  
     m_max_players_widget = getWidget<SpinnerWidget>("max_players");
     assert(m_max_players_widget != NULL);
-    m_max_players_widget->setValue(8);
+    m_max_players_widget
+        ->setMax(UserConfigParams::m_server_max_players.getDefaultValue());
+    m_max_players_widget->setValue(UserConfigParams::m_server_max_players);
 
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
@@ -162,15 +164,10 @@ void CreateServerScreen::createServer()
         SFXManager::get()->quickSound("anvil");
         return;
     }
-    else if (max_players < 2 || max_players > 12)
-    {
-        m_info_widget->setText(
-            _("The maxinum number of players has to be between 2 and 12."),
-            false);
-        SFXManager::get()->quickSound("anvil");
-        return;
-    }
+    assert(max_players > 1 &&
+        max_players <= UserConfigParams::m_server_max_players.getDefaultValue());
 
+    UserConfigParams::m_server_max_players = max_players;
     // In case of a LAN game, we can create the new server object now
     if (NetworkConfig::get()->isLAN())
     {

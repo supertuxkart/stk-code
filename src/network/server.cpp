@@ -16,7 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/server.hpp"
-
+#include "network/network_config.hpp"
 #include "io/xml_node.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
@@ -38,8 +38,11 @@ Server::Server(const XMLNode & xml, bool is_lan)
     m_current_players = 0;
     m_max_players = 0;
     m_is_lan = is_lan;
-    m_minor_mode = RaceManager::MINOR_MODE_NORMAL_RACE;
-    m_difficulty = RaceManager::DIFFICULTY_HARD;
+    unsigned server_data = 0;
+    xml.get("game_mode", &server_data);
+    m_minor_mode = NetworkConfig::get()->getLocalGameMode(server_data).first;
+    xml.get("difficulty", &server_data);
+    m_difficulty = (RaceManager::Difficulty)server_data;
 
     xml.get("name", &m_lower_case_name);
     m_name = StringUtils::xmlDecode(m_lower_case_name);

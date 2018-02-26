@@ -162,6 +162,8 @@ void ServerSelection::onColumnClicked(int column_id)
     {
         case 0: Server::setSortOrder(Server::SO_NAME); break;
         case 1: Server::setSortOrder(Server::SO_PLAYERS); break;
+        case 2: Server::setSortOrder(Server::SO_DIFFICULTY); break;
+        case 3: Server::setSortOrder(Server::SO_GAME_MODE); break;
         default: assert(0); break;
     }   // switch
     /** \brief Toggle the sort order after column click **/

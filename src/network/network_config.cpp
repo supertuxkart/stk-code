@@ -48,7 +48,7 @@ NetworkConfig::NetworkConfig()
     m_client_port           = 2759;
 }   // NetworkConfig
 
-// --------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Sets if this instance is a server or client. It also assigns the
  *  private port depending if this is a server or client.
  */
@@ -56,3 +56,53 @@ void NetworkConfig::setIsServer(bool b)
 {
     m_is_server = b;
 }   // setIsServer
+
+// ----------------------------------------------------------------------------
+unsigned NetworkConfig::getServerGameMode(RaceManager::MinorRaceModeType mode,
+                                          bool gp)
+{
+    if (gp)
+    {
+        if (mode == RaceManager::MINOR_MODE_NORMAL_RACE)
+            return 0;
+        else if (mode == RaceManager::MINOR_MODE_TIME_TRIAL)
+            return 1;
+    }
+    else
+    {
+        if (mode == RaceManager::MINOR_MODE_NORMAL_RACE)
+            return 2;
+        else if (mode == RaceManager::MINOR_MODE_TIME_TRIAL)
+            return 3;
+        else if (mode == RaceManager::MINOR_MODE_3_STRIKES)
+            return 4;
+        else if (mode == RaceManager::MINOR_MODE_SOCCER)
+            return 5;
+    }
+    return 0;
+}   // getServerGameMode
+
+// ----------------------------------------------------------------------------
+std::pair<RaceManager::MinorRaceModeType, bool>
+    NetworkConfig::getLocalGameMode(unsigned id)
+{
+    switch(id)
+    {
+        case 0:
+            return { RaceManager::MINOR_MODE_NORMAL_RACE, true };
+        case 1:
+            return { RaceManager::MINOR_MODE_TIME_TRIAL, true };
+        case 2:
+            return { RaceManager::MINOR_MODE_NORMAL_RACE, false };
+        case 3:
+            return { RaceManager::MINOR_MODE_TIME_TRIAL, false };
+        case 4:
+            return { RaceManager::MINOR_MODE_3_STRIKES, false };
+        case 5:
+            return { RaceManager::MINOR_MODE_SOCCER, false };
+        default:
+            break;
+    }
+    return { RaceManager::MINOR_MODE_NORMAL_RACE, false };
+
+}   // getLocalGameMode

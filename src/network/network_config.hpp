@@ -23,6 +23,7 @@
 #define HEADER_NETWORK_CONFIG
 
 #include "network/transport_address.hpp"
+#include "race/race_manager.hpp"
 #include "utils/synchronised.hpp"
 
 #include "irrString.h"
@@ -154,35 +155,41 @@ public:
     // ------------------------------------------------------------------------
     /** Sets the maximum number of players for this server. */
     void setMaxPlayers(int n) { m_max_players = n; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the maximum number of players for this server. */
     int getMaxPlayers() const { return m_max_players; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns if this instance is a server. */
     bool isServer() const { return m_is_server;  }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns if this instance is a client. */
     bool isClient() const { return !m_is_server; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Sets the name of this server. */
     void setServerName(const irr::core::stringw &name)
     {
         m_server_name = name;
     }   // setServerName
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the server name. */
     const irr::core::stringw& getServerName() const
     {
         assert(isServer());
         return m_server_name;
     }   // getServerName
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Sets if a client should immediately connect to the first server. */
     void setAutoConnect(bool b) { m_auto_connect = b; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns if an immediate connection to the first server was
      *  requested. */
     bool isAutoConnect() const { return m_auto_connect; }
+    // ------------------------------------------------------------------------
+    /** Returns the game mode id for server database. */
+    unsigned getServerGameMode(RaceManager::MinorRaceModeType mode, bool gp);
+    // ------------------------------------------------------------------------
+    /** Returns the game mode id and if grandprix from server database id. */
+    std::pair<RaceManager::MinorRaceModeType, bool> getLocalGameMode(unsigned);
 
 };   // class NetworkConfig
 
