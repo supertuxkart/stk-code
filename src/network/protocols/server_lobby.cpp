@@ -102,7 +102,7 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
  */
 ServerLobby::~ServerLobby()
 {
-    if (m_server_registered)
+    if (m_server_registered && NetworkConfig::get()->isWAN())
     {
         unregisterServer();
     }
@@ -225,7 +225,8 @@ void ServerLobby::asynchronousUpdate()
         // this thread, but there is no need for the protocol manager
         // to react to any requests before the server is registered.
         registerServer();
-        m_state = ACCEPTING_CLIENTS;
+        if (m_server_registered)
+            m_state = ACCEPTING_CLIENTS;
         break;
     }
     case ACCEPTING_CLIENTS:
@@ -444,9 +445,9 @@ void ServerLobby::signalRaceStartToClients()
  */
 void ServerLobby::startSelection(const Event *event)
 {
-    assert(m_server_registered);
-    if (m_server_registered)
+    if (NetworkConfig::get()->isWAN())
     {
+        assert(m_server_registered);
         unregisterServer();
         m_server_registered = false;
     }
