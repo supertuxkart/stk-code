@@ -156,6 +156,22 @@ void CIrrDeviceAndroid::printConfig()
 	os::Printer::log("   touch:", core::stringc(touch).c_str(), ELL_DEBUG);
 	os::Printer::log("   ui_mode_type:", core::stringc(ui_mode_type).c_str(), ELL_DEBUG);
 	os::Printer::log("   ui_mode_night:", core::stringc(ui_mode_night).c_str(), ELL_DEBUG);
+	
+	int rotation = getRotation();
+	int deg[4] = {0, 90, 180, 270};
+	
+	os::Printer::log("Rotation: ", core::stringc(deg[rotation]).c_str(), ELL_DEBUG);
+	
+	int default_rotation = getDefaultRotation();
+	
+	if (default_rotation == 1)
+	{
+		os::Printer::log("Default rotation: landscape", ELL_DEBUG);
+	}
+	else
+	{
+		os::Printer::log("Default rotation: portrait", ELL_DEBUG);
+	}
 }
 
 void CIrrDeviceAndroid::createVideoModeList()
@@ -417,6 +433,7 @@ void CIrrDeviceAndroid::handleAndroidCommand(android_app* app, int32_t cmd)
 		os::Printer::log("Android command APP_CMD_LOW_MEMORY", ELL_DEBUG);
 		break;
 	default:
+		os::Printer::log("Android command: ", core::stringc(cmd).c_str(), ELL_DEBUG);
 		break;
 	}
 	
@@ -1108,6 +1125,75 @@ void CIrrDeviceAndroid::getKeyChar(SEvent& event)
 	else if (event.KeyInput.SystemKeyCode == AKEYCODE_PERIOD)
 	{
 		event.KeyInput.Char =  46;
+	}
+}
+
+int CIrrDeviceAndroid::getRotation()
+{
+	JavaVMAttachArgs args;
+	args.version = JNI_VERSION_1_6;
+	args.name = "NativeThread";
+	args.group = NULL;
+	JNIEnv* env;
+
+	if (Android->activity->vm->AttachCurrentThread(&env, &args) != JNI_OK) 
+	{
+		os::Printer::log("Cannot find rotation.", ELL_DEBUG);
+		return 0;
+	}
+
+	jobject activity_obj = Android->activity->clazz;
+
+	jclass activity = env->GetObjectClass(activity_obj);
+	jclass context = env->FindClass("android/content/Context");
+	jclass window_manager = env->FindClass("android/view/WindowManager");
+	jclass display = env->FindClass("android/view/Display");
+
+	jmethodID get_system_service = env->GetMethodID(activity, "getSystemService", 
+											"(Ljava/lang/String;)Ljava/lang/Object;");
+	jmethodID get_default_display = env->GetMethodID(window_manager, 
+												   "getDefaultDisplay", 
+												   "()Landroid/view/Display;");
+	jmethodID get_rotation = env->GetMethodID(display, "getRotation", "()I");
+
+	jfieldID window_service = env->GetStaticFieldID(context, "WINDOW_SERVICE", 
+														"Ljava/lang/String;");
+
+	jobject window_service_obj = env->GetStaticObjectField(context, window_service);
+
+	jobject window_manager_obj = env->CallObjectMethod(activity_obj, get_system_service, 
+												   window_service_obj);
+
+	jobject display_obj = env->CallObjectMethod(window_manager_obj, get_default_display);
+	
+	int rotation = env->CallIntMethod(display_obj, get_rotation);
+	
+	env->DeleteLocalRef(activity);
+	env->DeleteLocalRef(context);
+	env->DeleteLocalRef(window_manager);
+	env->DeleteLocalRef(display);	
+	
+	Android->activity->vm->DetachCurrentThread();
+	
+	return rotation;
+}
+
+int CIrrDeviceAndroid::getDefaultRotation()
+{
+	int rotation = getRotation();
+	
+	int32_t orientation = AConfiguration_getOrientation(Android->config);
+	
+	if (((rotation == 0 || rotation == 2) && 
+		orientation == ACONFIGURATION_ORIENTATION_LAND) ||
+		((rotation == 1 || rotation == 3) && 
+		orientation == ACONFIGURATION_ORIENTATION_PORT))
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
 	}
 }
 

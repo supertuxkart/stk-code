@@ -133,6 +133,8 @@ namespace irr
 		void createKeyMap();
 		void createVideoModeList();
 		void getKeyChar(SEvent& event);
+		int getRotation();
+		int getDefaultRotation();
 		video::SExposedVideoData& getExposedVideoData();
 		
 		static void handleAndroidCommand(android_app* app, int32_t cmd);
