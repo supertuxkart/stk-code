@@ -213,11 +213,11 @@ void CreateServerScreen::createServer()
 
     NetworkConfig::get()->setIsServer(false);
     std::string server_string = NetworkConfig::get()->isWAN() ?
-        "--wan-server=" : "--lan-server=";
+        "--public-server --wan-server=" : "--lan-server=";
     server_string += StringUtils::xmlEncode(name);
     char option[1024];
     sprintf(option, " --no-graphics --type=%d --difficulty=%d "
-        "--max-players=%d --start-console --public-server "
+        "--max-players=%d --network-console --no-console-log "
         "--stdout=server.log",
         gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER),
         difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER),
@@ -226,7 +226,6 @@ void CreateServerScreen::createServer()
         new SeparateProcess(SeparateProcess::getCurrentExecutableLocation(),
         server_string + option + password, "quit");
 
-    NetworkConfig::get()->setClientServer(true);
     ServersManager::get()->cleanUpServers();
     TransportAddress address(0x7f000001,
         NetworkConfig::get()->getServerDiscoveryPort());

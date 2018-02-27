@@ -68,18 +68,13 @@ private:
     /** Maximum number of players on the server. */
     int m_max_players;
 
-    /** If this is a server, it indicates if this server is registered
-    *  with the stk server. */
-    bool m_is_registered;
+    /** True if STK was started with connect-now argument, so it use direct
+     *  request-connection without using the addon server. */
+    bool m_direct_connect;
 
     /** True if a client should connect to the first server it finds and
      *  immediately start a race. */
     bool m_auto_connect;
-
-    /** True if this is a client and server in graphics mode made by server
-     *  creation screen. This is also used by connect-now to bypass stk
-     *  server in wan game. */
-    bool m_client_server;
 
     /** If this is a server, the server name. */
     irr::core::stringw m_server_name;
@@ -173,10 +168,6 @@ public:
     /** Returns if this instance is a client. */
     bool isClient() const { return !m_is_server; }
     // ------------------------------------------------------------------------
-    void setClientServer(bool val) { m_client_server = val; }
-    // ------------------------------------------------------------------------
-    bool isClientServer() const { return m_client_server; }
-    // ------------------------------------------------------------------------
     /** Sets the name of this server. */
     void setServerName(const irr::core::stringw &name)
     {
@@ -202,6 +193,11 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the game mode id and if grandprix from server database id. */
     std::pair<RaceManager::MinorRaceModeType, bool> getLocalGameMode(unsigned);
+    // ------------------------------------------------------------------------
+    void setDirectConnect(bool val) { m_direct_connect = val; }
+    // ------------------------------------------------------------------------
+    bool isDirectConnect() const { return m_direct_connect; }
+    // ------------------------------------------------------------------------
 
 };   // class NetworkConfig
 

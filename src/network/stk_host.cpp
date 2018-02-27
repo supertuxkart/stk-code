@@ -841,7 +841,8 @@ void STKHost::handleDirectSocketRequest(Network* lan_network)
     {
         // In case of a LAN connection, we only allow connections from
         // a LAN address (192.168*, ..., and 127.*).
-        if (!sender.isLAN() && !sender.isPublicAddressLAN())
+        if (!sender.isLAN() && !sender.isPublicAddressLAN() &&
+            !NetworkConfig::get()->isPublicServer())
         {
             Log::error("STKHost", "Client trying to connect from '%s'",
                        sender.toString().c_str());

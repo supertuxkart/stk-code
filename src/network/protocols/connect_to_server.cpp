@@ -78,7 +78,7 @@ void ConnectToServer::setup()
     // In case of LAN or client-server we already have the server's
     // and our ip address, so we can immediately start requesting a connection.
     m_state = (NetworkConfig::get()->isLAN() ||
-        NetworkConfig::get()->isClientServer()) ?
+        STKHost::get()->isClientServer()) ?
         GOT_SERVER_ADDRESS : SET_PUBLIC_ADDRESS;
 }   // setup
 
@@ -153,7 +153,7 @@ void ConnectToServer::asynchronousUpdate()
                 m_server_address.getIP() ==
                 STKHost::get()->getPublicAddress().getIP()) ||
                 (NetworkConfig::get()->isLAN() ||
-                NetworkConfig::get()->isClientServer()))
+                STKHost::get()->isClientServer()))
             {
                 // We're in the same lan (same public ip address).
                 // The state will change to CONNECTING
@@ -197,7 +197,7 @@ void ConnectToServer::asynchronousUpdate()
             Log::info("ConnectToServer", "Connected");
             // LAN networking does not use the stk server tables.
             if (NetworkConfig::get()->isWAN() &&
-                !NetworkConfig::get()->isClientServer())
+                !STKHost::get()->isClientServer())
             {
                 auto hide_address = std::make_shared<HidePublicAddress>();
                 hide_address->requestStart();
@@ -212,8 +212,6 @@ void ConnectToServer::asynchronousUpdate()
             {
                 return;
             }
-            // We don't need this flag anymore after connect to server
-            NetworkConfig::get()->setClientServer(false);
             m_state = DONE;
             break;
         case DONE:

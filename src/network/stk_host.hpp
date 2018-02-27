@@ -201,57 +201,61 @@ public:
     void        setErrorMessage(const irr::core::stringw &message);
     bool        isAuthorisedToControl() const;
 
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the last error (or "" if no error has happened). */
     const irr::core::stringw& getErrorMessage() const
-                                                { return m_error_message; }
-    // --------------------------------------------------------------------
+                                                    { return m_error_message; }
+    // ------------------------------------------------------------------------
     /** Returns true if a shutdown of the network infrastructure was
      *  requested. */
-    bool requestedShutdown() const { return m_shutdown.load(); }
-    // --------------------------------------------------------------------
+    bool requestedShutdown() const                { return m_shutdown.load(); }
+    // ------------------------------------------------------------------------
     /** Returns the current game setup. */
-    GameSetup* getGameSetup() { return m_game_setup; }
-    // --------------------------------------------------------------------
+    GameSetup* getGameSetup()                          { return m_game_setup; }
+    // ------------------------------------------------------------------------
     int receiveRawPacket(char *buffer, int buffer_len, 
                          TransportAddress* sender, int max_tries = -1)
     {
         return m_network->receiveRawPacket(buffer, buffer_len, sender,
                                            max_tries);
     }   // receiveRawPacket
-
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     void sendRawPacket(const BareNetworkString &buffer,
                        const TransportAddress& dst)
     {
         m_network->sendRawPacket(buffer, dst);
     }  // sendRawPacket
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns a const reference to the list of peers. */
-    const std::vector<STKPeer*> &getPeers() { return m_peers; }
-    // --------------------------------------------------------------------
+    const std::vector<STKPeer*> &getPeers()                 { return m_peers; }
+    // ------------------------------------------------------------------------
     /** Returns the next (unique) host id. */
     unsigned int getNextHostId() const
     {
         assert(m_next_unique_host_id >= 0);
         return m_next_unique_host_id;
     }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the number of currently connected peers. */
-    unsigned int getPeerCount() { return (int)m_peers.size(); }
-    // --------------------------------------------------------------------
+    unsigned int getPeerCount()                 { return (int)m_peers.size(); }
+    // ------------------------------------------------------------------------
     /** Sets the global host id of this host. */
-    void setMyHostId(uint8_t my_host_id) { m_host_id = my_host_id; }
-    // --------------------------------------------------------------------
+    void setMyHostId(uint8_t my_host_id)            { m_host_id = my_host_id; }
+    // ------------------------------------------------------------------------
     /** Returns the host id of this host. */
-    uint8_t getMyHostId() const { return m_host_id; }
-    // --------------------------------------------------------------------
+    uint8_t getMyHostId() const                           { return m_host_id; }
+    // ------------------------------------------------------------------------
     /** Sends a message from a client to the server. */
     void sendToServer(NetworkString *data, bool reliable = true)
     {
         assert(NetworkConfig::get()->isClient());
         m_peers[0]->sendPacket(data, reliable);
     }   // sendToServer
+    // ------------------------------------------------------------------------
+    /** True if this is a client and server in graphics mode made by server
+     *  creation screen. */
+    bool isClientServer() const          { return m_separate_process != NULL; }
+
 };   // class STKHost
 
 #endif // STK_HOST_HPP

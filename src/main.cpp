@@ -540,8 +540,8 @@ void cmdLineHelp()
                               " and the music.\n"
     "  -t,  --track=NAME       Start track NAME.\n"
     "       --gp=NAME          Start the specified Grand Prix.\n"
-    "       --add-gp-dir=DIR   Load Grand Prix files in DIR. Setting will be saved "
-                              "in config.xml under additional_gp_directory. Use "
+    "       --add-gp-dir=DIR   Load Grand Prix files in DIR. Setting will be saved\n"
+                              "in config.xml under additional_gp_directory. Use\n"
                               "--add-gp-dir=\"\" to unset.\n"
     "       --stk-config=FILE  use ./data/FILE instead of "
                               "./data/stk_config.xml\n"
@@ -567,7 +567,7 @@ void cmdLineHelp()
     "       --no-graphics      Do not display the actual race.\n"
     "       --demo-mode=t      Enables demo mode after t seconds of idle time in "
                                "main menu.\n"
-    "       --demo-tracks=t1,t2 List of tracks to be used in demo mode. No"
+    "       --demo-tracks=t1,t2 List of tracks to be used in demo mode. No\n"
     "                          spaces are allowed in the track names.\n"
     "       --demo-laps=n      Number of laps to use in a demo.\n"
     "       --demo-karts=n     Number of karts to use in a demo.\n"
@@ -578,6 +578,7 @@ void cmdLineHelp()
     // "       --test-ai=n        Use the test-ai for every n-th AI kart.\n"
     // "                          (so n=1 means all Ais will be the test ai)\n"
     // "
+    "       --network-console  Enable network console.\n"
     "       --wan-server=name  Start a Wan server (not a playing client).\n"
     "       --public-server    Allow direct connection to the server (without stk server)\n"
     "       --lan-server=name  Start a LAN server (not a playing client).\n"
@@ -586,11 +587,10 @@ void cmdLineHelp()
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --port=n           Port number to use.\n"
-    "       --my-address=1.1.1.1:1  Own IP address (can replace stun protocol)\n"
     "       --disable-lan      Disable LAN detection (connect using WAN).\n"
     "       --auto-connect     Automatically connect to fist server and start race\n"
     "       --max-players=n    Maximum number of clients (server only).\n"
-    "       --no-console       Does not write messages in the console but to\n"
+    "       --no-console-log   Does not write messages in the console but to\n"
     "                          stdout.log.\n"
     "  -h,  --help             Show this help.\n"
     "       --log=N            Set the verbosity to a value between\n"
@@ -675,7 +675,7 @@ int handleCmdLineOutputModifier()
         Log::disableColor();
         Log::verbose("main", "Colours disabled.");
     }
-    if(CommandLine::has("--no-console"))
+    if(CommandLine::has("--no-console-log"))
         Log::toggleConsoleLog(false);
 
     return 0;
@@ -1032,7 +1032,7 @@ int handleCmdLine()
     }
 
     // Networking command lines
-    if(CommandLine::has("--start-console"))
+    if(CommandLine::has("--network-console"))
         STKHost::m_enable_console = true;
 
     if (CommandLine::has("--server-password", &s))
@@ -1066,7 +1066,7 @@ int handleCmdLine()
         else
         {
             NetworkConfig::get()->setIsWAN();
-            NetworkConfig::get()->setClientServer(true);
+            NetworkConfig::get()->setDirectConnect(true);
         }
         NetworkConfig::get()->setIsServer(false);
         Log::info("main", "Try to connect to server '%s'.",

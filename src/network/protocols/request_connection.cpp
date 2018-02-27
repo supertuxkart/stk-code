@@ -76,9 +76,10 @@ void RequestConnection::asynchronousUpdate()
         case NONE:
         {
             if (NetworkConfig::get()->isLAN() ||
-                NetworkConfig::get()->isClientServer())
+                NetworkConfig::get()->isDirectConnect() ||
+                STKHost::get()->isClientServer())
             {
-                if (NetworkConfig::get()->isClientServer())
+                if (STKHost::get()->isClientServer())
                 {
                     // Allow 10 seconds for the separate process to fully
                     // start-up
@@ -88,6 +89,7 @@ void RequestConnection::asynchronousUpdate()
                     ServersManager::get()->getServerByID(m_server_id);
                 BareNetworkString message(std::string("connection-request"));
                 STKHost::get()->sendRawPacket(message, server->getAddress());
+                NetworkConfig::get()->setDirectConnect(false);
                 m_state = DONE;
             }
             else
