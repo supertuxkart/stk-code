@@ -60,6 +60,9 @@ private:
     /** If set this will disable coloring of log messages. */
     static bool     m_no_colors;
 
+    /** If false that logging will only be saved to a file. */
+    static bool     m_console_log;
+
     /** The file where stdout output will be written */
     static FILE* m_file_stdout;
 
@@ -117,6 +120,7 @@ public:
 
     static void closeOutputFiles();
     static void flushBuffers();
+    static void toggleConsoleLog(bool val);
 
     // ------------------------------------------------------------------------
     /** Sets the number of lines to buffer. Setting the buffer size to a 

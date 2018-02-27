@@ -592,7 +592,6 @@ void cmdLineHelp()
     "       --max-players=n    Maximum number of clients (server only).\n"
     "       --no-console       Does not write messages in the console but to\n"
     "                          stdout.log.\n"
-    "       --console          Write messages in the console and files\n"
     "  -h,  --help             Show this help.\n"
     "       --log=N            Set the verbosity to a value between\n"
     "                          0 (Debug) and 5 (Only Fatal messages)\n"
@@ -676,12 +675,8 @@ int handleCmdLineOutputModifier()
         Log::disableColor();
         Log::verbose("main", "Colours disabled.");
     }
-
-    if(CommandLine::has("--console"))
-        UserConfigParams::m_log_errors_to_console=true;
     if(CommandLine::has("--no-console"))
-        UserConfigParams::m_log_errors_to_console=false;
-
+        Log::toggleConsoleLog(false);
 
     return 0;
 }
@@ -734,7 +729,6 @@ int handleCmdLinePreliminary()
     if(CommandLine::has("--no-graphics") || CommandLine::has("-l"))
     {
         ProfileWorld::disableGraphics();
-        UserConfigParams::m_log_errors_to_console=true;
     }
 
     if(CommandLine::has("--screensize", &s) || CommandLine::has("-s", &s))
