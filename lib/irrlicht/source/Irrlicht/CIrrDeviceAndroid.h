@@ -123,6 +123,7 @@ namespace irr
         bool IsMousePressed;
         float GamepadAxisX;
         float GamepadAxisY;
+        int DefaultOrientation;
 
         video::SExposedVideoData ExposedVideoData;
 

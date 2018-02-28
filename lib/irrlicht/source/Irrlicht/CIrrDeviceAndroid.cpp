@@ -50,7 +50,8 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     Gyroscope(0),
     IsMousePressed(false),
     GamepadAxisX(0),
-    GamepadAxisY(0)
+    GamepadAxisY(0),
+    DefaultOrientation(0)
 {
     #ifdef _DEBUG
     setDebugName("CIrrDeviceAndroid");
@@ -62,6 +63,8 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     Android->userData = this;
     Android->onAppCmd = handleAndroidCommand;
     Android->onInputEvent = handleInput;
+    
+    DefaultOrientation = getDefaultRotation();
     
     printConfig();
     createKeyMap();
@@ -250,9 +253,25 @@ bool CIrrDeviceAndroid::run()
                 case ASENSOR_TYPE_ACCELEROMETER:
                     SEvent accEvent;
                     accEvent.EventType = EET_ACCELEROMETER_EVENT;
-                    accEvent.AccelerometerEvent.X = event.acceleration.x;
-                    accEvent.AccelerometerEvent.Y = event.acceleration.y;
+                    
+                    if (DefaultOrientation == 0)
+                    {
+                        accEvent.AccelerometerEvent.X = event.acceleration.x;
+                        accEvent.AccelerometerEvent.Y = event.acceleration.y;
+                    }
+                    else
+                    {
+                        accEvent.AccelerometerEvent.X = event.acceleration.y;
+                        accEvent.AccelerometerEvent.Y = -event.acceleration.x;
+                    }
                     accEvent.AccelerometerEvent.Z = event.acceleration.z;
+                    
+                    if (accEvent.AccelerometerEvent.X < 0)
+                    {
+                        accEvent.AccelerometerEvent.X *= -1;
+                        accEvent.AccelerometerEvent.Y *= -1;
+                        accEvent.AccelerometerEvent.Z *= -1;
+                    }
 
                     postEventFromUser(accEvent);
                     break;
