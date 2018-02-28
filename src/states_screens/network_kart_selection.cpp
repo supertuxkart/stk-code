@@ -223,10 +223,6 @@ bool NetworkKartSelectionScreen::onEscapePressed()
     // then remove the lobby screen (you left the server)
     StateManager::get()->popMenu();
     ServerSelection::getInstance()->refresh();
-    // notify the server that we left
-    auto clrp = LobbyProtocol::get<ClientLobby>();
-    if (clrp)
-        clrp->leave();
     STKHost::get()->shutdown();
     return true; // remove the screen
 }   // onEscapePressed

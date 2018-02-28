@@ -29,6 +29,8 @@
 #else
 #  include <iostream>
 #  include <unistd.h>
+#  include <signal.h>
+#  include <sys/wait.h>
 #endif
 
 // ----------------------------------------------------------------------------
@@ -57,11 +59,9 @@ std::string SeparateProcess::getCurrentExecutableLocation()
 
 // ----------------------------------------------------------------------------
 SeparateProcess::SeparateProcess(const std::string& exe,
-                                 const std::string& argument,
-                                 const std::string& destroy_command)
-               : m_destroy_command(destroy_command)
+                                 const std::string& argument, bool create_pipe)
 {
-    if (!createChildProcess(exe, argument))
+    if (!createChildProcess(exe, argument, create_pipe))
     {
         Log::fatal("SeparateProcess", "Failed to run %s %s",
             exe.c_str(), argument.c_str());
@@ -72,16 +72,30 @@ SeparateProcess::SeparateProcess(const std::string& exe,
 // ----------------------------------------------------------------------------
 SeparateProcess::~SeparateProcess()
 {
-    std::string s = sendCommand(m_destroy_command);
-    if (s != m_destroy_command)
+#ifndef WIN32
+    if (m_child_stdin_write != -1 && m_child_stdout_read != -1)
     {
-        Log::error("SeparateProcess", "Could not shutdown the separate "
-            "process properly");
+        close(m_child_stdin_write);
+        close(m_child_stdout_read);
     }
-
-#ifdef LINUX
-    close(m_child_stdin_write);
-    close(m_child_stdout_read);
+    kill(m_child_pid, SIGTERM);
+    bool dead = false;
+    for (int i = 0; i < 5; i++)
+    {
+        int status;
+        if (waitpid(m_child_pid, &status, WNOHANG) == m_child_pid)
+        {
+            dead = true;
+            break;
+        }
+        StkTime::sleep(1000);
+    }
+    if (!dead)
+    {
+        Log::info("SeparateProcess", "Timeout waiting for child process to "
+            "self-destroying, killing it anyway");
+        kill(m_child_pid, SIGKILL);
+    }
 #endif
     Log::info("SeparateProcess", "Destroyed");
 }   // ~SeparateProcess
@@ -93,7 +107,8 @@ SeparateProcess::~SeparateProcess()
  */
 #ifdef WIN32
 bool SeparateProcess::createChildProcess(const std::string& exe,
-                                         const std::string& argument)
+                                         const std::string& argument,
+                                         bool create_pipe)
 {
     // Based on: https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx
     SECURITY_ATTRIBUTES sec_attr;
@@ -103,35 +118,36 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
     sec_attr.bInheritHandle       = TRUE;
     sec_attr.lpSecurityDescriptor = NULL;
 
-    // Create a pipe for the child process's STDOUT.
-
-    if (!CreatePipe(&m_child_stdout_read, &m_child_stdout_write, &sec_attr, 0))
+    // Create a pipe for the child process's STDOUT if needed.
+    if (create_pipe)
     {
-        Log::error("SeparateProcess", "Error creating StdoutRd CreatePipe");
-        return false;
-    }
+        if (!CreatePipe(&m_child_stdout_read, &m_child_stdout_write, &sec_attr, 0))
+        {
+            Log::error("SeparateProcess", "Error creating StdoutRd CreatePipe");
+            return false;
+        }
 
-    // Ensure the read handle to the pipe for STDOUT is not inherited.
-    if (!SetHandleInformation(m_child_stdout_read, HANDLE_FLAG_INHERIT, 0))
-    {
-        Log::error("SeparateProcess", "Stdout SetHandleInformation");
-        return false;
-    }
+        // Ensure the read handle to the pipe for STDOUT is not inherited.
+        if (!SetHandleInformation(m_child_stdout_read, HANDLE_FLAG_INHERIT, 0))
+        {
+            Log::error("SeparateProcess", "Stdout SetHandleInformation");
+            return false;
+        }
 
-    // Create a pipe for the child process's STDIN.
-    if (!CreatePipe(&m_child_stdin_read, &m_child_stdin_write, &sec_attr, 0))
-    {
-        Log::error("SeparateProcess", "Stdin CreatePipe");
-        return false;
-    }
+        // Create a pipe for the child process's STDIN.
+        if (!CreatePipe(&m_child_stdin_read, &m_child_stdin_write, &sec_attr, 0))
+        {
+            Log::error("SeparateProcess", "Stdin CreatePipe");
+            return false;
+        }
 
-    // Ensure the write handle to the pipe for STDIN is not inherited.
-    if (!SetHandleInformation(m_child_stdin_write, HANDLE_FLAG_INHERIT, 0))
-    {
-        Log::error("SeparateProcess", "Stdin SetHandleInformation");
-        return false;
+        // Ensure the write handle to the pipe for STDIN is not inherited.
+        if (!SetHandleInformation(m_child_stdin_write, HANDLE_FLAG_INHERIT, 0))
+        {
+            Log::error("SeparateProcess", "Stdin SetHandleInformation");
+            return false;
+        }
     }
-
     PROCESS_INFORMATION piProcInfo;
     STARTUPINFO siStartInfo;
 
@@ -143,16 +159,19 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
     // This structure specifies the STDIN and STDOUT handles for redirection.
 
     ZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
-    siStartInfo.cb = sizeof(STARTUPINFO);
-    siStartInfo.hStdError = m_child_stdout_write;
-    siStartInfo.hStdOutput = m_child_stdout_write;
-    siStartInfo.hStdInput = m_child_stdin_read;
-    siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+    if (create_pipe)
+    {
+        siStartInfo.cb = sizeof(STARTUPINFO);
+        siStartInfo.hStdError = m_child_stdout_write;
+        siStartInfo.hStdOutput = m_child_stdout_write;
+        siStartInfo.hStdInput = m_child_stdin_read;
+        siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+    }
 
     // Create the child process.
-
+    std::string cmd = (exe + argument);
     bool success = CreateProcess(NULL,
-        (exe + argument).c_str(),      // command line
+        &cmd[0],               // command line
         NULL,                  // process security attributes
         NULL,                  // primary thread security attributes
         TRUE,                  // handles are inherited
@@ -180,7 +199,8 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
 #else    // linux and osx
 
 bool SeparateProcess::createChildProcess(const std::string& exe,
-                                         const std::string& argument)
+                                         const std::string& argument,
+                                         bool create_pipe)
 {
     const int PIPE_READ=0;
     const int PIPE_WRITE=1;
@@ -188,19 +208,22 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
     int       stdout_pipe[2];
     int       child;
 
-    if (pipe(stdin_pipe) < 0)
+    if (create_pipe)
     {
-        Log::error("SeparateProcess", "Can't allocate pipe for input "
-            "redirection.");
-        return -1;
-    }
-    if (pipe(stdout_pipe) < 0)
-    {
-        close(stdin_pipe[PIPE_READ]);
-        close(stdin_pipe[PIPE_WRITE]);
-        Log::error("SeparateProcess", "allocating pipe for child output "
-            "redirect");
-        return false;
+        if (pipe(stdin_pipe) < 0)
+        {
+            Log::error("SeparateProcess", "Can't allocate pipe for input "
+                "redirection.");
+            return -1;
+        }
+        if (pipe(stdout_pipe) < 0)
+        {
+            close(stdin_pipe[PIPE_READ]);
+            close(stdin_pipe[PIPE_WRITE]);
+            Log::error("SeparateProcess", "allocating pipe for child output "
+                "redirect");
+            return false;
+        }
     }
 
     child = fork();
@@ -209,25 +232,28 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
         // Child process:
         Log::info("SeparateProcess", "Child process started.");
 
-        // redirect stdin
-        if (dup2(stdin_pipe[PIPE_READ], STDIN_FILENO) == -1)
+        if (create_pipe)
         {
-            Log::error("SeparateProcess", "Redirecting stdin");
-            return false;
-        }
+            // redirect stdin
+            if (dup2(stdin_pipe[PIPE_READ], STDIN_FILENO) == -1)
+            {
+                Log::error("SeparateProcess", "Redirecting stdin");
+                return false;
+            }
 
-        // redirect stdout
-        if (dup2(stdout_pipe[PIPE_WRITE], STDOUT_FILENO) == -1)
-        {
-            Log::error("SeparateProcess", "Redirecting stdout");
-            return false;
-        }
+            // redirect stdout
+            if (dup2(stdout_pipe[PIPE_WRITE], STDOUT_FILENO) == -1)
+            {
+                Log::error("SeparateProcess", "Redirecting stdout");
+                return false;
+            }
 
-        // all these are for use by parent only
-        close(stdin_pipe[PIPE_READ]);
-        close(stdin_pipe[PIPE_WRITE]);
-        close(stdout_pipe[PIPE_READ]);
-        close(stdout_pipe[PIPE_WRITE]);
+            // all these are for use by parent only
+            close(stdin_pipe[PIPE_READ]);
+            close(stdin_pipe[PIPE_WRITE]);
+            close(stdout_pipe[PIPE_READ]);
+            close(stdout_pipe[PIPE_WRITE]);
+        }
 
         // run child process image
         std::vector<char*> argv;
@@ -247,20 +273,27 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
     }
     else if (child > 0)
     {
-        // parent continues here
-        // close unused file descriptors, these are for child only
-        close(stdin_pipe[PIPE_READ]);
-        close(stdout_pipe[PIPE_WRITE]);
-        m_child_stdin_write = stdin_pipe[PIPE_WRITE];
-        m_child_stdout_read = stdout_pipe[PIPE_READ];
+        m_child_pid = child;
+        if (create_pipe)
+        {
+            // parent continues here
+            // close unused file descriptors, these are for child only
+            close(stdin_pipe[PIPE_READ]);
+            close(stdout_pipe[PIPE_WRITE]);
+            m_child_stdin_write = stdin_pipe[PIPE_WRITE];
+            m_child_stdout_read = stdout_pipe[PIPE_READ];
+        }
     }
     else   // child < 0
     {
-        // failed to create child
-        close(stdin_pipe[PIPE_READ]);
-        close(stdin_pipe[PIPE_WRITE]);
-        close(stdout_pipe[PIPE_READ]);
-        close(stdout_pipe[PIPE_WRITE]);
+        if (create_pipe)
+        {
+            // failed to create child
+            close(stdin_pipe[PIPE_READ]);
+            close(stdin_pipe[PIPE_WRITE]);
+            close(stdout_pipe[PIPE_READ]);
+            close(stdout_pipe[PIPE_WRITE]);
+        }
         return false;
     }
     return true;

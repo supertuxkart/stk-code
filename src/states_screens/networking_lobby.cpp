@@ -212,10 +212,6 @@ void NetworkingLobby::tearDown()
 
 bool NetworkingLobby::onEscapePressed()
 {
-    // notify the server that we left
-    auto clrp = LobbyProtocol::get<ClientLobby>();
-    if (clrp)
-        clrp->leave();
     STKHost::get()->shutdown();
     return true; // close the screen
 }   // onEscapePressed

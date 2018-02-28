@@ -28,8 +28,6 @@
 class SeparateProcess
 {
 private:
-    const std::string m_destroy_command;
-
 #ifdef WIN32
     // Various handles for the window pipes
     HANDLE m_child_stdin_read;
@@ -37,13 +35,14 @@ private:
     HANDLE m_child_stdout_read;
     HANDLE m_child_stdout_write;
 #else
-    int m_child_stdin_write;
-    int m_child_stdout_read;
+    int m_child_stdin_write = -1;
+    int m_child_stdout_read = -1;
+    int m_child_pid = -1;
 #endif
 
     // ------------------------------------------------------------------------
     bool createChildProcess(const std::string& exe,
-                            const std::string& argument);
+                            const std::string& argument, bool create_pipe);
     // ------------------------------------------------------------------------
     std::string getLine();
 
@@ -52,7 +51,7 @@ public:
     static std::string getCurrentExecutableLocation();
     // ------------------------------------------------------------------------
      SeparateProcess(const std::string& exe, const std::string& argument,
-                     const std::string& destroy_command);
+                     bool create_pipe = false);
     // ------------------------------------------------------------------------
     ~SeparateProcess();
     // ------------------------------------------------------------------------

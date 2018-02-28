@@ -157,6 +157,7 @@
 #    include <direct.h>
 #  endif
 #else
+#  include <signal.h>
 #  include <unistd.h>
 #endif
 #include <stdexcept>
@@ -1569,13 +1570,23 @@ void askForInternetPermission()
     #endif
 #endif
 
+#ifndef WIN32
+void signalTerminateHandler(int signum)
+{
+    if (main_loop)
+        main_loop->abort();
+}   // signalTerminateHandler
+#endif
+
 // ----------------------------------------------------------------------------
 int main(int argc, char *argv[] )
 {
     CommandLine::init(argc, argv);
 
     CrashReporting::installHandlers();
-
+#ifndef WIN32
+    signal(SIGTERM, signalTerminateHandler);
+#endif
     srand(( unsigned ) time( 0 ));
 
     try
@@ -1874,8 +1885,8 @@ int main(int argc, char *argv[] )
     StateManager::get()->resetActivePlayers();
     if(input_manager) delete input_manager; // if early crash avoid delete NULL
 
-    if(NetworkConfig::get()->isNetworking() && STKHost::existHost())
-        STKHost::get()->abort();
+    if (STKHost::existHost())
+        STKHost::get()->shutdown();
 
     cleanSuperTuxKart();
 
@@ -1984,12 +1995,7 @@ static void cleanSuperTuxKart()
     // in the request manager, so it can not be deleted earlier.
     if(addons_manager)  delete addons_manager;
 
-    // FIXME: do we need to wait for threads there, can they be
-    // moved further up?
     ServersManager::deallocate();
-    if(NetworkConfig::get()->isNetworking() && STKHost::existHost())
-        STKHost::destroy();
-
     cleanUserConfig();
 
     StateManager::deallocate();
