@@ -224,13 +224,18 @@ void CreateServerScreen::createServer()
         server_string += token;
     }
 
+    std::string server_id_file = "server_id_file_";
+    server_id_file += StringUtils::toString(StkTime::getTimeSinceEpoch());
+    NetworkConfig::get()->setServerIdFile(
+        file_manager->getUserConfigFile(server_id_file));
+
     char option[1024];
     sprintf(option, " --no-graphics --type=%d --difficulty=%d "
         "--max-players=%d --network-console --no-console-log "
-        "--stdout=server.log",
+        "--stdout=server.log --server-id-file=%s",
         gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER),
         difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER),
-        max_players);
+        max_players, server_id_file.c_str());
     SeparateProcess* sp =
         new SeparateProcess(SeparateProcess::getCurrentExecutableLocation(),
         server_string + option + password, "quit");

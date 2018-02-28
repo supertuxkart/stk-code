@@ -41,6 +41,8 @@
 #include "utils/random_generator.hpp"
 #include "utils/time.hpp"
 
+#include <fstream>
+
 /** This is the central game setup protocol running in the server. It is
  *  mostly a finite state machine. Note that all nodes in ellipses and light
  *  grey background are actual states; nodes in boxes and white background 
@@ -191,6 +193,20 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
 }   // notifyEventAsynchronous
 
 //-----------------------------------------------------------------------------
+/** Create the server id file to let the graphics server client connect. */
+void ServerLobby::createServerIdFile()
+{
+    const std::string& sid = NetworkConfig::get()->getServerIdFile();
+    if (!sid.empty())
+    {
+        std::fstream fs;
+        fs.open(sid, std::ios::out);
+        fs.close();
+        NetworkConfig::get()->setServerIdFile("");
+    }
+}   // createServerIdFile
+
+//-----------------------------------------------------------------------------
 /** Find out the public IP server or poll STK server asynchronously. */
 void ServerLobby::asynchronousUpdate()
 {
@@ -204,6 +220,7 @@ void ServerLobby::asynchronousUpdate()
         {
             m_state = ACCEPTING_CLIENTS;
             STKHost::get()->startListening();
+            createServerIdFile();
             return;
         }
         STKHost::get()->setPublicAddress();
@@ -225,7 +242,10 @@ void ServerLobby::asynchronousUpdate()
         // to react to any requests before the server is registered.
         registerServer();
         if (m_server_registered)
+        {
             m_state = ACCEPTING_CLIENTS;
+            createServerIdFile();
+        }
         break;
     }
     case ACCEPTING_CLIENTS:

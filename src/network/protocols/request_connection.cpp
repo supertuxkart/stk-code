@@ -81,9 +81,22 @@ void RequestConnection::asynchronousUpdate()
             {
                 if (STKHost::get()->isClientServer())
                 {
-                    // Allow 10 seconds for the separate process to fully
-                    // start-up
-                    StkTime::sleep(10000);
+                    // Allow up to 10 seconds for the separate process to
+                    // fully start-up
+                    double timeout = StkTime::getRealTime() + 10.;
+                    while (StkTime::getRealTime() < timeout)
+                    {
+                        const std::string& sid = NetworkConfig::get()
+                            ->getServerIdFile();
+                        assert(!sid.empty());
+                        if (file_manager->fileExists(sid))
+                        {
+                            file_manager->removeFile(sid);
+                            break;
+                        }
+                        StkTime::sleep(10);
+                    }
+                    NetworkConfig::get()->setServerIdFile("");
                 }
                 const Server *server =
                     ServersManager::get()->getServerByID(m_server_id);

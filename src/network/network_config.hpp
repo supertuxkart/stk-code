@@ -24,7 +24,6 @@
 
 #include "network/transport_address.hpp"
 #include "race/race_manager.hpp"
-#include "utils/synchronised.hpp"
 
 #include "irrString.h"
 
@@ -87,6 +86,9 @@ private:
     /** Used by wan server. */
     uint32_t m_cur_user_id;
     std::string m_cur_user_token;
+
+    /** Used by client server to determine if the child server is created. */
+    std::string m_server_id_file;
 
     NetworkConfig();
 
@@ -217,6 +219,9 @@ public:
     // ------------------------------------------------------------------------
     void setUserDetails(Online::XMLRequest* r, const std::string& name);
     // ------------------------------------------------------------------------
+    void setServerIdFile(const std::string& id) { m_server_id_file = id; }
+    // ------------------------------------------------------------------------
+    const std::string& getServerIdFile() const { return m_server_id_file; }
 
 };   // class NetworkConfig
 

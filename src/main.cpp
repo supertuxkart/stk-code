@@ -1049,6 +1049,12 @@ int handleCmdLine()
         NetworkConfig::get()->setPassword(StringUtils::wideToUtf8(pw));
     }
 
+    if (CommandLine::has("--server-id-file", &s))
+    {
+        NetworkConfig::get()->setServerIdFile(
+            file_manager->getUserConfigFile(s));
+    }
+
     if(CommandLine::has("--max-players", &n))
         UserConfigParams::m_server_max_players=n;
     NetworkConfig::get()->
@@ -1100,7 +1106,7 @@ int handleCmdLine()
             }
             can_wan = true;
         }
-        else
+        else if (!can_wan)
         {
             Log::warn("main", "No saved online player session to create a wan server");
         }
