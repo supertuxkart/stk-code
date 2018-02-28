@@ -887,7 +887,6 @@ int handleCmdLine()
     int n;
     std::string s;
 
-    bool try_login = false;
     irr::core::stringw login, password;
 
     if (CommandLine::has("--unit-testing"))
@@ -1011,24 +1010,33 @@ int handleCmdLine()
     }   // --type
 
 
-    if(CommandLine::has("--login", &s) )
-    {
+    if (CommandLine::has("--login", &s))
         login = s.c_str();
-        try_login = true;
-    }   // --login
-
-    if(CommandLine::has("--password", &s))
+    if (CommandLine::has("--password", &s))
         password = s.c_str();
-    if (try_login)
+
+    bool can_wan = false;
+    if (!login.empty() && !password.empty())
     {
         irr::core::stringw s;
         Online::XMLRequest* request =
                 PlayerManager::requestSignIn(login, password);
-
-        if (request->isSuccess())
+        while (PlayerManager::getCurrentOnlineState() != PlayerProfile::OS_SIGNED_IN)
         {
-            Log::info("Main", "Logged in from command-line.");
+            Online::RequestManager::get()->update(0.0f);
+            StkTime::sleep(1);
         }
+        Log::info("Main", "Logged in from command-line.");
+        can_wan = true;
+        delete request;
+    }
+
+    if (!can_wan && CommandLine::has("--login-id", &n) &&
+        CommandLine::has("--token", &s))
+    {
+        NetworkConfig::get()->setCurrentUserId(n);
+        NetworkConfig::get()->setCurrentUserToken(s);
+        can_wan = true;
     }
 
     // Networking command lines
@@ -1080,28 +1088,29 @@ int handleCmdLine()
 
     if (CommandLine::has("--wan-server", &s))
     {
+        // Try to use saved user token if exists
         PlayerProfile* player = PlayerManager::getCurrentPlayer();
-        if (player && player->wasOnlineLastTime() && player->wasOnlineLastTime() &&
-            player->hasSavedSession())
+        if (!can_wan && player && player->wasOnlineLastTime() &&
+            player->wasOnlineLastTime() && player->hasSavedSession())
         {
-            while (true)
+            while (PlayerManager::getCurrentOnlineState() != PlayerProfile::OS_SIGNED_IN)
             {
                 Online::RequestManager::get()->update(0.0f);
                 StkTime::sleep(1);
-                if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
-                {
-                    break;
-                }
             }
+            can_wan = true;
+        }
+        else
+        {
+            Log::warn("main", "No saved online player session to create a wan server");
+        }
+        if (can_wan)
+        {
             NetworkConfig::get()->setServerName(StringUtils::xmlDecode(s));
             NetworkConfig::get()->setIsServer(true);
             NetworkConfig::get()->setIsWAN();
             STKHost::create();
             Log::info("main", "Creating a WAN server '%s'.", s.c_str());
-        }
-        else
-        {
-            Log::warn("main", "No saved online player session to create a wan server");
         }
     }
     else if (CommandLine::has("--lan-server", &s))

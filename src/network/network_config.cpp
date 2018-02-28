@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/network_config.hpp"
+#include "online/xml_request.hpp"
 
 NetworkConfig *NetworkConfig::m_network_config = NULL;
 bool           NetworkConfig::m_disable_lan    = false;
@@ -41,6 +42,8 @@ NetworkConfig::NetworkConfig()
     m_is_public_server      = false;
     m_max_players           = 4;
     m_direct_connect        = false;
+    m_cur_user_id           = 0;
+    m_cur_user_token        = "";
     m_server_name           = "";
     m_password              = "";
     m_server_discovery_port = 2757;
@@ -106,3 +109,10 @@ std::pair<RaceManager::MinorRaceModeType, bool>
     return { RaceManager::MINOR_MODE_NORMAL_RACE, false };
 
 }   // getLocalGameMode
+
+// ----------------------------------------------------------------------------
+void NetworkConfig::setUserDetails(Online::XMLRequest* r,
+                                   const std::string& name)
+{
+    assert(!m_cur_user_token.empty());
+}   // setUserDetails

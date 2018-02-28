@@ -28,6 +28,11 @@
 
 #include "irrString.h"
 
+namespace Online
+{
+    class XMLRequest;
+}
+
 class NetworkConfig
 {
 private:
@@ -78,6 +83,10 @@ private:
 
     /** If this is a server, the server name. */
     irr::core::stringw m_server_name;
+
+    /** Used by wan server. */
+    uint32_t m_cur_user_id;
+    std::string m_cur_user_token;
 
     NetworkConfig();
 
@@ -197,6 +206,16 @@ public:
     void setDirectConnect(bool val) { m_direct_connect = val; }
     // ------------------------------------------------------------------------
     bool isDirectConnect() const { return m_direct_connect; }
+    // ------------------------------------------------------------------------
+    void setCurrentUserId(uint32_t id) { m_cur_user_id = id ; }
+    // ------------------------------------------------------------------------
+    void setCurrentUserToken(const std::string& t) { m_cur_user_token = t; }
+    // ------------------------------------------------------------------------
+    uint32_t getCurrentUserId() const { return m_cur_user_id; }
+    // ------------------------------------------------------------------------
+    const std::string& getCurrentUserToken() const { return m_cur_user_token; }
+    // ------------------------------------------------------------------------
+    void setUserDetails(Online::XMLRequest* r, const std::string& name);
     // ------------------------------------------------------------------------
 
 };   // class NetworkConfig

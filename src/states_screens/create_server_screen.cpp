@@ -215,6 +215,15 @@ void CreateServerScreen::createServer()
     std::string server_string = NetworkConfig::get()->isWAN() ?
         "--public-server --wan-server=" : "--lan-server=";
     server_string += StringUtils::xmlEncode(name);
+    if (NetworkConfig::get()->isWAN())
+    {
+        char token[1024];
+        sprintf(token, " --login-id=%d --token=%s",
+            NetworkConfig::get()->getCurrentUserId(),
+            NetworkConfig::get()->getCurrentUserToken().c_str());
+        server_string += token;
+    }
+
     char option[1024];
     sprintf(option, " --no-graphics --type=%d --difficulty=%d "
         "--max-players=%d --network-console --no-console-log "
