@@ -18,13 +18,13 @@
 
 #include "network/protocols/request_connection.hpp"
 
-#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
+#include "online/xml_request.hpp"
 
 using namespace Online;
 
@@ -95,9 +95,8 @@ void RequestConnection::asynchronousUpdate()
             else
             {
                 m_request = new ServerJoinRequest();
-                PlayerManager::setUserDetails(m_request, "request-connection",
-                                               Online::API::SERVER_PATH);
-
+                NetworkConfig::get()->setUserDetails(m_request,
+                    "request-connection");
                 m_request->addParameter("server_id", m_server_id);
                 m_request->queue();
                 m_state = REQUEST_PENDING;

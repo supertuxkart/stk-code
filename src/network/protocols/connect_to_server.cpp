@@ -18,7 +18,6 @@
 
 #include "network/protocols/connect_to_server.hpp"
 
-#include "config/player_manager.hpp"
 #include "network/event.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/get_peer_address.hpp"
@@ -263,8 +262,7 @@ void ConnectToServer::registerWithSTKServer()
     // STK server.
     const TransportAddress& addr = STKHost::get()->getPublicAddress();
     Online::XMLRequest *request  = new Online::XMLRequest();
-    PlayerManager::setUserDetails(request, "set",
-                                  Online::API::SERVER_PATH);
+    NetworkConfig::get()->setUserDetails(request, "set");
     request->addParameter("address", addr.getIP());
     request->addParameter("port", addr.getPort());
     request->addParameter("private_port", STKHost::get()->getPrivatePort());
@@ -301,8 +299,7 @@ void ConnectToServer::registerWithSTKServer()
 void ConnectToServer::handleQuickConnect()
 {
     Online::XMLRequest *request = new Online::XMLRequest();
-    PlayerManager::setUserDetails(request, "quick-join",
-                                  Online::API::SERVER_PATH);
+    NetworkConfig::get()->setUserDetails(request, "quick-join");
     request->executeNow();
 
     const XMLNode * result = request->getXMLData();

@@ -18,7 +18,6 @@
 
 #include "network/protocols/server_lobby.hpp"
 
-#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
@@ -351,7 +350,7 @@ void ServerLobby::registerServer()
 {
     Online::XMLRequest *request = new Online::XMLRequest();
     const TransportAddress& addr = STKHost::get()->getPublicAddress();
-    PlayerManager::setUserDetails(request, "create", Online::API::SERVER_PATH);
+    NetworkConfig::get()->setUserDetails(request, "create");
     request->addParameter("address",      addr.getIP()                    );
     request->addParameter("port",         addr.getPort()                  );
     request->addParameter("private_port",
@@ -392,7 +391,7 @@ void ServerLobby::unregisterServer()
 {
     const TransportAddress &addr = STKHost::get()->getPublicAddress();
     Online::XMLRequest* request = new Online::XMLRequest();
-    PlayerManager::setUserDetails(request, "stop", Online::API::SERVER_PATH);
+    NetworkConfig::get()->setUserDetails(request, "stop");
 
     request->addParameter("address", addr.getIP());
     request->addParameter("port", addr.getPort());
@@ -520,8 +519,7 @@ void ServerLobby::checkIncomingConnectionRequests()
     // Now poll the stk server
     last_poll_time = StkTime::getRealTime();
     Online::XMLRequest* request = new Online::XMLRequest();
-    PlayerManager::setUserDetails(request, "poll-connection-requests",
-                                  Online::API::SERVER_PATH);
+    NetworkConfig::get()->setUserDetails(request, "poll-connection-requests");
 
     const TransportAddress &addr = STKHost::get()->getPublicAddress();
     request->addParameter("address", addr.getIP()  );
