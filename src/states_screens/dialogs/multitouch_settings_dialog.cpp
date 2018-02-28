@@ -51,17 +51,6 @@ MultitouchSettingsDialog::~MultitouchSettingsDialog()
 
 void MultitouchSettingsDialog::beforeAddingWidgets()
 {
-    SpinnerWidget* accelerometer = getWidget<SpinnerWidget>("accelerometer");
-    assert(accelerometer != NULL);
-
-    accelerometer->m_properties[PROP_WRAP_AROUND] = "true";
-    accelerometer->clearLabels();
-    accelerometer->addLabel(_("Disabled"));
-    accelerometer->addLabel(_("Tablet"));
-    accelerometer->addLabel(_("Phone"));
-    accelerometer->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    accelerometer->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
-
     updateValues();
 }
 
@@ -94,10 +83,11 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         assert(buttons_inv != NULL);
         UserConfigParams::m_multitouch_inverted = buttons_inv->getState();
 
-        SpinnerWidget* accelerometer = getWidget<SpinnerWidget>("accelerometer");
+        CheckBoxWidget* accelerometer = getWidget<CheckBoxWidget>("accelerometer");
         assert(accelerometer != NULL);
 
-        UserConfigParams::m_multitouch_accelerometer = accelerometer->getValue();
+        UserConfigParams::m_multitouch_accelerometer = accelerometer->
+                                                            getState() ? 1 : 0;
 
         MultitouchDevice* touch_device = input_manager->getDeviceManager()->
                                                         getMultitouchDevice();
@@ -154,9 +144,9 @@ void MultitouchSettingsDialog::updateValues()
     assert(buttons_inv != NULL);
     buttons_inv->setState(UserConfigParams::m_multitouch_inverted);
 
-    SpinnerWidget* accelerometer = getWidget<SpinnerWidget>("accelerometer");
+    CheckBoxWidget* accelerometer = getWidget<CheckBoxWidget>("accelerometer");
     assert(accelerometer != NULL);
-    accelerometer->setValue(UserConfigParams::m_multitouch_accelerometer);
+    accelerometer->setState(UserConfigParams::m_multitouch_accelerometer != 0);
 }
 
 // -----------------------------------------------------------------------------

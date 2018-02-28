@@ -1196,17 +1196,9 @@ EventPropagation InputManager::input(const SEvent& event)
                     
                 float factor = UserConfigParams::m_multitouch_tilt_factor;
                 factor = std::max(factor, 0.1f);
-
-                if (UserConfigParams::m_multitouch_accelerometer == 1)
-                {
-                    button->axis_x = (float)-event.AccelerometerEvent.X / factor;
-                    device->handleControls(button);
-                }
-                else if (UserConfigParams::m_multitouch_accelerometer == 2)
-                {
-                    button->axis_x = (float)event.AccelerometerEvent.Y / factor;
-                    device->handleControls(button);
-                }
+                button->axis_x = (float)event.AccelerometerEvent.Y / factor;
+                
+                device->handleControls(button);
             }
         }
     }
