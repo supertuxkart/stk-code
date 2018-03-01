@@ -212,16 +212,22 @@ void CreateServerScreen::createServer()
 #else
 
     NetworkConfig::get()->setIsServer(false);
-    std::string server_string = NetworkConfig::get()->isWAN() ?
-        "--public-server --wan-server=" : "--lan-server=";
-    server_string += StringUtils::xmlEncode(name);
+    std::ostringstream server_cfg;
+#ifdef WIN32
+    server_cfg << " ";
+#endif
+
+    const std::string server_name = StringUtils::xmlEncode(name);
     if (NetworkConfig::get()->isWAN())
     {
-        char token[1024];
-        sprintf(token, " --login-id=%d --token=%s",
-            NetworkConfig::get()->getCurrentUserId(),
-            NetworkConfig::get()->getCurrentUserToken().c_str());
-        server_string += token;
+        server_cfg << "--public-server --wan-server=" <<
+            server_name << " --login-id=" <<
+            NetworkConfig::get()->getCurrentUserId() << " --token=" <<
+            NetworkConfig::get()->getCurrentUserToken();
+    }
+    else
+    {
+        server_cfg << "--lan-server=" << server_name;
     }
 
     std::string server_id_file = "server_id_file_";
@@ -229,15 +235,17 @@ void CreateServerScreen::createServer()
     NetworkConfig::get()->setServerIdFile(
         file_manager->getUserConfigFile(server_id_file));
 
-    char option[1024];
-    sprintf(option, " --no-graphics --type=%d --difficulty=%d "
-        "--max-players=%d --stdout=server.log --server-id-file=%s",
-        gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER),
-        difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER),
-        max_players, server_id_file.c_str());
+    server_cfg << " --no-graphics --stdout=server.log --type=" <<
+        gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) <<
+        " --difficulty=" <<
+        difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER) <<
+        " --max-players=" << max_players <<
+        " --server-id-file=" << server_id_file <<
+        " --log=1 --no-console-log";
+
     SeparateProcess* sp =
         new SeparateProcess(SeparateProcess::getCurrentExecutableLocation(),
-        server_string + option + password);
+        server_cfg.str() + password);
 
     ServersManager::get()->cleanUpServers();
     TransportAddress address(0x7f000001,
