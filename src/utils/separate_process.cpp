@@ -45,7 +45,7 @@ std::string SeparateProcess::getCurrentExecutableLocation()
 #elif defined (__APPLE__)
     char path[1024];
     unsigned buf_size = 1024;
-    if (_NSGetExecutablePath(path, &buf_size) != 0)
+    if (_NSGetExecutablePath(path, &buf_size) == 0)
     {
         return file_manager->getFileSystem()->getAbsolutePath(path).c_str();
     }
