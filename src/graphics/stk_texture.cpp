@@ -79,7 +79,7 @@ STKTexture::STKTexture(video::IImage* img, const std::string& name)
 STKTexture::~STKTexture()
 {
 #ifndef SERVER_ONLY
-    if (m_texture_name != 0)
+    if (m_texture_name != 0 && !ProfileWorld::isNoGraphics())
     {
         glDeleteTextures(1, &m_texture_name);
     }
