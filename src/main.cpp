@@ -1684,6 +1684,7 @@ int main(int argc, char *argv[] )
             }
             else if (!CVS->isGLSL())
             {
+                #if !defined(ANDROID)
                 if (UserConfigParams::m_old_driver_popup)
                 {
                     #ifdef USE_GLES2
@@ -1700,6 +1701,7 @@ int main(int argc, char *argv[] )
                                             /*from queue*/ true);
                     GUIEngine::DialogQueue::get()->pushDialog(dialog);
                 }
+                #endif
                 Log::warn("OpenGL", "OpenGL version is too old!");
             }
         }
