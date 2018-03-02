@@ -84,6 +84,8 @@ protected:
 
     RaceManager::MinorRaceModeType m_minor_mode;
 
+    RaceManager::MajorRaceModeType m_major_mode;
+
     RaceManager::Difficulty m_difficulty;
 
     /** The sort order to be used in the comparison. */
@@ -92,9 +94,10 @@ protected:
 public:
 
          /** Initialises the object from an XML node. */
-         Server(const XMLNode &xml, bool is_lan);
-         Server(const irr::core::stringw &name, bool is_lan, int max_players,
-                int current_players, const TransportAddress &address);
+         Server(const XMLNode &xml);
+         Server(unsigned server_id, const irr::core::stringw &name,
+                int max_players, int current_players, unsigned difficulty,
+                unsigned server_mode, const TransportAddress &address);
     bool filterByWords(const irr::core::stringw words) const;
     // ------------------------------------------------------------------------
     /** Returns ip address and port of this server. */
@@ -120,13 +123,13 @@ public:
     /** Returns the number of currently connected players. */
     const int getCurrentPlayers() const { return m_current_players; }
     // ------------------------------------------------------------------------
-    RaceManager::MinorRaceModeType getRaceMinorMode() const { return m_minor_mode; }
+    RaceManager::MinorRaceModeType getRaceMinorMode() const
+                                                       { return m_minor_mode; }
     // ------------------------------------------------------------------------
-    void setRaceMinorMode(RaceManager::MinorRaceModeType m) { m_minor_mode = m; }
+    RaceManager::MajorRaceModeType getRaceMajorMode() const
+                                                       { return m_major_mode; }
     // ------------------------------------------------------------------------
-    RaceManager::Difficulty getDifficulty() const { return m_difficulty; }
-    // ------------------------------------------------------------------------
-    void setDifficulty(RaceManager::Difficulty d) { m_difficulty = d; }
+    RaceManager::Difficulty getDifficulty() const      { return m_difficulty; }
     // ------------------------------------------------------------------------
     /** Compares two servers according to the sort order currently defined.
      *  \param a The addon to compare this addon to.

@@ -381,7 +381,7 @@ void ServerLobby::registerServer()
     request->addParameter("difficulty", race_manager->getDifficulty());
     request->addParameter("game_mode",
         NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
-        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX));
+        race_manager->getMajorMode()));
     Log::info("ServerLobby", "Public server addr %s", addr.toString().c_str());
 
     request->executeNow();

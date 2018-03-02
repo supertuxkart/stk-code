@@ -584,7 +584,9 @@ void cmdLineHelp()
     "       --public-server    Allow direct connection to the server (without stk server)\n"
     "       --lan-server=name  Start a LAN server (not a playing client).\n"
     "       --server-password= Sets a password for a server (both client&server).\n"
-    "       --connect-now=ip   Connect to a server with IP known now (in format x.x.x.x:xxx(port)).\n"
+    "       --connect-now=ip   Connect to a server with IP known now\n"
+    "                          (in format x.x.x.x:xxx(port)), the port should be its\n"
+    "                          server discovery port.\n"
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --port=n           Port number to use.\n"
@@ -1087,8 +1089,11 @@ int handleCmdLine()
         Log::info("main", "Try to connect to server '%s'.",
                   ip.toString().c_str()                    );
         irr::core::stringw name = StringUtils::utf8ToWide(ip.toString());
-        ServersManager::get()->addServer(new Server(name, /*lan*/true,
-                                                    16, 0, ip));
+        ServersManager::get()->addServer(new Server(0, name,
+            NetworkConfig::get()->getMaxPlayers(), 0,
+            race_manager->getDifficulty(),
+            NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
+            race_manager->getMajorMode()), ip));
         ServersManager::get()->setJoinedServer(0);
         STKHost::create();
     }

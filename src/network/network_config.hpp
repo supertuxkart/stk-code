@@ -200,10 +200,12 @@ public:
     bool isAutoConnect() const { return m_auto_connect; }
     // ------------------------------------------------------------------------
     /** Returns the game mode id for server database. */
-    unsigned getServerGameMode(RaceManager::MinorRaceModeType mode, bool gp);
+    unsigned getServerGameMode(RaceManager::MinorRaceModeType mode,
+                               RaceManager::MajorRaceModeType);
     // ------------------------------------------------------------------------
-    /** Returns the game mode id and if grandprix from server database id. */
-    std::pair<RaceManager::MinorRaceModeType, bool> getLocalGameMode(unsigned);
+    /** Returns the minor and majar game mode from server database id. */
+    std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
+        getLocalGameMode(unsigned);
     // ------------------------------------------------------------------------
     void setDirectConnect(bool val) { m_direct_connect = val; }
     // ------------------------------------------------------------------------

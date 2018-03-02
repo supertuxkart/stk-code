@@ -833,8 +833,10 @@ void STKHost::handleDirectSocketRequest(Network* lan_network)
         s.addUInt8(0);   // FIXME: current number of connected players
         s.addUInt32(sender.getIP());
         s.addUInt16(sender.getPort());
-        s.addUInt16((uint16_t)race_manager->getMinorMode());
         s.addUInt8((uint8_t)race_manager->getDifficulty());
+        s.addUInt8((uint8_t)
+            NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
+            race_manager->getMajorMode()));
         lan_network->sendRawPacket(s, sender);
     }   // if message is server-requested
     else if (command == "connection-request")

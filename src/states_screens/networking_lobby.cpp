@@ -108,16 +108,28 @@ void NetworkingLobby::init()
     {
         m_server_name = server->getName();
         core::stringw each_line;
+        //I18N: In the networking lobby
         each_line = _("Server name: %s", m_server_name);
         m_server_info.push_back(each_line);
 
         const core::stringw& difficulty_name =
-            race_manager->getDifficultyName(race_manager->getDifficulty());
+            race_manager->getDifficultyName(server->getDifficulty());
+        //I18N: In the networking lobby
         each_line = _("Difficulty: %s", difficulty_name);
         m_server_info.push_back(each_line);
 
+        //I18N: In the networking lobby
+        each_line = _("Max players: %d", server->getMaxPlayers());
+        m_server_info.push_back(each_line);
+
+        //I18N: In the networking lobby
         core::stringw mode = RaceManager::getNameOf(server->getRaceMinorMode());
         each_line = _("Game mode: %s", mode);
+
+        race_manager->setMinorMode(server->getRaceMinorMode());
+        race_manager->setMajorMode(server->getRaceMajorMode());
+        race_manager->setDifficulty(server->getDifficulty());
+
         m_server_info.push_back(each_line);
     }
 

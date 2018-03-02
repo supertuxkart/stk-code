@@ -175,19 +175,24 @@ void CreateServerScreen::createServer()
     if (!password.empty())
         password = std::string(" --server-password=") + password;
 
+    ServersManager::get()->cleanUpServers();
+    TransportAddress server_address(0x7f000001,
+        NetworkConfig::get()->getServerDiscoveryPort());
+
+
+    TransportAddress address(0x7f000001,
+        NetworkConfig::get()->getServerDiscoveryPort());
+    Server *server = new Server(0/*server_id*/, name, max_players,
+        /*current_player*/0, (RaceManager::Difficulty)
+        difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER),
+        NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
+            race_manager->getMajorMode()), server_address);
+    ServersManager::get()->addServer(server);
+    ServersManager::get()->setJoinedServer(0);
+
+#undef USE_GRAPHICS_SERVER
 #ifdef USE_GRAPHICS_SERVER
     NetworkConfig::get()->setIsServer(true);
-
-    // In case of a LAN game, we can create the new server object now
-    if (NetworkConfig::get()->isLAN())
-    {
-        // FIXME Is this actually necessary?? Only in case of WAN, or LAN and WAN?
-        TransportAddress address(0x7f000001,0);  // 127.0.0.1
-        Server *server = new Server(name, /*lan*/true, max_players,
-                                    /*current_player*/1, address);
-        ServersManager::get()->addServer(server);
-    }
-
     // In case of a WAN game, we register this server with the
     // stk server, and will get the server's id when this 
     // request is finished.
@@ -246,14 +251,6 @@ void CreateServerScreen::createServer()
     SeparateProcess* sp =
         new SeparateProcess(SeparateProcess::getCurrentExecutableLocation(),
         server_cfg.str() + password);
-
-    ServersManager::get()->cleanUpServers();
-    TransportAddress address(0x7f000001,
-        NetworkConfig::get()->getServerDiscoveryPort());
-    Server *server = new Server(name, /*lan*/true, max_players,
-        /*current_player*/0, address);
-    ServersManager::get()->addServer(server);
-    ServersManager::get()->setJoinedServer(0);
     STKHost::create(sp);
 
 #endif

@@ -61,52 +61,69 @@ void NetworkConfig::setIsServer(bool b)
 }   // setIsServer
 
 // ----------------------------------------------------------------------------
-unsigned NetworkConfig::getServerGameMode(RaceManager::MinorRaceModeType mode,
-                                          bool gp)
+unsigned NetworkConfig::getServerGameMode(RaceManager::MinorRaceModeType minor,
+                                          RaceManager::MajorRaceModeType major)
 {
-    if (gp)
+    if (major == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
-        if (mode == RaceManager::MINOR_MODE_NORMAL_RACE)
+        if (minor == RaceManager::MINOR_MODE_NORMAL_RACE)
             return 0;
-        else if (mode == RaceManager::MINOR_MODE_TIME_TRIAL)
+        else if (minor == RaceManager::MINOR_MODE_TIME_TRIAL)
             return 1;
+        else if (minor == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+            return 2;
     }
     else
     {
-        if (mode == RaceManager::MINOR_MODE_NORMAL_RACE)
-            return 2;
-        else if (mode == RaceManager::MINOR_MODE_TIME_TRIAL)
+        if (minor == RaceManager::MINOR_MODE_NORMAL_RACE)
             return 3;
-        else if (mode == RaceManager::MINOR_MODE_3_STRIKES)
+        else if (minor == RaceManager::MINOR_MODE_TIME_TRIAL)
             return 4;
-        else if (mode == RaceManager::MINOR_MODE_SOCCER)
+        else if (minor == RaceManager::MINOR_MODE_FOLLOW_LEADER)
             return 5;
+        else if (minor == RaceManager::MINOR_MODE_3_STRIKES)
+            return 6;
+        else if (minor == RaceManager::MINOR_MODE_SOCCER)
+            return 7;
     }
     return 0;
 }   // getServerGameMode
 
 // ----------------------------------------------------------------------------
-std::pair<RaceManager::MinorRaceModeType, bool>
+std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
     NetworkConfig::getLocalGameMode(unsigned id)
 {
     switch(id)
     {
         case 0:
-            return { RaceManager::MINOR_MODE_NORMAL_RACE, true };
+            return { RaceManager::MINOR_MODE_NORMAL_RACE,
+                RaceManager::MAJOR_MODE_GRAND_PRIX };
         case 1:
-            return { RaceManager::MINOR_MODE_TIME_TRIAL, true };
+            return { RaceManager::MINOR_MODE_TIME_TRIAL,
+                RaceManager::MAJOR_MODE_GRAND_PRIX };
         case 2:
-            return { RaceManager::MINOR_MODE_NORMAL_RACE, false };
+            return { RaceManager::MINOR_MODE_FOLLOW_LEADER,
+                RaceManager::MAJOR_MODE_GRAND_PRIX };
         case 3:
-            return { RaceManager::MINOR_MODE_TIME_TRIAL, false };
+            return { RaceManager::MINOR_MODE_NORMAL_RACE,
+                RaceManager::MAJOR_MODE_SINGLE };
         case 4:
-            return { RaceManager::MINOR_MODE_3_STRIKES, false };
+            return { RaceManager::MINOR_MODE_TIME_TRIAL,
+                RaceManager::MAJOR_MODE_SINGLE };
         case 5:
-            return { RaceManager::MINOR_MODE_SOCCER, false };
+            return { RaceManager::MINOR_MODE_FOLLOW_LEADER,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 6:
+            return { RaceManager::MINOR_MODE_3_STRIKES,
+                RaceManager::MAJOR_MODE_SINGLE };
+        case 7:
+            return { RaceManager::MINOR_MODE_SOCCER,
+                RaceManager::MAJOR_MODE_SINGLE };
         default:
             break;
     }
-    return { RaceManager::MINOR_MODE_NORMAL_RACE, false };
+    return { RaceManager::MINOR_MODE_NORMAL_RACE,
+        RaceManager::MAJOR_MODE_SINGLE };
 
 }   // getLocalGameMode
 
