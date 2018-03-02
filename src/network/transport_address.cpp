@@ -21,7 +21,9 @@
 #ifdef WIN32
 #  include <iphlpapi.h>
 #else
-#include <ifaddrs.h>
+#  include <sys/ioctl.h>
+#  include <net/if.h>
+#  include <string.h>
 #endif
 
 // ----------------------------------------------------------------------------
@@ -48,20 +50,50 @@ bool TransportAddress::isLAN() const
 bool TransportAddress::isPublicAddressLAN() const
 {
 #ifndef WIN32
-    struct ifaddrs *ifap, *ifa;
-    struct sockaddr_in *sa;
-    getifaddrs(&ifap); // get the info
-    for (ifa = ifap; ifa; ifa = ifa->ifa_next)
+    char buffer[2048] = {};
+    struct ifconf ifc;
+    ifc.ifc_len = sizeof(buffer);
+    ifc.ifc_buf = (caddr_t)buffer;
+
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (fd < 0)
     {
-        if (ifa->ifa_addr->sa_family == AF_INET)
+        Log::error("TransportAddress","create socket failed, errno "
+            "= %s (%d)\n", strerror(errno), errno);
+        return false;
+    }
+
+    if (ioctl(fd, SIOCGIFCONF, &ifc) < 0)
+    {
+        if (fd >= 0)
+            close(fd);
+        Log::error("TransportAddress", "ioctl SIOCGIFCONF failed, "
+            "errno = %s (%d)\n", strerror(errno), errno);
+        return false;
+    }
+    bool is_local_host = false;
+    for (int i = 0; i < ifc.ifc_len; i += sizeof(struct ifreq))
+    {
+        struct ifreq *ifr = (struct ifreq*)(buffer + i);
+        if (ifr->ifr_addr.sa_family != AF_INET)
         {
-            sa = (struct sockaddr_in *) ifa->ifa_addr;
-            // This interface is ours
-            if (ntohl(sa->sin_addr.s_addr) == getIP())
-                return true;
+            // only support IPv4
+            continue;
+        }
+        struct sockaddr_in *addr = (struct sockaddr_in*)&ifr->ifr_addr;
+        if (ntohl(addr->sin_addr.s_addr) == getIP())
+        {
+            is_local_host = true;
+            break;
         }
     }
-    freeifaddrs(ifap);
+    if (fd >= 0 && close(fd) != 0)
+    {
+        Log::error("TransportAddress", "close fd %d failed, errno "
+            "= %s (%d)\n", strerror(errno), errno);
+    }
+    return is_local_host;
+
 #else
     // Query the list of all IP addresses on the local host. First call to
     // GetIpAddrTable with 0 bytes buffer will return insufficient buffer
@@ -92,8 +124,8 @@ bool TransportAddress::isPublicAddressLAN() const
         }
     }
     delete[] table;
-#endif
     return false;
+#endif
 }   // isLAN
 
 // ----------------------------------------------------------------------------
