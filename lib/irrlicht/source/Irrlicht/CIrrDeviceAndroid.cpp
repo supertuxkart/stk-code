@@ -51,7 +51,7 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     IsMousePressed(false),
     GamepadAxisX(0),
     GamepadAxisY(0),
-    DefaultOrientation(0)
+    DefaultOrientation(ORIENTATION_UNKNOWN)
 {
     #ifdef _DEBUG
     setDebugName("CIrrDeviceAndroid");
@@ -63,8 +63,6 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     Android->userData = this;
     Android->onAppCmd = handleAndroidCommand;
     Android->onInputEvent = handleInput;
-    
-    DefaultOrientation = getDefaultRotation();
     
     printConfig();
     createKeyMap();
@@ -159,22 +157,6 @@ void CIrrDeviceAndroid::printConfig()
     os::Printer::log("   touch:", core::stringc(touch).c_str(), ELL_DEBUG);
     os::Printer::log("   ui_mode_type:", core::stringc(ui_mode_type).c_str(), ELL_DEBUG);
     os::Printer::log("   ui_mode_night:", core::stringc(ui_mode_night).c_str(), ELL_DEBUG);
-    
-    int rotation = getRotation();
-    int deg[4] = {0, 90, 180, 270};
-    
-    os::Printer::log("Rotation: ", core::stringc(deg[rotation]).c_str(), ELL_DEBUG);
-    
-    int default_rotation = getDefaultRotation();
-    
-    if (default_rotation == 1)
-    {
-        os::Printer::log("Default rotation: landscape", ELL_DEBUG);
-    }
-    else
-    {
-        os::Printer::log("Default rotation: portrait", ELL_DEBUG);
-    }
 }
 
 void CIrrDeviceAndroid::createVideoModeList()
@@ -254,15 +236,15 @@ bool CIrrDeviceAndroid::run()
                     SEvent accEvent;
                     accEvent.EventType = EET_ACCELEROMETER_EVENT;
                     
-                    if (DefaultOrientation == 0)
-                    {
-                        accEvent.AccelerometerEvent.X = event.acceleration.x;
-                        accEvent.AccelerometerEvent.Y = event.acceleration.y;
-                    }
-                    else
+                    if (DefaultOrientation == ORIENTATION_LANDSCAPE)
                     {
                         accEvent.AccelerometerEvent.X = event.acceleration.y;
                         accEvent.AccelerometerEvent.Y = -event.acceleration.x;
+                    }
+                    else
+                    {
+                        accEvent.AccelerometerEvent.X = event.acceleration.x;
+                        accEvent.AccelerometerEvent.Y = event.acceleration.y;
                     }
                     accEvent.AccelerometerEvent.Z = event.acceleration.z;
                     
@@ -1197,7 +1179,7 @@ int CIrrDeviceAndroid::getRotation()
     return rotation;
 }
 
-int CIrrDeviceAndroid::getDefaultRotation()
+DeviceOrientation CIrrDeviceAndroid::getDefaultOrientation()
 {
     int rotation = getRotation();
     
@@ -1208,11 +1190,11 @@ int CIrrDeviceAndroid::getDefaultRotation()
         ((rotation == 1 || rotation == 3) && 
         orientation == ACONFIGURATION_ORIENTATION_PORT))
     {
-        return 1;
+        return ORIENTATION_LANDSCAPE;
     }
     else
     {
-        return 0;
+        return ORIENTATION_PORTRAIT;
     }
 }
 
@@ -1220,6 +1202,11 @@ bool CIrrDeviceAndroid::activateAccelerometer(float updateInterval)
 {
     if (!isAccelerometerAvailable())
         return false;
+    
+    if (DefaultOrientation == ORIENTATION_UNKNOWN)
+    {
+        DefaultOrientation = getDefaultOrientation();
+    }
 
     ASensorEventQueue_enableSensor(SensorEventQueue, Accelerometer);
     ASensorEventQueue_setEventRate(SensorEventQueue, Accelerometer,
