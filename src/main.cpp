@@ -1570,14 +1570,6 @@ void askForInternetPermission()
     #endif
 #endif
 
-#ifndef WIN32
-void signalTerminateHandler(int signum)
-{
-    if (main_loop)
-        main_loop->abort();
-}   // signalTerminateHandler
-#endif
-
 // ----------------------------------------------------------------------------
 int main(int argc, char *argv[] )
 {
@@ -1585,7 +1577,11 @@ int main(int argc, char *argv[] )
 
     CrashReporting::installHandlers();
 #ifndef WIN32
-    signal(SIGTERM, signalTerminateHandler);
+    signal(SIGTERM, [](int signum)
+        {
+            if (main_loop)
+                main_loop->abort();
+        });
 #endif
     srand(( unsigned ) time( 0 ));
 
@@ -1617,7 +1613,11 @@ int main(int argc, char *argv[] )
 
         // Get into menu mode initially.
         input_manager->setMode(InputManager::MENU);
-        main_loop = new MainLoop();
+        int parent_pid;
+        if (CommandLine::has("--parent-process", &parent_pid))
+            main_loop = new MainLoop(parent_pid);
+        else
+            main_loop = new MainLoop(0/*parent_pid*/);
         material_manager->loadMaterial();
 
         // Preload the explosion effects (explode.png)

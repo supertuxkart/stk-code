@@ -34,6 +34,8 @@ private:
     HANDLE m_child_stdin_write;
     HANDLE m_child_stdout_read;
     HANDLE m_child_stdout_write;
+    HANDLE m_child_handle;
+    DWORD m_child_pid;
 #else
     int m_child_stdin_write = -1;
     int m_child_stdout_read = -1;

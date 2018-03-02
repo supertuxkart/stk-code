@@ -72,14 +72,36 @@ SeparateProcess::SeparateProcess(const std::string& exe,
 // ----------------------------------------------------------------------------
 SeparateProcess::~SeparateProcess()
 {
-#ifndef WIN32
+    bool dead = false;
+#ifdef WIN32
+    std::string class_name = "separate_process";
+    class_name += StringUtils::toString(m_child_pid);
+    HWND hwnd = FindWindowEx(HWND_MESSAGE, NULL, &class_name[0], NULL);
+    if (hwnd != NULL)
+    {
+        PostMessage(hwnd, WM_DESTROY, NULL, NULL);
+        if (WaitForSingleObject(m_child_handle, 5000) != WAIT_TIMEOUT)
+        {
+            dead = true;
+        }
+    }
+
+    if (!dead)
+    {
+        Log::info("SeparateProcess", "Timeout waiting for child process to "
+            "self-destroying, killing it anyway");
+        if (TerminateProcess(m_child_handle, 0) == 0)
+            Log::warn("SeparateProcess", "Failed to kill child process.");
+    }
+    if (CloseHandle(m_child_handle) == 0)
+        Log::warn("SeparateProcess", "Failed to close child process handle.");
+#else
     if (m_child_stdin_write != -1 && m_child_stdout_read != -1)
     {
         close(m_child_stdin_write);
         close(m_child_stdout_read);
     }
     kill(m_child_pid, SIGTERM);
-    bool dead = false;
     for (int i = 0; i < 5; i++)
     {
         int status;
@@ -169,13 +191,14 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
     }
 
     // Create the child process.
-    std::string cmd = (exe + argument);
+    std::string cmd = exe + argument + " --parent-process=" +
+        StringUtils::toString(GetCurrentProcessId());
     bool success = CreateProcess(NULL,
         &cmd[0],               // command line
         NULL,                  // process security attributes
         NULL,                  // primary thread security attributes
         TRUE,                  // handles are inherited
-        0,                     // creation flags
+        CREATE_NO_WINDOW,      // creation flags
         NULL,                  // use parent's environment
         NULL,                  // use parent's current directory
         &siStartInfo,          // STARTUPINFO pointer
@@ -186,12 +209,15 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
         return false;
     }
 
-    // Close handles to the child process and its primary thread.
-    // Some applications might keep these handles to monitor the status
-    // of the child process, for example.
-
-    CloseHandle(piProcInfo.hProcess);
-    CloseHandle(piProcInfo.hThread);
+    m_child_handle = piProcInfo.hProcess;
+    m_child_pid = piProcInfo.dwProcessId;
+    if (m_child_pid == 0)
+    {
+        Log::warn("SeparateProcess", "Invalid child pid.");
+        return false;
+    }
+    if (CloseHandle(piProcInfo.hThread) == 0)
+        Log::warn("SeparateProcess", "Failed to close child thread handle.");
 
     return true;
 }   // createChildProcess - windows version
@@ -347,7 +373,7 @@ std::string SeparateProcess::sendCommand(const std::string &command)
     // until the child process is running before writing data.
     DWORD bytes_written;
     bool success = WriteFile(m_child_stdin_write, command.c_str(),
-                             command.size()+1, &bytes_written, NULL     ) != 0;
+        unsigned(command.size()) + 1, &bytes_written, NULL) != 0;
 #else
     write(m_child_stdin_write, (command+"\n").c_str(), command.size()+1);
 #endif
