@@ -24,6 +24,7 @@
 #  include <sys/ioctl.h>
 #  include <net/if.h>
 #  include <string.h>
+#  include <errno.h>
 #endif
 
 // ----------------------------------------------------------------------------
