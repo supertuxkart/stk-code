@@ -56,6 +56,12 @@ OnlineProfileServers::OnlineProfileServers() : GUIEngine::Screen("online/profile
 
 void OnlineProfileServers::loadedFromFile()
 {
+    if (!PlayerManager::getCurrentOnlineId())
+    {
+        getWidget<IconButtonWidget>("find_wan_server")->setActive(false);
+        getWidget<IconButtonWidget>("create_wan_server")->setActive(false);
+        getWidget<IconButtonWidget>("quick_wan_play")->setActive(false);
+    }
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
@@ -74,7 +80,7 @@ void OnlineProfileServers::eventCallback(Widget* widget, const std::string& name
 {
     if (name == "back")
     {
-        StateManager::get()->popMenu();
+        StateManager::get()->escapePressed();
         return;
     }
     if (name == "wan")
@@ -90,7 +96,6 @@ void OnlineProfileServers::eventCallback(Widget* widget, const std::string& name
         else if (selection == "create_wan_server")
         {
             NetworkConfig::get()->setIsWAN();
-            NetworkConfig::get()->setIsServer(true);
             CreateServerScreen::getInstance()->push();
         }
         else if (selection == "quick_wan_play")
@@ -143,9 +148,9 @@ void OnlineProfileServers::doQuickPlay()
     {
         delete join_request;
         NetworkingLobby::getInstance()->push();
-        ConnectToServer *cts = new ConnectToServer(server->getServerId(),
+        auto cts = std::make_shared<ConnectToServer>(server->getServerId(),
             server->getHostId());
-        ProtocolManager::getInstance()->requestStart(cts);
+        ProtocolManager::lock()->requestStart(cts);
     }
     else
     {

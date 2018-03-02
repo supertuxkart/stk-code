@@ -48,7 +48,6 @@ private:
 
     Synchronised<float>      m_last_load_time;
     void                     refresh(bool success, const XMLNode * input);
-    void                     cleanUpServers();
     Online::XMLRequest *     getWANRefreshRequest() const;
     Online::XMLRequest *     getLANRefreshRequest() const;
 
@@ -56,7 +55,7 @@ public:
     // Singleton
     static ServersManager*   get();
     static void              deallocate();
-
+    void                     cleanUpServers();
     Online::XMLRequest *     getRefreshRequest(bool request_now = true);
     void                     setJoinedServer(uint32_t server_id);
     void                     unsetJoinedServer();

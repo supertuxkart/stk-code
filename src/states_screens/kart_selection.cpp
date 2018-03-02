@@ -429,7 +429,7 @@ void KartSelectionScreen::tearDown()
 
 void KartSelectionScreen::unloaded()
 {
-    // these pointer is no more valid (have been deleted along other widgets)
+    // This pointer is no longer valid (has been deleted along other widgets)
     m_dispatcher = NULL;
 }
 
@@ -1470,8 +1470,8 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     {
         const KartProperties* prop = kart_properties_manager->getKartById(i);
         // Ignore karts that are not in the selected group
-        if(selected_kart_group != ALL_KART_GROUPS_ID &&
-            !prop->isInGroup(selected_kart_group))
+        if((selected_kart_group != ALL_KART_GROUPS_ID &&
+            !prop->isInGroup(selected_kart_group)) || isIgnored(prop->getIdent()))
             continue;
         karts.push_back(prop);
     }

@@ -44,9 +44,12 @@ public:
     /** Set the sort order used in the comparison function. */
     enum SortOrder
     {
-        SO_SCORE = 1,    // Sorted on satisfaction score
-        SO_NAME = 2,     // Sorted alphabetically by name
-        SO_PLAYERS = 4
+        SO_NAME = 0,     // Sorted alphabetically by name
+        SO_PLAYERS = 1,
+        SO_DIFFICULTY = 2,
+        SO_GAME_MODE = 3,
+        SO_SCORE = 4    // Sorted on satisfaction score (unused)
+
     };
 
 protected:
@@ -81,6 +84,8 @@ protected:
 
     RaceManager::MinorRaceModeType m_minor_mode;
 
+    RaceManager::MajorRaceModeType m_major_mode;
+
     RaceManager::Difficulty m_difficulty;
 
     /** The sort order to be used in the comparison. */
@@ -89,9 +94,10 @@ protected:
 public:
 
          /** Initialises the object from an XML node. */
-         Server(const XMLNode &xml, bool is_lan);
-         Server(const irr::core::stringw &name, bool is_lan, int max_players,
-                int current_players, const TransportAddress &address);
+         Server(const XMLNode &xml);
+         Server(unsigned server_id, const irr::core::stringw &name,
+                int max_players, int current_players, unsigned difficulty,
+                unsigned server_mode, const TransportAddress &address);
     bool filterByWords(const irr::core::stringw words) const;
     // ------------------------------------------------------------------------
     /** Returns ip address and port of this server. */
@@ -117,13 +123,13 @@ public:
     /** Returns the number of currently connected players. */
     const int getCurrentPlayers() const { return m_current_players; }
     // ------------------------------------------------------------------------
-    RaceManager::MinorRaceModeType getRaceMinorMode() const { return m_minor_mode; }
+    RaceManager::MinorRaceModeType getRaceMinorMode() const
+                                                       { return m_minor_mode; }
     // ------------------------------------------------------------------------
-    void setRaceMinorMode(RaceManager::MinorRaceModeType m) { m_minor_mode = m; }
+    RaceManager::MajorRaceModeType getRaceMajorMode() const
+                                                       { return m_major_mode; }
     // ------------------------------------------------------------------------
-    RaceManager::Difficulty getDifficulty() const { return m_difficulty; }
-    // ------------------------------------------------------------------------
-    void setDifficulty(RaceManager::Difficulty d) { m_difficulty = d; }
+    RaceManager::Difficulty getDifficulty() const      { return m_difficulty; }
     // ------------------------------------------------------------------------
     /** Compares two servers according to the sort order currently defined.
      *  \param a The addon to compare this addon to.
@@ -141,6 +147,12 @@ public:
             break;
         case SO_PLAYERS:
             return m_current_players < server.m_current_players;
+            break;
+        case SO_DIFFICULTY:
+            return m_difficulty < server.m_difficulty;
+            break;
+        case SO_GAME_MODE:
+            return m_minor_mode < server.m_minor_mode;
             break;
         }   // switch
 

@@ -18,13 +18,12 @@
 
 #include "network/protocols/server_lobby.hpp"
 
-#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
 #include "network/event.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
-#include "network/protocols/get_public_address.hpp"
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/latency_protocol.hpp"
 #include "network/protocol_manager.hpp"
@@ -33,13 +32,16 @@
 #include "network/stk_peer.hpp"
 #include "online/online_profile.hpp"
 #include "online/request_manager.hpp"
+#include "race/race_manager.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/waiting_for_others.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/random_generator.hpp"
 #include "utils/time.hpp"
 
+#include <fstream>
 
 /** This is the central game setup protocol running in the server. It is
  *  mostly a finite state machine. Note that all nodes in ellipses and light
@@ -83,6 +85,17 @@
 ServerLobby::ServerLobby() : LobbyProtocol(NULL)
 {
     setHandleDisconnections(true);
+    m_state = SET_PUBLIC_ADDRESS;
+
+    // We use maximum 16bit unsigned limit
+    auto all_k = kart_properties_manager->getAllAvailableKarts();
+    auto all_t = track_manager->getAllTrackIdentifiers();
+    if (all_k.size() >= 65536)
+        all_k.resize(65535);
+    if (all_t.size() >= 65536)
+        all_t.resize(65535);
+    m_available_kts.getData().first = { all_k.begin(), all_k.end() };
+    m_available_kts.getData().second = { all_t.begin(), all_t.end() };
 }   // ServerLobby
 
 //-----------------------------------------------------------------------------
@@ -90,22 +103,21 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
  */
 ServerLobby::~ServerLobby()
 {
+    if (m_server_registered && NetworkConfig::get()->isWAN())
+    {
+        unregisterServer();
+    }
 }   // ~ServerLobby
 
 //-----------------------------------------------------------------------------
 
 void ServerLobby::setup()
 {
+    m_server_registered = false;
     m_game_setup = STKHost::get()->setupNewGame();
     m_game_setup->setNumLocalPlayers(0);    // no local players on a server
     m_next_player_id.setAtomic(0);
-
-    // In case of LAN we don't need our public address or register with the
-    // STK server, so we can directly go to the accepting clients state.
-    m_state             = NetworkConfig::get()->isLAN() ? ACCEPTING_CLIENTS 
-                                                        : INIT_WAN;
     m_selection_enabled = false;
-    m_current_protocol  = NULL;
     Log::info("ServerLobby", "Starting the protocol.");
 
     // Initialise the data structures to detect if all clients and 
@@ -123,6 +135,29 @@ void ServerLobby::setup()
 }   // setup
 
 //-----------------------------------------------------------------------------
+bool ServerLobby::notifyEvent(Event* event)
+{
+    assert(m_game_setup); // assert that the setup exists
+    if (event->getType() != EVENT_TYPE_MESSAGE)
+        return false;
+
+    NetworkString &data = event->data();
+    assert(data.size()); // message not empty
+    uint8_t message_type;
+    message_type = data.getUInt8();
+    Log::info("ServerLobby", "Synchronous message received with type %d.",
+              message_type);
+    switch (message_type)
+    {
+    case LE_REQUEST_BEGIN: startSelection(event); break;
+    default: Log::error("ServerLobby", "Unknown message type %d - ignored.",
+                        message_type);
+             break;
+    }   // switch message_type
+    return true;
+}   // notifyEvent
+
+//-----------------------------------------------------------------------------
 
 bool ServerLobby::notifyEventAsynchronous(Event* event)
 {
@@ -138,7 +173,6 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         switch(message_type)
         {
         case LE_CONNECTION_REQUESTED: connectionRequested(event); break;
-        case LE_REQUEST_BEGIN: startSelection(event);             break;
         case LE_KART_SELECTION: kartSelectionRequested(event);    break;
         case LE_CLIENT_LOADED_WORLD: finishedLoadingWorldClient(event); break;
         case LE_STARTED_RACE:  startedRaceOnClient(event);        break;
@@ -150,7 +184,6 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_VOTE_LAPS:  playerLapsVote(event);                break;
         case LE_RACE_FINISHED_ACK: playerFinishedResult(event);   break;
         }   // switch
-           
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
     else if (event->getType() == EVENT_TYPE_DISCONNECTED)
     {
@@ -160,41 +193,95 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
 }   // notifyEventAsynchronous
 
 //-----------------------------------------------------------------------------
-/** Simple finite state machine. First get the public ip address. Once this
+/** Create the server id file to let the graphics server client connect. */
+void ServerLobby::createServerIdFile()
+{
+    const std::string& sid = NetworkConfig::get()->getServerIdFile();
+    if (!sid.empty())
+    {
+        std::fstream fs;
+        fs.open(sid, std::ios::out);
+        fs.close();
+        NetworkConfig::get()->setServerIdFile("");
+    }
+}   // createServerIdFile
+
+//-----------------------------------------------------------------------------
+/** Find out the public IP server or poll STK server asynchronously. */
+void ServerLobby::asynchronousUpdate()
+{
+    switch (m_state.load())
+    {
+    case SET_PUBLIC_ADDRESS:
+    {
+        // In case of LAN we don't need our public address or register with the
+        // STK server, so we can directly go to the accepting clients state.
+        if (NetworkConfig::get()->isLAN())
+        {
+            m_state = ACCEPTING_CLIENTS;
+            STKHost::get()->startListening();
+            createServerIdFile();
+            return;
+        }
+        STKHost::get()->setPublicAddress();
+        if (STKHost::get()->getPublicAddress().isUnset())
+        {
+            m_state = ERROR_LEAVE;
+        }
+        else
+        {
+            STKHost::get()->startListening();
+            m_state = REGISTER_SELF_ADDRESS;
+        }
+        break;
+    }
+    case REGISTER_SELF_ADDRESS:
+    {
+        // Register this server with the STK server. This will block
+        // this thread, but there is no need for the protocol manager
+        // to react to any requests before the server is registered.
+        registerServer();
+        if (m_server_registered)
+        {
+            m_state = ACCEPTING_CLIENTS;
+            createServerIdFile();
+        }
+        break;
+    }
+    case ACCEPTING_CLIENTS:
+    {
+        // Only poll the STK server if this is a WAN server.
+        if (NetworkConfig::get()->isWAN())
+            checkIncomingConnectionRequests();
+        break;
+    }
+    case ERROR_LEAVE:
+    {
+        requestTerminate();
+        m_state = EXITING;
+        STKHost::get()->setErrorMessage(_("Failed to setup server."));
+        STKHost::get()->requestShutdown();
+        break;
+    }
+    default:
+        break;
+    }
+}   // asynchronousUpdate
+
+//-----------------------------------------------------------------------------
+/** Simple finite state machine.  Once this
  *  is known, register the server and its address with the stk server so that
  *  client can find it.
  */
 void ServerLobby::update(float dt)
 {
-    switch (m_state)
+    switch (m_state.load())
     {
-    case INIT_WAN:
-        // Start the protocol to find the public ip address.
-        m_current_protocol = new GetPublicAddress(this);
-        m_current_protocol->requestStart();
-        m_state = GETTING_PUBLIC_ADDRESS;
-        // The callback from GetPublicAddress will wake this protocol up
-        requestPause();
-        break;
-    case GETTING_PUBLIC_ADDRESS:
-    {
-        Log::debug("ServerLobby", "Public address known.");
-        // Free GetPublicAddress protocol
-        delete m_current_protocol;
-
-        // Register this server with the STK server. This will block
-        // this thread, but there is no need for the protocol manager
-        // to react to any requests before the server is registered.
-        registerServer();
-        Log::info("ServerLobby", "Server registered.");
-        m_state = ACCEPTING_CLIENTS;
-    }
-    break;
+    case SET_PUBLIC_ADDRESS:
+    case REGISTER_SELF_ADDRESS:
     case ACCEPTING_CLIENTS:
     {
-        // Only poll the STK server if this is a WAN server.
-        if(NetworkConfig::get()->isWAN())
-            checkIncomingConnectionRequests();
+        // Waiting for asynchronousUpdate
         break;
     }
     case SELECTING:
@@ -209,13 +296,12 @@ void ServerLobby::update(float dt)
         break;
     case WAIT_FOR_WORLD_LOADED:
         // Note that m_server_has_loaded_world is called by the main thread
-        // (same a the thread updating this protocol)
+        // (same as the thread updating this protocol)
         m_client_ready_count.lock();
         if (m_server_has_loaded_world &&
             m_client_ready_count.getData() == m_game_setup->getPlayerCount())
         {
             signalRaceStartToClients();
-            m_server_delay = 0.02f;
             m_client_ready_count.getData() = 0;
         }
         m_client_ready_count.unlock();
@@ -223,13 +309,14 @@ void ServerLobby::update(float dt)
         // they have started the race/
         break;
     case WAIT_FOR_RACE_STARTED: 
-        // The function finishedLoadingWorldClient() will trigger the
+        // The function startedRaceOnClient() will trigger the
         // next state.
         break;
     case DELAY_SERVER:
-        m_server_delay -= dt;
-        if (m_server_delay < 0)
+        if (m_server_delay < StkTime::getRealTime())
         {
+            Log::verbose("ServerLobby", "End delay at %lf",
+                         StkTime::getRealTime());
             m_state = RACING;
             World::getWorld()->setReadyToRace();
         }
@@ -252,33 +339,25 @@ void ServerLobby::update(float dt)
             sendMessageToPeersChangingToken(exit_result_screen,
                                             /*reliable*/true);
             delete exit_result_screen;
-            m_state = ACCEPTING_CLIENTS;
+            m_state = NetworkConfig::get()->isLAN() ?
+                ACCEPTING_CLIENTS : REGISTER_SELF_ADDRESS;
             RaceResultGUI::getInstance()->backToLobby();
             // notify the network world that it is stopped
             RaceEventManager::getInstance()->stop();
             // stop race protocols
-            findAndTerminateProtocol(PROTOCOL_CONTROLLER_EVENTS);
-            findAndTerminateProtocol(PROTOCOL_KART_UPDATE);
-            findAndTerminateProtocol(PROTOCOL_GAME_EVENTS);
+            auto pm = ProtocolManager::lock();
+            assert(pm);
+            pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
+            pm->findAndTerminate(PROTOCOL_KART_UPDATE);
+            pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
+            setup();
         }
         break;
-    case DONE:
-        m_state = EXITING;
-        requestTerminate();
-        break;
+    case ERROR_LEAVE:
     case EXITING:
         break;
     }
 }   // update
-
-//-----------------------------------------------------------------------------
-/** Callback when the GetPublicAddress terminates. It will unpause this
- *  protocol, which triggers the next state of the finite state machine.
- */
-void ServerLobby::callback(Protocol *protocol)
-{
-    requestUnpause();
-}   // callback
 
 //-----------------------------------------------------------------------------
 /** Register this server (i.e. its public address) with the STK server
@@ -290,17 +369,21 @@ void ServerLobby::callback(Protocol *protocol)
 void ServerLobby::registerServer()
 {
     Online::XMLRequest *request = new Online::XMLRequest();
-    const TransportAddress& addr = NetworkConfig::get()->getMyAddress();
-    PlayerManager::setUserDetails(request, "create", Online::API::SERVER_PATH);
+    const TransportAddress& addr = STKHost::get()->getPublicAddress();
+    NetworkConfig::get()->setUserDetails(request, "create");
     request->addParameter("address",      addr.getIP()                    );
     request->addParameter("port",         addr.getPort()                  );
     request->addParameter("private_port",
-                                    NetworkConfig::get()->getServerPort() );
+                                    STKHost::get()->getPrivatePort()      );
     request->addParameter("name",   NetworkConfig::get()->getServerName() );
-    request->addParameter("max_players", 
-                          UserConfigParams::m_server_max_players          );
-    Log::info("RegisterServer", "Showing addr %s", addr.toString().c_str());
-    
+    request->addParameter("max_players",
+        NetworkConfig::get()->getMaxPlayers());
+    request->addParameter("difficulty", race_manager->getDifficulty());
+    request->addParameter("game_mode",
+        NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
+        race_manager->getMajorMode()));
+    Log::info("ServerLobby", "Public server addr %s", addr.toString().c_str());
+
     request->executeNow();
 
     const XMLNode * result = request->getXMLData();
@@ -308,17 +391,55 @@ void ServerLobby::registerServer()
 
     if (result->get("success", &rec_success) && rec_success == "yes")
     {
-        Log::info("RegisterServer", "Server is now online.");
-        STKHost::get()->setRegistered(true);
+        Log::info("ServerLobby", "Server is now online.");
+        m_server_registered = true;
     }
     else
     {
         irr::core::stringc error(request->getInfo().c_str());
-        Log::error("RegisterServer", "%s", error.c_str());
-        STKHost::get()->setErrorMessage(_("Failed to register server: %s", error.c_str()));
+        Log::error("ServerLobby", "%s", error.c_str());
+        m_state = ERROR_LEAVE;
     }
-
+    delete request;
 }   // registerServer
+
+//-----------------------------------------------------------------------------
+/** Unregister this server (i.e. its public address) with the STK server,
+ *  currently when karts enter kart selection screen it will be done.
+ */
+void ServerLobby::unregisterServer()
+{
+    const TransportAddress &addr = STKHost::get()->getPublicAddress();
+    Online::XMLRequest* request = new Online::XMLRequest();
+    NetworkConfig::get()->setUserDetails(request, "stop");
+
+    request->addParameter("address", addr.getIP());
+    request->addParameter("port", addr.getPort());
+
+    Log::info("ServerLobby", "address %s", addr.toString().c_str());
+    request->executeNow();
+
+    const XMLNode * result = request->getXMLData();
+    std::string rec_success;
+
+    if (result->get("success", &rec_success))
+    {
+        if (rec_success == "yes")
+        {
+            Log::info("ServerLobby", "Server is now unregister.");
+        }
+        else
+        {
+            Log::error("ServerLobby", "Fail to unregister server.");
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Fail to stop server.");
+    }
+    delete request;
+
+}   // unregisterServer
 
 //-----------------------------------------------------------------------------
 /** This function is called when all clients have loaded the world and
@@ -327,6 +448,8 @@ void ServerLobby::registerServer()
  */
 void ServerLobby::signalRaceStartToClients()
 {
+    Log::verbose("Server", "Signaling race start to clients at %lf",
+                 StkTime::getRealTime());
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     NetworkString *ns = getNetworkString(1);
     ns->addUInt8(LE_START_RACE);
@@ -341,11 +464,18 @@ void ServerLobby::signalRaceStartToClients()
  */
 void ServerLobby::startSelection(const Event *event)
 {
+    if (NetworkConfig::get()->isWAN())
+    {
+        assert(m_server_registered);
+        unregisterServer();
+        m_server_registered = false;
+    }
 
     if (m_state != ACCEPTING_CLIENTS)
     {
         Log::warn("ServerLobby",
-                  "Received startSelection while being in state %d", m_state);
+                  "Received startSelection while being in state %d",
+                  m_state.load());
         return;
     }
     if(event && !event->getPeer()->isAuthorised())
@@ -357,8 +487,24 @@ void ServerLobby::startSelection(const Event *event)
     }
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     NetworkString *ns = getNetworkString(1);
-    // start selection
+    // Start selection - must be synchronous since the receiver pushes
+    // a new screen, which must be donefrom the main thread.
+    ns->setSynchronous(true);
     ns->addUInt8(LE_START_SELECTION);
+    m_available_kts.lock();
+    const auto& all_k = m_available_kts.getData().first;
+    const auto& all_t = m_available_kts.getData().second;
+    ns->addUInt16((uint16_t)all_k.size()).addUInt16((uint16_t)all_t.size());
+    for (const std::string& kart : all_k)
+    {
+        ns->encodeString(kart);
+    }
+    for (const std::string& track : all_t)
+    {
+        ns->encodeString(track);
+    }
+    m_available_kts.unlock();
+
     sendMessageToPeersChangingToken(ns, /*reliable*/true);
     delete ns;
 
@@ -367,8 +513,7 @@ void ServerLobby::startSelection(const Event *event)
     m_state = SELECTING;
     WaitingForOthersScreen::getInstance()->push();
 
-    Protocol *p = new LatencyProtocol();
-    p->requestStart();
+    std::make_shared<LatencyProtocol>()->requestStart();
     Log::info("LobbyProtocol", "LatencyProtocol started.");
 
 }   // startSelection
@@ -385,15 +530,21 @@ void ServerLobby::checkIncomingConnectionRequests()
     if (StkTime::getRealTime() < last_poll_time + POLL_INTERVAL)
         return;
 
+    // Keep the port open, it can be sent to anywhere as we will send to the
+    // correct peer later in ConnectToPeer.
+    BareNetworkString data;
+    data.addUInt8(0);
+    STKHost::get()->sendRawPacket(data, STKHost::get()->getStunAddress());
+
     // Now poll the stk server
     last_poll_time = StkTime::getRealTime();
     Online::XMLRequest* request = new Online::XMLRequest();
-    PlayerManager::setUserDetails(request, "poll-connection-requests",
-                                  Online::API::SERVER_PATH);
+    NetworkConfig::get()->setUserDetails(request, "poll-connection-requests");
 
-    const TransportAddress &addr = NetworkConfig::get()->getMyAddress();
+    const TransportAddress &addr = STKHost::get()->getPublicAddress();
     request->addParameter("address", addr.getIP()  );
     request->addParameter("port",    addr.getPort());
+    request->addParameter("current_players", STKHost::get()->getPeerCount());
 
     request->executeNow();
     assert(request->isDone());
@@ -415,9 +566,8 @@ void ServerLobby::checkIncomingConnectionRequests()
         users_xml->getNode(i)->get("id", &id);
         Log::debug("ServerLobby",
                    "User with id %d wants to connect.", id);
-        Protocol *p = new ConnectToPeer(id);
-        p->requestStart();
-    }        
+        std::make_shared<ConnectToPeer>(id)->requestStart();
+    }
     delete request;
 }   // checkIncomingConnectionRequests
 
@@ -536,11 +686,70 @@ void ServerLobby::connectionRequested(Event* event)
     // Connection accepted.
     // ====================
     std::string name_u8;
-    int len = data.decodeString(&name_u8);
+    data.decodeString(&name_u8);
     core::stringw name = StringUtils::utf8ToWide(name_u8);
     std::string password;
     data.decodeString(&password);
     bool is_authorised = (password==NetworkConfig::get()->getPassword());
+
+    std::set<std::string> client_karts, client_tracks;
+    const unsigned kart_num = data.getUInt16();
+    const unsigned track_num = data.getUInt16();
+    for (unsigned i = 0; i < kart_num; i++)
+    {
+        std::string kart;
+        data.decodeString(&kart);
+        client_karts.insert(kart);
+    }
+    for (unsigned i = 0; i < track_num; i++)
+    {
+        std::string track;
+        data.decodeString(&track);
+        client_tracks.insert(track);
+    }
+
+    // Remove karts/tracks from server that are not supported on the new client
+    // so that in the end the server has a list of all karts/tracks available
+    // on all clients
+    std::set<std::string> karts_erase, tracks_erase;
+    for (const std::string& server_kart : m_available_kts.getData().first)
+    {
+        if (client_karts.find(server_kart) == client_karts.end())
+        {
+            karts_erase.insert(server_kart);
+        }
+    }
+    for (const std::string& server_track : m_available_kts.getData().second)
+    {
+        if (client_tracks.find(server_track) == client_tracks.end())
+        {
+            tracks_erase.insert(server_track);
+        }
+    }
+
+    // Drop this player if he doesn't have at least 1 kart / track the same
+    // from server
+    if (karts_erase.size() == m_available_kts.getData().first.size() ||
+        tracks_erase.size() == m_available_kts.getData().second.size())
+    {
+        NetworkString *message = getNetworkString(2);
+        message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(3);
+        peer->sendPacket(message);
+        delete message;
+        Log::verbose("ServerLobby", "Player has incompatible karts / tracks");
+        m_available_kts.unlock();
+        return;
+    }
+
+    for (const std::string& kart_erase : karts_erase)
+    {
+        m_available_kts.getData().first.erase(kart_erase);
+    }
+    for (const std::string& track_erase : tracks_erase)
+    {
+        m_available_kts.getData().second.erase(track_erase);
+    }
+    m_available_kts.unlock();
 
     // Get the unique global ID for this player.
     m_next_player_id.lock();
@@ -620,7 +829,7 @@ void ServerLobby::kartSelectionRequested(Event* event)
     if(m_state!=SELECTING)
     {
         Log::warn("Server", "Received kart selection while in state %d.",
-                  m_state);
+                  m_state.load());
         return;
     }
 
@@ -909,12 +1118,16 @@ void ServerLobby::finishedLoadingWorldClient(Event *event)
 void ServerLobby::startedRaceOnClient(Event *event)
 {
     m_client_ready_count.lock();
-    Log::verbose("ServerLobby", "Host %d has started race.",
-                 event->getPeer()->getHostId());
+    Log::verbose("ServerLobby", "Host %d has started race at %lf.",
+                 event->getPeer()->getHostId(), StkTime::getRealTime());
     m_client_ready_count.getData()++;
     if (m_client_ready_count.getData() == m_game_setup->getPlayerCount())
     {
         m_state = DELAY_SERVER;
+        m_server_delay = StkTime::getRealTime() + 0.1f;
+        Log::verbose("ServerLobby", "Started delay at %lf set delay to %lf",
+                     StkTime::getRealTime(),
+                    m_server_delay);
         terminateLatencyProtocol();
     }
     m_client_ready_count.unlock();
@@ -927,7 +1140,7 @@ void ServerLobby::startedRaceOnClient(Event *event)
 void ServerLobby::playerFinishedResult(Event *event)
 {
     m_player_ready_counter++;
-    if(m_player_ready_counter == STKHost::get()->getPeerCount())
+    if(m_player_ready_counter >= STKHost::get()->getPeerCount())
     {
         // We can't trigger the world/race exit here, since this is called
         // from the protocol manager thread. So instead we force the timeout

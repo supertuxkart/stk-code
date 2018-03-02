@@ -19,6 +19,7 @@
 #include "network/protocols/client_lobby.hpp"
 
 #include "config/player_manager.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "modes/world_with_rank.hpp"
 #include "network/event.hpp"
 #include "network/network_config.hpp"
@@ -33,6 +34,7 @@
 #include "states_screens/network_kart_selection.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 
 // ============================================================================
@@ -237,6 +239,7 @@ bool ClientLobby::notifyEvent(Event* event)
               message_type);
     switch(message_type)
     {
+        case LE_START_SELECTION:       startSelection(event);      break;
         case LE_KART_SELECTION_UPDATE: kartSelectionUpdate(event); break;
         case LE_LOAD_WORLD:            loadWorld();                break;
         case LE_RACE_FINISHED:         raceFinished(event);        break;
@@ -266,7 +269,6 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
             case LE_NEW_PLAYER_CONNECTED: newPlayer(event);              break;
             case LE_PLAYER_DISCONNECTED : disconnectedPlayer(event);     break;
             case LE_START_RACE: startGame(event);                        break;
-            case LE_START_SELECTION: startSelection(event);              break;
             case LE_CONNECTION_REFUSED: connectionRefused(event);        break;
             case LE_CONNECTION_ACCEPTED: connectionAccepted(event);      break;
             case LE_KART_SELECTION_REFUSED: kartSelectionRefused(event); break;
@@ -321,6 +323,23 @@ void ClientLobby::update(float dt)
         // 4 (size of id), global id
         ns->addUInt8(LE_CONNECTION_REQUESTED).encodeString(name)
           .encodeString(NetworkConfig::get()->getPassword());
+
+        auto all_k = kart_properties_manager->getAllAvailableKarts();
+        auto all_t = track_manager->getAllTrackIdentifiers();
+        if (all_k.size() >= 65536)
+            all_k.resize(65535);
+        if (all_t.size() >= 65536)
+            all_t.resize(65535);
+        ns->addUInt16((uint16_t)all_k.size()).addUInt16((uint16_t)all_t.size());
+        for (const std::string& kart : all_k)
+        {
+            ns->encodeString(kart);
+        }
+        for (const std::string& track : all_t)
+        {
+            ns->encodeString(track);
+        }
+
         sendToServer(ns);
         delete ns;
         m_state = REQUESTING_CONNECTION;
@@ -334,11 +353,11 @@ void ClientLobby::update(float dt)
     {
         NetworkKartSelectionScreen* screen =
                                      NetworkKartSelectionScreen::getInstance();
+        screen->setAvailableKartsFromServer(m_available_karts);
         screen->push();
         m_state = SELECTING_KARTS;
 
-        Protocol *p = new LatencyProtocol();
-        p->requestStart();
+        std::make_shared<LatencyProtocol>()->requestStart();
         Log::info("LobbyProtocol", "LatencyProtocol started.");
     }
     break;
@@ -350,7 +369,7 @@ void ClientLobby::update(float dt)
         break;
     case DONE:
         m_state = EXITING;
-        ProtocolManager::getInstance()->requestTerminate(this);
+        requestTerminate();
         break;
     case EXITING:
         break;
@@ -507,6 +526,15 @@ void ClientLobby::connectionAccepted(Event* event)
     NetworkingLobby::getInstance()->addPlayer(profile);
     m_server = event->getPeer();
     m_state = CONNECTED;
+    if (NetworkConfig::get()->isAutoConnect())
+    {
+        // Send a message to the server to start
+        NetworkString start(PROTOCOL_LOBBY_ROOM);
+        start.setSynchronous(true);
+        start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
+        STKHost::get()->sendToServer(&start, true);
+    }
+
 }   // connectionAccepted
 
 //-----------------------------------------------------------------------------
@@ -537,6 +565,9 @@ void ClientLobby::connectionRefused(Event* event)
         break;
     case 2:
         Log::info("ClientLobby", "Client busy.");
+        break;
+    case 3:
+        Log::info("ClientLobby", "Having incompatible karts / tracks.");
         break;
     default:
         Log::info("ClientLobby", "Connection refused.");
@@ -609,8 +640,7 @@ void ClientLobby::kartSelectionUpdate(Event* event)
 
 //-----------------------------------------------------------------------------
 
-/*! \brief Called when the server broadcasts to start the race.
-race needs to be started.
+/*! \brief Called when the server broadcasts to start the race to all clients.
  *  \param event : Event providing the information (no additional information
  *                 in this case).
  */
@@ -620,7 +650,8 @@ void ClientLobby::startGame(Event* event)
     // Triggers the world finite state machine to go from WAIT_FOR_SERVER_PHASE
     // to READY_PHASE.
     World::getWorld()->setReadyToRace();
-    Log::info("ClientLobby", "Starting new game");
+    Log::info("ClientLobby", "Starting new game at %lf",
+              StkTime::getRealTime());
 }   // startGame
 
 //-----------------------------------------------------------------------------
@@ -636,6 +667,8 @@ void ClientLobby::startingRaceNow()
     NetworkString *ns = getNetworkString(2);
     ns->addUInt8(LE_STARTED_RACE);
     sendToServer(ns, /*reliable*/true);
+    Log::verbose("ClientLobby", "StartingRaceNow at %lf",
+                 StkTime::getRealTime());
     terminateLatencyProtocol();
 }   // startingRaceNow
 
@@ -647,6 +680,23 @@ void ClientLobby::startingRaceNow()
 void ClientLobby::startSelection(Event* event)
 {
     m_state = KART_SELECTION;
+    const NetworkString& data = event->data();
+    const unsigned kart_num = data.getUInt16();
+    const unsigned track_num = data.getUInt16();
+    m_available_karts.clear();
+    m_available_tracks.clear();
+    for (unsigned i = 0; i < kart_num; i++)
+    {
+        std::string kart;
+        data.decodeString(&kart);
+        m_available_karts.insert(kart);
+    }
+    for (unsigned i = 0; i < track_num; i++)
+    {
+        std::string track;
+        data.decodeString(&track);
+        m_available_tracks.insert(track);
+    }
     Log::info("ClientLobby", "Kart selection starts now");
 }   // startSelection
 
@@ -671,29 +721,11 @@ void ClientLobby::raceFinished(Event* event)
                "Server notified that the race is finished.");
 
     // stop race protocols
-    Protocol* protocol = ProtocolManager::getInstance()
-                       ->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
-    if (protocol)
-        ProtocolManager::getInstance()->requestTerminate(protocol);
-    else
-        Log::error("ClientLobby",
-                   "No controller events protocol registered.");
-
-    protocol = ProtocolManager::getInstance() 
-             ->getProtocol(PROTOCOL_KART_UPDATE);
-    if (protocol)
-        ProtocolManager::getInstance()->requestTerminate(protocol);
-    else
-        Log::error("ClientLobby",
-                   "No kart update protocol registered.");
-
-    protocol = ProtocolManager::getInstance()
-             ->getProtocol(PROTOCOL_GAME_EVENTS);
-    if (protocol)
-        ProtocolManager::getInstance()->requestTerminate(protocol);
-    else
-        Log::error("ClientLobby",
-                   "No game events protocol registered.");
+    auto pm = ProtocolManager::lock();
+    assert(pm);
+    pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
+    pm->findAndTerminate(PROTOCOL_KART_UPDATE);
+    pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
 
     // finish the race
     WorldWithRank* ranked_world = (WorldWithRank*)(World::getWorld());
@@ -720,6 +752,16 @@ void ClientLobby::raceFinished(Event* event)
 void ClientLobby::exitResultScreen(Event *event)
 {
     RaceResultGUI::getInstance()->backToLobby();
+    // Will be reset to linked if connected to server, see update(float dt)
+    m_game_setup = STKHost::get()->setupNewGame();
+    STKHost::get()->getServerPeerForClient()->unsetClientServerToken();
+    // stop race protocols
+    auto pm = ProtocolManager::lock();
+    assert(pm);
+    pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
+    pm->findAndTerminate(PROTOCOL_KART_UPDATE);
+    pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
+    m_state = NONE;
 }   // exitResultScreen
 
 //-----------------------------------------------------------------------------

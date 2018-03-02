@@ -24,8 +24,8 @@
 
 #include "utils/log.hpp"
 
-/*! \class ProtocolManager
- *  \brief Manages the protocols at runtime.
+/*! \class AbstractSingleton
+ *  \brief Manages the abstract singleton at runtime.
  *  This has been designed to allow multi-inheritance. This is advised to
  *  re-declare getInstance, but whithout templates parameters in the inheriting
  *  classes.

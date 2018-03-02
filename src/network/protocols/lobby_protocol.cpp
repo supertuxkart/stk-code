@@ -24,16 +24,16 @@
 #include "modes/world.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/protocols/controller_events_protocol.hpp"
+#include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
-#include "network/protocols/kart_update_protocol.hpp"
 #include "network/protocols/latency_protocol.hpp"
 #include "network/race_event_manager.hpp"
+#include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 
-LobbyProtocol *LobbyProtocol::m_lobby = NULL;
+std::weak_ptr<LobbyProtocol> LobbyProtocol::m_lobby;
 
 LobbyProtocol::LobbyProtocol(CallbackObject* callback_object)
                  : Protocol(PROTOCOL_LOBBY_ROOM, callback_object)
@@ -57,6 +57,7 @@ LobbyProtocol::~LobbyProtocol()
 void LobbyProtocol::loadWorld()
 {
     Log::info("LobbyProtocol", "Ready !");
+    RewindManager::setEnable(true);
 
     // Race startup sequence
     // ---------------------
@@ -124,9 +125,8 @@ void LobbyProtocol::loadWorld()
     // Load the actual world.
     m_game_setup->getRaceConfig()->loadWorld();
     World::getWorld()->setNetworkWorld(true);
-    (new KartUpdateProtocol())->requestStart();
-    (new ControllerEventsProtocol())->requestStart();
-    (new GameEventsProtocol())->requestStart();
+    GameProtocol::createInstance()->requestStart();
+    std::make_shared<GameEventsProtocol>()->requestStart();
 
 }   // loadWorld
 
@@ -135,9 +135,5 @@ void LobbyProtocol::loadWorld()
  */
 void LobbyProtocol::terminateLatencyProtocol()
 {
-    Protocol *p = ProtocolManager::getInstance()
-                ->getProtocol(PROTOCOL_SYNCHRONIZATION);
-    LatencyProtocol *sp = dynamic_cast<LatencyProtocol*>(p);
-    if (sp)
-        sp->requestTerminate();
+    ProtocolManager::lock()->findAndTerminate(PROTOCOL_SYNCHRONIZATION);
 }   // stopLatencyProtocol

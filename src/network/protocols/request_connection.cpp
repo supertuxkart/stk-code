@@ -18,13 +18,13 @@
 
 #include "network/protocols/request_connection.hpp"
 
-#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
+#include "online/xml_request.hpp"
 
 using namespace Online;
 
@@ -75,20 +75,41 @@ void RequestConnection::asynchronousUpdate()
     {
         case NONE:
         {
-            if(NetworkConfig::get()->isLAN())
+            if (NetworkConfig::get()->isLAN() ||
+                NetworkConfig::get()->isDirectConnect() ||
+                STKHost::get()->isClientServer())
             {
-                const Server *server = 
+                if (STKHost::get()->isClientServer())
+                {
+                    // Allow up to 10 seconds for the separate process to
+                    // fully start-up
+                    double timeout = StkTime::getRealTime() + 10.;
+                    while (StkTime::getRealTime() < timeout)
+                    {
+                        const std::string& sid = NetworkConfig::get()
+                            ->getServerIdFile();
+                        assert(!sid.empty());
+                        if (file_manager->fileExists(sid))
+                        {
+                            file_manager->removeFile(sid);
+                            break;
+                        }
+                        StkTime::sleep(10);
+                    }
+                    NetworkConfig::get()->setServerIdFile("");
+                }
+                const Server *server =
                     ServersManager::get()->getServerByID(m_server_id);
                 BareNetworkString message(std::string("connection-request"));
                 STKHost::get()->sendRawPacket(message, server->getAddress());
+                NetworkConfig::get()->setDirectConnect(false);
                 m_state = DONE;
             }
             else
             {
                 m_request = new ServerJoinRequest();
-                PlayerManager::setUserDetails(m_request, "request-connection",
-                                               Online::API::SERVER_PATH);
-
+                NetworkConfig::get()->setUserDetails(m_request,
+                    "request-connection");
                 m_request->addParameter("server_id", m_server_id);
                 m_request->queue();
                 m_state = REQUEST_PENDING;

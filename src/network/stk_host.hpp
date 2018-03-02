@@ -38,10 +38,11 @@
 #define WIN32_LEAN_AND_MEAN
 #include <enet/enet.h>
 
-#include <pthread.h>
+#include <atomic>
+#include <thread>
 
 class GameSetup;
-class NetworkConsole;
+class SeparateProcess;
 
 class STKHost
 {
@@ -63,14 +64,14 @@ private:
     /** Singleton pointer to the instance. */
     static STKHost* m_stk_host;
 
+    /** Separate process of server instance. */
+    SeparateProcess* m_separate_process;
+
     /** ENet host interfacing sockets. */
     Network* m_network;
 
-    /** A separate network connection (socket) to handle LAN requests. */
-    Network *m_lan_network;
-
-    /** Network console */
-    NetworkConsole *m_network_console;
+    /** Network console thread */
+    std::thread m_network_console;
 
     /** The list of peers connected to this instance. */
     std::vector<STKPeer*> m_peers;
@@ -88,28 +89,38 @@ private:
     GameSetup* m_game_setup;
 
     /** Id of thread listening to enet events. */
-    pthread_t*  m_listening_thread;
+    std::thread m_listening_thread;
 
     /** Flag which is set from the protocol manager thread which
      *  triggers a shutdown of the STKHost (and the Protocolmanager). */
-    bool m_shutdown;
+    std::atomic_bool m_shutdown;
 
-    /** Mutex used to stop this thread. */
-    pthread_mutex_t m_exit_mutex;
-
-    /** If this is a server, it indicates if this server is registered
-     *  with the stk server. */
-    bool m_is_registered;
+    /** Atomic flag used to stop this thread. */
+    std::atomic_flag m_exit_flag = ATOMIC_FLAG_INIT;
 
     /** An error message, which is set by a protocol to be displayed
      *  in the GUI. */
     irr::core::stringw m_error_message;
 
+    /** The public address found by stun (if WAN is used). */
+    TransportAddress m_public_address;
+
+    /** The public address stun server used. */
+    TransportAddress m_stun_address;
+
+    /** The private port enet socket is bound. */
+    uint16_t m_private_port;
+
+    /** An error message, which is set by a protocol to be displayed
+     *  in the GUI. */
+
              STKHost(uint32_t server_id, uint32_t host_id);
              STKHost(const irr::core::stringw &server_name);
     virtual ~STKHost();
     void init();
-    void handleDirectSocketRequest();
+    void handleDirectSocketRequest(Network* lan_network);
+    // ------------------------------------------------------------------------
+    void mainLoop();
 
 public:
     /** If a network console should be started. Note that the console can cause
@@ -120,7 +131,7 @@ public:
     /** Creates the STKHost. It takes all confifguration parameters from
      *  NetworkConfig. This STKHost can either be a client or a server.
      */
-    static void create();
+    static void create(SeparateProcess* p = NULL);
 
     // ------------------------------------------------------------------------
     /** Returns the instance of STKHost. */
@@ -140,14 +151,37 @@ public:
     /** Checks if the STKHost has been created. */
     static bool existHost() { return m_stk_host != NULL; }
     // ------------------------------------------------------------------------
-
-    static void* mainLoop(void* self);
-
+    const TransportAddress& getPublicAddress() const
+                                                   { return m_public_address; }
+    // ------------------------------------------------------------------------
+    const TransportAddress& getStunAddress() const
+                                                     { return m_stun_address; }
+    // ------------------------------------------------------------------------
+    uint16_t getPrivatePort() const
+                                                     { return m_private_port; }
+    // ------------------------------------------------------------------------
+    void setPrivatePort();
+    // ------------------------------------------------------------------------
+    void setPublicAddress();
+    // ------------------------------------------------------------------------
     virtual GameSetup* setupNewGame();
     void abort();
     void deleteAllPeers();
     bool connect(const TransportAddress& peer);
-    void requestShutdown();
+
+    //-------------------------------------------------------------------------
+    /** Requests that the network infrastructure is to be shut down. This
+    *   function is called from a thread, but the actual shutdown needs to be
+    *   done from the main thread to avoid race conditions (e.g.
+    *   ProtocolManager might still access data structures when the main thread
+    *   tests if STKHost exist (which it does, but ProtocolManager might be
+    *   shut down already.
+    */
+    void requestShutdown()
+    {
+        m_shutdown.store(true);
+    }   // requestExit
+    //-------------------------------------------------------------------------
     void shutdown();
 
     void sendPacketExcept(STKPeer* peer,
@@ -162,82 +196,66 @@ public:
     void        removePeer(const STKPeer* peer);
     bool        isConnectedTo(const TransportAddress& peer_address);
     STKPeer    *getPeer(ENetPeer *enet_peer);
+    STKPeer    *getServerPeerForClient() const;
     std::vector<NetworkPlayerProfile*> getMyPlayerProfiles();
-    int         mustStopListening();
-    uint16_t    getPort() const;
     void        setErrorMessage(const irr::core::stringw &message);
     bool        isAuthorisedToControl() const;
-    const irr::core::stringw& 
-                getErrorMessage() const;
 
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    /** Returns the last error (or "" if no error has happened). */
+    const irr::core::stringw& getErrorMessage() const
+                                                    { return m_error_message; }
+    // ------------------------------------------------------------------------
     /** Returns true if a shutdown of the network infrastructure was
      *  requested. */
-    bool requestedShutdown() const { return m_shutdown; }
-    // --------------------------------------------------------------------
+    bool requestedShutdown() const                { return m_shutdown.load(); }
+    // ------------------------------------------------------------------------
     /** Returns the current game setup. */
-    GameSetup* getGameSetup() { return m_game_setup; }
-    // --------------------------------------------------------------------
+    GameSetup* getGameSetup()                          { return m_game_setup; }
+    // ------------------------------------------------------------------------
     int receiveRawPacket(char *buffer, int buffer_len, 
                          TransportAddress* sender, int max_tries = -1)
     {
         return m_network->receiveRawPacket(buffer, buffer_len, sender,
                                            max_tries);
     }   // receiveRawPacket
-
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     void sendRawPacket(const BareNetworkString &buffer,
                        const TransportAddress& dst)
     {
         m_network->sendRawPacket(buffer, dst);
     }  // sendRawPacket
-
-    // --------------------------------------------------------------------
-    /** Returns the IP address of this host. */
-    uint32_t  getAddress() const
-    {
-        return m_network->getENetHost()->address.host;
-    }   // getAddress
-
-
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns a const reference to the list of peers. */
-    const std::vector<STKPeer*> &getPeers() { return m_peers; }
-    // --------------------------------------------------------------------
+    const std::vector<STKPeer*> &getPeers()                 { return m_peers; }
+    // ------------------------------------------------------------------------
     /** Returns the next (unique) host id. */
     unsigned int getNextHostId() const
     {
         assert(m_next_unique_host_id >= 0);
         return m_next_unique_host_id;
     }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the number of currently connected peers. */
-    unsigned int getPeerCount() { return (int)m_peers.size(); }
-    // --------------------------------------------------------------------
-    /** Sets if this server is registered with the stk server. */
-    void setRegistered(bool registered)
-    {
-        m_is_registered = registered; 
-    }   // setRegistered
-    // --------------------------------------------------------------------
-    /** Returns if this server is registered with the stk server. */
-    bool isRegistered() const
-    {
-        return m_is_registered;
-    }   // isRegistered
-    // --------------------------------------------------------------------
+    unsigned int getPeerCount()                 { return (int)m_peers.size(); }
+    // ------------------------------------------------------------------------
     /** Sets the global host id of this host. */
-    void setMyHostId(uint8_t my_host_id) { m_host_id = my_host_id; }
-    // --------------------------------------------------------------------
+    void setMyHostId(uint8_t my_host_id)            { m_host_id = my_host_id; }
+    // ------------------------------------------------------------------------
     /** Returns the host id of this host. */
-    uint8_t getMyHostId() const { return m_host_id; }
-    // --------------------------------------------------------------------
+    uint8_t getMyHostId() const                           { return m_host_id; }
+    // ------------------------------------------------------------------------
     /** Sends a message from a client to the server. */
     void sendToServer(NetworkString *data, bool reliable = true)
     {
         assert(NetworkConfig::get()->isClient());
         m_peers[0]->sendPacket(data, reliable);
     }   // sendToServer
+    // ------------------------------------------------------------------------
+    /** True if this is a client and server in graphics mode made by server
+     *  creation screen. */
+    bool isClientServer() const          { return m_separate_process != NULL; }
+
 };   // class STKHost
 
 #endif // STK_HOST_HPP

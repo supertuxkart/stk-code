@@ -27,6 +27,7 @@
  */
 
 #include "network/remote_kart_info.hpp"
+#include "utils/interpolation_array.hpp"
 #include "utils/no_copy.hpp"
 
 #include "utils/constants.hpp"
@@ -82,6 +83,17 @@ public:
     int   m_max_karts;                 /**<Maximum number of karts.            */
     bool  m_smooth_normals;            /**< If normals for raycasts for wheels
                                            should be interpolated.             */
+
+    /** How many state updates per second the server will send. */
+    int m_network_state_frequeny;
+
+    /** Smoothing of prediction errors for position, defined as an
+     *  InterpolationArray. */
+    InterpolationArray m_positional_smoothing;
+    /** Smoothing of prediction errors for rotations, defined as an
+     *  InterpolationArray. */
+    InterpolationArray m_rotational_smoothing;
+
     /** If the angle between a normal on a vertex and the normal of the
      *  triangle are more than this value, the physics will use the normal
      *  of the triangle in smoothing normal. */
@@ -92,6 +104,9 @@ public:
 
     /** Default friction to be used for any moveable, e.g. karts, balls. */
     float m_default_moveable_friction;
+
+    /** Default FPS rate for physics. */
+    int m_physics_fps;
 
     int   m_max_skidmarks;           /**<Maximum number of skid marks/kart.  */
     float m_skid_fadeout_time;       /**<Time till skidmarks fade away.      */
@@ -105,7 +120,6 @@ public:
           m_max_track_version;       /**<version supported by this binary.   */
     int   m_max_display_news;        /**<How often a news message is displayed
                                          before it is ignored. */
-    bool  m_enable_networking;
 
     /** Disable steering if skidding is stopped. This can help in making
      *  skidding more controllable (since otherwise when trying to steer while

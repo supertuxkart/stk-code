@@ -23,6 +23,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/widgets/player_kart_widget.hpp"
+#include "input/device_manager.hpp"
 #include "items/item_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -30,6 +31,7 @@
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/stk_host.hpp"
+#include "states_screens/race_setup_screen.hpp"
 #include "states_screens/server_selection.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
@@ -106,6 +108,15 @@ void NetworkKartSelectionScreen::init()
         m_kart_widgets[n].move( fullarea->m_x + splitWidth*n,
                                 fullarea->m_y, splitWidth, fullarea->m_h);
     }
+    // In case of auto-connect, select default kart and go to track selection.
+    if (NetworkConfig::get()->isAutoConnect())
+    {
+        DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
+        assert(w != NULL);
+        w->setSelection(UserConfigParams::m_default_kart, /*player id*/0, /*focus*/true);
+        playerConfirm(0);
+        RaceSetupScreen::getInstance()->push();
+    }
 
 }   // init
 
@@ -133,9 +144,7 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
     }
     if(playerID == PLAYER_ID_GAME_MASTER) // self
     {
-
-        LobbyProtocol* protocol = LobbyProtocol::get();
-        ClientLobby *clrp = dynamic_cast<ClientLobby*>(protocol);
+        auto clrp = LobbyProtocol::get<ClientLobby>();
         assert(clrp);
         // FIXME SPLITSCREEN: we need to supply the global player id of the 
         // player selecting the kart here. For now ... just vote the same kart
@@ -145,8 +154,9 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
         for(unsigned int i=0; i<players.size(); i++)
         {
             clrp->requestKartSelection(players[i]->getGlobalPlayerId(),
-                                           selection);
+                                       selection                        );
         }
+        input_manager->getDeviceManager()->setAssignMode(ASSIGN);
     }
 }   // playerConfirm
 
@@ -168,21 +178,23 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
     if(widget_id==-1)
         return;
 
-    KartSelectionScreen::updateKartWidgetModel(widget_id, kart_name,
-                                       irr::core::stringw(kart_name.c_str()),
-                                       /*Todo get color*/0.0f);
-    KartSelectionScreen::updateKartStats(widget_id, kart_name);
-    m_kart_widgets[widget_id].setKartInternalName(kart_name);
-    m_kart_widgets[widget_id].markAsReady(); // mark player ready
+    // In case of auto-connect the screen is already replaced, so
+    // m_kart_widget is empty.
+    if (! STKHost::get()->isAuthorisedToControl())
+    {
+        KartSelectionScreen::updateKartWidgetModel(widget_id, kart_name,
+                                           irr::core::stringw(kart_name.c_str()),
+                                           /*Todo get color*/0.0f);
+        KartSelectionScreen::updateKartStats(widget_id, kart_name);
+        m_kart_widgets[widget_id].setKartInternalName(kart_name);
+        m_kart_widgets[widget_id].markAsReady(); // mark player ready
+    }
 
     // If this is the authorised client, send the currently set race config
     // to the server.
     if(STKHost::get()->isAuthorisedToControl())
     {
-        Protocol* protocol = ProtocolManager::getInstance()
-                           ->getProtocol(PROTOCOL_LOBBY_ROOM);
-        ClientLobby* clrp =
-                           dynamic_cast<ClientLobby*>(protocol);
+        auto clrp = LobbyProtocol::get<ClientLobby>();
         assert(clrp);
         // FIXME: for now we submit a vote from the authorised user
         // for the various modes based on the settings in the race manager. 
@@ -197,12 +209,11 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
             clrp->voteMinor(id, race_manager->getMinorMode());
             clrp->voteReversed(id, race_manager->getReverseTrack());
             clrp->voteRaceCount(id, 1);
-            clrp->voteLaps(id, 3);
+            clrp->voteLaps(id, 1);
         }
         //WaitingForOthersScreen::getInstance()->push();
         //return;
     }
-    TracksScreen::getInstance()->setOfficalTrack(true);
     TracksScreen::getInstance()->push();
 }   // playerSelected
 
@@ -212,11 +223,6 @@ bool NetworkKartSelectionScreen::onEscapePressed()
     // then remove the lobby screen (you left the server)
     StateManager::get()->popMenu();
     ServerSelection::getInstance()->refresh();
-    Protocol *lobby = LobbyProtocol::get();
-    // notify the server that we left
-    ClientLobby* clrp =
-        dynamic_cast<ClientLobby*>(lobby);
-    if (clrp)
-        clrp->leave();
+    STKHost::get()->shutdown();
     return true; // remove the screen
 }   // onEscapePressed

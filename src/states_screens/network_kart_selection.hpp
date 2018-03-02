@@ -21,6 +21,8 @@
 #include "states_screens/kart_selection.hpp"
 #include "guiengine/screen.hpp"
 
+#include <set>
+
 class NetworkKartSelectionScreen : public KartSelectionScreen,
                   public GUIEngine::ScreenSingleton<NetworkKartSelectionScreen>
 {
@@ -33,7 +35,19 @@ protected:
     virtual ~NetworkKartSelectionScreen();
 
     virtual void playerConfirm(const int playerID) OVERRIDE;
+
+private:
+    std::set<std::string> m_available_karts;
+    virtual bool isIgnored(const std::string& ident) const OVERRIDE
+    {
+        return m_available_karts.find(ident) == m_available_karts.end();
+    }
+
 public:
+    void setAvailableKartsFromServer(const std::set<std::string>& k)
+    {
+        m_available_karts = k;
+    }
     virtual void init() OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;
     virtual void playerSelected(uint8_t player_id,

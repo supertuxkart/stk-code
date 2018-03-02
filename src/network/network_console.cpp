@@ -16,87 +16,64 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "network/network_console.hpp"
-
-#include "main_loop.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/stk_host.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/protocols/server_lobby.hpp"
-#include "network/protocols/stop_server.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 #include "utils/vs.hpp"
+#include "main_loop.hpp"
 
 #include <iostream>
 
-
-NetworkConsole::NetworkConsole()
+namespace NetworkConsole
 {
-    m_localhost = NULL;
-    m_thread_keyboard = NULL;
-}
+// ----------------------------------------------------------------------------
+void kickAllPlayers(STKHost* host)
+{
+    const std::vector<STKPeer*> &peers = host->getPeers();
+    for (unsigned int i = 0; i < peers.size(); i++)
+    {
+        peers[i]->disconnect();
+    }
+}   // kickAllPlayers
 
 // ----------------------------------------------------------------------------
-NetworkConsole::~NetworkConsole()
-{
-#ifndef ANDROID
-    if (m_thread_keyboard)
-        pthread_cancel(*m_thread_keyboard);//, SIGKILL);
-#endif
-}
-
-// ----------------------------------------------------------------------------
-void NetworkConsole::run()
-{
-    // listen keyboard console input
-    m_thread_keyboard = new pthread_t;
-    pthread_create(m_thread_keyboard, NULL, mainLoop, this);
-
-    Log::info("NetworkConsole", "Ready.");
-}   // run
-
-// ----------------------------------------------------------------------------
-void* NetworkConsole::mainLoop(void* data)
+void mainLoop(STKHost* host)
 {
     VS::setThreadName("NetworkConsole");
-    NetworkConsole *me = static_cast<NetworkConsole*>(data);
     std::string str = "";
-    bool stop = false;
-    while (!stop)
+    while (!host->requestedShutdown())
     {
         getline(std::cin, str);
         if (str == "quit")
         {
-            stop = true;
+            host->requestShutdown();
         }
         else if (str == "kickall" && NetworkConfig::get()->isServer())
         {
-            me->kickAllPlayers();
+            kickAllPlayers(host);
         }
         else if (str == "start" && NetworkConfig::get()->isServer())
         {
-            ServerLobby* protocol = 
-                dynamic_cast<ServerLobby*>(LobbyProtocol::get());
-            protocol->signalRaceStartToClients();
+            auto sl = LobbyProtocol::get<ServerLobby>();
+            sl->signalRaceStartToClients();
         }
         else if (str == "selection" && NetworkConfig::get()->isServer())
         {
-            ServerLobby* protocol =
-                    dynamic_cast<ServerLobby*>(LobbyProtocol::get());
-            protocol->startSelection();
+            auto sl = LobbyProtocol::get<ServerLobby>();
+            sl->startSelection();
         }
         else if (str == "select" && NetworkConfig::get()->isClient())
         {
             std::string str2;
             getline(std::cin, str2);
-            ServerLobby* protocol =
-                dynamic_cast<ServerLobby*>(LobbyProtocol::get());
-            ClientLobby* clrp = dynamic_cast<ClientLobby*>(protocol);
+            auto clrp = LobbyProtocol::get<ClientLobby>();
             std::vector<NetworkPlayerProfile*> players =
-                                         STKHost::get()->getMyPlayerProfiles();
+                host->getMyPlayerProfiles();
             // For now send a vote for each local player
             for(unsigned int i=0; i<players.size(); i++)
             {
@@ -109,11 +86,9 @@ void* NetworkConsole::mainLoop(void* data)
             std::cout << "Vote for ? (track/laps/reversed/major/minor/race#) :";
             std::string str2;
             getline(std::cin, str2);
-            LobbyProtocol* protocol = LobbyProtocol::get();
-            ClientLobby* clrp =
-                               dynamic_cast<ClientLobby*>(protocol);
+            auto clrp = LobbyProtocol::get<ClientLobby>();
             std::vector<NetworkPlayerProfile*> players =
-                                     STKHost::get()->getMyPlayerProfiles();
+                host->getMyPlayerProfiles();
             if (str2 == "track")
             {
                 std::cin >> str2;
@@ -163,26 +138,7 @@ void* NetworkConsole::mainLoop(void* data)
             Log::info("Console", "Unknown command '%s'.", str.c_str());
         }
     }   // while !stop
-
-    Protocol *p = new StopServer();
-    while(p->getState() != PROTOCOL_STATE_TERMINATED)
-    {
-        StkTime::sleep(1);
-    }
-
-    delete p;
-
     main_loop->abort();
-
-    return NULL;
 }   // mainLoop
 
-// ----------------------------------------------------------------------------
-void NetworkConsole::kickAllPlayers()
-{
-    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
-    for (unsigned int i = 0; i < peers.size(); i++)
-    {
-        peers[i]->disconnect();
-    }
-}   // kickAllPlayers
+}

@@ -60,6 +60,7 @@
 #include "karts/max_speed.hpp"
 #include "karts/rescue_animation.hpp"
 #include "karts/skidding.hpp"
+#include "main_loop.hpp"
 #include "modes/overworld.hpp"
 #include "modes/soccer_world.hpp"
 #include "modes/world.hpp"
@@ -68,7 +69,6 @@
 #include "modes/soccer_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
-#include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"
@@ -1266,7 +1266,7 @@ void Kart::update(float dt)
     // is used furthermore for engine power, camera distance etc
     updateSpeed();
 
-    if(!history->replayHistory() && !RewindManager::get()->isRewinding())
+    if(!history->replayHistory() || !history->dontDoPhysics())
         m_controller->update(dt);
 
 #undef DEBUG_CAMERA_SHAKE
@@ -1285,18 +1285,17 @@ void Kart::update(float dt)
 #ifdef DEBUG_TO_COMPARE_KART_PHYSICS
     // This information is useful when comparing kart physics, e.g. to
     // see top speed, acceleration (i.e. time to top speed) etc.
-    Log::verbose("physics", "%s t %f %f xyz %f %f %f v %f %f %f sk %f %d %f %f %f st %f %f",
+    Log::verbose("physics", "     %s t %f %f xyz(9-11) %f %f %f v(13-15) %f %f %f steerf(17) %f maxangle(19) %f speed(21) %f steering(23-24) %f %f clock %lf",
         getIdent().c_str(),
         World::getWorld()->getTime(), dt,
         getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
-        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),
-        m_skidding->getSkidFactor(),
-        m_skidding->getSkidState(),
-        m_skidding->getSteeringFraction(),
-        getMaxSteerAngle(),
-        m_speed,
-        m_vehicle->getWheelInfo(0).m_steering,
-        m_vehicle->getWheelInfo(1).m_steering
+        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),  //13,14,15
+        m_skidding->getSteeringFraction(), //19
+        getMaxSteerAngle(),  //20
+        m_speed,  //21
+        m_vehicle->getWheelInfo(0).m_steering,  //23
+        m_vehicle->getWheelInfo(1).m_steering,  //24
+        StkTime::getRealTime()
         );
 #endif
 
@@ -1417,7 +1416,25 @@ void Kart::update(float dt)
         old_group = m_body->getBroadphaseHandle()->m_collisionFilterGroup;
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
-
+#ifdef XX
+    Log::verbose("physicsafter", "%s t %f %f xyz(9-11) %f %f %f %f %f %f "
+        "v(16-18) %f %f %f steerf(20) %f maxangle(22) %f speed(24) %f "
+        "steering(26-27) %f %f clock(29) %lf",
+        getIdent().c_str(),
+        World::getWorld()->getTime(), dt,
+        getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
+        m_body->getWorldTransform().getOrigin().getX(),
+        m_body->getWorldTransform().getOrigin().getY(),
+        m_body->getWorldTransform().getOrigin().getZ(),
+        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),  //13,14,15
+        m_skidding->getSteeringFraction(), //19
+        getMaxSteerAngle(),  //20
+        m_speed,  //21
+        m_vehicle->getWheelInfo(0).m_steering,  //23
+        m_vehicle->getWheelInfo(1).m_steering,  //24
+        StkTime::getRealTime()
+    );
+#endif
     // After the physics step was done, the position of the wheels (as stored
     // in wheelInfo) is actually outdated, since the chassis was moved
     // according to the force acting from the wheels. So the center of the
@@ -1521,8 +1538,8 @@ void Kart::update(float dt)
     // Check if any item was hit.
     // check it if we're not in a network world, or if we're on the server
     // (when network mode is on)
-    if (!RaceEventManager::getInstance()->isRunning() ||
-        NetworkConfig::get()->isServer())
+    if(!NetworkConfig::get()->isNetworking() ||
+        NetworkConfig::get()->isServer()       )
         ItemManager::get()->checkItemHit(this);
 
     static video::SColor pink(255, 255, 133, 253);
@@ -1755,7 +1772,7 @@ void Kart::handleMaterialSFX(const Material *material)
 
     // terrain sound is not necessarily a looping sound so check its status before
     // setting its speed, to avoid 'ressuscitating' sounds that had already stopped
-    if(m_terrain_sound &&
+    if(m_terrain_sound && main_loop->isLstSubstep() &&
       (m_terrain_sound->getStatus()==SFXBase::SFX_PLAYING ||
        m_terrain_sound->getStatus()==SFXBase::SFX_PAUSED))
     {
@@ -2387,10 +2404,13 @@ void Kart::updatePhysics(float dt)
  */
 void Kart::updateEngineSFX(float dt)
 {
-    // when going faster, use higher pitch for engine
-    if(!m_engine_sound || !SFXManager::get()->sfxAllowed())
+    // Only update SFX during the last substep (otherwise too many SFX commands
+    // in one frame), and if sfx are enabled
+    if(!m_engine_sound || !SFXManager::get()->sfxAllowed() ||
+        !main_loop->isLstSubstep()                              )
         return;
 
+    // when going faster, use higher pitch for engine
     if(isOnGround())
     {
         float max_speed = m_kart_properties->getEngineMaxSpeed();

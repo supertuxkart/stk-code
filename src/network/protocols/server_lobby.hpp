@@ -5,27 +5,35 @@
 #include "utils/cpp2011.hpp"
 #include "utils/synchronised.hpp"
 
+#include <atomic>
+#include <set>
+
 class ServerLobby : public LobbyProtocol
-                  , public CallbackObject
 {
-private:
+public:
     /* The state for a small finite state machine. */
-    enum
+    enum ServerState : unsigned int
     {
-        INIT_WAN,                 // Start state for WAN game
-        GETTING_PUBLIC_ADDRESS,   // Waiting to receive its public ip address
+        SET_PUBLIC_ADDRESS,       // Waiting to receive its public ip address
+        REGISTER_SELF_ADDRESS,    // Register with STK online server
         ACCEPTING_CLIENTS,        // In lobby, accepting clients
         SELECTING,                // kart, track, ... selection started
         LOAD_WORLD,               // Server starts loading world
         WAIT_FOR_WORLD_LOADED,    // Wait for clients and server to load world
         WAIT_FOR_RACE_STARTED,    // Wait for all clients to have started the race
-        START_RACE,               // Inform clients to start race
         DELAY_SERVER,             // Additional server delay
         RACING,                   // racing
         RESULT_DISPLAY,           // Show result screen
-        DONE,                     // shutting down server
+        ERROR_LEAVE,              // shutting down server
         EXITING
-    } m_state;
+    };
+private:
+    std::atomic<ServerState> m_state;
+
+    /** Available karts and tracks for all clients, this will be initialized
+     *  with data in server first. */
+    Synchronised<std::pair<std::set<std::string>,
+        std::set<std::string> > > m_available_kts;
 
     /** Next id to assign to a peer. */
     Synchronised<int> m_next_player_id;
@@ -43,11 +51,14 @@ private:
 
     /** Keeps track of an artificial server delay (which makes sure that the
      *  data from all clients has arrived when the server computes a certain
-     *  timestep. */
-    float m_server_delay;
+     *  timestep.(. It stores the real time since epoch + delta (atm 0.1
+     *  seconds), which is the real time at which the server should start. */
+    double m_server_delay;
 
-    Protocol *m_current_protocol;
     bool m_selection_enabled;
+
+    /** It indicates if this server is registered with the stk server. */
+    std::atomic_bool m_server_registered;
 
     /** Counts how many players are ready to go on. */
     int m_player_ready_counter;
@@ -71,22 +82,26 @@ private:
     void registerServer();
     void finishedLoadingWorldClient(Event *event);
     void startedRaceOnClient(Event *event);
+    void unregisterServer();
+    void createServerIdFile();
 public:
              ServerLobby();
     virtual ~ServerLobby();
 
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
+    virtual bool notifyEvent(Event* event) OVERRIDE;
     virtual void setup() OVERRIDE;
     virtual void update(float dt) OVERRIDE;
-    virtual void asynchronousUpdate() OVERRIDE {};
+    virtual void asynchronousUpdate() OVERRIDE;
 
     void signalRaceStartToClients();
     void startSelection(const Event *event=NULL);
     void checkIncomingConnectionRequests();
     void checkRaceFinished();
     void finishedLoadingWorld();
-
-    virtual void callback(Protocol *protocol) OVERRIDE;
+    ServerState getCurrentState() const { return m_state.load(); }
+    virtual bool waitingForPlayers() const OVERRIDE
+                                { return m_state.load() == ACCEPTING_CLIENTS; }
 
 };   // class ServerLobby
 

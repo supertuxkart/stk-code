@@ -318,8 +318,6 @@ public:
       * quadgraph. Override to change value. */
     virtual bool useChecklineRequirements() const { return false; }
     // ------------------------------------------------------------------------
-    void delayedSelfDestruct();
-    // ------------------------------------------------------------------------
     virtual void escapePressed();
     // ------------------------------------------------------------------------
     virtual void loadCustomModels() {}

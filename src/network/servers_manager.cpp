@@ -169,6 +169,8 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             // any local servers.
             double start_time = StkTime::getRealTime();
             const double DURATION = 1.0;
+            int cur_server_id = ServersManager::get()->getNumServers();
+            assert(cur_server_id == 0);
             while(StkTime::getRealTime() - start_time < DURATION)
             {
                 TransportAddress sender;
@@ -183,16 +185,11 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     uint8_t players     = s.getUInt8();
                     uint32_t my_ip      = s.getUInt32();
                     uint16_t my_port    = s.getUInt16();
-                    uint16_t mode       = s.getUInt16();
                     uint8_t difficulty  = s.getUInt8();
-                    Server* server = new Server(name, /*lan*/true,
-                        max_players, players, sender);
-                    server->setDifficulty((RaceManager::Difficulty)difficulty);
-                    server->setRaceMinorMode((RaceManager::MinorRaceModeType)mode);
+                    uint8_t mode        = s.getUInt8();
+                    Server* server = new Server(cur_server_id++, name,
+                        max_players,players, difficulty, mode, sender);
                     ServersManager::get()->addServer(server);
-
-                    TransportAddress me(my_ip, my_port);
-                    NetworkConfig::get()->setMyAddress(me);
                     m_success = true;
                 }   // if received_data
             }    // while still waiting
@@ -262,7 +259,7 @@ void ServersManager::refresh(bool success, const XMLNode *input)
     const XMLNode *servers_xml = input->getNode("servers");
     for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
     {
-        addServer(new Server(*servers_xml->getNode(i), /*is_lan*/false));
+        addServer(new Server(*servers_xml->getNode(i)));
     }
     m_last_load_time.setAtomic((float)StkTime::getRealTime());
 }   // refresh

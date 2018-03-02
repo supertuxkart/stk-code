@@ -30,6 +30,7 @@
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/protocols/server_lobby.hpp"
+#include "network/rewind_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "tracks/track.hpp"
 
@@ -61,6 +62,7 @@ WorldStatus::WorldStatus()
 void WorldStatus::reset()
 {
     m_time            = 0.0f;
+    m_adjust_time_by  = 0.0f;
     m_auxiliary_timer = 0.0f;
     m_count_up_timer  = 0.0f;
 
@@ -206,6 +208,7 @@ void WorldStatus::updateTime(const float dt)
             m_auxiliary_timer += dt;
 
             if (UserConfigParams::m_artist_debug_mode &&
+                !NetworkConfig::get()->isNetworking() &&
                 race_manager->getNumberOfKarts() -
                 race_manager->getNumSpareTireKarts() == 1 &&
                 race_manager->getTrackName() != "tutorial")
@@ -259,8 +262,7 @@ void WorldStatus::updateTime(const float dt)
             if (!m_server_is_ready) return;
 
             m_phase = READY_PHASE;
-            Protocol *p = LobbyProtocol::get();
-            ClientLobby *cl = dynamic_cast<ClientLobby*>(p);
+            auto cl = LobbyProtocol::get<ClientLobby>();
             if (cl)
                 cl->startingRaceNow();
             return;   // Don't increase time
@@ -282,7 +284,8 @@ void WorldStatus::updateTime(const float dt)
 
             // In artist debug mode, when without opponents, skip the
             // ready/set/go counter faster
-            if (UserConfigParams::m_artist_debug_mode &&
+            if (UserConfigParams::m_artist_debug_mode     &&
+                !NetworkConfig::get()->isNetworking()     &&
                 race_manager->getNumberOfKarts() -
                 race_manager->getNumSpareTireKarts() == 1 &&
                 race_manager->getTrackName() != "tutorial")
@@ -390,7 +393,7 @@ void WorldStatus::updateTime(const float dt)
     }
 
     IrrlichtDevice *device = irr_driver->getDevice();
-
+    
     switch (m_clock_mode)
     {
         case CLOCK_CHRONO:
@@ -427,6 +430,41 @@ void WorldStatus::updateTime(const float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
+/** If the server requests that a client's time should be adjusted,
+ *  smoothly change the clock speed of this client to go a bit faster
+ *  or slower till the overall adjustment was reached.
+ *  \param dt Original time step size.
+ */
+float WorldStatus::adjustDT(float dt)
+{
+    // If request, adjust world time to go ahead (adjust>0) or
+    // slow down (<0). This is done in 5% of dt steps so that the
+    // user will not notice this.
+    const float FRACTION = 0.10f;   // fraction of dt to be adjusted
+    float time_adjust;
+    if (m_adjust_time_by >= 0)   // make it run faster
+    {
+        time_adjust = dt * FRACTION;
+        if (time_adjust > m_adjust_time_by) time_adjust = m_adjust_time_by;
+        if (m_adjust_time_by > 0)
+            Log::verbose("info", "At %f %f adjusting time by %f dt %f to dt %f for %f",
+                World::getWorld()->getTime(), StkTime::getRealTime(),
+                time_adjust, dt, dt - time_adjust, m_adjust_time_by);
+    }
+    else   // m_adjust_time negative, i.e. will go slower
+    {
+        time_adjust = -dt * FRACTION;
+        if (time_adjust < m_adjust_time_by) time_adjust = m_adjust_time_by;
+        Log::verbose("info", "At %f %f adjusting time by %f dt %f to dt %f for %f",
+            World::getWorld()->getTime(), StkTime::getRealTime(),
+            time_adjust, dt, dt - time_adjust, m_adjust_time_by);
+    }
+    m_adjust_time_by -= time_adjust;
+    dt -= time_adjust;
+    return dt;
+}  // adjustDT
+
+//-----------------------------------------------------------------------------
 /** Called on the client when it receives a notification from the server that
  *  all clients (and server) are ready to start the race. The server will
  *  then additionally wait for all clients to report back that they are
@@ -460,7 +498,8 @@ void WorldStatus::pause(Phase phase)
     m_phase          = phase;
     IrrlichtDevice *device = irr_driver->getDevice();
 
-    if (!device->getTimer()->isStopped())
+    if (!device->getTimer()->isStopped() &&
+        !NetworkConfig::get()->isNetworking())
         device->getTimer()->stop();
 }   // pause
 
@@ -475,6 +514,7 @@ void WorldStatus::unpause()
     m_previous_phase = UNDEFINED_PHASE;
     IrrlichtDevice *device = irr_driver->getDevice();
 
-    if (device->getTimer()->isStopped())
+    if (device->getTimer()->isStopped() &&
+        !NetworkConfig::get()->isNetworking())
         device->getTimer()->start();
 }   // unpause

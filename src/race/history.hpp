@@ -24,6 +24,7 @@
 
 #include "LinearMath/btQuaternion.h"
 
+#include "input/input.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/vec3.hpp"
@@ -53,6 +54,9 @@ private:
     /** Points to the last used entry, and will wrap around. */
     int                        m_current;
 
+    /** Points to the last used input event index. */
+    unsigned int               m_event_index;
+
     /** True if the buffer has wrapped around. */
     bool                       m_wrapped;
 
@@ -67,6 +71,10 @@ private:
     /** Stores the kart controls being used (for physics replay). */
     std::vector<KartControl>   m_all_controls;
 
+    /** For networking: keep track of the replay time so that the
+     *  right event can be replayed. */
+    float                      m_history_time;
+
     /** Stores the coordinates (for simple replay). */
     AlignedArray<Vec3>         m_all_xyz;
 
@@ -76,15 +84,34 @@ private:
     /** The identities of the karts to use. */
     std::vector<std::string>  m_kart_ident;
 
+    // ------------------------------------------------------------------------
+    struct InputEvent
+    {
+        /** Index at which the even happened. */
+        int m_index;
+        /* Time at which this event occurred. */
+        float m_time;
+        /** For which kart the event was. */
+        int m_kart_index;
+        /** Which action it was. */
+        PlayerAction m_action;
+        /** The value to use. */
+        int m_value;
+    };   // InputEvent
+    // ------------------------------------------------------------------------
+
+    /** All input events. */
+    std::vector<InputEvent> m_all_input_events;
+
     void  allocateMemory(int number_of_frames);
 public:
           History        ();
-    void  startReplay    ();
     void  initRecording  ();
     void  Save           ();
     void  Load           ();
     void  updateSaving(float dt);
-    float updateReplayAndGetDT();
+    float updateReplayAndGetDT(float time, float dt);
+    void  addEvent(int kart_id, PlayerAction pa, int value);
 
     // -------------------I-----------------------------------------------------
     /** Returns the identifier of the n-th kart. */

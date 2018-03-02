@@ -18,6 +18,7 @@
 
 #include "network/rewind_info.hpp"
 
+#include "network/network_config.hpp"
 #include "physics/physics.hpp"
 
 /** Constructor for a state: it only takes the size, and allocates a buffer
@@ -30,25 +31,33 @@ RewindInfo::RewindInfo(float time, bool is_confirmed)
     m_is_confirmed = is_confirmed;
 }   // RewindInfo
 
-// ============================================================================
-RewindInfoTime::RewindInfoTime(float time)
-              : RewindInfo(time, /*is_confirmed*/true)
+// ----------------------------------------------------------------------------
+/** Adjusts the time of this RewindInfo. This is only called on the server
+ *  in case that an event is received in the past - in this case the server
+ *  needs to avoid a Rewind by moving this event forward to the current time.
+ */
+void RewindInfo::setTime(float time)
 {
-}   // RewindInfoTime
+    assert(NetworkConfig::get()->isServer());
+    assert(m_time < time);
+    m_time = time;
+}   // setTime
 
 // ============================================================================
 RewindInfoState::RewindInfoState(float time, Rewinder *rewinder, 
                                  BareNetworkString *buffer, bool is_confirmed)
     : RewindInfoRewinder(time, rewinder, buffer, is_confirmed)
 {
-    m_local_physics_time = Physics::getInstance()->getPhysicsWorld()
-                                                 ->getLocalTime();
+    // rewinder = NULL is used in unit testing, in which case no world exists
+    if(rewinder!=NULL)
+        m_local_physics_time = Physics::getInstance()->getPhysicsWorld()
+                                                     ->getLocalTime();
 }   // RewindInfoState
 
 // ============================================================================
 RewindInfoEvent::RewindInfoEvent(float time, EventRewinder *event_rewinder,
                                  BareNetworkString *buffer, bool is_confirmed)
-    : RewindInfo(time, is_confirmed)
+               : RewindInfo(time, is_confirmed)
 {
     m_event_rewinder = event_rewinder;
     m_buffer         = buffer;

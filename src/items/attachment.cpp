@@ -204,7 +204,7 @@ void Attachment::set(AttachmentType type, float time,
     {
         BareNetworkString *buffer = new BareNetworkString(2);
         saveState(buffer);
-        rwm->addEvent(this, buffer);
+        rwm->addEvent(this, buffer, /*confirmed*/true);
     }
 #endif
 }   // set
@@ -269,7 +269,13 @@ void Attachment::saveState(BareNetworkString *buffer) const
 void Attachment::rewindTo(BareNetworkString *buffer)
 {
     uint8_t type = buffer->getUInt8();
+
     AttachmentType new_type = AttachmentType(type & 0x7f);   // mask out bit 7
+    // FIXME Sometimes type == 255 is returned, reason unknown
+    if (new_type > ATTACH_NOTHING)
+    {
+        return;
+    }
 
     // If there is no attachment, clear the attachment if necessary and exit
     if(new_type==ATTACH_NOTHING)

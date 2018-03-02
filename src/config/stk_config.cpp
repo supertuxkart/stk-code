@@ -117,6 +117,15 @@ void STKConfig::load(const std::string &filename)
         Log::fatal("StkConfig", "Wrong number of item switches defined in stk_config");
     }
 
+    if (m_positional_smoothing.size() == 0)
+    {
+        Log::fatal("StkConfig", "No positional smoothing defined in stk_config.");
+    }
+    if (m_rotational_smoothing.size() == 0)
+    {
+        Log::fatal("StkConfig", "No rotationalsmoothing defined in stk_config.");
+    }
+
     CHECK_NEG(m_max_karts,                 "<karts max=..."             );
     CHECK_NEG(m_item_switch_time,          "item-switch-time"           );
     CHECK_NEG(m_bubblegum_counter,         "bubblegum disappear counter");
@@ -139,6 +148,8 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_replay_dt,                 "replay delta-t"             );
     CHECK_NEG(m_smooth_angle_limit,        "physics smooth-angle-limit" );
     CHECK_NEG(m_default_track_friction,    "physics default-track-friction");
+    CHECK_NEG(m_physics_fps,               "physics fps"                );
+    CHECK_NEG(m_network_state_frequeny,    "network state-frequency"    );
     CHECK_NEG(m_default_moveable_friction, "physics default-moveable-friction");
 
     // Square distance to make distance checks cheaper (no sqrt)
@@ -160,6 +171,7 @@ void STKConfig::init_defaults()
         m_smooth_angle_limit     = m_penalty_time              =
         m_default_track_friction = m_default_moveable_friction =
         UNDEFINED;
+    m_physics_fps                = -100;
     m_bubblegum_counter          = -100;
     m_shield_restrict_weapos     = false;
     m_max_karts                  = -100;
@@ -173,8 +185,8 @@ void STKConfig::init_defaults()
     m_replay_delta_angle         = -100;
     m_replay_delta_pos2          = -100;
     m_replay_dt                  = -100;
+    m_network_state_frequeny     = -100;
     m_title_music                = NULL;
-    m_enable_networking          = true;
     m_smooth_normals             = false;
     m_same_powerup_mode          = POWERUP_MODE_ONLY_IF_SAME;
     m_ai_acceleration            = 1.0f;
@@ -249,6 +261,7 @@ void STKConfig::getAllData(const XMLNode * root)
         physics_node->get("default-track-friction", &m_default_track_friction);
         physics_node->get("default-moveable-friction",
                                                  &m_default_moveable_friction);
+        physics_node->get("fps",                    &m_physics_fps           );
     }
 
     if (const XMLNode *startup_node= root->getNode("startup"))
@@ -353,8 +366,12 @@ void STKConfig::getAllData(const XMLNode * root)
         ai_node->get("acceleration", &m_ai_acceleration);
     }
 
-    if(const XMLNode *networking_node= root->getNode("networking"))
-        networking_node->get("enable", &m_enable_networking);
+    if (const XMLNode *networking_node = root->getNode("networking"))
+    {
+        networking_node->get("state-frequency",      &m_network_state_frequeny);
+        networking_node->get("positional-smoothing", &m_positional_smoothing  );
+        networking_node->get("rotational-smoothing", &m_rotational_smoothing  );
+    }
 
     if(const XMLNode *replay_node = root->getNode("replay"))
     {

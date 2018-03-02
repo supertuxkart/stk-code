@@ -89,10 +89,9 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         {
             if(STKHost::existHost())
             {
-                Protocol* protocol = LobbyProtocol::get();
-                ClientLobby* clrp =
-                              dynamic_cast<ClientLobby*>(protocol);
-                assert(clrp);   // server never shows the track screen.
+                auto clrp = LobbyProtocol::get<ClientLobby>();
+                // server never shows the track screen.
+                assert(clrp);
                 // FIXME SPLITSCREEN: we need to supply the global player id of the
                 // player selecting the track here. For now ... just vote the same
                 // track for each local player.
@@ -171,6 +170,14 @@ void TracksScreen::init()
         tracks_widget->setSelection(0, PLAYER_ID_GAME_MASTER, true);
     }
     STKTexManager::getInstance()->unsetTextureErrorMessage();
+    if (NetworkConfig::get()->isAutoConnect())
+    {
+        DynamicRibbonWidget* tw = getWidget<DynamicRibbonWidget>("tracks");
+        tw->setSelection(UserConfigParams::m_last_track, 0,
+                         /*focus*/true);
+        eventCallback(tw, "tracks",
+                      /*player id*/0);
+    }
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -187,19 +194,17 @@ void TracksScreen::buildTrackList()
     m_random_track_list.clear();
 
     const std::string& curr_group_name = tabs->getSelectionIDString(0);
-
-    if (!(curr_group_name == DEFAULT_GROUP_NAME ||
-        curr_group_name == ALL_TRACK_GROUPS_ID) && m_offical_track)
-    {
-        tracks_widget->setText(_("Only official tracks are supported."));
-        tracks_widget->updateItemDisplay();
-        return;
-    }
-
     const int track_amount = (int)track_manager->getNumberOfTracks();
 
     // First build a list of all tracks to be displayed
     // (e.g. exclude arenas, ...)
+	bool is_network = (STKHost::existHost());
+    std::shared_ptr<ClientLobby> clrp;
+    if (is_network)
+    {
+        clrp = LobbyProtocol::get<ClientLobby>();
+        assert(clrp);
+    }
     PtrVector<Track, REF> tracks;
     for (int n = 0; n < track_amount; n++)
     {
@@ -208,14 +213,18 @@ void TracksScreen::buildTrackList()
             && !curr->hasEasterEggs())
             continue;
         if (curr->isArena() || curr->isSoccer()||curr->isInternal()) continue;
-        if (m_offical_track && !curr->isInGroup(DEFAULT_GROUP_NAME)) continue;
+        if (!curr->isInGroup(DEFAULT_GROUP_NAME)) continue;
         if (curr_group_name != ALL_TRACK_GROUPS_ID &&
             !curr->isInGroup(curr_group_name)) continue;
-
+        if (is_network &&
+            clrp->getAvailableTracks().find(curr->getIdent()) ==
+            clrp->getAvailableTracks().end())
+        {
+            continue;
+        }
         tracks.push_back(curr);
     }   // for n<track_amount
 
-	bool is_network = (STKHost::existHost());
     tracks.insertionSort();
     for (unsigned int i = 0; i < tracks.size(); i++)
     {

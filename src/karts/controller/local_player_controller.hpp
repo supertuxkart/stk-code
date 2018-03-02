@@ -61,7 +61,8 @@ public:
                                        const int local_playerID);
                 ~LocalPlayerController();
     void         update            (float) OVERRIDE;
-    void         action            (PlayerAction action, int value) OVERRIDE;
+    bool         action            (PlayerAction action, int value,
+                                    bool dry_run=false) OVERRIDE;
     virtual void handleZipper      (bool play_sound) OVERRIDE;
     void         collectedItem     (const Item &item, int add_info=-1,
                                     float previous_energy=0) OVERRIDE;

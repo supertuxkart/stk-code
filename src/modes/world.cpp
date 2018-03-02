@@ -128,7 +128,6 @@ World::World() : WorldStatus()
     m_schedule_pause     = false;
     m_schedule_unpause   = false;
     m_schedule_exit_race = false;
-    m_self_destruct      = false;
     m_schedule_tutorial  = false;
     m_is_network_world   = false;
 
@@ -230,14 +229,19 @@ void World::init()
     {
         Weather::getInstance<Weather>();   // create Weather instance
     }
-    if((NetworkConfig::get()->isServer() && !ProfileWorld::isNoGraphics()) ||
-        race_manager->isWatchingReplay())
-    {
-        // In case that the server is running with gui or watching replay,
-        // create a camera and attach it to the first kart.
-        Camera::createCamera(World::getWorld()->getKart(0), 0);
 
-    }
+    if (Camera::getNumCameras() == 0)
+    {
+        if ( (NetworkConfig::get()->isServer() && 
+              !ProfileWorld::isNoGraphics()       ) ||
+            race_manager->isWatchingReplay()            )
+        {
+            // In case that the server is running with gui or watching replay,
+            // create a camera and attach it to the first kart.
+            Camera::createCamera(World::getWorld()->getKart(0), 0);
+
+        }   // if server with graphics of is watching replay
+    } // if getNumCameras()==0
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -850,18 +854,14 @@ void World::updateWorld(float dt)
         m_schedule_unpause = false;
     }
 
-    if (m_self_destruct)
-    {
-        delete this;
-        return;
-    }
-
     // Don't update world if a menu is shown or the race is over.
     if( getPhase() == FINISH_PHASE         ||
         getPhase() == IN_GAME_MENU_PHASE      )
         return;
 
-    if (!history->replayHistory())
+    if (!history->replayHistory()                 && 
+        ! (NetworkConfig::get()->isClient() &&
+           RewindManager::get()->isRewinding() )    )
     {
         history->updateSaving(dt);   // updating the saved state
     }
@@ -981,7 +981,9 @@ void World::update(float dt)
 
     PROFILER_PUSH_CPU_MARKER("World::update (sub-updates)", 0x20, 0x7F, 0x00);
     WorldStatus::update(dt);
-    RewindManager::get()->saveStates();
+    PROFILER_POP_CPU_MARKER();
+    PROFILER_PUSH_CPU_MARKER("World::update (RewindManager)", 0x20, 0x7F, 0x40);
+    RewindManager::get()->update(dt);
     PROFILER_POP_CPU_MARKER();
 
     PROFILER_PUSH_CPU_MARKER("World::update (Kart::upate)", 0x40, 0x7F, 0x00);
@@ -1042,7 +1044,6 @@ void World::update(float dt)
 void World::updateTime(const float dt)
 {
     WorldStatus::updateTime(dt);
-    RewindManager::get()->setCurrentTime(getTime(), dt);
 }   // updateTime
 
 // ----------------------------------------------------------------------------
@@ -1291,15 +1292,6 @@ void World::unpause()
             pc->resetInputState();
     }
 }   // pause
-
-//-----------------------------------------------------------------------------
-/** Call when the world needs to be deleted but you can't do it immediately
- * because you are e.g. within World::update()
- */
-void World::delayedSelfDestruct()
-{
-    m_self_destruct = true;
-}   // delayedSelfDestruct
 
 //-----------------------------------------------------------------------------
 void World::escapePressed()
