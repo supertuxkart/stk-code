@@ -719,31 +719,17 @@ namespace UserConfigParams
     PARAM_PREFIX StringListUserConfigParam         m_stun_servers
             PARAM_DEFAULT(  StringListUserConfigParam("Stun_servers", "The stun servers"
                             " that will be used to know the public address.",
-                            24,
-                            "provserver.televolution.net",
-                            "sip1.lakedestiny.cordiaip.com",
-                            "stun1.voiceeclipse.net",
-                            "stun01.sipphone.com",
+                            10,
+                            "stun.cope.es",
+                            "stun.12connect.com",
                             "stun.callwithus.com",
                             "stun.counterpath.net",
-                            "stun.endigovoip.com",
                             "stun.ekiga.net",
-                            "stun.ideasip.com",
-                            "stun.internetcalls.com",
-                            "stun.ipns.com",
-                            "stun.noc.ams-ix.net",
-                            "stun.phonepower.com",
-                            "stun.phoneserve.com",
-                            "stun.rnktel.com",
-                            "stun.softjoys.com",
-                            "stunserver.org",
-                            "stun.sipgate.net",
+                            "stun.schlund.de",
                             "stun.stunprotocol.org",
                             "stun.voip.aebc.com",
-                            "stun.voipbuster.com",
-                            "stun.voxalot.com",
-                            "stun.voxgratia.org",
-                            "stun.xten.com") );
+                            "numb.viagenie.ca",
+                            "stun.ivao.aero") );
 
     // ---- Gamemode setup
     PARAM_PREFIX IntToIntUserConfigParam m_num_karts_per_gamemode

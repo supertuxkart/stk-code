@@ -506,12 +506,11 @@ void STKHost::setPublicAddress()
 
         // The stun message is valid, so we parse it now:
         // Those are the port and the address to be detected
-        bool found = false;
+        TransportAddress non_xor_addr, xor_addr;
         while (true)
         {
             if (response.size() < 4)
             {
-                Log::error("STKHost", "STUN response is invalid.");
                 break;
             }
             unsigned type = response.getUInt16();
@@ -558,11 +557,14 @@ void STKHost::setPublicAddress()
                     // Obfuscation is described in Section 15.2 of RFC 5389.
                     port ^= magic_cookie >> 16;
                     ip ^= magic_cookie;
+                    xor_addr.setPort(port);
+                    xor_addr.setIP(ip);
                 }
-                m_public_address.setPort(port);
-                m_public_address.setIP(ip);
-                found = true;
-                break;
+                else
+                {
+                    non_xor_addr.setPort(port);
+                    non_xor_addr.setIP(ip);
+                }
             }   // type == mapped_address || type == xor_mapped_address
             else
             {
@@ -573,8 +575,23 @@ void STKHost::setPublicAddress()
             }
         }   // while true
         // Found public address and port
-        if (found)
+        if (!xor_addr.isUnset() || !non_xor_addr.isUnset())
+        {
+            // Use XOR mapped address when possible to avoid translation of
+            // the packet content by application layer gateways (ALGs) that
+            // perform deep packet inspection in an attempt to perform
+            // alternate NAT traversal methods.
+            if (!xor_addr.isUnset())
+            {
+                m_public_address.copy(xor_addr);
+            }
+            else
+            {
+                Log::warn("STKHost", "Only non xor-mapped address returned.");
+                m_public_address.copy(non_xor_addr);
+            }
             untried_server.clear();
+        }
     }
 }   // setPublicAddress
 
