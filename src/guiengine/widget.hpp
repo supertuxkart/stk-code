@@ -326,7 +326,7 @@ namespace GUIEngine
          * it visible implicitely calls setActive(true). If you mix visiblity and (de)activated calls,
          * undefined behavior may ensue (like invisible but clickable buttons).
          */
-        void setVisible(bool visible);
+        virtual void setVisible(bool visible);
 
         /** Returns if the element is visible. */
         bool isVisible() const;
