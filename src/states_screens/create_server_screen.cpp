@@ -60,8 +60,12 @@ void CreateServerScreen::loadedFromFile()
  
     m_max_players_widget = getWidget<SpinnerWidget>("max_players");
     assert(m_max_players_widget != NULL);
-    m_max_players_widget
-        ->setMax(UserConfigParams::m_server_max_players.getDefaultValue());
+    int max = UserConfigParams::m_server_max_players.getDefaultValue();
+    m_max_players_widget->setMax(max);
+    
+    if (UserConfigParams::m_server_max_players > max)
+        UserConfigParams::m_server_max_players = max;
+
     m_max_players_widget->setValue(UserConfigParams::m_server_max_players);
 
     m_info_widget = getWidget<LabelWidget>("info");
