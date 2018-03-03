@@ -107,8 +107,8 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         CheckBoxWidget* accelerometer = getWidget<CheckBoxWidget>("accelerometer");
         assert(accelerometer != NULL);
 
-        UserConfigParams::m_multitouch_accelerometer = accelerometer->
-                                                            getState() ? 1 : 0;
+        UserConfigParams::m_multitouch_controls = accelerometer->
+                                                            getState() ? 2 : 1;
 
         MultitouchDevice* touch_device = input_manager->getDeviceManager()->
                                                         getMultitouchDevice();
@@ -129,7 +129,7 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         UserConfigParams::m_multitouch_deadzone_edge.revertToDefaults();
         UserConfigParams::m_multitouch_deadzone_center.revertToDefaults();
         UserConfigParams::m_multitouch_mode.revertToDefaults();
-        UserConfigParams::m_multitouch_accelerometer.revertToDefaults();
+        UserConfigParams::m_multitouch_controls.revertToDefaults();
 
         updateValues();
 
@@ -167,7 +167,7 @@ void MultitouchSettingsDialog::updateValues()
 
     CheckBoxWidget* accelerometer = getWidget<CheckBoxWidget>("accelerometer");
     assert(accelerometer != NULL);
-    accelerometer->setState(UserConfigParams::m_multitouch_accelerometer != 0);
+    accelerometer->setState(UserConfigParams::m_multitouch_controls == 2);
 }
 
 // -----------------------------------------------------------------------------
