@@ -62,6 +62,9 @@ void OnlineProfileServers::loadedFromFile()
         getWidget<IconButtonWidget>("create_wan_server")->setActive(false);
         getWidget<IconButtonWidget>("quick_wan_play")->setActive(false);
     }
+#ifdef ANDROID
+    getWidget("create_wan_server")->setVisible(false);
+#endif
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
