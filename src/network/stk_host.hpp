@@ -39,9 +39,11 @@
 #include <enet/enet.h>
 
 #include <atomic>
+#include <memory>
 #include <thread>
 
 class GameSetup;
+class Server;
 class SeparateProcess;
 
 class STKHost
@@ -114,7 +116,7 @@ private:
     /** An error message, which is set by a protocol to be displayed
      *  in the GUI. */
 
-             STKHost(uint32_t server_id, uint32_t host_id);
+             STKHost(std::shared_ptr<Server> server);
              STKHost(const irr::core::stringw &server_name);
     virtual ~STKHost();
     void init();
@@ -131,7 +133,8 @@ public:
     /** Creates the STKHost. It takes all confifguration parameters from
      *  NetworkConfig. This STKHost can either be a client or a server.
      */
-    static void create(SeparateProcess* p = NULL);
+    static void create(std::shared_ptr<Server> server = nullptr,
+                       SeparateProcess* p = NULL);
 
     // ------------------------------------------------------------------------
     /** Returns the instance of STKHost. */

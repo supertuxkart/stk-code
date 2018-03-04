@@ -39,24 +39,21 @@ private:
     ServerSelection();
     ~ServerSelection();
 
-    GUIEngine::IconButtonWidget *               m_reload_widget;
-    GUIEngine::LabelWidget *                    m_update_status;
-    GUIEngine::ListWidget *                     m_server_list_widget;
+    GUIEngine::IconButtonWidget* m_reload_widget;
+    GUIEngine::LabelWidget* m_update_status;
+    GUIEngine::ListWidget* m_server_list_widget;
 
     /** \brief To check (and set) if sort order is descending **/
-    bool                                        m_sort_desc;
+    bool m_sort_desc;
 
-    /** A pointer to the http request for getting a server list. */
-    const Online::XMLRequest *m_refresh_request;
+    bool m_refreshing_server;
 
-
-public:
+    /** Load the servers into the main list.*/
+    void loadList(unsigned sort_case);
 
     void refresh();
 
-    /** Load the addons into the main list.*/
-    void loadList();
-
+public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
 

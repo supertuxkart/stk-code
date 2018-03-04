@@ -26,7 +26,7 @@
 #include "modes/demo_world.hpp"
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/network_config.hpp"
-#include "network/servers_manager.hpp"
+#include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -179,20 +179,14 @@ void CreateServerScreen::createServer()
     if (!password.empty())
         password = std::string(" --server-password=") + password;
 
-    ServersManager::get()->cleanUpServers();
     TransportAddress server_address(0x7f000001,
         NetworkConfig::get()->getServerDiscoveryPort());
 
-
-    TransportAddress address(0x7f000001,
-        NetworkConfig::get()->getServerDiscoveryPort());
-    Server *server = new Server(0/*server_id*/, name, max_players,
-        /*current_player*/0, (RaceManager::Difficulty)
+    auto server = std::make_shared<Server>(0/*server_id*/, name,
+        max_players, /*current_player*/0, (RaceManager::Difficulty)
         difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER),
         NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
             race_manager->getMajorMode()), server_address);
-    ServersManager::get()->addServer(server);
-    ServersManager::get()->setJoinedServer(0);
 
 #undef USE_GRAPHICS_SERVER
 #ifdef USE_GRAPHICS_SERVER
@@ -255,7 +249,7 @@ void CreateServerScreen::createServer()
     SeparateProcess* sp =
         new SeparateProcess(SeparateProcess::getCurrentExecutableLocation(),
         server_cfg.str() + password);
-    STKHost::create(sp);
+    STKHost::create(server, sp);
 
 #endif
 }   // createServer

@@ -28,7 +28,6 @@
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/server_lobby.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/servers_manager.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/separate_process.hpp"
@@ -66,15 +65,14 @@
 STKHost *STKHost::m_stk_host       = NULL;
 bool     STKHost::m_enable_console = false;
 
-void STKHost::create(SeparateProcess* p)
+void STKHost::create(std::shared_ptr<Server> server, SeparateProcess* p)
 {
     assert(m_stk_host == NULL);
     if (NetworkConfig::get()->isServer())
         m_stk_host = new STKHost(NetworkConfig::get()->getServerName());
     else
     {
-        Server *server = ServersManager::get()->getJoinedServer();
-        m_stk_host = new STKHost(server->getServerId(), 0);
+        m_stk_host = new STKHost(server);
     }
     m_stk_host->m_separate_process = p;
     if (!m_stk_host->m_network)
@@ -256,7 +254,7 @@ void STKHost::create(SeparateProcess* p)
 // ============================================================================
 /** Constructor for a client
  */
-STKHost::STKHost(uint32_t server_id, uint32_t host_id)
+STKHost::STKHost(std::shared_ptr<Server> server)
 {
     m_next_unique_host_id = -1;
     // Will be overwritten with the correct value once a connection with the
@@ -266,7 +264,7 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
 
     ENetAddress ea;
     ea.host = STKHost::HOST_ANY;
-    ea.port =  NetworkConfig::get()->getClientPort();
+    ea.port = NetworkConfig::get()->getClientPort();
 
     m_network = new Network(/*peer_count*/1,       /*channel_limit*/2,
                             /*max_in_bandwidth*/0, /*max_out_bandwidth*/0,
@@ -278,7 +276,7 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
     }
 
     setPrivatePort();
-    std::make_shared<ConnectToServer>(server_id, host_id)->requestStart();
+    std::make_shared<ConnectToServer>(server)->requestStart();
 }   // STKHost
 
 // ----------------------------------------------------------------------------
@@ -382,7 +380,6 @@ STKHost::~STKHost()
  */
 void STKHost::shutdown()
 {
-    ServersManager::get()->unsetJoinedServer();
     ProtocolManager::lock()->abort();
     deleteAllPeers();
     destroy();

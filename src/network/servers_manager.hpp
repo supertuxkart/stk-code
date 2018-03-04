@@ -19,13 +19,17 @@
 #ifndef HEADER_SERVERS_MANAGER_HPP
 #define HEADER_SERVERS_MANAGER_HPP
 
-#include "online/request_manager.hpp"
-#include "network/server.hpp"
-#include "utils/ptr_vector.hpp"
-#include "utils/synchronised.hpp"
-#include "utils/types.hpp"
+#include <atomic>
+#include <algorithm>
+#include <cassert>
+#include <functional>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace Online { class XMLRequest; }
+class Server;
+class XMLNode;
 
 /**
  * \brief
@@ -34,40 +38,51 @@ namespace Online { class XMLRequest; }
 class ServersManager
 {
 private:
+    /** List of servers */
+    std::vector<std::shared_ptr<Server> > m_servers;
+
+    std::atomic<float> m_last_load_time;
+
+    std::atomic_bool m_list_updated;
+    // ------------------------------------------------------------------------
      ServersManager();
+    // ------------------------------------------------------------------------
     ~ServersManager();
-
-    /** Sorted vector of servers */
-    Synchronised<PtrVector<Server> >                m_sorted_servers;
-
-    /** Maps server id's to the same servers*/
-    Synchronised<std::map<uint32_t, Server*> >      m_mapped_servers;
-
-    /** This is a pointer to a copy of the server, the moment it got joined */
-    Synchronised<Server *>   m_joined_server;
-
-    Synchronised<float>      m_last_load_time;
-    void                     refresh(bool success, const XMLNode * input);
-    Online::XMLRequest *     getWANRefreshRequest() const;
-    Online::XMLRequest *     getLANRefreshRequest() const;
+    // ------------------------------------------------------------------------
+    void setWanServers(bool success, const XMLNode* input);
+    // ------------------------------------------------------------------------
+    void setLanServers(std::vector<std::shared_ptr<Server> >& servers)
+    {
+        m_servers = std::move(servers);
+        m_list_updated = true;
+    }
+    // ------------------------------------------------------------------------
+    Online::XMLRequest* getWANRefreshRequest() const;
+    // ------------------------------------------------------------------------
+    Online::XMLRequest* getLANRefreshRequest() const;
 
 public:
+    // ------------------------------------------------------------------------
     // Singleton
-    static ServersManager*   get();
-    static void              deallocate();
-    void                     cleanUpServers();
-    Online::XMLRequest *     getRefreshRequest(bool request_now = true);
-    void                     setJoinedServer(uint32_t server_id);
-    void                     unsetJoinedServer();
-    void                     addServer(Server * server);
-    int                      getNumServers() const;
-    const Server *           getServerByID(uint32_t server_id) const;
-    const Server *           getServerBySort(int index) const;
-    void                     sort(bool sort_desc);
-    Server *                 getJoinedServer() const;
-
-    // Returns the best server to join
-    const Server *           getQuickPlay() const;
+    static ServersManager* get();
+    // ------------------------------------------------------------------------
+    static void deallocate();
+    // ------------------------------------------------------------------------
+    void cleanUpServers()                                { m_servers.clear(); }
+    // ------------------------------------------------------------------------
+    void sortServers(std::function<bool(const std::shared_ptr<Server> a,
+                     const std::shared_ptr<Server> b)> sorting_function)
+    {
+        assert(m_list_updated);
+        std::sort(m_servers.begin(), m_servers.end(), sorting_function);
+    }
+    // ------------------------------------------------------------------------
+    bool refresh();
+    // ------------------------------------------------------------------------
+    const std::vector<std::shared_ptr<Server> >& getServers() const
+                                                          { return m_servers; }
+    // ------------------------------------------------------------------------
+    bool listUpdated() const                         { return m_list_updated; }
 
 };   // class ServersManager
 #endif // HEADER_SERVERS_MANAGER_HPP

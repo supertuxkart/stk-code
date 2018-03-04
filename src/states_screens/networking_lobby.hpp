@@ -19,6 +19,7 @@
 #define HEADER_NETWORKING_LOBBY_HPP
 
 #include "guiengine/screen.hpp"
+#include <memory>
 
 class Server;
 
@@ -45,7 +46,7 @@ private:
 
     NetworkingLobby();
 
-    core::stringw m_server_name;
+    std::shared_ptr<Server> m_joined_server;
     std::vector<core::stringw> m_server_info;
 
     GUIEngine::IconButtonWidget * m_back_widget;
@@ -89,6 +90,7 @@ public:
 
     /** Used to insert each client chat message (reserved). */
     void addMoreServerInfo(const core::stringw& info);
+    void setJoinedServer(std::shared_ptr<Server> server);
     void addPlayer(NetworkPlayerProfile *profile);
     void removePlayer(NetworkPlayerProfile *profile);
 };   // class NetworkingLobby

@@ -22,8 +22,10 @@
 #include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
+#include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "online/xml_request.hpp"
+#include "online/request_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/time.hpp"
 
@@ -33,58 +35,35 @@
 
 #define SERVER_REFRESH_INTERVAL 5.0f
 
-static ServersManager* manager_singleton(NULL);
+static ServersManager* g_manager_singleton(NULL);
 
+// ============================================================================
 ServersManager* ServersManager::get()
 {
-    if (manager_singleton == NULL)
-        manager_singleton = new ServersManager();
+    if (g_manager_singleton == NULL)
+        g_manager_singleton = new ServersManager();
 
-    return manager_singleton;
+    return g_manager_singleton;
 }   // get
 
-// ------------------------------------------------------------------------
+// ============================================================================
 void ServersManager::deallocate()
 {
-    delete manager_singleton;
-    manager_singleton = NULL;
+    delete g_manager_singleton;
+    g_manager_singleton = NULL;
 }   // deallocate
 
-// ===========================================================-=============
+// ----------------------------------------------------------------------------
 ServersManager::ServersManager()
 {
-    m_last_load_time.setAtomic(0.0f);
-    m_joined_server.setAtomic(NULL);
+    m_last_load_time.store(0.0f);
+    m_list_updated = false;
 }   // ServersManager
 
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 ServersManager::~ServersManager()
 {
-    cleanUpServers();
 }   // ~ServersManager
-
-// ------------------------------------------------------------------------
-/** Removes all stored server information. After this call the list of
- *  servers can be refreshed.
- */
-void ServersManager::cleanUpServers()
-{
-    if(m_joined_server.getAtomic()!=NULL)
-    {
-        // m_joinsed_server is a pointer into the m_server structure,
-        // we can not modify this data structure while this pointer exists.
-        Log::warn("ServersManager", "Server cleanUp while being already "
-                                    "connected to a server.");
-        return;
-    }
-
-    m_sorted_servers.lock();
-    m_sorted_servers.getData().clearAndDeleteAll();
-    m_sorted_servers.unlock();
-    m_mapped_servers.lock();
-    m_mapped_servers.getData().clear();
-    m_mapped_servers.unlock();
-}   // cleanUpServers
 
 // ----------------------------------------------------------------------------
 /** Returns a WAN update-list-of-servers request. It queries the
@@ -98,12 +77,13 @@ Online::XMLRequest* ServersManager::getWANRefreshRequest() const
     class WANRefreshRequest : public Online::XMLRequest
     {
     public:
-        WANRefreshRequest() : Online::XMLRequest(/*manage_memory*/false,
+        WANRefreshRequest() : Online::XMLRequest(/*manage_memory*/true,
                                                  /*priority*/100) {}
         // --------------------------------------------------------------------
-        virtual void callback()
+        virtual void afterOperation() OVERRIDE
         {
-            ServersManager::get()->refresh(isSuccess(), getXMLData());
+            Online::XMLRequest::afterOperation();
+            ServersManager::get()->setWanServers(isSuccess(), getXMLData());
         }   // callback
         // --------------------------------------------------------------------
     };   // RefreshRequest
@@ -132,7 +112,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
     public:
 
         /** High priority for this request. */
-        LANRefreshRequest() : XMLRequest(false, 100) {m_success = false;}
+        LANRefreshRequest() : XMLRequest(true, 100) {m_success = false;}
         // --------------------------------------------------------------------
         virtual ~LANRefreshRequest() {}
         // --------------------------------------------------------------------
@@ -169,9 +149,11 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             // any local servers.
             double start_time = StkTime::getRealTime();
             const double DURATION = 1.0;
-            int cur_server_id = ServersManager::get()->getNumServers();
+            const auto& servers = ServersManager::get()->getServers();
+            int cur_server_id = servers.size();
             assert(cur_server_id == 0);
-            while(StkTime::getRealTime() - start_time < DURATION)
+            std::vector<std::shared_ptr<Server> > servers_now;
+            while (StkTime::getRealTime() - start_time < DURATION)
             {
                 TransportAddress sender;
                 int len = broadcast->receiveRawPacket(buffer, LEN, &sender, 1);
@@ -187,16 +169,14 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     uint16_t my_port    = s.getUInt16();
                     uint8_t difficulty  = s.getUInt8();
                     uint8_t mode        = s.getUInt8();
-                    Server* server = new Server(cur_server_id++, name,
-                        max_players,players, difficulty, mode, sender);
-                    ServersManager::get()->addServer(server);
-                    m_success = true;
+                    servers_now.emplace_back(std::make_shared<Server>
+                        (cur_server_id++, name, max_players, players,
+                        difficulty, mode, sender));
                 }   // if received_data
             }    // while still waiting
-
+            m_success = true;
+            ServersManager::get()->setLanServers(servers_now);
             delete broadcast;
-            if (!m_success)
-                m_info = _("No LAN server detected");
         }   // operation
         // --------------------------------------------------------------------
         /** This function is necessary, otherwise the XML- and HTTP-Request
@@ -212,133 +192,46 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
 
 // ----------------------------------------------------------------------------
 /** Factory function to create either a LAN or a WAN update-of-server
- *  requests. The current list of servers is also cleared/
+ *  requests. The current list of servers is also cleared.
  */
-Online::XMLRequest* ServersManager::getRefreshRequest(bool request_now)
+bool ServersManager::refresh()
 {
-    if (StkTime::getRealTime() - m_last_load_time.getAtomic()
+    if (StkTime::getRealTime() - m_last_load_time.load()
         < SERVER_REFRESH_INTERVAL)
     {
         // Avoid too frequent refreshing
-        return NULL;
-    }
-
-    if(m_joined_server.getAtomic()!=NULL)
-    {
-        // m_joinsed_server is a pointer into the m_server structure,
-        // we can not modify this data structure while this pointer exists.
-        Log::warn("ServersManager", "Server refresh while being already "
-                                    "connected to a server.");
-        return NULL;
+        return false;
     }
 
     cleanUpServers();
-    Online::XMLRequest *request = 
-        NetworkConfig::get()->isWAN() ? getWANRefreshRequest()
-                                      : getLANRefreshRequest();
-
-    if (request_now)
-        Online::RequestManager::get()->addRequest(request);
-
-    return request;
-}   // getRefreshRequest
+    m_list_updated = false;
+    if (NetworkConfig::get()->isWAN())
+       Online::RequestManager::get()->addRequest(getWANRefreshRequest());
+    else
+       Online::RequestManager::get()->addRequest(getLANRefreshRequest());
+    return true;
+}   // refresh
 
 // ----------------------------------------------------------------------------
-/** Callback from the refresh request.
+/** Callback from the refresh request for wan servers.
  *  \param success If the refresh was successful.
  *  \param input The XML data describing the server.
  */
-void ServersManager::refresh(bool success, const XMLNode *input)
+void ServersManager::setWanServers(bool success, const XMLNode* input)
 {
     if (!success)
     {
         Log::error("Server Manager", "Could not refresh server list");
+        m_list_updated = true;
         return;
     }
 
     const XMLNode *servers_xml = input->getNode("servers");
     for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
     {
-        addServer(new Server(*servers_xml->getNode(i)));
+        m_servers.emplace_back(
+            std::make_shared<Server>(*servers_xml->getNode(i)));
     }
-    m_last_load_time.setAtomic((float)StkTime::getRealTime());
+    m_last_load_time.store((float)StkTime::getRealTime());
+    m_list_updated = true;
 }   // refresh
-
-// ----------------------------------------------------------------------------
-const Server* ServersManager::getQuickPlay() const
-{
-    if (m_sorted_servers.getData().size() > 0)
-        return getServerBySort(0);
-
-    return NULL;
-}   // getQuickPlay
-
-// ----------------------------------------------------------------------------
-/** Sets a pointer to the server to which this client is connected. From now
- *  on the list of servers must not be modified (else this pointer might
- *  become invalid).
- */
-void ServersManager::setJoinedServer(uint32_t id)
-{
-    MutexLocker(m_mapped_servers);
-    m_joined_server.getData() = m_mapped_servers.getData().at(id);
-}   // setJoinedServer
-
-// ----------------------------------------------------------------------------
-/** Unsets the server to which this client is connected.
- */
-void ServersManager::unsetJoinedServer()
-{
-    MutexLocker(m_joined_server);
-    m_joined_server.getData() = NULL;
-}   // unsetJoinedServer
-
-// ----------------------------------------------------------------------------
-/** Adds a server to the list of known servers.
- *  \param server The server to add.
- */
-void ServersManager::addServer(Server *server)
-{
-    m_sorted_servers.lock();
-    m_sorted_servers.getData().push_back(server);
-    m_sorted_servers.unlock();
-
-    m_mapped_servers.lock();
-    m_mapped_servers.getData()[server->getServerId()] = server;
-    m_mapped_servers.unlock();
-}   // addServer
-
-// ----------------------------------------------------------------------------
-int ServersManager::getNumServers() const
-{
-    MutexLocker(m_sorted_servers);
-    return m_sorted_servers.getData().size();
-}   // getNumServers
-
-// ----------------------------------------------------------------------------
-const Server* ServersManager::getServerBySort(int index) const
-{
-    MutexLocker(m_sorted_servers);
-    return m_sorted_servers.getData().get(index);
-}   // getServerBySort
-
-// ------------------------------------------------------------------------
-const Server* ServersManager::getServerByID(uint32_t id) const
-{
-    MutexLocker(m_mapped_servers);
-    return m_mapped_servers.getData().at(id);
-}   // getServerByID
-
-// ----------------------------------------------------------------------------
-Server* ServersManager::getJoinedServer() const
-{
-    return m_joined_server.getAtomic();
-}   // getJoinedServer
-
-// ----------------------------------------------------------------------------
-void ServersManager::sort(bool sort_desc)
-{
-    MutexLocker(m_sorted_servers);
-    m_sorted_servers.getData().insertionSort(0, sort_desc);
-}   // sort
-

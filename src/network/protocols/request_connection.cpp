@@ -22,20 +22,20 @@
 #include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/servers_manager.hpp"
+#include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "online/xml_request.hpp"
 
 using namespace Online;
 
 /** Constructor. Stores the server id.
- *  \param server_id Id of the server.
+ *  \param server Server to be joined.
  */
-RequestConnection::RequestConnection(uint32_t server_id)
+RequestConnection::RequestConnection(std::shared_ptr<Server> server)
                  : Protocol(PROTOCOL_SILENT)
 {
-    m_server_id = server_id;
-    m_request   = NULL;
+    m_server  = server;
+    m_request = NULL;
 }   // RequestConnection
 
 // ----------------------------------------------------------------------------
@@ -50,20 +50,6 @@ void RequestConnection::setup()
 {
     m_state = NONE;
 }   // setup
-
-// ----------------------------------------------------------------------------
-/** The callback for the server join request. It informs the server manager
- *  of a successful join request.
- */
-void RequestConnection::ServerJoinRequest::callback()
-{
-    if (isSuccess())
-    {
-        uint32_t server_id;
-        getXMLData()->get("serverid", &server_id);
-        ServersManager::get()->setJoinedServer(server_id);
-    }
-}   // ServerJoinRequest::callback
 
 // ----------------------------------------------------------------------------
 /** This implements a finite state machine to monitor the server join
@@ -98,19 +84,17 @@ void RequestConnection::asynchronousUpdate()
                     }
                     NetworkConfig::get()->setServerIdFile("");
                 }
-                const Server *server =
-                    ServersManager::get()->getServerByID(m_server_id);
                 BareNetworkString message(std::string("connection-request"));
-                STKHost::get()->sendRawPacket(message, server->getAddress());
+                STKHost::get()->sendRawPacket(message, m_server->getAddress());
                 NetworkConfig::get()->setDirectConnect(false);
                 m_state = DONE;
             }
             else
             {
-                m_request = new ServerJoinRequest();
+                m_request = new Online::XMLRequest();
                 NetworkConfig::get()->setUserDetails(m_request,
                     "request-connection");
-                m_request->addParameter("server_id", m_server_id);
+                m_request->addParameter("server_id", m_server->getServerId());
                 m_request->queue();
                 m_state = REQUEST_PENDING;
             }
@@ -135,7 +119,7 @@ void RequestConnection::asynchronousUpdate()
                 {
                     Log::error("RequestConnection",
                              "Fail to make a request to connecto to server %d",
-                               m_server_id);
+                               m_server->getServerId());
                 }
             }
             else

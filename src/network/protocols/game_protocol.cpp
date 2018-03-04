@@ -31,6 +31,7 @@
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
+#include "utils/time.hpp"
 
 // ============================================================================
 std::weak_ptr<GameProtocol> GameProtocol::m_game_protocol;

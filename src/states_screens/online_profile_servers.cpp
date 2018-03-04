@@ -20,13 +20,10 @@
 #include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "network/network_config.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/connect_to_server.hpp"
-#include "network/protocols/request_connection.hpp"
+#include "network/stk_host.hpp"
 #include "network/servers_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/create_server_screen.hpp"
@@ -103,6 +100,8 @@ void OnlineProfileServers::eventCallback(Widget* widget, const std::string& name
         }
         else if (selection == "quick_wan_play")
         {
+            NetworkConfig::get()->setIsWAN();
+            NetworkConfig::get()->setIsServer(false);
             doQuickPlay();
         }
     }
@@ -110,55 +109,11 @@ void OnlineProfileServers::eventCallback(Widget* widget, const std::string& name
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
-
 void OnlineProfileServers::doQuickPlay()
 {
-    // Refresh server list.
-    HTTPRequest* refresh_request = ServersManager::get()->getRefreshRequest(false);
-    if (refresh_request != NULL) // consider request done
-    {
-        refresh_request->executeNow();
-        delete refresh_request;
-    }
-    else
-    {
-        Log::error("OnlineScreen", "Could not get the server list.");
-        return;
-    }
-
-    // select first one
-    const Server *server = ServersManager::get()->getQuickPlay();
-    if(!server)
-    {
-        Log::error("OnlineProfileServers", "Can not find quick play server.");
-        return;
-    }
-
-    // do a join request
-    XMLRequest *join_request = new RequestConnection::ServerJoinRequest();
-    if (!join_request)
-    {
-        SFXManager::get()->quickSound("anvil");
-        return;
-    }
-
-    PlayerManager::setUserDetails(join_request, "request-connection",
-        Online::API::SERVER_PATH);
-    join_request->addParameter("server_id", server->getServerId());
-
-    join_request->executeNow();
-    if (join_request->isSuccess())
-    {
-        delete join_request;
-        NetworkingLobby::getInstance()->push();
-        auto cts = std::make_shared<ConnectToServer>(server->getServerId(),
-            server->getHostId());
-        ProtocolManager::lock()->requestStart(cts);
-    }
-    else
-    {
-        SFXManager::get()->quickSound("anvil");
-    }
+    STKHost::create();
+    NetworkingLobby::getInstance()->setJoinedServer(nullptr);
+    NetworkingLobby::getInstance()->push();
 }   // doQuickPlay
 
 // ----------------------------------------------------------------------------

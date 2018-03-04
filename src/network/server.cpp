@@ -21,8 +21,6 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
-Server::SortOrder Server::m_sort_order = Server::SO_NAME;
-
 /** Constructor based on XML data received from the stk server.
  *  \param xml The data for one server as received as part of the
  *         get-all stk-server request.
@@ -77,8 +75,10 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
                const TransportAddress &address)
 {
     m_name               = name;
+    m_lower_case_name    = StringUtils::toLowerCase(StringUtils::wideToUtf8(name));
     m_satisfaction_score = 0;
     m_server_id          = server_id;
+    m_host_id            = 0;
     m_current_players    = current_players;
     m_max_players        = max_players;
     m_address.copy(address);

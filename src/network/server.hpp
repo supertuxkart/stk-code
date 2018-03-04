@@ -41,17 +41,6 @@ class Server
 {
 public:
 
-    /** Set the sort order used in the comparison function. */
-    enum SortOrder
-    {
-        SO_NAME = 0,     // Sorted alphabetically by name
-        SO_PLAYERS = 1,
-        SO_DIFFICULTY = 2,
-        SO_GAME_MODE = 3,
-        SO_SCORE = 4    // Sorted on satisfaction score (unused)
-
-    };
-
 protected:
     /** The server name to be displayed. */
     irr::core::stringw m_name;
@@ -88,9 +77,6 @@ protected:
 
     RaceManager::Difficulty m_difficulty;
 
-    /** The sort order to be used in the comparison. */
-    static SortOrder m_sort_order;
-
 public:
 
          /** Initialises the object from an XML node. */
@@ -103,10 +89,8 @@ public:
     /** Returns ip address and port of this server. */
     const TransportAddress& getAddress() const { return m_address; }
     // ------------------------------------------------------------------------
-    /** Sets the sort order used in the comparison function. It is static, so
-    *  that each instance can access the sort order. */
-    static void setSortOrder(SortOrder so) { m_sort_order = so; }
-
+    /** Returns the lower case name of the server. */
+    const std::string& getLowerCaseName() const { return m_lower_case_name; }
     // ------------------------------------------------------------------------
     /** Returns the name of the server. */
     const irr::core::stringw& getName() const { return m_name; }
@@ -114,7 +98,8 @@ public:
     /** Returns the ID of this server. */
     const uint32_t getServerId() const { return m_server_id; }
     // ------------------------------------------------------------------------
-    /** Returns the unique host id of this server. */
+    /** Returns the unique host id of this server (wan game only), which is
+     *  the user id in STK addon server of the server owner. */
     const uint32_t getHostId() const { return m_host_id; }
     // ------------------------------------------------------------------------
     /** Returns the maximum number of players allowed on this server. */
@@ -130,34 +115,7 @@ public:
                                                        { return m_major_mode; }
     // ------------------------------------------------------------------------
     RaceManager::Difficulty getDifficulty() const      { return m_difficulty; }
-    // ------------------------------------------------------------------------
-    /** Compares two servers according to the sort order currently defined.
-     *  \param a The addon to compare this addon to.
-     */
-    bool operator<(const Server &server) const
-    {
-        switch (m_sort_order)
-        {
-        case SO_SCORE:
-            return m_satisfaction_score < server.m_satisfaction_score;
-            break;
-        case SO_NAME:
-            // m_id is the lower case name
-            return m_lower_case_name < server.m_lower_case_name;
-            break;
-        case SO_PLAYERS:
-            return m_current_players < server.m_current_players;
-            break;
-        case SO_DIFFICULTY:
-            return m_difficulty < server.m_difficulty;
-            break;
-        case SO_GAME_MODE:
-            return m_minor_mode < server.m_minor_mode;
-            break;
-        }   // switch
 
-        return true;
-    }   // operator<
 
 };   // Server
 #endif // HEADER_SERVER_HPP

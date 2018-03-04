@@ -214,6 +214,7 @@
 #include "network/network_string.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/rewind_queue.hpp"
+#include "network/server.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
 #include "online/profile_manager.hpp"
@@ -1089,13 +1090,13 @@ int handleCmdLine()
         Log::info("main", "Try to connect to server '%s'.",
                   ip.toString().c_str()                    );
         irr::core::stringw name = StringUtils::utf8ToWide(ip.toString());
-        ServersManager::get()->addServer(new Server(0, name,
+        auto server = std::make_shared<Server>(0, name,
             NetworkConfig::get()->getMaxPlayers(), 0,
             race_manager->getDifficulty(),
             NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
-            race_manager->getMajorMode()), ip));
-        ServersManager::get()->setJoinedServer(0);
-        STKHost::create();
+            race_manager->getMajorMode()), ip);
+        NetworkingLobby::getInstance()->setJoinedServer(server);
+        STKHost::create(server);
     }
 
     if (CommandLine::has("--wan-server", &s))
@@ -1768,9 +1769,7 @@ int main(int argc, char *argv[] )
             HardwareStats::reportHardwareStats();
         }
 
-        // This can only be the case if --connect-now was used, which adds
-        // a server to the server list.
-        if (ServersManager::get()->getNumServers()==1)
+        if (STKHost::existHost())
         {
             NetworkingLobby::getInstance()->push();
         }

@@ -36,7 +36,7 @@
 #include "network/network_player_profile.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/protocols/server_lobby.hpp"
-#include "network/servers_manager.hpp"
+#include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -103,36 +103,6 @@ void NetworkingLobby::init()
     m_server_info.clear();
     Screen::init();
     setInitialFocus();
-    Server* server = ServersManager::get()->getJoinedServer();
-    if (server)
-    {
-        m_server_name = server->getName();
-        core::stringw each_line;
-        //I18N: In the networking lobby
-        each_line = _("Server name: %s", m_server_name);
-        m_server_info.push_back(each_line);
-
-        const core::stringw& difficulty_name =
-            race_manager->getDifficultyName(server->getDifficulty());
-        //I18N: In the networking lobby
-        each_line = _("Difficulty: %s", difficulty_name);
-        m_server_info.push_back(each_line);
-
-        //I18N: In the networking lobby
-        each_line = _("Max players: %d", server->getMaxPlayers());
-        m_server_info.push_back(each_line);
-
-        //I18N: In the networking lobby
-        core::stringw mode = RaceManager::getNameOf(server->getRaceMinorMode());
-        each_line = _("Game mode: %s", mode);
-
-        race_manager->setMinorMode(server->getRaceMinorMode());
-        race_manager->setMajorMode(server->getRaceMajorMode());
-        race_manager->setDifficulty(server->getDifficulty());
-
-        m_server_info.push_back(each_line);
-    }
-
     m_start_button->setVisible(false);
 
     // For now create the active player and bind it to the right
@@ -141,6 +111,44 @@ void NetworkingLobby::init()
     PlayerProfile* profile = PlayerManager::getCurrentPlayer();
     StateManager::get()->createActivePlayer(profile, device);
 }   // init
+
+// ----------------------------------------------------------------------------
+void NetworkingLobby::setJoinedServer(std::shared_ptr<Server> server)
+{
+    if (server == m_joined_server)
+        return;
+
+    m_joined_server = server;
+    m_server_info.clear();
+
+    if (!m_joined_server)
+        return;
+    core::stringw each_line;
+
+    //I18N: In the networking lobby
+    each_line = _("Server name: %s", m_joined_server->getName());
+    m_server_info.push_back(each_line);
+
+    const core::stringw& difficulty_name =
+        race_manager->getDifficultyName(m_joined_server->getDifficulty());
+    //I18N: In the networking lobby
+    each_line = _("Difficulty: %s", difficulty_name);
+    m_server_info.push_back(each_line);
+
+    //I18N: In the networking lobby
+    each_line = _("Max players: %d", m_joined_server->getMaxPlayers());
+    m_server_info.push_back(each_line);
+
+    //I18N: In the networking lobby
+    core::stringw mode = RaceManager::getNameOf(m_joined_server->getRaceMinorMode());
+    each_line = _("Game mode: %s", mode);
+
+    race_manager->setMinorMode(m_joined_server->getRaceMinorMode());
+    race_manager->setMajorMode(m_joined_server->getRaceMajorMode());
+    race_manager->setDifficulty(m_joined_server->getDifficulty());
+
+    m_server_info.push_back(each_line);
+}   // setJoinedServer
 
 // ----------------------------------------------------------------------------
 void NetworkingLobby::addMoreServerInfo(const core::stringw& info)
@@ -153,8 +161,17 @@ void NetworkingLobby::onUpdate(float delta)
     auto lp = LobbyProtocol::get<LobbyProtocol>();
     if (!lp)
     {
-        const core::stringw connect_msg = StringUtils::loadingDots(
-            _("Connecting to server %s", m_server_name));
+        core::stringw connect_msg;
+        if (m_joined_server)
+        {
+            connect_msg = StringUtils::loadingDots(
+                _("Connecting to server %s", m_joined_server->getName()));
+        }
+        else if (NetworkConfig::get()->isClient())
+        {
+            connect_msg =
+                StringUtils::loadingDots(_("Finding a quick play server"));
+        }
         m_text_bubble->setText(connect_msg, true);
         m_start_button->setVisible(false);
     }
@@ -177,7 +194,6 @@ void NetworkingLobby::onUpdate(float delta)
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
-
 void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
                                     const int playerID)
 {
