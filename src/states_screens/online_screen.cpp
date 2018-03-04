@@ -81,7 +81,7 @@ void OnlineScreen::beforeAddingWidget()
     if (wan)
     {
         wan->setActive(is_logged_in);
-        //wan->setVisible(is_logged_in);
+        wan->setVisible(is_logged_in);
     }
 } // beforeAddingWidget
 

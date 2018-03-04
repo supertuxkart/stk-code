@@ -164,6 +164,12 @@ namespace GUIEngine
         const video::ITexture* getTexture();
         // --------------------------------------------------------------------
         virtual void setVisible(bool visible) OVERRIDE;
+        // --------------------------------------------------------------------
+        virtual void elementRemoved() OVERRIDE
+        {
+            Widget::elementRemoved();
+            m_label = NULL;
+        }
     };
 }
 
