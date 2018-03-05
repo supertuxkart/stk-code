@@ -196,8 +196,7 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
         int selected_index = m_server_list_widget->getSelectionID();
         // This can happen e.g. when the list is empty and the user
         // clicks somewhere.
-        if (selected_index < 0 ||
-            m_refreshing_server ||
+        if (selected_index < 0 || m_refreshing_server ||
             selected_index >= (int)ServersManager::get()->getServers().size())
         {
             return;
@@ -215,6 +214,15 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
 void ServerSelection::onUpdate(float dt)
 
 {
+    // In case of auto-connect command line parameter, select the first server asap
+    if (NetworkConfig::get()->isAutoConnect() &&
+        m_refreshing_server == false          &&
+        !ServersManager::get()->getServers().empty())
+    {
+        ServerInfoDialog *sid = new ServerInfoDialog(ServersManager::get()->getServers()[0]);
+        sid->requestJoin();
+    }
+
     if (!m_refreshing_server) return;
 
     if (ServersManager::get()->listUpdated())
@@ -238,12 +246,4 @@ void ServerSelection::onUpdate(float dt)
         m_reload_widget->setActive(true);
     }
 
-    // In case of auto-connect command line parameter, select the first server asap
-    if (NetworkConfig::get()->isAutoConnect() && 
-        m_refreshing_server == false          &&
-        !ServersManager::get()->getServers().empty())
-    {
-        ServerInfoDialog *sid = new ServerInfoDialog(ServersManager::get()->getServers()[0]);
-        sid->requestJoin();
-    }
 }   // onUpdate

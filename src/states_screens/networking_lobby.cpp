@@ -100,7 +100,6 @@ void NetworkingLobby::beforeAddingWidget()
  */
 void NetworkingLobby::init()
 {
-    m_server_info.clear();
     Screen::init();
     setInitialFocus();
     m_start_button->setVisible(false);
