@@ -1023,8 +1023,7 @@ int handleCmdLine()
     if (!login.empty() && !password.empty())
     {
         irr::core::stringw s;
-        Online::XMLRequest* request =
-                PlayerManager::requestSignIn(login, password);
+        PlayerManager::requestSignIn(login, password);
         while (PlayerManager::getCurrentOnlineState() != PlayerProfile::OS_SIGNED_IN)
         {
             Online::RequestManager::get()->update(0.0f);
@@ -1032,7 +1031,6 @@ int handleCmdLine()
         }
         Log::info("Main", "Logged in from command-line.");
         can_wan = true;
-        delete request;
     }
 
     if (!can_wan && CommandLine::has("--login-id", &n) &&

@@ -52,7 +52,7 @@ namespace Online
         {
             virtual void callback ();
         public:
-            SignInRequest(bool manage_memory = false)
+            SignInRequest(bool manage_memory)
                 : XMLRequest(manage_memory, /*priority*/10) {}
         };   // SignInRequest
 
@@ -105,8 +105,8 @@ namespace Online
         const std::string& getToken() const { return m_token; }
         virtual void requestSavedSession();
         virtual void requestSignOut();
-        virtual SignInRequest *requestSignIn(const irr::core::stringw &username,
-                                             const irr::core::stringw &password);
+        virtual void requestSignIn(const irr::core::stringw &username,
+                                   const irr::core::stringw &password);
 
     public:
         OnlinePlayerProfile(const XMLNode *player);

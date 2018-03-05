@@ -111,15 +111,14 @@ namespace Online
      *  \param username Name of user.
      *  \param password Password.
      */
-    OnlinePlayerProfile::SignInRequest*
-        OnlinePlayerProfile::requestSignIn(const core::stringw &username,
+    void OnlinePlayerProfile::requestSignIn(const core::stringw &username,
                                            const core::stringw &password)
     {
         // If the player changes the online account, there can be a
         // logout stil happening.
         assert(m_online_state == OS_SIGNED_OUT ||
                m_online_state == OS_SIGNING_OUT);
-        SignInRequest * request = new SignInRequest(false);
+        SignInRequest * request = new SignInRequest(true);
 
         // We can't use setUserDetail here, since there is no token yet
         request->setApiURL(API::USER_PATH, "connect");
@@ -130,8 +129,6 @@ namespace Online
                                                  : "false");
         request->queue();
         m_online_state = OS_SIGNING_IN;
-
-        return request;
     }   // requestSignIn
 
     // ------------------------------------------------------------------------
