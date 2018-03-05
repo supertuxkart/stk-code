@@ -79,8 +79,8 @@ ServerInfoDialog::~ServerInfoDialog()
 void ServerInfoDialog::requestJoin()
 {
     STKHost::create(m_server);
-    ModalDialog::dismiss();
     NetworkingLobby::getInstance()->setJoinedServer(m_server);
+    ModalDialog::dismiss();
     NetworkingLobby::getInstance()->push();
 }   // requestJoin
 
