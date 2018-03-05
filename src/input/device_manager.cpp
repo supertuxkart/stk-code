@@ -23,6 +23,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "input/gamepad_android_config.hpp"
 #include "input/gamepad_device.hpp"
 #include "input/keyboard_device.hpp"
 #include "input/multitouch_device.hpp"
@@ -80,6 +81,10 @@ bool DeviceManager::initialize()
         if(UserConfigParams::logMisc())
             Log::info("Device manager","No keyboard configuration exists, creating one.");
         m_keyboard_configs.push_back(new KeyboardConfig());
+        
+#ifdef ANDROID
+        m_keyboard_configs.push_back(new GamepadAndroidConfig());
+#endif
         created = true;
     }
 
@@ -568,12 +573,13 @@ bool DeviceManager::load()
                       config->getName().c_str());
             continue;
         }
-        if(config->getName()=="keyboard")
+        if (config->getName() == "keyboard" ||
+            config->getName() == "gamepad_android")
         {
             KeyboardConfig *kc = static_cast<KeyboardConfig*>(device_config);
             m_keyboard_configs.push_back(kc);
         }
-        else if (config->getName()=="gamepad")
+        else if (config->getName() == "gamepad")
         {
             GamepadConfig *gc = static_cast<GamepadConfig*>(device_config);
             m_gamepad_configs.push_back(gc);

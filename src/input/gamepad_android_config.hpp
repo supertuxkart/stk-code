@@ -16,11 +16,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_KEYBOARD_CONFIG_HPP
-#define HEADER_KEYBOARD_CONFIG_HPP
+#ifndef HEADER_GAMEPAD_ANDROID_CONFIG_HPP
+#define HEADER_GAMEPAD_ANDROID_CONFIG_HPP
 
 #include "input/binding.hpp"
-#include "input/device_config.hpp"
+#include "input/keyboard_config.hpp"
 #include "input/input.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/cpp2011.hpp"
@@ -28,25 +28,26 @@
 #include <iosfwd>
 
 /**
-  * \brief specialisation of DeviceConfig for keyboard type devices
+  * \brief specialisation of DeviceConfig for android gamepad devices
   * \ingroup config
   */
-class KeyboardConfig : public DeviceConfig
+class GamepadAndroidConfig : public KeyboardConfig
 {
 
 public:
 
-                KeyboardConfig();
-    virtual    ~KeyboardConfig() {}
+                GamepadAndroidConfig();
+    virtual    ~GamepadAndroidConfig() {}
 
     virtual void setDefaultBinds();
     virtual void save(std::ofstream& stream);
+    virtual irr::core::stringw getBindingAsString(const PlayerAction action) const;
 
     // ------------------------------------------------------------------------
     virtual bool isGamePad()  const { return false; }
     // ------------------------------------------------------------------------
     virtual bool isKeyboard() const { return true; }
 
-};   // class KeyboardConfig
+};   // class GamepadAndroidConfig
 
 #endif
