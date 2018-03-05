@@ -219,8 +219,11 @@ namespace Online
             input->get("username", &username);
             input->get("userid", &userid);
 #endif
-            NetworkConfig::get()->setCurrentUserId(userid);
-            NetworkConfig::get()->setCurrentUserToken(m_token);
+            if (NetworkConfig::get()->getServerIdFile().empty())
+            {
+                NetworkConfig::get()->setCurrentUserId(userid);
+                NetworkConfig::get()->setCurrentUserToken(m_token);
+            }
             setLastOnlineName(username);
 
             OnlineProfile* profile = new OnlineProfile(userid, username, true);
