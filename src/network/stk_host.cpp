@@ -372,6 +372,16 @@ STKHost::~STKHost()
     delete m_network;
     enet_deinitialize();
     delete m_separate_process;
+    // Always clean up server id file in case client failed to connect
+    const std::string& sid = NetworkConfig::get()->getServerIdFile();
+    if (!sid.empty())
+    {
+        if (file_manager->fileExists(sid))
+        {
+            file_manager->removeFile(sid);
+        }
+        NetworkConfig::get()->setServerIdFile("");
+    }
 }   // ~STKHost
 
 //-----------------------------------------------------------------------------
