@@ -1185,11 +1185,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         scene::CBatchingMesh *merged_mesh = new scene::CBatchingMesh();
         merged_mesh->addMesh(mesh);
         merged_mesh->finalize();
-#ifndef SERVER_ONLY
         tangent_mesh = merged_mesh;
-#else
-        tangent_mesh = merged_mesh;
-#endif
         // The reference count of the mesh is 1, since it is in irrlicht's
         // cache. So we only have to remove it from the cache.
         irr_driver->removeMeshFromCache(mesh);
@@ -1198,9 +1194,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     {
         // SPM does the combine for you
         tangent_mesh = mesh;
-#ifndef SERVER_ONLY
         tangent_mesh->grab();
-#endif
     }
     // The merged mesh is grabbed by the octtree, so we don't need
     // to keep a reference to it.
