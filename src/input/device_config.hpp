@@ -95,6 +95,7 @@ public:
     irr::core::stringw getMappingIdString (const PlayerAction action) const;
     virtual irr::core::stringw getBindingAsString(const PlayerAction action) const;
     virtual bool isGamePad()  const = 0;
+    virtual bool isGamePadAndroid()  const = 0;
     virtual bool isKeyboard() const = 0;
 
     virtual void save(std::ofstream& stream);

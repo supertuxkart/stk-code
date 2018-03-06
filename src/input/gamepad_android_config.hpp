@@ -46,6 +46,8 @@ public:
     // ------------------------------------------------------------------------
     virtual bool isGamePad()  const { return false; }
     // ------------------------------------------------------------------------
+    virtual bool isGamePadAndroid()  const { return true; }
+    // ------------------------------------------------------------------------
     virtual bool isKeyboard() const { return true; }
 
 };   // class GamepadAndroidConfig

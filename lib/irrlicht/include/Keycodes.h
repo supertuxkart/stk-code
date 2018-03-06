@@ -179,23 +179,27 @@ namespace irr
 		IRR_KEY_PA1              = 0xFD,  // PA1 key
 		IRR_KEY_OEM_CLEAR        = 0xFE,   // Clear key
 
-		IRR_KEY_BUTTON_A         = 0x100,
-		IRR_KEY_BUTTON_B         = 0x101,
-		IRR_KEY_BUTTON_C         = 0x102,
-		IRR_KEY_BUTTON_X         = 0x103,
-		IRR_KEY_BUTTON_Y         = 0x104,
-		IRR_KEY_BUTTON_Z         = 0x105,
-		IRR_KEY_BUTTON_L1        = 0x106,
-		IRR_KEY_BUTTON_R1        = 0x107,
-		IRR_KEY_BUTTON_L2        = 0x108,
-		IRR_KEY_BUTTON_R2        = 0x109,
-		IRR_KEY_BUTTON_THUMBL    = 0x10A,
-		IRR_KEY_BUTTON_THUMBR    = 0x11B,
-		IRR_KEY_BUTTON_START     = 0x11C,
-		IRR_KEY_BUTTON_SELECT    = 0x11D,
-		IRR_KEY_BUTTON_MODE      = 0x11E,
+		IRR_KEY_BUTTON_LEFT      = 0x100,
+		IRR_KEY_BUTTON_RIGHT     = 0x101,
+		IRR_KEY_BUTTON_UP        = 0x102,
+		IRR_KEY_BUTTON_DOWN      = 0x103,
+		IRR_KEY_BUTTON_A         = 0x104,
+		IRR_KEY_BUTTON_B         = 0x105,
+		IRR_KEY_BUTTON_C         = 0x106,
+		IRR_KEY_BUTTON_X         = 0x107,
+		IRR_KEY_BUTTON_Y         = 0x108,
+		IRR_KEY_BUTTON_Z         = 0x109,
+		IRR_KEY_BUTTON_L1        = 0x10A,
+		IRR_KEY_BUTTON_R1        = 0x10B,
+		IRR_KEY_BUTTON_L2        = 0x10C,
+		IRR_KEY_BUTTON_R2        = 0x10D,
+		IRR_KEY_BUTTON_THUMBL    = 0x10E,
+		IRR_KEY_BUTTON_THUMBR    = 0x10F,
+		IRR_KEY_BUTTON_START     = 0x110,
+		IRR_KEY_BUTTON_SELECT    = 0x111,
+		IRR_KEY_BUTTON_MODE      = 0x112,
 
-		IRR_KEY_CODES_COUNT      = 0x11F // this is not a key, but the amount of keycodes there are.
+		IRR_KEY_CODES_COUNT      = 0x113 // this is not a key, but the amount of keycodes there are.
 	};
 
 } // end namespace irr

@@ -82,11 +82,26 @@ bool DeviceManager::initialize()
             Log::info("Device manager","No keyboard configuration exists, creating one.");
         m_keyboard_configs.push_back(new KeyboardConfig());
         
-#ifdef ANDROID
-        m_keyboard_configs.push_back(new GamepadAndroidConfig());
-#endif
         created = true;
     }
+    
+#ifdef ANDROID
+    bool has_gamepad_android_config = false;
+    
+    for (unsigned int i = 0; i < m_keyboard_configs.size(); i++)
+    {
+        if (m_keyboard_configs[i].isGamePadAndroid())
+        {
+            has_gamepad_android_config = true;
+        }
+    }
+    
+    if (!has_gamepad_android_config)
+    {
+        m_keyboard_configs.push_back(new GamepadAndroidConfig());
+        created = true;
+    }
+#endif
 
     const int keyboard_amount = m_keyboard_configs.size();
     for (int n = 0; n < keyboard_amount; n++)

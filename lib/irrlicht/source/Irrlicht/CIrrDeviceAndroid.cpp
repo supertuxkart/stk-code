@@ -760,15 +760,16 @@ s32 CIrrDeviceAndroid::handleGamepad(AInputEvent* androidEvent)
             if (GamepadAxisX != 0)
             {
                 event.KeyInput.PressedDown = false;
-                event.KeyInput.Key = GamepadAxisX < 0 ? IRR_KEY_LEFT
-                                                      : IRR_KEY_RIGHT;
+                event.KeyInput.Key = GamepadAxisX < 0 ? IRR_KEY_BUTTON_LEFT
+                                                      : IRR_KEY_BUTTON_RIGHT;
                 postEventFromUser(event);
             }
             
             if (axis_x != 0)
             {
                 event.KeyInput.PressedDown = true;
-                event.KeyInput.Key = axis_x < 0 ? IRR_KEY_LEFT : IRR_KEY_RIGHT;
+                event.KeyInput.Key = axis_x < 0 ? IRR_KEY_BUTTON_LEFT 
+								                : IRR_KEY_BUTTON_RIGHT;
                 postEventFromUser(event);
             }
             
@@ -780,15 +781,16 @@ s32 CIrrDeviceAndroid::handleGamepad(AInputEvent* androidEvent)
             if (GamepadAxisY != 0)
             {
                 event.KeyInput.PressedDown = false;
-                event.KeyInput.Key = GamepadAxisY < 0 ? IRR_KEY_UP
-                                                      : IRR_KEY_DOWN;
+                event.KeyInput.Key = GamepadAxisY < 0 ? IRR_KEY_BUTTON_UP
+                                                      : IRR_KEY_BUTTON_DOWN;
                 postEventFromUser(event);
             }
             
             if (axis_y != 0)
             {
                 event.KeyInput.PressedDown = true;
-                event.KeyInput.Key = axis_y < 0 ? IRR_KEY_UP : IRR_KEY_DOWN;
+                event.KeyInput.Key = axis_y < 0 ? IRR_KEY_BUTTON_UP 
+								                : IRR_KEY_BUTTON_DOWN;
                 postEventFromUser(event);
             }
             

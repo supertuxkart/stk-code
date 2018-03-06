@@ -53,6 +53,18 @@ irr::core::stringw GamepadAndroidConfig::getBindingAsString(const PlayerAction a
     
     switch (id)
     {
+    case IRR_KEY_BUTTON_LEFT:
+        button_name = _C("input_key", "Left");
+        break;
+    case IRR_KEY_BUTTON_RIGHT:
+        button_name = _C("input_key", "Right");
+        break;
+    case IRR_KEY_BUTTON_UP:
+        button_name = _C("input_key", "Up");
+        break;
+    case IRR_KEY_BUTTON_DOWN:
+        button_name = _C("input_key", "Down");
+        break;
     case IRR_KEY_BUTTON_A:
         button_name = "A";
         break;
@@ -111,20 +123,20 @@ irr::core::stringw GamepadAndroidConfig::getBindingAsString(const PlayerAction a
 void GamepadAndroidConfig::setDefaultBinds()
 {
     setBinding(PA_NITRO,       Input::IT_KEYBOARD, IRR_KEY_BUTTON_X);
-    setBinding(PA_ACCEL,       Input::IT_KEYBOARD, IRR_KEY_UP);
-    setBinding(PA_BRAKE,       Input::IT_KEYBOARD, IRR_KEY_DOWN);
-    setBinding(PA_STEER_LEFT,  Input::IT_KEYBOARD, IRR_KEY_LEFT);
-    setBinding(PA_STEER_RIGHT, Input::IT_KEYBOARD, IRR_KEY_RIGHT);
+    setBinding(PA_ACCEL,       Input::IT_KEYBOARD, IRR_KEY_BUTTON_UP);
+    setBinding(PA_BRAKE,       Input::IT_KEYBOARD, IRR_KEY_BUTTON_DOWN);
+    setBinding(PA_STEER_LEFT,  Input::IT_KEYBOARD, IRR_KEY_BUTTON_LEFT);
+    setBinding(PA_STEER_RIGHT, Input::IT_KEYBOARD, IRR_KEY_BUTTON_RIGHT);
     setBinding(PA_DRIFT,       Input::IT_KEYBOARD, IRR_KEY_BUTTON_Y);
     setBinding(PA_RESCUE,      Input::IT_KEYBOARD, IRR_KEY_BUTTON_L1);
     setBinding(PA_FIRE,        Input::IT_KEYBOARD, IRR_KEY_BUTTON_A);
     setBinding(PA_LOOK_BACK,   Input::IT_KEYBOARD, IRR_KEY_BUTTON_R1);
     setBinding(PA_PAUSE_RACE,  Input::IT_KEYBOARD, IRR_KEY_BUTTON_B);
 
-    setBinding(PA_MENU_UP,     Input::IT_KEYBOARD, IRR_KEY_UP);
-    setBinding(PA_MENU_DOWN,   Input::IT_KEYBOARD, IRR_KEY_DOWN);
-    setBinding(PA_MENU_LEFT,   Input::IT_KEYBOARD, IRR_KEY_LEFT);
-    setBinding(PA_MENU_RIGHT,  Input::IT_KEYBOARD, IRR_KEY_RIGHT);
+    setBinding(PA_MENU_UP,     Input::IT_KEYBOARD, IRR_KEY_BUTTON_UP);
+    setBinding(PA_MENU_DOWN,   Input::IT_KEYBOARD, IRR_KEY_BUTTON_DOWN);
+    setBinding(PA_MENU_LEFT,   Input::IT_KEYBOARD, IRR_KEY_BUTTON_LEFT);
+    setBinding(PA_MENU_RIGHT,  Input::IT_KEYBOARD, IRR_KEY_BUTTON_RIGHT);
     setBinding(PA_MENU_SELECT, Input::IT_KEYBOARD, IRR_KEY_BUTTON_A);
     setBinding(PA_MENU_CANCEL, Input::IT_KEYBOARD, IRR_KEY_BUTTON_B);
 }
