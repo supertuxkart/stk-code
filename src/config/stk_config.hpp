@@ -171,6 +171,11 @@ public:
 
     unsigned m_tc_quality;
 
+    /** Client and server port use random ports if enabled in user config. */
+    uint16_t m_server_discovery_port;
+    uint16_t m_client_port;
+    uint16_t m_server_port;
+
     /** Lists of TTF files used in STK. */
     std::vector<std::string> m_normal_ttf;
     std::vector<std::string> m_digit_ttf;

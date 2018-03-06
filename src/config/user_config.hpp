@@ -739,9 +739,15 @@ namespace UserConfigParams
             std::make_pair(1100, 4)
         ));
 
+    // ---- Network
+    PARAM_PREFIX GroupUserConfigParam  m_network_group
+        PARAM_DEFAULT(GroupUserConfigParam("Network", "Network Settings"));
     PARAM_PREFIX BoolUserConfigParam m_log_packets
-            PARAM_DEFAULT( BoolUserConfigParam(false, "log-network-packets",
-                                                 "If all network packets should be logged") );
+        PARAM_DEFAULT(BoolUserConfigParam(false, "log-network-packets",
+        &m_network_group, "If all network packets should be logged"));
+    PARAM_PREFIX BoolUserConfigParam m_random_ports
+        PARAM_DEFAULT(BoolUserConfigParam(true, "randrom-ports",
+        &m_network_group, "Use random ports for client and server connection"));
 
     // ---- Graphic Quality
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality

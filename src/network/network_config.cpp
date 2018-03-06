@@ -17,6 +17,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/network_config.hpp"
+#include "config/stk_config.hpp"
+#include "config/user_config.hpp"
 #include "online/xml_request.hpp"
 
 NetworkConfig *NetworkConfig::m_network_config = NULL;
@@ -46,9 +48,17 @@ NetworkConfig::NetworkConfig()
     m_cur_user_token        = "";
     m_server_name           = "";
     m_password              = "";
-    m_server_discovery_port = 2757;
-    m_server_port           = 2758;
-    m_client_port           = 2759;
+    m_server_discovery_port = stk_config->m_server_discovery_port;
+    if (UserConfigParams::m_random_ports)
+    {
+        m_client_port = 0;
+        m_server_port = 0;
+    }
+    else
+    {
+        m_client_port = stk_config->m_client_port;
+        m_server_port = stk_config->m_server_port;
+    }
 }   // NetworkConfig
 
 // ----------------------------------------------------------------------------

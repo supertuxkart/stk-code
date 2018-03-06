@@ -126,6 +126,12 @@ void STKConfig::load(const std::string &filename)
         Log::fatal("StkConfig", "No rotationalsmoothing defined in stk_config.");
     }
 
+    if (m_client_port == 0 || m_server_port == 0 || m_server_discovery_port == 0 ||
+        m_client_port == m_server_port || m_client_port == m_server_discovery_port ||
+        m_server_port == m_server_discovery_port)
+    {
+        Log::fatal("StkConfig", "Invalid default port values.");
+    }
     CHECK_NEG(m_max_karts,                 "<karts max=..."             );
     CHECK_NEG(m_item_switch_time,          "item-switch-time"           );
     CHECK_NEG(m_bubblegum_counter,         "bubblegum disappear counter");
@@ -195,6 +201,9 @@ void STKConfig::init_defaults()
     m_cutscene_fov               = 0.61f;
     m_max_skinning_bones         = 1024;
     m_tc_quality                 = 16;
+    m_server_discovery_port      = 2757;
+    m_client_port                = 2758;
+    m_server_port                = 2759;
 
     m_score_increase.clear();
     m_leader_intervals.clear();
@@ -396,6 +405,19 @@ void STKConfig::getAllData(const XMLNode * root)
     if (const XMLNode *tc = root->getNode("texture-compression"))
     {
         tc->get("quality", &m_tc_quality);
+    }
+
+    if (const XMLNode *tc = root->getNode("network"))
+    {
+        unsigned server_discovery_port = 0;
+        unsigned client_port = 0;
+        unsigned server_port = 0;
+        tc->get("server-discovery-port", &server_discovery_port);
+        tc->get("client-port", &client_port);
+        tc->get("server-port", &server_port);
+        m_server_discovery_port = (uint16_t)server_discovery_port;
+        m_client_port = (uint16_t)client_port;
+        m_server_port = (uint16_t)server_port;
     }
 
     // Get the default KartProperties
