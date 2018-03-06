@@ -25,18 +25,18 @@
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "online/xml_request.hpp"
+#include "utils/string_utils.hpp"
 
 using namespace Online;
 
 /** Constructor. Stores the server id.
  *  \param server Server to be joined.
  */
-RequestConnection::RequestConnection(std::shared_ptr<Server> server, bool lan)
+RequestConnection::RequestConnection(std::shared_ptr<Server> server)
                  : Protocol(PROTOCOL_SILENT)
 {
     m_server  = server;
     m_request = NULL;
-    m_lan     = lan;
 }   // RequestConnection
 
 // ----------------------------------------------------------------------------
@@ -62,7 +62,11 @@ void RequestConnection::asynchronousUpdate()
     {
         case NONE:
         {
-            if (m_lan)
+            if ((!NetworkConfig::m_disable_lan &&
+                m_server->getAddress().getIP() ==
+                STKHost::get()->getPublicAddress().getIP()) ||
+                (NetworkConfig::get()->isLAN() ||
+                STKHost::get()->isClientServer()))
             {
                 if (NetworkConfig::get()->isWAN())
                 {
@@ -88,16 +92,28 @@ void RequestConnection::asynchronousUpdate()
                     }
                     NetworkConfig::get()->setServerIdFile("");
                 }
-                BareNetworkString message(std::string("connection-request"));
-                // Even for real lan server the port is guaranteed to be
-                // the discovery port as the server info for lan is always
-                // sent from the discovery port
+                std::string str_msg("connection-request");
+                BareNetworkString message(str_msg +
+                    (STKHost::get()->isClientServer() ? "-localhost" :
+                    StringUtils::toString(m_server->getPrivatePort())));
+
                 TransportAddress server_addr;
-                server_addr.setIP(m_server->getAddress().getIP());
+                if (!NetworkConfig::m_disable_lan &&
+                    m_server->getAddress().getIP() ==
+                    STKHost::get()->getPublicAddress().getIP() &&
+                    !STKHost::get()->isClientServer())
+                {
+                    // If use lan connection in wan server, send a broadcast
+                    server_addr.setIP(0xffffffff);
+                }
+                else
+                {
+                    server_addr.setIP(m_server->getAddress().getIP());
+                }
+                // Direct socket always listens on server discovery port
                 server_addr.setPort(NetworkConfig::get()
                     ->getServerDiscoveryPort());
                 STKHost::get()->sendRawPacket(message, server_addr);
-                NetworkConfig::get()->setDirectConnect(false);
                 m_state = DONE;
             }
             else

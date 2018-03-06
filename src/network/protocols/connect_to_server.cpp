@@ -119,12 +119,7 @@ void ConnectToServer::asynchronousUpdate()
             Log::info("ConnectToServer", "Server's address known");
             m_state = REQUESTING_CONNECTION;
             auto request_connection =
-                std::make_shared<RequestConnection>(m_server,
-                (!NetworkConfig::m_disable_lan &&
-                m_server_address.getIP() ==
-                STKHost::get()->getPublicAddress().getIP()) ||
-                (NetworkConfig::get()->isLAN() ||
-                STKHost::get()->isClientServer()));
+                std::make_shared<RequestConnection>(m_server);
             request_connection->requestStart();
             m_current_protocol = request_connection;
             // Reset timer for next usage
@@ -346,7 +341,7 @@ void ConnectToServer::waitingAloha(bool is_wan)
                    sender.toString().c_str());
         if (!is_wan)
         {
-            if (sender.isPublicAddressLAN())
+            if (sender.isPublicAddressLocalhost())
                 sender.setIP(0x7f000001); // 127.0.0.1
         }
         m_server_address.copy(sender);

@@ -839,6 +839,9 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket)
     BareNetworkString message(buffer, len);
     std::string command;
     message.decodeString(&command);
+    const std::string connection_cmd = std::string("connection-request") +
+        StringUtils::toString(m_private_port);
+    const std::string connection_cmd_localhost("connection-request-localhost");
 
     if (command == "stk-server")
     {
@@ -857,19 +860,18 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket)
         s.encodeString(name);
         s.addUInt8(NetworkConfig::get()->getMaxPlayers());
         s.addUInt8(0);   // FIXME: current number of connected players
-        s.addUInt32(sender.getIP());
-        s.addUInt16(sender.getPort());
+        s.addUInt16(m_private_port);
         s.addUInt8((uint8_t)race_manager->getDifficulty());
         s.addUInt8((uint8_t)
             NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
             race_manager->getMajorMode()));
         direct_socket->sendRawPacket(s, sender);
     }   // if message is server-requested
-    else if (command == "connection-request")
+    else if (command == connection_cmd)
     {
         // In case of a LAN connection, we only allow connections from
         // a LAN address (192.168*, ..., and 127.*).
-        if (!sender.isLAN() && !sender.isPublicAddressLAN() &&
+        if (!sender.isLAN() && !sender.isPublicAddressLocalhost() &&
             !NetworkConfig::get()->isPublicServer())
         {
             Log::error("STKHost", "Client trying to connect from '%s'",
@@ -878,6 +880,19 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket)
             return;
         }
         std::make_shared<ConnectToPeer>(sender)->requestStart();
+    }
+    else if (command == connection_cmd_localhost)
+    {
+        if (sender.getIP() == 0x7f000001)
+        {
+            std::make_shared<ConnectToPeer>(sender)->requestStart();
+        }
+        else
+        {
+            Log::error("STKHost", "Client trying to connect from '%s'",
+                       sender.toString().c_str());
+            Log::error("STKHost", "which is not localhost - rejected.");
+        }
     }
     else
         Log::info("STKHost", "Received unknown command '%s'",

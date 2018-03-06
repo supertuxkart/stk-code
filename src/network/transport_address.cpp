@@ -48,7 +48,7 @@ bool TransportAddress::isLAN() const
 // ----------------------------------------------------------------------------
 /** Returns this IP address is localhost (127.0.0.1).
  */
-bool TransportAddress::isPublicAddressLAN() const
+bool TransportAddress::isPublicAddressLocalhost() const
 {
 #ifndef WIN32
     char buffer[2048] = {};
@@ -127,7 +127,7 @@ bool TransportAddress::isPublicAddressLAN() const
     delete[] table;
     return false;
 #endif
-}   // isLAN
+}   // isPublicAddressLocalhost
 
 // ----------------------------------------------------------------------------
 /** Unit testing. Test various LAN patterns to verify that isLAN() works as

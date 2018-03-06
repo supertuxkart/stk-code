@@ -60,15 +60,12 @@ protected:
     /** The score/rating given */
     float m_satisfaction_score;
 
-    /** True if this server is on the LAN, false otherwise. */
-    bool m_is_lan;
-
     /** The public ip address and port of this server. */
     TransportAddress m_address;
 
     /** This is the private port of the server. This is used if a WAN game
      *  is started, but one client is discovered on the same LAN, so a direct
-     *  connection using the private port is possible. */
+     *  connection using the private port with a broadcast is possible. */
     uint16_t m_private_port;
 
     RaceManager::MinorRaceModeType m_minor_mode;
@@ -101,6 +98,8 @@ public:
     /** Returns the unique host id of this server (wan game only), which is
      *  the user id in STK addon server of the server owner. */
     const uint32_t getHostId() const { return m_host_id; }
+    // ------------------------------------------------------------------------
+    uint16_t getPrivatePort() const { return m_private_port; }
     // ------------------------------------------------------------------------
     /** Returns the maximum number of players allowed on this server. */
     const int getMaxPlayers() const { return m_max_players; }

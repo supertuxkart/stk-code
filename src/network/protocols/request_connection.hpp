@@ -26,12 +26,9 @@ protected:
     /** State of this connection. */
     STATE m_state;
 
-    /** If lan connection is used which send a request to direct socket. */
-    bool m_lan;
-
 public:
     // ------------------------------------------------------------------------
-             RequestConnection(std::shared_ptr<Server> server, bool lan);
+             RequestConnection(std::shared_ptr<Server> server);
     virtual ~RequestConnection();
     virtual void setup() OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;

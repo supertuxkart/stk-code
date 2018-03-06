@@ -157,18 +157,18 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             {
                 TransportAddress sender;
                 int len = broadcast->receiveRawPacket(buffer, LEN, &sender, 1);
-                if(len>0)
+                if (len > 0)
                 {
                     BareNetworkString s(buffer, len);
                     irr::core::stringw name;
                     // bytes_read is the number of bytes read
-                    uint8_t bytes_read  = s.decodeStringW(&name);
+                    s.decodeStringW(&name);
                     uint8_t max_players = s.getUInt8();
                     uint8_t players     = s.getUInt8();
-                    uint32_t my_ip      = s.getUInt32();
-                    uint16_t my_port    = s.getUInt16();
+                    uint16_t port       = s.getUInt16();
                     uint8_t difficulty  = s.getUInt8();
                     uint8_t mode        = s.getUInt8();
+                    sender.setPort(port);
                     servers_now.emplace_back(std::make_shared<Server>
                         (cur_server_id++, name, max_players, players,
                         difficulty, mode, sender));
