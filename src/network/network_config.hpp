@@ -72,10 +72,6 @@ private:
     /** Maximum number of players on the server. */
     int m_max_players;
 
-    /** True if STK was started with connect-now argument, so it use direct
-     *  request-connection without using the addon server. */
-    bool m_direct_connect;
-
     /** True if a client should connect to the first server it finds and
      *  immediately start a race. */
     bool m_auto_connect;
@@ -206,10 +202,6 @@ public:
     /** Returns the minor and majar game mode from server database id. */
     std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
         getLocalGameMode(unsigned);
-    // ------------------------------------------------------------------------
-    void setDirectConnect(bool val) { m_direct_connect = val; }
-    // ------------------------------------------------------------------------
-    bool isDirectConnect() const { return m_direct_connect; }
     // ------------------------------------------------------------------------
     void setCurrentUserId(uint32_t id) { m_cur_user_id = id ; }
     // ------------------------------------------------------------------------

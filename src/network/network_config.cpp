@@ -43,7 +43,6 @@ NetworkConfig::NetworkConfig()
     m_is_server             = false;
     m_is_public_server      = false;
     m_max_players           = 4;
-    m_direct_connect        = false;
     m_cur_user_id           = 0;
     m_cur_user_token        = "";
     m_server_name           = "";

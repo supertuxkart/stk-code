@@ -587,7 +587,7 @@ void cmdLineHelp()
     "       --server-password= Sets a password for a server (both client&server).\n"
     "       --connect-now=ip   Connect to a server with IP known now\n"
     "                          (in format x.x.x.x:xxx(port)), the port should be its\n"
-    "                          server discovery port.\n"
+    "                          private port.\n"
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --port=n           Port number to use.\n"
@@ -1075,15 +1075,7 @@ int handleCmdLine()
     if (CommandLine::has("--connect-now", &s))
     {
         TransportAddress ip(s);
-        if (ip.isLAN())
-        {
-            NetworkConfig::get()->setIsLAN();
-        }
-        else
-        {
-            NetworkConfig::get()->setIsWAN();
-            NetworkConfig::get()->setDirectConnect(true);
-        }
+        NetworkConfig::get()->setIsLAN();
         NetworkConfig::get()->setIsServer(false);
         Log::info("main", "Try to connect to server '%s'.",
                   ip.toString().c_str()                    );
