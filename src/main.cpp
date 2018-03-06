@@ -1120,6 +1120,7 @@ int handleCmdLine()
             NetworkConfig::get()->setServerName(StringUtils::xmlDecode(s));
             NetworkConfig::get()->setIsServer(true);
             NetworkConfig::get()->setIsWAN();
+            NetworkConfig::get()->setIsPublicServer();
             STKHost::create();
             Log::info("main", "Creating a WAN server '%s'.", s.c_str());
         }

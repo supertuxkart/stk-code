@@ -62,11 +62,7 @@ void GetPeerAddress::asynchronousUpdate()
             m_address.setIP(ip);
 
             uint16_t port;
-            uint32_t my_ip = STKHost::get()->getPublicAddress().getIP();
-            if (m_address.getIP() == my_ip && !NetworkConfig::m_disable_lan)
-                result->get("private_port", &port);
-            else
-                result->get("port", &port);
+            result->get("port", &port);
             m_address.setPort(port);
 
             Log::debug("GetPeerAddress", "Peer address retrieved.");

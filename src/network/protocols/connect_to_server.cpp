@@ -119,7 +119,12 @@ void ConnectToServer::asynchronousUpdate()
             Log::info("ConnectToServer", "Server's address known");
             m_state = REQUESTING_CONNECTION;
             auto request_connection =
-                std::make_shared<RequestConnection>(m_server);
+                std::make_shared<RequestConnection>(m_server,
+                (!NetworkConfig::m_disable_lan &&
+                m_server_address.getIP() ==
+                STKHost::get()->getPublicAddress().getIP()) ||
+                (NetworkConfig::get()->isLAN() ||
+                STKHost::get()->isClientServer()));
             request_connection->requestStart();
             m_current_protocol = request_connection;
             // Reset timer for next usage
@@ -152,7 +157,7 @@ void ConnectToServer::asynchronousUpdate()
                 m_state = NetworkConfig::get()->isWAN() ?
                     HIDING_ADDRESS : DONE;
             }
-            if ((!NetworkConfig::m_disable_lan && 
+            if ((!NetworkConfig::m_disable_lan &&
                 m_server_address.getIP() ==
                 STKHost::get()->getPublicAddress().getIP()) ||
                 (NetworkConfig::get()->isLAN() ||

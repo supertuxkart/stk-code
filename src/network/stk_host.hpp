@@ -119,7 +119,7 @@ private:
              STKHost(const irr::core::stringw &server_name);
     virtual ~STKHost();
     void init();
-    void handleDirectSocketRequest(Network* lan_network);
+    void handleDirectSocketRequest(Network* direct_socket);
     // ------------------------------------------------------------------------
     void mainLoop();
 

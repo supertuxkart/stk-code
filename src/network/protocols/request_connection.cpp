@@ -31,11 +31,12 @@ using namespace Online;
 /** Constructor. Stores the server id.
  *  \param server Server to be joined.
  */
-RequestConnection::RequestConnection(std::shared_ptr<Server> server)
+RequestConnection::RequestConnection(std::shared_ptr<Server> server, bool lan)
                  : Protocol(PROTOCOL_SILENT)
 {
     m_server  = server;
     m_request = NULL;
+    m_lan     = lan;
 }   // RequestConnection
 
 // ----------------------------------------------------------------------------
@@ -61,10 +62,13 @@ void RequestConnection::asynchronousUpdate()
     {
         case NONE:
         {
-            if (NetworkConfig::get()->isLAN() ||
-                NetworkConfig::get()->isDirectConnect() ||
-                STKHost::get()->isClientServer())
+            if (m_lan)
             {
+                if (NetworkConfig::get()->isWAN())
+                {
+                    Log::info("RequestConnection",
+                        "LAN connection to WAN server will be used.");
+                }
                 if (STKHost::get()->isClientServer())
                 {
                     // Allow up to 10 seconds for the separate process to
@@ -85,7 +89,14 @@ void RequestConnection::asynchronousUpdate()
                     NetworkConfig::get()->setServerIdFile("");
                 }
                 BareNetworkString message(std::string("connection-request"));
-                STKHost::get()->sendRawPacket(message, m_server->getAddress());
+                // Even for real lan server the port is guaranteed to be
+                // the discovery port as the server info for lan is always
+                // sent from the discovery port
+                TransportAddress server_addr;
+                server_addr.setIP(m_server->getAddress().getIP());
+                server_addr.setPort(NetworkConfig::get()
+                    ->getServerDiscoveryPort());
+                STKHost::get()->sendRawPacket(message, server_addr);
                 NetworkConfig::get()->setDirectConnect(false);
                 m_state = DONE;
             }
