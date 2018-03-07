@@ -286,8 +286,11 @@ void LinearWorld::newLap(unsigned int kart_index)
     // Last lap message (kart_index's assert in previous block already)
     if (raceHasLaps() && kart_info.m_race_lap+1 == lap_count)
     {
-        m_race_gui->addMessage(_("Final lap!"), kart,
+        if (lap_count > 1)
+        {
+            m_race_gui->addMessage(_("Final lap!"), kart,
                                3.0f, GUIEngine::getSkin()->getColor("font::normal"), true);
+        }
         if(!m_last_lap_sfx_played && lap_count > 1)
         {
             if (UserConfigParams::m_music)

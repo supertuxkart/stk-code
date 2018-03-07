@@ -45,6 +45,10 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 
+#ifdef ANDROID
+#include "main_android.hpp"
+#endif
+
 
 // set to 1 to debug i18n
 #define TRANSLATE_VERBOSE 0
@@ -301,6 +305,24 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                              "GetLocaleInfo tryname returns '%s'.", c);
                 if(c[0]) language += std::string("_")+c;
             }   // if c[0]
+            
+#elif defined(ANDROID)
+            char p_language[3] = {};
+            AConfiguration_getLanguage(global_android_app->config, p_language);
+            
+            if (p_language != NULL)
+            {
+                language += p_language;
+                
+                char p_country[3] = {};
+                AConfiguration_getCountry(global_android_app->config, p_country);
+                
+                if (p_country)
+                {
+                    language += "_";
+                    language += p_country;
+                }
+            }
 #endif
         }   // neither LANGUAGE nor LANG defined
 

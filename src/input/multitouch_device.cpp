@@ -140,7 +140,7 @@ void MultitouchDevice::addButton(MultitouchButtonType type, int x, int y,
 #ifdef ANDROID
     if (button->type == MultitouchButtonType::BUTTON_STEERING)
     {
-        if (UserConfigParams::m_multitouch_accelerometer > 0 &&
+        if (UserConfigParams::m_multitouch_controls == 2 &&
             !m_android_device->isAccelerometerActive())
         {
             m_android_device->activateAccelerometer(1.0f / 30);

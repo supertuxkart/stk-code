@@ -228,6 +228,7 @@
 #include "states_screens/register_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
+#include "states_screens/dialogs/init_android_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/track.hpp"
@@ -1668,6 +1669,21 @@ int main(int argc, char *argv[] )
                 }
                 Log::warn("main", "Screen size is too small!");
             }
+            
+            #ifdef ANDROID
+            if (UserConfigParams::m_multitouch_controls == 0)
+            {
+                int32_t touch = AConfiguration_getTouchscreen(
+                                                    global_android_app->config);
+                
+                if (touch != ACONFIGURATION_TOUCHSCREEN_NOTOUCH)
+                {
+                    InitAndroidDialog* init_android = new InitAndroidDialog(
+                                                                    0.6f, 0.6f);
+                    GUIEngine::DialogQueue::get()->pushDialog(init_android);
+                }
+            }
+            #endif
 
             if (GraphicsRestrictions::isDisabled(
                 GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
@@ -1684,6 +1700,7 @@ int main(int argc, char *argv[] )
             }
             else if (!CVS->isGLSL())
             {
+                #if !defined(ANDROID)
                 if (UserConfigParams::m_old_driver_popup)
                 {
                     #ifdef USE_GLES2
@@ -1700,6 +1717,7 @@ int main(int argc, char *argv[] )
                                             /*from queue*/ true);
                     GUIEngine::DialogQueue::get()->pushDialog(dialog);
                 }
+                #endif
                 Log::warn("OpenGL", "OpenGL version is too old!");
             }
         }
