@@ -50,8 +50,7 @@ OnlineProfileServers::OnlineProfileServers() : GUIEngine::Screen("online/profile
 }   // OnlineProfileServers
 
 // -----------------------------------------------------------------------------
-
-void OnlineProfileServers::loadedFromFile()
+void OnlineProfileServers::beforeAddingWidget()
 {
     if (!PlayerManager::getCurrentOnlineId())
     {
@@ -62,7 +61,7 @@ void OnlineProfileServers::loadedFromFile()
 #ifdef ANDROID
     getWidget("create_wan_server")->setVisible(false);
 #endif
-}   // loadedFromFile
+}   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
 
