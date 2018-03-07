@@ -1,0 +1,20 @@
+<!--
+Shader used to enable bloom only at night time (to emulate neons, lamps, etc)
+-->
+<spshader>
+    <shader-info name="dynamicnightbloom" fallback-shader="solid" use-tangents="Y"/>
+    <first-pass vertex-shader="sp_pass.vert"
+        fragment-shader="sp_dynamic_night_bloom.frag"
+        skinned-mesh-shader="sp_skinning.vert">
+    </first-pass>
+    <shadow-pass vertex-shader="sp_shadow.vert"
+        fragment-shader="white.frag"
+        skinned-mesh-shader="sp_skinning_shadow.vert">
+    </shadow-pass>
+    <uniform-assigners>
+        <uniform-assigner name="layer"
+        function="shadowCascadeUniformAssigner"/>
+        <uniform-assigner name="is_during_day"
+        function="isDuringDayUniformAssigner"/>
+    </uniform-assigners>
+</spshader>

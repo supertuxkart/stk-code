@@ -468,10 +468,10 @@ namespace UserConfigParams
             &m_multitouch_group,
             "Draw steering wheel on right side.") );
 
-    PARAM_PREFIX IntUserConfigParam         m_multitouch_accelerometer
-            PARAM_DEFAULT( IntUserConfigParam(0, "multitouch_accelerometer",
+    PARAM_PREFIX IntUserConfigParam         m_multitouch_controls
+            PARAM_DEFAULT( IntUserConfigParam(0, "multitouch_controls",
             &m_multitouch_group,
-            "Accelerometer mode: 0 = off, 1 = tablet, 2 = phone"));
+            "Multitouch mode: 0 = undefined, 1 = steering wheel, 2 = accelerometer"));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_center
             PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone_center",

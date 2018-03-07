@@ -43,7 +43,8 @@ export RUN_OPTIMIZE_SCRIPT=0
 export DECREASE_QUALITY=1
 export CONVERT_TO_JPG=1
 
-export CONVERT_TO_JPG_BLACKLIST="data/karts/hexley/hexley_kart_diffuse.png"
+export CONVERT_TO_JPG_BLACKLIST="data/karts/hexley/hexley_kart_diffuse.png \
+                                 data/models/traffic_light.png"
 
 export BLACKLIST_FILES="data/music/cocoa_river_fast.ogg2"
 

@@ -18,12 +18,17 @@
 #include "states_screens/dialogs/multitouch_settings_dialog.hpp"
 
 #include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "input/multitouch_device.hpp"
 #include "utils/translation.hpp"
+
+#ifdef ANDROID
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
+#endif
 
 #include <IGUIEnvironment.h>
 
@@ -51,16 +56,21 @@ MultitouchSettingsDialog::~MultitouchSettingsDialog()
 
 void MultitouchSettingsDialog::beforeAddingWidgets()
 {
-    SpinnerWidget* accelerometer = getWidget<SpinnerWidget>("accelerometer");
-    assert(accelerometer != NULL);
+    bool accelerometer_available = false;
+    
+#ifdef ANDROID
+    CIrrDeviceAndroid* android_device = dynamic_cast<CIrrDeviceAndroid*>(
+                                                    irr_driver->getDevice());
+    assert(android_device != NULL);
+    accelerometer_available = android_device->isAccelerometerAvailable();
+#endif
 
-    accelerometer->m_properties[PROP_WRAP_AROUND] = "true";
-    accelerometer->clearLabels();
-    accelerometer->addLabel(_("Disabled"));
-    accelerometer->addLabel(_("Tablet"));
-    accelerometer->addLabel(_("Phone"));
-    accelerometer->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    accelerometer->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
+    if (!accelerometer_available)
+    {
+        CheckBoxWidget* accelerometer = getWidget<CheckBoxWidget>("accelerometer");
+        assert(accelerometer != NULL);
+        accelerometer->setActive(false);
+    }
 
     updateValues();
 }
@@ -94,10 +104,11 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         assert(buttons_inv != NULL);
         UserConfigParams::m_multitouch_inverted = buttons_inv->getState();
 
-        SpinnerWidget* accelerometer = getWidget<SpinnerWidget>("accelerometer");
+        CheckBoxWidget* accelerometer = getWidget<CheckBoxWidget>("accelerometer");
         assert(accelerometer != NULL);
 
-        UserConfigParams::m_multitouch_accelerometer = accelerometer->getValue();
+        UserConfigParams::m_multitouch_controls = accelerometer->
+                                                            getState() ? 2 : 1;
 
         MultitouchDevice* touch_device = input_manager->getDeviceManager()->
                                                         getMultitouchDevice();
@@ -118,7 +129,7 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         UserConfigParams::m_multitouch_deadzone_edge.revertToDefaults();
         UserConfigParams::m_multitouch_deadzone_center.revertToDefaults();
         UserConfigParams::m_multitouch_mode.revertToDefaults();
-        UserConfigParams::m_multitouch_accelerometer.revertToDefaults();
+        UserConfigParams::m_multitouch_controls.revertToDefaults();
 
         updateValues();
 
@@ -154,9 +165,9 @@ void MultitouchSettingsDialog::updateValues()
     assert(buttons_inv != NULL);
     buttons_inv->setState(UserConfigParams::m_multitouch_inverted);
 
-    SpinnerWidget* accelerometer = getWidget<SpinnerWidget>("accelerometer");
+    CheckBoxWidget* accelerometer = getWidget<CheckBoxWidget>("accelerometer");
     assert(accelerometer != NULL);
-    accelerometer->setValue(UserConfigParams::m_multitouch_accelerometer);
+    accelerometer->setState(UserConfigParams::m_multitouch_controls == 2);
 }
 
 // -----------------------------------------------------------------------------

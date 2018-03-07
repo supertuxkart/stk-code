@@ -23,6 +23,10 @@
 #include "../../../lib/irrlicht/include/IrrCompileConfig.h"
 #include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceLinux.h"
 
+#ifdef ANDROID
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
+#endif
+
 /*
     todo:
     optional scrollbars
@@ -1255,12 +1259,24 @@ bool CGUIEditBox::processMouse(const SEvent& event)
         }
         else if (!m_rtl)
         {
+            bool use_screen_keyboard = UserConfigParams::m_screen_keyboard;
+            
+            #ifdef ANDROID
+            int32_t keyboard = AConfiguration_getKeyboard(
+                                                    global_android_app->config);
+            
+            if (keyboard == ACONFIGURATION_KEYBOARD_QWERTY)
+            {
+                use_screen_keyboard = false;
+            }
+            #endif
+            
             if (!AbsoluteClippingRect.isPointInside(
                 core::position2d<s32>(event.MouseInput.X, event.MouseInput.Y)))
             {
                 return false;
             }
-            else if (UserConfigParams::m_screen_keyboard)
+            else if (use_screen_keyboard)
             {
                 CursorPos = Text.size();
                 setTextMarkers(CursorPos, CursorPos);

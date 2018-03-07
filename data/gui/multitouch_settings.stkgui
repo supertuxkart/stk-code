@@ -35,7 +35,7 @@
             <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Accelerometer"/>
             <div proportion="1" align="center" height="fit" layout="horizontal-row" >
                 <spacer width="40" height="10" />
-                <spinner id="accelerometer" proportion="1"/>
+                <checkbox id="accelerometer"/>
             </div>
         </div>
 
