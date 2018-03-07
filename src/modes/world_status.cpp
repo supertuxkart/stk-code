@@ -313,6 +313,7 @@ void WorldStatus::updateTime(const float dt)
             // In artist debug mode, when without opponents, 
             // skip the ready/set/go counter faster
             if (UserConfigParams::m_artist_debug_mode &&
+                !NetworkConfig::get()->isNetworking() &&
                 race_manager->getNumberOfKarts() -
                 race_manager->getNumSpareTireKarts() == 1 &&
                 race_manager->getTrackName() != "tutorial")
@@ -483,6 +484,7 @@ void WorldStatus::startReadySetGo()
  */
 void WorldStatus::setTime(const float time)
 {
+    m_count_up_timer += (time - m_time);
     m_time = time;
 }   // setTime
 
