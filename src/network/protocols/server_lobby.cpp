@@ -202,7 +202,6 @@ void ServerLobby::createServerIdFile()
         std::fstream fs;
         fs.open(sid, std::ios::out);
         fs.close();
-        NetworkConfig::get()->setServerIdFile("");
     }
 }   // createServerIdFile
 
