@@ -145,7 +145,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "back")
     {
-        StateManager::get()->popMenu();
+        StateManager::get()->escapePressed();
         return;
     }
 
@@ -188,13 +188,13 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
-
-void OnlineScreen::tearDown()
+/** Also called when pressing the back button. It resets the flags to indicate
+ *  a networked game.
+ */
+bool OnlineScreen::onEscapePressed()
 {
-}   // tearDown
+    NetworkConfig::get()->unsetNetworking();
+    return true;
+}   // onEscapePressed
 
-// ----------------------------------------------------------------------------
 
-void OnlineScreen::onDisabledItemClicked(const std::string& item)
-{
-}   // onDisabledItemClicked

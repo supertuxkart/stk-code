@@ -62,10 +62,8 @@ public:
     virtual void init() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void tearDown() OVERRIDE;
+    virtual bool onEscapePressed() OVERRIDE;
 
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void onDisabledItemClicked(const std::string& item) OVERRIDE;
 };
 
 #endif
