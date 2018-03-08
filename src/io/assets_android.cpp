@@ -36,6 +36,7 @@
 AssetsAndroid::AssetsAndroid(FileManager* file_manager)
 {
     m_file_manager = file_manager;
+    m_progress_bar = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -203,8 +204,13 @@ void AssetsAndroid::init()
     // Extract data directory from apk if it's needed
     if (needs_extract_data)
     {
+        m_progress_bar = new ProgressBarAndroid();
+        m_progress_bar->draw(0.01f);
+            
         removeData();
         extractData();
+        
+        delete m_progress_bar;
 
         if (!m_file_manager->fileExists(m_stk_dir + "/.extracted"))
         {
@@ -262,8 +268,6 @@ void AssetsAndroid::extractData()
             file.clear();
             file.seekg(0, std::ios::beg);
 
-            ProgressBarAndroid* progress_bar = new ProgressBarAndroid();
-            progress_bar->draw(0.0f);
             unsigned int current_line = 1;
 
             while (!file.eof())
@@ -277,10 +281,11 @@ void AssetsAndroid::extractData()
                 success = extractDir(dir_name);
 
                 assert(lines_count > 0);
-                progress_bar->draw((float)(current_line) / lines_count);
+                float pos = 0.01f + (float)(current_line) / lines_count * 0.99f;
+                m_progress_bar->draw(pos);
                 current_line++;
 
-                if (progress_bar->closeEventReceived())
+                if (m_progress_bar->closeEventReceived())
                 {
                     success = false;
                 }
@@ -288,8 +293,6 @@ void AssetsAndroid::extractData()
                 if (!success)
                     break;
             }
-
-            delete progress_bar;
         }
     }
     else

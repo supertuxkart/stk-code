@@ -21,11 +21,13 @@
 #include <string>
 
 class FileManager;
+class ProgressBarAndroid;
 
 class AssetsAndroid
 {
 private:
     FileManager* m_file_manager;
+    ProgressBarAndroid* m_progress_bar;
     std::string m_stk_dir;
 
     void extractData();
