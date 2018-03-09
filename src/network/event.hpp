@@ -30,6 +30,8 @@
 
 #include "enet/enet.h"
 
+#include <memory>
+
 class STKPeer;
 
 /*!
@@ -65,13 +67,13 @@ private:
     EVENT_TYPE m_type;
 
     /** Pointer to the peer that triggered that event. */
-    STKPeer* m_peer;
+    std::shared_ptr<STKPeer> m_peer;
 
     /** Arrivial time of the event, for timeouts. */
     double m_arrival_time;
 
 public:
-         Event(ENetEvent* event);
+         Event(ENetEvent* event, std::shared_ptr<STKPeer> peer);
         ~Event();
 
     // ------------------------------------------------------------------------
@@ -80,7 +82,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the peer of this event. */
-    STKPeer* getPeer() const { return m_peer;  }
+    STKPeer* getPeer() const { return m_peer.get(); }
     // ------------------------------------------------------------------------
     /** \brief Get a const reference to the received data.
      *  This is empty for events like connection or disconnections. 

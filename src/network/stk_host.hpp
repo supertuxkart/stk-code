@@ -38,7 +38,9 @@
 #include <enet/enet.h>
 
 #include <atomic>
+#include <map>
 #include <memory>
+#include <mutex>
 #include <thread>
 
 class GameSetup;
@@ -58,9 +60,6 @@ public:
         PORT_ANY = 0              //!< Any port.
     };
 
-
-    friend class STKPeer; // allow direct enet modifications in implementations
-
 private:
     /** Singleton pointer to the instance. */
     static STKHost* m_stk_host;
@@ -74,8 +73,11 @@ private:
     /** Network console thread */
     std::thread m_network_console;
 
+    /** Make sure the removing or adding a peer is thread-safe. */
+    std::mutex m_peers_mutex;
+
     /** The list of peers connected to this instance. */
-    std::vector<STKPeer*> m_peers;
+    std::map<ENetPeer*, std::shared_ptr<STKPeer> > m_peers;
 
     /** Next unique host id. It is increased whenever a new peer is added (see
      *  getPeer()), but not decreased whena host (=peer) disconnects. This
@@ -111,9 +113,6 @@ private:
 
     /** The private port enet socket is bound. */
     uint16_t m_private_port;
-
-    /** An error message, which is set by a protocol to be displayed
-     *  in the GUI. */
 
              STKHost(std::shared_ptr<Server> server);
              STKHost(const irr::core::stringw &server_name);
@@ -156,18 +155,15 @@ public:
     const TransportAddress& getPublicAddress() const
                                                    { return m_public_address; }
     // ------------------------------------------------------------------------
-    const TransportAddress& getStunAddress() const
-                                                     { return m_stun_address; }
+    const TransportAddress& getStunAddress() const   { return m_stun_address; }
     // ------------------------------------------------------------------------
-    uint16_t getPrivatePort() const
-                                                     { return m_private_port; }
+    uint16_t getPrivatePort() const                  { return m_private_port; }
     // ------------------------------------------------------------------------
     void setPrivatePort();
     // ------------------------------------------------------------------------
     void setPublicAddress();
     // ------------------------------------------------------------------------
     virtual GameSetup* setupNewGame();
-    void abort();
     void deleteAllPeers();
     bool connect(const TransportAddress& peer);
 
@@ -195,9 +191,7 @@ public:
     void        startListening();
     void        stopListening();
     bool        peerExists(const TransportAddress& peer_address);
-    void        removePeer(const STKPeer* peer);
     bool        isConnectedTo(const TransportAddress& peer_address);
-    STKPeer    *getPeer(ENetPeer *enet_peer);
     STKPeer    *getServerPeerForClient() const;
     std::vector<NetworkPlayerProfile*> getMyPlayerProfiles();
     void        setErrorMessage(const irr::core::stringw &message);
@@ -229,7 +223,16 @@ public:
     }  // sendRawPacket
     // ------------------------------------------------------------------------
     /** Returns a const reference to the list of peers. */
-    const std::vector<STKPeer*> &getPeers()                 { return m_peers; }
+    std::vector<STKPeer*> getPeers()
+    {
+        std::lock_guard<std::mutex> lock(m_peers_mutex);
+        std::vector<STKPeer*> peers;
+        for (auto p : m_peers)
+        {
+            peers.push_back(p.second.get());
+        }
+        return peers;
+    }
     // ------------------------------------------------------------------------
     /** Returns the next (unique) host id. */
     unsigned int getNextHostId() const
@@ -239,7 +242,11 @@ public:
     }
     // ------------------------------------------------------------------------
     /** Returns the number of currently connected peers. */
-    unsigned int getPeerCount()                 { return (int)m_peers.size(); }
+    unsigned int getPeerCount()
+    {
+        std::lock_guard<std::mutex> lock(m_peers_mutex);
+        return m_peers.size();
+    }
     // ------------------------------------------------------------------------
     /** Sets the global host id of this host. */
     void setMyHostId(uint8_t my_host_id)            { m_host_id = my_host_id; }
@@ -247,12 +254,7 @@ public:
     /** Returns the host id of this host. */
     uint8_t getMyHostId() const                           { return m_host_id; }
     // ------------------------------------------------------------------------
-    /** Sends a message from a client to the server. */
-    void sendToServer(NetworkString *data, bool reliable = true)
-    {
-        assert(NetworkConfig::get()->isClient());
-        m_peers[0]->sendPacket(data, reliable);
-    }   // sendToServer
+    void sendToServer(NetworkString *data, bool reliable = true);
     // ------------------------------------------------------------------------
     /** True if this is a client and server in graphics mode made by server
      *  creation screen. */

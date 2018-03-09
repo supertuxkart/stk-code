@@ -644,8 +644,6 @@ void ServerLobby::clientDisconnected(Event* event)
     }
 
     sendMessageToPeersChangingToken(msg, /*reliable*/true);
-    // Remove the profile from the peer (to avoid double free)
-    STKHost::get()->removePeer(event->getPeer());
     delete msg;
     
 }   // clientDisconnected

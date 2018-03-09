@@ -208,7 +208,6 @@ void ClientLobby::voteLaps(uint8_t player_id, uint8_t laps,
 void ClientLobby::leave()
 {
     m_server->disconnect();
-    STKHost::get()->removePeer(m_server);
     m_server_address.clear();
 }   // leave
 
@@ -452,7 +451,6 @@ void ClientLobby::disconnectedPlayer(Event* event)
         }
     }   // while
 
-    STKHost::get()->removePeer(event->getPeer());
 }   // disconnectedPlayer
 
 //-----------------------------------------------------------------------------

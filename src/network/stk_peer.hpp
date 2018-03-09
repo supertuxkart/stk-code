@@ -23,6 +23,7 @@
 #ifndef STK_PEER_HPP
 #define STK_PEER_HPP
 
+#include "network/transport_address.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 
@@ -55,6 +56,9 @@ protected:
 
     /** True if this peer is authorised to control a server. */
     bool m_is_authorised;
+
+    TransportAddress m_peer_address;
+
 public:
              STKPeer(ENetPeer *enet_peer);
     virtual ~STKPeer();
@@ -64,8 +68,7 @@ public:
     void disconnect();
     bool isConnected() const;
     bool exists() const;
-    uint32_t getAddress() const;
-    uint16_t getPort() const;
+    const TransportAddress& getAddress() const { return m_peer_address; }
     bool isSamePeer(const STKPeer* peer) const;
     bool isSamePeer(const ENetPeer* peer) const;
     std::vector<NetworkPlayerProfile*> getAllPlayerProfiles();

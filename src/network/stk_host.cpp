@@ -295,7 +295,7 @@ STKHost::STKHost(const irr::core::stringw &server_name)
     addr.host = STKHost::HOST_ANY;
     addr.port = NetworkConfig::get()->getServerPort();
 
-    m_network= new Network(NetworkConfig::get()->getMaxPlayers(),
+    m_network = new Network(NetworkConfig::get()->getMaxPlayers(),
                            /*channel_limit*/2,
                            /*max_in_bandwidth*/0,
                            /*max_out_bandwidth*/ 0, &addr,
@@ -359,12 +359,7 @@ STKHost::~STKHost()
         delete m_game_setup;
     m_game_setup = NULL;
 
-    // Delete all connected peers
-    while (!m_peers.empty())
-    {
-        delete m_peers.back();
-        m_peers.pop_back();
-    }
+    m_peers.clear();
 
     Network::closeLog();
     stopListening();
@@ -634,26 +629,8 @@ GameSetup* STKHost::setupNewGame()
 */
 void STKHost::deleteAllPeers()
 {
-    // remove all peers
-    for (unsigned int i = 0; i < m_peers.size(); i++)
-    {
-        delete m_peers[i];
-        m_peers[i] = NULL;
-    }
     m_peers.clear();
 }   // deleteAllPeers
-
-// ----------------------------------------------------------------------------
-/** Called when STK exits. It stops the listening thread and the
- *  ProtocolManager.
- */
-void STKHost::abort()
-{
-    // Finish protocol manager first, to avoid that it access data
-    // in STKHost.
-    ProtocolManager::lock()->abort();
-    stopListening();
-}   // abort
 
 // --------------------------------------------------------------------
 /** Sets an error message for the gui.
@@ -726,7 +703,7 @@ bool STKHost::isAuthorisedToControl() const
     // stk logic), no peer is authorised.
     if(m_peers.size()==0)
         return false;
-    return m_peers[0]->isAuthorised();
+    return m_peers.begin()->second->isAuthorised();
 }   // isAuthorisedToControl
 
 // ----------------------------------------------------------------------------
@@ -778,32 +755,46 @@ void STKHost::mainLoop()
             {
                 // Don't create more event if no protocol manager or it will
                 // be exiting
+                enet_packet_destroy(event.packet);
                 continue;
             }
-            // Create an STKEvent with the event data. This will also
-            // create the peer if it doesn't exist already
-            Event* stk_event = new Event(&event);
-            STKPeer* peer = stk_event->getPeer();
-            if (stk_event->getType() == EVENT_TYPE_CONNECTED)
+
+            Event* stk_event = NULL;
+            if (event.type == ENET_EVENT_TYPE_CONNECT)
             {
-                Log::info("STKHost", "A client has just connected. There are "
-                          "now %lu peers.", m_peers.size());
-                Log::debug("STKHost", "Addresses are : %lx, %lx",
-                           stk_event->getPeer(), peer);
-            }   // EVENT_TYPE_CONNECTED
-            else if (stk_event->getType() == EVENT_TYPE_DISCONNECTED)
+                auto stk_peer = std::make_shared<STKPeer>(event.peer);
+                m_peers[event.peer] = stk_peer;
+                stk_event = new Event(&event, stk_peer);
+                TransportAddress addr(event.peer->address);
+                Log::info("STKHost", "%s has just connected. There are "
+                    "now %u peers.", addr.toString().c_str(), getPeerCount());
+            }   // ENET_EVENT_TYPE_CONNECT
+            else if (event.type == ENET_EVENT_TYPE_DISCONNECT)
             {
-                Log::info("STKHost", "A client has just disconnected.");
                 Log::flushBuffers();
-            }   // EVENT_TYPE_CONNECTED
-            else if (stk_event->getType() == EVENT_TYPE_MESSAGE)
+                // Use the previous stk peer so protocol can see the network
+                // profile and handle it for disconnection
+                assert(m_peers.find(event.peer) != m_peers.end());
+                stk_event = new Event(&event, m_peers.at(event.peer));
+                m_peers.erase(event.peer);
+                TransportAddress addr(event.peer->address);
+                Log::info("STKHost", "%s has just disconnected. There are "
+                    "now %u peers.", addr.toString().c_str(), getPeerCount());
+            }   // ENET_EVENT_TYPE_DISCONNECT
+
+            if (!stk_event)
+            {
+                assert(m_peers.find(event.peer) != m_peers.end());
+                stk_event = new Event(&event, m_peers.at(event.peer));
+            }
+            if (stk_event->getType() == EVENT_TYPE_MESSAGE)
             {
                 Network::logPacket(stk_event->data(), true);
-                TransportAddress stk_addr(peer->getAddress());
 #ifdef DEBUG_MESSAGE_CONTENT
                 Log::verbose("NetworkManager",
                              "Message, Sender : %s time %f message:",
-                             stk_addr.toString(/*show port*/false).c_str(),
+                             stk_event->getPeer()->getAddress()
+                             .toString(/*show port*/false).c_str(),
                              StkTime::getRealTime());
                 Log::verbose("NetworkManager", "%s",
                              stk_event->data().getLogMessage().c_str());
@@ -906,14 +897,15 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket)
  */
 bool STKHost::peerExists(const TransportAddress& peer)
 {
-    ENetHost *host = m_network->getENetHost();
-    for (unsigned int i = 0; i < host->peerCount ; i++)
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    for (auto p : m_peers)
     {
-        if (host->peers[i].address.host == ntohl(peer.getIP()) &&
-            host->peers[i].address.port == peer.getPort()        )
-        {
+        auto stk_peer = p.second;
+        if (stk_peer->getAddress() == peer ||
+            ((stk_peer->getAddress().isPublicAddressLocalhost() ||
+            peer.isPublicAddressLocalhost()) &&
+            stk_peer->getAddress().getPort() == peer.getPort()))
             return true;
-        }
     }
     return false;
 }   // peerExists
@@ -925,39 +917,6 @@ std::vector<NetworkPlayerProfile*> STKHost::getMyPlayerProfiles()
 }   // getMyPlayerProfiles
 
 // ----------------------------------------------------------------------------
-/** Returns the STK peer belonging to the given enet_peer. If no STKPeer
- *  exists, create a new STKPeer.
- *  \param enet_peer The EnetPeer.
- */
-STKPeer* STKHost::getPeer(ENetPeer *enet_peer)
-{
-    for(unsigned int i=0; i<m_peers.size(); i++)
-    {
-        if(m_peers[i]->isSamePeer(enet_peer))
-            return m_peers[i];
-    }
-
-    // Make sure that a client only adds one other peer (=the server).
-    if(NetworkConfig::get()->isClient() && m_peers.size()>0)
-    {
-        Log::error("STKHost",
-                   "Client is adding more than one server, ignored for now.");
-    }
-
-
-    //FIXME Should we check #clients here? It might be easier to only
-    // handle this at connect time, not in all getPeer calls.
-    STKPeer *peer = new STKPeer(enet_peer);
-    Log::debug("getPeer", 
-               "Creating a new peer, address are STKPeer:%p, Peer:%p",
-               peer, enet_peer);
-
-    m_peers.push_back(peer);
-    m_next_unique_host_id ++;
-    return peer;
-}   // getPeer
-
-// ----------------------------------------------------------------------------
 /** \brief Return the only server peer for client.
  *  \return STKPeer the STKPeer of server.
  */
@@ -965,7 +924,7 @@ STKPeer* STKHost::getServerPeerForClient() const
 {
     assert(m_peers.size() == 1);
     assert(NetworkConfig::get()->isClient());
-    return m_peers[0];
+    return m_peers.begin()->second.get();
 }   // getServerPeerForClient
 
 // ----------------------------------------------------------------------------
@@ -986,44 +945,6 @@ bool STKHost::isConnectedTo(const TransportAddress& peer)
     return false;
 }   // isConnectedTo
 
-
-// ----------------------------------------------------------------------------
-void STKHost::removePeer(const STKPeer* peer)
-{
-    if (!peer || !peer->exists()) // peer does not exist (already removed)
-        return;
-
-    TransportAddress addr(peer->getAddress());
-    Log::debug("STKHost", "Disconnected host: %s", addr.toString().c_str());
-            
-    // remove the peer:
-    bool removed = false;
-    for (unsigned int i = 0; i < m_peers.size(); i++)
-    {
-        if (m_peers[i]->isSamePeer(peer) && !removed) // remove only one
-        {
-            delete m_peers[i];
-            m_peers.erase(m_peers.begin() + i, m_peers.begin() + i + 1);
-            Log::verbose("NetworkManager",
-                "The peer has been removed from the Network Manager.");
-            removed = true;
-        }
-        else if (m_peers[i]->isSamePeer(peer))
-        {
-            Log::fatal("NetworkManager",
-                       "Multiple peers match the disconnected one.");
-        }
-    }   // for i < m_peers.size()
-
-    if (!removed)
-        Log::warn("NetworkManager", "The peer that has been disconnected was "
-                                    "not registered by the Network Manager.");
-
-    Log::info("NetworkManager",
-              "Somebody is now disconnected. There are now %lu peers.",
-              m_peers.size());
-}   // removePeer
-
 //-----------------------------------------------------------------------------
 /** Sends data to all peers except the specified one.
  *  \param peer Peer which will not receive the message.
@@ -1033,13 +954,23 @@ void STKHost::removePeer(const STKPeer* peer)
 void STKHost::sendPacketExcept(STKPeer* peer, NetworkString *data,
                                bool reliable)
 {
-    for (unsigned int i = 0; i < m_peers.size(); i++)
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    for (auto p : m_peers)
     {
-        STKPeer* p = m_peers[i];
-        if (!p->isSamePeer(peer))
+        STKPeer* stk_peer = p.second.get();
+        if (!stk_peer->isSamePeer(peer))
         {
-            p->sendPacket(data, reliable);
+            stk_peer->sendPacket(data, reliable);
         }
     }
 }   // sendPacketExcept
 
+//-----------------------------------------------------------------------------
+/** Sends a message from a client to the server. */
+void STKHost::sendToServer(NetworkString *data, bool reliable)
+{
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    assert(m_peers.size() == 1);
+    assert(NetworkConfig::get()->isClient());
+    m_peers.begin()->second->sendPacket(data, reliable);
+}   // sendToServer

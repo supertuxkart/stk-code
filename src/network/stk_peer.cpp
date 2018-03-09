@@ -30,6 +30,7 @@
 /** Constructor for an empty peer.
  */
 STKPeer::STKPeer(ENetPeer *enet_peer)
+       : m_peer_address(enet_peer->address)
 {
     m_enet_peer           = enet_peer;
     m_is_authorised       = false;
@@ -43,7 +44,7 @@ STKPeer::STKPeer(ENetPeer *enet_peer)
  */
 STKPeer::~STKPeer()
 {
-    m_enet_peer           = NULL;
+    enet_peer_disconnect(m_enet_peer, 0);
     m_client_server_token = 0;
 }   // ~STKPeer
 
@@ -66,29 +67,13 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable)
     TransportAddress a(m_enet_peer->address);
     Log::verbose("STKPeer", "sending packet of size %d to %s at %f",
                  data->size(), a.toString().c_str(),StkTime::getRealTime());
-         
+
     ENetPacket* packet = enet_packet_create(data->getData(),
                                             data->getTotalSize(),
                                     (reliable ? ENET_PACKET_FLAG_RELIABLE
                                               : ENET_PACKET_FLAG_UNSEQUENCED));
     enet_peer_send(m_enet_peer, 0, packet);
 }   // sendPacket
-
-//-----------------------------------------------------------------------------
-/** Returns the IP address (in host format) of this client.
- */
-uint32_t STKPeer::getAddress() const
-{
-    return ntohl(m_enet_peer->address.host);
-}   // getAddress
-
-//-----------------------------------------------------------------------------
-/** Returns the port of this peer.
- */
-uint16_t STKPeer::getPort() const
-{
-    return m_enet_peer->address.port;
-}
 
 //-----------------------------------------------------------------------------
 /** Returns if the peer is connected or not.

@@ -18,7 +18,6 @@
 
 #include "network/event.hpp"
 
-#include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
@@ -28,7 +27,7 @@
 /** \brief Constructor
  *  \param event : The event that needs to be translated.
  */
-Event::Event(ENetEvent* event)
+Event::Event(ENetEvent* event, std::shared_ptr<STKPeer> peer)
 {
     m_arrival_time = (double)StkTime::getTimeSinceEpoch();
 
@@ -61,7 +60,7 @@ Event::Event(ENetEvent* event)
         enet_packet_destroy(event->packet);
     }
 
-    m_peer = STKHost::get()->getPeer(event->peer);
+    m_peer = peer;
     if(m_type == EVENT_TYPE_MESSAGE && m_peer->isClientServerTokenSet() &&
         m_data->getToken()!=m_peer->getClientServerToken() )
     {

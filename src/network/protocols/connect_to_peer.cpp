@@ -115,6 +115,13 @@ void ConnectToPeer::asynchronousUpdate()
         }
         case WAIT_FOR_CONNECTION:
         {
+            if (STKHost::get()->peerExists(m_peer_address))
+            {
+                Log::error("ConnectToPeer",
+                    "The peer you want to connect to already exists.");
+                m_state = DONE;
+                break;
+            }
             // Each 2 second for a ping or broadcast
             if (StkTime::getRealTime() > m_timer + 2.0)
             {
