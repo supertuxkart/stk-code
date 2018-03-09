@@ -239,7 +239,7 @@ void ConnectToServer::update(float dt)
         {
             // lobby room protocol if we're connected only
             if (STKHost::get()->getPeerCount() > 0 &&
-                STKHost::get()->getPeers()[0]->isConnected() &&
+                STKHost::get()->getServerPeerForClient()->isConnected() &&
                 !m_server_address.isUnset())
             {
                 // Let main thread create ClientLobby for better

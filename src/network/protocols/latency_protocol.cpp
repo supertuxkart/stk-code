@@ -56,7 +56,7 @@ bool LatencyProtocol::notifyEventAsynchronous(Event* event)
     uint32_t request  = data.getUInt8();
     uint32_t sequence = data.getUInt32();
 
-    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
+    auto peers = STKHost::get()->getPeers();
     assert(peers.size() > 0);
 
     // Find the right peer id. The host id (i.e. each host sendings its
@@ -124,7 +124,7 @@ void LatencyProtocol::asynchronousUpdate()
     float current_time = float(StkTime::getRealTime());
     if (NetworkConfig::get()->isServer() &&  current_time > m_last_time+1)
     {
-        const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
+        auto peers = STKHost::get()->getPeers();
         for (unsigned int i = 0; i < peers.size(); i++)
         {
             NetworkString *ping_request = 

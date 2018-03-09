@@ -34,7 +34,7 @@ namespace NetworkConsole
 // ----------------------------------------------------------------------------
 void kickAllPlayers(STKHost* host)
 {
-    const std::vector<STKPeer*> &peers = host->getPeers();
+    auto peers = host->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
         peers[i]->disconnect();

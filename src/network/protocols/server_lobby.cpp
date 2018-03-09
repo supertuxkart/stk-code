@@ -449,7 +449,6 @@ void ServerLobby::signalRaceStartToClients()
 {
     Log::verbose("Server", "Signaling race start to clients at %lf",
                  StkTime::getRealTime());
-    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     NetworkString *ns = getNetworkString(1);
     ns->addUInt8(LE_START_RACE);
     sendMessageToPeersChangingToken(ns, /*reliable*/true);
@@ -485,7 +484,6 @@ void ServerLobby::startSelection(const Event *event)
                   event->getPeer());
         return;
     }
-    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     NetworkString *ns = getNetworkString(1);
     // Start selection - must be synchronous since the receiver pushes
     // a new screen, which must be donefrom the main thread.
@@ -605,8 +603,6 @@ void ServerLobby::checkIncomingConnectionRequests()
             }
         }
     }
-
-    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
 
     NetworkString *total = getNetworkString(1 + karts_results.size());
     total->setSynchronous(true);

@@ -180,7 +180,9 @@ public:
     }   // requestExit
     //-------------------------------------------------------------------------
     void shutdown();
-
+    //-------------------------------------------------------------------------
+    void sendPacketToAllPeers(NetworkString *data, bool reliable = true);
+    //-------------------------------------------------------------------------
     void sendPacketExcept(STKPeer* peer,
                           NetworkString *data,
                           bool reliable = true);
@@ -191,7 +193,7 @@ public:
     void        stopListening();
     bool        peerExists(const TransportAddress& peer_address);
     bool        isConnectedTo(const TransportAddress& peer_address);
-    STKPeer    *getServerPeerForClient() const;
+    std::shared_ptr<STKPeer> getServerPeerForClient() const;
     std::vector<NetworkPlayerProfile*> getMyPlayerProfiles();
     void        setErrorMessage(const irr::core::stringw &message);
     bool        isAuthorisedToControl() const;
@@ -221,14 +223,14 @@ public:
         m_network->sendRawPacket(buffer, dst);
     }  // sendRawPacket
     // ------------------------------------------------------------------------
-    /** Returns a const reference to the list of peers. */
-    std::vector<STKPeer*> getPeers()
+    /** Returns a copied list of peers. */
+    std::vector<std::shared_ptr<STKPeer> > getPeers()
     {
         std::lock_guard<std::mutex> lock(m_peers_mutex);
-        std::vector<STKPeer*> peers;
+        std::vector<std::shared_ptr<STKPeer> > peers;
         for (auto p : m_peers)
         {
-            peers.push_back(p.second.get());
+            peers.push_back(p.second);
         }
         return peers;
     }

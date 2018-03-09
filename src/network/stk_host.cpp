@@ -920,11 +920,11 @@ std::vector<NetworkPlayerProfile*> STKHost::getMyPlayerProfiles()
 /** \brief Return the only server peer for client.
  *  \return STKPeer the STKPeer of server.
  */
-STKPeer* STKHost::getServerPeerForClient() const
+std::shared_ptr<STKPeer> STKHost::getServerPeerForClient() const
 {
     assert(m_peers.size() == 1);
     assert(NetworkConfig::get()->isClient());
-    return m_peers.begin()->second.get();
+    return m_peers.begin()->second;
 }   // getServerPeerForClient
 
 // ----------------------------------------------------------------------------
@@ -944,6 +944,20 @@ bool STKHost::isConnectedTo(const TransportAddress& peer)
     }
     return false;
 }   // isConnectedTo
+
+//-----------------------------------------------------------------------------
+/** Sends data to all peers
+ *  \param data Data to sent.
+ *  \param reliable If the data should be sent reliable or now.
+ */
+void STKHost::sendPacketToAllPeers(NetworkString *data, bool reliable)
+{
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    for (auto p : m_peers)
+    {
+        p.second->sendPacket(data, reliable);
+    }
+}   // sendPacketExcept
 
 //-----------------------------------------------------------------------------
 /** Sends data to all peers except the specified one.
