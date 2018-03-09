@@ -38,7 +38,6 @@ ConnectToPeer::ConnectToPeer(uint32_t peer_id)  : Protocol(PROTOCOL_CONNECTION)
     m_peer_id          = peer_id;
     m_state            = NONE;
     m_is_lan           = false;
-    setHandleConnections(true);
 }   // ConnectToPeer(peer_id)
 
 // ----------------------------------------------------------------------------
@@ -53,7 +52,6 @@ ConnectToPeer::ConnectToPeer(const TransportAddress &address)
     // with the state when we found the peer address.
     m_state            = WAIT_FOR_CONNECTION;
     m_is_lan           = true;
-    setHandleConnections(true);
 }   // ConnectToPeers(TransportAddress)
 
 // ----------------------------------------------------------------------------
@@ -61,17 +59,6 @@ ConnectToPeer::ConnectToPeer(const TransportAddress &address)
 ConnectToPeer::~ConnectToPeer()
 {
 }   // ~ConnectToPeer
-
-// ----------------------------------------------------------------------------
-bool ConnectToPeer::notifyEventAsynchronous(Event* event)
-{
-    if (event->getType() == EVENT_TYPE_CONNECTED)
-    {
-        Log::debug("ConnectToPeer", "Received event notifying peer connection.");
-        m_state = CONNECTED; // we received a message, we are connected
-    }
-    return true;
-}   // notifyEventAsynchronous
 
 // ----------------------------------------------------------------------------
 /** Simple finite state machine: Start a GetPeerAddress protocol. Once the
@@ -117,8 +104,9 @@ void ConnectToPeer::asynchronousUpdate()
         {
             if (STKHost::get()->peerExists(m_peer_address))
             {
-                Log::error("ConnectToPeer",
-                    "The peer you want to connect to already exists.");
+                Log::info("ConnectToPeer",
+                    "Peer %s has established a connection.",
+                    m_peer_address.toString().c_str());
                 m_state = DONE;
                 break;
             }
@@ -149,21 +137,11 @@ void ConnectToPeer::asynchronousUpdate()
                     // Not much we can do about if we don't receive the client
                     // connection - it could have stopped, lost network, ...
                     // Terminate this protocol.
-                    Log::error("ConnectToPeer", "Time out trying to connect to %s",
+                    Log::warn("ConnectToPeer", "Time out trying to connect to %s",
                             m_peer_address.toString().c_str());
-                    requestTerminate();
+                    m_state = DONE;
                 }
             }
-            break;
-        }
-        case CONNECTING: // waiting for the peer to connect
-            // If we receive a 'connected' event from enet, our
-            // notifyEventAsynchronous is called, which will move
-            // the FSM to the next state CONNECTED
-            break;
-        case CONNECTED:
-        {
-            m_state = DONE;
             break;
         }
         case DONE:

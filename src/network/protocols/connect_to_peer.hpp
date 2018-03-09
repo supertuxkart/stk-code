@@ -55,8 +55,6 @@ protected:
         NONE,
         RECEIVED_PEER_ADDRESS,
         WAIT_FOR_CONNECTION,
-        CONNECTING,
-        CONNECTED,
         DONE,
         EXITING
     }  m_state;
@@ -66,7 +64,6 @@ public:
              ConnectToPeer(const TransportAddress &address);
     virtual ~ConnectToPeer();
 
-    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
     virtual void setup() OVERRIDE {}
     virtual void update(float dt) OVERRIDE {}
     virtual void asynchronousUpdate() OVERRIDE;
