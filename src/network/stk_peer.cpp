@@ -63,8 +63,13 @@ void STKPeer::disconnect()
  */
 void STKPeer::sendPacket(NetworkString *data, bool reliable)
 {
-    data->setToken(m_client_server_token);
     TransportAddress a(m_enet_peer->address);
+    // Enet will reuse a disconnected peer so we check here to avoid sending
+    // to wrong peer
+    if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
+        a != m_peer_address)
+        return;
+    data->setToken(m_client_server_token);
     Log::verbose("STKPeer", "sending packet of size %d to %s at %f",
                  data->size(), a.toString().c_str(),StkTime::getRealTime());
 
@@ -84,13 +89,6 @@ bool STKPeer::isConnected() const
     Log::info("STKPeer", "The peer state is %i", m_enet_peer->state);
     return (m_enet_peer->state == ENET_PEER_STATE_CONNECTED);
 }   // isConnected
-
-//-----------------------------------------------------------------------------
-
-bool STKPeer::exists() const
-{
-    return (m_enet_peer != NULL); // assert that the peer exists
-}
 
 //-----------------------------------------------------------------------------
 /** Returns if this STKPeer is the same as the given peer.

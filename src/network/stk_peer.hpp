@@ -70,7 +70,6 @@ public:
                             bool reliable = true);
     void disconnect();
     bool isConnected() const;
-    bool exists() const;
     const TransportAddress& getAddress() const { return m_peer_address; }
     bool isSamePeer(const STKPeer* peer) const;
     bool isSamePeer(const ENetPeer* peer) const;
