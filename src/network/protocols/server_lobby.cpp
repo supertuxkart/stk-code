@@ -463,6 +463,7 @@ void ServerLobby::signalRaceStartToClients()
  */
 void ServerLobby::startSelection(const Event *event)
 {
+    std::lock_guard<std::mutex> lock(m_connection_mutex);
     if (NetworkConfig::get()->isWAN())
     {
         assert(m_server_registered);
@@ -663,6 +664,7 @@ void ServerLobby::clientDisconnected(Event* event)
  */
 void ServerLobby::connectionRequested(Event* event)
 {
+    std::lock_guard<std::mutex> lock(m_connection_mutex);
     STKPeer* peer = event->getPeer();
     const NetworkString &data = event->data();
 

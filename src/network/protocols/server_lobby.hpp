@@ -6,6 +6,7 @@
 #include "utils/synchronised.hpp"
 
 #include <atomic>
+#include <mutex>
 #include <set>
 
 class ServerLobby : public LobbyProtocol
@@ -65,6 +66,10 @@ private:
 
     /** Timeout counter for showing the result screen. */
     float m_timeout;
+
+    /** Lock this mutex whenever a client is connect / disconnect or
+     *  starting race. */
+    std::mutex m_connection_mutex;
 
     // connection management
     void clientDisconnected(Event* event);
