@@ -27,6 +27,7 @@
 #include "utils/time.hpp"
 #include "utils/vs.hpp"
 
+#include <algorithm>
 #include <assert.h>
 #include <cstdlib>
 #include <errno.h>
@@ -229,8 +230,9 @@ void ProtocolManager::startProtocol(std::shared_ptr<Protocol> protocol)
     protocol->setup();
     protocol->setState(PROTOCOL_STATE_RUNNING);
     opt.unlock();
+    Protocol* protocol_ptr = protocol.get();
     Log::info("ProtocolManager",
-        "A %s protocol has been started.", typeid(*protocol).name());
+        "A %s protocol has been started.", typeid(*protocol_ptr).name());
 
     // setup the protocol and notify it that it's started
 }   // startProtocol
@@ -278,9 +280,10 @@ void ProtocolManager::OneProtocolType::removeProtocol(std::shared_ptr<Protocol> 
                   m_protocols.getData().end(),   p);
     if (i == m_protocols.getData().end())
     {
+        Protocol* protocol_ptr = p.get();
         Log::error("ProtocolManager",
                    "Trying to delete protocol '%s', which was not found",
-                   typeid(*p).name());
+                   typeid(*protocol_ptr).name());
     }
     else
     {
@@ -305,8 +308,9 @@ void ProtocolManager::terminateProtocol(std::shared_ptr<Protocol> protocol)
     opt.unlock();
     protocol->setState(PROTOCOL_STATE_TERMINATED);
     protocol->terminated();
+    Protocol* protocol_ptr = protocol.get();
     Log::info("ProtocolManager",
-        "A %s protocol has been terminated.", typeid(*protocol).name());
+        "A %s protocol has been terminated.", typeid(*protocol_ptr).name());
 }   // terminateProtocol
 
 // ----------------------------------------------------------------------------

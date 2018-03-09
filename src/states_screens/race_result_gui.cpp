@@ -44,6 +44,7 @@
 #include "modes/overworld.hpp"
 #include "modes/soccer_world.hpp"
 #include "modes/world_with_rank.hpp"
+#include "network/network_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "race/highscores.hpp"

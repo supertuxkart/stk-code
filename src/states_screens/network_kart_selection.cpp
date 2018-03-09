@@ -27,6 +27,7 @@
 #include "items/item_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby.hpp"

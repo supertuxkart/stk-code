@@ -23,9 +23,7 @@
 #define STK_HOST_HPP
 
 #include "network/network.hpp"
-#include "network/network_config.hpp"
 #include "network/network_string.hpp"
-#include "network/stk_peer.hpp"
 #include "network/transport_address.hpp"
 #include "utils/synchronised.hpp"
 
@@ -44,6 +42,7 @@
 #include <thread>
 
 class GameSetup;
+class NetworkPlayerProfile;
 class Server;
 class SeparateProcess;
 

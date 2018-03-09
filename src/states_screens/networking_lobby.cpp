@@ -33,6 +33,7 @@
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/protocols/server_lobby.hpp"
