@@ -69,10 +69,14 @@ void STKHost::create(std::shared_ptr<Server> server, SeparateProcess* p)
 {
     assert(m_stk_host == NULL);
     if (NetworkConfig::get()->isServer())
+    {
         m_stk_host = new STKHost(NetworkConfig::get()->getServerName());
+        LobbyProtocol::create<ServerLobby>()->requestStart();
+    }
     else
     {
         m_stk_host = new STKHost(server);
+        std::make_shared<ConnectToServer>(server)->requestStart();
     }
     m_stk_host->m_separate_process = p;
     if (!m_stk_host->m_network)
@@ -276,7 +280,6 @@ STKHost::STKHost(std::shared_ptr<Server> server)
     }
 
     setPrivatePort();
-    std::make_shared<ConnectToServer>(server)->requestStart();
 }   // STKHost
 
 // ----------------------------------------------------------------------------
@@ -305,11 +308,7 @@ STKHost::STKHost(const irr::core::stringw &server_name)
         Log::fatal("STKHost", "An error occurred while trying to create an "
                               "ENet server host.");
     }
-
     setPrivatePort();
-    ProtocolManager::lock()
-        ->requestStart(LobbyProtocol::create<ServerLobby>());
-
 }   // STKHost(server_name)
 
 // ----------------------------------------------------------------------------
