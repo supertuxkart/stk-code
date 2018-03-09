@@ -762,7 +762,8 @@ void STKHost::mainLoop()
             Event* stk_event = NULL;
             if (event.type == ENET_EVENT_TYPE_CONNECT)
             {
-                auto stk_peer = std::make_shared<STKPeer>(event.peer);
+                auto stk_peer =
+                    std::make_shared<STKPeer>(event.peer, m_network);
                 m_peers[event.peer] = stk_peer;
                 stk_event = new Event(&event, stk_peer);
                 TransportAddress addr(event.peer->address);

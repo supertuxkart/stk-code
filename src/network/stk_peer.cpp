@@ -29,8 +29,8 @@
 
 /** Constructor for an empty peer.
  */
-STKPeer::STKPeer(ENetPeer *enet_peer)
-       : m_peer_address(enet_peer->address)
+STKPeer::STKPeer(ENetPeer *enet_peer, Network* network)
+       : m_peer_address(enet_peer->address), m_network(network)
 {
     m_enet_peer           = enet_peer;
     m_is_authorised       = false;
@@ -72,6 +72,7 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable)
                                             data->getTotalSize(),
                                     (reliable ? ENET_PACKET_FLAG_RELIABLE
                                               : ENET_PACKET_FLAG_UNSEQUENCED));
+    auto lock = m_network->acquireEnetLock();
     enet_peer_send(m_enet_peer, 0, packet);
 }   // sendPacket
 

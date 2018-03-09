@@ -20,8 +20,6 @@
 
 #include "network/event.hpp"
 #include "network/protocol.hpp"
-#include "network/stk_host.hpp"
-#include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include "utils/time.hpp"

@@ -174,6 +174,7 @@ void Network::broadcastPacket(NetworkString *data, bool reliable)
     ENetPacket* packet = enet_packet_create(data->getData(), data->size() + 1,
                                       reliable ? ENET_PACKET_FLAG_RELIABLE
                                                : ENET_PACKET_FLAG_UNSEQUENCED);
+    auto lock = acquireEnetLock();
     enet_host_broadcast(m_host, 0, packet);
 }   // broadcastPacket
 

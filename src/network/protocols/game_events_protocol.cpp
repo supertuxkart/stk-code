@@ -8,7 +8,7 @@
 #include "modes/world.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
-#include "network/protocol_manager.hpp"
+#include "network/network_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 

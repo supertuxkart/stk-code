@@ -31,6 +31,7 @@
 
 #include <vector>
 
+class Network;
 class NetworkPlayerProfile;
 class NetworkString;
 class TransportAddress;
@@ -59,8 +60,10 @@ protected:
 
     TransportAddress m_peer_address;
 
+    Network* m_network;
+
 public:
-             STKPeer(ENetPeer *enet_peer);
+             STKPeer(ENetPeer *enet_peer, Network* network);
     virtual ~STKPeer();
 
     virtual void sendPacket(NetworkString *data,

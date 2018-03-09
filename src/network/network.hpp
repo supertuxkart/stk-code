@@ -31,6 +31,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <enet/enet.h>
 
+#include <mutex>
 #include <stdio.h>
 
 class BareNetworkString;
@@ -46,6 +47,8 @@ class Network
 private:
     /** ENet host interfacing sockets. */
     ENetHost*  m_host;
+
+    std::mutex m_enet_mutex;
 
     /** Where to log packets. If NULL for FILE* logging is disabled. */
     static Synchronised<FILE*> m_log_file;
@@ -68,6 +71,9 @@ public:
                          TransportAddress* sender, int max_tries = -1);
     void     broadcastPacket(NetworkString *data,
                              bool reliable = true);
+    // ------------------------------------------------------------------------
+    std::unique_lock<std::mutex> acquireEnetLock()
+                         { return std::unique_lock<std::mutex>(m_enet_mutex); }
     // ------------------------------------------------------------------------
     /** Returns a pointer to the ENet host object. */
     ENetHost* getENetHost() { return m_host; }
