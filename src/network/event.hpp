@@ -79,7 +79,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the type of this event. */
     EVENT_TYPE getType() const { return m_type; }
-
+    // ------------------------------------------------------------------------
+    /** Returns the peer of this event (shared pointer). */
+    std::shared_ptr<STKPeer> getPeerSP() const { return m_peer; }
     // ------------------------------------------------------------------------
     /** Returns the peer of this event. */
     STKPeer* getPeer() const { return m_peer.get(); }

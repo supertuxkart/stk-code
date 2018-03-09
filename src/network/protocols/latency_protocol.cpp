@@ -20,11 +20,13 @@
 LatencyProtocol::LatencyProtocol() 
                : Protocol(PROTOCOL_SYNCHRONIZATION)
 {
-    unsigned int size = STKHost::get()->getPeerCount();
-    m_pings.resize(size, std::map<uint32_t,double>());
-    m_successed_pings.resize(size, 0);
-    m_total_diff.resize(size, 0);
-    m_average_ping.resize(size, 0);
+    for (std::shared_ptr<STKPeer> peer : STKHost::get()->getPeers())
+    {
+        m_pings[peer] = std::map<uint32_t,double>();
+        m_average_ping[peer] = 0;
+        m_successed_pings[peer] = 0;
+        m_total_diff[peer] = 0.0;
+    }
     m_pings_count = 0;
     m_last_time = 0.0;
 }   // LatencyProtocol
@@ -32,6 +34,14 @@ LatencyProtocol::LatencyProtocol()
 //-----------------------------------------------------------------------------
 LatencyProtocol::~LatencyProtocol()
 {
+    for (auto p : m_average_ping)
+    {
+        std::string peer_name = "disconnected";
+        if (auto peer = p.first.lock())
+            peer_name = peer->getAddress().toString();
+        Log::info("LatencyProtocol", "Peer %s: Average ping %u.",
+            peer_name.c_str(), p.second);
+    }
 }   // ~LatencyProtocol
 
 //-----------------------------------------------------------------------------
@@ -56,22 +66,6 @@ bool LatencyProtocol::notifyEventAsynchronous(Event* event)
     uint32_t request  = data.getUInt8();
     uint32_t sequence = data.getUInt32();
 
-    auto peers = STKHost::get()->getPeers();
-    assert(peers.size() > 0);
-
-    // Find the right peer id. The host id (i.e. each host sendings its
-    // host id) can not be used here, since host ids can have gaps (if a
-    // host should disconnect)
-    uint8_t peer_id = -1;
-    for (unsigned int i = 0; i < peers.size(); i++)
-    {
-        if (peers[i]->isSamePeer(event->getPeer()))
-        {
-            peer_id = i;
-            break;
-        }
-    }
-
     if (request)
     {
         // Only a client should receive a request for a ping response
@@ -86,23 +80,26 @@ bool LatencyProtocol::notifyEventAsynchronous(Event* event)
     {
         // Only a server should receive this kind of message
         assert(NetworkConfig::get()->isServer());
-        if (sequence >= m_pings[peer_id].size())
+        if (sequence >= m_pings[event->getPeerSP()].size())
         {
             Log::warn("LatencyProtocol",
                       "The sequence# %u isn't known.", sequence);
             return true;
         }
         double current_time = StkTime::getRealTime();
-        m_total_diff[peer_id] += current_time - m_pings[peer_id][sequence];
-        m_successed_pings[peer_id]++;
-        m_average_ping[peer_id] =
-            (int)((m_total_diff[peer_id]/m_successed_pings[peer_id])*1000.0);
+        m_total_diff[event->getPeerSP()] +=
+            current_time - m_pings[event->getPeerSP()][sequence];
+        m_successed_pings[event->getPeerSP()]++;
+        m_average_ping[event->getPeerSP()] =
+            (int)((m_total_diff[event->getPeerSP()] /
+            m_successed_pings[event->getPeerSP()]) * 1000.0);
 
         Log::debug("LatencyProtocol",
-            "Peer %d sequence %d ping %u average %u at %lf",
-            peer_id, sequence,
-            (unsigned int)((current_time - m_pings[peer_id][sequence])*1000),
-            m_average_ping[peer_id],
+            "Peer %s: sequence %d ping %u average %u at %lf",
+            event->getPeerSP()->getAddress().toString().c_str(), sequence,
+            (unsigned int)(
+            (current_time - m_pings[event->getPeerSP()][sequence]) * 1000),
+            m_average_ping[event->getPeerSP()],
             StkTime::getRealTime());
     }
     return true;
@@ -124,16 +121,16 @@ void LatencyProtocol::asynchronousUpdate()
     float current_time = float(StkTime::getRealTime());
     if (NetworkConfig::get()->isServer() &&  current_time > m_last_time+1)
     {
-        auto peers = STKHost::get()->getPeers();
-        for (unsigned int i = 0; i < peers.size(); i++)
+        for (auto& p : m_pings)
         {
-            NetworkString *ping_request = 
-                            getNetworkString(5);
-            ping_request->addUInt8(1).addUInt32((int)m_pings[i].size());
-            m_pings[i] [ m_pings_count ] = current_time;
-            peers[i]->sendPacket(ping_request, false);
-            delete ping_request;
-        }   // for i M peers
+            if (auto peer = p.first.lock())
+            {
+                NetworkString *ping_request = getNetworkString(5);
+                ping_request->addUInt8(1).addUInt32((unsigned)p.second.size());
+                peer->sendPacket(ping_request, false);
+                p.second[m_pings_count] = current_time;
+            }
+        }   // for i < all peers
         m_last_time = current_time;
         m_pings_count++;
     }   // if current_time > m_last_time + 0.1
