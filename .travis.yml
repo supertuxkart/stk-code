@@ -14,10 +14,10 @@ matrix:
 
 env:
   matrix:
-    - BUILD_TYPE="Debug" SERVER_ONLY="OFF"
-    - BUILD_TYPE="Debug" SERVER_ONLY="ON"
-    - BUILD_TYPE="Release" SERVER_ONLY="OFF"
-    - BUILD_TYPE="Release" SERVER_ONLY="ON"
+    - BUILD_TYPE="Debug" SERVER_ONLY="OFF" UNITTEST="true"
+    - BUILD_TYPE="Debug" SERVER_ONLY="ON" UNITTEST="false"
+    - BUILD_TYPE="Release" SERVER_ONLY="OFF" UNITTEST="false"
+    - BUILD_TYPE="Release" SERVER_ONLY="ON" UNITTEST="false"
 
 addons:
   apt:
@@ -40,6 +40,11 @@ addons:
     - zlib1g-dev
 
 before_script:
+  # For unit testing
+  - if [ "$UNITTEST" ]; then svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets ../stk-assets; fi
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  
   # Unfortunately using all threads crashes g++: "g++: internal compiler error: Killed (program cc1plus)"
   # Use half of the available threads, gcc is memory hungry
   - 'if [ ${CC} = "gcc" ]; then
@@ -55,6 +60,7 @@ script:
   - cd "build"
   - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off
   - make VERBOSE=1 -j $THREADS
+  - if [ "$UNITTEST" ]; then ./bin/supertuxkart --unit-testing; fi
 
 notifications:
   irc:
