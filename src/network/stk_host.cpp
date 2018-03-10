@@ -655,6 +655,7 @@ void STKHost::setErrorMessage(const irr::core::stringw &message)
  */
 bool STKHost::connect(const TransportAddress& address)
 {
+    assert(NetworkConfig::get()->isClient());
     if (peerExists(address))
         return isConnectedTo(address);
 
@@ -719,6 +720,7 @@ bool STKHost::isAuthorisedToControl() const
 void STKHost::mainLoop()
 {
     VS::setThreadName("STKHost");
+    Log::info("STKHost", "Listening has been started.");
     ENetEvent event;
     ENetHost* host = m_network->getENetHost();
 
@@ -822,7 +824,7 @@ void STKHost::mainLoop()
         }   // while enet_host_service
     }   // while m_exit_flag.test_and_set()
     delete direct_socket;
-    Log::info("STKHost", "Listening has been stopped");
+    Log::info("STKHost", "Listening has been stopped.");
 }   // mainLoop
 
 // ----------------------------------------------------------------------------

@@ -183,7 +183,9 @@ void ConnectToServer::asynchronousUpdate()
             if (StkTime::getRealTime() > m_timer + 5.0)
             {
                 m_timer = StkTime::getRealTime();
+                STKHost::get()->stopListening();
                 STKHost::get()->connect(m_server_address);
+                STKHost::get()->startListening();
                 Log::info("ConnectToServer", "Trying to connect to %s",
                     m_server_address.toString().c_str());
                 if (m_tried_connection++ > 3)
@@ -313,16 +315,14 @@ void ConnectToServer::waitingAloha(bool is_wan)
 {
     // just send a broadcast packet, the client will know our 
     // ip address and will connect
-    STKHost* host = STKHost::get();
-    host->stopListening(); // stop the listening
-
+    STKHost::get()->stopListening(); // stop the listening
     Log::info("ConnectToServer", "Waiting broadcast message.");
 
     TransportAddress sender;
     // get the sender
     const int LEN=256;
     char buffer[LEN];
-    int len = host->receiveRawPacket(buffer, LEN, &sender, 2000);
+    int len = STKHost::get()->receiveRawPacket(buffer, LEN, &sender, 2000);
     if(len<0)
     {
         Log::warn("ConnectToServer",
@@ -333,7 +333,6 @@ void ConnectToServer::waitingAloha(bool is_wan)
     BareNetworkString message(buffer, len);
     std::string received;
     message.decodeString(&received);
-    host->startListening(); // start listening again
     std::string aloha("aloha_stk");
     if (received==aloha)
     {
@@ -360,7 +359,9 @@ bool ConnectToServer::notifyEventAsynchronous(Event* event)
     {
         Log::info("ConnectToServer", "The Connect To Server protocol has "
             "received an event notifying that he's connected to the peer.");
-        m_state = CONNECTED; // we received a message, we are connected
+        // We received a message and connected, no need to check for address
+        // as only 1 peer possible in client
+        m_state = CONNECTED;
     }
     return true;
 }   // notifyEventAsynchronous
