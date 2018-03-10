@@ -31,9 +31,9 @@
 
 #include <vector>
 
-class Network;
 class NetworkPlayerProfile;
 class NetworkString;
+class STKHost;
 class TransportAddress;
 
 enum PeerDisconnectInfo : unsigned int
@@ -67,10 +67,10 @@ protected:
 
     TransportAddress m_peer_address;
 
-    Network* m_network;
+    STKHost* m_host;
 
 public:
-             STKPeer(ENetPeer *enet_peer, Network* network);
+             STKPeer(ENetPeer *enet_peer, STKHost* host);
              ~STKPeer();
     // ------------------------------------------------------------------------
     void sendPacket(NetworkString *data, bool reliable = true);

@@ -62,6 +62,7 @@
 #include <limits>
 #include <random>
 #include <string>
+#include <utility>
 
 STKHost *STKHost::m_stk_host       = NULL;
 bool     STKHost::m_enable_console = false;
@@ -750,7 +751,26 @@ void STKHost::mainLoop()
             handleDirectSocketRequest(direct_socket);
         }   // if discovery host
 
-        while (enet_host_service(host, &event, 20) != 0)
+        std::list<std::tuple<ENetPeer*, ENetPacket*, uint32_t,
+            ENetCommandType> > copied_list;
+        std::unique_lock<std::mutex> lock(m_enet_cmd_mutex);
+        std::swap(copied_list, m_enet_cmd);
+        lock.unlock();
+        for (auto& p : copied_list)
+        {
+            switch (std::get<3>(p))
+            {
+            case ECT_SEND_PACKET:
+                enet_peer_send(std::get<0>(p), (uint8_t)std::get<2>(p),
+                    std::get<1>(p));
+                break;
+            case ECT_DISCONNECT:
+                enet_peer_disconnect(std::get<0>(p), std::get<2>(p));
+                break;
+            }
+        }
+
+        while (enet_host_service(host, &event, 0) != 0)
         {
             if (event.type == ENET_EVENT_TYPE_NONE)
                 continue;
@@ -759,7 +779,7 @@ void STKHost::mainLoop()
             if (event.type == ENET_EVENT_TYPE_CONNECT)
             {
                 auto stk_peer =
-                    std::make_shared<STKPeer>(event.peer, m_network);
+                    std::make_shared<STKPeer>(event.peer, this);
                 std::unique_lock<std::mutex> lock(m_peers_mutex);
                 m_peers[event.peer] = stk_peer;
                 lock.unlock();
@@ -822,7 +842,8 @@ void STKHost::mainLoop()
             else
                 delete stk_event;
         }   // while enet_host_service
-    }   // while m_exit_flag.test_and_set()
+        StkTime::sleep(10);
+    }   // while m_exit_timeout.load() > StkTime::getRealTime()
     delete direct_socket;
     Log::info("STKHost", "Listening has been stopped.");
 }   // mainLoop

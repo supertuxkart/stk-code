@@ -29,8 +29,8 @@
 
 /** Constructor for an empty peer.
  */
-STKPeer::STKPeer(ENetPeer *enet_peer, Network* network)
-       : m_peer_address(enet_peer->address), m_network(network)
+STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host)
+       : m_peer_address(enet_peer->address), m_host(host)
 {
     m_enet_peer           = enet_peer;
     m_is_authorised       = false;
@@ -48,8 +48,7 @@ STKPeer::~STKPeer()
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
         a != m_peer_address)
         return;
-    auto lock = m_network->acquireEnetLock();
-    enet_peer_disconnect(m_enet_peer, PDI_NORMAL);
+    m_host->addEnetCommand(m_enet_peer, NULL, PDI_NORMAL, ECT_DISCONNECT);
 }   // ~STKPeer
 
 //-----------------------------------------------------------------------------
@@ -61,8 +60,7 @@ void STKPeer::kick()
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
         a != m_peer_address)
         return;
-    auto lock = m_network->acquireEnetLock();
-    enet_peer_disconnect(m_enet_peer, PDI_KICK);
+    m_host->addEnetCommand(m_enet_peer, NULL, PDI_KICK, ECT_DISCONNECT);
 }   // kick
 
 //-----------------------------------------------------------------------------
@@ -86,8 +84,7 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable)
                                             data->getTotalSize(),
                                     (reliable ? ENET_PACKET_FLAG_RELIABLE
                                               : ENET_PACKET_FLAG_UNSEQUENCED));
-    auto lock = m_network->acquireEnetLock();
-    enet_peer_send(m_enet_peer, 0, packet);
+    m_host->addEnetCommand(m_enet_peer, packet, 0, ECT_SEND_PACKET);
 }   // sendPacket
 
 //-----------------------------------------------------------------------------
@@ -122,6 +119,6 @@ bool STKPeer::isSamePeer(const ENetPeer* peer) const
  */
 std::vector<NetworkPlayerProfile*> STKPeer::getAllPlayerProfiles()
 {
-    return STKHost::get()->getGameSetup()->getAllPlayersOnHost(getHostId());
+    return m_host->getGameSetup()->getAllPlayersOnHost(getHostId());
 }   // getAllPlayerProfiles
 

@@ -25,7 +25,6 @@
 #include "network/network.hpp"
 #include "network/network_string.hpp"
 #include "network/transport_address.hpp"
-#include "utils/synchronised.hpp"
 
 #include "irrString.h"
 
@@ -36,15 +35,23 @@
 #include <enet/enet.h>
 
 #include <atomic>
+#include <list>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <tuple>
 
 class GameSetup;
 class NetworkPlayerProfile;
 class Server;
 class SeparateProcess;
+
+enum ENetCommandType : unsigned int
+{
+    ECT_SEND_PACKET = 0,
+    ECT_DISCONNECT = 1
+};
 
 class STKHost
 {
@@ -74,6 +81,15 @@ private:
 
     /** Make sure the removing or adding a peer is thread-safe. */
     std::mutex m_peers_mutex;
+
+    /** Let (atm enet_peer_send and enet_peer_disconnect) run in the listening
+     *  thread. */
+    std::list<std::tuple<ENetPeer*/*peer receive*/,
+        ENetPacket*/*packet to send*/, uint32_t/*integer data*/,
+        ENetCommandType> > m_enet_cmd;
+
+    /** Protect \ref m_enet_cmd from multiple threads usage. */
+    std::mutex m_enet_cmd_mutex;
 
     /** The list of peers connected to this instance. */
     std::map<ENetPeer*, std::shared_ptr<STKPeer> > m_peers;
@@ -198,7 +214,13 @@ public:
     std::vector<NetworkPlayerProfile*> getMyPlayerProfiles();
     void        setErrorMessage(const irr::core::stringw &message);
     bool        isAuthorisedToControl() const;
-
+    //-------------------------------------------------------------------------
+    void addEnetCommand(ENetPeer* peer, ENetPacket* packet, uint32_t i,
+                        ENetCommandType ect)
+    {
+        std::lock_guard<std::mutex> lock(m_enet_cmd_mutex);
+        m_enet_cmd.emplace_back(peer, packet, i, ect);
+    }
     // ------------------------------------------------------------------------
     /** Returns the last error (or "" if no error has happened). */
     const irr::core::stringw& getErrorMessage() const
