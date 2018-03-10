@@ -14,10 +14,10 @@ matrix:
 
 env:
   matrix:
-    - BUILD_TYPE="Debug" SERVER_ONLY="OFF"
-    - BUILD_TYPE="Debug" SERVER_ONLY="ON"
-    - BUILD_TYPE="Release" SERVER_ONLY="OFF"
-    - BUILD_TYPE="Release" SERVER_ONLY="ON"
+    - BUILD_TYPE="Debug" SERVER_ONLY="OFF" UNITTEST="./bin/supertuxkart --unit-testing"
+    - BUILD_TYPE="Debug" SERVER_ONLY="ON" UNITTEST="true"
+    - BUILD_TYPE="Release" SERVER_ONLY="OFF" UNITTEST="true"
+    - BUILD_TYPE="Release" SERVER_ONLY="ON" UNITTEST="true"
 
 addons:
   apt:
@@ -40,6 +40,10 @@ addons:
     - zlib1g-dev
 
 before_script:
+  - svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets ../stk-assets
+  - "export DISPLAY=:99.0" # For unit testing
+  - "sh -e /etc/init.d/xvfb start" # For unit testing
+  - sleep 3 # give xvfb some time to start
   # Unfortunately using all threads crashes g++: "g++: internal compiler error: Killed (program cc1plus)"
   # Use half of the available threads, gcc is memory hungry
   - 'if [ ${CC} = "gcc" ]; then
@@ -53,8 +57,9 @@ before_script:
 script:
   - mkdir "build"
   - cd "build"
-  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off
+  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DBUILD_RECORDER=off
   - make VERBOSE=1 -j $THREADS
+  - $UNITTEST
 
 notifications:
   irc:
