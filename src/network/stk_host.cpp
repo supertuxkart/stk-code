@@ -59,6 +59,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <limits>
 #include <random>
 #include <string>
 
@@ -320,9 +321,7 @@ void STKHost::init()
     m_shutdown         = false;
     m_network          = NULL;
     m_game_setup       = NULL;
-
-    m_exit_flag.clear();
-    m_exit_flag.test_and_set();
+    m_exit_timeout.store(std::numeric_limits<double>::max());
 
     // Start with initialising ENet
     // ============================
@@ -358,8 +357,7 @@ STKHost::~STKHost()
         delete m_game_setup;
     m_game_setup = NULL;
 
-    m_peers.clear();
-
+    disconnectAllPeers(true/*timeout_waiting*/);
     Network::closeLog();
     stopListening();
 
@@ -385,7 +383,6 @@ STKHost::~STKHost()
 void STKHost::shutdown()
 {
     ProtocolManager::lock()->abort();
-    deleteAllPeers();
     destroy();
 }   // shutdown
 
@@ -624,14 +621,21 @@ GameSetup* STKHost::setupNewGame()
 }   // setupNewGame
 
 //-----------------------------------------------------------------------------
-/** Called when you leave a server.
+/** Disconnect all connected peers.
 */
-void STKHost::deleteAllPeers()
+void STKHost::disconnectAllPeers(bool timeout_waiting)
 {
-    m_peers.clear();
-}   // deleteAllPeers
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    if (!m_peers.empty())
+    {
+        // Wait for at most 2 seconds for disconnect event to be generated
+        if (timeout_waiting)
+            m_exit_timeout.store(StkTime::getRealTime() + 2.0);
+        m_peers.clear();
+    }
+}   // disconnectAllPeers
 
-// --------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /** Sets an error message for the gui.
  */
 void STKHost::setErrorMessage(const irr::core::stringw &message)
@@ -644,7 +648,7 @@ void STKHost::setErrorMessage(const irr::core::stringw &message)
     m_error_message = message;
 }   // setErrorMessage
 
-// --------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /** \brief Try to establish a connection to a given transport address.
  *  \param peer : The transport address which you want to connect to.
  *  \return True if we're successfully connected. False elseway.
@@ -672,8 +676,7 @@ bool STKHost::connect(const TransportAddress& address)
  */
 void STKHost::startListening()
 {
-    m_exit_flag.clear();
-    m_exit_flag.test_and_set();
+    m_exit_timeout.store(std::numeric_limits<double>::max());
     m_listening_thread = std::thread(std::bind(&STKHost::mainLoop, this));
 }   // startListening
 
@@ -683,7 +686,8 @@ void STKHost::startListening()
  */
 void STKHost::stopListening()
 {
-    m_exit_flag.clear();
+    if (m_exit_timeout.load() == std::numeric_limits<double>::max())
+        m_exit_timeout.store(0.0);
     if (m_listening_thread.joinable())
         m_listening_thread.join();
 }   // stopListening
@@ -736,7 +740,7 @@ void STKHost::mainLoop()
         }
     }
 
-    while (m_exit_flag.test_and_set())
+    while (m_exit_timeout.load() > StkTime::getRealTime())
     {
         auto sl = LobbyProtocol::get<ServerLobby>();
         if (direct_socket && sl && sl->waitingForPlayers())
@@ -749,21 +753,14 @@ void STKHost::mainLoop()
             if (event.type == ENET_EVENT_TYPE_NONE)
                 continue;
 
-            auto pm = ProtocolManager::lock();
-            if (!pm || pm->isExiting())
-            {
-                // Don't create more event if no protocol manager or it will
-                // be exiting
-                enet_packet_destroy(event.packet);
-                continue;
-            }
-
             Event* stk_event = NULL;
             if (event.type == ENET_EVENT_TYPE_CONNECT)
             {
                 auto stk_peer =
                     std::make_shared<STKPeer>(event.peer, m_network);
+                std::unique_lock<std::mutex> lock(m_peers_mutex);
                 m_peers[event.peer] = stk_peer;
+                lock.unlock();
                 stk_event = new Event(&event, stk_peer);
                 TransportAddress addr(event.peer->address);
                 Log::info("STKHost", "%s has just connected. There are "
@@ -772,20 +769,35 @@ void STKHost::mainLoop()
             else if (event.type == ENET_EVENT_TYPE_DISCONNECT)
             {
                 Log::flushBuffers();
+
+                // If used a timeout waiting disconnect, exit now
+                if (m_exit_timeout.load() !=
+                    std::numeric_limits<double>::max())
+                {
+                    m_exit_timeout.store(0.0);
+                    break;
+                }
                 // Use the previous stk peer so protocol can see the network
                 // profile and handle it for disconnection
-                assert(m_peers.find(event.peer) != m_peers.end());
-                stk_event = new Event(&event, m_peers.at(event.peer));
-                m_peers.erase(event.peer);
+                if (m_peers.find(event.peer) != m_peers.end())
+                {
+                    stk_event = new Event(&event, m_peers.at(event.peer));
+                    std::lock_guard<std::mutex> lock(m_peers_mutex);
+                    m_peers.erase(event.peer);
+                }
                 TransportAddress addr(event.peer->address);
                 Log::info("STKHost", "%s has just disconnected. There are "
                     "now %u peers.", addr.toString().c_str(), getPeerCount());
             }   // ENET_EVENT_TYPE_DISCONNECT
 
-            if (!stk_event)
+            if (!stk_event && m_peers.find(event.peer) != m_peers.end())
             {
-                assert(m_peers.find(event.peer) != m_peers.end());
                 stk_event = new Event(&event, m_peers.at(event.peer));
+            }
+            else if (!stk_event)
+            {
+                enet_packet_destroy(event.packet);
+                continue;
             }
             if (stk_event->getType() == EVENT_TYPE_MESSAGE)
             {
@@ -802,8 +814,11 @@ void STKHost::mainLoop()
             }   // if message event
 
             // notify for the event now.
-            pm->propagateEvent(stk_event);
-
+            auto pm = ProtocolManager::lock();
+            if (pm && !pm->isExiting())
+                pm->propagateEvent(stk_event);
+            else
+                delete stk_event;
         }   // while enet_host_service
     }   // while m_exit_flag.test_and_set()
     delete direct_socket;

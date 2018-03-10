@@ -37,7 +37,7 @@ void kickAllPlayers(STKHost* host)
     auto peers = host->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        peers[i]->disconnect();
+        peers[i]->kick();
     }
 }   // kickAllPlayers
 

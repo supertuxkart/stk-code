@@ -97,8 +97,8 @@ private:
      *  triggers a shutdown of the STKHost (and the Protocolmanager). */
     std::atomic_bool m_shutdown;
 
-    /** Atomic flag used to stop this thread. */
-    std::atomic_flag m_exit_flag = ATOMIC_FLAG_INIT;
+    /** Use as a timeout to waiting a disconnect event when exiting. */
+    std::atomic<double> m_exit_timeout;
 
     /** An error message, which is set by a protocol to be displayed
      *  in the GUI. */
@@ -162,10 +162,11 @@ public:
     // ------------------------------------------------------------------------
     void setPublicAddress();
     // ------------------------------------------------------------------------
-    virtual GameSetup* setupNewGame();
-    void deleteAllPeers();
+    GameSetup* setupNewGame();
+    // ------------------------------------------------------------------------
+    void disconnectAllPeers(bool timeout_waiting = false);
+    // ------------------------------------------------------------------------
     bool connect(const TransportAddress& peer);
-
     //-------------------------------------------------------------------------
     /** Requests that the network infrastructure is to be shut down. This
     *   function is called from a thread, but the actual shutdown needs to be

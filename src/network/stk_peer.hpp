@@ -36,6 +36,13 @@ class NetworkPlayerProfile;
 class NetworkString;
 class TransportAddress;
 
+enum PeerDisconnectInfo : unsigned int
+{
+    PDI_TIMEOUT = 0, //!< Timeout disconnected (default in enet).
+    PDI_NORMAL = 1, //!< Normal disconnction with acknowledgement
+    PDI_KICK = 2, //!< Kick disconnection
+};   // PeerDisconnectInfo
+
 /*! \class STKPeer
  *  \brief Represents a peer.
  *  This class is used to interface the ENetPeer structure.
@@ -64,11 +71,12 @@ protected:
 
 public:
              STKPeer(ENetPeer *enet_peer, Network* network);
-    virtual ~STKPeer();
-
-    virtual void sendPacket(NetworkString *data,
-                            bool reliable = true);
-    void disconnect();
+             ~STKPeer();
+    // ------------------------------------------------------------------------
+    void sendPacket(NetworkString *data, bool reliable = true);
+    // ------------------------------------------------------------------------
+    void kick();
+    // ------------------------------------------------------------------------
     bool isConnected() const;
     const TransportAddress& getAddress() const { return m_peer_address; }
     bool isSamePeer(const STKPeer* peer) const;
@@ -79,7 +87,7 @@ public:
     void setClientServerToken(const uint32_t& token)
     {
         m_client_server_token = token; 
-        m_token_set = true; 
+        m_token_set = true;
     }   // setClientServerToken
     // ------------------------------------------------------------------------
     void unsetClientServerToken() { m_token_set = false; }

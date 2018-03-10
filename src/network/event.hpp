@@ -44,6 +44,7 @@ enum EVENT_TYPE
     EVENT_TYPE_DISCONNECTED,//!< A peer is disconnected
     EVENT_TYPE_MESSAGE      //!< A message between server and client protocols
 };
+enum PeerDisconnectInfo : unsigned int;
 
 /*!
  * \class Event
@@ -71,6 +72,9 @@ private:
 
     /** Arrivial time of the event, for timeouts. */
     double m_arrival_time;
+
+    /** For disconnection event, a bit more info is provided. */
+    PeerDisconnectInfo m_pdi;
 
 public:
          Event(ENetEvent* event, std::shared_ptr<STKPeer> peer);
@@ -103,7 +107,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the arrival time of this event. */
     double getArrivalTime() const { return m_arrival_time; }
-
+    // ------------------------------------------------------------------------
+    PeerDisconnectInfo getPeerDisconnectInfo() const { return m_pdi; }
     // ------------------------------------------------------------------------
 
 };   // class Event

@@ -44,17 +44,26 @@ STKPeer::STKPeer(ENetPeer *enet_peer, Network* network)
  */
 STKPeer::~STKPeer()
 {
-    enet_peer_disconnect(m_enet_peer, 0);
-    m_client_server_token = 0;
+    TransportAddress a(m_enet_peer->address);
+    if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
+        a != m_peer_address)
+        return;
+    auto lock = m_network->acquireEnetLock();
+    enet_peer_disconnect(m_enet_peer, PDI_NORMAL);
 }   // ~STKPeer
 
 //-----------------------------------------------------------------------------
-/** Disconnect from the server.
+/** Kick this peer (used by server).
  */
-void STKPeer::disconnect()
+void STKPeer::kick()
 {
-    enet_peer_disconnect(m_enet_peer, 0);
-}   // disconnect
+    TransportAddress a(m_enet_peer->address);
+    if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
+        a != m_peer_address)
+        return;
+    auto lock = m_network->acquireEnetLock();
+    enet_peer_disconnect(m_enet_peer, PDI_KICK);
+}   // kick
 
 //-----------------------------------------------------------------------------
 /** Sends a packet to this host.
@@ -86,7 +95,7 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable)
  */
 bool STKPeer::isConnected() const
 {
-    Log::info("STKPeer", "The peer state is %i", m_enet_peer->state);
+    Log::debug("STKPeer", "The peer state is %i", m_enet_peer->state);
     return (m_enet_peer->state == ENET_PEER_STATE_CONNECTED);
 }   // isConnected
 

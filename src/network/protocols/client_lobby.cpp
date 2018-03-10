@@ -61,7 +61,6 @@ ClientLobby::ClientLobby() : LobbyProtocol(NULL)
 {
 
     m_server_address.clear();
-    m_server = NULL;
     setHandleDisconnections(true);
 }   // ClientLobby
 
@@ -207,8 +206,6 @@ void ClientLobby::voteLaps(uint8_t player_id, uint8_t laps,
  */
 void ClientLobby::leave()
 {
-    m_server->disconnect();
-    m_server_address.clear();
 }   // leave
 
 //-----------------------------------------------------------------------------
@@ -288,6 +285,22 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
         // the ProtocolManager, which might already have been deleted.
         // So only signal that STKHost should exit, which will be tested
         // from the main thread.
+        STKHost::get()->disconnectAllPeers(false/*timeout_waiting*/);
+        switch(event->getPeerDisconnectInfo())
+        {
+            case PDI_TIMEOUT:
+                STKHost::get()->setErrorMessage(
+                    _("Server connection timed out."));
+                break;
+            case PDI_NORMAL:
+                STKHost::get()->setErrorMessage(
+                    _("Server has been shut down."));
+                break;
+            case PDI_KICK:
+                STKHost::get()->setErrorMessage(
+                    _("You were kicked from the server."));
+                break;
+        }   // switch
         STKHost::get()->requestShutdown();
         return true;
     } // disconnection
@@ -507,8 +520,8 @@ void ClientLobby::connectionAccepted(Event* event)
         uint8_t player_id = data.getUInt8();
         uint8_t host_id   = data.getUInt8();
         irr::core::stringw name;
-        int bytes_read = data.decodeStringW(&name);
-        
+        data.decodeStringW(&name);
+
         NetworkPlayerProfile* profile2 =
             new NetworkPlayerProfile(name, player_id, host_id);
         m_game_setup->addPlayer(profile2);
@@ -521,7 +534,6 @@ void ClientLobby::connectionAccepted(Event* event)
     // on server and all clients.
     m_game_setup->addPlayer(profile);
     NetworkingLobby::getInstance()->addPlayer(profile);
-    m_server = event->getPeer();
     m_state = CONNECTED;
     if (NetworkConfig::get()->isAutoConnect())
     {
@@ -841,7 +853,7 @@ void ClientLobby::playerTrackVote(Event* event)
     std::string track_name;
     uint8_t player_id = data.getUInt8();
     uint8_t number    = data.getUInt8();
-    int N = data.decodeString(&track_name);
+    data.decodeString(&track_name);
     m_game_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name,
                                                  number);
 }   // playerTrackVote

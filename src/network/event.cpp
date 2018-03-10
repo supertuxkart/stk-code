@@ -30,6 +30,7 @@
 Event::Event(ENetEvent* event, std::shared_ptr<STKPeer> peer)
 {
     m_arrival_time = (double)StkTime::getTimeSinceEpoch();
+    m_pdi = PDI_TIMEOUT;
 
     switch (event->type)
     {
@@ -38,6 +39,7 @@ Event::Event(ENetEvent* event, std::shared_ptr<STKPeer> peer)
         break;
     case ENET_EVENT_TYPE_DISCONNECT:
         m_type = EVENT_TYPE_DISCONNECTED;
+        m_pdi = (PeerDisconnectInfo)event->data;
         break;
     case ENET_EVENT_TYPE_RECEIVE:
         m_type = EVENT_TYPE_MESSAGE;

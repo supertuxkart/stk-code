@@ -6,8 +6,6 @@
 #include "utils/cpp2011.hpp"
 #include <set>
 
-class STKPeer;
-
 class ClientLobby : public LobbyProtocol
 {
 private:
@@ -30,8 +28,6 @@ private:
     void playerLapsVote(Event* event);
 
     TransportAddress m_server_address;
-
-    STKPeer* m_server;
 
     enum STATE
     {
