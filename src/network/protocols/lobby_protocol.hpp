@@ -42,7 +42,7 @@ public:
         LE_KART_SELECTION_UPDATE,         // inform client about kart selected
         LE_REQUEST_BEGIN,                 // begin of kart selection
         LE_KART_SELECTION_REFUSED,        // Client not auth. to start selection
-        LE_NEW_PLAYER_CONNECTED,          // inform client about new player
+        LE_UPDATE_PLAYER_LIST,            // inform client about player list update
         LE_KART_SELECTION,                // Player selected kart
         LE_PLAYER_DISCONNECTED,           // Client disconnected
         LE_CLIENT_LOADED_WORLD,           // Client finished loading world
@@ -60,6 +60,18 @@ public:
         LE_VOTE_TRACK,                    // vote for a track
         LE_VOTE_REVERSE,                  // vote if race in reverse
         LE_VOTE_LAPS,                     // vote number of laps
+        LE_CHAT,
+        LE_FINAL_PLAYER_LIST,
+        LE_AUTHORISED
+    };
+
+    enum RejectReason : uint8_t
+    {
+        RR_BUSY = 0,
+        RR_BANNED = 1,
+        RR_INCORRECT_PASSWORD = 2,
+        RR_INCOMPATIBLE_DATA = 3,
+        RR_TOO_MANY_PLAYERS = 4
     };
 
 protected:

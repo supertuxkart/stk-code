@@ -25,12 +25,12 @@
 #include "network/race_config.hpp"
 #include "network/remote_kart_info.hpp"
 
-#include <vector>
+#include <memory>
+#include <mutex>
 #include <string>
+#include <vector>
 
-namespace Online { class OnlineProfile; }
 class NetworkPlayerProfile;
-
 
 // ============================================================================
 /*! \class GameSetup

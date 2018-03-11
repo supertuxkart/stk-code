@@ -29,6 +29,7 @@
 
 #include <enet/enet.h>
 
+#include <memory>
 #include <vector>
 
 class NetworkPlayerProfile;
@@ -62,26 +63,38 @@ protected:
     /** Host id of this peer. */
     int m_host_id;
 
-    /** True if this peer is authorised to control a server. */
-    bool m_is_authorised;
-
     TransportAddress m_peer_address;
 
     STKHost* m_host;
 
+    std::vector<std::shared_ptr<NetworkPlayerProfile> > m_players;
+
 public:
-             STKPeer(ENetPeer *enet_peer, STKHost* host);
-             ~STKPeer();
+             STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id);
+             ~STKPeer() {}
     // ------------------------------------------------------------------------
     void sendPacket(NetworkString *data, bool reliable = true);
     // ------------------------------------------------------------------------
+    void disconnect();
+    // ------------------------------------------------------------------------
     void kick();
+    // ------------------------------------------------------------------------
+    void reset();
     // ------------------------------------------------------------------------
     bool isConnected() const;
     const TransportAddress& getAddress() const { return m_peer_address; }
     bool isSamePeer(const STKPeer* peer) const;
     bool isSamePeer(const ENetPeer* peer) const;
-    std::vector<NetworkPlayerProfile*> getAllPlayerProfiles();
+    // ------------------------------------------------------------------------
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >
+                                getPlayerProfiles() const { return m_players; }
+    // ------------------------------------------------------------------------
+    bool hasPlayerProfiles() const               { return !m_players.empty(); }
+    // ------------------------------------------------------------------------
+    void cleanPlayerProfiles()                           { m_players.clear(); }
+    // ------------------------------------------------------------------------
+    void addPlayer(std::shared_ptr<NetworkPlayerProfile> p)
+                                                    { m_players.push_back(p); }
     // ------------------------------------------------------------------------
     /** Sets the token for this client. */
     void setClientServerToken(const uint32_t& token)
@@ -90,7 +103,11 @@ public:
         m_token_set = true;
     }   // setClientServerToken
     // ------------------------------------------------------------------------
-    void unsetClientServerToken() { m_token_set = false; }
+    void unsetClientServerToken()
+    {
+        m_token_set = false;
+        m_client_server_token = 0;
+    }
     // ------------------------------------------------------------------------
     /** Returns the token of this client. */
     uint32_t getClientServerToken() const { return m_client_server_token; }
@@ -98,21 +115,9 @@ public:
     /** Returns if the token for this client is known. */
     bool isClientServerTokenSet() const { return m_token_set; }
     // ------------------------------------------------------------------------
-    /** Sets the host if of this peer. */
-    void setHostId(int host_id) { m_host_id = host_id; }
-    // ------------------------------------------------------------------------
     /** Returns the host id of this peer. */
-    int getHostId() const { return m_host_id; }
-    // ------------------------------------------------------------------------
-    /** Sets if this peer is authorised to control the server. */
-    void setAuthorised(bool authorised) { m_is_authorised = authorised; }
-    // ------------------------------------------------------------------------
-    /** Returns if this peer is authorised to control the server. The server
-     *  uses this to check if a peer is allowed certain commands; and a client
-     *  uses this function (in which case this peer is actually the server
-     *  peer) to see if this client is allowed certain command (i.e. to
-     *  display additional GUI elements). */
-    bool isAuthorised() const { return m_is_authorised; }
+    uint32_t getHostId() const { return m_host_id; }
+
 };   // STKPeer
 
 #endif // STK_PEER_HPP

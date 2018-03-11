@@ -34,7 +34,6 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "network/network_config.hpp"
-#include "network/network_player_profile.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/protocols/server_lobby.hpp"
 #include "network/server.hpp"
@@ -262,16 +261,25 @@ void NetworkingLobby::onDialogClose()
 }   // onDialogClose()
 
 // ----------------------------------------------------------------------------
-void NetworkingLobby::addPlayer(NetworkPlayerProfile *profile)
+void NetworkingLobby::addPlayer(const std::tuple<uint32_t, uint32_t,
+                                core::stringw, bool>& p)
 {
     // In GUI-less server this function will be called without proper
     // initialisation
-    if(m_player_list)
-        m_player_list->addItem(StringUtils::toString(profile->getGlobalPlayerId()),
-                               profile->getName());
+    if (m_player_list)
+    {
+        const std::string internal_name =
+            StringUtils::toString(std::get<0>(p)) + "_" +
+            StringUtils::toString(std::get<1>(p));
+        m_player_list->addItem(internal_name, std::get<2>(p));
+        if (std::get<3>(p))
+            m_player_list->markItemRed(internal_name, true);
+    }
 }  // addPlayer
 
 // ----------------------------------------------------------------------------
-void NetworkingLobby::removePlayer(NetworkPlayerProfile *profile)
+void NetworkingLobby::cleanPlayers()
 {
-}   // removePlayer
+    if (m_player_list)
+        m_player_list->clear();
+}   // cleanPlayers

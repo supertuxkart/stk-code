@@ -34,9 +34,9 @@ enum SoccerTeam
 };
 
 /** Game difficulty per player. */
-enum PerPlayerDifficulty
+enum PerPlayerDifficulty : uint8_t
 {
-    PLAYER_DIFFICULTY_NORMAL,
+    PLAYER_DIFFICULTY_NORMAL = 0,
     PLAYER_DIFFICULTY_HANDICAP,
     PLAYER_DIFFICULTY_COUNT
 };
@@ -51,7 +51,7 @@ class RemoteKartInfo
         SoccerTeam          m_soccer_team;
         bool                m_network_player;
         PerPlayerDifficulty m_difficulty;
-
+        float               m_default_kart_color;
 public:
      RemoteKartInfo(int player_id, const std::string& kart_name,
                     const irr::core::stringw& user_name, int host_id,
@@ -75,6 +75,7 @@ public:
     void setGlobalPlayerId(int id)           { m_global_player_id = id;   }
     void setSoccerTeam(SoccerTeam team)      { m_soccer_team = team;      }
     void setNetworkPlayer(bool value)        { m_network_player = value;  }
+    void setDefaultKartColor(float value) { m_default_kart_color = value; }
     void setPerPlayerDifficulty(PerPlayerDifficulty value) 
                                              { m_difficulty = value;      }
     int  getHostId() const                   { return m_host_id;          }
@@ -85,6 +86,7 @@ public:
     const irr::core::stringw& getPlayerName() const { return m_user_name; }
     SoccerTeam getSoccerTeam() const         { return m_soccer_team;      }
     PerPlayerDifficulty getDifficulty() const { return m_difficulty;      }
+    float getDefaultKartColor() const      { return m_default_kart_color; }
 
     bool operator<(const RemoteKartInfo& other) const
     {

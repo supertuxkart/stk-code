@@ -9,7 +9,6 @@
 class ClientLobby : public LobbyProtocol
 {
 private:
-    void newPlayer(Event* event);
     void disconnectedPlayer(Event* event);
     void connectionAccepted(Event* event); //!< Callback function on connection acceptation
     void connectionRefused(Event* event); //!< Callback function on connection refusal
@@ -26,6 +25,8 @@ private:
     void playerTrackVote(Event* event);
     void playerReversedVote(Event* event);
     void playerLapsVote(Event* event);
+    void updatePlayerList(Event* event);
+    void becomingServerOwner();
 
     TransportAddress m_server_address;
 
@@ -65,7 +66,6 @@ public:
     void voteLaps(uint8_t player_id, uint8_t laps, uint8_t track_nb = 0);
     void doneWithResults();
     void startingRaceNow();
-    void leave();
 
     const std::set<std::string>& getAvailableKarts() const
                                                   { return m_available_karts; }

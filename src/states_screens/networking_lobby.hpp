@@ -20,6 +20,7 @@
 
 #include "guiengine/screen.hpp"
 #include <memory>
+#include <tuple>
 
 class Server;
 
@@ -31,8 +32,6 @@ namespace GUIEngine
     class IconButtonWidget;
     class TextBoxWidget;
 }
-
-class NetworkPlayerProfile;
 
 /**
   * \brief Handles the main menu
@@ -91,8 +90,9 @@ public:
     /** Used to insert each client chat message (reserved). */
     void addMoreServerInfo(const core::stringw& info);
     void setJoinedServer(std::shared_ptr<Server> server);
-    void addPlayer(NetworkPlayerProfile *profile);
-    void removePlayer(NetworkPlayerProfile *profile);
+    void addPlayer(const std::tuple<uint32_t/*host id*/, uint32_t/*online id*/,
+                   core::stringw/*player name*/, bool/*is server owner*/>& p);
+    void cleanPlayers();
 };   // class NetworkingLobby
 
 #endif

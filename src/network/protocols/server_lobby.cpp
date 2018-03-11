@@ -41,6 +41,7 @@
 #include "utils/random_generator.hpp"
 #include "utils/time.hpp"
 
+#include <algorithm>
 #include <fstream>
 
 /** This is the central game setup protocol running in the server. It is
@@ -84,18 +85,9 @@
  */
 ServerLobby::ServerLobby() : LobbyProtocol(NULL)
 {
+    m_has_created_server_id_file = false;
     setHandleDisconnections(true);
     m_state = SET_PUBLIC_ADDRESS;
-
-    // We use maximum 16bit unsigned limit
-    auto all_k = kart_properties_manager->getAllAvailableKarts();
-    auto all_t = track_manager->getAllTrackIdentifiers();
-    if (all_k.size() >= 65536)
-        all_k.resize(65535);
-    if (all_t.size() >= 65536)
-        all_t.resize(65535);
-    m_available_kts.getData().first = { all_k.begin(), all_k.end() };
-    m_available_kts.getData().second = { all_t.begin(), all_t.end() };
 }   // ServerLobby
 
 //-----------------------------------------------------------------------------
@@ -113,6 +105,16 @@ ServerLobby::~ServerLobby()
 
 void ServerLobby::setup()
 {
+    // We use maximum 16bit unsigned limit
+    auto all_k = kart_properties_manager->getAllAvailableKarts();
+    auto all_t = track_manager->getAllTrackIdentifiers();
+    if (all_k.size() >= 65536)
+        all_k.resize(65535);
+    if (all_t.size() >= 65536)
+        all_t.resize(65535);
+    m_available_kts.first = { all_k.begin(), all_k.end() };
+    m_available_kts.second = { all_t.begin(), all_t.end() };
+
     m_server_registered = false;
     m_game_setup = STKHost::get()->setupNewGame();
     m_game_setup->setNumLocalPlayers(0);    // no local players on a server
@@ -197,11 +199,12 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
 void ServerLobby::createServerIdFile()
 {
     const std::string& sid = NetworkConfig::get()->getServerIdFile();
-    if (!sid.empty())
+    if (!sid.empty() && !m_has_created_server_id_file)
     {
         std::fstream fs;
         fs.open(sid, std::ios::out);
         fs.close();
+        m_has_created_server_id_file = true;
     }
 }   // createServerIdFile
 
@@ -265,6 +268,7 @@ void ServerLobby::asynchronousUpdate()
     default:
         break;
     }
+
 }   // asynchronousUpdate
 
 //-----------------------------------------------------------------------------
@@ -274,6 +278,9 @@ void ServerLobby::asynchronousUpdate()
  */
 void ServerLobby::update(float dt)
 {
+    // Check if server owner has left
+    updateServerOwner();
+
     switch (m_state.load())
     {
     case SET_PUBLIC_ADDRESS:
@@ -463,12 +470,6 @@ void ServerLobby::signalRaceStartToClients()
 void ServerLobby::startSelection(const Event *event)
 {
     std::lock_guard<std::mutex> lock(m_connection_mutex);
-    if (NetworkConfig::get()->isWAN())
-    {
-        assert(m_server_registered);
-        unregisterServer();
-        m_server_registered = false;
-    }
 
     if (m_state != ACCEPTING_CLIENTS)
     {
@@ -477,21 +478,28 @@ void ServerLobby::startSelection(const Event *event)
                   m_state.load());
         return;
     }
-    if(event && !event->getPeer()->isAuthorised())
+    if (event->getPeerSP() != m_server_owner.lock())
     {
         Log::warn("ServerLobby", 
                   "Client %lx is not authorised to start selection.",
                   event->getPeer());
         return;
     }
+
+    if (NetworkConfig::get()->isWAN())
+    {
+        assert(m_server_registered);
+        unregisterServer();
+        m_server_registered = false;
+    }
+
     NetworkString *ns = getNetworkString(1);
     // Start selection - must be synchronous since the receiver pushes
     // a new screen, which must be donefrom the main thread.
     ns->setSynchronous(true);
     ns->addUInt8(LE_START_SELECTION);
-    m_available_kts.lock();
-    const auto& all_k = m_available_kts.getData().first;
-    const auto& all_t = m_available_kts.getData().second;
+    const auto& all_k = m_available_kts.first;
+    const auto& all_t = m_available_kts.second;
     ns->addUInt16((uint16_t)all_k.size()).addUInt16((uint16_t)all_t.size());
     for (const std::string& kart : all_k)
     {
@@ -501,7 +509,6 @@ void ServerLobby::startSelection(const Event *event)
     {
         ns->encodeString(track);
     }
-    m_available_kts.unlock();
 
     sendMessageToPeersChangingToken(ns, /*reliable*/true);
     delete ns;
@@ -625,23 +632,21 @@ void ServerLobby::checkIncomingConnectionRequests()
  */
 void ServerLobby::clientDisconnected(Event* event)
 {
-    std::vector<NetworkPlayerProfile*> players_on_host = 
-                                      event->getPeer()->getAllPlayerProfiles();
+    std::lock_guard<std::mutex> lock(m_connection_mutex);
+    auto players_on_peer = event->getPeer()->getPlayerProfiles();
+    if (players_on_peer.empty())
+        return;
 
-    NetworkString *msg = getNetworkString(2);
+    NetworkString* msg = getNetworkString(2);
     msg->addUInt8(LE_PLAYER_DISCONNECTED);
-
-    for(unsigned int i=0; i<players_on_host.size(); i++)
+    msg->addUInt8((uint8_t)players_on_peer.size());
+    for (auto p : players_on_peer)
     {
-        msg->addUInt8(players_on_host[i]->getGlobalPlayerId());
-        Log::info("ServerLobby", "Player disconnected : id %d",
-                  players_on_host[i]->getGlobalPlayerId());
-        m_game_setup->removePlayer(players_on_host[i]);
+        msg->encodeString(p->getName());
     }
-
     sendMessageToPeersChangingToken(msg, /*reliable*/true);
+    updatePlayerList();
     delete msg;
-    
 }   // clientDisconnected
 
 //-----------------------------------------------------------------------------
@@ -659,34 +664,62 @@ void ServerLobby::clientDisconnected(Event* event)
 void ServerLobby::connectionRequested(Event* event)
 {
     std::lock_guard<std::mutex> lock(m_connection_mutex);
-    STKPeer* peer = event->getPeer();
+    std::shared_ptr<STKPeer> peer = event->getPeerSP();
+    peer->cleanPlayerProfiles();
+
     const NetworkString &data = event->data();
 
     // can we add the player ?
-    if (m_game_setup->getPlayerCount() >= NetworkConfig::get()->getMaxPlayers() ||
-        m_state!=ACCEPTING_CLIENTS                                           )
+    if (m_game_setup->getPlayerCount() >=
+        NetworkConfig::get()->getMaxPlayers() ||
+        m_state != ACCEPTING_CLIENTS)
     {
         NetworkString *message = getNetworkString(2);
-        // Len, error code: 2 = busy, 0 = too many players
         message->addUInt8(LE_CONNECTION_REFUSED)
-                .addUInt8(m_state!=ACCEPTING_CLIENTS ? 2 : 0);
+            .addUInt8(m_state != ACCEPTING_CLIENTS ?
+            RR_BUSY : RR_TOO_MANY_PLAYERS);
 
-        // send only to the peer that made the request
+        // send only to the peer that made the request and disconect it now
         peer->sendPacket(message);
+        peer->reset();
         delete message;
         Log::verbose("ServerLobby", "Player refused");
         return;
     }
 
-    // Connection accepted.
-    // ====================
-    std::string name_u8;
-    data.decodeString(&name_u8);
-    core::stringw name = StringUtils::utf8ToWide(name_u8);
+    // Check for password
     std::string password;
     data.decodeString(&password);
-    bool is_authorised = (password==NetworkConfig::get()->getPassword());
+    if (password != NetworkConfig::get()->getPassword())
+    {
+        NetworkString *message = getNetworkString(2);
+        message->addUInt8(LE_CONNECTION_REFUSED)
+                .addUInt8(RR_INCORRECT_PASSWORD);
 
+        // send only to the peer that made the request and disconect it now
+        peer->sendPacket(message);
+        peer->reset();
+        delete message;
+        Log::verbose("ServerLobby", "Player refused: incorrect password");
+        return;
+    }
+
+    // Connection accepted.
+    // ====================
+    uint8_t player_count = data.getUInt8();
+    for (unsigned i = 0; i < player_count; i++)
+    {
+        std::string name_u8;
+        data.decodeString(&name_u8);
+        core::stringw name = StringUtils::utf8ToWide(name_u8);
+        float default_kart_color = data.getFloat();
+        uint32_t online_id = data.getUInt32();
+        PerPlayerDifficulty per_player_difficulty =
+            (PerPlayerDifficulty)data.getUInt8();
+        peer->addPlayer(std::make_shared<NetworkPlayerProfile>
+            (peer, name, peer->getHostId(), default_kart_color, online_id,
+            per_player_difficulty));
+    }
     std::set<std::string> client_karts, client_tracks;
     const unsigned kart_num = data.getUInt16();
     const unsigned track_num = data.getUInt16();
@@ -707,14 +740,14 @@ void ServerLobby::connectionRequested(Event* event)
     // so that in the end the server has a list of all karts/tracks available
     // on all clients
     std::set<std::string> karts_erase, tracks_erase;
-    for (const std::string& server_kart : m_available_kts.getData().first)
+    for (const std::string& server_kart : m_available_kts.first)
     {
         if (client_karts.find(server_kart) == client_karts.end())
         {
             karts_erase.insert(server_kart);
         }
     }
-    for (const std::string& server_track : m_available_kts.getData().second)
+    for (const std::string& server_track : m_available_kts.second)
     {
         if (client_tracks.find(server_track) == client_tracks.end())
         {
@@ -724,48 +757,27 @@ void ServerLobby::connectionRequested(Event* event)
 
     // Drop this player if he doesn't have at least 1 kart / track the same
     // from server
-    if (karts_erase.size() == m_available_kts.getData().first.size() ||
-        tracks_erase.size() == m_available_kts.getData().second.size())
+    if (karts_erase.size() == m_available_kts.first.size() ||
+        tracks_erase.size() == m_available_kts.second.size())
     {
         NetworkString *message = getNetworkString(2);
-        message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(3);
+        message->addUInt8(LE_CONNECTION_REFUSED)
+            .addUInt8(RR_INCOMPATIBLE_DATA);
         peer->sendPacket(message);
+        peer->reset();
         delete message;
         Log::verbose("ServerLobby", "Player has incompatible karts / tracks");
-        m_available_kts.unlock();
         return;
     }
 
     for (const std::string& kart_erase : karts_erase)
     {
-        m_available_kts.getData().first.erase(kart_erase);
+        m_available_kts.first.erase(kart_erase);
     }
     for (const std::string& track_erase : tracks_erase)
     {
-        m_available_kts.getData().second.erase(track_erase);
+        m_available_kts.second.erase(track_erase);
     }
-    m_available_kts.unlock();
-
-    // Get the unique global ID for this player.
-    m_next_player_id.lock();
-    m_next_player_id.getData()++;
-    int new_player_id = m_next_player_id.getData();
-    m_next_player_id.unlock();
-    if(m_game_setup->getLocalMasterID()==0)
-        m_game_setup->setLocalMaster(new_player_id);
-
-    // The host id has already been incremented when the peer
-    // was added, so it is the right id now.
-    int new_host_id = STKHost::get()->getNextHostId();
-
-    // Notify everybody that there is a new player
-    // -------------------------------------------
-    NetworkString *message = getNetworkString(3+1+name_u8.size());
-    // size of id -- id -- size of local id -- local id;
-    message->addUInt8(LE_NEW_PLAYER_CONNECTED).addUInt8(new_player_id)
-            .addUInt8(new_host_id).encodeString(name_u8);
-    STKHost::get()->sendPacketExcept(peer, message);
-    delete message;
 
     // Now answer to the peer that just connected
     // ------------------------------------------
@@ -777,38 +789,83 @@ void ServerLobby::connectionRequested(Event* event)
                                 (token_generator.get(RAND_MAX) & 0xff));
 
     peer->setClientServerToken(token);
-    peer->setAuthorised(is_authorised);
-    peer->setHostId(new_host_id);
-
-    const std::vector<NetworkPlayerProfile*> &players = m_game_setup->getPlayers();
     // send a message to the one that asked to connect
-    // Estimate 10 as average name length
-    NetworkString *message_ack = getNetworkString(4 + players.size() * (2+10));
-    // connection success -- size of token -- token
-    message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt8(new_player_id)
-                .addUInt8(new_host_id).addUInt8(is_authorised);
-    // Add all players so that this user knows (this new player is only added
-    // to the list of players later, so the new player's info is not included)
-    for (unsigned int i = 0; i < players.size(); i++)
-    {
-        message_ack->addUInt8(players[i]->getGlobalPlayerId())
-                    .addUInt8(players[i]->getHostId())
-                    .encodeString(players[i]->getName());
-    }
+    NetworkString *message_ack = getNetworkString(4);
+    // connection success -- return the host id of peer
+    message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt32(peer->getHostId());
     peer->sendPacket(message_ack);
     delete message_ack;
 
-    NetworkPlayerProfile* profile = 
-        new NetworkPlayerProfile(name, new_player_id, new_host_id);
-    m_game_setup->addPlayer(profile);
-    NetworkingLobby::getInstance()->addPlayer(profile);
-
+    updatePlayerList();
     Log::verbose("ServerLobby", "New player.");
 
 }   // connectionRequested
 
 //-----------------------------------------------------------------------------
+void ServerLobby::updatePlayerList()
+{
+    if (m_state.load() != ACCEPTING_CLIENTS)
+        return;
+    auto all_profiles = STKHost::get()->getAllPlayerProfiles();
+    NetworkString* pl = getNetworkString();
+    pl->setSynchronous(true);
+    pl->addUInt8(LE_UPDATE_PLAYER_LIST).addUInt8((uint8_t)all_profiles.size());
+    for (auto profile : all_profiles)
+    {
+        pl->addUInt32(profile->getHostId()).addUInt32(profile->getOnlineID())
+            .encodeString(profile->getName());
+        uint8_t server_owner = 0;
+        if (m_server_owner.lock() == profile->getPeer())
+            server_owner = 1;
+        pl->addUInt8(server_owner);
+    }
+    sendMessageToPeersChangingToken(pl);
+    delete pl;
+}   // updatePlayerList
 
+//-----------------------------------------------------------------------------
+void ServerLobby::updateServerOwner()
+{
+    if (m_state.load() < ACCEPTING_CLIENTS ||
+        m_state.load() > RESULT_DISPLAY)
+        return;
+    if (!m_server_owner.expired())
+        return;
+    auto peers = STKHost::get()->getPeers();
+    if (peers.empty())
+        return;
+    std::sort(peers.begin(), peers.end(), [](const std::shared_ptr<STKPeer> a,
+        const std::shared_ptr<STKPeer> b)->bool
+        {
+            return a->getHostId() < b->getHostId();
+        });
+
+    std::shared_ptr<STKPeer> owner;
+    std::lock_guard<std::mutex> lock(m_connection_mutex);
+    // Make sure no one access the weak pointer or adding player to peers
+    for (auto peer: peers)
+    {
+        // Only 127.0.0.1 can be server owner in case of graphics-client-server
+        if (peer->hasPlayerProfiles() &&
+            (NetworkConfig::get()->getServerIdFile().empty() ||
+            peer->getAddress().getIP() == 0x7f000001))
+        {
+            owner = peer;
+            break;
+        }
+    }
+    if (owner)
+    {
+        NetworkString* ns = getNetworkString();
+        ns->addUInt8(LE_AUTHORISED);
+        owner->sendPacket(ns);
+        delete ns;
+        m_server_owner = owner;
+        updatePlayerList();
+    }
+}   // updateServerOwner
+
+//-----------------------------------------------------------------------------
 /*! \brief Called when a player asks to select a kart.
  *  \param event : Event providing the information.
  *

@@ -29,27 +29,24 @@
 
 /** Constructor for an empty peer.
  */
-STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host)
+STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
        : m_peer_address(enet_peer->address), m_host(host)
 {
     m_enet_peer           = enet_peer;
-    m_is_authorised       = false;
     m_client_server_token = 0;
-    m_host_id             = 0;
+    m_host_id             = host_id;
     m_token_set           = false;
 }   // STKPeer
 
 //-----------------------------------------------------------------------------
-/** Destructor.
- */
-STKPeer::~STKPeer()
+void STKPeer::disconnect()
 {
     TransportAddress a(m_enet_peer->address);
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
         a != m_peer_address)
         return;
     m_host->addEnetCommand(m_enet_peer, NULL, PDI_NORMAL, ECT_DISCONNECT);
-}   // ~STKPeer
+}   // disconnect
 
 //-----------------------------------------------------------------------------
 /** Kick this peer (used by server).
@@ -62,6 +59,18 @@ void STKPeer::kick()
         return;
     m_host->addEnetCommand(m_enet_peer, NULL, PDI_KICK, ECT_DISCONNECT);
 }   // kick
+
+//-----------------------------------------------------------------------------
+/** Forcefully disconnects a peer (used by server).
+ */
+void STKPeer::reset()
+{
+    TransportAddress a(m_enet_peer->address);
+    if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
+        a != m_peer_address)
+        return;
+    m_host->addEnetCommand(m_enet_peer, NULL, 0, ECT_RESET);
+}   // reset
 
 //-----------------------------------------------------------------------------
 /** Sends a packet to this host.
@@ -111,14 +120,3 @@ bool STKPeer::isSamePeer(const ENetPeer* peer) const
 {
     return peer==m_enet_peer;
 }   // isSamePeer
-
-//-----------------------------------------------------------------------------
-/** Returns the list of all player profiles connected to this peer. Note that
- *  this function is somewhat expensive (it loops over all network profiles
- *  to find the ones with the same host id as this peer.
- */
-std::vector<NetworkPlayerProfile*> STKPeer::getAllPlayerProfiles()
-{
-    return m_host->getGameSetup()->getAllPlayersOnHost(getHostId());
-}   // getAllPlayerProfiles
-

@@ -262,7 +262,6 @@ void STKHost::create(std::shared_ptr<Server> server, SeparateProcess* p)
  */
 STKHost::STKHost(std::shared_ptr<Server> server)
 {
-    m_next_unique_host_id = -1;
     // Will be overwritten with the correct value once a connection with the
     // server is made.
     m_host_id = 0;
@@ -291,16 +290,14 @@ STKHost::STKHost(std::shared_ptr<Server> server)
 STKHost::STKHost(const irr::core::stringw &server_name)
 {
     init();
-    // The host id will be increased whenever a new peer is added, so the
-    // first client will have host id 1 (host id 0 is the server).
-    m_next_unique_host_id = 0;
     m_host_id = 0;   // indicates a server host.
 
     ENetAddress addr;
     addr.host = STKHost::HOST_ANY;
     addr.port = NetworkConfig::get()->getServerPort();
 
-    m_network = new Network(NetworkConfig::get()->getMaxPlayers(),
+    // Reserver 1 peer to handle full server message
+    m_network = new Network(NetworkConfig::get()->getMaxPlayers() + 1,
                            /*channel_limit*/2,
                            /*max_in_bandwidth*/0,
                            /*max_out_bandwidth*/ 0, &addr,
@@ -320,6 +317,7 @@ STKHost::STKHost(const irr::core::stringw &server_name)
 void STKHost::init()
 {
     m_shutdown         = false;
+    m_authorised       = false;
     m_network          = NULL;
     m_game_setup       = NULL;
     m_exit_timeout.store(std::numeric_limits<double>::max());
@@ -627,13 +625,14 @@ GameSetup* STKHost::setupNewGame()
 void STKHost::disconnectAllPeers(bool timeout_waiting)
 {
     std::lock_guard<std::mutex> lock(m_peers_mutex);
-    if (!m_peers.empty())
+    if (!m_peers.empty() && timeout_waiting)
     {
+        for (auto peer : m_peers)
+            peer.second->disconnect();
         // Wait for at most 2 seconds for disconnect event to be generated
-        if (timeout_waiting)
-            m_exit_timeout.store(StkTime::getRealTime() + 2.0);
-        m_peers.clear();
+        m_exit_timeout.store(StkTime::getRealTime() + 2.0);
     }
+    m_peers.clear();
 }   // disconnectAllPeers
 
 //-----------------------------------------------------------------------------
@@ -695,23 +694,6 @@ void STKHost::stopListening()
 }   // stopListening
 
 // ----------------------------------------------------------------------------
-/** Returns true if this client instance is allowed to control the server.
- *  A client can authorise itself by providing the server's password. It is
- *  then allowed to control the server (e.g. start kart selection).
- *  The information if this client was authorised by the server is actually
- *  stored in the peer (which is the server peer on a client).
- */
-bool STKHost::isAuthorisedToControl() const 
-{
-    assert(NetworkConfig::get()->isClient());
-    // If we are not properly connected (i.e. only enet connection, but not
-    // stk logic), no peer is authorised.
-    if(m_peers.size()==0)
-        return false;
-    return m_peers.begin()->second->isAuthorised();
-}   // isAuthorisedToControl
-
-// ----------------------------------------------------------------------------
 /** \brief Thread function checking if data is received.
  *  This function tries to get data from network low-level functions as
  *  often as possible. When something is received, it generates an
@@ -767,6 +749,14 @@ void STKHost::mainLoop()
             case ECT_DISCONNECT:
                 enet_peer_disconnect(std::get<0>(p), std::get<2>(p));
                 break;
+            case ECT_RESET:
+                // Flush enet before reset (so previous command is send)
+                enet_host_flush(host);
+                enet_peer_reset(std::get<0>(p));
+                // Remove the stk peer of it
+                std::lock_guard<std::mutex> lock(m_peers_mutex);
+                m_peers.erase(std::get<0>(p));
+                break;
             }
         }
 
@@ -778,8 +768,8 @@ void STKHost::mainLoop()
             Event* stk_event = NULL;
             if (event.type == ENET_EVENT_TYPE_CONNECT)
             {
-                auto stk_peer =
-                    std::make_shared<STKPeer>(event.peer, this);
+                auto stk_peer = std::make_shared<STKPeer>
+                    (event.peer, this, m_next_unique_host_id++);
                 std::unique_lock<std::mutex> lock(m_peers_mutex);
                 m_peers[event.peer] = stk_peer;
                 lock.unlock();
@@ -1026,3 +1016,30 @@ void STKHost::sendToServer(NetworkString *data, bool reliable)
     assert(NetworkConfig::get()->isClient());
     m_peers.begin()->second->sendPacket(data, reliable);
 }   // sendToServer
+
+//-----------------------------------------------------------------------------
+std::vector<std::shared_ptr<NetworkPlayerProfile> >
+    STKHost::getAllPlayerProfiles() const
+{
+    std::vector<std::shared_ptr<NetworkPlayerProfile> > p;
+    std::unique_lock<std::mutex> lock(m_peers_mutex);
+    for (auto peer : m_peers)
+    {
+        auto peer_profile = peer.second->getPlayerProfiles();
+        p.insert(p.end(), peer_profile.begin(), peer_profile.end());
+    }
+    lock.unlock();
+    return p;
+}   // getAllPlayerProfiles
+
+//-----------------------------------------------------------------------------
+std::shared_ptr<STKPeer> STKHost::findPeerByHostId(uint32_t id) const
+{
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    auto ret = std::find_if(m_peers.begin(), m_peers.end(),
+        [id](const std::pair<ENetPeer*, std::shared_ptr<STKPeer> >& p)
+        {
+            return p.second->getHostId() == id;
+        });
+    return ret != m_peers.end() ? ret->second : nullptr;
+}   // findPeerByHostId

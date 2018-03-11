@@ -50,7 +50,8 @@ class SeparateProcess;
 enum ENetCommandType : unsigned int
 {
     ECT_SEND_PACKET = 0,
-    ECT_DISCONNECT = 1
+    ECT_DISCONNECT = 1,
+    ECT_RESET = 2
 };
 
 class STKHost
@@ -80,7 +81,7 @@ private:
     std::thread m_network_console;
 
     /** Make sure the removing or adding a peer is thread-safe. */
-    std::mutex m_peers_mutex;
+    mutable std::mutex m_peers_mutex;
 
     /** Let (atm enet_peer_send and enet_peer_disconnect) run in the listening
      *  thread. */
@@ -98,10 +99,10 @@ private:
      *  getPeer()), but not decreased whena host (=peer) disconnects. This
      *  results in a unique host id for each host, even when a host should
      *  disconnect and then reconnect. */
-    int m_next_unique_host_id;
+    uint32_t m_next_unique_host_id = 0;
 
     /** Host id of this host. */
-    uint8_t m_host_id;
+    uint32_t m_host_id = 0;
 
     /** Stores data about the online game to play. */
     GameSetup* m_game_setup;
@@ -112,6 +113,9 @@ private:
     /** Flag which is set from the protocol manager thread which
      *  triggers a shutdown of the STKHost (and the Protocolmanager). */
     std::atomic_bool m_shutdown;
+
+    /** True if this local host is authorised to control a server. */
+    std::atomic_bool m_authorised;
 
     /** Use as a timeout to waiting a disconnect event when exiting. */
     std::atomic<double> m_exit_timeout;
@@ -141,7 +145,6 @@ public:
     /** If a network console should be started. Note that the console can cause
     *  a crash in release mode on windows (see #1529). */
     static bool m_enable_console;
-
 
     /** Creates the STKHost. It takes all confifguration parameters from
      *  NetworkConfig. This STKHost can either be a client or a server.
@@ -199,7 +202,21 @@ public:
     void shutdown();
     //-------------------------------------------------------------------------
     void sendPacketToAllPeers(NetworkString *data, bool reliable = true);
-    //-------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    /** Returns true if this client instance is allowed to control the server.
+     *  It will auto transfer ownership if previous server owner disconnected.
+     */
+    bool isAuthorisedToControl() const          { return m_authorised.load(); }
+    // ------------------------------------------------------------------------
+    /** Sets if this local host is authorised to control the server. */
+    void setAuthorisedToControl(bool authorised)
+                                            { m_authorised.store(authorised); }
+    // ------------------------------------------------------------------------
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >
+                                                  getAllPlayerProfiles() const;
+    // ------------------------------------------------------------------------
+    std::shared_ptr<STKPeer> findPeerByHostId(uint32_t id) const;
+    // ------------------------------------------------------------------------
     void sendPacketExcept(STKPeer* peer,
                           NetworkString *data,
                           bool reliable = true);
@@ -213,8 +230,6 @@ public:
     std::shared_ptr<STKPeer> getServerPeerForClient() const;
     std::vector<NetworkPlayerProfile*> getMyPlayerProfiles();
     void        setErrorMessage(const irr::core::stringw &message);
-    bool        isAuthorisedToControl() const;
-    //-------------------------------------------------------------------------
     void addEnetCommand(ENetPeer* peer, ENetPacket* packet, uint32_t i,
                         ENetCommandType ect)
     {
@@ -247,7 +262,7 @@ public:
     }  // sendRawPacket
     // ------------------------------------------------------------------------
     /** Returns a copied list of peers. */
-    std::vector<std::shared_ptr<STKPeer> > getPeers()
+    std::vector<std::shared_ptr<STKPeer> > getPeers() const
     {
         std::lock_guard<std::mutex> lock(m_peers_mutex);
         std::vector<std::shared_ptr<STKPeer> > peers;
@@ -266,17 +281,17 @@ public:
     }
     // ------------------------------------------------------------------------
     /** Returns the number of currently connected peers. */
-    unsigned int getPeerCount()
+    unsigned int getPeerCount() const
     {
         std::lock_guard<std::mutex> lock(m_peers_mutex);
         return m_peers.size();
     }
     // ------------------------------------------------------------------------
-    /** Sets the global host id of this host. */
-    void setMyHostId(uint8_t my_host_id)            { m_host_id = my_host_id; }
+    /** Sets the global host id of this host (client use). */
+    void setMyHostId(uint32_t my_host_id)           { m_host_id = my_host_id; }
     // ------------------------------------------------------------------------
     /** Returns the host id of this host. */
-    uint8_t getMyHostId() const                           { return m_host_id; }
+    uint32_t getMyHostId() const                          { return m_host_id; }
     // ------------------------------------------------------------------------
     void sendToServer(NetworkString *data, bool reliable = true);
     // ------------------------------------------------------------------------

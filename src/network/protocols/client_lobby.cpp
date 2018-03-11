@@ -20,6 +20,7 @@
 
 #include "config/player_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "guiengine/message_queue.hpp"
 #include "modes/world_with_rank.hpp"
 #include "network/event.hpp"
 #include "network/network_config.hpp"
@@ -29,6 +30,7 @@
 #include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
+#include "online/online_player_profile.hpp"
 #include "online/online_profile.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/network_kart_selection.hpp"
@@ -202,13 +204,6 @@ void ClientLobby::voteLaps(uint8_t player_id, uint8_t laps,
 }   // voteLaps
 
 //-----------------------------------------------------------------------------
-/** Called when a client selects to exit a server.
- */
-void ClientLobby::leave()
-{
-}   // leave
-
-//-----------------------------------------------------------------------------
 /** Called from the gui when a client clicked on 'continue' on the race result
  *  screen. It notifies the server that this client has exited the screen and
  *  is back at the lobby.
@@ -239,6 +234,7 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_LOAD_WORLD:            loadWorld();                break;
         case LE_RACE_FINISHED:         raceFinished(event);        break;
         case LE_EXIT_RESULT:           exitResultScreen(event);    break;
+        case LE_UPDATE_PLAYER_LIST:    updatePlayerList(event);    break;
         default:
             return false;
             break;
@@ -261,7 +257,6 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
                   message_type);
         switch(message_type)
         {
-            case LE_NEW_PLAYER_CONNECTED: newPlayer(event);              break;
             case LE_PLAYER_DISCONNECTED : disconnectedPlayer(event);     break;
             case LE_START_RACE: startGame(event);                        break;
             case LE_CONNECTION_REFUSED: connectionRefused(event);        break;
@@ -273,6 +268,7 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
             case LE_VOTE_TRACK: playerTrackVote(event);                  break;
             case LE_VOTE_REVERSE: playerReversedVote(event);             break;
             case LE_VOTE_LAPS: playerLapsVote(event);                    break;
+            case LE_AUTHORISED: becomingServerOwner();                   break;
         }   // switch
 
         return true;
@@ -321,20 +317,31 @@ void ClientLobby::update(float dt)
         break;
     case LINKED:
     {
-        core::stringw name;
-        if(PlayerManager::getCurrentOnlineState()==PlayerProfile::OS_SIGNED_IN)
-            name = PlayerManager::getCurrentOnlineUserName();
-        else
-            name = PlayerManager::getCurrentPlayer()->getName();
+        // atm assume only 1 local player (no split screen yet)
+        NetworkString *ns = getNetworkString();
+        ns->addUInt8(LE_CONNECTION_REQUESTED)
+            .encodeString(NetworkConfig::get()->getPassword());
 
-        std::string name_u8 = StringUtils::wideToUtf8(name);
-        const std::string &password = NetworkConfig::get()->getPassword();
-        NetworkString *ns = getNetworkString(6+1+name_u8.size()
-                                                 +1+password.size());
-        // 4 (size of id), global id
-        ns->addUInt8(LE_CONNECTION_REQUESTED).encodeString(name)
-          .encodeString(NetworkConfig::get()->getPassword());
-
+        uint8_t num_player = 1;
+        ns->addUInt8(num_player);
+        for (unsigned i = 0; i < num_player; i++)
+        {
+            core::stringw name;
+            PlayerProfile* player = PlayerManager::getCurrentPlayer();
+            if (PlayerManager::getCurrentOnlineState() ==
+                PlayerProfile::OS_SIGNED_IN)
+                name = PlayerManager::getCurrentOnlineUserName();
+            else
+                name = player->getName();
+            std::string name_u8 = StringUtils::wideToUtf8(name);
+            ns->encodeString(name_u8).addFloat(player->getDefaultKartColor());
+            Online::OnlinePlayerProfile* opp =
+                dynamic_cast<Online::OnlinePlayerProfile*>(player);
+            ns->addUInt32(opp && opp->getProfile() ?
+                opp->getProfile()->getID() : 0);
+            // Assume no handicap player now
+            ns->addUInt8(PLAYER_DIFFICULTY_NORMAL);
+        }
         auto all_k = kart_properties_manager->getAllAvailableKarts();
         auto all_t = track_manager->getAllTrackIdentifiers();
         if (all_k.size() >= 65536)
@@ -389,49 +396,6 @@ void ClientLobby::update(float dt)
 
 //-----------------------------------------------------------------------------
 
-/*! \brief Called when a new player is connected to the server
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0            1         2          
- *       -------------------------------------
- *  Size |     1      |    1   |             |
- *  Data | player_id  | hostid | player name |
- *       -------------------------------------
- */
-void ClientLobby::newPlayer(Event* event)
-{
-    if (!checkDataSize(event, 2)) return;
-    const NetworkString &data = event->data();
-
-    uint8_t player_id = data.getUInt8();
-    uint8_t host_id   = data.getUInt8();
-    core::stringw name;
-    data.decodeStringW(&name);
-    // FIXME need adjusting when splitscreen is used/
-    if(STKHost::get()->getGameSetup()->isLocalMaster(player_id))
-    {
-        Log::error("ClientLobby",
-                   "The server notified me that I'm a new player in the "
-                   "room (not normal).");
-    }
-    else if (m_game_setup->getProfile(player_id) == NULL)
-    {
-        Log::verbose("ClientLobby", "New player connected.");
-        NetworkPlayerProfile* profile = 
-                      new NetworkPlayerProfile(name, player_id, host_id);
-        m_game_setup->addPlayer(profile);
-        NetworkingLobby::getInstance()->addPlayer(profile);
-    }
-    else
-    {
-        Log::error("ClientLobby",
-                   "One of the player notified in the list is myself.");
-    }
-}   // newPlayer
-
-//-----------------------------------------------------------------------------
-
 /*! \brief Called when a new player is disconnected
  *  \param event : Event providing the information.
  *
@@ -447,95 +411,67 @@ void ClientLobby::disconnectedPlayer(Event* event)
     if (!checkDataSize(event, 1)) return;
 
     NetworkString &data = event->data();
-    while(data.size()>0)
+    unsigned disconnected_player_count = data.getUInt8();
+    for (unsigned i = 0; i < disconnected_player_count; i++)
     {
-        const NetworkPlayerProfile *profile = 
-                        m_game_setup->getProfile(data.getUInt8());
-        if (m_game_setup->removePlayer(profile))
-        {
-            Log::info("ClientLobby",
-                      "Player %d removed successfully.",
-                      profile->getGlobalPlayerId());
-        }
-        else
-        {
-            Log::error("ClientLobby",
-                       "The disconnected peer wasn't known.");
-        }
-    }   // while
+        core::stringw player_name;
+        data.decodeStringW(&player_name);
+        core::stringw msg = _("%s disconnected.", player_name);
+        // Use the friend icon to avoid an error-like message
+        MessageQueue::add(MessageQueue::MT_FRIEND, msg);
+    }
 
 }   // disconnectedPlayer
 
 //-----------------------------------------------------------------------------
-
 /*! \brief Called when the server accepts the connection.
  *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0                   1        2            3       
- *       ---------------------------------------------------------
- *  Size |    1     |   1    | 1          |             |
- *  Data | player_id| hostid | authorised |playernames* |
- *       ---------------------------------------------------------
  */
 void ClientLobby::connectionAccepted(Event* event)
 {
-    // At least 3 bytes should remain now
-    if(!checkDataSize(event, 3)) return;
+    // At least 4 byte should remain now
+    if (!checkDataSize(event, 4)) return;
 
     NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
 
     // Accepted
     // ========
-    Log::info("ClientLobby",
-              "The server accepted the connection.");
+    Log::info("ClientLobby", "The server accepted the connection.");
 
-    // self profile
-    irr::core::stringw name;
-    if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
-        name = PlayerManager::getCurrentOnlineUserName();
-    else
-        name = PlayerManager::getCurrentPlayer()->getName();
-    uint8_t my_player_id = data.getUInt8();
-    uint8_t my_host_id   = data.getUInt8();
-    uint8_t authorised   = data.getUInt8();
-    // Store this client's authorisation status in the peer information
-    // for the server.
-    event->getPeer()->setAuthorised(authorised!=0);
-    STKHost::get()->setMyHostId(my_host_id);
-
-    NetworkPlayerProfile* profile = 
-        new NetworkPlayerProfile(name, my_player_id, my_host_id);
-    STKHost::get()->getGameSetup()->setLocalMaster(my_player_id);
+    STKHost::get()->setMyHostId(data.getUInt32());
     m_game_setup->setNumLocalPlayers(1);
     // connection token
     uint32_t token = data.getToken();
     peer->setClientServerToken(token);
-
-    // Add all players
-    // ===============
-    while (data.size() > 0)
-    {
-        uint8_t player_id = data.getUInt8();
-        uint8_t host_id   = data.getUInt8();
-        irr::core::stringw name;
-        data.decodeStringW(&name);
-
-        NetworkPlayerProfile* profile2 =
-            new NetworkPlayerProfile(name, player_id, host_id);
-        m_game_setup->addPlayer(profile2);
-        // Inform the network lobby of all players so that the GUI can
-        // show all currently connected players.
-        NetworkingLobby::getInstance()->addPlayer(profile2);
-    }
-
-    // Add self after other players so that player order is identical
-    // on server and all clients.
-    m_game_setup->addPlayer(profile);
-    NetworkingLobby::getInstance()->addPlayer(profile);
     m_state = CONNECTED;
-    if (NetworkConfig::get()->isAutoConnect())
+}   // connectionAccepted
+
+//-----------------------------------------------------------------------------
+void ClientLobby::updatePlayerList(Event* event)
+{
+    if (!checkDataSize(event, 1)) return;
+    NetworkString &data = event->data();
+    unsigned player_count = data.getUInt8();
+    NetworkingLobby::getInstance()->cleanPlayers();
+    for (unsigned i = 0; i < player_count; i++)
+    {
+        std::tuple<uint32_t, uint32_t, core::stringw, bool> pl;
+        std::get<0>(pl) = data.getUInt32();
+        std::get<1>(pl) = data.getUInt32();
+        data.decodeStringW(&std::get<2>(pl));
+        std::get<3>(pl) = data.getUInt8() == 1;
+        NetworkingLobby::getInstance()->addPlayer(pl);
+    }
+}   // updatePlayerList
+
+//-----------------------------------------------------------------------------
+void ClientLobby::becomingServerOwner()
+{
+    MessageQueue::add(MessageQueue::MT_GENERIC,
+        _("You are now the owner of server."));
+    STKHost::get()->setAuthorisedToControl(true);
+    if (m_state == CONNECTED && NetworkConfig::get()->isAutoConnect())
     {
         // Send a message to the server to start
         NetworkString start(PROTOCOL_LOBBY_ROOM);
@@ -543,8 +479,7 @@ void ClientLobby::connectionAccepted(Event* event)
         start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
         STKHost::get()->sendToServer(&start, true);
     }
-
-}   // connectionAccepted
+}   // becomingServerOwner
 
 //-----------------------------------------------------------------------------
 
@@ -562,26 +497,31 @@ void ClientLobby::connectionRefused(Event* event)
 {
     if (!checkDataSize(event, 1)) return;
     const NetworkString &data = event->data();
-    
-    switch (data.getUInt8()) // the second byte
+    switch ((RejectReason)data.getUInt8()) // the second byte
     {
-    case 0:
-        Log::info("ClientLobby",
-                  "Connection refused : too many players.");
+    case RR_BUSY:
+        STKHost::get()->setErrorMessage(
+            _("Connection refused: Server is busy."));
         break;
-    case 1:
-        Log::info("ClientLobby", "Connection refused : banned.");
+    case RR_BANNED:
+        STKHost::get()->setErrorMessage(
+            _("Connection refused: You are banned from the server."));
         break;
-    case 2:
-        Log::info("ClientLobby", "Client busy.");
+    case RR_INCORRECT_PASSWORD:
+        STKHost::get()->setErrorMessage(
+            _("Connection refused: Server password is incorrect."));
         break;
-    case 3:
-        Log::info("ClientLobby", "Having incompatible karts / tracks.");
+    case RR_INCOMPATIBLE_DATA:
+        STKHost::get()->setErrorMessage(
+            _("Connection refused: Game data is incompatible."));
         break;
-    default:
-        Log::info("ClientLobby", "Connection refused.");
+    case RR_TOO_MANY_PLAYERS:
+        STKHost::get()->setErrorMessage(
+            _("Connection refused: Server is full."));
         break;
     }
+    STKHost::get()->disconnectAllPeers(false/*timeout_waiting*/);
+    STKHost::get()->requestShutdown();
 }   // connectionRefused
 
 //-----------------------------------------------------------------------------

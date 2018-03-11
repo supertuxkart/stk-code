@@ -6,8 +6,11 @@
 #include "utils/synchronised.hpp"
 
 #include <atomic>
+#include <memory>
 #include <mutex>
 #include <set>
+
+class STKPeer;
 
 class ServerLobby : public LobbyProtocol
 {
@@ -31,10 +34,13 @@ public:
 private:
     std::atomic<ServerState> m_state;
 
+    /** Hold the next connected peer for server owner if current one expired
+     * (disconnected). */
+    std::weak_ptr<STKPeer> m_server_owner;
+
     /** Available karts and tracks for all clients, this will be initialized
      *  with data in server first. */
-    Synchronised<std::pair<std::set<std::string>,
-        std::set<std::string> > > m_available_kts;
+    std::pair<std::set<std::string>, std::set<std::string> > m_available_kts;
 
     /** Next id to assign to a peer. */
     Synchronised<int> m_next_player_id;
@@ -57,6 +63,8 @@ private:
     double m_server_delay;
 
     bool m_selection_enabled;
+
+    bool m_has_created_server_id_file;
 
     /** It indicates if this server is registered with the stk server. */
     std::atomic_bool m_server_registered;
@@ -89,6 +97,9 @@ private:
     void startedRaceOnClient(Event *event);
     void unregisterServer();
     void createServerIdFile();
+    void updatePlayerList();
+    void updateServerOwner();
+
 public:
              ServerLobby();
     virtual ~ServerLobby();

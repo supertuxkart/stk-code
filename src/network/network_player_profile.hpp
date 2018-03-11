@@ -26,10 +26,11 @@
 #include "utils/types.hpp"
 
 #include "irrString.h"
-
+#include <memory>
 #include <string>
-namespace Online { class OnlineProfile; }
+#include <tuple>
 
+class STKPeer;
 
 /*! \class NetworkPlayerProfile
  *  \brief Contains the profile of a player.
@@ -37,31 +38,51 @@ namespace Online { class OnlineProfile; }
 class NetworkPlayerProfile
 {
 private:
+    std::weak_ptr<STKPeer> m_peer;
+
+    /** The name of the player. */
+    irr::core::stringw m_player_name;
+
+    /** Host id of this player. */
+    uint32_t m_host_id;
+
+    float m_default_kart_color;
+
+    uint32_t m_online_id;
+
+    /** Per player difficulty. */
+    PerPlayerDifficulty m_per_player_difficulty;
+
+    /** The selected kart id. */
+    std::string m_kart_name; 
+
     /** The unique id of the player for this race. The number is assigned
      *  by the server (and it might not be the index of this player in the
      *  peer list. */
     uint8_t m_global_player_id;
 
-    /** Host id of this player. */
-    uint8_t m_host_id;
-
-    /** The selected kart id. */
-    std::string m_kart_name; 
-
-    /** The name of the player. */
-    irr::core::stringw m_player_name;
-
     /** The kart id in the World class (pointer to AbstractKart). */
     uint8_t m_world_kart_id;
 
-    /** Per player difficulty. */
-    PerPlayerDifficulty m_per_player_difficulty;
 public:
-         NetworkPlayerProfile(const irr::core::stringw &name,
-                              int global_player_id, int host_id);
-        ~NetworkPlayerProfile();
+    NetworkPlayerProfile(std::shared_ptr<STKPeer> peer,
+                         const irr::core::stringw &name, uint32_t host_id,
+                         float default_kart_color, uint32_t online_id,
+                         PerPlayerDifficulty per_player_difficulty)
+    {
+        m_peer                  = peer;
+        m_player_name           = name;
+        m_host_id               = host_id;
+        m_default_kart_color    = default_kart_color;
+        m_online_id             = online_id;
+        m_per_player_difficulty = per_player_difficulty;
+        m_global_player_id      = 0;
+        m_world_kart_id         = 0;
+    }
+    // ------------------------------------------------------------------------
+    ~NetworkPlayerProfile() {}
+    // ------------------------------------------------------------------------
     bool isLocalPlayer() const;
-
     // ------------------------------------------------------------------------
     /** Sets the global player id of this player. */
     void setGlobalPlayerId(int player_id) { m_global_player_id = player_id; }
@@ -93,6 +114,15 @@ public:
     /** Returns the name of this player. */
     const irr::core::stringw& getName() const { return m_player_name; }
     // ------------------------------------------------------------------------
+    float getDefaultKartColor() const { return m_default_kart_color; }
+    // ------------------------------------------------------------------------
+    uint32_t getOnlineID() const { return m_online_id; }
+    // ------------------------------------------------------------------------
+    std::shared_ptr<STKPeer> getPeer() const { return m_peer.lock(); }
+    // ------------------------------------------------------------------------
+    /** Returns the minimun info for networking lobby screen. */
+    std::tuple<uint32_t, uint32_t, irr::core::stringw> toTuple() const
+             { return std::make_tuple(m_host_id, m_online_id, m_player_name); }
 
 };   // class NetworkPlayerProfile
 
