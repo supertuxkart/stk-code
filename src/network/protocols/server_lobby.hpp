@@ -95,6 +95,7 @@ private:
     void registerServer();
     void finishedLoadingWorldClient(Event *event);
     void startedRaceOnClient(Event *event);
+    void kickHost(Event* event);
     void unregisterServer();
     void createServerIdFile();
     void updatePlayerList();

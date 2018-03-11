@@ -62,7 +62,8 @@ public:
         LE_VOTE_LAPS,                     // vote number of laps
         LE_CHAT,
         LE_FINAL_PLAYER_LIST,
-        LE_AUTHORISED
+        LE_AUTHORISED,
+        LE_KICK_HOST
     };
 
     enum RejectReason : uint8_t

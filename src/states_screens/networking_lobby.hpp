@@ -34,11 +34,11 @@ namespace GUIEngine
 }
 
 /**
-  * \brief Handles the main menu
+  * \brief Handles the networking lobby
   * \ingroup states_screens
   */
-class NetworkingLobby :     public GUIEngine::Screen,
-                            public GUIEngine::ScreenSingleton<NetworkingLobby>
+class NetworkingLobby : public GUIEngine::Screen,
+                        public GUIEngine::ScreenSingleton<NetworkingLobby>
 {
 private:
     friend class GUIEngine::ScreenSingleton<NetworkingLobby>;
@@ -54,9 +54,6 @@ private:
     GUIEngine::IconButtonWidget *m_start_button;
     GUIEngine::ListWidget *m_player_list;
     GUIEngine::TextBoxWidget* m_chat_box;
-
-    /** \brief Sets which widget has to be focused. Depends on the user state. */
-    void setInitialFocus();
 
 public:
 
@@ -80,12 +77,6 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual bool onEscapePressed() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void onDisabledItemClicked(const std::string& item) OVERRIDE;
-
-    /** \brief Implements the callback when a dialog gets closed. */
-    virtual void onDialogClose() OVERRIDE;
 
     /** Used to insert each client chat message (reserved). */
     void addMoreServerInfo(const core::stringw& info);

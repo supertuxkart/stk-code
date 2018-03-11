@@ -160,7 +160,20 @@ bool ServerLobby::notifyEvent(Event* event)
 }   // notifyEvent
 
 //-----------------------------------------------------------------------------
+void ServerLobby::kickHost(Event* event)
+{
+    std::unique_lock<std::mutex> lock(m_connection_mutex);
+    if (m_server_owner.lock() != event->getPeerSP())
+        return;
+    lock.unlock();
+    NetworkString& data = event->data();
+    uint32_t host_id = data.getUInt32();
+    std::shared_ptr<STKPeer> peer = STKHost::get()->findPeerByHostId(host_id);
+    if (peer)
+        peer->kick();
+}   // kickHost
 
+//-----------------------------------------------------------------------------
 bool ServerLobby::notifyEventAsynchronous(Event* event)
 {
     assert(m_game_setup); // assert that the setup exists
@@ -185,6 +198,8 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_VOTE_REVERSE: playerReversedVote(event);          break;
         case LE_VOTE_LAPS:  playerLapsVote(event);                break;
         case LE_RACE_FINISHED_ACK: playerFinishedResult(event);   break;
+        case LE_KICK_HOST: kickHost(event);                       break;
+        default:                                                  break;
         }   // switch
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
     else if (event->getType() == EVENT_TYPE_DISCONNECTED)

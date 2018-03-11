@@ -20,6 +20,7 @@
 
 #include "config/player_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "guiengine/message_queue.hpp"
 #include "modes/world_with_rank.hpp"
 #include "network/event.hpp"
@@ -369,6 +370,8 @@ void ClientLobby::update(float dt)
         break;
     case KART_SELECTION:
     {
+        // In case the user opened a user info dialog
+        GUIEngine::ModalDialog::dismiss();
         NetworkKartSelectionScreen* screen =
                                      NetworkKartSelectionScreen::getInstance();
         screen->setAvailableKartsFromServer(m_available_karts);

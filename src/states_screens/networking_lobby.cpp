@@ -39,7 +39,7 @@
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/dialogs/network_user_dialog.hpp"
 #include "utils/translation.hpp"
 
 using namespace Online;
@@ -101,7 +101,6 @@ void NetworkingLobby::beforeAddingWidget()
 void NetworkingLobby::init()
 {
     Screen::init();
-    setInitialFocus();
     m_start_button->setVisible(false);
 
     // For now create the active player and bind it to the right
@@ -201,6 +200,18 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
         StateManager::get()->escapePressed();
         return;
     }
+    else if (name == m_player_list->m_properties[GUIEngine::PROP_ID])
+    {
+        auto host_online_ids = StringUtils::splitToUInt
+            (m_player_list->getSelectionInternalName(), '_');
+        if (host_online_ids.size() != 2 ||
+            STKHost::get()->getMyHostId() == host_online_ids[0])
+        {
+            return;
+        }
+        new NetworkUserDialog(host_online_ids[0], host_online_ids[1],
+            m_player_list->getSelectionLabel());
+    }   // click on replay file
 
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
     if (ribbon == NULL) return;
@@ -227,6 +238,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
             STKHost::get()->sendToServer(&start, true);
         }
     }
+
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
@@ -244,23 +256,6 @@ bool NetworkingLobby::onEscapePressed()
 }   // onEscapePressed
 
 // ----------------------------------------------------------------------------
-void NetworkingLobby::onDisabledItemClicked(const std::string& item)
-{
-
-}   // onDisabledItemClicked
-
-// ----------------------------------------------------------------------------
-void NetworkingLobby::setInitialFocus()
-{
-}   // setInitialFocus
-
-// ----------------------------------------------------------------------------
-void NetworkingLobby::onDialogClose()
-{
-    setInitialFocus();
-}   // onDialogClose()
-
-// ----------------------------------------------------------------------------
 void NetworkingLobby::addPlayer(const std::tuple<uint32_t, uint32_t,
                                 core::stringw, bool>& p)
 {
@@ -273,7 +268,7 @@ void NetworkingLobby::addPlayer(const std::tuple<uint32_t, uint32_t,
             StringUtils::toString(std::get<1>(p));
         m_player_list->addItem(internal_name, std::get<2>(p));
         if (std::get<3>(p))
-            m_player_list->markItemRed(internal_name, true);
+            m_player_list->markItemBlue(internal_name, true);
     }
 }  // addPlayer
 
