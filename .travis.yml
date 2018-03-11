@@ -41,7 +41,7 @@ addons:
 
 before_script:
   # For unit testing
-  - if [ "$UNITTEST" ]; then svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets ../stk-assets; fi
+  - if "$UNITTEST"; then svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets ../stk-assets; fi
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
   
@@ -60,7 +60,7 @@ script:
   - cd "build"
   - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off
   - make VERBOSE=1 -j $THREADS
-  - if [ "$UNITTEST" ]; then ./bin/supertuxkart --unit-testing; fi
+  - if "$UNITTEST"; then ./bin/supertuxkart --unit-testing; fi
 
 notifications:
   irc:
