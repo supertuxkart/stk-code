@@ -375,7 +375,10 @@ void EventHandler::processGUIAction(const PlayerAction action,
 
         case PA_RESCUE:
         case PA_MENU_CANCEL:
-            if (pressedDown) GUIEngine::getStateManager()->escapePressed();
+            if (pressedDown&& !isWithinATextBox())
+            {
+                GUIEngine::getStateManager()->escapePressed();
+            }
             break;
 
         case PA_FIRE:
