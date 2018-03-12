@@ -270,6 +270,7 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
             case LE_VOTE_REVERSE: playerReversedVote(event);             break;
             case LE_VOTE_LAPS: playerLapsVote(event);                    break;
             case LE_SERVER_OWNERSHIP: becomingServerOwner();             break;
+            default:                                                     break;
         }   // switch
 
         return true;

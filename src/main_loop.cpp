@@ -336,7 +336,7 @@ void MainLoop::run()
             STKHost::get()->requestedShutdown())
         {
             SFXManager::get()->quickSound("anvil");
-            core::stringw msg = _("Connection to server is lost.");
+            core::stringw msg = _("Server connection timed out.");
             if (!STKHost::get()->getErrorMessage().empty())
             {
                 msg = STKHost::get()->getErrorMessage();
