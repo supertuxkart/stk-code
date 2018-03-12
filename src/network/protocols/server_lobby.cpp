@@ -720,8 +720,6 @@ void ServerLobby::connectionRequested(Event* event)
         return;
     }
 
-    // Connection accepted.
-    // ====================
     uint8_t player_count = data.getUInt8();
     for (unsigned i = 0; i < player_count; i++)
     {
@@ -736,6 +734,20 @@ void ServerLobby::connectionRequested(Event* event)
             (peer, name, peer->getHostId(), default_kart_color, online_id,
             per_player_difficulty));
     }
+
+    if (peer->isBanned())
+    {
+        NetworkString *message = getNetworkString(2);
+        message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BANNED);
+        peer->sendPacket(message);
+        peer->reset();
+        delete message;
+        Log::verbose("ServerLobby", "Player refused: banned");
+        return;
+    }
+
+    // Connection accepted.
+    // ====================
     std::set<std::string> client_karts, client_tracks;
     const unsigned kart_num = data.getUInt16();
     const unsigned track_num = data.getUInt16();

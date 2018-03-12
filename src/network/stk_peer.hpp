@@ -96,6 +96,8 @@ public:
     void addPlayer(std::shared_ptr<NetworkPlayerProfile> p)
                                                     { m_players.push_back(p); }
     // ------------------------------------------------------------------------
+    bool isBanned() const;
+    // ------------------------------------------------------------------------
     /** Sets the token for this client. */
     void setClientServerToken(const uint32_t& token)
     {
