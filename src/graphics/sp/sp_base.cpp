@@ -574,6 +574,7 @@ void init()
 void destroy()
 {
     g_dy_dc.clear();
+    SPTextureManager::get()->stopThreads();
     SPShaderManager::destroy();
     g_glow_shader = NULL;
     g_normal_visualizer = NULL;
