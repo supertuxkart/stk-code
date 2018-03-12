@@ -1012,7 +1012,8 @@ void STKHost::sendPacketExcept(STKPeer* peer, NetworkString *data,
 void STKHost::sendToServer(NetworkString *data, bool reliable)
 {
     std::lock_guard<std::mutex> lock(m_peers_mutex);
-    assert(m_peers.size() == 1);
+    if (m_peers.empty())
+        return;
     assert(NetworkConfig::get()->isClient());
     m_peers.begin()->second->sendPacket(data, reliable);
 }   // sendToServer
