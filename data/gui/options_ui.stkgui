@@ -80,6 +80,16 @@
                 </div>
             </div>
 
+            <spacer height="4" width="10" />
+
+            <div layout="horizontal-row" width="100%" height="fit">
+                <div proportion="1" height="fit" layout="horizontal-row" >
+                    <checkbox id="enable-lobby-chat"/>
+                    <spacer width="20" height="100%" />
+                    <label height="100%" id="label-lobby-chat" I18N="In the ui settings" text="Enable chatting in networking lobby"/>
+                </div>
+            </div>
+
             <spacer height="18" width="4"/>
 
             <!-- ************ LANGUAGE CHOICE ************ -->
