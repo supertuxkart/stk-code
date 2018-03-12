@@ -167,12 +167,13 @@ void TrackInfoScreen::init()
     if (has_AI)
     {
         m_ai_kart_spinner->setActive(true);
-        
-        int num_ai = UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] - local_players;
-        
+
+        int num_ai = int(UserConfigParams::m_num_karts_per_gamemode
+            [race_manager->getMinorMode()]) - local_players;
+
         // Avoid negative numbers (which can happen if e.g. the number of karts
         // in a previous race was lower than the number of players now.
-            
+
         if (num_ai < 0) num_ai = 0;
         m_ai_kart_spinner->setValue(num_ai);
 

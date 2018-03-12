@@ -16,8 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef HEADER_USER_INFO_DIALOG_HPP
-#define HEADER_USER_INFO_DIALOG_HPP
+#ifndef HEADER_NETWORK_USER_DIALOG_HPP
+#define HEADER_NETWORK_USER_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets.hpp"

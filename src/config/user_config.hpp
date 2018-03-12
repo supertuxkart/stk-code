@@ -184,7 +184,7 @@ public:
         return m_elements[key];
     }
 };   // ListUserConfigParam
-typedef MapUserConfigParam<int, int>    IntToIntUserConfigParam;
+typedef MapUserConfigParam<uint32_t, uint32_t> UIntToUIntUserConfigParam;
 // ============================================================================
 class IntUserConfigParam : public UserConfigParam
 {
@@ -732,11 +732,11 @@ namespace UserConfigParams
                             "stun.ivao.aero") );
 
     // ---- Gamemode setup
-    PARAM_PREFIX IntToIntUserConfigParam m_num_karts_per_gamemode
-        PARAM_DEFAULT(IntToIntUserConfigParam("num_karts_per_gamemode",
+    PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode
+        PARAM_DEFAULT(UIntToUIntUserConfigParam("num_karts_per_gamemode",
             "The Number of karts per gamemode.",
             1,
-            std::make_pair(1100, 4)
+            std::make_pair(1100u, 4u)
         ));
 
     // ---- Network
@@ -748,6 +748,15 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam m_random_ports
         PARAM_DEFAULT(BoolUserConfigParam(true, "randrom-ports",
         &m_network_group, "Use random ports for client and server connection"));
+
+    // ---- Gamemode setup
+    PARAM_PREFIX UIntToUIntUserConfigParam m_server_ban_list
+        PARAM_DEFAULT(UIntToUIntUserConfigParam("server_ban_list",
+            "LHS: IP in 32bit format, RHS: online id, if 0 than all players "
+            "from this IP will be banned.",
+            1,
+            std::make_pair(0u, 0u)
+        ));
 
     // ---- Graphic Quality
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality
