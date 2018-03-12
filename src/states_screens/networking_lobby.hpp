@@ -33,6 +33,14 @@ namespace GUIEngine
     class TextBoxWidget;
 }
 
+namespace irr
+{
+    namespace gui
+    {
+        class STKModifiedSpriteBank;
+    }
+}
+
 /**
   * \brief Handles the networking lobby
   * \ingroup states_screens
@@ -54,6 +62,11 @@ private:
     GUIEngine::IconButtonWidget *m_start_button;
     GUIEngine::ListWidget *m_player_list;
     GUIEngine::TextBoxWidget* m_chat_box;
+
+    irr::gui::STKModifiedSpriteBank* m_icon_bank;
+
+    /** \brief implement optional callback from parent class GUIEngine::Screen */
+    virtual void unloaded();
 
 public:
 
@@ -81,9 +94,9 @@ public:
     /** Used to insert each client chat message (reserved). */
     void addMoreServerInfo(const core::stringw& info);
     void setJoinedServer(std::shared_ptr<Server> server);
-    void addPlayer(const std::tuple<uint32_t/*host id*/, uint32_t/*online id*/,
-                   core::stringw/*player name*/, bool/*is server owner*/>& p);
-    void cleanPlayers();
+    void updatePlayers(const std::vector<std::tuple<uint32_t/*host id*/,
+                       uint32_t/*online id*/, core::stringw/*player name*/,
+                       int/*icon id*/> >& p);
 };   // class NetworkingLobby
 
 #endif

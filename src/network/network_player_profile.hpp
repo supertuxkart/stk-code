@@ -118,11 +118,9 @@ public:
     // ------------------------------------------------------------------------
     uint32_t getOnlineID() const { return m_online_id; }
     // ------------------------------------------------------------------------
-    std::shared_ptr<STKPeer> getPeer() const { return m_peer.lock(); }
+    bool isOfflineAccount() const { return m_online_id == 0; }
     // ------------------------------------------------------------------------
-    /** Returns the minimun info for networking lobby screen. */
-    std::tuple<uint32_t, uint32_t, irr::core::stringw> toTuple() const
-             { return std::make_tuple(m_host_id, m_online_id, m_player_name); }
+    std::shared_ptr<STKPeer> getPeer() const { return m_peer.lock(); }
 
 };   // class NetworkPlayerProfile
 

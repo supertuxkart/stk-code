@@ -62,7 +62,7 @@ public:
         LE_VOTE_LAPS,                     // vote number of laps
         LE_CHAT,
         LE_FINAL_PLAYER_LIST,
-        LE_AUTHORISED,
+        LE_SERVER_OWNERSHIP,
         LE_KICK_HOST
     };
 

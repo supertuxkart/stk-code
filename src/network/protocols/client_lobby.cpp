@@ -269,7 +269,7 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
             case LE_VOTE_TRACK: playerTrackVote(event);                  break;
             case LE_VOTE_REVERSE: playerReversedVote(event);             break;
             case LE_VOTE_LAPS: playerLapsVote(event);                    break;
-            case LE_AUTHORISED: becomingServerOwner();                   break;
+            case LE_SERVER_OWNERSHIP: becomingServerOwner();             break;
         }   // switch
 
         return true;
@@ -454,18 +454,21 @@ void ClientLobby::connectionAccepted(Event* event)
 void ClientLobby::updatePlayerList(Event* event)
 {
     if (!checkDataSize(event, 1)) return;
-    NetworkString &data = event->data();
+    NetworkString& data = event->data();
     unsigned player_count = data.getUInt8();
-    NetworkingLobby::getInstance()->cleanPlayers();
+    std::vector<std::tuple<uint32_t, uint32_t, core::stringw, int> > players;
     for (unsigned i = 0; i < player_count; i++)
     {
-        std::tuple<uint32_t, uint32_t, core::stringw, bool> pl;
+        std::tuple<uint32_t, uint32_t, core::stringw, int> pl;
         std::get<0>(pl) = data.getUInt32();
         std::get<1>(pl) = data.getUInt32();
         data.decodeStringW(&std::get<2>(pl));
-        std::get<3>(pl) = data.getUInt8() == 1;
-        NetworkingLobby::getInstance()->addPlayer(pl);
+        // icon to be used, see NetworkingLobby::loadedFromFile
+        std::get<3>(pl) = data.getUInt8() == 1 /*if server owner*/ ? 0 :
+            std::get<1>(pl) != 0 /*if online account*/ ? 1 : 2;
+        players.push_back(pl);
     }
+    NetworkingLobby::getInstance()->updatePlayers(players);
 }   // updatePlayerList
 
 //-----------------------------------------------------------------------------

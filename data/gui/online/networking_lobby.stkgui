@@ -20,7 +20,7 @@
             <box proportion="2" height="100%" layout="vertical-row">
                 <textbox id="chat" width="100%" height="30%"/>
                 <spacer height="20"/>
-                <button id="send_text" height="30%" width="fit" I18N="In the network lobby" text="Send text" />
+                <button id="send_text" height="30%" width="fit" I18N="In the network lobby" text="Send" />
             </box>
             <spacer width="40"/>
             <buttonbar id="actions" proportion="1" width="75%" height="75%">

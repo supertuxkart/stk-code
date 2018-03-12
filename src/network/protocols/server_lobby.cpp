@@ -166,6 +166,7 @@ void ServerLobby::kickHost(Event* event)
     if (m_server_owner.lock() != event->getPeerSP())
         return;
     lock.unlock();
+    if (!checkDataSize(event, 4)) return;
     NetworkString& data = event->data();
     uint32_t host_id = data.getUInt32();
     std::shared_ptr<STKPeer> peer = STKHost::get()->findPeerByHostId(host_id);
@@ -872,7 +873,7 @@ void ServerLobby::updateServerOwner()
     if (owner)
     {
         NetworkString* ns = getNetworkString();
-        ns->addUInt8(LE_AUTHORISED);
+        ns->addUInt8(LE_SERVER_OWNERSHIP);
         owner->sendPacket(ns);
         delete ns;
         m_server_owner = owner;

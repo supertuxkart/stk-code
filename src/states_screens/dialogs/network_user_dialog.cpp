@@ -47,6 +47,7 @@ void NetworkUserDialog::beforeAddingWidgets()
 
     m_friend_widget = getWidget<IconButtonWidget>("friend");
     assert(m_friend_widget != NULL);
+    m_friend_widget->setVisible(m_online_id != 0);
     m_kick_widget = getWidget<IconButtonWidget>("decline");
     assert(m_kick_widget != NULL);
 

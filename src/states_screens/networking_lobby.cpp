@@ -15,16 +15,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#define DEBUG_MENU_ITEM 0
-
 #include "states_screens/networking_lobby.hpp"
 
 #include <string>
-#include <iostream>
 
-#include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
-#include "guiengine/widgets/bubble_widget.hpp"
+#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
@@ -86,6 +82,18 @@ void NetworkingLobby::loadedFromFile()
     m_exit_widget = getWidget<IconButtonWidget>("exit");
     assert(m_exit_widget != NULL);
 
+    m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
+    video::ITexture* icon_1 = irr_driver->getTexture
+        (file_manager->getAsset(FileManager::GUI, "cup_gold.png"));
+    video::ITexture* icon_2 = irr_driver->getTexture
+        (file_manager->getAsset(FileManager::GUI, "difficulty_medium.png"));
+    video::ITexture* icon_3 = irr_driver->getTexture
+        (file_manager->getAsset(FileManager::GUI, "main_help.png"));
+    m_icon_bank->addTextureAsSprite(icon_1);
+    m_icon_bank->addTextureAsSprite(icon_2);
+    m_icon_bank->addTextureAsSprite(icon_3);
+    const int screen_width = irr_driver->getFrameSize().Width;
+    m_icon_bank->setScale(screen_width > 1280 ? 0.4f : 0.25f);
 }   // loadedFromFile
 
 // ---------------------------------------------------------------------------
@@ -105,7 +113,8 @@ void NetworkingLobby::init()
 
     // For now create the active player and bind it to the right
     // input device.
-    InputDevice *device = input_manager->getDeviceManager()->getLatestUsedDevice();
+    InputDevice* device =
+        input_manager->getDeviceManager()->getLatestUsedDevice();
     PlayerProfile* profile = PlayerManager::getCurrentPlayer();
     StateManager::get()->createActivePlayer(profile, device);
 }   // init
@@ -242,13 +251,19 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
+void NetworkingLobby::unloaded()
+{
+    delete m_icon_bank;
+    m_icon_bank = NULL;
+}   // unloaded
+
+// ----------------------------------------------------------------------------
 
 void NetworkingLobby::tearDown()
 {
 }   // tearDown
 
 // ----------------------------------------------------------------------------
-
 bool NetworkingLobby::onEscapePressed()
 {
     STKHost::get()->shutdown();
@@ -256,25 +271,29 @@ bool NetworkingLobby::onEscapePressed()
 }   // onEscapePressed
 
 // ----------------------------------------------------------------------------
-void NetworkingLobby::addPlayer(const std::tuple<uint32_t, uint32_t,
-                                core::stringw, bool>& p)
+void NetworkingLobby::updatePlayers(const std::vector<std::tuple<uint32_t,
+                                    uint32_t, core::stringw, int> >& p)
 {
     // In GUI-less server this function will be called without proper
     // initialisation
-    if (m_player_list)
-    {
-        const std::string internal_name =
-            StringUtils::toString(std::get<0>(p)) + "_" +
-            StringUtils::toString(std::get<1>(p));
-        m_player_list->addItem(internal_name, std::get<2>(p));
-        if (std::get<3>(p))
-            m_player_list->markItemBlue(internal_name, true);
-    }
-}  // addPlayer
+    if (!m_player_list)
+        return;
+    m_player_list->clear();
 
-// ----------------------------------------------------------------------------
-void NetworkingLobby::cleanPlayers()
-{
-    if (m_player_list)
-        m_player_list->clear();
-}   // cleanPlayers
+    if (p.empty())
+        return;
+
+    irr::gui::STKModifiedSpriteBank* icon_bank = m_icon_bank;
+    for (auto& q : p)
+    {
+        if (icon_bank)
+        {
+            m_player_list->setIcons(icon_bank);
+            icon_bank = NULL;
+        }
+        const std::string internal_name =
+            StringUtils::toString(std::get<0>(q)) + "_" +
+            StringUtils::toString(std::get<1>(q));
+        m_player_list->addItem(internal_name, std::get<2>(q), std::get<3>(q));
+    }
+}  // updatePlayers
