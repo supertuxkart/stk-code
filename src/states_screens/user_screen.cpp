@@ -159,8 +159,8 @@ void BaseUserScreen::init()
     m_new_registered_data = false;
     if (m_auto_login)
     {
-        login();
         m_auto_login = false;
+        login();
         return;
     }
     m_auto_login = false;
