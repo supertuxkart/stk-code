@@ -26,6 +26,7 @@ private:
     void playerReversedVote(Event* event);
     void playerLapsVote(Event* event);
     void updatePlayerList(Event* event);
+    void handleChat(Event* event);
     void becomingServerOwner();
 
     TransportAddress m_server_address;

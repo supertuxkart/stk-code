@@ -18,6 +18,7 @@
 
 #include "network/protocols/client_lobby.hpp"
 
+#include "config/user_config.hpp"
 #include "config/player_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -236,6 +237,7 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_RACE_FINISHED:         raceFinished(event);        break;
         case LE_EXIT_RESULT:           exitResultScreen(event);    break;
         case LE_UPDATE_PLAYER_LIST:    updatePlayerList(event);    break;
+        case LE_CHAT:                  handleChat(event);          break;
         default:
             return false;
             break;
@@ -489,7 +491,21 @@ void ClientLobby::becomingServerOwner()
 }   // becomingServerOwner
 
 //-----------------------------------------------------------------------------
+void ClientLobby::handleChat(Event* event)
+{
+    if (!UserConfigParams::m_lobby_chat)
+        return;
+    std::string message;
+    event->data().decodeString(&message);
+    Log::info("ClientLobby", "%s", message.c_str());
+    if (message.size() > 0)
+    {
+        NetworkingLobby::getInstance()->addMoreServerInfo(
+            StringUtils::utf8ToWide(message));
+    }
+}   // handleChat
 
+//-----------------------------------------------------------------------------
 /*! \brief Called when the server refuses the connection.
  *  \param event : Event providing the information.
  *

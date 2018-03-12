@@ -748,6 +748,10 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam m_random_ports
         PARAM_DEFAULT(BoolUserConfigParam(true, "randrom-ports",
         &m_network_group, "Use random ports for client and server connection"));
+    PARAM_PREFIX BoolUserConfigParam m_lobby_chat
+        PARAM_DEFAULT(BoolUserConfigParam(false, "lobby-chat",
+        &m_network_group, "Enable chatting in networking lobby, if off than "
+        "no chat message will be displayed from any players."));
 
     // ---- Gamemode setup
     PARAM_PREFIX UIntToUIntUserConfigParam m_server_ban_list

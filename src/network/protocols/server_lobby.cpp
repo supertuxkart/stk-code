@@ -160,6 +160,26 @@ bool ServerLobby::notifyEvent(Event* event)
 }   // notifyEvent
 
 //-----------------------------------------------------------------------------
+void ServerLobby::handleChat(Event* event)
+{
+    if (!event->getPeer()->hasPlayerProfiles())
+    {
+        Log::warn("ServerLobby", "Unauthorized peer wants to chat.");
+        return;
+    }
+    core::stringw message;
+    event->data().decodeStringW(&message);
+    if (message.size() > 0)
+    {
+        NetworkString* chat = getNetworkString();
+        chat->setSynchronous(true);
+        chat->addUInt8(LE_CHAT).encodeString(message);
+        sendMessageToPeersChangingToken(chat, /*reliable*/true);
+        delete chat;
+    }
+}   // handleChat
+
+//-----------------------------------------------------------------------------
 void ServerLobby::kickHost(Event* event)
 {
     std::unique_lock<std::mutex> lock(m_connection_mutex);
@@ -200,6 +220,7 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_VOTE_LAPS:  playerLapsVote(event);                break;
         case LE_RACE_FINISHED_ACK: playerFinishedResult(event);   break;
         case LE_KICK_HOST: kickHost(event);                       break;
+        case LE_CHAT: handleChat(event);                          break;
         default:                                                  break;
         }   // switch
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
@@ -739,6 +760,7 @@ void ServerLobby::connectionRequested(Event* event)
     {
         NetworkString *message = getNetworkString(2);
         message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BANNED);
+        peer->cleanPlayerProfiles();
         peer->sendPacket(message);
         peer->reset();
         delete message;
@@ -791,6 +813,7 @@ void ServerLobby::connectionRequested(Event* event)
         NetworkString *message = getNetworkString(2);
         message->addUInt8(LE_CONNECTION_REFUSED)
             .addUInt8(RR_INCOMPATIBLE_DATA);
+        peer->cleanPlayerProfiles();
         peer->sendPacket(message);
         peer->reset();
         delete message;

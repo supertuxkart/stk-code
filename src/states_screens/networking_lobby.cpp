@@ -19,8 +19,11 @@
 
 #include <string>
 
+#include "config/user_config.hpp"
 #include "config/player_manager.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
+#include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
@@ -57,6 +60,7 @@ DEFINE_SCREEN_SINGLETON( NetworkingLobby );
 // ----------------------------------------------------------------------------
 NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
 {
+    m_server_info_height = GUIEngine::getFont()->getDimension(L"X").Height;
     m_player_list = NULL;
 }   // NetworkingLobby
 
@@ -75,6 +79,9 @@ void NetworkingLobby::loadedFromFile()
 
     m_chat_box = getWidget<TextBoxWidget>("chat");
     assert(m_chat_box != NULL);
+
+    m_send_button = getWidget<ButtonWidget>("send");
+    assert(m_send_button != NULL);
 
     m_player_list = getWidget<ListWidget>("players");
     assert(m_player_list!= NULL);
@@ -99,6 +106,18 @@ void NetworkingLobby::loadedFromFile()
 // ---------------------------------------------------------------------------
 void NetworkingLobby::beforeAddingWidget()
 {
+    if (!UserConfigParams::m_lobby_chat)
+    {
+        getWidget("chat")->setVisible(false);
+        getWidget("chat")->setActive(false);
+        getWidget("send")->setVisible(false);
+    }
+    else
+    {
+        getWidget("chat")->setVisible(true);
+        getWidget("chat")->setActive(true);
+        getWidget("send")->setVisible(true);
+    }
 } // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -158,8 +177,29 @@ void NetworkingLobby::setJoinedServer(std::shared_ptr<Server> server)
 }   // setJoinedServer
 
 // ----------------------------------------------------------------------------
-void NetworkingLobby::addMoreServerInfo(const core::stringw& info)
+void NetworkingLobby::addMoreServerInfo(core::stringw info)
 {
+    assert(m_text_bubble->getDimension().Height > 10 &&
+        m_text_bubble->getDimension().Width > 10);
+    while ((int)m_server_info.size() * m_server_info_height >
+        m_text_bubble->getDimension().Height - 10)
+    {
+        m_server_info.erase(m_server_info.begin());
+    }
+    while ((int)GUIEngine::getFont()->getDimension(info.c_str()).Width >
+        m_text_bubble->getDimension().Width - 10)
+    {
+        int size = (m_text_bubble->getDimension().Width - 10)
+            / m_server_info_height;
+        assert(size > 0);
+        core::stringw new_info = info.subString(0, size);
+        m_server_info.push_back(new_info);
+        info = info.subString(new_info.size(), 80);
+    }
+    if (info.size() > 0)
+    {
+        m_server_info.push_back(info);
+    }
 }   // addMoreServerInfo
 
 // ----------------------------------------------------------------------------
@@ -220,7 +260,30 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
         }
         new NetworkUserDialog(host_online_ids[0], host_online_ids[1],
             m_player_list->getSelectionLabel());
-    }   // click on replay file
+    }   // click on a user
+    else if (name == m_send_button->m_properties[PROP_ID])
+    {
+        core::stringw text = m_chat_box->getText();
+        // Max 80 words
+        text = text.subString(0, 80).trim();
+        if (text.size() > 0)
+        {
+            NetworkString chat(PROTOCOL_LOBBY_ROOM);
+            chat.addUInt8(LobbyProtocol::LE_CHAT);
+
+            core::stringw name;
+            PlayerProfile* player = PlayerManager::getCurrentPlayer();
+            if (PlayerManager::getCurrentOnlineState() ==
+                PlayerProfile::OS_SIGNED_IN)
+                name = PlayerManager::getCurrentOnlineUserName();
+            else
+                name = player->getName();
+            chat.encodeString(name + L": " + text);
+
+            STKHost::get()->sendToServer(&chat, true);
+        }
+        m_chat_box->setText("");
+    }   // send chat message
 
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
     if (ribbon == NULL) return;
@@ -247,7 +310,6 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
             STKHost::get()->sendToServer(&start, true);
         }
     }
-
 }   // eventCallback
 
 // ----------------------------------------------------------------------------

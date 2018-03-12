@@ -26,7 +26,7 @@ class Server;
 
 namespace GUIEngine
 { 
-    class Widget;
+    class ButtonWidget;
     class LabelWidget;
     class ListWidget;
     class IconButtonWidget;
@@ -55,13 +55,15 @@ private:
 
     std::shared_ptr<Server> m_joined_server;
     std::vector<core::stringw> m_server_info;
+    int m_server_info_height;
 
-    GUIEngine::IconButtonWidget * m_back_widget;
-    GUIEngine::LabelWidget * m_text_bubble;
-    GUIEngine::IconButtonWidget * m_exit_widget;
-    GUIEngine::IconButtonWidget *m_start_button;
-    GUIEngine::ListWidget *m_player_list;
+    GUIEngine::IconButtonWidget* m_back_widget;
+    GUIEngine::LabelWidget* m_text_bubble;
+    GUIEngine::IconButtonWidget* m_exit_widget;
+    GUIEngine::IconButtonWidget* m_start_button;
+    GUIEngine::ListWidget* m_player_list;
     GUIEngine::TextBoxWidget* m_chat_box;
+    GUIEngine::ButtonWidget* m_send_button;
 
     irr::gui::STKModifiedSpriteBank* m_icon_bank;
 
@@ -92,7 +94,7 @@ public:
     virtual bool onEscapePressed() OVERRIDE;
 
     /** Used to insert each client chat message (reserved). */
-    void addMoreServerInfo(const core::stringw& info);
+    void addMoreServerInfo(core::stringw info);
     void setJoinedServer(std::shared_ptr<Server> server);
     void updatePlayers(const std::vector<std::tuple<uint32_t/*host id*/,
                        uint32_t/*online id*/, core::stringw/*player name*/,
