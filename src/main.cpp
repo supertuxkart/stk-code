@@ -1746,12 +1746,10 @@ int main(int argc, char *argv[] )
             // so we immediately start the main menu (unless it was requested
             // to always show the login screen). Otherwise show the login
             // screen first.
-            if(PlayerManager::getCurrentPlayer() && !
+            MainMenuScreen::getInstance()->push();
+
+            if (!PlayerManager::getCurrentPlayer() ||
                 UserConfigParams::m_always_show_login_screen)
-            {
-                MainMenuScreen::getInstance()->push();
-            }
-            else
             {
                 UserScreen::getInstance()->push();
                 // If there is no player, push the RegisterScreen on top of
