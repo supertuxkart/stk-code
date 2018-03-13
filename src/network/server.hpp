@@ -74,13 +74,16 @@ protected:
 
     RaceManager::Difficulty m_difficulty;
 
+    bool m_password_protected;
+
 public:
 
          /** Initialises the object from an XML node. */
          Server(const XMLNode &xml);
          Server(unsigned server_id, const irr::core::stringw &name,
                 int max_players, int current_players, unsigned difficulty,
-                unsigned server_mode, const TransportAddress &address);
+                unsigned server_mode, const TransportAddress &address,
+                bool password_protected);
     bool filterByWords(const irr::core::stringw words) const;
     // ------------------------------------------------------------------------
     /** Returns ip address and port of this server. */
@@ -114,7 +117,8 @@ public:
                                                        { return m_major_mode; }
     // ------------------------------------------------------------------------
     RaceManager::Difficulty getDifficulty() const      { return m_difficulty; }
-
+    // ------------------------------------------------------------------------
+    bool isPasswordProtected() const           { return m_password_protected; }
 
 };   // Server
 #endif // HEADER_SERVER_HPP

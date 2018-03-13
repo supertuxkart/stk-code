@@ -93,6 +93,9 @@ public:
      *  WAN code to be used when connection client and server). */
     static bool m_disable_lan;
 
+    /** Server version, will be advanced if there are protocol changes. */
+    static const uint8_t m_server_version;
+
     /** Singleton get, which creates this object if necessary. */
     static NetworkConfig *get()
     {

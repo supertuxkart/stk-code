@@ -425,6 +425,11 @@ void ServerLobby::registerServer()
     request->addParameter("game_mode",
         NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
         race_manager->getMajorMode()));
+    request->addParameter("password",
+        (unsigned)(!NetworkConfig::get()->getPassword().empty()));
+    request->addParameter("version",
+        (unsigned)NetworkConfig::m_server_version);
+
     Log::info("ServerLobby", "Public server addr %s", addr.toString().c_str());
 
     request->executeNow();

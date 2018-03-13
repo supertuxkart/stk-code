@@ -872,10 +872,9 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket)
             name = name.substr(0, 255);
 
         // Send the answer, consisting of server name, max players, 
-        // current players, and the client's ip address and port
-        // number (which solves the problem which network interface
-        // might be the right one if there is more than one).
+        // current players
         BareNetworkString s((int)name.size()+1+11);
+        s.addUInt8(NetworkConfig::m_server_version);
         s.encodeString(name);
         s.addUInt8(NetworkConfig::get()->getMaxPlayers());
         s.addUInt8(0);   // FIXME: current number of connected players
@@ -884,6 +883,7 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket)
         s.addUInt8((uint8_t)
             NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
             race_manager->getMajorMode()));
+        s.addUInt8(!NetworkConfig::get()->getPassword().empty());
         direct_socket->sendRawPacket(s, sender);
     }   // if message is server-requested
     else if (command == connection_cmd)

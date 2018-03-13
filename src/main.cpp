@@ -1045,10 +1045,11 @@ int handleCmdLine()
     if(CommandLine::has("--network-console"))
         STKHost::m_enable_console = true;
 
+    core::stringw server_password;
     if (CommandLine::has("--server-password", &s))
     {
-        core::stringw pw = StringUtils::xmlDecode(s);
-        NetworkConfig::get()->setPassword(StringUtils::wideToUtf8(pw));
+        server_password = StringUtils::xmlDecode(s);
+        NetworkConfig::get()->setPassword(StringUtils::wideToUtf8(server_password));
     }
 
     if (CommandLine::has("--server-id-file", &s))
@@ -1084,7 +1085,7 @@ int handleCmdLine()
             NetworkConfig::get()->getMaxPlayers(), 0,
             race_manager->getDifficulty(),
             NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
-            race_manager->getMajorMode()), ip);
+            race_manager->getMajorMode()), ip, !server_password.empty());
         NetworkingLobby::getInstance()->setJoinedServer(server);
         STKHost::create(server);
     }

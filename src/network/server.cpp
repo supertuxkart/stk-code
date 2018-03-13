@@ -56,6 +56,7 @@ Server::Server(const XMLNode& xml)
     xml.get("port", &port);
     m_address.setPort(port);
     xml.get("private_port", &m_private_port);
+    xml.get("password", &m_password_protected);
 } // Server(const XML&)
 
 // ----------------------------------------------------------------------------
@@ -69,10 +70,11 @@ Server::Server(const XMLNode& xml)
  *  \param difficulty The difficulty of server.
  *  \param server_mode The game modes of server (including minor and major).
  *  \param address IP and port of the server.
+ *  \param password_protected True if can only be joined with a password.
  */
 Server::Server(unsigned server_id, const core::stringw &name, int max_players,
                int current_players, unsigned difficulty, unsigned server_mode,
-               const TransportAddress &address)
+               const TransportAddress &address, bool password_protected)
 {
     m_name               = name;
     m_lower_case_name    = StringUtils::toLowerCase(StringUtils::wideToUtf8(name));
@@ -87,6 +89,7 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
     m_difficulty = (RaceManager::Difficulty)difficulty;
     m_minor_mode = NetworkConfig::get()->getLocalGameMode(server_mode).first;
     m_major_mode = NetworkConfig::get()->getLocalGameMode(server_mode).second;
+    m_password_protected = password_protected;
 }   // server(server_id, ...)
 
 // ----------------------------------------------------------------------------
