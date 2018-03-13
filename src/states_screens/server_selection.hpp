@@ -19,11 +19,20 @@
 #define HEADER_SERVER_SELECTION_HPP
 
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets.hpp"
+#include "guiengine/widgets/list_widget.hpp"
+
+#include <memory>
 
 namespace Online { class XMLRequest; }
 
-namespace GUIEngine { class Widget; }
+namespace GUIEngine
+{
+    class CheckBoxWidget;
+    class IconButtonWidget;
+    class LabelWidget;
+    class ListWidget;
+}
+class Server;
 
 /**
   * \brief ServerSelection
@@ -39,6 +48,9 @@ private:
     ServerSelection();
     ~ServerSelection();
 
+    std::vector<std::shared_ptr<Server> > m_servers;
+
+    GUIEngine::CheckBoxWidget* m_private_server;
     GUIEngine::IconButtonWidget* m_reload_widget;
     GUIEngine::LabelWidget* m_update_status;
     GUIEngine::ListWidget* m_server_list_widget;
@@ -50,6 +62,8 @@ private:
 
     /** Load the servers into the main list.*/
     void loadList(unsigned sort_case);
+
+    void copyFromServersManager();
 
     void refresh();
 

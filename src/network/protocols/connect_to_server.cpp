@@ -33,6 +33,8 @@
 #include "utils/time.hpp"
 #include "utils/log.hpp"
 
+#include <algorithm>
+
 // ----------------------------------------------------------------------------
 /** Specify server to connect to.
  *  \param server Server to connect to (if nullptr than we use quick play).
@@ -78,8 +80,7 @@ void ConnectToServer::asynchronousUpdate()
                     StkTime::sleep(1);
                 while (!ServersManager::get()->listUpdated())
                     StkTime::sleep(1);
-                auto servers = ServersManager::get()->getServers();
-                ServersManager::get()->cleanUpServers();
+                auto servers = std::move(ServersManager::get()->getServers());
 
                 // Remove password protected servers
                 servers.erase(std::remove_if(servers.begin(), servers.end(), []

@@ -18,6 +18,9 @@
 #include "states_screens/server_selection.hpp"
 
 #include "audio/sfx_manager.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "network/network_config.hpp"
 #include "network/server.hpp"
@@ -28,8 +31,8 @@
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 
-#include <iostream>
-#include <assert.h>
+#include <algorithm>
+#include <cassert>
 
 using namespace Online;
 
@@ -55,6 +58,7 @@ ServerSelection::~ServerSelection()
  */
 void ServerSelection::tearDown()
 {
+    m_servers.clear();
     ServersManager::get()->cleanUpServers();
     m_server_list_widget->clear();
 }   // tearDown
@@ -85,6 +89,9 @@ void ServerSelection::loadedFromFile()
     m_server_list_widget = getWidget<GUIEngine::ListWidget>("server_list");
     assert(m_server_list_widget != NULL);
     m_server_list_widget->setColumnListener(this);
+    m_private_server = getWidget<GUIEngine::CheckBoxWidget>("private_server");
+    assert(m_private_server != NULL);
+    m_private_server->setState(false);
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -118,7 +125,7 @@ void ServerSelection::init()
 void ServerSelection::loadList(unsigned sort_case)
 {
     m_server_list_widget->clear();
-    ServersManager::get()->sortServers([sort_case, this]
+    std::sort(m_servers.begin(), m_servers.end(), [sort_case, this]
         (const std::shared_ptr<Server> a,
          const std::shared_ptr<Server> b)->bool
         {
@@ -142,7 +149,7 @@ void ServerSelection::loadList(unsigned sort_case)
             assert(false);
             return false;
         });
-    for (auto server : ServersManager::get()->getServers())
+    for (auto server : m_servers)
     {
         core::stringw num_players;
         num_players.append(StringUtils::toWString(server->getCurrentPlayers()));
@@ -182,24 +189,25 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
     {
         StateManager::get()->escapePressed();
     }
-
     else if (name == "reload")
     {
         refresh();
     }
-
+    else if (name == "private_server")
+    {
+        copyFromServersManager();
+    }
     else if (name == m_server_list_widget->m_properties[GUIEngine::PROP_ID])
     {
         int selected_index = m_server_list_widget->getSelectionID();
         // This can happen e.g. when the list is empty and the user
         // clicks somewhere.
         if (selected_index < 0 || m_refreshing_server ||
-            selected_index >= (int)ServersManager::get()->getServers().size())
+            selected_index >= (int)m_servers.size())
         {
             return;
         }
-        new ServerInfoDialog(
-            ServersManager::get()->getServers()[selected_index]);
+        new ServerInfoDialog(m_servers[selected_index]);
     }   // click on server
 
 }   // eventCallback
@@ -209,14 +217,13 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
  *  if so, update the list of servers.
  */
 void ServerSelection::onUpdate(float dt)
-
 {
     // In case of auto-connect command line parameter, select the first server asap
     if (NetworkConfig::get()->isAutoConnect() &&
         m_refreshing_server == false          &&
-        !ServersManager::get()->getServers().empty())
+        !m_servers.empty())
     {
-        ServerInfoDialog *sid = new ServerInfoDialog(ServersManager::get()->getServers()[0]);
+        ServerInfoDialog *sid = new ServerInfoDialog(m_servers[0]);
         sid->requestJoin();
     }
 
@@ -228,8 +235,9 @@ void ServerSelection::onUpdate(float dt)
         if (!ServersManager::get()->getServers().empty())
         {
             int selection = m_server_list_widget->getSelectionID();
-            std::string selection_str = m_server_list_widget->getSelectionInternalName();
-            loadList(0);
+            std::string selection_str = m_server_list_widget
+                ->getSelectionInternalName();
+            copyFromServersManager();
             // restore previous selection
             if (selection != -1 && selection_str != "loading")
                 m_server_list_widget->setSelectionID(selection);
@@ -250,3 +258,17 @@ void ServerSelection::onUpdate(float dt)
     }
 
 }   // onUpdate
+
+// ----------------------------------------------------------------------------
+void ServerSelection::copyFromServersManager()
+{
+    m_servers = ServersManager::get()->getServers();
+    if (m_servers.empty())
+        return;
+    m_servers.erase(std::remove_if(m_servers.begin(), m_servers.end(),
+        [this](const std::shared_ptr<Server> a)->bool
+        {
+            return a->isPasswordProtected() != m_private_server->getState();
+        }), m_servers.end());
+    loadList(0);
+}   // copyFromServersManager
