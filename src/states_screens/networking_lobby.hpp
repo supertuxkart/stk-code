@@ -19,6 +19,7 @@
 #define HEADER_NETWORKING_LOBBY_HPP
 
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include <memory>
 #include <tuple>
 
@@ -46,7 +47,8 @@ namespace irr
   * \ingroup states_screens
   */
 class NetworkingLobby : public GUIEngine::Screen,
-                        public GUIEngine::ScreenSingleton<NetworkingLobby>
+                        public GUIEngine::ScreenSingleton<NetworkingLobby>,
+                        public GUIEngine::ITextBoxWidgetListener
 {
 private:
     friend class GUIEngine::ScreenSingleton<NetworkingLobby>;
@@ -69,6 +71,15 @@ private:
 
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     virtual void unloaded();
+
+    virtual void onTextUpdated() {}
+    virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE
+    {
+        sendChat(text);
+        return true;
+    }
+
+    void sendChat(irr::core::stringw text);
 
 public:
 

@@ -23,12 +23,12 @@
 #include "config/player_manager.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/CGUIEditBox.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
-#include "guiengine/widgets/text_box_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
@@ -136,6 +136,7 @@ void NetworkingLobby::init()
         input_manager->getDeviceManager()->getLatestUsedDevice();
     PlayerProfile* profile = PlayerManager::getCurrentPlayer();
     StateManager::get()->createActivePlayer(profile, device);
+    m_chat_box->addListener(this);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -241,6 +242,29 @@ void NetworkingLobby::onUpdate(float delta)
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
+void NetworkingLobby::sendChat(irr::core::stringw text)
+{
+    // Max 80 words
+    text = text.subString(0, 80).trim();
+    if (text.size() > 0)
+    {
+        NetworkString chat(PROTOCOL_LOBBY_ROOM);
+        chat.addUInt8(LobbyProtocol::LE_CHAT);
+
+        core::stringw name;
+        PlayerProfile* player = PlayerManager::getCurrentPlayer();
+        if (PlayerManager::getCurrentOnlineState() ==
+            PlayerProfile::OS_SIGNED_IN)
+            name = PlayerManager::getCurrentOnlineUserName();
+        else
+            name = player->getName();
+        chat.encodeString(name + L": " + text);
+
+        STKHost::get()->sendToServer(&chat, true);
+    }
+}   // sendChat
+
+// ----------------------------------------------------------------------------
 void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
                                     const int playerID)
 {
@@ -263,25 +287,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
     }   // click on a user
     else if (name == m_send_button->m_properties[PROP_ID])
     {
-        core::stringw text = m_chat_box->getText();
-        // Max 80 words
-        text = text.subString(0, 80).trim();
-        if (text.size() > 0)
-        {
-            NetworkString chat(PROTOCOL_LOBBY_ROOM);
-            chat.addUInt8(LobbyProtocol::LE_CHAT);
-
-            core::stringw name;
-            PlayerProfile* player = PlayerManager::getCurrentPlayer();
-            if (PlayerManager::getCurrentOnlineState() ==
-                PlayerProfile::OS_SIGNED_IN)
-                name = PlayerManager::getCurrentOnlineUserName();
-            else
-                name = player->getName();
-            chat.encodeString(name + L": " + text);
-
-            STKHost::get()->sendToServer(&chat, true);
-        }
+        sendChat(m_chat_box->getText());
         m_chat_box->setText("");
     }   // send chat message
 
