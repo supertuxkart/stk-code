@@ -78,7 +78,7 @@ private:
     AbstractKart   *m_kart;
 
     /** Time left till attachment expires. */
-    float           m_time_left;
+    int             m_ticks_left;
 
     /** For parachutes only. */
     float           m_initial_speed;
@@ -114,7 +114,7 @@ public:
     void  hitBanana(Item *item, int new_attachment=-1);
     void  update (float dt);
     void  handleCollisionWithKart(AbstractKart *other);
-    void  set (AttachmentType type, float time,
+    void  set (AttachmentType type, int ticks,
                AbstractKart *previous_kart=NULL);
     virtual void rewind(BareNetworkString *buffer);
     void rewindTo(BareNetworkString *buffer);
@@ -122,16 +122,17 @@ public:
 
     // ------------------------------------------------------------------------
     /** Sets the type of the attachment, but keeps the old time left value. */
-    void  set (AttachmentType type) { set(type, m_time_left); }
+    void  set (AttachmentType type) { set(type, m_ticks_left); }
     // ------------------------------------------------------------------------
     /** Returns the type of this attachment. */
     AttachmentType getType() const { return m_type; }
     // ------------------------------------------------------------------------
-    /** Returns how much time is left before this attachment is removed. */
-    float getTimeLeft() const { return m_time_left;      }
+    /** Returns how much time (in ticks) is left before this attachment is 
+     *  removed. */
+    int getTicksLeft() const { return m_ticks_left;      }
     // ------------------------------------------------------------------------
     /** Sets how long this attachment will remain attached. */
-    void  setTimeLeft(float t){ m_time_left = t;         }
+    void  setTicksLeft(int t){ m_ticks_left = t;         }
     // ------------------------------------------------------------------------
     /** Returns the previous owner of this attachment, used in bombs that
      *  are being passed between karts. */

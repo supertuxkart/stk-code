@@ -75,10 +75,11 @@ RewindManager::~RewindManager()
 void RewindManager::reset()
 {
     m_is_rewinding         = false;
-    m_not_rewound_time     = 0;
+    m_not_rewound_ticks    = 0;
     m_overall_state_size   = 0;
-    m_state_frequency      = 1.0f / stk_config->m_network_state_frequeny;
-    m_last_saved_state     = -9999.9f;  // forces initial state save
+    m_last_saved_state     = -1;  // forces initial state save
+    m_state_frequency      =
+        stk_config->getPhysicsFPS() / stk_config->m_network_state_frequeny;
 
     if(!m_enable_rewind_manager) return;
 
@@ -102,7 +103,7 @@ void RewindManager::reset()
 /** Adds a new TimeStep entry. Only exception is time=0 (which happens during
  *  all of 'ready, set, go') - for which only one entry is created.
  */
-void RewindManager::addNextTimeStep(float time, float dt)
+void RewindManager::addNextTimeStep(int time, float dt)
 {
     // Add a timestep entry each timestep, except at 'ready, set, go'
     // at which time is 0 - we add only one entry there
@@ -122,7 +123,7 @@ void RewindManager::addNextTimeStep(float time, float dt)
  */
 void RewindManager::addEvent(EventRewinder *event_rewinder,
                              BareNetworkString *buffer, bool confirmed,
-                             float time                                   )
+                             int ticks                                   )
 {
     if(m_is_rewinding) 
     {
@@ -131,9 +132,9 @@ void RewindManager::addEvent(EventRewinder *event_rewinder,
         return;
     }
 
-    if (time < 0)
-        time = World::getWorld()->getTime();
-    m_rewind_queue.addLocalEvent(event_rewinder, buffer, confirmed, time);
+    if (ticks < 0)
+        ticks = World::getWorld()->getTimeTicks();
+    m_rewind_queue.addLocalEvent(event_rewinder, buffer, confirmed, ticks);
 }   // addEvent
 
 // ----------------------------------------------------------------------------
@@ -145,9 +146,9 @@ void RewindManager::addEvent(EventRewinder *event_rewinder,
  *  \param buffer Pointer to the event data.
  */
 void RewindManager::addNetworkEvent(EventRewinder *event_rewinder,
-                                    BareNetworkString *buffer, float time)
+                                    BareNetworkString *buffer, int ticks)
 {
-    m_rewind_queue.addNetworkEvent(event_rewinder, buffer, time);
+    m_rewind_queue.addNetworkEvent(event_rewinder, buffer, ticks);
 }   // addNetworkEvent
 
 // ----------------------------------------------------------------------------
@@ -159,13 +160,13 @@ void RewindManager::addNetworkEvent(EventRewinder *event_rewinder,
  *  \param buffer Pointer to the event data.
  */
 void RewindManager::addNetworkState(int rewinder_index, BareNetworkString *buffer,
-                                    float time)
+                                    int ticks)
 {
     assert(NetworkConfig::get()->isClient());
     // On a client dt from a state is never used, it maintains
     // its own dt information (using TimeEvents).
     m_rewind_queue.addNetworkState(m_all_rewinder[rewinder_index], buffer,
-                                   time, -99);
+                                   ticks, -99);
 }   // addNetworkState
 
 // ----------------------------------------------------------------------------
@@ -180,11 +181,13 @@ void RewindManager::update(float dt)
         m_is_rewinding              )  return;
 
     float time = World::getWorld()->getTime();
-    m_not_rewound_time = time;
+    int ticks = World::getWorld()->getTimeTicks();
+
+    m_not_rewound_ticks = ticks;
 
     // Clients don't save state, so they just exit.
     if ( NetworkConfig::get()->isClient() || 
-         time - m_last_saved_state < m_state_frequency  )
+         ticks - m_last_saved_state < m_state_frequency  )
     {
         return;
     }
@@ -201,7 +204,7 @@ void RewindManager::update(float dt)
             m_overall_state_size += buffer->size();
             // Add to the previously created container
             m_rewind_queue.addLocalState(*rewinder, buffer, /*confirmed*/true,
-                                         World::getWorld()->getTime());
+                                         World::getWorld()->getTimeTicks());
             GameProtocol::lock()->addState(buffer);
         }   // size >= 0
         else
@@ -211,7 +214,7 @@ void RewindManager::update(float dt)
     PROFILER_PUSH_CPU_MARKER("RewindManager - send state", 0x20, 0x7F, 0x40);
     GameProtocol::lock()->sendState();
     PROFILER_POP_CPU_MARKER();
-    m_last_saved_state = time;
+    m_last_saved_state = ticks;
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -223,23 +226,23 @@ void RewindManager::update(float dt)
 void RewindManager::playEventsTill(float time, float *dt)
 {    
     bool needs_rewind;
-    float rewind_time;
+    int rewind_ticks;
 
     // Merge in all network events that have happened since the last
     // merge and that have happened before the current time (which will
     // be getTime()+dt - world time has not been updated yet).
-    m_rewind_queue.mergeNetworkData(World::getWorld()->getTime(), *dt,
-                                    &needs_rewind, &rewind_time);
+    m_rewind_queue.mergeNetworkData(World::getWorld()->getTimeTicks(), *dt,
+                                    &needs_rewind, &rewind_ticks);
 
     if (needs_rewind)
     {
         Log::setPrefix("Rewind");
         PROFILER_PUSH_CPU_MARKER("Rewind", 128, 128, 128);
-        rewindTo(rewind_time);
+        rewindTo(rewind_ticks);
         PROFILER_POP_CPU_MARKER();
         Log::setPrefix("");
         TimeStepInfo *tsi = m_rewind_queue.getCurrent();
-        World::getWorld()->setTime(tsi->getTime());
+        World::getWorld()->setTicks(tsi->getTicks());
         Physics::getInstance()->getPhysicsWorld()->resetLocalTime();
     }
 
@@ -262,8 +265,8 @@ void RewindManager::playEventsTill(float time, float *dt)
     if (tsi->hasConfirmedState() && NetworkConfig::get()->isClient())
     {
         Log::warn("RewindManager",
-            "Client has received state in the future: at %f state %f",
-            World::getWorld()->getTime(), tsi->getTime());
+            "Client has received state in the future: at %d state %d",
+            World::getWorld()->getTimeTicks(), tsi->getTicks());
     }
     m_is_rewinding = false;
 }   // playEventsTill
@@ -272,9 +275,9 @@ void RewindManager::playEventsTill(float time, float *dt)
 /** Rewinds to the specified time, then goes forward till the current
  *  World::getTime() is reached again: it will replay everything before
  *  World::getTime(), but not the events at World::getTime() (or later)/
- *  \param rewind_time Time to rewind to.
+ *  \param rewind_ticks Time to rewind to.
  */
-void RewindManager::rewindTo(float rewind_time)
+void RewindManager::rewindTo(int rewind_ticks)
 {
     assert(!m_is_rewinding);
     bool is_history = history->replayHistory();
@@ -293,7 +296,7 @@ void RewindManager::rewindTo(float rewind_time)
     // Then undo the rewind infos going backwards in time
     // --------------------------------------------------
     m_is_rewinding = true;
-    m_rewind_queue.undoUntil(rewind_time);
+    m_rewind_queue.undoUntil(rewind_ticks);
 
     // Rewind the required state(s)
     // ----------------------------
@@ -304,11 +307,11 @@ void RewindManager::rewindTo(float rewind_time)
     TimeStepInfo *current = m_rewind_queue.getCurrent();
 
     // Store the time to which we have to replay to,
-    // which can be earlier than rewind_time
-    float exact_rewind_time = current->getTime();
+    // which can be earlier than rewind_ticks
+    int exact_rewind_ticks = current->getTicks();
 
     // Now start the rewind with the full state:
-    world->setTime(exact_rewind_time);
+    world->setTicks(exact_rewind_ticks);
     float local_physics_time = current->getLocalPhysicsTime();
     Physics::getInstance()->getPhysicsWorld()->setLocalTime(local_physics_time);
 
@@ -346,8 +349,8 @@ void RewindManager::rewindTo(float rewind_time)
 
         ++m_rewind_queue;
         current = m_rewind_queue.getCurrent();
-        world->setTime(current->getTime());
-    }   // while (world->getTime() < current_time)
+        world->setTicks(current->getTicks());
+    }   // while (world->getTicks() < current_ticks)
 
     // Now compute the errors which need to be visually smoothed
     for (rewinder = m_all_rewinder.begin();

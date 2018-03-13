@@ -273,8 +273,8 @@ void MainLoop::run()
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
 
         left_over_time += getLimitedDt();
-        int num_steps   = int(left_over_time * stk_config->m_physics_fps);
-        float dt        = 1.0f / stk_config->m_physics_fps;
+        int num_steps   = stk_config->time2Ticks(left_over_time);
+        float dt = stk_config->ticks2Time(1);
         left_over_time -= num_steps * dt ;
 
         if (STKHost::existHost() &&
@@ -309,7 +309,7 @@ void MainLoop::run()
         if (World::getWorld() && RewindManager::get()->isEnabled())
         {
             RewindManager::get()
-                ->addNextTimeStep(World::getWorld()->getTime(), dt);
+                ->addNextTimeStep(World::getWorld()->getTimeTicks(), dt);
         }
 
         if (!m_abort)
@@ -349,7 +349,7 @@ void MainLoop::run()
             if (World::getWorld() && RewindManager::get()->isEnabled() && i>0)
             {
                 RewindManager::get()
-                    ->addNextTimeStep(World::getWorld()->getTime(), dt);
+                    ->addNextTimeStep(World::getWorld()->getTimeTicks(), dt);
             }
 
             // Enable last substep in last iteration

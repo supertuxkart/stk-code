@@ -81,7 +81,7 @@ public:
     void startNewState();
     void addState(BareNetworkString *buffer);
     void sendState();
-    void adjustTimeForClient(STKPeer *peer, float t);
+    void adjustTimeForClient(STKPeer *peer, int ticks);
 
     virtual void undo(BareNetworkString *buffer) OVERRIDE;
     virtual void rewind(BareNetworkString *buffer) OVERRIDE;

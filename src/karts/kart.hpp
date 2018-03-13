@@ -223,7 +223,7 @@ protected:
     SFXBuffer    *m_crash_sounds[CRASH_SOUND_COUNT];
     SFXBuffer    *m_goo_sound;
     SFXBuffer    *m_boing_sound;
-    float         m_time_last_crash;
+    int          m_ticks_last_crash;
     RaceManager::KartType m_type;
 
     /** To prevent using nitro in too short bursts */

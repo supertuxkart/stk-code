@@ -773,13 +773,13 @@ float KartProperties::getParachuteFriction() const
 }  // getParachuteFriction
 
 // ----------------------------------------------------------------------------
-float KartProperties::getParachuteDuration() const
+int KartProperties::getParachuteDuration() const
 {
     return m_cached_characteristic->getParachuteDuration();
 }  // getParachuteDuration
 
 // ----------------------------------------------------------------------------
-float KartProperties::getParachuteDurationOther() const
+int KartProperties::getParachuteDurationOther() const
 {
     return m_cached_characteristic->getParachuteDurationOther();
 }  // getParachuteDurationOther

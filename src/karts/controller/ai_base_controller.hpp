@@ -36,7 +36,7 @@ private:
     /** Stores the last N times when a collision happened. This is used
     *  to detect when the AI is stuck, i.e. N collisions happened in
     *  a certain period of time. */
-    std::vector<float> m_collision_times;
+    std::vector<int> m_collision_ticks;
 
     /** A flag that is set during the physics processing to indicate that
     *  this kart is stuck and needs to be rescued. */

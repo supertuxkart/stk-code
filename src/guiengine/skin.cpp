@@ -921,7 +921,7 @@ SColorf GetPlayerColor(int player_id)
     SColorf color_rgb = { 0,0,0,1 };
     
     
-    col.Saturation = col.Saturation * (1.0F / (floor(player_id / 4) + 1) );
+    col.Saturation = col.Saturation * (1.0f / (floorf(float(player_id / 4)) + 1) );
     col.toRGB(color_rgb);
     return color_rgb;
 }
@@ -1161,9 +1161,9 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
                 SColorf color_rgb = GetPlayerColor(i);
                 
-                parentRibbonWidget->m_skin_r = color_rgb.r * 255.0F;
-                parentRibbonWidget->m_skin_g = color_rgb.g * 255.0F;
-                parentRibbonWidget->m_skin_b = color_rgb.b * 255.0F;
+                parentRibbonWidget->m_skin_r = short(color_rgb.r * 255.0f);
+                parentRibbonWidget->m_skin_g = short(color_rgb.g * 255.0f);
+                parentRibbonWidget->m_skin_b = short(color_rgb.b * 255.0f);
 
                 if (nPlayersOnThisItem > 0)
                 {
@@ -1270,9 +1270,9 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     {
         params=&SkinConfig::m_render_params["spinner::neutral"];
     }
-    widget->m_skin_r = color_rgb.r * 255.0f;
-    widget->m_skin_g = color_rgb.g * 255.0f;
-    widget->m_skin_b = color_rgb.b * 255.0f;
+    widget->m_skin_r = short(color_rgb.r * 255.0f);
+    widget->m_skin_g = short(color_rgb.g * 255.0f);
+    widget->m_skin_b = short(color_rgb.b * 255.0f);
 
     for (int i = 1; i < MAX_PLAYER_COUNT + 1; i++) 
     {

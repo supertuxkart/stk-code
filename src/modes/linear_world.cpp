@@ -38,6 +38,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <climits>
 #include <iostream>
 
 //-----------------------------------------------------------------------------
@@ -49,7 +50,7 @@ LinearWorld::LinearWorld() : WorldWithRank()
     m_last_lap_sfx         = SFXManager::get()->createSoundSource("last_lap_fanfare");
     m_last_lap_sfx_played  = false;
     m_last_lap_sfx_playing = false;
-    m_fastest_lap          = 9999999.9f;
+    m_fastest_lap_ticks    = INT_MAX;
 }   // LinearWorld
 
 // ----------------------------------------------------------------------------
@@ -87,8 +88,9 @@ LinearWorld::~LinearWorld()
 void LinearWorld::reset()
 {
     WorldWithRank::reset();
-    m_last_lap_sfx_played = false;
+    m_last_lap_sfx_played  = false;
     m_last_lap_sfx_playing = false;
+    m_fastest_lap_ticks    = INT_MAX;
 
     const unsigned int kart_amount = (unsigned int) m_karts.size();
     for(unsigned int i=0; i<kart_amount; i++)
@@ -274,7 +276,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     if(kart_info.m_race_lap+1 <= lap_count)
     {
         assert(kart->getWorldKartId()==kart_index);
-        kart_info.m_time_at_last_lap=getTime();
+        kart_info.m_ticks_at_last_lap=getTimeTicks();
         kart_info.m_race_lap++;
         m_kart_info[kart_index].m_overall_distance =
               m_kart_info[kart_index].m_race_lap 
@@ -345,23 +347,23 @@ void LinearWorld::newLap(unsigned int kart_index)
     {
         kart->finishedRace(getTime());
     }
-    float time_per_lap;
+    int ticks_per_lap;
     if (kart_info.m_race_lap == 1) // just completed first lap
     {
-        time_per_lap=getTime();
+        ticks_per_lap = getTimeTicks();
     }
     else //completing subsequent laps
     {
-        time_per_lap=getTime() - kart_info.m_lap_start_time;
+        ticks_per_lap = getTimeTicks() - kart_info.m_lap_start_ticks;
     }
 
     // if new fastest lap
-    if(time_per_lap < m_fastest_lap && raceHasLaps() &&
-        kart_info.m_race_lap>0)
+    if(ticks_per_lap < m_fastest_lap_ticks && raceHasLaps() &&
+        kart_info.m_race_lap>0                                )
     {
-        m_fastest_lap = time_per_lap;
+        m_fastest_lap_ticks = ticks_per_lap;
 
-        std::string s = StringUtils::timeToString(time_per_lap);
+        std::string s = StringUtils::ticksTimeToString(ticks_per_lap);
 
         // Store the temporary string because clang would mess this up
         // (remove the stringw before the wchar_t* is used).
@@ -379,7 +381,7 @@ void LinearWorld::newLap(unsigned int kart_index)
 
     } // end if new fastest lap
 
-    kart_info.m_lap_start_time = getTime();
+    kart_info.m_lap_start_ticks = getTimeTicks();
     kart->getController()->newLap(kart_info.m_race_lap);
 }   // newLap
 
@@ -422,18 +424,18 @@ float LinearWorld::getEstimatedFinishTime(const int kart_id) const
 }   // getEstimatedFinishTime
 
 //-----------------------------------------------------------------------------
-float LinearWorld::getTimeAtLapForKart(const int kart_id) const
+int LinearWorld::getTicksAtLapForKart(const int kart_id) const
 {
     assert(kart_id < (int)m_kart_info.size());
-    return m_kart_info[kart_id].m_time_at_last_lap;
-}   // getTimeAtLapForKart
+    return m_kart_info[kart_id].m_ticks_at_last_lap;
+}   // getTicksAtLapForKart
 
 //-----------------------------------------------------------------------------
 void LinearWorld::getKartsDisplayInfo(
                            std::vector<RaceGUIBase::KartIconDisplayInfo> *info)
 {
-    int   laps_of_leader       = -1;
-    float time_of_leader       = -1;
+    int laps_of_leader  = -1;
+    int ticks_of_leader = INT_MAX;
     // Find the best time for the lap. We can't simply use
     // the time of the kart at position 1, since the kart
     // might have been overtaken by now
@@ -448,7 +450,7 @@ void LinearWorld::getKartsDisplayInfo(
         rank_info.lap = -1;
 
         if(kart->isEliminated()) continue;
-        const float lap_time = getTimeAtLapForKart(kart->getWorldKartId());
+        const int lap_ticks = getTicksAtLapForKart(kart->getWorldKartId());
         const int current_lap  = getLapForKart( kart->getWorldKartId() );
         rank_info.lap = current_lap;
 
@@ -457,11 +459,11 @@ void LinearWorld::getKartsDisplayInfo(
             // more laps than current leader --> new leader and
             // new time computation
             laps_of_leader = current_lap;
-            time_of_leader = lap_time;
+            ticks_of_leader = lap_ticks;
         } else if(current_lap == laps_of_leader)
         {
             // Same number of laps as leader: use fastest time
-            time_of_leader=std::min(time_of_leader,lap_time);
+            ticks_of_leader=std::min(ticks_of_leader,lap_ticks);
         }
     }
 
@@ -476,24 +478,24 @@ void LinearWorld::getKartsDisplayInfo(
 
         // Don't compare times when crossing the start line first
         if(laps_of_leader>0                                                &&
-           (getTime() - getTimeAtLapForKart(kart->getWorldKartId())<5.0f ||
+           (getTimeTicks() - getTicksAtLapForKart(kart->getWorldKartId())<5||
             rank_info.lap != laps_of_leader)                               &&
             raceHasLaps())
         {  // Display for 5 seconds
             std::string str;
             if(position == 1)
             {
-                str = " " + StringUtils::timeToString(
-                                 getTimeAtLapForKart(kart->getWorldKartId()) );
+                str = " " + StringUtils::ticksTimeToString(
+                                 getTicksAtLapForKart(kart->getWorldKartId()) );
             }
             else
             {
-                float timeBehind;
-                timeBehind = (kart_info.m_race_lap==laps_of_leader
-                                ? getTimeAtLapForKart(kart->getWorldKartId())
-                                : getTime())
-                           - time_of_leader;
-                str = "+" + StringUtils::timeToString(timeBehind);
+                int ticks_behind;
+                ticks_behind = (kart_info.m_race_lap==laps_of_leader
+                                ? getTicksAtLapForKart(kart->getWorldKartId())
+                                : getTimeTicks())
+                           - ticks_of_leader;
+                str = "+" + StringUtils::ticksTimeToString(ticks_behind);
             }
             rank_info.m_text = irr::core::stringw(str.c_str());
         }

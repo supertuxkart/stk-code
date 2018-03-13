@@ -357,7 +357,7 @@ void Kart::reset()
     m_has_started          = false;
     m_bounce_back_time     = 0.0f;
     m_brake_time           = 0.0f;
-    m_time_last_crash      = 0.0f;
+    m_ticks_last_crash     = 0;
     m_speed                = 0.0f;
     m_smoothed_speed       = 0.0f;
     m_current_lean         = 0.0f;
@@ -1051,7 +1051,7 @@ void Kart::collectedItem(Item *item, int add_info)
  */
 float Kart::getStartupBoost() const
 {
-    float t = World::getWorld()->getTimeSinceStart();
+    float t = stk_config->ticks2Time(World::getWorld()->getTicksSinceStart());
     std::vector<float> startup_times = m_kart_properties->getStartupTime();
     for (unsigned int i = 0; i < startup_times.size(); i++)
     {
@@ -1110,16 +1110,16 @@ bool Kart::isNearGround() const
 }   // isNearGround
 
 // ------------------------------------------------------------------------
-/**
- * Enables a kart shield protection for a certain amount of time.
+/** Enables a kart shield protection for a certain amount of time.
  */
 void Kart::setShieldTime(float t)
 {
     if(isShielded())
     {
-        getAttachment()->setTimeLeft(t);
+        getAttachment()->setTicksLeft(stk_config->time2Ticks(t));
     }
-}
+}   // setShieldTime
+
 // ------------------------------------------------------------------------
 /**
  * Returns true if the kart is protected by a shield.
@@ -1144,8 +1144,8 @@ bool Kart::isShielded() const
  */
 float Kart::getShieldTime() const
 {
-    if(isShielded())
-        return getAttachment()->getTimeLeft();
+    if (isShielded())
+        return stk_config->ticks2Time(getAttachment()->getTicksLeft());
     else
         return 0.0f;
 }   // getShieldTime
@@ -1159,7 +1159,7 @@ void Kart::decreaseShieldTime()
 {
     if (isShielded())
     {
-        getAttachment()->setTimeLeft(0.0f);
+        getAttachment()->setTicksLeft(0);
     }
 }   // decreaseShieldTime
 
@@ -2193,9 +2193,10 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
  */
 void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 {
-    if(World::getWorld()->getTimeSinceStart()-m_time_last_crash < 0.5f) return;
+    int ticks_since_start = World::getWorld()->getTicksSinceStart();
+    if(ticks_since_start-m_ticks_last_crash < 0.5f) return;
 
-    m_time_last_crash = World::getWorld()->getTimeSinceStart();
+    m_ticks_last_crash = ticks_since_start;
     // After a collision disable the engine for a short time so that karts
     // can 'bounce back' a bit (without this the engine force will prevent
     // karts from bouncing back, they will instead stuck towards the obstable).

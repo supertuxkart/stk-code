@@ -72,10 +72,12 @@ void Moveable::addError(const Vec3& pos_error,
                         const btQuaternion &rot_error)
 {
     m_positional_error += pos_error;
+#ifdef DEBUG_VISUAL_ERROR
     Log::info("VisualError", "time %f addError %f %f %f size %f",
         World::getWorld()->getTime(),
         m_positional_error.getX(), m_positional_error.getY(), m_positional_error.getZ(),
         m_positional_error.length());
+#endif
     m_rotational_error *= rot_error;
 }   // addError
 
@@ -96,10 +98,12 @@ void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
     {
         float error = m_positional_error.length();
         m_positional_error *= stk_config->m_positional_smoothing.get(error);
+#ifdef DEBUG_VISUAL_ERROR
         Log::info("VisualError", "time %f reduceError %f %f %f size %f",
             World::getWorld()->getTime(),
             m_positional_error.getX(), m_positional_error.getY(), m_positional_error.getZ(),
             m_positional_error.length());
+#endif
     }
 #ifndef SERVER_ONLY
     Vec3 xyz=getXYZ()+offset_xyz - m_positional_error;

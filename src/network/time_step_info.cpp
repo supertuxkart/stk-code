@@ -25,9 +25,9 @@
  *  \param time Time for this TimeStepInfo object.
  *  \param dt Time step size.
  */
-TimeStepInfo::TimeStepInfo(float time, float dt)
+TimeStepInfo::TimeStepInfo(int ticks, float dt)
 {
-    m_time = time;
+    m_ticks = ticks;
     m_dt = dt;
     // In case of unit testing physics does not exist
     if (Physics::getInstance())

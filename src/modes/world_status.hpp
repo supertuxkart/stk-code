@@ -91,6 +91,9 @@ protected:
     /** Elasped/remaining time in seconds. */
     double          m_time;
 
+    /** Time in number of ticks (in terms of physics time steps). */
+    int             m_time_ticks;
+
     /** If the start race should be played, disabled in cutscenes. */
     bool            m_play_racestart_sounds;
 
@@ -123,15 +126,17 @@ private:
     /**
       * Remember previous phase e.g. on pause
       */
-    Phase          m_previous_phase;
+    Phase           m_previous_phase;
 
     /**
      * Counts time during the initial 'ready/set/go' phase, or at the end of a race.
      * This timer basically kicks in when we need to calculate non-race time like labels.
      */
-    float           m_auxiliary_timer;
+    int             m_auxiliary_ticks;
 
-    float           m_count_up_timer;
+    /** Special counter to count ticks since start (in terms of physics
+     *  timestep size). */
+    int             m_count_up_ticks;
 
     bool            m_engines_started;
     /** In networked game a client must wait for the server to start 'ready
@@ -155,6 +160,7 @@ public:
     virtual void enterRaceOverState();
     virtual void terminateRace();
     void         setTime(const float time);
+    void         setTicks(int ticks);
     float        adjustDT(float dt);
 
     // ------------------------------------------------------------------------
@@ -190,7 +196,12 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the current race time. */
-    float   getTime() const      { return (float)m_time; }
+    float   getTime() const { return (float)m_time; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the current race time in time ticks (i.e. based on the physics
+     *  time step size). */
+    int getTimeTicks() const { return m_time_ticks; }
 
     // ------------------------------------------------------------------------
     /** Will be called to notify your derived class that the clock,
@@ -202,8 +213,8 @@ public:
     virtual void onGo() {};
 
     // ------------------------------------------------------------------------
-    /** Get the time since start regardless of which way the clock counts */
-    float getTimeSinceStart() const { return m_count_up_timer; }
+    /** Get the ticks since start regardless of which way the clock counts */
+    int getTicksSinceStart() const { return m_count_up_ticks; }
     // ------------------------------------------------------------------------
     void setReadyToRace() { m_server_is_ready = true; }
     // ------------------------------------------------------------------------

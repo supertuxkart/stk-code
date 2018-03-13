@@ -154,7 +154,7 @@ void Physics::update(float dt)
     // Since the world update (which calls physics update) is called at the
     // fixed frequency necessary for the physics update, we need to do exactly
     // one physic step only.
-    m_dynamics_world->stepSimulation(dt, 1, 1.0f / stk_config->m_physics_fps);
+    m_dynamics_world->stepSimulation(dt, 1, stk_config->ticks2Time(1));
 
     // Now handle the actual collision. Note: flyables can not be removed
     // inside of this loop, since the same flyables might hit more than one
