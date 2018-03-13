@@ -164,7 +164,11 @@ public:
     void setIsWAN() { m_network_type = NETWORK_WAN; }
     // ------------------------------------------------------------------------
     /** Set that this is not a networked game. */
-    void unsetNetworking() { m_network_type = NETWORK_NONE; }
+    void unsetNetworking()
+    {
+        m_network_type = NETWORK_NONE;
+        m_password = "";
+    }
     // ------------------------------------------------------------------------
     /** Sets the maximum number of players for this server. */
     void setMaxPlayers(int n) { m_max_players = n; }

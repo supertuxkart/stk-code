@@ -78,17 +78,26 @@ void ConnectToServer::asynchronousUpdate()
                     StkTime::sleep(1);
                 while (!ServersManager::get()->listUpdated())
                     StkTime::sleep(1);
-                if (!ServersManager::get()->getServers().empty())
+                auto servers = ServersManager::get()->getServers();
+                ServersManager::get()->cleanUpServers();
+
+                // Remove password protected servers
+                servers.erase(std::remove_if(servers.begin(), servers.end(), []
+                    (const std::shared_ptr<Server> a)->bool
+                    {
+                        return a->isPasswordProtected();
+                    }), servers.end());
+
+                if (!servers.empty())
                 {
                     // For quick play we choose the server with the least player
-                    ServersManager::get()->sortServers([]
+                    std::sort(servers.begin(), servers.end(), []
                         (const std::shared_ptr<Server> a,
                         const std::shared_ptr<Server> b)->bool
                         {
                             return a->getCurrentPlayers() < b->getCurrentPlayers();
                         });
-                    m_server = ServersManager::get()->getServers()[0];
-                    ServersManager::get()->cleanUpServers();
+                    m_server = servers[0];
                 }
                 else
                 {
@@ -99,6 +108,7 @@ void ConnectToServer::asynchronousUpdate()
                     m_state = EXITING;
                     return;
                 }
+                servers.clear();
             }
             STKHost::get()->setPublicAddress();
             // Set to DONE will stop STKHost is not connected

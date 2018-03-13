@@ -1045,11 +1045,11 @@ int handleCmdLine()
     if(CommandLine::has("--network-console"))
         STKHost::m_enable_console = true;
 
-    core::stringw server_password;
+    std::string server_password;
     if (CommandLine::has("--server-password", &s))
     {
-        server_password = StringUtils::xmlDecode(s);
-        NetworkConfig::get()->setPassword(StringUtils::wideToUtf8(server_password));
+        server_password = s;
+        NetworkConfig::get()->setPassword(server_password);
     }
 
     if (CommandLine::has("--server-id-file", &s))

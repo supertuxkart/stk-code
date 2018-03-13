@@ -164,18 +164,31 @@ void CreateServerScreen::createServer()
 
     if (name.size() < 4 || name.size() > 30)
     {
+        //I18N: In the create server screen
         m_info_widget->setText(
             _("Name has to be between 4 and 30 characters long!"), false);
         SFXManager::get()->quickSound("anvil");
         return;
     }
-    assert(max_players > 1 &&
-        max_players <= UserConfigParams::m_server_max_players.getDefaultValue());
+    assert(max_players > 1 && max_players <=
+        UserConfigParams::m_server_max_players.getDefaultValue());
 
     UserConfigParams::m_server_max_players = max_players;
-    core::stringw password_w = getWidget<TextBoxWidget>("password")->getText();
-    std::string password = StringUtils::xmlEncode(password_w);
-    NetworkConfig::get()->setPassword(StringUtils::wideToUtf8(password_w));
+    std::string password = StringUtils::wideToUtf8(getWidget<TextBoxWidget>
+        ("password")->getText());
+    if ((!password.empty() != 0 &&
+        password.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOP"
+        "QRSTUVWXYZ01234567890_") != std::string::npos) ||
+        password.size() > 255)
+    {
+        //I18N: In the create server screen
+        m_info_widget->setText(
+            _("Incorrect characters in password!"), false);
+        SFXManager::get()->quickSound("anvil");
+        return;
+    }
+
+    NetworkConfig::get()->setPassword(password);
     if (!password.empty())
         password = std::string(" --server-password=") + password;
 
@@ -186,7 +199,7 @@ void CreateServerScreen::createServer()
         max_players, /*current_player*/0, (RaceManager::Difficulty)
         difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER),
         NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
-        race_manager->getMajorMode()), server_address, !password_w.empty());
+        race_manager->getMajorMode()), server_address, !password.empty());
 
 #undef USE_GRAPHICS_SERVER
 #ifdef USE_GRAPHICS_SERVER
