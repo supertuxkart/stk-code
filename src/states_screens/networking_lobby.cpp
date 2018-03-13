@@ -60,7 +60,6 @@ DEFINE_SCREEN_SINGLETON( NetworkingLobby );
 // ----------------------------------------------------------------------------
 NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
 {
-    m_server_info_height = GUIEngine::getFont()->getDimension(L"X").Height;
     m_player_list = NULL;
 }   // NetworkingLobby
 
@@ -128,6 +127,7 @@ void NetworkingLobby::beforeAddingWidget()
 void NetworkingLobby::init()
 {
     Screen::init();
+    m_server_info_height = GUIEngine::getFont()->getDimension(L"X").Height;
     m_start_button->setVisible(false);
 
     // For now create the active player and bind it to the right
@@ -180,13 +180,7 @@ void NetworkingLobby::setJoinedServer(std::shared_ptr<Server> server)
 // ----------------------------------------------------------------------------
 void NetworkingLobby::addMoreServerInfo(core::stringw info)
 {
-    assert(m_text_bubble->getDimension().Height > 10 &&
-        m_text_bubble->getDimension().Width > 10);
-    while ((int)m_server_info.size() * m_server_info_height >
-        m_text_bubble->getDimension().Height - 10)
-    {
-        m_server_info.erase(m_server_info.begin());
-    }
+    assert(m_text_bubble->getDimension().Width > 10);
     while ((int)GUIEngine::getFont()->getDimension(info.c_str()).Width >
         m_text_bubble->getDimension().Width - 10)
     {
@@ -200,6 +194,11 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
     if (info.size() > 0)
     {
         m_server_info.push_back(info);
+    }
+    while ((int)m_server_info.size() * m_server_info_height >
+        m_text_bubble->getDimension().Height)
+    {
+        m_server_info.erase(m_server_info.begin());
     }
 }   // addMoreServerInfo
 
@@ -244,8 +243,7 @@ void NetworkingLobby::onUpdate(float delta)
 // ----------------------------------------------------------------------------
 void NetworkingLobby::sendChat(irr::core::stringw text)
 {
-    // Max 80 words
-    text = text.subString(0, 80).trim();
+    text = text.trim().removeChars(L"\n\r");
     if (text.size() > 0)
     {
         NetworkString chat(PROTOCOL_LOBBY_ROOM);
@@ -258,7 +256,8 @@ void NetworkingLobby::sendChat(irr::core::stringw text)
             name = PlayerManager::getCurrentOnlineUserName();
         else
             name = player->getName();
-        chat.encodeString(name + L": " + text);
+        // Max 80 words
+        chat.encodeString((name + L": " + text).subString(0, 80));
 
         STKHost::get()->sendToServer(&chat, true);
     }
