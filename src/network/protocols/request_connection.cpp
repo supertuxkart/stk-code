@@ -113,7 +113,14 @@ void RequestConnection::asynchronousUpdate()
                 // Direct socket always listens on server discovery port
                 server_addr.setPort(NetworkConfig::get()
                     ->getServerDiscoveryPort());
-                STKHost::get()->sendRawPacket(message, server_addr);
+                // Avoid possible packet loss, the connect to peer done by
+                // server will auto terminate if same peer from same port
+                // has connected already
+                for (int i = 0; i < 5; i++)
+                {
+                    STKHost::get()->sendRawPacket(message, server_addr);
+                    StkTime::sleep(1);
+                }
                 m_state = DONE;
             }
             else
