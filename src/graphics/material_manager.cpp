@@ -25,6 +25,7 @@
 #include "config/user_config.hpp"
 #include "graphics/material.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/sp/sp_texture_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "modes/profile_world.hpp"
@@ -55,6 +56,8 @@ MaterialManager::MaterialManager()
  */
 MaterialManager::~MaterialManager()
 {
+    SP::SPTextureManager::get()->stopThreads();
+    
     for(unsigned int i=0; i<m_materials.size(); i++)
     {
         delete m_materials[i];
