@@ -50,8 +50,6 @@ public:
     }
     virtual void init() OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;
-    virtual void playerSelected(uint8_t player_id,
-                                const std::string &kart_name);
 };
 
 #endif // NETWORK_KART_SELECTION_HPP

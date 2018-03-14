@@ -96,13 +96,13 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
                 // FIXME SPLITSCREEN: we need to supply the global player id of the
                 // player selecting the track here. For now ... just vote the same
                 // track for each local player.
-                std::vector<NetworkPlayerProfile*> players =
+                /*std::vector<NetworkPlayerProfile*> players =
                                          STKHost::get()->getMyPlayerProfiles();
                 for(unsigned int i=0; i<players.size(); i++)
                 {
                     clrp->voteTrack(players[i]->getGlobalPlayerId(),selection);
                 }
-                WaitingForOthersScreen::getInstance()->push();
+                WaitingForOthersScreen::getInstance()->push();*/
             }
             else
             {

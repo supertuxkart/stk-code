@@ -70,7 +70,7 @@ private:
     uint16_t m_client_port;
 
     /** Maximum number of players on the server. */
-    int m_max_players;
+    unsigned m_max_players;
 
     /** True if a client should connect to the first server it finds and
      *  immediately start a race. */
@@ -171,10 +171,10 @@ public:
     }
     // ------------------------------------------------------------------------
     /** Sets the maximum number of players for this server. */
-    void setMaxPlayers(int n) { m_max_players = n; }
+    void setMaxPlayers(unsigned n) { m_max_players = n; }
     // ------------------------------------------------------------------------
     /** Returns the maximum number of players for this server. */
-    int getMaxPlayers() const { return m_max_players; }
+    unsigned getMaxPlayers() const { return m_max_players; }
     // ------------------------------------------------------------------------
     /** Returns if this instance is a server. */
     bool isServer() const { return m_is_server;  }

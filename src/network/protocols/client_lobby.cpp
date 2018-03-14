@@ -25,10 +25,12 @@
 #include "guiengine/message_queue.hpp"
 #include "modes/world_with_rank.hpp"
 #include "network/event.hpp"
+#include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/latency_protocol.hpp"
+#include "network/race_config.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -85,7 +87,7 @@ void ClientLobby::setAddress(const TransportAddress &address)
 
 void ClientLobby::setup()
 {
-    m_game_setup = STKHost::get()->setupNewGame(); // create a new game setup
+    LobbyProtocol::setup();
     m_state = NONE;
 }   // setup
 
@@ -446,6 +448,7 @@ void ClientLobby::connectionAccepted(Event* event)
     Log::info("ClientLobby", "The server accepted the connection.");
 
     STKHost::get()->setMyHostId(data.getUInt32());
+    // For now no split screen so only 1 player
     m_game_setup->setNumLocalPlayers(1);
     // connection token
     uint32_t token = data.getToken();
@@ -596,18 +599,7 @@ void ClientLobby::kartSelectionRefused(Event* event)
 void ClientLobby::kartSelectionUpdate(Event* event)
 {
     if(!checkDataSize(event, 3)) return;
-    const NetworkString &data = event->data();
-    uint8_t player_id = data.getUInt8();
-    std::string kart_name;
-    data.decodeString(&kart_name);
-    if (!m_game_setup->isKartAvailable(kart_name))
-    {
-        Log::error("ClientLobby",
-                   "The updated kart is taken already.");
-    }
-    m_game_setup->setPlayerKart(player_id, kart_name);
-    NetworkKartSelectionScreen::getInstance()->playerSelected(player_id,
-                                                              kart_name);
+
 }   // kartSelectionUpdate
 
 //-----------------------------------------------------------------------------
@@ -725,7 +717,7 @@ void ClientLobby::exitResultScreen(Event *event)
 {
     RaceResultGUI::getInstance()->backToLobby();
     // Will be reset to linked if connected to server, see update(float dt)
-    m_game_setup = STKHost::get()->setupNewGame();
+    LobbyProtocol::setup();
     STKHost::get()->getServerPeerForClient()->unsetClientServerToken();
     // stop race protocols
     auto pm = ProtocolManager::lock();
@@ -873,19 +865,8 @@ void ClientLobby::playerLapsVote(Event* event)
  */
 void ClientLobby::finishedLoadingWorld()
 {
-    assert(STKHost::get()->getPeerCount() == 1);
-    std::vector<NetworkPlayerProfile*> players =
-                                         STKHost::get()->getMyPlayerProfiles();
-    NetworkString *ns = getNetworkString(2);
+    NetworkString* ns = getNetworkString(1);
     ns->addUInt8(LE_CLIENT_LOADED_WORLD);
-    ns->addUInt8( uint8_t(players.size()) ) ;
-    for (unsigned int i = 0; i < players.size(); i++)
-    {
-        ns->addUInt8(players[i]->getGlobalPlayerId());
-        Log::info("ClientLobby", 
-                  "Player %d ready, notifying server.",
-                  players[i]->getGlobalPlayerId());
-    }   // for i < players.size()
-    sendToServer(ns, /*reliable*/true);
+    sendToServer(ns, true);
     delete ns;
 }   // finishedLoadingWorld

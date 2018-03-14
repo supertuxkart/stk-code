@@ -3,9 +3,9 @@
 
 #include "network/protocols/lobby_protocol.hpp"
 #include "utils/cpp2011.hpp"
-#include "utils/synchronised.hpp"
 
 #include <atomic>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <set>
@@ -42,27 +42,18 @@ private:
      *  with data in server first. */
     std::pair<std::set<std::string>, std::set<std::string> > m_available_kts;
 
-    /** Next id to assign to a peer. */
-    Synchronised<int> m_next_player_id;
-
     /** Keeps track of the server state. */
-    bool m_server_has_loaded_world;
+    std::atomic_bool m_server_has_loaded_world;
 
-    /** Counts how many clients have finished loading the world. */
-    Synchronised<int> m_client_ready_count;
-
-    /** For debugging: keep track of the state (ready or not) of each player,
-     *  to make sure no client/player reports more than once. Needs to be a
-     *  map since the client IDs can be non-consecutive. */
-    std::map<uint8_t, bool> m_player_states;
+    /** Counts how many peers have finished loading the world. */
+    std::map<std::weak_ptr<STKPeer>, bool,
+        std::owner_less<std::weak_ptr<STKPeer> > > m_peers_ready;
 
     /** Keeps track of an artificial server delay (which makes sure that the
      *  data from all clients has arrived when the server computes a certain
      *  timestep.(. It stores the real time since epoch + delta (atm 0.1
      *  seconds), which is the real time at which the server should start. */
     double m_server_delay;
-
-    bool m_selection_enabled;
 
     bool m_has_created_server_id_file;
 
@@ -101,6 +92,7 @@ private:
     void createServerIdFile();
     void updatePlayerList();
     void updateServerOwner();
+    bool checkPeersReady() const;
 
 public:
              ServerLobby();

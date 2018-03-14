@@ -20,9 +20,9 @@
 #define LOBBY_PROTOCOL_HPP
 
 #include "network/protocol.hpp"
-
-#include "network/game_setup.hpp"
 #include "network/network_string.hpp"
+
+class GameSetup;
 
 /*!
  * \class LobbyProtocol
@@ -78,7 +78,7 @@ public:
 protected:
     static std::weak_ptr<LobbyProtocol> m_lobby;
 
-    /** The game setup. */
+    /** Stores data about the online game to play. */
     GameSetup* m_game_setup;
 
 public:
@@ -109,7 +109,7 @@ public:
 
              LobbyProtocol(CallbackObject* callback_object);
     virtual ~LobbyProtocol();
-    virtual void setup()                = 0;
+    virtual void setup();
     virtual void update(float dt)       = 0;
     virtual void finishedLoadingWorld() = 0;
     virtual void loadWorld();
@@ -120,6 +120,7 @@ public:
     {
         assert(false);   // Only defined in client
     };
+    GameSetup* getGameSetup() const { return m_game_setup; }
 
 };   // class LobbyProtocol
 

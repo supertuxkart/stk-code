@@ -86,8 +86,8 @@ public:
     bool isSamePeer(const STKPeer* peer) const;
     bool isSamePeer(const ENetPeer* peer) const;
     // ------------------------------------------------------------------------
-    std::vector<std::shared_ptr<NetworkPlayerProfile> >
-                                getPlayerProfiles() const { return m_players; }
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >& getPlayerProfiles()
+                                                          { return m_players; }
     // ------------------------------------------------------------------------
     bool hasPlayerProfiles() const               { return !m_players.empty(); }
     // ------------------------------------------------------------------------

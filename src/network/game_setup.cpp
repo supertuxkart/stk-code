@@ -19,6 +19,7 @@
 #include "network/game_setup.hpp"
 
 #include "karts/abstract_kart.hpp"
+#include "network/race_config.hpp"
 #include "modes/world.hpp"
 #include "network/network_player_profile.hpp"
 #include "online/online_profile.hpp"
@@ -39,43 +40,39 @@ GameSetup::GameSetup()
 GameSetup::~GameSetup()
 {
     // remove all players
-    for (unsigned int i = 0; i < m_players.size(); i++)
-    {
-        delete m_players[i];
-    };
     m_players.clear();
     delete m_race_config;
 }   // ~GameSetup
 
 //-----------------------------------------------------------------------------
-
-void GameSetup::addPlayer(NetworkPlayerProfile* profile)
+void GameSetup::addPlayer(std::shared_ptr<NetworkPlayerProfile> profile)
 {
     m_players.push_back(profile);
-    Log::info("GameSetup", "New player in the game setup. Player id : %d.",
-              profile->getGlobalPlayerId());
+    Log::info("GameSetup", "New player in the game setup. Player name : %s.",
+        StringUtils::wideToUtf8(profile->getName()).c_str());
 }   // addPlayer
 
 //-----------------------------------------------------------------------------
-/** Removed a player give his NetworkPlayerProfile.
- *  \param profile The NetworkPlayerProfile to remove.
- *  \return True if the player was found and removed, false otherwise.
+/** Update and see if any player disconnects.
+ *  \param remove_disconnected_players remove the disconnected players,
+ *  otherwise replace with AI (when racing), so this function must be called
+ *  in main thread.
  */
-bool GameSetup::removePlayer(const NetworkPlayerProfile *profile)
+void GameSetup::update(bool remove_disconnected_players)
 {
-    for (unsigned int i = 0; i < m_players.size(); i++)
+    std::unique_lock<std::mutex> lock(m_players_mutex);
+    if (remove_disconnected_players)
     {
-        if (m_players[i] == profile)
-        {
-            delete m_players[i];
-            m_players.erase(m_players.begin()+i, m_players.begin()+i+1);
-            Log::verbose("GameSetup",
-                         "Removed a player from the game setup. Remains %u.",
-                          m_players.size());
-            return true;
-        }
+        m_players.erase(std::remove_if(m_players.begin(), m_players.end(), []
+            (const std::weak_ptr<NetworkPlayerProfile> npp)->bool
+            {
+                return npp.expired();
+            }), m_players.end());
+        return;
     }
-    return false;
+    lock.unlock();
+    if (!World::getWorld())
+        return;
 }   // removePlayer
 
 //-----------------------------------------------------------------------------
@@ -98,37 +95,12 @@ bool GameSetup::isLocalMaster(uint8_t player_id)
 }   // isLocalMaster
 
 //-----------------------------------------------------------------------------
-/** Sets the kart the specified player uses.
- *  \param player_id  ID of this player (in this race).
- *  \param kart_name Name of the kart the player picked.
- */
-void GameSetup::setPlayerKart(uint8_t player_id, const std::string &kart_name)
-{
-    bool found = false;
-    for (unsigned int i = 0; i < m_players.size(); i++)
-    {
-        if (m_players[i]->getGlobalPlayerId() == player_id)
-        {
-            m_players[i]->setKartName(kart_name);
-            Log::info("GameSetup::setPlayerKart", "Player %d took kart %s",
-                      player_id, kart_name.c_str());
-            found = true;
-        }
-    }
-    if (!found)
-    {
-        Log::info("GameSetup::setPlayerKart", "The player %d was unknown.",
-                  player_id);
-    }
-}   // setPlayerKart
-
-//-----------------------------------------------------------------------------
 
 void GameSetup::bindKartsToProfiles()
 {
     World::KartList karts = World::getWorld()->getKarts();
 
-    for (unsigned int i = 0; i < m_players.size(); i++)
+    /*for (unsigned int i = 0; i < m_players.size(); i++)
     {
         Log::info("GameSetup", "Player %d has id %d and kart %s", i,
                   m_players[i]->getGlobalPlayerId(),
@@ -155,73 +127,5 @@ void GameSetup::bindKartsToProfiles()
         {
             Log::error("GameSetup", "Error while binding world kart ids to players profiles.");
         }
-    }
+    }*/
 }   // bindKartsToProfiles
-
-//-----------------------------------------------------------------------------
-/** \brief Get a network player profile with the specified player id.
- *  \param player_id : Player id in this race.
- *  \return The profile of the player having the specified player id, or
- *          NULL if no such player exists.
- */
-const NetworkPlayerProfile* GameSetup::getProfile(uint8_t player_id)
-{
-    for (unsigned int i = 0; i < m_players.size(); i++)
-    {
-        if (m_players[i]->getGlobalPlayerId()== player_id)
-        {
-            return m_players[i];
-        }
-    }
-    return NULL;
-}   // getProfile
-
-//-----------------------------------------------------------------------------
-/** \brief Get a network player profile matching a kart name.
- *  \param kart_name : Name of the kart used by the player.
- *  \return The profile of the player having the kart kart_name, or NULL
- *           if no such network profile exists.
- */
-
-const NetworkPlayerProfile* GameSetup::getProfile(const std::string &kart_name)
-{
-    for (unsigned int i = 0; i < m_players.size(); i++)
-    {
-        if (m_players[i]->getKartName() == kart_name)
-        {
-            return m_players[i];
-        }
-    }
-    return NULL;
-}   // getProfile(kart_name)
-
-//-----------------------------------------------------------------------------
-/** Returns the list of all player profiles from a specified host. Note that
- *  this function is somewhat expensive (it loops over all network profiles
- *  to find the ones with the specified host id).
- *  \param host_id The host id which players should be collected.
- *  \return List of NetworkPlayerProfile pointers/
- */
-std::vector<NetworkPlayerProfile*> GameSetup::getAllPlayersOnHost(uint8_t host_id)
-{
-    std::vector<NetworkPlayerProfile*> result;
-
-    for (unsigned int i = 0; i < m_players.size(); i++)
-    {
-        if (m_players[i]->getHostId() == host_id)
-            result.push_back(m_players[i]);
-    }
-    return result;
-}   // getAllPlayersOnHost
-
-//-----------------------------------------------------------------------------
-
-bool GameSetup::isKartAvailable(std::string kart_name)
-{
-    for (unsigned int i = 0; i < m_players.size(); i++)
-    {
-        if (m_players[i]->getKartName() == kart_name)
-            return false;
-    }
-    return true;
-}

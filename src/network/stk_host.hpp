@@ -45,6 +45,7 @@
 class GameSetup;
 class NetworkPlayerProfile;
 class Server;
+class ServerLobby;
 class SeparateProcess;
 
 enum ENetCommandType : unsigned int
@@ -104,9 +105,6 @@ private:
     /** Host id of this host. */
     uint32_t m_host_id = 0;
 
-    /** Stores data about the online game to play. */
-    GameSetup* m_game_setup;
-
     /** Id of thread listening to enet events. */
     std::thread m_listening_thread;
 
@@ -133,17 +131,22 @@ private:
     /** The private port enet socket is bound. */
     uint16_t m_private_port;
 
-             STKHost(std::shared_ptr<Server> server);
-             STKHost(const irr::core::stringw &server_name);
-    virtual ~STKHost();
+    // ------------------------------------------------------------------------
+    STKHost(std::shared_ptr<Server> server);
+    // ------------------------------------------------------------------------
+    STKHost(const irr::core::stringw &server_name);
+    // ------------------------------------------------------------------------
+    ~STKHost();
+    // ------------------------------------------------------------------------
     void init();
-    void handleDirectSocketRequest(Network* direct_socket);
+    // ------------------------------------------------------------------------
+    void handleDirectSocketRequest(Network* direct_socket,
+                                   std::shared_ptr<ServerLobby> sl);
     // ------------------------------------------------------------------------
     void mainLoop();
 
 public:
-    /** If a network console should be started. Note that the console can cause
-    *  a crash in release mode on windows (see #1529). */
+    /** If a network console should be started. */
     static bool m_enable_console;
 
     /** Creates the STKHost. It takes all confifguration parameters from
@@ -181,8 +184,6 @@ public:
     // ------------------------------------------------------------------------
     void setPublicAddress();
     // ------------------------------------------------------------------------
-    GameSetup* setupNewGame();
-    // ------------------------------------------------------------------------
     void disconnectAllPeers(bool timeout_waiting = false);
     // ------------------------------------------------------------------------
     bool connect(const TransportAddress& peer);
@@ -217,19 +218,25 @@ public:
     // ------------------------------------------------------------------------
     std::shared_ptr<STKPeer> findPeerByHostId(uint32_t id) const;
     // ------------------------------------------------------------------------
-    void sendPacketExcept(STKPeer* peer,
-                          NetworkString *data,
+    void sendPacketExcept(STKPeer* peer, NetworkString *data,
                           bool reliable = true);
-    void        setupClient(int peer_count, int channel_limit,
-                            uint32_t max_incoming_bandwidth,
-                            uint32_t max_outgoing_bandwidth);
-    void        startListening();
-    void        stopListening();
-    bool        peerExists(const TransportAddress& peer_address);
-    bool        isConnectedTo(const TransportAddress& peer_address);
+    // ------------------------------------------------------------------------
+    void setupClient(int peer_count, int channel_limit,
+                     uint32_t max_incoming_bandwidth,
+                     uint32_t max_outgoing_bandwidth);
+    // ------------------------------------------------------------------------
+    void startListening();
+    // ------------------------------------------------------------------------
+    void stopListening();
+    // ------------------------------------------------------------------------
+    bool peerExists(const TransportAddress& peer_address);
+    // ------------------------------------------------------------------------
+    bool isConnectedTo(const TransportAddress& peer_address);
+    // ------------------------------------------------------------------------
     std::shared_ptr<STKPeer> getServerPeerForClient() const;
-    std::vector<NetworkPlayerProfile*> getMyPlayerProfiles();
-    void        setErrorMessage(const irr::core::stringw &message);
+    // ------------------------------------------------------------------------
+    void setErrorMessage(const irr::core::stringw &message);
+    // ------------------------------------------------------------------------
     void addEnetCommand(ENetPeer* peer, ENetPacket* packet, uint32_t i,
                         ENetCommandType ect)
     {
@@ -244,9 +251,6 @@ public:
     /** Returns true if a shutdown of the network infrastructure was
      *  requested. */
     bool requestedShutdown() const                { return m_shutdown.load(); }
-    // ------------------------------------------------------------------------
-    /** Returns the current game setup. */
-    GameSetup* getGameSetup()                          { return m_game_setup; }
     // ------------------------------------------------------------------------
     int receiveRawPacket(char *buffer, int buffer_len, 
                          TransportAddress* sender, int max_tries = -1)

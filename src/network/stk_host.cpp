@@ -21,6 +21,7 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "network/event.hpp"
+#include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_console.hpp"
 #include "network/network_string.hpp"
@@ -72,8 +73,9 @@ void STKHost::create(std::shared_ptr<Server> server, SeparateProcess* p)
     assert(m_stk_host == NULL);
     if (NetworkConfig::get()->isServer())
     {
+        std::shared_ptr<ServerLobby> sl = LobbyProtocol::create<ServerLobby>();
         m_stk_host = new STKHost(NetworkConfig::get()->getServerName());
-        LobbyProtocol::create<ServerLobby>()->requestStart();
+        sl->requestStart();
     }
     else
     {
@@ -319,7 +321,6 @@ void STKHost::init()
     m_shutdown         = false;
     m_authorised       = false;
     m_network          = NULL;
-    m_game_setup       = NULL;
     m_exit_timeout.store(std::numeric_limits<double>::max());
 
     // Start with initialising ENet
@@ -351,10 +352,6 @@ STKHost::~STKHost()
     requestShutdown();
     if (m_network_console.joinable())
         m_network_console.join();
-    // delete the game setup
-    if (m_game_setup)
-        delete m_game_setup;
-    m_game_setup = NULL;
 
     disconnectAllPeers(true/*timeout_waiting*/);
     Network::closeLog();
@@ -608,18 +605,6 @@ void STKHost::setPrivatePort()
 }   // setPrivatePort
 
 //-----------------------------------------------------------------------------
-/** A previous GameSetup is deletea and a new one is created.
- *  \return Newly create GameSetup object.
- */
-GameSetup* STKHost::setupNewGame()
-{
-    if (m_game_setup)
-        delete m_game_setup;
-    m_game_setup = new GameSetup();
-    return m_game_setup;
-}   // setupNewGame
-
-//-----------------------------------------------------------------------------
 /** Disconnect all connected peers.
 */
 void STKHost::disconnectAllPeers(bool timeout_waiting)
@@ -730,7 +715,7 @@ void STKHost::mainLoop()
         auto sl = LobbyProtocol::get<ServerLobby>();
         if (direct_socket && sl && sl->waitingForPlayers())
         {
-            handleDirectSocketRequest(direct_socket);
+            handleDirectSocketRequest(direct_socket, sl);
         }   // if discovery host
 
         std::list<std::tuple<ENetPeer*, ENetPacket*, uint32_t,
@@ -847,7 +832,8 @@ void STKHost::mainLoop()
  *  message is received, will answer with a message containing server details
  *  (and sender IP address and port).
  */
-void STKHost::handleDirectSocketRequest(Network* direct_socket)
+void STKHost::handleDirectSocketRequest(Network* direct_socket,
+                                        std::shared_ptr<ServerLobby> sl)
 {
     const int LEN=2048;
     char buffer[LEN];
@@ -877,7 +863,7 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket)
         s.addUInt8(NetworkConfig::m_server_version);
         s.encodeString(name);
         s.addUInt8(NetworkConfig::get()->getMaxPlayers());
-        s.addUInt8(0);   // FIXME: current number of connected players
+        s.addUInt8((uint8_t)sl->getGameSetup()->getPlayerCount());
         s.addUInt16(m_private_port);
         s.addUInt8((uint8_t)race_manager->getDifficulty());
         s.addUInt8((uint8_t)
@@ -937,12 +923,6 @@ bool STKHost::peerExists(const TransportAddress& peer)
     }
     return false;
 }   // peerExists
-
-// ----------------------------------------------------------------------------
-std::vector<NetworkPlayerProfile*> STKHost::getMyPlayerProfiles()
-{
-    return m_game_setup->getAllPlayersOnHost(m_host_id);
-}   // getMyPlayerProfiles
 
 // ----------------------------------------------------------------------------
 /** \brief Return the only server peer for client.

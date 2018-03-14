@@ -27,6 +27,7 @@
 #include "items/item_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
@@ -71,16 +72,13 @@ void NetworkKartSelectionScreen::init()
     back_button->setImage("gui/main_quit.png");
 
     // add a widget for each player except self (already exists):
-    GameSetup* setup = STKHost::get()->getGameSetup();
-    if (!setup)
+    GameSetup* game_setup = LobbyProtocol::get<LobbyProtocol>()->getGameSetup();
+    if (!game_setup)
     {
         Log::error("NetworkKartSelectionScreen",
                    "No network game setup registered.");
         return;
     }
-    std::vector<NetworkPlayerProfile*> players = setup->getPlayers();
-
-    Log::info("NKSS", "There are %d players", players.size());
     // ---- Get available area for karts
     // make a copy of the area, ands move it to be outside the screen
     Widget* kartsAreaWidget = getWidget("playerskarts");
@@ -90,7 +88,6 @@ void NetworkKartSelectionScreen::init()
                             kartsAreaWidget->m_y,
                             kartsAreaWidget->m_x + shift + kartsAreaWidget->m_w,
                             kartsAreaWidget->m_y + kartsAreaWidget->m_h);
-    GameSetup *game_setup = STKHost::get()->getGameSetup();
 
     // FIXME: atm only adds the local master, split screen supports
     // needs to be added
@@ -115,7 +112,6 @@ void NetworkKartSelectionScreen::init()
         assert(w != NULL);
         w->setSelection(UserConfigParams::m_default_kart, /*player id*/0, /*focus*/true);
         playerConfirm(0);
-        RaceSetupScreen::getInstance()->push();
     }
 
 }   // init
@@ -142,80 +138,20 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
         SFXManager::get()->quickSound( "anvil" );
         return;
     }
-    if(playerID == PLAYER_ID_GAME_MASTER) // self
+    if (playerID == PLAYER_ID_GAME_MASTER) // self
     {
-        auto clrp = LobbyProtocol::get<ClientLobby>();
-        assert(clrp);
         // FIXME SPLITSCREEN: we need to supply the global player id of the 
         // player selecting the kart here. For now ... just vote the same kart
         // for each local player.
-        std::vector<NetworkPlayerProfile*> players =
-            STKHost::get()->getMyPlayerProfiles();
-        for(unsigned int i=0; i<players.size(); i++)
-        {
-            clrp->requestKartSelection(players[i]->getGlobalPlayerId(),
-                                       selection                        );
-        }
+        uint8_t player_count = 1;
+        NetworkString kart(PROTOCOL_LOBBY_ROOM);
+        kart.addUInt8(LobbyProtocol::LE_KART_SELECTION).addUInt8(player_count)
+            .encodeString(selection);
+        STKHost::get()->sendToServer(&kart, true);
         input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+        TracksScreen::getInstance()->push();
     }
 }   // playerConfirm
-
-// ----------------------------------------------------------------------------
-void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
-                                                const std::string &kart_name)
-{
-    int widget_id = -1;
-    for (unsigned int i = 0; i < m_id_mapping.size(); i++)
-    {
-        Log::info("NKSS", "Checking race id %d : mapped of %d is %d",
-                   player_id, i, m_id_mapping[i]);
-        if (m_id_mapping[i] == player_id)
-            widget_id = i;
-    }
-
-    // This selection was for a remote kart, which is not shown
-    // Just ignore it.
-    if(widget_id==-1)
-        return;
-
-    // In case of auto-connect the screen is already replaced, so
-    // m_kart_widget is empty.
-    if (! STKHost::get()->isAuthorisedToControl())
-    {
-        KartSelectionScreen::updateKartWidgetModel(widget_id, kart_name,
-                                           irr::core::stringw(kart_name.c_str()),
-                                           /*Todo get color*/0.0f);
-        KartSelectionScreen::updateKartStats(widget_id, kart_name);
-        m_kart_widgets[widget_id].setKartInternalName(kart_name);
-        m_kart_widgets[widget_id].markAsReady(); // mark player ready
-    }
-
-    // If this is the authorised client, send the currently set race config
-    // to the server.
-    if(STKHost::get()->isAuthorisedToControl())
-    {
-        auto clrp = LobbyProtocol::get<ClientLobby>();
-        assert(clrp);
-        // FIXME: for now we submit a vote from the authorised user
-        // for the various modes based on the settings in the race manager. 
-        // This needs more/better gui elements (and some should be set when
-        // defining the server).
-        std::vector<NetworkPlayerProfile*> players =
-                                         STKHost::get()->getMyPlayerProfiles();
-        for(unsigned int i=0; i<players.size(); i++)
-        {
-            uint8_t id = players[i]->getGlobalPlayerId();
-            clrp->voteMajor(id, race_manager->getMajorMode());
-            clrp->voteMinor(id, race_manager->getMinorMode());
-            clrp->voteReversed(id, race_manager->getReverseTrack());
-            clrp->voteRaceCount(id, 1);
-            clrp->voteLaps(id, 1);
-        }
-        //WaitingForOthersScreen::getInstance()->push();
-        //return;
-    }
-    TracksScreen::getInstance()->push();
-}   // playerSelected
 
 // ----------------------------------------------------------------------------
 bool NetworkKartSelectionScreen::onEscapePressed()

@@ -22,15 +22,16 @@
 #ifndef GAME_SETUP_HPP
 #define GAME_SETUP_HPP
 
-#include "network/race_config.hpp"
 #include "network/remote_kart_info.hpp"
 
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
 
 class NetworkPlayerProfile;
+class RaceConfig;
 
 // ============================================================================
 /*! \class GameSetup
@@ -40,8 +41,10 @@ class NetworkPlayerProfile;
 class GameSetup
 {
 private:
+    mutable std::mutex m_players_mutex;
+
     /** Information about all connected players. */
-    std::vector<NetworkPlayerProfile*> m_players;
+    std::vector<std::weak_ptr<NetworkPlayerProfile> > m_players;
 
     /** The race configuration. */
     RaceConfig* m_race_config;
@@ -52,26 +55,22 @@ private:
     /** The player id of the local game master, used in 
      *  kart selection screen. */
     uint8_t m_local_master;
+
 public:
-             GameSetup();
-    virtual ~GameSetup();
-
-    void addPlayer(NetworkPlayerProfile* profile); //!< Add a player.
-    bool removePlayer(const NetworkPlayerProfile *profile);
-    void setPlayerKart(uint8_t player_id, const std::string &kart_name);
-    void bindKartsToProfiles(); //!< Sets the right world_kart_id in profiles
+    // ------------------------------------------------------------------------
+    GameSetup();
+    // ------------------------------------------------------------------------
+    ~GameSetup();
+    // ------------------------------------------------------------------------
+    void addPlayer(std::shared_ptr<NetworkPlayerProfile> profile);
+    // ------------------------------------------------------------------------
+    void update(bool remove_disconnected_players);
+    // ------------------------------------------------------------------------
+    void bindKartsToProfiles();
+    // ------------------------------------------------------------------------
     void setLocalMaster(uint8_t player_id);
-
+    // ------------------------------------------------------------------------
     bool isLocalMaster(uint8_t player_id);
-    const NetworkPlayerProfile* getProfile(uint8_t id);
-    const NetworkPlayerProfile* getProfile(const std::string &kart_name);
-    std::vector<NetworkPlayerProfile*> getAllPlayersOnHost(uint8_t host_id);
-
-    /*! \brief Used to know if a kart is available.
-     *  \param kart_name : Name of the kart to check.
-     *  \return True if the kart hasn't been selected yet, false elseway.
-     */
-    bool isKartAvailable(std::string kart_name);
     // ------------------------------------------------------------------------
     /** Sets the number of local players. */
     void setNumLocalPlayers(int n) { m_num_local_players = n; } 
@@ -79,26 +78,23 @@ public:
     /** Returns the nunber of local players. */
     int getNumLocalPlayers() const { return m_num_local_players; }
     // ------------------------------------------------------------------------
-    /*! \brief Used to know if a kart is playable.
-     *  \param kart_name : Name of the kart to check.
-     *  \return True if the kart is playable (standard kart).
-     *  Currently this is always true as the kart selection screen shows
-     *  only the standard karts.
-     */
-    bool isKartAllowed(std::string kart_name) { return true; }
-    // ------------------------------------------------------------------------
     /** Returns the configuration for this race. */
     RaceConfig* getRaceConfig() { return m_race_config; }
     // ------------------------------------------------------------------------
     /** \brief Get the players that are in the game
     *  \return A vector containing pointers on the players profiles. */
-    const std::vector<NetworkPlayerProfile*>& getPlayers() const
+    std::vector<std::weak_ptr<NetworkPlayerProfile> > getPlayers() const
     {
+        std::lock_guard<std::mutex> lock(m_players_mutex);
         return m_players;
     }   // getPlayers
     // ------------------------------------------------------------------------
     /** Returns the number of connected players. */
-    int getPlayerCount() { return (int)m_players.size(); }
+    unsigned getPlayerCount()
+    {
+        std::lock_guard<std::mutex> lock(m_players_mutex);
+        return (unsigned)m_players.size();
+    }
     // ------------------------------------------------------------------------
     /** Returns the id of the local master. */
     int getLocalMasterID() const { return m_local_master; }

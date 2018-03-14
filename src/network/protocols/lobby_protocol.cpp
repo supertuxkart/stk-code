@@ -22,14 +22,15 @@
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "modes/world.hpp"
+#include "network/game_setup.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/protocols/latency_protocol.hpp"
+#include "network/race_config.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
-#include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -44,6 +45,8 @@ LobbyProtocol::LobbyProtocol(CallbackObject* callback_object)
 // ----------------------------------------------------------------------------
 LobbyProtocol::~LobbyProtocol()
 {
+    if (m_game_setup)
+        delete m_game_setup;
 }   // ~LobbyProtocol
 
 //-----------------------------------------------------------------------------
@@ -73,7 +76,7 @@ void LobbyProtocol::loadWorld()
 
     // Create the kart information for the race manager:
     // -------------------------------------------------
-    std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();
+    /*std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();
     int local_player_id = 0;
     for (unsigned int i = 0; i < players.size(); i++)
     {
@@ -95,7 +98,7 @@ void LobbyProtocol::loadWorld()
         // corresponding device associated with it).
         RemoteKartInfo rki(is_local ? local_player_id
                                     : i - local_player_id
-                                      + STKHost::get()->getGameSetup()->getNumLocalPlayers(),
+                                      + m_game_setup->getNumLocalPlayers(),
                            profile->getKartName(),
                            profile->getName(),
                            profile->getHostId(),
@@ -110,7 +113,7 @@ void LobbyProtocol::loadWorld()
 
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);
-    }   // for i in players
+    }   // for i in players*/
 
     // Make sure that if there is only a single local player this player can
     // use all input devices.
@@ -137,3 +140,14 @@ void LobbyProtocol::terminateLatencyProtocol()
 {
     ProtocolManager::lock()->findAndTerminate(PROTOCOL_SYNCHRONIZATION);
 }   // stopLatencyProtocol
+
+//-----------------------------------------------------------------------------
+/** A previous GameSetup is deleted and a new one is created.
+ *  \return Newly create GameSetup object.
+ */
+void LobbyProtocol::setup()
+{
+    if (m_game_setup)
+        delete m_game_setup;
+    m_game_setup = new GameSetup();
+}   // setupNewGame

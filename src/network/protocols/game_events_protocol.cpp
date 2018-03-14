@@ -176,7 +176,7 @@ void GameEventsProtocol::clientHasStarted()
 *  ready set go. */
 void GameEventsProtocol::receivedClientHasStarted(Event *event)
 {
-    assert(NetworkConfig::get()->isServer());
+/*    assert(NetworkConfig::get()->isServer());
     m_count_ready_clients++;
     Log::verbose("GameEvent",
                  "Host %d has started ready-set-go: %d out of %d done",
@@ -189,5 +189,5 @@ void GameEventsProtocol::receivedClientHasStarted(Event *event)
         // SIgnal the server to start now - since it is now behind the client
         // times by the latency of the 'slowest' client.
         World::getWorld()->startReadySetGo();
-    }
+    }*/
 }   // receivedClientHasStarted
