@@ -406,7 +406,14 @@ void BaseUserScreen::eventCallback(Widget* widget,
  */
 void BaseUserScreen::closeScreen()
 {
-    StateManager::get()->popMenu();
+    if (StateManager::get()->getMenuStackSize() > 1)
+    {
+        StateManager::get()->popMenu();
+    }
+    else
+    {
+        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+    }
 }   // closeScreen
 
 // ----------------------------------------------------------------------------
