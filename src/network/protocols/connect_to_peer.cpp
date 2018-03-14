@@ -123,13 +123,16 @@ void ConnectToPeer::asynchronousUpdate()
 
                 BareNetworkString aloha(std::string("aloha_stk"));
                 STKHost::get()->sendRawPacket(aloha, broadcast_address);
-                Log::info("ConnectToPeer", "Broadcast aloha sent.");
+                Log::verbose("ConnectToPeer", "Broadcast aloha sent.");
                 StkTime::sleep(1);
 
-                broadcast_address.setIP(0x7f000001); // 127.0.0.1 (localhost)
-                broadcast_address.setPort(m_peer_address.getPort());
-                STKHost::get()->sendRawPacket(aloha, broadcast_address);
-                Log::info("ConnectToPeer", "Broadcast aloha to self.");
+                if (m_peer_address.isPublicAddressLocalhost())
+                {
+                    broadcast_address.setIP(0x7f000001); // 127.0.0.1 (localhost)
+                    broadcast_address.setPort(m_peer_address.getPort());
+                    STKHost::get()->sendRawPacket(aloha, broadcast_address);
+                    Log::verbose("ConnectToPeer", "Broadcast aloha to self.");
+                }
 
                 // 20 seconds timeout
                 if (m_tried_connection++ > 10)
