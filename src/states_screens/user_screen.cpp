@@ -197,8 +197,8 @@ EventPropagation BaseUserScreen::filterActions(PlayerAction action,
             || (m_password_tb != NULL && m_password_tb->isFocusedForPlayer(PLAYER_ID_GAME_MASTER)))
         {
             login();
+            return EVENT_BLOCK;
         }
-        return EVENT_BLOCK;
     }
 
     return EVENT_LET;
