@@ -56,7 +56,9 @@ MaterialManager::MaterialManager()
  */
 MaterialManager::~MaterialManager()
 {
+#ifndef SERVER_ONLY
     SP::SPTextureManager::get()->stopThreads();
+#endif
     
     for(unsigned int i=0; i<m_materials.size(); i++)
     {
