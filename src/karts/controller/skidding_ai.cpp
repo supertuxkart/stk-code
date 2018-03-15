@@ -318,31 +318,35 @@ void SkiddingAI::update(float dt)
     // of us.
     bool commands_set = false;
     if(m_ai_properties->m_handle_bomb &&
-        m_kart->getAttachment()->getType()==Attachment::ATTACH_BOMB &&
-        m_kart_ahead )
+        m_kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
     {
-        // Use nitro if the kart is far ahead, or faster than this kart
-        m_controls->setNitro(m_distance_ahead>10.0f ||
+       //TODO : add logic to allow an AI kart to pass the bomb to a kart
+       //       close behind by slowing/steering slightly
+       if ( m_kart_ahead != m_kart->getAttachment()->getPreviousOwner())
+       {
+           // Use nitro if the kart is far ahead, or faster than this kart
+           m_controls->setNitro(m_distance_ahead>10.0f ||
                              m_kart_ahead->getSpeed() > m_kart->getSpeed());
-        // If we are close enough, try to hit this kart
-        if(m_distance_ahead<=10)
-        {
-            Vec3 target = m_kart_ahead->getXYZ();
+           // If we are close enough, try to hit this kart
+           if(m_distance_ahead<=10)
+           {
+              Vec3 target = m_kart_ahead->getXYZ();
 
-            // If we are faster, try to predict the point where we will hit
-            // the other kart
-            if((m_kart_ahead->getSpeed() < m_kart->getSpeed()) &&
-                !m_kart_ahead->isGhostKart())
-            {
-                float time_till_hit = m_distance_ahead
-                                    / (m_kart->getSpeed()-m_kart_ahead->getSpeed());
-                target += m_kart_ahead->getVelocity()*time_till_hit;
-            }
-            float steer_angle = steerToPoint(target);
-            setSteering(steer_angle, dt);
-            commands_set = true;
-        }
-        handleRescue(dt);
+              // If we are faster, try to predict the point where we will hit
+              // the other kart
+              if((m_kart_ahead->getSpeed() < m_kart->getSpeed()) &&
+                  !m_kart_ahead->isGhostKart())
+              {
+                  float time_till_hit = m_distance_ahead
+                                      / (m_kart->getSpeed()-m_kart_ahead->getSpeed());
+                  target += m_kart_ahead->getVelocity()*time_till_hit;
+              }
+              float steer_angle = steerToPoint(target);
+              setSteering(steer_angle, dt);
+              commands_set = true;
+           }
+           handleRescue(dt);
+       }
     }
     if(!commands_set)
     {
