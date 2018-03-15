@@ -291,7 +291,7 @@ public:
     /** Sets the kart AI boost state.
      *  Not pure abstract, since there is no need to implement this e.g. in Ghost.
      *  \param boosted True if a boost should be applied. */
-    virtual void setBoostAI(bool boosted) const = 0;
+    virtual void setBoostAI(bool boosted) = 0;
     
     // ------------------------------------------------------------------------
     /** Returns the kart AI boost state.
