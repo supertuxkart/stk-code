@@ -68,7 +68,10 @@ public:
             for (unsigned int n=0; n<m_listeners.size(); n++)
             {
                 if (m_listeners[n].onEnterPressed(Text))
+                {
                     Text = L"";
+                    CursorPos = 0;
+                }
             }
         }
         return out;

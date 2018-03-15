@@ -819,7 +819,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 
     calculateScrollPos();
 
-    if (CursorPos > Text.size())
+    if (CursorPos > (s32)Text.size())
         CursorPos = Text.size();
 
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
