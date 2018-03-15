@@ -1264,8 +1264,8 @@ void SkiddingAI::handleItems(const float dt)
                  && (projectile_types % 1000)/100 == 0)
               {
                  //don't discard swatter against plunger
-                 if( projectile_types % 100)/10 == 0
-                    || ((projectile_types % 100)/10 >= 1 && type != Attachment::ATTACH_SWATTER)
+                 if( (projectile_types % 100)/10 == 0
+                    || ((projectile_types % 100)/10 >= 1 && type != Attachment::ATTACH_SWATTER)
                  {
                     m_controls->setFire(true);
                     m_controls->setLookBack(false);
@@ -1278,8 +1278,8 @@ void SkiddingAI::handleItems(const float dt)
               if( !m_kart->isShielded() && projectile_is_close)
               {
                  //don't discard swatter against plunger
-                 if( projectile_types % 100)/10 == 0
-                    || ((projectile_types % 100)/10 >= 1 && type != Attachment::ATTACH_SWATTER)
+                 if( (projectile_types % 100)/10 == 0
+                    || ((projectile_types % 100)/10 >= 1 && type != Attachment::ATTACH_SWATTER)
                  {
                     m_controls->setFire(true);
                     m_controls->setLookBack(false);
@@ -1504,7 +1504,7 @@ void SkiddingAI::handleItems(const float dt)
            }
            
            // Use swatter to remove bad attachments
-           if((ai_skill == 4) || (ai_skill == 5))
+           if((ai_skill == 4) || (ai_skill == 5))
            {
                if( type == Attachment::ATTACH_BOMB
                || type == Attachment::ATTACH_PARACHUTE
