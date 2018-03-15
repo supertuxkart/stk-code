@@ -1181,7 +1181,7 @@ void SkiddingAI::handleItems(const float dt)
 
     // Tactic 1: wait ten seconds, then use item
     // -----------------------------------------
-    if(!m_ai_properties->m_item_usage_non_random)
+    if(m_ai_properties->m_item_usage_skill <= 1)
     {
         if( m_time_since_last_shot > 10.0f )
         {
@@ -1654,7 +1654,7 @@ void SkiddingAI::handleNitroAndZipper()
     if( (m_kart->getEnergy()==0 ||
         m_ai_properties->m_nitro_usage==AIProperties::NITRO_NONE)  &&
         (m_kart->getPowerup()->getType()!=PowerupManager::POWERUP_ZIPPER ||
-         !m_ai_properties->m_item_usage_non_random )                         )
+         m_ai_properties->m_item_usage_skill <= 1 )                         )
         return;
 
     // If there are items to avoid close, and we only have zippers, don't
