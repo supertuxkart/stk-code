@@ -65,7 +65,7 @@ void AIProperties::load(const XMLNode *ai_node)
     ai_node->get("straight-length-for-zipper",&m_straight_length_for_zipper);
     ai_node->get("rb-skid-probability",       &m_skid_probability          );
     ai_node->get("speed-cap",                 &m_speed_cap                 );
-    ai_node->get("non-random-item-usage",     &m_item_usage_non_random     );
+    ai_node->get("item-skill",                &m_item_usage_skill          );
     ai_node->get("collect-avoid-items",       &m_collect_avoid_items       );
     ai_node->get("handle-bomb",               &m_handle_bomb               );
     ai_node->get("skidding-threshold",        &m_skidding_threshold        );
