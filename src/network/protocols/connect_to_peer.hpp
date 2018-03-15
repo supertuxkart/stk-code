@@ -23,8 +23,6 @@
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
 
-#include <chrono>
-
 /** One instance of this is started for every peer who tries to
  *  connect to this server.
  */

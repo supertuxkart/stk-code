@@ -38,8 +38,10 @@
 #include "online/online_profile.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/network_kart_selection.hpp"
+#include "states_screens/tracks_screen.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 
@@ -92,122 +94,6 @@ void ClientLobby::setup()
 }   // setup
 
 //-----------------------------------------------------------------------------
-/** Sends the selection of a kart from this client to the server.
- *  \param player_id The global player id of the voting player.
- *  \param kart_name Name of the selected kart.
- */
-void ClientLobby::requestKartSelection(uint8_t player_id,
-                                       const std::string &kart_name)
-{
-    NetworkString *request = getNetworkString(3+kart_name.size());
-    request->addUInt8(LE_KART_SELECTION).addUInt8(player_id)
-            .encodeString(kart_name);
-    sendToServer(request, /*reliable*/ true);
-    delete request;
-}   // requestKartSelection
-
-//-----------------------------------------------------------------------------
-/** Sends a vote for a major vote from a client to the server. Note that even
- *  this client will only store the vote when it is received back from the
- *  server.
- *  \param player_id The global player id of the voting player.
- *  \param major Major mode voted for.
- */
-void ClientLobby::voteMajor(uint8_t player_id, uint32_t major)
-{
-    NetworkString *request = getNetworkString(6);
-    request->addUInt8(LE_VOTE_MAJOR).addUInt8(player_id)
-           .addUInt32(major);
-    sendToServer(request, true);
-    delete request;
-}   // voteMajor
-
-//-----------------------------------------------------------------------------
-/** Sends a vote for the number of tracks from a client to the server. Note
- *  that even this client will only store the vote when it is received back
- *  from the server.
- *  \param player_id The global player id of the voting player.
- *  \param count NUmber of tracks to play.
- */
-void ClientLobby::voteRaceCount(uint8_t player_id, uint8_t count)
-{
-    NetworkString *request = getNetworkString(3);
-    request->addUInt8(LE_VOTE_RACE_COUNT).addUInt8(player_id).addUInt8(count);
-    sendToServer(request, true);
-    delete request;
-}   // voteRaceCount
-
-//-----------------------------------------------------------------------------
-/** Sends a vote for the minor game mode from a client to the server. Note that
- *  even this client will only store the vote when it is received back from the
- *  server.
- *  \param player_id The global player id of the voting player.
- *  \param minor Voted minor mode.
- */
-void ClientLobby::voteMinor(uint8_t player_id, uint32_t minor)
-{
-    NetworkString *request = getNetworkString(6);
-    request->addUInt8(LE_VOTE_MINOR).addUInt8(player_id).addUInt32(minor);
-    sendToServer(request, true);
-    delete request;
-}   // voteMinor
-
-//-----------------------------------------------------------------------------
-/** Sends the vote about which track to play at which place in the list of
- *  tracks (like a custom GP definition). Note that even this client will only
- *  store the vote when it is received back from the server.
- *  \param player_id The global player id of the voting player.
- *  \param track Name of the track.
- *  \param At which place in the list of tracks this track should be played.
- */
-void ClientLobby::voteTrack(uint8_t player_id,
-                                        const std::string &track,
-                                        uint8_t track_nb)
-{
-    NetworkString *request = getNetworkString(2+1+track.size());
-    request->addUInt8(LE_VOTE_TRACK).addUInt8(player_id).addUInt8(track_nb)
-            .encodeString(track);
-    sendToServer(request, true);
-    delete request;
-}   // voteTrack
-
-//-----------------------------------------------------------------------------
-/** Sends a vote if a track at a specified place in the list of all tracks
- *  should be played in reverse or not. Note that even this client will only
- *  store the vote when it is received back from the server.
- *  \param player_id Global player id of the voting player.
- *  \param reversed True if the track should be played in reverse.
- *  \param track_nb Index for the track to be voted on in the list of all
- *         tracks.
- */
-void ClientLobby::voteReversed(uint8_t player_id, bool reversed, 
-                                           uint8_t track_nb)
-{
-    NetworkString *request = getNetworkString(9);
-    request->addUInt8(LE_VOTE_REVERSE).addUInt8(player_id).addUInt8(reversed)
-            .addUInt8(track_nb);
-    sendToServer(request, true);
-    delete request;
-}   // voteReversed
-
-//-----------------------------------------------------------------------------
-/** Vote for the number of laps of the specified track. Note that even this
- *  client will only store the vote when it is received back from the server.
- *  \param player_id Global player id of the voting player.
- *  \param laps Number of laps for the specified track.
- *  \param track_nb Index of the track in the list of all tracks.
- */
-void ClientLobby::voteLaps(uint8_t player_id, uint8_t laps,
-                                       uint8_t track_nb)
-{
-    NetworkString *request = getNetworkString(10);
-    request->addUInt8(LE_VOTE_LAPS).addUInt8(player_id).addUInt8(laps)
-            .addUInt8(track_nb);
-    sendToServer(request, true);
-    delete request;
-}   // voteLaps
-
-//-----------------------------------------------------------------------------
 /** Called from the gui when a client clicked on 'continue' on the race result
  *  screen. It notifies the server that this client has exited the screen and
  *  is back at the lobby.
@@ -234,7 +120,6 @@ bool ClientLobby::notifyEvent(Event* event)
     switch(message_type)
     {
         case LE_START_SELECTION:       startSelection(event);      break;
-        case LE_KART_SELECTION_UPDATE: kartSelectionUpdate(event); break;
         case LE_LOAD_WORLD:            loadWorld();                break;
         case LE_RACE_FINISHED:         raceFinished(event);        break;
         case LE_EXIT_RESULT:           exitResultScreen(event);    break;
@@ -266,13 +151,7 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
             case LE_START_RACE: startGame(event);                        break;
             case LE_CONNECTION_REFUSED: connectionRefused(event);        break;
             case LE_CONNECTION_ACCEPTED: connectionAccepted(event);      break;
-            case LE_KART_SELECTION_REFUSED: kartSelectionRefused(event); break;
-            case LE_VOTE_MAJOR : playerMajorVote(event);                 break;
-            case LE_VOTE_RACE_COUNT: playerRaceCountVote(event);         break;
-            case LE_VOTE_MINOR: playerMinorVote(event);                  break;
-            case LE_VOTE_TRACK: playerTrackVote(event);                  break;
-            case LE_VOTE_REVERSE: playerReversedVote(event);             break;
-            case LE_VOTE_LAPS: playerLapsVote(event);                    break;
+            case LE_VOTE: displayPlayerVote(event);                      break;
             case LE_SERVER_OWNERSHIP: becomingServerOwner();             break;
             default:                                                     break;
         }   // switch
@@ -310,7 +189,6 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
 }   // notifyEventAsynchronous
 
 //-----------------------------------------------------------------------------
-
 void ClientLobby::update(float dt)
 {
     switch (m_state)
@@ -382,7 +260,9 @@ void ClientLobby::update(float dt)
         screen->setAvailableKartsFromServer(m_available_karts);
         screen->push();
         m_state = SELECTING_KARTS;
-
+        // Todo: add max lap
+        TracksScreen::getInstance()->setNetworkTracks();
+        TracksScreen::getInstance()->setMaxLap(3);
         std::make_shared<LatencyProtocol>()->requestStart();
         Log::info("LobbyProtocol", "LatencyProtocol started.");
     }
@@ -403,7 +283,32 @@ void ClientLobby::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
+void ClientLobby::displayPlayerVote(Event* event)
+{
+    if (!checkDataSize(event, 4)) return;
+    // Get the player name who voted
+    core::stringw player_name;
+    NetworkString& data = event->data();
+    data.decodeStringW(&player_name);
+    player_name += ": ";
+    std::string track_name;
+    data.decodeString(&track_name);
+    Track* track = track_manager->getTrack(track_name);
+    if (!track)
+        Log::fatal("ClientLobby", "Missing track %s", track_name.c_str());
+    core::stringw track_readable = track->getName();
+    int lap = data.getUInt8();
+    bool reversed = (bool)data.getUInt8();
+    core::stringw yes = _("Yes");
+    core::stringw no = _("No");
+    //I18N: Vote message in network game from a player
+    core::stringw vote_msg = _("Track: %s, Laps: %d, Reversed: %s",
+        track_readable, lap, reversed ? yes : no);
+    vote_msg = player_name + vote_msg;
+    MessageQueue::add(MessageQueue::MT_GENERIC, vote_msg);
+}   // displayPlayerVote
 
+//-----------------------------------------------------------------------------
 /*! \brief Called when a new player is disconnected
  *  \param event : Event providing the information.
  *
@@ -552,58 +457,6 @@ void ClientLobby::connectionRefused(Event* event)
 
 //-----------------------------------------------------------------------------
 
-/*! \brief Called when the server refuses the kart selection request.
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0
- *       ----------------
- *  Size |      1       |
- *  Data | refusal code |
- *       ----------------
- */
-void ClientLobby::kartSelectionRefused(Event* event)
-{
-    if(!checkDataSize(event, 1)) return;
-
-    const NetworkString &data = event->data();
-
-    switch (data.getUInt8()) // the error code
-    {
-    case 0:
-        Log::info("ClientLobby",
-                  "Kart selection refused : already taken.");
-        break;
-    case 1:
-        Log::info("ClientLobby",
-                  "Kart selection refused : not available.");
-        break;
-    default:
-        Log::info("ClientLobby", "Kart selection refused.");
-        break;
-    }
-}   // kartSelectionRefused
-
-//-----------------------------------------------------------------------------
-
-/*! \brief Called when the server tells to update a player's kart.
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0           1           2                    3           N+3
- *       --------------------------------------------------
- *  Size |    1      |       1            |     N     |
- *  Data | player id | N (kart name size) | kart name |
- *       --------------------------------------------------
- */
-void ClientLobby::kartSelectionUpdate(Event* event)
-{
-    if(!checkDataSize(event, 3)) return;
-
-}   // kartSelectionUpdate
-
-//-----------------------------------------------------------------------------
-
 /*! \brief Called when the server broadcasts to start the race to all clients.
  *  \param event : Event providing the information (no additional information
  *                 in this case).
@@ -727,136 +580,6 @@ void ClientLobby::exitResultScreen(Event *event)
     pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
     m_state = NONE;
 }   // exitResultScreen
-
-//-----------------------------------------------------------------------------
-/*! \brief Called when a player votes for a major race mode.
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0          1                 2
- *       ------------------------------
- *  Size |    1     |        1        |
- *  Data |player id | major mode vote |
- *       ------------------------------
- */
-void ClientLobby::playerMajorVote(Event* event)
-{
-    const NetworkString &data = event->data();
-    if (!checkDataSize(event, 2))
-        return;
-    uint8_t player_id = data.getUInt8();
-    uint8_t mode      = data.getUInt8();
-    m_game_setup->getRaceConfig()->setPlayerMajorVote(player_id, mode);
-}   // playerMajorVote
-
-//-----------------------------------------------------------------------------
-/*! \brief Called when a player votes for the number of races in a GP.
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0           1
- *       ---------------------------
- *  Size |     1     |      1      |
- *  Data | player id | races count |
- *       ---------------------------
- */
-void ClientLobby::playerRaceCountVote(Event* event)
-{
-    if (!checkDataSize(event, 2)) return;
-    const NetworkString &data = event->data();
-    uint8_t player_id = data.getUInt8();
-    uint8_t count     = data.getUInt8();
-    m_game_setup->getRaceConfig()->setPlayerRaceCountVote(player_id, count);
-}   // playerRaceCountVote
-
-//-----------------------------------------------------------------------------
-/*! \brief Called when a player votes for a minor race mode.
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0           1
- *       -------------------------------
- *  Size |      1    |        4        |
- *  Data | player id | minor mode vote |
- *       -------------------------------
- */
-void ClientLobby::playerMinorVote(Event* event)
-{
-    if (!checkDataSize(event, 2)) return;
-    const NetworkString &data = event->data();
-    uint8_t player_id = data.getUInt8();
-    uint8_t minor     = data.getUInt8();
-    m_game_setup->getRaceConfig()->setPlayerMinorVote(player_id, minor);
-}   // playerMinorVote
-
-//-----------------------------------------------------------------------------
-
-/*! \brief Called when a player votes for a track.
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0           1                   2   3
- *       --------------------------------------------------
- *  Size |      1    |       1           | 1 |     N      |
- *  Data | player id | track number (gp) | N | track name |
- *       --------------------------------------------------
- */
-void ClientLobby::playerTrackVote(Event* event)
-{
-    if (!checkDataSize(event, 3)) return;
-    const NetworkString &data = event->data();
-    std::string track_name;
-    uint8_t player_id = data.getUInt8();
-    uint8_t number    = data.getUInt8();
-    data.decodeString(&track_name);
-    m_game_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name,
-                                                 number);
-}   // playerTrackVote
-
-//-----------------------------------------------------------------------------
-
-/*! \brief Called when a player votes for the reverse mode of a race
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0           1         2
- *       -------------------------------------------
- *  Size |     1     |    1    |       1           |
- *  Data | player id |reversed | track number (gp) |
- *       -------------------------------------------
- */
-void ClientLobby::playerReversedVote(Event* event)
-{
-    if (!checkDataSize(event, 3)) return;
-    const NetworkString &data = event->data();
-    uint8_t player_id = data.getUInt8();
-    uint8_t reversed  = data.getUInt8();
-    uint8_t number    = data.getUInt8();
-    m_game_setup->getRaceConfig()->setPlayerReversedVote(player_id, reversed!=0,
-                                                    number);
-}   // playerReversedVote
-
-//-----------------------------------------------------------------------------
-
-/*! \brief Called when a player votes for a major race mode.
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0           1      2
- *       ----------------------------------------
- *  Size |     1     |   1  |       1           |
- *  Data | player id | laps | track number (gp) |
- *       ----------------------------------------
- */
-void ClientLobby::playerLapsVote(Event* event)
-{
-    if (!checkDataSize(event, 3)) return;
-    const NetworkString &data = event->data();
-    uint8_t player_id = data.getUInt8();
-    uint8_t laps      = data.getUInt8();
-    uint8_t number    = data.getUInt8();
-    m_game_setup->getRaceConfig()->setPlayerLapsVote(player_id, laps, number);
-}   // playerLapsVote
 
 //-----------------------------------------------------------------------------
 /** Callback when the world is loaded. The client will inform the server

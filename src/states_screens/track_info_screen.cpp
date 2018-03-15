@@ -374,7 +374,8 @@ void TrackInfoScreen::onEnterPressedInternal()
        num_ai = m_ai_kart_spinner->getValue();
 
 
-    if (UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] != (local_players + num_ai))
+    if (UserConfigParams::m_num_karts_per_gamemode
+        [race_manager->getMinorMode()] != unsigned(local_players + num_ai))
     {
         race_manager->setNumKarts(local_players + num_ai);
         UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = local_players + num_ai;

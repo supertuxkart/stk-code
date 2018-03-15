@@ -63,7 +63,7 @@ private:
     /** Counts how many players are ready to go on. */
     int m_player_ready_counter;
 
-    /** Timeout counter for showing the result screen. */
+    /** Timeout counter for various state. */
     float m_timeout;
 
     /** Lock this mutex whenever a client is connect / disconnect or
@@ -75,13 +75,8 @@ private:
     void connectionRequested(Event* event);
     // kart selection
     void kartSelectionRequested(Event* event);
-    // race votes
-    void playerMajorVote(Event* event);
-    void playerRaceCountVote(Event* event);
-    void playerMinorVote(Event* event);
-    void playerTrackVote(Event* event);
-    void playerReversedVote(Event* event);
-    void playerLapsVote(Event* event);
+    // Track(s) votes
+    void playerVote(Event *event);
     void playerFinishedResult(Event *event);
     void registerServer();
     void finishedLoadingWorldClient(Event *event);
@@ -108,7 +103,7 @@ public:
     void startSelection(const Event *event=NULL);
     void checkIncomingConnectionRequests();
     void checkRaceFinished();
-    void finishedLoadingWorld();
+    void finishedLoadingWorld() OVERRIDE;
     ServerState getCurrentState() const { return m_state.load(); }
     virtual bool waitingForPlayers() const OVERRIDE
                                 { return m_state.load() == ACCEPTING_CLIENTS; }

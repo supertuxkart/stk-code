@@ -205,12 +205,7 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_KART_SELECTION: kartSelectionRequested(event);    break;
         case LE_CLIENT_LOADED_WORLD: finishedLoadingWorldClient(event); break;
         case LE_STARTED_RACE:  startedRaceOnClient(event);        break;
-        case LE_VOTE_MAJOR: playerMajorVote(event);               break;
-        case LE_VOTE_RACE_COUNT: playerRaceCountVote(event);      break;
-        case LE_VOTE_MINOR: playerMinorVote(event);               break;
-        case LE_VOTE_TRACK: playerTrackVote(event);               break;
-        case LE_VOTE_REVERSE: playerReversedVote(event);          break;
-        case LE_VOTE_LAPS:  playerLapsVote(event);                break;
+        case LE_VOTE: playerVote(event);                          break;
         case LE_RACE_FINISHED_ACK: playerFinishedResult(event);   break;
         case LE_KICK_HOST: kickHost(event);                       break;
         case LE_CHAT: handleChat(event);                          break;
@@ -572,6 +567,9 @@ void ServerLobby::startSelection(const Event *event)
     delete ns;
 
     m_state = SELECTING;
+    // 30 seconds for clients to choose kart and track
+    // will be increased later if there is grand prix
+    m_timeout = StkTime::getRealTime() + 30.0f;
     WaitingForOthersScreen::getInstance()->push();
 
     std::make_shared<LatencyProtocol>()->requestStart();
@@ -954,7 +952,10 @@ void ServerLobby::kartSelectionRequested(Event* event)
         return;
     }
 
-    if (!checkDataSize(event, 1)) return;
+    if (!checkDataSize(event, 1) ||
+        event->getPeer()->getPlayerProfiles().empty())
+        return;
+
     const NetworkString& data = event->data();
     STKPeer* peer = event->getPeer();
     unsigned player_count = data.getUInt8();
@@ -979,185 +980,24 @@ void ServerLobby::kartSelectionRequested(Event* event)
 }   // kartSelectionRequested
 
 //-----------------------------------------------------------------------------
-
-/*! \brief Called when a player votes for a major race mode.
+/*! \brief Called when a player votes for track(s).
  *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0           1
- *       -------------------------------
- *  Size |      1    |       4         |
- *  Data | player-id | major mode vote |
- *       -------------------------------
  */
-void ServerLobby::playerMajorVote(Event* event)
+void ServerLobby::playerVote(Event* event)
 {
-    if (!checkDataSize(event, 5)) return;
+    if (!checkDataSize(event, 4) ||
+        event->getPeer()->getPlayerProfiles().empty())
+        return;
 
-    NetworkString &data = event->data();
-    uint8_t player_id   = data.getUInt8();
-    uint32_t major      = data.getUInt32();
-    m_game_setup->getRaceConfig()->setPlayerMajorVote(player_id, major);
-    // Send the vote to everybody (including the sender)
-    NetworkString *other = getNetworkString(6);
-    other->addUInt8(LE_VOTE_MAJOR).addUInt8(player_id).addUInt32(major);
-    sendMessageToPeersChangingToken(other);
-    delete other;
-}   // playerMajorVote
+    NetworkString& data = event->data();
+    NetworkString other = NetworkString(PROTOCOL_LOBBY_ROOM);
+    other.addUInt8(LE_VOTE).encodeString(event->getPeer()
+        ->getPlayerProfiles()[0]->getName());
+    other += data;
+    sendMessageToPeersChangingToken(&other);
 
-//-----------------------------------------------------------------------------
-/** \brief Called when a player votes for the number of races in a GP.
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0           1
- *       ---------------------------
- *  Size |      1    |       4     |
- *  Data | player-id | races count |
- *       ---------------------------
- */
-void ServerLobby::playerRaceCountVote(Event* event)
-{
-    if (!checkDataSize(event, 1)) return;
-    NetworkString &data = event->data();
-    uint8_t player_id   = data.getUInt8();
-    uint8_t race_count  = data.getUInt8();
-    m_game_setup->getRaceConfig()->setPlayerRaceCountVote(player_id, race_count);
-    // Send the vote to everybody (including the sender)
-    NetworkString *other = getNetworkString(3);
-    other->addUInt8(LE_VOTE_RACE_COUNT).addUInt8(player_id)
-          .addUInt8(race_count);
-    sendMessageToPeersChangingToken(other);
-    delete other;
-}   // playerRaceCountVote
-
-//-----------------------------------------------------------------------------
-
-/*! \brief Called when a player votes for a minor race mode.
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0           1
- *       -------------------------------
- *  Size |      1    |         4       |
- *  Data | player-id | minor mode vote |
- *       -------------------------------
- */
-void ServerLobby::playerMinorVote(Event* event)
-{
-    if (!checkDataSize(event, 1)) return;
-    NetworkString &data = event->data();
-    uint8_t player_id   = data.getUInt8();
-    uint32_t minor      = data.getUInt32();
-    m_game_setup->getRaceConfig()->setPlayerMinorVote(player_id, minor);
-
-    // Send the vote to everybody (including the sender)
-    NetworkString *other = getNetworkString(3);
-    other->addUInt8(LE_VOTE_MINOR).addUInt8(player_id).addUInt8(minor); 
-    sendMessageToPeersChangingToken(other);
-    delete other;
-}   // playerMinorVote
-
-//-----------------------------------------------------------------------------
-
-/*! \brief Called when a player votes for a track.
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0           1                    2  3
- *       --------------------------------------------------
- *  Size |     1     |        1          | 1 |      N     |
- *  Data | player id | track number (gp) | N | track name |
- *       --------------------------------------------------
- */
-void ServerLobby::playerTrackVote(Event* event)
-{
-    if (!checkDataSize(event, 3)) return;
-    NetworkString &data  = event->data();
-    uint8_t player_id    = data.getUInt8();
-    // As which track this track should be used, e.g. 1st track: Sandtrack
-    // 2nd track Mathclass, ...
-    uint8_t track_number = data.getUInt8();
-    std::string track_name;
-    int N = data.decodeString(&track_name);
-    m_game_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name,
-                                                 track_number);
-    // Send the vote to everybody (including the sender)
-    NetworkString *other = getNetworkString(3+1+data.size());
-    other->addUInt8(LE_VOTE_TRACK).addUInt8(player_id).addUInt8(track_number)
-          .encodeString(track_name);
-    sendMessageToPeersChangingToken(other);
-    delete other;
-
-    // Check if we received all information
-    if (m_game_setup->getRaceConfig()->getNumTrackVotes() ==
-                                                m_game_setup->getPlayerCount())
-    {
-        // Inform clients to start loading the world
-        NetworkString *ns = getNetworkString(1);
-        ns->setSynchronous(true);
-        ns->addUInt8(LE_LOAD_WORLD);
-        sendMessageToPeersChangingToken(ns, /*reliable*/true);
-        delete ns;
-        m_state = LOAD_WORLD;   // Server can now load world
-    }
-}   // playerTrackVote
-
-//-----------------------------------------------------------------------------
-/*! \brief Called when a player votes for the reverse mode of a race
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0           1          2
- *       --------------------------------------------
- *  Size |     1     |     1    |       1           |
- *  Data | player id | reversed | track number (gp) |
- *       --------------------------------------------
- */
-void ServerLobby::playerReversedVote(Event* event)
-{
-    if (!checkDataSize(event, 3)) return;
-
-    NetworkString &data = event->data();
-    uint8_t player_id   = data.getUInt8();
-    uint8_t reverse     = data.getUInt8();
-    uint8_t nb_track    = data.getUInt8();
-    m_game_setup->getRaceConfig()->setPlayerReversedVote(player_id,
-                                                         reverse!=0, nb_track);
-    // Send the vote to everybody (including the sender)
-    NetworkString *other = getNetworkString(4);
-    other->addUInt8(LE_VOTE_REVERSE).addUInt8(player_id).addUInt8(reverse)
-          .addUInt8(nb_track);
-    sendMessageToPeersChangingToken(other);
-    delete other;
-}   // playerReversedVote
-
-//-----------------------------------------------------------------------------
-/*! \brief Called when a player votes for a major race mode.
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0           1      2 
- *       ----------------------------------------
- *  Size |     1     |   1  |       1           |
- *  Data | player id | laps | track number (gp) |
- *       ----------------------------------------
- */
-void ServerLobby::playerLapsVote(Event* event)
-{
-    if (!checkDataSize(event, 2)) return;
-    NetworkString &data = event->data();
-    uint8_t player_id   = data.getUInt8();
-    uint8_t lap_count   = data.getUInt8();
-    uint8_t track_nb    = data.getUInt8();
-    m_game_setup->getRaceConfig()->setPlayerLapsVote(player_id, lap_count,
-                                                     track_nb);
-    NetworkString *other = getNetworkString(4);
-    other->addUInt8(LE_VOTE_LAPS).addUInt8(player_id).addUInt8(lap_count)
-          .addUInt8(track_nb);
-    sendMessageToPeersChangingToken(other);
-    delete other;
-}   // playerLapsVote
+    // Save the vote
+}   // playerVote
 
 // ----------------------------------------------------------------------------
 /** Called from the RaceManager of the server when the world is loaded. Marks

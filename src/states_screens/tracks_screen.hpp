@@ -33,7 +33,14 @@ class TracksScreen : public GUIEngine::Screen,
     friend class GUIEngine::ScreenSingleton<TracksScreen>;
 
 private:
-    TracksScreen() : Screen("tracks.stkgui") {}
+    TracksScreen() : Screen("tracks.stkgui")
+    {
+        m_network_tracks = false;
+        m_max_lap = 0;
+    }
+
+    bool m_network_tracks;
+    unsigned m_max_lap;
 
     /** adds the tracks from the current track group into the tracks ribbon */
     void buildTrackList();
@@ -56,8 +63,19 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
 
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void tearDown() OVERRIDE;
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void onUpdate(float dt) OVERRIDE;
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual bool onEscapePressed() OVERRIDE;
+
     void setFocusOnTrack(const std::string& trackName);
 
+    void setNetworkTracks() { m_network_tracks = true; }
+    void setMaxLap(unsigned lap) { m_max_lap = lap; }
 };
 
 #endif

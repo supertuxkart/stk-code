@@ -53,15 +53,8 @@ public:
         LE_RACE_FINISHED,                 // race has finished, display result
         LE_RACE_FINISHED_ACK,             // client went back to lobby
         LE_EXIT_RESULT,                   // Force clients to exit race result screen
-        LE_VOTE,                          // Any vote (race mode, track, ...)
-        LE_VOTE_MAJOR,                    // vote of major race mode
-        LE_VOTE_MINOR,                    // vote for minor race mode
-        LE_VOTE_RACE_COUNT,               // vote for number of tracks
-        LE_VOTE_TRACK,                    // vote for a track
-        LE_VOTE_REVERSE,                  // vote if race in reverse
-        LE_VOTE_LAPS,                     // vote number of laps
+        LE_VOTE,                          // Track vote
         LE_CHAT,
-        LE_FINAL_PLAYER_LIST,
         LE_SERVER_OWNERSHIP,
         LE_KICK_HOST
     };
@@ -115,11 +108,6 @@ public:
     virtual void loadWorld();
     virtual bool waitingForPlayers() const = 0;
     void terminateLatencyProtocol();
-    virtual void requestKartSelection(uint8_t player_id,
-                                      const std::string &kart_name)
-    {
-        assert(false);   // Only defined in client
-    };
     GameSetup* getGameSetup() const { return m_game_setup; }
 
 };   // class LobbyProtocol

@@ -149,6 +149,8 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
             .encodeString(selection);
         STKHost::get()->sendToServer(&kart, true);
         input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+        // Remove kart screen
+        StateManager::get()->popMenu();
         TracksScreen::getInstance()->push();
     }
 }   // playerConfirm

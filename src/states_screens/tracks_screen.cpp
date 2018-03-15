@@ -22,10 +22,12 @@
 #include "config/user_config.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/spinner_widget.hpp"
 #include "io/file_manager.hpp"
-#include "network/network_player_profile.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
 #include "network/stk_host.hpp"
@@ -88,21 +90,16 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
 
         if (track)
         {
-            if(STKHost::existHost())
+            if (STKHost::existHost())
             {
-                auto clrp = LobbyProtocol::get<ClientLobby>();
-                // server never shows the track screen.
-                assert(clrp);
-                // FIXME SPLITSCREEN: we need to supply the global player id of the
-                // player selecting the track here. For now ... just vote the same
-                // track for each local player.
-                /*std::vector<NetworkPlayerProfile*> players =
-                                         STKHost::get()->getMyPlayerProfiles();
-                for(unsigned int i=0; i<players.size(); i++)
-                {
-                    clrp->voteTrack(players[i]->getGlobalPlayerId(),selection);
-                }
-                WaitingForOthersScreen::getInstance()->push();*/
+                NetworkString vote(PROTOCOL_LOBBY_ROOM);
+                vote.addUInt8(LobbyProtocol::LE_VOTE);
+                vote.encodeString(track->getIdent()).addUInt8
+                    (getWidget<SpinnerWidget>("lap-spinner")->getValue())
+                    .addUInt8(
+                    getWidget<CheckBoxWidget>("reverse")->getState());
+                STKHost::get()->sendToServer(&vote, true);
+                WaitingForOthersScreen::getInstance()->push();
             }
             else
             {
@@ -125,10 +122,28 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
 }   // eventCallback
 
 // -----------------------------------------------------------------------------
+bool TracksScreen::onEscapePressed()
+{
+    if (m_network_tracks)
+    {
+        // Remove this screen
+        StateManager::get()->popMenu();
+        STKHost::get()->shutdown();
+    }
+    return true; // remove the screen
+}   // onEscapePressed
 
+// -----------------------------------------------------------------------------
+void TracksScreen::tearDown()
+{
+    m_network_tracks = false;
+}   // tearDown
+
+// -----------------------------------------------------------------------------
 void TracksScreen::beforeAddingWidget()
 {
     Screen::init();
+
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     tabs->clearAllChildren();
 
@@ -147,12 +162,24 @@ void TracksScreen::beforeAddingWidget()
 
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
     tracks_widget->setItemCountHint( (int)track_manager->getNumberOfTracks()+1 );
+
 }   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
-
 void TracksScreen::init()
 {
+    // change the back button image (because it makes the game quit)
+    if (m_network_tracks)
+    {
+        IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
+        back_button->setImage("gui/main_quit.png");
+    }
+    else
+    {
+        IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
+        back_button->setImage("gui/back.png");
+    }
+
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
     assert(tracks_widget != NULL);
 
@@ -171,15 +198,47 @@ void TracksScreen::init()
         tracks_widget->setSelection(0, PLAYER_ID_GAME_MASTER, true);
     }
     STKTexManager::getInstance()->unsetTextureErrorMessage();
-    if (NetworkConfig::get()->isAutoConnect())
+    if (!m_network_tracks)
     {
-        DynamicRibbonWidget* tw = getWidget<DynamicRibbonWidget>("tracks");
-        tw->setSelection(UserConfigParams::m_last_track, 0,
-                         /*focus*/true);
-        eventCallback(tw, "tracks",
-                      /*player id*/0);
+        getWidget("lap-text")->setActive(false);
+        getWidget("lap-text")->setVisible(false);
+        getWidget("lap-spinner")->setActive(false);
+        getWidget("lap-spinner")->setVisible(false);
+        getWidget("reverse-text")->setActive(false);
+        getWidget("reverse-text")->setVisible(false);
+        getWidget("reverse")->setActive(false);
+        getWidget("reverse")->setVisible(false);
+    }
+    else
+    {
+        getWidget("lap-text")->setActive(true);
+        getWidget("lap-text")->setVisible(true);
+        getWidget("lap-spinner")->setActive(true);
+        getWidget("lap-spinner")->setVisible(true);
+        getWidget<SpinnerWidget>("lap-spinner")->setMin(1);
+        getWidget<SpinnerWidget>("lap-spinner")->setMax(m_max_lap);
+        getWidget<SpinnerWidget>("lap-spinner")->setValue(1);
+        getWidget("reverse-text")->setActive(true);
+        getWidget("reverse-text")->setVisible(true);
+        getWidget("reverse")->setActive(true);
+        getWidget("reverse")->setVisible(true);
+        getWidget<CheckBoxWidget>("reverse")->setState(false);
     }
 }   // init
+
+// -----------------------------------------------------------------------------
+void TracksScreen::onUpdate(float dt)
+{
+    if (NetworkConfig::get()->isAutoConnect() && m_network_tracks)
+    {
+        assert(!m_random_track_list.empty());
+        NetworkString vote(PROTOCOL_LOBBY_ROOM);
+        vote.addUInt8(LobbyProtocol::LE_VOTE);
+        vote.encodeString(m_random_track_list[0]).addUInt8(1).addUInt8(0);
+        STKHost::get()->sendToServer(&vote, true);
+        WaitingForOthersScreen::getInstance()->push();
+    }
+}   // onUpdate
 
 // -----------------------------------------------------------------------------
 /** Rebuild the list of tracks. This need to be recomputed e.g. to
@@ -257,7 +316,6 @@ void TracksScreen::buildTrackList()
 }   // buildTrackList
 
 // -----------------------------------------------------------------------------
-
 void TracksScreen::setFocusOnTrack(const std::string& trackName)
 {
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
@@ -266,5 +324,3 @@ void TracksScreen::setFocusOnTrack(const std::string& trackName)
     // so it's safe to use 'PLAYER_ID_GAME_MASTER'
     tracks_widget->setSelection(trackName, PLAYER_ID_GAME_MASTER, true);
 }   // setFocusOnTrack
-
-// -----------------------------------------------------------------------------
