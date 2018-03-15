@@ -43,7 +43,7 @@ AIProperties::AIProperties(RaceManager::Difficulty difficulty)
     m_make_use_of_slipstream     = false;
     m_collect_avoid_items        = false;
     m_handle_bomb                = false;
-    m_item_usage_non_random      = false;
+    m_item_usage_skill           = 0;
     m_disable_slipstream_usage   = false;
     m_nitro_usage                = NITRO_NONE;
 
@@ -82,6 +82,8 @@ void AIProperties::load(const XMLNode *ai_node)
         m_nitro_usage = NITRO_SOME;
     else if(s=="all")
         m_nitro_usage = NITRO_ALL;
+    else if(s=="advanced")
+        m_nitro_usage = NITRO_ADVANCED;
     else
     {
         Log::fatal("AIProperties",
