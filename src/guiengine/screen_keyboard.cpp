@@ -233,6 +233,7 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
         
     SEvent event;
     bool send_event = false;
+    bool close_keyboard = false;
         
     if (eventSource == "Shift")
     {
@@ -264,8 +265,10 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
     }
     else if (eventSource == "Enter")
     {
-        dismiss();
-        return EVENT_BLOCK;
+        event.KeyInput.Key = IRR_KEY_RETURN;
+        event.KeyInput.Char = 0;
+        send_event = true;
+        close_keyboard = true;
     }
     else if (eventSource == "Back")
     {
@@ -294,6 +297,11 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
         event.KeyInput.Shift = false;
 
         m_edit_box->OnEvent(event);
+    }
+    
+    if (close_keyboard)
+    {
+        dismiss();
     }
 
     return EVENT_BLOCK;
