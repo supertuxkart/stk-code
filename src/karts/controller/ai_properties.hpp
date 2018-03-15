@@ -111,11 +111,11 @@ protected:
     /** If the AI should actively try to pass on a bomb. */
     bool m_handle_bomb;
 
-    /** True if items should be used better (i.e. non random). */
-    bool m_item_usage_non_random;
+    /** Determines the strategies used by the AI for items. 0 is worst, 5 is best. */
+    int m_item_usage_skill;
 
     /** How the AI uses nitro. */
-    enum {NITRO_NONE, NITRO_SOME, NITRO_ALL} m_nitro_usage;
+    enum {NITRO_NONE, NITRO_SOME, NITRO_ALL, NITRO_ADVANCED} m_nitro_usage;
 
     /** TODO: ONLY USE FOR OLD SKIDDING! CAN BE REMOVED once the new skidding
      *  works as expected.
