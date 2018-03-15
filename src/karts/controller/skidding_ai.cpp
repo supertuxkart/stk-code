@@ -1256,7 +1256,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
 
     // 1) Filter and sort all items close by
     // -------------------------------------
-    const float max_item_lookahead_distance = 12.f;
+    const float max_item_lookahead_distance = 2.f;
     while(distance < max_item_lookahead_distance)
     {
         int n_index= DriveGraph::get()->getNode(node)->getIndex();
@@ -1275,6 +1275,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
     }   // while (distance < max_item_lookahead_distance)
 
     //items_to_avoid and items_to_collect now contain the closest item information needed after
+    //What matters is (a) if the lists are void ; (b) if they are not, what kind of item it is
    
     switch( m_kart->getPowerup()->getType() )
     {
@@ -1282,7 +1283,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
     // Level 3 : Use the shield against flyable except cakes. Use the shield against bad attachments.
     //           Use the bubble gum against an enemy close behind, except if holding a swatter.
     // Level 4 : Level 3 and protect against cakes too
-    // Level 5 : Level 4 and use after the plunger hit rather than before
+    // Level 5 : Level 4 and let plunger hit (can use the shield after)
     case PowerupManager::POWERUP_BUBBLEGUM:
         {
            Attachment::AttachmentType type = m_kart->getAttachment()->getType();
@@ -1349,6 +1350,30 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
                break;
            }
            
+           // Use shield if kart is going to hit a bad item (banana or bubblegum)
+           if((ai_skill == 4) || (ai_skill == 5)) 
+           {
+              if( !m_kart->isShielded() && items_to_avoid.size()>0)
+              {
+                 m_controls->setFire(true);
+                 m_controls->setLookBack(false);
+                 break;
+              }             
+           }
+           // Use shield if kart is going to hit an item box
+           else if (ai_skill == 5)
+           {
+              if( !m_kart->isShielded() && items_to_collect.size()>0)
+              {
+                 if (items_to_collect[0]->getType() == Item::ITEM_BONUS_BOX)
+                 {
+                    m_controls->setFire(true);
+                    m_controls->setLookBack(false);
+                    break;
+                 }
+              }             
+           }
+             
            // Avoid dropping all bubble gums one after another
            if( m_time_since_last_shot < 2.0f) break;
 
@@ -1358,7 +1383,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
            // Should we check the speed of the kart as well? I.e. only drop if
            // the kart behind is faster? Otoh this approach helps preventing an
            // overtaken kart to overtake us again.
-           if(m_distance_behind < 12.0f && m_distance_behind > 3.0f    )
+           if(m_distance_behind < 10.0f && m_distance_behind > 3.0f    )
            {
                m_controls->setFire(true);
                m_controls->setLookBack(true);
@@ -1399,7 +1424,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
             // the kart anyway, or that this might force the kart ahead to
             // use its nitro/zipper (and then we will shoot since then the
             // kart is faster).
-            if((ai_skill >= 3)
+            if(ai_skill >= 3)
             {
                if ((fire_backwards && kart_behind_is_slow) ||
                   (!fire_backwards && kart_ahead_is_slow)    )
@@ -1770,7 +1795,7 @@ void SkiddingAI::handleNitroAndZipper()
     if( (m_kart->getEnergy()==0 ||
         m_ai_properties->m_nitro_usage==AIProperties::NITRO_NONE)  &&
         (m_kart->getPowerup()->getType()!=PowerupManager::POWERUP_ZIPPER ||
-         !m_ai_properties->m_item_usage_skill <= 1 )                         )
+         (m_ai_properties->m_item_usage_skill <= 1) )                     )
         return;
 
     // If there are items to avoid close, and we only have zippers, don't
