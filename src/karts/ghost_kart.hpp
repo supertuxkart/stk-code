@@ -77,6 +77,10 @@ public:
     // ------------------------------------------------------------------------
     virtual void  kartIsInRestNow() {};
     // ------------------------------------------------------------------------
-
+    /** To allow compilation */
+    virtual void  setBoostAI     (bool boosted);
+    virtual bool  getBoostAI     () const;
+    // ------------------------------------------------------------------------
+    
 };   // GhostKart
 #endif
