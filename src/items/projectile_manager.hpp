@@ -66,7 +66,7 @@ public:
     bool             projectileIsClose(const AbstractKart * const kart,
                                        float radius);
     // if the int in decimal is ABCD, then there is D bowling balls ;
-    // C is plungers ; B is akes ; A is basket balls
+    // C is plungers ; B is cakes ; A is basket balls
     // Warning : radius is not meant to encompass the whole track
     // An overflow may happen in that unintended case.
     int              projectileCloseType(const AbstractKart * const kart,
