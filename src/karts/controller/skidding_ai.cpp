@@ -1837,7 +1837,7 @@ void SkiddingAI::handleNitroAndZipper()
     if(m_world->getLapForKart(m_kart->getWorldKartId())
                         ==race_manager->getNumLaps()-1 &&
        (m_ai_properties->m_nitro_usage == AIProperties::NITRO_ALL ||
-       m_ai_properties->m_nitro_usage == AIProperties::NITRO_ADVANCED)
+       m_ai_properties->m_nitro_usage == AIProperties::NITRO_ADVANCED))
     {
         float finish =
             m_world->getEstimatedFinishTime(m_kart->getWorldKartId());
