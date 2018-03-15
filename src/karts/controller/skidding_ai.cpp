@@ -1134,13 +1134,10 @@ void SkiddingAI::evaluateItems(const Item *item, Vec3 kart_aim_direction,
 /** Handle all items depending on the chosen strategy.
  *  Level 0 "AI" : do nothing (not used by default)
  *  Level 1 "AI" : use items after a random time
- *  Level 2 "AI" : TBD
- *  Level 3 "AI" : TBD
- *  Level 4 "AI" : TBD
- *  Level 5 "AI" : TBD (not yet used ; meant for SuperTux GP preferred kart or bosses race)
- Either (low level AI) just use an item after 10 seconds, or do a much
- *  better job on higher level AI - e.g. aiming at karts ahead/behind, wait an
- *  appropriate time before using multiple items etc.
+ *  Level 2 AI : TBD
+ *  Level 3 AI : TBD
+ *  Level 4 AI : TBD
+ *  Level 5 AI : TBD (not yet used ; meant for SuperTux GP preferred kart or bosses race)
  *  \param dt Time step size.
  *  TODO: Implications of Bubble-Shield for AI's powerup-handling
 
@@ -1228,56 +1225,104 @@ void SkiddingAI::handleItems(const float dt)
     // -----------------------------------------
     float min_bubble_time = 2.0f;
 
+    int projectile_types = 0; //ABCD : A basket, B cakes, C plunger, D bowling
+    projectile_types = projectile_manager->projectileCloseType(m_kart,
+                                    m_ai_properties->m_shield_incoming_radius);
+   
+    bool projectile_is_close = false;
+    projectile_is_close = projectile_manager->projectileIsClose(m_kart,
+                                    m_ai_properties->m_shield_incoming_radius);
+   
     switch( m_kart->getPowerup()->getType() )
     {
+    // Level 2 : Use the shield immediately after a wait time
+    // Level 3 : Use the shield against flyable except cakes. Use the shield against bad attachments.
+    //           Use the bubble gum against an enemy close behind, except if holding a swatter.
+    // Level 4 : Level 3 and protect against cakes too
+    // Level 5 : Level 4 and use after the plunger hit rather than before
     case PowerupManager::POWERUP_BUBBLEGUM:
         {
-            Attachment::AttachmentType type = m_kart->getAttachment()->getType();
-            // Don't use shield when we have a swatter.
-            if( type == Attachment::ATTACH_SWATTER)
-                break;
+           Attachment::AttachmentType type = m_kart->getAttachment()->getType();
+           
+           if((ai_skill == 2) && (m_time_since_last_shot > 2.0f))
+           {
+               m_controls->setFire(true);
+               m_controls->setLookBack(false);
+               break;
+           }
+           
+           // Check if a flyable (cake, ...) is close. If so, use bubblegum
+           // as shield
+           if(ai_skill == 3) //don't protect against cakes
+           {
+              if( !m_kart->isShielded() && projectile_is_close
+                 && (projectile_types % 1000)/100 == 0)
+              {
+                 //don't discard swatter against plunger
+                 if( projectile_types % 100)/10 == 0
+                    || ((projectile_types % 100)/10 >= 1 && type != Attachment::ATTACH_SWATTER)
+                 {
+                    m_controls->setFire(true);
+                    m_controls->setLookBack(false);
+                    break;
+                 }
+              }             
+           }
+           else if(ai_skill == 4)
+           {
+              if( !m_kart->isShielded() && projectile_is_close)
+              {
+                 //don't discard swatter against plunger
+                 if( projectile_types % 100)/10 == 0
+                    || ((projectile_types % 100)/10 >= 1 && type != Attachment::ATTACH_SWATTER)
+                 {
+                    m_controls->setFire(true);
+                    m_controls->setLookBack(false);
+                    break;
+                 }
+              }             
+           }           
+           else if (ai_skill == 5) //don't protect against plungers alone TODO : activate after plunger hit
+           {
+              if( !m_kart->isShielded() && projectile_is_close)
+              {
+                 if ((projectile_types % 10000)/100 >=1
+                     || (projectile_types % 10) >=1 )
+                 {
+                    m_controls->setFire(true);
+                    m_controls->setLookBack(false);
+                    break;
+                 }
+              }             
+           }
 
-            // Check if a flyable (cake, ...) is close. If so, use bubblegum
-            // as shield
-            if( !m_kart->isShielded() &&
-                projectile_manager->projectileIsClose(m_kart,
-                                    m_ai_properties->m_shield_incoming_radius) )
-            {
-                m_controls->setFire(true);
-                m_controls->setLookBack(false);
-                break;
-            }
+           // Use shield to remove bad attachments
+           if( type == Attachment::ATTACH_BOMB
+             || type == Attachment::ATTACH_PARACHUTE
+             || type == Attachment::ATTACH_ANVIL )
+           {
+               m_controls->setFire(true);
+               m_controls->setLookBack(false);
+               break;
+           }
+           
+           // Avoid dropping all bubble gums one after another
+           if( m_time_since_last_shot < 2.0f) break;
 
-            // Avoid dropping all bubble gums one after another
-            if( m_time_since_last_shot < 3.0f) break;
-
-            // Use bubblegum if the next kart  behind is 'close' but not too close
-            // (too close likely means that the kart is not behind but more to the
-            // side of this kart and so won't be hit by the bubble gum anyway).
-            // Should we check the speed of the kart as well? I.e. only drop if
-            // the kart behind is faster? Otoh this approach helps preventing an
-            // overtaken kart to overtake us again.
-            if(m_distance_behind < 15.0f && m_distance_behind > 3.0f    )
-            {
-                m_controls->setFire(true);
-                m_controls->setLookBack(true);
-                break;
-            }
-
-            // If this kart is in its last lap, drop bubble gums at every
-            // opportunity, since this kart won't envounter them anymore.
-            LinearWorld *lin_world = dynamic_cast<LinearWorld*>(World::getWorld());
-            if(m_time_since_last_shot > 3.0f &&
-                lin_world &&
-                lin_world->getKartLaps(m_kart->getWorldKartId())
-                                   == race_manager->getNumLaps()-1)
-            {
-                m_controls->setFire(true);
-                m_controls->setLookBack(true);
-                break;
-            }
-            break;   // POWERUP_BUBBLEGUM
-        }
+           // Use bubblegum if the next kart  behind is 'close' but not too close
+           // (too close likely means that the kart is not behind but more to the
+           // side of this kart and so won't be hit by the bubble gum anyway).
+           // Should we check the speed of the kart as well? I.e. only drop if
+           // the kart behind is faster? Otoh this approach helps preventing an
+           // overtaken kart to overtake us again.
+           if(m_distance_behind < 12.0f && m_distance_behind > 3.0f    )
+           {
+               m_controls->setFire(true);
+               m_controls->setLookBack(true);
+               break;
+           }
+           break;   // POWERUP_BUBBLEGUM
+       }
     case PowerupManager::POWERUP_CAKE:
         {
             // if the kart has a shield, do not break it by using a cake.
