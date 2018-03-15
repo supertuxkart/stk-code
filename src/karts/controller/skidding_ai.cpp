@@ -352,8 +352,7 @@ void SkiddingAI::update(float dt)
     {
         /*Response handling functions*/
         handleAcceleration(dt);
-        handleSteering(dt);
-        handleItems(dt);
+        handleSteering(dt); //Item handling relocated there to be direction aware
         handleRescue(dt);
         handleBraking();
         // If a bomb is attached, nitro might already be set.
@@ -553,6 +552,9 @@ void SkiddingAI::handleSteering(float dt)
         m_curve[CURVE_AIM]->addPoint(m_kart->getXYZ()+eps);
         m_curve[CURVE_AIM]->addPoint(aim_point);
 #endif
+
+        //Manage item utilisation
+        handleItems(dt, &aim_point, last_node);
 
         // Potentially adjust the point to aim for in order to either
         // aim to collect item, or steer to avoid a bad item.
@@ -1149,7 +1151,7 @@ void SkiddingAI::evaluateItems(const Item *item, Vec3 kart_aim_direction,
  *  STATE: shield on -> avoid usage of offensive items (with certain tolerance)
  *  STATE: swatter on -> avoid usage of shield
  */
-void SkiddingAI::handleItems(const float dt)
+void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_node)
 {
     m_controls->setFire(false);
     if(m_kart->getKartAnimation() ||
@@ -1237,6 +1239,42 @@ void SkiddingAI::handleItems(const float dt)
     bool projectile_is_close = false;
     projectile_is_close = projectile_manager->projectileIsClose(m_kart,
                                     m_ai_properties->m_shield_incoming_radius);
+
+    // Preparing item list for item aware actions
+
+    // Angle to aim_point
+    Vec3 kart_aim_direction = *aim_point - m_kart->getXYZ();
+
+    // Make sure we have a valid last_node
+    if(last_node==Graph::UNKNOWN_SECTOR)
+        last_node = m_next_node_index[m_track_node];
+
+    int node = m_track_node;
+    float distance = 0;
+    std::vector<const Item *> items_to_collect;
+    std::vector<const Item *> items_to_avoid;
+
+    // 1) Filter and sort all items close by
+    // -------------------------------------
+    const float max_item_lookahead_distance = 12.f;
+    while(distance < max_item_lookahead_distance)
+    {
+        int n_index= DriveGraph::get()->getNode(node)->getIndex();
+        const std::vector<Item *> &items_ahead =
+            ItemManager::get()->getItemsInQuads(n_index);
+        for(unsigned int i=0; i<items_ahead.size(); i++)
+        {
+            evaluateItems(items_ahead[i],  kart_aim_direction,
+                          &items_to_avoid, &items_to_collect);
+        }   // for i<items_ahead;
+        distance += DriveGraph::get()->getDistanceToNext(node,
+                                                      m_successor_index[node]);
+        node = m_next_node_index[node];
+        // Stop when we have reached the last quad
+        if(node==last_node) break;
+    }   // while (distance < max_item_lookahead_distance)
+
+    //items_to_avoid and items_to_collect now contain the closest item information needed after
    
     switch( m_kart->getPowerup()->getType() )
     {
@@ -1384,6 +1422,10 @@ void SkiddingAI::handleItems(const float dt)
             break;
         }   // POWERUP_CAKE
 
+    // Level 2 : Use the bowling ball against enemies with a 5 second delay
+    // Level 3 : Only 3 seconds of delay
+    // Level 4 : Same as level 3
+    // Level 5 : Same as level 4           
     case PowerupManager::POWERUP_BOWLING:
         {
             // if the kart has a shield, do not break it by using a bowling ball.
@@ -1392,7 +1434,8 @@ void SkiddingAI::handleItems(const float dt)
             // Leave more time between bowling balls, since they are
             // slower, so it should take longer to hit something which
             // can result in changing our target.
-            if(m_time_since_last_shot < 5.0f) break;
+            if(ai_skill == 2 && m_time_since_last_shot < 5.0f) break;
+            if(ai_skill >= 3 && m_time_since_last_shot < 3.0f) break;
             // Consider angle towards karts
             bool straight_behind = false;
             bool straight_ahead = false;
