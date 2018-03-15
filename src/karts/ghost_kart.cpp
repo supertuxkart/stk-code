@@ -151,3 +151,13 @@ float GhostKart::getSpeed() const
     assert(gc->getCurrentReplayIndex() < m_all_physic_info.size());
     return m_all_physic_info[gc->getCurrentReplayIndex()].m_speed;
 }   // getSpeed
+
+// -----------------------------------------------------------------------------
+void Kart::setBoostAI(bool boosted)
+{
+}   // setBoostAI
+// -----------------------------------------------------------------------------
+bool Kart::getBoostAI() const
+{
+    return false;
+}   // getBoostAI
