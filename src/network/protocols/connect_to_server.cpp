@@ -159,9 +159,13 @@ void ConnectToServer::asynchronousUpdate()
             }
             if (m_tried_connection++ > 10)
             {
-                Log::error("ConnectToServer", "Timeout waiting for aloha");
-                m_state = NetworkConfig::get()->isWAN() ?
-                    HIDING_ADDRESS : DONE;
+                Log::warn("ConnectToServer", "Timeout waiting for"
+                    " aloha, trying to connect anyway.");
+                m_state = CONNECTING;
+                // Reset timer for next usage
+                m_timer = 0.0;
+                m_tried_connection = 0;
+                return;
             }
             if ((!NetworkConfig::m_disable_lan &&
                 m_server_address.getIP() ==
