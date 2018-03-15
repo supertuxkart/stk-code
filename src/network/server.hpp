@@ -49,7 +49,7 @@ protected:
     std::string m_lower_case_name;
 
     uint32_t m_server_id;
-    uint32_t m_host_id;
+    uint32_t m_server_owner;
 
     /** The maximum number of players that the server supports */
     int m_max_players;
@@ -98,9 +98,8 @@ public:
     /** Returns the ID of this server. */
     const uint32_t getServerId() const { return m_server_id; }
     // ------------------------------------------------------------------------
-    /** Returns the unique host id of this server (wan game only), which is
-     *  the user id in STK addon server of the server owner. */
-    const uint32_t getHostId() const { return m_host_id; }
+    /** Returns the user id in STK addon server of the server owner (WAN). */
+    const uint32_t getServerOwner() const { return m_server_owner; }
     // ------------------------------------------------------------------------
     uint16_t getPrivatePort() const { return m_private_port; }
     // ------------------------------------------------------------------------

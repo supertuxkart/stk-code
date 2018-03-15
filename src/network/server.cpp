@@ -46,7 +46,7 @@ Server::Server(const XMLNode& xml)
     m_lower_case_name = StringUtils::toLowerCase(m_lower_case_name);
 
     xml.get("id", &m_server_id);
-    xml.get("hostid", &m_host_id);
+    xml.get("host_id", &m_server_owner);
     xml.get("max_players", &m_max_players);
     xml.get("current_players", &m_current_players);
     uint32_t ip;
@@ -80,7 +80,7 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
     m_lower_case_name    = StringUtils::toLowerCase(StringUtils::wideToUtf8(name));
     m_satisfaction_score = 0;
     m_server_id          = server_id;
-    m_host_id            = 0;
+    m_server_owner       = 0;
     m_current_players    = current_players;
     m_max_players        = max_players;
     m_address.copy(address);

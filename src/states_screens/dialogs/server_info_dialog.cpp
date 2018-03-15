@@ -46,8 +46,8 @@ using namespace Online;
 ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
                 : ModalDialog(0.8f,0.8f), m_server(server), m_password(NULL)
 {
-    Log::info("ServerInfoDialog", "Server id is %d, Host id is %d",
-       server->getServerId(), server->getHostId());
+    Log::info("ServerInfoDialog", "Server id is %d, owner is %d",
+       server->getServerId(), server->getServerOwner());
     m_self_destroy = false;
 
     loadFromFile("online/server_info_dialog.stkgui");
