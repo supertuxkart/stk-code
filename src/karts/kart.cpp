@@ -143,6 +143,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_min_nitro_time       = 0.0f;
     m_fire_clicked         = 0;
     m_wrongway_counter     = 0;
+    m_boosted_ai           = false;
     m_type                 = RaceManager::KT_AI;
 
     m_view_blocked_by_plunger = 0;
@@ -469,6 +470,17 @@ float Kart::getSpeedIncreaseTimeLeft(unsigned int category) const
 {
     return m_max_speed->getSpeedIncreaseTimeLeft(category);
 }   // getSpeedIncreaseTimeLeft
+
+// -----------------------------------------------------------------------------
+void Kart::setBoostAI(bool boosted)
+{
+    m_boosted_ai = boosted;
+}   // setBoostAI
+// -----------------------------------------------------------------------------
+bool Kart::getBoostAI() const
+{
+    return m_boosted_ai;
+}   // getBoostAI
 
 // -----------------------------------------------------------------------------
 /** Returns the current material the kart is on. */
