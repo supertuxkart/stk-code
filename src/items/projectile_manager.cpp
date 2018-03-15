@@ -153,3 +153,44 @@ bool ProjectileManager::projectileIsClose(const AbstractKart * const kart,
     }
     return false;
 }   // projectileIsClose
+
+// -----------------------------------------------------------------------------
+/** Returns ABCD with D, C, B and A the numbers of bowling balls, plungers, cakes
+ *  and basket balls respectively within the given distance of the specified kart.
+ *  It overflows if the answer is over 9, which is bad in theory but
+ *  harmless in practice
+ *  \param kart The kart for which the test is done.
+ *  \param radius Distance within which the projectile must be.
+*/
+int ProjectileManager::projectileCloseType(const AbstractKart * const kart,
+                                         float radius)
+{
+    float r2 = radius*radius;
+    int counter = 0;
+
+    for(Projectiles::iterator i  = m_active_projectiles.begin();
+                              i != m_active_projectiles.end();   i++)
+    {
+        float dist2 = (*i)->getXYZ().distance2(kart->getXYZ());
+        if(dist2<r2)
+        {
+            if ((*i)->getType() == PowerupManager::POWERUP_BOWLING)
+            {
+                counter = counter + 1;   
+            }
+            else if ((*i)->getType() == PowerupManager::POWERUP_PLUNGER)
+            {
+                counter = counter + 10;   
+            }
+            else if ((*i)->getType() == PowerupManager::POWERUP_CAKE)
+            {
+                counter = counter + 100;   
+            }
+            else if ((*i)->getType() == PowerupManager::POWERUP_RUBBERBALL)
+            {
+                counter = counter + 1000;   
+            }
+        }
+    }
+    return counter;
+}   // projectileCloseType
