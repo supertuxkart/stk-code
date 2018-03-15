@@ -273,6 +273,8 @@ public:
     virtual void   setSlowdown(unsigned int category, float max_speed_fraction,
                                float fade_in_time);
     virtual float getSpeedIncreaseTimeLeft(unsigned int category) const;
+    virtual void  setBoostAI     (bool boosted);
+    virtual bool  getBoostAI     ();
     virtual void  collectedItem(Item *item, int random_attachment);
     virtual float getStartupBoost() const;
 
