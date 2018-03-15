@@ -1190,7 +1190,7 @@ void SkiddingAI::handleItems(const float dt)
       }
       else
       {
-         ai_skill = m_ai_properties->m_item_usage_skill
+         ai_skill = m_ai_properties->m_item_usage_skill;
       }
    }
    
@@ -1214,7 +1214,7 @@ void SkiddingAI::handleItems(const float dt)
     if(ai_skill == 1)
     {
        int random_t = 0;
-       g = RandomGenerator();
+       RandomGenerator g = RandomGenerator();
        random_t = g.get(6);
        random_t = random_t + 5;
           
@@ -1265,7 +1265,7 @@ void SkiddingAI::handleItems(const float dt)
               {
                  //don't discard swatter against plunger
                  if( (projectile_types % 100)/10 == 0
-                    || ((projectile_types % 100)/10 >= 1 && type != Attachment::ATTACH_SWATTER)
+                    || ((projectile_types % 100)/10 >= 1 && type != Attachment::ATTACH_SWATTER))
                  {
                     m_controls->setFire(true);
                     m_controls->setLookBack(false);
@@ -1279,7 +1279,7 @@ void SkiddingAI::handleItems(const float dt)
               {
                  //don't discard swatter against plunger
                  if( (projectile_types % 100)/10 == 0
-                    || ((projectile_types % 100)/10 >= 1 && type != Attachment::ATTACH_SWATTER)
+                    || ((projectile_types % 100)/10 >= 1 && type != Attachment::ATTACH_SWATTER))
                  {
                     m_controls->setFire(true);
                     m_controls->setLookBack(false);
@@ -1331,7 +1331,7 @@ void SkiddingAI::handleItems(const float dt)
     case PowerupManager::POWERUP_CAKE:
         {
             // if the kart has a shield, do not break it by using a cake.
-            if((m_kart->getShieldTime() > min_bubble_timeif) && (stk_config->m_shield_restrict_weapons == true))
+            if((m_kart->getShieldTime() > min_bubble_time) && (stk_config->m_shield_restrict_weapons == true))
                 break;
             // Leave some time between shots
             if(m_time_since_last_shot<3.0f) break;
