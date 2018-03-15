@@ -105,18 +105,6 @@ void NetworkingLobby::loadedFromFile()
 // ---------------------------------------------------------------------------
 void NetworkingLobby::beforeAddingWidget()
 {
-    if (!UserConfigParams::m_lobby_chat)
-    {
-        getWidget("chat")->setVisible(false);
-        getWidget("chat")->setActive(false);
-        getWidget("send")->setVisible(false);
-    }
-    else
-    {
-        getWidget("chat")->setVisible(true);
-        getWidget("chat")->setActive(true);
-        getWidget("send")->setVisible(true);
-    }
 } // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -136,7 +124,22 @@ void NetworkingLobby::init()
         input_manager->getDeviceManager()->getLatestUsedDevice();
     PlayerProfile* profile = PlayerManager::getCurrentPlayer();
     StateManager::get()->createActivePlayer(profile, device);
-    m_chat_box->addListener(this);
+
+    if (!UserConfigParams::m_lobby_chat)
+    {
+        getWidget("chat")->setVisible(false);
+        getWidget("chat")->setActive(false);
+        getWidget("send")->setVisible(false);
+        getWidget("send")->setActive(false);
+    }
+    else
+    {
+        m_chat_box->addListener(this);
+        getWidget("chat")->setVisible(true);
+        getWidget("chat")->setActive(true);
+        getWidget("send")->setVisible(true);
+        getWidget("send")->setActive(true);
+    }
 }   // init
 
 // ----------------------------------------------------------------------------
