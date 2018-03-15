@@ -1281,7 +1281,7 @@ void SkiddingAI::handleItems(const float dt)
     case PowerupManager::POWERUP_CAKE:
         {
             // if the kart has a shield, do not break it by using a cake.
-            if(m_kart->getShieldTime() > min_bubble_time)
+            if((m_kart->getShieldTime() > min_bubble_timeif) && (stk_config->m_shield_restrict_weapons == true))
                 break;
             // Leave some time between shots
             if(m_time_since_last_shot<3.0f) break;
@@ -1329,7 +1329,7 @@ void SkiddingAI::handleItems(const float dt)
     case PowerupManager::POWERUP_BOWLING:
         {
             // if the kart has a shield, do not break it by using a bowling ball.
-            if(m_kart->getShieldTime() > min_bubble_time)
+            if((m_kart->getShieldTime() > min_bubble_time) && (stk_config->m_shield_restrict_weapons == true))
                 break;
             // Leave more time between bowling balls, since they are
             // slower, so it should take longer to hit something which
@@ -1386,7 +1386,7 @@ void SkiddingAI::handleItems(const float dt)
     case PowerupManager::POWERUP_PLUNGER:
         {
             // if the kart has a shield, do not break it by using a plunger.
-            if(m_kart->getShieldTime() > min_bubble_time)
+            if((m_kart->getShieldTime() > min_bubble_time) && (stk_config->m_shield_restrict_weapons == true))
                 break;
 
             // Leave more time after a plunger, since it will take some
@@ -1460,7 +1460,7 @@ void SkiddingAI::handleItems(const float dt)
         }
     case PowerupManager::POWERUP_RUBBERBALL:
         // if the kart has a shield, do not break it by using a swatter.
-        if(m_kart->getShieldTime() > min_bubble_time)
+        if((m_kart->getShieldTime() > min_bubble_time) && (stk_config->m_shield_restrict_weapons == true))
             break;
         // Perhaps some more sophisticated algorithm might be useful.
         // For now: fire if there is a kart ahead (which means that
