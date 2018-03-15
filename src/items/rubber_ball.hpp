@@ -84,7 +84,7 @@ private:
     /** Timer before another rubber ball can be picked up. This is to ensure
      *  that there are not too many rubber balls on the track in races with many
      *  karts. */
-    static float m_time_between_balls;
+    static int m_ticks_between_balls;
 
     /** This factor is used to influence how much the rubber ball should aim
      *  at its target early. It used the 'distance to center of track' of its
@@ -204,7 +204,11 @@ public:
     static  void init(const XMLNode &node, scene::IMesh *rubberball);
     virtual bool updateAndDelete(float dt);
     virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL);
-    static float getTimeBetweenRubberBalls()    {return m_time_between_balls;}
+    virtual void setAnimation(AbstractKartAnimation *animation);
+    // ------------------------------------------------------------------------
+    /** Returns time (in ticks) between rubberballs, to avoid that in games
+     *  with many karts too many rubber balls are in play at the same time. */
+    static int   getTicksBetweenRubberBalls() { return m_ticks_between_balls; }
     // ------------------------------------------------------------------------
     /** This object does not create an explosion, all affects on
      *  karts are handled by this hit() function. */

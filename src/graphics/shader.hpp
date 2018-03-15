@@ -20,7 +20,6 @@
 #ifndef HEADER_SHADER_HPP
 #define HEADER_SHADER_HPP
 
-#include "graphics/central_settings.hpp"
 #include "graphics/gl_headers.hpp"
 #include "graphics/shader_files_manager.hpp"
 #include "graphics/shared_gpu_objects.hpp"
@@ -29,6 +28,7 @@
 #include <matrix4.h>
 #include <SColor.h>
 #include <vector3d.h>
+#include <array>
 
 #include <string>
 #include <vector>
@@ -55,8 +55,7 @@ protected:
 
     /** OpenGL's program id. */
     GLuint m_program;
-
-    void bypassUBO() const;
+    std::vector<std::shared_ptr<GLuint> > m_shaders;
 
     // ========================================================================
     /** Ends recursion. */
@@ -70,13 +69,13 @@ protected:
     void loadAndAttachShader(GLint shader_type, const std::string &name,
                              Types ... args)
     {
-        GLint shader_id = ShaderFilesManager::getInstance()
+        auto shader_id = ShaderFilesManager::getInstance()
             ->getShaderFile(name, shader_type);
-        glAttachShader(m_program, shader_id);
-        GLint is_deleted = GL_TRUE;
-        glGetShaderiv(shader_id, GL_DELETE_STATUS, &is_deleted);
-        if (is_deleted == GL_FALSE)
-            glDeleteShader(shader_id);
+        if (shader_id)
+        {
+            m_shaders.push_back(shader_id);
+            glAttachShader(m_program, *shader_id);
+        }
         loadAndAttachShader(args...);
     }   // loadAndAttachShader
     // ------------------------------------------------------------------------
@@ -87,15 +86,17 @@ protected:
     {
         loadAndAttachShader(shader_type, std::string(name), args...);
     }   // loadAndAttachShader
-    // ------------------------------------------------------------------------
-    void setAttribute(AttributeType type);
 
 public:
         ShaderBase();
+        ~ShaderBase()
+        {
+            glDeleteProgram(m_program);
+        }
     int loadTFBProgram(const std::string &vertex_file_path,
                        const char **varyings,
                        unsigned varyingscount);
-    static void updateShaders();
+    static void killShaders();
     GLuint createVAO();
     // ------------------------------------------------------------------------
     /** Activates the shader calling glUseProgram. */
@@ -146,9 +147,9 @@ private:
     /** End of recursive implementation of assignUniforms. */
     void assignUniformsImpl()
     {
-        bindPoint("MatrixData",   0);
+        bindPoint("Matrices", 0);
         bindPoint("LightingData", 1);
-        bindPoint("SkinningData", 2);
+        bindPoint("SPFogData", 2);
     }   // assignUniformsImpl
 
     // ------------------------------------------------------------------------
@@ -171,8 +172,6 @@ public:
     /** Sets the uniforms for this shader. */
     void setUniforms(const Args & ... args) const
     {
-        if (!CVS->isARBUniformBufferObjectUsable())
-            bypassUBO();
         setUniformsImpl(args...);
     }   // setUniforms
     // ------------------------------------------------------------------------
@@ -218,6 +217,15 @@ private:
     {
         glUniform4i(m_uniforms[N], col.getRed(), col.getGreen(),
                                    col.getBlue(), col.getAlpha());
+        setUniformsImpl<N + 1>(arg...);
+    }   // setUniformsImpl
+
+    // ------------------------------------------------------------------------
+    /** Implementation for setUniforms for a 4 floats uniform. */
+    template<unsigned N = 0, typename... Args1>
+    void setUniformsImpl(const std::array<float, 4> &ff, Args1... arg) const
+    {
+        glUniform4f(m_uniforms[N], ff[0], ff[1], ff[2], ff[3]);
         setUniformsImpl<N + 1>(arg...);
     }   // setUniformsImpl
 
@@ -349,13 +357,12 @@ public:
     {
         m_program = glCreateProgram();
         loadAndAttachShader(args...);
-        if (!CVS->isARBExplicitAttribLocationUsable())
-            setAttribute(type);
         glLinkProgram(m_program);
 
         GLint Result = GL_FALSE;
         glGetProgramiv(m_program, GL_LINK_STATUS, &Result);
-        if (Result == GL_FALSE) {
+        if (Result == GL_FALSE)
+        {
             int info_length;
             Log::error("Shader", "Error when linking these shaders :");
             printFileList(args...);
@@ -365,8 +372,12 @@ public:
             Log::error("Shader", error_message);
             delete[] error_message;
         }
+        // After linking all shaders can be detached
+        for (auto shader : m_shaders)
+        {
+            glDetachShader(m_program, *shader);
+        }
     }   // loadProgram
-
     // ------------------------------------------------------------------------
     void drawFullScreenEffect(Args...args)
     {
@@ -378,7 +389,6 @@ public:
 
 };   // Shader
 
-// ============================================================================
 
 #endif
 

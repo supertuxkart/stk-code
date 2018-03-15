@@ -22,20 +22,19 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shader.hpp"
-#include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/texture_shader.hpp"
 #include "utils/cpp2011.hpp"
 
 // ============================================================================
-class Primitive2DList : public TextureShader<Primitive2DList, 1, float>
+class Primitive2DList : public TextureShader<Primitive2DList, 1, float, core::vector2df>
 {
 public:
     Primitive2DList()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "primitive2dlist.vert",
                             GL_FRAGMENT_SHADER, "transparent.frag");
-        assignUniforms("custom_alpha");
+        assignUniforms("custom_alpha", "fullscreen");
         assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
     }   // Primitive2DList
 };   //Primitive2DList
@@ -70,7 +69,7 @@ public:
                             GL_FRAGMENT_SHADER, "texturedquad.frag");
         assignUniforms("center", "size", "texcenter", "texsize");
 
-        assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
+        assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }   // TextureRectShader
 };   // TextureRectShader
 
@@ -93,41 +92,12 @@ class ColoredTextureRectShader : public TextureShader<ColoredTextureRectShader, 
                                                core::vector2df, core::vector2df,
                                                core::vector2df, core::vector2df>
 {
-#ifdef XX
-private:
-    GLuint m_quad_buffer;
-
-    void initQuadBuffer()
-    {
-        const float quad_vertex[] = { -1., -1., -1.,  1.,   // UpperLeft
-                                      -1.,  1., -1., -1.,   // LowerLeft
-                                       1., -1.,  1.,  1.,   // UpperRight
-                                       1.,  1.,  1., -1. }; // LowerRight 
-        glGenBuffers(1, &m_quad_buffer);
-        glBindBuffer(GL_ARRAY_BUFFER, m_quad_buffer);
-        glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), quad_vertex,
-                     GL_STATIC_DRAW);
-
-        glGenVertexArrays(1, &SharedObject::UIVAO);
-        glBindVertexArray(SharedObject::UIVAO);
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(3);
-        glBindBuffer(GL_ARRAY_BUFFER, m_quad_buffer);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 
-                              (GLvoid *)(2 * sizeof(float)));
-        glBindVertexArray(0);
-    }   // initQuadBuffer
-#endif
 public:
     GLuint m_color_vbo;
     GLuint m_vao;
 
     ColoredTextureRectShader()
     {
-#ifdef XX
-        initQuadBuffer();
-#endif
         loadProgram(OBJECT, GL_VERTEX_SHADER, "colortexturedquad.vert",
                             GL_FRAGMENT_SHADER, "colortexturedquad.frag");
         assignUniforms("center", "size", "texcenter", "texsize");
@@ -143,16 +113,15 @@ public:
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
         glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 
                               (GLvoid *)(2 * sizeof(float)));
-        const unsigned quad_color[] = {   0,   0,   0, 255,
+        glBindVertexArray(0);
+        const uint8_t quad_color[] = {   0,   0,   0, 255,
                                         255,   0,   0, 255,
                                           0, 255,   0, 255,
                                           0,   0, 255, 255 };
         glGenBuffers(1, &m_color_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, m_color_vbo);
-        glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(unsigned), quad_color,
-                     GL_DYNAMIC_DRAW);
-        glVertexAttribIPointer(2, 4, GL_UNSIGNED_INT, 4 * sizeof(unsigned), 0);
-        glBindVertexArray(0);
+        glBufferData(GL_ARRAY_BUFFER, 16, quad_color, GL_DYNAMIC_DRAW);
+
     }   // ColoredTextureRectShader
 };   // ColoredTextureRectShader
 
@@ -164,16 +133,11 @@ static void drawTexColoredQuad(const video::ITexture *texture,
                                float tex_center_pos_y, float tex_width,
                                float tex_height)
 {
-    unsigned colors[] = {
-        col[0].getRed(), col[0].getGreen(), col[0].getBlue(), col[0].getAlpha(),
-        col[1].getRed(), col[1].getGreen(), col[1].getBlue(), col[1].getAlpha(),
-        col[2].getRed(), col[2].getGreen(), col[2].getBlue(), col[2].getAlpha(),
-        col[3].getRed(), col[3].getGreen(), col[3].getBlue(), col[3].getAlpha(),
-    };
-
+    glBindVertexArray(ColoredTextureRectShader::getInstance()->m_vao);
     glBindBuffer(GL_ARRAY_BUFFER,
                  ColoredTextureRectShader::getInstance()->m_color_vbo);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, 16 * sizeof(unsigned), colors);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, 16, col);
+    glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, 4 , 0);
 
     ColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(ColoredTextureRectShader::getInstance()->m_vao);
@@ -186,8 +150,9 @@ static void drawTexColoredQuad(const video::ITexture *texture,
                       core::vector2df(tex_width, tex_height));
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
 
     glGetError();
 }   // drawTexColoredQuad
@@ -659,7 +624,9 @@ void draw2DVertexPrimitiveList(video::ITexture *tex, const void* vertices,
     VertexUtils::bindVertexArrayAttrib(vType);
 
     Primitive2DList::getInstance()->use();
-    Primitive2DList::getInstance()->setUniforms(1.0f);
+    Primitive2DList::getInstance()->setUniforms(1.0f,
+        core::vector2df(float(irr_driver->getActualScreenSize().Width),
+        float(irr_driver->getActualScreenSize().Height)));
     Primitive2DList::getInstance()->setTextureUnits(tex->getOpenGLTextureName());
     glDrawElements(GL_TRIANGLE_FAN, primitiveCount, GL_UNSIGNED_SHORT, 0);
 

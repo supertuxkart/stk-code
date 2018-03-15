@@ -4,6 +4,7 @@ cmake_build*/
 dependencies*/
 CMakeFiles/
 stk-editor/
+.vscode/
 
 .config/
 supertuxkart-64
@@ -56,10 +57,14 @@ android/android-ndk*
 android/android-sdk*
 android/assets
 android/bin
-android/obj
+android/build
 android/libs
+android/obj
+android/res
+android/.gradle
 android-*
 *.apk
+*.keystore
 
 lib/curl
 lib/freetype

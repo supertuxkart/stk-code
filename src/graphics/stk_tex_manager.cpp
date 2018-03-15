@@ -16,12 +16,15 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/stk_tex_manager.hpp"
+#include "config/hardware_stats.hpp"
+#include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/materials.hpp"
 #include "graphics/stk_texture.hpp"
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/log.hpp"
+
+#include <algorithm>
 
 // ----------------------------------------------------------------------------
 STKTexManager::~STKTexManager()
@@ -55,12 +58,16 @@ STKTexture* STKTexManager::findTextureInFileSystem(const std::string& filename,
 }   // findTextureInFileSystem
 
 // ----------------------------------------------------------------------------
-video::ITexture* STKTexManager::getTexture(const std::string& path, bool srgb,
-                                           bool premul_alpha,
-                                           bool set_material, bool mesh_tex,
-                                           bool no_upload, bool single_channel,
+video::ITexture* STKTexManager::getTexture(const std::string& path,
+                                           TexConfig* tc, bool no_upload,
                                            bool create_if_unfound)
 {
+    if (path.empty())
+    {
+        Log::error("STKTexManager", "Texture name is empty.");
+        return NULL;
+    }
+
     auto ret = m_all_textures.find(path);
     if (!no_upload && ret != m_all_textures.end())
         return ret->second;
@@ -79,8 +86,7 @@ video::ITexture* STKTexManager::getTexture(const std::string& path, bool srgb,
     if (create_if_unfound)
     {
         new_texture = new STKTexture(full_path.empty() ? path : full_path,
-            srgb, premul_alpha, set_material, mesh_tex, no_upload,
-            single_channel);
+            tc, no_upload);
         if (new_texture->getOpenGLTextureName() == 0 && !no_upload)
         {
             const char* name = new_texture->getName().getPtr();
@@ -147,114 +153,6 @@ void STKTexManager::removeTexture(STKTexture* texture, bool remove_all)
 }   // removeTexture
 
 // ----------------------------------------------------------------------------
-void STKTexManager::dumpAllTexture(bool mesh_texture)
-{
-    for (auto p : m_all_textures)
-    {
-        if (!p.second || (mesh_texture && !p.second->isMeshTexture()))
-            continue;
-        Log::info("STKTexManager", "%s size: %0.2fK", p.first.c_str(),
-            float(p.second->getTextureSize()) / 1024);
-    }
-}   // dumpAllTexture
-
-// ----------------------------------------------------------------------------
-int STKTexManager::dumpTextureUsage()
-{
-    int size = 0;
-    for (auto p : m_all_textures)
-    {
-        if (p.second == NULL)
-            continue;
-        size += p.second->getTextureSize() / 1024 / 1024;
-    }
-    Log::info("STKTexManager", "Total %dMB", size);
-    return size;
-}   // dumpAllTexture
-
-// ----------------------------------------------------------------------------
-video::ITexture* STKTexManager::getUnicolorTexture(const irr::video::SColor &c)
-{
-    std::string name = StringUtils::toString(c.color) + "unic";
-    auto ret = m_all_textures.find(name);
-    if (ret != m_all_textures.end())
-        return ret->second;
-
-    uint8_t* data = new uint8_t[2 * 2 * 4];
-    memcpy(data, &c.color, sizeof(video::SColor));
-    memcpy(data + 4, &c.color, sizeof(video::SColor));
-    memcpy(data + 8, &c.color, sizeof(video::SColor));
-    memcpy(data + 12, &c.color, sizeof(video::SColor));
-    return addTexture(new STKTexture(data, name, 2));
-
-}   // getUnicolorTexture
-
-// ----------------------------------------------------------------------------
-core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
-{
-    core::stringw result;
-#ifndef SERVER_ONLY
-    if (CVS->isTextureCompressionEnabled())
-        return L"Please disable texture compression for reloading textures.";
-
-    if (name.empty())
-    {
-        for (auto p : m_all_textures)
-        {
-            if (p.second == NULL || !p.second->isMeshTexture())
-                continue;
-            p.second->reload();
-            Log::info("STKTexManager", "%s reloaded",
-                p.second->getName().getPtr());
-        }
-        return L"All textures reloaded.";
-    }
-
-    core::stringw list = name;
-    list.make_lower().replace(L'\u005C', L'\u002F');
-    std::vector<std::string> names =
-        StringUtils::split(StringUtils::wideToUtf8(list), ';');
-    for (const std::string& fname : names)
-    {
-        for (auto p : m_all_textures)
-        {
-            if (p.second == NULL || !p.second->isMeshTexture())
-                continue;
-            std::string tex_path =
-                StringUtils::toLowerCase(p.second->getName().getPtr());
-            std::string tex_name = StringUtils::getBasename(tex_path);
-            if (fname == tex_name || fname == tex_path)
-            {
-                p.second->reload();
-                result += tex_name.c_str();
-                result += L" ";
-                break;
-            }
-        }
-    }
-    if (result.empty())
-        return L"Texture(s) not found!";
-#endif   // !SERVER_ONLY
-    return result + "reloaded.";
-}   // reloadTexture
-
-// ----------------------------------------------------------------------------
-void STKTexManager::reset()
-{
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    if (!CVS->isAZDOEnabled()) return;
-    for (auto p : m_all_textures)
-    {
-        if (p.second == NULL)
-            continue;
-        p.second->unloadHandle();
-    }
-    // Driver seems to crash if texture handles are not cleared...
-    ObjectPass1Shader::getInstance()->recreateTrilinearSampler(0);
-#endif
-}   // reset
-
-// ----------------------------------------------------------------------------
 /** Sets an error message to be displayed when a texture is not found. This
  *  error message is shown before the "Texture %s not found or invalid"
  *  message. It can be used to supply additional details like what kart is
@@ -271,3 +169,17 @@ void STKTexManager::setTextureErrorMessage(const std::string &error,
     else
         m_texture_error_message = StringUtils::insertValues(error, detail);
 }   // setTextureErrorMessage
+
+// ----------------------------------------------------------------------------
+int STKTexManager::dumpTextureUsage()
+{
+    int size = 0;
+    for (auto p : m_all_textures)
+    {
+        if (p.second == NULL)
+            continue;
+        size += p.second->getTextureSize() / 1024 / 1024;
+    }
+    Log::info("STKTexManager", "Total %dMB", size);
+    return size;
+}   // dumpTextureUsage

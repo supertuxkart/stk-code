@@ -47,8 +47,11 @@ GLuint TextureShaderBase::m_all_texture_types[] =
   /* ST_VOLUME_LINEAR_FILTERED         */ GL_TEXTURE_3D,
   /* ST_NEARED_CLAMPED_FILTERED        */ GL_TEXTURE_2D,
   /* ST_BILINEAR_CLAMPED_FILTERED      */ GL_TEXTURE_2D,
-  /* ST_SEMI_TRILINEAR                 */ GL_TEXTURE_2D,
-  /* ST_TEXTURE_BUFFER                 */ GL_TEXTURE_BUFFER
+  /* ST_SEMI_TRILINEAR                 */ GL_TEXTURE_2D
+#ifndef USE_GLES2
+  /* ST_TEXTURE_BUFFER                */, GL_TEXTURE_BUFFER
+#endif
+
 };
 
 // ----------------------------------------------------------------------------
@@ -120,8 +123,10 @@ void TextureShaderBase::bindTextureNearestClamped(GLuint texture_unit,
 // ----------------------------------------------------------------------------
 void TextureShaderBase::bindTextureBuffer(GLuint texture_unit, GLuint tex_id)
 {
+#ifndef USE_GLES2
     glActiveTexture(GL_TEXTURE0 + texture_unit);
     glBindTexture(GL_TEXTURE_BUFFER, tex_id);
+#endif
 }   // bindTextureBuffer
 
 // ----------------------------------------------------------------------------
@@ -246,8 +251,10 @@ GLuint TextureShaderBase::createSamplers(SamplerTypeNew sampler_type)
         return createBilinearClampedSampler();
     case ST_SEMI_TRILINEAR:
         return createSemiTrilinearSampler();
+#ifndef USE_GLES2
     case ST_TEXTURE_BUFFER:
         return 0;
+#endif
     default:
         assert(false);
         return 0;

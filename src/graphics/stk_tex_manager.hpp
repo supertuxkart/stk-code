@@ -23,16 +23,38 @@
 #include "utils/singleton.hpp"
 
 #include "irrString.h"
+#include "ITexture.h"
 
-#include <algorithm>
+#include <cassert>
 #include <string>
 #include <unordered_map>
 
 class STKTexture;
 namespace irr
 {
-    namespace video { class ITexture; class SColor; }
+    namespace video { class SColor; }
 }
+
+struct TexConfig
+{
+     bool m_srgb;
+     bool m_premul_alpha;
+     bool m_mesh_tex;
+     bool m_set_material;
+     bool m_colorization_mask;
+     bool m_normal_map;
+     TexConfig(bool srgb = false, bool premul_alpha = false,
+               bool mesh_tex = true, bool set_material = false,
+               bool color_mask = false, bool normal_map = false)
+     {
+         m_srgb = srgb;
+         m_premul_alpha = premul_alpha;
+         m_mesh_tex = mesh_tex;
+         m_set_material = set_material;
+         m_colorization_mask = color_mask;
+         m_normal_map = normal_map;
+     }
+};
 
 class STKTexManager : public Singleton<STKTexManager>, NoCopy
 {
@@ -53,27 +75,15 @@ public:
     ~STKTexManager();
     // ------------------------------------------------------------------------
     irr::video::ITexture* getTexture(const std::string& path,
-                                     bool srgb = false,
-                                     bool premul_alpha = false,
-                                     bool set_material = false,
-                                     bool mesh_tex = false,
+                                     TexConfig* tc = NULL,
                                      bool no_upload = false,
-                                     bool single_channel = false,
                                      bool create_if_unfound = true);
-    // ------------------------------------------------------------------------
-    irr::video::ITexture* getUnicolorTexture(const irr::video::SColor &c);
     // ------------------------------------------------------------------------
     irr::video::ITexture* addTexture(STKTexture* texture);
     // ------------------------------------------------------------------------
     void removeTexture(STKTexture* texture, bool remove_all = false);
     // ------------------------------------------------------------------------
-    void dumpAllTexture(bool mesh_texture);
-    // ------------------------------------------------------------------------
     int dumpTextureUsage();
-    // ------------------------------------------------------------------------
-    irr::core::stringw reloadTexture(const irr::core::stringw& name);
-    // ------------------------------------------------------------------------
-    void reset();
     // ------------------------------------------------------------------------
     /** Returns the currently defined texture error message, which is used
      *  by event_handler.cpp to print additional info about irrlicht

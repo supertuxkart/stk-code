@@ -17,6 +17,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tracks/quad.hpp"
+#include "tracks/graph.hpp"
+#include "utils/mini_glm.hpp"
 #include "utils/log.hpp"
 
 #include <algorithm>
@@ -36,6 +38,8 @@ Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
                               std::min(p2.getY(), p3.getY())  );
     m_max_height = std::max ( std::max(p0.getY(), p1.getY()),
                               std::max(p2.getY(), p3.getY())  );
+    m_min_height_testing = Graph::MIN_HEIGHT_TESTING;
+    m_max_height_testing = Graph::MAX_HEIGHT_TESTING;
 }   // Quad
 
 // ----------------------------------------------------------------------------
@@ -66,6 +70,34 @@ void Quad::getVertices(video::S3DVertex *v, const video::SColor &color) const
 }   // setVertices
 
 // ----------------------------------------------------------------------------
+/** Sets the vertices in an spm vertex array to the 4 points of this quad.
+ *  \param v The vertex array in which to set the vertices.
+ *  \param color The color to use for this quad.
+ */
+void Quad::getSPMVertices(video::S3DVertexSkinnedMesh *v,
+                          const video::SColor &color) const
+{
+    // Eps is used to raise the track debug quads a little bit higher than
+    // the ground, so that they are actually visible.
+    core::vector3df normal = getNormal().toIrrVector();
+    core::vector3df eps = normal * 0.1f;
+    v[0].m_position = m_p[0].toIrrVector()+eps;
+    v[1].m_position = m_p[1].toIrrVector()+eps;
+    v[2].m_position = m_p[2].toIrrVector()+eps;
+    v[3].m_position = m_p[3].toIrrVector()+eps;
+
+    v[0].m_normal = MiniGLM::compressVector3(normal);
+    v[1].m_normal = MiniGLM::compressVector3(normal);
+    v[2].m_normal = MiniGLM::compressVector3(normal);
+    v[3].m_normal = MiniGLM::compressVector3(normal);
+
+    v[0].m_color  = color;
+    v[1].m_color  = color;
+    v[2].m_color  = color;
+    v[3].m_color  = color;
+}   // setVertices
+
+// ----------------------------------------------------------------------------
 bool Quad::pointInside(const Vec3& p, bool ignore_vertical) const
 {
     // In case that a kart can validly run too high over one driveline
@@ -77,8 +109,8 @@ bool Quad::pointInside(const Vec3& p, bool ignore_vertical) const
     // with the minimum height of the quad (and not with the actual
     // height of the quad at the point where the kart is).
     if(!ignore_vertical                &&
-       (p.getY() - m_max_height > 5.0f ||
-       p.getY() - m_min_height < -1.0f   ))
+       (p.getY() - m_max_height > m_max_height_testing ||
+       p.getY() - m_min_height < m_min_height_testing   ))
        return false;
 
     // If a point is exactly on the line of two quads (e.g. between points

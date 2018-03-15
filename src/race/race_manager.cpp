@@ -66,7 +66,7 @@ RaceManager::RaceManager()
 {
     // Several code depends on this, e.g. kart_properties
     assert(DIFFICULTY_FIRST == 0);
-    m_num_karts          = UserConfigParams::m_num_karts;
+    m_num_karts          = UserConfigParams::m_default_num_karts;
     m_difficulty         = DIFFICULTY_HARD;
     m_major_mode         = MAJOR_MODE_SINGLE;
     m_minor_mode         = MINOR_MODE_NORMAL_RACE;
@@ -338,7 +338,7 @@ void RaceManager::startNew(bool from_overworld)
                                          ->getUniqueID(),
                                          m_grand_prix.getId(),
                                          m_minor_mode,
-                                         m_player_karts.size());
+                                         (unsigned int)m_player_karts.size());
     
             // Saved GP only in offline mode
             if (m_continue_saved_gp)
@@ -394,7 +394,7 @@ void RaceManager::startNew(bool from_overworld)
 
     // Then add the AI karts (randomly chosen)
     // ----------------------------------------
-    const unsigned int ai_kart_count = m_ai_kart_list.size();
+    const unsigned int ai_kart_count = (unsigned int)m_ai_kart_list.size();
     for(unsigned int i = 0; i < ai_kart_count; i++)
     {
         m_kart_status.push_back(KartStatus(m_ai_kart_list[i], i, -1, -1,
@@ -431,7 +431,9 @@ void RaceManager::startNew(bool from_overworld)
     {
         if (m_continue_saved_gp)
         {
-            m_track_number = m_saved_gp->getNextTrack();
+            int next_track = m_saved_gp->getNextTrack();
+            if (next_track < (int)m_tracks.size())
+                m_track_number = next_track;
             m_saved_gp->loadKarts(m_kart_status);
         }
         else 
@@ -445,7 +447,7 @@ void RaceManager::startNew(bool from_overworld)
                                              ->getUniqueID(),
                                              m_grand_prix.getId(),
                                              m_minor_mode,
-                                             m_player_karts.size());
+                                             (unsigned int)m_player_karts.size());
             }   // while m_saved_gp
         }   // if m_continue_saved_gp
     }   // if grand prix

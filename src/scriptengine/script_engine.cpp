@@ -108,7 +108,7 @@ namespace Scripting
         // Read the entire file
         std::string script;
         script.resize(len);
-        int c = fread(&script[0], len, 1, f);
+        size_t c = fread(&script[0], len, 1, f);
         fclose(f);
         if (c != 1)
         {
@@ -222,7 +222,7 @@ namespace Scripting
     /*
     void ScriptEngine::runMethod(asIScriptObject* obj, std::string methodName)
     {
-        asIObjectType* type = obj->GetObjectType();
+        asITypeInfo* type = obj->GetObjectType();
         asIScriptFunction* method = type->GetMethodByName(methodName.c_str());
         if (method == NULL)
             Log::error("Scripting", ("runMethod: object does not implement method " + methodName).c_str());

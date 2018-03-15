@@ -23,7 +23,6 @@
 
 #ifdef AI_DEBUG
 #  include "graphics/irr_driver.hpp"
-#  include "graphics/stk_tex_manager.hpp"
 #endif
 #include "graphics/show_curve.hpp"
 #include "graphics/slip_stream.hpp"
@@ -40,6 +39,7 @@
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/profile_world.hpp"
+#include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/drive_graph.hpp"
 #include "tracks/track.hpp"
@@ -101,8 +101,6 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
                                      i==2 ? 128 : 0);
         m_debug_sphere[i] = irr_driver->addSphere(1.0f, col_debug);
         m_debug_sphere[i]->setVisible(false);
-        m_debug_sphere[i]->setMaterialTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(128, 255, 105, 180)));
-        m_debug_sphere[i]->setMaterialTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     }
     m_debug_sphere[m_point_selection_algorithm]->setVisible(true);
     m_item_sphere  = irr_driver->addSphere(1.0f, video::SColor(255, 0, 255, 0));
@@ -917,8 +915,15 @@ bool SkiddingAI::steerToAvoid(const std::vector<const Item *> &items_to_avoid,
     const Vec3& left = items_to_avoid[index_left_most]->getXYZ();
     int node_index = items_to_avoid[index_left_most]->getGraphNode();
     const Vec3& normal = DriveGraph::get()->getNode(node_index)->getNormal();
+    Vec3 hit;
+    Vec3 hit_nor(0, 1, 0);
+    const Material* m;
+    m_track->getPtrTriangleMesh()->castRay(
+        Vec3(line_to_target.getMiddle()) + normal,
+        Vec3(line_to_target.getMiddle()) + normal * -10000, &hit, &m,
+        &hit_nor);
     Vec3 p1 = line_to_target.start,
-         p2 = line_to_target.getMiddle() + normal.toIrrVector(),
+         p2 = line_to_target.getMiddle() + hit_nor.toIrrVector(),
          p3 = line_to_target.end;
 
     int item_index = -1;
@@ -935,12 +940,6 @@ bool SkiddingAI::steerToAvoid(const std::vector<const Item *> &items_to_avoid,
     else
     {
         const Vec3& right = items_to_avoid[index_right_most]->getXYZ();
-        int node_index = items_to_avoid[index_right_most]->getGraphNode();
-        const Vec3& normal = DriveGraph::get()->getNode(node_index)->getNormal();
-        Vec3 p1 = line_to_target.start,
-            p2 = line_to_target.getMiddle() + normal.toIrrVector(),
-            p3 = line_to_target.end;
-
         if (right.sideofPlane(p1, p2, p3) >= 0)
         {
             // Right of rightmost point

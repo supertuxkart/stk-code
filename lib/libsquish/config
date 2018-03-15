@@ -1,0 +1,38 @@
+# config file for GNUmake
+
+# define to 1 to use OpenMP parallelization
+USE_OPENMP ?= 0
+
+# define to 1 to install shared library
+USE_SHARED ?= 0
+
+# define to 1 to use Altivec instructions
+USE_ALTIVEC ?= 0
+
+# define to 1 to use SSE2 instructions
+USE_SSE ?= 0
+
+# default flags
+CXXFLAGS ?= -O2 -Wall
+ifeq ($(USE_OPENMP),1)
+   CPPFLAGS += -DSQUISH_USE_OPENMP
+   CXXFLAGS += -fopenmp
+endif
+ifeq ($(USE_ALTIVEC),1)
+   CPPFLAGS += -DSQUISH_USE_ALTIVEC=1
+   CXXFLAGS += -maltivec
+endif
+ifeq ($(USE_SSE),1)
+   CPPFLAGS += -DSQUISH_USE_SSE=2
+   CXXFLAGS += -msse
+endif
+
+# install options
+INSTALL = install
+INSTALL_FILE      = $(INSTALL) -p -m 644
+INSTALL_PROGRAM   = $(INSTALL) -p -m 755
+INSTALL_DIRECTORY = $(INSTALL) -d -m 755
+
+# where should we install to
+INSTALL_DIR ?= /usr/local
+LIB_PATH ?= lib

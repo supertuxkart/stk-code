@@ -297,6 +297,12 @@ int	btDiscreteDynamicsWorld::stepSimulation( btScalar timeStep,int maxSubSteps, 
 	}
 
 	clearForces();
+    // Reset the max speeds of all karts, so that supertuxkart can
+    // set any new max_speed.
+    for (int i = 0; i<m_actions.size(); i++)
+    {
+        m_actions[i]->resetMaxSpeed();
+    }
 
 #ifndef BT_NO_PROFILE
 	CProfileManager::Increment_Frame_Counter();

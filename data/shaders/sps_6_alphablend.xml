@@ -1,0 +1,13 @@
+<spshader>
+    <shader-info name="alphablend" transparent="Y" use-alpha-channel="Y"/>
+    <first-pass use-function="alphaBlendUse" vertex-shader="sp_pass.vert"
+        fragment-shader="sp_transparent.frag"
+        skinned-mesh-shader="sp_skinning.vert">
+    </first-pass>
+    <uniform-assigners>
+        <uniform-assigner name="fog_enabled"
+        function="fogUniformAssigner"/>
+        <uniform-assigner name="custom_alpha"
+        function="zeroAlphaUniformAssigner"/>
+    </uniform-assigners>
+</spshader>

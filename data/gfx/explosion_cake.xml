@@ -18,16 +18,13 @@
                max="1200"         />
     
     <!-- Size of the particles -->
-    <size      min="0.65"
-               max="0.95"
+    <size      min="0.60"
+               max="0.85"
                x-increase-factor="0.6"
                y-increase-factor="0.6"
                />
     
     <color     min="255 255 255"
                max="255 255 255"  />
-    
-    <!-- How much time in milliseconds before the particle is fully faded out  -->
-    <fadeout   time="800"         />
 
 </particles>

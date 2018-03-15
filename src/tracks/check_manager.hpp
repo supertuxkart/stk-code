@@ -27,6 +27,7 @@
 
 class AbstractKart;
 class CheckStructure;
+class Flyable;
 class Track;
 class XMLNode;
 class Vec3;
@@ -46,6 +47,8 @@ private:
           ~CheckManager();
 public:
     void   add(CheckStructure* strct) { m_all_checks.push_back(strct); }
+    void   addFlyableToCannons(Flyable *flyable);
+    void   removeFlyableFromCannons(Flyable *flyable);
     void   load(const XMLNode &node);
     void   update(float dt);
     void   reset(const Track &track);

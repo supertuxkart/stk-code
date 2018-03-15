@@ -19,37 +19,34 @@
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/graphics_restrictions.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/materials.hpp"
 #include "modes/profile_world.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
-#include <fstream>
-#include <functional>
-
-#if !defined(USE_GLES2)
-static const uint8_t CACHE_VERSION = 1;
-#endif
 // ----------------------------------------------------------------------------
-STKTexture::STKTexture(const std::string& path, bool srgb, bool premul_alpha,
-                       bool set_material, bool mesh_tex, bool no_upload,
-                       bool single_channel)
-          : video::ITexture(path.c_str()), m_texture_handle(0), m_srgb(srgb),
-            m_premul_alpha(premul_alpha), m_mesh_texture(mesh_tex),
-            m_single_channel(single_channel), m_material(NULL),
-            m_texture_name(0), m_texture_size(0), m_texture_image(NULL)
+STKTexture::STKTexture(const std::string& path, TexConfig* tc, bool no_upload)
+          : video::ITexture(path.c_str()), m_single_channel(false),
+            m_tex_config(NULL), m_texture_name(0), m_texture_size(0),
+            m_texture_image(NULL)
 {
-    if (set_material)
+    if (tc != NULL)
     {
-        m_material = material_manager->getMaterialFor(this);
-        m_mesh_texture = true;
+        m_tex_config = (TexConfig*)malloc(sizeof(TexConfig));
+        memcpy(m_tex_config, tc, sizeof(TexConfig));
     }
-
 #ifndef SERVER_ONLY
-    if (!CVS->isGLSL())
-        m_srgb = false;
+    if (m_tex_config)
+    {
+        if (ProfileWorld::isNoGraphics() ||
+            (!CVS->isDeferredEnabled()) || !CVS->isGLSL())
+        {
+            m_tex_config->m_srgb = false;
+        }
+    }
     if (!CVS->isARBTextureSwizzleUsable())
         m_single_channel = false;
 #endif
@@ -57,12 +54,11 @@ STKTexture::STKTexture(const std::string& path, bool srgb, bool premul_alpha,
 }   // STKTexture
 
 // ----------------------------------------------------------------------------
-STKTexture::STKTexture(uint8_t* data, const std::string& name, size_t size,
+STKTexture::STKTexture(uint8_t* data, const std::string& name, unsigned int size,
                        bool single_channel)
-          : video::ITexture(name.c_str()), m_texture_handle(0), m_srgb(false),
-            m_premul_alpha(false), m_mesh_texture(false),
-            m_single_channel(single_channel), m_material(NULL),
-            m_texture_name(0), m_texture_size(0), m_texture_image(NULL)
+          : video::ITexture(name.c_str()), m_single_channel(single_channel),
+            m_tex_config(NULL), m_texture_name(0), m_texture_size(0),
+            m_texture_image(NULL)
 {
     m_size.Width = size;
     m_size.Height = size;
@@ -72,10 +68,9 @@ STKTexture::STKTexture(uint8_t* data, const std::string& name, size_t size,
 
 // ----------------------------------------------------------------------------
 STKTexture::STKTexture(video::IImage* img, const std::string& name)
-          : video::ITexture(name.c_str()), m_texture_handle(0), m_srgb(false),
-            m_premul_alpha(false), m_mesh_texture(false),
-            m_single_channel(false), m_material(NULL), m_texture_name(0),
-            m_texture_size(0), m_texture_image(NULL)
+          : video::ITexture(name.c_str()), m_single_channel(false),
+            m_tex_config(NULL), m_texture_name(0), m_texture_size(0),
+            m_texture_image(NULL)
 {
     reload(false/*no_upload*/, NULL/*preload_data*/, img);
 }   // STKTexture
@@ -84,7 +79,6 @@ STKTexture::STKTexture(video::IImage* img, const std::string& name)
 STKTexture::~STKTexture()
 {
 #ifndef SERVER_ONLY
-    unloadHandle();
     if (m_texture_name != 0)
     {
         glDeleteTextures(1, &m_texture_name);
@@ -92,6 +86,7 @@ STKTexture::~STKTexture()
 #endif   // !SERVER_ONLY
     if (m_texture_image != NULL)
         m_texture_image->drop();
+    free(m_tex_config);
 }   // ~STKTexture
 
 // ----------------------------------------------------------------------------
@@ -100,6 +95,9 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
 {
     if (ProfileWorld::isNoGraphics())
     {
+        m_orig_size.Width = 2;
+        m_orig_size.Height = 2;
+        m_size = m_orig_size;
         m_texture_name = 1;
         if (preload_data)
             delete[] preload_data;
@@ -108,51 +106,7 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
         return;
     }
 #ifndef SERVER_ONLY
-    irr_driver->getDevice()->getLogger()->setLogLevel(ELL_NONE);
 
-    std::string compressed_texture;
-#if !defined(USE_GLES2)
-    if (!no_upload && m_mesh_texture && CVS->isTextureCompressionEnabled())
-    {
-        std::string orig_file = NamedPath.getPtr();
-
-        std::string basename = StringUtils::getBasename(orig_file);
-        std::string container_id;
-        if (file_manager->searchTextureContainerId(container_id, basename))
-        {
-            std::string cache_subdir = "hd/";
-            if ((UserConfigParams::m_high_definition_textures & 0x01) == 0x01)
-            {
-                cache_subdir = "hd/";
-            }
-            else
-            {
-                cache_subdir = StringUtils::insertValues("resized_%i/",
-                    (int)UserConfigParams::m_max_texture_size);
-            }
-
-            std::string cache_dir = file_manager->getCachedTexturesDir() +
-                cache_subdir + container_id;
-            compressed_texture = cache_dir + "/" + basename + ".stktz";
-
-            if ((!file_manager->fileExists(compressed_texture) ||
-                file_manager->fileIsNewer(compressed_texture, orig_file)) &&
-                loadCompressedTexture(compressed_texture))
-            {
-                Log::debug("STKTexture", "Compressed %s for texture %s",
-                    compressed_texture.c_str(), orig_file.c_str());
-                return;
-            }
-
-            file_manager->checkAndCreateDirectoryP(cache_dir);
-        }
-        else
-        {
-            Log::warn("STKTexture", "Cannot find container_id for texture %s",
-                orig_file.c_str());
-        }
-    }
-#endif
     video::IImage* orig_img = NULL;
     uint8_t* data = preload_data;
     if (data == NULL)
@@ -172,62 +126,24 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
         }
         orig_img = resizeImage(orig_img, &m_orig_size, &m_size);
         applyMask(orig_img);
-        data = (uint8_t*)orig_img->lock();
-        if (m_single_channel)
-        {
-            uint8_t* sc = new uint8_t[m_size.Width * m_size.Height];
-            for (unsigned int i = 0; i < m_size.Width * m_size.Height; i++)
-                sc[i] = data[4 * i + 3];
-            orig_img->unlock();
-            orig_img->drop();
-            orig_img = NULL;
-            data = sc;
-        }
+        data = orig_img ? (uint8_t*)orig_img->lock() : NULL;
     }
 
     const unsigned int w = m_size.Width;
     const unsigned int h = m_size.Height;
     unsigned int format = m_single_channel ? GL_RED : GL_BGRA;
-    unsigned int internal_format = m_single_channel ? GL_R8 : GL_RGBA;
+    unsigned int internal_format = m_single_channel ? GL_R8 : isSrgb() ?
+        GL_SRGB8_ALPHA8 : GL_RGBA8;
 
-#if !defined(USE_GLES2)
-    if (m_mesh_texture && CVS->isTextureCompressionEnabled())
-    {
-        internal_format = m_single_channel ? GL_COMPRESSED_RED_RGTC1 :
-            m_srgb ? GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT :
-            GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-    }
-    else
-    {
-        internal_format =
-            m_single_channel ? GL_R8 : m_srgb ? GL_SRGB_ALPHA : GL_RGBA;
-    }
-#endif
-
+    // GLES 2.0 specs doesn't allow GL_RGBA8 internal format
 #if defined(USE_GLES2)
-    if (!CVS->isEXTTextureFormatBGRA8888Usable() && !m_single_channel)
+    if (!CVS->isGLSL())
     {
-        format = GL_RGBA;
-        for (unsigned int i = 0; i < w * h; i++)
-        {
-            uint8_t tmp_val = data[i * 4];
-            data[i * 4] = data[i * 4 + 2];
-            data[i * 4 + 2] = tmp_val;
-        }
+        internal_format = GL_RGBA;
     }
 #endif
-    if (m_premul_alpha && !m_single_channel)
-    {
-        for (unsigned int i = 0; i < w * h; i++)
-        {
-            float alpha = data[4 * i + 3];
-            if (alpha > 0.0f)
-                alpha = pow(alpha / 255.f, 1.f / 2.2f);
-            data[i * 4] = (uint8_t)(data[i * 4] * alpha);
-            data[i * 4 + 1] = (uint8_t)(data[i * 4 + 1] * alpha);
-            data[i * 4 + 2] = (uint8_t)(data[i * 4 + 2] * alpha);
-        }
-    }
+
+    formatConversion(data, &format, w, h);
 
     if (!no_upload)
     {
@@ -268,64 +184,92 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
     else
         delete[] data;
 
-    if (!compressed_texture.empty())
-        saveCompressedTexture(compressed_texture);
     if (!no_upload)
         glBindTexture(GL_TEXTURE_2D, 0);
 
-    irr_driver->getDevice()->getLogger()->setLogLevel(ELL_WARNING);
 #endif   // !SERVER_ONLY
 }   // reload
 
+//-----------------------------------------------------------------------------
+void STKTexture::formatConversion(uint8_t* data, unsigned int* format,
+                                  unsigned int w, unsigned int h) const
+{
+#ifndef SERVER_ONLY
+#if defined(USE_GLES2)
+    if (!m_single_channel)
+    {
+        if (format)
+            *format = GL_RGBA;
+        for (unsigned int i = 0; i < w * h; i++)
+        {
+            uint8_t tmp_val = data[i * 4];
+            data[i * 4] = data[i * 4 + 2];
+            data[i * 4 + 2] = tmp_val;
+        }
+    }
+#endif
+    if (isPremulAlpha() && !m_single_channel)
+    {
+        for (unsigned int i = 0; i < w * h; i++)
+        {
+            float alpha = data[4 * i + 3];
+            if (alpha > 0.0f)
+            {
+                alpha /= 255.0f;
+
+                if (CVS->isDeferredEnabled())
+                {
+                    alpha = pow(alpha, 1.0f / 2.2f);
+                }
+            }
+            data[i * 4] = (uint8_t)(data[i * 4] * alpha);
+            data[i * 4 + 1] = (uint8_t)(data[i * 4 + 1] * alpha);
+            data[i * 4 + 2] = (uint8_t)(data[i * 4 + 2] * alpha);
+        }
+    }
+#endif   // !SERVER_ONLY
+}   // formatConversion
+
 // ----------------------------------------------------------------------------
 video::IImage* STKTexture::resizeImage(video::IImage* orig_img,
-                                       core::dimension2du* new_img_size,
-                                       core::dimension2du* new_tex_size)
+                                       core::dimension2du* orig_size,
+                                       core::dimension2du* final_size) const
 {
     video::IImage* image = orig_img;
 #ifndef SERVER_ONLY
-    const core::dimension2du& old_size = image->getDimension();
-    core::dimension2du img_size = old_size;
+    if (image == NULL)
+        assert(orig_size && orig_size->Width > 0 && orig_size->Height > 0);
+        
+    video::IVideoDriver* driver = irr_driver->getVideoDriver();
+        
+    core::dimension2du img_size = image ? image->getDimension() : *orig_size;
+    
+    bool has_npot = !GraphicsRestrictions::isDisabled(
+                                GraphicsRestrictions::GR_NPOT_TEXTURES) && 
+                                driver->queryFeature(video::EVDF_TEXTURE_NPOT);
+                                
+    core::dimension2du tex_size = img_size.getOptimalSize(!has_npot);
+    const core::dimension2du& max_size = driver->getDriverAttributes().
+                                  getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
 
-    const float ratio = float(img_size.Width) / float(img_size.Height);
-    const unsigned int drv_max_size =
-        irr_driver->getVideoDriver()->getMaxTextureSize().Width;
-
-    if ((img_size.Width > drv_max_size) && (ratio >= 1.0f))
-    {
-        img_size.Width = drv_max_size;
-        img_size.Height = (unsigned)(drv_max_size / ratio);
-    }
-    else if (img_size.Height > drv_max_size)
-    {
-        img_size.Height = drv_max_size;
-        img_size.Width = (unsigned)(drv_max_size * ratio);
-    }
-
-    if (img_size != old_size)
-    {
-        video::IImage* new_img = irr_driver->getVideoDriver()
-            ->createImage(video::ECF_A8R8G8B8, img_size);
-        image->copyToScaling(new_img);
-        image->drop();
-        image = new_img;
-    }
-
-    core::dimension2du tex_size = img_size.getOptimalSize
-        (!irr_driver->getVideoDriver()->queryFeature(video::EVDF_TEXTURE_NPOT));
-    const core::dimension2du& max_size = irr_driver->getVideoDriver()
-        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
-
-    if (max_size.Width > 0 && tex_size.Width > max_size.Width)
+    if (tex_size.Width > max_size.Width)
         tex_size.Width = max_size.Width;
-    if (max_size.Height > 0 && tex_size.Height > max_size.Height)
+    if (tex_size.Height > max_size.Height)
         tex_size.Height = max_size.Height;
+
+    if (orig_size && final_size)
+    {
+        *orig_size = img_size;
+        *final_size = tex_size;
+    }
+    if (image == NULL)
+        return NULL;
 
     if (image->getColorFormat() != video::ECF_A8R8G8B8 ||
         tex_size != img_size)
     {
-        video::IImage* new_texture = irr_driver
-            ->getVideoDriver()->createImage(video::ECF_A8R8G8B8, tex_size);
+        video::IImage* new_texture = driver->createImage(video::ECF_A8R8G8B8, 
+                                                         tex_size);
         if (tex_size != img_size)
             image->copyToScaling(new_texture);
         else
@@ -334,11 +278,6 @@ video::IImage* STKTexture::resizeImage(video::IImage* orig_img,
         image = new_texture;
     }
 
-    if (new_img_size && new_tex_size)
-    {
-        *new_img_size = img_size;
-        *new_tex_size = tex_size;
-    }
 #endif   // !SERVER_ONLY
     return image;
 }   // resizeImage
@@ -347,14 +286,19 @@ video::IImage* STKTexture::resizeImage(video::IImage* orig_img,
 void STKTexture::applyMask(video::IImage* orig_img)
 {
 #ifndef SERVER_ONLY
-    if (m_material && !m_material->getAlphaMask().empty())
+    Material* material = NULL;
+    if (material_manager)
+    {
+        material = material_manager->getMaterialFor(this);
+    }
+    if (material && !material->getAlphaMask().empty())
     {
         video::IImage* converted_mask = irr_driver->getVideoDriver()
-            ->createImageFromFile(m_material->getAlphaMask().c_str());
+            ->createImageFromFile(material->getAlphaMask().c_str());
         if (converted_mask == NULL)
         {
             Log::warn("STKTexture", "Applying mask failed for '%s'!",
-                m_material->getAlphaMask().c_str());
+                material->getAlphaMask().c_str());
             return;
         }
         converted_mask = resizeImage(converted_mask);
@@ -379,123 +323,15 @@ void STKTexture::applyMask(video::IImage* orig_img)
 }   // applyMask
 
 //-----------------------------------------------------------------------------
-/** Try to load a compressed texture from the given file name.
- *  Data in the specified file need to have a specific format. See the
- *  saveCompressedTexture() function for a description of the format.
- *  \return true if the loading succeeded, false otherwise.
- *  \see saveCompressedTexture
- */
-bool STKTexture::loadCompressedTexture(const std::string& file_name)
-{
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    std::ifstream ifs(file_name.c_str(), std::ios::in | std::ios::binary);
-    if (!ifs.is_open())
-        return false;
-
-    int internal_format;
-    uint8_t cache_verison;
-    ifs.read((char*)&cache_verison, sizeof(uint8_t));
-    if (cache_verison != CACHE_VERSION)
-    {
-        Log::warn("STKTexture", "%s version %d is not supported!",
-            file_name.c_str(), cache_verison);
-        ifs.close();
-        // Remove the file later if we have more version
-        return false;
-    }
-    ifs.read((char*)&internal_format, sizeof(int));
-    ifs.read((char*)&m_size.Width, sizeof(unsigned int));
-    ifs.read((char*)&m_size.Height, sizeof(unsigned int));
-    ifs.read((char*)&m_orig_size.Width, sizeof(unsigned int));
-    ifs.read((char*)&m_orig_size.Height, sizeof(unsigned int));
-    ifs.read((char*)&m_texture_size, sizeof(unsigned int));
-
-    if (ifs.fail() || m_texture_size == 0)
-        return false;
-
-    char *data = new char[m_texture_size];
-    ifs.read(data, m_texture_size);
-    if (!ifs.fail())
-    {
-        // No on the fly reload is supported for compressed texture
-        assert(m_texture_name == 0);
-        glGenTextures(1, &m_texture_name);
-        glBindTexture(GL_TEXTURE_2D, m_texture_name);
-        if (internal_format == GL_COMPRESSED_RED_RGTC1)
-        {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_ONE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_ONE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_ONE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_RED);
-        }
-        glCompressedTexImage2D(GL_TEXTURE_2D, 0, internal_format,
-            m_size.Width, m_size.Height, 0, m_texture_size, (GLvoid*)data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        delete[] data;
-        ifs.close();
-        return true;
-    }
-    delete[] data;
-#endif
-    return false;
-}   // loadCompressedTexture
-
-//-----------------------------------------------------------------------------
-/** Try to save the last texture sent to glTexImage2D in a file of the given
- *   file name. This function should only be used for textures sent to
- *   glTexImage2D with a compressed internal format as argument.<br>
- *   \note The following format is used to save the compressed texture:<br>
- *         <version><internal-format><w><h><orig_w><orig_h><size><data> <br>
- *         The first element is the version of cache, next six elements are
- *         integers and the last one is stored on \c size bytes.
- *   \see loadCompressedTexture
- */
-void STKTexture::saveCompressedTexture(const std::string& compressed_tex)
-{
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    int internal_format;
-    int compression_successful = 0;
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT,
-        (GLint *)&internal_format);
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH,
-        (GLint *)&m_size.Width);
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT,
-        (GLint *)&m_size.Height);
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED,
-        (GLint *)&compression_successful);
-    if (compression_successful == 0) return;
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
-        GL_TEXTURE_COMPRESSED_IMAGE_SIZE, (GLint *)&m_texture_size);
-    if (m_texture_size == 0) return;
-
-    char *data = new char[m_texture_size];
-    glGetCompressedTexImage(GL_TEXTURE_2D, 0, (GLvoid*)data);
-    std::ofstream ofs(compressed_tex.c_str(),
-        std::ios::out | std::ios::binary);
-    if (ofs.is_open())
-    {
-        ofs.write((char*)&CACHE_VERSION, sizeof(uint8_t));
-        ofs.write((char*)&internal_format, sizeof(int));
-        ofs.write((char*)&m_size.Width, sizeof(unsigned int));
-        ofs.write((char*)&m_size.Height, sizeof(unsigned int));
-        ofs.write((char*)&m_orig_size.Width, sizeof(unsigned int));
-        ofs.write((char*)&m_orig_size.Height, sizeof(unsigned int));
-        ofs.write((char*)&m_texture_size, sizeof(unsigned int));
-        ofs.write(data, m_texture_size);
-        ofs.close();
-    }
-    delete[] data;
-#endif
-}   // saveCompressedTexture
-
-//-----------------------------------------------------------------------------
 bool STKTexture::hasMipMaps() const
 {
-#ifndef SERVER_ONLY
+#if defined(USE_GLES2)
+    return true;
+#elif defined(SERVER_ONLY)
+    return false;
+#else
     return CVS->getGLSLVersion() >= 130;
 #endif   // !SERVER_ONLY
-    return false;
 }   // hasMipMaps
 
 //-----------------------------------------------------------------------------
@@ -517,31 +353,19 @@ void* STKTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
 }   // lock
 
 //-----------------------------------------------------------------------------
-u64 STKTexture::getHandle()
+bool STKTexture::isSrgb() const
 {
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    assert(CVS->isAZDOEnabled());
-    if (m_texture_handle != 0) return m_texture_handle;
-
-    m_texture_handle =
-        glGetTextureSamplerHandleARB( m_texture_name,
-        ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
-
-    if (!glIsTextureHandleResidentARB(m_texture_handle))
-        glMakeTextureHandleResidentARB(m_texture_handle);
-#endif
-    return m_texture_handle;
-}   // getHandle
+    return m_tex_config && m_tex_config->m_srgb;
+}   // isSrgb
 
 //-----------------------------------------------------------------------------
-void STKTexture::unloadHandle()
+bool STKTexture::isPremulAlpha() const
 {
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    if (CVS->isAZDOEnabled())
-    {
-        if (m_texture_handle == 0) return;
-        glMakeTextureHandleNonResidentARB(m_texture_handle);
-        m_texture_handle = 0;
-    }
-#endif
-}   // unloadHandle
+    return m_tex_config && m_tex_config->m_premul_alpha;
+}   // isPremulAlpha
+
+//-----------------------------------------------------------------------------
+bool STKTexture::isMeshTexture() const
+{
+    return m_tex_config && m_tex_config->m_mesh_tex;
+}   // isMeshTexture

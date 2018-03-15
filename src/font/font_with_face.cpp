@@ -30,6 +30,8 @@
 #include "guiengine/skin.hpp"
 #include "utils/string_utils.hpp"
 
+#include <array>
+
 // ----------------------------------------------------------------------------
 /** Constructor. It will initialize the \ref m_spritebank and TTF files to use.
  *  \param name The name of face, used by irrlicht to distinguish spritebank.
@@ -225,7 +227,7 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
             for (unsigned int i = 0; i < size; i++)
                 image_data[4 * i + 3] = bits->buffer[i];
             glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
-                bits->width, bits->rows, GL_BGRA, GL_UNSIGNED_BYTE,
+                bits->width, bits->rows, GL_RGBA, GL_UNSIGNED_BYTE,
                 image_data);
             delete[] image_data;
         }
@@ -677,15 +679,24 @@ void FontWithFace::render(const core::stringw& text,
             top.setAlpha(color.getAlpha());
             bottom.setAlpha(color.getAlpha());
 
-            video::SColor title_colors[] = {top, bottom, top, bottom};
-            if (char_collector != NULL)
+            std::array<video::SColor, 4> title_colors;
+            if (CVS->isGLSL())
             {
-                char_collector->collectChar(texture, dest, source,
-                    title_colors);
+                title_colors = { { top, bottom, top, bottom } };
             }
             else
             {
-                draw2DImage(texture, dest, source, clip, title_colors, true);
+                title_colors = { { bottom, top, top, bottom } };
+            }
+            if (char_collector != NULL)
+            {
+                char_collector->collectChar(texture, dest, source,
+                    title_colors.data());
+            }
+            else
+            {
+                draw2DImage(texture, dest, source, clip, title_colors.data(),
+                    true);
             }
         }
         else

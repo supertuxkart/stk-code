@@ -60,8 +60,8 @@ vec2 UpdateClipRegion(float lc,          /* Light x/y coordinate (view space) */
 vec4 ComputeClipRegion(vec3 lightPosView, float lightRadius)
 {
     if (lightPosView.z + lightRadius >= zNear) {
-        vec2 clipX = UpdateClipRegion(lightPosView.x, lightPosView.z, lightRadius, ProjectionMatrix[0][0]);
-        vec2 clipY = UpdateClipRegion(lightPosView.y, lightPosView.z, lightRadius, ProjectionMatrix[1][1]);
+        vec2 clipX = UpdateClipRegion(lightPosView.x, lightPosView.z, lightRadius, u_projection_matrix[0][0]);
+        vec2 clipY = UpdateClipRegion(lightPosView.y, lightPosView.z, lightRadius, u_projection_matrix[1][1]);
 
         return vec4(clipX, clipY);
     }
@@ -72,7 +72,7 @@ vec4 ComputeClipRegion(vec3 lightPosView, float lightRadius)
 
 void main(void)
 {
-    vec4 Center = ViewMatrix * vec4(Position, 1.);
+    vec4 Center = u_view_matrix * vec4(Position, 1.);
     Center /= Center.w;
 
     vec2 ProjectedCornerPosition;
@@ -98,7 +98,7 @@ void main(void)
     float quadDepth = max(zNear, Center.z - Radius);
 
     // Project quad depth into clip space
-    vec4 quadClip = ProjectionMatrix * vec4(0., 0., quadDepth, 1.0f);
+    vec4 quadClip = u_projection_matrix * vec4(0., 0., quadDepth, 1.0f);
     gl_Position = vec4(ProjectedCornerPosition, quadClip.z / quadClip.w, 1.);
 
     col = Color;

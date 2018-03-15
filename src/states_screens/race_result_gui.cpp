@@ -135,7 +135,7 @@ void RaceResultGUI::init()
     else
     {
         m_start_track = 0;
-        m_end_track = tracks.size();
+        m_end_track = (int)tracks.size();
     }
 }   // init
 
@@ -201,12 +201,21 @@ void RaceResultGUI::enableAllButtons()
         // In case of a GP:
         // ----------------
         top->setVisible(false);
+        top->setFocusable(false);
 
         middle->setText(_("Continue"));
         middle->setVisible(true);
 
-        bottom->setText(_("Abort Grand Prix"));
-        bottom->setVisible(true);
+        if (race_manager->getTrackNumber() + 1 < race_manager->getNumOfTracks()) 
+        {
+            bottom->setText(_("Abort Grand Prix"));
+            bottom->setVisible(true);
+            bottom->setFocusable(true);
+        }
+        else
+        {
+            bottom->setFocusable(false);
+        }
 
         middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
@@ -217,7 +226,7 @@ void RaceResultGUI::enableAllButtons()
 
         middle->setText(_("Restart"));
         middle->setVisible(true);
-
+        middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
         if (race_manager->raceWasStartedFromOverworld())
         {
             top->setVisible(false);
@@ -230,8 +239,6 @@ void RaceResultGUI::enableAllButtons()
             bottom->setText(_("Back to the menu"));
         }
         bottom->setVisible(true);
-
-        bottom->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
 }   // enableAllButtons
 
@@ -330,7 +337,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             }
             return;
         }
-        Log::fatal("RaceResultGUI", "Incorrect event '%s' when things are unlocked.",
+        Log::warn("RaceResultGUI", "Incorrect event '%s' when things are unlocked.",
             name.c_str());
     }
 
@@ -408,7 +415,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         }
     }
     else
-        Log::fatal("RaceResultGUI", "Incorrect event '%s' for normal race.",
+        Log::warn("RaceResultGUI", "Incorrect event '%s' for normal race.",
             name.c_str());
     return;
 }   // eventCallback
@@ -486,7 +493,7 @@ void RaceResultGUI::backToLobby()
             // Save a pointer to the current row_info entry
             RowInfo *ri = &(m_all_row_infos[position - first_position]);
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
-            ri->m_kart_name = getKartDisplayName(kart);
+            ri->m_kart_name = kart->getController()->getName();
 
             video::ITexture *icon =
                 kart->getKartProperties()->getIconMaterial()->getTexture();
@@ -855,7 +862,7 @@ void RaceResultGUI::backToLobby()
             ri->m_kart_icon =
                 kart->getKartProperties()->getIconMaterial()->getTexture();
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
-            ri->m_kart_name = getKartDisplayName(kart);
+            ri->m_kart_name = kart->getController()->getName();
 
             // In FTL karts do have a time, which is shown even when the kart
             // is eliminated
@@ -906,29 +913,6 @@ void RaceResultGUI::backToLobby()
         }   // i < num_karts
 #endif
     }   // determineGPLayout
-
-    //-----------------------------------------------------------------------------
-    /** Returns a string to display next to a kart. For a player that's the name
-     *  of the player, for an AI kart it's the name of the driver.
-     */
-    core::stringw RaceResultGUI::getKartDisplayName(const AbstractKart *kart) const
-    {
-        const EndController *ec =
-            dynamic_cast<const EndController*>(kart->getController());
-        // If the race was given up, there is no end controller for the
-        // players, so this case needs to be handled separately
-        if(ec && ec->isLocalPlayerController())
-            return ec->getName();
-        else
-        {
-            // No end controller, check explicitely for a player controller
-            const PlayerController *pc =
-                dynamic_cast<const PlayerController*>(kart->getController());
-            // Check if the kart is a player controller to get the real name
-            if(pc) return pc->getName();
-        }
-        return translations->fribidize(kart->getName());
-    }   // getKartDisplayName
 
     //-----------------------------------------------------------------------------
     /** Displays the race results for a single kart.
@@ -1340,7 +1324,7 @@ void RaceResultGUI::backToLobby()
     // ----------------------------------------------------------------------------
     void RaceResultGUI::cleanupGPProgress()
     {
-        for (size_t i = 0; i < m_gp_progress_widgets.size(); i++)
+        for (unsigned int i = 0; i < m_gp_progress_widgets.size(); i++)
             m_widgets.remove(m_gp_progress_widgets.get(i));
         m_gp_progress_widgets.clearAndDeleteAll();
     }   // cleanupGPProgress

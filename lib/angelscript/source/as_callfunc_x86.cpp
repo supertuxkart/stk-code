@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2016 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -126,7 +126,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 			if( descr->parameterTypes[n].IsObject() && !descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() )
 			{
 #ifdef COMPLEX_OBJS_PASSED_BY_REF
-				if( descr->parameterTypes[n].GetObjectType()->flags & COMPLEX_MASK )
+				if( descr->parameterTypes[n].GetTypeInfo()->flags & COMPLEX_MASK )
 				{
 					paramBuffer[dpos++] = args[spos++];
 					paramSize++;
@@ -340,6 +340,17 @@ endcopy:
 	volatile asPWORD a[] = {asPWORD(args), asPWORD(paramSize), asPWORD(func)};
 
 	asm __volatile__(
+#ifdef __OPTIMIZE__
+		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// causing exceptions to crash the application. By adding this prologue
+		// and the epilogue below, the stack unwind works as it should. 
+		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
+		"pushl %%ebp               \n"
+		".cfi_adjust_cfa_offset 4  \n"
+		".cfi_rel_offset ebp, 0    \n"
+		"movl %%esp, %%ebp         \n"
+		".cfi_def_cfa_register ebp \n"
+#endif
 		_S(CLEAR_FPU_STACK)    "\n"
 		"pushl %%ebx            \n"
 		"movl  %%edx, %%ebx     \n"
@@ -374,7 +385,14 @@ endcopy:
 		// Pop the alignment bytes
 		"popl  %%esp            \n"
 		"popl  %%ebx            \n"
-
+#ifdef __OPTIMIZE__
+		// Epilogue
+		"movl %%ebp, %%esp         \n"
+		".cfi_def_cfa_register esp \n"
+		"popl %%ebp                \n"
+		".cfi_adjust_cfa_offset -4 \n"
+		".cfi_restore ebp          \n"
+#endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
 		"leal  %1, %%ecx        \n"
@@ -444,6 +462,17 @@ endcopy:
 	volatile asPWORD a[] = {asPWORD(obj), asPWORD(args), asPWORD(paramSize), asPWORD(func)};
 
 	asm __volatile__ (
+#ifdef __OPTIMIZE__
+		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// causing exceptions to crash the application. By adding this prologue
+		// and the epilogue below, the stack unwind works as it should. 
+		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
+		"pushl %%ebp               \n"
+		".cfi_adjust_cfa_offset 4  \n"
+		".cfi_rel_offset ebp, 0    \n"
+		"movl %%esp, %%ebp         \n"
+		".cfi_def_cfa_register ebp \n"
+#endif
 		_S(CLEAR_FPU_STACK)    "\n"
 		"pushl %%ebx            \n"
 		"movl  %%edx, %%ebx     \n"
@@ -479,7 +508,14 @@ endcopy:
 		// Pop the alignment bytes
 		"popl  %%esp            \n"
 		"popl  %%ebx            \n"
-
+#ifdef __OPTIMIZE__
+		// Epilogue
+		"movl %%ebp, %%esp         \n"
+		".cfi_def_cfa_register esp \n"
+		"popl %%ebp                \n"
+		".cfi_adjust_cfa_offset -4 \n"
+		".cfi_restore ebp          \n"
+#endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
 		"leal  %1, %%ecx        \n"
@@ -549,6 +585,17 @@ endcopy:
 	volatile asPWORD a[] = {asPWORD(obj), asPWORD(args), asPWORD(paramSize), asPWORD(func)};
 
 	asm __volatile__ (
+#ifdef __OPTIMIZE__
+		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// causing exceptions to crash the application. By adding this prologue
+		// and the epilogue below, the stack unwind works as it should. 
+		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
+		"pushl %%ebp               \n"
+		".cfi_adjust_cfa_offset 4  \n"
+		".cfi_rel_offset ebp, 0    \n"
+		"movl %%esp, %%ebp         \n"
+		".cfi_def_cfa_register ebp \n"
+#endif
 		_S(CLEAR_FPU_STACK)    "\n"
 		"pushl %%ebx            \n"
 		"movl  %%edx, %%ebx     \n"
@@ -584,7 +631,14 @@ endcopy:
 		// Pop the alignment bytes
 		"popl  %%esp            \n"
 		"popl  %%ebx            \n"
-
+#ifdef __OPTIMIZE__
+		// Epilogue
+		"movl %%ebp, %%esp         \n"
+		".cfi_def_cfa_register esp \n"
+		"popl %%ebp                \n"
+		".cfi_adjust_cfa_offset -4 \n"
+		".cfi_restore ebp          \n"
+#endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
 		"leal  %1, %%ecx        \n"
@@ -663,6 +717,17 @@ endcopy:
 	volatile asPWORD a[] = {asPWORD(obj), asPWORD(args), asPWORD(paramSize), asPWORD(func), asPWORD(retPtr)};
 
 	asm __volatile__ (
+#ifdef __OPTIMIZE__
+		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// causing exceptions to crash the application. By adding this prologue
+		// and the epilogue below, the stack unwind works as it should. 
+		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
+		"pushl %%ebp               \n"
+		".cfi_adjust_cfa_offset 4  \n"
+		".cfi_rel_offset ebp, 0    \n"
+		"movl %%esp, %%ebp         \n"
+		".cfi_def_cfa_register ebp \n"
+#endif
 		_S(CLEAR_FPU_STACK)    "\n"
 		"pushl %%ebx            \n"
 		"movl  %%edx, %%ebx     \n"
@@ -702,7 +767,14 @@ endcopy:
 		// Pop the alignment bytes
 		"popl  %%esp            \n"
 		"popl  %%ebx            \n"
-
+#ifdef __OPTIMIZE__
+		// Epilogue
+		"movl %%ebp, %%esp         \n"
+		".cfi_def_cfa_register esp \n"
+		"popl %%ebp                \n"
+		".cfi_adjust_cfa_offset -4 \n"
+		".cfi_restore ebp          \n"
+#endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
 		"leal  %1, %%ecx        \n"
@@ -777,6 +849,17 @@ endcopy:
 	volatile asPWORD a[] = {asPWORD(args), asPWORD(paramSize), asPWORD(func), asPWORD(retPtr)};
 
 	asm __volatile__ (
+#ifdef __OPTIMIZE__
+		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// causing exceptions to crash the application. By adding this prologue
+		// and the epilogue below, the stack unwind works as it should. 
+		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
+		"pushl %%ebp               \n"
+		".cfi_adjust_cfa_offset 4  \n"
+		".cfi_rel_offset ebp, 0    \n"
+		"movl %%esp, %%ebp         \n"
+		".cfi_def_cfa_register ebp \n"
+#endif
 		_S(CLEAR_FPU_STACK)    "\n"
 		"pushl %%ebx            \n"
 		"movl  %%edx, %%ebx     \n"
@@ -813,7 +896,14 @@ endcopy:
 		// Pop the alignment bytes
 		"popl  %%esp            \n"
 		"popl  %%ebx            \n"
-
+#ifdef __OPTIMIZE__
+		// Epilogue
+		"movl %%ebp, %%esp         \n"
+		".cfi_def_cfa_register esp \n"
+		"popl %%ebp                \n"
+		".cfi_adjust_cfa_offset -4 \n"
+		".cfi_restore ebp          \n"
+#endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
 		"leal  %1, %%ecx        \n"
@@ -890,6 +980,17 @@ endcopy:
 	volatile asPWORD a[] = {asPWORD(obj), asPWORD(args), asPWORD(paramSize), asPWORD(func), asPWORD(retPtr)};
 
 	asm __volatile__ (
+#ifdef __OPTIMIZE__
+		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// causing exceptions to crash the application. By adding this prologue
+		// and the epilogue below, the stack unwind works as it should. 
+		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
+		"pushl %%ebp               \n"
+		".cfi_adjust_cfa_offset 4  \n"
+		".cfi_rel_offset ebp, 0    \n"
+		"movl %%esp, %%ebp         \n"
+		".cfi_def_cfa_register ebp \n"
+#endif
 		_S(CLEAR_FPU_STACK)    "\n"
 		"pushl %%ebx            \n"
 		"movl  %%edx, %%ebx     \n"
@@ -929,7 +1030,14 @@ endcopy:
 		// Pop the alignment bytes
 		"popl  %%esp            \n"
 		"popl  %%ebx            \n"
-
+#ifdef __OPTIMIZE__
+		// Epilogue
+		"movl %%ebp, %%esp         \n"
+		".cfi_def_cfa_register esp \n"
+		"popl %%ebp                \n"
+		".cfi_adjust_cfa_offset -4 \n"
+		".cfi_restore ebp          \n"
+#endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
 		"leal  %1, %%ecx        \n"
@@ -994,6 +1102,17 @@ endcopy:
 	volatile asPWORD a[] = {asPWORD(args), asPWORD(paramSize), asPWORD(func)};
 
 	asm __volatile__ (
+#ifdef __OPTIMIZE__
+		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// causing exceptions to crash the application. By adding this prologue
+		// and the epilogue below, the stack unwind works as it should. 
+		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
+		"pushl %%ebp               \n"
+		".cfi_adjust_cfa_offset 4  \n"
+		".cfi_rel_offset ebp, 0    \n"
+		"movl %%esp, %%ebp         \n"
+		".cfi_def_cfa_register ebp \n"
+#endif
 		_S(CLEAR_FPU_STACK)    "\n"
 		"pushl %%ebx            \n"
 		"movl  %%edx, %%ebx     \n"
@@ -1026,7 +1145,14 @@ endcopy:
 		// Pop the alignment bytes
 		"popl  %%esp            \n"
 		"popl  %%ebx            \n"
-
+#ifdef __OPTIMIZE__
+		// Epilogue
+		"movl %%ebp, %%esp         \n"
+		".cfi_def_cfa_register esp \n"
+		"popl %%ebp                \n"
+		".cfi_adjust_cfa_offset -4 \n"
+		".cfi_restore ebp          \n"
+#endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
 		"leal  %1, %%ecx        \n"
@@ -1107,6 +1233,17 @@ endcopy:
 	volatile asPWORD a[] = {asPWORD(obj), asPWORD(args), asPWORD(paramSize), asPWORD(func)};
 
 	asm __volatile__ (
+#ifdef __OPTIMIZE__
+		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// causing exceptions to crash the application. By adding this prologue
+		// and the epilogue below, the stack unwind works as it should. 
+		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
+		"pushl %%ebp               \n"
+		".cfi_adjust_cfa_offset 4  \n"
+		".cfi_rel_offset ebp, 0    \n"
+		"movl %%esp, %%ebp         \n"
+		".cfi_def_cfa_register ebp \n"
+#endif
 		_S(CLEAR_FPU_STACK)    "\n"
 		"pushl %%ebx            \n"
 		"movl  %%edx, %%ebx     \n"
@@ -1148,7 +1285,14 @@ endcopy:
 		// Pop the alignment bytes
 		"popl  %%esp            \n"
 		"popl  %%ebx            \n"
-
+#ifdef __OPTIMIZE__
+		// Epilogue
+		"movl %%ebp, %%esp         \n"
+		".cfi_def_cfa_register esp \n"
+		"popl %%ebp                \n"
+		".cfi_adjust_cfa_offset -4 \n"
+		".cfi_restore ebp          \n"
+#endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
 		"leal  %1, %%ecx        \n"
@@ -1236,6 +1380,17 @@ endcopy:
 	volatile asPWORD a[] = {asPWORD(obj), asPWORD(args), asPWORD(paramSize), asPWORD(func), asPWORD(retPtr)};
 
 	asm __volatile__ (
+#ifdef __OPTIMIZE__
+		// When compiled with optimizations the stack unwind doesn't work properly, 
+		// causing exceptions to crash the application. By adding this prologue
+		// and the epilogue below, the stack unwind works as it should. 
+		// TODO: runtime optimize: The prologue/epilogue shouldn't be needed if the correct cfi directives are used below
+		"pushl %%ebp               \n"
+		".cfi_adjust_cfa_offset 4  \n"
+		".cfi_rel_offset ebp, 0    \n"
+		"movl %%esp, %%ebp         \n"
+		".cfi_def_cfa_register ebp \n"
+#endif
 		_S(CLEAR_FPU_STACK)   "\n"
 		"pushl %%ebx           \n"
 		"movl  %%edx, %%ebx    \n"
@@ -1290,7 +1445,14 @@ endcopy:
 		// Pop the alignment bytes
 		"popl  %%esp           \n"
 		"popl  %%ebx           \n"
-
+#ifdef __OPTIMIZE__
+		// Epilogue
+		"movl %%ebp, %%esp         \n"
+		".cfi_def_cfa_register esp \n"
+		"popl %%ebp                \n"
+		".cfi_adjust_cfa_offset -4 \n"
+		".cfi_restore ebp          \n"
+#endif
 		// Copy EAX:EDX to retQW. As the stack pointer has been
 		// restored it is now safe to access the local variable
 		"leal  %1, %%ecx        \n"

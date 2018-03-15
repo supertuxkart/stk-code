@@ -45,19 +45,40 @@ private:
     btVector3 dummy1, dummy2;
     btDefaultMotionState        *m_motion_state;
     btCollisionShape            *m_collision_shape;
+
     /** The three normals for each triangle. */
     AlignedArray<btVector3>      m_normals;
+
     /** Pre-compute value used in smoothing. */
     AlignedArray<float>          m_p1p2p3;
+
+    /** If the rigid body can be transformed (which means that normalising
+     *  the normals need to update the vertices and normals used according
+     *  to the current transform of the body. */
+    bool m_can_be_transformed;
+
 public:
-         TriangleMesh();
+    class RigidBodyTriangleMesh : public btRigidBody
+    {
+    public:
+        TriangleMesh *m_triangle_mesh;
+        RigidBodyTriangleMesh(TriangleMesh *tm,
+            const btRigidBody::btRigidBodyConstructionInfo &ci)
+            : btRigidBody(ci),
+            m_triangle_mesh(tm)
+        {
+        }   // RigidBodyTriangleMesh
+    };
+
+         TriangleMesh(bool can_be_transformed);
         ~TriangleMesh();
     void addTriangle(const btVector3 &t1, const btVector3 &t2,
                      const btVector3 &t3, const btVector3 &n1,
                      const btVector3 &n2, const btVector3 &n3,
                      const Material* m);
     void createCollisionShape(bool create_collision_object=true, const char* serialized_bhv=NULL);
-    void createPhysicalBody(btCollisionObject::CollisionFlags flags=
+    void createPhysicalBody(float friction,
+                            btCollisionObject::CollisionFlags flags=
                                (btCollisionObject::CollisionFlags)0,
                             const char* serializedBhv = NULL);
     void removeAll();
@@ -78,6 +99,7 @@ public:
         m_free_body = false;
         m_body = body;
     }
+    const btRigidBody *getBody() const { return m_body; }
     // ------------------------------------------------------------------------
     const Material* getMaterial(int n) const
                                           {return m_triangleIndex2Material[n];}
@@ -94,27 +116,27 @@ public:
     /** Returns the points of the 'indx' triangle.
      *  \param indx Index of the triangle to get.
      *  \param p1,p2,p3 On return the three points of the triangle. */
-    void getTriangle(unsigned int indx, btVector3 **p1, btVector3 **p2,
-                     btVector3 **p3) const
+    void getTriangle(unsigned int indx, btVector3 *p1, btVector3 *p2,
+                     btVector3 *p3) const
     {
         const IndexedMeshArray &m = m_mesh.getIndexedMeshArray();
         btVector3 *p = &(((btVector3*)(m[0].m_vertexBase))[3*indx]);
-        *p1 = &(p[0]);
-        *p2 = &(p[1]);
-        *p3 = &(p[2]);
+        *p1 = p[0];
+        *p2 = p[1];
+        *p3 = p[2];
     }   // getTriangle
     // ------------------------------------------------------------------------
     /** Returns the normals of the triangle with the given index.
      *  \param indx Index of the triangle to get the three normals of.
      *  \result n1,n2,n3 The three normals. */
-    void getNormals(unsigned int indx, const btVector3 **n1, 
-                    const btVector3 **n2, const btVector3 **n3) const
+    void getNormals(unsigned int indx, btVector3 *n1, 
+                    btVector3 *n2, btVector3 *n3) const
     {
         assert(indx < m_triangleIndex2Material.size());
         unsigned int n = indx*3;
-        *n1 = &(m_normals[n  ]);
-        *n2 = &(m_normals[n+1]);
-        *n3 = &(m_normals[n+2]);
+        *n1 = m_normals[n  ];
+        *n2 = m_normals[n+1];
+        *n3 = m_normals[n+2];
     }   // getNormals
     // ------------------------------------------------------------------------
     /** Returns basically the area of the triangle, which is needed when

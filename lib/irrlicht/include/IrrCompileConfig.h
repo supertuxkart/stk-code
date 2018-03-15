@@ -32,12 +32,9 @@
 //! DEVICE is the windowing system used, several PLATFORMs support more than one DEVICE
 //! Irrlicht can be compiled with more than one device
 //! _IRR_COMPILE_WITH_WINDOWS_DEVICE_ for Windows API based device
-//! _IRR_COMPILE_WITH_WINDOWS_CE_DEVICE_ for Windows CE API based device
 //! _IRR_COMPILE_WITH_OSX_DEVICE_ for Cocoa native windowing on OSX
 //! _IRR_COMPILE_WITH_X11_DEVICE_ for Linux X11 based device
 //! _IRR_COMPILE_WITH_SDL_DEVICE_ for platform independent SDL framework
-//! _IRR_COMPILE_WITH_CONSOLE_DEVICE_ for no windowing system, used as a fallback
-//! _IRR_COMPILE_WITH_FB_DEVICE_ for framebuffer systems
 
 //! Passing defines to the compiler which have NO in front of the _IRR definename is an alternative
 //! way which can be used to disable defines (instead of outcommenting them in this header).
@@ -52,11 +49,6 @@
 #undef _IRR_COMPILE_WITH_SDL_DEVICE_
 #endif
 
-//! Comment this line to compile without the fallback console device.
-#define _IRR_COMPILE_WITH_CONSOLE_DEVICE_
-#ifdef NO_IRR_COMPILE_WITH_CONSOLE_DEVICE_
-#undef _IRR_COMPILE_WITH_CONSOLE_DEVICE_
-#endif
 
 //! WIN32 for Windows32
 //! WIN64 for Windows64
@@ -67,13 +59,6 @@
 #define _IRR_COMPILE_WITH_WINDOWS_DEVICE_
 #endif
 
-//! WINCE is a very restricted environment for mobile devices
-#if defined(_WIN32_WCE)
-#define _IRR_WINDOWS_
-#define _IRR_WINDOWS_API_
-#define _IRR_WINDOWS_CE_PLATFORM_
-#define _IRR_COMPILE_WITH_WINDOWS_CE_DEVICE_
-#endif
 
 #if defined(_MSC_VER) && (_MSC_VER < 1300)
 #  error "Only Microsoft Visual Studio 7.0 and later are supported."
@@ -117,14 +102,26 @@
 #define _IRR_COMPILE_ANDROID_ASSET_READER_
 #endif
 
+#if defined(_IRR_COMPILE_WITH_OGLES2_) && !defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
+#define _IRR_COMPILE_WITH_EGL_
+#endif
+
 #if !defined(_IRR_WINDOWS_API_) && !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_)
 #ifndef _IRR_SOLARIS_PLATFORM_
 #define _IRR_LINUX_PLATFORM_
 #endif
 #define _IRR_POSIX_API_
 #define _IRR_COMPILE_WITH_X11_DEVICE_
+//#define _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 #endif
 
+#ifdef NO_IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#undef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#endif
+
+#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#define _IRR_COMPILE_WITH_EGL_
+#endif
 
 //! Define _IRR_COMPILE_WITH_JOYSTICK_SUPPORT_ if you want joystick events.
 #define _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
@@ -156,7 +153,7 @@ headers, e.g. Summer 2004.  This is a Microsoft issue, not an Irrlicht one.
 //! Define _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_ if you want to use DirectInput for joystick handling.
 /** This only applies to Windows devices, currently only supported under Win32 device.
 If not defined, Windows Multimedia library is used, which offers also broad support for joystick devices. */
-#undef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
+#define _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
 #ifdef NO_IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
 #undef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
 #endif
@@ -309,7 +306,7 @@ tool <http://developer.nvidia.com/object/nvperfhud_home.html>. */
 #undef _IRR_USE_NVIDIA_PERFHUD_
 
 //! Uncomment the following line if you want to ignore the deprecated warnings
-//#define IGNORE_DEPRECATED_WARNING
+#define IGNORE_DEPRECATED_WARNING
 
 //! Define _IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_ if you want to use bone based
 /** animated meshes. If you compile without this, you will be unable to load

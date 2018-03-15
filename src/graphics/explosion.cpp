@@ -20,16 +20,16 @@
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/stk_particle.hpp"
 #include "items/projectile_manager.hpp"
 #include "race/race_manager.hpp"
 #include "utils/vec3.hpp"
-
-#include <IParticleSystemSceneNode.h>
 
 const float burst_time = 0.1f;
 
@@ -42,9 +42,27 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound, const char 
     m_emission_frames = 0;
 
 #ifndef SERVER_ONLY
+    std::string filename = particle_file;
+    
+#ifdef ANDROID
+    // Use a lower quality effect on Android for better performance
+    if (filename == "explosion.xml" || 
+        filename == "explosion_bomb.xml" ||
+        filename == "explosion_cake.xml")
+    {
+        filename = "explosion_low.xml";
+    }
+#endif
+    
     ParticleKindManager* pkm = ParticleKindManager::get();
-    ParticleKind* particles = pkm->getParticles(particle_file);
-    m_emitter = new ParticleEmitter(particles, coord,  NULL);
+    ParticleKind* particles = pkm->getParticles(filename);
+    m_emitter = NULL;
+    
+    if (UserConfigParams::m_particles_effects > 1)
+    {
+        m_emitter = new ParticleEmitter(particles, coord,  NULL);
+        m_emitter->getNode()->setPreGenerating(false);
+    }
 #endif
 }   // Explosion
 
@@ -75,26 +93,6 @@ bool Explosion::updateAndDelete(float dt)
     m_emission_frames++;
     m_remaining_time -= dt;
 
-#ifndef SERVER_ONLY
-    if (m_remaining_time < 0.0f && m_remaining_time >= -explosion_time)
-    {
-        scene::ISceneNode* node = m_emitter->getNode();
-        
-        const int intensity = (int)(255-(m_remaining_time/-explosion_time)*255);
-        node->getMaterial(0).AmbientColor.setGreen(intensity);
-        node->getMaterial(0).DiffuseColor.setGreen(intensity);
-        node->getMaterial(0).EmissiveColor.setGreen(intensity);
-        
-        node->getMaterial(0).AmbientColor.setBlue(intensity);
-        node->getMaterial(0).DiffuseColor.setBlue(intensity);
-        node->getMaterial(0).EmissiveColor.setBlue(intensity);
-        
-        node->getMaterial(0).AmbientColor.setRed(intensity);
-        node->getMaterial(0).DiffuseColor.setRed(intensity);
-        node->getMaterial(0).EmissiveColor.setRed(intensity);
-    }
-#endif
-
     // Do nothing more if the animation is still playing
     if (m_remaining_time>0) return false;
 
@@ -106,7 +104,7 @@ bool Explosion::updateAndDelete(float dt)
 #ifndef SERVER_ONLY
         // if framerate is very low, emit for at least a few frames, in case
         // burst time is lower than the time of 1 frame
-        if (m_emission_frames > 2)
+        if (m_emission_frames > 2 && m_emitter != NULL)
         {
             // Stop the emitter and wait a little while for all particles to have time to fade out
             m_emitter->getNode()->getEmitter()->setMinParticlesPerSecond(0);

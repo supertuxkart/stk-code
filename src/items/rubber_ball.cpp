@@ -29,6 +29,7 @@
 #include "modes/linear_world.hpp"
 #include "physics/btKart.hpp"
 #include "physics/triangle_mesh.hpp"
+#include "tracks/check_manager.hpp"
 #include "tracks/drive_graph.hpp"
 #include "tracks/drive_node.hpp"
 #include "tracks/track.hpp"
@@ -46,7 +47,7 @@ float RubberBall::m_st_max_height_difference;
 float RubberBall::m_st_fast_ping_distance;
 float RubberBall::m_st_early_target_factor;
 int   RubberBall::m_next_id = 0;
-float RubberBall::m_time_between_balls;
+int   RubberBall::m_ticks_between_balls;
 
 
 // Debug only, so that we can get a feel on how well balls are aiming etc.
@@ -103,7 +104,7 @@ RubberBall::RubberBall(AbstractKart *kart)
         DriveGraph::get()->getNode(getCurrentGraphNode())->getNormal();
     TerrainInfo::update(getXYZ(), -normal);
     initializeControlPoints(m_owner->getXYZ());
-
+    CheckManager::get()->addFlyableToCannons(this);
 }   // RubberBall
 
 // ----------------------------------------------------------------------------
@@ -114,6 +115,7 @@ RubberBall::~RubberBall()
     if(m_ping_sfx->getStatus()==SFXBase::SFX_PLAYING)
         m_ping_sfx->stop();
     m_ping_sfx->deleteSFX();
+    CheckManager::get()->removeFlyableFromCannons(this);
 }   // ~RubberBall
 
 // ----------------------------------------------------------------------------
@@ -144,6 +146,17 @@ void RubberBall::initializeControlPoints(const Vec3 &xyz)
     m_t             = 0;
     m_t_increase    = m_speed/m_length_cp_1_2;
 }   // initializeControlPoints
+
+// ----------------------------------------------------------------------------
+void RubberBall::setAnimation(AbstractKartAnimation *animation)
+{
+    if (!animation)
+    {
+        initializeControlPoints(getXYZ());
+        m_height_timer = 0;
+    }
+    Flyable::setAnimation(animation);
+}   // setAnimation
 
 // ----------------------------------------------------------------------------
 /** Determines the first kart that is still in the race.
@@ -259,7 +272,7 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
     m_st_max_height_difference      = 10.0f;
     m_st_fast_ping_distance         = 50.0f;
     m_st_early_target_factor        =  1.0f;
-    m_time_between_balls            = 15;
+    m_ticks_between_balls           = stk_config->time2Ticks(15.0f);
 
     if(!node.get("interval", &m_st_interval))
         Log::warn("powerup", "No interval specified for rubber ball.");
@@ -293,9 +306,10 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
     if(!node.get("early-target-factor", &m_st_early_target_factor))
         Log::warn("powerup",
                   "No early-target-factor specified for rubber ball.");
-    if(!node.get("time-between-balls", &m_time_between_balls))
+    if(!node.get("time-between-balls", &m_ticks_between_balls))
         Log::warn("powerup",
                   "No time-between-balls specified for rubber ball.");
+    m_ticks_between_balls = stk_config->time2Ticks(float(m_ticks_between_balls));
     Flyable::init(node, rubberball, PowerupManager::POWERUP_RUBBERBALL);
 }   // init
 
@@ -310,6 +324,7 @@ bool RubberBall::updateAndDelete(float dt)
     // FIXME: what does the rubber ball do in case of battle mode??
     if(!world) return true;
 
+    
     if(m_delete_timer>0)
     {
         m_delete_timer -= dt;
@@ -321,6 +336,14 @@ bool RubberBall::updateAndDelete(float dt)
 #endif
             return true;
         }
+    }
+
+    if (hasAnimation())
+    {
+        // Flyable will call update() of the animation to 
+        // update the ball's position.
+        m_previous_xyz = getXYZ();
+        return Flyable::updateAndDelete(dt);
     }
 
     // Update the target in case that the first kart was overtaken (or has
@@ -355,8 +378,10 @@ bool RubberBall::updateAndDelete(float dt)
     float height    = updateHeight()+m_extend.getY()*0.5f;
     
     if(UserConfigParams::logFlyable())
-        Log::debug("[RubberBall]", "ball %d: %f %f %f height %f gethot %f ",
-                m_id, next_xyz.getX(), next_xyz.getY(), next_xyz.getZ(), height, getHoT());
+        Log::debug("[RubberBall]", "ball %d: %f %f %f height %f gethot %f terrain %d aim %d",
+                m_id, next_xyz.getX(), next_xyz.getY(), next_xyz.getZ(), height, getHoT(),
+			    isOnRoad(),
+            m_aiming_at_target);
 
     // No need to check for terrain height if the ball is low to the ground
     if(height > 0.5f)
@@ -379,7 +404,18 @@ bool RubberBall::updateAndDelete(float dt)
         Log::verbose("RubberBall", "newy2 %f gmth %f", height,
                      getTunnelHeight(next_xyz,vertical_offset));
 
-    next_xyz = next_xyz + getNormal()*(height);
+    // Ball squashing:
+    // ===============
+#ifndef SERVER_ONLY
+    if (height<1.0f*m_extend.getY())
+        m_node->setScale(core::vector3df(1.0f, height / m_extend.getY(), 1.0f));
+    else
+        m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+    next_xyz = getHitPoint() + getNormal()*(height*m_node->getScale().Y);
+
+#else
+    next_xyz = getHitPoint() + getNormal()*(height);
+#endif
     m_previous_xyz = getXYZ();
     m_previous_height = (getXYZ() - getHitPoint()).length();
     setXYZ(next_xyz);
@@ -389,13 +425,6 @@ bool RubberBall::updateAndDelete(float dt)
 
     // Determine new distance along track
     TrackSector::update(next_xyz);
-
-    // Ball squashing:
-    // ===============
-    if(height<1.5f*m_extend.getY())
-        m_node->setScale(core::vector3df(1.0f, height/m_extend.getY(),1.0f));
-    else
-        m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
 
     return Flyable::updateAndDelete(dt);
 }   // updateAndDelete
@@ -420,17 +449,6 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
     else
         *next_xyz = getXYZ() - getNormal()*m_previous_height +(dt*m_speed / diff.length())*diff;
 
-    Vec3 old_vec = getXYZ()-m_previous_xyz;
-    Vec3 new_vec = *next_xyz - getXYZ();
-    //float angle  = atan2(new_vec.getZ(), new_vec.getX())
-    //             - atan2(old_vec.getZ(), old_vec.getX());
-    float angle = new_vec.angle(old_vec);
-    
-    // Adjust angle to be between -180 and 180 degrees
-    if(angle < -M_PI)
-        angle += 2*M_PI;
-    else if(angle > M_PI)
-        angle -= 2*M_PI;
     // If ball is close to the target, then explode
     if (diff.length() < m_target->getKartLength()) 
         hit((AbstractKart*)m_target);

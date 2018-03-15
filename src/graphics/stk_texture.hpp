@@ -26,18 +26,16 @@
 
 using namespace irr;
 
-class Material;
+struct TexConfig;
 
 class STKTexture : public video::ITexture, NoCopy
 {
 private:
     core::dimension2d<u32> m_size, m_orig_size;
 
-    uint64_t m_texture_handle;
+    bool m_single_channel;
 
-    bool m_srgb, m_premul_alpha, m_mesh_texture, m_single_channel;
-
-    Material* m_material;
+    TexConfig* m_tex_config;
 
     GLuint m_texture_name;
 
@@ -47,23 +45,24 @@ private:
 
     // ------------------------------------------------------------------------
     video::IImage* resizeImage(video::IImage* orig_img,
-                               core::dimension2du* new_img_size = NULL,
-                               core::dimension2du* new_tex_size = NULL);
+                               core::dimension2du* orig_size = NULL,
+                               core::dimension2du* final_size = NULL) const;
+    // ------------------------------------------------------------------------
+    void formatConversion(uint8_t* data, unsigned int* format, unsigned int w,
+                          unsigned int h) const;
+    // ------------------------------------------------------------------------
+    bool isSrgb() const;
+    // ------------------------------------------------------------------------
+    bool isPremulAlpha() const;
     // ------------------------------------------------------------------------
     void applyMask(video::IImage* orig_img);
     // ------------------------------------------------------------------------
-    bool loadCompressedTexture(const std::string& file_name);
-    // ------------------------------------------------------------------------
-    void saveCompressedTexture(const std::string& file_name);
 
 public:
     // ------------------------------------------------------------------------
-    STKTexture(const std::string& path, bool srgb = false,
-               bool premul_alpha = false, bool set_material = false,
-               bool mesh_tex = false, bool no_upload = false,
-               bool single_channel = false);
+    STKTexture(const std::string& path, TexConfig* tc, bool no_upload = false);
     // ------------------------------------------------------------------------
-    STKTexture(uint8_t* data, const std::string& name, size_t size,
+    STKTexture(uint8_t* data, const std::string& name, unsigned int size,
                bool single_channel = false);
     // ------------------------------------------------------------------------
     STKTexture(video::IImage* img, const std::string& name);
@@ -104,24 +103,14 @@ public:
     // ------------------------------------------------------------------------
     virtual u32 getOpenGLTextureName() const         { return m_texture_name; }
     // ------------------------------------------------------------------------
-    virtual u64 getHandle();
-    // ------------------------------------------------------------------------
-    virtual void unloadHandle();
-    // ------------------------------------------------------------------------
-    bool isSrgb() const                                      { return m_srgb; }
-    // ------------------------------------------------------------------------
-    bool isPremulAlpha() const                       { return m_premul_alpha; }
-    // ------------------------------------------------------------------------
-    bool isMeshTexture() const                       { return m_mesh_texture; }
-    // ------------------------------------------------------------------------
-    void setMeshTexture(bool val)                     { m_mesh_texture = val; }
-    // ------------------------------------------------------------------------
-    unsigned int getTextureSize() const              { return m_texture_size; }
+    virtual unsigned int getTextureSize() const      { return m_texture_size; }
     // ------------------------------------------------------------------------
     void reload(bool no_upload = false, uint8_t* preload_data = NULL,
                 video::IImage* preload_img = NULL);
     // ------------------------------------------------------------------------
     video::IImage* getTextureImage()                { return m_texture_image; }
+    // ------------------------------------------------------------------------
+    bool isMeshTexture() const;
 
 };   // STKTexture
 

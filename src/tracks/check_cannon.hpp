@@ -21,11 +21,18 @@
 
 #include "animations/animation_base.hpp"
 #include "tracks/check_line.hpp"
+#include "utils/cpp2011.hpp"
 
 class CheckManager;
+class Flyable;
 class Ipo;
 class ShowCurve;
 class XMLNode;
+
+namespace SP
+{
+    class SPDynamicDrawCall;
+}
 
 /**
  *  \brief Implements a simple checkline that will cause a kart to be
@@ -37,7 +44,8 @@ class CheckCannon : public CheckLine
 {
 private:
     /** The target point the kart will fly to. */
-    core::line3df   m_target;
+    Vec3 m_target_left;
+    Vec3 m_target_right;
 
     /** Stores the cannon curve data. */
     Ipo *m_curve;
@@ -45,13 +53,23 @@ private:
 #ifdef DEBUG
     /** If track debugging is enabled, this will show the the curve of
      *  the cannon in the race. */
-    ShowCurve * m_show_curve;
+    ShowCurve* m_show_curve;
+
+    /** Used to display debug information about checklines. */
+    std::shared_ptr<SP::SPDynamicDrawCall> m_debug_target_dy_dc;
 #endif
+    std::vector<Flyable*> m_all_flyables;
+    std::vector<Vec3>     m_flyable_previous_position;
 
 public:
              CheckCannon(const XMLNode &node, unsigned int index);
     virtual ~CheckCannon();
-    virtual void trigger(unsigned int kart_index);
+    virtual void trigger(unsigned int kart_index) OVERRIDE;
+    virtual void changeDebugColor(bool is_active) OVERRIDE;
+    virtual void update(float dt) OVERRIDE;
+    virtual bool triggeringCheckline() const { return false; }
+    void addFlyable(Flyable *flyable);
+    void removeFlyable(Flyable *flyable);
 };   // CheckLine
 
 #endif

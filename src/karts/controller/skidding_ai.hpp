@@ -48,6 +48,8 @@
 #include "tracks/drive_node.hpp"
 #include "utils/random_generator.hpp"
 
+#include <line3d.h>
+
 class LinearWorld;
 class DriveGraph;
 class ShowCurve;

@@ -45,6 +45,10 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 
+#ifdef ANDROID
+#include "main_android.hpp"
+#endif
+
 
 // set to 1 to debug i18n
 #define TRANSLATE_VERBOSE 0
@@ -301,6 +305,24 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                              "GetLocaleInfo tryname returns '%s'.", c);
                 if(c[0]) language += std::string("_")+c;
             }   // if c[0]
+            
+#elif defined(ANDROID)
+            char p_language[3] = {};
+            AConfiguration_getLanguage(global_android_app->config, p_language);
+            
+            if (p_language != NULL)
+            {
+                language += p_language;
+                
+                char p_country[3] = {};
+                AConfiguration_getCountry(global_android_app->config, p_country);
+                
+                if (p_country)
+                {
+                    language += "_";
+                    language += p_country;
+                }
+            }
 #endif
         }   // neither LANGUAGE nor LANG defined
 
@@ -451,7 +473,7 @@ bool Translations::isRTLText(const wchar_t *in_ptr)
     FriBidiChar *fribidiInput = toFribidiChar(in_ptr);
 
     FriBidiCharType *types = new FriBidiCharType[length];
-    fribidi_get_bidi_types(fribidiInput, length, types);
+    fribidi_get_bidi_types(fribidiInput, (FriBidiStrIndex)length, types);
     freeFribidiChar(fribidiInput);
 
     // Declare as RTL if one character is RTL
@@ -608,7 +630,7 @@ core::stringw Translations::fribidizeLine(const core::stringw &str)
     FriBidiChar *fribidiOutput = new FriBidiChar[length + 1];
     memset(fribidiOutput, 0, (length + 1) * sizeof(FriBidiChar));
     fribidi_boolean result = fribidi_log2vis(fribidiInput,
-                                                length,
+                                                (FriBidiStrIndex)length,
                                                 &pbase_dir,
                                                 fribidiOutput,
             /* gint   *position_L_to_V_list */ NULL,

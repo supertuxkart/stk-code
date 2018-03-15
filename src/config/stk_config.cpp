@@ -138,6 +138,9 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_replay_delta_pos2,         "replay delta-position"      );
     CHECK_NEG(m_replay_dt,                 "replay delta-t"             );
     CHECK_NEG(m_smooth_angle_limit,        "physics smooth-angle-limit" );
+    CHECK_NEG(m_default_track_friction,    "physics default-track-friction");
+    CHECK_NEG(m_physics_fps,               "physics fps"                );
+    CHECK_NEG(m_default_moveable_friction, "physics default-moveable-friction");
 
     // Square distance to make distance checks cheaper (no sqrt)
     m_replay_delta_pos2 *= m_replay_delta_pos2;
@@ -156,7 +159,9 @@ void STKConfig::init_defaults()
         m_delay_finish_time      = m_skid_fadeout_time         =
         m_near_ground            = m_item_switch_time          =
         m_smooth_angle_limit     = m_penalty_time              =
+        m_default_track_friction = m_default_moveable_friction =
         UNDEFINED;
+    m_physics_fps                = -100;
     m_bubblegum_counter          = -100;
     m_shield_restrict_weapos     = false;
     m_max_karts                  = -100;
@@ -178,6 +183,8 @@ void STKConfig::init_defaults()
     m_disable_steer_while_unskid = false;
     m_camera_follow_skid         = false;
     m_cutscene_fov               = 0.61f;
+    m_max_skinning_bones         = 1024;
+    m_tc_quality                 = 16;
 
     m_score_increase.clear();
     m_leader_intervals.clear();
@@ -239,8 +246,12 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if (const XMLNode *physics_node= root->getNode("physics"))
     {
-        physics_node->get("smooth-normals",     &m_smooth_normals    );
-        physics_node->get("smooth-angle-limit", &m_smooth_angle_limit);
+        physics_node->get("smooth-normals",         &m_smooth_normals        );
+        physics_node->get("smooth-angle-limit",     &m_smooth_angle_limit    );
+        physics_node->get("default-track-friction", &m_default_track_friction);
+        physics_node->get("default-moveable-friction",
+                                                 &m_default_moveable_friction);
+        physics_node->get("fps",                    &m_physics_fps           );
     }
 
     if (const XMLNode *startup_node= root->getNode("startup"))
@@ -265,6 +276,11 @@ void STKConfig::getAllData(const XMLNode * root)
         camera->get("fov-2", &m_camera_fov[1]);
         camera->get("fov-3", &m_camera_fov[2]);
         camera->get("fov-4", &m_camera_fov[3]);
+        
+        for (unsigned int i = 4; i < MAX_PLAYER_COUNT; i++) 
+        {
+            camera->get("fov-4", &m_camera_fov[i]);
+        }
         camera->get("cutscene-fov", &m_cutscene_fov);
     }
 
@@ -356,6 +372,16 @@ void STKConfig::getAllData(const XMLNode * root)
     {
         fonts_list->get("normal-ttf", &m_normal_ttf);
         fonts_list->get("digit-ttf",  &m_digit_ttf );
+    }
+
+    if (const XMLNode *skinning = root->getNode("skinning"))
+    {
+        skinning->get("max-bones", &m_max_skinning_bones);
+    }
+
+    if (const XMLNode *tc = root->getNode("texture-compression"))
+    {
+        tc->get("quality", &m_tc_quality);
     }
 
     // Get the default KartProperties

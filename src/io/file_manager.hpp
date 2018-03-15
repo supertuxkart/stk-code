@@ -162,6 +162,8 @@ public:
     }
     // ------------------------------------------------------------------------
     std::string searchMusic(const std::string& file_name) const;
+    // ------------------------------------------------------------------------
+    std::string searchModel(const std::string& file_name) const;
     std::string searchTexture(const std::string& fname) const;
     std::string getUserConfigFile(const std::string& fname) const;
     bool        fileExists(const std::string& path) const;

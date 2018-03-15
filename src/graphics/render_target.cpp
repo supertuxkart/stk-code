@@ -19,7 +19,7 @@
 #include "graphics/render_target.hpp"
 
 #include "graphics/2dutils.hpp"
-#include "graphics/glwrap.hpp"
+#include "graphics/frame_buffer.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shader_based_renderer.hpp"
@@ -36,6 +36,12 @@ GL1RenderTarget::GL1RenderTarget(const irr::core::dimension2du &dimension,
     if (m_render_target_texture != NULL)
     {
         irr_driver->getVideoDriver()->setRenderTarget(m_render_target_texture);
+    }
+    else
+    {
+        // m_render_target_texture will be NULL if RTT doesn't work on this 
+        // computer
+        Log::error("GL1RenderTarget", "Cannot render to texture.");
     }
 
     m_rtt_main_node = NULL;
@@ -58,12 +64,8 @@ irr::core::dimension2du GL1RenderTarget::getTextureSize() const
 //-----------------------------------------------------------------------------
 void GL1RenderTarget::renderToTexture(irr::scene::ICameraSceneNode* camera, float dt)
 {
-    // m_render_target_texture will be NULL if RTT doesn't work on this computer
     if (m_render_target_texture == NULL)
-    {
-        Log::error("GL1RenderTarget", "Cannot render to texture.");
         return;
-    }
 
     irr_driver->getVideoDriver()->setRenderTarget(m_render_target_texture);
 
@@ -145,13 +147,10 @@ void GL3RenderTarget::draw2DImage(const irr::core::rect<s32>& dest_rect,
     assert(m_frame_buffer != NULL);
     irr::core::rect<s32> source_rect(0, 0, m_frame_buffer->getWidth(),
                                      m_frame_buffer->getHeight());
-    glEnable(GL_FRAMEBUFFER_SRGB);
     draw2DImageFromRTT(m_frame_buffer->getRTT()[0],
                        m_frame_buffer->getWidth(), m_frame_buffer->getHeight(),
                        dest_rect, source_rect,
                        clip_rect, colors, use_alpha_channel_of_texture);
-    glDisable(GL_FRAMEBUFFER_SRGB);
-
 }   // draw2DImage
 
 #endif   // !SERVER_ONLY

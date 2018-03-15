@@ -109,7 +109,8 @@ void InputManager::handleStaticAction(int key, int value)
 
     // When no players... a cutscene
     if (race_manager->getNumPlayers() == 0 && world != NULL && value > 0 &&
-        (key == KEY_SPACE || key == KEY_RETURN))
+        (key == IRR_KEY_SPACE || key == IRR_KEY_RETURN || 
+        key == IRR_KEY_BUTTON_A))
     {
         world->onFirePressed(NULL);
     }
@@ -128,39 +129,39 @@ void InputManager::handleStaticAction(int key, int value)
 #ifdef DEBUG
         // Special debug options for profile mode: switch the
         // camera to show a different kart.
-        case KEY_KEY_1:
-        case KEY_KEY_2:
-        case KEY_KEY_3:
-        case KEY_KEY_4:
-        case KEY_KEY_5:
-        case KEY_KEY_6:
-        case KEY_KEY_7:
-        case KEY_KEY_8:
-        case KEY_KEY_9:
+        case IRR_KEY_1:
+        case IRR_KEY_2:
+        case IRR_KEY_3:
+        case IRR_KEY_4:
+        case IRR_KEY_5:
+        case IRR_KEY_6:
+        case IRR_KEY_7:
+        case IRR_KEY_8:
+        case IRR_KEY_9:
         {
             if(!ProfileWorld::isProfileMode() || !world) break;
-            int kart_id = key - KEY_KEY_1;
+            int kart_id = key - IRR_KEY_1;
             if(kart_id<0 || kart_id>=(int)world->getNumKarts()) break;
             Camera::getCamera(0)->setKart(world->getKart(kart_id));
             break;
         }
 #endif
 
-        case KEY_CONTROL:
-        case KEY_RCONTROL:
-        case KEY_LCONTROL:
-        case KEY_RMENU:
-        case KEY_LMENU:
-        case KEY_LWIN:
+        case IRR_KEY_CONTROL:
+        case IRR_KEY_RCONTROL:
+        case IRR_KEY_LCONTROL:
+        case IRR_KEY_RMENU:
+        case IRR_KEY_LMENU:
+        case IRR_KEY_LWIN:
             control_is_pressed = value!=0;
             break;
-        case KEY_LSHIFT:
-        case KEY_RSHIFT:
-        case KEY_SHIFT:
+        case IRR_KEY_LSHIFT:
+        case IRR_KEY_RSHIFT:
+        case IRR_KEY_SHIFT:
             shift_is_pressed = value!=0; break;
 
         // Flying up and down
-        case KEY_KEY_I:
+        case IRR_KEY_I:
         {
             if (!world || !UserConfigParams::m_artist_debug_mode) break;
 
@@ -170,7 +171,7 @@ void InputManager::handleStaticAction(int key, int value)
             kart->flyUp();
             break;
         }
-        case KEY_KEY_K:
+        case IRR_KEY_K:
         {
             if (!world || !UserConfigParams::m_artist_debug_mode) break;
 
@@ -181,7 +182,7 @@ void InputManager::handleStaticAction(int key, int value)
             break;
         }
         // Moving the first person camera
-        case KEY_KEY_W:
+        case IRR_KEY_W:
         {
             CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
             if (world && UserConfigParams::m_artist_debug_mode && cam  )
@@ -192,7 +193,7 @@ void InputManager::handleStaticAction(int key, int value)
             }
             break;
         }
-        case KEY_KEY_S:
+        case IRR_KEY_S:
         {
             CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
             if (world && UserConfigParams::m_artist_debug_mode && cam)
@@ -203,7 +204,7 @@ void InputManager::handleStaticAction(int key, int value)
             }
             break;
         }
-        case KEY_KEY_D:
+        case IRR_KEY_D:
         {
             CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
             if (world && !UserConfigParams::m_artist_debug_mode && cam)
@@ -214,7 +215,7 @@ void InputManager::handleStaticAction(int key, int value)
             }
             break;
         }
-        case KEY_KEY_A:
+        case IRR_KEY_A:
         {
             CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
             if (world && UserConfigParams::m_artist_debug_mode && cam)
@@ -225,7 +226,7 @@ void InputManager::handleStaticAction(int key, int value)
             }
             break;
         }
-        case KEY_KEY_R:
+        case IRR_KEY_R:
         {
             CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
             if (world && UserConfigParams::m_artist_debug_mode && cam)
@@ -236,7 +237,7 @@ void InputManager::handleStaticAction(int key, int value)
             }
             break;
         }
-        case KEY_KEY_F:
+        case IRR_KEY_F:
         {
             CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
             if (world && UserConfigParams::m_artist_debug_mode && cam)
@@ -248,7 +249,7 @@ void InputManager::handleStaticAction(int key, int value)
             break;
         }
         // Rotating the first person camera
-        case KEY_KEY_Q:
+        case IRR_KEY_Q:
         {
             CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
             if (world && UserConfigParams::m_artist_debug_mode && cam )
@@ -258,7 +259,7 @@ void InputManager::handleStaticAction(int key, int value)
             }
             break;
         }
-        case KEY_KEY_E:
+        case IRR_KEY_E:
         {
             CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
             if (world && UserConfigParams::m_artist_debug_mode && cam)
@@ -269,14 +270,24 @@ void InputManager::handleStaticAction(int key, int value)
             break;
         }
 
-        case KEY_SNAPSHOT:
-        case KEY_PRINT:
+        case IRR_KEY_SNAPSHOT:
+        case IRR_KEY_PRINT:
             // on windows we don't get a press event, only release.  So
             // save on release only (to avoid saving twice on other platforms)
-            if (value ==0 )
-                irr_driver->requestScreenshot();
+            if (value == 0)
+            {
+                if (control_is_pressed)
+                {
+                    const bool is_recording = irr_driver->isRecording();
+                    irr_driver->setRecording(!is_recording);
+                }
+                else
+                {
+                    irr_driver->requestScreenshot();
+                }
+            }
             break;
-        case KEY_F11:
+        case IRR_KEY_F11:
             if(value && shift_is_pressed && world && RewindManager::isEnabled())
             {
                 printf("Enter rewind to time:");
@@ -307,7 +318,7 @@ void InputManager::handleStaticAction(int key, int value)
 #endif
             }
             break;
-        case KEY_F2:
+        case IRR_KEY_F2:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
@@ -315,42 +326,42 @@ void InputManager::handleStaticAction(int key, int value)
                 kart->setPowerup(PowerupManager::POWERUP_PLUNGER, 10000);
             }
             break;
-        case KEY_F3:
+        case IRR_KEY_F3:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_CAKE, 10000);
             }
             break;
-        case KEY_F4:
+        case IRR_KEY_F4:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_SWITCH, 10000);
             }
             break;
-        case KEY_F5:
+        case IRR_KEY_F5:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_BOWLING, 10000);
             }
             break;
-        case KEY_F6:
+        case IRR_KEY_F6:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 10000);
             }
             break;
-        case KEY_F7:
+        case IRR_KEY_F7:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(PowerupManager::POWERUP_ZIPPER, 10000);
             }
             break;
-        case KEY_F8:
+        case IRR_KEY_F8:
             if (UserConfigParams::m_artist_debug_mode && value && world)
             {
                 if (control_is_pressed)
@@ -373,7 +384,7 @@ void InputManager::handleStaticAction(int key, int value)
                 }
             }
             break;
-        case KEY_F9:
+        case IRR_KEY_F9:
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
@@ -386,7 +397,7 @@ void InputManager::handleStaticAction(int key, int value)
             }
             break;
             */
-        case KEY_F10:
+        case IRR_KEY_F10:
             if(world && value)
             {
                 if(control_is_pressed)
@@ -396,7 +407,7 @@ void InputManager::handleStaticAction(int key, int value)
             }
             break;
             /*
-        case KEY_F11:
+        case IRR_KEY_F11:
             if (UserConfigParams::m_artist_debug_mode && value &&
                 control_is_pressed && world)
             {
@@ -404,7 +415,7 @@ void InputManager::handleStaticAction(int key, int value)
             }
             break;
             */
-        case KEY_F12:
+        case IRR_KEY_F12:
             if(value)
                 UserConfigParams::m_display_fps =
                     !UserConfigParams::m_display_fps;
@@ -478,11 +489,13 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
         // We have to save the direction in which the axis was moved.
         // This is done by storing it as a sign (and since button can
         // be zero, we add one before changing the sign).
-        int input_id = value>=0 ? 1+button : -(1+button);
+        int input_button_id = value>=0 ? 1+button : -(1+button);
+        std::tuple<int, int> input_id(deviceID, input_button_id);
+        std::tuple<int, int> input_id_inv(deviceID, -input_button_id);
 
         bool id_was_high         = m_sensed_input_high_gamepad.find(input_id)
                                    != m_sensed_input_high_gamepad.end();
-        bool inverse_id_was_high = m_sensed_input_high_gamepad.find(-input_id)
+        bool inverse_id_was_high = m_sensed_input_high_gamepad.find(input_id_inv)
                                    != m_sensed_input_high_gamepad.end();
         bool id_was_zero         = m_sensed_input_zero_gamepad.find(button)
                                    != m_sensed_input_zero_gamepad.end();
@@ -646,13 +659,18 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
     {
         action = PA_BEFORE_FIRST;
 
-        if      (button == KEY_UP)     action = PA_MENU_UP;
-        else if (button == KEY_DOWN)   action = PA_MENU_DOWN;
-        else if (button == KEY_LEFT)   action = PA_MENU_LEFT;
-        else if (button == KEY_RIGHT)  action = PA_MENU_RIGHT;
-        else if (button == KEY_SPACE)  action = PA_MENU_SELECT;
-        else if (button == KEY_RETURN) action = PA_MENU_SELECT;
-        else if (button == KEY_TAB)
+        if      (button == IRR_KEY_UP)            action = PA_MENU_UP;
+        else if (button == IRR_KEY_DOWN)          action = PA_MENU_DOWN;
+        else if (button == IRR_KEY_LEFT)          action = PA_MENU_LEFT;
+        else if (button == IRR_KEY_RIGHT)         action = PA_MENU_RIGHT;
+        else if (button == IRR_KEY_SPACE)         action = PA_MENU_SELECT;
+        else if (button == IRR_KEY_RETURN)        action = PA_MENU_SELECT;
+        else if (button == IRR_KEY_BUTTON_UP)     action = PA_MENU_DOWN;
+        else if (button == IRR_KEY_BUTTON_DOWN)   action = PA_MENU_UP;
+        else if (button == IRR_KEY_BUTTON_LEFT)   action = PA_MENU_LEFT;
+        else if (button == IRR_KEY_BUTTON_RIGHT)  action = PA_MENU_RIGHT;
+        else if (button == IRR_KEY_BUTTON_A)      action = PA_MENU_SELECT;
+        else if (button == IRR_KEY_TAB)
         {
             if (shift_mask)
             {
@@ -664,7 +682,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             }
         }
 
-        if (button == KEY_RETURN)
+        if (button == IRR_KEY_RETURN || button == IRR_KEY_BUTTON_A)
         {
             if (GUIEngine::ModalDialog::isADialogActive() &&
                 !GUIEngine::ScreenKeyboard::isActive())
@@ -759,7 +777,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             Controller* controller = pk->getController();
             if (controller != NULL) controller->action(action, abs(value));
         }
-        else if (race_manager->isWatchingReplay())
+        else if (race_manager->isWatchingReplay() && !GUIEngine::ModalDialog::isADialogActive())
         {
             // Get the first ghost kart
             World::getWorld()->getKart(0)
@@ -963,7 +981,7 @@ EventPropagation InputManager::input(const SEvent& event)
         if (event.KeyInput.PressedDown)
         {
             // escape is a little special
-            if (key == KEY_ESCAPE)
+            if (key == IRR_KEY_ESCAPE)
             {
                 StateManager::get()->escapePressed();
                 return EVENT_BLOCK;
@@ -974,11 +992,12 @@ EventPropagation InputManager::input(const SEvent& event)
             // single letter). Same for spacebar. Same for letters.
             if (GUIEngine::isWithinATextBox())
             {
-                if (key == KEY_BACK || key == KEY_SPACE || key == KEY_SHIFT)
+                if (key == IRR_KEY_BACK || key == IRR_KEY_SPACE || 
+                    key == IRR_KEY_SHIFT)
                 {
                     return EVENT_LET;
                 }
-                if (key >= KEY_KEY_0 && key <= KEY_KEY_Z)
+                if (key >= IRR_KEY_0 && key <= IRR_KEY_Z)
                 {
                     return EVENT_LET;
                 }
@@ -1006,11 +1025,12 @@ EventPropagation InputManager::input(const SEvent& event)
             // single letter). Same for spacebar. Same for letters.
             if (GUIEngine::isWithinATextBox())
             {
-                if (key == KEY_BACK || key == KEY_SPACE || key == KEY_SHIFT)
+                if (key == IRR_KEY_BACK || key == IRR_KEY_SPACE || 
+                    key == IRR_KEY_SHIFT)
                 {
                     return EVENT_LET;
                 }
-                if (key >= KEY_KEY_0 && key <= KEY_KEY_Z)
+                if (key >= IRR_KEY_0 && key <= IRR_KEY_Z)
                 {
                     return EVENT_LET;
                 }
@@ -1024,7 +1044,7 @@ EventPropagation InputManager::input(const SEvent& event)
     else if (event.EventType == EET_TOUCH_INPUT_EVENT)
     {
         MultitouchDevice* device = m_device_manager->getMultitouchDevice();
-        unsigned int id = event.TouchInput.ID;
+        unsigned int id = (unsigned int)event.TouchInput.ID;
 
         if (device != NULL && id < device->m_events.size())
         {
@@ -1130,8 +1150,8 @@ EventPropagation InputManager::input(const SEvent& event)
         // Simulate touch event on non-android devices
         #if !defined(ANDROID)
         MultitouchDevice* device = m_device_manager->getMultitouchDevice();
-        
-        if (device != NULL && (type == EMIE_LMOUSE_PRESSED_DOWN || 
+
+        if (device != NULL && (type == EMIE_LMOUSE_PRESSED_DOWN ||
             type == EMIE_LMOUSE_LEFT_UP || type == EMIE_MOUSE_MOVED))
         {
             device->m_events[0].id = 0;
@@ -1168,26 +1188,23 @@ EventPropagation InputManager::input(const SEvent& event)
     else if (event.EventType == EET_ACCELEROMETER_EVENT)
     {
         MultitouchDevice* device = m_device_manager->getMultitouchDevice();
-        
-        if (device)
+
+        if (device && device->isAccelerometerActive())
         {
+            m_device_manager->updateMultitouchDevice();
+
             for (unsigned int i = 0; i < device->getButtonsCount(); i++)
             {
                 MultitouchButton* button = device->getButton(i);
-                
+
                 if (button->type != BUTTON_STEERING)
                     continue;
-
-                if (UserConfigParams::m_multitouch_accelerometer == 1)
-                {
-                    button->axis_x = -event.AccelerometerEvent.X / 5.0f;
-                    device->handleControls(button);
-                }
-                else if (UserConfigParams::m_multitouch_accelerometer == 2)
-                {
-                    button->axis_x = event.AccelerometerEvent.Y / 5.0f;
-                    device->handleControls(button);                    
-                }
+                    
+                float factor = UserConfigParams::m_multitouch_tilt_factor;
+                factor = std::max(factor, 0.1f);
+                button->axis_x = (float)event.AccelerometerEvent.Y / factor;
+                
+                device->handleControls(button);
             }
         }
     }

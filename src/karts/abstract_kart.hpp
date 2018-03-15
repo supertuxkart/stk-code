@@ -45,11 +45,12 @@ class KartModel;
 class KartProperties;
 class Material;
 class Powerup;
+class RenderInfo;
+class SFXBuffer;
 class Skidding;
 class SlipStream;
 class TerrainInfo;
 
-enum KartRenderType: unsigned int;
 
 /** An abstract interface for the actual karts. Some functions are actually
  *  implemented here in order to allow inlining.
@@ -101,7 +102,7 @@ public:
                                 int world_kart_id,
                                 int position, const btTransform& init_transform,
                                 PerPlayerDifficulty difficulty,
-                                KartRenderType krt);
+                                std::shared_ptr<RenderInfo> ri);
     virtual       ~AbstractKart();
     virtual core::stringw getName() const;
     virtual void   reset();
@@ -166,10 +167,7 @@ public:
     // Access to the graphical kart model.
     // ------------------------------------------------------------------------
     /** Returns this kart's kart model. */
-    KartModel* getKartModel() { return m_kart_model;      }
-    // ------------------------------------------------------------------------
-    /** Returns this kart's kart model. */
-    const KartModel* getKartModel() const { return m_kart_model;      }
+    KartModel* getKartModel() const { return m_kart_model;      }
     // ------------------------------------------------------------------------
     /** Returns the length of the kart. */
     float getKartLength() const { return m_kart_length; }
@@ -472,7 +470,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns whether this kart is jumping. */
     virtual bool isJumping() const = 0;
-
+    // ------------------------------------------------------------------------
+    virtual void playSound(SFXBuffer* buffer) = 0;
 };   // AbstractKart
 
 

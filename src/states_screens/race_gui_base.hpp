@@ -88,6 +88,8 @@ private:
         bool                m_important;
         bool                m_big_font;
 
+        bool                m_outline;
+
         // -----------------------------------------------------
         // std::vector needs standard copy-ctor and std-assignment op.
         // let compiler create defaults .. they'll do the job, no
@@ -95,7 +97,7 @@ private:
         TimedMessage(const irr::core::stringw &message,
                      const AbstractKart *kart, float time,
                      const video::SColor &color, const bool important,
-                     bool big_font)
+                     bool big_font, bool outline)
         {
             m_message        = message;
             m_kart           = kart;
@@ -103,6 +105,7 @@ private:
             m_color          = color;
             m_important      = important;
             m_big_font       = big_font;
+            m_outline        = outline;
         }   // TimedMessage
         // -----------------------------------------------------
         // in follow leader the clock counts backwards
@@ -122,7 +125,7 @@ private:
     int              m_max_font_height;
 
     /** Musical notes icon (for music description and credits) */
-    Material        *m_music_icon;
+        video::ITexture* m_music_icon;
 
     /** Translated strings 'ready', 'set', 'go'. */
     core::stringw    m_string_ready, m_string_set, m_string_go, m_string_goal;
@@ -143,8 +146,8 @@ private:
     
 
 protected:
-    /** Material for the 'plunger in the face' texture. */
-    Material        *m_plunger_face;
+    /** Texture for the 'plunger in the face' texture. */
+    video::ITexture* m_plunger_face;
 
     /** State of the plunger: From the 'init' states the plunger switches
      *  between two slow moving states ('shakily moving') till the end of
@@ -178,7 +181,7 @@ protected:
     video::ITexture *m_gauge_goal;
 
     /** The frame around player karts in the mini map. */
-    Material         *m_icons_frame;
+    video::ITexture* m_icons_frame;
     
     RaceGUIMultitouch* m_multitouch_gui;
 
@@ -229,7 +232,7 @@ public:
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
                             bool important=true,
-                            bool big_font=false);
+                            bool big_font=false, bool outline=false);
     virtual void update(float dt);
     virtual void preRenderCallback(const Camera *camera);
     // ------------------------------------------------------------------------

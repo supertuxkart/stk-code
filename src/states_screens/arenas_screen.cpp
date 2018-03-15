@@ -342,7 +342,7 @@ void ArenasScreen::buildTrackList()
     if (m_unsupported_arena.size() > 0)
         w->setText( _P("%d arena unavailable in single player.",
                        "%d arenas unavailable in single player.",
-                       m_unsupported_arena.size()) );
+                       (int)m_unsupported_arena.size()) );
 }
 
 // ------------------------------------------------------------------------------------------------------

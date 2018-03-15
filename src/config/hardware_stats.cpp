@@ -102,7 +102,7 @@ int getRAM()
  */
 int getNumProcessors()
 {
-#ifdef __linux__
+#if defined(__linux__) || defined(__CYGWIN__)
     return sysconf(_SC_NPROCESSORS_CONF);
 #endif
 #ifdef WIN32
@@ -294,7 +294,12 @@ void reportHardwareStats()
 #else
     json.add("os_macosx", 0);
 #endif
-#ifdef __linux__
+#ifdef ANDROID
+    json.add("os_android", 1);
+#else
+    json.add("os_android", 0);
+#endif
+#if defined(__linux__) && !defined(ANDROID)
     json.add("os_linux", 1);
     json.add("os_unix", 1);
 #else

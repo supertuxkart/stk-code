@@ -95,6 +95,10 @@ private:
                     bool enable_transparency=false,
                     const video::SColor *track_color=NULL);
     // ------------------------------------------------------------------------
+    void createMeshSP(bool show_invisible=true,
+                      bool enable_transparency=false,
+                      const video::SColor *track_color=NULL);
+    // ------------------------------------------------------------------------
     void cleanupDebugMesh();
     // ------------------------------------------------------------------------
     virtual bool hasLapLine() const = 0;
@@ -103,6 +107,9 @@ private:
 
 public:
     static const int UNKNOWN_SECTOR;
+    // For 2d Quad
+    static const float MIN_HEIGHT_TESTING;
+    static const float MAX_HEIGHT_TESTING;
     // ------------------------------------------------------------------------
     /** Returns the one instance of this object. It is possible that there
      *  is no instance created (e.g. arena without navmesh) so we don't assert
@@ -146,7 +153,7 @@ public:
         return m_all_nodes[i];
     }
     // ------------------------------------------------------------------------
-    unsigned int getNumNodes() const             { return m_all_nodes.size(); }
+    unsigned int getNumNodes() const { return (unsigned int)m_all_nodes.size(); }
     // ------------------------------------------------------------------------
     void findRoadSector(const Vec3& XYZ, int *sector,
                         std::vector<int> *all_sectors = NULL,

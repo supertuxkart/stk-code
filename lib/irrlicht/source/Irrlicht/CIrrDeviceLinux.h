@@ -18,13 +18,8 @@
 #ifdef _IRR_COMPILE_WITH_X11_
 
 #ifdef _IRR_COMPILE_WITH_OPENGL_
-#include <GL/gl.h>
 #define GLX_GLXEXT_LEGACY 1
 #include <GL/glx.h>
-#ifdef _IRR_OPENGL_USE_EXTPOINTER_
-#define GLX_GLXEXT_PROTOTYPES
-#include "glxext.h"
-#endif
 #endif
 
 #include <X11/Xlib.h>
@@ -68,6 +63,9 @@ namespace irr
 		//! sets the caption of the window
 		virtual void setWindowCaption(const wchar_t* text);
 
+		//! sets the class of the window
+		virtual void setWindowClass(const char* text);
+
 		//! returns if window is active. if not, nothing need to be drawn
 		virtual bool isWindowActive() const;
 
@@ -101,6 +99,12 @@ namespace irr
 
 		//! Restores the window size.
 		virtual void restoreWindow();
+		
+		//! Move window to requested position
+		virtual bool moveWindow(int x, int y);
+
+		//! Get current window position.
+		virtual bool getWindowPosition(int* x, int* y);
 
 		//! Activate any joysticks, and generate events for them.
 		virtual bool activateJoysticks(core::array<SJoystickInfo> & joystickInfo);

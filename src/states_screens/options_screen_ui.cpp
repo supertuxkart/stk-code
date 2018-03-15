@@ -128,6 +128,13 @@ void OptionsScreenUI::init()
     assert( skinSelector != NULL );
 
     // ---- video modes
+    CheckBoxWidget* splitscreen_method = getWidget<CheckBoxWidget>("split_screen_horizontally");
+    assert(splitscreen_method != NULL);
+    splitscreen_method->setState(UserConfigParams::split_screen_horizontally);
+
+    //Forbid changing this setting in game
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+    splitscreen_method->setActive(!in_game);
 
     CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
     assert( fps != NULL );
@@ -165,11 +172,12 @@ void OptionsScreenUI::init()
     // --- select the right skin in the spinner
     bool currSkinFound = false;
     const int skinCount = (int) m_skins.size();
+    std::string user_skin = StringUtils::toLowerCase(UserConfigParams::m_skin_file.c_str());
     for (int n=0; n<skinCount; n++)
     {
-        const std::string skinFileName = StringUtils::getBasename(m_skins[n]);
+        const std::string skinFileName = StringUtils::toLowerCase(StringUtils::getBasename(m_skins[n]));
 
-        if (UserConfigParams::m_skin_file.c_str() == skinFileName)
+        if (user_skin == skinFileName)
         {
             skinSelector->setValue(n);
             currSkinFound = true;
@@ -219,6 +227,7 @@ void OptionsScreenUI::init()
     // Forbid changing language while in-game, since this crashes (changing the language involves
     // tearing down and rebuilding the menu stack. not good when in-game)
     list_widget->setActive(StateManager::get()->getGameState() != GUIEngine::INGAME_MENU);
+    
 
 }   // init
 
@@ -256,6 +265,13 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         const core::stringw selectedSkin = skinSelector->getStringValue();
         UserConfigParams::m_skin_file = core::stringc(selectedSkin.c_str()).c_str() + std::string(".stkskin");
         GUIEngine::reloadSkin();
+    }
+    else if (name == "split_screen_horizontally")
+    {
+        CheckBoxWidget* split_screen_horizontally = getWidget<CheckBoxWidget>("split_screen_horizontally");
+        assert(split_screen_horizontally != NULL);
+        UserConfigParams::split_screen_horizontally = split_screen_horizontally->getState();
+
     }
     else if (name == "showfps")
     {

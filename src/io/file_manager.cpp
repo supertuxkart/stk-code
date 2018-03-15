@@ -211,14 +211,33 @@ FileManager::FileManager()
                    "Set $SUPERTUXKART_DATADIR to point to the data directory.");
         // fatal will exit the application
     }
-
+    
     addRootDirs(root_dir);
-    if( fileExists(root_dir+"../../stk-assets"))
-        addRootDirs(root_dir+"../../stk-assets");
-    if( fileExists(root_dir+"../../supertuxkart-assets"))
-        addRootDirs(root_dir+"../../supertuxkart-assets");
-    if ( getenv ( "SUPERTUXKART_ROOT_PATH" ) != NULL )
-        addRootDirs(getenv("SUPERTUXKART_ROOT_PATH"));
+    
+    std::string assets_dir;
+    
+    if (getenv("SUPERTUXKART_ASSETS_DIR") != NULL)
+    {
+        assets_dir = std::string(getenv("SUPERTUXKART_ASSETS_DIR"));
+    }
+    else if (fileExists(root_dir + "../../stk-assets"))
+    {
+        assets_dir = root_dir + "../../stk-assets";
+    }
+    else if (fileExists(root_dir + "../../supertuxkart-assets"))
+    {
+        assets_dir = root_dir + "../../supertuxkart-assets";
+    }
+    else if (getenv("SUPERTUXKART_ROOT_PATH") != NULL)
+    {
+        //is this needed?
+        assets_dir = std::string(getenv("SUPERTUXKART_ROOT_PATH"));
+    }
+    
+    if (!assets_dir.empty() && assets_dir != root_dir)
+    {
+        addRootDirs(assets_dir);
+    }
 
     checkAndCreateConfigDir();
     checkAndCreateAddonsDir();
@@ -601,14 +620,14 @@ bool FileManager::findFile(std::string& full_path,
     return false;
 }   // findFile
 
-    //-----------------------------------------------------------------------------
-    /** Tries to find the specified file in any of the given search paths.
-    *  \param full_path On return contains the full path of the file, or
-    *         "" if the file is not found.
-    *  \param file_name The name of the file to look for.
-    *  \param search_path The list of paths to search for the file.
-    *  \return True if the file is found, false otherwise.
-    */
+//-----------------------------------------------------------------------------
+/** Tries to find the specified file in any of the given search paths.
+*  \param full_path On return contains the full path of the file, or
+*         "" if the file is not found.
+*  \param file_name The name of the file to look for.
+*  \param search_path The list of paths to search for the file.
+*  \return True if the file is found, false otherwise.
+*/
 bool FileManager::findFile(std::string& full_path,
     const std::string& file_name,
     const std::vector<TextureSearchPath>& search_path) const
@@ -960,7 +979,8 @@ void FileManager::checkAndCreateScreenshotDir()
     m_screenshot_dir  = getenv("HOME");
     m_screenshot_dir += "/Library/Application Support/SuperTuxKart/Screenshots/";
 #else
-    m_screenshot_dir = checkAndCreateLinuxDir("XDG_CACHE_HOME", "supertuxkart", ".cache/", ".");
+    m_screenshot_dir  = checkAndCreateLinuxDir("XDG_DATA_HOME", "supertuxkart",
+                                          ".local/share", ".stkscreenshots");
     m_screenshot_dir += "screenshots/";
 #endif
 
@@ -1230,6 +1250,24 @@ std::string FileManager::searchMusic(const std::string& file_name) const
     }
     return path;
 }   // searchMusic
+
+//-----------------------------------------------------------------------------
+/** Returns the full path of a model file by searching all model search paths.
+ *  It throws an exception if the file is not found.
+ *  \param file_name File name to search for.
+ */
+std::string FileManager::searchModel(const std::string& file_name) const
+{
+    std::string path;
+    bool success = findFile(path, file_name, m_model_search_path);
+    if (!success)
+    {
+        throw std::runtime_error(
+            "[FileManager::searchModel] Cannot find model file '"
+            +file_name+"'.");
+    }
+    return path;
+}   // searchModel
 
 //-----------------------------------------------------------------------------
 /** Returns true if the given name is a directory.

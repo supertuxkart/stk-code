@@ -122,7 +122,7 @@ void GroupUserConfigParam::writeInner(std::ofstream& stream, int level) const
 {
     std::string tab(level * 4,' ');
     for(int i = 0; i < level; i++) tab =+ "    ";
-    const int children_amount = m_attributes.size();
+    const int  children_amount = (int)m_attributes.size();
 
     stream << "    " << tab.c_str() << "<" << m_param_name.c_str() << "\n";
 
@@ -144,7 +144,7 @@ void GroupUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
         return;
     }
 
-    const int attributes_amount = m_attributes.size();
+    const int attributes_amount = (int)m_attributes.size();
     for (int n=0; n<attributes_amount; n++)
     {
         m_attributes[n]->findYourDataInAnAttributeOf(child);
@@ -246,7 +246,7 @@ ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
 template<typename T, typename U>
 void ListUserConfigParam<T, U>::write(std::ofstream& stream) const
 {
-    const int elts_amount = m_elements.size();
+    const int elts_amount = (int)m_elements.size();
 
     // comment
     if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str();
@@ -321,9 +321,129 @@ core::stringc ListUserConfigParam<T, U>::toString() const
     return "";
 }   // toString
 
+// ----------------------------------------------------------------------------
+template<typename T, typename U>
+MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
+    const char* comment)
+{
+    m_param_name = param_name;
+    all_params.push_back(this);
+    if (comment != NULL) m_comment = comment;
+}   // MapUserConfigParam
 
+// ----------------------------------------------------------------------------
+template<typename T, typename U>
+MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
+    const char* comment,
+    int nb_elements,
+    ...)
+{
+    m_param_name = param_name;
+    all_params.push_back(this);
+    if (comment != NULL) m_comment = comment;
 
-// ============================================================================
+    // add the default list
+    va_list arguments;
+    va_start(arguments, nb_elements);
+
+    struct pair_type { T key; U value; };
+
+    for (int i = 0; i < nb_elements; i++) 
+    {
+        pair_type key_value_pair = va_arg(arguments, pair_type);
+        m_elements.insert(std::pair<T, U>(key_value_pair.key, key_value_pair.value));
+    }
+    va_end(arguments);                  // Cleans up the list
+}   // MapUserConfigParam
+
+// ----------------------------------------------------------------------------
+template<typename T, typename U>
+MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
+    GroupUserConfigParam* group,
+    const char* comment)
+{
+    m_param_name = param_name;
+    group->addChild(this);
+    if (comment != NULL) m_comment = comment;
+}   // MapUserConfigParam
+
+// ----------------------------------------------------------------------------
+template<typename T, typename U>
+MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
+    GroupUserConfigParam* group,
+    const char* comment,
+    int nb_elements,
+    ...)
+{
+    m_param_name = param_name;
+    group->addChild(this);
+    if (comment != NULL) m_comment = comment;
+
+    // add the default list
+    va_list arguments;
+    va_start(arguments, nb_elements);
+
+    struct pair_type { T key; U value; };
+
+    for (int i = 0; i < nb_elements; i++)
+    {
+        pair_type key_value_pair = va_arg(arguments, pair_type);
+        m_elements.insert(std::pair<T, U>(key_value_pair.key, key_value_pair.value));
+    }
+    va_end(arguments);                  // Cleans up the list
+}   // MapUserConfigParam
+
+// ----------------------------------------------------------------------------
+template<typename T, typename U>
+void MapUserConfigParam<T, U>::write(std::ofstream& stream) const
+{
+    // comment
+    if (m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str();
+    stream << " -->\n    <" << m_param_name.c_str() << "\n";
+
+    for (const auto& kv : m_elements) 
+    {
+        stream << "        " << kv.first << "=\"" << kv.second << "\"\n";
+    }
+    stream << "    >\n";
+    stream << "    </" << m_param_name.c_str() << ">\n\n";
+}   // write
+
+// ----------------------------------------------------------------------------
+
+template<typename T, typename U>
+void MapUserConfigParam<T, U>::findYourDataInAChildOf(const XMLNode* node)
+{
+    const XMLNode* child = node->getNode(m_param_name);
+    if (child == NULL)
+    {
+        //Log::error("User Config", "Couldn't find parameter group %s", m_param_name.c_str());
+        return;
+    }
+    child->get(&m_elements);
+}   // findYourDataInAChildOf
+
+// ----------------------------------------------------------------------------
+template<typename T, typename U>
+void MapUserConfigParam<T, U>::findYourDataInAnAttributeOf(const XMLNode* node)
+{
+}   // findYourDataInAnAttributeOf
+
+// ----------------------------------------------------------------------------
+template<typename T, typename U>
+void MapUserConfigParam<T, U>::addElement(T element, U value)
+{
+    m_elements[element] = value;
+}   // findYourDataInAnAttributeOf
+
+// ----------------------------------------------------------------------------
+template<typename T, typename U>
+core::stringc MapUserConfigParam<T, U>::toString() const
+{
+    return "";
+}   // toString
+
+// ----------------------------------------------------------------------------
 IntUserConfigParam::IntUserConfigParam(int default_value,
                                        const char* param_name,
                                        const char* comment)
@@ -728,7 +848,7 @@ bool UserConfig::loadConfig()
     UserConfigParams::m_saved_grand_prix_list.clearAndDeleteAll();
     std::vector<XMLNode*> saved_gps;
     root->getNodes("SavedGP", saved_gps);
-    const int gp_amount = saved_gps.size();
+    const int gp_amount = (int)saved_gps.size();
     for (int i=0; i<gp_amount; i++)
     {
         UserConfigParams::m_saved_grand_prix_list.push_back(

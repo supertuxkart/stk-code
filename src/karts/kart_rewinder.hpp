@@ -19,7 +19,6 @@
 #ifndef HEADER_KART_REWINDER_HPP
 #define HEADER_KART_REWINDER_HPP
 
-#include "graphics/render_info.hpp"
 #include "karts/kart.hpp"
 #include "network/rewinder.hpp"
 #include "utils/cpp2011.hpp"
@@ -39,7 +38,7 @@ public:
                               unsigned int world_kart_id,
                               int position, const btTransform& init_transform,
                               PerPlayerDifficulty difficulty,
-                              KartRenderType krt = KRT_DEFAULT);
+                              std::shared_ptr<RenderInfo> ri);
    virtual      ~KartRewinder() {};
    virtual BareNetworkString* saveState() const;
    void          reset();

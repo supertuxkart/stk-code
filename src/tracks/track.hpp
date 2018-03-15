@@ -104,7 +104,12 @@ private:
     unsigned int             m_magic_number;
 #endif
 
+    /* Gravity to be used for this track. */
     float                    m_gravity;
+
+    /** Friction to be used for the track. */
+    float                    m_friction;
+
     std::string              m_ident;
     std::string              m_screenshot;
     bool                     m_is_day;
@@ -369,6 +374,8 @@ private:
     /** List of all bezier curves in the track - for e.g. camera, ... */
     std::vector<BezierCurve*> m_all_curves;
 
+    std::vector<std::pair<TrackObject*, TrackObject*> > m_meta_library;
+
     /** The number of laps the track will be raced in a random GP.
      * m_actual_number_of_laps is initialised with this value.*/
     int m_default_number_of_laps;
@@ -402,6 +409,9 @@ public:
      *  minutes(!) in debug mode to be computed. */
     static bool        m_dont_load_navmesh;
 
+    /** Static helper function to pre-upload vertex buffer in spm. */
+    static void uploadNodeVertexBuffer(scene::ISceneNode *node);
+
     static const float NOHIT;
 
                        Track             (const std::string &filename);
@@ -413,9 +423,6 @@ public:
     void               createPhysicsModel(unsigned int main_track_count);
     void               update(float dt);
     void               reset();
-    void               adjustForFog(scene::ISceneNode *node);
-    void               adjustForFog(scene::IMesh* mesh,
-                                    scene::ISceneNode* parent_scene_node);
     void               itemCommand(const XMLNode *node);
     core::stringw      getName() const;
     core::stringw      getSortName() const;
@@ -667,6 +674,10 @@ public:
     // ------------------------------------------------------------------------
     /** Adds mesh to cleanup list */
     void addCachedMesh(scene::IMesh* mesh) { m_all_cached_meshes.push_back(mesh); }
+    // ------------------------------------------------------------------------
+    /** Adds the parent of the meta library for correction later */
+    void addMetaLibrary(TrackObject* parent, TrackObject* meta_library)
+                         { m_meta_library.emplace_back(parent, meta_library); }
 };   // class Track
 
 #endif

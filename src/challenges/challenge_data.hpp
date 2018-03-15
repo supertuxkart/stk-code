@@ -84,7 +84,7 @@ private:
 
     int                            m_num_laps;
     int                            m_position[RaceManager::DIFFICULTY_COUNT];
-    int                            m_num_karts[RaceManager::DIFFICULTY_COUNT];
+    int                            m_default_num_karts[RaceManager::DIFFICULTY_COUNT];
     std::string                    m_ai_kart_ident[RaceManager::DIFFICULTY_COUNT];
     std::string                    m_replay_files[RaceManager::DIFFICULTY_COUNT];
     float                          m_time[RaceManager::DIFFICULTY_COUNT];
@@ -208,7 +208,7 @@ public:
      */
     int getNumKarts(RaceManager::Difficulty difficulty) const
     {
-        return m_num_karts[difficulty];
+        return m_default_num_karts[difficulty];
     }   // getNumKarts
     // ------------------------------------------------------------------------
     /** Returns the maximum time in which the kart must finish.

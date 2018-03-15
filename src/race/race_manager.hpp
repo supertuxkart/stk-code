@@ -489,6 +489,19 @@ public:
     {
         return m_num_local_players;
     }   // getNumLocalPlayers
+    
+    // ------------------------------------------------------------------------
+    /** Returns true if the split screen display leaves an empty space that
+     *  can be used to display the minimap.
+     */
+    bool getIfEmptyScreenSpaceExists() const
+    {
+        const float sqrt_num_players = sqrtf((float)getNumLocalPlayers());
+        const int rows = (int)ceil(sqrt_num_players);
+        const int cols = (int)round(sqrt_num_players);
+        const int total_spaces = rows * cols;
+        return (total_spaces - getNumLocalPlayers() > 0);
+    }   // getIfEmptyScreenSpaceExists
     // ------------------------------------------------------------------------
     /** Returns the selected number of karts (selected number of players and
      *  AI karts. */
@@ -612,6 +625,8 @@ public:
     float getTimeTarget() const { return m_time_target; }
     // ------------------------------------------------------------------------
     int getTrackNumber() const { return m_track_number; }
+    // ------------------------------------------------------------------------
+    int getNumOfTracks() const { return (int)m_tracks.size(); }
     // ------------------------------------------------------------------------
     /** Returns the list of AI karts to use. Used for networking, and for
     *  the --ai= command line option. */

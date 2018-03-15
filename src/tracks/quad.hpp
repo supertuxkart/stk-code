@@ -27,7 +27,7 @@
 
 namespace irr
 {
-    namespace video { struct S3DVertex; }
+    namespace video { struct S3DVertex;  struct S3DVertexSkinnedMesh; }
 }
 using namespace irr;
 
@@ -58,11 +58,11 @@ private:
 
     /** The minimum height of the quad, used in case that several quads
      *  are on top of each other when determining the sector a kart is on. */
-    float m_min_height;
+    float m_min_height, m_min_height_testing;
 
     /** The maximum height of the quad, used together with m_min_height
      *  to distinguish between quads which are on top of each other. */
-    float m_max_height;
+    float m_max_height, m_max_height_testing;
 
 public:
     LEAK_CHECK()
@@ -75,11 +75,20 @@ public:
     // ------------------------------------------------------------------------
     void getVertices(video::S3DVertex *v, const video::SColor &color) const;
     // ------------------------------------------------------------------------
+    void getSPMVertices(video::S3DVertexSkinnedMesh *v,
+                        const video::SColor &color) const;
+    // ------------------------------------------------------------------------
     /** Returns the i-th. point of a quad. */
     const Vec3& operator[](int i) const                      { return m_p[i]; }
     // ------------------------------------------------------------------------
     /** Returns the center of a quad. */
     const Vec3& getCenter ()      const                    { return m_center; }
+    // ------------------------------------------------------------------------
+    void setHeightTesting(float min, float max)
+    {
+        m_min_height_testing = min;
+        m_max_height_testing = max;
+    }
     // ------------------------------------------------------------------------
     /** Returns the minimum height of a quad. */
     float getMinHeight() const                         { return m_min_height; }

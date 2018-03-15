@@ -82,11 +82,14 @@ private:
      *  at the edge of button */
     float m_deadzone_edge;
 
+    /** True if accelerometer is in use */
+    bool m_accelerometer_active;
+
 #ifdef ANDROID
     /** Pointer to the Android irrlicht device */
     CIrrDeviceAndroid* m_android_device;
 #endif
-    
+
     float getSteeringFactor(float value);
     void updateButtonAxes(MultitouchButton* button, float x, float y);
 
@@ -108,16 +111,20 @@ public:
     void addButton(MultitouchButtonType type, int x, int y, int width,
                    int height);
     void clearButtons();
+    void reset();
 
     /** Returns the number of created buttons */
-    unsigned int getButtonsCount() {return m_buttons.size();}
+    unsigned int getButtonsCount() { return (unsigned int)m_buttons.size();}
 
     /** Returns pointer to the selected button */
     MultitouchButton* getButton(unsigned int i) {return m_buttons.at(i);}
 
+    /** True if accelerometer is in use */
+    bool isAccelerometerActive() {return m_accelerometer_active;}
+
     void updateDeviceState(unsigned int event_id);
     void handleControls(MultitouchButton* button);
-    
+
     void updateConfigParams();
 
 };   // MultitouchDevice

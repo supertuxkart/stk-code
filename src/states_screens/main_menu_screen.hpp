@@ -32,13 +32,6 @@ class MainMenuScreen : public GUIEngine::Screen, public GUIEngine::ScreenSinglet
 private:
     friend class GUIEngine::ScreenSingleton<MainMenuScreen>;
 
-    core::stringw m_online_string;
-
-    core::stringw m_login_string;
-
-    /** Keep the widget to avoid looking it up every frame. */
-    GUIEngine::IconButtonWidget* m_online;
-
     /** Keep the widget to to the user name. */
     GUIEngine::ButtonWidget *m_user_id;
 
@@ -52,6 +45,9 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void beforeAddingWidget() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,

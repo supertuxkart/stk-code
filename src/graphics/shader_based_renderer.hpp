@@ -44,30 +44,16 @@ private:
     Skybox                     *m_skybox;
     SphericalHarmonics         *m_spherical_harmonics;
     DrawCalls                   m_draw_calls;
-    AbstractGeometryPasses     *m_geometry_passes;
     LightingPasses              m_lighting_passes;
     ShadowMatrices              m_shadow_matrices;
     PostProcessing             *m_post_processing;
 
-    /** Static glowing things are loaded once per track.
-     * Glowing items can appear ordisappear each frame */
-    std::vector<GlowData>       m_glowing;
-    size_t                      m_nb_static_glowing;
-
-    void setOverrideMaterial();
-    
-    void addItemsInGlowingList();
-    void removeItemsInGlowingList();
-    
     void prepareForwardRenderer();
-    
-    void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
-                          float dt);
-                          
+
     void uploadLightingData() const;
 
     void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode,
-                                   size_t width, size_t height);
+                                   unsigned int width, unsigned int height);
     
     void resetShadowCamNodes(){m_shadow_matrices.resetShadowCamNodes();}
     
@@ -78,14 +64,17 @@ private:
 
     void renderSSAO() const;
 
+    void renderGlow() const;
+
     void renderScene(irr::scene::ICameraSceneNode * const camnode,
                      float dt, bool hasShadows, bool forceRTT);
-                     
-    void renderParticles();
+    void renderSceneDeferred(irr::scene::ICameraSceneNode * const camnode,
+                     float dt, bool hasShadows, bool forceRTT);
 
     void debugPhysics();
-    void renderPostProcessing(Camera * const camera);
+    void renderPostProcessing(Camera * const camera, bool first_cam);
     void preloadShaderFiles();
+    void renderShadows();
 
 public:
     ShaderBasedRenderer();
@@ -108,12 +97,7 @@ public:
                                           bool force_SH_computation = true) OVERRIDE;
 
     void addSunLight(const irr::core::vector3df &pos) OVERRIDE;
-    
-    void addGlowingNode(scene::ISceneNode *n,
-                        float r = 1.0f, float g = 1.0f, float b = 1.0f) OVERRIDE;
-                        
-    void clearGlowingNodes() OVERRIDE;
-    
+
     void render(float dt) OVERRIDE;
 
     std::unique_ptr<RenderTarget> createRenderTarget(const irr::core::dimension2du &dimension,
@@ -124,6 +108,10 @@ public:
                          float dt);
 
     void setRTT(RTT* rtts);
+
+    RTT* getRTTs() { return m_rtts; }
+    ShadowMatrices* getShadowMatrices() { return &m_shadow_matrices; }
+    PostProcessing* getPostProcessing() { return m_post_processing; }
 
 };
 

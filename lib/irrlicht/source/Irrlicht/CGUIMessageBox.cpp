@@ -269,28 +269,28 @@ bool CGUIMessageBox::OnEvent(const SEvent& event)
 			{
 				switch (event.KeyInput.Key)
 				{
-				case KEY_RETURN:
+				case IRR_KEY_RETURN:
 					if (OkButton)
 					{
 						OkButton->setPressed(true);
 						Pressed = true;
 					}
 					break;
-				case KEY_KEY_Y:
+				case IRR_KEY_Y:
 					if (YesButton)
 					{
 						YesButton->setPressed(true);
 						Pressed = true;
 					}
 					break;
-				case KEY_KEY_N:
+				case IRR_KEY_N:
 					if (NoButton)
 					{
 						NoButton->setPressed(true);
 						Pressed = true;
 					}
 					break;
-				case KEY_ESCAPE:
+				case IRR_KEY_ESCAPE:
 					if (Pressed)
 					{
 						// cancel press
@@ -319,7 +319,7 @@ bool CGUIMessageBox::OnEvent(const SEvent& event)
 			else
 			if (Pressed)
 			{
-				if (OkButton && event.KeyInput.Key == KEY_RETURN)
+				if (OkButton && event.KeyInput.Key == IRR_KEY_RETURN)
 				{
 					setVisible(false);	// this is a workaround to make sure it's no longer the hovered element, crashes on pressing 1-2 times ESC
 					Environment->setFocus(0);
@@ -329,7 +329,7 @@ bool CGUIMessageBox::OnEvent(const SEvent& event)
 					return true;
 				}
 				else
-				if ((CancelButton || CloseButton) && event.KeyInput.Key == KEY_ESCAPE)
+				if ((CancelButton || CloseButton) && event.KeyInput.Key == IRR_KEY_ESCAPE)
 				{
 					setVisible(false);	// this is a workaround to make sure it's no longer the hovered element, crashes on pressing 1-2 times ESC
 					Environment->setFocus(0);
@@ -339,7 +339,7 @@ bool CGUIMessageBox::OnEvent(const SEvent& event)
 					return true;
 				}
 				else
-				if (YesButton && event.KeyInput.Key == KEY_KEY_Y)
+				if (YesButton && event.KeyInput.Key == IRR_KEY_Y)
 				{
 					setVisible(false);	// this is a workaround to make sure it's no longer the hovered element, crashes on pressing 1-2 times ESC
 					Environment->setFocus(0);
@@ -349,7 +349,7 @@ bool CGUIMessageBox::OnEvent(const SEvent& event)
 					return true;
 				}
 				else
-				if (NoButton && event.KeyInput.Key == KEY_KEY_N)
+				if (NoButton && event.KeyInput.Key == IRR_KEY_N)
 				{
 					setVisible(false);	// this is a workaround to make sure it's no longer the hovered element, crashes on pressing 1-2 times ESC
 					Environment->setFocus(0);

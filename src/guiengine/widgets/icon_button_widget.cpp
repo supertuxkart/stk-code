@@ -65,15 +65,15 @@ void IconButtonWidget::add()
     // ---- Icon
     if (m_texture == NULL)
     {
-        if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
+        // Avoid warning about missing texture in case of e.g.
+        // screenshot widget
+        if (m_properties[PROP_ICON] != "")
         {
-            setTexture(irr_driver->getTexture(m_properties[PROP_ICON]));
-        }
-        else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
-        {
-            // Avoid warning about missing texture in case of e.g.
-            // screenshot widget
-            if(m_properties[PROP_ICON] != "")
+            if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
+            {
+                setTexture(irr_driver->getTexture(m_properties[PROP_ICON]));
+            }
+            else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
             {
                 std::string file = file_manager->getAsset(m_properties[PROP_ICON]);
                 setTexture(irr_driver->getTexture(file));
@@ -125,7 +125,9 @@ void IconButtonWidget::add()
 
     if (m_scale_mode == SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO)
     {
-        useAspectRatio = (float)m_texture_w / (float)m_texture_h;
+        assert(m_texture->getOriginalSize().Height > 0);
+        useAspectRatio = (float)m_texture->getOriginalSize().Width / 
+                         (float)m_texture->getOriginalSize().Height;
     }
     else if (m_scale_mode == SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO)
     {
@@ -342,9 +344,7 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
     name += "_disabled";
     STKTexManager* stkm = STKTexManager::getInstance();
     STKTexture* disabled_stk_tex = static_cast<STKTexture*>(stkm->getTexture
-        (name, false/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
-        false/*mesh_tex*/, false /*no_upload*/, false/*single_channel*/,
-        false/*create_if_unfound*/));
+        (name, NULL/*tc*/, false /*no_upload*/, false/*create_if_unfound*/));
     if (disabled_stk_tex == NULL)
     {
         SColor c;

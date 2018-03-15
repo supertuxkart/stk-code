@@ -56,7 +56,7 @@ public:
     }   // bindVertexArray
 };   // SkyboxShader
 
-
+#if !defined(USE_GLES2)
 class SpecularIBLGenerator : public TextureShader<SpecularIBLGenerator, 2,
                                                   core::matrix4, float >
 {
@@ -70,7 +70,7 @@ public:
                            1, "samples", ST_TEXTURE_BUFFER);
     }
 };   // SpecularIBLGenerator
-
+#endif
 
 namespace {
     // ----------------------------------------------------------------------------
@@ -163,19 +163,6 @@ void Skybox::generateCubeMapFromTextures()
         assert(img != NULL);
         img->copyToScaling(rgba[i], size, size);
 
-#if defined(USE_GLES2)
-        if (CVS->isEXTTextureFormatBGRA8888Usable())
-        {
-            // BGRA image returned by getTextureImage causes black sky in gles
-            for (unsigned int j = 0; j < size * size; j++)
-            {
-                char tmp_val = rgba[i][j * 4];
-                rgba[i][j * 4] = rgba[i][j * 4 + 2];
-                rgba[i][j * 4 + 2] = tmp_val;
-            }
-        }
-#endif
-
         if (i == 2 || i == 3)
         {
             char *tmp = new char[size * size * 4];
@@ -191,13 +178,16 @@ void Skybox::generateCubeMapFromTextures()
         }
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_cube_map);
-#if !defined(USE_GLES2)
-        GLint internal_format = CVS->isTextureCompressionEnabled() ?
-                                    GL_COMPRESSED_SRGB_ALPHA : GL_SRGB_ALPHA;
-        GLint format = GL_BGRA;
-#else
-        GLint internal_format = GL_RGBA8;
+
+        bool needs_srgb_format = CVS->isDeferredEnabled();
+
         GLint format = GL_RGBA;
+        GLint internal_format = needs_srgb_format ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+#if !defined(USE_GLES2)
+        if (CVS->isTextureCompressionEnabled())
+            internal_format = needs_srgb_format ? GL_COMPRESSED_SRGB_ALPHA
+                                                : GL_COMPRESSED_RGBA;
+        format = GL_BGRA;
 #endif
 
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
@@ -215,7 +205,7 @@ void Skybox::generateSpecularCubemap()
 {
     glGenTextures(1, &m_specular_probe);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_specular_probe);
-    size_t cubemap_size = 256;
+    unsigned int cubemap_size = 256;
     for (int i = 0; i < 6; i++)
     {
 #if !defined(USE_GLES2)
@@ -228,7 +218,7 @@ void Skybox::generateSpecularCubemap()
     }
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-    if (!CVS->isDefferedEnabled() || !CVS->isARBTextureBufferObjectUsable())
+    if (!CVS->isDeferredEnabled())
         return;
 
 #if !defined(USE_GLES2)
@@ -291,8 +281,7 @@ void Skybox::generateSpecularCubemap()
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                    GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
                                    m_specular_probe, level);
-            GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-            assert(status == GL_FRAMEBUFFER_COMPLETE);
+            assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
             SpecularIBLGenerator::getInstance()
                 ->setTextureUnits(m_cube_map, sample_texture);
@@ -358,7 +347,11 @@ void Skybox::render(const scene::ICameraSceneNode *camera) const
     glDisable(GL_CULL_FACE);
     assert(m_skybox_textures.size() == 6);
 
-    glDisable(GL_BLEND);
+    if (CVS->isDeferredEnabled())
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE);
+    }
 
     SkyboxShader::getInstance()->use();
     SkyboxShader::getInstance()->bindVertexArray();
@@ -368,6 +361,7 @@ void Skybox::render(const scene::ICameraSceneNode *camera) const
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
+    glDisable(GL_BLEND);
 }   // renderSkybox
 
 #endif   // !SERVER_ONLY

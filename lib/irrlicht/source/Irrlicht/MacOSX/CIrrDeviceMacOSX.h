@@ -50,6 +50,9 @@ namespace irr
 		//! sets the caption of the window
 		virtual void setWindowCaption(const wchar_t* text);
 
+		//! sets the class of the window
+		virtual void setWindowClass(const char* text) {}
+
 		//! returns if window is active. if not, nothing need to be drawn
 		virtual bool isWindowActive() const;
 
@@ -79,6 +82,12 @@ namespace irr
 
 		//! Restore the window to normal size if possible.
 		virtual void restoreWindow();
+
+		//! Move window to requested position
+		virtual bool moveWindow(int x, int y);
+
+		//! Get current window position.
+		virtual bool getWindowPosition(int* x, int* y);
 
 		//! Activate any joysticks, and generate events for them.
 		virtual bool activateJoysticks(core::array<SJoystickInfo> & joystickInfo);

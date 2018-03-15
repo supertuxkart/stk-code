@@ -29,6 +29,14 @@ extern bool GLContextDebugBit;
 #include <X11/XKBlib.h>
 #include <X11/Xatom.h>
 
+#ifdef _IRR_COMPILE_WITH_OPENGL_
+#include <GL/gl.h>
+#ifdef _IRR_OPENGL_USE_EXTPOINTER_
+#define GLX_GLXEXT_PROTOTYPES
+#include "glxext.h"
+#endif
+#endif
+
 #ifdef _IRR_LINUX_XCURSOR_
 #include <X11/Xcursor/Xcursor.h>
 #endif
@@ -269,7 +277,7 @@ bool CIrrDeviceLinux::restoreResolution()
 	}
 	#endif
 	#ifdef _IRR_LINUX_X11_RANDR_
-	if (UseXRandR && CreationParams.Fullscreen && old_mode != BadRRMode)
+	if (UseXRandR && CreationParams.Fullscreen && old_mode != 0)
 	{
 		XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
 		if (!res)
@@ -278,6 +286,7 @@ bool CIrrDeviceLinux::restoreResolution()
 		XRROutputInfo* output = XRRGetOutputInfo(display, res, output_id);
 		if (!output || !output->crtc || output->connection == RR_Disconnected) 
 		{
+			XRRFreeScreenResources(res);
 			XRRFreeOutputInfo(output);
 			return false;
 		}
@@ -285,6 +294,7 @@ bool CIrrDeviceLinux::restoreResolution()
 		XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);
 		if (!crtc) 
 		{
+			XRRFreeScreenResources(res);
 			XRRFreeOutputInfo(output);
 			return false;
 		}
@@ -377,7 +387,7 @@ bool CIrrDeviceLinux::changeResolution()
 	#ifdef _IRR_LINUX_X11_RANDR_
 	while (XRRQueryExtension(display, &eventbase, &errorbase))
 	{
-		if (output_id == BadRROutput)
+		if (output_id == 0)
 			break;
 
 		XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
@@ -516,6 +526,7 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 #endif
 
 #ifdef _IRR_COMPILE_WITH_OPENGL_
+#ifdef _IRR_COMPILE_WITH_X11_
 static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, bool force_legacy_context)
 {
 	GLXContext Context;
@@ -600,7 +611,7 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, boo
 	Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
 	return Context;
 }
-
+#endif
 #endif
 
 bool CIrrDeviceLinux::createWindow()
@@ -664,11 +675,15 @@ bool CIrrDeviceLinux::createWindow()
 #elif defined(GLX_SGIS_multisample)
 					GLX_SAMPLE_BUFFERS_SGIS, 1,
 					GLX_SAMPLES_SGIS, CreationParams.AntiAlias, // 18,19
+#else
+#error
 #endif
 #ifdef GLX_ARB_framebuffer_sRGB
 					GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB, CreationParams.HandleSRGB,
 #elif defined(GLX_EXT_framebuffer_sRGB)
 					GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, CreationParams.HandleSRGB,
+#else
+#error
 #endif
 					GLX_STEREO, CreationParams.Stereobuffer?True:False,
 					None
@@ -681,8 +696,47 @@ bool CIrrDeviceLinux::createWindow()
 					visualAttrBuffer[17] = 0;
 					visualAttrBuffer[19] = 0;
 				}
+				
+				if (CreationParams.HandleSRGB == false)
+				{
+					visualAttrBuffer[21] = GLX_DONT_CARE;
+				}
+				
 				// first round with unchanged values
 				{
+					configList=glxChooseFBConfig(display, screennr, visualAttrBuffer,&nitems);
+					if (!configList && CreationParams.AntiAlias)
+					{
+						while (!configList && (visualAttrBuffer[19]>1))
+						{
+							visualAttrBuffer[19] -= 1;
+							configList=glxChooseFBConfig(display, screennr, visualAttrBuffer,&nitems);
+						}
+						if (!configList)
+						{
+							visualAttrBuffer[17] = 0;
+							visualAttrBuffer[19] = 0;
+							configList=glxChooseFBConfig(display, screennr, visualAttrBuffer,&nitems);
+							if (configList)
+							{
+								os::Printer::log("No FSAA available.", ELL_WARNING);
+								CreationParams.AntiAlias=0;
+							}
+							else
+							{
+								//reenable multisampling
+								visualAttrBuffer[17] = 1;
+								visualAttrBuffer[19] = CreationParams.AntiAlias;
+							}
+						}
+					}
+				}
+				// Try to disable sRGB framebuffer
+				if (!configList && CreationParams.HandleSRGB)
+				{
+					os::Printer::log("No sRGB framebuffer available.", ELL_WARNING);
+					CreationParams.HandleSRGB=false;
+					visualAttrBuffer[21] = GLX_DONT_CARE;
 					configList=glxChooseFBConfig(display, screennr, visualAttrBuffer,&nitems);
 					if (!configList && CreationParams.AntiAlias)
 					{
@@ -866,6 +920,13 @@ bool CIrrDeviceLinux::createWindow()
 				&visTempl, &visNumber);
 			visTempl.depth -= 8;
 		}
+		
+		if (!visual && !CreationParams.WithAlphaChannel)
+		{
+			visTempl.depth = 32;
+			visual = XGetVisualInfo(display, VisualScreenMask|VisualDepthMask,
+									&visTempl, &visNumber);
+		}
 	}
 
 	if (!visual)
@@ -893,21 +954,29 @@ bool CIrrDeviceLinux::createWindow()
 		attributes.event_mask |= PointerMotionMask |
 				ButtonPressMask | KeyPressMask |
 				ButtonReleaseMask | KeyReleaseMask;
+				
+	bool netWM = false;
+	
+	Atom *list;
+	Atom type;
+	int form;
+	unsigned long remain, len;
+
+	Atom WMCheck = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", false);
+	Status s = XGetWindowProperty(display, DefaultRootWindow(display),
+								  WMCheck, 0L, 1L, False, XA_WINDOW,
+								  &type, &form, &len, &remain,
+								  (unsigned char **)&list);
+								  
+	
+	if (s == Success)
+	{
+		XFree(list);
+		netWM = (len > 0);
+	}
 
 	if (!CreationParams.WindowId)
 	{
-		Atom *list;
-		Atom type;
-		int form;
-		unsigned long remain, len;
-
-		Atom WMCheck = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", false);
-		Status s = XGetWindowProperty(display, DefaultRootWindow(display),
-									  WMCheck, 0L, 1L, False, XA_WINDOW,
-									  &type, &form, &len, &remain,
-									  (unsigned char **)&list);
-		XFree(list);
-		bool netWM = (s == Success) && len;
 		attributes.override_redirect = !netWM && CreationParams.Fullscreen;
 
 		// create new Window
@@ -922,90 +991,105 @@ bool CIrrDeviceLinux::createWindow()
 		Atom wmDelete;
 		wmDelete = XInternAtom(display, wmDeleteWindow, True);
 		XSetWMProtocols(display, window, &wmDelete, 1);
-
+		
 		if (CreationParams.Fullscreen)
 		{
-			if (netWM)
+			// Some window managers don't respect values from XCreateWindow and
+			// place window in random position. This may cause that fullscreen
+			// window is showed in wrong screen. It doesn't matter for vidmode
+			// which displays cloned image in all devices.
+			#ifdef _IRR_LINUX_X11_RANDR_
+			XMoveResizeWindow(display, window, crtc_x, crtc_y, Width, Height);
+			XRaiseWindow(display, window);
+			XFlush(display);
+			#endif
+		}
+		
+		unsigned int display_width = XDisplayWidth(display, screennr);
+		unsigned int display_height = XDisplayHeight(display, screennr);
+		
+		bool has_display_size = (Width == display_width && Height == display_height);
+		
+		if (netWM && (CreationParams.Fullscreen || has_display_size))
+		{
+			Atom WMStateAtom = XInternAtom(display, "_NET_WM_STATE", true);
+			Atom WMStateAtom1 = None;
+			Atom WMStateAtom2 = None;
+			
+			if (CreationParams.Fullscreen)
 			{
-				// Some window managers don't respect values from XCreateWindow and
-				// place window in random position. This may cause that fullscreen
-				// window is showed in wrong screen. It doesn't matter for vidmode
-				// which displays cloned image in all devices.
-				#ifdef _IRR_LINUX_X11_RANDR_
-				XMoveResizeWindow(display, window, crtc_x, crtc_y, Width, Height);
-				XRaiseWindow(display, window);
-				XFlush(display);
-				#endif
-
-				// Set the fullscreen mode via the window manager. This allows alt-tabing, volume hot keys & others.
-				// Get the needed atom from there freedesktop names
-				Atom WMStateAtom = XInternAtom(display, "_NET_WM_STATE", true);
-				Atom WMFullscreenAtom = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", true);
-
-				XEvent xev = {0}; // The event should be filled with zeros before setting its attributes
-				xev.type = ClientMessage;
-				xev.xclient.window = window;
-				xev.xclient.message_type = WMStateAtom;
-				xev.xclient.format = 32;
-				xev.xclient.data.l[0] = 1;
-				xev.xclient.data.l[1] = WMFullscreenAtom;
-				XSendEvent(display, RootWindow(display, visual->screen), false, 
-							SubstructureRedirectMask | SubstructureNotifyMask, &xev);
-
-				XFlush(display);
-				
-				// Wait until window state is already changed to fullscreen
-				bool fullscreen = false;
-				for (int i = 0; i < 500; i++)
-				{
-					Atom type;
-					int format;
-					unsigned long numItems, bytesAfter;
-					unsigned char* data = NULL;
-
-					int s = XGetWindowProperty(display, window, WMStateAtom,
-											0l, 1024, False, XA_ATOM, &type, 
-											&format,  &numItems, &bytesAfter, 
-											&data);
-
-					if (s == Success) 
-					{
-						Atom* atoms = (Atom*)data;
-						
-						for (unsigned int i = 0; i < numItems; ++i) 
-						{
-							if (atoms[i] == WMFullscreenAtom) 
-							{
-								fullscreen = true;
-								break;
-							}
-						}
-					}
-						
-					XFree(data);
-					
-					if (fullscreen == true)
-						break;
-					
-					usleep(1000);
-				}
-					
-				if (!fullscreen)
-				{
-					os::Printer::log("Warning! Got timeout while checking fullscreen sate", ELL_WARNING);
-				}        
+				WMStateAtom1 = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", true);
 			}
 			else
 			{
-				XSetInputFocus(display, window, RevertToParent, CurrentTime);
-				int grabKb = XGrabKeyboard(display, window, True, GrabModeAsync,
-					GrabModeAsync, CurrentTime);
-				IrrPrintXGrabError(grabKb, "XGrabKeyboard");
-				int grabPointer = XGrabPointer(display, window, True, ButtonPressMask,
-					GrabModeAsync, GrabModeAsync, window, None, CurrentTime);
-				IrrPrintXGrabError(grabPointer, "XGrabPointer");
-				XWarpPointer(display, None, window, 0, 0, 0, 0, 0, 0);
+				WMStateAtom1 = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_HORZ", true);
+				WMStateAtom2 = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_VERT", true);
 			}
+			
+			XEvent xev = {0}; // The event should be filled with zeros before setting its attributes
+			xev.type = ClientMessage;
+			xev.xclient.window = window;
+			xev.xclient.message_type = WMStateAtom;
+			xev.xclient.format = 32;
+			xev.xclient.data.l[0] = 1;
+			xev.xclient.data.l[1] = WMStateAtom1;
+			xev.xclient.data.l[2] = WMStateAtom2;
+			
+			XSendEvent(display, RootWindow(display, visual->screen), false, 
+						SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+
+			XFlush(display);
+			
+			// Wait until window state is already changed
+			bool changed = false;
+			for (int i = 0; i < 500; i++)
+			{
+				Atom type;
+				int format;
+				unsigned long numItems, bytesAfter;
+				Atom* atoms = NULL;
+
+				int s = XGetWindowProperty(display, window, WMStateAtom,
+										0l, 1024, False, XA_ATOM, &type, 
+										&format,  &numItems, &bytesAfter, 
+										(unsigned char**)&atoms);
+
+				if (s == Success) 
+				{
+					for (unsigned int i = 0; i < numItems; ++i) 
+					{
+						if (atoms[i] == WMStateAtom1) 
+						{
+							changed = true;
+							break;
+						}
+					}
+					
+					XFree(atoms);
+				}
+				
+				if (changed == true)
+					break;
+				
+				usleep(1000);
+			}
+				
+			if (!changed)
+			{
+				os::Printer::log("Warning! Got timeout when changing window state", ELL_WARNING);
+			}        
+		}
+			
+		if (!netWM && CreationParams.Fullscreen)
+		{
+			XSetInputFocus(display, window, RevertToParent, CurrentTime);
+			int grabKb = XGrabKeyboard(display, window, True, GrabModeAsync,
+				GrabModeAsync, CurrentTime);
+			IrrPrintXGrabError(grabKb, "XGrabKeyboard");
+			int grabPointer = XGrabPointer(display, window, True, ButtonPressMask,
+				GrabModeAsync, GrabModeAsync, window, None, CurrentTime);
+			IrrPrintXGrabError(grabPointer, "XGrabPointer");
+			XWarpPointer(display, None, window, 0, 0, 0, 0, 0, 0);
 		}
 	}
 	else
@@ -1093,6 +1177,18 @@ bool CIrrDeviceLinux::createWindow()
 	CreationParams.Bits = bits;
 	CreationParams.WindowSize.Width = Width;
 	CreationParams.WindowSize.Height = Height;
+	
+	if (netWM == true)
+	{
+		Atom opaque_region = XInternAtom(display, "_NET_WM_OPAQUE_REGION", true);
+		
+		if (opaque_region != None)
+		{
+			unsigned long window_rect[4] = {0, 0, Width, Height};
+			XChangeProperty(display, window, opaque_region, XA_CARDINAL, 32,
+							PropModeReplace, (unsigned char*)window_rect, 4);
+		}
+	}
 
 	StdHints = XAllocSizeHints();
 	long num;
@@ -1209,6 +1305,9 @@ bool CIrrDeviceLinux::createInputContext()
 		return false;
 	}
 
+	// It's showed as memory leak, but we shouldn't delete it. From the xlib
+	// documentation: "The returned modifiers string is owned by Xlib and 
+	// should not be modified or freed by the client."
 	char* p = XSetLocaleModifiers("");
 	if (p == NULL)
 	{
@@ -1702,13 +1801,20 @@ bool CIrrDeviceLinux::run()
 
 			case ClientMessage:
 				{
-					char *atom = XGetAtomName(display, event.xclient.message_type);
-					if (*atom == *wmDeleteWindow)
+					char* atom = XGetAtomName(display, event.xclient.message_type);
+					
+					if (atom != NULL)
 					{
-						os::Printer::log("Quit message received.", ELL_INFORMATION);
-						Close = true;
+						if (strcmp(atom, "WM_PROTOCOLS") == 0)
+						{
+							os::Printer::log("Quit message received.", ELL_INFORMATION);
+							Close = true;
+						}
+						
+						XFree(atom);
 					}
-					else
+					
+					if (!Close)
 					{
 						// we assume it's a user message
 						irrevent.EventType = irr::EET_USER_EVENT;
@@ -1716,7 +1822,6 @@ bool CIrrDeviceLinux::run()
 						irrevent.UserEvent.UserData2 = (s32)event.xclient.data.l[1];
 						postEventFromUser(irrevent);
 					}
-					XFree(atom);
 				}
 				break;
 
@@ -1820,6 +1925,22 @@ void CIrrDeviceLinux::setWindowCaption(const wchar_t* text)
 		XSetWMIconName(display, window, &txt);
 		XFree(txt.value);
 	}
+#endif
+}
+
+//! sets the class of the window
+void CIrrDeviceLinux::setWindowClass(const char* text)
+{
+#ifdef _IRR_COMPILE_WITH_X11_
+	if (CreationParams.DriverType == video::EDT_NULL)
+		return;
+
+	// Set class hints on Linux, used by Window Managers.
+	XClassHint* classhint = XAllocClassHint();
+	classhint->res_name = (char*)text;
+	classhint->res_class = (char*)text;
+	XSetClassHint(display, window, classhint);
+	XFree(classhint);
 #endif
 }
 
@@ -1992,8 +2113,8 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 			}
 			#endif
 			#ifdef _IRR_LINUX_X11_RANDR_
-			output_id = BadRROutput;
-			old_mode = BadRRMode;
+			output_id = 0;
+			old_mode = 0;
 			
 			while (XRRQueryExtension(display, &eventbase, &errorbase))
 			{
@@ -2024,7 +2145,7 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 					}
 					
 					if (res->outputs[i] == primary_id ||
-						output_id == BadRROutput || crtc_tmp->x < crtc->x ||
+						output_id == 0 || crtc_tmp->x < crtc->x ||
 						(crtc_tmp->x == crtc->x && crtc_tmp->y < crtc->y))
 					{
 						XRRFreeCrtcInfo(crtc);
@@ -2044,7 +2165,7 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 						break;
 				}
 				
-				if (output_id == BadRROutput)
+				if (output_id == 0)
 				{
 					os::Printer::log("Could not get video output.", ELL_WARNING);
 					break;
@@ -2129,6 +2250,101 @@ void CIrrDeviceLinux::restoreWindow()
 #endif
 }
 
+/*
+Returns the parent window of "window" (i.e. the ancestor of window
+that is a direct child of the root, or window itself if it is a direct child).
+If window is the root window, returns window.
+*/
+bool get_toplevel_parent(Display* display, Window window, Window* tp_window)
+{
+#ifdef _IRR_COMPILE_WITH_X11_
+	Window current_window = window;
+	Window parent;
+	Window root;
+	Window* children;
+	unsigned int num_children;
+	
+	while (true)
+	{
+		bool success = XQueryTree(display, current_window, &root,
+									&parent, &children, &num_children);
+		
+		if (!success)
+		{
+			os::Printer::log("XQueryTree error", ELL_ERROR);
+			return false;
+		}
+		
+		if (children) 
+		{
+			XFree(children);
+		}
+		
+		if (current_window == root || parent == root) 
+		{
+			*tp_window = current_window;
+			return true;
+		}
+		else
+		{
+			current_window = parent;
+		}
+	}
+#endif
+
+	return false;
+}
+
+
+//! Move window to requested position
+bool CIrrDeviceLinux::moveWindow(int x, int y)
+{
+#ifdef _IRR_COMPILE_WITH_X11_
+	if (CreationParams.DriverType == video::EDT_NULL || CreationParams.Fullscreen)
+		return false;
+		
+	int display_width = XDisplayWidth(display, screennr);
+	int display_height = XDisplayHeight(display, screennr);
+
+	core::min_(x, display_width - (int)Width);
+	core::min_(y, display_height - (int)Height);
+    
+	XMoveWindow(display, window, x, y);
+	return true;
+#endif
+
+	return false;
+}
+
+//! Get current window position.
+bool CIrrDeviceLinux::getWindowPosition(int* x, int* y)
+{
+#ifdef _IRR_COMPILE_WITH_X11_
+	if (CreationParams.DriverType == video::EDT_NULL || CreationParams.Fullscreen)
+		return false;
+		
+	Window tp_window;
+	
+	bool success = get_toplevel_parent(display, window, &tp_window);
+	
+	if (!success)
+		return false;
+
+	XWindowAttributes xwa;
+	success = XGetWindowAttributes(display, tp_window, &xwa);
+	
+	if (!success)
+		return false;
+		
+	*x = xwa.x;
+	*y = xwa.y;
+
+	return true;
+#endif
+
+	return false;
+}
+
 
 void CIrrDeviceLinux::createKeyMap()
 {
@@ -2138,194 +2354,194 @@ void CIrrDeviceLinux::createKeyMap()
 
 #ifdef _IRR_COMPILE_WITH_X11_
 	KeyMap.reallocate(190);
-	KeyMap.push_back(SKeyMap(XK_BackSpace, KEY_BACK));
-	KeyMap.push_back(SKeyMap(XK_Tab, KEY_TAB));
-	KeyMap.push_back(SKeyMap(XK_ISO_Left_Tab, KEY_TAB));
+	KeyMap.push_back(SKeyMap(XK_BackSpace, IRR_KEY_BACK));
+	KeyMap.push_back(SKeyMap(XK_Tab, IRR_KEY_TAB));
+	KeyMap.push_back(SKeyMap(XK_ISO_Left_Tab, IRR_KEY_TAB));
 	KeyMap.push_back(SKeyMap(XK_Linefeed, 0)); // ???
-	KeyMap.push_back(SKeyMap(XK_Clear, KEY_CLEAR));
-	KeyMap.push_back(SKeyMap(XK_Return, KEY_RETURN));
-	KeyMap.push_back(SKeyMap(XK_Pause, KEY_PAUSE));
-	KeyMap.push_back(SKeyMap(XK_Scroll_Lock, KEY_SCROLL));
+	KeyMap.push_back(SKeyMap(XK_Clear, IRR_KEY_CLEAR));
+	KeyMap.push_back(SKeyMap(XK_Return, IRR_KEY_RETURN));
+	KeyMap.push_back(SKeyMap(XK_Pause, IRR_KEY_PAUSE));
+	KeyMap.push_back(SKeyMap(XK_Scroll_Lock, IRR_KEY_SCROLL));
 	KeyMap.push_back(SKeyMap(XK_Sys_Req, 0)); // ???
-	KeyMap.push_back(SKeyMap(XK_Escape, KEY_ESCAPE));
-	KeyMap.push_back(SKeyMap(XK_Insert, KEY_INSERT));
-	KeyMap.push_back(SKeyMap(XK_Delete, KEY_DELETE));
-	KeyMap.push_back(SKeyMap(XK_Home, KEY_HOME));
-	KeyMap.push_back(SKeyMap(XK_Left, KEY_LEFT));
-	KeyMap.push_back(SKeyMap(XK_Up, KEY_UP));
-	KeyMap.push_back(SKeyMap(XK_Right, KEY_RIGHT));
-	KeyMap.push_back(SKeyMap(XK_Down, KEY_DOWN));
-	KeyMap.push_back(SKeyMap(XK_Prior, KEY_PRIOR));
-	KeyMap.push_back(SKeyMap(XK_Page_Up, KEY_PRIOR));
-	KeyMap.push_back(SKeyMap(XK_Next, KEY_NEXT));
-	KeyMap.push_back(SKeyMap(XK_Page_Down, KEY_NEXT));
-	KeyMap.push_back(SKeyMap(XK_End, KEY_END));
-	KeyMap.push_back(SKeyMap(XK_Begin, KEY_HOME));
-	KeyMap.push_back(SKeyMap(XK_Num_Lock, KEY_NUMLOCK));
-	KeyMap.push_back(SKeyMap(XK_KP_Space, KEY_SPACE));
-	KeyMap.push_back(SKeyMap(XK_KP_Tab, KEY_TAB));
-	KeyMap.push_back(SKeyMap(XK_KP_Enter, KEY_RETURN));
-	KeyMap.push_back(SKeyMap(XK_KP_F1, KEY_F1));
-	KeyMap.push_back(SKeyMap(XK_KP_F2, KEY_F2));
-	KeyMap.push_back(SKeyMap(XK_KP_F3, KEY_F3));
-	KeyMap.push_back(SKeyMap(XK_KP_F4, KEY_F4));
-	KeyMap.push_back(SKeyMap(XK_KP_Home, KEY_HOME));
-	KeyMap.push_back(SKeyMap(XK_KP_Left, KEY_LEFT));
-	KeyMap.push_back(SKeyMap(XK_KP_Up, KEY_UP));
-	KeyMap.push_back(SKeyMap(XK_KP_Right, KEY_RIGHT));
-	KeyMap.push_back(SKeyMap(XK_KP_Down, KEY_DOWN));
-	KeyMap.push_back(SKeyMap(XK_Print, KEY_PRINT));
-	KeyMap.push_back(SKeyMap(XK_KP_Prior, KEY_PRIOR));
-	KeyMap.push_back(SKeyMap(XK_KP_Page_Up, KEY_PRIOR));
-	KeyMap.push_back(SKeyMap(XK_KP_Next, KEY_NEXT));
-	KeyMap.push_back(SKeyMap(XK_KP_Page_Down, KEY_NEXT));
-	KeyMap.push_back(SKeyMap(XK_KP_End, KEY_END));
-	KeyMap.push_back(SKeyMap(XK_KP_Begin, KEY_HOME));
-	KeyMap.push_back(SKeyMap(XK_KP_Insert, KEY_INSERT));
-	KeyMap.push_back(SKeyMap(XK_KP_Delete, KEY_DELETE));
+	KeyMap.push_back(SKeyMap(XK_Escape, IRR_KEY_ESCAPE));
+	KeyMap.push_back(SKeyMap(XK_Insert, IRR_KEY_INSERT));
+	KeyMap.push_back(SKeyMap(XK_Delete, IRR_KEY_DELETE));
+	KeyMap.push_back(SKeyMap(XK_Home, IRR_KEY_HOME));
+	KeyMap.push_back(SKeyMap(XK_Left, IRR_KEY_LEFT));
+	KeyMap.push_back(SKeyMap(XK_Up, IRR_KEY_UP));
+	KeyMap.push_back(SKeyMap(XK_Right, IRR_KEY_RIGHT));
+	KeyMap.push_back(SKeyMap(XK_Down, IRR_KEY_DOWN));
+	KeyMap.push_back(SKeyMap(XK_Prior, IRR_KEY_PRIOR));
+	KeyMap.push_back(SKeyMap(XK_Page_Up, IRR_KEY_PRIOR));
+	KeyMap.push_back(SKeyMap(XK_Next, IRR_KEY_NEXT));
+	KeyMap.push_back(SKeyMap(XK_Page_Down, IRR_KEY_NEXT));
+	KeyMap.push_back(SKeyMap(XK_End, IRR_KEY_END));
+	KeyMap.push_back(SKeyMap(XK_Begin, IRR_KEY_HOME));
+	KeyMap.push_back(SKeyMap(XK_Num_Lock, IRR_KEY_NUMLOCK));
+	KeyMap.push_back(SKeyMap(XK_KP_Space, IRR_KEY_SPACE));
+	KeyMap.push_back(SKeyMap(XK_KP_Tab, IRR_KEY_TAB));
+	KeyMap.push_back(SKeyMap(XK_KP_Enter, IRR_KEY_RETURN));
+	KeyMap.push_back(SKeyMap(XK_KP_F1, IRR_KEY_F1));
+	KeyMap.push_back(SKeyMap(XK_KP_F2, IRR_KEY_F2));
+	KeyMap.push_back(SKeyMap(XK_KP_F3, IRR_KEY_F3));
+	KeyMap.push_back(SKeyMap(XK_KP_F4, IRR_KEY_F4));
+	KeyMap.push_back(SKeyMap(XK_KP_Home, IRR_KEY_HOME));
+	KeyMap.push_back(SKeyMap(XK_KP_Left, IRR_KEY_LEFT));
+	KeyMap.push_back(SKeyMap(XK_KP_Up, IRR_KEY_UP));
+	KeyMap.push_back(SKeyMap(XK_KP_Right, IRR_KEY_RIGHT));
+	KeyMap.push_back(SKeyMap(XK_KP_Down, IRR_KEY_DOWN));
+	KeyMap.push_back(SKeyMap(XK_Print, IRR_KEY_PRINT));
+	KeyMap.push_back(SKeyMap(XK_KP_Prior, IRR_KEY_PRIOR));
+	KeyMap.push_back(SKeyMap(XK_KP_Page_Up, IRR_KEY_PRIOR));
+	KeyMap.push_back(SKeyMap(XK_KP_Next, IRR_KEY_NEXT));
+	KeyMap.push_back(SKeyMap(XK_KP_Page_Down, IRR_KEY_NEXT));
+	KeyMap.push_back(SKeyMap(XK_KP_End, IRR_KEY_END));
+	KeyMap.push_back(SKeyMap(XK_KP_Begin, IRR_KEY_HOME));
+	KeyMap.push_back(SKeyMap(XK_KP_Insert, IRR_KEY_INSERT));
+	KeyMap.push_back(SKeyMap(XK_KP_Delete, IRR_KEY_DELETE));
 	KeyMap.push_back(SKeyMap(XK_KP_Equal, 0)); // ???
-	KeyMap.push_back(SKeyMap(XK_KP_Multiply, KEY_MULTIPLY));
-	KeyMap.push_back(SKeyMap(XK_KP_Add, KEY_ADD));
-	KeyMap.push_back(SKeyMap(XK_KP_Separator, KEY_SEPARATOR));
-	KeyMap.push_back(SKeyMap(XK_KP_Subtract, KEY_SUBTRACT));
-	KeyMap.push_back(SKeyMap(XK_KP_Decimal, KEY_DECIMAL));
-	KeyMap.push_back(SKeyMap(XK_KP_Divide, KEY_DIVIDE));
-	KeyMap.push_back(SKeyMap(XK_KP_0, KEY_NUMPAD0));
-	KeyMap.push_back(SKeyMap(XK_KP_1, KEY_NUMPAD1));
-	KeyMap.push_back(SKeyMap(XK_KP_2, KEY_NUMPAD2));
-	KeyMap.push_back(SKeyMap(XK_KP_3, KEY_NUMPAD3));
-	KeyMap.push_back(SKeyMap(XK_KP_4, KEY_NUMPAD4));
-	KeyMap.push_back(SKeyMap(XK_KP_5, KEY_NUMPAD5));
-	KeyMap.push_back(SKeyMap(XK_KP_6, KEY_NUMPAD6));
-	KeyMap.push_back(SKeyMap(XK_KP_7, KEY_NUMPAD7));
-	KeyMap.push_back(SKeyMap(XK_KP_8, KEY_NUMPAD8));
-	KeyMap.push_back(SKeyMap(XK_KP_9, KEY_NUMPAD9));
-	KeyMap.push_back(SKeyMap(XK_F1, KEY_F1));
-	KeyMap.push_back(SKeyMap(XK_F2, KEY_F2));
-	KeyMap.push_back(SKeyMap(XK_F3, KEY_F3));
-	KeyMap.push_back(SKeyMap(XK_F4, KEY_F4));
-	KeyMap.push_back(SKeyMap(XK_F5, KEY_F5));
-	KeyMap.push_back(SKeyMap(XK_F6, KEY_F6));
-	KeyMap.push_back(SKeyMap(XK_F7, KEY_F7));
-	KeyMap.push_back(SKeyMap(XK_F8, KEY_F8));
-	KeyMap.push_back(SKeyMap(XK_F9, KEY_F9));
-	KeyMap.push_back(SKeyMap(XK_F10, KEY_F10));
-	KeyMap.push_back(SKeyMap(XK_F11, KEY_F11));
-	KeyMap.push_back(SKeyMap(XK_F12, KEY_F12));
-	KeyMap.push_back(SKeyMap(XK_Shift_L, KEY_LSHIFT));
-	KeyMap.push_back(SKeyMap(XK_Shift_R, KEY_RSHIFT));
-	KeyMap.push_back(SKeyMap(XK_Control_L, KEY_LCONTROL));
-	KeyMap.push_back(SKeyMap(XK_Control_R, KEY_RCONTROL));
-	KeyMap.push_back(SKeyMap(XK_Caps_Lock, KEY_CAPITAL));
-	KeyMap.push_back(SKeyMap(XK_Shift_Lock, KEY_CAPITAL));
-	KeyMap.push_back(SKeyMap(XK_Meta_L, KEY_LWIN));
-	KeyMap.push_back(SKeyMap(XK_Meta_R, KEY_RWIN));
-	KeyMap.push_back(SKeyMap(XK_Alt_L, KEY_LMENU));
-	KeyMap.push_back(SKeyMap(XK_Alt_R, KEY_RMENU));
-	KeyMap.push_back(SKeyMap(XK_ISO_Level3_Shift, KEY_RMENU));
-	KeyMap.push_back(SKeyMap(XK_Menu, KEY_MENU));
-	KeyMap.push_back(SKeyMap(XK_space, KEY_SPACE));
+	KeyMap.push_back(SKeyMap(XK_KP_Multiply, IRR_KEY_MULTIPLY));
+	KeyMap.push_back(SKeyMap(XK_KP_Add, IRR_KEY_ADD));
+	KeyMap.push_back(SKeyMap(XK_KP_Separator, IRR_KEY_SEPARATOR));
+	KeyMap.push_back(SKeyMap(XK_KP_Subtract, IRR_KEY_SUBTRACT));
+	KeyMap.push_back(SKeyMap(XK_KP_Decimal, IRR_KEY_DECIMAL));
+	KeyMap.push_back(SKeyMap(XK_KP_Divide, IRR_KEY_DIVIDE));
+	KeyMap.push_back(SKeyMap(XK_KP_0, IRR_KEY_NUMPAD0));
+	KeyMap.push_back(SKeyMap(XK_KP_1, IRR_KEY_NUMPAD1));
+	KeyMap.push_back(SKeyMap(XK_KP_2, IRR_KEY_NUMPAD2));
+	KeyMap.push_back(SKeyMap(XK_KP_3, IRR_KEY_NUMPAD3));
+	KeyMap.push_back(SKeyMap(XK_KP_4, IRR_KEY_NUMPAD4));
+	KeyMap.push_back(SKeyMap(XK_KP_5, IRR_KEY_NUMPAD5));
+	KeyMap.push_back(SKeyMap(XK_KP_6, IRR_KEY_NUMPAD6));
+	KeyMap.push_back(SKeyMap(XK_KP_7, IRR_KEY_NUMPAD7));
+	KeyMap.push_back(SKeyMap(XK_KP_8, IRR_KEY_NUMPAD8));
+	KeyMap.push_back(SKeyMap(XK_KP_9, IRR_KEY_NUMPAD9));
+	KeyMap.push_back(SKeyMap(XK_F1, IRR_KEY_F1));
+	KeyMap.push_back(SKeyMap(XK_F2, IRR_KEY_F2));
+	KeyMap.push_back(SKeyMap(XK_F3, IRR_KEY_F3));
+	KeyMap.push_back(SKeyMap(XK_F4, IRR_KEY_F4));
+	KeyMap.push_back(SKeyMap(XK_F5, IRR_KEY_F5));
+	KeyMap.push_back(SKeyMap(XK_F6, IRR_KEY_F6));
+	KeyMap.push_back(SKeyMap(XK_F7, IRR_KEY_F7));
+	KeyMap.push_back(SKeyMap(XK_F8, IRR_KEY_F8));
+	KeyMap.push_back(SKeyMap(XK_F9, IRR_KEY_F9));
+	KeyMap.push_back(SKeyMap(XK_F10, IRR_KEY_F10));
+	KeyMap.push_back(SKeyMap(XK_F11, IRR_KEY_F11));
+	KeyMap.push_back(SKeyMap(XK_F12, IRR_KEY_F12));
+	KeyMap.push_back(SKeyMap(XK_Shift_L, IRR_KEY_LSHIFT));
+	KeyMap.push_back(SKeyMap(XK_Shift_R, IRR_KEY_RSHIFT));
+	KeyMap.push_back(SKeyMap(XK_Control_L, IRR_KEY_LCONTROL));
+	KeyMap.push_back(SKeyMap(XK_Control_R, IRR_KEY_RCONTROL));
+	KeyMap.push_back(SKeyMap(XK_Caps_Lock, IRR_KEY_CAPITAL));
+	KeyMap.push_back(SKeyMap(XK_Shift_Lock, IRR_KEY_CAPITAL));
+	KeyMap.push_back(SKeyMap(XK_Meta_L, IRR_KEY_LWIN));
+	KeyMap.push_back(SKeyMap(XK_Meta_R, IRR_KEY_RWIN));
+	KeyMap.push_back(SKeyMap(XK_Alt_L, IRR_KEY_LMENU));
+	KeyMap.push_back(SKeyMap(XK_Alt_R, IRR_KEY_RMENU));
+	KeyMap.push_back(SKeyMap(XK_ISO_Level3_Shift, IRR_KEY_RMENU));
+	KeyMap.push_back(SKeyMap(XK_Menu, IRR_KEY_MENU));
+	KeyMap.push_back(SKeyMap(XK_space, IRR_KEY_SPACE));
 	KeyMap.push_back(SKeyMap(XK_exclam, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_quotedbl, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_section, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_numbersign, KEY_OEM_2));
+	KeyMap.push_back(SKeyMap(XK_numbersign, IRR_KEY_OEM_2));
 	KeyMap.push_back(SKeyMap(XK_dollar, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_percent, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_ampersand, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_apostrophe, KEY_OEM_7));
+	KeyMap.push_back(SKeyMap(XK_apostrophe, IRR_KEY_OEM_7));
 	KeyMap.push_back(SKeyMap(XK_parenleft, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_parenright, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_asterisk, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_plus, KEY_PLUS)); //?
-	KeyMap.push_back(SKeyMap(XK_comma, KEY_COMMA)); //?
-	KeyMap.push_back(SKeyMap(XK_minus, KEY_MINUS)); //?
-	KeyMap.push_back(SKeyMap(XK_period, KEY_PERIOD)); //?
-	KeyMap.push_back(SKeyMap(XK_slash, KEY_OEM_2)); //?
-	KeyMap.push_back(SKeyMap(XK_0, KEY_KEY_0));
-	KeyMap.push_back(SKeyMap(XK_1, KEY_KEY_1));
-	KeyMap.push_back(SKeyMap(XK_2, KEY_KEY_2));
-	KeyMap.push_back(SKeyMap(XK_3, KEY_KEY_3));
-	KeyMap.push_back(SKeyMap(XK_4, KEY_KEY_4));
-	KeyMap.push_back(SKeyMap(XK_5, KEY_KEY_5));
-	KeyMap.push_back(SKeyMap(XK_6, KEY_KEY_6));
-	KeyMap.push_back(SKeyMap(XK_7, KEY_KEY_7));
-	KeyMap.push_back(SKeyMap(XK_8, KEY_KEY_8));
-	KeyMap.push_back(SKeyMap(XK_9, KEY_KEY_9));
+	KeyMap.push_back(SKeyMap(XK_plus, IRR_KEY_PLUS)); //?
+	KeyMap.push_back(SKeyMap(XK_comma, IRR_KEY_COMMA)); //?
+	KeyMap.push_back(SKeyMap(XK_minus, IRR_KEY_MINUS)); //?
+	KeyMap.push_back(SKeyMap(XK_period, IRR_KEY_PERIOD)); //?
+	KeyMap.push_back(SKeyMap(XK_slash, IRR_KEY_OEM_2)); //?
+	KeyMap.push_back(SKeyMap(XK_0, IRR_KEY_0));
+	KeyMap.push_back(SKeyMap(XK_1, IRR_KEY_1));
+	KeyMap.push_back(SKeyMap(XK_2, IRR_KEY_2));
+	KeyMap.push_back(SKeyMap(XK_3, IRR_KEY_3));
+	KeyMap.push_back(SKeyMap(XK_4, IRR_KEY_4));
+	KeyMap.push_back(SKeyMap(XK_5, IRR_KEY_5));
+	KeyMap.push_back(SKeyMap(XK_6, IRR_KEY_6));
+	KeyMap.push_back(SKeyMap(XK_7, IRR_KEY_7));
+	KeyMap.push_back(SKeyMap(XK_8, IRR_KEY_8));
+	KeyMap.push_back(SKeyMap(XK_9, IRR_KEY_9));
 	KeyMap.push_back(SKeyMap(XK_colon, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_semicolon, KEY_OEM_1));
-	KeyMap.push_back(SKeyMap(XK_less, KEY_OEM_102));
-	KeyMap.push_back(SKeyMap(XK_equal, KEY_PLUS));
+	KeyMap.push_back(SKeyMap(XK_semicolon, IRR_KEY_OEM_1));
+	KeyMap.push_back(SKeyMap(XK_less, IRR_KEY_OEM_102));
+	KeyMap.push_back(SKeyMap(XK_equal, IRR_KEY_PLUS));
 	KeyMap.push_back(SKeyMap(XK_greater, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_question, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_at, KEY_KEY_2)); //?
+	KeyMap.push_back(SKeyMap(XK_at, IRR_KEY_2)); //?
 	KeyMap.push_back(SKeyMap(XK_mu, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_EuroSign, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_A, KEY_KEY_A));
-	KeyMap.push_back(SKeyMap(XK_B, KEY_KEY_B));
-	KeyMap.push_back(SKeyMap(XK_C, KEY_KEY_C));
-	KeyMap.push_back(SKeyMap(XK_D, KEY_KEY_D));
-	KeyMap.push_back(SKeyMap(XK_E, KEY_KEY_E));
-	KeyMap.push_back(SKeyMap(XK_F, KEY_KEY_F));
-	KeyMap.push_back(SKeyMap(XK_G, KEY_KEY_G));
-	KeyMap.push_back(SKeyMap(XK_H, KEY_KEY_H));
-	KeyMap.push_back(SKeyMap(XK_I, KEY_KEY_I));
-	KeyMap.push_back(SKeyMap(XK_J, KEY_KEY_J));
-	KeyMap.push_back(SKeyMap(XK_K, KEY_KEY_K));
-	KeyMap.push_back(SKeyMap(XK_L, KEY_KEY_L));
-	KeyMap.push_back(SKeyMap(XK_M, KEY_KEY_M));
-	KeyMap.push_back(SKeyMap(XK_N, KEY_KEY_N));
-	KeyMap.push_back(SKeyMap(XK_O, KEY_KEY_O));
-	KeyMap.push_back(SKeyMap(XK_P, KEY_KEY_P));
-	KeyMap.push_back(SKeyMap(XK_Q, KEY_KEY_Q));
-	KeyMap.push_back(SKeyMap(XK_R, KEY_KEY_R));
-	KeyMap.push_back(SKeyMap(XK_S, KEY_KEY_S));
-	KeyMap.push_back(SKeyMap(XK_T, KEY_KEY_T));
-	KeyMap.push_back(SKeyMap(XK_U, KEY_KEY_U));
-	KeyMap.push_back(SKeyMap(XK_V, KEY_KEY_V));
-	KeyMap.push_back(SKeyMap(XK_W, KEY_KEY_W));
-	KeyMap.push_back(SKeyMap(XK_X, KEY_KEY_X));
-	KeyMap.push_back(SKeyMap(XK_Y, KEY_KEY_Y));
-	KeyMap.push_back(SKeyMap(XK_Z, KEY_KEY_Z));
-	KeyMap.push_back(SKeyMap(XK_bracketleft, KEY_OEM_4));
-	KeyMap.push_back(SKeyMap(XK_backslash, KEY_OEM_5));
-	KeyMap.push_back(SKeyMap(XK_bracketright, KEY_OEM_6));
-	KeyMap.push_back(SKeyMap(XK_asciicircum, KEY_OEM_5));
+	KeyMap.push_back(SKeyMap(XK_A, IRR_KEY_A));
+	KeyMap.push_back(SKeyMap(XK_B, IRR_KEY_B));
+	KeyMap.push_back(SKeyMap(XK_C, IRR_KEY_C));
+	KeyMap.push_back(SKeyMap(XK_D, IRR_KEY_D));
+	KeyMap.push_back(SKeyMap(XK_E, IRR_KEY_E));
+	KeyMap.push_back(SKeyMap(XK_F, IRR_KEY_F));
+	KeyMap.push_back(SKeyMap(XK_G, IRR_KEY_G));
+	KeyMap.push_back(SKeyMap(XK_H, IRR_KEY_H));
+	KeyMap.push_back(SKeyMap(XK_I, IRR_KEY_I));
+	KeyMap.push_back(SKeyMap(XK_J, IRR_KEY_J));
+	KeyMap.push_back(SKeyMap(XK_K, IRR_KEY_K));
+	KeyMap.push_back(SKeyMap(XK_L, IRR_KEY_L));
+	KeyMap.push_back(SKeyMap(XK_M, IRR_KEY_M));
+	KeyMap.push_back(SKeyMap(XK_N, IRR_KEY_N));
+	KeyMap.push_back(SKeyMap(XK_O, IRR_KEY_O));
+	KeyMap.push_back(SKeyMap(XK_P, IRR_KEY_P));
+	KeyMap.push_back(SKeyMap(XK_Q, IRR_KEY_Q));
+	KeyMap.push_back(SKeyMap(XK_R, IRR_KEY_R));
+	KeyMap.push_back(SKeyMap(XK_S, IRR_KEY_S));
+	KeyMap.push_back(SKeyMap(XK_T, IRR_KEY_T));
+	KeyMap.push_back(SKeyMap(XK_U, IRR_KEY_U));
+	KeyMap.push_back(SKeyMap(XK_V, IRR_KEY_V));
+	KeyMap.push_back(SKeyMap(XK_W, IRR_KEY_W));
+	KeyMap.push_back(SKeyMap(XK_X, IRR_KEY_X));
+	KeyMap.push_back(SKeyMap(XK_Y, IRR_KEY_Y));
+	KeyMap.push_back(SKeyMap(XK_Z, IRR_KEY_Z));
+	KeyMap.push_back(SKeyMap(XK_bracketleft, IRR_KEY_OEM_4));
+	KeyMap.push_back(SKeyMap(XK_backslash, IRR_KEY_OEM_5));
+	KeyMap.push_back(SKeyMap(XK_bracketright, IRR_KEY_OEM_6));
+	KeyMap.push_back(SKeyMap(XK_asciicircum, IRR_KEY_OEM_5));
 	KeyMap.push_back(SKeyMap(XK_degree, 0)); //?
-	KeyMap.push_back(SKeyMap(XK_underscore, KEY_MINUS)); //?
-	KeyMap.push_back(SKeyMap(XK_grave, KEY_OEM_3));
-	KeyMap.push_back(SKeyMap(XK_acute, KEY_OEM_6));
-	KeyMap.push_back(SKeyMap(XK_a, KEY_KEY_A));
-	KeyMap.push_back(SKeyMap(XK_b, KEY_KEY_B));
-	KeyMap.push_back(SKeyMap(XK_c, KEY_KEY_C));
-	KeyMap.push_back(SKeyMap(XK_d, KEY_KEY_D));
-	KeyMap.push_back(SKeyMap(XK_e, KEY_KEY_E));
-	KeyMap.push_back(SKeyMap(XK_f, KEY_KEY_F));
-	KeyMap.push_back(SKeyMap(XK_g, KEY_KEY_G));
-	KeyMap.push_back(SKeyMap(XK_h, KEY_KEY_H));
-	KeyMap.push_back(SKeyMap(XK_i, KEY_KEY_I));
-	KeyMap.push_back(SKeyMap(XK_j, KEY_KEY_J));
-	KeyMap.push_back(SKeyMap(XK_k, KEY_KEY_K));
-	KeyMap.push_back(SKeyMap(XK_l, KEY_KEY_L));
-	KeyMap.push_back(SKeyMap(XK_m, KEY_KEY_M));
-	KeyMap.push_back(SKeyMap(XK_n, KEY_KEY_N));
-	KeyMap.push_back(SKeyMap(XK_o, KEY_KEY_O));
-	KeyMap.push_back(SKeyMap(XK_p, KEY_KEY_P));
-	KeyMap.push_back(SKeyMap(XK_q, KEY_KEY_Q));
-	KeyMap.push_back(SKeyMap(XK_r, KEY_KEY_R));
-	KeyMap.push_back(SKeyMap(XK_s, KEY_KEY_S));
-	KeyMap.push_back(SKeyMap(XK_t, KEY_KEY_T));
-	KeyMap.push_back(SKeyMap(XK_u, KEY_KEY_U));
-	KeyMap.push_back(SKeyMap(XK_v, KEY_KEY_V));
-	KeyMap.push_back(SKeyMap(XK_w, KEY_KEY_W));
-	KeyMap.push_back(SKeyMap(XK_x, KEY_KEY_X));
-	KeyMap.push_back(SKeyMap(XK_y, KEY_KEY_Y));
-	KeyMap.push_back(SKeyMap(XK_z, KEY_KEY_Z));
-	KeyMap.push_back(SKeyMap(XK_ssharp, KEY_OEM_4));
-	KeyMap.push_back(SKeyMap(XK_adiaeresis, KEY_OEM_7));
-	KeyMap.push_back(SKeyMap(XK_odiaeresis, KEY_OEM_3));
-	KeyMap.push_back(SKeyMap(XK_udiaeresis, KEY_OEM_1));
-	KeyMap.push_back(SKeyMap(XK_Super_L, KEY_LWIN));
-	KeyMap.push_back(SKeyMap(XK_Super_R, KEY_RWIN));
+	KeyMap.push_back(SKeyMap(XK_underscore, IRR_KEY_MINUS)); //?
+	KeyMap.push_back(SKeyMap(XK_grave, IRR_KEY_OEM_3));
+	KeyMap.push_back(SKeyMap(XK_acute, IRR_KEY_OEM_6));
+	KeyMap.push_back(SKeyMap(XK_a, IRR_KEY_A));
+	KeyMap.push_back(SKeyMap(XK_b, IRR_KEY_B));
+	KeyMap.push_back(SKeyMap(XK_c, IRR_KEY_C));
+	KeyMap.push_back(SKeyMap(XK_d, IRR_KEY_D));
+	KeyMap.push_back(SKeyMap(XK_e, IRR_KEY_E));
+	KeyMap.push_back(SKeyMap(XK_f, IRR_KEY_F));
+	KeyMap.push_back(SKeyMap(XK_g, IRR_KEY_G));
+	KeyMap.push_back(SKeyMap(XK_h, IRR_KEY_H));
+	KeyMap.push_back(SKeyMap(XK_i, IRR_KEY_I));
+	KeyMap.push_back(SKeyMap(XK_j, IRR_KEY_J));
+	KeyMap.push_back(SKeyMap(XK_k, IRR_KEY_K));
+	KeyMap.push_back(SKeyMap(XK_l, IRR_KEY_L));
+	KeyMap.push_back(SKeyMap(XK_m, IRR_KEY_M));
+	KeyMap.push_back(SKeyMap(XK_n, IRR_KEY_N));
+	KeyMap.push_back(SKeyMap(XK_o, IRR_KEY_O));
+	KeyMap.push_back(SKeyMap(XK_p, IRR_KEY_P));
+	KeyMap.push_back(SKeyMap(XK_q, IRR_KEY_Q));
+	KeyMap.push_back(SKeyMap(XK_r, IRR_KEY_R));
+	KeyMap.push_back(SKeyMap(XK_s, IRR_KEY_S));
+	KeyMap.push_back(SKeyMap(XK_t, IRR_KEY_T));
+	KeyMap.push_back(SKeyMap(XK_u, IRR_KEY_U));
+	KeyMap.push_back(SKeyMap(XK_v, IRR_KEY_V));
+	KeyMap.push_back(SKeyMap(XK_w, IRR_KEY_W));
+	KeyMap.push_back(SKeyMap(XK_x, IRR_KEY_X));
+	KeyMap.push_back(SKeyMap(XK_y, IRR_KEY_Y));
+	KeyMap.push_back(SKeyMap(XK_z, IRR_KEY_Z));
+	KeyMap.push_back(SKeyMap(XK_ssharp, IRR_KEY_OEM_4));
+	KeyMap.push_back(SKeyMap(XK_adiaeresis, IRR_KEY_OEM_7));
+	KeyMap.push_back(SKeyMap(XK_odiaeresis, IRR_KEY_OEM_3));
+	KeyMap.push_back(SKeyMap(XK_udiaeresis, IRR_KEY_OEM_1));
+	KeyMap.push_back(SKeyMap(XK_Super_L, IRR_KEY_LWIN));
+	KeyMap.push_back(SKeyMap(XK_Super_R, IRR_KEY_RWIN));
 
 	KeyMap.sort();
 #endif
@@ -2629,9 +2845,11 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
 									&numItems, &dummy, &data);
 
 	if (result == Success)
+	{
 		Clipboard = (irr::c8*)data;
+		XFree(data);
+	}
 
-	XFree (data);
 	return Clipboard.c_str();
 #else
 	return 0;

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2016 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -39,7 +39,7 @@ BEGIN_AS_NAMESPACE
 int     asCompareStrings(const char *str1, size_t len1, const char *str2, size_t len2);
 
 double  asStringScanDouble(const char *string, size_t *numScanned);
-asQWORD asStringScanUInt64(const char *string, int base, size_t *numScanned);
+asQWORD asStringScanUInt64(const char *string, int base, size_t *numScanned, bool *overflow);
 
 int     asStringEncodeUTF8(unsigned int value, char *outEncodedBuffer);
 int     asStringDecodeUTF8(const char *encodedBuffer, unsigned int *outLength);

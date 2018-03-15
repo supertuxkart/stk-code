@@ -27,6 +27,7 @@
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/dialogs/kart_color_slider_dialog.hpp"
 #include "states_screens/dialogs/recovery_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_audio.hpp"
@@ -153,12 +154,13 @@ void BaseUserScreen::init()
     getWidget<IconButtonWidget>("new_user")->setActive(!in_game);
     getWidget<IconButtonWidget>("rename")->setActive(!in_game);
     getWidget<IconButtonWidget>("delete")->setActive(!in_game);
+    getWidget<IconButtonWidget>("default_kart_color")->setActive(!in_game);
 
     m_new_registered_data = false;
     if (m_auto_login)
     {
-        login();
         m_auto_login = false;
+        login();
         return;
     }
     m_auto_login = false;
@@ -380,6 +382,10 @@ void BaseUserScreen::eventCallback(Widget* widget,
             // Init will automatically be called, which
             // refreshes the player list
         }
+        else if (button == "default_kart_color")
+        {
+            new KartColorSliderDialog(getSelectedPlayer());
+        }
         else if (button == "delete")
         {
             deletePlayer();
@@ -400,7 +406,14 @@ void BaseUserScreen::eventCallback(Widget* widget,
  */
 void BaseUserScreen::closeScreen()
 {
-    StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+    if (StateManager::get()->getMenuStackSize() > 1)
+    {
+        StateManager::get()->popMenu();
+    }
+    else
+    {
+        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+    }
 }   // closeScreen
 
 // ----------------------------------------------------------------------------

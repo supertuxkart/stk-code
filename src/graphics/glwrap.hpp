@@ -28,6 +28,7 @@
 #include "utils/vec3.hpp"
 
 #include <irrlicht.h>
+#include <array>
 #include <vector>
 
 namespace HardwareStats
@@ -55,33 +56,17 @@ class GPUTimer
     bool initialised;
     unsigned lastResult;
     bool canSubmitQuery;
+    const char* m_name;
 public:
-    GPUTimer();
+    GPUTimer(const char* name);
     unsigned elapsedTimeus();
-};
-
-class FrameBuffer : public NoCopy
-{
-private:
-    GLuint fbo, fbolayer;
-    std::vector<GLuint> RenderTargets;
-    GLuint DepthTexture;
-    size_t width, height;
-public:
-    FrameBuffer();
-    FrameBuffer(const std::vector <GLuint> &RTTs, size_t w, size_t h, bool layered = false);
-    FrameBuffer(const std::vector <GLuint> &RTTs, GLuint DS, size_t w, size_t h, bool layered = false);
-    ~FrameBuffer();
-    void bind() const;
-    void bindLayer(unsigned) const;
-    const std::vector<GLuint> &getRTT() const { return RenderTargets; }
-    GLuint getDepthTexture() const { assert(DepthTexture); return DepthTexture; }
-    size_t getWidth() const { return width; }
-    size_t getHeight() const { return height; }
-    static void Blit(const FrameBuffer &Src, const FrameBuffer &Dst, GLbitfield mask = GL_COLOR_BUFFER_BIT, GLenum filter = GL_NEAREST);
-    void BlitToDefault(size_t, size_t, size_t, size_t);
-
-    LEAK_CHECK();
+    const char* getName() const { return m_name; }
+    void reset()
+    {
+        initialised = false;
+        lastResult = 0;
+        canSubmitQuery = true;
+    }
 };
 
 class VertexUtils
@@ -140,7 +125,7 @@ public:
             glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)36);
             // Bitangent
             glEnableVertexAttribArray(6);
-            glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)48);
+            glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)48);
             break;
         case video::EVT_SKINNED_MESH:
             glEnableVertexAttribArray(0);
@@ -150,13 +135,15 @@ public:
             glEnableVertexAttribArray(2);
             glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(tp), (GLvoid*)24);
             glEnableVertexAttribArray(3);
-            glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)28);
+            glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)28);
             glEnableVertexAttribArray(4);
-            glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)44);
+            glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)36);
+            glEnableVertexAttribArray(11);
+            glVertexAttribPointer(11, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)48);
             glEnableVertexAttribArray(5);
-            glVertexAttribIPointer(5, 4, GL_INT, getVertexPitchFromType(tp), (GLvoid*)60);
+            glVertexAttribIPointer(5, 4, GL_SHORT, getVertexPitchFromType(tp), (GLvoid*)64);
             glEnableVertexAttribArray(6);
-            glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)76);
+            glVertexAttribPointer(6, 4, GL_HALF_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)72);
             break;
         }
     }

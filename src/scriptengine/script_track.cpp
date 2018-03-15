@@ -22,6 +22,7 @@
 #include "font/digit_face.hpp"
 #include "font/font_manager.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/stk_text_billboard.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "input/device_manager.hpp"
@@ -98,12 +99,13 @@ namespace Scripting
 #ifndef SERVER_ONLY
             if (CVS->isGLSL())
             {
-                STKTextBillboard* tb = new STKTextBillboard(wtext.c_str(), digit_face,
+                STKTextBillboard* tb = new STKTextBillboard(
                     GUIEngine::getSkin()->getColor("font::bottom"),
                     GUIEngine::getSkin()->getColor("font::top"),
                     irr_driver->getSceneManager()->getRootSceneNode(),
                     irr_driver->getSceneManager(), -1, xyz,
                     core::vector3df(1.5f, 1.5f, 1.5f));
+                tb->init(wtext.c_str(), digit_face);
 
                 ::Track::getCurrentTrack()->addNode(tb);
                 tb->drop();
@@ -125,6 +127,23 @@ namespace Scripting
                 ::Track::getCurrentTrack()->addNode(sn);
             }
 #endif
+        }
+
+        /** Function for re-enable a trigger after a specific timeout*/
+        void setTriggerReenableTimeout(std::string* triggerID, std::string* lib_id,
+                                       float reenable_time)
+        {
+            ::TrackObject* tobj = ::Track::getCurrentTrack()->getTrackObjectManager()
+                ->getTrackObject(*lib_id, *triggerID);
+            if (tobj != NULL)
+            {
+                TrackObjectPresentationActionTrigger* topat =
+                    tobj->getPresentation<TrackObjectPresentationActionTrigger>();
+                if (topat != NULL)
+                {
+                    topat->setReenableTimeout(reenable_time);
+                }
+            }
         }
 
         /** Exits the race to the main menu */
@@ -151,6 +170,21 @@ namespace Scripting
         bool isTrackReverse()
         {
             return race_manager->getReverseTrack();
+        }
+
+        int getMajorRaceMode()
+        {
+            return race_manager->getMajorMode();
+        }
+
+        int getMinorRaceMode()
+        {
+            return race_manager->getMinorMode();
+        }
+
+        bool isDuringDay()
+        {
+            return ::Track::getCurrentTrack()->getIsDuringDay();
         }
 
         void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)
@@ -226,22 +260,79 @@ namespace Scripting
 
             /** Sets a loop for a skeletal animation */
             // TODO: can we use a type and avoid void* ?
-            void setLoop(int start, int end /** \cond DOXYGEN_IGNORE */, void *memory /** \endcond */)
+            void setFrameLoop(int start, int end /** \cond DOXYGEN_IGNORE */, void *memory /** \endcond */)
             {
-                ((TrackObjectPresentationMesh*)(memory))->setLoop(start, end);
+                if (memory)
+                {
+                    ((scene::IAnimatedMeshSceneNode*)(memory))->setFrameLoop(start, end);
+                }
+            }
+
+            /** Sets a loop once for a skeletal animation */
+            void setFrameLoopOnce(int start, int end /** \cond DOXYGEN_IGNORE */, void *memory /** \endcond */)
+            {
+                if (memory)
+                {
+                    ((scene::IAnimatedMeshSceneNode*)(memory))->setFrameLoopOnce(start, end);
+                }
+            }
+
+            /** Get current frame in a skeletal animation */
+            int getFrameNr(/** \cond DOXYGEN_IGNORE */void *memory /** \endcond */)
+            {
+                if (memory)
+                {
+                    return (int)((scene::IAnimatedMeshSceneNode*)(memory))->getFrameNr();
+                }
+                return -1;
+            }
+
+            /** Gets the animation set for a skeletal animation */
+            int getAnimationSet(/** \cond DOXYGEN_IGNORE */void *memory /** \endcond */)
+            {
+                if (memory)
+                {
+                    return ((scene::IAnimatedMeshSceneNode*)(memory))->getAnimationSet();
+                }
+                return -1;
+            }
+
+            /** Remove all animation set for a skeletal animation */
+            void removeAllAnimationSet(/** \cond DOXYGEN_IGNORE */void *memory /** \endcond */)
+            {
+                if (memory)
+                {
+                    ((scene::IAnimatedMeshSceneNode*)(memory))->removeAllAnimationSet();
+                }
+            }
+
+            /** Add an animation set for a skeletal animation */
+            void addAnimationSet(int start/** \cond DOXYGEN_IGNORE */, int end/** \cond DOXYGEN_IGNORE */, /** \cond DOXYGEN_IGNORE */void *memory /** \endcond */)
+            {
+                if (memory)
+                {
+                    ((scene::IAnimatedMeshSceneNode*)(memory))->addAnimationSet(start, end);
+                }
+            }
+
+            /** use an current frame for a skeletal animation */
+            void useAnimationSet(int set_num /** \cond DOXYGEN_IGNORE */, void *memory /** \endcond */)
+            {
+                if (memory)
+                {
+                    ((scene::IAnimatedMeshSceneNode*)(memory))->useAnimationSet(set_num);
+                }
             }
 
             /** Sets the current frame for a skeletal animation */
             void setCurrentFrame(int frame /** \cond DOXYGEN_IGNORE */, void *memory /** \endcond */)
             {
-                ((TrackObjectPresentationMesh*)(memory))->setCurrentFrame(frame);
+                if (memory)
+                {
+                    ((scene::IAnimatedMeshSceneNode*)(memory))->setCurrentFrame((float)frame);
+                }
             }
 
-            /** Get current frame in a skeletal animation */
-            int getCurrentFrame(/** \cond DOXYGEN_IGNORE */void *memory /** \endcond */)
-            {
-                return ((TrackObjectPresentationMesh*)(memory))->getCurrentFrame();
-            }
             /** @} */
         }
 
@@ -379,6 +470,8 @@ namespace Scripting
                 asFUNCTION(createTrigger), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void createTextBillboard(const string &in, const Vec3 &in)",
                 asFUNCTION(createTextBillboard), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void setTriggerReenableTimeout(const string &in, const string &in, float reenable_time)",
+                asFUNCTION(setTriggerReenableTimeout), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("TrackObject@ getTrackObject(const string &in, const string &in)", asFUNCTION(getTrackObject), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void exitRace()", asFUNCTION(exitRace), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void pauseRace()", asFUNCTION(pauseRace), asCALL_CDECL); assert(r >= 0);
@@ -386,6 +479,9 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("int getNumberOfKarts()", asFUNCTION(getNumberOfKarts), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("int getNumLocalPlayers()", asFUNCTION(getNumLocalPlayers), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("bool isReverse()", asFUNCTION(isTrackReverse), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("int getMajorRaceMode()", asFUNCTION(getMajorRaceMode), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("int getMinorRaceMode()", asFUNCTION(getMinorRaceMode), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("bool isDuringDay()", asFUNCTION(isDuringDay), asCALL_CDECL); assert(r >= 0);
 
             // TrackObject
             r = engine->RegisterObjectMethod("TrackObject", "void setEnabled(bool status)", asMETHOD(::TrackObject, setEnabled), asCALL_THISCALL); assert(r >= 0);
@@ -398,15 +494,22 @@ namespace Scripting
             r = engine->RegisterObjectMethod("TrackObject", "void moveTo(const Vec3 &in, bool)", asMETHOD(::TrackObject, moveTo), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "Vec3 getCenterPosition()", asFUNCTION(TrackObject::getCenterPosition), asCALL_CDECL_OBJLAST); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "Vec3 getOrigin()", asFUNCTION(TrackObject::getOrigin), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("TrackObject", "TrackObject@ getParentLibrary()", asMETHOD(::TrackObject, getParentLibrary), asCALL_THISCALL); assert(r >= 0);
+            r = engine->RegisterObjectMethod("TrackObject", "string getName()", asMETHOD(::TrackObject, getName), asCALL_THISCALL); assert(r >= 0);
 
             // PhysicalObject
             r = engine->RegisterObjectMethod("PhysicalObject", "bool isFlattenKartObject()", asMETHOD(PhysicalObject, isFlattenKartObject), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("PhysicalObject", "void disable()", asMETHOD(PhysicalObject, disable), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("PhysicalObject", "void enable()", asMETHOD(PhysicalObject, enable), asCALL_THISCALL); assert(r >= 0);
 
-            // TrackObjectPresentationMesh (Mesh or Skeletal Animation)
-            r = engine->RegisterObjectMethod("Mesh", "void setLoop(int start, int end)", asFUNCTION(Mesh::setLoop), asCALL_CDECL_OBJLAST); assert(r >= 0);
-            r = engine->RegisterObjectMethod("Mesh", "int getCurrentFrame()", asFUNCTION(Mesh::getCurrentFrame), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            // Animated Mesh
+            r = engine->RegisterObjectMethod("Mesh", "void setFrameLoop(int start, int end)", asFUNCTION(Mesh::setFrameLoop), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("Mesh", "void setFrameLoopOnce(int start, int end)", asFUNCTION(Mesh::setFrameLoopOnce), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("Mesh", "int getFrameNr()", asFUNCTION(Mesh::getFrameNr), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("Mesh", "int getAnimationSet()", asFUNCTION(Mesh::getAnimationSet), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("Mesh", "void useAnimationSet(int set_num)", asFUNCTION(Mesh::useAnimationSet), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("Mesh", "void addAnimationSet(int start, int end)", asFUNCTION(Mesh::addAnimationSet), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("Mesh", "void removeAllAnimationSet()", asFUNCTION(Mesh::removeAllAnimationSet), asCALL_CDECL_OBJLAST); assert(r >= 0);
             r = engine->RegisterObjectMethod("Mesh", "void setCurrentFrame(int frame)", asFUNCTION(Mesh::setCurrentFrame), asCALL_CDECL_OBJLAST); assert(r >= 0);
             //r = engine->RegisterObjectMethod("Mesh", "void move(Vec3 &in)", asFUNCTION(movePresentation), asCALL_CDECL_OBJLAST); assert(r >= 0);
 

@@ -25,6 +25,10 @@
 #include "utils/string_utils.hpp"
 #include "utils/types.hpp"
 
+#ifdef ANDROID
+#include "main_android.hpp"
+#endif
+
 #include <algorithm>
 #include <array>
 
@@ -40,34 +44,40 @@ namespace GraphicsRestrictions
         /** The list of names used in the XML file for the graphics
          *  restriction types. They must be in the same order as the types. */
 
-        std::array<std::string, 27> m_names_of_restrictions = {
-            "UniformBufferObject",
-            "GeometryShader",
-            "DrawIndirect",
-            "TextureView",
-            "TextureStorage",
-            "ImageLoadStore",
-            "BaseInstance",
-            "ComputeShader",
-            "ArraysOfArrays",
-            "ShaderStorageBufferObject",
-            "MultiDrawIndirect",
-            "ShaderAtomicCounters",
-            "BufferStorage",
-            "BindlessTexture",
-            "TextureCompressionS3TC",
-            "AMDVertexShaderLayer",
-            "ExplicitAttribLocation",
-            "TextureFilterAnisotropic",
-            "TextureFormatBGRA8888",
-            "ColorBufferFloat",
-            "DriverRecentEnough",
-            "HighDefinitionTextures",
-            "AdvancedPipeline",
-            "FramebufferSRGBWorking",
-            "FramebufferSRGBCapable",
-            "GI",
-            "ForceLegacyDevice"
+        std::array<std::string, 30> m_names_of_restrictions =
+        {
+            {
+                "UniformBufferObject",
+                "GeometryShader",
+                "DrawIndirect",
+                "TextureView",
+                "TextureStorage",
+                "ImageLoadStore",
+                "BaseInstance",
+                "ComputeShader",
+                "ArraysOfArrays",
+                "ShaderStorageBufferObject",
+                "MultiDrawIndirect",
+                "ShaderAtomicCounters",
+                "BufferStorage",
+                "BindlessTexture",
+                "TextureCompressionS3TC",
+                "AMDVertexShaderLayer",
+                "ExplicitAttribLocation",
+                "TextureFilterAnisotropic",
+                "TextureFormatBGRA8888",
+                "ColorBufferFloat",
+                "DriverRecentEnough",
+                "HighDefinitionTextures",
+                "HighDefinitionTextures256",
+                "AdvancedPipeline",
+                "Correct10bitNormalization",
+                "GI",
+                "ForceLegacyDevice",
+                "VertexIdWorking",
+                "HardwareSkinning",
+                "NpotTextures"
+            }
         };
     }   // namespace Private
     using namespace Private;
@@ -130,6 +140,18 @@ public:
     Version(const std::string &driver_version, const std::string &card_name)
     {
         m_version.clear();
+        
+#ifdef ANDROID
+        // Android version should be enough to disable certain features on this
+        // platform
+        int version = AConfiguration_getSdkVersion(global_android_app->config);
+        
+        if (version > 0)
+        {
+            m_version.push_back(version);
+            return;
+        }
+#endif
 
         // Mesa needs to be tested first, otherwise (if testing for card name
         // further down) it would be detected as a non-mesa driver.
@@ -176,6 +198,11 @@ public:
             if (s.size() == 3)
             {
                 convertVersionString(s[2]);
+                return;
+            }
+            else if (s.size() == 5)
+            {
+                convertVersionString(s[4]);
                 return;
             }
 
@@ -243,7 +270,7 @@ public:
     /** If *this < other. */
     bool operator< (const Version &other) const
     {
-        unsigned int min_n = std::min(m_version.size(), other.m_version.size());
+        unsigned int min_n = (unsigned int)std::min(m_version.size(), other.m_version.size());
         for (unsigned int i = 0; i<min_n; i++)
         {
             if (m_version[i] > other.m_version[i]) return false;
@@ -258,7 +285,7 @@ public:
     /** If *this <= other. */
     bool operator<= (const Version &other) const
     {
-        unsigned int min_n = std::min(m_version.size(), other.m_version.size());
+        unsigned int min_n = (unsigned int)std::min(m_version.size(), other.m_version.size());
         for (unsigned int i = 0; i<min_n; i++)
         {
             if (m_version[i] > other.m_version[i]) return false;
@@ -291,6 +318,9 @@ private:
     /** For which OS this rule applies. */
     std::string m_os;
 
+    /** For which vendor this rule applies. */
+    std::string m_vendor;
+
     /** Which options to disable. */
     std::vector<std::string> m_disable_options;
 public:
@@ -309,6 +339,7 @@ public:
         }
 
         rule->get("os", &m_os);
+        rule->get("vendor", &m_vendor);
 
         std::string s;
         if(rule->get("version", &s) && s.size()>1)
@@ -340,7 +371,8 @@ public:
             m_disable_options = StringUtils::split(s, ' ');
     }   // Rule
     // ------------------------------------------------------------------------
-    bool applies(const std::string &card, const Version &version) const
+    bool applies(const std::string &card, const Version &version,
+                 const std::string &vendor) const
     {
         // Test for OS
         // -----------
@@ -348,20 +380,26 @@ public:
         {
 #if defined(__linux__) && !defined(ANDROID)
             if(m_os!="linux") return false;
-#endif
-#ifdef WIN32
+#elif defined(WIN32)
             if(m_os!="windows") return false;
-#endif
-#ifdef __APPLE__
+#elif defined(__APPLE__)
             if(m_os!="osx") return false;
-#endif
-#ifdef BSD
+#elif defined(BSD)
             if(m_os!="bsd") return false;
-#endif
-#ifdef ANDROID
+#elif defined(ANDROID)
             if(m_os!="android") return false;
+#else
+            return false;
 #endif
         }   // m_os.size()>0
+        
+        // Test for vendor
+        // ---------------
+        if (m_vendor.size() > 0)
+        {
+            if (m_vendor != vendor)
+                return false;
+        }
 
         // Test for card
         // -------------
@@ -466,9 +504,11 @@ void unitTesting()
  *  \param driver_version The GL_VERSION string (i.e. opengl and version
  *         number).
  *  \param card_name The GL_RENDERER string (i.e. graphics card).
+ *  \param vendor The GL_VENDOR string
  */
 void init(const std::string &driver_version,
-          const std::string &card_name)
+          const std::string &card_name,
+          const std::string &vendor)
 {
     for (unsigned int i = 0; i < GR_COUNT; i++)
         m_all_graphics_restriction.push_back(false);
@@ -502,7 +542,7 @@ void init(const std::string &driver_version,
             continue;
         }
         Rule rule(xml_rule);
-        if (rule.applies(card_name, version))
+        if (rule.applies(card_name, version, vendor))
         {
             std::vector<std::string> restrictions = rule.getRestrictions();
             std::vector<std::string>::iterator p;

@@ -48,7 +48,7 @@ DEFINE_SCREEN_SINGLETON( OnlineProfileServers );
 
 // -----------------------------------------------------------------------------
 
-OnlineProfileServers::OnlineProfileServers() : OnlineProfileBase("online/profile_servers.stkgui")
+OnlineProfileServers::OnlineProfileServers() : GUIEngine::Screen("online/profile_servers.stkgui")
 {
 }   // OnlineProfileServers
 
@@ -56,44 +56,28 @@ OnlineProfileServers::OnlineProfileServers() : OnlineProfileBase("online/profile
 
 void OnlineProfileServers::loadedFromFile()
 {
-    OnlineProfileBase::loadedFromFile();
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
 
 void OnlineProfileServers::init()
 {
-    OnlineProfileBase::init();
-    m_profile_tabs->select( m_servers_tab->m_properties[PROP_ID], PLAYER_ID_GAME_MASTER );
-    m_servers_tab->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    // OnlineScreen::getInstance()->push();
+    RibbonWidget* ribbon = getWidget<RibbonWidget>("wan");
+    assert(ribbon != NULL);
+    ribbon->select("find_wan_server", PLAYER_ID_GAME_MASTER);
+    ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // init
 
 // -----------------------------------------------------------------------------
 
 void OnlineProfileServers::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-    OnlineProfileBase::eventCallback( widget, name, playerID);
-
-    if (name == "lan")
+    if (name == "back")
     {
-        RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
-        std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        if (selection == "create_lan_server")
-        {
-            NetworkConfig::get()->setIsLAN();
-            NetworkConfig::get()->setIsServer(true);
-            CreateServerScreen::getInstance()->push();
-            // TODO: create lan server
-        }
-        else if (selection == "find_lan_server")
-        {
-            NetworkConfig::get()->setIsLAN();
-            NetworkConfig::get()->setIsServer(false);
-            ServerSelection::getInstance()->push();
-        }
+        StateManager::get()->popMenu();
+        return;
     }
-    else if (name == "wan")
+    if (name == "wan")
     {
         RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
         std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
@@ -176,6 +160,6 @@ void OnlineProfileServers::doQuickPlay()
 bool OnlineProfileServers::onEscapePressed()
 {
     NetworkConfig::get()->unsetNetworking();
-    return OnlineProfileBase::onEscapePressed();
+    return true;
 }   // onEscapePressed
 

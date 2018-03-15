@@ -23,6 +23,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "input/gamepad_android_config.hpp"
 #include "input/gamepad_device.hpp"
 #include "input/keyboard_device.hpp"
 #include "input/multitouch_device.hpp"
@@ -46,6 +47,12 @@ DeviceManager::DeviceManager()
     m_single_player = NULL;
     m_multitouch_device = NULL;
 }   // DeviceManager
+
+// -----------------------------------------------------------------------------
+DeviceManager::~DeviceManager()
+{
+    delete m_multitouch_device;
+}   // ~DeviceManager
 
 // -----------------------------------------------------------------------------
 bool DeviceManager::initialize()
@@ -74,8 +81,27 @@ bool DeviceManager::initialize()
         if(UserConfigParams::logMisc())
             Log::info("Device manager","No keyboard configuration exists, creating one.");
         m_keyboard_configs.push_back(new KeyboardConfig());
+        
         created = true;
     }
+    
+#ifdef ANDROID
+    bool has_gamepad_android_config = false;
+    
+    for (unsigned int i = 0; i < m_keyboard_configs.size(); i++)
+    {
+        if (m_keyboard_configs[i].isGamePadAndroid())
+        {
+            has_gamepad_android_config = true;
+        }
+    }
+    
+    if (!has_gamepad_android_config)
+    {
+        m_keyboard_configs.push_back(new GamepadAndroidConfig());
+        created = true;
+    }
+#endif
 
     const int keyboard_amount = m_keyboard_configs.size();
     for (int n = 0; n < keyboard_amount; n++)
@@ -382,6 +408,16 @@ InputDevice *DeviceManager::mapGamepadInput(Input::InputType type,
 
     if (gPad != NULL)
     {
+        // Ignore deadzone events if this isn't the latest used device in
+        // single-player mode (allowing the player to switch device at any time)
+        int dz = static_cast<GamepadConfig*>(gPad->getConfiguration())->getDeadzone();
+        if (m_single_player != NULL && m_latest_used_device != gPad
+            && *value > -dz && *value < dz)
+        {
+            *player = NULL;
+            return NULL;
+        }
+
         if (gPad->processAndMapInput(type, button_id, mode, action, value))
         {
             if (m_single_player != NULL)
@@ -419,7 +455,7 @@ void DeviceManager::updateMultitouchDevice()
         if (m_multitouch_device->getPlayer() != m_single_player)
             m_multitouch_device->setPlayer(m_single_player);
     }
-    else if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
+    else
     {
         m_multitouch_device->setPlayer(NULL);
     }
@@ -552,12 +588,13 @@ bool DeviceManager::load()
                       config->getName().c_str());
             continue;
         }
-        if(config->getName()=="keyboard")
+        if (config->getName() == "keyboard" ||
+            config->getName() == "gamepad_android")
         {
             KeyboardConfig *kc = static_cast<KeyboardConfig*>(device_config);
             m_keyboard_configs.push_back(kc);
         }
-        else if (config->getName()=="gamepad")
+        else if (config->getName() == "gamepad")
         {
             GamepadConfig *gc = static_cast<GamepadConfig*>(device_config);
             m_gamepad_configs.push_back(gc);

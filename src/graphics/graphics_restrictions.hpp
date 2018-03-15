@@ -56,16 +56,20 @@ namespace GraphicsRestrictions
         GR_COLOR_BUFFER_FLOAT,
         GR_DRIVER_RECENT_ENOUGH,
         GR_HIGHDEFINITION_TEXTURES,
+        GR_HIGHDEFINITION_TEXTURES_256,
         GR_ADVANCED_PIPELINE,
-        GR_FRAMEBUFFER_SRGB_WORKING,
-        GR_FRAMEBUFFER_SRGB_CAPABLE,
+        GR_CORRECT_10BIT_NORMALIZATION,
         GR_GI,
         GR_FORCE_LEGACY_DEVICE,
+        GR_VERTEX_ID_WORKING,
+        GR_HARDWARE_SKINNING,
+        GR_NPOT_TEXTURES,
         GR_COUNT  /** MUST be last entry. */
     } ;
 
     void init(const std::string &driver_version,
-              const std::string &card_name       );
+              const std::string &card_name,
+              const std::string &vendor       );
     bool isDisabled(GraphicsRestrictionsType type);
 
     void unitTesting();

@@ -1,11 +1,31 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2016-2017 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #ifdef ANDROID
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "utils/log.hpp"
 
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
 
 extern int main(int argc, char *argv[]);
+
+struct android_app* global_android_app;
 
 void override_default_params()
 {
@@ -20,9 +40,14 @@ void override_default_params()
     // Disable advanced lighting by default to make the game playable
     UserConfigParams::m_dynamic_lights = false;
 
-    // Enable touch steering and screen keyboard
-    UserConfigParams::m_multitouch_enabled = true;
-    UserConfigParams::m_screen_keyboard = true;
+    // Enable touch steering and screen keyboard when touchscreen is available
+    int32_t touch = AConfiguration_getTouchscreen(global_android_app->config);
+    
+    if (touch != ACONFIGURATION_TOUCHSCREEN_NOTOUCH)
+    {
+        UserConfigParams::m_multitouch_enabled = true;
+        UserConfigParams::m_screen_keyboard = true;
+    }
     
     // It shouldn't matter, but STK is always run in fullscreen on android
     UserConfigParams::m_fullscreen = true;
@@ -42,11 +67,14 @@ void android_main(struct android_app* app)
 {
     Log::info("AndroidMain", "Loading application...");
         
-    app_dummy();
+    global_android_app = app;
     
+    // Initialize global Android window state variables
+    CIrrDeviceAndroid::onCreate();
+    
+    app_dummy();
     override_default_params();
 
-    global_android_app = app;
     main(0, {});
 
     Log::info("AndroidMain", "Closing STK...");

@@ -358,7 +358,7 @@ void Skidding::update(float dt, bool is_on_ground,
             m_predicted_curve->setVisible(true);
             m_predicted_curve->setPosition(m_kart->getXYZ());
             m_predicted_curve->setHeading(m_kart->getHeading());
-            float angle = kp->getMaxSteerAngle(SPEED)
+            float angle = m_kart->getMaxSteerAngle(SPEED)
                         * fabsf(getSteeringFraction());
             float r = kp->getWheelBase()
                     / asin(angle)*1.0f;
@@ -371,7 +371,7 @@ void Skidding::update(float dt, bool is_on_ground,
             {
                 float real_x = m_skid_state==SKID_ACCUMULATE_LEFT ? -x : x;
                 Vec3 xyz(real_x, 0.2f, sqrt(r*r-(r-x)*(r-x))*(1.0f+SPEED/150.0f)
-                          *(1+(angle/kp->getMaxSteerAngle(SPEED)-0.6f)*0.1f));
+                          *(1+(angle/m_kart->getMaxSteerAngle(SPEED)-0.6f)*0.1f));
                 Vec3 xyz1=m_kart->getTrans()(xyz);
                 Log::debug("Skidding", "predict %f %f %f speed %f angle %f",
                     xyz1.getX(), xyz1.getY(), xyz1.getZ(),
@@ -404,7 +404,7 @@ void Skidding::update(float dt, bool is_on_ground,
             Log::debug("Skidding", "actual %f %f %f turn %f speed %f angle %f",
                 m_kart->getXYZ().getX(),m_kart->getXYZ().getY(),m_kart->getXYZ().getZ(),
                 m_real_steering, m_kart->getSpeed(),
-                kp->getMaxSteerAngle(m_kart->getSpeed()));
+                m_kart->getMaxSteerAngle(m_kart->getSpeed()));
 #endif
             m_skid_time += dt;
             float bonus_time, bonus_speed, bonus_force;

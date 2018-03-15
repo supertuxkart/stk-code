@@ -128,7 +128,7 @@ void LatencyProtocol::asynchronousUpdate()
         {
             NetworkString *ping_request = 
                             getNetworkString(5);
-            ping_request->addUInt8(1).addUInt32(m_pings[i].size());
+            ping_request->addUInt8(1).addUInt32((int)m_pings[i].size());
             m_pings[i] [ m_pings_count ] = current_time;
             peers[i]->sendPacket(ping_request, false);
             delete ping_request;

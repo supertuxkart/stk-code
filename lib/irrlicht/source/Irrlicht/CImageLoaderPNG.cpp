@@ -27,14 +27,14 @@ namespace video
 // PNG function for error handling
 static void png_cpexcept_error(png_structp png_ptr, png_const_charp msg)
 {
-	os::Printer::log("PNG fatal error", msg, ELL_ERROR);
+	printf("PNG fatal error: %s\n", msg);
 	longjmp(png_jmpbuf(png_ptr), 1);
 }
 
 // PNG function for warning handling
 static void png_cpexcept_warn(png_structp png_ptr, png_const_charp msg)
 {
-	os::Printer::log("PNG warning", msg, ELL_WARNING);
+	//os::Printer::log("PNG warning", msg, ELL_WARNING);
 }
 
 // PNG function for file reading
@@ -86,7 +86,7 @@ bool CImageLoaderPng::isALoadableFileFormat(io::IReadFile* file) const
 
 
 // load in the image data
-IImage* CImageLoaderPng::loadImage(io::IReadFile* file) const
+IImage* CImageLoaderPng::loadImage(io::IReadFile* file, bool skip_checking) const
 {
 #ifdef _IRR_COMPILE_WITH_LIBPNG_
 	if (!file)
@@ -96,27 +96,17 @@ IImage* CImageLoaderPng::loadImage(io::IReadFile* file) const
 	//Used to point to image rows
 	u8** RowPointers = 0;
 
-	png_byte buffer[8];
-	// Read the first few bytes of the PNG file
-	if( file->read(buffer, 8) != 8 )
-	{
-		os::Printer::log("LOAD PNG: can't read file\n", file->getFileName(), ELL_ERROR);
+	if (skip_checking)
+		file->seek(8);
+	else if (!isALoadableFileFormat(file))
 		return 0;
-	}
-
-	// Check if it really is a PNG file
-	if( png_sig_cmp(buffer, 0, 8) )
-	{
-		os::Printer::log("LOAD PNG: not really a png\n", file->getFileName(), ELL_ERROR);
-		return 0;
-	}
 
 	// Allocate the png read struct
 	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
 		NULL, (png_error_ptr)png_cpexcept_error, (png_error_ptr)png_cpexcept_warn);
 	if (!png_ptr)
 	{
-		os::Printer::log("LOAD PNG: Internal PNG create read struct failure\n", file->getFileName(), ELL_ERROR);
+		//os::Printer::log("LOAD PNG: Internal PNG create read struct failure\n", file->getFileName(), ELL_ERROR);
 		return 0;
 	}
 
@@ -124,7 +114,7 @@ IImage* CImageLoaderPng::loadImage(io::IReadFile* file) const
 	png_infop info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr)
 	{
-		os::Printer::log("LOAD PNG: Internal PNG create info struct failure\n", file->getFileName(), ELL_ERROR);
+		//os::Printer::log("LOAD PNG: Internal PNG create info struct failure\n", file->getFileName(), ELL_ERROR);
 		png_destroy_read_struct(&png_ptr, NULL, NULL);
 		return 0;
 	}
@@ -184,20 +174,6 @@ IImage* CImageLoaderPng::loadImage(io::IReadFile* file) const
 	if (ColorType==PNG_COLOR_TYPE_GRAY || ColorType==PNG_COLOR_TYPE_GRAY_ALPHA)
 		png_set_gray_to_rgb(png_ptr);
 
-	int intent;
-	const double screen_gamma = 2.2;
-
-	if (png_get_sRGB(png_ptr, info_ptr, &intent))
-		png_set_gamma(png_ptr, screen_gamma, 0.45455);
-	else
-	{
-		double image_gamma;
-		if (png_get_gAMA(png_ptr, info_ptr, &image_gamma))
-			png_set_gamma(png_ptr, screen_gamma, image_gamma);
-		else
-			png_set_gamma(png_ptr, screen_gamma, 0.45455);
-	}
-
 	// Update the changes in between, as we need to get the new color type
 	// for proper processing of the RGBA type
 	png_read_update_info(png_ptr, info_ptr);
@@ -229,7 +205,7 @@ IImage* CImageLoaderPng::loadImage(io::IReadFile* file) const
 		image = new CImage(ECF_R8G8B8, core::dimension2d<u32>(Width, Height));
 	if (!image)
 	{
-		os::Printer::log("LOAD PNG: Internal PNG create image struct failure\n", file->getFileName(), ELL_ERROR);
+		//os::Printer::log("LOAD PNG: Internal PNG create image struct failure\n", file->getFileName(), ELL_ERROR);
 		png_destroy_read_struct(&png_ptr, NULL, NULL);
 		return 0;
 	}
@@ -238,7 +214,7 @@ IImage* CImageLoaderPng::loadImage(io::IReadFile* file) const
 	RowPointers = new png_bytep[Height];
 	if (!RowPointers)
 	{
-		os::Printer::log("LOAD PNG: Internal PNG create row pointers failure\n", file->getFileName(), ELL_ERROR);
+		//os::Printer::log("LOAD PNG: Internal PNG create row pointers failure\n", file->getFileName(), ELL_ERROR);
 		png_destroy_read_struct(&png_ptr, NULL, NULL);
 		delete image;
 		return 0;
@@ -276,6 +252,26 @@ IImage* CImageLoaderPng::loadImage(io::IReadFile* file) const
 #endif // _IRR_COMPILE_WITH_LIBPNG_
 }
 
+core::dimension2du CImageLoaderPng::getImageSize(io::IReadFile* file) const
+{
+#ifdef _IRR_COMPILE_WITH_LIBPNG_
+	if (!file || !isALoadableFileFormat(file))
+		return core::dimension2du(0, 0);
+	core::dimension2d<u32> dim;
+	file->seek(16);
+	file->read(&dim.Width, 4);
+	file->seek(20);
+	file->read(&dim.Height, 4);
+	file->seek(0);
+#ifndef __BIG_ENDIAN__
+	dim.Width = os::Byteswap::byteswap(dim.Width);
+	dim.Height = os::Byteswap::byteswap(dim.Height);
+#endif
+	return dim;
+#else
+	return core::dimension2du(0, 0);
+#endif // _IRR_COMPILE_WITH_LIBPNG_
+}
 
 IImageLoader* createImageLoaderPNG()
 {
@@ -287,4 +283,3 @@ IImageLoader* createImageLoaderPNG()
 }//end namespace video
 
 #endif
-

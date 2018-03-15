@@ -26,39 +26,26 @@ class SharedGPUObjects
 {
 private:
     static bool m_has_been_initialised;
-    static GLuint m_billboard_vbo;
     static GLuint m_sky_tri_vbo;
     static GLuint m_frustrum_vbo;
     static GLuint m_frustrum_indices;
-    static GLuint m_particle_quad_vbo;
     static GLuint m_View_projection_matrices_ubo;
     static GLuint m_lighting_data_ubo;
     static GLuint m_full_screen_quad_vao;
     static GLuint m_ui_vao;
     static GLuint m_quad_buffer;
     static GLuint m_quad_vbo;
-    static GLuint m_skinning_ubo;
-    static int m_max_mat4_size;
 
     static void initQuadVBO();
     static void initQuadBuffer();
-    static void initBillboardVBO();
     static void initSkyTriVBO();
     static void initFrustrumVBO();
     static void initShadowVPMUBO();
     static void initLightingDataUBO();
-    static void initParticleQuadVBO();
-    static void initSkinningUBO();
 
 public:
     static void init();
     static void reset();
-    // ------------------------------------------------------------------------
-    static GLuint getBillboardVBO() 
-    {
-        assert(m_has_been_initialised);
-        return m_billboard_vbo;
-    }   // getBillboardVBO
     // ------------------------------------------------------------------------
     static GLuint getSkyTriVBO() 
     {
@@ -77,12 +64,6 @@ public:
         assert(m_has_been_initialised);
         return m_frustrum_indices;
     }   // getFrustrumIndices
-    // ------------------------------------------------------------------------
-    static GLuint getParticleQuadVBO() 
-    {
-        assert(m_has_been_initialised);
-        return m_particle_quad_vbo;
-    }   // getParticleQuadVBO
     // ------------------------------------------------------------------------
     static GLuint getViewProjectionMatricesUBO() 
     {
@@ -119,17 +100,7 @@ public:
         assert(m_has_been_initialised);
         return m_quad_vbo;
     }   // getQuadVBO
-    // ------------------------------------------------------------------------
-    static GLuint getSkinningUBO()
-    {
-        assert(m_has_been_initialised);
-        return m_skinning_ubo;
-    }   // getSkinningUBO
-    // ------------------------------------------------------------------------
-    static int getMaxMat4Size()
-    {
-        return m_max_mat4_size;
-    }   // getMaxMat4Size
+
 };   // class SharedGPUObjects
 
 

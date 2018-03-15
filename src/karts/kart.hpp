@@ -28,11 +28,11 @@
 
 #include "LinearMath/btTransform.h"
 
-#include "graphics/render_info.hpp"
 #include "items/powerup_manager.hpp"    // For PowerupType
 #include "karts/abstract_kart.hpp"
-#include "karts/kart_properties.hpp"
 #include "utils/no_copy.hpp"
+
+#include <SColor.h>
 
 class AbstractKartAnimation;
 class Attachment;
@@ -193,6 +193,8 @@ protected:
     float           m_finish_time;
     bool            m_finished_race;
 
+    float           m_falling_time = 0.35f;
+
     /** When a kart has its view blocked by the plunger, this variable will be
      *  > 0 the number it contains is the time left before removing plunger. */
     float         m_view_blocked_by_plunger;
@@ -201,20 +203,27 @@ protected:
     /** For camera handling an exponentially smoothened value is used, which
      *  reduces stuttering of the camera. */
     float         m_smoothed_speed;
+    
+    /** For smoothing engine sound**/
+    float         m_last_factor_engine_sound;
 
     std::vector<SFXBase*> m_custom_sounds;
-    SFXBase      *m_beep_sound;
+    int m_emitter_id = 0;
+    static const int EMITTER_COUNT = 3;
+    SFXBase      *m_emitters[EMITTER_COUNT];
     SFXBase      *m_engine_sound;
-    SFXBase      *m_crash_sound;
     SFXBase      *m_terrain_sound;
     SFXBase      *m_nitro_sound;
     /** A pointer to the previous terrain sound needs to be saved so that an
      *  'older' sfx can be finished and an abrupt end of the sfx is avoided. */
     SFXBase      *m_previous_terrain_sound;
     SFXBase      *m_skid_sound;
-    SFXBase      *m_goo_sound;
-    SFXBase      *m_boing_sound;
-    float         m_time_last_crash;
+    SFXBuffer    *m_horn_sound;
+    static const int CRASH_SOUND_COUNT = 3;
+    SFXBuffer    *m_crash_sounds[CRASH_SOUND_COUNT];
+    SFXBuffer    *m_goo_sound;
+    SFXBuffer    *m_boing_sound;
+    int          m_ticks_last_crash;
     RaceManager::KartType m_type;
 
     /** To prevent using nitro in too short bursts */
@@ -222,11 +231,11 @@ protected:
 
     void          updatePhysics(float dt);
     void          handleMaterialSFX(const Material *material);
-    void          handleMaterialGFX();
+    void          handleMaterialGFX(float dt);
     void          updateFlying();
     void          updateSliding();
     void          updateEnginePowerAndBrakes(float dt);
-    void          updateEngineSFX();
+    void          updateEngineSFX(float dt);
     void          updateSpeed();
     void          updateNitro(float dt);
     float         getActualWheelForce();
@@ -237,7 +246,7 @@ public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
                         PerPlayerDifficulty difficulty,
-                        KartRenderType krt = KRT_DEFAULT);
+                        std::shared_ptr<RenderInfo> ri);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
     virtual void   kartIsInRestNow();
@@ -339,8 +348,7 @@ public:
     virtual btTransform getAlignedTransform(const float customPitch=-1);
     // -------------------------------------------------------------------------
     /** Returns the color used for this kart. */
-    const video::SColor &getColor() const
-                                        {return m_kart_properties->getColor();}
+    const irr::video::SColor &getColor() const;
     // ------------------------------------------------------------------------
     /** Returns the time till full steering is reached for this kart.
      *  \param steer Current steer value (must be >=0), on which the time till
@@ -468,7 +476,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns whether this kart is jumping. */
     virtual bool isJumping() const { return m_is_jumping; };
-
+    // ------------------------------------------------------------------------
+    SFXBase* getNextEmitter();
+    // ------------------------------------------------------------------------
+    virtual void playSound(SFXBuffer* buffer);
 };   // Kart
 
 

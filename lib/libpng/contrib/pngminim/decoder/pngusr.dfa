@@ -1,6 +1,6 @@
 # pngminim/decoder/pngusr.dfa
 #
-# Copyright (c) 2010-2011 Glenn Randers-Pehrson
+# Copyright (c) 2010-2013 Glenn Randers-Pehrson
 #
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -37,3 +37,4 @@ option SETJMP on
 option STDIO on
 option READ_EXPAND on
 option READ_STRIP_16_TO_8 on
+option USER_LIMITS on

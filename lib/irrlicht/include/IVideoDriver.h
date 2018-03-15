@@ -1186,7 +1186,9 @@ namespace video
 		\return The created image.
 		If you no longer need the image, you should call IImage::drop().
 		See IReferenceCounted::drop() for more information. */
-		virtual IImage* createImageFromFile(io::IReadFile* file) =0;
+		virtual IImage* createImageFromFile(io::IReadFile* file, video::IImageLoader** loader = NULL) =0;
+
+		virtual video::IImageLoader* getImageLoaderForFile(const io::path& filename) = 0;
 
 		//! Writes the provided image to a file.
 		/** Requires that there is a suitable image writer registered

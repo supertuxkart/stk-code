@@ -43,6 +43,7 @@ OverWorld::OverWorld() : World()
 {
     m_return_to_garage            = false;
     m_stop_music_when_dialog_open = false;
+    m_play_track_intro_sound      = false;
 }   // Overworld
 
 //-----------------------------------------------------------------------------
@@ -277,7 +278,7 @@ void OverWorld::onMouseClick(int x, int y)
         // be the location of the challenge bubble.
         AbstractKart* kart = getKart(0);
         kart->setXYZ(challenge->m_position);
-        kart->getVehicle()->capSpeed(0);
+        kart->getVehicle()->setMaxSpeed(0);
 
         unsigned int index   = getRescuePositionIndex(kart);
         btTransform s        = getRescueTransform(index);

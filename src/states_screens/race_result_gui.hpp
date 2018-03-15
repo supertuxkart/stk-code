@@ -194,7 +194,6 @@ private:
     void displayPostRaceInfo();
     void displaySoccerResults();
     void displayScreenShots();
-    irr::core::stringw getKartDisplayName(const AbstractKart *kart) const;
 
     int  getFontHeight () const;
 
@@ -238,7 +237,8 @@ public:
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
                             bool important=true,
-                            bool big_font=false) OVERRIDE { }
+                            bool big_font=false,
+                            bool outline=false) OVERRIDE { }
 
     void nextPhase();
 

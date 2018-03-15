@@ -189,6 +189,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/referee.hpp"
+#include "graphics/sp/sp_base.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/dialog_queue.hpp"
@@ -202,6 +203,7 @@
 #include "items/projectile_manager.hpp"
 #include "karts/combined_characteristic.hpp"
 #include "karts/controller/ai_base_lap_controller.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/cutscene_world.hpp"
@@ -226,6 +228,7 @@
 #include "states_screens/register_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
+#include "states_screens/dialogs/init_android_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/track.hpp"
@@ -235,6 +238,7 @@
 #include "utils/crash_reporting.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/log.hpp"
+#include "utils/mini_glm.hpp"
 #include "utils/translation.hpp"
 
 static void cleanSuperTuxKart();
@@ -305,8 +309,9 @@ void gamepadVisualisation()
 
                     if (evt.PressedDown)
                     {
-                        if (evt.Key == KEY_RETURN || evt.Key == KEY_ESCAPE ||
-                            evt.Key == KEY_SPACE)
+                        if (evt.Key == IRR_KEY_RETURN || 
+                            evt.Key == IRR_KEY_ESCAPE ||
+                            evt.Key == IRR_KEY_SPACE)
                         {
                             exit(0);
                         }
@@ -420,7 +425,7 @@ void handleXmasMode()
     }   // switch m_xmas_mode
 
     if(xmas)
-        kart_properties_manager->setHatMeshName("christmas_hat.b3d");
+        kart_properties_manager->setHatMeshName("christmas_hat.spm");
 }   // handleXmasMode
 // ============================================================================
 /** Determines if Easter Ears should be used
@@ -477,7 +482,7 @@ void handleEasterEarMode()
     int day, month, year;
     StkTime::getDate(&day, &month, &year);
     if (isEasterMode(day, month, year, /*before_after_days*/5))
-        kart_properties_manager->setHatMeshName("easter_ears.b3d");
+        kart_properties_manager->setHatMeshName("easter_ears.spm");
 }   // handleEasterMode
 
 // ============================================================================
@@ -527,43 +532,45 @@ void cmdLineHelp()
 {
     fprintf(stdout,
     "Usage: %s [OPTIONS]\n\n"
-    "Run SuperTuxKart, a racing game with go-kart that features"
-    " the Tux and friends.\n\n"
+    "Run SuperTuxKart, a go-kart racing game that features "
+    "Tux and friends.\n\n"
     "Options:\n"
     "  -N,  --no-start-screen  Immediately start race without showing a "
                               "menu.\n"
     "  -R,  --race-now         Same as -N but also skip the ready-set-go phase"
                               " and the music.\n"
-    "  -t,  --track=NAME       Start at track NAME.\n"
+    "  -t,  --track=NAME       Start track NAME.\n"
     "       --gp=NAME          Start the specified Grand Prix.\n"
-    "       --add-gp-dir=DIR   Load Grand Prix in DIR. Setting will be saved "
-                              "inconfig.xml under additional_gp_directory. Use "
+    "       --add-gp-dir=DIR   Load Grand Prix files in DIR. Setting will be saved "
+                              "in config.xml under additional_gp_directory. Use "
                               "--add-gp-dir=\"\" to unset.\n"
     "       --stk-config=FILE  use ./data/FILE instead of "
                               "./data/stk_config.xml\n"
-    "  -k,  --numkarts=NUM     Number of karts on the racetrack.\n"
-    "       --kart=NAME        Use kart number NAME.\n"
+    "  -k,  --numkarts=NUM     Set number of karts on the racetrack.\n"
+    "       --kart=NAME        Use kart NAME.\n"
     "       --ai=a,b,...       Use the karts a, b, ... for the AI.\n"
     "       --laps=N           Define number of laps to N.\n"
-    "       --mode=N           N=1 novice, N=2 driver, N=3 racer.\n"
-    "       --type=N           N=0 Normal, N=1 Time trial, N=2 FTL\n"
+    "       --mode=N           N=1 Beginner, N=2 Intermediate, N=3 Expert, N=4 SuperTux.\n"
+    "       --type=N           N=0 Normal, N=1 Time trial, N=2 Follow The Leader\n"
     "       --reverse          Play track in reverse (if allowed)\n"
-    "  -f,  --fullscreen       Select fullscreen display.\n"
-    "  -w,  --windowed         Windowed display (default).\n"
-    "  -s,  --screensize=WxH   Set the screen size (e.g. 320x200).\n"
-    "  -v,  --version          Show version of SuperTuxKart.\n"
+    "  -f,  --fullscreen       Use fullscreen display.\n"
+    "  -w,  --windowed         Use windowed display (default).\n"
+    "  -s,  --screensize=WxH   Set the display size (e.g. 320x200).\n"
+    "  -v,  --version          Print version of SuperTuxKart.\n"
     "       --trackdir=DIR     A directory from which additional tracks are "
                               "loaded.\n"
     "       --profile-laps=n   Enable automatic driven profile mode for n "
                               "laps.\n"
     "       --profile-time=n   Enable automatic driven profile mode for n "
                               "seconds.\n"
+    "       --unlock-all       Permanently unlock all karts and tracks for testing.\n"
+    "       --no-unlock-all    Disable unlock-all (i.e. base unlocking on player achievement).\n"
     "       --no-graphics      Do not display the actual race.\n"
-    "       --demo-mode=t      Enables demo mode after t seconds idle time in "
+    "       --demo-mode=t      Enables demo mode after t seconds of idle time in "
                                "main menu.\n"
-    "       --demo-tracks=t1,t2 List of tracks to be used in demo mode. No\n"
+    "       --demo-tracks=t1,t2 List of tracks to be used in demo mode. No"
     "                          spaces are allowed in the track names.\n"
-    "       --demo-laps=n      Number of laps in a demo.\n"
+    "       --demo-laps=n      Number of laps to use in a demo.\n"
     "       --demo-karts=n     Number of karts to use in a demo.\n"
     // "       --history          Replay history file 'history.dat'.\n"
     // "       --history=n        Replay history file 'history.dat' using:\n"
@@ -589,6 +596,7 @@ void cmdLineHelp()
     "  -h,  --help             Show this help.\n"
     "       --log=N            Set the verbosity to a value between\n"
     "                          0 (Debug) and 5 (Only Fatal messages)\n"
+    "       --logbuffer=N      Buffers up to N lines log lines before writing.\n"
     "       --root=DIR         Path to add to the list of STK root directories.\n"
     "                          You can specify more than one by separating them\n"
     "                          with colons (:).\n"
@@ -596,16 +604,16 @@ void cmdLineHelp()
     "                          This is for internal debugging use only.\n"
     "       --enable-glow      Enable glow effect.\n"
     "       --disable-glow     Disable glow effect.\n"
-    "       --enable-bloom     Enable bloom graphical effect.\n"
-    "       --disable-bloom    Disable bloom graphical effect.\n"
+    "       --enable-bloom     Enable bloom effect.\n"
+    "       --disable-bloom    Disable bloom effect.\n"
     "       --enable-light-shaft Enable light shafts (God rays).\n"
     "       --disable-light-shaft Disable light shafts (God rays).\n"
     "       --enable-dof       Enable depth of field.\n"
     "       --disable-dof      Disable depth of field.\n"
-    "       --enable-gi        Enable global illumination.\n"
-    "       --disable-gi       Disable global illumination.\n"
-    "       --enable-gfx       Enable animated scenery.\n"
-    "       --disable-gfx      Disable animated scenery.\n"
+    "       --enable-particles  Enable particles.\n"
+    "       --disable-particles Disable particles.\n"
+    "       --enable-animated-characters  Enable animated characters.\n"
+    "       --disable-animated-characters Disable animated characters.\n"
     "       --enable-motion-blur Enable motion blur.\n"
     "       --disable-motion-blur Disable motion blur.\n"
     "       --enable-mlaa      Enable anti-aliasing.\n"
@@ -618,17 +626,18 @@ void cmdLineHelp()
     "       --disable-ibl      Disable image based lighting.\n"
     "       --enable-hd-textures Enable high definition textures.\n"
     "       --disable-hd-textures Disable high definition textures.\n"
-    "       --enable-dynamic-lights Enable advanced pipline graphical options.\n"
-    "       --disable-dynamic-lights Disable advanced pipline graphical options.\n"
-    "       --enable-trilinear Enable trilinear texture filtering.\n"
-    "       --disable-trilinear Use bilinear texture filtering.\n"
-    "       --anisotropic=n    Anisotropic filtering quality (0 to disable).\n"
-    "                          Takes precedence over trilinear or bilinear\n"
-    "                          texture filtering.\n"
-    "       --shadows=n        Set shadow quality (0 to disable shadows).\n"
+    "       --enable-dynamic-lights Enable advanced pipline.\n"
+    "       --disable-dynamic-lights Disable advanced pipline.\n"
+    "       --anisotropic=n     Anisotropic filtering quality (0 to disable).\n"
+    "                           Takes precedence over trilinear or bilinear\n"
+    "                           texture filtering.\n"
+    "       --shadows=n         Set resolution of shadows (0 to disable).\n"
+    "       --apitrace          This will disable buffer storage and\n"
+    "                           writing gpu query strings to opengl, which\n"
+    "                           can be seen later in apitrace.\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
-    "http://supertuxkart.net\n\n",
+    "https://supertuxkart.net\n\n",
     CommandLine::getExecName().c_str()
     );
 }   // cmdLineHelp
@@ -651,10 +660,6 @@ int handleCmdLineOutputModifier()
     {
         Log::info("main", "==============================");
         Log::info("main", "SuperTuxKart, %s.", STK_VERSION ) ;
-        // IRRLICHT_VERSION_SVN
-        Log::info("main", "Irrlicht version %i.%i.%i (%s)",
-                          IRRLICHT_VERSION_MAJOR , IRRLICHT_VERSION_MINOR,
-                          IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
         Log::info("main", "==============================");
         cleanUserConfig();
         exit(0);
@@ -663,6 +668,8 @@ int handleCmdLineOutputModifier()
     int n;
     if(CommandLine::has("--log", &n))
         Log::setLogLevel(n);
+    if (CommandLine::has("--logbuffer", &n))
+        Log::setBufferSize(n);
 
     if(CommandLine::has("--log=nocolor"))
     {
@@ -706,6 +713,12 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
     if(CommandLine::has("--online"))
         MainMenuScreen::m_enable_online=true;
+#if !(defined(SERVER_ONLY) || defined(ANDROID))
+    if(CommandLine::has("--apitrace"))
+    {
+        SP::sp_apitrace = true;
+    }
+#endif
 
     std::string s;
     if(CommandLine::has("--stk-config", &s))
@@ -799,16 +812,16 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_dof = true;
     else if (CommandLine::has("--disable-dof"))
         UserConfigParams::m_dof = false;
-    // global illumination
-    if (CommandLine::has("--enable-gi"))
-        UserConfigParams::m_gi = true;
-    else if (CommandLine::has("--disable-gi"))
-        UserConfigParams::m_gi = false;
-    // animated scenery
-    if (CommandLine::has("--enable-gfx"))
-        UserConfigParams::m_graphical_effects = true;
-    else if (CommandLine::has("--disable-gfx"))
-        UserConfigParams::m_graphical_effects = false;
+    // particles effects
+    if (CommandLine::has("--enable-particles"))
+        UserConfigParams::m_particles_effects = 2;
+    else if (CommandLine::has("--disable-particles"))
+        UserConfigParams::m_particles_effects = 0;
+    // animated characters
+    if (CommandLine::has("--enable-animated-characters"))
+        UserConfigParams::m_animated_characters = true;
+    else if (CommandLine::has("--disable-animated-characters"))
+        UserConfigParams::m_animated_characters = false;
     if (CommandLine::has("--enable-motion-blur"))
         UserConfigParams::m_motionblur = true;
     else if (CommandLine::has("--disable-motion-blur"))
@@ -837,11 +850,6 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_high_definition_textures =  2 | 1;
     else if (CommandLine::has("--disable-hd-textures"))
         UserConfigParams::m_high_definition_textures = 2;
-    if (CommandLine::has("--enable-trilinear"))
-        UserConfigParams::m_trilinear = true;
-    else if (CommandLine::has("--disable-trilinear"))
-        UserConfigParams::m_trilinear = false;
-
 
     // Enable loading grand prix from local directory
     if(CommandLine::has("--add-gp-dir", &s))
@@ -1133,7 +1141,7 @@ int handleCmdLine()
     if(CommandLine::has("--track", &s) || CommandLine::has("-t", &s))
     {
         race_manager->setTrack(s);
-        Log::verbose("main", "You choose to start in track '%s'.",
+        Log::verbose("main", "You chose to start in track '%s'.",
                      s.c_str());
 
         Track* t = track_manager->getTrack(s);
@@ -1143,7 +1151,7 @@ int handleCmdLine()
         }
         else if (t->isArena())
         {
-            //if it's arena, don't create ai karts
+            //if it's arena, don't create AI karts
             const std::vector<std::string> l;
             race_manager->setDefaultAIKartList(l);
             // Add 1 for the player kart
@@ -1152,7 +1160,7 @@ int handleCmdLine()
         }
         else if (t->isSoccer())
         {
-            //if it's soccer, don't create ai karts
+            //if it's soccer, don't create AI karts
             const std::vector<std::string> l;
             race_manager->setDefaultAIKartList(l);
             // Add 1 for the player kart
@@ -1164,6 +1172,7 @@ int handleCmdLine()
     // used only for debugging/testing
     if (CommandLine::has("--cutscene", &s))
     {
+        UserConfigParams::m_no_start_screen = true; // Purple menu background otherwise
         race_manager->setTrack(s);
         StateManager::get()->enterGameState();
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
@@ -1187,16 +1196,16 @@ int handleCmdLine()
 
     if(CommandLine::has("--numkarts", &n) ||CommandLine::has("-k", &n))
     {
-        UserConfigParams::m_num_karts = n;
-        if(UserConfigParams::m_num_karts > stk_config->m_max_karts)
+        UserConfigParams::m_default_num_karts = n;
+        if(UserConfigParams::m_default_num_karts > stk_config->m_max_karts)
         {
             Log::warn("main", "Number of karts reset to maximum number %d.",
                       stk_config->m_max_karts);
-            UserConfigParams::m_num_karts = stk_config->m_max_karts;
+            UserConfigParams::m_default_num_karts = stk_config->m_max_karts;
         }
-        race_manager->setNumKarts( UserConfigParams::m_num_karts );
+        race_manager->setNumKarts( UserConfigParams::m_default_num_karts );
         Log::verbose("main", "%d karts will be used.",
-                     (int)UserConfigParams::m_num_karts);
+                     (int)UserConfigParams::m_default_num_karts);
     }   // --numkarts
 
     if(CommandLine::has( "--no-start-screen") ||
@@ -1218,7 +1227,7 @@ int handleCmdLine()
         }
         else
         {
-            Log::verbose("main", "You choose to have %d laps.", laps);
+            Log::verbose("main", "You chose to have %d laps.", laps);
             race_manager->setNumLaps(laps);
         }
     }   // --laps
@@ -1238,7 +1247,17 @@ int handleCmdLine()
             race_manager->setNumLaps(n);
         }
     }   // --profile-laps
-
+    
+    if(CommandLine::has("--unlock-all"))
+    {
+        UserConfigParams::m_everything_unlocked = true;
+    } // --unlock-all
+    
+    if(CommandLine::has("--no-unlock-all"))
+    {
+        UserConfigParams::m_everything_unlocked = false;
+    } // --no-unlock-all
+    
     if(CommandLine::has("--profile-time",  &n))
     {
         Log::verbose("main", "Profiling: %d seconds.", n);
@@ -1320,7 +1339,7 @@ int handleCmdLine()
 
         if (request->isSuccess())
         {
-            Log::info("Main", "Logged in from command line.");
+            Log::info("Main", "Logged in from command-line.");
         }
     }
 
@@ -1380,9 +1399,9 @@ void initRest()
     font_manager->loadFonts();
     GUIEngine::init(device, driver, StateManager::get());
 
-    // This only initialises the non-network part of the addons manager. The
-    // online section of the addons manager will be initialised from a
-    // separate thread running in network http.
+    // This only initialises the non-network part of the add-ons manager. The
+    // online section of the add-ons manager will be initialised from a
+    // separate thread running in network HTTP.
     addons_manager          = new AddonsManager();
     Online::ProfileManager::create();
 
@@ -1467,7 +1486,7 @@ void askForInternetPermission()
             // Typically internet is disabled here (just better safe
             // than sorry). If internet should be allowed, the news
             // manager needs to be started (which in turn activates
-            // the addons manager).
+            // the add-ons manager).
             bool need_to_start_news_manager =
                 UserConfigParams::m_internet_status !=
                                   Online::RequestManager::IPERM_ALLOWED;
@@ -1550,6 +1569,9 @@ int main(int argc, char *argv[] )
         main_loop = new MainLoop();
         material_manager->loadMaterial();
 
+        // Preload the explosion effects (explode.png)
+        ParticleKindManager::get()->getParticles("explosion.xml");
+
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
@@ -1593,9 +1615,8 @@ int main(int argc, char *argv[] )
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "gift.png")       );
 
-        file_manager->popTextureSearchPath();
-
         attachment_manager->loadModels();
+        file_manager->popTextureSearchPath();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "banana.png")    );
@@ -1605,8 +1626,8 @@ int main(int argc, char *argv[] )
 
         addons_manager->checkInstalledAddons();
 
-        // Load addons.xml to get info about addons even when not
-        // allowed to access the internet
+        // Load addons.xml to get info about add-ons even when not
+        // allowed to access the Internet
         if (UserConfigParams::m_internet_status !=
             Online::RequestManager::IPERM_ALLOWED)
         {
@@ -1620,7 +1641,7 @@ int main(int argc, char *argv[] )
                 }
                 catch (std::runtime_error& e)
                 {
-                    Log::warn("Addons", "Exception thrown when initializing addons manager : %s", e.what());
+                    Log::warn("Addons", "Exception thrown when initializing add-ons manager : %s", e.what());
                 }
             }
         }
@@ -1631,37 +1652,74 @@ int main(int argc, char *argv[] )
             exit(0);
         }
 
-        if (!ProfileWorld::isNoGraphics() &&
-            GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
-        {
-            if (UserConfigParams::m_old_driver_popup)
-            {
-                MessageDialog *dialog =
-                    new MessageDialog(_("Your driver version is too old. Please install "
-                    "the latest video drivers."),
-                    /*from queue*/ true);
-                GUIEngine::DialogQueue::get()->pushDialog(dialog);
-            }
-            Log::warn("OpenGL", "Driver is too old!");
-        }
 #ifndef SERVER_ONLY
-        else if (!CVS->isGLSL())
+        if (!ProfileWorld::isNoGraphics())
         {
-            if (UserConfigParams::m_old_driver_popup)
+            // Some Android devices have only 320x240 and height >= 480 is bare
+            // minimum to make the GUI working as expected.
+            if (irr_driver->getActualScreenSize().Height < 480)
             {
-                #ifdef USE_GLES2
-                irr::core::stringw version = "OpenGL ES 3.0";
-                #else
-                irr::core::stringw version = "OpenGL 3.1";
-                #endif
-                MessageDialog *dialog =
-                    new MessageDialog(_("Your OpenGL version appears to be too old. Please verify "
-                    "if an update for your video driver is available. SuperTuxKart requires %s or better.",
-                    version),
-                    /*from queue*/ true);
-                GUIEngine::DialogQueue::get()->pushDialog(dialog);
+                if (UserConfigParams::m_old_driver_popup)
+                {
+                    MessageDialog *dialog =
+                        new MessageDialog(_("Your screen resolution is too "
+                                            "low to run STK."),
+                                            /*from queue*/ true);
+                    GUIEngine::DialogQueue::get()->pushDialog(dialog);
+                }
+                Log::warn("main", "Screen size is too small!");
             }
-            Log::warn("OpenGL", "OpenGL version is too old!");
+            
+            #ifdef ANDROID
+            if (UserConfigParams::m_multitouch_controls == 0)
+            {
+                int32_t touch = AConfiguration_getTouchscreen(
+                                                    global_android_app->config);
+                
+                if (touch != ACONFIGURATION_TOUCHSCREEN_NOTOUCH)
+                {
+                    InitAndroidDialog* init_android = new InitAndroidDialog(
+                                                                    0.6f, 0.6f);
+                    GUIEngine::DialogQueue::get()->pushDialog(init_android);
+                }
+            }
+            #endif
+
+            if (GraphicsRestrictions::isDisabled(
+                GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
+            {
+                if (UserConfigParams::m_old_driver_popup)
+                {
+                    MessageDialog *dialog =
+                        new MessageDialog(_("Your driver version is too old. "
+                                            "Please install the latest video "
+                                            "drivers."), /*from queue*/ true);
+                    GUIEngine::DialogQueue::get()->pushDialog(dialog);
+                }
+                Log::warn("OpenGL", "Driver is too old!");
+            }
+            else if (!CVS->isGLSL())
+            {
+                #if !defined(ANDROID)
+                if (UserConfigParams::m_old_driver_popup)
+                {
+                    #ifdef USE_GLES2
+                    irr::core::stringw version = "OpenGL ES 3.0";
+                    #else
+                    irr::core::stringw version = "OpenGL 3.3";
+                    #endif
+                    MessageDialog *dialog =
+                        new MessageDialog(_("Your OpenGL version appears to be "
+                                            "too old. Please verify if an "
+                                            "update for your video driver is "
+                                            "available. SuperTuxKart requires "
+                                            "%s or better.", version), 
+                                            /*from queue*/ true);
+                    GUIEngine::DialogQueue::get()->pushDialog(dialog);
+                }
+                #endif
+                Log::warn("OpenGL", "OpenGL version is too old!");
+            }
         }
 #endif
         // Note that on the very first run of STK internet status is set to
@@ -1741,9 +1799,8 @@ int main(int argc, char *argv[] )
             race_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
             main_loop->run();
-            // well, actually run() will never return, since
-            // it exits after replaying history (see history::GetNextDT()).
-            // So the next line is just to make this obvious here!
+            // The run() function will only return if the user aborts.
+            Log::flushBuffers();
             exit(-3);
         }
 
@@ -1773,8 +1830,10 @@ int main(int argc, char *argv[] )
     }  // try
     catch (std::exception &e)
     {
+        Log::flushBuffers();
         Log::error("main", "Exception caught : %s.",e.what());
         Log::error("main", "Aborting SuperTuxKart.");
+        Log::flushBuffers();
     }
 
     /* Program closing...*/
@@ -1797,6 +1856,8 @@ int main(int argc, char *argv[] )
 #ifdef DEBUG
     MemoryLeaks::checkForLeaks();
 #endif
+
+    Log::flushBuffers();
 
 #ifndef WIN32
     if (user_config) //close logfiles
@@ -1868,7 +1929,7 @@ static void cleanSuperTuxKart()
     // But still give them some additional time to finish. It avoids a
     // race condition where a thread might access the file manager after it
     // was deleted (in cleanUserConfig below), but before STK finishes and
-    // the os takes all threads down.
+    // the OS takes all threads down.
 
     if(!NewsManager::get()->waitForReadyToDeleted(2.0f))
     {
@@ -1888,12 +1949,12 @@ static void cleanSuperTuxKart()
     }
     SFXManager::destroy();
 
-    // Music manager can not be deleted before the sfx thread is stopped
-    // (since sfx commands can contain music information, which are
+    // Music manager can not be deleted before the SFX thread is stopped
+    // (since SFX commands can contain music information, which are
     // deleted by the music manager).
     delete music_manager;
 
-    // The addons manager might still be called from a currenty running request
+    // The add-ons manager might still be called from a currenty running request
     // in the request manager, so it can not be deleted earlier.
     if(addons_manager)  delete addons_manager;
 
@@ -1933,6 +1994,8 @@ void runUnitTests()
 {
     Log::info("UnitTest", "Starting unit testing");
     Log::info("UnitTest", "=====================");
+    Log::info("UnitTest", "MiniGLM");
+    MiniGLM::unitTesting();
     Log::info("UnitTest", "GraphicsRestrictions");
     GraphicsRestrictions::unitTesting();
     Log::info("UnitTest", "NetworkString");

@@ -41,6 +41,7 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
 {
     m_race_gui = race_gui;
     m_minimap_bottom = 0;
+    m_gui_action = false;
     m_directionnal_wheel_tex = NULL;
     m_pause_tex = NULL;
     m_nitro_tex = NULL;
@@ -76,6 +77,18 @@ RaceGUIMultitouch::~RaceGUIMultitouch()
 
 
 //-----------------------------------------------------------------------------
+/** Sets the multitouch race gui to its initial state
+ */
+void RaceGUIMultitouch::reset()
+{
+    if (m_device != NULL)
+    {
+        m_device->reset();
+    }
+}   // reset
+
+
+//-----------------------------------------------------------------------------
 /** Clears all previously created buttons in the multitouch device
  */
 void RaceGUIMultitouch::closeMultitouchSteering()
@@ -103,34 +116,50 @@ void RaceGUIMultitouch::initMultitouchSteering()
     const float btn_size = 0.125f * h * scale;
     const float btn2_size = 0.35f * h * scale;
     const float margin = 0.075f * h * scale;
-    const float top_margin = 0.3f * h;
+    const float margin_top = 0.3f * h;
     const float col_size = (btn_size + margin);
+
     const float small_ratio = 0.75f;
+    const float btn_small_size = small_ratio * btn_size;
+    const float margin_small = small_ratio * margin;
+    const float col_small_size = small_ratio * col_size;
+
+    float first_column_x = w - 2 * col_size;
+    float second_column_x = w - 1 * col_size;
+    float steering_btn_margin = 0.6f * margin;
+    float steering_btn_x = steering_btn_margin;
+    float steering_btn_y = h - steering_btn_margin - btn2_size;
+    
+    if (UserConfigParams::m_multitouch_inverted)
+    {
+        first_column_x = margin + 1 * col_size;
+        second_column_x = margin;
+        steering_btn_x = w - btn2_size - steering_btn_margin;
+    }
 
     m_minimap_bottom = (unsigned int)(h - 2 * col_size);
 
     m_device->addButton(BUTTON_STEERING,
-                      int(0.5f * margin), int(h - 0.5f * margin - btn2_size),
-                      int(btn2_size), int(btn2_size));
+                        int(steering_btn_x), int(steering_btn_y),
+                        int(btn2_size), int(btn2_size));
     m_device->addButton(BUTTON_ESCAPE,
-                      int(top_margin), int(small_ratio * margin),
-                      int(small_ratio * btn_size), int(small_ratio * btn_size));
+                        int(margin_top), int(margin_small),
+                        int(btn_small_size), int(btn_small_size));
     m_device->addButton(BUTTON_RESCUE,
-                      int(top_margin + small_ratio * col_size),
-                      int(small_ratio * margin),
-                      int(small_ratio * btn_size), int(small_ratio * btn_size));
+                        int(margin_top + col_small_size), int(margin_small),
+                        int(btn_small_size), int(btn_small_size));
     m_device->addButton(BUTTON_NITRO,
-                      int(w - 1 * col_size), int(h - 2 * col_size),
-                      int(btn_size), int(btn_size));
+                        int(second_column_x), int(h - 2 * col_size),
+                        int(btn_size), int(btn_size));
     m_device->addButton(BUTTON_SKIDDING,
-                      int(w - 1 * col_size), int(h - 1 * col_size),
-                      int(btn_size), int(btn_size));
+                        int(second_column_x), int(h - 1 * col_size),
+                        int(btn_size), int(btn_size));
     m_device->addButton(BUTTON_FIRE,
-                      int(w - 2 * col_size),  int(h - 2 * col_size),
-                      int(btn_size), int(btn_size));
+                        int(first_column_x),  int(h - 2 * col_size),
+                        int(btn_size), int(btn_size));
     m_device->addButton(BUTTON_LOOK_BACKWARDS,
-                      int(w - 2 * col_size), int(h - 1 * col_size),
-                      int(btn_size), int(btn_size));
+                        int(first_column_x), int(h - 1 * col_size),
+                        int(btn_size), int(btn_size));
                       
     m_directionnal_wheel_tex = irr_driver->getTexture(FileManager::GUI, 
                                               "android/directionnal_wheel.png");
@@ -147,6 +176,7 @@ void RaceGUIMultitouch::initMultitouchSteering()
                                                   "android/blur_bg_button.png");
     m_bg_button_focus_tex = irr_driver->getTexture(FileManager::GUI, 
                                             "android/blur_bg_button_focus.png");
+    m_gui_action_tex = irr_driver->getTexture(FileManager::GUI,"challenge.png");
 
 } // initMultitouchSteering
 
@@ -209,8 +239,12 @@ void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
             case MultitouchButtonType::BUTTON_FIRE:
             {
                 const Powerup* powerup = kart->getPowerup();
-                if (powerup->getType() != PowerupManager::POWERUP_NOTHING &&
-                    !kart->hasFinishedRace())
+                if (m_gui_action == true)
+                {
+                    btn_texture = m_gui_action_tex;
+                }
+                else if (powerup->getType() != PowerupManager::POWERUP_NOTHING
+                         && !kart->hasFinishedRace())
                 {
                     btn_texture = powerup->getIcon()->getTexture();
                 }
@@ -265,13 +299,14 @@ void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
                 float scale = UserConfigParams::m_multitouch_scale *
                     (float)(irr_driver->getActualScreenSize().Height) / 720.0f;
 
-                m_race_gui->drawEnergyMeter(button->x + button->width * 1.15f,
-                                            button->y + button->height * 1.35f,
+                m_race_gui->drawEnergyMeter(int(button->x + button->width * 1.15f),
+                                            int(button->y + button->height * 1.35f),
                                             kart, viewport,
                                             core::vector2df(scale, scale));
             }
             else if (button->type == MultitouchButtonType::BUTTON_FIRE &&
-                     kart->getPowerup()->getNum() > 1)
+                     kart->getPowerup()->getNum() > 1 && 
+                     m_gui_action == false)
             {
                 gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
                 core::rect<s32> pos((int)(button->x),

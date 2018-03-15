@@ -41,8 +41,6 @@ CAnimatedMeshSceneNode::CAnimatedMeshSceneNode(IAnimatedMesh* mesh,
 	#ifdef _DEBUG
 	setDebugName("CAnimatedMeshSceneNode");
 	#endif
-
-	setMesh(mesh);
 }
 
 
@@ -101,12 +99,12 @@ void CAnimatedMeshSceneNode::buildFrameNr(u32 timeMs)
 		if (FramesPerSecond > 0.f) //forwards...
 		{
 			if (CurrentFrameNr > EndFrame)
-				CurrentFrameNr = StartFrame + fmod(CurrentFrameNr - StartFrame, (f32)(EndFrame-StartFrame));
+				CurrentFrameNr = StartFrame + fmodf(CurrentFrameNr - StartFrame, (f32)(EndFrame-StartFrame));
 		}
 		else //backwards...
 		{
 			if (CurrentFrameNr < StartFrame)
-				CurrentFrameNr = EndFrame - fmod(EndFrame - CurrentFrameNr, (f32)(EndFrame-StartFrame));
+				CurrentFrameNr = EndFrame - fmodf(EndFrame - CurrentFrameNr, (f32)(EndFrame-StartFrame));
 		}
 	}
 	else
@@ -178,7 +176,7 @@ void CAnimatedMeshSceneNode::OnRegisterSceneNode()
 	}
 }
 
-IMesh * CAnimatedMeshSceneNode::getMeshForCurrentFrame(SkinningCallback sc, int offset)
+IMesh * CAnimatedMeshSceneNode::getMeshForCurrentFrame()
 {
 	if(Mesh->getMeshType() != EAMT_SKINNED)
 	{
@@ -203,7 +201,7 @@ IMesh * CAnimatedMeshSceneNode::getMeshForCurrentFrame(SkinningCallback sc, int 
 			skinnedMesh->animateMesh(getFrameNr(), 1.0f);
 
 		// Update the skinned mesh for the current joint transforms.
-		skinnedMesh->skinMesh(AnimationStrength, sc, offset);
+		skinnedMesh->skinMesh(AnimationStrength);
 
 		if (JointMode == EJUOR_READ)//read from mesh
 		{
@@ -1001,6 +999,61 @@ void CAnimatedMeshSceneNode::useAnimationSet(u32 set_num)
 	}
 	setFrameLoop(m_animation_set[set_num * 2], m_animation_set[set_num * 2 + 1]);
 }
+
+void CAnimatedMeshSceneNode::setFrameLoopOnce(s32 begin, s32 end)
+{
+	if (LoopCallBack != NULL || !Looping)
+	{
+		return;
+	}
+	Looping = false;
+	class MiniLoopSetter : public IAnimationEndCallBack
+	{
+	private:
+		int m_old_start, m_old_end, m_new_start, m_new_end;
+
+		bool m_run_cb;
+	public:
+		MiniLoopSetter(int old_start, int old_end, int new_start, int new_end)
+			: m_old_start(old_start), m_old_end(old_end),
+			m_new_start(new_start), m_new_end(new_end), m_run_cb(false) {}
+		virtual void OnAnimationEnd(IAnimatedMeshSceneNode* node)
+		{
+			if (!m_run_cb)
+			{
+				m_run_cb = true;
+				node->setFrameLoop(m_new_start, m_new_end);
+				return;
+			}
+			if (m_run_cb)
+			{
+				node->setFrameLoop(m_old_start, m_old_end);
+				node->setLoopMode(true);
+				node->setAnimationEndCallback(NULL);
+				return;
+			}
+		}
+	};
+	MiniLoopSetter* mls = new MiniLoopSetter(StartFrame, EndFrame,
+		begin, end);
+	setAnimationEndCallback(mls);
+	mls->drop();
+
+}
+
+s32 CAnimatedMeshSceneNode::getAnimationSet() const
+{
+	for (u32 i = 0; i < m_animation_set.size(); i += 2)
+	{
+		if (m_animation_set[i] == (u32)StartFrame &&
+			m_animation_set[i + 1] == (u32)EndFrame)
+		{
+			return (s32)(i >> 1);
+		}
+	}
+	return -1;
+}
+
 
 } // end namespace scene
 } // end namespace irr

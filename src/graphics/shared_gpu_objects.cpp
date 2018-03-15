@@ -18,26 +18,22 @@
 #ifndef SERVER_ONLY
 
 #include "graphics/shared_gpu_objects.hpp"
+#include "config/stk_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "utils/log.hpp"
 
-#include "matrix4.h"
-#include <algorithm>
-
-GLuint SharedGPUObjects::m_billboard_vbo;
 GLuint SharedGPUObjects::m_sky_tri_vbo;
 GLuint SharedGPUObjects::m_frustrum_vbo;
 GLuint SharedGPUObjects::m_frustrum_indices;
-GLuint SharedGPUObjects::m_particle_quad_vbo;
 GLuint SharedGPUObjects::m_View_projection_matrices_ubo;
 GLuint SharedGPUObjects::m_lighting_data_ubo;
 GLuint SharedGPUObjects::m_full_screen_quad_vao;
 GLuint SharedGPUObjects::m_ui_vao;
 GLuint SharedGPUObjects::m_quad_buffer;
 GLuint SharedGPUObjects::m_quad_vbo;
-GLuint SharedGPUObjects::m_skinning_ubo;
-int    SharedGPUObjects::m_max_mat4_size = 1024;
 bool   SharedGPUObjects::m_has_been_initialised = false;
+
+#include "matrix4.h"
 
 /** Initialises m_full_screen_quad_vbo.
  */
@@ -104,21 +100,6 @@ void SharedGPUObjects::initQuadBuffer()
 }   // initQuadBuffer
 
 // ----------------------------------------------------------------------------
-void SharedGPUObjects::initBillboardVBO()
-{
-    float QUAD[] = 
-    {
-        -.5, -.5, 0., 1.,
-        -.5,  .5, 0., 0.,
-         .5, -.5, 1., 1.,
-         .5,  .5, 1., 0.,
-    };
-    glGenBuffers(1, &m_billboard_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_billboard_vbo);
-    glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), QUAD, GL_STATIC_DRAW);
-}   // initBillboardVBO
-
-// ----------------------------------------------------------------------------
 void SharedGPUObjects::initSkyTriVBO()
 {
     const float TRI_VERTEX[] =
@@ -175,60 +156,18 @@ void SharedGPUObjects::initLightingDataUBO()
 }   // initLightingDataUBO
 
 // ----------------------------------------------------------------------------
-void SharedGPUObjects::initSkinningUBO()
-{
-    assert(CVS->isARBUniformBufferObjectUsable());
-    irr::core::matrix4 m;
-    glGenBuffers(1, &m_skinning_ubo);
-    glBindBuffer(GL_UNIFORM_BUFFER, m_skinning_ubo);
-    int max_size = 0;
-    glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &max_size);
-    max_size = std::min(max_size, 65536);
-    m_max_mat4_size = max_size / 16 / sizeof(float);
-    Log::info("SharedGPUObjects", "Hardware skinning supported, max joints"
-        " support: %d", m_max_mat4_size);
-    glBufferData(GL_UNIFORM_BUFFER, max_size, 0, GL_STREAM_DRAW);
-    // Reserve a identity matrix for non moving mesh in animated model used by
-    // vertex shader calculation
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * sizeof(float), m.pointer());
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-}   // initSkinningUBO
-
-// ----------------------------------------------------------------------------
-void SharedGPUObjects::initParticleQuadVBO()
-{
-    static const GLfloat QUAD_VERTEX[] =
-    {
-        -.5, -.5, 0., 0.,
-         .5, -.5, 1., 0.,
-        -.5,  .5, 0., 1.,
-         .5,  .5, 1., 1.,
-    };
-    glGenBuffers(1, &m_particle_quad_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_particle_quad_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(QUAD_VERTEX), QUAD_VERTEX,
-                 GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}   // initParticleQuadVBO
-
-// ----------------------------------------------------------------------------
 void SharedGPUObjects::init()
 {
     if (m_has_been_initialised)
         return;
     initQuadVBO();
     initQuadBuffer();
-    initBillboardVBO();
     initSkyTriVBO();
     initFrustrumVBO();
-    initParticleQuadVBO();
-    
     if (CVS->isARBUniformBufferObjectUsable())
     {
         initShadowVPMUBO();
         initLightingDataUBO();
-        if (CVS->supportsHardwareSkinning())
-            initSkinningUBO();
     }
 
     m_has_been_initialised = true;

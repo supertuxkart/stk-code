@@ -3,11 +3,11 @@
 <config>
   <!--  Minimum and maximum kart versions that can be used by this binary.
         Older version will be ignored. -->
-  <kart-version min="2" max="2"/>
+  <kart-version min="2" max="3"/>
 
   <!-- Minimum and maxium track versions that be be read by this binary.
        Older versions will be ignored. -->
-  <track-version min="6" max="6"/>
+  <track-version min="6" max="7"/>
 
   <!-- Maximum number of karts to be used at the same time. This limit
        can easily be increased, but some tracks might not have valid start
@@ -92,9 +92,17 @@
           case (all three normals discarded, the interpolation will just
           return the normal of the triangle (i.e. de facto no interpolation),
           but it helps making smoothing much more useful without fixing tracks.
+      fps: The physics timestep size
+      default-track-friction: Default friction to be used for the track and
+          any track/library pbject.
+      default-moveable-friction: Default friction to be used for any moveable,
+          e.g. karts, bowling balls, ...
       -->
   <physics smooth-normals="true"
-           smooth-angle-limit="0.65"/>
+           smooth-angle-limit="0.65"
+           fps="120"
+           default-track-friction="0.5"
+           default-moveable-friction="0.5" />
 
   <!-- The title music. -->
   <music title="main_theme.music"/>
@@ -392,9 +400,9 @@
            outside of the chassis and results in more stable physical
            behaviour of the karts. -->
     <collision impulse-type="normal"
-               impulse="3000" impulse-time="0.1" terrain-impulse="1600"
-               restitution="1.0" bevel-factor="0.5 0.0 0.7"
-               physical-wheel-position="-1" />
+               impulse="3000" impulse-time="0.1" terrain-impulse="160"
+               restitution="1.0" bevel-factor="0.5 0.0 0.3"
+               physical-wheel-position="0" />
 
      <!-- Skidding: increase: multiplicative increase of skidding factor in each frame.
               decrease: multiplicative decrease of skidding factor in each frame.
@@ -454,5 +462,22 @@
   -->
   <fonts-list normal-ttf="Cantarell-Regular.otf FreeSans.ttf wqy-microhei.ttf NotoNaskhArabicUI-Bold.ttf"
               digit-ttf="SigmarOne.otf" />
+
+  <!-- Maximum bones from all animated meshes in each frame to be uploaded for
+       hardware skinning, For gles 3.0 the specification guarantees at least 2048, for
+       TBO in desktop at least 65536 (max buffer size) / 64, SSBO at least 2^24 / 64,
+       so 1024 will work everywhere. -->
+  <skinning max-bones="1024"/>
+
+  <!-- For users with libsquish:
+    Use a slow but high quality colour compressor.
+    kColourClusterFit = (32),
+    Use a fast but low quality colour compressor.
+    kColourRangeFit	= (64),
+    Use a very slow but very high quality colour compressor.
+    kColourIterativeClusterFit = (256),
+    STK default the low quality.
+  -->
+  <texture-compression quality="64"/>
 
 </config>

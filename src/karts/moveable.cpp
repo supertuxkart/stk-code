@@ -20,6 +20,7 @@
 #include <math.h>
 #include "karts/moveable.hpp"
 
+#include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
@@ -89,7 +90,9 @@ void Moveable::reset()
         m_body->setAngularVelocity(btVector3(0, 0, 0));
         m_body->setCenterOfMassTransform(m_transform);
     }
+#ifndef SERVER_ONLY
     m_node->setVisible(true);  // In case that the objects was eliminated
+#endif
 
     Vec3 up       = getTrans().getBasis().getColumn(1);
     m_pitch       = atan2(up.getZ(), fabsf(up.getY()));
@@ -170,6 +173,7 @@ void Moveable::createBody(float mass, btTransform& trans,
     btRigidBody::btRigidBodyConstructionInfo info(mass, m_motion_state,
                                                   shape, inertia);
     info.m_restitution = restitution;
+    info.m_friction = stk_config->m_default_moveable_friction;
 
     // Then create a rigid body
     // ------------------------

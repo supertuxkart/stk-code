@@ -192,14 +192,17 @@ void ProgressBarAndroid::draw(float value)
     value = value > 1.0f ? 1.0f : value;
 
     m_close_event_received = !m_device->run();
-
-    m_device->getVideoDriver()->beginScene(true, true);
-
-    glClear(GL_COLOR_BUFFER_BIT);
-    glUniform1f(m_progress, value);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-
-    m_device->getVideoDriver()->endScene();
+    
+    if (!m_close_event_received)
+    {
+        m_device->getVideoDriver()->beginScene(true, true);
+    
+        glClear(GL_COLOR_BUFFER_BIT);
+        glUniform1f(m_progress, value);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    
+        m_device->getVideoDriver()->endScene();
+    }
 }
 
 #endif

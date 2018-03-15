@@ -65,6 +65,9 @@ RaceGUI::RaceGUI()
 {
     m_enabled = true;
     
+    if (UserConfigParams::m_artist_debug_mode && UserConfigParams::m_hide_gui)
+        m_enabled = false;
+
     // Determine maximum length of the rank/lap text, in order to
     // align those texts properly on the right side of the viewport.
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
@@ -83,6 +86,13 @@ RaceGUI::RaceGUI()
     float scaling = irr_driver->getFrameSize().Height / 480.0f;
     const float map_size = 100.0f;
     const float top_margin = 3.5f * m_font_height;
+    
+    if (UserConfigParams::m_multitouch_enabled && 
+        UserConfigParams::m_multitouch_mode != 0 &&
+        race_manager->getNumLocalPlayers() == 1)
+    {
+        m_multitouch_gui = new RaceGUIMultitouch(this);
+    }
     
     // Check if we have enough space for minimap when touch steering is enabled
     if (m_multitouch_gui != NULL)
@@ -111,7 +121,7 @@ RaceGUI::RaceGUI()
 
 
     // special case : when 3 players play, use available 4th space for such things
-    if (race_manager->getNumLocalPlayers() == 3)
+    if (race_manager->getIfEmptyScreenSpaceExists())
     {
         m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
     }
@@ -125,14 +135,18 @@ RaceGUI::RaceGUI()
 
     m_is_tutorial = (race_manager->getTrackName() == "tutorial");
 
+    // Load speedmeter texture before rendering the first frame
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
+    m_speed_meter_icon->getTexture();
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
+    m_speed_bar_icon->getTexture();
     //createMarkerTexture();
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
 RaceGUI::~RaceGUI()
 {
+    delete m_multitouch_gui;
 }   // ~Racegui
 
 
@@ -176,15 +190,13 @@ void RaceGUI::renderGlobal(float dt)
 
     // Special case : when 3 players play, use 4th window to display such
     // stuff (but we must clear it)
-    if (race_manager->getNumLocalPlayers() == 3 &&
+    if (race_manager->getIfEmptyScreenSpaceExists() &&
         !GUIEngine::ModalDialog::isADialogActive())
     {
         static video::SColor black = video::SColor(255,0,0,0);
-        GL32_draw2DRectangle(black,
-                              core::rect<s32>(irr_driver->getActualScreenSize().Width/2,
-                                              irr_driver->getActualScreenSize().Height/2,
-                                              irr_driver->getActualScreenSize().Width,
-                                              irr_driver->getActualScreenSize().Height));
+
+        GL32_draw2DRectangle(black, irr_driver->getSplitscreenWindow(
+            race_manager->getNumLocalPlayers()));
     }
 
     World *world = World::getWorld();
@@ -241,7 +253,15 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     
     drawPlungerInFace(camera, dt);
 
-    scaling *= viewport.getWidth()/800.0f; // scale race GUI along screen size
+    if (viewport.getWidth() != irr_driver->getActualScreenSize().Width)
+    {
+        scaling *= float(viewport.getWidth()) / float(irr_driver->getActualScreenSize().Width); // scale race GUI along screen size
+    }
+    else
+    {
+        scaling *= float(viewport.getWidth()) / 800.0f; // scale race GUI along screen size
+    }
+    
     drawAllMessages(kart, viewport, scaling);
 
     if(!World::getWorld()->isRacePhase()) return;
@@ -354,9 +374,10 @@ void RaceGUI::drawGlobalTimer()
                         irr_driver->getActualScreenSize().Width                  , 50);
 
     // special case : when 3 players play, use available 4th space for such things
-    if (race_manager->getNumLocalPlayers() == 3)
+    if (race_manager->getIfEmptyScreenSpaceExists())
     {
-        pos += core::vector2d<s32>(0, irr_driver->getActualScreenSize().Height/2);
+        pos -= core::vector2d<s32>(0, pos.LowerRightCorner.Y / 2);
+        pos += core::vector2d<s32>(0, irr_driver->getActualScreenSize().Height - irr_driver->getSplitscreenWindow(0).getHeight());
     }
 
     gui::ScalableFont* font = (use_digit_font ? GUIEngine::getHighresDigitFont() : GUIEngine::getFont());
@@ -398,12 +419,14 @@ void RaceGUI::drawGlobalMiniMap()
         const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
         track->mapPoint2MiniMap(xyz, &draw_at);
-        draw_at *= UserConfigParams::m_scale_rtts_factor;
-
+        
         video::ITexture* icon = sta ?
             irr_driver->getTexture(FileManager::GUI, "heart.png") :
             kart->getKartProperties()->getMinimapIcon();
-
+        if (icon == NULL)
+        {
+            continue;
+        }
         // int marker_height = m_marker->getSize().Height;
         core::rect<s32> source(core::position2di(0, 0), icon->getSize());
         int marker_half_size = (kart->getController()->isLocalPlayerController()
@@ -421,7 +444,7 @@ void RaceGUI::drawGlobalMiniMap()
     {
         Vec3 draw_at;
         track->mapPoint2MiniMap(sw->getBallPosition(), &draw_at);
-        draw_at *= UserConfigParams::m_scale_rtts_factor;
+        
         video::ITexture* icon =
             irr_driver->getTexture(FileManager::GUI, "soccer_ball_normal.png");
 
@@ -872,14 +895,18 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     if (lap < 0 ) return;
 
     core::recti pos;
-    pos.UpperLeftCorner.Y   = viewport.UpperLeftCorner.Y + m_font_height;
+    
+    pos.UpperLeftCorner.Y = viewport.UpperLeftCorner.Y + m_font_height;
+
     // If the time display in the top right is in this viewport,
     // move the lap/rank display down a little bit so that it is
     // displayed under the time.
-    if (viewport.UpperLeftCorner.Y==0 &&
-        viewport.LowerRightCorner.X==(int)(irr_driver->getActualScreenSize().Width) &&
-        race_manager->getNumPlayers()!=3)
-        pos.UpperLeftCorner.Y   += m_font_height;
+    if (viewport.UpperLeftCorner.Y == 0 &&
+        viewport.LowerRightCorner.X == (int)(irr_driver->getActualScreenSize().Width) &&
+        !race_manager->getIfEmptyScreenSpaceExists()) 
+    {
+        pos.UpperLeftCorner.Y += m_font_height;
+    }
     pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y+20;
     pos.UpperLeftCorner.X   = viewport.LowerRightCorner.X
                             - m_lap_width - 10;

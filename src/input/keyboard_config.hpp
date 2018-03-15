@@ -39,11 +39,13 @@ public:
                 KeyboardConfig();
     virtual    ~KeyboardConfig() {}
 
-    void        setDefaultBinds     ();
+    virtual void setDefaultBinds();
     virtual void save(std::ofstream& stream);
 
     // ------------------------------------------------------------------------
     virtual bool isGamePad()  const { return false; }
+    // ------------------------------------------------------------------------
+    virtual bool isGamePadAndroid()  const { return false; }
     // ------------------------------------------------------------------------
     virtual bool isKeyboard() const { return true; }
 

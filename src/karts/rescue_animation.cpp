@@ -18,18 +18,26 @@
 
 #include "karts/rescue_animation.hpp"
 
-#include "graphics/callbacks.hpp"
+#include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/referee.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
-#include "modes/world.hpp"
+#include "modes/world_with_rank.hpp"
 #include "physics/physics.hpp"
+#include "physics/triangle_mesh.hpp"
+#include "tracks/drive_graph.hpp"
+#include "tracks/quad.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_sector.hpp"
 
 #include "ISceneNode.h"
 
+#include <algorithm>
+
+#include "graphics/camera_normal.hpp"
 /** The constructor stores a pointer to the kart this object is animating,
  *  and initialised the timer.
  *  \param kart Pointer to the kart which is animated.
@@ -40,28 +48,41 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     m_referee     = new Referee(*m_kart);
     m_kart->getNode()->addChild(m_referee->getSceneNode());
     m_timer       = m_kart->getKartProperties()->getRescueDuration();
-    m_velocity    = m_kart->getKartProperties()->getRescueHeight() / m_timer;
+    m_up_vector   = m_kart->getTrans().getBasis().getColumn(1);
     m_xyz         = m_kart->getXYZ();
-
+    m_orig_rotation = m_kart->getRotation();
     m_kart->getAttachment()->clear();
 
-    // Get the current rotation of the kart
-    m_curr_rotation = m_kart->getNode()->getRotation() * DEGREE_TO_RAD;
+    // Determine maximum rescue height with up-raycast
+    float max_height = m_kart->getKartProperties()->getRescueHeight();
+    float hit_dest = maximumHeight();
+   
+    max_height = std::min(hit_dest, max_height);
+    m_velocity = max_height / m_timer;
 
     // Determine the rotation that will rotate the kart from the current
     // up direction to the right up direction it should have according to
-    // the normal at the kart's location
-    Vec3 up = m_kart->getTrans().getBasis().getColumn(1);
-    btQuaternion q = shortestArcQuat(up, m_kart->getNormal());
-   
-    // Store this rotation as 'delta HPR', which is added over time to the
-    // current rotation to end up (after m_timer seconds) with the right up
-    // rotation
-    m_add_rotation.setHPR(q);
-    m_add_rotation /= m_timer;
-
+    // the last vaild quad of the kart
+    WorldWithRank* wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
+    if (DriveGraph::get() && wwr &&
+        wwr->getTrackSector(m_kart->getWorldKartId())->getCurrentGraphNode() > -1)
+    {
+        const int sector = wwr->getTrackSector(m_kart->getWorldKartId())
+            ->getCurrentGraphNode();
+        const Vec3& quad_normal = DriveGraph::get()->getQuad(sector)
+            ->getNormal();
+        btQuaternion angle_rot(btVector3(0, 1, 0),
+            Track::getCurrentTrack()->getAngle(sector));
+        m_des_rotation = shortestArcQuat(Vec3(0, 1, 0), quad_normal) * angle_rot;
+        m_des_rotation.normalize();
+    }
+    else
+    {
+        m_des_rotation = m_orig_rotation;
+    }
+    
     // Add a hit unless it was auto-rescue
-    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
+    if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
         !is_auto_rescue)
     {
         ThreeStrikesBattle *world=(ThreeStrikesBattle*)World::getWorld();
@@ -69,51 +90,86 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
         if (UserConfigParams::m_arena_ai_stats)
             world->increaseRescueCount();
     }
+
 };   // RescueAnimation
+
 
 //-----------------------------------------------------------------------------
 /** This object is automatically destroyed when the timer expires.
  */
 RescueAnimation::~RescueAnimation()
 {
-    // If m_timer >=0, this object is deleted because the kart
-    // is deleted (at the end of a race), which means that
-    // world is in the process of being deleted. In this case
-    // we can't call removeKartAfterRescue() or getPhysics anymore.
-    if(m_timer < 0)
-        World::getWorld()->moveKartAfterRescue(m_kart);
+    m_kart->getBody()->setLinearVelocity(btVector3(0, 0, 0));
+    m_kart->getBody()->setAngularVelocity(btVector3(0, 0, 0));
     m_kart->getNode()->removeChild(m_referee->getSceneNode());
     delete m_referee;
     m_referee = NULL;
-    if(m_timer < 0)
-    {
-        m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
-        m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
-        Physics::getInstance()->addKart(m_kart);
-        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
-        {
-            Camera *camera = Camera::getCamera(i);
-            if(camera && camera->getKart()==m_kart &&
-                camera->getType() != Camera::CM_TYPE_END)
-                camera->setMode(Camera::CM_NORMAL);
-        }
-    }
 }   // ~RescueAnimation
 
+// Determine maximum rescue height with up-raycast
+float RescueAnimation::maximumHeight() 
+{
+    float hit_dest = 9999999.9f;
+
+    Vec3 hit;
+    const Material* m = NULL;
+    Vec3 to = m_up_vector * 10000.0f;
+    const TriangleMesh &tm = Track::getCurrentTrack()->getTriangleMesh();
+    if (tm.castRay(m_xyz, to, &hit, &m, NULL/*normal*/, /*interpolate*/true))
+    {
+        hit_dest = (hit - m_xyz).length();
+        hit_dest -= Referee::getHeight();
+        if (hit_dest < 1.0f)
+        {
+            hit_dest = 1.0f;
+        }
+    }
+    return hit_dest;
+}
 // ----------------------------------------------------------------------------
+
 /** Updates the kart animation.
  *  \param dt Time step size.
  *  \return True if the explosion is still shown, false if it has finished.
  */
 void RescueAnimation::update(float dt)
 {
-    m_xyz += dt*m_velocity * m_kart->getNormal();
-    m_kart->setXYZ(m_xyz);
-    m_curr_rotation += dt*m_add_rotation;
-    btMatrix3x3 m;
-    m.setEulerZYX(m_curr_rotation.getPitch(), m_curr_rotation.getHeading(),
-                   m_curr_rotation.getRoll());
-    m_kart->setRotation(m);
+
+    if (m_timer <= (m_kart->getKartProperties()->getRescueDuration() * rescue_moment))
+    {
+        if (kart_on_track == false) 
+        {
+            kart_on_track = true;
+
+            World::getWorld()->moveKartAfterRescue(m_kart);
+
+            for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
+            {
+                CameraNormal* camera = dynamic_cast<CameraNormal*>(Camera::getCamera(i));
+                if (camera && camera->getKart() == m_kart &&
+                    dynamic_cast<CameraNormal*>(camera)) 
+                {
+                    camera->setMode(Camera::CM_NORMAL);
+                    camera->snapToPosition();
+                }
+            }
+
+            m_up_vector = m_kart->getTrans().getBasis().getColumn(1);
+            m_xyz = m_kart->getXYZ();
+
+            float hit_dest = maximumHeight();
+            float max_height = std::min(hit_dest, m_kart->getKartProperties()->getRescueHeight()) * rescue_moment;
+            m_xyz += max_height * m_up_vector;
+        }
+
+        m_xyz -= dt * m_velocity * m_up_vector;
+        m_kart->setXYZ(m_xyz);
+    } 
+    else 
+    {
+        m_xyz += dt * m_velocity * m_up_vector;
+        m_kart->setXYZ(m_xyz);
+    }
 
     AbstractKartAnimation::update(dt);
 

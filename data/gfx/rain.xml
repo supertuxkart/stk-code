@@ -25,9 +25,5 @@
     
     <color     min="255 255 255"
                max="255 255 255"   />
-    
-    <!-- How much time in milliseconds before the particle is fully faded out  -->
-    <fadeout   time="100"          />
-
 
 </particles>
