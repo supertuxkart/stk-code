@@ -1719,7 +1719,7 @@ void SkiddingAI::handleNitroAndZipper()
     if( (m_kart->getEnergy()==0 ||
         m_ai_properties->m_nitro_usage==AIProperties::NITRO_NONE)  &&
         (m_kart->getPowerup()->getType()!=PowerupManager::POWERUP_ZIPPER ||
-         !m_ai_properties->m_item_usage_non_random )                         )
+         !m_ai_properties->m_item_usage_skill <= 1 )                         )
         return;
 
     // If there are items to avoid close, and we only have zippers, don't
