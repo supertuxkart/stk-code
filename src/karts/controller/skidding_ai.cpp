@@ -1256,7 +1256,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
 
     // 1) Filter and sort all items close by
     // -------------------------------------
-    const float max_item_lookahead_distance = 2.f;
+    const float max_item_lookahead_distance = 10.f;
     while(distance < max_item_lookahead_distance)
     {
         int n_index= DriveGraph::get()->getNode(node)->getIndex();
@@ -1353,7 +1353,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
            // Use shield if kart is going to hit a bad item (banana or bubblegum)
            if((ai_skill == 4) || (ai_skill == 5)) 
            {
-              if( !m_kart->isShielded() && items_to_avoid.size()>0)
+              if( !m_kart->isShielded() && items_to_avoid.size()>0) //TODO : calculate distance to closest
               {
                  m_controls->setFire(true);
                  m_controls->setLookBack(false);
@@ -1363,7 +1363,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
            // Use shield if kart is going to hit an item box
            else if (ai_skill == 5)
            {
-              if( !m_kart->isShielded() && items_to_collect.size()>0)
+              if( !m_kart->isShielded() && items_to_collect.size()>0) //TODO : calculate distance to closest
               {
                  if (items_to_collect[0]->getType() == Item::ITEM_BONUS_BOX)
                  {
