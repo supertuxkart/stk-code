@@ -1134,10 +1134,11 @@ void SkiddingAI::evaluateItems(const Item *item, Vec3 kart_aim_direction,
 /** Handle all items depending on the chosen strategy.
  *  Level 0 "AI" : do nothing (not used by default)
  *  Level 1 "AI" : use items after a random time
- *  Level 2 AI : TBD
- *  Level 3 AI : TBD
- *  Level 4 AI : TBD
- *  Level 5 AI : TBD (not yet used ; meant for SuperTux GP preferred kart or bosses race)
+ *  Level 2 AI : strategy detailed before each item
+ *  Level 3 AI : strategy detailed before each item
+ *  Level 4 AI : strategy detailed before each item
+ *  Level 5 AI : strategy detailed before each item
+ *  (level 5 is not yet used ; meant for SuperTux GP preferred karts or bosses race)
  *  \param dt Time step size.
  *  TODO: Implications of Bubble-Shield for AI's powerup-handling
 
@@ -1483,8 +1484,33 @@ void SkiddingAI::handleItems(const float dt)
         }
         break;   // POWERUP_ANVIL
 
+          
+    // Level 2 : Use the swatter immediately after a wait time
+    // Level 3 : Use the swatter when enemies are close
+    // Level 4 : Level 3 and use the swatter to remove bad attachments
+    // Level 5 : Same as level 4.
     case PowerupManager::POWERUP_SWATTER:
         {
+           Attachment::AttachmentType type = m_kart->getAttachment()->getType();
+           
+           if((ai_skill == 2) && (m_time_since_last_shot > 2.0f))
+           {
+               m_controls->setFire(true);
+               break;
+           }
+           
+           // Use swatter to remove bad attachments
+           if((ai_skill == 4) || (ai_skill == 5))
+           {
+               if( type == Attachment::ATTACH_BOMB
+               || type == Attachment::ATTACH_PARACHUTE
+               || type == Attachment::ATTACH_ANVIL )
+              {
+                  m_controls->setFire(true);
+                  m_controls->setLookBack(false);
+                  break;
+               }
+           }
             // Squared distance for which the swatter works
             float d2 = m_kart->getKartProperties()->getSwatterDistance();
             // if the kart has a shield, do not break it by using a swatter.
