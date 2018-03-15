@@ -274,7 +274,7 @@ public:
                                float fade_in_time);
     virtual float getSpeedIncreaseTimeLeft(unsigned int category) const;
     virtual void  setBoostAI     (bool boosted);
-    virtual bool  getBoostAI     ();
+    virtual bool  getBoostAI     () const;
     virtual void  collectedItem(Item *item, int random_attachment);
     virtual float getStartupBoost() const;
 
