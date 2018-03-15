@@ -1328,13 +1328,18 @@ void SkiddingAI::handleItems(const float dt)
            }
            break;   // POWERUP_BUBBLEGUM
        }
+          
+    // Level 2 : Use the cake against any close enemy, with priority to those ahead
+    // Level 3 : Don't fire on slower karts
+    // Level 4 : Same as level 3 TODO : Fire if the kart has a swatter which may hit us
+    // Level 5 : Same as level 4 TODO : Don't fire on a shielded kart if we're just behind (gum)
     case PowerupManager::POWERUP_CAKE:
         {
             // if the kart has a shield, do not break it by using a cake.
             if((m_kart->getShieldTime() > min_bubble_time) && (stk_config->m_shield_restrict_weapons == true))
                 break;
             // Leave some time between shots
-            if(m_time_since_last_shot<3.0f) break;
+            if(m_time_since_last_shot<2.0f) break;
 
             // Do not fire if the kart is driving too slow
             bool kart_behind_is_slow =
@@ -1356,9 +1361,12 @@ void SkiddingAI::handleItems(const float dt)
             // the kart anyway, or that this might force the kart ahead to
             // use its nitro/zipper (and then we will shoot since then the
             // kart is faster).
-            if ((fire_backwards && kart_behind_is_slow) ||
-                (!fire_backwards && kart_ahead_is_slow)    )
-                break;
+            if((ai_skill >= 3)
+            {
+               if ((fire_backwards && kart_behind_is_slow) ||
+                  (!fire_backwards && kart_ahead_is_slow)    )
+                  break;
+            }
 
             // Don't fire if the kart we are aiming at is invulnerable.
             if ((fire_backwards  && m_kart_behind && m_kart_behind->isInvulnerable()) ||
