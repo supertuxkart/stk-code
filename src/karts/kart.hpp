@@ -160,6 +160,9 @@ protected:
 
     /** Counter which is used for displaying wrong way message after a delay */
     float        m_wrongway_counter;
+    
+    /** True if the kart has been selected to have a boosted ai */
+    bool         m_boosted_ai;
 
 
     // Bullet physics parameters
