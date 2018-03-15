@@ -1132,7 +1132,13 @@ void SkiddingAI::evaluateItems(const Item *item, Vec3 kart_aim_direction,
 
 //-----------------------------------------------------------------------------
 /** Handle all items depending on the chosen strategy.
- *  Either (low level AI) just use an item after 10 seconds, or do a much
+ *  Level 0 "AI" : do nothing (not used by default)
+ *  Level 1 "AI" : use items after a random time
+ *  Level 2 "AI" : TBD
+ *  Level 3 "AI" : TBD
+ *  Level 4 "AI" : TBD
+ *  Level 5 "AI" : TBD (not yet used ; meant for SuperTux GP preferred kart or bosses race)
+ Either (low level AI) just use an item after 10 seconds, or do a much
  *  better job on higher level AI - e.g. aiming at karts ahead/behind, wait an
  *  appropriate time before using multiple items etc.
  *  \param dt Time step size.
@@ -1172,12 +1178,45 @@ void SkiddingAI::handleItems(const float dt)
         }
         return;
     }
+   
+   int ai_skill = 0;
+   if (m_ai_properties->m_item_usage_skill > 0)
+   {
+      if (m_ai_properties->m_item_usage_skill > 5)
+      {
+         ai_skill = 5;
+      }
+      else
+      {
+         ai_skill = m_ai_properties->m_item_usage_skill
+      }
+   }
+   
+   if (m_kart->getBoostAI() == true)
+   {
+      if (ai_skill < 5)
+      {
+         ai_skill = ai_skill + 1; //possible improvement : make the boost amplitude pulled from config
+      }
+   }
 
-    // Tactic 1: wait ten seconds, then use item
+    // Tactic 0: don't use item
     // -----------------------------------------
-    if(!m_ai_properties->m_item_usage_non_random)
+    if(ai_skill == 0)
     {
-        if( m_time_since_last_shot > 10.0f )
+        return;
+    }
+
+    // Tactic 1: wait between 5 and 10 seconds, then use item
+    // ------------------------------------------------------
+    if(ai_skill == 1)
+    {
+       int random_t = 0;
+       g = RandomGenerator();
+       random_t = g.get(6);
+       random_t = random_t + 5;
+          
+        if( m_time_since_last_shot > random_t )
         {
             m_controls->setFire(true);
             m_time_since_last_shot = 0.0f;
@@ -1185,8 +1224,8 @@ void SkiddingAI::handleItems(const float dt)
         return;
     }
 
-    // Tactic 2: calculate
-    // -------------------
+    // Tactics 2 to 5: calculate
+    // -----------------------------------------
     float min_bubble_time = 2.0f;
 
     switch( m_kart->getPowerup()->getType() )
