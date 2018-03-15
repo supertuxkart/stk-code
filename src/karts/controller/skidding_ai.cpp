@@ -1360,8 +1360,9 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
                  break;
               }             
            }
+           
            // Use shield if kart is going to hit an item box
-           else if (ai_skill == 5)
+           if (ai_skill == 5)
            {
               if( !m_kart->isShielded() && items_to_collect.size()>0) //TODO : calculate distance to closest
               {
