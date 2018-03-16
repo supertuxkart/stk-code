@@ -50,6 +50,9 @@ public:
     }
     virtual void init() OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;
+     /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void tearDown() OVERRIDE;
+
 };
 
 #endif // NETWORK_KART_SELECTION_HPP

@@ -147,7 +147,6 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
         kart.addUInt8(LobbyProtocol::LE_KART_SELECTION).addUInt8(player_count)
             .encodeString(selection);
         STKHost::get()->sendToServer(&kart, true);
-        input_manager->getDeviceManager()->setAssignMode(ASSIGN);
         // Remove kart screen
         StateManager::get()->popMenu();
         TracksScreen::getInstance()->setNetworkTracks();
@@ -156,10 +155,18 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
 }   // playerConfirm
 
 // ----------------------------------------------------------------------------
+void NetworkKartSelectionScreen::tearDown()
+{
+    KartSelectionScreen::tearDown();
+    input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+}   // tearDown
+
+// ----------------------------------------------------------------------------
 bool NetworkKartSelectionScreen::onEscapePressed()
 {
     // then remove the lobby screen (you left the server)
     StateManager::get()->popMenu();
     STKHost::get()->shutdown();
+    input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
     return true; // remove the screen
 }   // onEscapePressed
