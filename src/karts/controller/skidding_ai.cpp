@@ -1925,11 +1925,11 @@ void SkiddingAI::handleNitroAndZipper()
    {
       if (m_ai_properties->m_nitro_usage > 4)
       {
-         nitro_usage = 4;
+         nitro_skill = 4;
       }
       else
       {
-         nitro_usage = m_ai_properties->m_nitro_usage;
+         nitro_skill = m_ai_properties->m_nitro_usage;
       }
    }
    
@@ -1944,39 +1944,63 @@ void SkiddingAI::handleNitroAndZipper()
          nitro_skill = nitro_skill + 1; //possible improvement : make the boost amplitude pulled from config
       }
    }
+   
+   if (m_kart->getPowerup()->getType()!=PowerupManager::POWERUP_ZIPPER)
+   {
+      ai_skill = 0; //don't try to use the zipper if there is none  
+   }
+   
+   //Nitro skill 0 : don't use
+   //Nitro skill 1 : don't use if the kart is braking, on the ground, has finished the race, has no nitro,
+   //                has a parachute or an anvil attached, or has a plunger in the face.
+   //                Otherwise, use it immediately
+   //Nitro skill 2 : TBD
+   //Nitro skill 3 : TBD
+   //Nitro skill 4 : Level 3 and ignore the plunger
+   
     m_controls->setNitro(false);
-    // If we are already very fast, save nitro.
-    if(m_kart->getSpeed() > 0.95f*m_kart->getCurrentMaxSpeed())
-        return;
-    // Don't use nitro when the AI has a plunger in the face!
-    if(m_kart->getBlockedByPlungerTime()>0) return;
-
-    // Don't use nitro if we are braking
+   
+    // Don't use nitro or zipper if we are braking
     if(m_controls->getBrake()) return;
-
-    // Don't use nitro if the kart is not on ground or has finished the race
+   
+    // Don't use nitro or zipper if the kart is not on ground or has finished the race
     if(!m_kart->isOnGround() || m_kart->hasFinishedRace()) return;
-
-    // Don't compute nitro usage if we don't have nitro or are not supposed
-    // to use it, and we don't have a zipper or are not supposed to use
-    // it (calculated).
-    if( (m_kart->getEnergy()==0 || m_ai_properties->m_nitro_usage == 0)  &&
-        (m_kart->getPowerup()->getType()!=PowerupManager::POWERUP_ZIPPER ||
-         (m_ai_properties->m_item_usage_skill <= 1) )                     )
-        return;
-
-    // If there are items to avoid close, and we only have zippers, don't
-    // use them (since this make it harder to avoid items).
-    if(m_avoid_item_close &&
-        (m_kart->getEnergy()==0 ||
-         m_ai_properties->m_nitro_usage == 0) )
-        return;
-    // If a parachute or anvil is attached, the nitro doesn't give much
+   
+    // Don't use nitro or zipper when the AI has a plunger in the face!
+    if(m_kart->getBlockedByPlungerTime()>0)
+    {
+        if ((nitro_skill < 4) && (ai_skill < 5))
+        {
+           return;
+        }
+       else if (nitro_skill < 4)
+       {
+           nitro_skill = 0;  
+       }
+       else if (ai_skill < 5)
+       {
+           ai_skill = 0;  
+       }
+    }
+   
+    // If a parachute or anvil is attached, the nitro and zipper don't give much
     // benefit. Better wait till later.
     const bool has_slowdown_attachment =
         m_kart->getAttachment()->getType()==Attachment::ATTACH_PARACHUTE ||
         m_kart->getAttachment()->getType()==Attachment::ATTACH_ANVIL;
     if(has_slowdown_attachment) return;
+   
+    // Don't compute nitro usage if we don't have nitro or are not supposed
+    // to use it, and we don't have a zipper or are not supposed to use
+    // it (calculated).
+    if( (m_kart->getEnergy()==0 || nitro_skill == 0)  && (ai_skill <= 1) )
+        return;
+
+    // If there are items to avoid close, and we only have zippers, don't
+    // use them (since this make it harder to avoid items).
+    if(m_avoid_item_close &&
+        (m_kart->getEnergy()==0 || m_ai_properties->m_nitro_usage == 0) )
+        return;
 
     // If the kart is very slow (e.g. after rescue), use nitro
     if(m_kart->getSpeed()<5)
@@ -2037,8 +2061,7 @@ void SkiddingAI::handleNitroAndZipper()
         return;
     }
 
-    if(m_kart->getPowerup()->getType()==PowerupManager::POWERUP_ZIPPER &&
-        m_kart->getSpeed()>1.0f &&
+    if(ai_skill >= 2 && m_kart->getSpeed()>1.0f &&
         m_kart->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0)
     {
         DriveNode::DirectionType dir;
