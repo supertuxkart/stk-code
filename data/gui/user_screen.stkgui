@@ -68,7 +68,7 @@
 								 I18N="In the user screen" text="Cancel" label_location="bottom"/>
 				</buttonbar>
 			</div>
-			<spacer width="20" height="25"/>
+			<spacer width="20" height="40"/>
         </box>
         <spacer width="20" height="15"/>
     </div>
