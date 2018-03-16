@@ -492,6 +492,8 @@ void SkiddingAI::handleSteering(float dt)
     }
     //If we are going to crash against a kart, avoid it if it doesn't
     //drives the kart out of the road
+    //TODO : adds item handling to use a cake if available to
+    //open the road
     else if( m_crashes.m_kart != -1 && !m_crashes.m_road )
     {
         //-1 = left, 1 = right, 0 = no crash.
@@ -1256,7 +1258,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
 
     // 1) Filter and sort all items close by
     // -------------------------------------
-    const float max_item_lookahead_distance = 10.f;
+    const float max_item_lookahead_distance = 20.0f;
     while(distance < max_item_lookahead_distance)
     {
         int n_index= DriveGraph::get()->getNode(node)->getIndex();
@@ -1280,10 +1282,11 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
     switch( m_kart->getPowerup()->getType() )
     {
     // Level 2 : Use the shield immediately after a wait time
-    // Level 3 : Use the shield against flyable except cakes. Use the shield against bad attachments.
+    // Level 3 : Use the shield against flyables except cakes. Use the shield against bad attachments.
     //           Use the bubble gum against an enemy close behind, except if holding a swatter.
-    // Level 4 : Level 3 and protect against cakes too
-    // Level 5 : Level 4 and let plunger hit (can use the shield after)
+    // Level 4 : Level 3, and protect against cakes too, and use before hitting gum/banana
+    // Level 5 : Level 4, and use before hitting item box, and let plunger hit
+    //           (can use the shield after)
     case PowerupManager::POWERUP_BUBBLEGUM:
         {
            Attachment::AttachmentType type = m_kart->getAttachment()->getType();
@@ -1353,20 +1356,27 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
            // Use shield if kart is going to hit a bad item (banana or bubblegum)
            if((ai_skill == 4) || (ai_skill == 5)) 
            {
-              if( !m_kart->isShielded() && items_to_avoid.size()>0) //TODO : calculate distance to closest
+              if( !m_kart->isShielded() && items_to_avoid.size()>0)
               {
-                 m_controls->setFire(true);
-                 m_controls->setLookBack(false);
-                 break;
-              }             
+                 float d = (items_to_avoid[0]->getXYZ() - m_kart->getXYZ()).length2();
+                 
+                 if ((ai_skill == 4 && d < 1.5f) || (ai_skill == 5 && d < 0.7f)
+                 {
+                    m_controls->setFire(true);
+                    m_controls->setLookBack(false);
+                    break;
+                 }
+              }
            }
            
            // Use shield if kart is going to hit an item box
            if (ai_skill == 5)
            {
-              if( !m_kart->isShielded() && items_to_collect.size()>0) //TODO : calculate distance to closest
+              if( !m_kart->isShielded() && items_to_collect.size()>0)
               {
-                 if (items_to_collect[0]->getType() == Item::ITEM_BONUS_BOX)
+                 float d = (items_to_collect[0]->getXYZ() - m_kart->getXYZ()).length2();
+                 
+                 if ((items_to_collect[0]->getType() == Item::ITEM_BONUS_BOX) && (d < 0.7f))
                  {
                     m_controls->setFire(true);
                     m_controls->setLookBack(false);
