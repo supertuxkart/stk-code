@@ -24,8 +24,6 @@
 
 #include "network/remote_kart_info.hpp"
 
-#include <algorithm>
-#include <functional>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -90,10 +88,11 @@ public:
     {
         std::lock_guard<std::mutex> lock(m_players_mutex);
         std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
-        std::transform(m_players.begin(), m_players.end(),
-            std::back_inserter(players),
-            std::bind(&std::weak_ptr<NetworkPlayerProfile>::lock,
-            std::placeholders::_1));
+        for (auto player_weak : m_players)
+        {
+            if (auto player_connected = player_weak.lock())
+                players.push_back(player_connected);
+        }
         return players;
     }   // getConnectedPlayers
     // ------------------------------------------------------------------------
