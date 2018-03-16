@@ -1146,7 +1146,7 @@ void SkiddingAI::evaluateItems(const Item *item, Vec3 kart_aim_direction,
  *  Level 3 AI : strategy detailed before each item
  *  Level 4 AI : strategy detailed before each item
  *  Level 5 AI : strategy detailed before each item
- *  (level 5 is not yet used ; meant for SuperTux GP preferred karts or bosses race)
+ *  (level 5 is not yet used ; meant for SuperTux GP preferred karts or boss races)
  *  \param dt Time step size.
  *  TODO: Implications of Bubble-Shield for AI's powerup-handling
 
@@ -1360,7 +1360,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
               {
                  float d = (items_to_avoid[0]->getXYZ() - m_kart->getXYZ()).length2();
                  
-                 if ((ai_skill == 4 && d < 1.5f) || (ai_skill == 5 && d < 0.7f)
+                 if ((ai_skill == 4 && d < 1.5f) || (ai_skill == 5 && d < 0.7f))
                  {
                     m_controls->setFire(true);
                     m_controls->setLookBack(false);
@@ -1544,14 +1544,131 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
             break;
         }   // POWERUP_PLUNGER
 
+    // Level 2 : Use the switch after a wait time
+    // Level 3 : Same as level 2 but don't fire if close to a good item
+    // Level 4 : Same as level 3 and fire if very close to a bad item
+    // Level 5 : Use if it makes a better item available, or if very close
+    //           to a bad item. Don't use it if too close of a good item.
     case PowerupManager::POWERUP_SWITCH:
-        // For now don't use a switch if this kart is first (since it's more
-        // likely that this kart then gets a good iteam), otherwise use it
-        // after a waiting an appropriate time
-        if(m_kart->getPosition()>1 &&
-            m_time_since_last_shot > stk_config->m_item_switch_time+2.0f)
-            m_controls->setFire(true);
-        break;   // POWERUP_SWITCH
+        {
+            // It's extremely unlikely two switches are used close one after another
+            if(ai_skill == 2)
+            {
+                if (m_time_since_last_shot > 2.0f)
+                {
+                    m_controls->setFire(true);
+                   break;
+                }
+            }
+                     
+            else if((ai_skill == 3) || (ai_skill == 4))
+            {
+               if( (ai_skill == 4) && items_to_avoid.size() > 0)
+               {
+                   float d = (items_to_avoid[0]->getXYZ() - m_kart->getXYZ()).length2();
+               
+                   if (d < 2.0f)
+                   {
+                       m_controls->setFire(true);
+                       break;
+                   }
+                }
+                else if (items_to_collect.size() > 0)
+                {
+                    float d = (items_to_collect[0]->getXYZ() - m_kart->getXYZ()).length2();
+               
+                    if (d > 10.0f)
+                    {
+                        m_controls->setFire(true);
+                        break;
+                    }
+                }
+                else if (m_time_since_last_shot > 2.0f)
+                {
+                     m_controls->setFire(true);
+                     break;
+                }
+            }
+       
+            //TODO : retrieve ranking powerup class and use it to evaluate the best item
+            //       available depending of if the switch is used or not
+            //       In the mean time big nitro > item box > small nitro
+            //TODO : make steering switch-aware so that the kart goes towards a bad item
+            //       and use the switch at the last moment
+            //It would also be possible but complicated to check if using the switch will
+            //cause another kart not far from taking a bad item instead of a good one
+            //It should also be possible but complicated to discard items when a good
+            //and a bad one are two close from one another
+            else if(ai_skill == 5)
+            {  
+               //First step : identify the best available item
+               int i;
+               int bad = 0;
+               int good = 0;
+
+               //Good will store 1 for nitro, big or small, 2 for item box
+               //Big nitro are usually hard to take for the AI
+               for(i=items_to_collect.size()-1; i>=0; i--)
+               {
+                   if (items_to_collect[i]->getType() == Item::ITEM_BONUS_BOX)
+                   {
+                      good = 2;
+                     i = -1;
+                   }
+                  else if ( (items_to_collect[i]->getType() == Item::ITEM_NITRO_BIG) ||
+                            (items_to_collect[i]->getType() == Item::ITEM_NITRO_SMALL) )
+                  {
+                      good = 1;
+                  }
+               }
+           
+               //Bad will store 2 for bananas, 3 for bubble gum
+               for(i=items_to_avoid.size()-1; i>=0; i--)
+               {
+                   if (items_to_avoid[i]->getType() == Item::ITEM_BUBBLEGUM)
+                   {
+                      bad = 3;
+                      i = -1;
+                   }
+                   else if ( items_to_avoid[i]->getType() == Item::ITEM_BANANA )
+                   {
+                      bad = 2;
+                   }
+               }
+           
+               //Second step : make sure a close item don't make the choice pointless
+               if( items_to_avoid.size()>0)
+               {
+                   float d = (items_to_avoid[0]->getXYZ() - m_kart->getXYZ()).length2();
+               
+                   //fire if very close to a bad item
+                   if (d < 2.0f)
+                   {
+                      m_controls->setFire(true);
+                      break;
+                   }
+               }
+               if( items_to_collect.size()>0)
+               {
+                  float d = (items_to_collect[0]->getXYZ() - m_kart->getXYZ()).length2();
+               
+                  //don't fire if close to a good item
+                  if (d < 5.0f)
+                  {
+                     break;
+                  }
+               }
+           
+               //Third step : Use or don't use to get the best available item
+               if( bad > good)
+               {
+                  m_controls->setFire(true);
+                  break;
+               }
+            } //ai_skill == 5
+                     
+            break;
+        } // POWERUP_SWITCH
 
     case PowerupManager::POWERUP_PARACHUTE:
         // Wait one second more than a previous parachute
