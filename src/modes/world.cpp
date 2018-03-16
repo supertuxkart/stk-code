@@ -365,11 +365,11 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     case RaceManager::KT_PLAYER:
     {
         controller = new LocalPlayerController(new_kart, local_player_id);
-        const float hue = StateManager::get()->getActivePlayer(local_player_id)
-            ->getConstProfile()->getDefaultKartColor();
-        if (hue > 0.0f)
+        const PlayerProfile* p = StateManager::get()
+            ->getActivePlayer(local_player_id)->getConstProfile();
+        if (p && p->getDefaultKartColor() > 0.0f)
         {
-            ri->setHue(hue);
+            ri->setHue(p->getDefaultKartColor());
         }
 
         m_num_players ++;
