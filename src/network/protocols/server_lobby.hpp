@@ -93,7 +93,7 @@ private:
     void updatePlayerList();
     void updateServerOwner();
     bool checkPeersReady() const;
-    void handleVote();
+    std::tuple<std::string, uint8_t, bool> handleVote();
 
 public:
              ServerLobby();

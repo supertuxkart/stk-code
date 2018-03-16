@@ -66,13 +66,6 @@ void LobbyProtocol::loadWorld()
     // This creates the network world.
     RaceEventManager::getInstance<RaceEventManager>()->start();
 
-    // The number of karts includes the AI karts, which are not supported atm
-    race_manager->setNumKarts(m_game_setup->getPlayerCount());
-
-    // Set number of global and local players.
-    race_manager->setNumPlayers(m_game_setup->getPlayerCount(),
-                                m_game_setup->getNumLocalPlayers());
-
     // Make sure that if there is only a single local player this player can
     // use all input devices.
     StateManager::ActivePlayer *ap = race_manager->getNumLocalPlayers()>1
@@ -80,8 +73,6 @@ void LobbyProtocol::loadWorld()
                                    : StateManager::get()->getActivePlayer(0);
 
     input_manager->getDeviceManager()->setSinglePlayer(ap);
-
-    Log::info("LobbyProtocol", "Player configuration ready.");
 
     // Load the actual world.
     m_game_setup->loadWorld();
@@ -92,15 +83,22 @@ void LobbyProtocol::loadWorld()
 }   // loadWorld
 
 // ----------------------------------------------------------------------------
-void LobbyProtocol::configRemoteKart()
+void LobbyProtocol::configRemoteKart(
+      const std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const
 {
+    // The number of karts includes the AI karts, which are not supported atm
+    race_manager->setNumKarts(players.size());
+
+    // Set number of global and local players.
+    race_manager->setNumPlayers(players.size(),
+        m_game_setup->getNumLocalPlayers());
+
     // Create the kart information for the race manager:
     // -------------------------------------------------
-    /*std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();
     int local_player_id = 0;
     for (unsigned int i = 0; i < players.size(); i++)
     {
-        NetworkPlayerProfile* profile = players[i];
+        std::shared_ptr<NetworkPlayerProfile> profile = players[i];
         bool is_local = profile->isLocalPlayer();
 
         // All non-local players are created here. This means all players
@@ -123,7 +121,8 @@ void LobbyProtocol::configRemoteKart()
                            profile->getName(),
                            profile->getHostId(),
                           !is_local);
-        rki.setGlobalPlayerId(profile->getGlobalPlayerId());
+        rki.setGlobalPlayerId(i);
+        rki.setDefaultKartColor(profile->getDefaultKartColor());
         rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
         if (is_local)
         {
@@ -133,7 +132,8 @@ void LobbyProtocol::configRemoteKart()
 
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);
-    }   // for i in players*/
+    }   // for i in players
+    Log::info("LobbyProtocol", "Player configuration ready.");
 }   // configRemoteKart
 
 // ----------------------------------------------------------------------------

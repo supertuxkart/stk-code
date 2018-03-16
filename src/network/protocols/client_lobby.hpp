@@ -44,6 +44,8 @@ private:
     std::set<std::string> m_available_karts;
     std::set<std::string> m_available_tracks;
 
+    void addAllPlayers(Event* event);
+
 public:
              ClientLobby();
     virtual ~ClientLobby();

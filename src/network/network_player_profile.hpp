@@ -91,7 +91,7 @@ public:
     int getGlobalPlayerId() const { return m_global_player_id; }
     // ------------------------------------------------------------------------
     /** Returns the host id of this player. */
-    uint8_t getHostId() const { return m_host_id; }
+    uint32_t getHostId() const { return m_host_id; }
     // ------------------------------------------------------------------------
     /** Sets the kart name for this player. */
     void setKartName(const std::string &kart_name) { m_kart_name = kart_name; }
@@ -116,7 +116,7 @@ public:
     // ------------------------------------------------------------------------
     float getDefaultKartColor() const { return m_default_kart_color; }
     // ------------------------------------------------------------------------
-    uint32_t getOnlineID() const { return m_online_id; }
+    uint32_t getOnlineId() const { return m_online_id; }
     // ------------------------------------------------------------------------
     bool isOfflineAccount() const { return m_online_id == 0; }
     // ------------------------------------------------------------------------

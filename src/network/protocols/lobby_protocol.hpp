@@ -25,6 +25,9 @@
 class GameSetup;
 class NetworkPlayerProfile;
 
+#include <memory>
+#include <vector>
+
 /*!
  * \class LobbyProtocol
  * \brief Base class for both client and server lobby. The lobbies are started
@@ -75,7 +78,8 @@ protected:
     /** Stores data about the online game to play. */
     GameSetup* m_game_setup;
 
-    void configRemoteKart();
+    void configRemoteKart(
+     const std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
 
 public:
 

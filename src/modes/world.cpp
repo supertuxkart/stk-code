@@ -341,6 +341,13 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
         gk = ReplayPlay::get()->getNumGhostKart();
 
     std::shared_ptr<RenderInfo> ri = std::make_shared<RenderInfo>();
+    if (global_player_id > -1 && race_manager->getKartInfo(global_player_id)
+        .getDefaultKartColor() > 0.0f)
+    {
+        ri->setHue(race_manager->getKartInfo(global_player_id)
+            .getDefaultKartColor());
+    }
+
     int position           = index+1;
     btTransform init_pos   = getStartTransform(index - gk);
     AbstractKart *new_kart;
@@ -357,10 +364,7 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     {
     case RaceManager::KT_PLAYER:
     {
-        controller = new LocalPlayerController(new_kart,
-
-                         local_player_id);
-
+        controller = new LocalPlayerController(new_kart, local_player_id);
         const float hue = StateManager::get()->getActivePlayer(local_player_id)
             ->getConstProfile()->getDefaultKartColor();
         if (hue > 0.0f)

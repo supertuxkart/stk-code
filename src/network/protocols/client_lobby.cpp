@@ -105,7 +105,6 @@ void ClientLobby::doneWithResults()
 }   // doneWithResults
 
 //-----------------------------------------------------------------------------
-
 bool ClientLobby::notifyEvent(Event* event)
 {
     assert(m_game_setup); // assert that the setup exists
@@ -118,7 +117,7 @@ bool ClientLobby::notifyEvent(Event* event)
     switch(message_type)
     {
         case LE_START_SELECTION:       startSelection(event);      break;
-        case LE_LOAD_WORLD:            loadWorld();                break;
+        case LE_LOAD_WORLD:            addAllPlayers(event);       break;
         case LE_RACE_FINISHED:         raceFinished(event);        break;
         case LE_EXIT_RESULT:           exitResultScreen(event);    break;
         case LE_UPDATE_PLAYER_LIST:    updatePlayerList(event);    break;
@@ -131,7 +130,6 @@ bool ClientLobby::notifyEvent(Event* event)
 }   // notifyEvent
 
 //-----------------------------------------------------------------------------
-
 bool ClientLobby::notifyEventAsynchronous(Event* event)
 {
     assert(m_game_setup); // assert that the setup exists
@@ -185,6 +183,51 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
     } // disconnection
     return false;
 }   // notifyEventAsynchronous
+
+//-----------------------------------------------------------------------------
+void ClientLobby::addAllPlayers(Event* event)
+{
+    if (!checkDataSize(event, 1))
+    {
+        // If recieved invalid message for players leave now
+        STKHost::get()->disconnectAllPeers(false/*timeout_waiting*/);
+        STKHost::get()->requestShutdown();
+        return;
+    }
+    NetworkString& data = event->data();
+    std::string track_name;
+    data.decodeString(&track_name);
+    uint8_t lap = data.getUInt8();
+    bool reverse = (bool)data.getUInt8();
+    m_game_setup->setRace(track_name, lap, reverse);
+
+    std::shared_ptr<STKPeer> peer = event->getPeerSP();
+    peer->cleanPlayerProfiles();
+
+    std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
+    unsigned player_count = data.getUInt8();
+    assert(m_game_setup->getPlayerCount() == 0);
+
+    for (unsigned i = 0; i < player_count; i++)
+    {
+        core::stringw player_name;
+        data.decodeStringW(&player_name);
+        uint32_t host_id = data.getUInt32();
+        float kart_color = data.getFloat();
+        uint32_t online_id = data.getUInt32();
+        PerPlayerDifficulty ppd = (PerPlayerDifficulty)data.getUInt8();
+        auto player = std::make_shared<NetworkPlayerProfile>(peer, player_name,
+            host_id, kart_color, online_id, ppd);
+        std::string kart_name;
+        data.decodeString(&kart_name);
+        player->setKartName(kart_name);
+        peer->addPlayer(player);
+        m_game_setup->addPlayer(player);
+        players.push_back(player);
+    }
+    configRemoteKart(players);
+    loadWorld();
+}   // addAllPlayers
 
 //-----------------------------------------------------------------------------
 void ClientLobby::update(float dt)

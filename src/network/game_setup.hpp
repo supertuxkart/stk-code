@@ -24,6 +24,7 @@
 
 #include "network/remote_kart_info.hpp"
 
+#include <algorithm>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -68,25 +69,33 @@ public:
     // ------------------------------------------------------------------------
     void update(bool remove_disconnected_players);
     // ------------------------------------------------------------------------
-    void bindKartsToProfiles();
-    // ------------------------------------------------------------------------
-    void setLocalMaster(uint8_t player_id);
-    // ------------------------------------------------------------------------
-    bool isLocalMaster(uint8_t player_id);
-    // ------------------------------------------------------------------------
     /** Sets the number of local players. */
     void setNumLocalPlayers(int n) { m_num_local_players = n; } 
     // ------------------------------------------------------------------------
     /** Returns the nunber of local players. */
     int getNumLocalPlayers() const { return m_num_local_players; }
     // ------------------------------------------------------------------------
-    /** \brief Get the players that are in the game
+    /** \brief Get the players that are / were in the game
     *  \return A vector containing pointers on the players profiles. */
-    std::vector<std::weak_ptr<NetworkPlayerProfile> > getPlayers() const
+    const std::vector<std::weak_ptr<NetworkPlayerProfile> >& getPlayers() const
     {
         std::lock_guard<std::mutex> lock(m_players_mutex);
         return m_players;
     }   // getPlayers
+    // ------------------------------------------------------------------------
+    /** \brief Get the players that are in the game
+    *  \return A vector containing pointers on the players profiles. */
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >
+        getConnectedPlayers() const
+    {
+        std::lock_guard<std::mutex> lock(m_players_mutex);
+        std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
+        std::transform(m_players.begin(), m_players.end(),
+            std::back_inserter(players),
+            std::bind(&std::weak_ptr<NetworkPlayerProfile>::lock,
+            std::placeholders::_1));
+        return players;
+    }   // getConnectedPlayers
     // ------------------------------------------------------------------------
     /** Returns the number of connected players. */
     unsigned getPlayerCount()

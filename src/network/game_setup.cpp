@@ -67,25 +67,6 @@ void GameSetup::update(bool remove_disconnected_players)
 }   // removePlayer
 
 //-----------------------------------------------------------------------------
-/** Sets the player id of the local master.
- *  \param player_id The id of the player who is the local master.
- */
-void GameSetup::setLocalMaster(uint8_t player_id)
-{
-    m_local_master = player_id;
-}   // setLocalMaster
-
-//-----------------------------------------------------------------------------
-/** Returns true if the player id is the local game master (used in the
- *  network game selection.
- *  \param Local player id to test.
- */
-bool GameSetup::isLocalMaster(uint8_t player_id)
-{
-    return m_local_master == player_id;
-}   // isLocalMaster
-
-//-----------------------------------------------------------------------------
 void GameSetup::loadWorld()
 {
     assert(!m_track.empty());
@@ -94,38 +75,3 @@ void GameSetup::loadWorld()
     race_manager->setReverseTrack(m_reverse);
     race_manager->startSingleRace(m_track, m_laps, false/*from_overworld*/);
 }   // loadWorld
-
-//-----------------------------------------------------------------------------
-void GameSetup::bindKartsToProfiles()
-{
-    World::KartList karts = World::getWorld()->getKarts();
-
-    /*for (unsigned int i = 0; i < m_players.size(); i++)
-    {
-        Log::info("GameSetup", "Player %d has id %d and kart %s", i,
-                  m_players[i]->getGlobalPlayerId(),
-                  m_players[i]->getKartName().c_str());
-    }
-    for (unsigned int i = 0; i < karts.size(); i++)
-    {
-        Log::info("GameSetup", "Kart %d has id %d and kart %s", i,
-                   karts[i]->getWorldKartId(), karts[i]->getIdent().c_str());
-    }
-    for (unsigned int j = 0; j < m_players.size(); j++)
-    {
-        bool found = false;
-        for (unsigned int i = 0 ; i < karts.size(); i++)
-        {
-            if (karts[i]->getIdent() == m_players[j]->getKartName())
-            {
-                m_players[j]->setWorldKartID(karts[i]->getWorldKartId());
-                found = true;
-                break;
-            }
-        }
-        if (!found)
-        {
-            Log::error("GameSetup", "Error while binding world kart ids to players profiles.");
-        }
-    }*/
-}   // bindKartsToProfiles

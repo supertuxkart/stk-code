@@ -317,6 +317,48 @@ void ServerLobby::asynchronousUpdate()
             m_state = RACING;
             World::getWorld()->setReadyToRace();
         }
+        break;
+    case SELECTING:
+        if (m_timeout < (float)StkTime::getRealTime())
+        {
+            auto result = handleVote();
+            // Remove disconnected player (if any) one last time
+            m_game_setup->update(true);
+            auto players = m_game_setup->getConnectedPlayers();
+            // TODO: sort players for grand prix here
+            configRemoteKart(players);
+            // Reset for next state usage
+            for (auto p : m_peers_ready)
+            {
+                p.second = false;
+            }
+            m_state = LOAD_WORLD;
+            NetworkString* load_world = getNetworkString();
+            load_world->setSynchronous(true);
+            load_world->addUInt8(LE_LOAD_WORLD).encodeString(std::get<0>(result))
+                .addUInt8(std::get<1>(result)).addUInt8(std::get<2>(result))
+                .addUInt8((uint8_t)players.size());
+            for (auto player : players)
+            {
+                load_world->encodeString(player->getName())
+                    .addUInt32(player->getHostId())
+                    .addFloat(player->getDefaultKartColor())
+                    .addUInt32(player->getOnlineId())
+                    .addUInt8(player->getPerPlayerDifficulty());
+                if (player->getKartName().empty())
+                {
+                    RandomGenerator rg;
+                    std::set<std::string>::iterator it =
+                        m_available_kts.first.begin();
+                    std::advance(it, rg.get((int)m_available_kts.first.size()));
+                    player->setKartName(*it);
+                }
+                load_world->encodeString(player->getKartName());
+            }
+            sendMessageToPeersChangingToken(load_world);
+            delete load_world;
+        }
+        break;
     default:
         break;
     }
@@ -883,7 +925,7 @@ void ServerLobby::updatePlayerList()
     pl->addUInt8(LE_UPDATE_PLAYER_LIST).addUInt8((uint8_t)all_profiles.size());
     for (auto profile : all_profiles)
     {
-        pl->addUInt32(profile->getHostId()).addUInt32(profile->getOnlineID())
+        pl->addUInt32(profile->getHostId()).addUInt32(profile->getOnlineId())
             .encodeString(profile->getName());
         uint8_t server_owner = 0;
         if (m_server_owner.lock() == profile->getPeer())
@@ -963,15 +1005,16 @@ void ServerLobby::kartSelectionRequested(Event* event)
         data.decodeString(&kart);
         if (m_available_kts.first.find(kart) == m_available_kts.first.end())
         {
+            // Will be reset to a random one later
             Log::debug("ServerLobby", "Player %d from peer %d chose unknown "
                 "kart %s, use a random one", i, peer->getHostId(),
                 kart.c_str());
-            RandomGenerator rg;
-            std::set<std::string>::iterator it = m_available_kts.first.begin();
-            std::advance(it, rg.get((int)m_available_kts.first.size()));
-            kart = *it;
+            continue;
         }
-        peer->getPlayerProfiles()[i]->setKartName(kart);
+        else
+        {
+            peer->getPlayerProfiles()[i]->setKartName(kart);
+        }
         Log::verbose("ServerLobby", "Player %d from peer %d chose %s", i,
             peer->getHostId(), kart.c_str());
     }
@@ -1001,17 +1044,7 @@ void ServerLobby::playerVote(Event* event)
     float remaining_time = m_timeout - (float)StkTime::getRealTime();
     if (remaining_time < 0.0f)
     {
-        // Start world
-        handleVote();
-        configRemoteKart();
-        // Reset for next state usage
-        for (auto p : m_peers_ready)
-        {
-            p.second = false;
-        }
-
-        m_state = LOAD_WORLD;
-        return;
+        remaining_time = 0.0f;
     }
 
     NetworkString& data = event->data();
@@ -1022,15 +1055,17 @@ void ServerLobby::playerVote(Event* event)
 
     std::string track_name;
     data.decodeString(&track_name);
-    m_peers_votes.emplace(event->getPeerSP(), std::forward_as_tuple(track_name,
-        data.getUInt8(), (bool)data.getUInt8()));
+    uint8_t lap = data.getUInt8();
+    bool reverse = (bool)data.getUInt8();
+    m_peers_votes[event->getPeerSP()] =
+        std::make_tuple(track_name,lap, reverse);
     other.addUInt8((uint8_t)remaining_time);
     sendMessageToPeersChangingToken(&other);
 
 }   // playerVote
 
 // ----------------------------------------------------------------------------
-void ServerLobby::handleVote()
+std::tuple<std::string, uint8_t, bool> ServerLobby::handleVote()
 {
     // Default settings if no votes at all
     RandomGenerator rg;
@@ -1104,6 +1139,7 @@ void ServerLobby::handleVote()
         final_reverse = reverse_vote->first;
 
     m_game_setup->setRace(final_track, final_laps, final_reverse);
+    return std::make_tuple(final_track, final_laps, final_reverse);
 }   // handleVote
 
 // ----------------------------------------------------------------------------

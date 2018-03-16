@@ -142,7 +142,7 @@ bool STKPeer::isBanned() const
             return true;
         for (auto p : m_players)
         {
-            if (ret->second == p->getOnlineID())
+            if (ret->second == p->getOnlineId())
                 return true;
         }
     }
