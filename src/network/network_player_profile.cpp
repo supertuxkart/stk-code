@@ -17,8 +17,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/network_player_profile.hpp"
-
+#include "network/network_config.hpp"
 #include "network/stk_host.hpp"
+
 // ----------------------------------------------------------------------------
 /** Returns true if this player is local, i.e. running on this computer. This
  *  is done by comparing the host id of this player with the host id of this
@@ -26,5 +27,7 @@
  */
 bool NetworkPlayerProfile::isLocalPlayer() const
 {
-    return m_host_id == STKHost::get()->getMyHostId();
+    // Server never has local player atm
+    return NetworkConfig::get()->isClient() &&
+        m_host_id == STKHost::get()->getMyHostId();
 }   // isLocalPlayer
