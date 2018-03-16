@@ -1027,7 +1027,6 @@ void ServerLobby::kartSelectionRequested(Event* event)
  */
 void ServerLobby::playerVote(Event* event)
 {
-    std::lock_guard<std::mutex> lock(m_connection_mutex);
     if (m_state != SELECTING)
     {
         Log::warn("ServerLobby", "Received track vote while in state %d.",
@@ -1039,13 +1038,16 @@ void ServerLobby::playerVote(Event* event)
         event->getPeer()->getPlayerProfiles().empty())
         return;
 
-    // Check if first vote, if so start counter (10 seconds voting time)
+    // Check if first vote, if so start counter
     if (m_timeout == std::numeric_limits<float>::max())
-        m_timeout = (float)StkTime::getRealTime() + 10.0f;
+    {
+        m_timeout = (float)StkTime::getRealTime() +
+            UserConfigParams::m_voting_timeout;
+    }
     float remaining_time = m_timeout - (float)StkTime::getRealTime();
     if (remaining_time < 0.0f)
     {
-        remaining_time = 0.0f;
+        return;
     }
 
     NetworkString& data = event->data();

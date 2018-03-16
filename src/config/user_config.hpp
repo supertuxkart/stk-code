@@ -752,7 +752,9 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "lobby-chat",
         &m_network_group, "Enable chatting in networking lobby, if off than "
         "no chat message will be displayed from any players."));
-
+    PARAM_PREFIX FloatUserConfigParam m_voting_timeout
+        PARAM_DEFAULT(FloatUserConfigParam(10.0f, "voting-timeout",
+        &m_network_group, "Timeout in seconds for voting tracks in server."));
     // ---- Gamemode setup
     PARAM_PREFIX UIntToUIntUserConfigParam m_server_ban_list
         PARAM_DEFAULT(UIntToUIntUserConfigParam("server_ban_list",
