@@ -9,6 +9,7 @@
 #include <memory>
 #include <mutex>
 #include <set>
+#include <tuple>
 
 class STKPeer;
 
@@ -49,6 +50,10 @@ private:
     std::map<std::weak_ptr<STKPeer>, bool,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_ready;
 
+    /** Vote from each peer. */
+    std::map<std::weak_ptr<STKPeer>, std::tuple<std::string, uint8_t, bool>,
+        std::owner_less<std::weak_ptr<STKPeer> > > m_peers_votes;
+
     /** Keeps track of an artificial server delay (which makes sure that the
      *  data from all clients has arrived when the server computes a certain
      *  timestep.(. It stores the real time since epoch + delta (atm 0.1
@@ -88,6 +93,7 @@ private:
     void updatePlayerList();
     void updateServerOwner();
     bool checkPeersReady() const;
+    void handleVote();
 
 public:
              ServerLobby();

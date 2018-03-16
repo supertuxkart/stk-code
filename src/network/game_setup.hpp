@@ -31,7 +31,6 @@
 #include <vector>
 
 class NetworkPlayerProfile;
-class RaceConfig;
 
 // ============================================================================
 /*! \class GameSetup
@@ -46,9 +45,6 @@ private:
     /** Information about all connected players. */
     std::vector<std::weak_ptr<NetworkPlayerProfile> > m_players;
 
-    /** The race configuration. */
-    RaceConfig* m_race_config;
-
     /** Stores the number of local players. */
     int m_num_local_players;
 
@@ -56,11 +52,17 @@ private:
      *  kart selection screen. */
     uint8_t m_local_master;
 
+    std::string m_track;
+
+    unsigned m_laps;
+
+    bool m_reverse;
+
 public:
     // ------------------------------------------------------------------------
     GameSetup();
     // ------------------------------------------------------------------------
-    ~GameSetup();
+    ~GameSetup() {}
     // ------------------------------------------------------------------------
     void addPlayer(std::shared_ptr<NetworkPlayerProfile> profile);
     // ------------------------------------------------------------------------
@@ -77,9 +79,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the nunber of local players. */
     int getNumLocalPlayers() const { return m_num_local_players; }
-    // ------------------------------------------------------------------------
-    /** Returns the configuration for this race. */
-    RaceConfig* getRaceConfig() { return m_race_config; }
     // ------------------------------------------------------------------------
     /** \brief Get the players that are in the game
     *  \return A vector containing pointers on the players profiles. */
@@ -98,6 +97,15 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the id of the local master. */
     int getLocalMasterID() const { return m_local_master; }
+    // ------------------------------------------------------------------------
+    void setRace(const std::string& track, unsigned laps, bool reverse)
+    {
+        m_track = track;
+        m_laps = laps;
+        m_reverse = reverse;
+    }
+    // ------------------------------------------------------------------------
+    void loadWorld();
 };
 
 #endif // GAME_SETUP_HPP

@@ -23,6 +23,7 @@
 #include "network/network_string.hpp"
 
 class GameSetup;
+class NetworkPlayerProfile;
 
 /*!
  * \class LobbyProtocol
@@ -73,6 +74,8 @@ protected:
 
     /** Stores data about the online game to play. */
     GameSetup* m_game_setup;
+
+    void configRemoteKart();
 
 public:
 

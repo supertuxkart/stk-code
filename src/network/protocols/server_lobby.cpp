@@ -28,7 +28,6 @@
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/latency_protocol.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/race_config.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -124,6 +123,7 @@ void ServerLobby::setup()
     // the server are ready:
     m_server_has_loaded_world.store(false);
     m_peers_ready.clear();
+    m_peers_votes.clear();
     m_server_delay = 0.0;
     Log::info("ServerLobby", "Reset server to initial state.");
 }   // setup
@@ -995,21 +995,116 @@ void ServerLobby::playerVote(Event* event)
         event->getPeer()->getPlayerProfiles().empty())
         return;
 
-    NetworkString& data = event->data();
-    NetworkString other = NetworkString(PROTOCOL_LOBBY_ROOM);
-    other.addUInt8(LE_VOTE).encodeString(event->getPeer()
-        ->getPlayerProfiles()[0]->getName());
-    other += data;
     // Check if first vote, if so start counter (10 seconds voting time)
     if (m_timeout == std::numeric_limits<float>::max())
         m_timeout = (float)StkTime::getRealTime() + 10.0f;
     float remaining_time = m_timeout - (float)StkTime::getRealTime();
     if (remaining_time < 0.0f)
-        remaining_time = 0.0f;
+    {
+        // Start world
+        handleVote();
+        configRemoteKart();
+        // Reset for next state usage
+        for (auto p : m_peers_ready)
+        {
+            p.second = false;
+        }
+
+        m_state = LOAD_WORLD;
+        return;
+    }
+
+    NetworkString& data = event->data();
+    NetworkString other = NetworkString(PROTOCOL_LOBBY_ROOM);
+    other.addUInt8(LE_VOTE).encodeString(event->getPeer()
+        ->getPlayerProfiles()[0]->getName());
+    other += data;
+
+    std::string track_name;
+    data.decodeString(&track_name);
+    m_peers_votes.emplace(event->getPeerSP(), std::forward_as_tuple(track_name,
+        data.getUInt8(), (bool)data.getUInt8()));
     other.addUInt8((uint8_t)remaining_time);
     sendMessageToPeersChangingToken(&other);
 
 }   // playerVote
+
+// ----------------------------------------------------------------------------
+void ServerLobby::handleVote()
+{
+    // Default settings if no votes at all
+    RandomGenerator rg;
+    std::set<std::string>::iterator it = m_available_kts.second.begin();
+    std::advance(it, rg.get((int)m_available_kts.second.size()));
+    std::string final_track = *it;
+    unsigned final_laps = UserConfigParams::m_num_laps;
+    bool final_reverse = (bool)(final_track.size() % 2);
+
+    std::map<std::string, unsigned> tracks;
+    std::map<unsigned, unsigned> laps;
+    std::map<bool, unsigned> reverses;
+    for (auto p : m_peers_votes)
+    {
+        if (p.first.expired())
+            continue;
+        auto track_vote = tracks.find(std::get<0>(p.second));
+        if (track_vote == tracks.end())
+            tracks[std::get<0>(p.second)] = 1;
+        else
+            track_vote->second++;
+        auto lap_vote = laps.find(std::get<1>(p.second));
+        if (lap_vote == laps.end())
+            laps[std::get<1>(p.second)] = 1;
+        else
+            lap_vote->second++;
+        auto reverse_vote = reverses.find(std::get<2>(p.second));
+        if (reverse_vote == reverses.end())
+            reverses[std::get<2>(p.second)] = 1;
+        else
+            reverse_vote->second++;
+    }
+
+    unsigned vote = 0;
+    auto track_vote = tracks.begin();
+    for (auto c_vote = tracks.begin(); c_vote != tracks.end(); c_vote++)
+    {
+        if (c_vote->second > vote)
+        {
+            vote = c_vote->second;
+            track_vote = c_vote;
+        }
+    }
+    if (track_vote != tracks.end())
+        final_track = track_vote->first;
+
+    vote = 0;
+    auto lap_vote = laps.begin();
+    for (auto c_vote = laps.begin(); c_vote != laps.end(); c_vote++)
+    {
+        if (c_vote->second > vote)
+        {
+            vote = c_vote->second;
+            lap_vote = c_vote;
+        }
+    }
+    if (lap_vote != laps.end())
+        final_laps = lap_vote->first;
+
+    vote = 0;
+    auto reverse_vote = reverses.begin();
+    for (auto c_vote = reverses.begin(); c_vote != reverses.end(); c_vote++)
+    {
+        if (c_vote->second > vote)
+        {
+            vote = c_vote->second;
+            reverse_vote = c_vote;
+        }
+    }
+    if (reverse_vote != reverses.end())
+        final_reverse = reverse_vote->first;
+
+    m_game_setup->setRace(final_track, final_laps, final_reverse);
+}   // handleVote
 
 // ----------------------------------------------------------------------------
 /** Called from the RaceManager of the server when the world is loaded. Marks

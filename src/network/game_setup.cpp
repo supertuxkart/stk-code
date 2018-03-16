@@ -18,8 +18,8 @@
 
 #include "network/game_setup.hpp"
 
+#include "config/player_manager.hpp"
 #include "karts/abstract_kart.hpp"
-#include "network/race_config.hpp"
 #include "modes/world.hpp"
 #include "network/network_player_profile.hpp"
 #include "online/online_profile.hpp"
@@ -27,22 +27,13 @@
 #include "utils/log.hpp"
 
 //-----------------------------------------------------------------------------
-
 GameSetup::GameSetup()
 {
-    m_race_config       = new RaceConfig();
     m_num_local_players = 0;
     m_local_master      = 0;
+    m_laps              = 0;
+    m_reverse           = false;
 }   // GameSetup
-
-//-----------------------------------------------------------------------------
-
-GameSetup::~GameSetup()
-{
-    // remove all players
-    m_players.clear();
-    delete m_race_config;
-}   // ~GameSetup
 
 //-----------------------------------------------------------------------------
 void GameSetup::addPlayer(std::shared_ptr<NetworkPlayerProfile> profile)
@@ -95,7 +86,16 @@ bool GameSetup::isLocalMaster(uint8_t player_id)
 }   // isLocalMaster
 
 //-----------------------------------------------------------------------------
+void GameSetup::loadWorld()
+{
+    assert(!m_track.empty());
+    // Disable accidentally unlocking of a challenge
+    PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
+    race_manager->setReverseTrack(m_reverse);
+    race_manager->startSingleRace(m_track, m_laps, false/*from_overworld*/);
+}   // loadWorld
 
+//-----------------------------------------------------------------------------
 void GameSetup::bindKartsToProfiles()
 {
     World::KartList karts = World::getWorld()->getKarts();
