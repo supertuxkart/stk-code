@@ -206,13 +206,11 @@ void LinearWorld::update(float dt)
         if (m_karts[i]->hasFinishedRace() ||
             m_karts[i]->isEliminated()       ) continue;
 
-        // During the last lap update the estimated finish time.
-        // This is used to play the faster music, and by the AI
-        if (m_kart_info[i].m_race_lap == race_manager->getNumLaps()-1)
-        {
-            m_kart_info[i].m_estimated_finish =
+        // Update the estimated finish time.
+        // This is used by the AI
+        m_kart_info[i].m_estimated_finish =
                 estimateFinishTimeForKart(m_karts[i]);
-        }
+
         checkForWrongDirection(i, dt);
     }
 
@@ -413,13 +411,12 @@ int LinearWorld::getLapForKart(const int kart_id) const
 }   // getLapForKart
 
 //-----------------------------------------------------------------------------
-/** Returns the estimated finishing time. Only valid during the last lap!
+/** Returns the estimated finishing time.
  *  \param kart_id Id of the kart.
  */
 float LinearWorld::getEstimatedFinishTime(const int kart_id) const
 {
     assert(kart_id < (int)m_kart_info.size());
-    assert(m_kart_info[kart_id].m_race_lap == race_manager->getNumLaps()-1);
     return m_kart_info[kart_id].m_estimated_finish;
 }   // getEstimatedFinishTime
 
