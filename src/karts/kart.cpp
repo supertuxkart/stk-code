@@ -1269,6 +1269,7 @@ void Kart::update(float dt)
     if(!history->replayHistory() || !history->dontDoPhysics())
         m_controller->update(dt);
 
+#ifndef SERVER_ONLY
 #undef DEBUG_CAMERA_SHAKE
 #ifdef DEBUG_CAMERA_SHAKE
     Log::verbose("camera", "%s t %f %f xyz %f %f %f v %f %f %f d3 %f d2 %f",
@@ -1279,6 +1280,7 @@ void Kart::update(float dt)
         (Camera::getCamera(0)->getXYZ()-getXYZ()).length(),
         (Camera::getCamera(0)->getXYZ()-getXYZ()).length_2d()
         );
+#endif
 #endif
 
 #undef DEBUG_TO_COMPARE_KART_PHYSICS

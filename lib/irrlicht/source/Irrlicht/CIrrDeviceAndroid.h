@@ -23,7 +23,13 @@
 
 namespace irr
 {
-
+    enum DeviceOrientation
+    {
+        ORIENTATION_UNKNOWN,
+        ORIENTATION_PORTRAIT,
+        ORIENTATION_LANDSCAPE
+    };
+    
     class CIrrDeviceAndroid : public CIrrDeviceStub, video::IImagePresenter
     {
     public:
@@ -123,7 +129,7 @@ namespace irr
         bool IsMousePressed;
         float GamepadAxisX;
         float GamepadAxisY;
-        int DefaultOrientation;
+        DeviceOrientation DefaultOrientation;
 
         video::SExposedVideoData ExposedVideoData;
 
@@ -135,7 +141,7 @@ namespace irr
         void createVideoModeList();
         void getKeyChar(SEvent& event);
         int getRotation();
-        int getDefaultRotation();
+        DeviceOrientation getDefaultOrientation();
         video::SExposedVideoData& getExposedVideoData();
         
         static void handleAndroidCommand(android_app* app, int32_t cmd);

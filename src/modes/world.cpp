@@ -1006,12 +1006,17 @@ void World::update(float dt)
     }
     PROFILER_POP_CPU_MARKER();
 
-    PROFILER_PUSH_CPU_MARKER("World::update (camera)", 0x60, 0x7F, 0x00);
-    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+    // Updating during a rewind introduces stuttering in the camera
+    if (!RewindManager::get()->isRewinding())
     {
-        Camera::getCamera(i)->update(dt);
-    }
-    PROFILER_POP_CPU_MARKER();
+        PROFILER_PUSH_CPU_MARKER("World::update (camera)", 0x60, 0x7F, 0x00);
+
+        for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
+        {
+            Camera::getCamera(i)->update(dt);
+        }
+        PROFILER_POP_CPU_MARKER();
+    }   // if !rewind
 
     if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(dt);
     Scripting::ScriptEngine *script_engine = Scripting::ScriptEngine::getInstance();

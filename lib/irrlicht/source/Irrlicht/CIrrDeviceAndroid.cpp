@@ -51,7 +51,7 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     IsMousePressed(false),
     GamepadAxisX(0),
     GamepadAxisY(0),
-    DefaultOrientation(0)
+    DefaultOrientation(ORIENTATION_UNKNOWN)
 {
     #ifdef _DEBUG
     setDebugName("CIrrDeviceAndroid");
@@ -63,8 +63,6 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     Android->userData = this;
     Android->onAppCmd = handleAndroidCommand;
     Android->onInputEvent = handleInput;
-    
-    DefaultOrientation = getDefaultRotation();
     
     printConfig();
     createKeyMap();
@@ -159,22 +157,6 @@ void CIrrDeviceAndroid::printConfig()
     os::Printer::log("   touch:", core::stringc(touch).c_str(), ELL_DEBUG);
     os::Printer::log("   ui_mode_type:", core::stringc(ui_mode_type).c_str(), ELL_DEBUG);
     os::Printer::log("   ui_mode_night:", core::stringc(ui_mode_night).c_str(), ELL_DEBUG);
-    
-    int rotation = getRotation();
-    int deg[4] = {0, 90, 180, 270};
-    
-    os::Printer::log("Rotation: ", core::stringc(deg[rotation]).c_str(), ELL_DEBUG);
-    
-    int default_rotation = getDefaultRotation();
-    
-    if (default_rotation == 1)
-    {
-        os::Printer::log("Default rotation: landscape", ELL_DEBUG);
-    }
-    else
-    {
-        os::Printer::log("Default rotation: portrait", ELL_DEBUG);
-    }
 }
 
 void CIrrDeviceAndroid::createVideoModeList()
@@ -254,15 +236,15 @@ bool CIrrDeviceAndroid::run()
                     SEvent accEvent;
                     accEvent.EventType = EET_ACCELEROMETER_EVENT;
                     
-                    if (DefaultOrientation == 0)
-                    {
-                        accEvent.AccelerometerEvent.X = event.acceleration.x;
-                        accEvent.AccelerometerEvent.Y = event.acceleration.y;
-                    }
-                    else
+                    if (DefaultOrientation == ORIENTATION_LANDSCAPE)
                     {
                         accEvent.AccelerometerEvent.X = event.acceleration.y;
                         accEvent.AccelerometerEvent.Y = -event.acceleration.x;
+                    }
+                    else
+                    {
+                        accEvent.AccelerometerEvent.X = event.acceleration.x;
+                        accEvent.AccelerometerEvent.Y = event.acceleration.y;
                     }
                     accEvent.AccelerometerEvent.Z = event.acceleration.z;
                     
@@ -778,15 +760,16 @@ s32 CIrrDeviceAndroid::handleGamepad(AInputEvent* androidEvent)
             if (GamepadAxisX != 0)
             {
                 event.KeyInput.PressedDown = false;
-                event.KeyInput.Key = GamepadAxisX < 0 ? IRR_KEY_LEFT
-                                                      : IRR_KEY_RIGHT;
+                event.KeyInput.Key = GamepadAxisX < 0 ? IRR_KEY_BUTTON_LEFT
+                                                      : IRR_KEY_BUTTON_RIGHT;
                 postEventFromUser(event);
             }
             
             if (axis_x != 0)
             {
                 event.KeyInput.PressedDown = true;
-                event.KeyInput.Key = axis_x < 0 ? IRR_KEY_LEFT : IRR_KEY_RIGHT;
+                event.KeyInput.Key = axis_x < 0 ? IRR_KEY_BUTTON_LEFT 
+								                : IRR_KEY_BUTTON_RIGHT;
                 postEventFromUser(event);
             }
             
@@ -798,15 +781,16 @@ s32 CIrrDeviceAndroid::handleGamepad(AInputEvent* androidEvent)
             if (GamepadAxisY != 0)
             {
                 event.KeyInput.PressedDown = false;
-                event.KeyInput.Key = GamepadAxisY < 0 ? IRR_KEY_UP
-                                                      : IRR_KEY_DOWN;
+                event.KeyInput.Key = GamepadAxisY < 0 ? IRR_KEY_BUTTON_UP
+                                                      : IRR_KEY_BUTTON_DOWN;
                 postEventFromUser(event);
             }
             
             if (axis_y != 0)
             {
                 event.KeyInput.PressedDown = true;
-                event.KeyInput.Key = axis_y < 0 ? IRR_KEY_UP : IRR_KEY_DOWN;
+                event.KeyInput.Key = axis_y < 0 ? IRR_KEY_BUTTON_UP 
+								                : IRR_KEY_BUTTON_DOWN;
                 postEventFromUser(event);
             }
             
@@ -962,21 +946,21 @@ void CIrrDeviceAndroid::createKeyMap()
     KeyMap[AKEYCODE_SWITCH_CHARSET] = IRR_KEY_UNKNOWN; 
 
     // following look like controller inputs
-    KeyMap[AKEYCODE_BUTTON_A] = IRR_KEY_RETURN; 
-    KeyMap[AKEYCODE_BUTTON_B] = IRR_KEY_ESCAPE; 
-    KeyMap[AKEYCODE_BUTTON_C] = IRR_KEY_2; 
-    KeyMap[AKEYCODE_BUTTON_X] = IRR_KEY_3; 
-    KeyMap[AKEYCODE_BUTTON_Y] = IRR_KEY_4; 
-    KeyMap[AKEYCODE_BUTTON_Z] = IRR_KEY_5; 
-    KeyMap[AKEYCODE_BUTTON_L1] = IRR_KEY_6;  
-    KeyMap[AKEYCODE_BUTTON_R1] = IRR_KEY_7; 
-    KeyMap[AKEYCODE_BUTTON_L2] = IRR_KEY_8; 
-    KeyMap[AKEYCODE_BUTTON_R2] = IRR_KEY_9; 
-    KeyMap[AKEYCODE_BUTTON_THUMBL] = IRR_KEY_RETURN; 
-    KeyMap[AKEYCODE_BUTTON_THUMBR] = IRR_KEY_RETURN;  
-    KeyMap[AKEYCODE_BUTTON_START] = IRR_KEY_RETURN; 
-    KeyMap[AKEYCODE_BUTTON_SELECT] = IRR_KEY_ESCAPE; 
-    KeyMap[AKEYCODE_BUTTON_MODE] = IRR_KEY_MENU; 
+    KeyMap[AKEYCODE_BUTTON_A] = IRR_KEY_BUTTON_A; 
+    KeyMap[AKEYCODE_BUTTON_B] = IRR_KEY_BUTTON_B; 
+    KeyMap[AKEYCODE_BUTTON_C] = IRR_KEY_BUTTON_C; 
+    KeyMap[AKEYCODE_BUTTON_X] = IRR_KEY_BUTTON_X; 
+    KeyMap[AKEYCODE_BUTTON_Y] = IRR_KEY_BUTTON_Y; 
+    KeyMap[AKEYCODE_BUTTON_Z] = IRR_KEY_BUTTON_Z; 
+    KeyMap[AKEYCODE_BUTTON_L1] = IRR_KEY_BUTTON_L1;  
+    KeyMap[AKEYCODE_BUTTON_R1] = IRR_KEY_BUTTON_R1; 
+    KeyMap[AKEYCODE_BUTTON_L2] = IRR_KEY_BUTTON_L2; 
+    KeyMap[AKEYCODE_BUTTON_R2] = IRR_KEY_BUTTON_R2; 
+    KeyMap[AKEYCODE_BUTTON_THUMBL] = IRR_KEY_BUTTON_THUMBL; 
+    KeyMap[AKEYCODE_BUTTON_THUMBR] = IRR_KEY_BUTTON_THUMBR;  
+    KeyMap[AKEYCODE_BUTTON_START] = IRR_KEY_BUTTON_START; 
+    KeyMap[AKEYCODE_BUTTON_SELECT] = IRR_KEY_BUTTON_SELECT; 
+    KeyMap[AKEYCODE_BUTTON_MODE] = IRR_KEY_BUTTON_MODE; 
 
     KeyMap[AKEYCODE_ESCAPE] = IRR_KEY_ESCAPE; 
     KeyMap[AKEYCODE_FORWARD_DEL] = IRR_KEY_DELETE; 
@@ -1197,7 +1181,7 @@ int CIrrDeviceAndroid::getRotation()
     return rotation;
 }
 
-int CIrrDeviceAndroid::getDefaultRotation()
+DeviceOrientation CIrrDeviceAndroid::getDefaultOrientation()
 {
     int rotation = getRotation();
     
@@ -1208,11 +1192,11 @@ int CIrrDeviceAndroid::getDefaultRotation()
         ((rotation == 1 || rotation == 3) && 
         orientation == ACONFIGURATION_ORIENTATION_PORT))
     {
-        return 1;
+        return ORIENTATION_LANDSCAPE;
     }
     else
     {
-        return 0;
+        return ORIENTATION_PORTRAIT;
     }
 }
 
@@ -1220,6 +1204,11 @@ bool CIrrDeviceAndroid::activateAccelerometer(float updateInterval)
 {
     if (!isAccelerometerAvailable())
         return false;
+    
+    if (DefaultOrientation == ORIENTATION_UNKNOWN)
+    {
+        DefaultOrientation = getDefaultOrientation();
+    }
 
     ASensorEventQueue_enableSensor(SensorEventQueue, Accelerometer);
     ASensorEventQueue_setEventRate(SensorEventQueue, Accelerometer,

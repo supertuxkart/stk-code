@@ -109,7 +109,8 @@ void InputManager::handleStaticAction(int key, int value)
 
     // When no players... a cutscene
     if (race_manager->getNumPlayers() == 0 && world != NULL && value > 0 &&
-        (key == IRR_KEY_SPACE || key == IRR_KEY_RETURN))
+        (key == IRR_KEY_SPACE || key == IRR_KEY_RETURN || 
+        key == IRR_KEY_BUTTON_A))
     {
         world->onFirePressed(NULL);
     }
@@ -658,12 +659,17 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
     {
         action = PA_BEFORE_FIRST;
 
-        if      (button == IRR_KEY_UP)     action = PA_MENU_UP;
-        else if (button == IRR_KEY_DOWN)   action = PA_MENU_DOWN;
-        else if (button == IRR_KEY_LEFT)   action = PA_MENU_LEFT;
-        else if (button == IRR_KEY_RIGHT)  action = PA_MENU_RIGHT;
-        else if (button == IRR_KEY_SPACE)  action = PA_MENU_SELECT;
-        else if (button == IRR_KEY_RETURN) action = PA_MENU_SELECT;
+        if      (button == IRR_KEY_UP)            action = PA_MENU_UP;
+        else if (button == IRR_KEY_DOWN)          action = PA_MENU_DOWN;
+        else if (button == IRR_KEY_LEFT)          action = PA_MENU_LEFT;
+        else if (button == IRR_KEY_RIGHT)         action = PA_MENU_RIGHT;
+        else if (button == IRR_KEY_SPACE)         action = PA_MENU_SELECT;
+        else if (button == IRR_KEY_RETURN)        action = PA_MENU_SELECT;
+        else if (button == IRR_KEY_BUTTON_UP)     action = PA_MENU_DOWN;
+        else if (button == IRR_KEY_BUTTON_DOWN)   action = PA_MENU_UP;
+        else if (button == IRR_KEY_BUTTON_LEFT)   action = PA_MENU_LEFT;
+        else if (button == IRR_KEY_BUTTON_RIGHT)  action = PA_MENU_RIGHT;
+        else if (button == IRR_KEY_BUTTON_A)      action = PA_MENU_SELECT;
         else if (button == IRR_KEY_TAB)
         {
             if (shift_mask)
@@ -676,7 +682,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             }
         }
 
-        if (button == IRR_KEY_RETURN)
+        if (button == IRR_KEY_RETURN || button == IRR_KEY_BUTTON_A)
         {
             if (GUIEngine::ModalDialog::isADialogActive() &&
                 !GUIEngine::ScreenKeyboard::isActive())

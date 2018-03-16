@@ -28,6 +28,7 @@
 #include "modes/easter_egg_hunt.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
+#include "network/rewind_manager.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/drive_graph.hpp"
 #include "tracks/drive_node.hpp"
@@ -336,7 +337,8 @@ void Item::update(float dt)
 
         if(!m_rotate || m_node == NULL) return;
         // have it rotate
-        m_rotation_angle += dt * M_PI ;
+        if(!RewindManager::get()->isRewinding())
+            m_rotation_angle += dt * M_PI;
         if (m_rotation_angle > M_PI * 2) m_rotation_angle -= M_PI * 2;
 
         btMatrix3x3 m;

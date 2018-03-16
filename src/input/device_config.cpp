@@ -20,6 +20,7 @@
 #include "input/device_config.hpp"
 
 #include "input/gamepad_config.hpp"
+#include "input/gamepad_android_config.hpp"
 #include "input/keyboard_config.hpp"
 #include "io/xml_node.hpp"
 #include "utils/log.hpp"
@@ -46,6 +47,10 @@ DeviceConfig* DeviceConfig::create(const XMLNode *config)
     else if(config->getName()=="gamepad")
     {
         device_config = new GamepadConfig();
+    }
+    else if(config->getName()=="gamepad_android")
+    {
+        device_config = new GamepadAndroidConfig();
     }
     else
     {
