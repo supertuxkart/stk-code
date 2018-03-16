@@ -33,7 +33,6 @@
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/track_info_screen.hpp"
-#include "states_screens/waiting_for_others.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -49,7 +48,13 @@ static const char ALL_TRACK_GROUPS_ID[] = "all";
 DEFINE_SCREEN_SINGLETON( TracksScreen );
 
 // -----------------------------------------------------------------------------
+void TracksScreen::loadedFromFile()
+{
+    getWidget<CheckBoxWidget>("reverse")->setState(false);
+    getWidget<SpinnerWidget>("lap-spinner")->setValue(1);
+}   // loadedFromFile
 
+// -----------------------------------------------------------------------------
 void TracksScreen::eventCallback(Widget* widget, const std::string& name,
                                  const int playerID)
 {
@@ -99,7 +104,6 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
                     .addUInt8(
                     getWidget<CheckBoxWidget>("reverse")->getState());
                 STKHost::get()->sendToServer(&vote, true);
-                WaitingForOthersScreen::getInstance()->push();
             }
             else
             {
@@ -200,35 +204,18 @@ void TracksScreen::init()
     STKTexManager::getInstance()->unsetTextureErrorMessage();
     if (!m_network_tracks)
     {
-        getWidget("lap-text")->setActive(false);
         getWidget("lap-text")->setVisible(false);
-        getWidget("lap-spinner")->setActive(false);
         getWidget("lap-spinner")->setVisible(false);
-        getWidget("reverse-text")->setActive(false);
         getWidget("reverse-text")->setVisible(false);
-        getWidget("reverse")->setActive(false);
         getWidget("reverse")->setVisible(false);
     }
     else
     {
-        getWidget("lap-text")->setActive(true);
         getWidget("lap-text")->setVisible(true);
-        getWidget("lap-spinner")->setActive(true);
         getWidget("lap-spinner")->setVisible(true);
-        getWidget<SpinnerWidget>("lap-spinner")->setMin(1);
-        getWidget<SpinnerWidget>("lap-spinner")->setMax(m_max_lap);
-        getWidget<SpinnerWidget>("lap-spinner")->setValue(1);
-        getWidget("reverse-text")->setActive(true);
         getWidget("reverse-text")->setVisible(true);
-        getWidget("reverse")->setActive(true);
         getWidget("reverse")->setVisible(true);
-        getWidget<CheckBoxWidget>("reverse")->setState(false);
     }
-}   // init
-
-// -----------------------------------------------------------------------------
-void TracksScreen::onUpdate(float dt)
-{
     if (NetworkConfig::get()->isAutoConnect() && m_network_tracks)
     {
         assert(!m_random_track_list.empty());
@@ -236,9 +223,8 @@ void TracksScreen::onUpdate(float dt)
         vote.addUInt8(LobbyProtocol::LE_VOTE);
         vote.encodeString(m_random_track_list[0]).addUInt8(1).addUInt8(0);
         STKHost::get()->sendToServer(&vote, true);
-        WaitingForOthersScreen::getInstance()->push();
     }
-}   // onUpdate
+}   // init
 
 // -----------------------------------------------------------------------------
 /** Rebuild the list of tracks. This need to be recomputed e.g. to

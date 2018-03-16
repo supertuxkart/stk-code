@@ -38,7 +38,6 @@
 #include "online/online_profile.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/network_kart_selection.hpp"
-#include "states_screens/tracks_screen.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
@@ -260,9 +259,6 @@ void ClientLobby::update(float dt)
         screen->setAvailableKartsFromServer(m_available_karts);
         screen->push();
         m_state = SELECTING_KARTS;
-        // Todo: add max lap
-        TracksScreen::getInstance()->setNetworkTracks();
-        TracksScreen::getInstance()->setMaxLap(3);
         std::make_shared<LatencyProtocol>()->requestStart();
         Log::info("LobbyProtocol", "LatencyProtocol started.");
     }

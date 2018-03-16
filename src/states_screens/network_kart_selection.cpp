@@ -36,7 +36,6 @@
 #include "states_screens/race_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
-#include "states_screens/waiting_for_others.hpp"
 
 static const char ID_LOCKED[] = "locked/";
 
@@ -151,6 +150,7 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
         input_manager->getDeviceManager()->setAssignMode(ASSIGN);
         // Remove kart screen
         StateManager::get()->popMenu();
+        TracksScreen::getInstance()->setNetworkTracks();
         TracksScreen::getInstance()->push();
     }
 }   // playerConfirm

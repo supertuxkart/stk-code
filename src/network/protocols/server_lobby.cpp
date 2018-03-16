@@ -37,7 +37,6 @@
 #include "race/race_manager.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/race_result_gui.hpp"
-#include "states_screens/waiting_for_others.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/random_generator.hpp"
@@ -567,10 +566,9 @@ void ServerLobby::startSelection(const Event *event)
     delete ns;
 
     m_state = SELECTING;
-    // 30 seconds for clients to choose kart and track
-    // will be increased later if there is grand prix
-    m_timeout = StkTime::getRealTime() + 30.0f;
-    WaitingForOthersScreen::getInstance()->push();
+
+    // Will be changed after the first vote received
+    m_timeout = std::numeric_limits<float>::max();
 
     std::make_shared<LatencyProtocol>()->requestStart();
     Log::info("LobbyProtocol", "LatencyProtocol started.");
@@ -985,6 +983,14 @@ void ServerLobby::kartSelectionRequested(Event* event)
  */
 void ServerLobby::playerVote(Event* event)
 {
+    std::lock_guard<std::mutex> lock(m_connection_mutex);
+    if (m_state != SELECTING)
+    {
+        Log::warn("ServerLobby", "Received track vote while in state %d.",
+                  m_state.load());
+        return;
+    }
+
     if (!checkDataSize(event, 4) ||
         event->getPeer()->getPlayerProfiles().empty())
         return;
