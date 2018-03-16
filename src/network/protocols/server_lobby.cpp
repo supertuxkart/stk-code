@@ -325,14 +325,6 @@ void ServerLobby::asynchronousUpdate()
             // Remove disconnected player (if any) one last time
             m_game_setup->update(true);
             auto players = m_game_setup->getConnectedPlayers();
-            // TODO: sort players for grand prix here
-            configRemoteKart(players);
-            // Reset for next state usage
-            for (auto p : m_peers_ready)
-            {
-                p.second = false;
-            }
-            m_state = LOAD_WORLD;
             NetworkString* load_world = getNetworkString();
             load_world->setSynchronous(true);
             load_world->addUInt8(LE_LOAD_WORLD).encodeString(std::get<0>(result))
@@ -355,6 +347,15 @@ void ServerLobby::asynchronousUpdate()
                 }
                 load_world->encodeString(player->getKartName());
             }
+            // TODO: sort players for grand prix here
+            configRemoteKart(players);
+
+            // Reset for next state usage
+            for (auto p : m_peers_ready)
+            {
+                p.second = false;
+            }
+            m_state = LOAD_WORLD;
             sendMessageToPeersChangingToken(load_world);
             delete load_world;
         }
