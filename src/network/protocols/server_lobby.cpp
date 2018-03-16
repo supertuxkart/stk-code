@@ -1056,9 +1056,9 @@ void ServerLobby::playerVote(Event* event)
     std::string track_name;
     data.decodeString(&track_name);
     uint8_t lap = data.getUInt8();
-    bool reverse = (bool)data.getUInt8();
+    uint8_t reverse = data.getUInt8();
     m_peers_votes[event->getPeerSP()] =
-        std::make_tuple(track_name,lap, reverse);
+        std::make_tuple(track_name, lap, reverse == 1);
     other.addUInt8((uint8_t)remaining_time);
     sendMessageToPeersChangingToken(&other);
 
@@ -1073,7 +1073,7 @@ std::tuple<std::string, uint8_t, bool> ServerLobby::handleVote()
     std::advance(it, rg.get((int)m_available_kts.second.size()));
     std::string final_track = *it;
     unsigned final_laps = UserConfigParams::m_num_laps;
-    bool final_reverse = (bool)(final_track.size() % 2);
+    bool final_reverse = final_track.size() % 2 == 0;
 
     std::map<std::string, unsigned> tracks;
     std::map<unsigned, unsigned> laps;

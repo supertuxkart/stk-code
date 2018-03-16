@@ -198,8 +198,8 @@ void ClientLobby::addAllPlayers(Event* event)
     std::string track_name;
     data.decodeString(&track_name);
     uint8_t lap = data.getUInt8();
-    bool reverse = (bool)data.getUInt8();
-    m_game_setup->setRace(track_name, lap, reverse);
+    uint8_t reverse = data.getUInt8();
+    m_game_setup->setRace(track_name, lap, reverse == 1);
 
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     peer->cleanPlayerProfiles();
@@ -336,13 +336,13 @@ void ClientLobby::displayPlayerVote(Event* event)
         Log::fatal("ClientLobby", "Missing track %s", track_name.c_str());
     core::stringw track_readable = track->getName();
     int lap = data.getUInt8();
-    bool reversed = (bool)data.getUInt8();
+    int rev = data.getUInt8();
     int t = data.getUInt8();
     core::stringw yes = _("Yes");
     core::stringw no = _("No");
     //I18N: Vote message in network game from a player
     core::stringw vote_msg = _("Track: %s, laps: %d, reversed: %s, "
-        "remaining time: %ds", track_readable, lap, reversed ? yes : no, t);
+        "remaining time: %ds", track_readable, lap, rev == 1 ? yes : no, t);
     vote_msg = player_name + vote_msg;
     MessageQueue::add(MessageQueue::MT_NETWORK_MSG, vote_msg);
 }   // displayPlayerVote

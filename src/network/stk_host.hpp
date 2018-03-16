@@ -86,8 +86,8 @@ private:
 
     /** Let (atm enet_peer_send and enet_peer_disconnect) run in the listening
      *  thread. */
-    std::list<std::tuple<ENetPeer*/*peer receive*/,
-        ENetPacket*/*packet to send*/, uint32_t/*integer data*/,
+    std::list<std::tuple</*peer receive*/ENetPeer*,
+        /*packet to send*/ENetPacket*, /*integer data*/uint32_t,
         ENetCommandType> > m_enet_cmd;
 
     /** Protect \ref m_enet_cmd from multiple threads usage. */
@@ -288,7 +288,7 @@ public:
     unsigned int getPeerCount() const
     {
         std::lock_guard<std::mutex> lock(m_peers_mutex);
-        return m_peers.size();
+        return (unsigned)m_peers.size();
     }
     // ------------------------------------------------------------------------
     /** Sets the global host id of this host (client use). */

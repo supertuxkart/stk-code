@@ -150,7 +150,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             double start_time = StkTime::getRealTime();
             const double DURATION = 1.0;
             const auto& servers = ServersManager::get()->getServers();
-            int cur_server_id = servers.size();
+            int cur_server_id = (int)servers.size();
             assert(cur_server_id == 0);
             std::vector<std::shared_ptr<Server> > servers_now;
             while (StkTime::getRealTime() - start_time < DURATION)
@@ -178,7 +178,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     uint8_t password    = s.getUInt8();
                     servers_now.emplace_back(std::make_shared<Server>
                         (cur_server_id++, name, max_players, players,
-                        difficulty, mode, sender, password));
+                        difficulty, mode, sender, password == 1));
                 }   // if received_data
             }    // while still waiting
             m_success = true;
