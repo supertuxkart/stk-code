@@ -1900,10 +1900,50 @@ void SkiddingAI::handleRescue(const float dt)
 }   // handleRescue
 
 //-----------------------------------------------------------------------------
-/** Decides wether to use nitro or not.
+/** Decides wether to use nitro and zipper or not.
  */
 void SkiddingAI::handleNitroAndZipper()
 {
+   //Calculated here and not passed as parameter to not redo all the calls to the function
+   //May be better to change it
+   
+   int ai_skill = 0;
+   if (m_ai_properties->m_item_usage_skill > 0)
+   {
+      if (m_ai_properties->m_item_usage_skill > 5)
+      {
+         ai_skill = 5;
+      }
+      else
+      {
+         ai_skill = m_ai_properties->m_item_usage_skill;
+      }
+   }
+   
+   int nitro_skill = 0;
+   if (m_ai_properties->m_nitro_usage > 0)
+   {
+      if (m_ai_properties->m_nitro_usage > 4)
+      {
+         nitro_usage = 4;
+      }
+      else
+      {
+         nitro_usage = m_ai_properties->m_nitro_usage;
+      }
+   }
+   
+   if (m_kart->getBoostAI() == true)
+   {
+      if (ai_skill < 5)
+      {
+         ai_skill = ai_skill + 1; //possible improvement : make the boost amplitude pulled from config
+      }
+      if (nitro_skill < 4)
+      {
+         nitro_skill = nitro_skill + 1; //possible improvement : make the boost amplitude pulled from config
+      }
+   }
     m_controls->setNitro(false);
     // If we are already very fast, save nitro.
     if(m_kart->getSpeed() > 0.95f*m_kart->getCurrentMaxSpeed())
@@ -1920,8 +1960,7 @@ void SkiddingAI::handleNitroAndZipper()
     // Don't compute nitro usage if we don't have nitro or are not supposed
     // to use it, and we don't have a zipper or are not supposed to use
     // it (calculated).
-    if( (m_kart->getEnergy()==0 ||
-        m_ai_properties->m_nitro_usage==AIProperties::NITRO_NONE)  &&
+    if( (m_kart->getEnergy()==0 || m_ai_properties->m_nitro_usage == 0)  &&
         (m_kart->getPowerup()->getType()!=PowerupManager::POWERUP_ZIPPER ||
          (m_ai_properties->m_item_usage_skill <= 1) )                     )
         return;
@@ -1930,7 +1969,7 @@ void SkiddingAI::handleNitroAndZipper()
     // use them (since this make it harder to avoid items).
     if(m_avoid_item_close &&
         (m_kart->getEnergy()==0 ||
-         m_ai_properties->m_nitro_usage==AIProperties::NITRO_NONE) )
+         m_ai_properties->m_nitro_usage == 0) )
         return;
     // If a parachute or anvil is attached, the nitro doesn't give much
     // benefit. Better wait till later.
@@ -1963,8 +2002,7 @@ void SkiddingAI::handleNitroAndZipper()
     // is reached).
     if(m_world->getLapForKart(m_kart->getWorldKartId())
                         ==race_manager->getNumLaps()-1 &&
-       (m_ai_properties->m_nitro_usage == AIProperties::NITRO_ALL ||
-       m_ai_properties->m_nitro_usage == AIProperties::NITRO_ADVANCED))
+       (m_ai_properties->m_nitro_usage >= 2) )
     {
         float finish =
             m_world->getEstimatedFinishTime(m_kart->getWorldKartId());
@@ -1995,8 +2033,7 @@ void SkiddingAI::handleNitroAndZipper()
         m_kart_behind->getSpeed() > m_kart->getSpeed()    )
     {
         // Only prevent overtaking on highest level
-        m_controls->setNitro(m_ai_properties->m_nitro_usage
-                              == AIProperties::NITRO_ALL);
+        m_controls->setNitro(m_ai_properties->m_nitro_usage >= 2);
         return;
     }
 
