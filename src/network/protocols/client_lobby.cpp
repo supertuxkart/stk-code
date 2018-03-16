@@ -295,13 +295,14 @@ void ClientLobby::displayPlayerVote(Event* event)
     core::stringw track_readable = track->getName();
     int lap = data.getUInt8();
     bool reversed = (bool)data.getUInt8();
+    int t = data.getUInt8();
     core::stringw yes = _("Yes");
     core::stringw no = _("No");
     //I18N: Vote message in network game from a player
-    core::stringw vote_msg = _("Track: %s, Laps: %d, Reversed: %s",
-        track_readable, lap, reversed ? yes : no);
+    core::stringw vote_msg = _("Track: %s, laps: %d, reversed: %s, "
+        "remaining time: %ds", track_readable, lap, reversed ? yes : no, t);
     vote_msg = player_name + vote_msg;
-    MessageQueue::add(MessageQueue::MT_GENERIC, vote_msg);
+    MessageQueue::add(MessageQueue::MT_NETWORK_MSG, vote_msg);
 }   // displayPlayerVote
 
 //-----------------------------------------------------------------------------

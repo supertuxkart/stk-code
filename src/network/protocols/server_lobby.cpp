@@ -1000,9 +1000,15 @@ void ServerLobby::playerVote(Event* event)
     other.addUInt8(LE_VOTE).encodeString(event->getPeer()
         ->getPlayerProfiles()[0]->getName());
     other += data;
+    // Check if first vote, if so start counter (10 seconds voting time)
+    if (m_timeout == std::numeric_limits<float>::max())
+        m_timeout = (float)StkTime::getRealTime() + 10.0f;
+    float remaining_time = m_timeout - (float)StkTime::getRealTime();
+    if (remaining_time < 0.0f)
+        remaining_time = 0.0f;
+    other.addUInt8((uint8_t)remaining_time);
     sendMessageToPeersChangingToken(&other);
 
-    // Save the vote
 }   // playerVote
 
 // ----------------------------------------------------------------------------
