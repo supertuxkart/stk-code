@@ -1675,7 +1675,7 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
 
         if (widget.m_type == WTYPE_DIV)
         {
-            if (widget.m_show_bounding_box)
+            if (widget.m_show_bounding_box && widget.isVisible())
             {
                 if (widget.m_is_bounding_box_round)
                 {
