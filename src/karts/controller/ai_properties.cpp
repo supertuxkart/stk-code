@@ -45,7 +45,7 @@ AIProperties::AIProperties(RaceManager::Difficulty difficulty)
     m_handle_bomb                = false;
     m_item_usage_skill           = 0;
     m_disable_slipstream_usage   = false;
-    m_nitro_usage                = NITRO_NONE;
+    m_nitro_usage                = 0;
 
 }   // AIProperties
 
@@ -73,23 +73,8 @@ void AIProperties::load(const XMLNode *ai_node)
     ai_node->get("false-start-probability",   &m_false_start_probability   );
     ai_node->get("min-start-delay",           &m_min_start_delay           );
     ai_node->get("max-start-delay",           &m_max_start_delay           );
+    ai_node->get("nitro-usage",               &m_nitro_usage               );
 
-    std::string s;
-    ai_node->get("nitro-usage",               &s);
-    if(s=="none")
-        m_nitro_usage = NITRO_NONE;
-    else if(s=="some")
-        m_nitro_usage = NITRO_SOME;
-    else if(s=="all")
-        m_nitro_usage = NITRO_ALL;
-    else if(s=="advanced")
-        m_nitro_usage = NITRO_ADVANCED;
-    else
-    {
-        Log::fatal("AIProperties",
-                "Incorrect nitro-usage '%s' in AI '%s'.",s.c_str(),
-                m_ident.c_str());
-    }
     // We actually need the square of the distance later
     m_bad_item_closeness_2 *= m_bad_item_closeness_2;
 
