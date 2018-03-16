@@ -1950,15 +1950,36 @@ void SkiddingAI::handleNitroAndZipper()
       ai_skill = 0; //don't try to use the zipper if there is none  
    }
    
+   int nitro_time = m_kart->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_NITRO);
+   
    //Nitro skill 0 : don't use
    //Nitro skill 1 : don't use if the kart is braking, on the ground, has finished the race, has no nitro,
    //                has a parachute or an anvil attached, or has a plunger in the face.
    //                Otherwise, use it immediately
-   //Nitro skill 2 : TBD
-   //Nitro skill 3 : TBD
-   //Nitro skill 4 : Level 3 and ignore the plunger
+   //Nitro skill 2 : Don't use nitro if there is more than 1,2 seconds of effect left. Use it when at
+   //                max speed or under 5 of speed (after rescue, etc.).
+   //                Tries to builds a reserve of 3 energy to use towards the end
+   //Nitro skill 3 : Same as level 2, but don't use until 0,5 seconds of effect left, and don't use close
+   //                to bad items, and has a target reserve of 6 energy
+   //Nitro skill 4 : Same as level 3, but don't use until 0,05 seconds of effect left and ignore the plunger
+   //                and has a target reserve of 10 energy
    
     m_controls->setNitro(false);
+   
+   int energy_reserve = 0;
+   
+   if (nitro_skill == 2)
+   {
+      energy_reserve = 3;  
+   }
+   if (nitro_skill == 3)
+   {
+      energy_reserve = 6;  
+   }
+   if (nitro_skill == 4)
+   {
+      energy_reserve = 10;  
+   }
    
     // Don't use nitro or zipper if we are braking
     if(m_controls->getBrake()) return;
@@ -1990,77 +2011,91 @@ void SkiddingAI::handleNitroAndZipper()
         m_kart->getAttachment()->getType()==Attachment::ATTACH_ANVIL;
     if(has_slowdown_attachment) return;
    
-    // Don't compute nitro usage if we don't have nitro or are not supposed
-    // to use it, and we don't have a zipper or are not supposed to use
-    // it (calculated).
-    if( (m_kart->getEnergy()==0 || nitro_skill == 0)  && (ai_skill <= 1) )
+    // Don't compute nitro usage if we don't have nitro
+    if( m_kart->getEnergy()==0 )
+    {
+       nitro_skill = 0;
+    }
+   
+    // Don't use nitro if there is already a nitro boost active
+    // Nitro effect has a duration of around 2 seconds
+    if ((nitro_skill == 4) && nitro_time >= 0.05f )
+    {
+       nitro_skill = 0;
+    }
+    else if ((nitro_skill == 3) && nitro_time >= 0.50f )
+    {
+       nitro_skill = 0;
+    }
+    else if ((nitro_skill == 2) && nitro_time >= 1.20f )
+    {
+       nitro_skill = 0;
+    }
+   
+    // If there are items to avoid close
+    // Don't use zippers
+    // Dont use nitro if nitro_skill is 3 or 4
+    // (since going faster makes it harder to avoid items).
+    if(m_avoid_item_close && (m_kart->getEnergy()==0 || nitro_skill == 0 || nitro_skill >= 3) )
         return;
-
-    // If there are items to avoid close, and we only have zippers, don't
-    // use them (since this make it harder to avoid items).
-    if(m_avoid_item_close &&
-        (m_kart->getEnergy()==0 || m_ai_properties->m_nitro_usage == 0) )
-        return;
-
-    // If the kart is very slow (e.g. after rescue), use nitro
-    if(m_kart->getSpeed()<5)
+   
+    // If basic AI, use nitro immediately
+   
+    if (nitro_skill == 1)
     {
         m_controls->setNitro(true);
         return;
     }
-
-    // If this kart is the last kart, and we have enough
-    // (i.e. more than 2) nitro, use it.
-    // -------------------------------------------------
-    const unsigned int num_karts = m_world->getCurrentNumKarts();
-    if(m_kart->getPosition()== (int)num_karts &&
-        num_karts>1 && m_kart->getEnergy()>2.0f)
+   
+    // Estimate time towards the end of the race.
+    // Decreases the reserve size when there is an estimate of
+    // less than 4*energy seconds remaining.
+    // This takes into account that the useful boost is of around
+    // 2 seconds, that the kart will go a bit faster than predicted
+    // and that there may be moments when it's not useful to do so
+    // (parachutes, etc).
+    if(nitro_skill >= 2 && energy_reserve > 0)
     {
-        m_controls->setNitro(true);
-        return;
-    }
-
-    // On the last track shortly before the finishing line, use nitro
-    // anyway. Since the kart is faster with nitro, estimate a 50% time
-    // decrease (additionally some nitro will be saved when top speed
-    // is reached).
-    if(m_world->getLapForKart(m_kart->getWorldKartId())
-                        ==race_manager->getNumLaps()-1 &&
-       (m_ai_properties->m_nitro_usage >= 2) )
-    {
-        float finish =
-            m_world->getEstimatedFinishTime(m_kart->getWorldKartId());
-        if( 1.5f*m_kart->getEnergy() >= finish - m_world->getTime() )
+        float finish = m_world->getEstimatedFinishTime(m_kart->getWorldKartId());
+        if( 4.0f*m_kart->getEnergy() >= (finish - m_world->getTime()) )
         {
-            m_controls->setNitro(true);
-            return;
+            energy_reserve-- ; //Reduces the energy reserve by one
         }
     }
-
-    // A kart within this distance is considered to be overtaking (or to be
-    // overtaken).
-    const float overtake_distance = 10.0f;
-
-    // Try to overtake a kart that is close ahead, except
-    // when we are already much faster than that kart
-    // --------------------------------------------------
-    if(m_kart_ahead                                       &&
-        m_distance_ahead < overtake_distance              &&
-        m_kart_ahead->getSpeed()+5.0f > m_kart->getSpeed()   )
+   
+    // Don't use nitro if building an energy reserve
+    if (m_kart->getEnergy() <= energy_reserve)
     {
-            m_controls->setNitro(true);
-            return;
+        nitro_skill = 0;  
     }
 
-    if(m_kart_behind                                   &&
-        m_distance_behind < overtake_distance          &&
-        m_kart_behind->getSpeed() > m_kart->getSpeed()    )
+    // If the kart is very slow (e.g. after rescue), use nitro
+    if(nitro_skill > 0 && m_kart->getSpeed()<5)
     {
-        // Only prevent overtaking on highest level
-        m_controls->setNitro(m_ai_properties->m_nitro_usage >= 2);
+        m_controls->setNitro(true);
+        return;
+    }
+   
+   // If kart is at max speed, use nitro
+   // This is to profit from the max speed increase
+   // And because it means there should be no slowing down from, e.g. plungers
+   if (nitro_skill > 0 && m_kart->getSpeed() > 0.99f*m_kart->getCurrentMaxSpeed() )
+    {
+        m_controls->setNitro(true);
         return;
     }
 
+    // If this kart is the last kart, and we have nitro, use it.
+    // -------------------------------------------------
+    const unsigned int num_karts = m_world->getCurrentNumKarts();
+    if(nitro_skill > 0 && m_kart->getPosition()== (int)num_karts &&
+        num_karts > 1 )
+    {
+        m_controls->setNitro(true);
+        return;
+    }
+   
+    // Use zipper
     if(ai_skill >= 2 && m_kart->getSpeed()>1.0f &&
         m_kart->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0)
     {
