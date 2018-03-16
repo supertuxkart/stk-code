@@ -115,7 +115,7 @@ protected:
     int m_item_usage_skill;
 
     /** How the AI uses nitro. */
-    enum {NITRO_NONE, NITRO_SOME, NITRO_ALL, NITRO_ADVANCED} m_nitro_usage;
+    int m_nitro_usage;
 
     /** TODO: ONLY USE FOR OLD SKIDDING! CAN BE REMOVED once the new skidding
      *  works as expected.
