@@ -86,6 +86,9 @@ protected:
 
     /** Handles the powerup of a kart. */
     Powerup *m_powerup;
+    
+    /** Remember the last **used** powerup of a kart for AI purposes. */
+    Powerup *m_last_used_powerup;
 
     /** True if kart is flying (for debug purposes only). */
     bool m_flying;
@@ -313,6 +316,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the current powerup. */
     virtual Powerup* getPowerup() { return m_powerup; }
+    // ------------------------------------------------------------------------
+    /** Returns the last used powerup. */
+    virtual Powerup* getLastUsedPowerup() { return m_last_used_powerup; }
     // ------------------------------------------------------------------------
     /** Returns the number of powerups. */
     virtual int getNumPowerup() const;
