@@ -48,13 +48,7 @@ static const char ALL_TRACK_GROUPS_ID[] = "all";
 DEFINE_SCREEN_SINGLETON( TracksScreen );
 
 // -----------------------------------------------------------------------------
-void TracksScreen::loadedFromFile()
-{
-    getWidget<CheckBoxWidget>("reverse")->setState(false);
-    getWidget<SpinnerWidget>("lap-spinner")->setValue(1);
-}   // loadedFromFile
 
-// -----------------------------------------------------------------------------
 void TracksScreen::eventCallback(Widget* widget, const std::string& name,
                                  const int playerID)
 {
@@ -97,12 +91,16 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         {
             if (STKHost::existHost())
             {
+                assert(m_laps);
+                assert(m_reversed);
+                // Remember reverse globally for each stk instance
+                m_reverse_checked = m_reversed->getState();
+                UserConfigParams::m_num_laps = m_laps->getValue();
                 NetworkString vote(PROTOCOL_LOBBY_ROOM);
                 vote.addUInt8(LobbyProtocol::LE_VOTE);
-                vote.encodeString(track->getIdent()).addUInt8
-                    (getWidget<SpinnerWidget>("lap-spinner")->getValue())
-                    .addUInt8(
-                    getWidget<CheckBoxWidget>("reverse")->getState());
+                vote.encodeString(track->getIdent())
+                    .addUInt8(m_laps->getValue())
+                    .addUInt8(m_reversed->getState());
                 STKHost::get()->sendToServer(&vote, true);
             }
             else
@@ -144,9 +142,54 @@ void TracksScreen::tearDown()
 }   // tearDown
 
 // -----------------------------------------------------------------------------
+void TracksScreen::loadedFromFile()
+{
+    m_reversed = NULL;
+    m_laps = NULL;
+}   // loadedFromFile
+
+// -----------------------------------------------------------------------------
 void TracksScreen::beforeAddingWidget()
 {
     Screen::init();
+
+    Widget* rect_box = getWidget("rect-box");
+
+    if (m_bottom_box_height == -1)
+        m_bottom_box_height = rect_box->m_h;
+
+    if (m_network_tracks)
+    {
+        rect_box->setVisible(true);
+        rect_box->m_properties[GUIEngine::PROP_HEIGHT] = StringUtils::toString(m_bottom_box_height);
+        getWidget("lap-text")->setVisible(true);
+        //I18N: In track screen
+        getWidget<LabelWidget>("lap-text")->setText(_("Number of laps"), false);
+        m_laps = getWidget<SpinnerWidget>("lap-spinner");
+        assert(m_laps != NULL);
+        m_laps->setVisible(true);
+        getWidget("reverse-text")->setVisible(true);
+        //I18N: In track screen
+        getWidget<LabelWidget>("reverse-text")->setText(_("Drive in reverse"), false);
+        m_reversed = getWidget<CheckBoxWidget>("reverse");
+        assert(m_reversed != NULL);
+        m_reversed->m_properties[GUIEngine::PROP_ALIGN] = "center";
+        calculateLayout();
+    }
+    else
+    {
+        rect_box->setVisible(false);
+        rect_box->m_properties[GUIEngine::PROP_HEIGHT] = "0";
+        m_laps = NULL;
+        m_reversed = NULL;
+        getWidget("lap-text")->setVisible(false);
+        getWidget<LabelWidget>("lap-text")->setText(L"", false);
+        getWidget("lap-spinner")->setVisible(false);
+        getWidget("reverse-text")->setVisible(false);
+        getWidget<LabelWidget>("reverse-text")->setText(L"", false);
+        getWidget("reverse")->setVisible(false);
+        calculateLayout();
+    }
 
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     tabs->clearAllChildren();
@@ -202,20 +245,15 @@ void TracksScreen::init()
         tracks_widget->setSelection(0, PLAYER_ID_GAME_MASTER, true);
     }
     STKTexManager::getInstance()->unsetTextureErrorMessage();
-    if (!m_network_tracks)
+    if (m_network_tracks)
     {
-        getWidget("lap-text")->setVisible(false);
-        getWidget("lap-spinner")->setVisible(false);
-        getWidget("reverse-text")->setVisible(false);
-        getWidget("reverse")->setVisible(false);
+        if (UserConfigParams::m_num_laps == 0 ||
+            UserConfigParams::m_num_laps > 20)
+            UserConfigParams::m_num_laps = 1;
+        m_laps->setValue(UserConfigParams::m_num_laps);
+        m_reversed->setState(m_reverse_checked);
     }
-    else
-    {
-        getWidget("lap-text")->setVisible(true);
-        getWidget("lap-spinner")->setVisible(true);
-        getWidget("reverse-text")->setVisible(true);
-        getWidget("reverse")->setVisible(true);
-    }
+
     if (NetworkConfig::get()->isAutoConnect() && m_network_tracks)
     {
         assert(!m_random_track_list.empty());

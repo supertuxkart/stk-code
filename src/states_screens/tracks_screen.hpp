@@ -21,7 +21,11 @@
 #include "guiengine/screen.hpp"
 #include <deque>
 
-namespace GUIEngine { class Widget; }
+namespace GUIEngine
+{
+    class CheckBoxWidget;
+    class SpinnerWidget;
+}
 
 /**
   * \brief screen where the user can select a track
@@ -36,9 +40,14 @@ private:
     TracksScreen() : Screen("tracks.stkgui")
     {
         m_network_tracks = false;
+        m_reverse_checked = false;
     }
 
-    bool m_network_tracks;
+    GUIEngine::CheckBoxWidget* m_reversed;
+    GUIEngine::SpinnerWidget* m_laps;
+    bool m_network_tracks, m_reverse_checked;
+
+    int m_bottom_box_height = -1;
 
     /** adds the tracks from the current track group into the tracks ribbon */
     void buildTrackList();
