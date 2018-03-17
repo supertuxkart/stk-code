@@ -1380,6 +1380,10 @@ void Kart::update(float dt)
 
     if(m_controls.getFire() && !m_fire_clicked && !m_kart_animation)
     {
+        if (m_powerup->getType() != PowerupManager::POWERUP_NOTHING)
+        {
+            setLastUsedPowerup(m_powerup->getType());
+        }
         // use() needs to be called even if there currently is no collecteable
         // since use() can test if something needs to be switched on/off.
         m_powerup->use() ;
