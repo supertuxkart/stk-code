@@ -2049,7 +2049,7 @@ void SkiddingAI::handleNitroAndZipper()
    
     // Estimate time towards the end of the race.
     // Decreases the reserve size when there is an estimate of
-    // less than 4*energy seconds remaining.
+    // less than 5*energy seconds remaining.
     // This takes into account that the useful boost is of around
     // 2 seconds, that the kart will go a bit faster than predicted
     // and that there may be moments when it's not useful to do so
@@ -2057,9 +2057,9 @@ void SkiddingAI::handleNitroAndZipper()
     if(nitro_skill >= 2 && energy_reserve > 0.0f)
     {
         float finish = m_world->getEstimatedFinishTime(m_kart->getWorldKartId()) - m_world->getTime();
-        if( 4.0f*m_kart->getEnergy() >= finish )
+        if( 5.0f*m_kart->getEnergy() >= finish )
         {
-            energy_reserve = finish/4 ;
+            energy_reserve = finish/5 ;
         }
     }
    
