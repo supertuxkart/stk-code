@@ -253,6 +253,9 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
         }
     }
 
+    std::string parent_pid = "--parent-process=";
+    int current_pid = getpid();
+    parent_pid += StringUtils::toString(current_pid);
     child = fork();
     if (child == 0)
     {
@@ -289,6 +292,7 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
         argv.push_back(const_cast<char*>(exe_file.c_str()));
         for (unsigned i = 0; i < rest_argv.size(); i++)
             argv.push_back(const_cast<char*>(rest_argv[i].c_str()));
+        argv.push_back(const_cast<char*>(parent_pid.c_str()));
         argv.push_back(NULL);
         execvp(exe.c_str(), argv.data());
         Log::error("SeparateProcess", "Error in execl: errnp %d", errno);

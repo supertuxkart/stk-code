@@ -44,6 +44,10 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
 
+#ifndef WIN32
+#include <unistd.h>
+#endif
+
 MainLoop* main_loop = 0;
 
 MainLoop::MainLoop(unsigned parent_pid)
@@ -323,6 +327,10 @@ void MainLoop::run()
             if (WaitForSingleObject(parent, 0) != WAIT_TIMEOUT)
                 m_abort = true;
         }
+#else
+        // POSIX equivalent
+        if (m_parent_pid != 0 && getppid() != (int)m_parent_pid)
+            m_abort = true;
 #endif
         m_is_last_substep = false;
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
