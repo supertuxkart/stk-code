@@ -305,8 +305,8 @@ public:
     float getAnvilSpeedFactor() const;
 
     float getParachuteFriction() const;
-    float getParachuteDuration() const;
-    float getParachuteDurationOther() const;
+    int   getParachuteDuration() const;
+    int   getParachuteDurationOther() const;
     float getParachuteDurationRankMult() const;
     float getParachuteDurationSpeedMult() const;
     float getParachuteLboundFraction() const;
