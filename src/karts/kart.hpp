@@ -311,6 +311,9 @@ public:
     /** Sets a new powerup. */
     virtual void setPowerup (PowerupManager::PowerupType t, int n);
     // ------------------------------------------------------------------------
+    /** Sets the last used powerup. */
+    virtual void setLastUsedPowerup (PowerupManager::PowerupType t);
+    // ------------------------------------------------------------------------
     /** Returns the current powerup. */
     virtual const Powerup* getPowerup() const { return m_powerup; }
     // ------------------------------------------------------------------------
@@ -497,4 +500,3 @@ public:
 #endif
 
 /* EOF */
-
