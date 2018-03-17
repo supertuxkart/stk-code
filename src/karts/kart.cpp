@@ -118,6 +118,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_max_speed            = new MaxSpeed(this);
     m_terrain_info         = new TerrainInfo();
     m_powerup              = new Powerup(this);
+    m_last_used_powerup    = new Powerup(this);
     m_vehicle              = NULL;
     m_initial_position     = position;
     m_race_position        = position;
@@ -290,6 +291,7 @@ Kart::~Kart()
     delete m_max_speed;
     delete m_terrain_info;
     delete m_powerup;
+    delete m_last_used_powerup;
 
     if(m_controller)
         delete m_controller;
@@ -324,6 +326,7 @@ void Kart::reset()
     m_stars_effect->reset();
     m_max_speed->reset();
     m_powerup->reset();
+    m_last_used_powerup->reset();
 
     // Reset animations and wheels
     m_kart_model->reset();
@@ -518,6 +521,15 @@ float Kart::getHoT() const
 void Kart::setPowerup(PowerupManager::PowerupType t, int n)
 {
     m_powerup->set(t, n);
+}   // setPowerup
+
+// ----------------------------------------------------------------------------
+/** Sets the powerup this kart has last used. Number is always 1.
+ *  \param t Type of the powerup.
+ */
+void Kart::setLastUsedPowerup(PowerupManager::PowerupType t)
+{
+    m_last_used_powerup->set(t, 1);
 }   // setPowerup
 
 // -----------------------------------------------------------------------------
