@@ -1161,7 +1161,15 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
         return;
 
     m_time_since_last_shot += dt;
-
+   
+    //time since last shot is meant to avoid using the same item
+    //several times in rapid succession ; not to wait to use a useful
+    //collected item
+    if ( m_kart->getPowerup()->getType() != m_kart->getLastUsedPowerup()->getType() )
+    {
+       m_time_since_last_shot = 50.0f; //The AI may wait if the value is low, so set a high value
+    }
+   
     if (m_superpower == RaceManager::SUPERPOWER_NOLOK_BOSS)
     {
         m_controls->setLookBack(m_kart->getPowerup()->getType() ==
