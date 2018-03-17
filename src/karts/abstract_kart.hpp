@@ -389,9 +389,6 @@ public:
     /** Returns the current powerup. */
     virtual const Powerup *getPowerup() const = 0;
     // ------------------------------------------------------------------------
-    /** Returns the last used powerup. */
-    virtual const Powerup *getLastUsedPowerup() const = 0;
-    // ------------------------------------------------------------------------
     /** Returns the current powerup. */
     virtual Powerup *getPowerup() = 0;
     // ------------------------------------------------------------------------
