@@ -1958,27 +1958,27 @@ void SkiddingAI::handleNitroAndZipper()
    //                Otherwise, use it immediately
    //Nitro skill 2 : Don't use nitro if there is more than 1,2 seconds of effect left. Use it when at
    //                max speed or under 5 of speed (after rescue, etc.).
-   //                Tries to builds a reserve of 3 energy to use towards the end
+   //                Tries to builds a reserve of 4 energy to use towards the end
    //Nitro skill 3 : Same as level 2, but don't use until 0,5 seconds of effect left, and don't use close
-   //                to bad items, and has a target reserve of 6 energy
+   //                to bad items, and has a target reserve of 8 energy
    //Nitro skill 4 : Same as level 3, but don't use until 0,05 seconds of effect left and ignore the plunger
-   //                and has a target reserve of 10 energy
+   //                and has a target reserve of 12 energy
    
     m_controls->setNitro(false);
    
-   int energy_reserve = 0;
+   float energy_reserve = 0;
    
    if (nitro_skill == 2)
    {
-      energy_reserve = 3;  
+      energy_reserve = 4;  
    }
    if (nitro_skill == 3)
    {
-      energy_reserve = 6;  
+      energy_reserve = 8;  
    }
    if (nitro_skill == 4)
    {
-      energy_reserve = 10;  
+      energy_reserve = 12;  
    }
    
     // Don't use nitro or zipper if we are braking
@@ -2054,12 +2054,12 @@ void SkiddingAI::handleNitroAndZipper()
     // 2 seconds, that the kart will go a bit faster than predicted
     // and that there may be moments when it's not useful to do so
     // (parachutes, etc).
-    if(nitro_skill >= 2 && energy_reserve > 0)
+    if(nitro_skill >= 2 && energy_reserve > 0.0f)
     {
-        float finish = m_world->getEstimatedFinishTime(m_kart->getWorldKartId());
-        if( 4.0f*m_kart->getEnergy() >= (finish - m_world->getTime()) )
+        float finish = m_world->getEstimatedFinishTime(m_kart->getWorldKartId()) - m_world->getTime();
+        if( 4.0f*m_kart->getEnergy() >= finish )
         {
-            energy_reserve-- ; //Reduces the energy reserve by one
+            energy_reserve = finish/4 ;
         }
     }
    
