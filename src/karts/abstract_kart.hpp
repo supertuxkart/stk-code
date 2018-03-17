@@ -395,6 +395,9 @@ public:
     /** Returns the current powerup. */
     virtual Powerup *getPowerup() = 0;
     // ------------------------------------------------------------------------
+    /** Returns the last used powerup. */
+    virtual Powerup *getLastUsedPowerup() = 0;
+    // ------------------------------------------------------------------------
     /** Returns a points to this kart's graphical effects. */
     virtual KartGFX* getKartGFX() = 0;
     // ------------------------------------------------------------------------
