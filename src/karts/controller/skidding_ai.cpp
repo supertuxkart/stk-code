@@ -1958,7 +1958,7 @@ void SkiddingAI::handleNitroAndZipper()
       ai_skill = 0; //don't try to use the zipper if there is none  
    }
    
-   int nitro_time = m_kart->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_NITRO);
+   float nitro_time = m_kart->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_NITRO);
    
    //Nitro skill 0 : don't use
    //Nitro skill 1 : don't use if the kart is braking, on the ground, has finished the race, has no nitro,
