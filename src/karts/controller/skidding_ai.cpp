@@ -325,8 +325,8 @@ void SkiddingAI::update(float dt)
        if ( m_kart_ahead != m_kart->getAttachment()->getPreviousOwner())
        {
            // Use nitro if the kart is far ahead, or faster than this kart
-           m_controls->setNitro(m_distance_ahead>10.0f ||
-                             m_kart_ahead->getSpeed() > m_kart->getSpeed());
+           handleNitroAndZipper();
+          
            // If we are close enough, try to hit this kart
            if(m_distance_ahead<=10)
            {
@@ -1965,7 +1965,7 @@ void SkiddingAI::handleNitroAndZipper()
    //                has a parachute or an anvil attached, or has a plunger in the face.
    //                Otherwise, use it immediately
    //Nitro skill 2 : Don't use nitro if there is more than 1,2 seconds of effect left. Use it when at
-   //                max speed or under 5 of speed (after rescue, etc.).
+   //                max speed or under 5 of speed (after rescue, etc.). Use it to pass bombs.
    //                Tries to builds a reserve of 4 energy to use towards the end
    //Nitro skill 3 : Same as level 2, but don't use until 0,5 seconds of effect left, and don't use close
    //                to bad items, and has a target reserve of 8 energy
@@ -2068,6 +2068,16 @@ void SkiddingAI::handleNitroAndZipper()
         if( 5.0f*m_kart->getEnergy() >= finish )
         {
             energy_reserve = finish/5 ;
+        }
+    }
+   
+    // If trying to pass a bomb to a kart faster or far ahead, use nitro reserve
+    if(m_kart->getAttachment()->getType() == Attachment::ATTACH_BOMB
+       && nitro_skill >= 2 && energy_reserve > 0.0f)
+    {
+        if (m_distance_ahead>10.0f || m_kart_ahead->getSpeed() > m_kart->getSpeed() )
+        {
+            energy_reserve = 0 ;
         }
     }
    
