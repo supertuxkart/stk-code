@@ -123,6 +123,7 @@ void MainMenuScreen::init()
     assert(m_user_id);
 
     // reset in case we're coming back from a race
+    NetworkConfig::get()->cleanNetworkPlayers();
     StateManager::get()->resetActivePlayers();
     input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
     input_manager->getDeviceManager()->setSinglePlayer( NULL );

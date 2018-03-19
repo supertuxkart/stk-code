@@ -42,9 +42,6 @@ void NetworkUserDialog::beforeAddingWidgets()
     assert(m_name_widget != NULL);
     m_name_widget->setText(m_name, false);
 
-    m_options_widget = getWidget<RibbonWidget>("options");
-    assert(m_options_widget != NULL);
-
     m_friend_widget = getWidget<IconButtonWidget>("friend");
     assert(m_friend_widget != NULL);
     m_friend_widget->setVisible(m_online_id != 0);

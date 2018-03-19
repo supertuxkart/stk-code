@@ -243,30 +243,37 @@ void ClientLobby::update(float dt)
         break;
     case LINKED:
     {
-        // atm assume only 1 local player (no split screen yet)
         NetworkString *ns = getNetworkString();
         ns->addUInt8(LE_CONNECTION_REQUESTED)
             .encodeString(NetworkConfig::get()->getPassword());
 
-        uint8_t num_player = 1;
-        ns->addUInt8(num_player);
-        for (unsigned i = 0; i < num_player; i++)
+        assert(!NetworkConfig::get()->isAddingNetworkPlayers());
+        ns->addUInt8(
+            (uint8_t)NetworkConfig::get()->getNetworkPlayers().size());
+        // Only first player has online name and profile
+        bool first_player = true;
+        for (auto& p : NetworkConfig::get()->getNetworkPlayers())
         {
             core::stringw name;
-            PlayerProfile* player = PlayerManager::getCurrentPlayer();
+            PlayerProfile* player = std::get<1>(p);
             if (PlayerManager::getCurrentOnlineState() ==
-                PlayerProfile::OS_SIGNED_IN)
+                PlayerProfile::OS_SIGNED_IN && first_player)
+            {
                 name = PlayerManager::getCurrentOnlineUserName();
+            }
             else
+            {
                 name = player->getName();
+            }
             std::string name_u8 = StringUtils::wideToUtf8(name);
             ns->encodeString(name_u8).addFloat(player->getDefaultKartColor());
             Online::OnlinePlayerProfile* opp =
                 dynamic_cast<Online::OnlinePlayerProfile*>(player);
-            ns->addUInt32(opp && opp->getProfile() ?
+            ns->addUInt32(first_player && opp && opp->getProfile() ?
                 opp->getProfile()->getID() : 0);
-            // Assume no handicap player now
-            ns->addUInt8(PLAYER_DIFFICULTY_NORMAL);
+            // Per-player handicap
+            ns->addUInt8(std::get<2>(p));
+            first_player = false;
         }
         auto all_k = kart_properties_manager->getAllAvailableKarts();
         auto all_t = track_manager->getAllTrackIdentifiers();
@@ -397,8 +404,9 @@ void ClientLobby::connectionAccepted(Event* event)
     Log::info("ClientLobby", "The server accepted the connection.");
 
     STKHost::get()->setMyHostId(data.getUInt32());
-    // For now no split screen so only 1 player
-    m_game_setup->setNumLocalPlayers(1);
+    assert(!NetworkConfig::get()->isAddingNetworkPlayers());
+    m_game_setup->setNumLocalPlayers((int)
+        NetworkConfig::get()->getNetworkPlayers().size());
     // connection token
     uint32_t token = data.getToken();
     peer->setClientServerToken(token);

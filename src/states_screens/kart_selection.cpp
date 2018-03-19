@@ -37,6 +37,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
+#include "network/network_config.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -340,7 +341,8 @@ void KartSelectionScreen::init()
     tabs->setActive(true);
 
     m_kart_widgets.clearAndDeleteAll();
-    StateManager::get()->resetActivePlayers();
+    if (NetworkConfig::get()->getNetworkPlayers().empty())
+        StateManager::get()->resetActivePlayers();
     input_manager->getDeviceManager()->setAssignMode(DETECT_NEW);
 
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");

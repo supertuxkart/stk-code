@@ -26,11 +26,16 @@
 #include "race/race_manager.hpp"
 
 #include "irrString.h"
+#include <tuple>
+#include <vector>
 
 namespace Online
 {
     class XMLRequest;
 }
+
+class InputDevice;
+class PlayerProfile;
 
 class NetworkConfig
 {
@@ -76,6 +81,8 @@ private:
      *  immediately start a race. */
     bool m_auto_connect;
 
+    bool m_done_adding_network_players;
+
     /** If this is a server, the server name. */
     irr::core::stringw m_server_name;
 
@@ -85,6 +92,9 @@ private:
 
     /** Used by client server to determine if the child server is created. */
     std::string m_server_id_file;
+
+    std::vector<std::tuple<InputDevice*, PlayerProfile*,
+        /*is_handicap*/bool> > m_network_players;
 
     NetworkConfig();
 
@@ -168,6 +178,33 @@ public:
     {
         m_network_type = NETWORK_NONE;
         m_password = "";
+    }
+    // ------------------------------------------------------------------------
+    const std::vector<std::tuple<InputDevice*, PlayerProfile*, bool> >&
+                        getNetworkPlayers() const { return m_network_players; }
+    // ------------------------------------------------------------------------
+    bool isAddingNetworkPlayers() const
+                                     { return !m_done_adding_network_players; }
+    // ------------------------------------------------------------------------
+    void doneAddingNetworkPlayers()   { m_done_adding_network_players = true; }
+    // ------------------------------------------------------------------------
+    bool addNetworkPlayer(InputDevice* device, PlayerProfile* profile, bool h)
+    {
+        for (auto& p : m_network_players)
+        {
+            if (std::get<0>(p) == device)
+                return false;
+            if (std::get<1>(p) == profile)
+                return false;
+        }
+        m_network_players.emplace_back(device, profile, h);
+        return true;
+    }
+    // ------------------------------------------------------------------------
+    void cleanNetworkPlayers()
+    {
+        m_network_players.clear();
+        m_done_adding_network_players = false;
     }
     // ------------------------------------------------------------------------
     /** Sets the maximum number of players for this server. */

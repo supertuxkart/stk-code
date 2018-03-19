@@ -51,6 +51,12 @@ class NetworkingLobby : public GUIEngine::Screen,
                         public GUIEngine::ITextBoxWidgetListener
 {
 private:
+    enum LobbyState
+    {
+        LS_ADD_PLAYERS,
+        LS_CONNECTING
+    } m_state;
+
     friend class GUIEngine::ScreenSingleton<NetworkingLobby>;
 
     NetworkingLobby();
@@ -104,12 +110,14 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual bool onEscapePressed() OVERRIDE;
 
-    /** Used to insert each client chat message (reserved). */
+    void finishAddingPlayers();
     void addMoreServerInfo(core::stringw info);
     void setJoinedServer(std::shared_ptr<Server> server);
     void updatePlayers(const std::vector<std::tuple<uint32_t/*host id*/,
                        uint32_t/*online id*/, core::stringw/*player name*/,
                        int/*icon id*/> >& p);
+    void addSplitscreenPlayer(irr::core::stringw name);
+
 };   // class NetworkingLobby
 
 #endif

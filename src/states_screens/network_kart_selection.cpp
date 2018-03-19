@@ -165,6 +165,7 @@ void NetworkKartSelectionScreen::tearDown()
 bool NetworkKartSelectionScreen::onEscapePressed()
 {
     // then remove the lobby screen (you left the server)
+    StateManager::get()->resetActivePlayers();
     StateManager::get()->popMenu();
     STKHost::get()->shutdown();
     input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);

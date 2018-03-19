@@ -263,7 +263,7 @@ void CreateServerScreen::createServer()
         new SeparateProcess(SeparateProcess::getCurrentExecutableLocation(),
         server_cfg.str() + password);
     STKHost::create(server, sp);
-
+    NetworkingLobby::getInstance()->setJoinedServer(server);
 #endif
 }   // createServer
 

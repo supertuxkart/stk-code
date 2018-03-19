@@ -34,6 +34,7 @@
 #include "io/file_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"
+#include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/server_lobby.hpp"
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
@@ -115,30 +116,37 @@ void NetworkingLobby::beforeAddingWidget()
 void NetworkingLobby::init()
 {
     Screen::init();
+    // Already connected
+    if (LobbyProtocol::get<LobbyProtocol>())
+        return;
+
     m_server_info_height = GUIEngine::getFont()->getDimension(L"X").Height;
     m_start_button->setVisible(false);
+    getWidget("chat")->setVisible(false);
+    getWidget("chat")->setActive(false);
+    getWidget("send")->setVisible(false);
+    getWidget("send")->setActive(false);
 
-    // For now create the active player and bind it to the right
-    // input device.
-    InputDevice* device =
-        input_manager->getDeviceManager()->getLatestUsedDevice();
-    PlayerProfile* profile = PlayerManager::getCurrentPlayer();
-    StateManager::get()->createActivePlayer(profile, device);
-
-    if (!UserConfigParams::m_lobby_chat)
+    if (NetworkConfig::get()->getNetworkPlayers().empty())
     {
-        getWidget("chat")->setVisible(false);
-        getWidget("chat")->setActive(false);
-        getWidget("send")->setVisible(false);
-        getWidget("send")->setActive(false);
+        m_state = LS_ADD_PLAYERS;
+        input_manager->getDeviceManager()->mapFireToSelect(true);
+        input_manager->getDeviceManager()->setAssignMode(DETECT_NEW);
     }
-    else
+    else if (NetworkConfig::get()->isClient())
     {
-        m_chat_box->addListener(this);
-        getWidget("chat")->setVisible(true);
-        getWidget("chat")->setActive(true);
-        getWidget("send")->setVisible(true);
-        getWidget("send")->setActive(true);
+        // In case players had already configured connect now
+        m_state = LS_CONNECTING;
+        std::make_shared<ConnectToServer>(m_joined_server)->requestStart();
+        if (UserConfigParams::m_lobby_chat)
+        {
+            m_chat_box->clearListeners();
+            m_chat_box->addListener(this);
+            getWidget("chat")->setVisible(true);
+            getWidget("chat")->setActive(true);
+            getWidget("send")->setVisible(true);
+            getWidget("send")->setActive(true);
+        }
     }
 }   // init
 
@@ -208,6 +216,17 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
 // ----------------------------------------------------------------------------
 void NetworkingLobby::onUpdate(float delta)
 {
+    if (m_state == LS_ADD_PLAYERS && NetworkConfig::get()->isClient())
+    {
+        m_text_bubble->setText(_("Everyone:\nPress the 'Select' button to "
+                                          "join the game"), true);
+        m_start_button->setVisible(false);
+        m_exit_widget->setVisible(false);
+        return;
+    }
+
+    m_start_button->setVisible(false);
+    m_exit_widget->setVisible(true);
     auto lp = LobbyProtocol::get<LobbyProtocol>();
     if (!lp)
     {
@@ -304,19 +323,11 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == m_start_button->m_properties[PROP_ID])
     {
-        if (NetworkConfig::get()->isServer())
-        {
-            auto slrp = LobbyProtocol::get<ServerLobby>();
-            slrp->startSelection();
-        }
-        else
-        {
-            // Send a message to the server to start
-            NetworkString start(PROTOCOL_LOBBY_ROOM);
-            start.setSynchronous(true);
-            start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
-            STKHost::get()->sendToServer(&start, true);
-        }
+        // Send a message to the server to start
+        NetworkString start(PROTOCOL_LOBBY_ROOM);
+        start.setSynchronous(true);
+        start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
+        STKHost::get()->sendToServer(&start, true);
     }
 }   // eventCallback
 
@@ -328,14 +339,26 @@ void NetworkingLobby::unloaded()
 }   // unloaded
 
 // ----------------------------------------------------------------------------
-
 void NetworkingLobby::tearDown()
 {
+    // Server has a dummy network lobby too
+    if (!NetworkConfig::get()->isClient())
+        return;
+    input_manager->getDeviceManager()->mapFireToSelect(false);
+    assert(!NetworkConfig::get()->isAddingNetworkPlayers());
+    StateManager::get()->resetActivePlayers();
+    for (auto& p : NetworkConfig::get()->getNetworkPlayers())
+    {
+        StateManager::get()->createActivePlayer(std::get<1>(p),
+            std::get<0>(p));
+    }
 }   // tearDown
 
 // ----------------------------------------------------------------------------
 bool NetworkingLobby::onEscapePressed()
 {
+    input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
+    input_manager->getDeviceManager()->mapFireToSelect(false);
     STKHost::get()->shutdown();
     return true; // close the screen
 }   // onEscapePressed
@@ -366,4 +389,30 @@ void NetworkingLobby::updatePlayers(const std::vector<std::tuple<uint32_t,
             StringUtils::toString(std::get<1>(q));
         m_player_list->addItem(internal_name, std::get<2>(q), std::get<3>(q));
     }
-}  // updatePlayers
+}   // updatePlayers
+
+// ----------------------------------------------------------------------------
+void NetworkingLobby::addSplitscreenPlayer(irr::core::stringw name)
+{
+    if (!m_player_list)
+        return;
+    m_player_list->setIcons(m_icon_bank);
+    m_player_list->addItem(StringUtils::wideToUtf8(name), name, 1);
+}   // addSplitscreenPlayer
+
+// ----------------------------------------------------------------------------
+void NetworkingLobby::finishAddingPlayers()
+{
+    m_state = LS_CONNECTING;
+    std::make_shared<ConnectToServer>(m_joined_server)->requestStart();
+    m_start_button->setVisible(false);
+    if (UserConfigParams::m_lobby_chat)
+    {
+        m_chat_box->clearListeners();
+        m_chat_box->addListener(this);
+        getWidget("chat")->setVisible(true);
+        getWidget("chat")->setActive(true);
+        getWidget("send")->setVisible(true);
+        getWidget("send")->setActive(true);
+    }
+}   // finishAddingPlayers

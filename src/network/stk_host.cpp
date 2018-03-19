@@ -26,7 +26,6 @@
 #include "network/network_console.hpp"
 #include "network/network_string.hpp"
 #include "network/protocols/connect_to_peer.hpp"
-#include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/server_lobby.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/stk_peer.hpp"
@@ -80,7 +79,6 @@ void STKHost::create(std::shared_ptr<Server> server, SeparateProcess* p)
     else
     {
         m_stk_host = new STKHost(server);
-        std::make_shared<ConnectToServer>(server)->requestStart();
     }
     m_stk_host->m_separate_process = p;
     if (!m_stk_host->m_network)
