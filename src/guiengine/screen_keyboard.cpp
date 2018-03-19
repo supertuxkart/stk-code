@@ -81,6 +81,8 @@ ScreenKeyboard::ScreenKeyboard(float percent_width, float percent_height,
     m_percent_height  = std::min(std::max(percent_height, 0.0f), 1.0f);
     m_irrlicht_window = NULL;
     m_edit_box        = edit_box;
+    m_back_button     = NULL;
+    m_repeat_time     = 0;
     
     init();
 }   // ScreenKeyboard
@@ -135,6 +137,10 @@ void ScreenKeyboard::init()
     
     createButtons();
     assignButtons(BUTTONS_LOWER);
+    
+    Widget* button_widget = getWidget<ButtonWidget>("Back");
+    assert(button_widget != NULL);
+    m_back_button = button_widget->getIrrlichtElement<IGUIButton>();
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -222,6 +228,42 @@ void ScreenKeyboard::assignButtons(ButtonsType buttons_type)
 }   // assignButtons
 
 // ----------------------------------------------------------------------------
+
+void ScreenKeyboard::onUpdate(float dt)
+{
+    if (m_back_button->isPressed())
+    {
+        const unsigned int repeat_rate = 40;
+        const unsigned int repeat_delay = 400;
+        
+        SEvent event;
+        event.KeyInput.Key = IRR_KEY_BACK;
+        event.KeyInput.Char = 0;
+        event.EventType = EET_KEY_INPUT_EVENT;
+        event.KeyInput.PressedDown = true;
+        event.KeyInput.Control = false;
+        event.KeyInput.Shift = false;
+        
+        if (m_repeat_time == 0)
+        {
+            m_edit_box->OnEvent(event);
+        }
+
+        while (m_repeat_time > repeat_delay + repeat_rate)
+        {
+            m_edit_box->OnEvent(event);
+            m_repeat_time -= repeat_rate;
+        }
+        
+        m_repeat_time += (unsigned int)(dt * 1000);
+    }
+    else
+    {
+        m_repeat_time = 0;
+    }
+}
+
+// ----------------------------------------------------------------------------
 /** A function that handles buttons events
  *  \param eventSource Button ID
  *  \return Block event if edit box is assigned
@@ -272,9 +314,7 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
     }
     else if (eventSource == "Back")
     {
-        event.KeyInput.Key = IRR_KEY_BACK;
-        event.KeyInput.Char = 0;
-        send_event = true;
+        send_event = false;
     }
     else if (eventSource == "Space")
     {
