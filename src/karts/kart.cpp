@@ -118,7 +118,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_max_speed            = new MaxSpeed(this);
     m_terrain_info         = new TerrainInfo();
     m_powerup              = new Powerup(this);
-    m_last_used_powerup    = new Powerup(this);
+    m_last_used_powerup    = new PowerupManager::PowerupType(this);
     m_vehicle              = NULL;
     m_initial_position     = position;
     m_race_position        = position;
