@@ -40,7 +40,6 @@ namespace MessageQueue
         MT_ACHIEVEMENT,
         MT_ERROR,
         MT_GENERIC,
-        MT_NETWORK_MSG,
         MT_PROGRESS
     };
 

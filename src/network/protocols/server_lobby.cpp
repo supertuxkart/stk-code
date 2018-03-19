@@ -1052,8 +1052,10 @@ void ServerLobby::playerVote(Event* event)
 
     NetworkString& data = event->data();
     NetworkString other = NetworkString(PROTOCOL_LOBBY_ROOM);
-    other.addUInt8(LE_VOTE).encodeString(event->getPeer()
+    std::string name = StringUtils::wideToUtf8(event->getPeer()
         ->getPlayerProfiles()[0]->getName());
+    other.addUInt8(LE_VOTE).addFloat(m_timeout).encodeString(name)
+        .addUInt32(event->getPeer()->getHostId());
     other += data;
 
     std::string track_name;
@@ -1062,7 +1064,6 @@ void ServerLobby::playerVote(Event* event)
     uint8_t reverse = data.getUInt8();
     m_peers_votes[event->getPeerSP()] =
         std::make_tuple(track_name, lap, reverse == 1);
-    other.addUInt8((uint8_t)remaining_time);
     sendMessageToPeersChangingToken(&other);
 
 }   // playerVote

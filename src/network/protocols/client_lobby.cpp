@@ -39,6 +39,7 @@
 #include "states_screens/network_kart_selection.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/tracks_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
@@ -296,6 +297,7 @@ void ClientLobby::update(float dt)
     {
         // In case the user opened a user info dialog
         GUIEngine::ModalDialog::dismiss();
+        TracksScreen::getInstance()->resetVote();
         NetworkKartSelectionScreen* screen =
                                      NetworkKartSelectionScreen::getInstance();
         screen->setAvailableKartsFromServer(m_available_karts);
@@ -325,9 +327,12 @@ void ClientLobby::displayPlayerVote(Event* event)
 {
     if (!checkDataSize(event, 4)) return;
     // Get the player name who voted
-    core::stringw player_name;
     NetworkString& data = event->data();
-    data.decodeStringW(&player_name);
+    float timeout = data.getFloat();
+    TracksScreen::getInstance()->setVoteTimeout(timeout);
+    std::string player_name;
+    data.decodeString(&player_name);
+    uint32_t host_id = data.getUInt32();
     player_name += ": ";
     std::string track_name;
     data.decodeString(&track_name);
@@ -337,14 +342,14 @@ void ClientLobby::displayPlayerVote(Event* event)
     core::stringw track_readable = track->getName();
     int lap = data.getUInt8();
     int rev = data.getUInt8();
-    int t = data.getUInt8();
     core::stringw yes = _("Yes");
     core::stringw no = _("No");
     //I18N: Vote message in network game from a player
-    core::stringw vote_msg = _("Track: %s, laps: %d, reversed: %s, "
-        "remaining time: %ds", track_readable, lap, rev == 1 ? yes : no, t);
-    vote_msg = player_name + vote_msg;
-    MessageQueue::add(MessageQueue::MT_NETWORK_MSG, vote_msg);
+    core::stringw vote_msg = _("Track: %s,\nlaps: %d, reversed: %s",
+        track_readable, lap, rev == 1 ? yes : no);
+    vote_msg = StringUtils::utf8ToWide(player_name) + vote_msg;
+    TracksScreen::getInstance()->addVoteMessage(player_name +
+        StringUtils::toString(host_id), vote_msg);
 }   // displayPlayerVote
 
 //-----------------------------------------------------------------------------

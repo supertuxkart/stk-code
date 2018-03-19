@@ -21,6 +21,7 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/stk_tex_manager.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -139,6 +140,7 @@ bool TracksScreen::onEscapePressed()
 void TracksScreen::tearDown()
 {
     m_network_tracks = false;
+    m_vote_timeout = -1.0f;
 }   // tearDown
 
 // -----------------------------------------------------------------------------
@@ -146,6 +148,7 @@ void TracksScreen::loadedFromFile()
 {
     m_reversed = NULL;
     m_laps = NULL;
+    m_votes = NULL;
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
@@ -158,6 +161,7 @@ void TracksScreen::beforeAddingWidget()
     if (m_bottom_box_height == -1)
         m_bottom_box_height = rect_box->m_h;
 
+    m_votes = getWidget<LabelWidget>("vote-text");
     if (m_network_tracks)
     {
         rect_box->setVisible(true);
@@ -174,6 +178,9 @@ void TracksScreen::beforeAddingWidget()
         m_reversed = getWidget<CheckBoxWidget>("reverse");
         assert(m_reversed != NULL);
         m_reversed->m_properties[GUIEngine::PROP_ALIGN] = "center";
+        getWidget("all-track")->m_properties[GUIEngine::PROP_WIDTH] = "60%";
+        getWidget("vote")->setVisible(true);
+        m_votes->setVisible(true);
         calculateLayout();
     }
     else
@@ -186,9 +193,11 @@ void TracksScreen::beforeAddingWidget()
         getWidget("lap-spinner")->setVisible(false);
         getWidget("reverse-text")->setVisible(false);
         getWidget("reverse")->setVisible(false);
+        getWidget("all-track")->m_properties[GUIEngine::PROP_WIDTH] = "98%";
+        getWidget("vote")->setVisible(false);
+        m_votes->setVisible(false);
         calculateLayout();
     }
-
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     tabs->clearAllChildren();
 
@@ -346,3 +355,33 @@ void TracksScreen::setFocusOnTrack(const std::string& trackName)
     // so it's safe to use 'PLAYER_ID_GAME_MASTER'
     tracks_widget->setSelection(trackName, PLAYER_ID_GAME_MASTER, true);
 }   // setFocusOnTrack
+
+// -----------------------------------------------------------------------------
+void TracksScreen::onUpdate(float dt)
+{
+    if (m_vote_timeout == -1.0f)
+    {
+        return;
+    }
+    assert(m_votes);
+    m_votes->setVisible(true);
+    int remaining_time = int(m_vote_timeout - float(StkTime::getRealTime()));
+    if (remaining_time < 0)
+        remaining_time = 0;
+    //I18N: In tracks screen, about voting of tracks in network
+    core::stringw message = _("Remaining time: %d\n", remaining_time);
+    unsigned height = GUIEngine::getFont()->getDimension(L"X").Height;
+    const unsigned total_height = m_votes->getDimension().Height;
+    m_vote_messages.lock();
+    for (auto& p : m_vote_messages.getData())
+    {
+        height += GUIEngine::getFont()->getDimension(L"X").Height * 2;
+        if (height > total_height)
+            break;
+        message += p.second;
+        message += L"\n";
+    }
+    m_vote_messages.unlock();
+    m_votes->setText(message, true);
+
+}   // onUpdate

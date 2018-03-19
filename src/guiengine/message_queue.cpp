@@ -101,7 +101,7 @@ private:
 
 public:
     TextMessage(MessageQueue::MessageType mt, const core::stringw &message) :
-        Message(mt == MessageQueue::MT_NETWORK_MSG ? 1.0f : 5.0f)
+        Message(5.0f)
     {
         m_message_type = mt;
         m_message      = message;
@@ -111,8 +111,7 @@ public:
             m_render_type = "achievement-message::neutral";
         else if (mt == MessageQueue::MT_ERROR)
             m_render_type = "error-message::neutral";
-        else if (mt == MessageQueue::MT_GENERIC ||
-            mt == MessageQueue::MT_NETWORK_MSG)
+        else if (mt == MessageQueue::MT_GENERIC)
             m_render_type = "generic-message::neutral";
         else
             m_render_type = "friend-message::neutral";
