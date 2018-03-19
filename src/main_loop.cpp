@@ -19,8 +19,6 @@
 
 #include "main_loop.hpp"
 
-#include <assert.h>
-
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -28,7 +26,6 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/message_queue.hpp"
 #include "input/input_manager.hpp"
-#include "input/wiimote_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
@@ -44,8 +41,11 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
 
+#include <assert.h>
+
 MainLoop* main_loop = 0;
 
+// ----------------------------------------------------------------------------
 MainLoop::MainLoop() :
 m_abort(false)
 {
@@ -323,9 +323,6 @@ void MainLoop::run()
                 PROFILER_POP_CPU_MARKER();
 
                 PROFILER_PUSH_CPU_MARKER("Input/GUI", 0x7F, 0x00, 0x00);
-    #ifdef ENABLE_WIIUSE
-                wiimote_manager->update();
-    #endif
                 input_manager->update(frame_duration);
                 GUIEngine::update(frame_duration);
                 PROFILER_POP_CPU_MARKER();
