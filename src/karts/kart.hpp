@@ -321,7 +321,7 @@ public:
     virtual Powerup* getPowerup() { return m_powerup; }
     // ------------------------------------------------------------------------
     /** Returns the last used powerup. */
-    virtual PowerupManager::PowerupType* getLastUsedPowerup() { return m_last_used_powerup; }
+    virtual PowerupManager::PowerupType getLastUsedPowerup() { return m_last_used_powerup; }
     // ------------------------------------------------------------------------
     /** Returns the number of powerups. */
     virtual int getNumPowerup() const;
