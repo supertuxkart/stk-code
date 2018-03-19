@@ -186,6 +186,37 @@ void ScreenKeyboard::createButtons()
 }   // createButtons
 
 // ----------------------------------------------------------------------------
+
+std::wstring ScreenKeyboard::getKeyName(std::string key_id)
+{
+    std::wstring key_name;
+    
+    if (key_id == "Enter")
+    {
+        key_name = L"\u23CE";
+    }
+    else if (key_id == "Shift")
+    {
+        key_name = L"\u21E7";
+    }
+    else if (key_id == "Back")
+    {
+        key_name = L"\u232B";
+    }
+    else if (key_id == "Space")
+    {
+        key_name = L"\u2423";
+    }
+    else
+    {
+        std::wstring tmp(key_id.begin(), key_id.end());
+        key_name = tmp;
+    }
+    
+    return key_name;
+}
+
+// ----------------------------------------------------------------------------
 /** A function that allows to select one of the available buttons layout
  *  \param buttons_type One of the available buttons type
  */
@@ -219,9 +250,11 @@ void ScreenKeyboard::assignButtons(ButtonsType buttons_type)
         for (int j = 0; j < KEYBOARD_COLS_NUM; j++)
         {
             std::string key = keys != NULL ? (*keys)[i][j] : "?";
+            std::wstring key_name = getKeyName(key);
 
             ButtonWidget* button = m_buttons[i * KEYBOARD_COLS_NUM + j];
-            button->setText(key.c_str());
+            
+            button->setText(key_name.c_str());
             button->m_properties[PROP_ID] = key;
         }
     }

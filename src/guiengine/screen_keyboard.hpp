@@ -95,6 +95,7 @@ namespace GUIEngine
         void init();
         void createButtons();
         void assignButtons(ButtonsType buttons_type);
+        std::wstring getKeyName(std::string key_id);
 
     public:
         LEAK_CHECK()
