@@ -87,8 +87,8 @@ protected:
     /** Handles the powerup of a kart. */
     Powerup *m_powerup;
     
-    /** Remember the last **used** powerup of a kart for AI purposes. */
-    Powerup *m_last_used_powerup;
+    /** Remember the last **used** powerup type of a kart for AI purposes. */
+    PowerupManager::PowerupType *m_last_used_powerup;
 
     /** True if kart is flying (for debug purposes only). */
     bool m_flying;
