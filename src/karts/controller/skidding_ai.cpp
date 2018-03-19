@@ -1958,18 +1958,20 @@ void SkiddingAI::handleNitroAndZipper()
       ai_skill = 0; //don't try to use the zipper if there is none  
    }
    
-   float nitro_time = m_kart->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_NITRO);
-   
+   //Nitro continue to be advantageous during the fadeout
+   float nitro_time = ( m_kart->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_NITRO)
+                       + m_kart->getKartProperties()->getNitroFadeOutTime() );
+
    //Nitro skill 0 : don't use
    //Nitro skill 1 : don't use if the kart is braking, on the ground, has finished the race, has no nitro,
    //                has a parachute or an anvil attached, or has a plunger in the face.
    //                Otherwise, use it immediately
-   //Nitro skill 2 : Don't use nitro if there is more than 1,2 seconds of effect left. Use it when at
+   //Nitro skill 2 : Don't use nitro if there is more than 1,2 seconds of effect/fadeout left. Use it when at
    //                max speed or under 5 of speed (after rescue, etc.). Use it to pass bombs.
    //                Tries to builds a reserve of 4 energy to use towards the end
-   //Nitro skill 3 : Same as level 2, but don't use until 0,5 seconds of effect left, and don't use close
+   //Nitro skill 3 : Same as level 2, but don't use until 0,5 seconds of effect/fadeout left, and don't use close
    //                to bad items, and has a target reserve of 8 energy
-   //Nitro skill 4 : Same as level 3, but don't use until 0,05 seconds of effect left and ignore the plunger
+   //Nitro skill 4 : Same as level 3, but don't use until 0,05 seconds of effect/fadeout left and ignore the plunger
    //                and has a target reserve of 12 energy
    
     m_controls->setNitro(false);
@@ -2026,16 +2028,16 @@ void SkiddingAI::handleNitroAndZipper()
     }
    
     // Don't use nitro if there is already a nitro boost active
-    // Nitro effect has a duration of around 2 seconds
+    // Nitro effect and fadeout varies between karts type from 2 to 4 seconds
     if ((nitro_skill == 4) && nitro_time >= 0.05f )
     {
        nitro_skill = 0;
     }
-    else if ((nitro_skill == 3) && nitro_time >= 0.50f )
+    else if ((nitro_skill == 3) && nitro_time >= (m_kart->getKartProperties()->getNitroFadeOutTime()*0.5f) )
     {
        nitro_skill = 0;
     }
-    else if ((nitro_skill == 2) && nitro_time >= 1.20f )
+    else if ((nitro_skill == 2) && nitro_time >= (m_kart->getKartProperties()->getNitroFadeOutTime()*0.8f) )
     {
        nitro_skill = 0;
     }
