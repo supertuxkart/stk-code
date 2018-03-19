@@ -169,7 +169,7 @@ float MainLoop::getLimitedDt()
     // to findout which events to replay
     if (World::getWorld() && history->replayHistory() )
     {
-        history->updateReplay(World::getWorld()->getTime(), dt);
+        history->updateReplay(World::getWorld()->getTimeTicks(), dt);
     }
     return dt;
 }   // getLimitedDt
