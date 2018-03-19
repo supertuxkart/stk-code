@@ -104,7 +104,7 @@ public:
          Skidding(Kart *kart);
         ~Skidding();
     void reset();
-    void update(float dt, bool is_on_ground, float steer,
+    void update(int dt, bool is_on_ground, float steer,
                 KartControl::SkidControl skidding);
     void saveState(BareNetworkString *buffer);
     void rewindTo(BareNetworkString *buffer);

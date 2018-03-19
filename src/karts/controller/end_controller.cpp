@@ -172,7 +172,7 @@ void EndController::action(PlayerAction action, int value)
 }   // action
 
 //-----------------------------------------------------------------------------
-void EndController::update(float dt)
+void EndController::update(int ticks)
 {
     // This is used to enable firing an item backwards.
     m_controls->setLookBack(false);
@@ -180,7 +180,7 @@ void EndController::update(float dt)
     m_controls->setBrake(false);
     m_controls->setAccel(1.0f);
 
-    AIBaseLapController::update(dt);
+    AIBaseLapController::update(ticks);
 
     // In case of battle mode: don't do anything
     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
@@ -198,6 +198,7 @@ void EndController::update(float dt)
     calcSteps();
 
     /*Response handling functions*/
+    float dt = stk_config->ticks2Time(ticks);
     handleSteering(dt);
     handleRescue(dt);
 }   // update

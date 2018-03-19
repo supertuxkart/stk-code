@@ -68,7 +68,7 @@ public:
 
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
     virtual void setup() OVERRIDE {}
-    virtual void update(float dt) OVERRIDE {}
+    virtual void update(int ticks) OVERRIDE {}
     virtual void asynchronousUpdate() OVERRIDE;
 };   // class ConnectToPeer
 

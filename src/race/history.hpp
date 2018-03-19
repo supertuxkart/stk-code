@@ -71,10 +71,6 @@ private:
     /** Stores the kart controls being used (for physics replay). */
     std::vector<KartControl>   m_all_controls;
 
-    /** For networking: keep track of the replay time so that the
-     *  right event can be replayed. */
-    float                      m_history_time;
-
     /** Stores the coordinates (for simple replay). */
     AlignedArray<Vec3>         m_all_xyz;
 
@@ -90,7 +86,7 @@ private:
         /** Index at which the even happened. */
         int m_index;
         /* Time at which this event occurred. */
-        float m_time;
+        int m_world_ticks;
         /** For which kart the event was. */
         int m_kart_index;
         /** Which action it was. */
@@ -109,8 +105,8 @@ public:
     void  initRecording  ();
     void  Save           ();
     void  Load           ();
-    void  updateSaving(float dt);
-    float updateReplayAndGetDT(float time, float dt);
+    void  updateSaving(int ticks);
+    void  updateReplay(int world_ticks, float dt);
     void  addEvent(int kart_id, PlayerAction pa, int value);
 
     // -------------------I-----------------------------------------------------

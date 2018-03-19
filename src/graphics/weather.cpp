@@ -30,7 +30,7 @@ Weather::Weather()
 {
     m_thunder_sound = NULL;
     m_weather_sound = NULL;
-    m_lightning = 0.0f;
+    m_lightning = 0;
     
     if (Track::getCurrentTrack()->getWeatherLightning())
     {
@@ -44,7 +44,7 @@ Weather::Weather()
     }
 
     RandomGenerator g;
-    m_next_lightning = (float)g.get(35);
+    m_next_lightning = stk_config->time2Ticks((float)g.get(35));
 }   // Weather
 
 // ----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ Weather::~Weather()
 
 // ----------------------------------------------------------------------------
 
-void Weather::update(float dt)
+void Weather::update(int ticks)
 {
     if (!Track::getCurrentTrack()->getWeatherLightning())
         return;
@@ -68,9 +68,9 @@ void Weather::update(float dt)
     if (World::getWorld()->getRaceGUI() == NULL)
         return;
         
-    m_next_lightning -= dt;
+    m_next_lightning -= ticks;
 
-    if (m_next_lightning < 0.0f)
+    if (m_next_lightning < 0)
     {
         startLightning();
 
@@ -80,12 +80,12 @@ void Weather::update(float dt)
         }
 
         RandomGenerator g;
-        m_next_lightning = 35 + (float)g.get(35);
+        m_next_lightning = stk_config->time2Ticks(35.0f + (float)g.get(35));
     }
     
-    if (m_lightning > 0.0f)
+    if (m_lightning > 0)
     {
-        m_lightning -= dt;
+        m_lightning -= ticks;
     }
 }   // update
 
@@ -100,11 +100,20 @@ void Weather::playSound()
     }
 }
 
+// ----------------------------------------------------------------------------
+/** Set the flag that a lightning should be shown. */
+void Weather::startLightning()
+{
+    m_lightning = stk_config->time2Ticks(1.0f);
+}   // startLightning
+
+// ----------------------------------------------------------------------------
 irr::core::vector3df Weather::getIntensity()
 {
-    irr::core::vector3df value = {0.7f * m_lightning, 
-                                  0.7f * m_lightning, 
-                                  0.7f * std::min(1.0f, m_lightning * 1.5f)};
+    float light = stk_config->ticks2Time(m_lightning);
+    irr::core::vector3df value = {0.7f * light, 
+                                  0.7f * light, 
+                                  0.7f * std::min(1.0f, light * 1.5f)};
                                  
     return value;
-}
+}   // getIntensity

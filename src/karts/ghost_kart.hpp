@@ -46,7 +46,7 @@ private:
 public:
                   GhostKart(const std::string& ident,
                             unsigned int world_kart_id, int position);
-    virtual void  update (float dt);
+    virtual void  update(int ticks);
     virtual void  reset();
     // ------------------------------------------------------------------------
     /** No physics body for ghost kart, so nothing to adjust. */

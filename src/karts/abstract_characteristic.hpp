@@ -362,7 +362,7 @@ public:
     float getSlipstreamDuration() const;
     float getSlipstreamLength() const;
     float getSlipstreamWidth() const;
-    float getSlipstreamCollectTime() const;
+    int   getSlipstreamCollectTicks() const;
     float getSlipstreamUseTime() const;
     float getSlipstreamAddPower() const;
     float getSlipstreamMinSpeed() const;

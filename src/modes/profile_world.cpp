@@ -149,10 +149,11 @@ bool ProfileWorld::isRaceOver()
 
 //-----------------------------------------------------------------------------
 /** Counts the number of frames.
+ *  \param ticks number of physics time steps - should be 1.
  */
-void ProfileWorld::update(float dt)
+void ProfileWorld::update(int ticks)
 {
-    StandardRace::update(dt);
+    StandardRace::update(ticks);
 
     m_frame_count++;
     video::IVideoDriver *driver = irr_driver->getVideoDriver();

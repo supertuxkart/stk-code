@@ -75,7 +75,7 @@ protected:
     // ------------------------------------------------------------------------
     void         determineTurnRadius(const Vec3 &end, Vec3 *center,
                                      float *radius) const;
-    virtual void update      (float delta);
+    virtual void update(int ticks);
     virtual void setSteering   (float angle, float dt);
     // ------------------------------------------------------------------------
     /** Return true if AI can skid now. */

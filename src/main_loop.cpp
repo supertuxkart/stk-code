@@ -169,25 +169,25 @@ float MainLoop::getLimitedDt()
     // to findout which events to replay
     if (World::getWorld() && history->replayHistory() )
     {
-        dt = history->updateReplayAndGetDT(World::getWorld()->getTime(), dt);
+        history->updateReplay(World::getWorld()->getTime(), dt);
     }
     return dt;
 }   // getLimitedDt
 
 //-----------------------------------------------------------------------------
 /** Updates all race related objects.
- *  \param dt Time step size.
+ *  \param ticks Number of ticks (physics steps) to simulate - should be 1.
  */
-void MainLoop::updateRace(float dt)
+void MainLoop::updateRace(int ticks)
 {
     if (!World::getWorld())  return;   // No race on atm - i.e. we are in menu
 
     // The race event manager will update world in case of an online race
     if ( RaceEventManager::getInstance() && 
          RaceEventManager::getInstance()->isRunning() )
-        RaceEventManager::getInstance()->update(dt);
+        RaceEventManager::getInstance()->update(ticks);
     else
-        World::getWorld()->updateWorld(dt);
+        World::getWorld()->updateWorld(ticks);
 }   // updateRace
 
 //-----------------------------------------------------------------------------
@@ -356,7 +356,7 @@ void MainLoop::run()
             m_is_last_substep = (i == num_steps - 1);
 
             PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
-            if (World::getWorld()) updateRace(dt);
+            if (World::getWorld()) updateRace(1);
             PROFILER_POP_CPU_MARKER();
 
             // We need to check again because update_race may have requested
@@ -368,11 +368,11 @@ void MainLoop::run()
                                      0x7F, 0x00, 0x7F);
             if (auto pm = ProtocolManager::lock())
             {
-                pm->update(dt);
+                pm->update(1);
             }
             PROFILER_POP_CPU_MARKER();
 
-            if (World::getWorld()) World::getWorld()->updateTime(dt);
+            if (World::getWorld()) World::getWorld()->updateTime(1);
         }   // for i < num_steps
 
         m_is_last_substep = false;

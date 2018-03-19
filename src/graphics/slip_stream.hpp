@@ -61,7 +61,7 @@ private:
     float              m_length;
 
     /** The time a kart was in slipstream. */
-    float         m_slipstream_time;
+    int           m_slipstream_ticks;
 
     /** Slipstream mode: either nothing happening, or the kart is collecting
      *  'slipstream credits', or the kart is using accumulated credits. */
@@ -80,7 +80,7 @@ public:
                  SlipStream  (AbstractKart* kart);
     virtual     ~SlipStream  ();
     void         reset();
-    virtual void update(float dt);
+    virtual void update(int ticks);
     void         setIntensity(float f, const AbstractKart* kart);
     void         updateSlipstreamPower();
     bool         isSlipstreamReady() const;

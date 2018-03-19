@@ -57,7 +57,7 @@ public:
 
     virtual const std::string& getIdent() const OVERRIDE;
     virtual void terminateRace() OVERRIDE;
-    virtual void update(float dt) OVERRIDE;
+    virtual void update(int ticks) OVERRIDE;
     virtual void getKartsDisplayInfo(
                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
 
@@ -65,7 +65,7 @@ public:
     void collectedEasterEgg(const AbstractKart *kart);
     void readData(const std::string &filename);
 
-    virtual void checkForWrongDirection(unsigned int i, float dt) OVERRIDE;
+    virtual void checkForWrongDirection(unsigned int i, int ticks) OVERRIDE;
     virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
 
 };   // EasterEggHunt

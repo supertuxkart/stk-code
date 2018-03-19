@@ -839,9 +839,10 @@ float KartProperties::getBubblegumTorque() const
 }  // getBubblegumTorque
 
 // ----------------------------------------------------------------------------
-float KartProperties::getBubblegumFadeInTime() const
+int KartProperties::getBubblegumFadeInTicks() const
 {
-    return m_cached_characteristic->getBubblegumFadeInTime();
+    return stk_config->time2Ticks(m_cached_characteristic
+                                  ->getBubblegumFadeInTime());
 }  // getBubblegumFadeInTime
 
 // ----------------------------------------------------------------------------
@@ -929,9 +930,10 @@ float KartProperties::getPlungerBandSpeedIncrease() const
 }  // getPlungerBandSpeedIncrease
 
 // ----------------------------------------------------------------------------
-float KartProperties::getPlungerBandFadeOutTime() const
+int KartProperties::getPlungerBandFadeOutTicks() const
 {
-    return m_cached_characteristic->getPlungerBandFadeOutTime();
+    return stk_config->time2Ticks(m_cached_characteristic
+                                   ->getPlungerBandFadeOutTime());
 }  // getPlungerBandFadeOutTime
 
 // ----------------------------------------------------------------------------
@@ -994,6 +996,15 @@ float KartProperties::getNitroDuration() const
     return m_cached_characteristic->getNitroDuration();
 }  // getNitroDuration
 
+// ------------------------------------------------------------------------
+/** Returns minimum time during which nitro is consumed when pressing nitro
+ *  key, to prevent using nitro in very short bursts
+  */
+int KartProperties::getNitroMinConsumptionTicks() const
+{
+    return stk_config->time2Ticks(m_nitro_min_consumption);
+}
+
 // ----------------------------------------------------------------------------
 float KartProperties::getNitroEngineForce() const
 {
@@ -1037,9 +1048,10 @@ float KartProperties::getNitroMax() const
 }  // getNitroMax
 
 // ----------------------------------------------------------------------------
-float KartProperties::getSlipstreamDuration() const
+int KartProperties::getSlipstreamDuration() const
 {
-    return m_cached_characteristic->getSlipstreamDuration();
+    return stk_config->time2Ticks( m_cached_characteristic
+                                   ->getSlipstreamDuration() );
 }  // getSlipstreamDuration
 
 // ----------------------------------------------------------------------------
@@ -1055,9 +1067,9 @@ float KartProperties::getSlipstreamWidth() const
 }  // getSlipstreamWidth
 
 // ----------------------------------------------------------------------------
-float KartProperties::getSlipstreamCollectTime() const
+int KartProperties::getSlipstreamCollectTicks() const
 {
-    return m_cached_characteristic->getSlipstreamCollectTime();
+    return m_cached_characteristic->getSlipstreamCollectTicks();
 }  // getSlipstreamCollectTime
 
 // ----------------------------------------------------------------------------
@@ -1085,9 +1097,10 @@ float KartProperties::getSlipstreamMaxSpeedIncrease() const
 }  // getSlipstreamMaxSpeedIncrease
 
 // ----------------------------------------------------------------------------
-float KartProperties::getSlipstreamFadeOutTime() const
+int KartProperties::getSlipstreamFadeOutTicks() const
 {
-    return m_cached_characteristic->getSlipstreamFadeOutTime();
+    return stk_config->time2Ticks(m_cached_characteristic
+                                  ->getSlipstreamFadeOutTime());
 }  // getSlipstreamFadeOutTime
 
 // ----------------------------------------------------------------------------

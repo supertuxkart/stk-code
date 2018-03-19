@@ -76,7 +76,7 @@ Bowling::Bowling(AbstractKart *kart)
     getBody()->setCollisionFlags(flag);
 
     // should not live forever, auto-destruct after 20 seconds
-    m_max_lifespan = 20;
+    m_max_lifespan = stk_config->time2Ticks(20);
 
     m_roll_sfx = SFXManager::get()->createSoundSource("bowling_roll");
     m_roll_sfx->play();
@@ -118,9 +118,9 @@ void Bowling::init(const XMLNode &node, scene::IMesh *bowling)
  *  \param dt Time step size.
  *  \returns True of this object should be removed.
  */
-bool Bowling::updateAndDelete(float dt)
+bool Bowling::updateAndDelete(int ticks)
 {
-    bool can_be_deleted = Flyable::updateAndDelete(dt);
+    bool can_be_deleted = Flyable::updateAndDelete(ticks);
     if(can_be_deleted)
         return true;
 

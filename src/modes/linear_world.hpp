@@ -101,7 +101,7 @@ protected:
       */
     AlignedArray<KartInfo> m_kart_info;
 
-    virtual void  checkForWrongDirection(unsigned int i, float dt);
+    virtual void  checkForWrongDirection(unsigned int i, int ticks);
     void          updateRacePosition();
     virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
 
@@ -113,7 +113,7 @@ public:
     virtual void  init() OVERRIDE;
     virtual      ~LinearWorld();
 
-    virtual void  update(float delta) OVERRIDE;
+    virtual void  update(int ticks) OVERRIDE;
     float         getDistanceDownTrackForKart(const int kart_id) const;
     float         getDistanceToCenterForKart(const int kart_id) const;
     float         getEstimatedFinishTime(const int kart_id) const;

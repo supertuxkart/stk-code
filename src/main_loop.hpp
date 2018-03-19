@@ -41,7 +41,7 @@ private:
     Uint32   m_curr_time;
     Uint32   m_prev_time;
     float    getLimitedDt();
-    void     updateRace(float dt);
+    void     updateRace(int ticks);
 public:
          MainLoop();
         ~MainLoop();

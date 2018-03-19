@@ -241,8 +241,6 @@ void RewindQueue::addNetworkState(Rewinder *rewinder, BareNetworkString *buffer,
  *  local rewind information.
  *  \param world_ticks[in] Current world time up to which network events will be
  *         merged in.
- *  \param dt[in] Time step size. The current frame will cover events between
- *         world_time and world_time+dt.
  *  \param needs_rewind[out] True if network rewind information was received
  *         which was in the past (of this simulation), so a rewind must be
  *         performed.
@@ -250,7 +248,7 @@ void RewindQueue::addNetworkState(Rewinder *rewinder, BareNetworkString *buffer,
  *         must be performed (at least). Otherwise undefined, but the value
  *         might be modified in this function.
  */
-void RewindQueue::mergeNetworkData(int world_ticks, float dt,
+void RewindQueue::mergeNetworkData(int world_ticks,
                                    bool *needs_rewind, int *rewind_ticks)
 {
     *needs_rewind = false;
@@ -274,10 +272,8 @@ void RewindQueue::mergeNetworkData(int world_ticks, float dt,
     {
         // Ignore any events that will happen in the future. An event needs
         // to be handled at the closest time to its original time. The current
-        // time step id world_time, the next will be world_time+dt. So if the
-        // event is later than world_time+0.5*dt, it will be closer to a
-        // future time stamp and is ignored now.
-        if ((*i)->getTicks() > world_ticks+0.5f*dt)
+        // time step is world_ticks.
+        if ((*i)->getTicks() > world_ticks)
         {
             i++;
             continue;
@@ -467,17 +463,17 @@ void RewindQueue::unitTesting()
     int world_ticks = 0;
     float dt = 0.01f;
     assert((*q0.m_time_step_info.begin())->getNumberOfEvents() == 1);
-    q0.mergeNetworkData(world_ticks, dt, &needs_rewind, &rewind_ticks);
+    q0.mergeNetworkData(world_ticks, &needs_rewind, &rewind_ticks);
     assert((*q0.m_time_step_info.begin())->getNumberOfEvents() == 2);
 
     // This will be added to timestep 0
     q0.addNetworkEvent(dummy_rewinder, NULL, 2);
     dt = 0.01f;   // to small, event from 0.2 will not be merged
-    q0.mergeNetworkData(world_ticks, dt, &needs_rewind, &rewind_ticks);
+    q0.mergeNetworkData(world_ticks, &needs_rewind, &rewind_ticks);
     assert(q0.m_time_step_info.size() == 2);
     assert((*q0.m_time_step_info.begin())->getNumberOfEvents() == 2);
     dt = 0.3f;
-    q0.mergeNetworkData(world_ticks, dt, &needs_rewind, &rewind_ticks);
+    q0.mergeNetworkData(world_ticks, &needs_rewind, &rewind_ticks);
     assert(q0.m_time_step_info.size() == 2);
     assert((*q0.m_time_step_info.begin())->getNumberOfEvents() == 3);
 
@@ -485,7 +481,7 @@ void RewindQueue::unitTesting()
     q0.addNetworkEvent(dummy_rewinder, NULL, 1);
     world_ticks = 8;
     dt = 0.3f;
-    q0.mergeNetworkData(world_ticks, dt, &needs_rewind, &rewind_ticks);
+    q0.mergeNetworkData(world_ticks, &needs_rewind, &rewind_ticks);
     // Note that end() is behind the list, i.e. invalid, but rbegin()
     // is the last element
     assert((*q0.m_time_step_info.rbegin())->getNumberOfEvents() == 1);

@@ -298,7 +298,7 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
 
 //-----------------------------------------------------------------------------
 
-void ClientLobby::update(float dt)
+void ClientLobby::update(int ticks)
 {
     switch (m_state)
     {

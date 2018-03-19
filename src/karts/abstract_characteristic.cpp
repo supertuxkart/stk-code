@@ -1496,7 +1496,7 @@ float AbstractCharacteristic::getSlipstreamWidth() const
 }  // getSlipstreamWidth
 
 // ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSlipstreamCollectTime() const
+int AbstractCharacteristic::getSlipstreamCollectTicks() const
 {
     float result;
     bool is_set = false;
@@ -1504,8 +1504,8 @@ float AbstractCharacteristic::getSlipstreamCollectTime() const
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
                     getName(SLIPSTREAM_COLLECT_TIME).c_str());
-    return result;
-}  // getSlipstreamCollectTime
+    return stk_config->time2Ticks(result);
+}  // getSlipstreamCollectTicks
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getSlipstreamUseTime() const

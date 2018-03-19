@@ -63,9 +63,9 @@ void ProjectileManager::cleanup()
 
 // -----------------------------------------------------------------------------
 /** General projectile update call. */
-void ProjectileManager::update(float dt)
+void ProjectileManager::update(int ticks)
 {
-    updateServer(dt);
+    updateServer(ticks);
 
     HitEffects::iterator he = m_active_hit_effects.begin();
     while(he!=m_active_hit_effects.end())
@@ -77,7 +77,7 @@ void ProjectileManager::update(float dt)
             he = next;
         }
         // Update this hit effect. If it can be removed, remove it.
-        else if((*he)->updateAndDelete(dt))
+        else if((*he)->updateAndDelete(ticks))
         {
             delete *he;
             HitEffects::iterator next = m_active_hit_effects.erase(he);
@@ -90,12 +90,12 @@ void ProjectileManager::update(float dt)
 
 // -----------------------------------------------------------------------------
 /** Updates all rockets on the server (or no networking). */
-void ProjectileManager::updateServer(float dt)
+void ProjectileManager::updateServer(int ticks)
 {
     Projectiles::iterator p = m_active_projectiles.begin();
     while(p!=m_active_projectiles.end())
     {
-        bool can_be_deleted = (*p)->updateAndDelete(dt);
+        bool can_be_deleted = (*p)->updateAndDelete(ticks);
         if(can_be_deleted)
         {
             HitEffect *he = (*p)->getHitEffect();

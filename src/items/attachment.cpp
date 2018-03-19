@@ -366,8 +366,9 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         // default time. This is necessary to avoid that a kart lands on the
         // same banana again once the explosion animation is finished, giving
         // the kart the same penalty twice.
-        float f = std::max(item->getDisableTime(), kp->getExplosionDuration() + 2.0f);
-        item->setDisableTime(f);
+        int ticks = std::max(item->getDisableTicks(), 
+                             stk_config->time2Ticks(kp->getExplosionDuration() + 2.0f));
+        item->setDisableTicks(ticks);
         break;
         }
     case ATTACH_ANVIL:
@@ -490,7 +491,7 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
 }   // handleCollisionWithKart
 
 //-----------------------------------------------------------------------------
-void Attachment::update(float dt)
+void Attachment::update(int ticks)
 {
     if(m_type==ATTACH_NOTHING) return;
 
@@ -499,7 +500,7 @@ void Attachment::update(float dt)
     if (m_type == ATTACH_BOMB && m_kart->getKartAnimation() != NULL)
         return;
 
-    m_ticks_left--;  // dt always physics time step
+    m_ticks_left -= ticks;
 
 
     bool is_shield = m_type == ATTACH_BUBBLEGUM_SHIELD ||
@@ -526,6 +527,7 @@ void Attachment::update(float dt)
         m_node->setVisible(mod > ticks_per_flash);
     }
 
+    float dt = stk_config->ticks2Time(ticks);
     if (m_node_scale < m_wanted_node_scale)
     {
         m_node_scale += dt*1.5f;
@@ -537,7 +539,7 @@ void Attachment::update(float dt)
 
     if(m_plugin)
     {
-        bool discard = m_plugin->updateAndTestFinished(dt);
+        bool discard = m_plugin->updateAndTestFinished(ticks);
         if(discard)
         {
             clear();  // also removes the plugin

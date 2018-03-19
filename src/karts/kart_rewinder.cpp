@@ -181,9 +181,9 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
 /** Called once a frame. It will add a new kart control event to the rewind
  *  manager if any control values have changed.
  */
-void KartRewinder::update(float dt)
+void KartRewinder::update(int ticks)
 {
-    Kart::update(dt);
+    Kart::update(ticks);
 }   // update
 
 // ----------------------------------------------------------------------------

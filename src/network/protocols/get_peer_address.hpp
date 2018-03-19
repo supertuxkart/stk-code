@@ -45,7 +45,7 @@ public:
     /** Returns the address found. */
     const TransportAddress &getAddress() const { return m_address;  }
     // ------------------------------------------------------------------------
-    virtual void update(float dt) OVERRIDE {}
+    virtual void update(int ticks) OVERRIDE {}
     // ------------------------------------------------------------------------
     virtual bool notifyEvent(Event* event) OVERRIDE { return true; }
     // ------------------------------------------------------------------------

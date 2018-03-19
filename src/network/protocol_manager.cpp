@@ -395,14 +395,14 @@ bool ProtocolManager::sendEvent(Event* event)
  *  \param dt Time step size.
  *  \param async True if asynchronousUpdate() should be called.
  */
-void ProtocolManager::OneProtocolType::update(float dt, bool async)
+void ProtocolManager::OneProtocolType::update(int ticks, bool async)
 {
     for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
     {
         if (m_protocols.getData()[i]->getState() == PROTOCOL_STATE_RUNNING)
         {
             async ? m_protocols.getData()[i]->asynchronousUpdate()
-                  : m_protocols.getData()[i]->update(dt);
+                  : m_protocols.getData()[i]->update(ticks);
         }
     }
 }   // update
@@ -417,7 +417,7 @@ void ProtocolManager::OneProtocolType::update(float dt, bool async)
  *  This function is called by the main thread (i.e. from main_loop).
  *  This function IS FPS-dependant.
  */
-void ProtocolManager::update(float dt)
+void ProtocolManager::update(int ticks)
 {
     // Update from main thread only:
     assert(std::this_thread::get_id() != m_asynchronous_update_thread.get_id());
@@ -449,7 +449,7 @@ void ProtocolManager::update(float dt)
     {
         OneProtocolType &opt = m_all_protocols[i];
         opt.lock();
-        opt.update(dt, /*async*/false);
+        opt.update(ticks, /*async*/false);
         opt.unlock();
     }
 }   // update

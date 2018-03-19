@@ -54,13 +54,13 @@ private:
     SFXBuffer   *m_grab_sound;
     SFXBuffer   *m_full_sound;
 
-    virtual void steer(float, int) OVERRIDE;
+    virtual void steer(int, int) OVERRIDE;
     virtual void displayPenaltyWarning() OVERRIDE;
 public:
                  LocalPlayerController(AbstractKart *kart,
                                        const int local_playerID);
                 ~LocalPlayerController();
-    void         update            (float) OVERRIDE;
+    void         update            (int ticks) OVERRIDE;
     bool         action            (PlayerAction action, int value,
                                     bool dry_run=false) OVERRIDE;
     virtual void handleZipper      (bool play_sound) OVERRIDE;

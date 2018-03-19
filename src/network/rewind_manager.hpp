@@ -137,9 +137,9 @@ public:
     // Non-static function declarations:
 
     void reset();
-    void update(float dt);
+    void update(int ticks);
     void rewindTo(int target_ticks);
-    void playEventsTill(float time, float *dt);
+    void playEventsTill(float time, int *ticks);
     void addEvent(EventRewinder *event_rewinder, BareNetworkString *buffer,
                   bool confirmed, int ticks = -1);
     void addNetworkEvent(EventRewinder *event_rewinder,

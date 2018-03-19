@@ -82,8 +82,8 @@ public:
                          BareNetworkString *buffer, int ticks);
     void addNetworkState(Rewinder *rewinder, BareNetworkString *buffer,
                          int ticks, float dt);
-    void mergeNetworkData(int world_ticks, float dt,
-                          bool *needs_rewind, int *rewind_ticks);
+    void mergeNetworkData(int world_ticks,  bool *needs_rewind, 
+                          int *rewind_ticks);
     bool isEmpty() const;
     bool hasMoreRewindInfo() const;
     void undoUntil(int undo_ticks);

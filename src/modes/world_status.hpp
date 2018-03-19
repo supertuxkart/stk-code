@@ -152,8 +152,8 @@ public:
     virtual ~WorldStatus();
 
     virtual void reset();
-    virtual void updateTime(const float dt);
-    virtual void update(float dt);
+    virtual void updateTime(int ticks);
+    virtual void update(int ticks);
     void         startReadySetGo();
     virtual void pause(Phase phase);
     virtual void unpause();

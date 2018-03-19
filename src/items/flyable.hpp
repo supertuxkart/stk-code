@@ -127,11 +127,11 @@ protected:
 
     /** Time since thrown. used so a kart can't hit himself when trying
      *  something, and also to put some time limit to some collectibles */
-    float             m_time_since_thrown;
+    int               m_ticks_since_thrown;
 
     /** Set to something > -1 if this flyable should auto-destrcut after
-     *  a while. */
-    float             m_max_lifespan;
+     *  that may ticks. */
+    int                m_max_lifespan;
 
     /** If set to true, the kart that throwns this flyable can't collide
      *  with it for a short time. */
@@ -167,7 +167,7 @@ public:
     virtual     ~Flyable     ();
     static void  init        (const XMLNode &node, scene::IMesh *model,
                               PowerupManager::PowerupType type);
-    virtual bool              updateAndDelete(float);
+    virtual bool              updateAndDelete(int ticks);
     virtual void              setAnimation(AbstractKartAnimation *animation);
     virtual HitEffect*        getHitEffect() const;
     bool                      isOwnerImmunity(const AbstractKart *kart_hit) const;

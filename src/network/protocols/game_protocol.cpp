@@ -65,7 +65,7 @@ GameProtocol::~GameProtocol()
 /** Synchronous update - will send all commands collected during the last
  *  frame (and could optional only send messages every N frames).
  */
-void GameProtocol::update(float dt)
+void GameProtocol::update(int ticks)
 {
     if (m_all_actions.size() == 0) return;   // nothing to do
 
@@ -78,7 +78,7 @@ void GameProtocol::update(float dt)
     // Add all actions
     for (auto a : m_all_actions)
     {
-        m_data_to_send->addFloat(a.m_time);
+        m_data_to_send->addUInt32(a.m_ticks);
         m_data_to_send->addUInt8(a.m_kart_id);
         m_data_to_send->addUInt8((uint8_t)(a.m_action)).addUInt32(a.m_value)
                        .addUInt32(a.m_value_l).addUInt32(a.m_value_r);
@@ -130,7 +130,7 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
     a.m_value   = value;
     a.m_value_l = val_l;
     a.m_value_r = val_r;
-    a.m_time    = World::getWorld()->getTime();
+    a.m_ticks   = World::getWorld()->getTimeTicks();
 
     m_all_actions.push_back(a);
 
@@ -142,8 +142,8 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
     RewindManager::get()->addEvent(this, s, /*confirmed*/true,
                                    World::getWorld()->getTimeTicks() );
 
-    Log::info("GameProtocol", "Action at %f: %d value %d",
-              World::getWorld()->getTime(), action, 
+    Log::info("GameProtocol", "Action at %d: %d value %d",
+              World::getWorld()->getTimeTicks(), action, 
               action==PlayerAction::PA_STEER_RIGHT ? -value : value);
 }   // controllerAction
 
@@ -238,8 +238,8 @@ void GameProtocol::adjustTimeForClient(STKPeer *peer, int ticks)
  */
 void GameProtocol::handleAdjustTime(Event *event)
 {
-    float t = event->data().getFloat();
-    World::getWorld()->setAdjustTime(t);
+    int ticks = event->data().getUInt32();
+    World::getWorld()->setAdjustTime(stk_config->ticks2Time(ticks));
 }   // handleAdjustTime
 // ----------------------------------------------------------------------------
 /** Called by the server before assembling a new message containing the full
@@ -249,9 +249,9 @@ void GameProtocol::startNewState()
 {
     assert(NetworkConfig::get()->isServer());
     m_data_to_send->clear();
-    m_data_to_send->addUInt8(GP_STATE).addFloat(World::getWorld()->getTime());
-    Log::info("GameProtocol", "Sending new state at %f.",
-              World::getWorld()->getTime());
+    m_data_to_send->addUInt8(GP_STATE).addUInt32(World::getWorld()->getTimeTicks());
+    Log::info("GameProtocol", "Sending new state at %d.",
+              World::getWorld()->getTimeTicks());
 }   // startNewState
 
 // ----------------------------------------------------------------------------

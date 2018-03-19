@@ -46,7 +46,7 @@ private:
     virtual ~RaceEventManager();
 
 public:
-    void update(float dt);
+    void update(int ticks);
 
     void start();
     void stop();

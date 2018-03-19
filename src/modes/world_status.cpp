@@ -172,7 +172,7 @@ void WorldStatus::terminateRace()
  *  updated.
  *  \param dt Time step.
  */
-void WorldStatus::update(float dt)
+void WorldStatus::update(int ticks)
 {
 }   // update
 
@@ -180,9 +180,9 @@ void WorldStatus::update(float dt)
 /** Updates the world time and clock (which might be running backwards), and
  *  all status information, called once per frame at the end of the main
  *  loop.
- *  \param dt Duration of time step.
+ *  \param ticks Number of ticks (physics time steps) - should be 1.
  */
-void WorldStatus::updateTime(const float dt)
+void WorldStatus::updateTime(int ticks)
 {
     switch (m_phase)
     {

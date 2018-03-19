@@ -38,7 +38,7 @@
 PlayerController::PlayerController(AbstractKart *kart)
                 : Controller(kart)
 {
-    m_penalty_time = 0.0f;
+    m_penalty_ticks = 0;
 }   // PlayerController
 
 //-----------------------------------------------------------------------------
@@ -53,13 +53,13 @@ PlayerController::~PlayerController()
  */
 void PlayerController::reset()
 {
-    m_steer_val_l  = 0;
-    m_steer_val_r  = 0;
-    m_steer_val    = 0;
-    m_prev_brake   = 0;
-    m_prev_accel   = 0;
-    m_prev_nitro   = false;
-    m_penalty_time = 0;
+    m_steer_val_l   = 0;
+    m_steer_val_r   = 0;
+    m_steer_val     = 0;
+    m_prev_brake    = 0;
+    m_prev_accel    = 0;
+    m_prev_nitro    = false;
+    m_penalty_ticks = 0;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -167,7 +167,7 @@ bool PlayerController::action(PlayerAction action, int value, bool dry_run)
         break;
     case PA_ACCEL:
         SET_OR_TEST(m_prev_accel, value);
-        if (value && !(m_penalty_time > 0.0f))
+        if (value && !(m_penalty_ticks > 0))
         {
             SET_OR_TEST_GETTER(Accel, value/32768.0f);
             SET_OR_TEST_GETTER(Brake, false);
@@ -249,7 +249,7 @@ void PlayerController::actionFromNetwork(PlayerAction p_action, int value,
 //-----------------------------------------------------------------------------
 /** Handles steering for a player kart.
  */
-void PlayerController::steer(float dt, int steer_val)
+void PlayerController::steer(int ticks, int steer_val)
 {
     // Get the old value, compute the new steering value,
     // and set it at the end of this function
@@ -264,6 +264,7 @@ void PlayerController::steer(float dt, int steer_val)
     // Amount the steering is changed for digital devices.
     // If the steering is 'back to straight', a different steering
     // change speed is used.
+    float dt = stk_config->ticks2Time(ticks);
     const float STEER_CHANGE = ( (steer_val<=0 && steer<0) ||
                                  (steer_val>=0 && steer>0)   )
                      ? dt/m_kart->getKartProperties()->getTurnTimeResetSteer()
@@ -313,13 +314,13 @@ void PlayerController::skidBonusTriggered()
 //-----------------------------------------------------------------------------
 /** Updates the player kart, called once each timestep.
  */
-void PlayerController::update(float dt)
+void PlayerController::update(int ticks)
 {
     // Don't do steering if it's replay. In position only replay it doesn't
     // matter, but if it's physics replay the gradual steering causes
     // incorrect results, since the stored values are already adjusted.
     if (!history->replayHistory() || !history->dontDoPhysics())
-        steer(dt, m_steer_val);
+        steer(ticks, m_steer_val);
 
     if (World::getWorld()->getPhase() == World::GOAL_PHASE)
     {
@@ -336,11 +337,11 @@ void PlayerController::update(float dt)
             // Only give penalty time in SET_PHASE.
             // Penalty time check makes sure it doesn't get rendered on every
             // update.
-            if (m_penalty_time == 0.0 &&
+            if (m_penalty_ticks == 0 &&
                 World::getWorld()->getPhase() == WorldStatus::SET_PHASE)
             {
                 displayPenaltyWarning();
-                m_penalty_time = stk_config->m_penalty_time;
+                m_penalty_ticks = stk_config->m_penalty_ticks;
             }   // if penalty_time = 0
 
             m_controls->setBrake(false);
@@ -350,9 +351,9 @@ void PlayerController::update(float dt)
         return;
     }   // if isStartPhase
 
-    if (m_penalty_time>0.0)
+    if (m_penalty_ticks>0)
     {
-        m_penalty_time-=dt;
+        m_penalty_ticks-=ticks;
         return;
     }
 

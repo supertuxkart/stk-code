@@ -172,7 +172,7 @@ bool LocalPlayerController::action(PlayerAction action, int value,
 //-----------------------------------------------------------------------------
 /** Handles steering for a player kart.
  */
-void LocalPlayerController::steer(float dt, int steer_val)
+void LocalPlayerController::steer(int ticks, int steer_val)
 {
     if(UserConfigParams::m_gamepad_debug)
     {
@@ -182,7 +182,7 @@ void LocalPlayerController::steer(float dt, int steer_val)
                              m_kart, 1.0f,
                              video::SColor(255, 255, 0, 255), false);
     }
-    PlayerController::steer(dt, steer_val);
+    PlayerController::steer(ticks, steer_val);
     
     if(UserConfigParams::m_gamepad_debug)
     {
@@ -194,7 +194,7 @@ void LocalPlayerController::steer(float dt, int steer_val)
 //-----------------------------------------------------------------------------
 /** Updates the player kart, called once each timestep.
  */
-void LocalPlayerController::update(float dt)
+void LocalPlayerController::update(int ticks)
 {
     if (UserConfigParams::m_gamepad_debug)
     {
@@ -203,7 +203,7 @@ void LocalPlayerController::update(float dt)
         Log::debug("LocalPlayerController", "irr_driver", "-------------------------------------");
     }
 
-    PlayerController::update(dt);
+    PlayerController::update(ticks);
 
     // look backward when the player requests or
     // if automatic reverse camera is active

@@ -80,7 +80,7 @@ public:
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
     virtual void finishedLoadingWorld() OVERRIDE;
     virtual void setup() OVERRIDE;
-    virtual void update(float dt) OVERRIDE;
+    virtual void update(int ticks) OVERRIDE;
     virtual bool waitingForPlayers() const OVERRIDE
                                                   { return m_state == LINKED; }
     virtual void asynchronousUpdate() OVERRIDE {}

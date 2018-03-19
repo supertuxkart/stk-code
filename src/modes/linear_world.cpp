@@ -150,13 +150,13 @@ void LinearWorld::reset()
 //-----------------------------------------------------------------------------
 /** General update function called once per frame. This updates the kart
  *  sectors, which are then used to determine the kart positions.
- *  \param dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void LinearWorld::update(float dt)
+void LinearWorld::update(int ticks)
 {
     // run generic parent stuff that applies to all modes. It
     // especially updates the kart positions.
-    WorldWithRank::update(dt);
+    WorldWithRank::update(ticks);
 
     if (m_last_lap_sfx_playing &&
         m_last_lap_sfx->getStatus() != SFXBase::SFX_PLAYING)
@@ -197,7 +197,7 @@ void LinearWorld::update(float dt)
     // updated their position and laps etc, otherwise inconsistencies
     // (like two karts at same position) can occur.
     // ---------------------------------------------------------------
-    WorldWithRank::updateTrack(dt);
+    WorldWithRank::updateTrack(ticks);
     updateRacePosition();
 
     for (unsigned int i=0; i<kart_amount; i++)
@@ -213,7 +213,7 @@ void LinearWorld::update(float dt)
             m_kart_info[i].m_estimated_finish =
                 estimateFinishTimeForKart(m_karts[i]);
         }
-        checkForWrongDirection(i, dt);
+        checkForWrongDirection(i, ticks);
     }
 
 #ifdef DEBUG
@@ -842,12 +842,12 @@ void LinearWorld::updateRacePosition()
  *  player karts to display a message to the player.
  *  \param i Kart id.
  */
-void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
+void LinearWorld::checkForWrongDirection(unsigned int i, int ticks)
 {
     if (!m_karts[i]->getController()->isLocalPlayerController()) 
         return;
 
-    float wrongway_counter = m_karts[i]->getWrongwayCounter();
+    int wrongway_counter = m_karts[i]->getWrongwayCounter();
     
     const AbstractKart *kart=m_karts[i];
     // If the kart can go in more than one directions from the current track
@@ -875,14 +875,14 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
         kart->getVelocityLC().getY() > 0.0f &&
         !kart->hasFinishedRace())
     {
-        wrongway_counter += dt;
+        wrongway_counter += ticks;
         
-        if (wrongway_counter > 2.0f)
-            wrongway_counter = 2.0f;
+        if (wrongway_counter > stk_config->time2Ticks(2.0f))
+            wrongway_counter = stk_config->time2Ticks(2.0f);
     }
     else
     {
-        wrongway_counter -= dt;
+        wrongway_counter -= ticks;
 
         if (wrongway_counter < 0)
             wrongway_counter = 0;
@@ -891,7 +891,7 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
     if (kart->getKartAnimation())
         wrongway_counter = 0;
     
-    if (wrongway_counter > 1.0f)
+    if (wrongway_counter > stk_config->time2Ticks(1.0f))
     {
         m_race_gui->addMessage(_("WRONG WAY!"), kart,
                                /* time */ -1.0f,

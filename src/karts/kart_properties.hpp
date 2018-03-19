@@ -353,11 +353,6 @@ public:
     const std::string& getKartDir   () const {return m_root;                  }
 
     // ------------------------------------------------------------------------
-    /** Returns minimum time during which nitro is consumed when pressing nitro
-     *  key, to prevent using nitro in very short bursts
-     */
-    float getNitroMinConsumptionTime() const { return m_nitro_min_consumption; }
-    // ------------------------------------------------------------------------
     /** Returns the bevel factor (!=0 indicates to use a bevelled box). */
     const Vec3 &getBevelFactor() const { return m_bevel_factor; }
     // ------------------------------------------------------------------------
@@ -440,7 +435,7 @@ public:
     float getBubblegumDuration() const;
     float getBubblegumSpeedFraction() const;
     float getBubblegumTorque() const;
-    float getBubblegumFadeInTime() const;
+    int   getBubblegumFadeInTicks() const;
     float getBubblegumShieldDuration() const;
 
     float getZipperDuration() const;
@@ -458,7 +453,7 @@ public:
     float getPlungerBandForce() const;
     float getPlungerBandDuration() const;
     float getPlungerBandSpeedIncrease() const;
-    float getPlungerBandFadeOutTime() const;
+    int   getPlungerBandFadeOutTicks() const;
     float getPlungerInFaceTime() const;
 
     std::vector<float> getStartupTime() const;
@@ -480,16 +475,18 @@ public:
     float getNitroMaxSpeedIncrease() const;
     float getNitroFadeOutTime() const;
     float getNitroMax() const;
+    int   getNitroMinConsumptionTicks() const;
+    // ------------------------------------------------------------------------
 
-    float getSlipstreamDuration() const;
+    int getSlipstreamDuration() const;
     float getSlipstreamLength() const;
     float getSlipstreamWidth() const;
-    float getSlipstreamCollectTime() const;
+    int   getSlipstreamCollectTicks() const;
     float getSlipstreamUseTime() const;
     float getSlipstreamAddPower() const;
     float getSlipstreamMinSpeed() const;
     float getSlipstreamMaxSpeedIncrease() const;
-    float getSlipstreamFadeOutTime() const;
+    int getSlipstreamFadeOutTicks() const;
 
     float getSkidIncrease() const;
     float getSkidDecrease() const;

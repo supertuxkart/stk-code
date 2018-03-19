@@ -937,7 +937,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         }
 
         //Plunger
-        if (kart->getBlockedByPlungerTime()>0)
+        if (kart->getBlockedByPlungerTicks()>0)
         {
             video::ITexture *icon_plunger =
             powerup_manager->getIcon(PowerupManager::POWERUP_PLUNGER)->getTexture();
@@ -981,7 +981,7 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
 {
 #ifndef SERVER_ONLY
     const AbstractKart *kart = camera->getKart();
-    if (kart->getBlockedByPlungerTime()<=0)
+    if (kart->getBlockedByPlungerTicks()<=0)
     {
         m_plunger_state = PLUNGER_STATE_INIT;
         return;
@@ -1006,7 +1006,7 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
         if(m_plunger_move_time < dt && m_plunger_state!=PLUNGER_STATE_FAST)
         {
             const float fast_time = 0.3f;
-            if(kart->getBlockedByPlungerTime()<fast_time)
+            if(kart->getBlockedByPlungerTicks()<fast_time)
             {
                 // First time we reach faste state: select random target point
                 // at top of screen and set speed accordingly

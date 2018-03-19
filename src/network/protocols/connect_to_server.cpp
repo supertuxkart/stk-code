@@ -218,7 +218,7 @@ void ConnectToServer::asynchronousUpdate()
 }   // asynchronousUpdate
 
 // ----------------------------------------------------------------------------
-void ConnectToServer::update(float dt)
+void ConnectToServer::update(int ticks)
 {
     switch(m_state.load())
     {

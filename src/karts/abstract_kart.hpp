@@ -253,7 +253,7 @@ public:
     virtual float getFinishTime() const = 0;
     // ------------------------------------------------------------------------
     /** Returns true if the kart has a plunger attached to its face. */
-    virtual float getBlockedByPlungerTime() const = 0;
+    virtual int getBlockedByPlungerTicks() const = 0;
     // ------------------------------------------------------------------------
     /** Sets that the view is blocked by a plunger. The duration depends on
      *  the difficulty, see KartPorperties getPlungerInFaceTime. */
@@ -285,7 +285,7 @@ public:
      *  category. Not pure abstract, since there is no need to implement this
      *  e.g. in Ghost.
      *  \param category Which category to report on. */
-    virtual float getSpeedIncreaseTimeLeft(unsigned int category) const = 0;
+    virtual int getSpeedIncreaseTicksLeft(unsigned int category) const = 0;
     // ------------------------------------------------------------------------
     /** Sets an increased maximum speed for a category.
      *  \param category The category for which to set the higher maximum speed.
@@ -295,15 +295,15 @@ public:
      *  \param fade_out_time How long the maximum speed will fade out linearly.
      */
     virtual void increaseMaxSpeed(unsigned int category, float add_speed,
-                                  float engine_force, float duration,
-                                  float fade_out_time) = 0;
+                                  float engine_force, int duration,
+                                  int fade_out_time) = 0;
     // ------------------------------------------------------------------------
     /** Defines a slowdown, which is in fraction of top speed.
      *  \param category The category for which the speed is increased.
      *  \param max_speed_fraction Fraction of top speed to allow only.
      *  \param fade_in_time How long till maximum speed is capped. */
     virtual void setSlowdown(unsigned int category, float max_speed_fraction,
-                             float fade_in_time) = 0;
+                             int fade_in_time) = 0;
     // ------------------------------------------------------------------------
     /** Returns the remaining collected energy. */
     virtual float getEnergy() const = 0;
@@ -364,7 +364,7 @@ public:
     /** Return whether nitro is being used despite the nitro button not being
      *  pressed due to minimal use time requirements
      */
-    virtual float isOnMinNitroTime() const = 0;
+    virtual bool isOnMinNitroTime() const = 0;
     // ------------------------------------------------------------------------
     /** Returns the current material the kart is on. */
     virtual const Material *getMaterial() const = 0;
@@ -412,7 +412,7 @@ public:
     /** Returns if the kart is invulnerable. */
     virtual bool isInvulnerable() const = 0;
     // ------------------------------------------------------------------------
-    virtual void setInvulnerableTime(float t) = 0;
+    virtual void setInvulnerableTicks(int ticks) = 0;
     // ------------------------------------------------------------------------
     /** Returns if the kart is protected by a shield. */
     virtual bool isShielded() const = 0;
@@ -459,8 +459,8 @@ public:
     virtual void setOnScreenText(const wchar_t *text) = 0;
     // ------------------------------------------------------------------------- 
     /** Counter which is used for displaying wrong way message after a delay */
-    virtual float getWrongwayCounter() = 0;
-    virtual void setWrongwayCounter(float counter) = 0;
+    virtual int getWrongwayCounter() = 0;
+    virtual void setWrongwayCounter(int counter) = 0;
     // ------------------------------------------------------------------------
     /** Returns whether this kart wins or loses. */
     virtual bool getRaceResult() const = 0;

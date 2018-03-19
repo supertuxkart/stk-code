@@ -88,7 +88,7 @@ void Moveable::addError(const Vec3& pos_error,
  *  \param offset_xyz Offset to be added to the position.
  *  \param rotation Additional rotation.
  */
-void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
+void Moveable::updateGraphics(int ticks, const Vec3& offset_xyz,
                               const btQuaternion& rotation)
 {
     // If this is a client, don't smooth error during rewinds
@@ -165,16 +165,16 @@ void Moveable::stopFlying()
 //-----------------------------------------------------------------------------
 /** Updates the current position and rotation from the corresponding physics
  *  body, and then calls updateGraphics to position the model correctly.
- *  \param float dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void Moveable::update(float dt)
+void Moveable::update(int ticks)
 {
     if(m_body->getInvMass()!=0)
         m_motion_state->getWorldTransform(m_transform);
     m_velocityLC = getVelocity()*m_transform.getBasis();
     updatePosition();
 
-    updateGraphics(dt, Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
+    updateGraphics(ticks, Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
 }   // update
 
 //-----------------------------------------------------------------------------

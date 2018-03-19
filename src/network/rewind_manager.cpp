@@ -172,10 +172,11 @@ void RewindManager::addNetworkState(int rewinder_index, BareNetworkString *buffe
 // ----------------------------------------------------------------------------
 /** Determines if a new state snapshot should be taken, and if so calls all
  *  rewinder to do so.
- *  \param dt Time step size.
+ *  \param ticks_not_used NUmber of physics time steps - should be 1.
  */
-void RewindManager::update(float dt)
+void RewindManager::update(int ticks_not_used)
 {
+    // FIXME: rename ticks_not_used
     if(!m_enable_rewind_manager  || 
         m_all_rewinder.size()==0 ||
         m_is_rewinding              )  return;
@@ -220,18 +221,18 @@ void RewindManager::update(float dt)
 // ----------------------------------------------------------------------------
 /** Replays all events from the last event played till the specified time.
  *  \param time Up to (and inclusive) which time events will be replayed.
- *  \param dt Time step size. This might get adjusted if a new state has
- *         been received.
+ *  \param dt Number of time steps - should be 1.
  */
-void RewindManager::playEventsTill(float time, float *dt)
+void RewindManager::playEventsTill(float time, int *ticks)
 {    
     bool needs_rewind;
     int rewind_ticks;
 
-    // Merge in all network events that have happened since the last
+    // Merge in all network events that have happened at the current
+    // time step.
     // merge and that have happened before the current time (which will
     // be getTime()+dt - world time has not been updated yet).
-    m_rewind_queue.mergeNetworkData(World::getWorld()->getTimeTicks(), *dt,
+    m_rewind_queue.mergeNetworkData(World::getWorld()->getTimeTicks(),
                                     &needs_rewind, &rewind_ticks);
 
     if (needs_rewind)
@@ -340,12 +341,12 @@ void RewindManager::rewindTo(int rewind_ticks)
         // the world:
         current->replayAllEvents();
         dt = current->getDT();
-        world->updateWorld(dt);
+        world->updateWorld(1);
 #undef SHOW_ROLLBACK
 #ifdef SHOW_ROLLBACK
         irr_driver->update(dt);
 #endif
-        world->updateTime(dt);
+        world->updateTime(1);
 
         ++m_rewind_queue;
         current = m_rewind_queue.getCurrent();

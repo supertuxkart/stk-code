@@ -252,7 +252,7 @@ void ServerLobby::asynchronousUpdate()
  *  is known, register the server and its address with the stk server so that
  *  client can find it.
  */
-void ServerLobby::update(float dt)
+void ServerLobby::update(int ticks)
 {
     switch (m_state.load())
     {
@@ -439,7 +439,7 @@ void ServerLobby::signalRaceStartToClients()
  */
 void ServerLobby::startSelection(const Event *event)
 {
-    assert(m_server_registered);
+    //assert(m_server_registered);
     if (m_server_registered)
     {
         unregisterServer();

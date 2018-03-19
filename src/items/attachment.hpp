@@ -112,7 +112,7 @@ public:
          ~Attachment();
     void  clear ();
     void  hitBanana(Item *item, int new_attachment=-1);
-    void  update (float dt);
+    void  update(int ticks);
     void  handleCollisionWithKart(AbstractKart *other);
     void  set (AttachmentType type, int ticks,
                AbstractKart *previous_kart=NULL);
