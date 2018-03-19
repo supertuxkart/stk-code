@@ -1537,13 +1537,14 @@ void Track::update(int ticks)
         Scripting::ScriptEngine::getInstance()->runFunction(false, "void onStart()");
         m_startup_run = true;
     }
-    m_track_object_manager->update(ticks);
+    float dt = stk_config->ticks2Time(ticks);
+    m_track_object_manager->update(dt);
 
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {
-        m_animated_textures[i]->update(ticks);
+        m_animated_textures[i]->update(dt);
     }
-    CheckManager::get()->update(ticks);
+    CheckManager::get()->update(dt);
     ItemManager::get()->update(ticks);
 
     // TODO: enable onUpdate scripts if we ever find a compelling use for them
