@@ -111,10 +111,14 @@ protected:
     /** If the AI should actively try to pass on a bomb. */
     bool m_handle_bomb;
 
-    /** Determines the strategies used by the AI for items. 0 is worst, 5 is best. */
+    /** Determines the strategies used by the AI for items. 0 is no use,
+        1 is random use ; 2 to 5 use varying tactics, with 2 having the worst
+        and 5 the best. */
     int m_item_usage_skill;
 
-    /** How the AI uses nitro. */
+    /** How the AI uses nitro. 0 correspond to no use ; 1 to immediate use 
+        2 to 4 to various levels of mastery (the AI tries to accumulate a reserve
+        and to use bursts whose size/spacing varies according to the level). */
     int m_nitro_usage;
 
     /** TODO: ONLY USE FOR OLD SKIDDING! CAN BE REMOVED once the new skidding
