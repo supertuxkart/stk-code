@@ -26,11 +26,8 @@ class SFXBase;
 
 class Weather : public AbstractSingleton<Weather>
 {
-    /** Counts ticks till the next lighting appears. */
-    int m_next_lightning;
-
-    /** Counts the ticks for displaying the current lighting. */
-    int m_lightning;
+    float m_next_lightning;
+    float m_lightning;
 
     SFXBase* m_thunder_sound;
     SFXBase* m_weather_sound;
@@ -39,13 +36,14 @@ public:
              Weather();
     virtual ~Weather();
 
-    void update(int ticks);
+    void update(float dt);
     void playSound();
-    void startLightning();
-    irr::core::vector3df getIntensity();
-
-    bool shouldLightning() { return m_lightning > 0; }
     
-};   // class Weather
+    /** Set the flag that a lightning should be shown. */
+    void startLightning() { m_lightning = 1.0f; }
+    bool shouldLightning() { return m_lightning > 0.0f; }
+    
+    irr::core::vector3df getIntensity();
+};
 
 #endif

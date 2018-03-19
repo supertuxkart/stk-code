@@ -959,6 +959,21 @@ void World::scheduleTutorial()
 }   // scheduleTutorial
 
 //-----------------------------------------------------------------------------
+/** This updates all only graphical elements. It is only called once per
+ *  rendered frame, not once per time step.
+ *  float dt Time since last rame.
+ */
+void World::updateGraphics(float dt)
+{
+    PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
+    if (UserConfigParams::m_particles_effects > 1 && Weather::getInstance())
+    {
+        Weather::getInstance()->update(dt);
+    }
+    PROFILER_POP_CPU_MARKER();
+}   // updateGraphics
+
+//-----------------------------------------------------------------------------
 /** Updates the physics, all karts, the track, and projectile manager.
  *  \param ticks Number of physics time steps - should be 1.
  */
@@ -1023,13 +1038,6 @@ void World::update(int ticks)
     {
         Physics::getInstance()->update(ticks);
     }
-
-    PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
-    if (UserConfigParams::m_particles_effects > 1 && Weather::getInstance())
-    {
-        Weather::getInstance()->update(ticks);
-    }
-    PROFILER_POP_CPU_MARKER();
 
     PROFILER_PUSH_CPU_MARKER("World::update (projectiles)", 0xa0, 0x7F, 0x00);
     projectile_manager->update(ticks);

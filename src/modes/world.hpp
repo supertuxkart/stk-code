@@ -236,6 +236,7 @@ public:
     // Virtual functions
     // =================
     virtual void    init();
+    virtual void    updateGraphics(float dt);
     virtual void    terminateRace() OVERRIDE;
     virtual void    reset() OVERRIDE;
     virtual void    pause(Phase phase) OVERRIDE;

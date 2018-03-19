@@ -317,6 +317,11 @@ void MainLoop::run()
             float frame_duration = num_steps * dt;
             if (!ProfileWorld::isNoGraphics())
             {
+                PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
+                if (World::getWorld())
+                    World::getWorld()->updateGraphics(frame_duration);
+                PROFILER_POP_CPU_MARKER();
+
                 // Render the previous frame, and also handle all user input.
                 PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
                 irr_driver->update(frame_duration);
