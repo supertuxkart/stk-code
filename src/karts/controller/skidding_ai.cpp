@@ -1961,6 +1961,8 @@ void SkiddingAI::handleNitroAndZipper()
    //Nitro continue to be advantageous during the fadeout
    float nitro_time = ( m_kart->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_NITRO)
                        + m_kart->getKartProperties()->getNitroFadeOutTime() );
+   float nitro_max_time = m_kart->getKartProperties()->getNitroDuration()
+                         + m_kart->getKartProperties()->getNitroFadeOutTime();
 
    //Nitro skill 0 : don't use
    //Nitro skill 1 : don't use if the kart is braking, on the ground, has finished the race, has no nitro,
@@ -2029,15 +2031,16 @@ void SkiddingAI::handleNitroAndZipper()
    
     // Don't use nitro if there is already a nitro boost active
     // Nitro effect and fadeout varies between karts type from 2 to 4 seconds
-    if ((nitro_skill == 4) && nitro_time >= 0.05f )
+    // So vary time according to kart properties
+    if ((nitro_skill == 4) && nitro_time >= (nitro_max_time*0.01f) )
     {
        nitro_skill = 0;
     }
-    else if ((nitro_skill == 3) && nitro_time >= (m_kart->getKartProperties()->getNitroFadeOutTime()*0.5f) )
+    else if ((nitro_skill == 3) && nitro_time >= (nitro_max_time*0.35f) )
     {
        nitro_skill = 0;
     }
-    else if ((nitro_skill == 2) && nitro_time >= (m_kart->getKartProperties()->getNitroFadeOutTime()*0.8f) )
+    else if ((nitro_skill == 2) && nitro_time >= (nitro_max_time*0.5f) )
     {
        nitro_skill = 0;
     }
@@ -2058,18 +2061,35 @@ void SkiddingAI::handleNitroAndZipper()
     }
    
     // Estimate time towards the end of the race.
-    // Decreases the reserve size when there is an estimate of
-    // less than 5*energy seconds remaining.
-    // This takes into account that the useful boost is of around
-    // 2 seconds, that the kart will go a bit faster than predicted
-    // and that there may be moments when it's not useful to do so
-    // (parachutes, etc).
+    // Decreases the reserve size when there is an estimate of time remaining
+    // to the end of less than 2,5 times the maximum nitro effect duration.
+    // This vary depending on kart characteristic.
+    // There is a margin because the kart will go a bit faster than predicted
+    // by the estimate, because the kart may collect more nitro and because
+    // there may be moments when it's not useful to use nitro (parachutes, etc).
     if(nitro_skill >= 2 && energy_reserve > 0.0f)
     {
         float finish = m_world->getEstimatedFinishTime(m_kart->getWorldKartId()) - m_world->getTime();
-        if( 5.0f*m_kart->getEnergy() >= finish )
+        float max_time_effect = nitro_max_time / m_kart->getKartProperties()->getNitroConsumption()
+                                * m_kart->getEnergy()*2; //the minimum burst consumes around 0,5 energy
+       
+        // The burster forces the AI to consume its reserve by series of 2 bursts
+        // Otherwise the bursting differences of the various nitro skill wouldn't matter here
+        // In short races, most AI nitro usage may be at the end with the reserve
+        float burster;
+        
+        if ( nitro_time > 0)
         {
-            energy_reserve = finish/5 ;
+           burster = 2*nitro_max_time;
+        }
+       else
+       {
+            burster = 0;  
+       }
+        if( (2.5f*max_time_effect) >= (finish - burster) )
+        {
+            // Absolute reduction to avoid small amount of unburned nitro at the end
+            energy_reserve = (finish - burster)/(2.5f*max_time_effect/m_kart->getEnergy()) - 0.5f ;
         }
     }
    
@@ -2090,7 +2110,7 @@ void SkiddingAI::handleNitroAndZipper()
     }
 
     // If the kart is very slow (e.g. after rescue), use nitro
-    if(nitro_skill > 0 && m_kart->getSpeed()<5)
+    if(nitro_skill > 0 && m_kart->getSpeed()<5 && m_kart->getSpeed()>2)
     {
         m_controls->setNitro(true);
         return;
