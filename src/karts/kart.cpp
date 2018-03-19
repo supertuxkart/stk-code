@@ -118,7 +118,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_max_speed            = new MaxSpeed(this);
     m_terrain_info         = new TerrainInfo();
     m_powerup              = new Powerup(this);
-    m_last_used_powerup    = new PowerupManager::PowerupType(this);
+    m_last_used_powerup    = new PowerupManager::PowerupType();
     m_vehicle              = NULL;
     m_initial_position     = position;
     m_race_position        = position;
@@ -326,7 +326,6 @@ void Kart::reset()
     m_stars_effect->reset();
     m_max_speed->reset();
     m_powerup->reset();
-    m_last_used_powerup->reset();
 
     // Reset animations and wheels
     m_kart_model->reset();
@@ -529,7 +528,7 @@ void Kart::setPowerup(PowerupManager::PowerupType t, int n)
  */
 void Kart::setLastUsedPowerup(PowerupManager::PowerupType t)
 {
-    m_last_used_powerup = t;
+    *m_last_used_powerup = t;
 }   // setLastUsedPowerup
 
 // -----------------------------------------------------------------------------
