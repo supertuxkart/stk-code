@@ -183,10 +183,8 @@ void TracksScreen::beforeAddingWidget()
         m_laps = NULL;
         m_reversed = NULL;
         getWidget("lap-text")->setVisible(false);
-        getWidget<LabelWidget>("lap-text")->setText(L"", false);
         getWidget("lap-spinner")->setVisible(false);
         getWidget("reverse-text")->setVisible(false);
-        getWidget<LabelWidget>("reverse-text")->setText(L"", false);
         getWidget("reverse")->setVisible(false);
         calculateLayout();
     }
