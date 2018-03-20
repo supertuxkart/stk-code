@@ -130,8 +130,6 @@ void NetworkingLobby::init()
     if (NetworkConfig::get()->getNetworkPlayers().empty())
     {
         m_state = LS_ADD_PLAYERS;
-        input_manager->getDeviceManager()->mapFireToSelect(true);
-        input_manager->getDeviceManager()->setAssignMode(DETECT_NEW);
     }
     else if (NetworkConfig::get()->isClient())
     {
@@ -222,6 +220,11 @@ void NetworkingLobby::onUpdate(float delta)
                                           "join the game"), true);
         m_start_button->setVisible(false);
         m_exit_widget->setVisible(false);
+        if (!GUIEngine::ModalDialog::isADialogActive())
+        {
+            input_manager->getDeviceManager()->setAssignMode(DETECT_NEW);
+            input_manager->getDeviceManager()->mapFireToSelect(true);
+        }
         return;
     }
 
@@ -345,7 +348,6 @@ void NetworkingLobby::tearDown()
     if (!NetworkConfig::get()->isClient())
         return;
     input_manager->getDeviceManager()->mapFireToSelect(false);
-    assert(!NetworkConfig::get()->isAddingNetworkPlayers());
     StateManager::get()->resetActivePlayers();
     for (auto& p : NetworkConfig::get()->getNetworkPlayers())
     {
@@ -416,3 +418,11 @@ void NetworkingLobby::finishAddingPlayers()
         getWidget("send")->setActive(true);
     }
 }   // finishAddingPlayers
+
+// ----------------------------------------------------------------------------
+void NetworkingLobby::cleanAddedPlayers()
+{
+    if (!m_player_list)
+        return;
+    m_player_list->clear();
+}   // cleanAddedPlayers

@@ -38,9 +38,7 @@ private:
 
     bool m_self_destroy;
 
-    bool m_connect_now;
-
-    GUIEngine::LabelWidget* m_error_message;
+    GUIEngine::LabelWidget* m_message;
 
     GUIEngine::SpinnerWidget* m_profiles;
 
@@ -54,15 +52,16 @@ private:
 
     GUIEngine::IconButtonWidget* m_cancel;
 
+    GUIEngine::IconButtonWidget* m_reset;
+
 public:
     SplitscreenPlayerDialog(InputDevice* device)
-        : ModalDialog(0.8f,0.8f), m_device(device), m_self_destroy(false),
-          m_connect_now(false)
+        : ModalDialog(0.8f,0.8f), m_device(device), m_self_destroy(false)
     {
         loadFromFile("online/splitscreen_player_dialog.stkgui");
     }
     // ------------------------------------------------------------------------
-    ~SplitscreenPlayerDialog();
+    ~SplitscreenPlayerDialog() {}
     // ------------------------------------------------------------------------
     virtual void beforeAddingWidgets();
     // ------------------------------------------------------------------------

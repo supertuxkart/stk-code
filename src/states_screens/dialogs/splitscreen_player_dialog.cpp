@@ -32,18 +32,6 @@
 
 using namespace GUIEngine;
 using namespace irr;
-using namespace irr::gui;
-using namespace Online;
-
-// ----------------------------------------------------------------------------
-SplitscreenPlayerDialog::~SplitscreenPlayerDialog()
-{
-    if (!m_connect_now)
-    {
-        input_manager->getDeviceManager()->setAssignMode(DETECT_NEW);
-        input_manager->getDeviceManager()->mapFireToSelect(true);
-    }
-}   // ~SplitscreenPlayerDialog
 
 // ----------------------------------------------------------------------------
 void SplitscreenPlayerDialog::beforeAddingWidgets()
@@ -52,7 +40,7 @@ void SplitscreenPlayerDialog::beforeAddingWidgets()
     for (unsigned i = 0; i < PlayerManager::get()->getNumPlayers(); i++)
         m_profiles->addLabel(PlayerManager::get()->getPlayer(i)->getName());
 
-    m_error_message = getWidget<LabelWidget>("error-message");
+    m_message = getWidget<LabelWidget>("message-label");
 
     m_handicap = getWidget<CheckBoxWidget>("handicap");
     m_handicap->setState(false);
@@ -67,6 +55,8 @@ void SplitscreenPlayerDialog::beforeAddingWidgets()
     assert(m_connect != NULL);
     m_cancel = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel != NULL);
+    m_reset = getWidget<IconButtonWidget>("reset");
+    assert(m_reset != NULL);
 
     input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
     input_manager->getDeviceManager()->mapFireToSelect(false);
@@ -97,8 +87,9 @@ GUIEngine::EventPropagation
             else
             {
                 //I18N: in splitscreen player dialog for network game
-                m_error_message->setErrorColor();
-                m_error_message->setText(_("Player already exists."), false);
+                m_message->setErrorColor();
+                m_message->setText(_("Player or input device already exists."),
+                    false);
             }
             return GUIEngine::EVENT_BLOCK;
         }
@@ -108,18 +99,24 @@ GUIEngine::EventPropagation
             {
                 NetworkConfig::get()->doneAddingNetworkPlayers();
                 NetworkingLobby::getInstance()->finishAddingPlayers();
-                m_connect_now = true;
                 m_self_destroy = true;
                 return GUIEngine::EVENT_BLOCK;
             }
             //I18N: in splitscreen player dialog for network game
-            m_error_message->setErrorColor();
-            m_error_message->setText(_("No player available to connect."),
-                false);
+            m_message->setErrorColor();
+            m_message->setText(
+                _("No player available for connecting to server."), false);
             return GUIEngine::EVENT_BLOCK;
         }
         else if(selection == m_cancel->m_properties[PROP_ID])
         {
+            m_self_destroy = true;
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if(selection == m_reset->m_properties[PROP_ID])
+        {
+            NetworkConfig::get()->cleanNetworkPlayers();
+            NetworkingLobby::getInstance()->cleanAddedPlayers();
             m_self_destroy = true;
             return GUIEngine::EVENT_BLOCK;
         }

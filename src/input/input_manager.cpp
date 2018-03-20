@@ -714,6 +714,9 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         {
             if (NetworkConfig::get()->isAddingNetworkPlayers())
             {
+                // Ignore release event
+                if (value == 0)
+                    return;
                 InputDevice *device = NULL;
                 if (type == Input::IT_KEYBOARD)
                 {
@@ -791,7 +794,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                 // Prevent null pointer crash
                 return;
             }
-Log::info("","%s",StringUtils::wideToUtf8(player->getProfile()->getName()).c_str());
+
             // Find the corresponding PlayerKart from our ActivePlayer instance
             AbstractKart* pk = player->getKart();
 

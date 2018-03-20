@@ -117,6 +117,7 @@ public:
                        uint32_t/*online id*/, core::stringw/*player name*/,
                        int/*icon id*/> >& p);
     void addSplitscreenPlayer(irr::core::stringw name);
+    void cleanAddedPlayers();
 
 };   // class NetworkingLobby
 
