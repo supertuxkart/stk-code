@@ -319,7 +319,7 @@ void ServerLobby::asynchronousUpdate()
         }
         break;
     case SELECTING:
-        if (m_timeout < (float)StkTime::getRealTime())
+        if (m_timeout.load() < (float)StkTime::getRealTime())
         {
             auto result = handleVote();
             // Remove disconnected player (if any) one last time
@@ -426,7 +426,7 @@ void ServerLobby::update(int ticks)
         }
         break;
     case RESULT_DISPLAY:
-        if(StkTime::getRealTime() > m_timeout)
+        if(StkTime::getRealTime() > m_timeout.load())
         {
             RaceResultGUI::getInstance()->backToLobby();
             // notify the network world that it is stopped
@@ -611,7 +611,7 @@ void ServerLobby::startSelection(const Event *event)
     m_state = SELECTING;
 
     // Will be changed after the first vote received
-    m_timeout = std::numeric_limits<float>::max();
+    m_timeout.store(std::numeric_limits<float>::max());
 
     std::make_shared<LatencyProtocol>()->requestStart();
     Log::info("LobbyProtocol", "LatencyProtocol started.");
@@ -685,7 +685,7 @@ void ServerLobby::checkIncomingConnectionRequests()
     m_player_ready_counter = 0;
     // Set the delay before the server forces all clients to exit the race
     // result screen and go back to the lobby
-    m_timeout = (float)(StkTime::getRealTime()+15.0f);
+    m_timeout.store((float)(StkTime::getRealTime()+15.0f));
     m_state = RESULT_DISPLAY;
 
     // calculate karts ranks :
@@ -1039,12 +1039,12 @@ void ServerLobby::playerVote(Event* event)
         return;
 
     // Check if first vote, if so start counter
-    if (m_timeout == std::numeric_limits<float>::max())
+    if (m_timeout.load() == std::numeric_limits<float>::max())
     {
-        m_timeout = (float)StkTime::getRealTime() +
-            UserConfigParams::m_voting_timeout;
+        m_timeout.store((float)StkTime::getRealTime() +
+            UserConfigParams::m_voting_timeout);
     }
-    float remaining_time = m_timeout - (float)StkTime::getRealTime();
+    float remaining_time = m_timeout.load() - (float)StkTime::getRealTime();
     if (remaining_time < 0.0f)
     {
         return;
@@ -1054,7 +1054,7 @@ void ServerLobby::playerVote(Event* event)
     NetworkString other = NetworkString(PROTOCOL_LOBBY_ROOM);
     std::string name = StringUtils::wideToUtf8(event->getPeer()
         ->getPlayerProfiles()[0]->getName());
-    other.addUInt8(LE_VOTE).addFloat(m_timeout).encodeString(name)
+    other.addUInt8(LE_VOTE).addFloat(m_timeout.load()).encodeString(name)
         .addUInt32(event->getPeer()->getHostId());
     other += data;
 
@@ -1205,7 +1205,7 @@ void ServerLobby::playerFinishedResult(Event *event)
         // We can't trigger the world/race exit here, since this is called
         // from the protocol manager thread. So instead we force the timeout
         // to get triggered (which is done from the main thread):
-        m_timeout = 0;
+        m_timeout.store(0);
     }
 }   // playerFinishedResult
 

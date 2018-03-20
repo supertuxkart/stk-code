@@ -69,7 +69,7 @@ private:
     int m_player_ready_counter;
 
     /** Timeout counter for various state. */
-    float m_timeout;
+    std::atomic<float> m_timeout;
 
     /** Lock this mutex whenever a client is connect / disconnect or
      *  starting race. */
