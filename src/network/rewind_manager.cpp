@@ -33,7 +33,7 @@
 
 #include <algorithm>
 
-RewindManager* RewindManager::m_rewind_manager        = NULL;
+RewindManager* RewindManager::m_rewind_manager = NULL;
 bool           RewindManager::m_enable_rewind_manager = false;
 
 /** Creates the singleton. */
@@ -74,19 +74,19 @@ RewindManager::~RewindManager()
  */
 void RewindManager::reset()
 {
-    m_is_rewinding         = false;
-    m_not_rewound_ticks    = 0;
-    m_overall_state_size   = 0;
-    m_last_saved_state     = -1;  // forces initial state save
-    m_state_frequency      =
+    m_is_rewinding = false;
+    m_not_rewound_ticks = 0;
+    m_overall_state_size = 0;
+    m_last_saved_state = -1;  // forces initial state save
+    m_state_frequency =
         stk_config->getPhysicsFPS() / stk_config->m_network_state_frequeny;
 
-    if(!m_enable_rewind_manager) return;
+    if (!m_enable_rewind_manager) return;
 
     AllRewinder::iterator r = m_all_rewinder.begin();
-    while(r!=m_all_rewinder.end())
+    while (r != m_all_rewinder.end())
     {
-        if(!(*r)->canBeDestroyed())
+        if (!(*r)->canBeDestroyed())
         {
             r++;
             continue;
@@ -107,8 +107,8 @@ void RewindManager::addNextTimeStep(int time, float dt)
 {
     // Add a timestep entry each timestep, except at 'ready, set, go'
     // at which time is 0 - we add only one entry there
-    if (  ( time>0 || m_rewind_queue.isEmpty()                           ) &&
-          World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE    )
+    if ((time > 0 || m_rewind_queue.isEmpty()) &&
+        World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE)
     {
         m_rewind_queue.addNewTimeStep(time, dt);
     }
@@ -119,13 +119,13 @@ void RewindManager::addNextTimeStep(int time, float dt)
  *  and not freed by the caller!
  *  \param time Time at which the event was recorded. If time is not specified
  *          (or set to -1), the current world time is used.
- *  \param buffer Pointer to the event data. 
+ *  \param buffer Pointer to the event data.
  */
 void RewindManager::addEvent(EventRewinder *event_rewinder,
-                             BareNetworkString *buffer, bool confirmed,
-                             int ticks                                   )
+    BareNetworkString *buffer, bool confirmed,
+    int ticks)
 {
-    if(m_is_rewinding) 
+    if (m_is_rewinding)
     {
         delete buffer;
         Log::error("RewindManager", "Adding event when rewinding");
@@ -146,7 +146,7 @@ void RewindManager::addEvent(EventRewinder *event_rewinder,
  *  \param buffer Pointer to the event data.
  */
 void RewindManager::addNetworkEvent(EventRewinder *event_rewinder,
-                                    BareNetworkString *buffer, int ticks)
+    BareNetworkString *buffer, int ticks)
 {
     m_rewind_queue.addNetworkEvent(event_rewinder, buffer, ticks);
 }   // addNetworkEvent
@@ -160,13 +160,13 @@ void RewindManager::addNetworkEvent(EventRewinder *event_rewinder,
  *  \param buffer Pointer to the event data.
  */
 void RewindManager::addNetworkState(int rewinder_index, BareNetworkString *buffer,
-                                    int ticks)
+    int ticks)
 {
     assert(NetworkConfig::get()->isClient());
     // On a client dt from a state is never used, it maintains
     // its own dt information (using TimeEvents).
     m_rewind_queue.addNetworkState(m_all_rewinder[rewinder_index], buffer,
-                                   ticks, -99);
+        ticks, -99);
 }   // addNetworkState
 
 // ----------------------------------------------------------------------------
@@ -177,9 +177,9 @@ void RewindManager::addNetworkState(int rewinder_index, BareNetworkString *buffe
 void RewindManager::update(int ticks_not_used)
 {
     // FIXME: rename ticks_not_used
-    if(!m_enable_rewind_manager  || 
-        m_all_rewinder.size()==0 ||
-        m_is_rewinding              )  return;
+    if (!m_enable_rewind_manager ||
+        m_all_rewinder.size() == 0 ||
+        m_is_rewinding)  return;
 
     float time = World::getWorld()->getTime();
     int ticks = World::getWorld()->getTimeTicks();
@@ -187,8 +187,8 @@ void RewindManager::update(int ticks_not_used)
     m_not_rewound_ticks = ticks;
 
     // Clients don't save state, so they just exit.
-    if ( NetworkConfig::get()->isClient() || 
-         ticks - m_last_saved_state < m_state_frequency  )
+    if (NetworkConfig::get()->isClient() ||
+        ticks - m_last_saved_state < m_state_frequency)
     {
         return;
     }
@@ -197,15 +197,15 @@ void RewindManager::update(int ticks_not_used)
     // Save state
     GameProtocol::lock()->startNewState();
     AllRewinder::const_iterator rewinder;
-    for(rewinder=m_all_rewinder.begin(); rewinder!=m_all_rewinder.end(); ++rewinder)
+    for (rewinder = m_all_rewinder.begin(); rewinder != m_all_rewinder.end(); ++rewinder)
     {
         BareNetworkString *buffer = (*rewinder)->saveState();
-        if(buffer && buffer->size()>=0)
+        if (buffer && buffer->size() >= 0)
         {
             m_overall_state_size += buffer->size();
             // Add to the previously created container
             m_rewind_queue.addLocalState(*rewinder, buffer, /*confirmed*/true,
-                                         World::getWorld()->getTimeTicks());
+                World::getWorld()->getTimeTicks());
             GameProtocol::lock()->addState(buffer);
         }   // size >= 0
         else
@@ -224,7 +224,7 @@ void RewindManager::update(int ticks_not_used)
  *  \param dt Number of time steps - should be 1.
  */
 void RewindManager::playEventsTill(float time, int *ticks)
-{    
+{
     bool needs_rewind;
     int rewind_ticks;
 
@@ -233,7 +233,7 @@ void RewindManager::playEventsTill(float time, int *ticks)
     // merge and that have happened before the current time (which will
     // be getTime()+dt - world time has not been updated yet).
     m_rewind_queue.mergeNetworkData(World::getWorld()->getTimeTicks(),
-                                    &needs_rewind, &rewind_ticks);
+        &needs_rewind, &rewind_ticks);
 
     if (needs_rewind)
     {
@@ -260,7 +260,7 @@ void RewindManager::playEventsTill(float time, int *ticks)
 
     TimeStepInfo *tsi = m_rewind_queue.getLast();
 
-   // ++m_rewind_queue;   // Point to end of queue now
+    // ++m_rewind_queue;   // Point to end of queue now
     tsi->replayAllEvents();
 
     if (tsi->hasConfirmedState() && NetworkConfig::get()->isClient())
@@ -282,14 +282,14 @@ void RewindManager::rewindTo(int rewind_ticks)
 {
     assert(!m_is_rewinding);
     bool is_history = history->replayHistory();
-    history->doReplayHistory(History::HISTORY_NONE);
+    history->setReplayHistory(false);
 
     // First save all current transforms so that the error
     // can be computed between the transforms before and after
     // the rewind.
     AllRewinder::iterator rewinder;
-    for (rewinder = m_all_rewinder.begin(); 
-         rewinder != m_all_rewinder.end(); ++rewinder)
+    for (rewinder = m_all_rewinder.begin();
+        rewinder != m_all_rewinder.end(); ++rewinder)
     {
         (*rewinder)->saveTransform();
     }
@@ -323,7 +323,7 @@ void RewindManager::rewindTo(int rewind_ticks)
     if (World::getWorld()->getPhase() == WorldStatus::IN_GAME_MENU_PHASE)
     {
         m_is_rewinding = false;
-        history->doReplayHistory(History::HISTORY_PHYSICS);
+        history->setReplayHistory(is_history);
         return;
     }
 
@@ -334,7 +334,7 @@ void RewindManager::rewindTo(int rewind_ticks)
     // info for the current time has already been added previously, so
     // we rewind till we have reached the last timestep entry (which is
     // the current time step).
-    while (current !=m_rewind_queue.getLast())
+    while (current != m_rewind_queue.getLast())
     {
         // Now handle all events(!) at the current time (i.e. between 
         // World::getTime() and World::getTime()+dt) before updating
@@ -359,8 +359,8 @@ void RewindManager::rewindTo(int rewind_ticks)
     {
         (*rewinder)->computeError();
     }
-    if(is_history)
-        history->doReplayHistory(History::HISTORY_PHYSICS);
+
+    history->setReplayHistory(is_history);
     m_is_rewinding = false;
 }   // rewindTo
 

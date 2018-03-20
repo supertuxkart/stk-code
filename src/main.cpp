@@ -573,9 +573,6 @@ void cmdLineHelp()
     "       --demo-laps=n      Number of laps to use in a demo.\n"
     "       --demo-karts=n     Number of karts to use in a demo.\n"
     // "       --history          Replay history file 'history.dat'.\n"
-    // "       --history=n        Replay history file 'history.dat' using:\n"
-    // "                            n=1: recorded positions\n"
-    // "                            n=2: recorded key strokes\n"
     // "       --test-ai=n        Use the test-ai for every n-th AI kart.\n"
     // "                          (so n=1 means all Ais will be the test ai)\n"
     // "
@@ -1282,21 +1279,13 @@ int handleCmdLine()
         race_manager->setNumLaps(999999); // profile end depends on time
     }   // --profile-time
 
-    if(CommandLine::has("--history",  &n))
+    if(CommandLine::has("--history"))
     {
-        history->doReplayHistory( (History::HistoryReplayMode)n);
+        history->setReplayHistory(true);
         // Force the no-start screen flag, since this initialises
         // the player structures correctly.
         if(!MainMenuScreen::m_enable_online)
             UserConfigParams::m_no_start_screen = true;
-    }   // --history=%d
-
-    if(CommandLine::has("--history"))  // handy default for --history=1
-    {
-        history->doReplayHistory(History::HISTORY_POSITION);
-        // Force the no-start screen flag, since this initialises
-        // the player structures correctly.
-        UserConfigParams::m_no_start_screen = true;
     }   // --history
 
     // Demo mode

@@ -860,13 +860,6 @@ void World::updateWorld(int ticks)
         getPhase() == IN_GAME_MENU_PHASE      )
         return;
 
-    if (!history->replayHistory()                 && 
-        ! (NetworkConfig::get()->isClient() &&
-           RewindManager::get()->isRewinding() )    )
-    {
-        history->updateSaving(ticks);   // updating the saved state
-    }
-
     try
     {
         update(ticks);
@@ -1034,10 +1027,7 @@ void World::update(int ticks)
     Scripting::ScriptEngine *script_engine = Scripting::ScriptEngine::getInstance();
     if (script_engine) script_engine->update(ticks);
 
-    if (!history->dontDoPhysics())
-    {
-        Physics::getInstance()->update(ticks);
-    }
+    Physics::getInstance()->update(ticks);
 
     PROFILER_PUSH_CPU_MARKER("World::update (projectiles)", 0xa0, 0x7F, 0x00);
     projectile_manager->update(ticks);

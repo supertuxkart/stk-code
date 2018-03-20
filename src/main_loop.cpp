@@ -164,13 +164,6 @@ float MainLoop::getLimitedDt()
         dt = World::getWorld()->adjustDT(dt);
     }
 
-    // If we are doing a replay, use the dt from the history file if this
-    // is not networked, otherwise history will use current time and dt
-    // to findout which events to replay
-    if (World::getWorld() && history->replayHistory() )
-    {
-        history->updateReplay(World::getWorld()->getTimeTicks(), dt);
-    }
     return dt;
 }   // getLimitedDt
 
@@ -331,7 +324,8 @@ void MainLoop::run()
                 input_manager->update(frame_duration);
                 GUIEngine::update(frame_duration);
                 PROFILER_POP_CPU_MARKER();
-
+                if (World::getWorld() && history->replayHistory())
+                    history->updateReplay(World::getWorld()->getTimeTicks());
                 PROFILER_PUSH_CPU_MARKER("Music", 0x7F, 0x00, 0x00);
                 SFXManager::get()->update();
                 PROFILER_POP_CPU_MARKER();
