@@ -1268,8 +1268,7 @@ void Kart::update(int ticks)
     // is used furthermore for engine power, camera distance etc
     updateSpeed();
 
-    if(!history->replayHistory() || !history->dontDoPhysics())
-        m_controller->update(ticks);
+    m_controller->update(ticks);
 
 #ifndef SERVER_ONLY
 #undef DEBUG_CAMERA_SHAKE
