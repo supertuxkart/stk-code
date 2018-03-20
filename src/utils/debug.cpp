@@ -122,6 +122,7 @@ enum DebugMenuCommand
     DEBUG_GUI_CAM_NORMAL,
     DEBUG_GUI_CAM_SMOOTH,
     DEBUG_GUI_CAM_ATTACH,
+    DEBUG_VIEW_KART_PREVIOUS,
     DEBUG_VIEW_KART_ONE,
     DEBUG_VIEW_KART_TWO,
     DEBUG_VIEW_KART_THREE,
@@ -130,6 +131,7 @@ enum DebugMenuCommand
     DEBUG_VIEW_KART_SIX,
     DEBUG_VIEW_KART_SEVEN,
     DEBUG_VIEW_KART_EIGHT,
+    DEBUG_VIEW_KART_NEXT,
     DEBUG_HIDE_KARTS,
     DEBUG_THROTTLE_FPS,
     DEBUG_VISUAL_VALUES,
@@ -244,6 +246,7 @@ LightNode* findNearestLight()
 
 bool handleContextMenuAction(s32 cmd_id)
 {
+    unsigned int kart_num = Camera::getActiveCamera()->getKart()->getWorldKartId();
 
     World *world = World::getWorld();
     Physics *physics = Physics::getInstance();
@@ -603,6 +606,19 @@ bool handleContextMenuAction(s32 cmd_id)
         }
         break;
     }
+    case DEBUG_VIEW_KART_PREVIOUS:
+    {
+        if (kart_num == 0)
+        {
+            kart_num += World::getWorld()->getNumKarts() - 1;
+        }
+        else
+        {
+            kart_num--;
+        }
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
+        break;
+    }
     case DEBUG_VIEW_KART_ONE:
         changeCameraTarget(1);
         break;
@@ -627,6 +643,20 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_VIEW_KART_EIGHT:
         changeCameraTarget(8);
         break;
+    case DEBUG_VIEW_KART_NEXT:
+    {
+        if (kart_num == World::getWorld()->getNumKarts() - 1)
+        {
+            kart_num = 0;
+        }
+        else
+        {
+             kart_num++;
+        }
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
+        break;
+    }
+
     case DEBUG_PRINT_START_POS:
         if (!world) return false;
         for (unsigned int i = 0; i<world->getNumKarts(); i++)
@@ -893,6 +923,7 @@ bool onEvent(const SEvent &event)
 
             mnu->addItem(L"Change camera target >",-1,true, true);
             sub = mnu->getSubMenu(5);
+            sub->addItem(L"To previous kart (Ctrl + F5)", DEBUG_VIEW_KART_PREVIOUS);
             sub->addItem(L"To kart one", DEBUG_VIEW_KART_ONE);
             sub->addItem(L"To kart two", DEBUG_VIEW_KART_TWO);
             sub->addItem(L"To kart three", DEBUG_VIEW_KART_THREE);
@@ -901,6 +932,7 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"To kart six", DEBUG_VIEW_KART_SIX);
             sub->addItem(L"To kart seven", DEBUG_VIEW_KART_SEVEN);
             sub->addItem(L"To kart eight", DEBUG_VIEW_KART_EIGHT);
+            sub->addItem(L"To next kart (Ctrl + F6)", DEBUG_VIEW_KART_NEXT);
 
             mnu->addItem(L"Font >",-1,true, true);
             sub = mnu->getSubMenu(6);
@@ -970,6 +1002,7 @@ bool onEvent(const SEvent &event)
 
 bool handleStaticAction(int key)
 {
+    unsigned int kart_num = Camera::getActiveCamera()->getKart()->getWorldKartId();
     if (key == IRR_KEY_F1)
     {
         handleContextMenuAction(DEBUG_GUI_CAM_FREE);
@@ -983,6 +1016,32 @@ bool handleStaticAction(int key)
 #ifndef SERVER_ONLY
         SP::SPTextureManager::get()->reloadTexture("");
 #endif
+        return true;
+    }
+    else if (key == IRR_KEY_F5)
+    {
+        if (kart_num == 0)
+        {
+            kart_num += World::getWorld()->getNumKarts() - 1;
+        }
+        else
+        {
+            kart_num--;
+        }
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
+        return true;
+    }
+    else if (key == IRR_KEY_F6)
+    {
+        if (kart_num == World::getWorld()->getNumKarts() - 1)
+        {
+            kart_num = 0;
+        }
+        else
+        {
+             kart_num++;
+        }
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         return true;
     }
     // TODO: create more keyboard shortcuts
