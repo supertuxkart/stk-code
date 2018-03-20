@@ -163,9 +163,9 @@ protected:
     virtual void  onGo() OVERRIDE;
     /** Returns true if the race is over. Must be defined by all modes. */
     virtual bool  isRaceOver() = 0;
-    virtual void  update(float dt) OVERRIDE;
+    virtual void  update(int ticks) OVERRIDE;
     virtual void  createRaceGUI();
-            void  updateTrack(float dt);
+            void  updateTrack(int ticks);
     // ------------------------------------------------------------------------
     /** Used for AI karts that are still racing when all player kart finished.
      *  Generally it should estimate the arrival time for those karts, but as
@@ -236,11 +236,11 @@ public:
     // Virtual functions
     // =================
     virtual void    init();
+    virtual void    updateGraphics(float dt);
     virtual void    terminateRace() OVERRIDE;
     virtual void    reset() OVERRIDE;
     virtual void    pause(Phase phase) OVERRIDE;
     virtual void    unpause() OVERRIDE;
-    virtual void    updateTime(const float dt) OVERRIDE;
     virtual void    getDefaultCollectibles(int *collectible_type,
                                            int *amount );
     virtual void    endRaceEarly() { return; }
@@ -273,7 +273,7 @@ public:
     void            scheduleUnpause();
     void            scheduleExitRace() { m_schedule_exit_race = true; }
     void            scheduleTutorial();
-    void            updateWorld(float dt);
+    void            updateWorld(int ticks);
     void            handleExplosion(const Vec3 &xyz, AbstractKart *kart_hit,
                                     PhysicalObject *object);
     AbstractKart*   getPlayerKart(unsigned int player) const;

@@ -41,7 +41,7 @@ public:
     virtual void asynchronousUpdate() OVERRIDE;
 
     // ------------------------------------------------------------------------
-    virtual void update(float dt) OVERRIDE {}
+    virtual void update(int ticks) OVERRIDE {}
 
 };   // class LatencyProtocol
 

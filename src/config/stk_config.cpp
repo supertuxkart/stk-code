@@ -133,7 +133,7 @@ void STKConfig::load(const std::string &filename)
         Log::fatal("StkConfig", "Invalid default port values.");
     }
     CHECK_NEG(m_max_karts,                 "<karts max=..."             );
-    CHECK_NEG(m_item_switch_time,          "item-switch-time"           );
+    CHECK_NEG(m_item_switch_ticks,         "item switch-time"           );
     CHECK_NEG(m_bubblegum_counter,         "bubblegum disappear counter");
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
     CHECK_NEG(m_max_skidmarks,             "max-skidmarks"              );
@@ -146,7 +146,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_delay_finish_time,         "delay-finish-time"          );
     CHECK_NEG(m_music_credit_time,         "music-credit-time"          );
     CHECK_NEG(m_leader_time_per_kart,      "leader time-per-kart"       );
-    CHECK_NEG(m_penalty_time,              "penalty-time"               );
+    CHECK_NEG(m_penalty_ticks,             "penalty-time"               );
     CHECK_NEG(m_max_display_news,          "max-display-news"           );
     CHECK_NEG(m_replay_max_time,           "replay max-time"            );
     CHECK_NEG(m_replay_delta_angle,        "replay delta-angle"         );
@@ -173,10 +173,11 @@ void STKConfig::init_defaults()
     m_bomb_time                  = m_bomb_time_increase        =
         m_explosion_impulse_objects = m_music_credit_time      =
         m_delay_finish_time      = m_skid_fadeout_time         =
-        m_near_ground            = m_item_switch_time          =
-        m_smooth_angle_limit     = m_penalty_time              =
-        m_default_track_friction = m_default_moveable_friction =
-        UNDEFINED;
+        m_near_ground            = 
+        m_smooth_angle_limit     = m_default_track_friction    =
+        m_default_moveable_friction =    UNDEFINED;
+    m_item_switch_ticks          = -100;
+    m_penalty_ticks              = -100;
     m_physics_fps                = -100;
     m_bubblegum_counter          = -100;
     m_shield_restrict_weapos     = false;
@@ -275,7 +276,9 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if (const XMLNode *startup_node= root->getNode("startup"))
     {
-        startup_node->get("penalty", &m_penalty_time );
+        float f;
+        startup_node->get("penalty", &f);
+        m_penalty_ticks = time2Ticks(f);
     }
 
     if (const XMLNode *news_node= root->getNode("news"))
@@ -356,7 +359,9 @@ void STKConfig::getAllData(const XMLNode * root)
     if(const XMLNode *switch_node= root->getNode("switch"))
     {
         switch_node->get("items", &m_switch_items    );
-        switch_node->get("time",  &m_item_switch_time);
+        float f;
+        if( switch_node->get("time",  &f) )
+            m_item_switch_ticks = stk_config->time2Ticks(f);
     }
 
     if(const XMLNode *bubblegum_node= root->getNode("bubblegum"))

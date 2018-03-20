@@ -231,7 +231,7 @@ void ClientLobby::addAllPlayers(Event* event)
 }   // addAllPlayers
 
 //-----------------------------------------------------------------------------
-void ClientLobby::update(float dt)
+void ClientLobby::update(int ticks)
 {
     switch (m_state)
     {

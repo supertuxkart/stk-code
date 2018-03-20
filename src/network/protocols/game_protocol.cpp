@@ -65,7 +65,7 @@ GameProtocol::~GameProtocol()
 /** Synchronous update - will send all commands collected during the last
  *  frame (and could optional only send messages every N frames).
  */
-void GameProtocol::update(float dt)
+void GameProtocol::update(int ticks)
 {
     if (m_all_actions.size() == 0) return;   // nothing to do
 
@@ -78,7 +78,7 @@ void GameProtocol::update(float dt)
     // Add all actions
     for (auto a : m_all_actions)
     {
-        m_data_to_send->addFloat(a.m_time);
+        m_data_to_send->addUInt32(a.m_ticks);
         m_data_to_send->addUInt8(a.m_kart_id);
         m_data_to_send->addUInt8((uint8_t)(a.m_action)).addUInt32(a.m_value)
                        .addUInt32(a.m_value_l).addUInt32(a.m_value_r);
@@ -130,7 +130,7 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
     a.m_value   = value;
     a.m_value_l = val_l;
     a.m_value_r = val_r;
-    a.m_time    = World::getWorld()->getTime();
+    a.m_ticks   = World::getWorld()->getTimeTicks();
 
     m_all_actions.push_back(a);
 
@@ -140,10 +140,10 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
     s->addUInt8(kart_id).addUInt8(action).addUInt32(value)
                         .addUInt32(val_l).addUInt32(val_r);
     RewindManager::get()->addEvent(this, s, /*confirmed*/true,
-                                   World::getWorld()->getTime() );
+                                   World::getWorld()->getTimeTicks() );
 
-    Log::info("GameProtocol", "Action at %f: %d value %d",
-              World::getWorld()->getTime(), action, 
+    Log::info("GameProtocol", "Action at %d: %d value %d",
+              World::getWorld()->getTimeTicks(), action, 
               action==PlayerAction::PA_STEER_RIGHT ? -value : value);
 }   // controllerAction
 
@@ -158,19 +158,21 @@ void GameProtocol::handleControllerAction(Event *event)
     NetworkString &data = event->data();
     uint8_t count = data.getUInt8();
     bool will_trigger_rewind = false;
-    float rewind_delta = 0.0f;
+    int rewind_delta = 0;
     for (unsigned int i = 0; i < count; i++)
     {
-        float   time    = data.getFloat();
+        int ticks = data.getUInt32();
+
         // Since this is running in a thread, it might be called during
         // a rewind, i.e. with an incorrect world time. So the event
         // time needs to be compared with the World time independent
         // of any rewinding.
-        if (time < RewindManager::get()->getNotRewoundWorldTime() &&
+        if (ticks < RewindManager::get()->getNotRewoundWorldTicks() &&
             !will_trigger_rewind                                     )
         {
             will_trigger_rewind = true;
-            rewind_delta = time - RewindManager::get()->getNotRewoundWorldTime();
+            rewind_delta = ticks 
+                         - RewindManager::get()->getNotRewoundWorldTicks();
         }
         uint8_t kart_id = data.getUInt8();
         assert(kart_id < World::getWorld()->getNumKarts());
@@ -179,12 +181,12 @@ void GameProtocol::handleControllerAction(Event *event)
         int value   = data.getUInt32();
         int value_l = data.getUInt32();
         int value_r = data.getUInt32();
-        Log::info("GameProtocol", "Action at %f: %d %d %d %d %d",
-                  time, kart_id, action, value, value_l, value_r);
+        Log::info("GameProtocol", "Action at %d: %d %d %d %d %d",
+                  ticks, kart_id, action, value, value_l, value_r);
         BareNetworkString *s = new BareNetworkString(3);
         s->addUInt8(kart_id).addUInt8(action).addUInt32(value)
                             .addUInt32(value_l).addUInt32(value_r);
-        RewindManager::get()->addNetworkEvent(this, s, time);
+        RewindManager::get()->addNetworkEvent(this, s, ticks);
     }
 
     if (data.size() > 0)
@@ -200,9 +202,9 @@ void GameProtocol::handleControllerAction(Event *event)
         if (will_trigger_rewind)
         {
             Log::info("GameProtocol",
-                "At %f %f %f requesting time adjust of %f for host %d",
-                World::getWorld()->getTime(), StkTime::getRealTime(),
-                RewindManager::get()->getNotRewoundWorldTime(),
+                "At %d %f %d requesting time adjust of %d for host %d",
+                World::getWorld()->getTimeTicks(), StkTime::getRealTime(),
+                RewindManager::get()->getNotRewoundWorldTicks(),
                 rewind_delta, event->getPeer()->getHostId());
             // This message from a client triggered a rewind in the server.
             // To avoid this, signal to the client that it should slow down.
@@ -219,11 +221,11 @@ void GameProtocol::handleControllerAction(Event *event)
  *  \param peer The peer that triggered the rewind.
  *  \param t Time that the peer needs to slowdown (<0) or sped up(>0).
  */
-void GameProtocol::adjustTimeForClient(STKPeer *peer, float t)
+void GameProtocol::adjustTimeForClient(STKPeer *peer, int ticks)
 {
     assert(NetworkConfig::get()->isServer());
     NetworkString *ns = getNetworkString(5);
-    ns->addUInt8(GP_ADJUST_TIME).addFloat(t);
+    ns->addUInt8(GP_ADJUST_TIME).addUInt32(ticks);
     // This message can be send unreliable, it's not critical if it doesn't
     // get delivered, the server will request again later anyway.
     peer->sendPacket(ns, /*reliable*/false);
@@ -236,8 +238,8 @@ void GameProtocol::adjustTimeForClient(STKPeer *peer, float t)
  */
 void GameProtocol::handleAdjustTime(Event *event)
 {
-    float t = event->data().getFloat();
-    World::getWorld()->setAdjustTime(t);
+    int ticks = event->data().getUInt32();
+    World::getWorld()->setAdjustTime(stk_config->ticks2Time(ticks));
 }   // handleAdjustTime
 // ----------------------------------------------------------------------------
 /** Called by the server before assembling a new message containing the full
@@ -247,9 +249,9 @@ void GameProtocol::startNewState()
 {
     assert(NetworkConfig::get()->isServer());
     m_data_to_send->clear();
-    m_data_to_send->addUInt8(GP_STATE).addFloat(World::getWorld()->getTime());
-    Log::info("GameProtocol", "Sending new state at %f.",
-              World::getWorld()->getTime());
+    m_data_to_send->addUInt8(GP_STATE).addUInt32(World::getWorld()->getTimeTicks());
+    Log::info("GameProtocol", "Sending new state at %d.",
+              World::getWorld()->getTimeTicks());
 }   // startNewState
 
 // ----------------------------------------------------------------------------
@@ -282,9 +284,9 @@ void GameProtocol::handleState(Event *event)
 
     assert(NetworkConfig::get()->isClient());
     NetworkString &data = event->data();
-    float time          = data.getFloat();
-    Log::info("GameProtocol", "Received at %f state from %f",
-              World::getWorld()->getTime(), time);
+    int ticks           = data.getUInt32();
+    Log::info("GameProtocol", "Received at %d state from %d",
+              World::getWorld()->getTimeTicks(), ticks);
     int index           = 0;
     while (data.size() > 0)
     {
@@ -292,7 +294,7 @@ void GameProtocol::handleState(Event *event)
         BareNetworkString *state = new BareNetworkString(data.getCurrentData(),
                                                          count);
         data.skip(count);
-        RewindManager::get()->addNetworkState(index, state, time);
+        RewindManager::get()->addNetworkState(index, state, ticks);
         index++;
     }   // while data.size()>0
 }   // handleState

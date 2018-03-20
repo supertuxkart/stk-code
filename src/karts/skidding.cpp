@@ -225,15 +225,17 @@ float Skidding::getSteeringWhenSkidding(float steering) const
 
  // ----------------------------------------------------------------------------
 /** Updates skidding status.
- *  \param dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  *  \param is_on_ground True if the kart is on ground.
  *  \param steering Raw steering of the kart [-1,1], i.e. not adjusted by
  *               the kart's max steering angle.
  *  \param skidding  True if the skid button is pressed.
  */
-void Skidding::update(float dt, bool is_on_ground,
+void Skidding::update(int ticks, bool is_on_ground,
                       float steering, KartControl::SkidControl skidding)
 {
+    float dt = stk_config->ticks2Time(ticks);
+
     const KartProperties *kp = m_kart->getKartProperties();
 
     // If a kart animation is shown, stop all skidding bonuses.
@@ -440,9 +442,10 @@ void Skidding::update(float dt, bool is_on_ground,
                           ->setCreationRateRelative(KartGFX::KGFX_SKIDR, 1.0f);
                     m_kart->m_max_speed->
                         instantSpeedIncrease(MaxSpeed::MS_INCREASE_SKIDDING,
-                                             bonus_speed, bonus_speed,
-                                             bonus_force, bonus_time,
-                                             /*fade-out-time*/ 1.0f);
+                               bonus_speed, bonus_speed,
+                               bonus_force,
+                               stk_config->time2Ticks(bonus_time),
+                               /*fade-out-time*/ stk_config->time2Ticks(1.0f));
                     
                     if (m_kart->getController()->canGetAchievements())
                     {

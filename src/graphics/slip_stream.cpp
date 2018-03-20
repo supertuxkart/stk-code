@@ -63,7 +63,7 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
     }
 #endif
 
-    m_slipstream_time      = 0.0f;
+    m_slipstream_ticks = 0;
 
     float length = m_kart->getKartProperties()->getSlipstreamLength();
     float kw     = m_kart->getKartWidth();
@@ -122,8 +122,8 @@ SlipStream::~SlipStream()
 /** Called at re-start of a race. */
 void SlipStream::reset()
 {
-    m_slipstream_mode = SS_NONE;
-    m_slipstream_time = 0;
+    m_slipstream_mode  = SS_NONE;
+    m_slipstream_ticks = 0;
 
     // Reset a potential max speed increase
     m_kart->increaseMaxSpeed(MaxSpeed::MS_INCREASE_SLIPSTREAM, 0, 0, 0, 0);
@@ -188,7 +188,7 @@ SP::SPMesh* SlipStream::createMesh(Material* material)
         ("custom_alpha", [this](SP::SPUniformAssigner* ua)->void
         {
             // In sp shader it's assigned reverse by 1.0 - custom_alpha
-            ua->setValue(1.0f - m_slipstream_time);
+            ua->setValue(1.0f - stk_config->ticks2Time(m_slipstream_ticks));
         });
 
     std::vector<uint16_t> indices;
@@ -289,8 +289,8 @@ void SlipStream::setIntensity(float f, const AbstractKart *kart)
 */
 bool SlipStream::isSlipstreamReady() const
 {
-    return m_slipstream_time>
-        m_kart->getKartProperties()->getSlipstreamCollectTime();
+    return m_slipstream_ticks>
+        m_kart->getKartProperties()->getSlipstreamCollectTicks();
 }   // isSlipstreamReady
 
 //-----------------------------------------------------------------------------
@@ -309,7 +309,7 @@ void SlipStream::updateSlipstreamPower()
                                 kp->getSlipstreamMaxSpeedIncrease(),
                                 kp->getSlipstreamAddPower(),
                                 kp->getSlipstreamDuration(),
-                                kp->getSlipstreamFadeOutTime());
+                                kp->getSlipstreamFadeOutTicks());
     }
 }   // upateSlipstreamPower
 
@@ -341,7 +341,7 @@ void SlipStream::setDebugColor(const video::SColor &color)
 /** Update, called once per timestep.
  *  \param dt Time step size.
  */
-void SlipStream::update(float dt)
+void SlipStream::update(int ticks)
 {
     const KartProperties *kp = m_kart->getKartProperties();
 
@@ -350,12 +350,12 @@ void SlipStream::update(float dt)
         || m_kart->isGhostKart())
         return;
 
-    MovingTexture::update(dt);
+    MovingTexture::update(stk_config->ticks2Time(ticks));
 
     if(m_slipstream_mode==SS_USE)
     {
-        m_slipstream_time -= dt;
-        if(m_slipstream_time<0) m_slipstream_mode=SS_NONE;
+        m_slipstream_ticks -= ticks;
+        if(m_slipstream_ticks<0) m_slipstream_mode=SS_NONE;
     }
 
     updateSlipstreamPower();
@@ -463,28 +463,33 @@ void SlipStream::update(float dt)
             {
                 m_slipstream_mode = SS_USE;
                 m_kart->handleZipper();
-                m_slipstream_time = kp->getSlipstreamCollectTime();
+                m_slipstream_ticks = kp->getSlipstreamCollectTicks();
                 return;
             }
         }
-        m_slipstream_time -=dt;
-        if(m_slipstream_time<0) m_slipstream_mode = SS_NONE;
+        m_slipstream_ticks -= ticks;
+        if(m_slipstream_ticks<0) m_slipstream_mode = SS_NONE;
         setIntensity(0, NULL);
         return;
     }   // if !is_sstreaming
 
     if(UserConfigParams::m_slipstream_debug &&
         m_kart->getController()->isLocalPlayerController())
-        m_target_kart->getSlipstream()->setDebugColor(video::SColor(255, 0, 255, 0));
+        m_target_kart->getSlipstream()
+                     ->setDebugColor(video::SColor(255, 0, 255, 0));
     // Accumulate slipstream credits now
-    m_slipstream_time = m_slipstream_mode==SS_NONE ? dt
-                                                   : m_slipstream_time+dt;
+    
+    if (m_slipstream_mode == SS_NONE)
+        m_slipstream_ticks = ticks;
+    else
+        m_slipstream_ticks += ticks;
+
     if(isSlipstreamReady())
         m_kart->setSlipstreamEffect(9.0f);
-    setIntensity(m_slipstream_time, m_target_kart);
+    setIntensity(stk_config->ticks2Time(m_slipstream_ticks), m_target_kart);
 
     m_slipstream_mode = SS_COLLECT;
-    if (m_slipstream_time > kp->getSlipstreamCollectTime())
+    if (m_slipstream_ticks > kp->getSlipstreamCollectTicks())
     {
         setIntensity(1.0f, m_target_kart);
     }

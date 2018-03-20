@@ -311,7 +311,7 @@ void World::reset()
     irr_driver->reset();
 
     //Reset the Rubber Ball Collect Time to some negative value.
-    powerup_manager->setBallCollectTime(-100);
+    powerup_manager->setBallCollectTicks(-100);
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -744,7 +744,8 @@ void World::resetAllKarts()
             (*i)->getMaterial() && (*i)->getMaterial()->hasGravity() ?
             (*i)->getNormal() * -g : Vec3(0, -g, 0));
     }
-    for(int i=0; i<60; i++) Physics::getInstance()->update(1.f/60.f);
+    for(int i=0; i<stk_config->getPhysicsFPS(); i++) 
+        Physics::getInstance()->update(1);
 
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
     {
@@ -838,9 +839,9 @@ void World::scheduleUnpause()
  *  call World::update() first, to get updated kart positions. If race
  *  over would be handled in World::update, LinearWorld had no opportunity
  *  to update its data structures before the race is finished).
- *  \param dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void World::updateWorld(float dt)
+void World::updateWorld(int ticks)
 {
 #ifdef DEBUG
     assert(m_magic_number == 0xB01D6543);
@@ -867,12 +868,12 @@ void World::updateWorld(float dt)
         ! (NetworkConfig::get()->isClient() &&
            RewindManager::get()->isRewinding() )    )
     {
-        history->updateSaving(dt);   // updating the saved state
+        history->updateSaving(ticks);   // updating the saved state
     }
 
     try
     {
-        update(dt);
+        update(ticks);
     }
     catch (AbortWorldUpdateException& e)
     {
@@ -962,10 +963,25 @@ void World::scheduleTutorial()
 }   // scheduleTutorial
 
 //-----------------------------------------------------------------------------
-/** Updates the physics, all karts, the track, and projectile manager.
- *  \param dt Time step size.
+/** This updates all only graphical elements. It is only called once per
+ *  rendered frame, not once per time step.
+ *  float dt Time since last rame.
  */
-void World::update(float dt)
+void World::updateGraphics(float dt)
+{
+    PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
+    if (UserConfigParams::m_particles_effects > 1 && Weather::getInstance())
+    {
+        Weather::getInstance()->update(dt);
+    }
+    PROFILER_POP_CPU_MARKER();
+}   // updateGraphics
+
+//-----------------------------------------------------------------------------
+/** Updates the physics, all karts, the track, and projectile manager.
+ *  \param ticks Number of physics time steps - should be 1.
+ */
+void World::update(int ticks)
 {
 #ifdef DEBUG
     assert(m_magic_number == 0xB01D6543);
@@ -974,20 +990,20 @@ void World::update(float dt)
     PROFILER_PUSH_CPU_MARKER("World::update()", 0x00, 0x7F, 0x00);
 
 #if MEASURE_FPS
-    static float time = 0.0f;
-    time += dt;
-    if (time > 5.0f)
+    static int time = 0.0f;
+    time += ticks;
+    if (time > stk_config->time2Ticks(5.0f))
     {
-        time -= 5.0f;
+        time -= stk_config->time2Ticks(5.0f);
         printf("%i\n",irr_driver->getVideoDriver()->getFPS());
     }
 #endif
 
     PROFILER_PUSH_CPU_MARKER("World::update (sub-updates)", 0x20, 0x7F, 0x00);
-    WorldStatus::update(dt);
+    WorldStatus::update(ticks);
     PROFILER_POP_CPU_MARKER();
     PROFILER_PUSH_CPU_MARKER("World::update (RewindManager)", 0x20, 0x7F, 0x40);
-    RewindManager::get()->update(dt);
+    RewindManager::get()->update(ticks);
     PROFILER_POP_CPU_MARKER();
 
     PROFILER_PUSH_CPU_MARKER("World::update (Kart::upate)", 0x40, 0x7F, 0x00);
@@ -1002,7 +1018,7 @@ void World::update(float dt)
             dynamic_cast<SpareTireAI*>(m_karts[i]->getController());
         // Update all karts that are not eliminated
         if(!m_karts[i]->isEliminated() || (sta && sta->isMoving()))
-            m_karts[i]->update(dt);
+            m_karts[i]->update(ticks);
     }
     PROFILER_POP_CPU_MARKER();
 
@@ -1013,29 +1029,22 @@ void World::update(float dt)
 
         for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
         {
-            Camera::getCamera(i)->update(dt);
+            Camera::getCamera(i)->update(stk_config->ticks2Time(ticks));
         }
         PROFILER_POP_CPU_MARKER();
     }   // if !rewind
 
-    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(dt);
+    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(ticks);
     Scripting::ScriptEngine *script_engine = Scripting::ScriptEngine::getInstance();
-    if (script_engine) script_engine->update(dt);
+    if (script_engine) script_engine->update(ticks);
 
     if (!history->dontDoPhysics())
     {
-        Physics::getInstance()->update(dt);
+        Physics::getInstance()->update(ticks);
     }
-
-    PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
-    if (UserConfigParams::m_particles_effects > 1 && Weather::getInstance())
-    {
-        Weather::getInstance()->update(dt);
-    }
-    PROFILER_POP_CPU_MARKER();
 
     PROFILER_PUSH_CPU_MARKER("World::update (projectiles)", 0xa0, 0x7F, 0x00);
-    projectile_manager->update(dt);
+    projectile_manager->update(ticks);
     PROFILER_POP_CPU_MARKER();
 
     PROFILER_POP_CPU_MARKER();
@@ -1044,16 +1053,6 @@ void World::update(float dt)
     assert(m_magic_number == 0xB01D6543);
 #endif
 }   // update
-
-// ----------------------------------------------------------------------------
-/** Compute the new time, and set this new time to be used in the rewind
- *  manager.
- *  \param dt Time step size.
- */
-void World::updateTime(const float dt)
-{
-    WorldStatus::updateTime(dt);
-}   // updateTime
 
 // ----------------------------------------------------------------------------
 /** Only updates the track. The order in which the various parts of STK are
@@ -1072,12 +1071,12 @@ void World::updateTime(const float dt)
  *  update has to be called after updating the race position in linear world.
  *  That's why there is a separate call for trackUpdate here.
  */
-void World::updateTrack(float dt)
+void World::updateTrack(int ticks)
 {
-    Track::getCurrentTrack()->update(dt);
+    Track::getCurrentTrack()->update(ticks);
 }   // update Track
-// ----------------------------------------------------------------------------
 
+// ----------------------------------------------------------------------------
 Highscores* World::getHighscores() const
 {
     if(!m_use_highscores) return NULL;

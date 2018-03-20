@@ -64,7 +64,7 @@ public:
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
     virtual void setup() OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
-    virtual void update(float dt) OVERRIDE;
+    virtual void update(int ticks) OVERRIDE;
 };   // class ConnectToServer
 
 #endif // CONNECT_TO_SERVER_HPP

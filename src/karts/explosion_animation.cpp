@@ -105,7 +105,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
 
     // Set invulnerable time, and graphical effects
     float t = m_kart->getKartProperties()->getExplosionInvulnerabilityTime();
-    m_kart->setInvulnerableTime(t);
+    m_kart->setInvulnerableTicks(stk_config->time2Ticks(t));
     m_kart->showStarEffect(t);
     
     m_kart->getAttachment()->clear();

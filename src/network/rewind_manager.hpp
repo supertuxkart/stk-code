@@ -101,14 +101,15 @@ private:
     bool m_is_rewinding;
 
     /** How much time between consecutive state saves. */
-    float m_state_frequency;
+    int m_state_frequency;
 
-    /** Time at which the last state was saved. */
-    float m_last_saved_state;
+    /** Ticks at which the last state was saved. */
+    int m_last_saved_state;
 
-    /** This stores the original World time during a rewind. It is used to
-     *  detect if a client's local time need adjustment to reduce rewinds. */
-    float m_not_rewound_time;
+    /** This stores the original World time in ticks during a rewind. It is
+     *  used to detect if a client's local time need adjustment to reduce
+     *  rewinds. */
+    int m_not_rewound_ticks;
 
     RewindManager();
    ~RewindManager();
@@ -136,16 +137,16 @@ public:
     // Non-static function declarations:
 
     void reset();
-    void update(float dt);
-    void rewindTo(float target_time);
-    void playEventsTill(float time, float *dt);
+    void update(int ticks);
+    void rewindTo(int target_ticks);
+    void playEventsTill(float time, int *ticks);
     void addEvent(EventRewinder *event_rewinder, BareNetworkString *buffer,
-                  bool confirmed, float time = -1.0f);
+                  bool confirmed, int ticks = -1);
     void addNetworkEvent(EventRewinder *event_rewinder,
-                         BareNetworkString *buffer, float time);
+                         BareNetworkString *buffer, int ticks);
     void addNetworkState(int rewinder_index, BareNetworkString *buffer,
-                         float time);
-    void addNextTimeStep(float time, float dt);
+                         int ticks);
+    void addNextTimeStep(int ticks, float dt);
     // ------------------------------------------------------------------------
     /** Adds a Rewinder to the list of all rewinders.
      *  \return true If rewinding is enabled, false otherwise. 
@@ -160,7 +161,7 @@ public:
     /** Returns true if currently a rewind is happening. */
     bool isRewinding() const { return m_is_rewinding; }
     // ------------------------------------------------------------------------
-    float getNotRewoundWorldTime() const { return m_not_rewound_time;  }
+    int getNotRewoundWorldTicks() const { return m_not_rewound_ticks;  }
 };   // RewindManager
 
 

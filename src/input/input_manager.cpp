@@ -28,9 +28,10 @@
 #include "guiengine/screen_keyboard.hpp"
 #include "input/device_manager.hpp"
 #include "input/gamepad_device.hpp"
+#include "input/input.hpp"
 #include "input/keyboard_device.hpp"
 #include "input/multitouch_device.hpp"
-#include "input/input.hpp"
+#include "input/wiimote_manager.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/demo_world.hpp"
@@ -86,6 +87,10 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
 // -----------------------------------------------------------------------------
 void InputManager::update(float dt)
 {
+#ifdef ENABLE_WIIUSE
+    wiimote_manager->update();
+#endif
+
     if(m_timer_in_use)
     {
         m_timer -= dt;
@@ -292,14 +297,14 @@ void InputManager::handleStaticAction(int key, int value)
         case IRR_KEY_F11:
             if(value && shift_is_pressed && world && RewindManager::isEnabled())
             {
-                printf("Enter rewind to time:");
+                printf("Enter rewind to time in ticks:");
                 char s[256];
                 fgets(s, 256, stdin);
-                float t;
+                int t;
                 StringUtils::fromString(s,t);
                 RewindManager::get()->rewindTo(t);
-                Log::info("Rewind", "Rewinding from %f to %f",
-                          world->getTime(), t);
+                Log::info("Rewind", "Rewinding from %d to %d",
+                          world->getTimeTicks(), t);
             }
             break;
 

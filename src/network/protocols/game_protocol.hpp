@@ -54,7 +54,7 @@ private:
     // Dummy data structure to save all kart actions.
     struct Action
     {
-        float        m_time;
+        int          m_ticks;
         int          m_kart_id;
         PlayerAction m_action;
         int          m_value;
@@ -74,14 +74,14 @@ public:
     virtual ~GameProtocol();
 
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
-    virtual void update(float dt) OVERRIDE;
+    virtual void update(int ticks) OVERRIDE;
 
     void controllerAction(int kart_id, PlayerAction action,
                           int value, int val_l, int val_r);
     void startNewState();
     void addState(BareNetworkString *buffer);
     void sendState();
-    void adjustTimeForClient(STKPeer *peer, float t);
+    void adjustTimeForClient(STKPeer *peer, int ticks);
 
     virtual void undo(BareNetworkString *buffer) OVERRIDE;
     virtual void rewind(BareNetworkString *buffer) OVERRIDE;

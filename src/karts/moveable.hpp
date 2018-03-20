@@ -116,10 +116,10 @@ public:
             m_motion_state->setWorldTransform(m_transform);
     }   // setRotation(btQuaternion)
     // ------------------------------------------------------------------------
-    virtual void  updateGraphics(float dt, const Vec3& off_xyz,
+    virtual void  updateGraphics(int ticks, const Vec3& off_xyz,
                                  const btQuaternion& off_rotation);
     virtual void  reset();
-    virtual void  update(float dt) ;
+    virtual void  update(int ticks) ;
     btRigidBody  *getBody() const {return m_body; }
     void          createBody(float mass, btTransform& trans,
                              btCollisionShape *shape,

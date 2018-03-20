@@ -305,8 +305,8 @@ public:
     float getAnvilSpeedFactor() const;
 
     float getParachuteFriction() const;
-    float getParachuteDuration() const;
-    float getParachuteDurationOther() const;
+    int   getParachuteDuration() const;
+    int   getParachuteDurationOther() const;
     float getParachuteDurationRankMult() const;
     float getParachuteDurationSpeedMult() const;
     float getParachuteLboundFraction() const;
@@ -362,7 +362,7 @@ public:
     float getSlipstreamDuration() const;
     float getSlipstreamLength() const;
     float getSlipstreamWidth() const;
-    float getSlipstreamCollectTime() const;
+    int   getSlipstreamCollectTicks() const;
     float getSlipstreamUseTime() const;
     float getSlipstreamAddPower() const;
     float getSlipstreamMinSpeed() const;

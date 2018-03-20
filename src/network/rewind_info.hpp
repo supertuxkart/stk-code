@@ -46,7 +46,7 @@ private:
     LEAK_CHECK();
 
     /** Time when this RewindInfo was taken. */
-    float m_time;
+    int m_ticks;
 
     /** A confirmed event is one that was sent from the server. When
      *  rewinding we have to start with a confirmed state for each
@@ -54,7 +54,7 @@ private:
     bool m_is_confirmed;
 
 public:
-    RewindInfo(float time, bool is_confirmed);
+    RewindInfo(int ticks, bool is_confirmed);
 
     /** Called when going back in time to undo any rewind information. */
     virtual void undo() = 0;
@@ -62,12 +62,12 @@ public:
     /** This is called while going forwards in time again to reach current
      *  time. */
     virtual void rewind() = 0;
-    void setTime(float time);
+    void setTicks(int ticks);
     // ------------------------------------------------------------------------
     virtual ~RewindInfo() { }
     // ------------------------------------------------------------------------
     /** Returns the time at which this RewindInfo was saved. */
-    float getTime() const { return m_time; }
+    int getTicks() const { return m_ticks; }
     // ------------------------------------------------------------------------
     /** Sets if this RewindInfo is confirmed or not. */
     void setConfirmed(bool b) { m_is_confirmed = b; }
@@ -101,9 +101,9 @@ protected:
     Rewinder *m_rewinder;
 
 public:
-    RewindInfoRewinder(float time, Rewinder *rewinder,
+    RewindInfoRewinder(int ticks, Rewinder *rewinder,
                        BareNetworkString *buffer, bool is_confirmed)
-        : RewindInfo(time, is_confirmed)
+        : RewindInfo(ticks, is_confirmed)
     {
         m_rewinder = rewinder;
         m_buffer = buffer;
@@ -126,7 +126,7 @@ private:
     float m_local_physics_time;
 
 public:
-             RewindInfoState(float time, Rewinder *rewinder, 
+             RewindInfoState(int ticks, Rewinder *rewinder, 
                              BareNetworkString *buffer, bool is_confirmed);
     virtual ~RewindInfoState() {};
 
@@ -169,7 +169,7 @@ private:
     /** Buffer with the event data. */
     BareNetworkString *m_buffer;
 public:
-             RewindInfoEvent(float time, EventRewinder *event_rewinder,
+             RewindInfoEvent(int ticks, EventRewinder *event_rewinder,
                              BareNetworkString *buffer, bool is_confirmed);
     virtual ~RewindInfoEvent()
     {

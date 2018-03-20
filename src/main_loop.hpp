@@ -42,7 +42,7 @@ private:
     Uint32   m_prev_time;
     unsigned m_parent_pid;
     float    getLimitedDt();
-    void     updateRace(float dt);
+    void     updateRace(int ticks);
 public:
          MainLoop(unsigned parent_pid);
         ~MainLoop();

@@ -19,8 +19,6 @@
 
 #include "main_loop.hpp"
 
-#include <assert.h>
-
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -28,7 +26,6 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/message_queue.hpp"
 #include "input/input_manager.hpp"
-#include "input/wiimote_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
@@ -50,6 +47,7 @@
 
 MainLoop* main_loop = 0;
 
+// ----------------------------------------------------------------------------
 MainLoop::MainLoop(unsigned parent_pid)
         : m_abort(false), m_parent_pid(parent_pid)
 {
@@ -198,25 +196,25 @@ float MainLoop::getLimitedDt()
     // to findout which events to replay
     if (World::getWorld() && history->replayHistory() )
     {
-        dt = history->updateReplayAndGetDT(World::getWorld()->getTime(), dt);
+        history->updateReplay(World::getWorld()->getTimeTicks(), dt);
     }
     return dt;
 }   // getLimitedDt
 
 //-----------------------------------------------------------------------------
 /** Updates all race related objects.
- *  \param dt Time step size.
+ *  \param ticks Number of ticks (physics steps) to simulate - should be 1.
  */
-void MainLoop::updateRace(float dt)
+void MainLoop::updateRace(int ticks)
 {
     if (!World::getWorld())  return;   // No race on atm - i.e. we are in menu
 
     // The race event manager will update world in case of an online race
     if ( RaceEventManager::getInstance() && 
          RaceEventManager::getInstance()->isRunning() )
-        RaceEventManager::getInstance()->update(dt);
+        RaceEventManager::getInstance()->update(ticks);
     else
-        World::getWorld()->updateWorld(dt);
+        World::getWorld()->updateWorld(ticks);
 }   // updateRace
 
 //-----------------------------------------------------------------------------
@@ -336,8 +334,8 @@ void MainLoop::run()
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
 
         left_over_time += getLimitedDt();
-        int num_steps   = int(left_over_time * stk_config->m_physics_fps);
-        float dt        = 1.0f / stk_config->m_physics_fps;
+        int num_steps   = stk_config->time2Ticks(left_over_time);
+        float dt = stk_config->ticks2Time(1);
         left_over_time -= num_steps * dt ;
 
         if (STKHost::existHost() &&
@@ -372,7 +370,7 @@ void MainLoop::run()
         if (World::getWorld() && RewindManager::get()->isEnabled())
         {
             RewindManager::get()
-                ->addNextTimeStep(World::getWorld()->getTime(), dt);
+                ->addNextTimeStep(World::getWorld()->getTimeTicks(), dt);
         }
 
         if (!m_abort)
@@ -380,15 +378,17 @@ void MainLoop::run()
             float frame_duration = num_steps * dt;
             if (!ProfileWorld::isNoGraphics())
             {
+                PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
+                if (World::getWorld())
+                    World::getWorld()->updateGraphics(frame_duration);
+                PROFILER_POP_CPU_MARKER();
+
                 // Render the previous frame, and also handle all user input.
                 PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
                 irr_driver->update(frame_duration);
                 PROFILER_POP_CPU_MARKER();
 
                 PROFILER_PUSH_CPU_MARKER("Input/GUI", 0x7F, 0x00, 0x00);
-    #ifdef ENABLE_WIIUSE
-                wiimote_manager->update();
-    #endif
                 input_manager->update(frame_duration);
                 GUIEngine::update(frame_duration);
                 PROFILER_POP_CPU_MARKER();
@@ -412,14 +412,14 @@ void MainLoop::run()
             if (World::getWorld() && RewindManager::get()->isEnabled() && i>0)
             {
                 RewindManager::get()
-                    ->addNextTimeStep(World::getWorld()->getTime(), dt);
+                    ->addNextTimeStep(World::getWorld()->getTimeTicks(), dt);
             }
 
             // Enable last substep in last iteration
             m_is_last_substep = (i == num_steps - 1);
 
             PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
-            if (World::getWorld()) updateRace(dt);
+            if (World::getWorld()) updateRace(1);
             PROFILER_POP_CPU_MARKER();
 
             // We need to check again because update_race may have requested
@@ -431,11 +431,11 @@ void MainLoop::run()
                                      0x7F, 0x00, 0x7F);
             if (auto pm = ProtocolManager::lock())
             {
-                pm->update(dt);
+                pm->update(1);
             }
             PROFILER_POP_CPU_MARKER();
 
-            if (World::getWorld()) World::getWorld()->updateTime(dt);
+            if (World::getWorld()) World::getWorld()->updateTime(1);
         }   // for i < num_steps
 
         m_is_last_substep = false;

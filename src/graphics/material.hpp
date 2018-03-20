@@ -155,7 +155,7 @@ private:
     RandomGenerator m_random_hue;
 
     /** How much the top speed is reduced per second. */
-    float            m_slowdown_time;
+    int              m_slowdown_ticks;
 
     /** Maximum speed at which no more slow down occurs. */
     float            m_max_speed_fraction;
@@ -287,7 +287,7 @@ public:
     /** Returns how long it will take for a slowdown to take effect.
      *  It is the time it takes till the full slowdown applies to
      *  karts. So a short time will slowdown a kart much faster. */
-    float getSlowDownTime() const { return m_slowdown_time;          }
+    int getSlowDownTicks() const { return m_slowdown_ticks;          }
     // ------------------------------------------------------------------------
     /** Returns true if this material is under some other mesh and therefore
      *  requires another raycast to find the surface it is under (used for

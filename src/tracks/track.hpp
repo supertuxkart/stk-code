@@ -421,7 +421,7 @@ public:
     void               startMusic        () const;
 
     void               createPhysicsModel(unsigned int main_track_count);
-    void               update(float dt);
+    void               update(int ticks);
     void               reset();
     void               itemCommand(const XMLNode *node);
     core::stringw      getName() const;

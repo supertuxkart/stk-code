@@ -59,22 +59,24 @@ public:
      *  - SAME: give it one more item of the type it currently has.
      *  - ONLY_IF_SAME: only give it one more item if the randomly chosen item
      *          has the same type as the currently held item. */
-    enum {POWERUP_MODE_NEW,
-          POWERUP_MODE_SAME,
-          POWERUP_MODE_ONLY_IF_SAME}
-          m_same_powerup_mode;
+    enum {
+        POWERUP_MODE_NEW,
+        POWERUP_MODE_SAME,
+        POWERUP_MODE_ONLY_IF_SAME
+    }
+    m_same_powerup_mode;
 
     static float UNDEFINED;
     float m_bomb_time;                 /**<Time before a bomb explodes.        */
     float m_bomb_time_increase;        /**<Time added to bomb timer when it's
                                            passed on.                          */
-    float m_item_switch_time;          /**< Time items will be switched.       */
+    int   m_item_switch_ticks;          /**< Time items will be switched.       */
     int   m_bubblegum_counter;         /**< How many times bubble gums must be
                                             driven over before they disappear. */
     bool  m_shield_restrict_weapos;    /**<Wether weapon usage is punished. */
     float m_explosion_impulse_objects; /**<Impulse of explosion on moving
                                             objects, e.g. road cones, ...      */
-    float m_penalty_time;              /**< Penalty time when starting too
+    int   m_penalty_ticks;              /**< Penalty time when starting too
                                             early.                             */
     float m_delay_finish_time;         /**<Delay after a race finished before
                                            the results are displayed.          */
@@ -105,9 +107,6 @@ public:
     /** Default friction to be used for any moveable, e.g. karts, balls. */
     float m_default_moveable_friction;
 
-    /** Default FPS rate for physics. */
-    int m_physics_fps;
-
     int   m_max_skidmarks;           /**<Maximum number of skid marks/kart.  */
     float m_skid_fadeout_time;       /**<Time till skidmarks fade away.      */
     float m_near_ground;             /**<Determines when a kart is not near
@@ -115,9 +114,9 @@ public:
                                       *  constraint is disabled to allow for
                                       *  more violent explosions.            */
     int   m_min_kart_version,        /**<The minimum and maximum .kart file  */
-          m_max_kart_version;        /**<version supported by this binary.   */
+        m_max_kart_version;        /**<version supported by this binary.   */
     int   m_min_track_version,       /**<The minimum and maximum .track file */
-          m_max_track_version;       /**<version supported by this binary.   */
+        m_max_track_version;       /**<version supported by this binary.   */
     int   m_max_display_news;        /**<How often a news message is displayed
                                          before it is ignored. */
 
@@ -135,8 +134,8 @@ public:
                                          used to give a handicap to AIs */
 
     std::vector<float>
-          m_leader_intervals;        /**<Interval in follow the leader till
-                                         last kart is reomved.               */
+        m_leader_intervals;        /**<Interval in follow the leader till
+                                       last kart is reomved.               */
     float m_leader_time_per_kart;    /**< Additional time to each leader
                                           interval for each additional kart. */
     std::vector<int> m_switch_items; /**< How to switch items.               */
@@ -187,19 +186,24 @@ private:
      *  loaded a user specified config file. */
     bool  m_has_been_loaded;
 
+    /** Default FPS rate for physics. */
+    int m_physics_fps;
+
+
 public:
-         STKConfig();
-        ~STKConfig();
-    void init_defaults    ();
-    void getAllData       (const XMLNode * root);
-    void load             (const std::string &filename);
+    STKConfig();
+    ~STKConfig();
+    void init_defaults();
+    void getAllData(const XMLNode * root);
+    void load(const std::string &filename);
     const std::string &getMainMenuPicture(int n);
     const std::string &getBackgroundPicture(int n);
+
     void  getAllScores(std::vector<int> *all_scores, int num_karts);
     // ------------------------------------------------------------------------
     /** Returns the default kart properties for each kart. */
     const KartProperties &
-         getDefaultKartProperties() const {return *m_default_kart_properties; }
+        getDefaultKartProperties() const { return *m_default_kart_properties; }
 
     // ------------------------------------------------------------------------
     /** Returns the kart properties for a certain type of kart.
@@ -210,6 +214,15 @@ public:
     {
         return *m_kart_properties.at(type);
     }   // getKartProperties
+    // ------------------------------------------------------------------------
+    /** Converts a tick value (in physics time step size) into seconds. */
+    float ticks2Time(int ticks) { return float(ticks)/m_physics_fps; }
+    // ------------------------------------------------------------------------
+    /** Converts a time value into ticks (of physics time steps). */
+    int time2Ticks(float t) { return int(t * m_physics_fps);  }
+    // ------------------------------------------------------------------------
+    /** Returns the physics frame per seconds rate. */
+    int getPhysicsFPS() const { return m_physics_fps; }
 }
 ;   // STKConfig
 

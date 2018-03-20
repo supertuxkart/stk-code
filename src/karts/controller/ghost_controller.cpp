@@ -35,7 +35,7 @@ void GhostController::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
-void GhostController::update(float dt)
+void GhostController::update(int ticks)
 {
     m_current_time = World::getWorld()->getTime();
     // Find (if necessary) the next index to use

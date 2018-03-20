@@ -18,10 +18,11 @@
 #ifndef HEADER_LINEAR_WORLD_HPP
 #define HEADER_LINEAR_WORLD_HPP
 
-#include <vector>
-
 #include "modes/world_with_rank.hpp"
 #include "utils/aligned_array.hpp"
+
+#include <climits>
+#include <vector>
 
 class SFXBase;
 
@@ -42,8 +43,8 @@ private:
 
     bool         m_last_lap_sfx_playing;
 
-    /** The fastest lap time. */
-    float       m_fastest_lap;
+    /** The fastest lap time, in ticks of physics dt. */
+    int          m_fastest_lap_ticks;
 
     /** The track length returned by Track::getLength() only covers the
      *  distance from start line to finish line, i.e. it does not include
@@ -65,10 +66,10 @@ private:
         int         m_race_lap;
 
         /** Time at finishing last lap. */
-        float       m_time_at_last_lap;
+        int         m_ticks_at_last_lap;
 
         /** Time at start of a new lap. */
-        float       m_lap_start_time;
+        int         m_lap_start_ticks;
 
         /** During last lap only: estimated finishing time!   */
         float       m_estimated_finish;
@@ -83,11 +84,11 @@ private:
         /** Re-initialises all data. */
         void reset()
         {
-            m_race_lap         = -1;
-            m_lap_start_time   = 0;
-            m_time_at_last_lap = 99999.9f;
-            m_estimated_finish = -1.0f;
-            m_overall_distance = 0.0f;
+            m_race_lap          = -1;
+            m_lap_start_ticks   = 0;
+            m_ticks_at_last_lap = INT_MAX;
+            m_estimated_finish  = -1.0f;
+            m_overall_distance  = 0.0f;
         }   // reset
     };
     // ------------------------------------------------------------------------
@@ -100,7 +101,7 @@ protected:
       */
     AlignedArray<KartInfo> m_kart_info;
 
-    virtual void  checkForWrongDirection(unsigned int i, float dt);
+    virtual void  checkForWrongDirection(unsigned int i, int ticks);
     void          updateRacePosition();
     virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
 
@@ -112,12 +113,12 @@ public:
     virtual void  init() OVERRIDE;
     virtual      ~LinearWorld();
 
-    virtual void  update(float delta) OVERRIDE;
+    virtual void  update(int ticks) OVERRIDE;
     float         getDistanceDownTrackForKart(const int kart_id) const;
     float         getDistanceToCenterForKart(const int kart_id) const;
     float         getEstimatedFinishTime(const int kart_id) const;
     int           getLapForKart(const int kart_id) const;
-    float         getTimeAtLapForKart(const int kart_id) const;
+    int           getTicksAtLapForKart(const int kart_id) const;
 
     virtual  void getKartsDisplayInfo(
                   std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
@@ -155,11 +156,11 @@ public:
     {
         return m_kart_info[kart_index].m_overall_distance;
     }   // getOverallDistance
-
+    // ------------------------------------------------------------------------
     /** Returns time for the fastest laps */
     float getFastestLap() const
     {
-        return m_fastest_lap;
+        return stk_config->ticks2Time(m_fastest_lap_ticks);
     }
 };   // LinearWorld
 

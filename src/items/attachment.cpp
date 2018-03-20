@@ -49,7 +49,7 @@ Attachment::Attachment(AbstractKart* kart)
           : EventRewinder()
 {
     m_type                 = ATTACH_NOTHING;
-    m_time_left            = 0.0;
+    m_ticks_left           = 0;
     m_plugin               = NULL;
     m_kart                 = kart;
     m_previous_owner       = NULL;
@@ -103,7 +103,7 @@ Attachment::~Attachment()
  *         can be passed back to the previous owner). NULL if a no
  *         previous owner exists.
  */
-void Attachment::set(AttachmentType type, float time,
+void Attachment::set(AttachmentType type, int ticks,
                      AbstractKart *current_kart)
 {
     bool was_bomb = (m_type == ATTACH_BOMB);
@@ -162,7 +162,7 @@ void Attachment::set(AttachmentType type, float time,
     m_node->setScale(core::vector3df(m_node_scale,m_node_scale,m_node_scale));
 
     m_type             = type;
-    m_time_left        = time;
+    m_ticks_left       = ticks;
     m_previous_owner   = current_kart;
     m_node->setRotation(core::vector3df(0, 0, 0));
 
@@ -188,7 +188,7 @@ void Attachment::set(AttachmentType type, float time,
 
         speed_mult = 1.0f + (f *  (temp_mult - 1.0f));
 
-        m_time_left = m_time_left * speed_mult;
+        m_ticks_left = int(m_ticks_left * speed_mult);
 
         if (UserConfigParams::m_particles_effects > 1)
         {
@@ -230,7 +230,7 @@ void Attachment::clear()
 
     m_type=ATTACH_NOTHING;
 
-    m_time_left=0.0;
+    m_ticks_left = 0;
     m_node->setVisible(false);
     m_node->setPosition(core::vector3df());
     m_node->setRotation(core::vector3df());
@@ -254,7 +254,7 @@ void Attachment::saveState(BareNetworkString *buffer) const
     buffer->addUInt8(type);
     if(m_type!=ATTACH_NOTHING)
     {
-        buffer->addFloat(m_time_left);
+        buffer->addUInt32(m_ticks_left);
         if(m_type==ATTACH_BOMB && m_previous_owner)
             buffer->addUInt8(m_previous_owner->getWorldKartId());
         // m_initial_speed is not saved, on restore state it will
@@ -284,13 +284,13 @@ void Attachment::rewindTo(BareNetworkString *buffer)
         return;
     }
 
-    float time_left = buffer->getFloat();
+    int ticks_left = buffer->getUInt32();
 
     // Attaching an object can be expensive (loading new models, ...)
     // so avoid doing this if there is no change in attachment type
     if(new_type == m_type)
     {
-        setTimeLeft(time_left);
+        setTicksLeft(ticks_left);
         return;
     }
 
@@ -305,7 +305,7 @@ void Attachment::rewindTo(BareNetworkString *buffer)
     {
         m_previous_owner = NULL;
     }
-    set(new_type, time_left, m_previous_owner);
+    set(new_type, ticks_left, m_previous_owner);
 }   // rewindTo
 // -----------------------------------------------------------------------------
 /** Called when going forwards in time during a rewind. 
@@ -333,11 +333,11 @@ void Attachment::hitBanana(Item *item, int new_attachment)
     if(m_type == ATTACH_BUBBLEGUM_SHIELD ||
        m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD)
     {
-        m_time_left = 0.0f;
+        m_ticks_left = 0;
         return;
     }
 
-    float leftover_time   = 0.0f;
+    int leftover_ticks = 0;
 
     bool add_a_new_item = true;
 
@@ -366,19 +366,20 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         // default time. This is necessary to avoid that a kart lands on the
         // same banana again once the explosion animation is finished, giving
         // the kart the same penalty twice.
-        float f = std::max(item->getDisableTime(), kp->getExplosionDuration() + 2.0f);
-        item->setDisableTime(f);
+        int ticks = std::max(item->getDisableTicks(), 
+                             stk_config->time2Ticks(kp->getExplosionDuration() + 2.0f));
+        item->setDisableTicks(ticks);
         break;
         }
     case ATTACH_ANVIL:
         // if the kart already has an anvil, attach a new anvil,
         // and increase the overall time
         new_attachment = 1;
-        leftover_time  = m_time_left;
+        leftover_ticks  = m_ticks_left;
         break;
     case ATTACH_PARACHUTE:
         new_attachment = 0;
-        leftover_time  = m_time_left;
+        leftover_ticks  = m_ticks_left;
         break;
     default:
         // There is no attachment currently, but there will be one
@@ -399,7 +400,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         switch (new_attachment)
         {
         case 0:
-            set(ATTACH_PARACHUTE, kp->getParachuteDuration() + leftover_time);
+            set(ATTACH_PARACHUTE, kp->getParachuteDuration() + leftover_ticks);
             m_initial_speed = m_kart->getSpeed();
 
             // if going very slowly or backwards,
@@ -407,7 +408,8 @@ void Attachment::hitBanana(Item *item, int new_attachment)
             if(m_initial_speed <= 1.5) m_initial_speed = 1.5;
             break ;
         case 1:
-            set(ATTACH_ANVIL, kp->getAnvilDuration() + leftover_time);
+            set(ATTACH_ANVIL, stk_config->time2Ticks(kp->getAnvilDuration())
+                + leftover_ticks                                      );
             // if ( m_kart == m_kart[0] )
             //   sound -> playSfx ( SOUND_SHOOMF ) ;
             // Reduce speed once (see description above), all other changes are
@@ -416,10 +418,9 @@ void Attachment::hitBanana(Item *item, int new_attachment)
             m_kart->updateWeight();
             break ;
         case 2:
-            set( ATTACH_BOMB, stk_config->m_bomb_time+leftover_time);
+            set( ATTACH_BOMB, stk_config->time2Ticks(stk_config->m_bomb_time)
+                            + leftover_ticks                                 );
 
-            // if ( m_kart == m_kart[0] )
-            //   sound -> playSfx ( SOUND_SHOOMF ) ;
             break ;
         }   // switch
     }
@@ -446,8 +447,8 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
         // If both karts have a bomb, explode them immediately:
         if(attachment_other->getType()==Attachment::ATTACH_BOMB)
         {
-            setTimeLeft(0.0f);
-            attachment_other->setTimeLeft(0.0f);
+            setTicksLeft(0);
+            attachment_other->setTicksLeft(0);
         }
         else  // only this kart has a bomb, move it to the other
         {
@@ -455,10 +456,11 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
             if (getPreviousOwner() != other || World::getWorld()->getNumKarts() <= 2)
             {
                 // Don't move if this bomb was from other kart originally
-                other->getAttachment()->set(ATTACH_BOMB,
-                                            getTimeLeft()+
-                                            stk_config->m_bomb_time_increase,
-                                            m_kart);
+                other->getAttachment()
+                    ->set(ATTACH_BOMB, 
+                          getTicksLeft()+stk_config->time2Ticks(
+                                           stk_config->m_bomb_time_increase),
+                          m_kart);
                 other->playCustomSFX(SFXManager::CUSTOM_ATTACH);
                 clear();
             }
@@ -473,8 +475,10 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
             m_kart->decreaseShieldTime();
             return;
         }
-        set(ATTACH_BOMB, other->getAttachment()->getTimeLeft()+
-                         stk_config->m_bomb_time_increase, other);
+        set(ATTACH_BOMB,
+            other->getAttachment()->getTicksLeft()+
+               stk_config->time2Ticks(stk_config->m_bomb_time_increase),
+            other);
         other->getAttachment()->clear();
         m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
     }
@@ -487,7 +491,7 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
 }   // handleCollisionWithKart
 
 //-----------------------------------------------------------------------------
-void Attachment::update(float dt)
+void Attachment::update(int ticks)
 {
     if(m_type==ATTACH_NOTHING) return;
 
@@ -496,7 +500,7 @@ void Attachment::update(float dt)
     if (m_type == ATTACH_BOMB && m_kart->getKartAnimation() != NULL)
         return;
 
-    m_time_left -=dt;
+    m_ticks_left -= ticks;
 
 
     bool is_shield = m_type == ATTACH_BUBBLEGUM_SHIELD ||
@@ -504,22 +508,26 @@ void Attachment::update(float dt)
     float m_wanted_node_scale = is_shield 
                               ? std::max(1.0f, m_kart->getHighestPoint()*1.1f)
                               : 1.0f;
-    int slow_flashes = 3;
-    if (is_shield && m_time_left < slow_flashes)
+    int slow_flashes = stk_config->time2Ticks(3.0f);
+    if (is_shield && m_ticks_left < slow_flashes)
     {
         int flashes_per_second = 4;
-        int divisor = 2;
+        int ticks_per_flash = stk_config->time2Ticks(0.25f);
         
-        float fast_flashes = 0.5F;
-        if (m_time_left < fast_flashes)
+        int fast_flashes = stk_config->time2Ticks(0.5f);
+        if (m_ticks_left < fast_flashes)
         {
             flashes_per_second = 12;
+            ticks_per_flash = stk_config->time2Ticks(1.0f/12);
         }
 
-        int mod = (int)(m_time_left * flashes_per_second * 2) % divisor;
-        m_node->setVisible(2*mod >= divisor);
+        //int divisor = 2;
+        //int mod = (int)(m_ticks_left * flashes_per_second * 2) % divisor;
+        int mod = m_ticks_left % ticks_per_flash;
+        m_node->setVisible(mod > ticks_per_flash);
     }
 
+    float dt = stk_config->ticks2Time(ticks);
     if (m_node_scale < m_wanted_node_scale)
     {
         m_node_scale += dt*1.5f;
@@ -531,7 +539,7 @@ void Attachment::update(float dt)
 
     if(m_plugin)
     {
-        bool discard = m_plugin->updateAndTestFinished(dt);
+        bool discard = m_plugin->updateAndTestFinished(ticks);
         if(discard)
         {
             clear();  // also removes the plugin
@@ -558,7 +566,7 @@ void Attachment::update(float dt)
                                   f * (kp->getParachuteUboundFraction()
                                      - kp->getParachuteLboundFraction())))
         {
-            m_time_left = -1;
+            m_ticks_left = -1;
         }
         }
         break;
@@ -576,22 +584,23 @@ void Attachment::update(float dt)
         assert(false);
         break;
     case ATTACH_BOMB:
-
+    {
         if (m_bomb_sound) m_bomb_sound->setPosition(m_kart->getXYZ());
 
         // Mesh animation frames are 1 to 61 frames (60 steps)
         // The idea is change second by second, counterclockwise 60 to 0 secs
         // If longer times needed, it should be a surprise "oh! bomb activated!"
-        if(m_time_left <= (m_node->getEndFrame() - m_node->getStartFrame()-1))
+        float time_left = stk_config->ticks2Time(m_ticks_left);
+        if (time_left <= (m_node->getEndFrame() - m_node->getStartFrame() - 1))
         {
             m_node->setCurrentFrame(m_node->getEndFrame()
-                                    - m_node->getStartFrame()-1-m_time_left);
+                - m_node->getStartFrame() - 1 - time_left);
         }
-        if(m_time_left<=0.0)
+        if (m_ticks_left <= 0)
         {
             HitEffect *he = new Explosion(m_kart->getXYZ(), "explosion",
-                                          "explosion_bomb.xml"          );
-            if(m_kart->getController()->isLocalPlayerController())
+                "explosion_bomb.xml");
+            if (m_kart->getController()->isLocalPlayerController())
                 he->setLocalPlayerKartHit();
             projectile_manager->addHitEffect(he);
             ExplosionAnimation::create(m_kart);
@@ -603,11 +612,12 @@ void Attachment::update(float dt)
             }
         }
         break;
+    }
     case ATTACH_BUBBLEGUM_SHIELD:
     case ATTACH_NOLOK_BUBBLEGUM_SHIELD:
-        if (m_time_left < 0)
+        if (m_ticks_left < 0)
         {
-            m_time_left = 0.0f;
+            m_ticks_left = 0;
             if (m_bubble_explode_sound) m_bubble_explode_sound->deleteSFX();
             m_bubble_explode_sound =
                 SFXManager::get()->createSoundSource("bubblegum_explode");
@@ -638,7 +648,7 @@ void Attachment::update(float dt)
     }   // switch
 
     // Detach attachment if its time is up.
-    if ( m_time_left <= 0.0f)
+    if ( m_ticks_left <= 0)
         clear();
 }   // update
 

@@ -56,8 +56,8 @@ SpareTireAI::SpareTireAI(AbstractKart *kart)
 void SpareTireAI::reset()
 {
     BattleAI::reset();
-    m_idx = 0;
-    m_timer = 0.0f;
+    m_idx   = 0;
+    m_timer = 0;
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -65,12 +65,12 @@ void SpareTireAI::reset()
  *  \ref m_timer reaches zero which it will be decreased here.
  *  \param dt Time step size.
  */
-void SpareTireAI::update(float dt)
+void SpareTireAI::update(int ticks)
 {
-    BattleAI::update(dt);
-    m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI, 0.5f, /*fade_in_time*/0.0f);
-    m_timer -= dt;
-    if (m_timer < 0.0f)
+    BattleAI::update(ticks);
+    m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI, 0.5f, /*fade_in_time*/0);
+    m_timer -= ticks;
+    if (m_timer < 0)
         unspawn();
 }   // update
 
@@ -108,10 +108,10 @@ void SpareTireAI::findTarget()
  *  moving around.
  *  \param time_to_last Time before calling \ref unspawn.
  */
-void SpareTireAI::spawn(float time_to_last)
+void SpareTireAI::spawn(int ticks_to_last)
 {
     findDefaultPath();
-    m_timer = time_to_last;
+    m_timer = ticks_to_last;
 
     Physics::getInstance()->addKart(m_kart);
     m_kart->startEngineSFX();

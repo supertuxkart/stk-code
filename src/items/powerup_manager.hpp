@@ -113,7 +113,7 @@ private:
     float         m_all_max_turn_angle[POWERUP_MAX];
 
     /** Last time the bouncing ball was collected */
-    float         m_rubber_ball_collect_time;
+    int           m_rubber_ball_collect_ticks;
 
 public:
     /** The mesh for each model (if the powerup has a model), e.g. a switch
@@ -165,8 +165,8 @@ public:
     float         getMaxTurnAngle (int type) const {return m_all_max_turn_angle[type];}
     const btVector3&
                   getExtend       (int type) const {return m_all_extends[type];}
-    float         getBallCollectTime() const {return m_rubber_ball_collect_time;}
-    void          setBallCollectTime(float time) {m_rubber_ball_collect_time=time;}
+    int           getBallCollectTicks() const {return m_rubber_ball_collect_ticks;}
+    void          setBallCollectTicks(int ticks) {m_rubber_ball_collect_ticks=ticks;}
 
 };
 

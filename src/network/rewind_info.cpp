@@ -25,9 +25,9 @@
  *  for all state info.
  *  \param size Necessary buffer size for a state.
  */
-RewindInfo::RewindInfo(float time, bool is_confirmed)
+RewindInfo::RewindInfo(int ticks, bool is_confirmed)
 {
-    m_time         = time;
+    m_ticks        = ticks;
     m_is_confirmed = is_confirmed;
 }   // RewindInfo
 
@@ -36,17 +36,17 @@ RewindInfo::RewindInfo(float time, bool is_confirmed)
  *  in case that an event is received in the past - in this case the server
  *  needs to avoid a Rewind by moving this event forward to the current time.
  */
-void RewindInfo::setTime(float time)
+void RewindInfo::setTicks(int ticks)
 {
     assert(NetworkConfig::get()->isServer());
-    assert(m_time < time);
-    m_time = time;
-}   // setTime
+    assert(m_ticks < ticks);
+    m_ticks = ticks;
+}   // setTicks
 
 // ============================================================================
-RewindInfoState::RewindInfoState(float time, Rewinder *rewinder, 
+RewindInfoState::RewindInfoState(int ticks, Rewinder *rewinder, 
                                  BareNetworkString *buffer, bool is_confirmed)
-    : RewindInfoRewinder(time, rewinder, buffer, is_confirmed)
+    : RewindInfoRewinder(ticks, rewinder, buffer, is_confirmed)
 {
     // rewinder = NULL is used in unit testing, in which case no world exists
     if(rewinder!=NULL)
@@ -55,9 +55,9 @@ RewindInfoState::RewindInfoState(float time, Rewinder *rewinder,
 }   // RewindInfoState
 
 // ============================================================================
-RewindInfoEvent::RewindInfoEvent(float time, EventRewinder *event_rewinder,
+RewindInfoEvent::RewindInfoEvent(int ticks, EventRewinder *event_rewinder,
                                  BareNetworkString *buffer, bool is_confirmed)
-               : RewindInfo(time, is_confirmed)
+               : RewindInfo(ticks, is_confirmed)
 {
     m_event_rewinder = event_rewinder;
     m_buffer         = buffer;

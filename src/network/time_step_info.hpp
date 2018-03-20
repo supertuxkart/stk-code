@@ -53,7 +53,7 @@ private:
     AllRewindInfo m_list_of_events;
 
     /** Time at which those events should be executed here. */
-    float m_time;
+    int m_ticks;
 
     /** Time step to be used. */
     float m_dt;
@@ -62,20 +62,20 @@ private:
      *  60 fps. Restoring this value exactly improves accuracy of rewinds. */
     float m_local_physics_time;
 public:
-    TimeStepInfo(float time, float dt);
+    TimeStepInfo(int ticks, float dt);
     void insert(RewindInfo *ri);
     void undoAll();
     void replayAllEvents();
     void replayAllStates();
     // ------------------------------------------------------------------------
     /** Sets the tiem of this object. */
-    void setTime(float time) { m_time = time; }
+    void setTicks(int ticks) { m_ticks = ticks; }
     // ------------------------------------------------------------------------
     /** Sets the time step size of this object. */
     void setDT(float dt) { m_dt = dt;  }
     // ------------------------------------------------------------------------
     /** Returns the time for this TimeStepInfo instance. */
-    float getTime() const { return m_time;  }
+    int getTicks() const { return m_ticks;  }
     // ------------------------------------------------------------------------
     /** Returns the left-over physics time. */
     float getLocalPhysicsTime() const { return m_local_physics_time;  }

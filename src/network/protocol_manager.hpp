@@ -149,7 +149,7 @@ private:
         void removeProtocol(std::shared_ptr<Protocol> p);
         void requestTerminateAll();
         bool notifyEvent(Event *event);
-        void update(float dt, bool async);
+        void update(int ticks, bool async);
         void abort();
         // --------------------------------------------------------------------
         /** Returns the first protocol of a given type. It is assumed that
@@ -242,7 +242,7 @@ public:
     void      requestUnpause(std::shared_ptr<Protocol> protocol);
     void      requestTerminate(std::shared_ptr<Protocol> protocol);
     void      findAndTerminate(ProtocolType type);
-    void      update(float dt);
+    void      update(int ticks);
     // ------------------------------------------------------------------------
     bool isExiting() const                            { return m_exit.load(); }
     // ------------------------------------------------------------------------

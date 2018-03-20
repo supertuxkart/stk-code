@@ -49,7 +49,7 @@ public:
    void          reset();
    virtual void  rewindToState(BareNetworkString *p) OVERRIDE;
    virtual void  rewindToEvent(BareNetworkString *p) OVERRIDE;
-   virtual void  update(float dt);
+   virtual void  update(int ticks) OVERRIDE;
 
    // -------------------------------------------------------------------------
    virtual void  undoState(BareNetworkString *p) OVERRIDE

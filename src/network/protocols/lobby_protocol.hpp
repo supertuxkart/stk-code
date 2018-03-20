@@ -109,8 +109,8 @@ public:
 
              LobbyProtocol(CallbackObject* callback_object);
     virtual ~LobbyProtocol();
-    virtual void setup();
-    virtual void update(float dt)       = 0;
+    virtual void setup()                = 0;
+    virtual void update(int ticks)      = 0;
     virtual void finishedLoadingWorld() = 0;
     virtual void loadWorld();
     virtual bool waitingForPlayers() const = 0;

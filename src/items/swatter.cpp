@@ -114,8 +114,9 @@ Swatter::~Swatter()
  *  \param dt Time step size.
  *  \return True if the attachment should be discarded.
  */
-bool Swatter::updateAndTestFinished(float dt)
+bool Swatter::updateAndTestFinished(int ticks)
 {
+    float dt = stk_config->ticks2Time(ticks);
     if (!m_discard_now)
     {
         if (m_removing_bomb)

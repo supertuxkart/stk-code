@@ -101,9 +101,9 @@ void OverWorld::enterOverWorld()
 
 //-----------------------------------------------------------------------------
 /** General update function called once per frame.
- *  \param dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void OverWorld::update(float dt)
+void OverWorld::update(int ticks)
 {
     // Skip annoying waiting without a purpose
     // Make sure to do all things that would normally happen in the
@@ -119,8 +119,8 @@ void OverWorld::update(float dt)
             music_manager->startMusic();
         m_karts[0]->startEngineSFX();
     }
-    World::update(dt);
-    World::updateTrack(dt);
+    World::update(ticks);
+    World::updateTrack(ticks);
     const unsigned int kart_amount  = (unsigned int)m_karts.size();
 
     // isn't it cool, on the overworld nitro is free!

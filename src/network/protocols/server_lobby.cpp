@@ -386,7 +386,7 @@ bool ServerLobby::checkPeersReady() const
  *  is known, register the server and its address with the stk server so that
  *  client can find it.
  */
-void ServerLobby::update(float dt)
+void ServerLobby::update(int ticks)
 {
     // Check if server owner has left
     updateServerOwner();
@@ -1200,7 +1200,7 @@ void ServerLobby::startedRaceOnClient(Event *event)
 void ServerLobby::playerFinishedResult(Event *event)
 {
     m_player_ready_counter++;
-    if(m_player_ready_counter >= STKHost::get()->getPeerCount())
+    if(m_player_ready_counter >= (int)STKHost::get()->getPeerCount())
     {
         // We can't trigger the world/race exit here, since this is called
         // from the protocol manager thread. So instead we force the timeout

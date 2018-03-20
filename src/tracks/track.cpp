@@ -1524,13 +1524,14 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
 /** Update, called once per frame.
  *  \param dt Timestep.
  */
-void Track::update(float dt)
+void Track::update(int ticks)
 {
     if (!m_startup_run) // first time running update = good point to run startup script
     {
         Scripting::ScriptEngine::getInstance()->runFunction(false, "void onStart()");
         m_startup_run = true;
     }
+    float dt = stk_config->ticks2Time(ticks);
     m_track_object_manager->update(dt);
 
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
@@ -1538,7 +1539,7 @@ void Track::update(float dt)
         m_animated_textures[i]->update(dt);
     }
     CheckManager::get()->update(dt);
-    ItemManager::get()->update(dt);
+    ItemManager::get()->update(ticks);
 
     // TODO: enable onUpdate scripts if we ever find a compelling use for them
     //Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();

@@ -22,8 +22,9 @@ RaceEventManager::~RaceEventManager()
 // ----------------------------------------------------------------------------
 /** In network games this update function is called instead of
  *  World::updateWorld(). 
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void RaceEventManager::update(float dt)
+void RaceEventManager::update(int ticks)
 {
     // Replay all recorded events up to the current time (only if the
     // timer isn't stopped, otherwise a potential rewind will trigger
@@ -33,11 +34,11 @@ void RaceEventManager::update(float dt)
         // This might adjust dt - if a new state is being played, the dt is
         // determined from the last state till 'now'
         PROFILER_PUSH_CPU_MARKER("RaceEvent:play event", 100, 100, 100);
-        RewindManager::get()->playEventsTill(World::getWorld()->getTime(),
-                                             &dt);
+        RewindManager::get()->playEventsTill(World::getWorld()->getTimeTicks(),
+                                             &ticks);
         PROFILER_POP_CPU_MARKER();
     }
-    World::getWorld()->updateWorld(dt);
+    World::getWorld()->updateWorld(ticks);
 
     // if the race is over
     if (World::getWorld()->getPhase() >= WorldStatus::RESULT_DISPLAY_PHASE &&

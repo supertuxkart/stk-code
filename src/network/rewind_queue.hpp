@@ -55,7 +55,7 @@ private:
      *  always be at the same time as World::getTime(). */
     AllTimeStepInfo::iterator m_current;
 
-    AllTimeStepInfo::iterator findPreviousTimeStepInfo(float t);
+    AllTimeStepInfo::iterator findPreviousTimeStepInfo(int ticks);
     void insertRewindInfo(RewindInfo *ri);
 
     struct _TimeStepInfoCompare
@@ -73,21 +73,21 @@ public:
          RewindQueue();
         ~RewindQueue();
     void reset();
-    void addNewTimeStep(float time, float dt);
+    void addNewTimeStep(int ticks, float dt);
     void addLocalEvent(EventRewinder *event_rewinder, BareNetworkString *buffer,
-                       bool confirmed, float time);
+                       bool confirmed, int ticks);
     void addLocalState(Rewinder *rewinder, BareNetworkString *buffer,
-                       bool confirmed, float time);
+                       bool confirmed, int ticks);
     void addNetworkEvent(EventRewinder *event_rewinder,
-                         BareNetworkString *buffer, float time);
+                         BareNetworkString *buffer, int ticks);
     void addNetworkState(Rewinder *rewinder, BareNetworkString *buffer,
-                         float time, float dt);
-    void mergeNetworkData(float world_time, float dt,
-                          bool *needs_rewind, float *rewind_time);
+                         int ticks, float dt);
+    void mergeNetworkData(int world_ticks,  bool *needs_rewind, 
+                          int *rewind_ticks);
     bool isEmpty() const;
     bool hasMoreRewindInfo() const;
-    void undoUntil(float undo_time);
-    float determineNextDT(float max_time);
+    void undoUntil(int undo_ticks);
+    float determineNextDT();
     // ------------------------------------------------------------------------
     /** Returns the last (i.e. newest) entry in the TimeStepInfo list. This is
      *  used for rewinds, since it's the first TimeStep that must not be
