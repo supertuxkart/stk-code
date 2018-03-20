@@ -616,8 +616,7 @@ bool handleContextMenuAction(s32 cmd_id)
         {
             kart_num--;
         }
-        const unsigned real_num = abs(kart_num);
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(real_num));
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         break;
     }
     case DEBUG_VIEW_KART_ONE:
@@ -654,8 +653,7 @@ bool handleContextMenuAction(s32 cmd_id)
         {
              kart_num++;
         }
-        const unsigned real_num = abs(kart_num);
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(real_num));
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         break;
     }
 
@@ -1030,8 +1028,7 @@ bool handleStaticAction(int key)
         {
             kart_num--;
         }
-        const unsigned real_num = abs(kart_num);
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(real_num));
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         return true;
     }
     else if (key == IRR_KEY_F6)
@@ -1044,8 +1041,7 @@ bool handleStaticAction(int key)
         {
              kart_num++;
         }
-        const unsigned real_num = abs(kart_num);
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(real_num));
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         return true;
     }
     // TODO: create more keyboard shortcuts
