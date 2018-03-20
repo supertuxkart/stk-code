@@ -130,6 +130,18 @@ enum DebugMenuCommand
     DEBUG_VIEW_KART_SIX,
     DEBUG_VIEW_KART_SEVEN,
     DEBUG_VIEW_KART_EIGHT,
+    DEBUG_VIEW_KART_NINE,
+    DEBUG_VIEW_KART_TEN,
+    DEBUG_VIEW_KART_ELEVEN,
+    DEBUG_VIEW_KART_TWELVE,
+    DEBUG_VIEW_KART_THIRTEEN,
+    DEBUG_VIEW_KART_FOURTEEN,
+    DEBUG_VIEW_KART_FIFTEEN,
+    DEBUG_VIEW_KART_SIXTEEN,
+    DEBUG_VIEW_KART_SEVENTEEN,
+    DEBUG_VIEW_KART_EIGHTEEN,
+    DEBUG_VIEW_KART_NINETEEN,
+    DEBUG_VIEW_KART_TWENTY,
     DEBUG_HIDE_KARTS,
     DEBUG_THROTTLE_FPS,
     DEBUG_VISUAL_VALUES,
@@ -627,6 +639,43 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_VIEW_KART_EIGHT:
         changeCameraTarget(8);
         break;
+    case DEBUG_VIEW_KART_NINE:
+       changeCameraTarget(9);
+        break; 
+    case DEBUG_VIEW_KART_TEN:
+       changeCameraTarget(10);
+        break; 
+    case DEBUG_VIEW_KART_ELEVEN:
+       changeCameraTarget(11);
+        break; 
+    case DEBUG_VIEW_KART_TWELVE:
+       changeCameraTarget(12);
+        break; 
+    case DEBUG_VIEW_KART_THIRTEEN:
+       changeCameraTarget(13);
+        break; 
+    case DEBUG_VIEW_KART_FOURTEEN:
+       changeCameraTarget(14);
+        break; 
+    case DEBUG_VIEW_KART_FIFTEEN:
+       changeCameraTarget(15);
+        break; 
+    case DEBUG_VIEW_KART_SIXTEEN:
+       changeCameraTarget(16);
+        break; 
+    case DEBUG_VIEW_KART_SEVENTEEN:
+       changeCameraTarget(17);
+        break; 
+    case DEBUG_VIEW_KART_EIGHTEEN:
+       changeCameraTarget(18);
+        break; 
+    case DEBUG_VIEW_KART_NINETEEN:
+       changeCameraTarget(19);
+        break; 
+    case DEBUG_VIEW_KART_TWENTY:
+       changeCameraTarget(20);
+        break; 
+
     case DEBUG_PRINT_START_POS:
         if (!world) return false;
         for (unsigned int i = 0; i<world->getNumKarts(); i++)
@@ -853,8 +902,31 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Physics debug (no kart)", DEBUG_GRAPHICS_BULLET_2);
             sub->addItem(L"Reset debug views", DEBUG_GRAPHICS_RESET);
 
-            mnu->addItem(L"Items >",-1,true,true);
+            mnu->addItem(L"Change camera target >",-1,true, true);
             sub = mnu->getSubMenu(1);
+            sub->addItem(L"To kart one", DEBUG_VIEW_KART_ONE);
+            sub->addItem(L"To kart two", DEBUG_VIEW_KART_TWO);
+            sub->addItem(L"To kart three", DEBUG_VIEW_KART_THREE);
+            sub->addItem(L"To kart four", DEBUG_VIEW_KART_FOUR);
+            sub->addItem(L"To kart five", DEBUG_VIEW_KART_FIVE);
+            sub->addItem(L"To kart six", DEBUG_VIEW_KART_SIX);
+            sub->addItem(L"To kart seven", DEBUG_VIEW_KART_SEVEN);
+            sub->addItem(L"To kart eight", DEBUG_VIEW_KART_EIGHT);
+            sub->addItem(L"To kart nine", DEBUG_VIEW_KART_NINE);
+            sub->addItem(L"To kart ten", DEBUG_VIEW_KART_TEN);
+            sub->addItem(L"To kart eleven", DEBUG_VIEW_KART_ELEVEN);
+            sub->addItem(L"To kart twelve", DEBUG_VIEW_KART_TWELVE);
+            sub->addItem(L"To kart thirteen", DEBUG_VIEW_KART_THIRTEEN);
+            sub->addItem(L"To kart fourteen", DEBUG_VIEW_KART_FOURTEEN);
+            sub->addItem(L"To kart fifteen", DEBUG_VIEW_KART_FIFTEEN);
+            sub->addItem(L"To kart sixteen", DEBUG_VIEW_KART_SIXTEEN);
+            sub->addItem(L"To kart seventeen", DEBUG_VIEW_KART_SEVENTEEN);
+            sub->addItem(L"To kart eighteen", DEBUG_VIEW_KART_EIGHTEEN);
+            sub->addItem(L"To kart nineteen", DEBUG_VIEW_KART_NINETEEN);
+            sub->addItem(L"To kart twenty", DEBUG_VIEW_KART_TWENTY);
+
+            mnu->addItem(L"Items >",-1,true,true);
+            sub = mnu->getSubMenu(2);
             sub->addItem(L"Basketball", DEBUG_POWERUP_RUBBERBALL );
             sub->addItem(L"Bowling", DEBUG_POWERUP_BOWLING );
             sub->addItem(L"Bubblegum", DEBUG_POWERUP_BUBBLEGUM );
@@ -867,14 +939,14 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Nitro", DEBUG_POWERUP_NITRO );
 
             mnu->addItem(L"Attachments >",-1,true, true);
-            sub = mnu->getSubMenu(2);
+            sub = mnu->getSubMenu(3);
             sub->addItem(L"Bomb", DEBUG_ATTACHMENT_BOMB);
             sub->addItem(L"Anvil", DEBUG_ATTACHMENT_ANVIL);
             sub->addItem(L"Parachute", DEBUG_ATTACHMENT_PARACHUTE);
             sub->addItem(L"Explosion", DEBUG_ATTACHMENT_EXPLOSION);
 
             mnu->addItem(L"GUI >",-1,true, true);
-            sub = mnu->getSubMenu(3);
+            sub = mnu->getSubMenu(4);
             sub->addItem(L"Toggle GUI", DEBUG_GUI_TOGGLE);
             sub->addItem(L"Hide karts", DEBUG_GUI_HIDE_KARTS);
             sub->addItem(L"Top view", DEBUG_GUI_CAM_TOP);
@@ -887,20 +959,9 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Attach fps camera to kart", DEBUG_GUI_CAM_ATTACH);
 
             mnu->addItem(L"Recording >",-1,true, true);
-            sub = mnu->getSubMenu(4);
+            sub = mnu->getSubMenu(5);
             sub->addItem(L"Start recording", DEBUG_START_RECORDING);
             sub->addItem(L"Stop recording", DEBUG_STOP_RECORDING);
-
-            mnu->addItem(L"Change camera target >",-1,true, true);
-            sub = mnu->getSubMenu(5);
-            sub->addItem(L"To kart one", DEBUG_VIEW_KART_ONE);
-            sub->addItem(L"To kart two", DEBUG_VIEW_KART_TWO);
-            sub->addItem(L"To kart three", DEBUG_VIEW_KART_THREE);
-            sub->addItem(L"To kart four", DEBUG_VIEW_KART_FOUR);
-            sub->addItem(L"To kart five", DEBUG_VIEW_KART_FIVE);
-            sub->addItem(L"To kart six", DEBUG_VIEW_KART_SIX);
-            sub->addItem(L"To kart seven", DEBUG_VIEW_KART_SEVEN);
-            sub->addItem(L"To kart eight", DEBUG_VIEW_KART_EIGHT);
 
             mnu->addItem(L"Font >",-1,true, true);
             sub = mnu->getSubMenu(6);
