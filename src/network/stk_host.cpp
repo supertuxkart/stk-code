@@ -385,7 +385,8 @@ void STKHost::shutdown()
  */
 void STKHost::setPublicAddress()
 {
-    std::vector<std::string> untried_server = UserConfigParams::m_stun_servers;
+    std::vector<std::string> untried_server =
+        UserConfigParams::m_stun_servers_list;
     // Generate random list of stun servers
     std::random_device rd;
     std::mt19937 g(rd());

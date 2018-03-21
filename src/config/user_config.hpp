@@ -716,9 +716,9 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(12, "server_max_players",
                                        "Maximum number of players on the server.") );
 
-    PARAM_PREFIX StringListUserConfigParam         m_stun_servers
-            PARAM_DEFAULT(  StringListUserConfigParam("Stun_servers", "The stun servers"
-                            " that will be used to know the public address.",
+    PARAM_PREFIX StringListUserConfigParam         m_stun_servers_list
+        PARAM_DEFAULT(  StringListUserConfigParam("Stun_servers_list",
+        "The stun servers that will be used to know the public address.",
                             10,
                             "stun.cope.es",
                             "stun.12connect.com",
