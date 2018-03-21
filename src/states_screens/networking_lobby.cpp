@@ -116,36 +116,35 @@ void NetworkingLobby::beforeAddingWidget()
 void NetworkingLobby::init()
 {
     Screen::init();
-    // Already connected
-    if (LobbyProtocol::get<LobbyProtocol>())
-        return;
 
     m_server_info_height = GUIEngine::getFont()->getDimension(L"X").Height;
     m_start_button->setVisible(false);
+    m_state = LS_CONNECTING;
     getWidget("chat")->setVisible(false);
     getWidget("chat")->setActive(false);
     getWidget("send")->setVisible(false);
     getWidget("send")->setActive(false);
 
+    // Connect to server now if we have saved players and not disconnected
+    if (!LobbyProtocol::get<LobbyProtocol>() &&
+        !NetworkConfig::get()->getNetworkPlayers().empty())
+        std::make_shared<ConnectToServer>(m_joined_server)->requestStart();
+
     if (NetworkConfig::get()->getNetworkPlayers().empty())
     {
         m_state = LS_ADD_PLAYERS;
     }
-    else if (NetworkConfig::get()->isClient())
+    else if (NetworkConfig::get()->isClient() &&
+        UserConfigParams::m_lobby_chat)
     {
-        // In case players had already configured connect now
-        m_state = LS_CONNECTING;
-        std::make_shared<ConnectToServer>(m_joined_server)->requestStart();
-        if (UserConfigParams::m_lobby_chat)
-        {
-            m_chat_box->clearListeners();
-            m_chat_box->addListener(this);
-            getWidget("chat")->setVisible(true);
-            getWidget("chat")->setActive(true);
-            getWidget("send")->setVisible(true);
-            getWidget("send")->setActive(true);
-        }
+        m_chat_box->clearListeners();
+        m_chat_box->addListener(this);
+        getWidget("chat")->setVisible(true);
+        getWidget("chat")->setActive(true);
+        getWidget("send")->setVisible(true);
+        getWidget("send")->setActive(true);
     }
+
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -348,18 +347,11 @@ void NetworkingLobby::tearDown()
     if (!NetworkConfig::get()->isClient())
         return;
     input_manager->getDeviceManager()->mapFireToSelect(false);
-    StateManager::get()->resetActivePlayers();
-    for (auto& p : NetworkConfig::get()->getNetworkPlayers())
-    {
-        StateManager::get()->createActivePlayer(std::get<1>(p),
-            std::get<0>(p));
-    }
 }   // tearDown
 
 // ----------------------------------------------------------------------------
 bool NetworkingLobby::onEscapePressed()
 {
-    input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
     input_manager->getDeviceManager()->mapFireToSelect(false);
     STKHost::get()->shutdown();
     return true; // close the screen

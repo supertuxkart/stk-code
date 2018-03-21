@@ -22,6 +22,8 @@ private:
     void handleChat(Event* event);
     void becomingServerOwner();
 
+    void clearPlayers();
+
     TransportAddress m_server_address;
 
     enum STATE

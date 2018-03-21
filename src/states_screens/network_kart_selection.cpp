@@ -17,157 +17,92 @@
 
 #include "states_screens/network_kart_selection.hpp"
 
-#include "audio/sfx_manager.hpp"
-#include "challenges/unlock_manager.hpp"
-#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
-#include "guiengine/widgets/player_kart_widget.hpp"
 #include "input/device_manager.hpp"
-#include "items/item_manager.hpp"
-#include "karts/kart_properties.hpp"
-#include "karts/kart_properties_manager.hpp"
-#include "network/game_setup.hpp"
 #include "network/network_config.hpp"
-#include "network/network_player_profile.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/client_lobby.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "network/stk_host.hpp"
-#include "states_screens/race_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
-
-static const char ID_LOCKED[] = "locked/";
 
 using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( NetworkKartSelectionScreen );
 
-NetworkKartSelectionScreen::NetworkKartSelectionScreen()
-                          : KartSelectionScreen("karts_online.stkgui")
-{
-}   // NetworkKartSelectionScreen
-
-// ----------------------------------------------------------------------------
-NetworkKartSelectionScreen::~NetworkKartSelectionScreen()
-{
-}   // ~NetworkKartSelectionScreen
-
 // ----------------------------------------------------------------------------
 void NetworkKartSelectionScreen::init()
 {
-    m_multiplayer = false;
+    assert(!NetworkConfig::get()->isAddingNetworkPlayers());
+    m_multiplayer = NetworkConfig::get()->getNetworkPlayers().size() != 1;
     KartSelectionScreen::init();
 
     RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
-    assert( tabs != NULL );
-    // Select standard kart group
-    tabs->select( "standard", PLAYER_ID_GAME_MASTER);
-    tabs->setActive(false);
-    tabs->setVisible(false);
+    assert(tabs != NULL);
 
     // change the back button image (because it makes the game quit)
     IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
     back_button->setImage("gui/main_quit.png");
 
-    // add a widget for each player except self (already exists):
-    GameSetup* game_setup = LobbyProtocol::get<LobbyProtocol>()->getGameSetup();
-    if (!game_setup)
+    DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
+    assert(w != NULL);
+    for (auto& p : NetworkConfig::get()->getNetworkPlayers())
     {
-        Log::error("NetworkKartSelectionScreen",
-                   "No network game setup registered.");
-        return;
+        joinPlayer(std::get<0>(p), std::get<1>(p));
+        w->updateItemDisplay();
+        if (!w->setSelection(UserConfigParams::m_default_kart, 0, true))
+        {
+            // if kart from config not found, select the first instead
+            w->setSelection(0, 0, true);
+        }
     }
-    // ---- Get available area for karts
-    // make a copy of the area, ands move it to be outside the screen
-    Widget* kartsAreaWidget = getWidget("playerskarts");
-    // start at the rightmost of the screen
-    const int shift = irr_driver->getFrameSize().Width;
-    core::recti kartsArea(kartsAreaWidget->m_x + shift,
-                            kartsAreaWidget->m_y,
-                            kartsAreaWidget->m_x + shift + kartsAreaWidget->m_w,
-                            kartsAreaWidget->m_y + kartsAreaWidget->m_h);
-
-    // FIXME: atm only adds the local master, split screen supports
-    // needs to be added
-    int player_id = game_setup->getLocalMasterID();
-    m_id_mapping.clear();
-    m_id_mapping.insert(m_id_mapping.begin(), player_id);
-
-    const int amount = m_kart_widgets.size();
-    Widget* fullarea = getWidget("playerskarts");
-
-    const int splitWidth = fullarea->m_w / amount;
-
-    for (int n=0; n<amount; n++)
-    {
-        m_kart_widgets[n].move( fullarea->m_x + splitWidth*n,
-                                fullarea->m_y, splitWidth, fullarea->m_h);
-    }
-    // In case of auto-connect, select default kart and go to track selection.
-    if (NetworkConfig::get()->isAutoConnect())
-    {
-        DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
-        assert(w != NULL);
-        w->setSelection(UserConfigParams::m_default_kart, /*player id*/0, /*focus*/true);
-        playerConfirm(0);
-    }
-
 }   // init
 
 // ----------------------------------------------------------------------------
-void NetworkKartSelectionScreen::playerConfirm(const int playerID)
+void NetworkKartSelectionScreen::allPlayersDone()
 {
-    DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
-    assert(w != NULL);
-    const std::string selection = w->getSelectionIDString(playerID);
-    if (StringUtils::startsWith(selection, ID_LOCKED))
+    input_manager->setMasterPlayerOnly(true);
+
+    RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
+    assert(tabs != NULL);
+
+    std::string selected_kart_group =
+        tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
+    UserConfigParams::m_last_used_kart_group = selected_kart_group;
+
+    const PtrVector<StateManager::ActivePlayer, HOLD>& players =
+        StateManager::get()->getActivePlayers();
+    for (unsigned int n = 0; n < players.size(); n++)
     {
-        unlock_manager->playLockSound();
-        return;
+        StateManager::get()->getActivePlayer(n)->getProfile()
+            ->incrementUseFrequency();
     }
 
-    if (playerID == PLAYER_ID_GAME_MASTER)
+    const uint8_t kart_count = (uint8_t)m_kart_widgets.size();
+    NetworkString kart(PROTOCOL_LOBBY_ROOM);
+    kart.addUInt8(LobbyProtocol::LE_KART_SELECTION).addUInt8(kart_count);
+    for (unsigned n = 0; n < kart_count; n++)
     {
-        UserConfigParams::m_default_kart = selection;
+        // If server recieve an invalid name, it will auto correct to a random
+        // kart
+        kart.encodeString(m_kart_widgets[n].m_kartInternalName);
     }
+    STKHost::get()->sendToServer(&kart, true);
 
-    if (m_kart_widgets[playerID].getKartInternalName().size() == 0)
-    {
-        SFXManager::get()->quickSound( "anvil" );
-        return;
-    }
-    if (playerID == PLAYER_ID_GAME_MASTER) // self
-    {
-        // FIXME SPLITSCREEN: we need to supply the global player id of the 
-        // player selecting the kart here. For now ... just vote the same kart
-        // for each local player.
-        uint8_t player_count = 1;
-        NetworkString kart(PROTOCOL_LOBBY_ROOM);
-        kart.addUInt8(LobbyProtocol::LE_KART_SELECTION).addUInt8(player_count)
-            .encodeString(selection);
-        STKHost::get()->sendToServer(&kart, true);
-        // Remove kart screen
-        StateManager::get()->popMenu();
-        TracksScreen::getInstance()->setNetworkTracks();
-        TracksScreen::getInstance()->push();
-    }
-}   // playerConfirm
-
-// ----------------------------------------------------------------------------
-void NetworkKartSelectionScreen::tearDown()
-{
-    KartSelectionScreen::tearDown();
+    // ---- Switch to assign mode
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
-}   // tearDown
+    // Remove kart screen
+    StateManager::get()->popMenu();
+    TracksScreen::getInstance()->setNetworkTracks();
+    TracksScreen::getInstance()->push();
+
+}   // allPlayersDone
 
 // ----------------------------------------------------------------------------
 bool NetworkKartSelectionScreen::onEscapePressed()
 {
     // then remove the lobby screen (you left the server)
-    StateManager::get()->resetActivePlayers();
     StateManager::get()->popMenu();
     STKHost::get()->shutdown();
-    input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
     return true; // remove the screen
 }   // onEscapePressed

@@ -150,8 +150,6 @@ void MainMenuScreen::init()
         w->setBadge(LOADING_BADGE);
     }
 
-    IconButtonWidget* online = getWidget<IconButtonWidget>("online");
-
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
     w->setText(news_text, true);

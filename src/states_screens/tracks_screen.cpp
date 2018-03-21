@@ -161,7 +161,6 @@ void TracksScreen::beforeAddingWidget()
     if (m_bottom_box_height == -1)
         m_bottom_box_height = rect_box->m_h;
 
-    m_votes = getWidget<LabelWidget>("vote-text");
     if (m_network_tracks)
     {
         rect_box->setVisible(true);
@@ -180,7 +179,6 @@ void TracksScreen::beforeAddingWidget()
         m_reversed->m_properties[GUIEngine::PROP_ALIGN] = "center";
         getWidget("all-track")->m_properties[GUIEngine::PROP_WIDTH] = "60%";
         getWidget("vote")->setVisible(true);
-        m_votes->setVisible(true);
         calculateLayout();
     }
     else
@@ -195,9 +193,11 @@ void TracksScreen::beforeAddingWidget()
         getWidget("reverse")->setVisible(false);
         getWidget("all-track")->m_properties[GUIEngine::PROP_WIDTH] = "98%";
         getWidget("vote")->setVisible(false);
-        m_votes->setVisible(false);
         calculateLayout();
     }
+    m_votes = getWidget<LabelWidget>("vote-text");
+    m_votes->setVisible(false);
+
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     tabs->clearAllChildren();
 
@@ -359,11 +359,13 @@ void TracksScreen::setFocusOnTrack(const std::string& trackName)
 // -----------------------------------------------------------------------------
 void TracksScreen::onUpdate(float dt)
 {
+    assert(m_votes);
     if (m_vote_timeout == -1.0f)
     {
+        m_votes->setText(L"", false);
         return;
     }
-    assert(m_votes);
+
     m_votes->setVisible(true);
     int remaining_time = int(m_vote_timeout - float(StkTime::getRealTime()));
     if (remaining_time < 0)

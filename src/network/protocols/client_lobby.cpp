@@ -20,9 +20,10 @@
 
 #include "config/user_config.hpp"
 #include "config/player_manager.hpp"
-#include "karts/kart_properties_manager.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/message_queue.hpp"
+#include "input/device_manager.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "modes/world_with_rank.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
@@ -72,10 +73,20 @@ ClientLobby::ClientLobby() : LobbyProtocol(NULL)
 }   // ClientLobby
 
 //-----------------------------------------------------------------------------
-
 ClientLobby::~ClientLobby()
 {
+    clearPlayers();
 }   // ClientLobby
+
+//-----------------------------------------------------------------------------
+void ClientLobby::clearPlayers()
+{
+    StateManager::get()->resetActivePlayers();
+    input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
+    input_manager->getDeviceManager()->setSinglePlayer(NULL);
+    input_manager->setMasterPlayerOnly(false);
+    input_manager->getDeviceManager()->clearLatestUsedDevice();
+}   // clearPlayers
 
 //-----------------------------------------------------------------------------
 /** Sets the address of the server. 
@@ -84,10 +95,12 @@ void ClientLobby::setAddress(const TransportAddress &address)
 {
     m_server_address.copy(address);
 }   // setAddress
-//-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
 void ClientLobby::setup()
 {
+    clearPlayers();
+    TracksScreen::getInstance()->resetVote();
     LobbyProtocol::setup();
     m_state = NONE;
 }   // setup
@@ -304,11 +317,27 @@ void ClientLobby::update(int ticks)
     {
         // In case the user opened a user info dialog
         GUIEngine::ModalDialog::dismiss();
-        TracksScreen::getInstance()->resetVote();
         NetworkKartSelectionScreen* screen =
-                                     NetworkKartSelectionScreen::getInstance();
+            NetworkKartSelectionScreen::getInstance();
         screen->setAvailableKartsFromServer(m_available_karts);
-        screen->push();
+        // In case of auto-connect, use random karts (or previous kart) from
+        // server and go to track selection (or grand prix later)
+        if (NetworkConfig::get()->isAutoConnect())
+        {
+            input_manager->setMasterPlayerOnly(true);
+            for (auto& p : NetworkConfig::get()->getNetworkPlayers())
+            {
+                StateManager::get()
+                    ->createActivePlayer(std::get<1>(p), std::get<0>(p));
+            }
+            input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+            TracksScreen::getInstance()->setNetworkTracks();
+            TracksScreen::getInstance()->push();
+        }
+        else
+        {
+            screen->push();
+        }
         m_state = SELECTING_KARTS;
         std::make_shared<LatencyProtocol>()->requestStart();
         Log::info("LobbyProtocol", "LatencyProtocol started.");
@@ -620,17 +649,18 @@ void ClientLobby::raceFinished(Event* event)
  */
 void ClientLobby::exitResultScreen(Event *event)
 {
-    RaceResultGUI::getInstance()->backToLobby();
-    // Will be reset to linked if connected to server, see update(float dt)
-    LobbyProtocol::setup();
-    STKHost::get()->getServerPeerForClient()->unsetClientServerToken();
     // stop race protocols
     auto pm = ProtocolManager::lock();
     assert(pm);
     pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
     pm->findAndTerminate(PROTOCOL_KART_UPDATE);
     pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
-    m_state = NONE;
+
+    // Will be reset to linked if connected to server, see update(float dt)
+    setup();
+
+    RaceResultGUI::getInstance()->backToLobby();
+    STKHost::get()->getServerPeerForClient()->unsetClientServerToken();
 }   // exitResultScreen
 
 //-----------------------------------------------------------------------------

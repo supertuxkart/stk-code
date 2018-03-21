@@ -712,7 +712,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         // when a device presses fire or rescue
         if (m_device_manager->getAssignMode() == DETECT_NEW)
         {
-            if (NetworkConfig::get()->isAddingNetworkPlayers())
+            if (NetworkConfig::get()->isNetworking() &&
+                NetworkConfig::get()->isAddingNetworkPlayers())
             {
                 // Ignore release event
                 if (value == 0)
@@ -775,7 +776,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
                     if (device != NULL)
                     {
-                        KartSelectionScreen::getRunningInstance()->joinPlayer(device);
+                        KartSelectionScreen::getRunningInstance()->joinPlayer(device, NULL/*player profile*/);
                     }
                 }
                 return; // we're done here, ignore devices that aren't
