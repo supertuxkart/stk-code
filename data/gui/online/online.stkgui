@@ -4,9 +4,22 @@
         <header text_align="center" width="80%" align="center" text="Online"/>
         <spacer height="15" width="10"/>
         <button id="user-id" width="20%" height="fit" align="center"/>
+        <spacer height="20"/>
+
+        <box width="50%" height="10%"  layout="vertical-row" align="center">
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label proportion="3" I18N="In the networking menu"
+                    text="Enable splitscreen or handicap players" text_align="right"/>
+                <spacer width="50"/>
+                <div proportion="1" height="fit" layout="horizontal-row">
+                    <checkbox id="enable-splitscreen" align="center" />
+                </div>
+            </div>
+        </box>
+
         <spacer height="15" width="10"/>
         <icon id="logo" align="center" proportion="4" width="100%" icon="gui/logo.png"/>
-        
+
         <spacer height="15" width="10"/>
         
         <buttonbar id="menu_toprow" proportion="3" width="90%" align="center">

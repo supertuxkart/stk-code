@@ -20,16 +20,11 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
-#include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
-#include "input/input_manager.hpp"
-#include "input/keyboard_device.hpp"
-#include "io/file_manager.hpp"
-#include "main_loop.hpp"
 #include "network/network_config.hpp"
 #include "online/request_manager.hpp"
 #include "states_screens/online_lan.hpp"
@@ -39,9 +34,7 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
-#include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
-
 
 #include <string>
 
@@ -64,6 +57,9 @@ OnlineScreen::OnlineScreen() : Screen("online/online.stkgui")
 
 void OnlineScreen::loadedFromFile()
 {
+    m_enable_splitscreen = getWidget<CheckBoxWidget>("enable-splitscreen");
+    assert(m_enable_splitscreen);
+    m_enable_splitscreen->setState(false);
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -102,6 +98,15 @@ void OnlineScreen::init()
     RibbonWidget* r = getWidget<RibbonWidget>("menu_toprow");
     r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
+    // Pre-add a default single player profile in network
+    if (!m_enable_splitscreen->getState() &&
+        NetworkConfig::get()->getNetworkPlayers().empty())
+    {
+        NetworkConfig::get()->addNetworkPlayer(
+            input_manager->getDeviceManager()->getLatestUsedDevice(),
+            PlayerManager::getCurrentPlayer(), false/*handicap*/);
+        NetworkConfig::get()->doneAddingNetworkPlayers();
+    }
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -146,6 +151,26 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
     else if (name == "back")
     {
         StateManager::get()->escapePressed();
+        return;
+    }
+    else if (name == "enable-splitscreen")
+    {
+        CheckBoxWidget* splitscreen = dynamic_cast<CheckBoxWidget*>(widget);
+        assert(splitscreen);
+        if (!splitscreen->getState())
+        {
+            // Default single player
+            NetworkConfig::get()->cleanNetworkPlayers();
+            NetworkConfig::get()->addNetworkPlayer(
+                input_manager->getDeviceManager()->getLatestUsedDevice(),
+                PlayerManager::getCurrentPlayer(), false/*handicap*/);
+            NetworkConfig::get()->doneAddingNetworkPlayers();
+        }
+        else
+        {
+            // Let lobby add the players
+            NetworkConfig::get()->cleanNetworkPlayers();
+        }
         return;
     }
 
@@ -193,6 +218,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
  */
 bool OnlineScreen::onEscapePressed()
 {
+    NetworkConfig::get()->cleanNetworkPlayers();
     NetworkConfig::get()->unsetNetworking();
     return true;
 }   // onEscapePressed

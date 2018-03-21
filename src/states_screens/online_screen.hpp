@@ -20,7 +20,7 @@
 
 #include "guiengine/screen.hpp"
 
-namespace GUIEngine { class Widget;       class ListWidget; 
+namespace GUIEngine { class CheckBoxWidget; class ListWidget;
                       class ButtonWidget; class IconButtonWidget; }
 
 /**
@@ -41,6 +41,8 @@ private:
 
     /** Keep the widget to avoid looking it up every frame. */
     GUIEngine::IconButtonWidget* m_online;
+
+    GUIEngine::CheckBoxWidget* m_enable_splitscreen;
 
     OnlineScreen();
 
