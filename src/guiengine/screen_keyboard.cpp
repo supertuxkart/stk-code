@@ -37,23 +37,23 @@ typedef std::string KeyboardLayout[KEYBOARD_ROWS_NUM][KEYBOARD_COLS_NUM];
     
 KeyboardLayout layout_lower = 
             {{"q", "w", "e", "r", "t", "y", "u", "i", "o", "p",     "123"  },
-             {"a", "s", "d", "f", "g", "h", "j", "k", "l", "Back",  "Shift"},
+             {"a", "s", "d", "f", "g", "h", "j", "k", "l", "Shift", "Back" },
              {"z", "x", "c", "v", "b", "n", "m", ",", ".", "Space", "Enter"}};
                                          
 KeyboardLayout layout_upper = 
             {{"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P",     "123"  },
-             {"A", "S", "D", "F", "G", "H", "J", "K", "L", "Back",  "Shift"},
+             {"A", "S", "D", "F", "G", "H", "J", "K", "L", "Shift", "Back" },
              {"Z", "X", "C", "V", "B", "N", "M", ",", ".", "Space", "Enter"}};
-                                   
+             
 KeyboardLayout layout_digits = 
-            {{"1", "2", "3", "!", "@", "#", "$", "%", "^", "&",     "Text" },
-             {"4", "5", "6", "*", "(", ")", "-", "_", "=", "Back",  "Shift"},
-             {"7", "8", "9", "0", "+", "/", "?", ",", ".", "Space", "Enter"}};
+            {{"1", "2", "3", "!", "@",  "#", "$", "%", "^", "&",     "Text" },
+             {"4", "5", "6", "*", "(",  ")", "-", "+", "?", "Shift", "Back" },               
+             {"7", "8", "9", "0", "\"", ";", ":", ",", ".", "Space", "Enter"}};
                                     
 KeyboardLayout layout_digits2 = 
-            {{"1", "2", "3", "[", "]",  "{",  "}", ";", ":", "\\",    "Text" },
-             {"4", "5", "6", "|", "\'", "\"", "<", ">", "`", "Back",  "Shift"},
-             {"7", "8", "9", "0", "~",  "/",  "?", ",", ".", "Space", "Enter"}};
+            {{"1", "2", "3", "[", "]",  "{", "}", "~", "`", "\\",    "Text" },
+             {"4", "5", "6", "|", "<",  ">", "_", "=", "/", "Shift", "Back" },
+             {"7", "8", "9", "0", "\'", ";", ":", ",", ".", "Space", "Enter"}};
 
 ScreenKeyboard* ScreenKeyboard::m_screen_keyboard = NULL;
 
