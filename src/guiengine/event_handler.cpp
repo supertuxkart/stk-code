@@ -816,7 +816,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
 
                 const int playerID = input_manager->getPlayerKeyboardID();
                 if (input_manager->masterPlayerOnly() && playerID != PLAYER_ID_GAME_MASTER) break;
-                if (!w->isFocusedForPlayer(playerID)) w->setFocusForPlayer(playerID);
+                if (playerID != -1 && !w->isFocusedForPlayer(playerID)) w->setFocusForPlayer(playerID);
 
                 break;
             }
