@@ -9,7 +9,7 @@
         <box width="50%" height="10%"  layout="vertical-row" align="center">
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label proportion="3" I18N="In the networking menu"
-                    text="Enable splitscreen or handicap players" text_align="right"/>
+                    text="Enable splitscreen or player handicaps" text_align="right"/>
                 <spacer width="50"/>
                 <div proportion="1" height="fit" layout="horizontal-row">
                     <checkbox id="enable-splitscreen" align="center" />
