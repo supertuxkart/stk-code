@@ -767,20 +767,15 @@ void ServerLobby::connectionRequested(Event* event)
     const NetworkString &data = event->data();
 
     // can we add the player ?
-    if (m_game_setup->getPlayerCount() >=
-        NetworkConfig::get()->getMaxPlayers() ||
-        m_state != ACCEPTING_CLIENTS)
+    if (m_state != ACCEPTING_CLIENTS)
     {
         NetworkString *message = getNetworkString(2);
-        message->addUInt8(LE_CONNECTION_REFUSED)
-            .addUInt8(m_state != ACCEPTING_CLIENTS ?
-            RR_BUSY : RR_TOO_MANY_PLAYERS);
-
+        message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BUSY);
         // send only to the peer that made the request and disconect it now
         peer->sendPacket(message);
         peer->reset();
         delete message;
-        Log::verbose("ServerLobby", "Player refused");
+        Log::verbose("ServerLobby", "Player refused: selection started");
         return;
     }
 
@@ -792,8 +787,6 @@ void ServerLobby::connectionRequested(Event* event)
         NetworkString *message = getNetworkString(2);
         message->addUInt8(LE_CONNECTION_REFUSED)
                 .addUInt8(RR_INCORRECT_PASSWORD);
-
-        // send only to the peer that made the request and disconect it now
         peer->sendPacket(message);
         peer->reset();
         delete message;
@@ -801,7 +794,19 @@ void ServerLobby::connectionRequested(Event* event)
         return;
     }
 
-    uint8_t player_count = data.getUInt8();
+    unsigned player_count = data.getUInt8();
+    if (m_game_setup->getPlayerCount() + player_count >
+        NetworkConfig::get()->getMaxPlayers())
+    {
+        NetworkString *message = getNetworkString(2);
+        message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_TOO_MANY_PLAYERS);
+        peer->sendPacket(message);
+        peer->reset();
+        delete message;
+        Log::verbose("ServerLobby", "Player refused: too many players");
+        return;
+    }
+
     for (unsigned i = 0; i < player_count; i++)
     {
         std::string name_u8;
