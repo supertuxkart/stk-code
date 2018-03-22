@@ -321,8 +321,6 @@ void KartSelectionScreen::init()
     Widget* placeholder = getWidget("playerskarts");
     assert(placeholder != NULL);
 
-    // FIXME : The reserved id value is -1 when we switch from KSS to NKSS and vice-versa
-
     m_dispatcher->setRootID(placeholder->m_reserved_id);
 
     g_root_id = placeholder->m_reserved_id;

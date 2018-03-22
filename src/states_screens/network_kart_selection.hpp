@@ -54,6 +54,12 @@ public:
     // ------------------------------------------------------------------------
     virtual bool playerQuit(StateManager::ActivePlayer* player) OVERRIDE
                                                                { return true; }
+     /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void tearDown() OVERRIDE
+    {
+        m_must_delete_on_back = true;
+        KartSelectionScreen::tearDown();
+    }
 
 };
 
