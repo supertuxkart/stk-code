@@ -8,16 +8,16 @@
 
         <div width="80%" align="center" layout="vertical-row" height="fit" >
             <div width="100%" height="fit" layout="horizontal-row" >
-                <label proportion="1" text_align="left" I18N="Splitscreen player in network" text="Name"/>
+                <label id="name-text" proportion="1" text_align="left" I18N="Splitscreen player in network" text="Name"/>
                 <spinner id="name-spinner" width="50%" align="center" wrap_around="true" />
             </div>
         </div>
 
         <spacer height="20" width="50"/>
 
-        <div width="80%" align="center" layout="vertical-row" height="fit" >
+        <div id="handicap-row" width="80%" align="center" layout="vertical-row" height="fit" >
             <div width="100%" height="fit" layout="horizontal-row" >
-                <label proportion="1" text_align="left" I18N="Splitscreen player in network" text="Handicap"/>
+                <label id="handicap-text" proportion="1" text_align="left" I18N="Splitscreen player in network" text="Handicap"/>
                 <checkbox id="handicap" align="center" />
             </div>
         </div>

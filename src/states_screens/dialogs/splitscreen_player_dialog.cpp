@@ -24,6 +24,11 @@
 #include "guiengine/dialog_queue.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/message_queue.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
+#include "guiengine/widgets/spinner_widget.hpp"
 #include "network/network_config.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "utils/translation.hpp"
@@ -38,17 +43,21 @@ void SplitscreenPlayerDialog::beforeAddingWidgets()
 {
     m_profiles = getWidget<SpinnerWidget>("name-spinner");
     for (unsigned i = 0; i < PlayerManager::get()->getNumPlayers(); i++)
-        m_profiles->addLabel(PlayerManager::get()->getPlayer(i)->getName());
+    {
+        PlayerProfile* p = PlayerManager::get()->getPlayer(i);
+        if (!NetworkConfig::get()->playerExists(p))
+        {
+            m_profiles->addLabel(p->getName());
+            m_available_players.push_back(p);
+        }
+    }
 
     m_message = getWidget<LabelWidget>("message-label");
-
+    assert(m_message != NULL);
     m_handicap = getWidget<CheckBoxWidget>("handicap");
-    m_handicap->setState(false);
-    m_handicap->setActive(UserConfigParams::m_per_player_difficulty);
-
+    assert(m_handicap != NULL);
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
-
     m_add = getWidget<IconButtonWidget>("add");
     assert(m_add != NULL);
     m_connect = getWidget<IconButtonWidget>("connect");
@@ -57,6 +66,29 @@ void SplitscreenPlayerDialog::beforeAddingWidgets()
     assert(m_cancel != NULL);
     m_reset = getWidget<IconButtonWidget>("reset");
     assert(m_reset != NULL);
+
+    if (NetworkConfig::get()->getNetworkPlayers().size() == MAX_PLAYER_COUNT)
+    {
+        m_available_players.clear();
+    }
+    if (m_available_players.empty())
+    {
+        getWidget("name-text")->setVisible(false);
+        getWidget("handicap-row")->setVisible(false);
+        m_add->setVisible(false);
+        m_profiles->setVisible(false);
+        m_connect->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    }
+    else
+    {
+        getWidget("name-text")->setVisible(true);
+        getWidget("handicap-row")->setVisible(true);
+        m_add->setVisible(true);
+        m_profiles->setVisible(true);
+        m_add->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        m_handicap->setState(false);
+        m_handicap->setActive(UserConfigParams::m_per_player_difficulty);
+    }
 
     input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
     input_manager->getDeviceManager()->mapFireToSelect(false);
@@ -75,7 +107,7 @@ GUIEngine::EventPropagation
         {
             const unsigned pid = m_profiles->getValue();
             assert(pid < PlayerManager::get()->getNumPlayers());
-            PlayerProfile* p = PlayerManager::get()->getPlayer(pid);
+            PlayerProfile* p = m_available_players[pid];
             const bool handicap = m_handicap->getState();
             if (NetworkConfig::get()->addNetworkPlayer(m_device, p, handicap))
             {
@@ -88,7 +120,7 @@ GUIEngine::EventPropagation
             {
                 //I18N: in splitscreen player dialog for network game
                 m_message->setErrorColor();
-                m_message->setText(_("Player or input device already exists."),
+                m_message->setText(_("Input device already exists."),
                     false);
             }
             return GUIEngine::EVENT_BLOCK;

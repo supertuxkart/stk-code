@@ -20,12 +20,22 @@
 #define HEADER_SPLITSCREEN_PLAYER_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets.hpp"
 #include "utils/types.hpp"
 
 #include <irrString.h>
+#include <vector>
 
 class InputDevice;
+class PlayerProfile;
+
+namespace GUIEngine
+{
+    class CheckBoxWidget;
+    class IconButtonWidget;
+    class LabelWidget;
+    class RibbonWidget;
+    class SpinnerWidget;
+}
 
 /**
  * \brief Dialog that handle user in network lobby
@@ -37,6 +47,8 @@ private:
     InputDevice* m_device;
 
     bool m_self_destroy;
+
+    std::vector<PlayerProfile*> m_available_players;
 
     GUIEngine::LabelWidget* m_message;
 

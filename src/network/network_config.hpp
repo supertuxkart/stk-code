@@ -201,6 +201,16 @@ public:
         return true;
     }
     // ------------------------------------------------------------------------
+    bool playerExists(PlayerProfile* profile) const
+    {
+        for (auto& p : m_network_players)
+        {
+            if (std::get<1>(p) == profile)
+                return true;
+        }
+        return false;
+    }
+    // ------------------------------------------------------------------------
     void cleanNetworkPlayers()
     {
         m_network_players.clear();
