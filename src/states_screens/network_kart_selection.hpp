@@ -54,6 +54,7 @@ public:
     // ------------------------------------------------------------------------
     virtual bool playerQuit(StateManager::ActivePlayer* player) OVERRIDE
                                                                { return true; }
+    // ------------------------------------------------------------------------
      /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown() OVERRIDE
     {

@@ -376,6 +376,11 @@ void KartSelectionScreen::init()
     else */
     // For now this is what will happen
     input_manager->getDeviceManager()->setAssignMode(DETECT_NEW);
+    // This flag will cause that a 'fire' event will be mapped to 'select' (if
+    // 'fire' is not assigned to a GUI event). This is done to support the old
+    // way of player joining by pressing 'fire' instead of 'select'.
+    input_manager->getDeviceManager()->mapFireToSelect(true);
+
     if (!NetworkConfig::get()->isNetworking())
     {
         if (!m_multiplayer)
@@ -396,10 +401,6 @@ void KartSelectionScreen::init()
             // Add multiplayer message
             addMultiplayerMessage();
         }
-        // This flag will cause that a 'fire' event will be mapped to 'select' (if
-        // 'fire' is not assigned to a GUI event). This is done to support the old
-        // way of player joining by pressing 'fire' instead of 'select'.
-        input_manager->getDeviceManager()->mapFireToSelect(true);
     }
 }   // init
 

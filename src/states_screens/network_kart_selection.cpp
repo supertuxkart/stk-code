@@ -36,9 +36,6 @@ void NetworkKartSelectionScreen::init()
     m_multiplayer = NetworkConfig::get()->getNetworkPlayers().size() != 1;
     KartSelectionScreen::init();
 
-    RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
-    assert(tabs != NULL);
-
     // change the back button image (because it makes the game quit)
     IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
     back_button->setImage("gui/main_quit.png");
