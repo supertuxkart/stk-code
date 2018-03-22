@@ -42,7 +42,8 @@ using namespace irr;
 void SplitscreenPlayerDialog::beforeAddingWidgets()
 {
     m_profiles = getWidget<SpinnerWidget>("name-spinner");
-    for (unsigned i = 0; i < PlayerManager::get()->getNumPlayers(); i++)
+    for (unsigned i = 0; i < PlayerManager::get()->getNumNonGuestPlayers();
+         i++)
     {
         PlayerProfile* p = PlayerManager::get()->getPlayer(i);
         if (!NetworkConfig::get()->playerExists(p))
