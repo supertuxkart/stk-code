@@ -24,6 +24,7 @@
 #include <tuple>
 
 class Server;
+class STKPeer;
 
 namespace GUIEngine
 { 
@@ -62,10 +63,12 @@ private:
     NetworkingLobby();
 
     std::shared_ptr<Server> m_joined_server;
+    std::weak_ptr<STKPeer> m_server_peer;
     std::vector<core::stringw> m_server_info;
     int m_server_info_height;
 
     GUIEngine::IconButtonWidget* m_back_widget;
+    GUIEngine::LabelWidget* m_header;
     GUIEngine::LabelWidget* m_text_bubble;
     GUIEngine::IconButtonWidget* m_exit_widget;
     GUIEngine::IconButtonWidget* m_start_button;

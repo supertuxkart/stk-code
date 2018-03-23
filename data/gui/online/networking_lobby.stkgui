@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
-        <header text_align="center" width="80%" align="center" I18N="In networking lobby" text="Lobby"/>
+        <header id="lobby-text" text_align="center" width="80%" align="center" I18N="In networking lobby" text="Lobby"/>
         <spacer height="15" width="10"/>
         <div proportion="4" x="2%" width="96%" layout="vertical-row">
             <div width="100%" proportion="2" layout="horizontal-row">

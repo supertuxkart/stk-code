@@ -117,6 +117,14 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the host id of this peer. */
     uint32_t getHostId() const { return m_host_id; }
+    // ------------------------------------------------------------------------
+    /** Returns the ping to this peer from host, if variance is too large
+     *  return 0. */
+    uint32_t getPing() const
+    {
+        return m_enet_peer->roundTripTimeVariance > 20 ?
+            0 : m_enet_peer->roundTripTime;
+    }
 
 };   // STKPeer
 

@@ -39,6 +39,7 @@
 #include "network/protocols/server_lobby.hpp"
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/network_user_dialog.hpp"
 #include "utils/translation.hpp"
@@ -67,6 +68,9 @@ NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
 
 void NetworkingLobby::loadedFromFile()
 {
+    m_header = getWidget<LabelWidget>("lobby-text");
+    assert(m_header != NULL);
+
     m_back_widget = getWidget<IconButtonWidget>("back");
     assert(m_back_widget != NULL);
 
@@ -116,6 +120,8 @@ void NetworkingLobby::init()
 {
     Screen::init();
 
+    //I18N: In the networking lobby
+    m_header->setText(_("Lobby"), false);
     m_server_info_height = GUIEngine::getFont()->getDimension(L"X").Height;
     m_start_button->setVisible(false);
     m_state = LS_CONNECTING;
@@ -125,7 +131,7 @@ void NetworkingLobby::init()
     getWidget("send")->setActive(false);
 
     // Connect to server now if we have saved players and not disconnected
-    if (!LobbyProtocol::get<LobbyProtocol>() &&
+    if (m_joined_server &&
         !NetworkConfig::get()->getNetworkPlayers().empty())
         std::make_shared<ConnectToServer>(m_joined_server)->requestStart();
 
@@ -247,6 +253,8 @@ void NetworkingLobby::onUpdate(float delta)
     }
     else
     {
+        if (m_server_peer.expired())
+            m_server_peer = STKHost::get()->getServerPeerForClient();
         core::stringw total_msg;
         for (auto& string : m_server_info)
         {
@@ -255,12 +263,20 @@ void NetworkingLobby::onUpdate(float delta)
         }
         m_text_bubble->setText(total_msg, true);
     }
-    if (NetworkConfig::get()->isClient() &&
-        STKHost::get()->isAuthorisedToControl())
+    if (NetworkConfig::get()->isClient())
     {
-        m_start_button->setVisible(true);
+        if (STKHost::get()->isAuthorisedToControl())
+        {
+            m_start_button->setVisible(true);
+        }
+        if (auto p = m_server_peer.lock())
+        {
+            //I18N: In the networking lobby, display ping when connected
+            const uint32_t ping = p->getPing();
+            if (ping != 0)
+                m_header->setText(_("Lobby (ping: %dms)", ping), false);
+        }
     }
-
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -342,6 +358,7 @@ void NetworkingLobby::unloaded()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::tearDown()
 {
+    m_joined_server.reset();
     // Server has a dummy network lobby too
     if (!NetworkConfig::get()->isClient())
         return;
@@ -351,6 +368,7 @@ void NetworkingLobby::tearDown()
 // ----------------------------------------------------------------------------
 bool NetworkingLobby::onEscapePressed()
 {
+    m_joined_server.reset();
     input_manager->getDeviceManager()->mapFireToSelect(false);
     STKHost::get()->shutdown();
     return true; // close the screen
