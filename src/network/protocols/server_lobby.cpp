@@ -1242,8 +1242,10 @@ void ServerLobby::updateBanList()
 {
     std::lock_guard<std::mutex> lock(m_connection_mutex);
     m_ban_list.clear();
-    std::map<std::string, uint32_t> ban_list =
-        UserConfigParams::m_server_ban_list;
-    for (auto& ban : ban_list)
+    for (auto& ban : UserConfigParams::m_server_ban_list)
+    {
+        if (ban.first == "0.0.0.0")
+            continue;
         m_ban_list[TransportAddress(ban.first).getIP()] = ban.second;
+    }
 }   // updateBanList

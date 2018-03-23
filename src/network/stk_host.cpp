@@ -385,17 +385,29 @@ void STKHost::shutdown()
  */
 void STKHost::setPublicAddress()
 {
-    std::vector<std::string> untried_server =
-        UserConfigParams::m_stun_servers_list;
-    // Generate random list of stun servers
+    std::vector<std::pair<std::string, uint32_t> > untried_server;
+    for (auto& p : UserConfigParams::m_stun_list)
+        untried_server.push_back(p);
+
+    assert(untried_server.size() > 2);
+    // Randomly use stun servers of the low ping from top-half of the list
+    std::sort(untried_server.begin(), untried_server.end(),
+        [] (const std::pair<std::string, uint32_t>& a,
+        const std::pair<std::string, uint32_t>& b)->bool
+        {
+            return a.second > b.second;
+        });
     std::random_device rd;
     std::mt19937 g(rd());
-    std::shuffle(untried_server.begin(), untried_server.end(), g);
+    std::shuffle(untried_server.begin() + (untried_server.size() / 2),
+        untried_server.end(), g);
+
     while (!untried_server.empty())
     {
         // Pick last element in untried servers
-        const char* server_name = untried_server.back().c_str();
-        Log::debug("STKHost", "Using STUN server %s", server_name);
+        std::string server_name = untried_server.back().first.c_str();
+        UserConfigParams::m_stun_list[server_name] = (uint32_t)-1;
+        Log::debug("STKHost", "Using STUN server %s", server_name.c_str());
 
         struct addrinfo hints, *res;
 
@@ -404,11 +416,11 @@ void STKHost::setPublicAddress()
         hints.ai_socktype = SOCK_STREAM;
 
         // Resolve the stun server name so we can send it a STUN request
-        int status = getaddrinfo(server_name, NULL, &hints, &res);
+        int status = getaddrinfo(server_name.c_str(), NULL, &hints, &res);
         if (status != 0)
         {
             Log::error("STKHost", "Error in getaddrinfo for stun server"
-                " %s: %s", server_name, gai_strerror(status));
+                " %s: %s", server_name.c_str(), gai_strerror(status));
             untried_server.pop_back();
             continue;
         }
@@ -439,6 +451,7 @@ void STKHost::setPublicAddress()
         }
 
         m_network->sendRawPacket(s, m_stun_address);
+        double ping = StkTime::getRealTime();
         freeaddrinfo(res);
 
         // Recieve now
@@ -446,6 +459,7 @@ void STKHost::setPublicAddress()
         const int LEN = 2048;
         char buffer[LEN];
         int len = m_network->receiveRawPacket(buffer, LEN, &sender, 2000);
+        ping = StkTime::getRealTime() - ping;
 
         if (sender.getIP() != m_stun_address.getIP())
         {
@@ -583,6 +597,9 @@ void STKHost::setPublicAddress()
                 Log::warn("STKHost", "Only non xor-mapped address returned.");
                 m_public_address.copy(non_xor_addr);
             }
+            // Succeed, save ping
+            UserConfigParams::m_stun_list[server_name] =
+                (uint32_t)(ping * 1000.0);
             untried_server.clear();
         }
     }

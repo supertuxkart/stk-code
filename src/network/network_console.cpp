@@ -107,9 +107,7 @@ void mainLoop(STKHost* host)
         }
         else if (str == "listban")
         {
-            std::map<std::string, uint32_t> ban_list =
-                UserConfigParams::m_server_ban_list;
-            for (auto& ban : ban_list)
+            for (auto& ban : UserConfigParams::m_server_ban_list)
             {
                 if (ban.first == "0.0.0.0")
                     continue;

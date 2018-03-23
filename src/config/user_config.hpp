@@ -37,6 +37,7 @@
       cause an undefined game action now
    6: Added stick configurations.
 */
+#include <iterator>
 #include <string>
 #include <map>
 #include <vector>
@@ -99,44 +100,6 @@ public:
 
 // ============================================================================
 template<typename T, typename U>
-class ListUserConfigParam : public UserConfigParam
-{
-    std::vector<T> m_elements;
-
-public:
-    ListUserConfigParam(const char* param_name,
-                         const char* comment = NULL);
-    ListUserConfigParam(const char* param_name,
-                         const char* comment,
-                         int nb_elts,
-                         ...);
-    ListUserConfigParam(const char* param_name,
-                         GroupUserConfigParam* group,
-                         const char* comment = NULL);
-    ListUserConfigParam(const char* param_name,
-                         GroupUserConfigParam* group,
-                         const char* comment,
-                         int nb_elts,
-                         ...);
-
-    void write(std::ofstream& stream) const;
-    void findYourDataInAChildOf(const XMLNode* node);
-    void findYourDataInAnAttributeOf(const XMLNode* node);
-
-    void addElement(T element);
-
-    irr::core::stringc toString() const;
-
-    operator std::vector<T>() const
-            { return m_elements; }
-    float& operator=(const std::vector<T>& v)
-            { m_elements = std::vector<T>(v); return m_elements; }
-    float& operator=(const ListUserConfigParam& v)
-            { m_elements = std::vector<T>(v); return m_elements; }
-};   // ListUserConfigParam
-typedef ListUserConfigParam<std::string, const char*>    StringListUserConfigParam;
-
-template<typename T, typename U>
 class MapUserConfigParam : public UserConfigParam
 {
     std::map<T, U> m_elements;
@@ -163,9 +126,17 @@ public:
 
     irr::core::stringc toString() const;
 
-    operator std::map<T,U>() const
+    operator std::map<T, U>() const
     {
         return m_elements;
+    }
+    typename std::map<T, U>::iterator begin()
+    {
+        return m_elements.begin();
+    }
+    typename std::map<T, U>::iterator end()
+    {
+        return m_elements.end();
     }
     std::map<T, U>& operator=(const std::map<T,U>& v)
     {
@@ -181,7 +152,7 @@ public:
     {
         return m_elements[key];
     }
-};   // ListUserConfigParam
+};   // MapUserConfigParam
 typedef MapUserConfigParam<uint32_t, uint32_t> UIntToUIntUserConfigParam;
 typedef MapUserConfigParam<std::string, uint32_t> StringToUIntUserConfigParam;
 // ============================================================================
@@ -707,44 +678,25 @@ namespace UserConfigParams
      *  can store. */
     PARAM_PREFIX float m_profiler_buffer_duration PARAM_DEFAULT(20.0f);
 
-    // not saved to file
-
     // ---- Networking
-
-    PARAM_PREFIX IntUserConfigParam         m_server_max_players
-            PARAM_DEFAULT(  IntUserConfigParam(12, "server_max_players",
-                                       "Maximum number of players on the server.") );
-
-    PARAM_PREFIX StringListUserConfigParam         m_stun_servers_list
-        PARAM_DEFAULT(  StringListUserConfigParam("Stun_servers_list",
-        "The stun servers that will be used to know the public address.",
-                            10,
-                            "stun.cope.es",
-                            "stun.12connect.com",
-                            "stun.callwithus.com",
-                            "stun.counterpath.net",
-                            "stun.ekiga.net",
-                            "stun.schlund.de",
-                            "stun.stunprotocol.org",
-                            "stun.voip.aebc.com",
-                            "numb.viagenie.ca",
-                            "stun.ivao.aero") );
-
-    // ---- Gamemode setup
-    PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode
-        PARAM_DEFAULT(UIntToUIntUserConfigParam("num_karts_per_gamemode",
-            "The Number of karts per gamemode.",
+    PARAM_PREFIX StringToUIntUserConfigParam m_stun_list
+        PARAM_DEFAULT(StringToUIntUserConfigParam("stun_list",
+        "The stun servers that will be used to know the public address,"
+        " LHS: server address, RHS: ping time.",
             {
-                { 0u, 4u },
-                { 1002u, 5u },
-                { 1100u, 4u },
-                { 1101u, 4u },
-                { 2000u, 4u },
-                { 2001u, 4u },
+                { "numb.viagenie.ca", 0u },
+                { "stun.12connect.com", 0u },
+                { "stun.callwithus.com", 0u },
+                { "stun.cope.es", 0u },
+                { "stun.counterpath.net", 0u },
+                { "stun.ekiga.net", 0u },
+                { "stun.ivao.aero", 0u },
+                { "stun.schlund.de", 0u },
+                { "stun.stunprotocol.org", 0u },
+                { "stun.voip.aebc.com", 0u }
             }
         ));
 
-    // ---- Network
     PARAM_PREFIX GroupUserConfigParam  m_network_group
         PARAM_DEFAULT(GroupUserConfigParam("Network", "Network Settings"));
     PARAM_PREFIX BoolUserConfigParam m_log_packets
@@ -760,12 +712,29 @@ namespace UserConfigParams
     PARAM_PREFIX FloatUserConfigParam m_voting_timeout
         PARAM_DEFAULT(FloatUserConfigParam(10.0f, "voting-timeout",
         &m_network_group, "Timeout in seconds for voting tracks in server."));
-    // ---- Gamemode setup
+    PARAM_PREFIX IntUserConfigParam m_server_max_players
+        PARAM_DEFAULT(IntUserConfigParam(12, "server_max_players",
+        &m_network_group, "Maximum number of players on the server."));
+
     PARAM_PREFIX StringToUIntUserConfigParam m_server_ban_list
         PARAM_DEFAULT(StringToUIntUserConfigParam("server_ban_list",
             "LHS: IP in x.x.x.x format, RHS: online id, if 0 than all players "
             "from this IP will be banned.",
             { { "0.0.0.0", 0u } }
+        ));
+
+    // ---- Gamemode setup
+    PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode
+        PARAM_DEFAULT(UIntToUIntUserConfigParam("num_karts_per_gamemode",
+            "The Number of karts per gamemode.",
+            {
+                { 0u, 4u },
+                { 1002u, 5u },
+                { 1100u, 4u },
+                { 1101u, 4u },
+                { 2000u, 4u },
+                { 2001u, 4u }
+            }
         ));
 
     // ---- Graphic Quality
