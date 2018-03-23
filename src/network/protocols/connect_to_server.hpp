@@ -56,7 +56,7 @@ private:
 
     void registerWithSTKServer();
     void waitingAloha(bool is_wan);
-
+    bool handleDirectConnect();
 public:
              ConnectToServer(std::shared_ptr<Server> server);
     virtual ~ConnectToServer();

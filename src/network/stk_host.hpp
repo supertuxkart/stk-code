@@ -302,6 +302,8 @@ public:
     /** True if this is a client and server in graphics mode made by server
      *  creation screen. */
     bool isClientServer() const          { return m_separate_process != NULL; }
+    // ------------------------------------------------------------------------
+    void replaceNetwork(ENetEvent& event, Network* network);
 
 };   // class STKHost
 

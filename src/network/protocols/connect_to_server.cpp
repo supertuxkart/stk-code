@@ -18,7 +18,9 @@
 
 #include "network/protocols/connect_to_server.hpp"
 
+#include "config/user_config.hpp"
 #include "network/event.hpp"
+#include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/get_peer_address.hpp"
 #include "network/protocols/hide_public_address.hpp"
@@ -42,7 +44,11 @@
 ConnectToServer::ConnectToServer(std::shared_ptr<Server> server)
                : Protocol(PROTOCOL_CONNECTION)
 {
-    m_server = server;
+    if (server)
+    {
+        m_server = server;
+        m_server_address.copy(m_server->getAddress());
+    }
     setHandleConnections(true);
 }   // ConnectToServer(server, host)
 
@@ -99,6 +105,7 @@ void ConnectToServer::asynchronousUpdate()
                             return a->getCurrentPlayers() < b->getCurrentPlayers();
                         });
                     m_server = servers[0];
+                    m_server_address.copy(m_server->getAddress());
                 }
                 else
                 {
@@ -111,6 +118,9 @@ void ConnectToServer::asynchronousUpdate()
                 }
                 servers.clear();
             }
+
+            if (handleDirectConnect())
+                return;
             STKHost::get()->setPublicAddress();
             // Set to DONE will stop STKHost is not connected
             m_state = STKHost::get()->getPublicAddress().isUnset() ?
@@ -126,7 +136,6 @@ void ConnectToServer::asynchronousUpdate()
         case GOT_SERVER_ADDRESS:
         {
             assert(m_server);
-            m_server_address.copy(m_server->getAddress());
             Log::info("ConnectToServer", "Server's address known");
             m_state = REQUESTING_CONNECTION;
             auto request_connection =
@@ -218,7 +227,8 @@ void ConnectToServer::asynchronousUpdate()
             Log::info("ConnectToServer", "Connected");
             // LAN networking does not use the stk server tables.
             if (NetworkConfig::get()->isWAN() &&
-                !STKHost::get()->isClientServer())
+                !STKHost::get()->isClientServer() &&
+                !STKHost::get()->getPublicAddress().isUnset())
             {
                 auto hide_address = std::make_shared<HidePublicAddress>();
                 hide_address->requestStart();
@@ -280,6 +290,41 @@ void ConnectToServer::update(int ticks)
             break;
     }
 }   // update
+
+// ----------------------------------------------------------------------------
+bool ConnectToServer::handleDirectConnect()
+{
+    if (UserConfigParams::m_random_ports && NetworkConfig::get()->isWAN() &&
+        !STKHost::get()->isClientServer())
+    {
+        ENetEvent event;
+        ENetAddress ea;
+        ea.host = STKHost::HOST_ANY;
+        ea.port = STKHost::PORT_ANY;
+        Network* dc = new Network(/*peer_count*/1, /*channel_limit*/2,
+            /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &ea,
+            true/*change_port_if_bound*/);
+        assert(dc);
+        ENetPeer* p = dc->connectTo(m_server_address);
+        if (p)
+        {
+            while (enet_host_service(dc->getENetHost(), &event, 1500) != 0)
+            {
+                if (event.type == ENET_EVENT_TYPE_CONNECT)
+                {
+                    Log::info("ConnectToServer",
+                        "Direct connection to %s succeed",
+                        m_server_address.toString().c_str());
+                    STKHost::get()->replaceNetwork(event, dc);
+                    m_state = DONE;
+                    return true;
+                }
+            }
+        }
+        delete dc;
+    }
+    return false;
+}   // handleDirectConnect
 
 // ----------------------------------------------------------------------------
 /** Register this client with the STK server.

@@ -118,7 +118,7 @@ bool LatencyProtocol::notifyEventAsynchronous(Event* event)
  */
 void LatencyProtocol::asynchronousUpdate()
 {
-    float current_time = float(StkTime::getRealTime());
+    double current_time = StkTime::getRealTime();
     if (NetworkConfig::get()->isServer() &&  current_time > m_last_time+1)
     {
         for (auto& p : m_pings)

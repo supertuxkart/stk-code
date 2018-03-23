@@ -1040,3 +1040,21 @@ std::shared_ptr<STKPeer> STKHost::findPeerByHostId(uint32_t id) const
         });
     return ret != m_peers.end() ? ret->second : nullptr;
 }   // findPeerByHostId
+
+//-----------------------------------------------------------------------------
+void STKHost::replaceNetwork(ENetEvent& event, Network* network)
+{
+    assert(NetworkConfig::get()->isClient());
+    assert(!m_listening_thread.joinable());
+    assert(network->getENetHost()->peerCount == 1);
+    delete m_network;
+    m_network = network;
+    auto stk_peer = std::make_shared<STKPeer>(event.peer, this,
+        m_next_unique_host_id++);
+    m_peers[event.peer] = stk_peer;
+    setPrivatePort();
+    startListening();
+    auto pm = ProtocolManager::lock();
+    if (pm && !pm->isExiting())
+        pm->propagateEvent(new Event(&event, stk_peer));
+}   // replaceNetwork
