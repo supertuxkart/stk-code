@@ -60,8 +60,6 @@
 #include "utils/string_utils.hpp"
 #include <algorithm>
 
-DEFINE_SCREEN_SINGLETON(RaceResultGUI);
-
 /** Constructor, initialises internal data structures.
  */
 RaceResultGUI::RaceResultGUI() : Screen("race_result.stkgui",

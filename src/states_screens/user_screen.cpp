@@ -40,9 +40,6 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( UserScreen       );
-DEFINE_SCREEN_SINGLETON( TabbedUserScreen );
-
 // ----------------------------------------------------------------------------
 
 BaseUserScreen::BaseUserScreen(const std::string &name) : Screen(name.c_str())

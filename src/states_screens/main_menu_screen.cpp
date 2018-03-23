@@ -68,8 +68,6 @@
 using namespace GUIEngine;
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( MainMenuScreen );
-
 bool MainMenuScreen::m_enable_online = false;
 
 // ----------------------------------------------------------------------------

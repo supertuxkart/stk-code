@@ -33,8 +33,6 @@ using namespace irr::core;
 
 const char* EditTrackScreen::ALL_TRACKS_GROUP_ID = "all";
 
-DEFINE_SCREEN_SINGLETON( EditTrackScreen );
-
 // -----------------------------------------------------------------------------
 EditTrackScreen::EditTrackScreen()
     : Screen("edit_track.stkgui"), m_track_group(ALL_TRACKS_GROUP_ID),

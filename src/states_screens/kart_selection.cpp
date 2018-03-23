@@ -56,7 +56,6 @@ static const char ID_DONT_USE[] = "x";
 // a kart called 'locked'
 static const char ID_LOCKED[] = "locked/";
 
-//DEFINE_SCREEN_SINGLETON( KartSelectionScreen );
 KartSelectionScreen* KartSelectionScreen::m_instance_ptr = NULL;
 
 int g_root_id;

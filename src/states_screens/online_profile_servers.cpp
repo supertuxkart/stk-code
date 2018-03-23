@@ -41,8 +41,6 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( OnlineProfileServers );
-
 // -----------------------------------------------------------------------------
 
 OnlineProfileServers::OnlineProfileServers() : GUIEngine::Screen("online/profile_servers.stkgui")

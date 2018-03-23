@@ -36,9 +36,6 @@
 using namespace GUIEngine;
 using namespace irr::core;
 
-DEFINE_SCREEN_SINGLETON( GrandPrixEditorScreen );
-
-
 // -----------------------------------------------------------------------------
 GrandPrixEditorScreen::GrandPrixEditorScreen() 
                      : Screen("grand_prix_editor.stkgui"), m_selection(NULL),

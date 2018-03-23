@@ -48,8 +48,6 @@
 using irr::gui::IGUIStaticText;
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( GPInfoScreen );
-
 /** Constructor, initialised some variables which might be used before
  *  loadedFromFile is called.
  */

@@ -27,8 +27,6 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( NetworkKartSelectionScreen );
-
 // ----------------------------------------------------------------------------
 void NetworkKartSelectionScreen::init()
 {

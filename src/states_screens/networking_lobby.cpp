@@ -46,8 +46,6 @@
 using namespace Online;
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( NetworkingLobby );
-
 /** This is the lobby screen that is shown on all clients, but not on the
  *  server. It shows currently connected clients, and allows the 'master'
  *  client (i.e. the stk instance that created the server) to control the

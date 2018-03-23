@@ -52,8 +52,6 @@ using namespace irr::video;
 using namespace irr::core;
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( TrackInfoScreen );
-
 // ----------------------------------------------------------------------------
 /** Constructor, which loads the corresponding track_info.stkgui file. */
 TrackInfoScreen::TrackInfoScreen()

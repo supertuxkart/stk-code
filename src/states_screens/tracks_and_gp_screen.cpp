@@ -42,8 +42,6 @@ using namespace irr::video;
 
 static const char ALL_TRACK_GROUPS_ID[] = "all";
 
-DEFINE_SCREEN_SINGLETON( TracksAndGPScreen );
-
 // -----------------------------------------------------------------------------
 
 void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,

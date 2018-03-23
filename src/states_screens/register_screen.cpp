@@ -38,8 +38,6 @@ using namespace Online;
 using namespace irr;
 using namespace core;
 
-DEFINE_SCREEN_SINGLETON( RegisterScreen );
-
 // -----------------------------------------------------------------------------
 
 RegisterScreen::RegisterScreen() : Screen("online/register.stkgui")

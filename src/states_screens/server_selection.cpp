@@ -36,8 +36,6 @@
 
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( ServerSelection );
-
 // ----------------------------------------------------------------------------
 /** Constructor, which loads the stkgui file.
  */

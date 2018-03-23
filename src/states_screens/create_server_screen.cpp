@@ -43,8 +43,6 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( CreateServerScreen );
-
 // ----------------------------------------------------------------------------
 
 CreateServerScreen::CreateServerScreen() : Screen("online/create_server.stkgui")

@@ -42,8 +42,6 @@
 using namespace GUIEngine;
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( OnlineScreen );
-
 // ----------------------------------------------------------------------------
 
 OnlineScreen::OnlineScreen() : Screen("online/online.stkgui")

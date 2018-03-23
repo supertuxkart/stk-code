@@ -45,8 +45,6 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( OnlineLanScreen );
-
 // -----------------------------------------------------------------------------
 
 OnlineLanScreen::OnlineLanScreen() : GUIEngine::Screen("online/lan.stkgui")

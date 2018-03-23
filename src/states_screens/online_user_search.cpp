@@ -32,8 +32,6 @@ using namespace Online;
 #include <assert.h>
 #include <iostream>
 
-DEFINE_SCREEN_SINGLETON( OnlineUserSearch );
-
 // ----------------------------------------------------------------------------
 
 OnlineUserSearch::OnlineUserSearch() : Screen("online/user_search.stkgui")
