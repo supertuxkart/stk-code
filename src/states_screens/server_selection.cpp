@@ -104,6 +104,8 @@ void ServerSelection::beforeAddingWidget()
     m_server_list_widget->addColumn( _("Players"), 1);
     m_server_list_widget->addColumn(_("Difficulty"), 1);
     m_server_list_widget->addColumn(_("Game mode"), 1);
+    if (NetworkConfig::get()->isWAN())
+        m_server_list_widget->addColumn(_("Server owner"), 1);
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -145,6 +147,9 @@ void ServerSelection::loadList(unsigned sort_case)
             case 3:
                 return c->getRaceMinorMode() > d->getRaceMinorMode();
                 break;
+            case 4:
+                return c->getServerOwnerName() > d->getServerOwnerName();
+                break;
             }   // switch
             assert(false);
             return false;
@@ -166,6 +171,11 @@ void ServerSelection::loadList(unsigned sort_case)
         core::stringw mode = RaceManager::getNameOf(server->getRaceMinorMode());
         row.push_back(GUIEngine::ListWidget::ListCell(mode, -1, 1, true));
 
+        if (NetworkConfig::get()->isWAN())
+        {
+            row.push_back(GUIEngine::ListWidget::ListCell(StringUtils::
+                utf8ToWide(server->getServerOwnerName()), -1, 1, true));
+        }
         m_server_list_widget->addItem("server", row);
     }
 }   // loadList

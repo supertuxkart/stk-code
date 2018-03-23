@@ -16,6 +16,10 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/server.hpp"
+#include "config/player_manager.hpp"
+#include "online/online_player_profile.hpp"
+#include "online/online_profile.hpp"
+#include "online/profile_manager.hpp"
 #include "network/network_config.hpp"
 #include "io/xml_node.hpp"
 #include "utils/constants.hpp"
@@ -57,6 +61,34 @@ Server::Server(const XMLNode& xml)
     m_address.setPort(port);
     xml.get("private_port", &m_private_port);
     xml.get("password", &m_password_protected);
+    m_server_owner_name = "-";
+
+    // Display server owner name if he's your friend or localhost
+    Online::OnlineProfile* opp = PlayerManager::getCurrentPlayer()->getProfile();
+    // Check localhost owner
+    if (opp && opp->getID() == m_server_owner)
+    {
+        m_server_owner_name =
+            StringUtils::wideToUtf8(opp->getUserName());
+    }
+    else if (opp && opp->hasFetchedFriends())
+    {
+        // Check friend(s)
+        for (uint32_t user_id : opp->getFriends())
+        {
+            if (user_id == m_server_owner)
+            {
+                Online::OnlineProfile* friend_profile =
+                    Online::ProfileManager::get()->getProfileByID(user_id);
+                if (friend_profile)
+                {
+                    m_server_owner_name =
+                        StringUtils::wideToUtf8(friend_profile->getUserName());
+                }
+            }
+        }
+    }
+
 } // Server(const XML&)
 
 // ----------------------------------------------------------------------------

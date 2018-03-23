@@ -76,6 +76,10 @@ protected:
 
     bool m_password_protected;
 
+    /* WAN server only, show the owner name of server, can only be seen
+     * for localhost or if you are friend with the server owner. */
+    std::string m_server_owner_name;
+
 public:
 
          /** Initialises the object from an XML node. */
@@ -118,6 +122,9 @@ public:
     RaceManager::Difficulty getDifficulty() const      { return m_difficulty; }
     // ------------------------------------------------------------------------
     bool isPasswordProtected() const           { return m_password_protected; }
+    // ------------------------------------------------------------------------
+    const std::string& getServerOwnerName() const
+                                                { return m_server_owner_name; }
 
 };   // Server
 #endif // HEADER_SERVER_HPP

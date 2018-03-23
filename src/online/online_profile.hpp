@@ -24,6 +24,7 @@
 #include "utils/types.hpp"
 #include "utils/ptr_vector.hpp"
 
+#include <atomic>
 #include <irrString.h>
 #include <string>
 
@@ -91,7 +92,7 @@ private:
     /** Whether or not the user of this profile, is a friend of the current user */
     bool                            m_is_friend;
 
-    bool                            m_has_fetched_friends;
+    std::atomic_bool                m_has_fetched_friends;
 
     /** List of user id's that are friends with the user of this profile.
      * In case this profile is of the current user, this list also contains
@@ -123,15 +124,15 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns true if the achievements for this profile have been fetched. */
-    bool hasFetchedAchievements() const { return m_has_fetched_achievements; }
+    bool hasFetchedAchievements() const  { return m_has_fetched_achievements; }
 
     // ------------------------------------------------------------------------
     /** Unsets the flag that all friends of this profile are in cache. Used
      *  when a profile is pushed out of cache. */
-    void unsetHasFetchedFriends() { m_has_fetched_friends = false;  }
+    void unsetHasFetchedFriends() { m_has_fetched_friends.store(false);  }
     // ------------------------------------------------------------------------
     /** Returns true if the friend list for this profile has been fetched. */
-    bool hasFetchedFriends() const { return m_has_fetched_friends; }
+    bool hasFetchedFriends() const { return m_has_fetched_friends.load(); }
 
     // ------------------------------------------------------------------------
     /** True if the profile has fetched friends. */
