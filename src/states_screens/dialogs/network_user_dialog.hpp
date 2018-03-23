@@ -20,14 +20,15 @@
 #define HEADER_NETWORK_USER_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets.hpp"
 #include "utils/types.hpp"
 
 #include <irrString.h>
 
-namespace Online
+namespace GUIEngine
 {
-    class OnlineProfile;
+    class IconButtonWidget;
+    class LabelWidget;
+    class RibbonWidget;
 }
 
 /**
@@ -72,12 +73,7 @@ public:
     // ------------------------------------------------------------------------
     GUIEngine::EventPropagation processEvent(const std::string& source);
     // ------------------------------------------------------------------------
-    virtual bool onEscapePressed()
-    {
-        if (m_cancel_widget->isActivated())
-            m_self_destroy = true;
-        return false;
-    }
+    virtual bool onEscapePressed();
     // ------------------------------------------------------------------------
     virtual void onUpdate(float dt)
     {

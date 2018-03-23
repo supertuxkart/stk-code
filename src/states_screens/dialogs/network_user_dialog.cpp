@@ -20,6 +20,9 @@
 #include "config/player_manager.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "online/online_profile.hpp"
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/stk_host.hpp"
@@ -43,6 +46,21 @@ void NetworkUserDialog::beforeAddingWidgets()
     m_friend_widget = getWidget<IconButtonWidget>("friend");
     assert(m_friend_widget != NULL);
     m_friend_widget->setVisible(m_online_id != 0);
+
+    // Hide friend request button if already friend
+    Online::OnlineProfile* opp =
+        PlayerManager::getCurrentPlayer()->getProfile();
+    if (m_online_id != 0 && opp && opp->hasFetchedFriends())
+    {
+        for (uint32_t user_id : opp->getFriends())
+        {
+            if (user_id == m_online_id)
+            {
+                m_friend_widget->setVisible(false);
+            }
+        }
+    }
+
     m_kick_widget = getWidget<IconButtonWidget>("decline");
     assert(m_kick_widget != NULL);
 
@@ -97,3 +115,11 @@ GUIEngine::EventPropagation
     }
     return GUIEngine::EVENT_LET;
 }   // processEvent
+
+// -----------------------------------------------------------------------------
+bool NetworkUserDialog::onEscapePressed()
+{
+    if (m_cancel_widget->isActivated())
+        m_self_destroy = true;
+    return false;
+}   // onEscapePressed
