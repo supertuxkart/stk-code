@@ -91,7 +91,7 @@ void NetworkingLobby::loadedFromFile()
 
     m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
     video::ITexture* icon_1 = irr_driver->getTexture
-        (file_manager->getAsset(FileManager::GUI, "cup_gold.png"));
+        (file_manager->getAsset(FileManager::GUI, "crown.png"));
     video::ITexture* icon_2 = irr_driver->getTexture
         (file_manager->getAsset(FileManager::GUI, "difficulty_medium.png"));
     video::ITexture* icon_3 = irr_driver->getTexture
