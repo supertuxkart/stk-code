@@ -72,13 +72,15 @@ void SplitscreenPlayerDialog::beforeAddingWidgets()
     {
         m_available_players.clear();
     }
+
+    m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     if (m_available_players.empty())
     {
         getWidget("name-text")->setVisible(false);
         getWidget("handicap-row")->setVisible(false);
         m_add->setVisible(false);
         m_profiles->setVisible(false);
-        m_connect->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        m_options_widget->select("connect", PLAYER_ID_GAME_MASTER);
     }
     else
     {
@@ -86,9 +88,9 @@ void SplitscreenPlayerDialog::beforeAddingWidgets()
         getWidget("handicap-row")->setVisible(true);
         m_add->setVisible(true);
         m_profiles->setVisible(true);
-        m_add->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
         m_handicap->setState(false);
         m_handicap->setActive(UserConfigParams::m_per_player_difficulty);
+        m_options_widget->select("add", PLAYER_ID_GAME_MASTER);
     }
 
     input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);

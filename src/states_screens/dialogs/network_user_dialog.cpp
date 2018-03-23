@@ -36,8 +36,6 @@ using namespace Online;
 // ----------------------------------------------------------------------------
 void NetworkUserDialog::beforeAddingWidgets()
 {
-    m_options_widget = getWidget<RibbonWidget>("options");
-    assert(m_options_widget != NULL);
     m_name_widget = getWidget<LabelWidget>("name");
     assert(m_name_widget != NULL);
     m_name_widget->setText(m_name, false);
@@ -54,7 +52,11 @@ void NetworkUserDialog::beforeAddingWidgets()
 
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
-    m_cancel_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+
+    m_options_widget = getWidget<RibbonWidget>("options");
+    assert(m_options_widget != NULL);
+    m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_options_widget->select("cancel", PLAYER_ID_GAME_MASTER);
 
     getWidget<IconButtonWidget>("accept")->setVisible(false);
     getWidget<IconButtonWidget>("remove")->setVisible(false);
