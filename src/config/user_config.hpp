@@ -146,16 +146,14 @@ public:
         const char* comment = NULL);
     MapUserConfigParam(const char* param_name,
         const char* comment,
-        int nb_elts,
-        ...);
+        std::map<T, U> default_value);
     MapUserConfigParam(const char* param_name,
         GroupUserConfigParam* group,
         const char* comment = NULL);
     MapUserConfigParam(const char* param_name,
         GroupUserConfigParam* group,
         const char* comment,
-        int nb_elts,
-        ...);
+        std::map<T, U> default_value);
 
     void write(std::ofstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
@@ -185,6 +183,7 @@ public:
     }
 };   // ListUserConfigParam
 typedef MapUserConfigParam<uint32_t, uint32_t> UIntToUIntUserConfigParam;
+typedef MapUserConfigParam<std::string, uint32_t> StringToUIntUserConfigParam;
 // ============================================================================
 class IntUserConfigParam : public UserConfigParam
 {
@@ -735,8 +734,14 @@ namespace UserConfigParams
     PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode
         PARAM_DEFAULT(UIntToUIntUserConfigParam("num_karts_per_gamemode",
             "The Number of karts per gamemode.",
-            1,
-            std::make_pair(1100u, 4u)
+            {
+                { 0u, 4u },
+                { 1002u, 5u },
+                { 1100u, 4u },
+                { 1101u, 4u },
+                { 2000u, 4u },
+                { 2001u, 4u },
+            }
         ));
 
     // ---- Network
@@ -756,30 +761,17 @@ namespace UserConfigParams
         PARAM_DEFAULT(FloatUserConfigParam(10.0f, "voting-timeout",
         &m_network_group, "Timeout in seconds for voting tracks in server."));
     // ---- Gamemode setup
-    PARAM_PREFIX UIntToUIntUserConfigParam m_server_ban_list
-        PARAM_DEFAULT(UIntToUIntUserConfigParam("server_ban_list",
-            "LHS: IP in 32bit format, RHS: online id, if 0 than all players "
+    PARAM_PREFIX StringToUIntUserConfigParam m_server_ban_list
+        PARAM_DEFAULT(StringToUIntUserConfigParam("server_ban_list",
+            "LHS: IP in x.x.x.x format, RHS: online id, if 0 than all players "
             "from this IP will be banned.",
-            1,
-            std::make_pair(0u, 0u)
+            { { "0.0.0.0", 0u } }
         ));
 
     // ---- Graphic Quality
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality
             PARAM_DEFAULT( GroupUserConfigParam("GFX",
                                                 "Graphics Quality Settings") );
-
-    // On OSX 10.4 and before there may be driver issues with FBOs, so to be
-    // safe disable them by default
-#ifdef __APPLE__
-    #if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-    #define FBO_DEFAULT false
-    #else
-    #define FBO_DEFAULT true
-    #endif
-#else
-#define FBO_DEFAULT true
-#endif
 
     PARAM_PREFIX IntUserConfigParam        m_particles_effects
             PARAM_DEFAULT(  IntUserConfigParam(2, "particles-effecs",

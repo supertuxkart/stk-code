@@ -21,6 +21,7 @@
 #include "network/network_player_profile.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "utils/time.hpp"
 #include "utils/vs.hpp"
 #include "main_loop.hpp"
@@ -87,7 +88,8 @@ void mainLoop(STKHost* host)
             {
                 peer->kick();
                 UserConfigParams::m_server_ban_list
-                    [peer->getAddress().getIP()] = 0;
+                    [peer->getAddress().toString(false/*show_port*/)] = 0;
+                LobbyProtocol::get<ServerLobby>()->updateBanList();
             }
             else
                 std::cout << "Unknown host id: " << number << std::endl;
@@ -105,15 +107,13 @@ void mainLoop(STKHost* host)
         }
         else if (str == "listban")
         {
-            std::map<uint32_t, uint32_t> ban_list =
+            std::map<std::string, uint32_t> ban_list =
                 UserConfigParams::m_server_ban_list;
             for (auto& ban : ban_list)
             {
-                if (ban.first == 0)
+                if (ban.first == "0.0.0.0")
                     continue;
-                TransportAddress a;
-                a.setIP(ban.first);
-                std::cout << "IP: " << a.toString(false) << " online id: " <<
+                std::cout << "IP: " << ban.first << " online id: " <<
                     ban.second << std::endl;
             }
         }

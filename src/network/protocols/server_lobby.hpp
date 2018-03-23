@@ -75,6 +75,9 @@ private:
      *  starting race. */
     std::mutex m_connection_mutex;
 
+    /** Ban list ip (in decimal) with online user id. */
+    std::map<uint32_t, uint32_t> m_ban_list;
+
     // connection management
     void clientDisconnected(Event* event);
     void connectionRequested(Event* event);
@@ -111,6 +114,7 @@ public:
     void checkRaceFinished();
     void finishedLoadingWorld() OVERRIDE;
     ServerState getCurrentState() const { return m_state.load(); }
+    void updateBanList();
     virtual bool waitingForPlayers() const OVERRIDE
                                 { return m_state.load() == ACCEPTING_CLIENTS; }
 

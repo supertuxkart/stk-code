@@ -89,6 +89,7 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
     m_has_created_server_id_file = false;
     setHandleDisconnections(true);
     m_state = SET_PUBLIC_ADDRESS;
+    updateBanList();
 }   // ServerLobby
 
 //-----------------------------------------------------------------------------
@@ -821,7 +822,29 @@ void ServerLobby::connectionRequested(Event* event)
             per_player_difficulty));
     }
 
-    if (peer->isBanned())
+    bool is_banned = false;
+    auto ret = m_ban_list.find(peer->getAddress().getIP());
+    if (ret != m_ban_list.end())
+    {
+        // Ban all players
+        if (ret->second == 0)
+        {
+            is_banned = true;
+        }
+        else
+        {
+            for (auto& p : peer->getPlayerProfiles())
+            {
+                if (ret->second == p->getOnlineId())
+                {
+                    is_banned = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (is_banned)
     {
         NetworkString *message = getNetworkString(2);
         message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BANNED);
@@ -1215,3 +1238,12 @@ void ServerLobby::playerFinishedResult(Event *event)
 }   // playerFinishedResult
 
 //-----------------------------------------------------------------------------
+void ServerLobby::updateBanList()
+{
+    std::lock_guard<std::mutex> lock(m_connection_mutex);
+    m_ban_list.clear();
+    std::map<std::string, uint32_t> ban_list =
+        UserConfigParams::m_server_ban_list;
+    for (auto& ban : ban_list)
+        m_ban_list[TransportAddress(ban.first).getIP()] = ban.second;
+}   // updateBanList

@@ -121,30 +121,3 @@ bool STKPeer::isSamePeer(const ENetPeer* peer) const
 {
     return peer==m_enet_peer;
 }   // isSamePeer
-
-//-----------------------------------------------------------------------------
-/** Returns true if this peer should be banned.
-*/
-bool STKPeer::isBanned() const
-{
-    if (m_players.empty())
-    {
-        Log::warn("STKPeer", "Missing player info to check for online id ban");
-    }
-
-    std::map<uint32_t, uint32_t> ban_list =
-        UserConfigParams::m_server_ban_list;
-    auto ret = ban_list.find(m_peer_address.getIP());
-    if (ret != ban_list.end())
-    {
-        // Ban all players
-        if (ret->second == 0)
-            return true;
-        for (auto p : m_players)
-        {
-            if (ret->second == p->getOnlineId())
-                return true;
-        }
-    }
-    return false;
-}   // isBanned

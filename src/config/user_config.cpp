@@ -334,26 +334,12 @@ MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
 // ----------------------------------------------------------------------------
 template<typename T, typename U>
 MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
-    const char* comment,
-    int nb_elements,
-    ...)
+    const char* comment, std::map<T, U> default_value)
 {
     m_param_name = param_name;
     all_params.push_back(this);
     if (comment != NULL) m_comment = comment;
-
-    // add the default list
-    va_list arguments;
-    va_start(arguments, nb_elements);
-
-    struct pair_type { T key; U value; };
-
-    for (int i = 0; i < nb_elements; i++) 
-    {
-        pair_type key_value_pair = va_arg(arguments, pair_type);
-        m_elements.insert(std::pair<T, U>(key_value_pair.key, key_value_pair.value));
-    }
-    va_end(arguments);                  // Cleans up the list
+    m_elements = default_value;
 }   // MapUserConfigParam
 
 // ----------------------------------------------------------------------------
@@ -370,27 +356,14 @@ MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
 // ----------------------------------------------------------------------------
 template<typename T, typename U>
 MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
-    GroupUserConfigParam* group,
-    const char* comment,
-    int nb_elements,
-    ...)
+    GroupUserConfigParam* group, const char* comment,
+    std::map<T, U> default_value)
 {
     m_param_name = param_name;
     group->addChild(this);
     if (comment != NULL) m_comment = comment;
 
-    // add the default list
-    va_list arguments;
-    va_start(arguments, nb_elements);
-
-    struct pair_type { T key; U value; };
-
-    for (int i = 0; i < nb_elements; i++)
-    {
-        pair_type key_value_pair = va_arg(arguments, pair_type);
-        m_elements.insert(std::pair<T, U>(key_value_pair.key, key_value_pair.value));
-    }
-    va_end(arguments);                  // Cleans up the list
+    m_elements = default_value;
 }   // MapUserConfigParam
 
 // ----------------------------------------------------------------------------
