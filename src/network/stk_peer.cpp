@@ -37,6 +37,7 @@ STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
     m_client_server_token = 0;
     m_host_id             = host_id;
     m_token_set           = false;
+    m_connected_time      = (float)StkTime::getRealTime();
 }   // STKPeer
 
 //-----------------------------------------------------------------------------
@@ -121,3 +122,14 @@ bool STKPeer::isSamePeer(const ENetPeer* peer) const
 {
     return peer==m_enet_peer;
 }   // isSamePeer
+
+//-----------------------------------------------------------------------------
+/** Returns the ping to this peer from host, it waits for 15 seconds for a
+ *  stable ping returned by enet measured in ms.
+ */
+uint32_t STKPeer::getPing() const
+{
+    if ((float)StkTime::getRealTime() - m_connected_time < 15.0f)
+        return 0;
+    return m_enet_peer->lastRoundTripTime;
+}   // getPing
