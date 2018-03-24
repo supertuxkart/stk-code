@@ -893,6 +893,7 @@ void LinearWorld::checkForWrongDirection(unsigned int i, int ticks)
     
     if (wrongway_counter > stk_config->time2Ticks(1.0f))
     {
+        m_race_gui->cleanupMessages(0.0f);
         m_race_gui->addMessage(_("WRONG WAY!"), kart,
                                /* time */ -1.0f,
                                video::SColor(255,255,255,255),

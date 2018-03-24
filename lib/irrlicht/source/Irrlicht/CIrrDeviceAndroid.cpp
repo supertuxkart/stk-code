@@ -48,6 +48,8 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     : CIrrDeviceStub(param),
     Accelerometer(0),
     Gyroscope(0),
+    AccelerometerActive(false),
+    GyroscopeActive(false),
     IsMousePressed(false),
     GamepadAxisX(0),
     GamepadAxisY(0),
@@ -246,14 +248,14 @@ bool CIrrDeviceAndroid::run()
                         accEvent.AccelerometerEvent.X = event.acceleration.x;
                         accEvent.AccelerometerEvent.Y = event.acceleration.y;
                     }
-                    accEvent.AccelerometerEvent.Z = event.acceleration.z;
                     
                     if (accEvent.AccelerometerEvent.X < 0)
                     {
                         accEvent.AccelerometerEvent.X *= -1;
                         accEvent.AccelerometerEvent.Y *= -1;
-                        accEvent.AccelerometerEvent.Z *= -1;
                     }
+                    
+                    accEvent.AccelerometerEvent.Z = event.acceleration.z;
 
                     postEventFromUser(accEvent);
                     break;
@@ -769,7 +771,7 @@ s32 CIrrDeviceAndroid::handleGamepad(AInputEvent* androidEvent)
             {
                 event.KeyInput.PressedDown = true;
                 event.KeyInput.Key = axis_x < 0 ? IRR_KEY_BUTTON_LEFT 
-								                : IRR_KEY_BUTTON_RIGHT;
+                                                : IRR_KEY_BUTTON_RIGHT;
                 postEventFromUser(event);
             }
             
@@ -790,7 +792,7 @@ s32 CIrrDeviceAndroid::handleGamepad(AInputEvent* androidEvent)
             {
                 event.KeyInput.PressedDown = true;
                 event.KeyInput.Key = axis_y < 0 ? IRR_KEY_BUTTON_UP 
-								                : IRR_KEY_BUTTON_DOWN;
+                                                : IRR_KEY_BUTTON_DOWN;
                 postEventFromUser(event);
             }
             
@@ -1210,12 +1212,19 @@ bool CIrrDeviceAndroid::activateAccelerometer(float updateInterval)
         DefaultOrientation = getDefaultOrientation();
     }
 
-    ASensorEventQueue_enableSensor(SensorEventQueue, Accelerometer);
-    ASensorEventQueue_setEventRate(SensorEventQueue, Accelerometer,
+    int err = ASensorEventQueue_enableSensor(SensorEventQueue, Accelerometer);
+    
+    if (err == 0)
+    {
+        AccelerometerActive = true;
+        
+        ASensorEventQueue_setEventRate(SensorEventQueue, Accelerometer,
                     (int32_t)(updateInterval*1000.f*1000.f)); // in microseconds
+                    
+        os::Printer::log("Activated accelerometer", ELL_DEBUG);
+    }
 
-    os::Printer::log("Activated accelerometer", ELL_DEBUG);
-    return true;
+    return AccelerometerActive;
 }
 
 bool CIrrDeviceAndroid::deactivateAccelerometer()
@@ -1223,15 +1232,20 @@ bool CIrrDeviceAndroid::deactivateAccelerometer()
     if (!Accelerometer)
         return false;
 
-    ASensorEventQueue_disableSensor(SensorEventQueue, Accelerometer);
-    Accelerometer = 0;
-    os::Printer::log("Deactivated accelerometer", ELL_DEBUG);
-    return true;
+    int err = ASensorEventQueue_disableSensor(SensorEventQueue, Accelerometer);
+    
+    if (err == 0)
+    {
+        AccelerometerActive = false;
+        os::Printer::log("Deactivated accelerometer", ELL_DEBUG);
+    }
+    
+    return !AccelerometerActive;
 }
 
 bool CIrrDeviceAndroid::isAccelerometerActive()
 {
-    return (Accelerometer != NULL);
+    return AccelerometerActive;
 }
 
 bool CIrrDeviceAndroid::isAccelerometerAvailable()
@@ -1250,12 +1264,19 @@ bool CIrrDeviceAndroid::activateGyroscope(float updateInterval)
     if (!isGyroscopeAvailable())
         return false;
 
-    ASensorEventQueue_enableSensor(SensorEventQueue, Gyroscope);
-    ASensorEventQueue_setEventRate(SensorEventQueue, Gyroscope,
+    int err = ASensorEventQueue_enableSensor(SensorEventQueue, Gyroscope);
+    
+    if (err == 0)
+    {
+        GyroscopeActive = true;
+        
+        ASensorEventQueue_setEventRate(SensorEventQueue, Gyroscope,
                     (int32_t)(updateInterval*1000.f*1000.f)); // in microseconds
 
-    os::Printer::log("Activated gyroscope", ELL_DEBUG);
-    return true;
+        os::Printer::log("Activated gyroscope", ELL_DEBUG);
+    }
+    
+    return GyroscopeActive;
 }
 
 bool CIrrDeviceAndroid::deactivateGyroscope()
@@ -1263,15 +1284,20 @@ bool CIrrDeviceAndroid::deactivateGyroscope()
     if (!Gyroscope)
         return false;
 
-    ASensorEventQueue_disableSensor(SensorEventQueue, Gyroscope);
-    Gyroscope = 0;
-    os::Printer::log("Deactivated gyroscope", ELL_DEBUG);
-    return true;
+    int err = ASensorEventQueue_disableSensor(SensorEventQueue, Gyroscope);
+    
+    if (err == 0)
+    {
+        GyroscopeActive = false;
+        os::Printer::log("Deactivated gyroscope", ELL_DEBUG);
+    }
+    
+    return !GyroscopeActive;
 }
 
 bool CIrrDeviceAndroid::isGyroscopeActive()
 {
-    return (Gyroscope != NULL);
+    return GyroscopeActive;
 }
 
 bool CIrrDeviceAndroid::isGyroscopeAvailable()

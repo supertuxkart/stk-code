@@ -331,6 +331,12 @@ void FontWithFace::setDPI()
 {
     const int screen_width = irr_driver->getFrameSize().Width;
     const int screen_height = irr_driver->getFrameSize().Height;
+    
+#ifdef ANDROID
+    float scale = screen_height / 480.0f;
+    m_face_dpi = getScalingFactorTwo() * getScalingFactorOne() * scale;
+
+#else
     float scale = std::max(0, screen_width - 640) / 564.0f;
 
     // attempt to compensate for small screens
@@ -341,6 +347,7 @@ void FontWithFace::setDPI()
 
     m_face_dpi = unsigned((getScalingFactorOne() + 0.2f * scale) *
         getScalingFactorTwo());
+#endif
 
 }   // setDPI
 

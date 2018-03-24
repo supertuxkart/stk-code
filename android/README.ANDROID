@@ -44,13 +44,12 @@ and extract it to stk-code/lib. It contains sources of libraries that are used
 in STK, but are not availiable in stk-code repository (curl, freetype, openal).
 
 You need also Android SDK for android-19 platform (the API for Android 4.4) and
-Android NDK. Note that NDK >= r15b is atm. not supported. Version r12b is
+Android NDK. Note that NDK >= r15 is atm. not supported. Version r12b is
 strongly recommended, because it's known that it works without issues.
 
 You need to create proper "android-sdk" and "android-ndk" symlinks in the
 directory with Android project, so that the compilation script will have access
-to the SDK and NDK. These paths can be also set in SDK_PATH and NDK_PATH 
-environmental variables.
+to the SDK and NDK.
 
 Before running the compilation, run the generate_assets script, so that
 selected assets will be copied to "assets" directory, and then included in the
@@ -67,22 +66,6 @@ If the assets directory is already prepared, you can run "./make.sh" command to
 build the project and create an apk file. Note that all arguments are passed to
 the make command, so that you can run "./make.sh -j5" for multi-threaded build.
 
-If you want to prepare a package for particular architecture, you can choose it
-by setting the COMPILE_ARCH environmental variable. At this stage, supported
-architectures are "armv7", "x86" and "aarch64". The default is "armv7".
-
-You can choose build type by setting BUILD_TYPE environment variable to "debug"
-or "release". The default is debug build. Note that if you choose release build,
-you have to manually sign the apk with your key and run zipalign.
-
-Additionally you can choose the build tool by setting BUILD_TOOL environment
-variable to "gradle" or "ant". Note that ant has been already removed from
-Android SDK, so you have to use SDK <= 25.2.5 for building with ant. By default 
-the BUILD_TOOL is set to "gradle".
-
-You can override the SDK build-tools version by setting the BUILD_TOOLS_VER
-environment variable.
-
 Basically if all dependencies are installed in the system, it should be enough
 to just run:
 
@@ -90,6 +73,33 @@ to just run:
     export NDK_PATH=/path/to/your/android/ndk
     ./generate_assets.sh
     ./make.sh -j5
+
+
+
+--------------------------------------------------------------------------------
+ ENVIRONMENT VARIABLES
+--------------------------------------------------------------------------------
+
+COMPILE_ARCH    - Allows to choose CPU architecture for which the package will
+                  be compiled. 
+                  Possible values: armv7, aarch64, x86, x86_64.
+                  Default is: armv7.
+
+BUILD_TYPE      - Allows to set build type.
+                  Possible values: debug, release, beta.
+                  Default is: debug.
+
+BUILD_TOOL      - Allows to choose a tool that is used for creating package. 
+                  Note that ant has been already removed from Android SDK, so 
+                  you have to use SDK <= 25.2.5 for building with ant.
+                  Possible values: ant, gradle.
+                  Default is: gradle.
+
+BUILD_TOOLS_VER - Allows to override the SDK build-tools version.
+
+SDK_PATH        - Path to SDK directory
+
+NDK_PATH        - Path to NDK directory
 
 
 

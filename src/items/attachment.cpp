@@ -511,20 +511,16 @@ void Attachment::update(int ticks)
     int slow_flashes = stk_config->time2Ticks(3.0f);
     if (is_shield && m_ticks_left < slow_flashes)
     {
-        int flashes_per_second = 4;
-        int ticks_per_flash = stk_config->time2Ticks(0.25f);
-        
+        int ticks_per_flash = stk_config->time2Ticks(0.2f);
+
         int fast_flashes = stk_config->time2Ticks(0.5f);
         if (m_ticks_left < fast_flashes)
         {
-            flashes_per_second = 12;
-            ticks_per_flash = stk_config->time2Ticks(1.0f/12);
+            ticks_per_flash = stk_config->time2Ticks(0.07f);
         }
 
-        //int divisor = 2;
-        //int mod = (int)(m_ticks_left * flashes_per_second * 2) % divisor;
-        int mod = m_ticks_left % ticks_per_flash;
-        m_node->setVisible(mod > ticks_per_flash);
+        int division = (m_ticks_left / ticks_per_flash);
+        m_node->setVisible((division & 0x1) == 0);
     }
 
     float dt = stk_config->ticks2Time(ticks);

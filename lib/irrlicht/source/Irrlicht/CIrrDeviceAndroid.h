@@ -111,6 +111,8 @@ namespace irr
         ASensorEventQueue* SensorEventQueue;
         const ASensor* Accelerometer;
         const ASensor* Gyroscope;
+        bool AccelerometerActive;
+        bool GyroscopeActive;
 
         static bool IsPaused;
         static bool IsFocused;

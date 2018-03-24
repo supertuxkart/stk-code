@@ -19,6 +19,7 @@
 #ifndef HEADER_SCREEN_KEYBOARD_HPP
 #define HEADER_SCREEN_KEYBOARD_HPP
 
+#include <IGUIButton.h>
 #include <IGUIWindow.h>
 
 #include "guiengine/abstract_top_level_container.hpp"
@@ -67,8 +68,14 @@ namespace GUIEngine
          *  that is used by the keyboard */
         float m_percent_height;
         
+        /** A time for repeat key feature */
+        unsigned int m_repeat_time;
+        
         /** The edit box that is assigned to the keyboard */
         CGUIEditBox* m_edit_box;
+        
+        /** A button that is used as backspace key */
+        irr::gui::IGUIButton* m_back_button;
         
         /** Remembers currently selected button type */
         ButtonsType m_buttons_type;
@@ -88,6 +95,7 @@ namespace GUIEngine
         void init();
         void createButtons();
         void assignButtons(ButtonsType buttons_type);
+        std::wstring getKeyName(std::string key_id);
 
     public:
         LEAK_CHECK()
@@ -100,7 +108,6 @@ namespace GUIEngine
         
         static void dismiss();
         static bool onEscapePressed();
-        
         /** Returns pointer to the created keyboard or NULL if keyboard was
          *  not created */
         static ScreenKeyboard* getCurrent() {return m_screen_keyboard;}
@@ -108,6 +115,9 @@ namespace GUIEngine
         /** Returns true if keyboard is created */
         static bool isActive() {return m_screen_keyboard != NULL;}
 
+        /** Override to be notified of updates */
+        virtual void onUpdate(float dt);
+        
         /** Get irrlicht window used by the keyboard widget */
         irr::gui::IGUIWindow* getIrrlichtElement() {return m_irrlicht_window;}
 
