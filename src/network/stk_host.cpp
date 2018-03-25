@@ -946,8 +946,9 @@ bool STKHost::peerExists(const TransportAddress& peer)
  */
 std::shared_ptr<STKPeer> STKHost::getServerPeerForClient() const
 {
-    assert(m_peers.size() == 1);
     assert(NetworkConfig::get()->isClient());
+    if (m_peers.size() != 1)
+        return nullptr;
     return m_peers.begin()->second;
 }   // getServerPeerForClient
 

@@ -131,7 +131,7 @@ void NetworkingLobby::init()
     getWidget("send")->setActive(false);
 
     // Connect to server now if we have saved players and not disconnected
-    if (m_joined_server &&
+    if (!LobbyProtocol::get<LobbyProtocol>() &&
         !NetworkConfig::get()->getNetworkPlayers().empty())
         std::make_shared<ConnectToServer>(m_joined_server)->requestStart();
 
@@ -253,7 +253,7 @@ void NetworkingLobby::onUpdate(float delta)
     }
     else
     {
-        if (m_server_peer.expired())
+        if (m_server_peer.expired() && STKHost::existHost())
             m_server_peer = STKHost::get()->getServerPeerForClient();
         core::stringw total_msg;
         for (auto& string : m_server_info)
