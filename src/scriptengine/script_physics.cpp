@@ -19,9 +19,10 @@
 #include <assert.h>
 #include <angelscript.h>
 #include "script_physics.hpp"
+#include "graphics/explosion.hpp"
 #include "graphics/hit_effect.hpp"
 #include "items/projectile_manager.hpp"
-#include "graphics/explosion.hpp"
+#include "scriptengine/aswrappedcall.hpp"
 
 namespace Scripting
 {
@@ -41,7 +42,15 @@ namespace Scripting
         {
             int r;
             engine->SetDefaultNamespace("Physics");
-            r = engine->RegisterGlobalFunction("string createExplosion(Vec3 &in)", asFUNCTION(createExplosion), asCALL_GENERIC); assert(r >= 0);
+            
+            if (strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY"))
+            {
+                r = engine->RegisterGlobalFunction("string createExplosion(Vec3 &in)", WRAP_FN(createExplosion), asCALL_GENERIC); assert(r >= 0);
+            }
+            else
+            {
+                r = engine->RegisterGlobalFunction("string createExplosion(Vec3 &in)", asFUNCTION(createExplosion), asCALL_GENERIC); assert(r >= 0);
+            }
         }
     }
 }

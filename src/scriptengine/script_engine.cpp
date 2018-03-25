@@ -21,6 +21,7 @@
 #include "io/file_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
+#include "scriptengine/aswrappedcall.hpp"
 #include "scriptengine/script_audio.hpp"
 #include "scriptengine/script_challenges.hpp"
 #include "scriptengine/script_kart.hpp"

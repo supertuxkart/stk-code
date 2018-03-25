@@ -22,6 +22,7 @@
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
 #include "scriptvec3.hpp"
+#include "scriptengine/aswrappedcall.hpp"
 
 #include <assert.h>
 #include <angelscript.h>
@@ -128,11 +129,24 @@ namespace Scripting
 
         /** @}*/
         /** @}*/
-
-        void registerScriptFunctions(asIScriptEngine *engine)
+        
+        void registerScriptFunctions_Generic(asIScriptEngine *engine)
         {
             int r; // of type asERetCodes
-            engine->SetDefaultNamespace("Kart");
+            
+            r = engine->RegisterGlobalFunction("void squash(int id, float time)", WRAP_FN(squash), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void teleport(int id, const Vec3 &in)", WRAP_FN(teleport), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void setVelocity(int id, const Vec3 &in)", WRAP_FN(setVelocity), asCALL_GENERIC); assert(r >= 0);
+            //r = engine->RegisterGlobalFunction("void jumpTo(int id, float x, float y)", WRAP_FN(jumpTo), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("Vec3 getLocation(int id)", WRAP_FN(getLocation), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("Vec3 getVelocity(int id)", WRAP_FN(getVelocity), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("float getMaxSpeed(int id)", WRAP_FN(getMaxSpeed), asCALL_GENERIC); assert(r >= 0);
+        }
+        
+        void registerScriptFunctions_Native(asIScriptEngine *engine)
+        {
+            int r; // of type asERetCodes
+            
             r = engine->RegisterGlobalFunction("void squash(int id, float time)", asFUNCTION(squash), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void teleport(int id, const Vec3 &in)", asFUNCTION(teleport), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void setVelocity(int id, const Vec3 &in)", asFUNCTION(setVelocity), asCALL_CDECL); assert(r >= 0);
@@ -140,6 +154,20 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("Vec3 getLocation(int id)", asFUNCTION(getLocation), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("Vec3 getVelocity(int id)", asFUNCTION(getVelocity), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("float getMaxSpeed(int id)", asFUNCTION(getMaxSpeed), asCALL_CDECL); assert(r >= 0);
+        }
+        
+        void registerScriptFunctions(asIScriptEngine *engine)
+        {
+            engine->SetDefaultNamespace("Kart");
+            
+            if (strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY"))
+            {
+                registerScriptFunctions_Generic(engine);
+            }
+            else
+            {
+                registerScriptFunctions_Native(engine);
+            }
         }
 
         void registerScriptEnums(asIScriptEngine *engine)

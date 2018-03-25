@@ -22,6 +22,7 @@
 #include "input/device_manager.hpp"
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
+#include "scriptengine/aswrappedcall.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track.hpp"
@@ -135,6 +136,15 @@ namespace Scripting
         {
             ScriptEngine::getInstance()->addPendingTimeout(delay, obj);
         }
+                
+        void setTimeoutDelegate_Generic(asIScriptGeneric *gen)
+        {
+            asIScriptFunction *obj = (asIScriptFunction*)gen->GetArgAddress(0);
+            float delay = gen->GetArgFloat(1);
+            obj->AddRef();
+            ScriptEngine::getInstance()->addPendingTimeout(delay, obj);
+        }
+
 
         /** Log to the console */
         void logInfo(std::string* log)
@@ -180,10 +190,33 @@ namespace Scripting
         }
         /** \endcond */
 
-        void registerScriptFunctions(asIScriptEngine *engine)
+        void registerScriptFunctions_Generic(asIScriptEngine *engine)
         {
             int r; // of type asERetCodes
-            engine->SetDefaultNamespace("Utils");
+            
+            r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in)", WRAP_FN(proxy_insertValues1), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in)", WRAP_FN(proxy_insertValues2), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in, const string &in)", WRAP_FN(proxy_insertValues3), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in, const string &in, const string &in)", WRAP_FN(proxy_insertValues4), asCALL_GENERIC); assert(r >= 0);
+            
+            r = engine->RegisterGlobalFunction("void runScript(string &in)", WRAP_FN(runScript), asCALL_GENERIC); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("int randomInt(int, int)", WRAP_FN(randomInt), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("float randomFloat(int, int)", WRAP_FN(randomFloat), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void setTimeout(const string &in, float)", WRAP_FN(setTimeout), asCALL_GENERIC); assert(r >= 0);
+            
+            r = engine->RegisterFuncdef("void TimeoutCallback()"); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void setTimeoutDelegate(TimeoutCallback@, float)", asFUNCTION(setTimeoutDelegate_Generic), asCALL_GENERIC); assert(r >= 0);
+            //~ r = engine->RegisterGlobalFunction("void setTimeoutDelegate(TimeoutCallback@, float)", WRAP_FN(setTimeoutDelegate), asCALL_GENERIC); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("void logInfo(const string &in)", WRAP_FN(logInfo), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void logWarning(const string &in)", WRAP_FN(logWarning), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void logError(const string &in)", WRAP_FN(logError), asCALL_GENERIC); assert(r >= 0);
+        }
+        
+        void registerScriptFunctions_Native(asIScriptEngine *engine)
+        {
+            int r; // of type asERetCodes
 
             r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in)", asFUNCTION(proxy_insertValues1), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in)", asFUNCTION(proxy_insertValues2), asCALL_CDECL); assert(r >= 0);
@@ -202,6 +235,20 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void logInfo(const string &in)", asFUNCTION(logInfo), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void logWarning(const string &in)", asFUNCTION(logWarning), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void logError(const string &in)", asFUNCTION(logError), asCALL_CDECL); assert(r >= 0);
+        }
+        
+        void registerScriptFunctions(asIScriptEngine *engine)
+        {
+            engine->SetDefaultNamespace("Utils");
+            
+            if (strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY"))
+            {
+                registerScriptFunctions_Generic(engine);
+            }
+            else
+            {
+                registerScriptFunctions_Native(engine);
+            }
         }
     }
 
