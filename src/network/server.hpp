@@ -80,6 +80,8 @@ protected:
      * for localhost or if you are friend with the server owner. */
     std::string m_server_owner_name;
 
+    /* WAN server only, distance based on IP latitude and longitude. */
+    float m_distance;
 public:
 
          /** Initialises the object from an XML node. */
@@ -125,6 +127,8 @@ public:
     // ------------------------------------------------------------------------
     const std::string& getServerOwnerName() const
                                                 { return m_server_owner_name; }
+    // ------------------------------------------------------------------------
+    float getDistance() const                            { return m_distance; }
 
 };   // Server
 #endif // HEADER_SERVER_HPP

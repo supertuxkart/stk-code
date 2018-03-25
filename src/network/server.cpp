@@ -38,6 +38,7 @@ Server::Server(const XMLNode& xml)
     m_server_id = 0;
     m_current_players = 0;
     m_max_players = 0;
+    m_distance = 0.0f;
     unsigned server_data = 0;
     xml.get("game_mode", &server_data);
     m_minor_mode = NetworkConfig::get()->getLocalGameMode(server_data).first;
@@ -61,6 +62,7 @@ Server::Server(const XMLNode& xml)
     m_address.setPort(port);
     xml.get("private_port", &m_private_port);
     xml.get("password", &m_password_protected);
+    xml.get("distance", &m_distance);
     m_server_owner_name = "-";
 
     // Display server owner name if he's your friend or localhost
@@ -122,6 +124,7 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
     m_minor_mode = NetworkConfig::get()->getLocalGameMode(server_mode).first;
     m_major_mode = NetworkConfig::get()->getLocalGameMode(server_mode).second;
     m_password_protected = password_protected;
+    m_distance = 0.0f;
 }   // server(server_id, ...)
 
 // ----------------------------------------------------------------------------

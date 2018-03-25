@@ -103,7 +103,11 @@ void ServerSelection::beforeAddingWidget()
     m_server_list_widget->addColumn(_("Difficulty"), 1);
     m_server_list_widget->addColumn(_("Game mode"), 1);
     if (NetworkConfig::get()->isWAN())
+    {
         m_server_list_widget->addColumn(_("Server owner"), 1);
+        // I18N: In server selection screen, distance to server
+        m_server_list_widget->addColumn(_("Distance"), 1);
+    }
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -148,6 +152,9 @@ void ServerSelection::loadList(unsigned sort_case)
             case 4:
                 return c->getServerOwnerName() > d->getServerOwnerName();
                 break;
+            case 5:
+                return c->getDistance() > d->getDistance();
+                break;
             }   // switch
             assert(false);
             return false;
@@ -173,6 +180,12 @@ void ServerSelection::loadList(unsigned sort_case)
         {
             row.push_back(GUIEngine::ListWidget::ListCell(StringUtils::
                 utf8ToWide(server->getServerOwnerName()), -1, 1, true));
+            // I18N: In server selection screen, unknown distance to server
+            core::stringw distance = _("Unknown");
+            if (!(server->getDistance() < 0.0f))
+                distance = StringUtils::toWString(server->getDistance());
+            row.push_back(GUIEngine::ListWidget::ListCell(distance, -1, 1,
+                true));
         }
         m_server_list_widget->addItem("server", row);
     }
