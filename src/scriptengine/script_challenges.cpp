@@ -30,6 +30,7 @@
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "tracks/track_object_manager.hpp"
+#include "scriptengine/aswrappedcall.hpp"
 
 #include <angelscript.h>
 #include <assert.h>
@@ -107,11 +108,34 @@ namespace Scripting
         /** @}*/
         /** @}*/
 
-        void registerScriptFunctions(asIScriptEngine *engine)
+        void registerScriptFunctions_Generic(asIScriptEngine *engine)
         {
             int r; // of type asERetCodes
+            
+            r = engine->RegisterGlobalFunction("int getCompletedChallengesCount()", 
+                                               WRAP_FN(getCompletedChallengesCount), 
+                                               asCALL_GENERIC); 
+            assert( r >= 0 );
 
-            engine->SetDefaultNamespace("Challenges");
+            r = engine->RegisterGlobalFunction("int getChallengeCount()", 
+                                               WRAP_FN(getChallengeCount), 
+                                               asCALL_GENERIC); 
+            assert( r >= 0 );
+
+            r = engine->RegisterGlobalFunction("bool isChallengeUnlocked(string &in)", 
+                                               WRAP_FN(isChallengeUnlocked), 
+                                               asCALL_GENERIC); 
+            assert( r >= 0 );
+
+            r = engine->RegisterGlobalFunction("int getChallengeRequiredPoints(string &in)", 
+                                               WRAP_FN(getChallengeRequiredPoints), 
+                                               asCALL_GENERIC); 
+            assert( r >= 0 );
+        }
+        
+        void registerScriptFunctions_Native(asIScriptEngine *engine)
+        {
+            int r; // of type asERetCodes
 
             r = engine->RegisterGlobalFunction("int getCompletedChallengesCount()", 
                                                asFUNCTION(getCompletedChallengesCount),
@@ -129,7 +153,21 @@ namespace Scripting
                                                asFUNCTION(getChallengeRequiredPoints),
                                                asCALL_CDECL);
             assert(r >= 0);
-        }   // registerScriptFunctions
+        }
+        
+        void registerScriptFunctions(asIScriptEngine *engine)
+        {
+            engine->SetDefaultNamespace("Challenges");
+            
+            if (strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY"))
+            {
+                registerScriptFunctions_Generic(engine);
+            }
+            else
+            {
+                registerScriptFunctions_Native(engine);
+            }
+        } // registerScriptFunctions
 
     }   // namespace Challenges
 

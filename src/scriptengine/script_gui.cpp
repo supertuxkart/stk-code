@@ -23,6 +23,7 @@
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "modes/world.hpp"
+#include "scriptengine/aswrappedcall.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
@@ -165,11 +166,25 @@ namespace Scripting
             return translate(formatString, arg1, arg2, arg3);
         }
         /** \endcond */
-
-        void registerScriptFunctions(asIScriptEngine *engine)
+        
+        void registerScriptFunctions_Generic(asIScriptEngine *engine)
         {
             int r; // of type asERetCodes
-            engine->SetDefaultNamespace("GUI");
+            
+            r = engine->RegisterGlobalFunction("void displayModalMessage(const string &in)", WRAP_FN(displayModalMessage), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void displayOverlayMessage(const string &in)", WRAP_FN(displayOverlayMessage), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void clearOverlayMessages()", WRAP_FN(clearOverlayMessages), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("string getKeyBinding(int input)", WRAP_FN(getKeyBinding), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("string translate(const string &in)", WRAP_FN(proxy_translate), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("string translate(const string &in, const string &in)", WRAP_FN(proxy_translateAndInsertValues1), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("string translate(const string &in, const string &in, const string &in)", WRAP_FN(proxy_translateAndInsertValues2), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("string translate(const string &in, const string &in, const string &in, const string &in)", WRAP_FN(proxy_translateAndInsertValues3), asCALL_GENERIC); assert(r >= 0);
+        }
+        
+        void registerScriptFunctions_Native(asIScriptEngine *engine)
+        {
+            int r; // of type asERetCodes
+            
             r = engine->RegisterGlobalFunction("void displayModalMessage(const string &in)", asFUNCTION(displayModalMessage), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void displayOverlayMessage(const string &in)", asFUNCTION(displayOverlayMessage), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void clearOverlayMessages()", asFUNCTION(clearOverlayMessages), asCALL_CDECL); assert(r >= 0);
@@ -178,6 +193,20 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("string translate(const string &in, const string &in)", asFUNCTION(proxy_translateAndInsertValues1), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("string translate(const string &in, const string &in, const string &in)", asFUNCTION(proxy_translateAndInsertValues2), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("string translate(const string &in, const string &in, const string &in, const string &in)", asFUNCTION(proxy_translateAndInsertValues3), asCALL_CDECL); assert(r >= 0);
+        }
+        
+        void registerScriptFunctions(asIScriptEngine *engine)
+        {
+            engine->SetDefaultNamespace("GUI");
+            
+            if (strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY"))
+            {
+                registerScriptFunctions_Generic(engine);
+            }
+            else
+            {
+                registerScriptFunctions_Native(engine);
+            }
         }
 
         void registerScriptEnums(asIScriptEngine *engine)
