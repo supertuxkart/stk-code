@@ -120,6 +120,8 @@ public:
     /** Returns the host id of this peer. */
     uint32_t getHostId() const { return m_host_id; }
     // ------------------------------------------------------------------------
+    float getConnectedTime() const { return m_connected_time; }
+    // ------------------------------------------------------------------------
     uint32_t getPing() const;
 
 };   // STKPeer

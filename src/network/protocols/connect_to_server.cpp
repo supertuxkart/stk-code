@@ -166,7 +166,7 @@ void ConnectToServer::asynchronousUpdate()
                 m_current_protocol = hide_address;
                 return;
             }
-            if (m_tried_connection++ > 10)
+            if (m_tried_connection++ > 7)
             {
                 Log::warn("ConnectToServer", "Timeout waiting for"
                     " aloha, trying to connect anyway.");
@@ -212,7 +212,7 @@ void ConnectToServer::asynchronousUpdate()
                 STKHost::get()->startListening();
                 Log::info("ConnectToServer", "Trying to connect to %s",
                     m_server_address.toString().c_str());
-                if (m_tried_connection++ > 3)
+                if (m_tried_connection++ > 1)
                 {
                     Log::error("ConnectToServer", "Timeout connect to %s",
                         m_server_address.toString().c_str());
@@ -294,7 +294,10 @@ void ConnectToServer::update(int ticks)
 // ----------------------------------------------------------------------------
 bool ConnectToServer::handleDirectConnect()
 {
-    if (UserConfigParams::m_random_ports && NetworkConfig::get()->isWAN() &&
+    // Direct connection to server should only possbile if public and private
+    // ports of server are the same
+    if (NetworkConfig::get()->isWAN() &&
+        m_server->getPrivatePort() == m_server->getAddress().getPort() &&
         !STKHost::get()->isClientServer())
     {
         ENetEvent event;
@@ -308,7 +311,7 @@ bool ConnectToServer::handleDirectConnect()
         ENetPeer* p = dc->connectTo(m_server_address);
         if (p)
         {
-            while (enet_host_service(dc->getENetHost(), &event, 1500) != 0)
+            while (enet_host_service(dc->getENetHost(), &event, 2000) != 0)
             {
                 if (event.type == ENET_EVENT_TYPE_CONNECT)
                 {
