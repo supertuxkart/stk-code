@@ -504,15 +504,13 @@ void ProtocolManager::asynchronousUpdate()
     for (unsigned int i = 0; i < m_all_protocols.size(); i++)
     {
         OneProtocolType &opt = m_all_protocols[i];
-        // The lock is likely not necessary, since this function is only
-        // called from the ProtocolManager thread, and this thread is also
+        // We don't need lock here because it can hang the GUI when connecting
+        // to or creating server, since this function is only called from 
+        // the ProtocolManager thread, and this thread is also
         // the only one who changes the number of protocols.
-        // Edit: remove this lock can avoid hanging the GUI when connecting
-        // to or creating server, but you need to make sure async and non-async
-        // update in each protocol will have atomic or mutex write
-        //opt.lock();
+        // But you need to make sure async and non-async
+        // update in each protocol will have atomic or mutex-protected write
         opt.update(0, /*async*/true);  // dt does not matter, so set it to 0
-        //opt.unlock();
     }
 
     PROFILER_POP_CPU_MARKER();
