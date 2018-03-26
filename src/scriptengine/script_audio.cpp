@@ -50,17 +50,15 @@ namespace Scripting
 
         void registerScriptFunctions(asIScriptEngine *engine)
         {
-            int r; // of type asERetCodes
             engine->SetDefaultNamespace("Audio");
             
-            if (strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY"))
-            {
-                r = engine->RegisterGlobalFunction("void playSound(const string &in)", WRAP_FN(playSound), asCALL_GENERIC); assert(r >= 0);
-            }
-            else
-            {
-                r = engine->RegisterGlobalFunction("void playSound(const string &in)", asFUNCTION(playSound), asCALL_CDECL); assert(r >= 0);
-            }
+            bool mp = strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY");
+            asDWORD call_conv = mp ? asCALL_GENERIC : asCALL_CDECL;
+            int r; // of type asERetCodes
+            
+            r = engine->RegisterGlobalFunction("void playSound(const string &in)", 
+                                               mp ? WRAP_FN(playSound) : asFUNCTION(playSound), 
+                                               call_conv); assert(r >= 0);
         }
     }
 
