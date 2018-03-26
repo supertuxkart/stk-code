@@ -22,7 +22,6 @@
 #include "graphics/explosion.hpp"
 #include "graphics/hit_effect.hpp"
 #include "items/projectile_manager.hpp"
-#include "scriptengine/aswrappedcall.hpp"
 
 namespace Scripting
 {
@@ -40,17 +39,12 @@ namespace Scripting
         }
         void registerScriptFunctions(asIScriptEngine *engine)
         {
-            int r;
             engine->SetDefaultNamespace("Physics");
             
-            if (strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY"))
-            {
-                r = engine->RegisterGlobalFunction("string createExplosion(Vec3 &in)", WRAP_FN(createExplosion), asCALL_GENERIC); assert(r >= 0);
-            }
-            else
-            {
-                r = engine->RegisterGlobalFunction("string createExplosion(Vec3 &in)", asFUNCTION(createExplosion), asCALL_GENERIC); assert(r >= 0);
-            }
+            int r;
+            r = engine->RegisterGlobalFunction("string createExplosion(Vec3 &in)", 
+                                               asFUNCTION(createExplosion), 
+                                               asCALL_GENERIC); assert(r >= 0);
         }
     }
 }

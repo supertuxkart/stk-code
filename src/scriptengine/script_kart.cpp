@@ -130,44 +130,41 @@ namespace Scripting
         /** @}*/
         /** @}*/
         
-        void registerScriptFunctions_Generic(asIScriptEngine *engine)
-        {
-            int r; // of type asERetCodes
-            
-            r = engine->RegisterGlobalFunction("void squash(int id, float time)", WRAP_FN(squash), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void teleport(int id, const Vec3 &in)", WRAP_FN(teleport), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void setVelocity(int id, const Vec3 &in)", WRAP_FN(setVelocity), asCALL_GENERIC); assert(r >= 0);
-            //r = engine->RegisterGlobalFunction("void jumpTo(int id, float x, float y)", WRAP_FN(jumpTo), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("Vec3 getLocation(int id)", WRAP_FN(getLocation), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("Vec3 getVelocity(int id)", WRAP_FN(getVelocity), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("float getMaxSpeed(int id)", WRAP_FN(getMaxSpeed), asCALL_GENERIC); assert(r >= 0);
-        }
-        
-        void registerScriptFunctions_Native(asIScriptEngine *engine)
-        {
-            int r; // of type asERetCodes
-            
-            r = engine->RegisterGlobalFunction("void squash(int id, float time)", asFUNCTION(squash), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void teleport(int id, const Vec3 &in)", asFUNCTION(teleport), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void setVelocity(int id, const Vec3 &in)", asFUNCTION(setVelocity), asCALL_CDECL); assert(r >= 0);
-            //r = engine->RegisterGlobalFunction("void jumpTo(int id, float x, float y)", asFUNCTION(jumpTo), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("Vec3 getLocation(int id)", asFUNCTION(getLocation), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("Vec3 getVelocity(int id)", asFUNCTION(getVelocity), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("float getMaxSpeed(int id)", asFUNCTION(getMaxSpeed), asCALL_CDECL); assert(r >= 0);
-        }
-        
         void registerScriptFunctions(asIScriptEngine *engine)
         {
             engine->SetDefaultNamespace("Kart");
             
-            if (strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY"))
-            {
-                registerScriptFunctions_Generic(engine);
-            }
-            else
-            {
-                registerScriptFunctions_Native(engine);
-            }
+            bool mp = strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY");
+            asDWORD call_conv = mp ? asCALL_GENERIC : asCALL_CDECL;
+            int r; // of type asERetCodes
+            
+            r = engine->RegisterGlobalFunction("void squash(int id, float time)", 
+                                               mp ? WRAP_FN(squash) : asFUNCTION(squash), 
+                                               call_conv); assert(r >= 0);
+                                               
+            r = engine->RegisterGlobalFunction("void teleport(int id, const Vec3 &in)", 
+                                               mp ? WRAP_FN(teleport) : asFUNCTION(teleport), 
+                                               call_conv); assert(r >= 0);
+                                               
+            r = engine->RegisterGlobalFunction("void setVelocity(int id, const Vec3 &in)", 
+                                               mp ? WRAP_FN(setVelocity) : asFUNCTION(setVelocity), 
+                                               call_conv); assert(r >= 0);
+                                               
+            //r = engine->RegisterGlobalFunction("void jumpTo(int id, float x, float y)", 
+            //                                   mp ? WRAP_FN(jumpTo) : asFUNCTION(jumpTo), 
+            //                                   call_conv); assert(r >= 0);
+            
+            r = engine->RegisterGlobalFunction("Vec3 getLocation(int id)", 
+                                               mp ? WRAP_FN(getLocation) : asFUNCTION(getLocation), 
+                                               call_conv); assert(r >= 0);
+                                               
+            r = engine->RegisterGlobalFunction("Vec3 getVelocity(int id)", 
+                                               mp ? WRAP_FN(getVelocity) : asFUNCTION(getVelocity), 
+                                               call_conv); assert(r >= 0);
+                                               
+            r = engine->RegisterGlobalFunction("float getMaxSpeed(int id)", 
+                                               mp ? WRAP_FN(getMaxSpeed) : asFUNCTION(getMaxSpeed), 
+                                               call_conv); assert(r >= 0);
         }
 
         void registerScriptEnums(asIScriptEngine *engine)
