@@ -15,23 +15,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#define DEBUG_MENU_ITEM 0
-
 #include "states_screens/create_server_screen.hpp"
 
 #include "audio/sfx_manager.hpp"
-#include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "modes/demo_world.hpp"
-#include "network/protocols/lobby_protocol.hpp"
 #include "network/network_config.hpp"
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
-#include "states_screens/dialogs/server_info_dialog.hpp"
 #include "utils/separate_process.hpp"
 #include "utils/translation.hpp"
 
@@ -88,7 +81,6 @@ void CreateServerScreen::loadedFromFile()
 void CreateServerScreen::init()
 {
     Screen::init();
-    DemoWorld::resetIdleTime();
     m_info_widget->setText("", false);
     LabelWidget *title = getWidget<LabelWidget>("title");
 
@@ -163,8 +155,7 @@ void CreateServerScreen::updateMoreOption(int game_mode)
             m_more_options_spinner->addLabel(_("Disabled"));
             for (int i = 1; i <= 20; i++)
             {
-                m_more_options_spinner->addLabel
-                    (StringUtils::utf8ToWide(StringUtils::toString(i)));
+                m_more_options_spinner->addLabel(StringUtils::toWString(i));
             }
             m_more_options_spinner->setValue(0);
             break;
