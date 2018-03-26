@@ -34,10 +34,10 @@ STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
        : m_peer_address(enet_peer->address), m_host(host)
 {
     m_enet_peer           = enet_peer;
-    m_client_server_token = 0;
     m_host_id             = host_id;
-    m_token_set           = false;
     m_connected_time      = (float)StkTime::getRealTime();
+    m_token_set.store(false);
+    m_client_server_token.store(0);
 }   // STKPeer
 
 //-----------------------------------------------------------------------------

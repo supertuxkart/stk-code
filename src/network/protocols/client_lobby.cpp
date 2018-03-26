@@ -435,7 +435,8 @@ void ClientLobby::connectionAccepted(Event* event)
         NetworkConfig::get()->getNetworkPlayers().size());
     // connection token
     uint32_t token = data.getToken();
-    peer->setClientServerToken(token);
+    if (!peer->isClientServerTokenSet())
+        peer->setClientServerToken(token);
     m_state = CONNECTED;
 }   // connectionAccepted
 
@@ -656,7 +657,6 @@ void ClientLobby::exitResultScreen(Event *event)
     setup();
 
     RaceResultGUI::getInstance()->backToLobby();
-    STKHost::get()->getServerPeerForClient()->unsetClientServerToken();
 }   // exitResultScreen
 
 //-----------------------------------------------------------------------------

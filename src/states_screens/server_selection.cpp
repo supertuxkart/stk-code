@@ -104,7 +104,9 @@ void ServerSelection::beforeAddingWidget()
     m_server_list_widget->addColumn(_("Game mode"), 2);
     if (NetworkConfig::get()->isWAN())
     {
-        m_server_list_widget->addColumn(_("Server owner"), 1);
+        // I18N: In server selection screen, owner of server, only displayed
+        // if it's localhost or friends'
+        m_server_list_widget->addColumn(_("Owner"), 1);
         // I18N: In server selection screen, distance to server
         m_server_list_widget->addColumn(_("Distance"), 1);
     }

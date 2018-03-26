@@ -63,15 +63,6 @@ Event::Event(ENetEvent* event, std::shared_ptr<STKPeer> peer)
     }
 
     m_peer = peer;
-    if(m_type == EVENT_TYPE_MESSAGE && m_peer->isClientServerTokenSet() &&
-        m_data->getToken()!=m_peer->getClientServerToken() )
-    {
-        Log::error("Event", "Received event with invalid token!");
-        Log::error("Event", "HostID %d Token %d message token %d",
-            m_peer->getHostId(), m_peer->getClientServerToken(),
-            m_data->getToken());
-        Log::error("Event", m_data->getLogMessage().c_str());
-    }
 }   // Event(ENetEvent)
 
 // ----------------------------------------------------------------------------

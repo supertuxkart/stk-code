@@ -29,6 +29,7 @@
 
 #include <enet/enet.h>
 
+#include <atomic>
 #include <memory>
 #include <vector>
 
@@ -55,10 +56,10 @@ protected:
     ENetPeer* m_enet_peer;
 
     /** The token of this client. */
-    uint32_t m_client_server_token;
+    std::atomic_uint32_t m_client_server_token;
 
     /** True if the token for this peer has been set. */
-    bool m_token_set;
+    std::atomic_bool m_token_set;
 
     /** Host id of this peer. */
     int m_host_id;
@@ -99,28 +100,31 @@ public:
                                                     { m_players.push_back(p); }
     // ------------------------------------------------------------------------
     /** Sets the token for this client. */
-    void setClientServerToken(const uint32_t& token)
+    void setClientServerToken(const uint32_t token)
     {
-        m_client_server_token = token; 
-        m_token_set = true;
+        m_client_server_token.store(token);
+        m_token_set.store(true);
     }   // setClientServerToken
     // ------------------------------------------------------------------------
+    /** Unsets the token for this client. (used in server to invalidate peer)
+     */
     void unsetClientServerToken()
     {
-        m_token_set = false;
-        m_client_server_token = 0;
+        m_client_server_token.store(0);
+        m_token_set.store(false);
     }
     // ------------------------------------------------------------------------
     /** Returns the token of this client. */
-    uint32_t getClientServerToken() const { return m_client_server_token; }
+    uint32_t getClientServerToken() const
+                                       { return m_client_server_token.load(); }
     // ------------------------------------------------------------------------
     /** Returns if the token for this client is known. */
-    bool isClientServerTokenSet() const { return m_token_set; }
+    bool isClientServerTokenSet() const          { return m_token_set.load(); }
     // ------------------------------------------------------------------------
     /** Returns the host id of this peer. */
-    uint32_t getHostId() const { return m_host_id; }
+    uint32_t getHostId() const                            { return m_host_id; }
     // ------------------------------------------------------------------------
-    float getConnectedTime() const { return m_connected_time; }
+    float getConnectedTime() const                 { return m_connected_time; }
     // ------------------------------------------------------------------------
     uint32_t getPing() const;
 

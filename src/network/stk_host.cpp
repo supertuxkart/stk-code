@@ -707,10 +707,11 @@ void STKHost::mainLoop()
     Log::info("STKHost", "Listening has been started.");
     ENetEvent event;
     ENetHost* host = m_network->getENetHost();
+    const bool is_server = NetworkConfig::get()->isServer();
 
     // A separate network connection (socket) to handle LAN requests.
     Network* direct_socket = NULL;
-    if ((NetworkConfig::get()->isLAN() && NetworkConfig::get()->isServer()) ||
+    if ((NetworkConfig::get()->isLAN() && is_server) ||
         NetworkConfig::get()->isPublicServer())
     {
         TransportAddress address(0,
@@ -733,6 +734,32 @@ void STKHost::mainLoop()
         {
             handleDirectSocketRequest(direct_socket, sl);
         }   // if discovery host
+
+        if (is_server)
+        {
+            std::unique_lock<std::mutex> peer_lock(m_peers_mutex);
+            // Remove any peer which has no token for 7 seconds
+            // The token is set when the first connection request has happened
+            for (auto it = m_peers.begin(); it != m_peers.end();)
+            {
+                if (!it->second->isClientServerTokenSet() &&
+                    (float)StkTime::getRealTime() >
+                    it->second->getConnectedTime() + 7.0f)
+                {
+                    Log::info("STKHost", "%s has no token for more than 7"
+                        " seconds, disconnect it by force.",
+                        it->second->getAddress().toString().c_str());
+                    enet_host_flush(host);
+                    enet_peer_reset(it->first);
+                    it = m_peers.erase(it);
+                }
+                else
+                {
+                    it++;
+                }
+            }
+            peer_lock.unlock();
+        }
 
         std::list<std::tuple<ENetPeer*, ENetPacket*, uint32_t,
             ENetCommandType> > copied_list;
@@ -805,7 +832,39 @@ void STKHost::mainLoop()
 
             if (!stk_event && m_peers.find(event.peer) != m_peers.end())
             {
-                stk_event = new Event(&event, m_peers.at(event.peer));
+                auto& peer = m_peers.at(event.peer);
+                unsigned token = 0;
+                // Token is after the protocol type (1 byte) in stk network
+                // string (network order)
+                token += event.packet->data[1];
+                token <<= 8;
+                token += event.packet->data[2];
+                token <<= 8;
+                token += event.packet->data[3];
+                token <<= 8;
+                token += event.packet->data[4];
+
+                if (is_server && ((!peer->isClientServerTokenSet() &&
+                    !isConnectionRequestPacket(event.packet->data,
+                    (int)event.packet->dataLength)) ||
+                    (token != peer->getClientServerToken())))
+                {
+                    // For server discard all events from wrong or unset token
+                    // peers if that is not a connection request
+                    if (token != peer->getClientServerToken())
+                    {
+                        Log::error("STKHost", "Received event with invalid token!");
+                        Log::error("STKHost", "HostID %d Token %d message token %d",
+                            peer->getHostId(), peer->getClientServerToken(), token);
+                        NetworkString wrong_event(event.packet->data,
+                            (int)event.packet->dataLength);
+                        Log::error("STKHost", wrong_event.getLogMessage().c_str());
+                        peer->unsetClientServerToken();
+                    }
+                    enet_packet_destroy(event.packet);
+                    continue;
+                }
+                stk_event = new Event(&event, peer);
             }
             else if (!stk_event)
             {
@@ -980,7 +1039,8 @@ void STKHost::sendPacketToAllPeers(NetworkString *data, bool reliable)
     std::lock_guard<std::mutex> lock(m_peers_mutex);
     for (auto p : m_peers)
     {
-        p.second->sendPacket(data, reliable);
+        if (p.second->isClientServerTokenSet())
+            p.second->sendPacket(data, reliable);
     }
 }   // sendPacketExcept
 
@@ -997,7 +1057,7 @@ void STKHost::sendPacketExcept(STKPeer* peer, NetworkString *data,
     for (auto p : m_peers)
     {
         STKPeer* stk_peer = p.second.get();
-        if (!stk_peer->isSamePeer(peer))
+        if (!stk_peer->isSamePeer(peer) && p.second->isClientServerTokenSet())
         {
             stk_peer->sendPacket(data, reliable);
         }
@@ -1059,3 +1119,13 @@ void STKHost::replaceNetwork(ENetEvent& event, Network* network)
     if (pm && !pm->isExiting())
         pm->propagateEvent(new Event(&event, stk_peer));
 }   // replaceNetwork
+
+//-----------------------------------------------------------------------------
+bool STKHost::isConnectionRequestPacket(unsigned char* data, int length)
+{
+    if (length < 6)
+        return false;
+    // Connection request is not synchronous
+    return (uint8_t)data[0] == PROTOCOL_LOBBY_ROOM &&
+        (uint8_t)data[5] == LobbyProtocol::LE_CONNECTION_REQUESTED;
+}   // isConnectionRequestPacket

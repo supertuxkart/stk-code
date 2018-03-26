@@ -913,16 +913,19 @@ void ServerLobby::connectionRequested(Event* event)
         m_available_kts.second.erase(track_erase);
     }
 
-    // Now answer to the peer that just connected
-    // ------------------------------------------
-    RandomGenerator token_generator;
-    // use 4 random numbers because rand_max is probably 2^15-1.
-    uint32_t token = (uint32_t)((token_generator.get(RAND_MAX) & 0xff) << 24 |
-                                (token_generator.get(RAND_MAX) & 0xff) << 16 |
-                                (token_generator.get(RAND_MAX) & 0xff) <<  8 |
-                                (token_generator.get(RAND_MAX) & 0xff));
+    if (!peer->isClientServerTokenSet())
+    {
+        // Now answer to the peer that just connected
+        // ------------------------------------------
+        RandomGenerator token_generator;
+        // use 4 random numbers because rand_max is probably 2^15-1.
+        uint32_t token = (uint32_t)((token_generator.get(RAND_MAX) & 0xff) << 24 |
+                                    (token_generator.get(RAND_MAX) & 0xff) << 16 |
+                                    (token_generator.get(RAND_MAX) & 0xff) <<  8 |
+                                    (token_generator.get(RAND_MAX) & 0xff));
 
-    peer->setClientServerToken(token);
+        peer->setClientServerToken(token);
+    }
     // send a message to the one that asked to connect
     NetworkString *message_ack = getNetworkString(4);
     // connection success -- return the host id of peer

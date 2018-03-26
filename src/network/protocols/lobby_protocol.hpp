@@ -38,8 +38,8 @@ class LobbyProtocol : public Protocol
 {
 public:
     /** Lists all lobby events (LE). */
-    enum 
-    { 
+    enum : uint8_t
+    {
         LE_CONNECTION_REQUESTED   = 1,    // a connection to the server
         LE_CONNECTION_REFUSED,            // Connection to server refused
         LE_CONNECTION_ACCEPTED,           // Connection to server accepted
