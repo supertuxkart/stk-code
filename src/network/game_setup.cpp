@@ -36,14 +36,6 @@ GameSetup::GameSetup()
 }   // GameSetup
 
 //-----------------------------------------------------------------------------
-void GameSetup::addPlayer(std::shared_ptr<NetworkPlayerProfile> profile)
-{
-    m_players.push_back(profile);
-    Log::info("GameSetup", "New player in the game setup. Player name : %s.",
-        StringUtils::wideToUtf8(profile->getName()).c_str());
-}   // addPlayer
-
-//-----------------------------------------------------------------------------
 /** Update and see if any player disconnects.
  *  \param remove_disconnected_players remove the disconnected players,
  *  otherwise replace with AI (when racing), so this function must be called

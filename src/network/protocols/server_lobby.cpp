@@ -935,10 +935,13 @@ void ServerLobby::connectionRequested(Event* event)
 
     m_peers_ready[peer] = false;
     for (std::shared_ptr<NetworkPlayerProfile> npp : peer->getPlayerProfiles())
+    {
         m_game_setup->addPlayer(npp);
+        Log::info("ServerLobby", "New player %s with online id %u from %s.",
+            StringUtils::wideToUtf8(npp->getName()).c_str(),
+            npp->getOnlineId(), peer->getAddress().toString().c_str());
+    }
     updatePlayerList();
-    Log::verbose("ServerLobby", "New player.");
-
 }   // connectionRequested
 
 //-----------------------------------------------------------------------------

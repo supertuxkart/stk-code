@@ -63,7 +63,8 @@ public:
     // ------------------------------------------------------------------------
     ~GameSetup() {}
     // ------------------------------------------------------------------------
-    void addPlayer(std::shared_ptr<NetworkPlayerProfile> profile);
+    void addPlayer(std::shared_ptr<NetworkPlayerProfile> profile)
+                                              { m_players.push_back(profile); }
     // ------------------------------------------------------------------------
     void update(bool remove_disconnected_players);
     // ------------------------------------------------------------------------
