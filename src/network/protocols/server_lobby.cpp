@@ -26,7 +26,6 @@
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocols/connect_to_peer.hpp"
-#include "network/protocols/latency_protocol.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
@@ -613,10 +612,6 @@ void ServerLobby::startSelection(const Event *event)
 
     // Will be changed after the first vote received
     m_timeout.store(std::numeric_limits<float>::max());
-
-    std::make_shared<LatencyProtocol>()->requestStart();
-    Log::info("LobbyProtocol", "LatencyProtocol started.");
-
 }   // startSelection
 
 //-----------------------------------------------------------------------------
@@ -1217,7 +1212,6 @@ void ServerLobby::startedRaceOnClient(Event *event)
         m_server_delay = StkTime::getRealTime() + 0.1;
         Log::verbose("ServerLobby", "Started delay at %lf set delay to %lf",
             StkTime::getRealTime(), m_server_delay);
-        terminateLatencyProtocol();
     }
 }   // startedRaceOnClient
 

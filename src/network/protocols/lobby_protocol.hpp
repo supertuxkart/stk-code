@@ -114,7 +114,6 @@ public:
     virtual void finishedLoadingWorld() = 0;
     virtual void loadWorld();
     virtual bool waitingForPlayers() const = 0;
-    void terminateLatencyProtocol();
     GameSetup* getGameSetup() const { return m_game_setup; }
 
 };   // class LobbyProtocol

@@ -24,10 +24,8 @@
 #include "modes/world.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_player_profile.hpp"
-#include "network/protocol_manager.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
-#include "network/protocols/latency_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
 #include "race/race_manager.hpp"
@@ -135,14 +133,6 @@ void LobbyProtocol::configRemoteKart(
     }   // for i in players
     Log::info("LobbyProtocol", "Player configuration ready.");
 }   // configRemoteKart
-
-// ----------------------------------------------------------------------------
-/** Terminates the LatencyProtocol.
- */
-void LobbyProtocol::terminateLatencyProtocol()
-{
-    ProtocolManager::lock()->findAndTerminate(PROTOCOL_SYNCHRONIZATION);
-}   // stopLatencyProtocol
 
 //-----------------------------------------------------------------------------
 /** A previous GameSetup is deleted and a new one is created.

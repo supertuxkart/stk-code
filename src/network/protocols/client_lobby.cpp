@@ -30,7 +30,6 @@
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/protocols/latency_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -339,8 +338,6 @@ void ClientLobby::update(int ticks)
             screen->push();
         }
         m_state = SELECTING_KARTS;
-        std::make_shared<LatencyProtocol>()->requestStart();
-        Log::info("LobbyProtocol", "LatencyProtocol started.");
     }
     break;
     case SELECTING_KARTS:
@@ -567,7 +564,6 @@ void ClientLobby::startingRaceNow()
     sendToServer(ns, /*reliable*/true);
     Log::verbose("ClientLobby", "StartingRaceNow at %lf",
                  StkTime::getRealTime());
-    terminateLatencyProtocol();
 }   // startingRaceNow
 
 //-----------------------------------------------------------------------------
