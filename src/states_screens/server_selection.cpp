@@ -98,10 +98,10 @@ void ServerSelection::loadedFromFile()
 void ServerSelection::beforeAddingWidget()
 {
     m_server_list_widget->clearColumns();
-    m_server_list_widget->addColumn( _("Name"), 2 );
+    m_server_list_widget->addColumn( _("Name"), 3);
     m_server_list_widget->addColumn( _("Players"), 1);
     m_server_list_widget->addColumn(_("Difficulty"), 1);
-    m_server_list_widget->addColumn(_("Game mode"), 1);
+    m_server_list_widget->addColumn(_("Game mode"), 2);
     if (NetworkConfig::get()->isWAN())
     {
         m_server_list_widget->addColumn(_("Server owner"), 1);
@@ -166,15 +166,15 @@ void ServerSelection::loadList(unsigned sort_case)
         num_players.append("/");
         num_players.append(StringUtils::toWString(server->getMaxPlayers()));
         std::vector<GUIEngine::ListWidget::ListCell> row;
-        row.push_back(GUIEngine::ListWidget::ListCell(server->getName(),-1,3));
-        row.push_back(GUIEngine::ListWidget::ListCell(num_players,-1,1,true));
+        row.push_back(GUIEngine::ListWidget::ListCell(server->getName(), -1, 3));
+        row.push_back(GUIEngine::ListWidget::ListCell(num_players, -1, 1, true));
 
         core::stringw difficulty =
             race_manager->getDifficultyName(server->getDifficulty());
         row.push_back(GUIEngine::ListWidget::ListCell(difficulty, -1, 1, true));
 
         core::stringw mode = RaceManager::getNameOf(server->getRaceMinorMode());
-        row.push_back(GUIEngine::ListWidget::ListCell(mode, -1, 1, true));
+        row.push_back(GUIEngine::ListWidget::ListCell(mode, -1, 2, true));
 
         if (NetworkConfig::get()->isWAN())
         {
