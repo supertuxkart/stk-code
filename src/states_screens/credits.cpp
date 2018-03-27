@@ -29,6 +29,7 @@ using irr::core::stringc;
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
+#include "online/link_helper.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -389,6 +390,10 @@ void CreditsScreen::eventCallback(GUIEngine::Widget* widget,
     if (name == "back")
     {
         StateManager::get()->escapePressed();
+    }
+    if (name == "donate")
+    {
+        Online::LinkHelper::OpenURL("https://SuperTuxKart.net/Donate"); // Open donation page
     }
 }
 

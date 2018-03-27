@@ -20,10 +20,12 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "audio/sfx_manager.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include "online/link_helper.hpp"
 #include "online/xml_request.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -182,6 +184,17 @@ void RegisterScreen::makeEntryFieldsVisible()
         getWidget<TextBoxWidget>("email_confirm")->setVisible(new_account);
         getWidget<LabelWidget  >("label_email_confirm")->setVisible(new_account);
     }
+
+    getWidget<ButtonWidget >("password_reset")->setVisible(online && !new_account);
+//    if (online && !new_account)
+//    {
+//        getWidget<ButtonWidget>("password_reset")->m_properties[GUIEngine::PROP_HEIGHT] = "100";
+//    }
+//    else
+//    {
+//        getWidget<ButtonWidget>("password_reset")->m_properties[GUIEngine::PROP_HEIGHT] = "0";
+//    }
+//    calculateLayout();
 }   // makeEntryFieldsVisible
 
 // -----------------------------------------------------------------------------
@@ -426,6 +439,10 @@ void RegisterScreen::eventCallback(Widget* widget, const std::string& name,
             StateManager::get()->popMenu();
             onEscapePressed();
         }
+    }
+    else if (name == "password_reset")
+    {
+        Online::LinkHelper::OpenURL("http://addons.SuperTuxKart.net/password-reset.php"); // Open password reset page
     }
     else if (name == "back")
     {
