@@ -108,7 +108,7 @@ void ServerSelection::beforeAddingWidget()
         // if it's localhost or friends'
         m_server_list_widget->addColumn(_("Owner"), 1);
         // I18N: In server selection screen, distance to server
-        m_server_list_widget->addColumn(_("Distance"), 1);
+        m_server_list_widget->addColumn(_("Distance (km)"), 1);
     }
 }   // beforeAddingWidget
 

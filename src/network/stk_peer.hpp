@@ -56,7 +56,7 @@ protected:
     ENetPeer* m_enet_peer;
 
     /** The token of this client. */
-    std::atomic_uint32_t m_client_server_token;
+    std::atomic<uint32_t> m_client_server_token;
 
     /** True if the token for this peer has been set. */
     std::atomic_bool m_token_set;
