@@ -7,6 +7,10 @@
 #endif
 #include <new>
 
+#ifdef GetObject
+#undef GetObject
+#endif
+
 namespace gw {
 
 template <typename T> class Proxy {
