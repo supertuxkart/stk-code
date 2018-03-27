@@ -57,16 +57,25 @@ public:
                     const irr::core::stringw& user_name, int host_id,
                     bool network)
                   : m_kart_name(kart_name), m_user_name(user_name),
-                    m_local_player_id(player_id), m_host_id(host_id),
-                    m_soccer_team(SOCCER_TEAM_NONE), m_network_player(network),
-                    m_difficulty(PLAYER_DIFFICULTY_NORMAL)
+                    m_local_player_id(player_id), m_global_player_id(-1),
+                    m_host_id(host_id), m_soccer_team(SOCCER_TEAM_NONE),
+                    m_network_player(network),
+                    m_difficulty(PLAYER_DIFFICULTY_NORMAL),
+                    m_default_kart_color(0.0f)
      {}
      RemoteKartInfo(const std::string& kart_name) : m_kart_name(kart_name),
-                    m_user_name(""), m_local_player_id(-1), m_host_id(-1),
-                    m_difficulty(PLAYER_DIFFICULTY_NORMAL)
+                    m_user_name(""), m_local_player_id(-1),
+                    m_global_player_id(-1), m_host_id(-1),
+                    m_soccer_team(SOCCER_TEAM_NONE), m_network_player(false),
+                    m_difficulty(PLAYER_DIFFICULTY_NORMAL),
+                    m_default_kart_color(0.0f)
      {}
-     RemoteKartInfo() : m_kart_name(""), m_user_name(""), m_local_player_id(-1),
-                    m_host_id(-1), m_difficulty(PLAYER_DIFFICULTY_NORMAL)
+     RemoteKartInfo() : m_kart_name(""), m_user_name(""),
+                    m_local_player_id(-1), m_global_player_id(-1),
+                    m_host_id(-1), m_soccer_team(SOCCER_TEAM_NONE),
+                    m_network_player(false),
+                    m_difficulty(PLAYER_DIFFICULTY_NORMAL),
+                    m_default_kart_color(0.0f)
      {}
     void setKartName(const std::string& n)   { m_kart_name = n;           }
     void setPlayerName(const irr::core::stringw& u) { m_user_name = u;    }

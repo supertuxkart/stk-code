@@ -382,6 +382,7 @@ void KartSelectionScreen::init()
 
     if (!NetworkConfig::get()->isNetworking())
     {
+        StateManager::get()->resetActivePlayers();
         if (!m_multiplayer)
         {
             joinPlayer(input_manager->getDeviceManager()->getLatestUsedDevice(),
