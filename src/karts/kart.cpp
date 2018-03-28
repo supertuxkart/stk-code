@@ -118,7 +118,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_max_speed            = new MaxSpeed(this);
     m_terrain_info         = new TerrainInfo();
     m_powerup              = new Powerup(this);
-    m_last_used_powerup    = new PowerupManager::PowerupType();
+    m_last_used_powerup    = PowerupManager::POWERUP_NOTHING;
     m_vehicle              = NULL;
     m_initial_position     = position;
     m_race_position        = position;
@@ -291,7 +291,6 @@ Kart::~Kart()
     delete m_max_speed;
     delete m_terrain_info;
     delete m_powerup;
-    delete m_last_used_powerup;
 
     if(m_controller)
         delete m_controller;
