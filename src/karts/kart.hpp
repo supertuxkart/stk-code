@@ -88,7 +88,7 @@ protected:
     Powerup *m_powerup;
     
     /** Remember the last **used** powerup type of a kart for AI purposes. */
-    PowerupManager::PowerupType *m_last_used_powerup;
+    PowerupManager::PowerupType m_last_used_powerup;
 
     /** True if kart is flying (for debug purposes only). */
     bool m_flying;
@@ -321,7 +321,7 @@ public:
     virtual Powerup* getPowerup() { return m_powerup; }
     // ------------------------------------------------------------------------
     /** Returns the last used powerup. */
-    virtual PowerupManager::PowerupType* getLastUsedPowerup() { return m_last_used_powerup; }
+    virtual PowerupManager::PowerupType getLastUsedPowerup() { return m_last_used_powerup; }
     // ------------------------------------------------------------------------
     /** Returns the number of powerups. */
     virtual int getNumPowerup() const;
