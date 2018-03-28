@@ -161,7 +161,7 @@ bool ProjectileManager::projectileIsClose(const AbstractKart * const kart,
  *  \param radius Distance within which the projectile must be.
  *  \param type The type of projectile checked
 */
-int ProjectileManager::projectileCloseType(const AbstractKart * const kart,
+int ProjectileManager::getNearbyProjectileCount(const AbstractKart * const kart,
                                          float radius, PowerupManager::PowerupType type)
 {
     float r2 = radius*radius;
@@ -181,4 +181,4 @@ int ProjectileManager::projectileCloseType(const AbstractKart * const kart,
         }
     }
     return projectileCount;
-}   // projectileCloseType
+}   // getNearbyProjectileCount
