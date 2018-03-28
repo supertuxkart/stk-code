@@ -155,42 +155,30 @@ bool ProjectileManager::projectileIsClose(const AbstractKart * const kart,
 }   // projectileIsClose
 
 // -----------------------------------------------------------------------------
-/** Returns ABCD with D, C, B and A the numbers of bowling balls, plungers, cakes
- *  and basket balls respectively within the given distance of the specified kart.
- *  It overflows if the answer is over 9, which is bad in theory but
- *  harmless in practice
+/** Returns an int containing the numbers of a given flyable in a given radius
+ *  around the kart
  *  \param kart The kart for which the test is done.
  *  \param radius Distance within which the projectile must be.
+ *  \param type The type of projectile checked
 */
 int ProjectileManager::projectileCloseType(const AbstractKart * const kart,
-                                         float radius)
+                                         float radius, PowerupManager::PowerupType type)
 {
     float r2 = radius*radius;
-    int counter = 0;
+    int projectileCount = 0;
 
     for(Projectiles::iterator i  = m_active_projectiles.begin();
                               i != m_active_projectiles.end();   i++)
     {
-        float dist2 = (*i)->getXYZ().distance2(kart->getXYZ());
-        if(dist2<r2)
+        if ((*i)->getType() == type)
         {
-            if ((*i)->getType() == PowerupManager::POWERUP_BOWLING)
+            float dist2 = (*i)->getXYZ().distance2(kart->getXYZ());
+            if(dist2<r2)
             {
-                counter = counter + 1;   
-            }
-            else if ((*i)->getType() == PowerupManager::POWERUP_PLUNGER)
-            {
-                counter = counter + 10;   
-            }
-            else if ((*i)->getType() == PowerupManager::POWERUP_CAKE)
-            {
-                counter = counter + 100;   
-            }
-            else if ((*i)->getType() == PowerupManager::POWERUP_RUBBERBALL)
-            {
-                counter = counter + 1000;   
+
+                projectileCount++;
             }
         }
     }
-    return counter;
+    return projectileCount;
 }   // projectileCloseType
