@@ -1242,13 +1242,30 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
     // -----------------------------------------
     float min_bubble_time = 2.0f;
 
-    int projectile_types = 0; //ABCD : A basket, B cakes, C plunger, D bowling
-    projectile_types = projectile_manager->projectileCloseType(m_kart,
-                                    m_ai_properties->m_shield_incoming_radius);
+    int projectile_types[4]; //[3] basket, [2] cakes, [1] plunger, [0] bowling
+    projectile_types[0] = projectile_manager->projectileCloseType(m_kart,
+                                    m_ai_properties->m_shield_incoming_radius, PowerupManager::POWERUP_BOWLING);
+    projectile_types[1] = projectile_manager->projectileCloseType(m_kart,
+                                    m_ai_properties->m_shield_incoming_radius, PowerupManager::POWERUP_PLUNGER);
+    projectile_types[2] = projectile_manager->projectileCloseType(m_kart,
+                                    m_ai_properties->m_shield_incoming_radius, PowerupManager::POWERUP_CAKE);
+    projectile_types[3] = projectile_manager->projectileCloseType(m_kart,
+                                    m_ai_properties->m_shield_incoming_radius, PowerupManager::POWERUP_RUBBERBALL);
    
     bool projectile_is_close = false;
-    projectile_is_close = projectile_manager->projectileIsClose(m_kart,
-                                    m_ai_properties->m_shield_incoming_radius);
+    float shield_radius = m_ai_properties->m_shield_incoming_radius;
+    if (m_kart->getBoostAI() == true)
+    {
+        if (shield_radius == 0)
+        {
+            shield_radius = 15;
+        }
+        else if (shield_radius >= 3)
+        {
+            shield_radius = shield_radius - 2;
+        }
+    }
+    projectile_is_close = projectile_manager->projectileIsClose(m_kart, shield_radius);
 
     // Preparing item list for item aware actions
 
@@ -1311,11 +1328,11 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
            if(ai_skill == 3) //don't protect against cakes
            {
               if( !m_kart->isShielded() && projectile_is_close
-                 && (projectile_types % 1000)/100 == 0)
+                 && projectile_types[2] == 0)
               {
                  //don't discard swatter against plunger
-                 if( (projectile_types % 100)/10 == 0
-                    || ((projectile_types % 100)/10 >= 1 && type != Attachment::ATTACH_SWATTER))
+                 if( projectile_types[1] == 0
+                    || (projectile_types[1] >= 1 && type != Attachment::ATTACH_SWATTER))
                  {
                     m_controls->setFire(true);
                     m_controls->setLookBack(false);
@@ -1328,8 +1345,8 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
               if( !m_kart->isShielded() && projectile_is_close)
               {
                  //don't discard swatter against plunger
-                 if( (projectile_types % 100)/10 == 0
-                    || ((projectile_types % 100)/10 >= 1 && type != Attachment::ATTACH_SWATTER))
+                 if( projectile_types[1] == 0
+                    || (projectile_types[1] >= 1 && type != Attachment::ATTACH_SWATTER))
                  {
                     m_controls->setFire(true);
                     m_controls->setLookBack(false);
@@ -1341,8 +1358,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
            {
               if( !m_kart->isShielded() && projectile_is_close)
               {
-                 if ((projectile_types % 10000)/100 >=1
-                     || (projectile_types % 10) >=1 )
+                 if (projectile_types[0] >=1 || projectile_types[2] >=1 || projectile_types[3] >=1 )
                  {
                     m_controls->setFire(true);
                     m_controls->setLookBack(false);
