@@ -66,7 +66,7 @@ public:
     bool             projectileIsClose(const AbstractKart * const kart,
                                        float radius);
 
-    int             projectileCloseType(const AbstractKart * const kart,
+    int              getNearbyProjectileCount(const AbstractKart * const kart,
                                        float radius, PowerupManager::PowerupType type);
     // ------------------------------------------------------------------------
     /** Adds a special hit effect to be shown.
