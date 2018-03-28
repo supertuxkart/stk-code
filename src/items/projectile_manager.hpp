@@ -65,12 +65,9 @@ public:
     void             removeTextures   ();
     bool             projectileIsClose(const AbstractKart * const kart,
                                        float radius);
-    // if the int in decimal is ABCD, then there is D bowling balls ;
-    // C is plungers ; B is cakes ; A is basket balls
-    // Warning : radius is not meant to encompass the whole track
-    // An overflow may happen in that unintended case.
-    int              projectileCloseType(const AbstractKart * const kart,
-                                       float radius);
+
+    int             projectileCloseType(const AbstractKart * const kart,
+                                       float radius, PowerupManager::PowerupType type);
     // ------------------------------------------------------------------------
     /** Adds a special hit effect to be shown.
      *  \param hit_effect The hit effect to be added. */
