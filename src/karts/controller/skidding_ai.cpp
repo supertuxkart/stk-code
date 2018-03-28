@@ -1637,7 +1637,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
                    if (items_to_collect[i]->getType() == Item::ITEM_BONUS_BOX)
                    {
                       good = 2;
-                     i = -1;
+                      i = -1;
                    }
                   else if ( (items_to_collect[i]->getType() == Item::ITEM_NITRO_BIG) ||
                             (items_to_collect[i]->getType() == Item::ITEM_NITRO_SMALL) )
@@ -2018,10 +2018,10 @@ void SkiddingAI::handleNitroAndZipper()
     // Don't use nitro or zipper when the AI has a plunger in the face!
     if(m_kart->getBlockedByPlungerTime()>0)
     {
-        if ((nitro_skill < 4) && (ai_skill < 5))
-        {
-           return;
-        }
+       if ((nitro_skill < 4) && (ai_skill < 5))
+       {
+          return;
+       }
        else if (nitro_skill < 4)
        {
            nitro_skill = 0;  
@@ -2031,7 +2031,7 @@ void SkiddingAI::handleNitroAndZipper()
            ai_skill = 0;  
        }
     }
-   
+
     // If a parachute or anvil is attached, the nitro and zipper don't give much
     // benefit. Better wait till later.
     const bool has_slowdown_attachment =
@@ -2098,10 +2098,10 @@ void SkiddingAI::handleNitroAndZipper()
         {
            burster = 2*nitro_max_time;
         }
-       else
-       {
-            burster = 0;  
-       }
+        else
+        {
+           burster = 0;  
+        }
         if( (2.5f*max_time_effect) >= (finish - burster) )
         {
             // Absolute reduction to avoid small amount of unburned nitro at the end
