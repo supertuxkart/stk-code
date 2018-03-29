@@ -168,12 +168,17 @@ void ConnectToServer::asynchronousUpdate()
             }
             if (m_tried_connection++ > 7)
             {
-                Log::warn("ConnectToServer", "Timeout waiting for"
-                    " aloha, trying to connect anyway.");
-                m_state = CONNECTING;
-                // Reset timer for next usage
-                m_timer = 0.0;
-                m_tried_connection = 0;
+                if (NetworkConfig::get()->isWAN())
+                {
+                    Log::warn("ConnectToServer", "Timeout waiting for"
+                        " aloha, trying to connect anyway.");
+                    m_state = CONNECTING;
+                    // Reset timer for next usage
+                    m_timer = 0.0;
+                    m_tried_connection = 0;
+                }
+                else
+                    m_state = DONE;
                 return;
             }
             if ((!NetworkConfig::m_disable_lan &&
