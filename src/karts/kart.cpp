@@ -527,7 +527,7 @@ void Kart::setPowerup(PowerupManager::PowerupType t, int n)
  */
 void Kart::setLastUsedPowerup(PowerupManager::PowerupType t)
 {
-    *m_last_used_powerup = t;
+    m_last_used_powerup = t;
 }   // setLastUsedPowerup
 
 // -----------------------------------------------------------------------------
