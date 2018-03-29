@@ -1142,10 +1142,9 @@ void SkiddingAI::evaluateItems(const Item *item, Vec3 kart_aim_direction,
 /** Handle all items depending on the chosen strategy.
  *  Level 0 "AI" : do nothing (not used by default)
  *  Level 1 "AI" : use items after a random time
- *  Level 2 AI : strategy detailed before each item
- *  Level 3 AI : strategy detailed before each item
- *  Level 4 AI : strategy detailed before each item
- *  Level 5 AI : strategy detailed before each item
+ *  Level 2 to 5 AI : strategy detailed before each item
+ *  Each successive level is overall stronger (5 the strongest, 2 the weakest of
+ *  non-random strategies), but two levels may share a strategy for a given item.
  *  (level 5 is not yet used ; meant for SuperTux GP preferred karts or boss races)
  *  \param dt Time step size.
  *  TODO: Implications of Bubble-Shield for AI's powerup-handling
@@ -1243,13 +1242,13 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
     float min_bubble_time = 2.0f;
 
     int projectile_types[4]; //[3] basket, [2] cakes, [1] plunger, [0] bowling
-    projectile_types[0] = projectile_manager->projectileCloseType(m_kart,
+    projectile_types[0] = projectile_manager->getNearbyProjectileCount(m_kart,
                                     m_ai_properties->m_shield_incoming_radius, PowerupManager::POWERUP_BOWLING);
-    projectile_types[1] = projectile_manager->projectileCloseType(m_kart,
+    projectile_types[1] = projectile_manager->getNearbyProjectileCount(m_kart,
                                     m_ai_properties->m_shield_incoming_radius, PowerupManager::POWERUP_PLUNGER);
-    projectile_types[2] = projectile_manager->projectileCloseType(m_kart,
+    projectile_types[2] = projectile_manager->getNearbyProjectileCount(m_kart,
                                     m_ai_properties->m_shield_incoming_radius, PowerupManager::POWERUP_CAKE);
-    projectile_types[3] = projectile_manager->projectileCloseType(m_kart,
+    projectile_types[3] = projectile_manager->getNearbyProjectileCount(m_kart,
                                     m_ai_properties->m_shield_incoming_radius, PowerupManager::POWERUP_RUBBERBALL);
    
     bool projectile_is_close = false;
@@ -1581,7 +1580,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
                 if (m_time_since_last_shot > 2.0f)
                 {
                     m_controls->setFire(true);
-                   break;
+                    break;
                 }
             }
                      
