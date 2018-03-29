@@ -1205,12 +1205,9 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
       }
    }
    
-   if (m_kart->getBoostAI() == true)
+   if (m_kart->getBoostAI() == true && ai_skill < 5)
    {
-      if (ai_skill < 5)
-      {
-         ai_skill = ai_skill + 1; //possible improvement : make the boost amplitude pulled from config
-      }
+      ai_skill++; //possible improvement : make the boost amplitude pulled from config
    }
 
     // Tactic 0: don't use item
@@ -1225,8 +1222,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
     if(ai_skill == 1)
     {
        int random_t = 0;
-       RandomGenerator g = RandomGenerator();
-       random_t = g.get(6);
+       random_t = m_random_skid.get(6); //Reuse the random skid generator
        random_t = random_t + 5;
           
         if( m_time_since_last_shot > random_t )
