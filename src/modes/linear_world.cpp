@@ -96,7 +96,7 @@ void LinearWorld::reset()
     for(unsigned int i=0; i<kart_amount; i++)
     {
         m_kart_info[i].reset();
-        m_karts[i]->setWrongwayCounter(0);
+        m_karts[i]->setWrongwayTimer(0);
     }   // next kart
 
     // At the moment the last kart would be the one that is furthest away
@@ -158,13 +158,6 @@ void LinearWorld::update(int ticks)
     // especially updates the kart positions.
     WorldWithRank::update(ticks);
 
-    if (m_last_lap_sfx_playing &&
-        m_last_lap_sfx->getStatus() != SFXBase::SFX_PLAYING)
-    {
-        music_manager->resetTemporaryVolume();
-        m_last_lap_sfx_playing = false;
-    }
-
     const unsigned int kart_amount = getNumKarts();
 
     // Do stuff specific to this subtype of race.
@@ -213,7 +206,6 @@ void LinearWorld::update(int ticks)
             m_kart_info[i].m_estimated_finish =
                 estimateFinishTimeForKart(m_karts[i]);
         }
-        checkForWrongDirection(i, ticks);
     }
 
 #ifdef DEBUG
@@ -241,6 +233,33 @@ void LinearWorld::update(int ticks)
     }
 #endif
 }   // update
+
+//-----------------------------------------------------------------------------
+/** This updates all only graphical elements.It is only called once per
+*  rendered frame, not once per time step.
+*  float dt Time since last rame.
+*/
+void LinearWorld::updateGraphics(float dt)
+{
+    if (m_last_lap_sfx_playing &&
+        m_last_lap_sfx->getStatus() != SFXBase::SFX_PLAYING)
+    {
+        music_manager->resetTemporaryVolume();
+        m_last_lap_sfx_playing = false;
+    }
+
+    const unsigned int kart_amount = getNumKarts();
+    for (unsigned int i = 0; i<kart_amount; i++)
+    {
+        // ---------- update rank ------
+        if (!m_karts[i]->hasFinishedRace() &&
+            !m_karts[i]->isEliminated())
+        {
+            checkForWrongDirection(i, dt);
+        }
+    }   // for i <kart_amount
+
+}   // updateGraphics
 
 //-----------------------------------------------------------------------------
 /** Is called by check structures if a kart starts a new lap.
@@ -841,13 +860,14 @@ void LinearWorld::updateRacePosition()
 /** Checks if a kart is going in the wrong direction. This is done only for
  *  player karts to display a message to the player.
  *  \param i Kart id.
+ *  \param dt Time step size.
  */
-void LinearWorld::checkForWrongDirection(unsigned int i, int ticks)
+void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
 {
     if (!m_karts[i]->getController()->isLocalPlayerController()) 
         return;
 
-    int wrongway_counter = m_karts[i]->getWrongwayCounter();
+    float wrongway_timer = m_karts[i]->getWrongwayTimer();
     
     const AbstractKart *kart=m_karts[i];
     // If the kart can go in more than one directions from the current track
@@ -875,23 +895,23 @@ void LinearWorld::checkForWrongDirection(unsigned int i, int ticks)
         kart->getVelocityLC().getY() > 0.0f &&
         !kart->hasFinishedRace())
     {
-        wrongway_counter += ticks;
+        wrongway_timer += dt;
         
-        if (wrongway_counter > stk_config->time2Ticks(2.0f))
-            wrongway_counter = stk_config->time2Ticks(2.0f);
+        if (wrongway_timer > 2.0f)
+            wrongway_timer = 2.0f;
     }
     else
     {
-        wrongway_counter -= ticks;
+        wrongway_timer -= dt;
 
-        if (wrongway_counter < 0)
-            wrongway_counter = 0;
+        if (wrongway_timer < 0)
+            wrongway_timer = 0;
     }
     
     if (kart->getKartAnimation())
-        wrongway_counter = 0;
+        wrongway_timer = 0;
     
-    if (wrongway_counter > stk_config->time2Ticks(1.0f))
+    if (wrongway_timer > 1.0f)
     {
         m_race_gui->addMessage(_("WRONG WAY!"), kart,
                                /* time */ -1.0f,
@@ -900,7 +920,7 @@ void LinearWorld::checkForWrongDirection(unsigned int i, int ticks)
                                /*big font*/  true);
     }  // if angle is too big
     
-    m_karts[i]->setWrongwayCounter(wrongway_counter);
+    m_karts[i]->setWrongwayTimer(wrongway_timer);
 }   // checkForWrongDirection
 
 //-----------------------------------------------------------------------------

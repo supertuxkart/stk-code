@@ -158,8 +158,8 @@ protected:
     /** True if fire button was pushed and not released */
     bool         m_fire_clicked;
 
-    /** Counter which is used for displaying wrong way message after a delay */
-    int          m_wrongway_counter;
+    /** Timer which is used for displaying wrong way message after a delay */
+    float        m_wrongway_timer;
 
 
     // Bullet physics parameters
@@ -463,10 +463,10 @@ public:
     /** For debugging only: check if a kart is flying. */
     bool isFlying() const { return m_flying;  }
     // ------------------------------------------------------------------------
-    /** Counter which is used for displaying wrong way message after a delay */
-    int getWrongwayCounter() { return m_wrongway_counter; }
+    /** Timer which is used for displaying wrong way message after a delay */
+    float getWrongwayTimer() { return m_wrongway_timer; }
     // ------------------------------------------------------------------------
-    void setWrongwayCounter(int counter) { m_wrongway_counter = counter; }
+    void setWrongwayTimer(float timer) { m_wrongway_timer = timer; }
     // ------------------------------------------------------------------------
     /** Returns whether this kart wins or loses. */
     virtual bool getRaceResult() const { return m_race_result;  }
