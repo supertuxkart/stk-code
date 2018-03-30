@@ -208,8 +208,9 @@ void EasterEggHunt::getKartsDisplayInfo(
 /** Override the base class method to change behavior. We don't want wrong
  *  direction messages in the easter egg mode since there is no direction there.
  *  \param i Kart id.
+ *  \param dt Time step size.
  */
-void EasterEggHunt::checkForWrongDirection(unsigned int i, int ticks)
+void EasterEggHunt::checkForWrongDirection(unsigned int i, float dt)
 {
 }   // checkForWrongDirection
 

@@ -141,7 +141,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_is_jumping           = false;
     m_min_nitro_ticks      = 0;
     m_fire_clicked         = 0;
-    m_wrongway_counter     = 0;
+    m_wrongway_timer       = 0;
     m_type                 = RaceManager::KT_AI;
 
     m_view_blocked_by_plunger = 0;
