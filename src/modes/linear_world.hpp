@@ -62,8 +62,8 @@ private:
     class KartInfo
     {
     public:
-        /** Number of finished(!) laps. */
-        int         m_race_lap;
+        /** Number of finished laps. */
+        int         m_finished_laps;
 
         /** Time at finishing last lap. */
         int         m_ticks_at_last_lap;
@@ -84,7 +84,7 @@ private:
         /** Re-initialises all data. */
         void reset()
         {
-            m_race_lap          = -1;
+            m_finished_laps          = -1;
             m_lap_start_ticks   = 0;
             m_ticks_at_last_lap = INT_MAX;
             m_estimated_finish  = -1.0f;
@@ -142,10 +142,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of laps a kart has completed.
      *  \param kart_index World index of the kart. */
-    int getKartLaps(unsigned int kart_index) const OVERRIDE
+    int getFinishedLapsOfKart(unsigned int kart_index) const OVERRIDE
     {
         assert(kart_index < m_kart_info.size());
-        return m_kart_info[kart_index].m_race_lap;
+        return m_kart_info[kart_index].m_finished_laps;
     }   // getkartLap
     // ------------------------------------------------------------------------
     void setLastTriggeredCheckline(unsigned int kart_index, int index);

@@ -222,10 +222,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of laps for a given kart. Only valid when
      *  raceHasLaps() - otherwise STK will abort. */
-    virtual int getKartLaps(unsigned int kart_index) const
+    virtual int getFinishedLapsOfKart(unsigned int kart_index) const
     {
         assert(false); return -1; // remove compiler warning
-    }   // getKartLaps
+    }   // getFinishedLapsOfKart
     // ------------------------------------------------------------------------
     /** Called by the code that draws the list of karts on the race GUI
       * to know what needs to be drawn in the current mode. */
