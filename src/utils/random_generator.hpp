@@ -40,7 +40,7 @@ private:
 public:
     RandomGenerator();
 
-    std::vector<int> generateAllSeeds();
+    //std::vector<int> generateAllSeeds();
     /** Returns a pseudo random number between 0 and n-1 inclusive */
     int  get(int n)  {return rand() % n; }
     void seed(int s) {m_random_value = s;}

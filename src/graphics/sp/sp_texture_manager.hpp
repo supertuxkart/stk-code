@@ -85,6 +85,20 @@ public:
     // ------------------------------------------------------------------------
     ~SPTextureManager();
     // ------------------------------------------------------------------------
+    void stopThreads()
+    {
+        m_max_threaded_load_obj.store(0);
+        std::unique_lock<std::mutex> ul(m_thread_obj_mutex);
+        m_threaded_functions.push_back([](){ return true; });
+        m_thread_obj_cv.notify_all();
+        ul.unlock();
+        for (std::thread& t : m_threaded_load_obj)
+        {
+            t.join();
+        }
+        m_threaded_load_obj.clear();
+    }
+    // ------------------------------------------------------------------------
     void removeUnusedTextures();
     // ------------------------------------------------------------------------
     void addThreadedFunction(std::function<bool()> threaded_function)

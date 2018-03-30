@@ -185,7 +185,6 @@ protected:
     
     RaceGUIMultitouch* m_multitouch_gui;
 
-    void cleanupMessages(const float dt);
     //void createMarkerTexture();
     void createRegularPolygon(unsigned int n, float radius,
                               const core::vector2df &center,
@@ -247,6 +246,8 @@ public:
     virtual void drawEnergyMeter(int x, int y, const AbstractKart *kart,
                                  const core::recti &viewport,
                                  const core::vector2df &scaling) {};
+
+    void cleanupMessages(const float dt);
 
 };   // RaceGUIBase
 

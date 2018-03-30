@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for track in abyss cocoa_temple fortmagma greenvalley lighthouse olivermath snowmountain stk_enterprise zengarden hacienda mansion snowtuxpeak farm mines sandtrack city gran_paradiso_island minigolf scotland xr591; do
+for track in abyss candela_city cocoa_temple cornfield_crossing fortmagma gran_paradiso_island greenvalley hacienda lighthouse mansion mines minigolf olivermath sandtrack scotland snowmountain snowtuxpeak stk_enterprise volcano_island xr591 zengarden; do
  echo "Testing $track"
    $1 --log=0 -R     \
        --ai=nolok,nolok,nolok,nolok,nolok,nolok,nolok,nolok \

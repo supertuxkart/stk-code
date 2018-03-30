@@ -43,7 +43,6 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id)
         (m_rd.m_filename) : m_rd.m_filename).c_str()), false);
 
     m_back_widget = getWidget<IconButtonWidget>("back");
-    m_back_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
     // Non-deletable for custom (standard) replay file
     getWidget<IconButtonWidget>("remove")->setActive(!m_rd.m_custom_replay_file);
@@ -62,6 +61,8 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id)
     m_record_widget->setState(false);
     m_watch_widget->setState(false);
 
+    m_action_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_action_widget->select("start", PLAYER_ID_GAME_MASTER);
 }   // GhostReplayInfoDialog
 
 // -----------------------------------------------------------------------------

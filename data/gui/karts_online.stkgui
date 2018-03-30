@@ -19,7 +19,7 @@
         </box>
 
         <!-- Groups will be added dynamically at runtime -->
-        <tabs width="98%" x="1%" height="25" id="kartgroups">
+        <tabs width="98%" x="1%" height="5%" id="kartgroups">
         </tabs>
         <spacer width="100%" height="2%"/>
     </div>

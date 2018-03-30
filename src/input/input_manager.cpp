@@ -782,7 +782,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             Controller* controller = pk->getController();
             if (controller != NULL) controller->action(action, abs(value));
         }
-        else if (race_manager->isWatchingReplay())
+        else if (race_manager->isWatchingReplay() && !GUIEngine::ModalDialog::isADialogActive())
         {
             // Get the first ghost kart
             World::getWorld()->getKart(0)

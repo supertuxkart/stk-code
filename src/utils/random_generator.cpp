@@ -21,17 +21,18 @@
 #include <stdlib.h>
 #include <ctime>
 
-std::vector<RandomGenerator*> RandomGenerator::m_all_random_generators;
+//std::vector<RandomGenerator*> RandomGenerator::m_all_random_generators;
 
 RandomGenerator::RandomGenerator()
 {
     m_a = 1103515245;
     m_c = 12345;
-    m_all_random_generators.push_back(this);
+    //m_all_random_generators.push_back(this);
     m_random_value = 3141591;
 }   // RandomGenerator
 
 // ----------------------------------------------------------------------------
+#if 0
 std::vector<int> RandomGenerator::generateAllSeeds()
 {
     std::vector<int> all_seeds;
@@ -44,7 +45,6 @@ std::vector<int> RandomGenerator::generateAllSeeds()
     return all_seeds;
 }   // generateAllSeeds
 
-#if 0
 
 // ----------------------------------------------------------------------------
 int RandomGenerator::get(int n)
