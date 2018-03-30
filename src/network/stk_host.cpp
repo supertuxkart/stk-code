@@ -28,9 +28,9 @@
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/server_lobby.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/servers_manager.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
+#include "utils/separate_process.hpp"
 #include "utils/time.hpp"
 #include "utils/vs.hpp"
 
@@ -65,16 +65,16 @@
 STKHost *STKHost::m_stk_host       = NULL;
 bool     STKHost::m_enable_console = false;
 
-void STKHost::create()
+void STKHost::create(std::shared_ptr<Server> server, SeparateProcess* p)
 {
     assert(m_stk_host == NULL);
     if (NetworkConfig::get()->isServer())
         m_stk_host = new STKHost(NetworkConfig::get()->getServerName());
     else
     {
-        Server *server = ServersManager::get()->getJoinedServer();
-        m_stk_host = new STKHost(server->getServerId(), 0);
+        m_stk_host = new STKHost(server);
     }
+    m_stk_host->m_separate_process = p;
     if (!m_stk_host->m_network)
     {
         delete m_stk_host;
@@ -254,7 +254,7 @@ void STKHost::create()
 // ============================================================================
 /** Constructor for a client
  */
-STKHost::STKHost(uint32_t server_id, uint32_t host_id)
+STKHost::STKHost(std::shared_ptr<Server> server)
 {
     m_next_unique_host_id = -1;
     // Will be overwritten with the correct value once a connection with the
@@ -264,7 +264,7 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
 
     ENetAddress ea;
     ea.host = STKHost::HOST_ANY;
-    ea.port =  NetworkConfig::get()->getClientPort();
+    ea.port = NetworkConfig::get()->getClientPort();
 
     m_network = new Network(/*peer_count*/1,       /*channel_limit*/2,
                             /*max_in_bandwidth*/0, /*max_out_bandwidth*/0,
@@ -276,7 +276,7 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
     }
 
     setPrivatePort();
-    std::make_shared<ConnectToServer>(server_id, host_id)->requestStart();
+    std::make_shared<ConnectToServer>(server)->requestStart();
 }   // STKHost
 
 // ----------------------------------------------------------------------------
@@ -371,6 +371,17 @@ STKHost::~STKHost()
 
     delete m_network;
     enet_deinitialize();
+    delete m_separate_process;
+    // Always clean up server id file in case client failed to connect
+    const std::string& sid = NetworkConfig::get()->getServerIdFile();
+    if (!sid.empty())
+    {
+        if (file_manager->fileExists(sid))
+        {
+            file_manager->removeFile(sid);
+        }
+        NetworkConfig::get()->setServerIdFile("");
+    }
 }   // ~STKHost
 
 //-----------------------------------------------------------------------------
@@ -379,7 +390,6 @@ STKHost::~STKHost()
  */
 void STKHost::shutdown()
 {
-    ServersManager::get()->unsetJoinedServer();
     ProtocolManager::lock()->abort();
     deleteAllPeers();
     destroy();
@@ -503,12 +513,11 @@ void STKHost::setPublicAddress()
 
         // The stun message is valid, so we parse it now:
         // Those are the port and the address to be detected
-        bool found = false;
+        TransportAddress non_xor_addr, xor_addr;
         while (true)
         {
             if (response.size() < 4)
             {
-                Log::error("STKHost", "STUN response is invalid.");
                 break;
             }
             unsigned type = response.getUInt16();
@@ -555,11 +564,14 @@ void STKHost::setPublicAddress()
                     // Obfuscation is described in Section 15.2 of RFC 5389.
                     port ^= magic_cookie >> 16;
                     ip ^= magic_cookie;
+                    xor_addr.setPort(port);
+                    xor_addr.setIP(ip);
                 }
-                m_public_address.setPort(port);
-                m_public_address.setIP(ip);
-                found = true;
-                break;
+                else
+                {
+                    non_xor_addr.setPort(port);
+                    non_xor_addr.setIP(ip);
+                }
             }   // type == mapped_address || type == xor_mapped_address
             else
             {
@@ -570,8 +582,23 @@ void STKHost::setPublicAddress()
             }
         }   // while true
         // Found public address and port
-        if (found)
+        if (!xor_addr.isUnset() || !non_xor_addr.isUnset())
+        {
+            // Use XOR mapped address when possible to avoid translation of
+            // the packet content by application layer gateways (ALGs) that
+            // perform deep packet inspection in an attempt to perform
+            // alternate NAT traversal methods.
+            if (!xor_addr.isUnset())
+            {
+                m_public_address.copy(xor_addr);
+            }
+            else
+            {
+                Log::warn("STKHost", "Only non xor-mapped address returned.");
+                m_public_address.copy(non_xor_addr);
+            }
             untried_server.clear();
+        }
     }
 }   // setPublicAddress
 
@@ -716,21 +743,29 @@ void STKHost::mainLoop()
     ENetHost* host = m_network->getENetHost();
 
     // A separate network connection (socket) to handle LAN requests.
-    Network* lan_network = NULL;
-    if (NetworkConfig::get()->isLAN() && NetworkConfig::get()->isServer())
+    Network* direct_socket = NULL;
+    if ((NetworkConfig::get()->isLAN() && NetworkConfig::get()->isServer()) ||
+        NetworkConfig::get()->isPublicServer())
     {
         TransportAddress address(0,
             NetworkConfig::get()->getServerDiscoveryPort());
         ENetAddress eaddr = address.toEnetAddress();
-        lan_network = new Network(1, 1, 0, 0, &eaddr);
+        direct_socket = new Network(1, 1, 0, 0, &eaddr);
+        if (direct_socket->getENetHost() == NULL)
+        {
+            Log::warn("STKHost", "No direct socket available, this "
+                "server may not be connected by lan network");
+            delete direct_socket;
+            direct_socket = NULL;
+        }
     }
 
     while (m_exit_flag.test_and_set())
     {
         auto sl = LobbyProtocol::get<ServerLobby>();
-        if (lan_network && sl && sl->waitingForPlayers())
+        if (direct_socket && sl && sl->waitingForPlayers())
         {
-            handleDirectSocketRequest(lan_network);
+            handleDirectSocketRequest(direct_socket);
         }   // if discovery host
 
         while (enet_host_service(host, &event, 20) != 0)
@@ -780,7 +815,7 @@ void STKHost::mainLoop()
 
         }   // while enet_host_service
     }   // while m_exit_flag.test_and_set()
-    delete lan_network;
+    delete direct_socket;
     Log::info("STKHost", "Listening has been stopped");
 }   // mainLoop
 
@@ -793,17 +828,20 @@ void STKHost::mainLoop()
  *  message is received, will answer with a message containing server details
  *  (and sender IP address and port).
  */
-void STKHost::handleDirectSocketRequest(Network* lan_network)
+void STKHost::handleDirectSocketRequest(Network* direct_socket)
 {
     const int LEN=2048;
     char buffer[LEN];
 
     TransportAddress sender;
-    int len = lan_network->receiveRawPacket(buffer, LEN, &sender, 1);
+    int len = direct_socket->receiveRawPacket(buffer, LEN, &sender, 1);
     if(len<=0) return;
     BareNetworkString message(buffer, len);
     std::string command;
     message.decodeString(&command);
+    const std::string connection_cmd = std::string("connection-request") +
+        StringUtils::toString(m_private_port);
+    const std::string connection_cmd_localhost("connection-request-localhost");
 
     if (command == "stk-server")
     {
@@ -822,17 +860,19 @@ void STKHost::handleDirectSocketRequest(Network* lan_network)
         s.encodeString(name);
         s.addUInt8(NetworkConfig::get()->getMaxPlayers());
         s.addUInt8(0);   // FIXME: current number of connected players
-        s.addUInt32(sender.getIP());
-        s.addUInt16(sender.getPort());
-        s.addUInt16((uint16_t)race_manager->getMinorMode());
+        s.addUInt16(m_private_port);
         s.addUInt8((uint8_t)race_manager->getDifficulty());
-        lan_network->sendRawPacket(s, sender);
+        s.addUInt8((uint8_t)
+            NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
+            race_manager->getMajorMode()));
+        direct_socket->sendRawPacket(s, sender);
     }   // if message is server-requested
-    else if (command == "connection-request")
+    else if (command == connection_cmd)
     {
         // In case of a LAN connection, we only allow connections from
         // a LAN address (192.168*, ..., and 127.*).
-        if (!sender.isLAN() && !sender.isPublicAddressLAN())
+        if (!sender.isLAN() && !sender.isPublicAddressLocalhost() &&
+            !NetworkConfig::get()->isPublicServer())
         {
             Log::error("STKHost", "Client trying to connect from '%s'",
                        sender.toString().c_str());
@@ -840,6 +880,19 @@ void STKHost::handleDirectSocketRequest(Network* lan_network)
             return;
         }
         std::make_shared<ConnectToPeer>(sender)->requestStart();
+    }
+    else if (command == connection_cmd_localhost)
+    {
+        if (sender.getIP() == 0x7f000001)
+        {
+            std::make_shared<ConnectToPeer>(sender)->requestStart();
+        }
+        else
+        {
+            Log::error("STKHost", "Client trying to connect from '%s'",
+                       sender.toString().c_str());
+            Log::error("STKHost", "which is not localhost - rejected.");
+        }
     }
     else
         Log::info("STKHost", "Received unknown command '%s'",

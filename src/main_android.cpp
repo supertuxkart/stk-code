@@ -58,9 +58,6 @@ void override_default_params()
     
     // Create default user istead of showing login screen to make life easier
     UserConfigParams::m_enforce_current_player = true;
-    
-    // Just for debugging
-    UserConfigParams::m_log_errors_to_console = true;
 }
 
 void android_main(struct android_app* app) 

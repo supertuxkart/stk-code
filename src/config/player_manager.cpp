@@ -129,10 +129,10 @@ void PlayerManager::onSTKQuit()
  *         RequestManager.
  */
 
-Online::XMLRequest *PlayerManager::requestSignIn(const irr::core::stringw &username,
-                                                 const irr::core::stringw &password)
+void PlayerManager::requestSignIn(const irr::core::stringw &username,
+                                  const irr::core::stringw &password)
 {
-    return getCurrentPlayer()->requestSignIn(username, password);
+    getCurrentPlayer()->requestSignIn(username, password);
 }   // requestSignIn
 
 // ----------------------------------------------------------------------------

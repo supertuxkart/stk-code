@@ -33,6 +33,7 @@ namespace irr
 
 #include "guiengine/widget.hpp"
 #include "utils/leak_check.hpp"
+#include "utils/cpp2011.hpp"
 
 namespace GUIEngine
 {
@@ -161,6 +162,14 @@ namespace GUIEngine
         // --------------------------------------------------------------------
         /** Returns the texture of this button. */
         const video::ITexture* getTexture();
+        // --------------------------------------------------------------------
+        virtual void setVisible(bool visible) OVERRIDE;
+        // --------------------------------------------------------------------
+        virtual void elementRemoved() OVERRIDE
+        {
+            Widget::elementRemoved();
+            m_label = NULL;
+        }
     };
 }
 

@@ -26,12 +26,13 @@
 #include "modes/demo_world.hpp"
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/network_config.hpp"
-#include "network/servers_manager.hpp"
+#include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/dialogs/server_info_dialog.hpp"
+#include "utils/separate_process.hpp"
 #include "utils/translation.hpp"
 
 #include <irrString.h>
@@ -59,7 +60,13 @@ void CreateServerScreen::loadedFromFile()
  
     m_max_players_widget = getWidget<SpinnerWidget>("max_players");
     assert(m_max_players_widget != NULL);
-    m_max_players_widget->setValue(8);
+    int max = UserConfigParams::m_server_max_players.getDefaultValue();
+    m_max_players_widget->setMax(max);
+    
+    if (UserConfigParams::m_server_max_players > max)
+        UserConfigParams::m_server_max_players = max;
+
+    m_max_players_widget->setValue(UserConfigParams::m_server_max_players);
 
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
@@ -162,25 +169,28 @@ void CreateServerScreen::createServer()
         SFXManager::get()->quickSound("anvil");
         return;
     }
-    else if (max_players < 2 || max_players > 12)
-    {
-        m_info_widget->setText(
-            _("The maxinum number of players has to be between 2 and 12."),
-            false);
-        SFXManager::get()->quickSound("anvil");
-        return;
-    }
+    assert(max_players > 1 &&
+        max_players <= UserConfigParams::m_server_max_players.getDefaultValue());
 
-    // In case of a LAN game, we can create the new server object now
-    if (NetworkConfig::get()->isLAN())
-    {
-        // FIXME Is this actually necessary?? Only in case of WAN, or LAN and WAN?
-        TransportAddress address(0x7f000001,0);  // 127.0.0.1
-        Server *server = new Server(name, /*lan*/true, max_players,
-                                    /*current_player*/1, address);
-        ServersManager::get()->addServer(server);
-    }
+    UserConfigParams::m_server_max_players = max_players;
+    core::stringw password_w = getWidget<TextBoxWidget>("password")->getText();
+    std::string password = StringUtils::xmlEncode(password_w);
+    NetworkConfig::get()->setPassword(StringUtils::wideToUtf8(password_w));
+    if (!password.empty())
+        password = std::string(" --server-password=") + password;
 
+    TransportAddress server_address(0x7f000001,
+        NetworkConfig::get()->getServerDiscoveryPort());
+
+    auto server = std::make_shared<Server>(0/*server_id*/, name,
+        max_players, /*current_player*/0, (RaceManager::Difficulty)
+        difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER),
+        NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
+            race_manager->getMajorMode()), server_address);
+
+#undef USE_GRAPHICS_SERVER
+#ifdef USE_GRAPHICS_SERVER
+    NetworkConfig::get()->setIsServer(true);
     // In case of a WAN game, we register this server with the
     // stk server, and will get the server's id when this 
     // request is finished.
@@ -200,13 +210,48 @@ void CreateServerScreen::createServer()
     else
         race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
 
-    core::stringw password_w = getWidget<TextBoxWidget>("password")->getText();
-    std::string password(core::stringc(password_w.c_str()).c_str());
-    NetworkConfig::get()->setPassword(password);
-
     race_manager->setReverseTrack(false);
     STKHost::create();
+#else
 
+    NetworkConfig::get()->setIsServer(false);
+    std::ostringstream server_cfg;
+#ifdef WIN32
+    server_cfg << " ";
+#endif
+
+    const std::string server_name = StringUtils::xmlEncode(name);
+    if (NetworkConfig::get()->isWAN())
+    {
+        server_cfg << "--public-server --wan-server=" <<
+            server_name << " --login-id=" <<
+            NetworkConfig::get()->getCurrentUserId() << " --token=" <<
+            NetworkConfig::get()->getCurrentUserToken();
+    }
+    else
+    {
+        server_cfg << "--lan-server=" << server_name;
+    }
+
+    std::string server_id_file = "server_id_file_";
+    server_id_file += StringUtils::toString(StkTime::getTimeSinceEpoch());
+    NetworkConfig::get()->setServerIdFile(
+        file_manager->getUserConfigFile(server_id_file));
+
+    server_cfg << " --no-graphics --stdout=server.log --type=" <<
+        gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) <<
+        " --difficulty=" <<
+        difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER) <<
+        " --max-players=" << max_players <<
+        " --server-id-file=" << server_id_file <<
+        " --log=1 --no-console-log";
+
+    SeparateProcess* sp =
+        new SeparateProcess(SeparateProcess::getCurrentExecutableLocation(),
+        server_cfg.str() + password);
+    STKHost::create(server, sp);
+
+#endif
 }   // createServer
 
 // ----------------------------------------------------------------------------

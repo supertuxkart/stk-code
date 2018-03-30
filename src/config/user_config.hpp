@@ -205,7 +205,7 @@ public:
 
     irr::core::stringc toString() const;
     void revertToDefaults()      { m_value = m_default_value;        }
-
+    int getDefaultValue()        { return  m_default_value;          }
     operator int() const         { return m_value;                   }
     int& operator++(int dummy)   { m_value++; return m_value;        }
     int& operator=(const int& v) { m_value = v; return m_value;      }
@@ -713,37 +713,23 @@ namespace UserConfigParams
     // ---- Networking
 
     PARAM_PREFIX IntUserConfigParam         m_server_max_players
-            PARAM_DEFAULT(  IntUserConfigParam(16, "server_max_players",
+            PARAM_DEFAULT(  IntUserConfigParam(12, "server_max_players",
                                        "Maximum number of players on the server.") );
 
     PARAM_PREFIX StringListUserConfigParam         m_stun_servers
             PARAM_DEFAULT(  StringListUserConfigParam("Stun_servers", "The stun servers"
                             " that will be used to know the public address.",
-                            24,
-                            "provserver.televolution.net",
-                            "sip1.lakedestiny.cordiaip.com",
-                            "stun1.voiceeclipse.net",
-                            "stun01.sipphone.com",
+                            10,
+                            "stun.cope.es",
+                            "stun.12connect.com",
                             "stun.callwithus.com",
                             "stun.counterpath.net",
-                            "stun.endigovoip.com",
                             "stun.ekiga.net",
-                            "stun.ideasip.com",
-                            "stun.internetcalls.com",
-                            "stun.ipns.com",
-                            "stun.noc.ams-ix.net",
-                            "stun.phonepower.com",
-                            "stun.phoneserve.com",
-                            "stun.rnktel.com",
-                            "stun.softjoys.com",
-                            "stunserver.org",
-                            "stun.sipgate.net",
+                            "stun.schlund.de",
                             "stun.stunprotocol.org",
                             "stun.voip.aebc.com",
-                            "stun.voipbuster.com",
-                            "stun.voxalot.com",
-                            "stun.voxgratia.org",
-                            "stun.xten.com") );
+                            "numb.viagenie.ca",
+                            "stun.ivao.aero") );
 
     // ---- Gamemode setup
     PARAM_PREFIX IntToIntUserConfigParam m_num_karts_per_gamemode
@@ -753,9 +739,15 @@ namespace UserConfigParams
             std::make_pair(1100, 4)
         ));
 
+    // ---- Network
+    PARAM_PREFIX GroupUserConfigParam  m_network_group
+        PARAM_DEFAULT(GroupUserConfigParam("Network", "Network Settings"));
     PARAM_PREFIX BoolUserConfigParam m_log_packets
-            PARAM_DEFAULT( BoolUserConfigParam(false, "log-network-packets",
-                                                 "If all network packets should be logged") );
+        PARAM_DEFAULT(BoolUserConfigParam(false, "log-network-packets",
+        &m_network_group, "If all network packets should be logged"));
+    PARAM_PREFIX BoolUserConfigParam m_random_ports
+        PARAM_DEFAULT(BoolUserConfigParam(true, "randrom-ports",
+        &m_network_group, "Use random ports for client and server connection"));
 
     // ---- Graphic Quality
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality
@@ -837,17 +829,6 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_crashed
             PARAM_DEFAULT(  BoolUserConfigParam(false, "crashed") );
 
-#if defined(WIN32) && !defined(__CYGWIN__)
-    // No console on windows
-#  define CONSOLE_DEFAULT false
-#else
-#  define CONSOLE_DEFAULT true
-#endif
-    // No console on windows
-    PARAM_PREFIX BoolUserConfigParam        m_log_errors_to_console
-            PARAM_DEFAULT(  BoolUserConfigParam(
-            CONSOLE_DEFAULT, "log_errors", "Enable logging to console.") );
-    
     // ---- Camera
     PARAM_PREFIX GroupUserConfigParam        m_camera
             PARAM_DEFAULT( GroupUserConfigParam("camera",

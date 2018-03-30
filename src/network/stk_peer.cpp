@@ -23,6 +23,7 @@
 #include "network/stk_host.hpp"
 #include "network/transport_address.hpp"
 #include "utils/log.hpp"
+#include "utils/time.hpp"
 
 #include <string.h>
 

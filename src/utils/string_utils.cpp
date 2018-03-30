@@ -679,7 +679,8 @@ namespace StringUtils
         std::ostringstream output;
         for(unsigned int i=0; i<s.size(); i++)
         {
-            if (s[i] >= 128 || s[i] == '&' || s[i] == '<' || s[i] == '>' || s[i] == '\"')
+            if (s[i] >= 128 || s[i] == '&' || s[i] == '<' || s[i] == '>' ||
+                s[i] == '\"' || s[i] == ' ')
             {
                 output << "&#x" << std::hex << std::uppercase << s[i] << ";";
             }

@@ -416,3 +416,13 @@ void IconButtonWidget::setLabelFont()
         }
     }
 }
+
+// -----------------------------------------------------------------------------
+
+void IconButtonWidget::setVisible(bool visible)
+{
+    Widget::setVisible(visible);
+
+    if (m_label != NULL)
+        m_label->setVisible(visible);
+}

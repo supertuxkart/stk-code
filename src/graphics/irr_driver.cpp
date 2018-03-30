@@ -303,7 +303,6 @@ core::recti IrrDriver::getSplitscreenWindow(int WindowNum)
 
     const int x_grid_Position = WindowNum % cols;
     const int y_grid_Position = int(floor((WindowNum) / cols));
-    int wid = (int)irr_driver->getActualScreenSize().Width;
 
 //To prevent the viewport going over the right side, we use std::min to ensure the right corners are never larger than the total width
     return core::recti(
@@ -715,8 +714,8 @@ void IrrDriver::initDevice()
     // set cursor visible by default (what's the default is not too clearly documented,
     // so let's decide ourselves...)
     m_device->getCursorControl()->setVisible(true);
-    m_pointer_shown = true;
 #endif
+    m_pointer_shown = true;
 }   // initDevice
 
 // ----------------------------------------------------------------------------
@@ -786,16 +785,19 @@ void IrrDriver::getOpenGLData(std::string *vendor, std::string *renderer,
 //-----------------------------------------------------------------------------
 void IrrDriver::showPointer()
 {
+#ifndef SERVER_ONLY
     if (!m_pointer_shown)
     {
         m_pointer_shown = true;
         this->getDevice()->getCursorControl()->setVisible(true);
     }
+#endif
 }   // showPointer
 
 //-----------------------------------------------------------------------------
 void IrrDriver::hidePointer()
 {
+#ifndef SERVER_ONLY
     // always visible in artist debug mode, to be able to use the context menu
     if (UserConfigParams::m_artist_debug_mode)
     {
@@ -808,6 +810,7 @@ void IrrDriver::hidePointer()
         m_pointer_shown = false;
         this->getDevice()->getCursorControl()->setVisible(false);
     }
+#endif
 }   // hidePointer
 
 //-----------------------------------------------------------------------------

@@ -23,6 +23,7 @@
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
 #include <atomic>
+#include <memory>
 #include <string>
 
 class Server;
@@ -32,14 +33,11 @@ class ConnectToServer : public Protocol
 private:
     double m_timer = 0.0;
     TransportAddress m_server_address;
-    uint32_t m_server_id;
-    uint32_t m_host_id;
+    std::shared_ptr<Server> m_server;
     unsigned m_tried_connection = 0;
 
-    const Server* m_server = NULL;
     /** Protocol currently being monitored. */
     std::weak_ptr<Protocol> m_current_protocol;
-    bool m_quick_join;
 
     /** State for finite state machine. */
     enum ConnectState : unsigned int
@@ -57,12 +55,10 @@ private:
     std::atomic<ConnectState> m_state;
 
     void registerWithSTKServer();
-    void handleQuickConnect();
     void waitingAloha(bool is_wan);
 
 public:
-             ConnectToServer();
-             ConnectToServer(uint32_t server_id, uint32_t host_id);
+             ConnectToServer(std::shared_ptr<Server> server);
     virtual ~ConnectToServer();
 
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;

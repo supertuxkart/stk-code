@@ -18,7 +18,6 @@
 
 #include "network/protocols/server_lobby.hpp"
 
-#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
@@ -33,6 +32,7 @@
 #include "network/stk_peer.hpp"
 #include "online/online_profile.hpp"
 #include "online/request_manager.hpp"
+#include "race/race_manager.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/waiting_for_others.hpp"
@@ -40,6 +40,8 @@
 #include "utils/log.hpp"
 #include "utils/random_generator.hpp"
 #include "utils/time.hpp"
+
+#include <fstream>
 
 /** This is the central game setup protocol running in the server. It is
  *  mostly a finite state machine. Note that all nodes in ellipses and light
@@ -101,7 +103,7 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
  */
 ServerLobby::~ServerLobby()
 {
-    if (m_server_registered)
+    if (m_server_registered && NetworkConfig::get()->isWAN())
     {
         unregisterServer();
     }
@@ -191,6 +193,20 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
 }   // notifyEventAsynchronous
 
 //-----------------------------------------------------------------------------
+/** Create the server id file to let the graphics server client connect. */
+void ServerLobby::createServerIdFile()
+{
+    const std::string& sid = NetworkConfig::get()->getServerIdFile();
+    if (!sid.empty())
+    {
+        std::fstream fs;
+        fs.open(sid, std::ios::out);
+        fs.close();
+        NetworkConfig::get()->setServerIdFile("");
+    }
+}   // createServerIdFile
+
+//-----------------------------------------------------------------------------
 /** Find out the public IP server or poll STK server asynchronously. */
 void ServerLobby::asynchronousUpdate()
 {
@@ -204,6 +220,7 @@ void ServerLobby::asynchronousUpdate()
         {
             m_state = ACCEPTING_CLIENTS;
             STKHost::get()->startListening();
+            createServerIdFile();
             return;
         }
         STKHost::get()->setPublicAddress();
@@ -224,7 +241,11 @@ void ServerLobby::asynchronousUpdate()
         // this thread, but there is no need for the protocol manager
         // to react to any requests before the server is registered.
         registerServer();
-        m_state = ACCEPTING_CLIENTS;
+        if (m_server_registered)
+        {
+            m_state = ACCEPTING_CLIENTS;
+            createServerIdFile();
+        }
         break;
     }
     case ACCEPTING_CLIENTS:
@@ -349,16 +370,20 @@ void ServerLobby::registerServer()
 {
     Online::XMLRequest *request = new Online::XMLRequest();
     const TransportAddress& addr = STKHost::get()->getPublicAddress();
-    PlayerManager::setUserDetails(request, "create", Online::API::SERVER_PATH);
+    NetworkConfig::get()->setUserDetails(request, "create");
     request->addParameter("address",      addr.getIP()                    );
     request->addParameter("port",         addr.getPort()                  );
     request->addParameter("private_port",
                                     STKHost::get()->getPrivatePort()      );
     request->addParameter("name",   NetworkConfig::get()->getServerName() );
-    request->addParameter("max_players", 
-                          UserConfigParams::m_server_max_players          );
+    request->addParameter("max_players",
+        NetworkConfig::get()->getMaxPlayers());
+    request->addParameter("difficulty", race_manager->getDifficulty());
+    request->addParameter("game_mode",
+        NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
+        race_manager->getMajorMode()));
     Log::info("ServerLobby", "Public server addr %s", addr.toString().c_str());
-    
+
     request->executeNow();
 
     const XMLNode * result = request->getXMLData();
@@ -386,7 +411,7 @@ void ServerLobby::unregisterServer()
 {
     const TransportAddress &addr = STKHost::get()->getPublicAddress();
     Online::XMLRequest* request = new Online::XMLRequest();
-    PlayerManager::setUserDetails(request, "stop", Online::API::SERVER_PATH);
+    NetworkConfig::get()->setUserDetails(request, "stop");
 
     request->addParameter("address", addr.getIP());
     request->addParameter("port", addr.getPort());
@@ -439,9 +464,9 @@ void ServerLobby::signalRaceStartToClients()
  */
 void ServerLobby::startSelection(const Event *event)
 {
-    //assert(m_server_registered);
-    if (m_server_registered)
+    if (NetworkConfig::get()->isWAN())
     {
+        assert(m_server_registered);
         unregisterServer();
         m_server_registered = false;
     }
@@ -514,12 +539,12 @@ void ServerLobby::checkIncomingConnectionRequests()
     // Now poll the stk server
     last_poll_time = StkTime::getRealTime();
     Online::XMLRequest* request = new Online::XMLRequest();
-    PlayerManager::setUserDetails(request, "poll-connection-requests",
-                                  Online::API::SERVER_PATH);
+    NetworkConfig::get()->setUserDetails(request, "poll-connection-requests");
 
     const TransportAddress &addr = STKHost::get()->getPublicAddress();
     request->addParameter("address", addr.getIP()  );
     request->addParameter("port",    addr.getPort());
+    request->addParameter("current_players", STKHost::get()->getPeerCount());
 
     request->executeNow();
     assert(request->isDone());

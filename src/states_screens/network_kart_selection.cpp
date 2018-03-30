@@ -32,7 +32,6 @@
 #include "network/protocols/client_lobby.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/race_setup_screen.hpp"
-#include "states_screens/server_selection.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
 #include "states_screens/waiting_for_others.hpp"
@@ -222,11 +221,6 @@ bool NetworkKartSelectionScreen::onEscapePressed()
 {
     // then remove the lobby screen (you left the server)
     StateManager::get()->popMenu();
-    ServerSelection::getInstance()->refresh();
-    // notify the server that we left
-    auto clrp = LobbyProtocol::get<ClientLobby>();
-    if (clrp)
-        clrp->leave();
     STKHost::get()->shutdown();
     return true; // remove the screen
 }   // onEscapePressed

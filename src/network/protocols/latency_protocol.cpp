@@ -26,6 +26,7 @@ LatencyProtocol::LatencyProtocol()
     m_total_diff.resize(size, 0);
     m_average_ping.resize(size, 0);
     m_pings_count = 0;
+    m_last_time = 0.0;
 }   // LatencyProtocol
 
 //-----------------------------------------------------------------------------

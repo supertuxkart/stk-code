@@ -45,14 +45,38 @@
 
 MainLoop* main_loop = 0;
 
-// ----------------------------------------------------------------------------
-MainLoop::MainLoop() :
-m_abort(false)
+MainLoop::MainLoop(unsigned parent_pid)
+        : m_abort(false), m_parent_pid(parent_pid)
 {
     m_curr_time       = 0;
     m_prev_time       = 0;
     m_throttle_fps    = true;
     m_is_last_substep = false;
+#ifdef WIN32
+    if (parent_pid != 0)
+    {
+        std::string class_name = "separate_process";
+        class_name += StringUtils::toString(GetCurrentProcessId());
+        WNDCLASSEX wx = {};
+        wx.cbSize = sizeof(WNDCLASSEX);
+        wx.lpfnWndProc = [](HWND h, UINT m, WPARAM w, LPARAM l)->LRESULT
+        {
+            if (m == WM_DESTROY)
+            {
+                PostQuitMessage(0);
+                return 0;
+            }
+            return DefWindowProc(h, m, w, l);
+        };
+        wx.hInstance = GetModuleHandle(0);
+        wx.lpszClassName = &class_name[0];
+        if (RegisterClassEx(&wx))
+        {
+            CreateWindowEx(0, &class_name[0], "stk_server_only",
+                0, 0, 0, 0, 0, HWND_MESSAGE, NULL, NULL, NULL);
+        }
+    }
+#endif
 }  // MainLoop
 
 //-----------------------------------------------------------------------------
@@ -259,8 +283,38 @@ void MainLoop::run()
     // DT keeps track of the leftover time, since the race update
     // happens in fixed timesteps
     float left_over_time = 0;
+
+#ifdef WIN32
+    HANDLE parent = 0;
+    if (m_parent_pid != 0)
+    {
+        parent = OpenProcess(PROCESS_ALL_ACCESS, FALSE, m_parent_pid);
+        if (parent == 0 || parent == INVALID_HANDLE_VALUE)
+        {
+            Log::warn("MainLoop", "Cannot open parent handle, this child "
+                "may not be auto destroyed when parent is terminated");
+        }
+    }
+#endif
+
     while(!m_abort)
     {
+#ifdef WIN32
+        if (parent != 0 && parent != INVALID_HANDLE_VALUE)
+        {
+            MSG msg;
+            while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+                if (msg.message == WM_QUIT)
+                    m_abort = true;
+            }
+            // If parent is killed, abort the child main loop too
+            if (WaitForSingleObject(parent, 0) != WAIT_TIMEOUT)
+                m_abort = true;
+        }
+#endif
         m_is_last_substep = false;
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
 
@@ -356,6 +410,11 @@ void MainLoop::run()
         PROFILER_POP_CPU_MARKER();   // MainLoop pop
         PROFILER_SYNC_FRAME();
     }  // while !m_abort
+
+#ifdef WIN32
+    if (parent != 0 && parent != INVALID_HANDLE_VALUE)
+        CloseHandle(parent);
+#endif
 
 }   // run
 

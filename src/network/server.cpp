@@ -16,19 +16,16 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/server.hpp"
-
+#include "network/network_config.hpp"
 #include "io/xml_node.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
-Server::SortOrder Server::m_sort_order = Server::SO_NAME;
-
 /** Constructor based on XML data received from the stk server.
  *  \param xml The data for one server as received as part of the
  *         get-all stk-server request.
- *  \param is_lan If this is a lan only server.
  */
-Server::Server(const XMLNode & xml, bool is_lan)
+Server::Server(const XMLNode& xml)
 {
     assert(xml.getName() == "server");
 
@@ -37,9 +34,12 @@ Server::Server(const XMLNode & xml, bool is_lan)
     m_server_id = 0;
     m_current_players = 0;
     m_max_players = 0;
-    m_is_lan = is_lan;
-    m_minor_mode = RaceManager::MINOR_MODE_NORMAL_RACE;
-    m_difficulty = RaceManager::DIFFICULTY_HARD;
+    unsigned server_data = 0;
+    xml.get("game_mode", &server_data);
+    m_minor_mode = NetworkConfig::get()->getLocalGameMode(server_data).first;
+    m_major_mode = NetworkConfig::get()->getLocalGameMode(server_data).second;
+    xml.get("difficulty", &server_data);
+    m_difficulty = (RaceManager::Difficulty)server_data;
 
     xml.get("name", &m_lower_case_name);
     m_name = StringUtils::xmlDecode(m_lower_case_name);
@@ -60,29 +60,34 @@ Server::Server(const XMLNode & xml, bool is_lan)
 
 // ----------------------------------------------------------------------------
 /** Manual server creation, based on data received from a LAN server discovery
- *  (see ServersManager::getLANRefresh). This constructor is only used for
- *  LAN servers.
+ *  (see ServersManager::getLANRefresh) or local graphics server creation
+ *  where the server info is known already.
+ *  \param server_id ID of server.
  *  \param name Name of the server.
- *  \param is_lan If this is a lan-only server.
  *  \param max_players Maximum number of players allowed on this server.
  *  \param current_players The currently connected number of players.
+ *  \param difficulty The difficulty of server.
+ *  \param server_mode The game modes of server (including minor and major).
+ *  \param address IP and port of the server.
  */
-Server::Server(const core::stringw &name, bool is_lan, int max_players,
-               int current_players, const TransportAddress &address)
+Server::Server(unsigned server_id, const core::stringw &name, int max_players,
+               int current_players, unsigned difficulty, unsigned server_mode,
+               const TransportAddress &address)
 {
     m_name               = name;
+    m_lower_case_name    = StringUtils::toLowerCase(StringUtils::wideToUtf8(name));
     m_satisfaction_score = 0;
-    m_server_id          = 0;
+    m_server_id          = server_id;
+    m_host_id            = 0;
     m_current_players    = current_players;
     m_max_players        = max_players;
-    m_is_lan             = is_lan;
     m_address.copy(address);
     // In case of LAN server, public and private port are the same.
     m_private_port       = m_address.getPort();
-    m_minor_mode = RaceManager::MINOR_MODE_NORMAL_RACE;
-    m_difficulty = RaceManager::DIFFICULTY_HARD;
-
-}   // server(name, ...)
+    m_difficulty = (RaceManager::Difficulty)difficulty;
+    m_minor_mode = NetworkConfig::get()->getLocalGameMode(server_mode).first;
+    m_major_mode = NetworkConfig::get()->getLocalGameMode(server_mode).second;
+}   // server(server_id, ...)
 
 // ----------------------------------------------------------------------------
 /** \brief Filter the add-on with a list of words.

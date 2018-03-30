@@ -83,6 +83,7 @@ private:
     void finishedLoadingWorldClient(Event *event);
     void startedRaceOnClient(Event *event);
     void unregisterServer();
+    void createServerIdFile();
 public:
              ServerLobby();
     virtual ~ServerLobby();

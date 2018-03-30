@@ -89,7 +89,7 @@ private:
     }   // TransportAddress(const TransportAddress&)
 public:
     // ------------------------------------------------------------------------
-    bool isPublicAddressLAN() const;
+    bool isPublicAddressLocalhost() const;
     // ------------------------------------------------------------------------
     bool isLAN() const;
     // ------------------------------------------------------------------------

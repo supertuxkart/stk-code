@@ -18,7 +18,6 @@
 
 #include "network/protocols/connect_to_server.hpp"
 
-#include "config/player_manager.hpp"
 #include "network/event.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/get_peer_address.hpp"
@@ -27,37 +26,21 @@
 #include "network/protocols/client_lobby.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/servers_manager.hpp"
+#include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
+#include "states_screens/networking_lobby.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"
 
 // ----------------------------------------------------------------------------
-/** Connects to a server. This is the quick connect constructor, which 
- *  will pick a server randomly.
- */
-ConnectToServer::ConnectToServer() : Protocol(PROTOCOL_CONNECTION)
-{
-    m_server_id  = 0;
-    m_host_id    = 0;
-    m_quick_join = true;
-    m_server_address.clear();
-    setHandleConnections(true);
-}   // ConnectToServer()
-
-// ----------------------------------------------------------------------------
 /** Specify server to connect to.
- *  \param server_id Id of server to connect to.
- *  \param host_id Id of host.
+ *  \param server Server to connect to (if nullptr than we use quick play).
  */
-ConnectToServer::ConnectToServer(uint32_t server_id, uint32_t host_id)
+ConnectToServer::ConnectToServer(std::shared_ptr<Server> server)
                : Protocol(PROTOCOL_CONNECTION)
 {
-    m_server_id  = server_id;
-    m_host_id    = host_id;
-    m_quick_join = false;
-    m_server = ServersManager::get()->getServerByID(m_server_id);
-    m_server_address.copy(m_server->getAddress());
+    m_server = server;
     setHandleConnections(true);
 }   // ConnectToServer(server, host)
 
@@ -75,10 +58,11 @@ void ConnectToServer::setup()
 {
     Log::info("ConnectToServer", "SETUP");
     m_current_protocol.reset();
-    // In case of LAN we already have the server's and our ip address,
-    // so we can immediately start requesting a connection.
-    m_state = NetworkConfig::get()->isLAN() ? GOT_SERVER_ADDRESS :
-        SET_PUBLIC_ADDRESS;
+    // In case of LAN or client-server we already have the server's
+    // and our ip address, so we can immediately start requesting a connection.
+    m_state = (NetworkConfig::get()->isLAN() ||
+        STKHost::get()->isClientServer()) ?
+        GOT_SERVER_ADDRESS : SET_PUBLIC_ADDRESS;
 }   // setup
 
 // ----------------------------------------------------------------------------
@@ -88,6 +72,34 @@ void ConnectToServer::asynchronousUpdate()
     {
         case SET_PUBLIC_ADDRESS:
         {
+            if (!m_server)
+            {
+                while (!ServersManager::get()->refresh())
+                    StkTime::sleep(1);
+                while (!ServersManager::get()->listUpdated())
+                    StkTime::sleep(1);
+                if (!ServersManager::get()->getServers().empty())
+                {
+                    // For quick play we choose the server with the least player
+                    ServersManager::get()->sortServers([]
+                        (const std::shared_ptr<Server> a,
+                        const std::shared_ptr<Server> b)->bool
+                        {
+                            return a->getCurrentPlayers() < b->getCurrentPlayers();
+                        });
+                    m_server = ServersManager::get()->getServers()[0];
+                    ServersManager::get()->cleanUpServers();
+                }
+                else
+                {
+                    // Shutdown STKHost (go back to online menu too)
+                    STKHost::get()->setErrorMessage(
+                        _("No quick play server available."));
+                    STKHost::get()->requestShutdown();
+                    m_state = EXITING;
+                    return;
+                }
+            }
             STKHost::get()->setPublicAddress();
             // Set to DONE will stop STKHost is not connected
             m_state = STKHost::get()->getPublicAddress().isUnset() ?
@@ -97,26 +109,17 @@ void ConnectToServer::asynchronousUpdate()
         case REGISTER_SELF_ADDRESS:
         {
             registerWithSTKServer();  // Register us with STK server
-            if (m_quick_join)
-            {
-                handleQuickConnect();
-                // Quick connect will give us the server details,
-                // so we can immediately try to connect to the server
-                m_state = REQUESTING_CONNECTION;
-            }
-            else
-            {
-                m_state = GOT_SERVER_ADDRESS;
-            }
+            m_state = GOT_SERVER_ADDRESS;
         }
         break;
         case GOT_SERVER_ADDRESS:
         {
-            assert(!m_quick_join);
+            assert(m_server);
+            m_server_address.copy(m_server->getAddress());
             Log::info("ConnectToServer", "Server's address known");
             m_state = REQUESTING_CONNECTION;
             auto request_connection =
-                std::make_shared<RequestConnection>(m_server_id);
+                std::make_shared<RequestConnection>(m_server);
             request_connection->requestStart();
             m_current_protocol = request_connection;
             // Reset timer for next usage
@@ -124,6 +127,7 @@ void ConnectToServer::asynchronousUpdate()
             break;
         }
         case REQUESTING_CONNECTION:
+        {
             if (!m_current_protocol.expired())
             {
                 return;
@@ -148,10 +152,11 @@ void ConnectToServer::asynchronousUpdate()
                 m_state = NetworkConfig::get()->isWAN() ?
                     HIDING_ADDRESS : DONE;
             }
-            if ((!NetworkConfig::m_disable_lan && 
+            if ((!NetworkConfig::m_disable_lan &&
                 m_server_address.getIP() ==
                 STKHost::get()->getPublicAddress().getIP()) ||
-                NetworkConfig::get()->isLAN())
+                (NetworkConfig::get()->isLAN() ||
+                STKHost::get()->isClientServer()))
             {
                 // We're in the same lan (same public ip address).
                 // The state will change to CONNECTING
@@ -171,6 +176,7 @@ void ConnectToServer::asynchronousUpdate()
                 waitingAloha(true/*is_wan*/);
             }
             break;
+        }
         case CONNECTING: // waiting the server to answer our connection
         {
             // Every 5 seconds
@@ -194,7 +200,8 @@ void ConnectToServer::asynchronousUpdate()
         {
             Log::info("ConnectToServer", "Connected");
             // LAN networking does not use the stk server tables.
-            if (NetworkConfig::get()->isWAN())
+            if (NetworkConfig::get()->isWAN() &&
+                !STKHost::get()->isClientServer())
             {
                 auto hide_address = std::make_shared<HidePublicAddress>();
                 hide_address->requestStart();
@@ -222,6 +229,12 @@ void ConnectToServer::update(int ticks)
 {
     switch(m_state.load())
     {
+        case REQUESTING_CONNECTION:
+        {
+            assert(m_server);
+            NetworkingLobby::getInstance()->setJoinedServer(m_server);
+            break;
+        }
         case DONE:
         {
             // lobby room protocol if we're connected only
@@ -239,7 +252,7 @@ void ConnectToServer::update(int ticks)
             {
                 // Shutdown STKHost (go back to online menu too)
                 STKHost::get()->setErrorMessage(
-                    _("Cannot connect to server %s.",  m_server->getName()));
+                    _("Cannot connect to server %s.", m_server->getName()));
                 STKHost::get()->requestShutdown();
             }
             requestTerminate();
@@ -260,8 +273,7 @@ void ConnectToServer::registerWithSTKServer()
     // STK server.
     const TransportAddress& addr = STKHost::get()->getPublicAddress();
     Online::XMLRequest *request  = new Online::XMLRequest();
-    PlayerManager::setUserDetails(request, "set",
-                                  Online::API::SERVER_PATH);
+    NetworkConfig::get()->setUserDetails(request, "set");
     request->addParameter("address", addr.getIP());
     request->addParameter("port", addr.getPort());
     request->addParameter("private_port", STKHost::get()->getPrivatePort());
@@ -291,46 +303,6 @@ void ConnectToServer::registerWithSTKServer()
     delete request;
 
 }   // registerWithSTKServer
-
-// ----------------------------------------------------------------------------
-/** Called to request a quick connect from the STK server.
- */
-void ConnectToServer::handleQuickConnect()
-{
-    Online::XMLRequest *request = new Online::XMLRequest();
-    PlayerManager::setUserDetails(request, "quick-join",
-                                  Online::API::SERVER_PATH);
-    request->executeNow();
-
-    const XMLNode * result = request->getXMLData();
-    std::string success;
-
-    if(result->get("success", &success) && success=="yes")
-    {
-        uint32_t ip;
-        result->get("ip", &ip);
-        m_server_address.setIP(ip);
-
-        uint16_t port;
-        // If we are using a LAN connection, we need the private (local) port
-        if (m_server_address.getIP() == 
-            STKHost::get()->getPublicAddress().getIP())
-        {
-            result->get("private_port", &port);
-        }
-        else
-            result->get("port", &port);
-
-        m_server_address.setPort(port);
-
-        Log::debug("GetPeerAddress", "Address gotten successfully.");
-    }
-    else
-    {
-        Log::error("GetPeerAddress", "Failed to get address.");
-    }
-    delete request;
-}   // handleQuickConnect
 
 // ----------------------------------------------------------------------------
 /** Called when the server is on the same LAN. It uses broadcast to
@@ -369,7 +341,7 @@ void ConnectToServer::waitingAloha(bool is_wan)
                    sender.toString().c_str());
         if (!is_wan)
         {
-            if (sender.isPublicAddressLAN())
+            if (sender.isPublicAddressLocalhost())
                 sender.setIP(0x7f000001); // 127.0.0.1
         }
         m_server_address.copy(sender);

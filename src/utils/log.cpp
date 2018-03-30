@@ -37,6 +37,7 @@ bool          Log::m_no_colors     = false;
 FILE*         Log::m_file_stdout   = NULL;
 std::string   Log::m_prefix        = "";
 size_t        Log::m_buffer_size = 1;
+bool          Log::m_console_log = true;
 Synchronised<std::vector<struct Log::LineInfo> > Log::m_line_buffer;
 
 // ----------------------------------------------------------------------------
@@ -46,6 +47,8 @@ Synchronised<std::vector<struct Log::LineInfo> > Log::m_line_buffer;
  */
 void Log::setTerminalColor(LogLevel level)
 {
+    if (!m_console_log) return;
+
     if(m_no_colors) return;
 
     // Thanks to funto for the colouring code!
@@ -109,6 +112,8 @@ void Log::setTerminalColor(LogLevel level)
  */
 void Log::resetTerminalColor()
 {
+    if (!m_console_log) return;
+
     if(m_no_colors) return;
 
 #ifdef WIN32
@@ -198,32 +203,33 @@ void Log::writeLine(const char *line, int level)
 {
 
     // If we don't have a console file, write to stdout and hope for the best
-    if ( m_buffer_size <= 1 &&
-           (!m_file_stdout || level >= LL_WARN ||
-            UserConfigParams::m_log_errors_to_console) ) // log to console
+    if (m_buffer_size <= 1 || !m_file_stdout)
     {
         setTerminalColor((LogLevel)level);
-#ifdef ANDROID
-        android_LogPriority alp;
-        switch (level)
+        if (m_console_log)
         {
-            // STK is using the levels slightly different from android
-            // (debug lowest, verbose above it; while android reverses
-            // this order. So to get the same behaviour (e.g. filter
-            // out debug message, but still get verbose, we swap
-            // the order here.
-        case LL_VERBOSE: alp = ANDROID_LOG_DEBUG;   break;
-        case LL_DEBUG:   alp = ANDROID_LOG_VERBOSE; break;
-        case LL_INFO:    alp = ANDROID_LOG_INFO;    break;
-        case LL_WARN:    alp = ANDROID_LOG_WARN;    break;
-        case LL_ERROR:   alp = ANDROID_LOG_ERROR;   break;
-        case LL_FATAL:   alp = ANDROID_LOG_FATAL;   break;
-        default:         alp = ANDROID_LOG_FATAL;
-        }
-        __android_log_print(alp, "SuperTuxKart", "%s", line);
+#ifdef ANDROID
+            android_LogPriority alp;
+            switch (level)
+            {
+                // STK is using the levels slightly different from android
+                // (debug lowest, verbose above it; while android reverses
+                // this order. So to get the same behaviour (e.g. filter
+                // out debug message, but still get verbose, we swap
+                // the order here.
+            case LL_VERBOSE: alp = ANDROID_LOG_DEBUG;   break;
+            case LL_DEBUG:   alp = ANDROID_LOG_VERBOSE; break;
+            case LL_INFO:    alp = ANDROID_LOG_INFO;    break;
+            case LL_WARN:    alp = ANDROID_LOG_WARN;    break;
+            case LL_ERROR:   alp = ANDROID_LOG_ERROR;   break;
+            case LL_FATAL:   alp = ANDROID_LOG_FATAL;   break;
+            default:         alp = ANDROID_LOG_FATAL;
+            }
+            __android_log_print(alp, "SuperTuxKart", "%s", line);
 #else
-        printf("%s", line);
+            printf("%s", line);
 #endif
+        }
         resetTerminalColor();  // this prints a \n
     }
 
@@ -240,6 +246,12 @@ void Log::writeLine(const char *line, int level)
     }
 #endif
 }   // _fluhBuffers
+
+// ----------------------------------------------------------------------------
+void Log::toggleConsoleLog(bool val)
+{
+    m_console_log = val;
+}   // toggleConsoleLog
 
 // ----------------------------------------------------------------------------
 /** Flushes all stored log messages to the various output devices (thread safe).

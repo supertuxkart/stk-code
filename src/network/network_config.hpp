@@ -23,9 +23,14 @@
 #define HEADER_NETWORK_CONFIG
 
 #include "network/transport_address.hpp"
-#include "utils/synchronised.hpp"
+#include "race/race_manager.hpp"
 
 #include "irrString.h"
+
+namespace Online
+{
+    class XMLRequest;
+}
 
 class NetworkConfig
 {
@@ -43,7 +48,9 @@ private:
 
     /** If set it allows clients to connect directly to this server without
      *  using the stk server in between. It requires obviously that this
-     *  server is accessible (through the firewall) from the outside. */
+     *  server is accessible (through the firewall) from the outside,
+     *  then you can use the \ref m_server_discovery_port and ip address for
+     *  direct connection. */
     bool m_is_public_server;
 
     /** True if this host is a server, false otherwise. */
@@ -52,7 +59,8 @@ private:
     /** The password for a server (or to authenticate to a server). */
     std::string m_password;
 
-    /** The port number to which the server listens to detect LAN requests. */
+    /** The port number to which the server listens to detect direct socket
+     *  requests. */
     uint16_t m_server_discovery_port;
 
     /** The port on which the server listens for connection requests from LAN. */
@@ -64,16 +72,19 @@ private:
     /** Maximum number of players on the server. */
     int m_max_players;
 
-    /** If this is a server, it indicates if this server is registered
-    *  with the stk server. */
-    bool m_is_registered;
-
     /** True if a client should connect to the first server it finds and
      *  immediately start a race. */
     bool m_auto_connect;
 
     /** If this is a server, the server name. */
     irr::core::stringw m_server_name;
+
+    /** Used by wan server. */
+    uint32_t m_cur_user_id;
+    std::string m_cur_user_token;
+
+    /** Used by client server to determine if the child server is created. */
+    std::string m_server_id_file;
 
     NetworkConfig();
 
@@ -154,35 +165,57 @@ public:
     // ------------------------------------------------------------------------
     /** Sets the maximum number of players for this server. */
     void setMaxPlayers(int n) { m_max_players = n; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the maximum number of players for this server. */
     int getMaxPlayers() const { return m_max_players; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns if this instance is a server. */
     bool isServer() const { return m_is_server;  }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns if this instance is a client. */
     bool isClient() const { return !m_is_server; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Sets the name of this server. */
     void setServerName(const irr::core::stringw &name)
     {
         m_server_name = name;
     }   // setServerName
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the server name. */
     const irr::core::stringw& getServerName() const
     {
         assert(isServer());
         return m_server_name;
     }   // getServerName
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Sets if a client should immediately connect to the first server. */
     void setAutoConnect(bool b) { m_auto_connect = b; }
-    // --------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns if an immediate connection to the first server was
      *  requested. */
     bool isAutoConnect() const { return m_auto_connect; }
+    // ------------------------------------------------------------------------
+    /** Returns the game mode id for server database. */
+    unsigned getServerGameMode(RaceManager::MinorRaceModeType mode,
+                               RaceManager::MajorRaceModeType);
+    // ------------------------------------------------------------------------
+    /** Returns the minor and majar game mode from server database id. */
+    std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
+        getLocalGameMode(unsigned);
+    // ------------------------------------------------------------------------
+    void setCurrentUserId(uint32_t id) { m_cur_user_id = id ; }
+    // ------------------------------------------------------------------------
+    void setCurrentUserToken(const std::string& t) { m_cur_user_token = t; }
+    // ------------------------------------------------------------------------
+    uint32_t getCurrentUserId() const { return m_cur_user_id; }
+    // ------------------------------------------------------------------------
+    const std::string& getCurrentUserToken() const { return m_cur_user_token; }
+    // ------------------------------------------------------------------------
+    void setUserDetails(Online::XMLRequest* r, const std::string& name);
+    // ------------------------------------------------------------------------
+    void setServerIdFile(const std::string& id) { m_server_id_file = id; }
+    // ------------------------------------------------------------------------
+    const std::string& getServerIdFile() const { return m_server_id_file; }
 
 };   // class NetworkConfig
 
