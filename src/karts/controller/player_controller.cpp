@@ -106,8 +106,8 @@ bool PlayerController::action(PlayerAction action, int value, bool dry_run)
 
     /** If dry_run (parameter) is true, this macro tests if this action would
      *  trigger a state change in the specified variable (without actually
-     *  doing it). If it will trigger a state change, the marco will trigger
-     *  immediatley a return to the caller. If dry_run is false, it will only
+     *  doing it). If it will trigger a state change, the macro will
+     *  immediatley return to the caller. If dry_run is false, it will only
      *  assign the new value to the variable (and not return to the user
      *  early). The do-while(0) helps using this macro e.g. in the 'then'
      *  clause of an if statement. */
@@ -125,7 +125,7 @@ bool PlayerController::action(PlayerAction action, int value, bool dry_run)
     } while(0)
 
     /** Basically the same as the above macro, but is uses getter/setter
-     *  funcitons. The name of the setter/getter is set'name'(value) and
+     *  functions. The name of the setter/getter is set'name'(value) and
      *  get'name'(). */
 #define SET_OR_TEST_GETTER(name, value)                           \
     do                                                            \

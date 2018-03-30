@@ -37,11 +37,10 @@ class TimeStepInfo;
 class RewindQueue
 {
 private:
-    /** Pointer to all saved */
-    typedef std::list<TimeStepInfo*> AllTimeStepInfo;
 
-    /** The list of all events that are affected by a rewind. */
-    AllTimeStepInfo m_time_step_info;
+    typedef std::list<RewindInfo*> AllRewindInfo;
+
+    AllRewindInfo m_all_rewind_info;
 
     /** The list of all events received from the network. They are stored
      *  in a separate thread (so this data structure is thread-save), and
@@ -51,21 +50,10 @@ private:
     typedef std::vector<RewindInfo*> AllNetworkRewindInfo;
     Synchronised<AllNetworkRewindInfo> m_network_events;
 
-    /** Iterator to the curren time step info to be handled. This should
-     *  always be at the same time as World::getTime(). */
-    AllTimeStepInfo::iterator m_current;
+    /** Iterator to the curren time step info to be handled. */
+    AllRewindInfo::iterator m_current;
 
-    AllTimeStepInfo::iterator findPreviousTimeStepInfo(int ticks);
     void insertRewindInfo(RewindInfo *ri);
-
-    struct _TimeStepInfoCompare
-    {
-        bool operator()(const TimeStepInfo * const ri1, const TimeStepInfo * const ri2) const;
-    } m_time_step_info_compare;
-
-    void testingSortingOrderType(EventRewinder *rewinder, int types[3]);
-    void testingSortingOrderTime(EventRewinder *rewinder, int types[3],
-                                 float times[3]                       );
 
 public:
         static void unitTesting();
@@ -73,7 +61,6 @@ public:
          RewindQueue();
         ~RewindQueue();
     void reset();
-    void addNewTimeStep(int ticks, float dt);
     void addLocalEvent(EventRewinder *event_rewinder, BareNetworkString *buffer,
                        bool confirmed, int ticks);
     void addLocalState(Rewinder *rewinder, BareNetworkString *buffer,
@@ -81,34 +68,30 @@ public:
     void addNetworkEvent(EventRewinder *event_rewinder,
                          BareNetworkString *buffer, int ticks);
     void addNetworkState(Rewinder *rewinder, BareNetworkString *buffer,
-                         int ticks, float dt);
+                         int ticks);
     void mergeNetworkData(int world_ticks,  bool *needs_rewind, 
                           int *rewind_ticks);
+    void replayAllEvents(int ticks);
     bool isEmpty() const;
     bool hasMoreRewindInfo() const;
-    void undoUntil(int undo_ticks);
-    float determineNextDT();
-    // ------------------------------------------------------------------------
-    /** Returns the last (i.e. newest) entry in the TimeStepInfo list. This is
-     *  used for rewinds, since it's the first TimeStep that must not be
-     *  rewound. */
-    TimeStepInfo *getLast() { return *m_time_step_info.rbegin(); }
+    int  undoUntil(int undo_ticks);
 
     // ------------------------------------------------------------------------
-    RewindQueue::AllTimeStepInfo::iterator& operator++()
+    /** Sets the current element to be the next one and returns the next
+     *  RewindInfo element. */
+    void next()
     {
-        assert(m_current != m_time_step_info.end());
+        assert(m_current != m_all_rewind_info.end());
         m_current++;
-        return m_current;
+        return;
     }   // operator++
 
     // ------------------------------------------------------------------------
-    /** Returns the current RewindInfo. Caller must make sure that there is at least
-     *  one more RewindInfo (see hasMoreRewindInfo()). */
-    TimeStepInfo *getCurrent()
+    /** Returns the current RewindInfo. Caller must make sure that there is at
+     *  least one more RewindInfo (see hasMoreRewindInfo()). */
+    RewindInfo* getCurrent()
     {
-        assert(m_current != m_time_step_info.end());
-        return *m_current;
+        return (m_current != m_all_rewind_info.end() ) ? *m_current : NULL;
     }   // getNext
 
 };   // RewindQueue

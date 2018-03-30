@@ -78,9 +78,6 @@ public:
     /** If this RewindInfo is an event. Subclasses will overwrite this. */
     virtual bool isEvent() const { return false; }
     // ------------------------------------------------------------------------
-    /** If this RewindInfo is time info. Subclasses will overwrite this. */
-    virtual bool isTime() const { return false; }
-    // ------------------------------------------------------------------------
     /** If this RewindInfo is an event. Subclasses will overwrite this. */
     virtual bool isState() const { return false; }
     // ------------------------------------------------------------------------
@@ -121,18 +118,11 @@ public:
 // ============================================================================
 class RewindInfoState: public RewindInfoRewinder
 {
-private:
-    /** The 'left over' time from the physics. */
-    float m_local_physics_time;
-
 public:
              RewindInfoState(int ticks, Rewinder *rewinder, 
                              BareNetworkString *buffer, bool is_confirmed);
     virtual ~RewindInfoState() {};
 
-    // ------------------------------------------------------------------------
-    /** Returns the left-over physics time. */
-    float getLocalPhysicsTime() const { return m_local_physics_time; }
     // ------------------------------------------------------------------------
     virtual bool isState() const { return true; }
     // ------------------------------------------------------------------------

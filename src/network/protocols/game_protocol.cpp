@@ -139,6 +139,7 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
     BareNetworkString *s = new BareNetworkString(4);
     s->addUInt8(kart_id).addUInt8(action).addUInt32(value)
                         .addUInt32(val_l).addUInt32(val_r);
+
     RewindManager::get()->addEvent(this, s, /*confirmed*/true,
                                    World::getWorld()->getTimeTicks() );
 
@@ -255,7 +256,9 @@ void GameProtocol::startNewState()
 }   // startNewState
 
 // ----------------------------------------------------------------------------
-/** Called by a server to add data to the current state.
+/** Called by a server to add data to the current state. The data in buffer
+ *  is copied, so the data can be freed after this call/.
+ *  \param buffer Adds the data in the buffer to the current state.
  */
 void GameProtocol::addState(BareNetworkString *buffer)
 {
@@ -263,6 +266,7 @@ void GameProtocol::addState(BareNetworkString *buffer)
     m_data_to_send->addUInt16(buffer->size());
     (*m_data_to_send) += *buffer;
 }   // addState
+
 // ----------------------------------------------------------------------------
 /** Called when the last state information has been added and the message
  *  can be sent to the clients.
