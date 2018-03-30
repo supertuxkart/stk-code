@@ -154,9 +154,8 @@ float MainLoop::getLimitedDt()
 
     dt *= 0.001f;
 
-    // If this is a client, the server might request an 
-    // adjustment of this client's world clock (to reduce
-    // number of rewinds).
+    // If this is a client, the server might request an adjustment of
+    // this client's world clock (to reduce number of rewinds).
     if (World::getWorld()                   &&
         NetworkConfig::get()->isClient()    &&
         !RewindManager::get()->isRewinding()   )
@@ -297,14 +296,6 @@ void MainLoop::run()
             NetworkConfig::get()->unsetNetworking();
         }
 
-        // Add a Time step entry to the rewind list, which can store all
-        // all input ecents being issued during the driver update.
-        if (World::getWorld() && RewindManager::get()->isEnabled())
-        {
-            RewindManager::get()
-                ->addNextTimeStep(World::getWorld()->getTimeTicks(), dt);
-        }
-
         if (!m_abort)
         {
             float frame_duration = num_steps * dt;
@@ -338,16 +329,6 @@ void MainLoop::run()
 
         for(int i=0; i<num_steps; i++)
         {
-            // Create the TimeStepInfo structure. For the first iteration
-            // this is done before the irr_driver update (since this needs
-            // to store input events at the event), but for any further
-            // substep another TimeStepInfo needs to be created here.
-            if (World::getWorld() && RewindManager::get()->isEnabled() && i>0)
-            {
-                RewindManager::get()
-                    ->addNextTimeStep(World::getWorld()->getTimeTicks(), dt);
-            }
-
             // Enable last substep in last iteration
             m_is_last_substep = (i == num_steps - 1);
 

@@ -23,7 +23,6 @@
 #include "network/network_config.hpp"
 #include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
-#include "network/time_step_info.hpp"
 
 #include <algorithm>
 
@@ -43,7 +42,6 @@
  */
 RewindQueue::RewindQueue()
 {
-    m_current = m_time_step_info.begin();
     reset();
 }   // RewindQueue
 
@@ -53,14 +51,8 @@ RewindQueue::RewindQueue()
  */
 RewindQueue::~RewindQueue()
 {
-    // Destroying the 
-    AllTimeStepInfo::const_iterator i;
-
-    for(i=m_time_step_info.begin(); i!=m_time_step_info.end(); ++i)
-    {
-        delete *i;
-    }
-    m_time_step_info.clear();
+    // This frees all current data
+    reset();
 }   // ~RewindQueue
 
 // ----------------------------------------------------------------------------
@@ -68,16 +60,6 @@ RewindQueue::~RewindQueue()
  */
 void RewindQueue::reset()
 {
-
-    for(AllTimeStepInfo::const_iterator i =m_time_step_info.begin();
-                                        i!=m_time_step_info.end(); i++)
-    {
-        delete *i;
-    }
-
-    m_time_step_info.clear();
-    m_current = m_time_step_info.begin();
-
     m_network_events.lock();
 
     AllNetworkRewindInfo &info = m_network_events.getData();
@@ -88,87 +70,50 @@ void RewindQueue::reset()
     }
     m_network_events.getData().clear();
     m_network_events.unlock();
+
+    AllRewindInfo::const_iterator i;
+    for (i = m_all_rewind_info.begin(); i != m_all_rewind_info.end(); ++i)
+        delete *i;
+
+    m_all_rewind_info.clear();
+    m_current = m_all_rewind_info.end();
 }   // reset
-
-// ----------------------------------------------------------------------------
-/** Adds a new TimeStepInfo for the specified time. The TimeStepInfo acts
- *  as an container to store all states and events that happen at this time
- *  (or at least close to this time, since e.g. several events from clients
- *  happening at slightly different times will be all handled in the same
- *  timestep.
- *  \param time New time to add.
- *  \param dt Time step size that is going to be used for this time step.
- */
-void RewindQueue::addNewTimeStep(int ticks, float dt)
-{
-    TimeStepInfo *tsi = new TimeStepInfo(ticks, dt);
-    assert(m_time_step_info.empty()                 ||
-           ticks > m_time_step_info.back()->getTicks()  );
-    m_time_step_info.push_back(tsi);
-
-    // If current was not initialised
-    if (m_current == m_time_step_info.end())
-    {
-        m_current--;
-    }
-}   // addNewTimeStep
-
-// ----------------------------------------------------------------------------
-/** Finds the TimeStepInfo object to which an event at time t should be added.
- *  The TimeStepInfo object might not have the exacct same time, it can be
- *  the closest existing (or in future this function might even add a totally
- *  new TimeStepInfo object).
- *  \param Time at which the event that needs to be added hapened.
- */
-RewindQueue::AllTimeStepInfo::iterator 
-             RewindQueue::findPreviousTimeStepInfo(int ticks)
-{
-    AllTimeStepInfo::iterator i = m_time_step_info.end();
-    while(i!=m_time_step_info.begin())
-    {
-        i--;
-        if ((*i)->getTicks() <= ticks) return i;
-    } 
-    return i;
-}   // findPreviousTimeStepInfo
-
-// ----------------------------------------------------------------------------
-/** A compare function used when sorting the event lists. It sorts events by
- *  time. In case of equal times, it sorts states and events first (since the
- *  state needs to be restored when replaying first before any other events).
- */
-bool RewindQueue::_TimeStepInfoCompare::operator()(const TimeStepInfo * const ri1,
-                                                   const TimeStepInfo * const ri2) const
-{
-    return ri1->getTicks() < ri2->getTicks();
-}   // RewindQueue::operator()
 
 // ----------------------------------------------------------------------------
 /** Inserts a RewindInfo object in the list of all events at the correct time.
  *  If there are several RewindInfo at the exact same time, state RewindInfo
- *  will be insert at the front, and event and time info at the end of the
- *  RewindInfo with the same time.
+ *  will be insert at the front, and event info at the end of the RewindInfo
+ *  with the same time.
  *  \param ri The RewindInfo object to insert.
+ *  \param update_current If set, the current pointer will be updated if
+ *         necessary to point to the new event
  */
 void RewindQueue::insertRewindInfo(RewindInfo *ri)
 {
-    // FIXME: this should always be the last element in the list(??)
-    AllTimeStepInfo::iterator bucket = findPreviousTimeStepInfo(ri->getTicks());
+    AllRewindInfo::iterator i = m_all_rewind_info.end();
 
-    // FIXME: In case of a history replay an element could be inserted in the
-    // very first frame (on very quick recorded start, and if the first frame
-    // takes a long time - e.g. in networking startup), i.e. before a TimeStep
-    // info was added. Since this is mostly for debugging, just ignore this
-    // this for now.
-    if(bucket!=m_time_step_info.end())
-        (*bucket)->insert(ri);
+    while (i != m_all_rewind_info.begin())
+    {
+        AllRewindInfo::iterator i_prev = i;
+        i_prev--;
+        // Now test if 'ri' needs to be inserted after the
+        // previous element, i.e. before the current element:
+        if ((*i_prev)->getTicks() < ri->getTicks()) break;
+        if ((*i_prev)->getTicks() == ri->getTicks() &&
+            (*i_prev)->isState() && ri->isEvent()      ) break;
+        i = i_prev;
+    }
+    if(m_current == m_all_rewind_info.end())
+        m_current = m_all_rewind_info.insert(i, ri);
+    else
+        m_all_rewind_info.insert(i, ri);  
 }   // insertRewindInfo
 
 // ----------------------------------------------------------------------------
 /** Adds an event to the rewind data. The data to be stored must be allocated
  *  and not freed by the caller!
- *  \param time Time at which the event was recorded.
  *  \param buffer Pointer to the event data. 
+ *  \param ticks Time at which the event happened.
  */
 void RewindQueue::addLocalEvent(EventRewinder *event_rewinder,
                                 BareNetworkString *buffer, bool confirmed,
@@ -188,7 +133,7 @@ void RewindQueue::addLocalEvent(EventRewinder *event_rewinder,
  *  \param confirmed If this state is confirmed to be correct (e.g. is
  *         being received from the servrer), or just a local state for
  *         faster rewinds.
- *  \param time Time at which the state was captured.
+ *  \param ticks Time at which the event happened.
  */
 void RewindQueue::addLocalState(Rewinder *rewinder, BareNetworkString *buffer,
                                 bool confirmed, int ticks)
@@ -201,10 +146,10 @@ void RewindQueue::addLocalState(Rewinder *rewinder, BareNetworkString *buffer,
 // ----------------------------------------------------------------------------
 /** Adds an event to the list of network rewind data. This function is
  *  threadsafe so can be called by the network thread. The data is synched
- *  to m_time_step_info by the main thread. The data to be stored must be
- *  allocated and not freed by the caller!
- *  \param time Time at which the event was recorded.
+ *  to m_tRewindInformation list by the main thread. The data to be stored
+ *  must be allocated and not freed by the caller!
  *  \param buffer Pointer to the event data.
+ *  \param ticks Time at which the event happened.
  */
 void RewindQueue::addNetworkEvent(EventRewinder *event_rewinder,
                                   BareNetworkString *buffer, int ticks)
@@ -220,13 +165,13 @@ void RewindQueue::addNetworkEvent(EventRewinder *event_rewinder,
 // ----------------------------------------------------------------------------
 /** Adds a state to the list of network rewind data. This function is
  *  threadsafe so can be called by the network thread. The data is synched
- *  to m_time_step_info by the main thread. The data to be stored must be
+ *  to RewindInfo list by the main thread. The data to be stored must be
  *  allocated and not freed by the caller!
- *  \param time Time at which the event was recorded.
  *  \param buffer Pointer to the event data.
+ *  \param ticks Time at which the event happened.
  */
 void RewindQueue::addNetworkState(Rewinder *rewinder, BareNetworkString *buffer,
-                                  int ticks, float dt)
+                                  int ticks)
 {
     RewindInfo *ri = new RewindInfoState(ticks, rewinder,
                                          buffer, /*confirmed*/true);
@@ -237,19 +182,18 @@ void RewindQueue::addNetworkState(Rewinder *rewinder, BareNetworkString *buffer,
 }   // addNetworkState
 
 // ----------------------------------------------------------------------------
-/** Merges thread-safe all data received from the network with the current
- *  local rewind information.
+/** Merges thread-safe all data received from the network up to and including
+ *  the current time (tick) with the current local rewind information.
  *  \param world_ticks[in] Current world time up to which network events will be
  *         merged in.
- *  \param needs_rewind[out] True if network rewind information was received
+ *  \param needs_rewind[out] True if a network event/state was received
  *         which was in the past (of this simulation), so a rewind must be
  *         performed.
  *  \param rewind_time[out] If needs_rewind is true, the time to which a rewind
- *         must be performed (at least). Otherwise undefined, but the value
- *         might be modified in this function.
+ *         must be performed (at least). Otherwise undefined.
  */
-void RewindQueue::mergeNetworkData(int world_ticks,
-                                   bool *needs_rewind, int *rewind_ticks)
+void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
+                                   int *rewind_ticks)
 {
     *needs_rewind = false;
     m_network_events.lock();
@@ -268,10 +212,9 @@ void RewindQueue::mergeNetworkData(int world_ticks,
     // FIXME: making m_network_events sorted would prevent the need to 
     // go through the whole list of events
     AllNetworkRewindInfo::iterator i = m_network_events.getData().begin();
-    while( i!=m_network_events.getData().end() )
+    while (i != m_network_events.getData().end())
     {
-        // Ignore any events that will happen in the future. An event needs
-        // to be handled at the closest time to its original time. The current
+        // Ignore any events that will happen in the future. The current
         // time step is world_ticks.
         if ((*i)->getTicks() > world_ticks)
         {
@@ -285,64 +228,36 @@ void RewindQueue::mergeNetworkData(int world_ticks,
         if (NetworkConfig::get()->isServer() && (*i)->getTicks() < world_ticks)
         {
             Log::warn("RewindQueue", "At %d received message from %d",
-                      world_ticks, (*i)->getTicks());
+                world_ticks, (*i)->getTicks());
             // Server received an event in the past. Adjust this event
-            // to be executed now - at least we get a bit closer to the
+            // to be executed 'now' - at least we get a bit closer to the
             // client state.
             (*i)->setTicks(world_ticks);
         }
 
-        // Find closest previous time step.
-        AllTimeStepInfo::iterator prev =
-                         findPreviousTimeStepInfo((*i)->getTicks());
-        AllTimeStepInfo::iterator next = prev;
-        next++;
+        insertRewindInfo(*i);
 
-        int event_ticks = (*i)->getTicks();
+        Log::info("Rewind", "Inserting %s from time %d",
+                  (*i)->isEvent() ? "event" : "state",
+                  (*i)->getTicks()                       );
 
-        TimeStepInfo *tsi;
-
-        // Assign this event to the closest of the two existing timesteps
-        // prev and next (inserting an additional event in the past would
-        // mean more CPU work in the rewind this will very likely trigger).
-        if (next == m_time_step_info.end())
-            tsi = *prev;
-        else if ( (*next)->getTicks()-event_ticks < event_ticks-(*prev)->getTicks() )
-            tsi = *next;
-        else
-            tsi = *prev;
-
-        tsi->insert(*i);
-        Log::info("Rewind", "Inserting event from time %d type %c to timstepinfo %d prev %d next %d",
-                  (*i)->getTicks(), 
-                  (*i)->isEvent() ? 'E' : ((*i)->isState() ? 'S' : 'T'),
-                  tsi->getTicks(),
-                  (*prev)->getTicks(), 
-                  next != m_time_step_info.end() ? (*next)->getTicks() : 9999 );
-
-        // Check if a rewind is necessary: either an message arrived in the past
-        // or if the time is between world_time and world_time+dt (otherwise
-        // the message would have been ignored further up), 'rewind' to this new
-        // state anyway
-        if (NetworkConfig::get()->isClient())
+        // Check if a rewind is necessary, i.e. a message is received in the
+        // past of client (server never rewinds).
+        if (NetworkConfig::get()->isClient() && (*i)->getTicks() < world_ticks)
         {
-            // We need rewind if we either receive an event in the past
-            // (FIXME: maybe we can just ignore this since we will also get
-            // a state update??), or receive a state from the current time
-            // (i.e. between world_time and world_time+dt). In the latter
-            // case we can just 'rewind' to this stage instead of doing a
-            // full simulation - though this client should potentially 
-            // speed up a bit: if it receives a state from the server
-            // at the time the client is currently simulating (instead of
-            // triggering a rollback) it is not ahead enough of the server
-            // which will trigger a time adjustment from the server anyway.
-            if (tsi->getTicks() < world_ticks ||
-                (*i)->isState() && tsi == m_time_step_info.back())
-            {
-                *needs_rewind = true;
-                if (tsi->getTicks() > *rewind_ticks) *rewind_ticks = tsi->getTicks();
-            }
-        }   // if client
+            // We need rewind if we receive an event in the past. This will
+            // then trigger a rewind later. Note that we only rewind to the
+            // latest event that happened earlier than 'now' - if there is
+            // more than one event in the past, we rewind to the last event.
+            // Since we restore a state before the rewind, this state will
+            // either include the earlier event or the state will be before
+            // the earlier event, and the event will be replayed anyway. This
+            // makes it easy to handle lost event messages.
+            *needs_rewind = true;
+            if ((*i)->getTicks() > *rewind_ticks)
+                *rewind_ticks = (*i)->getTicks();
+        }   // if client and ticks < world_ticks
+
         i = m_network_events.getData().erase(i);
     }   // for i in m_network_events
 
@@ -353,7 +268,7 @@ void RewindQueue::mergeNetworkData(int world_ticks,
 // ----------------------------------------------------------------------------
 bool RewindQueue::isEmpty() const
 {
-    return m_time_step_info.empty();
+    return m_current == m_all_rewind_info.end();
 }   // isEmpty
 
 // ----------------------------------------------------------------------------
@@ -361,52 +276,59 @@ bool RewindQueue::isEmpty() const
  */
 bool RewindQueue::hasMoreRewindInfo() const
 {
-    return m_current != m_time_step_info.end();
+    return m_current != m_all_rewind_info.end();
 }   // hasMoreRewindInfo
-
-// ----------------------------------------------------------------------------
-/** Determines the next time step size to use when recomputing the physics.
- *  The time step size is either 1/60 (default physics), or less, if there
- *  is an even to handle before that time.
- *  \param next_state The next state to replay.
- *  \param end_time The end time to which we must replay forward. Don't
- *         return a dt that would be bigger tham this value.
- *  \return The time step size to use in the next simulation step.
- */
-float RewindQueue::determineNextDT()
-{
-    return stk_config->ticks2Time(1);
-}   // determineNextDT
 
 // ----------------------------------------------------------------------------
 /** Rewinds the rewind queue and undos all events/states stored. It stops
  *  when the first confirmed state is reached that was recorded before the
- *  undo_time and sets the internal 'current' pointer to this state. It is
- *  assumed that this function is called after a new TimeStepInfo instance
- *  was added (i.e. after RewindManager::update() was called), so the state
- *  m_current is pointing to is ignored.
+ *  undo_time and sets the internal 'current' pointer to this state. 
  *  \param undo_time To what at least events need to be undone.
+ *  \return The time in ticks of the confirmed state
  */
-void RewindQueue::undoUntil(int undo_ticks)
+int RewindQueue::undoUntil(int undo_ticks)
 {
-    while (m_current != m_time_step_info.begin())
+    // m_current points to the next not yet executed event (or state)
+    // or end() if nothing else is in the queue
+    if (m_current != m_all_rewind_info.begin())
+        m_current--;
+
+    do 
     {
-        --m_current;
         // Undo all events and states from the current time
-        (*m_current)->undoAll();
+        (*m_current)->undo();
 
-        if ((*m_current)->getTicks() <= undo_ticks &&
-            (*m_current)->hasConfirmedState())
+        if ( (*m_current)->getTicks() <= undo_ticks && 
+             (*m_current)->isState() && (*m_current)->isConfirmed() )
         {
-            return;
+            return (*m_current)->getTicks();
         }
+        m_current--;
+    } while (m_current != m_all_rewind_info.end());
 
-    }   // while m_current!=m_time_step_info.begin()
-
+    // Shouldn't happen
     Log::error("RewindManager", "No state for rewind to %d",
                undo_ticks);
-
+    return -1;
 }   // undoUntil
+
+// ----------------------------------------------------------------------------
+/** Replays all events (not states) that happened at the specified time.
+ *  \param ticks Time in ticks.
+ */
+void RewindQueue::replayAllEvents(int ticks)
+{
+    // Replay all events that happened at the current time step
+    while ( m_current != m_all_rewind_info.end() && 
+            (*m_current)->getTicks() == ticks        )
+    {
+        if ((*m_current)->isEvent())
+            (*m_current)->rewind();
+        m_current++;
+        if (!hasMoreRewindInfo()) break;
+    }   // while current->getTIcks == ticks
+
+}   // replayAllEvents
 
 // ----------------------------------------------------------------------------
 /** Unit tests for RewindQueue. It tests:
@@ -439,62 +361,74 @@ void RewindQueue::unitTesting()
     };
     DummyRewinder *dummy_rewinder = new DummyRewinder();
 
+    // First tests: add a state first, then an event, and make
+    // sure the state stays first
     RewindQueue q0;
     assert(q0.isEmpty());
     assert(!q0.hasMoreRewindInfo());
 
-    q0.addNewTimeStep(0, 0.5f);
-    q0.m_current = q0.m_time_step_info.begin();
-    assert(!q0.isEmpty());
+    q0.addLocalState(NULL, NULL, /*confirmed*/true, 0);
+    assert(q0.m_all_rewind_info.front()->isState());
+    assert(!q0.m_all_rewind_info.front()->isEvent());
     assert(q0.hasMoreRewindInfo());
-    assert(q0.m_time_step_info.size() == 1);
-
-    assert((*q0.m_time_step_info.begin())->getNumberOfEvents() == 0);
-    q0.addLocalState(NULL, NULL, true, 0);
-    assert((*q0.m_time_step_info.begin())->getNumberOfEvents() == 1);
-
-    q0.addNewTimeStep(1, 0.5f);
-    assert(q0.m_time_step_info.size() == 2);
+    assert(q0.undoUntil(0) == 0);
 
     q0.addNetworkEvent(dummy_rewinder, NULL, 0);
+    // Network events are not immediately merged
+    assert(q0.m_all_rewind_info.size() == 1);
 
     bool needs_rewind;
     int rewind_ticks;
     int world_ticks = 0;
-    float dt = 0.01f;
-    assert((*q0.m_time_step_info.begin())->getNumberOfEvents() == 1);
     q0.mergeNetworkData(world_ticks, &needs_rewind, &rewind_ticks);
-    assert((*q0.m_time_step_info.begin())->getNumberOfEvents() == 2);
+    assert(q0.hasMoreRewindInfo());
+    assert(q0.m_all_rewind_info.size() == 2);
+    AllRewindInfo::iterator rii = q0.m_all_rewind_info.begin();
+    assert((*rii)->isState());
+    rii++;
+    assert((*rii)->isEvent());
 
-    // This will be added to timestep 0
-    q0.addNetworkEvent(dummy_rewinder, NULL, 2);
-    dt = 0.01f;   // to small, event from 0.2 will not be merged
+    // Another state must be sorted before the event:
+    q0.addNetworkState(dummy_rewinder, NULL, 0);
+    assert(q0.hasMoreRewindInfo());
     q0.mergeNetworkData(world_ticks, &needs_rewind, &rewind_ticks);
-    assert(q0.m_time_step_info.size() == 2);
-    assert((*q0.m_time_step_info.begin())->getNumberOfEvents() == 2);
-    dt = 0.3f;
-    q0.mergeNetworkData(world_ticks, &needs_rewind, &rewind_ticks);
-    assert(q0.m_time_step_info.size() == 2);
-    assert((*q0.m_time_step_info.begin())->getNumberOfEvents() == 3);
+    assert(q0.m_all_rewind_info.size() == 3);
+    rii = q0.m_all_rewind_info.begin();
+    assert((*rii)->isState());
+    rii++;
+    assert((*rii)->isState());
+    rii++;
+    assert((*rii)->isEvent());
 
-    // This event will get added to the last time step info at 1.0:
-    q0.addNetworkEvent(dummy_rewinder, NULL, 1);
-    world_ticks = 8;
-    dt = 0.3f;
-    q0.mergeNetworkData(world_ticks, &needs_rewind, &rewind_ticks);
-    // Note that end() is behind the list, i.e. invalid, but rbegin()
-    // is the last element
-    assert((*q0.m_time_step_info.rbegin())->getNumberOfEvents() == 1);
+    // Test time base comparisons: adding an event to the end
+    q0.addLocalEvent(dummy_rewinder, NULL, true, 4);
+    // Then adding an earlier event
+    q0.addLocalEvent(dummy_rewinder, NULL, false, 1);
+    // rii points to the 3rd element, the ones added just now
+    // should be elements4 and 5:
+    rii++;
+    assert((*rii)->getTicks()==1);
+    rii++;
+    assert((*rii)->getTicks()==4);
+
+    // Now test inserting an event first, then the state
+    RewindQueue q1;
+    q1.addLocalEvent(NULL, NULL, true, 5);
+    q1.addLocalState(NULL, NULL, true, 5);
+    rii = q1.m_all_rewind_info.begin();
+    assert((*rii)->isState());
+    rii++;
+    assert((*rii)->isEvent());
 
     // Bugs seen before
     // ----------------
     // 1) Current pointer was not reset from end of list when an event
     //    was added and the pointer was already at end of list
     RewindQueue b1;
-    b1.addNewTimeStep(1, 0.1f);
-    ++b1;    // Should now point at end of list
-    b1.hasMoreRewindInfo();
-    b1.addNewTimeStep(2, 0.1f);
-    TimeStepInfo *tsi = b1.getCurrent();
-    assert(tsi->getTicks() == 2);
+    b1.addLocalEvent(NULL, NULL, true, 1);
+    b1.next();    // Should now point at end of list
+    assert(!b1.hasMoreRewindInfo());
+    b1.addLocalEvent(NULL, NULL, true, 2);
+    RewindInfo *ri = b1.getCurrent();
+    assert(ri->getTicks() == 2);
 }   // unitTesting

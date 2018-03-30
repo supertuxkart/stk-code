@@ -48,10 +48,6 @@ RewindInfoState::RewindInfoState(int ticks, Rewinder *rewinder,
                                  BareNetworkString *buffer, bool is_confirmed)
     : RewindInfoRewinder(ticks, rewinder, buffer, is_confirmed)
 {
-    // rewinder = NULL is used in unit testing, in which case no world exists
-    if(rewinder!=NULL)
-        m_local_physics_time = Physics::getInstance()->getPhysicsWorld()
-                                                     ->getLocalTime();
 }   // RewindInfoState
 
 // ============================================================================
