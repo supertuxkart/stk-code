@@ -199,12 +199,12 @@ namespace GUIEngine
     /** \brief Add a screen to the list of screens known by the gui engine */
     void  addScreenToList(Screen* screen);
     /** \brief Remove a screen from the list of screens known by the gui engine */
-    void  removeScreen(const char* name);
+    void  removeScreen(Screen* screen);
 
     /** \brief Low-level mean to change current screen.
       * \note Do not use directly. Use a state manager instead to get higher-level functionnality.
       */
-    void switchToScreen(const char* );
+    void switchToScreen(Screen* screen);
 
     /** \brief erases the currently displayed screen, removing all added irrLicht widgets
       * \note Do not use directly. Use a state manager instead to get higher-level functionnality.
