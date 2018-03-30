@@ -97,10 +97,6 @@ namespace Online
         }   // getOnlineState
 
         // ----------------------------------------------------------------
-        /** Returns a pointer to the profile associated with the current user. */
-        OnlineProfile* getProfile() const { return m_profile; }
-
-        // ----------------------------------------------------------------
         /** Returns the session token of the signed in user. */
         const std::string& getToken() const { return m_token; }
         virtual void requestSavedSession();
@@ -112,6 +108,9 @@ namespace Online
         OnlinePlayerProfile(const XMLNode *player);
         OnlinePlayerProfile(const core::stringw &name, bool is_guest = false);
         virtual ~OnlinePlayerProfile() {}
+        // ----------------------------------------------------------------
+        /** Returns a pointer to the profile associated with the current user. */
+        OnlineProfile* getProfile() const { return m_profile; }
         // ----------------------------------------------------------------
     }; // class OnlinePlayerProfile
 } // namespace Online

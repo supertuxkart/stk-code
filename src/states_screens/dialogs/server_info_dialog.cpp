@@ -18,8 +18,13 @@
 #include "states_screens/dialogs/server_info_dialog.hpp"
 
 #include "guiengine/engine.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
+#include "network/network_config.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -39,10 +44,10 @@ using namespace Online;
  *         server (i.e. while it is being created).
  */
 ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
-                : ModalDialog(0.8f,0.8f), m_server(server)
+                : ModalDialog(0.8f,0.8f), m_server(server), m_password(NULL)
 {
-    Log::info("ServerInfoDialog", "Server id is %d, Host id is %d",
-       server->getServerId(), server->getHostId());
+    Log::info("ServerInfoDialog", "Server id is %d, owner is %d",
+       server->getServerId(), server->getServerOwner());
     m_self_destroy = false;
 
     loadFromFile("online/server_info_dialog.stkgui");
@@ -67,10 +72,21 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
     assert(m_cancel_widget != NULL);
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
+    if (m_server->isPasswordProtected())
+    {
+        m_password = getWidget<TextBoxWidget>("password");
+        m_password->setPasswordBox(true, L'*');
+        assert(m_password != NULL);
+    }
+    else
+    {
+        getWidget("label_password")->setVisible(false);
+        getWidget("password")->setVisible(false);
+    }
+
 }   // ServerInfoDialog
 
 // -----------------------------------------------------------------------------
-
 ServerInfoDialog::~ServerInfoDialog()
 {
 }   // ~ServerInfoDialog
@@ -78,6 +94,16 @@ ServerInfoDialog::~ServerInfoDialog()
 // -----------------------------------------------------------------------------
 void ServerInfoDialog::requestJoin()
 {
+    if (m_server->isPasswordProtected())
+    {
+        assert(m_password != NULL);
+        NetworkConfig::get()->setPassword(
+            StringUtils::wideToUtf8(m_password->getText()));
+    }
+    else
+    {
+        NetworkConfig::get()->setPassword("");
+    }
     STKHost::create(m_server);
     NetworkingLobby::getInstance()->setJoinedServer(m_server);
     ModalDialog::dismiss();

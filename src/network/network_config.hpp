@@ -26,11 +26,16 @@
 #include "race/race_manager.hpp"
 
 #include "irrString.h"
+#include <tuple>
+#include <vector>
 
 namespace Online
 {
     class XMLRequest;
 }
+
+class InputDevice;
+class PlayerProfile;
 
 class NetworkConfig
 {
@@ -70,11 +75,13 @@ private:
     uint16_t m_client_port;
 
     /** Maximum number of players on the server. */
-    int m_max_players;
+    unsigned m_max_players;
 
     /** True if a client should connect to the first server it finds and
      *  immediately start a race. */
     bool m_auto_connect;
+
+    bool m_done_adding_network_players;
 
     /** If this is a server, the server name. */
     irr::core::stringw m_server_name;
@@ -86,12 +93,18 @@ private:
     /** Used by client server to determine if the child server is created. */
     std::string m_server_id_file;
 
+    std::vector<std::tuple<InputDevice*, PlayerProfile*,
+        /*is_handicap*/bool> > m_network_players;
+
     NetworkConfig();
 
 public:
     /** Stores the command line flag to disable lan detection (i.e. force
      *  WAN code to be used when connection client and server). */
     static bool m_disable_lan;
+
+    /** Server version, will be advanced if there are protocol changes. */
+    static const uint8_t m_server_version;
 
     /** Singleton get, which creates this object if necessary. */
     static NetworkConfig *get()
@@ -161,13 +174,54 @@ public:
     void setIsWAN() { m_network_type = NETWORK_WAN; }
     // ------------------------------------------------------------------------
     /** Set that this is not a networked game. */
-    void unsetNetworking() { m_network_type = NETWORK_NONE; }
+    void unsetNetworking()
+    {
+        m_network_type = NETWORK_NONE;
+        m_password = "";
+    }
+    // ------------------------------------------------------------------------
+    const std::vector<std::tuple<InputDevice*, PlayerProfile*, bool> >&
+                        getNetworkPlayers() const { return m_network_players; }
+    // ------------------------------------------------------------------------
+    bool isAddingNetworkPlayers() const
+                                     { return !m_done_adding_network_players; }
+    // ------------------------------------------------------------------------
+    void doneAddingNetworkPlayers()   { m_done_adding_network_players = true; }
+    // ------------------------------------------------------------------------
+    bool addNetworkPlayer(InputDevice* device, PlayerProfile* profile, bool h)
+    {
+        for (auto& p : m_network_players)
+        {
+            if (std::get<0>(p) == device)
+                return false;
+            if (std::get<1>(p) == profile)
+                return false;
+        }
+        m_network_players.emplace_back(device, profile, h);
+        return true;
+    }
+    // ------------------------------------------------------------------------
+    bool playerExists(PlayerProfile* profile) const
+    {
+        for (auto& p : m_network_players)
+        {
+            if (std::get<1>(p) == profile)
+                return true;
+        }
+        return false;
+    }
+    // ------------------------------------------------------------------------
+    void cleanNetworkPlayers()
+    {
+        m_network_players.clear();
+        m_done_adding_network_players = false;
+    }
     // ------------------------------------------------------------------------
     /** Sets the maximum number of players for this server. */
-    void setMaxPlayers(int n) { m_max_players = n; }
+    void setMaxPlayers(unsigned n) { m_max_players = n; }
     // ------------------------------------------------------------------------
     /** Returns the maximum number of players for this server. */
-    int getMaxPlayers() const { return m_max_players; }
+    unsigned getMaxPlayers() const { return m_max_players; }
     // ------------------------------------------------------------------------
     /** Returns if this instance is a server. */
     bool isServer() const { return m_is_server;  }

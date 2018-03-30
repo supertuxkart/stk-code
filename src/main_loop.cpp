@@ -41,10 +41,13 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
 
-#include <assert.h>
+#ifndef WIN32
+#include <unistd.h>
+#endif
 
 MainLoop* main_loop = 0;
 
+// ----------------------------------------------------------------------------
 MainLoop::MainLoop(unsigned parent_pid)
         : m_abort(false), m_parent_pid(parent_pid)
 {
@@ -314,6 +317,10 @@ void MainLoop::run()
             if (WaitForSingleObject(parent, 0) != WAIT_TIMEOUT)
                 m_abort = true;
         }
+#else
+        // POSIX equivalent
+        if (m_parent_pid != 0 && getppid() != (int)m_parent_pid)
+            m_abort = true;
 #endif
         m_is_last_substep = false;
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
@@ -327,7 +334,7 @@ void MainLoop::run()
             STKHost::get()->requestedShutdown())
         {
             SFXManager::get()->quickSound("anvil");
-            core::stringw msg = _("Connection to server is lost.");
+            core::stringw msg = _("Server connection timed out.");
             if (!STKHost::get()->getErrorMessage().empty())
             {
                 msg = STKHost::get()->getErrorMessage();

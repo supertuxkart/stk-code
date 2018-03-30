@@ -15,23 +15,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#define DEBUG_MENU_ITEM 0
-
 #include "states_screens/create_server_screen.hpp"
 
 #include "audio/sfx_manager.hpp"
-#include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "modes/demo_world.hpp"
-#include "network/protocols/lobby_protocol.hpp"
 #include "network/network_config.hpp"
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
-#include "states_screens/dialogs/server_info_dialog.hpp"
 #include "utils/separate_process.hpp"
 #include "utils/translation.hpp"
 
@@ -42,8 +35,6 @@
 
 
 using namespace GUIEngine;
-
-DEFINE_SCREEN_SINGLETON( CreateServerScreen );
 
 // ----------------------------------------------------------------------------
 
@@ -62,7 +53,7 @@ void CreateServerScreen::loadedFromFile()
     assert(m_max_players_widget != NULL);
     int max = UserConfigParams::m_server_max_players.getDefaultValue();
     m_max_players_widget->setMax(max);
-    
+
     if (UserConfigParams::m_server_max_players > max)
         UserConfigParams::m_server_max_players = max;
 
@@ -71,8 +62,15 @@ void CreateServerScreen::loadedFromFile()
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
 
+    m_more_options_text = getWidget<LabelWidget>("more-options");
+    assert(m_more_options_text != NULL);
+    m_more_options_spinner = getWidget<SpinnerWidget>("more-options-spinner");
+    assert(m_more_options_spinner != NULL);
+
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
+    m_game_mode_widget = getWidget<RibbonWidget>("gamemode");
+    assert(m_game_mode_widget != NULL);
     m_create_widget = getWidget<IconButtonWidget>("create");
     assert(m_create_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
@@ -83,7 +81,6 @@ void CreateServerScreen::loadedFromFile()
 void CreateServerScreen::init()
 {
     Screen::init();
-    DemoWorld::resetIdleTime();
     m_info_widget->setText("", false);
     LabelWidget *title = getWidget<LabelWidget>("title");
 
@@ -109,6 +106,7 @@ void CreateServerScreen::init()
     RibbonWidget* gamemode = getWidget<RibbonWidget>("gamemode");
     assert(gamemode != NULL);
     gamemode->setSelection(0, PLAYER_ID_GAME_MASTER);
+    updateMoreOption(0);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -131,7 +129,61 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
             createServer();
         }   // is create_widget
     }
+    else if (name == m_game_mode_widget->m_properties[PROP_ID])
+    {
+        const int selection =
+            m_game_mode_widget->getSelection(PLAYER_ID_GAME_MASTER);
+        updateMoreOption(selection);
+    }
+
 }   // eventCallback
+
+// ----------------------------------------------------------------------------
+void CreateServerScreen::updateMoreOption(int game_mode)
+{
+    switch (game_mode)
+    {
+        case 0:
+        case 1:
+        {
+            m_more_options_text->setVisible(true);
+            //I18N: In the create server screen
+            m_more_options_text->setText(_("No. of grand prix track(s)"),
+                false);
+            m_more_options_spinner->setVisible(true);
+            m_more_options_spinner->clearLabels();
+            m_more_options_spinner->addLabel(_("Disabled"));
+            for (int i = 1; i <= 20; i++)
+            {
+                m_more_options_spinner->addLabel(StringUtils::toWString(i));
+            }
+            m_more_options_spinner->setValue(0);
+            break;
+        }
+        case 3:
+        {
+            m_more_options_text->setVisible(true);
+            m_more_options_spinner->setVisible(true);
+            m_more_options_spinner->clearLabels();
+            //I18N: In the create server screen
+            m_more_options_text->setText(_("Soccer game type"), false);
+            m_more_options_spinner->setVisible(true);
+            m_more_options_spinner->clearLabels();
+            //I18N: In the create server screen for soccer server
+            m_more_options_spinner->addLabel(_("Time limit"));
+            //I18N: In the create server screen for soccer server
+            m_more_options_spinner->addLabel(_("Goals limit"));
+            m_more_options_spinner->setValue(0);
+            break;
+        }
+        default:
+        {
+            m_more_options_text->setVisible(false);
+            m_more_options_spinner->setVisible(false);
+            break;
+        }
+    }
+}   // updateMoreOption
 
 // ----------------------------------------------------------------------------
 /** Called once per framce to check if the server creation request has
@@ -164,18 +216,31 @@ void CreateServerScreen::createServer()
 
     if (name.size() < 4 || name.size() > 30)
     {
+        //I18N: In the create server screen
         m_info_widget->setText(
             _("Name has to be between 4 and 30 characters long!"), false);
         SFXManager::get()->quickSound("anvil");
         return;
     }
-    assert(max_players > 1 &&
-        max_players <= UserConfigParams::m_server_max_players.getDefaultValue());
+    assert(max_players > 1 && max_players <=
+        UserConfigParams::m_server_max_players.getDefaultValue());
 
     UserConfigParams::m_server_max_players = max_players;
-    core::stringw password_w = getWidget<TextBoxWidget>("password")->getText();
-    std::string password = StringUtils::xmlEncode(password_w);
-    NetworkConfig::get()->setPassword(StringUtils::wideToUtf8(password_w));
+    std::string password = StringUtils::wideToUtf8(getWidget<TextBoxWidget>
+        ("password")->getText());
+    if ((!password.empty() != 0 &&
+        password.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOP"
+        "QRSTUVWXYZ01234567890_") != std::string::npos) ||
+        password.size() > 255)
+    {
+        //I18N: In the create server screen
+        m_info_widget->setText(
+            _("Incorrect characters in password!"), false);
+        SFXManager::get()->quickSound("anvil");
+        return;
+    }
+
+    NetworkConfig::get()->setPassword(password);
     if (!password.empty())
         password = std::string(" --server-password=") + password;
 
@@ -186,7 +251,7 @@ void CreateServerScreen::createServer()
         max_players, /*current_player*/0, (RaceManager::Difficulty)
         difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER),
         NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
-            race_manager->getMajorMode()), server_address);
+        race_manager->getMajorMode()), server_address, !password.empty());
 
 #undef USE_GRAPHICS_SERVER
 #ifdef USE_GRAPHICS_SERVER
@@ -250,7 +315,7 @@ void CreateServerScreen::createServer()
         new SeparateProcess(SeparateProcess::getCurrentExecutableLocation(),
         server_cfg.str() + password);
     STKHost::create(server, sp);
-
+    NetworkingLobby::getInstance()->setJoinedServer(server);
 #endif
 }   // createServer
 

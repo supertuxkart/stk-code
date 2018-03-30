@@ -19,9 +19,17 @@
 #define HEADER_TRACKS_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
+#include "utils/synchronised.hpp"
 #include <deque>
+#include <map>
+#include <string>
 
-namespace GUIEngine { class Widget; }
+namespace GUIEngine
+{
+    class CheckBoxWidget;
+    class LabelWidget;
+    class SpinnerWidget;
+}
 
 /**
   * \brief screen where the user can select a track
@@ -33,7 +41,23 @@ class TracksScreen : public GUIEngine::Screen,
     friend class GUIEngine::ScreenSingleton<TracksScreen>;
 
 private:
-    TracksScreen() : Screen("tracks.stkgui") {}
+    TracksScreen() : Screen("tracks.stkgui")
+    {
+        m_network_tracks = false;
+        m_reverse_checked = false;
+    }
+
+    GUIEngine::CheckBoxWidget* m_reversed;
+    GUIEngine::SpinnerWidget* m_laps;
+    GUIEngine::LabelWidget* m_votes;
+
+    bool m_network_tracks, m_reverse_checked;
+
+    int m_bottom_box_height = -1;
+
+    float m_vote_timeout = -1.0f;
+
+    Synchronised<std::map<std::string, core::stringw> > m_vote_messages;
 
     /** adds the tracks from the current track group into the tracks ribbon */
     void buildTrackList();
@@ -43,7 +67,7 @@ private:
 public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile() OVERRIDE {};
+    virtual void loadedFromFile() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget,
@@ -56,7 +80,41 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
 
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void tearDown() OVERRIDE;
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual bool onEscapePressed() OVERRIDE;
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void onUpdate(float dt) OVERRIDE;
+
     void setFocusOnTrack(const std::string& trackName);
+
+    void setNetworkTracks() { m_network_tracks = true; }
+
+    void resetVote()
+    {
+        m_vote_messages.lock();
+        m_vote_messages.getData().clear();
+        m_vote_messages.unlock();
+        m_vote_timeout = -1.0f;
+    }
+
+    void setVoteTimeout(float timeout)
+    {
+        if (m_vote_timeout != -1.0f)
+            return;
+        m_vote_timeout = timeout;
+    }
+
+    void addVoteMessage(const std::string& user,
+                        const irr::core::stringw& message)
+    {
+        m_vote_messages.lock();
+        m_vote_messages.getData()[user] = message;
+        m_vote_messages.unlock();
+    }
 
 };
 

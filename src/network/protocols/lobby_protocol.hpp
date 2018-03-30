@@ -20,9 +20,13 @@
 #define LOBBY_PROTOCOL_HPP
 
 #include "network/protocol.hpp"
-
-#include "network/game_setup.hpp"
 #include "network/network_string.hpp"
+
+class GameSetup;
+class NetworkPlayerProfile;
+
+#include <memory>
+#include <vector>
 
 /*!
  * \class LobbyProtocol
@@ -34,15 +38,15 @@ class LobbyProtocol : public Protocol
 {
 public:
     /** Lists all lobby events (LE). */
-    enum 
-    { 
+    enum : uint8_t
+    {
         LE_CONNECTION_REQUESTED   = 1,    // a connection to the server
         LE_CONNECTION_REFUSED,            // Connection to server refused
         LE_CONNECTION_ACCEPTED,           // Connection to server accepted
         LE_KART_SELECTION_UPDATE,         // inform client about kart selected
         LE_REQUEST_BEGIN,                 // begin of kart selection
         LE_KART_SELECTION_REFUSED,        // Client not auth. to start selection
-        LE_NEW_PLAYER_CONNECTED,          // inform client about new player
+        LE_UPDATE_PLAYER_LIST,            // inform client about player list update
         LE_KART_SELECTION,                // Player selected kart
         LE_PLAYER_DISCONNECTED,           // Client disconnected
         LE_CLIENT_LOADED_WORLD,           // Client finished loading world
@@ -53,20 +57,29 @@ public:
         LE_RACE_FINISHED,                 // race has finished, display result
         LE_RACE_FINISHED_ACK,             // client went back to lobby
         LE_EXIT_RESULT,                   // Force clients to exit race result screen
-        LE_VOTE,                          // Any vote (race mode, track, ...)
-        LE_VOTE_MAJOR,                    // vote of major race mode
-        LE_VOTE_MINOR,                    // vote for minor race mode
-        LE_VOTE_RACE_COUNT,               // vote for number of tracks
-        LE_VOTE_TRACK,                    // vote for a track
-        LE_VOTE_REVERSE,                  // vote if race in reverse
-        LE_VOTE_LAPS,                     // vote number of laps
+        LE_VOTE,                          // Track vote
+        LE_CHAT,
+        LE_SERVER_OWNERSHIP,
+        LE_KICK_HOST
+    };
+
+    enum RejectReason : uint8_t
+    {
+        RR_BUSY = 0,
+        RR_BANNED = 1,
+        RR_INCORRECT_PASSWORD = 2,
+        RR_INCOMPATIBLE_DATA = 3,
+        RR_TOO_MANY_PLAYERS = 4
     };
 
 protected:
     static std::weak_ptr<LobbyProtocol> m_lobby;
 
-    /** The game setup. */
+    /** Stores data about the online game to play. */
     GameSetup* m_game_setup;
+
+    void configRemoteKart(
+     const std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
 
 public:
 
@@ -101,12 +114,7 @@ public:
     virtual void finishedLoadingWorld() = 0;
     virtual void loadWorld();
     virtual bool waitingForPlayers() const = 0;
-    void terminateLatencyProtocol();
-    virtual void requestKartSelection(uint8_t player_id,
-                                      const std::string &kart_name)
-    {
-        assert(false);   // Only defined in client
-    };
+    GameSetup* getGameSetup() const { return m_game_setup; }
 
 };   // class LobbyProtocol
 

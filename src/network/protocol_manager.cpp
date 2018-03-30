@@ -20,13 +20,12 @@
 
 #include "network/event.hpp"
 #include "network/protocol.hpp"
-#include "network/stk_host.hpp"
-#include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include "utils/time.hpp"
 #include "utils/vs.hpp"
 
+#include <algorithm>
 #include <assert.h>
 #include <cstdlib>
 #include <errno.h>
@@ -229,8 +228,9 @@ void ProtocolManager::startProtocol(std::shared_ptr<Protocol> protocol)
     protocol->setup();
     protocol->setState(PROTOCOL_STATE_RUNNING);
     opt.unlock();
+    Protocol* protocol_ptr = protocol.get();
     Log::info("ProtocolManager",
-        "A %s protocol has been started.", typeid(*protocol).name());
+        "A %s protocol has been started.", typeid(*protocol_ptr).name());
 
     // setup the protocol and notify it that it's started
 }   // startProtocol
@@ -278,9 +278,10 @@ void ProtocolManager::OneProtocolType::removeProtocol(std::shared_ptr<Protocol> 
                   m_protocols.getData().end(),   p);
     if (i == m_protocols.getData().end())
     {
+        Protocol* protocol_ptr = p.get();
         Log::error("ProtocolManager",
                    "Trying to delete protocol '%s', which was not found",
-                   typeid(*p).name());
+                   typeid(*protocol_ptr).name());
     }
     else
     {
@@ -305,8 +306,9 @@ void ProtocolManager::terminateProtocol(std::shared_ptr<Protocol> protocol)
     opt.unlock();
     protocol->setState(PROTOCOL_STATE_TERMINATED);
     protocol->terminated();
+    Protocol* protocol_ptr = protocol.get();
     Log::info("ProtocolManager",
-        "A %s protocol has been terminated.", typeid(*protocol).name());
+        "A %s protocol has been terminated.", typeid(*protocol_ptr).name());
 }   // terminateProtocol
 
 // ----------------------------------------------------------------------------
@@ -502,15 +504,13 @@ void ProtocolManager::asynchronousUpdate()
     for (unsigned int i = 0; i < m_all_protocols.size(); i++)
     {
         OneProtocolType &opt = m_all_protocols[i];
-        // The lock is likely not necessary, since this function is only
-        // called from the ProtocolManager thread, and this thread is also
+        // We don't need lock here because it can hang the GUI when connecting
+        // to or creating server, since this function is only called from 
+        // the ProtocolManager thread, and this thread is also
         // the only one who changes the number of protocols.
-        // Edit: remove this lock can avoid hanging the GUI when connecting
-        // to or creating server, but you need to make sure async and non-async
-        // update in each protocol will have atomic or mutex write
-        //opt.lock();
+        // But you need to make sure async and non-async
+        // update in each protocol will have atomic or mutex-protected write
         opt.update(0, /*async*/true);  // dt does not matter, so set it to 0
-        //opt.unlock();
     }
 
     PROFILER_POP_CPU_MARKER();

@@ -16,6 +16,10 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/server.hpp"
+#include "config/player_manager.hpp"
+#include "online/online_player_profile.hpp"
+#include "online/online_profile.hpp"
+#include "online/profile_manager.hpp"
 #include "network/network_config.hpp"
 #include "io/xml_node.hpp"
 #include "utils/constants.hpp"
@@ -34,6 +38,7 @@ Server::Server(const XMLNode& xml)
     m_server_id = 0;
     m_current_players = 0;
     m_max_players = 0;
+    m_distance = 0.0f;
     unsigned server_data = 0;
     xml.get("game_mode", &server_data);
     m_minor_mode = NetworkConfig::get()->getLocalGameMode(server_data).first;
@@ -46,7 +51,7 @@ Server::Server(const XMLNode& xml)
     m_lower_case_name = StringUtils::toLowerCase(m_lower_case_name);
 
     xml.get("id", &m_server_id);
-    xml.get("hostid", &m_host_id);
+    xml.get("host_id", &m_server_owner);
     xml.get("max_players", &m_max_players);
     xml.get("current_players", &m_current_players);
     uint32_t ip;
@@ -56,6 +61,36 @@ Server::Server(const XMLNode& xml)
     xml.get("port", &port);
     m_address.setPort(port);
     xml.get("private_port", &m_private_port);
+    xml.get("password", &m_password_protected);
+    xml.get("distance", &m_distance);
+    m_server_owner_name = "-";
+
+    // Display server owner name if he's your friend or localhost
+    Online::OnlineProfile* opp = PlayerManager::getCurrentPlayer()->getProfile();
+    // Check localhost owner
+    if (opp && opp->getID() == m_server_owner)
+    {
+        m_server_owner_name =
+            StringUtils::wideToUtf8(opp->getUserName());
+    }
+    else if (opp && opp->hasFetchedFriends())
+    {
+        // Check friend(s)
+        for (uint32_t user_id : opp->getFriends())
+        {
+            if (user_id == m_server_owner)
+            {
+                Online::OnlineProfile* friend_profile =
+                    Online::ProfileManager::get()->getProfileByID(user_id);
+                if (friend_profile)
+                {
+                    m_server_owner_name =
+                        StringUtils::wideToUtf8(friend_profile->getUserName());
+                }
+            }
+        }
+    }
+
 } // Server(const XML&)
 
 // ----------------------------------------------------------------------------
@@ -69,16 +104,17 @@ Server::Server(const XMLNode& xml)
  *  \param difficulty The difficulty of server.
  *  \param server_mode The game modes of server (including minor and major).
  *  \param address IP and port of the server.
+ *  \param password_protected True if can only be joined with a password.
  */
 Server::Server(unsigned server_id, const core::stringw &name, int max_players,
                int current_players, unsigned difficulty, unsigned server_mode,
-               const TransportAddress &address)
+               const TransportAddress &address, bool password_protected)
 {
     m_name               = name;
     m_lower_case_name    = StringUtils::toLowerCase(StringUtils::wideToUtf8(name));
     m_satisfaction_score = 0;
     m_server_id          = server_id;
-    m_host_id            = 0;
+    m_server_owner       = 0;
     m_current_players    = current_players;
     m_max_players        = max_players;
     m_address.copy(address);
@@ -87,6 +123,8 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
     m_difficulty = (RaceManager::Difficulty)difficulty;
     m_minor_mode = NetworkConfig::get()->getLocalGameMode(server_mode).first;
     m_major_mode = NetworkConfig::get()->getLocalGameMode(server_mode).second;
+    m_password_protected = password_protected;
+    m_distance = 0.0f;
 }   // server(server_id, ...)
 
 // ----------------------------------------------------------------------------

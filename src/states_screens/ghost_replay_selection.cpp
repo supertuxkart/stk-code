@@ -27,8 +27,6 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( GhostReplaySelection );
-
 // ----------------------------------------------------------------------------
 /** Constructor, which loads the stkgui file.
  */

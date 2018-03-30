@@ -44,7 +44,8 @@
 #include "modes/overworld.hpp"
 #include "modes/soccer_world.hpp"
 #include "modes/world_with_rank.hpp"
-#include "network/protocol_manager.hpp"
+#include "network/network_config.hpp"
+#include "network/stk_host.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "race/highscores.hpp"
 #include "scriptengine/property_animator.hpp"
@@ -52,15 +53,12 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/network_kart_selection.hpp"
-#include "states_screens/online_profile_servers.hpp"
+#include "states_screens/online_screen.hpp"
 #include "states_screens/race_setup_screen.hpp"
-#include "states_screens/server_selection.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 #include <algorithm>
-
-DEFINE_SCREEN_SINGLETON(RaceResultGUI);
 
 /** Constructor, initialises internal data structures.
  */
@@ -172,10 +170,10 @@ void RaceResultGUI::enableAllButtons()
     {
         Log::info("This work was networked", "This is a network world.");
         top->setVisible(false);
-        middle->setText(_("Continue."));
+        middle->setText(_("Continue"));
         middle->setVisible(true);
         middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        bottom->setText(_("Quit the server."));
+        bottom->setText(_("Quit the server"));
         bottom->setVisible(true);
         if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
         {
@@ -355,9 +353,14 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         }
         if (name == "bottom") // Quit server (return to main menu)
         {
+            if (STKHost::existHost())
+            {
+                STKHost::get()->shutdown();
+            }
             race_manager->exitRace();
             race_manager->setAIKartOverride("");
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            NetworkConfig::get()->unsetNetworking();
         }
         return;
     }
@@ -427,8 +430,7 @@ void RaceResultGUI::backToLobby()
     race_manager->exitRace();
     race_manager->setAIKartOverride("");
     Screen* newStack[] = { MainMenuScreen::getInstance(),
-                           OnlineProfileServers::getInstance(),
-                           ServerSelection::getInstance(),
+                           OnlineScreen::getInstance(),
                            NetworkingLobby::getInstance(),
                            NULL                                  };
     StateManager::get()->resetAndSetStack(newStack);

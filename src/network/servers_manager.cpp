@@ -150,7 +150,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             double start_time = StkTime::getRealTime();
             const double DURATION = 1.0;
             const auto& servers = ServersManager::get()->getServers();
-            int cur_server_id = servers.size();
+            int cur_server_id = (int)servers.size();
             assert(cur_server_id == 0);
             std::vector<std::shared_ptr<Server> > servers_now;
             while (StkTime::getRealTime() - start_time < DURATION)
@@ -160,6 +160,12 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                 if (len > 0)
                 {
                     BareNetworkString s(buffer, len);
+                    uint8_t version = s.getUInt8();
+                    if (version != NetworkConfig::m_server_version)
+                    {
+                        Log::verbose("ServersManager", "Skipping a server");
+                        continue;
+                    }
                     irr::core::stringw name;
                     // bytes_read is the number of bytes read
                     s.decodeStringW(&name);
@@ -169,9 +175,10 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     uint8_t difficulty  = s.getUInt8();
                     uint8_t mode        = s.getUInt8();
                     sender.setPort(port);
+                    uint8_t password    = s.getUInt8();
                     servers_now.emplace_back(std::make_shared<Server>
                         (cur_server_id++, name, max_players, players,
-                        difficulty, mode, sender));
+                        difficulty, mode, sender, password == 1));
                 }   // if received_data
             }    // while still waiting
             m_success = true;
@@ -229,6 +236,14 @@ void ServersManager::setWanServers(bool success, const XMLNode* input)
     const XMLNode *servers_xml = input->getNode("servers");
     for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
     {
+        unsigned version = 0;
+        servers_xml->getNode(i)->get("version", &version);
+        assert(version != 0);
+        if (version != NetworkConfig::m_server_version)
+        {
+            Log::verbose("ServersManager", "Skipping a server");
+            continue;
+        }
         m_servers.emplace_back(
             std::make_shared<Server>(*servers_xml->getNode(i)));
     }

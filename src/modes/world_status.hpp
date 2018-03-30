@@ -19,6 +19,7 @@
 #define HEADER_WORLD_STATUS_HPP
 
 #include "utils/cpp2011.hpp"
+#include <atomic>
 
 class SFXBase;
 
@@ -143,7 +144,7 @@ private:
     *  set go' to make sure all client are actually ready to start the game.
     *  A server on the other hand will run behind all clients, so it will
     *  wait for all clients to indicate that they have started the race. */
-    bool m_server_is_ready;
+    std::atomic_bool m_server_is_ready;
 
     void startEngines();
 
@@ -216,7 +217,7 @@ public:
     /** Get the ticks since start regardless of which way the clock counts */
     int getTicksSinceStart() const { return m_count_up_ticks; }
     // ------------------------------------------------------------------------
-    void setReadyToRace() { m_server_is_ready = true; }
+    void setReadyToRace() { m_server_is_ready.store(true); }
     // ------------------------------------------------------------------------
     /** Sets a time by which the clock should be adjusted. Used by networking
      *  if too many rewinds are detected. */

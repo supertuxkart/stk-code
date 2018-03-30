@@ -22,14 +22,12 @@
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "modes/world.hpp"
+#include "network/game_setup.hpp"
 #include "network/network_player_profile.hpp"
-#include "network/protocol_manager.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
-#include "network/protocols/latency_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
-#include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -44,6 +42,8 @@ LobbyProtocol::LobbyProtocol(CallbackObject* callback_object)
 // ----------------------------------------------------------------------------
 LobbyProtocol::~LobbyProtocol()
 {
+    if (m_game_setup)
+        delete m_game_setup;
 }   // ~LobbyProtocol
 
 //-----------------------------------------------------------------------------
@@ -64,20 +64,39 @@ void LobbyProtocol::loadWorld()
     // This creates the network world.
     RaceEventManager::getInstance<RaceEventManager>()->start();
 
+    // Make sure that if there is only a single local player this player can
+    // use all input devices.
+    StateManager::ActivePlayer *ap = race_manager->getNumLocalPlayers()>1
+                                   ? NULL
+                                   : StateManager::get()->getActivePlayer(0);
+
+    input_manager->getDeviceManager()->setSinglePlayer(ap);
+
+    // Load the actual world.
+    m_game_setup->loadWorld();
+    World::getWorld()->setNetworkWorld(true);
+    GameProtocol::createInstance()->requestStart();
+    std::make_shared<GameEventsProtocol>()->requestStart();
+
+}   // loadWorld
+
+// ----------------------------------------------------------------------------
+void LobbyProtocol::configRemoteKart(
+      const std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const
+{
     // The number of karts includes the AI karts, which are not supported atm
-    race_manager->setNumKarts(m_game_setup->getPlayerCount());
+    race_manager->setNumKarts((int)players.size());
 
     // Set number of global and local players.
-    race_manager->setNumPlayers(m_game_setup->getPlayerCount(),
-                                m_game_setup->getNumLocalPlayers());
+    race_manager->setNumPlayers((int)players.size(),
+        m_game_setup->getNumLocalPlayers());
 
     // Create the kart information for the race manager:
     // -------------------------------------------------
-    std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();
     int local_player_id = 0;
     for (unsigned int i = 0; i < players.size(); i++)
     {
-        NetworkPlayerProfile* profile = players[i];
+        std::shared_ptr<NetworkPlayerProfile> profile = players[i];
         bool is_local = profile->isLocalPlayer();
 
         // All non-local players are created here. This means all players
@@ -95,12 +114,13 @@ void LobbyProtocol::loadWorld()
         // corresponding device associated with it).
         RemoteKartInfo rki(is_local ? local_player_id
                                     : i - local_player_id
-                                      + STKHost::get()->getGameSetup()->getNumLocalPlayers(),
+                                      + m_game_setup->getNumLocalPlayers(),
                            profile->getKartName(),
                            profile->getName(),
                            profile->getHostId(),
                           !is_local);
-        rki.setGlobalPlayerId(profile->getGlobalPlayerId());
+        rki.setGlobalPlayerId(i);
+        rki.setDefaultKartColor(profile->getDefaultKartColor());
         rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
         if (is_local)
         {
@@ -111,29 +131,16 @@ void LobbyProtocol::loadWorld()
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);
     }   // for i in players
-
-    // Make sure that if there is only a single local player this player can
-    // use all input devices.
-    StateManager::ActivePlayer *ap = race_manager->getNumLocalPlayers()>1
-                                   ? NULL
-                                   : StateManager::get()->getActivePlayer(0);
-
-    input_manager->getDeviceManager()->setSinglePlayer(ap);
-
     Log::info("LobbyProtocol", "Player configuration ready.");
+}   // configRemoteKart
 
-    // Load the actual world.
-    m_game_setup->getRaceConfig()->loadWorld();
-    World::getWorld()->setNetworkWorld(true);
-    GameProtocol::createInstance()->requestStart();
-    std::make_shared<GameEventsProtocol>()->requestStart();
-
-}   // loadWorld
-
-// ----------------------------------------------------------------------------
-/** Terminates the LatencyProtocol.
+//-----------------------------------------------------------------------------
+/** A previous GameSetup is deleted and a new one is created.
+ *  \return Newly create GameSetup object.
  */
-void LobbyProtocol::terminateLatencyProtocol()
+void LobbyProtocol::setup()
 {
-    ProtocolManager::lock()->findAndTerminate(PROTOCOL_SYNCHRONIZATION);
-}   // stopLatencyProtocol
+    if (m_game_setup)
+        delete m_game_setup;
+    m_game_setup = new GameSetup();
+}   // setupNewGame

@@ -27,31 +27,41 @@ class NetworkKartSelectionScreen : public KartSelectionScreen,
                   public GUIEngine::ScreenSingleton<NetworkKartSelectionScreen>
 {
     friend class GUIEngine::ScreenSingleton<NetworkKartSelectionScreen>;
+
 protected:
-    //!< map the id of the kart widgets to race ids
-    std::vector<uint8_t> m_id_mapping;
-
-    NetworkKartSelectionScreen();
-    virtual ~NetworkKartSelectionScreen();
-
-    virtual void playerConfirm(const int playerID) OVERRIDE;
+    // ------------------------------------------------------------------------
+    NetworkKartSelectionScreen() : KartSelectionScreen("karts.stkgui") {}
+    // ------------------------------------------------------------------------
+    ~NetworkKartSelectionScreen() {}
+    // ------------------------------------------------------------------------
+    virtual void allPlayersDone() OVERRIDE;
 
 private:
     std::set<std::string> m_available_karts;
+
+    // ------------------------------------------------------------------------
     virtual bool isIgnored(const std::string& ident) const OVERRIDE
-    {
-        return m_available_karts.find(ident) == m_available_karts.end();
-    }
+           { return m_available_karts.find(ident) == m_available_karts.end(); }
 
 public:
+    // ------------------------------------------------------------------------
     void setAvailableKartsFromServer(const std::set<std::string>& k)
-    {
-        m_available_karts = k;
-    }
+                                                     { m_available_karts = k; }
+    // ------------------------------------------------------------------------
     virtual void init() OVERRIDE;
+    // ------------------------------------------------------------------------
     virtual bool onEscapePressed() OVERRIDE;
-    virtual void playerSelected(uint8_t player_id,
-                                const std::string &kart_name);
+    // ------------------------------------------------------------------------
+    virtual bool playerQuit(StateManager::ActivePlayer* player) OVERRIDE
+                                                               { return true; }
+    // ------------------------------------------------------------------------
+     /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void tearDown() OVERRIDE
+    {
+        m_must_delete_on_back = true;
+        KartSelectionScreen::tearDown();
+    }
+
 };
 
 #endif // NETWORK_KART_SELECTION_HPP

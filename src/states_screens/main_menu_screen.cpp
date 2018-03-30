@@ -68,8 +68,6 @@
 using namespace GUIEngine;
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( MainMenuScreen );
-
 bool MainMenuScreen::m_enable_online = false;
 
 // ----------------------------------------------------------------------------
@@ -123,6 +121,7 @@ void MainMenuScreen::init()
     assert(m_user_id);
 
     // reset in case we're coming back from a race
+    NetworkConfig::get()->cleanNetworkPlayers();
     StateManager::get()->resetActivePlayers();
     input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
     input_manager->getDeviceManager()->setSinglePlayer( NULL );
@@ -148,8 +147,6 @@ void MainMenuScreen::init()
         w->resetAllBadges();
         w->setBadge(LOADING_BADGE);
     }
-
-    IconButtonWidget* online = getWidget<IconButtonWidget>("online");
 
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();

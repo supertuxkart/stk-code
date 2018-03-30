@@ -20,9 +20,6 @@
 #define HEADER_SERVERS_MANAGER_HPP
 
 #include <atomic>
-#include <algorithm>
-#include <cassert>
-#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -70,17 +67,9 @@ public:
     // ------------------------------------------------------------------------
     void cleanUpServers()                                { m_servers.clear(); }
     // ------------------------------------------------------------------------
-    void sortServers(std::function<bool(const std::shared_ptr<Server> a,
-                     const std::shared_ptr<Server> b)> sorting_function)
-    {
-        assert(m_list_updated);
-        std::sort(m_servers.begin(), m_servers.end(), sorting_function);
-    }
-    // ------------------------------------------------------------------------
     bool refresh();
     // ------------------------------------------------------------------------
-    const std::vector<std::shared_ptr<Server> >& getServers() const
-                                                          { return m_servers; }
+    std::vector<std::shared_ptr<Server> >& getServers()   { return m_servers; }
     // ------------------------------------------------------------------------
     bool listUpdated() const                         { return m_list_updated; }
 

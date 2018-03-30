@@ -3,10 +3,15 @@
 
 #include "network/protocols/lobby_protocol.hpp"
 #include "utils/cpp2011.hpp"
-#include "utils/synchronised.hpp"
 
 #include <atomic>
+#include <map>
+#include <memory>
+#include <mutex>
 #include <set>
+#include <tuple>
+
+class STKPeer;
 
 class ServerLobby : public LobbyProtocol
 {
@@ -30,24 +35,24 @@ public:
 private:
     std::atomic<ServerState> m_state;
 
+    /** Hold the next connected peer for server owner if current one expired
+     * (disconnected). */
+    std::weak_ptr<STKPeer> m_server_owner;
+
     /** Available karts and tracks for all clients, this will be initialized
      *  with data in server first. */
-    Synchronised<std::pair<std::set<std::string>,
-        std::set<std::string> > > m_available_kts;
-
-    /** Next id to assign to a peer. */
-    Synchronised<int> m_next_player_id;
+    std::pair<std::set<std::string>, std::set<std::string> > m_available_kts;
 
     /** Keeps track of the server state. */
-    bool m_server_has_loaded_world;
+    std::atomic_bool m_server_has_loaded_world;
 
-    /** Counts how many clients have finished loading the world. */
-    Synchronised<int> m_client_ready_count;
+    /** Counts how many peers have finished loading the world. */
+    std::map<std::weak_ptr<STKPeer>, bool,
+        std::owner_less<std::weak_ptr<STKPeer> > > m_peers_ready;
 
-    /** For debugging: keep track of the state (ready or not) of each player,
-     *  to make sure no client/player reports more than once. Needs to be a
-     *  map since the client IDs can be non-consecutive. */
-    std::map<uint8_t, bool> m_player_states;
+    /** Vote from each peer. */
+    std::map<std::weak_ptr<STKPeer>, std::tuple<std::string, uint8_t, bool>,
+        std::owner_less<std::weak_ptr<STKPeer> > > m_peers_votes;
 
     /** Keeps track of an artificial server delay (which makes sure that the
      *  data from all clients has arrived when the server computes a certain
@@ -55,7 +60,7 @@ private:
      *  seconds), which is the real time at which the server should start. */
     double m_server_delay;
 
-    bool m_selection_enabled;
+    bool m_has_created_server_id_file;
 
     /** It indicates if this server is registered with the stk server. */
     std::atomic_bool m_server_registered;
@@ -63,27 +68,36 @@ private:
     /** Counts how many players are ready to go on. */
     int m_player_ready_counter;
 
-    /** Timeout counter for showing the result screen. */
-    float m_timeout;
+    /** Timeout counter for various state. */
+    std::atomic<float> m_timeout;
+
+    /** Lock this mutex whenever a client is connect / disconnect or
+     *  starting race. */
+    std::mutex m_connection_mutex;
+
+    /** Ban list ip (in decimal) with online user id. */
+    std::map<uint32_t, uint32_t> m_ban_list;
 
     // connection management
     void clientDisconnected(Event* event);
     void connectionRequested(Event* event);
     // kart selection
     void kartSelectionRequested(Event* event);
-    // race votes
-    void playerMajorVote(Event* event);
-    void playerRaceCountVote(Event* event);
-    void playerMinorVote(Event* event);
-    void playerTrackVote(Event* event);
-    void playerReversedVote(Event* event);
-    void playerLapsVote(Event* event);
+    // Track(s) votes
+    void playerVote(Event *event);
     void playerFinishedResult(Event *event);
     void registerServer();
     void finishedLoadingWorldClient(Event *event);
     void startedRaceOnClient(Event *event);
+    void kickHost(Event* event);
+    void handleChat(Event* event);
     void unregisterServer();
     void createServerIdFile();
+    void updatePlayerList();
+    void updateServerOwner();
+    bool checkPeersReady() const;
+    std::tuple<std::string, uint8_t, bool> handleVote();
+
 public:
              ServerLobby();
     virtual ~ServerLobby();
@@ -98,8 +112,9 @@ public:
     void startSelection(const Event *event=NULL);
     void checkIncomingConnectionRequests();
     void checkRaceFinished();
-    void finishedLoadingWorld();
+    void finishedLoadingWorld() OVERRIDE;
     ServerState getCurrentState() const { return m_state.load(); }
+    void updateBanList();
     virtual bool waitingForPlayers() const OVERRIDE
                                 { return m_state.load() == ACCEPTING_CLIENTS; }
 

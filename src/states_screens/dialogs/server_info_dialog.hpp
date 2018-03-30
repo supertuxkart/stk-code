@@ -20,10 +20,15 @@
 #define HEADER_SERVER_INFO_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets/icon_button_widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
-#include "guiengine/widgets/label_widget.hpp"
 #include "utils/types.hpp"
+
+namespace GUIEngine
+{
+    class LabelWidget;
+    class RibbonWidget;
+    class IconButtonWidget;
+    class TextBoxWidget;
+}
 
 #include <memory>
 #include <irrString.h>
@@ -49,6 +54,8 @@ private:
     /** The cancel button. */
     GUIEngine::IconButtonWidget *m_cancel_widget;
 
+    /** Specify server password if needed. */
+    GUIEngine::TextBoxWidget* m_password;
 
 public:
     ServerInfoDialog(std::shared_ptr<Server> server);

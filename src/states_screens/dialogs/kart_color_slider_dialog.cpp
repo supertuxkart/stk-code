@@ -27,6 +27,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
+#include "states_screens/state_manager.hpp"
 
 using namespace GUIEngine;
 
@@ -36,10 +37,11 @@ KartColorSliderDialog::KartColorSliderDialog(PlayerProfile* pp)
 {
     loadFromFile("kart_color_slider.stkgui");
     m_player_profile = pp;
-    getWidget<SpinnerWidget>("color-slider")->setValue(
-        int(pp->getDefaultKartColor() * 100.0f));
-    m_model_view->getModelViewRenderInfo()->setHue(
-        float(getWidget<SpinnerWidget>("color-slider")->getValue()) / 100.0f);
+
+    SpinnerWidget* color_slider = getWidget<SpinnerWidget>("color-slider");
+    color_slider->setValue(int(pp->getDefaultKartColor() * 100.0f));
+    m_model_view->getModelViewRenderInfo()->setHue(float(color_slider->getValue()) / 100.0f);
+    color_slider->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // KartColorSliderDialog
 
 // ----------------------------------------------------------------------------

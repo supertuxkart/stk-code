@@ -119,11 +119,7 @@ void Protocol::requestTerminate()
 void Protocol::sendMessageToPeersChangingToken(NetworkString *message,
                                                bool reliable)
 {
-    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
-    for (unsigned int i = 0; i < peers.size(); i++)
-    {
-        peers[i]->sendPacket(message, reliable);
-    }
+    STKHost::get()->sendPacketToAllPeers(message, reliable);
 }   // sendMessageToPeersChangingToken
 
 // ----------------------------------------------------------------------------

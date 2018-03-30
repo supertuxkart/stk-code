@@ -48,7 +48,7 @@ WorldStatus::WorldStatus()
     m_play_track_intro_sound = UserConfigParams::m_music;
     m_play_ready_set_go_sounds = true;
     m_play_racestart_sounds = true;
-    m_server_is_ready       = false;
+    m_server_is_ready.store(false);
 
     IrrlichtDevice *device = irr_driver->getDevice();
 
@@ -99,7 +99,7 @@ void WorldStatus::reset()
     // In case of a networked race the race can only start once
     // all protocols are up. This flag is used to wait for
     // a confirmation before starting the actual race.
-    m_server_is_ready = false;
+    m_server_is_ready.store(false);
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -262,7 +262,7 @@ void WorldStatus::updateTime(int ticks)
             // loaded the world). The server waits for a confirmation from
             // each client that they have started (to guarantee that the
             // server is running with a local time behind all clients).
-            if (!m_server_is_ready) return;
+            if (m_server_is_ready.load() == false) return;
 
             m_phase = READY_PHASE;
             auto cl = LobbyProtocol::get<ClientLobby>();
@@ -484,7 +484,7 @@ float WorldStatus::adjustDT(float dt)
  */
 void WorldStatus::startReadySetGo()
 {
-    m_server_is_ready = true;
+    m_server_is_ready.store(true);
 }   // startReadySetGo
 
 //-----------------------------------------------------------------------------

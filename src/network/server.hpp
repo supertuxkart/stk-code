@@ -49,7 +49,7 @@ protected:
     std::string m_lower_case_name;
 
     uint32_t m_server_id;
-    uint32_t m_host_id;
+    uint32_t m_server_owner;
 
     /** The maximum number of players that the server supports */
     int m_max_players;
@@ -74,13 +74,22 @@ protected:
 
     RaceManager::Difficulty m_difficulty;
 
+    bool m_password_protected;
+
+    /* WAN server only, show the owner name of server, can only be seen
+     * for localhost or if you are friend with the server owner. */
+    std::string m_server_owner_name;
+
+    /* WAN server only, distance based on IP latitude and longitude. */
+    float m_distance;
 public:
 
          /** Initialises the object from an XML node. */
          Server(const XMLNode &xml);
          Server(unsigned server_id, const irr::core::stringw &name,
                 int max_players, int current_players, unsigned difficulty,
-                unsigned server_mode, const TransportAddress &address);
+                unsigned server_mode, const TransportAddress &address,
+                bool password_protected);
     bool filterByWords(const irr::core::stringw words) const;
     // ------------------------------------------------------------------------
     /** Returns ip address and port of this server. */
@@ -95,9 +104,8 @@ public:
     /** Returns the ID of this server. */
     const uint32_t getServerId() const { return m_server_id; }
     // ------------------------------------------------------------------------
-    /** Returns the unique host id of this server (wan game only), which is
-     *  the user id in STK addon server of the server owner. */
-    const uint32_t getHostId() const { return m_host_id; }
+    /** Returns the user id in STK addon server of the server owner (WAN). */
+    const uint32_t getServerOwner() const { return m_server_owner; }
     // ------------------------------------------------------------------------
     uint16_t getPrivatePort() const { return m_private_port; }
     // ------------------------------------------------------------------------
@@ -114,7 +122,13 @@ public:
                                                        { return m_major_mode; }
     // ------------------------------------------------------------------------
     RaceManager::Difficulty getDifficulty() const      { return m_difficulty; }
-
+    // ------------------------------------------------------------------------
+    bool isPasswordProtected() const           { return m_password_protected; }
+    // ------------------------------------------------------------------------
+    const std::string& getServerOwnerName() const
+                                                { return m_server_owner_name; }
+    // ------------------------------------------------------------------------
+    float getDistance() const                            { return m_distance; }
 
 };   // Server
 #endif // HEADER_SERVER_HPP

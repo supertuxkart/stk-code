@@ -659,6 +659,7 @@ namespace GUIEngine
 
         /** Gets called when the widget is active and got clicked. (Only works for button widgets for now.) */
         virtual void onClick()  { }
+        virtual irr::core::dimension2di getDimension() const { return irr::core::dimension2di(m_w, m_h); }
     };
 
 

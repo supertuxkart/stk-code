@@ -26,6 +26,10 @@
                 <label proportion="1" text_align="left" I18N="In the networking lobby" text="Game mode:"/>
                 <label proportion="2" text_align="left" id="server_game_mode" text=""/>
             </div>
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label id="label_password" text_align="left" proportion="1" text="Password"/>
+                <textbox id="password" proportion="2" height="fit"/>
+            </div>
         </div>
 
         <spacer height="20" width="50"/>

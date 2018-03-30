@@ -18,7 +18,9 @@
 
 #include "network/protocols/connect_to_server.hpp"
 
+#include "config/user_config.hpp"
 #include "network/event.hpp"
+#include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/get_peer_address.hpp"
 #include "network/protocols/hide_public_address.hpp"
@@ -33,6 +35,8 @@
 #include "utils/time.hpp"
 #include "utils/log.hpp"
 
+#include <algorithm>
+
 // ----------------------------------------------------------------------------
 /** Specify server to connect to.
  *  \param server Server to connect to (if nullptr than we use quick play).
@@ -40,7 +44,11 @@
 ConnectToServer::ConnectToServer(std::shared_ptr<Server> server)
                : Protocol(PROTOCOL_CONNECTION)
 {
-    m_server = server;
+    if (server)
+    {
+        m_server = server;
+        m_server_address.copy(m_server->getAddress());
+    }
     setHandleConnections(true);
 }   // ConnectToServer(server, host)
 
@@ -78,17 +86,26 @@ void ConnectToServer::asynchronousUpdate()
                     StkTime::sleep(1);
                 while (!ServersManager::get()->listUpdated())
                     StkTime::sleep(1);
-                if (!ServersManager::get()->getServers().empty())
+                auto servers = std::move(ServersManager::get()->getServers());
+
+                // Remove password protected servers
+                servers.erase(std::remove_if(servers.begin(), servers.end(), []
+                    (const std::shared_ptr<Server> a)->bool
+                    {
+                        return a->isPasswordProtected();
+                    }), servers.end());
+
+                if (!servers.empty())
                 {
                     // For quick play we choose the server with the least player
-                    ServersManager::get()->sortServers([]
+                    std::sort(servers.begin(), servers.end(), []
                         (const std::shared_ptr<Server> a,
                         const std::shared_ptr<Server> b)->bool
                         {
                             return a->getCurrentPlayers() < b->getCurrentPlayers();
                         });
-                    m_server = ServersManager::get()->getServers()[0];
-                    ServersManager::get()->cleanUpServers();
+                    m_server = servers[0];
+                    m_server_address.copy(m_server->getAddress());
                 }
                 else
                 {
@@ -99,7 +116,11 @@ void ConnectToServer::asynchronousUpdate()
                     m_state = EXITING;
                     return;
                 }
+                servers.clear();
             }
+
+            if (handleDirectConnect())
+                return;
             STKHost::get()->setPublicAddress();
             // Set to DONE will stop STKHost is not connected
             m_state = STKHost::get()->getPublicAddress().isUnset() ?
@@ -115,7 +136,6 @@ void ConnectToServer::asynchronousUpdate()
         case GOT_SERVER_ADDRESS:
         {
             assert(m_server);
-            m_server_address.copy(m_server->getAddress());
             Log::info("ConnectToServer", "Server's address known");
             m_state = REQUESTING_CONNECTION;
             auto request_connection =
@@ -146,11 +166,15 @@ void ConnectToServer::asynchronousUpdate()
                 m_current_protocol = hide_address;
                 return;
             }
-            if (m_tried_connection++ > 10)
+            if (m_tried_connection++ > 7)
             {
-                Log::error("ConnectToServer", "Timeout waiting for aloha");
-                m_state = NetworkConfig::get()->isWAN() ?
-                    HIDING_ADDRESS : DONE;
+                Log::warn("ConnectToServer", "Timeout waiting for"
+                    " aloha, trying to connect anyway.");
+                m_state = CONNECTING;
+                // Reset timer for next usage
+                m_timer = 0.0;
+                m_tried_connection = 0;
+                return;
             }
             if ((!NetworkConfig::m_disable_lan &&
                 m_server_address.getIP() ==
@@ -183,10 +207,12 @@ void ConnectToServer::asynchronousUpdate()
             if (StkTime::getRealTime() > m_timer + 5.0)
             {
                 m_timer = StkTime::getRealTime();
+                STKHost::get()->stopListening();
                 STKHost::get()->connect(m_server_address);
+                STKHost::get()->startListening();
                 Log::info("ConnectToServer", "Trying to connect to %s",
                     m_server_address.toString().c_str());
-                if (m_tried_connection++ > 3)
+                if (m_tried_connection++ > 1)
                 {
                     Log::error("ConnectToServer", "Timeout connect to %s",
                         m_server_address.toString().c_str());
@@ -201,7 +227,8 @@ void ConnectToServer::asynchronousUpdate()
             Log::info("ConnectToServer", "Connected");
             // LAN networking does not use the stk server tables.
             if (NetworkConfig::get()->isWAN() &&
-                !STKHost::get()->isClientServer())
+                !STKHost::get()->isClientServer() &&
+                !STKHost::get()->getPublicAddress().isUnset())
             {
                 auto hide_address = std::make_shared<HidePublicAddress>();
                 hide_address->requestStart();
@@ -239,7 +266,7 @@ void ConnectToServer::update(int ticks)
         {
             // lobby room protocol if we're connected only
             if (STKHost::get()->getPeerCount() > 0 &&
-                STKHost::get()->getPeers()[0]->isConnected() &&
+                STKHost::get()->getServerPeerForClient()->isConnected() &&
                 !m_server_address.isUnset())
             {
                 // Let main thread create ClientLobby for better
@@ -263,6 +290,44 @@ void ConnectToServer::update(int ticks)
             break;
     }
 }   // update
+
+// ----------------------------------------------------------------------------
+bool ConnectToServer::handleDirectConnect()
+{
+    // Direct connection to server should only possbile if public and private
+    // ports of server are the same
+    if (NetworkConfig::get()->isWAN() &&
+        m_server->getPrivatePort() == m_server->getAddress().getPort() &&
+        !STKHost::get()->isClientServer())
+    {
+        ENetEvent event;
+        ENetAddress ea;
+        ea.host = STKHost::HOST_ANY;
+        ea.port = STKHost::PORT_ANY;
+        Network* dc = new Network(/*peer_count*/1, /*channel_limit*/2,
+            /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &ea,
+            true/*change_port_if_bound*/);
+        assert(dc);
+        ENetPeer* p = dc->connectTo(m_server_address);
+        if (p)
+        {
+            while (enet_host_service(dc->getENetHost(), &event, 2000) != 0)
+            {
+                if (event.type == ENET_EVENT_TYPE_CONNECT)
+                {
+                    Log::info("ConnectToServer",
+                        "Direct connection to %s succeed",
+                        m_server_address.toString().c_str());
+                    STKHost::get()->replaceNetwork(event, dc);
+                    m_state = DONE;
+                    return true;
+                }
+            }
+        }
+        delete dc;
+    }
+    return false;
+}   // handleDirectConnect
 
 // ----------------------------------------------------------------------------
 /** Register this client with the STK server.
@@ -313,16 +378,14 @@ void ConnectToServer::waitingAloha(bool is_wan)
 {
     // just send a broadcast packet, the client will know our 
     // ip address and will connect
-    STKHost* host = STKHost::get();
-    host->stopListening(); // stop the listening
-
+    STKHost::get()->stopListening(); // stop the listening
     Log::info("ConnectToServer", "Waiting broadcast message.");
 
     TransportAddress sender;
     // get the sender
     const int LEN=256;
     char buffer[LEN];
-    int len = host->receiveRawPacket(buffer, LEN, &sender, 2000);
+    int len = STKHost::get()->receiveRawPacket(buffer, LEN, &sender, 2000);
     if(len<0)
     {
         Log::warn("ConnectToServer",
@@ -333,7 +396,6 @@ void ConnectToServer::waitingAloha(bool is_wan)
     BareNetworkString message(buffer, len);
     std::string received;
     message.decodeString(&received);
-    host->startListening(); // start listening again
     std::string aloha("aloha_stk");
     if (received==aloha)
     {
@@ -360,7 +422,9 @@ bool ConnectToServer::notifyEventAsynchronous(Event* event)
     {
         Log::info("ConnectToServer", "The Connect To Server protocol has "
             "received an event notifying that he's connected to the peer.");
-        m_state = CONNECTED; // we received a message, we are connected
+        // We received a message and connected, no need to check for address
+        // as only 1 peer possible in client
+        m_state = CONNECTED;
     }
     return true;
 }   // notifyEventAsynchronous

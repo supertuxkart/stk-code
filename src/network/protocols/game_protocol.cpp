@@ -22,7 +22,6 @@
 #include "karts/controller/player_controller.hpp"
 #include "network/event.hpp"
 #include "network/network_config.hpp"
-#include "network/network_player_profile.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"

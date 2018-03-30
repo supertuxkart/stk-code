@@ -8,7 +8,7 @@
 #include "modes/world.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
-#include "network/protocol_manager.hpp"
+#include "network/network_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 
@@ -82,30 +82,23 @@ bool GameEventsProtocol::notifyEvent(Event* event)
  */
 void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
 {
-    GameSetup* setup = STKHost::get()->getGameSetup();
-    assert(setup);
+    NetworkString *ns = getNetworkString(7);
+    ns->setSynchronous(true);
+    // Item picked : send item id, powerup type and kart race id
+    uint8_t powerup = 0;
+    if (item->getType() == Item::ITEM_BANANA)
+        powerup = (int)(kart->getAttachment()->getType());
+    else if (item->getType() == Item::ITEM_BONUS_BOX)
+        powerup = (((int)(kart->getPowerup()->getType()) << 4) & 0xf0)
+                        + (kart->getPowerup()->getNum()        & 0x0f);
 
-    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
-    for (unsigned int i = 0; i < peers.size(); i++)
-    {
-        NetworkString *ns = getNetworkString(7);
-        ns->setSynchronous(true);
-        // Item picked : send item id, powerup type and kart race id
-        uint8_t powerup = 0;
-        if (item->getType() == Item::ITEM_BANANA)
-            powerup = (int)(kart->getAttachment()->getType());
-        else if (item->getType() == Item::ITEM_BONUS_BOX)
-            powerup = (((int)(kart->getPowerup()->getType()) << 4) & 0xf0) 
-                           + (kart->getPowerup()->getNum()         & 0x0f);
-
-        ns->addUInt8(GE_ITEM_COLLECTED).addUInt32(item->getItemId())
-           .addUInt8(powerup).addUInt8(kart->getWorldKartId());
-        peers[i]->sendPacket(ns, /*reliable*/true);
-        delete ns;
-        Log::info("GameEventsProtocol",
-                  "Notified a peer that a kart collected item %d.",
-                  (int)(kart->getPowerup()->getType()));
-    }
+    ns->addUInt8(GE_ITEM_COLLECTED).addUInt32(item->getItemId())
+        .addUInt8(powerup).addUInt8(kart->getWorldKartId());
+    Log::info("GameEventsProtocol",
+        "Notified a peer that a kart collected item %d.",
+        (int)(kart->getPowerup()->getType()));
+    STKHost::get()->sendPacketToAllPeers(ns, /*reliable*/true);
+    delete ns;
 }   // collectedItem
 
 // ----------------------------------------------------------------------------
@@ -183,7 +176,7 @@ void GameEventsProtocol::clientHasStarted()
 *  ready set go. */
 void GameEventsProtocol::receivedClientHasStarted(Event *event)
 {
-    assert(NetworkConfig::get()->isServer());
+/*    assert(NetworkConfig::get()->isServer());
     m_count_ready_clients++;
     Log::verbose("GameEvent",
                  "Host %d has started ready-set-go: %d out of %d done",
@@ -196,5 +189,5 @@ void GameEventsProtocol::receivedClientHasStarted(Event *event)
         // SIgnal the server to start now - since it is now behind the client
         // times by the latency of the 'slowest' client.
         World::getWorld()->startReadySetGo();
-    }
+    }*/
 }   // receivedClientHasStarted

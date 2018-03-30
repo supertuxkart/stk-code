@@ -110,6 +110,9 @@ void LabelWidget::add()
 
     if (m_scroll_speed <= 0)
         m_element->setNotClipped(true);
+
+    if (!m_is_visible)
+        m_element->setVisible(false);
 }   // add
 
 // ----------------------------------------------------------------------------

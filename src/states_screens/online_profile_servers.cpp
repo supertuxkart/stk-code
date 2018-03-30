@@ -41,8 +41,6 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( OnlineProfileServers );
-
 // -----------------------------------------------------------------------------
 
 OnlineProfileServers::OnlineProfileServers() : GUIEngine::Screen("online/profile_servers.stkgui")
@@ -110,6 +108,7 @@ void OnlineProfileServers::eventCallback(Widget* widget, const std::string& name
 // ----------------------------------------------------------------------------
 void OnlineProfileServers::doQuickPlay()
 {
+    NetworkConfig::get()->setPassword("");
     STKHost::create();
     NetworkingLobby::getInstance()->setJoinedServer(nullptr);
     NetworkingLobby::getInstance()->push();

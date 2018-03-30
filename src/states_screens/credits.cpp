@@ -33,8 +33,6 @@ using irr::core::stringc;
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
-DEFINE_SCREEN_SINGLETON( CreditsScreen );
-
 using namespace GUIEngine;
 const float TIME_SECTION_FADE = 0.8f;
 const float ENTRIES_FADE_TIME = 0.3f;

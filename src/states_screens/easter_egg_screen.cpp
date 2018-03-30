@@ -39,8 +39,6 @@ using namespace irr::video;
 
 static const char ALL_TRACK_GROUPS_ID[] = "all";
 
-DEFINE_SCREEN_SINGLETON( EasterEggScreen );
-
 // -----------------------------------------------------------------------------
 
 EasterEggScreen::EasterEggScreen() : Screen("easter_egg.stkgui")

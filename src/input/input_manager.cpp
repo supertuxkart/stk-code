@@ -37,10 +37,12 @@
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "replay/replay_recorder.hpp"
+#include "states_screens/dialogs/splitscreen_player_dialog.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_device.hpp"
@@ -710,6 +712,31 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         // when a device presses fire or rescue
         if (m_device_manager->getAssignMode() == DETECT_NEW)
         {
+            if (NetworkConfig::get()->isNetworking() &&
+                NetworkConfig::get()->isAddingNetworkPlayers())
+            {
+                // Ignore release event
+                if (value == 0)
+                    return;
+                InputDevice *device = NULL;
+                if (type == Input::IT_KEYBOARD)
+                {
+                    //Log::info("InputManager", "New Player Joining with Key %d", button);
+                    device = m_device_manager->getKeyboardFromBtnID(button);
+                }
+                else if (type == Input::IT_STICKBUTTON ||
+                        type == Input::IT_STICKMOTION    )
+                {
+                    device = m_device_manager->getGamePadFromIrrID(deviceID);
+                }
+                if (device && (action == PA_FIRE || action == PA_MENU_SELECT))
+                {
+                    if (!GUIEngine::ModalDialog::isADialogActive())
+                        new SplitscreenPlayerDialog(device);
+                    return;
+                }
+            }
+
             // Player is unjoining
             if ((player != NULL) && (action == PA_RESCUE ||
                                      action == PA_MENU_CANCEL ) )
@@ -749,7 +776,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
                     if (device != NULL)
                     {
-                        KartSelectionScreen::getRunningInstance()->joinPlayer(device);
+                        KartSelectionScreen::getRunningInstance()->joinPlayer(device, NULL/*player profile*/);
                     }
                 }
                 return; // we're done here, ignore devices that aren't

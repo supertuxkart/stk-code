@@ -23,8 +23,6 @@
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
 
-#include <chrono>
-
 /** One instance of this is started for every peer who tries to
  *  connect to this server.
  */
@@ -55,8 +53,6 @@ protected:
         NONE,
         RECEIVED_PEER_ADDRESS,
         WAIT_FOR_CONNECTION,
-        CONNECTING,
-        CONNECTED,
         DONE,
         EXITING
     }  m_state;
@@ -66,7 +62,6 @@ public:
              ConnectToPeer(const TransportAddress &address);
     virtual ~ConnectToPeer();
 
-    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
     virtual void setup() OVERRIDE {}
     virtual void update(int ticks) OVERRIDE {}
     virtual void asynchronousUpdate() OVERRIDE;

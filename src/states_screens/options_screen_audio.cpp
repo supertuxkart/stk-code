@@ -39,8 +39,6 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( OptionsScreenAudio );
-
 // -----------------------------------------------------------------------------
 
 OptionsScreenAudio::OptionsScreenAudio() : Screen("options_audio.stkgui")
