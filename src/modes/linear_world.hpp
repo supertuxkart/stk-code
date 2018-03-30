@@ -78,17 +78,22 @@ private:
          *  track-length plus distance-along-track). */
         float       m_overall_distance;
 
+        /** Accumulates the time a kart has been driving in the wrong
+         *  direction so that a message can be displayed. */
+        float       m_wrong_way_timer;
+
         /** Initialises all fields. */
         KartInfo()  { reset(); }
         // --------------------------------------------------------------------
         /** Re-initialises all data. */
         void reset()
         {
-            m_finished_laps          = -1;
+            m_finished_laps     = -1;
             m_lap_start_ticks   = 0;
             m_ticks_at_last_lap = INT_MAX;
             m_estimated_finish  = -1.0f;
             m_overall_distance  = 0.0f;
+            m_wrong_way_timer   = 0.0f;
         }   // reset
     };
     // ------------------------------------------------------------------------

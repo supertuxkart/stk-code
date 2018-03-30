@@ -96,7 +96,6 @@ void LinearWorld::reset()
     for(unsigned int i=0; i<kart_amount; i++)
     {
         m_kart_info[i].reset();
-        m_karts[i]->setWrongwayTimer(0);
     }   // next kart
 
     // At the moment the last kart would be the one that is furthest away
@@ -867,7 +866,7 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
     if (!m_karts[i]->getController()->isLocalPlayerController()) 
         return;
 
-    float wrongway_timer = m_karts[i]->getWrongwayTimer();
+    KartInfo &ki = m_kart_info[i];
     
     const AbstractKart *kart=m_karts[i];
     // If the kart can go in more than one directions from the current track
@@ -888,39 +887,38 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
     else if (angle_diff < -M_PI)
         angle_diff += 2*M_PI;
 
-    // Display a warning message if the kart is going back way (unless
-    // the kart has already finished the race).
+    // Display a warning message if the kart is going back way, i.e. if angle
+    // is too big(unless the kart has already finished the race).
     if ((angle_diff > DEGREE_TO_RAD * 120.0f ||
         angle_diff < -DEGREE_TO_RAD * 120.0f) &&
         kart->getVelocityLC().getY() > 0.0f &&
         !kart->hasFinishedRace())
     {
-        wrongway_timer += dt;
+        ki.m_wrong_way_timer += dt;
         
-        if (wrongway_timer > 2.0f)
-            wrongway_timer = 2.0f;
+        if (ki.m_wrong_way_timer> 2.0f)
+            ki.m_wrong_way_timer= 2.0f;
     }
     else
     {
-        wrongway_timer -= dt;
+        ki.m_wrong_way_timer -= dt;
 
-        if (wrongway_timer < 0)
-            wrongway_timer = 0;
+        if (ki.m_wrong_way_timer < 0)
+            ki.m_wrong_way_timer = 0;
     }
     
     if (kart->getKartAnimation())
-        wrongway_timer = 0;
+        ki.m_wrong_way_timer = 0;
     
-    if (wrongway_timer > 1.0f)
+    if (ki.m_wrong_way_timer > 1.0f)
     {
         m_race_gui->addMessage(_("WRONG WAY!"), kart,
                                /* time */ -1.0f,
                                video::SColor(255,255,255,255),
                                /*important*/ true,
                                /*big font*/  true);
-    }  // if angle is too big
+    }
     
-    m_karts[i]->setWrongwayTimer(wrongway_timer);
 }   // checkForWrongDirection
 
 //-----------------------------------------------------------------------------

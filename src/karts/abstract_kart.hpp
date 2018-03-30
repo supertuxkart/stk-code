@@ -457,10 +457,6 @@ public:
     /** Set a text that is displayed on top of a kart.
      */
     virtual void setOnScreenText(const wchar_t *text) = 0;
-    // ------------------------------------------------------------------------- 
-    /** Counter which is used for displaying wrong way message after a delay */
-    virtual float getWrongwayTimer() = 0;
-    virtual void setWrongwayTimer(float timer) = 0;
     // ------------------------------------------------------------------------
     /** Returns whether this kart wins or loses. */
     virtual bool getRaceResult() const = 0;

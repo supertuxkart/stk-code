@@ -158,10 +158,6 @@ protected:
     /** True if fire button was pushed and not released */
     bool         m_fire_clicked;
 
-    /** Timer which is used for displaying wrong way message after a delay */
-    float        m_wrongway_timer;
-
-
     // Bullet physics parameters
     // -------------------------
     btCompoundShape          m_kart_chassis;
@@ -462,11 +458,6 @@ public:
     // ------------------------------------------------------------------------
     /** For debugging only: check if a kart is flying. */
     bool isFlying() const { return m_flying;  }
-    // ------------------------------------------------------------------------
-    /** Timer which is used for displaying wrong way message after a delay */
-    float getWrongwayTimer() { return m_wrongway_timer; }
-    // ------------------------------------------------------------------------
-    void setWrongwayTimer(float timer) { m_wrongway_timer = timer; }
     // ------------------------------------------------------------------------
     /** Returns whether this kart wins or loses. */
     virtual bool getRaceResult() const { return m_race_result;  }
