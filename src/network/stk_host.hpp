@@ -43,6 +43,7 @@
 #include <tuple>
 
 class GameSetup;
+class LobbyProtocol;
 class NetworkPlayerProfile;
 class Server;
 class ServerLobby;
@@ -154,9 +155,9 @@ public:
     /** Creates the STKHost. It takes all confifguration parameters from
      *  NetworkConfig. This STKHost can either be a client or a server.
      */
-    static void create(std::shared_ptr<Server> server = nullptr,
-                       SeparateProcess* p = NULL);
-
+    static std::shared_ptr<LobbyProtocol>
+        create(std::shared_ptr<Server> server = nullptr,
+               SeparateProcess* p = NULL);
     // ------------------------------------------------------------------------
     /** Returns the instance of STKHost. */
     static STKHost *get()

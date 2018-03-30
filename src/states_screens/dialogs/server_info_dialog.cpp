@@ -60,7 +60,7 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
     GUIEngine::LabelWidget *lbldifficulty = getWidget<LabelWidget>("server_difficulty");
     lbldifficulty->setText(difficulty, false);
 
-    core::stringw mode = RaceManager::getNameOf(server->getRaceMinorMode());
+    core::stringw mode = NetworkConfig::get()->getModeName(server->getServerMode());
     GUIEngine::LabelWidget *gamemode = getWidget<LabelWidget>("server_game_mode");
     gamemode->setText(mode, false);
 

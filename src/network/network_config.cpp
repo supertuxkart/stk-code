@@ -72,39 +72,38 @@ void NetworkConfig::setIsServer(bool b)
 }   // setIsServer
 
 // ----------------------------------------------------------------------------
-unsigned NetworkConfig::getServerGameMode(RaceManager::MinorRaceModeType minor,
-                                          RaceManager::MajorRaceModeType major)
+void NetworkConfig::setServerMode(RaceManager::MinorRaceModeType minor,
+                                      RaceManager::MajorRaceModeType major)
 {
     if (major == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         if (minor == RaceManager::MINOR_MODE_NORMAL_RACE)
-            return 0;
+            m_server_mode = 0;
         else if (minor == RaceManager::MINOR_MODE_TIME_TRIAL)
-            return 1;
+            m_server_mode = 1;
         else if (minor == RaceManager::MINOR_MODE_FOLLOW_LEADER)
-            return 2;
+            m_server_mode = 2;
     }
     else
     {
         if (minor == RaceManager::MINOR_MODE_NORMAL_RACE)
-            return 3;
+            m_server_mode = 3;
         else if (minor == RaceManager::MINOR_MODE_TIME_TRIAL)
-            return 4;
+            m_server_mode = 4;
         else if (minor == RaceManager::MINOR_MODE_FOLLOW_LEADER)
-            return 5;
+            m_server_mode = 5;
         else if (minor == RaceManager::MINOR_MODE_3_STRIKES)
-            return 6;
+            m_server_mode = 6;
         else if (minor == RaceManager::MINOR_MODE_SOCCER)
-            return 7;
+            m_server_mode = 7;
     }
-    return 0;
-}   // getServerGameMode
+}   // setServerMode
 
 // ----------------------------------------------------------------------------
 std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
-    NetworkConfig::getLocalGameMode(unsigned id)
+    NetworkConfig::getLocalGameMode()
 {
-    switch(id)
+    switch (m_server_mode)
     {
         case 0:
             return { RaceManager::MINOR_MODE_NORMAL_RACE,
@@ -147,3 +146,25 @@ void NetworkConfig::setUserDetails(Online::XMLRequest* r,
     r->addParameter("userid", m_cur_user_id);
     r->addParameter("token", m_cur_user_token);
 }   // setUserDetails
+
+// ----------------------------------------------------------------------------
+core::stringw NetworkConfig::getModeName(unsigned id)
+{
+    switch(id)
+    {
+        case 0:
+            return _("Normal Race (Grand Prix)");
+        case 1:
+            return _("Time Trial (Grand Prix)");
+        case 3:
+            return _("Normal Race");
+        case 4:
+            return _("Time Trial");
+        case 6:
+            return _("3 Strikes Battle");
+        case 7:
+            return _("Soccer");
+        default:
+            return L"";
+    }
+}   // getModeName

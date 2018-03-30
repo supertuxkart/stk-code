@@ -39,10 +39,9 @@ Server::Server(const XMLNode& xml)
     m_current_players = 0;
     m_max_players = 0;
     m_distance = 0.0f;
+    m_server_mode = 0;
+    xml.get("game_mode", &m_server_mode);
     unsigned server_data = 0;
-    xml.get("game_mode", &server_data);
-    m_minor_mode = NetworkConfig::get()->getLocalGameMode(server_data).first;
-    m_major_mode = NetworkConfig::get()->getLocalGameMode(server_data).second;
     xml.get("difficulty", &server_data);
     m_difficulty = (RaceManager::Difficulty)server_data;
 
@@ -121,8 +120,7 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
     // In case of LAN server, public and private port are the same.
     m_private_port       = m_address.getPort();
     m_difficulty = (RaceManager::Difficulty)difficulty;
-    m_minor_mode = NetworkConfig::get()->getLocalGameMode(server_mode).first;
-    m_major_mode = NetworkConfig::get()->getLocalGameMode(server_mode).second;
+    m_server_mode = server_mode;
     m_password_protected = password_protected;
     m_distance = 0.0f;
 }   // server(server_id, ...)

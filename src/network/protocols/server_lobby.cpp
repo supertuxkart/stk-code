@@ -476,9 +476,7 @@ void ServerLobby::registerServer()
     request->addParameter("max_players",
         NetworkConfig::get()->getMaxPlayers());
     request->addParameter("difficulty", race_manager->getDifficulty());
-    request->addParameter("game_mode",
-        NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
-        race_manager->getMajorMode()));
+    request->addParameter("game_mode", NetworkConfig::get()->getServerMode());
     request->addParameter("password",
         (unsigned)(!NetworkConfig::get()->getPassword().empty()));
     request->addParameter("version",
@@ -927,9 +925,11 @@ void ServerLobby::connectionRequested(Event* event)
         peer->setClientServerToken(token);
     }
     // send a message to the one that asked to connect
-    NetworkString *message_ack = getNetworkString(4);
+    NetworkString* message_ack = getNetworkString(4);
+    message_ack->setSynchronous(true);
     // connection success -- return the host id of peer
     message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt32(peer->getHostId());
+    m_game_setup->configClientAcceptConnection(message_ack);
     peer->sendPacket(message_ack);
     delete message_ack;
 

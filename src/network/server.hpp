@@ -68,9 +68,7 @@ protected:
      *  connection using the private port with a broadcast is possible. */
     uint16_t m_private_port;
 
-    RaceManager::MinorRaceModeType m_minor_mode;
-
-    RaceManager::MajorRaceModeType m_major_mode;
+    unsigned m_server_mode;
 
     RaceManager::Difficulty m_difficulty;
 
@@ -115,11 +113,7 @@ public:
     /** Returns the number of currently connected players. */
     const int getCurrentPlayers() const { return m_current_players; }
     // ------------------------------------------------------------------------
-    RaceManager::MinorRaceModeType getRaceMinorMode() const
-                                                       { return m_minor_mode; }
-    // ------------------------------------------------------------------------
-    RaceManager::MajorRaceModeType getRaceMajorMode() const
-                                                       { return m_major_mode; }
+    unsigned getServerMode() const                    { return m_server_mode; }
     // ------------------------------------------------------------------------
     RaceManager::Difficulty getDifficulty() const      { return m_difficulty; }
     // ------------------------------------------------------------------------

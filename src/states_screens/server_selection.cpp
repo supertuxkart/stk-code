@@ -149,7 +149,7 @@ void ServerSelection::loadList(unsigned sort_case)
                 return c->getDifficulty() > d->getDifficulty();
                 break;
             case 3:
-                return c->getRaceMinorMode() > d->getRaceMinorMode();
+                return c->getServerMode() > d->getServerMode();
                 break;
             case 4:
                 return c->getServerOwnerName() > d->getServerOwnerName();
@@ -175,7 +175,8 @@ void ServerSelection::loadList(unsigned sort_case)
             race_manager->getDifficultyName(server->getDifficulty());
         row.push_back(GUIEngine::ListWidget::ListCell(difficulty, -1, 1, true));
 
-        core::stringw mode = RaceManager::getNameOf(server->getRaceMinorMode());
+        core::stringw mode =
+            NetworkConfig::get()->getModeName(server->getServerMode());
         row.push_back(GUIEngine::ListWidget::ListCell(mode, -1, 2, true));
 
         if (NetworkConfig::get()->isWAN())

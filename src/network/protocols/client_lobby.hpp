@@ -64,7 +64,7 @@ public:
     virtual void setup() OVERRIDE;
     virtual void update(int ticks) OVERRIDE;
     virtual bool waitingForPlayers() const OVERRIDE
-                                                  { return m_state == LINKED; }
+                                                  { return m_state == CONNECTED; }
     virtual void asynchronousUpdate() OVERRIDE {}
 
 };

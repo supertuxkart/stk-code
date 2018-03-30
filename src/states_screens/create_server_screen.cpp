@@ -250,8 +250,7 @@ void CreateServerScreen::createServer()
     auto server = std::make_shared<Server>(0/*server_id*/, name,
         max_players, /*current_player*/0, (RaceManager::Difficulty)
         difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER),
-        NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
-        race_manager->getMajorMode()), server_address, !password.empty());
+        0, server_address, !password.empty());
 
 #undef USE_GRAPHICS_SERVER
 #ifdef USE_GRAPHICS_SERVER
@@ -276,7 +275,9 @@ void CreateServerScreen::createServer()
         race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
 
     race_manager->setReverseTrack(false);
-    STKHost::create();
+    auto sl = STKHost::create();
+    assert(sl);
+    sl->requestStart();
 #else
 
     NetworkConfig::get()->setIsServer(false);
@@ -310,6 +311,22 @@ void CreateServerScreen::createServer()
         " --max-players=" << max_players <<
         " --server-id-file=" << server_id_file <<
         " --log=1 --no-console-log";
+
+    if (m_more_options_spinner->isVisible())
+    {
+        int esi = m_more_options_spinner->getValue();
+        if (gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER)
+            != 3/*is soccer*/)
+        {
+            // Grand prix track count
+            if (esi > 0)
+                server_cfg << " --extra-server-info=" << esi;
+        }
+        else
+        {
+            server_cfg << " --extra-server-info=" << esi;
+        }
+    }
 
     SeparateProcess* sp =
         new SeparateProcess(SeparateProcess::getCurrentExecutableLocation(),

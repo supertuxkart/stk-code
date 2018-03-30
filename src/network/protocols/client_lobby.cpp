@@ -135,6 +135,7 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_EXIT_RESULT:           exitResultScreen(event);    break;
         case LE_UPDATE_PLAYER_LIST:    updatePlayerList(event);    break;
         case LE_CHAT:                  handleChat(event);          break;
+        case LE_CONNECTION_ACCEPTED:   connectionAccepted(event);  break;
         default:
             return false;
             break;
@@ -159,7 +160,6 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
             case LE_PLAYER_DISCONNECTED : disconnectedPlayer(event);     break;
             case LE_START_RACE: startGame(event);                        break;
             case LE_CONNECTION_REFUSED: connectionRefused(event);        break;
-            case LE_CONNECTION_ACCEPTED: connectionAccepted(event);      break;
             case LE_VOTE: displayPlayerVote(event);                      break;
             case LE_SERVER_OWNERSHIP: becomingServerOwner();             break;
             default:                                                     break;
@@ -419,8 +419,8 @@ void ClientLobby::disconnectedPlayer(Event* event)
  */
 void ClientLobby::connectionAccepted(Event* event)
 {
-    // At least 4 byte should remain now
-    if (!checkDataSize(event, 4)) return;
+    // At least 10 bytes should remain now
+    if (!checkDataSize(event, 10)) return;
 
     NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
@@ -437,6 +437,73 @@ void ClientLobby::connectionAccepted(Event* event)
     uint32_t token = data.getToken();
     if (!peer->isClientServerTokenSet())
         peer->setClientServerToken(token);
+    // Add server info
+    core::stringw str, each_line;
+    uint8_t u_data;
+    data.decodeStringW(&str);
+
+    //I18N: In the networking lobby
+    each_line = _("Server name: %s", str);
+    NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
+
+    u_data = data.getUInt8();
+    const core::stringw& difficulty_name =
+        race_manager->getDifficultyName((RaceManager::Difficulty)u_data);
+    race_manager->setDifficulty((RaceManager::Difficulty)u_data);
+    //I18N: In the networking lobby
+    each_line = _("Difficulty: %s", difficulty_name);
+    NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
+
+    u_data = data.getUInt8();
+    //I18N: In the networking lobby
+    each_line = _("Max players: %d", (int)u_data);
+    NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
+
+    u_data = data.getUInt8();
+    NetworkConfig::get()->setServerMode(u_data);
+    auto game_mode = NetworkConfig::get()->getLocalGameMode();
+    race_manager->setMinorMode(game_mode.first);
+    // We may use single mode in network even it's grand prix
+    //race_manager->setMajorMode(game_mode.second);
+
+    //I18N: In the networking lobby
+    each_line = _("Game mode: %s", NetworkConfig::get()->getModeName(u_data));
+    NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
+
+    uint8_t extra_server_info = data.getUInt8();
+    switch (extra_server_info)
+    {
+        case 0:
+            break;
+        case 1:
+        {
+            u_data = data.getUInt8();
+            core::stringw tl = _("Time limit");
+            core::stringw gl = _("Goals limit");
+            core::stringw sgt = u_data == 0 ? tl : gl;
+            m_game_setup->setSoccerGoalTarget((bool)u_data);
+            //I18N: In the networking lobby
+            each_line = _("Soccer game type: %s", sgt);
+            NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
+            break;
+        }
+        case 2:
+        {
+            unsigned cur_gp_track = data.getUInt8();
+            unsigned total_gp_track = data.getUInt8();
+            m_game_setup->setGrandPrixTrack(total_gp_track);
+            each_line = _("Grand prix progress: %d / %d", cur_gp_track,
+                total_gp_track);
+            NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
+            break;
+        }
+    }
+
+    // MOTD
+    data.decodeStringW(&str);
+    if (!str.empty())
+        NetworkingLobby::getInstance()->addMoreServerInfo(str);
+
     m_state = CONNECTED;
 }   // connectionAccepted
 
@@ -537,7 +604,7 @@ void ClientLobby::connectionRefused(Event* event)
 //-----------------------------------------------------------------------------
 
 /*! \brief Called when the server broadcasts to start the race to all clients.
- *  \param event : Event providing the information (no additional information
+ *  \param event : Event providing the information (no additional informati
  *                 in this case).
  */
 void ClientLobby::startGame(Event* event)

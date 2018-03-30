@@ -210,6 +210,8 @@
 #include "modes/cutscene_world.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
+#include "network/protocols/lobby_protocol.hpp"
+#include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/rewind_manager.hpp"
@@ -1014,7 +1016,6 @@ int handleCmdLine()
         }
     }   // --type
 
-
     if (CommandLine::has("--login", &s))
         login = s.c_str();
     if (CommandLine::has("--password", &s))
@@ -1053,6 +1054,12 @@ int handleCmdLine()
         NetworkConfig::get()->setPassword(server_password);
     }
 
+    if (CommandLine::has("--motd", &s))
+    {
+        core::stringw motd = StringUtils::xmlDecode(s);
+        NetworkConfig::get()->setMOTD(motd);
+    }
+
     if (CommandLine::has("--server-id-file", &s))
     {
         NetworkConfig::get()->setServerIdFile(
@@ -1084,13 +1091,12 @@ int handleCmdLine()
         irr::core::stringw name = StringUtils::utf8ToWide(ip.toString());
         auto server = std::make_shared<Server>(0, name,
             NetworkConfig::get()->getMaxPlayers(), 0,
-            race_manager->getDifficulty(),
-            NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
-            race_manager->getMajorMode()), ip, !server_password.empty());
+            race_manager->getDifficulty(), 0, ip, !server_password.empty());
         NetworkingLobby::getInstance()->setJoinedServer(server);
         STKHost::create(server);
     }
 
+    std::shared_ptr<LobbyProtocol> server_lobby;
     if (CommandLine::has("--wan-server", &s))
     {
         // Try to use saved user token if exists
@@ -1115,7 +1121,7 @@ int handleCmdLine()
             NetworkConfig::get()->setIsServer(true);
             NetworkConfig::get()->setIsWAN();
             NetworkConfig::get()->setIsPublicServer();
-            STKHost::create();
+            server_lobby = STKHost::create();
             Log::info("main", "Creating a WAN server '%s'.", s.c_str());
         }
     }
@@ -1124,13 +1130,41 @@ int handleCmdLine()
         NetworkConfig::get()->setServerName(StringUtils::xmlDecode(s));
         NetworkConfig::get()->setIsServer(true);
         NetworkConfig::get()->setIsLAN();
-        STKHost::create();
+        server_lobby = STKHost::create();
         Log::info("main", "Creating a LAN server '%s'.", s.c_str());
     }
     if (CommandLine::has("--auto-connect"))
     {
         NetworkConfig::get()->setAutoConnect(true);
     }
+
+    if (CommandLine::has("--extra-server-info", &n))
+    {
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+        {
+            LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
+                ->setSoccerGoalTarget((bool)n);
+            NetworkConfig::get()->setServerMode(
+                race_manager->getMinorMode(),
+                RaceManager::MAJOR_MODE_SINGLE);
+        }
+        else
+        {
+            LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
+                ->setGrandPrixTrack(n);
+            NetworkConfig::get()->setServerMode(
+                race_manager->getMinorMode(),
+                RaceManager::MAJOR_MODE_GRAND_PRIX);
+        }
+    }
+    else
+    {
+        NetworkConfig::get()->setServerMode(
+            race_manager->getMinorMode(), RaceManager::MAJOR_MODE_SINGLE);
+    }
+    // The extra server info has to be set before server lobby started
+    if (server_lobby)
+        server_lobby->requestStart();
 
     /** Disable detection of LAN connection when connecting via WAN. This is
      *  mostly a debugging feature to force using WAN connection. */
@@ -1902,6 +1936,7 @@ int main(int argc, char *argv[] )
     if (STKHost::existHost())
         STKHost::get()->shutdown();
 
+    NetworkConfig::destroy();
     cleanSuperTuxKart();
 
 #ifdef DEBUG

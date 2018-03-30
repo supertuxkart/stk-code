@@ -36,14 +36,13 @@ std::weak_ptr<LobbyProtocol> LobbyProtocol::m_lobby;
 LobbyProtocol::LobbyProtocol(CallbackObject* callback_object)
                  : Protocol(PROTOCOL_LOBBY_ROOM, callback_object)
 {
-    m_game_setup = NULL;
+    m_game_setup = new GameSetup();
 }   // LobbyProtocol
 
 // ----------------------------------------------------------------------------
 LobbyProtocol::~LobbyProtocol()
 {
-    if (m_game_setup)
-        delete m_game_setup;
+    delete m_game_setup;
 }   // ~LobbyProtocol
 
 //-----------------------------------------------------------------------------
@@ -140,7 +139,5 @@ void LobbyProtocol::configRemoteKart(
  */
 void LobbyProtocol::setup()
 {
-    if (m_game_setup)
-        delete m_game_setup;
-    m_game_setup = new GameSetup();
+    m_game_setup->reset();
 }   // setupNewGame

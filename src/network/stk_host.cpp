@@ -67,14 +67,15 @@
 STKHost *STKHost::m_stk_host       = NULL;
 bool     STKHost::m_enable_console = false;
 
-void STKHost::create(std::shared_ptr<Server> server, SeparateProcess* p)
+std::shared_ptr<LobbyProtocol> STKHost::create(std::shared_ptr<Server> server,
+                                               SeparateProcess* p)
 {
     assert(m_stk_host == NULL);
+    std::shared_ptr<LobbyProtocol> lp;
     if (NetworkConfig::get()->isServer())
     {
-        std::shared_ptr<ServerLobby> sl = LobbyProtocol::create<ServerLobby>();
+        lp = LobbyProtocol::create<ServerLobby>();
         m_stk_host = new STKHost(NetworkConfig::get()->getServerName());
-        sl->requestStart();
     }
     else
     {
@@ -86,6 +87,7 @@ void STKHost::create(std::shared_ptr<Server> server, SeparateProcess* p)
         delete m_stk_host;
         m_stk_host = NULL;
     }
+    return lp;
 }   // create
 
 // ============================================================================
@@ -941,9 +943,7 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
         s.addUInt8((uint8_t)sl->getGameSetup()->getPlayerCount());
         s.addUInt16(m_private_port);
         s.addUInt8((uint8_t)race_manager->getDifficulty());
-        s.addUInt8((uint8_t)
-            NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
-            race_manager->getMajorMode()));
+        s.addUInt8((uint8_t)NetworkConfig::get()->getServerMode());
         s.addUInt8(!NetworkConfig::get()->getPassword().empty());
         direct_socket->sendRawPacket(s, sender);
     }   // if message is server-requested

@@ -153,44 +153,6 @@ void NetworkingLobby::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-void NetworkingLobby::setJoinedServer(std::shared_ptr<Server> server)
-{
-    if (server == m_joined_server)
-        return;
-
-    m_joined_server = server;
-    m_server_info.clear();
-
-    if (!m_joined_server)
-        return;
-    core::stringw each_line;
-
-    //I18N: In the networking lobby
-    each_line = _("Server name: %s", m_joined_server->getName());
-    m_server_info.push_back(each_line);
-
-    const core::stringw& difficulty_name =
-        race_manager->getDifficultyName(m_joined_server->getDifficulty());
-    //I18N: In the networking lobby
-    each_line = _("Difficulty: %s", difficulty_name);
-    m_server_info.push_back(each_line);
-
-    //I18N: In the networking lobby
-    each_line = _("Max players: %d", m_joined_server->getMaxPlayers());
-    m_server_info.push_back(each_line);
-
-    //I18N: In the networking lobby
-    core::stringw mode = RaceManager::getNameOf(m_joined_server->getRaceMinorMode());
-    each_line = _("Game mode: %s", mode);
-
-    race_manager->setMinorMode(m_joined_server->getRaceMinorMode());
-    race_manager->setMajorMode(m_joined_server->getRaceMajorMode());
-    race_manager->setDifficulty(m_joined_server->getDifficulty());
-
-    m_server_info.push_back(each_line);
-}   // setJoinedServer
-
-// ----------------------------------------------------------------------------
 void NetworkingLobby::addMoreServerInfo(core::stringw info)
 {
     assert(m_text_bubble->getDimension().Width > 10);
