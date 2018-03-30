@@ -889,7 +889,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
 
     World *world = World::getWorld();
     if (!world->raceHasLaps()) return;
-    const int lap = world->getKartLaps(kart->getWorldKartId());
+    const int lap = world->getFinishedLapsOfKart(kart->getWorldKartId());
 
     // don't display 'lap 0/..' at the start of a race
     if (lap < 0 ) return;

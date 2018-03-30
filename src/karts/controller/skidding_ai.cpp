@@ -1231,7 +1231,7 @@ void SkiddingAI::handleItems(const float dt)
             LinearWorld *lin_world = dynamic_cast<LinearWorld*>(World::getWorld());
             if(m_time_since_last_shot > 3.0f &&
                 lin_world &&
-                lin_world->getKartLaps(m_kart->getWorldKartId())
+                lin_world->getFinishedLapsOfKart(m_kart->getWorldKartId())
                                    == race_manager->getNumLaps()-1)
             {
                 m_controls->setFire(true);

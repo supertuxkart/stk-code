@@ -181,7 +181,7 @@ void LinearWorld::update(int ticks)
              !kart->isGhostKart())
             continue;
         getTrackSector(n)->update(kart->getFrontXYZ());
-        kart_info.m_overall_distance = kart_info.m_race_lap
+        kart_info.m_overall_distance = kart_info.m_finished_laps
                                      * Track::getCurrentTrack()->getTrackLength()
                         + getDistanceDownTrackForKart(kart->getWorldKartId());
     }   // for n
@@ -201,7 +201,7 @@ void LinearWorld::update(int ticks)
 
         // During the last lap update the estimated finish time.
         // This is used to play the faster music, and by the AI
-        if (m_kart_info[i].m_race_lap == race_manager->getNumLaps()-1)
+        if (m_kart_info[i].m_finished_laps == race_manager->getNumLaps()-1)
         {
             m_kart_info[i].m_estimated_finish =
                 estimateFinishTimeForKart(m_karts[i]);
@@ -222,7 +222,7 @@ void LinearWorld::update(int ticks)
                        "distanceDownTrack=%f overallDistance=%f %s",
                     j, m_karts[j]->getPosition(),
                     m_karts[j]->hasFinishedRace(),
-                    m_kart_info[j].m_race_lap,
+                    m_kart_info[j].m_finished_laps,
                     getDistanceDownTrackForKart(m_karts[j]->getWorldKartId()),
                     m_kart_info[j].m_overall_distance,
                     (m_karts[j]->getPosition() == m_karts[i]->getPosition()
@@ -283,7 +283,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     // allows the end controller to switch end cameras
     if(kart->hasFinishedRace())
     {
-        kart->getController()->newLap(kart_info.m_race_lap);
+        kart->getController()->newLap(kart_info.m_finished_laps);
         return;
     }
 
@@ -292,18 +292,18 @@ void LinearWorld::newLap(unsigned int kart_index)
     // Only increase the lap counter and set the new time if the
     // kart hasn't already finished the race (otherwise the race_gui
     // will begin another countdown).
-    if(kart_info.m_race_lap+1 <= lap_count)
+    if(kart_info.m_finished_laps+1 <= lap_count)
     {
         assert(kart->getWorldKartId()==kart_index);
         kart_info.m_ticks_at_last_lap=getTimeTicks();
-        kart_info.m_race_lap++;
+        kart_info.m_finished_laps++;
         m_kart_info[kart_index].m_overall_distance =
-              m_kart_info[kart_index].m_race_lap 
+              m_kart_info[kart_index].m_finished_laps 
             * Track::getCurrentTrack()->getTrackLength()
             + getDistanceDownTrackForKart(kart->getWorldKartId());
     }
     // Last lap message (kart_index's assert in previous block already)
-    if (raceHasLaps() && kart_info.m_race_lap+1 == lap_count)
+    if (raceHasLaps() && kart_info.m_finished_laps+1 == lap_count)
     {
         if (lap_count > 1)
         {
@@ -332,10 +332,10 @@ void LinearWorld::newLap(unsigned int kart_index)
             }
         }
     }
-    else if (raceHasLaps() && kart_info.m_race_lap > 0 &&
-             kart_info.m_race_lap+1 < lap_count)
+    else if (raceHasLaps() && kart_info.m_finished_laps > 0 &&
+             kart_info.m_finished_laps+1 < lap_count)
     {
-        m_race_gui->addMessage(_("Lap %i", kart_info.m_race_lap+1),
+        m_race_gui->addMessage(_("Lap %i", kart_info.m_finished_laps+1),
                                kart, 3.0f, GUIEngine::getSkin()->getColor("font::normal"),
                                true);
     }
@@ -362,12 +362,12 @@ void LinearWorld::newLap(unsigned int kart_index)
     updateRacePosition();
 
     // Race finished
-    if(kart_info.m_race_lap >= race_manager->getNumLaps() && raceHasLaps())
+    if(kart_info.m_finished_laps >= race_manager->getNumLaps() && raceHasLaps())
     {
         kart->finishedRace(getTime());
     }
     int ticks_per_lap;
-    if (kart_info.m_race_lap == 1) // just completed first lap
+    if (kart_info.m_finished_laps == 1) // just completed first lap
     {
         ticks_per_lap = getTimeTicks();
     }
@@ -378,7 +378,7 @@ void LinearWorld::newLap(unsigned int kart_index)
 
     // if new fastest lap
     if(ticks_per_lap < m_fastest_lap_ticks && raceHasLaps() &&
-        kart_info.m_race_lap>0                                )
+        kart_info.m_finished_laps>0                                )
     {
         m_fastest_lap_ticks = ticks_per_lap;
 
@@ -401,7 +401,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     } // end if new fastest lap
 
     kart_info.m_lap_start_ticks = getTimeTicks();
-    kart->getController()->newLap(kart_info.m_race_lap);
+    kart->getController()->newLap(kart_info.m_finished_laps);
 }   // newLap
 
 //-----------------------------------------------------------------------------
@@ -428,7 +428,7 @@ float LinearWorld::getDistanceToCenterForKart(const int kart_id) const
 int LinearWorld::getLapForKart(const int kart_id) const
 {
     assert(kart_id < (int)m_kart_info.size());
-    return  m_kart_info[kart_id].m_race_lap;
+    return  m_kart_info[kart_id].m_finished_laps;
 }   // getLapForKart
 
 //-----------------------------------------------------------------------------
@@ -438,7 +438,7 @@ int LinearWorld::getLapForKart(const int kart_id) const
 float LinearWorld::getEstimatedFinishTime(const int kart_id) const
 {
     assert(kart_id < (int)m_kart_info.size());
-    assert(m_kart_info[kart_id].m_race_lap == race_manager->getNumLaps()-1);
+    assert(m_kart_info[kart_id].m_finished_laps == race_manager->getNumLaps()-1);
     return m_kart_info[kart_id].m_estimated_finish;
 }   // getEstimatedFinishTime
 
@@ -510,7 +510,7 @@ void LinearWorld::getKartsDisplayInfo(
             else
             {
                 int ticks_behind;
-                ticks_behind = (kart_info.m_race_lap==laps_of_leader
+                ticks_behind = (kart_info.m_finished_laps==laps_of_leader
                                 ? getTicksAtLapForKart(kart->getWorldKartId())
                                 : getTimeTicks())
                            - ticks_of_leader;
@@ -525,14 +525,14 @@ void LinearWorld::getKartsDisplayInfo(
 
         int numLaps = race_manager->getNumLaps();
 
-        if(kart_info.m_race_lap>=numLaps)
+        if(kart_info.m_finished_laps>=numLaps)
         {  // kart is finished, display in green
             rank_info.m_color.setGreen(0);
             rank_info.m_color.setBlue(0);
         }
-        else if(kart_info.m_race_lap>=0 && numLaps>1)
+        else if(kart_info.m_finished_laps>=0 && numLaps>1)
         {
-            int col = (int)(255*(1.0f-(float)kart_info.m_race_lap
+            int col = (int)(255*(1.0f-(float)kart_info.m_finished_laps
                                     /((float)numLaps-1.0f)        ));
             rank_info.m_color.setBlue(col);
             rank_info.m_color.setGreen(col);
@@ -776,7 +776,7 @@ void LinearWorld::updateRacePosition()
         // first kart is doing its last lap.
         if(!m_faster_music_active                                  &&
             p == 1                                                 &&
-            kart_info.m_race_lap == race_manager->getNumLaps() - 1 &&
+            kart_info.m_finished_laps == race_manager->getNumLaps() - 1 &&
             useFastMusicNearEnd()                                       )
         {
             music_manager->switchToFastMusic();
@@ -913,7 +913,6 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
     
     if (wrongway_timer > 1.0f)
     {
-        m_race_gui->cleanupMessages(0.0f);
         m_race_gui->addMessage(_("WRONG WAY!"), kart,
                                /* time */ -1.0f,
                                video::SColor(255,255,255,255),

@@ -184,8 +184,8 @@ void ProfileWorld::enterRaceOverState()
         int max_laps = -2;
         for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
         {
-            if(m_kart_info[i].m_race_lap>max_laps)
-                max_laps = m_kart_info[i].m_race_lap;
+            if(m_kart_info[i].m_finished_laps>max_laps)
+                max_laps = m_kart_info[i].m_finished_laps;
         }   // for i<getNumberOfKarts
         race_manager->setNumLaps(max_laps+1);
     }
