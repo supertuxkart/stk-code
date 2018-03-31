@@ -297,7 +297,7 @@ void ConnectToServer::update(int ticks)
 }   // update
 
 // ----------------------------------------------------------------------------
-bool ConnectToServer::handleDirectConnect()
+bool ConnectToServer::handleDirectConnect(int timeout)
 {
     // Direct connection to server should only possbile if public and private
     // ports of server are the same
@@ -316,7 +316,7 @@ bool ConnectToServer::handleDirectConnect()
         ENetPeer* p = dc->connectTo(m_server_address);
         if (p)
         {
-            while (enet_host_service(dc->getENetHost(), &event, 2000) != 0)
+            while (enet_host_service(dc->getENetHost(), &event, timeout) != 0)
             {
                 if (event.type == ENET_EVENT_TYPE_CONNECT)
                 {

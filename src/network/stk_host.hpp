@@ -133,9 +133,7 @@ private:
     uint16_t m_private_port;
 
     // ------------------------------------------------------------------------
-    STKHost(std::shared_ptr<Server> server);
-    // ------------------------------------------------------------------------
-    STKHost(const irr::core::stringw &server_name);
+    STKHost(bool server);
     // ------------------------------------------------------------------------
     ~STKHost();
     // ------------------------------------------------------------------------
@@ -155,9 +153,7 @@ public:
     /** Creates the STKHost. It takes all confifguration parameters from
      *  NetworkConfig. This STKHost can either be a client or a server.
      */
-    static std::shared_ptr<LobbyProtocol>
-        create(std::shared_ptr<Server> server = nullptr,
-               SeparateProcess* p = NULL);
+    static std::shared_ptr<LobbyProtocol> create(SeparateProcess* p = NULL);
     // ------------------------------------------------------------------------
     /** Returns the instance of STKHost. */
     static STKHost *get()

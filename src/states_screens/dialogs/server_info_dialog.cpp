@@ -104,7 +104,7 @@ void ServerInfoDialog::requestJoin()
     {
         NetworkConfig::get()->setPassword("");
     }
-    STKHost::create(m_server);
+    STKHost::create();
     NetworkingLobby::getInstance()->setJoinedServer(m_server);
     ModalDialog::dismiss();
     NetworkingLobby::getInstance()->push();

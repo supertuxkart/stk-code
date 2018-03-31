@@ -210,7 +210,8 @@
 #include "modes/cutscene_world.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
-#include "network/protocols/lobby_protocol.hpp"
+#include "network/protocols/connect_to_server.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
@@ -590,7 +591,7 @@ void cmdLineHelp()
     "       --server-password= Sets a password for a server (both client&server).\n"
     "       --connect-now=ip   Connect to a server with IP known now\n"
     "                          (in format x.x.x.x:xxx(port)), the port should be its\n"
-    "                          private port.\n"
+    "                          public port.\n"
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --port=n           Port number to use.\n"
@@ -1083,17 +1084,33 @@ int handleCmdLine()
     }
     if (CommandLine::has("--connect-now", &s))
     {
-        TransportAddress ip(s);
-        NetworkConfig::get()->setIsLAN();
+        TransportAddress server_addr(s);
+        NetworkConfig::get()->setIsWAN();
         NetworkConfig::get()->setIsServer(false);
-        Log::info("main", "Try to connect to server '%s'.",
-                  ip.toString().c_str()                    );
-        irr::core::stringw name = StringUtils::utf8ToWide(ip.toString());
-        auto server = std::make_shared<Server>(0, name,
-            NetworkConfig::get()->getMaxPlayers(), 0,
-            race_manager->getDifficulty(), 0, ip, !server_password.empty());
-        NetworkingLobby::getInstance()->setJoinedServer(server);
-        STKHost::create(server);
+        auto server = std::make_shared<Server>(0, L"", 0, 0, 0, 0, server_addr,
+            !server_password.empty());
+        NetworkConfig::get()->addNetworkPlayer(
+            input_manager->getDeviceManager()->getLatestUsedDevice(),
+            PlayerManager::getCurrentPlayer(), false/*handicap*/);
+        NetworkConfig::get()->doneAddingNetworkPlayers();
+        STKHost::create();
+        auto cts = std::make_shared<ConnectToServer>(server);
+        cts->setup();
+        Log::info("main", "Trying to connect to server '%s'.",
+            server_addr.toString().c_str());
+        if (!cts->handleDirectConnect(10000))
+        {
+            Log::error("main", "Timeout trying to connect to server '%s'.",
+                server_addr.toString().c_str());
+            STKHost::get()->shutdown();
+            exit(0);
+        }
+        else
+        {
+            auto cl = LobbyProtocol::create<ClientLobby>();
+            cl->setAddress(server_addr);
+            cl->requestStart();
+        }
     }
 
     std::shared_ptr<LobbyProtocol> server_lobby;

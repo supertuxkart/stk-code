@@ -67,20 +67,20 @@
 STKHost *STKHost::m_stk_host       = NULL;
 bool     STKHost::m_enable_console = false;
 
-std::shared_ptr<LobbyProtocol> STKHost::create(std::shared_ptr<Server> server,
-                                               SeparateProcess* p)
+std::shared_ptr<LobbyProtocol> STKHost::create(SeparateProcess* p)
 {
     assert(m_stk_host == NULL);
     std::shared_ptr<LobbyProtocol> lp;
     if (NetworkConfig::get()->isServer())
     {
         lp = LobbyProtocol::create<ServerLobby>();
-        m_stk_host = new STKHost(NetworkConfig::get()->getServerName());
+        m_stk_host = new STKHost(true/*server*/);
     }
     else
     {
-        m_stk_host = new STKHost(server);
+        m_stk_host = new STKHost(false/*server*/);
     }
+    // Separate process for client-server gui if exists
     m_stk_host->m_separate_process = p;
     if (!m_stk_host->m_network)
     {
@@ -260,57 +260,40 @@ std::shared_ptr<LobbyProtocol> STKHost::create(std::shared_ptr<Server> server,
  */
 
 // ============================================================================
-/** Constructor for a client
+/** The constructor for a server or client.
  */
-STKHost::STKHost(std::shared_ptr<Server> server)
-{
-    // Will be overwritten with the correct value once a connection with the
-    // server is made.
-    m_host_id = 0;
-    init();
-
-    ENetAddress ea;
-    ea.host = STKHost::HOST_ANY;
-    ea.port = NetworkConfig::get()->getClientPort();
-
-    m_network = new Network(/*peer_count*/1,       /*channel_limit*/2,
-                            /*max_in_bandwidth*/0, /*max_out_bandwidth*/0,
-                            &ea, true/*change_port_if_bound*/);
-    if (!m_network)
-    {
-        Log::fatal ("STKHost", "An error occurred while trying to create "
-                               "an ENet client host.");
-    }
-
-    setPrivatePort();
-}   // STKHost
-
-// ----------------------------------------------------------------------------
-/** The constructor for a server.
- *  The server control flow starts with the ServerLobby.
- */
-STKHost::STKHost(const irr::core::stringw &server_name)
+STKHost::STKHost(bool server)
 {
     init();
     m_host_id = 0;   // indicates a server host.
 
     ENetAddress addr;
     addr.host = STKHost::HOST_ANY;
-    addr.port = NetworkConfig::get()->getServerPort();
 
-    // Reserver 1 peer to handle full server message
-    m_network = new Network(NetworkConfig::get()->getMaxPlayers() + 1,
-                           /*channel_limit*/2,
-                           /*max_in_bandwidth*/0,
-                           /*max_out_bandwidth*/ 0, &addr,
-                           true/*change_port_if_bound*/);
+    if (server)
+    {
+        addr.port = NetworkConfig::get()->getServerPort();
+        // Reserve 1 peer to deliver full server message
+        m_network = new Network(NetworkConfig::get()->getMaxPlayers() + 1,
+            /*channel_limit*/2, /*max_in_bandwidth*/0,
+            /*max_out_bandwidth*/ 0, &addr, true/*change_port_if_bound*/);
+    }
+    else
+    {
+        addr.port = NetworkConfig::get()->getClientPort();
+        // Client only has 1 peer
+        m_network = new Network(/*peer_count*/1, /*channel_limit*/2,
+            /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &addr,
+            true/*change_port_if_bound*/);
+    }
+
     if (!m_network)
     {
         Log::fatal("STKHost", "An error occurred while trying to create an "
                               "ENet server host.");
     }
     setPrivatePort();
-}   // STKHost(server_name)
+}   // STKHost
 
 // ----------------------------------------------------------------------------
 /** Initialises the internal data structures and starts the protocol manager

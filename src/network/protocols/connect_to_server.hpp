@@ -56,7 +56,6 @@ private:
 
     void registerWithSTKServer();
     void waitingAloha(bool is_wan);
-    bool handleDirectConnect();
 public:
              ConnectToServer(std::shared_ptr<Server> server);
     virtual ~ConnectToServer();
@@ -65,6 +64,8 @@ public:
     virtual void setup() OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
     virtual void update(int ticks) OVERRIDE;
+    bool handleDirectConnect(int timeout = 2000);
+
 };   // class ConnectToServer
 
 #endif // CONNECT_TO_SERVER_HPP
