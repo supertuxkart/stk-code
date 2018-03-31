@@ -34,7 +34,6 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "states_screens/options_screen_video.hpp"
-#include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -172,12 +171,16 @@ GUIEngine::EventPropagation
             }
             World::getWorld()->scheduleUnpause();
             race_manager->exitRace();
-            Screen* newStack[] = {MainMenuScreen::getInstance(),
-                                  NetworkConfig::get()->isNetworking() ?
-                                  static_cast<Screen*>(OnlineScreen::getInstance()) :
-                                  static_cast<Screen*>(RaceSetupScreen::getInstance()),
-                                  NULL};
-            StateManager::get()->resetAndSetStack( newStack );
+            Screen* new_stack[] =
+                {
+                    MainMenuScreen::getInstance(),
+                    RaceSetupScreen::getInstance(),
+                    NULL
+                };
+            StateManager::get()->resetAndSetStack(
+                NetworkConfig::get()->isNetworking() ?
+                NetworkConfig::get()->getResetScreens().data() :
+                new_stack);
             NetworkConfig::get()->unsetNetworking();
             return GUIEngine::EVENT_BLOCK;
         }

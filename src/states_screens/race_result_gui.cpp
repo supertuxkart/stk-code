@@ -51,9 +51,7 @@
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/networking_lobby.hpp"
 #include "states_screens/network_kart_selection.hpp"
-#include "states_screens/online_screen.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -351,7 +349,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 clrp->doneWithResults();
             backToLobby();
         }
-        if (name == "bottom") // Quit server (return to main menu)
+        if (name == "bottom") // Quit server (return to online lan / wan menu)
         {
             if (STKHost::existHost())
             {
@@ -359,7 +357,8 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             }
             race_manager->exitRace();
             race_manager->setAIKartOverride("");
-            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            StateManager::get()->resetAndSetStack(
+                NetworkConfig::get()->getResetScreens().data());
             NetworkConfig::get()->unsetNetworking();
         }
         return;
@@ -422,18 +421,15 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
 }   // eventCallback
 
 //-----------------------------------------------------------------------------
-/** Sets up the giu to go back to the lobby. Can only be called in case of a
+/** Sets up the gui to go back to the lobby. Can only be called in case of a
  *  networked game.
  */
 void RaceResultGUI::backToLobby()
 {
     race_manager->exitRace();
     race_manager->setAIKartOverride("");
-    Screen* newStack[] = { MainMenuScreen::getInstance(),
-                           OnlineScreen::getInstance(),
-                           NetworkingLobby::getInstance(),
-                           NULL                                  };
-    StateManager::get()->resetAndSetStack(newStack);
+    StateManager::get()->resetAndSetStack(
+        NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
 }   // backToLobby
 
 //-----------------------------------------------------------------------------

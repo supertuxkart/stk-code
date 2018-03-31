@@ -20,6 +20,11 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "online/xml_request.hpp"
+#include "states_screens/main_menu_screen.hpp"
+#include "states_screens/networking_lobby.hpp"
+#include "states_screens/online_lan.hpp"
+#include "states_screens/online_profile_servers.hpp"
+#include "states_screens/online_screen.hpp"
 
 NetworkConfig *NetworkConfig::m_network_config = NULL;
 bool           NetworkConfig::m_disable_lan    = false;
@@ -168,3 +173,57 @@ core::stringw NetworkConfig::getModeName(unsigned id)
             return L"";
     }
 }   // getModeName
+
+// ----------------------------------------------------------------------------
+std::vector<GUIEngine::Screen*>
+    NetworkConfig::getResetScreens(bool lobby) const
+{
+    if (lobby)
+    {
+        if (isWAN())
+        {
+            return
+                {
+                    MainMenuScreen::getInstance(),
+                    OnlineScreen::getInstance(),
+                    OnlineProfileServers::getInstance(),
+                    NetworkingLobby::getInstance(),
+                    nullptr
+                };
+        }
+        else
+        {
+            return
+                {
+                    MainMenuScreen::getInstance(),
+                    OnlineScreen::getInstance(),
+                    OnlineLanScreen::getInstance(),
+                    NetworkingLobby::getInstance(),
+                    nullptr
+                };
+        }
+    }
+    else
+    {
+        if (isWAN())
+        {
+            return
+                {
+                    MainMenuScreen::getInstance(),
+                    OnlineScreen::getInstance(),
+                    OnlineProfileServers::getInstance(),
+                    nullptr
+                };
+        }
+        else
+        {
+            return
+                {
+                    MainMenuScreen::getInstance(),
+                    OnlineScreen::getInstance(),
+                    OnlineLanScreen::getInstance(),
+                    nullptr
+                };
+        }
+    }
+}   // getResetScreens

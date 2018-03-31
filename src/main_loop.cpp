@@ -36,8 +36,6 @@
 #include "online/request_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/main_menu_screen.hpp"
-#include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
 
@@ -354,12 +352,8 @@ void MainLoop::run()
             }
             if (!ProfileWorld::isNoGraphics())
             {
-                GUIEngine::Screen* new_stack[] =
-                {
-                    MainMenuScreen::getInstance(),
-                    OnlineScreen::getInstance(), NULL
-                };
-                StateManager::get()->resetAndSetStack(new_stack);
+                StateManager::get()->resetAndSetStack(
+                    NetworkConfig::get()->getResetScreens().data());
                 MessageQueue::add(MessageQueue::MT_ERROR, msg);
             }
             NetworkConfig::get()->unsetNetworking();

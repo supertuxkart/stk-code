@@ -34,6 +34,11 @@ namespace Online
     class XMLRequest;
 }
 
+namespace GUIEngine
+{
+    class Screen;
+}
+
 class InputDevice;
 class PlayerProfile;
 
@@ -283,6 +288,8 @@ public:
     unsigned getServerMode() const { return m_server_mode; }
     // ------------------------------------------------------------------------
     core::stringw getModeName(unsigned id);
+    // ------------------------------------------------------------------------
+    std::vector<GUIEngine::Screen*> getResetScreens(bool lobby = false) const;
 
 };   // class NetworkConfig
 
