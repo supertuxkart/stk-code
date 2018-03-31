@@ -24,6 +24,8 @@
 #include <map>
 #include <string>
 
+class Track;
+
 namespace GUIEngine
 {
     class CheckBoxWidget;
@@ -47,6 +49,7 @@ private:
         m_reverse_checked = false;
     }
 
+    Track* m_selected_track = NULL;
     GUIEngine::CheckBoxWidget* m_reversed;
     GUIEngine::SpinnerWidget* m_laps;
     GUIEngine::LabelWidget* m_votes;
@@ -59,10 +62,12 @@ private:
 
     Synchronised<std::map<std::string, core::stringw> > m_vote_messages;
 
+    std::deque<std::string> m_random_track_list;
+
     /** adds the tracks from the current track group into the tracks ribbon */
     void buildTrackList();
 
-    std::deque<std::string> m_random_track_list;
+    void voteForPlayer();
 
 public:
 
@@ -101,12 +106,7 @@ public:
         m_vote_timeout = -1.0f;
     }
 
-    void setVoteTimeout(float timeout)
-    {
-        if (m_vote_timeout != -1.0f)
-            return;
-        m_vote_timeout = timeout;
-    }
+    void setVoteTimeout(float timeout);
 
     void addVoteMessage(const std::string& user,
                         const irr::core::stringw& message)

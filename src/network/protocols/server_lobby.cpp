@@ -1083,8 +1083,8 @@ void ServerLobby::playerVote(Event* event)
     NetworkString other = NetworkString(PROTOCOL_LOBBY_ROOM);
     std::string name = StringUtils::wideToUtf8(event->getPeer()
         ->getPlayerProfiles()[0]->getName());
-    other.addUInt8(LE_VOTE).addFloat(m_timeout.load()).encodeString(name)
-        .addUInt32(event->getPeer()->getHostId());
+    other.addUInt8(LE_VOTE).addFloat(UserConfigParams::m_voting_timeout)
+        .encodeString(name).addUInt32(event->getPeer()->getHostId());
     other += data;
 
     std::string track_name;
