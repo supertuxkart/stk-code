@@ -66,6 +66,8 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
         m_on_road ? test_nodes : NULL, ignore_vertical);
     m_on_road = m_current_graph_node != Graph::UNKNOWN_SECTOR;
 
+    bool isValidQuad = true;
+
     // If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
     // the road, so we have to use search for the closest graph node.
     if(m_current_graph_node == Graph::UNKNOWN_SECTOR)
@@ -90,6 +92,7 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
         else
         {
             //bool has_prerequisite = false;
+            isValidQuad = false;
 
             for (unsigned int i=0; i<checkline_requirements.size(); i++)
             {
@@ -97,6 +100,7 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
                 {
                     //has_prerequisite = true;
                     m_last_valid_graph_node = m_current_graph_node;
+                    isValidQuad = true;
                     break;
                 }
             }
@@ -108,8 +112,16 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
 
     // Now determine the 'track' coords, i.e. ow far from the start of the
     // track, and how far to the left or right of the center driveline.
-    DriveGraph::get()->spatialToTrack(&m_current_track_coords, xyz,
-                                      m_current_graph_node);
+    if (isValidQuad || m_last_valid_graph_node == Graph::UNKNOWN_SECTOR)
+    {
+        DriveGraph::get()->spatialToTrack(&m_current_track_coords, xyz,
+            m_current_graph_node);
+    }
+    else
+    {
+        DriveGraph::get()->spatialToTrack(&m_current_track_coords, xyz,
+            m_last_valid_graph_node);
+    }
 }   // update
 
 // ----------------------------------------------------------------------------
