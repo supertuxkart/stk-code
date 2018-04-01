@@ -81,10 +81,13 @@ ClientLobby::~ClientLobby()
 void ClientLobby::clearPlayers()
 {
     StateManager::get()->resetActivePlayers();
-    input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
-    input_manager->getDeviceManager()->setSinglePlayer(NULL);
-    input_manager->setMasterPlayerOnly(false);
-    input_manager->getDeviceManager()->clearLatestUsedDevice();
+    if (input_manager)
+    {
+        input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
+        input_manager->getDeviceManager()->setSinglePlayer(NULL);
+        input_manager->setMasterPlayerOnly(false);
+        input_manager->getDeviceManager()->clearLatestUsedDevice();
+    }
 }   // clearPlayers
 
 //-----------------------------------------------------------------------------

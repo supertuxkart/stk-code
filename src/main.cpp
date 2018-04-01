@@ -1942,7 +1942,11 @@ int main(int argc, char *argv[] )
     // If the window was closed in the middle of a race, remove players,
     // so we don't crash later when StateManager tries to access input devices.
     StateManager::get()->resetActivePlayers();
-    if(input_manager) delete input_manager; // if early crash avoid delete NULL
+    if (input_manager)
+    {
+        delete input_manager;
+        input_manager = NULL;
+    }
 
     if (STKHost::existHost())
         STKHost::get()->shutdown();
