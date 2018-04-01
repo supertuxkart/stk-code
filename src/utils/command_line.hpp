@@ -82,35 +82,53 @@ public:
     static void reportInvalidParameters();
     static bool has(const std::string &option);
     // ------------------------------------------------------------------------
-    /** Searches for an option 'option=XX'. If found, *t will contain 'XX'.
-     *  If the value was found, the entry is removed from the list of all
-     *  command line arguments. This is the interface for any integer
-     *  values (i.e. using %d as format while scanning).
+    /** Searches for an option 'option=XX'. If found, *value will contain 'XX'.
+     *  If the value was found and the type of XX and value matches each other,
+     *  the entry is removed from the list of all command line arguments.
      *  \param option The option (must include '-' or '--' as required).
-     *  \param t Address of a variable to store the value.
-     *  \param format The '%' format to sscanf the value in t with.
+     *  \param value Pointer to store the value.
      *  \return true if the value was found, false otherwise.
      */
-    static bool has(const std::string &option, int *t)
+    template<typename T> static bool has(const std::string& option, T* value)
     {
-        return has(option, t, "%d");
+        std::string equal = option + "=";
+        std::vector<std::string>::iterator i;
+        for (i = m_argv.begin(); i < m_argv.end(); i++)
+        {
+            if (i->compare(0, equal.size(), equal) == 0)
+            {
+                std::string result =
+                    i->substr(equal.size(), std::string::npos);
+                if (StringUtils::fromString(result, *value))
+                {
+                    m_argv.erase(i);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     // ------------------------------------------------------------------------
-    /** Searches for an option 'option=XX'. If found, *t will contain 'XX'.
-     *  If the value was found, the entry is removed from the list of all
-     *  command line arguments. This is the interface for a std::string
+    /** Searches for an option 'option=XX'. If found, *value will contain 'XX'.
+     *  If the value was found and the type of XX and value matches each other,
+     *  the entry is removed from the list of all command line arguments.
+     *  It copies the result directly to value to include space.
      *  \param option The option (must include '-' or '--' as required).
-     *  \param t Address of a variable to store the value.
-     *  \param format The '%' format to sscanf the value in t with.
+     *  \param value String pointer to store the value.
      *  \return true if the value was found, false otherwise.
      */
-    static bool has(const std::string &option, std::string *t)
+    static bool has(const std::string& option, std::string* value)
     {
-        char s[1024];
-        if(has(option, s, "%1023s"))
+        std::string equal = option + "=";
+        std::vector<std::string>::iterator i;
+        for (i = m_argv.begin(); i < m_argv.end(); i++)
         {
-            *t = s;
-            return true;
+            if (i->compare(0, equal.size(), equal) == 0)
+            {
+                *value = i->substr(equal.size(), std::string::npos);
+                m_argv.erase(i);
+                return true;
+            }
         }
         return false;
     }   // has<std::string>
