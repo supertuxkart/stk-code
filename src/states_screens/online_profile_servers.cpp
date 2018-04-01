@@ -50,12 +50,6 @@ OnlineProfileServers::OnlineProfileServers() : GUIEngine::Screen("online/profile
 // -----------------------------------------------------------------------------
 void OnlineProfileServers::beforeAddingWidget()
 {
-    if (!PlayerManager::getCurrentOnlineId())
-    {
-        getWidget<IconButtonWidget>("find_wan_server")->setActive(false);
-        getWidget<IconButtonWidget>("create_wan_server")->setActive(false);
-        getWidget<IconButtonWidget>("quick_wan_play")->setActive(false);
-    }
 #ifdef ANDROID
     getWidget("create_wan_server")->setVisible(false);
 #endif
@@ -65,10 +59,23 @@ void OnlineProfileServers::beforeAddingWidget()
 
 void OnlineProfileServers::init()
 {
-    RibbonWidget* ribbon = getWidget<RibbonWidget>("wan");
-    assert(ribbon != NULL);
-    ribbon->select("find_wan_server", PLAYER_ID_GAME_MASTER);
-    ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    if (!PlayerManager::getCurrentOnlineId())
+    {
+        getWidget("back")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        getWidget<IconButtonWidget>("find_wan_server")->setActive(false);
+        getWidget<IconButtonWidget>("create_wan_server")->setActive(false);
+        getWidget<IconButtonWidget>("quick_wan_play")->setActive(false);
+    }
+    else
+    {
+        getWidget<IconButtonWidget>("find_wan_server")->setActive(true);
+        getWidget<IconButtonWidget>("create_wan_server")->setActive(true);
+        getWidget<IconButtonWidget>("quick_wan_play")->setActive(true);
+        RibbonWidget* ribbon = getWidget<RibbonWidget>("wan");
+        assert(ribbon != NULL);
+        ribbon->select("find_wan_server", PLAYER_ID_GAME_MASTER);
+        ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    }
 }   // init
 
 // -----------------------------------------------------------------------------
