@@ -2460,9 +2460,6 @@ void Kart::updateEnginePowerAndBrakes(float dt)
     updateNitro(dt);
     float engine_power = getActualWheelForce();
 
-    // apply nitro boost if relevant
-    if(getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_NITRO))
-        engine_power*=1.2f;
     // apply parachute physics if relevant
     if(m_attachment->getType()==Attachment::ATTACH_PARACHUTE)
         engine_power*=0.2f;
