@@ -117,9 +117,6 @@ public:
     void addMoreServerInfo(core::stringw info);
     void setJoinedServer(std::shared_ptr<Server> server)
     {
-        if (server == m_joined_server)
-            return;
-
         m_joined_server = server;
         m_server_info.clear();
     }

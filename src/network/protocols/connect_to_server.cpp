@@ -262,7 +262,9 @@ void ConnectToServer::update(int ticks)
     switch(m_state.load())
     {
         case REQUESTING_CONNECTION:
+        case CONNECTING:
         {
+            // Make sure lobby display the quick play server name
             assert(m_server);
             NetworkingLobby::getInstance()->setJoinedServer(m_server);
             break;
