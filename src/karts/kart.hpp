@@ -86,6 +86,9 @@ protected:
 
     /** Handles the powerup of a kart. */
     Powerup *m_powerup;
+    
+    /** Remember the last **used** powerup type of a kart for AI purposes. */
+    PowerupManager::PowerupType m_last_used_powerup;
 
     /** True if kart is flying (for debug purposes only). */
     bool m_flying;
@@ -160,6 +163,9 @@ protected:
 
     /** Counter which is used for displaying wrong way message after a delay */
     float        m_wrongway_counter;
+    
+    /** True if the kart has been selected to have a boosted ai */
+    bool         m_boosted_ai;
 
 
     // Bullet physics parameters
@@ -270,6 +276,8 @@ public:
     virtual void   setSlowdown(unsigned int category, float max_speed_fraction,
                                float fade_in_time);
     virtual float getSpeedIncreaseTimeLeft(unsigned int category) const;
+    virtual void  setBoostAI     (bool boosted);
+    virtual bool  getBoostAI     () const;
     virtual void  collectedItem(Item *item, int random_attachment);
     virtual float getStartupBoost() const;
 
@@ -303,11 +311,17 @@ public:
     /** Sets a new powerup. */
     virtual void setPowerup (PowerupManager::PowerupType t, int n);
     // ------------------------------------------------------------------------
+    /** Sets the last used powerup. */
+    virtual void setLastUsedPowerup (PowerupManager::PowerupType t);
+    // ------------------------------------------------------------------------
     /** Returns the current powerup. */
     virtual const Powerup* getPowerup() const { return m_powerup; }
     // ------------------------------------------------------------------------
     /** Returns the current powerup. */
     virtual Powerup* getPowerup() { return m_powerup; }
+    // ------------------------------------------------------------------------
+    /** Returns the last used powerup. */
+    virtual PowerupManager::PowerupType getLastUsedPowerup() { return m_last_used_powerup; }
     // ------------------------------------------------------------------------
     /** Returns the number of powerups. */
     virtual int getNumPowerup() const;
@@ -486,4 +500,3 @@ public:
 #endif
 
 /* EOF */
-

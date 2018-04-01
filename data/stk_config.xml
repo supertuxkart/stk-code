@@ -225,10 +225,12 @@
          min/max-start-delay: Minimum and maximum start delay.
            See http://www.humanbenchmark.com/tests/reactiontime/stats.php
            Average reaction time is around 0.215 s.
-         nitro-usage: "none", "some", "all": if nitro should be used, and
-           how much the AI should try to use it good.
-         non-random-item-usage: If true, use items in a sophisticated way,
-           otherwise use items randomly.
+         nitro-usage: Integer determining how well the AI uses nitro, from 0 to 4
+           0 corresponds to no use ; while 1 to 4 corresponds to various degrees
+           of quality use (using it immediately for 1 to more context-aware strategies)
+         item-skill: Integer determining how well the AI use items, from 0 to 5
+           0 corresponds to no use ; 1 to use after a random time ; while 2 to 5 use
+           more advanced tactics
          collect-avoid-items: if the AI should collect and avoid items,
            or just ignore them.
          handle-bomb: If the AI should actively try to pass on a bomb.
@@ -287,8 +289,8 @@
                 shield-incoming-radius="0"
                 false-start-probability="0.08"
                 min-start-delay="0.3" max-start-delay="0.5"
-                nitro-usage="none"
-                non-random-item-usage="false"
+                nitro-usage="0"
+                item-skill="1"
                 collect-avoid-items="false"
                 handle-bomb="false"
                 speed-cap="-10:1.0 -5:0.9 5:0.8 20:0.7 50:0.6"
@@ -305,8 +307,8 @@
                 shield-incoming-radius="10"
                 false-start-probability="0.04"
                 min-start-delay="0.25" max-start-delay="0.4"
-                nitro-usage="some"
-                non-random-item-usage="true"
+                nitro-usage="1"
+                item-skill="2"
                 collect-avoid-items="true"
                 handle-bomb="false"
                 speed-cap="10:1.0 50:0.8"
@@ -320,11 +322,11 @@
                 straight-length-for-zipper="35"
                 use-slipstream="true"
                 disable-slipstream-usage="false"
-                shield-incoming-radius="10"
+                shield-incoming-radius="8"
                 false-start-probability="0.01"
                 min-start-delay="0.15" max-start-delay="0.28"
-                nitro-usage="all"
-                non-random-item-usage="true"
+                nitro-usage="2"
+                item-skill="3"
                 collect-avoid-items="true"
                 handle-bomb="true"
                 speed-cap="20:1.0 50:0.8"
@@ -338,11 +340,11 @@
                 straight-length-for-zipper="35"
                 use-slipstream="true"
                 disable-slipstream-usage="false"
-                shield-incoming-radius="10"
+                shield-incoming-radius="6"
                 false-start-probability="0.0"
                 min-start-delay="0.15" max-start-delay="0.2"
-                nitro-usage="all"
-                non-random-item-usage="true"
+                nitro-usage="3"
+                item-skill="4"
                 collect-avoid-items="true"
                 handle-bomb="true"
                 speed-cap="0:1.0"
