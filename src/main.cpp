@@ -191,6 +191,7 @@
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/referee.hpp"
 #include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_shader.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/dialog_queue.hpp"
@@ -571,6 +572,7 @@ void cmdLineHelp()
     "       --unlock-all       Permanently unlock all karts and tracks for testing.\n"
     "       --no-unlock-all    Disable unlock-all (i.e. base unlocking on player achievement).\n"
     "       --no-graphics      Do not display the actual race.\n"
+    "       --sp-shader-debug  Enables debug in sp shader, it will print all unavailable uniforms.\n"
     "       --demo-mode=t      Enables demo mode after t seconds of idle time in "
                                "main menu.\n"
     "       --demo-tracks=t1,t2 List of tracks to be used in demo mode. No\n"
@@ -734,10 +736,13 @@ int handleCmdLinePreliminary()
     if(CommandLine::has("--kartdir", &s))
         KartPropertiesManager::addKartSearchDir(s);
 
+#ifndef SERVER_ONLY
     if(CommandLine::has("--no-graphics") || CommandLine::has("-l"))
-    {
+#endif
         ProfileWorld::disableGraphics();
-    }
+
+    if (CommandLine::has("--sp-shader-debug"))
+        SP::SPShader::m_sp_shader_debug = true;
 
     if(CommandLine::has("--screensize", &s) || CommandLine::has("-s", &s))
     {
