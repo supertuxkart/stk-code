@@ -74,6 +74,8 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
     {
         m_current_graph_node = Graph::get()->findOutOfRoadSector(xyz,
             prev_sector, test_nodes, ignore_vertical);
+        isValidQuad = false;
+
         // ArenaGraph (battle and soccer mode) doesn't need the code below
         if (ag) return;
     }
