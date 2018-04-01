@@ -627,9 +627,10 @@ void ClientLobby::startGame(Event* event)
  */
 void ClientLobby::startingRaceNow()
 {
-    NetworkString *ns = getNetworkString(2);
+    NetworkString* ns = getNetworkString(2);
     ns->addUInt8(LE_STARTED_RACE);
     sendToServer(ns, /*reliable*/true);
+    delete ns;
     Log::verbose("ClientLobby", "StartingRaceNow at %lf",
                  StkTime::getRealTime());
 }   // startingRaceNow
