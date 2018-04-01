@@ -74,7 +74,23 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
     {
         m_current_graph_node = Graph::get()->findOutOfRoadSector(xyz,
             prev_sector, test_nodes, ignore_vertical);
+
+        // keep the current quad as the latest valid one IF the player has one
+        // of the required checklines
+        const DriveNode* dn = DriveGraph::get()->getNode(m_current_graph_node);
+        const std::vector<int>& checkline_requirements = dn->getChecklineRequirements();
+
         isValidQuad = false;
+        for (unsigned int i = 0; i<checkline_requirements.size(); i++)
+        {
+            if (m_last_triggered_checkline == checkline_requirements[i])
+            {
+                //has_prerequisite = true;
+                m_last_valid_graph_node = m_current_graph_node;
+                isValidQuad = true;
+                break;
+            }
+        }
 
         // ArenaGraph (battle and soccer mode) doesn't need the code below
         if (ag) return;
