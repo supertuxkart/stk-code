@@ -143,6 +143,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
 {
     if (name == "user-id")
     {
+        NetworkConfig::get()->cleanNetworkPlayers();
         UserScreen::getInstance()->push();
         return;
     }
@@ -197,7 +198,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                                 "\"Connect to the Internet\"."));
             return;
         }
-        
+
         if (PlayerManager::getCurrentOnlineId())
         {
             ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
@@ -220,5 +221,3 @@ bool OnlineScreen::onEscapePressed()
     NetworkConfig::get()->unsetNetworking();
     return true;
 }   // onEscapePressed
-
-
