@@ -25,6 +25,7 @@
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/message_queue.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "input/input_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
@@ -338,6 +339,8 @@ void MainLoop::run()
                 msg = STKHost::get()->getErrorMessage();
             }
             STKHost::get()->shutdown();
+            // In case the user opened a race pause dialog
+            GUIEngine::ModalDialog::dismiss();
             if (World::getWorld())
             {
                 race_manager->exitRace();
