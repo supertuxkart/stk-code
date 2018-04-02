@@ -435,7 +435,6 @@ void ServerLobby::update(int ticks)
             auto pm = ProtocolManager::lock();
             assert(pm);
             pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
-            pm->findAndTerminate(PROTOCOL_KART_UPDATE);
             pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
             setup();
             m_state = NetworkConfig::get()->isLAN() ?

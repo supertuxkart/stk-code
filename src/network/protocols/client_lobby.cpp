@@ -690,7 +690,6 @@ void ClientLobby::raceFinished(Event* event)
     auto pm = ProtocolManager::lock();
     assert(pm);
     pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
-    pm->findAndTerminate(PROTOCOL_KART_UPDATE);
     pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
 
     // finish the race
@@ -721,7 +720,6 @@ void ClientLobby::exitResultScreen(Event *event)
     auto pm = ProtocolManager::lock();
     assert(pm);
     pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
-    pm->findAndTerminate(PROTOCOL_KART_UPDATE);
     pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
 
     // Will be reset to linked if connected to server, see update(float dt)
