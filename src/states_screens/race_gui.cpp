@@ -460,7 +460,7 @@ void RaceGUI::drawGlobalMiniMap()
 
 //-----------------------------------------------------------------------------
 /** Energy meter that gets filled with nitro. This function is called from
- *  drawSpeedAndEnergy, which defines the correct position of the energy
+ *  drawSpeedEnergyRank, which defines the correct position of the energy
  *  meter.
  *  \param x X position of the meter.
  *  \param y Y position of the meter.
@@ -473,7 +473,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 {
 #ifndef SERVER_ONLY
     float min_ratio        = std::min(scaling.X, scaling.Y);
-    const int GAUGEWIDTH   = 78;
+    const int GAUGEWIDTH   = 110;
     int gauge_width        = (int)(GAUGEWIDTH*min_ratio);
     int gauge_height       = (int)(GAUGEWIDTH*min_ratio);
 
@@ -483,8 +483,8 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
     else if (state > 1.0f) state = 1.0f;
 
     core::vector2df offset;
-    offset.X = (float)(x-gauge_width) - 9.0f*scaling.X;
-    offset.Y = (float)y-30.0f*scaling.Y;
+    offset.X = (float)(x-gauge_width) - 2.0f*scaling.X;
+    offset.Y = (float)y-6.0f*scaling.Y;
 
 
     // Background
@@ -496,6 +496,23 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
                                 m_gauge_empty->getSize()) /* source rect */,
                 NULL /* clip rect */, NULL /* colors */,
                 true /* alpha */);
+
+    // The positions for A to E are defined here.
+
+    // They are calculated from gauge_full.png
+    // They are further than the nitrometer farther position because
+    // the lines between them would otherwise cut through the outside circle.
+    
+    float ax = 0.194f;
+    float ay = 0.350f;
+    float bx = 0.198f;
+    float by = 0.988f;
+    float cx = 0.514f;
+    float cy = 0.901f;
+    float dx = 0.747f;
+    float dy = 0.669f;
+    float ex = 0.831f;
+    float ey = 0.350f;
 
     // Target
 
@@ -510,58 +527,71 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
         // There are three different polygons used, depending on
         // the target. Consider the nitro-display texture:
         //
-        //   ----E-x--D       (position of v,w,x vary depending on
-        //            |        nitro)
-        //       A    w
-        //            |
-        //   -B--v----C
-        // For nitro state <= r1 the triangle ABv is used, with v between B and C.
-        // For nitro state <= r2 the quad ABCw is used, with w between C and D.
-        // For nitro state >  r2 the poly ABCDx is used, with x between D and E.
+        //    A                E (position of v,w,x vary depending on
+        //                    -|                                nitro)
+        //                    x
+        //                    |
+        //                 -D-|
+        //              -w-|
+        //         |-C--|
+        //   -B--v-|
+        // For coin target <= r1 the triangle ABv is used, with v between B and C.
+        // For coin target <= r2 the quad ABCw is used, with w between C and D.
+        // For coin target >  r2 the poly ABCDx is used, with x between D and E.
 
-        vertices[0].TCoords = core::vector2df(0.3f, 0.4f);
-        vertices[0].Pos     = core::vector3df(offset.X+0.3f*gauge_width,
-                                              offset.Y-(1-0.4f)*gauge_height, 0);
-        vertices[1].TCoords = core::vector2df(0, 1.0f);
-        vertices[1].Pos     = core::vector3df(offset.X, offset.Y, 0);
+        vertices[0].TCoords = core::vector2df(ax, ay);
+        vertices[0].Pos     = core::vector3df(offset.X+ax*gauge_width,
+                                              offset.Y-(1-ay)*gauge_height, 0);
+        vertices[1].TCoords = core::vector2df(bx, by);
+        vertices[1].Pos     = core::vector3df(offset.X+bx*gauge_width,
+                                              offset.Y-(1-by)*gauge_height, 0);
         // The targets at which different polygons must be used.
 
-        const float r1 = 0.4f;
-        const float r2 = 0.65f;
+        const float r1 = 0.334f;
+        const float r2 = 0.667f;
+
         if(coin_target<=r1)
         {
             count   = 3;
             float f = coin_target/r1;
-            vertices[2].TCoords = core::vector2df(0.08f + (1.0f-0.08f)*f, 1.0f);
-            vertices[2].Pos =  core::vector3df(offset.X + (0.08f*gauge_width)
-                                                + (1.0f - 0.08f)*f*gauge_width,
-                                               offset.Y,0);
+
+            //vary v between B and C
+            vertices[2].TCoords = core::vector2df(cx*(f)+bx*(1.0f-f), cy*(f)+by*(1.0f-f));
+            //f : the proportion of C. 1-f : the proportion of B
+            vertices[2].Pos = core::vector3df(offset.X+ ((cx*(f)+bx*(1.0f-f))*gauge_width),
+                                          offset.Y-(((1-cy)*(f)+(1-by)*(1.0f-f))*gauge_height),0);
                 }
         else if(coin_target<=r2)
         {
             count   = 4;
             float f = (coin_target - r1)/(r2-r1);
-            vertices[2].TCoords = core::vector2df(1.0f, 1.0f);
-            vertices[2].Pos     = core::vector3df(offset.X + gauge_width,
-                                                  offset.Y, 0);
-            vertices[3].TCoords = core::vector2df(1.0f, (1.0f-f));
-            vertices[3].Pos = core::vector3df(offset.X + gauge_width,
-                                              offset.Y-f*gauge_height,0);
+
+            //defines the position of C
+            vertices[2].TCoords = core::vector2df(cx, cy);
+            vertices[2].Pos     = core::vector3df(offset.X+cx*gauge_width,
+                                              offset.Y-(1-cy)*gauge_height, 0);
+            //vary w between C and D
+            vertices[3].TCoords = core::vector2df(dx*(f)+cx*(1.0f-f), dy*(f)+cy*(1.0f-f));
+            vertices[3].Pos = core::vector3df(offset.X+ ((dx*(f)+cx*(1.0f-f))*gauge_width),
+                                              offset.Y-(((1-dy)*(f)+(1-cy)*(1.0f-f))*gauge_height),0);
         }
         else
         {
             count   = 5;
             float f = (coin_target - r2)/(1-r2);
-            vertices[2].TCoords = core::vector2df(1.0, 1.0f);
-            vertices[2].Pos     = core::vector3df(offset.X + gauge_width,
-                                                  offset.Y, 0);
-            vertices[3].TCoords = core::vector2df(1.0,0);
-            vertices[3].Pos     = core::vector3df(offset.X + gauge_width,
-                                                  offset.Y-gauge_height, 0);
-            vertices[4].TCoords = core::vector2df(1.0f - f*(1-0.61f), 0);
-            vertices[4].Pos     = core::vector3df(offset.X + gauge_width
-                                                   - (1.0f-0.61f)*f*gauge_width,
-                                                   offset.Y-gauge_height, 0);
+
+            //defines the position of C
+            vertices[2].TCoords = core::vector2df(cx, cy);
+            vertices[2].Pos     = core::vector3df(offset.X+cx*gauge_width,
+                                          offset.Y-(1-cy)*gauge_height, 0);
+            //defines the position of D
+            vertices[3].TCoords = core::vector2df(dx, dy);
+            vertices[3].Pos     = core::vector3df(offset.X+dx*gauge_width,
+                                          offset.Y-(1-dy)*gauge_height, 0);
+            //vary x between D and E
+            vertices[4].TCoords = core::vector2df(ex*(f)+dx*(1.0f-f), ey*(f)+dy*(1.0f-f));
+            vertices[4].Pos = core::vector3df(offset.X+ ((ex*(f)+dx*(1.0f-f))*gauge_width),
+                                          offset.Y-(((1-ey)*(f)+(1-dy)*(1.0f-f))*gauge_height),0);
         }
         short int index[5]={0};
         for(unsigned int i=0; i<count; i++)
@@ -579,8 +609,6 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
     }
 
-
-
     // Filling (current state)
 
     if(state <=0) return; //Nothing to do
@@ -590,62 +618,62 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
         video::S3DVertex vertices[5];
         unsigned int count=2;
 
-        // There are three different polygons used, depending on
-        // the nitro state. Consider the nitro-display texture:
-        //
-        //   ----E-x--D       (position of v,w,x vary depending on
-        //            |        nitro)
-        //       A    w
-        //            |
-        //   -B--v----C
-        // For nitro state <= r1 the triangle ABv is used, with v between B and C.
-        // For nitro state <= r2 the quad ABCw is used, with w between C and D.
-        // For nitro state >  r2 the poly ABCDx is used, with x between D and E.
+        // See comments for coin_target : this function identically
 
-        vertices[0].TCoords = core::vector2df(0.3f, 0.4f);
-        vertices[0].Pos     = core::vector3df(offset.X+0.3f*gauge_width,
-                                              offset.Y-(1-0.4f)*gauge_height, 0);
-        vertices[1].TCoords = core::vector2df(0, 1.0f);
-        vertices[1].Pos     = core::vector3df(offset.X, offset.Y, 0);
+        vertices[0].TCoords = core::vector2df(ax, ay);
+        vertices[0].Pos     = core::vector3df(offset.X+ax*gauge_width,
+                                              offset.Y-(1-ay)*gauge_height, 0);
+        vertices[1].TCoords = core::vector2df(bx, by);
+        vertices[1].Pos     = core::vector3df(offset.X+bx*gauge_width,
+                                              offset.Y-(1-by)*gauge_height, 0);
+
         // The states at which different polygons must be used.
 
-        const float r1 = 0.4f;
-        const float r2 = 0.65f;
+        const float r1 = 0.334f;
+        const float r2 = 0.667f;
+
         if(state<=r1)
         {
             count   = 3;
             float f = state/r1;
-            vertices[2].TCoords = core::vector2df(0.08f + (1.0f-0.08f)*f, 1.0f);
-            vertices[2].Pos = core::vector3df(offset.X + (0.08f*gauge_width)
-                                                       + (1.0f - 0.08f)
-                                                         *f*gauge_width,
-                                              offset.Y,0);
-                }
+
+            //vary v between B and C
+            vertices[2].TCoords = core::vector2df(cx*(f)+bx*(1.0f-f), cy*(f)+by*(1.0f-f));
+            //f : the proportion of C. 1-f : the proportion of B
+            vertices[2].Pos = core::vector3df(offset.X+ ((cx*(f)+bx*(1.0f-f))*gauge_width),
+                                          offset.Y-(((1-cy)*(f)+(1-by)*(1.0f-f))*gauge_height),0);
+        }
         else if(state<=r2)
         {
             count   = 4;
             float f = (state - r1)/(r2-r1);
-            vertices[2].TCoords = core::vector2df(1.0f, 1.0f);
-            vertices[2].Pos     = core::vector3df(offset.X + gauge_width,
-                                                  offset.Y, 0);
-            vertices[3].TCoords = core::vector2df(1.0f, (1.0f-f));
-            vertices[3].Pos = core::vector3df(offset.X + gauge_width,
-                                              offset.Y-f*gauge_height,0);
+
+            //defines the position of C
+            vertices[2].TCoords = core::vector2df(cx, cy);
+            vertices[2].Pos     = core::vector3df(offset.X+cx*gauge_width,
+                                              offset.Y-(1-cy)*gauge_height, 0);
+            //vary w between C and D
+            vertices[3].TCoords = core::vector2df(dx*(f)+cx*(1.0f-f), dy*(f)+cy*(1.0f-f));
+            vertices[3].Pos = core::vector3df(offset.X+ ((dx*(f)+cx*(1.0f-f))*gauge_width),
+                                              offset.Y-(((1-dy)*(f)+(1-cy)*(1.0f-f))*gauge_height),0);
         }
         else
         {
             count   = 5;
             float f = (state - r2)/(1-r2);
-            vertices[2].TCoords = core::vector2df(1.0, 1.0f);
-            vertices[2].Pos     = core::vector3df(offset.X + gauge_width,
-                                                  offset.Y, 0);
-            vertices[3].TCoords = core::vector2df(1.0,0);
-            vertices[3].Pos = core::vector3df(offset.X + gauge_width,
-                                              offset.Y-gauge_height, 0);
-            vertices[4].TCoords = core::vector2df(1.0f - f*(1-0.61f), 0);
-            vertices[4].Pos     =
-                core::vector3df(offset.X + gauge_width - (1.0f-0.61f)*f*gauge_width,
-                                offset.Y-gauge_height, 0);
+
+            //defines the position of C
+            vertices[2].TCoords = core::vector2df(cx, cy);
+            vertices[2].Pos     = core::vector3df(offset.X+cx*gauge_width,
+                                          offset.Y-(1-cy)*gauge_height, 0);
+            //defines the position of D
+            vertices[3].TCoords = core::vector2df(dx, dy);
+            vertices[3].Pos     = core::vector3df(offset.X+dx*gauge_width,
+                                          offset.Y-(1-dy)*gauge_height, 0);
+            //vary x between D and E
+            vertices[4].TCoords = core::vector2df(ex*(f)+dx*(1.0f-f), ey*(f)+dy*(1.0f-f));
+            vertices[4].Pos = core::vector3df(offset.X+ ((ex*(f)+dx*(1.0f-f))*gauge_width),
+                                          offset.Y-(((1-ey)*(f)+(1-dy)*(1.0f-f))*gauge_height),0);
         }
         short int index[5]={0};
         for(unsigned int i=0; i<count; i++)
@@ -803,65 +831,146 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
 
     // Draw the actual speed bar (if the speed is >0)
     // ----------------------------------------------
-    float speed_ratio = speed/KILOMETERS_PER_HOUR/110.0f;
+    float speed_ratio = speed/40.0f; //max displayed speed of 40
     if(speed_ratio>1) speed_ratio = 1;
 
-    video::S3DVertex vertices[5];
+    video::S3DVertex vertices[6];
     unsigned int count;
 
-    // There are three different polygons used, depending on
+    // There are four different polygons used, depending on
     // the speed ratio. Consider the speed-display texture:
     //
-    //   D----x----D       (position of v,w,x vary depending on
-    //   |                 speed)
-    //   w    A
-    //   |
-    //   C--v-B----E
+    //       |---E-y-|
+    //   D-x-|       |---F       (position of v,w,x,y vary depending on
+    //   |                        speed, on the segments between the points,
+    // -w-                        who can't be represented exactly here)
+    // |        A
+    // C        
+    // |
+    // -v-|
+    //    |---B
     // For speed ratio <= r1 the triangle ABv is used, with v between B and C.
-    // For speed ratio <= r2 the quad ABCw is used, with w between C and D.
-    // For speed ratio >  r2 the poly ABCDx is used, with x between D and E.
+    // For speed ratio <= r2 the poly ABCw is used, with w between C and D.
+    // For speed ratio <= r3 the poly ABCDx is used, with x between D and E.
+    // For speed ratio >  r3 the poly ABCDEy is used, with y between E and F.
 
-    vertices[0].TCoords = core::vector2df(0.7f, 0.5f);
-    vertices[0].Pos     = core::vector3df(offset.X+0.7f*meter_width,
-                                          offset.Y-0.5f*meter_height, 0);
-    vertices[1].TCoords = core::vector2df(0.52f, 1.0f);
-    vertices[1].Pos     = core::vector3df(offset.X+0.52f*meter_width, offset.Y, 0);
+    // Positions of A, B, C, D, E and F are calculated
+    // according to the speedometer png.
+    // B is 36,9° clockwise from the vertical (on bottom-left)
+    // F s 70,7° clockwise from the vertical (on upper-right)
+    // A is the center of the speedometer's circle
+    // B, C, D, E and F are points on the line
+    // from A to 0, 0,25, 0,5, 0,75 and 1 of speed ratio.
+    // They are 1,13* further than the speedometer farther position because
+    // the lines between them would otherwise cut through the outside circle.
+
+    //defines the position of the center A
+    vertices[0].TCoords = core::vector2df(0.544f, 0.566f);
+    vertices[0].Pos     = core::vector3df(offset.X+0.544f*meter_width,
+                                          offset.Y-0.434f*meter_height, 0);
+
+    // The positions for B to F are defined here.
+    // Otherwise the formulas are unreadable and hard to change
+
+    // They are calculated from speedometer.png
+    // A is the center of the speedometer's circle
+    // B, C, D, E and F are points on the line
+    // from A to 0, 0,25, 0,5, 0,75 and 1 of speed ratio
+    // B is 36,9° clockwise from the vertical (on bottom-left)
+    // F s 70,7° clockwise from the vertical (on upper-right)
+    // They are 1,13* further than the speedometer farther position because
+    // the lines between them would otherwise cut through the outside circle.
+
+    float bx = 0.198f;
+    float by = 1.025f;
+    float cx = -0.031f;
+    float cy = 0.589f;
+    float dx = 0.164f;
+    float dy = 0.134f;
+    float ex = 0.639f;
+    float ey = 0.0f;
+    float fx = 1.043f;
+    float fy = 0.284f;
+
+    //defines the position of the point B
+    vertices[1].TCoords = core::vector2df(bx, by);
+    vertices[1].Pos     = core::vector3df(offset.X+bx*meter_width,
+                                          offset.Y-(1-by)*meter_height, 0);
+
     // The speed ratios at which different triangles must be used.
     // These values should be adjusted in case that the speed display
     // is not linear enough. Mostly the speed values are below 0.7, it
     // needs some zipper to get closer to 1.
-    const float r1 = 0.2f;
-    const float r2 = 0.6f;
+    const float r1 = 0.25f;
+    const float r2 = 0.5f;
+    const float r3 = 0.75f;
+
     if(speed_ratio<=r1)
     {
         count   = 3;
         float f = speed_ratio/r1;
-        vertices[2].TCoords = core::vector2df(0.52f*(1-f), 1.0f);
-        vertices[2].Pos = core::vector3df(offset.X+ (0.52f*(1.0f-f)*meter_width),
-                                          offset.Y,0);
+
+        //vary v between B and C
+        vertices[2].TCoords = core::vector2df(cx*(f)+bx*(1.0f-f), cy*(f)+by*(1.0f-f));
+        //f : the proportion of C. 1-f : the proportion of B
+        vertices[2].Pos = core::vector3df(offset.X+ ((cx*(f)+bx*(1.0f-f))*meter_width),
+                                          offset.Y-(((1-cy)*(f)+(1-by)*(1.0f-f))*meter_height),0);
     }
     else if(speed_ratio<=r2)
     {
         count   = 4;
         float f = (speed_ratio - r1)/(r2-r1);
-        vertices[2].TCoords = core::vector2df(0, 1.0f);
-        vertices[2].Pos     = core::vector3df(offset.X, offset.Y, 0);
-        vertices[3].TCoords = core::vector2df(0, (1-f));
-        vertices[3].Pos = core::vector3df(offset.X, offset.Y-f*meter_height,0);
+
+        //defines the position of C
+        vertices[2].TCoords = core::vector2df(cx, cy);
+        vertices[2].Pos     = core::vector3df(offset.X+cx*meter_width,
+                                          offset.Y-(1-cy)*meter_height, 0);
+        //vary w between C and D
+        vertices[3].TCoords = core::vector2df(dx*(f)+cx*(1.0f-f), dy*(f)+cy*(1.0f-f));
+        vertices[3].Pos = core::vector3df(offset.X+ ((dx*(f)+cx*(1.0f-f))*meter_width),
+                                          offset.Y-(((1-dy)*(f)+(1-cy)*(1.0f-f))*meter_height),0);
+    }
+    else if(speed_ratio<=r3)
+    {
+        count   = 5;
+        float f = (speed_ratio - r2)/(r3-r2);
+
+        //defines the position of C
+        vertices[2].TCoords = core::vector2df(cx, cy);
+        vertices[2].Pos     = core::vector3df(offset.X+cx*meter_width,
+                                          offset.Y-(1-cy)*meter_height, 0);
+        //defines the position of D
+        vertices[3].TCoords = core::vector2df(dx, dy);
+        vertices[3].Pos     = core::vector3df(offset.X+dx*meter_width,
+                                          offset.Y-(1-dy)*meter_height, 0);
+        //vary x between D and E
+        vertices[4].TCoords = core::vector2df(ex*(f)+dx*(1.0f-f), ey*(f)+dy*(1.0f-f));
+        vertices[4].Pos = core::vector3df(offset.X+ ((ex*(f)+dx*(1.0f-f))*meter_width),
+                                          offset.Y-(((1-ey)*(f)+(1-dy)*(1.0f-f))*meter_height),0);
     }
     else
     {
-        count   = 5;
-        float f = (speed_ratio - r2)/(1-r2);
-        vertices[2].TCoords = core::vector2df(0, 1.0f);
-        vertices[2].Pos     = core::vector3df(offset.X, offset.Y, 0);
-        vertices[3].TCoords = core::vector2df(0,0);
-        vertices[3].Pos = core::vector3df(offset.X, offset.Y-meter_height, 0);
-        vertices[4].TCoords = core::vector2df(f, 0);
-        vertices[4].Pos     = core::vector3df(offset.X+f*meter_width,
-                                              offset.Y-meter_height, 0);
+        count   = 6;
+        float f = (speed_ratio - r3)/(1-r3);
+
+        //defines the position of C
+        vertices[2].TCoords = core::vector2df(cx, cy);
+        vertices[2].Pos     = core::vector3df(offset.X+cx*meter_width,
+                                          offset.Y-(1-cy)*meter_height, 0);
+        //defines the position of D
+        vertices[3].TCoords = core::vector2df(dx, dy);
+        vertices[3].Pos     = core::vector3df(offset.X+dx*meter_width,
+                                          offset.Y-(1-dy)*meter_height, 0);
+        //defines the position of E
+        vertices[4].TCoords = core::vector2df(ex, ey);
+        vertices[4].Pos     = core::vector3df(offset.X+ex*meter_width,
+                                          offset.Y-(1-ey)*meter_height, 0);
+        //vary y between E and F
+        vertices[5].TCoords = core::vector2df(fx*(f)+ex*(1.0f-f), fy*(f)+ey*(1.0f-f));
+        vertices[5].Pos = core::vector3df(offset.X+ ((fx*(f)+ex*(1.0f-f))*meter_width),
+                                          offset.Y-(((1-fy)*(f)+(1-ey)*(1.0f-f))*meter_height),0);
     }
-    short int index[5];
+    short int index[6];
     for(unsigned int i=0; i<count; i++)
     {
         index[i]=i;
