@@ -484,7 +484,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
     core::vector2df offset;
     offset.X = (float)(x-gauge_width) - 2.0f*scaling.X;
-    offset.Y = (float)y-6.0f*scaling.Y;
+    offset.Y = (float)y-5.0f*scaling.Y;
 
 
     // Background
@@ -503,16 +503,16 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
     // They are further than the nitrometer farther position because
     // the lines between them would otherwise cut through the outside circle.
     
-    float ax = 0.194f;
-    float ay = 0.350f;
-    float bx = 0.198f;
-    float by = 0.988f;
-    float cx = 0.514f;
-    float cy = 0.901f;
-    float dx = 0.747f;
-    float dy = 0.669f;
-    float ex = 0.831f;
-    float ey = 0.350f;
+    float ax = 0.193f;
+    float ay = 0.349f;
+    float bx = 0.193f;
+    float by = 0.987f;
+    float cx = 0.513f;
+    float cy = 0.9f;
+    float dx = 0.746f;
+    float dy = 0.668f;
+    float ex = 0.829f;
+    float ey = 0.349f;
 
     // Target
 
@@ -523,6 +523,10 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
         video::S3DVertex vertices[5];
         unsigned int count=2;
+
+        bx = 0.150f;//the thickness makes it go further left than the nitro bar
+        by = 1.050f;//the goal is nearly guaranteed to be over r1
+
 
         // There are three different polygons used, depending on
         // the target. Consider the nitro-display texture:
@@ -606,6 +610,9 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
         irr_driver->getVideoDriver()->setMaterial(m);
         draw2DVertexPrimitiveList(m_gauge_goal, vertices, count,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
+
+        bx = 0.198f;//restore B to proper value for nitro filling
+        by = 0.988f;
 
     }
 
