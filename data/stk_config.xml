@@ -38,29 +38,29 @@
     <points points="2" /> <!-- added with 5 karts -->
     <points points="1" /> <!-- added with 6 karts -->
     <points points="3" /> <!-- added with 7 karts -->
-    <points points="2" /> <!-- added with 8 karts -->
+    <points points="1" /> <!-- added with 8 karts -->
     <points points="3" /> <!-- added with 9 karts -->
-    <points points="1" /> <!-- added with 10 karts -->
-    <points points="4" /> <!-- added with 11 karts -->
+    <points points="4" /> <!-- added with 10 karts -->
+    <points points="1" /> <!-- added with 11 karts -->
     <points points="2" /> <!-- added with 12 karts -->
-    <points points="1" /> <!-- added with 13 karts -->
-    <points points="3" /> <!-- added with 14 karts -->
-    <points points="2" /> <!-- added with 15 karts -->
-    <points points="1" /> <!-- added with 16 karts -->
+    <points points="5" /> <!-- added with 13 karts -->
+    <points points="1" /> <!-- added with 14 karts -->
+    <points points="3" /> <!-- added with 15 karts -->
+    <points points="6" /> <!-- added with 16 karts -->
     <points points="4" /> <!-- added with 17 karts -->
     <points points="2" /> <!-- added with 18 karts -->
-    <points points="3" /> <!-- added with 19 karts -->
+    <points points="7" /> <!-- added with 19 karts -->
     <points points="1" /> <!-- added with 20 karts -->
-    <points points="5" /> <!-- added with 21 karts -->
-    <points points="2" /> <!-- added with 22 karts -->
-    <points points="1" /> <!-- added with 23 karts -->
-    <points points="3" /> <!-- added with 24 karts -->
-    <points points="4" /> <!-- added with 25 karts -->
-    <points points="1" /> <!-- added with 26 karts -->
-    <points points="2" /> <!-- added with 27 karts -->
-    <points points="1" /> <!-- added with 28 karts -->
-    <points points="3" /> <!-- added with 29 karts -->
-    <points points="5" /> <!-- added with 30 karts -->
+    <points points="8" /> <!-- added with 21 karts -->
+    <points points="1" /> <!-- added with 22 karts -->
+    <points points="2" /> <!-- added with 23 karts -->
+    <points points="1" /> <!-- added with 24 karts -->
+    <points points="9" /> <!-- added with 25 karts -->
+    <points points="4" /> <!-- added with 26 karts -->
+    <points points="1" /> <!-- added with 27 karts -->
+    <points points="10" /><!-- added with 28 karts -->
+    <points points="2" /> <!-- added with 29 karts -->
+    <points points="12" /><!-- added with 30 karts -->
   </grand-prix>
 
   <!-- Time in follow-the-leader after which karts are removed.
