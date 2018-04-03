@@ -473,7 +473,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 {
 #ifndef SERVER_ONLY
     float min_ratio        = std::min(scaling.X, scaling.Y);
-    const int GAUGEWIDTH   = 110;
+    const int GAUGEWIDTH   = 92;//same inner radius as the inner speedometer circle
     int gauge_width        = (int)(GAUGEWIDTH*min_ratio);
     int gauge_height       = (int)(GAUGEWIDTH*min_ratio);
 
@@ -483,8 +483,8 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
     else if (state > 1.0f) state = 1.0f;
 
     core::vector2df offset;
-    offset.X = (float)(x-gauge_width) - 2.0f*scaling.X;
-    offset.Y = (float)y-5.0f*scaling.Y;
+    offset.X = (float)(x-gauge_width) + 4.0f*scaling.X;
+    offset.Y = (float)y-10.0f*scaling.Y;
 
 
     // Background
@@ -778,10 +778,10 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     oss << rank; // the current font has no . :(   << ".";
 
     core::recti pos;
-    pos.LowerRightCorner = core::vector2di(int(offset.X + 0.65f*meter_width),
-                                           int(offset.Y - 0.55f*meter_height));
-    pos.UpperLeftCorner = core::vector2di(int(offset.X + 0.65f*meter_width),
-                                          int(offset.Y - 0.55f*meter_height));
+    pos.LowerRightCorner = core::vector2di(int(offset.X + 0.64f*meter_width),
+                                           int(offset.Y - 0.49f*meter_height));
+    pos.UpperLeftCorner = core::vector2di(int(offset.X + 0.64f*meter_width),
+                                          int(offset.Y - 0.49f*meter_height));
 
     static video::SColor color = video::SColor(255, 255, 255, 255);
     font->draw(oss.str().c_str(), pos, color, true, true);
