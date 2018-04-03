@@ -61,7 +61,8 @@ void LobbyProtocol::loadWorld()
     // Race startup sequence
     // ---------------------
     // This creates the network world.
-    RaceEventManager::getInstance<RaceEventManager>()->start();
+    auto gep = std::make_shared<GameEventsProtocol>();
+    RaceEventManager::getInstance<RaceEventManager>()->start(gep);
 
     // Make sure that if there is only a single local player this player can
     // use all input devices.
@@ -75,7 +76,7 @@ void LobbyProtocol::loadWorld()
     m_game_setup->loadWorld();
     World::getWorld()->setNetworkWorld(true);
     GameProtocol::createInstance()->requestStart();
-    std::make_shared<GameEventsProtocol>()->requestStart();
+    gep->requestStart();
 
 }   // loadWorld
 
@@ -130,6 +131,8 @@ void LobbyProtocol::configRemoteKart(
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);
     }   // for i in players
+    // Clean all previous AI if exists in offline game
+    race_manager->computeRandomKartList();
     Log::info("LobbyProtocol", "Player configuration ready.");
 }   // configRemoteKart
 

@@ -51,8 +51,9 @@ void RaceEventManager::update(int ticks)
 }   // update
 
 // ----------------------------------------------------------------------------
-void RaceEventManager::start()
+void RaceEventManager::start(std::shared_ptr<GameEventsProtocol> gep)
 {
+    m_game_events_protocol = gep;
     m_running = true;
 }   // start
 
@@ -74,9 +75,8 @@ bool RaceEventManager::isRaceOver()
 // ----------------------------------------------------------------------------
 void RaceEventManager::kartFinishedRace(AbstractKart *kart, float time)
 {
-    auto protocol = std::static_pointer_cast<GameEventsProtocol>(
-        ProtocolManager::lock()->getProtocol(PROTOCOL_GAME_EVENTS));
-    protocol->kartFinishedRace(kart, time);
+    if (auto game_events_protocol = m_game_events_protocol.lock())
+        game_events_protocol->kartFinishedRace(kart, time);
 }   // kartFinishedRace
 
 // ----------------------------------------------------------------------------
@@ -89,9 +89,7 @@ void RaceEventManager::collectedItem(Item *item, AbstractKart *kart)
 {
     // this is only called in the server
     assert(NetworkConfig::get()->isServer());
-
-    auto protocol = std::static_pointer_cast<GameEventsProtocol>(
-        ProtocolManager::lock()->getProtocol(PROTOCOL_GAME_EVENTS));
-    protocol->collectedItem(item,kart);
+    if (auto game_events_protocol = m_game_events_protocol.lock())
+        game_events_protocol->collectedItem(item, kart);
 }   // collectedItem
 

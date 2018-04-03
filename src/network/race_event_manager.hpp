@@ -21,10 +21,10 @@
 
 #include "input/input.hpp"
 #include "utils/singleton.hpp"
-#include <map>
+#include <memory>
 
 class Controller;
-class KartUpdateProtocol;
+class GameEventsProtocol;
 class AbstractKart;
 class Item;
 
@@ -40,6 +40,8 @@ private:
     bool m_running;
     float m_race_time;
 
+    std::weak_ptr<GameEventsProtocol> m_game_events_protocol;
+
     friend class AbstractSingleton<RaceEventManager>;
 
              RaceEventManager();
@@ -48,7 +50,7 @@ private:
 public:
     void update(int ticks);
 
-    void start();
+    void start(std::shared_ptr<GameEventsProtocol> gep);
     void stop();
     bool isRaceOver();
 
