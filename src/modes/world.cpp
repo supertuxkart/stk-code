@@ -1294,7 +1294,9 @@ void World::unpause()
 //-----------------------------------------------------------------------------
 void World::escapePressed()
 {
-    new RacePausedDialog(0.8f, 0.6f);
+    if (!(NetworkConfig::get()->isNetworking() &&
+        getPhase() < RACE_PHASE))
+        new RacePausedDialog(0.8f, 0.6f);
 }   // escapePressed
 
 // ----------------------------------------------------------------------------

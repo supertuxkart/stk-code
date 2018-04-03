@@ -391,10 +391,12 @@ void WorldStatus::updateTime(int ticks)
             break;
         }
         case FINISH_PHASE:
+        case IN_GAME_MENU_PHASE:
             // Nothing to do here.
             break;
         case GOAL_PHASE:
             // Nothing to do here as well.
+            break;
 
         default: break;
     }
