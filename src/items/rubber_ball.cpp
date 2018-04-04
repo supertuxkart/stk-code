@@ -334,7 +334,7 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
     }
     if (m_st_max_offset_distance <= m_st_min_offset_distance)
     {
-        m_st_max_offset_distance = m_st_min_offset_distance + 1.àf;
+        m_st_max_offset_distance = m_st_min_offset_distance + 1.0f;
     }
 
     m_ticks_between_balls = stk_config->time2Ticks(float(m_ticks_between_balls));
