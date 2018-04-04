@@ -15,19 +15,45 @@
         model="anchor.spm"                              />
   <item name="switch"         icon="swap-icon.png"      />
   <item name="swatter"        icon="swatter-icon.png"   />
-  <!--  interval: How long a single bounce takes.
+  <!--  min-speed-offset: The speed of the ball is calculated
+                    by adding the speed-offset to the difficulty's
+                    max-speed. min-speed-offset is used when the
+                    ball is closer than min-offset-distance
+                    to the target.
+        max-speed-offset: The additional speed of the ball when
+                    farther than max-offset-distance.
+        speed : defines the initial speed. Mainly kept for
+                    compatibility with flyable class
+        min-offset-distance: The distance under which the ball is
+                    at minimal speed.
+        max-offset-distance: The distance under which the ball is
+                    at maximal speed. If it is not equal to
+                    min-offset-distance, the ball speeds between
+                    both is a weighted average of the min and
+                    max speed.
+        interval: How long a single bounce takes.
         max-height: The maximum height of a bounce.
         min-height: Unused mostly, but defines implicitly
                     the starting height (as average of
                     max and min height).
+        fast-ping-distance: When the ball is closer than 
+                    this to the target, it will bounce
+                    at a high rate and low.
+        early-target-factor: the rubber ball can use the
+                    relative position of the kart to the
+                    center of the track for improved targeting
+                    (i.e. the ball will align its relative
+                    position to the center of the track early).
+                    This allows a lower target-distance to be
+                    used since the ball is better aligned,
+                    hopefully reducing the frequency of 
+                    tunneling.
         target-distance: When the ball is closer than 
                     this to the target, it will aim
                     directly at the target.
         target-max-angle: Once the ball is aiming for its
                     target, it can at most change the angle
                     this much per second(!).
-        time-between-balls:  Reduces the frequency with which rubber 
-                    balls are found to 1 every 'timer' seconds.
         min-interpolation-distance: how far the control
                     points (which are center of squads)
                     must be from each other. A large value
@@ -40,30 +66,28 @@
                     bouncing on the pyramid). Quite
                     catastrophal on the startrack and
                     skyline).
+        time-between-balls:  Reduces the frequency with which rubber 
+                    balls are found to 1 every 'timer' seconds.
         squash-slowdown: How much karts that are 
                     squashed are slowed down.
         squash-duration: How long karts stay squashed.
         delete-timer: How long before the ball is removed
                     if no suitable target is found.
-        early-target-factor: the rubber ball can use the
-                    relative position of the kart to the
-                    center of the track for improved targeting
-                    (i.e. the ball will align its relative
-                    position to the center of the track early).
-                    This allows a lower target-distance to be
-                    used since the ball is better aligned,
-                    hopefully reducing the frequency of 
-                    tunneling.
    -->
   <item name="rubber-ball"    icon="rubber_ball-icon.png"
-        model="rubber_ball.spm" speed="35.0"
+        model="rubber_ball.spm"
+        speed="42.0"
+        min-speed-offset="9.0"
+        max-speed-offset="29.0"
+        min-offset-distance="50.0"
+        max-offset-distance="250.0"
         scale="1 1 1"         interval="1"
         max-height="4.0"      min-height="0"
         fast-ping-distance="50" 
         early-target-factor="1"
         target-distance="15"  target-max-angle = "90"
         min-interpolation-distance="5"
-        time-between-balls="15"
+        time-between-balls="25"
         squash-slowdown="0.5" squash-duration="2"
         delete-time="5.0"     max-height-difference="10" />
   <item name="parachute"      icon="parachute-icon.png"
@@ -108,4 +132,3 @@
 
     
 </powerup>
-
