@@ -81,6 +81,20 @@ private:
      *  ball will be deleted. */
     static float m_st_delete_time;
 
+    /** If the ball is closer to its target than min_offset_distance, the speed
+     *  in addition to the difficulty's default max speed. */
+    static float m_st_min_speed_offset;
+
+    /** If the ball is farther to its target than max_offset_distance, the speed
+     *  in addition to the difficulty's default max speed. */
+    static float m_st_max_speed_offset;
+
+    /** The distance to target under which the ball is the slowest */
+    static float m_st_min_offset_distance;
+
+    /** The distance to target over which the ball is the fastest */
+    static float m_st_max_offset_distance;
+
     /** Timer before another rubber ball can be picked up. This is to ensure
      *  that there are not too many rubber balls on the track in races with many
      *  karts. */
@@ -194,6 +208,7 @@ private:
     float        updateHeight();
     void         interpolate(Vec3 *next_xyz, float dt);
     void         moveTowardsTarget(Vec3 *next_xyz, float dt);
+    void         updateWeightedSpeed(float dt);
     void         initializeControlPoints(const Vec3 &xyz);
     float        getTunnelHeight(const Vec3 &next_xyz, 
                                      const float vertical_offset) const;
