@@ -150,7 +150,7 @@ public:
     bool isSoccerGoalTarget() const
     {
         assert(hasExtraSeverInfo());
-        return (bool)m_extra_server_info;
+        return m_extra_server_info != 0;
     }
     // ------------------------------------------------------------------------
     const std::vector<std::string>& getAllTracks() const   { return m_tracks; }

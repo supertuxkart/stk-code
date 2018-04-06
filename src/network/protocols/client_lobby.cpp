@@ -485,7 +485,7 @@ void ClientLobby::connectionAccepted(Event* event)
             core::stringw tl = _("Time limit");
             core::stringw gl = _("Goals limit");
             core::stringw sgt = u_data == 0 ? tl : gl;
-            m_game_setup->setSoccerGoalTarget((bool)u_data);
+            m_game_setup->setSoccerGoalTarget(u_data != 0);
             //I18N: In the networking lobby
             each_line = _("Soccer game type: %s", sgt);
             NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
