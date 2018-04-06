@@ -402,7 +402,7 @@ void ServerLobby::update(int ticks)
     case REGISTER_SELF_ADDRESS:
     case ACCEPTING_CLIENTS:
     case WAIT_FOR_WORLD_LOADED:
-    case WAIT_FOR_RACE_STARTED: 
+    case WAIT_FOR_RACE_STARTED:
     case DELAY_SERVER:
     {
         // Waiting for asynchronousUpdate

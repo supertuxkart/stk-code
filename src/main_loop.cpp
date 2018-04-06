@@ -30,6 +30,7 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
@@ -299,8 +300,25 @@ void MainLoop::run()
     }
 #endif
 
-    while(!m_abort)
+    while (!m_abort)
     {
+        bool loading_shutdown = false;
+        auto lb = LobbyProtocol::get<LobbyProtocol>();
+        if (World::getWorld() && lb &&
+            STKHost::existHost() && !STKHost::get()->requestedShutdown())
+        {
+            while (!lb->allPlayersReady())
+            {
+                if (STKHost::existHost() && STKHost::get()->requestedShutdown())
+                {
+                    loading_shutdown = true;
+                    break;
+                }
+                StkTime::sleep(1);
+                m_curr_time = irr_driver->getDevice()->getTimer()->getRealTime();
+            }
+        }
+
 #ifdef WIN32
         if (parent != 0 && parent != INVALID_HANDLE_VALUE)
         {
@@ -329,7 +347,9 @@ void MainLoop::run()
         float dt = stk_config->ticks2Time(1);
         left_over_time -= num_steps * dt ;
 
-        if (STKHost::existHost() &&
+        // Shutdown next frame if shutdown request is sent while loading the
+        // world
+        if (!loading_shutdown && STKHost::existHost() &&
             STKHost::get()->requestedShutdown())
         {
             SFXManager::get()->quickSound("anvil");

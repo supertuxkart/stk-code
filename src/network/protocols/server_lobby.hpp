@@ -117,6 +117,8 @@ public:
     void updateBanList();
     virtual bool waitingForPlayers() const OVERRIDE
                                 { return m_state.load() == ACCEPTING_CLIENTS; }
+    virtual bool allPlayersReady() const OVERRIDE
+                            { return m_state.load() >= WAIT_FOR_RACE_STARTED; }
 
 };   // class ServerLobby
 

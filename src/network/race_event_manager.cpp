@@ -4,7 +4,6 @@
 #include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
-#include "network/protocol_manager.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/rewind_manager.hpp"
 #include "utils/profiler.hpp"

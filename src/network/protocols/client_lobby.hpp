@@ -4,6 +4,8 @@
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
+
+#include <atomic>
 #include <set>
 
 class ClientLobby : public LobbyProtocol
@@ -26,7 +28,7 @@ private:
 
     TransportAddress m_server_address;
 
-    enum STATE
+    enum ClientState : unsigned int
     {
         NONE,
         LINKED,
@@ -41,7 +43,7 @@ private:
     };
 
     /** The state of the finite state machine. */
-    STATE m_state;
+    std::atomic<ClientState> m_state;
 
     std::set<std::string> m_available_karts;
     std::set<std::string> m_available_tracks;
@@ -64,9 +66,10 @@ public:
     virtual void setup() OVERRIDE;
     virtual void update(int ticks) OVERRIDE;
     virtual bool waitingForPlayers() const OVERRIDE
-                                                  { return m_state == CONNECTED; }
+                                        { return m_state.load() == CONNECTED; }
     virtual void asynchronousUpdate() OVERRIDE {}
-
+    virtual bool allPlayersReady() const OVERRIDE
+                                          { return m_state.load() >= PLAYING; }
 };
 
 #endif // CLIENT_LOBBY_HPP

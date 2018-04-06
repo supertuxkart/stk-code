@@ -104,7 +104,7 @@ void ClientLobby::setup()
     clearPlayers();
     TracksScreen::getInstance()->resetVote();
     LobbyProtocol::setup();
-    m_state = NONE;
+    m_state.store(NONE);
 }   // setup
 
 //-----------------------------------------------------------------------------
@@ -248,12 +248,12 @@ void ClientLobby::addAllPlayers(Event* event)
 //-----------------------------------------------------------------------------
 void ClientLobby::update(int ticks)
 {
-    switch (m_state)
+    switch (m_state.load())
     {
     case NONE:
         if (STKHost::get()->isConnectedTo(m_server_address))
         {
-            m_state = LINKED;
+            m_state.store(LINKED);
         }
         break;
     case LINKED:
@@ -308,7 +308,7 @@ void ClientLobby::update(int ticks)
 
         sendToServer(ns);
         delete ns;
-        m_state = REQUESTING_CONNECTION;
+        m_state.store(REQUESTING_CONNECTION);
     }
     break;
     case REQUESTING_CONNECTION:
@@ -340,7 +340,7 @@ void ClientLobby::update(int ticks)
         {
             screen->push();
         }
-        m_state = SELECTING_KARTS;
+        m_state.store(SELECTING_KARTS);
     }
     break;
     case SELECTING_KARTS:
@@ -350,7 +350,7 @@ void ClientLobby::update(int ticks)
     case RACE_FINISHED:
         break;
     case DONE:
-        m_state = EXITING;
+        m_state.store(EXITING);
         requestTerminate();
         break;
     case EXITING:
@@ -507,7 +507,7 @@ void ClientLobby::connectionAccepted(Event* event)
     if (!str.empty())
         NetworkingLobby::getInstance()->addMoreServerInfo(str);
 
-    m_state = CONNECTED;
+    m_state.store(CONNECTED);
 }   // connectionAccepted
 
 //-----------------------------------------------------------------------------
@@ -537,7 +537,7 @@ void ClientLobby::becomingServerOwner()
     MessageQueue::add(MessageQueue::MT_GENERIC,
         _("You are now the owner of server."));
     STKHost::get()->setAuthorisedToControl(true);
-    if (m_state == CONNECTED && NetworkConfig::get()->isAutoConnect())
+    if (m_state.load() == CONNECTED && NetworkConfig::get()->isAutoConnect())
     {
         // Send a message to the server to start
         NetworkString start(PROTOCOL_LOBBY_ROOM);
@@ -612,7 +612,7 @@ void ClientLobby::connectionRefused(Event* event)
  */
 void ClientLobby::startGame(Event* event)
 {
-    m_state = PLAYING;
+    m_state.store(PLAYING);
     // Triggers the world finite state machine to go from WAIT_FOR_SERVER_PHASE
     // to READY_PHASE.
     World::getWorld()->setReadyToRace();
@@ -645,7 +645,7 @@ void ClientLobby::startingRaceNow()
  */
 void ClientLobby::startSelection(Event* event)
 {
-    m_state = KART_SELECTION;
+    m_state.store(KART_SELECTION);
     const NetworkString& data = event->data();
     const unsigned kart_num = data.getUInt16();
     const unsigned track_num = data.getUInt16();
@@ -706,7 +706,7 @@ void ClientLobby::raceFinished(Event* event)
         position++;
     }
     ranked_world->endSetKartPositions();
-    m_state = RACE_FINISHED;
+    m_state.store(RACE_FINISHED);
     ranked_world->terminateRace();
 }   // raceFinished
 
