@@ -215,7 +215,8 @@ void NetworkingLobby::onUpdate(float delta)
     }
     else
     {
-        if (m_server_peer.expired() && STKHost::existHost())
+        if (m_server_peer.expired() && NetworkConfig::get()->isClient()
+            && STKHost::existHost())
             m_server_peer = STKHost::get()->getServerPeerForClient();
         core::stringw total_msg;
         for (auto& string : m_server_info)
