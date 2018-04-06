@@ -470,7 +470,8 @@ void ClientLobby::connectionAccepted(Event* event)
     //race_manager->setMajorMode(game_mode.second);
 
     //I18N: In the networking lobby
-    each_line = _("Game mode: %s", NetworkConfig::get()->getModeName(u_data));
+    core::stringw mode_name = NetworkConfig::get()->getModeName(u_data);
+    each_line = _("Game mode: %s", mode_name);
     NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
 
     uint8_t extra_server_info = data.getUInt8();
