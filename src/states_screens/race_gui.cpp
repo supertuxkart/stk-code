@@ -474,7 +474,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 {
 #ifndef SERVER_ONLY
     float min_ratio        = std::min(scaling.X, scaling.Y);
-    const int GAUGEWIDTH   = 92;//same inner radius as the inner speedometer circle
+    const int GAUGEWIDTH   = 94;//same inner radius as the inner speedometer circle
     int gauge_width        = (int)(GAUGEWIDTH*min_ratio);
     int gauge_height       = (int)(GAUGEWIDTH*min_ratio);
 
@@ -484,8 +484,8 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
     else if (state > 1.0f) state = 1.0f;
 
     core::vector2df offset;
-    offset.X = (float)(x-gauge_width) + 4.0f*scaling.X;
-    offset.Y = (float)y-10.0f*scaling.Y;
+    offset.X = (float)(x-gauge_width) - 9.5f*scaling.X;
+    offset.Y = (float)y-11.5f*scaling.Y;
 
 
     // Background
@@ -498,77 +498,54 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
                 NULL /* clip rect */, NULL /* colors */,
                 true /* alpha */);
 
-    // The positions for A to E are defined here.
+    // The positions for A to G are defined here.
     // They are calculated from gauge_full.png
     // They are further than the nitrometer farther position because
     // the lines between them would otherwise cut through the outside circle.
     
-    int vertices_count = 5;
+    const int vertices_count = 7;
 
     core::vector2df position[vertices_count];
-    position[0].X = 0.193f;//A
-    position[0].Y = 0.349f;//A
-    position[1].X = 0.193f;//B
-    position[1].Y = 0.987f;//B
-    position[2].X = 0.513f;//C
-    position[2].Y = 0.9f;//C
-    position[3].X = 0.746f;//D
-    position[3].Y = 0.668f;//D
-    position[4].X = 0.829f;//E
-    position[4].Y = 0.349f;//E
+    position[0].X = 0.324f;//A
+    position[0].Y = 0.35f;//A
+    position[1].X = 0.029f;//B
+    position[1].Y = 0.918f;//B
+    position[2].X = 0.307f;//C
+    position[2].Y = 0.99f;//C
+    position[3].X = 0.589f;//D
+    position[3].Y = 0.932f;//D
+    position[4].X = 0.818f;//E
+    position[4].Y = 0.755f;//E
+    position[5].X = 0.945f;//F
+    position[5].Y = 0.497f;//F
+    position[6].X = 0.948f;//G
+    position[6].Y = 0.211f;//G
 
-    // Target
 
-    if (race_manager->getCoinTarget() > 0)
-    {
-        float coin_target = (float)race_manager->getCoinTarget()
-                          / kart->getKartProperties()->getNitroMax();
+    // The states at which different polygons must be used.
 
-        video::S3DVertex vertices[vertices_count];
-
-        position[1].X = 0.150f;//the thickness makes it go further left than the nitro bar
-        position[1].Y = 1.050f;//the goal is nearly guaranteed to be over r1
-
-        float threshold[vertices_count-2];
-        threshold[0] = 0.334f;
-        threshold[1] = 0.667f;
-        threshold[2] = 1.0f;
-
-        unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count, 
-                                                     coin_target, gauge_width, gauge_height, offset);
-
-        short int index[5]={0};
-        for(unsigned int i=0; i<count; i++)
-        {
-            index[i]=count-i-1;
-            vertices[i].Color = video::SColor(255, 255, 255, 255);
-        }
-
-        video::SMaterial m;
-        m.setTexture(0, m_gauge_goal);
-        m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-        irr_driver->getVideoDriver()->setMaterial(m);
-        draw2DVertexPrimitiveList(m_gauge_goal, vertices, count,
-        index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
-
-        position[1].X = 0.198f;//restore B to proper value for nitro filling
-        position[1].Y = 0.988f;
-    }
+    float threshold[vertices_count-2];
+    threshold[0] = 0.2f;
+    threshold[1] = 0.4f;
+    threshold[2] = 0.6f;
+    threshold[3] = 0.8f;
+    threshold[4] = 1.0f;
 
     // Filling (current state)
-
-    if(state <=0) return; //Nothing to do
 
     if (state > 0.0f)
     {
         video::S3DVertex vertices[vertices_count];
 
-        // The states at which different polygons must be used.
-
-        float threshold[vertices_count-2];
-        threshold[0] = 0.334f;
-        threshold[1] = 0.667f;
-        threshold[2] = 1.0f;
+        //3D effect : wait for the full border to appear before drawing
+        for (int i=0;i<5;i++)
+        {
+            if ((state-0.2f*i < 0.006f && state-0.2f*i >= 0.0f) || (0.2f*i-state < 0.003f && 0.2f*i-state >= 0.0f) )
+            {
+                state = 0.2f*i-0.003f;
+                break;
+            }
+        }
 
         unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count,
                                                      state, gauge_width, gauge_height, offset);
@@ -591,6 +568,33 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
         draw2DVertexPrimitiveList(m.getTexture(0), vertices, count,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
 
+    }
+
+    // Target
+
+    if (race_manager->getCoinTarget() > 0)
+    {
+        float coin_target = (float)race_manager->getCoinTarget()
+                          / kart->getKartProperties()->getNitroMax();
+
+        video::S3DVertex vertices[vertices_count];
+
+        unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count, 
+                                                     coin_target, gauge_width, gauge_height, offset);
+
+        short int index[5]={0};
+        for(unsigned int i=0; i<count; i++)
+        {
+            index[i]=count-i-1;
+            vertices[i].Color = video::SColor(255, 255, 255, 255);
+        }
+
+        video::SMaterial m;
+        m.setTexture(0, m_gauge_goal);
+        m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+        irr_driver->getVideoDriver()->setMaterial(m);
+        draw2DVertexPrimitiveList(m_gauge_goal, vertices, count,
+        index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
     }
 #endif
 }   // drawEnergyMeter
@@ -734,43 +738,72 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
 
     // see computeVerticesForMeter for the detail of the drawing
 
-    int vertices_count = 6;
+    const int vertices_count = 12;
 
     video::S3DVertex vertices[vertices_count];
 
-    // The positions for A to F are defined here.
+    // The positions for A to J2 are defined here.
 
     // They are calculated from speedometer.png
     // A is the center of the speedometer's circle
-    // B, C, D, E and F are points on the line
-    // from A to 0, 0,25, 0,5, 0,75 and 1 of speed ratio
-    // B is 36,9° clockwise from the vertical (on bottom-left)
-    // F s 70,7° clockwise from the vertical (on upper-right)
+    // B2, C, D, E, F, G, H, I and J1 are points on the line
+    // from A to their respective 1/8th threshold division
+    // B2 is 36,9° clockwise from the vertical (on bottom-left)
+    // J1 s 70,7° clockwise from the vertical (on upper-right)
+    // B1 and J2 are used for correct display of the 3D effect
     // They are 1,13* further than the speedometer farther position because
     // the lines between them would otherwise cut through the outside circle.
 
     core::vector2df position[vertices_count];
 
-    position[0].X = 0.544f;//A
+    position[0].X = 0.546f;//A
     position[0].Y = 0.566f;//A
-    position[1].X = 0.198f;//B
-    position[1].Y = 1.025f;//B
-    position[2].X = -0.031f;//C
-    position[2].Y = 0.589f;//C
-    position[3].X = 0.164f;//D
-    position[3].Y = 0.134f;//D
-    position[4].X = 0.639f;//E
-    position[4].Y = 0.0f;//E
-    position[5].X = 1.043f;//F
-    position[5].Y = 0.284f;//F
+    position[1].X = 0.216f;//B1
+    position[1].Y = 1.036f;//B1
+    position[2].X = 0.201f;//B2
+    position[2].Y = 1.023f;//B2
+    position[3].X = 0.036f;//C
+    position[3].Y = 0.831f;//C
+    position[4].X = -0.029f;//D
+    position[4].Y = 0.589f;//D
+    position[5].X = 0.018f;//E
+    position[5].Y = 0.337f;//E
+    position[6].X = 0.169f;//F
+    position[6].Y = 0.134f;//F
+    position[7].X = 0.391f;//G
+    position[7].Y = 0.014f;//G
+    position[8].X = 0.642f;//H
+    position[8].Y = 0.0f;//H
+    position[9].X = 0.878f;//I
+    position[9].Y = 0.098f;//I
+    position[10].X = 1.046f;//J1
+    position[10].Y = 0.285f;//J1
+    position[11].X = 1.052f;//J2
+    position[11].Y = 0.297f;//J2
 
     // The speed ratios at which different triangles must be used.
 
     float threshold[vertices_count-2];
-    threshold[0] = 0.25f;
-    threshold[1] = 0.50f;
-    threshold[2] = 0.75f;
-    threshold[3] = 1.0f;
+    threshold[0] = 0.00001f;//for the 3D margin
+    threshold[1] = 0.125f;
+    threshold[2] = 0.25f;
+    threshold[3] = 0.375f;
+    threshold[4] = 0.50f;
+    threshold[5] = 0.625f;
+    threshold[6] = 0.750f;
+    threshold[7] = 0.875f;
+    threshold[8] = 0.99999f;//for the 3D margin
+    threshold[9] = 1.0f;
+
+    //3D effect : wait for the full border to appear before drawing
+    for (int i=0;i<8;i++)
+    {
+        if ((speed_ratio-0.125f*i < 0.00625f && speed_ratio-0.125f*i >= 0.0f) || (0.125f*i-speed_ratio < 0.0045f && 0.125f*i-speed_ratio >= 0.0f) )
+        {
+            speed_ratio = 0.125f*i-0.0045f;
+            break;
+        }
+    }
 
     unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count, 
                                                      speed_ratio, meter_width, meter_height, offset);
