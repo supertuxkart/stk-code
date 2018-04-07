@@ -37,6 +37,7 @@ out vec2 uv;
 out vec2 uv_two;
 out vec4 color;
 out vec4 world_position;
+out vec3 world_normal;
 out float camdist;
 out float hue_change;
 
@@ -52,15 +53,15 @@ void main()
     vec4 quaternion = normalize(vec4(i_rotation.xyz, i_scale.w));
     vec4 v_world_position = getWorldPosition(i_origin, quaternion, i_scale.xyz,
         i_position);
-    vec3 world_normal = rotateVector(quaternion, i_normal.xyz);
+    vec3 v_world_normal = rotateVector(quaternion, i_normal.xyz);
     vec3 world_tangent = rotateVector(quaternion, i_tangent.xyz);
 
     tangent = (u_view_matrix * vec4(world_tangent, 0.0)).xyz;
     bitangent = (u_view_matrix *
        // bitangent sign
-      vec4(cross(world_normal, world_tangent) * i_tangent.w, 0.0)
+      vec4(cross(v_world_normal, world_tangent) * i_tangent.w, 0.0)
       ).xyz;
-    normal = (u_view_matrix * vec4(world_normal, 0.0)).xyz;
+    normal = (u_view_matrix * vec4(v_world_normal, 0.0)).xyz;
 
     uv = vec2(i_uv.x + (i_texture_trans.x * i_normal.w),
         i_uv.y + (i_texture_trans.y * i_normal.w));
@@ -71,4 +72,5 @@ void main()
     hue_change = float(i_misc_data.y) * 0.01;
     gl_Position = u_projection_view_matrix * v_world_position;
     world_position = v_world_position;
+    world_normal = v_world_normal;
 }
