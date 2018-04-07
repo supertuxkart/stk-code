@@ -15,22 +15,7 @@ layout(location = 1) out vec4 o_normal_color;
 
 void main()
 {
-    vec4 col = sampleTextureLayer0(uv);
-    vec4 col2 = sampleTextureLayer0(uv * 2.0);
-    vec4 col3 = sampleTextureLayer0(uv * 4.0);
-
-    // From Low to medium
-    float factor = camdist * 0.01;
-    factor = pow(factor - 0.1, 1.4);
-    factor = clamp(factor, 0.0, 1.0);
-    col = mix(col2, col, factor);
-    
-    // From medium to high
-    factor = camdist * 0.01;
-    factor = pow(factor - 0.1, 0.4);
-    factor = clamp(factor, 0.0, 1.0);
-
-    col = mix(col3, col, factor);
+    vec4 col = multi_sampleTextureLayer0(uv, camdist);
 
     if (hue_change > 0.0)
     {
@@ -52,8 +37,8 @@ void main()
     vec3 final_color = col.xyz * color.xyz;
 
 #if defined(Advanced_Lighting_Enabled)
-    vec4 layer_2 = sampleTextureLayer2(uv);
-    vec4 layer_3 = sampleTextureLayer3(uv);
+    vec4 layer_2 = multi_sampleTextureLayer2(uv, camdist);
+    vec4 layer_3 = multi_sampleTextureLayer3(uv, camdist);
     o_diffuse_color = vec4(final_color, layer_2.z);
 
     vec3 tangent_space_normal = 2.0 * layer_3.xyz - 1.0;
