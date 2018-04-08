@@ -319,13 +319,11 @@ int RewindQueue::undoUntil(int undo_ticks)
 void RewindQueue::replayAllEvents(int ticks)
 {
     // Replay all events that happened at the current time step
-    while ( m_current != m_all_rewind_info.end() && 
-            (*m_current)->getTicks() == ticks        )
+    while ( hasMoreRewindInfo() && (*m_current)->getTicks() == ticks )
     {
         if ((*m_current)->isEvent())
             (*m_current)->rewind();
         m_current++;
-        if (!hasMoreRewindInfo()) break;
     }   // while current->getTIcks == ticks
 
 }   // replayAllEvents
