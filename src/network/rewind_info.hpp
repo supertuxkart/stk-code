@@ -178,7 +178,7 @@ public:
     }   // undo
     // ------------------------------------------------------------------------
     /** This is called while going forwards in time again to reach current
-     *  time. Calls rewindEvent().
+     *  time. Calls rewind() in the event rewinder.
      */
     virtual void rewind()
     {
