@@ -100,7 +100,7 @@ void RewindQueue::insertRewindInfo(RewindInfo *ri)
         // previous element, i.e. before the current element:
         if ((*i_prev)->getTicks() < ri->getTicks()) break;
         if ((*i_prev)->getTicks() == ri->getTicks() &&
-            (*i_prev)->isState() && ri->isEvent()      ) break;
+            ri->isEvent()                              ) break;
         i = i_prev;
     }
     if(m_current == m_all_rewind_info.end())
@@ -429,4 +429,23 @@ void RewindQueue::unitTesting()
     b1.addLocalEvent(NULL, NULL, true, 2);
     RewindInfo *ri = b1.getCurrent();
     assert(ri->getTicks() == 2);
+
+    // 2) Make sure when adding an event at the same time as an existing
+    //    event, that m_current pooints to the first event, otherwise
+    //    events with same time stamp will not be handled correctly.
+    //    At this stage current points to the event at time 2 from above
+    AllRewindInfo::iterator current_old = b1.m_current;
+    b1.addLocalEvent(NULL, NULL, true, 2);
+    // Make sure that current was not modified, i.e. the new event at time
+    // 2 was added at the end of the list:
+    assert(current_old == b1.m_current);
+
+    // This should not trigger an exception, now current points to the
+    // second event at the same time:
+    b1.next();
+    assert(ri->getTicks() == 2);
+    assert(ri->isEvent());
+    b1.next();
+    assert(b1.m_current == b1.m_all_rewind_info.end());
+
 }   // unitTesting
