@@ -463,7 +463,7 @@ void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
     
     if (m_multitouch_gui != NULL)
     {
-        m_multitouch_gui->drawMultitouchSteering(kart, viewport, scaling);
+        m_multitouch_gui->draw(kart, viewport, scaling);
     }
 }   // renderPlayerView
 

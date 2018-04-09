@@ -459,6 +459,8 @@ void DeviceManager::updateMultitouchDevice()
     {
         m_multitouch_device->setPlayer(NULL);
     }
+    
+    m_multitouch_device->updateController();
 }   // updateMultitouchDevice
 
 //-----------------------------------------------------------------------------

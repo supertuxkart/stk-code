@@ -36,7 +36,7 @@ MultitouchDevice::MultitouchDevice()
     m_type          = DT_MULTITOUCH;
     m_name          = "Multitouch";
     m_player        = NULL;
-    m_accelerometer_active = false;
+    m_controller    = NULL;
 #ifdef ANDROID
     m_android_device = dynamic_cast<CIrrDeviceAndroid*>(
                                                     irr_driver->getDevice());
@@ -136,22 +136,6 @@ void MultitouchDevice::addButton(MultitouchButtonType type, int x, int y,
     }
 
     m_buttons.push_back(button);
-
-#ifdef ANDROID
-    if (button->type == MultitouchButtonType::BUTTON_STEERING)
-    {
-        if (UserConfigParams::m_multitouch_controls == 2 &&
-            !m_android_device->isAccelerometerActive())
-        {
-            m_android_device->activateAccelerometer(1.0f / 30);
-
-            if (m_android_device->isAccelerometerActive())
-            {
-                m_accelerometer_active = true;
-            }
-        }
-    }
-#endif
 } // addButton
 
 // ----------------------------------------------------------------------------
@@ -159,15 +143,6 @@ void MultitouchDevice::addButton(MultitouchButtonType type, int x, int y,
  */
 void MultitouchDevice::clearButtons()
 {
-#ifdef ANDROID
-    if (m_accelerometer_active == true &&
-        m_android_device->isAccelerometerActive())
-    {
-        m_android_device->deactivateAccelerometer();
-        m_accelerometer_active = false;
-    }
-#endif
-
     for (MultitouchButton* button : m_buttons)
     {
         delete button;
@@ -197,6 +172,45 @@ void MultitouchDevice::reset()
         event.y = 0;
     }
 } // reset
+
+// ----------------------------------------------------------------------------
+/** Activates accelerometer
+ */
+void MultitouchDevice::activateAccelerometer()
+{
+#ifdef ANDROID
+    if (!m_android_device->isAccelerometerActive())
+    {
+        m_android_device->activateAccelerometer(1.0f / 30);
+    }
+#endif
+}
+
+// ----------------------------------------------------------------------------
+/** Deativates accelerometer
+ */
+void MultitouchDevice::deactivateAccelerometer()
+{
+#ifdef ANDROID
+    if (m_android_device->isAccelerometerActive())
+    {
+        m_android_device->deactivateAccelerometer();
+    }
+#endif
+}
+
+// ----------------------------------------------------------------------------
+/** Get accelerometer state
+ *  \return true if accelerometer is active
+ */
+bool MultitouchDevice::isAccelerometerActive()
+{
+#ifdef ANDROID
+    return m_android_device->isAccelerometerActive();
+#endif
+
+    return false;
+}
 
 // ----------------------------------------------------------------------------
 /** The function that is executed when touch event occurs. It updates the
@@ -241,13 +255,15 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
                 
                 if (button->pressed == true)
                 {
-                    updateButtonAxes(button,
-                         (float)(event.x - button->x) / (button->width/2) - 1,
-                         (float)(event.y - button->y) / (button->height/2) - 1);
+                    button->axis_x = 
+                        (float)(event.x - button->x) / (button->width/2) - 1;
+                    button->axis_y = 
+                        (float)(event.y - button->y) / (button->height/2) - 1;
                 }
                 else
                 {
-                    updateButtonAxes(button, 0.0f, 0.0f);
+                    button->axis_x = 0.0f;
+                    button->axis_y = 0.0f;
                 }
 
                 if (prev_axis_x != button->axis_x ||
@@ -298,35 +314,95 @@ float MultitouchDevice::getSteeringFactor(float value)
                     m_deadzone_center), 1.0f);
 }
 
-/** Updates the button axes. It leaves X axis untouched if the accelerometer is
- *  used for turning left/right
- *  \param button A button that should be updated
- *  \param x A value from 0 to 1
- *  \param y A value from 0 to 1
- */
-void MultitouchDevice::updateButtonAxes(MultitouchButton* button, float x,
-                                        float y)
-{
-    if (m_accelerometer_active == false)
-    {
-        button->axis_x = x;
-    }
+// ----------------------------------------------------------------------------
 
-    button->axis_y = y;
+void MultitouchDevice::updateAxisX(float value)
+{
+    if (m_controller == NULL)
+        return;
+        
+    if (value < -m_deadzone_center)
+    {
+        float factor = getSteeringFactor(std::abs(value));
+        m_controller->action(PA_STEER_LEFT, int(factor * Input::MAX_VALUE));
+    }
+    else if (value > m_deadzone_center)
+    {
+        float factor = getSteeringFactor(std::abs(value));
+        m_controller->action(PA_STEER_RIGHT, int(factor * Input::MAX_VALUE));
+    }
+    else
+    {
+        m_controller->action(PA_STEER_LEFT, 0);
+        m_controller->action(PA_STEER_RIGHT, 0);
+    }
 }
 
 // ----------------------------------------------------------------------------
 
+void MultitouchDevice::updateAxisY(float value)
+{
+    if (m_controller == NULL)
+        return;
+        
+    if (value < -m_deadzone_center)
+    {
+        float factor = getSteeringFactor(std::abs(value));
+        m_controller->action(PA_ACCEL, int(factor * Input::MAX_VALUE));
+    }
+    else if (value > m_deadzone_center)
+    {
+        float factor = getSteeringFactor(std::abs(value));
+        m_controller->action(PA_BRAKE, int(factor * Input::MAX_VALUE));
+    }
+    else
+    {
+        m_controller->action(PA_BRAKE, 0);
+        m_controller->action(PA_ACCEL, 0);
+    }
+}
 
 // ----------------------------------------------------------------------------
+
 /** Sends proper action for player controller depending on the button type
  *  and state.
  *  \param button The button that should be handled.
  */
 void MultitouchDevice::handleControls(MultitouchButton* button)
 {
-    if (m_player == NULL)
+    if (m_controller == NULL)
         return;
+        
+    if (button->type == MultitouchButtonType::BUTTON_STEERING)
+    {
+#ifdef ANDROID
+        if (!m_android_device->isAccelerometerActive())
+#endif
+        {
+            updateAxisX(button->axis_x);
+        }
+        
+        updateAxisY(button->axis_y);
+    }
+    else
+    {
+        if (button->action != PA_BEFORE_FIRST)
+        {
+            int value = button->pressed ? Input::MAX_VALUE : 0;
+            m_controller->action(button->action, value);
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+void MultitouchDevice::updateController()
+{
+    if (m_player == NULL)
+    {
+        m_controller = NULL;
+        return;
+    }
 
     // Handle multitouch events only when race is running. It avoids to process
     // it when pause dialog is active during the race. And there is no reason
@@ -335,60 +411,20 @@ void MultitouchDevice::handleControls(MultitouchButton* button)
         GUIEngine::ModalDialog::isADialogActive() ||
         GUIEngine::ScreenKeyboard::isActive() ||
         race_manager->isWatchingReplay())
+    {
+        m_controller = NULL;
         return;
+    }
 
     AbstractKart* pk = m_player->getKart();
 
     if (pk == NULL)
-        return;
-
-    Controller* controller = pk->getController();
-
-    if (controller == NULL)
-        return;
-
-    if (button->type == MultitouchButtonType::BUTTON_STEERING)
     {
-        if (button->axis_y < -m_deadzone_center)
-        {
-            float factor = getSteeringFactor(std::abs(button->axis_y));
-            controller->action(PA_ACCEL, int(factor * Input::MAX_VALUE));
-        }
-        else if (button->axis_y > m_deadzone_center)
-        {
-            float factor = getSteeringFactor(std::abs(button->axis_y));
-            controller->action(PA_BRAKE, int(factor * Input::MAX_VALUE));
-        }
-        else
-        {
-            controller->action(PA_BRAKE, 0);
-            controller->action(PA_ACCEL, 0);
-        }
+        m_controller = NULL;
+        return;
+    }
 
-        if (button->axis_x < -m_deadzone_center)
-        {
-            float factor = getSteeringFactor(std::abs(button->axis_x));
-            controller->action(PA_STEER_LEFT, int(factor * Input::MAX_VALUE));
-        }
-        else if (button->axis_x > m_deadzone_center)
-        {
-            float factor = getSteeringFactor(std::abs(button->axis_x));
-            controller->action(PA_STEER_RIGHT, int(factor * Input::MAX_VALUE));
-        }
-        else
-        {
-            controller->action(PA_STEER_LEFT, 0);
-            controller->action(PA_STEER_RIGHT, 0);
-        }
-    }
-    else
-    {
-        if (button->action != PA_BEFORE_FIRST)
-        {
-            int value = button->pressed ? Input::MAX_VALUE : 0;
-            controller->action(button->action, value);
-        }
-    }
-} // handleControls
+    m_controller = pk->getController();
+}
 
 // ----------------------------------------------------------------------------

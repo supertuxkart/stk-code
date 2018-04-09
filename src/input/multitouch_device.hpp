@@ -68,11 +68,15 @@ struct MultitouchButton
     float axis_y;
 };
 
+class Controller;
+
 class MultitouchDevice : public InputDevice
 {
 private:
     /** The list of pointers to all created buttons */
     std::vector<MultitouchButton*> m_buttons;
+    
+    Controller* m_controller;
 
     /** The parameter that is used for steering button and determines dead area
      *  in a center of button */
@@ -82,16 +86,13 @@ private:
      *  at the edge of button */
     float m_deadzone_edge;
 
-    /** True if accelerometer is in use */
-    bool m_accelerometer_active;
-
 #ifdef ANDROID
     /** Pointer to the Android irrlicht device */
     CIrrDeviceAndroid* m_android_device;
 #endif
 
     float getSteeringFactor(float value);
-    void updateButtonAxes(MultitouchButton* button, float x, float y);
+    void handleControls(MultitouchButton* button);
 
 public:
     /** The array that contains data for all multitouch input events */
@@ -119,12 +120,14 @@ public:
     /** Returns pointer to the selected button */
     MultitouchButton* getButton(unsigned int i) {return m_buttons.at(i);}
 
-    /** True if accelerometer is in use */
-    bool isAccelerometerActive() {return m_accelerometer_active;}
-
+    void activateAccelerometer();
+    void deactivateAccelerometer();
+    bool isAccelerometerActive();
+    
+    void updateAxisX(float value);
+    void updateAxisY(float value);
     void updateDeviceState(unsigned int event_id);
-    void handleControls(MultitouchButton* button);
-
+    void updateController();
     void updateConfigParams();
 
 };   // MultitouchDevice

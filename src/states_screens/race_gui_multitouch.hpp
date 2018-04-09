@@ -38,7 +38,7 @@ private:
     bool m_gui_action;
     unsigned int m_minimap_bottom;
     
-    video::ITexture* m_directionnal_wheel_tex;
+    video::ITexture* m_steering_wheel_tex;
     video::ITexture* m_pause_tex;
     video::ITexture* m_nitro_tex;
     video::ITexture* m_nitro_empty_tex;
@@ -48,17 +48,18 @@ private:
     video::ITexture* m_bg_button_tex;
     video::ITexture* m_bg_button_focus_tex;
     video::ITexture* m_gui_action_tex;
+    video::ITexture* m_up_tex;
+    video::ITexture* m_down_tex;
 
-    void initMultitouchSteering();
-    void closeMultitouchSteering();
+    void init();
+    void close();
 
 public:
      RaceGUIMultitouch(RaceGUIBase* race_gui);
     ~RaceGUIMultitouch();
 
-    void drawMultitouchSteering(const AbstractKart* kart,
-                                const core::recti &viewport,
-                                const core::vector2df &scaling);
+    void draw(const AbstractKart* kart, const core::recti &viewport,
+              const core::vector2df &scaling);
                                 
     unsigned int getMinimapBottom() {return m_minimap_bottom;}
     void setGuiAction(bool enabled = true) {m_gui_action = enabled;}
