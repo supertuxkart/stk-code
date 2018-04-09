@@ -229,7 +229,7 @@ void LinearWorld::update(float dt)
                     j, m_karts[j]->getPosition(),
                     m_karts[j]->hasFinishedRace(),
                     m_kart_info[j].m_race_lap,
-                    getDistanceDownTrackForKart(m_karts[j]->getWorldKartId()),
+                    getDistanceDownTrackForKart(m_karts[j]->getWorldKartId(), true),
                     m_kart_info[j].m_overall_distance,
                     (m_karts[j]->getPosition() == m_karts[i]->getPosition()
                      ? "<--- !!!" : "")                                      );
