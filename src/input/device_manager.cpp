@@ -643,6 +643,18 @@ void DeviceManager::save()
 
     configfile << "<input version=\"" << INPUT_FILE_VERSION << "\">\n\n";
 
+    configfile << "<!--\n"
+        << "Event 1 : Keyboard button press\n"
+        << "    'id' indicates which button, as defined by irrlicht's EKEY_CODE enum\n"
+        << "    'character' contains the associated unicode character.\n"
+        << "        Only used as fallback when displaying special characters in the UI.\n"
+        << "Event 2 : Gamepad stick motion\n"
+        << "    'id' indicates which stick, starting from 0\n"
+        << "    'direction' 0 means negative, 1 means positive\n"
+        << "Event 3 : Gamepad button press\n"
+        << "    'id' indicates which button, starting from 0\n"
+        << "-->\n\n";
+
     for(unsigned int n=0; n<m_keyboard_configs.size(); n++)
     {
         m_keyboard_configs[n].save(configfile);
