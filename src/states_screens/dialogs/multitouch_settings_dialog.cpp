@@ -129,6 +129,7 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         UserConfigParams::m_multitouch_deadzone_edge.revertToDefaults();
         UserConfigParams::m_multitouch_deadzone_center.revertToDefaults();
         UserConfigParams::m_multitouch_mode.revertToDefaults();
+        UserConfigParams::m_multitouch_inverted.revertToDefaults();
         UserConfigParams::m_multitouch_controls.revertToDefaults();
 
         updateValues();
