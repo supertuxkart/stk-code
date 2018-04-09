@@ -237,8 +237,6 @@ void RewindManager::playEventsTill(int world_ticks, int *ticks)
     {
         Log::setPrefix("Rewind");
         PROFILER_PUSH_CPU_MARKER("Rewind", 128, 128, 128);
-        if (World::getWorld()->getKart(0)->getControls().getAccel() > 0)
-            printf("");
         rewindTo(rewind_ticks, world_ticks);
         // This should replay everything up to 'now'
         assert(World::getWorld()->getTimeTicks() == world_ticks);
