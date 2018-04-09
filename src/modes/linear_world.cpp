@@ -108,7 +108,7 @@ void LinearWorld::reset()
     for(unsigned int i=0; i<kart_amount; i++)
     {
         m_distance_increase = std::min(m_distance_increase,
-                                       getDistanceDownTrackForKart(i));
+                                       getDistanceDownTrackForKart(i, false));
     }
     // Track length - minimum distance is how much the track length must
     // be increased to avoid negative values in estimateFinishTimeForKart
@@ -190,7 +190,7 @@ void LinearWorld::update(float dt)
         getTrackSector(n)->update(kart->getFrontXYZ());
         kart_info.m_overall_distance = kart_info.m_race_lap
                                      * Track::getCurrentTrack()->getTrackLength()
-                        + getDistanceDownTrackForKart(kart->getWorldKartId());
+                        + getDistanceDownTrackForKart(kart->getWorldKartId(), true);
     }   // for n
 
     // Update all positions. This must be done after _all_ karts have
@@ -279,7 +279,7 @@ void LinearWorld::newLap(unsigned int kart_index)
         m_kart_info[kart_index].m_overall_distance =
               m_kart_info[kart_index].m_race_lap 
             * Track::getCurrentTrack()->getTrackLength()
-            + getDistanceDownTrackForKart(kart->getWorldKartId());
+            + getDistanceDownTrackForKart(kart->getWorldKartId(), true);
     }
     // Last lap message (kart_index's assert in previous block already)
     if (raceHasLaps() && kart_info.m_race_lap+1 == lap_count)
@@ -388,9 +388,9 @@ void LinearWorld::newLap(unsigned int kart_index)
  *  crossing the start line..
  *  \param kart_id Index of the kart.
  */
-float LinearWorld::getDistanceDownTrackForKart(const int kart_id) const
+float LinearWorld::getDistanceDownTrackForKart(const int kart_id, bool account_for_checklines) const
 {
-    return getTrackSector(kart_id)->getDistanceFromStart();
+    return getTrackSector(kart_id)->getDistanceFromStart(account_for_checklines);
 }   // getDistanceDownTrackForKart
 
 //-----------------------------------------------------------------------------
