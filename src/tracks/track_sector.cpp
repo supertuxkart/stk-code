@@ -109,14 +109,12 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
 
     // Now determine the 'track' coords, i.e. ow far from the start of the
     // track, and how far to the left or right of the center driveline.
-    if (isValidQuad || m_last_valid_graph_node == Graph::UNKNOWN_SECTOR)
+    DriveGraph::get()->spatialToTrack(&m_current_track_coords, xyz,
+        m_current_graph_node);
+
+    if (m_last_valid_graph_node != Graph::UNKNOWN_SECTOR)
     {
-        DriveGraph::get()->spatialToTrack(&m_current_track_coords, xyz,
-            m_current_graph_node);
-    }
-    else
-    {
-        DriveGraph::get()->spatialToTrack(&m_current_track_coords, xyz,
+        DriveGraph::get()->spatialToTrack(&m_latest_valid_track_coords, xyz,
             m_last_valid_graph_node);
     }
 }   // update

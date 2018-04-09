@@ -94,7 +94,7 @@ float MainLoop::getLimitedDt()
             {
                 Log::verbose("fps", "time %f distance %f dt %f fps %f",
                              lw->getTime(),
-                             lw->getDistanceDownTrackForKart(0),
+                             lw->getDistanceDownTrackForKart(0, true),
                              dt*0.001f, 1000.0f / dt);
             }
             else

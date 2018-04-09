@@ -69,7 +69,7 @@ bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     // has check defined.
     if(!lin_world)
         return false;
-    float current_distance = lin_world->getDistanceDownTrackForKart(kart_index);
+    float current_distance = lin_world->getDistanceDownTrackForKart(kart_index, false);
     bool result = (m_previous_distance[kart_index]>0.95f*track_length &&
                   current_distance<7.0f);
 
