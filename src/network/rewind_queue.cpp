@@ -288,28 +288,19 @@ bool RewindQueue::hasMoreRewindInfo() const
  */
 int RewindQueue::undoUntil(int undo_ticks)
 {
-    // m_current points to the next not yet executed event (or state)
-    // or end() if nothing else is in the queue
-    if (m_current != m_all_rewind_info.begin())
-        m_current--;
-
-    do 
+    // A rewind is done after a state in the past is inserted. This function
+    // makes sure that m_current is not end()
+    assert(m_current != m_all_rewind_info.end());
+    
+    while((*m_current)->getTicks() > undo_ticks ||
+        (*m_current)->isEvent() || !(*m_current)->isConfirmed())
     {
         // Undo all events and states from the current time
         (*m_current)->undo();
-
-        if ( (*m_current)->getTicks() <= undo_ticks && 
-             (*m_current)->isState() && (*m_current)->isConfirmed() )
-        {
-            return (*m_current)->getTicks();
-        }
         m_current--;
-    } while (m_current != m_all_rewind_info.end());
+    }
 
-    // Shouldn't happen
-    Log::error("RewindManager", "No state for rewind to %d",
-               undo_ticks);
-    return -1;
+    return (*m_current)->getTicks();
 }   // undoUntil
 
 // ----------------------------------------------------------------------------
