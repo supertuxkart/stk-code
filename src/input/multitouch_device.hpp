@@ -34,6 +34,7 @@
 enum MultitouchButtonType
 {
     BUTTON_STEERING,
+    BUTTON_UP_DOWN,
     BUTTON_FIRE,
     BUTTON_NITRO,
     BUTTON_SKIDDING,

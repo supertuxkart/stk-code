@@ -251,23 +251,39 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
             if (button->type == MultitouchButtonType::BUTTON_STEERING)
             {
                 float prev_axis_x = button->axis_x;
-                float prev_axis_y = button->axis_y;
                 
                 if (button->pressed == true)
                 {
                     button->axis_x = 
                         (float)(event.x - button->x) / (button->width/2) - 1;
+                }
+                else
+                {
+                    button->axis_x = 0.0f;
+                }
+
+                if (prev_axis_x != button->axis_x)
+                {
+                    update_controls = true;
+                }
+            }
+            
+            if (button->type == MultitouchButtonType::BUTTON_STEERING ||
+                button->type == MultitouchButtonType::BUTTON_UP_DOWN)
+            {
+                float prev_axis_y = button->axis_y;
+                
+                if (button->pressed == true)
+                {
                     button->axis_y = 
                         (float)(event.y - button->y) / (button->height/2) - 1;
                 }
                 else
                 {
-                    button->axis_x = 0.0f;
                     button->axis_y = 0.0f;
                 }
 
-                if (prev_axis_x != button->axis_x ||
-                    prev_axis_y != button->axis_y)
+                if (prev_axis_y != button->axis_y)
                 {
                     update_controls = true;
                 }
@@ -375,13 +391,11 @@ void MultitouchDevice::handleControls(MultitouchButton* button)
         
     if (button->type == MultitouchButtonType::BUTTON_STEERING)
     {
-#ifdef ANDROID
-        if (!m_android_device->isAccelerometerActive())
-#endif
-        {
-            updateAxisX(button->axis_x);
-        }
-        
+        updateAxisX(button->axis_x);
+        updateAxisY(button->axis_y);
+    }
+    else if (button->type == MultitouchButtonType::BUTTON_UP_DOWN)
+    {
         updateAxisY(button->axis_y);
     }
     else

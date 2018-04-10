@@ -39,6 +39,7 @@ private:
     unsigned int m_minimap_bottom;
     
     video::ITexture* m_steering_wheel_tex;
+    video::ITexture* m_up_down_tex;
     video::ITexture* m_pause_tex;
     video::ITexture* m_nitro_tex;
     video::ITexture* m_nitro_empty_tex;
@@ -48,8 +49,6 @@ private:
     video::ITexture* m_bg_button_tex;
     video::ITexture* m_bg_button_focus_tex;
     video::ITexture* m_gui_action_tex;
-    video::ITexture* m_up_tex;
-    video::ITexture* m_down_tex;
 
     void init();
     void close();
