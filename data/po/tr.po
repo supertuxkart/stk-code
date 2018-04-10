@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-11-13 00:19+0000\n"
+"PO-Revision-Date: 2017-12-06 00:21+0000\n"
 "Last-Translator: yakup <mutouk@yandex.ru>\n"
 "Language-Team: Turkish (http://www.transifex.com/supertuxkart/supertuxkart/language/tr/)\n"
 "MIME-Version: 1.0\n"
@@ -1923,11 +1923,11 @@ msgstr ""
 
 #. I18N: ../stk-assets/karts/kiki/kart.xml
 msgid "Kiki"
-msgstr ""
+msgstr "Kiki"
 
 #. I18N: ../stk-assets/karts/konqi/kart.xml
 msgid "Konqi"
-msgstr ""
+msgstr "Konqi"
 
 #. I18N: ../stk-assets/karts/nolok/kart.xml
 msgid "Nolok"
@@ -1935,11 +1935,11 @@ msgstr "Nolok"
 
 #. I18N: ../stk-assets/karts/pidgin/kart.xml
 msgid "Pidgin"
-msgstr ""
+msgstr "Pidgin"
 
 #. I18N: ../stk-assets/karts/puffy/kart.xml
 msgid "Puffy"
-msgstr ""
+msgstr "Puffy"
 
 #. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
 msgid "Sara the Racer"
@@ -1959,7 +1959,7 @@ msgstr "Tux"
 
 #. I18N: ../stk-assets/karts/wilber/kart.xml
 msgid "Wilber"
-msgstr ""
+msgstr "Wilber"
 
 #. I18N: ../stk-assets/karts/xue/kart.xml
 msgid "Xue"
