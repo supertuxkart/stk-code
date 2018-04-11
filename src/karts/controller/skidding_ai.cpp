@@ -1345,7 +1345,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
 
     case PowerupManager::POWERUP_SWATTER:
         {
-             // if the kart has a shield, do not break it by using a swatter.
+             // if the kart has a shield, do not return it by using a swatter.
             if(m_kart->getShieldTime() > min_bubble_time)
                 break;
 
@@ -1575,14 +1575,20 @@ void SkiddingAI::handleCake(int item_skill)
     }
 
     // Don't fire on an invulnerable kart.
-    if (m_kart_behind->isInvulnerable())
+    if (m_kart_behind != NULL)
     {
-        fire_behind -= 100.0f;
+        if (m_kart_behind->isInvulnerable())
+        {
+            fire_behind -= 100.0f;
+        }
     }
 
-    if (m_kart_ahead->isInvulnerable())
+    if (m_kart_ahead != NULL)
     {
-        fire_ahead -= 100.0f;
+        if (m_kart_ahead->isInvulnerable())
+        {
+            fire_ahead -= 100.0f;
+        }
     }
 
     // Don't fire at a kart that is slower than us. Reason is that
@@ -1613,10 +1619,19 @@ void SkiddingAI::handleCake(int item_skill)
     //Try to take out a kart which has a swatter in priority
     if (item_skill>=4)
     {
-        bool kart_behind_has_swatter =
-            (m_kart_behind->getAttachment()->getType() == Attachment::ATTACH_SWATTER);
-        bool kart_ahead_has_swatter =
-            (m_kart_ahead->getAttachment()->getType() == Attachment::ATTACH_SWATTER);
+        bool kart_behind_has_swatter = false;
+        if (m_kart_behind != NULL)
+        {
+            kart_behind_has_swatter = (m_kart_behind->getAttachment()->getType()
+                                       == Attachment::ATTACH_SWATTER);
+        }
+
+        bool kart_ahead_has_swatter = false;
+        if (m_kart_ahead != NULL)
+        {
+            kart_ahead_has_swatter = (m_kart_ahead->getAttachment()->getType() 
+                                      == Attachment::ATTACH_SWATTER);
+        }
 
         //If it is slower, the swatter is more dangerous
         if (kart_ahead_has_swatter)
@@ -1720,14 +1735,20 @@ void SkiddingAI::handleBowling(int item_skill)
     }
 
     // Don't fire if the kart we are aiming at is invulnerable.
-    if (m_kart_behind->isInvulnerable())
+    if (m_kart_behind != NULL)
     {
-        straight_behind = false;
+        if (m_kart_behind->isInvulnerable())
+        {
+            straight_behind = false;
+        }
     }
 
-    if (m_kart_ahead->isInvulnerable())
+    if (m_kart_ahead != NULL)
     {
-        straight_ahead = false;
+        if (m_kart_ahead->isInvulnerable())
+        {
+            straight_ahead = false;
+        }
     }
 
     //Don't fire on a kart straight ahead with a bubblegum shield
