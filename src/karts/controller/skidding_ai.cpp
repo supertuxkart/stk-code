@@ -1345,6 +1345,10 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
 
     case PowerupManager::POWERUP_SWATTER:
         {
+             // if the kart has a shield, do not break it by using a swatter.
+            if(m_kart->getShieldTime() > min_bubble_time)
+                break;
+
             handleSwatter(item_skill);
             break;
         } // POWERUP_SWATTER
@@ -1802,9 +1806,7 @@ void SkiddingAI::handleSwatter(int item_skill)
     }
      // Squared distance for which the swatter works
      float d2 = m_kart->getKartProperties()->getSwatterDistance();
-     // if the kart has a shield, do not return it by using a swatter.
-     if(m_kart->getShieldTime() > min_bubble_time)
-         return;
+
      // Fire if the closest kart ahead or to the back is not already
      // squashed and close enough.
      // FIXME: this can be improved on, since more than one kart might
