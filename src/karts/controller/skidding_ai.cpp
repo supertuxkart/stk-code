@@ -1541,39 +1541,18 @@ void SkiddingAI::handleCake(int item_skill)
     float fire_ahead = 0.0f;
     float fire_behind = 0.0f;
 
-    if (kart_behind_is_close)
-    {
-        fire_behind += 25.0f - m_distance_behind;
-    }
-    else 
-    {
-        fire_behind -= 100.0f;
-    }
-    if (kart_ahead_is_close)
-    {
-        fire_ahead += 30.0f - m_distance_ahead; //prefer targetting ahead
-    }
-    else
-    {
-        fire_ahead -= 100.0f;
-    }
+    if (kart_behind_is_close) fire_behind += 25.0f - m_distance_behind;
+    else                      fire_behind -= 100.0f;
+
+    if (kart_ahead_is_close)  fire_ahead += 30.0f - m_distance_ahead; //prefer targetting ahead
+    else                      fire_ahead -= 100.0f;
 
     // Don't fire on an invulnerable kart.
-    if (m_kart_behind != NULL)
-    {
-        if (m_kart_behind->isInvulnerable())
-        {
-            fire_behind -= 100.0f;
-        }
-    }
+    if (m_kart_behind && m_kart_behind->isInvulnerable())
+        fire_behind -= 100.0f;
 
-    if (m_kart_ahead != NULL)
-    {
-        if (m_kart_ahead->isInvulnerable())
-        {
-            fire_ahead -= 100.0f;
-        }
-    }
+    if (m_kart_ahead && m_kart_ahead->isInvulnerable())
+        fire_ahead -= 100.0f;
 
     // Don't fire at a kart that is slower than us. Reason is that
     // we can either save the cake for later since we will overtake
@@ -1582,36 +1561,25 @@ void SkiddingAI::handleCake(int item_skill)
     // kart is faster).    
     if(item_skill >= 3)
     {
-        if (kart_behind_is_slow)
-        {
-            fire_behind -= 50.0f;
-        }
-        else 
-        {
-            fire_behind += 25.0f;
-        }
-        if (kart_ahead_is_slow)
-        {
-            fire_ahead -= 50.0f;
-        }
-        else 
-        {
-            fire_ahead += 25.0f;
-        }
+        if (kart_behind_is_slow) fire_behind -= 50.0f;
+        else                     fire_behind += 25.0f;
+
+        if (kart_ahead_is_slow) fire_ahead -= 50.0f;
+        else                    fire_ahead += 25.0f;
     }
 
     //Try to take out a kart which has a swatter in priority
     if (item_skill>=4)
     {
         bool kart_behind_has_swatter = false;
-        if (m_kart_behind != NULL)
+        if (m_kart_behind)
         {
             kart_behind_has_swatter = (m_kart_behind->getAttachment()->getType()
                                        == Attachment::ATTACH_SWATTER);
         }
 
         bool kart_ahead_has_swatter = false;
-        if (m_kart_ahead != NULL)
+        if (m_kart_ahead)
         {
             kart_ahead_has_swatter = (m_kart_ahead->getAttachment()->getType() 
                                       == Attachment::ATTACH_SWATTER);
@@ -1620,22 +1588,13 @@ void SkiddingAI::handleCake(int item_skill)
         //If it is slower, the swatter is more dangerous
         if (kart_ahead_has_swatter)
         {
-            if (kart_ahead_is_slow)
-            {
-                fire_ahead += 75.0f;
-            }
-            else
-            {
-                fire_ahead += 15.0f;
-            }
+            if (kart_ahead_is_slow) fire_ahead += 75.0f;
+            else                    fire_ahead += 15.0f;
         }
         //If it is slower, we can wait for it to get faster and closer before firing
         if (kart_behind_has_swatter)
         {
-            if (!kart_behind_is_slow)
-            {
-                fire_behind += 25.0f;
-            }
+            if (!kart_behind_is_slow) fire_behind += 25.0f;
         }
     }
 
@@ -1692,12 +1651,12 @@ void SkiddingAI::handleCake(int item_skill)
  */
 void SkiddingAI::handleBowling(int item_skill)
 {
-
     // Leave more time between bowling balls, since they are
     // slower, so it should take longer to hit something which
     // can result in changing our target.
     if(item_skill == 2 && m_time_since_last_shot < 5.0f) return;
     if(item_skill >= 3 && m_time_since_last_shot < 3.0f) return;
+
     // Consider angle towards karts
     bool straight_behind = false;
     bool straight_ahead = false;
@@ -1719,21 +1678,11 @@ void SkiddingAI::handleBowling(int item_skill)
     }
 
     // Don't fire if the kart we are aiming at is invulnerable.
-    if (m_kart_behind != NULL)
-    {
-        if (m_kart_behind->isInvulnerable())
-        {
-            straight_behind = false;
-        }
-    }
+    if (m_kart_behind && m_kart_behind->isInvulnerable())
+        straight_behind = false;
 
-    if (m_kart_ahead != NULL)
-    {
-        if (m_kart_ahead->isInvulnerable())
-        {
-            straight_ahead = false;
-        }
-    }
+    if (m_kart_ahead && m_kart_ahead->isInvulnerable())
+        straight_ahead = false;
 
     //Don't fire on a kart straight ahead with a bubblegum shield
     if (item_skill == 5)
