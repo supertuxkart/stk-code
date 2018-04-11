@@ -80,7 +80,7 @@ make -j4
 ```
 STK can then be run from the build directory with `bin/supertuxkart`
 
-### Recompiling
+### Recompiling with the most recent code
 
 To recompile the latest code without redownloading the entire source, first run the ```svn up``` command inside the 'stk-assets' directory, then run the following commands inside the 'stk-code' directory:
 
