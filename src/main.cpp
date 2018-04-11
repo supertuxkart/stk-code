@@ -1118,6 +1118,7 @@ int handleCmdLine()
     {
         const std::vector<std::string> l=StringUtils::split(std::string(s),',');
         race_manager->setDefaultAIKartList(l);
+        race_manager->setNumKarts((int)l.size());
     }   // --aiNP
 
     if(CommandLine::has( "--mode", &s) || CommandLine::has( "--difficulty", &s))
