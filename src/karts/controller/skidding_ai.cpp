@@ -361,23 +361,13 @@ void SkiddingAI::update(float dt)
         if(!m_controls->getNitro())
             handleNitroAndZipper(item_skill);
     }
-    // If we are supposed to use nitro, but have a zipper,
-    // use the zipper instead (unless there are items to avoid cloe by)
-    if(m_controls->getNitro() &&
-        m_kart->getPowerup()->getType()==PowerupManager::POWERUP_ZIPPER &&
-        m_kart->getSpeed()>1.0f &&
-        m_kart->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0 &&
-        !m_avoid_item_close)
+
+    // Make sure that not all AI karts use the zipper at the same
+    // time in time trial at start up, so disable it during the 5 first seconds
+    if(race_manager->getMinorMode()== RaceManager::MINOR_MODE_TIME_TRIAL &&
+        (m_world->getTime()<5.0f) )
     {
-        // Make sure that not all AI karts use the zipper at the same
-        // time in time trial at start up, so during the first 5 seconds
-        // this is done at random only.
-        if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_TIME_TRIAL ||
-            (m_world->getTime()<3.0f && rand()%50==1) )
-        {
-            m_controls->setNitro(false);
-            m_controls->setFire(true);
-        }
+        m_controls->setFire(false);
     }
 
     /*And obviously general kart stuff*/
@@ -2259,7 +2249,8 @@ void SkiddingAI::handleNitroAndZipper(int item_skill)
     }
    
     // Use zipper
-    if(item_skill >= 2 && m_kart->getSpeed()>1.0f &&
+    if(m_kart->getPowerup()->getType() == PowerupManager::POWERUP_ZIPPER 
+        && item_skill >= 2 && m_kart->getSpeed()>1.0f &&
         m_kart->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0)
     {
         DriveNode::DirectionType dir;
