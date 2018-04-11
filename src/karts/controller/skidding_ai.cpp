@@ -1354,6 +1354,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
     if(m_controls->getFire())  m_time_since_last_shot = 0.0f;
 }   // handleItems
 
+
 //-----------------------------------------------------------------------------
 /** Handle bubblegum depending on the chosen strategy
  * Level 2 : Use the shield immediately after a wait time
@@ -1369,18 +1370,15 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
 void SkiddingAI::handleBubblegum(int item_skill, const std::vector<const Item *> &items_to_collect,
                                                const std::vector<const Item *> &items_to_avoid)
 {
+    int shield_radius = m_ai_properties->m_shield_incoming_radius;
+
     int projectile_types[4]; //[3] basket, [2] cakes, [1] plunger, [0] bowling
-    projectile_types[0] = projectile_manager->getNearbyProjectileCount(m_kart,
-                                    m_ai_properties->m_shield_incoming_radius, PowerupManager::POWERUP_BOWLING);
-    projectile_types[1] = projectile_manager->getNearbyProjectileCount(m_kart,
-                                    m_ai_properties->m_shield_incoming_radius, PowerupManager::POWERUP_PLUNGER);
-    projectile_types[2] = projectile_manager->getNearbyProjectileCount(m_kart,
-                                    m_ai_properties->m_shield_incoming_radius, PowerupManager::POWERUP_CAKE);
-    projectile_types[3] = projectile_manager->getNearbyProjectileCount(m_kart,
-                                    m_ai_properties->m_shield_incoming_radius, PowerupManager::POWERUP_RUBBERBALL);
+    projectile_types[0] = projectile_manager->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_BOWLING);
+    projectile_types[1] = projectile_manager->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_PLUNGER);
+    projectile_types[2] = projectile_manager->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_CAKE);
+    projectile_types[3] = projectile_manager->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_RUBBERBALL);
    
     bool projectile_is_close = false;
-    int shield_radius = m_ai_properties->m_shield_incoming_radius;
     projectile_is_close = projectile_manager->projectileIsClose(m_kart, shield_radius);
 
     Attachment::AttachmentType type = m_kart->getAttachment()->getType();
@@ -1499,13 +1497,20 @@ void SkiddingAI::handleBubblegum(int item_skill, const std::vector<const Item *>
     // Avoid dropping all bubble gums one after another
     if( m_time_since_last_shot < 2.0f) return;
 
-    // Use bubblegum if the next kart  behind is 'close' but not too close
-    // (too close likely means that the kart is not behind but more to the
-    // side of this kart and so won't be hit by the bubble gum anyway).
-    // Should we check the speed of the kart as well? I.e. only drop if
-    // the kart behind is faster? Otoh this approach helps preventing an
-    // overtaken kart to overtake us again.
-    if(m_distance_behind < 10.0f && m_distance_behind > 3.0f    )
+    // Use bubblegum if the next kart  behind is 'close'
+    // and straight behind
+
+    bool straight_behind = false;
+    if (m_kart_behind)
+    {
+        Vec3 behind_lc = m_kart->getTrans().inverse()
+            (m_kart_behind->getXYZ());
+        const float abs_angle =
+            atan2f(fabsf(behind_lc.x()), fabsf(behind_lc.z()));
+        if (abs_angle < 0.2f) straight_behind = true;
+    }
+
+    if(m_distance_behind < 8.0f && straight_behind   )
     {
         m_controls->setFire(true);
         m_controls->setLookBack(true);
@@ -1516,7 +1521,8 @@ void SkiddingAI::handleBubblegum(int item_skill, const std::vector<const Item *>
 
 //-----------------------------------------------------------------------------
 /** Handle cake depending on the chosen strategy
- * Level 2 : Use the cake against any close vulnerable enemy, with priority to those ahead and close
+ * Level 2 : Use the cake against any close vulnerable enemy, with priority to those ahead and close,
+ *           check if the enemy is roughly ahead.
  * Level 3 : Level 2 and don't fire on slower karts
  * Level 4 : Level 3 and fire if the kart has a swatter which may hit us
  * Level 5 : Level 4 and don't fire on a shielded kart if we're just behind (gum)
@@ -1531,6 +1537,34 @@ void SkiddingAI::handleCake(int item_skill)
     bool kart_behind_is_close = m_distance_behind < 25.0f;
     bool kart_ahead_is_close = m_distance_ahead < 20.0f;
 
+    bool kart_ahead_has_gum = false;
+
+    bool straight_ahead = false;
+    bool rather_ahead = false;//used to not fire in big curves
+    bool rather_behind = false;
+
+    if (m_kart_ahead)
+    {
+        kart_ahead_has_gum = (m_kart_ahead->getAttachment()->getType()
+                                 == Attachment::ATTACH_BUBBLEGUM_SHIELD);
+
+        Vec3 ahead_lc = m_kart->getTrans().inverse()
+            (m_kart_ahead->getXYZ());
+        const float abs_angle =
+            atan2f(fabsf(ahead_lc.x()), fabsf(ahead_lc.z()));
+        if (abs_angle < 0.2f) straight_ahead = true;
+        if (abs_angle < 0.5f) rather_ahead = true;
+    }
+
+    if (m_kart_behind)
+    {
+        Vec3 behind_lc = m_kart->getTrans().inverse()
+            (m_kart_behind->getXYZ());
+        const float abs_angle =
+            atan2f(fabsf(behind_lc.x()), fabsf(behind_lc.z()));
+        if (abs_angle < 0.5f) rather_behind = true;
+    }
+
     // Do not fire if the kart is driving too slow
     bool kart_behind_is_slow =
         (m_kart_behind && m_kart_behind->getSpeed() < m_kart->getSpeed());
@@ -1541,10 +1575,10 @@ void SkiddingAI::handleCake(int item_skill)
     float fire_ahead = 0.0f;
     float fire_behind = 0.0f;
 
-    if (kart_behind_is_close) fire_behind += 25.0f - m_distance_behind;
+    if (kart_behind_is_close && rather_behind) fire_behind += 25.0f - m_distance_behind;
     else                      fire_behind -= 100.0f;
 
-    if (kart_ahead_is_close)  fire_ahead += 30.0f - m_distance_ahead; //prefer targetting ahead
+    if (kart_ahead_is_close && rather_ahead)  fire_ahead += 30.0f - m_distance_ahead; //prefer targetting ahead
     else                      fire_ahead -= 100.0f;
 
     // Don't fire on an invulnerable kart.
@@ -1599,26 +1633,9 @@ void SkiddingAI::handleCake(int item_skill)
     }
 
     //Don't fire on a kart straight ahead with a bubblegum shield
-    if (item_skill == 5)
+    if (item_skill == 5 && kart_ahead_has_gum && straight_ahead)
     {
-        bool kart_ahead_has_gum =
-            (m_kart_ahead->getAttachment()->getType() == Attachment::ATTACH_BUBBLEGUM_SHIELD);
-
-        bool straight_ahead = false;
-
-        if (m_kart_ahead)
-        {
-            Vec3 ahead_lc = m_kart->getTrans().inverse()
-                (m_kart_ahead->getXYZ());
-            const float abs_angle =
-                atan2f(fabsf(ahead_lc.x()), fabsf(ahead_lc.z()));
-            if (abs_angle < 0.2f) straight_ahead = true;
-        }
-
-        if (kart_ahead_has_gum && straight_ahead)
-        {
-            fire_ahead -= 100.0f;
-        }
+        fire_ahead -= 100.0f;
     }
 
     // Compare how interesting each target is to determine if firing backwards or not
@@ -1687,8 +1704,13 @@ void SkiddingAI::handleBowling(int item_skill)
     //Don't fire on a kart straight ahead with a bubblegum shield
     if (item_skill == 5)
     {
-        bool kart_ahead_has_gum =
-            (m_kart_ahead->getAttachment()->getType() == Attachment::ATTACH_BUBBLEGUM_SHIELD);
+        bool kart_ahead_has_gum = false;
+
+        if (m_kart_ahead)
+        {
+            kart_ahead_has_gum = (m_kart_ahead->getAttachment()->getType()
+                                 == Attachment::ATTACH_BUBBLEGUM_SHIELD);
+        }
 
         if (kart_ahead_has_gum && straight_ahead)
         {
