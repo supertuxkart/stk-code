@@ -327,10 +327,10 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
                 m_race_gui != NULL)
             {
                 float scale = UserConfigParams::m_multitouch_scale *
-                    (float)(irr_driver->getActualScreenSize().Height) / 720.0f;
+                    (float)(irr_driver->getActualScreenSize().Height) / 760.0f;
 
                 m_race_gui->drawEnergyMeter(int(button->x + button->width * 1.15f),
-                                            int(button->y + button->height * 1.35f),
+                                            int(button->y + button->height * 1.15f),
                                             kart, viewport,
                                             core::vector2df(scale, scale));
             }
