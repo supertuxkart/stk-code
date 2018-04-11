@@ -1192,20 +1192,10 @@ EventPropagation InputManager::input(const SEvent& event)
         if (device && device->isAccelerometerActive())
         {
             m_device_manager->updateMultitouchDevice();
-
-            for (unsigned int i = 0; i < device->getButtonsCount(); i++)
-            {
-                MultitouchButton* button = device->getButton(i);
-
-                if (button->type != BUTTON_STEERING)
-                    continue;
-                    
-                float factor = UserConfigParams::m_multitouch_tilt_factor;
-                factor = std::max(factor, 0.1f);
-                button->axis_x = (float)event.AccelerometerEvent.Y / factor;
-                
-                device->handleControls(button);
-            }
+            
+            float factor = UserConfigParams::m_multitouch_tilt_factor;
+            factor = std::max(factor, 0.1f);
+            device->updateAxisX(event.AccelerometerEvent.Y / factor);
         }
     }
 

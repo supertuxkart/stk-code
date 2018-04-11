@@ -2,7 +2,7 @@
 
 Icons firstly made for SuperTuxKart UI on Android.
 
-Files: blur_bg_button ; blur_bg_button_focus ; directionnal_wheel ; drift ; nitro ; nitro_empty ; pause ; thunderbird_reset ; wing_mirror
+Files: blur_bg_button ; blur_bg_button_focus ; steering_wheel ; drift ; nitro ; nitro_empty ; pause ; thunderbird_reset ; wing_mirror
 	- CC BY-SA 4.0 / author: Néd J. Édoire
 
 # License information:

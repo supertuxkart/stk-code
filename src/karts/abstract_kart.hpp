@@ -286,7 +286,20 @@ public:
      *  e.g. in Ghost.
      *  \param category Which category to report on. */
     virtual float getSpeedIncreaseTimeLeft(unsigned int category) const = 0;
+    
     // ------------------------------------------------------------------------
+    /** Sets the kart AI boost state.
+     *  Not pure abstract, since there is no need to implement this e.g. in Ghost.
+     *  \param boosted True if a boost should be applied. */
+    virtual void setBoostAI(bool boosted) = 0;
+    
+    // ------------------------------------------------------------------------
+    /** Returns the kart AI boost state.
+     *  Not pure abstract, since there is no need to implement this e.g. in Ghost. */
+    virtual bool getBoostAI() const = 0;
+    
+    // ------------------------------------------------------------------------
+    
     /** Sets an increased maximum speed for a category.
      *  \param category The category for which to set the higher maximum speed.
      *  \param add_speed How much speed (in m/s) is added to the maximum speed.
@@ -378,6 +391,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the current powerup. */
     virtual Powerup *getPowerup() = 0;
+    // ------------------------------------------------------------------------
+    /** Returns the last used powerup type. */
+    virtual PowerupManager::PowerupType getLastUsedPowerup() = 0;
     // ------------------------------------------------------------------------
     /** Returns a points to this kart's graphical effects. */
     virtual KartGFX* getKartGFX() = 0;

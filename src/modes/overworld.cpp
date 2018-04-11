@@ -57,6 +57,9 @@ OverWorld::~OverWorld()
 /** Function to simplify the start process */
 void OverWorld::enterOverWorld()
 {
+    // update point count and the list of locked/unlocked stuff
+    PlayerManager::getCurrentPlayer()->computeActive();
+
     race_manager->setNumPlayers(1);
     race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
     race_manager->setMinorMode (RaceManager::MINOR_MODE_OVERWORLD);

@@ -18,9 +18,11 @@
 
 #include "script_audio.hpp"
 #include "audio/sfx_manager.hpp"
+#include "scriptengine/aswrappedcall.hpp"
 
 #include <angelscript.h>
 #include <assert.h>
+#include <cstring>
 
 /** \cond DOXYGEN_IGNORE */
 namespace Scripting
@@ -48,9 +50,15 @@ namespace Scripting
 
         void registerScriptFunctions(asIScriptEngine *engine)
         {
-            int r; // of type asERetCodes
             engine->SetDefaultNamespace("Audio");
-            r = engine->RegisterGlobalFunction("void playSound(const string &in)", asFUNCTION(playSound), asCALL_CDECL); assert(r >= 0);
+            
+            bool mp = strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY");
+            asDWORD call_conv = mp ? asCALL_GENERIC : asCALL_CDECL;
+            int r; // of type asERetCodes
+            
+            r = engine->RegisterGlobalFunction("void playSound(const string &in)", 
+                                               mp ? WRAP_FN(playSound) : asFUNCTION(playSound), 
+                                               call_conv); assert(r >= 0);
         }
     }
 

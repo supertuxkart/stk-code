@@ -22,6 +22,7 @@
 #include "input/device_manager.hpp"
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
+#include "scriptengine/aswrappedcall.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track.hpp"
@@ -179,29 +180,65 @@ namespace Scripting
             return insertValues(formatString, arg1, arg2, arg3, arg4);
         }
         /** \endcond */
-
+        
         void registerScriptFunctions(asIScriptEngine *engine)
         {
-            int r; // of type asERetCodes
             engine->SetDefaultNamespace("Utils");
-
-            r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in)", asFUNCTION(proxy_insertValues1), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in)", asFUNCTION(proxy_insertValues2), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in, const string &in)", asFUNCTION(proxy_insertValues3), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in, const string &in, const string &in)", asFUNCTION(proxy_insertValues4), asCALL_CDECL); assert(r >= 0);
             
-            r = engine->RegisterGlobalFunction("void runScript(string &in)", asFUNCTION(runScript), asCALL_CDECL); assert(r >= 0);
+            bool mp = strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY");
+            asDWORD call_conv = mp ? asCALL_GENERIC : asCALL_CDECL;
+            int r; // of type asERetCodes
 
-            r = engine->RegisterGlobalFunction("int randomInt(int, int)", asFUNCTION(randomInt), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("float randomFloat(int, int)", asFUNCTION(randomFloat), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void setTimeout(const string &in, float)", asFUNCTION(setTimeout), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in)", 
+                                               mp ? WRAP_FN(proxy_insertValues1) : asFUNCTION(proxy_insertValues1), 
+                                               call_conv); assert(r >= 0);
+                                               
+            r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in)", 
+                                               mp ? WRAP_FN(proxy_insertValues2) : asFUNCTION(proxy_insertValues2), 
+                                               call_conv); assert(r >= 0);
+                                               
+            r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in, const string &in)", 
+                                               mp ? WRAP_FN(proxy_insertValues3) : asFUNCTION(proxy_insertValues3), 
+                                               call_conv); assert(r >= 0);
+                                               
+            r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in, const string &in, const string &in)", 
+                                               mp ? WRAP_FN(proxy_insertValues4) : asFUNCTION(proxy_insertValues4), 
+                                               call_conv); assert(r >= 0);
+            
+            r = engine->RegisterGlobalFunction("void runScript(string &in)", 
+                                               mp ? WRAP_FN(runScript) : asFUNCTION(runScript), 
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("int randomInt(int, int)", 
+                                               mp ? WRAP_FN(randomInt) : asFUNCTION(randomInt), 
+                                               call_conv); assert(r >= 0);
+                                               
+            r = engine->RegisterGlobalFunction("float randomFloat(int, int)", 
+                                               mp ? WRAP_FN(randomFloat) : asFUNCTION(randomFloat),
+                                               call_conv); assert(r >= 0);
+                                               
+            r = engine->RegisterGlobalFunction("void setTimeout(const string &in, float)", 
+                                               mp ? WRAP_FN(setTimeout) : asFUNCTION(setTimeout), 
+                                               call_conv); assert(r >= 0);
             
             r = engine->RegisterFuncdef("void TimeoutCallback()"); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void setTimeoutDelegate(TimeoutCallback@, float)", asFUNCTION(setTimeoutDelegate), asCALL_CDECL); assert(r >= 0);
+            
+            r = engine->RegisterGlobalFunction("void setTimeoutDelegate(TimeoutCallback@, float)", 
+                                               mp ? WRAP_FN(setTimeoutDelegate) : asFUNCTION(setTimeoutDelegate), 
+                                               call_conv); assert(r >= 0);
 
-            r = engine->RegisterGlobalFunction("void logInfo(const string &in)", asFUNCTION(logInfo), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void logWarning(const string &in)", asFUNCTION(logWarning), asCALL_CDECL); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void logError(const string &in)", asFUNCTION(logError), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void logInfo(const string &in)", 
+                                               mp ? WRAP_FN(logInfo) : asFUNCTION(logInfo), 
+                                               call_conv); assert(r >= 0);
+                                               
+            r = engine->RegisterGlobalFunction("void logWarning(const string &in)", 
+                                               mp ? WRAP_FN(logWarning) : asFUNCTION(logWarning), 
+                                               call_conv); assert(r >= 0);
+                                               
+            r = engine->RegisterGlobalFunction("void logError(const string &in)", 
+                                               mp ? WRAP_FN(logError) : asFUNCTION(logError), 
+                                               call_conv); assert(r >= 0);
+
         }
     }
 

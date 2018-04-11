@@ -118,6 +118,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_max_speed            = new MaxSpeed(this);
     m_terrain_info         = new TerrainInfo();
     m_powerup              = new Powerup(this);
+    m_last_used_powerup    = PowerupManager::POWERUP_NOTHING;
     m_vehicle              = NULL;
     m_initial_position     = position;
     m_race_position        = position;
@@ -143,6 +144,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_min_nitro_time       = 0.0f;
     m_fire_clicked         = 0;
     m_wrongway_counter     = 0;
+    m_boosted_ai           = false;
     m_type                 = RaceManager::KT_AI;
 
     m_view_blocked_by_plunger = 0;
@@ -471,6 +473,17 @@ float Kart::getSpeedIncreaseTimeLeft(unsigned int category) const
 }   // getSpeedIncreaseTimeLeft
 
 // -----------------------------------------------------------------------------
+void Kart::setBoostAI(bool boosted)
+{
+    m_boosted_ai = boosted;
+}   // setBoostAI
+// -----------------------------------------------------------------------------
+bool Kart::getBoostAI() const
+{
+    return m_boosted_ai;
+}   // getBoostAI
+
+// -----------------------------------------------------------------------------
 /** Returns the current material the kart is on. */
 const Material *Kart::getMaterial() const
 {
@@ -507,6 +520,15 @@ void Kart::setPowerup(PowerupManager::PowerupType t, int n)
 {
     m_powerup->set(t, n);
 }   // setPowerup
+
+// ----------------------------------------------------------------------------
+/** Sets the powerup this kart has last used. Number is always 1.
+ *  \param t Type of the powerup.
+ */
+void Kart::setLastUsedPowerup(PowerupManager::PowerupType t)
+{
+    m_last_used_powerup = t;
+}   // setLastUsedPowerup
 
 // -----------------------------------------------------------------------------
 int Kart::getNumPowerup() const
@@ -1356,6 +1378,10 @@ void Kart::update(float dt)
 
     if(m_controls.getFire() && !m_fire_clicked && !m_kart_animation)
     {
+        if (m_powerup->getType() != PowerupManager::POWERUP_NOTHING)
+        {
+            setLastUsedPowerup(m_powerup->getType());
+        }
         // use() needs to be called even if there currently is no collecteable
         // since use() can test if something needs to be switched on/off.
         m_powerup->use() ;
