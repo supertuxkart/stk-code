@@ -11,13 +11,7 @@ layout(location = 3) in vec2 i_uv;
 layout(location = 6) in ivec4 i_joint;
 layout(location = 7) in vec4 i_weight;
 layout(location = 8) in vec3 i_origin;
-
-#if defined(Converts_10bit_Vector)
-layout(location = 9) in vec4 i_rotation_orig;
-#else
 layout(location = 9) in vec4 i_rotation;
-#endif
-
 layout(location = 10) in vec4 i_scale;
 layout(location = 12) in ivec2 i_misc_data;
 
@@ -27,11 +21,6 @@ out vec2 uv;
 
 void main()
 {
-
-#if defined(Converts_10bit_Vector)
-    vec4 i_rotation = convert10BitVector(i_rotation_orig);
-#endif
-
     vec4 idle_position = vec4(i_position, 1.0);
     vec4 skinned_position = vec4(0.0);
     int skinning_offset = i_misc_data.x;
@@ -83,9 +72,7 @@ void main()
 #endif
 
     skinned_position = joint_matrix * idle_position;
-
-    vec4 quaternion = normalize(vec4(i_rotation.xyz, i_scale.w));
-    vec4 world_position = getWorldPosition(i_origin, quaternion, i_scale.xyz,
+    vec4 world_position = getWorldPosition(i_origin, i_rotation, i_scale.xyz,
         skinned_position.xyz);
     uv = i_uv;
     gl_Position = u_shadow_projection_view_matrices[layer] * world_position;
