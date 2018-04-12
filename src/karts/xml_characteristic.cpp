@@ -563,10 +563,14 @@ void XmlCharacteristic::load(const XMLNode *node)
     {
         sub_node->get("duration",
             &m_values[SLIPSTREAM_DURATION]);
+        sub_node->get("base-speed",
+            &m_values[SLIPSTREAM_BASE_SPEED]);
         sub_node->get("length",
             &m_values[SLIPSTREAM_LENGTH]);
         sub_node->get("width",
             &m_values[SLIPSTREAM_WIDTH]);
+        sub_node->get("inner-factor",
+            &m_values[SLIPSTREAM_INNER_FACTOR]);
         sub_node->get("collect-time",
             &m_values[SLIPSTREAM_COLLECT_TIME]);
         sub_node->get("use-time",
@@ -624,4 +628,3 @@ void XmlCharacteristic::load(const XMLNode *node)
 
     /* <characteristics-end getXml> */
 }   // load
-
