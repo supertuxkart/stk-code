@@ -274,9 +274,13 @@ public:
      *  \param torque The rotation to apply.  */
     void setTimedRotation(float t, const btVector3 &rot)
     {
-        m_additional_rotation      = rot/t;
+        if(t>0) m_additional_rotation = rot/t;
         m_time_additional_rotation = t;
     }   // setTimedTorque
+    // ------------------------------------------------------------------------
+    const btVector3& getTimedRotation() const { return m_additional_rotation;  }
+    // ------------------------------------------------------------------------
+    float getTimedRotationTime() const { return m_time_additional_rotation;  }
     // ------------------------------------------------------------------------
     /** Sets the maximum speed for this kart. */
     void setMaxSpeed(float new_max_speed) 
