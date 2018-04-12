@@ -74,6 +74,11 @@ protected:
      *  new lap is triggered. */
     Vec3 m_xyz_front;
 
+    /** The coordinates of the 30 previous positions */
+    Vec3 m_previous_xyz[30];
+
+    float time_previous_counter;
+
     /** Is time flying activated */
     bool m_is_jumping;
 
@@ -470,6 +475,10 @@ public:
     /** Returns the normal of the terrain the kart is over atm. This is
      *  defined even if the kart is flying. */
     virtual const Vec3& getNormal() const;
+    // ------------------------------------------------------------------------
+    /** Returns the position 0,25s before */
+    virtual const Vec3& getPreviousXYZ() const;
+
     // ------------------------------------------------------------------------
     /** For debugging only: check if a kart is flying. */
     bool isFlying() const { return m_flying;  }
