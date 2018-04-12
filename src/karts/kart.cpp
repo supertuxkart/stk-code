@@ -1418,23 +1418,29 @@ void Kart::update(int ticks)
         old_group = m_body->getBroadphaseHandle()->m_collisionFilterGroup;
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
+#undef XX
 #ifdef XX
-    Log::verbose("physicsafter", "%s t %f %f xyz(9-11) %f %f %f %f %f %f "
+    Log::verbose("physicsafter", "%s t %f %d xyz(9-11) %f %f %f %f %f %f "
         "v(16-18) %f %f %f steerf(20) %f maxangle(22) %f speed(24) %f "
-        "steering(26-27) %f %f clock(29) %lf",
+        "steering(26-27) %f %f clock(29) %lf skidstate(31) %d factor(33) %f "
+        "maxspeed(35) %f engf(37) %f",
         getIdent().c_str(),
-        World::getWorld()->getTime(), dt,
+        World::getWorld()->getTime(), World::getWorld()->getTimeTicks(),
         getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
         m_body->getWorldTransform().getOrigin().getX(),
         m_body->getWorldTransform().getOrigin().getY(),
         m_body->getWorldTransform().getOrigin().getZ(),
-        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),  //13,14,15
-        m_skidding->getSteeringFraction(), //19
-        getMaxSteerAngle(),  //20
-        m_speed,  //21
-        m_vehicle->getWheelInfo(0).m_steering,  //23
-        m_vehicle->getWheelInfo(1).m_steering,  //24
-        StkTime::getRealTime()
+        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),  //16-18
+        m_skidding->getSteeringFraction(), //20
+        getMaxSteerAngle(),  //22
+        m_speed,  //24
+        m_vehicle->getWheelInfo(0).m_steering,  //26
+        m_vehicle->getWheelInfo(1).m_steering,  //27
+        StkTime::getRealTime(),  //29
+        m_skidding->getSkidState(), //31
+        m_skidding->getSkidFactor(),    //33
+        m_max_speed->getCurrentMaxSpeed(),
+        m_max_speed->getCurrentAdditionalEngineForce()  // 37
     );
 #endif
     // After the physics step was done, the position of the wheels (as stored
