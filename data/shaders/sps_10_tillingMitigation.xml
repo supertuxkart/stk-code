@@ -1,12 +1,10 @@
 <spshader>
     <shader-info name="tillingMitigation" fallback-shader="solid" use-tangents="Y"/>
     <first-pass vertex-shader="sp_pass.vert"
-        fragment-shader="sp_tilling_mitigation.frag"
-        skinned-mesh-shader="sp_skinning.vert">
+        fragment-shader="sp_tilling_mitigation.frag">
     </first-pass>
     <shadow-pass vertex-shader="sp_shadow.vert"
-        fragment-shader="white.frag"
-        skinned-mesh-shader="sp_skinning_shadow.vert">
+        fragment-shader="white.frag">
     </shadow-pass>
     <uniform-assigners>
         <uniform-assigner name="layer"
