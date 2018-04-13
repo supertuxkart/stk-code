@@ -310,6 +310,23 @@ public:
     virtual void increaseMaxSpeed(unsigned int category, float add_speed,
                                   float engine_force, float duration,
                                   float fade_out_time) = 0;
+
+    // ----------------------------------------------------------------------------
+    /** This adjusts the top speed using increaseMaxSpeed, but additionally
+     *  causes an instant speed boost, which can be smaller than add-max-speed.
+     *  (e.g. a zipper can give an instant boost of 5 m/s, but over time would
+     *  allow the speed to go up by 10 m/s).
+     *  \param category The category for which the speed is increased.
+     *  \param add_max_speed Increase of the maximum allowed speed.
+     *  \param speed_boost An instant speed increase for this kart.
+     *  \param engine_force Additional engine force.
+     *  \param duration Duration of the increased speed.
+     *  \param fade_out_time How long the maximum speed will fade out linearly.
+     */
+    virtual void instantSpeedIncrease(unsigned int category, float add_max_speed,
+                                    float speed_boost, float engine_force, float duration,
+                                    float fade_out_time) = 0;
+
     // ------------------------------------------------------------------------
     /** Defines a slowdown, which is in fraction of top speed.
      *  \param category The category for which the speed is increased.
