@@ -467,6 +467,15 @@ void Kart::increaseMaxSpeed(unsigned int category, float add_speed,
 }   // increaseMaxSpeed
 
 // -----------------------------------------------------------------------------
+void Kart::instantSpeedIncrease(unsigned int category, float add_max_speed,
+                            float speed_boost, float engine_force, float duration,
+                            float fade_out_time)
+{
+    m_max_speed->instantSpeedIncrease(category, add_max_speed, speed_boost,
+                                      engine_force, duration, fade_out_time);
+}   // instantSpeedIncrease
+
+// -----------------------------------------------------------------------------
 void Kart::setSlowdown(unsigned int category, float max_speed_fraction,
                        float fade_in_time)
 {
