@@ -550,7 +550,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
         unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count,
                                                      state, gauge_width, gauge_height, offset);
 
-        short int index[5]={0};
+        short int index[vertices_count]={0};
         for(unsigned int i=0; i<count; i++)
         {
             index[i]=count-i-1;
@@ -582,7 +582,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
         unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count, 
                                                      coin_target, gauge_width, gauge_height, offset);
 
-        short int index[5]={0};
+        short int index[vertices_count]={0};
         for(unsigned int i=0; i<count; i++)
         {
             index[i]=count-i-1;
