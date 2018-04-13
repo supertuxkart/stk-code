@@ -278,6 +278,9 @@ public:
     virtual void   increaseMaxSpeed(unsigned int category, float add_speed,
                                     float engine_force, float duration,
                                     float fade_out_time);
+    virtual void   instantSpeedIncrease(unsigned int category, float add_max_speed,
+                                    float speed_boost, float engine_force, float duration,
+                                    float fade_out_time);
     virtual void   setSlowdown(unsigned int category, float max_speed_fraction,
                                float fade_in_time);
     virtual float getSpeedIncreaseTimeLeft(unsigned int category) const;
