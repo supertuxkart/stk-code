@@ -118,8 +118,6 @@ void btKart::reset()
         updateWheelTransform(i, true);
     }
     m_visual_wheels_touch_ground = false;
-    m_skid_angular_velocity      = 0;
-    m_is_skidding                = false;
     m_allow_sliding              = false;
     m_num_wheels_on_ground       = 0;
     m_additional_impulse         = btVector3(0,0,0);
@@ -831,34 +829,7 @@ void btKart::updateFriction(btScalar timeStep)
     // Note: don't reset zipper speed, or the kart rewinder will
     // get incorrect zipper information.
 
-    // The kart just stopped skidding. Adjust the velocity so that
-    // it points in the right direction.
-    // FIXME: this is not good enough, we need some smooth interpolation here.
-    if(m_is_skidding && m_skid_angular_velocity == 0)
-    {
-        btVector3 v = m_chassisBody->getLinearVelocity();
-        v.setZ(sqrt(v.getX()*v.getX()+v.getZ()*v.getZ()));
-        v.setX(0);
-        btVector3 v_new = m_chassisBody->getWorldTransform().getBasis()*v;
-        m_chassisBody->setLinearVelocity(v_new);
-        m_is_skidding = false;
-    }
-
-    if(m_skid_angular_velocity!=0)
-    {
-        m_is_skidding = true;
-        // Skidding is implemented by not having any forward impulse,
-        // but only add a side impulse
-        for(unsigned int i=0; i<4; i++)
-        {
-            m_forwardImpulse[i] = 0;
-            m_sideImpulse[i] = 0;
-        }
-        btVector3 av = m_chassisBody->getAngularVelocity();
-        av.setY(m_skid_angular_velocity);
-        m_chassisBody->setAngularVelocity(av);
-    }
-    else if (sliding && (m_allow_sliding || m_time_additional_impulse>0) )
+    if (sliding && (m_allow_sliding || m_time_additional_impulse>0) )
     {
         for (int wheel = 0; wheel < getNumWheels(); wheel++)
         {
