@@ -44,6 +44,8 @@ SlipStream::SlipStream(AbstractKart* kart)
 {
     m_node = NULL;
     m_kart = kart;
+    m_moving = NULL;
+    m_moving_fast = NULL;
 
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
@@ -163,8 +165,13 @@ SlipStream::~SlipStream()
     }
     delete m_slipstream_quad;
     delete m_slipstream_inner_quad;
-    delete m_moving;
-    delete m_moving_fast;
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        delete m_moving;
+        delete m_moving_fast;
+    }
+#endif
 
 }   // ~SlipStream
 
@@ -558,8 +565,13 @@ void SlipStream::update(float dt)
         updateQuad();
     }
 
-    m_moving->update(dt);
-    m_moving_fast->update(dt);
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        m_moving->update(dt);
+        m_moving_fast->update(dt);
+    }
+#endif
 
     if(m_slipstream_mode==SS_USE)
     {
@@ -580,7 +592,9 @@ void SlipStream::update(float dt)
 #ifndef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
     if(m_kart->getSpeed() < kp->getSlipstreamMinSpeed() - 2.0f)
     {
-        setIntensity(0, NULL);
+#ifndef SERVER_ONLY
+        if (CVS->isGLSL()) setIntensity(0, NULL);
+#endif
         m_slipstream_mode = SS_NONE;
         if(UserConfigParams::m_slipstream_debug)
         {
@@ -712,7 +726,9 @@ void SlipStream::update(float dt)
         }
         m_slipstream_time -=dt;
         if(m_slipstream_time<0) m_slipstream_mode = SS_NONE;
-        setIntensity(0, NULL);
+#ifndef SERVER_ONLY
+        if (CVS->isGLSL()) setIntensity(0, NULL);
+#endif
         return;
     }   // if !is_sstreaming
 
@@ -741,7 +757,9 @@ void SlipStream::update(float dt)
 
     if(isSlipstreamReady())
         m_kart->setSlipstreamEffect(9.0f);
-    setIntensity(m_slipstream_time, m_target_kart);
-
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL()) setIntensity(m_slipstream_time, m_target_kart);
+#endif
     m_slipstream_mode = SS_COLLECT;
 }   // update
+isG
