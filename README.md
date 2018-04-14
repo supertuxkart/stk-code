@@ -80,7 +80,7 @@ make -j4
 ```
 STK can then be run from the build directory with `bin/supertuxkart`
 
-### Recompiling with the most recent code
+#### Keeping your build up to date
 
 To recompile the latest code without redownloading the entire source, first run the ```svn up``` command inside the 'stk-assets' directory, then run the following commands inside the 'stk-code' directory:
 
@@ -90,7 +90,9 @@ cmake ..
 make -j4
 ```
 
-*Note: "-j4" is an example, for a faster build, use "-jx" instead, where "x" is the amount of CPU threads you have, minus one.
+##### Build Speed Optimization
+
+"-j4" is an example, for a faster build, use "-jx" instead, where "x" is the amount of CPU threads you have, minus one.
 
 ### Further options
 
