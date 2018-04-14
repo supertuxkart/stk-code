@@ -1207,6 +1207,11 @@ void Kart::eliminate()
         m_stars_effect->reset();
         m_stars_effect->update(1);
     }
+   
+    if (m_attachment)
+    {
+        m_attachment->clear();
+    }
 
     m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_TERRAIN, 0);
     m_kart_gfx->setGFXInvisible();
