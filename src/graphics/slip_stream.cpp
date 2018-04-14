@@ -762,4 +762,3 @@ void SlipStream::update(float dt)
 #endif
     m_slipstream_mode = SS_COLLECT;
 }   // update
-isG
