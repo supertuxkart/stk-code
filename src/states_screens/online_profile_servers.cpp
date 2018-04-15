@@ -51,7 +51,8 @@ OnlineProfileServers::OnlineProfileServers() : GUIEngine::Screen("online/profile
 void OnlineProfileServers::beforeAddingWidget()
 {
 #ifdef ANDROID
-    getWidget("create_wan_server")->setVisible(false);
+    if (getWidget("create_wan_server"))
+        getWidget("create_wan_server")->setVisible(false);
 #endif
 }   // beforeAddingWidget
 
@@ -76,6 +77,11 @@ void OnlineProfileServers::init()
         ribbon->select("find_wan_server", PLAYER_ID_GAME_MASTER);
         ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
+#ifdef ANDROID
+    if (getWidget("create_wan_server") &&
+        getWidget("create_wan_server")->isVisible())
+        getWidget("create_wan_server")->setVisible(false);
+#endif
 }   // init
 
 // -----------------------------------------------------------------------------
