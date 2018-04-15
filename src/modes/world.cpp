@@ -1214,7 +1214,7 @@ void World::eliminateKart(int kart_id, bool notify_of_elimination)
             {
                 // Store the temporary string because clang would mess this up
                 // (remove the stringw before the wchar_t* is used).
-                const core::stringw &kart_name = kart->getName();
+                const core::stringw &kart_name = kart->getController()->getName();
                 m_race_gui->addMessage(_("'%s' has been eliminated.",
                                        kart_name),
                                        camera->getKart(),

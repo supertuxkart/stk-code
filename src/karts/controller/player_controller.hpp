@@ -93,6 +93,9 @@ public:
     virtual void finishedRace(float time) OVERRIDE
     {
     }   // finishedRace
+    // ------------------------------------------------------------------------
+    /** Returns the name of the player profile. */
+    core::stringw getName() const OVERRIDE;
 
 };   // class PlayerController
 

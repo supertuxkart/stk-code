@@ -383,3 +383,11 @@ bool LocalPlayerController::canGetAchievements() const
 {
     return m_player->getConstProfile() == PlayerManager::getCurrentPlayer();
 }   // canGetAchievements
+
+// ----------------------------------------------------------------------------
+core::stringw LocalPlayerController::getName() const
+{
+    if (NetworkConfig::get()->isNetworking())
+        return PlayerController::getName();
+    return m_player->getProfile()->getName();
+}   // getName

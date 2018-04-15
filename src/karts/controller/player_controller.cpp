@@ -29,6 +29,10 @@
 #include "karts/skidding.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
+#include "network/game_setup.hpp"
+#include "network/network_config.hpp"
+#include "network/network_player_profile.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "utils/constants.hpp"
@@ -385,3 +389,16 @@ void PlayerController::rewindTo(BareNetworkString *buffer)
     m_steer_val_l = buffer->getUInt32();
     m_steer_val_r = buffer->getUInt32();
 }   // rewindTo
+
+// ----------------------------------------------------------------------------
+core::stringw PlayerController::getName() const
+{
+    if (NetworkConfig::get()->isNetworking())
+    {
+        auto& players = LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
+            ->getPlayers();
+        if (auto player = players.at(m_kart->getWorldKartId()).lock())
+            return player->getName();
+    }
+    return m_kart->getName();
+}   // getName

@@ -385,7 +385,7 @@ void LinearWorld::newLap(unsigned int kart_index)
 
         // Store the temporary string because clang would mess this up
         // (remove the stringw before the wchar_t* is used).
-        const core::stringw &kart_name = kart->getName();
+        const core::stringw &kart_name = kart->getController()->getName();
 
         //I18N: as in "fastest lap: 60 seconds by Wilber"
         irr::core::stringw m_fastest_lap_message =
