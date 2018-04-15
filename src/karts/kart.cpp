@@ -1207,6 +1207,11 @@ void Kart::eliminate()
         m_stars_effect->reset();
         m_stars_effect->update(1);
     }
+   
+    if (m_attachment)
+    {
+        m_attachment->clear();
+    }
 
     m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_TERRAIN, 0);
     m_kart_gfx->setGFXInvisible();
@@ -1996,11 +2001,13 @@ void Kart::updateNitro(float dt)
 
         // when pressing the key, don't allow the min time to go under zero.
         // If it went under zero, it would be reset
+        // As the time deduction happens before, it can be an arbitrarily
+        // small number > 0. Smaller means more responsive controls.
         if (m_controls.getNitro() && m_min_nitro_time <= 0.0f)
-            m_min_nitro_time = 0.1f;
+            m_min_nitro_time = 0.005f;
     }
 
-    bool increase_speed = (m_controls.getNitro() && isOnGround());
+    bool increase_speed = (m_min_nitro_time > 0 && isOnGround());
     if (!increase_speed && m_min_nitro_time <= 0.0f)
     {
         if(m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING)
@@ -2863,7 +2870,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     // --------------------------------------------------------
     float nitro_frac = 0;
     if ( (m_controls.getNitro() || m_min_nitro_time > 0.0f) &&
-         isOnGround() &&  m_collected_energy > 0            )
+          m_collected_energy > 0            )
     {
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!
