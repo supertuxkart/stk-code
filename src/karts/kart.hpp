@@ -77,7 +77,7 @@ protected:
     /** The coordinates of the 30 previous positions */
     Vec3 m_previous_xyz[30];
 
-    float time_previous_counter;
+    float m_time_previous_counter;
 
     /** Is time flying activated */
     bool m_is_jumping;
