@@ -84,7 +84,8 @@ STK can then be run from the build directory with `bin/supertuxkart`
 
 To recompile the latest code without redownloading the entire source, first run the ```svn up``` command inside the 'stk-assets' directory, then run the following commands inside the 'stk-code' directory:
 
-```git pull
+```bash
+git pull
 cd cmake_build
 cmake ..
 make -j4
