@@ -1295,7 +1295,7 @@ void World::unpause()
 void World::escapePressed()
 {
     if (!(NetworkConfig::get()->isNetworking() &&
-        getPhase() < RACE_PHASE))
+        getPhase() < MUSIC_PHASE))
         new RacePausedDialog(0.8f, 0.6f);
 }   // escapePressed
 
