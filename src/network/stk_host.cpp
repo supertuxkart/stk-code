@@ -293,6 +293,8 @@ STKHost::STKHost(bool server)
                               "ENet server host.");
     }
     setPrivatePort();
+    if (server)
+        Log::info("STKHost", "Server port is %d", m_private_port);
 }   // STKHost
 
 // ----------------------------------------------------------------------------
