@@ -2,6 +2,7 @@
 #define SERVER_LOBBY_HPP
 
 #include "network/protocols/lobby_protocol.hpp"
+#include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
 
 #include <atomic>
@@ -77,6 +78,8 @@ private:
 
     /** Ban list ip (in decimal) with online user id. */
     std::map<uint32_t, uint32_t> m_ban_list;
+
+    TransportAddress m_server_address;
 
     // connection management
     void clientDisconnected(Event* event);

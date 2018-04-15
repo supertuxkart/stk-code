@@ -256,6 +256,7 @@ void ServerLobby::asynchronousUpdate()
         }
         else
         {
+            m_server_address.copy(STKHost::get()->getPublicAddress());
             STKHost::get()->startListening();
             m_state = REGISTER_SELF_ADDRESS;
         }
@@ -465,10 +466,9 @@ void ServerLobby::update(int ticks)
 void ServerLobby::registerServer()
 {
     Online::XMLRequest *request = new Online::XMLRequest();
-    const TransportAddress& addr = STKHost::get()->getPublicAddress();
     NetworkConfig::get()->setUserDetails(request, "create");
-    request->addParameter("address",      addr.getIP()                    );
-    request->addParameter("port",         addr.getPort()                  );
+    request->addParameter("address",      m_server_address.getIP()        );
+    request->addParameter("port",         m_server_address.getPort()      );
     request->addParameter("private_port",
                                     STKHost::get()->getPrivatePort()      );
     request->addParameter("name",   NetworkConfig::get()->getServerName() );
@@ -481,7 +481,8 @@ void ServerLobby::registerServer()
     request->addParameter("version",
         (unsigned)NetworkConfig::m_server_version);
 
-    Log::info("ServerLobby", "Public server addr %s", addr.toString().c_str());
+    Log::info("ServerLobby", "Public server address %s",
+        m_server_address.toString().c_str());
 
     request->executeNow();
 
@@ -508,14 +509,13 @@ void ServerLobby::registerServer()
  */
 void ServerLobby::unregisterServer()
 {
-    const TransportAddress &addr = STKHost::get()->getPublicAddress();
     Online::XMLRequest* request = new Online::XMLRequest();
     NetworkConfig::get()->setUserDetails(request, "stop");
 
-    request->addParameter("address", addr.getIP());
-    request->addParameter("port", addr.getPort());
-
-    Log::info("ServerLobby", "address %s", addr.toString().c_str());
+    request->addParameter("address", m_server_address.getIP());
+    request->addParameter("port", m_server_address.getPort());
+    Log::info("ServerLobby", "Unregister server address %s",
+        m_server_address.toString().c_str());
     request->executeNow();
 
     const XMLNode * result = request->getXMLData();
