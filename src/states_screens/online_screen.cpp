@@ -25,6 +25,7 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include "input/device_manager.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/client_lobby.hpp"
@@ -234,9 +235,10 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
         }
         core::stringw instruction =
             _("Enter the server address with IP followed by : and then port.");
-        new GeneralTextFieldDialog(instruction.c_str(),
-            [](const irr::core::stringw& text) {},
-            [](GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
+        auto gtfd = new GeneralTextFieldDialog(instruction.c_str(),
+            [] (const irr::core::stringw& text) {},
+            [this] (GUIEngine::LabelWidget* lw,
+                   GUIEngine::TextBoxWidget* tb)->bool
             {
                 TransportAddress server_addr(
                     StringUtils::wideToUtf8(tb->getText()));
@@ -267,11 +269,17 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                     return false;
                 }
 
+                m_entered_server_address.copy(server_addr);
                 auto cl = LobbyProtocol::create<ClientLobby>();
                 cl->setAddress(server_addr);
                 cl->requestStart();
                 return true;
             });
+        if (!m_entered_server_address.isUnset())
+        {
+            gtfd->getTextField()->setText(StringUtils::utf8ToWide(
+                m_entered_server_address.toString()));
+        }
     }
 }   // eventCallback
 
