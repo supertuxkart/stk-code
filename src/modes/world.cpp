@@ -341,11 +341,13 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
         gk = ReplayPlay::get()->getNumGhostKart();
 
     std::shared_ptr<RenderInfo> ri = std::make_shared<RenderInfo>();
-    if (global_player_id > -1 && race_manager->getKartInfo(global_player_id)
-        .getDefaultKartColor() > 0.0f)
+    core::stringw online_name;
+    if (global_player_id > -1)
     {
         ri->setHue(race_manager->getKartInfo(global_player_id)
             .getDefaultKartColor());
+        online_name = race_manager->getKartInfo(global_player_id)
+            .getPlayerName();
     }
 
     int position           = index+1;
@@ -378,6 +380,8 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     case RaceManager::KT_NETWORK_PLAYER:
     {
         controller = new NetworkPlayerController(new_kart);
+        if (!online_name.empty())
+            new_kart->setOnScreenText(online_name.c_str());
         m_num_players++;
         break;
     }
