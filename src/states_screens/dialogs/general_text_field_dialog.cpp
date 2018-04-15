@@ -69,7 +69,7 @@ GUIEngine::EventPropagation GeneralTextFieldDialog::processEvent(const std::stri
     else if (eventSource == "ok")
     {
         // If validation callback return true, dismiss the dialog
-        if (m_val_cb(m_title, m_text_field))
+        if (!m_self_destroy && m_val_cb(m_title, m_text_field))
             m_self_destroy = true;
         return GUIEngine::EVENT_BLOCK;
     }
@@ -88,7 +88,7 @@ void GeneralTextFieldDialog::onEnterPressedInternal()
         return;
     }
 
-    if (m_val_cb(m_title, m_text_field))
+    if (!m_self_destroy && m_val_cb(m_title, m_text_field))
         m_self_destroy = true;
 
 }   // onEnterPressedInternal
