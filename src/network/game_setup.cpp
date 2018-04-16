@@ -23,14 +23,15 @@
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
-#include "online/online_profile.hpp"
+#include "network/protocols/game_events_protocol.hpp"
+#include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
 #include "utils/log.hpp"
 
 //-----------------------------------------------------------------------------
 /** Update and see if any player disconnects.
  *  \param remove_disconnected_players remove the disconnected players,
- *  otherwise replace with AI (when racing), so this function must be called
+ *  otherwise eliminate the kart in world, so this function must be called
  *  in main thread.
  */
 void GameSetup::update(bool remove_disconnected_players)
@@ -46,8 +47,27 @@ void GameSetup::update(bool remove_disconnected_players)
         return;
     }
     lock.unlock();
-    if (!World::getWorld())
+    if (!World::getWorld() ||
+        World::getWorld()->getPhase() < WorldStatus::MUSIC_PHASE)
         return;
+    for (uint8_t i = 0; i < (uint8_t)m_players.size(); i++)
+    {
+        if (!m_players[i].expired())
+            continue;
+        AbstractKart* k = World::getWorld()->getKart(i);
+        if (!k->isEliminated())
+        {
+            World::getWorld()->eliminateKart(i,
+                false/*notify_of_elimination*/);
+            k->setPosition(
+                World::getWorld()->getCurrentNumKarts() + 1);
+            k->finishedRace(World::getWorld()->getTime());
+            NetworkString p(PROTOCOL_GAME_EVENTS);
+            p.setSynchronous(true);
+            p.addUInt8(GameEventsProtocol::GE_PLAYER_DISCONNECT).addUInt8(i);
+            STKHost::get()->sendPacketToAllPeers(&p, true);
+        }
+    }
 }   // removePlayer
 
 //-----------------------------------------------------------------------------

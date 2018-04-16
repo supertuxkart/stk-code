@@ -1202,6 +1202,7 @@ AbstractKart *World::getLocalPlayerKart(unsigned int n) const
 /** Remove (eliminate) a kart from the race */
 void World::eliminateKart(int kart_id, bool notify_of_elimination)
 {
+    assert(kart_id < (int)m_karts.size());
     AbstractKart *kart = m_karts[kart_id];
     if (kart->isGhostKart()) return;
 

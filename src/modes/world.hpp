@@ -113,7 +113,6 @@ protected:
 
     void  updateHighscores  (int* best_highscore_rank);
     void  resetAllKarts     ();
-    void  eliminateKart     (int kart_number, bool notifyOfElimination=true);
     Controller*
           loadAIController  (AbstractKart *kart);
 
@@ -321,6 +320,8 @@ public:
     virtual void escapePressed();
     // ------------------------------------------------------------------------
     virtual void loadCustomModels() {}
+    // ------------------------------------------------------------------------
+    void eliminateKart(int kart_number, bool notify_of_elimination = true);
 
     /** Set the network mode (true if networked) */
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }

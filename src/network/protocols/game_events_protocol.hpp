@@ -9,12 +9,15 @@ class Item;
 
 class GameEventsProtocol : public Protocol
 {
-private:
+public:
     enum GameEventType : uint8_t
     {
         GE_ITEM_COLLECTED     = 1,
-        GE_KART_FINISHED_RACE = 2
+        GE_KART_FINISHED_RACE = 2,
+        GE_PLAYER_DISCONNECT = 3
     };   // GameEventType
+private:
+    void eliminatePlayer(const NetworkString &ns);
 
 public:
              GameEventsProtocol();
@@ -31,7 +34,7 @@ public:
     // ------------------------------------------------------------------------
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE 
     {
-        return false; 
+        return false;
     }   // notifyEventAsynchronous
 
 

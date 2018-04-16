@@ -46,11 +46,6 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         Log::warn("GameEventsProtocol", "Too short message.");
         return true;
     }
-    if ( event->getPeer()->getClientServerToken() != data.getToken())
-    {
-        Log::warn("GameEventsProtocol", "Bad token.");
-        return true;
-    }
     uint8_t type = data.getUInt8();
     switch (type)
     {
@@ -58,7 +53,8 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         collectedItem(data);        break;
     case GE_KART_FINISHED_RACE:
         kartFinishedRace(data);     break;
-
+    case GE_PLAYER_DISCONNECT:
+        eliminatePlayer(data);      break;
     default:
         Log::warn("GameEventsProtocol", "Unkown message type.");
         break;
@@ -89,6 +85,22 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
     STKHost::get()->sendPacketToAllPeers(ns, /*reliable*/true);
     delete ns;
 }   // collectedItem
+
+// ----------------------------------------------------------------------------
+void GameEventsProtocol::eliminatePlayer(const NetworkString &data)
+{
+    assert(NetworkConfig::get()->isClient());
+    if (data.size() < 1)
+    {
+        Log::warn("GameEventsProtocol", "eliminatePlayer: Too short message.");
+    }
+    int kartid = data.getUInt8();
+    World::getWorld()->eliminateKart(kartid, false/*notify_of_elimination*/);
+    World::getWorld()->getKart(kartid)->setPosition(
+        World::getWorld()->getCurrentNumKarts() + 1);
+    World::getWorld()->getKart(kartid)->finishedRace(
+        World::getWorld()->getTime());
+}   // eliminatePlayer
 
 // ----------------------------------------------------------------------------
 /** Called on the client when an itemCollected message is received.
