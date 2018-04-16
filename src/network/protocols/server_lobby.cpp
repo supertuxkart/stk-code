@@ -772,6 +772,21 @@ void ServerLobby::connectionRequested(Event* event)
         return;
     }
 
+    // Check server version
+    int version = data.getUInt8();
+    if (version < stk_config->m_max_server_version ||
+        version > stk_config->m_max_server_version)
+    {
+        NetworkString *message = getNetworkString(2);
+        message->addUInt8(LE_CONNECTION_REFUSED)
+                .addUInt8(RR_INCOMPATIBLE_DATA);
+        peer->sendPacket(message);
+        peer->reset();
+        delete message;
+        Log::verbose("ServerLobby", "Player refused: wrong server version");
+        return;
+    }
+
     // Check for password
     std::string password;
     data.decodeString(&password);

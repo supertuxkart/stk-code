@@ -9,6 +9,10 @@
        Older versions will be ignored. -->
   <track-version min="6" max="7"/>
 
+  <!-- Minimum and maxium server versions that be be read by this binary.
+       Older versions will be ignored. -->
+  <server-version min="1" max="1"/>
+
   <!-- Maximum number of karts to be used at the same time. This limit
        can easily be increased, but some tracks might not have valid start
        positions for those additional karts. -->

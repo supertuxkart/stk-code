@@ -260,6 +260,7 @@ void ClientLobby::update(int ticks)
     {
         NetworkString *ns = getNetworkString();
         ns->addUInt8(LE_CONNECTION_REQUESTED)
+            .addUInt8(NetworkConfig::m_server_version)
             .encodeString(NetworkConfig::get()->getPassword());
 
         assert(!NetworkConfig::get()->isAddingNetworkPlayers());

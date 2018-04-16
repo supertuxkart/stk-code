@@ -18,6 +18,7 @@
 
 #include "network/servers_manager.hpp"
 
+#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "network/network.hpp"
 #include "network/network_config.hpp"
@@ -160,8 +161,9 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                 if (len > 0)
                 {
                     BareNetworkString s(buffer, len);
-                    uint8_t version = s.getUInt8();
-                    if (version != NetworkConfig::m_server_version)
+                    int version = s.getUInt8();
+                    if (version < stk_config->m_max_server_version ||
+                        version > stk_config->m_max_server_version)
                     {
                         Log::verbose("ServersManager", "Skipping a server");
                         continue;
@@ -236,10 +238,11 @@ void ServersManager::setWanServers(bool success, const XMLNode* input)
     const XMLNode *servers_xml = input->getNode("servers");
     for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
     {
-        unsigned version = 0;
+        int version = 0;
         servers_xml->getNode(i)->get("version", &version);
         assert(version != 0);
-        if (version != NetworkConfig::m_server_version)
+        if (version < stk_config->m_max_server_version ||
+            version > stk_config->m_max_server_version)
         {
             Log::verbose("ServersManager", "Skipping a server");
             continue;
