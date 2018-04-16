@@ -32,6 +32,7 @@
 #include "network/network_config.hpp"
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "online/request_manager.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/online_lan.hpp"
@@ -234,7 +235,8 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
             return;
         }
         core::stringw instruction =
-            _("Enter the server address with IP followed by : and then port.");
+            _("Enter the server address with IP (optional) followed by : and"
+            " then port.");
         auto gtfd = new GeneralTextFieldDialog(instruction.c_str(),
             [] (const irr::core::stringw& text) {},
             [this] (GUIEngine::LabelWidget* lw,
@@ -242,7 +244,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
             {
                 TransportAddress server_addr(
                     StringUtils::wideToUtf8(tb->getText()));
-                if (server_addr.isUnset())
+                if (server_addr.getIP() == 0)
                 {
                     core::stringw err = _("Invalid server address: %s.",
                         tb->getText());
@@ -269,9 +271,10 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                     return false;
                 }
 
-                m_entered_server_address.copy(server_addr);
+                m_entered_server_address.copy(
+                    STKHost::get()->getServerPeerForClient()->getAddress());
                 auto cl = LobbyProtocol::create<ClientLobby>();
-                cl->setAddress(server_addr);
+                cl->setAddress(m_entered_server_address);
                 cl->requestStart();
                 return true;
             });

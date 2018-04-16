@@ -959,6 +959,12 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
             Log::error("STKHost", "which is not localhost - rejected.");
         }
     }
+    else if (command == "stk-server-port")
+    {
+        BareNetworkString s;
+        s.addUInt16(m_private_port);
+        direct_socket->sendRawPacket(s, sender);
+    }
     else
         Log::info("STKHost", "Received unknown command '%s'",
                   std::string(buffer, len).c_str());
