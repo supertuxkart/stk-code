@@ -158,15 +158,42 @@ void RewindManager::addNetworkEvent(EventRewinder *event_rewinder,
  *  \param time Time at which the event was recorded.
  *  \param buffer Pointer to the event data.
  */
-void RewindManager::addNetworkState(int rewinder_index, BareNetworkString *buffer,
-    int ticks)
+void RewindManager::addNetworkState(int rewinder_index, 
+                                    BareNetworkString *buffer, int ticks)
 {
     assert(NetworkConfig::get()->isClient());
-    // On a client dt from a state is never used, it maintains
-    // its own dt information (using TimeEvents).
     m_rewind_queue.addNetworkState(m_all_rewinder[rewinder_index], buffer,
                                    ticks);
 }   // addNetworkState
+
+// ----------------------------------------------------------------------------
+/** Saves a local state using the GameProtocol function to combine several
+ *  independent rewinders to write one state. Typically only the server needs
+ *  to save a state (which is then send to the clients), except that each
+ *  client needs one initial state (in case that it receives an event from
+ *  a client before a state from the serer).
+ *  \param allow_local_save Do a local save.
+ */
+void RewindManager::saveState(bool allow_local_save)
+{
+    PROFILER_PUSH_CPU_MARKER("RewindManager - save state", 0x20, 0x7F, 0x20);
+    GameProtocol::lock()->startNewState(allow_local_save);
+    AllRewinder::const_iterator rewinder;
+    for (rewinder = m_all_rewinder.begin(); rewinder != m_all_rewinder.end(); ++rewinder)
+    {
+        // TODO: check if it's worth passing in a sufficiently large buffer from
+        // GameProtocol - this would save the copy operation.
+        BareNetworkString *buffer = (*rewinder)->saveState();
+        if (buffer && buffer->size() >= 0)
+        {
+            m_overall_state_size += buffer->size();
+            GameProtocol::lock()->addState(allow_local_save, buffer);
+        }   // size >= 0
+        delete buffer;    // buffer can be freed
+    }
+    PROFILER_POP_CPU_MARKER();
+
+}   // saveState
 
 // ----------------------------------------------------------------------------
 /** Determines if a new state snapshot should be taken, and if so calls all
@@ -192,31 +219,14 @@ void RewindManager::update(int ticks_not_used)
         return;
     }
 
-
     // Save state
-    PROFILER_PUSH_CPU_MARKER("RewindManager - save state", 0x20, 0x7F, 0x20);
-    GameProtocol::lock()->startNewState();
-    AllRewinder::const_iterator rewinder;
-    for (rewinder = m_all_rewinder.begin(); rewinder != m_all_rewinder.end(); ++rewinder)
-    {
-        // TODO: check if it's worth passing in a sufficiently large buffer from
-        // GameProtocol - this would save the copy operation.
-        BareNetworkString *buffer = (*rewinder)->saveState();
-        if (buffer && buffer->size() >= 0)
-        {
-            m_overall_state_size += buffer->size();
-            GameProtocol::lock()->addState(buffer);
-        }   // size >= 0
-        delete buffer;    // buffer can be freed
-    }
-    PROFILER_POP_CPU_MARKER();
+    saveState(/**allow_local_save*/false);
     PROFILER_PUSH_CPU_MARKER("RewindManager - send state", 0x20, 0x7F, 0x40);
     GameProtocol::lock()->sendState();
     PROFILER_POP_CPU_MARKER();
     m_last_saved_state = ticks;
 }   // update
 
-#include "karts/abstract_kart.hpp"
 // ----------------------------------------------------------------------------
 /** Replays all events from the last event played till the specified time.
  *  \param world_ticks Up to (and inclusive) which time events will be replayed.

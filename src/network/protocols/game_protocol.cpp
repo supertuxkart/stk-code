@@ -245,13 +245,17 @@ void GameProtocol::handleAdjustTime(Event *event)
 // ----------------------------------------------------------------------------
 /** Called by the server before assembling a new message containing the full
  *  state of the race to be sent to a client.
+ * \param allow_local_save If set it allows a state to be saved on a client.
+ *        This only happens at the very first time step to ensure each client
+ *        has a state in case it receives an event before a server state.
  */
-void GameProtocol::startNewState()
+void GameProtocol::startNewState(bool allow_local_save)
 {
-    assert(NetworkConfig::get()->isServer());
+    assert(allow_local_save || NetworkConfig::get()->isServer());
+
     m_data_to_send->clear();
     m_data_to_send->addUInt8(GP_STATE).addUInt32(World::getWorld()->getTimeTicks());
-    Log::info("GameProtocol", "Sending new state at %d.",
+    Log::info("GameProtocol", "Starting new state at %d.",
               World::getWorld()->getTimeTicks());
 }   // startNewState
 
@@ -260,9 +264,9 @@ void GameProtocol::startNewState()
  *  is copied, so the data can be freed after this call/.
  *  \param buffer Adds the data in the buffer to the current state.
  */
-void GameProtocol::addState(BareNetworkString *buffer)
+void GameProtocol::addState(bool allow_local_save, BareNetworkString *buffer)
 {
-    assert(NetworkConfig::get()->isServer());
+    assert(allow_local_save || NetworkConfig::get()->isServer());
     m_data_to_send->addUInt16(buffer->size());
     (*m_data_to_send) += *buffer;
 }   // addState
@@ -273,6 +277,8 @@ void GameProtocol::addState(BareNetworkString *buffer)
  */
 void GameProtocol::sendState()
 {
+    Log::info("GameProtocol", "Sending new state at %d.",
+        World::getWorld()->getTimeTicks());
     assert(NetworkConfig::get()->isServer());
     sendMessageToPeersChangingToken(m_data_to_send, /*reliable*/true);
 }   // sendState

@@ -78,8 +78,8 @@ public:
 
     void controllerAction(int kart_id, PlayerAction action,
                           int value, int val_l, int val_r);
-    void startNewState();
-    void addState(BareNetworkString *buffer);
+    void startNewState(bool allow_local_save);
+    void addState(bool allow_local_save, BareNetworkString *buffer);
     void sendState();
     void adjustTimeForClient(STKPeer *peer, int ticks);
 

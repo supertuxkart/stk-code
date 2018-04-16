@@ -147,6 +147,7 @@ public:
     void addNetworkState(int rewinder_index, BareNetworkString *buffer,
                          int ticks);
     void addNextTimeStep(int ticks, float dt);
+    void saveState(bool allow_local_save);
     // ------------------------------------------------------------------------
     /** Adds a Rewinder to the list of all rewinders.
      *  \return true If rewinding is enabled, false otherwise. 
