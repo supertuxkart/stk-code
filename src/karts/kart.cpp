@@ -147,6 +147,12 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_boosted_ai           = false;
     m_type                 = RaceManager::KT_AI;
 
+    for (int i=0;i<30;i++)
+    {
+        m_previous_xyz[i] = getXYZ();
+    }
+    m_time_previous_counter = 0.0f;
+
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
 
@@ -370,6 +376,12 @@ void Kart::reset()
     m_has_caught_nolok_bubblegum = false;
     m_is_jumping           = false;
 
+    for (int i=0;i<30;i++)
+    {
+        m_previous_xyz[i] = getXYZ();
+    }
+    m_time_previous_counter = 0.0f;
+
     // In case that the kart was in the air, in which case its
     // linear damping is 0
     if(m_body)
@@ -453,6 +465,15 @@ void Kart::increaseMaxSpeed(unsigned int category, float add_speed,
     m_max_speed->increaseMaxSpeed(category, add_speed, engine_force, duration,
                                   fade_out_time);
 }   // increaseMaxSpeed
+
+// -----------------------------------------------------------------------------
+void Kart::instantSpeedIncrease(unsigned int category, float add_max_speed,
+                            float speed_boost, float engine_force, float duration,
+                            float fade_out_time)
+{
+    m_max_speed->instantSpeedIncrease(category, add_max_speed, speed_boost,
+                                      engine_force, duration, fade_out_time);
+}   // instantSpeedIncrease
 
 // -----------------------------------------------------------------------------
 void Kart::setSlowdown(unsigned int category, float max_speed_fraction,
@@ -1207,6 +1228,11 @@ void Kart::eliminate()
         m_stars_effect->reset();
         m_stars_effect->update(1);
     }
+   
+    if (m_attachment)
+    {
+        m_attachment->clear();
+    }
 
     m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_TERRAIN, 0);
     m_kart_gfx->setGFXInvisible();
@@ -1278,9 +1304,22 @@ void Kart::update(float dt)
     {
         m_kart_animation->update(dt);
     }
+
+    m_time_previous_counter += dt;
+    while (m_time_previous_counter > (1.0f/120.0f))
+    {
+        m_previous_xyz[0] = getXYZ();
+        for (int i=29;i>0;i--)
+        {
+            m_previous_xyz[i] = m_previous_xyz[i-1];
+        }
+        m_time_previous_counter -= (1.0f/120.0f);
+    }
+
     // Update the position and other data taken from the physics (or
     // an animation which calls setXYZ(), which also updates the kart
     // physical position).
+
     Moveable::update(dt);
 
     Vec3 front(0, 0, getKartLength()*0.5f);
@@ -1996,11 +2035,13 @@ void Kart::updateNitro(float dt)
 
         // when pressing the key, don't allow the min time to go under zero.
         // If it went under zero, it would be reset
+        // As the time deduction happens before, it can be an arbitrarily
+        // small number > 0. Smaller means more responsive controls.
         if (m_controls.getNitro() && m_min_nitro_time <= 0.0f)
-            m_min_nitro_time = 0.1f;
+            m_min_nitro_time = 0.005f;
     }
 
-    bool increase_speed = (m_controls.getNitro() && isOnGround());
+    bool increase_speed = (m_min_nitro_time > 0 && isOnGround());
     if (!increase_speed && m_min_nitro_time <= 0.0f)
     {
         if(m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING)
@@ -2863,7 +2904,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     // --------------------------------------------------------
     float nitro_frac = 0;
     if ( (m_controls.getNitro() || m_min_nitro_time > 0.0f) &&
-         isOnGround() &&  m_collected_energy > 0            )
+          m_collected_energy > 0            )
     {
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!
@@ -3049,6 +3090,14 @@ const Vec3& Kart::getNormal() const
 {
     return m_terrain_info->getNormal();
 }   // getNormal
+
+// ------------------------------------------------------------------------
+/** Returns the position 0,25s before */
+const Vec3& Kart::getPreviousXYZ() const
+{
+    return m_previous_xyz[29];
+}   // getPreviousXYZ
+
 
 // ------------------------------------------------------------------------
 void Kart::playSound(SFXBuffer* buffer)

@@ -482,8 +482,10 @@ public:
     float getNitroMax() const;
 
     float getSlipstreamDuration() const;
+    float getSlipstreamBaseSpeed() const;
     float getSlipstreamLength() const;
     float getSlipstreamWidth() const;
+    float getSlipstreamInnerFactor() const;
     float getSlipstreamCollectTime() const;
     float getSlipstreamUseTime() const;
     float getSlipstreamAddPower() const;

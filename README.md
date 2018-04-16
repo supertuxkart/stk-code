@@ -64,13 +64,13 @@ mesa-common-dev pkg-config zlib1g-dev
 ```
 ### In-game recorder
 
-In order to build the in-game recorder for STK, you have to install
+To build the in-game recorder for STK, you have to install
 libopenglrecorder from your distribution, or compile it yourself from [here](https://github.com/Benau/libopenglrecorder).
 Compilation instruction is explained there. If you don't need this feature, pass `-DBUILD_RECORDER=off` to cmake.
 
 ### Compiling
 
-Run the following commands inside `stk-code` directory to compile SuperTuxKart:
+To compile SuperTuxKart, run the following commands inside `stk-code` directory:
 
 ```bash
 mkdir cmake_build
@@ -79,6 +79,21 @@ cmake ..
 make -j4
 ```
 STK can then be run from the build directory with `bin/supertuxkart`
+
+#### Keeping your build up to date
+
+To recompile the latest code without redownloading the entire source, first run the ```svn up``` command inside the 'stk-assets' directory, then run the following commands inside the 'stk-code' directory:
+
+```bash
+git pull
+cd cmake_build
+cmake ..
+make -j4
+```
+
+##### Build Speed Optimization
+
+"-j4" is an example, for a faster build, use "-jx" instead, where "x" is the amount of CPU threads you have, minus one.
 
 ### Further options
 
