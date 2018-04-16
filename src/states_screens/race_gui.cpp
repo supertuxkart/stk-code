@@ -137,9 +137,9 @@ RaceGUI::RaceGUI()
 
     // Load speedmeter texture before rendering the first frame
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
-    m_speed_meter_icon->getTexture();
+    m_speed_meter_icon->getTexture(false,false);
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
-    m_speed_bar_icon->getTexture();
+    m_speed_bar_icon->getTexture(false,false);
     //createMarkerTexture();
 }   // RaceGUI
 
@@ -789,7 +789,7 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
                                                      speed_ratio, meter_width, meter_height, offset);
 
 
-    drawMeterTexture(m_speed_bar_icon->getTexture(false,false), vertices, count);
+    drawMeterTexture(m_speed_bar_icon->getTexture(), vertices, count);
 #endif
 }   // drawSpeedEnergyRank
 
