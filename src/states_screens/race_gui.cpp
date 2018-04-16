@@ -795,6 +795,7 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
 
 void RaceGUI::drawMeterTexture(video::ITexture *meter_texture, video::S3DVertex vertices[], unsigned int count)
 {
+#ifndef SERVER_ONLY
     //Should be greater or equal than the greatest vertices_count used by the meter functions
     short int index[12];
     for(unsigned int i=0; i<count; i++)
@@ -812,6 +813,7 @@ void RaceGUI::drawMeterTexture(video::ITexture *meter_texture, video::S3DVertex 
     draw2DVertexPrimitiveList(m.getTexture(0), vertices, count,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
     glDisable(GL_BLEND);
+#endif
 }   // drawMeterTexture
 
 
