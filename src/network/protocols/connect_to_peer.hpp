@@ -39,9 +39,6 @@ protected:
      *  gone. */
     std::shared_ptr<Protocol> m_current_protocol;
 
-    /** True if this is a LAN connection. */
-    bool m_is_lan;
-
     /** Timer use for tracking broadcast. */
     double m_timer = 0.0;
 
