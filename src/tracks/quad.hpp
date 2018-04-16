@@ -84,6 +84,9 @@ public:
     /** Returns the center of a quad. */
     const Vec3& getCenter ()      const                    { return m_center; }
     // ------------------------------------------------------------------------
+    /** Set new quad coordinates. */
+    void setQuad (const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3);
+    // ------------------------------------------------------------------------
     void setHeightTesting(float min, float max)
     {
         m_min_height_testing = min;
