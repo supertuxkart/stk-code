@@ -1043,6 +1043,12 @@ float KartProperties::getSlipstreamDuration() const
 }  // getSlipstreamDuration
 
 // ----------------------------------------------------------------------------
+float KartProperties::getSlipstreamBaseSpeed() const
+{
+    return m_cached_characteristic->getSlipstreamBaseSpeed();
+}  // getSlipstreamBaseSpeed
+
+// ----------------------------------------------------------------------------
 float KartProperties::getSlipstreamLength() const
 {
     return m_cached_characteristic->getSlipstreamLength();
@@ -1053,6 +1059,12 @@ float KartProperties::getSlipstreamWidth() const
 {
     return m_cached_characteristic->getSlipstreamWidth();
 }  // getSlipstreamWidth
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSlipstreamInnerFactor() const
+{
+    return m_cached_characteristic->getSlipstreamInnerFactor();
+}  // getSlipstreamInnerFactor
 
 // ----------------------------------------------------------------------------
 float KartProperties::getSlipstreamCollectTime() const
@@ -1199,4 +1211,3 @@ bool KartProperties::getSkidEnabled() const
 }  // getSkidEnabled
 
 /* <characteristics-end kpgetter> */
-

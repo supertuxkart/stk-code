@@ -44,17 +44,31 @@ class Material;
 /**
   * \ingroup graphics
   */
-class SlipStream : public MovingTexture
+class SlipStream
 {
 private:
     /** The kart to which this smoke belongs. */
     AbstractKart *m_kart;
 
+    /** The moving texture for the normal node */
+
+    MovingTexture *m_moving;
+
+    /** The moving texture for the fast node */
+
+    MovingTexture *m_moving_fast;
+
     /** The scene node. */
     scene::ISceneNode *m_node;
 
+    /** The fast scene node. */
+    scene::ISceneNode *m_node_fast;
+
     /** For debugging: a simple quad to display where slipstream works. */
     std::shared_ptr<SP::SPDynamicDrawCall> m_debug_dc;
+
+    /** For debugging: a simple quad to display where inner slipstream works. */
+    std::shared_ptr<SP::SPDynamicDrawCall> m_debug_dc2;
 
     /** The length of the slipstream cylinder. This is used to scale
      *  the actual scene node correctly. */
@@ -70,12 +84,16 @@ private:
     /** This is slipstream area if the kart is at 0,0,0 without rotation. */
     Quad         *m_slipstream_quad;
 
+    /** This is the inner slipstream area if the kart is at 0,0,0 without rotation. */
+    Quad         *m_slipstream_inner_quad;
+
     /** The kart from which this kart gets slipstream. Used by the AI to
      ** overtake the right kart. */
     AbstractKart* m_target_kart;
 
     SP::SPMesh*  createMesh(Material* material);
-    void         setDebugColor(const video::SColor &color);
+    void         setDebugColor(const video::SColor &color, bool inner);
+    void         updateQuad();
 public:
                  SlipStream  (AbstractKart* kart);
     virtual     ~SlipStream  ();
@@ -97,4 +115,3 @@ public:
     bool        inUse() const {return m_slipstream_mode==SS_USE; }
 };   // SlipStream
 #endif
-

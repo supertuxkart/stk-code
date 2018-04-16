@@ -74,6 +74,11 @@ protected:
      *  new lap is triggered. */
     Vec3 m_xyz_front;
 
+    /** The coordinates of the 30 previous positions */
+    Vec3 m_previous_xyz[30];
+
+    float m_time_previous_counter;
+
     /** Is time flying activated */
     bool m_is_jumping;
 
@@ -273,6 +278,9 @@ public:
     virtual void   increaseMaxSpeed(unsigned int category, float add_speed,
                                     float engine_force, float duration,
                                     float fade_out_time);
+    virtual void   instantSpeedIncrease(unsigned int category, float add_max_speed,
+                                    float speed_boost, float engine_force, float duration,
+                                    float fade_out_time);
     virtual void   setSlowdown(unsigned int category, float max_speed_fraction,
                                float fade_in_time);
     virtual float getSpeedIncreaseTimeLeft(unsigned int category) const;
@@ -470,6 +478,10 @@ public:
     /** Returns the normal of the terrain the kart is over atm. This is
      *  defined even if the kart is flying. */
     virtual const Vec3& getNormal() const;
+    // ------------------------------------------------------------------------
+    /** Returns the position 0,25s before */
+    virtual const Vec3& getPreviousXYZ() const;
+
     // ------------------------------------------------------------------------
     /** For debugging only: check if a kart is flying. */
     bool isFlying() const { return m_flying;  }

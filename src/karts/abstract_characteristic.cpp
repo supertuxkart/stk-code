@@ -215,9 +215,13 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case SLIPSTREAM_DURATION:
         return TYPE_FLOAT;
+    case SLIPSTREAM_BASE_SPEED:
+        return TYPE_FLOAT;
     case SLIPSTREAM_LENGTH:
         return TYPE_FLOAT;
     case SLIPSTREAM_WIDTH:
+        return TYPE_FLOAT;
+    case SLIPSTREAM_INNER_FACTOR:
         return TYPE_FLOAT;
     case SLIPSTREAM_COLLECT_TIME:
         return TYPE_FLOAT;
@@ -447,10 +451,14 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "NITRO_MAX";
     case SLIPSTREAM_DURATION:
         return "SLIPSTREAM_DURATION";
+    case SLIPSTREAM_BASE_SPEED:
+        return "SLIPSTREAM_BASE_SPEED";
     case SLIPSTREAM_LENGTH:
         return "SLIPSTREAM_LENGTH";
     case SLIPSTREAM_WIDTH:
         return "SLIPSTREAM_WIDTH";
+    case SLIPSTREAM_INNER_FACTOR:
+        return "SLIPSTREAM_INNER_FACTOR";
     case SLIPSTREAM_COLLECT_TIME:
         return "SLIPSTREAM_COLLECT_TIME";
     case SLIPSTREAM_USE_TIME:
@@ -1472,6 +1480,18 @@ float AbstractCharacteristic::getSlipstreamDuration() const
 }  // getSlipstreamDuration
 
 // ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSlipstreamBaseSpeed() const
+{
+    float result;
+    bool is_set = false;
+    process(SLIPSTREAM_BASE_SPEED, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SLIPSTREAM_BASE_SPEED).c_str());
+    return result;
+}  // getSlipstreamBaseSpeed
+
+// ----------------------------------------------------------------------------
 float AbstractCharacteristic::getSlipstreamLength() const
 {
     float result;
@@ -1494,6 +1514,18 @@ float AbstractCharacteristic::getSlipstreamWidth() const
                     getName(SLIPSTREAM_WIDTH).c_str());
     return result;
 }  // getSlipstreamWidth
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSlipstreamInnerFactor() const
+{
+    float result;
+    bool is_set = false;
+    process(SLIPSTREAM_INNER_FACTOR, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SLIPSTREAM_INNER_FACTOR).c_str());
+    return result;
+}  // getSlipstreamInnerFactor
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getSlipstreamCollectTime() const
@@ -1785,4 +1817,3 @@ bool AbstractCharacteristic::getSkidEnabled() const
 
 
 /* <characteristics-end acgetter> */
-
