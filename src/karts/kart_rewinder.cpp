@@ -127,8 +127,6 @@ BareNetworkString* KartRewinder::saveState() const
 /** Actually rewind to the specified state. */
 void KartRewinder::rewindToState(BareNetworkString *buffer)
 {
-    buffer->reset();   // make sure the buffer is read from the beginning
-
     // 1) Physics values: transform and velocities
     // -------------------------------------------
     btTransform t;

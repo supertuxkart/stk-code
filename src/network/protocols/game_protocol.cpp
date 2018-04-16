@@ -293,20 +293,19 @@ void GameProtocol::handleState(Event *event)
         return;
 
     assert(NetworkConfig::get()->isClient());
-    NetworkString &data = event->data();
-    int ticks           = data.getUInt32();
+    const NetworkString &data = event->data();
+    int ticks          = data.getUInt32();
+    // Now copy the state data (without ticks etc) to a new
+    // string, so it can be reset to the beginning easily
+    // when restoring the state:
+    BareNetworkString *bns = new BareNetworkString(data.getCurrentData(),
+                                                   data.size());
+
+    // The memory for bns will be handled in the RewindInfoState object
+    RewindManager::get()->addNetworkState(bns, ticks);
+
     Log::info("GameProtocol", "Received at %d state from %d",
               World::getWorld()->getTimeTicks(), ticks);
-    int index           = 0;
-    while (data.size() > 0)
-    {
-        uint16_t count = data.getUInt16();
-        BareNetworkString *state = new BareNetworkString(data.getCurrentData(),
-                                                         count);
-        data.skip(count);
-        RewindManager::get()->addNetworkState(index, state, ticks);
-        index++;
-    }   // while data.size()>0
 }   // handleState
 
 // ----------------------------------------------------------------------------

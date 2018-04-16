@@ -135,10 +135,10 @@ void RewindQueue::addLocalEvent(EventRewinder *event_rewinder,
  *         faster rewinds.
  *  \param ticks Time at which the event happened.
  */
-void RewindQueue::addLocalState(Rewinder *rewinder, BareNetworkString *buffer,
+void RewindQueue::addLocalState(BareNetworkString *buffer,
                                 bool confirmed, int ticks)
 {
-    RewindInfo *ri = new RewindInfoState(ticks, rewinder, buffer, confirmed);
+    RewindInfo *ri = new RewindInfoState(ticks, buffer, confirmed);
     assert(ri);
     insertRewindInfo(ri);
 }   // addLocalState
@@ -170,11 +170,9 @@ void RewindQueue::addNetworkEvent(EventRewinder *event_rewinder,
  *  \param buffer Pointer to the event data.
  *  \param ticks Time at which the event happened.
  */
-void RewindQueue::addNetworkState(Rewinder *rewinder, BareNetworkString *buffer,
-                                  int ticks)
+void RewindQueue::addNetworkState(BareNetworkString *buffer, int ticks)
 {
-    RewindInfo *ri = new RewindInfoState(ticks, rewinder,
-                                         buffer, /*confirmed*/true);
+    RewindInfo *ri = new RewindInfoState(ticks, buffer, /*confirmed*/true);
 
     m_network_events.lock();
     m_network_events.getData().push_back(ri);
@@ -356,7 +354,7 @@ void RewindQueue::unitTesting()
     assert(q0.isEmpty());
     assert(!q0.hasMoreRewindInfo());
 
-    q0.addLocalState(NULL, NULL, /*confirmed*/true, 0);
+    q0.addLocalState(NULL, /*confirmed*/true, 0);
     assert(q0.m_all_rewind_info.front()->isState());
     assert(!q0.m_all_rewind_info.front()->isEvent());
     assert(q0.hasMoreRewindInfo());
@@ -378,7 +376,7 @@ void RewindQueue::unitTesting()
     assert((*rii)->isEvent());
 
     // Another state must be sorted before the event:
-    q0.addNetworkState(dummy_rewinder, NULL, 0);
+    q0.addNetworkState(NULL, 0);
     assert(q0.hasMoreRewindInfo());
     q0.mergeNetworkData(world_ticks, &needs_rewind, &rewind_ticks);
     assert(q0.m_all_rewind_info.size() == 3);
@@ -403,7 +401,7 @@ void RewindQueue::unitTesting()
     // Now test inserting an event first, then the state
     RewindQueue q1;
     q1.addLocalEvent(NULL, NULL, true, 5);
-    q1.addLocalState(NULL, NULL, true, 5);
+    q1.addLocalState(NULL, true, 5);
     rii = q1.m_all_rewind_info.begin();
     assert((*rii)->isState());
     rii++;

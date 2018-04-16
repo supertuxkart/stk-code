@@ -63,12 +63,10 @@ public:
     void reset();
     void addLocalEvent(EventRewinder *event_rewinder, BareNetworkString *buffer,
                        bool confirmed, int ticks);
-    void addLocalState(Rewinder *rewinder, BareNetworkString *buffer,
-                       bool confirmed, int ticks);
+    void addLocalState(BareNetworkString *buffer, bool confirmed, int ticks);
     void addNetworkEvent(EventRewinder *event_rewinder,
                          BareNetworkString *buffer, int ticks);
-    void addNetworkState(Rewinder *rewinder, BareNetworkString *buffer,
-                         int ticks);
+    void addNetworkState(BareNetworkString *buffer, int ticks);
     void mergeNetworkData(int world_ticks,  bool *needs_rewind, 
                           int *rewind_ticks);
     void replayAllEvents(int ticks);

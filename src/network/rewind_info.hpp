@@ -84,45 +84,22 @@ public:
 };   // RewindInfo
 
 // ============================================================================
-/** A rewind info abstract class that keeps track of a rewinder object, and
- *  has a BareNetworkString buffer which is used to store a state or event.
+/** A class that stores a game state and can rewind it.
  */
-class RewindInfoRewinder : public RewindInfo
+class RewindInfoState: public RewindInfo
 {
 private:
     /** Pointer to the buffer which stores all states. */
     BareNetworkString *m_buffer;
-
-protected:
-    /** The Rewinder instance for which this data is. */
-    Rewinder *m_rewinder;
-
 public:
-    RewindInfoRewinder(int ticks, Rewinder *rewinder,
-                       BareNetworkString *buffer, bool is_confirmed)
-        : RewindInfo(ticks, is_confirmed)
-    {
-        m_rewinder = rewinder;
-        m_buffer = buffer;
-    }   // RewindInfoRewinder
-    // ------------------------------------------------------------------------
-    virtual ~RewindInfoRewinder()
-    {
-        delete m_buffer;
-    }   // ~RewindInfoRewinder
+             RewindInfoState(int ticks,  BareNetworkString *buffer, 
+                             bool is_confirmed);
+    virtual ~RewindInfoState() {};
+    virtual void rewind();
+
     // ------------------------------------------------------------------------
     /** Returns a pointer to the state buffer. */
     BareNetworkString *getBuffer() const { return m_buffer; }
-};   // RewindInfoRewinder
-
-// ============================================================================
-class RewindInfoState: public RewindInfoRewinder
-{
-public:
-             RewindInfoState(int ticks, Rewinder *rewinder, 
-                             BareNetworkString *buffer, bool is_confirmed);
-    virtual ~RewindInfoState() {};
-
     // ------------------------------------------------------------------------
     virtual bool isState() const { return true; }
     // ------------------------------------------------------------------------
@@ -130,23 +107,8 @@ public:
      *  It calls undoState in the rewinder. */
     virtual void undo()
     {
-        if(m_rewinder)   // Unit testing uses NULL as rewinder
-            m_rewinder->undoState(getBuffer());
+        // Nothing being done in case of an undo that goes further back
     }   // undo
-    // ------------------------------------------------------------------------
-    /** Rewinds to this state. This is called while going forwards in time
-     *  again to reach current time. It will call rewindToState().
-     *  if the state is a confirmed state. */
-    virtual void rewind()
-    {
-        if (isConfirmed())
-            m_rewinder->rewindToState(getBuffer());
-        else
-        {
-            // TODO
-            // Handle replacing of stored states.
-        }
-    }   // rewind
 };   // class RewindInfoState
 
 // ============================================================================

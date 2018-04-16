@@ -158,12 +158,10 @@ void RewindManager::addNetworkEvent(EventRewinder *event_rewinder,
  *  \param time Time at which the event was recorded.
  *  \param buffer Pointer to the event data.
  */
-void RewindManager::addNetworkState(int rewinder_index, 
-                                    BareNetworkString *buffer, int ticks)
+void RewindManager::addNetworkState(BareNetworkString *buffer, int ticks)
 {
     assert(NetworkConfig::get()->isClient());
-    m_rewind_queue.addNetworkState(m_all_rewinder[rewinder_index], buffer,
-                                   ticks);
+    m_rewind_queue.addNetworkState(buffer, ticks);
 }   // addNetworkState
 
 // ----------------------------------------------------------------------------
@@ -194,6 +192,28 @@ void RewindManager::saveState(bool allow_local_save)
     PROFILER_POP_CPU_MARKER();
 
 }   // saveState
+
+    // ----------------------------------------------------------------------------
+/** Restores a given state by calling rewindToState for each available rewinder
+ *  with its correct data.
+ *  \param data The data string used to store the whole game state.
+ *
+ */
+void RewindManager::restoreState(BareNetworkString *data)
+{
+    data->reset();   
+    int index = 0;
+    //AllRewinder::const_iterator rewinder;
+    for (auto rewinder = m_all_rewinder.begin(); rewinder != m_all_rewinder.end();
+                                          ++rewinder)
+    {
+        uint16_t count = data->getUInt16();
+        if (count > 0)
+        {
+            (*rewinder)->rewindToState(data);
+        }
+    }   // for all rewinder
+}   // restoreState
 
 // ----------------------------------------------------------------------------
 /** Determines if a new state snapshot should be taken, and if so calls all
