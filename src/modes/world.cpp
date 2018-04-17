@@ -464,7 +464,7 @@ World::~World()
     {
         // No race result gui is shown, so m_race_gui is the in-race
         // gui and this must be deleted.
-        delete m_race_gui;
+        delete m_race_gui;;
     }
     
     Weather::kill();
@@ -637,26 +637,18 @@ void World::terminateRace()
     m_saved_race_gui = m_race_gui;
 
     RaceResultGUI* results = RaceResultGUI::getInstance();
-    Referee* referee;
-    bool keep_referee = m_race_gui->hasReferee();
-    std::vector<Vec3> kart_position;
-    std::vector<Vec3> kart_rotation;
-    float referee_height;
+
+    bool keep_referee = m_race_gui->hasActiveReferee();
+
     if (keep_referee)
-    {
-        referee = m_race_gui->getReferee();
-        kart_position = m_race_gui->getPositionArray();
-        kart_rotation = m_race_gui->getRotationArray();
-        referee_height = m_race_gui->getRefereeHeight();
         m_race_gui->removeRefereeFromScene();
-    }
     m_race_gui       = results;
     if (keep_referee)
     {
-        m_race_gui->setReferee(*referee);
-        m_race_gui->setPositionArray(kart_position);
-        m_race_gui->setRotationArray(kart_rotation);
-        m_race_gui->setRefereeHeight(referee_height);
+        m_race_gui->setReferee(*m_saved_race_gui->getReferee());
+        m_race_gui->setPositionArray(m_saved_race_gui->getPositionArray());
+        m_race_gui->setRotationArray(m_saved_race_gui->getRotationArray());
+        m_race_gui->setRefereeHeight(m_saved_race_gui->getRefereeHeight());
         m_race_gui->addRefereeToScene();
     }
 
