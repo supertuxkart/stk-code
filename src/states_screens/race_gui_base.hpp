@@ -33,6 +33,7 @@ namespace irr
 }
 using namespace irr;
 
+#include "graphics/referee.hpp"
 #include "utils/vec3.hpp"
 
 class AbstractKart;
@@ -248,6 +249,20 @@ public:
                                  const core::vector2df &scaling) {};
 
     void cleanupMessages(const float dt);
+
+    virtual void addRefereeToScene();
+    virtual void removeRefereeFromScene();
+
+    virtual void setRefereeHeight(float height);
+    float getRefereeHeight() { return m_referee_height; }
+    virtual void setPositionArray(std::vector<Vec3> new_positions);
+    std::vector<Vec3> getPositionArray() { return m_referee_pos; }
+    virtual void setRotationArray(std::vector<Vec3> new_rotations);
+    std::vector<Vec3> getRotationArray() { return m_referee_rotation; }
+
+    virtual bool hasReferee();
+    virtual void setReferee(Referee referee);
+    Referee* getReferee() {return m_referee; }
 
 };   // RaceGUIBase
 
