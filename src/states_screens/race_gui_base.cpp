@@ -146,7 +146,7 @@ void RaceGUIBase::reset()
     }
 
     m_referee_height = 10.0f;
-    m_referee->attachToSceneNode();
+    addRefereeToScene();
     m_referee->selectReadySetGo(0); // set red color
     m_plunger_move_time = 0;
     m_plunger_offset    = core::vector2di(0,0);
@@ -397,7 +397,8 @@ void RaceGUIBase::renderGlobal(float dt)
 void RaceGUIBase::update(float dt)
 {
     // E.g. a race result gui does not have a referee
-    if(m_referee)
+    // (except if it was aborted early)
+    if(hasReferee())
     {
         World *world = World::getWorld();
         // During GO move the referee up again
@@ -406,7 +407,10 @@ void RaceGUIBase::update(float dt)
             m_referee_height = 10.0f;
             m_referee->selectReadySetGo(0);   // set red color
         }
-        else if(world->getPhase()==World::GO_PHASE)
+        else if(world->getPhase()==World::GO_PHASE
+              ||world->getPhase()==World::DELAY_FINISH_PHASE
+              ||world->getPhase()==World::RESULT_DISPLAY_PHASE
+              ||world->getPhase()==World::FINISH_PHASE)
         {
             m_referee_height += dt*5.0f;
             m_referee->selectReadySetGo(2);
@@ -431,7 +435,7 @@ void RaceGUIBase::update(float dt)
         }
         else if(m_referee->isAttached())   // race phase:
         {
-            m_referee->removeFromSceneGraph();
+            removeRefereeFromScene();
         }
     }   // if referee node
 }   // update
@@ -1067,3 +1071,42 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
                                               true /* alpha */     );
 #endif   // !SERVER_ONLY
 }   // drawPlungerInFace
+
+void RaceGUIBase::removeRefereeFromScene()
+{
+    m_referee->removeFromSceneGraph();
+}
+
+void RaceGUIBase::addRefereeToScene()
+{
+    m_referee->attachToSceneNode();
+}
+
+void RaceGUIBase::setRefereeHeight(float height)
+{
+    m_referee_height = height;
+}
+
+void RaceGUIBase::setPositionArray(std::vector<Vec3> new_positions)
+{
+    m_referee_pos = new_positions;
+}
+
+void RaceGUIBase::setRotationArray(std::vector<Vec3> new_rotations)
+{
+    m_referee_rotation = new_rotations;
+}
+
+bool RaceGUIBase::hasReferee()
+{
+    if (m_referee)
+        return m_referee->isAttached();
+    return (false);
+}
+
+void RaceGUIBase::setReferee(Referee referee)
+{
+    m_referee = new Referee(referee);
+}
+
+/* EOF */
