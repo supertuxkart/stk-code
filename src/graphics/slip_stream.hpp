@@ -119,7 +119,6 @@ private:
     void         updateQuad();
     void         updateSlipstreamingTextures(float f, const AbstractKart* kart);
     void         updateBonusTexture();
-    void         updateSlipstreamPower();
 public:
                  SlipStream  (AbstractKart* kart);
     virtual     ~SlipStream  ();
