@@ -260,7 +260,7 @@ public:
     virtual void setRotationArray(std::vector<Vec3> new_rotations);
     std::vector<Vec3> getRotationArray() { return m_referee_rotation; }
 
-    virtual bool hasReferee();
+    virtual bool hasActiveReferee();
     virtual void setReferee(Referee referee);
     Referee* getReferee() {return m_referee; }
 
