@@ -172,10 +172,10 @@ void RewindManager::addNetworkState(BareNetworkString *buffer, int ticks)
  *  a client before a state from the serer).
  *  \param allow_local_save Do a local save.
  */
-void RewindManager::saveState(bool allow_local_save)
+void RewindManager::saveState(bool local_save)
 {
     PROFILER_PUSH_CPU_MARKER("RewindManager - save state", 0x20, 0x7F, 0x20);
-    GameProtocol::lock()->startNewState(allow_local_save);
+    GameProtocol::lock()->startNewState(local_save);
     AllRewinder::const_iterator rewinder;
     for (rewinder = m_all_rewinder.begin(); rewinder != m_all_rewinder.end(); ++rewinder)
     {
@@ -185,15 +185,34 @@ void RewindManager::saveState(bool allow_local_save)
         if (buffer && buffer->size() >= 0)
         {
             m_overall_state_size += buffer->size();
-            GameProtocol::lock()->addState(allow_local_save, buffer);
+            GameProtocol::lock()->addState(buffer);
         }   // size >= 0
         delete buffer;    // buffer can be freed
     }
     PROFILER_POP_CPU_MARKER();
-
 }   // saveState
 
-    // ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+/** Saves a state on the client. Used to save an initial state at t=0 for each
+ *  client in case that we receive an event from another client (which will
+ *  trigger a rewind) before a state from the server.
+ */
+void RewindManager::saveLocalState()
+{
+    int ticks = World::getWorld()->getTimeTicks();
+
+    saveState(/*local_state*/true);
+    NetworkString *state = GameProtocol::lock()->getState();
+
+    // Copy the data to a new string, making the buffer in
+    // GameProtocol availble for again.
+    BareNetworkString *bns =
+        new BareNetworkString(state->getCurrentData(),
+                              state->size()           );
+    m_rewind_queue.addLocalState(bns, /*confirmed*/true, ticks);
+}   // saveLocalState
+
+// ----------------------------------------------------------------------------
 /** Restores a given state by calling rewindToState for each available rewinder
  *  with its correct data.
  *  \param data The data string used to store the whole game state.
