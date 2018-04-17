@@ -398,7 +398,7 @@ void RaceGUIBase::update(float dt)
 {
     // E.g. a race result gui does not have a referee
     // (except if it was aborted early)
-    if(hasReferee())
+    if(hasActiveReferee())
     {
         World *world = World::getWorld();
         // During GO move the referee up again
@@ -1097,7 +1097,7 @@ void RaceGUIBase::setRotationArray(std::vector<Vec3> new_rotations)
     m_referee_rotation = new_rotations;
 }
 
-bool RaceGUIBase::hasReferee()
+bool RaceGUIBase::hasActiveReferee()
 {
     if (m_referee)
         return m_referee->isAttached();
@@ -1106,6 +1106,7 @@ bool RaceGUIBase::hasReferee()
 
 void RaceGUIBase::setReferee(Referee referee)
 {
+    delete m_referee;
     m_referee = new Referee(referee);
 }
 
