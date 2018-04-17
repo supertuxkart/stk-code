@@ -1087,21 +1087,19 @@ void RaceGUIBase::setRefereeHeight(float height)
     m_referee_height = height;
 }
 
-void RaceGUIBase::setPositionArray(std::vector<Vec3> new_positions)
+void RaceGUIBase::setPositionArray(const std::vector<Vec3>& new_positions)
 {
     m_referee_pos = new_positions;
 }
 
-void RaceGUIBase::setRotationArray(std::vector<Vec3> new_rotations)
+void RaceGUIBase::setRotationArray(const std::vector<Vec3>& new_rotations)
 {
     m_referee_rotation = new_rotations;
 }
 
 bool RaceGUIBase::hasActiveReferee()
 {
-    if (m_referee)
-        return m_referee->isAttached();
-    return (false);
+    return (m_referee && m_referee->isAttached());
 }
 
 void RaceGUIBase::setReferee(Referee referee)
