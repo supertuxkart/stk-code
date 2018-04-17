@@ -255,9 +255,9 @@ public:
 
     virtual void setRefereeHeight(float height);
     float getRefereeHeight() { return m_referee_height; }
-    virtual void setPositionArray(std::vector<Vec3> new_positions);
+    virtual void setPositionArray(const std::vector<Vec3>& new_positions);
     std::vector<Vec3> getPositionArray() { return m_referee_pos; }
-    virtual void setRotationArray(std::vector<Vec3> new_rotations);
+    virtual void setRotationArray(const std::vector<Vec3>& new_rotations);
     std::vector<Vec3> getRotationArray() { return m_referee_rotation; }
 
     virtual bool hasActiveReferee();
