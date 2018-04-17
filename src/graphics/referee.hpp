@@ -44,6 +44,15 @@ class AbstractKart;
 class Referee
 {
 private:
+
+    //Overloads the = operator for referee
+    Referee& operator=(Referee other_referee)
+    {
+        swap(*this, other_referee);
+
+        return *this;
+    }
+
     /** The static mesh, which is loaded from a static function and shared
      *  between all instances. */
     static scene::IAnimatedMesh *m_st_referee_mesh;
@@ -86,7 +95,27 @@ private:
 public:
                 Referee();
                 Referee(const AbstractKart &kart);
+                Referee(const Referee &);
                ~Referee();
+    friend void swap(Referee& first_ref, Referee& second_ref)
+    {
+        using std::swap;
+
+        swap(first_ref.m_st_referee_mesh, second_ref.m_st_referee_mesh);
+        swap(first_ref.m_st_traffic_lights, second_ref.m_st_traffic_lights);
+
+        swap(first_ref.m_st_traffic_buffer, second_ref.m_st_traffic_buffer);
+        swap(first_ref.m_st_first_start_frame, second_ref.m_st_first_start_frame);
+        swap(first_ref.m_st_last_start_frame, second_ref.m_st_last_start_frame);
+        swap(first_ref.m_st_first_rescue_frame, second_ref.m_st_first_rescue_frame);
+        swap(first_ref.m_st_last_rescue_frame, second_ref.m_st_last_rescue_frame);
+
+        swap(first_ref.m_st_start_offset, second_ref.m_st_start_offset);
+        swap(first_ref.m_st_scale, second_ref.m_st_scale);
+        swap(first_ref.m_st_start_rotation, second_ref.m_st_start_rotation);
+        swap(first_ref.m_height, second_ref.m_height);
+    }
+
     void        selectReadySetGo(int rsg);
     void        attachToSceneNode();
     static void init();
