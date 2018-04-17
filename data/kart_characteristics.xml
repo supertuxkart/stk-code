@@ -366,7 +366,7 @@
                        invulnerability-time="7" />
             <nitro engine-force="350" max-speed-increase="4.5" duration="1.5"
                    fade-out-time="2.5" />
-            <slipstream length="*0.9" collect-time="*0.9" add-power="*1"
+            <slipstream length="*0.9" collect-time="*0.9"
                         duration-factor="*1" fade-out-time="*1" />
         </characteristic>
         <characteristic name="medium">
@@ -379,7 +379,7 @@
             <explosion time="1.8" radius="5"
                        invulnerability-time="6" />
             <nitro engine-force="425" consumption="1.4" duration="1" />
-            <slipstream add-power="*0.8" duration-factor="*0.8" fade-out-time="*1" />
+            <slipstream duration-factor="*0.8" fade-out-time="*1" />
         </characteristic>
         <characteristic name="heavy">
             <engine power="*1" max-speed="*1" brake-factor="*0.66"
@@ -394,7 +394,7 @@
                        invulnerability-time="6" />
             <nitro engine-force="600" consumption="2" max-speed-increase="8"
                    duration="0.7" fade-out-time="1.3" />
-            <slipstream length="*1.1" collect-time="*1.1" add-power="*0.6"
+            <slipstream length="*1.1" collect-time="*1.1"
                    duration-factor="*0.6" fade-out-time="*1" />
         </characteristic>
     </kart-types>
