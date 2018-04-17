@@ -200,6 +200,56 @@ Referee::Referee(const AbstractKart &kart)
 }   // Referee
 
 // ----------------------------------------------------------------------------
+/** Fully copy an instance of the referee
+ */
+Referee::Referee(const Referee &copied_referee)
+{
+    m_st_traffic_buffer = copied_referee.m_st_traffic_buffer;
+    m_st_first_start_frame = copied_referee.m_st_first_start_frame;
+    m_st_last_start_frame = copied_referee.m_st_last_start_frame;
+    m_st_first_rescue_frame = copied_referee.m_st_first_rescue_frame;
+    m_st_last_rescue_frame = copied_referee.m_st_last_rescue_frame;
+    m_st_start_offset = copied_referee.m_st_start_offset;
+    m_st_scale = copied_referee.m_st_scale;
+    m_st_start_rotation = copied_referee.m_st_start_rotation;
+    m_height = copied_referee.m_height;
+
+    //m_st_referee_mesh and m_st_traffic_lights
+    //memory adresses must not be copied from copied_referee
+    //to avoid undefined behavior upon copied_reference deletion
+    if (!m_st_referee_mesh)
+        init();
+
+    assert(m_st_referee_mesh);
+
+    // First add a NULL mesh, then set the material to be read only
+    // (this appears to be the only way to get read only materials).
+    // This way we only need to adjust the materials in the original
+    // mesh. ATM it doesn't make any difference, but if we ever should
+    // decide to use more than one referee model at startup we only
+    // have to change the textures once, and all models will be in synch.
+    m_scene_node = irr_driver->addAnimatedMesh(NULL, "referee");
+    m_scene_node->setReadOnlyMaterials(true);
+    m_scene_node->setMesh(m_st_referee_mesh);
+    m_scene_node->grab();
+    m_scene_node->setRotation(m_st_start_rotation.toIrrVector());
+    m_scene_node->setScale(m_st_scale.toIrrVector());
+    m_scene_node->setFrameLoop(m_st_first_start_frame,
+                               m_st_last_start_frame);
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL() && CVS->isDeferredEnabled())
+    {
+        m_light = irr_driver->addLight(core::vector3df(0.0f, 0.0f, 0.6f), 0.7f, 2.0f,
+            0.7f /* r */, 0.0 /* g */, 0.0f /* b */, false /* sun */, m_scene_node);
+    }
+    else
+#endif
+    {
+        m_light = NULL;
+    }
+} //Referee
+
+// ----------------------------------------------------------------------------
 Referee::~Referee()
 {
     if(m_scene_node->getParent())
@@ -279,4 +329,3 @@ void Referee::selectReadySetGo(int rsg)
         }
     }
 }   // selectReadySetGo
-
