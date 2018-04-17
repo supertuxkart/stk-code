@@ -3092,12 +3092,20 @@ const Vec3& Kart::getNormal() const
 }   // getNormal
 
 // ------------------------------------------------------------------------
-/** Returns the position 0,25s before */
+/** Returns the position 0.25s before */
 const Vec3& Kart::getPreviousXYZ() const
 {
     return m_previous_xyz[29];
 }   // getPreviousXYZ
 
+// ------------------------------------------------------------------------
+/** Returns a more recent different previous position */
+const Vec3& Kart::getRecentPreviousXYZ() const
+{
+    //Not the most recent, because the angle variations would be too
+    //irregular on some tracks whose roads are not smooth enough
+    return m_previous_xyz[5];
+}   // getRecentPreviousXYZ
 
 // ------------------------------------------------------------------------
 void Kart::playSound(SFXBuffer* buffer)
