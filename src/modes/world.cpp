@@ -464,7 +464,7 @@ World::~World()
     {
         // No race result gui is shown, so m_race_gui is the in-race
         // gui and this must be deleted.
-        delete m_race_gui;;
+        delete m_race_gui;
     }
     
     Weather::kill();
