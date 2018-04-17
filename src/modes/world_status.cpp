@@ -305,7 +305,8 @@ void WorldStatus::updateTime(int ticks)
                 // Save one initial state on a client, in case that an event
                 // is received from a client (trieggering a rollback) before
                 // a state from the server has been received.
-                if (NetworkConfig::get()->isClient())
+                if (NetworkConfig::get()->isNetworking() &&  
+                    NetworkConfig::get()->isClient()        )
                 {
                     RewindManager::get()->saveLocalState();
                     // FIXME TODO: save state in rewind queue!
