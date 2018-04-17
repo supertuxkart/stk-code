@@ -479,8 +479,11 @@ public:
      *  defined even if the kart is flying. */
     virtual const Vec3& getNormal() const;
     // ------------------------------------------------------------------------
-    /** Returns the position 0,25s before */
+    /** Returns the position 0.25s before */
     virtual const Vec3& getPreviousXYZ() const;
+    // ------------------------------------------------------------------------
+    /** Returns a more recent different previous position */
+    virtual const Vec3& getRecentPreviousXYZ() const;
 
     // ------------------------------------------------------------------------
     /** For debugging only: check if a kart is flying. */
