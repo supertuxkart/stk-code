@@ -29,4 +29,5 @@ static const char* endianness_test_ptr = (const char*)&endianness_test;
 // in little-endian, byte 0 will be 0. in big endian, byte 0 will be 1
 const bool IS_LITTLE_ENDIAN = (endianness_test_ptr[0] == 0);
 
-const char STK_VERSION[] = "git";
+// "SUPERTUXKART_VERSION" is defined from CMakeLists.txt from the project version
+const char STK_VERSION[] = SUPERTUXKART_VERSION;
