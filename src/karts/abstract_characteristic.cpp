@@ -213,7 +213,7 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case NITRO_MAX:
         return TYPE_FLOAT;
-    case SLIPSTREAM_DURATION:
+    case SLIPSTREAM_DURATION_FACTOR:
         return TYPE_FLOAT;
     case SLIPSTREAM_BASE_SPEED:
         return TYPE_FLOAT;
@@ -223,9 +223,9 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case SLIPSTREAM_INNER_FACTOR:
         return TYPE_FLOAT;
-    case SLIPSTREAM_COLLECT_TIME:
+    case SLIPSTREAM_MIN_COLLECT_TIME:
         return TYPE_FLOAT;
-    case SLIPSTREAM_USE_TIME:
+    case SLIPSTREAM_MAX_COLLECT_TIME:
         return TYPE_FLOAT;
     case SLIPSTREAM_ADD_POWER:
         return TYPE_FLOAT;
@@ -449,8 +449,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "NITRO_FADE_OUT_TIME";
     case NITRO_MAX:
         return "NITRO_MAX";
-    case SLIPSTREAM_DURATION:
-        return "SLIPSTREAM_DURATION";
+    case SLIPSTREAM_DURATION_FACTOR:
+        return "SLIPSTREAM_DURATION_FACTOR";
     case SLIPSTREAM_BASE_SPEED:
         return "SLIPSTREAM_BASE_SPEED";
     case SLIPSTREAM_LENGTH:
@@ -459,10 +459,10 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "SLIPSTREAM_WIDTH";
     case SLIPSTREAM_INNER_FACTOR:
         return "SLIPSTREAM_INNER_FACTOR";
-    case SLIPSTREAM_COLLECT_TIME:
-        return "SLIPSTREAM_COLLECT_TIME";
-    case SLIPSTREAM_USE_TIME:
-        return "SLIPSTREAM_USE_TIME";
+    case SLIPSTREAM_MIN_COLLECT_TIME:
+        return "SLIPSTREAM_MIN_COLLECT_TIME";
+    case SLIPSTREAM_MAX_COLLECT_TIME:
+        return "SLIPSTREAM_MAX_COLLECT_TIME";
     case SLIPSTREAM_ADD_POWER:
         return "SLIPSTREAM_ADD_POWER";
     case SLIPSTREAM_MIN_SPEED:
@@ -1468,16 +1468,16 @@ float AbstractCharacteristic::getNitroMax() const
 }  // getNitroMax
 
 // ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSlipstreamDuration() const
+float AbstractCharacteristic::getSlipstreamDurationFactor() const
 {
     float result;
     bool is_set = false;
-    process(SLIPSTREAM_DURATION, &result, &is_set);
+    process(SLIPSTREAM_DURATION_FACTOR, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SLIPSTREAM_DURATION).c_str());
+                    getName(SLIPSTREAM_DURATION_FACTOR).c_str());
     return result;
-}  // getSlipstreamDuration
+}  // getSlipstreamDurationFactor
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getSlipstreamBaseSpeed() const
@@ -1528,28 +1528,28 @@ float AbstractCharacteristic::getSlipstreamInnerFactor() const
 }  // getSlipstreamInnerFactor
 
 // ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSlipstreamCollectTime() const
+float AbstractCharacteristic::getSlipstreamMinCollectTime() const
 {
     float result;
     bool is_set = false;
-    process(SLIPSTREAM_COLLECT_TIME, &result, &is_set);
+    process(SLIPSTREAM_MIN_COLLECT_TIME, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SLIPSTREAM_COLLECT_TIME).c_str());
+                    getName(SLIPSTREAM_MIN_COLLECT_TIME).c_str());
     return result;
-}  // getSlipstreamCollectTime
+}  // getSlipstreamMinCollectTime
 
 // ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSlipstreamUseTime() const
+float AbstractCharacteristic::getSlipstreamMaxCollectTime() const
 {
     float result;
     bool is_set = false;
-    process(SLIPSTREAM_USE_TIME, &result, &is_set);
+    process(SLIPSTREAM_MAX_COLLECT_TIME, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SLIPSTREAM_USE_TIME).c_str());
+                    getName(SLIPSTREAM_MAX_COLLECT_TIME).c_str());
     return result;
-}  // getSlipstreamUseTime
+}  // getSlipstreamMaxCollecTime
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getSlipstreamAddPower() const
