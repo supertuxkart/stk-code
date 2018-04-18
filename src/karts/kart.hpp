@@ -74,10 +74,10 @@ protected:
      *  new lap is triggered. */
     Vec3 m_xyz_front;
 
-    /* Fix the time covered by the history size, in seconds */
+    /* Determines the time covered by the history size, in seconds */
     const float XYZ_HISTORY_TIME = 0.25f;
 
-    /* Fix the number of previous XYZ positions of the kart to remember
+    /* Determines the number of previous XYZ positions of the kart to remember
        Initialized in the constructor and unchanged from then on */
     int m_xyz_history_size;
 
