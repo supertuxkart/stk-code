@@ -50,19 +50,6 @@ void RaceEventManager::update(int ticks)
 }   // update
 
 // ----------------------------------------------------------------------------
-void RaceEventManager::start(std::shared_ptr<GameEventsProtocol> gep)
-{
-    m_game_events_protocol = gep;
-    m_running = true;
-}   // start
-
-// ----------------------------------------------------------------------------
-void RaceEventManager::stop()
-{
-    m_running = false;
-}   // stop
-
-// ----------------------------------------------------------------------------
 bool RaceEventManager::isRaceOver()
 {
     if(!World::getWorld())

@@ -48,17 +48,25 @@ private:
     virtual ~RaceEventManager();
 
 public:
+    // ------------------------------------------------------------------------
     void update(int ticks);
-
-    void start(std::shared_ptr<GameEventsProtocol> gep);
-    void stop();
-    bool isRaceOver();
-
-    void collectedItem(Item *item, AbstractKart *kart);
-    void kartFinishedRace(AbstractKart *kart, float time);
+    // ------------------------------------------------------------------------
+    void start(std::shared_ptr<GameEventsProtocol> gep)
+    {
+        m_game_events_protocol = gep;
+        m_running = true;
+    }
+    // ------------------------------------------------------------------------
+    void stop()                                          { m_running = false; }
     // ------------------------------------------------------------------------
     /** Returns if this instance is in running state or not. */
-    bool isRunning() { return m_running; }
+    bool isRunning()                                      { return m_running; }
+    // ------------------------------------------------------------------------
+    bool isRaceOver();
+    // ------------------------------------------------------------------------
+    void collectedItem(Item *item, AbstractKart *kart);
+    // ------------------------------------------------------------------------
+    void kartFinishedRace(AbstractKart *kart, float time);
 
 };
 

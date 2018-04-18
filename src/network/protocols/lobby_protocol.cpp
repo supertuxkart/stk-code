@@ -42,6 +42,8 @@ LobbyProtocol::LobbyProtocol(CallbackObject* callback_object)
 // ----------------------------------------------------------------------------
 LobbyProtocol::~LobbyProtocol()
 {
+    if (RaceEventManager::getInstance())
+        RaceEventManager::getInstance()->stop();
     delete m_game_setup;
 }   // ~LobbyProtocol
 
