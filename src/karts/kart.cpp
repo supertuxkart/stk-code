@@ -148,7 +148,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_type                 = RaceManager::KT_AI;
 
     m_xyz_history_size     = stk_config->time2Ticks(XYZ_HISTORY_TIME);
-    printf("m_xyz_history_size %i\n",m_xyz_history_size);
 
     Vec3 initial_position = getXYZ();
     for (int i=0;i<m_xyz_history_size;i++)
