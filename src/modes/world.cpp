@@ -637,7 +637,20 @@ void World::terminateRace()
     m_saved_race_gui = m_race_gui;
 
     RaceResultGUI* results = RaceResultGUI::getInstance();
+
+    bool keep_referee = m_race_gui->hasActiveReferee();
+
+    if (keep_referee)
+        m_race_gui->removeRefereeFromScene();
     m_race_gui       = results;
+    if (keep_referee)
+    {
+        m_race_gui->setReferee(*m_saved_race_gui->getReferee());
+        m_race_gui->setPositionArray(m_saved_race_gui->getPositionArray());
+        m_race_gui->setRotationArray(m_saved_race_gui->getRotationArray());
+        m_race_gui->setRefereeHeight(m_saved_race_gui->getRefereeHeight());
+        m_race_gui->addRefereeToScene();
+    }
 
     if (best_highscore_rank > 0)
     {
@@ -936,7 +949,6 @@ void World::updateWorld(float dt)
             else
             {
                 delete this;
-
                 if (race_manager->raceWasStartedFromOverworld())
                 {
                     OverWorld::enterOverWorld();

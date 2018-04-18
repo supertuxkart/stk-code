@@ -84,9 +84,26 @@ private:
     scene::ISceneNode* m_light;
 
 public:
+    //Overloads the = operator for referee
+    Referee& operator=(Referee other_referee)
+    {
+        swap(*this, other_referee);
+
+        return *this;
+    }
+
                 Referee();
                 Referee(const AbstractKart &kart);
+                Referee(const Referee &);
                ~Referee();
+    friend void swap(Referee& first_ref, Referee& second_ref)
+    {
+        using std::swap;
+
+        swap(first_ref.m_scene_node, second_ref.m_scene_node);
+        swap(first_ref.m_light, second_ref.m_light);
+    }
+
     void        selectReadySetGo(int rsg);
     void        attachToSceneNode();
     static void init();
