@@ -32,6 +32,7 @@
 #include "race/race_manager.hpp"
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/race_gui_base.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
@@ -187,6 +188,7 @@ GUIEngine::EventPropagation
         else if (selection == "endrace")
         {
             ModalDialog::dismiss();
+            World::getWorld()->getRaceGUI()->removeReferee();
             World::getWorld()->endRaceEarly();
             return GUIEngine::EVENT_BLOCK;
         }

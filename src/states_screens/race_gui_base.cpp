@@ -1067,3 +1067,12 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
                                               true /* alpha */     );
 #endif   // !SERVER_ONLY
 }   // drawPlungerInFace
+
+// ----------------------------------------------------------------------------
+void RaceGUIBase::removeReferee()
+{
+    if (m_referee->isAttached())   // race phase:
+    {
+        m_referee->removeFromSceneGraph();
+    }
+}   // removeReferee
