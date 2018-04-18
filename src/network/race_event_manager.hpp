@@ -62,6 +62,11 @@ public:
     /** Returns if this instance is in running state or not. */
     bool isRunning()                                      { return m_running; }
     // ------------------------------------------------------------------------
+    std::shared_ptr<GameEventsProtocol> getProtocol() const
+                                      { return m_game_events_protocol.lock(); }
+    // ------------------------------------------------------------------------
+    bool protocolStopped() const   { return m_game_events_protocol.expired(); }
+    // ------------------------------------------------------------------------
     bool isRaceOver();
     // ------------------------------------------------------------------------
     void collectedItem(Item *item, AbstractKart *kart);

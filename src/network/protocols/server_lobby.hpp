@@ -124,6 +124,7 @@ private:
         }
     }
     std::tuple<std::string, uint8_t, bool> handleVote();
+    void stopCurrentRace();
 
 public:
              ServerLobby();

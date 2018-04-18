@@ -29,7 +29,8 @@
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
-#include "network/protocol_manager.hpp"
+#include "network/protocols/game_protocol.hpp"
+#include "network/protocols/game_events_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -706,10 +707,16 @@ void ClientLobby::raceFinished(Event* event)
     }
 
     // stop race protocols
-    auto pm = ProtocolManager::lock();
-    assert(pm);
-    pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
-    pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
+    RaceEventManager::getInstance()->stop();
+
+    RaceEventManager::getInstance()->getProtocol()->requestTerminate();
+    GameProtocol::lock()->requestTerminate();
+
+    while (!RaceEventManager::getInstance()->protocolStopped())
+        StkTime::sleep(1);
+    while (!GameProtocol::emptyInstance())
+        StkTime::sleep(1);
+
     m_received_server_result = true;
 }   // raceFinished
 

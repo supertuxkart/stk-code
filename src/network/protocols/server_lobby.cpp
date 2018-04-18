@@ -26,7 +26,8 @@
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocols/connect_to_peer.hpp"
-#include "network/protocol_manager.hpp"
+#include "network/protocols/game_protocol.hpp"
+#include "network/protocols/game_events_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -369,6 +370,22 @@ void ServerLobby::asynchronousUpdate()
  */
 void ServerLobby::update(int ticks)
 {
+    // Reset server to initial state if no more connected players
+    if (m_state.load() > ACCEPTING_CLIENTS &&
+        STKHost::get()->getPeerCount() == 0 &&
+        NetworkConfig::get()->getServerIdFile().empty())
+    {
+        std::lock_guard<std::mutex> lock(m_connection_mutex);
+        if (RaceEventManager::getInstance() &&
+            RaceEventManager::getInstance()->isRunning())
+        {
+            stopCurrentRace();
+        }
+        m_state = NetworkConfig::get()->isLAN() ?
+            ACCEPTING_CLIENTS : REGISTER_SELF_ADDRESS;
+        setup();
+    }
+
     // Check if server owner has left
     updateServerOwner();
     if (m_game_setup)
@@ -650,7 +667,7 @@ void ServerLobby::checkIncomingConnectionRequests()
  *  to state RESULT_DISPLAY, during which the race result gui is shown and all
  *  clients can click on 'continue'.
  */
- void ServerLobby::checkRaceFinished()
+void ServerLobby::checkRaceFinished()
 {
     assert(RaceEventManager::getInstance()->isRunning());
     assert(World::getWorld());
@@ -671,14 +688,8 @@ void ServerLobby::checkIncomingConnectionRequests()
             static_cast<LinearWorld*>(World::getWorld())->getFastestLapTicks();
         total->addUInt32(fastest_lap);
     }
-    RaceResultGUI::getInstance()->backToLobby();
-    // notify the network world that it is stopped
-    RaceEventManager::getInstance()->stop();
-    // stop race protocols
-    auto pm = ProtocolManager::lock();
-    assert(pm);
-    pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
-    pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
+
+    stopCurrentRace();
     // Set the delay before the server forces all clients to exit the race
     // result screen and go back to the lobby
     m_timeout.store((float)StkTime::getRealTime() + 15.0f);
@@ -688,6 +699,27 @@ void ServerLobby::checkIncomingConnectionRequests()
     Log::info("ServerLobby", "End of game message sent");
 
 }   // checkRaceFinished
+
+//-----------------------------------------------------------------------------
+/** Stop any race currently in server, should only be called in main thread.
+ */
+void ServerLobby::stopCurrentRace()
+{
+    // notify the network world that it is stopped
+    RaceEventManager::getInstance()->stop();
+
+    // stop race protocols before going back to lobby (end race)
+    RaceEventManager::getInstance()->getProtocol()->requestTerminate();
+    GameProtocol::lock()->requestTerminate();
+
+    while (!RaceEventManager::getInstance()->protocolStopped())
+        StkTime::sleep(1);
+    while (!GameProtocol::emptyInstance())
+        StkTime::sleep(1);
+
+    // This will go back to lobby in server (and exit the current race)
+    RaceResultGUI::getInstance()->backToLobby();
+}   // stopCurrentRace
 
 //-----------------------------------------------------------------------------
 /** Called when a client disconnects.
