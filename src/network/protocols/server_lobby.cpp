@@ -20,7 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "modes/world.hpp"
+#include "modes/linear_world.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
@@ -106,6 +106,7 @@ ServerLobby::~ServerLobby()
 void ServerLobby::setup()
 {
     LobbyProtocol::setup();
+    StateManager::get()->resetActivePlayers();
     // We use maximum 16bit unsigned limit
     auto all_k = kart_properties_manager->getAllAvailableKarts();
     auto all_t = track_manager->getAllTrackIdentifiers();
@@ -122,7 +123,7 @@ void ServerLobby::setup()
     // Initialise the data structures to detect if all clients and 
     // the server are ready:
     m_server_has_loaded_world.store(false);
-    m_peers_ready.clear();
+    resetPeersReady();
     m_peers_votes.clear();
     m_server_delay = 0.0;
     Log::info("ServerLobby", "Reset server to initial state.");
@@ -144,6 +145,7 @@ bool ServerLobby::notifyEvent(Event* event)
     switch (message_type)
     {
     case LE_REQUEST_BEGIN: startSelection(event); break;
+    case LE_RACE_FINISHED_ACK: playerFinishedResult(event);   break;
     default: Log::error("ServerLobby", "Unknown message type %d - ignored.",
                         message_type);
              break;
@@ -205,7 +207,6 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_CLIENT_LOADED_WORLD: finishedLoadingWorldClient(event); break;
         case LE_STARTED_RACE:  startedRaceOnClient(event);        break;
         case LE_VOTE: playerVote(event);                          break;
-        case LE_RACE_FINISHED_ACK: playerFinishedResult(event);   break;
         case LE_KICK_HOST: kickHost(event);                       break;
         case LE_CHAT: handleChat(event);                          break;
         default:                                                  break;
@@ -299,10 +300,7 @@ void ServerLobby::asynchronousUpdate()
             return;
         m_state = WAIT_FOR_RACE_STARTED;
         // Reset for next state usage
-        for (auto p : m_peers_ready)
-        {
-            p.second = false;
-        }
+        resetPeersReady();
         signalRaceStartToClients();
         break;
     }
@@ -352,10 +350,7 @@ void ServerLobby::asynchronousUpdate()
             configRemoteKart(players);
 
             // Reset for next state usage
-            for (auto p : m_peers_ready)
-            {
-                p.second = false;
-            }
+            resetPeersReady();
             m_state = LOAD_WORLD;
             sendMessageToPeersChangingToken(load_world);
             delete load_world;
@@ -366,21 +361,6 @@ void ServerLobby::asynchronousUpdate()
     }
 
 }   // asynchronousUpdate
-
-//-----------------------------------------------------------------------------
-bool ServerLobby::checkPeersReady() const
-{
-    bool all_ready = true;
-    for (auto p : m_peers_ready)
-    {
-        if (p.first.expired())
-            continue;
-        all_ready = all_ready && p.second;
-        if (!all_ready)
-            return false;
-    }
-    return true;
-}   // checkPeersReady
 
 //-----------------------------------------------------------------------------
 /** Simple finite state machine.  Once this
@@ -427,19 +407,9 @@ void ServerLobby::update(int ticks)
         }
         break;
     case RESULT_DISPLAY:
-        if(StkTime::getRealTime() > m_timeout.load())
+        if (checkPeersReady() ||
+            StkTime::getRealTime() > m_timeout.load())
         {
-            RaceResultGUI::getInstance()->backToLobby();
-            // notify the network world that it is stopped
-            RaceEventManager::getInstance()->stop();
-            // stop race protocols
-            auto pm = ProtocolManager::lock();
-            assert(pm);
-            pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
-            pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
-            setup();
-            m_state = NetworkConfig::get()->isLAN() ?
-                ACCEPTING_CLIENTS : REGISTER_SELF_ADDRESS;
             // Send a notification to all clients to exit
             // the race result screen
             NetworkString *exit_result_screen = getNetworkString(1);
@@ -448,6 +418,17 @@ void ServerLobby::update(int ticks)
             sendMessageToPeersChangingToken(exit_result_screen,
                                             /*reliable*/true);
             delete exit_result_screen;
+            std::lock_guard<std::mutex> lock(m_connection_mutex);
+            m_state = NetworkConfig::get()->isLAN() ?
+                ACCEPTING_CLIENTS : REGISTER_SELF_ADDRESS;
+            updatePlayerList();
+            NetworkString* server_info = getNetworkString();
+            server_info->setSynchronous(true);
+            server_info->addUInt8(LE_SERVER_INFO);
+            m_game_setup->addServerInfo(server_info);
+            sendMessageToPeersChangingToken(server_info);
+            delete server_info;
+            setup();
         }
         break;
     case ERROR_LEAVE:
@@ -673,45 +654,39 @@ void ServerLobby::checkIncomingConnectionRequests()
 {
     assert(RaceEventManager::getInstance()->isRunning());
     assert(World::getWorld());
-    if(!RaceEventManager::getInstance()->isRaceOver()) return;
+    if (!RaceEventManager::getInstance()->isRaceOver()) return;
 
-    m_player_ready_counter = 0;
-    // Set the delay before the server forces all clients to exit the race
-    // result screen and go back to the lobby
-    m_timeout.store((float)(StkTime::getRealTime()+15.0f));
-    m_state = RESULT_DISPLAY;
-
-    // calculate karts ranks :
-    int num_karts = race_manager->getNumberOfKarts();
-    std::vector<int> karts_results;
-    std::vector<float> karts_times;
-    for (int j = 0; j < num_karts; j++)
-    {
-        float kart_time = race_manager->getKartRaceTime(j);
-        for (unsigned int i = 0; i < karts_times.size(); i++)
-        {
-            if (kart_time < karts_times[i])
-            {
-                karts_times.insert(karts_times.begin() + i, kart_time);
-                karts_results.insert(karts_results.begin() + i, j);
-                break;
-            }
-        }
-    }
-
-    NetworkString *total = getNetworkString(1 + karts_results.size());
+    // Reset for next state usage
+    resetPeersReady();
+    NetworkString* total = getNetworkString();
     total->setSynchronous(true);
     total->addUInt8(LE_RACE_FINISHED);
-    for (unsigned int i = 0; i < karts_results.size(); i++)
+    if (m_game_setup->isGrandPrix())
     {
-        total->addUInt8(karts_results[i]); // kart pos = i+1
-        Log::info("ServerLobby", "Kart %d finished #%d",
-            karts_results[i], i + 1);
+        // fastest lap, and than each kart before / after grand prix points
     }
+    else if (race_manager->modeHasLaps())
+    {
+        int fastest_lap =
+            static_cast<LinearWorld*>(World::getWorld())->getFastestLapTicks();
+        total->addUInt32(fastest_lap);
+    }
+    RaceResultGUI::getInstance()->backToLobby();
+    // notify the network world that it is stopped
+    RaceEventManager::getInstance()->stop();
+    // stop race protocols
+    auto pm = ProtocolManager::lock();
+    assert(pm);
+    pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
+    pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
+    // Set the delay before the server forces all clients to exit the race
+    // result screen and go back to the lobby
+    m_timeout.store((float)StkTime::getRealTime() + 15.0f);
+    m_state = RESULT_DISPLAY;
     sendMessageToPeersChangingToken(total, /*reliable*/ true);
     delete total;
     Log::info("ServerLobby", "End of game message sent");
-        
+
 }   // checkRaceFinished
 
 //-----------------------------------------------------------------------------
@@ -943,9 +918,15 @@ void ServerLobby::connectionRequested(Event* event)
     message_ack->setSynchronous(true);
     // connection success -- return the host id of peer
     message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt32(peer->getHostId());
-    m_game_setup->configClientAcceptConnection(message_ack);
     peer->sendPacket(message_ack);
     delete message_ack;
+
+    NetworkString* server_info = getNetworkString();
+    server_info->setSynchronous(true);
+    server_info->addUInt8(LE_SERVER_INFO);
+    m_game_setup->addServerInfo(server_info);
+    peer->sendPacket(server_info);
+    delete server_info;
 
     m_peers_ready[peer] = false;
     for (std::shared_ptr<NetworkPlayerProfile> npp : peer->getPlayerProfiles())
@@ -961,7 +942,7 @@ void ServerLobby::connectionRequested(Event* event)
 //-----------------------------------------------------------------------------
 void ServerLobby::updatePlayerList()
 {
-    if (m_state.load() != ACCEPTING_CLIENTS)
+    if (m_state.load() > ACCEPTING_CLIENTS)
         return;
     auto all_profiles = STKHost::get()->getAllPlayerProfiles();
     NetworkString* pl = getNetworkString();
@@ -1241,14 +1222,10 @@ void ServerLobby::startedRaceOnClient(Event *event)
  */
 void ServerLobby::playerFinishedResult(Event *event)
 {
-    m_player_ready_counter++;
-    if(m_player_ready_counter >= (int)STKHost::get()->getPeerCount())
-    {
-        // We can't trigger the world/race exit here, since this is called
-        // from the protocol manager thread. So instead we force the timeout
-        // to get triggered (which is done from the main thread):
-        m_timeout.store(0);
-    }
+    if (m_state.load() != RESULT_DISPLAY)
+        return;
+    std::shared_ptr<STKPeer> peer = event->getPeerSP();
+    m_peers_ready.at(peer) = true;
 }   // playerFinishedResult
 
 //-----------------------------------------------------------------------------

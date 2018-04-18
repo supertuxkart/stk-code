@@ -24,7 +24,7 @@
 #include "guiengine/message_queue.hpp"
 #include "input/device_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "modes/world_with_rank.hpp"
+#include "modes/linear_world.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
@@ -102,6 +102,7 @@ void ClientLobby::setAddress(const TransportAddress &address)
 void ClientLobby::setup()
 {
     clearPlayers();
+    m_received_server_result = false;
     TracksScreen::getInstance()->resetVote();
     LobbyProtocol::setup();
     m_state.store(NONE);
@@ -114,7 +115,8 @@ void ClientLobby::setup()
  */
 void ClientLobby::doneWithResults()
 {
-    NetworkString *done = getNetworkString(1);
+    NetworkString* done = getNetworkString(1);
+    done->setSynchronous(true);
     done->addUInt8(LE_RACE_FINISHED_ACK);
     sendToServer(done, /*reliable*/true);
     delete done;
@@ -139,6 +141,7 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_UPDATE_PLAYER_LIST:    updatePlayerList(event);    break;
         case LE_CHAT:                  handleChat(event);          break;
         case LE_CONNECTION_ACCEPTED:   connectionAccepted(event);  break;
+        case LE_SERVER_INFO:           handleServerInfo(event);    break;
         default:
             return false;
             break;
@@ -219,10 +222,9 @@ void ClientLobby::addAllPlayers(Event* event)
 
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     peer->cleanPlayerProfiles();
-
+    m_game_setup->update(true/*remove_disconnected_players*/);
     std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
     unsigned player_count = data.getUInt8();
-    assert(m_game_setup->getPlayerCount() == 0);
 
     for (unsigned i = 0; i < player_count; i++)
     {
@@ -423,8 +425,8 @@ void ClientLobby::disconnectedPlayer(Event* event)
  */
 void ClientLobby::connectionAccepted(Event* event)
 {
-    // At least 10 bytes should remain now
-    if (!checkDataSize(event, 10)) return;
+    // At least 4 bytes should remain now
+    if (!checkDataSize(event, 4)) return;
 
     NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
@@ -439,8 +441,18 @@ void ClientLobby::connectionAccepted(Event* event)
         NetworkConfig::get()->getNetworkPlayers().size());
     // connection token
     uint32_t token = data.getToken();
-    if (!peer->isClientServerTokenSet())
-        peer->setClientServerToken(token);
+    peer->setClientServerToken(token);
+    m_state.store(CONNECTED);
+
+}   // connectionAccepted
+
+//-----------------------------------------------------------------------------
+void ClientLobby::handleServerInfo(Event* event)
+{
+    // At least 6 bytes should remain now
+    if (!checkDataSize(event, 6)) return;
+
+    NetworkString &data = event->data();
     // Add server info
     core::stringw str, each_line;
     uint8_t u_data;
@@ -509,8 +521,7 @@ void ClientLobby::connectionAccepted(Event* event)
     if (!str.empty())
         NetworkingLobby::getInstance()->addMoreServerInfo(str);
 
-    m_state.store(CONNECTED);
-}   // connectionAccepted
+}   // handleServerInfo
 
 //-----------------------------------------------------------------------------
 void ClientLobby::updatePlayerList(Event* event)
@@ -682,34 +693,24 @@ void ClientLobby::startSelection(Event* event)
  */
 void ClientLobby::raceFinished(Event* event)
 {
-    if(!checkDataSize(event, 1)) return;
-
     NetworkString &data = event->data();
-    Log::error("ClientLobby",
-               "Server notified that the race is finished.");
+    Log::info("ClientLobby", "Server notified that the race is finished.");
+    if (m_game_setup->isGrandPrix())
+    {
+        // fastest lap, and than each kart before / after grand prix points
+    }
+    else if (race_manager->modeHasLaps())
+    {
+        int t = data.getUInt32();
+        static_cast<LinearWorld*>(World::getWorld())->setFastestLapTicks(t);
+    }
 
     // stop race protocols
     auto pm = ProtocolManager::lock();
     assert(pm);
     pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
     pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
-
-    // finish the race
-    WorldWithRank* ranked_world = (WorldWithRank*)(World::getWorld());
-    ranked_world->beginSetKartPositions();
-    ranked_world->setPhase(WorldStatus::RESULT_DISPLAY_PHASE);
-    int position = 1;
-    while(data.size()>0)
-    {
-        uint8_t kart_id = data.getUInt8();
-        ranked_world->setKartPosition(kart_id,position);
-        Log::info("ClientLobby", "Kart %d has finished #%d",
-                  kart_id, position);
-        position++;
-    }
-    ranked_world->endSetKartPositions();
-    m_state.store(RACE_FINISHED);
-    ranked_world->terminateRace();
+    m_received_server_result = true;
 }   // raceFinished
 
 //-----------------------------------------------------------------------------
@@ -718,15 +719,8 @@ void ClientLobby::raceFinished(Event* event)
  */
 void ClientLobby::exitResultScreen(Event *event)
 {
-    // stop race protocols
-    auto pm = ProtocolManager::lock();
-    assert(pm);
-    pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
-    pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
-
-    // Will be reset to linked if connected to server, see update(float dt)
     setup();
-
+    m_state.store(CONNECTED);
     RaceResultGUI::getInstance()->backToLobby();
 }   // exitResultScreen
 

@@ -149,6 +149,11 @@ void WorldStatus::setClockMode(const ClockType mode, const float initial_time)
  */
 void WorldStatus::enterRaceOverState()
 {
+    // Waiting for server result info
+    auto cl = LobbyProtocol::get<ClientLobby>();
+    if (cl && !cl->receivedServerResult())
+        return;
+
     // Don't enter race over if it's already race over
     if (m_phase == DELAY_FINISH_PHASE || m_phase == RESULT_DISPLAY_PHASE ||
         m_phase == FINISH_PHASE)

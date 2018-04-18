@@ -161,10 +161,11 @@ bool LocalPlayerController::action(PlayerAction action, int value,
         NetworkConfig::get()->isClient()    &&
         !RewindManager::get()->isRewinding()   )
     {
-        GameProtocol::lock()
-                    ->controllerAction(m_kart->getWorldKartId(),
-                                       action, value,
-                                       m_steer_val_l, m_steer_val_r);
+        if (auto gp = GameProtocol::lock())
+        {
+            gp->controllerAction(m_kart->getWorldKartId(), action, value,
+                m_steer_val_l, m_steer_val_r);
+        }
     }
     return PlayerController::action(action, value, /*dry_run*/false);
 }   // action

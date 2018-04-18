@@ -568,7 +568,7 @@ void World::terminateRace()
     // to show it in the GUI
     int best_highscore_rank = -1;
     std::string highscore_who = "";
-    if (!this->isNetworkWorld())
+    if (!isNetworkWorld())
     {
         updateHighscores(&best_highscore_rank);
     }
@@ -1073,7 +1073,7 @@ void World::updateTrack(int ticks)
 // ----------------------------------------------------------------------------
 Highscores* World::getHighscores() const
 {
-    if(!m_use_highscores) return NULL;
+    if (isNetworkWorld() || !m_use_highscores) return NULL;
 
     const Highscores::HighscoreType type = "HST_" + getIdent();
 

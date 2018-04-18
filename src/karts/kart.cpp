@@ -69,6 +69,7 @@
 #include "modes/soccer_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"
@@ -861,23 +862,23 @@ void Kart::finishedRace(float time, bool from_server)
     // because the race was over (i.e. estimating the finish time). If
     // this kart then crosses the finish line (with the end controller)
     // it would trigger a race end again.
-    if(m_finished_race) return;
+    if (m_finished_race) return;
 
-/*    if(!from_server)
+    if (NetworkConfig::get()->isNetworking() && !from_server)
     {
-        if(NetworkConfig::get()->isServer())
+        if (NetworkConfig::get()->isServer())
         {
             RaceEventManager::getInstance()->kartFinishedRace(this, time);
         }   // isServer
 
         // Ignore local detection of a kart finishing a race in a 
         // network game.
-        else if(NetworkConfig::get()->isClient())
+        else if (NetworkConfig::get()->isClient())
         {
             return;
         }
     }   // !from_server
-*/
+
     m_finished_race = true;
     m_finish_time   = time;
     m_controller->finishedRace(time);
@@ -918,7 +919,7 @@ void Kart::finishedRace(float time, bool from_server)
     {
         // Save for music handling in race result gui
         setRaceResult();
-        if(!isGhostKart())
+        if (!isGhostKart())
         {
             setController(new EndController(this, m_controller));
         }
@@ -949,15 +950,17 @@ void Kart::setRaceResult()
                 else
                     m_race_result = false;
             }
-            else if (this->getPosition() <= 0.5f*race_manager->getNumberOfKarts() ||
-                     this->getPosition() == 1)
+            else if (this->getPosition() <= 0.5f *
+                World::getWorld()->getCurrentNumKarts() ||
+                this->getPosition() == 1)
                 m_race_result = true;
             else
                 m_race_result = false;
         }
         else
         {
-            if (this->getPosition() <= 0.5f*race_manager->getNumberOfKarts() ||
+            if (this->getPosition() <= 0.5f *
+                World::getWorld()->getCurrentNumKarts() ||
                 this->getPosition() == 1)
                 m_race_result = true;
             else

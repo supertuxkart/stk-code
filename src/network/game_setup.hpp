@@ -125,7 +125,7 @@ public:
     // ------------------------------------------------------------------------
     void setGrandPrixTrack(int tracks_no)  { m_extra_server_info = tracks_no; }
     // ------------------------------------------------------------------------
-    void configClientAcceptConnection(NetworkString* ns);
+    void addServerInfo(NetworkString* ns);
     // ------------------------------------------------------------------------
     void loadWorld();
     // ------------------------------------------------------------------------

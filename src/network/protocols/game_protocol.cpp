@@ -326,8 +326,7 @@ void GameProtocol::rewind(BareNetworkString *buffer)
     int value_r = buffer->getUInt32();
     Controller *c = World::getWorld()->getKart(kart_id)->getController();
     PlayerController *pc = dynamic_cast<PlayerController*>(c);
-    // FIXME this can be endcontroller when finishing the race
-    //assert(pc);
-    if(pc)
+    // This can be endcontroller when finishing the race
+    if (pc)
         pc->actionFromNetwork(action, value, value_l, value_r);
 }   // rewind

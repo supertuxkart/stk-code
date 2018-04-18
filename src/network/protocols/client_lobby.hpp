@@ -22,6 +22,7 @@ private:
     void displayPlayerVote(Event* event);
     void updatePlayerList(Event* event);
     void handleChat(Event* event);
+    void handleServerInfo(Event* event);
     void becomingServerOwner();
 
     void clearPlayers();
@@ -48,6 +49,8 @@ private:
     std::set<std::string> m_available_karts;
     std::set<std::string> m_available_tracks;
 
+    bool m_received_server_result = false;
+
     void addAllPlayers(Event* event);
 
 public:
@@ -55,6 +58,7 @@ public:
     virtual ~ClientLobby();
     void setAddress(const TransportAddress &address);
     void doneWithResults();
+    bool receivedServerResult()            { return m_received_server_result; }
     void startingRaceNow();
     const std::set<std::string>& getAvailableKarts() const
                                                   { return m_available_karts; }

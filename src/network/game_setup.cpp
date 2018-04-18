@@ -101,7 +101,7 @@ bool GameSetup::isGrandPrix() const
 }   // isGrandPrix
 
 //-----------------------------------------------------------------------------
-void GameSetup::configClientAcceptConnection(NetworkString* ns)
+void GameSetup::addServerInfo(NetworkString* ns)
 {
     assert(NetworkConfig::get()->isServer());
     ns->encodeString(NetworkConfig::get()->getServerName());
@@ -127,4 +127,4 @@ void GameSetup::configClientAcceptConnection(NetworkString* ns)
         ns->addUInt8((uint8_t)0);
     }
     ns->encodeString(NetworkConfig::get()->getMOTD());
-}   // configClientAcceptConnection
+}   // addServerInfo
