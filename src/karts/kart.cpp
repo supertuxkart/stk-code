@@ -1550,23 +1550,6 @@ void Kart::update(int ticks)
         NetworkConfig::get()->isServer()       )
         ItemManager::get()->checkItemHit(this);
 
-    static video::SColor pink(255, 255, 133, 253);
-    static video::SColor green(255, 61, 87, 23);
-
-#ifndef SERVER_ONLY
-    // draw skidmarks if relevant (we force pink skidmarks on when hitting 
-    // a bubblegum)
-    if(m_kart_properties->getSkidEnabled() && m_skidmarks)
-    {
-        m_skidmarks->update(dt,
-                            m_bubblegum_ticks > 0,
-                            (m_bubblegum_ticks > 0 
-                                ? (m_has_caught_nolok_bubblegum ? &green 
-                                                                : &pink) 
-                                : NULL            )                     );
-    }
-#endif
-
     const bool emergency = getKartAnimation()!=NULL;
 
     if (emergency)
@@ -1785,7 +1768,7 @@ void Kart::handleMaterialSFX(const Material *material)
 
     // terrain sound is not necessarily a looping sound so check its status before
     // setting its speed, to avoid 'ressuscitating' sounds that had already stopped
-    if(m_terrain_sound && main_loop->isLstSubstep() &&
+    if(m_terrain_sound && main_loop->isLastSubstep() &&
       (m_terrain_sound->getStatus()==SFXBase::SFX_PLAYING ||
        m_terrain_sound->getStatus()==SFXBase::SFX_PAUSED))
     {
@@ -2423,7 +2406,7 @@ void Kart::updateEngineSFX(float dt)
     // Only update SFX during the last substep (otherwise too many SFX commands
     // in one frame), and if sfx are enabled
     if(!m_engine_sound || !SFXManager::get()->sfxAllowed() ||
-        !main_loop->isLstSubstep()                              )
+        !main_loop->isLastSubstep()                              )
         return;
 
     // when going faster, use higher pitch for engine
@@ -2860,9 +2843,25 @@ SFXBase* Kart::getNextEmitter()
  *  \param offset_xyz Offset to be added to the position.
  *  \param rotation Additional rotation.
  */
-void Kart::updateGraphics(int ticks, const Vec3& offset_xyz,
-                          const btQuaternion& rotation)
+void Kart::updateGraphics(float dt)
 {
+    static video::SColor pink(255, 255, 133, 253);
+    static video::SColor green(255, 61, 87, 23);
+
+#ifndef SERVER_ONLY
+    // draw skidmarks if relevant (we force pink skidmarks on when hitting 
+    // a bubblegum)
+    if (m_kart_properties->getSkidEnabled() && m_skidmarks)
+    {
+        m_skidmarks->update(dt,
+            m_bubblegum_ticks > 0,
+            (m_bubblegum_ticks > 0
+                ? (m_has_caught_nolok_bubblegum ? &green
+                    : &pink)
+                : NULL));
+    }
+#endif
+
     // Upate particle effects (creation rate, and emitter size
     // depending on speed)
     // --------------------------------------------------------
@@ -2896,7 +2895,6 @@ void Kart::updateGraphics(int ticks, const Vec3& offset_xyz,
 
     const float roll_speed = m_kart_properties->getLeanSpeed() * DEGREE_TO_RAD;
 
-    float dt = stk_config->ticks2Time(ticks);
     if(speed_frac > 0.8f && fabsf(steer_frac)>0.5f)
     {
         // Use steering ^ 7, which means less effect at lower
@@ -2949,7 +2947,7 @@ void Kart::updateGraphics(int ticks, const Vec3& offset_xyz,
     center_shift = getTrans().getBasis() * center_shift;
 
     float heading = m_skidding->getVisualSkidRotation();
-    Moveable::updateGraphics(ticks, center_shift,
+    Moveable::updateGraphics(dt, center_shift,
                              btQuaternion(heading, 0, -m_current_lean));
 
     // m_speed*dt is the distance the kart has moved, which determines

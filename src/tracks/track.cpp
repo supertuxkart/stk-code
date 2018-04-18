@@ -1521,7 +1521,22 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
 }   // handleAnimatedTextures
 
 // ----------------------------------------------------------------------------
-/** Update, called once per frame.
+/** This updates all only graphical elements. It is only called once per
+ *  rendered frame, not once per time step.
+ *  float dt Time since last rame.
+ */
+void Track::updateGraphics(float dt)
+{
+    m_track_object_manager->updateGraphics(dt);
+
+    for (unsigned int i = 0; i<m_animated_textures.size(); i++)
+    {
+        m_animated_textures[i]->update(dt);
+    }
+}   // updateGraphics
+
+// ----------------------------------------------------------------------------
+/** Update, called once per physics time step.
  *  \param dt Timestep.
  */
 void Track::update(int ticks)
@@ -1533,11 +1548,6 @@ void Track::update(int ticks)
     }
     float dt = stk_config->ticks2Time(ticks);
     m_track_object_manager->update(dt);
-
-    for(unsigned int i=0; i<m_animated_textures.size(); i++)
-    {
-        m_animated_textures[i]->update(dt);
-    }
     CheckManager::get()->update(dt);
     ItemManager::get()->update(ticks);
 

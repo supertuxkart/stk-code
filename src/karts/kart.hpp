@@ -246,8 +246,7 @@ public:
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
     virtual void   kartIsInRestNow();
-    virtual void   updateGraphics(int ticks, const Vec3& off_xyz,
-                                  const btQuaternion& off_rotation);
+    virtual void   updateGraphics(float dt) OVERRIDE;
     virtual void   createPhysics    ();
     virtual void   updateWeight     ();
     virtual float  getSpeedForTurnRadius(float radius) const;

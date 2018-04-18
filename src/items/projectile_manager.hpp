@@ -59,6 +59,7 @@ public:
     void             loadData         ();
     void             cleanup          ();
     void             update           (int ticks);
+    void             updateGraphics   (float dt);
     Flyable*         newProjectile    (AbstractKart *kart,
                                        PowerupManager::PowerupType type);
     void             Deactivate       (Flyable *p) {}

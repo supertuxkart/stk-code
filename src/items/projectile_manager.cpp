@@ -62,6 +62,21 @@ void ProjectileManager::cleanup()
 }   // cleanup
 
 // -----------------------------------------------------------------------------
+/** Called once per rendered frame. It is used to only update any graphical
+ *  effects, and calls updateGraphics in any flyable objects.
+ *  \param dt Time step size (since last call).
+ */
+void ProjectileManager::updateGraphics(float dt)
+{
+    for (auto p  = m_active_projectiles.begin(); 
+              p != m_active_projectiles.end();   ++p)
+    {
+        (*p)->updateGraphics(dt);
+    }
+
+}   // updateGraphics
+
+// -----------------------------------------------------------------------------
 /** General projectile update call. */
 void ProjectileManager::update(int ticks)
 {

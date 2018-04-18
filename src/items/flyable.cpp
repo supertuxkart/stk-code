@@ -372,6 +372,16 @@ void Flyable::setAnimation(AbstractKartAnimation *animation)
 }   // addAnimation
 
 //-----------------------------------------------------------------------------
+/** Called once per rendered frame. It is used to only update any graphical
+ *  effects.
+ *  \param dt Time step size (since last call).
+ */
+void Flyable::updateGraphics(float dt)
+{
+    Moveable::updateGraphics(dt, Vec3(0, 0, 0), btQuaternion(0, 0, 0, 1));
+}   // updateGraphics
+
+//-----------------------------------------------------------------------------
 /** Updates this flyable. It calls Moveable::update. If this function returns
  *  true, the flyable will be deleted by the projectile manager.
  *  \param dt Time step size.

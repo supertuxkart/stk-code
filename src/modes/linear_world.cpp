@@ -240,6 +240,7 @@ void LinearWorld::update(int ticks)
 */
 void LinearWorld::updateGraphics(float dt)
 {
+    WorldWithRank::updateGraphics(dt);
     if (m_last_lap_sfx_playing &&
         m_last_lap_sfx->getStatus() != SFXBase::SFX_PLAYING)
     {
