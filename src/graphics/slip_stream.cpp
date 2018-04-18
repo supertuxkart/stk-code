@@ -46,16 +46,16 @@ SlipStream::SlipStream(AbstractKart* kart)
     m_kart = kart;
     m_moving = NULL;
     m_moving_fast = NULL;
+    m_moving_bonus = NULL;
 
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
         m_moving = new MovingTexture(0.0f, 0.0f);
-        m_moving_fast = new MovingTexture(0.0f, 0.0f);
 
         Material* material =
             material_manager->getMaterialSPM("slipstream.png", "");
-        SP::SPMesh* mesh = createMesh(material);
+        SP::SPMesh* mesh = createMesh(material, false);
         m_node = irr_driver->addMesh(mesh, "slipstream");
         mesh->drop();
         std::string debug_name = m_kart->getIdent()+" (slip-stream)";
@@ -67,8 +67,10 @@ SlipStream::SlipStream(AbstractKart* kart)
         assert(spmn);
         m_moving->setSPTM(spmn->getTextureMatrix(0).data());
 
+        m_moving_fast = new MovingTexture(0.0f, 0.0f);
+
         material = material_manager->getMaterialSPM("slipstream2.png", "");
-        mesh = createMesh(material);
+        mesh = createMesh(material, false);
         m_node_fast = irr_driver->addMesh(mesh, "slipstream2");
         mesh->drop();
         debug_name = m_kart->getIdent()+" (slip-stream2)";
@@ -79,10 +81,29 @@ SlipStream::SlipStream(AbstractKart* kart)
         spmn = dynamic_cast<SP::SPMeshNode*>(m_node_fast);
         assert(spmn);
         m_moving_fast->setSPTM(spmn->getTextureMatrix(0).data());
+
+        m_moving_bonus = new MovingTexture(0.0f, 0.0f);
+
+        material = material_manager->getMaterialSPM("slipstream_bonus.png", "");
+        mesh = createMesh(material, true);
+        m_bonus_node = irr_driver->addMesh(mesh, "slipstream-bonus");
+        mesh->drop();
+        debug_name = m_kart->getIdent()+" (slip-stream-bonus)";
+        m_bonus_node->setName(debug_name.c_str());
+        m_bonus_node->setPosition(core::vector3df(0, 0 * 0.25f + 2.5f,
+            m_kart->getKartLength()));
+        m_bonus_node->setVisible(true);
+        spmn = dynamic_cast<SP::SPMeshNode*>(m_bonus_node);
+        assert(spmn);
+        m_moving_bonus->setSPTM(spmn->getTextureMatrix(0).data());
     }
 #endif
 
     m_slipstream_time      = 0.0f;
+    m_bonus_time           = 0.0f;
+    m_bonus_active         = false;
+    m_current_target_id    = -1;//should not match a real possible kart ID
+    m_previous_target_id   = -1;
 
     //The kart starts at 0 speed anyway
     float length = 0.0f;
@@ -101,6 +122,8 @@ SlipStream::SlipStream(AbstractKart* kart)
     m_slipstream_quad          = new Quad(p[0], p[1], p[2], p[3]);
     //The position will be corrected in the update anyway
     m_slipstream_inner_quad    = new Quad(p[0], p[1], p[2], p[3]);
+    //The position will be corrected in the update anyway
+    m_slipstream_outer_quad    = new Quad(p[0], p[1], p[2], p[3]);
 #ifndef SERVER_ONLY
     if (UserConfigParams::m_slipstream_debug)
     {
@@ -155,6 +178,10 @@ SlipStream::~SlipStream()
     {
         irr_driver->removeNode(m_node_fast);
     }
+    if (m_bonus_node)
+    {
+        irr_driver->removeNode(m_bonus_node);
+    }
     if (m_debug_dc)
     {
         m_debug_dc->removeFromSP();
@@ -165,11 +192,13 @@ SlipStream::~SlipStream()
     }
     delete m_slipstream_quad;
     delete m_slipstream_inner_quad;
+    delete m_slipstream_outer_quad;
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
         delete m_moving;
         delete m_moving_fast;
+        delete m_moving_bonus;
     }
 #endif
 
@@ -181,6 +210,7 @@ void SlipStream::reset()
 {
     m_slipstream_mode = SS_NONE;
     m_slipstream_time = 0;
+    m_bonus_time = 0;
 
     // Reset a potential max speed increase
     m_kart->increaseMaxSpeed(MaxSpeed::MS_INCREASE_SLIPSTREAM, 0, 0, 0, 0);
@@ -193,13 +223,19 @@ void SlipStream::reset()
  *  texture coordniates.
  *  \param material  The material to use.
  */
-SP::SPMesh* SlipStream::createMesh(Material* material)
+SP::SPMesh* SlipStream::createMesh(Material* material, bool bonus_mesh)
 {
     SP::SPMesh* spm = NULL;
 #ifndef SERVER_ONLY
     // All radius, starting with the one closest to the kart (and
     // widest) to the one furthest away. A 0 indicates the end of the list
-    float radius[] = {1.5f, 1.0f, 0.5f, 0.0f};
+
+    std::vector<float> radius = {1.5f, 1.0f, 0.5f, 0.0f};
+
+    if (bonus_mesh)
+    {
+        radius = {0.9f,0.6f,0.3f,0.0f};
+    }
 
     // The distance of each of the circle from the kart. The number of
     // entries in this array must be the same as the number of non-zero
@@ -217,7 +253,12 @@ SP::SPMesh* SlipStream::createMesh(Material* material)
     // (radius1-radius0)/(distance1-distance0) = (radius2-radius1)/(distnace2-distance0)
     // This way the line connecting the upper "+" is a straight line,
     // and so the 3d cone shape will not be disturbed.
-    float distance[] = {2.0f, 6.0f, 10.0f };
+    std::vector<float> distance = {2.0f, 6.0f, 10.0f };
+
+    if (bonus_mesh)
+    {
+        distance = {0.4f, 0.8f, 1.2f };
+    }
 
     // The alpha values for the rings, no 'end of list' entry required.
     int alphas[]     = {0, 255, 0};
@@ -230,7 +271,10 @@ SP::SPMesh* SlipStream::createMesh(Material* material)
     assert(num_circles > 0);
 
     // Length is distance of last circle to distance of first circle:
-    m_length = distance[num_circles-1] - distance[0];
+    float length = distance[num_circles-1] - distance[0];
+
+    if (!bonus_mesh)
+        m_length = length;
 
     // The number of points for each circle. Since part of the slip stream
     // might be under the ground (esp. first and last segment), specify
@@ -241,12 +285,24 @@ SP::SPMesh* SlipStream::createMesh(Material* material)
     const float         f              = 2*M_PI/float(num_segments);
     SP::SPMeshBuffer* buffer           = new SP::SPMeshBuffer();
 
-    static_cast<SP::SPPerObjectUniform*>(buffer)->addAssignerFunction
-        ("custom_alpha", [this](SP::SPUniformAssigner* ua)->void
-        {
-            // In sp shader it's assigned reverse by 1.0 - custom_alpha
-            ua->setValue(1.0f - m_slipstream_time);
-        });
+    if(!bonus_mesh)
+    {
+        static_cast<SP::SPPerObjectUniform*>(buffer)->addAssignerFunction
+            ("custom_alpha", [this](SP::SPUniformAssigner* ua)->void
+            {
+                // In sp shader it's assigned reverse by 1.0 - custom_alpha
+                ua->setValue(1.0f - m_slipstream_time);
+            });
+    }
+    else
+    {
+        static_cast<SP::SPPerObjectUniform*>(buffer)->addAssignerFunction
+            ("custom_alpha", [this](SP::SPUniformAssigner* ua)->void
+            {
+                // In sp shader it's assigned reverse by 1.0 - custom_alpha
+                ua->setValue(1.0f - m_bonus_time);
+            });
+    }
 
     std::vector<uint16_t> indices;
     std::vector<video::S3DVertexSkinnedMesh> vertices;
@@ -265,7 +321,7 @@ SP::SPMesh* SlipStream::createMesh(Material* material)
             // Enable texture matrix and dummy normal for visualization
             v.m_normal = 0x1FF << 10 | 1 << 30;
             v.m_color = video::SColor(alphas[j], 255, 255, 255);
-            v.m_all_uvs[0] = MiniGLM::toFloat16(curr_distance/m_length);
+            v.m_all_uvs[0] = MiniGLM::toFloat16(curr_distance/length);
             v.m_all_uvs[1] = MiniGLM::toFloat16(
                 (float)(i-first_segment)/(last_segment-first_segment)
                 + (j%2)*(.5f/num_segments));
@@ -299,13 +355,8 @@ SP::SPMesh* SlipStream::createMesh(Material* material)
     return spm;
 }   // createMesh
 
-//-----------------------------------------------------------------------------
-/** Sets the animation intensity (or speed).
- *  \param f Intensity: 0 = no slip stream,
- *                      1 = collecting
- *                      2 = bonus can be used
- */
-void SlipStream::setIntensity(float f, const AbstractKart *kart)
+//----------------------------------------------------------------------------- */
+void SlipStream::updateSlipstreamingTextures(float f, const AbstractKart *kart)
 {
     if (!kart || !m_node || !m_node_fast)
     {
@@ -320,7 +371,7 @@ void SlipStream::setIntensity(float f, const AbstractKart *kart)
         return;
     }
 
-    float ktf = m_kart->getKartProperties()->getSlipstreamCollectTime();
+    float ktf = m_kart->getKartProperties()->getSlipstreamMinCollectTime();
 
     const float above_terrain = 0.2f;
     core::vector3df my_pos = m_kart->getNode()->getPosition();
@@ -343,7 +394,9 @@ void SlipStream::setIntensity(float f, const AbstractKart *kart)
     m_node_fast->setVisible(f>=ktf);
 
     //specify the texture speed movement
-    if (f > 8.0f) f = 8.0f;
+    float max_f = m_kart->getKartProperties()->getSlipstreamMaxCollectTime();
+
+    if (f > max_f) f = max_f;
     f = f/2;
 
     m_moving->setSpeed(f, 0);
@@ -353,7 +406,32 @@ void SlipStream::setIntensity(float f, const AbstractKart *kart)
     // For debugging: make the slip stream effect visible all the time
     m_node->setVisible(true);
     m_moving->setSpeed(1.0f, 0.0f);
-}   // setIntensity
+}   // updateSlipstreamingTextures
+
+//----------------------------------------------------------------------------- */
+void SlipStream::updateBonusTexture()
+{
+    if (!m_bonus_node)
+    {
+        return;
+    }
+
+    const float above_terrain = 0.2f;
+    core::vector3df my_pos = m_kart->getNode()->getPosition();
+    my_pos.Y += above_terrain;
+
+    core::vector3df previous_pos = m_kart->getRecentPreviousXYZ().toIrrVector();
+    core::vector3df diff = my_pos - previous_pos;
+    core::vector3df rotation = diff.getHorizontalAngle();
+
+    m_bonus_node->setPosition(my_pos);
+    m_bonus_node->setRotation(rotation);
+
+    m_bonus_node->setVisible(m_bonus_time > 0.0f && m_kart->getSpeed() > 2.0f);
+
+    float bonus_speed = 1.0f + std::max(m_bonus_time/1.5f,0.0f);
+    m_moving_bonus->setSpeed(bonus_speed, 0);
+} //updateBonusTexture
 
 //-----------------------------------------------------------------------------
 /** Returns true if enough slipstream credits have been accumulated
@@ -362,27 +440,8 @@ void SlipStream::setIntensity(float f, const AbstractKart *kart)
 bool SlipStream::isSlipstreamReady() const
 {
     return m_slipstream_time>
-        m_kart->getKartProperties()->getSlipstreamCollectTime();
+        m_kart->getKartProperties()->getSlipstreamMinCollectTime();
 }   // isSlipstreamReady
-
-//-----------------------------------------------------------------------------
-/** Returns the additional force being applied to the kart because of
- *  slipstreaming.
- */
-void SlipStream::updateSlipstreamPower()
-{
-    // See if we are currently using accumulated slipstream credits:
-    // -------------------------------------------------------------
-    if(m_slipstream_mode==SS_USE)
-    {        
-        const KartProperties *kp = m_kart->getKartProperties();
-        m_kart->increaseMaxSpeed(MaxSpeed::MS_INCREASE_SLIPSTREAM,
-                                kp->getSlipstreamMaxSpeedIncrease(),
-                                kp->getSlipstreamAddPower(),
-                                kp->getSlipstreamDuration(),
-                                kp->getSlipstreamFadeOutTime());
-    }
-}   // upateSlipstreamPower
 
 //-----------------------------------------------------------------------------
 /** Sets the color of the debug mesh (which shows the area in which slipstream
@@ -493,6 +552,12 @@ void SlipStream::updateQuad()
     //Update the slipstreaming quad
     m_slipstream_quad->setQuad(p[0], p[1], p[2], p[3]);
 
+    p[1]=Vec3((-ew*0.5f+offx)*1.1f, 0, -kl*0.5f-(length+offz)*1.1f);
+    p[2]=Vec3((ew*0.5f+offx)*1.1f, 0, -kl*0.5f-(length+offz)*1.1f);
+
+    //Update the slipstreaming outer quad
+    m_slipstream_outer_quad->setQuad(p[0], p[1], p[2], p[3]);
+
 #ifndef SERVER_ONLY
     //recalculate quad position for debug drawing
     if (UserConfigParams::m_slipstream_debug)
@@ -518,10 +583,8 @@ void SlipStream::updateQuad()
     offx   = (kl*0.5f+length)*noffset.x();
     offz   = (kl*0.5f+length)*noffset.z();
 
-    p[0]=Vec3(-kw*0.5f, 0, kl*0.5f );
     p[1]=Vec3(-ew*0.5f+offx, 0, -kl*0.5f-length+offz);
     p[2]=Vec3( ew*0.5f+offx, 0, -kl*0.5f-length+offz);
-    p[3]=Vec3( kw*0.5f, 0, kl*0.5f );
 
     //Update the slipstreaming inner quad
     m_slipstream_inner_quad->setQuad(p[0], p[1], p[2], p[3]);
@@ -570,16 +633,12 @@ void SlipStream::update(float dt)
     {
         m_moving->update(dt);
         m_moving_fast->update(dt);
+        m_moving_bonus->update(dt);
     }
 #endif
 
-    if(m_slipstream_mode==SS_USE)
-    {
-        m_slipstream_time -= dt;//This makes slipstream_time decrease twice faster
-        if(m_slipstream_time<0) m_slipstream_mode=SS_NONE;
-    }
-
-    updateSlipstreamPower();
+    m_bonus_time -= dt;
+    if (m_bonus_time <= 0) m_bonus_active = false;
 
     // If this kart is too slow for slipstreaming taking effect, do nothing
     // Use a margin because what really matters is the target's speed
@@ -593,7 +652,11 @@ void SlipStream::update(float dt)
     if(m_kart->getSpeed() < kp->getSlipstreamMinSpeed() - 2.0f)
     {
 #ifndef SERVER_ONLY
-        if (CVS->isGLSL()) setIntensity(0, NULL);
+        if (CVS->isGLSL())
+        {
+            updateSlipstreamingTextures(0,NULL);
+            updateBonusTexture();
+        }
 #endif
         m_slipstream_mode = SS_NONE;
         if(UserConfigParams::m_slipstream_debug)
@@ -611,7 +674,9 @@ void SlipStream::update(float dt)
     unsigned int num_karts   = world->getNumKarts();
     bool is_sstreaming       = false;
     bool is_inner_sstreaming = false;
+    bool is_outer_sstreaming = false;
     m_target_kart            = NULL;
+    std::vector<float> target_value;
 
     // Note that this loop can not be simply replaced with a shorter loop
     // using only the karts with a better position - since a kart might
@@ -619,13 +684,19 @@ void SlipStream::update(float dt)
     for(unsigned int i=0; i<num_karts; i++)
     {
         m_target_kart= world->getKart(i);
+        target_value.push_back(0);
 
         // Don't test for slipstream with itself, a kart that is being
         // rescued or exploding, a ghost kart or an eliminated kart
         if(m_target_kart==m_kart               ||
             m_target_kart->getKartAnimation()  ||
             m_target_kart->isGhostKart()       ||
-            m_target_kart->isEliminated()        ) continue;
+            m_target_kart->isEliminated()        )
+        {
+            if (m_previous_target_id >= 0 && (int) i==m_previous_target_id)
+                m_previous_target_id = -1;
+            continue;
+        }
 
         const KartProperties *kp_target = m_target_kart->getKartProperties();
 
@@ -649,7 +720,8 @@ void SlipStream::update(float dt)
                 m_target_kart->getSlipstream()
                               ->setDebugColor(video::SColor(255, 0, 0, 0), true);
             }
-
+            if (m_previous_target_id >= 0 && (int) i==m_previous_target_id)
+                m_previous_target_id = -1;
             continue;
         }
 #endif
@@ -659,13 +731,15 @@ void SlipStream::update(float dt)
         // (additional target_kart_length because that kart's center
         // is not the center of rotation of the slipstreaming quad)
         Vec3 delta = m_kart->getXYZ() - m_target_kart->getXYZ();
-        float l    = kp_target->getSlipstreamLength();
+        float l    = kp_target->getSlipstreamLength()*1.1;//Outer quad margin
         float speed_factor = m_target_kart->getSpeed()
                             /kp_target->getSlipstreamBaseSpeed();
         l = l*speed_factor + m_target_kart->getKartLength()
                            + 0.5f*m_kart->getKartLength();
         if(delta.length2() > l*l)
         {
+            if (m_previous_target_id >= 0 && (int) i==m_previous_target_id)
+                m_previous_target_id = -1;
             continue;
         }
         // Real test 1: if in inner slipstream quad of other kart
@@ -674,7 +748,8 @@ void SlipStream::update(float dt)
         {
             is_inner_sstreaming = true;
             is_sstreaming       = true;
-            break;
+            target_value[i]     = 2000.0f - delta.length2();
+            continue;
         }
         if(UserConfigParams::m_slipstream_debug &&
             m_kart->getController()->isLocalPlayerController())
@@ -686,13 +761,73 @@ void SlipStream::update(float dt)
                                          ->pointInside(lc))
         {
             is_sstreaming     = true;
-            break;
+            target_value[i]     = 1000.0f - delta.length2();
+            continue;
+        }
+        else if (m_previous_target_id >= 0 && (int) i==m_previous_target_id)
+        {
+            m_previous_target_id = -1;
         }
         if(UserConfigParams::m_slipstream_debug &&
             m_kart->getController()->isLocalPlayerController())
             m_target_kart->getSlipstream()
                          ->setDebugColor(video::SColor(255, 0, 0, 255),false);
+
+        // Real test3: if in outer slipstream quad of other kart
+        if(m_target_kart->getSlipstream()->m_slipstream_outer_quad
+                                         ->pointInside(lc))
+        {
+            is_outer_sstreaming     = true;
+            continue;
+        }
     }   // for i < num_karts
+
+    int best_target=-1;
+    float best_target_value=0.0f;
+    
+    //Select the best target
+    for(unsigned int i=0; i<num_karts; i++)
+    {
+        if (target_value[i] > best_target_value)
+        {
+            best_target_value = target_value[i];
+            best_target=i;
+        }
+    }   // for i < num_karts
+
+    if (best_target >= 0)
+    {
+        m_target_kart = world->getKart(best_target);
+    }
+
+    //When changing slipstream target (including no good target)
+    if (best_target!=m_current_target_id)
+    {
+        m_previous_target_id = m_current_target_id;
+        m_current_target_id = best_target;
+    }
+
+    if(isSlipstreamReady() && (m_current_target_id < 0
+                               || (m_previous_target_id >= 0
+                                   && target_value[m_previous_target_id] == 0.0f)))
+    {
+        // The first time slipstream is ready after collecting, and
+        // you are leaving the slipstream area, the bonus is activated
+        float additional_time = m_slipstream_time*kp->getSlipstreamDurationFactor();
+        if (m_bonus_time <= 0.0f)
+            m_bonus_time = additional_time;
+        else
+            m_bonus_time += additional_time;
+
+        m_slipstream_time = 0.0f;
+        m_bonus_active = true;
+        m_kart->instantSpeedIncrease(MaxSpeed::MS_INCREASE_SLIPSTREAM,
+                                kp->getSlipstreamMaxSpeedIncrease(),
+                                kp->getSlipstreamMaxSpeedIncrease(),
+                                kp->getSlipstreamAddPower(),
+                                m_bonus_time,
+                                kp->getSlipstreamFadeOutTime());
+    }
 
     if(!is_sstreaming)
     {
@@ -706,28 +841,18 @@ void SlipStream::update(float dt)
                          ->setDebugColor(video::SColor(255, 0, 255, 0),true);
 
         }
-
-        if(isSlipstreamReady())
-        {
-            // The first time slipstream is ready after collecting
-            // and you are leaving the slipstream area, you get an
-            // instant speed_increase
-            if(m_slipstream_mode==SS_COLLECT)
-            {
-                m_slipstream_mode = SS_USE;
-                m_kart->instantSpeedIncrease(MaxSpeed::MS_INCREASE_SLIPSTREAM,
-                                kp->getSlipstreamMaxSpeedIncrease(),
-                                kp->getSlipstreamMaxSpeedIncrease(),
-                                kp->getSlipstreamAddPower(),
-                                kp->getSlipstreamDuration(),
-                                kp->getSlipstreamFadeOutTime());
-                return;
-            }
-        }
-        m_slipstream_time -=dt;
+        //Reduces the easiness of reusing most of the accumulated time with another kart
+        if(is_outer_sstreaming)
+            m_slipstream_time -=dt;
+        else
+            m_slipstream_time -=3*dt;
         if(m_slipstream_time<0) m_slipstream_mode = SS_NONE;
 #ifndef SERVER_ONLY
-        if (CVS->isGLSL()) setIntensity(0, NULL);
+        if (CVS->isGLSL())
+        {
+            updateSlipstreamingTextures(0,NULL);
+            updateBonusTexture();
+        }
 #endif
         return;
     }   // if !is_sstreaming
@@ -751,14 +876,18 @@ void SlipStream::update(float dt)
         m_slipstream_time = m_slipstream_mode==SS_NONE ? dt : m_slipstream_time+dt;
     }
 
-    //Cap the possible credits. Keep this similar to the animation speed cap.
-    if (m_slipstream_time > 8.0f)
-        m_slipstream_time = 8.0f;
+    //Cap the possible credits
+    if (m_slipstream_time > m_kart->getKartProperties()->getSlipstreamMaxCollectTime())
+        m_slipstream_time = m_kart->getKartProperties()->getSlipstreamMaxCollectTime();
 
     if(isSlipstreamReady())
         m_kart->setSlipstreamEffect(9.0f);
 #ifndef SERVER_ONLY
-    if (CVS->isGLSL()) setIntensity(m_slipstream_time, m_target_kart);
+    if (CVS->isGLSL())
+    {
+        updateSlipstreamingTextures(m_slipstream_time, m_target_kart);
+        updateBonusTexture();
+    }
 #endif
     m_slipstream_mode = SS_COLLECT;
 }   // update

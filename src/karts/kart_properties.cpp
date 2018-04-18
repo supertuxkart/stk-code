@@ -1037,10 +1037,10 @@ float KartProperties::getNitroMax() const
 }  // getNitroMax
 
 // ----------------------------------------------------------------------------
-float KartProperties::getSlipstreamDuration() const
+float KartProperties::getSlipstreamDurationFactor() const
 {
-    return m_cached_characteristic->getSlipstreamDuration();
-}  // getSlipstreamDuration
+    return m_cached_characteristic->getSlipstreamDurationFactor();
+}  // getSlipstreamDurationFactor
 
 // ----------------------------------------------------------------------------
 float KartProperties::getSlipstreamBaseSpeed() const
@@ -1067,16 +1067,16 @@ float KartProperties::getSlipstreamInnerFactor() const
 }  // getSlipstreamInnerFactor
 
 // ----------------------------------------------------------------------------
-float KartProperties::getSlipstreamCollectTime() const
+float KartProperties::getSlipstreamMinCollectTime() const
 {
-    return m_cached_characteristic->getSlipstreamCollectTime();
-}  // getSlipstreamCollectTime
+    return m_cached_characteristic->getSlipstreamMinCollectTime();
+}  // getSlipstreamMinCollectTime
 
 // ----------------------------------------------------------------------------
-float KartProperties::getSlipstreamUseTime() const
+float KartProperties::getSlipstreamMaxCollectTime() const
 {
-    return m_cached_characteristic->getSlipstreamUseTime();
-}  // getSlipstreamUseTime
+    return m_cached_characteristic->getSlipstreamMaxCollectTime();
+}  // getSlipstreamMaxCollectTime
 
 // ----------------------------------------------------------------------------
 float KartProperties::getSlipstreamAddPower() const
