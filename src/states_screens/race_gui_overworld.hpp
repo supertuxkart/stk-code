@@ -65,10 +65,11 @@ private:
     video::ITexture *m_trophy1;
     video::ITexture *m_trophy2;
     video::ITexture *m_trophy3;
+    video::ITexture *m_trophy4;
     video::ITexture *m_lock;
     video::ITexture *m_open_challenge;
 
-    video::ITexture* m_icons[5];
+    video::ITexture* m_icons[6];
 
     /** The size of a single marker on the screen for AI karts,
      *  need not be a power of 2. */
