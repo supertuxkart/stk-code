@@ -163,6 +163,10 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_reset_height       = settings.m_reset_height;
     m_on_kart_collision  = settings.m_on_kart_collision;
     m_on_item_collision  = settings.m_on_item_collision;
+    m_current_transform.setOrigin(Vec3());
+    m_current_transform.setRotation(
+        btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
+
     m_body_added = false;
 
     m_init_pos.setIdentity();
