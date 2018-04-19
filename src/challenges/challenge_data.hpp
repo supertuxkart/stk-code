@@ -44,6 +44,17 @@ public:
         UNLOCK_KART,
         UNLOCK_DIFFICULTY
     };
+
+    /** The level of completion of a GP challenge
+    */
+    enum GPLevel
+    {
+        GP_NONE,
+        GP_EASY,
+        GP_MEDIUM,
+        GP_HARD,
+        GP_BEST
+    };
     // ------------------------------------------------------------------------
     class UnlockableFeature
     {
@@ -95,6 +106,7 @@ private:
     std::string                    m_filename;
     /** Version number of the challenge. */
     int                            m_version;
+    bool                           m_is_unlock_list;
     bool                           m_is_ghost_replay;
 
     void setUnlocks(const std::string &id,
@@ -120,7 +132,7 @@ public:
 
     virtual void check() const;
     virtual bool isChallengeFulfilled() const;
-    virtual bool isGPFulfilled() const;
+    virtual GPLevel isGPFulfilled() const;
     void  addUnlockTrackReward(const std::string &track_name);
     void  addUnlockModeReward(const std::string &internal_mode_name,
                               const irr::core::stringw &user_mode_name);
@@ -142,11 +154,11 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the id of the challenge. */
-    const std::string &getId() const { return m_id; }
+    const std::string &getChallengeId() const { return m_id; }
 
     // ------------------------------------------------------------------------
     /** Sets the id of this challenge. */
-    void  setId(const std::string& s) { m_id = s; }
+    void  setChallengeId(const std::string& s) { m_id = s; }
 
     // ------------------------------------------------------------------------
     /** Returns the track associated with this challenge. */
@@ -185,6 +197,9 @@ public:
     /** Returns if this challenge is using ghost replay. */
     bool isGhostReplay() const { return m_is_ghost_replay; }
     // ------------------------------------------------------------------------
+    /** Returns if this challenge is an unlock list. */
+    bool isUnlockList() const { return m_is_unlock_list; }
+    // ------------------------------------------------------------------------
     /** Returns the challenge mode of this challenge. */
     ChallengeModeType getMode() const { return m_mode; }
     // ------------------------------------------------------------------------
@@ -196,9 +211,9 @@ public:
     const irr::core::stringw getChallengeDescription() const;
 
     // ------------------------------------------------------------------------
-    /** Returns the minimum position the player must have in order to win.
+    /** Returns the maximum position the player must have in order to win.
      */
-    int getPosition(RaceManager::Difficulty difficulty) const
+    int getMaxPosition(RaceManager::Difficulty difficulty) const
     {
         return m_position[difficulty];
     }   // getPosition
