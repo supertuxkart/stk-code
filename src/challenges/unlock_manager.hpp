@@ -44,12 +44,16 @@ private:
     typedef std::map<std::string, ChallengeData*> AllChallengesType;
     AllChallengesType             m_all_challenges;
 
+    /* The challenges who don't have a race, only unlockables */
+    AllChallengesType             m_list_challenges;
+
     void readAllChallengesInDirs(const std::vector<std::string>* all_dirs);
 
 public:
                UnlockManager     ();
               ~UnlockManager     ();
     void       addOrFreeChallenge(ChallengeData *c);
+    void       addListChallenge(ChallengeData *c);
     void       addChallenge      (const std::string& filename);
 
     const ChallengeData *getChallengeData(const std::string& id);
@@ -62,6 +66,7 @@ public:
     void       findWhatWasUnlocked(int pointsBefore, int pointsNow,
                                    std::vector<std::string>& tracks,
                                    std::vector<std::string>& gps);
+    void       unlockByPoints(int points, const StoryModeStatus* status);
 
     StoryModeStatus *createStoryModeStatus(const XMLNode *node=NULL);
 
