@@ -155,7 +155,7 @@ void DynamicRibbonWidget::add()
     
     if (UserConfigParams::m_hidpi_enabled)
     {
-        m_arrows_w *= 1.5f;
+        m_arrows_w = int(m_arrows_w*1.5f);
     }
 
     const int button_h = m_arrows_w;

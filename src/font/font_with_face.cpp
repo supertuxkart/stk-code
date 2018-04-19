@@ -336,7 +336,7 @@ void FontWithFace::setDPI()
     if (UserConfigParams::m_hidpi_enabled)
     {
         float scale = screen_height / 480.0f;
-        m_face_dpi = getScalingFactorTwo() * getScalingFactorOne() * scale;
+        m_face_dpi = int(getScalingFactorTwo() * getScalingFactorOne() * scale);
     }
     else
     {
