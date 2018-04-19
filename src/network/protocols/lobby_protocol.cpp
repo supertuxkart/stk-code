@@ -69,7 +69,10 @@ void LobbyProtocol::loadWorld()
     StateManager::ActivePlayer *ap = race_manager->getNumLocalPlayers()>1
                                    ? NULL
                                    : StateManager::get()->getActivePlayer(0);
-
+    // Reset the ai kart list in the race manager, otherwise in network race
+    // we can get an assertion if previously a local race with AI was done
+    std::vector<std::string> ai_kart_list;
+    race_manager->setAIKartList(ai_kart_list);
     input_manager->getDeviceManager()->setSinglePlayer(ap);
 
     // Load the actual world.
