@@ -303,7 +303,7 @@ void UnlockManager::unlockByPoints(int points, const StoryModeStatus* status)
 
     // Unlock first bonus kart
 
-    int bonus_kart_floor = easy_challenge*(1);
+    int bonus_kart_floor = easy_challenge*(20+4*GP_FACTOR); //Always unlock before fort magma
 
     challenge_id = "unlock_bonus_kart1";
     c = status->getChallengeStatus(challenge_id);
