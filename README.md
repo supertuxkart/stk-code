@@ -1,3 +1,28 @@
+# SpeedrunnerSuperTuxKart (SSTK)
+[![Build Status](https://travis-ci.org/psypherium/SpeedrunnerSuperTuxKart.svg?branch=master)](https://travis-ci.org/supertuxkart/stk-code)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/psypherium/SpeedrunnerSuperTuxKart?svg=true&branch=master)](https://ci.appveyor.com/project/supertuxkart/stk-code)
+
+
+## Precompiled 0.9.3 Download:
+- https://github.com/psypherium/SpeedrunnerSuperTuxKart/releases/download/0.9.3-timer/supertuxkart-0.9.3-speedrunner_edition.tar.gz
+## Information
+- tar.gz is precompiled from 0.9.3 frozen code + timer
+- Source code is latest git code + timer
+## Current Features:
+- Added alayans timer mod
+- Uploaded precompiled binaries
+## Planned Features:
+- Upload Precompiled Binary of latest git code (0.9.4 pre-alpha)
+## Methodology:
+- Hardfreeze when 0.9.4 code released
+
+## In a different fork (SSTK-P)
+- Replace all music with CC4.0 techno by psypherium (except Hacienda)
+
+Original README.md is below:
+
+
+
 # SuperTuxKart
 [![Build Status](https://travis-ci.org/supertuxkart/stk-code.svg?branch=master)](https://travis-ci.org/supertuxkart/stk-code)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/supertuxkart/stk-code?svg=true&branch=master)](https://ci.appveyor.com/project/supertuxkart/stk-code)
