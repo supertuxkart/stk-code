@@ -246,7 +246,12 @@ LightNode* findNearestLight()
 
 bool handleContextMenuAction(s32 cmd_id)
 {
-    unsigned int kart_num = Camera::getActiveCamera()->getKart()->getWorldKartId();
+    Camera* camera = Camera::getActiveCamera();
+    unsigned int kart_num = 0;
+    if (camera != NULL && camera->getKart() != NULL)
+    {
+        kart_num = camera->getKart()->getWorldKartId();
+    }
 
     World *world = World::getWorld();
     Physics *physics = Physics::getInstance();
