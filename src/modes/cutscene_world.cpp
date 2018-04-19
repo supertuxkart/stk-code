@@ -442,7 +442,7 @@ void CutsceneWorld::enterRaceOverState()
                 ((CutsceneWorld*)World::getWorld())->setParts(parts);
 
                 assert(unlocked.size() > 0);
-                scene->addTrophy(race_manager->getDifficulty());
+                scene->addTrophy(race_manager->getDifficulty(),true);
                 scene->findWhatWasUnlocked(race_manager->getDifficulty());
 
                 StateManager::get()->replaceTopMostScreen(scene, GUIEngine::INGAME_MENU);
@@ -493,7 +493,7 @@ void CutsceneWorld::enterRaceOverState()
                 parts.push_back("featunlocked");
                 ((CutsceneWorld*)World::getWorld())->setParts(parts);
 
-                scene->addTrophy(race_manager->getDifficulty());
+                scene->addTrophy(race_manager->getDifficulty(),true);
                 scene->findWhatWasUnlocked(race_manager->getDifficulty());
 
                 StateManager::get()->replaceTopMostScreen(scene, GUIEngine::INGAME_MENU);
@@ -594,5 +594,4 @@ void CutsceneWorld::createRaceGUI()
 {
     m_race_gui = new CutsceneGUI();
 }   // createRaceGUI
-
 
