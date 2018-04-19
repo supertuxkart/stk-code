@@ -2912,8 +2912,6 @@ SFXBase* Kart::getNextEmitter()
  *  to be lowered by X).
  *  This function also takes additional graphical effects into account, e.g.
  *  a (visual only) jump when skidding, and leaning of the kart.
- *  \param offset_xyz Offset to be added to the position.
- *  \param rotation Additional rotation.
  */
 void Kart::updateGraphics(float dt)
 {
