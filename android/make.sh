@@ -239,10 +239,8 @@ if [ -f "$DIRNAME/obj/project_version" ]; then
     if [ -z "$PROJECT_VERSION" ]; then
         PROJECT_VERSION="$PROJECT_VERSION_PREV"
     elif [ "$PROJECT_VERSION" != "$PROJECT_VERSION_PREV" ]; then
-        echo "Error: Compilation of different version has been already made."
-        echo "Run './make.sh clean' first or set PROJECT_VERSION variable" \
-             "to '$PROJECT_VERSION_PREV.'"
-        exit
+        echo "Different project version has been set. Forcing recompilation..."
+        touch -c "$DIRNAME/Android.mk"
     fi
 fi
 
@@ -273,9 +271,7 @@ if [ -d "$DIRNAME/assets/data" ]; then
     fi
 fi
 
-if [ ! -f "$DIRNAME/obj/project_version" ]; then
-    echo "$PROJECT_VERSION" > "$DIRNAME/obj/project_version"
-fi
+echo "$PROJECT_VERSION" > "$DIRNAME/obj/project_version"
 
 
 # Standalone toolchain
