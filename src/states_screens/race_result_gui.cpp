@@ -281,7 +281,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             bool gameCompleted = false;
             for (unsigned int n = 0; n < unlocked.size(); n++)
             {
-                if (unlocked[n]->getId() == "fortmagma")
+                if (unlocked[n]->getChallengeId() == "fortmagma")
                 {
                     gameCompleted = true;
                     break;
@@ -326,7 +326,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 FeatureUnlockedCutScene* scene =
                     FeatureUnlockedCutScene::getInstance();
 
-                scene->addTrophy(race_manager->getDifficulty());
+                scene->addTrophy(race_manager->getDifficulty(),false);
                 scene->findWhatWasUnlocked(race_manager->getDifficulty());
                 scene->push();
                 race_manager->setAIKartOverride("");
