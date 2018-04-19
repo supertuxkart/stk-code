@@ -42,11 +42,13 @@
  */
 SlipStream::SlipStream(AbstractKart* kart)
 {
-    m_node = NULL;
     m_kart = kart;
     m_moving = NULL;
     m_moving_fast = NULL;
     m_moving_bonus = NULL;
+    m_node = NULL;
+    m_node_fast = NULL;
+    m_bonus_node = NULL;
 
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
