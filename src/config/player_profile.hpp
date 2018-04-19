@@ -263,7 +263,11 @@ public:
     unsigned int getNumHardTrophies() const
     {
         return m_story_mode_status->getNumHardTrophies();
-    }   // getNumHardTropies
+    }   // getNumHardTrophies
+    unsigned int getNumBestTrophies() const
+    {
+        return m_story_mode_status->getNumBestTrophies();
+    }   // getNumBestTrophies
     // ------------------------------------------------------------------------
     AchievementsStatus* getAchievementsStatus()
     {
