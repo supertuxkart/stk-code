@@ -1,20 +1,24 @@
 <?xml version="1.0"?>
-<challenge version="2">
-    <track id="olivermath" laps="3"/>
+<challenge version="3">
+    <unlock_list list="false"/>
+    <track id="olivermath" laps="5"/>
     <mode major="single" minor="quickrace"/>
     <requirements trophies="0"/>
-    
+
+    <best>
+        <karts number="7"/>
+        <requirements position="1" time="95"/>
+    </best>
     <hard>
-        <karts number="5"/>
-        <requirements position="1" time="65"/>
+        <karts number="6"/>
+        <requirements position="1" time="110"/>
     </hard>
     <medium>
         <karts number="5"/>
-        <requirements position="1" time="85"/>
+        <requirements position="1" time="140"/>
     </medium>
     <easy>
-        <karts number="5"/>
-        <requirements position="1" time="130"/>
+        <karts number="4"/>
+        <requirements position="1" time="210"/>
     </easy>
 </challenge>
-
