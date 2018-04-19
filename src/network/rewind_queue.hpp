@@ -53,7 +53,12 @@ private:
     /** Iterator to the curren time step info to be handled. */
     AllRewindInfo::iterator m_current;
 
+    /** Time at which the latest confirmed state is at. */
+    int m_latest_confirmed_state_time;
+
+
     void insertRewindInfo(RewindInfo *ri);
+    void cleanupOldRewindInfo(int ticks);
 
 public:
         static void unitTesting();

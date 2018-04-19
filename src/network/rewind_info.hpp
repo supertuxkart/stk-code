@@ -94,7 +94,7 @@ private:
 public:
              RewindInfoState(int ticks,  BareNetworkString *buffer, 
                              bool is_confirmed);
-    virtual ~RewindInfoState() {};
+    virtual ~RewindInfoState() { delete m_buffer; };
     virtual void rewind();
 
     // ------------------------------------------------------------------------

@@ -77,6 +77,7 @@ void RewindQueue::reset()
 
     m_all_rewind_info.clear();
     m_current = m_all_rewind_info.end();
+    m_latest_confirmed_state_time = -1;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -141,6 +142,10 @@ void RewindQueue::addLocalState(BareNetworkString *buffer,
     RewindInfo *ri = new RewindInfoState(ticks, buffer, confirmed);
     assert(ri);
     insertRewindInfo(ri);
+    if (confirmed && m_latest_confirmed_state_time < ticks)
+    {
+        cleanupOldRewindInfo(ticks);
+    }
 }   // addLocalState
 
 // ----------------------------------------------------------------------------
@@ -209,6 +214,7 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
 
     // FIXME: making m_network_events sorted would prevent the need to 
     // go through the whole list of events
+    int latest_confirmed_state = -1;
     AllNetworkRewindInfo::iterator i = m_network_events.getData().begin();
     while (i != m_network_events.getData().end())
     {
@@ -256,12 +262,40 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
                 *rewind_ticks = (*i)->getTicks();
         }   // if client and ticks < world_ticks
 
+        if ((*i)->isState() && (*i)->getTicks() > latest_confirmed_state &&
+            (*i)->isConfirmed())
+        {
+            latest_confirmed_state = (*i)->getTicks();
+        }
+
         i = m_network_events.getData().erase(i);
     }   // for i in m_network_events
 
     m_network_events.unlock();
 
+    if (latest_confirmed_state > m_latest_confirmed_state_time)
+    {
+        cleanupOldRewindInfo(latest_confirmed_state);
+    }
+
 }   // mergeNetworkData
+
+// ----------------------------------------------------------------------------
+/** Deletes all states and event before the given time.
+ *  \param ticks Time (in ticks).
+ */
+void RewindQueue::cleanupOldRewindInfo(int ticks)
+{
+    auto i = m_all_rewind_info.begin();
+
+    while ( (*i)->getTicks() < ticks)
+    {
+        if (m_current == i) next();
+        delete *i;
+        i = m_all_rewind_info.erase(i);
+    }
+
+}   // cleanupOldRewindInfo
 
 // ----------------------------------------------------------------------------
 bool RewindQueue::isEmpty() const
@@ -436,5 +470,15 @@ void RewindQueue::unitTesting()
     assert(ri->isEvent());
     b1.next();
     assert(b1.m_current == b1.m_all_rewind_info.end());
+
+    // 3) Test that if cleanupOldRewindInfo is called, it will if necessary
+    //    adjust m_current to point to the latest confirmed state.
+    RewindQueue b2;
+    b2.addNetworkState(NULL, 1);
+    b2.addNetworkState(NULL, 2);
+    b2.addNetworkState(NULL, 3);
+    b2.mergeNetworkData(4, &needs_rewind, &rewind_ticks);
+    assert((*b2.m_current)->getTicks() == 3);
+
 
 }   // unitTesting
