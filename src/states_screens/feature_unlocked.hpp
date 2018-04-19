@@ -166,7 +166,7 @@ public:
     void addUnlockedThings(const std::vector<const ChallengeData*> unlocked);
     */
 
-    void addTrophy(RaceManager::Difficulty difficulty);
+    void addTrophy(RaceManager::Difficulty difficulty, bool is_grandprix);
 
     /** override from base class to handle escape press */
     virtual bool onEscapePressed() OVERRIDE;
@@ -175,4 +175,3 @@ public:
 };
 
 #endif
-
