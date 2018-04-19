@@ -23,6 +23,7 @@
 #include "audio/sfx_manager.hpp"
 #include "challenges/challenge_data.hpp"
 #include "challenges/challenge_status.hpp"
+#include "challenges/story_mode_status.hpp"
 #include "config/player_manager.hpp"
 #include "config/player_profile.hpp"
 #include "config/user_config.hpp"
@@ -142,19 +143,30 @@ void UnlockManager::addOrFreeChallenge(ChallengeData *c)
 {
     if(isSupportedVersion(*c))
     {
-        m_all_challenges[c->getId()]=c;
+        m_all_challenges[c->getChallengeId()]=c;
+        if (c->isUnlockList())
+            addListChallenge(c);
     }
     else
     {
         Log::warn("Challenge", "Challenge '%s' is not supported - ignored.",
-                 c->getId().c_str());
+                 c->getChallengeId().c_str());
         delete c;
     }
 }   // addOrFreeChallenge
 
 //-----------------------------------------------------------------------------
+/** Add a challenge to the unlock challenges list
+ *  \param c The challenge that is either stored or freed.
+ */
+void UnlockManager::addListChallenge(ChallengeData *c)
+{
+    m_list_challenges[c->getChallengeId()]=c;
+}   // addListChallenge
+
+//-----------------------------------------------------------------------------
 /** Reads a challenge from the given filename. The challenge will then either
- *  be stored, or (if the challenge version is not supported anymore
+ *  be stored, or (if the challenge version is not supported anymore, freed)
  *  \param filename Name of the challenge file to read.
  */
 void UnlockManager::addChallenge(const std::string& filename)
@@ -228,20 +240,24 @@ bool UnlockManager::isSupportedVersion(const ChallengeData &challenge)
 {
     // Test if challenge version number is in between minimum
     // and maximum supported version.
-    return (challenge.getVersion()>=2 && challenge.getVersion()<=2);
+    return (challenge.getVersion()>=3 && challenge.getVersion()<=3);
 }   // isSupportedVersion
 
 
 //-----------------------------------------------------------------------------
-
+/** This functions finds what new tracks and GP have been unlocked
+ */
 void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
                                         std::vector<std::string>& tracks,
                                         std::vector<std::string>& gps)
 {
+
+    ChallengeData* c = NULL;
+
     for (AllChallengesType::iterator it = m_all_challenges.begin();
          it != m_all_challenges.end(); it++)
     {
-        ChallengeData* c = it->second;
+        c = it->second;
         if (c->getNumTrophies() > points_before &&
             c->getNumTrophies() <= points_now      )
         {
@@ -257,4 +273,65 @@ void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
             }
         }
     }
-}
+} // findWhatWasUnlocked
+
+void UnlockManager::unlockByPoints(int points, const StoryModeStatus* status)
+{
+    int easy_challenge = CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM];
+    int medium_challenge = CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM];
+    int hard_challenge = CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD];
+    int best_challenge = CHALLENGE_POINTS[RaceManager::DIFFICULTY_BEST];
+    std::string challenge_id;
+
+    // Unlock SuperTux difficulty
+    // We can't test if it is already unlocked because m_locked_features is undefined
+    // when this function is called
+
+
+    int supertux_floor = hard_challenge*(10+4*GP_FACTOR)+medium_challenge*(11);
+    challenge_id = "unlock_supertux";
+    ChallengeStatus* c = status->getChallengeStatus(challenge_id);
+
+    if( supertux_floor <= points && c!=NULL)
+    {
+        c->setSolved(RaceManager::DIFFICULTY_BEST);
+    }
+    else if( c == NULL )
+    {
+        Log::warn("Unlock Manager", "No unlock_supertux challenge defined.");
+    }
+
+    // Unlock first bonus kart
+
+    int bonus_kart_floor = easy_challenge*(1);
+
+    challenge_id = "unlock_bonus_kart1";
+    c = status->getChallengeStatus(challenge_id);
+
+    if( bonus_kart_floor <= points && c!=NULL)
+    {
+        c->setSolved(RaceManager::DIFFICULTY_BEST);
+    }
+    else if( c == NULL )
+    {
+        Log::warn("Unlock Manager", "No unlock_bonus_kart1 challenge defined.");
+    }
+
+    // Unlock second bonus kart
+
+    bonus_kart_floor = hard_challenge*(15+4*GP_FACTOR)+best_challenge*(6);
+
+    challenge_id = "unlock_bonus_kart2";
+    c = status->getChallengeStatus(challenge_id);
+
+    if( bonus_kart_floor <= points && c!=NULL)
+    {
+        c->setSolved(RaceManager::DIFFICULTY_BEST);
+    }
+    else if( c == NULL )
+    {
+        Log::warn("Unlock Manager", "No unlock_bonus_kart2 challenge defined.");
+    }
+} // unlockByPoints
+
+/* EOF */
