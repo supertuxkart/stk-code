@@ -34,6 +34,7 @@ private:
     bool extractDir(std::string dir_name);
     void removeData();
     void touchFile(std::string path);
+    bool isWritable(std::string path);
     std::string getPreferredPath(const std::vector<std::string>& paths);
 
 public:

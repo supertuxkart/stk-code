@@ -42,7 +42,8 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
     m_race_gui = race_gui;
     m_minimap_bottom = 0;
     m_gui_action = false;
-    m_directionnal_wheel_tex = NULL;
+    m_steering_wheel_tex = NULL;
+    m_up_down_tex = NULL;
     m_pause_tex = NULL;
     m_nitro_tex = NULL;
     m_nitro_empty_tex = NULL;
@@ -51,6 +52,7 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
     m_drift_tex = NULL;
     m_bg_button_tex = NULL;
     m_bg_button_focus_tex = NULL;
+    m_gui_action_tex = NULL;
 
     m_device = input_manager->getDeviceManager()->getMultitouchDevice();
 
@@ -63,7 +65,7 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
         UserConfigParams::m_multitouch_scale = 0.5f;
     }
 
-    initMultitouchSteering();
+    init();
 }   // RaceGUIMultitouch
 
 
@@ -72,7 +74,7 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
  */
 RaceGUIMultitouch::~RaceGUIMultitouch()
 {
-    closeMultitouchSteering();
+    close();
 }   // ~RaceGUIMultitouch
 
 
@@ -91,23 +93,33 @@ void RaceGUIMultitouch::reset()
 //-----------------------------------------------------------------------------
 /** Clears all previously created buttons in the multitouch device
  */
-void RaceGUIMultitouch::closeMultitouchSteering()
+void RaceGUIMultitouch::close()
 {
     if (m_device != NULL)
     {
         m_device->clearButtons();
     }
-}   // closeMultitouchSteering
+    
+    if (m_device->isAccelerometerActive())
+    {
+        m_device->deactivateAccelerometer();
+    }
+}   // close
 
 
 //-----------------------------------------------------------------------------
-/** Makes some initializations and determines the look of multitouch steering
+/** Makes some initializations and determines the look of multitouch race GUI
  *  interface
  */
-void RaceGUIMultitouch::initMultitouchSteering()
+void RaceGUIMultitouch::init()
 {
     if (m_device == NULL)
         return;
+        
+    if (UserConfigParams::m_multitouch_controls == 2)
+    {
+        m_device->activateAccelerometer();
+    }
 
     const float scale = UserConfigParams::m_multitouch_scale;
 
@@ -138,10 +150,20 @@ void RaceGUIMultitouch::initMultitouchSteering()
     }
 
     m_minimap_bottom = (unsigned int)(h - 2 * col_size);
+    
+    if (m_device->isAccelerometerActive())
+    {
+        m_device->addButton(BUTTON_UP_DOWN,
+                    int(steering_btn_x + btn2_size / 4), int(steering_btn_y),
+                    int(btn2_size / 2), int(btn2_size));
+    }
+    else
+    {
+        m_device->addButton(BUTTON_STEERING,
+                            int(steering_btn_x), int(steering_btn_y),
+                            int(btn2_size), int(btn2_size));
+    }
 
-    m_device->addButton(BUTTON_STEERING,
-                        int(steering_btn_x), int(steering_btn_y),
-                        int(btn2_size), int(btn2_size));
     m_device->addButton(BUTTON_ESCAPE,
                         int(margin_top), int(margin_small),
                         int(btn_small_size), int(btn_small_size));
@@ -161,8 +183,10 @@ void RaceGUIMultitouch::initMultitouchSteering()
                         int(first_column_x), int(h - 1 * col_size),
                         int(btn_size), int(btn_size));
                       
-    m_directionnal_wheel_tex = irr_driver->getTexture(FileManager::GUI, 
-                                              "android/directionnal_wheel.png");
+    m_steering_wheel_tex = irr_driver->getTexture(FileManager::GUI, 
+                                                  "android/steering_wheel.png");
+    m_up_down_tex = irr_driver->getTexture(FileManager::GUI, 
+                                                         "android/up_down.png");
     m_pause_tex = irr_driver->getTexture(FileManager::GUI, "android/pause.png");
     m_nitro_tex = irr_driver->getTexture(FileManager::GUI, "android/nitro.png");
     m_nitro_empty_tex = irr_driver->getTexture(FileManager::GUI, 
@@ -178,17 +202,17 @@ void RaceGUIMultitouch::initMultitouchSteering()
                                             "android/blur_bg_button_focus.png");
     m_gui_action_tex = irr_driver->getTexture(FileManager::GUI,"challenge.png");
 
-} // initMultitouchSteering
+} // init
 
 //-----------------------------------------------------------------------------
-/** Draws the buttons for multitouch steering.
+/** Draws the buttons for multitouch race GUI.
  *  \param kart The kart for which to show the data.
  *  \param viewport The viewport to use.
  *  \param scaling Which scaling to apply to the buttons.
  */
-void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
-                                     const core::recti &viewport,
-                                     const core::vector2df &scaling)
+void RaceGUIMultitouch::draw(const AbstractKart* kart,
+                             const core::recti &viewport,
+                             const core::vector2df &scaling)
 {
 #ifndef SERVER_ONLY
     if (m_device == NULL)
@@ -210,7 +234,7 @@ void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
 
         if (button->type == MultitouchButtonType::BUTTON_STEERING)
         {
-            video::ITexture* btn_texture = m_directionnal_wheel_tex;
+            video::ITexture* btn_texture = m_steering_wheel_tex;
             core::rect<s32> coords(pos_zero, btn_texture->getSize());
             draw2DImage(btn_texture, btn_pos, coords, NULL, NULL, true);
 
@@ -225,6 +249,12 @@ void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
             //                      int(round(x + w)), int(round(y + h)));
 
             // draw2DImage(btn_texture, pos2, coords, NULL, NULL, true);
+        }
+        if (button->type == MultitouchButtonType::BUTTON_UP_DOWN)
+        {
+            video::ITexture* btn_texture = m_up_down_tex;
+            core::rect<s32> coords(pos_zero, btn_texture->getSize());
+            draw2DImage(btn_texture, btn_pos, coords, NULL, NULL, true);
         }
         else
         {
@@ -297,10 +327,10 @@ void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
                 m_race_gui != NULL)
             {
                 float scale = UserConfigParams::m_multitouch_scale *
-                    (float)(irr_driver->getActualScreenSize().Height) / 720.0f;
+                    (float)(irr_driver->getActualScreenSize().Height) / 760.0f;
 
                 m_race_gui->drawEnergyMeter(int(button->x + button->width * 1.15f),
-                                            int(button->y + button->height * 1.35f),
+                                            int(button->y + button->height * 1.15f),
                                             kart, viewport,
                                             core::vector2df(scale, scale));
             }
@@ -321,4 +351,4 @@ void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
         }
     }
 #endif
-} // drawMultitouchSteering
+} // draw

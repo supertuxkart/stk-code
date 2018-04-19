@@ -1181,7 +1181,7 @@ void SkiddingAI::handleItems(const float dt)
 
     // Tactic 1: wait ten seconds, then use item
     // -----------------------------------------
-    if(!m_ai_properties->m_item_usage_non_random)
+    if(m_ai_properties->m_item_usage_skill <= 1)
     {
         if( m_time_since_last_shot > 10.0f )
         {
@@ -1652,16 +1652,16 @@ void SkiddingAI::handleNitroAndZipper()
     // to use it, and we don't have a zipper or are not supposed to use
     // it (calculated).
     if( (m_kart->getEnergy()==0 ||
-        m_ai_properties->m_nitro_usage==AIProperties::NITRO_NONE)  &&
+        m_ai_properties->m_nitro_usage == 0)  &&
         (m_kart->getPowerup()->getType()!=PowerupManager::POWERUP_ZIPPER ||
-         !m_ai_properties->m_item_usage_non_random )                         )
+         m_ai_properties->m_item_usage_skill <= 1 )                         )
         return;
 
     // If there are items to avoid close, and we only have zippers, don't
     // use them (since this make it harder to avoid items).
     if(m_avoid_item_close &&
         (m_kart->getEnergy()==0 ||
-         m_ai_properties->m_nitro_usage==AIProperties::NITRO_NONE) )
+         m_ai_properties->m_nitro_usage == 0) )
         return;
     // If a parachute or anvil is attached, the nitro doesn't give much
     // benefit. Better wait till later.
@@ -1694,7 +1694,7 @@ void SkiddingAI::handleNitroAndZipper()
     // is reached).
     if(m_world->getLapForKart(m_kart->getWorldKartId())
                         ==race_manager->getNumLaps()-1 &&
-       m_ai_properties->m_nitro_usage == AIProperties::NITRO_ALL)
+       m_ai_properties->m_nitro_usage >= 2)
     {
         float finish =
             m_world->getEstimatedFinishTime(m_kart->getWorldKartId());
@@ -1725,8 +1725,7 @@ void SkiddingAI::handleNitroAndZipper()
         m_kart_behind->getSpeed() > m_kart->getSpeed()    )
     {
         // Only prevent overtaking on highest level
-        m_controls->setNitro(m_ai_properties->m_nitro_usage
-                              == AIProperties::NITRO_ALL    );
+        m_controls->setNitro(m_ai_properties->m_nitro_usage >= 2 );
         return;
     }
 

@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# David Blaszyk <david@sudomail.ne.jp>, 2017
 # lindwurm, 2015
 # Sugahara Masayuki <brindflontia@gmail.com>, 2015
 # lip_of_cygnus <Shinya1248@gmail.com>, 2015
@@ -12,8 +13,8 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-11-13 00:19+0000\n"
-"Last-Translator: Auria <auria.mg@gmail.com>\n"
+"PO-Revision-Date: 2017-11-21 21:28+0000\n"
+"Last-Translator: David Blaszyk <david@sudomail.ne.jp>\n"
 "Language-Team: Japanese (http://www.transifex.com/supertuxkart/supertuxkart/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -992,7 +993,7 @@ msgstr "閉じる"
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Server Creation"
-msgstr ""
+msgstr "サーバー創造"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -1011,7 +1012,7 @@ msgstr ""
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Password (optional)"
-msgstr ""
+msgstr "パスワード (任意)"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -1161,7 +1162,7 @@ msgstr "ゲームモード"
 #. I18N: ./data/gui/online/networking_lobby.stkgui
 #. I18N: In the networking lobby
 msgid "Exit"
-msgstr ""
+msgstr "終了"
 
 #. I18N: ./data/gui/online/notification_dialog.stkgui
 #. I18N: User info dialog
@@ -1219,7 +1220,7 @@ msgstr "サーバーを見つける"
 #. I18N: In the online multiplayer screen
 #: src/states_screens/create_server_screen.cpp:83
 msgid "Create Server"
-msgstr ""
+msgstr "サーバーを創造する"
 
 #. I18N: ./data/gui/online/profile_servers.stkgui
 msgid "Global Networking"
@@ -1243,7 +1244,7 @@ msgstr "パスワード:"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "Change"
-msgstr ""
+msgstr "変更"
 
 #. I18N: ./data/gui/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
@@ -1291,12 +1292,12 @@ msgstr "ユーザーを作成"
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "New Online Account"
-msgstr ""
+msgstr "新しいオンラインアカウント"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "Existing Online Account"
-msgstr ""
+msgstr "現存のオンラインアカウント"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
@@ -1345,7 +1346,7 @@ msgstr ""
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept"
-msgstr ""
+msgstr "受け付ける"
 
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
@@ -1381,7 +1382,7 @@ msgstr "フレンドを追加"
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline"
-msgstr ""
+msgstr "断る"
 
 #. I18N: ./data/gui/online/user_search.stkgui
 msgid "User search"
@@ -1531,7 +1532,7 @@ msgstr "FPS 表示"
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Always show login screen"
-msgstr ""
+msgstr "いつもログイン画面を表示"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
@@ -1680,7 +1681,7 @@ msgstr "タイプ："
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Number of goals to win"
-msgstr ""
+msgstr "ゴールの勝ち数"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
@@ -1690,7 +1691,7 @@ msgstr ""
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Game type (Goals limit / Time limit)"
-msgstr ""
+msgstr "ゲームタイプ (ゴール限定 / 時間限定)"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
@@ -1977,14 +1978,14 @@ msgstr ""
 #: src/addons/news_manager.cpp:179
 #, c-format
 msgid "Error downloading news: '%s'."
-msgstr ""
+msgstr "ニューズをダウンロードエラー： '1%s'"
 
 #. I18N: number of laps to race in a challenge
 #: src/challenges/challenge_data.cpp:266
 #: src/states_screens/race_result_gui.cpp:1424
 #, c-format
 msgid "Laps: %i"
-msgstr ""
+msgstr "ラップ： 1%i"
 
 #: src/challenges/challenge_data.cpp:272
 msgid "Follow the leader"
@@ -2044,12 +2045,12 @@ msgstr "設定したコンフィグファイルが古すぎます。削除して
 
 #: src/graphics/irr_driver.cpp:535
 msgid "Video recording started."
-msgstr ""
+msgstr "録画を始めた"
 
 #: src/graphics/irr_driver.cpp:541
 #, c-format
 msgid "Video saved in \"%s\"."
-msgstr ""
+msgstr "ビデオは \"%s\" に保存しました"
 
 #: src/graphics/irr_driver.cpp:545
 msgid "Encoding progress:"
@@ -2121,43 +2122,43 @@ msgstr ""
 #: src/input/binding.cpp:126
 msgctxt "input_key"
 msgid "Backspace"
-msgstr ""
+msgstr "バックスペース"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:128
 msgctxt "input_key"
 msgid "Tab"
-msgstr ""
+msgstr "タブ"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:130
 msgctxt "input_key"
 msgid "Clear"
-msgstr ""
+msgstr "消す"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:132
 msgctxt "input_key"
 msgid "Return"
-msgstr ""
+msgstr "リターンキー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:134
 msgctxt "input_key"
 msgid "Shift"
-msgstr ""
+msgstr "シフトキー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:136
 msgctxt "input_key"
 msgid "Control"
-msgstr ""
+msgstr "コントロールキー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:138
 msgctxt "input_key"
 msgid "Alt/Menu"
-msgstr ""
+msgstr "Altキー/メニュー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:140
@@ -2169,7 +2170,7 @@ msgstr "ポーズ"
 #: src/input/binding.cpp:142
 msgctxt "input_key"
 msgid "Caps Lock"
-msgstr ""
+msgstr "キャプスロックキー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:144
@@ -2194,7 +2195,7 @@ msgstr ""
 #: src/input/binding.cpp:151
 msgctxt "input_key"
 msgid "Escape"
-msgstr ""
+msgstr "エスケープキー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:153
@@ -2224,7 +2225,7 @@ msgstr ""
 #: src/input/binding.cpp:161
 msgctxt "input_key"
 msgid "Space"
-msgstr ""
+msgstr "スペースキー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:163
@@ -2242,43 +2243,43 @@ msgstr ""
 #: src/input/binding.cpp:167
 msgctxt "input_key"
 msgid "End"
-msgstr ""
+msgstr "エンドキー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:169
 msgctxt "input_key"
 msgid "Home"
-msgstr ""
+msgstr "ホームキー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:171
 msgctxt "input_key"
 msgid "Left"
-msgstr ""
+msgstr "左キー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:173
 msgctxt "input_key"
 msgid "Up"
-msgstr ""
+msgstr "上キー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:175
 msgctxt "input_key"
 msgid "Right"
-msgstr ""
+msgstr "右キー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:177
 msgctxt "input_key"
 msgid "Down"
-msgstr ""
+msgstr "下キー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:179
 msgctxt "input_key"
 msgid "Select"
-msgstr ""
+msgstr "選択"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:181
@@ -2576,12 +2577,12 @@ msgstr "入力したコンフィグファイルはこのバージョンのSTKと
 #. I18N: Name of the black button on xbox controller
 #: src/input/gamepad_config.cpp:167
 msgid "Black"
-msgstr ""
+msgstr "黒い"
 
 #. I18N: Name of the white button on xbox controller
 #: src/input/gamepad_config.cpp:171
 msgid "White"
-msgstr ""
+msgstr "白い"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
@@ -2652,7 +2653,7 @@ msgstr ""
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:218
 msgid "Start"
-msgstr ""
+msgstr "スタート"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:220
@@ -3133,7 +3134,7 @@ msgstr "無効"
 #: src/states_screens/dialogs/custom_video_settings.cpp:67
 #: src/states_screens/options_screen_video.cpp:462
 msgid "Important only"
-msgstr ""
+msgstr "大体だけ"
 
 #. I18N: animations setting (only karts with human players are animated)
 #: src/states_screens/dialogs/custom_video_settings.cpp:74
@@ -3182,19 +3183,19 @@ msgstr ""
 #: src/states_screens/edit_gp_screen.cpp:257
 #: src/states_screens/ghost_replay_selection.cpp:117
 msgid "No"
-msgstr ""
+msgstr "いいえ"
 
 #: src/states_screens/dialogs/multitouch_settings_dialog.cpp:60
 msgid "Tablet"
-msgstr ""
+msgstr "タブレット"
 
 #: src/states_screens/dialogs/multitouch_settings_dialog.cpp:61
 msgid "Phone"
-msgstr ""
+msgstr "スマホ"
 
 #: src/states_screens/dialogs/recovery_dialog.cpp:121
 msgid "Username and/or email address invalid."
-msgstr ""
+msgstr "ユーザー名またはメールアドレスは無効"
 
 #: src/states_screens/dialogs/registration_dialog.cpp:42
 #, c-format
@@ -3246,7 +3247,7 @@ msgstr "リクエストを取り消す"
 #: src/states_screens/dialogs/user_info_dialog.cpp:154
 #: src/states_screens/dialogs/user_info_dialog.cpp:211
 msgid "Today"
-msgstr ""
+msgstr "今日"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:158
 msgid "Friend request sent!"
@@ -3308,7 +3309,7 @@ msgstr "コース"
 #: src/states_screens/edit_gp_screen.cpp:67
 #: src/states_screens/ghost_replay_selection.cpp:81
 msgid "Laps"
-msgstr ""
+msgstr "ラップ"
 
 #: src/states_screens/edit_gp_screen.cpp:68
 msgid "Reversed"
@@ -3374,7 +3375,7 @@ msgstr ""
 
 #: src/states_screens/ghost_replay_selection.cpp:83
 msgid "User"
-msgstr ""
+msgstr "ユーザー"
 
 #: src/states_screens/gp_info_screen.cpp:74
 msgid "Default"
@@ -3793,7 +3794,7 @@ msgstr "スタート！"
 #. I18N: Shown when a goal is scored
 #: src/states_screens/race_gui_base.cpp:71
 msgid "GOAL!"
-msgstr ""
+msgstr "ゴール！"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
@@ -3838,7 +3839,7 @@ msgstr "アイテムボタンを押してチャレンジを開始"
 
 #: src/states_screens/race_result_gui.cpp:175
 msgid "Continue."
-msgstr ""
+msgstr "続く"
 
 #: src/states_screens/race_result_gui.cpp:178
 msgid "Quit the server."
@@ -3907,12 +3908,12 @@ msgstr "ハイスコア"
 #: src/states_screens/race_result_gui.cpp:1432
 #, c-format
 msgid "Difficulty: %s"
-msgstr ""
+msgstr "難しさ： %s"
 
 #: src/states_screens/race_result_gui.cpp:1440
 #, c-format
 msgid "Best lap time: %s"
-msgstr ""
+msgstr "ベストラップ時間： %s"
 
 #: src/states_screens/race_setup_screen.cpp:87
 msgid "All blows allowed, so catch weapons and make clever use of them!"

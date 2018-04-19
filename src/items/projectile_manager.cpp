@@ -153,3 +153,32 @@ bool ProjectileManager::projectileIsClose(const AbstractKart * const kart,
     }
     return false;
 }   // projectileIsClose
+
+// -----------------------------------------------------------------------------
+/** Returns an int containing the numbers of a given flyable in a given radius
+ *  around the kart
+ *  \param kart The kart for which the test is done.
+ *  \param radius Distance within which the projectile must be.
+ *  \param type The type of projectile checked
+*/
+int ProjectileManager::getNearbyProjectileCount(const AbstractKart * const kart,
+                                         float radius, PowerupManager::PowerupType type)
+{
+    float r2 = radius*radius;
+    int projectileCount = 0;
+
+    for(Projectiles::iterator i  = m_active_projectiles.begin();
+                              i != m_active_projectiles.end();   i++)
+    {
+        if ((*i)->getType() == type)
+        {
+            float dist2 = (*i)->getXYZ().distance2(kart->getXYZ());
+            if(dist2<r2)
+            {
+
+                projectileCount++;
+            }
+        }
+    }
+    return projectileCount;
+}   // getNearbyProjectileCount

@@ -463,7 +463,7 @@ void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
     
     if (m_multitouch_gui != NULL)
     {
-        m_multitouch_gui->drawMultitouchSteering(kart, viewport, scaling);
+        m_multitouch_gui->draw(kart, viewport, scaling);
     }
 }   // renderPlayerView
 
@@ -770,7 +770,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         {
             LinearWorld *linear_world = (LinearWorld*)(World::getWorld());
 
-            float distance = linear_world->getDistanceDownTrackForKart(kart_id)
+            float distance = linear_world->getDistanceDownTrackForKart(kart_id, true)
                            + Track::getCurrentTrack()->getTrackLength()*lap;
             if ((position>1) &&
                 (previous_distance-distance<m_dist_show_overlap) &&

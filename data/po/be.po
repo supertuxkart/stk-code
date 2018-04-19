@@ -4,14 +4,14 @@
 # 
 # Translators:
 # , 2015
-# Viktar Vauchkevich, 2017
+# Viktar Vauchkevich, 2017-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-11-13 00:19+0000\n"
-"Last-Translator: Auria <auria.mg@gmail.com>\n"
+"PO-Revision-Date: 2018-01-18 18:02+0000\n"
+"Last-Translator: Viktar Vauchkevich\n"
 "Language-Team: Belarusian (http://www.transifex.com/supertuxkart/supertuxkart/language/be/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -49,7 +49,7 @@ msgstr "Марафонец"
 
 #. I18N: ./data/achievements.xml
 msgid "Make a race with 5 laps or more."
-msgstr "Зрабі гонку на 5 ці больш кругоў."
+msgstr "Зрабі гонку на 5 ці больш колаў."
 
 #. I18N: ./data/achievements.xml
 msgid "Skid-row"
@@ -57,7 +57,7 @@ msgstr "Дрыфтэр"
 
 #. I18N: ./data/achievements.xml
 msgid "Make 5 skidding in a single lap."
-msgstr "Зрабі 5 заносаў за 1 круг."
+msgstr "Зрабі 5 заносаў за 1 кола."
 
 #. I18N: ./data/achievements.xml
 msgid "Gold driver"
@@ -274,7 +274,7 @@ msgstr "Стваральнікі"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 msgid "Graphics Settings"
-msgstr "Настаўленні графікі"
+msgstr "Налады графікі"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -299,7 +299,7 @@ msgstr "Зіхаценне (Bloom)"
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Light shaft (God rays)"
-msgstr "Промні святла"
+msgstr "Промні святла (гало)"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -354,17 +354,17 @@ msgstr "Анімацыя персанажаў"
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Rendered image quality"
-msgstr ""
+msgstr "Якасць апрацаванай выявы"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Geometry detail"
-msgstr ""
+msgstr "Дэталі геаметрыі"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "* Restart STK to apply new settings"
-msgstr "* Перазапусціце STK, каб ужыць новыя настаўленні"
+msgstr "* Перазапусціце STK, каб ужыць новыя налады"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: ./data/gui/multitouch_settings.stkgui
@@ -620,11 +620,11 @@ msgstr "Сумесная гульня"
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: Tab in help menu
 msgid "Bananas"
-msgstr ""
+msgstr "Бананы"
 
 #. I18N: ./data/gui/help1.stkgui
 msgid "Start the tutorial"
-msgstr ""
+msgstr "Пачаць навучанне"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -656,7 +656,7 @@ msgstr "Калі вы бачыце замок, то гэта азначае, ш�
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help menu
 msgid "The 'skidding' key allows you to skid in sharp turns and get a boost."
-msgstr "Кнопка «заноса» дазваляе слізгаць у крутым павароце і атрымаць паскарэнне."
+msgstr "Кнопка «заносу» дазваляе слізгаць у крутым павароце і атрымаць паскарэнне."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: in the help screen
@@ -796,24 +796,24 @@ msgstr "Пасля настройкі прылад увода вы гатовы�
 msgid ""
 "Hitting a banana can result in one of the following being attached to the "
 "kart:"
-msgstr ""
+msgstr "Наезд на банан прывядзе да далучэння да карта аднаго з наступных прадметаў:"
 
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
 msgid "Anchor - slows down the kart."
-msgstr ""
+msgstr "Якар запавольвае карт."
 
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
 msgid "Parachute - slows down the kart less than the anchor."
-msgstr ""
+msgstr "Парашут запавольвае карт менш, чым якар."
 
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
 msgid ""
 "Bomb - detonates after a short amount of time to throw the kart up in the "
 "air. Bump into another kart to transfer the bomb to another player."
-msgstr ""
+msgstr "Бомба ўзрываецца пасля кароткага прамежку часу і падкідвае карт у паветра. Ударце іншы карт каб перадаць бомбу іншаму гульцу."
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -902,46 +902,46 @@ msgstr "Выйсці"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 msgid "Touch Device Settings"
-msgstr ""
+msgstr "Налады сэнсарнай прылады"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Device enabled"
-msgstr ""
+msgstr "Пралада ўключаная"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Inverted buttons"
-msgstr ""
+msgstr "Інвертаваныя кнопкі"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Buttons scale"
-msgstr ""
+msgstr "Маштаб кнопак"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Accelerometer"
-msgstr ""
+msgstr "Паскарэнне"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Advanced"
-msgstr ""
+msgstr "Пашыраныя"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Deadzone"
-msgstr ""
+msgstr "Мёртвая зона"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Sensitivity"
-msgstr ""
+msgstr "Адчувальнасць"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 msgid "Restore defaults"
-msgstr ""
+msgstr "Аднавіць агаданыя"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -1232,7 +1232,7 @@ msgstr "Хуткая гульня"
 #. I18N: Section in the profile screen
 #: src/states_screens/online_profile_base.cpp:113
 msgid "Account Settings"
-msgstr "Настаўленні конта"
+msgstr "Налады конту"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 #. I18N: In the online account settings screen
@@ -1248,7 +1248,7 @@ msgstr "Змяніць"
 #. I18N: ./data/gui/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 msgid "Account Recovery"
-msgstr "Аднаўленне конта"
+msgstr "Аднаўленне конту"
 
 #. I18N: ./data/gui/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
@@ -1326,7 +1326,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at http://privacy.supertuxkart.net"
-msgstr "Вы можаце гуляць без стварэння анлайн-конта, выбраўшы афлайн-конт. Але пры гэтым вы не зможаце злучыцца з сябрамі, галасаваць за дадаткі і інш. Азнаёмцеся з нашай заявай аб канфідэнцыйнасці на http://privacy.supertuxkart.net"
+msgstr "Вы можаце гуляць без стварэння анлайн-конту, выбраўшы афлайн-конт. Але пры гэтым вы не зможаце злучыцца з сябрамі, галасаваць за дадаткі і інш. Азнаёмцеся з нашай заявай аб канфідэнцыйнасці на http://privacy.supertuxkart.net"
 
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
@@ -1564,7 +1564,7 @@ msgstr "Узровень графічных эфектаў"
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
 msgid "Custom settings..."
-msgstr "Свае настаўленні"
+msgstr "Асабістыя налады…"
 
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: In the video settings
@@ -1762,7 +1762,7 @@ msgstr "Баявая выспа"
 
 #. I18N: ../stk-assets/tracks/candela_city/track.xml
 msgid "Candela City"
-msgstr ""
+msgstr "Горад Кандэла"
 
 #. I18N: ../stk-assets/tracks/cave/track.xml
 msgid "Cave X"
@@ -1774,7 +1774,7 @@ msgstr "Храм какавы"
 
 #. I18N: ../stk-assets/tracks/cornfield_crossing/track.xml
 msgid "Cornfield Crossing"
-msgstr ""
+msgstr "Кукурузнае перакрыжаванне"
 
 #. I18N: ../stk-assets/tracks/fortmagma/track.xml
 msgid "Fort Magma"
@@ -1799,7 +1799,7 @@ msgstr "Ледзяное футбольнае поле"
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
-msgstr "Штосці не так, маленькі хіпі? Твой вялікі гну лідар знік?"
+msgstr "Штосці не так, маленькі хіпі? Твой вялікі лідар гну знік?"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -1825,7 +1825,7 @@ msgstr "Але ты, гаротны валацуга, ніколі не змож
 
 #. I18N: ../stk-assets/tracks/lasdunasarena/track.xml
 msgid "Las Dunas Arena"
-msgstr ""
+msgstr "Лас-Дунас-Арэна"
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
 msgid "Around the lighthouse"
@@ -1921,7 +1921,7 @@ msgstr "Хекслі"
 
 #. I18N: ../stk-assets/karts/kiki/kart.xml
 msgid "Kiki"
-msgstr ""
+msgstr "Кікі"
 
 #. I18N: ../stk-assets/karts/konqi/kart.xml
 msgid "Konqi"
@@ -1970,7 +1970,7 @@ msgstr "Завершанае дасягненне «%s»."
 
 #: src/addons/addons_manager.cpp:104 src/addons/news_manager.cpp:322
 msgid "Failed to connect to the SuperTuxKart add-ons server."
-msgstr ""
+msgstr "Не атрымалася злучыцца з северам дадаткаў SuperTuxKart."
 
 #: src/addons/news_manager.cpp:179
 #, c-format
@@ -2042,16 +2042,16 @@ msgstr "Ваш файл канфігурацыі занадта стары. Ён
 
 #: src/graphics/irr_driver.cpp:535
 msgid "Video recording started."
-msgstr ""
+msgstr "Пачаўся запіс відэа."
 
 #: src/graphics/irr_driver.cpp:541
 #, c-format
 msgid "Video saved in \"%s\"."
-msgstr ""
+msgstr "Відэа захаванае ў «%s»."
 
 #: src/graphics/irr_driver.cpp:545
 msgid "Encoding progress:"
-msgstr ""
+msgstr "Прагрэс кадавання:"
 
 #: src/graphics/irr_driver.cpp:1682
 #, c-format
@@ -2726,11 +2726,11 @@ msgstr "Не едзьце да сігналу!"
 
 #: src/karts/controller/spare_tire_ai.cpp:147
 msgid "You can have at most 3 lives!"
-msgstr ""
+msgstr "Вы можаце мець максімум 3 жыцці!"
 
 #: src/karts/controller/spare_tire_ai.cpp:153
 msgid "+1 life."
-msgstr ""
+msgstr "+1 жыццё."
 
 #: src/karts/kart.cpp:908 src/karts/kart.cpp:913
 msgid "You won the race!"
@@ -2753,7 +2753,7 @@ msgstr "SuperTuxKart можа падлучацца да сервера, каб �
 
 #: src/main.cpp:1654
 msgid "Your screen resolution is too low to run STK."
-msgstr ""
+msgstr "Разрозненне вашага экрана занадта малое для STK."
 
 #: src/main.cpp:1668
 msgid ""
@@ -2803,10 +2803,10 @@ msgstr "НЯПРАВІЛЬНЫ НАПРАМАК!"
 #, c-format
 msgid "%i spare tire kart has been spawned!"
 msgid_plural "%i spare tire karts have been spawned!"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%i запаска для карта з'явілася!"
+msgstr[1] "%i запаскі для карта з'явіліся!"
+msgstr[2] "%i запасак для карта з'явілася!"
+msgstr[3] "%i запасак для карта з'явілася!"
 
 #: src/modes/world.cpp:1202
 msgid "You have been eliminated!"
@@ -2820,7 +2820,7 @@ msgstr "«%s» дыскваліфікаваны."
 #: src/network/protocols/server_lobby.cpp:318
 #, c-format
 msgid "Failed to register server: %s"
-msgstr ""
+msgstr "Не атрымалася зарэгістраваць сервер: %s"
 
 #: src/network/servers_manager.cpp:198
 msgid "No LAN server detected"
@@ -3149,7 +3149,7 @@ msgstr "Адключана"
 #: src/states_screens/dialogs/custom_video_settings.cpp:67
 #: src/states_screens/options_screen_video.cpp:462
 msgid "Important only"
-msgstr ""
+msgstr "Толькі важнае"
 
 #. I18N: animations setting (only karts with human players are animated)
 #: src/states_screens/dialogs/custom_video_settings.cpp:74
@@ -3168,7 +3168,7 @@ msgstr "Для ўсіх"
 #: src/states_screens/dialogs/custom_video_settings.cpp:102
 #: src/states_screens/options_screen_video.cpp:469
 msgid "Low"
-msgstr ""
+msgstr "Нізкі"
 
 #. I18N: Geometry level high : everything is displayed
 #. I18N: in the graphical options tooltip;
@@ -3178,21 +3178,21 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:103
 #: src/states_screens/options_screen_video.cpp:472
 msgid "High"
-msgstr ""
+msgstr "Высокі"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:94
 #: src/states_screens/options_screen_video.cpp:466
 msgid "Very Low"
-msgstr ""
+msgstr "Вельмі нізкі"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very high
 #: src/states_screens/dialogs/custom_video_settings.cpp:97
 #: src/states_screens/options_screen_video.cpp:475
 msgid "Very High"
-msgstr ""
+msgstr "Вельмі высокі"
 
 #: src/states_screens/dialogs/message_dialog.cpp:129
 #: src/states_screens/edit_gp_screen.cpp:257
@@ -3202,11 +3202,11 @@ msgstr "Не"
 
 #: src/states_screens/dialogs/multitouch_settings_dialog.cpp:60
 msgid "Tablet"
-msgstr ""
+msgstr "Планшэт"
 
 #: src/states_screens/dialogs/multitouch_settings_dialog.cpp:61
 msgid "Phone"
-msgstr ""
+msgstr "Тэлефон"
 
 #: src/states_screens/dialogs/recovery_dialog.cpp:121
 msgid "Username and/or email address invalid."
@@ -3220,7 +3220,7 @@ msgid ""
 "the box below, you are confirming that you understand these terms. If you "
 "have any questions or comments regarding these terms, one of the members of "
 "the development team would gladly assist you."
-msgstr ""
+msgstr "Калі ласка, азнаёмцеся з умовамі карыстання SuperTuxKart на «%s». Вы павінны пагадзіцца з гэтымі ўмовамі для таго, каб зарэгістраваць конт для STK. Усталяваўшы сцяжок ніжэй, вы пацвярджаеце, што вы разумееце гэтыя ўмовы. Калі вы маеце пытанні ці каменты адносна ўмоў, адзін з чальцоў каманды распрацоўнікаў з задавальненнем дапаможа вам."
 
 #: src/states_screens/dialogs/select_challenge.cpp:52
 #, c-format
@@ -3390,7 +3390,7 @@ msgstr "Час фінішу"
 
 #: src/states_screens/ghost_replay_selection.cpp:83
 msgid "User"
-msgstr ""
+msgstr "Карыстальнік"
 
 #: src/states_screens/gp_info_screen.cpp:74
 msgid "Default"
@@ -3674,7 +3674,7 @@ msgstr "Клавіятура %i"
 
 #: src/states_screens/options_screen_input.cpp:138
 msgid "Touch Device"
-msgstr ""
+msgstr "Сэнсарная прылада"
 
 #: src/states_screens/options_screen_ui.cpp:159
 msgid ""
@@ -3785,7 +3785,7 @@ msgstr "Глабальнае асвятленне: %s"
 #: src/states_screens/options_screen_video.cpp:534
 #, c-format
 msgid "Rendered image quality: %s"
-msgstr ""
+msgstr "Якасць апрацаванай выявы: %s"
 
 #: src/states_screens/race_gui.cpp:358 src/states_screens/race_gui.cpp:360
 msgid "Challenge Failed"
@@ -3842,7 +3842,7 @@ msgstr "Ранг"
 
 #: src/states_screens/race_gui_overworld.cpp:518
 msgid "Press fire to start the tutorial"
-msgstr ""
+msgstr "Націсніце Атаку, каб пачаць навучанне"
 
 #: src/states_screens/race_gui_overworld.cpp:557
 msgid "Type: Grand Prix"
@@ -3989,7 +3989,7 @@ msgstr "Некарэктны Email!"
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
-msgstr "Вы атрымаеце электронны ліст з далейшымі інструкцыямі для актывацыі конта. Калі ласка, будзьце церпялівымі і не забудзьце праверыць тэчку са спамам."
+msgstr "Вы атрымаеце электронны ліст з далейшымі інструкцыямі для актывацыі конту. Калі ласка, будзьце церпялівымі і не забудзьце праверыць тэчку са спамам."
 
 #: src/states_screens/register_screen.cpp:402
 #: src/states_screens/user_screen.cpp:338
@@ -4133,7 +4133,7 @@ msgstr "Ой! Калі ў вас праблемы, націсніце <%s> дл�
 msgid ""
 "Accelerate and press the <%s> key while turning to skid. Skidding for a "
 "short while can help you turn faster to take sharp turns."
-msgstr "Разганіцеся і націсніце <%s> пад час заноса. Коўзанне дапаможа вам прайсць крутыя павароты хутчэй."
+msgstr "Разганіцеся і націсніце <%s> пад час заносу. Коўзанне дапаможа вам прайсць крутыя павароты хутчэй."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:77
 #: ../stk-assets/tracks/tutorial/triggers.as:78

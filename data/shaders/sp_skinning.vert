@@ -24,13 +24,7 @@ layout(location = 5) in vec4 i_tangent;
 layout(location = 6) in ivec4 i_joint;
 layout(location = 7) in vec4 i_weight;
 layout(location = 8) in vec3 i_origin;
-
-#if defined(Converts_10bit_Vector)
-layout(location = 9) in vec4 i_rotation_orig;
-#else
 layout(location = 9) in vec4 i_rotation;
-#endif
-
 layout(location = 10) in vec4 i_scale;
 layout(location = 11) in vec2 i_texture_trans;
 layout(location = 12) in ivec2 i_misc_data;
@@ -52,7 +46,6 @@ void main()
 #if defined(Converts_10bit_Vector)
     vec4 i_normal = convert10BitVector(i_normal_orig);
     vec4 i_tangent = convert10BitVector(i_tangent_orig);
-    vec4 i_rotation = convert10BitVector(i_rotation_orig);
 #endif
 
     vec4 idle_position = vec4(i_position, 1.0);
@@ -113,11 +106,10 @@ void main()
     skinned_normal = joint_matrix * idle_normal;
     skinned_tangent = joint_matrix * idle_tangent;
 
-    vec4 quaternion = normalize(vec4(i_rotation.xyz, i_scale.w));
-    vec4 world_position = getWorldPosition(i_origin, quaternion, i_scale.xyz,
+    vec4 world_position = getWorldPosition(i_origin, i_rotation, i_scale.xyz,
         skinned_position.xyz);
-    vec3 world_normal = rotateVector(quaternion, skinned_normal.xyz);
-    vec3 world_tangent = rotateVector(quaternion, skinned_tangent.xyz);
+    vec3 world_normal = rotateVector(i_rotation, skinned_normal.xyz);
+    vec3 world_tangent = rotateVector(i_rotation, skinned_tangent.xyz);
 
     tangent = (u_view_matrix * vec4(world_tangent, 0.0)).xyz;
     bitangent = (u_view_matrix *

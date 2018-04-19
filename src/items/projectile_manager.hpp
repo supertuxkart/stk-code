@@ -65,6 +65,9 @@ public:
     void             removeTextures   ();
     bool             projectileIsClose(const AbstractKart * const kart,
                                        float radius);
+
+    int              getNearbyProjectileCount(const AbstractKart * const kart,
+                                       float radius, PowerupManager::PowerupType type);
     // ------------------------------------------------------------------------
     /** Adds a special hit effect to be shown.
      *  \param hit_effect The hit effect to be added. */

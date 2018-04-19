@@ -4,13 +4,14 @@
 # 
 # Translators:
 # Andrej Znidarsic <andrej.znidarsic@gmail.com>, 2015-2016
+# Sasa Batistic <sasa.batistic@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-11-13 00:19+0000\n"
-"Last-Translator: Auria <auria.mg@gmail.com>\n"
+"PO-Revision-Date: 2018-02-28 13:25+0000\n"
+"Last-Translator: Sasa Batistic <sasa.batistic@gmail.com>\n"
 "Language-Team: Slovenian (http://www.transifex.com/supertuxkart/supertuxkart/language/sl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -619,11 +620,11 @@ msgstr "Več igralski način."
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: Tab in help menu
 msgid "Bananas"
-msgstr ""
+msgstr "Banane"
 
 #. I18N: ./data/gui/help1.stkgui
 msgid "Start the tutorial"
-msgstr ""
+msgstr "Začni z vodnikom"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -800,12 +801,12 @@ msgstr ""
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
 msgid "Anchor - slows down the kart."
-msgstr ""
+msgstr "Sidro - upočasni vozilo."
 
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
 msgid "Parachute - slows down the kart less than the anchor."
-msgstr ""
+msgstr "Padalo - manj upočasni dirkalnik kot sidro."
 
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
