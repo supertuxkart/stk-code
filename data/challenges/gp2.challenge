@@ -1,19 +1,24 @@
 <?xml version="1.0"?>
-<challenge version="2">
+<challenge version="3">
+    <unlock_list list="false"/>
     <grandprix id="2_offthebeatentrack"/>
     <mode major="grandprix" minor="quickrace"/>
-    <requirements trophies="85"/>
+    <requirements trophies="70"/>
     
+    <best>
+        <karts number="8"/>
+        <requirements position="1"/>
+    </best>
     <hard>
-        <karts number="5"/>
+        <karts number="7"/>
         <requirements position="1"/>
     </hard>
     <medium>
-        <karts number="4"/>
+        <karts number="6"/>
         <requirements position="1"/>
     </medium>
     <easy>
-        <karts number="3"/>
+        <karts number="5"/>
         <requirements position="1"/>
     </easy>
 </challenge>
