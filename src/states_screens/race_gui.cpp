@@ -137,9 +137,9 @@ RaceGUI::RaceGUI()
 
     // Load speedmeter texture before rendering the first frame
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
-    m_speed_meter_icon->getTexture();
+    m_speed_meter_icon->getTexture(false,false);
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
-    m_speed_bar_icon->getTexture();
+    m_speed_bar_icon->getTexture(false,false);
     //createMarkerTexture();
 }   // RaceGUI
 
@@ -503,33 +503,38 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
     // They are further than the nitrometer farther position because
     // the lines between them would otherwise cut through the outside circle.
     
-    const int vertices_count = 7;
+    const int vertices_count = 9;
 
     core::vector2df position[vertices_count];
     position[0].X = 0.324f;//A
     position[0].Y = 0.35f;//A
-    position[1].X = 0.029f;//B
-    position[1].Y = 0.918f;//B
-    position[2].X = 0.307f;//C
-    position[2].Y = 0.99f;//C
-    position[3].X = 0.589f;//D
-    position[3].Y = 0.932f;//D
-    position[4].X = 0.818f;//E
-    position[4].Y = 0.755f;//E
-    position[5].X = 0.945f;//F
-    position[5].Y = 0.497f;//F
-    position[6].X = 0.948f;//G
-    position[6].Y = 0.211f;//G
-
+    position[1].X = 0.01f;//B1 (margin for gauge goal)
+    position[1].Y = 0.88f;//B1
+    position[2].X = 0.029f;//B2
+    position[2].Y = 0.918f;//B2
+    position[3].X = 0.307f;//C
+    position[3].Y = 0.99f;//C
+    position[4].X = 0.589f;//D
+    position[4].Y = 0.932f;//D
+    position[5].X = 0.818f;//E
+    position[5].Y = 0.755f;//E
+    position[6].X = 0.945f;//F
+    position[6].Y = 0.497f;//F
+    position[7].X = 0.948f;//G1
+    position[7].Y = 0.211f;//G1
+    position[8].X = 0.94f;//G2 (margin for gauge goal)
+    position[8].Y = 0.17f;//G2
 
     // The states at which different polygons must be used.
 
     float threshold[vertices_count-2];
-    threshold[0] = 0.2f;
-    threshold[1] = 0.4f;
-    threshold[2] = 0.6f;
-    threshold[3] = 0.8f;
-    threshold[4] = 1.0f;
+    threshold[0] = 0.0001f; //for gauge drawing
+    threshold[1] = 0.2f;
+    threshold[2] = 0.4f;
+    threshold[3] = 0.6f;
+    threshold[4] = 0.8f;
+    threshold[5] = 0.9999f;
+    threshold[6] = 1.0f;
 
     // Filling (current state)
 
@@ -550,24 +555,10 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
         unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count,
                                                      state, gauge_width, gauge_height, offset);
 
-        short int index[5]={0};
-        for(unsigned int i=0; i<count; i++)
-        {
-            index[i]=count-i-1;
-            vertices[i].Color = video::SColor(255, 255, 255, 255);
-        }
-
-
-        video::SMaterial m;
         if(kart->getControls().getNitro() || kart->isOnMinNitroTime())
-            m.setTexture(0, m_gauge_full_bright);
+            drawMeterTexture(m_gauge_full_bright, vertices, count);
         else
-            m.setTexture(0, m_gauge_full);
-        m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-        irr_driver->getVideoDriver()->setMaterial(m);
-        draw2DVertexPrimitiveList(m.getTexture(0), vertices, count,
-        index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
-
+            drawMeterTexture(m_gauge_full, vertices, count);
     }
 
     // Target
@@ -582,19 +573,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
         unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count, 
                                                      coin_target, gauge_width, gauge_height, offset);
 
-        short int index[5]={0};
-        for(unsigned int i=0; i<count; i++)
-        {
-            index[i]=count-i-1;
-            vertices[i].Color = video::SColor(255, 255, 255, 255);
-        }
-
-        video::SMaterial m;
-        m.setTexture(0, m_gauge_goal);
-        m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-        irr_driver->getVideoDriver()->setMaterial(m);
-        draw2DVertexPrimitiveList(m_gauge_goal, vertices, count,
-        index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
+        drawMeterTexture(m_gauge_goal, vertices, count);
     }
 #endif
 }   // drawEnergyMeter
@@ -737,6 +716,7 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
     if(speed_ratio>1) speed_ratio = 1;
 
     // see computeVerticesForMeter for the detail of the drawing
+    // If increasing this, update drawMeterTexture
 
     const int vertices_count = 12;
 
@@ -809,20 +789,33 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
                                                      speed_ratio, meter_width, meter_height, offset);
 
 
-    short int index[vertices_count];
+    drawMeterTexture(m_speed_bar_icon->getTexture(), vertices, count);
+#endif
+}   // drawSpeedEnergyRank
+
+void RaceGUI::drawMeterTexture(video::ITexture *meter_texture, video::S3DVertex vertices[], unsigned int count)
+{
+#ifndef SERVER_ONLY
+    //Should be greater or equal than the greatest vertices_count used by the meter functions
+    short int index[12];
     for(unsigned int i=0; i<count; i++)
     {
         index[i]=i;
         vertices[i].Color = video::SColor(255, 255, 255, 255);
     }
+
     video::SMaterial m;
-    m.setTexture(0, m_speed_bar_icon->getTexture());
+    m.setTexture(0, meter_texture);
     m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     irr_driver->getVideoDriver()->setMaterial(m);
-    draw2DVertexPrimitiveList(m_speed_bar_icon->getTexture(), vertices, count,
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    draw2DVertexPrimitiveList(m.getTexture(0), vertices, count,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
+    glDisable(GL_BLEND);
 #endif
-}   // drawSpeedEnergyRank
+}   // drawMeterTexture
+
 
 
 //-----------------------------------------------------------------------------

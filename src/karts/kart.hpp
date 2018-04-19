@@ -74,8 +74,15 @@ protected:
      *  new lap is triggered. */
     Vec3 m_xyz_front;
 
-    /** The coordinates of the 30 previous positions */
-    Vec3 m_previous_xyz[30];
+    /* Determines the time covered by the history size, in seconds */
+    const float XYZ_HISTORY_TIME = 0.25f;
+
+    /* Determines the number of previous XYZ positions of the kart to remember
+       Initialized in the constructor and unchanged from then on */
+    int m_xyz_history_size;
+
+    /** The coordinates of the XYZ_HISTORY_SIZE previous positions */
+    std::vector<Vec3> m_previous_xyz;
 
     float m_time_previous_counter;
 
@@ -479,8 +486,12 @@ public:
      *  defined even if the kart is flying. */
     virtual const Vec3& getNormal() const;
     // ------------------------------------------------------------------------
-    /** Returns the position 0,25s before */
+    /** Returns the position 0.25s before */
     virtual const Vec3& getPreviousXYZ() const;
+
+    // ------------------------------------------------------------------------
+    /** Returns a more recent different previous position */
+    virtual const Vec3& getRecentPreviousXYZ() const;
 
     // ------------------------------------------------------------------------
     /** For debugging only: check if a kart is flying. */

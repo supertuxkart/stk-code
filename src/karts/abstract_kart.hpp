@@ -476,8 +476,11 @@ public:
      *  defined even if the kart is flying. */
     virtual const Vec3& getNormal() const = 0;
     // ------------------------------------------------------------------------
-    /** Returns the position 0,25s before */
+    /** Returns the position 0.25s before */
     virtual const Vec3& getPreviousXYZ() const = 0;
+    // ------------------------------------------------------------------------
+    /** Returns the most recent different previous position */
+    virtual const Vec3& getRecentPreviousXYZ() const = 0;
     // ------------------------------------------------------------------------
     /** Returns the height of the terrain. we're currently above */
     virtual float getHoT() const = 0;

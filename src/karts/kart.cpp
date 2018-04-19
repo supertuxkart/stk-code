@@ -147,9 +147,12 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_boosted_ai           = false;
     m_type                 = RaceManager::KT_AI;
 
-    for (int i=0;i<30;i++)
+    m_xyz_history_size     = stk_config->time2Ticks(XYZ_HISTORY_TIME);
+
+    Vec3 initial_position = getXYZ();
+    for (int i=0;i<m_xyz_history_size;i++)
     {
-        m_previous_xyz[i] = getXYZ();
+        m_previous_xyz.push_back(initial_position);
     }
     m_time_previous_counter = 0.0f;
 
@@ -376,7 +379,7 @@ void Kart::reset()
     m_has_caught_nolok_bubblegum = false;
     m_is_jumping           = false;
 
-    for (int i=0;i<30;i++)
+    for (int i=0;i<m_xyz_history_size;i++)
     {
         m_previous_xyz[i] = getXYZ();
     }
@@ -1228,7 +1231,7 @@ void Kart::eliminate()
         m_stars_effect->reset();
         m_stars_effect->update(1);
     }
-   
+
     if (m_attachment)
     {
         m_attachment->clear();
@@ -1306,14 +1309,14 @@ void Kart::update(float dt)
     }
 
     m_time_previous_counter += dt;
-    while (m_time_previous_counter > (1.0f/120.0f))
+    while (m_time_previous_counter > stk_config->ticks2Time(1))
     {
         m_previous_xyz[0] = getXYZ();
-        for (int i=29;i>0;i--)
+        for (int i=m_xyz_history_size-1;i>0;i--)
         {
             m_previous_xyz[i] = m_previous_xyz[i-1];
         }
-        m_time_previous_counter -= (1.0f/120.0f);
+        m_time_previous_counter -= stk_config->ticks2Time(1);
     }
 
     // Update the position and other data taken from the physics (or
@@ -3092,12 +3095,20 @@ const Vec3& Kart::getNormal() const
 }   // getNormal
 
 // ------------------------------------------------------------------------
-/** Returns the position 0,25s before */
+/** Returns the position 0.25s before */
 const Vec3& Kart::getPreviousXYZ() const
 {
-    return m_previous_xyz[29];
+    return m_previous_xyz[m_xyz_history_size-1];
 }   // getPreviousXYZ
 
+// ------------------------------------------------------------------------
+/** Returns a more recent different previous position */
+const Vec3& Kart::getRecentPreviousXYZ() const
+{
+    //Not the most recent, because the angle variations would be too
+    //irregular on some tracks whose roads are not smooth enough
+    return m_previous_xyz[m_xyz_history_size/5];
+}   // getRecentPreviousXYZ
 
 // ------------------------------------------------------------------------
 void Kart::playSound(SFXBuffer* buffer)
