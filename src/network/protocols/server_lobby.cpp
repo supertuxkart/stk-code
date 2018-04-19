@@ -588,6 +588,24 @@ void ServerLobby::startSelection(const Event *event)
     // a new screen, which must be donefrom the main thread.
     ns->setSynchronous(true);
     ns->addUInt8(LE_START_SELECTION);
+
+    // Remove karts / tracks from server that are not supported on all clients
+    std::set<std::string> karts_erase, tracks_erase;
+    auto peers = STKHost::get()->getPeers();
+    for (auto peer : peers)
+    {
+        peer->eraseServerKarts(m_available_kts.first, karts_erase);
+        peer->eraseServerTracks(m_available_kts.second, tracks_erase);
+    }
+    for (const std::string& kart_erase : karts_erase)
+    {
+        m_available_kts.first.erase(kart_erase);
+    }
+    for (const std::string& track_erase : tracks_erase)
+    {
+        m_available_kts.second.erase(track_erase);
+    }
+
     const auto& all_k = m_available_kts.first;
     const auto& all_t = m_available_kts.second;
     ns->addUInt16((uint16_t)all_k.size()).addUInt16((uint16_t)all_t.size());
@@ -888,9 +906,8 @@ void ServerLobby::connectionRequested(Event* event)
         client_tracks.insert(track);
     }
 
-    // Remove karts/tracks from server that are not supported on the new client
-    // so that in the end the server has a list of all karts/tracks available
-    // on all clients
+    // Drop this player if he doesn't have at least 1 kart / track the same
+    // as server
     std::set<std::string> karts_erase, tracks_erase;
     for (const std::string& server_kart : m_available_kts.first)
     {
@@ -907,8 +924,6 @@ void ServerLobby::connectionRequested(Event* event)
         }
     }
 
-    // Drop this player if he doesn't have at least 1 kart / track the same
-    // from server
     if (karts_erase.size() == m_available_kts.first.size() ||
         tracks_erase.size() == m_available_kts.second.size())
     {
@@ -923,14 +938,9 @@ void ServerLobby::connectionRequested(Event* event)
         return;
     }
 
-    for (const std::string& kart_erase : karts_erase)
-    {
-        m_available_kts.first.erase(kart_erase);
-    }
-    for (const std::string& track_erase : tracks_erase)
-    {
-        m_available_kts.second.erase(track_erase);
-    }
+    // Save available karts and tracks from clients in STKPeer so if this peer
+    // disconnects later in lobby it won't affect current players
+    peer->setAvailableKartsTracks(client_karts, client_tracks);
 
     if (!peer->isClientServerTokenSet())
     {
@@ -945,6 +955,7 @@ void ServerLobby::connectionRequested(Event* event)
 
         peer->setClientServerToken(token);
     }
+
     // send a message to the one that asked to connect
     NetworkString* message_ack = getNetworkString(4);
     message_ack->setSynchronous(true);
@@ -1072,7 +1083,7 @@ void ServerLobby::kartSelectionRequested(Event* event)
         {
             peer->getPlayerProfiles()[i]->setKartName(kart);
         }
-        Log::verbose("ServerLobby", "Player %d from peer %d chose %s", i,
+        Log::debug("ServerLobby", "Player %d from peer %d chose %s", i,
             peer->getHostId(), kart.c_str());
     }
 }   // kartSelectionRequested

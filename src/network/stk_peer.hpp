@@ -31,6 +31,7 @@
 
 #include <atomic>
 #include <memory>
+#include <set>
 #include <vector>
 
 class NetworkPlayerProfile;
@@ -71,6 +72,9 @@ protected:
     std::vector<std::shared_ptr<NetworkPlayerProfile> > m_players;
 
     float m_connected_time;
+
+    /** Available karts and tracks from this peer */
+    std::pair<std::set<std::string>, std::set<std::string> > m_available_kts;
 
 public:
              STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id);
@@ -125,6 +129,40 @@ public:
     uint32_t getHostId() const                            { return m_host_id; }
     // ------------------------------------------------------------------------
     float getConnectedTime() const                 { return m_connected_time; }
+    // ------------------------------------------------------------------------
+    void setAvailableKartsTracks(std::set<std::string>& k,
+                                 std::set<std::string>& t)
+              { m_available_kts = std::make_pair(std::move(k), std::move(t)); }
+    // ------------------------------------------------------------------------
+    void eraseServerKarts(const std::set<std::string>& server_karts,
+                          std::set<std::string>& karts_erase)
+    {
+        if (m_available_kts.first.empty())
+            return;
+        for (const std::string& server_kart : server_karts)
+        {
+            if (m_available_kts.first.find(server_kart) ==
+                m_available_kts.first.end())
+            {
+                karts_erase.insert(server_kart);
+            }
+        }
+    }
+    // ------------------------------------------------------------------------
+    void eraseServerTracks(const std::set<std::string>& server_tracks,
+                           std::set<std::string>& tracks_erase)
+    {
+        if (m_available_kts.second.empty())
+            return;
+        for (const std::string& server_track : server_tracks)
+        {
+            if (m_available_kts.second.find(server_track) ==
+                m_available_kts.second.end())
+            {
+                tracks_erase.insert(server_track);
+            }
+        }
+    }
     // ------------------------------------------------------------------------
     uint32_t getPing() const;
 
