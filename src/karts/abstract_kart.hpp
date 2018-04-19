@@ -282,11 +282,23 @@ public:
     virtual float getCurrentMaxSpeed() const = 0;
     // ------------------------------------------------------------------------
     /** Returns how much increased speed time is left over in the given
-     *  category. Not pure abstract, since there is no need to implement this
-     *  e.g. in Ghost.
+     *  category.
      *  \param category Which category to report on. */
     virtual int getSpeedIncreaseTicksLeft(unsigned int category) const = 0;
+    
     // ------------------------------------------------------------------------
+    /** Sets the kart AI boost state.
+     *  Not pure abstract, since there is no need to implement this e.g. in Ghost.
+     *  \param boosted True if a boost should be applied. */
+    virtual void setBoostAI(bool boosted) = 0;
+    
+    // ------------------------------------------------------------------------
+    /** Returns the kart AI boost state.
+     *  Not pure abstract, since there is no need to implement this e.g. in Ghost. */
+    virtual bool getBoostAI() const = 0;
+    
+    // ------------------------------------------------------------------------
+    
     /** Sets an increased maximum speed for a category.
      *  \param category The category for which to set the higher maximum speed.
      *  \param add_speed How much speed (in m/s) is added to the maximum speed.
@@ -295,8 +307,25 @@ public:
      *  \param fade_out_time How long the maximum speed will fade out linearly.
      */
     virtual void increaseMaxSpeed(unsigned int category, float add_speed,
-                                  float engine_force, int duration,
-                                  int fade_out_time) = 0;
+                                  float engine_force, float duration,
+                                  float fade_out_time) = 0;
+
+    // ----------------------------------------------------------------------------
+    /** This adjusts the top speed using increaseMaxSpeed, but additionally
+     *  causes an instant speed boost, which can be smaller than add-max-speed.
+     *  (e.g. a zipper can give an instant boost of 5 m/s, but over time would
+     *  allow the speed to go up by 10 m/s).
+     *  \param category The category for which the speed is increased.
+     *  \param add_max_speed Increase of the maximum allowed speed.
+     *  \param speed_boost An instant speed increase for this kart.
+     *  \param engine_force Additional engine force.
+     *  \param duration Duration of the increased speed.
+     *  \param fade_out_time How long the maximum speed will fade out linearly.
+     */
+    virtual void instantSpeedIncrease(unsigned int category, float add_max_speed,
+                                    float speed_boost, float engine_force, float duration,
+                                    float fade_out_time) = 0;
+
     // ------------------------------------------------------------------------
     /** Defines a slowdown, which is in fraction of top speed.
      *  \param category The category for which the speed is increased.
@@ -379,6 +408,9 @@ public:
     /** Returns the current powerup. */
     virtual Powerup *getPowerup() = 0;
     // ------------------------------------------------------------------------
+    /** Returns the last used powerup type. */
+    virtual PowerupManager::PowerupType getLastUsedPowerup() = 0;
+    // ------------------------------------------------------------------------
     /** Returns a points to this kart's graphical effects. */
     virtual KartGFX* getKartGFX() = 0;
     // ------------------------------------------------------------------------
@@ -443,6 +475,12 @@ public:
      *  defined even if the kart is flying. */
     virtual const Vec3& getNormal() const = 0;
     // ------------------------------------------------------------------------
+    /** Returns the position 0.25s before */
+    virtual const Vec3& getPreviousXYZ() const = 0;
+    // ------------------------------------------------------------------------
+    /** Returns the most recent different previous position */
+    virtual const Vec3& getRecentPreviousXYZ() const = 0;
+    // ------------------------------------------------------------------------
     /** Returns the height of the terrain. we're currently above */
     virtual float getHoT() const = 0;
     // ------------------------------------------------------------------------
@@ -474,4 +512,3 @@ public:
 #endif
 
 /* EOF */
-

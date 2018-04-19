@@ -643,8 +643,8 @@ void RubberBall::updateDistanceToTarget()
     const LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
 
     float target_distance =
-        world->getDistanceDownTrackForKart(m_target->getWorldKartId());
-    float ball_distance = getDistanceFromStart();
+        world->getDistanceDownTrackForKart(m_target->getWorldKartId(), true);
+    float ball_distance = getDistanceFromStart(true);
 
     m_distance_to_target = target_distance - ball_distance;
     if(m_distance_to_target < 0)

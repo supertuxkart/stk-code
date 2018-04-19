@@ -550,7 +550,8 @@ void cmdLineHelp()
                               "./data/stk_config.xml\n"
     "  -k,  --numkarts=NUM     Set number of karts on the racetrack.\n"
     "       --kart=NAME        Use kart NAME.\n"
-    "       --ai=a,b,...       Use the karts a, b, ... for the AI.\n"
+    "       --ai=a,b,...       Use the karts a, b, ... for the AI, and additional player kart.\n"
+    "       --aiNP=a,b,...     Use the karts a, b, ... for the AI, no additional player kart.\n"
     "       --laps=N           Define number of laps to N.\n"
     "       --mode=N           N=1 Beginner, N=2 Intermediate, N=3 Expert, N=4 SuperTux.\n"
     "       --type=N           N=0 Normal, N=1 Time trial, N=2 Follow The Leader\n"
@@ -1185,6 +1186,38 @@ int handleCmdLine()
         // Add 1 for the player kart
         race_manager->setNumKarts((int)l.size()+1);
     }   // --ai
+
+    if(CommandLine::has("--aiNP", &s))
+    {
+        const std::vector<std::string> l=StringUtils::split(std::string(s),',');
+        race_manager->setDefaultAIKartList(l);
+        race_manager->setNumKarts((int)l.size());
+    }   // --aiNP
+
+    if(CommandLine::has( "--mode", &s) || CommandLine::has( "--difficulty", &s))
+    {
+        int n = atoi(s.c_str());
+        if(n<0 || n>RaceManager::DIFFICULTY_LAST)
+            Log::warn("main", "Invalid difficulty '%s' - ignored.\n",
+                      s.c_str());
+        else
+            race_manager->setDifficulty(RaceManager::Difficulty(n));
+    }   // --mode
+
+    if(CommandLine::has("--type", &n))
+    {
+        switch (n)
+        {
+        case 0: race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
+                break;
+        case 1: race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
+                break;
+        case 2: race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
+                break;
+        default:
+                Log::warn("main", "Invalid race type '%d' - ignored.", n);
+        }
+    }   // --type
 
     if(CommandLine::has("--track", &s) || CommandLine::has("-t", &s))
     {

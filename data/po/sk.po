@@ -7,13 +7,14 @@
 # Dušan Kazik <prescott66@gmail.com>, 2015
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
 # MiroslavR <miroslavr256@gmail.com>, 2015-2016
+# Vladimír Záhradník <vladimir.zahradnik@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-11-13 00:19+0000\n"
-"Last-Translator: Auria <auria.mg@gmail.com>\n"
+"PO-Revision-Date: 2018-01-05 11:47+0000\n"
+"Last-Translator: Vladimír Záhradník <vladimir.zahradnik@gmail.com>\n"
 "Language-Team: Slovak (http://www.transifex.com/supertuxkart/supertuxkart/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -296,7 +297,7 @@ msgstr "Osvetlenie založené na obrázku"
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Bloom"
-msgstr ""
+msgstr "Bloom (rozptýlené svetlo)"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -306,7 +307,7 @@ msgstr "Svetelné lúče"
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Ambient Occlusion"
-msgstr ""
+msgstr "Zatienenie okolím"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -356,12 +357,12 @@ msgstr "Animácia postáv"
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Rendered image quality"
-msgstr ""
+msgstr "Kvalita vykresľovaného obrazu"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Geometry detail"
-msgstr ""
+msgstr "Geometrické podrobnosti"
 
 #. I18N: ./data/gui/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -465,12 +466,12 @@ msgstr "Pokračovať"
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Record the race for ghost replay"
-msgstr ""
+msgstr "Nahrať pretek pre opakovačku s duchom"
 
 #. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
 msgid "Watch replay only"
-msgstr ""
+msgstr "Iba pozrieť opakovačku"
 
 #. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info screen action
@@ -486,17 +487,17 @@ msgstr "Začať preteky"
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Ghost Replay Selection"
-msgstr ""
+msgstr "Výber opakovačky s duchom"
 
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Only show replays matching the current difficulty"
-msgstr ""
+msgstr "Zobrazovať iba opakovačky odpovedajúce aktuálnej obtiažnosti"
 
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Record ghost replay"
-msgstr ""
+msgstr "Nahrať pre opakovačku s duchom"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -609,7 +610,7 @@ msgstr "Herné režimy"
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: Tab in help menu
 msgid "Multi-player"
-msgstr ""
+msgstr "Hra viac hráčov"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -622,11 +623,11 @@ msgstr ""
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: Tab in help menu
 msgid "Bananas"
-msgstr ""
+msgstr "Banány"
 
 #. I18N: ./data/gui/help1.stkgui
 msgid "Start the tutorial"
-msgstr ""
+msgstr "Spustiť výuku"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
@@ -729,7 +730,7 @@ msgstr "Obyčajné preteky: Povoľujú sa všetky údery, tak sa chopte zbraní 
 msgid ""
 "Time Trial: Contains no powerups, so only your driving skills matter! This "
 "mode allows you to record the race for replaying."
-msgstr ""
+msgstr "Pretek na čas: Neobsahuje žiadne bonusy, záleží iba na vašich vodičských schopnostiach! Tento režim umožňuje nahrávať pretek pre neskoršie spätné prehrávanie."
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -748,7 +749,7 @@ msgstr "Bitka na 3 údery: Triafajte ostatných hráčov zbraňami, kým nepríd
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 msgid "Soccer: Use your kart to push the ball into the goal."
-msgstr ""
+msgstr "Futbal: Použite svoju motokáru na natlačenie lopty do bránky."
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -798,24 +799,24 @@ msgstr "Po nakonfigurovaní vstupných zariadení môžete začať hrať. V hlav
 msgid ""
 "Hitting a banana can result in one of the following being attached to the "
 "kart:"
-msgstr ""
+msgstr "Náraz do banánu môže mať za následok, že sa pripojí k motokáre jedna z nasledujúcich položiek:"
 
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
 msgid "Anchor - slows down the kart."
-msgstr ""
+msgstr "Kotva - spomaľuje motokáru."
 
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
 msgid "Parachute - slows down the kart less than the anchor."
-msgstr ""
+msgstr "Padák - spomaľuje motokáru menej než kotva."
 
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: In the help menu
 msgid ""
 "Bomb - detonates after a short amount of time to throw the kart up in the "
 "air. Bump into another kart to transfer the bomb to another player."
-msgstr ""
+msgstr "Bomba - po chvíli vybuchne a vyhodí motokáru do vzduchu. Nárazom do inej motokáry prehodíte bombu inému hráčovi."
 
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -904,46 +905,46 @@ msgstr "Ukončiť"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 msgid "Touch Device Settings"
-msgstr ""
+msgstr "Nastavenia dotykového zariadenia"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Device enabled"
-msgstr ""
+msgstr "Zariadenie je povolené"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Inverted buttons"
-msgstr ""
+msgstr "Prehodené tlačidlá"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Buttons scale"
-msgstr ""
+msgstr "Rozsah tlačidiel"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Accelerometer"
-msgstr ""
+msgstr "Akcelerometer"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Advanced"
-msgstr ""
+msgstr "Pokročilé"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Deadzone"
-msgstr ""
+msgstr "Zóna smrti"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Sensitivity"
-msgstr ""
+msgstr "Citlivosť"
 
 #. I18N: ./data/gui/multitouch_settings.stkgui
 msgid "Restore defaults"
-msgstr ""
+msgstr "Obnoviť predvolené nastavenia"
 
 #. I18N: ./data/gui/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -1208,7 +1209,7 @@ msgstr "Servery"
 
 #. I18N: ./data/gui/online/profile_servers.stkgui
 msgid "Local Networking"
-msgstr ""
+msgstr "Lokálna sieť"
 
 #. I18N: ./data/gui/online/profile_servers.stkgui
 #. I18N: In the online multiplayer screen
@@ -1223,7 +1224,7 @@ msgstr "Vytvoriť server"
 
 #. I18N: ./data/gui/online/profile_servers.stkgui
 msgid "Global Networking"
-msgstr ""
+msgstr "Globálna sieť"
 
 #. I18N: ./data/gui/online/profile_servers.stkgui
 #. I18N: In the online multiplayer screen
@@ -1501,7 +1502,7 @@ msgstr "Hráte ako"
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In the player configuration screen
 msgid "Press enter or double-click on a player to edit their settings"
-msgstr ""
+msgstr "Stlačte enter alebo dvakrát rýchlo kliknite na hráča, aby ste upravili jeho nastavenia"
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In the player configuration screen
@@ -1756,7 +1757,7 @@ msgstr "Vymazať"
 
 #. I18N: ../stk-assets/tracks/abyss/track.xml
 msgid "Antediluvian Abyss"
-msgstr ""
+msgstr "Predpotopná priepasť"
 
 #. I18N: ../stk-assets/tracks/battleisland/track.xml
 msgid "Battle Island"
@@ -1764,7 +1765,7 @@ msgstr "Boj na ostrove"
 
 #. I18N: ../stk-assets/tracks/candela_city/track.xml
 msgid "Candela City"
-msgstr ""
+msgstr "Mesto Candela"
 
 #. I18N: ../stk-assets/tracks/cave/track.xml
 msgid "Cave X"
@@ -1776,7 +1777,7 @@ msgstr "Kakaový chrám"
 
 #. I18N: ../stk-assets/tracks/cornfield_crossing/track.xml
 msgid "Cornfield Crossing"
-msgstr ""
+msgstr "Kros kukuričným poľom"
 
 #. I18N: ../stk-assets/tracks/fortmagma/track.xml
 msgid "Fort Magma"
@@ -1796,7 +1797,7 @@ msgstr "Hacienda"
 
 #. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
 msgid "Icy Soccer Field"
-msgstr ""
+msgstr "Ľadové futbalové ihrisko"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -1827,7 +1828,7 @@ msgstr "No poraziť mňa – kráľa motokár – sa vám úbohým krpcom nikdy
 
 #. I18N: ../stk-assets/tracks/lasdunasarena/track.xml
 msgid "Las Dunas Arena"
-msgstr ""
+msgstr "Piesočné duny"
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
 msgid "Around the lighthouse"
@@ -1883,7 +1884,7 @@ msgstr "Chrám"
 
 #. I18N: ../stk-assets/tracks/volcano_island/track.xml
 msgid "Volcan Island"
-msgstr ""
+msgstr "Sopečný ostrov"
 
 #. I18N: ../stk-assets/tracks/xr591/track.xml
 msgid "XR591"
@@ -1923,7 +1924,7 @@ msgstr "Hexley"
 
 #. I18N: ../stk-assets/karts/kiki/kart.xml
 msgid "Kiki"
-msgstr ""
+msgstr "Kiki"
 
 #. I18N: ../stk-assets/karts/konqi/kart.xml
 msgid "Konqi"
@@ -1972,7 +1973,7 @@ msgstr "Dokončili ste úspech „%s“."
 
 #: src/addons/addons_manager.cpp:104 src/addons/news_manager.cpp:322
 msgid "Failed to connect to the SuperTuxKart add-ons server."
-msgstr ""
+msgstr "Nepodarilo sa pripojiť k serveru doplnkov SuperTuxKart."
 
 #: src/addons/news_manager.cpp:179
 #, c-format
@@ -2044,16 +2045,16 @@ msgstr "Váš konfiguračný súbor bol príliš starý, takže bol zmazaný a v
 
 #: src/graphics/irr_driver.cpp:535
 msgid "Video recording started."
-msgstr ""
+msgstr "Začalo nahrávanie videa."
 
 #: src/graphics/irr_driver.cpp:541
 #, c-format
 msgid "Video saved in \"%s\"."
-msgstr ""
+msgstr "Video uložené do „%s“."
 
 #: src/graphics/irr_driver.cpp:545
 msgid "Encoding progress:"
-msgstr ""
+msgstr "Priebeh kódovania:"
 
 #: src/graphics/irr_driver.cpp:1682
 #, c-format
@@ -2593,25 +2594,25 @@ msgstr "Ľavá spúšť"
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:181 src/input/gamepad_config.cpp:244
 msgid "Right thumb right"
-msgstr ""
+msgstr "Pravý palec doprava"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:183 src/input/gamepad_config.cpp:246
 msgid "Right thumb left"
-msgstr ""
+msgstr "Pravý palec doľava"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of trigger on gamepads
 #: src/input/gamepad_config.cpp:185 src/input/gamepad_config.cpp:240
 msgid "Right thumb down"
-msgstr ""
+msgstr "Pravý palec nadol"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:187 src/input/gamepad_config.cpp:242
 msgid "Right thumb up"
-msgstr ""
+msgstr "Pravý palec nahor"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:189 src/input/gamepad_config.cpp:248
@@ -2657,32 +2658,32 @@ msgstr "Start"
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:220
 msgid "Left thumb button"
-msgstr ""
+msgstr "Tlačidlo ľavého palca"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:222
 msgid "Right thumb button"
-msgstr ""
+msgstr "Tlačidlo pravého palca"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:231
 msgid "Left thumb right"
-msgstr ""
+msgstr "Ľavý palec doprava"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:233
 msgid "Left thumb left"
-msgstr ""
+msgstr "Ľavý palec doľava"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:235
 msgid "Left thumb down"
-msgstr ""
+msgstr "Ľavý palec nadol"
 
 #. I18N: name of stick on gamepads
 #: src/input/gamepad_config.cpp:237
 msgid "Left thumb up"
-msgstr ""
+msgstr "Ľavý palec nahor"
 
 #: src/input/input_manager.cpp:807
 #, c-format
@@ -2697,13 +2698,13 @@ msgstr "V tejto chvíli môže vykonávať činnosť iba vlastník hry!"
 msgid ""
 "Connect your wiimote to the Bluetooth manager, then click on Ok. Detailed "
 "instructions at supertuxkart.net/Wiimote"
-msgstr ""
+msgstr "Pripojte svoj Wiimote ovládač v Správe Bluetooth zariadení a potom kliknite na tlačidlo OK. Podrobný návod je na supertuxkart.net/Wiimote"
 
 #: src/input/wiimote_manager.cpp:391
 msgid ""
 "Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
 "mode, then click on Ok. Detailed instructions at supertuxkart.net/Wiimote"
-msgstr ""
+msgstr "Súčasne na svojom Wiimote ovládači stlačte tlačidlá 1+2, čím ho prepnete do režimu vyhľadávania. Potom kliknite na tlačidlo Ok. Podrobný návod je na supertuxkart.net/Wiimote"
 
 #: src/input/wiimote_manager.cpp:414
 #, c-format
@@ -2727,11 +2728,11 @@ msgstr "Nepridávajte plyn pred štartom"
 
 #: src/karts/controller/spare_tire_ai.cpp:147
 msgid "You can have at most 3 lives!"
-msgstr ""
+msgstr "Môžete mať najviac 3 životy!"
 
 #: src/karts/controller/spare_tire_ai.cpp:153
 msgid "+1 life."
-msgstr ""
+msgstr "+1 život."
 
 #: src/karts/kart.cpp:908 src/karts/kart.cpp:913
 msgid "You won the race!"
@@ -2754,7 +2755,7 @@ msgstr "SuperTuxKart sa môže pripájať na server s cieľom sťahovať doplnky
 
 #: src/main.cpp:1654
 msgid "Your screen resolution is too low to run STK."
-msgstr ""
+msgstr "Rozlíšenie vašej obrazovky je príliš nízke na spustenie STK."
 
 #: src/main.cpp:1668
 msgid ""
@@ -2766,7 +2767,7 @@ msgstr "Verzia ovládača grafickej karty je príliš stará. Prosím, nainštal
 msgid ""
 "Your OpenGL version appears to be too old. Please verify if an update for "
 "your video driver is available. SuperTuxKart requires %s or better."
-msgstr ""
+msgstr "Verzia vášho OpenGL sa zdá byť príliš stará. Overte, prosím, či nie je k dispozícii aktualizácia ovládača vašej grafickej karty. SuperTuxKart vyžaduje verziu %s alebo vyššiu."
 
 #: src/modes/easter_egg_hunt.cpp:202
 #, c-format
@@ -2804,9 +2805,9 @@ msgstr "ZLÁ CESTA!"
 #, c-format
 msgid "%i spare tire kart has been spawned!"
 msgid_plural "%i spare tire karts have been spawned!"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Vznikla %i náhradná pneumatika pre motokáru!"
+msgstr[1] "Vznikli %i náhradné pneumatiky pre motokáru!"
+msgstr[2] "Vzniklo %i náhradných pneumatík pre motokáru!"
 
 #: src/modes/world.cpp:1202
 msgid "You have been eliminated!"
@@ -2820,7 +2821,7 @@ msgstr "'%s' bol(a) vyradený(á)."
 #: src/network/protocols/server_lobby.cpp:318
 #, c-format
 msgid "Failed to register server: %s"
-msgstr ""
+msgstr "Nepodarilo sa zaregistrovať server: %s"
 
 #: src/network/servers_manager.cpp:198
 msgid "No LAN server detected"
@@ -2900,12 +2901,12 @@ msgstr "Futbal"
 
 #: src/replay/replay_recorder.cpp:183
 msgid "Incomplete replay file will not be saved."
-msgstr ""
+msgstr "Neúplný súbor s opakovačkou nebude uložený."
 
 #: src/replay/replay_recorder.cpp:219
 #, c-format
 msgid "Replay saved in \"%s\"."
-msgstr ""
+msgstr "Opakovačka uložená do „%s\"."
 
 #: src/states_screens/addons_screen.cpp:50
 msgid "1 week"
@@ -2951,7 +2952,7 @@ msgstr "Dátum aktualizácie"
 msgid ""
 "Access to the Internet is disabled. (To enable it, go to options and select "
 "tab 'User Interface')"
-msgstr ""
+msgstr "Prístup k internetu je zakázaný. (Pokiaľ ho chcete povoliť, prejdite do ponuky Možnosti a vyberte kartu „Používateľské rozhranie“)"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:343
@@ -3001,9 +3002,9 @@ msgstr "Náhodná aréna"
 #, c-format
 msgid "%d arena unavailable in single player."
 msgid_plural "%d arenas unavailable in single player."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d aréna nie je k dispozícii v režime jedného hráča."
+msgstr[1] "%d arény nie sú k dispozícii v režime jedného hráča."
+msgstr[2] "%d arén nie je k dispozícii v režime jedného hráča."
 
 #: src/states_screens/create_server_screen.cpp:82
 msgid "Create LAN Server"
@@ -3145,7 +3146,7 @@ msgstr "Zakázané"
 #: src/states_screens/dialogs/custom_video_settings.cpp:67
 #: src/states_screens/options_screen_video.cpp:462
 msgid "Important only"
-msgstr ""
+msgstr "Iba dôležité"
 
 #. I18N: animations setting (only karts with human players are animated)
 #: src/states_screens/dialogs/custom_video_settings.cpp:74
@@ -3164,7 +3165,7 @@ msgstr "Povolená pre všetky"
 #: src/states_screens/dialogs/custom_video_settings.cpp:102
 #: src/states_screens/options_screen_video.cpp:469
 msgid "Low"
-msgstr ""
+msgstr "Nízka"
 
 #. I18N: Geometry level high : everything is displayed
 #. I18N: in the graphical options tooltip;
@@ -3174,21 +3175,21 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:103
 #: src/states_screens/options_screen_video.cpp:472
 msgid "High"
-msgstr ""
+msgstr "Vysoká"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:94
 #: src/states_screens/options_screen_video.cpp:466
 msgid "Very Low"
-msgstr ""
+msgstr "Veľmi nízka"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very high
 #: src/states_screens/dialogs/custom_video_settings.cpp:97
 #: src/states_screens/options_screen_video.cpp:475
 msgid "Very High"
-msgstr ""
+msgstr "Veľmi vysoká"
 
 #: src/states_screens/dialogs/message_dialog.cpp:129
 #: src/states_screens/edit_gp_screen.cpp:257
@@ -3198,11 +3199,11 @@ msgstr "Nie"
 
 #: src/states_screens/dialogs/multitouch_settings_dialog.cpp:60
 msgid "Tablet"
-msgstr ""
+msgstr "Tablet"
 
 #: src/states_screens/dialogs/multitouch_settings_dialog.cpp:61
 msgid "Phone"
-msgstr ""
+msgstr "Telefón"
 
 #: src/states_screens/dialogs/recovery_dialog.cpp:121
 msgid "Username and/or email address invalid."
@@ -3216,7 +3217,7 @@ msgid ""
 "the box below, you are confirming that you understand these terms. If you "
 "have any questions or comments regarding these terms, one of the members of "
 "the development team would gladly assist you."
-msgstr ""
+msgstr "Prečítajte si, prosím, zmluvné podmienky pre SuperTuxKart na adrese '%s'. S týmito podmienkami musíte súhlasiť, aby ste si mohli zaregistrovať účet pre STK. Zaškrtnutím políčka nižšie potvrdzujete, že týmto podmienkam rozumiete. Pokiaľ máte akékoľvek otázky alebo pripomienky k týmto podmienkam, niektorý z členov vývojového tímu vám rád pomôže."
 
 #: src/states_screens/dialogs/select_challenge.cpp:52
 #, c-format
@@ -3245,7 +3246,7 @@ msgstr "Zber nitra"
 #: src/states_screens/dialogs/select_challenge.cpp:151
 #: src/states_screens/race_setup_screen.cpp:136
 msgid "Ghost replay race"
-msgstr ""
+msgstr "Opakovaný pretek s duchom"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:75
 msgid "Server successfully created. You can now join it."
@@ -3382,11 +3383,11 @@ msgstr "Odomkli ste grand prix %0"
 
 #: src/states_screens/ghost_replay_selection.cpp:82
 msgid "Finish Time"
-msgstr ""
+msgstr "Konečný čas"
 
 #: src/states_screens/ghost_replay_selection.cpp:83
 msgid "User"
-msgstr ""
+msgstr "Používateľ"
 
 #: src/states_screens/gp_info_screen.cpp:74
 msgid "Default"
@@ -3405,7 +3406,7 @@ msgstr "Náhodné"
 #: src/states_screens/gp_info_screen.cpp:154
 #: src/states_screens/gp_info_screen.cpp:179
 msgid "Reload"
-msgstr ""
+msgstr "Znovu načítať"
 
 #: src/states_screens/grand_prix_cutscene.cpp:75
 #: src/states_screens/grand_prix_editor_screen.cpp:101
@@ -3454,7 +3455,7 @@ msgstr "Náhodná motokára"
 
 #: src/states_screens/kart_selection.cpp:859
 msgid "Locked"
-msgstr ""
+msgstr "Uzamknuté"
 
 #: src/states_screens/kart_selection.cpp:961
 msgid ""
@@ -3478,7 +3479,7 @@ msgstr "Bez prístupu k internetu nemožno sťahovať doplnky. Ak chcete sťahov
 
 #: src/states_screens/main_menu_screen.cpp:566
 msgid "The add-ons module is currently disabled in the Options screen"
-msgstr ""
+msgstr "Modul „Doplnky“ je momentálne vypnutý v ponuke Možnosti"
 
 #: src/states_screens/main_menu_screen.cpp:578
 msgid "Please wait while the add-ons are loading"
@@ -3670,13 +3671,13 @@ msgstr "Klávesnica %i"
 
 #: src/states_screens/options_screen_input.cpp:138
 msgid "Touch Device"
-msgstr ""
+msgstr "Dotykové zariadenie"
 
 #: src/states_screens/options_screen_ui.cpp:159
 msgid ""
 "In multiplayer mode, players can select handicapped (more difficult) "
 "profiles on the kart selection screen"
-msgstr ""
+msgstr "V režime viac hráčov si hráči môžu vybrať profil „hendikepovaný“ (náročnejší) na obrazovke výberu motokár"
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options_screen_ui.cpp:191
@@ -3736,7 +3737,7 @@ msgstr "Antialiasing: %s"
 #: src/states_screens/options_screen_video.cpp:504
 #, c-format
 msgid "Ambient occlusion: %s"
-msgstr ""
+msgstr "Zatienenie okolím: %s"
 
 #: src/states_screens/options_screen_video.cpp:508
 #, c-format
@@ -3752,7 +3753,7 @@ msgstr "Tiene: %i"
 #: src/states_screens/options_screen_video.cpp:513
 #, c-format
 msgid "Bloom: %s"
-msgstr ""
+msgstr "Bloom (rozptýlené svetlo): %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options_screen_video.cpp:517
@@ -3781,7 +3782,7 @@ msgstr "Globálne osvetlenie: %s"
 #: src/states_screens/options_screen_video.cpp:534
 #, c-format
 msgid "Rendered image quality: %s"
-msgstr ""
+msgstr "Kvalita vykresľovaného obrazu: %s"
 
 #: src/states_screens/race_gui.cpp:358 src/states_screens/race_gui.cpp:360
 msgid "Challenge Failed"
@@ -3838,7 +3839,7 @@ msgstr "Poradie"
 
 #: src/states_screens/race_gui_overworld.cpp:518
 msgid "Press fire to start the tutorial"
-msgstr ""
+msgstr "Stlačte tlačidlo streľby pre zahájenie výuky"
 
 #: src/states_screens/race_gui_overworld.cpp:557
 msgid "Type: Grand Prix"
@@ -3850,7 +3851,7 @@ msgstr "Výzvu začnete stlačením tlačidla na útok"
 
 #: src/states_screens/race_result_gui.cpp:175
 msgid "Continue."
-msgstr ""
+msgstr "Pokračovať."
 
 #: src/states_screens/race_result_gui.cpp:178
 msgid "Quit the server."
@@ -3945,7 +3946,7 @@ msgstr "Triafajte ostatných hráčov zbraňami, kým neprídu o všetky životy
 
 #: src/states_screens/race_setup_screen.cpp:119
 msgid "Push the ball into the opposite cage to score goals."
-msgstr ""
+msgstr "Dotlačte loptu do bránky protihráča."
 
 #: src/states_screens/race_setup_screen.cpp:129
 msgid "Explore tracks to find all hidden eggs"
@@ -3953,7 +3954,7 @@ msgstr "Nájdite všetky vajíčka poskrývané na tratiach"
 
 #: src/states_screens/race_setup_screen.cpp:137
 msgid "Race against ghost karts and try to beat them!"
-msgstr ""
+msgstr "Pretekajte proti motokáram duchov a skúste ich poraziť!"
 
 #: src/states_screens/register_screen.cpp:218
 #: src/states_screens/register_screen.cpp:225
@@ -4036,7 +4037,7 @@ msgstr "Jazda naopak"
 #. I18N: In the track info screen
 #: src/states_screens/track_info_screen.cpp:218
 msgid "Random item location"
-msgstr ""
+msgstr "Náhodné rozmiestnenie položky"
 
 #: src/states_screens/user_screen.cpp:111
 msgid "Exit game"

@@ -319,38 +319,41 @@ void SkiddingAI::update(int ticks)
     // of us.
     bool commands_set = false;
     if(m_ai_properties->m_handle_bomb &&
-        m_kart->getAttachment()->getType()==Attachment::ATTACH_BOMB &&
-        m_kart_ahead )
+        m_kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
     {
-        // Use nitro if the kart is far ahead, or faster than this kart
-        m_controls->setNitro(m_distance_ahead>10.0f ||
-                             m_kart_ahead->getSpeed() > m_kart->getSpeed());
-        // If we are close enough, try to hit this kart
-        if(m_distance_ahead<=10)
-        {
-            Vec3 target = m_kart_ahead->getXYZ();
+       //TODO : add logic to allow an AI kart to pass the bomb to a kart
+       //       close behind by slowing/steering slightly
+       if ( m_kart_ahead != m_kart->getAttachment()->getPreviousOwner())
+       {
+           // Use nitro if the kart is far ahead, or faster than this kart
+           handleNitroAndZipper();
+          
+           // If we are close enough, try to hit this kart
+           if(m_distance_ahead<=10)
+           {
+              Vec3 target = m_kart_ahead->getXYZ();
 
-            // If we are faster, try to predict the point where we will hit
-            // the other kart
-            if((m_kart_ahead->getSpeed() < m_kart->getSpeed()) &&
-                !m_kart_ahead->isGhostKart())
-            {
-                float time_till_hit = m_distance_ahead
-                                    / (m_kart->getSpeed()-m_kart_ahead->getSpeed());
-                target += m_kart_ahead->getVelocity()*time_till_hit;
-            }
-            float steer_angle = steerToPoint(target);
-            setSteering(steer_angle, dt);
-            commands_set = true;
-        }
-        handleRescue(dt);
+              // If we are faster, try to predict the point where we will hit
+              // the other kart
+              if((m_kart_ahead->getSpeed() < m_kart->getSpeed()) &&
+                  !m_kart_ahead->isGhostKart())
+              {
+                  float time_till_hit = m_distance_ahead
+                                      / (m_kart->getSpeed()-m_kart_ahead->getSpeed());
+                  target += m_kart_ahead->getVelocity()*time_till_hit;
+              }
+              float steer_angle = steerToPoint(target);
+              setSteering(steer_angle, dt);
+              commands_set = true;
+           }
+           handleRescue(dt);
+       }
     }
     if(!commands_set)
     {
         /*Response handling functions*/
         handleAcceleration(ticks);
         handleSteering(dt);
-        handleItems(dt);
         handleRescue(dt);
         handleBraking();
         // If a bomb is attached, nitro might already be set.
@@ -490,6 +493,8 @@ void SkiddingAI::handleSteering(float dt)
     }
     //If we are going to crash against a kart, avoid it if it doesn't
     //drives the kart out of the road
+    //TODO : adds item handling to use a cake if available to
+    //open the road
     else if( m_crashes.m_kart != -1 && !m_crashes.m_road )
     {
         //-1 = left, 1 = right, 0 = no crash.
@@ -550,6 +555,9 @@ void SkiddingAI::handleSteering(float dt)
         m_curve[CURVE_AIM]->addPoint(m_kart->getXYZ()+eps);
         m_curve[CURVE_AIM]->addPoint(aim_point);
 #endif
+
+        //Manage item utilisation
+        handleItems(dt, &aim_point, last_node);
 
         // Potentially adjust the point to aim for in order to either
         // aim to collect item, or steer to avoid a bad item.
@@ -1133,16 +1141,19 @@ void SkiddingAI::evaluateItems(const Item *item, Vec3 kart_aim_direction,
 
 //-----------------------------------------------------------------------------
 /** Handle all items depending on the chosen strategy.
- *  Either (low level AI) just use an item after 10 seconds, or do a much
- *  better job on higher level AI - e.g. aiming at karts ahead/behind, wait an
- *  appropriate time before using multiple items etc.
+ *  Level 0 "AI" : do nothing (not used by default)
+ *  Level 1 "AI" : use items after a random time
+ *  Level 2 to 5 AI : strategy detailed before each item
+ *  Each successive level is overall stronger (5 the strongest, 2 the weakest of
+ *  non-random strategies), but two levels may share a strategy for a given item.
+ *  (level 5 is not yet used ; meant for SuperTux GP preferred karts or boss races)
  *  \param dt Time step size.
  *  TODO: Implications of Bubble-Shield for AI's powerup-handling
 
  *  STATE: shield on -> avoid usage of offensive items (with certain tolerance)
  *  STATE: swatter on -> avoid usage of shield
  */
-void SkiddingAI::handleItems(const float dt)
+void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_node)
 {
     m_controls->setFire(false);
     if(m_kart->getKartAnimation() ||
@@ -1150,7 +1161,15 @@ void SkiddingAI::handleItems(const float dt)
         return;
 
     m_time_since_last_shot += dt;
-
+   
+    //time since last shot is meant to avoid using the same item
+    //several times in rapid succession ; not to wait to use a useful
+    //collected item
+    if ( m_kart->getPowerup()->getType() != m_kart->getLastUsedPowerup() )
+    {
+       m_time_since_last_shot = 50.0f; //The AI may wait if the value is low, so set a high value
+    }
+   
     if (m_superpower == RaceManager::SUPERPOWER_NOLOK_BOSS)
     {
         m_controls->setLookBack(m_kart->getPowerup()->getType() ==
@@ -1173,12 +1192,41 @@ void SkiddingAI::handleItems(const float dt)
         }
         return;
     }
+   
+   int ai_skill = 0;
+   if (m_ai_properties->m_item_usage_skill > 0)
+   {
+      if (m_ai_properties->m_item_usage_skill > 5)
+      {
+         ai_skill = 5;
+      }
+      else
+      {
+         ai_skill = m_ai_properties->m_item_usage_skill;
+      }
+   }
+   
+   if (m_kart->getBoostAI() == true && ai_skill < 5)
+   {
+      ai_skill++; //possible improvement : make the boost amplitude pulled from config
+   }
 
-    // Tactic 1: wait ten seconds, then use item
+    // Tactic 0: don't use item
     // -----------------------------------------
-    if(!m_ai_properties->m_item_usage_non_random)
+    if(ai_skill == 0)
     {
-        if( m_time_since_last_shot > 10.0f )
+        return;
+    }
+
+    // Tactic 1: wait between 5 and 10 seconds, then use item
+    // ------------------------------------------------------
+    if(ai_skill == 1)
+    {
+       int random_t = 0;
+       random_t = m_random_skid.get(6); //Reuse the random skid generator
+       random_t = random_t + 5;
+          
+        if( m_time_since_last_shot > random_t )
         {
             m_controls->setFire(true);
             m_time_since_last_shot = 0.0f;
@@ -1186,67 +1234,206 @@ void SkiddingAI::handleItems(const float dt)
         return;
     }
 
-    // Tactic 2: calculate
-    // -------------------
+    // Tactics 2 to 5: calculate
+    // -----------------------------------------
     float min_bubble_time = 2.0f;
 
+    int projectile_types[4]; //[3] basket, [2] cakes, [1] plunger, [0] bowling
+    projectile_types[0] = projectile_manager->getNearbyProjectileCount(m_kart,
+                                    m_ai_properties->m_shield_incoming_radius, PowerupManager::POWERUP_BOWLING);
+    projectile_types[1] = projectile_manager->getNearbyProjectileCount(m_kart,
+                                    m_ai_properties->m_shield_incoming_radius, PowerupManager::POWERUP_PLUNGER);
+    projectile_types[2] = projectile_manager->getNearbyProjectileCount(m_kart,
+                                    m_ai_properties->m_shield_incoming_radius, PowerupManager::POWERUP_CAKE);
+    projectile_types[3] = projectile_manager->getNearbyProjectileCount(m_kart,
+                                    m_ai_properties->m_shield_incoming_radius, PowerupManager::POWERUP_RUBBERBALL);
+   
+    bool projectile_is_close = false;
+    float shield_radius = m_ai_properties->m_shield_incoming_radius;
+    if (m_kart->getBoostAI() == true)
+    {
+        if (shield_radius == 0)
+        {
+            shield_radius = 15;
+        }
+        else if (shield_radius >= 3)
+        {
+            shield_radius = shield_radius - 2;
+        }
+    }
+    projectile_is_close = projectile_manager->projectileIsClose(m_kart, shield_radius);
+
+    // Preparing item list for item aware actions
+
+    // Angle to aim_point
+    Vec3 kart_aim_direction = *aim_point - m_kart->getXYZ();
+
+    // Make sure we have a valid last_node
+    if(last_node==Graph::UNKNOWN_SECTOR)
+        last_node = m_next_node_index[m_track_node];
+
+    int node = m_track_node;
+    float distance = 0;
+    std::vector<const Item *> items_to_collect;
+    std::vector<const Item *> items_to_avoid;
+
+    // 1) Filter and sort all items close by
+    // -------------------------------------
+    const float max_item_lookahead_distance = 20.0f;
+    while(distance < max_item_lookahead_distance)
+    {
+        int n_index= DriveGraph::get()->getNode(node)->getIndex();
+        const std::vector<Item *> &items_ahead =
+            ItemManager::get()->getItemsInQuads(n_index);
+        for(unsigned int i=0; i<items_ahead.size(); i++)
+        {
+            evaluateItems(items_ahead[i],  kart_aim_direction,
+                          &items_to_avoid, &items_to_collect);
+        }   // for i<items_ahead;
+        distance += DriveGraph::get()->getDistanceToNext(node,
+                                                      m_successor_index[node]);
+        node = m_next_node_index[node];
+        // Stop when we have reached the last quad
+        if(node==last_node) break;
+    }   // while (distance < max_item_lookahead_distance)
+
+    //items_to_avoid and items_to_collect now contain the closest item information needed after
+    //What matters is (a) if the lists are void ; (b) if they are not, what kind of item it is
+   
     switch( m_kart->getPowerup()->getType() )
     {
+    // Level 2 : Use the shield immediately after a wait time
+    // Level 3 : Use the shield against flyables except cakes. Use the shield against bad attachments.
+    //           Use the bubble gum against an enemy close behind, except if holding a swatter.
+    // Level 4 : Level 3, and protect against cakes too, and use before hitting gum/banana
+    // Level 5 : Level 4, and use before hitting item box, and let plunger hit
+    //           (can use the shield after)
     case PowerupManager::POWERUP_BUBBLEGUM:
         {
-            Attachment::AttachmentType type = m_kart->getAttachment()->getType();
-            // Don't use shield when we have a swatter.
-            if( type == Attachment::ATTACH_SWATTER)
-                break;
+           Attachment::AttachmentType type = m_kart->getAttachment()->getType();
+           
+           if((ai_skill == 2) && (m_time_since_last_shot > 2.0f))
+           {
+               m_controls->setFire(true);
+               m_controls->setLookBack(false);
+               break;
+           }
+           
+           // Check if a flyable (cake, ...) is close. If so, use bubblegum
+           // as shield
+           if(ai_skill == 3) //don't protect against cakes
+           {
+              if( !m_kart->isShielded() && projectile_is_close
+                 && projectile_types[2] == 0)
+              {
+                 //don't discard swatter against plunger
+                 if( projectile_types[1] == 0
+                    || (projectile_types[1] >= 1 && type != Attachment::ATTACH_SWATTER))
+                 {
+                    m_controls->setFire(true);
+                    m_controls->setLookBack(false);
+                    break;
+                 }
+              }             
+           }
+           else if(ai_skill == 4)
+           {
+              if( !m_kart->isShielded() && projectile_is_close)
+              {
+                 //don't discard swatter against plunger
+                 if( projectile_types[1] == 0
+                    || (projectile_types[1] >= 1 && type != Attachment::ATTACH_SWATTER))
+                 {
+                    m_controls->setFire(true);
+                    m_controls->setLookBack(false);
+                    break;
+                 }
+              }             
+           }           
+           else if (ai_skill == 5) //don't protect against plungers alone TODO : activate after plunger hit
+           {
+              if( !m_kart->isShielded() && projectile_is_close)
+              {
+                 if (projectile_types[0] >=1 || projectile_types[2] >=1 || projectile_types[3] >=1 )
+                 {
+                    m_controls->setFire(true);
+                    m_controls->setLookBack(false);
+                    break;
+                 }
+              }             
+           }
 
-            // Check if a flyable (cake, ...) is close. If so, use bubblegum
-            // as shield
-            if( !m_kart->isShielded() &&
-                projectile_manager->projectileIsClose(m_kart,
-                                    m_ai_properties->m_shield_incoming_radius) )
-            {
-                m_controls->setFire(true);
-                m_controls->setLookBack(false);
-                break;
-            }
+           // Use shield to remove bad attachments
+           if( type == Attachment::ATTACH_BOMB
+             || type == Attachment::ATTACH_PARACHUTE
+             || type == Attachment::ATTACH_ANVIL )
+           {
+               m_controls->setFire(true);
+               m_controls->setLookBack(false);
+               break;
+           }
+           
+           // Use shield if kart is going to hit a bad item (banana or bubblegum)
+           if((ai_skill == 4) || (ai_skill == 5)) 
+           {
+              if( !m_kart->isShielded() && items_to_avoid.size()>0)
+              {
+                 float d = (items_to_avoid[0]->getXYZ() - m_kart->getXYZ()).length2();
+                 
+                 if ((ai_skill == 4 && d < 1.5f) || (ai_skill == 5 && d < 0.7f))
+                 {
+                    m_controls->setFire(true);
+                    m_controls->setLookBack(false);
+                    break;
+                 }
+              }
+           }
+           
+           // Use shield if kart is going to hit an item box
+           if (ai_skill == 5)
+           {
+              if( !m_kart->isShielded() && items_to_collect.size()>0)
+              {
+                 float d = (items_to_collect[0]->getXYZ() - m_kart->getXYZ()).length2();
+                 
+                 if ((items_to_collect[0]->getType() == Item::ITEM_BONUS_BOX) && (d < 0.7f))
+                 {
+                    m_controls->setFire(true);
+                    m_controls->setLookBack(false);
+                    break;
+                 }
+              }             
+           }
+             
+           // Avoid dropping all bubble gums one after another
+           if( m_time_since_last_shot < 2.0f) break;
 
-            // Avoid dropping all bubble gums one after another
-            if( m_time_since_last_shot < 3.0f) break;
-
-            // Use bubblegum if the next kart  behind is 'close' but not too close
-            // (too close likely means that the kart is not behind but more to the
-            // side of this kart and so won't be hit by the bubble gum anyway).
-            // Should we check the speed of the kart as well? I.e. only drop if
-            // the kart behind is faster? Otoh this approach helps preventing an
-            // overtaken kart to overtake us again.
-            if(m_distance_behind < 15.0f && m_distance_behind > 3.0f    )
-            {
-                m_controls->setFire(true);
-                m_controls->setLookBack(true);
-                break;
-            }
-
-            // If this kart is in its last lap, drop bubble gums at every
-            // opportunity, since this kart won't envounter them anymore.
-            LinearWorld *lin_world = dynamic_cast<LinearWorld*>(World::getWorld());
-            if(m_time_since_last_shot > 3.0f &&
-                lin_world &&
-                lin_world->getFinishedLapsOfKart(m_kart->getWorldKartId())
-                                   == race_manager->getNumLaps()-1)
-            {
-                m_controls->setFire(true);
-                m_controls->setLookBack(true);
-                break;
-            }
-            break;   // POWERUP_BUBBLEGUM
-        }
+           // Use bubblegum if the next kart  behind is 'close' but not too close
+           // (too close likely means that the kart is not behind but more to the
+           // side of this kart and so won't be hit by the bubble gum anyway).
+           // Should we check the speed of the kart as well? I.e. only drop if
+           // the kart behind is faster? Otoh this approach helps preventing an
+           // overtaken kart to overtake us again.
+           if(m_distance_behind < 10.0f && m_distance_behind > 3.0f    )
+           {
+               m_controls->setFire(true);
+               m_controls->setLookBack(true);
+               break;
+           }
+           break;   // POWERUP_BUBBLEGUM
+       }
+          
+    // Level 2 : Use the cake against any close enemy, with priority to those ahead
+    // Level 3 : Don't fire on slower karts
+    // Level 4 : Same as level 3 TODO : Fire if the kart has a swatter which may hit us
+    // Level 5 : Same as level 4 TODO : Don't fire on a shielded kart if we're just behind (gum)
     case PowerupManager::POWERUP_CAKE:
         {
             // if the kart has a shield, do not break it by using a cake.
-            if(m_kart->getShieldTime() > min_bubble_time)
+            if((m_kart->getShieldTime() > min_bubble_time) && (stk_config->m_shield_restrict_weapons == true))
                 break;
             // Leave some time between shots
-            if(m_time_since_last_shot<3.0f) break;
+            if(m_time_since_last_shot<2.0f) break;
 
             // Do not fire if the kart is driving too slow
             bool kart_behind_is_slow =
@@ -1268,9 +1455,12 @@ void SkiddingAI::handleItems(const float dt)
             // the kart anyway, or that this might force the kart ahead to
             // use its nitro/zipper (and then we will shoot since then the
             // kart is faster).
-            if ((fire_backwards && kart_behind_is_slow) ||
-                (!fire_backwards && kart_ahead_is_slow)    )
-                break;
+            if(ai_skill >= 3)
+            {
+               if ((fire_backwards && kart_behind_is_slow) ||
+                  (!fire_backwards && kart_ahead_is_slow)    )
+                  break;
+            }
 
             // Don't fire if the kart we are aiming at is invulnerable.
             if ((fire_backwards  && m_kart_behind && m_kart_behind->isInvulnerable()) ||
@@ -1288,15 +1478,20 @@ void SkiddingAI::handleItems(const float dt)
             break;
         }   // POWERUP_CAKE
 
+    // Level 2 : Use the bowling ball against enemies with a 5 second delay
+    // Level 3 : Only 3 seconds of delay
+    // Level 4 : Same as level 3
+    // Level 5 : Same as level 4           
     case PowerupManager::POWERUP_BOWLING:
         {
             // if the kart has a shield, do not break it by using a bowling ball.
-            if(m_kart->getShieldTime() > min_bubble_time)
+            if((m_kart->getShieldTime() > min_bubble_time) && (stk_config->m_shield_restrict_weapons == true))
                 break;
             // Leave more time between bowling balls, since they are
             // slower, so it should take longer to hit something which
             // can result in changing our target.
-            if(m_time_since_last_shot < 5.0f) break;
+            if(ai_skill == 2 && m_time_since_last_shot < 5.0f) break;
+            if(ai_skill >= 3 && m_time_since_last_shot < 3.0f) break;
             // Consider angle towards karts
             bool straight_behind = false;
             bool straight_ahead = false;
@@ -1348,7 +1543,7 @@ void SkiddingAI::handleItems(const float dt)
     case PowerupManager::POWERUP_PLUNGER:
         {
             // if the kart has a shield, do not break it by using a plunger.
-            if(m_kart->getShieldTime() > min_bubble_time)
+            if((m_kart->getShieldTime() > min_bubble_time) && (stk_config->m_shield_restrict_weapons == true))
                 break;
 
             // Leave more time after a plunger, since it will take some
@@ -1369,15 +1564,131 @@ void SkiddingAI::handleItems(const float dt)
             break;
         }   // POWERUP_PLUNGER
 
+    // Level 2 : Use the switch after a wait time
+    // Level 3 : Same as level 2 but don't fire if close to a good item
+    // Level 4 : Same as level 3 and fire if very close to a bad item
+    // Level 5 : Use if it makes a better item available, or if very close
+    //           to a bad item. Don't use it if too close of a good item.
     case PowerupManager::POWERUP_SWITCH:
-        // For now don't use a switch if this kart is first (since it's more
-        // likely that this kart then gets a good iteam), otherwise use it
-        // after a waiting an appropriate time
-        if(m_kart->getPosition()>1 &&
-            m_time_since_last_shot > 
-            stk_config->ticks2Time(stk_config->m_item_switch_ticks)+2.0f)
-            m_controls->setFire(true);
-        break;   // POWERUP_SWITCH
+        {
+            // It's extremely unlikely two switches are used close one after another
+            if(ai_skill == 2)
+            {
+                if (m_time_since_last_shot > 2.0f)
+                {
+                    m_controls->setFire(true);
+                    break;
+                }
+            }
+                     
+            else if((ai_skill == 3) || (ai_skill == 4))
+            {
+               if( (ai_skill == 4) && items_to_avoid.size() > 0)
+               {
+                   float d = (items_to_avoid[0]->getXYZ() - m_kart->getXYZ()).length2();
+               
+                   if (d < 2.0f)
+                   {
+                       m_controls->setFire(true);
+                       break;
+                   }
+                }
+                else if (items_to_collect.size() > 0)
+                {
+                    float d = (items_to_collect[0]->getXYZ() - m_kart->getXYZ()).length2();
+               
+                    if (d > 10.0f)
+                    {
+                        m_controls->setFire(true);
+                        break;
+                    }
+                }
+                else if (m_time_since_last_shot > 2.0f)
+                {
+                     m_controls->setFire(true);
+                     break;
+                }
+            }
+       
+            //TODO : retrieve ranking powerup class and use it to evaluate the best item
+            //       available depending of if the switch is used or not
+            //       In the mean time big nitro > item box > small nitro
+            //TODO : make steering switch-aware so that the kart goes towards a bad item
+            //       and use the switch at the last moment
+            //It would also be possible but complicated to check if using the switch will
+            //cause another kart not far from taking a bad item instead of a good one
+            //It should also be possible but complicated to discard items when a good
+            //and a bad one are two close from one another
+            else if(ai_skill == 5)
+            {  
+               //First step : identify the best available item
+               int i;
+               int bad = 0;
+               int good = 0;
+
+               //Good will store 1 for nitro, big or small, 2 for item box
+               //Big nitro are usually hard to take for the AI
+               for(i=items_to_collect.size()-1; i>=0; i--)
+               {
+                   if (items_to_collect[i]->getType() == Item::ITEM_BONUS_BOX)
+                   {
+                      good = 2;
+                      i = -1;
+                   }
+                  else if ( (items_to_collect[i]->getType() == Item::ITEM_NITRO_BIG) ||
+                            (items_to_collect[i]->getType() == Item::ITEM_NITRO_SMALL) )
+                  {
+                      good = 1;
+                  }
+               }
+           
+               //Bad will store 2 for bananas, 3 for bubble gum
+               for(i=items_to_avoid.size()-1; i>=0; i--)
+               {
+                   if (items_to_avoid[i]->getType() == Item::ITEM_BUBBLEGUM)
+                   {
+                      bad = 3;
+                      i = -1;
+                   }
+                   else if ( items_to_avoid[i]->getType() == Item::ITEM_BANANA )
+                   {
+                      bad = 2;
+                   }
+               }
+           
+               //Second step : make sure a close item don't make the choice pointless
+               if( items_to_avoid.size()>0)
+               {
+                   float d = (items_to_avoid[0]->getXYZ() - m_kart->getXYZ()).length2();
+               
+                   //fire if very close to a bad item
+                   if (d < 2.0f)
+                   {
+                      m_controls->setFire(true);
+                      break;
+                   }
+               }
+               if( items_to_collect.size()>0)
+               {
+                  float d = (items_to_collect[0]->getXYZ() - m_kart->getXYZ()).length2();
+               
+                  //don't fire if close to a good item
+                  if (d < 5.0f)
+                  {
+                     break;
+                  }
+               }
+           
+               //Third step : Use or don't use to get the best available item
+               if( bad > good)
+               {
+                  m_controls->setFire(true);
+                  break;
+               }
+            } //ai_skill == 5
+                     
+            break;
+        } // POWERUP_SWITCH
 
     case PowerupManager::POWERUP_PARACHUTE:
         // Wait one second more than a previous parachute
@@ -1401,8 +1712,33 @@ void SkiddingAI::handleItems(const float dt)
         }
         break;   // POWERUP_ANVIL
 
+          
+    // Level 2 : Use the swatter immediately after a wait time
+    // Level 3 : Use the swatter when enemies are close
+    // Level 4 : Level 3 and use the swatter to remove bad attachments
+    // Level 5 : Same as level 4.
     case PowerupManager::POWERUP_SWATTER:
         {
+           Attachment::AttachmentType type = m_kart->getAttachment()->getType();
+           
+           if((ai_skill == 2) && (m_time_since_last_shot > 2.0f))
+           {
+               m_controls->setFire(true);
+               break;
+           }
+           
+           // Use swatter to remove bad attachments
+           if((ai_skill == 4) || (ai_skill == 5))
+           {
+               if( type == Attachment::ATTACH_BOMB
+               || type == Attachment::ATTACH_PARACHUTE
+               || type == Attachment::ATTACH_ANVIL )
+              {
+                  m_controls->setFire(true);
+                  m_controls->setLookBack(false);
+                  break;
+               }
+           }
             // Squared distance for which the swatter works
             float d2 = m_kart->getKartProperties()->getSwatterDistance();
             // if the kart has a shield, do not break it by using a swatter.
@@ -1423,7 +1759,7 @@ void SkiddingAI::handleItems(const float dt)
         }
     case PowerupManager::POWERUP_RUBBERBALL:
         // if the kart has a shield, do not break it by using a swatter.
-        if(m_kart->getShieldTime() > min_bubble_time)
+        if((m_kart->getShieldTime() > min_bubble_time) && (stk_config->m_shield_restrict_weapons == true))
             break;
         // Perhaps some more sophisticated algorithm might be useful.
         // For now: fire if there is a kart ahead (which means that
@@ -1585,107 +1921,236 @@ void SkiddingAI::handleRescue(const float dt)
 }   // handleRescue
 
 //-----------------------------------------------------------------------------
-/** Decides wether to use nitro or not.
+/** Decides wether to use nitro and zipper or not.
  */
 void SkiddingAI::handleNitroAndZipper()
 {
+   //Calculated here and not passed as parameter to not redo all the calls to the function
+   //May be better to change it
+   
+   int ai_skill = 0;
+   if (m_ai_properties->m_item_usage_skill > 0)
+   {
+      if (m_ai_properties->m_item_usage_skill > 5)
+      {
+         ai_skill = 5;
+      }
+      else
+      {
+         ai_skill = m_ai_properties->m_item_usage_skill;
+      }
+   }
+   
+   int nitro_skill = 0;
+   if (m_ai_properties->m_nitro_usage > 0)
+   {
+      if (m_ai_properties->m_nitro_usage > 4)
+      {
+         nitro_skill = 4;
+      }
+      else
+      {
+         nitro_skill = m_ai_properties->m_nitro_usage;
+      }
+   }
+   
+   if (m_kart->getBoostAI() == true)
+   {
+      if (ai_skill < 5)
+      {
+         ai_skill = ai_skill + 1; //possible improvement : make the boost amplitude pulled from config
+      }
+      if (nitro_skill < 4)
+      {
+         nitro_skill = nitro_skill + 1; //possible improvement : make the boost amplitude pulled from config
+      }
+   }
+   
+   if (m_kart->getPowerup()->getType()!=PowerupManager::POWERUP_ZIPPER)
+   {
+      ai_skill = 0; //don't try to use the zipper if there is none  
+   }
+   
+   //Nitro continue to be advantageous during the fadeout
+   int nitro_ticks = m_kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_NITRO);
+   float nitro_time = ( stk_config->ticks2Time(nitro_ticks)
+                       + m_kart->getKartProperties()->getNitroFadeOutTime() );
+   float nitro_max_time = m_kart->getKartProperties()->getNitroDuration()
+                         + m_kart->getKartProperties()->getNitroFadeOutTime();
+
+   //Nitro skill 0 : don't use
+   //Nitro skill 1 : don't use if the kart is braking, on the ground, has finished the race, has no nitro,
+   //                has a parachute or an anvil attached, or has a plunger in the face.
+   //                Otherwise, use it immediately
+   //Nitro skill 2 : Don't use nitro if there is more than 1,2 seconds of effect/fadeout left. Use it when at
+   //                max speed or under 5 of speed (after rescue, etc.). Use it to pass bombs.
+   //                Tries to builds a reserve of 4 energy to use towards the end
+   //Nitro skill 3 : Same as level 2, but don't use until 0.5 seconds of effect/fadeout left, and don't use close
+   //                to bad items, and has a target reserve of 8 energy
+   //Nitro skill 4 : Same as level 3, but don't use until 0.05 seconds of effect/fadeout left and ignore the plunger
+   //                and has a target reserve of 12 energy
+   
     m_controls->setNitro(false);
-    // If we are already very fast, save nitro.
-    if(m_kart->getSpeed() > 0.95f*m_kart->getCurrentMaxSpeed())
-        return;
-    // Don't use nitro when the AI has a plunger in the face!
-    if(m_kart->getBlockedByPlungerTicks()>0) return;
-
-    // Don't use nitro if we are braking
+   
+   float energy_reserve = 0;
+   
+   if (nitro_skill == 2)
+   {
+      energy_reserve = 4;  
+   }
+   if (nitro_skill == 3)
+   {
+      energy_reserve = 8;  
+   }
+   if (nitro_skill == 4)
+   {
+      energy_reserve = 12;  
+   }
+   
+    // Don't use nitro or zipper if we are braking
     if(m_controls->getBrake()) return;
-
-    // Don't use nitro if the kart is not on ground or has finished the race
+   
+    // Don't use nitro or zipper if the kart is not on ground or has finished the race
     if(!m_kart->isOnGround() || m_kart->hasFinishedRace()) return;
+   
+    // Don't use nitro or zipper when the AI has a plunger in the face!
+    if(m_kart->getBlockedByPlungerTicks()>0)
+    {
+       if ((nitro_skill < 4) && (ai_skill < 5))
+       {
+          return;
+       }
+       else if (nitro_skill < 4)
+       {
+           nitro_skill = 0;  
+       }
+       else if (ai_skill < 5)
+       {
+           ai_skill = 0;  
+       }
+    }
 
-    // Don't compute nitro usage if we don't have nitro or are not supposed
-    // to use it, and we don't have a zipper or are not supposed to use
-    // it (calculated).
-    if( (m_kart->getEnergy()==0 ||
-        m_ai_properties->m_nitro_usage==AIProperties::NITRO_NONE)  &&
-        (m_kart->getPowerup()->getType()!=PowerupManager::POWERUP_ZIPPER ||
-         !m_ai_properties->m_item_usage_non_random )                         )
-        return;
-
-    // If there are items to avoid close, and we only have zippers, don't
-    // use them (since this make it harder to avoid items).
-    if(m_avoid_item_close &&
-        (m_kart->getEnergy()==0 ||
-         m_ai_properties->m_nitro_usage==AIProperties::NITRO_NONE) )
-        return;
-    // If a parachute or anvil is attached, the nitro doesn't give much
+    // If a parachute or anvil is attached, the nitro and zipper don't give much
     // benefit. Better wait till later.
     const bool has_slowdown_attachment =
         m_kart->getAttachment()->getType()==Attachment::ATTACH_PARACHUTE ||
         m_kart->getAttachment()->getType()==Attachment::ATTACH_ANVIL;
     if(has_slowdown_attachment) return;
-
-    // If the kart is very slow (e.g. after rescue), use nitro
-    if(m_kart->getSpeed()<5)
+   
+    // Don't compute nitro usage if we don't have nitro
+    if( m_kart->getEnergy()==0 )
+    {
+       nitro_skill = 0;
+    }
+   
+    // Don't use nitro if there is already a nitro boost active
+    // Nitro effect and fadeout varies between karts type from 2 to 4 seconds
+    // So vary time according to kart properties
+    if ((nitro_skill == 4) && nitro_time >= (nitro_max_time*0.01f) )
+    {
+       nitro_skill = 0;
+    }
+    else if ((nitro_skill == 3) && nitro_time >= (nitro_max_time*0.35f) )
+    {
+       nitro_skill = 0;
+    }
+    else if ((nitro_skill == 2) && nitro_time >= (nitro_max_time*0.5f) )
+    {
+       nitro_skill = 0;
+    }
+   
+    // If there are items to avoid close
+    // Don't use zippers
+    // Dont use nitro if nitro_skill is 3 or 4
+    // (since going faster makes it harder to avoid items).
+    if(m_avoid_item_close && (m_kart->getEnergy()==0 || nitro_skill == 0 || nitro_skill >= 3) )
+        return;
+   
+    // If basic AI, use nitro immediately
+   
+    if (nitro_skill == 1)
     {
         m_controls->setNitro(true);
         return;
     }
-
-    // If this kart is the last kart, and we have enough
-    // (i.e. more than 2) nitro, use it.
-    // -------------------------------------------------
-    const unsigned int num_karts = m_world->getCurrentNumKarts();
-    if(m_kart->getPosition()== (int)num_karts &&
-        num_karts>1 && m_kart->getEnergy()>2.0f)
+   
+    // Estimate time towards the end of the race.
+    // Decreases the reserve size when there is an estimate of time remaining
+    // to the end of less than 2,5 times the maximum nitro effect duration.
+    // This vary depending on kart characteristic.
+    // There is a margin because the kart will go a bit faster than predicted
+    // by the estimate, because the kart may collect more nitro and because
+    // there may be moments when it's not useful to use nitro (parachutes, etc).
+    if(nitro_skill >= 2 && energy_reserve > 0.0f)
     {
-        m_controls->setNitro(true);
-        return;
-    }
-
-    // On the last track shortly before the finishing line, use nitro
-    // anyway. Since the kart is faster with nitro, estimate a 50% time
-    // decrease (additionally some nitro will be saved when top speed
-    // is reached).
-    if(m_world->getLapForKart(m_kart->getWorldKartId())
-                        ==race_manager->getNumLaps()-1 &&
-       m_ai_properties->m_nitro_usage == AIProperties::NITRO_ALL)
-    {
-        float finish =
-            m_world->getEstimatedFinishTime(m_kart->getWorldKartId());
-        if( 1.5f*m_kart->getEnergy() >= finish - m_world->getTime() )
+        float finish = m_world->getEstimatedFinishTime(m_kart->getWorldKartId()) - m_world->getTime();
+        float max_time_effect = nitro_max_time / m_kart->getKartProperties()->getNitroConsumption()
+                                * m_kart->getEnergy()*2; //the minimum burst consumes around 0.5 energy
+       
+        // The burster forces the AI to consume its reserve by series of 2 bursts
+        // Otherwise the bursting differences of the various nitro skill wouldn't matter here
+        // In short races, most AI nitro usage may be at the end with the reserve
+        float burster;
+        
+        if ( nitro_time > 0)
         {
-            m_controls->setNitro(true);
-            return;
+           burster = 2*nitro_max_time;
+        }
+        else
+        {
+           burster = 0;  
+        }
+        if( (2.5f*max_time_effect) >= (finish - burster) )
+        {
+            // Absolute reduction to avoid small amount of unburned nitro at the end
+            energy_reserve = (finish - burster)/(2.5f*max_time_effect/m_kart->getEnergy()) - 0.5f ;
         }
     }
-
-    // A kart within this distance is considered to be overtaking (or to be
-    // overtaken).
-    const float overtake_distance = 10.0f;
-
-    // Try to overtake a kart that is close ahead, except
-    // when we are already much faster than that kart
-    // --------------------------------------------------
-    if(m_kart_ahead                                       &&
-        m_distance_ahead < overtake_distance              &&
-        m_kart_ahead->getSpeed()+5.0f > m_kart->getSpeed()   )
+   
+    // If trying to pass a bomb to a kart faster or far ahead, use nitro reserve
+    if(m_kart->getAttachment()->getType() == Attachment::ATTACH_BOMB
+       && nitro_skill >= 2 && energy_reserve > 0.0f)
     {
-            m_controls->setNitro(true);
-            return;
+        if (m_distance_ahead>10.0f || m_kart_ahead->getSpeed() > m_kart->getSpeed() )
+        {
+            energy_reserve = 0 ;
+        }
+    }
+   
+    // Don't use nitro if building an energy reserve
+    if (m_kart->getEnergy() <= energy_reserve)
+    {
+        nitro_skill = 0;  
     }
 
-    if(m_kart_behind                                   &&
-        m_distance_behind < overtake_distance          &&
-        m_kart_behind->getSpeed() > m_kart->getSpeed()    )
+    // If the kart is very slow (e.g. after rescue), use nitro
+    if(nitro_skill > 0 && m_kart->getSpeed()<5 && m_kart->getSpeed()>2)
     {
-        // Only prevent overtaking on highest level
-        m_controls->setNitro(m_ai_properties->m_nitro_usage
-                              == AIProperties::NITRO_ALL);
+        m_controls->setNitro(true);
+        return;
+    }
+   
+   // If kart is at max speed, use nitro
+   // This is to profit from the max speed increase
+   // And because it means there should be no slowing down from, e.g. plungers
+   if (nitro_skill > 0 && m_kart->getSpeed() > 0.99f*m_kart->getCurrentMaxSpeed() )
+    {
+        m_controls->setNitro(true);
         return;
     }
 
-    if(m_kart->getPowerup()->getType()==PowerupManager::POWERUP_ZIPPER &&
-        m_kart->getSpeed()>1.0f &&
+    // If this kart is the last kart, and we have nitro, use it.
+    // -------------------------------------------------
+    const unsigned int num_karts = m_world->getCurrentNumKarts();
+    if(nitro_skill > 0 && m_kart->getPosition()== (int)num_karts &&
+        num_karts > 1 )
+    {
+        m_controls->setNitro(true);
+        return;
+    }
+   
+    // Use zipper
+    if(ai_skill >= 2 && m_kart->getSpeed()>1.0f &&
         m_kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0)
     {
         DriveNode::DirectionType dir;

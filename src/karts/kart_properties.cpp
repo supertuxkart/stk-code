@@ -1048,11 +1048,16 @@ float KartProperties::getNitroMax() const
 }  // getNitroMax
 
 // ----------------------------------------------------------------------------
-int KartProperties::getSlipstreamDuration() const
+float KartProperties::getSlipstreamDurationFactor() const
 {
-    return stk_config->time2Ticks( m_cached_characteristic
-                                   ->getSlipstreamDuration() );
-}  // getSlipstreamDuration
+    return m_cached_characteristic->getSlipstreamDurationFactor();
+}  // getSlipstreamDurationFactor
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSlipstreamBaseSpeed() const
+{
+    return m_cached_characteristic->getSlipstreamBaseSpeed();
+}  // getSlipstreamBaseSpeed
 
 // ----------------------------------------------------------------------------
 float KartProperties::getSlipstreamLength() const
@@ -1067,16 +1072,22 @@ float KartProperties::getSlipstreamWidth() const
 }  // getSlipstreamWidth
 
 // ----------------------------------------------------------------------------
-int KartProperties::getSlipstreamCollectTicks() const
+float KartProperties::getSlipstreamInnerFactor() const
 {
-    return m_cached_characteristic->getSlipstreamCollectTicks();
-}  // getSlipstreamCollectTime
+    return m_cached_characteristic->getSlipstreamInnerFactor();
+}  // getSlipstreamInnerFactor
 
 // ----------------------------------------------------------------------------
-float KartProperties::getSlipstreamUseTime() const
+float KartProperties::getSlipstreamMinCollectTime() const
 {
-    return m_cached_characteristic->getSlipstreamUseTime();
-}  // getSlipstreamUseTime
+    return m_cached_characteristic->getSlipstreamMinCollectTime();
+}  // getSlipstreamMinCollectTime
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSlipstreamMaxCollectTime() const
+{
+    return m_cached_characteristic->getSlipstreamMaxCollectTime();
+}  // getSlipstreamMaxCollectTime
 
 // ----------------------------------------------------------------------------
 float KartProperties::getSlipstreamAddPower() const
@@ -1212,4 +1223,3 @@ bool KartProperties::getSkidEnabled() const
 }  // getSkidEnabled
 
 /* <characteristics-end kpgetter> */
-

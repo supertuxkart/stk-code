@@ -242,7 +242,8 @@ private:
     void  handleRaceStart();
     void  handleAcceleration(int ticks);
     void  handleSteering(float dt);
-    void  handleItems(const float dt);
+    void  handleItems(const float dt, const Vec3 *aim_point,
+                                           int last_node);
     void  handleRescue(const float dt);
     void  handleBraking();
     void  handleNitroAndZipper();

@@ -312,21 +312,27 @@
                max-speed-increase="5" duration="1" fade-out-time="2" max="20" />
 
         <!-- Slipstream
+            base-speed: the speed for which length and width are valid.
+                They are upscaled when faster and downscaled when slower.
             length: How far behind a kart slipstream works
+                (note : this helps OTHER karts)
             width: how wide slipstream works furthest away from the kart.
-            collect-time: How many seconds of sstream give  maximum benefit
-            use-time: How long the benefit will last.
-            add-power: Additional power due to sstreaming. 1 = +100%
+            inner-factor: The proportion of the slipstreaming area with
+                twice faster slipstream "credits" collection.
+            min-collect-time: How many seconds of sstream are needed to get a bonus
+                it can be accumulated faster if in the inner quad)
+            max-collect-time: How many seconds of sstream bonus can be accumulated at most
+            add-power: Additional power due to sstreaming.
             min-speed: Minimum speed necessary for slipstream to take effect.
             max-speed-increase: How much the speed of the kart might exceed
                 its normal maximum speed.
-            duration: How long the higher speed lasts after slipstream stopped
-                working.
+            duration-factor: A multiplicator to how long the higher speed lasts
+                1 means it last as long the total time collected
             fade-out-time: How long the slip stream speed increase will
                 gradually be reduced.  -->
-        <slipstream length="10" width="2" collect-time="2" use-time="5"
-                    add-power="3" min-speed="10" max-speed-increase="5"
-                    duration="1" fade-out-time="2" />
+        <slipstream base-speed="20" length="8" width="4" inner-factor="0.5"
+                    min-collect-time="3" max-collect-time="8" add-power="300" min-speed="8"
+                    max-speed-increase="5" duration-factor="1" fade-out-time="2" />
     </characteristic>
 
     <!-- The different difficulties (like easy, medium, hard) -->
@@ -360,9 +366,8 @@
                        invulnerability-time="7" />
             <nitro engine-force="350" max-speed-increase="4.5" duration="1.5"
                    fade-out-time="2.5" />
-            <slipstream length="11" collect-time="1.5" use-time="2.5" add-power="3.2"
-                        min-speed="9" max-speed-increase="4" duration="1.2"
-                        fade-out-time="2.3" />
+            <slipstream length="*0.9" collect-time="*0.9"
+                        duration-factor="*1" fade-out-time="*1" />
         </characteristic>
         <characteristic name="medium">
             <engine power="*0.63" max-speed="*1" brake-factor="*0.73"
@@ -374,8 +379,7 @@
             <explosion time="1.8" radius="5"
                        invulnerability-time="6" />
             <nitro engine-force="425" consumption="1.4" duration="1" />
-            <slipstream use-time="3.3" add-power="2.8" duration="0.9"
-                        fade-out-time="1.6" />
+            <slipstream duration-factor="*0.8" fade-out-time="*1" />
         </characteristic>
         <characteristic name="heavy">
             <engine power="*1" max-speed="*1" brake-factor="*0.66"
@@ -390,8 +394,8 @@
                        invulnerability-time="6" />
             <nitro engine-force="600" consumption="2" max-speed-increase="8"
                    duration="0.7" fade-out-time="1.3" />
-            <slipstream length="8.5" use-time="4" add-power="2.7" min-speed="10.5"
-                   max-speed-increase="8" duration="0.7" fade-out-time="1" />
+            <slipstream length="*1.1" collect-time="*1.1"
+                   duration-factor="*0.6" fade-out-time="*1" />
         </characteristic>
     </kart-types>
 

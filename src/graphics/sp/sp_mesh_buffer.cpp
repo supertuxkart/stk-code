@@ -247,16 +247,16 @@ void SPMeshBuffer::recreateVAO(unsigned i)
 #ifndef USE_GLES2
     if (CVS->isARBBufferStorageUsable())
     {
-        glBufferStorage(GL_ARRAY_BUFFER, m_gl_instance_size[i] * 32, NULL,
+        glBufferStorage(GL_ARRAY_BUFFER, m_gl_instance_size[i] * 44, NULL,
             GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
         m_ins_dat_mapped_ptr[i] = glMapBufferRange(GL_ARRAY_BUFFER, 0,
-            m_gl_instance_size[i] * 32,
+            m_gl_instance_size[i] * 44,
             GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
     }
     else
 #endif
     {
-        glBufferData(GL_ARRAY_BUFFER, m_gl_instance_size[i] * 32, NULL,
+        glBufferData(GL_ARRAY_BUFFER, m_gl_instance_size[i] * 44, NULL,
             GL_DYNAMIC_DRAW);
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -346,26 +346,23 @@ void SPMeshBuffer::recreateVAO(unsigned i)
     glBindBuffer(GL_ARRAY_BUFFER, m_ins_array[i]);
     // Origin
     glEnableVertexAttribArray(8);
-    glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, 32, (void*)0);
+    glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, 44, (void*)0);
     glVertexAttribDivisorARB(8, 1);
-    // Rotation (quaternion .xyz)
+    // Rotation (quaternion in 4 32bit floats)
     glEnableVertexAttribArray(9);
-    glVertexAttribPointer(9, 4, GL_INT_2_10_10_10_REV,
-        GraphicsRestrictions::isDisabled
-        (GraphicsRestrictions::GR_CORRECT_10BIT_NORMALIZATION) ? GL_FALSE : GL_TRUE, 32,
-        (void*)12);
+    glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, 44, (void*)12);
     glVertexAttribDivisorARB(9, 1);
-    // Scale (3 half floats and .w for quaternion .w)
+    // Scale (3 half floats and .w unused)
     glEnableVertexAttribArray(10);
-    glVertexAttribPointer(10, 4, GL_HALF_FLOAT, GL_FALSE, 32, (void*)16);
+    glVertexAttribPointer(10, 4, GL_HALF_FLOAT, GL_FALSE, 44, (void*)28);
     glVertexAttribDivisorARB(10, 1);
     // Texture translation
     glEnableVertexAttribArray(11);
-    glVertexAttribPointer(11, 2, GL_SHORT, GL_TRUE, 32, (void*)24);
+    glVertexAttribPointer(11, 2, GL_SHORT, GL_TRUE, 44, (void*)36);
     glVertexAttribDivisorARB(11, 1);
     // Misc data (skinning offset and hue change)
     glEnableVertexAttribArray(12);
-    glVertexAttribIPointer(12, 2, GL_SHORT, 32, (void*)28);
+    glVertexAttribIPointer(12, 2, GL_SHORT, 44, (void*)40);
     glVertexAttribDivisorARB(12, 1);
 
     glBindVertexArray(0);
@@ -400,15 +397,15 @@ void SPMeshBuffer::uploadInstanceData()
         if (CVS->isARBBufferStorageUsable())
         {
             memcpy(m_ins_dat_mapped_ptr[i], m_ins_dat[i].data(),
-                m_ins_dat[i].size() * 32);
+                m_ins_dat[i].size() * 44);
         }
         else
         {
             glBindBuffer(GL_ARRAY_BUFFER, m_ins_array[i]);
             void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, 0,
-                m_ins_dat[i].size() * 32, GL_MAP_WRITE_BIT |
+                m_ins_dat[i].size() * 44, GL_MAP_WRITE_BIT |
                 GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-            memcpy(ptr, m_ins_dat[i].data(), m_ins_dat[i].size() * 32);
+            memcpy(ptr, m_ins_dat[i].data(), m_ins_dat[i].size() * 44);
             glUnmapBuffer(GL_ARRAY_BUFFER);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }

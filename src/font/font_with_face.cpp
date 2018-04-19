@@ -18,6 +18,7 @@
 
 #include "font/font_with_face.hpp"
 
+#include "config/user_config.hpp"
 #include "font/face_ttf.hpp"
 #include "font/font_manager.hpp"
 #include "font/font_settings.hpp"
@@ -332,23 +333,24 @@ void FontWithFace::setDPI()
     const int screen_width = irr_driver->getFrameSize().Width;
     const int screen_height = irr_driver->getFrameSize().Height;
     
-#ifdef ANDROID
-    float scale = screen_height / 480.0f;
-    m_face_dpi = getScalingFactorTwo() * getScalingFactorOne() * scale;
-
-#else
-    float scale = std::max(0, screen_width - 640) / 564.0f;
-
-    // attempt to compensate for small screens
-    if (screen_width < 1200)
-        scale = std::max(0, screen_width - 640) / 750.0f;
-    if (screen_width < 900 || screen_height < 700)
-        scale = std::min(scale, 0.05f);
-
-    m_face_dpi = unsigned((getScalingFactorOne() + 0.2f * scale) *
-        getScalingFactorTwo());
-#endif
-
+    if (UserConfigParams::m_hidpi_enabled)
+    {
+        float scale = screen_height / 480.0f;
+        m_face_dpi = getScalingFactorTwo() * getScalingFactorOne() * scale;
+    }
+    else
+    {
+        float scale = std::max(0, screen_width - 640) / 564.0f;
+    
+        // attempt to compensate for small screens
+        if (screen_width < 1200)
+            scale = std::max(0, screen_width - 640) / 750.0f;
+        if (screen_width < 900 || screen_height < 700)
+            scale = std::min(scale, 0.05f);
+    
+        m_face_dpi = unsigned((getScalingFactorOne() + 0.2f * scale) *
+            getScalingFactorTwo());
+    }
 }   // setDPI
 
 // ----------------------------------------------------------------------------

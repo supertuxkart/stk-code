@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-11-13 00:19+0000\n"
+"PO-Revision-Date: 2017-11-15 14:31+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/supertuxkart/supertuxkart/language/gd/)\n"
 "MIME-Version: 1.0\n"
@@ -608,7 +608,7 @@ msgstr "Modhan-\r\ngeama"
 #. I18N: ./data/gui/help5.stkgui
 #. I18N: Tab in help menu
 msgid "Multi-player"
-msgstr "Ioma-chluicheadair"
+msgstr "Ioma-\nchluicheadair"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu

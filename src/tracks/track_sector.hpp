@@ -48,6 +48,8 @@ private:
      *  of the center driveline. */
     Vec3 m_current_track_coords;
 
+    Vec3 m_latest_valid_track_coords;
+
     /** True if the object is on the road (driveline), or not. */
     bool m_on_road;
 
@@ -61,7 +63,13 @@ public:
     float getRelativeDistanceToCenter() const;
     // ------------------------------------------------------------------------
     /** Returns how far the the object is from the start line. */
-    float getDistanceFromStart() const { return m_current_track_coords.getZ();}
+    float getDistanceFromStart(bool account_for_checklines) const
+    {
+        if (account_for_checklines)
+            return m_latest_valid_track_coords.getZ();
+        else
+            return m_current_track_coords.getZ();
+    }
     // ------------------------------------------------------------------------
     /** Returns the distance to the centre driveline. */
     float getDistanceToCenter() const { return m_current_track_coords.getX(); }
