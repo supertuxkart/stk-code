@@ -19,6 +19,7 @@
 #ifndef GAME_SLOT_HPP
 #define GAME_SLOT_HPP
 
+#include "challenges/challenge_data.hpp"
 #include "race/race_manager.hpp"
 
 #include <irrString.h>
@@ -33,7 +34,8 @@ class ChallengeStatus;
 class UTFWriter;
 class XMLNode;
 
-const int CHALLENGE_POINTS[] = { 8, 9, 10 };
+const int CHALLENGE_POINTS[] = { 6, 7, 8, 10 };
+const int GP_FACTOR = 3;
 
 /** This class contains the progression through challenges for the story mode.
  *  It maintains a list of all challenges in a mapping of challenge id to
@@ -67,6 +69,7 @@ private:
     int m_easy_challenges;
     int m_medium_challenges;
     int m_hard_challenges;
+    int m_best_challenges;
 
 public:
 
@@ -102,8 +105,11 @@ public:
     /* Returns the number of fulfilled challenges at medium level. */
     int        getNumMediumTrophies() const { return m_medium_challenges; }
     // ------------------------------------------------------------------------
-    /** Returns the number of fulfilled challenges at har level. */
+    /** Returns the number of fulfilled challenges at hard level. */
     int        getNumHardTrophies  () const { return m_hard_challenges;   }
+    // ------------------------------------------------------------------------
+    /** Returns the number of fulfilled challenges at best level. */
+    int        getNumBestTrophies  () const { return m_best_challenges;   }
     // ------------------------------------------------------------------------
     /** Sets if this is the first time the intro is shown. */
     void       setFirstTime(bool ft) { m_first_time = ft;   }
@@ -118,7 +124,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a challenge given the challenge id.
      */
-    const ChallengeStatus* getChallengeStatus(const std::string& id) const
+    ChallengeStatus* getChallengeStatus(const std::string& id) const
     {
         std::map<std::string, ChallengeStatus*>::const_iterator it =
             m_challenges_state.find(id);
