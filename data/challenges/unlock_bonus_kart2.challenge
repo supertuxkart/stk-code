@@ -3,5 +3,5 @@
     <!-- This challenge can only be completed
          by dedicated code -->
     <unlock_list list="true"/>
-    <unlock kart="kiki"/>
+    <unlock kart="sara_the_wizard"/>
 </challenge>
