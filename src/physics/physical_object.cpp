@@ -607,6 +607,8 @@ void PhysicalObject::init(const PhysicalObject::Settings& settings)
 
 void PhysicalObject::updateGraphics(float dt)
 {
+    if (!m_is_dynamic)
+        return;
     Vec3 xyz = m_current_transform.getOrigin();
 
     // Offset the graphical position correctly:
