@@ -228,22 +228,33 @@ void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty diffic
 
 // ----------------------------------------------------------------------------
 
-void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty)
+void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty, bool is_grandprix)
 {
     core::stringw msg;
+
+    int gp_factor = is_grandprix ? GP_FACTOR : 1;
+    RaceManager::Difficulty max_unlocked_difficulty = RaceManager::DIFFICULTY_BEST;
+
+    if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+        max_unlocked_difficulty = RaceManager::DIFFICULTY_HARD;
+
     switch (difficulty)
     {
         case RaceManager::DIFFICULTY_EASY:
             msg = _("You completed the easy challenge! Points earned on this level: %i/%i",
-                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY], CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]);
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY]*gp_factor, CHALLENGE_POINTS[max_unlocked_difficulty]*gp_factor);
             break;
         case RaceManager::DIFFICULTY_MEDIUM:
             msg = _("You completed the intermediate challenge! Points earned on this level: %i/%i",
-                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM], CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]);
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM]*gp_factor, CHALLENGE_POINTS[max_unlocked_difficulty]*gp_factor);
             break;
         case RaceManager::DIFFICULTY_HARD:
             msg = _("You completed the difficult challenge! Points earned on this level: %i/%i",
-                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD], CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]);
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]*gp_factor, CHALLENGE_POINTS[max_unlocked_difficulty]*gp_factor);
+            break;
+        case RaceManager::DIFFICULTY_BEST:
+            msg = _("You completed the SuperTux challenge! Points earned on this level: %i/%i",
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_BEST]*gp_factor, CHALLENGE_POINTS[max_unlocked_difficulty]*gp_factor);
             break;
         default:
             assert(false);
@@ -260,6 +271,9 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty)
             break;
         case RaceManager::DIFFICULTY_HARD:
             model = file_manager->getAsset(FileManager::MODEL,"trophy_gold.spm");
+            break;
+        case RaceManager::DIFFICULTY_BEST:
+            model = file_manager->getAsset(FileManager::MODEL,"trophy_platinum.spm");
             break;
         default:
             assert(false);
