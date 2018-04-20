@@ -80,20 +80,14 @@ ChallengeData::ChallengeData(const std::string& filename)
         return;
     }
 
+    m_is_unlock_list = false;
     const XMLNode* unlock_list_node = root->getNode("unlock_list");
-    if (unlock_list_node == NULL)
+    if (unlock_list_node != NULL)
     {
-        throw std::runtime_error("Challenge file " + filename +
-                                 " has no <unlock_list> node!");
+        std::string list;
+        unlock_list_node->get("list", &list);
+        m_is_unlock_list = (list=="true");
     }
-
-    std::string list;
-    unlock_list_node->get("list", &list);
-
-    if(list=="true")
-        m_is_unlock_list = true;
-    else
-        m_is_unlock_list = false;
 
     std::vector<XMLNode*> unlocks;
     root->getNodes("unlock", unlocks);
@@ -116,6 +110,14 @@ ChallengeData::ChallengeData(const std::string& filename)
             throw std::runtime_error("Unknown unlock entry");
         }
     }
+
+    const XMLNode* requirements_node = root->getNode("requirements");
+    if (requirements_node == NULL)
+    {
+        throw std::runtime_error("Challenge file " + filename +
+                                 " has no <requirements> node!");
+    }
+    requirements_node->get("trophies", &m_num_trophies);
 
     //Don't check further if this is an unlock list
     if(m_is_unlock_list)
@@ -188,14 +190,6 @@ ChallengeData::ChallengeData(const std::string& filename)
             error("grandprix");
         }
     }
-
-    const XMLNode* requirements_node = root->getNode("requirements");
-    if (requirements_node == NULL)
-    {
-        throw std::runtime_error("Challenge file " + filename +
-                                 " has no <requirements> node!");
-    }
-    requirements_node->get("trophies", &m_num_trophies);
 
     const XMLNode* difficulties[RaceManager::DIFFICULTY_COUNT];
     difficulties[0] = root->getNode("easy");
