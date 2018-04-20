@@ -18,37 +18,54 @@
 
 #include "network/rewind_info.hpp"
 
+#include "network/network_config.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 
 /** Constructor for a state: it only takes the size, and allocates a buffer
  *  for all state info.
  *  \param size Necessary buffer size for a state.
  */
-RewindInfo::RewindInfo(float time, bool is_confirmed)
+RewindInfo::RewindInfo(int ticks, bool is_confirmed)
 {
-    m_time         = time;
+    m_ticks        = ticks;
     m_is_confirmed = is_confirmed;
 }   // RewindInfo
 
-// ============================================================================
-RewindInfoTime::RewindInfoTime(float time)
-              : RewindInfo(time, /*is_confirmed*/true)
+// ----------------------------------------------------------------------------
+/** Adjusts the time of this RewindInfo. This is only called on the server
+ *  in case that an event is received in the past - in this case the server
+ *  needs to avoid a Rewind by moving this event forward to the current time.
+ */
+void RewindInfo::setTicks(int ticks)
 {
-}   // RewindInfoTime
+    assert(NetworkConfig::get()->isServer());
+    assert(m_ticks < ticks);
+    m_ticks = ticks;
+}   // setTicks
 
 // ============================================================================
-RewindInfoState::RewindInfoState(float time, Rewinder *rewinder, 
-                                 BareNetworkString *buffer, bool is_confirmed)
-    : RewindInfoRewinder(time, rewinder, buffer, is_confirmed)
+RewindInfoState::RewindInfoState(int ticks, BareNetworkString *buffer,
+                                 bool is_confirmed)
+    : RewindInfo(ticks, is_confirmed)
 {
-    m_local_physics_time = Physics::getInstance()->getPhysicsWorld()
-                                                 ->getLocalTime();
+    m_buffer = buffer;
 }   // RewindInfoState
 
+// ------------------------------------------------------------------------
+/** Rewinds to this state. This is called while going forwards in time
+ *  again to reach current time. It will call rewindToState().
+ *  if the state is a confirmed state.
+ */
+void RewindInfoState::rewind()
+{
+    RewindManager::get()->restoreState(m_buffer);
+}   // rewind
+
 // ============================================================================
-RewindInfoEvent::RewindInfoEvent(float time, EventRewinder *event_rewinder,
+RewindInfoEvent::RewindInfoEvent(int ticks, EventRewinder *event_rewinder,
                                  BareNetworkString *buffer, bool is_confirmed)
-    : RewindInfo(time, is_confirmed)
+               : RewindInfo(ticks, is_confirmed)
 {
     m_event_rewinder = event_rewinder;
     m_buffer         = buffer;

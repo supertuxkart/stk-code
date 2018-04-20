@@ -19,6 +19,7 @@
 #define HEADER_WORLD_STATUS_HPP
 
 #include "utils/cpp2011.hpp"
+#include <atomic>
 
 class SFXBase;
 
@@ -106,6 +107,14 @@ private:
     /** The third sound to be played in ready, set, go. */
     SFXBase    *m_start_sound;
 
+    /** In networked game the world clock might be adjusted (without the
+     *  player noticing), e.g. if a client causes rewinds in the server,
+     *  that client needs to speed up to be further ahead of the server
+     *  and so reduce the number of rollbacks. This is the amount of time
+     *  by which the client's clock needs to be adjusted (positive or 
+     *  negative). */
+    float m_adjust_time_by;
+
     /** The clock mode: normal counting forwards, or countdown */ 
     ClockType       m_clock_mode;
 protected:
@@ -131,26 +140,29 @@ private:
     int             m_count_up_ticks;
 
     bool            m_engines_started;
-    void            startEngines();
     /** In networked game a client must wait for the server to start 'ready
-     *  set go' to make sure all client are actually ready to start the game.
-     *  A server on the other hand will run behind all clients, so it will
-     *  wait for all clients to indicate that they have started the race. */
-    bool m_server_is_ready;
+    *  set go' to make sure all client are actually ready to start the game.
+    *  A server on the other hand will run behind all clients, so it will
+    *  wait for all clients to indicate that they have started the race. */
+    std::atomic_bool m_server_is_ready;
+
+    void startEngines();
 
 public:
              WorldStatus();
     virtual ~WorldStatus();
 
     virtual void reset();
-    virtual void updateTime(const float dt);
-    virtual void update(float dt);
+    virtual void updateTime(int ticks);
+    virtual void update(int ticks);
     void         startReadySetGo();
     virtual void pause(Phase phase);
     virtual void unpause();
     virtual void enterRaceOverState();
     virtual void terminateRace();
     void         setTime(const float time);
+    void         setTicks(int ticks);
+    float        adjustDT(float dt);
 
     // ------------------------------------------------------------------------
     // Note: GO_PHASE is both: start phase and race phase
@@ -205,8 +217,11 @@ public:
     /** Get the ticks since start regardless of which way the clock counts */
     int getTicksSinceStart() const { return m_count_up_ticks; }
     // ------------------------------------------------------------------------
-    void setReadyToRace() { m_server_is_ready = true; }
-
+    void setReadyToRace() { m_server_is_ready.store(true); }
+    // ------------------------------------------------------------------------
+    /** Sets a time by which the clock should be adjusted. Used by networking
+     *  if too many rewinds are detected. */
+    void setAdjustTime(float t) { m_adjust_time_by = t; }
 };   // WorldStatus
 
 

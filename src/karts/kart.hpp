@@ -148,37 +148,33 @@ protected:
 
     /** How long the brake key has been pressed - the longer the harder
      *  the kart will brake. */
-    float        m_brake_time;
+    int          m_brake_ticks;
 
     /** A short time after a collision acceleration is disabled to allow
      *  the karts to bounce back*/
-    float        m_bounce_back_time;
+    int          m_bounce_back_ticks;
 
     /** Time a kart is invulnerable. */
-    float        m_invulnerable_time;
+    int          m_invulnerable_ticks;
 
     /** How long a kart is being squashed. If this is >0
      *  the kart is squashed. */
-    float        m_squash_time;
+    int          m_squash_ticks;
 
     /** Current leaning of the kart. */
     float        m_current_lean;
 
     /** If > 0 then bubble gum effect is on. This is the sliding when hitting a gum on the floor, not the shield. */
-    float        m_bubblegum_time;
+    int          m_bubblegum_ticks;
 
     /** The torque to apply after hitting a bubble gum. */
     float        m_bubblegum_torque;
 
     /** True if fire button was pushed and not released */
     bool         m_fire_clicked;
-
-    /** Counter which is used for displaying wrong way message after a delay */
-    float        m_wrongway_counter;
     
     /** True if the kart has been selected to have a boosted ai */
     bool         m_boosted_ai;
-
 
     // Bullet physics parameters
     // -------------------------
@@ -211,11 +207,11 @@ protected:
     float           m_finish_time;
     bool            m_finished_race;
 
-    float           m_falling_time = 0.35f;
+    int             m_falling_ticks;
 
     /** When a kart has its view blocked by the plunger, this variable will be
      *  > 0 the number it contains is the time left before removing plunger. */
-    float         m_view_blocked_by_plunger;
+    int           m_view_blocked_by_plunger;
     /** The current speed (i.e. length of velocity vector) of this kart. */
     float         m_speed;
     /** For camera handling an exponentially smoothened value is used, which
@@ -245,17 +241,17 @@ protected:
     RaceManager::KartType m_type;
 
     /** To prevent using nitro in too short bursts */
-    float         m_min_nitro_time;
+    int           m_min_nitro_ticks;
 
-    void          updatePhysics(float dt);
+    void          updatePhysics(int ticks);
     void          handleMaterialSFX(const Material *material);
-    void          handleMaterialGFX(float dt);
+    void          handleMaterialGFX(int ticks);
     void          updateFlying();
     void          updateSliding();
-    void          updateEnginePowerAndBrakes(float dt);
+    void          updateEnginePowerAndBrakes(int ticks);
     void          updateEngineSFX(float dt);
     void          updateSpeed();
-    void          updateNitro(float dt);
+    void          updateNitro(int ticks);
     float         getActualWheelForce();
     void          playCrashSFX(const Material* m, AbstractKart *k);
     void          loadData(RaceManager::KartType type, bool animatedModel);
@@ -268,8 +264,7 @@ public:
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
     virtual void   kartIsInRestNow();
-    virtual void   updateGraphics(float dt, const Vec3& off_xyz,
-                                  const btQuaternion& off_rotation);
+    virtual void   updateGraphics(float dt) OVERRIDE;
     virtual void   createPhysics    ();
     virtual void   updateWeight     ();
     virtual float  getSpeedForTurnRadius(float radius) const;
@@ -289,8 +284,8 @@ public:
                                     float speed_boost, float engine_force, float duration,
                                     float fade_out_time);
     virtual void   setSlowdown(unsigned int category, float max_speed_fraction,
-                               float fade_in_time);
-    virtual float getSpeedIncreaseTimeLeft(unsigned int category) const;
+                               int fade_in_time);
+    virtual int   getSpeedIncreaseTicksLeft(unsigned int category) const;
     virtual void  setBoostAI     (bool boosted);
     virtual bool  getBoostAI     () const;
     virtual void  collectedItem(Item *item, int random_attachment);
@@ -309,7 +304,7 @@ public:
     virtual void   crashed          (AbstractKart *k, bool update_attachments);
     virtual void   crashed          (const Material *m, const Vec3 &normal);
     virtual float  getHoT           () const;
-    virtual void   update           (float dt);
+    virtual void   update           (int ticks);
     virtual void   finishedRace     (float time, bool from_server=false);
     virtual void   setPosition      (int p);
     virtual void   beep             ();
@@ -364,7 +359,7 @@ public:
     virtual bool   hasFinishedRace     () const { return m_finished_race;    }
     // ------------------------------------------------------------------------
     /** Returns true if the kart has a plunger attached to its face. */
-    virtual float  getBlockedByPlungerTime() const
+    virtual int getBlockedByPlungerTicks() const
                                          { return m_view_blocked_by_plunger; }
     // ------------------------------------------------------------------------
     /** Sets that the view is blocked by a plunger. The duration depends on
@@ -445,10 +440,13 @@ public:
     virtual void eliminate();
     // ------------------------------------------------------------------------
     /** Makes a kart invulnerable for a certain amount of time. */
-    virtual void  setInvulnerableTime(float t) { m_invulnerable_time = t; }
+    virtual void setInvulnerableTicks(int ticks) OVERRIDE
+    { 
+        m_invulnerable_ticks = ticks;
+    }   // setInvulnerableTicks
     // ------------------------------------------------------------------------
     /** Returns if the kart is invulnerable. */
-    virtual bool   isInvulnerable() const { return m_invulnerable_time > 0; }
+    virtual bool isInvulnerable() const { return m_invulnerable_ticks > 0; }
     // ------------------------------------------------------------------------
     /** Enables a kart shield protection for a certain amount of time. */
     virtual void setShieldTime(float t);
@@ -469,10 +467,10 @@ public:
     /** Return whether nitro is being used despite the nitro button not being
      *  pressed due to minimal use time requirements
      */
-    virtual float isOnMinNitroTime() const { return m_min_nitro_time > 0.0f; }
+    virtual bool isOnMinNitroTime() const { return m_min_nitro_ticks > 0; }
     // ------------------------------------------------------------------------
     /** Returns if the kart is currently being squashed. */
-    virtual bool   isSquashed() const { return m_squash_time >0; }
+    virtual bool isSquashed() const { return m_squash_ticks >0; }
     // ------------------------------------------------------------------------
     /** Shows the star effect for a certain time. */
     virtual void showStarEffect(float t);
@@ -496,11 +494,6 @@ public:
     // ------------------------------------------------------------------------
     /** For debugging only: check if a kart is flying. */
     bool isFlying() const { return m_flying;  }
-    // ------------------------------------------------------------------------
-    /** Counter which is used for displaying wrong way message after a delay */
-    float getWrongwayCounter() { return m_wrongway_counter; }
-    // ------------------------------------------------------------------------
-    void setWrongwayCounter(float counter) { m_wrongway_counter = counter; }
     // ------------------------------------------------------------------------
     /** Returns whether this kart wins or loses. */
     virtual bool getRaceResult() const { return m_race_result;  }

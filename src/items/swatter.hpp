@@ -21,6 +21,7 @@
 
 #include "config/stk_config.hpp"
 #include "items/attachment_plugin.hpp"
+#include "utils/cpp2011.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/random_generator.hpp"
 
@@ -79,7 +80,7 @@ public:
              Swatter(AbstractKart *kart, bool was_bomb,
                      scene::ISceneNode* bomb_scene_node);
     virtual ~Swatter();
-    bool     updateAndTestFinished(float dt);
+    bool     updateAndTestFinished(int ticks) OVERRIDE;
 
     // ------------------------------------------------------------------------
     /** Returns if the swatter is currently aiming, i.e. can be used to

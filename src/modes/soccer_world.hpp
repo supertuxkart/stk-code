@@ -266,8 +266,11 @@ private:
     SFXBase *m_goal_sound;
 
     /** Timer for displaying goal text*/
-    float m_goal_timer;
-    float m_ball_invalid_timer;
+    int m_goal_timer;
+
+    /** Counts ticks when the ball is off track, so a reset can be
+     *  triggered if the ball is off for more than 2 seconds. */
+    int m_ball_invalid_timer;
     int m_ball_hitter;
 
     /** Goals data of each team scored */
@@ -290,7 +293,7 @@ private:
     /** Set the team for the karts */
     void initKartList();
     /** Function to update the location the ball on the polygon map */
-    void updateBallPosition(float dt);
+    void updateBallPosition(int ticks);
     /** Function to update data for AI usage. */
     void updateAIData();
     /** Get number of teammates in a team, used by starting position assign. */
@@ -326,7 +329,7 @@ public:
 
     virtual const std::string& getIdent() const OVERRIDE;
 
-    virtual void update(float dt) OVERRIDE;
+    virtual void update(int ticks) OVERRIDE;
     // ------------------------------------------------------------------------
     void onCheckGoalTriggered(bool first_goal);
     // ------------------------------------------------------------------------

@@ -38,8 +38,6 @@ using namespace Online;
 using namespace irr;
 using namespace core;
 
-DEFINE_SCREEN_SINGLETON( RegisterScreen );
-
 // -----------------------------------------------------------------------------
 
 RegisterScreen::RegisterScreen() : Screen("online/register.stkgui")
@@ -96,7 +94,8 @@ void RegisterScreen::init()
             username = getenv("LOGNAME");
     }
 
-    getWidget<TextBoxWidget>("local_username")->setText(username);
+    TextBoxWidget* local_username = getWidget<TextBoxWidget>("local_username");
+    local_username->setText(username);
 
     m_password_widget->setPasswordBox(true, L'*');
     getWidget<TextBoxWidget>("password_confirm")->setPasswordBox(true, L'*');
@@ -106,6 +105,8 @@ void RegisterScreen::init()
 
     onDialogClose();
     makeEntryFieldsVisible();
+
+    local_username->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // init
 
 // -----------------------------------------------------------------------------

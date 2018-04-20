@@ -51,8 +51,6 @@
 #include <line3d.h>
 
 class LinearWorld;
-class DriveGraph;
-class ShowCurve;
 class Track;
 
 namespace irr
@@ -145,8 +143,8 @@ private:
     /** Distance to the kard behind. */
     float m_distance_behind;
 
-    /** The actual start delay used. */
-    float m_start_delay;
+    /** The actual start delay used in ticks. */
+    int m_start_delay;
 
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
@@ -242,7 +240,7 @@ private:
      *specific action (more like, associated with inaction).
      */
     void  handleRaceStart();
-    void  handleAcceleration(const float dt);
+    void  handleAcceleration(int ticks);
     void  handleSteering(float dt);
     void  handleItems(const float dt, const Vec3 *aim_point,
                                            int last_node);
@@ -278,7 +276,7 @@ protected:
 public:
                  SkiddingAI(AbstractKart *kart);
                 ~SkiddingAI();
-    virtual void update      (float delta) ;
+    virtual void update      (int ticks);
     virtual void reset       ();
     virtual const irr::core::stringw& getNamePostfix() const;
 };

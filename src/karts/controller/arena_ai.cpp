@@ -59,8 +59,8 @@ void ArenaAI::reset()
     m_reverse_point = Vec3(0, 0, 0);
     m_time_since_last_shot = 0.0f;
     m_time_since_driving = 0.0f;
-    m_time_since_off_road = 0.0f;
-    m_time_since_reversing = 0.0f;
+    m_ticks_since_off_road = 0;
+    m_ticks_since_reversing = 0;
     m_time_since_uturn = 0.0f;
     m_turn_radius = 0.0f;
     m_steering_angle = 0.0f;
@@ -74,9 +74,9 @@ void ArenaAI::reset()
 /** This is the main entry point for the AI.
  *  It is called once per frame for each AI and determines the behaviour of
  *  the AI, e.g. steering, accelerating/braking, firing.
- *  \param dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void ArenaAI::update(float dt)
+void ArenaAI::update(int ticks)
 {
     // This is used to enable firing an item backwards.
     m_controls->setLookBack(false);
@@ -96,30 +96,31 @@ void ArenaAI::update(float dt)
 
     if (!isKartOnRoad() && m_kart->isOnGround())
     {
-        m_time_since_off_road += dt;
+        m_ticks_since_off_road += ticks;
     }
-    else if (m_time_since_off_road != 0.0f)
+    else if (m_ticks_since_off_road != 0)
     {
-        m_time_since_off_road = 0.0f;
+        m_ticks_since_off_road = 0;
     }
 
     // If the kart needs to be rescued, do it now (and nothing else)
-    if (m_time_since_off_road > 5.0f && m_kart->isOnGround())
+    if (m_ticks_since_off_road > stk_config->time2Ticks(5.0f) &&
+        m_kart->isOnGround()                                     )
     {
-        m_time_since_off_road = 0.0f;
+        m_ticks_since_off_road = 0;
         new RescueAnimation(m_kart);
-        AIBaseController::update(dt);
+        AIBaseController::update(ticks);
         return;
     }
 
     if (isWaiting())
     {
-        AIBaseController::update(dt);
+        AIBaseController::update(ticks);
         return;
     }
-
+    float dt = stk_config->ticks2Time(ticks);
     checkIfStuck(dt);
-    if (gettingUnstuck(dt))
+    if (gettingUnstuck(ticks))
         return;
 
     findTarget();
@@ -156,7 +157,7 @@ void ArenaAI::update(float dt)
         setSteering(m_steering_angle, dt);
     }
 
-    AIBaseController::update(dt);
+    AIBaseController::update(ticks);
 
 }   // update
 
@@ -385,22 +386,23 @@ void ArenaAI::doUTurn(const float dt)
  *  \param dt Time step size.
  *  \return True if getting stuck is needed to be done.
  */
-bool ArenaAI::gettingUnstuck(const float dt)
+bool ArenaAI::gettingUnstuck(int ticks)
 {
     if (!m_is_stuck || m_is_uturn) return false;
 
     resetAfterStop();
+    float dt = stk_config->ticks2Time(ticks);
     setSteering(0.0f, dt);
     m_controls->setBrake(true);
 
-    m_time_since_reversing += dt;
+    m_ticks_since_reversing += ticks;
 
-    if (m_time_since_reversing >= 1.0f)
+    if (m_ticks_since_reversing >= stk_config->time2Ticks(1.0f))
     {
         m_is_stuck = false;
-        m_time_since_reversing = 0.0f;
+        m_ticks_since_reversing = 0;
     }
-    AIBaseController::update(dt);
+    AIBaseController::update(ticks);
     return true;
 
 }   // gettingUnstuck

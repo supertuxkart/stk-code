@@ -46,15 +46,13 @@ private:
     virtual ~RaceEventManager();
 
 public:
-    void update(float dt);
+    void update(int ticks);
 
     void start();
     void stop();
     bool isRaceOver();
 
     void collectedItem(Item *item, AbstractKart *kart);
-    void controllerAction(Controller* controller, PlayerAction action, 
-                          int value);
     void kartFinishedRace(AbstractKart *kart, float time);
     // ------------------------------------------------------------------------
     /** Returns if this instance is in running state or not. */

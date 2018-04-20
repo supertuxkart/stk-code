@@ -72,7 +72,7 @@ public:
     void  init();
     void  reset();
     void  save();
-    void  update(float dt);
+    void  update(int ticks);
 
     // ------------------------------------------------------------------------
     /** Creates a new instance of the replay object. */

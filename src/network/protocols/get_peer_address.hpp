@@ -35,18 +35,17 @@ private:
      *  to get the result. */
     TransportAddress m_address;
 public:
-             GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object);
+             GetPeerAddress(uint32_t peer_id);
     virtual ~GetPeerAddress();
 
     virtual void setup() OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
-    void setPeerID(uint32_t m_peer_id);
-
+    void setPeerID(uint32_t peer_id) { m_peer_id = peer_id; }
     // ------------------------------------------------------------------------
     /** Returns the address found. */
     const TransportAddress &getAddress() const { return m_address;  }
     // ------------------------------------------------------------------------
-    virtual void update(float dt) OVERRIDE {}
+    virtual void update(int ticks) OVERRIDE {}
     // ------------------------------------------------------------------------
     virtual bool notifyEvent(Event* event) OVERRIDE { return true; }
     // ------------------------------------------------------------------------

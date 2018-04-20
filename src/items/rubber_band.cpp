@@ -146,7 +146,7 @@ void RubberBand::updatePosition()
  *  so, an explosion is triggered.
  *  \param dt: Time step size.
  */
-void RubberBand::update(float dt)
+void RubberBand::update(int ticks)
 {
     const KartProperties *kp = m_owner->getKartProperties();
 
@@ -155,7 +155,7 @@ void RubberBand::update(float dt)
         // Rubber band snaps
         m_plunger->hit(NULL);
         // This causes the plunger to be removed at the next update
-        m_plunger->setKeepAlive(0.0f);
+        m_plunger->setKeepAlive(0);
         return;
     }
 
@@ -171,7 +171,7 @@ void RubberBand::update(float dt)
         // Rubber band snaps
         m_plunger->hit(NULL);
         // This causes the plunger to be removed at the next update
-        m_plunger->setKeepAlive(0.0f);
+        m_plunger->setKeepAlive(0);
     }
 
     // Apply forces (if applicable)
@@ -187,7 +187,7 @@ void RubberBand::update(float dt)
             // Rubber band snaps
             m_plunger->hit(NULL);
             // This causes the plunger to be removed at the next update
-            m_plunger->setKeepAlive(0.0f);
+            m_plunger->setKeepAlive(0);
             return;
         }
 
@@ -196,8 +196,8 @@ void RubberBand::update(float dt)
         m_owner->increaseMaxSpeed(MaxSpeed::MS_INCREASE_RUBBER,
             kp->getPlungerBandSpeedIncrease(),
             /*engine_force*/ 0.0f,
-            /*duration*/0.1f,
-            kp->getPlungerBandFadeOutTime());
+            /*duration*/stk_config->time2Ticks(0.1f),
+            kp->getPlungerBandFadeOutTicks());
         if(m_attached_state==RB_TO_KART)
             m_hit_kart->getBody()->applyCentralForce(diff*(-force));
     }
@@ -260,7 +260,7 @@ void RubberBand::hit(AbstractKart *kart_hit, const Vec3 *track_xyz)
         if(kart_hit->isShielded())
         {
             kart_hit->decreaseShieldTime();
-            m_plunger->setKeepAlive(0.0f);
+            m_plunger->setKeepAlive(0);
 
             return;
         }

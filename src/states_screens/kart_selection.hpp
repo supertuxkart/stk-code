@@ -38,6 +38,7 @@ namespace Online
 
 class FocusDispatcher;
 class InputDevice;
+class PlayerProfile;
 class KartHoverListener;
 
 extern int g_root_id;
@@ -85,7 +86,7 @@ protected:
     KartSelectionScreen(const char* filename);
 
     /** Called when all players selected their kart */
-    void allPlayersDone();
+    virtual void allPlayersDone();
 
     /** Called when number/order of karts changed, so that all will keep
      *  an up-to-date ID */
@@ -105,7 +106,7 @@ protected:
     /** Fill the ribbon with the karts from the currently selected group */
     void setKartsFromCurrentGroup();
 
-    virtual void playerConfirm(const int playerID);
+    void playerConfirm(const int playerID);
 
     void updateKartStats(uint8_t widget_id,
                          const std::string& selection);
@@ -122,6 +123,8 @@ protected:
 
     /** Remove the multiplayer message. */
     void removeMultiplayerMessage();
+
+    virtual bool isIgnored(const std::string& ident) const { return false; }
 
     /** Stores a pointer to the current selection screen */
     static KartSelectionScreen* m_instance_ptr;
@@ -141,14 +144,14 @@ public:
 
     /** \brief Called when a player hits 'fire'/'select' on his device to
      *  join the game */
-    bool joinPlayer(InputDevice* device);
+    bool joinPlayer(InputDevice* device, PlayerProfile* p);
 
     /**
       * \brief Called when a player hits 'rescue'/'cancel' on his device
       *  to leave the game
       * \return true if event was handled succesfully
       */
-    bool playerQuit(StateManager::ActivePlayer* player);
+    virtual bool playerQuit(StateManager::ActivePlayer* player);
 
      /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;

@@ -18,18 +18,19 @@
 
 #include "network/event.hpp"
 
-#include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
+#include "utils/time.hpp"
 
 #include <string.h>
 
 /** \brief Constructor
  *  \param event : The event that needs to be translated.
  */
-Event::Event(ENetEvent* event)
+Event::Event(ENetEvent* event, std::shared_ptr<STKPeer> peer)
 {
     m_arrival_time = (double)StkTime::getTimeSinceEpoch();
+    m_pdi = PDI_TIMEOUT;
 
     switch (event->type)
     {
@@ -38,6 +39,7 @@ Event::Event(ENetEvent* event)
         break;
     case ENET_EVENT_TYPE_DISCONNECT:
         m_type = EVENT_TYPE_DISCONNECTED;
+        m_pdi = (PeerDisconnectInfo)event->data;
         break;
     case ENET_EVENT_TYPE_RECEIVE:
         m_type = EVENT_TYPE_MESSAGE;
@@ -60,16 +62,7 @@ Event::Event(ENetEvent* event)
         enet_packet_destroy(event->packet);
     }
 
-    m_peer = STKHost::get()->getPeer(event->peer);
-    if(m_type == EVENT_TYPE_MESSAGE && m_peer->isClientServerTokenSet() &&
-        m_data->getToken()!=m_peer->getClientServerToken() )
-    {
-        Log::error("Event", "Received event with invalid token!");
-        Log::error("Event", "HostID %d Token %d message token %d",
-            m_peer->getHostId(), m_peer->getClientServerToken(),
-            m_data->getToken());
-        Log::error("Event", m_data->getLogMessage().c_str());
-    }
+    m_peer = peer;
 }   // Event(ENetEvent)
 
 // ----------------------------------------------------------------------------

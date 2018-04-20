@@ -208,7 +208,7 @@ void SPShader::bindTextures(const std::array<GLuint, 6>& tex,
 void SPShader::addAllUniforms(RenderPass rp)
 {
 #ifndef SERVER_ONLY
-    GLint total_uniforms;
+    GLint total_uniforms = 0;
     glGetProgramiv(m_program[rp], GL_ACTIVE_UNIFORMS, &total_uniforms);
     static const std::map<GLenum, std::type_index> supported_types =
         {

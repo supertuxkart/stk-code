@@ -42,11 +42,13 @@
  */
 SlipStream::SlipStream(AbstractKart* kart)
 {
-    m_node = NULL;
     m_kart = kart;
     m_moving = NULL;
     m_moving_fast = NULL;
     m_moving_bonus = NULL;
+    m_node = NULL;
+    m_node_fast = NULL;
+    m_bonus_node = NULL;
 
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
@@ -210,7 +212,7 @@ void SlipStream::reset()
 {
     m_slipstream_mode = SS_NONE;
     m_slipstream_time = 0;
-    m_bonus_time = 0;
+    m_bonus_time      = 0;
 
     // Reset a potential max speed increase
     m_kart->increaseMaxSpeed(MaxSpeed::MS_INCREASE_SLIPSTREAM, 0, 0, 0, 0);
@@ -612,7 +614,7 @@ void SlipStream::updateQuad()
 /** Update, called once per timestep.
  *  \param dt Time step size.
  */
-void SlipStream::update(float dt)
+void SlipStream::update(int ticks)
 {
     const KartProperties *kp = m_kart->getKartProperties();
 
@@ -628,6 +630,7 @@ void SlipStream::update(float dt)
         updateQuad();
     }
 
+    float dt = stk_config->ticks2Time(ticks);
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
@@ -731,7 +734,7 @@ void SlipStream::update(float dt)
         // (additional target_kart_length because that kart's center
         // is not the center of rotation of the slipstreaming quad)
         Vec3 delta = m_kart->getXYZ() - m_target_kart->getXYZ();
-        float l    = kp_target->getSlipstreamLength()*1.1;//Outer quad margin
+        float l    = kp_target->getSlipstreamLength()*1.1f;//Outer quad margin
         float speed_factor = m_target_kart->getSpeed()
                             /kp_target->getSlipstreamBaseSpeed();
         l = l*speed_factor + m_target_kart->getKartLength()
@@ -821,12 +824,13 @@ void SlipStream::update(float dt)
 
         m_slipstream_time = 0.0f;
         m_bonus_active = true;
+        int fade_out = kp->getSlipstreamFadeOutTicks();
         m_kart->instantSpeedIncrease(MaxSpeed::MS_INCREASE_SLIPSTREAM,
                                 kp->getSlipstreamMaxSpeedIncrease(),
                                 kp->getSlipstreamMaxSpeedIncrease(),
                                 kp->getSlipstreamAddPower(),
                                 m_bonus_time,
-                                kp->getSlipstreamFadeOutTime());
+                                stk_config->ticks2Time(fade_out)      );
     }
 
     if(!is_sstreaming)

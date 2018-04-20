@@ -66,7 +66,7 @@ private:
 public:
          RubberBand(Plunger *plunger, AbstractKart *kart);
         ~RubberBand();
-    void update(float dt);
+    void update(int ticks);
     void hit(AbstractKart *kart_hit, const Vec3 *track_xyz=NULL);
 };   // RubberBand
 #endif

@@ -33,8 +33,6 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( OnlineProfileFriends );
-
 int OnlineProfileFriends::m_sort_column      = 0;
 bool OnlineProfileFriends::m_sort_increasing = true;
 

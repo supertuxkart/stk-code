@@ -98,6 +98,7 @@ namespace GUIEngine
         PROP_ICON,
         PROP_FOCUS_ICON,
         PROP_TEXT_ALIGN,
+        PROP_TEXT_VALIGN,
         PROP_MIN_VALUE,
         PROP_MAX_VALUE,
         PROP_MAX_WIDTH,
@@ -325,7 +326,7 @@ namespace GUIEngine
          * it visible implicitely calls setActive(true). If you mix visiblity and (de)activated calls,
          * undefined behavior may ensue (like invisible but clickable buttons).
          */
-        void setVisible(bool visible);
+        virtual void setVisible(bool visible);
 
         /** Returns if the element is visible. */
         bool isVisible() const;
@@ -658,6 +659,7 @@ namespace GUIEngine
 
         /** Gets called when the widget is active and got clicked. (Only works for button widgets for now.) */
         virtual void onClick()  { }
+        virtual irr::core::dimension2di getDimension() const { return irr::core::dimension2di(m_w, m_h); }
     };
 
 

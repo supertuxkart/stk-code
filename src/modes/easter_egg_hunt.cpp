@@ -156,12 +156,12 @@ void EasterEggHunt::collectedEasterEgg(const AbstractKart *kart)
 
 //-----------------------------------------------------------------------------
 /** Update the world and the track.
- *  \param dt Time step size.
+ *  \param ticks Physics time step size - should be 1.
  */
-void EasterEggHunt::update(float dt)
+void EasterEggHunt::update(int ticks)
 {
-    LinearWorld::update(dt);
-    LinearWorld::updateTrack(dt);
+    LinearWorld::update(ticks);
+    LinearWorld::updateTrack(ticks);
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -208,6 +208,7 @@ void EasterEggHunt::getKartsDisplayInfo(
 /** Override the base class method to change behavior. We don't want wrong
  *  direction messages in the easter egg mode since there is no direction there.
  *  \param i Kart id.
+ *  \param dt Time step size.
  */
 void EasterEggHunt::checkForWrongDirection(unsigned int i, float dt)
 {

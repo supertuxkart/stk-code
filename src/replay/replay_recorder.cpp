@@ -95,9 +95,9 @@ void ReplayRecorder::init()
 
 //-----------------------------------------------------------------------------
 /** Saves the current replay data.
- *  \param dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void ReplayRecorder::update(float dt)
+void ReplayRecorder::update(int ticks)
 {
     if (m_incorrect_replay || m_complete_replay) return;
 

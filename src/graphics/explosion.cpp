@@ -20,6 +20,7 @@
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -31,14 +32,15 @@
 #include "race/race_manager.hpp"
 #include "utils/vec3.hpp"
 
-const float burst_time = 0.1f;
 
 /** Creates an explosion effect. */
 Explosion::Explosion(const Vec3& coord, const char* explosion_sound, const char * particle_file)
                      : HitSFX(coord, explosion_sound)
 {
     // short emision time, explosion, not constant flame
-    m_remaining_time  = burst_time;
+
+    m_explosion_ticks = stk_config->time2Ticks(2.0f);
+    m_remaining_ticks = stk_config->time2Ticks(0.1f);
     m_emission_frames = 0;
 
 #ifndef SERVER_ONLY
@@ -84,22 +86,22 @@ Explosion::~Explosion()
  *  \param dt Time step size.
  *  \return true If the explosion is finished.
  */
-bool Explosion::updateAndDelete(float dt)
+bool Explosion::updateAndDelete(int ticks)
 {
     // The explosion sfx is shorter than the particle effect,
     // so no need to save the result of the update call.
-    HitSFX::updateAndDelete(dt);
+    HitSFX::updateAndDelete(ticks);
 
     m_emission_frames++;
-    m_remaining_time -= dt;
+    m_remaining_ticks -= ticks;
 
     // Do nothing more if the animation is still playing
-    if (m_remaining_time>0) return false;
+    if (m_remaining_ticks>0) return false;
 
     // Otherwise check that the sfx has finished, otherwise the
     // sfx will get aborted 'in the middle' when this explosion
     // object is removed.
-    if (m_remaining_time > -explosion_time)
+    if (m_remaining_ticks > -m_explosion_ticks)
     {
 #ifndef SERVER_ONLY
         // if framerate is very low, emit for at least a few frames, in case
@@ -122,3 +124,4 @@ bool Explosion::updateAndDelete(float dt)
 
     return false;  // not finished
 }   // updateAndDelete
+

@@ -19,38 +19,11 @@
 #ifndef HEADER_NETWORK_CONSOLE_HPP
 #define HEADER_NETWORK_CONSOLE_HPP
 
-#include "utils/types.hpp"
-
-#include "pthread.h"
-
-class NetworkString;
 class STKHost;
 
-class NetworkConsole
+namespace NetworkConsole
 {
-protected:
-
-    STKHost *m_localhost;
-
-    pthread_t* m_thread_keyboard;
-
-    uint8_t m_max_players;
-
-    static void* mainLoop(void* data);
-
-public:
-             NetworkConsole();
-    virtual ~NetworkConsole();
-
-    virtual void run();
-    void kickAllPlayers();
-    // ------------------------------------------------------------------------
-    void setMaxPlayers(uint8_t count) { m_max_players = count; }
-    // ------------------------------------------------------------------------
-    uint8_t getMaxPlayers() { return m_max_players; }
-    // ------------------------------------------------------------------------
-    virtual bool isServer() { return true; }
-
+    void mainLoop(STKHost* host);
 };   // class NetworkConsole
 
 #endif // SERVER_CONSOLE_HPP

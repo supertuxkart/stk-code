@@ -40,9 +40,6 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( UserScreen       );
-DEFINE_SCREEN_SINGLETON( TabbedUserScreen );
-
 // ----------------------------------------------------------------------------
 
 BaseUserScreen::BaseUserScreen(const std::string &name) : Screen(name.c_str())
@@ -197,8 +194,8 @@ EventPropagation BaseUserScreen::filterActions(PlayerAction action,
             || (m_password_tb != NULL && m_password_tb->isFocusedForPlayer(PLAYER_ID_GAME_MASTER)))
         {
             login();
+            return EVENT_BLOCK;
         }
-        return EVENT_BLOCK;
     }
 
     return EVENT_LET;

@@ -123,7 +123,7 @@ public:
                  SlipStream  (AbstractKart* kart);
     virtual     ~SlipStream  ();
     void         reset();
-    virtual void update(float dt);
+    virtual void update(int ticks);
     bool         isSlipstreamReady() const;
 
     // ------------------------------------------------------------------------

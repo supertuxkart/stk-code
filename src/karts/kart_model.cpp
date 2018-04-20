@@ -1026,10 +1026,10 @@ void KartModel::update(float dt, float distance, float steer, float speed,
 #endif
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
 
-        float suspension_length = 0.0f;
+        float suspension_length = m_default_physics_suspension[i];
         GhostKart* gk = dynamic_cast<GhostKart*>(m_kart);
         // Prevent using suspension length uninitialized
-        if (dt != 0.0f && !(gk && gt_replay_index == -1))
+        if ( !gk || gt_replay_index != -1)
         {
             if (gk)
             {

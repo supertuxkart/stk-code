@@ -18,10 +18,9 @@
 
 #include "network/protocols/hide_public_address.hpp"
 
-#include "config/player_manager.hpp"
-#include "config/user_config.hpp"
-#include "network/protocol_manager.hpp"
+#include "network/network_config.hpp"
 #include "online/request_manager.hpp"
+#include "online/xml_request.hpp"
 #include "utils/log.hpp"
 
 HidePublicAddress::HidePublicAddress() : Protocol(PROTOCOL_SILENT)
@@ -42,8 +41,7 @@ void HidePublicAddress::asynchronousUpdate()
     if (m_state == NONE)
     {
         m_request = new Online::XMLRequest();
-        PlayerManager::setUserDetails(m_request, "unset", Online::API::SERVER_PATH);
-
+        NetworkConfig::get()->setUserDetails(m_request, "unset");
         Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;
     }
@@ -56,7 +54,7 @@ void HidePublicAddress::asynchronousUpdate()
         {
             if(rec_success == "yes")
             {
-                Log::debug("HidePublicAddress", "Address hidden successfully.");
+                Log::info("HidePublicAddress", "Address hidden successfully.");
             }
             else
             {

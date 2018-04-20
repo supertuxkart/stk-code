@@ -20,9 +20,12 @@
 #define HEADER_REWIND_MANAGER_HPP
 
 #include "network/rewinder.hpp"
+#include "network/rewind_queue.hpp"
 #include "utils/ptr_vector.hpp"
+#include "utils/synchronised.hpp"
 
 #include <assert.h>
+#include <list>
 #include <vector>
 
 class RewindInfo;
@@ -88,10 +91,8 @@ private:
     /** A list of all objects that can be rewound. */
     AllRewinder m_all_rewinder;
 
-    /** Pointer to all saved states. */
-    typedef std::vector<RewindInfo*> AllRewindInfo;
-
-    AllRewindInfo m_rewind_info;
+    /** The queue that stores all rewind infos. */
+    RewindQueue m_rewind_queue;
 
     /** Overall amount of memory allocated by states. */
     unsigned int m_overall_state_size;
@@ -100,67 +101,32 @@ private:
     bool m_is_rewinding;
 
     /** How much time between consecutive state saves. */
-    float m_state_frequency;
+    int m_state_frequency;
 
-    /** Time at which the last state was saved. */
-    float m_last_saved_state;
+    /** Ticks at which the last state was saved. */
+    int m_last_saved_state;
 
-    /** The current time to be used in all states/events. This is used to
-     *  give all states and events during one frame the same time, even
-     *  if e.g. states are saved before world time is increased, other
-     *  events later. */
-    float m_current_time;
-
-    /** The current time step size. */
-    float m_time_step;
-
-#define REWIND_SEARCH_STATS
-
-#ifdef REWIND_SEARCH_STATS
-    /** Gather some statistics about how many comparisons we do, 
-     *  to find out if it's worth doing a binary search.*/
-    mutable int m_count_of_comparisons;
-    mutable int m_count_of_searches;
-#endif
+    /** This stores the original World time in ticks during a rewind. It is
+     *  used to detect if a client's local time need adjustment to reduce
+     *  rewinds. */
+    int m_not_rewound_ticks;
 
     RewindManager();
-    ~RewindManager();
-    unsigned int findFirstIndex(float time) const;
-    void insertRewindInfo(RewindInfo *ri);
-    float determineTimeStepSize(int state, float max_time);
+   ~RewindManager();
+
 public:
     // First static functions to manage rewinding.
     // ===========================================
     static RewindManager *create();
     static void destroy();
     // ------------------------------------------------------------------------
-    /** Sets the time that is to be used for all further states or events,
-     *  and the time step size. This is necessary so that states/events before 
-     *  and after World::m_time is increased have the same time stamp. 
-     *  \param t Time.
-     *  \param dt Time step size.
-     */
-    void setCurrentTime(float t, float dt)
-    {
-        m_current_time = t;
-        m_time_step    = dt;
-    }   // setCurrentTime
-
-    // ------------------------------------------------------------------------
-    /** Returns the current time. */
-    float getCurrentTime() const { return m_current_time; }
-    // ------------------------------------------------------------------------
-    float getCurrentTimeStep() const { return m_time_step; }
-    // ------------------------------------------------------------------------
     /** En- or disables rewinding. */
-    static void setEnable(bool m) { m_enable_rewind_manager = m;}
-
+    static void setEnable(bool m) { m_enable_rewind_manager = m; }
     // ------------------------------------------------------------------------
     /** Returns if rewinding is enabled or not. */
     static bool isEnabled() { return m_enable_rewind_manager; }
-        
     // ------------------------------------------------------------------------
-    /** Returns the singleton. This function will not automatically create 
+    /** Returns the singleton. This function will not automatically create
      *  the singleton. */
     static RewindManager *get()
     {
@@ -168,12 +134,21 @@ public:
         return m_rewind_manager;
     }   // get
 
-    // ------------------------------------------------------------------------
+    // Non-static function declarations:
 
     void reset();
-    void saveStates();
-    void rewindTo(float target_time);
-    void addEvent(EventRewinder *event_rewinder, BareNetworkString *buffer);
+    void update(int ticks);
+    void rewindTo(int target_ticks, int ticks_now);
+    void playEventsTill(int world_ticks, int *ticks);
+    void addEvent(EventRewinder *event_rewinder, BareNetworkString *buffer,
+                  bool confirmed, int ticks = -1);
+    void addNetworkEvent(EventRewinder *event_rewinder,
+                         BareNetworkString *buffer, int ticks);
+    void addNetworkState(BareNetworkString *buffer, int ticks);
+    void addNextTimeStep(int ticks, float dt);
+    void saveState(bool local_save);
+    void saveLocalState();
+    void restoreState(BareNetworkString *buffer);
     // ------------------------------------------------------------------------
     /** Adds a Rewinder to the list of all rewinders.
      *  \return true If rewinding is enabled, false otherwise. 
@@ -187,6 +162,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if currently a rewind is happening. */
     bool isRewinding() const { return m_is_rewinding; }
+    // ------------------------------------------------------------------------
+    int getNotRewoundWorldTicks() const { return m_not_rewound_ticks;  }
 };   // RewindManager
 
 

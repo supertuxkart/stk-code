@@ -1,0 +1,42 @@
+This shows in which order input handling, physics computations and
+other kart related items are updated in each frame.
+
+main_loop:
+    getDT()                              : Determine nexts DT --> simulation
+                                           is [T, T+DT] with T=now.
+    RewindManager::addNextTimeStep()     : Adds a default TimeStepInfo entry to the
+                                           RewindQueue which will store events for the
+					   current time step (e.g. key presses, and
+					   network data).
+    irr_driver::update()                 : Rendering and input handling.
+        Controller::action()             : Store user action in m_controls of
+	                                   kart. Clients send event to server.
+    RaceEventManager::update()           : A thin wrapper around world used in networked
+                                           races.
+        RewindManager::playEventsTill()  : Plays all events in [T, T+DT]: copies unhandled
+	                                   network events that must be handled at the
+ 					   current time to the current TimeStepInfo. Can do
+					   complete rewind and replay till T is reached again!
+    World::updateWorld()
+        RewindManager::update()          : Store current state on server if necessary and
+	                                   broadcast it to clients.
+	Karts::update()
+	     Moveable::update()          : Copy physics data from bullet to STK.
+	     updateSpeed()               : Get physics speed and set it in kart.
+	     Controller::update()        : Set kart steering based on user/AI input.
+	     Slipstream::update()        : call Kart::handleZipper if required.
+	     updatePhysics()
+	         HandleStartBoost        : Trigger boost if required.
+		 updateEnginePower...()  : Sets engine power/brakes for bullet vehicle.
+		 Skidding::update()      : Update skidding values (which will
+		                           affect steering).
+		 setSteering             : Sets the bullet steering based on
+		                           kart's current steering.
+		 updateSliding()         : Test for sliding which can reduce the wheels
+		                           friction/grip, causing the physics to slide.
+		 MaxSpeed::update()      : Cap speed of kart if kart is too fast.
+            !physicsafter                : !Print debug values
+	Physics::update()                : Time step bullet as often as necessary. This is
+					   using the steering etc information set above.
+    ProtocolManager::update()            : Synchronous protocol updates.
+    World::updateTime()                  : Increase time from T to T+DT.

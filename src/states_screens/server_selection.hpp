@@ -19,11 +19,20 @@
 #define HEADER_SERVER_SELECTION_HPP
 
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets.hpp"
+#include "guiengine/widgets/list_widget.hpp"
+
+#include <memory>
 
 namespace Online { class XMLRequest; }
 
-namespace GUIEngine { class Widget; }
+namespace GUIEngine
+{
+    class CheckBoxWidget;
+    class IconButtonWidget;
+    class LabelWidget;
+    class ListWidget;
+}
+class Server;
 
 /**
   * \brief ServerSelection
@@ -39,24 +48,26 @@ private:
     ServerSelection();
     ~ServerSelection();
 
-    GUIEngine::IconButtonWidget *               m_reload_widget;
-    GUIEngine::LabelWidget *                    m_update_status;
-    GUIEngine::ListWidget *                     m_server_list_widget;
+    std::vector<std::shared_ptr<Server> > m_servers;
+
+    GUIEngine::CheckBoxWidget* m_private_server;
+    GUIEngine::IconButtonWidget* m_reload_widget;
+    GUIEngine::LabelWidget* m_update_status;
+    GUIEngine::ListWidget* m_server_list_widget;
 
     /** \brief To check (and set) if sort order is descending **/
-    bool                                        m_sort_desc;
+    bool m_sort_desc;
 
-    /** A pointer to the http request for getting a server list. */
-    const Online::XMLRequest *m_refresh_request;
+    bool m_refreshing_server;
 
+    /** Load the servers into the main list.*/
+    void loadList(unsigned sort_case);
 
-public:
+    void copyFromServersManager();
 
     void refresh();
 
-    /** Load the addons into the main list.*/
-    void loadList();
-
+public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
 
