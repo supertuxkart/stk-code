@@ -230,6 +230,8 @@ public:
     // ------------------------------------------------------------------------
     unsigned int getPoints() const { return m_story_mode_status->getPoints(); }
     // ------------------------------------------------------------------------
+    unsigned int getNextUnlockPoints() const { return m_story_mode_status->getNextUnlockPoints(); }
+    // ------------------------------------------------------------------------
     void setFirstTime(bool b) { m_story_mode_status->setFirstTime(b); }
     // ------------------------------------------------------------------------
     bool isFirstTime() const { return m_story_mode_status->isFirstTime(); }
