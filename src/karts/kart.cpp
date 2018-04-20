@@ -2428,9 +2428,9 @@ void Kart::updatePhysics(int ticks)
     m_skidding->update(ticks, isOnGround(), m_controls.getSteer(),
                        m_controls.getSkidControl());
     m_vehicle->setVisualRotation(m_skidding->getVisualSkidRotation());
-    if(( m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_LEFT ||
-         m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
-        m_skidding->getGraphicalJumpOffset()==0)
+    if( ( m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_LEFT ||
+          m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
+       !m_skidding->isJumping()                                              )
     {
         if(m_skid_sound->getStatus()!=SFXBase::SFX_PLAYING && !isWheeless())
             m_skid_sound->play(getXYZ());
@@ -3011,9 +3011,9 @@ void Kart::updateGraphics(float dt)
 
     Vec3 center_shift(0, 0, 0);
 
-    center_shift.setY(m_skidding->getGraphicalJumpOffset()
-                      + fabsf(lean_height)
-                      +m_graphical_y_offset);
+    // Update the skidding jump height:
+    float jump_height = m_skidding->updateGraphics(dt);
+    center_shift.setY(jump_height + fabsf(lean_height) + m_graphical_y_offset);
     center_shift = getTrans().getBasis() * center_shift;
 
     float heading = m_skidding->getVisualSkidRotation();
