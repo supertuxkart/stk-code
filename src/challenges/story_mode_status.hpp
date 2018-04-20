@@ -62,6 +62,7 @@ private:
     const ChallengeStatus *m_current_challenge;
 
     int m_points;
+    int m_next_unlock_points;
 
     /** Set to false after the initial stuff (intro, select kart, etc.) */
     bool m_first_time;
@@ -99,6 +100,9 @@ public:
     /** Returns the number of points accumulated. */
     int        getPoints          () const { return m_points; }
     // ------------------------------------------------------------------------
+    /** Returns the number of points needed by the next unlockable. 0 if none. */
+    int        getNextUnlockPoints () const { return m_next_unlock_points; }
+    // ------------------------------------------------------------------------
     /** Returns the number of fulfilled challenges at easy level. */
     int        getNumEasyTrophies  () const { return m_easy_challenges;   }
     // ------------------------------------------------------------------------
@@ -124,7 +128,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a challenge given the challenge id.
      */
-    ChallengeStatus* getChallengeStatus(const std::string& id) const
+    const ChallengeStatus* getChallengeStatus(const std::string& id) const
     {
         std::map<std::string, ChallengeStatus*>::const_iterator it =
             m_challenges_state.find(id);
