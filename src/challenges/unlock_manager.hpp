@@ -66,7 +66,7 @@ public:
     void       findWhatWasUnlocked(int pointsBefore, int pointsNow,
                                    std::vector<std::string>& tracks,
                                    std::vector<std::string>& gps);
-    void       unlockByPoints(int points, const StoryModeStatus* status);
+    void       unlockByPoints(int points, ChallengeStatus* unlock_list);
 
     StoryModeStatus *createStoryModeStatus(const XMLNode *node=NULL);
 
