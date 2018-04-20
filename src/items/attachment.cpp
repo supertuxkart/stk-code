@@ -202,9 +202,10 @@ void Attachment::set(AttachmentType type, int ticks,
     RewindManager *rwm = RewindManager::get();
     if(rwm->isEnabled() && !rwm->isRewinding())
     {
-        BareNetworkString *buffer = new BareNetworkString(2);
-        saveState(buffer);
-        rwm->addEvent(this, buffer, /*confirmed*/true);
+        // FIXME!!!! For now commented out
+        //BareNetworkString *buffer = new BareNetworkString(2);
+        //saveState(buffer);
+        //rwm->addEvent(this, buffer, /*confirmed*/true);
     }
 #endif
 }   // set
