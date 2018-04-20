@@ -25,18 +25,13 @@ RaceEventManager::~RaceEventManager()
  */
 void RaceEventManager::update(int ticks)
 {
-    // Replay all recorded events up to the current time (only if the
-    // timer isn't stopped, otherwise a potential rewind will trigger
-    // an infinite loop since world time does not increase)
-    if (World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE)
-    {
-        // This might adjust dt - if a new state is being played, the dt is
-        // determined from the last state till 'now'
-        PROFILER_PUSH_CPU_MARKER("RaceEvent:play event", 100, 100, 100);
-        RewindManager::get()->playEventsTill(World::getWorld()->getTimeTicks(),
-                                             &ticks);
-        PROFILER_POP_CPU_MARKER();
-    }
+    // Replay all recorded events up to the current time
+    // This might adjust dt - if a new state is being played, the dt is
+    // determined from the last state till 'now'
+    PROFILER_PUSH_CPU_MARKER("RaceEvent:play event", 100, 100, 100);
+    RewindManager::get()->playEventsTill(World::getWorld()->getTimeTicks(),
+                                         &ticks);
+    PROFILER_POP_CPU_MARKER();
     World::getWorld()->updateWorld(ticks);
 
     // if the race is over
