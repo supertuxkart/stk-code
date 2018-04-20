@@ -20,19 +20,28 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "guiengine/message_queue.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include "input/device_manager.hpp"
+#include "network/protocols/connect_to_server.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
+#include "network/server.hpp"
+#include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "online/request_manager.hpp"
+#include "states_screens/networking_lobby.hpp"
 #include "states_screens/online_lan.hpp"
 #include "states_screens/online_profile_achievements.hpp"
 #include "states_screens/online_profile_servers.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
+#include "states_screens/dialogs/general_text_field_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "utils/string_utils.hpp"
 
@@ -134,6 +143,13 @@ void OnlineScreen::onUpdate(float delta)
 
     m_online->setLabel(PlayerManager::getCurrentOnlineId() ? m_online_string
                                                            : m_login_string);
+    // In case for entering server address finished
+    if (auto lb = LobbyProtocol::get<LobbyProtocol>())
+    {
+        NetworkingLobby::getInstance()->setJoinedServer(nullptr);
+        StateManager::get()->resetAndSetStack(
+            NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
+    }
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -143,6 +159,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
 {
     if (name == "user-id")
     {
+        NetworkConfig::get()->cleanNetworkPlayers();
         UserScreen::getInstance()->push();
         return;
     }
@@ -197,7 +214,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                                 "\"Connect to the Internet\"."));
             return;
         }
-        
+
         if (PlayerManager::getCurrentOnlineId())
         {
             ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
@@ -206,6 +223,65 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
         else
         {
             UserScreen::getInstance()->push();
+        }
+    }
+    else if (selection == "enter-address")
+    {
+        if (NetworkConfig::get()->isAddingNetworkPlayers())
+        {
+            core::stringw msg =
+                _("No player available for connecting to server.");
+            MessageQueue::add(MessageQueue::MT_ERROR, msg);
+            return;
+        }
+        core::stringw instruction =
+            _("Enter the server address with IP (optional) followed by : and"
+            " then port.");
+        auto gtfd = new GeneralTextFieldDialog(instruction.c_str(),
+            [] (const irr::core::stringw& text) {},
+            [this] (GUIEngine::LabelWidget* lw,
+                   GUIEngine::TextBoxWidget* tb)->bool
+            {
+                TransportAddress server_addr(
+                    StringUtils::wideToUtf8(tb->getText()));
+                if (server_addr.getIP() == 0)
+                {
+                    core::stringw err = _("Invalid server address: %s.",
+                        tb->getText());
+                    lw->setText(err, true);
+                    return false;
+                }
+                NetworkConfig::get()->setIsWAN();
+                NetworkConfig::get()->setIsServer(false);
+                NetworkConfig::get()->setPassword("");
+                auto server = std::make_shared<Server>(0, L"", 0, 0, 0, 0,
+                    server_addr, false);
+                STKHost::create();
+                auto cts = std::make_shared<ConnectToServer>(server);
+                cts->setup();
+                Log::info("OnlineScreen", "Trying to connect to server '%s'.",
+                    server_addr.toString().c_str());
+                if (!cts->handleDirectConnect(10000))
+                {
+                    core::stringw err = _("Cannot connect to server %s.",
+                        server_addr.toString().c_str());
+                    STKHost::get()->shutdown();
+                    NetworkConfig::get()->unsetNetworking();
+                    lw->setText(err, true);
+                    return false;
+                }
+
+                m_entered_server_address.copy(
+                    STKHost::get()->getServerPeerForClient()->getAddress());
+                auto cl = LobbyProtocol::create<ClientLobby>();
+                cl->setAddress(m_entered_server_address);
+                cl->requestStart();
+                return true;
+            });
+        if (!m_entered_server_address.isUnset())
+        {
+            gtfd->getTextField()->setText(StringUtils::utf8ToWide(
+                m_entered_server_address.toString()));
         }
     }
 }   // eventCallback
@@ -220,5 +296,3 @@ bool OnlineScreen::onEscapePressed()
     NetworkConfig::get()->unsetNetworking();
     return true;
 }   // onEscapePressed
-
-

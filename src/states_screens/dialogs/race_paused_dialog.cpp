@@ -19,6 +19,8 @@
 
 #include <string>
 
+#include "audio/music_manager.hpp"
+#include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -32,9 +34,9 @@
 #include "race/race_manager.hpp"
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/race_gui_base.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "states_screens/options_screen_video.hpp"
-#include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -57,16 +59,32 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
         loadFromFile("race_paused_dialog.stkgui");
     }
 
-    World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
-
     IconButtonWidget* back_btn = getWidget<IconButtonWidget>("backbtn");
     back_btn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
+
+    if (NetworkConfig::get()->isNetworking())
+    {
+        music_manager->pauseMusic();
+        SFXManager::get()->pauseAll();
+    }
+    else
+    {
+        World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
+    }
 }   // RacePausedDialog
 
 // ----------------------------------------------------------------------------
 RacePausedDialog::~RacePausedDialog()
 {
-    World::getWorld()->scheduleUnpause();
+    if (NetworkConfig::get()->isNetworking())
+    {
+        music_manager->resumeMusic();
+        SFXManager::get()->resumeAll();
+    }
+    else
+    {
+        World::getWorld()->scheduleUnpause();
+    }
 }   // ~RacePausedDialog
 
 // ----------------------------------------------------------------------------
@@ -172,18 +190,23 @@ GUIEngine::EventPropagation
             }
             World::getWorld()->scheduleUnpause();
             race_manager->exitRace();
-            Screen* newStack[] = {MainMenuScreen::getInstance(),
-                                  NetworkConfig::get()->isNetworking() ?
-                                  static_cast<Screen*>(OnlineScreen::getInstance()) :
-                                  static_cast<Screen*>(RaceSetupScreen::getInstance()),
-                                  NULL};
-            StateManager::get()->resetAndSetStack( newStack );
+            Screen* new_stack[] =
+                {
+                    MainMenuScreen::getInstance(),
+                    RaceSetupScreen::getInstance(),
+                    NULL
+                };
+            StateManager::get()->resetAndSetStack(
+                NetworkConfig::get()->isNetworking() ?
+                NetworkConfig::get()->getResetScreens().data() :
+                new_stack);
             NetworkConfig::get()->unsetNetworking();
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "endrace")
         {
             ModalDialog::dismiss();
+            World::getWorld()->getRaceGUI()->removeReferee();
             World::getWorld()->endRaceEarly();
             return GUIEngine::EVENT_BLOCK;
         }

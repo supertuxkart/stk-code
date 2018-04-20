@@ -24,12 +24,14 @@
 
 #include "network/remote_kart_info.hpp"
 
+#include <cassert>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
 
 class NetworkPlayerProfile;
+class NetworkString;
 
 // ============================================================================
 /*! \class GameSetup
@@ -47,19 +49,22 @@ private:
     /** Stores the number of local players. */
     int m_num_local_players;
 
-    /** The player id of the local game master, used in 
-     *  kart selection screen. */
-    uint8_t m_local_master;
-
-    std::string m_track;
+    std::vector<std::string> m_tracks;
 
     unsigned m_laps;
 
     bool m_reverse;
 
+    int m_extra_server_info;
+
 public:
     // ------------------------------------------------------------------------
-    GameSetup();
+    GameSetup()
+    {
+        m_num_local_players = 0;
+        m_extra_server_info = -1;
+        reset();
+    }
     // ------------------------------------------------------------------------
     ~GameSetup() {}
     // ------------------------------------------------------------------------
@@ -69,7 +74,7 @@ public:
     void update(bool remove_disconnected_players);
     // ------------------------------------------------------------------------
     /** Sets the number of local players. */
-    void setNumLocalPlayers(int n) { m_num_local_players = n; } 
+    void setNumLocalPlayers(int n) { m_num_local_players = n; }
     // ------------------------------------------------------------------------
     /** Returns the nunber of local players. */
     int getNumLocalPlayers() const { return m_num_local_players; }
@@ -104,17 +109,51 @@ public:
         return (unsigned)m_players.size();
     }
     // ------------------------------------------------------------------------
-    /** Returns the id of the local master. */
-    int getLocalMasterID() const { return m_local_master; }
-    // ------------------------------------------------------------------------
     void setRace(const std::string& track, unsigned laps, bool reverse)
     {
-        m_track = track;
+        m_tracks.push_back(track);
         m_laps = laps;
         m_reverse = reverse;
     }
     // ------------------------------------------------------------------------
+    void reset()
+    {
+        m_tracks.clear();
+        m_laps = 0;
+        m_reverse = false;
+    }
+    // ------------------------------------------------------------------------
+    void setGrandPrixTrack(int tracks_no)  { m_extra_server_info = tracks_no; }
+    // ------------------------------------------------------------------------
+    void addServerInfo(NetworkString* ns);
+    // ------------------------------------------------------------------------
     void loadWorld();
+    // ------------------------------------------------------------------------
+    bool isGrandPrix() const;
+    // ------------------------------------------------------------------------
+    bool hasExtraSeverInfo() const        { return m_extra_server_info != -1; }
+    // ------------------------------------------------------------------------
+    uint8_t getExtraServerInfo() const
+    {
+        assert(hasExtraSeverInfo());
+        return (uint8_t)m_extra_server_info;
+    }
+    // ------------------------------------------------------------------------
+    unsigned getTotalGrandPrixTracks() const
+    {
+        assert(isGrandPrix());
+        return m_extra_server_info;
+    }
+    // ------------------------------------------------------------------------
+    void setSoccerGoalTarget(bool val)      { m_extra_server_info = (int)val; }
+    // ------------------------------------------------------------------------
+    bool isSoccerGoalTarget() const
+    {
+        assert(hasExtraSeverInfo());
+        return m_extra_server_info != 0;
+    }
+    // ------------------------------------------------------------------------
+    const std::vector<std::string>& getAllTracks() const   { return m_tracks; }
 };
 
 #endif // GAME_SETUP_HPP

@@ -172,7 +172,7 @@ protected:
 
     /** True if fire button was pushed and not released */
     bool         m_fire_clicked;
-    
+
     /** True if the kart has been selected to have a boosted ai */
     bool         m_boosted_ai;
 
@@ -486,11 +486,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the position 0.25s before */
     virtual const Vec3& getPreviousXYZ() const;
-
     // ------------------------------------------------------------------------
     /** Returns a more recent different previous position */
     virtual const Vec3& getRecentPreviousXYZ() const;
-
     // ------------------------------------------------------------------------
     /** For debugging only: check if a kart is flying. */
     bool isFlying() const { return m_flying;  }

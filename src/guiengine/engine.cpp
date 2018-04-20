@@ -882,7 +882,7 @@ namespace GUIEngine
 
     // ------------------------------------------------------------------------
 
-    void switchToScreen(const char* screen_name)
+    void switchToScreen(Screen* screen)
     {
         needsUpdate.clearWithoutDeleting();
 
@@ -893,12 +893,12 @@ namespace GUIEngine
         Widget::resetIDCounters();
 
         // check if we already loaded this screen
-        const int screen_amount = g_loaded_screens.size();
-        for(int n=0; n<screen_amount; n++)
+        Screen* loaded_screen;
+        for_in (loaded_screen, g_loaded_screens)
         {
-            if (g_loaded_screens[n].getName() == screen_name)
+            if (loaded_screen == screen)
             {
-                g_current_screen = g_loaded_screens.get(n);
+                g_current_screen = loaded_screen;
                 break;
             }
         }
@@ -925,20 +925,21 @@ namespace GUIEngine
 
     // ------------------------------------------------------------------------
 
-    void removeScreen(const char* name)
+    void removeScreen(Screen* screen)
     {
-        const int screen_amount = g_loaded_screens.size();
-        for(int n=0; n<screen_amount; n++)
+        int n = 0;
+        Screen* loaded_screen;
+        for_in (loaded_screen, g_loaded_screens)
         {
-            if (g_loaded_screens[n].getName() == name)
+            if (loaded_screen == screen)
             {
-                g_current_screen = g_loaded_screens.get(n);
-                g_current_screen->unload();
-                delete g_current_screen;
+                screen->unload();
+                delete screen;
                 g_current_screen = NULL;
                 g_loaded_screens.remove(n);
                 break;
             }
+            n++;
         }
     }
 

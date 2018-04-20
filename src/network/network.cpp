@@ -186,9 +186,9 @@ void Network::openLog()
         std::string s = file_manager
             ->getUserConfigFile(FileManager::getStdoutName()+".packet");
         m_log_file.setAtomic(fopen(s.c_str(), "w+"));
+        if (!m_log_file.getData())
+            Log::warn("STKHost", "Network packets won't be logged: no file.");
     }
-    if (!m_log_file.getData())
-        Log::warn("STKHost", "Network packets won't be logged: no file.");
 }   // openLog
 
 // ----------------------------------------------------------------------------

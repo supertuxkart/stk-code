@@ -19,6 +19,8 @@
 #define HEADER_ONLINE_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
+#include "network/transport_address.hpp"
+
 
 namespace GUIEngine { class CheckBoxWidget; class ListWidget;
                       class ButtonWidget; class IconButtonWidget; }
@@ -43,6 +45,8 @@ private:
     GUIEngine::IconButtonWidget* m_online;
 
     GUIEngine::CheckBoxWidget* m_enable_splitscreen;
+
+    TransportAddress m_entered_server_address;
 
     OnlineScreen();
 

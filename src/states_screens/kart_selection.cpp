@@ -425,7 +425,9 @@ void KartSelectionScreen::tearDown()
     Screen::tearDown();
     m_kart_widgets.clearAndDeleteAll();
 
-    GUIEngine::removeScreen(getName().c_str());
+    if (m_must_delete_on_back)
+        GUIEngine::removeScreen(this);
+
 }   // tearDown
 
 // ----------------------------------------------------------------------------

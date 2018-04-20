@@ -60,7 +60,7 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
     GUIEngine::LabelWidget *lbldifficulty = getWidget<LabelWidget>("server_difficulty");
     lbldifficulty->setText(difficulty, false);
 
-    core::stringw mode = RaceManager::getNameOf(server->getRaceMinorMode());
+    core::stringw mode = NetworkConfig::get()->getModeName(server->getServerMode());
     GUIEngine::LabelWidget *gamemode = getWidget<LabelWidget>("server_game_mode");
     gamemode->setText(mode, false);
 
@@ -104,7 +104,7 @@ void ServerInfoDialog::requestJoin()
     {
         NetworkConfig::get()->setPassword("");
     }
-    STKHost::create(m_server);
+    STKHost::create();
     NetworkingLobby::getInstance()->setJoinedServer(m_server);
     ModalDialog::dismiss();
     NetworkingLobby::getInstance()->push();

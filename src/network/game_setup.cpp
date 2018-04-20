@@ -21,24 +21,17 @@
 #include "config/player_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
-#include "online/online_profile.hpp"
+#include "network/protocols/game_events_protocol.hpp"
+#include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
 #include "utils/log.hpp"
 
 //-----------------------------------------------------------------------------
-GameSetup::GameSetup()
-{
-    m_num_local_players = 0;
-    m_local_master      = 0;
-    m_laps              = 0;
-    m_reverse           = false;
-}   // GameSetup
-
-//-----------------------------------------------------------------------------
 /** Update and see if any player disconnects.
  *  \param remove_disconnected_players remove the disconnected players,
- *  otherwise replace with AI (when racing), so this function must be called
+ *  otherwise eliminate the kart in world, so this function must be called
  *  in main thread.
  */
 void GameSetup::update(bool remove_disconnected_players)
@@ -54,16 +47,84 @@ void GameSetup::update(bool remove_disconnected_players)
         return;
     }
     lock.unlock();
-    if (!World::getWorld())
+    if (!World::getWorld() ||
+        World::getWorld()->getPhase() < WorldStatus::MUSIC_PHASE)
         return;
+    for (uint8_t i = 0; i < (uint8_t)m_players.size(); i++)
+    {
+        if (!m_players[i].expired())
+            continue;
+        AbstractKart* k = World::getWorld()->getKart(i);
+        if (!k->isEliminated())
+        {
+            World::getWorld()->eliminateKart(i,
+                false/*notify_of_elimination*/);
+            k->setPosition(
+                World::getWorld()->getCurrentNumKarts() + 1);
+            k->finishedRace(World::getWorld()->getTime());
+            NetworkString p(PROTOCOL_GAME_EVENTS);
+            p.setSynchronous(true);
+            p.addUInt8(GameEventsProtocol::GE_PLAYER_DISCONNECT).addUInt8(i);
+            STKHost::get()->sendPacketToAllPeers(&p, true);
+        }
+    }
 }   // removePlayer
 
 //-----------------------------------------------------------------------------
 void GameSetup::loadWorld()
 {
-    assert(!m_track.empty());
+    assert(!m_tracks.empty());
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
+    race_manager->setTimeTarget(0.0f);
     race_manager->setReverseTrack(m_reverse);
-    race_manager->startSingleRace(m_track, m_laps, false/*from_overworld*/);
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    {
+        if (isSoccerGoalTarget())
+            race_manager->setMaxGoal(m_laps);
+        else
+            race_manager->setTimeTarget((float)m_laps * 60.0f);
+    }
+    else
+    {
+        race_manager->startSingleRace(m_tracks.back(), m_laps,
+            false/*from_overworld*/);
+    }
 }   // loadWorld
+
+//-----------------------------------------------------------------------------
+bool GameSetup::isGrandPrix() const
+{
+    return m_extra_server_info != -1 &&
+        NetworkConfig::get()->getLocalGameMode().second ==
+        RaceManager::MAJOR_MODE_GRAND_PRIX;
+}   // isGrandPrix
+
+//-----------------------------------------------------------------------------
+void GameSetup::addServerInfo(NetworkString* ns)
+{
+    assert(NetworkConfig::get()->isServer());
+    ns->encodeString(NetworkConfig::get()->getServerName());
+    ns->addUInt8(race_manager->getDifficulty())
+        .addUInt8((uint8_t)NetworkConfig::get()->getMaxPlayers())
+        .addUInt8((uint8_t)NetworkConfig::get()->getServerMode());
+    if (hasExtraSeverInfo())
+    {
+        if (isGrandPrix())
+        {
+            ns->addUInt8((uint8_t)2).addUInt8((uint8_t)m_tracks.size())
+                .addUInt8(getExtraServerInfo());
+        }
+        else
+        {
+            // Soccer mode
+            ns->addUInt8((uint8_t)1).addUInt8(getExtraServerInfo());
+        }
+    }
+    else
+    {
+        // No extra server info
+        ns->addUInt8((uint8_t)0);
+    }
+    ns->encodeString(NetworkConfig::get()->getMOTD());
+}   // addServerInfo

@@ -708,7 +708,7 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "log-network-packets",
         &m_network_group, "If all network packets should be logged"));
     PARAM_PREFIX BoolUserConfigParam m_random_ports
-        PARAM_DEFAULT(BoolUserConfigParam(true, "randrom-ports",
+        PARAM_DEFAULT(BoolUserConfigParam(true, "random-ports",
         &m_network_group, "Use random ports for client and server connection"));
     PARAM_PREFIX BoolUserConfigParam m_lobby_chat
         PARAM_DEFAULT(BoolUserConfigParam(false, "lobby-chat",

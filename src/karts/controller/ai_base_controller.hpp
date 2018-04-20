@@ -104,9 +104,8 @@ public:
     };
     virtual void skidBonusTriggered() {};
     // ------------------------------------------------------------------------
-    /** Not used for AIs. */
-    virtual void saveState(BareNetworkString *buffer) const OVERRIDE {}
-    virtual void rewindTo(BareNetworkString *buffer) OVERRIDE {}
+    virtual void saveState(BareNetworkString *buffer) const OVERRIDE;
+    virtual void rewindTo(BareNetworkString *buffer) OVERRIDE;
 
 };   // AIBaseController
 

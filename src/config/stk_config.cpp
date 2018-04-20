@@ -141,6 +141,8 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_max_kart_version,          "<kart-version max=...>"     );
     CHECK_NEG(m_min_track_version,         "min-track-version"          );
     CHECK_NEG(m_max_track_version,         "max-track-version"          );
+    CHECK_NEG(m_min_server_version,        "min-server-version"         );
+    CHECK_NEG(m_max_server_version,        "max-server-version"         );
     CHECK_NEG(m_skid_fadeout_time,         "skid-fadeout-time"          );
     CHECK_NEG(m_near_ground,               "near-ground"                );
     CHECK_NEG(m_delay_finish_time,         "delay-finish-time"          );
@@ -187,6 +189,8 @@ void STKConfig::init_defaults()
     m_max_kart_version           = -100;
     m_min_track_version          = -100;
     m_max_track_version          = -100;
+    m_min_server_version         = -100;
+    m_max_server_version         = -100;
     m_max_display_news           = -100;
     m_replay_max_time            = -100;
     m_replay_delta_angle         = -100;
@@ -231,6 +235,12 @@ void STKConfig::getAllData(const XMLNode * root)
     {
         node->get("min", &m_min_track_version);
         node->get("max", &m_max_track_version);
+    }
+
+    if(const XMLNode *node = root->getNode("server-version"))
+    {
+        node->get("min", &m_min_server_version);
+        node->get("max", &m_max_server_version);
     }
 
     if(const XMLNode *kart_node = root->getNode("karts"))

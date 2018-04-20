@@ -4,6 +4,8 @@
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
+
+#include <atomic>
 #include <set>
 
 class ClientLobby : public LobbyProtocol
@@ -20,13 +22,14 @@ private:
     void displayPlayerVote(Event* event);
     void updatePlayerList(Event* event);
     void handleChat(Event* event);
+    void handleServerInfo(Event* event);
     void becomingServerOwner();
 
     void clearPlayers();
 
     TransportAddress m_server_address;
 
-    enum STATE
+    enum ClientState : unsigned int
     {
         NONE,
         LINKED,
@@ -41,10 +44,12 @@ private:
     };
 
     /** The state of the finite state machine. */
-    STATE m_state;
+    std::atomic<ClientState> m_state;
 
     std::set<std::string> m_available_karts;
     std::set<std::string> m_available_tracks;
+
+    bool m_received_server_result = false;
 
     void addAllPlayers(Event* event);
 
@@ -53,6 +58,7 @@ public:
     virtual ~ClientLobby();
     void setAddress(const TransportAddress &address);
     void doneWithResults();
+    bool receivedServerResult()            { return m_received_server_result; }
     void startingRaceNow();
     const std::set<std::string>& getAvailableKarts() const
                                                   { return m_available_karts; }
@@ -64,9 +70,10 @@ public:
     virtual void setup() OVERRIDE;
     virtual void update(int ticks) OVERRIDE;
     virtual bool waitingForPlayers() const OVERRIDE
-                                                  { return m_state == LINKED; }
+                                        { return m_state.load() == CONNECTED; }
     virtual void asynchronousUpdate() OVERRIDE {}
-
+    virtual bool allPlayersReady() const OVERRIDE
+                                          { return m_state.load() >= PLAYING; }
 };
 
 #endif // CLIENT_LOBBY_HPP

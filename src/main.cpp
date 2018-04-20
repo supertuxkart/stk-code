@@ -191,6 +191,7 @@
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/referee.hpp"
 #include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_shader.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/dialog_queue.hpp"
@@ -210,6 +211,9 @@
 #include "modes/cutscene_world.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
+#include "network/protocols/connect_to_server.hpp"
+#include "network/protocols/client_lobby.hpp"
+#include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/rewind_manager.hpp"
@@ -569,6 +573,7 @@ void cmdLineHelp()
     "       --unlock-all       Permanently unlock all karts and tracks for testing.\n"
     "       --no-unlock-all    Disable unlock-all (i.e. base unlocking on player achievement).\n"
     "       --no-graphics      Do not display the actual race.\n"
+    "       --sp-shader-debug  Enables debug in sp shader, it will print all unavailable uniforms.\n"
     "       --demo-mode=t      Enables demo mode after t seconds of idle time in "
                                "main menu.\n"
     "       --demo-tracks=t1,t2 List of tracks to be used in demo mode. No\n"
@@ -586,7 +591,7 @@ void cmdLineHelp()
     "       --server-password= Sets a password for a server (both client&server).\n"
     "       --connect-now=ip   Connect to a server with IP known now\n"
     "                          (in format x.x.x.x:xxx(port)), the port should be its\n"
-    "                          private port.\n"
+    "                          public port.\n"
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --port=n           Port number to use.\n"
@@ -729,10 +734,13 @@ int handleCmdLinePreliminary()
     if(CommandLine::has("--kartdir", &s))
         KartPropertiesManager::addKartSearchDir(s);
 
+#ifndef SERVER_ONLY
     if(CommandLine::has("--no-graphics") || CommandLine::has("-l"))
-    {
+#endif
         ProfileWorld::disableGraphics();
-    }
+
+    if (CommandLine::has("--sp-shader-debug"))
+        SP::SPShader::m_sp_shader_debug = true;
 
     if(CommandLine::has("--screensize", &s) || CommandLine::has("-s", &s))
     {
@@ -1012,7 +1020,6 @@ int handleCmdLine()
         }
     }   // --type
 
-
     if (CommandLine::has("--login", &s))
         login = s.c_str();
     if (CommandLine::has("--password", &s))
@@ -1051,6 +1058,12 @@ int handleCmdLine()
         NetworkConfig::get()->setPassword(server_password);
     }
 
+    if (CommandLine::has("--motd", &s))
+    {
+        core::stringw motd = StringUtils::xmlDecode(s);
+        NetworkConfig::get()->setMOTD(motd);
+    }
+
     if (CommandLine::has("--server-id-file", &s))
     {
         NetworkConfig::get()->setServerIdFile(
@@ -1074,21 +1087,36 @@ int handleCmdLine()
     }
     if (CommandLine::has("--connect-now", &s))
     {
-        TransportAddress ip(s);
-        NetworkConfig::get()->setIsLAN();
+        TransportAddress server_addr(s);
+        NetworkConfig::get()->setIsWAN();
         NetworkConfig::get()->setIsServer(false);
-        Log::info("main", "Try to connect to server '%s'.",
-                  ip.toString().c_str()                    );
-        irr::core::stringw name = StringUtils::utf8ToWide(ip.toString());
-        auto server = std::make_shared<Server>(0, name,
-            NetworkConfig::get()->getMaxPlayers(), 0,
-            race_manager->getDifficulty(),
-            NetworkConfig::get()->getServerGameMode(race_manager->getMinorMode(),
-            race_manager->getMajorMode()), ip, !server_password.empty());
-        NetworkingLobby::getInstance()->setJoinedServer(server);
-        STKHost::create(server);
+        auto server = std::make_shared<Server>(0, L"", 0, 0, 0, 0, server_addr,
+            !server_password.empty());
+        NetworkConfig::get()->addNetworkPlayer(
+            input_manager->getDeviceManager()->getLatestUsedDevice(),
+            PlayerManager::getCurrentPlayer(), false/*handicap*/);
+        NetworkConfig::get()->doneAddingNetworkPlayers();
+        STKHost::create();
+        auto cts = std::make_shared<ConnectToServer>(server);
+        cts->setup();
+        Log::info("main", "Trying to connect to server '%s'.",
+            server_addr.toString().c_str());
+        if (!cts->handleDirectConnect(10000))
+        {
+            Log::error("main", "Timeout trying to connect to server '%s'.",
+                server_addr.toString().c_str());
+            STKHost::get()->shutdown();
+            exit(0);
+        }
+        else
+        {
+            auto cl = LobbyProtocol::create<ClientLobby>();
+            cl->setAddress(server_addr);
+            cl->requestStart();
+        }
     }
 
+    std::shared_ptr<LobbyProtocol> server_lobby;
     if (CommandLine::has("--wan-server", &s))
     {
         // Try to use saved user token if exists
@@ -1113,7 +1141,7 @@ int handleCmdLine()
             NetworkConfig::get()->setIsServer(true);
             NetworkConfig::get()->setIsWAN();
             NetworkConfig::get()->setIsPublicServer();
-            STKHost::create();
+            server_lobby = STKHost::create();
             Log::info("main", "Creating a WAN server '%s'.", s.c_str());
         }
     }
@@ -1122,13 +1150,41 @@ int handleCmdLine()
         NetworkConfig::get()->setServerName(StringUtils::xmlDecode(s));
         NetworkConfig::get()->setIsServer(true);
         NetworkConfig::get()->setIsLAN();
-        STKHost::create();
+        server_lobby = STKHost::create();
         Log::info("main", "Creating a LAN server '%s'.", s.c_str());
     }
     if (CommandLine::has("--auto-connect"))
     {
         NetworkConfig::get()->setAutoConnect(true);
     }
+
+    if (CommandLine::has("--extra-server-info", &n))
+    {
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+        {
+            LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
+                ->setSoccerGoalTarget((bool)n);
+            NetworkConfig::get()->setServerMode(
+                race_manager->getMinorMode(),
+                RaceManager::MAJOR_MODE_SINGLE);
+        }
+        else
+        {
+            LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
+                ->setGrandPrixTrack(n);
+            NetworkConfig::get()->setServerMode(
+                race_manager->getMinorMode(),
+                RaceManager::MAJOR_MODE_GRAND_PRIX);
+        }
+    }
+    else
+    {
+        NetworkConfig::get()->setServerMode(
+            race_manager->getMinorMode(), RaceManager::MAJOR_MODE_SINGLE);
+    }
+    // The extra server info has to be set before server lobby started
+    if (server_lobby)
+        server_lobby->requestStart();
 
     /** Disable detection of LAN connection when connecting via WAN. This is
      *  mostly a debugging feature to force using WAN connection. */
@@ -1919,11 +1975,16 @@ int main(int argc, char *argv[] )
     // If the window was closed in the middle of a race, remove players,
     // so we don't crash later when StateManager tries to access input devices.
     StateManager::get()->resetActivePlayers();
-    if(input_manager) delete input_manager; // if early crash avoid delete NULL
+    if (input_manager)
+    {
+        delete input_manager;
+        input_manager = NULL;
+    }
 
     if (STKHost::existHost())
         STKHost::get()->shutdown();
 
+    NetworkConfig::destroy();
     cleanSuperTuxKart();
 
 #ifdef DEBUG

@@ -37,7 +37,6 @@ ConnectToPeer::ConnectToPeer(uint32_t peer_id)  : Protocol(PROTOCOL_CONNECTION)
     m_peer_address.clear();
     m_peer_id          = peer_id;
     m_state            = NONE;
-    m_is_lan           = false;
 }   // ConnectToPeer(peer_id)
 
 // ----------------------------------------------------------------------------
@@ -51,7 +50,6 @@ ConnectToPeer::ConnectToPeer(const TransportAddress &address)
     // We don't need to find the peer address, so we can start
     // with the state when we found the peer address.
     m_state            = WAIT_FOR_CONNECTION;
-    m_is_lan           = true;
 }   // ConnectToPeers(TransportAddress)
 
 // ----------------------------------------------------------------------------

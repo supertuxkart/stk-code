@@ -24,12 +24,13 @@
 #include "guiengine/message_queue.hpp"
 #include "input/device_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "modes/world_with_rank.hpp"
+#include "modes/linear_world.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
-#include "network/protocol_manager.hpp"
+#include "network/protocols/game_protocol.hpp"
+#include "network/protocols/game_events_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -81,10 +82,13 @@ ClientLobby::~ClientLobby()
 void ClientLobby::clearPlayers()
 {
     StateManager::get()->resetActivePlayers();
-    input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
-    input_manager->getDeviceManager()->setSinglePlayer(NULL);
-    input_manager->setMasterPlayerOnly(false);
-    input_manager->getDeviceManager()->clearLatestUsedDevice();
+    if (input_manager)
+    {
+        input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
+        input_manager->getDeviceManager()->setSinglePlayer(NULL);
+        input_manager->setMasterPlayerOnly(false);
+        input_manager->getDeviceManager()->clearLatestUsedDevice();
+    }
 }   // clearPlayers
 
 //-----------------------------------------------------------------------------
@@ -99,9 +103,10 @@ void ClientLobby::setAddress(const TransportAddress &address)
 void ClientLobby::setup()
 {
     clearPlayers();
+    m_received_server_result = false;
     TracksScreen::getInstance()->resetVote();
     LobbyProtocol::setup();
-    m_state = NONE;
+    m_state.store(NONE);
 }   // setup
 
 //-----------------------------------------------------------------------------
@@ -111,7 +116,8 @@ void ClientLobby::setup()
  */
 void ClientLobby::doneWithResults()
 {
-    NetworkString *done = getNetworkString(1);
+    NetworkString* done = getNetworkString(1);
+    done->setSynchronous(true);
     done->addUInt8(LE_RACE_FINISHED_ACK);
     sendToServer(done, /*reliable*/true);
     delete done;
@@ -135,6 +141,8 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_EXIT_RESULT:           exitResultScreen(event);    break;
         case LE_UPDATE_PLAYER_LIST:    updatePlayerList(event);    break;
         case LE_CHAT:                  handleChat(event);          break;
+        case LE_CONNECTION_ACCEPTED:   connectionAccepted(event);  break;
+        case LE_SERVER_INFO:           handleServerInfo(event);    break;
         default:
             return false;
             break;
@@ -159,7 +167,6 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
             case LE_PLAYER_DISCONNECTED : disconnectedPlayer(event);     break;
             case LE_START_RACE: startGame(event);                        break;
             case LE_CONNECTION_REFUSED: connectionRefused(event);        break;
-            case LE_CONNECTION_ACCEPTED: connectionAccepted(event);      break;
             case LE_VOTE: displayPlayerVote(event);                      break;
             case LE_SERVER_OWNERSHIP: becomingServerOwner();             break;
             default:                                                     break;
@@ -216,10 +223,9 @@ void ClientLobby::addAllPlayers(Event* event)
 
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     peer->cleanPlayerProfiles();
-
+    m_game_setup->update(true/*remove_disconnected_players*/);
     std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
     unsigned player_count = data.getUInt8();
-    assert(m_game_setup->getPlayerCount() == 0);
 
     for (unsigned i = 0; i < player_count; i++)
     {
@@ -245,18 +251,19 @@ void ClientLobby::addAllPlayers(Event* event)
 //-----------------------------------------------------------------------------
 void ClientLobby::update(int ticks)
 {
-    switch (m_state)
+    switch (m_state.load())
     {
     case NONE:
         if (STKHost::get()->isConnectedTo(m_server_address))
         {
-            m_state = LINKED;
+            m_state.store(LINKED);
         }
         break;
     case LINKED:
     {
         NetworkString *ns = getNetworkString();
         ns->addUInt8(LE_CONNECTION_REQUESTED)
+            .addUInt8(NetworkConfig::m_server_version)
             .encodeString(NetworkConfig::get()->getPassword());
 
         assert(!NetworkConfig::get()->isAddingNetworkPlayers());
@@ -305,7 +312,7 @@ void ClientLobby::update(int ticks)
 
         sendToServer(ns);
         delete ns;
-        m_state = REQUESTING_CONNECTION;
+        m_state.store(REQUESTING_CONNECTION);
     }
     break;
     case REQUESTING_CONNECTION:
@@ -337,7 +344,7 @@ void ClientLobby::update(int ticks)
         {
             screen->push();
         }
-        m_state = SELECTING_KARTS;
+        m_state.store(SELECTING_KARTS);
     }
     break;
     case SELECTING_KARTS:
@@ -347,7 +354,7 @@ void ClientLobby::update(int ticks)
     case RACE_FINISHED:
         break;
     case DONE:
-        m_state = EXITING;
+        m_state.store(EXITING);
         requestTerminate();
         break;
     case EXITING:
@@ -419,7 +426,7 @@ void ClientLobby::disconnectedPlayer(Event* event)
  */
 void ClientLobby::connectionAccepted(Event* event)
 {
-    // At least 4 byte should remain now
+    // At least 4 bytes should remain now
     if (!checkDataSize(event, 4)) return;
 
     NetworkString &data = event->data();
@@ -435,10 +442,87 @@ void ClientLobby::connectionAccepted(Event* event)
         NetworkConfig::get()->getNetworkPlayers().size());
     // connection token
     uint32_t token = data.getToken();
-    if (!peer->isClientServerTokenSet())
-        peer->setClientServerToken(token);
-    m_state = CONNECTED;
+    peer->setClientServerToken(token);
+    m_state.store(CONNECTED);
+
 }   // connectionAccepted
+
+//-----------------------------------------------------------------------------
+void ClientLobby::handleServerInfo(Event* event)
+{
+    // At least 6 bytes should remain now
+    if (!checkDataSize(event, 6)) return;
+
+    NetworkString &data = event->data();
+    // Add server info
+    core::stringw str, each_line;
+    uint8_t u_data;
+    data.decodeStringW(&str);
+
+    //I18N: In the networking lobby
+    each_line = _("Server name: %s", str);
+    NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
+
+    u_data = data.getUInt8();
+    const core::stringw& difficulty_name =
+        race_manager->getDifficultyName((RaceManager::Difficulty)u_data);
+    race_manager->setDifficulty((RaceManager::Difficulty)u_data);
+    //I18N: In the networking lobby
+    each_line = _("Difficulty: %s", difficulty_name);
+    NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
+
+    u_data = data.getUInt8();
+    //I18N: In the networking lobby
+    each_line = _("Max players: %d", (int)u_data);
+    NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
+
+    u_data = data.getUInt8();
+    NetworkConfig::get()->setServerMode(u_data);
+    auto game_mode = NetworkConfig::get()->getLocalGameMode();
+    race_manager->setMinorMode(game_mode.first);
+    // We may use single mode in network even it's grand prix
+    //race_manager->setMajorMode(game_mode.second);
+
+    //I18N: In the networking lobby
+    core::stringw mode_name = NetworkConfig::get()->getModeName(u_data);
+    each_line = _("Game mode: %s", mode_name);
+    NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
+
+    uint8_t extra_server_info = data.getUInt8();
+    switch (extra_server_info)
+    {
+        case 0:
+            break;
+        case 1:
+        {
+            u_data = data.getUInt8();
+            core::stringw tl = _("Time limit");
+            core::stringw gl = _("Goals limit");
+            core::stringw sgt = u_data == 0 ? tl : gl;
+            m_game_setup->setSoccerGoalTarget(u_data != 0);
+            //I18N: In the networking lobby
+            each_line = _("Soccer game type: %s", sgt);
+            NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
+            break;
+        }
+        case 2:
+        {
+            unsigned cur_gp_track = data.getUInt8();
+            unsigned total_gp_track = data.getUInt8();
+            m_game_setup->setGrandPrixTrack(total_gp_track);
+            each_line = _("Grand prix progress: %d / %d", cur_gp_track,
+                total_gp_track);
+            NetworkingLobby::getInstance()->addMoreServerInfo(each_line);
+            break;
+        }
+    }
+
+    // MOTD
+    data.decodeStringW(&str);
+    if (!str.empty())
+        NetworkingLobby::getInstance()->addMoreServerInfo(str);
+
+}   // handleServerInfo
 
 //-----------------------------------------------------------------------------
 void ClientLobby::updatePlayerList(Event* event)
@@ -464,10 +548,10 @@ void ClientLobby::updatePlayerList(Event* event)
 //-----------------------------------------------------------------------------
 void ClientLobby::becomingServerOwner()
 {
-    MessageQueue::add(MessageQueue::MT_GENERIC,
-        _("You are now the owner of server."));
+    core::stringw msg = _("You are now the owner of server.");
+    MessageQueue::add(MessageQueue::MT_GENERIC, msg);
     STKHost::get()->setAuthorisedToControl(true);
-    if (m_state == CONNECTED && NetworkConfig::get()->isAutoConnect())
+    if (m_state.load() == CONNECTED && NetworkConfig::get()->isAutoConnect())
     {
         // Send a message to the server to start
         NetworkString start(PROTOCOL_LOBBY_ROOM);
@@ -537,12 +621,12 @@ void ClientLobby::connectionRefused(Event* event)
 //-----------------------------------------------------------------------------
 
 /*! \brief Called when the server broadcasts to start the race to all clients.
- *  \param event : Event providing the information (no additional information
+ *  \param event : Event providing the information (no additional informati
  *                 in this case).
  */
 void ClientLobby::startGame(Event* event)
 {
-    m_state = PLAYING;
+    m_state.store(PLAYING);
     // Triggers the world finite state machine to go from WAIT_FOR_SERVER_PHASE
     // to READY_PHASE.
     World::getWorld()->setReadyToRace();
@@ -560,9 +644,10 @@ void ClientLobby::startGame(Event* event)
  */
 void ClientLobby::startingRaceNow()
 {
-    NetworkString *ns = getNetworkString(2);
+    NetworkString* ns = getNetworkString(2);
     ns->addUInt8(LE_STARTED_RACE);
     sendToServer(ns, /*reliable*/true);
+    delete ns;
     Log::verbose("ClientLobby", "StartingRaceNow at %lf",
                  StkTime::getRealTime());
 }   // startingRaceNow
@@ -574,7 +659,7 @@ void ClientLobby::startingRaceNow()
  */
 void ClientLobby::startSelection(Event* event)
 {
-    m_state = KART_SELECTION;
+    m_state.store(KART_SELECTION);
     const NetworkString& data = event->data();
     const unsigned kart_num = data.getUInt16();
     const unsigned track_num = data.getUInt16();
@@ -609,35 +694,30 @@ void ClientLobby::startSelection(Event* event)
  */
 void ClientLobby::raceFinished(Event* event)
 {
-    if(!checkDataSize(event, 1)) return;
-
     NetworkString &data = event->data();
-    Log::error("ClientLobby",
-               "Server notified that the race is finished.");
+    Log::info("ClientLobby", "Server notified that the race is finished.");
+    if (m_game_setup->isGrandPrix())
+    {
+        // fastest lap, and than each kart before / after grand prix points
+    }
+    else if (race_manager->modeHasLaps())
+    {
+        int t = data.getUInt32();
+        static_cast<LinearWorld*>(World::getWorld())->setFastestLapTicks(t);
+    }
 
     // stop race protocols
-    auto pm = ProtocolManager::lock();
-    assert(pm);
-    pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
-    pm->findAndTerminate(PROTOCOL_KART_UPDATE);
-    pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
+    RaceEventManager::getInstance()->stop();
 
-    // finish the race
-    WorldWithRank* ranked_world = (WorldWithRank*)(World::getWorld());
-    ranked_world->beginSetKartPositions();
-    ranked_world->setPhase(WorldStatus::RESULT_DISPLAY_PHASE);
-    int position = 1;
-    while(data.size()>0)
-    {
-        uint8_t kart_id = data.getUInt8();
-        ranked_world->setKartPosition(kart_id,position);
-        Log::info("ClientLobby", "Kart %d has finished #%d",
-                  kart_id, position);
-        position++;
-    }
-    ranked_world->endSetKartPositions();
-    m_state = RACE_FINISHED;
-    ranked_world->terminateRace();
+    RaceEventManager::getInstance()->getProtocol()->requestTerminate();
+    GameProtocol::lock()->requestTerminate();
+
+    while (!RaceEventManager::getInstance()->protocolStopped())
+        StkTime::sleep(1);
+    while (!GameProtocol::emptyInstance())
+        StkTime::sleep(1);
+
+    m_received_server_result = true;
 }   // raceFinished
 
 //-----------------------------------------------------------------------------
@@ -646,16 +726,8 @@ void ClientLobby::raceFinished(Event* event)
  */
 void ClientLobby::exitResultScreen(Event *event)
 {
-    // stop race protocols
-    auto pm = ProtocolManager::lock();
-    assert(pm);
-    pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
-    pm->findAndTerminate(PROTOCOL_KART_UPDATE);
-    pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
-
-    // Will be reset to linked if connected to server, see update(float dt)
     setup();
-
+    m_state.store(CONNECTED);
     RaceResultGUI::getInstance()->backToLobby();
 }   // exitResultScreen
 

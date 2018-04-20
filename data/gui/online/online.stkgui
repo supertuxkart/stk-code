@@ -23,10 +23,13 @@
         <buttonbar id="menu_toprow" proportion="3" width="90%" align="center">
             <icon-button id="lan" width="128" height="128"
                          icon="gui/menu_multi.png" focus_icon="gui/menu_multi_focus.png"
-                         I18N="Networking menu button" text="Local Networking"/>
+                         I18N="Networking menu button" text="Local networking"/>
             <icon-button id="wan" width="128" height="128"
                          icon="gui/menu_multi.png" focus_icon="gui/menu_multi_focus.png"
-                         I18N="Networking menu button" text="Global Networking"/>
+                         I18N="Networking menu button" text="Global networking"/>
+            <icon-button id="enter-address" width="128" height="128"
+                         icon="gui/online/menu_quick_play.png" focus_icon="gui/online/menu_quick_play_hover.png"
+                         I18N="Networking menu button" text="Enter server address"/>
             <icon-button id="online" width="128" height="128"
                          icon="gui/menu_online.png" focus_icon="gui/menu_online_focus.png"
                          I18N="Networking menu button" text="Your profile"/>

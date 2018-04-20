@@ -46,10 +46,9 @@ enum ProtocolType
     PROTOCOL_LOBBY_ROOM        = 0x02,  //!< Protocol that is used during the lobby room phase.
     PROTOCOL_START_GAME        = 0x03,  //!< Protocol used when starting the game.
     PROTOCOL_SYNCHRONIZATION   = 0x04,  //!< Protocol used to determine latency
-    PROTOCOL_KART_UPDATE       = 0x05,  //!< Protocol to update karts position, rotation etc...
-    PROTOCOL_GAME_EVENTS       = 0x06,  //!< Protocol to communicate the game events.
-    PROTOCOL_CONTROLLER_EVENTS = 0x07,  //!< Protocol to transfer controller modifications
-    PROTOCOL_SILENT            = 0x08,  //!< Used for protocols that do not subscribe to any network event.
+    PROTOCOL_GAME_EVENTS       = 0x05,  //!< Protocol to communicate the game events.
+    PROTOCOL_CONTROLLER_EVENTS = 0x06,  //!< Protocol to transfer controller modifications
+    PROTOCOL_SILENT            = 0x07,  //!< Used for protocols that do not subscribe to any network event.
     PROTOCOL_MAX                     ,  //!< Maximum number of different protocol types
     PROTOCOL_SYNCHRONOUS       = 0x80,  //!< Flag, indicates synchronous delivery
 };   // ProtocolType

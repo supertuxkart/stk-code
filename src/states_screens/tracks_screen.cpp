@@ -52,7 +52,12 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
                                  const int playerID)
 {
     // -- track selection screen
-    if (name == "tracks")
+    if ((name == "lap-spinner" || name == "reverse") &&
+        STKHost::existHost() && m_selected_track != NULL)
+    {
+        voteForPlayer();
+    }
+    else if (name == "tracks")
     {
         DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
         if(!w2) return;
@@ -84,27 +89,17 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
             m_random_track_list.push_back(selection);
 
         }   // selection=="random_track"
-        Track *track = track_manager->getTrack(selection);
+        m_selected_track = track_manager->getTrack(selection);
 
-        if (track)
+        if (m_selected_track)
         {
             if (STKHost::existHost())
             {
-                assert(m_laps);
-                assert(m_reversed);
-                // Remember reverse globally for each stk instance
-                m_reverse_checked = m_reversed->getState();
-                UserConfigParams::m_num_laps = m_laps->getValue();
-                NetworkString vote(PROTOCOL_LOBBY_ROOM);
-                vote.addUInt8(LobbyProtocol::LE_VOTE);
-                vote.encodeString(track->getIdent())
-                    .addUInt8(m_laps->getValue())
-                    .addUInt8(m_reversed->getState());
-                STKHost::get()->sendToServer(&vote, true);
+                voteForPlayer();
             }
             else
             {
-                TrackInfoScreen::getInstance()->setTrack(track);
+                TrackInfoScreen::getInstance()->setTrack(m_selected_track);
                 TrackInfoScreen::getInstance()->push();
             }
         }   // if clicked_track
@@ -139,6 +134,7 @@ void TracksScreen::tearDown()
 {
     m_network_tracks = false;
     m_vote_timeout = -1.0f;
+    m_selected_track = NULL;
 }   // tearDown
 
 // -----------------------------------------------------------------------------
@@ -355,6 +351,31 @@ void TracksScreen::setFocusOnTrack(const std::string& trackName)
 }   // setFocusOnTrack
 
 // -----------------------------------------------------------------------------
+void TracksScreen::setVoteTimeout(float timeout)
+{
+    if (m_vote_timeout != -1.0f)
+        return;
+    m_vote_timeout = (float)StkTime::getRealTime() + timeout;
+}   // setVoteTimeout
+
+// -----------------------------------------------------------------------------
+void TracksScreen::voteForPlayer()
+{
+    assert(STKHost::existHost());
+    assert(m_selected_track);
+    assert(m_laps);
+    assert(m_reversed);
+    // Remember reverse globally for each stk instance
+    m_reverse_checked = m_reversed->getState();
+    UserConfigParams::m_num_laps = m_laps->getValue();
+    NetworkString vote(PROTOCOL_LOBBY_ROOM);
+    vote.addUInt8(LobbyProtocol::LE_VOTE);
+    vote.encodeString(m_selected_track->getIdent())
+        .addUInt8(m_laps->getValue()).addUInt8(m_reversed->getState());
+    STKHost::get()->sendToServer(&vote, true);
+}   // voteForPlayer
+
+// -----------------------------------------------------------------------------
 void TracksScreen::onUpdate(float dt)
 {
     assert(m_votes);
@@ -365,7 +386,7 @@ void TracksScreen::onUpdate(float dt)
     }
 
     m_votes->setVisible(true);
-    int remaining_time = int(m_vote_timeout - float(StkTime::getRealTime()));
+    int remaining_time = (int)(m_vote_timeout - StkTime::getRealTime());
     if (remaining_time < 0)
         remaining_time = 0;
     //I18N: In tracks screen, about voting of tracks in network

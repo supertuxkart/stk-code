@@ -36,14 +36,15 @@ std::weak_ptr<LobbyProtocol> LobbyProtocol::m_lobby;
 LobbyProtocol::LobbyProtocol(CallbackObject* callback_object)
                  : Protocol(PROTOCOL_LOBBY_ROOM, callback_object)
 {
-    m_game_setup = NULL;
+    m_game_setup = new GameSetup();
 }   // LobbyProtocol
 
 // ----------------------------------------------------------------------------
 LobbyProtocol::~LobbyProtocol()
 {
-    if (m_game_setup)
-        delete m_game_setup;
+    if (RaceEventManager::getInstance())
+        RaceEventManager::getInstance()->stop();
+    delete m_game_setup;
 }   // ~LobbyProtocol
 
 //-----------------------------------------------------------------------------
@@ -62,24 +63,21 @@ void LobbyProtocol::loadWorld()
     // Race startup sequence
     // ---------------------
     // This creates the network world.
-    RaceEventManager::getInstance<RaceEventManager>()->start();
+    auto gep = std::make_shared<GameEventsProtocol>();
+    RaceEventManager::getInstance<RaceEventManager>()->start(gep);
 
     // Make sure that if there is only a single local player this player can
     // use all input devices.
     StateManager::ActivePlayer *ap = race_manager->getNumLocalPlayers()>1
                                    ? NULL
                                    : StateManager::get()->getActivePlayer(0);
-    // Reset the ai kart list in the race manager, otherwise in network race
-    // we can get an assertion if previously a local race with AI was done
-    std::vector<std::string> ai_kart_list;
-    race_manager->setAIKartList(ai_kart_list);
     input_manager->getDeviceManager()->setSinglePlayer(ap);
 
     // Load the actual world.
     m_game_setup->loadWorld();
     World::getWorld()->setNetworkWorld(true);
     GameProtocol::createInstance()->requestStart();
-    std::make_shared<GameEventsProtocol>()->requestStart();
+    gep->requestStart();
 
 }   // loadWorld
 
@@ -134,6 +132,8 @@ void LobbyProtocol::configRemoteKart(
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);
     }   // for i in players
+    // Clean all previous AI if exists in offline game
+    race_manager->computeRandomKartList();
     Log::info("LobbyProtocol", "Player configuration ready.");
 }   // configRemoteKart
 
@@ -143,7 +143,5 @@ void LobbyProtocol::configRemoteKart(
  */
 void LobbyProtocol::setup()
 {
-    if (m_game_setup)
-        delete m_game_setup;
-    m_game_setup = new GameSetup();
+    m_game_setup->reset();
 }   // setupNewGame

@@ -2,6 +2,7 @@
 #define SERVER_LOBBY_HPP
 
 #include "network/protocols/lobby_protocol.hpp"
+#include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
 
 #include <atomic>
@@ -65,9 +66,6 @@ private:
     /** It indicates if this server is registered with the stk server. */
     std::atomic_bool m_server_registered;
 
-    /** Counts how many players are ready to go on. */
-    int m_player_ready_counter;
-
     /** Timeout counter for various state. */
     std::atomic<float> m_timeout;
 
@@ -77,6 +75,8 @@ private:
 
     /** Ban list ip (in decimal) with online user id. */
     std::map<uint32_t, uint32_t> m_ban_list;
+
+    TransportAddress m_server_address;
 
     // connection management
     void clientDisconnected(Event* event);
@@ -95,8 +95,36 @@ private:
     void createServerIdFile();
     void updatePlayerList();
     void updateServerOwner();
-    bool checkPeersReady() const;
+    bool checkPeersReady() const
+    {
+        bool all_ready = true;
+        for (auto p : m_peers_ready)
+        {
+            if (p.first.expired())
+                continue;
+            all_ready = all_ready && p.second;
+            if (!all_ready)
+                return false;
+        }
+        return true;
+    }
+    void resetPeersReady()
+    {
+        for (auto it = m_peers_ready.begin(); it != m_peers_ready.end();)
+        {
+            if (it->first.expired())
+            {
+                it = m_peers_ready.erase(it);
+            }
+            else
+            {
+                it->second = false;
+                it++;
+            }
+        }
+    }
     std::tuple<std::string, uint8_t, bool> handleVote();
+    void stopCurrentRace();
 
 public:
              ServerLobby();
@@ -117,6 +145,8 @@ public:
     void updateBanList();
     virtual bool waitingForPlayers() const OVERRIDE
                                 { return m_state.load() == ACCEPTING_CLIENTS; }
+    virtual bool allPlayersReady() const OVERRIDE
+                            { return m_state.load() >= WAIT_FOR_RACE_STARTED; }
 
 };   // class ServerLobby
 

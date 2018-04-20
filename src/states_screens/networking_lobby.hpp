@@ -115,7 +115,11 @@ public:
 
     void finishAddingPlayers();
     void addMoreServerInfo(core::stringw info);
-    void setJoinedServer(std::shared_ptr<Server> server);
+    void setJoinedServer(std::shared_ptr<Server> server)
+    {
+        m_joined_server = server;
+        m_server_info.clear();
+    }
     void updatePlayers(const std::vector<std::tuple<uint32_t/*host id*/,
                        uint32_t/*online id*/, core::stringw/*player name*/,
                        int/*icon id*/> >& p);

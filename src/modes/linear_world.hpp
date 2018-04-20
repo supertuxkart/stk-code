@@ -170,6 +170,18 @@ public:
     {
         return stk_config->ticks2Time(m_fastest_lap_ticks);
     }
+    // ------------------------------------------------------------------------
+    /** Network use: get fastest lap in ticks */
+    int getFastestLapTicks() const
+    {
+        return m_fastest_lap_ticks;
+    }
+    // ------------------------------------------------------------------------
+    /** Network use: set fastest lap in ticks */
+    void setFastestLapTicks(int ticks)
+    {
+        m_fastest_lap_ticks = ticks;
+    }
 };   // LinearWorld
 
 #endif

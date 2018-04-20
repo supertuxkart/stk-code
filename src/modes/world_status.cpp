@@ -29,7 +29,6 @@
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"
-#include "network/protocols/server_lobby.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "tracks/track.hpp"
@@ -150,6 +149,11 @@ void WorldStatus::setClockMode(const ClockType mode, const float initial_time)
  */
 void WorldStatus::enterRaceOverState()
 {
+    // Waiting for server result info
+    auto cl = LobbyProtocol::get<ClientLobby>();
+    if (cl && !cl->receivedServerResult())
+        return;
+
     // Don't enter race over if it's already race over
     if (m_phase == DELAY_FINISH_PHASE || m_phase == RESULT_DISPLAY_PHASE ||
         m_phase == FINISH_PHASE)
@@ -257,12 +261,11 @@ void WorldStatus::updateTime(int ticks)
         case WAIT_FOR_SERVER_PHASE:
         {
             // This stage is only reached in case of a networked game.
-            // A client waits for a message from the server that it can
-            // start the race (i.e. that all clients and the server have
-            // loaded the world). The server waits for a confirmation from
+            // The server waits for a confirmation from
             // each client that they have started (to guarantee that the
             // server is running with a local time behind all clients).
-            if (m_server_is_ready.load() == false) return;
+            if (NetworkConfig::get()->isServer() &&
+                m_server_is_ready.load() == false) return;
 
             m_phase = READY_PHASE;
             auto cl = LobbyProtocol::get<ClientLobby>();
@@ -400,10 +403,12 @@ void WorldStatus::updateTime(int ticks)
             break;
         }
         case FINISH_PHASE:
+        case IN_GAME_MENU_PHASE:
             // Nothing to do here.
             break;
         case GOAL_PHASE:
             // Nothing to do here as well.
+            break;
 
         default: break;
     }

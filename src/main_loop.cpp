@@ -25,10 +25,12 @@
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/message_queue.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "input/input_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
@@ -36,8 +38,6 @@
 #include "online/request_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/main_menu_screen.hpp"
-#include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
 
@@ -300,8 +300,25 @@ void MainLoop::run()
     }
 #endif
 
-    while(!m_abort)
+    while (!m_abort)
     {
+        bool loading_shutdown = false;
+        auto lb = LobbyProtocol::get<LobbyProtocol>();
+        if (World::getWorld() && lb &&
+            STKHost::existHost() && !STKHost::get()->requestedShutdown())
+        {
+            while (!lb->allPlayersReady())
+            {
+                if (STKHost::existHost() && STKHost::get()->requestedShutdown())
+                {
+                    loading_shutdown = true;
+                    break;
+                }
+                StkTime::sleep(1);
+                m_curr_time = irr_driver->getDevice()->getTimer()->getRealTime();
+            }
+        }
+
 #ifdef WIN32
         if (parent != 0 && parent != INVALID_HANDLE_VALUE)
         {
@@ -330,7 +347,9 @@ void MainLoop::run()
         float dt = stk_config->ticks2Time(1);
         left_over_time -= num_steps * dt ;
 
-        if (STKHost::existHost() &&
+        // Shutdown next frame if shutdown request is sent while loading the
+        // world
+        if (!loading_shutdown && STKHost::existHost() &&
             STKHost::get()->requestedShutdown())
         {
             SFXManager::get()->quickSound("anvil");
@@ -340,18 +359,16 @@ void MainLoop::run()
                 msg = STKHost::get()->getErrorMessage();
             }
             STKHost::get()->shutdown();
+            // In case the user opened a race pause dialog
+            GUIEngine::ModalDialog::dismiss();
             if (World::getWorld())
             {
                 race_manager->exitRace();
             }
             if (!ProfileWorld::isNoGraphics())
             {
-                GUIEngine::Screen* new_stack[] =
-                {
-                    MainMenuScreen::getInstance(),
-                    OnlineScreen::getInstance(), NULL
-                };
-                StateManager::get()->resetAndSetStack(new_stack);
+                StateManager::get()->resetAndSetStack(
+                    NetworkConfig::get()->getResetScreens().data());
                 MessageQueue::add(MessageQueue::MT_ERROR, msg);
             }
             NetworkConfig::get()->unsetNetworking();

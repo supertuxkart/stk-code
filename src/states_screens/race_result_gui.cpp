@@ -51,9 +51,7 @@
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/networking_lobby.hpp"
 #include "states_screens/network_kart_selection.hpp"
-#include "states_screens/online_screen.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -168,21 +166,14 @@ void RaceResultGUI::enableAllButtons()
     // If we're in a network world, change the buttons text
     if (World::getWorld()->isNetworkWorld())
     {
-        Log::info("This work was networked", "This is a network world.");
         top->setVisible(false);
         middle->setText(_("Continue"));
         middle->setVisible(true);
         middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
         bottom->setText(_("Quit the server"));
         bottom->setVisible(true);
-        if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
-        {
-            middle->setVisible(false); // you have to wait the server to start again
-            bottom->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        }
         return;
     }
-    Log::info("This work was NOT networked", "This is NOT a network world.");
 
     // If something was unlocked
     // -------------------------
@@ -342,16 +333,15 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     // If we're playing online :
     if (World::getWorld()->isNetworkWorld())
     {
-        StateManager::get()->popMenu();
         if (name == "middle") // Continue button (return to server lobby)
         {
             // Signal to the server that this client is back in the lobby now.
-            auto clrp = LobbyProtocol::get<ClientLobby>();
-            if(clrp)
-                clrp->doneWithResults();
-            backToLobby();
+            auto cl = LobbyProtocol::get<ClientLobby>();
+            if (cl)
+                cl->doneWithResults();
+            getWidget("middle")->setText(_("Waiting for others"));
         }
-        if (name == "bottom") // Quit server (return to main menu)
+        if (name == "bottom") // Quit server (return to online lan / wan menu)
         {
             if (STKHost::existHost())
             {
@@ -359,7 +349,8 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             }
             race_manager->exitRace();
             race_manager->setAIKartOverride("");
-            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            StateManager::get()->resetAndSetStack(
+                NetworkConfig::get()->getResetScreens().data());
             NetworkConfig::get()->unsetNetworking();
         }
         return;
@@ -430,18 +421,16 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
 }   // eventCallback
 
 //-----------------------------------------------------------------------------
-/** Sets up the giu to go back to the lobby. Can only be called in case of a
+/** Sets up the gui to go back to the lobby. Can only be called in case of a
  *  networked game.
  */
 void RaceResultGUI::backToLobby()
 {
     race_manager->exitRace();
     race_manager->setAIKartOverride("");
-    Screen* newStack[] = { MainMenuScreen::getInstance(),
-                           OnlineScreen::getInstance(),
-                           NetworkingLobby::getInstance(),
-                           NULL                                  };
-    StateManager::get()->resetAndSetStack(newStack);
+    GUIEngine::ModalDialog::dismiss();
+    StateManager::get()->resetAndSetStack(
+        NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
 }   // backToLobby
 
 //-----------------------------------------------------------------------------

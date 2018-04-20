@@ -30,6 +30,7 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/render_info.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "io/file_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/keyboard_device.hpp"
@@ -341,11 +342,13 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
         gk = ReplayPlay::get()->getNumGhostKart();
 
     std::shared_ptr<RenderInfo> ri = std::make_shared<RenderInfo>();
-    if (global_player_id > -1 && race_manager->getKartInfo(global_player_id)
-        .getDefaultKartColor() > 0.0f)
+    core::stringw online_name;
+    if (global_player_id > -1)
     {
         ri->setHue(race_manager->getKartInfo(global_player_id)
             .getDefaultKartColor());
+        online_name = race_manager->getKartInfo(global_player_id)
+            .getPlayerName();
     }
 
     int position           = index+1;
@@ -378,6 +381,8 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     case RaceManager::KT_NETWORK_PLAYER:
     {
         controller = new NetworkPlayerController(new_kart);
+        if (!online_name.empty())
+            new_kart->setOnScreenText(online_name.c_str());
         m_num_players++;
         break;
     }
@@ -564,7 +569,7 @@ void World::terminateRace()
     // to show it in the GUI
     int best_highscore_rank = -1;
     std::string highscore_who = "";
-    if (!this->isNetworkWorld())
+    if (!isNetworkWorld())
     {
         updateHighscores(&best_highscore_rank);
     }
@@ -656,6 +661,8 @@ void World::terminateRace()
         results->clearHighscores();
     }
 
+    // In case someone opened paused race dialog in network game
+    GUIEngine::ModalDialog::dismiss();
     results->push();
     WorldStatus::terminateRace();
 }   // terminateRace
@@ -1081,7 +1088,7 @@ void World::updateTrack(int ticks)
 // ----------------------------------------------------------------------------
 Highscores* World::getHighscores() const
 {
-    if(!m_use_highscores) return NULL;
+    if (isNetworkWorld() || !m_use_highscores) return NULL;
 
     const Highscores::HighscoreType type = "HST_" + getIdent();
 
@@ -1210,6 +1217,7 @@ AbstractKart *World::getLocalPlayerKart(unsigned int n) const
 /** Remove (eliminate) a kart from the race */
 void World::eliminateKart(int kart_id, bool notify_of_elimination)
 {
+    assert(kart_id < (int)m_karts.size());
     AbstractKart *kart = m_karts[kart_id];
     if (kart->isGhostKart()) return;
 
@@ -1226,7 +1234,7 @@ void World::eliminateKart(int kart_id, bool notify_of_elimination)
             {
                 // Store the temporary string because clang would mess this up
                 // (remove the stringw before the wchar_t* is used).
-                const core::stringw &kart_name = kart->getName();
+                const core::stringw &kart_name = kart->getController()->getName();
                 m_race_gui->addMessage(_("'%s' has been eliminated.",
                                        kart_name),
                                        camera->getKart(),
@@ -1306,7 +1314,9 @@ void World::unpause()
 //-----------------------------------------------------------------------------
 void World::escapePressed()
 {
-    new RacePausedDialog(0.8f, 0.6f);
+    if (!(NetworkConfig::get()->isNetworking() &&
+        getPhase() < MUSIC_PHASE))
+        new RacePausedDialog(0.8f, 0.6f);
 }   // escapePressed
 
 // ----------------------------------------------------------------------------

@@ -34,6 +34,11 @@ namespace Online
     class XMLRequest;
 }
 
+namespace GUIEngine
+{
+    class Screen;
+}
+
 class InputDevice;
 class PlayerProfile;
 
@@ -86,6 +91,8 @@ private:
     /** If this is a server, the server name. */
     irr::core::stringw m_server_name;
 
+    unsigned m_server_mode;
+
     /** Used by wan server. */
     uint32_t m_cur_user_id;
     std::string m_cur_user_token;
@@ -95,6 +102,8 @@ private:
 
     std::vector<std::tuple<InputDevice*, PlayerProfile*,
         /*is_handicap*/bool> > m_network_players;
+
+    core::stringw m_motd;
 
     NetworkConfig();
 
@@ -249,13 +258,9 @@ public:
      *  requested. */
     bool isAutoConnect() const { return m_auto_connect; }
     // ------------------------------------------------------------------------
-    /** Returns the game mode id for server database. */
-    unsigned getServerGameMode(RaceManager::MinorRaceModeType mode,
-                               RaceManager::MajorRaceModeType);
-    // ------------------------------------------------------------------------
     /** Returns the minor and majar game mode from server database id. */
     std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
-        getLocalGameMode(unsigned);
+        getLocalGameMode();
     // ------------------------------------------------------------------------
     void setCurrentUserId(uint32_t id) { m_cur_user_id = id ; }
     // ------------------------------------------------------------------------
@@ -270,6 +275,21 @@ public:
     void setServerIdFile(const std::string& id) { m_server_id_file = id; }
     // ------------------------------------------------------------------------
     const std::string& getServerIdFile() const { return m_server_id_file; }
+    // ------------------------------------------------------------------------
+    void setMOTD(const core::stringw& motd) { m_motd = motd; }
+    // ------------------------------------------------------------------------
+    const core::stringw& getMOTD() const { return m_motd; }
+    // ------------------------------------------------------------------------
+    void setServerMode(RaceManager::MinorRaceModeType mode,
+                       RaceManager::MajorRaceModeType);
+    // ------------------------------------------------------------------------
+    void setServerMode(unsigned mode) { m_server_mode = mode; }
+    // ------------------------------------------------------------------------
+    unsigned getServerMode() const { return m_server_mode; }
+    // ------------------------------------------------------------------------
+    core::stringw getModeName(unsigned id);
+    // ------------------------------------------------------------------------
+    std::vector<GUIEngine::Screen*> getResetScreens(bool lobby = false) const;
 
 };   // class NetworkConfig
 

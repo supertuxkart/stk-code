@@ -4,7 +4,6 @@
 #include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
-#include "network/protocol_manager.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/rewind_manager.hpp"
 #include "utils/profiler.hpp"
@@ -26,18 +25,13 @@ RaceEventManager::~RaceEventManager()
  */
 void RaceEventManager::update(int ticks)
 {
-    // Replay all recorded events up to the current time (only if the
-    // timer isn't stopped, otherwise a potential rewind will trigger
-    // an infinite loop since world time does not increase)
-    if (World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE)
-    {
-        // This might adjust dt - if a new state is being played, the dt is
-        // determined from the last state till 'now'
-        PROFILER_PUSH_CPU_MARKER("RaceEvent:play event", 100, 100, 100);
-        RewindManager::get()->playEventsTill(World::getWorld()->getTimeTicks(),
-                                             &ticks);
-        PROFILER_POP_CPU_MARKER();
-    }
+    // Replay all recorded events up to the current time
+    // This might adjust dt - if a new state is being played, the dt is
+    // determined from the last state till 'now'
+    PROFILER_PUSH_CPU_MARKER("RaceEvent:play event", 100, 100, 100);
+    RewindManager::get()->playEventsTill(World::getWorld()->getTimeTicks(),
+                                         &ticks);
+    PROFILER_POP_CPU_MARKER();
     World::getWorld()->updateWorld(ticks);
 
     // if the race is over
@@ -51,18 +45,6 @@ void RaceEventManager::update(int ticks)
 }   // update
 
 // ----------------------------------------------------------------------------
-void RaceEventManager::start()
-{
-    m_running = true;
-}   // start
-
-// ----------------------------------------------------------------------------
-void RaceEventManager::stop()
-{
-    m_running = false;
-}   // stop
-
-// ----------------------------------------------------------------------------
 bool RaceEventManager::isRaceOver()
 {
     if(!World::getWorld())
@@ -74,9 +56,8 @@ bool RaceEventManager::isRaceOver()
 // ----------------------------------------------------------------------------
 void RaceEventManager::kartFinishedRace(AbstractKart *kart, float time)
 {
-    auto protocol = std::static_pointer_cast<GameEventsProtocol>(
-        ProtocolManager::lock()->getProtocol(PROTOCOL_GAME_EVENTS));
-    protocol->kartFinishedRace(kart, time);
+    if (auto game_events_protocol = m_game_events_protocol.lock())
+        game_events_protocol->kartFinishedRace(kart, time);
 }   // kartFinishedRace
 
 // ----------------------------------------------------------------------------
@@ -89,9 +70,7 @@ void RaceEventManager::collectedItem(Item *item, AbstractKart *kart)
 {
     // this is only called in the server
     assert(NetworkConfig::get()->isServer());
-
-    auto protocol = std::static_pointer_cast<GameEventsProtocol>(
-        ProtocolManager::lock()->getProtocol(PROTOCOL_GAME_EVENTS));
-    protocol->collectedItem(item,kart);
+    if (auto game_events_protocol = m_game_events_protocol.lock())
+        game_events_protocol->collectedItem(item, kart);
 }   // collectedItem
 

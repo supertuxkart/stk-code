@@ -168,12 +168,17 @@ void ConnectToServer::asynchronousUpdate()
             }
             if (m_tried_connection++ > 7)
             {
-                Log::warn("ConnectToServer", "Timeout waiting for"
-                    " aloha, trying to connect anyway.");
-                m_state = CONNECTING;
-                // Reset timer for next usage
-                m_timer = 0.0;
-                m_tried_connection = 0;
+                if (NetworkConfig::get()->isWAN())
+                {
+                    Log::warn("ConnectToServer", "Timeout waiting for"
+                        " aloha, trying to connect anyway.");
+                    m_state = CONNECTING;
+                    // Reset timer for next usage
+                    m_timer = 0.0;
+                    m_tried_connection = 0;
+                }
+                else
+                    m_state = DONE;
                 return;
             }
             if ((!NetworkConfig::m_disable_lan &&
@@ -257,7 +262,9 @@ void ConnectToServer::update(int ticks)
     switch(m_state.load())
     {
         case REQUESTING_CONNECTION:
+        case CONNECTING:
         {
+            // Make sure lobby display the quick play server name
             assert(m_server);
             NetworkingLobby::getInstance()->setJoinedServer(m_server);
             break;
@@ -292,7 +299,7 @@ void ConnectToServer::update(int ticks)
 }   // update
 
 // ----------------------------------------------------------------------------
-bool ConnectToServer::handleDirectConnect()
+bool ConnectToServer::handleDirectConnect(int timeout)
 {
     // Direct connection to server should only possbile if public and private
     // ports of server are the same
@@ -308,10 +315,32 @@ bool ConnectToServer::handleDirectConnect()
             /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &ea,
             true/*change_port_if_bound*/);
         assert(dc);
+        if (m_server_address.getPort() == 0)
+        {
+            // Get the server port of server from (common) server discovery port
+            Log::info("ConnectToServer", "Detect port for server address.");
+            BareNetworkString s(std::string("stk-server-port"));
+            TransportAddress address(m_server_address.getIP(),
+                NetworkConfig::get()->getServerDiscoveryPort());
+            dc->sendRawPacket(s, address);
+            TransportAddress sender;
+            const int LEN = 2048;
+            char buffer[LEN];
+            int len = dc->receiveRawPacket(buffer, LEN, &sender, 2000);
+            if (len != 2)
+            {
+                Log::error("ConnectToServer", "Invalid port number");
+                delete dc;
+                return false;
+            }
+            BareNetworkString server_port(buffer, len);
+            uint16_t port = server_port.getUInt16();
+            m_server_address.setPort(port);
+        }
         ENetPeer* p = dc->connectTo(m_server_address);
         if (p)
         {
-            while (enet_host_service(dc->getENetHost(), &event, 2000) != 0)
+            while (enet_host_service(dc->getENetHost(), &event, timeout) != 0)
             {
                 if (event.type == ENET_EVENT_TYPE_CONNECT)
                 {
