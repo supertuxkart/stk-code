@@ -141,6 +141,19 @@ void TrackObjectManager::handleExplosion(const Vec3 &pos, const PhysicalObject *
 /** Updates all track objects.
  *  \param dt Time step size.
  */
+void TrackObjectManager::updateGraphics(float dt)
+{
+    TrackObject* curr;
+    for_in(curr, m_all_objects)
+    {
+        curr->updateGraphics(dt);
+    }
+}   // updateGraphics
+
+// ----------------------------------------------------------------------------
+/** Updates all track objects.
+ *  \param dt Time step size.
+ */
 void TrackObjectManager::update(float dt)
 {
     TrackObject* curr;

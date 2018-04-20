@@ -245,14 +245,22 @@ void GameProtocol::handleAdjustTime(Event *event)
 // ----------------------------------------------------------------------------
 /** Called by the server before assembling a new message containing the full
  *  state of the race to be sent to a client.
+ * \param local_save If set it allows a state to be saved on a client.
+ *        This only happens at the very first time step to ensure each client
+ *        has a state in case it receives an event before a server state.
  */
-void GameProtocol::startNewState()
+void GameProtocol::startNewState(bool local_save)
 {
-    assert(NetworkConfig::get()->isServer());
+    assert(local_save || NetworkConfig::get()->isServer());
+
     m_data_to_send->clear();
-    m_data_to_send->addUInt8(GP_STATE).addUInt32(World::getWorld()->getTimeTicks());
-    Log::info("GameProtocol", "Sending new state at %d.",
-              World::getWorld()->getTimeTicks());
+    // Local saves don't neet this info, they pass time directly to the
+    // RewindInfo in RewindManager::saveLocalState.
+    if (!local_save)
+    {
+        m_data_to_send->addUInt8(GP_STATE)
+                       .addUInt32(World::getWorld()->getTimeTicks());
+    }
 }   // startNewState
 
 // ----------------------------------------------------------------------------
@@ -262,7 +270,6 @@ void GameProtocol::startNewState()
  */
 void GameProtocol::addState(BareNetworkString *buffer)
 {
-    assert(NetworkConfig::get()->isServer());
     m_data_to_send->addUInt16(buffer->size());
     (*m_data_to_send) += *buffer;
 }   // addState
@@ -273,6 +280,8 @@ void GameProtocol::addState(BareNetworkString *buffer)
  */
 void GameProtocol::sendState()
 {
+    Log::info("GameProtocol", "Sending new state at %d.",
+        World::getWorld()->getTimeTicks());
     assert(NetworkConfig::get()->isServer());
     sendMessageToPeersChangingToken(m_data_to_send, /*reliable*/true);
 }   // sendState
@@ -287,20 +296,19 @@ void GameProtocol::handleState(Event *event)
         return;
 
     assert(NetworkConfig::get()->isClient());
-    NetworkString &data = event->data();
-    int ticks           = data.getUInt32();
+    const NetworkString &data = event->data();
+    int ticks          = data.getUInt32();
+    // Now copy the state data (without ticks etc) to a new
+    // string, so it can be reset to the beginning easily
+    // when restoring the state:
+    BareNetworkString *bns = new BareNetworkString(data.getCurrentData(),
+                                                   data.size());
+
+    // The memory for bns will be handled in the RewindInfoState object
+    RewindManager::get()->addNetworkState(bns, ticks);
+
     Log::info("GameProtocol", "Received at %d state from %d",
               World::getWorld()->getTimeTicks(), ticks);
-    int index           = 0;
-    while (data.size() > 0)
-    {
-        uint16_t count = data.getUInt16();
-        BareNetworkString *state = new BareNetworkString(data.getCurrentData(),
-                                                         count);
-        data.skip(count);
-        RewindManager::get()->addNetworkState(index, state, ticks);
-        index++;
-    }   // while data.size()>0
 }   // handleState
 
 // ----------------------------------------------------------------------------

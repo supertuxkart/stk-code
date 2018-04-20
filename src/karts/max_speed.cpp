@@ -397,6 +397,7 @@ void MaxSpeed::rewindTo(BareNetworkString *buffer)
     {
         m_speed_increase[i].rewindTo(buffer, (active_speedups & b) == b);
     }
-
+    // Make sure to update the physics
+    update(0);
 }   // rewindoTo
 

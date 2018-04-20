@@ -65,6 +65,9 @@ protected:
     btRigidBody           *m_body;
     KartMotionState       *m_motion_state;
 
+    virtual void  updateGraphics(float dt, const Vec3& off_xyz,
+                                 const btQuaternion& off_rotation);
+
 public:
                   Moveable();
     virtual      ~Moveable();
@@ -116,8 +119,6 @@ public:
             m_motion_state->setWorldTransform(m_transform);
     }   // setRotation(btQuaternion)
     // ------------------------------------------------------------------------
-    virtual void  updateGraphics(int ticks, const Vec3& off_xyz,
-                                 const btQuaternion& off_rotation);
     virtual void  reset();
     virtual void  update(int ticks) ;
     btRigidBody  *getBody() const {return m_body; }
@@ -130,6 +131,12 @@ public:
     void          updatePosition();
     void          addError(const Vec3& pos_error,
                            const btQuaternion &rot_error);
+    // ------------------------------------------------------------------------
+    /** Called once per rendered frame. It is used to only update any graphical
+     *  effects.
+     *  \param dt Time step size (since last call).
+     */
+    virtual void  updateGraphics(float dt) = 0;
 };   // class Moveable
 
 #endif

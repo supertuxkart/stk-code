@@ -55,7 +55,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if this is the last substep. Used to reduce the amount
      *  of updates (e.g. to sfx position) to once per rendered frame. */
-    bool isLstSubstep() const { return m_is_last_substep; }
+    bool isLastSubstep() const { return m_is_last_substep; }
 };   // MainLoop
 
 extern MainLoop* main_loop;

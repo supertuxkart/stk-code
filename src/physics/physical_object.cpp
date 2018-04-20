@@ -163,6 +163,10 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_reset_height       = settings.m_reset_height;
     m_on_kart_collision  = settings.m_on_kart_collision;
     m_on_item_collision  = settings.m_on_item_collision;
+    m_current_transform.setOrigin(Vec3());
+    m_current_transform.setRotation(
+        btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
+
     m_body_added = false;
 
     m_init_pos.setIdentity();
@@ -596,31 +600,48 @@ void PhysicalObject::init(const PhysicalObject::Settings& settings)
 }   // init
 
 // ----------------------------------------------------------------------------
+/** This updates all only graphical elements. It is only called once per
+ *  rendered frame, not once per time step.
+ *  float dt Time since last rame.
+ */
+
+void PhysicalObject::updateGraphics(float dt)
+{
+    if (!m_is_dynamic)
+        return;
+    Vec3 xyz = m_current_transform.getOrigin();
+
+    // Offset the graphical position correctly:
+    xyz += m_current_transform.getBasis()*m_graphical_offset;
+
+    Vec3 hpr;
+    hpr.setHPR(m_current_transform.getRotation());
+
+    // This will only update the visual position, so it can be
+    // called in updateGraphics()
+    m_object->move(xyz.toIrrVector(), hpr.toIrrVector()*RAD_TO_DEGREE,
+                   m_init_scale, /*updateRigidBody*/false, 
+                   /* isAbsoluteCoord */true);
+}   // updateGraphics
+
+// ----------------------------------------------------------------------------
+/** Update, called once per physics time step.
+ *  \param dt Timestep.
+ */
 void PhysicalObject::update(float dt)
 {
     if (!m_is_dynamic) return;
 
-    btTransform t;
-    m_motion_state->getWorldTransform(t);
+    m_motion_state->getWorldTransform(m_current_transform);
 
-    Vec3 xyz = t.getOrigin();
+    const Vec3 &xyz = m_current_transform.getOrigin();
     if(m_reset_when_too_low && xyz.getY()<m_reset_height)
     {
         m_body->setCenterOfMassTransform(m_init_pos);
         m_body->setLinearVelocity (btVector3(0,0,0));
         m_body->setAngularVelocity(btVector3(0,0,0));
-        xyz = Vec3(m_init_pos.getOrigin());
     }
-    // Offset the graphical position correctly:
-    xyz += t.getBasis()*m_graphical_offset;
 
-    //m_node->setPosition(xyz.toIrrVector());
-    Vec3 hpr;
-    hpr.setHPR(t.getRotation());
-    //m_node->setRotation(hpr.toIrrHPR());
-
-    m_object->move(xyz.toIrrVector(), hpr.toIrrVector()*RAD_TO_DEGREE,
-                   m_init_scale, false, true /* isAbsoluteCoord */);
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -673,9 +694,8 @@ void PhysicalObject::handleExplosion(const Vec3& pos, bool direct_hit)
     }
     else  // only affected by a distant explosion
     {
-        btTransform t;
-        m_motion_state->getWorldTransform(t);
-        btVector3 diff=t.getOrigin()-pos;
+
+        btVector3 diff=m_current_transform.getOrigin()-pos;
 
         float len2=diff.length2();
 

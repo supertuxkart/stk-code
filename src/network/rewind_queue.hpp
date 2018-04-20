@@ -53,7 +53,12 @@ private:
     /** Iterator to the curren time step info to be handled. */
     AllRewindInfo::iterator m_current;
 
+    /** Time at which the latest confirmed state is at. */
+    int m_latest_confirmed_state_time;
+
+
     void insertRewindInfo(RewindInfo *ri);
+    void cleanupOldRewindInfo(int ticks);
 
 public:
         static void unitTesting();
@@ -63,12 +68,10 @@ public:
     void reset();
     void addLocalEvent(EventRewinder *event_rewinder, BareNetworkString *buffer,
                        bool confirmed, int ticks);
-    void addLocalState(Rewinder *rewinder, BareNetworkString *buffer,
-                       bool confirmed, int ticks);
+    void addLocalState(BareNetworkString *buffer, bool confirmed, int ticks);
     void addNetworkEvent(EventRewinder *event_rewinder,
                          BareNetworkString *buffer, int ticks);
-    void addNetworkState(Rewinder *rewinder, BareNetworkString *buffer,
-                         int ticks);
+    void addNetworkState(BareNetworkString *buffer, int ticks);
     void mergeNetworkData(int world_ticks,  bool *needs_rewind, 
                           int *rewind_ticks);
     void replayAllEvents(int ticks);

@@ -48,7 +48,7 @@ Startup: time(std::vector<float>/floatVector), boost(std::vector<float>/floatVec
 Rescue: duration, vertOffset, height
 Explosion: duration, radius, invulnerabilityTime
 Nitro: duration, engineForce, consumption, smallContainer, bigContainer, maxSpeedIncrease, fadeOutTime, max
-Slipstream: duration, length, width, collectTime, useTime, addPower, minSpeed, maxSpeedIncrease, fadeOutTime
+Slipstream: durationFactor, baseSpeed, length, width, innerFactor, minCollectTime, maxCollectTime, addPower, minSpeed, maxSpeedIncrease, fadeOutTime
 Skid: increase, decrease, max, timeTillMax, visual, visualTime, revertVisualTime, minSpeed, timeTillBonus(std::vector<float>/floatVector), bonusSpeed(std::vector<float>/floatVector), bonusTime(std::vector<float>/floatVector), bonusForce(std::vector<float>/floatVector), physicalJumpTime, graphicalJumpTime, postSkidRotateFactor, reduceTurnMin, reduceTurnMax, enabled(bool)"""
 
 """ A GroupMember is an attribute of a group.
@@ -283,4 +283,3 @@ Operations:""")
 
 if __name__ == '__main__':
     main()
-

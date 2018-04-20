@@ -71,7 +71,6 @@ void LobbyProtocol::loadWorld()
     StateManager::ActivePlayer *ap = race_manager->getNumLocalPlayers()>1
                                    ? NULL
                                    : StateManager::get()->getActivePlayer(0);
-
     input_manager->getDeviceManager()->setSinglePlayer(ap);
 
     // Load the actual world.

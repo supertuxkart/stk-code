@@ -470,6 +470,11 @@ namespace UserConfigParams
             PARAM_DEFAULT( BoolUserConfigParam(false, "screen_keyboard",
             &m_multitouch_group,
             "Enable screen keyboard.") );
+            
+    PARAM_PREFIX BoolUserConfigParam         m_hidpi_enabled
+            PARAM_DEFAULT( BoolUserConfigParam(false, "hidpi_enabled",
+            &m_multitouch_group,
+            "Enable high-DPI support.") );
 
     // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order

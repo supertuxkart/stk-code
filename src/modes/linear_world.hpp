@@ -121,6 +121,8 @@ public:
     virtual void  update(int ticks) OVERRIDE;
     virtual void  updateGraphics(float dt) OVERRIDE;
     float         getDistanceDownTrackForKart(const int kart_id) const;
+    float         getDistanceDownTrackForKart(const int kart_id,
+                                            bool account_for_checklines) const;
     float         getDistanceToCenterForKart(const int kart_id) const;
     float         getEstimatedFinishTime(const int kart_id) const;
     int           getLapForKart(const int kart_id) const;

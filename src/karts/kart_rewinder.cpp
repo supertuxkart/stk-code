@@ -81,7 +81,7 @@ void KartRewinder::computeError()
  */
 BareNetworkString* KartRewinder::saveState() const
 {
-    const int MEMSIZE = 13*sizeof(float) + 9+3;
+    const int MEMSIZE = 17*sizeof(float) + 9+3;
 
     BareNetworkString *buffer = new BareNetworkString(MEMSIZE);
     const btRigidBody *body = getBody();
@@ -96,6 +96,8 @@ BareNetworkString* KartRewinder::saveState() const
     buffer->add(body->getAngularVelocity());
     buffer->addUInt8(m_has_started);   // necessary for startup speed boost
     buffer->addFloat(m_vehicle->getMinSpeed());
+    buffer->addFloat(m_vehicle->getTimedRotationTime());
+    buffer->add(m_vehicle->getTimedRotation());
 
     // 2) Steering and other player controls
     // -------------------------------------
@@ -125,8 +127,6 @@ BareNetworkString* KartRewinder::saveState() const
 /** Actually rewind to the specified state. */
 void KartRewinder::rewindToState(BareNetworkString *buffer)
 {
-    buffer->reset();   // make sure the buffer is read from the beginning
-
     // 1) Physics values: transform and velocities
     // -------------------------------------------
     btTransform t;
@@ -134,16 +134,8 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
     t.setRotation(buffer->getQuat());
     btRigidBody *body = getBody();
     body->setLinearVelocity(buffer->getVec3());
-    Log::info("KartRewinder", "t %f xyz %f %f %f v %f %f %f",
-        World::getWorld()->getTime(),
-        t.getOrigin().getX(),
-        t.getOrigin().getY(),
-        t.getOrigin().getZ(),
-        body->getLinearVelocity().getX(),
-        body->getLinearVelocity().getY(),
-        body->getLinearVelocity().getZ());
-
     body->setAngularVelocity(buffer->getVec3());
+
     // This function also reads the velocity, so it must be called
     // after the velocities are set
     body->proceedToTransform(t);
@@ -152,6 +144,9 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
     setTrans(t);
     m_has_started = buffer->getUInt8()!=0;   // necessary for startup speed boost
     m_vehicle->setMinSpeed(buffer->getFloat());
+    float time_rot = buffer->getFloat();
+    // Set timed rotation divides by time_rot
+    m_vehicle->setTimedRotation(time_rot, time_rot*buffer->getVec3());
 
     // 2) Steering and other controls
     // ------------------------------

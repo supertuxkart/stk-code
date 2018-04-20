@@ -23,32 +23,32 @@ export ARCH_ARMV7=arm
 export HOST_ARMV7=arm-linux-androideabi
 export NDK_PLATFORM_ARMV7=android-19
 export MIN_SDK_VERSION_ARMV7=19
-export TARGET_SDK_VERSION_ARMV7=21
-export COMPILE_SDK_VERSION_ARMV7=21
+export TARGET_SDK_VERSION_ARMV7=26
+export COMPILE_SDK_VERSION_ARMV7=26
 
 export NDK_ABI_AARCH64=arm64-v8a
 export ARCH_AARCH64=arm64
 export HOST_AARCH64=aarch64-linux-android
 export NDK_PLATFORM_AARCH64=android-21
 export MIN_SDK_VERSION_AARCH64=21
-export TARGET_SDK_VERSION_AARCH64=21
-export COMPILE_SDK_VERSION_AARCH64=21
+export TARGET_SDK_VERSION_AARCH64=26
+export COMPILE_SDK_VERSION_AARCH64=26
 
 export NDK_ABI_X86=x86
 export ARCH_X86=x86
 export HOST_X86=i686-linux-android
 export NDK_PLATFORM_X86=android-19
 export MIN_SDK_VERSION_X86=19
-export TARGET_SDK_VERSION_X86=21
-export COMPILE_SDK_VERSION_X86=21
+export TARGET_SDK_VERSION_X86=26
+export COMPILE_SDK_VERSION_X86=26
 
 export NDK_ABI_X86_64=x86_64
 export ARCH_X86_64=x86_64
 export HOST_X86_64=x86_64-linux-android
 export NDK_PLATFORM_X86_64=android-21
 export MIN_SDK_VERSION_X86_64=21
-export TARGET_SDK_VERSION_X86_64=21
-export COMPILE_SDK_VERSION_X86_64=21
+export TARGET_SDK_VERSION_X86_64=26
+export COMPILE_SDK_VERSION_X86_64=26
 
 export APP_NAME_RELEASE="SuperTuxKart"
 export PACKAGE_NAME_RELEASE="org.supertuxkart.stk"
@@ -231,6 +231,47 @@ if [ -z "$BUILD_TOOLS_VER" ] || [ ! -d "$SDK_PATH/build-tools/$BUILD_TOOLS_VER" 
     echo "Error: Couldn't detect build-tools version."
     exit
 fi
+
+# Set project version and code
+if [ -f "$DIRNAME/obj/project_version" ]; then
+    PROJECT_VERSION_PREV=$(cat "$DIRNAME/obj/project_version") 
+    
+    if [ -z "$PROJECT_VERSION" ]; then
+        PROJECT_VERSION="$PROJECT_VERSION_PREV"
+    elif [ "$PROJECT_VERSION" != "$PROJECT_VERSION_PREV" ]; then
+        echo "Different project version has been set. Forcing recompilation..."
+        touch -c "$DIRNAME/Android.mk"
+    fi
+fi
+
+if [ -z "$PROJECT_VERSION" ]; then
+    if [ $IS_DEBUG_BUILD -ne 0 ]; then
+        PROJECT_VERSION="git"
+    else
+        echo "Error: Variable PROJECT_VERSION is not set. It must have unique" \
+             "value for release build."
+        exit
+    fi
+fi
+
+if [ -z "$PROJECT_CODE" ]; then
+    if [ $IS_DEBUG_BUILD -ne 0 ]; then
+        PROJECT_CODE="1"
+    else
+        echo "Error: Variable PROJECT_CODE is not set."
+        exit
+    fi
+fi
+
+if [ -d "$DIRNAME/assets/data" ]; then
+    if [ ! -f "$DIRNAME/assets/data/supertuxkart.$PROJECT_VERSION" ]; then
+        echo "Error: supertuxkart.$PROJECT_VERSION doesn't exist in" \
+             "assets/data directory."
+        exit
+    fi
+fi
+
+echo "$PROJECT_VERSION" > "$DIRNAME/obj/project_version"
 
 
 # Standalone toolchain
@@ -423,6 +464,12 @@ sed -i "s/targetSdkVersion=\".*\"/targetSdkVersion=\"$TARGET_SDK_VERSION\"/g" \
        "$DIRNAME/AndroidManifest.xml"
        
 sed -i "s/package=\".*\"/package=\"$PACKAGE_NAME\"/g" \
+       "$DIRNAME/AndroidManifest.xml"
+       
+sed -i "s/versionName=\".*\"/versionName=\"$PROJECT_VERSION\"/g" \
+       "$DIRNAME/AndroidManifest.xml"
+       
+sed -i "s/versionCode=\".*\"/versionCode=\"$PROJECT_CODE\"/g" \
        "$DIRNAME/AndroidManifest.xml"
        
 cp "banner.png" "$DIRNAME/res/drawable/banner.png"

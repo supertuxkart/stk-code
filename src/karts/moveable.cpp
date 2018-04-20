@@ -88,7 +88,7 @@ void Moveable::addError(const Vec3& pos_error,
  *  \param offset_xyz Offset to be added to the position.
  *  \param rotation Additional rotation.
  */
-void Moveable::updateGraphics(int ticks, const Vec3& offset_xyz,
+void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
                               const btQuaternion& rotation)
 {
     // If this is a client, don't smooth error during rewinds
@@ -173,8 +173,6 @@ void Moveable::update(int ticks)
         m_motion_state->getWorldTransform(m_transform);
     m_velocityLC = getVelocity()*m_transform.getBasis();
     updatePosition();
-
-    updateGraphics(ticks, Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
 }   // update
 
 //-----------------------------------------------------------------------------

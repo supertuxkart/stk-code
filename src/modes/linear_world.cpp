@@ -107,7 +107,7 @@ void LinearWorld::reset()
     for(unsigned int i=0; i<kart_amount; i++)
     {
         m_distance_increase = std::min(m_distance_increase,
-                                       getDistanceDownTrackForKart(i));
+                                       getDistanceDownTrackForKart(i, false));
     }
     // Track length - minimum distance is how much the track length must
     // be increased to avoid negative values in estimateFinishTimeForKart
@@ -182,7 +182,7 @@ void LinearWorld::update(int ticks)
         getTrackSector(n)->update(kart->getFrontXYZ());
         kart_info.m_overall_distance = kart_info.m_finished_laps
                                      * Track::getCurrentTrack()->getTrackLength()
-                        + getDistanceDownTrackForKart(kart->getWorldKartId());
+                        + getDistanceDownTrackForKart(kart->getWorldKartId(), true);
     }   // for n
 
     // Update all positions. This must be done after _all_ karts have
@@ -198,13 +198,10 @@ void LinearWorld::update(int ticks)
         if (m_karts[i]->hasFinishedRace() ||
             m_karts[i]->isEliminated()       ) continue;
 
-        // During the last lap update the estimated finish time.
-        // This is used to play the faster music, and by the AI
-        if (m_kart_info[i].m_finished_laps == race_manager->getNumLaps()-1)
-        {
-            m_kart_info[i].m_estimated_finish =
+        // Update the estimated finish time.
+        // This is used by the AI
+        m_kart_info[i].m_estimated_finish =
                 estimateFinishTimeForKart(m_karts[i]);
-        }
     }
 
 #ifdef DEBUG
@@ -222,7 +219,7 @@ void LinearWorld::update(int ticks)
                     j, m_karts[j]->getPosition(),
                     m_karts[j]->hasFinishedRace(),
                     m_kart_info[j].m_finished_laps,
-                    getDistanceDownTrackForKart(m_karts[j]->getWorldKartId()),
+                    getDistanceDownTrackForKart(m_karts[j]->getWorldKartId(), true),
                     m_kart_info[j].m_overall_distance,
                     (m_karts[j]->getPosition() == m_karts[i]->getPosition()
                      ? "<--- !!!" : "")                                      );
@@ -240,6 +237,7 @@ void LinearWorld::update(int ticks)
 */
 void LinearWorld::updateGraphics(float dt)
 {
+    WorldWithRank::updateGraphics(dt);
     if (m_last_lap_sfx_playing &&
         m_last_lap_sfx->getStatus() != SFXBase::SFX_PLAYING)
     {
@@ -299,7 +297,7 @@ void LinearWorld::newLap(unsigned int kart_index)
         m_kart_info[kart_index].m_overall_distance =
               m_kart_info[kart_index].m_finished_laps 
             * Track::getCurrentTrack()->getTrackLength()
-            + getDistanceDownTrackForKart(kart->getWorldKartId());
+            + getDistanceDownTrackForKart(kart->getWorldKartId(), true);
     }
     // Last lap message (kart_index's assert in previous block already)
     if (raceHasLaps() && kart_info.m_finished_laps+1 == lap_count)
@@ -408,9 +406,9 @@ void LinearWorld::newLap(unsigned int kart_index)
  *  crossing the start line..
  *  \param kart_id Index of the kart.
  */
-float LinearWorld::getDistanceDownTrackForKart(const int kart_id) const
+float LinearWorld::getDistanceDownTrackForKart(const int kart_id, bool account_for_checklines) const
 {
-    return getTrackSector(kart_id)->getDistanceFromStart();
+    return getTrackSector(kart_id)->getDistanceFromStart(account_for_checklines);
 }   // getDistanceDownTrackForKart
 
 //-----------------------------------------------------------------------------
@@ -431,13 +429,12 @@ int LinearWorld::getLapForKart(const int kart_id) const
 }   // getLapForKart
 
 //-----------------------------------------------------------------------------
-/** Returns the estimated finishing time. Only valid during the last lap!
+/** Returns the estimated finishing time.
  *  \param kart_id Id of the kart.
  */
 float LinearWorld::getEstimatedFinishTime(const int kart_id) const
 {
     assert(kart_id < (int)m_kart_info.size());
-    assert(m_kart_info[kart_id].m_finished_laps == race_manager->getNumLaps()-1);
     return m_kart_info[kart_id].m_estimated_finish;
 }   // getEstimatedFinishTime
 

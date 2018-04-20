@@ -144,9 +144,11 @@ public:
                   bool confirmed, int ticks = -1);
     void addNetworkEvent(EventRewinder *event_rewinder,
                          BareNetworkString *buffer, int ticks);
-    void addNetworkState(int rewinder_index, BareNetworkString *buffer,
-                         int ticks);
+    void addNetworkState(BareNetworkString *buffer, int ticks);
     void addNextTimeStep(int ticks, float dt);
+    void saveState(bool local_save);
+    void saveLocalState();
+    void restoreState(BareNetworkString *buffer);
     // ------------------------------------------------------------------------
     /** Adds a Rewinder to the list of all rewinders.
      *  \return true If rewinding is enabled, false otherwise. 

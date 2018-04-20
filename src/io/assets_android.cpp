@@ -58,13 +58,13 @@ void AssetsAndroid::init()
 
     if (getenv("SUPERTUXKART_DATADIR"))
         paths.push_back(getenv("SUPERTUXKART_DATADIR"));
-
+        
     if (getenv("EXTERNAL_STORAGE"))
         paths.push_back(getenv("EXTERNAL_STORAGE"));
 
     if (getenv("SECONDARY_STORAGE"))
         paths.push_back(getenv("SECONDARY_STORAGE"));
-
+        
     if (global_android_app->activity->externalDataPath)
         paths.push_back(global_android_app->activity->externalDataPath);
 
@@ -88,6 +88,12 @@ void AssetsAndroid::init()
     for (std::string path : paths)
     {
         Log::info("AssetsAndroid", "Check data files in: %s", path.c_str());
+        
+        if (!isWritable(path))
+        {
+            Log::info("AssetsAndroid", "Path doesn't have write access.");
+            continue;
+        }
 
         if (m_file_manager->fileExists(path + "/" + app_dir_name + "/data/" + version))
         {
@@ -113,6 +119,12 @@ void AssetsAndroid::init()
         {
             Log::info("AssetsAndroid", "Check data files for different STK "
                                        "version in: %s", path.c_str());
+                                       
+            if (!isWritable(path))
+            {
+                Log::info("AssetsAndroid", "Path doesn't have write access.");
+                continue;
+            }
     
             if (m_file_manager->fileExists(path + "/" + app_dir_name + "/.extracted"))
             {
@@ -499,6 +511,20 @@ void AssetsAndroid::touchFile(std::string path)
 }
 
 //-----------------------------------------------------------------------------
+/** Checks if there is write access for selected path
+ *  \param path A path that should be checked
+ *  \return True if there is write access
+ */
+bool AssetsAndroid::isWritable(std::string path)
+{
+#ifdef ANDROID
+    return access(path.c_str(), R_OK) == 0 && access(path.c_str(), W_OK) == 0;
+#endif
+
+    return false;
+}
+
+//-----------------------------------------------------------------------------
 /** Determines best path for extracting assets, depending on available disk
  *  space.
  *  \param paths A list of paths that should be checked
@@ -518,6 +544,9 @@ std::string AssetsAndroid::getPreferredPath(const std::vector<std::string>&
         // access to these directories and i.e. can't manually delete the files
         // to clean up device
         if (path.find("/data") == 0)
+            continue;
+            
+        if (!isWritable(path))
             continue;
 
         struct statfs stat;

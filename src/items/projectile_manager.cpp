@@ -62,6 +62,21 @@ void ProjectileManager::cleanup()
 }   // cleanup
 
 // -----------------------------------------------------------------------------
+/** Called once per rendered frame. It is used to only update any graphical
+ *  effects, and calls updateGraphics in any flyable objects.
+ *  \param dt Time step size (since last call).
+ */
+void ProjectileManager::updateGraphics(float dt)
+{
+    for (auto p  = m_active_projectiles.begin(); 
+              p != m_active_projectiles.end();   ++p)
+    {
+        (*p)->updateGraphics(dt);
+    }
+
+}   // updateGraphics
+
+// -----------------------------------------------------------------------------
 /** General projectile update call. */
 void ProjectileManager::update(int ticks)
 {
@@ -153,3 +168,32 @@ bool ProjectileManager::projectileIsClose(const AbstractKart * const kart,
     }
     return false;
 }   // projectileIsClose
+
+// -----------------------------------------------------------------------------
+/** Returns an int containing the numbers of a given flyable in a given radius
+ *  around the kart
+ *  \param kart The kart for which the test is done.
+ *  \param radius Distance within which the projectile must be.
+ *  \param type The type of projectile checked
+*/
+int ProjectileManager::getNearbyProjectileCount(const AbstractKart * const kart,
+                                         float radius, PowerupManager::PowerupType type)
+{
+    float r2 = radius*radius;
+    int projectileCount = 0;
+
+    for(Projectiles::iterator i  = m_active_projectiles.begin();
+                              i != m_active_projectiles.end();   i++)
+    {
+        if ((*i)->getType() == type)
+        {
+            float dist2 = (*i)->getXYZ().distance2(kart->getXYZ());
+            if(dist2<r2)
+            {
+
+                projectileCount++;
+            }
+        }
+    }
+    return projectileCount;
+}   // getNearbyProjectileCount

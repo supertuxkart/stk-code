@@ -375,12 +375,12 @@ void ServerLobby::update(int ticks)
         STKHost::get()->getPeerCount() == 0 &&
         NetworkConfig::get()->getServerIdFile().empty())
     {
-        std::lock_guard<std::mutex> lock(m_connection_mutex);
         if (RaceEventManager::getInstance() &&
             RaceEventManager::getInstance()->isRunning())
         {
             stopCurrentRace();
         }
+        std::lock_guard<std::mutex> lock(m_connection_mutex);
         m_state = NetworkConfig::get()->isLAN() ?
             ACCEPTING_CLIENTS : REGISTER_SELF_ADDRESS;
         setup();

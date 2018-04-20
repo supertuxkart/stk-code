@@ -73,7 +73,7 @@ public:
     int   m_item_switch_ticks;          /**< Time items will be switched.       */
     int   m_bubblegum_counter;         /**< How many times bubble gums must be
                                             driven over before they disappear. */
-    bool  m_shield_restrict_weapos;    /**<Wether weapon usage is punished. */
+    bool  m_shield_restrict_weapons;   /**<Wether weapon usage is punished. */
     float m_explosion_impulse_objects; /**<Impulse of explosion on moving
                                             objects, e.g. road cones, ...      */
     int   m_penalty_ticks;              /**< Penalty time when starting too

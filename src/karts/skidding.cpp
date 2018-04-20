@@ -97,10 +97,11 @@ void Skidding::reset()
 void Skidding::saveState(BareNetworkString *buffer)
 {
     buffer->addUInt8(m_skid_state);
-    if(m_skid_state == SKID_NONE)
-        return;
+    buffer->addFloat(m_remaining_jump_time);
     buffer->addFloat(m_skid_time);
     buffer->addFloat(m_skid_factor);
+    if(m_skid_state == SKID_NONE)
+        return;
 }   // saveState
 
 // ----------------------------------------------------------------------------
@@ -110,9 +111,8 @@ void Skidding::saveState(BareNetworkString *buffer)
 void Skidding::rewindTo(BareNetworkString *buffer)
 {
     m_skid_state = (SkidState)buffer->getUInt8();
-    if(m_skid_state == SKID_NONE)
-        return;
-    m_skid_time =   buffer->getFloat();
+    m_remaining_jump_time = buffer->getFloat();
+    m_skid_time = buffer->getFloat();
     m_skid_factor = buffer->getFloat();
 }   // rewindTo
 

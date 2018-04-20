@@ -972,6 +972,18 @@ void World::updateGraphics(float dt)
         Weather::getInstance()->update(dt);
     }
     PROFILER_POP_CPU_MARKER();
+
+    // Update graphics of karts, e.g. visual suspension, skid marks
+    const int kart_amount = (int)m_karts.size();
+    for (int i = 0; i < kart_amount; ++i)
+    {
+        // Update all karts that are not eliminated
+        if (!m_karts[i]->isEliminated() )
+            m_karts[i]->updateGraphics(dt);
+    }
+
+    projectile_manager->updateGraphics(dt);
+    Track::getCurrentTrack()->updateGraphics(dt);
 }   // updateGraphics
 
 //-----------------------------------------------------------------------------

@@ -77,6 +77,7 @@ void RewindQueue::reset()
 
     m_all_rewind_info.clear();
     m_current = m_all_rewind_info.end();
+    m_latest_confirmed_state_time = -1;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -100,7 +101,7 @@ void RewindQueue::insertRewindInfo(RewindInfo *ri)
         // previous element, i.e. before the current element:
         if ((*i_prev)->getTicks() < ri->getTicks()) break;
         if ((*i_prev)->getTicks() == ri->getTicks() &&
-            (*i_prev)->isState() && ri->isEvent()      ) break;
+            ri->isEvent()                              ) break;
         i = i_prev;
     }
     if(m_current == m_all_rewind_info.end())
@@ -135,12 +136,16 @@ void RewindQueue::addLocalEvent(EventRewinder *event_rewinder,
  *         faster rewinds.
  *  \param ticks Time at which the event happened.
  */
-void RewindQueue::addLocalState(Rewinder *rewinder, BareNetworkString *buffer,
+void RewindQueue::addLocalState(BareNetworkString *buffer,
                                 bool confirmed, int ticks)
 {
-    RewindInfo *ri = new RewindInfoState(ticks, rewinder, buffer, confirmed);
+    RewindInfo *ri = new RewindInfoState(ticks, buffer, confirmed);
     assert(ri);
     insertRewindInfo(ri);
+    if (confirmed && m_latest_confirmed_state_time < ticks)
+    {
+        cleanupOldRewindInfo(ticks);
+    }
 }   // addLocalState
 
 // ----------------------------------------------------------------------------
@@ -170,11 +175,9 @@ void RewindQueue::addNetworkEvent(EventRewinder *event_rewinder,
  *  \param buffer Pointer to the event data.
  *  \param ticks Time at which the event happened.
  */
-void RewindQueue::addNetworkState(Rewinder *rewinder, BareNetworkString *buffer,
-                                  int ticks)
+void RewindQueue::addNetworkState(BareNetworkString *buffer, int ticks)
 {
-    RewindInfo *ri = new RewindInfoState(ticks, rewinder,
-                                         buffer, /*confirmed*/true);
+    RewindInfo *ri = new RewindInfoState(ticks, buffer, /*confirmed*/true);
 
     m_network_events.lock();
     m_network_events.getData().push_back(ri);
@@ -211,6 +214,7 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
 
     // FIXME: making m_network_events sorted would prevent the need to 
     // go through the whole list of events
+    int latest_confirmed_state = -1;
     AllNetworkRewindInfo::iterator i = m_network_events.getData().begin();
     while (i != m_network_events.getData().end())
     {
@@ -258,12 +262,40 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
                 *rewind_ticks = (*i)->getTicks();
         }   // if client and ticks < world_ticks
 
+        if ((*i)->isState() && (*i)->getTicks() > latest_confirmed_state &&
+            (*i)->isConfirmed())
+        {
+            latest_confirmed_state = (*i)->getTicks();
+        }
+
         i = m_network_events.getData().erase(i);
     }   // for i in m_network_events
 
     m_network_events.unlock();
 
+    if (latest_confirmed_state > m_latest_confirmed_state_time)
+    {
+        cleanupOldRewindInfo(latest_confirmed_state);
+    }
+
 }   // mergeNetworkData
+
+// ----------------------------------------------------------------------------
+/** Deletes all states and event before the given time.
+ *  \param ticks Time (in ticks).
+ */
+void RewindQueue::cleanupOldRewindInfo(int ticks)
+{
+    auto i = m_all_rewind_info.begin();
+
+    while ( (*i)->getTicks() < ticks)
+    {
+        if (m_current == i) next();
+        delete *i;
+        i = m_all_rewind_info.erase(i);
+    }
+
+}   // cleanupOldRewindInfo
 
 // ----------------------------------------------------------------------------
 bool RewindQueue::isEmpty() const
@@ -288,28 +320,19 @@ bool RewindQueue::hasMoreRewindInfo() const
  */
 int RewindQueue::undoUntil(int undo_ticks)
 {
-    // m_current points to the next not yet executed event (or state)
-    // or end() if nothing else is in the queue
-    if (m_current != m_all_rewind_info.begin())
-        m_current--;
-
-    do 
+    // A rewind is done after a state in the past is inserted. This function
+    // makes sure that m_current is not end()
+    assert(m_current != m_all_rewind_info.end());
+    
+    while((*m_current)->getTicks() > undo_ticks ||
+        (*m_current)->isEvent() || !(*m_current)->isConfirmed())
     {
         // Undo all events and states from the current time
         (*m_current)->undo();
-
-        if ( (*m_current)->getTicks() <= undo_ticks && 
-             (*m_current)->isState() && (*m_current)->isConfirmed() )
-        {
-            return (*m_current)->getTicks();
-        }
         m_current--;
-    } while (m_current != m_all_rewind_info.end());
+    }
 
-    // Shouldn't happen
-    Log::error("RewindManager", "No state for rewind to %d",
-               undo_ticks);
-    return -1;
+    return (*m_current)->getTicks();
 }   // undoUntil
 
 // ----------------------------------------------------------------------------
@@ -319,13 +342,11 @@ int RewindQueue::undoUntil(int undo_ticks)
 void RewindQueue::replayAllEvents(int ticks)
 {
     // Replay all events that happened at the current time step
-    while ( m_current != m_all_rewind_info.end() && 
-            (*m_current)->getTicks() == ticks        )
+    while ( hasMoreRewindInfo() && (*m_current)->getTicks() == ticks )
     {
         if ((*m_current)->isEvent())
             (*m_current)->rewind();
         m_current++;
-        if (!hasMoreRewindInfo()) break;
     }   // while current->getTIcks == ticks
 
 }   // replayAllEvents
@@ -367,7 +388,7 @@ void RewindQueue::unitTesting()
     assert(q0.isEmpty());
     assert(!q0.hasMoreRewindInfo());
 
-    q0.addLocalState(NULL, NULL, /*confirmed*/true, 0);
+    q0.addLocalState(NULL, /*confirmed*/true, 0);
     assert(q0.m_all_rewind_info.front()->isState());
     assert(!q0.m_all_rewind_info.front()->isEvent());
     assert(q0.hasMoreRewindInfo());
@@ -389,7 +410,7 @@ void RewindQueue::unitTesting()
     assert((*rii)->isEvent());
 
     // Another state must be sorted before the event:
-    q0.addNetworkState(dummy_rewinder, NULL, 0);
+    q0.addNetworkState(NULL, 0);
     assert(q0.hasMoreRewindInfo());
     q0.mergeNetworkData(world_ticks, &needs_rewind, &rewind_ticks);
     assert(q0.m_all_rewind_info.size() == 3);
@@ -414,7 +435,7 @@ void RewindQueue::unitTesting()
     // Now test inserting an event first, then the state
     RewindQueue q1;
     q1.addLocalEvent(NULL, NULL, true, 5);
-    q1.addLocalState(NULL, NULL, true, 5);
+    q1.addLocalState(NULL, true, 5);
     rii = q1.m_all_rewind_info.begin();
     assert((*rii)->isState());
     rii++;
@@ -431,4 +452,33 @@ void RewindQueue::unitTesting()
     b1.addLocalEvent(NULL, NULL, true, 2);
     RewindInfo *ri = b1.getCurrent();
     assert(ri->getTicks() == 2);
+
+    // 2) Make sure when adding an event at the same time as an existing
+    //    event, that m_current pooints to the first event, otherwise
+    //    events with same time stamp will not be handled correctly.
+    //    At this stage current points to the event at time 2 from above
+    AllRewindInfo::iterator current_old = b1.m_current;
+    b1.addLocalEvent(NULL, NULL, true, 2);
+    // Make sure that current was not modified, i.e. the new event at time
+    // 2 was added at the end of the list:
+    assert(current_old == b1.m_current);
+
+    // This should not trigger an exception, now current points to the
+    // second event at the same time:
+    b1.next();
+    assert(ri->getTicks() == 2);
+    assert(ri->isEvent());
+    b1.next();
+    assert(b1.m_current == b1.m_all_rewind_info.end());
+
+    // 3) Test that if cleanupOldRewindInfo is called, it will if necessary
+    //    adjust m_current to point to the latest confirmed state.
+    RewindQueue b2;
+    b2.addNetworkState(NULL, 1);
+    b2.addNetworkState(NULL, 2);
+    b2.addNetworkState(NULL, 3);
+    b2.mergeNetworkData(4, &needs_rewind, &rewind_ticks);
+    assert((*b2.m_current)->getTicks() == 3);
+
+
 }   // unitTesting

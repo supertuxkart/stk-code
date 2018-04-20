@@ -478,11 +478,13 @@ public:
     int   getNitroMinConsumptionTicks() const;
     // ------------------------------------------------------------------------
 
-    int getSlipstreamDuration() const;
+    float getSlipstreamDurationFactor() const;
+    float getSlipstreamBaseSpeed() const;
     float getSlipstreamLength() const;
     float getSlipstreamWidth() const;
-    int   getSlipstreamCollectTicks() const;
-    float getSlipstreamUseTime() const;
+    float getSlipstreamInnerFactor() const;
+    float getSlipstreamMinCollectTime() const;
+    float getSlipstreamMaxCollectTime() const;
     float getSlipstreamAddPower() const;
     float getSlipstreamMinSpeed() const;
     float getSlipstreamMaxSpeedIncrease() const;

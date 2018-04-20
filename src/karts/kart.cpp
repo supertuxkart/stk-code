@@ -118,6 +118,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_max_speed            = new MaxSpeed(this);
     m_terrain_info         = new TerrainInfo();
     m_powerup              = new Powerup(this);
+    m_last_used_powerup    = PowerupManager::POWERUP_NOTHING;
     m_vehicle              = NULL;
     m_initial_position     = position;
     m_race_position        = position;
@@ -142,7 +143,17 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_is_jumping           = false;
     m_min_nitro_ticks      = 0;
     m_fire_clicked         = 0;
+    m_boosted_ai           = false;
     m_type                 = RaceManager::KT_AI;
+
+    m_xyz_history_size     = stk_config->time2Ticks(XYZ_HISTORY_TIME);
+
+    Vec3 initial_position = getXYZ();
+    for (int i=0;i<m_xyz_history_size;i++)
+    {
+        m_previous_xyz.push_back(initial_position);
+    }
+    m_time_previous_counter = 0.0f;
 
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
@@ -366,6 +377,12 @@ void Kart::reset()
     m_has_caught_nolok_bubblegum = false;
     m_is_jumping           = false;
 
+    for (int i=0;i<m_xyz_history_size;i++)
+    {
+        m_previous_xyz[i] = getXYZ();
+    }
+    m_time_previous_counter = 0.0f;
+
     // In case that the kart was in the air, in which case its
     // linear damping is 0
     if(m_body)
@@ -443,18 +460,30 @@ void Kart::setXYZ(const Vec3& a)
 
 // -----------------------------------------------------------------------------
 void Kart::increaseMaxSpeed(unsigned int category, float add_speed,
-                            float engine_force, int duration,
-                            int fade_out_time)
+                            float engine_force, float duration,
+                            float fade_out_time)
 {
-    m_max_speed->increaseMaxSpeed(category, add_speed, engine_force, duration,
-                                  fade_out_time);
+    m_max_speed->increaseMaxSpeed(category, add_speed, engine_force,
+                                  stk_config->time2Ticks(duration),
+                                  stk_config->time2Ticks(fade_out_time));
 }   // increaseMaxSpeed
+
+// -----------------------------------------------------------------------------
+void Kart::instantSpeedIncrease(unsigned int category, float add_max_speed,
+                            float speed_boost, float engine_force, float duration,
+                            float fade_out_time)
+{
+    m_max_speed->instantSpeedIncrease(category, add_max_speed, speed_boost,
+                                      engine_force,
+                                      stk_config->time2Ticks(duration),
+                                      stk_config->time2Ticks(fade_out_time) );
+}   // instantSpeedIncrease
 
 // -----------------------------------------------------------------------------
 void Kart::setSlowdown(unsigned int category, float max_speed_fraction,
                        int fade_in_time)
 {
-    m_max_speed->setSlowdown(category, max_speed_fraction, fade_in_time);
+    m_max_speed->setSlowdown(category, max_speed_fraction,  fade_in_time);
 }   // setSlowdown
 
 // -----------------------------------------------------------------------------
@@ -467,6 +496,17 @@ int Kart::getSpeedIncreaseTicksLeft(unsigned int category) const
 {
     return m_max_speed->getSpeedIncreaseTicksLeft(category);
 }   // getSpeedIncreaseTimeLeft
+
+// -----------------------------------------------------------------------------
+void Kart::setBoostAI(bool boosted)
+{
+    m_boosted_ai = boosted;
+}   // setBoostAI
+// -----------------------------------------------------------------------------
+bool Kart::getBoostAI() const
+{
+    return m_boosted_ai;
+}   // getBoostAI
 
 // -----------------------------------------------------------------------------
 /** Returns the current material the kart is on. */
@@ -505,6 +545,15 @@ void Kart::setPowerup(PowerupManager::PowerupType t, int n)
 {
     m_powerup->set(t, n);
 }   // setPowerup
+
+// ----------------------------------------------------------------------------
+/** Sets the powerup this kart has last used. Number is always 1.
+ *  \param t Type of the powerup.
+ */
+void Kart::setLastUsedPowerup(PowerupManager::PowerupType t)
+{
+    m_last_used_powerup = t;
+}   // setLastUsedPowerup
 
 // -----------------------------------------------------------------------------
 int Kart::getNumPowerup() const
@@ -1188,6 +1237,11 @@ void Kart::eliminate()
         m_stars_effect->update(1);
     }
 
+    if (m_attachment)
+    {
+        m_attachment->clear();
+    }
+
     m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_TERRAIN, 0);
     m_kart_gfx->setGFXInvisible();
     if (m_engine_sound)
@@ -1259,6 +1313,18 @@ void Kart::update(int ticks)
     {
         m_kart_animation->update(dt);
     }
+
+    m_time_previous_counter += dt;
+    while (m_time_previous_counter > stk_config->ticks2Time(1))
+    {
+        m_previous_xyz[0] = getXYZ();
+        for (int i=m_xyz_history_size-1;i>0;i--)
+        {
+            m_previous_xyz[i] = m_previous_xyz[i-1];
+        }
+        m_time_previous_counter -= stk_config->ticks2Time(1);
+    }
+
     // Update the position and other data taken from the physics (or
     // an animation which calls setXYZ(), which also updates the kart
     // physical position).
@@ -1359,6 +1425,10 @@ void Kart::update(int ticks)
 
     if(m_controls.getFire() && !m_fire_clicked && !m_kart_animation)
     {
+        if (m_powerup->getType() != PowerupManager::POWERUP_NOTHING)
+        {
+            setLastUsedPowerup(m_powerup->getType());
+        }
         // use() needs to be called even if there currently is no collecteable
         // since use() can test if something needs to be switched on/off.
         m_powerup->use() ;
@@ -1421,23 +1491,29 @@ void Kart::update(int ticks)
         old_group = m_body->getBroadphaseHandle()->m_collisionFilterGroup;
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
+#undef XX
 #ifdef XX
-    Log::verbose("physicsafter", "%s t %f %f xyz(9-11) %f %f %f %f %f %f "
+    Log::verbose("physicsafter", "%s t %f %d xyz(9-11) %f %f %f %f %f %f "
         "v(16-18) %f %f %f steerf(20) %f maxangle(22) %f speed(24) %f "
-        "steering(26-27) %f %f clock(29) %lf",
+        "steering(26-27) %f %f clock(29) %lf skidstate(31) %d factor(33) %f "
+        "maxspeed(35) %f engf(37) %f",
         getIdent().c_str(),
-        World::getWorld()->getTime(), dt,
+        World::getWorld()->getTime(), World::getWorld()->getTimeTicks(),
         getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
         m_body->getWorldTransform().getOrigin().getX(),
         m_body->getWorldTransform().getOrigin().getY(),
         m_body->getWorldTransform().getOrigin().getZ(),
-        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),  //13,14,15
-        m_skidding->getSteeringFraction(), //19
-        getMaxSteerAngle(),  //20
-        m_speed,  //21
-        m_vehicle->getWheelInfo(0).m_steering,  //23
-        m_vehicle->getWheelInfo(1).m_steering,  //24
-        StkTime::getRealTime()
+        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),  //16-18
+        m_skidding->getSteeringFraction(), //20
+        getMaxSteerAngle(),  //22
+        m_speed,  //24
+        m_vehicle->getWheelInfo(0).m_steering,  //26
+        m_vehicle->getWheelInfo(1).m_steering,  //27
+        StkTime::getRealTime(),  //29
+        m_skidding->getSkidState(), //31
+        m_skidding->getSkidFactor(),    //33
+        m_max_speed->getCurrentMaxSpeed(),
+        m_max_speed->getCurrentAdditionalEngineForce()  // 37
     );
 #endif
     // After the physics step was done, the position of the wheels (as stored
@@ -1546,23 +1622,6 @@ void Kart::update(int ticks)
     if(!NetworkConfig::get()->isNetworking() ||
         NetworkConfig::get()->isServer()       )
         ItemManager::get()->checkItemHit(this);
-
-    static video::SColor pink(255, 255, 133, 253);
-    static video::SColor green(255, 61, 87, 23);
-
-#ifndef SERVER_ONLY
-    // draw skidmarks if relevant (we force pink skidmarks on when hitting 
-    // a bubblegum)
-    if(m_kart_properties->getSkidEnabled() && m_skidmarks)
-    {
-        m_skidmarks->update(dt,
-                            m_bubblegum_ticks > 0,
-                            (m_bubblegum_ticks > 0 
-                                ? (m_has_caught_nolok_bubblegum ? &green 
-                                                                : &pink) 
-                                : NULL            )                     );
-    }
-#endif
 
     const bool emergency = getKartAnimation()!=NULL;
 
@@ -1782,7 +1841,7 @@ void Kart::handleMaterialSFX(const Material *material)
 
     // terrain sound is not necessarily a looping sound so check its status before
     // setting its speed, to avoid 'ressuscitating' sounds that had already stopped
-    if(m_terrain_sound && main_loop->isLstSubstep() &&
+    if(m_terrain_sound && main_loop->isLastSubstep() &&
       (m_terrain_sound->getStatus()==SFXBase::SFX_PLAYING ||
        m_terrain_sound->getStatus()==SFXBase::SFX_PAUSED))
     {
@@ -1998,14 +2057,16 @@ void Kart::updateNitro(int ticks)
 
         // when pressing the key, don't allow the min time to go under zero.
         // If it went under zero, it would be reset
+        // As the time deduction happens before, it can be an arbitrarily
+        // small number > 0. Smaller means more responsive controls.
         if (m_controls.getNitro() && m_min_nitro_ticks <= 0)
             m_min_nitro_ticks = 1;
     }
 
-    bool increase_speed = (m_controls.getNitro() && isOnGround());
+    bool increase_speed = (m_min_nitro_ticks > 0 && isOnGround());
     if (!increase_speed && m_min_nitro_ticks <= 0)
     {
-        if(m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING)
+        if (m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING)
             m_nitro_sound->stop();
         return;
     }
@@ -2420,7 +2481,7 @@ void Kart::updateEngineSFX(float dt)
     // Only update SFX during the last substep (otherwise too many SFX commands
     // in one frame), and if sfx are enabled
     if(!m_engine_sound || !SFXManager::get()->sfxAllowed() ||
-        !main_loop->isLstSubstep()                              )
+        !main_loop->isLastSubstep()                              )
         return;
 
     // when going faster, use higher pitch for engine
@@ -2854,18 +2915,32 @@ SFXBase* Kart::getNextEmitter()
  *  to be lowered by X).
  *  This function also takes additional graphical effects into account, e.g.
  *  a (visual only) jump when skidding, and leaning of the kart.
- *  \param offset_xyz Offset to be added to the position.
- *  \param rotation Additional rotation.
  */
-void Kart::updateGraphics(int ticks, const Vec3& offset_xyz,
-                          const btQuaternion& rotation)
+void Kart::updateGraphics(float dt)
 {
+    static video::SColor pink(255, 255, 133, 253);
+    static video::SColor green(255, 61, 87, 23);
+
+#ifndef SERVER_ONLY
+    // draw skidmarks if relevant (we force pink skidmarks on when hitting 
+    // a bubblegum)
+    if (m_kart_properties->getSkidEnabled() && m_skidmarks)
+    {
+        m_skidmarks->update(dt,
+            m_bubblegum_ticks > 0,
+            (m_bubblegum_ticks > 0
+                ? (m_has_caught_nolok_bubblegum ? &green
+                    : &pink)
+                : NULL));
+    }
+#endif
+
     // Upate particle effects (creation rate, and emitter size
     // depending on speed)
     // --------------------------------------------------------
     float nitro_frac = 0;
     if ( (m_controls.getNitro() || m_min_nitro_ticks > 0) &&
-         isOnGround() &&  m_collected_energy > 0            )
+         m_collected_energy > 0                               )
     {
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!
@@ -2893,7 +2968,6 @@ void Kart::updateGraphics(int ticks, const Vec3& offset_xyz,
 
     const float roll_speed = m_kart_properties->getLeanSpeed() * DEGREE_TO_RAD;
 
-    float dt = stk_config->ticks2Time(ticks);
     if(speed_frac > 0.8f && fabsf(steer_frac)>0.5f)
     {
         // Use steering ^ 7, which means less effect at lower
@@ -2946,7 +3020,7 @@ void Kart::updateGraphics(int ticks, const Vec3& offset_xyz,
     center_shift = getTrans().getBasis() * center_shift;
 
     float heading = m_skidding->getVisualSkidRotation();
-    Moveable::updateGraphics(ticks, center_shift,
+    Moveable::updateGraphics(dt, center_shift,
                              btQuaternion(heading, 0, -m_current_lean));
 
     // m_speed*dt is the distance the kart has moved, which determines
@@ -3053,6 +3127,22 @@ const Vec3& Kart::getNormal() const
 {
     return m_terrain_info->getNormal();
 }   // getNormal
+
+// ------------------------------------------------------------------------
+/** Returns the position 0.25s before */
+const Vec3& Kart::getPreviousXYZ() const
+{
+    return m_previous_xyz[m_xyz_history_size-1];
+}   // getPreviousXYZ
+
+// ------------------------------------------------------------------------
+/** Returns a more recent different previous position */
+const Vec3& Kart::getRecentPreviousXYZ() const
+{
+    //Not the most recent, because the angle variations would be too
+    //irregular on some tracks whose roads are not smooth enough
+    return m_previous_xyz[m_xyz_history_size/5];
+}   // getRecentPreviousXYZ
 
 // ------------------------------------------------------------------------
 void Kart::playSound(SFXBuffer* buffer)

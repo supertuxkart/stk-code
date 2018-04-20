@@ -19,6 +19,7 @@
 #include "network/rewind_info.hpp"
 
 #include "network/network_config.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 
 /** Constructor for a state: it only takes the size, and allocates a buffer
@@ -44,11 +45,22 @@ void RewindInfo::setTicks(int ticks)
 }   // setTicks
 
 // ============================================================================
-RewindInfoState::RewindInfoState(int ticks, Rewinder *rewinder, 
-                                 BareNetworkString *buffer, bool is_confirmed)
-    : RewindInfoRewinder(ticks, rewinder, buffer, is_confirmed)
+RewindInfoState::RewindInfoState(int ticks, BareNetworkString *buffer,
+                                 bool is_confirmed)
+    : RewindInfo(ticks, is_confirmed)
 {
+    m_buffer = buffer;
 }   // RewindInfoState
+
+// ------------------------------------------------------------------------
+/** Rewinds to this state. This is called while going forwards in time
+ *  again to reach current time. It will call rewindToState().
+ *  if the state is a confirmed state.
+ */
+void RewindInfoState::rewind()
+{
+    RewindManager::get()->restoreState(m_buffer);
+}   // rewind
 
 // ============================================================================
 RewindInfoEvent::RewindInfoEvent(int ticks, EventRewinder *event_rewinder,

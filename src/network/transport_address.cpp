@@ -203,4 +203,17 @@ void TransportAddress::unitTesting()
     assert(t17.getIP() == (128u << 24));
     assert(!t17.isLAN());
 
+    // Test constructors
+    TransportAddress t18("128.0.0.0");
+    assert(t18.getIP() == (128u << 24));
+    assert(t18.getPort() == 0);
+
+    TransportAddress t19("128.0.0.0:1");
+    assert(t19.getIP() == (128u << 24));
+    assert(t19.getPort() == 1);
+
+    TransportAddress t20("128.0.0.0", 123);
+    assert(t20.getIP() == (128u << 24));
+    assert(t20.getPort() == 123);
+
 }   // unitTesting

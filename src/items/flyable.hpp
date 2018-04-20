@@ -22,16 +22,17 @@
 #ifndef HEADER_FLYABLE_HPP
 #define HEADER_FLYABLE_HPP
 
+#include "items/powerup_manager.hpp"
+#include "karts/moveable.hpp"
+#include "tracks/terrain_info.hpp"
+#include "utils/cpp2011.hpp"
+
+#include <irrString.h>
 namespace irr
 {
     namespace scene { class IMesh; }
 }
-#include <irrString.h>
 using namespace irr;
-
-#include "items/powerup_manager.hpp"
-#include "karts/moveable.hpp"
-#include "tracks/terrain_info.hpp"
 
 class AbstractKart;
 class AbstractKartAnimation;
@@ -167,6 +168,7 @@ public:
     virtual     ~Flyable     ();
     static void  init        (const XMLNode &node, scene::IMesh *model,
                               PowerupManager::PowerupType type);
+    void                      updateGraphics(float dt) OVERRIDE;
     virtual bool              updateAndDelete(int ticks);
     virtual void              setAnimation(AbstractKartAnimation *animation);
     virtual HitEffect*        getHitEffect() const;

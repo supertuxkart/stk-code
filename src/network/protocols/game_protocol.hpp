@@ -78,7 +78,7 @@ public:
 
     void controllerAction(int kart_id, PlayerAction action,
                           int value, int val_l, int val_r);
-    void startNewState();
+    void startNewState(bool local_save);
     void addState(BareNetworkString *buffer);
     void sendState();
     void adjustTimeForClient(STKPeer *peer, int ticks);
@@ -101,6 +101,9 @@ public:
     {
         return m_game_protocol.lock();
     }   // lock
+    // ------------------------------------------------------------------------
+    /** Returns the NetworkString in which a state was saved. */
+    NetworkString* getState() const { return m_data_to_send;  }
 
 };   // class GameProtocol
 
