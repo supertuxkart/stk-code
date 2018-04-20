@@ -709,7 +709,7 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_MISC;
     if(CommandLine::has("--debug=all") )
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
-    //if(CommandLine::has("--online"))
+    if(CommandLine::has("--online"))
         MainMenuScreen::m_enable_online=true;
 #if !(defined(SERVER_ONLY) || defined(ANDROID))
     if(CommandLine::has("--apitrace"))
