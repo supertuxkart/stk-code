@@ -155,6 +155,7 @@ RaceGUIOverworld::RaceGUIOverworld()
 
     m_lock           = irr_driver->getTexture(FileManager::GUI,"gui_lock.png");
     m_open_challenge = irr_driver->getTexture(FileManager::GUI,"challenge.png");
+    m_locked_bonus   = irr_driver->getTexture(FileManager::GUI,"mystery_unlock.png");
 
     m_icons[0] = m_lock;
     m_icons[1] = m_open_challenge;
@@ -162,6 +163,7 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_icons[3] = m_trophy2;
     m_icons[4] = m_trophy3;
     m_icons[5] = m_trophy4;
+    m_icons[6] = m_locked_bonus;
 }   // RaceGUIOverworld
 
 //-----------------------------------------------------------------------------
@@ -262,8 +264,11 @@ void RaceGUIOverworld::drawTrophyPoints()
 #ifndef SERVER_ONLY
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
     const int points = player->getPoints();
+    const int next_unlock_points = player->getNextUnlockPoints();
     std::string s = StringUtils::toString(points);
+    std::string s_goal = StringUtils::toString(next_unlock_points);
     core::stringw sw(s.c_str());
+    core::stringw swg(s_goal.c_str());
 
     static video::SColor time_color = video::SColor(255, 255, 255, 255);
 
@@ -340,18 +345,31 @@ void RaceGUIOverworld::drawTrophyPoints()
         font->draw(bestTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
     }
 
-    dest = core::rect<s32>(pos.UpperLeftCorner.X - size - 5, pos.UpperLeftCorner.Y,
-                           pos.UpperLeftCorner.X - 5, pos.UpperLeftCorner.Y + size);
+    dest = core::rect<s32>(pos.UpperLeftCorner.X - size + 5, pos.UpperLeftCorner.Y,
+                           pos.UpperLeftCorner.X + 5, pos.UpperLeftCorner.Y + size);
 
     draw2DImage(m_open_challenge, dest, source, NULL,
                                               NULL, true /* alpha */);
 
-    pos.LowerRightCorner.Y = dest.LowerRightCorner.Y;
-    pos.UpperLeftCorner.X += 5;
+    pos.LowerRightCorner.Y = dest.LowerRightCorner.Y + 1.5f*size;
+    pos.UpperLeftCorner.X -= (size - 10);
 
 
     font->draw(sw.c_str(), pos, time_color, false, vcenter, NULL, true /* ignore RTL */);
-    font->disableShadow();
+
+    if (next_unlock_points > points && (points + 80) >= next_unlock_points)
+    {
+        dest = core::rect<s32>(pos.UpperLeftCorner.X - 2*size, pos.UpperLeftCorner.Y,
+                           pos.UpperLeftCorner.X - size, pos.UpperLeftCorner.Y + size);
+
+        draw2DImage(m_locked_bonus, dest, source, NULL,
+                                                  NULL, true /* alpha */);
+
+        pos.UpperLeftCorner.X -= (2*size - 4);
+
+        font->draw(swg.c_str(), pos, time_color, false, vcenter, NULL, true /* ignore RTL */);
+        font->disableShadow();
+    }
 #endif
 }   // drawTrophyPoints
 
