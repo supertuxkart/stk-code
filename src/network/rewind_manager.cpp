@@ -346,15 +346,6 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     // Now start the rewind with the full state:
     world->setTicks(exact_rewind_ticks);
 
-    // Need to exit loop if in-game menu is open, since world clock
-    // will not be increased while the game is paused
-    if (World::getWorld()->getPhase() == WorldStatus::IN_GAME_MENU_PHASE)
-    {
-        m_is_rewinding = false;
-        history->setReplayHistory(is_history);
-        return;
-    }
-
     // Get the (first) full state to which we have to rewind
     RewindInfo *current = m_rewind_queue.getCurrent();
     assert(current->isState());

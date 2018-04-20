@@ -19,6 +19,8 @@
 
 #include <string>
 
+#include "audio/music_manager.hpp"
+#include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -57,16 +59,32 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
         loadFromFile("race_paused_dialog.stkgui");
     }
 
-    World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
-
     IconButtonWidget* back_btn = getWidget<IconButtonWidget>("backbtn");
     back_btn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
+
+    if (NetworkConfig::get()->isNetworking())
+    {
+        music_manager->pauseMusic();
+        SFXManager::get()->pauseAll();
+    }
+    else
+    {
+        World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
+    }
 }   // RacePausedDialog
 
 // ----------------------------------------------------------------------------
 RacePausedDialog::~RacePausedDialog()
 {
-    World::getWorld()->scheduleUnpause();
+    if (NetworkConfig::get()->isNetworking())
+    {
+        music_manager->resumeMusic();
+        SFXManager::get()->resumeAll();
+    }
+    else
+    {
+        World::getWorld()->scheduleUnpause();
+    }
 }   // ~RacePausedDialog
 
 // ----------------------------------------------------------------------------

@@ -30,6 +30,7 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/render_info.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "io/file_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/keyboard_device.hpp"
@@ -660,6 +661,8 @@ void World::terminateRace()
         results->clearHighscores();
     }
 
+    // In case someone opened paused race dialog in network game
+    GUIEngine::ModalDialog::dismiss();
     results->push();
     WorldStatus::terminateRace();
 }   // terminateRace
