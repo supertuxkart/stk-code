@@ -56,19 +56,15 @@ private:
     /** The selected kart id. */
     std::string m_kart_name; 
 
-    /** The unique id of the player for this race. The number is assigned
-     *  by the server (and it might not be the index of this player in the
-     *  peer list. */
-    uint8_t m_global_player_id;
-
-    /** The kart id in the World class (pointer to AbstractKart). */
-    uint8_t m_world_kart_id;
+    /** The local player id relative to each peer. */
+    int m_local_player_id;
 
 public:
     NetworkPlayerProfile(std::shared_ptr<STKPeer> peer,
                          const irr::core::stringw &name, uint32_t host_id,
                          float default_kart_color, uint32_t online_id,
-                         PerPlayerDifficulty per_player_difficulty)
+                         PerPlayerDifficulty per_player_difficulty,
+                         uint8_t local_player_id)
     {
         m_peer                  = peer;
         m_player_name           = name;
@@ -76,19 +72,12 @@ public:
         m_default_kart_color    = default_kart_color;
         m_online_id             = online_id;
         m_per_player_difficulty = per_player_difficulty;
-        m_global_player_id      = 0;
-        m_world_kart_id         = 0;
+        m_local_player_id      = local_player_id;
     }
     // ------------------------------------------------------------------------
     ~NetworkPlayerProfile() {}
     // ------------------------------------------------------------------------
     bool isLocalPlayer() const;
-    // ------------------------------------------------------------------------
-    /** Sets the global player id of this player. */
-    void setGlobalPlayerId(int player_id) { m_global_player_id = player_id; }
-    // ------------------------------------------------------------------------
-    /** Returns the global ID of this player in this race. */
-    int getGlobalPlayerId() const { return m_global_player_id; }
     // ------------------------------------------------------------------------
     /** Returns the host id of this player. */
     uint32_t getHostId() const { return m_host_id; }
@@ -99,11 +88,8 @@ public:
     /** Returns the name of the kart this player has selected. */
     const std::string &getKartName() const { return m_kart_name; }
     // ------------------------------------------------------------------------
-    /** Sets the world kart id for this player. */
-    void setWorldKartID(int id) { m_world_kart_id = id; }
-    // ------------------------------------------------------------------------
-    /** Retuens the world kart id for this player. */
-    int getWorldKartID() const { return m_world_kart_id; }
+    /** Retuens the local player id for this player. */
+    int getLocalPlayerId() const { return m_local_player_id; }
     // ------------------------------------------------------------------------
     /** Returns the per-player difficulty. */
     PerPlayerDifficulty getPerPlayerDifficulty() const

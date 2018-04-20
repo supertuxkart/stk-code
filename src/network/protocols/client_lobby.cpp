@@ -235,8 +235,9 @@ void ClientLobby::addAllPlayers(Event* event)
         float kart_color = data.getFloat();
         uint32_t online_id = data.getUInt32();
         PerPlayerDifficulty ppd = (PerPlayerDifficulty)data.getUInt8();
+        uint8_t local_id = data.getUInt8();
         auto player = std::make_shared<NetworkPlayerProfile>(peer, player_name,
-            host_id, kart_color, online_id, ppd);
+            host_id, kart_color, online_id, ppd, local_id);
         std::string kart_name;
         data.decodeString(&kart_name);
         player->setKartName(kart_name);

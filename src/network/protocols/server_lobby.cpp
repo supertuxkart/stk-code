@@ -336,7 +336,8 @@ void ServerLobby::asynchronousUpdate()
                     .addUInt32(player->getHostId())
                     .addFloat(player->getDefaultKartColor())
                     .addUInt32(player->getOnlineId())
-                    .addUInt8(player->getPerPlayerDifficulty());
+                    .addUInt8(player->getPerPlayerDifficulty())
+                    .addUInt8(player->getLocalPlayerId());
                 if (player->getKartName().empty())
                 {
                     RandomGenerator rg;
@@ -851,7 +852,7 @@ void ServerLobby::connectionRequested(Event* event)
             (PerPlayerDifficulty)data.getUInt8();
         peer->addPlayer(std::make_shared<NetworkPlayerProfile>
             (peer, name, peer->getHostId(), default_kart_color, online_id,
-            per_player_difficulty));
+            per_player_difficulty, (uint8_t)i));
     }
 
     bool is_banned = false;

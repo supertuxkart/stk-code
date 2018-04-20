@@ -94,7 +94,6 @@ void LobbyProtocol::configRemoteKart(
 
     // Create the kart information for the race manager:
     // -------------------------------------------------
-    int local_player_id = 0;
     for (unsigned int i = 0; i < players.size(); i++)
     {
         std::shared_ptr<NetworkPlayerProfile> profile = players[i];
@@ -102,20 +101,20 @@ void LobbyProtocol::configRemoteKart(
 
         // All non-local players are created here. This means all players
         // on the server, and all non-local players on a client (the local
-        // karts are created in the NetworkingLobby).
+        // karts are created in the ClientLobby).
+        int local_player_id = profile->getLocalPlayerId();
         if (!is_local)
         {
-            // On the server no device or player profile is needed.
-            StateManager::get()->createActivePlayer(NULL, NULL);
+            // No device or player profile is needed for remote kart.
+            local_player_id =
+                (int)(StateManager::get()->createActivePlayer(NULL, NULL));
         }
 
         // Adjust the local player id so that local players have the numbers
         // 0 to num-1; and all other karts start with num. This way the local
         // players get the first ActivePlayers assigned (which have the 
         // corresponding device associated with it).
-        RemoteKartInfo rki(is_local ? local_player_id
-                                    : i - local_player_id
-                                      + m_game_setup->getNumLocalPlayers(),
+        RemoteKartInfo rki(local_player_id,
                            profile->getKartName(),
                            profile->getName(),
                            profile->getHostId(),
@@ -123,12 +122,6 @@ void LobbyProtocol::configRemoteKart(
         rki.setGlobalPlayerId(i);
         rki.setDefaultKartColor(profile->getDefaultKartColor());
         rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
-        if (is_local)
-        {
-            rki.setLocalPlayerId(local_player_id);
-            local_player_id++;
-        }
-
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);
     }   // for i in players
