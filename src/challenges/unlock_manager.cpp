@@ -275,62 +275,16 @@ void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
     }
 } // findWhatWasUnlocked
 
-void UnlockManager::unlockByPoints(int points, const StoryModeStatus* status)
+//-----------------------------------------------------------------------------
+/** This functions sets as completed the "challenges" requiring a certain number
+ *  of points, to unlock features.
+ */
+void UnlockManager::unlockByPoints(int points, ChallengeStatus* unlock_list)
 {
-    int easy_challenge = CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM];
-    int medium_challenge = CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM];
-    int hard_challenge = CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD];
-    int best_challenge = CHALLENGE_POINTS[RaceManager::DIFFICULTY_BEST];
-    std::string challenge_id;
-
-    // Unlock SuperTux difficulty
-    // We can't test if it is already unlocked because m_locked_features is undefined
-    // when this function is called
-
-
-    int supertux_floor = hard_challenge*(10+4*GP_FACTOR)+medium_challenge*(11);
-    challenge_id = "unlock_supertux";
-    ChallengeStatus* c = status->getChallengeStatus(challenge_id);
-
-    if( supertux_floor <= points && c!=NULL)
+    //TODO : add support for other conditions (achievements...) for alternative unlock paths
+    if( unlock_list!=NULL && unlock_list->getData()->getNumTrophies() <= points)
     {
-        c->setSolved(RaceManager::DIFFICULTY_BEST);
-    }
-    else if( c == NULL )
-    {
-        Log::warn("Unlock Manager", "No unlock_supertux challenge defined.");
-    }
-
-    // Unlock first bonus kart
-
-    int bonus_kart_floor = easy_challenge*(20+4*GP_FACTOR); //Always unlock before fort magma
-
-    challenge_id = "unlock_bonus_kart1";
-    c = status->getChallengeStatus(challenge_id);
-
-    if( bonus_kart_floor <= points && c!=NULL)
-    {
-        c->setSolved(RaceManager::DIFFICULTY_BEST);
-    }
-    else if( c == NULL )
-    {
-        Log::warn("Unlock Manager", "No unlock_bonus_kart1 challenge defined.");
-    }
-
-    // Unlock second bonus kart
-
-    bonus_kart_floor = hard_challenge*(15+4*GP_FACTOR)+best_challenge*(6);
-
-    challenge_id = "unlock_bonus_kart2";
-    c = status->getChallengeStatus(challenge_id);
-
-    if( bonus_kart_floor <= points && c!=NULL)
-    {
-        c->setSolved(RaceManager::DIFFICULTY_BEST);
-    }
-    else if( c == NULL )
-    {
-        Log::warn("Unlock Manager", "No unlock_bonus_kart2 challenge defined.");
+        unlock_list->setSolved(RaceManager::DIFFICULTY_BEST);
     }
 } // unlockByPoints
 
