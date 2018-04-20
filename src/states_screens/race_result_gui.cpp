@@ -428,6 +428,7 @@ void RaceResultGUI::backToLobby()
 {
     race_manager->exitRace();
     race_manager->setAIKartOverride("");
+    GUIEngine::ModalDialog::dismiss();
     StateManager::get()->resetAndSetStack(
         NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
 }   // backToLobby
