@@ -548,8 +548,8 @@ void ClientLobby::updatePlayerList(Event* event)
 //-----------------------------------------------------------------------------
 void ClientLobby::becomingServerOwner()
 {
-    MessageQueue::add(MessageQueue::MT_GENERIC,
-        _("You are now the owner of server."));
+    core::stringw msg = _("You are now the owner of server.");
+    MessageQueue::add(MessageQueue::MT_GENERIC, msg);
     STKHost::get()->setAuthorisedToControl(true);
     if (m_state.load() == CONNECTED && NetworkConfig::get()->isAutoConnect())
     {
