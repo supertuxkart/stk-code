@@ -30,12 +30,14 @@
 //-----------------------------------------------------------------------------
 StoryModeStatus::StoryModeStatus(const XMLNode *node)
 {
-    m_points            = 0;
-    m_first_time        = true;
-    m_easy_challenges   = 0;
-    m_medium_challenges = 0;
-    m_hard_challenges   = 0;
-    m_current_challenge = NULL;
+    m_points             = 0;
+    m_next_unlock_points = 0;
+    m_first_time         = true;
+    m_easy_challenges    = 0;
+    m_medium_challenges  = 0;
+    m_hard_challenges    = 0;
+    m_best_challenges    = 0;
+    m_current_challenge  = NULL;
 
     // If there is saved data, load it
     if(node)
@@ -78,6 +80,7 @@ bool StoryModeStatus::isLocked(const std::string& feature)
 void StoryModeStatus::computeActive()
 {
     m_points = 0;
+    m_next_unlock_points = 0;
     m_easy_challenges = 0;
     m_medium_challenges = 0;
     m_hard_challenges = 0;
@@ -180,7 +183,18 @@ void StoryModeStatus::computeActive()
     // now we have the number of points.
 
     // test if we have unlocked a feature requiring a certain number of points
-    unlock_manager->unlockByPoints(m_points,this);
+    for(i = m_challenges_state.begin();
+        i != m_challenges_state.end();  i++)
+    {
+        if (i->second->isUnlockList())
+        {
+            unlock_manager->unlockByPoints(m_points,i->second);
+            //Retrieve the smallest number of points for the next unlockable
+            if (i->second->getData()->getNumTrophies() > m_points && (m_next_unlock_points == 0
+                || i->second->getData()->getNumTrophies() < m_next_unlock_points) )
+                m_next_unlock_points = i->second->getData()->getNumTrophies();
+        }
+    }
 
     //Actually lock the tracks
     for (i = m_challenges_state.begin(); i != m_challenges_state.end();  i++)
