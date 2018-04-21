@@ -97,7 +97,7 @@ ServerLobby::ServerLobby() : LobbyProtocol(NULL)
  */
 ServerLobby::~ServerLobby()
 {
-    if (m_server_registered && NetworkConfig::get()->isWAN())
+    if (m_server_registered)
     {
         unregisterServer();
     }
@@ -510,6 +510,7 @@ void ServerLobby::registerServer()
     {
         irr::core::stringc error(request->getInfo().c_str());
         Log::error("ServerLobby", "%s", error.c_str());
+        m_server_registered = false;
         m_state = ERROR_LEAVE;
     }
     delete request;
@@ -590,7 +591,7 @@ void ServerLobby::startSelection(const Event *event)
         return;
     }
 
-    if (NetworkConfig::get()->isWAN() && m_server_registered)
+    if (m_server_registered)
     {
         unregisterServer();
         m_server_registered = false;
