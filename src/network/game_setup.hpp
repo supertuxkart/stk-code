@@ -118,7 +118,8 @@ public:
     // ------------------------------------------------------------------------
     void reset()
     {
-        m_tracks.clear();
+        if (!isGrandPrixStarted())
+            m_tracks.clear();
         m_laps = 0;
         m_reverse = false;
     }
@@ -153,7 +154,17 @@ public:
         return m_extra_server_info != 0;
     }
     // ------------------------------------------------------------------------
+    bool isGrandPrixStarted() const
+    {
+        return isGrandPrix() && !m_tracks.empty() &&
+            m_tracks.size() != getTotalGrandPrixTracks();
+    }
+    // ------------------------------------------------------------------------
+    void stopGrandPrix()                                  { m_tracks.clear(); }
+    // ------------------------------------------------------------------------
     const std::vector<std::string>& getAllTracks() const   { return m_tracks; }
+    // ------------------------------------------------------------------------
+    void sortPlayersForGrandPrix();
 };
 
 #endif // GAME_SETUP_HPP

@@ -320,35 +320,7 @@ void ClientLobby::update(int ticks)
         break;
     case CONNECTED:
         break;
-    case KART_SELECTION:
-    {
-        // In case the user opened a user info dialog
-        GUIEngine::ModalDialog::dismiss();
-        NetworkKartSelectionScreen* screen =
-            NetworkKartSelectionScreen::getInstance();
-        screen->setAvailableKartsFromServer(m_available_karts);
-        // In case of auto-connect, use random karts (or previous kart) from
-        // server and go to track selection (or grand prix later)
-        if (NetworkConfig::get()->isAutoConnect())
-        {
-            input_manager->setMasterPlayerOnly(true);
-            for (auto& p : NetworkConfig::get()->getNetworkPlayers())
-            {
-                StateManager::get()
-                    ->createActivePlayer(std::get<1>(p), std::get<0>(p));
-            }
-            input_manager->getDeviceManager()->setAssignMode(ASSIGN);
-            TracksScreen::getInstance()->setNetworkTracks();
-            TracksScreen::getInstance()->push();
-        }
-        else
-        {
-            screen->push();
-        }
-        m_state.store(SELECTING_KARTS);
-    }
-    break;
-    case SELECTING_KARTS:
+    case SELECTING_ASSETS:
         break;
     case PLAYING:
         break;
@@ -481,8 +453,8 @@ void ClientLobby::handleServerInfo(Event* event)
     NetworkConfig::get()->setServerMode(u_data);
     auto game_mode = NetworkConfig::get()->getLocalGameMode();
     race_manager->setMinorMode(game_mode.first);
-    // We may use single mode in network even it's grand prix
-    //race_manager->setMajorMode(game_mode.second);
+    // We use single mode in network even it's grand prix
+    race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
 
     //I18N: In the networking lobby
     core::stringw mode_name = NetworkConfig::get()->getModeName(u_data);
@@ -660,8 +632,8 @@ void ClientLobby::startingRaceNow()
  */
 void ClientLobby::startSelection(Event* event)
 {
-    m_state.store(KART_SELECTION);
     const NetworkString& data = event->data();
+    uint8_t skip_kart_screen = data.getUInt8();
     const unsigned kart_num = data.getUInt16();
     const unsigned track_num = data.getUInt16();
     m_available_karts.clear();
@@ -678,7 +650,33 @@ void ClientLobby::startSelection(Event* event)
         data.decodeString(&track);
         m_available_tracks.insert(track);
     }
-    Log::info("ClientLobby", "Kart selection starts now");
+
+    // In case the user opened a user info dialog
+    GUIEngine::ModalDialog::dismiss();
+    NetworkKartSelectionScreen* screen =
+        NetworkKartSelectionScreen::getInstance();
+    screen->setAvailableKartsFromServer(m_available_karts);
+    // In case of auto-connect or continue a grand prix, use random karts
+    // (or previous kart) from server and go to track selection
+    if (NetworkConfig::get()->isAutoConnect() || skip_kart_screen == 1)
+    {
+        input_manager->setMasterPlayerOnly(true);
+        for (auto& p : NetworkConfig::get()->getNetworkPlayers())
+        {
+            StateManager::get()
+                ->createActivePlayer(std::get<1>(p), std::get<0>(p));
+        }
+        input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+        TracksScreen::getInstance()->setNetworkTracks();
+        TracksScreen::getInstance()->push();
+    }
+    else
+    {
+        screen->push();
+    }
+
+    m_state.store(SELECTING_ASSETS);
+    Log::info("ClientLobby", "Selection starts now");
 }   // startSelection
 
 //-----------------------------------------------------------------------------
@@ -699,7 +697,9 @@ void ClientLobby::raceFinished(Event* event)
     Log::info("ClientLobby", "Server notified that the race is finished.");
     if (m_game_setup->isGrandPrix())
     {
-        // fastest lap, and than each kart before / after grand prix points
+        int t = data.getUInt32();
+        static_cast<LinearWorld*>(World::getWorld())->setFastestLapTicks(t);
+        race_manager->configGrandPrixResultFromNetwork(data);
     }
     else if (race_manager->modeHasLaps())
     {

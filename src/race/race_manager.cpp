@@ -45,6 +45,7 @@
 #include "modes/soccer_world.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/network_config.hpp"
+#include "network/network_string.hpp"
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "replay/replay_play.hpp"
@@ -980,5 +981,70 @@ void RaceManager::startWatchingReplay(const std::string &track_ident,
 }   // startSingleRace
 
 //-----------------------------------------------------------------------------
+void RaceManager::configGrandPrixResultFromNetwork(NetworkString& ns)
+{
+    setMajorMode(MAJOR_MODE_GRAND_PRIX);
+    class NetworkGrandPrixData : public GrandPrixData
+    {
+    public:
+        NetworkGrandPrixData() : GrandPrixData()
+            { setGroup(GrandPrixData::GP_STANDARD); }
+        virtual std::vector<std::string>
+            getTrackNames(const bool includeLocked=false) const
+            { return m_tracks; }
+        virtual unsigned int
+            getNumberOfTracks(const bool includeLocked=false) const
+            { return m_tracks.size(); }
+        void addNetworkTrack(const std::string& t) { m_tracks.push_back(t); }
+    };
 
-/* EOF */
+    NetworkGrandPrixData ngpd;
+    unsigned int track_size = ns.getUInt8();
+    unsigned int all_track_size = ns.getUInt8();
+    assert(all_track_size > 0);
+    m_track_number = all_track_size -1;
+    for (unsigned i = 0; i < all_track_size; i++)
+    {
+        std::string t;
+        ns.decodeString(&t);
+        ngpd.addNetworkTrack(t);
+    }
+    while (all_track_size < track_size)
+    {
+        ngpd.addNetworkTrack("");
+        all_track_size++;
+    }
+
+    m_tracks = ngpd.getTrackNames();
+    // For result screen we only need current lap and reserve
+    m_num_laps.resize(track_size, m_num_laps[0]);
+    m_reverse_track.resize(track_size, m_reverse_track[0]);
+
+    m_grand_prix = ngpd;
+    unsigned int player_size = ns.getUInt8();
+    assert(player_size == m_kart_status.size());
+    for (unsigned i = 0; i < player_size; i++)
+    {
+        int last_score = ns.getUInt32();
+        int cur_score = ns.getUInt32();
+        float overall_time = ns.getFloat();
+        m_kart_status[i].m_last_score = last_score;
+        m_kart_status[i].m_score = cur_score;
+        m_kart_status[i].m_overall_time = overall_time;
+        m_kart_status[i].m_gp_rank = i;
+    }
+}   // configGrandPrixResultFromNetwork
+
+//-----------------------------------------------------------------------------
+void RaceManager::clearNetworkGrandPrixResult()
+{
+    if (m_major_mode != MAJOR_MODE_GRAND_PRIX)
+        return;
+    setMajorMode(MAJOR_MODE_SINGLE);
+    m_grand_prix = GrandPrixData();
+    m_track_number = 0;
+    m_tracks.clear();
+    m_num_laps.clear();
+    m_reverse_track.clear();
+
+}   // clearNetworkGrandPrixResult
