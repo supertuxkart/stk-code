@@ -234,9 +234,8 @@ void CutsceneWorld::update(int ticks)
         double prev_time = m_time;
         double now = StkTime::getRealTime();
         m_time = now - m_time_at_second_reset;
-        ticks = stk_config->time2Ticks(float(m_time - prev_time));
     }
-
+    
     float fade = 0.0f;
     float fadeIn = -1.0f;
     float fadeOut = -1.0f;

@@ -127,7 +127,7 @@ private:
         /** The maximum slowdown to apply. */
         float m_max_speed_fraction;
         /** How long it should take for the full slowdown to take effect. */
-        int m_fade_in_time;
+        int m_fade_in_ticks;
         /** The current slowdown fraction, taking the fade-in time
          *  into account. */
         float m_current_fraction;
@@ -148,7 +148,7 @@ private:
         {
             m_max_speed_fraction = 1.0f;
             m_current_fraction   = 1.0f;
-            m_fade_in_time       = 0;
+            m_fade_in_ticks      = 0;
             m_duration           = 0;
         }   //reset
         // --------------------------------------------------------------------

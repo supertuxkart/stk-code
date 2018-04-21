@@ -199,11 +199,11 @@ void MaxSpeed::SpeedIncrease::rewindTo(BareNetworkString *buffer,
  *         value is changed to something else).
  */
 void MaxSpeed::setSlowdown(unsigned int category, float max_speed_fraction,
-                           int fade_in_time, int duration)
+                           int fade_in_ticks, int duration)
 {
     assert(category>=MS_DECREASE_MIN && category <MS_DECREASE_MAX);
     m_speed_decrease[category].m_max_speed_fraction = max_speed_fraction;
-    m_speed_decrease[category].m_fade_in_time       = fade_in_time;
+    m_speed_decrease[category].m_fade_in_ticks      = fade_in_ticks;
     m_speed_decrease[category].m_duration           = duration;
 }   // setSlowdown
 
@@ -227,11 +227,11 @@ void MaxSpeed::SpeedDecrease::update(int ticks)
     }
 
     float diff = m_current_fraction - m_max_speed_fraction;
-    if(diff > 0)
+
+    if (diff > 0)
     {
-        float dt = stk_config->ticks2Time(ticks);
-        if (diff * m_fade_in_time > ticks)
-            m_current_fraction -= float(dt)/m_fade_in_time;
+        if (diff * m_fade_in_ticks > ticks)
+            m_current_fraction -= float(ticks) / float(m_fade_in_ticks);
         else
             m_current_fraction = m_max_speed_fraction;
     }
@@ -247,7 +247,7 @@ void MaxSpeed::SpeedDecrease::update(int ticks)
 void MaxSpeed::SpeedDecrease::saveState(BareNetworkString *buffer) const
 {
     buffer->addFloat(m_max_speed_fraction);
-    buffer->addUInt32(m_fade_in_time);
+    buffer->addUInt32(m_fade_in_ticks);
     buffer->addFloat(m_current_fraction);
     buffer->addUInt32(m_duration);
 }   // saveState
@@ -261,7 +261,7 @@ void MaxSpeed::SpeedDecrease::rewindTo(BareNetworkString *buffer,
     if(is_active)
     {
         m_max_speed_fraction = buffer->getFloat();
-        m_fade_in_time       = buffer->getUInt32();
+        m_fade_in_ticks      = buffer->getUInt32();
         m_current_fraction   = buffer->getFloat();
         m_duration           = buffer->getUInt32();
     }
