@@ -75,7 +75,8 @@ void GameSetup::loadWorld()
 {
     assert(!m_tracks.empty());
     // Disable accidentally unlocking of a challenge
-    PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
+    if (PlayerManager::getCurrentPlayer())
+        PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
     race_manager->setTimeTarget(0.0f);
     race_manager->setReverseTrack(m_reverse);
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
