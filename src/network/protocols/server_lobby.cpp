@@ -384,7 +384,8 @@ void ServerLobby::asynchronousUpdate()
 void ServerLobby::update(int ticks)
 {
     // Reset server to initial state if no more connected players
-    if (m_state.load() > ACCEPTING_CLIENTS &&
+    if ((m_state.load() > ACCEPTING_CLIENTS ||
+        m_game_setup->isGrandPrixStarted()) &&
         STKHost::get()->getPeerCount() == 0 &&
         NetworkConfig::get()->getServerIdFile().empty())
     {
