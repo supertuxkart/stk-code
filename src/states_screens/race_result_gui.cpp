@@ -1479,7 +1479,7 @@ void RaceResultGUI::backToLobby()
                 ("sshot_label_" + StringUtils::toString(n_sshot)).c_str());
             assert(sshot != NULL && label != NULL);
 
-            // Network grand prix chooses each track 1 bye 1
+            // Network grand prix chooses each track 1 by 1
             if (track == NULL)
             {
                 sshot->setImage(file_manager->getAsset(FileManager::GUI,

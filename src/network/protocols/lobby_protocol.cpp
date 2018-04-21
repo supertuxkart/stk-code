@@ -23,6 +23,7 @@
 #include "input/device_manager.hpp"
 #include "modes/world.hpp"
 #include "network/game_setup.hpp"
+#include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
@@ -90,7 +91,7 @@ void LobbyProtocol::configRemoteKart(
 
     // Set number of global and local players.
     race_manager->setNumPlayers((int)players.size(),
-        m_game_setup->getNumLocalPlayers());
+        (int)NetworkConfig::get()->getNetworkPlayers().size());
 
     // Create the kart information for the race manager:
     // -------------------------------------------------

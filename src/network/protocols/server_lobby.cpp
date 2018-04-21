@@ -126,11 +126,10 @@ void ServerLobby::setup()
     m_available_kts.second = { all_t.begin(), all_t.end() };
 
     m_server_registered = false;
-    m_game_setup->setNumLocalPlayers(0);    // no local players on a server
+    m_server_has_loaded_world.store(false);
 
     // Initialise the data structures to detect if all clients and 
     // the server are ready:
-    m_server_has_loaded_world.store(false);
     resetPeersReady();
     m_peers_votes.clear();
     m_server_delay = 0.0;

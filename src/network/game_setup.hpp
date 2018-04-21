@@ -46,9 +46,6 @@ private:
     /** Information about all connected players. */
     std::vector<std::weak_ptr<NetworkPlayerProfile> > m_players;
 
-    /** Stores the number of local players. */
-    int m_num_local_players;
-
     std::vector<std::string> m_tracks;
 
     unsigned m_laps;
@@ -61,7 +58,6 @@ public:
     // ------------------------------------------------------------------------
     GameSetup()
     {
-        m_num_local_players = 0;
         m_extra_server_info = -1;
         reset();
     }
@@ -72,12 +68,6 @@ public:
                                               { m_players.push_back(profile); }
     // ------------------------------------------------------------------------
     void update(bool remove_disconnected_players);
-    // ------------------------------------------------------------------------
-    /** Sets the number of local players. */
-    void setNumLocalPlayers(int n) { m_num_local_players = n; }
-    // ------------------------------------------------------------------------
-    /** Returns the nunber of local players. */
-    int getNumLocalPlayers() const { return m_num_local_players; }
     // ------------------------------------------------------------------------
     /** \brief Get the players that are / were in the game
     *  \return A vector containing pointers on the players profiles. */

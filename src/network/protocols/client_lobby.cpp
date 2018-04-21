@@ -411,8 +411,6 @@ void ClientLobby::connectionAccepted(Event* event)
 
     STKHost::get()->setMyHostId(data.getUInt32());
     assert(!NetworkConfig::get()->isAddingNetworkPlayers());
-    m_game_setup->setNumLocalPlayers((int)
-        NetworkConfig::get()->getNetworkPlayers().size());
     // connection token
     uint32_t token = data.getToken();
     peer->setClientServerToken(token);

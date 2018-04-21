@@ -76,6 +76,7 @@ RaceManager::RaceManager()
     m_coin_target        = 0;
     m_started_from_overworld = false;
     m_have_kart_last_position_on_overworld = false;
+    m_num_local_players = 0;
     setMaxGoal(0);
     setTimeTarget(0.0f);
     setReverseTrack(false);
