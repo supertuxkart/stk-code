@@ -27,6 +27,7 @@
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "graphics/material.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -245,16 +246,19 @@ void LinearWorld::updateGraphics(float dt)
         m_last_lap_sfx_playing = false;
     }
 
-    const unsigned int kart_amount = getNumKarts();
-    for (unsigned int i = 0; i<kart_amount; i++)
+    if (!GUIEngine::ModalDialog::isADialogActive())
     {
-        // ---------- update rank ------
-        if (!m_karts[i]->hasFinishedRace() &&
-            !m_karts[i]->isEliminated())
+        const unsigned int kart_amount = getNumKarts();
+        for (unsigned int i = 0; i<kart_amount; i++)
         {
-            checkForWrongDirection(i, dt);
-        }
-    }   // for i <kart_amount
+            // ---------- update rank ------
+            if (!m_karts[i]->hasFinishedRace() &&
+                !m_karts[i]->isEliminated())
+            {
+                checkForWrongDirection(i, dt);
+            }
+        }   // for i <kart_amount
+    }
 
 }   // updateGraphics
 
