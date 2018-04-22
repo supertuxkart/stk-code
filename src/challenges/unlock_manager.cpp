@@ -245,13 +245,14 @@ bool UnlockManager::isSupportedVersion(const ChallengeData &challenge)
 
 
 //-----------------------------------------------------------------------------
-/** This functions finds what new tracks and GP have been unlocked
+/** This functions finds what new tracks, GP and karts have been unlocked
  */
 void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
                                         std::vector<std::string>& tracks,
-                                        std::vector<std::string>& gps)
+                                        std::vector<std::string>& gps,
+                                        std::vector<std::string>& karts,
+                                        std::vector<const ChallengeData*>& unlocked)
 {
-
     ChallengeData* c = NULL;
 
     for (AllChallengesType::iterator it = m_all_challenges.begin();
@@ -273,19 +274,36 @@ void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
             }
         }
     }
+
+    for (unsigned int n = 0; n < unlocked.size(); n++)
+    {
+        std::vector<ChallengeData::UnlockableFeature> features = unlocked[n]->getFeatures();
+
+        for (unsigned int i = 0; i < features.size(); i++)
+        {
+            if( features[i].m_type == ChallengeData::UNLOCK_KART )
+                karts.push_back(features[i].m_name);
+        }
+    }
+
+    //std::vector<const ChallengeData*>
+    //    getRecentlyCompletedChallenges()
 } // findWhatWasUnlocked
 
 //-----------------------------------------------------------------------------
 /** This functions sets as completed the "challenges" requiring a certain number
  *  of points, to unlock features.
+ *  Returns true if the challenge has been completed
  */
-void UnlockManager::unlockByPoints(int points, ChallengeStatus* unlock_list)
+bool UnlockManager::unlockByPoints(int points, ChallengeStatus* unlock_list)
 {
     //TODO : add support for other conditions (achievements...) for alternative unlock paths
     if( unlock_list!=NULL && unlock_list->getData()->getNumTrophies() <= points)
     {
         unlock_list->setSolved(RaceManager::DIFFICULTY_BEST);
+        return true;
     }
+    return false;
 } // unlockByPoints
 
 /* EOF */
