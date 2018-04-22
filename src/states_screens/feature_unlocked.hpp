@@ -141,11 +141,11 @@ public:
     void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                        const int playerID) OVERRIDE;
 
-    void findWhatWasUnlocked(RaceManager::Difficulty difficulty);
+    void findWhatWasUnlocked(RaceManager::Difficulty difficulty,std::vector<const ChallengeData*>& unlocked);
 
     /** Call before showing up the screen to make a kart come out of the chest.
         'addUnlockedThings' will invoke this, so you generally don't need to call this directly. */
-    void addUnlockedKart(KartProperties* unlocked_kart, irr::core::stringw msg);
+    void addUnlockedKart(KartProperties* unlocked_kart);
 
     /** Call before showing up the screen to make a picture come out of the chest
         'addUnlockedThings' will invoke this, so you generally don't need to call this directly. */
@@ -166,7 +166,7 @@ public:
     void addUnlockedThings(const std::vector<const ChallengeData*> unlocked);
     */
 
-    void addTrophy(RaceManager::Difficulty difficulty, bool is_grandprix = false);
+    void addTrophy(RaceManager::Difficulty difficulty, bool is_grandprix);
 
     /** override from base class to handle escape press */
     virtual bool onEscapePressed() OVERRIDE;
