@@ -52,7 +52,7 @@
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/network_kart_selection.hpp"
+#include "states_screens/networking_lobby.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -441,6 +441,7 @@ void RaceResultGUI::backToLobby()
     cleanupGPProgress();
     StateManager::get()->resetAndSetStack(
         NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
+    NetworkingLobby::getInstance()->addMoreServerInfo(L"--------------------");
 }   // backToLobby
 
 //-----------------------------------------------------------------------------
