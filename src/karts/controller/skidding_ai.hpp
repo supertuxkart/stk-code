@@ -194,6 +194,9 @@ private:
     enum {SKID_PROBAB_NOT_YET, SKID_PROBAB_NO_SKID, SKID_PROBAB_SKID}
           m_skid_probability_state;
 
+    /** This is used by computeSkill to know what skill is used */
+    enum SkillType {ITEM_SKILL, NITRO_SKILL};
+
     /** The last item selected for collection, for which a probability
      *  was determined. */
     const Item *m_last_item_random;
@@ -242,11 +245,19 @@ private:
     void  handleRaceStart();
     void  handleAcceleration(int ticks);
     void  handleSteering(float dt);
+    int   computeSkill(SkillType type);
     void  handleItems(const float dt, const Vec3 *aim_point,
-                                           int last_node);
+                                int last_node, int item_skill);
+    void  handleBubblegum(int item_skill, const std::vector<const Item *> &items_to_collect,
+                                        const std::vector<const Item *> &items_to_avoid);
+    void  handleCake(int item_skill);
+    void  handleBowling(int item_skill);
+    void  handleSwatter(int item_skill);
+    void  handleSwitch(int item_skill, const std::vector<const Item *> &items_to_collect,
+                                     const std::vector<const Item *> &items_to_avoid);
     void  handleRescue(const float dt);
     void  handleBraking();
-    void  handleNitroAndZipper();
+    void  handleNitroAndZipper(int item_skill);
     void  computeNearestKarts();
     void  handleItemCollectionAndAvoidance(Vec3 *aim_point,
                                            int last_node);
