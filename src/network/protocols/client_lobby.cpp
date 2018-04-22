@@ -18,6 +18,7 @@
 
 #include "network/protocols/client_lobby.hpp"
 
+#include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "config/player_manager.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -381,6 +382,7 @@ void ClientLobby::disconnectedPlayer(Event* event)
     if (!checkDataSize(event, 1)) return;
 
     NetworkString &data = event->data();
+    SFXManager::get()->quickSound("appear");
     unsigned disconnected_player_count = data.getUInt8();
     for (unsigned i = 0; i < disconnected_player_count; i++)
     {
@@ -519,6 +521,7 @@ void ClientLobby::updatePlayerList(Event* event)
 //-----------------------------------------------------------------------------
 void ClientLobby::becomingServerOwner()
 {
+    SFXManager::get()->quickSound("wee");
     core::stringw msg = _("You are now the owner of server.");
     MessageQueue::add(MessageQueue::MT_GENERIC, msg);
     STKHost::get()->setAuthorisedToControl(true);
@@ -537,6 +540,7 @@ void ClientLobby::handleChat(Event* event)
 {
     if (!UserConfigParams::m_lobby_chat)
         return;
+    SFXManager::get()->quickSound("plopp");
     std::string message;
     event->data().decodeString(&message);
     Log::info("ClientLobby", "%s", message.c_str());
