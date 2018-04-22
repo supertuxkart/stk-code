@@ -452,7 +452,7 @@ void ClientLobby::handleServerInfo(Event* event)
     auto game_mode = NetworkConfig::get()->getLocalGameMode();
     race_manager->setMinorMode(game_mode.first);
     // We use single mode in network even it's grand prix
-    race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
+    race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
     //I18N: In the networking lobby
     core::stringw mode_name = NetworkConfig::get()->getModeName(u_data);
