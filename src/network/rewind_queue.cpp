@@ -225,6 +225,20 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
             i++;
             continue;
         }
+        // Any state of event that is received before the latest confirmed
+        // state can be deleted.
+        if ((*i)->getTicks() < m_latest_confirmed_state_time)
+        {
+            Log::info("RewindQueue",
+                      "Deleting %s at %d because it's before confirmed state %d",
+                      (*i)->isEvent() ? "event" : "state",
+                      (*i)->getTicks(),
+                      m_latest_confirmed_state_time);
+            delete *i;
+            i = m_network_events.getData().erase(i);
+            continue;
+        }
+
         // A server never rewinds (otherwise we would have to handle 
         // duplicated states, which in the best case would then have
         // a negative effect for every player, when in fact only one
@@ -276,6 +290,7 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
     if (latest_confirmed_state > m_latest_confirmed_state_time)
     {
         cleanupOldRewindInfo(latest_confirmed_state);
+        m_latest_confirmed_state_time = latest_confirmed_state;
     }
 
 }   // mergeNetworkData
