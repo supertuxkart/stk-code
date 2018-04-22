@@ -204,7 +204,7 @@ void FeatureUnlockedCutScene::onCutsceneEnd()
 
 // ----------------------------------------------------------------------------
 
-void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty difficulty)
+void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty difficulty,std::vector<const ChallengeData*>& unlocked)
 {
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
     int points_before = player->getPoints();
@@ -212,9 +212,10 @@ void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty diffic
 
     std::vector<std::string> tracks;
     std::vector<std::string> gps;
+    std::vector<std::string> karts;
 
     player->computeActive();
-    unlock_manager->findWhatWasUnlocked(points_before, points_now, tracks, gps);
+    unlock_manager->findWhatWasUnlocked(points_before, points_now, tracks, gps, karts, unlocked);
 
     for (unsigned int i = 0; i < tracks.size(); i++)
     {
@@ -223,6 +224,10 @@ void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty diffic
     for (unsigned int i = 0; i < gps.size(); i++)
     {
         addUnlockedGP(grand_prix_manager->getGrandPrix(gps[i]));
+    }
+    for (unsigned int i = 0; i < karts.size(); i++)
+    {
+        addUnlockedKart(const_cast<KartProperties*>(kart_properties_manager->getKart(karts[i])));
     }
 }
 
@@ -285,12 +290,17 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty, bool
 }
 
 // ----------------------------------------------------------------------------
-// unused for now, maybe will be useful later?
 
-void FeatureUnlockedCutScene::addUnlockedKart(KartProperties* unlocked_kart,
-                                              irr::core::stringw msg)
+void FeatureUnlockedCutScene::addUnlockedKart(KartProperties* unlocked_kart)
 {
-    assert(unlocked_kart != NULL);
+    if (unlocked_kart == NULL)
+    {
+        Log::error("FeatureUnlockedCutScene::addUnlockedKart", "Unlocked kart does not exist");
+        return;
+    }
+    irr::core::stringw name = unlocked_kart->getName();
+    irr::core::stringw msg = _("You unlocked ");
+    msg = msg + name + _("!");
     m_unlocked_stuff.push_back( new UnlockedThing(unlocked_kart, msg) );
 }  // addUnlockedKart
 
@@ -442,8 +452,6 @@ void FeatureUnlockedCutScene::init()
             Log::error("FeatureUnlockedCutScene::init", "Malformed unlocked goody");
         }
     }
-
-    PlayerManager::getCurrentPlayer()->clearUnlocked();
 }   // init
 
 // ----------------------------------------------------------------------------
