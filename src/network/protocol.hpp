@@ -23,10 +23,10 @@
 #ifndef PROTOCOL_HPP
 #define PROTOCOL_HPP
 
-#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 
+#include <memory>
 #include <stddef.h>
 
 class Event;
@@ -44,13 +44,11 @@ enum ProtocolType
     PROTOCOL_NONE              = 0x00,  //!< No protocol type assigned.
     PROTOCOL_CONNECTION        = 0x01,  //!< Protocol that deals with client-server connection.
     PROTOCOL_LOBBY_ROOM        = 0x02,  //!< Protocol that is used during the lobby room phase.
-    PROTOCOL_START_GAME        = 0x03,  //!< Protocol used when starting the game.
-    PROTOCOL_SYNCHRONIZATION   = 0x04,  //!<Protocol used to synchronize clocks.
-    PROTOCOL_KART_UPDATE       = 0x05,  //!< Protocol to update karts position, rotation etc...
-    PROTOCOL_GAME_EVENTS       = 0x06,  //!< Protocol to communicate the game events.
-    PROTOCOL_CONTROLLER_EVENTS = 0x07,  //!< Protocol to transfer controller modifications
+    PROTOCOL_GAME_EVENTS       = 0x03,  //!< Protocol to communicate the game events.
+    PROTOCOL_CONTROLLER_EVENTS = 0x04,  //!< Protocol to transfer controller modifications
+    PROTOCOL_SILENT            = 0x05,  //!< Used for protocols that do not subscribe to any network event.
+    PROTOCOL_MAX                     ,  //!< Maximum number of different protocol types
     PROTOCOL_SYNCHRONOUS       = 0x80,  //!< Flag, indicates synchronous delivery
-    PROTOCOL_SILENT            = 0xff   //!< Used for protocols that do not subscribe to any network event.
 };   // ProtocolType
 
 // ----------------------------------------------------------------------------
@@ -89,9 +87,9 @@ public:
  *  to make any network job.
  * \ingroup network
  */
-class Protocol : public NoCopy
+class Protocol : public std::enable_shared_from_this<Protocol>,
+                 public NoCopy
 {
-    LEAK_CHECK()
 protected:
     /** The type of the protocol. */
     ProtocolType m_type;
@@ -101,9 +99,6 @@ protected:
 
     /** The state this protocol is in (e.g. running, paused, ...). */
     ProtocolState m_state;
-
-    /** The unique id of the protocol. */
-    uint32_t        m_id;
 
     /** True if this protocol should receive connection events. */
     bool m_handle_connections;
@@ -121,7 +116,7 @@ public:
 
     /** \brief Called by the protocol listener, synchronously with the main
      *  loop. Must be re-defined.*/
-    virtual void update(float dt) = 0;
+    virtual void update(int ticks) = 0;
 
     /** \brief Called by the protocol listener as often as possible.
      *  Must be re-defined. */
@@ -138,7 +133,6 @@ public:
     void requestPause();
     void requestUnpause();
     void requestTerminate();
-    void findAndTerminateProtocol(ProtocolType type);
 
     // ------------------------------------------------------------------------
     /** \brief Called when the protocol is paused (by an other entity or by
@@ -162,12 +156,6 @@ public:
     // ------------------------------------------------------------------------
     /** Sets the current protocol state. */
     void setState(ProtocolState s) { m_state = s; }
-    // ------------------------------------------------------------------------
-    /** Returns the unique protocol ID. */
-    uint32_t getId() const { return m_id;  }
-    // ------------------------------------------------------------------------
-    /** Sets the unique protocol id. */
-    void setId(uint32_t id) { m_id = id;  }
     // ------------------------------------------------------------------------
     /** \brief Notify a protocol matching the Event type of that event.
      *  \param event : Pointer to the event.

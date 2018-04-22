@@ -27,6 +27,7 @@
  */
 
 #include "network/remote_kart_info.hpp"
+#include "utils/interpolation_array.hpp"
 #include "utils/no_copy.hpp"
 
 #include "utils/constants.hpp"
@@ -69,13 +70,13 @@ public:
     float m_bomb_time;                 /**<Time before a bomb explodes.        */
     float m_bomb_time_increase;        /**<Time added to bomb timer when it's
                                            passed on.                          */
-    float m_item_switch_time;          /**< Time items will be switched.       */
+    int   m_item_switch_ticks;          /**< Time items will be switched.       */
     int   m_bubblegum_counter;         /**< How many times bubble gums must be
                                             driven over before they disappear. */
     bool  m_shield_restrict_weapons;   /**<Wether weapon usage is punished. */
     float m_explosion_impulse_objects; /**<Impulse of explosion on moving
                                             objects, e.g. road cones, ...      */
-    float m_penalty_time;              /**< Penalty time when starting too
+    int   m_penalty_ticks;              /**< Penalty time when starting too
                                             early.                             */
     float m_delay_finish_time;         /**<Delay after a race finished before
                                            the results are displayed.          */
@@ -84,9 +85,20 @@ public:
     int   m_max_karts;                 /**<Maximum number of karts.            */
     bool  m_smooth_normals;            /**< If normals for raycasts for wheels
                                            should be interpolated.             */
-                                           /** If the angle between a normal on a vertex and the normal of the
-                                            *  triangle are more than this value, the physics will use the normal
-                                            *  of the triangle in smoothing normal. */
+
+    /** How many state updates per second the server will send. */
+    int m_network_state_frequeny;
+
+    /** Smoothing of prediction errors for position, defined as an
+     *  InterpolationArray. */
+    InterpolationArray m_positional_smoothing;
+    /** Smoothing of prediction errors for rotations, defined as an
+     *  InterpolationArray. */
+    InterpolationArray m_rotational_smoothing;
+
+    /** If the angle between a normal on a vertex and the normal of the
+     *  triangle are more than this value, the physics will use the normal
+     *  of the triangle in smoothing normal. */
     float m_smooth_angle_limit;
 
     /** Default friction for the track and any track/library object. */
@@ -105,9 +117,10 @@ public:
         m_max_kart_version;        /**<version supported by this binary.   */
     int   m_min_track_version,       /**<The minimum and maximum .track file */
         m_max_track_version;       /**<version supported by this binary.   */
+    int   m_min_server_version,       /**<The minimum and maximum server */
+        m_max_server_version;       /**<version supported by this binary.   */
     int   m_max_display_news;        /**<How often a news message is displayed
                                          before it is ignored. */
-    bool  m_enable_networking;
 
     /** Disable steering if skidding is stopped. This can help in making
      *  skidding more controllable (since otherwise when trying to steer while
@@ -158,6 +171,11 @@ public:
     unsigned m_max_skinning_bones;
 
     unsigned m_tc_quality;
+
+    /** Client and server port use random ports if enabled in user config. */
+    uint16_t m_server_discovery_port;
+    uint16_t m_client_port;
+    uint16_t m_server_port;
 
     /** Lists of TTF files used in STK. */
     std::vector<std::string> m_normal_ttf;

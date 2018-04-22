@@ -117,8 +117,23 @@ void STKConfig::load(const std::string &filename)
         Log::fatal("StkConfig", "Wrong number of item switches defined in stk_config");
     }
 
+    if (m_positional_smoothing.size() == 0)
+    {
+        Log::fatal("StkConfig", "No positional smoothing defined in stk_config.");
+    }
+    if (m_rotational_smoothing.size() == 0)
+    {
+        Log::fatal("StkConfig", "No rotationalsmoothing defined in stk_config.");
+    }
+
+    if (m_client_port == 0 || m_server_port == 0 || m_server_discovery_port == 0 ||
+        m_client_port == m_server_port || m_client_port == m_server_discovery_port ||
+        m_server_port == m_server_discovery_port)
+    {
+        Log::fatal("StkConfig", "Invalid default port values.");
+    }
     CHECK_NEG(m_max_karts,                 "<karts max=..."             );
-    CHECK_NEG(m_item_switch_time,          "item-switch-time"           );
+    CHECK_NEG(m_item_switch_ticks,         "item switch-time"           );
     CHECK_NEG(m_bubblegum_counter,         "bubblegum disappear counter");
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
     CHECK_NEG(m_max_skidmarks,             "max-skidmarks"              );
@@ -126,12 +141,14 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_max_kart_version,          "<kart-version max=...>"     );
     CHECK_NEG(m_min_track_version,         "min-track-version"          );
     CHECK_NEG(m_max_track_version,         "max-track-version"          );
+    CHECK_NEG(m_min_server_version,        "min-server-version"         );
+    CHECK_NEG(m_max_server_version,        "max-server-version"         );
     CHECK_NEG(m_skid_fadeout_time,         "skid-fadeout-time"          );
     CHECK_NEG(m_near_ground,               "near-ground"                );
     CHECK_NEG(m_delay_finish_time,         "delay-finish-time"          );
     CHECK_NEG(m_music_credit_time,         "music-credit-time"          );
     CHECK_NEG(m_leader_time_per_kart,      "leader time-per-kart"       );
-    CHECK_NEG(m_penalty_time,              "penalty-time"               );
+    CHECK_NEG(m_penalty_ticks,             "penalty-time"               );
     CHECK_NEG(m_max_display_news,          "max-display-news"           );
     CHECK_NEG(m_replay_max_time,           "replay max-time"            );
     CHECK_NEG(m_replay_delta_angle,        "replay delta-angle"         );
@@ -140,6 +157,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_smooth_angle_limit,        "physics smooth-angle-limit" );
     CHECK_NEG(m_default_track_friction,    "physics default-track-friction");
     CHECK_NEG(m_physics_fps,               "physics fps"                );
+    CHECK_NEG(m_network_state_frequeny,    "network state-frequency"    );
     CHECK_NEG(m_default_moveable_friction, "physics default-moveable-friction");
 
     // Square distance to make distance checks cheaper (no sqrt)
@@ -157,10 +175,11 @@ void STKConfig::init_defaults()
     m_bomb_time                  = m_bomb_time_increase        =
         m_explosion_impulse_objects = m_music_credit_time      =
         m_delay_finish_time      = m_skid_fadeout_time         =
-        m_near_ground            = m_item_switch_time          =
-        m_smooth_angle_limit     = m_penalty_time              =
-        m_default_track_friction = m_default_moveable_friction =
-        UNDEFINED;
+        m_near_ground            = 
+        m_smooth_angle_limit     = m_default_track_friction    =
+        m_default_moveable_friction =    UNDEFINED;
+    m_item_switch_ticks          = -100;
+    m_penalty_ticks              = -100;
     m_physics_fps                = -100;
     m_bubblegum_counter          = -100;
     m_shield_restrict_weapons    = false;
@@ -170,13 +189,15 @@ void STKConfig::init_defaults()
     m_max_kart_version           = -100;
     m_min_track_version          = -100;
     m_max_track_version          = -100;
+    m_min_server_version         = -100;
+    m_max_server_version         = -100;
     m_max_display_news           = -100;
     m_replay_max_time            = -100;
     m_replay_delta_angle         = -100;
     m_replay_delta_pos2          = -100;
     m_replay_dt                  = -100;
+    m_network_state_frequeny     = -100;
     m_title_music                = NULL;
-    m_enable_networking          = true;
     m_smooth_normals             = false;
     m_same_powerup_mode          = POWERUP_MODE_ONLY_IF_SAME;
     m_ai_acceleration            = 1.0f;
@@ -185,6 +206,9 @@ void STKConfig::init_defaults()
     m_cutscene_fov               = 0.61f;
     m_max_skinning_bones         = 1024;
     m_tc_quality                 = 16;
+    m_server_discovery_port      = 2757;
+    m_client_port                = 2758;
+    m_server_port                = 2759;
 
     m_score_increase.clear();
     m_leader_intervals.clear();
@@ -211,6 +235,12 @@ void STKConfig::getAllData(const XMLNode * root)
     {
         node->get("min", &m_min_track_version);
         node->get("max", &m_max_track_version);
+    }
+
+    if(const XMLNode *node = root->getNode("server-version"))
+    {
+        node->get("min", &m_min_server_version);
+        node->get("max", &m_max_server_version);
     }
 
     if(const XMLNode *kart_node = root->getNode("karts"))
@@ -256,7 +286,9 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if (const XMLNode *startup_node= root->getNode("startup"))
     {
-        startup_node->get("penalty", &m_penalty_time );
+        float f;
+        startup_node->get("penalty", &f);
+        m_penalty_ticks = time2Ticks(f);
     }
 
     if (const XMLNode *news_node= root->getNode("news"))
@@ -337,7 +369,9 @@ void STKConfig::getAllData(const XMLNode * root)
     if(const XMLNode *switch_node= root->getNode("switch"))
     {
         switch_node->get("items", &m_switch_items    );
-        switch_node->get("time",  &m_item_switch_time);
+        float f;
+        if( switch_node->get("time",  &f) )
+            m_item_switch_ticks = stk_config->time2Ticks(f);
     }
 
     if(const XMLNode *bubblegum_node= root->getNode("bubblegum"))
@@ -356,8 +390,12 @@ void STKConfig::getAllData(const XMLNode * root)
         ai_node->get("acceleration", &m_ai_acceleration);
     }
 
-    if(const XMLNode *networking_node= root->getNode("networking"))
-        networking_node->get("enable", &m_enable_networking);
+    if (const XMLNode *networking_node = root->getNode("networking"))
+    {
+        networking_node->get("state-frequency",      &m_network_state_frequeny);
+        networking_node->get("positional-smoothing", &m_positional_smoothing  );
+        networking_node->get("rotational-smoothing", &m_rotational_smoothing  );
+    }
 
     if(const XMLNode *replay_node = root->getNode("replay"))
     {
@@ -382,6 +420,19 @@ void STKConfig::getAllData(const XMLNode * root)
     if (const XMLNode *tc = root->getNode("texture-compression"))
     {
         tc->get("quality", &m_tc_quality);
+    }
+
+    if (const XMLNode *tc = root->getNode("network"))
+    {
+        unsigned server_discovery_port = 0;
+        unsigned client_port = 0;
+        unsigned server_port = 0;
+        tc->get("server-discovery-port", &server_discovery_port);
+        tc->get("client-port", &client_port);
+        tc->get("server-port", &server_port);
+        m_server_discovery_port = (uint16_t)server_discovery_port;
+        m_client_port = (uint16_t)client_port;
+        m_server_port = (uint16_t)server_port;
     }
 
     // Get the default KartProperties

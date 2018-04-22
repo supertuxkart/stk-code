@@ -15,22 +15,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#define DEBUG_MENU_ITEM 0
-
 #include "states_screens/create_server_screen.hpp"
 
 #include "audio/sfx_manager.hpp"
-#include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "modes/demo_world.hpp"
 #include "network/network_config.hpp"
-#include "network/servers_manager.hpp"
+#include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
-#include "states_screens/dialogs/server_info_dialog.hpp"
+#include "utils/separate_process.hpp"
 #include "utils/translation.hpp"
 
 #include <irrString.h>
@@ -40,8 +35,6 @@
 
 
 using namespace GUIEngine;
-
-DEFINE_SCREEN_SINGLETON( CreateServerScreen );
 
 // ----------------------------------------------------------------------------
 
@@ -58,13 +51,26 @@ void CreateServerScreen::loadedFromFile()
  
     m_max_players_widget = getWidget<SpinnerWidget>("max_players");
     assert(m_max_players_widget != NULL);
-    m_max_players_widget->setValue(8);
+    int max = UserConfigParams::m_server_max_players.getDefaultValue();
+    m_max_players_widget->setMax(max);
+
+    if (UserConfigParams::m_server_max_players > max)
+        UserConfigParams::m_server_max_players = max;
+
+    m_max_players_widget->setValue(UserConfigParams::m_server_max_players);
 
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
 
+    m_more_options_text = getWidget<LabelWidget>("more-options");
+    assert(m_more_options_text != NULL);
+    m_more_options_spinner = getWidget<SpinnerWidget>("more-options-spinner");
+    assert(m_more_options_spinner != NULL);
+
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
+    m_game_mode_widget = getWidget<RibbonWidget>("gamemode");
+    assert(m_game_mode_widget != NULL);
     m_create_widget = getWidget<IconButtonWidget>("create");
     assert(m_create_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
@@ -75,7 +81,6 @@ void CreateServerScreen::loadedFromFile()
 void CreateServerScreen::init()
 {
     Screen::init();
-    DemoWorld::resetIdleTime();
     m_info_widget->setText("", false);
     LabelWidget *title = getWidget<LabelWidget>("title");
 
@@ -101,6 +106,7 @@ void CreateServerScreen::init()
     RibbonWidget* gamemode = getWidget<RibbonWidget>("gamemode");
     assert(gamemode != NULL);
     gamemode->setSelection(0, PLAYER_ID_GAME_MASTER);
+    updateMoreOption(0);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -123,7 +129,61 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
             createServer();
         }   // is create_widget
     }
+    else if (name == m_game_mode_widget->m_properties[PROP_ID])
+    {
+        const int selection =
+            m_game_mode_widget->getSelection(PLAYER_ID_GAME_MASTER);
+        updateMoreOption(selection);
+    }
+
 }   // eventCallback
+
+// ----------------------------------------------------------------------------
+void CreateServerScreen::updateMoreOption(int game_mode)
+{
+    switch (game_mode)
+    {
+        case 0:
+        case 1:
+        {
+            m_more_options_text->setVisible(true);
+            //I18N: In the create server screen
+            m_more_options_text->setText(_("No. of grand prix track(s)"),
+                false);
+            m_more_options_spinner->setVisible(true);
+            m_more_options_spinner->clearLabels();
+            m_more_options_spinner->addLabel(_("Disabled"));
+            for (int i = 1; i <= 20; i++)
+            {
+                m_more_options_spinner->addLabel(StringUtils::toWString(i));
+            }
+            m_more_options_spinner->setValue(0);
+            break;
+        }
+        case 3:
+        {
+            m_more_options_text->setVisible(true);
+            m_more_options_spinner->setVisible(true);
+            m_more_options_spinner->clearLabels();
+            //I18N: In the create server screen
+            m_more_options_text->setText(_("Soccer game type"), false);
+            m_more_options_spinner->setVisible(true);
+            m_more_options_spinner->clearLabels();
+            //I18N: In the create server screen for soccer server
+            m_more_options_spinner->addLabel(_("Time limit"));
+            //I18N: In the create server screen for soccer server
+            m_more_options_spinner->addLabel(_("Goals limit"));
+            m_more_options_spinner->setValue(0);
+            break;
+        }
+        default:
+        {
+            m_more_options_text->setVisible(false);
+            m_more_options_spinner->setVisible(false);
+            break;
+        }
+    }
+}   // updateMoreOption
 
 // ----------------------------------------------------------------------------
 /** Called once per framce to check if the server creation request has
@@ -134,27 +194,6 @@ void CreateServerScreen::onUpdate(float delta)
     // If no host has been created, keep on waiting.
     if(!STKHost::existHost())
         return;
-
-    // First check if an error happened while registering the server:
-    // --------------------------------------------------------------
-    const irr::core::stringw &error = STKHost::get()->getErrorMessage();
-    if(error!="")
-    {
-        SFXManager::get()->quickSound("anvil");
-        m_info_widget->setErrorColor();
-        m_info_widget->setText(error, false);
-        return;
-    }
-
-    // Otherwise wait till we get an answer from the server:
-    // -----------------------------------------------------
-    if(!STKHost::get()->isRegistered() && !NetworkConfig::get()->isLAN())
-    {
-        m_info_widget->setDefaultColor();
-        m_info_widget->setText(StringUtils::loadingDots(_("Creating server")),
-                               false);
-        return;
-    }
 
     //FIXME If we really want a gui, we need to decide what else to do here
     // For now start the (wrong i.e. client) lobby, to prevent to create
@@ -177,30 +216,45 @@ void CreateServerScreen::createServer()
 
     if (name.size() < 4 || name.size() > 30)
     {
+        //I18N: In the create server screen
         m_info_widget->setText(
             _("Name has to be between 4 and 30 characters long!"), false);
         SFXManager::get()->quickSound("anvil");
         return;
     }
-    else if (max_players < 2 || max_players > 12)
+    assert(max_players > 1 && max_players <=
+        UserConfigParams::m_server_max_players.getDefaultValue());
+
+    UserConfigParams::m_server_max_players = max_players;
+    std::string password = StringUtils::wideToUtf8(getWidget<TextBoxWidget>
+        ("password")->getText());
+    if ((!password.empty() != 0 &&
+        password.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOP"
+        "QRSTUVWXYZ01234567890_") != std::string::npos) ||
+        password.size() > 255)
     {
+        //I18N: In the create server screen
         m_info_widget->setText(
-            _("The maxinum number of players has to be between 2 and 12."),
-            false);
+            _("Incorrect characters in password!"), false);
         SFXManager::get()->quickSound("anvil");
         return;
     }
 
-    // In case of a LAN game, we can create the new server object now
-    if (NetworkConfig::get()->isLAN())
-    {
-        // FIXME Is this actually necessary?? Only in case of WAN, or LAN and WAN?
-        TransportAddress address(0x7f000001,0);  // 127.0.0.1
-        Server *server = new Server(name, /*lan*/true, max_players,
-                                    /*current_player*/1, address);
-        ServersManager::get()->addServer(server);
-    }
+    NetworkConfig::get()->setPassword(password);
+    if (!password.empty())
+        password = std::string(" --server-password=") + password;
 
+    TransportAddress server_address(0x7f000001,
+        NetworkConfig::get()->getServerDiscoveryPort());
+
+    auto server = std::make_shared<Server>(0/*server_id*/, name,
+        max_players, /*current_player*/0, (RaceManager::Difficulty)
+        difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER),
+        0, server_address, !password.empty());
+
+#undef USE_GRAPHICS_SERVER
+#ifdef USE_GRAPHICS_SERVER
+    NetworkConfig::get()->setIsServer(true);
     // In case of a WAN game, we register this server with the
     // stk server, and will get the server's id when this 
     // request is finished.
@@ -220,13 +274,66 @@ void CreateServerScreen::createServer()
     else
         race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
 
-    core::stringw password_w = getWidget<TextBoxWidget>("password")->getText();
-    std::string password(core::stringc(password_w.c_str()).c_str());
-    NetworkConfig::get()->setPassword(password);
-
     race_manager->setReverseTrack(false);
-    STKHost::create();
+    auto sl = STKHost::create();
+    assert(sl);
+    sl->requestStart();
+#else
 
+    NetworkConfig::get()->setIsServer(false);
+    std::ostringstream server_cfg;
+#ifdef WIN32
+    server_cfg << " ";
+#endif
+
+    const std::string server_name = StringUtils::xmlEncode(name);
+    if (NetworkConfig::get()->isWAN())
+    {
+        server_cfg << "--public-server --wan-server=" <<
+            server_name << " --login-id=" <<
+            NetworkConfig::get()->getCurrentUserId() << " --token=" <<
+            NetworkConfig::get()->getCurrentUserToken();
+    }
+    else
+    {
+        server_cfg << "--lan-server=" << server_name;
+    }
+
+    std::string server_id_file = "server_id_file_";
+    server_id_file += StringUtils::toString(StkTime::getTimeSinceEpoch());
+    NetworkConfig::get()->setServerIdFile(
+        file_manager->getUserConfigFile(server_id_file));
+
+    server_cfg << " --no-graphics --stdout=server.log --type=" <<
+        gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) <<
+        " --difficulty=" <<
+        difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER) <<
+        " --max-players=" << max_players <<
+        " --server-id-file=" << server_id_file <<
+        " --log=1 --no-console-log";
+
+    if (m_more_options_spinner->isVisible())
+    {
+        int esi = m_more_options_spinner->getValue();
+        if (gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER)
+            != 3/*is soccer*/)
+        {
+            // Grand prix track count
+            if (esi > 0)
+                server_cfg << " --extra-server-info=" << esi;
+        }
+        else
+        {
+            server_cfg << " --extra-server-info=" << esi;
+        }
+    }
+
+    SeparateProcess* sp =
+        new SeparateProcess(SeparateProcess::getCurrentExecutableLocation(),
+        server_cfg.str() + password);
+    STKHost::create(sp);
+    NetworkingLobby::getInstance()->setJoinedServer(server);
+#endif
 }   // createServer
 
 // ----------------------------------------------------------------------------

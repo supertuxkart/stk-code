@@ -27,6 +27,7 @@
 #include "graphics/2dutils.hpp"
 #include "graphics/material.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/message_queue.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
@@ -44,23 +45,19 @@
 #include "modes/overworld.hpp"
 #include "modes/soccer_world.hpp"
 #include "modes/world_with_rank.hpp"
-#include "network/protocol_manager.hpp"
+#include "network/network_config.hpp"
+#include "network/stk_host.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "race/highscores.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/networking_lobby.hpp"
-#include "states_screens/network_kart_selection.hpp"
-#include "states_screens/online_profile_servers.hpp"
 #include "states_screens/race_setup_screen.hpp"
-#include "states_screens/server_selection.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 #include <algorithm>
-
-DEFINE_SCREEN_SINGLETON(RaceResultGUI);
 
 /** Constructor, initialises internal data structures.
  */
@@ -93,7 +90,7 @@ void RaceResultGUI::init()
     for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
     {
         const AbstractKart *kart = World::getWorld()->getKart(kart_id);
-        if (kart->getController()->isPlayerController())
+        if (kart->getController()->isLocalPlayerController())
             human_win = human_win && kart->getRaceResult();
     }
 
@@ -170,21 +167,14 @@ void RaceResultGUI::enableAllButtons()
     // If we're in a network world, change the buttons text
     if (World::getWorld()->isNetworkWorld())
     {
-        Log::info("This work was networked", "This is a network world.");
         top->setVisible(false);
-        middle->setText(_("Continue."));
+        middle->setText(_("Continue"));
         middle->setVisible(true);
         middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        bottom->setText(_("Quit the server."));
+        bottom->setText(_("Quit the server"));
         bottom->setVisible(true);
-        if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
-        {
-            middle->setVisible(false); // you have to wait the server to start again
-            bottom->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        }
         return;
     }
-    Log::info("This work was NOT networked", "This is NOT a network world.");
 
     // If something was unlocked
     // -------------------------
@@ -259,6 +249,33 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         m_start_track++;
         m_end_track++;
         displayScreenShots();
+    }
+
+    // If we're playing online :
+    if (World::getWorld()->isNetworkWorld())
+    {
+        if (name == "middle") // Continue button (return to server lobby)
+        {
+            // Signal to the server that this client is back in the lobby now.
+            auto cl = LobbyProtocol::get<ClientLobby>();
+            if (cl)
+                cl->doneWithResults();
+            getWidget("middle")->setText(_("Waiting for others"));
+        }
+        if (name == "bottom") // Quit server (return to online lan / wan menu)
+        {
+            race_manager->clearNetworkGrandPrixResult();
+            if (STKHost::existHost())
+            {
+                STKHost::get()->shutdown();
+            }
+            race_manager->exitRace();
+            race_manager->setAIKartOverride("");
+            StateManager::get()->resetAndSetStack(
+                NetworkConfig::get()->getResetScreens().data());
+            NetworkConfig::get()->unsetNetworking();
+        }
+        return;
     }
 
     // If something was unlocked, the 'continue' button was
@@ -341,29 +358,6 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             name.c_str());
     }
 
-    // If we're playing online :
-    if (World::getWorld()->isNetworkWorld())
-    {
-        StateManager::get()->popMenu();
-        if (name == "middle") // Continue button (return to server lobby)
-        {
-            // Signal to the server that this client is back in the lobby now.
-            Protocol* protocol = LobbyProtocol::get();
-            ClientLobby* clrp =
-                dynamic_cast<ClientLobby*>(protocol);
-            if(clrp)
-                clrp->doneWithResults();
-            backToLobby();
-        }
-        if (name == "bottom") // Quit server (return to main menu)
-        {
-            race_manager->exitRace();
-            race_manager->setAIKartOverride("");
-            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-        }
-        return;
-    }
-
     // Next check for GP
     // -----------------
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
@@ -429,19 +423,25 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
 }   // eventCallback
 
 //-----------------------------------------------------------------------------
-/** Sets up the giu to go back to the lobby. Can only be called in case of a
+/** Sets up the gui to go back to the lobby. Can only be called in case of a
  *  networked game.
  */
 void RaceResultGUI::backToLobby()
 {
+    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
+        race_manager->getTrackNumber() == race_manager->getNumOfTracks() - 1)
+    {
+        core::stringw msg = _("Network grand prix has been finished.");
+        MessageQueue::add(MessageQueue::MT_ACHIEVEMENT, msg);
+    }
+    race_manager->clearNetworkGrandPrixResult();
     race_manager->exitRace();
     race_manager->setAIKartOverride("");
-    Screen* newStack[] = { MainMenuScreen::getInstance(),
-                           OnlineProfileServers::getInstance(),
-                           ServerSelection::getInstance(),
-                           NetworkingLobby::getInstance(),
-                           NULL                                  };
-    StateManager::get()->resetAndSetStack(newStack);
+    GUIEngine::ModalDialog::dismiss();
+    cleanupGPProgress();
+    StateManager::get()->resetAndSetStack(
+        NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
+    NetworkingLobby::getInstance()->addMoreServerInfo(L"--------------------");
 }   // backToLobby
 
 //-----------------------------------------------------------------------------
@@ -1478,9 +1478,16 @@ void RaceResultGUI::backToLobby()
                 ("sshot_" + StringUtils::toString(n_sshot)).c_str());
             GUIEngine::LabelWidget* label = getWidget<GUIEngine::LabelWidget>(
                 ("sshot_label_" + StringUtils::toString(n_sshot)).c_str());
-            assert(track != NULL && sshot != NULL && label != NULL);
+            assert(sshot != NULL && label != NULL);
 
-            sshot->setImage(track->getScreenshotFile());
+            // Network grand prix chooses each track 1 by 1
+            if (track == NULL)
+            {
+                sshot->setImage(file_manager->getAsset(FileManager::GUI,
+                    "main_help.png"));
+            }
+            else
+                sshot->setImage(track->getScreenshotFile());
             if (i <= currentTrack)
                 sshot->setBadge(GUIEngine::OK_BADGE);
             else

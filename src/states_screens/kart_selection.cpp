@@ -37,6 +37,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
+#include "network/network_config.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -55,7 +56,6 @@ static const char ID_DONT_USE[] = "x";
 // a kart called 'locked'
 static const char ID_LOCKED[] = "locked/";
 
-//DEFINE_SCREEN_SINGLETON( KartSelectionScreen );
 KartSelectionScreen* KartSelectionScreen::m_instance_ptr = NULL;
 
 int g_root_id;
@@ -320,8 +320,6 @@ void KartSelectionScreen::init()
     Widget* placeholder = getWidget("playerskarts");
     assert(placeholder != NULL);
 
-    // FIXME : The reserved id value is -1 when we switch from KSS to NKSS and vice-versa
-
     m_dispatcher->setRootID(placeholder->m_reserved_id);
 
     g_root_id = placeholder->m_reserved_id;
@@ -340,8 +338,6 @@ void KartSelectionScreen::init()
     tabs->setActive(true);
 
     m_kart_widgets.clearAndDeleteAll();
-    StateManager::get()->resetActivePlayers();
-    input_manager->getDeviceManager()->setAssignMode(DETECT_NEW);
 
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
@@ -378,26 +374,34 @@ void KartSelectionScreen::init()
     }
     else */
     // For now this is what will happen
-    if (!m_multiplayer)
-    {
-        joinPlayer(input_manager->getDeviceManager()->getLatestUsedDevice());
-        w->updateItemDisplay();
-
-        // Player 0 select default kart
-        if (!w->setSelection(UserConfigParams::m_default_kart, 0, true))
-        {
-            // if kart from config not found, select the first instead
-            w->setSelection(0, 0, true);
-        }
-    } else
-        // Add multiplayer message
-        addMultiplayerMessage();
-
+    input_manager->getDeviceManager()->setAssignMode(DETECT_NEW);
     // This flag will cause that a 'fire' event will be mapped to 'select' (if
     // 'fire' is not assigned to a GUI event). This is done to support the old
     // way of player joining by pressing 'fire' instead of 'select'.
     input_manager->getDeviceManager()->mapFireToSelect(true);
 
+    if (!NetworkConfig::get()->isNetworking())
+    {
+        StateManager::get()->resetActivePlayers();
+        if (!m_multiplayer)
+        {
+            joinPlayer(input_manager->getDeviceManager()->getLatestUsedDevice(),
+                NULL/*player profile*/);
+            w->updateItemDisplay();
+
+            // Player 0 select default kart
+            if (!w->setSelection(UserConfigParams::m_default_kart, 0, true))
+            {
+                // if kart from config not found, select the first instead
+                w->setSelection(0, 0, true);
+            }
+        }
+        else
+        {
+            // Add multiplayer message
+            addMultiplayerMessage();
+        }
+    }
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -422,20 +426,21 @@ void KartSelectionScreen::tearDown()
     m_kart_widgets.clearAndDeleteAll();
 
     if (m_must_delete_on_back)
-        GUIEngine::removeScreen(getName().c_str());
+        GUIEngine::removeScreen(this);
+
 }   // tearDown
 
 // ----------------------------------------------------------------------------
 
 void KartSelectionScreen::unloaded()
 {
-    // these pointer is no more valid (have been deleted along other widgets)
+    // This pointer is no longer valid (has been deleted along other widgets)
     m_dispatcher = NULL;
 }
 
 // ----------------------------------------------------------------------------
 // Return true if event was handled successfully
-bool KartSelectionScreen::joinPlayer(InputDevice* device)
+bool KartSelectionScreen::joinPlayer(InputDevice* device, PlayerProfile* p)
 {
     bool first_player = m_kart_widgets.size() == 0;
 
@@ -468,14 +473,18 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device)
     }
 
     // ---- Create new active player
-    PlayerProfile* profile_to_use = PlayerManager::getCurrentPlayer();
+    PlayerProfile* profile_to_use = p == NULL ?
+        PlayerManager::getCurrentPlayer() : p;
 
     // Make sure enough guest character exists. At this stage this player has
     // not been added, so the number of guests requested for the first player
     // is 0 --> forcing at least one real player.
-    PlayerManager::get()->createGuestPlayers(
-                                     StateManager::get()->activePlayerCount());
-    if (!first_player)
+    if (p == NULL)
+    {
+        PlayerManager::get()->createGuestPlayers(
+            StateManager::get()->activePlayerCount());
+    }
+    if (!first_player && p == NULL)
     {
         // Give each player a different start profile
         const int num_active_players = StateManager::get()->activePlayerCount();
@@ -514,6 +523,12 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device)
     m_kart_widgets.push_back(newPlayerWidget);
 
     newPlayerWidget->add();
+    // From network kart selection, the player name is already defined
+    if (p != NULL)
+    {
+        newPlayerWidget->getPlayerNameSpinner()->setActive(false);
+        newPlayerWidget->getPlayerNameSpinner()->setCustomText(p->getName());
+    }
 
     // ---- Divide screen space among all karts
     const int amount = m_kart_widgets.size();
@@ -522,7 +537,8 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device)
     // in this special case, leave room for a message on the right
     if (m_multiplayer && first_player)
     {
-        addMultiplayerMessage();
+        if (p == NULL)
+            addMultiplayerMessage();
         const int splitWidth = fullarea->m_w / 2;
         m_kart_widgets[0].move( fullarea->m_x, fullarea->m_y, splitWidth,
                                 fullarea->m_h );
@@ -1470,8 +1486,8 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     {
         const KartProperties* prop = kart_properties_manager->getKartById(i);
         // Ignore karts that are not in the selected group
-        if(selected_kart_group != ALL_KART_GROUPS_ID &&
-            !prop->isInGroup(selected_kart_group))
+        if((selected_kart_group != ALL_KART_GROUPS_ID &&
+            !prop->isInGroup(selected_kart_group)) || isIgnored(prop->getIdent()))
             continue;
         karts.push_back(prop);
     }
@@ -1481,7 +1497,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     {
         const KartProperties* prop = karts.get(i);
         if (PlayerManager::getCurrentPlayer()->isLocked(prop->getIdent()) &&
-            !m_multiplayer)
+            !m_multiplayer && !NetworkConfig::get()->isNetworking())
         {
             w->addItem(_("Locked : solve active challenges to gain access to more!"),
                        ID_LOCKED + prop->getIdent(),

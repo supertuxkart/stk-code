@@ -23,9 +23,12 @@
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
+#include "network/network_config.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
+#include "states_screens/main_menu_screen.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
@@ -36,16 +39,8 @@ History* history = 0;
  */
 History::History()
 {
-    m_replay_mode = HISTORY_NONE;
+    m_replay_history = false;
 }   // History
-
-//-----------------------------------------------------------------------------
-/** Starts replay from the history file in the current directory.
- */
-void History::startReplay()
-{
-    Load();
-}   // startReplay
 
 //-----------------------------------------------------------------------------
 /** Initialise the history for a new recording. It especially allocates memory
@@ -53,12 +48,9 @@ void History::startReplay()
  */
 void History::initRecording()
 {
-    unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time
-                                             / stk_config->m_replay_dt      );
-    allocateMemory(max_frames);
-    m_current = -1;
-    m_wrapped = false;
-    m_size    = 0;
+    allocateMemory();
+    m_event_index = 0;
+    m_all_input_events.clear();
 }   // initRecording
 
 //-----------------------------------------------------------------------------
@@ -66,59 +58,61 @@ void History::initRecording()
  *  as when replaying (since in replay the data is read into memory first).
  *  \param number_of_frames Maximum number of frames to store.
  */
-void History::allocateMemory(int number_of_frames)
+void History::allocateMemory(int size)
 {
-    m_all_deltas.resize   (number_of_frames);
-    unsigned int num_karts = race_manager->getNumberOfKarts();
-    m_all_controls.resize (number_of_frames*num_karts);
-    m_all_xyz.resize      (number_of_frames*num_karts);
-    m_all_rotations.resize(number_of_frames*num_karts);
+    m_all_input_events.clear();
+    if(size<0)
+        m_all_input_events.reserve(1024);
+    else
+        m_all_input_events.resize(size);
 }   // allocateMemory
 
 //-----------------------------------------------------------------------------
-/** Saves the current history.
- *  \param dt Time step size.
+/** Stores an input event (e.g. acceleration or steering event) into the
+ *  history data for physics replay.
+ *  \param kart_id The kart index which triggered the event.
+ *  \param pa      The action.
+ *  \param value   Value of the action (0=release, 32768 = pressed), in
+ *                 between in case of analog devices.
  */
-void History::updateSaving(float dt)
+void History::addEvent(int kart_id, PlayerAction pa, int value)
 {
-    m_current++;
-    if(m_current>=(int)m_all_deltas.size())
-    {
-        m_wrapped = true;
-        m_current = 0;
-    }
-    else
-    {
-        // m_size must be m_all_deltas.size() or smaller
-        if(m_size<(int)m_all_deltas.size())
-            m_size ++;
-    }
-    m_all_deltas[m_current] = dt;
-
-    World *world = World::getWorld();
-    unsigned int num_karts = world->getNumKarts();
-    unsigned int index     = m_current*num_karts;
-    for(unsigned int i=0; i<num_karts; i++)
-    {
-        const AbstractKart *kart         = world->getKart(i);
-        m_all_controls[index+i]  = kart->getControls();
-        m_all_xyz[index+i]       = kart->getXYZ();
-        m_all_rotations[index+i] = kart->getVisualRotation();
-    }   // for i
-}   // updateSaving
+    InputEvent ie;
+    // The event is added before m_current is increased. So in order to
+    // save the right index for this event, we need to use m_current+1.
+    ie.m_world_ticks = World::getWorld()->getTimeTicks();
+    ie.m_action      = pa;
+    ie.m_value       = value;
+    ie.m_kart_index  = kart_id;
+    m_all_input_events.emplace_back(ie);
+}   // addEvent
 
 //-----------------------------------------------------------------------------
 /** Sets the kart position and controls to the recorded history value.
- *  \param dt Time step size.
+ *  \param world_ticks WOrld time in ticks.
+ *  \param ticks Number of time steps.
  */
-float History::updateReplayAndGetDT()
+void History::updateReplay(int world_ticks)
 {
-    m_current++;
     World *world = World::getWorld();
-    if(m_current>=(int)m_all_deltas.size())
+
+    while (m_event_index < m_all_input_events.size() &&
+        m_all_input_events[m_event_index].m_world_ticks <= world_ticks)
+    {
+        const InputEvent &ie = m_all_input_events[m_event_index];
+        AbstractKart *kart = world->getKart(ie.m_kart_index);
+        Log::verbose("history", "time %d event-time %d action %d %d",
+            world->getTimeTicks(), ie.m_world_ticks, ie.m_action,
+            ie.m_value);
+        kart->getController()->action(ie.m_action, ie.m_value);
+        m_event_index++;
+    }   // while we have events for current time step.
+
+    // Check if we have reached the end of the buffer
+    if(m_event_index >= m_all_input_events.size())
     {
         Log::info("History", "Replay finished");
-        m_current = 0;
+        m_event_index= 0;
         // This is useful to use a reproducable rewind problem:
         // replay it with history, for debugging only
 #undef DO_REWIND_AT_END_OF_HISTORY
@@ -126,28 +120,11 @@ float History::updateReplayAndGetDT()
         RewindManager::get()->rewindTo(5.0f);
         exit(-1);
 #else
-        // Note that for physics replay all physics parameters
-        // need to be reset, e.g. velocity, ...
         world->reset();
 #endif
-    }
-    unsigned int num_karts = world->getNumKarts();
-    for(unsigned k=0; k<num_karts; k++)
-    {
-        AbstractKart *kart = world->getKart(k);
-        unsigned int index=m_current*num_karts+k;
-        if(m_replay_mode==HISTORY_POSITION)
-        {
-            kart->setXYZ(m_all_xyz[index]);
-            kart->setRotation(m_all_rotations[index]);
-        }
-        else
-        {
-            kart->getControls().set(m_all_controls[index]);
-        }
-    }
-    return m_all_deltas[m_current];
-}   // updateReplayAndGetDT
+    }   // if m_event_index >= m_all_input_events.size()
+
+}   // updateReplay
 
 //-----------------------------------------------------------------------------
 /** Saves the history stored in the internal data structures into a file called
@@ -175,13 +152,14 @@ void History::Save()
 
     World *world   = World::getWorld();
     const int num_karts = world->getNumKarts();
-    fprintf(fd, "Version:  %s\n",   STK_VERSION);
-    fprintf(fd, "numkarts: %d\n",   num_karts);
-    fprintf(fd, "numplayers: %d\n", race_manager->getNumPlayers());
-    fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
+    fprintf(fd, "STK-version:      %s\n",   STK_VERSION);
+    fprintf(fd, "History-version:  %d\n",   1);
+    fprintf(fd, "numkarts:         %d\n",   num_karts);
+    fprintf(fd, "numplayers:       %d\n", race_manager->getNumPlayers());
+    fprintf(fd, "difficulty:       %d\n", race_manager->getDifficulty());
     fprintf(fd, "reverse: %c\n", race_manager->getReverseTrack() ? 'y' : 'n');
 
-    fprintf(fd, "track: %s\n",      Track::getCurrentTrack()->getIdent().c_str());
+    fprintf(fd, "track: %s\n", Track::getCurrentTrack()->getIdent().c_str());
 
     assert(num_karts > 0);
 
@@ -190,33 +168,17 @@ void History::Save()
     {
         fprintf(fd, "model %d: %s\n",k, world->getKart(k)->getIdent().c_str());
     }
-    fprintf(fd, "size:     %d\n", m_size);
+    fprintf(fd, "count:     %d\n", m_all_input_events.size());
 
-    int index = m_wrapped ? m_current : 0;
-    for(int i=0; i<m_size; i++)
+    for (unsigned int i = 0; i < m_all_input_events.size(); i++)
     {
-        fprintf(fd, "delta: %f\n",m_all_deltas[index]);
-        index=(index+1)%m_size;
-    }
+        fprintf(fd, "%d %d %d %d\n",
+                m_all_input_events[i].m_world_ticks,
+                m_all_input_events[i].m_kart_index,
+                m_all_input_events[i].m_action,
+                m_all_input_events[i].m_value      );
+    }   // for i
 
-    index = num_karts * (m_wrapped ? m_current : 0);
-    for(int i=0; i<m_size; i++)
-    {
-        for(int k=0; k<num_karts; k++)
-        {
-            fprintf(fd, "%f %f %d  %f %f %f  %f %f %f %f\n",
-                    m_all_controls[index+k].getSteer(),
-                    m_all_controls[index+k].getAccel(),
-                    m_all_controls[index+k].getButtonsCompressed(),
-                    m_all_xyz[index+k].getX(), m_all_xyz[index+k].getY(),
-                    m_all_xyz[index+k].getZ(),
-                    m_all_rotations[index+k].getX(),
-                    m_all_rotations[index+k].getY(),
-                    m_all_rotations[index+k].getZ(),
-                    m_all_rotations[index+k].getW()  );
-        }   // for i
-        index=(index+num_karts)%(num_karts*m_size);
-    }   // for k
     fprintf(fd, "History file end.\n");
     fclose(fd);
 }   // Save
@@ -245,10 +207,31 @@ void History::Load()
     if (fgets(s, 1023, fd) == NULL)
         Log::fatal("History", "Could not read history.dat.");
 
-    if (sscanf(s,"Version: %1023s",s1)!=1)
-        Log::fatal("History", "No Version information found in history file (bogus history file).");
-    else if (strcmp(s1,STK_VERSION))
-        Log::warn("History", "History is version '%s', STK version is '%s'.", s1, STK_VERSION);
+    // Check for unsupported hsitory file formats:
+    if (sscanf(s, "Version-2: %1023s", s1) == 1 ||
+        sscanf(s, "Version-1: %1023s", s1) == 1)
+    {
+        Log::fatal("History",
+                   "Old history file format is not supported anymore.");
+    }
+
+    if (sscanf(s,"STK-version: %1023s",s1)!=1)
+        Log::fatal("History", "No Version information found in history "
+                              "file (bogus history file).");
+    if (strcmp(s1,STK_VERSION))
+        Log::warn("History", "History is version '%s', STK version is '%s'.",
+                  s1, STK_VERSION);
+
+    if (fgets(s, 1023, fd) == NULL)
+        Log::fatal("History", "Could not read history.dat.");
+
+    int version;
+    if (sscanf(s, "History-version: %1023d", &version) != 1)
+        Log::fatal("Invalid version number found: '%s'", s);
+
+    if (version != 1)
+        Log::fatal("History",
+                   "Old-style history files are not supported anymore.");
 
     if (fgets(s, 1023, fd) == NULL)
         Log::fatal("History", "Could not read history.dat.");
@@ -269,22 +252,19 @@ void History::Load()
     race_manager->setDifficulty((RaceManager::Difficulty)n);
 
 
-    // Optional (not supported in older history files): include reverse
     fgets(s, 1023, fd);
     char r;
-    if (sscanf(s, "reverse: %c", &r) == 1)
-    {
-        fgets(s, 1023, fd);
-        race_manager->setReverseTrack(r == 'y');
-    }
+    if (sscanf(s, "reverse: %c", &r) != 1)
+        Log::fatal("History", "Could not read reverse information: '%s'", s);
+    race_manager->setReverseTrack(r == 'y');
 
-
+    fgets(s, 1023, fd);
     if(sscanf(s, "track: %1023s",s1)!=1)
         Log::warn("History", "Track not found in history file.");
     race_manager->setTrack(s1);
     // This value doesn't really matter, but should be defined, otherwise
     // the racing phase can switch to 'ending'
-    race_manager->setNumLaps(10);
+    race_manager->setNumLaps(100);
 
     for(unsigned int i=0; i<num_karts; i++)
     {
@@ -292,53 +272,38 @@ void History::Load()
         if(sscanf(s, "model %d: %1023s",&n, s1) != 2)
             Log::fatal("History", "No model information for kart %d found.", i);
         m_kart_ident.push_back(s1);
-        if(i<race_manager->getNumPlayers())
+        if(i<race_manager->getNumPlayers() && !MainMenuScreen::m_enable_online)
         {
             race_manager->setPlayerKart(i, s1);
         }
     }   // for i<nKarts
     // FIXME: The model information is currently ignored
+
     fgets(s, 1023, fd);
-    if(sscanf(s,"size: %d",&m_size)!=1)
+    int count;
+    if(sscanf(s,"count: %d",&count)!=1)
         Log::fatal("History", "Number of records not found in history file.");
 
-    allocateMemory(m_size);
-    m_current = -1;
-
-    for(int i=0; i<m_size; i++)
-    {
-        fgets(s, 1023, fd);
-        sscanf(s, "delta: %f\n",&m_all_deltas[i]);
-    }
+    allocateMemory(count);
+    m_event_index = 0;
 
     // We need to disable the rewind manager here (otherwise setting the
     // KartControl data would access the rewind manager).
     bool rewind_manager_was_enabled = RewindManager::isEnabled();
     RewindManager::setEnable(false);
 
-    for(int i=0; i<m_size; i++)
+    for (int i=0; i<count; i++)
     {
-        for(unsigned int k=0; k<num_karts; k++)
+        fgets(s, 1023, fd);
+        InputEvent &ie = m_all_input_events[i];
+        if (sscanf(s, "%d %d %d %d\n", &ie.m_world_ticks, &ie.m_kart_index,
+                   &ie.m_action, &ie.m_value) != 4                          )
         {
-            unsigned int index = num_karts * i+k;
-            fgets(s, 1023, fd);
-            int buttonsCompressed;
-            float x,y,z,rx,ry,rz,rw, steer, accel;
-            sscanf(s, "%f %f %d  %f %f %f  %f %f %f %f\n",
-                    &steer, &accel, &buttonsCompressed,
-                    &x, &y, &z,
-                    &rx, &ry, &rz, &rw
-                    );
-            m_all_controls[index].setSteer(steer);
-            m_all_controls[index].setAccel(accel);
-            m_all_xyz[index]       = Vec3(x,y,z);
-            m_all_rotations[index] = btQuaternion(rx,ry,rz,rw);
-            m_all_controls[index].setButtonsCompressed(char(buttonsCompressed));
-        }   // for i
-    }   // for k
+            Log::warn("History", "Problems reading event: '%s'", s);
+        }
+    }   // for i
     RewindManager::setEnable(rewind_manager_was_enabled);
 
-    fprintf(fd, "History file end.\n");
     fclose(fd);
 }   // Load
 

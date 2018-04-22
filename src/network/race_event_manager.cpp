@@ -4,10 +4,9 @@
 #include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/controller_events_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
-
+#include "network/rewind_manager.hpp"
+#include "utils/profiler.hpp"
 
 RaceEventManager::RaceEventManager()
 {
@@ -22,18 +21,22 @@ RaceEventManager::~RaceEventManager()
 // ----------------------------------------------------------------------------
 /** In network games this update function is called instead of
  *  World::updateWorld(). 
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void RaceEventManager::update(float dt)
+void RaceEventManager::update(int ticks)
 {
-    // This can happen in case of disconnects - protocol manager is
-    // shut down, but still events to process.
-    if(!ProtocolManager::getInstance())
-        return;
-
-    World::getWorld()->updateWorld(dt);
+    // Replay all recorded events up to the current time
+    // This might adjust dt - if a new state is being played, the dt is
+    // determined from the last state till 'now'
+    PROFILER_PUSH_CPU_MARKER("RaceEvent:play event", 100, 100, 100);
+    RewindManager::get()->playEventsTill(World::getWorld()->getTimeTicks(),
+                                         &ticks);
+    PROFILER_POP_CPU_MARKER();
+    World::getWorld()->updateWorld(ticks);
 
     // if the race is over
-    if (World::getWorld()->getPhase() >= WorldStatus::RESULT_DISPLAY_PHASE)
+    if (World::getWorld()->getPhase() >= WorldStatus::RESULT_DISPLAY_PHASE &&
+        World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE)
     {
         // consider the world finished.
         stop();
@@ -42,31 +45,19 @@ void RaceEventManager::update(float dt)
 }   // update
 
 // ----------------------------------------------------------------------------
-void RaceEventManager::start()
-{
-    m_running = true;
-}   // start
-
-// ----------------------------------------------------------------------------
-void RaceEventManager::stop()
-{
-    m_running = false;
-}   // stop
-
-// ----------------------------------------------------------------------------
 bool RaceEventManager::isRaceOver()
 {
     if(!World::getWorld())
         return false;
-    return (World::getWorld()->getPhase() >  WorldStatus::RACE_PHASE);
+    return (World::getWorld()->getPhase() > WorldStatus::RACE_PHASE &&
+        World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE);
 }   // isRaceOver
 
 // ----------------------------------------------------------------------------
 void RaceEventManager::kartFinishedRace(AbstractKart *kart, float time)
 {
-    GameEventsProtocol* protocol = static_cast<GameEventsProtocol*>(
-        ProtocolManager::getInstance()->getProtocol(PROTOCOL_GAME_EVENTS));
-    protocol->kartFinishedRace(kart, time);
+    if (auto game_events_protocol = m_game_events_protocol.lock())
+        game_events_protocol->kartFinishedRace(kart, time);
 }   // kartFinishedRace
 
 // ----------------------------------------------------------------------------
@@ -79,19 +70,7 @@ void RaceEventManager::collectedItem(Item *item, AbstractKart *kart)
 {
     // this is only called in the server
     assert(NetworkConfig::get()->isServer());
-
-    GameEventsProtocol* protocol = static_cast<GameEventsProtocol*>(
-        ProtocolManager::getInstance()->getProtocol(PROTOCOL_GAME_EVENTS));
-    protocol->collectedItem(item,kart);
+    if (auto game_events_protocol = m_game_events_protocol.lock())
+        game_events_protocol->collectedItem(item, kart);
 }   // collectedItem
-
-// ----------------------------------------------------------------------------
-void RaceEventManager::controllerAction(Controller* controller,
-                                        PlayerAction action, int value)
-{
-    ControllerEventsProtocol* protocol = static_cast<ControllerEventsProtocol*>(
-        ProtocolManager::getInstance()->getProtocol(PROTOCOL_CONTROLLER_EVENTS));
-    if (protocol)
-        protocol->controllerAction(controller, action, value);
-}   // controllerAction
 

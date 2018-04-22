@@ -37,6 +37,7 @@ const std::map<std::string, std::pair<unsigned, SamplerType> >
         { "skinning_tex", { 0, ST_TEXTURE_BUFFER } }
 #endif
     };
+bool SPShader::m_sp_shader_debug = false;
 
 // ----------------------------------------------------------------------------
 void SPShader::addShaderFile(const std::string& name, GLint shader_type,
@@ -208,7 +209,7 @@ void SPShader::bindTextures(const std::array<GLuint, 6>& tex,
 void SPShader::addAllUniforms(RenderPass rp)
 {
 #ifndef SERVER_ONLY
-    GLint total_uniforms;
+    GLint total_uniforms = 0;
     glGetProgramiv(m_program[rp], GL_ACTIVE_UNIFORMS, &total_uniforms);
     static const std::map<GLenum, std::type_index> supported_types =
         {
@@ -228,20 +229,25 @@ void SPShader::addAllUniforms(RenderPass rp)
         glGetActiveUniform(m_program[rp], i, 99, NULL, &size, &type, name);
         if (size != 1)
         {
-            Log::debug("SPShader", "Array of uniforms is not supported in"
-                " shader %s for %s.", m_name.c_str(), name);
+            if (m_sp_shader_debug)
+            {
+                Log::debug("SPShader", "Array of uniforms is not supported in"
+                    " shader %s for %s.", m_name.c_str(), name);
+            }
             continue;
         }
         auto ret = supported_types.find(type);
         if (ret == supported_types.end())
         {
-            Log::debug("SPShader", "%d type not supported", (unsigned)type);
+            if (m_sp_shader_debug)
+                Log::debug("SPShader", "%d type not supported", (unsigned)type);
             continue;
         }
         GLuint location = glGetUniformLocation(m_program[rp], name);
         if (location == GL_INVALID_INDEX)
         {
-            Log::debug("SPShader", "%s uniform not found", name);
+            if (m_sp_shader_debug)
+                Log::debug("SPShader", "%s uniform not found", name);
             continue;
         }
         m_uniforms[rp][name] = new SPUniformAssigner(ret->second, location);

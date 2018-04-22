@@ -24,10 +24,25 @@ class BareNetworkString;
 class Rewinder
 {
 private:
+    /** True if this object can be destroyed, i.e. if this object is a 'stand
+     *  alone' (i.e. not used in inheritance). If the object is used in
+     *  inheritance (e.g. KartRewinder, which is a Rewinder and Kart), then
+     *  freeing the kart will free this rewinder instance as well.
+     */
     bool m_can_be_destroyed;
+
 public:
  	        Rewinder(bool can_be_destroyed);
     virtual ~Rewinder();
+
+    /** Called before a rewind. Is used to save the previous position of an
+     *  object before a rewind, so that the error due to a rewind can be
+     *  computed. */
+    virtual void saveTransform() = 0;
+
+    /** Called when a rewind is finished, and is used to compute the error
+     *  caused by the rewind (which is then visually smoothed over time). */
+    virtual void computeError() = 0;
 
     /** Provides a copy of the state of the object in one memory buffer.
      *  The memory is managed by the RewindManager.

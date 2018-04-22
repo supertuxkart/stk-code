@@ -36,8 +36,6 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( HelpScreen1 );
-
 // -----------------------------------------------------------------------------
 
 HelpScreen1::HelpScreen1() : Screen("help1.stkgui")

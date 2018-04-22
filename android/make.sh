@@ -232,6 +232,47 @@ if [ -z "$BUILD_TOOLS_VER" ] || [ ! -d "$SDK_PATH/build-tools/$BUILD_TOOLS_VER" 
     exit
 fi
 
+# Set project version and code
+if [ -f "$DIRNAME/obj/project_version" ]; then
+    PROJECT_VERSION_PREV=$(cat "$DIRNAME/obj/project_version") 
+    
+    if [ -z "$PROJECT_VERSION" ]; then
+        PROJECT_VERSION="$PROJECT_VERSION_PREV"
+    elif [ "$PROJECT_VERSION" != "$PROJECT_VERSION_PREV" ]; then
+        echo "Different project version has been set. Forcing recompilation..."
+        touch -c "$DIRNAME/Android.mk"
+    fi
+fi
+
+if [ -z "$PROJECT_VERSION" ]; then
+    if [ $IS_DEBUG_BUILD -ne 0 ]; then
+        PROJECT_VERSION="git"
+    else
+        echo "Error: Variable PROJECT_VERSION is not set. It must have unique" \
+             "value for release build."
+        exit
+    fi
+fi
+
+if [ -z "$PROJECT_CODE" ]; then
+    if [ $IS_DEBUG_BUILD -ne 0 ]; then
+        PROJECT_CODE="1"
+    else
+        echo "Error: Variable PROJECT_CODE is not set."
+        exit
+    fi
+fi
+
+if [ -d "$DIRNAME/assets/data" ]; then
+    if [ ! -f "$DIRNAME/assets/data/supertuxkart.$PROJECT_VERSION" ]; then
+        echo "Error: supertuxkart.$PROJECT_VERSION doesn't exist in" \
+             "assets/data directory."
+        exit
+    fi
+fi
+
+echo "$PROJECT_VERSION" > "$DIRNAME/obj/project_version"
+
 
 # Standalone toolchain
 if [ ! -f "$DIRNAME/obj/make_standalone_toolchain.stamp" ]; then
@@ -423,6 +464,12 @@ sed -i "s/targetSdkVersion=\".*\"/targetSdkVersion=\"$TARGET_SDK_VERSION\"/g" \
        "$DIRNAME/AndroidManifest.xml"
        
 sed -i "s/package=\".*\"/package=\"$PACKAGE_NAME\"/g" \
+       "$DIRNAME/AndroidManifest.xml"
+       
+sed -i "s/versionName=\".*\"/versionName=\"$PROJECT_VERSION\"/g" \
+       "$DIRNAME/AndroidManifest.xml"
+       
+sed -i "s/versionCode=\".*\"/versionCode=\"$PROJECT_CODE\"/g" \
        "$DIRNAME/AndroidManifest.xml"
        
 cp "banner.png" "$DIRNAME/res/drawable/banner.png"

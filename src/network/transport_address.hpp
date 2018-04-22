@@ -58,7 +58,21 @@ public:
     }   // TransportAddress(EnetAddress)
 
     // ------------------------------------------------------------------------
-    /** Construct an IO address from a string in the format x.x.x.x:xxx. */
+    /** Construct an IO address from a string in the format x.x.x.x with a
+     *  port number. */
+    TransportAddress(const std::string& str, uint16_t port_number)
+    {
+        std::vector<uint32_t> ip = StringUtils::splitToUInt(str, '.');
+        m_ip   = 0;
+        m_port = 0;
+        if (ip.size() >= 4)
+            m_ip = (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3];
+
+        m_port = port_number;
+    }   // TransportAddress(string of ip, port number)
+
+    // ------------------------------------------------------------------------
+    /** Construct an IO address from a string in the format x.x.x.x:x. */
     TransportAddress(const std::string& str)
     {
         std::string combined = StringUtils::replace(str, ":", ".");
@@ -88,7 +102,12 @@ private:
         copy(other);
     }   // TransportAddress(const TransportAddress&)
 public:
+    // ------------------------------------------------------------------------
+    bool isPublicAddressLocalhost() const;
+    // ------------------------------------------------------------------------
     bool isLAN() const;
+    // ------------------------------------------------------------------------
+    bool isUnset() const { return m_ip == 0 || m_port == 0; }
     // ------------------------------------------------------------------------
     /** A copy function (to replace the copy constructor which is disabled
      *  using NoCopy): it copies the data from the argument into this object.*/

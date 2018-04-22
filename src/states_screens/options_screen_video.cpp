@@ -43,8 +43,6 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( OptionsScreenVideo );
-
 // ----------------------------------------------------------------------------
 void OptionsScreenVideo::initPresets()
 {

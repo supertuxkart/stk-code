@@ -20,13 +20,10 @@
 #include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "network/network_config.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/connect_to_server.hpp"
-#include "network/protocols/request_connection.hpp"
+#include "network/stk_host.hpp"
 #include "network/servers_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/create_server_screen.hpp"
@@ -44,8 +41,6 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( OnlineProfileServers );
-
 // -----------------------------------------------------------------------------
 
 OnlineProfileServers::OnlineProfileServers() : GUIEngine::Screen("online/profile_servers.stkgui")
@@ -53,19 +48,40 @@ OnlineProfileServers::OnlineProfileServers() : GUIEngine::Screen("online/profile
 }   // OnlineProfileServers
 
 // -----------------------------------------------------------------------------
-
-void OnlineProfileServers::loadedFromFile()
+void OnlineProfileServers::beforeAddingWidget()
 {
-}   // loadedFromFile
+#ifdef ANDROID
+    if (getWidget("create_wan_server"))
+        getWidget("create_wan_server")->setVisible(false);
+#endif
+}   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
 
 void OnlineProfileServers::init()
 {
-    RibbonWidget* ribbon = getWidget<RibbonWidget>("wan");
-    assert(ribbon != NULL);
-    ribbon->select("find_wan_server", PLAYER_ID_GAME_MASTER);
-    ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    if (!PlayerManager::getCurrentOnlineId())
+    {
+        getWidget("back")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        getWidget<IconButtonWidget>("find_wan_server")->setActive(false);
+        getWidget<IconButtonWidget>("create_wan_server")->setActive(false);
+        getWidget<IconButtonWidget>("quick_wan_play")->setActive(false);
+    }
+    else
+    {
+        getWidget<IconButtonWidget>("find_wan_server")->setActive(true);
+        getWidget<IconButtonWidget>("create_wan_server")->setActive(true);
+        getWidget<IconButtonWidget>("quick_wan_play")->setActive(true);
+        RibbonWidget* ribbon = getWidget<RibbonWidget>("wan");
+        assert(ribbon != NULL);
+        ribbon->select("find_wan_server", PLAYER_ID_GAME_MASTER);
+        ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    }
+#ifdef ANDROID
+    if (getWidget("create_wan_server") &&
+        getWidget("create_wan_server")->isVisible())
+        getWidget("create_wan_server")->setVisible(false);
+#endif
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -74,7 +90,7 @@ void OnlineProfileServers::eventCallback(Widget* widget, const std::string& name
 {
     if (name == "back")
     {
-        StateManager::get()->popMenu();
+        StateManager::get()->escapePressed();
         return;
     }
     if (name == "wan")
@@ -90,11 +106,12 @@ void OnlineProfileServers::eventCallback(Widget* widget, const std::string& name
         else if (selection == "create_wan_server")
         {
             NetworkConfig::get()->setIsWAN();
-            NetworkConfig::get()->setIsServer(true);
             CreateServerScreen::getInstance()->push();
         }
         else if (selection == "quick_wan_play")
         {
+            NetworkConfig::get()->setIsWAN();
+            NetworkConfig::get()->setIsServer(false);
             doQuickPlay();
         }
     }
@@ -102,55 +119,12 @@ void OnlineProfileServers::eventCallback(Widget* widget, const std::string& name
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
-
 void OnlineProfileServers::doQuickPlay()
 {
-    // Refresh server list.
-    HTTPRequest* refresh_request = ServersManager::get()->getRefreshRequest(false);
-    if (refresh_request != NULL) // consider request done
-    {
-        refresh_request->executeNow();
-        delete refresh_request;
-    }
-    else
-    {
-        Log::error("OnlineScreen", "Could not get the server list.");
-        return;
-    }
-
-    // select first one
-    const Server *server = ServersManager::get()->getQuickPlay();
-    if(!server)
-    {
-        Log::error("OnlineProfileServers", "Can not find quick play server.");
-        return;
-    }
-
-    // do a join request
-    XMLRequest *join_request = new RequestConnection::ServerJoinRequest();
-    if (!join_request)
-    {
-        SFXManager::get()->quickSound("anvil");
-        return;
-    }
-
-    PlayerManager::setUserDetails(join_request, "request-connection",
-        Online::API::SERVER_PATH);
-    join_request->addParameter("server_id", server->getServerId());
-
-    join_request->executeNow();
-    if (join_request->isSuccess())
-    {
-        delete join_request;
-        NetworkingLobby::getInstance()->push();
-        ConnectToServer *cts = new ConnectToServer(server->getServerId(),
-            server->getHostId());
-        ProtocolManager::getInstance()->requestStart(cts);
-    }
-    else
-    {
-        SFXManager::get()->quickSound("anvil");
-    }
+    NetworkConfig::get()->setPassword("");
+    STKHost::create();
+    NetworkingLobby::getInstance()->setJoinedServer(nullptr);
+    NetworkingLobby::getInstance()->push();
 }   // doQuickPlay
 
 // ----------------------------------------------------------------------------

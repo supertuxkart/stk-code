@@ -106,8 +106,6 @@ const float PODIUMS_FINAL_Y[3] = {
 
 const float PODIUMS_AND_KARTS_SPEED_Y[3] = { 0.9f, 1.35f, 0.45f };
 
-DEFINE_SCREEN_SINGLETON( GrandPrixWin );
-
 // -------------------------------------------------------------------------------------
 
 GrandPrixWin::GrandPrixWin() : GrandPrixCutscene("grand_prix_win.stkgui")

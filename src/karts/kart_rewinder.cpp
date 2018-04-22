@@ -21,6 +21,7 @@
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
@@ -51,6 +52,26 @@ void KartRewinder::reset()
 }   // reset
 
 // ----------------------------------------------------------------------------
+/** This function is called immediately before a rewind is done and saves
+ *  the current transform for the kart. The difference between this saved
+ *  transform and the new transform after rewind is the error that needs
+ *  (smoothly) be applied to the graphical position of the kart. 
+ */
+void KartRewinder::saveTransform()
+{
+    m_saved_transform = getTrans();
+}   // saveTransform
+
+// ----------------------------------------------------------------------------
+void KartRewinder::computeError()
+{
+    //btTransform error = getTrans() - m_saved_transform;
+    Vec3 pos_error = getTrans().getOrigin() - m_saved_transform.getOrigin();
+    btQuaternion rot_error(0, 0, 0, 1);
+    Kart::addError(pos_error, rot_error);
+}   // computeError
+
+// ----------------------------------------------------------------------------
 /** Saves all state information for a kart in a memory buffer. The memory
  *  is allocated here and the address returned. It will then be managed
  *  by the RewindManager. The size is used to keep track of memory usage
@@ -60,7 +81,7 @@ void KartRewinder::reset()
  */
 BareNetworkString* KartRewinder::saveState() const
 {
-    const int MEMSIZE = 13*sizeof(float) + 9+3;
+    const int MEMSIZE = 17*sizeof(float) + 9+3;
 
     BareNetworkString *buffer = new BareNetworkString(MEMSIZE);
     const btRigidBody *body = getBody();
@@ -75,10 +96,13 @@ BareNetworkString* KartRewinder::saveState() const
     buffer->add(body->getAngularVelocity());
     buffer->addUInt8(m_has_started);   // necessary for startup speed boost
     buffer->addFloat(m_vehicle->getMinSpeed());
+    buffer->addFloat(m_vehicle->getTimedRotationTime());
+    buffer->add(m_vehicle->getTimedRotation());
 
     // 2) Steering and other player controls
     // -------------------------------------
-    getControls().copyToBuffer(buffer);
+    getControls().saveState(buffer);
+    getController()->saveState(buffer);
 
     // 3) Attachment
     // -------------
@@ -103,8 +127,6 @@ BareNetworkString* KartRewinder::saveState() const
 /** Actually rewind to the specified state. */
 void KartRewinder::rewindToState(BareNetworkString *buffer)
 {
-    buffer->reset();   // make sure the buffer is read from the beginning
-
     // 1) Physics values: transform and velocities
     // -------------------------------------------
     btTransform t;
@@ -113,6 +135,7 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
     btRigidBody *body = getBody();
     body->setLinearVelocity(buffer->getVec3());
     body->setAngularVelocity(buffer->getVec3());
+
     // This function also reads the velocity, so it must be called
     // after the velocities are set
     body->proceedToTransform(t);
@@ -121,10 +144,14 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
     setTrans(t);
     m_has_started = buffer->getUInt8()!=0;   // necessary for startup speed boost
     m_vehicle->setMinSpeed(buffer->getFloat());
+    float time_rot = buffer->getFloat();
+    // Set timed rotation divides by time_rot
+    m_vehicle->setTimedRotation(time_rot, time_rot*buffer->getVec3());
 
     // 2) Steering and other controls
     // ------------------------------
-    getControls().setFromBuffer(buffer);
+    getControls().rewindTo(buffer);
+    getController()->rewindTo(buffer);
 
     // 3) Attachment
     // -------------
@@ -149,9 +176,9 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
 /** Called once a frame. It will add a new kart control event to the rewind
  *  manager if any control values have changed.
  */
-void KartRewinder::update(float dt)
+void KartRewinder::update(int ticks)
 {
-    Kart::update(dt);
+    Kart::update(ticks);
 }   // update
 
 // ----------------------------------------------------------------------------

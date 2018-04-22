@@ -21,6 +21,8 @@
 #include <irrString.h>
 using namespace irr;
 
+class BareNetworkString;
+
 /**
   * \defgroup controller Karts/controller
   * Contains kart controllers, which are either human players or AIs
@@ -31,6 +33,7 @@ using namespace irr;
 #include "states_screens/state_manager.hpp"
 
 class AbstractKart;
+class BareNetworString;
 class Item;
 class KartControl;
 class Material;
@@ -58,7 +61,7 @@ public:
                   Controller         (AbstractKart *kart);
     virtual      ~Controller         () {};
     virtual void  reset              () = 0;
-    virtual void  update             (float dt) = 0;
+    virtual void  update             (int ticks) = 0;
     virtual void  handleZipper       (bool play_sound) = 0;
     virtual void  collectedItem      (const Item &item, int add_info=-1,
                                       float previous_energy=0) = 0;
@@ -74,6 +77,9 @@ public:
      *  rubber-banding. */
     virtual bool  isPlayerController () const = 0;
     virtual bool  disableSlipstreamBonus() const = 0;
+    virtual void  saveState(BareNetworkString *buffer) const = 0;
+    virtual void  rewindTo(BareNetworkString *buffer) = 0;
+
     // ---------------------------------------------------------------------------
     /** Sets the controller name for this controller. */
     virtual void setControllerName(const std::string &name)
@@ -83,7 +89,7 @@ public:
     const std::string &getControllerName() const { return m_controller_name; }
     // ------------------------------------------------------------------------
     /** Default: ignore actions. Only PlayerController get them. */
-    virtual void action(PlayerAction action, int value) = 0;
+    virtual bool action(PlayerAction action, int value, bool dry_run=false) = 0;
     // ------------------------------------------------------------------------
     /** Callback whenever a new lap is triggered. Used by the AI
      *  to trigger a recomputation of the way to use.            */

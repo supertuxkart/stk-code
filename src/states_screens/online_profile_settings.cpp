@@ -35,8 +35,6 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( OnlineProfileSettings );
-
 // -----------------------------------------------------------------------------
 
 OnlineProfileSettings::OnlineProfileSettings() : OnlineProfileBase("online/profile_settings.stkgui")

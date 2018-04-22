@@ -27,6 +27,7 @@
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "graphics/material.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -96,7 +97,6 @@ void LinearWorld::reset()
     for(unsigned int i=0; i<kart_amount; i++)
     {
         m_kart_info[i].reset();
-        m_karts[i]->setWrongwayCounter(0);
     }   // next kart
 
     // At the moment the last kart would be the one that is furthest away
@@ -150,20 +150,13 @@ void LinearWorld::reset()
 //-----------------------------------------------------------------------------
 /** General update function called once per frame. This updates the kart
  *  sectors, which are then used to determine the kart positions.
- *  \param dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void LinearWorld::update(float dt)
+void LinearWorld::update(int ticks)
 {
     // run generic parent stuff that applies to all modes. It
     // especially updates the kart positions.
-    WorldWithRank::update(dt);
-
-    if (m_last_lap_sfx_playing &&
-        m_last_lap_sfx->getStatus() != SFXBase::SFX_PLAYING)
-    {
-        music_manager->resetTemporaryVolume();
-        m_last_lap_sfx_playing = false;
-    }
+    WorldWithRank::update(ticks);
 
     const unsigned int kart_amount = getNumKarts();
 
@@ -188,7 +181,7 @@ void LinearWorld::update(float dt)
              !kart->isGhostKart())
             continue;
         getTrackSector(n)->update(kart->getFrontXYZ());
-        kart_info.m_overall_distance = kart_info.m_race_lap
+        kart_info.m_overall_distance = kart_info.m_finished_laps
                                      * Track::getCurrentTrack()->getTrackLength()
                         + getDistanceDownTrackForKart(kart->getWorldKartId(), true);
     }   // for n
@@ -197,7 +190,7 @@ void LinearWorld::update(float dt)
     // updated their position and laps etc, otherwise inconsistencies
     // (like two karts at same position) can occur.
     // ---------------------------------------------------------------
-    WorldWithRank::updateTrack(dt);
+    WorldWithRank::updateTrack(ticks);
     updateRacePosition();
 
     for (unsigned int i=0; i<kart_amount; i++)
@@ -210,8 +203,6 @@ void LinearWorld::update(float dt)
         // This is used by the AI
         m_kart_info[i].m_estimated_finish =
                 estimateFinishTimeForKart(m_karts[i]);
-
-        checkForWrongDirection(i, dt);
     }
 
 #ifdef DEBUG
@@ -228,7 +219,7 @@ void LinearWorld::update(float dt)
                        "distanceDownTrack=%f overallDistance=%f %s",
                     j, m_karts[j]->getPosition(),
                     m_karts[j]->hasFinishedRace(),
-                    m_kart_info[j].m_race_lap,
+                    m_kart_info[j].m_finished_laps,
                     getDistanceDownTrackForKart(m_karts[j]->getWorldKartId(), true),
                     m_kart_info[j].m_overall_distance,
                     (m_karts[j]->getPosition() == m_karts[i]->getPosition()
@@ -239,6 +230,37 @@ void LinearWorld::update(float dt)
     }
 #endif
 }   // update
+
+//-----------------------------------------------------------------------------
+/** This updates all only graphical elements.It is only called once per
+*  rendered frame, not once per time step.
+*  float dt Time since last rame.
+*/
+void LinearWorld::updateGraphics(float dt)
+{
+    WorldWithRank::updateGraphics(dt);
+    if (m_last_lap_sfx_playing &&
+        m_last_lap_sfx->getStatus() != SFXBase::SFX_PLAYING)
+    {
+        music_manager->resetTemporaryVolume();
+        m_last_lap_sfx_playing = false;
+    }
+
+    if (!GUIEngine::ModalDialog::isADialogActive())
+    {
+        const unsigned int kart_amount = getNumKarts();
+        for (unsigned int i = 0; i<kart_amount; i++)
+        {
+            // ---------- update rank ------
+            if (!m_karts[i]->hasFinishedRace() &&
+                !m_karts[i]->isEliminated())
+            {
+                checkForWrongDirection(i, dt);
+            }
+        }   // for i <kart_amount
+    }
+
+}   // updateGraphics
 
 //-----------------------------------------------------------------------------
 /** Is called by check structures if a kart starts a new lap.
@@ -262,7 +284,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     // allows the end controller to switch end cameras
     if(kart->hasFinishedRace())
     {
-        kart->getController()->newLap(kart_info.m_race_lap);
+        kart->getController()->newLap(kart_info.m_finished_laps);
         return;
     }
 
@@ -271,18 +293,18 @@ void LinearWorld::newLap(unsigned int kart_index)
     // Only increase the lap counter and set the new time if the
     // kart hasn't already finished the race (otherwise the race_gui
     // will begin another countdown).
-    if(kart_info.m_race_lap+1 <= lap_count)
+    if(kart_info.m_finished_laps+1 <= lap_count)
     {
         assert(kart->getWorldKartId()==kart_index);
         kart_info.m_ticks_at_last_lap=getTimeTicks();
-        kart_info.m_race_lap++;
+        kart_info.m_finished_laps++;
         m_kart_info[kart_index].m_overall_distance =
-              m_kart_info[kart_index].m_race_lap 
+              m_kart_info[kart_index].m_finished_laps 
             * Track::getCurrentTrack()->getTrackLength()
             + getDistanceDownTrackForKart(kart->getWorldKartId(), true);
     }
     // Last lap message (kart_index's assert in previous block already)
-    if (raceHasLaps() && kart_info.m_race_lap+1 == lap_count)
+    if (raceHasLaps() && kart_info.m_finished_laps+1 == lap_count)
     {
         if (lap_count > 1)
         {
@@ -311,10 +333,10 @@ void LinearWorld::newLap(unsigned int kart_index)
             }
         }
     }
-    else if (raceHasLaps() && kart_info.m_race_lap > 0 &&
-             kart_info.m_race_lap+1 < lap_count)
+    else if (raceHasLaps() && kart_info.m_finished_laps > 0 &&
+             kart_info.m_finished_laps+1 < lap_count)
     {
-        m_race_gui->addMessage(_("Lap %i", kart_info.m_race_lap+1),
+        m_race_gui->addMessage(_("Lap %i", kart_info.m_finished_laps+1),
                                kart, 3.0f, GUIEngine::getSkin()->getColor("font::normal"),
                                true);
     }
@@ -341,12 +363,12 @@ void LinearWorld::newLap(unsigned int kart_index)
     updateRacePosition();
 
     // Race finished
-    if(kart_info.m_race_lap >= race_manager->getNumLaps() && raceHasLaps())
+    if(kart_info.m_finished_laps >= race_manager->getNumLaps() && raceHasLaps())
     {
         kart->finishedRace(getTime());
     }
     int ticks_per_lap;
-    if (kart_info.m_race_lap == 1) // just completed first lap
+    if (kart_info.m_finished_laps == 1) // just completed first lap
     {
         ticks_per_lap = getTimeTicks();
     }
@@ -357,7 +379,7 @@ void LinearWorld::newLap(unsigned int kart_index)
 
     // if new fastest lap
     if(ticks_per_lap < m_fastest_lap_ticks && raceHasLaps() &&
-        kart_info.m_race_lap>0                                )
+        kart_info.m_finished_laps>0                                )
     {
         m_fastest_lap_ticks = ticks_per_lap;
 
@@ -365,7 +387,7 @@ void LinearWorld::newLap(unsigned int kart_index)
 
         // Store the temporary string because clang would mess this up
         // (remove the stringw before the wchar_t* is used).
-        const core::stringw &kart_name = kart->getName();
+        const core::stringw &kart_name = kart->getController()->getName();
 
         //I18N: as in "fastest lap: 60 seconds by Wilber"
         irr::core::stringw m_fastest_lap_message =
@@ -380,7 +402,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     } // end if new fastest lap
 
     kart_info.m_lap_start_ticks = getTimeTicks();
-    kart->getController()->newLap(kart_info.m_race_lap);
+    kart->getController()->newLap(kart_info.m_finished_laps);
 }   // newLap
 
 //-----------------------------------------------------------------------------
@@ -407,7 +429,7 @@ float LinearWorld::getDistanceToCenterForKart(const int kart_id) const
 int LinearWorld::getLapForKart(const int kart_id) const
 {
     assert(kart_id < (int)m_kart_info.size());
-    return  m_kart_info[kart_id].m_race_lap;
+    return  m_kart_info[kart_id].m_finished_laps;
 }   // getLapForKart
 
 //-----------------------------------------------------------------------------
@@ -488,7 +510,7 @@ void LinearWorld::getKartsDisplayInfo(
             else
             {
                 int ticks_behind;
-                ticks_behind = (kart_info.m_race_lap==laps_of_leader
+                ticks_behind = (kart_info.m_finished_laps==laps_of_leader
                                 ? getTicksAtLapForKart(kart->getWorldKartId())
                                 : getTimeTicks())
                            - ticks_of_leader;
@@ -503,14 +525,14 @@ void LinearWorld::getKartsDisplayInfo(
 
         int numLaps = race_manager->getNumLaps();
 
-        if(kart_info.m_race_lap>=numLaps)
+        if(kart_info.m_finished_laps>=numLaps)
         {  // kart is finished, display in green
             rank_info.m_color.setGreen(0);
             rank_info.m_color.setBlue(0);
         }
-        else if(kart_info.m_race_lap>=0 && numLaps>1)
+        else if(kart_info.m_finished_laps>=0 && numLaps>1)
         {
-            int col = (int)(255*(1.0f-(float)kart_info.m_race_lap
+            int col = (int)(255*(1.0f-(float)kart_info.m_finished_laps
                                     /((float)numLaps-1.0f)        ));
             rank_info.m_color.setBlue(col);
             rank_info.m_color.setGreen(col);
@@ -754,7 +776,7 @@ void LinearWorld::updateRacePosition()
         // first kart is doing its last lap.
         if(!m_faster_music_active                                  &&
             p == 1                                                 &&
-            kart_info.m_race_lap == race_manager->getNumLaps() - 1 &&
+            kart_info.m_finished_laps == race_manager->getNumLaps() - 1 &&
             useFastMusicNearEnd()                                       )
         {
             music_manager->switchToFastMusic();
@@ -838,13 +860,14 @@ void LinearWorld::updateRacePosition()
 /** Checks if a kart is going in the wrong direction. This is done only for
  *  player karts to display a message to the player.
  *  \param i Kart id.
+ *  \param dt Time step size.
  */
 void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
 {
     if (!m_karts[i]->getController()->isLocalPlayerController()) 
         return;
 
-    float wrongway_counter = m_karts[i]->getWrongwayCounter();
+    KartInfo &ki = m_kart_info[i];
     
     const AbstractKart *kart=m_karts[i];
     // If the kart can go in more than one directions from the current track
@@ -865,40 +888,38 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
     else if (angle_diff < -M_PI)
         angle_diff += 2*M_PI;
 
-    // Display a warning message if the kart is going back way (unless
-    // the kart has already finished the race).
+    // Display a warning message if the kart is going back way, i.e. if angle
+    // is too big(unless the kart has already finished the race).
     if ((angle_diff > DEGREE_TO_RAD * 120.0f ||
         angle_diff < -DEGREE_TO_RAD * 120.0f) &&
         kart->getVelocityLC().getY() > 0.0f &&
         !kart->hasFinishedRace())
     {
-        wrongway_counter += dt;
+        ki.m_wrong_way_timer += dt;
         
-        if (wrongway_counter > 2.0f)
-            wrongway_counter = 2.0f;
+        if (ki.m_wrong_way_timer> 2.0f)
+            ki.m_wrong_way_timer= 2.0f;
     }
     else
     {
-        wrongway_counter -= dt;
+        ki.m_wrong_way_timer -= dt;
 
-        if (wrongway_counter < 0)
-            wrongway_counter = 0;
+        if (ki.m_wrong_way_timer < 0)
+            ki.m_wrong_way_timer = 0;
     }
     
     if (kart->getKartAnimation())
-        wrongway_counter = 0;
+        ki.m_wrong_way_timer = 0;
     
-    if (wrongway_counter > 1.0f)
+    if (ki.m_wrong_way_timer > 1.0f)
     {
-        m_race_gui->cleanupMessages(0.0f);
         m_race_gui->addMessage(_("WRONG WAY!"), kart,
                                /* time */ -1.0f,
                                video::SColor(255,255,255,255),
                                /*important*/ true,
                                /*big font*/  true);
-    }  // if angle is too big
+    }
     
-    m_karts[i]->setWrongwayCounter(wrongway_counter);
 }   // checkForWrongDirection
 
 //-----------------------------------------------------------------------------

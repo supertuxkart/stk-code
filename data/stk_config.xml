@@ -9,6 +9,10 @@
        Older versions will be ignored. -->
   <track-version min="6" max="7"/>
 
+  <!-- Minimum and maxium server versions that be be read by this binary.
+       Older versions will be ignored. -->
+  <server-version min="1" max="1"/>
+
   <!-- Maximum number of karts to be used at the same time. This limit
        can easily be increased, but some tracks might not have valid start
        positions for those additional karts. -->
@@ -160,9 +164,16 @@
        away if there is an explosion. -->
   <explosion impulse-objects="500.0" />
 
-  <!-- Networking - the current networking code is outdated and will not
-      work anymore - so for now don't enable this. -->
-  <networking enable="false"/>
+  <!-- Networking 
+       state-frequency: how many states the server will send per second.
+       positional-smoothing: smoothing factor used in exponential smoothing
+           depending on error.
+       rotational-smoothing: slerp factor used in exponential smoothing
+           of rotations depending on error.
+  -->
+  <networking state-frequency="10"
+              positional-smoothing="0.25:0.95 1.0:0.85"
+              rotational-smoothing="0.25:0.95 1.0:0.85" />
 
   <!-- The field od views for 1-4 player split screen. fov-3 is
        actually not used (since 3 player split screen uses the
@@ -481,5 +492,12 @@
     STK default the low quality.
   -->
   <texture-compression quality="64"/>
+
+  <!-- List of default ports used, by default STK use random ports
+       for client and server, disable it in user config to allow
+       port forward. The server discovery port has to be the same
+       across all clients and servers.
+  -->
+  <network server-discovery-port="2757" client-port="2758" server-port="2759"/>
 
 </config>

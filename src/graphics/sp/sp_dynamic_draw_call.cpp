@@ -56,9 +56,9 @@ SPDynamicDrawCall::SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt,
     glBufferData(GL_ARRAY_BUFFER, 4 * 48, NULL, GL_DYNAMIC_DRAW);
     glGenBuffers(1, &m_ibo);
     glBindBuffer(GL_ARRAY_BUFFER, m_ibo);
-    glBufferData(GL_ARRAY_BUFFER, 32, NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 44, NULL, GL_DYNAMIC_DRAW);
     SPInstancedData id = SPInstancedData(m_trans, 0.0f, 0.0f, 0.0f, 0);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, 32, &id);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, 44, &id);
     SPTextureManager::get()->increaseGLCommandFunctionCount(1);
     SPTextureManager::get()->addGLCommandFunction
         (std::bind(&SPDynamicDrawCall::initTextureDyDc, this));
@@ -120,26 +120,23 @@ SPDynamicDrawCall::SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt,
     glBindBuffer(GL_ARRAY_BUFFER, m_ibo);
     // Origin
     glEnableVertexAttribArray(8);
-    glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, 32, (void*)0);
+    glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, 44, (void*)0);
     glVertexAttribDivisorARB(8, 1);
-    // Rotation (quaternion .xyz)
+    // Rotation (quaternion in 4 32bit floats)
     glEnableVertexAttribArray(9);
-    glVertexAttribPointer(9, 4, GL_INT_2_10_10_10_REV,
-        GraphicsRestrictions::isDisabled
-        (GraphicsRestrictions::GR_CORRECT_10BIT_NORMALIZATION) ?
-        GL_FALSE : GL_TRUE, 32, (void*)12);
+    glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, 44, (void*)12);
     glVertexAttribDivisorARB(9, 1);
-    // Scale (3 half floats and .w for quaternion .w)
+    // Scale (3 half floats and .w unused)
     glEnableVertexAttribArray(10);
-    glVertexAttribPointer(10, 4, GL_HALF_FLOAT, GL_FALSE, 32, (void*)16);
+    glVertexAttribPointer(10, 4, GL_HALF_FLOAT, GL_FALSE, 44, (void*)28);
     glVertexAttribDivisorARB(10, 1);
     // Texture translation
     glEnableVertexAttribArray(11);
-    glVertexAttribPointer(11, 2, GL_SHORT, GL_TRUE, 32, (void*)24);
+    glVertexAttribPointer(11, 2, GL_SHORT, GL_TRUE, 44, (void*)36);
     glVertexAttribDivisorARB(11, 1);
     // Misc data (skinning offset and hue change)
     glEnableVertexAttribArray(12);
-    glVertexAttribIPointer(12, 2, GL_SHORT, 32, (void*)28);
+    glVertexAttribIPointer(12, 2, GL_SHORT, 44, (void*)40);
     glVertexAttribDivisorARB(12, 1);
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

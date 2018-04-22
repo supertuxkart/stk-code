@@ -90,7 +90,7 @@ private:
 
     /** Remaining time that items should remain switched. If the
      *  value is <0, it indicates that the items are not switched atm. */
-    float m_switch_time;
+    int m_switch_ticks;
 
     void  insertItem(Item *item);
     void  deleteItem(Item *item);
@@ -106,7 +106,7 @@ public:
                                     AbstractKart* parent=NULL);
     Item*          newItem         (const Vec3& xyz, float distance,
                                     TriggerItemListener* listener);
-    void           update          (float delta);
+    void           update          (int ticks);
     void           checkItemHit    (AbstractKart* kart);
     void           reset           ();
     void           collectedItem   (Item *item, AbstractKart *kart,

@@ -21,6 +21,7 @@
 
 #include "karts/kart.hpp"
 #include "replay/replay_base.hpp"
+#include "utils/cpp2011.hpp"
 
 #include "LinearMath/btTransform.h"
 
@@ -46,7 +47,8 @@ private:
 public:
                   GhostKart(const std::string& ident,
                             unsigned int world_kart_id, int position);
-    virtual void  update (float dt);
+    virtual void  update(int ticks) OVERRIDE;
+    virtual void  updateGraphics(float dt) OVERRIDE;
     virtual void  reset();
     // ------------------------------------------------------------------------
     /** No physics body for ghost kart, so nothing to adjust. */

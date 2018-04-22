@@ -181,9 +181,9 @@ const std::string& CutsceneWorld::getIdent() const
 
 //-----------------------------------------------------------------------------
 /** Update the world and the track.
- *  \param dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void CutsceneWorld::update(float dt)
+void CutsceneWorld::update(int ticks)
 {
     /*
     {
@@ -234,9 +234,8 @@ void CutsceneWorld::update(float dt)
         double prev_time = m_time;
         double now = StkTime::getRealTime();
         m_time = now - m_time_at_second_reset;
-        dt = (float)(m_time - prev_time);
     }
-
+    
     float fade = 0.0f;
     float fadeIn = -1.0f;
     float fadeOut = -1.0f;
@@ -288,8 +287,8 @@ void CutsceneWorld::update(float dt)
     }
 
 
-    World::update((float)dt);
-    World::updateTrack((float)dt);
+    World::update(ticks);
+    World::updateTrack(ticks);
 
     PtrVector<TrackObject>& objects = Track::getCurrentTrack()
                                     ->getTrackObjectManager()->getObjects();

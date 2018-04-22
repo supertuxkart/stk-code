@@ -248,6 +248,7 @@ public:
                                  const core::vector2df &scaling) {};
 
     void cleanupMessages(const float dt);
+    void removeReferee();
 
 };   // RaceGUIBase
 

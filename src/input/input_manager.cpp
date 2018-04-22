@@ -28,18 +28,21 @@
 #include "guiengine/screen_keyboard.hpp"
 #include "input/device_manager.hpp"
 #include "input/gamepad_device.hpp"
+#include "input/input.hpp"
 #include "input/keyboard_device.hpp"
 #include "input/multitouch_device.hpp"
-#include "input/input.hpp"
+#include "input/wiimote_manager.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "replay/replay_recorder.hpp"
+#include "states_screens/dialogs/splitscreen_player_dialog.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_device.hpp"
@@ -84,6 +87,10 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
 // -----------------------------------------------------------------------------
 void InputManager::update(float dt)
 {
+#ifdef ENABLE_WIIUSE
+    wiimote_manager->update();
+#endif
+
     if(m_timer_in_use)
     {
         m_timer -= dt;
@@ -290,14 +297,14 @@ void InputManager::handleStaticAction(int key, int value)
         case IRR_KEY_F11:
             if(value && shift_is_pressed && world && RewindManager::isEnabled())
             {
-                printf("Enter rewind to time:");
+                printf("Enter rewind to time in ticks:");
                 char s[256];
                 fgets(s, 256, stdin);
-                float t;
+                int t;
                 StringUtils::fromString(s,t);
-                RewindManager::get()->rewindTo(t);
-                Log::info("Rewind", "Rewinding from %f to %f",
-                          world->getTime(), t);
+                RewindManager::get()->rewindTo(t, world->getTimeTicks());
+                Log::info("Rewind", "Rewinding from %d to %d",
+                          world->getTimeTicks(), t);
             }
             break;
 
@@ -705,6 +712,31 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         // when a device presses fire or rescue
         if (m_device_manager->getAssignMode() == DETECT_NEW)
         {
+            if (NetworkConfig::get()->isNetworking() &&
+                NetworkConfig::get()->isAddingNetworkPlayers())
+            {
+                // Ignore release event
+                if (value == 0)
+                    return;
+                InputDevice *device = NULL;
+                if (type == Input::IT_KEYBOARD)
+                {
+                    //Log::info("InputManager", "New Player Joining with Key %d", button);
+                    device = m_device_manager->getKeyboardFromBtnID(button);
+                }
+                else if (type == Input::IT_STICKBUTTON ||
+                        type == Input::IT_STICKMOTION    )
+                {
+                    device = m_device_manager->getGamePadFromIrrID(deviceID);
+                }
+                if (device && (action == PA_FIRE || action == PA_MENU_SELECT))
+                {
+                    if (!GUIEngine::ModalDialog::isADialogActive())
+                        new SplitscreenPlayerDialog(device);
+                    return;
+                }
+            }
+
             // Player is unjoining
             if ((player != NULL) && (action == PA_RESCUE ||
                                      action == PA_MENU_CANCEL ) )
@@ -744,7 +776,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
                     if (device != NULL)
                     {
-                        KartSelectionScreen::getRunningInstance()->joinPlayer(device);
+                        KartSelectionScreen::getRunningInstance()->joinPlayer(device, NULL/*player profile*/);
                     }
                 }
                 return; // we're done here, ignore devices that aren't
@@ -1195,7 +1227,7 @@ EventPropagation InputManager::input(const SEvent& event)
             
             float factor = UserConfigParams::m_multitouch_tilt_factor;
             factor = std::max(factor, 0.1f);
-            device->updateAxisX(event.AccelerometerEvent.Y / factor);
+            device->updateAxisX(float(event.AccelerometerEvent.Y) / factor);
         }
     }
 

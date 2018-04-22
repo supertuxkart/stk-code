@@ -54,14 +54,15 @@ private:
     SFXBuffer   *m_grab_sound;
     SFXBuffer   *m_full_sound;
 
-    virtual void steer(float, int) OVERRIDE;
+    virtual void steer(int, int) OVERRIDE;
     virtual void displayPenaltyWarning() OVERRIDE;
 public:
                  LocalPlayerController(AbstractKart *kart,
                                        const int local_playerID);
                 ~LocalPlayerController();
-    void         update            (float) OVERRIDE;
-    void         action            (PlayerAction action, int value) OVERRIDE;
+    void         update            (int ticks) OVERRIDE;
+    bool         action            (PlayerAction action, int value,
+                                    bool dry_run=false) OVERRIDE;
     virtual void handleZipper      (bool play_sound) OVERRIDE;
     void         collectedItem     (const Item &item, int add_info=-1,
                                     float previous_energy=0) OVERRIDE;
@@ -77,7 +78,7 @@ public:
     virtual bool isLocalPlayerController() const OVERRIDE {return true;}
     // ------------------------------------------------------------------------
     /** Returns the name of the player profile. */
-    core::stringw getName() const OVERRIDE { return m_player->getProfile()->getName(); }
+    core::stringw getName() const OVERRIDE;
 
 
 };   // LocalPlayerController

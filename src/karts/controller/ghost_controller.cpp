@@ -35,7 +35,7 @@ void GhostController::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
-void GhostController::update(float dt)
+void GhostController::update(int ticks)
 {
     m_current_time = World::getWorld()->getTime();
     // Find (if necessary) the next index to use
@@ -82,9 +82,10 @@ void GhostController::addReplayTime(float time)
 }   // addReplayTime
 
 //-----------------------------------------------------------------------------
-void GhostController::action(PlayerAction action, int value)
+bool GhostController::action(PlayerAction action, int value, bool dry_run)
 {
     // Watching replay use only
     if (action == PA_LOOK_BACK)
         m_controls->setLookBack(value!=0);
+    return true;
 }   // action

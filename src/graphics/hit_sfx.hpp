@@ -36,7 +36,7 @@ private:
 public:
          HitSFX(const Vec3& coord, const char* explosion_sound);
         ~HitSFX();
-    virtual bool updateAndDelete(float dt) OVERRIDE;
+    virtual bool updateAndDelete(int ticks) OVERRIDE;
     virtual void setLocalPlayerKartHit() OVERRIDE;
 
 };   // HitSFX

@@ -19,45 +19,76 @@
 #define HEADER_NETWORKING_LOBBY_HPP
 
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
+#include <memory>
+#include <tuple>
 
 class Server;
+class STKPeer;
 
-namespace GUIEngine { 
-    class Widget;
-    class ListWidget; 
-    class IconButtonWidget;
+namespace GUIEngine
+{ 
+    class ButtonWidget;
     class LabelWidget;
-    class RibbonWidget;
+    class ListWidget;
+    class IconButtonWidget;
+    class TextBoxWidget;
 }
 
-class NetworkPlayerProfile;
+namespace irr
+{
+    namespace gui
+    {
+        class STKModifiedSpriteBank;
+    }
+}
 
 /**
-  * \brief Handles the main menu
+  * \brief Handles the networking lobby
   * \ingroup states_screens
   */
-class NetworkingLobby :     public GUIEngine::Screen,
-                            public GUIEngine::ScreenSingleton<NetworkingLobby>
+class NetworkingLobby : public GUIEngine::Screen,
+                        public GUIEngine::ScreenSingleton<NetworkingLobby>,
+                        public GUIEngine::ITextBoxWidgetListener
 {
 private:
-    friend class GUIEngine::ScreenSingleton<NetworkingLobby>;
+    enum LobbyState
+    {
+        LS_ADD_PLAYERS,
+        LS_CONNECTING
+    } m_state;
 
-    Server * m_server;
+    friend class GUIEngine::ScreenSingleton<NetworkingLobby>;
 
     NetworkingLobby();
 
-    GUIEngine::IconButtonWidget * m_back_widget;
-    GUIEngine::LabelWidget * m_server_name_widget;
-    GUIEngine::LabelWidget * m_online_status_widget;
-    GUIEngine::RibbonWidget * m_bottom_menu_widget;
-    GUIEngine::IconButtonWidget * m_exit_widget;
-    GUIEngine::IconButtonWidget *m_start_button;
-    GUIEngine::ListWidget *m_player_list;
-    GUIEngine::LabelWidget* m_server_difficulty;
-    GUIEngine::LabelWidget* m_server_game_mode;
+    std::shared_ptr<Server> m_joined_server;
+    std::weak_ptr<STKPeer> m_server_peer;
+    std::vector<core::stringw> m_server_info;
+    int m_server_info_height;
 
-    /** \brief Sets which widget has to be focused. Depends on the user state. */
-    void setInitialFocus();
+    GUIEngine::IconButtonWidget* m_back_widget;
+    GUIEngine::LabelWidget* m_header;
+    GUIEngine::LabelWidget* m_text_bubble;
+    GUIEngine::IconButtonWidget* m_exit_widget;
+    GUIEngine::IconButtonWidget* m_start_button;
+    GUIEngine::ListWidget* m_player_list;
+    GUIEngine::TextBoxWidget* m_chat_box;
+    GUIEngine::ButtonWidget* m_send_button;
+
+    irr::gui::STKModifiedSpriteBank* m_icon_bank;
+
+    /** \brief implement optional callback from parent class GUIEngine::Screen */
+    virtual void unloaded();
+
+    virtual void onTextUpdated() {}
+    virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE
+    {
+        sendChat(text);
+        return true;
+    }
+
+    void sendChat(irr::core::stringw text);
 
 public:
 
@@ -82,14 +113,19 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual bool onEscapePressed() OVERRIDE;
 
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void onDisabledItemClicked(const std::string& item) OVERRIDE;
+    void finishAddingPlayers();
+    void addMoreServerInfo(core::stringw info);
+    void setJoinedServer(std::shared_ptr<Server> server)
+    {
+        m_joined_server = server;
+        m_server_info.clear();
+    }
+    void updatePlayers(const std::vector<std::tuple<uint32_t/*host id*/,
+                       uint32_t/*online id*/, core::stringw/*player name*/,
+                       int/*icon id*/> >& p);
+    void addSplitscreenPlayer(irr::core::stringw name);
+    void cleanAddedPlayers();
 
-    /** \brief Implements the callback when a dialog gets closed. */
-    virtual void onDialogClose() OVERRIDE;
-
-    void addPlayer(NetworkPlayerProfile *profile);
-    void removePlayer(NetworkPlayerProfile *profile);
 };   // class NetworkingLobby
 
 #endif

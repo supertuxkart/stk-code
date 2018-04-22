@@ -71,6 +71,11 @@ public:
     // ------------------------------------------------------------------------
     GUIEngine::EventPropagation processEvent(const std::string& eventSource)
         OVERRIDE;
+    // ------------------------------------------------------------------------
+    GUIEngine::TextBoxWidget* getTextField() const     { return m_text_field; }
+    // ------------------------------------------------------------------------
+    GUIEngine::LabelWidget* getTitle() const                { return m_title; }
+
 };
 
 #endif

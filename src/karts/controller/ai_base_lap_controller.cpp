@@ -195,11 +195,11 @@ void AIBaseLapController::computePath()
 /** Updates the ai base controller each time step. Note that any calls to
  *  isStuck() must be done before update is called, since update will call
  *  AIBaseController::update() which will reset the isStuck flag!
- *  \param dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void AIBaseLapController::update(float dt)
+void AIBaseLapController::update(int ticks)
 {
-    AIBaseController::update(dt);
+    AIBaseController::update(ticks);
     if(DriveGraph::get())
     {
         // Update the current node:
@@ -252,7 +252,7 @@ float AIBaseLapController::steerToAngle(const unsigned int sector,
     //Desired angle minus current angle equals how many angles to turn
     float steer_angle = angle - m_kart->getHeading();
 
-    if(m_kart->getBlockedByPlungerTime()>0)
+    if(m_kart->getBlockedByPlungerTicks()>0)
         steer_angle += add_angle*0.2f;
     else
         steer_angle += add_angle;

@@ -62,8 +62,6 @@ const float ANIM_TO = 7.0f;
 const int GIFT_EXIT_FROM = (int)ANIM_TO;
 const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 7;
 
-DEFINE_SCREEN_SINGLETON( FeatureUnlockedCutScene );
-
 // ============================================================================
 
 #if 0
@@ -683,7 +681,7 @@ void FeatureUnlockedCutScene::continueButtonPressed()
         {
             // simulate all the steps of the animation until we reach the end
             onUpdate(0.4f);
-            World::getWorld()->updateWorld(0.4f);
+            World::getWorld()->updateWorld(stk_config->time2Ticks(0.4f));
         }
     }
     else

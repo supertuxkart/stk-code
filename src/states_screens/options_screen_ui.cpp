@@ -54,8 +54,6 @@
 using namespace GUIEngine;
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( OptionsScreenUI );
-
 // -----------------------------------------------------------------------------
 
 OptionsScreenUI::OptionsScreenUI() : Screen("options_ui.stkgui")
@@ -148,6 +146,9 @@ void OptionsScreenUI::init()
     LabelWidget *stats_label = getWidget<LabelWidget>("label-hw-report");
     assert( stats_label );
             stats->setState(UserConfigParams::m_hw_report_enable);
+
+    getWidget<CheckBoxWidget>("enable-lobby-chat")
+        ->setState(UserConfigParams::m_lobby_chat);
 
     if(news->getState())
     {
@@ -289,17 +290,24 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         // If internet gets enabled, re-initialise the addon manager (which
         // happens in a separate thread) so that news.xml etc can be
         // downloaded if necessary.
-        CheckBoxWidget *stats = getWidget<CheckBoxWidget>("enable-hw-report");
-        LabelWidget *stats_label = getWidget<LabelWidget>("label-hw-report");
+        CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
+        LabelWidget* stats_label = getWidget<LabelWidget>("label-hw-report");
+        CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
+        LabelWidget* chat_label = getWidget<LabelWidget>("label-lobby-chat");
         if(internet->getState())
         {
             NewsManager::get()->init(false);
             stats->setVisible(true);
             stats_label->setVisible(true);
             stats->setState(UserConfigParams::m_hw_report_enable);
+            chat->setVisible(true);
+            stats->setState(UserConfigParams::m_lobby_chat);
+            chat_label->setVisible(true);
         }
         else
         {
+            chat->setVisible(false);
+            chat_label->setVisible(false);
             stats->setVisible(false);
             stats_label->setVisible(false);
             PlayerProfile* profile = PlayerManager::getCurrentPlayer();
@@ -313,6 +321,11 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         UserConfigParams::m_hw_report_enable = stats->getState();
         if(stats->getState())
             HardwareStats::reportHardwareStats();
+    }
+    else if (name=="enable-lobby-chat")
+    {
+        CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
+        UserConfigParams::m_lobby_chat = chat->getState();
     }
     else if (name=="show-login")
     {

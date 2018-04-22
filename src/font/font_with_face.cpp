@@ -29,6 +29,7 @@
 #include "graphics/stk_tex_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/skin.hpp"
+#include "modes/profile_world.hpp"
 #include "utils/string_utils.hpp"
 
 #include <array>
@@ -209,7 +210,7 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
 
     const unsigned int cur_tex = m_spritebank->getTextureCount() -1;
 #ifndef SERVER_ONLY
-    if (bits->buffer != NULL)
+    if (bits->buffer != NULL && !ProfileWorld::isNoGraphics())
     {
         video::ITexture* tex = m_spritebank->getTexture(cur_tex);
         glBindTexture(GL_TEXTURE_2D, tex->getOpenGLTextureName());
@@ -335,7 +336,7 @@ void FontWithFace::setDPI()
     if (UserConfigParams::m_hidpi_enabled)
     {
         float scale = screen_height / 480.0f;
-        m_face_dpi = getScalingFactorTwo() * getScalingFactorOne() * scale;
+        m_face_dpi = int(getScalingFactorTwo() * getScalingFactorOne() * scale);
     }
     else
     {

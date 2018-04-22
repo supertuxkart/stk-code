@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="org.supertuxkart.stk_dbg"
           android:versionCode="1"
-          android:versionName="1.0"
+          android:versionName="git"
           android:installLocation="auto">
 
     <!-- This .apk has no Java code itself, so set hasCode to false. -->

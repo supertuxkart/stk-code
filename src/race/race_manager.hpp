@@ -36,6 +36,7 @@
 #include "utils/vec3.hpp"
 
 class AbstractKart;
+class NetworkString;
 class SavedGrandPrix;
 class Track;
 
@@ -227,7 +228,7 @@ public:
 #undef BATTLE_ARENA
 
     /** Game difficulty. */
-    enum Difficulty     { DIFFICULTY_EASY,
+    enum Difficulty     { DIFFICULTY_EASY = 0,
                           DIFFICULTY_FIRST = DIFFICULTY_EASY,
                           DIFFICULTY_MEDIUM,
                           DIFFICULTY_HARD,
@@ -303,7 +304,6 @@ private:
     /** Stores remote kart information about all player karts. */
     std::vector<RemoteKartInfo>      m_player_karts;
     std::vector<std::string>         m_tracks;
-    std::vector<int>                 m_host_ids;
 
     /** Number of local players. */
     unsigned int m_num_local_players;
@@ -786,6 +786,10 @@ public:
     {
         return m_num_spare_tire_karts;
     }   // getNumSpareTireKarts
+    // ------------------------------------------------------------------------
+    void configGrandPrixResultFromNetwork(NetworkString& ns);
+    // ------------------------------------------------------------------------
+    void clearNetworkGrandPrixResult();
 
 };   // RaceManager
 

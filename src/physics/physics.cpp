@@ -31,6 +31,7 @@
 #include "karts/controller/local_player_controller.hpp"
 #include "modes/soccer_world.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "karts/explosion_animation.hpp"
 #include "physics/btKart.hpp"
 #include "physics/irr_debug_drawer.hpp"
@@ -135,9 +136,9 @@ void Physics::removeKart(const AbstractKart *kart)
 
 //-----------------------------------------------------------------------------
 /** Updates the physics simulation and handles all collisions.
- *  \param dt Time step.
+ *  \param ticks Number of physics steps to simulate.
  */
-void Physics::update(float dt)
+void Physics::update(int ticks)
 {
     PROFILER_PUSH_CPU_MARKER("Physics", 0, 0, 0);
 
@@ -150,10 +151,11 @@ void Physics::update(float dt)
     // of objects.
     m_all_collisions.clear();
 
-    // Maximum of three substeps. This will work for framerate down to
-    // 20 FPS (bullet default frequency is 60 HZ).
-    m_dynamics_world->stepSimulation(dt, stk_config->getPhysicsFPS() / 20,
-                                     1.0f / stk_config->getPhysicsFPS());
+    // Since the world update (which calls physics update) is called at the
+    // fixed frequency necessary for the physics update, we need to do exactly
+    // one physic step only.
+    m_dynamics_world->stepSimulation(stk_config->ticks2Time(1), 1,
+                                     stk_config->ticks2Time(1)      );
 
     // Now handle the actual collision. Note: flyables can not be removed
     // inside of this loop, since the same flyables might hit more than one

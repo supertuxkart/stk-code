@@ -45,8 +45,6 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( OnlineLanScreen );
-
 // -----------------------------------------------------------------------------
 
 OnlineLanScreen::OnlineLanScreen() : GUIEngine::Screen("online/lan.stkgui")
@@ -55,9 +53,12 @@ OnlineLanScreen::OnlineLanScreen() : GUIEngine::Screen("online/lan.stkgui")
 
 // -----------------------------------------------------------------------------
 
-void OnlineLanScreen::loadedFromFile()
+void OnlineLanScreen::beforeAddingWidget()
 {
-}   // loadedFromFile
+#ifdef ANDROID
+    getWidget("create_lan_server")->setVisible(false);
+#endif
+}   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
 
@@ -75,7 +76,7 @@ void OnlineLanScreen::eventCallback(Widget* widget, const std::string& name, con
 {
     if (name == "back")
     {
-        StateManager::get()->popMenu();
+        StateManager::get()->escapePressed();
         return;
     }
     if (name == "lan")
@@ -85,9 +86,7 @@ void OnlineLanScreen::eventCallback(Widget* widget, const std::string& name, con
         if (selection == "create_lan_server")
         {
             NetworkConfig::get()->setIsLAN();
-            NetworkConfig::get()->setIsServer(true);
             CreateServerScreen::getInstance()->push();
-            // TODO: create lan server
         }
         else if (selection == "find_lan_server")
         {
@@ -106,7 +105,6 @@ void OnlineLanScreen::eventCallback(Widget* widget, const std::string& name, con
 bool OnlineLanScreen::onEscapePressed()
 {
     NetworkConfig::get()->unsetNetworking();
-    //StateManager::get()->popMenu();
     return true;
 }   // onEscapePressed
 

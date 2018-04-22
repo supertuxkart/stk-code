@@ -101,6 +101,14 @@ SDK_PATH        - Path to SDK directory
 
 NDK_PATH        - Path to NDK directory
 
+PROJECT_VERSION - Set Supertuxkart version number, for example "0.9.3" or 
+                  "git20170409" or whatever. 
+                  Default is: git.
+
+PROJECT_CODE    - Set Supertuxkart version code that is used in the manifest 
+                  file.
+                  Default is: 1.
+
 
 
 --------------------------------------------------------------------------------
@@ -110,29 +118,13 @@ NDK_PATH        - Path to NDK directory
 Making a release build is similar to typical compilation, but there are few
 additional things to do. 
 
-You have to change version numbers. This is important, because assets manager
-in STK checks these numbers and detects if already extracted data files are
+You have to set PROJECT_VERSION variable. This is important, because assets 
+manager in STK checks that value and detects if already extracted data files are
 up to date. So that when you will install new STK version, this will force new 
 data extraction automatically.
 
-So that you have to:
-
-1. Change "data/supertuxkart.git" to "data/supertuxkart.VERSION_NUMBER"
-
-2. Open "src/utils/constants.cpp" and change:
-
-    const char STK_VERSION[] = "git";
-      
-   to
-    
-    const char STK_VERSION[] = "VERSION_NUMBER";
-      
-   where "VERSION_NUMBER" is for example "0.9.3" or "git20170409" or whatever.
-    
-3. You can also update these lines in "android/AndroidManifest.xml":
-    android:versionCode="1"
-    android:versionName="1.0"
-
+The PROJECT_CODE variable typically should be set to a value higher than for
+previous release, so that users will receive the upgrade.
 
 Before compilation you have to set:
 

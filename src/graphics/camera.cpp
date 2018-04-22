@@ -41,7 +41,7 @@
 #include "utils/vs.hpp"
 
 #include "ISceneManager.h"
-
+#include <algorithm>
 #include <cmath>
 
 std::vector<Camera*> Camera::m_all_cameras;
@@ -58,6 +58,11 @@ Camera* Camera::createCamera(AbstractKart* kart, const int index)
 
     Camera *camera = createCamera(index, m_default_type, kart);
     m_all_cameras.push_back(camera);
+    std::sort(m_all_cameras.begin(), m_all_cameras.end(),
+        [](const Camera* a, const Camera* b)
+        {
+            return a->getIndex() < b->getIndex();
+        });
     return camera;
 }   // createCamera(kart)
 

@@ -30,6 +30,7 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/render_info.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "io/file_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/keyboard_device.hpp"
@@ -128,7 +129,6 @@ World::World() : WorldStatus()
     m_schedule_pause     = false;
     m_schedule_unpause   = false;
     m_schedule_exit_race = false;
-    m_self_destruct      = false;
     m_schedule_tutorial  = false;
     m_is_network_world   = false;
 
@@ -230,14 +230,19 @@ void World::init()
     {
         Weather::getInstance<Weather>();   // create Weather instance
     }
-    if((NetworkConfig::get()->isServer() && !ProfileWorld::isNoGraphics()) ||
-        race_manager->isWatchingReplay())
-    {
-        // In case that the server is running with gui or watching replay,
-        // create a camera and attach it to the first kart.
-        Camera::createCamera(World::getWorld()->getKart(0), 0);
 
-    }
+    if (Camera::getNumCameras() == 0)
+    {
+        if ( (NetworkConfig::get()->isServer() && 
+              !ProfileWorld::isNoGraphics()       ) ||
+            race_manager->isWatchingReplay()            )
+        {
+            // In case that the server is running with gui or watching replay,
+            // create a camera and attach it to the first kart.
+            Camera::createCamera(World::getWorld()->getKart(0), 0);
+
+        }   // if server with graphics of is watching replay
+    } // if getNumCameras()==0
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -337,6 +342,15 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
         gk = ReplayPlay::get()->getNumGhostKart();
 
     std::shared_ptr<RenderInfo> ri = std::make_shared<RenderInfo>();
+    core::stringw online_name;
+    if (global_player_id > -1)
+    {
+        ri->setHue(race_manager->getKartInfo(global_player_id)
+            .getDefaultKartColor());
+        online_name = race_manager->getKartInfo(global_player_id)
+            .getPlayerName();
+    }
+
     int position           = index+1;
     btTransform init_pos   = getStartTransform(index - gk);
     AbstractKart *new_kart;
@@ -353,15 +367,12 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     {
     case RaceManager::KT_PLAYER:
     {
-        controller = new LocalPlayerController(new_kart,
-
-                         local_player_id);
-
-        const float hue = StateManager::get()->getActivePlayer(local_player_id)
-            ->getConstProfile()->getDefaultKartColor();
-        if (hue > 0.0f)
+        controller = new LocalPlayerController(new_kart, local_player_id);
+        const PlayerProfile* p = StateManager::get()
+            ->getActivePlayer(local_player_id)->getConstProfile();
+        if (p && p->getDefaultKartColor() > 0.0f)
         {
-            ri->setHue(hue);
+            ri->setHue(p->getDefaultKartColor());
         }
 
         m_num_players ++;
@@ -370,6 +381,8 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     case RaceManager::KT_NETWORK_PLAYER:
     {
         controller = new NetworkPlayerController(new_kart);
+        if (!online_name.empty())
+            new_kart->setOnScreenText(online_name.c_str());
         m_num_players++;
         break;
     }
@@ -556,7 +569,7 @@ void World::terminateRace()
     // to show it in the GUI
     int best_highscore_rank = -1;
     std::string highscore_who = "";
-    if (!this->isNetworkWorld())
+    if (!isNetworkWorld())
     {
         updateHighscores(&best_highscore_rank);
     }
@@ -648,6 +661,8 @@ void World::terminateRace()
         results->clearHighscores();
     }
 
+    // In case someone opened paused race dialog in network game
+    GUIEngine::ModalDialog::dismiss();
     results->push();
     WorldStatus::terminateRace();
 }   // terminateRace
@@ -736,7 +751,8 @@ void World::resetAllKarts()
             (*i)->getMaterial() && (*i)->getMaterial()->hasGravity() ?
             (*i)->getNormal() * -g : Vec3(0, -g, 0));
     }
-    for(int i=0; i<60; i++) Physics::getInstance()->update(1.f/60.f);
+    for(int i=0; i<stk_config->getPhysicsFPS(); i++) 
+        Physics::getInstance()->update(1);
 
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
     {
@@ -830,9 +846,9 @@ void World::scheduleUnpause()
  *  call World::update() first, to get updated kart positions. If race
  *  over would be handled in World::update, LinearWorld had no opportunity
  *  to update its data structures before the race is finished).
- *  \param dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void World::updateWorld(float dt)
+void World::updateWorld(int ticks)
 {
 #ifdef DEBUG
     assert(m_magic_number == 0xB01D6543);
@@ -850,25 +866,14 @@ void World::updateWorld(float dt)
         m_schedule_unpause = false;
     }
 
-    if (m_self_destruct)
-    {
-        delete this;
-        return;
-    }
-
     // Don't update world if a menu is shown or the race is over.
     if( getPhase() == FINISH_PHASE         ||
         getPhase() == IN_GAME_MENU_PHASE      )
         return;
 
-    if (!history->replayHistory())
-    {
-        history->updateSaving(dt);   // updating the saved state
-    }
-
     try
     {
-        update(dt);
+        update(ticks);
     }
     catch (AbortWorldUpdateException& e)
     {
@@ -958,10 +963,37 @@ void World::scheduleTutorial()
 }   // scheduleTutorial
 
 //-----------------------------------------------------------------------------
-/** Updates the physics, all karts, the track, and projectile manager.
- *  \param dt Time step size.
+/** This updates all only graphical elements. It is only called once per
+ *  rendered frame, not once per time step.
+ *  float dt Time since last rame.
  */
-void World::update(float dt)
+void World::updateGraphics(float dt)
+{
+    PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
+    if (UserConfigParams::m_particles_effects > 1 && Weather::getInstance())
+    {
+        Weather::getInstance()->update(dt);
+    }
+    PROFILER_POP_CPU_MARKER();
+
+    // Update graphics of karts, e.g. visual suspension, skid marks
+    const int kart_amount = (int)m_karts.size();
+    for (int i = 0; i < kart_amount; ++i)
+    {
+        // Update all karts that are not eliminated
+        if (!m_karts[i]->isEliminated() )
+            m_karts[i]->updateGraphics(dt);
+    }
+
+    projectile_manager->updateGraphics(dt);
+    Track::getCurrentTrack()->updateGraphics(dt);
+}   // updateGraphics
+
+//-----------------------------------------------------------------------------
+/** Updates the physics, all karts, the track, and projectile manager.
+ *  \param ticks Number of physics time steps - should be 1.
+ */
+void World::update(int ticks)
 {
 #ifdef DEBUG
     assert(m_magic_number == 0xB01D6543);
@@ -970,18 +1002,20 @@ void World::update(float dt)
     PROFILER_PUSH_CPU_MARKER("World::update()", 0x00, 0x7F, 0x00);
 
 #if MEASURE_FPS
-    static float time = 0.0f;
-    time += dt;
-    if (time > 5.0f)
+    static int time = 0.0f;
+    time += ticks;
+    if (time > stk_config->time2Ticks(5.0f))
     {
-        time -= 5.0f;
+        time -= stk_config->time2Ticks(5.0f);
         printf("%i\n",irr_driver->getVideoDriver()->getFPS());
     }
 #endif
 
     PROFILER_PUSH_CPU_MARKER("World::update (sub-updates)", 0x20, 0x7F, 0x00);
-    WorldStatus::update(dt);
-    RewindManager::get()->saveStates();
+    WorldStatus::update(ticks);
+    PROFILER_POP_CPU_MARKER();
+    PROFILER_PUSH_CPU_MARKER("World::update (RewindManager)", 0x20, 0x7F, 0x40);
+    RewindManager::get()->update(ticks);
     PROFILER_POP_CPU_MARKER();
 
     PROFILER_PUSH_CPU_MARKER("World::update (Kart::upate)", 0x40, 0x7F, 0x00);
@@ -996,35 +1030,30 @@ void World::update(float dt)
             dynamic_cast<SpareTireAI*>(m_karts[i]->getController());
         // Update all karts that are not eliminated
         if(!m_karts[i]->isEliminated() || (sta && sta->isMoving()))
-            m_karts[i]->update(dt);
+            m_karts[i]->update(ticks);
     }
     PROFILER_POP_CPU_MARKER();
 
-    PROFILER_PUSH_CPU_MARKER("World::update (camera)", 0x60, 0x7F, 0x00);
-    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+    // Updating during a rewind introduces stuttering in the camera
+    if (!RewindManager::get()->isRewinding())
     {
-        Camera::getCamera(i)->update(dt);
-    }
-    PROFILER_POP_CPU_MARKER();
+        PROFILER_PUSH_CPU_MARKER("World::update (camera)", 0x60, 0x7F, 0x00);
 
-    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(dt);
+        for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
+        {
+            Camera::getCamera(i)->update(stk_config->ticks2Time(ticks));
+        }
+        PROFILER_POP_CPU_MARKER();
+    }   // if !rewind
+
+    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(ticks);
     Scripting::ScriptEngine *script_engine = Scripting::ScriptEngine::getInstance();
-    if (script_engine) script_engine->update(dt);
+    if (script_engine) script_engine->update(ticks);
 
-    if (!history->dontDoPhysics())
-    {
-        Physics::getInstance()->update(dt);
-    }
-
-    PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
-    if (UserConfigParams::m_particles_effects > 1 && Weather::getInstance())
-    {
-        Weather::getInstance()->update(dt);
-    }
-    PROFILER_POP_CPU_MARKER();
+    Physics::getInstance()->update(ticks);
 
     PROFILER_PUSH_CPU_MARKER("World::update (projectiles)", 0xa0, 0x7F, 0x00);
-    projectile_manager->update(dt);
+    projectile_manager->update(ticks);
     PROFILER_POP_CPU_MARKER();
 
     PROFILER_POP_CPU_MARKER();
@@ -1033,17 +1062,6 @@ void World::update(float dt)
     assert(m_magic_number == 0xB01D6543);
 #endif
 }   // update
-
-// ----------------------------------------------------------------------------
-/** Compute the new time, and set this new time to be used in the rewind
- *  manager.
- *  \param dt Time step size.
- */
-void World::updateTime(const float dt)
-{
-    WorldStatus::updateTime(dt);
-    RewindManager::get()->setCurrentTime(getTime(), dt);
-}   // updateTime
 
 // ----------------------------------------------------------------------------
 /** Only updates the track. The order in which the various parts of STK are
@@ -1062,15 +1080,15 @@ void World::updateTime(const float dt)
  *  update has to be called after updating the race position in linear world.
  *  That's why there is a separate call for trackUpdate here.
  */
-void World::updateTrack(float dt)
+void World::updateTrack(int ticks)
 {
-    Track::getCurrentTrack()->update(dt);
+    Track::getCurrentTrack()->update(ticks);
 }   // update Track
-// ----------------------------------------------------------------------------
 
+// ----------------------------------------------------------------------------
 Highscores* World::getHighscores() const
 {
-    if(!m_use_highscores) return NULL;
+    if (isNetworkWorld() || !m_use_highscores) return NULL;
 
     const Highscores::HighscoreType type = "HST_" + getIdent();
 
@@ -1199,6 +1217,7 @@ AbstractKart *World::getLocalPlayerKart(unsigned int n) const
 /** Remove (eliminate) a kart from the race */
 void World::eliminateKart(int kart_id, bool notify_of_elimination)
 {
+    assert(kart_id < (int)m_karts.size());
     AbstractKart *kart = m_karts[kart_id];
     if (kart->isGhostKart()) return;
 
@@ -1215,7 +1234,7 @@ void World::eliminateKart(int kart_id, bool notify_of_elimination)
             {
                 // Store the temporary string because clang would mess this up
                 // (remove the stringw before the wchar_t* is used).
-                const core::stringw &kart_name = kart->getName();
+                const core::stringw &kart_name = kart->getController()->getName();
                 m_race_gui->addMessage(_("'%s' has been eliminated.",
                                        kart_name),
                                        camera->getKart(),
@@ -1293,18 +1312,11 @@ void World::unpause()
 }   // pause
 
 //-----------------------------------------------------------------------------
-/** Call when the world needs to be deleted but you can't do it immediately
- * because you are e.g. within World::update()
- */
-void World::delayedSelfDestruct()
-{
-    m_self_destruct = true;
-}   // delayedSelfDestruct
-
-//-----------------------------------------------------------------------------
 void World::escapePressed()
 {
-    new RacePausedDialog(0.8f, 0.6f);
+    if (!(NetworkConfig::get()->isNetworking() &&
+        getPhase() < MUSIC_PHASE))
+        new RacePausedDialog(0.8f, 0.6f);
 }   // escapePressed
 
 // ----------------------------------------------------------------------------

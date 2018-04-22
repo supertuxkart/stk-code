@@ -36,16 +36,16 @@ void main()
     mask_2 = pow(mask_2, 1.5);
     mask_2 *= pow(mask_3, 0.5);
 
-    float skidding_marks = sampleTextureLayer5(uv * 10).g;
+    float skidding_marks = sampleTextureLayer5(uv * 10.0).g;
     skidding_marks *= mask_2;
     col = mix(col, vec4(0.0, 0.0, 0.0, 1.0), skidding_marks);
 
-    float skidding_marks_2 = sampleTextureLayer5(uv * 15).g;
+    float skidding_marks_2 = sampleTextureLayer5(uv * 15.0).g;
     skidding_marks_2 *= mask_2;
     col = mix(col, vec4(0.0, 0.0, 0.0, 1.0), skidding_marks_2);
 
     // Add some cracks
-    float cracks_marks = sampleTextureLayer5(uv * 11).b;
+    float cracks_marks = sampleTextureLayer5(uv * 11.0).b;
     float crack_mask = sampleTextureLayer4(uuv * 0.5).r;
     cracks_marks *= crack_mask;
     col = mix(col, vec4(0.0, 0.0, 0.0, 1.0), cracks_marks);

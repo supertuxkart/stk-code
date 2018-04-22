@@ -48,9 +48,9 @@ CIrrDeviceStub::CIrrDeviceStub(const SIrrlichtCreationParameters& params)
     }
     else
         FileSystem = io::createFileSystem();
-    core::stringc s = "Irrlicht Engine version ";
-	s.append(getVersion());
-	os::Printer::log(s.c_str(), ELL_INFORMATION);
+    //core::stringc s = "Irrlicht Engine version ";
+	//s.append(getVersion());
+	//os::Printer::log(s.c_str(), ELL_INFORMATION);
 
 	checkVersion(params.SDK_version_do_not_use);
 }

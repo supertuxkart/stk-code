@@ -24,6 +24,9 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
+#include "modes/world.hpp"
+#include "network/network_config.hpp"
+#include "network/rewind_manager.hpp"
 #include "tracks/track.hpp"
 
 #include "ISceneNode.h"
@@ -35,6 +38,8 @@ Moveable::Moveable()
     m_mesh            = NULL;
     m_node            = NULL;
     m_heading         = 0;
+    m_positional_error = Vec3(0.0f, 0.0f, 0.0f);
+    m_rotational_error = btQuaternion(0.0f, 0.0f, 0.0f, 1.0f);
 }   // Moveable
 
 //-----------------------------------------------------------------------------
@@ -57,6 +62,26 @@ void Moveable::setNode(scene::ISceneNode *n)
 }   // setNode
 
 //-----------------------------------------------------------------------------
+/** Adds a new error between graphical and physical position/rotation. Called
+ *  in case of a rewind to allow to for smoothing the visuals in case of
+ *  incorrect client prediction.
+ *  \param pos_error Positional error to add.
+ *  \param rot_Error Rotational error to add.
+ */
+void Moveable::addError(const Vec3& pos_error,
+                        const btQuaternion &rot_error)
+{
+    m_positional_error += pos_error;
+#ifdef DEBUG_VISUAL_ERROR
+    Log::info("VisualError", "time %f addError %f %f %f size %f",
+        World::getWorld()->getTime(),
+        m_positional_error.getX(), m_positional_error.getY(), m_positional_error.getZ(),
+        m_positional_error.length());
+#endif
+    m_rotational_error *= rot_error;
+}   // addError
+
+//-----------------------------------------------------------------------------
 /** Updates the graphics model. Mainly set the graphical position to be the
  *  same as the physics position, but uses offsets to position and rotation
  *  for special gfx effects (e.g. skidding will turn the karts more).
@@ -66,8 +91,22 @@ void Moveable::setNode(scene::ISceneNode *n)
 void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
                               const btQuaternion& rotation)
 {
+    // If this is a client, don't smooth error during rewinds
+    if (World::getWorld()->isNetworkWorld() &&
+        NetworkConfig::get()->isClient() &&
+        !RewindManager::get()->isRewinding())
+    {
+        float error = m_positional_error.length();
+        m_positional_error *= stk_config->m_positional_smoothing.get(error);
+#ifdef DEBUG_VISUAL_ERROR
+        Log::info("VisualError", "time %f reduceError %f %f %f size %f",
+            World::getWorld()->getTime(),
+            m_positional_error.getX(), m_positional_error.getY(), m_positional_error.getZ(),
+            m_positional_error.length());
+#endif
+    }
 #ifndef SERVER_ONLY
-    Vec3 xyz=getXYZ()+offset_xyz;
+    Vec3 xyz=getXYZ()+offset_xyz - m_positional_error;
     m_node->setPosition(xyz.toIrrVector());
     btQuaternion r_all = getRotation()*rotation;
     if(btFuzzyZero(r_all.getX()) && btFuzzyZero(r_all.getY()-0.70710677f) &&
@@ -126,16 +165,14 @@ void Moveable::stopFlying()
 //-----------------------------------------------------------------------------
 /** Updates the current position and rotation from the corresponding physics
  *  body, and then calls updateGraphics to position the model correctly.
- *  \param float dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void Moveable::update(float dt)
+void Moveable::update(int ticks)
 {
     if(m_body->getInvMass()!=0)
         m_motion_state->getWorldTransform(m_transform);
     m_velocityLC = getVelocity()*m_transform.getBasis();
     updatePosition();
-
-    updateGraphics(dt, Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
 }   // update
 
 //-----------------------------------------------------------------------------

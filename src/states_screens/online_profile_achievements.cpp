@@ -40,9 +40,6 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( OnlineProfileAchievements    );
-DEFINE_SCREEN_SINGLETON( TabOnlineProfileAchievements );
-
 // -----------------------------------------------------------------------------
 /** Constructor.
  */

@@ -38,7 +38,8 @@
 #include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
-#include "network/race_event_manager.hpp"
+#include "network/protocols/game_protocol.hpp"
+#include "network/rewind_manager.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
@@ -138,36 +139,51 @@ void LocalPlayerController::resetInputState()
  *                if between 1 and 32767, it indicates an analog value,
  *                and if it's 0 it indicates that the corresponding button
  *                was released.
+ *  \param dry_run If set it will return if this action will trigger a
+ *                 state change or not.
+ *  \return       True if dry_run==true and a state change would be triggered.
+ *                If dry_run==false, it returns true.
  */
-void LocalPlayerController::action(PlayerAction action, int value)
+bool LocalPlayerController::action(PlayerAction action, int value,
+                                   bool dry_run)
 {
-    PlayerController::action(action, value);
+    // If this event does not change the control state (e.g.
+    // it's a (auto) repeat event), do nothing. This especially
+    // optimises traffic to the server and other clients.
+    if (!PlayerController::action(action, value, /*dry_run*/true)) return false;
 
-    // If this is a client, send the action to the server
-    if (World::getWorld()->isNetworkWorld()      && 
-        NetworkConfig::get()->isClient()         &&
-        RaceEventManager::getInstance()->isRunning()    )
+    // Register event with history
+    if(!history->replayHistory())
+        history->addEvent(m_kart->getWorldKartId(), action, value);
+
+    // If this is a client, send the action to networking layer
+    if (World::getWorld()->isNetworkWorld() && 
+        NetworkConfig::get()->isClient()    &&
+        !RewindManager::get()->isRewinding()   )
     {
-        RaceEventManager::getInstance()->controllerAction(this, action, value);
+        if (auto gp = GameProtocol::lock())
+        {
+            gp->controllerAction(m_kart->getWorldKartId(), action, value,
+                m_steer_val_l, m_steer_val_r);
+        }
     }
-
+    return PlayerController::action(action, value, /*dry_run*/false);
 }   // action
 
 //-----------------------------------------------------------------------------
 /** Handles steering for a player kart.
  */
-void LocalPlayerController::steer(float dt, int steer_val)
+void LocalPlayerController::steer(int ticks, int steer_val)
 {
     if(UserConfigParams::m_gamepad_debug)
     {
-        Log::debug("LocalPlayerController", "steering: steer_val %d ", steer_val);
         RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
         gui_base->clearAllMessages();
         gui_base->addMessage(StringUtils::insertValues(L"steer_val %i", steer_val),
                              m_kart, 1.0f,
                              video::SColor(255, 255, 0, 255), false);
     }
-    PlayerController::steer(dt, steer_val);
+    PlayerController::steer(ticks, steer_val);
     
     if(UserConfigParams::m_gamepad_debug)
     {
@@ -179,7 +195,7 @@ void LocalPlayerController::steer(float dt, int steer_val)
 //-----------------------------------------------------------------------------
 /** Updates the player kart, called once each timestep.
  */
-void LocalPlayerController::update(float dt)
+void LocalPlayerController::update(int ticks)
 {
     if (UserConfigParams::m_gamepad_debug)
     {
@@ -188,7 +204,7 @@ void LocalPlayerController::update(float dt)
         Log::debug("LocalPlayerController", "irr_driver", "-------------------------------------");
     }
 
-    PlayerController::update(dt);
+    PlayerController::update(ticks);
 
     // look backward when the player requests or
     // if automatic reverse camera is active
@@ -368,3 +384,11 @@ bool LocalPlayerController::canGetAchievements() const
 {
     return m_player->getConstProfile() == PlayerManager::getCurrentPlayer();
 }   // canGetAchievements
+
+// ----------------------------------------------------------------------------
+core::stringw LocalPlayerController::getName() const
+{
+    if (NetworkConfig::get()->isNetworking())
+        return PlayerController::getName();
+    return m_player->getProfile()->getName();
+}   // getName

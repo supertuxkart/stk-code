@@ -19,14 +19,12 @@
 #ifndef HEADER_HISTORY_HPP
 #define HEADER_HISTORY_HPP
 
-#include <vector>
-#include <string>
 
-#include "LinearMath/btQuaternion.h"
-
+#include "input/input.hpp"
 #include "karts/controller/kart_control.hpp"
-#include "utils/aligned_array.hpp"
-#include "utils/vec3.hpp"
+
+#include <string>
+#include <vector>
 
 class Kart;
 
@@ -35,56 +33,41 @@ class Kart;
   */
 class History
 {
-public:
-    /** Determines which replay mode is selected:
-     *  HISTORY_NONE: no history replay.
-     *  HISTORY_POSITION: replay the positions and orientations of the karts,
-     *                    but don't simulate the physics.
-     *  HISTORY_PHYSICS:  Simulate the phyics based on the recorded actions.
-     *  These values can be used together, e.g. HISTORY_POSITION|HISTORY_CONTROL
-     */
-    enum HistoryReplayMode { HISTORY_NONE     = 0,
-                             HISTORY_POSITION = 1,
-                             HISTORY_PHYSICS  = 2 };
 private:
-    /** maximum number of history events to store. */
-    HistoryReplayMode          m_replay_mode;
+    /** True if a history should be replayed, */
+    bool m_replay_history;
 
-    /** Points to the last used entry, and will wrap around. */
-    int                        m_current;
-
-    /** True if the buffer has wrapped around. */
-    bool                       m_wrapped;
-
-    /** Counts how many entries in the arrays are used.  So if
-     *  the buffer hasn't wrapped around, this will indicate
-     *  how many entries to save. */
-    int                        m_size;
-
-    /** Stores all time step sizes. */
-    std::vector<float>         m_all_deltas;
-
-    /** Stores the kart controls being used (for physics replay). */
-    std::vector<KartControl>   m_all_controls;
-
-    /** Stores the coordinates (for simple replay). */
-    AlignedArray<Vec3>         m_all_xyz;
-
-    /** Stores the rotations of the karts. */
-    AlignedArray<btQuaternion> m_all_rotations;
+    /** Points to the last used input event index. */
+    unsigned int m_event_index;
 
     /** The identities of the karts to use. */
-    std::vector<std::string>  m_kart_ident;
+    std::vector<std::string> m_kart_ident;
 
-    void  allocateMemory(int number_of_frames);
+    // ------------------------------------------------------------------------
+    struct InputEvent
+    {
+        /* Time at which this event occurred. */
+        int m_world_ticks;
+        /** For which kart the event was. */
+        int m_kart_index;
+        /** Which action it was. */
+        PlayerAction m_action;
+        /** The value to use. */
+        int m_value;
+    };   // InputEvent
+    // ------------------------------------------------------------------------
+
+    /** All input events. */
+    std::vector<InputEvent> m_all_input_events;
+
+    void  allocateMemory(int size=-1);
 public:
           History        ();
-    void  startReplay    ();
     void  initRecording  ();
     void  Save           ();
     void  Load           ();
-    void  updateSaving(float dt);
-    float updateReplayAndGetDT();
+    void  updateReplay(int world_ticks);
+    void  addEvent(int kart_id, PlayerAction pa, int value);
 
     // -------------------I-----------------------------------------------------
     /** Returns the identifier of the n-th kart. */
@@ -94,14 +77,10 @@ public:
     }   // getKartIdent
     // ------------------------------------------------------------------------
     /** Returns if a history is replayed, i.e. the history mode is not none. */
-    bool  replayHistory  () const { return m_replay_mode != HISTORY_NONE;    }
+    bool  replayHistory() const { return m_replay_history; }
     // ------------------------------------------------------------------------
-    /** Enable replaying a history, enabled from the command line. */
-    void  doReplayHistory(HistoryReplayMode m) {m_replay_mode = m;           }
-    // ------------------------------------------------------------------------
-    /** Returns true if the physics should not be simulated in replay mode.
-     *  I.e. either no replay mode, or physics replay mode. */
-    bool dontDoPhysics   () const { return m_replay_mode == HISTORY_POSITION;}
+    /** Set if replay is enabled or not. */
+    void  setReplayHistory(bool b) { m_replay_history=b;  }
 };
 
 extern History* history;

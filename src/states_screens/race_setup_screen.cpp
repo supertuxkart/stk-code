@@ -43,7 +43,6 @@ const int CONFIG_CODE_SOCCER    = 5;
 const int CONFIG_CODE_GHOST     = 6;
 
 using namespace GUIEngine;
-DEFINE_SCREEN_SINGLETON( RaceSetupScreen );
 
 // -----------------------------------------------------------------------------
 
