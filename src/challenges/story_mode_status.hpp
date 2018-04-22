@@ -79,6 +79,7 @@ public:
 
     void computeActive();
     bool       isLocked          (const std::string& feature);
+    void       unlockFeatureByList();
     void       lockFeature       (ChallengeStatus *challenge);
     void       unlockFeature     (ChallengeStatus* c, RaceManager::Difficulty d,
                                   bool do_save=true);
