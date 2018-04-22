@@ -288,8 +288,6 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 }
             }
 
-            PlayerManager::getCurrentPlayer()->clearUnlocked();
-
             if (gameCompleted)
             {
                 // clear the race
@@ -327,7 +325,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                     FeatureUnlockedCutScene::getInstance();
 
                 scene->addTrophy(race_manager->getDifficulty(),false);
-                scene->findWhatWasUnlocked(race_manager->getDifficulty());
+                scene->findWhatWasUnlocked(race_manager->getDifficulty(),unlocked);
                 scene->push();
                 race_manager->setAIKartOverride("");
 
@@ -335,6 +333,9 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 parts.push_back("featunlocked");
                 ((CutsceneWorld*)World::getWorld())->setParts(parts);
             }
+
+            PlayerManager::getCurrentPlayer()->clearUnlocked();
+
             return;
         }
         Log::warn("RaceResultGUI", "Incorrect event '%s' when things are unlocked.",
