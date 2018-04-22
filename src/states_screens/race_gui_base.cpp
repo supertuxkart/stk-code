@@ -772,9 +772,10 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 
             float distance = linear_world->getDistanceDownTrackForKart(kart_id, true)
                            + Track::getCurrentTrack()->getTrackLength()*lap;
+
             if ((position>1) &&
                 (previous_distance-distance<m_dist_show_overlap) &&
-                (!kart->hasFinishedRace())                          )
+                (!kart->hasFinishedRace()) && lap >= 0 )
             {
                 //linear translation : form (0,ICON_PLAYER_WIDTH+2) to
                 // (previous_x-x_base+(ICON_PLAYER_WIDTH+2)/2,0)
