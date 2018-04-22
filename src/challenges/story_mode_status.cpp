@@ -182,19 +182,7 @@ void StoryModeStatus::computeActive()
 
     // now we have the number of points.
 
-    // test if we have unlocked a feature requiring a certain number of points
-    for(i = m_challenges_state.begin();
-        i != m_challenges_state.end();  i++)
-    {
-        if (i->second->isUnlockList())
-        {
-            unlock_manager->unlockByPoints(m_points,i->second);
-            //Retrieve the smallest number of points for the next unlockable
-            if (i->second->getData()->getNumTrophies() > m_points && (m_next_unlock_points == 0
-                || i->second->getData()->getNumTrophies() < m_next_unlock_points) )
-                m_next_unlock_points = i->second->getData()->getNumTrophies();
-        }
-    }
+    unlockFeatureByList();
 
     //Actually lock the tracks
     for (i = m_challenges_state.begin(); i != m_challenges_state.end();  i++)
@@ -212,11 +200,36 @@ void StoryModeStatus::computeActive()
             }
         }
     }
-
-    clearUnlocked();
-
-
 }   // computeActive
+
+//-----------------------------------------------------------------------------
+
+void StoryModeStatus::unlockFeatureByList()
+{
+    // test if we have unlocked a feature requiring a certain number of points
+    std::map<std::string, ChallengeStatus*>::const_iterator i;
+    for(i = m_challenges_state.begin();
+        i != m_challenges_state.end();  i++)
+    {
+        if (i->second->isUnlockList())
+        {
+            if (i->second->isSolvedAtAnyDifficulty())
+                continue;
+
+            bool newly_solved = unlock_manager->unlockByPoints(m_points,i->second);
+
+            // Add to list of recently unlocked features
+            if(newly_solved)
+                m_unlocked_features.push_back(i->second->getData());
+
+            //Retrieve the smallest number of points for the next unlockable
+            if (i->second->getData()->getNumTrophies() > m_points && (m_next_unlock_points == 0
+                || i->second->getData()->getNumTrophies() < m_next_unlock_points) )
+                m_next_unlock_points = i->second->getData()->getNumTrophies();
+        }
+    }
+} //unlockFeatureByList
+
 
 //-----------------------------------------------------------------------------
 
@@ -255,8 +268,10 @@ void StoryModeStatus::unlockFeature(ChallengeStatus* c, RaceManager::Difficulty 
         m_locked_features.erase(p);
     }
 
-    // Add to list of recently unlocked features
-    m_unlocked_features.push_back(c->getData());
+    // Add to list of recently unlocked features if the challenge is newly completed
+    if (!c->isSolvedAtAnyDifficulty())
+        m_unlocked_features.push_back(c->getData());
+
     c->setSolved(d);  // reset isActive flag
 
     // Save the new unlock information
@@ -279,6 +294,9 @@ void StoryModeStatus::setCurrentChallenge(const std::string &challenge_id)
  */
 void StoryModeStatus::raceFinished()
 {
+    //This check over the specially unlocked features (by points, etc)
+    unlockFeatureByList();
+
     if(m_current_challenge                                           &&
         m_current_challenge->isActive(race_manager->getDifficulty()) &&
         m_current_challenge->getData()->isChallengeFulfilled()           )
