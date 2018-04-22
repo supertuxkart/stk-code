@@ -345,27 +345,45 @@ void RaceGUIOverworld::drawTrophyPoints()
         font->draw(bestTrophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
     }
 
-    dest = core::rect<s32>(pos.UpperLeftCorner.X - size + 5, pos.UpperLeftCorner.Y,
-                           pos.UpperLeftCorner.X + 5, pos.UpperLeftCorner.Y + size);
+    dest = core::rect<s32>(pos.UpperLeftCorner.X - size, pos.UpperLeftCorner.Y,
+                           pos.UpperLeftCorner.X, pos.UpperLeftCorner.Y + size);
 
     draw2DImage(m_open_challenge, dest, source, NULL,
                                               NULL, true /* alpha */);
 
-    pos.LowerRightCorner.Y = dest.LowerRightCorner.Y + 1.5f*size;
-    pos.UpperLeftCorner.X -= (size - 10);
+    core::dimension2du area = font->getDimension(L"9");
+    int small_width = area.Width;
+    area = font->getDimension(L"99");
+    int middle_width = area.Width;
+    area = font->getDimension(L"999");
+    int large_width = area.Width;
 
+    int number_width;
+
+    if (points < 9) number_width = small_width;
+    else if (points <99) number_width = middle_width;
+    else number_width = large_width;
+
+    pos.LowerRightCorner.Y = dest.LowerRightCorner.Y + 1.5f*size;
+    pos.UpperLeftCorner.X -= (0.5f*size + number_width*0.5f);
 
     font->draw(sw.c_str(), pos, time_color, false, vcenter, NULL, true /* ignore RTL */);
 
+    pos.UpperLeftCorner.X += (0.5f*size + number_width*0.5f);
+
     if (next_unlock_points > points && (points + 80) >= next_unlock_points)
     {
-        dest = core::rect<s32>(pos.UpperLeftCorner.X - 2*size, pos.UpperLeftCorner.Y,
-                           pos.UpperLeftCorner.X - size, pos.UpperLeftCorner.Y + size);
+        if (next_unlock_points < 9) number_width = small_width;
+        else if (next_unlock_points <99) number_width = middle_width;
+        else number_width = large_width;
+
+        dest = core::rect<s32>(pos.UpperLeftCorner.X - 2.5f*size, pos.UpperLeftCorner.Y,
+                           pos.UpperLeftCorner.X - 1.5f*size, pos.UpperLeftCorner.Y + size);
 
         draw2DImage(m_locked_bonus, dest, source, NULL,
                                                   NULL, true /* alpha */);
 
-        pos.UpperLeftCorner.X -= (2*size - 4);
+        pos.UpperLeftCorner.X -= (2*size + number_width*0.5f);
 
         font->draw(swg.c_str(), pos, time_color, false, vcenter, NULL, true /* ignore RTL */);
         font->disableShadow();
