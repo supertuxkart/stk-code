@@ -309,7 +309,9 @@ bool Widget::isVisible() const
 {
     if (m_element != NULL)
     {
-        assert(m_element->isVisible() == m_is_visible);
+        // repair mismatch
+        if (m_element->isVisible() != m_is_visible)
+            m_element->setVisible(m_is_visible);
     }
     return m_is_visible;
 }

@@ -1,3 +1,20 @@
+## SuperTuxKart 0.9.3
+* Reduced RAM and VRAM usage, reducing load times by Auria and Benau
+* New mesh format optimized for space and hardware skinning
+* Code refactoring of both render pipeline by Benau and Elderme
+* New kart Wilber and Hexley by Jymis
+* New kart Kiki and updated Konqi by Benau
+* New tracks Candela City, Cornfield Crossing and Las Dunas Arena by samuncle
+* Physics improvements and various physics bugfixes by hiker
+* Kart GFX improvements (exhaust and headlight)
+* In-game screen recording powered by libopenglrecorder
+* High quality mipmap generation by Stragus
+* New smoother camera by Auria
+* New grand prix win scene
+* Gamepad configuration bugfixes
+* 3 Strikes Battles : added spare tire karts
+* Various improvements (wall driving fixes, parachutes, GP points, cannon fixes, colorization shader)
+
 ## SuperTuxKart 0.9.2
 * Ghost replay races by Benau
 * Battle mode AI by Benau

@@ -21,9 +21,12 @@
 #include "addons/addon.hpp"
 #include "config/stk_config.hpp"
 #include "config/player_manager.hpp"
-#include "graphics/glwrap.hpp"
-#include "graphics/irr_driver.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/shader_files_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
+#include "graphics/sp/sp_texture_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/cached_characteristic.hpp"
 #include "karts/combined_characteristic.hpp"
@@ -98,7 +101,10 @@ KartProperties::KartProperties(const std::string &filename)
     else
     {
         for (unsigned int i = 0; i < RaceManager::DIFFICULTY_COUNT; i++)
-            m_ai_properties[i].reset(new AIProperties((RaceManager::Difficulty) i));
+        {
+            m_ai_properties[i] =
+                std::make_shared<AIProperties>((RaceManager::Difficulty) i);
+        }
     }
 }   // KartProperties
 
@@ -106,6 +112,15 @@ KartProperties::KartProperties(const std::string &filename)
 /** Destructor, dereferences the kart model. */
 KartProperties::~KartProperties()
 {
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL() && m_kart_model.use_count() == 1)
+    {
+        m_kart_model = nullptr;
+        SP::SPShaderManager::get()->removeUnusedShaders();
+        ShaderFilesManager::getInstance()->removeUnusedShaderFiles();
+        SP::SPTextureManager::get()->removeUnusedTextures();
+    }
+#endif
 }   // ~KartProperties
 
 //-----------------------------------------------------------------------------
@@ -125,8 +140,10 @@ void KartProperties::copyForPlayer(const KartProperties *source)
     // So all pointer variables need to be separately allocated and assigned.
     if (source->m_characteristic)
     {
-        m_characteristic.reset(new XmlCharacteristic());
-        *m_characteristic = *source->m_characteristic;
+        // Remove the shared reference by creating a new pointer
+        m_characteristic = std::make_shared<XmlCharacteristic>();
+        m_characteristic->copyFrom(source->getCharacteristic());
+
         // Combine the characteristics for this object. We can't copy it because
         // this object has other pointers (to m_characteristic).
         combineCharacteristics();
@@ -148,7 +165,8 @@ void KartProperties::copyFrom(const KartProperties *source)
     // (but not for each player).
     for (unsigned int i = 0; i < RaceManager::DIFFICULTY_COUNT; i++)
     {
-        m_ai_properties[i].reset(new AIProperties((RaceManager::Difficulty) i));
+        m_ai_properties[i] =
+            std::make_shared<AIProperties>((RaceManager::Difficulty) i);
         assert(m_ai_properties);
         *m_ai_properties[i] = *source->m_ai_properties[i];
     }
@@ -185,7 +203,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // m_kart_model must be initialised after assigning the default
     // values from stk_config (otherwise all kart_properties will
     // share the same KartModel
-    m_kart_model.reset(new KartModel(/*is_master*/true));
+    m_kart_model = std::make_shared<KartModel>(/*is_master*/true);
 
     m_root  = StringUtils::getPath(filename)+"/";
     m_ident = StringUtils::getBasename(StringUtils::getPath(filename));
@@ -205,7 +223,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
             throw std::runtime_error(msg.str());
         }
         getAllData(root);
-        m_characteristic.reset(new XmlCharacteristic(root));
+        m_characteristic = std::make_shared<XmlCharacteristic>(root);
         combineCharacteristics();
     }
     catch(std::exception& err)
@@ -223,11 +241,18 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 
     // Load material
     std::string materials_file = m_root+"materials.xml";
-    file_manager->pushModelSearchPath  (m_root);
-    file_manager->pushTextureSearchPath(m_root);
+    std::string unique_id = StringUtils::insertValues("karts/%s", m_ident.c_str());
+    file_manager->pushModelSearchPath(m_root);
+    file_manager->pushTextureSearchPath(m_root, unique_id);
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        SP::SPShaderManager::get()->loadSPShaders(m_root);
+    }
+#endif
 
-    irr_driver->setTextureErrorMessage("Error while loading kart '%s':",
-                                       m_name);
+    STKTexManager::getInstance()
+        ->setTextureErrorMessage("Error while loading kart '%s':", m_name);
 
     // addShared makes sure that these textures/material infos stay in memory
     material_manager->addSharedMaterial(materials_file);
@@ -242,15 +267,13 @@ void KartProperties::load(const std::string &filename, const std::string &node)
                                                     /*make_permanent*/true,
                                                     /*complain_if_not_found*/true,
                                                     /*strip_path*/false);
-    if(m_minimap_icon_file!="")
-        m_minimap_icon = irr_driver->getTexture(m_root+m_minimap_icon_file);
+    if (m_minimap_icon_file!="")
+    {
+        m_minimap_icon = STKTexManager::getInstance()
+            ->getTexture(m_root+m_minimap_icon_file);
+    }
     else
         m_minimap_icon = NULL;
-
-    if (m_minimap_icon == NULL)
-    {
-        m_minimap_icon = getUnicolorTexture(m_color);
-    }
 
     // Only load the model if the .kart file has the appropriate version,
     // otherwise warnings are printed.
@@ -291,18 +314,38 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // used.
     m_wheel_base = fabsf(m_kart_model->getLength() - 2*0.25f);
 
-    m_shadow_texture = irr_driver->getTexture(m_shadow_file);
+    m_shadow_material = material_manager->getMaterialSPM(m_shadow_file, "",
+        "alphablend");
 
-    irr_driver->unsetTextureErrorMessage();
+    STKTexManager::getInstance()->unsetTextureErrorMessage();
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath();
 
 }   // load
 
+// ----------------------------------------------------------------------------
+/** Returns a pointer to the KartModel object.
+ *  \param krt The KartRenderType, like default, red, blue or transparent.
+ *  see the RenderInfo include for details
+ */
+KartModel* KartProperties::getKartModelCopy(std::shared_ptr<RenderInfo> ri) const
+{
+    return m_kart_model->makeCopy(ri);
+}  // getKartModelCopy
+
+// ----------------------------------------------------------------------------
+/** Sets the name of a mesh to be used for this kart.
+ *  \param hat_name Name of the mesh.
+ */
+void KartProperties::setHatMeshName(const std::string &hat_name)
+{
+    m_kart_model->setHatMeshName(hat_name);
+}  // setHatMeshName
+
 //-----------------------------------------------------------------------------
 void KartProperties::combineCharacteristics()
 {
-    m_combined_characteristic.reset(new CombinedCharacteristic());
+    m_combined_characteristic = std::make_shared<CombinedCharacteristic>();
     m_combined_characteristic->addCharacteristic(kart_properties_manager->
         getBaseCharacteristic());
     m_combined_characteristic->addCharacteristic(kart_properties_manager->
@@ -320,7 +363,8 @@ void KartProperties::combineCharacteristics()
         m_combined_characteristic->addCharacteristic(characteristic);
 
     m_combined_characteristic->addCharacteristic(m_characteristic.get());
-    m_cached_characteristic.reset(new CachedCharacteristic(m_combined_characteristic.get()));
+    m_cached_characteristic = std::make_shared<CachedCharacteristic>
+        (m_combined_characteristic.get());
 }   // combineCharacteristics
 
 //-----------------------------------------------------------------------------
@@ -343,11 +387,6 @@ void KartProperties::getAllData(const XMLNode * root)
     m_color.set(255, (int)(255*c.getX()), (int)(255*c.getY()), (int)(255*c.getZ()));
 
     root->get("groups",            &m_groups           );
-
-    root->get("shadow-scale",      &m_shadow_scale     );
-    root->get("shadow-x-offset",   &m_shadow_x_offset  );
-    root->get("shadow-z-offset",   &m_shadow_z_offset  );
-
     root->get("type",              &m_kart_type        );
 
     if(const XMLNode *dimensions_node = root->getNode("center"))
@@ -363,11 +402,6 @@ void KartProperties::getAllData(const XMLNode * root)
         m_ai_properties[RaceManager::DIFFICULTY_HARD]->load(hard);
         const XMLNode *best = ai_node->getNode("best");
         m_ai_properties[RaceManager::DIFFICULTY_BEST]->load(best);
-    }
-
-    if(const XMLNode *speed_weighted_objects_node = root->getNode("speed-weighted-objects"))
-    {
-        m_speed_weighted_object_properties.loadFromXMLNode(speed_weighted_objects_node);
     }
 
     if(const XMLNode *friction_node = root->getNode("friction"))
@@ -472,8 +506,6 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_collision_impulse_time,     "collision impulse-time"        );
     CHECK_NEG(m_restitution,                "collision restitution"         );
     CHECK_NEG(m_physical_wheel_position,    "collision physical-wheel-position");
-
-    m_speed_weighted_object_properties.checkAllSet();
 
     for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
         m_ai_properties[i]->checkAllSet(filename);
@@ -589,6 +621,12 @@ float KartProperties::getStabilityTrackConnectionAccel() const
 {
     return m_cached_characteristic->getStabilityTrackConnectionAccel();
 }  // getStabilityTrackConnectionAccel
+
+// ----------------------------------------------------------------------------
+std::vector<float> KartProperties::getStabilityAngularFactor() const
+{
+    return m_cached_characteristic->getStabilityAngularFactor();
+}  // getStabilityAngularFactor
 
 // ----------------------------------------------------------------------------
 float KartProperties::getStabilitySmoothFlyingImpulse() const
@@ -735,16 +773,28 @@ float KartProperties::getParachuteFriction() const
 }  // getParachuteFriction
 
 // ----------------------------------------------------------------------------
-float KartProperties::getParachuteDuration() const
+int KartProperties::getParachuteDuration() const
 {
     return m_cached_characteristic->getParachuteDuration();
 }  // getParachuteDuration
 
 // ----------------------------------------------------------------------------
-float KartProperties::getParachuteDurationOther() const
+int KartProperties::getParachuteDurationOther() const
 {
     return m_cached_characteristic->getParachuteDurationOther();
 }  // getParachuteDurationOther
+
+// ----------------------------------------------------------------------------
+float KartProperties::getParachuteDurationRankMult() const
+{
+    return m_cached_characteristic->getParachuteDurationRankMult();
+}  // getParachuteDurationRankMult
+
+// ----------------------------------------------------------------------------
+float KartProperties::getParachuteDurationSpeedMult() const
+{
+    return m_cached_characteristic->getParachuteDurationSpeedMult();
+}  // getParachuteDurationSpeedMult
 
 // ----------------------------------------------------------------------------
 float KartProperties::getParachuteLboundFraction() const
@@ -765,6 +815,12 @@ float KartProperties::getParachuteMaxSpeed() const
 }  // getParachuteMaxSpeed
 
 // ----------------------------------------------------------------------------
+float KartProperties::getFrictionKartFriction() const
+{
+    return m_cached_characteristic->getFrictionKartFriction();
+}  // getFrictionKartFriction
+
+// ----------------------------------------------------------------------------
 float KartProperties::getBubblegumDuration() const
 {
     return m_cached_characteristic->getBubblegumDuration();
@@ -783,9 +839,10 @@ float KartProperties::getBubblegumTorque() const
 }  // getBubblegumTorque
 
 // ----------------------------------------------------------------------------
-float KartProperties::getBubblegumFadeInTime() const
+int KartProperties::getBubblegumFadeInTicks() const
 {
-    return m_cached_characteristic->getBubblegumFadeInTime();
+    return stk_config->time2Ticks(m_cached_characteristic
+                                  ->getBubblegumFadeInTime());
 }  // getBubblegumFadeInTime
 
 // ----------------------------------------------------------------------------
@@ -873,9 +930,10 @@ float KartProperties::getPlungerBandSpeedIncrease() const
 }  // getPlungerBandSpeedIncrease
 
 // ----------------------------------------------------------------------------
-float KartProperties::getPlungerBandFadeOutTime() const
+int KartProperties::getPlungerBandFadeOutTicks() const
 {
-    return m_cached_characteristic->getPlungerBandFadeOutTime();
+    return stk_config->time2Ticks(m_cached_characteristic
+                                   ->getPlungerBandFadeOutTime());
 }  // getPlungerBandFadeOutTime
 
 // ----------------------------------------------------------------------------
@@ -938,6 +996,15 @@ float KartProperties::getNitroDuration() const
     return m_cached_characteristic->getNitroDuration();
 }  // getNitroDuration
 
+// ------------------------------------------------------------------------
+/** Returns minimum time during which nitro is consumed when pressing nitro
+ *  key, to prevent using nitro in very short bursts
+  */
+int KartProperties::getNitroMinConsumptionTicks() const
+{
+    return stk_config->time2Ticks(m_nitro_min_consumption);
+}
+
 // ----------------------------------------------------------------------------
 float KartProperties::getNitroEngineForce() const
 {
@@ -981,10 +1048,16 @@ float KartProperties::getNitroMax() const
 }  // getNitroMax
 
 // ----------------------------------------------------------------------------
-float KartProperties::getSlipstreamDuration() const
+float KartProperties::getSlipstreamDurationFactor() const
 {
-    return m_cached_characteristic->getSlipstreamDuration();
-}  // getSlipstreamDuration
+    return m_cached_characteristic->getSlipstreamDurationFactor();
+}  // getSlipstreamDurationFactor
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSlipstreamBaseSpeed() const
+{
+    return m_cached_characteristic->getSlipstreamBaseSpeed();
+}  // getSlipstreamBaseSpeed
 
 // ----------------------------------------------------------------------------
 float KartProperties::getSlipstreamLength() const
@@ -999,16 +1072,22 @@ float KartProperties::getSlipstreamWidth() const
 }  // getSlipstreamWidth
 
 // ----------------------------------------------------------------------------
-float KartProperties::getSlipstreamCollectTime() const
+float KartProperties::getSlipstreamInnerFactor() const
 {
-    return m_cached_characteristic->getSlipstreamCollectTime();
-}  // getSlipstreamCollectTime
+    return m_cached_characteristic->getSlipstreamInnerFactor();
+}  // getSlipstreamInnerFactor
 
 // ----------------------------------------------------------------------------
-float KartProperties::getSlipstreamUseTime() const
+float KartProperties::getSlipstreamMinCollectTime() const
 {
-    return m_cached_characteristic->getSlipstreamUseTime();
-}  // getSlipstreamUseTime
+    return m_cached_characteristic->getSlipstreamMinCollectTime();
+}  // getSlipstreamMinCollectTime
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSlipstreamMaxCollectTime() const
+{
+    return m_cached_characteristic->getSlipstreamMaxCollectTime();
+}  // getSlipstreamMaxCollectTime
 
 // ----------------------------------------------------------------------------
 float KartProperties::getSlipstreamAddPower() const
@@ -1029,9 +1108,10 @@ float KartProperties::getSlipstreamMaxSpeedIncrease() const
 }  // getSlipstreamMaxSpeedIncrease
 
 // ----------------------------------------------------------------------------
-float KartProperties::getSlipstreamFadeOutTime() const
+int KartProperties::getSlipstreamFadeOutTicks() const
 {
-    return m_cached_characteristic->getSlipstreamFadeOutTime();
+    return stk_config->time2Ticks(m_cached_characteristic
+                                  ->getSlipstreamFadeOutTime());
 }  // getSlipstreamFadeOutTime
 
 // ----------------------------------------------------------------------------
@@ -1142,6 +1222,4 @@ bool KartProperties::getSkidEnabled() const
     return m_cached_characteristic->getSkidEnabled();
 }  // getSkidEnabled
 
-
 /* <characteristics-end kpgetter> */
-

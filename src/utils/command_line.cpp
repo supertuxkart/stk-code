@@ -31,7 +31,9 @@ std::string               CommandLine::m_exec_name="";
  */
 void CommandLine::init(unsigned int argc, char *argv[])
 {
-    m_exec_name = argv[0];
+    if (argc > 0)
+        m_exec_name = argv[0];
+
     for(unsigned int i=1; i<argc; i++)
         m_argv.push_back(argv[i]);
 }   // CommandLine
@@ -59,9 +61,6 @@ void CommandLine::reportInvalidParameters()
 {
     for(unsigned int i=0; i<m_argv.size(); i++)
     {
-        // invalid param needs to go to console
-        UserConfigParams::m_log_errors_to_console = true;
-
         Log::error("CommandLine", "Invalid parameter: %s.", m_argv[i].c_str() );
     }
 }   // reportInvalidParameters

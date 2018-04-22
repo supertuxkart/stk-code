@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<particles emitter="box" box_x="0.05" box_y="0.05" box_z="0.10">
+
+    <spreading angle="2"         />
+    
+    <velocity  x="0.0"
+               y="0.005"
+               z="-0.01"         />
+    
+    <material  file="smoke.png"  />
+    
+    <!-- Amount of particles emitted per second -->
+    <rate      min="200"
+               max="300"          />
+    
+    <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
+    <lifetime  min="10"
+               max="40"           />
+    
+    <!-- Size of the particles -->
+    <size      min="0.05"
+               max="0.1"         
+               x-increase-factor="5"
+               y-increase-factor="5"
+               />
+    
+    <color     min="255 255 255"
+               max="0 0 0"  />
+
+</particles>

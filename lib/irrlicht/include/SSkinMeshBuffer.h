@@ -7,7 +7,8 @@
 
 #include "IMeshBuffer.h"
 #include "S3DVertex.h"
-
+#include "irrMap.h"
+#include <utility>
 
 namespace irr
 {
@@ -50,6 +51,7 @@ struct SSkinMeshBuffer : public IMeshBuffer
 				return (video::S3DVertex*)&Vertices_2TCoords[index];
 			case video::EVT_TANGENTS:
 				return (video::S3DVertex*)&Vertices_Tangents[index];
+			case video::EVT_SKINNED_MESH:
 			default:
 				return &Vertices_Standard[index];
 		}
@@ -64,6 +66,7 @@ struct SSkinMeshBuffer : public IMeshBuffer
 				return Vertices_2TCoords.const_pointer();
 			case video::EVT_TANGENTS:
 				return Vertices_Tangents.const_pointer();
+			case video::EVT_SKINNED_MESH:
 			default:
 				return Vertices_Standard.const_pointer();
 		}
@@ -180,6 +183,8 @@ struct SSkinMeshBuffer : public IMeshBuffer
 				}
 				break;
 			}
+			default:
+				break;
 		}
 	}
 
@@ -206,6 +211,10 @@ struct SSkinMeshBuffer : public IMeshBuffer
 			Vertices_Standard.clear();
 			VertexType=video::EVT_2TCOORDS;
 		}
+	}
+
+	void convertForSkinning()
+	{
 	}
 
 	//! Convert to tangents vertex type
@@ -403,6 +412,7 @@ struct SSkinMeshBuffer : public IMeshBuffer
 
 	//! What kind of primitives does this buffer contain? Default triangles
 	scene::E_PRIMITIVE_TYPE Primitive;
+
 };
 
 

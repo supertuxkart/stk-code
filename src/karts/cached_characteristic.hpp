@@ -21,6 +21,8 @@
 
 #include "karts/abstract_characteristic.hpp"
 
+#include <assert.h>
+
 class CachedCharacteristic : public AbstractCharacteristic
 {
 private:
@@ -46,7 +48,7 @@ public:
 
     /** Fetches all cached values from the original source. */
     void updateSource();
-
+    virtual void copyFrom(const AbstractCharacteristic *other) { assert(false); }
     virtual void process(CharacteristicType type, Value value, bool *is_set) const;
 };
 

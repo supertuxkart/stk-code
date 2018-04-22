@@ -37,6 +37,7 @@
       cause an undefined game action now
    6: Added stick configurations.
 */
+#include <iterator>
 #include <string>
 #include <map>
 #include <vector>
@@ -99,43 +100,61 @@ public:
 
 // ============================================================================
 template<typename T, typename U>
-class ListUserConfigParam : public UserConfigParam
+class MapUserConfigParam : public UserConfigParam
 {
-    std::vector<T> m_elements;
+    std::map<T, U> m_elements;
 
 public:
-    ListUserConfigParam(const char* param_name,
-                         const char* comment = NULL);
-    ListUserConfigParam(const char* param_name,
-                         const char* comment,
-                         int nb_elts,
-                         ...);
-    ListUserConfigParam(const char* param_name,
-                         GroupUserConfigParam* group,
-                         const char* comment = NULL);
-    ListUserConfigParam(const char* param_name,
-                         GroupUserConfigParam* group,
-                         const char* comment,
-                         int nb_elts,
-                         ...);
+    MapUserConfigParam(const char* param_name,
+        const char* comment = NULL);
+    MapUserConfigParam(const char* param_name,
+        const char* comment,
+        std::map<T, U> default_value);
+    MapUserConfigParam(const char* param_name,
+        GroupUserConfigParam* group,
+        const char* comment = NULL);
+    MapUserConfigParam(const char* param_name,
+        GroupUserConfigParam* group,
+        const char* comment,
+        std::map<T, U> default_value);
 
     void write(std::ofstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
-    void addElement(T element);
+    void addElement(T element, U value);
 
     irr::core::stringc toString() const;
 
-    operator std::vector<T>() const
-            { return m_elements; }
-    float& operator=(const std::vector<T>& v)
-            { m_elements = std::vector<T>(v); return m_elements; }
-    float& operator=(const ListUserConfigParam& v)
-            { m_elements = std::vector<T>(v); return m_elements; }
-};   // ListUserConfigParam
-typedef ListUserConfigParam<std::string, const char*>    StringListUserConfigParam;
-
+    operator std::map<T, U>() const
+    {
+        return m_elements;
+    }
+    typename std::map<T, U>::iterator begin()
+    {
+        return m_elements.begin();
+    }
+    typename std::map<T, U>::iterator end()
+    {
+        return m_elements.end();
+    }
+    std::map<T, U>& operator=(const std::map<T,U>& v)
+    {
+        m_elements = std::map<T, U>(v); 
+        return m_elements;
+    }
+    std::map<T, U>& operator=(const MapUserConfigParam& v)
+    {
+        m_elements = std::map<T,U>(v); 
+        return m_elements;
+    }
+    U& operator[] (const T key) 
+    {
+        return m_elements[key];
+    }
+};   // MapUserConfigParam
+typedef MapUserConfigParam<uint32_t, uint32_t> UIntToUIntUserConfigParam;
+typedef MapUserConfigParam<std::string, uint32_t> StringToUIntUserConfigParam;
 // ============================================================================
 class IntUserConfigParam : public UserConfigParam
 {
@@ -156,7 +175,7 @@ public:
 
     irr::core::stringc toString() const;
     void revertToDefaults()      { m_value = m_default_value;        }
-
+    int getDefaultValue()        { return  m_default_value;          }
     operator int() const         { return m_value;                   }
     int& operator++(int dummy)   { m_value++; return m_value;        }
     int& operator=(const int& v) { m_value = v; return m_value;      }
@@ -279,6 +298,16 @@ enum AnimType {ANIMS_NONE         = 0,
                ANIMS_PLAYERS_ONLY = 1,
                ANIMS_ALL          = 2 };
 
+enum GeometryLevel
+{
+    /** Display everything */
+    GEOLEVEL_0    = 0,
+    /** a few details are displayed */
+    GEOLEVEL_1    = 1,
+    /** Lowest level, no details are displayed. */
+    GEOLEVEL_2    = 2
+};
+
 /** Using X-macros for setting-possible values is not very pretty, but it's a
  *  no-maintenance case :
  *  when you want to add a new parameter, just add one signle line below and
@@ -325,7 +354,7 @@ namespace UserConfigParams
         PARAM_DEFAULT( GroupUserConfigParam("RaceSetup",
                                             "Race Setup Settings") );
 
-    PARAM_PREFIX IntUserConfigParam          m_num_karts
+    PARAM_PREFIX IntUserConfigParam          m_default_num_karts
             PARAM_DEFAULT(  IntUserConfigParam(4, "numkarts",
                             &m_race_setup_group,
                             "Default number of karts. -1 means use all") );
@@ -359,7 +388,7 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam m_last_used_kart_group
             PARAM_DEFAULT( StringUserConfigParam("all", "last_kart_group",
                                                  "Last selected kart group") );
-
+    
     // ---- Wiimote data
     PARAM_PREFIX GroupUserConfigParam        m_wiimote_group
         PARAM_DEFAULT( GroupUserConfigParam("WiiMote",
@@ -388,6 +417,64 @@ namespace UserConfigParams
             PARAM_DEFAULT( FloatUserConfigParam(0.0f, "wiimote-weight-sin",
             &m_wiimote_group,
             "A weight applied to the sin component of mapping wiimote angle to steering angle"));
+
+    // ---- Multitouch device
+    PARAM_PREFIX GroupUserConfigParam        m_multitouch_group
+        PARAM_DEFAULT( GroupUserConfigParam("Multitouch",
+                                            "Settings for the multitouch device") );
+
+    PARAM_PREFIX BoolUserConfigParam         m_multitouch_enabled
+            PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_enabled",
+            &m_multitouch_group,
+            "Enable multitouch support.") );
+            
+    PARAM_PREFIX IntUserConfigParam         m_multitouch_mode
+            PARAM_DEFAULT( IntUserConfigParam(1, "multitouch_mode",
+            &m_multitouch_group,
+            "Steering mode: 0 = off, 1 = buttons"));
+
+    PARAM_PREFIX BoolUserConfigParam         m_multitouch_inverted
+            PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_inverted",
+            &m_multitouch_group,
+            "Draw steering wheel on right side.") );
+
+    PARAM_PREFIX IntUserConfigParam         m_multitouch_controls
+            PARAM_DEFAULT( IntUserConfigParam(0, "multitouch_controls",
+            &m_multitouch_group,
+            "Multitouch mode: 0 = undefined, 1 = steering wheel, 2 = accelerometer"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_center
+            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone_center",
+            &m_multitouch_group,
+            "A parameter in range [0, 0.5] that determines the zone that is "
+            "considered as centered in steering button."));
+
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_edge
+            PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone_edge",
+            &m_multitouch_group,
+            "A parameter in range [0, 0.5] that determines the zone that is "
+            "considered as max value in steering button."));
+            
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_tilt_factor
+            PARAM_DEFAULT( FloatUserConfigParam(4.0f, "multitouch_tilt_factor",
+            &m_multitouch_group,
+            "A parameter that determines general accelerometer sensitivity."));
+
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_scale
+            PARAM_DEFAULT( FloatUserConfigParam(1.1f, "multitouch_scale",
+            &m_multitouch_group,
+            "A parameter in range [0.5, 1.5] that determines the scale of the "
+            "multitouch interface."));
+
+    PARAM_PREFIX BoolUserConfigParam         m_screen_keyboard
+            PARAM_DEFAULT( BoolUserConfigParam(false, "screen_keyboard",
+            &m_multitouch_group,
+            "Enable screen keyboard.") );
+            
+    PARAM_PREFIX BoolUserConfigParam         m_hidpi_enabled
+            PARAM_DEFAULT( BoolUserConfigParam(false, "hidpi_enabled",
+            &m_multitouch_group,
+            "Enable high-DPI support.") );
 
     // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
@@ -449,11 +536,14 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_force_legacy_device
         PARAM_DEFAULT(BoolUserConfigParam(false, "force_legacy_device",
         &m_video_group, "Force OpenGL 2 context, even if OpenGL 3 is available."));
-
+    PARAM_PREFIX BoolUserConfigParam        split_screen_horizontally
+        PARAM_DEFAULT(BoolUserConfigParam(true, "split_screen_horizontally",
+            &m_video_group, "When playing a non-square amount of players (e.g. 2),"
+            " should it split horizontally (top/bottom)"));
     PARAM_PREFIX BoolUserConfigParam        m_texture_compression
         PARAM_DEFAULT(BoolUserConfigParam(true, "enable_texture_compression",
         &m_video_group, "Enable Texture Compression"));
-    /** This is a bit flag: bit 0: enabled (1) or disabled(0). 
+    /** This is a bit flag: bit 0: enabled (1) or disabled(0).
      *  Bit 1: setting done by default(0), or by user choice (2). This allows
      *  to e.g. disable h.d. textures on hd3000 as default, but still allow the
      *  user to enable it. */
@@ -476,21 +566,54 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_dof
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dof",
         &m_video_group, "Enable Depth of Field"));
-    PARAM_PREFIX BoolUserConfigParam        m_gi
-        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_gi",
-        &m_video_group, "Enable Global Illumination"));
-    PARAM_PREFIX BoolUserConfigParam        m_azdo
-        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_azdo",
-        &m_video_group, "Enable 'Approaching Zero Driver Overhead' mode (very experimental !)"));
-    PARAM_PREFIX BoolUserConfigParam        m_sdsm
-        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_sdsm",
-        &m_video_group, "Enable Sampled Distribued Shadow Map (buggy atm)"));
-    PARAM_PREFIX BoolUserConfigParam        m_esm
-        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_esm",
-        &m_video_group, "Enable Exponential Shadow Map (better but slower)"));
     PARAM_PREFIX BoolUserConfigParam        m_old_driver_popup
         PARAM_DEFAULT(BoolUserConfigParam(true, "old_driver_popup",
         &m_video_group, "Determines if popup message about too old drivers should be displayed."));
+    PARAM_PREFIX FloatUserConfigParam       m_scale_rtts_factor
+        PARAM_DEFAULT(FloatUserConfigParam(1.0f, "scale_rtts_factor",
+        &m_video_group, "Allows to increase performance by setting lower RTTs "
+                        "resolution. Value should be smaller or equal to 1.0"));
+    PARAM_PREFIX IntUserConfigParam         m_max_texture_size
+        PARAM_DEFAULT(IntUserConfigParam(512, "max_texture_size",
+        &m_video_group, "Max texture size when high definition textures are "
+                        "disabled"));
+
+    PARAM_PREFIX BoolUserConfigParam        m_hq_mipmap
+        PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
+        &m_video_group, "Generate mipmap for textures using "
+                        "high quality method with SSE"));
+                        
+    // ---- Recording
+    PARAM_PREFIX GroupUserConfigParam        m_recording_group
+        PARAM_DEFAULT(GroupUserConfigParam("Recording",
+                            "Recording Settings"));
+
+    PARAM_PREFIX BoolUserConfigParam        m_limit_game_fps
+        PARAM_DEFAULT(BoolUserConfigParam(true, "limit_game_fps",
+        &m_recording_group, "Limit game framerate not beyond the fps of"
+                            " recording video."));
+    PARAM_PREFIX IntUserConfigParam         m_video_format
+        PARAM_DEFAULT(IntUserConfigParam(0, "video_format",
+        &m_recording_group, "Specify the video for record, which is the enum"
+                            " of VideoFormat in libopenglrecorder. It will"
+                            " auto fallback to MJPEG if libopenglrecorder was"
+                            " not compiled with such video encoder."));
+
+    PARAM_PREFIX IntUserConfigParam         m_audio_bitrate
+        PARAM_DEFAULT(IntUserConfigParam(112000, "audio_bitrate",
+        &m_recording_group, "Specify the bitrate for audio"));
+
+    PARAM_PREFIX IntUserConfigParam         m_video_bitrate
+        PARAM_DEFAULT(IntUserConfigParam(20000, "video_bitrate",
+        &m_recording_group, "Specify the bitrate for video"));
+
+    PARAM_PREFIX IntUserConfigParam         m_recorder_jpg_quality
+        PARAM_DEFAULT(IntUserConfigParam(90, "recorder_jpg_quality",
+        &m_recording_group, "Specify the jpg compression level of recorder"));
+
+    PARAM_PREFIX IntUserConfigParam         m_record_fps
+        PARAM_DEFAULT(IntUserConfigParam(30, "record_fps",
+        &m_recording_group, "Specify the fps of recording video"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
@@ -547,6 +670,8 @@ namespace UserConfigParams
 
     PARAM_PREFIX bool m_race_now          PARAM_DEFAULT( false );
 
+    PARAM_PREFIX bool m_enforce_current_player PARAM_DEFAULT( false );
+
     /** True to test funky ambient/diffuse/specularity in RGB &
      *  all anisotropic */
     PARAM_PREFIX bool m_rendering_debug   PARAM_DEFAULT( false );
@@ -554,70 +679,77 @@ namespace UserConfigParams
     /** True if graphical profiler should be displayed */
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
 
-    /** True if hardware skinning should be enabled */
-    PARAM_PREFIX bool m_hw_skinning_enabled  PARAM_DEFAULT( false );
-
-    // not saved to file
+    /** How many seconds worth of data the circular profile buffer
+     *  can store. */
+    PARAM_PREFIX float m_profiler_buffer_duration PARAM_DEFAULT(20.0f);
 
     // ---- Networking
+    PARAM_PREFIX StringToUIntUserConfigParam m_stun_list
+        PARAM_DEFAULT(StringToUIntUserConfigParam("stun_list",
+        "The stun servers that will be used to know the public address,"
+        " LHS: server address, RHS: ping time.",
+            {
+                { "numb.viagenie.ca", 0u },
+                { "stun.12connect.com", 0u },
+                { "stun.callwithus.com", 0u },
+                { "stun.cope.es", 0u },
+                { "stun.counterpath.net", 0u },
+                { "stun.ekiga.net", 0u },
+                { "stun.ivao.aero", 0u },
+                { "stun.schlund.de", 0u },
+                { "stun.stunprotocol.org", 0u },
+                { "stun.voip.aebc.com", 0u }
+            }
+        ));
 
-    PARAM_PREFIX IntUserConfigParam         m_server_max_players
-            PARAM_DEFAULT(  IntUserConfigParam(16, "server_max_players",
-                                       "Maximum number of players on the server.") );
-
-    PARAM_PREFIX StringListUserConfigParam         m_stun_servers
-            PARAM_DEFAULT(  StringListUserConfigParam("Stun_servers", "The stun servers"
-                            " that will be used to know the public address.",
-                            24,
-                            "provserver.televolution.net",
-                            "sip1.lakedestiny.cordiaip.com",
-                            "stun1.voiceeclipse.net",
-                            "stun01.sipphone.com",
-                            "stun.callwithus.com",
-                            "stun.counterpath.net",
-                            "stun.endigovoip.com",
-                            "stun.ekiga.net",
-                            "stun.ideasip.com",
-                            "stun.internetcalls.com",
-                            "stun.ipns.com",
-                            "stun.noc.ams-ix.net",
-                            "stun.phonepower.com",
-                            "stun.phoneserve.com",
-                            "stun.rnktel.com",
-                            "stun.softjoys.com",
-                            "stunserver.org",
-                            "stun.sipgate.net",
-                            "stun.stunprotocol.org",
-                            "stun.voip.aebc.com",
-                            "stun.voipbuster.com",
-                            "stun.voxalot.com",
-                            "stun.voxgratia.org",
-                            "stun.xten.com") );
-
+    PARAM_PREFIX GroupUserConfigParam  m_network_group
+        PARAM_DEFAULT(GroupUserConfigParam("Network", "Network Settings"));
     PARAM_PREFIX BoolUserConfigParam m_log_packets
-            PARAM_DEFAULT( BoolUserConfigParam(false, "log-network-packets",
-                                                 "If all network packets should be logged") );
+        PARAM_DEFAULT(BoolUserConfigParam(false, "log-network-packets",
+        &m_network_group, "If all network packets should be logged"));
+    PARAM_PREFIX BoolUserConfigParam m_random_ports
+        PARAM_DEFAULT(BoolUserConfigParam(true, "random-ports",
+        &m_network_group, "Use random ports for client and server connection"));
+    PARAM_PREFIX BoolUserConfigParam m_lobby_chat
+        PARAM_DEFAULT(BoolUserConfigParam(false, "lobby-chat",
+        &m_network_group, "Enable chatting in networking lobby, if off than "
+        "no chat message will be displayed from any players."));
+    PARAM_PREFIX FloatUserConfigParam m_voting_timeout
+        PARAM_DEFAULT(FloatUserConfigParam(10.0f, "voting-timeout",
+        &m_network_group, "Timeout in seconds for voting tracks in server."));
+    PARAM_PREFIX IntUserConfigParam m_server_max_players
+        PARAM_DEFAULT(IntUserConfigParam(12, "server_max_players",
+        &m_network_group, "Maximum number of players on the server."));
+
+    PARAM_PREFIX StringToUIntUserConfigParam m_server_ban_list
+        PARAM_DEFAULT(StringToUIntUserConfigParam("server_ban_list",
+            "LHS: IP in x.x.x.x format, RHS: online id, if 0 than all players "
+            "from this IP will be banned.",
+            { { "0.0.0.0", 0u } }
+        ));
+
+    // ---- Gamemode setup
+    PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode
+        PARAM_DEFAULT(UIntToUIntUserConfigParam("num_karts_per_gamemode",
+            "The Number of karts per gamemode.",
+            {
+                { 0u, 4u },
+                { 1002u, 5u },
+                { 1100u, 4u },
+                { 1101u, 4u },
+                { 2000u, 4u },
+                { 2001u, 4u }
+            }
+        ));
 
     // ---- Graphic Quality
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality
             PARAM_DEFAULT( GroupUserConfigParam("GFX",
                                                 "Graphics Quality Settings") );
 
-    // On OSX 10.4 and before there may be driver issues with FBOs, so to be
-    // safe disable them by default
-#ifdef __APPLE__
-    #if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-    #define FBO_DEFAULT false
-    #else
-    #define FBO_DEFAULT true
-    #endif
-#else
-#define FBO_DEFAULT true
-#endif
-
-    PARAM_PREFIX BoolUserConfigParam        m_graphical_effects
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "anim_gfx",
-                            &m_graphics_quality, "Scenery animations") );
+    PARAM_PREFIX IntUserConfigParam        m_particles_effects
+            PARAM_DEFAULT(  IntUserConfigParam(2, "particles-effecs",
+                            &m_graphics_quality, "Particles effects: 0 disabled, 1 only important, 2 enabled") );
 
     // This saves the actual user preference.
     PARAM_PREFIX IntUserConfigParam        m_xmas_mode
@@ -629,29 +761,22 @@ namespace UserConfigParams
         PARAM_DEFAULT(IntUserConfigParam(0, "easter-ear-mode",
         &m_graphics_quality, "Easter Bunny Ears: 0 use current date, 1 always on, 2 always off"));
 
-    PARAM_PREFIX BoolUserConfigParam        m_weather_effects
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx",
-                                     &m_graphics_quality, "Weather effects") );
-    PARAM_PREFIX IntUserConfigParam        m_show_steering_animations
-            PARAM_DEFAULT(  IntUserConfigParam(ANIMS_PLAYERS_ONLY,
-                            "steering_animations", &m_graphics_quality,
-                "Whether to display kart animations (0=disabled for all; "
-                "1=enabled for humans, disabled for AIs; 2=enabled for all") );
+    PARAM_PREFIX BoolUserConfigParam       m_animated_characters
+            PARAM_DEFAULT(  BoolUserConfigParam(true,
+                            "animated-characters", &m_graphics_quality,
+                "Whether to display animated characters") );
+
+    PARAM_PREFIX IntUserConfigParam        m_geometry_level
+            PARAM_DEFAULT(  IntUserConfigParam(GEOLEVEL_0,
+                            "geometry_level", &m_graphics_quality,
+                "Geometry quality 0=everything is displayed; "
+                "1=a few details are displayed; 2=lowest level, no details") );
+
     PARAM_PREFIX IntUserConfigParam         m_anisotropic
             PARAM_DEFAULT( IntUserConfigParam(4, "anisotropic",
                            &m_graphics_quality,
                            "Quality of anisotropic filtering (usual values include 2-4-8-16; 0 to disable)") );
-    PARAM_PREFIX BoolUserConfigParam         m_trilinear
-            PARAM_DEFAULT( BoolUserConfigParam(true, "trilinear",
-                           &m_graphics_quality,
-                           "Whether trilinear filtering is allowed to be "
-                           "used (true or false)") );
-    /*
-    PARAM_PREFIX IntUserConfigParam          m_antialiasing
-            PARAM_DEFAULT( IntUserConfigParam(0,
-                           "antialiasing", &m_graphics_quality,
-                           "Whether antialiasing is enabled (0 = disabled, 1 = 2x, 2 = 4x, 3 = 8x") );
-    */
+
     PARAM_PREFIX BoolUserConfigParam         m_vsync
             PARAM_DEFAULT( BoolUserConfigParam(false, "vsync",
                            &m_graphics_quality,
@@ -670,7 +795,7 @@ namespace UserConfigParams
                            "Enable Screen Space Ambient Occlusion") );
     PARAM_PREFIX IntUserConfigParam          m_shadows_resolution
             PARAM_DEFAULT( IntUserConfigParam(0,
-                           "shadows_resoltion", &m_graphics_quality,
+                           "shadows_resolution", &m_graphics_quality,
                            "Shadow resolution (0 = disabled") );
     PARAM_PREFIX BoolUserConfigParam          m_degraded_IBL
         PARAM_DEFAULT(BoolUserConfigParam(true,
@@ -684,17 +809,6 @@ namespace UserConfigParams
     // TODO : is this used with new code? does it still work?
     PARAM_PREFIX BoolUserConfigParam        m_crashed
             PARAM_DEFAULT(  BoolUserConfigParam(false, "crashed") );
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-    // No console on windows
-#  define CONSOLE_DEFAULT false
-#else
-#  define CONSOLE_DEFAULT true
-#endif
-    // No console on windows
-    PARAM_PREFIX BoolUserConfigParam        m_log_errors_to_console
-            PARAM_DEFAULT(  BoolUserConfigParam(
-            CONSOLE_DEFAULT, "log_errors", "Enable logging to console.") );
 
     // ---- Camera
     PARAM_PREFIX GroupUserConfigParam        m_camera
@@ -855,6 +969,14 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_artist_debug_mode
             PARAM_DEFAULT( BoolUserConfigParam(false, "artist_debug_mode",
                                "Whether to enable track debugging features") );
+
+    PARAM_PREFIX BoolUserConfigParam        m_hide_gui
+        PARAM_DEFAULT(BoolUserConfigParam(false, "debug_hide_gui",
+            "Whether to hide the GUI (artist debug mode)"));
+
+    PARAM_PREFIX BoolUserConfigParam        m_everything_unlocked
+            PARAM_DEFAULT( BoolUserConfigParam(false, "everything_unlocked",
+                               "Enable all karts and tracks") );
 
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;

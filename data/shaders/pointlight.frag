@@ -6,25 +6,30 @@ flat in float energy;
 flat in vec3 col;
 flat in float radius;
 
+#ifdef GL_ES
+layout (location = 0) out vec4 Diff;
+layout (location = 1) out vec4 Spec;
+#else
 out vec4 Diff;
 out vec4 Spec;
+#endif
 
-vec3 DecodeNormal(vec2 n);
-vec3 SpecularBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
-vec3 DiffuseBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
-vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
+#stk_include "utils/decodeNormal.frag"
+#stk_include "utils/SpecularBRDF.frag"
+#stk_include "utils/DiffuseBRDF.frag"
+#stk_include "utils/getPosFromUVDepth.frag"
 
 void main()
 {
-    vec2 texc = gl_FragCoord.xy / screen;
+    vec2 texc = gl_FragCoord.xy / u_screen;
     float z = texture(dtex, texc).x;
     vec3 norm = normalize(DecodeNormal(2. * texture(ntex, texc).xy - 1.));
     float roughness = texture(ntex, texc).z;
 
-    vec4 xpos = getPosFromUVDepth(vec3(texc, z), InverseProjectionMatrix);
+    vec4 xpos = getPosFromUVDepth(vec3(texc, z), u_inverse_projection_matrix);
     vec3 eyedir = -normalize(xpos.xyz);
 
-    vec4 pseudocenter = ViewMatrix * vec4(center.xyz, 1.0);
+    vec4 pseudocenter = u_view_matrix * vec4(center.xyz, 1.0);
     pseudocenter /= pseudocenter.w;
     vec3 light_pos = pseudocenter.xyz;
     vec3 light_col = col.xyz;

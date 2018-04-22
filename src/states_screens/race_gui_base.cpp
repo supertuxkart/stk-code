@@ -28,7 +28,6 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
@@ -41,8 +40,9 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/rescue_animation.hpp"
-#include "modes/follow_the_leader.hpp"
+#include "modes/linear_world.hpp"
 #include "modes/world.hpp"
+#include "states_screens/race_gui_multitouch.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
@@ -69,28 +69,27 @@ RaceGUIBase::RaceGUIBase()
     m_string_go             = _("Go!");
     //I18N: Shown when a goal is scored
     m_string_goal           = _("GOAL!");
-    // Make the two materials permanent (in case that they are not listed
-    // in the textures/materials.xml file).
-    m_music_icon            = material_manager->getMaterial("notes.png",
-                                                            /*full path*/false,
-                                                            /*permanent*/true);
-    if(!m_music_icon->getTexture())
-        Log::fatal("RaceGuiBase", "Can't find 'notes.png' texture, aborting.");
 
-    m_plunger_face          = material_manager->getMaterial("plungerface.png",
-                                                            /*full path*/false,
-                                                            /*permanent*/true);
-    if(!m_plunger_face->getTexture())
+    m_music_icon = irr_driver->getTexture("notes.png");
+    if (!m_music_icon)
+    {
+        Log::fatal("RaceGuiBase", "Can't find 'notes.png' texture, aborting.");
+    }
+
+    m_plunger_face = irr_driver->getTexture("plungerface.png");
+    if (!m_plunger_face)
+    {
         Log::fatal("RaceGuiBase",
                    "Can't find 'plungerface.png' texture, aborting.");
+    }
 
     //read frame picture for icons in the mini map.
-    m_icons_frame           = material_manager->getMaterial("icons-frame.png",
-                                                            /*full_path*/false,
-                                                            /*permanent*/true);
-    if(!m_icons_frame->getTexture())
+    m_icons_frame = irr_driver->getTexture("icons-frame.png");
+    if (!m_icons_frame)
+    {
         Log::fatal("RaceGuiBase",
                    "Can't find 'icons-frame.png' texture, aborting.");
+    }
 
     m_gauge_full            = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gauge_full.png"));
     m_gauge_full_bright     = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"gauge_full_bright.png"));
@@ -100,6 +99,7 @@ RaceGUIBase::RaceGUIBase()
     m_icons_inertia         = 2;
 
     m_referee               = NULL;
+    m_multitouch_gui        = NULL;
 }   // RaceGUIBase
 
 // ----------------------------------------------------------------------------
@@ -137,18 +137,27 @@ void RaceGUIBase::reset()
     {
         const AbstractKart *kart = World::getWorld()->getKart(i);
         m_referee_pos[i] = kart->getTrans()(Referee::getStartOffset());
-        m_referee_rotation[i] = Referee::getStartRotation()
-                              + Vec3(0, kart->getHeading()*RAD_TO_DEGREE, 0);
+        Vec3 hpr;
+        btQuaternion q = btQuaternion(kart->getTrans().getBasis().getColumn(1),
+            Referee::getStartRotation().getY() * DEGREE_TO_RAD) *
+            kart->getTrans().getRotation();
+        hpr.setHPR(q);
+        m_referee_rotation[i] = hpr.toIrrHPR();
     }
-
 
     m_referee_height = 10.0f;
     m_referee->attachToSceneNode();
+    m_referee->selectReadySetGo(0); // set red color
     m_plunger_move_time = 0;
     m_plunger_offset    = core::vector2di(0,0);
     m_plunger_speed     = core::vector2df(0,0);
     m_plunger_state     = PLUNGER_STATE_INIT;
     clearAllMessages();
+    
+    if (m_multitouch_gui != NULL)
+    {
+        m_multitouch_gui->reset();
+    }
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -197,9 +206,9 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
                                   const core::vector2df &scaling)
 {
     int y = viewport.LowerRightCorner.Y - m_small_font_max_height - 10;
-
-    const int x = (viewport.LowerRightCorner.X + viewport.UpperLeftCorner.X)/2;
-    const int w = (viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X);
+    
+    const int x = viewport.getCenter().X;
+    const int w = viewport.getWidth();
 
     // Draw less important messages first, at the very bottom of the screen
     // unimportant messages are skipped in multiplayer, they take too much screen space
@@ -216,16 +225,26 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
                 if (msg.m_kart && msg.m_kart!=kart) continue;
 
                 core::rect<s32> pos(x - w/2, y, x + w/2, y + m_max_font_height);
-                GUIEngine::getSmallFont()->draw(
+
+                gui::ScalableFont* font = GUIEngine::getSmallFont();
+
+                if (msg.m_outline)
+                    font->setBlackBorder(true);
+
+                font->draw(
                     core::stringw(msg.m_message.c_str()).c_str(),
                     pos, msg.m_color, true /* hcenter */, true /* vcenter */);
+
+                if (msg.m_outline)
+                    font->setBlackBorder(false);
+
                 y -= m_small_font_max_height;
             }
         }
     }
 
     // First line of text somewhat under the top of the viewport.
-    y = (int)(viewport.UpperLeftCorner.Y + 164*scaling.Y);
+    y = viewport.getCenter().Y;
 
     gui::ScalableFont* font = GUIEngine::getFont();
     gui::ScalableFont* big_font = GUIEngine::getTitleFont();
@@ -234,7 +253,6 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
     if (race_manager->getNumLocalPlayers() > 2)
     {
         font = GUIEngine::getSmallFont();
-        font_height = m_small_font_max_height;
     }
 
     irr_driver->getVideoDriver()->enableMaterial2D(); // seems like we need to remind irrlicht from time to time to use the Material2D
@@ -264,9 +282,16 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
         }
         else
         {
+            if (msg.m_outline)
+                font->setBlackBorder(true);
+
             font->draw(core::stringw(msg.m_message.c_str()).c_str(),
                        pos, msg.m_color, true /* hcenter */,
                        true /* vcenter */);
+
+            if (msg.m_outline)
+                font->setBlackBorder(false);
+
             y += font_height;
         }
     }   // for i in all messages
@@ -303,6 +328,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
                                    const core::recti &viewport,
                                    const core::vector2df &scaling)
 {
+#ifndef SERVER_ONLY
     // If player doesn't have any powerups or has completed race, do nothing.
     const Powerup* powerup = kart->getPowerup();
     if (powerup->getType() == PowerupManager::POWERUP_NOTHING
@@ -321,10 +347,10 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
 
     int nSize = (int)(64.0f * scale);
 
-    int itemSpacing = (int)(scale * 30);
+    int itemSpacing = (int)(scale * 32.0f);
 
-    int x1 = viewport.UpperLeftCorner.X  + viewport.getWidth()/2
-           - (n * itemSpacing)/2;
+    int x1 = viewport.UpperLeftCorner.X  + (viewport.getWidth()/2)
+           - ((n * itemSpacing)/2);
     int y1 = viewport.UpperLeftCorner.Y  + (int)(20 * scaling.Y);
 
     int x2 = 0;
@@ -337,7 +363,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
 
     for ( int i = 0 ; i < n ; i++ )
     {
-        x2 = (int)(x1+i*itemSpacing);
+        x2 = (int)((x1+i*itemSpacing) - (itemSpacing / 2));
         core::rect<s32> pos(x2, y1, x2+nSize, y1+nSize);
         draw2DImage(t, pos, rect, NULL,
                                                   NULL, true);
@@ -352,6 +378,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
             pos, video::SColor(255, 255, 255, 255));
         font->setScale(1.0f);
     }
+#endif
 }   // drawPowerupIcons
 
 // ----------------------------------------------------------------------------
@@ -419,8 +446,8 @@ void RaceGUIBase::preRenderCallback(const Camera *camera)
     if(m_referee && camera->getKart())
     {
         unsigned int world_id = camera->getKart()->getWorldKartId();
-        Vec3 xyz = m_referee_pos[world_id];
-        xyz.setY(xyz.getY()+m_referee_height);
+        Vec3 xyz = m_referee_pos[world_id] +
+            camera->getKart()->getNormal() * m_referee_height;
         m_referee->setPosition(xyz);
         m_referee->setRotation(m_referee_rotation[world_id]);
     }
@@ -429,7 +456,15 @@ void RaceGUIBase::preRenderCallback(const Camera *camera)
 // ----------------------------------------------------------------------------
 void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
 {
-
+    const core::recti &viewport = camera->getViewport();
+    const core::vector2df scaling = camera->getScaling();
+    const AbstractKart* kart = camera->getKart();
+    if(!kart) return;
+    
+    if (m_multitouch_gui != NULL)
+    {
+        m_multitouch_gui->draw(kart, viewport, scaling);
+    }
 }   // renderPlayerView
 
 
@@ -441,9 +476,9 @@ void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
 void RaceGUIBase::addMessage(const core::stringw &msg,
                              const AbstractKart *kart,
                              float time, const video::SColor &color,
-                             bool important, bool big_font)
+                             bool important, bool big_font, bool outline)
 {
-    m_messages.push_back(TimedMessage(msg, kart, time, color, important, big_font));
+    m_messages.push_back(TimedMessage(msg, kart, time, color, important, big_font, outline));
 }   // addMessage
 
 //-----------------------------------------------------------------------------
@@ -452,20 +487,14 @@ void RaceGUIBase::addMessage(const core::stringw &msg,
  */
 void RaceGUIBase::drawGlobalMusicDescription()
 {
+#ifndef SERVER_ONLY
      // show no music description when it's off
     if (!UserConfigParams::m_music) return;
 
     gui::IGUIFont*       font = GUIEngine::getFont();
 
-    float race_time = World::getWorld()->getTime();
-    // In the modes that the clock counts backwards, convert the
-    // countdown time to time since start:
-    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
-        race_time = ((FollowTheLeaderRace*)World::getWorld())->getClockStartTime()
-                  - race_time;
-    else if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER &&
-             race_manager->hasTimeTarget())
-        race_time = race_manager->getTimeTarget() - World::getWorld()->getTime();
+    float race_time =
+        stk_config->ticks2Time(World::getWorld()->getTicksSinceStart());
 
     // ---- Manage pulsing effect
     // 3.0 is the duration of ready/set (TODO: don't hardcode)
@@ -546,16 +575,15 @@ void RaceGUIBase::drawGlobalMusicDescription()
     int iconSizeX = (int)(ICON_SIZE*resize + x_pulse*resize*resize);
     int iconSizeY = (int)(ICON_SIZE*resize + y_pulse*resize*resize);
 
-    video::ITexture *t = m_music_icon->getTexture();
     core::rect<s32> dest(noteX-iconSizeX/2+20,
                          noteY-iconSizeY/2+ICON_SIZE/2,
                          noteX+iconSizeX/2+20,
                          noteY+iconSizeY/2+ICON_SIZE/2);
     const core::rect<s32> source(core::position2d<s32>(0,0),
-                                 t->getSize());
+                                 m_music_icon->getSize());
 
-    draw2DImage(t, dest, source,
-                                              NULL, NULL, true);
+    draw2DImage(m_music_icon, dest, source, NULL, NULL, true);
+#endif
 }   // drawGlobalMusicDescription
 
 //-----------------------------------------------------------------------------
@@ -627,6 +655,7 @@ void RaceGUIBase::drawGlobalReadySetGo()
  */
 void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 {
+#ifndef SERVER_ONLY
     // For now, don't draw player icons when in soccer mode
     const RaceManager::MinorRaceModeType  minor_mode = race_manager->getMinorMode();
     if(minor_mode == RaceManager::MINOR_MODE_SOCCER)
@@ -636,15 +665,19 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     int y_base = 20;
     unsigned int y_space = irr_driver->getActualScreenSize().Height - bottom_margin - y_base;
     // Special case : when 3 players play, use 4th window to display such stuff
-    if (race_manager->getNumLocalPlayers() == 3)
+    if (race_manager->getIfEmptyScreenSpaceExists())
     {
-        x_base = irr_driver->getActualScreenSize().Width/2 + x_base;
-        y_base = irr_driver->getActualScreenSize().Height/2 + y_base;
+        irr::core::recti Last_Space = irr_driver->getSplitscreenWindow(race_manager->getNumLocalPlayers());
+        x_base = Last_Space.UpperLeftCorner.X;
+        y_base = Last_Space.UpperLeftCorner.Y;
         y_space = irr_driver->getActualScreenSize().Height - y_base;
     }
 
+    unsigned int sta = race_manager->getNumSpareTireKarts();
+    const unsigned int num_karts = race_manager->getNumberOfKarts() - sta;
+
     // -2 because that's the spacing further on
-    int ICON_PLAYER_WIDTH = y_space / race_manager->getNumberOfKarts() - 2;
+    int ICON_PLAYER_WIDTH = y_space / num_karts - 2;
 
     int icon_width_max = (int)(50*(irr_driver->getActualScreenSize().Width/800.0f));
     int icon_width_min = (int)(35*(irr_driver->getActualScreenSize().Height/600.0f));
@@ -669,10 +702,11 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     int ICON_WIDTH = ICON_PLAYER_WIDTH * 4 / 5;
 
     WorldWithRank *world    = (WorldWithRank*)(World::getWorld());
+
     //initialize m_previous_icons_position
     if(m_previous_icons_position.size()==0)
     {
-        for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
+        for(unsigned int i=0; i<num_karts; i++)
         {
             const AbstractKart *kart = world->getKart(i);
             int position = kart->getPosition();
@@ -691,12 +725,19 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     int previous_y=y_base-ICON_PLAYER_WIDTH-2;
 
     gui::ScalableFont* font = GUIEngine::getFont();
-    const unsigned int kart_amount = world->getNumKarts();
+    const unsigned int kart_amount = world->getNumKarts() - sta;
 
     //where is the limit to hide last icons
-    int y_icons_limit=irr_driver->getActualScreenSize().Height-bottom_margin-ICON_PLAYER_WIDTH;
-    if (race_manager->getNumLocalPlayers() == 3)
-        y_icons_limit=irr_driver->getActualScreenSize().Height-ICON_WIDTH;
+    int y_icons_limit = irr_driver->getActualScreenSize().Height - 
+                                            bottom_margin - ICON_PLAYER_WIDTH;
+    if (race_manager->getIfEmptyScreenSpaceExists())
+    {
+        y_icons_limit = irr_driver->getActualScreenSize().Height - ICON_WIDTH;
+    }
+    else if (m_multitouch_gui != NULL)
+    {
+        y_icons_limit = irr_driver->getActualScreenSize().Height / 2;
+    }
 
     world->getKartsDisplayInfo(&m_kart_display_infos);
 
@@ -729,11 +770,12 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         {
             LinearWorld *linear_world = (LinearWorld*)(World::getWorld());
 
-            float distance = linear_world->getDistanceDownTrackForKart(kart_id)
-                           + linear_world->getTrack()->getTrackLength()*lap;
+            float distance = linear_world->getDistanceDownTrackForKart(kart_id, true)
+                           + Track::getCurrentTrack()->getTrackLength()*lap;
+
             if ((position>1) &&
                 (previous_distance-distance<m_dist_show_overlap) &&
-                (!kart->hasFinishedRace())                          )
+                (!kart->hasFinishedRace()) && lap >= 0 )
             {
                 //linear translation : form (0,ICON_PLAYER_WIDTH+2) to
                 // (previous_x-x_base+(ICON_PLAYER_WIDTH+2)/2,0)
@@ -820,9 +862,8 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
                                    100+(int)(100*cos(M_PI/2*i+World::getWorld()->getTime()*2)));
             }
             const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                       m_icons_frame->getTexture()->getSize());
-            draw2DImage(
-                                                      m_icons_frame->getTexture(), pos, rect,NULL, colors, true);
+                                       m_icons_frame->getSize());
+            draw2DImage(m_icons_frame, pos, rect,NULL, colors, true);
         }
 
         // Fixes crash bug, why are certain icons not showing up?
@@ -897,7 +938,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         }
 
         //Plunger
-        if (kart->getBlockedByPlungerTime()>0)
+        if (kart->getBlockedByPlungerTicks()>0)
         {
             video::ITexture *icon_plunger =
             powerup_manager->getIcon(PowerupManager::POWERUP_PLUNGER)->getTexture();
@@ -929,6 +970,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         }
 
     } //next position
+#endif
 }   // drawGlobalPlayerIcons
 
 // ----------------------------------------------------------------------------
@@ -938,8 +980,9 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
  */
 void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
 {
+#ifndef SERVER_ONLY
     const AbstractKart *kart = camera->getKart();
-    if (kart->getBlockedByPlungerTime()<=0)
+    if (kart->getBlockedByPlungerTicks()<=0)
     {
         m_plunger_state = PLUNGER_STATE_INIT;
         return;
@@ -964,7 +1007,7 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
         if(m_plunger_move_time < dt && m_plunger_state!=PLUNGER_STATE_FAST)
         {
             const float fast_time = 0.3f;
-            if(kart->getBlockedByPlungerTime()<fast_time)
+            if(kart->getBlockedByPlungerTicks()<fast_time)
             {
                 // First time we reach faste state: select random target point
                 // at top of screen and set speed accordingly
@@ -1012,16 +1055,25 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
     int plunger_x = viewport.UpperLeftCorner.X + screen_width/2
                   - plunger_size/2;
 
-    video::ITexture *t=m_plunger_face->getTexture();
     plunger_x += (int)m_plunger_offset.X;
     core::rect<s32> dest(plunger_x,              offset_y,
                          plunger_x+plunger_size, offset_y+plunger_size);
 
     const core::rect<s32> source(core::position2d<s32>(0,0),
-                                 t->getSize());
+                                 m_plunger_face->getSize());
 
-    draw2DImage(t, dest, source,
+    draw2DImage(m_plunger_face, dest, source,
                                               &viewport /* clip */,
                                               NULL /* color */,
                                               true /* alpha */     );
+#endif   // !SERVER_ONLY
 }   // drawPlungerInFace
+
+// ----------------------------------------------------------------------------
+void RaceGUIBase::removeReferee()
+{
+    if (m_referee->isAttached())   // race phase:
+    {
+        m_referee->removeFromSceneGraph();
+    }
+}   // removeReferee

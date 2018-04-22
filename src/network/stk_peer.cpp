@@ -17,42 +17,62 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/stk_peer.hpp"
+#include "config/user_config.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_string.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/stk_host.hpp"
 #include "network/transport_address.hpp"
 #include "utils/log.hpp"
+#include "utils/time.hpp"
 
 #include <string.h>
 
 /** Constructor for an empty peer.
  */
-STKPeer::STKPeer(ENetPeer *enet_peer)
+STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
+       : m_peer_address(enet_peer->address), m_host(host)
 {
     m_enet_peer           = enet_peer;
-    m_is_authorised       = false;
-    m_client_server_token = 0;
-    m_host_id             = 0;
-    m_token_set           = false;
+    m_host_id             = host_id;
+    m_connected_time      = (float)StkTime::getRealTime();
+    m_token_set.store(false);
+    m_client_server_token.store(0);
 }   // STKPeer
 
 //-----------------------------------------------------------------------------
-/** Destructor.
- */
-STKPeer::~STKPeer()
-{
-    m_enet_peer           = NULL;
-    m_client_server_token = 0;
-}   // ~STKPeer
-
-//-----------------------------------------------------------------------------
-/** Disconnect from the server.
- */
 void STKPeer::disconnect()
 {
-    enet_peer_disconnect(m_enet_peer, 0);
+    TransportAddress a(m_enet_peer->address);
+    if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
+        a != m_peer_address)
+        return;
+    m_host->addEnetCommand(m_enet_peer, NULL, PDI_NORMAL, ECT_DISCONNECT);
 }   // disconnect
+
+//-----------------------------------------------------------------------------
+/** Kick this peer (used by server).
+ */
+void STKPeer::kick()
+{
+    TransportAddress a(m_enet_peer->address);
+    if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
+        a != m_peer_address)
+        return;
+    m_host->addEnetCommand(m_enet_peer, NULL, PDI_KICK, ECT_DISCONNECT);
+}   // kick
+
+//-----------------------------------------------------------------------------
+/** Forcefully disconnects a peer (used by server).
+ */
+void STKPeer::reset()
+{
+    TransportAddress a(m_enet_peer->address);
+    if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
+        a != m_peer_address)
+        return;
+    m_host->addEnetCommand(m_enet_peer, NULL, 0, ECT_RESET);
+}   // reset
 
 //-----------------------------------------------------------------------------
 /** Sends a packet to this host.
@@ -61,49 +81,31 @@ void STKPeer::disconnect()
  */
 void STKPeer::sendPacket(NetworkString *data, bool reliable)
 {
-    data->setToken(m_client_server_token);
     TransportAddress a(m_enet_peer->address);
-    Log::verbose("STKPeer", "sending packet of size %d to %s",
-                 data->size(), a.toString().c_str());
-         
+    // Enet will reuse a disconnected peer so we check here to avoid sending
+    // to wrong peer
+    if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
+        a != m_peer_address)
+        return;
+    data->setToken(m_client_server_token);
+    Log::verbose("STKPeer", "sending packet of size %d to %s at %f",
+                 data->size(), a.toString().c_str(),StkTime::getRealTime());
+
     ENetPacket* packet = enet_packet_create(data->getData(),
                                             data->getTotalSize(),
                                     (reliable ? ENET_PACKET_FLAG_RELIABLE
                                               : ENET_PACKET_FLAG_UNSEQUENCED));
-    enet_peer_send(m_enet_peer, 0, packet);
+    m_host->addEnetCommand(m_enet_peer, packet, 0, ECT_SEND_PACKET);
 }   // sendPacket
-
-//-----------------------------------------------------------------------------
-/** Returns the IP address (in host format) of this client.
- */
-uint32_t STKPeer::getAddress() const
-{
-    return ntohl(m_enet_peer->address.host);
-}   // getAddress
-
-//-----------------------------------------------------------------------------
-/** Returns the port of this peer.
- */
-uint16_t STKPeer::getPort() const
-{
-    return m_enet_peer->address.port;
-}
 
 //-----------------------------------------------------------------------------
 /** Returns if the peer is connected or not.
  */
 bool STKPeer::isConnected() const
 {
-    Log::info("STKPeer", "The peer state is %i", m_enet_peer->state);
+    Log::debug("STKPeer", "The peer state is %i", m_enet_peer->state);
     return (m_enet_peer->state == ENET_PEER_STATE_CONNECTED);
 }   // isConnected
-
-//-----------------------------------------------------------------------------
-
-bool STKPeer::exists() const
-{
-    return (m_enet_peer != NULL); // assert that the peer exists
-}
 
 //-----------------------------------------------------------------------------
 /** Returns if this STKPeer is the same as the given peer.
@@ -122,12 +124,12 @@ bool STKPeer::isSamePeer(const ENetPeer* peer) const
 }   // isSamePeer
 
 //-----------------------------------------------------------------------------
-/** Returns the list of all player profiles connected to this peer. Note that
- *  this function is somewhat expensive (it loops over all network profiles
- *  to find the ones with the same host id as this peer.
+/** Returns the ping to this peer from host, it waits for 15 seconds for a
+ *  stable ping returned by enet measured in ms.
  */
-std::vector<NetworkPlayerProfile*> STKPeer::getAllPlayerProfiles()
+uint32_t STKPeer::getPing() const
 {
-    return STKHost::get()->getGameSetup()->getAllPlayersOnHost(getHostId());
-}   // getAllPlayerProfiles
-
+    if ((float)StkTime::getRealTime() - m_connected_time < 15.0f)
+        return 0;
+    return m_enet_peer->lastRoundTripTime;
+}   // getPing

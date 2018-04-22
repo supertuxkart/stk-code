@@ -45,6 +45,7 @@ namespace StringUtils
     std::string getExtension(const std::string& filename);
 
     bool notEmpty(const irr::core::stringw& input);
+    std::string ticksTimeToString(int time);
     std::string timeToString(float time);
     irr::core::stringw loadingDots(float interval = 0.5f, int max_dots = 3);
     irr::core::stringw loadingDots(const wchar_t *s);
@@ -230,6 +231,7 @@ namespace StringUtils
     irr::core::stringw utf8ToWide(const std::string &input);
     std::string wideToUtf8(const wchar_t* input);
     std::string wideToUtf8(const irr::core::stringw& input);
+    std::string findAndReplace(const std::string& source, const std::string& find, const std::string& replace);
 
 } // namespace StringUtils
 

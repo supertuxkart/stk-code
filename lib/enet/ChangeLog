@@ -1,3 +1,58 @@
+ENet 1.3.12 (April 24, 2014):
+
+* added maximumPacketSize and maximumWaitingData fields to ENetHost to limit the amount of 
+data waiting to be delivered on a peer (beware that the default maximumPacketSize is
+32MB and should be set higher if desired as should maximumWaitingData)
+
+ENet 1.3.11 (December 26, 2013):
+
+* allow an ENetHost to connect to itself
+* fixed possible bug with disconnect notifications during connect attempts
+* fixed some preprocessor definition bugs
+
+ENet 1.3.10 (October 23, 2013);
+
+* doubled maximum reliable window size
+* fixed RCVTIMEO/SNDTIMEO socket options and also added NODELAY
+
+ENet 1.3.9 (August 19, 2013):
+
+* added duplicatePeers option to ENetHost which can limit the number of peers from duplicate IPs
+* added enet_socket_get_option() and ENET_SOCKOPT_ERROR
+* added enet_host_random_seed() platform stub
+
+ENet 1.3.8 (June 2, 2013):
+
+* added enet_linked_version() for checking the linked version 
+* added enet_socket_get_address() for querying the local address of a socket
+* silenced some debugging prints unless ENET_DEBUG is defined during compilation
+* handle EINTR in enet_socket_wait() so that enet_host_service() doesn't propagate errors from signals
+* optimized enet_host_bandwidth_throttle() to be less expensive for large numbers of peers
+
+ENet 1.3.7 (March 6, 2013):
+
+* added ENET_PACKET_FLAG_SENT to indicate that a packet is being freed because it has been sent
+* added userData field to ENetPacket
+* changed how random seed is generated on Windows to avoid import warnings
+* fixed case where disconnects could be generated with no preceding connect event
+
+ENet 1.3.6 (December 11, 2012):
+
+* added support for intercept callback in ENetHost that can be used to process raw packets before ENet
+* added enet_socket_shutdown() for issuing shutdown on a socket
+* fixed enet_socket_connect() to not error on non-blocking connects
+* fixed bug in MTU negotiation during connections
+ 
+ENet 1.3.5 (July 31, 2012):
+
+* fixed bug in unreliable packet fragment queuing
+
+ENet 1.3.4 (May 29, 2012):
+
+* added enet_peer_ping_interval() for configuring per-peer ping intervals
+* added enet_peer_timeout() for configuring per-peer timeouts
+* added protocol packet size limits
+
 ENet 1.3.3 (June 28, 2011):
 
 * fixed bug with simultaneous disconnects not dispatching events

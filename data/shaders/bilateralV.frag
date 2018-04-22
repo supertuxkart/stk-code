@@ -3,12 +3,13 @@
 uniform sampler2D tex;
 uniform sampler2D depth;
 uniform vec2 pixel;
-uniform float sigma = 5.;
 
 out vec4 FragColor;
 
 void main()
 {
+    float sigma = 5.;
+
     vec2 uv = gl_FragCoord.xy * pixel;
     float X = uv.x;
     float Y = uv.y;
@@ -23,11 +24,11 @@ void main()
     g1 *= g2;
     float tmp_weight, total_weight = g0;
     for (int i = 1; i < 9; i++) {
-        tmp_weight = max(0.0, 1.0 - .001 * abs(texture(depth, vec2(X, Y - i * pixel.y)).x - pixel_depth));
-        sum += texture(tex, vec2(X, Y - i * pixel.y)) * g0 * tmp_weight;
+        tmp_weight = max(0.0, 1.0 - .001 * abs(texture(depth, vec2(X, Y - float(i) * pixel.y)).x - pixel_depth));
+        sum += texture(tex, vec2(X, Y - float(i) * pixel.y)) * g0 * tmp_weight;
         total_weight += g0 * tmp_weight;
-        tmp_weight = max(0.0, 1.0 - .001 * abs(texture(depth, vec2(X, Y + i * pixel.y)).x - pixel_depth));
-        sum += texture(tex, vec2(X, Y + i * pixel.y)) * g0 * tmp_weight;
+        tmp_weight = max(0.0, 1.0 - .001 * abs(texture(depth, vec2(X, Y + float(i) * pixel.y)).x - pixel_depth));
+        sum += texture(tex, vec2(X, Y + float(i) * pixel.y)) * g0 * tmp_weight;
         total_weight += g0 * tmp_weight;
         g0 *= g1;
         g1 *= g2;

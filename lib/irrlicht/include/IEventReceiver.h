@@ -33,6 +33,18 @@ namespace irr
 		/** Like mouse events, keyboard events are created by the device and passed to
 		IrrlichtDevice::postEventFromUser. They take the same path as mouse events. */
 		EET_KEY_INPUT_EVENT,
+        
+        //! A touch input event.
+		EET_TOUCH_INPUT_EVENT,
+        
+        //! A accelerometer event.
+        EET_ACCELEROMETER_EVENT,
+        
+        //! A gyroscope event.
+        EET_GYROSCOPE_EVENT,
+        
+        //! A device motion event.
+        EET_DEVICE_MOTION_EVENT,
 
 		//! A joystick (joypad, gamepad) input event.
 		/** Joystick events are created by polling all connected joysticks once per
@@ -71,6 +83,12 @@ namespace irr
 		MacOS: Not yet implemented
 		*/
 		EET_USER_EVENT,
+		
+		//! Pass on raw events from the OS
+		EET_SYSTEM_EVENT,
+		
+		//! Application state events like a resume, pause etc.
+		EET_APPLICATION_EVENT,
 
 		//! This enum is never used, it only forces the compiler to
 		//! compile these enumeration values to 32 bit.
@@ -163,6 +181,58 @@ namespace irr
 		EIME_FORCE_32_BIT = 0x7fffffff
 	};
 #endif
+    
+    //! Enumeration for all touch input events
+	enum ETOUCH_INPUT_EVENT
+	{
+		//! Touch was pressed down.
+		ETIE_PRESSED_DOWN = 0,
+
+		//! Touch was left up.
+		ETIE_LEFT_UP,
+
+		//! The touch changed its position.
+		ETIE_MOVED,
+
+		//! No real event. Just for convenience to get number of events
+		ETIE_COUNT
+	};
+	
+	enum ESYSTEM_EVENT_TYPE
+	{
+		//! From Android command handler for native activity messages
+		ESET_ANDROID_CMD = 0,
+
+		// TODO: for example ESET_WINDOWS_MESSAGE for win32 message loop events
+
+		//! No real event, but to get number of event types
+		ESET_COUNT
+	};
+	
+	//! Enumeration for a commonly used application state events (it's useful mainly for mobile devices)
+	enum EAPPLICATION_EVENT_TYPE
+	{
+		//! The application will be resumed.
+		EAET_WILL_RESUME = 0,
+		
+		//! The application has been resumed.
+		EAET_DID_RESUME,
+		
+		//! The application will be paused.
+		EAET_WILL_PAUSE,
+		
+		//! The application has been paused.
+		EAET_DID_PAUSE,
+
+		//! The application will be terminated.
+		EAET_WILL_TERMINATE,
+		
+		//! The application received a memory warning.
+		EAET_MEMORY_WARNING,
+
+		//! No real event, but to get number of event types.
+		EAET_COUNT
+	};
 
 	namespace gui
 	{
@@ -337,11 +407,15 @@ struct SEvent
 	//! Any kind of keyboard event.
 	struct SKeyInput
 	{
-		//! Character corresponding to the key (0, if not a character)
+		//! Character corresponding to the key (0, if not a character, value undefined in key releases)
 		wchar_t Char;
 
 		//! Key which has been pressed or released
 		EKEY_CODE Key;
+
+		//! System dependent code. Only set for systems which are described below, otherwise undefined.
+		//! Android: int32_t with physical key as returned by AKeyEvent_getKeyCode
+		u32 SystemKeyCode;
 
 		//! If not true, then the key was left up
 		bool PressedDown:1;
@@ -351,6 +425,65 @@ struct SEvent
 
 		//! True if ctrl was also pressed
 		bool Control:1;
+	};
+    
+    //! Any kind of touch event.
+	struct STouchInput
+	{
+        // Touch ID.
+        size_t ID;
+
+        // X position of simple touch.
+		s32 X;
+
+        // Y position of simple touch.
+		s32 Y;
+
+		//! Type of touch event.
+		ETOUCH_INPUT_EVENT Event;
+	};
+
+    
+    //! Any kind of accelerometer event.
+	struct SAccelerometerEvent
+	{
+        
+        // X acceleration.
+		f64 X;
+        
+        // Y acceleration.
+		f64 Y;
+        
+        // Z acceleration.
+		f64 Z;
+	};
+    
+    //! Any kind of gyroscope event.
+	struct SGyroscopeEvent
+	{
+        
+        // X rotation.
+		f64 X;
+        
+        // Y rotation.
+		f64 Y;
+        
+        // Z rotation.
+		f64 Z;
+	};
+    
+    //! Any kind of device motion event.
+	struct SDeviceMotionEvent
+	{
+        
+        // X angle - roll.
+		f64 X;
+        
+        // Y angle - pitch.
+		f64 Y;
+        
+        // Z angle - yaw.
+		f64 Z;
 	};
 
 	//! A joystick event.
@@ -412,7 +545,6 @@ struct SEvent
 		}
 	};
 
-
 	//! Any kind of log event.
 	struct SLogEvent
 	{
@@ -432,6 +564,31 @@ struct SEvent
 		//! Another user specified data as int
 		s32 UserData2;
 	};
+	
+	// Raw events from the OS
+	struct SSystemEvent
+	{
+		//! Android command handler native activity messages.
+		struct SAndroidCmd
+		{
+			//!  APP_CMD_ enums defined in android_native_app_glue.h from the Android NDK
+			s32 Cmd;
+		};
+
+		// TOOD: more structs for iphone, Windows, X11, etc.
+
+		ESYSTEM_EVENT_TYPE EventType;
+		union
+		{
+			struct SAndroidCmd AndroidCmd;
+		};
+	};
+	
+	// Application state event
+	struct SApplicationEvent
+	{
+		EAPPLICATION_EVENT_TYPE EventType;
+	};
 
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
 	struct SInputMethodEvent
@@ -447,15 +604,22 @@ struct SEvent
 	};
 #endif
 
+
 	EEVENT_TYPE EventType;
 	union
 	{
 		struct SGUIEvent GUIEvent;
 		struct SMouseInput MouseInput;
 		struct SKeyInput KeyInput;
+        struct STouchInput TouchInput;
+        struct SAccelerometerEvent AccelerometerEvent;
+        struct SGyroscopeEvent GyroscopeEvent;
+        struct SDeviceMotionEvent DeviceMotionEvent;
 		struct SJoystickEvent JoystickEvent;
 		struct SLogEvent LogEvent;
 		struct SUserEvent UserEvent;
+		struct SSystemEvent SystemEvent;
+		struct SApplicationEvent ApplicationEvent;
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
 		struct SInputMethodEvent InputMethodEvent;
 #endif

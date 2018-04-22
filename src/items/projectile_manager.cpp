@@ -62,10 +62,25 @@ void ProjectileManager::cleanup()
 }   // cleanup
 
 // -----------------------------------------------------------------------------
-/** General projectile update call. */
-void ProjectileManager::update(float dt)
+/** Called once per rendered frame. It is used to only update any graphical
+ *  effects, and calls updateGraphics in any flyable objects.
+ *  \param dt Time step size (since last call).
+ */
+void ProjectileManager::updateGraphics(float dt)
 {
-    updateServer(dt);
+    for (auto p  = m_active_projectiles.begin(); 
+              p != m_active_projectiles.end();   ++p)
+    {
+        (*p)->updateGraphics(dt);
+    }
+
+}   // updateGraphics
+
+// -----------------------------------------------------------------------------
+/** General projectile update call. */
+void ProjectileManager::update(int ticks)
+{
+    updateServer(ticks);
 
     HitEffects::iterator he = m_active_hit_effects.begin();
     while(he!=m_active_hit_effects.end())
@@ -77,7 +92,7 @@ void ProjectileManager::update(float dt)
             he = next;
         }
         // Update this hit effect. If it can be removed, remove it.
-        else if((*he)->updateAndDelete(dt))
+        else if((*he)->updateAndDelete(ticks))
         {
             delete *he;
             HitEffects::iterator next = m_active_hit_effects.erase(he);
@@ -90,12 +105,12 @@ void ProjectileManager::update(float dt)
 
 // -----------------------------------------------------------------------------
 /** Updates all rockets on the server (or no networking). */
-void ProjectileManager::updateServer(float dt)
+void ProjectileManager::updateServer(int ticks)
 {
     Projectiles::iterator p = m_active_projectiles.begin();
     while(p!=m_active_projectiles.end())
     {
-        bool can_be_deleted = (*p)->updateAndDelete(dt);
+        bool can_be_deleted = (*p)->updateAndDelete(ticks);
         if(can_be_deleted)
         {
             HitEffect *he = (*p)->getHitEffect();
@@ -153,3 +168,32 @@ bool ProjectileManager::projectileIsClose(const AbstractKart * const kart,
     }
     return false;
 }   // projectileIsClose
+
+// -----------------------------------------------------------------------------
+/** Returns an int containing the numbers of a given flyable in a given radius
+ *  around the kart
+ *  \param kart The kart for which the test is done.
+ *  \param radius Distance within which the projectile must be.
+ *  \param type The type of projectile checked
+*/
+int ProjectileManager::getNearbyProjectileCount(const AbstractKart * const kart,
+                                         float radius, PowerupManager::PowerupType type)
+{
+    float r2 = radius*radius;
+    int projectileCount = 0;
+
+    for(Projectiles::iterator i  = m_active_projectiles.begin();
+                              i != m_active_projectiles.end();   i++)
+    {
+        if ((*i)->getType() == type)
+        {
+            float dist2 = (*i)->getXYZ().distance2(kart->getXYZ());
+            if(dist2<r2)
+            {
+
+                projectileCount++;
+            }
+        }
+    }
+    return projectileCount;
+}   // getNearbyProjectileCount

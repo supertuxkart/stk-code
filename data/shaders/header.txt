@@ -16,15 +16,16 @@ uniform float greenLmn[9];
 uniform float redLmn[9];
 
 #else
-layout (std140) uniform MatrixesData
+
+layout (std140) uniform Matrices
 {
-    mat4 ViewMatrix;
-    mat4 ProjectionMatrix;
-    mat4 InverseViewMatrix;
-    mat4 InverseProjectionMatrix;
-    mat4 ProjectionViewMatrix;
-    mat4 ShadowViewProjMatrixes[4];
-    vec2 screen;
+    mat4 u_view_matrix;
+    mat4 u_projection_matrix;
+    mat4 u_inverse_view_matrix;
+    mat4 u_inverse_projection_matrix;
+    mat4 u_projection_view_matrix;
+    mat4 u_shadow_projection_view_matrices[4];
+    vec2 u_screen;
 };
 
 // Expand because of catalyst (14.12) not correctly associating array in UBO
@@ -63,5 +64,13 @@ layout (std140) uniform LightingData
     float rL21;
     float rL22;
 };
+
+layout (std140) uniform SPFogData
+{
+    // x: fog_start, y: fog_end, z: fog_max, w: fog_density
+    vec4 u_fog_data;
+    vec4 u_fog_color;
+};
+
 #endif
 #endif // HEADER_TXT

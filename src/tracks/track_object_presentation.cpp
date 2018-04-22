@@ -27,10 +27,10 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/mesh_tools.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/stk_mesh_scene_node.hpp"
+#include "graphics/stk_particle.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
@@ -38,6 +38,7 @@
 #include "input/input_manager.hpp"
 #include "items/item_manager.hpp"
 #include "karts/abstract_kart.hpp"
+#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
@@ -176,8 +177,13 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
     ModelDefinitionLoader& model_def_loader)
     : TrackObjectPresentationSceneNode(xml_node)
 {
+    m_parent = NULL;
+    m_start_executed = false;
+    m_reset_executed = false;
+
     std::string name;
     xml_node.get("name", &name);
+    m_name = name;
 
     m_node = irr_driver->getSceneManager()->addEmptySceneNode();
 #ifdef DEBUG
@@ -192,10 +198,7 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
 
     if (!model_def_loader.containsLibraryNode(name))
     {
-        World* world = World::getWorld();
-        Track* track = NULL;
-        if (world != NULL)
-            track = world->getTrack();
+        Track* track = Track::getCurrentTrack();
         std::string local_lib_node_path;
         std::string local_script_file_path;
         if (track != NULL)
@@ -211,13 +214,17 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
             lib_path = track->getTrackFile("library/" + name);
             libroot = file_manager->createXMLTree(local_lib_node_path);
             if (track != NULL)
-                World::getWorld()->getScriptEngine()->loadScript(local_script_file_path, false);
+            {
+                Scripting::ScriptEngine::getInstance()->loadScript(local_script_file_path, false);
+            }
         }
         else if (file_manager->fileExists(lib_node_path))
         {
             libroot = file_manager->createXMLTree(lib_node_path);
             if (track != NULL)
-                World::getWorld()->getScriptEngine()->loadScript(lib_script_file_path, false);
+            {
+                Scripting::ScriptEngine::getInstance()->loadScript(lib_script_file_path, false);
+            }
         }
         else
         {
@@ -233,9 +240,16 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
             return;
         }
 
-        file_manager->pushTextureSearchPath(lib_path + "/");
+        std::string unique_id = StringUtils::insertValues("library/%s", name.c_str());
+        file_manager->pushTextureSearchPath(lib_path + "/", unique_id);
         file_manager->pushModelSearchPath(lib_path);
         material_manager->pushTempMaterial(lib_path + "/materials.xml");
+#ifndef SERVER_ONLY
+        if (CVS->isGLSL())
+        {
+            SP::SPShaderManager::get()->loadSPShaders(lib_path);
+        }
+#endif
         model_def_loader.addToLibrary(name, libroot);
 
         // Load LOD groups
@@ -266,10 +280,49 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
     m_node->updateAbsolutePosition();
 
     assert(libroot != NULL);
-    World::getWorld()->getTrack()->loadObjects(libroot, lib_path, model_def_loader,
-        create_lod_definitions, m_node, parent);
+    Track::getCurrentTrack()->loadObjects(libroot, lib_path, model_def_loader,
+                                          create_lod_definitions, m_node,
+                                          parent);
     m_parent = parent;
 }   // TrackObjectPresentationLibraryNode
+
+// ----------------------------------------------------------------------------
+
+void TrackObjectPresentationLibraryNode::update(float dt)
+{
+    if (!m_start_executed)
+    {
+        m_start_executed = true;
+        std::string fn_name = StringUtils::insertValues("void %s::onStart(const string)", m_name.c_str());
+
+        if (m_parent != NULL)
+        {
+            std::string lib_id = m_parent->getID();
+            std::string* lib_id_ptr = &lib_id;
+
+            Scripting::ScriptEngine::getInstance()->runFunction(false, fn_name,
+                [&](asIScriptContext* ctx) {
+                    ctx->SetArgObject(0, lib_id_ptr);
+                });
+        }
+    }
+    if (!m_reset_executed)
+    {
+        m_reset_executed = true;
+        std::string fn_name = StringUtils::insertValues("void %s::onReset(const string)", m_name.c_str());
+
+        if (m_parent != NULL)
+        {
+            std::string lib_id = m_parent->getID();
+            std::string* lib_id_ptr = &lib_id;
+
+            Scripting::ScriptEngine::getInstance()->runFunction(false, fn_name,
+                [&](asIScriptContext* ctx) {
+                    ctx->SetArgObject(0, lib_id_ptr);
+                });
+        }
+    }
+}
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLibraryNode::~TrackObjectPresentationLibraryNode()
@@ -297,10 +350,11 @@ void TrackObjectPresentationLibraryNode::move(const core::vector3df& xyz, const 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLOD::TrackObjectPresentationLOD(const XMLNode& xml_node,
                                        scene::ISceneNode* parent,
-                                       ModelDefinitionLoader& model_def_loader)
+                                       ModelDefinitionLoader& model_def_loader,
+                                       std::shared_ptr<RenderInfo> ri)
                           : TrackObjectPresentationSceneNode(xml_node)
 {
-    m_node = model_def_loader.instanciateAsLOD(&xml_node, parent);
+    m_node = model_def_loader.instanciateAsLOD(&xml_node, parent, ri);
     if (m_node == NULL) throw std::runtime_error("Cannot load LOD node");
     m_node->setPosition(m_init_xyz);
     m_node->setRotation(m_init_hpr);
@@ -315,10 +369,35 @@ TrackObjectPresentationLOD::~TrackObjectPresentationLOD()
 }   // TrackObjectPresentationLOD
 
 // ----------------------------------------------------------------------------
+void TrackObjectPresentationLOD::reset()
+{
+    LODNode* ln = dynamic_cast<LODNode*>(m_node);
+    if (ln)
+    {
+        for (scene::ISceneNode* node : ln->getAllNodes())
+        {
+            scene::IAnimatedMeshSceneNode* a_node =
+                dynamic_cast<scene::IAnimatedMeshSceneNode*>(node);
+            if (a_node)
+            {
+                a_node->setLoopMode(true);
+                a_node->setAnimationEndCallback(NULL);
+                RandomGenerator rg;
+                int animation_set = 0;
+                if (a_node->getAnimationSetNum() > 0)
+                    animation_set = rg.get(a_node->getAnimationSetNum());
+                a_node->useAnimationSet(animation_set);
+            }
+        }
+    }
+}   // reset
+
+// ----------------------------------------------------------------------------
 TrackObjectPresentationMesh::TrackObjectPresentationMesh(
                                                      const XMLNode& xml_node,
                                                      bool enabled,
-                                                     scene::ISceneNode* parent)
+                                                     scene::ISceneNode* parent,
+                                                     std::shared_ptr<RenderInfo> render_info)
                            : TrackObjectPresentationSceneNode(xml_node)
 {
     m_is_looped  = false;
@@ -329,6 +408,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     std::string model_name;
     xml_node.get("model",   &model_name  );
 
+    m_render_info = render_info;
     m_model_file = model_name;
     m_is_in_skybox = false;
     std::string render_pass;
@@ -343,7 +423,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         m_is_in_skybox = true;
     }
 
-    bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
+    bool animated = skeletal_animation && (UserConfigParams::m_animated_characters ||
                      World::getWorld()->getIdent() == IDENT_CUTSCENE);
     bool displacing = false;
     xml_node.get("displacing", &displacing);
@@ -359,11 +439,6 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         throw std::runtime_error("Model '" + model_name + "' cannot be found");
     }
 
-    if (!animated)
-    {
-        m_mesh = MeshTools::createMeshWithTangents(m_mesh,
-                                                   &MeshTools::isNormalMap);
-    }
     init(&xml_node, parent, enabled);
 }   // TrackObjectPresentationMesh
 
@@ -380,6 +455,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     m_mesh         = NULL;
     m_node         = NULL;
     m_mesh         = model;
+    m_render_info  = NULL;
     init(NULL, NULL, true);
 }   // TrackObjectPresentationMesh
 
@@ -395,24 +471,32 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     m_mesh         = NULL;
     m_node         = NULL;
     m_is_in_skybox = false;
-    bool animated  = (UserConfigParams::m_graphical_effects ||
+    m_render_info  = NULL;
+    bool animated  = (UserConfigParams::m_particles_effects > 1 ||
                       World::getWorld()->getIdent() == IDENT_CUTSCENE);
 
     m_model_file = model_file;
-
+    file_manager->pushTextureSearchPath(StringUtils::getPath(model_file), "");
+#ifndef SERVER_ONLY
     if (file_manager->fileExists(model_file))
     {
         if (animated)
+        {
             m_mesh = irr_driver->getAnimatedMesh(model_file);
+        }
         else
+        {
             m_mesh = irr_driver->getMesh(model_file);
+        }
     }
+#endif
 
     if (!m_mesh)
     {
         throw std::runtime_error("Model '" + model_file + "' cannot be found");
     }
 
+    file_manager->popTextureSearchPath();
     init(NULL, NULL, true);
 }   // TrackObjectPresentationMesh
 
@@ -425,7 +509,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
     if(xml_node)
         xml_node->get("skeletal-animation", &skeletal_animation);
 
-    bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
+    bool animated = skeletal_animation && (UserConfigParams::m_particles_effects > 1 ||
              World::getWorld()->getIdent() == IDENT_CUTSCENE);
     bool displacing = false;
     std::string interaction;
@@ -447,23 +531,19 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
         {
             // Animated
             //m_node = irr_driver->getSceneManager()->addEmptySceneNode();
-            m_node = irr_driver->addMesh(m_mesh, m_model_file, parent);
+            m_node = irr_driver->addMesh(m_mesh, m_model_file, parent, m_render_info);
             enabled = false;
             m_force_always_hidden = true;
-            m_frame_start = 0;
-            m_frame_end = 0;
         }
         else
         {
             // Static
-            m_node = irr_driver->addMesh(m_mesh, m_model_file, parent);
+            m_node = irr_driver->addMesh(m_mesh, m_model_file, parent, m_render_info);
             enabled = false;
             m_force_always_hidden = true;
-            m_frame_start = 0;
-            m_frame_end = 0;
-
-            if (World::getWorld() && World::getWorld()->getTrack() && xml_node)
-                World::getWorld()->getTrack()->addPhysicsOnlyNode(m_node);
+            Track *track = Track::getCurrentTrack();
+            if (track && track && xml_node)
+                track->addPhysicsOnlyNode(m_node);
         }
     }
     else if (m_is_in_skybox)
@@ -482,39 +562,39 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
     {
         scene::IAnimatedMeshSceneNode *node =
             irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_mesh,
-                                        m_model_file, parent);
+                                        m_model_file, parent, m_render_info);
         m_node = node;
 
-        m_frame_start = node->getStartFrame();
+        std::vector<int> frames_start;
         if (xml_node)
-            xml_node->get("frame-start", &m_frame_start);
+            xml_node->get("frame-start", &frames_start);
 
-        m_frame_end = node->getEndFrame();
+        std::vector<int> frames_end;
         if (xml_node)
-            xml_node->get("frame-end", &m_frame_end);
+            xml_node->get("frame-end", &frames_end);
 
-        if (World::getWorld() && World::getWorld()->getTrack() && xml_node)
-            World::getWorld()->getTrack()
-            ->handleAnimatedTextures(m_node, *xml_node);
+        if (frames_start.empty() && frames_end.empty())
+        {
+            frames_start.push_back(node->getStartFrame());
+            frames_end.push_back(node->getEndFrame());
+        }
+        assert(frames_start.size() == frames_end.size());
+        for (unsigned int i = 0 ; i < frames_start.size() ; i++)
+             node->addAnimationSet(frames_start[i], frames_end[i]);
+        node->useAnimationSet(0);
+
+        Track *track = Track::getCurrentTrack();
+        if (track && track && xml_node)
+            track->handleAnimatedTextures(m_node, *xml_node);
+        Track::uploadNodeVertexBuffer(node);
     }
     else
     {
-        bool displacing = false;
-        if (xml_node)
-            xml_node->get("displacing", &displacing);
-
-        m_node = irr_driver->addMesh(m_mesh, m_model_file, parent);
-
-        STKMeshSceneNode* stkmesh = dynamic_cast<STKMeshSceneNode*>(m_node);
-        if (displacing && stkmesh != NULL)
-            stkmesh->setIsDisplacement(displacing);
-
-        m_frame_start = 0;
-        m_frame_end = 0;
-
-        if (World::getWorld() && World::getWorld()->getTrack() && xml_node)
-            World::getWorld()->getTrack()
-                             ->handleAnimatedTextures(m_node, *xml_node);
+        m_node = irr_driver->addMesh(m_mesh, m_model_file, parent, m_render_info);
+        Track *track = Track::getCurrentTrack();
+        if (track && xml_node)
+            track->handleAnimatedTextures(m_node, *xml_node);
+        Track::uploadNodeVertexBuffer(m_node);
     }
 
     if(!enabled)
@@ -552,6 +632,7 @@ void TrackObjectPresentationMesh::reset()
         a_node->setRotation(m_init_hpr);
         a_node->setScale(m_init_scale);
         a_node->setLoopMode(m_is_looped);
+        a_node->setAnimationEndCallback(NULL);
         a_node->setCurrentFrame((float)(a_node->getStartFrame()));
 
         // trick to reset the animation AND also the timer inside it
@@ -560,52 +641,13 @@ void TrackObjectPresentationMesh::reset()
 
         // irrlicht's "setFrameLoop" is a misnomer, it just sets the first and
         // last frame, even if looping is disabled
-        a_node->setFrameLoop(m_frame_start, m_frame_end);
+        RandomGenerator rg;
+        int animation_set = 0;
+        if (a_node->getAnimationSetNum() > 0)
+            animation_set = rg.get(a_node->getAnimationSetNum());
+        a_node->useAnimationSet(animation_set);
     }
 }   // reset
-
-// ----------------------------------------------------------------------------
-int TrackObjectPresentationMesh::getCurrentFrame()
-{
-    if (m_node->getType() == scene::ESNT_ANIMATED_MESH)
-    {
-        scene::IAnimatedMeshSceneNode *a_node =
-            (scene::IAnimatedMeshSceneNode*)m_node;
-
-        return (int)a_node->getFrameNr();
-    }
-    return -1; //Not a skeletal animation
-}   // getCurrentFrame
-
-// ----------------------------------------------------------------------------
-void TrackObjectPresentationMesh::setCurrentFrame(int frame)
-{
-    if (m_node->getType() == scene::ESNT_ANIMATED_MESH)
-    {
-        scene::IAnimatedMeshSceneNode *a_node =
-            (scene::IAnimatedMeshSceneNode*)m_node;
-
-        a_node->setCurrentFrame((f32)frame);
-    }
-}   // setCurrentFrame
-
-// ----------------------------------------------------------------------------
-/** Set custom loops, as well as pause by scripts.
- *  \param start Start frame.
- *  \param end End frame.
- */
-void TrackObjectPresentationMesh::setLoop(int start, int end)
-{
-    if (m_node->getType() == scene::ESNT_ANIMATED_MESH)
-    {
-        scene::IAnimatedMeshSceneNode *a_node =
-            (scene::IAnimatedMeshSceneNode*)m_node;
-
-        // irrlicht's "setFrameLoop" is a misnomer, it just sets the first and
-        // last frame, even if looping is disabled
-        a_node->setFrameLoop(start, end);
-    }
-}   // setLoop
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationSound::TrackObjectPresentationSound(
@@ -639,7 +681,7 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(
     xml_node.get("max_dist", &max_dist );
 
     // first try track dir, then global dir
-    std::string soundfile = World::getWorld()->getTrack()->getTrackFile(sound);
+    std::string soundfile = Track::getCurrentTrack()->getTrackFile(sound);
     //std::string soundfile = file_manager->getAsset(FileManager::MODEL,sound);
     if (!file_manager->fileExists(soundfile))
     {
@@ -768,25 +810,16 @@ TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(
         xml_node.get("start",  &m_fade_out_start);
         xml_node.get("end",    &m_fade_out_end  );
     }
-
-    video::ITexture* texture =
-        irr_driver->getTexture(file_manager->searchTexture(texture_name));
-    if (texture == NULL)
-    {
-        Log::warn("TrackObjectPresentation", "Billboard texture '%s' not found",
-                  texture_name.c_str());
-    }
     m_node = irr_driver->addBillboard(core::dimension2df(width, height),
-                                      texture, parent);
-    Material *stk_material = material_manager->getMaterial(texture_name);
-    stk_material->setMaterialProperties(&(m_node->getMaterial(0)), NULL);
-
+                                      texture_name, parent);
     m_node->setPosition(m_init_xyz);
 }   // TrackObjectPresentationBillboard
 
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationBillboard::update(float dt)
 {
+    if (ProfileWorld::isNoGraphics()) return;
+#ifndef SERVER_ONLY
     if (m_fade_out_when_close)
     {
         scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()
@@ -811,6 +844,7 @@ void TrackObjectPresentationBillboard::update(float dt)
             node->setColor(video::SColor(a, 255, 255, 255));
         }
     }   // m_fade_out_when_close
+#endif
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -828,7 +862,6 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(
 {
     m_emitter = NULL;
     m_lod_emitter_node = NULL;
-
     std::string path;
     xml_node.get("kind", &path);
     
@@ -842,6 +875,7 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(
     m_delayed_stop = false;
     m_delayed_stop_time = 0.0;
 
+#ifndef SERVER_ONLY
     try
     {
         ParticleKind* kind = ParticleKindManager::get()->getParticles(path);
@@ -878,6 +912,7 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(
         Log::warn ("Track", "Could not load particles '%s'; cause :\n    %s",
                    path.c_str(), e.what());
     }
+#endif
 }   // TrackObjectPresentationParticles
 
 // ----------------------------------------------------------------------------
@@ -916,20 +951,23 @@ void TrackObjectPresentationParticles::update(float dt)
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationParticles::triggerParticles()
 {
+#ifndef SERVER_ONLY
     if (m_emitter != NULL)
     {
         m_emitter->setCreationRateAbsolute(1.0f);
         m_emitter->setParticleType(m_emitter->getParticlesInfo());
     }
+#endif
 }   // triggerParticles
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationParticles::stop()
 {
+#ifndef SERVER_ONLY
     if (m_emitter != NULL)
     {
         m_emitter->setCreationRateAbsolute(0.0f);
-        m_emitter->clearParticles();
     }
+#endif
 }
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationParticles::stopIn(double delay)
@@ -940,18 +978,22 @@ void TrackObjectPresentationParticles::stopIn(double delay)
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationParticles::setRate(float rate)
 {
+#ifndef SERVER_ONLY
     if (m_emitter != NULL)
     {
         m_emitter->setCreationRateAbsolute(rate);
         m_emitter->setParticleType(m_emitter->getParticlesInfo());
     }
-}
+#endif
+}   // setRate
+
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLight::TrackObjectPresentationLight(
                                                      const XMLNode& xml_node, 
                                                      scene::ISceneNode* parent)
                             : TrackObjectPresentationSceneNode(xml_node)
 {
+    m_color.set(0);
     xml_node.get("color", &m_color);
     const video::SColorf colorf(m_color);
 
@@ -960,7 +1002,7 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(
 
     m_distance = 20.f * m_energy;
     xml_node.get("distance", &m_distance);
-
+#ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
         m_node = irr_driver->addLight(m_init_xyz, m_energy, m_distance,
@@ -968,6 +1010,7 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(
                                       parent);
     }
     else
+#endif
     {
         m_node = NULL; // lights require shaders to work
     }
@@ -988,8 +1031,16 @@ void TrackObjectPresentationLight::setEnergy(float energy)
     }
 }
 // ----------------------------------------------------------------------------
+void TrackObjectPresentationLight::setEnable(bool enabled)
+{
+    if (m_node != NULL)
+        m_node->setVisible(enabled);
+}   // setEnable
+
+// ----------------------------------------------------------------------------
 TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
-                                                       const XMLNode& xml_node)
+                                                     const XMLNode& xml_node,
+                                                     TrackObject* parent)
                                     :  TrackObjectPresentation(xml_node)
 {
     float trigger_distance = 1.0f;
@@ -1010,11 +1061,36 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
     {
         assert(false);
     }
+    m_xml_reenable_timeout = 999999.9f;
+    xml_node.get("reenable-timeout", &m_xml_reenable_timeout);
+    m_reenable_timeout = 0.0f;
 
-    m_action_active = true;
-
-    if (m_action.size() == 0)
+    if (m_action.empty())
+    {
         Log::warn("TrackObject", "Action-trigger has no action defined.");
+        return;
+    }
+
+    if (parent != NULL)
+    {
+        core::vector3df parent_xyz = parent->getInitXYZ();
+        core::vector3df parent_rot = parent->getInitRotation();
+        core::vector3df parent_scale = parent->getInitScale();
+        core::matrix4 lm, sm, rm;
+        lm.setTranslation(parent_xyz);
+        sm.setScale(parent_scale);
+        rm.setRotationDegrees(parent_rot);
+        core::matrix4 abs_trans = lm * rm * sm;
+
+        m_library_id = parent->getID();
+        m_library_name = parent->getName();
+        xml_node.get("triggered-object", &m_triggered_object);
+        if (!m_library_id.empty() && !m_triggered_object.empty() &&
+            !m_library_name.empty())
+        {
+            abs_trans.transformVect(m_init_xyz);
+        }
+    }
 
     if (m_type == TRIGGER_TYPE_POINT)
     {
@@ -1044,7 +1120,8 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
     m_init_scale           = core::vector3df(1, 1, 1);
     float trigger_distance = distance;
     m_action               = script_name;
-    m_action_active        = true;
+    m_xml_reenable_timeout = 999999.9f;
+    m_reenable_timeout     = 0.0f;
     m_type                 = TRIGGER_TYPE_POINT;
     ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
 }   // TrackObjectPresentationActionTrigger
@@ -1052,15 +1129,36 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationActionTrigger::onTriggerItemApproached()
 {
-    if (!m_action_active) return;
+    if (m_reenable_timeout > 0.0f)
+    {
+        return;
+    }
+    m_reenable_timeout = m_xml_reenable_timeout;
 
-    Scripting::ScriptEngine* script_engine =
-        World::getWorld()->getScriptEngine();
-    m_action_active = false; // TODO: allow auto re-activating?
-    int idKart = 0;
+    int kart_id = 0;
     Camera* camera = Camera::getActiveCamera();
     if (camera != NULL && camera->getKart() != NULL)
-        idKart = camera->getKart()->getWorldKartId();
-    script_engine->runFunction(true, "void " + m_action + "(int)",
-        [=](asIScriptContext* ctx) { ctx->SetArgDWord(0, idKart); });
+    {
+        kart_id = camera->getKart()->getWorldKartId();
+    }
+    if (!m_library_id.empty() && !m_triggered_object.empty() &&
+        !m_library_name.empty())
+    {
+        Scripting::ScriptEngine::getInstance()->runFunction(true, "void "
+            + m_library_name + "::" + m_action +
+            "(int, const string, const string)", [=](asIScriptContext* ctx)
+            {
+                ctx->SetArgDWord(0, kart_id);
+                ctx->SetArgObject(1, &m_library_id);
+                ctx->SetArgObject(2, &m_triggered_object);
+            });
+    }
+    else
+    {
+        Scripting::ScriptEngine::getInstance()->runFunction(true,
+            "void " + m_action + "(int)", [=](asIScriptContext* ctx)
+            {
+                ctx->SetArgDWord(0, kart_id);
+            });
+    }
 }   // onTriggerItemApproached

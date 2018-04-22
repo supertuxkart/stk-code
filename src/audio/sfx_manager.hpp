@@ -122,6 +122,9 @@ private:
         /** The sound effect for which the command should be executed. */
         SFXBase *m_sfx;
 
+        /** The sound buffer to play (null = no change) */
+        SFXBuffer *m_buffer = NULL;
+
         /** Stores music information for music commands. */
         MusicInformation *m_music_information;
 
@@ -232,12 +235,14 @@ private:
 public:
     static void create();
     static void destroy();
-    void queue(SFXCommands command,  SFXBase *sfx=NULL);
-    void queue(SFXCommands command,  SFXBase *sfx, float f);
-    void queue(SFXCommands command,  SFXBase *sfx, const Vec3 &p);
-    void queue(SFXCommands command,  SFXBase *sfx, float f, const Vec3 &p);
-    void queue(SFXCommands command,  MusicInformation *mi);
-    void queue(SFXCommands command,  MusicInformation *mi, float f);
+    void queue(SFXCommands command, SFXBase *sfx=NULL);
+    void queue(SFXCommands command, SFXBase *sfx, float f);
+    void queue(SFXCommands command, SFXBase *sfx, const Vec3 &p);
+    void queue(SFXCommands command, SFXBase *sfx, float f, const Vec3 &p);
+    void queue(SFXCommands command, MusicInformation *mi);
+    void queue(SFXCommands command, MusicInformation *mi, float f);
+    void queue(SFXCommands command, SFXBase *sfx, const Vec3 &p, SFXBuffer* buffer);
+
     // ------------------------------------------------------------------------
     /** Static function to get the singleton sfx manager. */
     static SFXManager *get()
@@ -296,6 +301,9 @@ public:
     /** Returns the current position of the listener. */
     Vec3 getListenerPos() const { return m_listener_position.getData(); }
 
+    // ------------------------------------------------------------------------
+
+    SFXBuffer* getBuffer(const std::string &name);
 };
 
 #endif // HEADER_SFX_MANAGER_HPP

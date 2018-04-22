@@ -21,7 +21,11 @@
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "config/hardware_stats.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "font/bold_face.hpp"
+#include "font/font_manager.hpp"
+#include "font/regular_face.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -49,8 +53,6 @@
 
 using namespace GUIEngine;
 using namespace Online;
-
-DEFINE_SCREEN_SINGLETON( OptionsScreenUI );
 
 // -----------------------------------------------------------------------------
 
@@ -124,6 +126,13 @@ void OptionsScreenUI::init()
     assert( skinSelector != NULL );
 
     // ---- video modes
+    CheckBoxWidget* splitscreen_method = getWidget<CheckBoxWidget>("split_screen_horizontally");
+    assert(splitscreen_method != NULL);
+    splitscreen_method->setState(UserConfigParams::split_screen_horizontally);
+
+    //Forbid changing this setting in game
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+    splitscreen_method->setActive(!in_game);
 
     CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
     assert( fps != NULL );
@@ -137,6 +146,9 @@ void OptionsScreenUI::init()
     LabelWidget *stats_label = getWidget<LabelWidget>("label-hw-report");
     assert( stats_label );
             stats->setState(UserConfigParams::m_hw_report_enable);
+
+    getWidget<CheckBoxWidget>("enable-lobby-chat")
+        ->setState(UserConfigParams::m_lobby_chat);
 
     if(news->getState())
     {
@@ -161,11 +173,12 @@ void OptionsScreenUI::init()
     // --- select the right skin in the spinner
     bool currSkinFound = false;
     const int skinCount = (int) m_skins.size();
+    std::string user_skin = StringUtils::toLowerCase(UserConfigParams::m_skin_file.c_str());
     for (int n=0; n<skinCount; n++)
     {
-        const std::string skinFileName = StringUtils::getBasename(m_skins[n]);
+        const std::string skinFileName = StringUtils::toLowerCase(StringUtils::getBasename(m_skins[n]));
 
-        if (UserConfigParams::m_skin_file.c_str() == skinFileName)
+        if (user_skin == skinFileName)
         {
             skinSelector->setValue(n);
             currSkinFound = true;
@@ -215,6 +228,7 @@ void OptionsScreenUI::init()
     // Forbid changing language while in-game, since this crashes (changing the language involves
     // tearing down and rebuilding the menu stack. not good when in-game)
     list_widget->setActive(StateManager::get()->getGameState() != GUIEngine::INGAME_MENU);
+    
 
 }   // init
 
@@ -253,6 +267,13 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         UserConfigParams::m_skin_file = core::stringc(selectedSkin.c_str()).c_str() + std::string(".stkskin");
         GUIEngine::reloadSkin();
     }
+    else if (name == "split_screen_horizontally")
+    {
+        CheckBoxWidget* split_screen_horizontally = getWidget<CheckBoxWidget>("split_screen_horizontally");
+        assert(split_screen_horizontally != NULL);
+        UserConfigParams::split_screen_horizontally = split_screen_horizontally->getState();
+
+    }
     else if (name == "showfps")
     {
         CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
@@ -269,21 +290,30 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         // If internet gets enabled, re-initialise the addon manager (which
         // happens in a separate thread) so that news.xml etc can be
         // downloaded if necessary.
-        CheckBoxWidget *stats = getWidget<CheckBoxWidget>("enable-hw-report");
-        LabelWidget *stats_label = getWidget<LabelWidget>("label-hw-report");
+        CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
+        LabelWidget* stats_label = getWidget<LabelWidget>("label-hw-report");
+        CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
+        LabelWidget* chat_label = getWidget<LabelWidget>("label-lobby-chat");
         if(internet->getState())
         {
             NewsManager::get()->init(false);
             stats->setVisible(true);
             stats_label->setVisible(true);
             stats->setState(UserConfigParams::m_hw_report_enable);
+            chat->setVisible(true);
+            stats->setState(UserConfigParams::m_lobby_chat);
+            chat_label->setVisible(true);
         }
         else
         {
+            chat->setVisible(false);
+            chat_label->setVisible(false);
             stats->setVisible(false);
             stats_label->setVisible(false);
+            PlayerProfile* profile = PlayerManager::getCurrentPlayer();
+            if (profile != NULL && profile->isLoggedIn())
+                profile->requestSignOut();
         }
-
     }
     else if (name=="enable-hw-report")
     {
@@ -291,6 +321,11 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         UserConfigParams::m_hw_report_enable = stats->getState();
         if(stats->getState())
             HardwareStats::reportHardwareStats();
+    }
+    else if (name=="enable-lobby-chat")
+    {
+        CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
+        UserConfigParams::m_lobby_chat = chat->getState();
     }
     else if (name=="show-login")
     {
@@ -331,17 +366,16 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 
         translations = new Translations();
 
-        //Reload fonts for new translation
-        GUIEngine::cleanHollowCopyFont();
-        GUIEngine::getTitleFont()->recreateFromLanguage();
-        GUIEngine::getFont()->recreateFromLanguage();
-        GUIEngine::reloadHollowCopyFont(GUIEngine::getFont());
-
+        // Reload fonts for new translation
         GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
 
+        font_manager->getFont<BoldFace>()->reset();
+        font_manager->getFont<RegularFace>()->reset();
         GUIEngine::getFont()->updateRTL();
         GUIEngine::getTitleFont()->updateRTL();
         GUIEngine::getSmallFont()->updateRTL();
+        GUIEngine::getLargeFont()->updateRTL();
+        GUIEngine::getOutlineFont()->updateRTL();
 
         UserConfigParams::m_language = selection.c_str();
         user_config->saveConfig();

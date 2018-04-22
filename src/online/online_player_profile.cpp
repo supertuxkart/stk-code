@@ -23,6 +23,7 @@
 #include "config/user_config.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/screen.hpp"
+#include "network/network_config.hpp"
 #include "online/online_profile.hpp"
 #include "online/profile_manager.hpp"
 #include "states_screens/main_menu_screen.hpp"
@@ -91,10 +92,9 @@ namespace Online
     /** Request a login using the saved credentials of the user. */
     void OnlinePlayerProfile::requestSavedSession()
     {
-        SignInRequest *request = NULL;
         if (m_online_state == OS_SIGNED_OUT && hasSavedSession())
         {
-            request = new SignInRequest(true);
+            SignInRequest *request = new SignInRequest(true);
             setUserDetails(request, "saved-session");
 
             // The userid must be taken from the saved data,
@@ -111,15 +111,14 @@ namespace Online
      *  \param username Name of user.
      *  \param password Password.
      */
-    OnlinePlayerProfile::SignInRequest*
-        OnlinePlayerProfile::requestSignIn(const core::stringw &username,
+    void OnlinePlayerProfile::requestSignIn(const core::stringw &username,
                                            const core::stringw &password)
     {
         // If the player changes the online account, there can be a
         // logout stil happening.
         assert(m_online_state == OS_SIGNED_OUT ||
                m_online_state == OS_SIGNING_OUT);
-        SignInRequest * request = new SignInRequest(false);
+        SignInRequest * request = new SignInRequest(true);
 
         // We can't use setUserDetail here, since there is no token yet
         request->setApiURL(API::USER_PATH, "connect");
@@ -130,8 +129,6 @@ namespace Online
                                                  : "false");
         request->queue();
         m_online_state = OS_SIGNING_IN;
-
-        return request;
     }   // requestSignIn
 
     // ------------------------------------------------------------------------
@@ -209,9 +206,21 @@ namespace Online
             core::stringw username("");
             uint32_t userid(0);
 
+#ifdef DEBUG
             int token_fetched       = input->get("token", &m_token);
             int username_fetched    = input->get("username", &username);
             int userid_fetched      = input->get("userid", &userid);
+            assert(token_fetched && username_fetched && userid_fetched);
+#else
+            input->get("token", &m_token);
+            input->get("username", &username);
+            input->get("userid", &userid);
+#endif
+            if (NetworkConfig::get()->getServerIdFile().empty())
+            {
+                NetworkConfig::get()->setCurrentUserId(userid);
+                NetworkConfig::get()->setCurrentUserToken(m_token);
+            }
             setLastOnlineName(username);
 
             OnlineProfile* profile = new OnlineProfile(userid, username, true);
@@ -219,7 +228,6 @@ namespace Online
             // existing profile, and then delete profile. Only the returned
             // pointer is save to use.
             m_profile = ProfileManager::get()->addPersistent(profile);
-            assert(token_fetched && username_fetched && userid_fetched);
             m_online_state = OS_SIGNED_IN;
             if(rememberPassword())
             {

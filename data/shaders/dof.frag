@@ -9,15 +9,15 @@ float range = 100.;
 
 void main()
 {
-    vec2 uv = gl_FragCoord.xy / screen;
+    vec2 uv = gl_FragCoord.xy / u_screen;
     float curdepth = texture(dtex, uv).x;
-    vec4 FragPos = InverseProjectionMatrix * (2.0f * vec4(uv, curdepth, 1.0f) - 1.0f);
+    vec4 FragPos = u_inverse_projection_matrix * (2.0 * vec4(uv, curdepth, 1.0) - 1.0);
     FragPos /= FragPos.w;
 
     float depth = FragPos.z;
     float blur = clamp(abs(depth - focalDepth) / range, -maxblur, maxblur);
 
-    vec2 offset = 10. / screen;
+    vec2 offset = 10. / u_screen;
 
     vec4 col = texture(tex, uv);
     vec4 colOriginal = col;
@@ -70,7 +70,7 @@ void main()
     col = vec4(col.rgb / 41.0, col.a);
     depth = clamp(max(1.1666 - (FragPos.z/240.0), FragPos.z - 2000.0), 0., 1.);
     
-    vec3 final = colOriginal.rgb * depth + col.rgb * (1 - depth);
+    vec3 final = colOriginal.rgb * depth + col.rgb * (1. - depth);
 
     FragColor = vec4(final, colOriginal.a);
 }

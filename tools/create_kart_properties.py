@@ -28,7 +28,7 @@ import sys
 # Each line contains a topic and the attributes of that topic.
 # This model is used for the xml file and to access the kart properties in the code.
 characteristics = """Suspension: stiffness, rest, travel, expSpringResponse(bool), maxForce
-Stability: rollInfluence, chassisLinearDamping, chassisAngularDamping, downwardImpulseFactor, trackConnectionAccel, smoothFlyingImpulse
+Stability: rollInfluence, chassisLinearDamping, chassisAngularDamping, downwardImpulseFactor, trackConnectionAccel, angularFactor(std::vector<float>/floatVector), smoothFlyingImpulse
 Turn: radius(InterpolationArray), timeResetSteer, timeFullSteer(InterpolationArray)
 Engine: power, maxSpeed, brakeFactor, brakeTimeIncrease, maxSpeedReverseRatio
 Gear: switchRatio(std::vector<float>/floatVector), powerIncrease(std::vector<float>/floatVector)
@@ -38,7 +38,8 @@ Camera: distance, forwardUpAngle, backwardUpAngle
 Jump: animationTime
 Lean: max, speed
 Anvil: duration, weight, speedFactor
-Parachute: friction, duration, durationOther, lboundFraction, uboundFraction, maxSpeed
+Parachute: friction, duration, durationOther, durationRankMult, durationSpeedMult, lboundFraction, uboundFraction, maxSpeed
+Friction: kartFriction
 Bubblegum: duration, speedFraction, torque, fadeInTime, shieldDuration
 Zipper: duration, force, speedGain, maxSpeedIncrease, fadeOutTime
 Swatter: duration, distance, squashDuration, squashSlowdown
@@ -47,7 +48,7 @@ Startup: time(std::vector<float>/floatVector), boost(std::vector<float>/floatVec
 Rescue: duration, vertOffset, height
 Explosion: duration, radius, invulnerabilityTime
 Nitro: duration, engineForce, consumption, smallContainer, bigContainer, maxSpeedIncrease, fadeOutTime, max
-Slipstream: duration, length, width, collectTime, useTime, addPower, minSpeed, maxSpeedIncrease, fadeOutTime
+Slipstream: durationFactor, baseSpeed, length, width, innerFactor, minCollectTime, maxCollectTime, addPower, minSpeed, maxSpeedIncrease, fadeOutTime
 Skid: increase, decrease, max, timeTillMax, visual, visualTime, revertVisualTime, minSpeed, timeTillBonus(std::vector<float>/floatVector), bonusSpeed(std::vector<float>/floatVector), bonusTime(std::vector<float>/floatVector), bonusForce(std::vector<float>/floatVector), physicalJumpTime, graphicalJumpTime, postSkidRotateFactor, reduceTurnMin, reduceTurnMax, enabled(bool)"""
 
 """ A GroupMember is an attribute of a group.
@@ -245,7 +246,7 @@ functions = {
     "getName":  (createGetName,  "Implement the getName function",                         "karts/abstract_characteristic.cpp"),
     "kpdefs":   (createKpDefs,   "Create the header function definitions for the getters", "karts/kart_properties.hpp"),
     "kpgetter": (createKpGetter, "Implement the getters",                                  "karts/kart_properties.cpp"),
-    "loadXml":  (createLoadXml,  "Code to load the characteristics from an xml file",      "karts/xml_characteristic.hpp"),
+    "loadXml":  (createLoadXml,  "Code to load the characteristics from an xml file",      "karts/xml_characteristic.cpp"),
 }
 
 def main():
@@ -282,4 +283,3 @@ Operations:""")
 
 if __name__ == '__main__':
     main()
-

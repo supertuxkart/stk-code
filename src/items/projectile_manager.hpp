@@ -52,19 +52,23 @@ private:
      *  being shown or have a sfx playing. */
     HitEffects       m_active_hit_effects;
 
-    void             updateServer(float dt);
+    void             updateServer(int ticks);
 public:
                      ProjectileManager() {}
                     ~ProjectileManager() {}
     void             loadData         ();
     void             cleanup          ();
-    void             update           (float dt);
+    void             update           (int ticks);
+    void             updateGraphics   (float dt);
     Flyable*         newProjectile    (AbstractKart *kart,
                                        PowerupManager::PowerupType type);
     void             Deactivate       (Flyable *p) {}
     void             removeTextures   ();
     bool             projectileIsClose(const AbstractKart * const kart,
                                        float radius);
+
+    int              getNearbyProjectileCount(const AbstractKart * const kart,
+                                       float radius, PowerupManager::PowerupType type);
     // ------------------------------------------------------------------------
     /** Adds a special hit effect to be shown.
      *  \param hit_effect The hit effect to be added. */

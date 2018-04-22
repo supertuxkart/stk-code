@@ -22,33 +22,6 @@
 #include <math.h>
 #include <algorithm>
 
-float clampf(float in, float low, float high) {
-    return in > high ? high : in < low ? low : in;
-}
-
-unsigned ispow(const unsigned in) {
-
-    if (in < 2) return 0;
-
-    return !(in & (in - 1));
-}
-
-// Simple 8-bit hash
-u8 shash8(const u8 * const data, const u16 size) {
-
-    u32 out = data[0], i;
-
-    for (i = 1; i < size; i++) {
-        out += data[i] * ((i + 1) ^ data[i - 1]);
-    }
-
-    out %= 307; // prime
-    out %= 256; // eight bits
-
-    return out;
-}
-
-
 /*
 
 Copyright (C) 2011 by-2015 Ashima Arts (Simplex noise)

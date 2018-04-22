@@ -19,12 +19,10 @@
 #include "karts/explosion_animation.hpp"
 
 #include "audio/sfx_manager.hpp"
-#include "graphics/callbacks.hpp"
 #include "graphics/camera.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
-#include "modes/world.hpp"
 #include "tracks/track.hpp"
 
 /** A static create function that does only create an explosion if
@@ -76,7 +74,8 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
                   : AbstractKartAnimation(kart, "ExplosionAnimation")
  {
     m_xyz = m_kart->getXYZ();
-    m_orig_y = m_xyz.getY();
+    m_orig_xyz = m_xyz;
+    m_normal = m_kart->getNormal();
     m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
     m_timer = m_kart->getKartProperties()->getExplosionDuration();
 
@@ -90,7 +89,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     // Since v(explosion_time*0.5) = 0, the following forumla computes
     // the right initial velocity for a kart to land back after
     // the specified time.
-    m_velocity = 0.5f * m_timer * World::getWorld()->getTrack()->getGravity();
+    m_velocity = 0.5f * m_timer * Track::getCurrentTrack()->getGravity();
 
     m_curr_rotation.setHeading(m_kart->getHeading());
     m_curr_rotation.setPitch(m_kart->getPitch());
@@ -106,7 +105,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
 
     // Set invulnerable time, and graphical effects
     float t = m_kart->getKartProperties()->getExplosionInvulnerabilityTime();
-    m_kart->setInvulnerableTime(t);
+    m_kart->setInvulnerableTicks(stk_config->time2Ticks(t));
     m_kart->showStarEffect(t);
     
     m_kart->getAttachment()->clear();
@@ -127,7 +126,7 @@ ExplosionAnimation::~ExplosionAnimation()
         for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
             Camera *camera = Camera::getCamera(i);
-            if(camera->getMode() != Camera::CM_FINAL)
+            if(camera->getType() != Camera::CM_TYPE_END)
                 camera->setMode(Camera::CM_NORMAL);
         }
     }
@@ -140,14 +139,13 @@ ExplosionAnimation::~ExplosionAnimation()
  */
 void ExplosionAnimation::update(float dt)
 {
-    m_velocity -= dt*World::getWorld()->getTrack()->getGravity();
-
-    m_xyz.setY(m_xyz.getY() + dt*m_velocity);
+    m_velocity -= dt*Track::getCurrentTrack()->getGravity();
+    m_xyz = m_xyz + dt*m_velocity*m_normal;
 
     // Make sure the kart does not end up under the track
-    if(m_xyz.getY()<m_orig_y)
+    if ((m_xyz - m_orig_xyz).dot(m_normal)<0)
     {
-        m_xyz.setY(m_orig_y);
+        m_xyz = m_orig_xyz;
         // This will trigger the end of the animations
         m_timer = -1;
     }

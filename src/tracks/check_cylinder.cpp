@@ -46,16 +46,16 @@ CheckCylinder::CheckCylinder(const XMLNode &node, unsigned int index, TriggerIte
 }   // CheckCylinder
 
 // ----------------------------------------------------------------------------
-/** True if going from old_pos to new_pos enters or leaves this sphere. This
+/** True if going from old_pos to new_pos enters or leaves this cylinder. This
  *  function is called from update (of the checkline structure). It also
  *  updates the flag about which karts are inside
  *  \param old_pos  Position in previous frame.
  *  \param new_pos  Position in current frame.
- *  \param kart_id     Index of the kart, can be used to store kart specific
+ *  \param kart_id  Index of the kart, can be used to store kart specific
  *                  additional data.
  */
 bool CheckCylinder::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
-                                unsigned int kart_id)
+                                int kart_id)
 {
     // TODO: this is the code for a sphere, rewrite for cylinder
     Vec3 old_pos_xz(old_pos.x(), 0.0f, old_pos.z());

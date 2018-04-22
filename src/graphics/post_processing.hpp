@@ -18,100 +18,89 @@
 #ifndef HEADER_POST_PROCESSING_HPP
 #define HEADER_POST_PROCESSING_HPP
 
-#include "IShaderConstantSetCallBack.h"
-#include "S3DVertex.h"
-#include "SMaterial.h"
-#include "graphics/camera.hpp"
+#include "graphics/gl_headers.hpp"
+
+#include <S3DVertex.h>
+#include <matrix4.h>
+#include <vector>
 
 class FrameBuffer;
-
-#include <vector>
+class RTT;
+class STKTexture;
 
 namespace irr
 {
-    namespace video { class IVideoDriver;   class ITexture; }
+    namespace video { class IVideoDriver; }
+    namespace scene { class ICameraSceneNode; }
 }
+
 using namespace irr;
 
 /** \brief   Handles post processing, eg motion blur
  *  \ingroup graphics
  */
-class PostProcessing: public IReferenceCounted
+class PostProcessing
 {
 private:
-    video::SMaterial    m_material;
-
     /** Boost time, how long the boost should be displayed. This also
      *  affects the strength of the effect: longer boost time will
      *  have a stronger effect. */
     std::vector<float>  m_boost_time;
 
-    bool m_any_boost;
-
-    /** The center of blurring, in texture coordinates [0,1]).*/
-    std::vector<core::vector2df> m_center;
-
-    /** The center to which the blurring is aimed at, in [0,1]. */
-    std::vector<core::vector2df> m_direction;
-
-    struct Quad { video::S3DVertex v0, v1, v2, v3; };
-
-    /** The vertices for the rectangle used for each camera. This includes
-     *  the vertex position, normal, and texture coordinate. */
-    std::vector<Quad> m_vertices;
-
-    video::ITexture *m_areamap;
-
-    void setMotionBlurCenterY(const u32 num, const float y);
+    STKTexture* m_areamap;
 
 public:
-                 PostProcessing(video::IVideoDriver* video_driver);
-    virtual     ~PostProcessing();
+                 PostProcessing();
+    virtual     ~PostProcessing() {}
 
     void         reset();
     /** Those should be called around the part where we render the scene to be
      *  post-processed */
-    void         begin();
+    void         begin() {}
     void         update(float dt);
 
-    /** Generate diffuse and specular map */
-    void         renderSunlight(const core::vector3df &direction,
-                                const video::SColorf &col);
-
-    void renderSSAO();
-    void renderEnvMap(unsigned skycubemap);
-    void renderRHDebug(unsigned SHR, unsigned SHG, unsigned SHB, 
-                       const core::matrix4 &rh_matrix,
-                       const core::vector3df &rh_extend);
-    void renderGI(const core::matrix4 &rh_matrix,
-                  const core::vector3df &rh_extend,
-                  const FrameBuffer &fb);
+    void renderBloom(GLuint in);
+    void renderSSAO(const FrameBuffer& linear_depth_framebuffer,
+                    const FrameBuffer& ssao_framebuffer,
+                    GLuint depth_stencil_texture);
     /** Blur the in texture */
-    void renderGaussian3Blur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary);
+    void renderGaussian3Blur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary) const;
 
     void renderGaussian6Blur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary,
-                              float sigmaV, float sigmaH);
-	void renderHorizontalBlur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary);
+                              float sigmaV, float sigmaH) const;
+	void renderHorizontalBlur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary) const;
 
-    void renderGaussian6BlurLayer(FrameBuffer &in_fbo, size_t layer,
-                                  float sigmaH, float sigmaV);
-    void renderGaussian17TapBlur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary);
+    void renderGaussian17TapBlur(const FrameBuffer &in_fbo,
+                                 const FrameBuffer &auxiliary,
+                                 const FrameBuffer &linear_depth) const;
 
     /** Render tex. Used for blit/texture resize */
-    void renderPassThrough(unsigned tex, unsigned width, unsigned height);
-    void renderTextureLayer(unsigned tex, unsigned layer);
-    void applyMLAA();
+    void renderPassThrough(unsigned tex, unsigned width, unsigned height) const;
+    void renderTextureLayer(unsigned tex, unsigned layer) const;
+    
+    void renderDoF(const FrameBuffer &framebuffer, GLuint color_texture, GLuint depth_stencil_texture);
+    void renderGodRays(scene::ICameraSceneNode * const camnode,
+                       const FrameBuffer &in_fbo,
+                       const FrameBuffer &tmp_fbo,
+                       const FrameBuffer &quarter1_fbo,
+                       const FrameBuffer &quarter2_fbo);
 
-    void renderMotionBlur(unsigned cam, const FrameBuffer &in_fbo,
-                          FrameBuffer &out_fbo);
-    void renderGlow(unsigned tex);
+    void applyMLAA(const FrameBuffer& mlaa_tmp_framebuffer,
+                   const FrameBuffer& mlaa_blend_framebuffer,
+                   const FrameBuffer& mlaa_colors_framebuffer);
+
+    void renderMotionBlur(const FrameBuffer &in_fbo,
+                          FrameBuffer &out_fbo,
+                          GLuint depth_stencil_texture);
+    void renderGlow(const FrameBuffer& quarter_framebuffer) const;
     void renderLightning(core::vector3df intensity);
-
-    /** Render the post-processed scene */
-    FrameBuffer *render(scene::ICameraSceneNode * const camnode, bool isRace);
 
     /** Use motion blur for a short time */
     void         giveBoost(unsigned int cam_index);
+    
+    /** Render the post-processed scene */
+    FrameBuffer *render(scene::ICameraSceneNode * const camnode, bool isRace,
+                        RTT *rtts);
 };   // class PostProcessing
 
 #endif // HEADER_POST_PROCESSING_HPP

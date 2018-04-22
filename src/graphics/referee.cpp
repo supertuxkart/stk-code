@@ -20,7 +20,10 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
+#include "graphics/material.hpp"
 #include "graphics/mesh_tools.hpp"
+#include "graphics/sp/sp_mesh_buffer.hpp"
+#include "graphics/sp/sp_mesh_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -36,6 +39,7 @@ int                   Referee::m_st_traffic_buffer     = -1;
 Vec3                  Referee::m_st_start_offset       = Vec3(-2, 2, 2);
 Vec3                  Referee::m_st_start_rotation     = Vec3(0, 180, 0);
 Vec3                  Referee::m_st_scale              = Vec3(1, 1, 1);
+float                 Referee::m_height                = 0.0f;
 scene::IAnimatedMesh *Referee::m_st_referee_mesh       = NULL;
 
 // ----------------------------------------------------------------------------
@@ -68,18 +72,6 @@ void Referee::init()
                model_filename.c_str());
     }
 
-    // Translate the mesh so that the x/z middle point
-    // and for y the lowest point are at 0,0,0:
-    Vec3 min,max;
-    MeshTools::minMax3D(m_st_referee_mesh, &min, &max);
-    Vec3 offset_from_center = -0.5f*(max+min);
-    offset_from_center.setY(0);
-    scene::IMeshManipulator *mani =
-        irr_driver->getVideoDriver()->getMeshManipulator();
-
-    core::matrix4 translate(core::matrix4::EM4CONST_IDENTITY);
-    translate.setTranslation(offset_from_center.toIrrVector());
-    mani->transform(m_st_referee_mesh, translate);
     node->get("first-rescue-frame", &m_st_first_rescue_frame);
     node->get("last-rescue-frame",  &m_st_last_rescue_frame );
     node->get("first-start-frame",  &m_st_first_start_frame );
@@ -95,7 +87,28 @@ void Referee::init()
 
     for(unsigned int i=0; i<m_st_referee_mesh->getMeshBufferCount(); i++)
     {
+        if (m_st_traffic_buffer != -1)
+        {
+            break;
+        }
         scene::IMeshBuffer *mb = m_st_referee_mesh->getMeshBuffer(i);
+        SP::SPMeshBuffer* spmb = dynamic_cast<SP::SPMeshBuffer*>(mb);
+        if (spmb)
+        {
+            auto ret = spmb->getAllSTKMaterials();
+            for (unsigned j = 0; j < ret.size(); j++)
+            {
+                std::string name =
+                    StringUtils::getBasename(ret[j]->getSamplerPath(0));
+                if (name == "traffic_light.png")
+                {
+                    m_st_traffic_buffer = i;
+                    spmb->enableTextureMatrix(j);
+                    break;
+                }
+            }
+            continue;
+        }
         video::SMaterial &irrMaterial = mb->getMaterial();
         video::ITexture* t=irrMaterial.getTexture(0);
         if(!t) continue;
@@ -124,6 +137,7 @@ void Referee::cleanup()
 {
     irr_driver->removeMeshFromCache(m_st_referee_mesh);
     m_st_referee_mesh = NULL;
+    m_st_traffic_buffer = -1;
 }   // cleanup
 
 // ----------------------------------------------------------------------------
@@ -147,15 +161,14 @@ Referee::Referee()
     m_scene_node->setScale(m_st_scale.toIrrVector());
     m_scene_node->setFrameLoop(m_st_first_start_frame,
                                m_st_last_start_frame);
-
-    irr_driver->applyObjectPassShader(m_scene_node);
-
-    if (CVS->isGLSL() && CVS->isDefferedEnabled())
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL() && CVS->isDeferredEnabled())
     {
         m_light = irr_driver->addLight(core::vector3df(0.0f, 0.0f, 0.6f), 0.7f, 2.0f,
             0.7f /* r */, 0.0 /* g */, 0.0f /* b */, false /* sun */, m_scene_node);
     }
     else
+#endif
     {
         m_light = NULL;
     }
@@ -184,7 +197,6 @@ Referee::Referee(const AbstractKart &kart)
     m_scene_node->setFrameLoop(m_st_first_rescue_frame,
                                m_st_last_rescue_frame);
 
-    irr_driver->applyObjectPassShader(m_scene_node);
 }   // Referee
 
 // ----------------------------------------------------------------------------
@@ -232,13 +244,24 @@ void Referee::selectReadySetGo(int rsg)
 {
     if (m_st_traffic_buffer < 0)
         return;
-    video::SMaterial &m = m_scene_node->getMaterial(m_st_traffic_buffer); // m_scene_node->getMesh()->getMeshBuffer(m_st_traffic_buffer)->getMaterial();
 
-    //if (irr_driver->isGLSL() && UserConfigParams::m_dynamic_lights)
-    //    m.MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
-
-    core::matrix4* matrix = &m.getTextureMatrix(0);
-    matrix->setTextureTranslate(0.0f, rsg*0.333f);
+    SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(m_scene_node);
+    if (spmn)
+    {
+        spmn->setTextureMatrix(m_st_traffic_buffer, {{ 0.0f, rsg * 0.333f }});
+    }
+    else
+    {
+        video::SMaterial &m = m_scene_node->getMaterial(m_st_traffic_buffer);
+        core::matrix4* matrix = &m.getTextureMatrix(0);
+        matrix->setTextureTranslate(0.0f, rsg*0.333f);
+        // disable lighting, we need to see the traffic light even if facing away
+        // from the sun
+        m.AmbientColor  = video::SColor(255, 255, 255, 255);
+        m.DiffuseColor  = video::SColor(255, 255, 255, 255);
+        m.EmissiveColor = video::SColor(255, 255, 255, 255);
+        m.SpecularColor = video::SColor(255, 255, 255, 255);
+    }
 
     if (m_light != NULL)
     {
@@ -255,12 +278,5 @@ void Referee::selectReadySetGo(int rsg)
             ((LightNode*)m_light)->setColor(0.0f, 0.6f, 0.0f);
         }
     }
-
-    // disable lighting, we need to see the traffic light even if facing away
-    // from the sun
-    m.AmbientColor  = video::SColor(255, 255, 255, 255);
-    m.DiffuseColor  = video::SColor(255, 255, 255, 255);
-    m.EmissiveColor = video::SColor(255, 255, 255, 255);
-    m.SpecularColor = video::SColor(255, 255, 255, 255);
 }   // selectReadySetGo
 

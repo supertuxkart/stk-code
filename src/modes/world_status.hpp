@@ -19,6 +19,7 @@
 #define HEADER_WORLD_STATUS_HPP
 
 #include "utils/cpp2011.hpp"
+#include <atomic>
 
 class SFXBase;
 
@@ -44,6 +45,10 @@ public:
 
         // Game setup, e.g. track loading
         SETUP_PHASE,
+
+        // Used in network games only: wait for the server to broadcast
+        // 'start'. This happens on a network client only
+        WAIT_FOR_SERVER_PHASE,
 
         // 'Ready' is displayed
         READY_PHASE,
@@ -82,7 +87,18 @@ public:
         //Goal scored phase
         GOAL_PHASE
     };
+
 protected:
+    /** Elasped/remaining time in seconds. */
+    double          m_time;
+
+    /** Time in number of ticks (in terms of physics time steps). */
+    int             m_time_ticks;
+
+    /** If the start race should be played, disabled in cutscenes. */
+    bool            m_play_racestart_sounds;
+
+private:
     /** Sound to play at the beginning of a race, during which a
      *  a camera intro of the track can be shown. */
     SFXBase    *m_track_intro_sound;
@@ -91,12 +107,17 @@ protected:
     /** The third sound to be played in ready, set, go. */
     SFXBase    *m_start_sound;
 
-    /**
-      * Elasped/remaining time in seconds
-      */
-    double          m_time;
-    ClockType       m_clock_mode;
+    /** In networked game the world clock might be adjusted (without the
+     *  player noticing), e.g. if a client causes rewinds in the server,
+     *  that client needs to speed up to be further ahead of the server
+     *  and so reduce the number of rollbacks. This is the amount of time
+     *  by which the client's clock needs to be adjusted (positive or 
+     *  negative). */
+    float m_adjust_time_by;
 
+    /** The clock mode: normal counting forwards, or countdown */ 
+    ClockType       m_clock_mode;
+protected:
     bool            m_play_track_intro_sound;
     bool            m_play_ready_set_go_sounds;
 
@@ -106,27 +127,42 @@ private:
     /**
       * Remember previous phase e.g. on pause
       */
-    Phase          m_previous_phase;
+    Phase           m_previous_phase;
 
     /**
      * Counts time during the initial 'ready/set/go' phase, or at the end of a race.
      * This timer basically kicks in when we need to calculate non-race time like labels.
      */
-    float           m_auxiliary_timer;
+    int             m_auxiliary_ticks;
+
+    /** Special counter to count ticks since start (in terms of physics
+     *  timestep size). */
+    int             m_count_up_ticks;
 
     bool            m_engines_started;
-    void            startEngines();
+    /** In networked game a client must wait for the server to start 'ready
+    *  set go' to make sure all client are actually ready to start the game.
+    *  A server on the other hand will run behind all clients, so it will
+    *  wait for all clients to indicate that they have started the race. */
+    std::atomic_bool m_server_is_ready;
+
+    void startEngines();
+
 public:
              WorldStatus();
     virtual ~WorldStatus();
 
-    void     reset();
-    void     update(const float dt);
-    void     setTime(const float time);
+    virtual void reset();
+    virtual void updateTime(int ticks);
+    virtual void update(int ticks);
+    void         startReadySetGo();
     virtual void pause(Phase phase);
     virtual void unpause();
     virtual void enterRaceOverState();
     virtual void terminateRace();
+    void         setTime(const float time);
+    void         setTicks(int ticks);
+    float        adjustDT(float dt);
 
     // ------------------------------------------------------------------------
     // Note: GO_PHASE is both: start phase and race phase
@@ -161,7 +197,12 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the current race time. */
-    float   getTime() const      { return (float)m_time; }
+    float   getTime() const { return (float)m_time; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the current race time in time ticks (i.e. based on the physics
+     *  time step size). */
+    int getTimeTicks() const { return m_time_ticks; }
 
     // ------------------------------------------------------------------------
     /** Will be called to notify your derived class that the clock,
@@ -172,6 +213,15 @@ public:
     /** Called when the race actually starts. */
     virtual void onGo() {};
 
+    // ------------------------------------------------------------------------
+    /** Get the ticks since start regardless of which way the clock counts */
+    int getTicksSinceStart() const { return m_count_up_ticks; }
+    // ------------------------------------------------------------------------
+    void setReadyToRace() { m_server_is_ready.store(true); }
+    // ------------------------------------------------------------------------
+    /** Sets a time by which the clock should be adjusted. Used by networking
+     *  if too many rewinds are detected. */
+    void setAdjustTime(float t) { m_adjust_time_by = t; }
 };   // WorldStatus
 
 

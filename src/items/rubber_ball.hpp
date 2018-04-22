@@ -23,9 +23,9 @@
 
 #include "items/flyable.hpp"
 #include "tracks/track_sector.hpp"
+#include "utils/cpp2011.hpp"
 
 class AbstractKart;
-class QuadGraph;
 class SFXBase;
 
 /**
@@ -80,12 +80,12 @@ private:
     /** If the ball overtakes its target or starts to aim at the kart which
      *  originally shot the rubber ball, after this amount of time the
      *  ball will be deleted. */
-    static float m_st_delete_time;
+    static int m_st_delete_ticks;
 
     /** Timer before another rubber ball can be picked up. This is to ensure
      *  that there are not too many rubber balls on the track in races with many
      *  karts. */
-    static float m_time_between_balls;
+    static int m_ticks_between_balls;
 
     /** This factor is used to influence how much the rubber ball should aim
      *  at its target early. It used the 'distance to center of track' of its
@@ -167,7 +167,7 @@ private:
      *  originally shot the rubber ball, after a certain amount of time the
      *  ball will be deleted. This timer tracks this time. If it is < 0
      *  it indicates that the ball is targeting another kart atm. */
-    float        m_delete_timer;
+    int          m_delete_ticks;
 
     /** The current maximum height of the ball. This value will be
      *  reduced if the ball gets closer to the target. */
@@ -193,18 +193,23 @@ private:
                                          float *f=NULL);
     void         getNextControlPoint();
     float        updateHeight();
-    void         interpolate(Vec3 *next_xyz, float dt);
-    void         moveTowardsTarget(Vec3 *next_xyz, float dt);
+    void         interpolate(Vec3 *next_xyz, int ticks);
+    void         moveTowardsTarget(Vec3 *next_xyz, int ticks);
     void         initializeControlPoints(const Vec3 &xyz);
-    float        getMaxTerrainHeight(const Vec3 &vertical_offset) const;
+    float        getTunnelHeight(const Vec3 &next_xyz, 
+                                     const float vertical_offset) const;
     bool         checkTunneling();
 public:
                  RubberBall  (AbstractKart* kart);
     virtual     ~RubberBall();
     static  void init(const XMLNode &node, scene::IMesh *rubberball);
-    virtual bool updateAndDelete(float dt);
+    virtual bool updateAndDelete(int ticks) OVERRIDE;
     virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL);
-    static float getTimeBetweenRubberBalls()    {return m_time_between_balls;}
+    virtual void setAnimation(AbstractKartAnimation *animation);
+    // ------------------------------------------------------------------------
+    /** Returns time (in ticks) between rubberballs, to avoid that in games
+     *  with many karts too many rubber balls are in play at the same time. */
+    static int   getTicksBetweenRubberBalls() { return m_ticks_between_balls; }
     // ------------------------------------------------------------------------
     /** This object does not create an explosion, all affects on
      *  karts are handled by this hit() function. */

@@ -39,10 +39,11 @@
 #include "tracks/track_object_manager.hpp"
 
 //-----------------------------------------------------------------------------
-OverWorld::OverWorld() : WorldWithRank()
+OverWorld::OverWorld() : World()
 {
     m_return_to_garage            = false;
     m_stop_music_when_dialog_open = false;
+    m_play_track_intro_sound      = false;
 }   // Overworld
 
 //-----------------------------------------------------------------------------
@@ -56,6 +57,9 @@ OverWorld::~OverWorld()
 /** Function to simplify the start process */
 void OverWorld::enterOverWorld()
 {
+    // update point count and the list of locked/unlocked stuff
+    PlayerManager::getCurrentPlayer()->computeActive();
+
     race_manager->setNumPlayers(1);
     race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
     race_manager->setMinorMode (RaceManager::MINOR_MODE_OVERWORLD);
@@ -100,9 +104,9 @@ void OverWorld::enterOverWorld()
 
 //-----------------------------------------------------------------------------
 /** General update function called once per frame.
- *  \param dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void OverWorld::update(float dt)
+void OverWorld::update(int ticks)
 {
     // Skip annoying waiting without a purpose
     // Make sure to do all things that would normally happen in the
@@ -112,14 +116,14 @@ void OverWorld::update(float dt)
         setPhase(RACE_PHASE);
         // Normally done in WorldStatus::update(), during phase SET_PHASE,
         // so we have to start music 'manually', since we skip all phases.
-        World::getWorld()->getTrack()->startMusic();
+        Track::getCurrentTrack()->startMusic();
 
         if (UserConfigParams::m_music)
             music_manager->startMusic();
         m_karts[0]->startEngineSFX();
     }
-    WorldWithRank::update(dt);
-    WorldWithRank::updateTrack(dt);
+    World::update(ticks);
+    World::updateTrack(ticks);
     const unsigned int kart_amount  = (unsigned int)m_karts.size();
 
     // isn't it cool, on the overworld nitro is free!
@@ -212,7 +216,7 @@ void OverWorld::createRaceGUI()
 void OverWorld::onFirePressed(Controller* who)
 {
     const std::vector<OverworldChallenge>& challenges =
-                                                  m_track->getChallengeList();
+                                  Track::getCurrentTrack()->getChallengeList();
 
     AbstractKart* k = getKart(0);
     Vec3 kart_xyz = k->getXYZ();
@@ -244,6 +248,10 @@ void OverWorld::onFirePressed(Controller* who)
 
                 const unsigned int val = challenge->getNumTrophies();
                 bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
+                
+                if (UserConfigParams::m_everything_unlocked)
+                    unlocked = true;
+
                 if (unlocked)
                 {
                     race_manager->setKartLastPositionOnOverworld(kart_xyz);
@@ -269,11 +277,11 @@ void OverWorld::onMouseClick(int x, int y)
     if(challenge)
     {
         // Use the 'get closest start point' rescue function
-        // from WorldWithRank by setting the kart's position to
+        // from World by setting the kart's position to
         // be the location of the challenge bubble.
         AbstractKart* kart = getKart(0);
         kart->setXYZ(challenge->m_position);
-        kart->getVehicle()->capSpeed(0);
+        kart->getVehicle()->setMaxSpeed(0);
 
         unsigned int index   = getRescuePositionIndex(kart);
         btTransform s        = getRescueTransform(index);

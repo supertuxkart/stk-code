@@ -32,6 +32,7 @@
 #include "physics/irr_debug_drawer.hpp"
 #include "physics/stk_dynamics_world.hpp"
 #include "physics/user_pointer.hpp"
+#include "utils/singleton.hpp"
 
 class AbstractKart;
 class STKDynamicsWorld;
@@ -41,6 +42,7 @@ class Vec3;
   * \ingroup physics
   */
 class Physics : public btSequentialImpulseConstraintSolver
+              , public AbstractSingleton<Physics>
 {
 private:
     /** Bullet can report the same collision more than once (up to 4
@@ -53,7 +55,8 @@ private:
      *  overhead (since it will likely use a tree to sort the entries).
      *  Considering that the number of collisions is usually rather small
      *  a simple list and linear search is faster is is being used here. */
-    class CollisionPair {
+    class CollisionPair
+    {
     private:
         /** The user pointer of the objects involved in this collision. */
         const UserPointer *m_up[2];
@@ -140,14 +143,22 @@ private:
 
     /** Used in physics debugging to draw the physics world. */
     IrrDebugDrawer                  *m_debug_drawer;
+
     btCollisionDispatcher           *m_dispatcher;
     btBroadphaseInterface           *m_axis_sweep;
     btDefaultCollisionConfiguration *m_collision_conf;
     CollisionList                    m_all_collisions;
 
+    /** Singleton. */
+    static Physics                  *m_physics;
+
+             Physics();
+    virtual ~Physics();
+
+    // Give the singleton access to the constructor
+    friend class AbstractSingleton<Physics>;
+
 public:
-          Physics          ();
-         ~Physics          ();
     void  init             (const Vec3 &min_world, const Vec3 &max_world);
     void  addKart          (const AbstractKart *k);
     void  addBody          (btRigidBody* b) {m_dynamics_world->addRigidBody(b);}
@@ -155,7 +166,7 @@ public:
     void  removeBody       (btRigidBody* b) {m_dynamics_world->removeRigidBody(b);}
     void  KartKartCollision(AbstractKart *ka, const Vec3 &contact_point_a,
                             AbstractKart *kb, const Vec3 &contact_point_b);
-    void  update           (float dt);
+    void  update           (int ticks);
     void  draw             ();
     STKDynamicsWorld*
           getPhysicsWorld  () const {return m_dynamics_world;}

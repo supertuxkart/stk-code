@@ -24,9 +24,9 @@
 #include "karts/controller/player_controller.hpp"
 
 class AbstractKart;
-class Camera;
-class Player;
+class ParticleEmitter;
 class SFXBase;
+class SFXBuffer;
 
 /** PlayerKart manages control events from the player and moves
   * them to the Kart
@@ -42,24 +42,27 @@ private:
 
     bool           m_sound_schedule;
 
-    /** The camera attached to the kart for this controller. The camera
-     *  object is managed in the Camera class, so no need to free it. */
-    Camera        *m_camera;
+    ParticleEmitter* m_sky_particles_emitter;
 
-    SFXBase       *m_bzzt_sound;
-    SFXBase       *m_wee_sound;
-    SFXBase       *m_ugh_sound;
-    SFXBase       *m_grab_sound;
-    SFXBase       *m_full_sound;
+    /** The index of the camera attached to the kart for this controller. The
+     *  camera object is managed in the Camera class, so no need to free it. */
+    int  m_camera_index;
 
-    virtual void steer(float, int) OVERRIDE;
+    SFXBase     *m_wee_sound;
+    SFXBuffer   *m_bzzt_sound;
+    SFXBuffer   *m_ugh_sound;
+    SFXBuffer   *m_grab_sound;
+    SFXBuffer   *m_full_sound;
+
+    virtual void steer(int, int) OVERRIDE;
     virtual void displayPenaltyWarning() OVERRIDE;
 public:
                  LocalPlayerController(AbstractKart *kart,
-                                       StateManager::ActivePlayer *player);
+                                       const int local_playerID);
                 ~LocalPlayerController();
-    void         update            (float) OVERRIDE;
-    void         action            (PlayerAction action, int value) OVERRIDE;
+    void         update            (int ticks) OVERRIDE;
+    bool         action            (PlayerAction action, int value,
+                                    bool dry_run=false) OVERRIDE;
     virtual void handleZipper      (bool play_sound) OVERRIDE;
     void         collectedItem     (const Item &item, int add_info=-1,
                                     float previous_energy=0) OVERRIDE;
@@ -75,7 +78,7 @@ public:
     virtual bool isLocalPlayerController() const OVERRIDE {return true;}
     // ------------------------------------------------------------------------
     /** Returns the name of the player profile. */
-    core::stringw getName() const OVERRIDE { return m_player->getProfile()->getName(); }
+    core::stringw getName() const OVERRIDE;
 
 
 };   // LocalPlayerController

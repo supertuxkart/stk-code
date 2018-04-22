@@ -55,8 +55,9 @@
 
 
 #include <stdlib.h>     /* for exit() prototype */
+#include <zlib.h>
 
-#include "png.h"        /* libpng header; includes zlib.h and setjmp.h */
+#include "png.h"        /* libpng header, includes setjmp.h */
 #include "writepng.h"   /* typedefs, common macros, public prototypes */
 
 
@@ -89,7 +90,7 @@ int writepng_init(mainprog_info *mainprog_ptr)
 
     /* could also replace libpng warning-handler (final NULL), but no need: */
 
-    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, mainprog_ptr,
+    png_ptr = png_create_write_struct(png_get_libpng_ver(NULL), mainprog_ptr,
       writepng_error_handler, NULL);
     if (!png_ptr)
         return 4;   /* out of memory */

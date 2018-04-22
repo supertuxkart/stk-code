@@ -327,7 +327,7 @@ void COpenGLExtensionHandler::dumpFramebufferFormats() const
 }
 
 
-void COpenGLExtensionHandler::initExtensions(bool stencilBuffer)
+void COpenGLExtensionHandler::initExtensions(bool stencilBuffer, bool useCoreContext)
 {
 	const f32 ogl_ver = core::fast_atof(reinterpret_cast<const c8*>(glGetString(GL_VERSION)));
 	Version = static_cast<u16>(core::floor32(ogl_ver)*100+core::round32(core::fract(ogl_ver)*10.0f));
@@ -336,10 +336,17 @@ void COpenGLExtensionHandler::initExtensions(bool stencilBuffer)
 	else
 		os::Printer::log("OpenGL driver version is not 1.2 or better.", ELL_WARNING);
 
+	if (!useCoreContext)
 	{
-		const char* t = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+		for (u32 i = 0; i < IRR_OpenGL_Feature_Count; i++)
+			FeatureAvailable[i] = false;
+			
+		const char* t = NULL;
 		size_t len = 0;
 		c8 *str = 0;
+		
+		t = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+		
 		if (t)
 		{
 			len = strlen(t);

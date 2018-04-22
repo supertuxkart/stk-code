@@ -47,9 +47,9 @@ public:
     virtual void       reallySetSpeedPosition(float f,
                                          const Vec3 &p) {}
     virtual void       play()                           {}
-    virtual void       reallyPlayNow()                  {}
-    virtual void       play(const Vec3 &xyz)            {}
-    virtual void       reallyPlayNow(const Vec3 &xyz)   {}
+    virtual void       reallyPlayNow(SFXBuffer* buffer = NULL) {}
+    virtual void       play(const Vec3 &xyz, SFXBuffer* buffer = NULL) {}
+    virtual void       reallyPlayNow(const Vec3 &xyz, SFXBuffer* buffer = NULL) {}
     virtual void       stop()                           {}
     virtual void       reallyStopNow()                  {}
     virtual void       pause()                          {}

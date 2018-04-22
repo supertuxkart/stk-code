@@ -52,7 +52,7 @@ void AbstractStateManager::enterGameState()
 
     if (getCurrentScreen() != NULL) getCurrentScreen()->tearDown();
     m_menu_stack.clear();
-    m_menu_stack.push_back(RACE_STATE_NAME);
+    m_menu_stack.emplace_back(RACE_STATE_NAME, (Screen*)NULL);
     setGameState(GAME);
     GUIEngine::cleanForGame();
 }   // enterGameState
@@ -83,7 +83,7 @@ void AbstractStateManager::setGameState(GameState state)
 #pragma mark Push/pop menus
 #endif
 
-void AbstractStateManager::pushMenu(std::string name)
+void AbstractStateManager::pushMenu(Screen* screen)
 {
     // currently, only a single in-game menu is supported
     assert(m_game_mode != INGAME_MENU);
@@ -94,14 +94,14 @@ void AbstractStateManager::pushMenu(std::string name)
     if (UserConfigParams::logGUI())
     {
         Log::info("AbstractStateManager::pushMenu", "Switching to screen %s",
-            name.c_str());
+            screen->getName().c_str());
     }
 
     // Send tear-down event to previous menu
     if (m_menu_stack.size() > 0 && m_game_mode != GAME)
         getCurrentScreen()->tearDown();
 
-    m_menu_stack.push_back(name);
+    m_menu_stack.emplace_back(screen->getName(), screen);
     if (m_game_mode == GAME)
     {
         setGameState(INGAME_MENU);
@@ -110,7 +110,7 @@ void AbstractStateManager::pushMenu(std::string name)
     {
         setGameState(MENU);
     }
-    switchToScreen(name.c_str());
+    switchToScreen(screen);
 
     onTopMostScreenChanged();
 }   // pushMenu
@@ -130,7 +130,7 @@ void AbstractStateManager::pushScreen(Screen* screen)
     }
 
     if (!screen->isLoaded()) screen->loadFromFile();
-    pushMenu(screen->getName());
+    pushMenu(screen);
     screen->init();
 
     onTopMostScreenChanged();
@@ -162,9 +162,9 @@ void AbstractStateManager::replaceTopMostScreen(Screen* screen, GUIEngine::GameS
     if (getCurrentScreen() != NULL)
         getCurrentScreen()->tearDown();
 
-    m_menu_stack[m_menu_stack.size()-1] = name;
+    m_menu_stack[m_menu_stack.size()-1] = std::make_pair(name, screen);
     setGameState(gameState);
-    switchToScreen(name.c_str());
+    switchToScreen(screen);
 
     // Send init event to new menu
     getCurrentScreen()->init();
@@ -187,7 +187,7 @@ void AbstractStateManager::reshowTopMostMenu()
         if (currScreen != NULL) getCurrentScreen()->tearDown();
     }
 
-    switchToScreen( m_menu_stack[m_menu_stack.size()-1].c_str() );
+    switchToScreen(m_menu_stack[m_menu_stack.size()-1].second);
 
     // Send init event to new menu
     Screen* screen = getCurrentScreen();
@@ -216,10 +216,10 @@ void AbstractStateManager::popMenu()
     if (UserConfigParams::logGUI())
     {
         Log::info("AbstractStateManager::popMenu", "Switching to screen %s",
-            m_menu_stack[m_menu_stack.size()-1].c_str());
+            m_menu_stack[m_menu_stack.size()-1].first.c_str());
     }
 
-    if (m_menu_stack[m_menu_stack.size()-1] == RACE_STATE_NAME)
+    if (m_menu_stack[m_menu_stack.size()-1].first == RACE_STATE_NAME)
     {
         setGameState(GAME);
         GUIEngine::cleanForGame();
@@ -227,7 +227,7 @@ void AbstractStateManager::popMenu()
     else
     {
         setGameState(MENU);
-        switchToScreen(m_menu_stack[m_menu_stack.size()-1].c_str());
+        switchToScreen(m_menu_stack[m_menu_stack.size()-1].second);
 
         Screen* screen = getCurrentScreen();
         if (!screen->isLoaded()) screen->loadFromFile();
@@ -254,10 +254,10 @@ void AbstractStateManager::resetAndGoToScreen(Screen* screen)
     m_menu_stack.clear();
 
     if (!screen->isLoaded()) screen->loadFromFile();
-    m_menu_stack.push_back(name);
+    m_menu_stack.emplace_back(name, screen);
     setGameState(MENU);
 
-    switchToScreen(name.c_str());
+    switchToScreen(screen);
     getCurrentScreen()->init();
 
     onTopMostScreenChanged();
@@ -277,12 +277,12 @@ void AbstractStateManager::resetAndSetStack(Screen* screens[])
 
     for (int n=0; screens[n] != NULL; n++)
     {
-        m_menu_stack.push_back(screens[n]->getName());
+        m_menu_stack.emplace_back(screens[n]->getName(), screens[n]);
     }
 
     setGameState(MENU);
 
-    switchToScreen(m_menu_stack[m_menu_stack.size()-1].c_str());
+    switchToScreen(m_menu_stack[m_menu_stack.size()-1].second);
     getCurrentScreen()->init();
 
     onTopMostScreenChanged();

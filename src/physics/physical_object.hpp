@@ -137,6 +137,10 @@ private:
     /** This is the initial position of the object for the physics. */
     btTransform           m_init_pos;
 
+    /** Save current transform to avoid frequent lookup from 
+     * world transform. */
+    btTransform           m_current_transform;
+
     /** The mesh might not have the same center as bullet does. This
      *  offset is used to offset the location of the graphical mesh
      *  so that the graphics are aligned with the bullet collision shape. */
@@ -192,6 +196,7 @@ public:
     virtual void reset          ();
     virtual void handleExplosion(const Vec3& pos, bool directHit);
     void         update         (float dt);
+    void         updateGraphics (float dt);
     void         init           (const Settings &settings);
     void         move           (const Vec3& xyz, const core::vector3df& hpr);
     void         hit            (const Material *m, const Vec3 &normal);

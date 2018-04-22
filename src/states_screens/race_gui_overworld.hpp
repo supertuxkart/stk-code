@@ -101,13 +101,13 @@ private:
 
     int              m_trophy_points_width;
 
+    /** The latest challenge approached by the kart */
+    const ChallengeData* m_active_challenge;
+
+    core::stringw    m_challenge_description;
+
     /** The current challenge over which the mouse is hovering. */
     const OverworldChallenge *m_current_challenge;
-
-    /* Display informat for one player on the screen. */
-    void drawEnergyMeter       (int x, int y, const AbstractKart *kart,
-                                const core::recti &viewport,
-                                const core::vector2df &scaling);
 
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();

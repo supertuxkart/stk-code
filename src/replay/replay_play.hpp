@@ -45,20 +45,23 @@ public:
         SO_KART_NUM,
         SO_DIFF,
         SO_LAPS,
-        SO_TIME
+        SO_TIME,
+        SO_USER
     };
 
     class ReplayData
     {
     public:
-        std::string              m_filename;
-        std::string              m_track_name;
-        std::vector<std::string> m_kart_list;
-        bool                     m_reverse;
-        bool                     m_custom_replay_file;
-        unsigned int             m_difficulty;
-        unsigned int             m_laps;
-        float                    m_min_time;
+        std::string                m_filename;
+        std::string                m_track_name;
+        core::stringw              m_user_name;
+        std::vector<std::string>   m_kart_list;
+        std::vector<core::stringw> m_name_list;
+        bool                       m_reverse;
+        bool                       m_custom_replay_file;
+        unsigned int               m_difficulty;
+        unsigned int               m_laps;
+        float                      m_min_time;
 
         bool operator < (const ReplayData& r) const
         {
@@ -81,6 +84,9 @@ public:
                     break;
                 case SO_TIME:
                     return m_min_time < r.m_min_time;
+                    break;
+                case SO_USER:
+                    return m_user_name < r.m_user_name;
                     break;
             }   // switch
             return true;
@@ -126,15 +132,16 @@ public:
                                           { return m_replay_file_list.at(n); }
     // ------------------------------------------------------------------------
     const unsigned int getNumReplayFile() const
-                                         { return m_replay_file_list.size(); }
+                           { return (unsigned int)m_replay_file_list.size(); }
     // ------------------------------------------------------------------------
     GhostKart*         getGhostKart(int n)    { return m_ghost_karts.get(n); }
     // ------------------------------------------------------------------------
     const unsigned int getNumGhostKart() const
     {
         assert(m_replay_file_list.size() > 0);
-        return m_replay_file_list.at(m_current_replay_file).m_kart_list.size();
-    }
+        return (unsigned int)m_replay_file_list.at(m_current_replay_file)
+                                               .m_kart_list.size();
+    }   // getNumGhostKart
     // ------------------------------------------------------------------------
     const std::string& getGhostKartName(int n) const
     {

@@ -1,0 +1,131 @@
+<spshader>
+    <!--
+        Notice: boolean Y or N here is case-sensitive
+
+        name: The name of the shader (cannot be empty), you have to make sure
+              no duplicated name will be introduced, and "_skinned" word is
+              reserved for automatic skinned mesh shader adding.
+
+        fallback-shader: The name of the shader to be used when advanced
+                         lighting is off, make sure that shader is loaded first
+                         (default is empty). STK will load list of sps*.xml
+                         files in ascending order from a directory.
+
+        transparent: If Y, than this shader will be used in transparent pass
+                     (default N).
+
+        drawing-priority: The larger this number, the later the meshes using
+                          this shader will be drawn. Only useful in transparent
+                          shader where drawing order matters because of alpha
+                          blending (default 0 which means order doesn't
+                          matter).
+
+        use-alpha-channel: If Y, this shader is going to access alpha channel
+                           from mesh texture layers. It's used to hint STK not
+                           to encode colorization mask for this material using
+                           this shader which it will overwrite the alpha
+                           channel (default N).
+
+        use-tangents: If Y, than meshes using this shader will have tangents
+                      and bitangents defined and you can access them in shader
+                      (default N).
+
+        srgb: Sample mesh texture layers in srgb or not (in 6 Ys / Ns), when
+              advanced lighting is off, srgb will always be false,
+              default (Y Y N N N N), even if any texture layer is unused in
+              shader, you cannot skip it from the above Y / N array.
+
+        You can only specific 1st and shadow pass of shader in .xml
+    -->
+    <shader-info name="solid" fallback-shader="" transparent="N"
+                 drawing-priority="0" use-alpha-channel="N" use-tangents="N"
+                 srgb="Y Y N N N N"/>
+    <!--
+        use-function: Specify function to be run before drawing meshes with
+                      this shader:
+
+            alphaBlendUse will be suitable for drawing alpha blend material.
+
+            additiveUse will be suitable for drawing additive material.
+
+            ghostUse will be suitable for drawing object with translucent
+            effect with face culling and depth buffer writing on.
+
+        unuse-function: Specify function to be run after drawing meshes with
+                        this shader (none at the moment).
+
+        vertex-shader: Specify the vertex shader, it will search in the
+                       directory of the location of this xml file first, if not
+                       found it will search in the official shader directory.
+                       Notice: if you use #stk_include in your shader file, STK
+                       will only search the include header in official shader
+                       directory.
+
+        fragment-shader: Specify the fragment shader, searching rule is the
+                         same as above.
+
+        skinned-mesh-shader: Specify the skinned mesh version of the vertex
+                             shader, searching rule is the same as above. You
+                             have to make sure the uniforms and the textures
+                             used in both skinned mesh / non-skinned mesh
+                             shader are the same.
+    -->
+    <first-pass use-function="" unuse-function="" vertex-shader="sp_pass.vert"
+        fragment-shader="sp_solid.frag" skinned-mesh-shader="sp_skinning.vert">
+        <prefilled-textures>
+            <!--
+                prefilled-textures: Define the prefilled textures used in
+                                    shaders, they will be the same for all
+                                    meshes drawn using this shader.
+
+                    name: Name of the texture used in shader (cannot be empty).
+
+                    file: Filename of the texture, it will search using the order
+                          in pushed texture searching directory
+                          (cannot be empty).
+
+                    srgb: Sample in srgb or not (specify in Y/N, default is N).
+                          When advanced lighting is off, srgb will always be
+                          false.
+
+                    sampler: nearest, nearest_clamped, bilinear,
+                             bilinear_clamped, trilinear, trilinear_clamped
+                             and semi_trilinear are possible right now, default
+                             is trilinear.
+                Example:
+            <prefilled-texture name="name_used_in_shader" file="texture.png"
+                 srgb="Y" sampler="trilinear"/>-->
+        </prefilled-textures>
+    </first-pass>
+    <shadow-pass use-function="" unuse-function=""
+        vertex-shader="sp_shadow.vert" fragment-shader="white.frag"
+        skinned-mesh-shader="sp_skinning_shadow.vert">
+    </shadow-pass>
+    <!--
+        uniform-assigners: List of uniform assigners functions to be auto-run
+                           when "use" the shader which set the uniform
+                           variables in shader, currently there are:
+
+            shadowCascadeUniformAssigner will set the current shadow
+            cascade being drawn.
+
+            windDirectionUniformAssigner will set the wind direction.
+
+            zeroAlphaUniformAssigner should be used in transparent shader.
+
+            fogUniformAssigner will set 0 / 1 if fog is enabled in track.
+
+            ghostAlphaUniformAssigner will set ghost (kart) color based on sun
+            color of track.
+
+            You have to specify the uniform name in shader together with the
+            bundled uniform-assigners.
+
+            Currently you can automatically assign to uniform type int, float,
+            mat4, vec4, vec3 and vec2 only.
+    -->
+    <uniform-assigners>
+        <uniform-assigner name="layer"
+        function="shadowCascadeUniformAssigner"/>
+    </uniform-assigners>
+</spshader>

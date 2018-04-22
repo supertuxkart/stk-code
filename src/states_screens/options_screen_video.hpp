@@ -25,7 +25,23 @@
 
 namespace GUIEngine { class Widget; }
 
-struct Input;
+struct GFXPreset
+{
+    bool lights;
+    int shadows;
+    bool bloom;
+    bool motionblur;
+    bool lightshaft;
+    bool glow;
+    bool mlaa;
+    bool ssao;
+    bool animatedCharacters;
+    int particles;
+    int image_quality;
+    /** Depth of field */
+    bool dof;
+    bool degraded_ibl;
+};
 
 /**
   * \brief Graphics options screen
@@ -33,11 +49,16 @@ struct Input;
   */
 class OptionsScreenVideo : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenVideo>
 {
+private:
+    bool m_prev_adv_pipline;
+    int m_prev_img_quality;
     OptionsScreenVideo();
     bool m_inited;
+    std::vector<GFXPreset> m_presets;
 
     void updateTooltip();
 
+    void initPresets();
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenVideo>;
 
@@ -58,6 +79,8 @@ public:
     virtual void unloaded() OVERRIDE;
 
     void         updateGfxSlider();
+    static int getImageQuality();
+    static void setImageQuality(int quality);
 };
 
 #endif

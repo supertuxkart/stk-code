@@ -29,6 +29,7 @@
 #endif
 #include "audio/sfx_base.hpp"
 #include "utils/leak_check.hpp"
+#include "utils/cpp2011.hpp"
 
 /**
   * \brief OpenAL implementation of the abstract SFXBase interface
@@ -81,11 +82,11 @@ public:
     virtual  ~SFXOpenAL();
 
     virtual void      updatePlayingSFX(float dt);
-    virtual bool      init();
-    virtual void      play();
-    virtual void      reallyPlayNow();
-    virtual void      play(const Vec3 &xyz);
-    virtual void      reallyPlayNow(const Vec3 &xyz);
+    virtual bool      init() OVERRIDE;
+    virtual void      play() OVERRIDE;
+    virtual void      reallyPlayNow(SFXBuffer* buffer = NULL) OVERRIDE;
+    virtual void      play(const Vec3 &xyz, SFXBuffer* buffer = NULL) OVERRIDE;
+    virtual void      reallyPlayNow(const Vec3 &xyz, SFXBuffer* buffer = NULL) OVERRIDE;
     virtual void      setLoop(bool status);
     virtual void      reallySetLoop(bool status);
     virtual void      stop();

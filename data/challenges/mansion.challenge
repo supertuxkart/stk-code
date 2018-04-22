@@ -3,10 +3,9 @@
     <track id="mansion" laps="3"/>
     <mode major="single" minor="quickrace"/>
 		<requirements trophies="110"/>
-     
     <hard>
         <karts number="5"/>
-        <requirements time="130"/>
+        <requirements time="110"/>
     </hard>
     <medium>
         <karts number="4"/>

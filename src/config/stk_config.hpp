@@ -27,8 +27,10 @@
  */
 
 #include "network/remote_kart_info.hpp"
+#include "utils/interpolation_array.hpp"
 #include "utils/no_copy.hpp"
 
+#include "utils/constants.hpp"
 #include <vector>
 #include <string>
 #include <map>
@@ -57,22 +59,24 @@ public:
      *  - SAME: give it one more item of the type it currently has.
      *  - ONLY_IF_SAME: only give it one more item if the randomly chosen item
      *          has the same type as the currently held item. */
-    enum {POWERUP_MODE_NEW,
-          POWERUP_MODE_SAME,
-          POWERUP_MODE_ONLY_IF_SAME}
-          m_same_powerup_mode;
+    enum {
+        POWERUP_MODE_NEW,
+        POWERUP_MODE_SAME,
+        POWERUP_MODE_ONLY_IF_SAME
+    }
+    m_same_powerup_mode;
 
     static float UNDEFINED;
     float m_bomb_time;                 /**<Time before a bomb explodes.        */
     float m_bomb_time_increase;        /**<Time added to bomb timer when it's
                                            passed on.                          */
-    float m_item_switch_time;          /**< Time items will be switched.       */
+    int   m_item_switch_ticks;          /**< Time items will be switched.       */
     int   m_bubblegum_counter;         /**< How many times bubble gums must be
                                             driven over before they disappear. */
-    bool  m_shield_restrict_weapos;    /**<Wether weapon usage is punished. */
+    bool  m_shield_restrict_weapons;   /**<Wether weapon usage is punished. */
     float m_explosion_impulse_objects; /**<Impulse of explosion on moving
                                             objects, e.g. road cones, ...      */
-    float m_penalty_time;              /**< Penalty time when starting too
+    int   m_penalty_ticks;              /**< Penalty time when starting too
                                             early.                             */
     float m_delay_finish_time;         /**<Delay after a race finished before
                                            the results are displayed.          */
@@ -81,10 +85,28 @@ public:
     int   m_max_karts;                 /**<Maximum number of karts.            */
     bool  m_smooth_normals;            /**< If normals for raycasts for wheels
                                            should be interpolated.             */
+
+    /** How many state updates per second the server will send. */
+    int m_network_state_frequeny;
+
+    /** Smoothing of prediction errors for position, defined as an
+     *  InterpolationArray. */
+    InterpolationArray m_positional_smoothing;
+    /** Smoothing of prediction errors for rotations, defined as an
+     *  InterpolationArray. */
+    InterpolationArray m_rotational_smoothing;
+
     /** If the angle between a normal on a vertex and the normal of the
      *  triangle are more than this value, the physics will use the normal
      *  of the triangle in smoothing normal. */
     float m_smooth_angle_limit;
+
+    /** Default friction for the track and any track/library object. */
+    float m_default_track_friction;
+
+    /** Default friction to be used for any moveable, e.g. karts, balls. */
+    float m_default_moveable_friction;
+
     int   m_max_skidmarks;           /**<Maximum number of skid marks/kart.  */
     float m_skid_fadeout_time;       /**<Time till skidmarks fade away.      */
     float m_near_ground;             /**<Determines when a kart is not near
@@ -92,12 +114,13 @@ public:
                                       *  constraint is disabled to allow for
                                       *  more violent explosions.            */
     int   m_min_kart_version,        /**<The minimum and maximum .kart file  */
-          m_max_kart_version;        /**<version supported by this binary.   */
+        m_max_kart_version;        /**<version supported by this binary.   */
     int   m_min_track_version,       /**<The minimum and maximum .track file */
-          m_max_track_version;       /**<version supported by this binary.   */
+        m_max_track_version;       /**<version supported by this binary.   */
+    int   m_min_server_version,       /**<The minimum and maximum server */
+        m_max_server_version;       /**<version supported by this binary.   */
     int   m_max_display_news;        /**<How often a news message is displayed
                                          before it is ignored. */
-    bool  m_enable_networking;
 
     /** Disable steering if skidding is stopped. This can help in making
      *  skidding more controllable (since otherwise when trying to steer while
@@ -113,8 +136,8 @@ public:
                                          used to give a handicap to AIs */
 
     std::vector<float>
-          m_leader_intervals;        /**<Interval in follow the leader till
-                                         last kart is reomved.               */
+        m_leader_intervals;        /**<Interval in follow the leader till
+                                       last kart is reomved.               */
     float m_leader_time_per_kart;    /**< Additional time to each leader
                                           interval for each additional kart. */
     std::vector<int> m_switch_items; /**< How to switch items.               */
@@ -141,16 +164,22 @@ public:
     float m_replay_delta_angle;
 
     /** The field of view for 1, 2, 3, 4 player split screen. */
-    float m_camera_fov[4];
+    float m_camera_fov[MAX_PLAYER_COUNT];
 
-    /** File names of the default fonts in STK. */
-    std::string m_font_default;
-    std::string m_font_default_fallback;
-    std::string m_font_cjk;
-    std::string m_font_ar;
-    std::string m_font_bold;
-    std::string m_font_bold_fallback;
-    std::string m_font_digit;
+    float m_cutscene_fov;
+
+    unsigned m_max_skinning_bones;
+
+    unsigned m_tc_quality;
+
+    /** Client and server port use random ports if enabled in user config. */
+    uint16_t m_server_discovery_port;
+    uint16_t m_client_port;
+    uint16_t m_server_port;
+
+    /** Lists of TTF files used in STK. */
+    std::vector<std::string> m_normal_ttf;
+    std::vector<std::string> m_digit_ttf;
 
 private:
     /** True if stk_config has been loaded. This is necessary if the
@@ -159,29 +188,43 @@ private:
      *  loaded a user specified config file. */
     bool  m_has_been_loaded;
 
+    /** Default FPS rate for physics. */
+    int m_physics_fps;
+
+
 public:
-         STKConfig();
-        ~STKConfig();
-    void init_defaults    ();
-    void getAllData       (const XMLNode * root);
-    void load             (const std::string &filename);
+    STKConfig();
+    ~STKConfig();
+    void init_defaults();
+    void getAllData(const XMLNode * root);
+    void load(const std::string &filename);
     const std::string &getMainMenuPicture(int n);
     const std::string &getBackgroundPicture(int n);
+
     void  getAllScores(std::vector<int> *all_scores, int num_karts);
     // ------------------------------------------------------------------------
     /** Returns the default kart properties for each kart. */
     const KartProperties &
-         getDefaultKartProperties() const {return *m_default_kart_properties; }
+        getDefaultKartProperties() const { return *m_default_kart_properties; }
 
     // ------------------------------------------------------------------------
     /** Returns the kart properties for a certain type of kart.
      *  \throw out_of_range if there is no data for 'type'.
      *  \param type Type of kart (e.g. heavy, medium, ...).
      */
-    const KartProperties& getKartProperties(std::string type)
+    const KartProperties& getKartProperties(const std::string &type)
     {
-        return *m_kart_properties.at(type); 
+        return *m_kart_properties.at(type);
     }   // getKartProperties
+    // ------------------------------------------------------------------------
+    /** Converts a tick value (in physics time step size) into seconds. */
+    float ticks2Time(int ticks) { return float(ticks)/m_physics_fps; }
+    // ------------------------------------------------------------------------
+    /** Converts a time value into ticks (of physics time steps). */
+    int time2Ticks(float t) { return int(t * m_physics_fps);  }
+    // ------------------------------------------------------------------------
+    /** Returns the physics frame per seconds rate. */
+    int getPhysicsFPS() const { return m_physics_fps; }
 }
 ;   // STKConfig
 

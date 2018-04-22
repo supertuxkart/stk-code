@@ -152,6 +152,10 @@ namespace irr
 		/** \param text: New text of the window caption. */
 		virtual void setWindowCaption(const wchar_t* text) = 0;
 
+		//! Sets the class of the window.
+		/** \param text: New text of the window class. */
+		virtual void setWindowClass(const char* text) = 0;
+
 		//! Returns if the window is active.
 		/** If the window is inactive,
 		nothing needs to be drawn. So if you don't want to draw anything
@@ -235,6 +239,15 @@ namespace irr
 
 		//! Restore the window to normal size if possible.
 		virtual void restoreWindow() =0;
+
+		//! Move window to requested position
+		/** \return true if success */
+		virtual bool moveWindow(int x, int y) = 0;
+
+		//! Get current window position.
+		/** \return true if success */
+		virtual bool getWindowPosition(int* x, int* y) = 0;
+
 
 		//! Activate any joysticks, and generate events for them.
 		/** Irrlicht contains support for joysticks, but does not generate joystick events by default,

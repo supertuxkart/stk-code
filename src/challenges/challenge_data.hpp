@@ -84,7 +84,7 @@ private:
 
     int                            m_num_laps;
     int                            m_position[RaceManager::DIFFICULTY_COUNT];
-    int                            m_num_karts[RaceManager::DIFFICULTY_COUNT];
+    int                            m_default_num_karts[RaceManager::DIFFICULTY_COUNT];
     std::string                    m_ai_kart_ident[RaceManager::DIFFICULTY_COUNT];
     std::string                    m_replay_files[RaceManager::DIFFICULTY_COUNT];
     float                          m_time[RaceManager::DIFFICULTY_COUNT];
@@ -109,8 +109,6 @@ private:
 
     /** Number of trophies required to access this challenge */
     int m_num_trophies;
-
-    irr::core::stringw m_challenge_description;
 
 public:
                  ChallengeData(const std::string& filename);
@@ -195,10 +193,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the description of this challenge.
      */
-    const irr::core::stringw& getChallengeDescription() const
-    {
-        return m_challenge_description;
-    }   // getChallengeDescription
+    const irr::core::stringw getChallengeDescription() const;
 
     // ------------------------------------------------------------------------
     /** Returns the minimum position the player must have in order to win.
@@ -213,7 +208,7 @@ public:
      */
     int getNumKarts(RaceManager::Difficulty difficulty) const
     {
-        return m_num_karts[difficulty];
+        return m_default_num_karts[difficulty];
     }   // getNumKarts
     // ------------------------------------------------------------------------
     /** Returns the maximum time in which the kart must finish.

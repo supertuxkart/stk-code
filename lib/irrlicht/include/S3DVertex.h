@@ -8,6 +8,7 @@
 #include "vector3d.h"
 #include "vector2d.h"
 #include "SColor.h"
+#include <cstring>
 
 namespace irr
 {
@@ -26,7 +27,9 @@ enum E_VERTEX_TYPE
 
 	//! Vertex with a tangent and binormal vector, video::S3DVertexTangents.
 	/** Usually used for tangent space normal mapping. */
-	EVT_TANGENTS
+	EVT_TANGENTS,
+
+	EVT_SKINNED_MESH
 };
 
 //! Array holding the built in vertex type names
@@ -251,7 +254,32 @@ struct S3DVertexTangents : public S3DVertex
 	}
 };
 
+//! SPM usage. */
+struct S3DVertexSkinnedMesh
+{
+	core::vector3df m_position;
+	u32 m_normal;
+	SColor m_color;
+	s16 m_all_uvs[4];
+	u32 m_tangent;
+	s16 m_joint_idx[4];
+	s16 m_weight[4];
 
+	S3DVertexSkinnedMesh()
+	{
+		m_normal = 0;
+		m_color.color = -1;
+		memset(m_all_uvs, 0, 8);
+		m_tangent = 0;
+		memset(m_joint_idx, 0, 8);
+		memset(m_weight, 0, 8);
+	}
+
+	E_VERTEX_TYPE getType() const
+	{
+		return EVT_SKINNED_MESH;
+	}
+};
 
 inline u32 getVertexPitchFromType(E_VERTEX_TYPE vertexType)
 {
@@ -261,6 +289,8 @@ inline u32 getVertexPitchFromType(E_VERTEX_TYPE vertexType)
 		return sizeof(video::S3DVertex2TCoords);
 	case video::EVT_TANGENTS:
 		return sizeof(video::S3DVertexTangents);
+	case video::EVT_SKINNED_MESH:
+		return sizeof(video::S3DVertexSkinnedMesh);
 	default:
 		return sizeof(video::S3DVertex);
 	}

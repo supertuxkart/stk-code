@@ -7,5 +7,5 @@ out vec4 FragColor;
 void main()
 {
 	vec4 res = texture(tex, uv);
-	FragColor = res * color / 255.;
+	FragColor = res * vec4(color) / 255.;
 }

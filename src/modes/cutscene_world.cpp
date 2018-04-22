@@ -61,6 +61,7 @@ CutsceneWorld::CutsceneWorld() : World()
     m_play_track_intro_sound = false;
     m_play_ready_set_go_sounds = false;
     m_fade_duration = 1.0f;
+    m_camera = NULL;
 }   // CutsceneWorld
 
 //-----------------------------------------------------------------------------
@@ -74,17 +75,18 @@ void CutsceneWorld::init()
 
     dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(1.0f);
 
-    getTrack()->startMusic();
+    Track::getCurrentTrack()->startMusic();
 
     m_duration = -1.0f;
 
-    Camera* stk_cam = Camera::createCamera(NULL);
+    Camera* stk_cam = Camera::createCamera(NULL, 0);
     m_camera = stk_cam->getCameraSceneNode();
-    m_camera->setFOV(0.61f);
+    m_camera->setFOV(stk_config->m_cutscene_fov);
     m_camera->bindTargetAndRotation(true); // no "look-at"
 
     // --- Build list of sounds to play at certain frames
-    PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
+    PtrVector<TrackObject>& objects = Track::getCurrentTrack()
+                                    ->getTrackObjectManager()->getObjects();
     for (TrackObject* curr : objects)
     {
         if (curr->getType() == "particle-emitter" &&
@@ -179,9 +181,9 @@ const std::string& CutsceneWorld::getIdent() const
 
 //-----------------------------------------------------------------------------
 /** Update the world and the track.
- *  \param dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void CutsceneWorld::update(float dt)
+void CutsceneWorld::update(int ticks)
 {
     /*
     {
@@ -198,7 +200,8 @@ void CutsceneWorld::update(float dt)
     {
         //printf("INITIAL TIME for CutsceneWorld\n");
 
-        PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
+        PtrVector<TrackObject>& objects = Track::getCurrentTrack()
+                                        ->getTrackObjectManager()->getObjects();
         TrackObject* curr;
         for_in(curr, objects)
         {
@@ -212,7 +215,8 @@ void CutsceneWorld::update(float dt)
     {
         m_second_reset = false;
 
-        PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
+        PtrVector<TrackObject>& objects = Track::getCurrentTrack()
+                                        ->getTrackObjectManager()->getObjects();
         TrackObject* curr;
         for_in(curr, objects)
         {
@@ -230,9 +234,8 @@ void CutsceneWorld::update(float dt)
         double prev_time = m_time;
         double now = StkTime::getRealTime();
         m_time = now - m_time_at_second_reset;
-        dt = (float)(m_time - prev_time);
     }
-
+    
     float fade = 0.0f;
     float fadeIn = -1.0f;
     float fadeOut = -1.0f;
@@ -264,7 +267,8 @@ void CutsceneWorld::update(float dt)
 
     //printf("Estimated current frame : %f\n", curr_frame);
 
-    const std::vector<Subtitle>& subtitles = m_track->getSubtitles();
+    const std::vector<Subtitle>& subtitles = Track::getCurrentTrack()
+                                           ->getSubtitles();
     bool foundSubtitle = false;
     for (unsigned int n = 0; n < subtitles.size(); n++)
     {
@@ -283,10 +287,11 @@ void CutsceneWorld::update(float dt)
     }
 
 
-    World::update((float)dt);
-    World::updateTrack((float)dt);
+    World::update(ticks);
+    World::updateTrack(ticks);
 
-    PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
+    PtrVector<TrackObject>& objects = Track::getCurrentTrack()
+                                    ->getTrackObjectManager()->getObjects();
     TrackObject* curr;
     for_in(curr, objects)
     {

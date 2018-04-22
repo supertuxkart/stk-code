@@ -36,7 +36,7 @@ AbstractKart::AbstractKart(const std::string& ident,
                            int world_kart_id, int position,
                            const btTransform& init_transform,
                            PerPlayerDifficulty difficulty,
-                           video::E_RENDER_TYPE rt)
+                           std::shared_ptr<RenderInfo> ri)
              : Moveable()
 {
     m_world_kart_id   = world_kart_id;
@@ -60,7 +60,7 @@ AbstractKart::AbstractKart(const std::string& ident,
     // released when the kart is deleted, but since the original
     // kart_model is stored in the kart_properties all the time,
     // there is no risk of a mesh being deleted to early.
-    m_kart_model  = m_kart_properties->getKartModelCopy(rt);
+    m_kart_model  = m_kart_properties->getKartModelCopy(ri);
     m_kart_width  = m_kart_model->getWidth();
     m_kart_height = m_kart_model->getHeight();
     m_kart_length = m_kart_model->getLength();
@@ -79,12 +79,15 @@ AbstractKart::~AbstractKart()
 // ----------------------------------------------------------------------------
 void AbstractKart::reset()
 {
-    Moveable::reset();
+    // important to delete animations before calling reset, as some animations
+    // set the kart velocity in their destructor (e.g. cannon) which "reset"
+    // can then cancel. See #2738
     if(m_kart_animation)
     {
         delete m_kart_animation;
         m_kart_animation = NULL;
     }
+    Moveable::reset();
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -127,6 +130,12 @@ void AbstractKart::setKartAnimation(AbstractKartAnimation *ka)
         else   Log::debug("Abstract_Kart", "Current kart animation is NULL.");
     }
 #endif
+    if (ka != NULL && m_kart_animation != NULL)
+    {
+        delete m_kart_animation;
+        m_kart_animation = NULL;
+    }
+
     // Make sure that the either the current animation is NULL and a new (!=0)
     // is set, or there is a current animation, then it must be set to 0. This
     // makes sure that the calling logic of this function is correct.

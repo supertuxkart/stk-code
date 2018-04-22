@@ -36,6 +36,7 @@
 #include "utils/vec3.hpp"
 
 class AbstractKart;
+class NetworkString;
 class SavedGrandPrix;
 class Track;
 
@@ -227,7 +228,7 @@ public:
 #undef BATTLE_ARENA
 
     /** Game difficulty. */
-    enum Difficulty     { DIFFICULTY_EASY,
+    enum Difficulty     { DIFFICULTY_EASY = 0,
                           DIFFICULTY_FIRST = DIFFICULTY_EASY,
                           DIFFICULTY_MEDIUM,
                           DIFFICULTY_HARD,
@@ -236,9 +237,10 @@ public:
                           DIFFICULTY_COUNT};
 
     /** Different kart types: A local player, a player connected via network,
-     *  an AI kart, the leader kart (currently not used), a ghost kart. */
+     *  an AI kart, the leader kart (currently not used), a ghost kart and
+     *  spare tire karts which allow gain life in battle mode */
     enum KartType       { KT_PLAYER, KT_NETWORK_PLAYER, KT_AI, KT_LEADER,
-                          KT_GHOST };
+                          KT_GHOST, KT_SPARE_TIRE };
 private:
 
     bool m_started_from_overworld;
@@ -302,7 +304,6 @@ private:
     /** Stores remote kart information about all player karts. */
     std::vector<RemoteKartInfo>      m_player_karts;
     std::vector<std::string>         m_tracks;
-    std::vector<int>                 m_host_ids;
 
     /** Number of local players. */
     unsigned int m_num_local_players;
@@ -329,6 +330,7 @@ private:
     GrandPrixData                    m_grand_prix;
     SavedGrandPrix*                  m_saved_gp;
     int                              m_num_karts;
+    unsigned int                     m_num_spare_tire_karts;
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
     int                              m_coin_target;
@@ -487,6 +489,19 @@ public:
     {
         return m_num_local_players;
     }   // getNumLocalPlayers
+    
+    // ------------------------------------------------------------------------
+    /** Returns true if the split screen display leaves an empty space that
+     *  can be used to display the minimap.
+     */
+    bool getIfEmptyScreenSpaceExists() const
+    {
+        const float sqrt_num_players = sqrtf((float)getNumLocalPlayers());
+        const int rows = (int)ceil(sqrt_num_players);
+        const int cols = (int)round(sqrt_num_players);
+        const int total_spaces = rows * cols;
+        return (total_spaces - getNumLocalPlayers() > 0);
+    }   // getIfEmptyScreenSpaceExists
     // ------------------------------------------------------------------------
     /** Returns the selected number of karts (selected number of players and
      *  AI karts. */
@@ -610,6 +625,8 @@ public:
     float getTimeTarget() const { return m_time_target; }
     // ------------------------------------------------------------------------
     int getTrackNumber() const { return m_track_number; }
+    // ------------------------------------------------------------------------
+    int getNumOfTracks() const { return (int)m_tracks.size(); }
     // ------------------------------------------------------------------------
     /** Returns the list of AI karts to use. Used for networking, and for
     *  the --ai= command line option. */
@@ -751,6 +768,28 @@ public:
     {
         return m_watching_replay;
     }   // isWatchingReplay
+    // ------------------------------------------------------------------------
+    void addSpareTireKart(const std::string& name)
+    {
+        m_kart_status.push_back(KartStatus(name, 0, -1, -1,
+            -1, KT_SPARE_TIRE, PLAYER_DIFFICULTY_NORMAL));
+        m_num_spare_tire_karts++;
+        m_num_karts++;
+    }   // addSpareTireKart
+    // ------------------------------------------------------------------------
+    void setSpareTireKartNum(unsigned int i)
+    {
+        m_num_spare_tire_karts = i;
+    }   // setSpareTireKartNum
+    // ------------------------------------------------------------------------
+    unsigned int getNumSpareTireKarts() const
+    {
+        return m_num_spare_tire_karts;
+    }   // getNumSpareTireKarts
+    // ------------------------------------------------------------------------
+    void configGrandPrixResultFromNetwork(NetworkString& ns);
+    // ------------------------------------------------------------------------
+    void clearNetworkGrandPrixResult();
 
 };   // RaceManager
 

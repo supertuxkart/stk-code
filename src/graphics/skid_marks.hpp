@@ -20,16 +20,20 @@
 #ifndef HEADER_SKID_MARK_HPP
 #define HEADER_SKID_MARK_HPP
 
+#include <aabbox3d.h>
+#include <memory>
+#include <SColor.h>
 #include <vector>
 
-#include <aabbox3d.h>
-#include <SMeshBuffer.h>
-namespace irr
-{
-    namespace video { class SMaterial;      }
-    namespace scene { class IMeshSceneNode; }
-}
 using namespace irr;
+
+class Material;
+
+namespace SP
+{
+    class SPDynamicDrawCall;
+    class SPShader;
+}
 
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
@@ -51,9 +55,6 @@ private:
     /** Reduce effect of Z-fighting. */
     float              m_width;
 
-    /** Index of current (last added) skid mark quad. */
-    int                m_current;
-
     /** Initial alpha value. */
     static const int   m_start_alpha;
 
@@ -61,10 +62,13 @@ private:
     static const int   m_start_grey;
 
     /** Material to use for the skid marks. */
-    video::SMaterial  *m_material;
+    Material* m_material;
+
+    /** Shader(alphablend) to use for the skid marks. */
+    std::shared_ptr<SP::SPShader> m_shader;
 
     // ------------------------------------------------------------------------
-    class SkidMarkQuads : public scene::SMeshBuffer, public NoCopy
+    class SkidMarkQuads : public NoCopy
     {
         /** Used to move skid marks at the same location slightly on
          *  top of each other to avoid a 'wobbling' effect when sometines
@@ -74,34 +78,30 @@ private:
         /** Fade out = alpha value. */
         float m_fade_out;
 
-        /** For culling, we need the overall radius of the skid marks. We
-         *  approximate this by maintaining an axis-aligned boundary box. */
-        core::aabbox3df m_aabb;
-
         video::SColor   m_start_color;
 
         /** Vector marking the start of the skidmarks (located between left and right wheel) */
         Vec3 m_center_start;
 
+        std::shared_ptr<SP::SPDynamicDrawCall> m_dy_dc;
+
     public:
             SkidMarkQuads (const Vec3 &left, const Vec3 &right,
-                           video::SMaterial *material, float z_offset,
-                           video::SColor* custom_color = NULL);
+                           const Vec3 &normal, Material* material,
+                           std::shared_ptr<SP::SPShader> shader,
+                           float z_offset, video::SColor* custom_color = NULL);
+            ~SkidMarkQuads();
         void add          (const Vec3 &left,
                            const Vec3 &right,
+                           const Vec3 &normal,
                            float distance);
-        void fade         (float f);
-        /** Returns the aabb of this skid mark quads. */
-        const core::aabbox3df &getAABB() { return m_aabb; }
+        bool fade         (float f);
         const Vec3& getCenterStart() const { return m_center_start; }
     };  // SkidMarkQuads
 
     // ------------------------------------------------------------------------
     /** Two skidmark objects for the left and right wheel. */
-    std::vector<SkidMarkQuads *>     m_left, m_right;
-
-    /** The nodes where each left/right pair is attached to. */
-    std::vector<scene::IMeshSceneNode *> m_nodes;
+    std::vector<std::unique_ptr<SkidMarkQuads> > m_left, m_right;
 
     /** Shared static so that consecutive skidmarks are at a slightly
      *  different height. */
@@ -113,8 +113,6 @@ public:
     void update (float dt, bool force_skid_marks=false,
                  video::SColor* custom_color = NULL);
     void reset();
-
-    void adjustFog(bool enabled);
 
 };   // SkidMarks
 

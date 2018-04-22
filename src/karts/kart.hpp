@@ -28,19 +28,21 @@
 
 #include "LinearMath/btTransform.h"
 
-#include "items/powerup.hpp"
+#include "items/powerup_manager.hpp"    // For PowerupType
 #include "karts/abstract_kart.hpp"
-#include "karts/kart_properties.hpp"
 #include "utils/no_copy.hpp"
 
-class btKart;
+#include <SColor.h>
 
-class Attachment;
-class Controller;
-class Item;
 class AbstractKartAnimation;
+class Attachment;
+class btKart;
+class btUprightConstraint;
+class Controller;
 class HitEffect;
+class Item;
 class KartGFX;
+class KartRewinder;
 class MaxSpeed;
 class ParticleEmitter;
 class ParticleKind;
@@ -72,10 +74,22 @@ protected:
      *  new lap is triggered. */
     Vec3 m_xyz_front;
 
+    /* Determines the time covered by the history size, in seconds */
+    const float XYZ_HISTORY_TIME = 0.25f;
+
+    /* Determines the number of previous XYZ positions of the kart to remember
+       Initialized in the constructor and unchanged from then on */
+    int m_xyz_history_size;
+
+    /** The coordinates of the XYZ_HISTORY_SIZE previous positions */
+    std::vector<Vec3> m_previous_xyz;
+
+    float m_time_previous_counter;
+
     /** Is time flying activated */
     bool m_is_jumping;
 
-private:
+protected:
     /** Handles speed increase and capping due to powerup, terrain, ... */
     MaxSpeed *m_max_speed;
 
@@ -84,6 +98,9 @@ private:
 
     /** Handles the powerup of a kart. */
     Powerup *m_powerup;
+    
+    /** Remember the last **used** powerup type of a kart for AI purposes. */
+    PowerupManager::PowerupType m_last_used_powerup;
 
     /** True if kart is flying (for debug purposes only). */
     bool m_flying;
@@ -131,24 +148,24 @@ private:
 
     /** How long the brake key has been pressed - the longer the harder
      *  the kart will brake. */
-    float        m_brake_time;
+    int          m_brake_ticks;
 
     /** A short time after a collision acceleration is disabled to allow
      *  the karts to bounce back*/
-    float        m_bounce_back_time;
+    int          m_bounce_back_ticks;
 
     /** Time a kart is invulnerable. */
-    float        m_invulnerable_time;
+    int          m_invulnerable_ticks;
 
     /** How long a kart is being squashed. If this is >0
      *  the kart is squashed. */
-    float        m_squash_time;
+    int          m_squash_ticks;
 
     /** Current leaning of the kart. */
     float        m_current_lean;
 
     /** If > 0 then bubble gum effect is on. This is the sliding when hitting a gum on the floor, not the shield. */
-    float        m_bubblegum_time;
+    int          m_bubblegum_ticks;
 
     /** The torque to apply after hitting a bubble gum. */
     float        m_bubblegum_torque;
@@ -156,9 +173,8 @@ private:
     /** True if fire button was pushed and not released */
     bool         m_fire_clicked;
 
-    /** Counter which is used for displaying wrong way message after a delay */
-    float        m_wrongway_counter;
-
+    /** True if the kart has been selected to have a boosted ai */
+    bool         m_boosted_ai;
 
     // Bullet physics parameters
     // -------------------------
@@ -176,8 +192,6 @@ private:
     /** The shadow of a kart. */
     Shadow          *m_shadow;
 
-    ParticleEmitter *m_sky_particles_emitter;
-
     /** All particle effects. */
     KartGFX         *m_kart_gfx;
 
@@ -193,37 +207,51 @@ private:
     float           m_finish_time;
     bool            m_finished_race;
 
+    int             m_falling_ticks;
+
     /** When a kart has its view blocked by the plunger, this variable will be
      *  > 0 the number it contains is the time left before removing plunger. */
-    float         m_view_blocked_by_plunger;
+    int           m_view_blocked_by_plunger;
+    /** The current speed (i.e. length of velocity vector) of this kart. */
     float         m_speed;
+    /** For camera handling an exponentially smoothened value is used, which
+     *  reduces stuttering of the camera. */
+    float         m_smoothed_speed;
+    
+    /** For smoothing engine sound**/
+    float         m_last_factor_engine_sound;
 
     std::vector<SFXBase*> m_custom_sounds;
-    SFXBase      *m_beep_sound;
+    int m_emitter_id = 0;
+    static const int EMITTER_COUNT = 3;
+    SFXBase      *m_emitters[EMITTER_COUNT];
     SFXBase      *m_engine_sound;
-    SFXBase      *m_crash_sound;
     SFXBase      *m_terrain_sound;
     SFXBase      *m_nitro_sound;
     /** A pointer to the previous terrain sound needs to be saved so that an
      *  'older' sfx can be finished and an abrupt end of the sfx is avoided. */
     SFXBase      *m_previous_terrain_sound;
     SFXBase      *m_skid_sound;
-    SFXBase      *m_goo_sound;
-    SFXBase      *m_boing_sound;
-    float         m_time_last_crash;
+    SFXBuffer    *m_horn_sound;
+    static const int CRASH_SOUND_COUNT = 3;
+    SFXBuffer    *m_crash_sounds[CRASH_SOUND_COUNT];
+    SFXBuffer    *m_goo_sound;
+    SFXBuffer    *m_boing_sound;
+    int          m_ticks_last_crash;
     RaceManager::KartType m_type;
 
     /** To prevent using nitro in too short bursts */
-    float         m_min_nitro_time;
+    int           m_min_nitro_ticks;
 
-    void          updatePhysics(float dt);
+    void          updatePhysics(int ticks);
     void          handleMaterialSFX(const Material *material);
-    void          handleMaterialGFX();
+    void          handleMaterialGFX(int ticks);
     void          updateFlying();
     void          updateSliding();
-    void          updateEnginePowerAndBrakes(float dt);
-    void          updateEngineSFX();
-    void          updateNitro(float dt);
+    void          updateEnginePowerAndBrakes(int ticks);
+    void          updateEngineSFX(float dt);
+    void          updateSpeed();
+    void          updateNitro(int ticks);
     float         getActualWheelForce();
     void          playCrashSFX(const Material* m, AbstractKart *k);
     void          loadData(RaceManager::KartType type, bool animatedModel);
@@ -232,12 +260,11 @@ public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
                         PerPlayerDifficulty difficulty,
-                        video::E_RENDER_TYPE rt = video::ERT_DEFAULT);
+                        std::shared_ptr<RenderInfo> ri);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
     virtual void   kartIsInRestNow();
-    virtual void   updateGraphics(float dt, const Vec3& off_xyz,
-                                  const btQuaternion& off_rotation);
+    virtual void   updateGraphics(float dt) OVERRIDE;
     virtual void   createPhysics    ();
     virtual void   updateWeight     ();
     virtual float  getSpeedForTurnRadius(float radius) const;
@@ -253,9 +280,14 @@ public:
     virtual void   increaseMaxSpeed(unsigned int category, float add_speed,
                                     float engine_force, float duration,
                                     float fade_out_time);
+    virtual void   instantSpeedIncrease(unsigned int category, float add_max_speed,
+                                    float speed_boost, float engine_force, float duration,
+                                    float fade_out_time);
     virtual void   setSlowdown(unsigned int category, float max_speed_fraction,
-                               float fade_in_time);
-    virtual float getSpeedIncreaseTimeLeft(unsigned int category) const;
+                               int fade_in_time);
+    virtual int   getSpeedIncreaseTicksLeft(unsigned int category) const;
+    virtual void  setBoostAI     (bool boosted);
+    virtual bool  getBoostAI     () const;
     virtual void  collectedItem(Item *item, int random_attachment);
     virtual float getStartupBoost() const;
 
@@ -272,7 +304,7 @@ public:
     virtual void   crashed          (AbstractKart *k, bool update_attachments);
     virtual void   crashed          (const Material *m, const Vec3 &normal);
     virtual float  getHoT           () const;
-    virtual void   update           (float dt);
+    virtual void   update           (int ticks);
     virtual void   finishedRace     (float time, bool from_server=false);
     virtual void   setPosition      (int p);
     virtual void   beep             ();
@@ -281,6 +313,7 @@ public:
 
     virtual bool   playCustomSFX    (unsigned int type);
     virtual void   setController(Controller *controller);
+    virtual void   setXYZ(const Vec3& a);
 
     // ========================================================================
     // Powerup related functions.
@@ -288,11 +321,17 @@ public:
     /** Sets a new powerup. */
     virtual void setPowerup (PowerupManager::PowerupType t, int n);
     // ------------------------------------------------------------------------
+    /** Sets the last used powerup. */
+    virtual void setLastUsedPowerup (PowerupManager::PowerupType t);
+    // ------------------------------------------------------------------------
     /** Returns the current powerup. */
     virtual const Powerup* getPowerup() const { return m_powerup; }
     // ------------------------------------------------------------------------
     /** Returns the current powerup. */
     virtual Powerup* getPowerup() { return m_powerup; }
+    // ------------------------------------------------------------------------
+    /** Returns the last used powerup. */
+    virtual PowerupManager::PowerupType getLastUsedPowerup() { return m_last_used_powerup; }
     // ------------------------------------------------------------------------
     /** Returns the number of powerups. */
     virtual int getNumPowerup() const;
@@ -320,7 +359,7 @@ public:
     virtual bool   hasFinishedRace     () const { return m_finished_race;    }
     // ------------------------------------------------------------------------
     /** Returns true if the kart has a plunger attached to its face. */
-    virtual float  getBlockedByPlungerTime() const
+    virtual int getBlockedByPlungerTicks() const
                                          { return m_view_blocked_by_plunger; }
     // ------------------------------------------------------------------------
     /** Sets that the view is blocked by a plunger. The duration depends on
@@ -333,8 +372,7 @@ public:
     virtual btTransform getAlignedTransform(const float customPitch=-1);
     // -------------------------------------------------------------------------
     /** Returns the color used for this kart. */
-    const video::SColor &getColor() const
-                                        {return m_kart_properties->getColor();}
+    const irr::video::SColor &getColor() const;
     // ------------------------------------------------------------------------
     /** Returns the time till full steering is reached for this kart.
      *  \param steer Current steer value (must be >=0), on which the time till
@@ -361,6 +399,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. */
     virtual float        getSpeed() const {return m_speed;                 }
+    // ------------------------------------------------------------------------
+    /** Returns the speed of the kart in meters/second. */
+    virtual float        getSmoothedSpeed() const { return m_smoothed_speed; }
     // ------------------------------------------------------------------------
     /** This is used on the client side only to set the speed of the kart
      *  from the server information.                                       */
@@ -391,7 +432,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if the kart is close to the ground, used to dis/enable
      *  the upright constraint to allow for more realistic explosions. */
-    bool           isNearGround     () const;
+    bool isNearGround() const;
     // ------------------------------------------------------------------------
     /** Returns true if the kart is eliminated.  */
     virtual bool isEliminated() const { return m_eliminated; }
@@ -399,10 +440,13 @@ public:
     virtual void eliminate();
     // ------------------------------------------------------------------------
     /** Makes a kart invulnerable for a certain amount of time. */
-    virtual void  setInvulnerableTime(float t) { m_invulnerable_time = t; }
+    virtual void setInvulnerableTicks(int ticks) OVERRIDE
+    { 
+        m_invulnerable_ticks = ticks;
+    }   // setInvulnerableTicks
     // ------------------------------------------------------------------------
     /** Returns if the kart is invulnerable. */
-    virtual bool   isInvulnerable() const { return m_invulnerable_time > 0; }
+    virtual bool isInvulnerable() const { return m_invulnerable_ticks > 0; }
     // ------------------------------------------------------------------------
     /** Enables a kart shield protection for a certain amount of time. */
     virtual void setShieldTime(float t);
@@ -423,10 +467,10 @@ public:
     /** Return whether nitro is being used despite the nitro button not being
      *  pressed due to minimal use time requirements
      */
-    virtual float isOnMinNitroTime() const { return m_min_nitro_time > 0.0f; }
+    virtual bool isOnMinNitroTime() const { return m_min_nitro_ticks > 0; }
     // ------------------------------------------------------------------------
     /** Returns if the kart is currently being squashed. */
-    virtual bool   isSquashed() const { return m_squash_time >0; }
+    virtual bool isSquashed() const { return m_squash_ticks >0; }
     // ------------------------------------------------------------------------
     /** Shows the star effect for a certain time. */
     virtual void showStarEffect(float t);
@@ -436,13 +480,18 @@ public:
     // ------------------------------------------------------------------------
     virtual void setOnScreenText(const wchar_t *text);
     // ------------------------------------------------------------------------
+    /** Returns the normal of the terrain the kart is over atm. This is
+     *  defined even if the kart is flying. */
+    virtual const Vec3& getNormal() const;
+    // ------------------------------------------------------------------------
+    /** Returns the position 0.25s before */
+    virtual const Vec3& getPreviousXYZ() const;
+    // ------------------------------------------------------------------------
+    /** Returns a more recent different previous position */
+    virtual const Vec3& getRecentPreviousXYZ() const;
+    // ------------------------------------------------------------------------
     /** For debugging only: check if a kart is flying. */
     bool isFlying() const { return m_flying;  }
-    // ------------------------------------------------------------------------
-    /** Counter which is used for displaying wrong way message after a delay */
-    float getWrongwayCounter() { return m_wrongway_counter; }
-    // ------------------------------------------------------------------------
-    void setWrongwayCounter(float counter) { m_wrongway_counter = counter; }
     // ------------------------------------------------------------------------
     /** Returns whether this kart wins or loses. */
     virtual bool getRaceResult() const { return m_race_result;  }
@@ -455,11 +504,13 @@ public:
     // ------------------------------------------------------------------------
     /** Returns whether this kart is jumping. */
     virtual bool isJumping() const { return m_is_jumping; };
-
+    // ------------------------------------------------------------------------
+    SFXBase* getNextEmitter();
+    // ------------------------------------------------------------------------
+    virtual void playSound(SFXBuffer* buffer);
 };   // Kart
 
 
 #endif
 
 /* EOF */
-

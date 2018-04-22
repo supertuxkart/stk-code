@@ -36,7 +36,8 @@ class DeviceConfig;
 enum DeviceType
 {
     DT_KEYBOARD,
-    DT_GAMEPAD
+    DT_GAMEPAD,
+    DT_MULTITOUCH
 };
 
 /**

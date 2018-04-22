@@ -52,7 +52,7 @@ public:
     // ------------------------------------------------------------------------
     /** Updates a plugin. This is called once each time frame. If the
      *  function returns true, the attachment is discarded. */
-    virtual bool updateAndTestFinished(float dt) = 0;
+    virtual bool updateAndTestFinished(int ticks) = 0;
 
     // ------------------------------------------------------------------------
     /** Called when the animation of the Attachment's node is done. */

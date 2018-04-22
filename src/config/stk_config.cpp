@@ -103,7 +103,7 @@ void STKConfig::load(const std::string &filename)
                    strA,filename.c_str());              \
     }
 
-    if(m_score_increase.size()==0 || (int)m_score_increase.size()!=m_max_karts)
+    if(m_score_increase.size()==0)
     {
         Log::fatal("StkConfig", "Not or not enough scores defined in stk_config");
     }
@@ -117,8 +117,23 @@ void STKConfig::load(const std::string &filename)
         Log::fatal("StkConfig", "Wrong number of item switches defined in stk_config");
     }
 
+    if (m_positional_smoothing.size() == 0)
+    {
+        Log::fatal("StkConfig", "No positional smoothing defined in stk_config.");
+    }
+    if (m_rotational_smoothing.size() == 0)
+    {
+        Log::fatal("StkConfig", "No rotationalsmoothing defined in stk_config.");
+    }
+
+    if (m_client_port == 0 || m_server_port == 0 || m_server_discovery_port == 0 ||
+        m_client_port == m_server_port || m_client_port == m_server_discovery_port ||
+        m_server_port == m_server_discovery_port)
+    {
+        Log::fatal("StkConfig", "Invalid default port values.");
+    }
     CHECK_NEG(m_max_karts,                 "<karts max=..."             );
-    CHECK_NEG(m_item_switch_time,          "item-switch-time"           );
+    CHECK_NEG(m_item_switch_ticks,         "item switch-time"           );
     CHECK_NEG(m_bubblegum_counter,         "bubblegum disappear counter");
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
     CHECK_NEG(m_max_skidmarks,             "max-skidmarks"              );
@@ -126,18 +141,24 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_max_kart_version,          "<kart-version max=...>"     );
     CHECK_NEG(m_min_track_version,         "min-track-version"          );
     CHECK_NEG(m_max_track_version,         "max-track-version"          );
+    CHECK_NEG(m_min_server_version,        "min-server-version"         );
+    CHECK_NEG(m_max_server_version,        "max-server-version"         );
     CHECK_NEG(m_skid_fadeout_time,         "skid-fadeout-time"          );
     CHECK_NEG(m_near_ground,               "near-ground"                );
     CHECK_NEG(m_delay_finish_time,         "delay-finish-time"          );
     CHECK_NEG(m_music_credit_time,         "music-credit-time"          );
     CHECK_NEG(m_leader_time_per_kart,      "leader time-per-kart"       );
-    CHECK_NEG(m_penalty_time,              "penalty-time"               );
+    CHECK_NEG(m_penalty_ticks,             "penalty-time"               );
     CHECK_NEG(m_max_display_news,          "max-display-news"           );
     CHECK_NEG(m_replay_max_time,           "replay max-time"            );
     CHECK_NEG(m_replay_delta_angle,        "replay delta-angle"         );
     CHECK_NEG(m_replay_delta_pos2,         "replay delta-position"      );
     CHECK_NEG(m_replay_dt,                 "replay delta-t"             );
     CHECK_NEG(m_smooth_angle_limit,        "physics smooth-angle-limit" );
+    CHECK_NEG(m_default_track_friction,    "physics default-track-friction");
+    CHECK_NEG(m_physics_fps,               "physics fps"                );
+    CHECK_NEG(m_network_state_frequeny,    "network state-frequency"    );
+    CHECK_NEG(m_default_moveable_friction, "physics default-moveable-friction");
 
     // Square distance to make distance checks cheaper (no sqrt)
     m_replay_delta_pos2 *= m_replay_delta_pos2;
@@ -154,33 +175,46 @@ void STKConfig::init_defaults()
     m_bomb_time                  = m_bomb_time_increase        =
         m_explosion_impulse_objects = m_music_credit_time      =
         m_delay_finish_time      = m_skid_fadeout_time         =
-        m_near_ground            = m_item_switch_time          =
-        m_smooth_angle_limit     = m_penalty_time              =
-        UNDEFINED;
+        m_near_ground            = 
+        m_smooth_angle_limit     = m_default_track_friction    =
+        m_default_moveable_friction =    UNDEFINED;
+    m_item_switch_ticks          = -100;
+    m_penalty_ticks              = -100;
+    m_physics_fps                = -100;
     m_bubblegum_counter          = -100;
-    m_shield_restrict_weapos     = false;
+    m_shield_restrict_weapons    = false;
     m_max_karts                  = -100;
     m_max_skidmarks              = -100;
     m_min_kart_version           = -100;
     m_max_kart_version           = -100;
     m_min_track_version          = -100;
     m_max_track_version          = -100;
+    m_min_server_version         = -100;
+    m_max_server_version         = -100;
     m_max_display_news           = -100;
     m_replay_max_time            = -100;
     m_replay_delta_angle         = -100;
     m_replay_delta_pos2          = -100;
     m_replay_dt                  = -100;
+    m_network_state_frequeny     = -100;
     m_title_music                = NULL;
-    m_enable_networking          = true;
     m_smooth_normals             = false;
     m_same_powerup_mode          = POWERUP_MODE_ONLY_IF_SAME;
     m_ai_acceleration            = 1.0f;
     m_disable_steer_while_unskid = false;
     m_camera_follow_skid         = false;
+    m_cutscene_fov               = 0.61f;
+    m_max_skinning_bones         = 1024;
+    m_tc_quality                 = 16;
+    m_server_discovery_port      = 2757;
+    m_client_port                = 2758;
+    m_server_port                = 2759;
 
     m_score_increase.clear();
     m_leader_intervals.clear();
     m_switch_items.clear();
+    m_normal_ttf.clear();
+    m_digit_ttf.clear();
 }   // init_defaults
 
 //-----------------------------------------------------------------------------
@@ -203,6 +237,12 @@ void STKConfig::getAllData(const XMLNode * root)
         node->get("max", &m_max_track_version);
     }
 
+    if(const XMLNode *node = root->getNode("server-version"))
+    {
+        node->get("min", &m_min_server_version);
+        node->get("max", &m_max_server_version);
+    }
+
     if(const XMLNode *kart_node = root->getNode("karts"))
         kart_node->get("max-number", &m_max_karts);
 
@@ -211,22 +251,20 @@ void STKConfig::getAllData(const XMLNode * root)
         for(unsigned int i=0; i<gp_node->getNumNodes(); i++)
         {
             const XMLNode *pn=gp_node->getNode(i);
-            int from=-1;
-            pn->get("from", &from);
-            int to=-1;
-            pn->get("to", &to);
-            if(to<0) to=m_max_karts;
             int points=-1;
             pn->get("points", &points);
-            if(points<0 || from<0 || from>to||
-               (int)m_score_increase.size()!=from-1)
+            if(points<0)
             {
                 Log::error("StkConfig", "Incorrect GP point specification:");
-                Log::fatal("StkConfig", "from: %d  to: %d  points: %d",
-                        from, to, points);
+                Log::fatal("StkConfig", "points: %d",
+                        points);
             }
-            for(int j=from; j<=to; j++)
-                m_score_increase.push_back(points);
+            m_score_increase.push_back(points);
+        }
+        if (m_max_karts > int(gp_node->getNumNodes()))
+        {
+            Log::error("StkConfig", "Not enough grand-prix ranking nodes:");
+            m_score_increase.resize(m_max_karts, 0);
         }
     }
 
@@ -238,13 +276,19 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if (const XMLNode *physics_node= root->getNode("physics"))
     {
-        physics_node->get("smooth-normals",     &m_smooth_normals    );
-        physics_node->get("smooth-angle-limit", &m_smooth_angle_limit);
+        physics_node->get("smooth-normals",         &m_smooth_normals        );
+        physics_node->get("smooth-angle-limit",     &m_smooth_angle_limit    );
+        physics_node->get("default-track-friction", &m_default_track_friction);
+        physics_node->get("default-moveable-friction",
+                                                 &m_default_moveable_friction);
+        physics_node->get("fps",                    &m_physics_fps           );
     }
 
     if (const XMLNode *startup_node= root->getNode("startup"))
     {
-        startup_node->get("penalty", &m_penalty_time );
+        float f;
+        startup_node->get("penalty", &f);
+        m_penalty_ticks = time2Ticks(f);
     }
 
     if (const XMLNode *news_node= root->getNode("news"))
@@ -264,6 +308,12 @@ void STKConfig::getAllData(const XMLNode * root)
         camera->get("fov-2", &m_camera_fov[1]);
         camera->get("fov-3", &m_camera_fov[2]);
         camera->get("fov-4", &m_camera_fov[3]);
+        
+        for (unsigned int i = 4; i < MAX_PLAYER_COUNT; i++) 
+        {
+            camera->get("fov-4", &m_camera_fov[i]);
+        }
+        camera->get("cutscene-fov", &m_cutscene_fov);
     }
 
     if (const XMLNode *music_node = root->getNode("music"))
@@ -319,13 +369,15 @@ void STKConfig::getAllData(const XMLNode * root)
     if(const XMLNode *switch_node= root->getNode("switch"))
     {
         switch_node->get("items", &m_switch_items    );
-        switch_node->get("time",  &m_item_switch_time);
+        float f;
+        if( switch_node->get("time",  &f) )
+            m_item_switch_ticks = stk_config->time2Ticks(f);
     }
 
     if(const XMLNode *bubblegum_node= root->getNode("bubblegum"))
     {
-        bubblegum_node->get("disappear-counter", &m_bubblegum_counter     );
-        bubblegum_node->get("restrict-weapons",  &m_shield_restrict_weapos);
+        bubblegum_node->get("disappear-counter", &m_bubblegum_counter      );
+        bubblegum_node->get("restrict-weapons",  &m_shield_restrict_weapons);
     }
 
     if(const XMLNode *explosion_node= root->getNode("explosion"))
@@ -338,8 +390,12 @@ void STKConfig::getAllData(const XMLNode * root)
         ai_node->get("acceleration", &m_ai_acceleration);
     }
 
-    if(const XMLNode *networking_node= root->getNode("networking"))
-        networking_node->get("enable", &m_enable_networking);
+    if (const XMLNode *networking_node = root->getNode("networking"))
+    {
+        networking_node->get("state-frequency",      &m_network_state_frequeny);
+        networking_node->get("positional-smoothing", &m_positional_smoothing  );
+        networking_node->get("rotational-smoothing", &m_rotational_smoothing  );
+    }
 
     if(const XMLNode *replay_node = root->getNode("replay"))
     {
@@ -350,15 +406,33 @@ void STKConfig::getAllData(const XMLNode * root)
 
     }
 
-    if(const XMLNode *font_node = root->getNode("font"))
+    if (const XMLNode *fonts_list = root->getNode("fonts-list"))
     {
-        font_node->get("default",          &m_font_default         );
-        font_node->get("default_fallback", &m_font_default_fallback);
-        font_node->get("cjk",              &m_font_cjk             );
-        font_node->get("ar",               &m_font_ar              );
-        font_node->get("bold",             &m_font_bold            );
-        font_node->get("bold_fallback",    &m_font_bold_fallback   );
-        font_node->get("digit",            &m_font_digit           );
+        fonts_list->get("normal-ttf", &m_normal_ttf);
+        fonts_list->get("digit-ttf",  &m_digit_ttf );
+    }
+
+    if (const XMLNode *skinning = root->getNode("skinning"))
+    {
+        skinning->get("max-bones", &m_max_skinning_bones);
+    }
+
+    if (const XMLNode *tc = root->getNode("texture-compression"))
+    {
+        tc->get("quality", &m_tc_quality);
+    }
+
+    if (const XMLNode *tc = root->getNode("network"))
+    {
+        unsigned server_discovery_port = 0;
+        unsigned client_port = 0;
+        unsigned server_port = 0;
+        tc->get("server-discovery-port", &server_discovery_port);
+        tc->get("client-port", &client_port);
+        tc->get("server-port", &server_port);
+        m_server_discovery_port = (uint16_t)server_discovery_port;
+        m_client_port = (uint16_t)client_port;
+        m_server_port = (uint16_t)server_port;
     }
 
     // Get the default KartProperties
@@ -392,15 +466,27 @@ void STKConfig::getAllData(const XMLNode * root)
  */
 void  STKConfig::getAllScores(std::vector<int> *all_scores, int num_karts)
 {
+    std::vector<int> sorted_score_increase;
+
     if (num_karts == 0) return;
 
     assert(num_karts <= m_max_karts);
     all_scores->resize(num_karts);
-    (*all_scores)[num_karts-1] = 1;  // last position gets one point
+    sorted_score_increase.resize(num_karts+1); //sorting function is [begin, end[
+
+    //get increase data into sorted_score_increase
+    for(int i=0; i<num_karts; i++)
+    {
+        sorted_score_increase[i] = m_score_increase[i];
+    }
+
+    std::sort (sorted_score_increase.begin(), sorted_score_increase.end());
+
+    (*all_scores)[num_karts-1] = sorted_score_increase[0];  // last position score
 
     // Must be signed, in case that num_karts==1
     for(int i=num_karts-2; i>=0; i--)
     {
-        (*all_scores)[i] = (*all_scores)[i+1] + m_score_increase[i];
+        (*all_scores)[i] = (*all_scores)[i+1] + sorted_score_increase[num_karts-i];
     }
 }   // getAllScores

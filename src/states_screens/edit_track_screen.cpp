@@ -33,8 +33,6 @@ using namespace irr::core;
 
 const char* EditTrackScreen::ALL_TRACKS_GROUP_ID = "all";
 
-DEFINE_SCREEN_SINGLETON( EditTrackScreen );
-
 // -----------------------------------------------------------------------------
 EditTrackScreen::EditTrackScreen()
     : Screen("edit_track.stkgui"), m_track_group(ALL_TRACKS_GROUP_ID),
@@ -177,8 +175,6 @@ void EditTrackScreen::init()
 // -----------------------------------------------------------------------------
 void EditTrackScreen::loadTrackList()
 {
-    bool belongs_to_group;
-
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
     assert(tracks_widget != NULL);
 
@@ -187,7 +183,7 @@ void EditTrackScreen::loadTrackList()
     for (unsigned int i = 0; i < track_manager->getNumberOfTracks(); i++)
     {
         Track* t = track_manager->getTrack(i);
-        belongs_to_group = (m_track_group.empty()                ||
+        bool belongs_to_group = (m_track_group.empty()                ||
                           m_track_group == ALL_TRACKS_GROUP_ID ||
                           t->isInGroup(m_track_group)                );
         if (!t->isArena()    && !t->isSoccer() &&

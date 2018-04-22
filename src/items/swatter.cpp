@@ -32,7 +32,7 @@
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
-#include "items/attachment.hpp"
+#include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
@@ -74,8 +74,8 @@ Swatter::Swatter(AbstractKart *kart, bool was_bomb,
 
     if (m_removing_bomb)
     {
-        m_scene_node->setMesh(irr_driver->getAnimatedMesh(
-                        file_manager->getAsset(FileManager::MODEL,"swatter_anim2.b3d") ) );
+        m_scene_node->setMesh(attachment_manager
+            ->getMesh(Attachment::ATTACH_SWATTER_ANIM));
         m_scene_node->setRotation(core::vector3df(0.0, -180.0, 0.0));
         m_scene_node->setAnimationSpeed(0.9f);
         m_scene_node->setCurrentFrame(0.0f);
@@ -114,8 +114,9 @@ Swatter::~Swatter()
  *  \param dt Time step size.
  *  \return True if the attachment should be discarded.
  */
-bool Swatter::updateAndTestFinished(float dt)
+bool Swatter::updateAndTestFinished(int ticks)
 {
+    float dt = stk_config->ticks2Time(ticks);
     if (!m_discard_now)
     {
         if (m_removing_bomb)
@@ -280,13 +281,11 @@ void Swatter::pointToTarget()
     }
     else
     {
-        Vec3 swatter_to_target = m_target->getXYZ()
-                               -Vec3(m_scene_node->getAbsolutePosition());
+        Vec3 swatter_to_target =
+            m_kart->getTrans().inverse()(m_target->getXYZ());
         float dy = -swatter_to_target.getZ();
         float dx = swatter_to_target.getX();
-        float angle = SWAT_ANGLE_OFFSET + (atan2(dy, dx)-m_kart->getHeading())
-                                        * 180.0f/M_PI;
-
+        float angle = SWAT_ANGLE_OFFSET + atan2f(dy, dx) * 180 / M_PI;
         m_scene_node->setRotation(core::vector3df(0.0, angle, 0.0));
     }
 }   // pointToTarget

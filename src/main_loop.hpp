@@ -21,22 +21,30 @@
 #define HEADER_MAIN_LOOP_HPP
 
 typedef unsigned long Uint32;
-
+#include <atomic>
 
 /** Management class for the whole gameflow, this is where the
     main-loop is */
 class MainLoop
 {
 private:
-    bool m_abort;
+    /** True if the main loop should exit. */
+    std::atomic_bool m_abort;
+
+    /** True if the frame rate should be throttled. */
     bool m_throttle_fps;
 
+    /** True during the last substep of the inner main loop (where world
+     *  is updated). Used to reduce amount of updates (e.g. sfx positions
+      * etc). */
+    bool     m_is_last_substep;
     Uint32   m_curr_time;
     Uint32   m_prev_time;
+    unsigned m_parent_pid;
     float    getLimitedDt();
-    void     updateRace(float dt);
+    void     updateRace(int ticks);
 public:
-         MainLoop();
+         MainLoop(unsigned parent_pid);
         ~MainLoop();
     void run();
     void abort();
@@ -44,6 +52,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if STK is to be stoppe. */
     bool isAborted() const { return m_abort; }
+    // ------------------------------------------------------------------------
+    /** Returns if this is the last substep. Used to reduce the amount
+     *  of updates (e.g. to sfx position) to once per rendered frame. */
+    bool isLastSubstep() const { return m_is_last_substep; }
 };   // MainLoop
 
 extern MainLoop* main_loop;

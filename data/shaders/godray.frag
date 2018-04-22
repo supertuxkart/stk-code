@@ -9,7 +9,7 @@ out vec4 FragColor;
 
 void main()
 {
-	vec2 uv = 4. * gl_FragCoord.xy / screen;
+	vec2 uv = 4. * gl_FragCoord.xy / u_screen;
 	vec2 texc = uv;
 	vec2 tosun = sunpos - texc;
 

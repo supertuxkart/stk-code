@@ -33,6 +33,7 @@
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/options_screen_ui.hpp"
 #include "states_screens/dialogs/add_device_dialog.hpp"
+#include "states_screens/dialogs/multitouch_settings_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
 #include "utils/string_utils.hpp"
@@ -44,8 +45,6 @@
 #include <algorithm>
 
 using namespace GUIEngine;
-
-DEFINE_SCREEN_SINGLETON( OptionsScreenInput );
 
 // -----------------------------------------------------------------------------
 
@@ -81,27 +80,40 @@ void OptionsScreenInput::buildDeviceList()
 
     assert( m_icon_bank != NULL );
     devices->setIcons(m_icon_bank);
+    
+    DeviceManager* device_manager = input_manager->getDeviceManager();
 
-    const int keyboard_config_count = input_manager->getDeviceManager()->getKeyboardConfigAmount();
+    const int keyboard_config_count = device_manager->getKeyboardConfigAmount();
 
     for (int i=0; i<keyboard_config_count; i++)
     {
-        //KeyboardConfig *config = input_manager->getDeviceList()->getKeyboardConfig(i);
-
+        KeyboardConfig *config = device_manager->getKeyboardConfig(i);
+        
         std::ostringstream kbname;
         kbname << "keyboard" << i;
         const std::string internal_name = kbname.str();
-
-        // since irrLicht's list widget has the nasty tendency to put the
-        // icons very close to the text, I'm adding spaces to compensate.
-        devices->addItem(internal_name, (core::stringw("   ") + _("Keyboard %i", i)).c_str(), 0 /* icon */);
+        
+        if (config->isGamePadAndroid())
+        {
+            // since irrLicht's list widget has the nasty tendency to put the
+            // icons very close to the text, I'm adding spaces to compensate.
+            devices->addItem(internal_name, (core::stringw("   ") + 
+                             _("Gamepad")).c_str(), 1 /* icon */);
+        }
+        else
+        {
+            // since irrLicht's list widget has the nasty tendency to put the
+            // icons very close to the text, I'm adding spaces to compensate.
+            devices->addItem(internal_name, (core::stringw("   ") + 
+                             _("Keyboard %i", i)).c_str(), 0 /* icon */);
+        }
     }
 
-    const int gpad_config_count = input_manager->getDeviceManager()->getGamePadConfigAmount();
+    const int gpad_config_count = device_manager->getGamePadConfigAmount();
 
     for (int i = 0; i < gpad_config_count; i++)
     {
-        GamepadConfig *config = input_manager->getDeviceManager()->getGamepadConfig(i);
+        GamepadConfig *config = device_manager->getGamepadConfig(i);
 
         // Don't display the configuration if a matching device is not available
         if (config->isPlugged())
@@ -126,6 +138,14 @@ void OptionsScreenInput::buildDeviceList()
             devices->addItem(internal_name, name, icon);
         }   // if config->isPlugged
     }   // for i<gpad_config_count
+    
+    MultitouchDevice* touch_device = device_manager->getMultitouchDevice();
+                                                        
+    if (touch_device != NULL)
+    {
+        devices->addItem("touch_device", (core::stringw("   ") + 
+                                                _("Touch Device")).c_str(), 1);
+    }
 }   // buildDeviceList
 
 // -----------------------------------------------------------------------------
@@ -250,6 +270,15 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
             {
                 Log::error("OptionsScreenInput", "Cannot read internal keyboard input device ID: %s",
                     selection.c_str());
+            }
+        }
+        else if (selection.find("touch_device") != std::string::npos)
+        {
+            // Don't edit multitouch settings during a race, because it needs
+            // to re-create all buttons to take an effect
+            if (StateManager::get()->getGameState() != GUIEngine::INGAME_MENU)
+            {
+                new MultitouchSettingsDialog(0.8f, 0.9f);
             }
         }
         else

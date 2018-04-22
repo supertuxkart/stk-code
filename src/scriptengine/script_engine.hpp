@@ -19,12 +19,15 @@
 #ifndef HEADER_SCRIPT_ENGINE_HPP
 #define HEADER_SCRIPT_ENGINE_HPP
 
-#include <string>
+#include "scriptengine/script_utils.hpp"
+#include "utils/no_copy.hpp"
+#include "utils/ptr_vector.hpp"
+#include "utils/singleton.hpp"
+
 #include <angelscript.h>
 #include <functional>
-
-#include "scriptengine/script_utils.hpp"
-#include "utils/ptr_vector.hpp"
+#include <map>
+#include <string>
 
 class TrackObjectPresentation;
 
@@ -53,12 +56,16 @@ namespace Scripting
         ~PendingTimeout();
     };
 
-    class ScriptEngine
+    class ScriptEngine : public AbstractSingleton<ScriptEngine>
     {
+         ScriptEngine();
+        ~ScriptEngine();
+
+        // Give the singleton access to the constructor.
+        friend class AbstractSingleton<ScriptEngine>;
+
     public:
 
-        ScriptEngine();
-        ~ScriptEngine();
 
         void runFunction(bool warn_if_not_found, std::string function_name);
         void runFunction(bool warn_if_not_found, std::string function_name,
@@ -75,7 +82,7 @@ namespace Scripting
 
         void addPendingTimeout(double time, const std::string& callback_name);
         void addPendingTimeout(double time, asIScriptFunction* delegate_fn);
-        void update(double dt);
+        void update(int ticks);
 
         asIScriptEngine* getEngine() { return m_engine; }
 

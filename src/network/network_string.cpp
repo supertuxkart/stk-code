@@ -30,7 +30,7 @@ void NetworkString::unitTesting()
 {
     NetworkString s(PROTOCOL_LOBBY_ROOM);
     assert(s.getProtocolType() == PROTOCOL_LOBBY_ROOM);
-    assert(s.getProtocolType() != PROTOCOL_KART_UPDATE);
+    assert(s.getProtocolType() != PROTOCOL_CONTROLLER_EVENTS);
     assert(!s.isSynchronous());
     s.setSynchronous(true);
     assert(s.isSynchronous());
@@ -47,6 +47,8 @@ void NetworkString::unitTesting()
     s.addUInt16(12345);
     s.addFloat(1.2345f);
 
+    // Since this string was not received, we need to skip the type and token explicitly.
+    s.skip(5);
     assert(s.getUInt16() == 12345);
     float f = s.getFloat();
     assert(f==1.2345f);
@@ -73,7 +75,7 @@ void NetworkString::unitTesting()
  *  the characters of the given string. */
 BareNetworkString& BareNetworkString::encodeString(const std::string &value)
 {
-    int len = value.size();
+    int len = (int)value.size();
     if(len<=255)
         return this->addUInt8(len).addString(value);
     else

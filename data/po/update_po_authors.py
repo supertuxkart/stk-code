@@ -1,9 +1,12 @@
 #!/usr/bin/env python
-
+# -*- coding: utf-8 -*-
 # A simple script that adds all authors from transifex, which are
 # listed in comments at the beginning of the file, to the 
 # 'translator-credits' translations - where launchpad added them
 # and which are shown in stk.
+#
+# First rename the transifex files:
+# for i in supertuxkartpot_*; do mv $i ${i##supertuxkartpot_}; done
 #
 # Usage:  update_po_authors.py  PATH_TO/LANGUAGE.po
 #
@@ -14,80 +17,109 @@
 #
 # Less important note: The specified file is overwritten without
 #           a backup! Make sure the git status is unmodified.
+# 
+
 
 import re
 import sys
 
 if __name__ == "__main__":
-    if len(sys.argv)!=2:
+    if len(sys.argv) < 2:
         print "Usage: getpo_authors.py PATH_TO_PO_FILE"
         sys.exit(-1)
 
-    f = open(sys.argv[1], "r")
-    if not f:
-        print "Can not find", sys.argv[1]
-        exit
-    lines = f.readlines()
+    for filename in sys.argv[1:]:
+        print("Processing file %s" % filename)
+        f = open(filename, "r")
+        if not f:
+            print "Can not find", filename
+            exit
+        lines = f.readlines()
 
-    f.close()
+        f.close()
 
-    new_authors = []
-    found        = 0
+        # There are two sources of contributors:
+        # 1) Entries in the header from transifex (after "Translators:"
+        #    till the first msgid string.
+        # 2) Entries as "translator-credits". These shouldn't be there,
+        #    but sometimes occur (e.g. because an old version of this
+        #    script was used that did not support these entries).
+        # Assemble all those entries in one line
+        
+        found                  = 0
+        contributions          = ""
+        line_count             = 0
+        new_authors            = []
+        author_list            = []
+        
+        # Find new and old authors with a simple finite state machine:
+        # ============================================================
+        i = 0
+        while i < len(lines):
+            line = lines[i][:-1]   # remove \n
+            i = i + 1
+            if line=="# Translators:":
+                while i <len(lines) and lines[i][:5]!="msgid":
+                    line = lines[i][:-1]   # remove \n
+                    if line [:14]!="# FIRST AUTHOR":
+                        new_authors.append(line[2:])
+                        author_list.append(line[2:])
+                    i = i + 1
+                
+            elif line[:26] == "msgid \"translator-credits\"":
+                line = lines[i][:-2]  # remove \"\n at end of line
+                # Ignore the fist entry (which is "msgstr ...").
+                authors = line.split("\\n")[1:]
+                for j in range(len(authors)):
+                    s = authors[j].strip()
+                    if s!="":
+                        author_list.append(s)
+                # Then remove the msgid and msgstr
+                del lines[i]      # msgstr
+                del lines[i-1]    # msgid
+                del lines[i-2]    # filename/line number info
+                del lines[i-3]    # empty line
 
-    # Find all authors with a simple finite state machine:
-    contributions = -1
-    line_count    =  0
-    for i in lines:
-        line = i[:-1]   # remove \n
-        if line=="# Translators:":
-            found = 1
-        elif found and line[:2]=="# " and line [:14]!="# FIRST AUTHOR":
-            new_authors.append(line[2:])
-        elif line[:5]=="msgid":
-            found = 0
-        elif line[:31]== "msgstr \"Launchpad Contributions":
-            contributions = line_count
-        line_count = line_count + 1
+        
+        # Delete all email addresses and URLs (esp. old launchpads)
+        # ---------------------------------------------------------
+        email = re.compile(r" *[^ ]+@[^ ]+ *")
+        url   = re.compile(r" *https?://[^ ]*")
+        for i, author in enumerate(author_list):
+            g = email.search(author)
+            if g:
+                author_list[i] = author[:g.start()] +", " \
+                               + author[g.end():]
+            g = url.search(author)
+            if g:
+                author_list[i] = author[:g.start()] \
+                               + author[g.end():]
+                
+        # Remove duplicated entries
+        # -------------------------
+        d = {}
+        new_list = []
+        for i, author in enumerate(author_list):
+            if not d.get(author, None):
+                new_list.append(author)
+                d[author]=1
+        author_list = new_list
 
+        all_authors_string = reduce(lambda x,y: x+"\\n"+y, author_list, "")
 
-    # Delete all email addresses - not sure if the authors
-    # would want them to be published
-    email=re.compile(" *<.*@.*\..*> *")   # one @ and one dot at least
-    for i in range(len(new_authors)):
-        g = email.search(new_authors[i])
-        if g:
-            new_authors[i] = new_authors[i][:g.start()] \
-                           + new_authors[i][g.end():]
-
-    # Get the old authors from the translator-credits string:
-    if contributions>0:
-        # Ignore the first entry, which is "msgstr ...", and the
-        # last two characters, which are the '"\n'.
-        old_authors = lines[contributions][:-2].split("\\n")[1:]
-        for i in range(len(old_authors)):
-            old_authors[i] = old_authors[i].strip()
-    else:
-        old_authors=[]
-    
-    all_authors = old_authors + new_authors;
-    all_authors = sorted(all_authors, key=lambda x: x.lower())
-    all_authors_string = reduce(lambda x,y: x+"\\n"+y, all_authors, "")
-
-    credits_line = "msgstr \"Launchpad Contributions:%s\"\n"%all_authors_string
-    # If no old authors exists, write a new entry:
-    if contributions==-1:
+        credits_line = "msgstr \"Launchpad Contributions:%s\"\n"%all_authors_string
+            
         lines.append("\n")
         lines.append("#: src/states_screens/credits.cpp:209\n")
         lines.append("msgid \"translator-credits\"\n")
         lines.append(credits_line)
-    else:
-        # Otherwise just replace the old contribution string
-        lines[contributions] = credits_line
 
 
-    # Overwrite old file
-    f = open(sys.argv[1], "w")
-    for i in lines:
-        f.write(i)
-    f.close()
+        # Overwrite old file
+        f = open(filename, "w")
+        for i in lines:
+            f.write(i)
+        f.close()
+        
+        print("Done with %s,"% filename)
             

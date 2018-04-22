@@ -22,7 +22,6 @@
 
 class AIProperties;
 class LinearWorld;
-class QuadGraph;
 class Track;
 class Vec3;
 
@@ -54,9 +53,9 @@ protected:
      *  graph nodes. */
     std::vector<std::vector<int> > m_all_look_aheads;
 
-    virtual void update      (float delta) ;
+    virtual void update(int ticks);
     virtual unsigned int getNextSector(unsigned int index);
-    virtual void  newLap             (int lap);
+    virtual void  newLap(int lap);
     //virtual void setControllerName(const std::string &name);
 
     float    steerToAngle  (const unsigned int sector, const float angle);

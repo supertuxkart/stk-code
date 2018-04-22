@@ -24,7 +24,8 @@
 
 #include "config/user_config.hpp"
 #include "graphics/material.hpp"
-#include "graphics/shaders.hpp"
+#include "graphics/particle_kind_manager.hpp"
+#include "graphics/sp/sp_texture_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "modes/profile_world.hpp"
@@ -55,18 +56,23 @@ MaterialManager::MaterialManager()
  */
 MaterialManager::~MaterialManager()
 {
+#ifndef SERVER_ONLY
+    SP::SPTextureManager::get()->stopThreads();
+#endif
+    
     for(unsigned int i=0; i<m_materials.size(); i++)
     {
         delete m_materials[i];
     }
     m_materials.clear();
 
-    for (std::map<video::E_MATERIAL_TYPE, Material*> ::iterator it =
-         m_default_materials.begin(); it != m_default_materials.end(); it++)
+    for (std::map<std::string, Material*> ::iterator it =
+         m_default_sp_materials.begin(); it != m_default_sp_materials.end();
+         it++)
     {
         delete it->second;
     }
-    m_default_materials.clear();
+    m_default_sp_materials.clear();
 }   // ~MaterialManager
 
 //-----------------------------------------------------------------------------
@@ -78,15 +84,71 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
 }
 
 //-----------------------------------------------------------------------------
-
-Material* MaterialManager::getMaterialFor(video::ITexture* t,
-    video::E_MATERIAL_TYPE material_type)
+Material* MaterialManager::getMaterialSPM(std::string lay_one_tex_lc,
+                                          std::string lay_two_tex_lc,
+                                          const std::string& def_shader_name)
 {
-    if (t == NULL)
-        return getDefaultMaterial(material_type);
+    std::string orignal_layer_one = lay_one_tex_lc;
+    core::stringc lc(lay_one_tex_lc.c_str());
+    lc.make_lower();
+    lay_one_tex_lc = lc.c_str();
+    lc = lay_two_tex_lc.c_str();
+    lc.make_lower();
+    lay_two_tex_lc = lc.c_str();
+    if (!lay_one_tex_lc.empty() &&
+        (lay_one_tex_lc.find('/') != std::string::npos ||
+        lay_one_tex_lc.find('\\') != std::string::npos))
+    {
+        // Search backward so that temporary (track) textures are found first
+        for (int i = (int)m_materials.size() - 1; i >= 0; i--)
+        {
+            if (m_materials[i]->getTexFullPath() == lay_one_tex_lc)
+            {
+                const std::string& mat_lay_two = m_materials[i]->getUVTwoTexture();
+                if (mat_lay_two.empty() && lay_two_tex_lc.empty())
+                {
+                    return m_materials[i];
+                }
+                else if (!mat_lay_two.empty() && !lay_two_tex_lc.empty())
+                {
+                    if (mat_lay_two == lay_two_tex_lc)
+                    {
+                        return m_materials[i];
+                    }
+                }
+            }
+        }
+    }
+    else if (!lay_one_tex_lc.empty())
+    {
+        for (int i = (int)m_materials.size() - 1; i >= 0; i--)
+        {
+            if (m_materials[i]->getTexFname() == lay_one_tex_lc)
+            {
+                const std::string& mat_lay_two = m_materials[i]->getUVTwoTexture();
+                if (mat_lay_two.empty() && lay_two_tex_lc.empty())
+                {
+                    return m_materials[i];
+                }
+                else if (!mat_lay_two.empty() && !lay_two_tex_lc.empty())
+                {
+                    if (mat_lay_two == lay_two_tex_lc)
+                    {
+                        return m_materials[i];
+                    }
+                }
+            }
+        }   // for i
+    }
+    return getDefaultSPMaterial(def_shader_name,
+        StringUtils::getBasename(orignal_layer_one));
+}
 
-    core::stringc img_path = core::stringc(t->getName());
-    const std::string image = StringUtils::getBasename(img_path.c_str());
+//-----------------------------------------------------------------------------
+Material* MaterialManager::getMaterialFor(video::ITexture* t)
+{
+    const io::path& img_path = t->getName().getInternalName();
+
     if (!img_path.empty() && (img_path.findFirst('/') != -1 || img_path.findFirst('\\') != -1))
     {
         // Search backward so that temporary (track) textures are found first
@@ -100,16 +162,32 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
     }
     else
     {
+        core::stringc image(StringUtils::getBasename(img_path.c_str()).c_str());
+        image.make_lower();
+
         for (int i = (int)m_materials.size() - 1; i >= 0; i--)
         {
-            if (m_materials[i]->getTexFname() == image)
+            if (m_materials[i]->getTexFname() == image.c_str())
             {
                 return m_materials[i];
             }
         }   // for i
     }
+    return NULL;
+}
 
-    return getDefaultMaterial(material_type);
+//-----------------------------------------------------------------------------
+Material* MaterialManager::getMaterialFor(video::ITexture* t,
+    video::E_MATERIAL_TYPE material_type)
+{
+    if (t == NULL)
+        return getDefaultSPMaterial("solid");
+
+    Material* m = getMaterialFor(t);
+    if (m != NULL)
+        return m;
+
+    return getDefaultSPMaterial("solid");
 }
 
 //-----------------------------------------------------------------------------
@@ -127,66 +205,27 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
         mat->setMaterialProperties(&(mb->getMaterial()), mb);
         return;
     }
-
-    Material* default_material = getDefaultMaterial(mb->getMaterial().MaterialType);
-    default_material->setMaterialProperties(&(mb->getMaterial()), mb);
 }   // setAllMaterialFlags
 
 //-----------------------------------------------------------------------------
-
-Material* MaterialManager::getDefaultMaterial(video::E_MATERIAL_TYPE shader_type)
+Material* MaterialManager::getDefaultSPMaterial(const std::string& shader_name,
+                                                const std::string& l1_lc)
 {
-    auto it = m_default_materials.find(shader_type);
-    if (it == m_default_materials.end())
+    core::stringc lc(l1_lc.c_str());
+    lc.make_lower();
+    const std::string key = shader_name + lc.c_str();
+    auto ret = m_default_sp_materials.find(key);
+    if (ret != m_default_sp_materials.end())
     {
-        Material* default_material = new Material("", false, false, false);
-
-        // TODO: workaround, should not hardcode these material types here?
-        // Try to find a cleaner way
-        // If graphics are disabled, shaders should not be accessed (getShader
-        // asserts that shaders are initialised).
-        if(!ProfileWorld::isNoGraphics() && CVS->isGLSL() &&
-            shader_type == Shaders::getShader(ShaderType::ES_OBJECT_UNLIT))
-            default_material->setShaderType(Material::SHADERTYPE_SOLID_UNLIT);
-        else if (!ProfileWorld::isNoGraphics() && CVS->isGLSL() &&
-                 shader_type == Shaders::getShader(ShaderType::ES_OBJECTPASS_REF))
-            default_material->setShaderType(Material::SHADERTYPE_ALPHA_TEST);
-        //else if (!ProfileWorld::isNoGraphics() && CVS->isGLSL() &&
-        //         shader_type == Shaders::getShader(ShaderType::ES_OBJECTPASS))
-        //    default_material->setShaderType(Material::SHADERTYPE_ALPHA_BLEND);
-        else
-            default_material->setShaderType(Material::SHADERTYPE_SOLID);
-
-        m_default_materials[shader_type] = default_material;
-        return default_material;
+        return ret->second;
     }
-    else
-    {
-        return it->second;
-    }
-}
+    Material* m = new Material(l1_lc.empty() ? "unicolor_white" :
+        l1_lc, false, false, false, shader_name);
+    m_default_sp_materials[key] = m;
+    return m;
+}   // getDefaultSPMaterial
 
 //-----------------------------------------------------------------------------
-
-void MaterialManager::adjustForFog(video::ITexture* t,
-                                   scene::IMeshBuffer *mb,
-                                   scene::ISceneNode* parent,
-                                   bool use_fog) const
-{
-    const std::string image = StringUtils::getBasename(core::stringc(t->getName()).c_str());
-    // Search backward so that temporary (track) textures are found first
-    for(int i = (int)m_materials.size()-1; i>=0; i-- )
-    {
-        if (m_materials[i]->getTexFname()==image)
-        {
-            m_materials[i]->adjustForFog(parent, &(mb->getMaterial()), use_fog);
-            return;
-        }
-    }   // for i
-}   // adjustForFog
-
-//-----------------------------------------------------------------------------
-
 void MaterialManager::setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb)
 {
     irr::video::SMaterial& material = mb->getMaterial();
@@ -201,9 +240,8 @@ void MaterialManager::setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb)
         material.MaterialType = irr::video::EMT_SOLID;
     }
 
-    Material* default_material = getDefaultMaterial(mb->getMaterial().MaterialType);
-    default_material->setMaterialProperties(&(mb->getMaterial()), mb);
 }
+
 //-----------------------------------------------------------------------------
 int MaterialManager::addEntity(Material *m)
 {
@@ -318,7 +356,7 @@ Material *MaterialManager::getMaterial(const std::string& fname,
                                        bool is_full_path,
                                        bool make_permanent,
                                        bool complain_if_not_found,
-                                       bool strip_path)
+                                       bool strip_path, bool install)
 {
     if(fname=="")
     {
@@ -338,14 +376,18 @@ Material *MaterialManager::getMaterial(const std::string& fname,
     else
         basename = fname;
         
+    core::stringc basename_lower(basename.c_str());
+    basename_lower.make_lower();
+
     // Search backward so that temporary (track) textures are found first
-    for(int i = (int)m_materials.size()-1; i>=0; i-- )
+    for (int i = (int)m_materials.size()-1; i>=0; i-- )
     {
-        if(m_materials[i]->getTexFname()==basename) return m_materials[i];
+        if (m_materials[i]->getTexFname() == basename_lower.c_str())
+            return m_materials[i];
     }
 
     // Add the new material
-    Material* m = new Material(fname, is_full_path, complain_if_not_found);
+    Material* m = new Material(fname, is_full_path, complain_if_not_found, install);
     m_materials.push_back(m);
     if(make_permanent)
     {
@@ -363,6 +405,30 @@ void MaterialManager::makeMaterialsPermanent()
 {
     m_shared_material_index = (int) m_materials.size();
 }   // makeMaterialsPermanent
+
+// ----------------------------------------------------------------------------
+void MaterialManager::unloadAllTextures()
+{
+    std::string texture_folder =
+        file_manager->getAssetDirectory(FileManager::TEXTURE);
+    texture_folder = file_manager->getFileSystem()->getAbsolutePath
+        (texture_folder.c_str()).c_str();
+    core::stringc texfname(texture_folder.c_str());
+    texfname.make_lower();
+    texture_folder = texfname.c_str();
+    for (int i = 0; i < m_shared_material_index; i++)
+    {
+        // Global particle textures will stay until exit
+        // STK, which avoid hangs when lazy-loading the texture when being
+        // triggered.
+        Material* m = m_materials[i];
+        if (!ParticleKindManager::get()->isGlobalParticleMaterial(m)
+            && m->getTexFullPath().find(texture_folder) != std::string::npos)
+        {
+            m->unloadTexture();
+        }
+    }
+}
 
 // ----------------------------------------------------------------------------
 bool MaterialManager::hasMaterial(const std::string& fname)

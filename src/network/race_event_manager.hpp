@@ -16,18 +16,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-/*! \file network_world.hpp
- */
-
 #ifndef NETWORK_WORLD_HPP
 #define NETWORK_WORLD_HPP
 
 #include "input/input.hpp"
 #include "utils/singleton.hpp"
-#include <map>
+#include <memory>
 
 class Controller;
-class KartUpdateProtocol;
+class GameEventsProtocol;
 class AbstractKart;
 class Item;
 
@@ -43,25 +40,38 @@ private:
     bool m_running;
     float m_race_time;
 
+    std::weak_ptr<GameEventsProtocol> m_game_events_protocol;
+
     friend class AbstractSingleton<RaceEventManager>;
 
              RaceEventManager();
     virtual ~RaceEventManager();
 
 public:
-    void update(float dt);
-
-    void start();
-    void stop();
-    bool isRaceOver();
-
-    void collectedItem(Item *item, AbstractKart *kart);
-    void controllerAction(Controller* controller, PlayerAction action, 
-                          int value);
-    void kartFinishedRace(AbstractKart *kart, float time);
+    // ------------------------------------------------------------------------
+    void update(int ticks);
+    // ------------------------------------------------------------------------
+    void start(std::shared_ptr<GameEventsProtocol> gep)
+    {
+        m_game_events_protocol = gep;
+        m_running = true;
+    }
+    // ------------------------------------------------------------------------
+    void stop()                                          { m_running = false; }
     // ------------------------------------------------------------------------
     /** Returns if this instance is in running state or not. */
-    bool isRunning() { return m_running; }
+    bool isRunning()                                      { return m_running; }
+    // ------------------------------------------------------------------------
+    std::shared_ptr<GameEventsProtocol> getProtocol() const
+                                      { return m_game_events_protocol.lock(); }
+    // ------------------------------------------------------------------------
+    bool protocolStopped() const   { return m_game_events_protocol.expired(); }
+    // ------------------------------------------------------------------------
+    bool isRaceOver();
+    // ------------------------------------------------------------------------
+    void collectedItem(Item *item, AbstractKart *kart);
+    // ------------------------------------------------------------------------
+    void kartFinishedRace(AbstractKart *kart, float time);
 
 };
 

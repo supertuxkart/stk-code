@@ -27,6 +27,10 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
+#include "graphics/render_info.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "io/file_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/keyboard_device.hpp"
@@ -36,14 +40,17 @@
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/skidding_ai.hpp"
+#include "karts/controller/spare_tire_ai.hpp"
 #include "karts/controller/test_ai.hpp"
 #include "karts/controller/network_player_controller.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "karts/kart_rewinder.hpp"
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/soccer_world.hpp"
 #include "network/network_config.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -109,26 +116,21 @@ World* World::m_world = NULL;
  *  after the constructor. Those functions must be called in the init()
  *  function, which is called immediately after the constructor.
  */
-World::World() : WorldStatus(), m_clear_color(255,100,101,140)
+World::World() : WorldStatus()
 {
 
 #ifdef DEBUG
     m_magic_number = 0xB01D6543;
 #endif
 
-    m_physics            = NULL;
     m_race_gui           = NULL;
     m_saved_race_gui     = NULL;
     m_use_highscores     = true;
-    m_track              = NULL;
     m_schedule_pause     = false;
     m_schedule_unpause   = false;
     m_schedule_exit_race = false;
-    m_self_destruct      = false;
     m_schedule_tutorial  = false;
     m_is_network_world   = false;
-    m_weather            = NULL;
-    m_force_disable_fog  = false;
 
     m_stop_music_when_dialog_open = true;
 
@@ -161,10 +163,12 @@ void World::init()
     // constructor is called, so the wrong race gui would be created.
     createRaceGUI();
 
+    RewindManager::create();
+
     // Grab the track file
-    m_track = track_manager->getTrack(race_manager->getTrackName());
-	m_script_engine = new Scripting::ScriptEngine();
-    if(!m_track)
+    Track *track = track_manager->getTrack(race_manager->getTrackName());
+    Scripting::ScriptEngine::getInstance<Scripting::ScriptEngine>();
+    if(!track)
     {
         std::ostringstream msg;
         msg << "Track '" << race_manager->getTrackName()
@@ -172,18 +176,19 @@ void World::init()
         throw std::runtime_error(msg.str());
     }
 
-    std::string script_path = World::getWorld()->getTrack()->getTrackFile("scripting.as");
-    m_script_engine->loadScript(script_path, true);
+    std::string script_path = track->getTrackFile("scripting.as");
+    Scripting::ScriptEngine::getInstance()->loadScript(script_path, true);
 
     // Create the physics
-    m_physics = new Physics();
+    Physics::getInstance<Physics>();
 
     unsigned int num_karts = race_manager->getNumberOfKarts();
     //assert(num_karts > 0);
 
     // Load the track models - this must be done before the karts so that the
     // karts can be positioned properly on (and not in) the tracks.
-    m_track->loadTrackModel(race_manager->getReverseTrack());
+    // This also defines the static Track::getCurrentTrack function.
+    track->loadTrackModel(race_manager->getReverseTrack());
 
     if (gk > 0)
     {
@@ -210,23 +215,34 @@ void World::init()
                                    race_manager->getKartType(i),
                                    race_manager->getPlayerDifficulty(i));
         m_karts.push_back(newkart);
-        m_track->adjustForFog(newkart->getNode());
 
     }  // for i
 
-    // Now that all models are loaded, apply the overrides
-    irr_driver->applyObjectPassShader();
+    // Load other custom models if needed
+    loadCustomModels();
 
     // Must be called after all karts are created
     m_race_gui->init();
 
-    powerup_manager->updateWeightsForRace(num_karts);
+    powerup_manager->updateWeightsForRace(race_manager->getNumberOfKarts());
 
-    if (UserConfigParams::m_weather_effects)
+    if (UserConfigParams::m_particles_effects > 1)
     {
-        m_weather = new Weather(m_track->getWeatherLightning(),
-                          m_track->getWeatherSound());
+        Weather::getInstance<Weather>();   // create Weather instance
     }
+
+    if (Camera::getNumCameras() == 0)
+    {
+        if ( (NetworkConfig::get()->isServer() && 
+              !ProfileWorld::isNoGraphics()       ) ||
+            race_manager->isWatchingReplay()            )
+        {
+            // In case that the server is running with gui or watching replay,
+            // create a camera and attach it to the first kart.
+            Camera::createCamera(World::getWorld()->getKart(0), 0);
+
+        }   // if server with graphics of is watching replay
+    } // if getNumCameras()==0
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -236,6 +252,8 @@ void World::init()
  */
 void World::reset()
 {
+    RewindManager::get()->reset();
+
     // If m_saved_race_gui is set, it means that the restart was done
     // when the race result gui was being shown. In this case restore the
     // race gui (note that the race result gui is cached and so never really
@@ -260,10 +278,7 @@ void World::reset()
         (*i)->reset();
     }
 
-    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
-    {
-        Camera::getCamera(i)->reset();
-    }
+    Camera::resetAllCameras();
 
     if(race_manager->hasGhostKarts())
         ReplayPlay::get()->reset();
@@ -272,7 +287,7 @@ void World::reset()
     // Note: track reset must be called after all karts exist, since check
     // objects need to allocate data structures depending on the number
     // of karts.
-    m_track->reset();
+    Track::getCurrentTrack()->reset();
 
     // Reset the race gui.
     m_race_gui->reset();
@@ -292,20 +307,12 @@ void World::reset()
         Log::info("World", "Start Recording race.");
         ReplayRecorder::get()->init();
     }
-    if((NetworkConfig::get()->isServer() && !ProfileWorld::isNoGraphics()) ||
-        race_manager->isWatchingReplay())
-    {
-        // In case that the server is running with gui or watching replay,
-        // create a camera and attach it to the first kart.
-        Camera::createCamera(World::getWorld()->getKart(0));
-
-    }
 
     // Reset all data structures that depend on number of karts.
     irr_driver->reset();
 
     //Reset the Rubber Ball Collect Time to some negative value.
-    powerup_manager->setBallCollectTime(-100);
+    powerup_manager->setBallCollectTicks(-100);
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -334,29 +341,59 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     if (race_manager->hasGhostKarts())
         gk = ReplayPlay::get()->getNumGhostKart();
 
+    std::shared_ptr<RenderInfo> ri = std::make_shared<RenderInfo>();
+    core::stringw online_name;
+    if (global_player_id > -1)
+    {
+        ri->setHue(race_manager->getKartInfo(global_player_id)
+            .getDefaultKartColor());
+        online_name = race_manager->getKartInfo(global_player_id)
+            .getPlayerName();
+    }
+
     int position           = index+1;
     btTransform init_pos   = getStartTransform(index - gk);
-    AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
-                                      difficulty);
+    AbstractKart *new_kart;
+    if (RewindManager::get()->isEnabled())
+        new_kart = new KartRewinder(kart_ident, index, position, init_pos,
+                                    difficulty, ri);
+    else
+        new_kart = new Kart(kart_ident, index, position, init_pos, difficulty,
+                            ri);
+
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
     switch(kart_type)
     {
     case RaceManager::KT_PLAYER:
-        controller = new LocalPlayerController(new_kart,
-                         StateManager::get()->getActivePlayer(local_player_id));
+    {
+        controller = new LocalPlayerController(new_kart, local_player_id);
+        const PlayerProfile* p = StateManager::get()
+            ->getActivePlayer(local_player_id)->getConstProfile();
+        if (p && p->getDefaultKartColor() > 0.0f)
+        {
+            ri->setHue(p->getDefaultKartColor());
+        }
+
         m_num_players ++;
         break;
+    }
     case RaceManager::KT_NETWORK_PLAYER:
+    {
         controller = new NetworkPlayerController(new_kart);
+        if (!online_name.empty())
+            new_kart->setOnScreenText(online_name.c_str());
         m_num_players++;
         break;
+    }
     case RaceManager::KT_AI:
+    {
         controller = loadAIController(new_kart);
         break;
+    }
     case RaceManager::KT_GHOST:
-        break;
     case RaceManager::KT_LEADER:
+    case RaceManager::KT_SPARE_TIRE:
         break;
     }
 
@@ -370,7 +407,7 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
  *  \param index Index of kart ranging from 0 to kart_num-1. */
 const btTransform &World::getStartTransform(int index)
 {
-    return m_track->getStartTransform(index);
+    return Track::getCurrentTrack()->getStartTransform(index);
 }   // getStartTransform
 
 //-----------------------------------------------------------------------------
@@ -416,11 +453,16 @@ Controller* World::loadAIController(AbstractKart *kart)
 //-----------------------------------------------------------------------------
 World::~World()
 {
+    material_manager->unloadAllTextures();
+    RewindManager::destroy();
+
     irr_driver->onUnloadWorld();
 
-    // In case that a race is aborted (e.g. track not found) m_track is 0.
-    if(m_track)
-        m_track->cleanup();
+    projectile_manager->cleanup();
+
+    // In case that a race is aborted (e.g. track not found) track is 0.
+    if(Track::getCurrentTrack())
+        Track::getCurrentTrack()->cleanup();
 
     // Delete the in-race-gui:
     if(m_saved_race_gui)
@@ -438,8 +480,7 @@ World::~World()
         delete m_race_gui;
     }
     
-    if (m_weather != NULL)
-        delete m_weather;
+    Weather::kill();
 
     for ( unsigned int i = 0 ; i < m_karts.size() ; i++ )
     {
@@ -464,13 +505,16 @@ World::~World()
     race_manager->setRaceGhostKarts(false);
     race_manager->setRecordRace(false);
     race_manager->setWatchingReplay(false);
+    race_manager->setTimeTarget(0.0f);
+    race_manager->setSpareTireKartNum(0);
 
     Camera::removeAllCameras();
 
-    projectile_manager->cleanup();
-    // In case that the track is not found, m_physics is still undefined.
-    if(m_physics)
-        delete m_physics;
+    // In case that the track is not found, Physics was not instantiated,
+    // but kill handles this correctly.
+    Physics::kill();
+
+    Scripting::ScriptEngine::kill();
 
     m_world = NULL;
 
@@ -525,14 +569,14 @@ void World::terminateRace()
     // to show it in the GUI
     int best_highscore_rank = -1;
     std::string highscore_who = "";
-    if (!this->isNetworkWorld())
+    if (!isNetworkWorld())
     {
         updateHighscores(&best_highscore_rank);
     }
 
     // Check achievements
     PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_COLUMBUS,
-                                       getTrack()->getIdent(), 1);
+                                       Track::getCurrentTrack()->getIdent(), 1);
     if (raceHasLaps())
     {
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_MARATHONER,
@@ -617,6 +661,8 @@ void World::terminateRace()
         results->clearHighscores();
     }
 
+    // In case someone opened paused race dialog in network game
+    GUIEngine::ModalDialog::dismiss();
     results->push();
     WorldStatus::terminateRace();
 }   // terminateRace
@@ -631,7 +677,7 @@ void World::resetAllKarts()
 {
     // Reset the physics 'remaining' time to 0 so that the number
     // of timesteps is reproducible if doing a physics-based history run
-    getPhysics()->getPhysicsWorld()->resetLocalTime();
+    Physics::getInstance()->getPhysicsWorld()->resetLocalTime();
 
     // If track checking is requested, check all rescue positions if
     // they are high enough.
@@ -671,16 +717,17 @@ void World::resetAllKarts()
         if ((*i)->isGhostKart()) continue;
         Vec3 xyz = (*i)->getXYZ();
         //start projection from top of kart
-        Vec3 up_offset(0, 0.5f * ((*i)->getKartHeight()), 0);
+        Vec3 up_offset = (*i)->getNormal() * (0.5f * ((*i)->getKartHeight()));
         (*i)->setXYZ(xyz+up_offset);
 
-        bool kart_over_ground = m_track->findGround(*i);
+        bool kart_over_ground = Track::getCurrentTrack()->findGround(*i);
 
         if (!kart_over_ground)
         {
             Log::error("World",
                        "No valid starting position for kart %d on track %s.",
-                        (int)(i-m_karts.begin()), m_track->getIdent().c_str());
+                       (int)(i - m_karts.begin()),
+                       Track::getCurrentTrack()->getIdent().c_str());
             if (UserConfigParams::m_artist_debug_mode)
             {
                 Log::warn("World", "Activating fly mode.");
@@ -694,69 +741,18 @@ void World::resetAllKarts()
         }
     }
 
-    bool all_finished=false;
-    // kart->isInRest() is not fully correct, since it only takes the
-    // velocity in count, which might be close to zero when the kart
-    // is just hitting the floor, before being pushed up again by
-    // the suspension. So we just do a longer initial simulation,
-    // which should be long enough for all karts to be firmly on ground.
-    for(int i=0; i<60; i++) m_physics->update(1.f/60.f);
-
-    // Stil wait will all karts are in rest (and handle the case that a kart
-    // fell through the ground, which can happen if a kart falls for a long
-    // time, therefore having a high speed when hitting the ground.
-    int count = 0;
-    while(!all_finished)
+    // Do a longer initial simulation, which should be long enough for all
+    // karts to be firmly on ground.
+    float g = Track::getCurrentTrack()->getGravity();
+    for (KartList::iterator i = m_karts.begin(); i != m_karts.end(); i++)
     {
-        if (count++ > 100)
-        {
-            Log::error("World", "Infinite loop waiting for all_finished?");
-            break;
-        }
-        m_physics->update(1.f/60.f);
-        all_finished=true;
-        for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
-        {
-            if ((*i)->isGhostKart()) continue;
-            if(!(*i)->isInRest())
-            {
-                Vec3            normal;
-                Vec3            hit_point;
-                const Material *material;
-                // We can't use (*i)->getXYZ(), since this is only defined
-                // after update() was called. Instead we have to get the
-                // real position of the rigid body.
-                btTransform     t;
-                (*i)->getBody()->getMotionState()->getWorldTransform(t);
-                // This test can not be done only once before the loop, since
-                // it can happen that the kart falls through the track later!
-                Vec3 to = t.getOrigin()+Vec3(0, -10000, 0);
-                m_track->getTriangleMesh().castRay(t.getOrigin(), to,
-                                                   &hit_point, &material,
-                                                   &normal);
-                if(!material)
-                {
-                    Log::error("World",
-                               "No valid starting position for kart %d "
-                               "on track %s.",
-                               (int)(i-m_karts.begin()),
-                               m_track->getIdent().c_str());
-                    if (UserConfigParams::m_artist_debug_mode)
-                    {
-                        Log::warn("World", "Activating fly mode.");
-                        (*i)->flyUp();
-                        continue;
-                    }
-                    else
-                    {
-                        exit(-1);
-                    }
-                }
-                all_finished=false;
-                break;
-            }
-        }
-    }   // while
+        if ((*i)->isGhostKart()) continue;
+        (*i)->getBody()->setGravity(
+            (*i)->getMaterial() && (*i)->getMaterial()->hasGravity() ?
+            (*i)->getNormal() * -g : Vec3(0, -g, 0));
+    }
+    for(int i=0; i<stk_config->getPhysicsFPS(); i++) 
+        Physics::getInstance()->update(1);
 
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
     {
@@ -794,8 +790,8 @@ void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
     btTransform pos(transform);
 
     // Move the kart
-    Vec3 xyz = pos.getOrigin() + btVector3(0, 0.5f*kart->getKartHeight(),0.0f);
-
+    Vec3 xyz = pos.getOrigin() +
+        pos.getBasis() * Vec3(0, 0.5f*kart->getKartHeight(), 0);
     pos.setOrigin(xyz);
     kart->setXYZ(xyz);
     kart->setRotation(pos.getRotation());
@@ -810,7 +806,8 @@ void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
 
     // Project kart to surface of track
     // This will set the physics transform
-    m_track->findGround(kart);
+    Track::getCurrentTrack()->findGround(kart);
+    CheckManager::get()->resetAfterKartMove(kart);
 
 }   // moveKartTo
 
@@ -849,9 +846,9 @@ void World::scheduleUnpause()
  *  call World::update() first, to get updated kart positions. If race
  *  over would be handled in World::update, LinearWorld had no opportunity
  *  to update its data structures before the race is finished).
- *  \param dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void World::updateWorld(float dt)
+void World::updateWorld(int ticks)
 {
 #ifdef DEBUG
     assert(m_magic_number == 0xB01D6543);
@@ -869,12 +866,6 @@ void World::updateWorld(float dt)
         m_schedule_unpause = false;
     }
 
-    if (m_self_destruct)
-    {
-        delete this;
-        return;
-    }
-
     // Don't update world if a menu is shown or the race is over.
     if( getPhase() == FINISH_PHASE         ||
         getPhase() == IN_GAME_MENU_PHASE      )
@@ -882,7 +873,7 @@ void World::updateWorld(float dt)
 
     try
     {
-        update(dt);
+        update(ticks);
     }
     catch (AbortWorldUpdateException& e)
     {
@@ -969,69 +960,100 @@ void World::scheduleTutorial()
 {
     m_schedule_exit_race = true;
     m_schedule_tutorial = true;
-}
+}   // scheduleTutorial
+
+//-----------------------------------------------------------------------------
+/** This updates all only graphical elements. It is only called once per
+ *  rendered frame, not once per time step.
+ *  float dt Time since last rame.
+ */
+void World::updateGraphics(float dt)
+{
+    PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
+    if (UserConfigParams::m_particles_effects > 1 && Weather::getInstance())
+    {
+        Weather::getInstance()->update(dt);
+    }
+    PROFILER_POP_CPU_MARKER();
+
+    // Update graphics of karts, e.g. visual suspension, skid marks
+    const int kart_amount = (int)m_karts.size();
+    for (int i = 0; i < kart_amount; ++i)
+    {
+        // Update all karts that are not eliminated
+        if (!m_karts[i]->isEliminated() )
+            m_karts[i]->updateGraphics(dt);
+    }
+
+    projectile_manager->updateGraphics(dt);
+    Track::getCurrentTrack()->updateGraphics(dt);
+}   // updateGraphics
 
 //-----------------------------------------------------------------------------
 /** Updates the physics, all karts, the track, and projectile manager.
- *  \param dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void World::update(float dt)
+void World::update(int ticks)
 {
 #ifdef DEBUG
     assert(m_magic_number == 0xB01D6543);
 #endif
 
-
     PROFILER_PUSH_CPU_MARKER("World::update()", 0x00, 0x7F, 0x00);
 
 #if MEASURE_FPS
-    static float time = 0.0f;
-    time += dt;
-    if (time > 5.0f)
+    static int time = 0.0f;
+    time += ticks;
+    if (time > stk_config->time2Ticks(5.0f))
     {
-        time -= 5.0f;
+        time -= stk_config->time2Ticks(5.0f);
         printf("%i\n",irr_driver->getVideoDriver()->getFPS());
     }
 #endif
 
     PROFILER_PUSH_CPU_MARKER("World::update (sub-updates)", 0x20, 0x7F, 0x00);
-    history->update(dt);
-    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(dt);
-    if(history->replayHistory()) dt=history->getNextDelta();
-    WorldStatus::update(dt);
-    if (m_script_engine) m_script_engine->update(dt);
+    WorldStatus::update(ticks);
+    PROFILER_POP_CPU_MARKER();
+    PROFILER_PUSH_CPU_MARKER("World::update (RewindManager)", 0x20, 0x7F, 0x40);
+    RewindManager::get()->update(ticks);
     PROFILER_POP_CPU_MARKER();
 
-    if (!history->dontDoPhysics())
-    {
-        m_physics->update(dt);
-    }
-
     PROFILER_PUSH_CPU_MARKER("World::update (Kart::upate)", 0x40, 0x7F, 0x00);
+
+    // Update all the karts. This in turn will also update the controller,
+    // which causes all AI steering commands set. So in the following 
+    // physics update the new steering is taken into account.
     const int kart_amount = (int)m_karts.size();
     for (int i = 0 ; i < kart_amount; ++i)
     {
+        SpareTireAI* sta =
+            dynamic_cast<SpareTireAI*>(m_karts[i]->getController());
         // Update all karts that are not eliminated
-        if(!m_karts[i]->isEliminated()) m_karts[i]->update(dt) ;
+        if(!m_karts[i]->isEliminated() || (sta && sta->isMoving()))
+            m_karts[i]->update(ticks);
     }
     PROFILER_POP_CPU_MARKER();
 
-    PROFILER_PUSH_CPU_MARKER("World::update (camera)", 0x60, 0x7F, 0x00);
-    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+    // Updating during a rewind introduces stuttering in the camera
+    if (!RewindManager::get()->isRewinding())
     {
-        Camera::getCamera(i)->update(dt);
-    }
-    PROFILER_POP_CPU_MARKER();
+        PROFILER_PUSH_CPU_MARKER("World::update (camera)", 0x60, 0x7F, 0x00);
 
-    PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
-    if (UserConfigParams::m_graphical_effects && m_weather)
-    {
-        m_weather->update(dt);
-    }
-    PROFILER_POP_CPU_MARKER();
+        for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
+        {
+            Camera::getCamera(i)->update(stk_config->ticks2Time(ticks));
+        }
+        PROFILER_POP_CPU_MARKER();
+    }   // if !rewind
+
+    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(ticks);
+    Scripting::ScriptEngine *script_engine = Scripting::ScriptEngine::getInstance();
+    if (script_engine) script_engine->update(ticks);
+
+    Physics::getInstance()->update(ticks);
 
     PROFILER_PUSH_CPU_MARKER("World::update (projectiles)", 0xa0, 0x7F, 0x00);
-    projectile_manager->update(dt);
+    projectile_manager->update(ticks);
     PROFILER_POP_CPU_MARKER();
 
     PROFILER_POP_CPU_MARKER();
@@ -1058,15 +1080,15 @@ void World::update(float dt)
  *  update has to be called after updating the race position in linear world.
  *  That's why there is a separate call for trackUpdate here.
  */
-void World::updateTrack(float dt)
+void World::updateTrack(int ticks)
 {
-    m_track->update(dt);
+    Track::getCurrentTrack()->update(ticks);
 }   // update Track
-// ----------------------------------------------------------------------------
 
+// ----------------------------------------------------------------------------
 Highscores* World::getHighscores() const
 {
-    if(!m_use_highscores) return NULL;
+    if (isNetworkWorld() || !m_use_highscores) return NULL;
 
     const Highscores::HighscoreType type = "HST_" + getIdent();
 
@@ -1195,6 +1217,7 @@ AbstractKart *World::getLocalPlayerKart(unsigned int n) const
 /** Remove (eliminate) a kart from the race */
 void World::eliminateKart(int kart_id, bool notify_of_elimination)
 {
+    assert(kart_id < (int)m_karts.size());
     AbstractKart *kart = m_karts[kart_id];
     if (kart->isGhostKart()) return;
 
@@ -1208,10 +1231,15 @@ void World::eliminateKart(int kart_id, bool notify_of_elimination)
                 m_race_gui->addMessage(_("You have been eliminated!"), kart,
                                        2.0f);
             else
+            {
+                // Store the temporary string because clang would mess this up
+                // (remove the stringw before the wchar_t* is used).
+                const core::stringw &kart_name = kart->getController()->getName();
                 m_race_gui->addMessage(_("'%s' has been eliminated.",
-                                       kart->getName()),
+                                       kart_name),
                                        camera->getKart(),
                                        2.0f);
+            }
         }  // for i < number of cameras
     }   // if notify_of_elimination
 
@@ -1284,26 +1312,29 @@ void World::unpause()
 }   // pause
 
 //-----------------------------------------------------------------------------
-/** Call when the world needs to be deleted but you can't do it immediately
- * because you are e.g. within World::update()
- */
-void World::delayedSelfDestruct()
-{
-    m_self_destruct = true;
-}
-
-//-----------------------------------------------------------------------------
-
 void World::escapePressed()
 {
-    new RacePausedDialog(0.8f, 0.6f);
-}
+    if (!(NetworkConfig::get()->isNetworking() &&
+        getPhase() < MUSIC_PHASE))
+        new RacePausedDialog(0.8f, 0.6f);
+}   // escapePressed
+
+// ----------------------------------------------------------------------------
+/** Returns the start transform with the give index.
+ *  \param rescue_pos Index of the start position to be returned.
+ *  \returns The transform of the corresponding start position.
+ */
+btTransform World::getRescueTransform(unsigned int rescue_pos) const
+{
+    return Track::getCurrentTrack()->getStartTransform(rescue_pos);
+}   // getRescueTransform
 
 //-----------------------------------------------------------------------------
-
-bool World::isFogEnabled() const
+/** Uses the start position as rescue positions, override if necessary
+ */
+unsigned int World::getNumberOfRescuePositions() const
 {
-    return !m_force_disable_fog && (m_track != NULL && m_track->isFogEnabled());
-}
+    return Track::getCurrentTrack()->getNumberOfStartPositions();
+}   // getNumberOfRescuePositions
 
 /* EOF */

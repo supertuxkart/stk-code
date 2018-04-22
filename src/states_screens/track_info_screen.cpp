@@ -21,7 +21,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -51,8 +51,6 @@ using namespace irr::gui;
 using namespace irr::video;
 using namespace irr::core;
 using namespace GUIEngine;
-
-DEFINE_SCREEN_SINGLETON( TrackInfoScreen );
 
 // ----------------------------------------------------------------------------
 /** Constructor, which loads the corresponding track_info.stkgui file. */
@@ -128,14 +126,13 @@ void TrackInfoScreen::init()
     // temporary icon, will replace it just after (but it will be shown if the given icon is not found)
     screenshot->m_properties[PROP_ICON] = "gui/main_help.png";
 
-    ITexture* image = irr_driver->getTexture(m_track->getScreenshotFile(),
-                                    "While loading screenshot for track '%s':",
-                                           m_track->getFilename()            );
+    ITexture* image = STKTexManager::getInstance()
+        ->getTexture(m_track->getScreenshotFile(),
+        "While loading screenshot for track '%s':", m_track->getFilename());
     if(!image)
     {
-        image = irr_driver->getTexture("main_help.png",
-                                    "While loading screenshot for track '%s':",
-                                    m_track->getFilename());
+        image = STKTexManager::getInstance()->getTexture("main_help.png",
+            "While loading screenshot for track '%s':", m_track->getFilename());
     }
     if (image != NULL)
         screenshot->setImage(image);
@@ -164,15 +161,20 @@ void TrackInfoScreen::init()
          race_manager->hasAI());
     m_ai_kart_spinner->setVisible(has_AI);
     getWidget<LabelWidget>("ai-text")->setVisible(has_AI);
+
     if (has_AI)
     {
         m_ai_kart_spinner->setActive(true);
 
+        int num_ai = int(UserConfigParams::m_num_karts_per_gamemode
+            [race_manager->getMinorMode()]) - local_players;
+
         // Avoid negative numbers (which can happen if e.g. the number of karts
         // in a previous race was lower than the number of players now.
-        int num_ai = UserConfigParams::m_num_karts - local_players;
+
         if (num_ai < 0) num_ai = 0;
         m_ai_kart_spinner->setValue(num_ai);
+
         race_manager->setNumKarts(num_ai + local_players);
         // Set the max karts supported based on the battle arena selected
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
@@ -185,7 +187,7 @@ void TrackInfoScreen::init()
         // A ftl reace needs at least three karts to make any sense
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
-            m_ai_kart_spinner->setMin(3 - local_players);
+            m_ai_kart_spinner->setMin(std::max(0, 3 - local_players));
         }
         // Make sure in battle and soccer mode at least 1 ai for single player
         else if((race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
@@ -241,7 +243,8 @@ void TrackInfoScreen::init()
         m_ai_kart_spinner->setValue(0);
         m_ai_kart_spinner->setActive(false);
         race_manager->setNumKarts(race_manager->getNumLocalPlayers());
-        UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers();
+        
+        UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers();
     }
     else if (record_available)
     {
@@ -311,7 +314,8 @@ void TrackInfoScreen::updateHighScores()
             if (prop != NULL)
             {
                 const std::string &icon_path = prop->getAbsoluteIconFile();
-                ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
+                ITexture* kart_icon_texture =
+                    STKTexManager::getInstance()->getTexture( icon_path );
                 m_kart_icons[n]->setImage(kart_icon_texture);
             }
             line = name + "\t" + core::stringw(time_string.c_str());
@@ -321,9 +325,9 @@ void TrackInfoScreen::updateHighScores()
             //I18N: for empty highscores entries
             line = _("(Empty)");
 
-            ITexture* no_kart_texture = irr_driver->getTexture(
-                                 file_manager->getAsset(FileManager::GUI,
-                                                        "random_kart.png") );
+            ITexture* no_kart_texture =
+                STKTexManager::getInstance()->getTexture
+                (file_manager->getAsset(FileManager::GUI, "random_kart.png"));
             m_kart_icons[n]->setImage(no_kart_texture);
 
         }
@@ -367,10 +371,12 @@ void TrackInfoScreen::onEnterPressedInternal()
     if (has_AI)
        num_ai = m_ai_kart_spinner->getValue();
 
-    if (UserConfigParams::m_num_karts != (local_players + num_ai))
+
+    if (UserConfigParams::m_num_karts_per_gamemode
+        [race_manager->getMinorMode()] != unsigned(local_players + num_ai))
     {
         race_manager->setNumKarts(local_players + num_ai);
-        UserConfigParams::m_num_karts = local_players + num_ai;
+        UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = local_players + num_ai;
     }
 
     // Disable accidentally unlocking of a challenge
@@ -420,7 +426,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         {
             m_ai_kart_spinner->setActive(false);
             race_manager->setNumKarts(race_manager->getNumLocalPlayers());
-            UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers();
+            UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers();
         }
         else
         {
@@ -439,7 +445,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     {
         const int num_ai = m_ai_kart_spinner->getValue();
         race_manager->setNumKarts( race_manager->getNumLocalPlayers() + num_ai );
-        UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers() + num_ai;
+        UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers() + num_ai;
         updateHighScores();
     }
 }   // eventCallback

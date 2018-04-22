@@ -45,8 +45,6 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( OptionsScreenDevice );
-
 // ----------------------------------------------------------------------------
 
 OptionsScreenDevice::OptionsScreenDevice() : Screen("options_device.stkgui")
@@ -106,6 +104,11 @@ void OptionsScreenDevice::init()
 
         delete_button->setLabel(label);
     }
+    else if (m_config->isGamePadAndroid())
+    {
+        delete_button->setLabel(_("Delete Configuration"));
+        delete_button->setActive(false);
+    }
     else
     {
         delete_button->setLabel(_("Delete Configuration"));
@@ -160,7 +163,11 @@ void OptionsScreenDevice::init()
 
     // Disable deletion keyboard configurations
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
-    getWidget<ButtonWidget>("delete")->setActive(!in_game);
+    
+    if (in_game)
+    {
+        getWidget<ButtonWidget>("delete")->setActive(false);
+    }
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -434,6 +441,10 @@ void OptionsScreenDevice::gotSensedInput(const Input& sensed_input)
             // refresh display
             updateInputButtons();
         }
+        else
+        {
+            return;
+        }
     }
     else if (sensed_input.m_type == Input::IT_NONE)
     {
@@ -460,9 +471,9 @@ void OptionsScreenDevice::gotSensedInput(const Input& sensed_input)
     ModalDialog::dismiss();
     input_manager->setMode(InputManager::MENU);
 
-    if (keyboard && (sensed_input.m_button_id == irr::KEY_SHIFT ||
-                     sensed_input.m_button_id == irr::KEY_LSHIFT ||
-                     sensed_input.m_button_id == irr::KEY_RSHIFT))
+    if (keyboard && (sensed_input.m_button_id == irr::IRR_KEY_SHIFT ||
+                     sensed_input.m_button_id == irr::IRR_KEY_LSHIFT ||
+                     sensed_input.m_button_id == irr::IRR_KEY_RSHIFT))
     {
         new MessageDialog(_("Warning: The 'Shift' is not a recommended key. When "
                             "'Shift' is pressed down, all keys that contain a "
@@ -535,7 +546,7 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
 
                 binding_to_set = (PlayerAction)n;
 
-                new PressAKeyDialog(0.4f, 0.4f);
+                new PressAKeyDialog(0.5f, 0.4f);
 
                 if (m_config->isKeyboard())
                 {
@@ -621,11 +632,10 @@ bool OptionsScreenDevice::conflictsBetweenKbdConfig(PlayerAction action,
                                                    PlayerAction from,
                                                    PlayerAction to)
 {
-    KeyboardConfig* other_kbd_config;
     int id = m_config->getBinding(action).getId();
     for (int i=0; i < input_manager->getDeviceManager()->getKeyboardAmount(); i++)
     {
-        other_kbd_config =
+        KeyboardConfig* other_kbd_config =
             input_manager->getDeviceManager()->getKeyboardConfig(i);
 
         if (m_config != other_kbd_config  &&

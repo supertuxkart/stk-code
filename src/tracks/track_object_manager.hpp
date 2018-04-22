@@ -59,6 +59,7 @@ public:
     void add(const XMLNode &xml_node, scene::ISceneNode* parent,
              ModelDefinitionLoader& model_def_loader,
              TrackObject* parent_library);
+    void updateGraphics(float dt);
     void update(float dt);
     void handleExplosion(const Vec3 &pos, const PhysicalObject *mp,
                          bool secondary_hits=true);
@@ -66,9 +67,6 @@ public:
                  const btVector3 &to, btVector3 *hit_point,
                  const Material **material, btVector3 *normal = NULL,
                  bool interpolate_normal = false) const;
-
-    /** Enable or disable fog on objects */
-    void enableFog(bool enable);
 
     void insertObject(TrackObject* object);
 

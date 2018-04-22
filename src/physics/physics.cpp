@@ -31,6 +31,7 @@
 #include "karts/controller/local_player_controller.hpp"
 #include "modes/soccer_world.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "karts/explosion_animation.hpp"
 #include "physics/btKart.hpp"
 #include "physics/irr_debug_drawer.hpp"
@@ -69,7 +70,7 @@ void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
     m_karts_to_delete.clear();
     m_dynamics_world->setGravity(
         btVector3(0.0f,
-                  -World::getWorld()->getTrack()->getGravity(),
+                  -Track::getCurrentTrack()->getGravity(),
                   0.0f));
     m_debug_drawer = new IrrDebugDrawer();
     m_dynamics_world->setDebugDrawer(m_debug_drawer);
@@ -135,9 +136,9 @@ void Physics::removeKart(const AbstractKart *kart)
 
 //-----------------------------------------------------------------------------
 /** Updates the physics simulation and handles all collisions.
- *  \param dt Time step.
+ *  \param ticks Number of physics steps to simulate.
  */
-void Physics::update(float dt)
+void Physics::update(int ticks)
 {
     PROFILER_PUSH_CPU_MARKER("Physics", 0, 0, 0);
 
@@ -150,9 +151,11 @@ void Physics::update(float dt)
     // of objects.
     m_all_collisions.clear();
 
-    // Maximum of three substeps. This will work for framerate down to
-    // 20 FPS (bullet default frequency is 60 HZ).
-    m_dynamics_world->stepSimulation(dt, 3);
+    // Since the world update (which calls physics update) is called at the
+    // fixed frequency necessary for the physics update, we need to do exactly
+    // one physic step only.
+    m_dynamics_world->stepSimulation(stk_config->ticks2Time(1), 1,
+                                     stk_config->ticks2Time(1)      );
 
     // Now handle the actual collision. Note: flyables can not be removed
     // inside of this loop, since the same flyables might hit more than one
@@ -169,7 +172,8 @@ void Physics::update(float dt)
                               p->getContactPointCS(0),
                               p->getUserPointer(1)->getPointerKart(),
                               p->getContactPointCS(1)                );
-            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            Scripting::ScriptEngine* script_engine =
+                                            Scripting::ScriptEngine::getInstance();
             int kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
             int kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
             script_engine->runFunction(false, "void onKartKartCollision(int, int)",
@@ -184,7 +188,7 @@ void Physics::update(float dt)
         {
             // Kart hits physical object
             // -------------------------
-            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            Scripting::ScriptEngine* script_engine = Scripting::ScriptEngine::getInstance();
             AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
             int kartId = kart->getWorldKartId();
             PhysicalObject* obj = p->getUserPointer(0)->getPointerPhysicalObject();
@@ -267,7 +271,7 @@ void Physics::update(float dt)
         {
             // Projectile hits physical object
             // -------------------------------
-            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            Scripting::ScriptEngine* script_engine = Scripting::ScriptEngine::getInstance();
             Flyable* flyable = p->getUserPointer(0)->getPointerFlyable();
             PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();
             std::string obj_id = obj->getID();
@@ -559,15 +563,24 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             }
             else if(upB->is(UserPointer::UP_PHYSICAL_OBJECT))
             {
-                int n = contact_manifold->getContactPoint(0).m_index1;
-                const Material *m
-                    = n>=0 ? upA->getPointerTriangleMesh()->getMaterial(n)
-                           : NULL;
-                const btVector3 &normal = contact_manifold->getContactPoint(0)
-                                                           .m_normalWorldOnB;
-                upB->getPointerPhysicalObject()->hit(m, normal);
-            }
-        }
+                std::vector<int> used;
+                for(int i=0; i< contact_manifold->getNumContacts(); i++)
+                {
+                    int n = contact_manifold->getContactPoint(i).m_index0;
+                    // Make sure to call the callback function only once
+                    // per triangle.
+                    if(std::find(used.begin(), used.end(), n)!=used.end())
+                        continue;
+                    used.push_back(n);
+                    const Material *m
+                        = n >= 0 ? upB->getPointerTriangleMesh()->getMaterial(n)
+                        : NULL;
+                    const btVector3 &normal = contact_manifold->getContactPoint(i)
+                        .m_normalWorldOnB;
+                    upA->getPointerPhysicalObject()->hit(m, normal);
+                }   // for i in getNumContacts()
+            }   // upB is physical object
+        }   // upA is track
         // 2) object a is a kart
         // =====================
         else if(upA->is(UserPointer::UP_KART))
@@ -646,15 +659,24 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                     upB, contact_manifold->getContactPoint(0).m_localPointB);
             else if(upB->is(UserPointer::UP_TRACK))
             {
-                int n = contact_manifold->getContactPoint(0).m_index1;
-                const Material *m
-                    = n>=0 ? upB->getPointerTriangleMesh()->getMaterial(n)
-                           : NULL;
-                const btVector3 &normal = contact_manifold->getContactPoint(0)
-                                                           .m_normalWorldOnB;
-                upA->getPointerPhysicalObject()->hit(m, normal);
-            }
-        }
+                std::vector<int> used;
+                for(int i=0; i< contact_manifold->getNumContacts(); i++)
+                {
+                    int n = contact_manifold->getContactPoint(i).m_index1;
+                    // Make sure to call the callback function only once
+                    // per triangle.
+                    if(std::find(used.begin(), used.end(), n)!=used.end())
+                        continue;
+                    used.push_back(n);
+                    const Material *m
+                        = n >= 0 ? upB->getPointerTriangleMesh()->getMaterial(n)
+                        : NULL;
+                    const btVector3 &normal = contact_manifold->getContactPoint(i)
+                                             .m_normalWorldOnB;
+                    upA->getPointerPhysicalObject()->hit(m, normal);
+                }   // for i in getNumContacts()
+            }   // upB is track
+        }   // upA is physical object
         else if (upA->is(UserPointer::UP_ANIMATION))
         {
             if(upB->is(UserPointer::UP_KART))

@@ -39,7 +39,6 @@ DebugSliderDialog::DebugSliderDialog() : ModalDialog(0.85f, 0.25f, MODAL_DIALOG_
     loadFromFile("debug_slider.stkgui");
 }
 
-#if !defined(__APPLE__)
 void DebugSliderDialog::setSliderHook(std::string id, unsigned min, unsigned max, std::function<int()> G, std::function<void(int)> S)
 {
     getWidget<SpinnerWidget>(id.c_str())->setValue(G());
@@ -47,7 +46,6 @@ void DebugSliderDialog::setSliderHook(std::string id, unsigned min, unsigned max
     getWidget<SpinnerWidget>(id.c_str())->setMax(max);
     Setters[id] = S;
 }
-#endif
 
 // ------------------------------------------------------------------------------------------------------
 
@@ -66,7 +64,6 @@ void DebugSliderDialog::onEnterPressedInternal()
 
 GUIEngine::EventPropagation DebugSliderDialog::processEvent(const std::string& eventSource)
 {
-#if !defined(__APPLE__)
     if (Setters.find(eventSource) == Setters.end())
         return GUIEngine::EVENT_LET;
 
@@ -74,9 +71,6 @@ GUIEngine::EventPropagation DebugSliderDialog::processEvent(const std::string& e
     Log::info("DebugSlider", "Value for <%s> : %i", eventSource.c_str(), value);
     Setters[eventSource](value);
     return GUIEngine::EVENT_BLOCK;
-#else
-    return GUIEngine::EVENT_LET;
-#endif
 }
 
 // ------------------------------------------------------------------------------------------------------

@@ -170,6 +170,7 @@ namespace Online
         curl_easy_setopt(m_curl_session, CURLOPT_CONNECTTIMEOUT, 20);
         curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_LIMIT, 10);
         curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_TIME, 20);
+        curl_easy_setopt(m_curl_session, CURLOPT_NOSIGNAL, 1);
         //curl_easy_setopt(m_curl_session, CURLOPT_VERBOSE, 1L);
         if (m_url.substr(0, 8) == "https://")
         {
@@ -273,6 +274,8 @@ namespace Online
                     uagent += (std::string)" (Macintosh)";
             #elif defined(__FreeBSD__)
                     uagent += (std::string)" (FreeBSD)";
+            #elif defined(ANDROID)
+                    uagent += (std::string)" (Android)";
             #elif defined(linux)
                     uagent += (std::string)" (Linux)";
             #else

@@ -102,7 +102,7 @@ int getRAM()
  */
 int getNumProcessors()
 {
-#ifdef __linux__
+#if defined(__linux__) || defined(__CYGWIN__)
     return sysconf(_SC_NPROCESSORS_CONF);
 #endif
 #ifdef WIN32
@@ -264,6 +264,9 @@ const std::string& getOSVersion()
  */
 void reportHardwareStats()
 {
+#ifdef SERVER_ONLY
+    return;
+#else
     if(!UserConfigParams::m_hw_report_enable)
         return;
 
@@ -291,7 +294,12 @@ void reportHardwareStats()
 #else
     json.add("os_macosx", 0);
 #endif
-#ifdef __linux__
+#ifdef ANDROID
+    json.add("os_android", 1);
+#else
+    json.add("os_android", 0);
+#endif
+#if defined(__linux__) && !defined(ANDROID)
     json.add("os_linux", 1);
     json.add("os_unix", 1);
 #else
@@ -335,8 +343,10 @@ void reportHardwareStats()
     if(nr_procs>0)
         json.add("cpu_numprocs", nr_procs);
 
+#ifndef SERVER_ONLY
     json.add("GL_EXTENSIONS", getGLExtensions());
     getGLLimits(&json);
+#endif
     json.finish();
 
     // ------------------------------------------------------------------------
@@ -391,7 +401,7 @@ void reportHardwareStats()
     request->setURL((std::string)UserConfigParams::m_server_hw_report+"/upload/v1/");
     //request->setURL("http://127.0.0.1:8000/upload/v1/");
     request->queue();
-
+#endif   // !SERVER_ONLY
 }   // reportHardwareStats
 
 }   // namespace HardwareStats

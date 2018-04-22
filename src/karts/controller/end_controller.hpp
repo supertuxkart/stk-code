@@ -25,7 +25,6 @@
 
 class Camera;
 class LinearWorld;
-class QuadGraph;
 class Track;
 class Vec3;
 
@@ -85,7 +84,7 @@ public:
                  EndController(AbstractKart *kart,
                                Controller *prev_controller);
                 ~EndController();
-    virtual void update      (float delta) ;
+    virtual void update      (int ticks) ;
     virtual void reset       ();
     virtual void action      (PlayerAction action, int value);
     virtual void newLap      (int lap);

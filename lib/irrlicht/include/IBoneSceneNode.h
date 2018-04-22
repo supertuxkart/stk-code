@@ -95,6 +95,11 @@ namespace scene
 		//! Updates the absolute position based on the relative and the parents position
 		virtual void updateAbsolutePositionOfAllChildren()=0;
 
+		virtual void setAbsoluteTransformation(const core::matrix4& m)
+		{
+			AbsoluteTransformation = m; 
+		}
+
 		s32 positionHint;
 		s32 scaleHint;
 		s32 rotationHint;

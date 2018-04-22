@@ -28,7 +28,7 @@ KartWithStats::KartWithStats(const std::string& ident,
                              int position, const btTransform& init_transform,
                              PerPlayerDifficulty difficulty)
              : Kart(ident, world_kart_id, position,
-                    init_transform, difficulty)
+                    init_transform, difficulty, nullptr)
 {
 }   // KartWithStats
 
@@ -58,14 +58,13 @@ void KartWithStats::reset()
  *  statistics for this kart.
  *  \param dt Time step size.
  */
-void KartWithStats::update(float dt)
+void KartWithStats::update(int ticks)
 {
-    Kart::update(dt);
-    if(getSpeed()>m_top_speed) m_top_speed = getSpeed();
-    if(getControls().m_skid)
-        m_skidding_time += dt;
-    if(getControls().m_brake)
-        m_brake_count ++;
+    Kart::update(ticks);
+    if(getSpeed()>m_top_speed        ) m_top_speed = getSpeed();
+    float dt = stk_config->ticks2Time(ticks);
+    if(getControls().getSkidControl()) m_skidding_time += dt;
+    if(getControls().getBrake()      ) m_brake_count ++;
     LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
     if(world && !world->isOnRoad(getWorldKartId()))
         m_off_track_count ++;

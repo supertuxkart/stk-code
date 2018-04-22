@@ -32,7 +32,6 @@ namespace irr
 using namespace irr;
 
 #include "audio/sfx_manager.hpp"
-#include "karts/kart_model.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
 #include "utils/interpolation_array.hpp"
@@ -42,8 +41,11 @@ class AbstractCharacteristic;
 class AIProperties;
 class CachedCharacteristic;
 class CombinedCharacteristic;
+class KartModel;
 class Material;
+class RenderInfo;
 class XMLNode;
+
 
 /**
  *  \brief This class stores the properties of a kart.
@@ -112,7 +114,7 @@ private:
                                        *   for this kart.*/
     float m_shadow_z_offset;          /**< Z offset of the shadow plane
                                        *   for this kart.*/
-    video::ITexture *m_shadow_texture;/**< The texture with the shadow. */
+    Material* m_shadow_material;      /**< The texture with the shadow. */
     video::SColor m_color;            /**< Color the represents the kart in the
                                        *   status bar and on the track-view. */
     int  m_shape;                     /**< Number of vertices in polygon when
@@ -173,9 +175,6 @@ private:
     // bullet physics data
     // -------------------
     float m_friction_slip;
-
-    /** Parameters for the speed-weighted objects */
-    SpeedWeightedObject::Properties   m_speed_weighted_object_properties;
 
     /** Shift of center of gravity. */
     Vec3  m_gravity_center_shift;
@@ -242,24 +241,13 @@ public:
     video::ITexture *getMinimapIcon  () const {return m_minimap_icon;         }
 
     // ------------------------------------------------------------------------
-    /** Returns a pointer to the KartModel object. */
-    KartModel*    getKartModelCopy
-                (video::E_RENDER_TYPE rt = video::ERT_DEFAULT) const
-                                          {return m_kart_model->makeCopy(rt); }
-
+    KartModel* getKartModelCopy(std::shared_ptr<RenderInfo> ri=nullptr) const;
     // ------------------------------------------------------------------------
     /** Returns a pointer to the main KartModel object. This copy
      *  should not be modified, not attachModel be called on it. */
     const KartModel& getMasterKartModel() const {return *m_kart_model;        }
-
     // ------------------------------------------------------------------------
-    /** Sets the name of a mesh to be used for this kart.
-     *  \param hat_name Name of the mesh.
-     */
-    void setHatMeshName(const std::string &hat_name)
-    {
-        m_kart_model->setHatMeshName(hat_name);
-    }   // setHatMeshName
+    void setHatMeshName(const std::string &hat_name);
     // ------------------------------------------------------------------------
     /** Returns the name of this kart.
         \note Pass it through fridibi as needed, this is the LTR name
@@ -282,7 +270,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the shadow texture to use. */
-    video::ITexture *getShadowTexture() const {return m_shadow_texture;       }
+    Material* getShadowMaterial() const           { return m_shadow_material; }
 
     // ------------------------------------------------------------------------
     /** Returns the absolute path of the icon file of this kart. */
@@ -321,13 +309,6 @@ public:
     float getFrictionSlip           () const {return m_friction_slip;         }
 
     // ------------------------------------------------------------------------
-    /** Returns parameters for the speed-weighted objects */
-    const SpeedWeightedObject::Properties& getSpeedWeightedObjectProperties() const
-    {
-        return m_speed_weighted_object_properties;
-    }
-
-    // ------------------------------------------------------------------------
     /** Returns the wheel base (distance front to rear axis). */
     float getWheelBase              () const {return m_wheel_base;            }
 
@@ -361,21 +342,6 @@ public:
     float getRestitution            () const { return m_restitution; }
 
     // ------------------------------------------------------------------------
-    /** Returns the scale factor by which the shadow plane
-     *  had to be set. */
-    float getShadowScale            () const {return m_shadow_scale;          }
-
-    // ------------------------------------------------------------------------
-    /** Returns the scale factor by which the shadow plane
-     *  had to be set. */
-    float getShadowXOffset          () const {return m_shadow_x_offset;       }
-
-    // ------------------------------------------------------------------------
-    /** Returns the scale factor by which the shadow plane
-     *  had to be set. */
-    float getShadowZOffset          () const {return m_shadow_z_offset;       }
-
-    // ------------------------------------------------------------------------
     /** Returns a pointer to the AI properties. */
     const AIProperties *getAIPropertiesForDifficulty() const
     {
@@ -386,12 +352,6 @@ public:
     /** Returns the full path where the files for this kart are stored. */
     const std::string& getKartDir   () const {return m_root;                  }
 
-    // ------------------------------------------------------------------------
-    // ------------------------------------------------------------------------
-    /** Returns minimum time during which nitro is consumed when pressing nitro
-     *  key, to prevent using nitro in very short bursts
-     */
-    float getNitroMinConsumptionTime() const { return m_nitro_min_consumption; }
     // ------------------------------------------------------------------------
     /** Returns the bevel factor (!=0 indicates to use a bevelled box). */
     const Vec3 &getBevelFactor() const { return m_bevel_factor; }
@@ -427,6 +387,7 @@ public:
     float getStabilityChassisAngularDamping() const;
     float getStabilityDownwardImpulseFactor() const;
     float getStabilityTrackConnectionAccel() const;
+    std::vector<float> getStabilityAngularFactor() const;
     float getStabilitySmoothFlyingImpulse() const;
 
     InterpolationArray getTurnRadius() const;
@@ -461,16 +422,20 @@ public:
     float getAnvilSpeedFactor() const;
 
     float getParachuteFriction() const;
-    float getParachuteDuration() const;
-    float getParachuteDurationOther() const;
+    int   getParachuteDuration() const;
+    int   getParachuteDurationOther() const;
+    float getParachuteDurationRankMult() const;
+    float getParachuteDurationSpeedMult() const;
     float getParachuteLboundFraction() const;
     float getParachuteUboundFraction() const;
     float getParachuteMaxSpeed() const;
 
+    float getFrictionKartFriction() const;
+
     float getBubblegumDuration() const;
     float getBubblegumSpeedFraction() const;
     float getBubblegumTorque() const;
-    float getBubblegumFadeInTime() const;
+    int   getBubblegumFadeInTicks() const;
     float getBubblegumShieldDuration() const;
 
     float getZipperDuration() const;
@@ -488,7 +453,7 @@ public:
     float getPlungerBandForce() const;
     float getPlungerBandDuration() const;
     float getPlungerBandSpeedIncrease() const;
-    float getPlungerBandFadeOutTime() const;
+    int   getPlungerBandFadeOutTicks() const;
     float getPlungerInFaceTime() const;
 
     std::vector<float> getStartupTime() const;
@@ -510,16 +475,20 @@ public:
     float getNitroMaxSpeedIncrease() const;
     float getNitroFadeOutTime() const;
     float getNitroMax() const;
+    int   getNitroMinConsumptionTicks() const;
+    // ------------------------------------------------------------------------
 
-    float getSlipstreamDuration() const;
+    float getSlipstreamDurationFactor() const;
+    float getSlipstreamBaseSpeed() const;
     float getSlipstreamLength() const;
     float getSlipstreamWidth() const;
-    float getSlipstreamCollectTime() const;
-    float getSlipstreamUseTime() const;
+    float getSlipstreamInnerFactor() const;
+    float getSlipstreamMinCollectTime() const;
+    float getSlipstreamMaxCollectTime() const;
     float getSlipstreamAddPower() const;
     float getSlipstreamMinSpeed() const;
     float getSlipstreamMaxSpeedIncrease() const;
-    float getSlipstreamFadeOutTime() const;
+    int getSlipstreamFadeOutTicks() const;
 
     float getSkidIncrease() const;
     float getSkidDecrease() const;
@@ -541,6 +510,8 @@ public:
     bool getSkidEnabled() const;
 
     /* <characteristics-end kpdefs> */
+    
+    LEAK_CHECK()
 };   // KartProperties
 
 #endif

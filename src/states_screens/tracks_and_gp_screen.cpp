@@ -20,7 +20,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -30,7 +30,6 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/track_info_screen.hpp"
 #include "states_screens/gp_info_screen.hpp"
-#include "states_screens/waiting_for_others.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -42,8 +41,6 @@ using namespace irr::core;
 using namespace irr::video;
 
 static const char ALL_TRACK_GROUPS_ID[] = "all";
-
-DEFINE_SCREEN_SINGLETON( TracksAndGPScreen );
 
 // -----------------------------------------------------------------------------
 
@@ -223,7 +220,7 @@ void TracksAndGPScreen::init()
     buildTrackList();
 
     // select old track for the game master (if found)
-    irr_driver->setTextureErrorMessage(
+    STKTexManager::getInstance()->setTextureErrorMessage(
               "While loading screenshot in track screen for last track '%s':",
               UserConfigParams::m_last_track);
     if (!tracks_widget->setSelection(UserConfigParams::m_last_track,
@@ -231,7 +228,7 @@ void TracksAndGPScreen::init()
     {
         tracks_widget->setSelection(0, PLAYER_ID_GAME_MASTER, true);
     }
-    irr_driver->unsetTextureErrorMessage();
+    STKTexManager::getInstance()->unsetTextureErrorMessage();
 }   // init
 
 // -----------------------------------------------------------------------------

@@ -19,9 +19,9 @@
 #include <assert.h>
 #include <angelscript.h>
 #include "script_physics.hpp"
+#include "graphics/explosion.hpp"
 #include "graphics/hit_effect.hpp"
 #include "items/projectile_manager.hpp"
-#include "graphics/explosion.hpp"
 
 namespace Scripting
 {
@@ -39,9 +39,12 @@ namespace Scripting
         }
         void registerScriptFunctions(asIScriptEngine *engine)
         {
-            int r;
             engine->SetDefaultNamespace("Physics");
-            r = engine->RegisterGlobalFunction("string createExplosion(Vec3 &in)", asFUNCTION(createExplosion), asCALL_GENERIC); assert(r >= 0);
+            
+            int r;
+            r = engine->RegisterGlobalFunction("string createExplosion(Vec3 &in)", 
+                                               asFUNCTION(createExplosion), 
+                                               asCALL_GENERIC); assert(r >= 0);
         }
     }
 }

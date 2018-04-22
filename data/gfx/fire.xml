@@ -18,12 +18,10 @@
                max="500"         />
     
     <!-- Size of the particles -->
-    <size      min="0.6"
-               max="0.8"        />
+    <size      min="0.55"
+               max="0.75"        />
     
     <color     min="255 255 255"
                max="255 255 255" />
-
-  <fadeout time="300" />
 
 </particles>

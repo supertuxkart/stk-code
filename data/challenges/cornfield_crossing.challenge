@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<challenge version="2">
+    <track id="cornfield_crossing" laps="3"/>
+    <mode major="single" minor="quickrace"/>
+    <requirements trophies="0"/>
+    
+    <hard>
+        <karts number="5"/>
+        <requirements position="1" time="165"/>
+    </hard>
+    <medium>
+        <karts number="4"/>
+        <requirements time="195"/>
+    </medium>
+    <easy>
+        <karts number="4"/>
+        <requirements time="290"/>
+    </easy>
+</challenge>

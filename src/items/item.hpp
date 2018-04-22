@@ -25,21 +25,22 @@
   * Defines the various collectibles and weapons of STK.
   */
 
-namespace irr
-{
-    namespace scene { class IMesh; class ISceneNode; }
-}
-using namespace irr;
 
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
-#include <line2d.h>
+#include <line3d.h>
 
 class AbstractKart;
-class LODNode;
 class Item;
+class LODNode;
+
+namespace irr
+{
+    namespace scene { class IMesh; class ISceneNode; }
+}
+using namespace irr;
 
 // -----------------------------------------------------------------------------
 
@@ -101,13 +102,16 @@ private:
      *  (bubble gums don't rotate, but it will be replaced with
      *  a nitro which rotates, and so overwrites the original
      *  rotation). */
-    Vec3 m_original_hpr;
+    btQuaternion  m_original_rotation;
+
+    /** Used when rotating the item */
+    float         m_rotation_angle;
 
     /** True if item was collected & is not displayed. */
     bool          m_collected;
 
     /** Time till a collected item reappears. */
-    float         m_time_till_return;
+    int           m_ticks_till_return;
 
     /** Scene node of this item. */
     LODNode *m_node;
@@ -127,7 +131,7 @@ private:
     bool          m_rotate;
 
     /** Optionally set this if this item was laid by a particular kart. in
-     *  this case the 'm_deactive_time' will also be set - see below. */
+     *  this case the 'm_deactive_ticks' will also be set - see below. */
     const AbstractKart   *m_event_handler;
 
     /** Kart that emitted this item if any */
@@ -135,7 +139,7 @@ private:
 
     /** Optionally if item was placed by a kart, a timer can be used to
      *  temporarly deactivate collision so a kart is not hit by its own item */
-    float         m_deactive_time;
+    int           m_deactive_ticks;
 
     /** Counts how often an item is used before it disappears. Used for
      *  bubble gum to make them disappear after a while. A value >0
@@ -164,6 +168,7 @@ private:
 
     void          initItem(ItemType type, const Vec3 &xyz);
     void          setType(ItemType type);
+    void          setMesh(scene::IMesh* mesh, scene::IMesh* lowres_mesh);
 
 public:
                   Item(ItemType type, const Vec3& xyz, const Vec3& normal,
@@ -171,7 +176,7 @@ public:
                   Item(const Vec3& xyz, float distance,
                        TriggerItemListener* trigger);
     virtual       ~Item ();
-    void          update  (float delta);
+    void          update(int ticks);
     virtual void  collected(const AbstractKart *kart, float t=2.0f);
     void          setParent(AbstractKart* parent);
     void          reset();
@@ -180,7 +185,6 @@ public:
 
     const AbstractKart* getEmitter() const { return m_emitter; }
 
-
     // ------------------------------------------------------------------------
     /** Returns true if the Kart is close enough to hit this item, the item is
      *  not deactivated anymore, and it wasn't placed by this kart (this is
@@ -189,29 +193,14 @@ public:
      *  \param xyz Location of kart (avoiding to use kart->getXYZ() so that
      *         kart.hpp does not need to be included here).
      */
-    bool hitKart (const Vec3 &xyz, const AbstractKart *kart=NULL) const
+    bool hitKart(const Vec3 &xyz, const AbstractKart *kart=NULL) const
     {
-        return (m_event_handler!=kart || m_deactive_time <=0) &&
-               (xyz-m_xyz).length2()<m_distance_2;
-    }   // hitKart
-
-private:
-    // ------------------------------------------------------------------------
-    /** Returns true if the Kart is close enough to hit this item, the item is
-     *  not deactivated anymore, and it wasn't placed by this kart (this is
-     *  e.g. used to avoid that a kart hits a bubble gum it just dropped).
-     *  This function only uses the 2d coordinates, and it used by the AI only.
-     *  \param kart Kart to test.
-     *  \param xyz Location of kart (avoiding to use kart->getXYZ() so that
-     *         kart.hpp does not need to be included here).
-     */
-    bool hitKart (const core::vector2df &xyz,
-                  const AbstractKart *kart=NULL) const
-    {
-        if(m_event_handler==kart && m_deactive_time >0) return false;
-        float d2 = (m_xyz.getX()-xyz.X)*(m_xyz.getX()-xyz.X)
-                 + (m_xyz.getZ()-xyz.Y)*(m_xyz.getZ()-xyz.Y);
-        return d2 < m_distance_2;
+        if (m_event_handler == kart && m_deactive_ticks > 0)
+            return false;
+        Vec3 lc = quatRotate(m_original_rotation, xyz - m_xyz);
+        // Don't be too strict if the kart is a bit above the item
+        lc.setY(lc.getY() / 2.0f);
+        return lc.length2() < m_distance_2;
     }   // hitKart
 
 protected:
@@ -224,12 +213,12 @@ protected:
      *  \param line The line segment which is tested if it is close enough
      *         to this item so that this item would be collected.
      */
-    bool hitLine(const core::line2df &line,
+    bool hitLine(const core::line3df &line,
                   const AbstractKart *kart=NULL) const
     {
-        if(m_event_handler==kart && m_deactive_time >0) return false;
-        core::vector2df p2d = m_xyz.toIrrVector2d();
-        core::vector2df closest = line.getClosestPoint(p2d);
+        if(m_event_handler==kart && m_deactive_ticks >0) return false;
+
+        Vec3 closest = line.getClosestPoint(m_xyz.toIrrVector());
         return hitKart(closest, kart);
     }   // hitLine
 
@@ -262,10 +251,10 @@ public:
      *  details.
      *  \param f Time till the item can be used again.
      */
-    void          setDisableTime(float f) { m_time_till_return = f; }
+    void          setDisableTicks(int t) { m_ticks_till_return = t; }
     // ------------------------------------------------------------------------
     /** Returns the time the item is disabled for. */
-    float         getDisableTime() const { return m_time_till_return; }
+    int           getDisableTicks() const { return m_ticks_till_return; }
     // ------------------------------------------------------------------------
     /** Returns the XYZ position of the item. */
     const Vec3&   getXYZ() const { return m_xyz; }

@@ -8,7 +8,7 @@ com pnglibconf.h - library build configuration
 com
 version
 com
-com Copyright (c) 1998-2011 Glenn Randers-Pehrson
+com Copyright (c) 2011-2015 Glenn Randers-Pehrson
 com
 com This code is released under the libpng license.
 com For conditions of distribution and use, see the disclaimer
@@ -21,7 +21,7 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 # C compiler to generate 'pnglibconf.h' - a list of all the
 # configuration options.  The file lists the various options
 # that can *only* be specified during the libpng build;
-# pnglibconf.h freezes the definitons selected for the specific
+# pnglibconf.h freezes the definitions selected for the specific
 # build.
 #
 # The syntax is detailed in scripts/options.awk, this is a summary
@@ -110,7 +110,7 @@ logunsupported = 1
 #
 # If you create a private DLL you need to define the following
 # macros in the file 'pngusr.h' and set -DPNG_USER_CONFIG for
-# compilation (i.e. in CFLAGS.)
+# compilation (i.e. in CPPFLAGS.)
 # #define PNG_USER_PRIVATEBUILD \
 #     <Describes by whom and why this version of the DLL was built>
 #  e.g. #define PNG_USER_PRIVATEBUILD "Build by MyCompany for xyz reasons."
@@ -126,6 +126,12 @@ logunsupported = 1
 # - PNG_USER_VERSIONINFO_COMMENTS
 # - PNG_USER_VERSIONINFO_COMPANYNAME
 # - PNG_USER_VERSIONINFO_LEGALTRADEMARKS
+
+# It is necessary to include configures definitions here so that AC_DEFINE
+# in configure.ac works in a comprehensible way
+@#if defined(HAVE_CONFIG_H) && !defined(PNG_NO_CONFIG_H)
+@#  include "config.h"
+@#endif
 
 @#ifdef PNG_USER_CONFIG
 @#  include "pngusr.h"
@@ -143,7 +149,7 @@ logunsupported = 1
 @#  endif
 @#endif
 
-# Note that PNG_USR_CONFIG only has an effect when building
+# Note that PNG_USER_CONFIG only has an effect when building
 # pnglibconf.h
 
 setting USER_CONFIG
@@ -179,6 +185,39 @@ option READ_INT_FUNCTIONS requires READ
 option WRITE_INT_FUNCTIONS disabled
 option WRITE enables WRITE_INT_FUNCTIONS
 
+# Implementation specific control of the optimizations, enabled by those
+# hardware or software options that need it (typically when run-time choices
+# must be made by the user)
+option SET_OPTION disabled
+
+# These options are specific to the ARM NEON hardware optimizations.  At present
+# these optimizations depend on GCC specific pre-processing of an assembler (.S)
+# file so they probably won't work with other compilers.
+#
+# ARM_NEON_OPT: unset: check at compile time (__ARM_NEON__ must be defined by
+#                      the compiler, typically as a result of specifying
+#                      CC="gcc -mfpu=neon".)
+#                   0: disable (even if the CPU has a NEON FPU.)
+#                   1: check at run time (via ARM_NEON_{API,CHECK})
+#                   2: switch on unconditionally (inadvisable - instead pass
+#                      -mfpu=neon to GCC in CC)
+#           When building libpng avoid using any setting other than '0'; '1' is
+#           set automatically when either 'API' or 'CHECK' are configured in,
+#           '2' should not be necessary as -mfpu=neon will achieve the same
+#           effect as well as applying NEON optimizations to the rest of the
+#           libpng code.
+#           NOTE: any setting other than '0' requires ALIGNED_MEMORY
+# ARM_NEON_API:   (PNG_ARM_NEON == 1) allow the optimization to be switched on
+#                 with png_set_option
+# ARM_NEON_CHECK: (PNG_ARM_NEON == 1) compile a run-time check to see if Neon
+#                 extensions are supported, this is poorly supported and
+#                 deprectated - use the png_set_option API.
+setting ARM_NEON_OPT
+option ARM_NEON_API disabled requires ALIGNED_MEMORY enables SET_OPTION,
+   sets ARM_NEON_OPT 1
+option ARM_NEON_CHECK disabled requires ALIGNED_MEMORY,
+   sets ARM_NEON_OPT 1
+
 # Generic options - affect both read and write.
 
 option WARNINGS
@@ -196,10 +235,6 @@ option FIXED_POINT enables ok_math
 # Added at libpng version 1.4.0
 
 option ERROR_TEXT
-
-# The following is always on (defined empty)
-
-setting CALLOC_SUPPORTED default
 
 # This protects us against compilers that run on a windowing system
 # and thus don't have or would rather us not use the stdio types:
@@ -247,39 +282,32 @@ option IO_STATE
 
 #option READ_BIG_ENDIAN disabled
 
-# Allow users to control limits on what the READ code will
-# read:
+# Libpng limits: limit the size of images and data on read.
+#
+# If this option is disabled all the limit checking code will be disabled:
 
-# Added at libpng-1.2.43; adds limit fields to png_struct,
-# allows some usages of these fields
+option USER_LIMITS requires READ
 
-option USER_LIMITS
+# The default settings given below for the limits mean that libpng will
+# limit the size of images or the size of data in ancilliary chunks to less
+# than the specification or implementation limits. Settings have the
+# following interpretations:
+#
+# USER_WIDTH_MAX: maximum width of an image that will be read
+# USER_HEIGHT_MAX: maximum height
+# USER_CHUNK_MALLOC_MAX: maximum in-memory (decompressed) size of a single chunk
+# USER_CHUNK_CACHE_MAX: maximum number of chunks to be cached
+#
+# Only chunks that are variable in number are counted towards the
+# USER_CHUNK_CACHE_MAX limit
+setting USER_WIDTH_MAX default        1000000
+setting USER_HEIGHT_MAX default       1000000
+setting USER_CHUNK_CACHE_MAX default     1000
+setting USER_CHUNK_MALLOC_MAX default 8000000
 
-# Added at libpng-1.2.6; adds setting APIs, allows additional
-# usage of this field (UTSL)
-
+# If this option is enabled APIs to set the above limits at run time are added;
+# without this the hardwired (compile time) limits will be used.
 option SET_USER_LIMITS requires USER_LIMITS
-
-# Feature added at libpng-1.4.0, this flag added at 1.4.1
-option SET_USER_LIMITS enables SET_CHUNK_CACHE_LIMIT
-# Feature added at libpng-1.4.1, this flag added at 1.4.1
-
-option SET_USER_LIMITS enables SET_CHUNK_MALLOC_LIMIT
-
-# Added at libpng-1.0.16 and 1.2.6.  To accept all valid PNGs no matter
-# how large, set these two limits to 0x7fffffff
-
-setting USER_WIDTH_MAX default 1000000
-setting USER_HEIGHT_MAX default 1000000
-
-# Added at libpng-1.2.43.  To accept all valid PNGs no matter
-# how large, set these two limits to 0.
-
-setting USER_CHUNK_CACHE_MAX default 0
-
-# Added at libpng-1.2.43
-
-setting USER_CHUNK_MALLOC_MAX default 0
 
 # All of the following options relate to code capabilities for
 # processing image data before creating a PNG or after reading one.
@@ -381,9 +409,7 @@ option WRITE_USER_TRANSFORM requires WRITE_TRANSFORMS
 
 option WRITE_INTERLACING requires WRITE
 
-# The following depends, internally, on WEIGHT_SHIFT and COST_SHIFT
-# where are set below.
-
+# Deprecated, will be removed.
 option WRITE_WEIGHTED_FILTER requires WRITE
 
 option WRITE_FLUSH requires WRITE
@@ -396,6 +422,7 @@ option USER_TRANSFORM_INFO if READ_USER_TRANSFORM WRITE_USER_TRANSFORM
 # This enables API to set compression parameters for compressing
 # non-IDAT chunks (zTXt, iTXt, iCCP, and unknown chunks).  This feature
 # was added at libpng-1.5.3.
+option WRITE_CUSTOMIZE_COMPRESSION requires WRITE
 option WRITE_CUSTOMIZE_ZTXT_COMPRESSION requires WRITE
 
 # Any chunks you are not interested in, you can undef here.  The
@@ -444,7 +471,7 @@ option CHECK_cHRM requires cHRM
 # but can help (in theory) on some architectures.  Only affects
 # internal structures.  Added at libpng 1.4.0
 
-option ALIGN_MEMORY
+option ALIGNED_MEMORY
 
 # Buggy compilers (e.g., gcc 2.7.2.2) need PNG_NO_POINTER_INDEXING
 # See png[wr]util.c, normally this should always be *on*
@@ -471,7 +498,7 @@ setting QUANTIZE_BLUE_BITS default 5
 # are only interested in 8 bits anyway.  Increasing this value
 # results in more memory being used, and more pow() functions
 # being called to fill in the gamma tables.  Don't set this value
-# less then 8, and even that may not work (I haven't tested it).
+# less than 8, and even that may not work (I haven't tested it).
 
 setting MAX_GAMMA_8 default 11
 
@@ -481,11 +508,6 @@ setting MAX_GAMMA_8 default 11
 # the range 0.95 to 1.05
 
 setting GAMMA_THRESHOLD_FIXED default 5000
-
-# Scaling factor for filter heuristic weighting calculations
-
-setting WEIGHT_SHIFT default 8
-setting COST_SHIFT default 3
 
 # Precision to use when converting a floating point value to a PNG
 # extension format string in an sCAL chunk (only relevant if the
@@ -513,7 +535,7 @@ chunk cHRM
 chunk gAMA
 chunk hIST
 chunk iCCP
-chunk iTXt
+chunk iTXt enables TEXT
 chunk oFFs
 chunk pCAL
 chunk sCAL
@@ -524,7 +546,7 @@ chunk sRGB
 chunk tEXt requires TEXT
 chunk tIME
 chunk tRNS
-chunk zTXt
+chunk zTXt enables TEXT
 
 # This only affects support of the optional PLTE chunk in RGB and RGBA
 # images.  Notice that READ_ANCILLARY_CHUNKS therefore disables part
@@ -561,7 +583,6 @@ option READ_COMPRESSED_TEXT disabled
 option READ_iCCP enables READ_COMPRESSED_TEXT
 option READ_iTXt enables READ_COMPRESSED_TEXT
 option READ_zTXt enables READ_COMPRESSED_TEXT
-option READ_COMPRESSED_TEXT enables READ_TEXT
 
 option WRITE_oFFs enables SAVE_INT_32
 option WRITE_pCAL enables SAVE_INT_32
@@ -570,9 +591,23 @@ option WRITE_COMPRESSED_TEXT disabled
 option WRITE_iCCP enables WRITE_COMPRESSED_TEXT
 option WRITE_iTXt enables WRITE_COMPRESSED_TEXT
 option WRITE_zTXt enables WRITE_COMPRESSED_TEXT
-option WRITE_COMPRESSED_TEXT enables WRITE_TEXT
 
 # Turn this off to disable png_read_png() and png_write_png() and
 # leave the row_pointers member out of the info structure.
 
 option INFO_IMAGE
+
+# added at libpng-1.5.10
+# Turn this off to disable warning about invalid palette index and
+# leave the num_palette_max member out of the png structure.
+
+option CHECK_FOR_INVALID_INDEX enables READ_CHECK_FOR_INVALID_INDEX
+option CHECK_FOR_INVALID_INDEX enables WRITE_CHECK_FOR_INVALID_INDEX
+option READ_CHECK_FOR_INVALID_INDEX requires READ CHECK_FOR_INVALID_INDEX
+option WRITE_CHECK_FOR_INVALID_INDEX requires WRITE CHECK_FOR_INVALID_INDEX
+
+# added at libpng-1.5.15
+option GET_PALETTE_MAX enables READ_GET_PALETTE_MAX WRITE_GET_PALETTE_MAX
+option READ_GET_PALETTE_MAX requires READ_CHECK_FOR_INVALID_INDEX disabled
+option WRITE_GET_PALETTE_MAX requires WRITE_CHECK_FOR_INVALID_INDEX disabled
+

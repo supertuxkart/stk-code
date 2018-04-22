@@ -22,13 +22,15 @@
 #include <algorithm>
 
 #include "io/xml_node.hpp"
+#include "karts/abstract_kart.hpp"
 #include "tracks/ambient_light_sphere.hpp"
 #include "tracks/check_cannon.hpp"
 #include "tracks/check_goal.hpp"
 #include "tracks/check_lap.hpp"
 #include "tracks/check_line.hpp"
 #include "tracks/check_structure.hpp"
-#include "tracks/track.hpp"
+#include "tracks/drive_graph.hpp"
+#include "utils/log.hpp"
 
 CheckManager *CheckManager::m_check_manager = NULL;
 
@@ -84,7 +86,7 @@ void CheckManager::load(const XMLNode &node)
         for(it=check_structures_to_change_state.begin();
             it != check_structures_to_change_state.end(); it++)
         {
-            if(QuadGraph::get()->isReverse())
+            if(DriveGraph::get()->isReverse())
                 m_all_checks[*it]->addSuccessor(i);
             else
                 m_all_checks[i]->addSuccessor(*it);
@@ -115,6 +117,50 @@ void CheckManager::reset(const Track &track)
     for(i=m_all_checks.begin(); i!=m_all_checks.end(); i++)
         (*i)->reset(track);
 }   // reset
+
+// ----------------------------------------------------------------------------
+/** Called after a kart is moved (e.g. after a rescue) to reset any cached
+ *  check information. Without this an incorrect crossing of a checkline
+ *  could be triggered since a CheckLine stores the previous position).
+ *  \param kart_index Index of the kart that was moved.
+ */
+void CheckManager::resetAfterKartMove(AbstractKart *kart)
+{
+    std::vector<CheckStructure*>::iterator i;
+    for (i = m_all_checks.begin(); i != m_all_checks.end(); i++)
+        (*i)->resetAfterKartMove(kart->getWorldKartId());
+}   // resetAfterKartMove
+
+// ----------------------------------------------------------------------------
+/** Adds a flyable object to be tested against cannons. This will allow
+ *  bowling- and rubber-balls to fly in a cannon.
+ *  \param flyable Pointer to the flyable to be added.
+ */
+void CheckManager::addFlyableToCannons(Flyable *flyable)
+{
+    for (unsigned int i = 0; i < m_all_checks.size(); i++)
+    {
+        CheckCannon *cc = dynamic_cast<CheckCannon*>(m_all_checks[i]);
+        if (cc)
+            cc->addFlyable(flyable);
+    }
+}   // addFlyable
+
+// ----------------------------------------------------------------------------
+/** Removes a flyable from all cannons. Used when this flyable is removed
+ *  (e.g. explodes).
+ *  \param flyable Pointer to the flyable to be removed.
+ */
+void CheckManager::removeFlyableFromCannons(Flyable *flyable)
+{
+    for (unsigned int i = 0; i < m_all_checks.size(); i++)
+    {
+        CheckCannon *cc = dynamic_cast<CheckCannon*>(m_all_checks[i]);
+        if (cc)
+            cc->removeFlyable(flyable);
+    }
+
+}   // addFlyable
 
 // ----------------------------------------------------------------------------
 /** Updates all animations. Called one per time step.

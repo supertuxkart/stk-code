@@ -15,16 +15,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/shadow_matrices.hpp"
 
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/glwrap.hpp"
+#include "graphics/frame_buffer.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
-#include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
+#include "graphics/texture_shader.hpp"
 #include "modes/world.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
@@ -32,54 +34,11 @@
 #include <limits>
 #include <ICameraSceneNode.h>
 #include <SViewFrustum.h>
-#include "../../lib/irrlicht/source/Irrlicht/CSceneManager.h"
-#include "../../lib/irrlicht/source/Irrlicht/os.h"
 
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
 float ShadowMatrices:: m_shadow_split[5] = { 1., 5., 20., 50., 150 };
-
-// ============================================================================
-class LightspaceBoundingBoxShader 
-    : public TextureShader<LightspaceBoundingBoxShader, 1,
-                           core::matrix4, float, float, float, float>
-{
-public:
-    LightspaceBoundingBoxShader() 
-    {
-        loadProgram(OBJECT, GL_COMPUTE_SHADER, "Lightspaceboundingbox.comp",
-                            GL_COMPUTE_SHADER, "utils/getPosFromUVDepth.frag");
-        assignSamplerNames(0, "depth", ST_NEAREST_FILTERED);
-        assignUniforms("SunCamMatrix", "split0", "split1", "split2", "splitmax");
-        GLuint block_idx = 
-            glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK, 
-                                      "BoundingBoxes");
-        glShaderStorageBlockBinding(m_program, block_idx, 2);
-    }   // LightspaceBoundingBoxShader
-};   // LightspaceBoundingBoxShader
-
-// ============================================================================
-class ShadowMatricesGenerationShader 
-    : public Shader <ShadowMatricesGenerationShader, core::matrix4>
-{
-public:
-    ShadowMatricesGenerationShader()
-    {
-        loadProgram(OBJECT,  GL_COMPUTE_SHADER, "shadowmatrixgeneration.comp");
-        assignUniforms("SunCamMatrix");
-        GLuint block_idx = 
-            glGetProgramResourceIndex(m_program, 
-                                      GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
-        glShaderStorageBlockBinding(m_program, block_idx, 2);
-        block_idx = 
-            glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK,
-                                      "NewMatrixData");
-        glShaderStorageBlockBinding(m_program, block_idx, 1);
-    }
-
-
-};   // ShadowMatricesGenerationShader
 
 // ============================================================================
 class ViewFrustrumShader : public Shader<ViewFrustrumShader, video::SColor, int>
@@ -123,22 +82,42 @@ ShadowMatrices::ShadowMatrices()
     m_shadow_cam_nodes[1] = NULL;
     m_shadow_cam_nodes[2] = NULL;
     m_shadow_cam_nodes[3] = NULL;
+    m_rsm_map_available = false;
+    m_rsm_matrix_initialized = false;
 }   // ShadowMatrices
+// ----------------------------------------------------------------------------
+ShadowMatrices::~ShadowMatrices()
+{
+    resetShadowCamNodes();
+    m_sun_cam->drop();
+}   // ~ShadowMatrices
+// ----------------------------------------------------------------------------
+void ShadowMatrices::resetShadowCamNodes()
+{
+    for (unsigned i = 0; i < 4; i++)
+    {
+        if (m_shadow_cam_nodes[i])
+        {
+            m_shadow_cam_nodes[i]->drop();
+            m_shadow_cam_nodes[i] = NULL;
+        }
+    }
+}   // resetShadowCamNodes
+
 // ----------------------------------------------------------------------------
 void ShadowMatrices::addLight(const core::vector3df &pos)
 {
     m_sun_cam->setPosition(pos);
     m_sun_cam->updateAbsolutePosition();
-
     m_rsm_matrix_initialized = false;
-
 }   // addLight
 
 // ----------------------------------------------------------------------------
 void ShadowMatrices::updateSunOrthoMatrices()
 {
-    for (unsigned i = 0; i < m_sun_ortho_matrices.size(); i++)
-        m_sun_ortho_matrices[i] *= irr_driver->getInvViewMatrix();
+    // Use the original value for culling
+    //for (unsigned i = 0; i < m_sun_ortho_matrices.size(); i++)
+    //    m_sun_ortho_matrices[i] *= irr_driver->getInvViewMatrix();
 }   // updateSunOrthoMatrices
 
 // ============================================================================
@@ -158,7 +137,7 @@ static std::vector<vector3df> getFrustrumVertex(const scene::SViewFrustum &frust
 
 // ----------------------------------------------------------------------------
 /** Given a matrix transform and a set of points returns an orthogonal
- *  projection matrix that maps coordinates of transformed points between -1 
+ *  projection matrix that maps coordinates of transformed points between -1
  *  and 1.
  *  \param transform a transform matrix.
  *  \param pointsInside a vector of point in 3d space.
@@ -206,85 +185,6 @@ core::matrix4 ShadowMatrices::getTighestFitOrthoProj(const core::matrix4 &transf
 }   // getTighestFitOrthoProj
 
 // ----------------------------------------------------------------------------
-/** Update shadowSplit values and make Cascade Bounding Box pointer valid.
- *  The function aunches two compute kernel that generates an histogram of the 
- *  depth buffer value (between 0 and 250 with increment of 0.25) and get an
- *  axis aligned bounding box (from SunCamMatrix view) containing all depth
- *  buffer value. It also retrieves the result from the previous computations 
- *  (in a Round Robin fashion) and update CBB pointer.
- *  \param width of the depth buffer
- *  \param height of the depth buffer
- *  TODO : The depth histogram part is commented out, needs to tweak it when 
- *         I have some motivation
- */
-void ShadowMatrices::updateSplitAndLightcoordRangeFromComputeShaders(unsigned int width,
-                                                                     unsigned int height)
-{
-    struct CascadeBoundingBox
-    {
-        int xmin;
-        int xmax;
-        int ymin;
-        int ymax;
-        int zmin;
-        int zmax;
-    };   // struct CascadeBoundingBox
-
-    // Value that should be kept between multiple calls
-    static bool ssboInit = false;
-    static GLuint CBBssbo, tempShadowMatssbo;
-    CascadeBoundingBox InitialCBB[4];
-
-    for (unsigned i = 0; i < 4; i++)
-    {
-        InitialCBB[i].xmin = InitialCBB[i].ymin = InitialCBB[i].zmin = 1000;
-        InitialCBB[i].xmax = InitialCBB[i].ymax = InitialCBB[i].zmax = -1000;
-    }
-
-    if (!ssboInit)
-    {
-        glGenBuffers(1, &CBBssbo);
-        glGenBuffers(1, &tempShadowMatssbo);
-        ssboInit = true;
-    }
-
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, CBBssbo);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, 4 * sizeof(CascadeBoundingBox),
-                 InitialCBB, GL_STATIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, CBBssbo);
-
-    LightspaceBoundingBoxShader::getInstance()->use();
-    LightspaceBoundingBoxShader::getInstance()
-        ->setTextureUnits(irr_driver->getDepthStencilTexture());
-    LightspaceBoundingBoxShader::getInstance()
-        ->setUniforms(m_sun_cam->getViewMatrix(),
-                      ShadowMatrices::m_shadow_split[1],
-                      ShadowMatrices::m_shadow_split[2],
-                      ShadowMatrices::m_shadow_split[3],
-                      ShadowMatrices::m_shadow_split[4]);
-    glDispatchCompute((int)width / 64, (int)height / 64, 1);
-
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, tempShadowMatssbo);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, 4 * 16 * sizeof(float), 0,
-                 GL_STATIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, tempShadowMatssbo);
-
-    ShadowMatricesGenerationShader::getInstance()->use();
-    ShadowMatricesGenerationShader::getInstance()
-        ->setUniforms(m_sun_cam->getViewMatrix());
-    glDispatchCompute(4, 1, 1);
-
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-    glBindBuffer(GL_COPY_READ_BUFFER, tempShadowMatssbo);
-    glBindBuffer(GL_COPY_WRITE_BUFFER,
-                 SharedGPUObjects::getViewProjectionMatricesUBO());
-    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0,
-                        80 * sizeof(float), 4 * 16 * sizeof(float));
-}   // updateSplitAndLightcoordRangeFromComputeShaders
-
-// ----------------------------------------------------------------------------
 /** Generate View, Projection, Inverse View, Inverse Projection, ViewProjection
  *  and InverseProjection matrixes and matrixes and cameras for the four shadow
  *   cascade and RSM.
@@ -295,10 +195,6 @@ void ShadowMatrices::updateSplitAndLightcoordRangeFromComputeShaders(unsigned in
 void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
                                                unsigned int width, unsigned int height)
 {
-    if (CVS->isSDSMEnabled())
-        updateSplitAndLightcoordRangeFromComputeShaders(width, height);
-    static_cast<scene::CSceneManager *>(irr_driver->getSceneManager())
-        ->OnAnimate(os::Timer::getTime());
     camnode->render();
     irr_driver->setProjMatrix(irr_driver->getVideoDriver()
                               ->getTransform(video::ETS_PROJECTION));
@@ -309,27 +205,12 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
 
     const float oldfar = camnode->getFarValue();
     const float oldnear = camnode->getNearValue();
-    float FarValues[] =
-    {
-        ShadowMatrices::m_shadow_split[1],
-        ShadowMatrices::m_shadow_split[2],
-        ShadowMatrices::m_shadow_split[3],
-        ShadowMatrices::m_shadow_split[4],
-    };
-    float NearValues[] =
-    {
-        ShadowMatrices::m_shadow_split[0],
-        ShadowMatrices::m_shadow_split[1],
-        ShadowMatrices::m_shadow_split[2],
-        ShadowMatrices::m_shadow_split[3]
-    };
 
-    float tmp[16 * 9 + 2];
-    memcpy(tmp, irr_driver->getViewMatrix().pointer(),          16 * sizeof(float));
-    memcpy(&tmp[16], irr_driver->getProjMatrix().pointer(),     16 * sizeof(float));
-    memcpy(&tmp[32], irr_driver->getInvViewMatrix().pointer(),  16 * sizeof(float));
-    memcpy(&tmp[48], irr_driver->getInvProjMatrix().pointer(),  16 * sizeof(float));
-    memcpy(&tmp[64], irr_driver->getProjViewMatrix().pointer(), 16 * sizeof(float));
+    memcpy(m_mat_ubo, irr_driver->getViewMatrix().pointer(),          16 * sizeof(float));
+    memcpy(&m_mat_ubo[16], irr_driver->getProjMatrix().pointer(),     16 * sizeof(float));
+    memcpy(&m_mat_ubo[32], irr_driver->getInvViewMatrix().pointer(),  16 * sizeof(float));
+    memcpy(&m_mat_ubo[48], irr_driver->getInvProjMatrix().pointer(),  16 * sizeof(float));
+    memcpy(&m_mat_ubo[64], irr_driver->getProjViewMatrix().pointer(), 16 * sizeof(float));
 
     m_sun_cam->render();
     for (unsigned i = 0; i < 4; i++)
@@ -341,18 +222,23 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
     m_sun_ortho_matrices.clear();
     const core::matrix4 &sun_cam_view_matrix = m_sun_cam->getViewMatrix();
 
-    if (World::getWorld() && World::getWorld()->getTrack())
+    const Track* const track = Track::getCurrentTrack();
+    if (track)
     {
-        // Compute track extent
-        btVector3 btmin, btmax;
-        if (World::getWorld()->getTrack()->getPtrTriangleMesh())
+        float FarValues[] =
         {
-            World::getWorld()->getTrack()->getTriangleMesh().getCollisionShape()
-                              .getAabb(btTransform::getIdentity(), btmin, btmax);
-        }
-        const Vec3 vmin = btmin, vmax = btmax;
-        core::aabbox3df trackbox(vmin.toIrrVector(), vmax.toIrrVector() -
-            core::vector3df(0, 30, 0));
+            ShadowMatrices::m_shadow_split[1],
+            ShadowMatrices::m_shadow_split[2],
+            ShadowMatrices::m_shadow_split[3],
+            ShadowMatrices::m_shadow_split[4],
+        };
+        float NearValues[] =
+        {
+            ShadowMatrices::m_shadow_split[0],
+            ShadowMatrices::m_shadow_split[1],
+            ShadowMatrices::m_shadow_split[2],
+            ShadowMatrices::m_shadow_split[3]
+        };
 
         // Shadow Matrixes and cameras
         for (unsigned i = 0; i < 4; i++)
@@ -400,41 +286,9 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
             m_shadow_cam_nodes[i]->render();
 
             m_sun_ortho_matrices.push_back(
-                  irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION) 
+                  irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION)
                 * irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW)       );
         }
-
-        // Rsm Matrix and camera
-        if (!m_rsm_matrix_initialized)
-        {
-            if (trackbox.MinEdge.X != trackbox.MaxEdge.X &&
-                trackbox.MinEdge.Y != trackbox.MaxEdge.Y &&
-                // Cover the case where sun_cam_view_matrix is null
-                sun_cam_view_matrix.getScale() != core::vector3df(0., 0., 0.))
-            {
-                sun_cam_view_matrix.transformBoxEx(trackbox);
-                core::matrix4 tmp_matrix;
-                tmp_matrix.buildProjectionMatrixOrthoLH(trackbox.MinEdge.X,
-                                                        trackbox.MaxEdge.X,
-                                                        trackbox.MaxEdge.Y,
-                                                        trackbox.MinEdge.Y,
-                                                        30, trackbox.MaxEdge.Z);
-                m_sun_cam->setProjectionMatrix(tmp_matrix, true);
-                m_sun_cam->render();
-            }
-            m_rsm_matrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION) 
-                         * irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-            m_rsm_matrix_initialized = true;
-            m_rsm_map_available = false;
-        }
-        m_rh_extend = core::vector3df(128, 64, 128);
-        core::vector3df campos = camnode->getAbsolutePosition();
-        core::vector3df translation(8 * floor(campos.X / 8), 
-                                    8 * floor(campos.Y / 8),
-                                    8 * floor(campos.Z / 8));
-        m_rh_matrix.setTranslation(translation);
-
-
         assert(m_sun_ortho_matrices.size() == 4);
         // reset normal camera
         camnode->setNearValue(oldnear);
@@ -443,24 +297,13 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
 
         size_t size = m_sun_ortho_matrices.size();
         for (unsigned i = 0; i < size; i++)
-            memcpy(&tmp[16 * i + 80],
+            memcpy(&m_mat_ubo[16 * i + 80],
                    m_sun_ortho_matrices[i].pointer(),
                    16 * sizeof(float));
     }
 
-    tmp[144] = float(width);
-    tmp[145] = float(height);
-    glBindBuffer(GL_UNIFORM_BUFFER, 
-                 SharedGPUObjects::getViewProjectionMatricesUBO());
-    if (CVS->isSDSMEnabled())
-    {
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 5) * sizeof(float), tmp);
-        glBufferSubData(GL_UNIFORM_BUFFER, (16 * 9) * sizeof(float), 
-                        2 * sizeof(float), &tmp[144]);
-    }
-    else
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 9 + 2) * sizeof(float),
-                        tmp);
+    m_mat_ubo[144] = float(width);
+    m_mat_ubo[145] = float(height);
 }   // computeMatrixesAndCameras
 
 // ----------------------------------------------------------------------------
@@ -475,25 +318,26 @@ void ShadowMatrices::renderWireFrameFrustrum(float *tmp, unsigned i)
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
 }
 // ----------------------------------------------------------------------------
-void ShadowMatrices::renderShadowsDebug()
+void ShadowMatrices::renderShadowsDebug(const FrameBuffer* shadow_framebuffer,
+                                        const PostProcessing *post_processing)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, UserConfigParams::m_height / 2,
                UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    PostProcessing *post_processing = irr_driver->getPostProcessing();
-    RTT *rtt = irr_driver->getRTT();
-    post_processing->renderTextureLayer(rtt->getShadowFBO().getRTT()[0], 0);
+    post_processing->renderTextureLayer(shadow_framebuffer->getDepthTexture(), 0);
     renderWireFrameFrustrum(m_shadows_cam[0], 0);
     glViewport(UserConfigParams::m_width / 2, UserConfigParams::m_height / 2,
                UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    post_processing->renderTextureLayer(rtt->getShadowFBO().getRTT()[0], 1);
+    post_processing->renderTextureLayer(shadow_framebuffer->getDepthTexture(), 1);
     renderWireFrameFrustrum(m_shadows_cam[1], 1);
     glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    post_processing->renderTextureLayer(rtt->getShadowFBO().getRTT()[0], 2);
+    post_processing->renderTextureLayer(shadow_framebuffer->getDepthTexture(), 2);
     renderWireFrameFrustrum(m_shadows_cam[2], 2);
     glViewport(UserConfigParams::m_width / 2, 0, UserConfigParams::m_width / 2,
                UserConfigParams::m_height / 2);
-    post_processing->renderTextureLayer(rtt->getShadowFBO().getRTT()[0], 3);
+    post_processing->renderTextureLayer(shadow_framebuffer->getDepthTexture(), 3);
     renderWireFrameFrustrum(m_shadows_cam[3], 3);
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 }
+
+#endif   // !SERVER_ONLY

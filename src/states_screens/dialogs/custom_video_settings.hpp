@@ -27,7 +27,6 @@
  */
 class CustomVideoSettingsDialog : public GUIEngine::ModalDialog
 {
-    
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height

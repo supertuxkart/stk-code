@@ -19,34 +19,67 @@
 
 #include "main_loop.hpp"
 
-#include <assert.h>
-
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/message_queue.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "input/input_manager.hpp"
-#include "input/wiimote_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/race_event_manager.hpp"
+#include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
 #include "online/request_manager.hpp"
+#include "race/history.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
 
+#ifndef WIN32
+#include <unistd.h>
+#endif
+
 MainLoop* main_loop = 0;
 
-MainLoop::MainLoop() :
-m_abort(false)
+// ----------------------------------------------------------------------------
+MainLoop::MainLoop(unsigned parent_pid)
+        : m_abort(false), m_parent_pid(parent_pid)
 {
-    m_curr_time = 0;
-    m_prev_time = 0;
-    m_throttle_fps = true;
+    m_curr_time       = 0;
+    m_prev_time       = 0;
+    m_throttle_fps    = true;
+    m_is_last_substep = false;
+#ifdef WIN32
+    if (parent_pid != 0)
+    {
+        std::string class_name = "separate_process";
+        class_name += StringUtils::toString(GetCurrentProcessId());
+        WNDCLASSEX wx = {};
+        wx.cbSize = sizeof(WNDCLASSEX);
+        wx.lpfnWndProc = [](HWND h, UINT m, WPARAM w, LPARAM l)->LRESULT
+        {
+            if (m == WM_DESTROY)
+            {
+                PostQuitMessage(0);
+                return 0;
+            }
+            return DefWindowProc(h, m, w, l);
+        };
+        wx.hInstance = GetModuleHandle(0);
+        wx.lpszClassName = &class_name[0];
+        if (RegisterClassEx(&wx))
+        {
+            CreateWindowEx(0, &class_name[0], "stk_server_only",
+                0, 0, 0, 0, 0, HWND_MESSAGE, NULL, NULL, NULL);
+        }
+    }
+#endif
 }  // MainLoop
 
 //-----------------------------------------------------------------------------
@@ -61,6 +94,9 @@ MainLoop::~MainLoop()
  */
 float MainLoop::getLimitedDt()
 {
+    m_prev_time = m_curr_time;
+    float dt = 0;
+
     // In profile mode without graphics, run with a fixed dt of 1/60
     if ((ProfileWorld::isProfileMode() && ProfileWorld::isNoGraphics()) ||
         UserConfigParams::m_arena_ai_stats)
@@ -69,13 +105,27 @@ float MainLoop::getLimitedDt()
     }
 
     IrrlichtDevice* device = irr_driver->getDevice();
-    m_prev_time = m_curr_time;
 
-    float dt;  // needed outside of the while loop
     while( 1 )
     {
         m_curr_time = device->getTimer()->getRealTime();
         dt = (float)(m_curr_time - m_prev_time);
+        // On a server (i.e. without graphics) the frame rate can be under
+        // 1 ms, i.e. dt = 0. Additionally, the resolution of a sleep
+        // statement is not that precise either: if the sleep statement
+        // would be consistent < 1ms, but the stk time would increase by
+        // 1 ms, the stk clock would be desynchronised from real time
+        // (it would go faster), resulting in synchronisation problems
+        // with clients (server time is supposed to be behind client time).
+        // So we play it safe by adding a loop to make sure at least 1ms
+        // (minimum time that can be handled by the integer timer) delay here.
+        while (dt <= 0)
+        {
+            StkTime::sleep(1);
+            m_curr_time = device->getTimer()->getRealTime();
+            dt = (float)(m_curr_time - m_prev_time);
+        }
+
         const World* const world = World::getWorld();
         if (UserConfigParams::m_fps_debug && world)
         {
@@ -84,7 +134,7 @@ float MainLoop::getLimitedDt()
             {
                 Log::verbose("fps", "time %f distance %f dt %f fps %f",
                              lw->getTime(),
-                             lw->getDistanceDownTrackForKart(0),
+                             lw->getDistanceDownTrackForKart(0, true),
                              dt*0.001f, 1000.0f / dt);
             }
             else
@@ -95,123 +145,301 @@ float MainLoop::getLimitedDt()
 
         }
 
-        // don't allow the game to run slower than a certain amount.
+        // Don't allow the game to run slower than a certain amount.
         // when the computer can't keep it up, slow down the shown time instead
-        static const float max_elapsed_time = 3.0f*1.0f/60.0f*1000.0f; /* time 3 internal substeps take */
-        if(dt > max_elapsed_time) dt=max_elapsed_time;
+        // But this can not be done in networking, otherwise the game time on
+        // client and server will not be in synch anymore
+        if(!NetworkConfig::get()->isNetworking())
+        {
+            /* time 3 internal substeps take */
+            const float MAX_ELAPSED_TIME = 3.0f*1.0f / 60.0f*1000.0f;
+            if (dt > MAX_ELAPSED_TIME) dt = MAX_ELAPSED_TIME;
+        }
+        if (!m_throttle_fps || ProfileWorld::isProfileMode()) break;
 
         // Throttle fps if more than maximum, which can reduce
         // the noise the fan on a graphics card makes.
-        // When in menus, reduce FPS much, it's not necessary to push to the maximum for plain menus
-        const int max_fps = (StateManager::get()->throttleFPS() ? 30 : UserConfigParams::m_max_fps);
-        const int current_fps = (int)(1000.0f/dt);
-        if (m_throttle_fps && current_fps > max_fps && !ProfileWorld::isProfileMode())
-        {
-            int wait_time = 1000/max_fps - 1000/current_fps;
-            if(wait_time < 1) wait_time = 1;
+        // When in menus, reduce FPS much, it's not necessary to push to the
+        // maximum for plain menus
+        const int max_fps = (irr_driver->isRecording() &&
+                             UserConfigParams::m_limit_game_fps )
+                          ? UserConfigParams::m_record_fps 
+                          : ( StateManager::get()->throttleFPS() 
+                              ? 60 
+                              : UserConfigParams::m_max_fps     );
+        const int current_fps = (int)(1000.0f / dt);
+        if (!m_throttle_fps || current_fps <= max_fps ||
+            ProfileWorld::isProfileMode()                )  break;
 
-            PROFILER_PUSH_CPU_MARKER("Throttle framerate", 0, 0, 0);
-            StkTime::sleep(wait_time);
-            PROFILER_POP_CPU_MARKER();
-        }
-        else break;
-    }
+        int wait_time = 1000 / max_fps - 1000 / current_fps;
+        if (wait_time < 1) wait_time = 1;
+
+        PROFILER_PUSH_CPU_MARKER("Throttle framerate", 0, 0, 0);
+        StkTime::sleep(wait_time);
+        PROFILER_POP_CPU_MARKER();
+    }   // while(1)
+
     dt *= 0.001f;
+
+    // If this is a client, the server might request an adjustment of
+    // this client's world clock (to reduce number of rewinds).
+    if (World::getWorld()                   &&
+        NetworkConfig::get()->isClient()    &&
+        !RewindManager::get()->isRewinding()   )
+    {
+        dt = World::getWorld()->adjustDT(dt);
+    }
+
     return dt;
 }   // getLimitedDt
 
 //-----------------------------------------------------------------------------
 /** Updates all race related objects.
- *  \param dt Time step size.
+ *  \param ticks Number of ticks (physics steps) to simulate - should be 1.
  */
-void MainLoop::updateRace(float dt)
+void MainLoop::updateRace(int ticks)
 {
+    if (!World::getWorld())  return;   // No race on atm - i.e. we are in menu
+
     // The race event manager will update world in case of an online race
-    if (RaceEventManager::getInstance<RaceEventManager>()->isRunning())
-        RaceEventManager::getInstance<RaceEventManager>()->update(dt);
+    if ( RaceEventManager::getInstance() && 
+         RaceEventManager::getInstance()->isRunning() )
+        RaceEventManager::getInstance()->update(ticks);
     else
-        World::getWorld()->updateWorld(dt);
+        World::getWorld()->updateWorld(ticks);
 }   // updateRace
 
 //-----------------------------------------------------------------------------
 /** Run the actual main loop.
+ *  The sequnce in which various parts of STK are updated is:
+ *  - Determine next time step size (`getLimitedDt`). This takes maximum fps
+ *    into account (i.e. sleep if the fps would be too high), and will actually
+ *    slow down the in-game clock if the fps are too low (if more than 3/60 of
+ *    a second have passed, more than 3 physics time steps would be needed, 
+ *    and physics do at most 3 time steps).
+ *  - if a race is taking place (i.e. not only a menu being shown), call
+ *    `updateRace()`, which is a thin wrapper around a call to
+ *    `World::updateWorld()`:
+ *    - Update history manager (which will either set the kart position and/or
+ *      controls when replaying, or store the current info for a replay).
+ *      This is mostly for debugging only (though available even in release
+ *      mode).
+ *    - Updates Replays - either storing data when not replaying, or
+ *      updating kart positions/control when replaying).
+ *    - Calls `WorldStatus::update()`, which updates the race state (e.g.
+ *      go from 'ready' to 'set' etc), and clock.
+ *    - Updates the physics (`Physics::update()`). This will simulate all
+ *      physical objects for the specified time with bullet.
+ *    - Updates all karts (`Kart::update()`). Obviously the update function
+ *      does a lot more than what is described here, this is only supposed to
+ *      be a _very_ high level overview:
+ *      - Updates its rewinder (to store potentially changed controls
+ *        as events) in `KartRewinder::update()`.
+ *      - Calls `Moveable::update()`, which takes the new position from
+ *        the physics and saves it (and computes dependent values, like
+ *        heading, local velocity).
+ *      - Updates its controller. This is either:
+ *        - an AI using `SkiddingController::update()` (which then will
+ *          compute the new controls), or 
+ *        - a player controller using `PlayerController::update()`, which will
+ *          handle smooth steering (in case of digital input devices steering
+ *          is adjusted a bit over time to avoid an instant change from all
+ *          left to all right). Input events will be handled when updating
+ *          the irrlicht driver later at the end of the main loop.
+ *      - Updates kart animation (like rescue, ...) if one is shown atm.
+ *      - Update attachments.
+ *      - update physics, i.e. taking the current steering and updating
+ *        the bullet raycast vehicle with that data. The settings are actually
+ *        only used in the next frame when the physics are updated.
+ *    - Updates all cameras via `Camera::update()`. The camera position and
+ *      rotation is adjusted according to the position etc of the kart (and
+ *      special circumstances like rescue, falling).
+ *    - Updates all projectiles using the projectile manager. Some of the
+ *      projectiles are mostly handled by the physics (e.g. a cake will mainly
+ *      check if it's out of bounds), others (like basket ball) do all 
+ *      their aiming and movement here.
+ *    - Updates the rewind manager to store rewind states.
+ *  - Updates the music manager.
+ *  - Updates the input manager (which only updates internal time, actual
+ *    input handling follows late)
+ *  - Updates the wiimote manager. This will read the data of all wiimotes
+ *    and feed the corresponding events to the irrlicht event system.
+ *  - Updates the STK internal gui engine. This updates all widgets, and
+ *    e.g. takes care of the rotation of the karts in the KartSelection
+ *    screen using the ModelViewWidget.
+ *  - Updates STK's irrlicht driver `IrrDriver::update()`:
+ *    - Calls Irrlicht's `beginScene()` .
+ *    - Renders the scene (several times with different viewport if
+ *      split screen is being used)
+ *    - Calls `GUIEngine::render()`, which renders all widgets with the
+ *      help of Irrlicht's GUIEnvironment (`drawAll()`). This will also
+ *      handle all events, i.e. all input is now handled (e.g. steering,
+ *      firing etc are all set in the corresponding karts depending on
+ *      user input).
+ *    - Calls Irrlicht's `endScene()`
  */
 void MainLoop::run()
 {
     IrrlichtDevice* device = irr_driver->getDevice();
 
     m_curr_time = device->getTimer()->getRealTime();
-    while(!m_abort)
+    // DT keeps track of the leftover time, since the race update
+    // happens in fixed timesteps
+    float left_over_time = 0;
+
+#ifdef WIN32
+    HANDLE parent = 0;
+    if (m_parent_pid != 0)
     {
+        parent = OpenProcess(PROCESS_ALL_ACCESS, FALSE, m_parent_pid);
+        if (parent == 0 || parent == INVALID_HANDLE_VALUE)
+        {
+            Log::warn("MainLoop", "Cannot open parent handle, this child "
+                "may not be auto destroyed when parent is terminated");
+        }
+    }
+#endif
+
+    while (!m_abort)
+    {
+        bool loading_shutdown = false;
+        auto lb = LobbyProtocol::get<LobbyProtocol>();
+        if (World::getWorld() && lb &&
+            STKHost::existHost() && !STKHost::get()->requestedShutdown())
+        {
+            while (!lb->allPlayersReady())
+            {
+                if (STKHost::existHost() && STKHost::get()->requestedShutdown())
+                {
+                    loading_shutdown = true;
+                    break;
+                }
+                StkTime::sleep(1);
+                m_curr_time = irr_driver->getDevice()->getTimer()->getRealTime();
+            }
+        }
+
+#ifdef WIN32
+        if (parent != 0 && parent != INVALID_HANDLE_VALUE)
+        {
+            MSG msg;
+            while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+                if (msg.message == WM_QUIT)
+                    m_abort = true;
+            }
+            // If parent is killed, abort the child main loop too
+            if (WaitForSingleObject(parent, 0) != WAIT_TIMEOUT)
+                m_abort = true;
+        }
+#else
+        // POSIX equivalent
+        if (m_parent_pid != 0 && getppid() != (int)m_parent_pid)
+            m_abort = true;
+#endif
+        m_is_last_substep = false;
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
 
-        m_prev_time = m_curr_time;
-        float dt   = getLimitedDt();
+        left_over_time += getLimitedDt();
+        int num_steps   = stk_config->time2Ticks(left_over_time);
+        float dt = stk_config->ticks2Time(1);
+        left_over_time -= num_steps * dt ;
 
-        if (World::getWorld())  // race is active if world exists
+        // Shutdown next frame if shutdown request is sent while loading the
+        // world
+        if (!loading_shutdown && STKHost::existHost() &&
+            STKHost::get()->requestedShutdown())
         {
-            PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
-            updateRace(dt);
-            PROFILER_POP_CPU_MARKER();
-        }   // if race is active
-
-        // We need to check again because update_race may have requested
-        // the main loop to abort; and it's not a good idea to continue
-        // since the GUI engine is no more to be called then.
-        // Also only do music, input, and graphics update if graphics are
-        // enabled.
-        if (!m_abort && !ProfileWorld::isNoGraphics())
-        {
-            PROFILER_PUSH_CPU_MARKER("Music/input/GUI", 0x7F, 0x00, 0x00);
-            input_manager->update(dt);
-
-            #ifdef ENABLE_WIIUSE
-                wiimote_manager->update();
-            #endif
-            
-            GUIEngine::update(dt);
-            PROFILER_POP_CPU_MARKER();
-
-            PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
-            irr_driver->update(dt);
-            PROFILER_POP_CPU_MARKER();
-
-            // Update sfx and music after graphics, so that graphics code
-            // can use as many threads as possible without interfering
-            // with audia
-            PROFILER_PUSH_CPU_MARKER("Music/input/GUI", 0x7F, 0x00, 0x00);
-            SFXManager::get()->update();
-            PROFILER_POP_CPU_MARKER();
-
-            PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
-            if (STKHost::existHost())
+            SFXManager::get()->quickSound("anvil");
+            core::stringw msg = _("Server connection timed out.");
+            if (!STKHost::get()->getErrorMessage().empty())
             {
-                if (STKHost::get()->requestedShutdown())
-                    STKHost::get()->shutdown();
-                else
-                    ProtocolManager::getInstance()->update(dt);
+                msg = STKHost::get()->getErrorMessage();
+            }
+            STKHost::get()->shutdown();
+            // In case the user opened a race pause dialog
+            GUIEngine::ModalDialog::dismiss();
+            if (World::getWorld())
+            {
+                race_manager->clearNetworkGrandPrixResult();
+                race_manager->exitRace();
+            }
+            if (!ProfileWorld::isNoGraphics())
+            {
+                StateManager::get()->resetAndSetStack(
+                    NetworkConfig::get()->getResetScreens().data());
+                MessageQueue::add(MessageQueue::MT_ERROR, msg);
+            }
+            NetworkConfig::get()->unsetNetworking();
+        }
+
+        if (!m_abort)
+        {
+            float frame_duration = num_steps * dt;
+            if (!ProfileWorld::isNoGraphics())
+            {
+                PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
+                if (World::getWorld())
+                    World::getWorld()->updateGraphics(frame_duration);
+                PROFILER_POP_CPU_MARKER();
+
+                // Render the previous frame, and also handle all user input.
+                PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
+                irr_driver->update(frame_duration);
+                PROFILER_POP_CPU_MARKER();
+
+                PROFILER_PUSH_CPU_MARKER("Input/GUI", 0x7F, 0x00, 0x00);
+                input_manager->update(frame_duration);
+                GUIEngine::update(frame_duration);
+                PROFILER_POP_CPU_MARKER();
+                if (World::getWorld() && history->replayHistory())
+                    history->updateReplay(World::getWorld()->getTimeTicks());
+                PROFILER_PUSH_CPU_MARKER("Music", 0x7F, 0x00, 0x00);
+                SFXManager::get()->update();
+                PROFILER_POP_CPU_MARKER();
+            }
+            // Some protocols in network will use RequestManager
+            PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
+            Online::RequestManager::get()->update(frame_duration);
+            PROFILER_POP_CPU_MARKER();
+        }
+
+        for(int i=0; i<num_steps; i++)
+        {
+            // Enable last substep in last iteration
+            m_is_last_substep = (i == num_steps - 1);
+
+            PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
+            if (World::getWorld()) updateRace(1);
+            PROFILER_POP_CPU_MARKER();
+
+            // We need to check again because update_race may have requested
+            // the main loop to abort; and it's not a good idea to continue
+            // since the GUI engine is no more to be called then.
+            if (m_abort) break;
+
+            PROFILER_PUSH_CPU_MARKER("Protocol manager update",
+                                     0x7F, 0x00, 0x7F);
+            if (auto pm = ProtocolManager::lock())
+            {
+                pm->update(1);
             }
             PROFILER_POP_CPU_MARKER();
 
-            PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
-            Online::RequestManager::get()->update(dt);
-            PROFILER_POP_CPU_MARKER();
-        }
-        else if (!m_abort && ProfileWorld::isNoGraphics())
-        {
-            PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
-            if(NetworkConfig::get()->isNetworking())
-                ProtocolManager::getInstance()->update(dt);
-            PROFILER_POP_CPU_MARKER();
+            if (World::getWorld()) World::getWorld()->updateTime(1);
+        }   // for i < num_steps
 
-            PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
-            Online::RequestManager::get()->update(dt);
-            PROFILER_POP_CPU_MARKER();
-        }
-
-        PROFILER_POP_CPU_MARKER();
+        m_is_last_substep = false;
+        PROFILER_POP_CPU_MARKER();   // MainLoop pop
         PROFILER_SYNC_FRAME();
     }  // while !m_abort
+
+#ifdef WIN32
+    if (parent != 0 && parent != INVALID_HANDLE_VALUE)
+        CloseHandle(parent);
+#endif
 
 }   // run
 

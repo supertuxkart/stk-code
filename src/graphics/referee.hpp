@@ -76,6 +76,8 @@ private:
     /** A rotation to be applied to the referee before displaying it. */
     static Vec3 m_st_start_rotation;
 
+    static float m_height;
+
     /** The scene node for an instance of the referee. */
     scene::IAnimatedMeshSceneNode *m_scene_node;
 
@@ -113,6 +115,9 @@ public:
     /** Returns the rotation of the mesh so that it faces the kart (when
      *  applied to a kart with heading 0). */
     static const Vec3& getStartRotation() {return m_st_start_rotation; }
+    // ------------------------------------------------------------------------
+    /** Returns the height of the referee. */
+    static const float getHeight() {return m_height; }
 };   // Referee
 
 #endif

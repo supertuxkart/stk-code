@@ -40,7 +40,7 @@ private:
     static std::vector<std::string> m_demo_tracks;
 
     /** Number of karts to use in demo mode. */
-    static int m_num_karts;
+    static int m_default_num_karts;
 
     /** Idle time after which demo mode should be started. */
     static float m_max_idle_time;
@@ -53,20 +53,25 @@ private:
 public:
                           DemoWorld();
     virtual              ~DemoWorld();
-    /** Returns identifier for this world. */
-    virtual  std::string getInternalCode() const OVERRIDE { return "DEMO"; }
-    virtual  void        update(float dt) OVERRIDE {ProfileWorld::update(dt);};
     virtual  bool        isRaceOver() OVERRIDE;
     virtual  void        enterRaceOverState() OVERRIDE;
     // ------------------------------------------------------------------------
-    static   bool        updateIdleTimeAndStartDemo(float dt);
+    /** Returns identifier for this world. */
+    virtual  std::string getInternalCode() const OVERRIDE { return "DEMO"; }
+    // ------------------------------------------------------------------------
+    virtual void update(int ticks) OVERRIDE { ProfileWorld::update(ticks); }
+    // ------------------------------------------------------------------------
+    static bool updateIdleTimeAndStartDemo(float dt);
     // ------------------------------------------------------------------------
     /** Sets the number of laps to use in demo mode. m_num_laps is from
      *  ProfileWorld. */
     static void setNumLaps(unsigned int num_laps) { m_num_laps = num_laps; }
     // ------------------------------------------------------------------------
     /** Sets the number of karts to use in demo mode. */
-    static void setNumKarts(unsigned int num_karts) { m_num_karts = num_karts;}
+    static void setNumKarts(unsigned int num_karts)
+    {
+        m_default_num_karts = num_karts;
+    }   // setNumKarts
     // ------------------------------------------------------------------------
     static void setTracks(const std::vector<std::string> &tracks);
     // ------------------------------------------------------------------------

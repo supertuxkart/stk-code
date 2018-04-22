@@ -17,17 +17,17 @@
 
 #include "states_screens/dialogs/server_info_dialog.hpp"
 
-#include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/request_connection.hpp"
-#include "network/servers_manager.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
+#include "network/server.hpp"
 #include "network/stk_host.hpp"
-#include "states_screens/dialogs/registration_dialog.hpp"
+#include "network/network_config.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
 #include <IGUIEnvironment.h>
 
@@ -43,36 +43,27 @@ using namespace Online;
  *  \param from_server_creation: true if the dialog shows the data of this
  *         server (i.e. while it is being created).
  */
-ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id,
-                                   bool from_server_creation)
-                : ModalDialog(0.8f,0.8f), m_server_id(server_id)
-                , m_host_id(host_id)
+ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
+                : ModalDialog(0.8f,0.8f), m_server(server), m_password(NULL)
 {
-    Log::info("ServerInfoDialog", "Server id is %d, Host id is %d",
-               server_id, host_id);
+    Log::info("ServerInfoDialog", "Server id is %d, owner is %d",
+       server->getServerId(), server->getServerOwner());
     m_self_destroy = false;
-    m_enter_lobby = false;
-    m_from_server_creation = from_server_creation;
 
     loadFromFile("online/server_info_dialog.stkgui");
 
     GUIEngine::LabelWidget *name = getWidget<LabelWidget>("server_name");
     assert(name);
-    const Server * server = ServersManager::get()->getServerByID(m_server_id);
     name->setText(server->getName(),false);
 
     core::stringw difficulty = race_manager->getDifficultyName(server->getDifficulty());
     GUIEngine::LabelWidget *lbldifficulty = getWidget<LabelWidget>("server_difficulty");
     lbldifficulty->setText(difficulty, false);
 
-    core::stringw mode = RaceManager::getNameOf(server->getRaceMinorMode());
+    core::stringw mode = NetworkConfig::get()->getModeName(server->getServerMode());
     GUIEngine::LabelWidget *gamemode = getWidget<LabelWidget>("server_game_mode");
     gamemode->setText(mode, false);
 
-    m_info_widget = getWidget<LabelWidget>("info");
-    assert(m_info_widget != NULL);
-    if (m_from_server_creation)
-        m_info_widget->setText(_("Server successfully created. You can now join it."), true);
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
     m_join_widget = getWidget<IconButtonWidget>("join");
@@ -81,10 +72,21 @@ ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id,
     assert(m_cancel_widget != NULL);
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
+    if (m_server->isPasswordProtected())
+    {
+        m_password = getWidget<TextBoxWidget>("password");
+        m_password->setPasswordBox(true, L'*');
+        assert(m_password != NULL);
+    }
+    else
+    {
+        getWidget("label_password")->setVisible(false);
+        getWidget("password")->setVisible(false);
+    }
+
 }   // ServerInfoDialog
 
 // -----------------------------------------------------------------------------
-
 ServerInfoDialog::~ServerInfoDialog()
 {
 }   // ~ServerInfoDialog
@@ -92,9 +94,18 @@ ServerInfoDialog::~ServerInfoDialog()
 // -----------------------------------------------------------------------------
 void ServerInfoDialog::requestJoin()
 {
-    ServersManager::get()->setJoinedServer(m_server_id);
-
+    if (m_server->isPasswordProtected())
+    {
+        assert(m_password != NULL);
+        NetworkConfig::get()->setPassword(
+            StringUtils::wideToUtf8(m_password->getText()));
+    }
+    else
+    {
+        NetworkConfig::get()->setPassword("");
+    }
     STKHost::create();
+    NetworkingLobby::getInstance()->setJoinedServer(m_server);
     ModalDialog::dismiss();
     NetworkingLobby::getInstance()->push();
 }   // requestJoin
@@ -146,17 +157,10 @@ bool ServerInfoDialog::onEscapePressed()
 // -----------------------------------------------------------------------------
 void ServerInfoDialog::onUpdate(float dt)
 {
-    //If we want to open the registration dialog, we need to close this one first
-    if (m_enter_lobby) m_self_destroy = true;
-
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
     {
         ModalDialog::dismiss();
-        if (m_from_server_creation)
-            StateManager::get()->popMenu();
-        else if (m_enter_lobby)
-            NetworkingLobby::getInstance()->push();
         return;
     }
 }   // onUpdate

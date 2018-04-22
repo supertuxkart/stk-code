@@ -14,6 +14,16 @@
 #include "matrix4.h"
 #include "quaternion.h"
 
+class JointInfluence
+{
+public:
+	int joint_idx;
+	float weight;
+};
+
+typedef irr::core::array<irr::core::array
+		<irr::core::array<JointInfluence> > > WeightInfluence;
+
 namespace irr
 {
 namespace scene
@@ -25,7 +35,6 @@ namespace scene
 	class CSkinnedMesh: public ISkinnedMesh
 	{
 	public:
-
 		//! constructor
 		CSkinnedMesh();
 
@@ -104,9 +113,6 @@ namespace scene
 		//! Sets Interpolation Mode
 		virtual void setInterpolationMode(E_INTERPOLATION_MODE mode);
 
-		//! Convertes the mesh to contain tangent information
-		virtual void convertMeshToTangents();
-
 		//! Does the mesh have no animation
 		virtual bool isStatic();
 
@@ -159,15 +165,25 @@ namespace scene
 		void addJoints(core::array<IBoneSceneNode*> &jointChildSceneNodes,
 				IAnimatedMeshSceneNode* node,
 				ISceneManager* smgr);
-        CSkinnedMesh *clone();
+
+		void convertForSkinning();
+
+		void computeWeightInfluence(SJoint *joint, size_t &index, WeightInfluence& wi);
+
+		void buildAllGlobalAnimatedMatrices(SJoint *Joint=0, SJoint *ParentJoint=0);
+
+		f32 AnimationFrames;
+
+		core::array<SJoint*> RootJoints;
+
 private:
+		void toStaticPose();
+
 		void checkForAnimation();
 
 		void normalizeWeights();
 
 		void buildAllLocalAnimatedMatrices();
-
-		void buildAllGlobalAnimatedMatrices(SJoint *Joint=0, SJoint *ParentJoint=0);
 
 		void getFrameData(f32 frame, SJoint *Node,
 				core::vector3df &position, s32 &positionHint,
@@ -182,19 +198,20 @@ private:
 			core::vector3df& tangent, core::vector3df& binormal,
 			core::vector3df& vt1, core::vector3df& vt2, core::vector3df& vt3,
 			core::vector2df& tc1, core::vector2df& tc2, core::vector2df& tc3);
+			
+		static bool sortJointInfluenceFunc(const JointInfluence& a, 
+										   const JointInfluence& b);
 
 		core::array<SSkinMeshBuffer*> *SkinningBuffers; //Meshbuffer to skin, default is to skin localBuffers
 
 		core::array<SSkinMeshBuffer*> LocalBuffers;
 
 		core::array<SJoint*> AllJoints;
-		core::array<SJoint*> RootJoints;
 
 		core::array< core::array<bool> > Vertices_Moved;
 
 		core::aabbox3d<f32> BoundingBox;
 
-		f32 AnimationFrames;
 		f32 FramesPerSecond;
 
 		f32 LastAnimatedFrame;

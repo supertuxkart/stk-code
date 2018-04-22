@@ -17,10 +17,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/camera.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
-#include "graphics/material_manager.hpp"
-#include "graphics/material.hpp"
 #include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
 
@@ -108,10 +107,23 @@ void LODNode::OnAnimate(u32 timeMs)
         // update absolute position
         updateAbsolutePosition();
 
-        int level = getLevel();
-        // Assume all the scene node have the same bouding box
-        if(level>=0)
-            m_nodes[level]->OnAnimate(timeMs);
+#ifndef SERVER_ONLY
+        if (CVS->isGLSL())
+        {
+            for (size_t i = 0; i < m_nodes.size(); i++)
+            {
+                m_nodes[i]->setVisible(true);
+                m_nodes[i]->OnAnimate(timeMs);
+            }
+        }
+        else
+#endif
+        {
+            int level = getLevel();
+            // Assume all the scene node have the same bouding box
+            if(level>=0)
+                m_nodes[level]->OnAnimate(timeMs);
+        }
 
         Box = m_nodes[m_detail.size()-1]->getBoundingBox();
 
@@ -151,6 +163,13 @@ void LODNode::OnRegisterSceneNode()
     bool shown = false;
     updateVisibility(&shown);
 
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        return;
+    }
+#endif
+
     const u32 now = irr_driver->getDevice()->getTimer()->getTime();
 
     // support an optional, mostly hard-coded fade-in/out effect for objects with a single level
@@ -175,19 +194,6 @@ void LODNode::OnRegisterSceneNode()
                 assert(node != NULL);
                 mesh = node->getMesh();
             }
-
-            for (unsigned int n=0; n<mesh->getMeshBufferCount(); n++)
-            {
-                scene::IMeshBuffer* mb = mesh->getMeshBuffer(n);
-                video::ITexture* t = mb->getMaterial().getTexture(0);
-                if (t == NULL) continue;
-
-                Material* m = material_manager->getMaterialFor(t, mb);
-                if (m != NULL)
-                {
-                    m->onMadeVisible(mb);
-                }
-            }
         }
         else if (m_previous_visibility == WAS_SHOWN && !shown)
         {
@@ -207,17 +213,6 @@ void LODNode::OnRegisterSceneNode()
                 mesh = node->getMesh();
             }
 
-            for (unsigned int n=0; n<mesh->getMeshBufferCount(); n++)
-            {
-                scene::IMeshBuffer* mb = mesh->getMeshBuffer(n);
-                video::ITexture* t = mb->getMaterial().getTexture(0);
-                if (t == NULL) continue;
-                Material* m = material_manager->getMaterialFor(t, mb);
-                if (m != NULL)
-                {
-                    m->onHidden(mb);
-                }
-            }
         }
         else if (m_previous_visibility == FIRST_PASS && !shown)
         {
@@ -236,24 +231,21 @@ void LODNode::OnRegisterSceneNode()
                 assert(node != NULL);
                 mesh = node->getMesh();
             }
-
-            for (unsigned int n=0; n<mesh->getMeshBufferCount(); n++)
-            {
-                scene::IMeshBuffer* mb = mesh->getMeshBuffer(n);
-                video::ITexture* t = mb->getMaterial().getTexture(0);
-                if(!t) continue;
-                Material* m = material_manager->getMaterialFor(t, mb);
-                if (m != NULL)
-                {
-                    m->isInitiallyHidden(mb);
-                }
-            }
         }
     }
 
     m_previous_visibility = (shown ? WAS_SHOWN : WAS_HIDDEN);
     m_last_tick = now;
-
+#ifndef SERVER_ONLY
+    if (!CVS->isGLSL())
+    {
+        for (core::list<ISceneNode*>::Iterator it = Children.begin();
+            it != Children.end(); it++)
+        {
+            (*it)->updateAbsolutePosition();
+        }
+    }
+#endif
     scene::ISceneNode::OnRegisterSceneNode();
 }
 
@@ -287,5 +279,5 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
     node->drop();
 
     node->updateAbsolutePosition();
-    irr_driver->applyObjectPassShader(node);
 }
+

@@ -28,6 +28,8 @@
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
+class RenderInfo;
+
 namespace GUIEngine
 {
     /** \brief A model view widget.
@@ -44,69 +46,70 @@ namespace GUIEngine
         RotationMode m_rotation_mode;
         float m_rotation_speed;
         float m_rotation_target;
-        
+
         PtrVector<scene::IMesh, REF> m_models;
-        AlignedArray<Vec3> m_model_location;
-        AlignedArray<Vec3> m_model_scale;
-        std::vector<int> m_model_frames;
-        
-        RTT* m_rtt_provider;
-        IrrDriver::RTTProvider* m_old_rtt_provider;
-        
-        float angle;
-        
+        std::vector<core::matrix4> m_model_location;
+        std::vector<std::pair<int, int> > m_model_frames;
+        std::vector<float> m_model_animation_speed;
+        std::vector<std::string> m_bone_attached;
+        std::unique_ptr<RenderTarget> m_render_target;
+        float m_angle;
+
         bool m_rtt_unsupported;
-        
+
         scene::ISceneNode          *m_rtt_main_node;
 
         scene::ICameraSceneNode    *m_camera;
 
         scene::ISceneNode          *m_light;
 
-        FrameBuffer                *m_frame_buffer;
-        video::ITexture            *m_texture;
+        std::shared_ptr<RenderInfo> m_render_info;
+
+        unsigned m_rtt_size;
 
     public:
-        
+
         LEAK_CHECK()
-        
-        ModelViewWidget();
+
+        ModelViewWidget(unsigned rtt_size = 512);
         virtual ~ModelViewWidget();
-        
+
         void add();
         void clearModels();
         void addModel(irr::scene::IMesh* mesh,
-                      const Vec3& location = Vec3(0,0,0),
-                      const Vec3& scale = Vec3(1,1,1),
-                      const int frame=-1);
-        
+                      const core::matrix4& location = core::matrix4(),
+                      const int start_loop_frame=-1,
+                      const int end_loop_frame=-1,
+                      float animation_speed = 0.0f,
+                      const std::string& bone_name = std::string());
+
         void update(float delta);
-        
+
+        void setRTTSize(unsigned rtt_size) { m_rtt_size = rtt_size; }
+
         virtual void elementRemoved();
-        
+
         /** Disables any model rotation */
         void setRotateOff();
-        
+
         /** Makes the model rotate at given speed (in degrees per second) */
         void setRotateContinuously(float speed);
-        
+
         /** Rotate to 'targetAngle' in degrees at given speed (in degrees per second) */
         void setRotateTo(float targetAngle, float speed);
-        
+
         /** Returns information if currently kart is rotating */
         bool isRotating();
-        
+
         void clearRttProvider();
 
-        void setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
-            AlignedArray<Vec3>& mesh_location,
-            AlignedArray<Vec3>& mesh_scale,
-            const std::vector<int>& model_frames);
+        void setupRTTScene();
 
-        FrameBuffer* getFrameBuffer() { return m_frame_buffer; }
-        video::ITexture* getTexture() { return m_texture; }
+        void drawRTTScene(const irr::core::rect<s32>& dest_rect) const;
+
+        std::shared_ptr<RenderInfo> getModelViewRenderInfo() { return m_render_info; }
     };
-    
+
 }
 
 #endif

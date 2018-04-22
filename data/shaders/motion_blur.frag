@@ -42,18 +42,18 @@ out vec4 FragColor;
 // Number of samples used for blurring
 #define NB_SAMPLES 8
 
-vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
+#stk_include "utils/getPosFromUVDepth.frag"
 
 void main()
 {
-    vec2 texcoords = gl_FragCoord.xy / screen;
+    vec2 texcoords = gl_FragCoord.xy / u_screen;
 
     // Sample the color buffer
     vec3 color = texture(color_buffer, texcoords).rgb;
 
     float z = texture(dtex, texcoords).x;
-    vec4 ViewPos = getPosFromUVDepth(vec3(texcoords, z), InverseProjectionMatrix);
-    vec4 OldScreenPos = previous_viewproj * InverseViewMatrix * ViewPos;
+    vec4 ViewPos = getPosFromUVDepth(vec3(texcoords, z), u_inverse_projection_matrix);
+    vec4 OldScreenPos = previous_viewproj * u_inverse_view_matrix * ViewPos;
     OldScreenPos /= OldScreenPos.w;
     OldScreenPos = .5 * OldScreenPos + .5;
 
@@ -74,7 +74,7 @@ void main()
 
     // Compute the blur
     vec2 inc_vec = blur_dir / vec2(NB_SAMPLES);
-    vec2 blur_texcoords = texcoords - inc_vec * NB_SAMPLES / 2;
+    vec2 blur_texcoords = texcoords - inc_vec * float(NB_SAMPLES) / 2.;
     for(int i=1 ; i < NB_SAMPLES ; i++)
     {
         color += texture(color_buffer, blur_texcoords).rgb;

@@ -108,7 +108,9 @@ namespace GUIEngine
         // ------------------------------------------------------------------------
         /** Called when players are renumbered (changes the player ID) */
         void setPlayerID(const int newPlayerID);
-
+        // ------------------------------------------------------------------------
+        PlayerNameSpinner* getPlayerNameSpinner() const
+                                                 { return m_player_ident_spinner; }
         // ------------------------------------------------------------------------
         /** Returns the ID of this player */
         int getPlayerID() const;

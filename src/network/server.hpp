@@ -41,14 +41,6 @@ class Server
 {
 public:
 
-    /** Set the sort order used in the comparison function. */
-    enum SortOrder
-    {
-        SO_SCORE = 1,    // Sorted on satisfaction score
-        SO_NAME = 2,     // Sorted alphabetically by name
-        SO_PLAYERS = 4
-    };
-
 protected:
     /** The server name to be displayed. */
     irr::core::stringw m_name;
@@ -57,7 +49,7 @@ protected:
     std::string m_lower_case_name;
 
     uint32_t m_server_id;
-    uint32_t m_host_id;
+    uint32_t m_server_owner;
 
     /** The maximum number of players that the server supports */
     int m_max_players;
@@ -68,39 +60,41 @@ protected:
     /** The score/rating given */
     float m_satisfaction_score;
 
-    /** True if this server is on the LAN, false otherwise. */
-    bool m_is_lan;
-
     /** The public ip address and port of this server. */
     TransportAddress m_address;
 
     /** This is the private port of the server. This is used if a WAN game
      *  is started, but one client is discovered on the same LAN, so a direct
-     *  connection using the private port is possible. */
+     *  connection using the private port with a broadcast is possible. */
     uint16_t m_private_port;
 
-    RaceManager::MinorRaceModeType m_minor_mode;
+    unsigned m_server_mode;
 
     RaceManager::Difficulty m_difficulty;
 
-    /** The sort order to be used in the comparison. */
-    static SortOrder m_sort_order;
+    bool m_password_protected;
 
+    /* WAN server only, show the owner name of server, can only be seen
+     * for localhost or if you are friend with the server owner. */
+    std::string m_server_owner_name;
+
+    /* WAN server only, distance based on IP latitude and longitude. */
+    float m_distance;
 public:
 
          /** Initialises the object from an XML node. */
-         Server(const XMLNode &xml, bool is_lan);
-         Server(const irr::core::stringw &name, bool is_lan, int max_players,
-                int current_players, const TransportAddress &address);
+         Server(const XMLNode &xml);
+         Server(unsigned server_id, const irr::core::stringw &name,
+                int max_players, int current_players, unsigned difficulty,
+                unsigned server_mode, const TransportAddress &address,
+                bool password_protected);
     bool filterByWords(const irr::core::stringw words) const;
     // ------------------------------------------------------------------------
     /** Returns ip address and port of this server. */
     const TransportAddress& getAddress() const { return m_address; }
     // ------------------------------------------------------------------------
-    /** Sets the sort order used in the comparison function. It is static, so
-    *  that each instance can access the sort order. */
-    static void setSortOrder(SortOrder so) { m_sort_order = so; }
-
+    /** Returns the lower case name of the server. */
+    const std::string& getLowerCaseName() const { return m_lower_case_name; }
     // ------------------------------------------------------------------------
     /** Returns the name of the server. */
     const irr::core::stringw& getName() const { return m_name; }
@@ -108,8 +102,10 @@ public:
     /** Returns the ID of this server. */
     const uint32_t getServerId() const { return m_server_id; }
     // ------------------------------------------------------------------------
-    /** Returns the unique host id of this server. */
-    const uint32_t getHostId() const { return m_host_id; }
+    /** Returns the user id in STK addon server of the server owner (WAN). */
+    const uint32_t getServerOwner() const { return m_server_owner; }
+    // ------------------------------------------------------------------------
+    uint16_t getPrivatePort() const { return m_private_port; }
     // ------------------------------------------------------------------------
     /** Returns the maximum number of players allowed on this server. */
     const int getMaxPlayers() const { return m_max_players; }
@@ -117,35 +113,16 @@ public:
     /** Returns the number of currently connected players. */
     const int getCurrentPlayers() const { return m_current_players; }
     // ------------------------------------------------------------------------
-    RaceManager::MinorRaceModeType getRaceMinorMode() const { return m_minor_mode; }
+    unsigned getServerMode() const                    { return m_server_mode; }
     // ------------------------------------------------------------------------
-    void setRaceMinorMode(RaceManager::MinorRaceModeType m) { m_minor_mode = m; }
+    RaceManager::Difficulty getDifficulty() const      { return m_difficulty; }
     // ------------------------------------------------------------------------
-    RaceManager::Difficulty getDifficulty() const { return m_difficulty; }
+    bool isPasswordProtected() const           { return m_password_protected; }
     // ------------------------------------------------------------------------
-    void setDifficulty(RaceManager::Difficulty d) { m_difficulty = d; }
+    const std::string& getServerOwnerName() const
+                                                { return m_server_owner_name; }
     // ------------------------------------------------------------------------
-    /** Compares two servers according to the sort order currently defined.
-     *  \param a The addon to compare this addon to.
-     */
-    bool operator<(const Server &server) const
-    {
-        switch (m_sort_order)
-        {
-        case SO_SCORE:
-            return m_satisfaction_score < server.m_satisfaction_score;
-            break;
-        case SO_NAME:
-            // m_id is the lower case name
-            return m_lower_case_name < server.m_lower_case_name;
-            break;
-        case SO_PLAYERS:
-            return m_current_players < server.m_current_players;
-            break;
-        }   // switch
-
-        return true;
-    }   // operator<
+    float getDistance() const                            { return m_distance; }
 
 };   // Server
 #endif // HEADER_SERVER_HPP

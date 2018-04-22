@@ -45,7 +45,8 @@
 #include "modes/soccer_world.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/network_config.hpp"
-#include "network/protocols/start_game_protocol.hpp"
+#include "network/network_string.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "scriptengine/property_animator.hpp"
@@ -66,7 +67,7 @@ RaceManager::RaceManager()
 {
     // Several code depends on this, e.g. kart_properties
     assert(DIFFICULTY_FIRST == 0);
-    m_num_karts          = UserConfigParams::m_num_karts;
+    m_num_karts          = UserConfigParams::m_default_num_karts;
     m_difficulty         = DIFFICULTY_HARD;
     m_major_mode         = MAJOR_MODE_SINGLE;
     m_minor_mode         = MINOR_MODE_NORMAL_RACE;
@@ -75,6 +76,7 @@ RaceManager::RaceManager()
     m_coin_target        = 0;
     m_started_from_overworld = false;
     m_have_kart_last_position_on_overworld = false;
+    m_num_local_players = 0;
     setMaxGoal(0);
     setTimeTarget(0.0f);
     setReverseTrack(false);
@@ -84,6 +86,7 @@ RaceManager::RaceManager()
     setTrack("jungle");
     m_default_ai_list.clear();
     setNumPlayers(0);
+    setSpareTireKartNum(0);
 }   // RaceManager
 
 //-----------------------------------------------------------------------------
@@ -279,7 +282,9 @@ void RaceManager::computeRandomKartList()
     }
 
     m_ai_kart_list.clear();
-    unsigned int m = std::min( (unsigned) n,  (unsigned)m_default_ai_list.size());
+
+    //Use the command line options AI list.
+    unsigned int m = std::min( (unsigned) m_num_karts,  (unsigned)m_default_ai_list.size());
 
     for(unsigned int i=0; i<m; i++)
     {
@@ -288,7 +293,7 @@ void RaceManager::computeRandomKartList()
     }
 
     if(n>0)
-        kart_properties_manager->getRandomKartList(n, m_player_karts,
+        kart_properties_manager->getRandomKartList(n, &m_player_karts,
                                                    &m_ai_kart_list   );
 
     if (m_ai_kart_override != "")
@@ -337,7 +342,7 @@ void RaceManager::startNew(bool from_overworld)
                                          ->getUniqueID(),
                                          m_grand_prix.getId(),
                                          m_minor_mode,
-                                         m_player_karts.size());
+                                         (unsigned int)m_player_karts.size());
     
             // Saved GP only in offline mode
             if (m_continue_saved_gp)
@@ -393,7 +398,7 @@ void RaceManager::startNew(bool from_overworld)
 
     // Then add the AI karts (randomly chosen)
     // ----------------------------------------
-    const unsigned int ai_kart_count = m_ai_kart_list.size();
+    const unsigned int ai_kart_count = (unsigned int)m_ai_kart_list.size();
     for(unsigned int i = 0; i < ai_kart_count; i++)
     {
         m_kart_status.push_back(KartStatus(m_ai_kart_list[i], i, -1, -1,
@@ -430,7 +435,9 @@ void RaceManager::startNew(bool from_overworld)
     {
         if (m_continue_saved_gp)
         {
-            m_track_number = m_saved_gp->getNextTrack();
+            int next_track = m_saved_gp->getNextTrack();
+            if (next_track < (int)m_tracks.size())
+                m_track_number = next_track;
             m_saved_gp->loadKarts(m_kart_status);
         }
         else 
@@ -444,7 +451,7 @@ void RaceManager::startNew(bool from_overworld)
                                              ->getUniqueID(),
                                              m_grand_prix.getId(),
                                              m_minor_mode,
-                                             m_player_karts.size());
+                                             (unsigned int)m_player_karts.size());
             }   // while m_saved_gp
         }   // if m_continue_saved_gp
     }   // if grand prix
@@ -559,10 +566,9 @@ void RaceManager::startNextRace()
     // the world has been setup
     if(NetworkConfig::get()->isNetworking())
     {
-        StartGameProtocol* protocol = static_cast<StartGameProtocol*>(
-            ProtocolManager::getInstance()->getProtocol(PROTOCOL_START_GAME));
-        if (protocol)
-            protocol->ready();
+        auto lobby = LobbyProtocol::get<LobbyProtocol>();
+        assert(lobby);
+        lobby->finishedLoadingWorld();
     }
 }   // startNextRace
 
@@ -976,5 +982,70 @@ void RaceManager::startWatchingReplay(const std::string &track_ident,
 }   // startSingleRace
 
 //-----------------------------------------------------------------------------
+void RaceManager::configGrandPrixResultFromNetwork(NetworkString& ns)
+{
+    setMajorMode(MAJOR_MODE_GRAND_PRIX);
+    class NetworkGrandPrixData : public GrandPrixData
+    {
+    public:
+        NetworkGrandPrixData() : GrandPrixData()
+            { setGroup(GrandPrixData::GP_STANDARD); }
+        virtual std::vector<std::string>
+            getTrackNames(const bool includeLocked=false) const
+            { return m_tracks; }
+        virtual unsigned int
+            getNumberOfTracks(const bool includeLocked=false) const
+            { return m_tracks.size(); }
+        void addNetworkTrack(const std::string& t) { m_tracks.push_back(t); }
+    };
 
-/* EOF */
+    NetworkGrandPrixData ngpd;
+    unsigned int track_size = ns.getUInt8();
+    unsigned int all_track_size = ns.getUInt8();
+    assert(all_track_size > 0);
+    m_track_number = all_track_size -1;
+    for (unsigned i = 0; i < all_track_size; i++)
+    {
+        std::string t;
+        ns.decodeString(&t);
+        ngpd.addNetworkTrack(t);
+    }
+    while (all_track_size < track_size)
+    {
+        ngpd.addNetworkTrack("");
+        all_track_size++;
+    }
+
+    m_tracks = ngpd.getTrackNames();
+    // For result screen we only need current lap and reserve
+    m_num_laps.resize(track_size, m_num_laps[0]);
+    m_reverse_track.resize(track_size, m_reverse_track[0]);
+
+    m_grand_prix = ngpd;
+    unsigned int player_size = ns.getUInt8();
+    assert(player_size == m_kart_status.size());
+    for (unsigned i = 0; i < player_size; i++)
+    {
+        int last_score = ns.getUInt32();
+        int cur_score = ns.getUInt32();
+        float overall_time = ns.getFloat();
+        m_kart_status[i].m_last_score = last_score;
+        m_kart_status[i].m_score = cur_score;
+        m_kart_status[i].m_overall_time = overall_time;
+        m_kart_status[i].m_gp_rank = i;
+    }
+}   // configGrandPrixResultFromNetwork
+
+//-----------------------------------------------------------------------------
+void RaceManager::clearNetworkGrandPrixResult()
+{
+    if (m_major_mode != MAJOR_MODE_GRAND_PRIX)
+        return;
+    setMajorMode(MAJOR_MODE_SINGLE);
+    m_grand_prix = GrandPrixData();
+    m_track_number = 0;
+    m_tracks.clear();
+    m_num_laps.clear();
+    m_reverse_track.clear();
+
+}   // clearNetworkGrandPrixResult

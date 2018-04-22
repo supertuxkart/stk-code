@@ -371,6 +371,8 @@ protected:
 						func(verts[i]);
 					}
 					break;
+				default:
+					break;
 				}
 				if (boundingBoxUpdate)
 				{

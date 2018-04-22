@@ -106,6 +106,9 @@ private:
     /** True if the login data are saved. */
     bool m_remember_password;
 
+    /** Default kart color (in hue) used in game, 0.0f to use the original. */
+    float m_default_kart_color;
+
     /** The complete challenge state. */
     StoryModeStatus *m_story_mode_status;
 
@@ -135,8 +138,8 @@ public:
     virtual Online::OnlineProfile* getProfile() const = 0;
     virtual void requestPoll() const = 0;
     virtual void requestSavedSession() = 0;
-    virtual Online::XMLRequest* requestSignIn(const irr::core::stringw &username,
-                                              const irr::core::stringw &password) = 0;
+    virtual void requestSignIn(const irr::core::stringw &username,
+                               const irr::core::stringw &password) = 0;
     virtual void signIn(bool success, const XMLNode * input) = 0;
     virtual void signOut(bool success, const XMLNode * input,
                          const irr::core::stringw &info) = 0;
@@ -300,6 +303,10 @@ public:
     /** Sets if this player was logged in last time it was used. */
     void setRememberPassword(bool b) { m_remember_password = b; }
     // ------------------------------------------------------------------------
+    void setDefaultKartColor(float c) { m_default_kart_color = c; }
+    // ------------------------------------------------------------------------
+    float getDefaultKartColor() const { return m_default_kart_color; }
+
 };   // class PlayerProfile
 
 #endif

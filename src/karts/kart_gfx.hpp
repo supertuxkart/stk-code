@@ -57,6 +57,8 @@ public:
                        KGFX_SKID1R = KGFX_SKIDR,
                        KGFX_SKID2L,
                        KGFX_SKID2R,
+                       KGFX_EXHAUST1,
+                       KGFX_EXHAUST2,
                        KGFX_COUNT};
 
 private:
@@ -74,6 +76,9 @@ private:
 
     /** Used to alternate particle effects from the rear wheels. */
     int         m_wheel_toggle;
+    
+    /** A skid level that is currently in use */
+    int m_skid_level;
 
     /** A light that's shown when the kart uses nitro. */
     irr::scene::ISceneNode* m_nitro_light;
@@ -89,7 +94,7 @@ private:
     void resizeBox(const KartGFXType type, float new_size);
 
 public:
-         KartGFX(const AbstractKart *kart);
+         KartGFX(const AbstractKart *kart, bool is_day);
         ~KartGFX();
     void reset();
     void setSkidLevel(const unsigned int level);

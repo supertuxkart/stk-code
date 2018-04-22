@@ -4,11 +4,11 @@ uniform sampler2D colorMap;
 out vec4 FragColor;
 
 void main() {
-	vec2 uv = gl_FragCoord.xy / screen;
-	vec2 uv_left = uv + vec2(-1., 0.) / screen;
-	vec2 uv_top = uv + vec2(0., 1.) / screen;
-	vec2 uv_right = uv + vec2(1., 0.) / screen;
-	vec2 uv_bottom = uv + vec2(0., -1.) / screen;
+	vec2 uv = gl_FragCoord.xy / u_screen;
+	vec2 uv_left = uv + vec2(-1., 0.) / u_screen;
+	vec2 uv_top = uv + vec2(0., 1.) / u_screen;
+	vec2 uv_right = uv + vec2(1., 0.) / u_screen;
+	vec2 uv_bottom = uv + vec2(0., -1.) / u_screen;
 
 	// Fetch the blending weights for current pixel:
 	vec4 topLeft = texture(blendMap, uv);

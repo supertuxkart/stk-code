@@ -20,13 +20,20 @@
 #define HEADER_SERVER_INFO_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets/icon_button_widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
-#include "guiengine/widgets/label_widget.hpp"
-#include "network/server.hpp"
 #include "utils/types.hpp"
 
+namespace GUIEngine
+{
+    class LabelWidget;
+    class RibbonWidget;
+    class IconButtonWidget;
+    class TextBoxWidget;
+}
+
+#include <memory>
 #include <irrString.h>
+
+class Server;
 
 /** \brief Dialog that allows a user to sign in
  * \ingroup states_screens
@@ -35,16 +42,9 @@ class ServerInfoDialog : public GUIEngine::ModalDialog
 {
 
 private:
-
     bool m_self_destroy;
-    bool m_enter_lobby;
-    bool m_from_server_creation;
 
-    const uint32_t m_server_id;
-    uint32_t m_host_id;
-
-    /** The gui element for messages. */
-    GUIEngine::LabelWidget *m_info_widget;
+    const std::shared_ptr<Server> m_server;
 
     GUIEngine::RibbonWidget *m_options_widget;
 
@@ -54,10 +54,11 @@ private:
     /** The cancel button. */
     GUIEngine::IconButtonWidget *m_cancel_widget;
 
-    void requestJoin();
+    /** Specify server password if needed. */
+    GUIEngine::TextBoxWidget* m_password;
 
 public:
-    ServerInfoDialog(uint32_t server_id, uint32_t host_id, bool just_created = false);
+    ServerInfoDialog(std::shared_ptr<Server> server);
     ~ServerInfoDialog();
 
     void onEnterPressedInternal();
@@ -65,6 +66,7 @@ public:
 
     virtual bool onEscapePressed();
     virtual void onUpdate(float dt);
+    void requestJoin();
 };   // class ServerInfoDialog
 
 #endif

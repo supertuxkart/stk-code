@@ -25,10 +25,10 @@
 #include "io/xml_node.hpp"
 #include "items/rubber_band.hpp"
 #include "items/projectile_manager.hpp"
+#include "graphics/central_settings.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
-#include "modes/world.hpp"
 #include "physics/physical_object.hpp"
 #include "physics/physics.hpp"
 #include "tracks/track.hpp"
@@ -41,12 +41,14 @@ Plunger::Plunger(AbstractKart *kart)
 {
     const float gravity = 0.0f;
 
+    setDoTerrainInfo(false);
+
     float forward_offset = 0.5f*kart->getKartLength()+0.5f*m_extend.getZ();
     float up_velocity = 0.0f;
     float plunger_speed = 2 * m_speed;
 
     // if the kart is looking backwards, release from the back
-    m_reverse_mode = kart->getControls().m_look_back;
+    m_reverse_mode = kart->getControls().getLookBack();
 
     // find closest kart in front of the current one
     const AbstractKart *closest_kart=0;
@@ -56,7 +58,6 @@ Plunger::Plunger(AbstractKart *kart)
                    kart /* search in front of this kart */, m_reverse_mode);
 
     btTransform kart_transform = kart->getAlignedTransform();
-    btMatrix3x3 kart_rotation = kart_transform.getBasis();
 
     float heading =kart->getHeading();
     float pitch  = kart->getTerrainPitch(heading);
@@ -70,32 +71,32 @@ Plunger::Plunger(AbstractKart *kart)
                                        &fire_angle, &up_velocity);
 
         btTransform trans = kart->getTrans();
-
-        trans.setRotation(btQuaternion(btVector3(0, 1, 0), fire_angle));
+        btQuaternion q;
+        q = trans.getRotation()*(btQuaternion(btVector3(0, 1, 0), fire_angle));
+        trans.setRotation(q);
 
         m_initial_velocity = btVector3(0.0f, up_velocity, plunger_speed);
 
         createPhysics(forward_offset, m_initial_velocity,
                       new btCylinderShape(0.5f*m_extend),
-                      0.5f /* restitution */ , gravity,
+                      0.5f /* restitution */ , btVector3(.0f,gravity,.0f),
                       /* rotates */false , /*turn around*/false, &trans);
     }
     else
     {
         createPhysics(forward_offset, btVector3(pitch, 0.0f, plunger_speed),
                       new btCylinderShape(0.5f*m_extend),
-                      0.5f /* restitution */, gravity,
+                      0.5f /* restitution */, btVector3(.0f,gravity,.0f),
                       false /* rotates */, m_reverse_mode, &kart_transform);
     }
 
     //adjust height according to terrain
     setAdjustUpVelocity(false);
 
+    m_rubber_band = NULL;
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
-    if( m_reverse_mode || race_manager->isBattleMode() )
-        m_rubber_band = NULL;
-    else
+    if (!(m_reverse_mode || race_manager->isBattleMode()))
     {
         m_rubber_band = new RubberBand(this, kart);
     }
@@ -121,24 +122,24 @@ void Plunger::init(const XMLNode &node, scene::IMesh *plunger_model)
  *  \param dt Time step size.
  *  \returns True of this object should be removed.
  */
-bool Plunger::updateAndDelete(float dt)
+bool Plunger::updateAndDelete(int ticks)
 {
     // In keep-alive mode, just update the rubber band
     if(m_keep_alive >= 0)
     {
-        m_keep_alive -= dt;
+        m_keep_alive -= ticks;
         if(m_keep_alive<=0)
         {
             setHasHit();
             return true;
         }
-        if(m_rubber_band != NULL) m_rubber_band->update(dt);
+        if(m_rubber_band != NULL) m_rubber_band->update(ticks);
         return false;
     }
 
     // Else: update the flyable and rubber band
-    bool ret = Flyable::updateAndDelete(dt);
-    if(m_rubber_band != NULL) m_rubber_band->update(dt);
+    bool ret = Flyable::updateAndDelete(ticks);
+    if(m_rubber_band != NULL) m_rubber_band->update(ticks);
 
     return ret;
 
@@ -171,22 +172,25 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
 
         m_keep_alive = 0;
         // Make this object invisible.
+#ifndef SERVER_ONLY
         getNode()->setVisible(false);
-        World::getWorld()->getPhysics()->removeBody(getBody());
+#endif
+        Physics::getInstance()->removeBody(getBody());
     }
     else
     {
-        m_keep_alive = m_owner->getKartProperties()->getPlungerBandDuration();
+        m_keep_alive = stk_config->time2Ticks(m_owner->getKartProperties()
+                                             ->getPlungerBandDuration()    );
 
-        // Make this object invisible by placing it faaar down. Not that if this
-        // objects is simply removed from the scene graph, it might be auto-deleted
-        // because the ref count reaches zero.
+        // Make this object invisible by placing it faaar down. Not that if
+        // this objects is simply removed from the scene graph, it might be
+        // auto-deleted because the ref count reaches zero.
         scene::ISceneNode *node = getNode();
         if(node)
         {
             node->setVisible(false);
         }
-        World::getWorld()->getPhysics()->removeBody(getBody());
+        Physics::getInstance()->removeBody(getBody());
 
         if(kart)
         {

@@ -70,7 +70,7 @@ public:
 
     virtual const std::string& getIdent() const OVERRIDE;
 
-    virtual void update(float dt) OVERRIDE;
+    virtual void update(int ticks) OVERRIDE;
 
     virtual void createRaceGUI() OVERRIDE;
 

@@ -21,24 +21,17 @@
 
 namespace irr
 {
-    namespace scene { class IMesh; class IMeshBuffer; }
+    namespace scene { class IMesh; }
 }
 using namespace irr;
-
-#include "utils/vec3.hpp"
+class Vec3;
 
 /**
   * \ingroup graphics
   */
 namespace MeshTools
 {
-    void minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max);
-
-    bool isNormalMap(scene::IMeshBuffer* mb);
-
-    // Copied from irrlicht
-    scene::IMesh* createMeshWithTangents(scene::IMesh* mesh, bool(*predicate)(scene::IMeshBuffer*),
-        bool recalculateNormals = false, bool smooth = false, bool angleWeighted = false, bool calculateTangents = true);
+    void minMax3D(scene::IMesh* mesh, Vec3* min, Vec3* max);
 }   // MeshTools
 
 #endif

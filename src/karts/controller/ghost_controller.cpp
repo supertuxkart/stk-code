@@ -16,14 +16,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/camera.hpp"
+#include "graphics/camera_fps.hpp"
 #include "karts/controller/ghost_controller.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "modes/world.hpp"
 
-GhostController::GhostController(AbstractKart *kart)
+GhostController::GhostController(AbstractKart *kart, core::stringw display_name)
                 : Controller(kart)
 {
+    m_display_name = display_name;
 }   // GhostController
 
 //-----------------------------------------------------------------------------
@@ -34,7 +35,7 @@ void GhostController::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
-void GhostController::update(float dt)
+void GhostController::update(int ticks)
 {
     m_current_time = World::getWorld()->getTime();
     // Find (if necessary) the next index to use
@@ -48,19 +49,23 @@ void GhostController::update(float dt)
     }
 
     // Watching replay use only
-    Camera *camera = Camera::getActiveCamera();
-    if (camera != NULL && camera->getMode() != Camera::CM_FINAL)
+    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {
-        if (m_controls->m_look_back)
+        Camera *camera = Camera::getCamera(i);
+        if(camera->getKart()!=m_kart) continue;
+        if (camera->getType() != Camera::CM_TYPE_END)
         {
-            camera->setMode(Camera::CM_REVERSE);
-        }
-        else
-        {
-            if (camera->getMode() == Camera::CM_REVERSE)
-                camera->setMode(Camera::CM_NORMAL);
-        }
-    }
+            if (m_controls->getLookBack())
+            {
+                camera->setMode(Camera::CM_REVERSE);
+            }
+            else
+            {
+                if (camera->getMode() == Camera::CM_REVERSE)
+                    camera->setMode(Camera::CM_NORMAL);
+            }
+        }   // if camera mode != END
+    }   // for i in all cameras
 
 }   // update
 
@@ -77,9 +82,10 @@ void GhostController::addReplayTime(float time)
 }   // addReplayTime
 
 //-----------------------------------------------------------------------------
-void GhostController::action(PlayerAction action, int value)
+bool GhostController::action(PlayerAction action, int value, bool dry_run)
 {
     // Watching replay use only
     if (action == PA_LOOK_BACK)
-        m_controls->m_look_back = (value!=0);
+        m_controls->setLookBack(value!=0);
+    return true;
 }   // action

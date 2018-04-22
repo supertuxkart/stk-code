@@ -30,6 +30,7 @@
 #include "guiengine/widgets/progress_bar_widget.hpp"
 #include "guiengine/widgets/skill_level_widget.hpp"
 
+class KartProperties;
 
 namespace GUIEngine
 {
@@ -47,7 +48,9 @@ namespace GUIEngine
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getHeightNeededAroundLabel() const { return 4; }
 
-        /** widget coordinates */
+        /** widget coordinates 
+            These are not the actual coordinates of any of the skill bars
+            but only (badly named) intermediate values*/
         int m_skill_bar_x, m_skill_bar_y, m_skill_bar_h, m_skill_bar_w;
 
         int m_player_id;
@@ -69,7 +72,7 @@ namespace GUIEngine
 
         KartStatsWidget(core::recti area, const int player_id,
                         std::string kart_group, bool multiplayer,
-                        bool display_text);
+                        bool display_icons);
         virtual ~KartStatsWidget() {};
 
         // ------------------------------------------------------------------------
@@ -91,14 +94,16 @@ namespace GUIEngine
          * inside itself */
         void setSize(const int x, const int y, const int w, const int h);
 
+        void setValues(const KartProperties* props);
+
         /** Change the value of the widget, it must be a percent. */
         void setValue(Stats type, int value);
 
         /** Get the current values of the widget. */
         int getValue(Stats type);
 
-        /** If the labels should be displayed. */
-        void setDisplayText(bool display_text);
+        /** If the icons should be displayed. */
+        void setDisplayIcons(bool display_icons);
     };
 }
 

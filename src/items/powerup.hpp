@@ -26,6 +26,7 @@
 #include "utils/random_generator.hpp"
 
 class AbstractKart;
+class BareNetworkString;
 class Item;
 class SFXBase;
 
@@ -48,7 +49,7 @@ private:
     int                         m_number;
 
     /** The owner (kart) of this powerup. */
-    AbstractKart*               m_owner;
+    AbstractKart*               m_kart;
 
 public:
                     Powerup      (AbstractKart* kart_);
@@ -56,9 +57,12 @@ public:
     void            set          (PowerupManager::PowerupType _type, int n=1);
     void            reset        ();
     Material*       getIcon      () const;
-    void            adjustSound ();
+    void            adjustSound  ();
     void            use          ();
     void            hitBonusBox (const Item &item, int newC=-1);
+    void            saveState(BareNetworkString *buffer) const;
+    void            rewindTo(BareNetworkString *buffer);
+
 
     /** Returns the number of powerups. */
     int             getNum       () const {return m_number;}

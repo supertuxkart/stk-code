@@ -402,7 +402,7 @@ bool CIrrDeviceSDL::run()
 
 #ifdef _IRR_WINDOWS_API_
 				// handle alt+f4 in Windows, because SDL seems not to
-				if ( (SDL_event.key.keysym.mod & KMOD_LALT) && key == KEY_F4)
+				if ( (SDL_event.key.keysym.mod & KMOD_LALT) && key == IRR_KEY_F4)
 				{
 					Close = true;
 					break;
@@ -761,6 +761,18 @@ void CIrrDeviceSDL::restoreWindow()
 	// do nothing
 }
 
+//! Move window to requested position
+bool CIrrDeviceSDL::moveWindow(int x, int y)
+{
+    return false;
+}
+
+//! Get current window position.
+bool CIrrDeviceSDL::getWindowPosition(int* x, int* y)
+{
+    return false;
+}
+
 
 //! returns if window is active. if not, nothing need to be drawn
 bool CIrrDeviceSDL::isWindowActive() const
@@ -837,131 +849,131 @@ void CIrrDeviceSDL::createKeyMap()
 
 	// buttons missing
 
-	KeyMap.push_back(SKeyMap(SDLK_BACKSPACE, KEY_BACK));
-	KeyMap.push_back(SKeyMap(SDLK_TAB, KEY_TAB));
-	KeyMap.push_back(SKeyMap(SDLK_CLEAR, KEY_CLEAR));
-	KeyMap.push_back(SKeyMap(SDLK_RETURN, KEY_RETURN));
+	KeyMap.push_back(SKeyMap(SDLK_BACKSPACE, IRR_KEY_BACK));
+	KeyMap.push_back(SKeyMap(SDLK_TAB, IRR_KEY_TAB));
+	KeyMap.push_back(SKeyMap(SDLK_CLEAR, IRR_KEY_CLEAR));
+	KeyMap.push_back(SKeyMap(SDLK_RETURN, IRR_KEY_RETURN));
 
 	// combined modifiers missing
 
-	KeyMap.push_back(SKeyMap(SDLK_PAUSE, KEY_PAUSE));
-	KeyMap.push_back(SKeyMap(SDLK_CAPSLOCK, KEY_CAPITAL));
+	KeyMap.push_back(SKeyMap(SDLK_PAUSE, IRR_KEY_PAUSE));
+	KeyMap.push_back(SKeyMap(SDLK_CAPSLOCK, IRR_KEY_CAPITAL));
 
 	// asian letter keys missing
 
-	KeyMap.push_back(SKeyMap(SDLK_ESCAPE, KEY_ESCAPE));
+	KeyMap.push_back(SKeyMap(SDLK_ESCAPE, IRR_KEY_ESCAPE));
 
 	// asian letter keys missing
 
-	KeyMap.push_back(SKeyMap(SDLK_SPACE, KEY_SPACE));
-	KeyMap.push_back(SKeyMap(SDLK_PAGEUP, KEY_PRIOR));
-	KeyMap.push_back(SKeyMap(SDLK_PAGEDOWN, KEY_NEXT));
-	KeyMap.push_back(SKeyMap(SDLK_END, KEY_END));
-	KeyMap.push_back(SKeyMap(SDLK_HOME, KEY_HOME));
-	KeyMap.push_back(SKeyMap(SDLK_LEFT, KEY_LEFT));
-	KeyMap.push_back(SKeyMap(SDLK_UP, KEY_UP));
-	KeyMap.push_back(SKeyMap(SDLK_RIGHT, KEY_RIGHT));
-	KeyMap.push_back(SKeyMap(SDLK_DOWN, KEY_DOWN));
+	KeyMap.push_back(SKeyMap(SDLK_SPACE, IRR_KEY_SPACE));
+	KeyMap.push_back(SKeyMap(SDLK_PAGEUP, IRR_KEY_PRIOR));
+	KeyMap.push_back(SKeyMap(SDLK_PAGEDOWN, IRR_KEY_NEXT));
+	KeyMap.push_back(SKeyMap(SDLK_END, IRR_KEY_END));
+	KeyMap.push_back(SKeyMap(SDLK_HOME, IRR_KEY_HOME));
+	KeyMap.push_back(SKeyMap(SDLK_LEFT, IRR_KEY_LEFT));
+	KeyMap.push_back(SKeyMap(SDLK_UP, IRR_KEY_UP));
+	KeyMap.push_back(SKeyMap(SDLK_RIGHT, IRR_KEY_RIGHT));
+	KeyMap.push_back(SKeyMap(SDLK_DOWN, IRR_KEY_DOWN));
 
 	// select missing
-	KeyMap.push_back(SKeyMap(SDLK_PRINT, KEY_PRINT));
+	KeyMap.push_back(SKeyMap(SDLK_PRINT, IRR_KEY_PRINT));
 	// execute missing
-	KeyMap.push_back(SKeyMap(SDLK_PRINT, KEY_SNAPSHOT));
+	KeyMap.push_back(SKeyMap(SDLK_PRINT, IRR_KEY_SNAPSHOT));
 
-	KeyMap.push_back(SKeyMap(SDLK_INSERT, KEY_INSERT));
-	KeyMap.push_back(SKeyMap(SDLK_DELETE, KEY_DELETE));
-	KeyMap.push_back(SKeyMap(SDLK_HELP, KEY_HELP));
+	KeyMap.push_back(SKeyMap(SDLK_INSERT, IRR_KEY_INSERT));
+	KeyMap.push_back(SKeyMap(SDLK_DELETE, IRR_KEY_DELETE));
+	KeyMap.push_back(SKeyMap(SDLK_HELP, IRR_KEY_HELP));
 
-	KeyMap.push_back(SKeyMap(SDLK_0, KEY_KEY_0));
-	KeyMap.push_back(SKeyMap(SDLK_1, KEY_KEY_1));
-	KeyMap.push_back(SKeyMap(SDLK_2, KEY_KEY_2));
-	KeyMap.push_back(SKeyMap(SDLK_3, KEY_KEY_3));
-	KeyMap.push_back(SKeyMap(SDLK_4, KEY_KEY_4));
-	KeyMap.push_back(SKeyMap(SDLK_5, KEY_KEY_5));
-	KeyMap.push_back(SKeyMap(SDLK_6, KEY_KEY_6));
-	KeyMap.push_back(SKeyMap(SDLK_7, KEY_KEY_7));
-	KeyMap.push_back(SKeyMap(SDLK_8, KEY_KEY_8));
-	KeyMap.push_back(SKeyMap(SDLK_9, KEY_KEY_9));
+	KeyMap.push_back(SKeyMap(SDLK_0, IRR_KEY_IRR_KEY_0));
+	KeyMap.push_back(SKeyMap(SDLK_1, IRR_KEY_IRR_KEY_1));
+	KeyMap.push_back(SKeyMap(SDLK_2, IRR_KEY_IRR_KEY_2));
+	KeyMap.push_back(SKeyMap(SDLK_3, IRR_KEY_IRR_KEY_3));
+	KeyMap.push_back(SKeyMap(SDLK_4, IRR_KEY_IRR_KEY_4));
+	KeyMap.push_back(SKeyMap(SDLK_5, IRR_KEY_IRR_KEY_5));
+	KeyMap.push_back(SKeyMap(SDLK_6, IRR_KEY_IRR_KEY_6));
+	KeyMap.push_back(SKeyMap(SDLK_7, IRR_KEY_IRR_KEY_7));
+	KeyMap.push_back(SKeyMap(SDLK_8, IRR_KEY_IRR_KEY_8));
+	KeyMap.push_back(SKeyMap(SDLK_9, IRR_KEY_IRR_KEY_9));
 
-	KeyMap.push_back(SKeyMap(SDLK_a, KEY_KEY_A));
-	KeyMap.push_back(SKeyMap(SDLK_b, KEY_KEY_B));
-	KeyMap.push_back(SKeyMap(SDLK_c, KEY_KEY_C));
-	KeyMap.push_back(SKeyMap(SDLK_d, KEY_KEY_D));
-	KeyMap.push_back(SKeyMap(SDLK_e, KEY_KEY_E));
-	KeyMap.push_back(SKeyMap(SDLK_f, KEY_KEY_F));
-	KeyMap.push_back(SKeyMap(SDLK_g, KEY_KEY_G));
-	KeyMap.push_back(SKeyMap(SDLK_h, KEY_KEY_H));
-	KeyMap.push_back(SKeyMap(SDLK_i, KEY_KEY_I));
-	KeyMap.push_back(SKeyMap(SDLK_j, KEY_KEY_J));
-	KeyMap.push_back(SKeyMap(SDLK_k, KEY_KEY_K));
-	KeyMap.push_back(SKeyMap(SDLK_l, KEY_KEY_L));
-	KeyMap.push_back(SKeyMap(SDLK_m, KEY_KEY_M));
-	KeyMap.push_back(SKeyMap(SDLK_n, KEY_KEY_N));
-	KeyMap.push_back(SKeyMap(SDLK_o, KEY_KEY_O));
-	KeyMap.push_back(SKeyMap(SDLK_p, KEY_KEY_P));
-	KeyMap.push_back(SKeyMap(SDLK_q, KEY_KEY_Q));
-	KeyMap.push_back(SKeyMap(SDLK_r, KEY_KEY_R));
-	KeyMap.push_back(SKeyMap(SDLK_s, KEY_KEY_S));
-	KeyMap.push_back(SKeyMap(SDLK_t, KEY_KEY_T));
-	KeyMap.push_back(SKeyMap(SDLK_u, KEY_KEY_U));
-	KeyMap.push_back(SKeyMap(SDLK_v, KEY_KEY_V));
-	KeyMap.push_back(SKeyMap(SDLK_w, KEY_KEY_W));
-	KeyMap.push_back(SKeyMap(SDLK_x, KEY_KEY_X));
-	KeyMap.push_back(SKeyMap(SDLK_y, KEY_KEY_Y));
-	KeyMap.push_back(SKeyMap(SDLK_z, KEY_KEY_Z));
+	KeyMap.push_back(SKeyMap(SDLK_a, IRR_KEY_IRR_KEY_A));
+	KeyMap.push_back(SKeyMap(SDLK_b, IRR_KEY_IRR_KEY_B));
+	KeyMap.push_back(SKeyMap(SDLK_c, IRR_KEY_IRR_KEY_C));
+	KeyMap.push_back(SKeyMap(SDLK_d, IRR_KEY_IRR_KEY_D));
+	KeyMap.push_back(SKeyMap(SDLK_e, IRR_KEY_IRR_KEY_E));
+	KeyMap.push_back(SKeyMap(SDLK_f, IRR_KEY_IRR_KEY_F));
+	KeyMap.push_back(SKeyMap(SDLK_g, IRR_KEY_IRR_KEY_G));
+	KeyMap.push_back(SKeyMap(SDLK_h, IRR_KEY_IRR_KEY_H));
+	KeyMap.push_back(SKeyMap(SDLK_i, IRR_KEY_IRR_KEY_I));
+	KeyMap.push_back(SKeyMap(SDLK_j, IRR_KEY_IRR_KEY_J));
+	KeyMap.push_back(SKeyMap(SDLK_k, IRR_KEY_IRR_KEY_K));
+	KeyMap.push_back(SKeyMap(SDLK_l, IRR_KEY_IRR_KEY_L));
+	KeyMap.push_back(SKeyMap(SDLK_m, IRR_KEY_IRR_KEY_M));
+	KeyMap.push_back(SKeyMap(SDLK_n, IRR_KEY_IRR_KEY_N));
+	KeyMap.push_back(SKeyMap(SDLK_o, IRR_KEY_IRR_KEY_O));
+	KeyMap.push_back(SKeyMap(SDLK_p, IRR_KEY_IRR_KEY_P));
+	KeyMap.push_back(SKeyMap(SDLK_q, IRR_KEY_IRR_KEY_Q));
+	KeyMap.push_back(SKeyMap(SDLK_r, IRR_KEY_IRR_KEY_R));
+	KeyMap.push_back(SKeyMap(SDLK_s, IRR_KEY_IRR_KEY_S));
+	KeyMap.push_back(SKeyMap(SDLK_t, IRR_KEY_IRR_KEY_T));
+	KeyMap.push_back(SKeyMap(SDLK_u, IRR_KEY_IRR_KEY_U));
+	KeyMap.push_back(SKeyMap(SDLK_v, IRR_KEY_IRR_KEY_V));
+	KeyMap.push_back(SKeyMap(SDLK_w, IRR_KEY_IRR_KEY_W));
+	KeyMap.push_back(SKeyMap(SDLK_x, IRR_KEY_IRR_KEY_X));
+	KeyMap.push_back(SKeyMap(SDLK_y, IRR_KEY_IRR_KEY_Y));
+	KeyMap.push_back(SKeyMap(SDLK_z, IRR_KEY_IRR_KEY_Z));
 
-	KeyMap.push_back(SKeyMap(SDLK_LSUPER, KEY_LWIN));
-	KeyMap.push_back(SKeyMap(SDLK_RSUPER, KEY_RWIN));
+	KeyMap.push_back(SKeyMap(SDLK_LSUPER, IRR_KEY_LWIN));
+	KeyMap.push_back(SKeyMap(SDLK_RSUPER, IRR_KEY_RWIN));
 	// apps missing
-	KeyMap.push_back(SKeyMap(SDLK_POWER, KEY_SLEEP)); //??
+	KeyMap.push_back(SKeyMap(SDLK_POWER, IRR_KEY_SLEEP)); //??
 
-	KeyMap.push_back(SKeyMap(SDLK_KP0, KEY_NUMPAD0));
-	KeyMap.push_back(SKeyMap(SDLK_KP1, KEY_NUMPAD1));
-	KeyMap.push_back(SKeyMap(SDLK_KP2, KEY_NUMPAD2));
-	KeyMap.push_back(SKeyMap(SDLK_KP3, KEY_NUMPAD3));
-	KeyMap.push_back(SKeyMap(SDLK_KP4, KEY_NUMPAD4));
-	KeyMap.push_back(SKeyMap(SDLK_KP5, KEY_NUMPAD5));
-	KeyMap.push_back(SKeyMap(SDLK_KP6, KEY_NUMPAD6));
-	KeyMap.push_back(SKeyMap(SDLK_KP7, KEY_NUMPAD7));
-	KeyMap.push_back(SKeyMap(SDLK_KP8, KEY_NUMPAD8));
-	KeyMap.push_back(SKeyMap(SDLK_KP9, KEY_NUMPAD9));
-	KeyMap.push_back(SKeyMap(SDLK_KP_MULTIPLY, KEY_MULTIPLY));
-	KeyMap.push_back(SKeyMap(SDLK_KP_PLUS, KEY_ADD));
-//	KeyMap.push_back(SKeyMap(SDLK_KP_, KEY_SEPARATOR));
-	KeyMap.push_back(SKeyMap(SDLK_KP_MINUS, KEY_SUBTRACT));
-	KeyMap.push_back(SKeyMap(SDLK_KP_PERIOD, KEY_DECIMAL));
-	KeyMap.push_back(SKeyMap(SDLK_KP_DIVIDE, KEY_DIVIDE));
+	KeyMap.push_back(SKeyMap(SDLK_KP0, IRR_KEY_NUMPAD0));
+	KeyMap.push_back(SKeyMap(SDLK_KP1, IRR_KEY_NUMPAD1));
+	KeyMap.push_back(SKeyMap(SDLK_KP2, IRR_KEY_NUMPAD2));
+	KeyMap.push_back(SKeyMap(SDLK_KP3, IRR_KEY_NUMPAD3));
+	KeyMap.push_back(SKeyMap(SDLK_KP4, IRR_KEY_NUMPAD4));
+	KeyMap.push_back(SKeyMap(SDLK_KP5, IRR_KEY_NUMPAD5));
+	KeyMap.push_back(SKeyMap(SDLK_KP6, IRR_KEY_NUMPAD6));
+	KeyMap.push_back(SKeyMap(SDLK_KP7, IRR_KEY_NUMPAD7));
+	KeyMap.push_back(SKeyMap(SDLK_KP8, IRR_KEY_NUMPAD8));
+	KeyMap.push_back(SKeyMap(SDLK_KP9, IRR_KEY_NUMPAD9));
+	KeyMap.push_back(SKeyMap(SDLK_KP_MULTIPLY, IRR_KEY_MULTIPLY));
+	KeyMap.push_back(SKeyMap(SDLK_KP_PLUS, IRR_KEY_ADD));
+//	KeyMap.push_back(SKeyMap(SDLK_KP_, IRR_KEY_SEPARATOR));
+	KeyMap.push_back(SKeyMap(SDLK_KP_MINUS, IRR_KEY_SUBTRACT));
+	KeyMap.push_back(SKeyMap(SDLK_KP_PERIOD, IRR_KEY_DECIMAL));
+	KeyMap.push_back(SKeyMap(SDLK_KP_DIVIDE, IRR_KEY_DIVIDE));
 
-	KeyMap.push_back(SKeyMap(SDLK_F1,  KEY_F1));
-	KeyMap.push_back(SKeyMap(SDLK_F2,  KEY_F2));
-	KeyMap.push_back(SKeyMap(SDLK_F3,  KEY_F3));
-	KeyMap.push_back(SKeyMap(SDLK_F4,  KEY_F4));
-	KeyMap.push_back(SKeyMap(SDLK_F5,  KEY_F5));
-	KeyMap.push_back(SKeyMap(SDLK_F6,  KEY_F6));
-	KeyMap.push_back(SKeyMap(SDLK_F7,  KEY_F7));
-	KeyMap.push_back(SKeyMap(SDLK_F8,  KEY_F8));
-	KeyMap.push_back(SKeyMap(SDLK_F9,  KEY_F9));
-	KeyMap.push_back(SKeyMap(SDLK_F10, KEY_F10));
-	KeyMap.push_back(SKeyMap(SDLK_F11, KEY_F11));
-	KeyMap.push_back(SKeyMap(SDLK_F12, KEY_F12));
-	KeyMap.push_back(SKeyMap(SDLK_F13, KEY_F13));
-	KeyMap.push_back(SKeyMap(SDLK_F14, KEY_F14));
-	KeyMap.push_back(SKeyMap(SDLK_F15, KEY_F15));
+	KeyMap.push_back(SKeyMap(SDLK_F1,  IRR_KEY_F1));
+	KeyMap.push_back(SKeyMap(SDLK_F2,  IRR_KEY_F2));
+	KeyMap.push_back(SKeyMap(SDLK_F3,  IRR_KEY_F3));
+	KeyMap.push_back(SKeyMap(SDLK_F4,  IRR_KEY_F4));
+	KeyMap.push_back(SKeyMap(SDLK_F5,  IRR_KEY_F5));
+	KeyMap.push_back(SKeyMap(SDLK_F6,  IRR_KEY_F6));
+	KeyMap.push_back(SKeyMap(SDLK_F7,  IRR_KEY_F7));
+	KeyMap.push_back(SKeyMap(SDLK_F8,  IRR_KEY_F8));
+	KeyMap.push_back(SKeyMap(SDLK_F9,  IRR_KEY_F9));
+	KeyMap.push_back(SKeyMap(SDLK_F10, IRR_KEY_F10));
+	KeyMap.push_back(SKeyMap(SDLK_F11, IRR_KEY_F11));
+	KeyMap.push_back(SKeyMap(SDLK_F12, IRR_KEY_F12));
+	KeyMap.push_back(SKeyMap(SDLK_F13, IRR_KEY_F13));
+	KeyMap.push_back(SKeyMap(SDLK_F14, IRR_KEY_F14));
+	KeyMap.push_back(SKeyMap(SDLK_F15, IRR_KEY_F15));
 	// no higher F-keys
 
-	KeyMap.push_back(SKeyMap(SDLK_NUMLOCK, KEY_NUMLOCK));
-	KeyMap.push_back(SKeyMap(SDLK_SCROLLOCK, KEY_SCROLL));
-	KeyMap.push_back(SKeyMap(SDLK_LSHIFT, KEY_LSHIFT));
-	KeyMap.push_back(SKeyMap(SDLK_RSHIFT, KEY_RSHIFT));
-	KeyMap.push_back(SKeyMap(SDLK_LCTRL,  KEY_LCONTROL));
-	KeyMap.push_back(SKeyMap(SDLK_RCTRL,  KEY_RCONTROL));
-	KeyMap.push_back(SKeyMap(SDLK_LALT,  KEY_LMENU));
-	KeyMap.push_back(SKeyMap(SDLK_RALT,  KEY_RMENU));
+	KeyMap.push_back(SKeyMap(SDLK_NUMLOCK, IRR_KEY_NUMLOCK));
+	KeyMap.push_back(SKeyMap(SDLK_SCROLLOCK, IRR_KEY_SCROLL));
+	KeyMap.push_back(SKeyMap(SDLK_LSHIFT, IRR_KEY_LSHIFT));
+	KeyMap.push_back(SKeyMap(SDLK_RSHIFT, IRR_KEY_RSHIFT));
+	KeyMap.push_back(SKeyMap(SDLK_LCTRL,  IRR_KEY_LCONTROL));
+	KeyMap.push_back(SKeyMap(SDLK_RCTRL,  IRR_KEY_RCONTROL));
+	KeyMap.push_back(SKeyMap(SDLK_LALT,  IRR_KEY_LMENU));
+	KeyMap.push_back(SKeyMap(SDLK_RALT,  IRR_KEY_RMENU));
 
-	KeyMap.push_back(SKeyMap(SDLK_PLUS,   KEY_PLUS));
-	KeyMap.push_back(SKeyMap(SDLK_COMMA,  KEY_COMMA));
-	KeyMap.push_back(SKeyMap(SDLK_MINUS,  KEY_MINUS));
-	KeyMap.push_back(SKeyMap(SDLK_PERIOD, KEY_PERIOD));
+	KeyMap.push_back(SKeyMap(SDLK_PLUS,   IRR_KEY_PLUS));
+	KeyMap.push_back(SKeyMap(SDLK_COMMA,  IRR_KEY_COMMA));
+	KeyMap.push_back(SKeyMap(SDLK_MINUS,  IRR_KEY_MINUS));
+	KeyMap.push_back(SKeyMap(SDLK_PERIOD, IRR_KEY_PERIOD));
 
 	// some special keys missing
 

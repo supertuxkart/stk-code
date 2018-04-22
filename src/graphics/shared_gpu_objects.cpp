@@ -15,13 +15,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/shared_gpu_objects.hpp"
+#ifndef SERVER_ONLY
 
-GLuint SharedGPUObjects::m_billboard_vbo;
+#include "graphics/shared_gpu_objects.hpp"
+#include "config/stk_config.hpp"
+#include "graphics/central_settings.hpp"
+#include "utils/log.hpp"
+
 GLuint SharedGPUObjects::m_sky_tri_vbo;
 GLuint SharedGPUObjects::m_frustrum_vbo;
 GLuint SharedGPUObjects::m_frustrum_indices;
-GLuint SharedGPUObjects::m_particle_quad_vbo;
 GLuint SharedGPUObjects::m_View_projection_matrices_ubo;
 GLuint SharedGPUObjects::m_lighting_data_ubo;
 GLuint SharedGPUObjects::m_full_screen_quad_vao;
@@ -29,6 +32,8 @@ GLuint SharedGPUObjects::m_ui_vao;
 GLuint SharedGPUObjects::m_quad_buffer;
 GLuint SharedGPUObjects::m_quad_vbo;
 bool   SharedGPUObjects::m_has_been_initialised = false;
+
+#include "matrix4.h"
 
 /** Initialises m_full_screen_quad_vbo.
  */
@@ -95,21 +100,6 @@ void SharedGPUObjects::initQuadBuffer()
 }   // initQuadBuffer
 
 // ----------------------------------------------------------------------------
-void SharedGPUObjects::initBillboardVBO()
-{
-    float QUAD[] = 
-    {
-        -.5, -.5, 0., 1.,
-        -.5,  .5, 0., 0.,
-         .5, -.5, 1., 1.,
-         .5,  .5, 1., 0.,
-    };
-    glGenBuffers(1, &m_billboard_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_billboard_vbo);
-    glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), QUAD, GL_STATIC_DRAW);
-}   // initBillboardVBO
-
-// ----------------------------------------------------------------------------
 void SharedGPUObjects::initSkyTriVBO()
 {
     const float TRI_VERTEX[] =
@@ -147,6 +137,7 @@ void SharedGPUObjects::initFrustrumVBO()
 // ----------------------------------------------------------------------------
 void SharedGPUObjects::initShadowVPMUBO()
 {
+    assert(CVS->isARBUniformBufferObjectUsable());
     glGenBuffers(1, &m_View_projection_matrices_ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, m_View_projection_matrices_ubo);
     glBufferData(GL_UNIFORM_BUFFER, (16 * 9 + 2) * sizeof(float), 0,
@@ -157,28 +148,12 @@ void SharedGPUObjects::initShadowVPMUBO()
 // ----------------------------------------------------------------------------
 void SharedGPUObjects::initLightingDataUBO()
 {
+    assert(CVS->isARBUniformBufferObjectUsable());
     glGenBuffers(1, &m_lighting_data_ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, m_lighting_data_ubo);
     glBufferData(GL_UNIFORM_BUFFER, 36 * sizeof(float), 0, GL_STREAM_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }   // initLightingDataUBO
-
-// ----------------------------------------------------------------------------
-void SharedGPUObjects::initParticleQuadVBO()
-{
-    static const GLfloat QUAD_VERTEX[] =
-    {
-        -.5, -.5, 0., 0.,
-         .5, -.5, 1., 0.,
-        -.5,  .5, 0., 1.,
-         .5,  .5, 1., 1.,
-    };
-    glGenBuffers(1, &m_particle_quad_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_particle_quad_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(QUAD_VERTEX), QUAD_VERTEX,
-                 GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}   // initParticleQuadVBO
 
 // ----------------------------------------------------------------------------
 void SharedGPUObjects::init()
@@ -187,12 +162,13 @@ void SharedGPUObjects::init()
         return;
     initQuadVBO();
     initQuadBuffer();
-    initBillboardVBO();
     initSkyTriVBO();
     initFrustrumVBO();
-    initShadowVPMUBO();
-    initLightingDataUBO();
-    initParticleQuadVBO();
+    if (CVS->isARBUniformBufferObjectUsable())
+    {
+        initShadowVPMUBO();
+        initLightingDataUBO();
+    }
 
     m_has_been_initialised = true;
 }   // SharedGPUObjects
@@ -206,3 +182,6 @@ void SharedGPUObjects::reset()
 {
     m_has_been_initialised = false;
 }   // reset
+
+#endif   // !SERVER_ONLY
+

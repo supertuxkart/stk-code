@@ -10,10 +10,13 @@
         <box id="filter_box" width="97%" height="75" layout="vertical-row" align="center">
             <div x="0" y="0" width="98%" height="100%" layout="horizontal-row" align="center">
                 <textbox id="filter_name" proportion="7" align="center" />
-                <spacer width="10" />
+                <spacer width="20" />
                 <label text="Updated" align="center" I18N="In addons screen, in the filtering bar, to enable a filter that will show only recently updated items"/>
+                <spacer width="10" />
                 <spinner id="filter_date" proportion="8" align="center" min_value="0" wrap_around="true"/>
+                <spacer width="10" />
                 <label text="Rating >=" align="center" I18N="In addons screen, in the filtering bar, to enable a filter that will show only items with good rating"/>
+                <spacer width="10" />
                 <spinner id="filter_rating" proportion="5" align="center" min_value="0" wrap_around="true"/>
                 <icon-button id="filter_search" height="100%" icon="gui/search.png"/>
             </div>
@@ -33,5 +36,8 @@
         <box proportion="1" width="98%" align="center" layout="vertical-row" padding="6">
             <list id="list_addons" x="0" y="0" width="100%" height="100%"/>
         </box>
+
+        <bright width="97%" id="tips_label" text="" align="center"/>
+
     </div>
 </stkgui>

@@ -1,5 +1,5 @@
 # makefile for libpng on Darwin / Mac OS X
-# Copyright (C) 2002, 2004, 2006, 2008, 2010-2011 Glenn Randers-Pehrson
+# Copyright (C) 2002, 2004, 2006, 2008, 2010-2014 Glenn Randers-Pehrson
 # Copyright (C) 2001 Christoph Pfisterer
 # derived from makefile.linux:
 #  Copyright (C) 1998, 1999 Greg Roelofs
@@ -15,10 +15,8 @@ prefix=/usr/local
 exec_prefix=$(prefix)
 
 # Where the zlib library and include files are located
-#ZLIBLIB=/usr/local/lib
-#ZLIBINC=/usr/local/include
-ZLIBLIB=../zlib
-ZLIBINC=../zlib
+ZLIBLIB=/usr/lib
+ZLIBINC=/usr/include
 
 # Library name:
 LIBNAME = libpng15
@@ -36,12 +34,13 @@ AR_RC=ar rc
 MKDIR_P=mkdir -p
 LN_SF=ln -sf
 RANLIB=ranlib
+CP=cp
 RM_F=/bin/rm -f
-ARCH="-arch i386 -arch x86_64"
 
-# CFLAGS=-I$(ZLIBINC) -W -Wall -O3 -funroll-loops
-CFLAGS=-I$(ZLIBINC) -W -Wall -O -funroll-loops $(ARCH)
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng15 -lz $(ARCH)
+CPPFLAGS=-I$(ZLIBINC)
+# CFLAGS=-W -Wall -O3 -funroll-loops
+CFLAGS=-W -Wall -O -funroll-loops
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng15 -lz
 
 INCPATH=$(prefix)/include
 LIBPATH=$(exec_prefix)/lib
@@ -63,6 +62,10 @@ DI=$(DESTDIR)$(INCPATH)
 DL=$(DESTDIR)$(LIBPATH)
 DM=$(DESTDIR)$(MANPATH)
 
+# Pre-built configuration
+# See scripts/pnglibconf.mak for more options
+PNGLIBCONF_H_PREBUILT = scripts/pnglibconf.h.prebuilt
+
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
@@ -71,14 +74,16 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 
 .SUFFIXES:      .c .o .pic.o
 
+.c.o:
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
+
 .c.pic.o:
-	$(CC) -c $(CFLAGS) -fno-common -o $@ $*.c
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -fno-common -o $@ $*.c
 
 all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config
 
-# see scripts/pnglibconf.mak for more options
-pnglibconf.h: scripts/pnglibconf.h.prebuilt
-	cp scripts/pnglibconf.h.prebuilt $@
+pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
+	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
 
 libpng.a: $(OBJS)
 	$(AR_RC) $@ $(OBJS)
@@ -136,10 +141,10 @@ install-static: install-headers libpng.a
 install-shared: install-headers $(LIBSOMAJ) libpng.pc
 	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
 	-@$(RM_F) $(DL)/$(LIBSO)
-	-@$(RM_F) $(DL)/$(LIBSOREL)
+	-@$(RM_F) $(DL)/$(LIBSOMAJ)
 	-@$(RM_F) $(DL)/$(OLDSO)
-	cp $(LIBSOMAJ) $(DL)/$(LIBSOREL)
-	chmod 755 $(DL)/$(LIBSOREL)
+	cp $(LIBSOMAJ) $(DL)
+	chmod 755 $(DL)/$(LIBSOMAJ)
 	(cd $(DL); \
 	$(LN_SF) $(LIBSOREL) $(LIBSO); \
 	$(LN_SF) $(LIBSO) $(OLDSO))
@@ -178,14 +183,14 @@ install: install-static install-shared install-man install-config
 test-dd:
 	echo
 	echo Testing installed dynamic shared library in $(DL).
-	$(CC) -I$(DI) -I$(ZLIBINC) \
+	$(CC) -I$(DI) $(CPPFLAGS) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
 	   -L$(DL) -L$(ZLIBLIB) \
 	   -o pngtestd `$(BINPATH)/$(LIBNAME)-config --ldflags`
 	./pngtestd pngtest.png
 
 test-installed:
-	$(CC) $(CFLAGS) \
+	$(CC) $(CPPFLAGS) $(CFLAGS) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
 	   -L$(ZLIBLIB) \
 	   -o pngtesti `$(BINPATH)/$(LIBNAME)-config --ldflags`

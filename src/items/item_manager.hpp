@@ -82,7 +82,7 @@ private:
 
     /** Stores which items are on which quad. m_items_in_quads[#quads]
      *  contains all items that are not on a quad. Note that this
-     *  field is undefined if no QuadGraph exist, e.g. in battle mode. */
+     *  field is undefined if no Graph exist, e.g. arena without navmesh. */
     std::vector< AllItemTypes > *m_items_in_quads;
 
     /** What item this item is switched to. */
@@ -90,7 +90,7 @@ private:
 
     /** Remaining time that items should remain switched. If the
      *  value is <0, it indicates that the items are not switched atm. */
-    float m_switch_time;
+    int m_switch_ticks;
 
     void  insertItem(Item *item);
     void  deleteItem(Item *item);
@@ -106,7 +106,7 @@ public:
                                     AbstractKart* parent=NULL);
     Item*          newItem         (const Vec3& xyz, float distance,
                                     TriggerItemListener* listener);
-    void           update          (float delta);
+    void           update          (int ticks);
     void           checkItemHit    (AbstractKart* kart);
     void           reset           ();
     void           collectedItem   (Item *item, AbstractKart *kart,
@@ -132,6 +132,16 @@ public:
         assert(n<(*m_items_in_quads).size());
         return (*m_items_in_quads)[n];
     }   // getItemsInQuads
+    // ------------------------------------------------------------------------
+    /** Returns the first item (NULL if none) on the specified quad
+     */
+    Item* getFirstItemInQuad(unsigned int n) const
+    {
+        assert(m_items_in_quads);
+        assert(n < m_items_in_quads->size());
+        return ((*m_items_in_quads)[n]).empty() ? NULL :
+            (*m_items_in_quads)[n].front();
+    }   // getFirstItemInQuad
 };   // ItemManager
 
 #endif

@@ -47,7 +47,7 @@
 #define DEGREE_TO_RAD      (M_PI/180.0f)
 #define RAD_TO_DEGREE      (180.0f/M_PI)
 
-const unsigned int MAX_PLAYER_COUNT = 4;
+const unsigned int MAX_PLAYER_COUNT = 8;
 
 extern const bool IS_LITTLE_ENDIAN;
 

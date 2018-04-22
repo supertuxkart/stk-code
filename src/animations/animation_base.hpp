@@ -67,8 +67,11 @@ public:
                  AnimationBase(const XMLNode &node);
                  AnimationBase(Ipo *ipo);
     virtual      ~AnimationBase() {}
-    virtual void update(float dt, Vec3 *xyz=NULL, Vec3 *hpr=NULL,
-                                  Vec3 *scale=NULL);
+    virtual void update(float dt,  Vec3 *xyz=NULL, Vec3 *hpr=NULL,
+                                   Vec3 *scale=NULL);
+    virtual void getAt(float time, Vec3 *xyz = NULL, Vec3 *hpr = NULL,
+                                   Vec3 *scale = NULL);
+    virtual void getDerivativeAt(float time, Vec3 *xyz);
     /** This needs to be implemented by the inheriting classes. It is called
      *  once per frame from the track. It has a dummy implementation that
      *  just asserts so that this class can be instantiated in

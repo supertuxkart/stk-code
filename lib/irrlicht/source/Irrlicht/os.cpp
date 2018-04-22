@@ -22,7 +22,7 @@
 	#include <libkern/OSByteOrder.h>
 	#define bswap_16(X) OSReadSwapInt16(&X,0)
 	#define bswap_32(X) OSReadSwapInt32(&X,0)
-#elif defined(__FreeBSD__)
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
 	#include <sys/endian.h>
 	#define bswap_16(X) bswap16(X)
 	#define bswap_32(X) bswap32(X)
@@ -143,6 +143,10 @@ namespace os
 #include <time.h>
 #include <sys/time.h>
 
+#ifdef _IRR_ANDROID_PLATFORM_ 
+#include <android/log.h>
+#endif
+
 namespace irr
 {
 namespace os
@@ -176,24 +180,38 @@ namespace os
 
 	void Printer::log(const c8* message, ELOG_LEVEL ll)
 	{
+#ifdef _IRR_ANDROID_PLATFORM_
+		__android_log_print(ANDROID_LOG_VERBOSE, "Irrlicht",  "%s", message);
+#endif
 		if (Logger)
 			Logger->log(message, ll);
 	}
 
 	void Printer::log(const wchar_t* message, ELOG_LEVEL ll)
 	{
+#ifdef _IRR_ANDROID_PLATFORM_
+		char test[200];
+		wcstombs(test, message, 200);
+		__android_log_print(ANDROID_LOG_VERBOSE, "Irrlicht",  "%s", test);
+#endif
 		if (Logger)
 			Logger->log(message, ll);
 	}
 
 	void Printer::log(const c8* message, const c8* hint, ELOG_LEVEL ll)
 	{
+#ifdef _IRR_ANDROID_PLATFORM_
+		__android_log_print(ANDROID_LOG_VERBOSE, "Irrlicht",  "%s %s", message, hint);
+#endif
 		if (Logger)
 			Logger->log(message, hint, ll);
 	}
 
 	void Printer::log(const c8* message, const io::path& hint, ELOG_LEVEL ll)
 	{
+#ifdef _IRR_ANDROID_PLATFORM_
+		__android_log_print(ANDROID_LOG_VERBOSE, "Irrlicht",  "%s %s", message, core::stringc(hint).c_str());
+#endif
 		if (Logger)
 			Logger->log(message, hint.c_str(), ll);
 	}

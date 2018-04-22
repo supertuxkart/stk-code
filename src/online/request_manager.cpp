@@ -104,10 +104,6 @@ namespace Online
         pthread_attr_init(&attr);
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-        // Should be the default, but just in case:
-        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-        //pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
-
         m_thread_id.setAtomic(new pthread_t());
         int error = pthread_create(m_thread_id.getData(), &attr,
                                    &RequestManager::mainLoop, this);
@@ -188,8 +184,6 @@ namespace Online
     {
         VS::setThreadName("RequestManager");
         RequestManager *me = (RequestManager*) obj;
-
-        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
         me->m_current_request = NULL;
         me->m_request_queue.lock();

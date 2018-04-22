@@ -20,19 +20,18 @@
 
 #include <vector>
 
-#include "modes/world_with_rank.hpp"
+#include "modes/world.hpp"
 #include "utils/aligned_array.hpp"
 
 #include "LinearMath/btTransform.h"
 
 /*
  * The overworld map where challenges are played.
- * \note This mode derives from LinearWorld to get support for drivelines,
- *       minimap and rescue, even though this world is not technically
- *       linear.
+ * \note Extends world to make a simple world where karts can drive around,
+ *       it adds challenges and starting of races.
  * \ingroup modes
  */
-class OverWorld : public WorldWithRank
+class OverWorld : public World
 {
 protected:
 
@@ -47,7 +46,7 @@ public:
 
     static void enterOverWorld();
 
-    virtual void  update(float delta) OVERRIDE;
+    virtual void  update(int ticks) OVERRIDE;
     unsigned int  getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
     virtual void  getKartsDisplayInfo(
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;

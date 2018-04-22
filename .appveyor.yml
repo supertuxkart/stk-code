@@ -1,0 +1,66 @@
+environment:
+    DEPS_DIR: c:\\projects\dependencies
+    DEPS_BRANCH: master
+    ASSETS_DIR: c:\\projects\stk-assets
+    APPVEYOR_CACHE_ENTRY_ZIP_ARGS: -t7z -m0=lzma2 -mx=9
+    IRC_NOTIFY_SCRIPT: c:\\projects\stk-code\tools\appveyor-irc-notify.py
+
+os: Visual Studio 2015
+clone_depth: 1
+shallow_clone: true
+
+platform:
+    # - x86
+    - x64
+
+configuration:
+    - Debug
+    - Release
+
+matrix:
+    fast_finish: true
+
+#cache:
+#    - '%DEPS_DIR%'
+    #- '%ASSETS_DIR%'
+
+install:
+    - ps: >-
+        If(!(Test-Path "$env:DEPS_DIR")) {
+            Write-Host "Downloading dependencies";
+            Start-Process -FilePath "git" -ArgumentList "clone --branch $env:DEPS_BRANCH --single-branch --depth 1 https://github.com/supertuxkart/dependencies.git $env:DEPS_DIR" -Wait;
+        }
+        Else {
+            Write-Host "Updating dependencies";
+            Start-Process -FilePath "git" -ArgumentList "fetch --depth 1" -WorkingDirectory "$env:DEPS_DIR" -Wait;
+        }
+        Get-ChildItem $env:DEPS_DIR | Measure-Object -property length -sum
+        #- ps: >-
+        #If(!(Test-Path "$env:ASSETS_DIR")) {
+        #    Write-Host "Downloading assets";
+        #    Start-Process -FilePath "svn" -ArgumentList "checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets $env:ASSETS_DIR" -Wait;
+        #}
+        #Else {
+        #    Write-Host "Updating assets";
+        #    Start-Process -FilePath "svn" -ArgumentList "update" -WorkingDirectory "$env:ASSETS_DIR" -Wait;
+        #}
+        #Get-ChildItem $env:ASSETS_DIR | Measure-Object -property length -sum
+
+before_build:
+    - ps: Copy-Item "${env:DEPS_DIR}\windows_64bit\dependencies" c:\projects\stk-code\dependencies-64bit –Recurse
+    - cmd: |
+        md build
+        cd build
+        if "%platform%"=="x64" set CMAKE_GENERATOR_NAME="Visual Studio 14 2015 Win64"
+        cmake -G %CMAKE_GENERATOR_NAME% -DCMAKE_BUILD_TYPE="%configuration%" .. -DCHECK_ASSETS=OFF
+
+build:
+    parallel: true
+    project: build\ALL_BUILD.vcxproj
+
+
+on_success:
+    - "python %IRC_NOTIFY_SCRIPT% supertuxkart [{author}:{branch}] {short_commit}: {message} {color_green}Succeeded,Details: {build_url},Commit: {commit_url}"
+
+on_failure:
+    - "python %IRC_NOTIFY_SCRIPT% supertuxkart [{author}:{branch}] {short_commit}: {message} {color_red}Failed,Details: {build_url},Commit: {commit_url}"

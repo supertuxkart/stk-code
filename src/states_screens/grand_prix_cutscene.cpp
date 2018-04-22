@@ -22,6 +22,8 @@
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/grand_prix_cutscene.hpp"
+#include "states_screens/grand_prix_editor_screen.hpp"
+#include "states_screens/dialogs/general_text_field_dialog.hpp"
 #include "tracks/track_manager.hpp"
 
 #include <string>
@@ -42,7 +44,7 @@ void GrandPrixCutscene::saveGPButton()
  *  The GP that the race_manager provides can't be used because we need some
  *  functions and settings that the GP manager only gives us through
  *  createNewGP(). */
-void GrandPrixCutscene::onNewGPWithName(const irr::core::stringw& name)
+void GrandPrixCutscene::setNewGPWithName(const irr::core::stringw& name)
 {
     // create a new GP with the correct filename and a unique id
     GrandPrixData* gp = grand_prix_manager->createNewGP(name);
@@ -56,7 +58,7 @@ void GrandPrixCutscene::onNewGPWithName(const irr::core::stringw& name)
 
     // Avoid double-save which can have bad side-effects
     getWidget<Button>("save")->setVisible(false);
-}   // onNewGPWithName
+}   // setNewGPWithName
 
 // ----------------------------------------------------------------------------
 
@@ -70,7 +72,9 @@ void GrandPrixCutscene::eventCallback(GUIEngine::Widget* widget,
     }
     else if (name == "save")
     {
-        new EnterGPNameDialog(this, 0.5f, 0.4f);
+        new GeneralTextFieldDialog(_("Please enter the name of the grand prix"),
+            std::bind(&GrandPrixCutscene::setNewGPWithName, this,
+            std::placeholders::_1), GrandPrixEditorScreen::validateName);
     }
 }   // eventCallback
 

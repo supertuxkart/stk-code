@@ -25,16 +25,17 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/material.hpp"
-#include "graphics/material_manager.hpp"
+#include "graphics/sp/sp_base.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
-#include "modes/linear_world.hpp"
+#include "karts/controller/spare_tire_ai.hpp"
 #include "network/network_config.hpp"
 #include "network/race_event_manager.hpp"
-#include "tracks/quad_graph.hpp"
-#include "tracks/battle_graph.hpp"
+#include "physics/triangle_mesh.hpp"
+#include "tracks/arena_graph.hpp"
+#include "tracks/arena_node.hpp"
 #include "tracks/track.hpp"
+#include "utils/random_generator.hpp"
 #include "utils/string_utils.hpp"
 
 #include <IMesh.h>
@@ -103,6 +104,9 @@ void ItemManager::loadDefaultItemMeshes()
                         "- aborting", name.c_str());
             exit(-1);
         }
+#ifndef SERVER_ONLY
+        SP::uploadSPM(mesh);
+#endif
         mesh->grab();
         m_item_mesh[i]            = mesh;
         node->get("glow", &(m_glow_color[i]));
@@ -113,7 +117,13 @@ void ItemManager::loadDefaultItemMeshes()
                               ? NULL
                               : irr_driver->getMesh(lowres_model_filename);
 
-        if (m_item_lowres_mesh[i]) m_item_lowres_mesh[i]->grab();
+        if (m_item_lowres_mesh[i])
+        {
+#ifndef SERVER_ONLY
+            SP::uploadSPM(m_item_lowres_mesh[i]);
+#endif
+            m_item_lowres_mesh[i]->grab();
+        }
     }   // for i
     delete root;
 }   // loadDefaultItemMeshes
@@ -146,7 +156,7 @@ void ItemManager::removeTextures()
  *  of each race. */
 ItemManager::ItemManager()
 {
-    m_switch_time = -1.0f;
+    m_switch_ticks = -1;
     // The actual loading is done in loadDefaultItems
 
     // Prepare the switch to array, which stores which item should be
@@ -157,12 +167,12 @@ ItemManager::ItemManager()
         m_switch_to.push_back((Item::ItemType)i);
     setSwitchItems(stk_config->m_switch_items);
 
-    if(QuadGraph::get())
+    if(Graph::get())
     {
         m_items_in_quads = new std::vector<AllItemTypes>;
         // Entries 0 to n-1 are for the quads, entry
         // n is for all items that are not on a quad.
-        m_items_in_quads->resize(QuadSet::get()->getNumberOfQuads()+1);
+        m_items_in_quads->resize(Graph::get()->getNumNodes()+1);
     }
     else
     {
@@ -224,11 +234,10 @@ void ItemManager::insertItem(Item *item)
     if(m_items_in_quads)
     {
         int graph_node = item->getGraphNode();
-        // If the item is on the driveline, store it at the appropriate index
+        // If the item is on the graph, store it at the appropriate index
         if(graph_node > -1)
         {
-            int sector = QuadGraph::get()->getNode(graph_node).getQuadIndex();
-            (*m_items_in_quads)[sector].push_back(item);
+            (*m_items_in_quads)[graph_node].push_back(item);
         }
         else  // otherwise store it in the 'outside' index
             (*m_items_in_quads)[m_items_in_quads->size()-1].push_back(item);
@@ -257,7 +266,7 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
 
     insertItem(item);
     if(parent != NULL) item->setParent(parent);
-    if(m_switch_time>=0)
+    if(m_switch_ticks>=0)
     {
         Item::ItemType new_type = m_switch_to[item->getType()];
         item->switchTo(new_type, m_item_mesh[(int)new_type],
@@ -287,6 +296,8 @@ Item* ItemManager::newItem(const Vec3& xyz, float distance,
 void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
 {
     assert(item);
+    // Spare tire karts don't collect items
+    if (dynamic_cast<SpareTireAI*>(kart->getController()) != NULL) return;
     if( (item->getType() == Item::ITEM_BUBBLEGUM || 
          item->getType() == Item::ITEM_BUBBLEGUM_NOLOK) && kart->isShielded())
     {
@@ -322,7 +333,7 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
         if((*i)->hitKart(kart->getXYZ(), kart))
         {
             // if we're not playing online, pick the item.
-            if (!RaceEventManager::getInstance()->isRunning())
+            if (!NetworkConfig::get()->isNetworking())
                 collectedItem(*i, kart);
             else if (NetworkConfig::get()->isServer())
             {
@@ -343,14 +354,14 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
 void ItemManager::reset()
 {
     // If items are switched, switch them back first.
-    if(m_switch_time>=0)
+    if(m_switch_ticks>=0)
     {
         for(AllItemTypes::iterator i =m_all_items.begin();
                                    i!=m_all_items.end(); i++)
         {
             if(*i) (*i)->switchBack();
         }
-        m_switch_time = -1.0f;
+        m_switch_ticks = -1;
 
     }
 
@@ -377,36 +388,36 @@ void ItemManager::reset()
         }
     }  // whilem_all_items.end() i
 
-    m_switch_time = -1;
+    m_switch_ticks = -1;
 }   // reset
 
 //-----------------------------------------------------------------------------
 /** Updates all items, and handles switching items back if the switch time
  *  is over.
- *  \param dt Time step.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void ItemManager::update(float dt)
+void ItemManager::update(int ticks)
 {
     // If switch time is over, switch all items back
-    if(m_switch_time>=0)
+    if(m_switch_ticks>=0)
     {
-        m_switch_time -= dt;
-        if(m_switch_time<0)
+        m_switch_ticks -= ticks;
+        if(m_switch_ticks<0)
         {
             for(AllItemTypes::iterator i =m_all_items.begin();
                 i!=m_all_items.end();  i++)
             {
                 if(*i) (*i)->switchBack();
             }   // for m_all_items
-        }   // m_switch_time < 0
-    }   // m_switch_time>=0
+        }   // m_switch_ticks < 0
+    }   // m_switch_ticks>=0
 
     for(AllItemTypes::iterator i =m_all_items.begin();
         i!=m_all_items.end();  i++)
     {
         if(*i)
         {
-            (*i)->update(dt);
+            (*i)->update(ticks);
             if( (*i)->isUsedUp())
             {
                 deleteItem( *i );
@@ -425,10 +436,8 @@ void ItemManager::deleteItem(Item *item)
     // First check if the item needs to be removed from the items-in-quad list
     if(m_items_in_quads)
     {
-        const Vec3 &xyz = item->getXYZ();
-        int sector = QuadGraph::UNKNOWN_SECTOR;
-        QuadGraph::get()->findRoadSector(xyz, &sector);
-        unsigned int indx = sector==QuadGraph::UNKNOWN_SECTOR
+        int sector = item->getGraphNode();
+        unsigned int indx = sector==Graph::UNKNOWN_SECTOR
                           ? (unsigned int) m_items_in_quads->size()-1
                           : sector;
         AllItemTypes &items = (*m_items_in_quads)[indx];
@@ -463,16 +472,16 @@ void ItemManager::switchItems()
 
         Item::ItemType new_type = m_switch_to[(*i)->getType()];
 
-        if(m_switch_time<0)
+        if(m_switch_ticks<0)
             (*i)->switchTo(new_type, m_item_mesh[(int)new_type], m_item_lowres_mesh[(int)new_type]);
         else
             (*i)->switchBack();
     }   // for m_all_items
 
-    // if the items are already switched (m_switch_time >=0)
-    // then switch back, and set m_switch_time to -1 to indicate
+    // if the items are already switched (m_switch_ticks >=0)
+    // then switch back, and set m_switch_ticks to -1 to indicate
     // that the items are now back to normal.
-    m_switch_time = m_switch_time < 0 ? stk_config->m_item_switch_time : -1;
+    m_switch_ticks = m_switch_ticks < 0 ? stk_config->m_item_switch_ticks : -1;
 
 }   // switchItems
 
@@ -480,40 +489,41 @@ void ItemManager::switchItems()
 bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
 {
     if (!UserConfigParams::m_random_arena_item) return false;
-    if (!BattleGraph::get()) return false;
+    if (!ArenaGraph::get()) return false;
 
+    const ArenaGraph* ag = ArenaGraph::get();
     std::vector<int> used_location;
     std::vector<int> invalid_location;
     for (unsigned int i = 0; i < pos.size(); i++)
     {
         // Load all starting positions of arena, so no items will be near them
-        int node = BattleGraph::get()->pointToNode(/*cur_node*/-1,
-            Vec3(pos[i].getOrigin()), /*ignore_vertical*/true);
+        int node = -1;
+        ag->findRoadSector(pos[i].getOrigin(), &node, NULL, true);
         assert(node != -1);
         used_location.push_back(node);
         invalid_location.push_back(node);
     }
 
     RandomGenerator random;
-    const unsigned int MIN_DIST = int(sqrt(BattleGraph::get()->getNumNodes()));
+    const unsigned int ALL_NODES = ag->getNumNodes();
+    const unsigned int MIN_DIST = int(sqrt(ALL_NODES));
     const unsigned int TOTAL_ITEM = MIN_DIST / 2;
 
     Log::info("[ItemManager]","Creating %d random items for arena", TOTAL_ITEM);
     for (unsigned int i = 0; i < TOTAL_ITEM; i++)
     {
         int chosen_node = -1;
-        const unsigned int total_node = BattleGraph::get()->getNumNodes();
         while(true)
         {
             if (used_location.size() - pos.size() +
-                invalid_location.size() == total_node)
+                invalid_location.size() == ALL_NODES)
             {
                 Log::warn("[ItemManager]","Can't place more random items! "
                     "Use default item location.");
                 return false;
             }
 
-            const int node = random.get(total_node);
+            const int node = random.get(ALL_NODES);
 
             // Check if tried
             std::vector<int>::iterator it = std::find(invalid_location.begin(),
@@ -522,7 +532,7 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
                 continue;
 
             // Check if near edge
-            if (BattleGraph::get()->isNearEdge(node))
+            if (ag->getNode(node)->isNearEdge())
             {
                 invalid_location.push_back(node);
                 continue;
@@ -532,8 +542,7 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
             for (unsigned int j = 0; j < used_location.size(); j++)
             {
                 if (!found) continue;
-                float test_distance = BattleGraph::get()
-                    ->getDistance(used_location[j], node);
+                float test_distance = ag->getDistance(used_location[j], node);
                 found = test_distance > MIN_DIST;
             }
             if (found)
@@ -566,10 +575,30 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
         Item::ItemType type = (j > BONUS_BOX ? Item::ITEM_BONUS_BOX :
             j > NITRO_BIG ? Item::ITEM_NITRO_BIG :
             j > NITRO_SMALL ? Item::ITEM_NITRO_SMALL : Item::ITEM_BANANA);
-        Vec3 loc = BattleGraph::get()
-            ->getPolyOfNode(used_location[i]).getCenter();
-        Item* item = newItem(type, loc, Vec3(0, 1, 0));
-        BattleGraph::get()->insertItems(item, used_location[i]);
+
+        ArenaNode* an = ag->getNode(used_location[i]);
+        Vec3 loc = an->getCenter();
+        Vec3 quad_normal = an->getNormal();
+        loc += quad_normal;
+
+        // Do a raycast to help place it fully on the surface
+        const Material* m;
+        Vec3 normal;
+        Vec3 hit_point;
+        const TriangleMesh& tm = Track::getCurrentTrack()->getTriangleMesh();
+        bool success = tm.castRay(loc, an->getCenter() + (-10000*quad_normal),
+            &hit_point, &m, &normal);
+
+        if (success)
+        {
+            newItem(type, hit_point, normal);
+        }
+        else
+        {
+            Log::warn("[ItemManager]","Raycast to surface failed"
+                      "from node %d", used_location[i]);
+            newItem(type, an->getCenter(), quad_normal);
+        }
     }
 
     return true;

@@ -143,7 +143,6 @@ void WiimoteManager::launchDetection(int timeout)
 
     //To prevent segmentation fault, have to delete NULLs
     number_deletables = 0;
-    number_deletables = 0;
     deletable_wiimotes = (wiimote_t**) malloc(sizeof(struct wiimote_t*) * (number_previous_wiimotes-number_merged_wiimotes));
     memset(deletable_wiimotes,0,sizeof(struct wiimote_t*) * (number_previous_wiimotes-number_merged_wiimotes));
     for (int i = 0; i < number_previous_wiimotes; i++)
@@ -386,11 +385,11 @@ int WiimoteManager::askUserToConnectWiimotes()
 {
     new MessageDialog(
 #ifdef WIN32
-        _("Connect your wiimote to the Bluetooth manager, then click on Ok."
+        _("Connect your wiimote to the Bluetooth manager, then click on Ok. "
                   "Detailed instructions at supertuxkart.net/Wiimote"),
 #else
         _("Press the buttons 1+2 simultaneously on your wiimote to put "
-          "it in discovery mode, then click on Ok."
+          "it in discovery mode, then click on Ok. "
                   "Detailed instructions at supertuxkart.net/Wiimote"),
 #endif
         MessageDialog::MESSAGE_DIALOG_OK_CANCEL,

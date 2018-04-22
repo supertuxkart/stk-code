@@ -27,8 +27,6 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( GhostReplaySelection );
-
 // ----------------------------------------------------------------------------
 /** Constructor, which loads the stkgui file.
  */
@@ -80,6 +78,7 @@ void GhostReplaySelection::beforeAddingWidget()
     m_replay_list_widget->addColumn( _("Difficulty"), 1);
     m_replay_list_widget->addColumn( _("Laps"), 1);
     m_replay_list_widget->addColumn( _("Finish Time"), 1);
+    m_replay_list_widget->addColumn( _("User"), 1);
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -106,10 +105,14 @@ void GhostReplaySelection::loadList()
             (RaceManager::Difficulty)rd.m_difficulty)
             continue;
 
+        Track* track = track_manager->getTrack(rd.m_track_name);
+        
+        if (track == NULL)
+            continue;
+
         std::vector<GUIEngine::ListWidget::ListCell> row;
-        Track* t = track_manager->getTrack(rd.m_track_name);
         row.push_back(GUIEngine::ListWidget::ListCell
-            (translations->fribidize(t->getName()) , -1, 3));
+            (translations->fribidize(track->getName()) , -1, 3));
         row.push_back(GUIEngine::ListWidget::ListCell
             (StringUtils::toWString(rd.m_kart_list.size()), -1, 1, true));
         row.push_back(GUIEngine::ListWidget::ListCell
@@ -122,6 +125,8 @@ void GhostReplaySelection::loadList()
             (StringUtils::toWString(rd.m_laps), -1, 1, true));
         row.push_back(GUIEngine::ListWidget::ListCell
             (StringUtils::toWString(rd.m_min_time) + L"s", -1, 1, true));
+        row.push_back(GUIEngine::ListWidget::ListCell
+            (rd.m_user_name.empty() ? " " : rd.m_user_name, -1, 1, true));
         m_replay_list_widget->addItem(StringUtils::toString(i), row);
     }
 }   // loadList
@@ -156,7 +161,6 @@ void GhostReplaySelection::eventCallback(GUIEngine::Widget* widget,
     else if (name == "record-ghost")
     {
         race_manager->setRecordRace(true);
-        TracksScreen::getInstance()->setOfficalTrack(false);
         TracksScreen::getInstance()->push();
     }
     else if (name == "replay_difficulty_toggle")
@@ -212,6 +216,9 @@ void GhostReplaySelection::onColumnClicked(int column_id)
             break;
         case 5:
             ReplayPlay::setSortOrder(ReplayPlay::SO_TIME);
+            break;
+        case 6:
+            ReplayPlay::setSortOrder(ReplayPlay::SO_USER);
             break;
         default:
             assert(0);

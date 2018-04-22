@@ -20,13 +20,15 @@
 #define HEADER_LOD_NODE_LOADER_HPP
 
 class LODNode;
-class Track;
 class STKInstancedSceneNode;
+class RenderInfo;
+class Track;
 
 #include <cassert>
 #include <map>
 #include <vector>
 #include <string>
+#include <memory>
 #include <irrlicht.h>
 #include "io/xml_node.hpp"
 
@@ -88,7 +90,9 @@ public:
          ModelDefinitionLoader(Track* track);
 
     void addModelDefinition(const XMLNode* xml);
-    LODNode* instanciateAsLOD(const XMLNode* xml_node, scene::ISceneNode* parent);
+    LODNode* instanciateAsLOD(const XMLNode* xml_node,
+                              scene::ISceneNode* parent,
+                              std::shared_ptr<RenderInfo> ri);
 
     void clear();
 

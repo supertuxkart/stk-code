@@ -46,6 +46,7 @@
 #include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/online_profile_achievements.hpp"
 #include "states_screens/online_profile_servers.hpp"
+#include "states_screens/online_screen.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
@@ -67,16 +68,12 @@
 using namespace GUIEngine;
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( MainMenuScreen );
-
 bool MainMenuScreen::m_enable_online = false;
 
 // ----------------------------------------------------------------------------
 
 MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
 {
-    m_online_string = _("Online");
-    m_login_string = _("Login");
 }   // MainMenuScreen
 
 // ----------------------------------------------------------------------------
@@ -85,6 +82,16 @@ void MainMenuScreen::loadedFromFile()
 {
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     w->setScrollSpeed(15);
+    
+    RibbonWidget* rw_top = getWidget<RibbonWidget>("menu_toprow");
+    assert(rw_top != NULL);
+    
+    if (track_manager->getTrack("overworld") == NULL ||
+        track_manager->getTrack("introcutscene") == NULL ||
+        track_manager->getTrack("introcutscene2") == NULL)
+    {
+        rw_top->removeChildNamed("story");
+    }
 
 #if DEBUG_MENU_ITEM != 1
     RibbonWidget* rw = getWidget<RibbonWidget>("menu_bottomrow");
@@ -98,6 +105,13 @@ void MainMenuScreen::loadedFromFile()
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
+
+void MainMenuScreen::beforeAddingWidget()
+{
+
+}
+
+// ----------------------------------------------------------------------------
 //
 void MainMenuScreen::init()
 {
@@ -107,6 +121,7 @@ void MainMenuScreen::init()
     assert(m_user_id);
 
     // reset in case we're coming back from a race
+    NetworkConfig::get()->cleanNetworkPlayers();
     StateManager::get()->resetActivePlayers();
     input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
     input_manager->getDeviceManager()->setSinglePlayer( NULL );
@@ -133,11 +148,6 @@ void MainMenuScreen::init()
         w->setBadge(LOADING_BADGE);
     }
 
-    m_online = getWidget<IconButtonWidget>("online");
-
-    if(!m_enable_online)
-        m_online->setActive(false);
-
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
     w->setText(news_text, true);
@@ -161,32 +171,25 @@ void MainMenuScreen::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-void MainMenuScreen::onUpdate(float delta)
 
+void MainMenuScreen::onUpdate(float delta)
 {
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
     if(PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST  ||
        PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
     {
         m_user_id->setText(player->getLastOnlineName() + "@stk");
-        m_online->setActive(true);
-        m_online->setLabel(m_online_string);
     }
     else if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_OUT)
     {
-        m_online->setActive(true);
-        m_online->setLabel(m_login_string);
         m_user_id->setText(player->getName());
     }
     else
     {
         // now must be either logging in or logging out
-        m_online->setActive(false);
         m_user_id->setText(player->getName());
     }
 
-    m_online->setLabel(PlayerManager::getCurrentOnlineId() ? m_online_string
-                                                           : m_login_string);
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
@@ -275,7 +278,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->startSingleRace("gpwin", 999, false);
         GrandPrixWin* scene = GrandPrixWin::getInstance();
         scene->push();
-        const std::string winners[] = { "elephpant", "nolok", "pidgin" };
+        const std::string winners[] = { "kiki", "nolok", "pidgin" };
         scene->setKarts(winners);
     }
     else if (selection == "test_gplose")
@@ -290,7 +293,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         scene->push();
         std::vector<std::string> losers;
         losers.push_back("nolok");
-        losers.push_back("elephpant");
+        losers.push_back("kiki");
         //losers.push_back("wilber");
         //losers.push_back("tux");
         scene->setKarts(losers);
@@ -337,7 +340,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                 track_manager->getTrack("lighthouse")
                              ->getScreenshotFile().c_str()));
             textures.push_back(irr_driver->getTexture(
-                track_manager->getTrack("startrack")
+                track_manager->getTrack("snowtuxpeak")
                              ->getScreenshotFile().c_str()));
             textures.push_back(irr_driver->getTexture(
                 track_manager->getTrack("sandtrack")
@@ -454,6 +457,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "story")
     {
+        NetworkConfig::get()->unsetNetworking();
         PlayerProfile *player = PlayerManager::getCurrentPlayer();
         if (player->isFirstTime())
         {
@@ -495,15 +499,23 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                 "\"Connect to the Internet\"."));
             return;
         }
-        
-        if (PlayerManager::getCurrentOnlineId())
+        // Define this to require a login to the stk server (default behaviour)
+        // Undefine for testing LAN only.
+        if (MainMenuScreen::m_enable_online)
         {
-            ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
-            OnlineProfileServers::getInstance()->push();
+            OnlineScreen::getInstance()->push();
         }
         else
         {
-            UserScreen::getInstance()->push();
+            if (PlayerManager::getCurrentOnlineId())
+            {
+                ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
+                TabOnlineProfileAchievements::getInstance()->push();
+            }
+            else
+            {
+                UserScreen::getInstance()->push();
+            }
         }
     }
     else if (selection == "addons")

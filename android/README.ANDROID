@@ -1,0 +1,147 @@
+================================================================================
+
+ SUPERTUXKART
+
+================================================================================
+
+
+
+--------------------------------------------------------------------------------
+ SYSTEM REQUIREMENTS
+--------------------------------------------------------------------------------
+
+To run SuperTuxKart on Android, you need a device that meets following
+requirements:
+
+- Android 4.4 or later
+- Processor compatible with armv7 or x86
+- GPU that supports OpenGL ES 3.0
+- 1 GB RAM (STK uses ~150 MB in minimal configuration)
+- 300 MB of free space on internal storage
+- Touch screen or external keyboard
+
+
+
+--------------------------------------------------------------------------------
+ COMPILATION
+--------------------------------------------------------------------------------
+
+The build scripts are designed to run under linux. They may work under cygwin
+after some tweaks, but atm. only linux is supported.
+
+Dependencies list (may be incomplete):
+
+    autoconf, automake, make, python, gradle, ant, imagemagick, cmake, 
+    vorbis-tools
+
+Additionally some dependencies for optimize_data script:
+
+    advancecomp, libjpeg-progs, optipng
+
+Before compilation you must download the package with dependencies from:
+https://github.com/supertuxkart/dependencies
+and extract it to stk-code/lib. It contains sources of libraries that are used
+in STK, but are not availiable in stk-code repository (curl, freetype, openal).
+
+You need also Android SDK for android-19 platform (the API for Android 4.4) and
+Android NDK. Note that NDK >= r15 is atm. not supported. Version r12b is
+strongly recommended, because it's known that it works without issues.
+
+You need to create proper "android-sdk" and "android-ndk" symlinks in the
+directory with Android project, so that the compilation script will have access
+to the SDK and NDK.
+
+Before running the compilation, run the generate_assets script, so that
+selected assets will be copied to "assets" directory, and then included in the
+apk file.
+
+You can select different karts and tracks by setting KARTS and TRACKS variables
+in the generate_assets.sh script at the beginning of file.
+
+When you are creating the assets directory manually, note that the
+directories.txt file is urgently needed and it is used by the application for
+extracting assets.
+
+If the assets directory is already prepared, you can run "./make.sh" command to
+build the project and create an apk file. Note that all arguments are passed to
+the make command, so that you can run "./make.sh -j5" for multi-threaded build.
+
+Basically if all dependencies are installed in the system, it should be enough
+to just run:
+
+    export SDK_PATH=/path/to/your/android/sdk
+    export NDK_PATH=/path/to/your/android/ndk
+    ./generate_assets.sh
+    ./make.sh -j5
+
+
+
+--------------------------------------------------------------------------------
+ ENVIRONMENT VARIABLES
+--------------------------------------------------------------------------------
+
+COMPILE_ARCH    - Allows to choose CPU architecture for which the package will
+                  be compiled. 
+                  Possible values: armv7, aarch64, x86, x86_64.
+                  Default is: armv7.
+
+BUILD_TYPE      - Allows to set build type.
+                  Possible values: debug, release, beta.
+                  Default is: debug.
+
+BUILD_TOOL      - Allows to choose a tool that is used for creating package. 
+                  Note that ant has been already removed from Android SDK, so 
+                  you have to use SDK <= 25.2.5 for building with ant.
+                  Possible values: ant, gradle.
+                  Default is: gradle.
+
+BUILD_TOOLS_VER - Allows to override the SDK build-tools version.
+
+SDK_PATH        - Path to SDK directory
+
+NDK_PATH        - Path to NDK directory
+
+PROJECT_VERSION - Set Supertuxkart version number, for example "0.9.3" or 
+                  "git20170409" or whatever. 
+                  Default is: git.
+
+PROJECT_CODE    - Set Supertuxkart version code that is used in the manifest 
+                  file.
+                  Default is: 1.
+
+
+
+--------------------------------------------------------------------------------
+ RELEASE BUILD
+--------------------------------------------------------------------------------
+
+Making a release build is similar to typical compilation, but there are few
+additional things to do. 
+
+You have to set PROJECT_VERSION variable. This is important, because assets 
+manager in STK checks that value and detects if already extracted data files are
+up to date. So that when you will install new STK version, this will force new 
+data extraction automatically.
+
+The PROJECT_CODE variable typically should be set to a value higher than for
+previous release, so that users will receive the upgrade.
+
+Before compilation you have to set:
+
+    export BUILD_TYPE=release
+
+and then you make standard compilation with:
+
+    ./generate_assets.sh
+    ./make.sh -j5
+    
+
+The compiled apk is unsigned, so you have to sign it with your key. To sign it,
+you have to run:
+
+    jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore \
+        my-release-key.keystore SuperTuxKart-release-unsigned.apk alias_name
+        
+and then:
+
+    zipalign -v 4 SuperTuxKart-release-unsigned.apk SuperTuxKart-release.apk

@@ -31,26 +31,54 @@
  * Here is an overview of the high-level interactions between modules :
  \dot
  digraph interaction {
- race -> modes
+# race -> modes
  race -> tracks
  race -> karts
- modes -> tracks
- modes -> karts
+# modes -> tracks
+# modes -> karts
  tracks -> graphics
  karts -> graphics
  tracks -> items
- graphics -> irrlicht
- guiengine -> irrlicht
- states_screens -> guiengine
- states_screens -> input
- guiengine -> input
- karts->physics
- tracks->physics
- karts -> controller
- input->controller
+ items -> graphics
+ animations -> graphics
+ graphics -> "Antarctica/irrlicht"
+# guiengine -> irrlicht
+# states_screens -> guiengine
+# input -> states_screens
+ input -> guiengine
+ guiengine -> font_system
+ karts -> physics
+ physics -> karts
+ tracks -> physics
+ ai -> controller
+ controller -> karts
+ input -> controller
  tracks -> animations
  physics -> animations
- }
+ animations -> physics
+ karts -> audio
+ physics -> audio
+ "translations\n(too many connections\nto draw)"
+ "configuration\n(too many connections\nto draw)"
+ addons -> tracks
+ addons -> karts
+ guiengine -> addons
+ guiengine -> race
+ addons -> online_manager
+ challenges -> race
+# challenges -> modes
+ guiengine -> challenges
+ online_manager -> addons
+ online_manager -> "STK Server"
+ "STK Server" -> online_manager
+ karts -> replay
+ replay 
+ # force karts and tracks on the same level, looks better this way
+ subgraph { 
+  rank = same; karts; tracks; 
+ } 
+
+}
  \enddot
 
  Note that this graph is only an approximation because the real one would be
@@ -73,6 +101,8 @@
    This module handles the user configuration, the supertuxkart configuration
    file (which contains options usually not edited by the player) and the input
    configuration file.
+ \li \ref font :
+   This module stores font files and tools used to draw characters in STK.
  \li \ref graphics :
    This module contains the core graphics engine, that is mostly a thin layer
    on top of irrlicht providing some additional features we need for STK
@@ -127,6 +157,7 @@
 #    include <direct.h>
 #  endif
 #else
+#  include <signal.h>
 #  include <unistd.h>
 #endif
 #include <stdexcept>
@@ -150,13 +181,17 @@
 #include "config/player_profile.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "font/font_manager.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/camera_debug.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/referee.hpp"
+#include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_shader.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/dialog_queue.hpp"
@@ -168,14 +203,22 @@
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
+#include "karts/combined_characteristic.hpp"
 #include "karts/controller/ai_base_lap_controller.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/cutscene_world.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
+#include "network/protocols/connect_to_server.hpp"
+#include "network/protocols/client_lobby.hpp"
+#include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
+#include "network/rewind_manager.hpp"
+#include "network/rewind_queue.hpp"
+#include "network/server.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
 #include "online/profile_manager.hpp"
@@ -187,10 +230,13 @@
 #include "replay/replay_play.hpp"
 #include "replay/replay_recorder.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/networking_lobby.hpp"
 #include "states_screens/register_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
+#include "states_screens/dialogs/init_android_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "tracks/arena_graph.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/command_line.hpp"
@@ -198,6 +244,7 @@
 #include "utils/crash_reporting.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/log.hpp"
+#include "utils/mini_glm.hpp"
 #include "utils/translation.hpp"
 
 static void cleanSuperTuxKart();
@@ -268,8 +315,9 @@ void gamepadVisualisation()
 
                     if (evt.PressedDown)
                     {
-                        if (evt.Key == KEY_RETURN || evt.Key == KEY_ESCAPE ||
-                            evt.Key == KEY_SPACE)
+                        if (evt.Key == IRR_KEY_RETURN || 
+                            evt.Key == IRR_KEY_ESCAPE ||
+                            evt.Key == IRR_KEY_SPACE)
                         {
                             exit(0);
                         }
@@ -383,7 +431,7 @@ void handleXmasMode()
     }   // switch m_xmas_mode
 
     if(xmas)
-        kart_properties_manager->setHatMeshName("christmas_hat.b3d");
+        kart_properties_manager->setHatMeshName("christmas_hat.spm");
 }   // handleXmasMode
 // ============================================================================
 /** Determines if Easter Ears should be used
@@ -391,9 +439,11 @@ void handleXmasMode()
  */
 bool isEasterMode(int day, int month, int year, int before_after_days)
 {
-    switch (UserConfigParams::m_easter_ear_mode)
-    {
-    case 0:
+    if (UserConfigParams::m_easter_ear_mode == 1) {
+        return true;
+    }
+
+    if (UserConfigParams::m_easter_ear_mode == 0)
     {
         // Compute Easter date, based on wikipedia formula
         // http://en.wikipedia.org/wiki/Computus
@@ -425,12 +475,9 @@ bool isEasterMode(int day, int month, int year, int before_after_days)
         }
         return (month > easter_start_month || (month == easter_start_month && day >= easter_start_day)) &&
                (month < easter_end_month   || (month == easter_end_month   && day <= easter_end_day));
-        break;
     }
-    case 1:  return true;  break;
-    default: return false; break;
-    }   // switch m_xmas_mode
 
+    return false;
 }   // isEasterMode(day, month, year, before_after_days)
 
 // ============================================================================
@@ -441,7 +488,7 @@ void handleEasterEarMode()
     int day, month, year;
     StkTime::getDate(&day, &month, &year);
     if (isEasterMode(day, month, year, /*before_after_days*/5))
-        kart_properties_manager->setHatMeshName("easter_ears.b3d");
+        kart_properties_manager->setHatMeshName("easter_ears.spm");
 }   // handleEasterMode
 
 // ============================================================================
@@ -469,7 +516,7 @@ void setupRaceStart()
         Log::warn("main", "Kart '%s' is unknown so will use the "
             "default kart.",
             UserConfigParams::m_default_kart.c_str());
-        race_manager->setPlayerKart(0, 
+        race_manager->setPlayerKart(0,
                            UserConfigParams::m_default_kart.getDefaultValue());
     }
     else
@@ -491,72 +538,113 @@ void cmdLineHelp()
 {
     fprintf(stdout,
     "Usage: %s [OPTIONS]\n\n"
-    "Run SuperTuxKart, a racing game with go-kart that features"
-    " the Tux and friends.\n\n"
+    "Run SuperTuxKart, a go-kart racing game that features "
+    "Tux and friends.\n\n"
     "Options:\n"
     "  -N,  --no-start-screen  Immediately start race without showing a "
                               "menu.\n"
     "  -R,  --race-now         Same as -N but also skip the ready-set-go phase"
                               " and the music.\n"
-    "  -t,  --track=NAME       Start at track NAME.\n"
+    "  -t,  --track=NAME       Start track NAME.\n"
     "       --gp=NAME          Start the specified Grand Prix.\n"
-    "       --add-gp-dir=DIR   Load Grand Prix in DIR. Setting will be saved "
-                              "inconfig.xml under additional_gp_directory. Use "
+    "       --add-gp-dir=DIR   Load Grand Prix files in DIR. Setting will be saved\n"
+                              "in config.xml under additional_gp_directory. Use\n"
                               "--add-gp-dir=\"\" to unset.\n"
     "       --stk-config=FILE  use ./data/FILE instead of "
                               "./data/stk_config.xml\n"
-    "  -k,  --numkarts=NUM     Number of karts on the racetrack.\n"
-    "       --kart=NAME        Use kart number NAME.\n"
-    "       --ai=a,b,...       Use the karts a, b, ... for the AI.\n"
+    "  -k,  --numkarts=NUM     Set number of karts on the racetrack.\n"
+    "       --kart=NAME        Use kart NAME.\n"
+    "       --ai=a,b,...       Use the karts a, b, ... for the AI, and additional player kart.\n"
+    "       --aiNP=a,b,...     Use the karts a, b, ... for the AI, no additional player kart.\n"
     "       --laps=N           Define number of laps to N.\n"
-    "       --mode=N           N=1 novice, N=2 driver, N=3 racer.\n"
-    "       --type=N           N=0 Normal, N=1 Time trial, N=2 FTL\n"
+    "       --mode=N           N=1 Beginner, N=2 Intermediate, N=3 Expert, N=4 SuperTux.\n"
+    "       --type=N           N=0 Normal, N=1 Time trial, N=2 Follow The Leader\n"
     "       --reverse          Play track in reverse (if allowed)\n"
-    "  -f,  --fullscreen       Select fullscreen display.\n"
-    "  -w,  --windowed         Windowed display (default).\n"
-    "  -s,  --screensize=WxH   Set the screen size (e.g. 320x200).\n"
-    "  -v,  --version          Show version of SuperTuxKart.\n"
+    "  -f,  --fullscreen       Use fullscreen display.\n"
+    "  -w,  --windowed         Use windowed display (default).\n"
+    "  -s,  --screensize=WxH   Set the display size (e.g. 320x200).\n"
+    "  -v,  --version          Print version of SuperTuxKart.\n"
     "       --trackdir=DIR     A directory from which additional tracks are "
                               "loaded.\n"
     "       --profile-laps=n   Enable automatic driven profile mode for n "
                               "laps.\n"
     "       --profile-time=n   Enable automatic driven profile mode for n "
                               "seconds.\n"
+    "       --unlock-all       Permanently unlock all karts and tracks for testing.\n"
+    "       --no-unlock-all    Disable unlock-all (i.e. base unlocking on player achievement).\n"
     "       --no-graphics      Do not display the actual race.\n"
-    "       --demo-mode=t      Enables demo mode after t seconds idle time in "
+    "       --sp-shader-debug  Enables debug in sp shader, it will print all unavailable uniforms.\n"
+    "       --demo-mode=t      Enables demo mode after t seconds of idle time in "
                                "main menu.\n"
     "       --demo-tracks=t1,t2 List of tracks to be used in demo mode. No\n"
     "                          spaces are allowed in the track names.\n"
-    "       --demo-laps=n      Number of laps in a demo.\n"
+    "       --demo-laps=n      Number of laps to use in a demo.\n"
     "       --demo-karts=n     Number of karts to use in a demo.\n"
     // "       --history          Replay history file 'history.dat'.\n"
-    // "       --history=n        Replay history file 'history.dat' using:\n"
-    // "                            n=1: recorded positions\n"
-    // "                            n=2: recorded key strokes\n"
     // "       --test-ai=n        Use the test-ai for every n-th AI kart.\n"
     // "                          (so n=1 means all Ais will be the test ai)\n"
-    // "                             
-    "       --server=name      Start a server (not a playing client).\n"
+    // "
+    "       --network-console  Enable network console.\n"
+    "       --wan-server=name  Start a Wan server (not a playing client).\n"
+    "       --public-server    Allow direct connection to the server (without stk server)\n"
     "       --lan-server=name  Start a LAN server (not a playing client).\n"
     "       --server-password= Sets a password for a server (both client&server).\n"
+    "       --connect-now=ip   Connect to a server with IP known now\n"
+    "                          (in format x.x.x.x:xxx(port)), the port should be its\n"
+    "                          public port.\n"
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --port=n           Port number to use.\n"
+    "       --disable-lan      Disable LAN detection (connect using WAN).\n"
+    "       --auto-connect     Automatically connect to fist server and start race\n"
     "       --max-players=n    Maximum number of clients (server only).\n"
-    "       --no-console       Does not write messages in the console but to\n"
+    "       --no-console-log   Does not write messages in the console but to\n"
     "                          stdout.log.\n"
-    "       --console          Write messages in the console and files\n"
     "  -h,  --help             Show this help.\n"
     "       --log=N            Set the verbosity to a value between\n"
     "                          0 (Debug) and 5 (Only Fatal messages)\n"
+    "       --logbuffer=N      Buffers up to N lines log lines before writing.\n"
     "       --root=DIR         Path to add to the list of STK root directories.\n"
     "                          You can specify more than one by separating them\n"
     "                          with colons (:).\n"
     "       --cutscene=NAME    Launch the specified track as a cutscene.\n"
     "                          This is for internal debugging use only.\n"
+    "       --enable-glow      Enable glow effect.\n"
+    "       --disable-glow     Disable glow effect.\n"
+    "       --enable-bloom     Enable bloom effect.\n"
+    "       --disable-bloom    Disable bloom effect.\n"
+    "       --enable-light-shaft Enable light shafts (God rays).\n"
+    "       --disable-light-shaft Disable light shafts (God rays).\n"
+    "       --enable-dof       Enable depth of field.\n"
+    "       --disable-dof      Disable depth of field.\n"
+    "       --enable-particles  Enable particles.\n"
+    "       --disable-particles Disable particles.\n"
+    "       --enable-animated-characters  Enable animated characters.\n"
+    "       --disable-animated-characters Disable animated characters.\n"
+    "       --enable-motion-blur Enable motion blur.\n"
+    "       --disable-motion-blur Disable motion blur.\n"
+    "       --enable-mlaa      Enable anti-aliasing.\n"
+    "       --disable-mlaa     Disable anti-aliasing.\n"
+    "       --enable-texture-compression Enable texture compression.\n"
+    "       --disable-texture-compression Disable texture compression.\n"
+    "       --enable-ssao      Enable screen space ambient occlusion.\n"
+    "       --disable-ssao     Disable screen space ambient occlusion.\n"
+    "       --enable-ibl       Enable image based lighting.\n"
+    "       --disable-ibl      Disable image based lighting.\n"
+    "       --enable-hd-textures Enable high definition textures.\n"
+    "       --disable-hd-textures Disable high definition textures.\n"
+    "       --enable-dynamic-lights Enable advanced pipline.\n"
+    "       --disable-dynamic-lights Disable advanced pipline.\n"
+    "       --anisotropic=n     Anisotropic filtering quality (0 to disable).\n"
+    "                           Takes precedence over trilinear or bilinear\n"
+    "                           texture filtering.\n"
+    "       --shadows=n         Set resolution of shadows (0 to disable).\n"
+    "       --apitrace          This will disable buffer storage and\n"
+    "                           writing gpu query strings to opengl, which\n"
+    "                           can be seen later in apitrace.\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
-    "http://supertuxkart.sourceforge.net\n\n",
+    "https://supertuxkart.net\n\n",
     CommandLine::getExecName().c_str()
     );
 }   // cmdLineHelp
@@ -579,10 +667,6 @@ int handleCmdLineOutputModifier()
     {
         Log::info("main", "==============================");
         Log::info("main", "SuperTuxKart, %s.", STK_VERSION ) ;
-        // IRRLICHT_VERSION_SVN
-        Log::info("main", "Irrlicht version %i.%i.%i (%s)",
-                          IRRLICHT_VERSION_MAJOR , IRRLICHT_VERSION_MINOR,
-                          IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
         Log::info("main", "==============================");
         cleanUserConfig();
         exit(0);
@@ -591,18 +675,16 @@ int handleCmdLineOutputModifier()
     int n;
     if(CommandLine::has("--log", &n))
         Log::setLogLevel(n);
+    if (CommandLine::has("--logbuffer", &n))
+        Log::setBufferSize(n);
 
     if(CommandLine::has("--log=nocolor"))
     {
         Log::disableColor();
         Log::verbose("main", "Colours disabled.");
     }
-
-    if(CommandLine::has("--console"))
-        UserConfigParams::m_log_errors_to_console=true;
-    if(CommandLine::has("--no-console"))
-        UserConfigParams::m_log_errors_to_console=false;
-
+    if(CommandLine::has("--no-console-log"))
+        Log::toggleConsoleLog(false);
 
     return 0;
 }
@@ -634,6 +716,12 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
     if(CommandLine::has("--online"))
         MainMenuScreen::m_enable_online=true;
+#if !(defined(SERVER_ONLY) || defined(ANDROID))
+    if(CommandLine::has("--apitrace"))
+    {
+        SP::sp_apitrace = true;
+    }
+#endif
 
     std::string s;
     if(CommandLine::has("--stk-config", &s))
@@ -646,11 +734,13 @@ int handleCmdLinePreliminary()
     if(CommandLine::has("--kartdir", &s))
         KartPropertiesManager::addKartSearchDir(s);
 
+#ifndef SERVER_ONLY
     if(CommandLine::has("--no-graphics") || CommandLine::has("-l"))
-    {
+#endif
         ProfileWorld::disableGraphics();
-        UserConfigParams::m_log_errors_to_console=true;
-    }
+
+    if (CommandLine::has("--sp-shader-debug"))
+        SP::SPShader::m_sp_shader_debug = true;
 
     if(CommandLine::has("--screensize", &s) || CommandLine::has("-s", &s))
     {
@@ -705,6 +795,67 @@ int handleCmdLinePreliminary()
     if(CommandLine::has("--windowed") || CommandLine::has("-w"))
         UserConfigParams::m_fullscreen = false;
 
+    // toggle graphical options
+    if (CommandLine::has("--enable-glow"))
+        UserConfigParams::m_glow = true;
+    else if (CommandLine::has("--disable-glow"))
+        UserConfigParams::m_glow = false;
+    if (CommandLine::has("--enable-bloom"))
+        UserConfigParams::m_bloom = true;
+    else if (CommandLine::has("--disable-bloom"))
+        UserConfigParams::m_bloom = false;
+    if (CommandLine::has("--enable-light-shaft"))
+        UserConfigParams::m_light_shaft = true;
+    else if (CommandLine::has("--disable-light-shaft"))
+        UserConfigParams::m_light_shaft = false;
+    if (CommandLine::has("--enable-dynamic-lights"))
+        UserConfigParams::m_dynamic_lights = true;
+    else if (CommandLine::has("--disable-dynamic-lights"))
+        UserConfigParams::m_dynamic_lights = false;
+    // depth of field
+    if (CommandLine::has("--enable-dof"))
+        UserConfigParams::m_dof = true;
+    else if (CommandLine::has("--disable-dof"))
+        UserConfigParams::m_dof = false;
+    // particles effects
+    if (CommandLine::has("--enable-particles"))
+        UserConfigParams::m_particles_effects = 2;
+    else if (CommandLine::has("--disable-particles"))
+        UserConfigParams::m_particles_effects = 0;
+    // animated characters
+    if (CommandLine::has("--enable-animated-characters"))
+        UserConfigParams::m_animated_characters = true;
+    else if (CommandLine::has("--disable-animated-characters"))
+        UserConfigParams::m_animated_characters = false;
+    if (CommandLine::has("--enable-motion-blur"))
+        UserConfigParams::m_motionblur = true;
+    else if (CommandLine::has("--disable-motion-blur"))
+        UserConfigParams::m_motionblur = false;
+    // anti-aliasing
+    if (CommandLine::has("--enable-mlaa"))
+        UserConfigParams::m_mlaa = true;
+    else if (CommandLine::has("--disable-mlaa"))
+        UserConfigParams::m_mlaa = false;
+    if (CommandLine::has("--enable-texture-compression"))
+        UserConfigParams::m_texture_compression = true;
+    else if (CommandLine::has("--disable-texture-compression"))
+        UserConfigParams::m_texture_compression = false;
+    // screen space ambient occluison
+    if (CommandLine::has("--enable-ssao"))
+        UserConfigParams::m_ssao = true;
+    else if (CommandLine::has("--disable-ssao"))
+        UserConfigParams::m_ssao = false;
+    // image based lighting
+    if (CommandLine::has("--enable-ibl"))
+        UserConfigParams::m_degraded_IBL = false;
+    else if (CommandLine::has("--disable-ibl"))
+        UserConfigParams::m_degraded_IBL = true;
+    // high definition textures user choice
+    if (CommandLine::has("--enable-hd-textures"))
+        UserConfigParams::m_high_definition_textures =  2 | 1;
+    else if (CommandLine::has("--disable-hd-textures"))
+        UserConfigParams::m_high_definition_textures = 2;
+
     // Enable loading grand prix from local directory
     if(CommandLine::has("--add-gp-dir", &s))
     {
@@ -723,6 +874,10 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_xmas_mode = n;
     if (CommandLine::has("--easter", &n))
         UserConfigParams::m_easter_ear_mode = n;
+    if (CommandLine::has("--shadows", &n))
+        UserConfigParams::m_shadows_resolution = n;
+    if (CommandLine::has("--anisotropic", &n))
+        UserConfigParams::m_anisotropic = n;
 
     // Useful for debugging: the temple navmesh needs 12 minutes in debug
     // mode to compute the distance matrix!!
@@ -743,7 +898,6 @@ int handleCmdLine()
     int n;
     std::string s;
 
-    bool try_login = false;
     irr::core::stringw login, password;
 
     if (CommandLine::has("--unit-testing"))
@@ -774,6 +928,8 @@ int handleCmdLine()
         AIBaseController::setTestAI(n);
     if (CommandLine::has("--fps-debug"))
         UserConfigParams::m_fps_debug = true;
+    if (CommandLine::has("--rewind") )
+        RewindManager::setEnable(true);
     if(CommandLine::has("--soccer-ai-stats"))
     {
         UserConfigParams::m_arena_ai_stats=true;
@@ -793,13 +949,16 @@ int handleCmdLine()
     }
     if(CommandLine::has("--battle-ai-stats"))
     {
+        std::string track;
+        if (!CommandLine::has("--track", &track))
+            track = "temple";
         UserConfigParams::m_arena_ai_stats=true;
         race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
         std::vector<std::string> l;
         for (int i = 0; i < 8; i++)
             l.push_back("tux");
         race_manager->setDefaultAIKartList(l);
-        race_manager->setTrack("temple");
+        race_manager->setTrack(track);
         race_manager->setNumKarts(8);
         race_manager->setDifficulty(RaceManager::Difficulty(3));
         UserConfigParams::m_no_start_screen = true;
@@ -808,58 +967,229 @@ int handleCmdLine()
         UserConfigParams::m_music = false;
     }
 
-    if(UserConfigParams::m_artist_debug_mode)
+    if (UserConfigParams::m_artist_debug_mode)
     {
-       if(CommandLine::has("--camera-wheel-debug"))
-           Camera::setDebugMode(Camera::CM_DEBUG_GROUND);
+        if (CommandLine::has("--camera-wheel-debug"))
+        {
+            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
+            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_GROUND);
+        }
         if(CommandLine::has("--camera-debug"))
-            Camera::setDebugMode(Camera::CM_DEBUG_TOP_OF_KART);
+        {
+            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
+            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_TOP_OF_KART);
+        }
         if(CommandLine::has("--camera-kart-debug"))
-            Camera::setDebugMode(Camera::CM_DEBUG_BEHIND_KART);
+        {
+            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
+            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_BEHIND_KART);
+        }
         if(CommandLine::has("--physics-debug"))
             UserConfigParams::m_physics_debug=1;
         if(CommandLine::has("--check-debug"))
             UserConfigParams::m_check_debug=true;
     }
 
+    if (CommandLine::has( "--difficulty", &s))
+    {
+        int n = atoi(s.c_str());
+        if(n<0 || n>RaceManager::DIFFICULTY_LAST)
+            Log::warn("main", "Invalid difficulty '%s' - ignored.\n",
+                      s.c_str());
+        else
+            race_manager->setDifficulty(RaceManager::Difficulty(n));
+    }   // --mode
+
+    if (CommandLine::has("--type", &n))
+    {
+        switch (n)
+        {
+        // The order here makes server creation screen easier
+        case 0: race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
+                break;
+        case 1: race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
+                break;
+        case 2: race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+                break;
+        case 3: race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
+                break;
+        case 4: race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
+                break;
+        default:
+                Log::warn("main", "Invalid race type '%d' - ignored.", n);
+        }
+    }   // --type
+
+    if (CommandLine::has("--login", &s))
+        login = s.c_str();
+    if (CommandLine::has("--password", &s))
+        password = s.c_str();
+
+    bool can_wan = false;
+    if (!login.empty() && !password.empty())
+    {
+        irr::core::stringw s;
+        PlayerManager::requestSignIn(login, password);
+        while (PlayerManager::getCurrentOnlineState() != PlayerProfile::OS_SIGNED_IN)
+        {
+            Online::RequestManager::get()->update(0.0f);
+            StkTime::sleep(1);
+        }
+        Log::info("Main", "Logged in from command-line.");
+        can_wan = true;
+    }
+
+    if (!can_wan && CommandLine::has("--login-id", &n) &&
+        CommandLine::has("--token", &s))
+    {
+        NetworkConfig::get()->setCurrentUserId(n);
+        NetworkConfig::get()->setCurrentUserToken(s);
+        can_wan = true;
+    }
+
     // Networking command lines
-    NetworkConfig::get()->
-        setMaxPlayers(UserConfigParams::m_server_max_players);
-    if(CommandLine::has("--server", &s))
-    {
-        NetworkConfig::get()->setServerName(core::stringw(s.c_str()));
-        NetworkConfig::get()->setIsServer(true);
-        NetworkConfig::get()->setIsWAN();
-        STKHost::create();
-        Log::info("main", "Creating a WAN server '%s'.", s.c_str());
-    } 
-    if (CommandLine::has("--lan-server", &s))
-    {
-        NetworkConfig::get()->setServerName(core::stringw(s.c_str()));
-        NetworkConfig::get()->setIsServer(true);
-        NetworkConfig::get()->setIsLAN();
-        STKHost::create();
-        Log::info("main", "Creating a LAN server '%s'.", s.c_str());
-    }   
+    if(CommandLine::has("--network-console"))
+        STKHost::m_enable_console = true;
+
+    std::string server_password;
     if (CommandLine::has("--server-password", &s))
     {
-        NetworkConfig::get()->setPassword(s);
+        server_password = s;
+        NetworkConfig::get()->setPassword(server_password);
+    }
+
+    if (CommandLine::has("--motd", &s))
+    {
+        core::stringw motd = StringUtils::xmlDecode(s);
+        NetworkConfig::get()->setMOTD(motd);
+    }
+
+    if (CommandLine::has("--server-id-file", &s))
+    {
+        NetworkConfig::get()->setServerIdFile(
+            file_manager->getUserConfigFile(s));
     }
 
     if(CommandLine::has("--max-players", &n))
         UserConfigParams::m_server_max_players=n;
-
-    if(CommandLine::has("--start-console"))
-        STKHost::m_enable_console = true;
-
-    if(CommandLine::has("--login", &s) )
+    NetworkConfig::get()->
+        setMaxPlayers(UserConfigParams::m_server_max_players);
+    if (CommandLine::has("--port", &n))
     {
-        login = s.c_str();
-        try_login = true;
-    }   // --login
+        // We don't know if this instance is going to be a client
+        // or server, so just set both ports, only one will be used anyway
+        NetworkConfig::get()->setClientPort(n);
+        NetworkConfig::get()->setServerPort(n);
+    }
+    if (CommandLine::has("--public-server"))
+    {
+        NetworkConfig::get()->setIsPublicServer();
+    }
+    if (CommandLine::has("--connect-now", &s))
+    {
+        TransportAddress server_addr(s);
+        NetworkConfig::get()->setIsWAN();
+        NetworkConfig::get()->setIsServer(false);
+        auto server = std::make_shared<Server>(0, L"", 0, 0, 0, 0, server_addr,
+            !server_password.empty());
+        NetworkConfig::get()->addNetworkPlayer(
+            input_manager->getDeviceManager()->getLatestUsedDevice(),
+            PlayerManager::getCurrentPlayer(), false/*handicap*/);
+        NetworkConfig::get()->doneAddingNetworkPlayers();
+        STKHost::create();
+        auto cts = std::make_shared<ConnectToServer>(server);
+        cts->setup();
+        Log::info("main", "Trying to connect to server '%s'.",
+            server_addr.toString().c_str());
+        if (!cts->handleDirectConnect(10000))
+        {
+            Log::error("main", "Timeout trying to connect to server '%s'.",
+                server_addr.toString().c_str());
+            STKHost::get()->shutdown();
+            exit(0);
+        }
+        else
+        {
+            auto cl = LobbyProtocol::create<ClientLobby>();
+            cl->setAddress(server_addr);
+            cl->requestStart();
+        }
+    }
 
-    if(CommandLine::has("--password", &s))
-        password = s.c_str();
+    std::shared_ptr<LobbyProtocol> server_lobby;
+    if (CommandLine::has("--wan-server", &s))
+    {
+        // Try to use saved user token if exists
+        PlayerProfile* player = PlayerManager::getCurrentPlayer();
+        if (!can_wan && player && player->wasOnlineLastTime() &&
+            player->wasOnlineLastTime() && player->hasSavedSession())
+        {
+            while (PlayerManager::getCurrentOnlineState() != PlayerProfile::OS_SIGNED_IN)
+            {
+                Online::RequestManager::get()->update(0.0f);
+                StkTime::sleep(1);
+            }
+            can_wan = true;
+        }
+        else if (!can_wan)
+        {
+            Log::warn("main", "No saved online player session to create a wan server");
+        }
+        if (can_wan)
+        {
+            NetworkConfig::get()->setServerName(StringUtils::xmlDecode(s));
+            NetworkConfig::get()->setIsServer(true);
+            NetworkConfig::get()->setIsWAN();
+            NetworkConfig::get()->setIsPublicServer();
+            server_lobby = STKHost::create();
+            Log::info("main", "Creating a WAN server '%s'.", s.c_str());
+        }
+    }
+    else if (CommandLine::has("--lan-server", &s))
+    {
+        NetworkConfig::get()->setServerName(StringUtils::xmlDecode(s));
+        NetworkConfig::get()->setIsServer(true);
+        NetworkConfig::get()->setIsLAN();
+        server_lobby = STKHost::create();
+        Log::info("main", "Creating a LAN server '%s'.", s.c_str());
+    }
+    if (CommandLine::has("--auto-connect"))
+    {
+        NetworkConfig::get()->setAutoConnect(true);
+    }
+
+    if (CommandLine::has("--extra-server-info", &n))
+    {
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+        {
+            LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
+                ->setSoccerGoalTarget((bool)n);
+            NetworkConfig::get()->setServerMode(
+                race_manager->getMinorMode(),
+                RaceManager::MAJOR_MODE_SINGLE);
+        }
+        else
+        {
+            LobbyProtocol::get<LobbyProtocol>()->getGameSetup()
+                ->setGrandPrixTrack(n);
+            NetworkConfig::get()->setServerMode(
+                race_manager->getMinorMode(),
+                RaceManager::MAJOR_MODE_GRAND_PRIX);
+        }
+    }
+    else
+    {
+        NetworkConfig::get()->setServerMode(
+            race_manager->getMinorMode(), RaceManager::MAJOR_MODE_SINGLE);
+    }
+    // The extra server info has to be set before server lobby started
+    if (server_lobby)
+        server_lobby->requestStart();
+
+    /** Disable detection of LAN connection when connecting via WAN. This is
+     *  mostly a debugging feature to force using WAN connection. */
+    if (CommandLine::has("--disable-lan"))
+        NetworkConfig::m_disable_lan = true;
 
     // Race parameters
     if(CommandLine::has("--kartsize-debug"))
@@ -913,6 +1243,13 @@ int handleCmdLine()
         race_manager->setNumKarts((int)l.size()+1);
     }   // --ai
 
+    if(CommandLine::has("--aiNP", &s))
+    {
+        const std::vector<std::string> l=StringUtils::split(std::string(s),',');
+        race_manager->setDefaultAIKartList(l);
+        race_manager->setNumKarts((int)l.size());
+    }   // --aiNP
+
     if(CommandLine::has( "--mode", &s) || CommandLine::has( "--difficulty", &s))
     {
         int n = atoi(s.c_str());
@@ -941,7 +1278,7 @@ int handleCmdLine()
     if(CommandLine::has("--track", &s) || CommandLine::has("-t", &s))
     {
         race_manager->setTrack(s);
-        Log::verbose("main", "You choose to start in track '%s'.",
+        Log::verbose("main", "You chose to start in track '%s'.",
                      s.c_str());
 
         Track* t = track_manager->getTrack(s);
@@ -951,7 +1288,7 @@ int handleCmdLine()
         }
         else if (t->isArena())
         {
-            //if it's arena, don't create ai karts
+            //if it's arena, don't create AI karts
             const std::vector<std::string> l;
             race_manager->setDefaultAIKartList(l);
             // Add 1 for the player kart
@@ -960,7 +1297,7 @@ int handleCmdLine()
         }
         else if (t->isSoccer())
         {
-            //if it's soccer, don't create ai karts
+            //if it's soccer, don't create AI karts
             const std::vector<std::string> l;
             race_manager->setDefaultAIKartList(l);
             // Add 1 for the player kart
@@ -972,6 +1309,7 @@ int handleCmdLine()
     // used only for debugging/testing
     if (CommandLine::has("--cutscene", &s))
     {
+        UserConfigParams::m_no_start_screen = true; // Purple menu background otherwise
         race_manager->setTrack(s);
         StateManager::get()->enterGameState();
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
@@ -995,16 +1333,16 @@ int handleCmdLine()
 
     if(CommandLine::has("--numkarts", &n) ||CommandLine::has("-k", &n))
     {
-        UserConfigParams::m_num_karts = n;
-        if(UserConfigParams::m_num_karts > stk_config->m_max_karts)
+        UserConfigParams::m_default_num_karts = n;
+        if(UserConfigParams::m_default_num_karts > stk_config->m_max_karts)
         {
             Log::warn("main", "Number of karts reset to maximum number %d.",
                       stk_config->m_max_karts);
-            UserConfigParams::m_num_karts = stk_config->m_max_karts;
+            UserConfigParams::m_default_num_karts = stk_config->m_max_karts;
         }
-        race_manager->setNumKarts( UserConfigParams::m_num_karts );
+        race_manager->setNumKarts( UserConfigParams::m_default_num_karts );
         Log::verbose("main", "%d karts will be used.",
-                     (int)UserConfigParams::m_num_karts);
+                     (int)UserConfigParams::m_default_num_karts);
     }   // --numkarts
 
     if(CommandLine::has( "--no-start-screen") ||
@@ -1026,7 +1364,7 @@ int handleCmdLine()
         }
         else
         {
-            Log::verbose("main", "You choose to have %d laps.", laps);
+            Log::verbose("main", "You chose to have %d laps.", laps);
             race_manager->setNumLaps(laps);
         }
     }   // --laps
@@ -1046,7 +1384,17 @@ int handleCmdLine()
             race_manager->setNumLaps(n);
         }
     }   // --profile-laps
-
+    
+    if(CommandLine::has("--unlock-all"))
+    {
+        UserConfigParams::m_everything_unlocked = true;
+    } // --unlock-all
+    
+    if(CommandLine::has("--no-unlock-all"))
+    {
+        UserConfigParams::m_everything_unlocked = false;
+    } // --no-unlock-all
+    
     if(CommandLine::has("--profile-time",  &n))
     {
         Log::verbose("main", "Profiling: %d seconds.", n);
@@ -1055,20 +1403,13 @@ int handleCmdLine()
         race_manager->setNumLaps(999999); // profile end depends on time
     }   // --profile-time
 
-    if(CommandLine::has("--history",  &n))
+    if(CommandLine::has("--history"))
     {
-        history->doReplayHistory( (History::HistoryReplayMode)n);
+        history->setReplayHistory(true);
         // Force the no-start screen flag, since this initialises
         // the player structures correctly.
-        UserConfigParams::m_no_start_screen = true;
-    }   // --history=%d
-
-    if(CommandLine::has("--history"))  // handy default for --history=1
-    {
-        history->doReplayHistory(History::HISTORY_POSITION);
-        // Force the no-start screen flag, since this initialises
-        // the player structures correctly.
-        UserConfigParams::m_no_start_screen = true;
+        if(!MainMenuScreen::m_enable_online)
+            UserConfigParams::m_no_start_screen = true;
     }   // --history
 
     // Demo mode
@@ -1114,22 +1455,10 @@ int handleCmdLine()
 
     CommandLine::reportInvalidParameters();
 
-    if(ProfileWorld::isProfileMode())
+    if (ProfileWorld::isProfileMode() || ProfileWorld::isNoGraphics())
     {
         UserConfigParams::m_sfx = false;  // Disable sound effects
         UserConfigParams::m_music = false;// and music when profiling
-    }
-
-    if (try_login)
-    {
-        irr::core::stringw s;
-        Online::XMLRequest* request =
-                PlayerManager::requestSignIn(login, password);
-
-        if (request->isSuccess())
-        {
-            Log::info("Main", "Logged in from command line.");
-        }
     }
 
     return 1;
@@ -1184,11 +1513,13 @@ void initRest()
         exit(0);
     }
 
+    font_manager = new FontManager();
+    font_manager->loadFonts();
     GUIEngine::init(device, driver, StateManager::get());
 
-    // This only initialises the non-network part of the addons manager. The
-    // online section of the addons manager will be initialised from a
-    // separate thread running in network http.
+    // This only initialises the non-network part of the add-ons manager. The
+    // online section of the add-ons manager will be initialised from a
+    // separate thread running in network HTTP.
     addons_manager          = new AddonsManager();
     Online::ProfileManager::create();
 
@@ -1273,7 +1604,7 @@ void askForInternetPermission()
             // Typically internet is disabled here (just better safe
             // than sorry). If internet should be allowed, the news
             // manager needs to be started (which in turn activates
-            // the addons manager).
+            // the add-ons manager).
             bool need_to_start_news_manager =
                 UserConfigParams::m_internet_status !=
                                   Online::RequestManager::IPERM_ALLOWED;
@@ -1322,7 +1653,13 @@ int main(int argc, char *argv[] )
     CommandLine::init(argc, argv);
 
     CrashReporting::installHandlers();
-
+#ifndef WIN32
+    signal(SIGTERM, [](int signum)
+        {
+            if (main_loop)
+                main_loop->abort();
+        });
+#endif
     srand(( unsigned ) time( 0 ));
 
     try
@@ -1353,8 +1690,15 @@ int main(int argc, char *argv[] )
 
         // Get into menu mode initially.
         input_manager->setMode(InputManager::MENU);
-        main_loop = new MainLoop();
+        int parent_pid;
+        if (CommandLine::has("--parent-process", &parent_pid))
+            main_loop = new MainLoop(parent_pid);
+        else
+            main_loop = new MainLoop(0/*parent_pid*/);
         material_manager->loadMaterial();
+
+        // Preload the explosion effects (explode.png)
+        ParticleKindManager::get()->getParticles("explosion.xml");
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "options_video.png"));
@@ -1380,7 +1724,7 @@ int main(int argc, char *argv[] )
         // Both item_manager and powerup_manager load models and therefore
         // textures from the model directory. To avoid reading the
         // materials.xml twice, we do this here once for both:
-        file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""));
+        file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""), "models");
         const std::string materials_file =
             file_manager->getAsset(FileManager::MODEL,"materials.xml");
         if(materials_file!="")
@@ -1399,9 +1743,8 @@ int main(int argc, char *argv[] )
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "gift.png")       );
 
-        file_manager->popTextureSearchPath();
-
         attachment_manager->loadModels();
+        file_manager->popTextureSearchPath();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "banana.png")    );
@@ -1411,8 +1754,8 @@ int main(int argc, char *argv[] )
 
         addons_manager->checkInstalledAddons();
 
-        // Load addons.xml to get info about addons even when not
-        // allowed to access the internet
+        // Load addons.xml to get info about add-ons even when not
+        // allowed to access the Internet
         if (UserConfigParams::m_internet_status !=
             Online::RequestManager::IPERM_ALLOWED)
         {
@@ -1426,7 +1769,7 @@ int main(int argc, char *argv[] )
                 }
                 catch (std::runtime_error& e)
                 {
-                    Log::warn("Addons", "Exception thrown when initializing addons manager : %s", e.what());
+                    Log::warn("Addons", "Exception thrown when initializing add-ons manager : %s", e.what());
                 }
             }
         }
@@ -1437,32 +1780,76 @@ int main(int argc, char *argv[] )
             exit(0);
         }
 
-        if (!ProfileWorld::isNoGraphics() &&
-            GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
+#ifndef SERVER_ONLY
+        if (!ProfileWorld::isNoGraphics())
         {
-            if (UserConfigParams::m_old_driver_popup)
+            // Some Android devices have only 320x240 and height >= 480 is bare
+            // minimum to make the GUI working as expected.
+            if (irr_driver->getActualScreenSize().Height < 480)
             {
-                MessageDialog *dialog =
-                    new MessageDialog(_("Your driver version is too old. Please install "
-                    "the latest video drivers."),
-                    /*from queue*/ true);
-                GUIEngine::DialogQueue::get()->pushDialog(dialog);
+                if (UserConfigParams::m_old_driver_popup)
+                {
+                    MessageDialog *dialog =
+                        new MessageDialog(_("Your screen resolution is too "
+                                            "low to run STK."),
+                                            /*from queue*/ true);
+                    GUIEngine::DialogQueue::get()->pushDialog(dialog);
+                }
+                Log::warn("main", "Screen size is too small!");
             }
-            Log::warn("OpenGL", "Driver is too old!");
-        }
-        else if (!CVS->isGLSL())
-        {
-            if (UserConfigParams::m_old_driver_popup)
+            
+            #ifdef ANDROID
+            if (UserConfigParams::m_multitouch_controls == 0)
             {
-                MessageDialog *dialog =
-                    new MessageDialog(_("Your OpenGL version appears to be too old. Please verify "
-                    "if an update for your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."),
-                    /*from queue*/ true);
-                GUIEngine::DialogQueue::get()->pushDialog(dialog);
+                int32_t touch = AConfiguration_getTouchscreen(
+                                                    global_android_app->config);
+                
+                if (touch != ACONFIGURATION_TOUCHSCREEN_NOTOUCH)
+                {
+                    InitAndroidDialog* init_android = new InitAndroidDialog(
+                                                                    0.6f, 0.6f);
+                    GUIEngine::DialogQueue::get()->pushDialog(init_android);
+                }
             }
-            Log::warn("OpenGL", "OpenGL version is too old!");
-        }
+            #endif
 
+            if (GraphicsRestrictions::isDisabled(
+                GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
+            {
+                if (UserConfigParams::m_old_driver_popup)
+                {
+                    MessageDialog *dialog =
+                        new MessageDialog(_("Your driver version is too old. "
+                                            "Please install the latest video "
+                                            "drivers."), /*from queue*/ true);
+                    GUIEngine::DialogQueue::get()->pushDialog(dialog);
+                }
+                Log::warn("OpenGL", "Driver is too old!");
+            }
+            else if (!CVS->isGLSL())
+            {
+                #if !defined(ANDROID)
+                if (UserConfigParams::m_old_driver_popup)
+                {
+                    #ifdef USE_GLES2
+                    irr::core::stringw version = "OpenGL ES 3.0";
+                    #else
+                    irr::core::stringw version = "OpenGL 3.3";
+                    #endif
+                    MessageDialog *dialog =
+                        new MessageDialog(_("Your OpenGL version appears to be "
+                                            "too old. Please verify if an "
+                                            "update for your video driver is "
+                                            "available. SuperTuxKart requires "
+                                            "%s or better.", version), 
+                                            /*from queue*/ true);
+                    GUIEngine::DialogQueue::get()->pushDialog(dialog);
+                }
+                #endif
+                Log::warn("OpenGL", "OpenGL version is too old!");
+            }
+        }
+#endif
         // Note that on the very first run of STK internet status is set to
         // "not asked", so the report will only be sent in the next run.
         if(UserConfigParams::m_internet_status==Online::RequestManager::IPERM_ALLOWED)
@@ -1470,8 +1857,17 @@ int main(int argc, char *argv[] )
             HardwareStats::reportHardwareStats();
         }
 
-        if(!UserConfigParams::m_no_start_screen)
+        if (STKHost::existHost())
         {
+            NetworkingLobby::getInstance()->push();
+        }
+        else if (!UserConfigParams::m_no_start_screen)
+        {
+            if (UserConfigParams::m_enforce_current_player)
+            {
+                PlayerManager::get()->enforceCurrentPlayer();
+            }
+
             // If there is a current player, it was saved in the config file,
             // so we immediately start the main menu (unless it was requested
             // to always show the login screen). Otherwise show the login
@@ -1526,13 +1922,15 @@ int main(int argc, char *argv[] )
         {
             // This will setup the race manager etc.
             history->Load();
-            race_manager->setupPlayerKartInfo();
-            race_manager->startNew(false);
-            main_loop->run();
-            // well, actually run() will never return, since
-            // it exits after replaying history (see history::GetNextDT()).
-            // So the next line is just to make this obvious here!
-            exit(-3);
+            if (!MainMenuScreen::m_enable_online)
+            {
+                race_manager->setupPlayerKartInfo();
+                race_manager->startNew(false);
+                main_loop->run();
+                // The run() function will only return if the user aborts.
+                Log::flushBuffers();
+                exit(-3);
+            }   // if !online
         }
 
         // Not replaying
@@ -1561,8 +1959,10 @@ int main(int argc, char *argv[] )
     }  // try
     catch (std::exception &e)
     {
+        Log::flushBuffers();
         Log::error("main", "Exception caught : %s.",e.what());
         Log::error("main", "Aborting SuperTuxKart.");
+        Log::flushBuffers();
     }
 
     /* Program closing...*/
@@ -1575,16 +1975,23 @@ int main(int argc, char *argv[] )
     // If the window was closed in the middle of a race, remove players,
     // so we don't crash later when StateManager tries to access input devices.
     StateManager::get()->resetActivePlayers();
-    if(input_manager) delete input_manager; // if early crash avoid delete NULL
+    if (input_manager)
+    {
+        delete input_manager;
+        input_manager = NULL;
+    }
 
-    if(NetworkConfig::get()->isNetworking() && STKHost::existHost())
-        STKHost::get()->abort();
+    if (STKHost::existHost())
+        STKHost::get()->shutdown();
 
+    NetworkConfig::destroy();
     cleanSuperTuxKart();
 
 #ifdef DEBUG
     MemoryLeaks::checkForLeaks();
 #endif
+
+    Log::flushBuffers();
 
 #ifndef WIN32
     if (user_config) //close logfiles
@@ -1648,6 +2055,7 @@ static void cleanSuperTuxKart()
     if(unlock_manager)          delete unlock_manager;
     Online::ProfileManager::destroy();
     GUIEngine::DialogQueue::deallocate();
+    if(font_manager)            delete font_manager;
 
     // Now finish shutting down objects which a separate thread. The
     // RequestManager has been signaled to shut down as early as possible,
@@ -1655,7 +2063,7 @@ static void cleanSuperTuxKart()
     // But still give them some additional time to finish. It avoids a
     // race condition where a thread might access the file manager after it
     // was deleted (in cleanUserConfig below), but before STK finishes and
-    // the os takes all threads down.
+    // the OS takes all threads down.
 
     if(!NewsManager::get()->waitForReadyToDeleted(2.0f))
     {
@@ -1675,21 +2083,16 @@ static void cleanSuperTuxKart()
     }
     SFXManager::destroy();
 
-    // Music manager can not be deleted before the sfx thread is stopped
-    // (since sfx commands can contain music information, which are
+    // Music manager can not be deleted before the SFX thread is stopped
+    // (since SFX commands can contain music information, which are
     // deleted by the music manager).
     delete music_manager;
 
-    // The addons manager might still be called from a currenty running request
+    // The add-ons manager might still be called from a currenty running request
     // in the request manager, so it can not be deleted earlier.
     if(addons_manager)  delete addons_manager;
 
-    // FIXME: do we need to wait for threads there, can they be
-    // moved further up?
     ServersManager::deallocate();
-    if(NetworkConfig::get()->isNetworking() && STKHost::existHost())
-        STKHost::destroy();
-
     cleanUserConfig();
 
     StateManager::deallocate();
@@ -1720,12 +2123,16 @@ void runUnitTests()
 {
     Log::info("UnitTest", "Starting unit testing");
     Log::info("UnitTest", "=====================");
-    Log::info("UnitTest", "- GraphicsRestrictions");
+    Log::info("UnitTest", "MiniGLM");
+    MiniGLM::unitTesting();
+    Log::info("UnitTest", "GraphicsRestrictions");
     GraphicsRestrictions::unitTesting();
-    Log::info("UnitTest", " - NetworkString");
+    Log::info("UnitTest", "NetworkString");
     NetworkString::unitTesting();
+    Log::info("UnitTest", "TransportAddress");
+    TransportAddress::unitTesting();
 
-    Log::info("UnitTest", " - Easter detection");
+    Log::info("UnitTest", "Easter detection");
     // Test easter mode: in 2015 Easter is 5th of April - check with 0 days
     // before and after
     int saved_easter_mode = UserConfigParams::m_easter_ear_mode;
@@ -1755,6 +2162,20 @@ void runUnitTests()
     assert( isEasterMode(22, 3, 2016, 5));
     assert(!isEasterMode(21, 3, 2016, 5));
     UserConfigParams::m_easter_ear_mode = saved_easter_mode;
+
+
+    Log::info("UnitTest", "Kart characteristics");
+    CombinedCharacteristic::unitTesting();
+
+    Log::info("UnitTest", "Arena Graph");
+    ArenaGraph::unitTesting();
+
+    Log::info("UnitTest", "Fonts for translation");
+    font_manager->unitTesting();
+
+    Log::info("UnitTest", "RewindQueue");
+    RewindQueue::unitTesting();
+
     Log::info("UnitTest", "=====================");
     Log::info("UnitTest", "Testing successful   ");
     Log::info("UnitTest", "=====================");

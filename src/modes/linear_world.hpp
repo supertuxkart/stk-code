@@ -18,11 +18,11 @@
 #ifndef HEADER_LINEAR_WORLD_HPP
 #define HEADER_LINEAR_WORLD_HPP
 
-#include <vector>
-
 #include "modes/world_with_rank.hpp"
-#include "tracks/track_sector.hpp"
 #include "utils/aligned_array.hpp"
+
+#include <climits>
+#include <vector>
 
 class SFXBase;
 
@@ -43,8 +43,8 @@ private:
 
     bool         m_last_lap_sfx_playing;
 
-    /** The fastest lap time. */
-    float       m_fastest_lap;
+    /** The fastest lap time, in ticks of physics dt. */
+    int          m_fastest_lap_ticks;
 
     /** The track length returned by Track::getLength() only covers the
      *  distance from start line to finish line, i.e. it does not include
@@ -62,14 +62,14 @@ private:
     class KartInfo
     {
     public:
-        /** Number of finished(!) laps. */
-        int         m_race_lap;
+        /** Number of finished laps. */
+        int         m_finished_laps;
 
         /** Time at finishing last lap. */
-        float       m_time_at_last_lap;
+        int         m_ticks_at_last_lap;
 
         /** Time at start of a new lap. */
-        float       m_lap_start_time;
+        int         m_lap_start_ticks;
 
         /** During last lap only: estimated finishing time!   */
         float       m_estimated_finish;
@@ -78,8 +78,9 @@ private:
          *  track-length plus distance-along-track). */
         float       m_overall_distance;
 
-        /** Stores the current graph node and track coordinates etc. */
-        TrackSector m_track_sector;
+        /** Accumulates the time a kart has been driving in the wrong
+         *  direction so that a message can be displayed. */
+        float       m_wrong_way_timer;
 
         /** Initialises all fields. */
         KartInfo()  { reset(); }
@@ -87,19 +88,13 @@ private:
         /** Re-initialises all data. */
         void reset()
         {
-            m_race_lap         = -1;
-            m_lap_start_time   = 0;
-            m_time_at_last_lap = 99999.9f;
-            m_estimated_finish = -1.0f;
-            m_overall_distance = 0.0f;
-            m_track_sector.reset();
+            m_finished_laps     = -1;
+            m_lap_start_ticks   = 0;
+            m_ticks_at_last_lap = INT_MAX;
+            m_estimated_finish  = -1.0f;
+            m_overall_distance  = 0.0f;
+            m_wrong_way_timer   = 0.0f;
         }   // reset
-        // --------------------------------------------------------------------
-        /** Returns a pointer to the current node object. */
-        TrackSector *getTrackSector() {return &m_track_sector; }
-        // --------------------------------------------------------------------
-        /** Returns a pointer to the current node object. */
-        const TrackSector *getTrackSector() const {return &m_track_sector; }
     };
     // ------------------------------------------------------------------------
 
@@ -123,13 +118,15 @@ public:
     virtual void  init() OVERRIDE;
     virtual      ~LinearWorld();
 
-    virtual void  update(float delta) OVERRIDE;
-    int           getSectorForKart(const AbstractKart *kart) const;
+    virtual void  update(int ticks) OVERRIDE;
+    virtual void  updateGraphics(float dt) OVERRIDE;
     float         getDistanceDownTrackForKart(const int kart_id) const;
+    float         getDistanceDownTrackForKart(const int kart_id,
+                                            bool account_for_checklines) const;
     float         getDistanceToCenterForKart(const int kart_id) const;
     float         getEstimatedFinishTime(const int kart_id) const;
     int           getLapForKart(const int kart_id) const;
-    float         getTimeAtLapForKart(const int kart_id) const;
+    int           getTicksAtLapForKart(const int kart_id) const;
 
     virtual  void getKartsDisplayInfo(
                   std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
@@ -150,36 +147,15 @@ public:
     /** Override settings from base class */
     virtual bool useChecklineRequirements() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
-    /** Returns true if the kart is on a valid driveline quad.
-     *  \param kart_index  Index of the kart. */
-    bool isOnRoad(unsigned int kart_index) const
-    {
-        return m_kart_info[kart_index].getTrackSector()->isOnRoad();
-    }   // isOnRoad
-
-    // ------------------------------------------------------------------------
     /** Returns the number of laps a kart has completed.
      *  \param kart_index World index of the kart. */
-    int getKartLaps(unsigned int kart_index) const OVERRIDE
+    int getFinishedLapsOfKart(unsigned int kart_index) const OVERRIDE
     {
         assert(kart_index < m_kart_info.size());
-        return m_kart_info[kart_index].m_race_lap;
+        return m_kart_info[kart_index].m_finished_laps;
     }   // getkartLap
-
     // ------------------------------------------------------------------------
-    /** Returns the track_sector object for the specified kart.
-     *  \param kart_index World index of the kart. */
-    TrackSector& getTrackSector(unsigned int kart_index)
-    {
-        return m_kart_info[kart_index].m_track_sector;
-    }   // getTrackSector
-    // ------------------------------------------------------------------------
-    void setLastTriggeredCheckline(unsigned int kart_index, int index)
-    {
-        if (m_kart_info.size() == 0)
-            return;
-        m_kart_info[kart_index].m_track_sector.setLastTriggeredCheckline(index);
-    }
+    void setLastTriggeredCheckline(unsigned int kart_index, int index);
     // ------------------------------------------------------------------------
     /** Returns how far the kart has driven so far (i.e.
      *  number-of-laps-finished times track-length plus distance-on-track.
@@ -188,6 +164,24 @@ public:
     {
         return m_kart_info[kart_index].m_overall_distance;
     }   // getOverallDistance
+    // ------------------------------------------------------------------------
+    /** Returns time for the fastest laps */
+    float getFastestLap() const
+    {
+        return stk_config->ticks2Time(m_fastest_lap_ticks);
+    }
+    // ------------------------------------------------------------------------
+    /** Network use: get fastest lap in ticks */
+    int getFastestLapTicks() const
+    {
+        return m_fastest_lap_ticks;
+    }
+    // ------------------------------------------------------------------------
+    /** Network use: set fastest lap in ticks */
+    void setFastestLapTicks(int ticks)
+    {
+        m_fastest_lap_ticks = ticks;
+    }
 };   // LinearWorld
 
 #endif

@@ -23,13 +23,9 @@
     <size      min="0.10"
                max="0.30"          />
     
-    <color     min="40 40 255"
+    <color     min="255 255 255"
                max="255 255 255"   />
-    
-    <!-- How much time in milliseconds before the particle is fully faded out  -->
-    <fadeout   time="100"          />
 
-    <wind      speed="0.16"
-               flips="Y"           />
+    <wind      flips="Y"           />
 
 </particles>

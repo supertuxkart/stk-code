@@ -31,9 +31,12 @@
 #include <string>
 #include "animations/three_d_animation.hpp"
 
-class XMLNode;
-class ThreeDAnimation;
+#include <memory>
+
 class ModelDefinitionLoader;
+class RenderInfo;
+class ThreeDAnimation;
+class XMLNode;
 
 /**
  * \ingroup tracks
@@ -59,8 +62,9 @@ private:
 
     std::string m_id;
 
-protected:
+    std::shared_ptr<RenderInfo>    m_render_info;
 
+protected:
 
     /** The initial XYZ position of the object. */
     core::vector3df                m_init_xyz;
@@ -115,6 +119,7 @@ public:
                              const PhysicalObject::Settings* physicsSettings);
     virtual      ~TrackObject();
     virtual void update(float dt);
+    virtual void updateGraphics(float dt);
     void move(const core::vector3df& xyz, const core::vector3df& hpr,
               const core::vector3df& scale, bool updateRigidBody,
               bool isAbsoluteCoord);
@@ -188,7 +193,7 @@ public:
     /** Should only be used on mesh track objects.
     * On the script side, the returned object is of type : @ref Scripting_Mesh
     */
-    TrackObjectPresentationMesh* getMesh() { return getPresentation<TrackObjectPresentationMesh>(); }
+    scene::IAnimatedMeshSceneNode* getMesh();
     /** Should only be used on particle emitter track objects.
     * On the script side, the returned object is of type : @ref Scripting_ParticleEmitter
     */

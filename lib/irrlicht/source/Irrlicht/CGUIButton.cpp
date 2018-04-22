@@ -116,7 +116,8 @@ bool CGUIButton::OnEvent(const SEvent& event)
 	{
 	case EET_KEY_INPUT_EVENT:
 		if (event.KeyInput.PressedDown &&
-			(event.KeyInput.Key == KEY_RETURN || event.KeyInput.Key == KEY_SPACE))
+			(event.KeyInput.Key == IRR_KEY_RETURN || 
+			event.KeyInput.Key == IRR_KEY_SPACE))
 		{
 			if (!IsPushButton)
 				setPressed(true);
@@ -125,14 +126,16 @@ bool CGUIButton::OnEvent(const SEvent& event)
 
 			return true;
 		}
-		if (Pressed && !IsPushButton && event.KeyInput.PressedDown && event.KeyInput.Key == KEY_ESCAPE)
+		if (Pressed && !IsPushButton && event.KeyInput.PressedDown && 
+			event.KeyInput.Key == IRR_KEY_ESCAPE)
 		{
 			setPressed(false);
 			return true;
 		}
 		else
 		if (!event.KeyInput.PressedDown && Pressed &&
-			(event.KeyInput.Key == KEY_RETURN || event.KeyInput.Key == KEY_SPACE))
+			(event.KeyInput.Key == IRR_KEY_RETURN || 
+			event.KeyInput.Key == IRR_KEY_SPACE))
 		{
 
 			if (!IsPushButton)
@@ -381,7 +384,7 @@ void CGUIButton::setImage(video::ITexture* image)
 
 	Image = image;
 	if (image)
-		ImageRect = core::rect<s32>(core::position2d<s32>(0,0), image->getOriginalSize());
+		ImageRect = core::rect<s32>(core::position2d<s32>(0,0), image->getSize());
 
 	if (!PressedImage)
 		setPressedImage(Image);
@@ -407,7 +410,7 @@ void CGUIButton::setPressedImage(video::ITexture* image)
 
 	PressedImage = image;
 	if (image)
-		PressedImageRect = core::rect<s32>(core::position2d<s32>(0,0), image->getOriginalSize());
+		PressedImageRect = core::rect<s32>(core::position2d<s32>(0,0), image->getSize());
 }
 
 

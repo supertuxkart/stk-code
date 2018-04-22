@@ -23,8 +23,10 @@
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "input/gamepad_android_config.hpp"
 #include "input/gamepad_device.hpp"
 #include "input/keyboard_device.hpp"
+#include "input/multitouch_device.hpp"
 #include "input/wiimote_manager.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/kart_selection.hpp"
@@ -43,7 +45,14 @@ DeviceManager::DeviceManager()
     m_latest_used_device = NULL;
     m_assign_mode = NO_ASSIGN;
     m_single_player = NULL;
+    m_multitouch_device = NULL;
 }   // DeviceManager
+
+// -----------------------------------------------------------------------------
+DeviceManager::~DeviceManager()
+{
+    delete m_multitouch_device;
+}   // ~DeviceManager
 
 // -----------------------------------------------------------------------------
 bool DeviceManager::initialize()
@@ -72,8 +81,27 @@ bool DeviceManager::initialize()
         if(UserConfigParams::logMisc())
             Log::info("Device manager","No keyboard configuration exists, creating one.");
         m_keyboard_configs.push_back(new KeyboardConfig());
+        
         created = true;
     }
+    
+#ifdef ANDROID
+    bool has_gamepad_android_config = false;
+    
+    for (unsigned int i = 0; i < m_keyboard_configs.size(); i++)
+    {
+        if (m_keyboard_configs[i].isGamePadAndroid())
+        {
+            has_gamepad_android_config = true;
+        }
+    }
+    
+    if (!has_gamepad_android_config)
+    {
+        m_keyboard_configs.push_back(new GamepadAndroidConfig());
+        created = true;
+    }
+#endif
 
     const int keyboard_amount = m_keyboard_configs.size();
     for (int n = 0; n < keyboard_amount; n++)
@@ -98,8 +126,9 @@ bool DeviceManager::initialize()
     {
         core::stringc name = m_irrlicht_gamepads[id].Name;
 
-        // Some linux systems report a disk accelerometer as a gamepad, skip that
+        // Some systems report a disk accelerometer as a gamepad, skip that
         if (name.find("LIS3LV02DL") != -1) continue;
+        if (name == "applesmc") continue;
 
         if(m_irrlicht_gamepads[id].HasGenericName)
         {
@@ -138,6 +167,11 @@ bool DeviceManager::initialize()
         addGamepad(gamepadDevice);
     } // end for
 
+    if (UserConfigParams::m_multitouch_enabled)
+    {
+        m_multitouch_device = new MultitouchDevice();
+    }
+
     if (created) save();
 
     return created;
@@ -154,6 +188,12 @@ void DeviceManager::clearGamepads()
 {
     m_gamepads.clearAndDeleteAll(); 
 }   // clearGamepads
+// -----------------------------------------------------------------------------
+void DeviceManager::clearMultitouchDevices()
+{
+    delete m_multitouch_device;
+    m_multitouch_device = NULL;
+}   // clearMultitouchDevices
 
 // -----------------------------------------------------------------------------
 void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
@@ -177,6 +217,9 @@ void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
         {
             m_keyboards[i].setPlayer(NULL);
         }
+
+        if (m_multitouch_device != NULL)
+            m_multitouch_device->setPlayer(NULL);
     }
 }   // setAssignMode
 
@@ -365,6 +408,16 @@ InputDevice *DeviceManager::mapGamepadInput(Input::InputType type,
 
     if (gPad != NULL)
     {
+        // Ignore deadzone events if this isn't the latest used device in
+        // single-player mode (allowing the player to switch device at any time)
+        int dz = static_cast<GamepadConfig*>(gPad->getConfiguration())->getDeadzone();
+        if (m_single_player != NULL && m_latest_used_device != gPad
+            && *value > -dz && *value < dz)
+        {
+            *player = NULL;
+            return NULL;
+        }
+
         if (gPad->processAndMapInput(type, button_id, mode, action, value))
         {
             if (m_single_player != NULL)
@@ -388,6 +441,27 @@ InputDevice *DeviceManager::mapGamepadInput(Input::InputType type,
 
     return gPad;
 }   // mapGamepadInput
+
+//-----------------------------------------------------------------------------
+
+void DeviceManager::updateMultitouchDevice()
+{
+    if (m_multitouch_device == NULL)
+        return;
+
+    if (m_single_player != NULL)
+    {
+        // in single-player mode, assign the gamepad as needed
+        if (m_multitouch_device->getPlayer() != m_single_player)
+            m_multitouch_device->setPlayer(m_single_player);
+    }
+    else
+    {
+        m_multitouch_device->setPlayer(NULL);
+    }
+    
+    m_multitouch_device->updateController();
+}   // updateMultitouchDevice
 
 //-----------------------------------------------------------------------------
 
@@ -490,6 +564,7 @@ bool DeviceManager::load()
     if(input->getName()!="input")
     {
         Log::warn("DeviceManager", "Invalid input.xml file - no input node.");
+        delete input;
         return false;
     }
 
@@ -500,6 +575,7 @@ bool DeviceManager::load()
         GUIEngine::showMessage(_("Please re-configure your key bindings."));
         GUIEngine::showMessage(_("Your input config file is not compatible "
                                  "with this version of STK."));
+        delete input;
         return false;
     }
 
@@ -514,12 +590,13 @@ bool DeviceManager::load()
                       config->getName().c_str());
             continue;
         }
-        if(config->getName()=="keyboard")
+        if (config->getName() == "keyboard" ||
+            config->getName() == "gamepad_android")
         {
             KeyboardConfig *kc = static_cast<KeyboardConfig*>(device_config);
             m_keyboard_configs.push_back(kc);
         }
-        else if (config->getName()=="gamepad")
+        else if (config->getName() == "gamepad")
         {
             GamepadConfig *gc = static_cast<GamepadConfig*>(device_config);
             m_gamepad_configs.push_back(gc);
@@ -566,6 +643,18 @@ void DeviceManager::save()
 
     configfile << "<input version=\"" << INPUT_FILE_VERSION << "\">\n\n";
 
+    configfile << "<!--\n"
+        << "Event 1 : Keyboard button press\n"
+        << "    'id' indicates which button, as defined by irrlicht's EKEY_CODE enum\n"
+        << "    'character' contains the associated unicode character.\n"
+        << "        Only used as fallback when displaying special characters in the UI.\n"
+        << "Event 2 : Gamepad stick motion\n"
+        << "    'id' indicates which stick, starting from 0\n"
+        << "    'direction' 0 means negative, 1 means positive\n"
+        << "Event 3 : Gamepad button press\n"
+        << "    'id' indicates which button, starting from 0\n"
+        << "-->\n\n";
+
     for(unsigned int n=0; n<m_keyboard_configs.size(); n++)
     {
         m_keyboard_configs[n].save(configfile);
@@ -602,5 +691,7 @@ void DeviceManager::shutdown()
     m_keyboards.clearAndDeleteAll();
     m_gamepad_configs.clearAndDeleteAll();
     m_keyboard_configs.clearAndDeleteAll();
+    delete m_multitouch_device;
+    m_multitouch_device = NULL;
     m_latest_used_device = NULL;
 }   // shutdown

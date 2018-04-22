@@ -123,7 +123,7 @@ AbstractKart *ProfileWorld::createKart(const std::string &kart_ident, int index,
     if (index == (int)race_manager->getNumberOfKarts()-1)
     {
         // The camera keeps track of all cameras and will free them
-        Camera::createCamera(new_kart);
+        Camera::createCamera(new_kart, local_player_id);
     }
     return new_kart;
 }   // createKart
@@ -149,10 +149,11 @@ bool ProfileWorld::isRaceOver()
 
 //-----------------------------------------------------------------------------
 /** Counts the number of frames.
+ *  \param ticks number of physics time steps - should be 1.
  */
-void ProfileWorld::update(float dt)
+void ProfileWorld::update(int ticks)
 {
-    StandardRace::update(dt);
+    StandardRace::update(ticks);
 
     m_frame_count++;
     video::IVideoDriver *driver = irr_driver->getVideoDriver();
@@ -183,8 +184,8 @@ void ProfileWorld::enterRaceOverState()
         int max_laps = -2;
         for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
         {
-            if(m_kart_info[i].m_race_lap>max_laps)
-                max_laps = m_kart_info[i].m_race_lap;
+            if(m_kart_info[i].m_finished_laps>max_laps)
+                max_laps = m_kart_info[i].m_finished_laps;
         }   // for i<getNumberOfKarts
         race_manager->setNumLaps(max_laps+1);
     }
@@ -244,7 +245,7 @@ void ProfileWorld::enterRaceOverState()
         all_groups.insert(kart->getController()->getControllerName());
         float distance = (float)(m_profile_mode==PROFILE_LAPS
                                  ? race_manager->getNumLaps() : 1);
-        distance *= m_track->getTrackLength();
+        distance *= Track::getCurrentTrack()->getTrackLength();
         ss << distance/kart->getFinishTime() << " " << kart->getTopSpeed() << " ";
         ss << kart->getSkiddingTime() << " " << kart->getRescueTime() << " ";
         ss << kart->getRescueCount() << " " << kart->getBrakeCount() << " ";
@@ -300,7 +301,7 @@ void ProfileWorld::enterRaceOverState()
 
             float distance = (float)(m_profile_mode==PROFILE_LAPS
                                      ? race_manager->getNumLaps() : 1);
-            distance *= m_track->getTrackLength();
+            distance *= Track::getCurrentTrack()->getTrackLength();
 
             Log::verbose("profile",
                    "%s %4.2f %3.2f %6.2f %4.2f %3d %5d %4.2f %3d %3d %3d %3d %3d %3d %5d %4.2f",

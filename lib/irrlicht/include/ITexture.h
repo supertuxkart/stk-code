@@ -104,6 +104,8 @@ public:
 	{
 	}
 
+	virtual ~ITexture() {}
+
 	//! Lock function.
 	/** Locks the Texture and returns a pointer to access the
 	pixels. After lock() has been called and all operations on the pixels
@@ -189,6 +191,11 @@ public:
 
 	//! Get name of texture (in most cases this is the filename)
 	const io::SNamedPath& getName() const { return NamedPath; }
+
+	//! return open gl texture name
+	virtual u32 getOpenGLTextureName() const = 0;
+
+	virtual u32 getTextureSize() const { return 0; }
 
 protected:
 

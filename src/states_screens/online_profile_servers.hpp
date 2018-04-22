@@ -33,7 +33,7 @@ namespace GUIEngine { class Widget; }
   * \brief Online profiel overview screen
   * \ingroup states_screens
   */
-class OnlineProfileServers : public OnlineProfileBase, public GUIEngine::ScreenSingleton<OnlineProfileServers>
+class OnlineProfileServers : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OnlineProfileServers>
 {
 protected:
     OnlineProfileServers();
@@ -44,7 +44,10 @@ public:
     friend class GUIEngine::ScreenSingleton<OnlineProfileServers>;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile() OVERRIDE;
+    virtual void loadedFromFile() OVERRIDE {}
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void beforeAddingWidget() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2016 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -49,7 +49,7 @@
 #ifndef AS_PSVITA
 // Possible on PSVita, but requires SDK access
 
-#if defined(__GNUC__) || defined( AS_MARMALADE )
+#if !defined(_MSC_VER) && (defined(__GNUC__) || defined(AS_MARMALADE))
 
 #ifdef __ghs__ 
 // WIIU defines __GNUC__ but types are not defined here in 'conventional' way 

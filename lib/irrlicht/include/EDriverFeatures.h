@@ -118,8 +118,8 @@ namespace video
 		//! Support for texture coord transformation via texture matrix
 		EVDF_TEXTURE_MATRIX,
 
-		//! Support for NVidia's CG shader language
-		EVDF_CG,
+		//! Support for DXTn compressed textures.
+		EVDF_TEXTURE_COMPRESSED_DXT,
 
 		//! Only used for counting the elements of this enum
 		EVDF_COUNT

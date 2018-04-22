@@ -1,4 +1,4 @@
-# Travis-CI configuration file for SuperTuxKart
+# Travis-CI configuration file for SuperTuxKart 
 #
 # Configuration manual:
 # http://docs.travis-ci.com/user/build-configuration/
@@ -14,34 +14,46 @@ matrix:
 
 env:
   matrix:
-    - BUILD_TYPE="Debug"
-    - BUILD_TYPE="Release"
+    - BUILD_TYPE="Debug" SERVER_ONLY="OFF"
+    - BUILD_TYPE="Debug" SERVER_ONLY="ON"
+    - BUILD_TYPE="Release" SERVER_ONLY="OFF"
+    - BUILD_TYPE="Release" SERVER_ONLY="ON"
 
 addons:
   apt:
     packages:
     - build-essential
-    - libogg-dev
-    - libvorbis-dev
-    - libopenal-dev
-    - libxxf86vm-dev
-    - libcurl4-openssl-dev
-    - libfribidi-dev
-    - libbluetooth-dev
-    - libgl1-mesa-dev
-    - libglu1-mesa-dev
-    - libglew-dev
     - cmake
+    - libbluetooth-dev
+    - libcurl4-gnutls-dev
+    - libfreetype6-dev
+    - libfribidi-dev
+    - libgl1-mesa-dev
+    - libjpeg-dev
+    - libogg-dev
+    - libopenal-dev
+    - libpng-dev
+    - libvorbis-dev
+    - libxrandr-dev
+    - mesa-common-dev
+    - pkg-config
+    - zlib1g-dev
 
 before_script:
-  - export THREADS=$((`nproc` + 1))
+  # Unfortunately using all threads crashes g++: "g++: internal compiler error: Killed (program cc1plus)"
+  # Use half of the available threads, gcc is memory hungry
+  - 'if [ ${CC} = "gcc" ]; then
+        export THREADS=$((`nproc` / 2));
+    else
+        export THREADS=$((`nproc` + 1));
+    fi'
   - echo "THREADS = $THREADS"
   - free -mt
 
 script:
   - mkdir "build"
   - cd "build"
-  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCHECK_ASSETS=off
+  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off
   - make VERBOSE=1 -j $THREADS
 
 notifications:

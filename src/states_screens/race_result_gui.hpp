@@ -160,7 +160,7 @@ private:
     bool                       m_gp_position_was_changed;
 
     /** The previous monospace state of the font. */
-    bool                       m_was_monospace;
+    //bool                       m_was_monospace;
 
     /** Sound effect at end of race. */
     SFXBase                   *m_finish_sound;
@@ -191,10 +191,9 @@ private:
     void addGPProgressWidget(GUIEngine::Widget* widget);
     void displayGPProgress();
     void cleanupGPProgress();
-    void displayHighScores();
+    void displayPostRaceInfo();
     void displaySoccerResults();
     void displayScreenShots();
-    irr::core::stringw getKartDisplayName(const AbstractKart *kart) const;
 
     int  getFontHeight () const;
 
@@ -238,7 +237,8 @@ public:
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
                             bool important=true,
-                            bool big_font=false) OVERRIDE { }
+                            bool big_font=false,
+                            bool outline=false) OVERRIDE { }
 
     void nextPhase();
 

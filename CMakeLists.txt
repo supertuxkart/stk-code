@@ -1,24 +1,41 @@
+cmake_minimum_required(VERSION 2.8.4)
+
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
-set(PROJECT_VERSION "0.9.1")
+set(PROJECT_VERSION "git")
+add_definitions( -DSUPERTUXKART_VERSION="${PROJECT_VERSION}" )
 
-cmake_minimum_required(VERSION 2.8.4)
 if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
   cmake_policy(SET CMP0043 OLD)
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
+include(CMakeDependentOption)
 
 include(BuildTypeSTKRelease)
-if (NOT CMAKE_BUILD_TYPE)
+if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "No build type selected, default to STKRelease")
     set(CMAKE_BUILD_TYPE "STKRelease")
 endif()
 
+option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
-option(ENABLE_NETWORK_MULTIPLAYER "Enable network multiplayer. This will replace the online profile GUI in the main menu with the network multiplayer GUI" OFF)
+option(USE_SYSTEM_ENET "Use system ENET instead of the built-in version, when available." ON)
+option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
+
+CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
+    "NOT SERVER_ONLY;NOT USE_GLES2;NOT APPLE" OFF)
+
+if((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
+    option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" ON)
+    option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
+endif()
+
+if(UNIX OR MINGW)
+    option(DEBUG_SYMBOLS "Compile with debug symbols" OFF)
+endif()
 
 if(MSVC AND (MSVC_VERSION LESS 1900))
     # Normally hide the option to build wiiuse on VS, since it depends
@@ -30,15 +47,15 @@ else()
     set(WIIUSE_BUILD ON)
 endif()
 
-if(MINGW OR CYGWIN)
+if(MINGW OR CYGWIN OR SERVER_ONLY)
     option(USE_WIIUSE "Support for wiimote input devices" OFF)
 else()
     option(USE_WIIUSE "Support for wiimote input devices" ON)
 endif()
 
 if(UNIX AND NOT APPLE)
-    option(USE_XRANDR "Use xrandr instead of vidmode" ON)
     option(USE_ASAN   "Build with Leak/Address sanitizer" OFF)
+    option(USE_LIBBFD "Use libbfd for crash reporting and leak check" OFF)
 endif()
 
 set(STK_SOURCE_DIR "src")
@@ -51,28 +68,101 @@ set(STK_INSTALL_BINARY_DIR "bin" CACHE
 set(STK_INSTALL_DATA_DIR "share/supertuxkart" CACHE
     STRING "Install data folder to this directory, absolute or relative to CMAKE_INSTALL_PREFIX")
 
+# Define dependencies path
+if(MSVC)
+    set(DEPENDENCIES "dependencies-vs")
+elseif(MINGW)
+    set(DEPENDENCIES "dependencies-mingw")
+else()
+    set(DEPENDENCIES "dependencies")
+endif()
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(DEPENDENCIES "${DEPENDENCIES}-64bit")
+endif()
+
+if(WIN32)
+    if(NOT IS_DIRECTORY "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}")
+        set(DEPENDENCIES "dependencies")
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            set(DEPENDENCIES "${DEPENDENCIES}-64bit")
+        endif()
+    endif()
+
+    if(NOT IS_DIRECTORY "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}")
+        message(FATAL_ERROR "Dependencies directory not found.")
+    endif()
+endif()
+
 # These variables enable MSVC to find libraries located in "dependencies"
 if(WIN32)
-    set(ENV{PATH} "$ENV{PATH};${PROJECT_SOURCE_DIR}/dependencies/include")
-    set(ENV{LIB} ${PROJECT_SOURCE_DIR}/dependencies/lib)
-    set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/dependencies)
+    set(ENV{PATH} "$ENV{PATH};${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/include")
+    set(ENV{LIB} ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib)
+    set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/${DEPENDENCIES})
     add_definitions(-D_IRR_STATIC_LIB_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
+endif()
+
+if(USE_GLES2)
+    add_definitions(-DUSE_GLES2)
+    add_definitions(-D_IRR_COMPILE_WITH_OGLES2_ -DNO_IRR_COMPILE_WITH_OPENGL_)
+endif()
+
+if(SERVER_ONLY)
+    add_definitions(-DSERVER_ONLY)
+    add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
+endif()
+
+#if(DISABLE_VPX)
+#    add_definitions(-DNO_VPX)
+#endif()
+
+if(UNIX OR MINGW)
+    if(DEBUG_SYMBOLS)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+    endif()
 endif()
 
 # Build the Bullet physics library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 
-# Build the ENet UDP network library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
-include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
+# Find system ENet library or build it if missing
+if((UNIX AND NOT APPLE) AND USE_SYSTEM_ENET)
+    find_package(ENet)
+endif()
 
-# Build glew library
-add_definitions(-DGLEW_NO_GLU)
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
-include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
+if(ENET_FOUND)
+    include_directories(${ENet_INCLUDE_DIRS})
+else()
+    # Fallback to built-in version
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
+    set(ENet_LIBRARIES "enet")
+endif()
 
-if((WIN32 AND NOT MINGW) OR APPLE)
+# Find system GLEW library or build it if missing
+if(NOT USE_GLES2 AND NOT SERVER_ONLY)
+    add_definitions(-DGLEW_NO_GLU)
+    if((UNIX AND NOT APPLE) AND USE_SYSTEM_GLEW)
+        find_package(PkgConfig)
+        if(PKGCONFIG_FOUND)
+            pkg_check_modules(GLEW glew>=2.1)
+        endif()
+    endif()
+
+    if(GLEW_FOUND)
+        include_directories(${GLEW_INCLUDE_DIRS})
+    else()
+        # Fallback to built-in version silently
+        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
+        include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
+        set(GLEW_LIBRARIES "glew")
+    endif()
+endif()
+
+if(MSVC OR APPLE)
     if (NOT APPLE)
     # Build zlib library
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/zlib")
@@ -83,22 +173,67 @@ if((WIN32 AND NOT MINGW) OR APPLE)
     endif()
 
     # Build png library
-    set (SKIP_INSTALL_ALL TRUE)
-    set (PNG_STATIC TRUE)
-    set (PNG_TESTS FALSE)
-    set (PNG_SHARED FALSE)
+    set(SKIP_INSTALL_ALL TRUE)
+    set(PNG_STATIC TRUE CACHE BOOL "Build static lib")
+    set(PNG_TESTS FALSE CACHE BOOL "Build libpng tests")
+    set(PNG_SHARED FALSE CACHE BOOL "Build shared lib")
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libpng")
     include_directories("${PROJECT_SOURCE_DIR}/lib/libpng")
 
-    #build jpeg library
+    set(PNG_PNG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/libpng/")
+    set(PNG_LIBRARY png_static)
+endif()
+
+# Add jpeg library
+if (APPLE)
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/jpeglib")
     include_directories("${PROJECT_SOURCE_DIR}/lib/jpeglib")
-
-    set(PNG_PNG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/libpng/")
-    set(PNG_LIBRARY png15_static)
     set(JPEG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/jpeglib/")
     set(JPEG_LIBRARY jpeglib)
+else()
+    find_package(JPEG REQUIRED)
+    include_directories(${JPEG_INCLUDE_DIR})
 endif()
+
+if (BUILD_RECORDER)
+    find_library(OPENGLRECORDER_LIBRARY NAMES openglrecorder libopenglrecorder PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib")
+    find_path(OPENGLRECORDER_INCLUDEDIR NAMES openglrecorder.h PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/include")
+    if (NOT OPENGLRECORDER_LIBRARY OR NOT OPENGLRECORDER_INCLUDEDIR)
+        if(PROJECT_VERSION STREQUAL "git")
+            message(WARNING "libopenglrecorder not found, disabling in-game recorder. "
+                "To use recorder, install libopenglrecorder.")
+            set(OPENGLRECORDER_LIBRARY CACHE INTERNAL "")
+            set(OPENGLRECORDER_INCLUDEDIR CACHE INTERNAL "")
+            set(BUILD_RECORDER OFF)
+        else()
+            message(FATAL_ERROR "libopenglrecorder not found. "
+            "Either install libopenglrecorder or disable in-game recorder with -DBUILD_RECORDER=0")
+        endif()
+    else()
+        include_directories(${OPENGLRECORDER_INCLUDEDIR})
+        mark_as_advanced(OPENGLRECORDER_LIBRARY OPENGLRECORDER_INCLUDEDIR)
+        add_definitions(-DENABLE_RECORDER)
+    endif()
+endif()
+
+if(NOT SERVER_ONLY AND NOT USE_GLES2)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
+endif()
+
+if(NOT SERVER_ONLY AND NOT USE_GLES2)
+    find_library(SQUISH_LIBRARY NAMES squish libsquish)
+    find_path(SQUISH_INCLUDEDIR NAMES squish.h PATHS)
+    if (NOT SQUISH_LIBRARY OR NOT SQUISH_INCLUDEDIR)
+        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libsquish")
+        include_directories("${PROJECT_SOURCE_DIR}/lib/libsquish")
+        SET(SQUISH_LIBRARY squish)
+    else()
+        include_directories("${SQUISH_INCLUDEDIR}")
+        MESSAGE(STATUS "Use system libsquish: ${SQUISH_LIBRARY}")
+    endif()
+endif()
+
 # Build the irrlicht library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
 include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
@@ -187,29 +322,20 @@ if(USE_FRIBIDI)
     endif()
 endif()
 
-# OpenMP
-find_package(OpenMP)
-if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+# OpenGL
+if(NOT USE_GLES2 AND NOT SERVER_ONLY)
+    find_package(OpenGL REQUIRED)
+    include_directories(${OPENGL_INCLUDE_DIR})
 endif()
 
-# OpenGL
-find_package(OpenGL REQUIRED)
-include_directories(${OPENGL_INCLUDE_DIR})
-
-if(UNIX AND NOT APPLE)
-    find_package(X11 REQUIRED)
-    include_directories(${X11_INCLUDE_DIR})
-
-    if(USE_XRANDR)
-        find_package(Xrandr REQUIRED)
-        if(NOT XRANDR_FOUND)
-            message(FATAL_ERROR "XRANDR not found.")
-        endif()
+if(USE_LIBBFD)
+    find_package(Libbfd)
+    if(LIBBFD_FOUND)
+        add_definitions(-DENABLE_LIBBFD)
+        include_directories(${LIBBFD_INCLUDE_DIRS})
     else()
-        find_library(IRRLICHT_XF86VM_LIBRARY Xxf86vm)
-        mark_as_advanced(IRRLICHT_XF86VM_LIBRARY)
+        set(USE_LIBBFD OFF CACHE BOOL "Use libbfd for crash reporting and leak check" FORCE)
+        message(WARNING "Libbfd not found, disable integrated stack trace.")
     endif()
 endif()
 
@@ -221,11 +347,6 @@ endif()
 
 if(MINGW AND CMAKE_BUILD_TYPE MATCHES Release)
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--subsystem,windows")
-endif()
-
-# Netwowk Multiplayer
-if(ENABLE_NETWORK_MULTIPLAYER)
-  add_definitions(-DENABLE_NETWORK_MULTIPLAYER_SCREEN)
 endif()
 
 if(WIN32)
@@ -309,7 +430,7 @@ else()
     elseif(MINGW)
         set(PTHREAD_NAMES "winpthread-1" "libwinpthread-1" "pthreadGC2")
     endif()
-    find_library(PTHREAD_LIBRARY NAMES pthread ${PTHREAD_NAMES} PATHS ${PROJECT_SOURCE_DIR}/dependencies/lib)
+    find_library(PTHREAD_LIBRARY NAMES pthread ${PTHREAD_NAMES} PATHS ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib)
     mark_as_advanced(PTHREAD_LIBRARY)
 
     # Set data dir (absolute or relative to CMAKE_INSTALL_PREFIX)
@@ -330,8 +451,10 @@ else()
 endif()
 
 # CURL
-if(WIN32)
-    target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/dependencies/lib/libcurldll.a)
+if(MSVC)
+    target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libcurl.lib)
+elseif(MINGW)
+    target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/libcurldll.a)
 else()
     find_package(CURL REQUIRED)
     include_directories(${CURL_INCLUDE_DIRS})
@@ -342,28 +465,42 @@ target_link_libraries(supertuxkart
     bulletdynamics
     bulletcollision
     bulletmath
-    enet
-    glew
+    ${ENet_LIBRARIES}
     stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
-    ${OPENGL_LIBRARIES}
     ${FREETYPE_LIBRARIES}
+    ${JPEG_LIBRARIES}
+    ${TURBOJPEG_LIBRARY}
+    #${VPX_LIBRARIES}
     )
 
-if(UNIX AND NOT APPLE)
-    target_link_libraries(supertuxkart ${X11_LIBRARIES})
-    if(USE_XRANDR)
-        target_link_libraries(supertuxkart ${XRANDR_LIBRARIES})
+if(NOT SERVER_ONLY)
+    if(NOT USE_GLES2)
+        target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES} graphics_utils)
     else()
-        target_link_libraries(supertuxkart ${IRRLICHT_XF86VM_LIBRARY})
+        target_link_libraries(supertuxkart GLESv2)
+    endif()
+endif()
+
+if(NOT SERVER_ONLY AND NOT USE_GLES2)
+    target_link_libraries(supertuxkart ${SQUISH_LIBRARY})
+endif()
+
+if(UNIX AND NOT APPLE)
+    if(USE_LIBBFD)
+        target_link_libraries(supertuxkart ${LIBBFD_LIBRARIES})
     endif()
     if(USE_ASAN)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
         target_link_libraries(supertuxkart "-fsanitize=address")
     endif()
+endif()
+
+if(BUILD_RECORDER)
+    target_link_libraries(supertuxkart ${OPENGLRECORDER_LIBRARY})
 endif()
 
 # FreeBSD does not search in /usr/local/lib, but at least Freetype is installed there :(
@@ -396,7 +533,7 @@ if(USE_WIIUSE)
         if(WIIUSE_BUILD)
             target_link_libraries(supertuxkart wiiuse)
         else()
-            target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/dependencies/lib/wiiuse.lib)
+            target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib/wiiuse.lib)
         endif()
     else()
         target_link_libraries(supertuxkart wiiuse bluetooth)
@@ -409,7 +546,7 @@ if(MSVC OR MINGW)
   target_link_libraries(supertuxkart iphlpapi.lib)
   add_custom_command(TARGET supertuxkart POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${PROJECT_SOURCE_DIR}/dependencies/dll"
+        "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/dll"
         $<TARGET_FILE_DIR:supertuxkart>)
   add_custom_target(stkshaders SOURCES ${STK_SHADERS})
 endif()
@@ -422,10 +559,6 @@ if(MINGW)
     find_library(LIBSTDCPP NAMES "libstdc++-6.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
     if(LIBSTDCPP)
         file(COPY ${LIBSTDCPP} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
-    endif()
-    find_library(LIBOPENMP NAMES "libgomp-1.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
-    if(LIBOPENMP)
-        file(COPY ${LIBOPENMP} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
     endif()
     find_library(LIBPTHREAD NAMES "winpthread-1.dll" "libwinpthread-1.dll" "pthreadGC2.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
     if(LIBPTHREAD)
@@ -470,10 +603,10 @@ if(STK_ASSETS_DIR AND CHECK_ASSETS)
   install(DIRECTORY ${STK_ASSETS_DIR} DESTINATION ${STK_INSTALL_DATA_DIR}/data PATTERN ".svn" EXCLUDE PATTERN ".git" EXCLUDE)
 endif()
 install(FILES ${STK_DATA_DIR}/supertuxkart.desktop DESTINATION share/applications)
-install(FILES data/supertuxkart_32.png DESTINATION share/icons/hicolor/32x32/apps RENAME supertuxkart.png)
+install(FILES data/supertuxkart_48.png DESTINATION share/icons/hicolor/48x48/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128/apps RENAME supertuxkart.png)
-install(FILES data/supertuxkart_32.png data/supertuxkart_128.png DESTINATION share/pixmaps)
-install(FILES data/supertuxkart.appdata.xml DESTINATION share/appdata)
+install(FILES data/supertuxkart_48.png DESTINATION share/pixmaps RENAME supertuxkart.png)
+install(FILES data/supertuxkart.appdata.xml DESTINATION share/metainfo)
 
 if(MINGW)
     install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/ DESTINATION ${STK_INSTALL_BINARY_DIR}

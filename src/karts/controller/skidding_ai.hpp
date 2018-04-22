@@ -45,12 +45,12 @@
 
 #include "karts/controller/ai_base_lap_controller.hpp"
 #include "race/race_manager.hpp"
-#include "tracks/graph_node.hpp"
+#include "tracks/drive_node.hpp"
 #include "utils/random_generator.hpp"
 
+#include <line3d.h>
+
 class LinearWorld;
-class QuadGraph;
-class ShowCurve;
 class Track;
 
 namespace irr
@@ -143,8 +143,8 @@ private:
     /** Distance to the kard behind. */
     float m_distance_behind;
 
-    /** The actual start delay used. */
-    float m_start_delay;
+    /** The actual start delay used in ticks. */
+    int m_start_delay;
 
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
@@ -155,7 +155,7 @@ private:
     int m_start_kart_crash_direction;
 
     /** The direction of the track where the kart is on atm. */
-    GraphNode::DirectionType m_current_track_direction;
+    DriveNode::DirectionType m_current_track_direction;
 
     /** The radius of the curve the kart is currently driving. Undefined
      *  when being on a straigt section. */
@@ -240,22 +240,23 @@ private:
      *specific action (more like, associated with inaction).
      */
     void  handleRaceStart();
-    void  handleAcceleration(const float dt);
+    void  handleAcceleration(int ticks);
     void  handleSteering(float dt);
-    void  handleItems(const float dt);
+    void  handleItems(const float dt, const Vec3 *aim_point,
+                                           int last_node);
     void  handleRescue(const float dt);
     void  handleBraking();
     void  handleNitroAndZipper();
     void  computeNearestKarts();
     void  handleItemCollectionAndAvoidance(Vec3 *aim_point,
                                            int last_node);
-    bool  handleSelectedItem(float kart_aim_angle, Vec3 *aim_point);
+    bool  handleSelectedItem(Vec3 kart_aim_direction, Vec3 *aim_point);
     bool  steerToAvoid(const std::vector<const Item *> &items_to_avoid,
-                       const core::line2df &line_to_target,
+                       const core::line3df &line_to_target,
                        Vec3 *aim_point);
     bool  hitBadItemWhenAimAt(const Item *item,
                               const std::vector<const Item *> &items_to_avoid);
-    void  evaluateItems(const Item *item, float kart_aim_angle,
+    void  evaluateItems(const Item *item, Vec3 kart_aim_direction,
                         std::vector<const Item *> *items_to_avoid,
                         std::vector<const Item *> *items_to_collect);
 
@@ -265,11 +266,6 @@ private:
     void  findNonCrashingPoint(Vec3 *result, int *last_node);
 
     void  determineTrackDirection();
-    void  determineTurnRadius(const Vec3 &start,
-                              const Vec3 &start_direction,
-                              const Vec3 &end,
-                              Vec3 *center,
-                              float *radius);
     virtual bool canSkid(float steer_fraction);
     virtual void setSteering(float angle, float dt);
     void handleCurve();
@@ -280,7 +276,7 @@ protected:
 public:
                  SkiddingAI(AbstractKart *kart);
                 ~SkiddingAI();
-    virtual void update      (float delta) ;
+    virtual void update      (int ticks);
     virtual void reset       ();
     virtual const irr::core::stringw& getNamePostfix() const;
 };

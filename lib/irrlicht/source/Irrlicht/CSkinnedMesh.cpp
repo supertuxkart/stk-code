@@ -9,6 +9,7 @@
 #include "CBoneSceneNode.h"
 #include "IAnimatedMeshSceneNode.h"
 #include "os.h"
+#include "irrMap.h"
 
 namespace irr
 {
@@ -18,7 +19,7 @@ namespace scene
 
 //! constructor
 CSkinnedMesh::CSkinnedMesh()
-: SkinningBuffers(0), AnimationFrames(0.f), FramesPerSecond(25.f),
+: AnimationFrames(0.f), SkinningBuffers(0), FramesPerSecond(25.f),
 	LastAnimatedFrame(-1), SkinnedLastFrame(false),
 	InterpolationMode(EIM_LINEAR),
 	HasAnimation(false), PreparedForSkinning(false),
@@ -27,7 +28,6 @@ CSkinnedMesh::CSkinnedMesh()
 	#ifdef _DEBUG
 	setDebugName("CSkinnedMesh");
 	#endif
-
 	SkinningBuffers=&LocalBuffers;
 }
 
@@ -74,12 +74,22 @@ void CSkinnedMesh::setAnimationSpeed(f32 fps)
 //! returns the animated mesh based on a detail level. 0 is the lowest, 255 the highest detail. Note, that some Meshes will ignore the detail level.
 IMesh* CSkinnedMesh::getMesh(s32 frame, s32 detailLevel, s32 startFrameLoop, s32 endFrameLoop)
 {
+	const bool is_hw_skinning_before = HardwareSkinning;
+	if (is_hw_skinning_before)
+	{
+		HardwareSkinning = false;
+		LastAnimatedFrame = -1;
+	}
 	//animate(frame,startFrameLoop, endFrameLoop);
 	if (frame==-1)
 		return this;
 
 	animateMesh((f32)frame, 1.0f);
 	skinMesh();
+
+	if (is_hw_skinning_before)
+		HardwareSkinning = true;
+
 	return this;
 }
 
@@ -93,6 +103,12 @@ IMesh* CSkinnedMesh::getMesh(s32 frame, s32 detailLevel, s32 startFrameLoop, s32
 //! blend: {0-old position, 1-New position}
 void CSkinnedMesh::animateMesh(f32 frame, f32 blend)
 {
+	if (HardwareSkinning && LastAnimatedFrame==frame)
+	{
+		SkinnedLastFrame=false;
+		return;
+	}
+
 	if (!HasAnimation || LastAnimatedFrame==frame)
 		return;
 
@@ -456,33 +472,32 @@ void CSkinnedMesh::skinMesh(f32 strength)
 	//-----------------
 
 	SkinnedLastFrame=true;
-	if (!HardwareSkinning)
+
+	//Software skin....
+	u32 i;
+
+	//rigid animation
+	for (i=0; i<AllJoints.size(); ++i)
 	{
-		//Software skin....
-		u32 i;
-
-		//rigid animation
-		for (i=0; i<AllJoints.size(); ++i)
+		for (u32 j=0; j<AllJoints[i]->AttachedMeshes.size(); ++j)
 		{
-			for (u32 j=0; j<AllJoints[i]->AttachedMeshes.size(); ++j)
-			{
-				SSkinMeshBuffer* Buffer=(*SkinningBuffers)[ AllJoints[i]->AttachedMeshes[j] ];
-				Buffer->Transformation=AllJoints[i]->GlobalAnimatedMatrix;
-			}
+			SSkinMeshBuffer* Buffer=(*SkinningBuffers)[ AllJoints[i]->AttachedMeshes[j] ];
+			Buffer->Transformation=AllJoints[i]->GlobalAnimatedMatrix;
 		}
-
-		//clear skinning helper array
-		for (i=0; i<Vertices_Moved.size(); ++i)
-			for (u32 j=0; j<Vertices_Moved[i].size(); ++j)
-				Vertices_Moved[i][j]=false;
-
-		//skin starting with the root joints
-		for (i=0; i<RootJoints.size(); ++i)
-			skinJoint(RootJoints[i], 0, strength);
-
-		for (i=0; i<SkinningBuffers->size(); ++i)
-			(*SkinningBuffers)[i]->setDirty(EBT_VERTEX);
 	}
+
+	//clear skinning helper array
+	for (i=0; i<Vertices_Moved.size(); ++i)
+		for (u32 j=0; j<Vertices_Moved[i].size(); ++j)
+			Vertices_Moved[i][j]=false;
+
+	//skin starting with the root joints
+	for (i=0; i<RootJoints.size(); ++i)
+		skinJoint(RootJoints[i], 0, strength);
+
+	for (i=0; i<SkinningBuffers->size(); ++i)
+		(*SkinningBuffers)[i]->setDirty(EBT_VERTEX);
+
 	updateBoundingBox();
 }
 
@@ -724,28 +739,28 @@ bool CSkinnedMesh::setHardwareSkinning(bool on)
 	if (HardwareSkinning!=on)
 	{
 		if (on)
-		{
-
-			//set mesh to static pose...
-			for (u32 i=0; i<AllJoints.size(); ++i)
-			{
-				SJoint *joint=AllJoints[i];
-				for (u32 j=0; j<joint->Weights.size(); ++j)
-				{
-					const u16 buffer_id=joint->Weights[j].buffer_id;
-					const u32 vertex_id=joint->Weights[j].vertex_id;
-					LocalBuffers[buffer_id]->getVertex(vertex_id)->Pos = joint->Weights[j].StaticPos;
-					LocalBuffers[buffer_id]->getVertex(vertex_id)->Normal = joint->Weights[j].StaticNormal;
-					LocalBuffers[buffer_id]->boundingBoxNeedsRecalculated();
-				}
-			}
-		}
+			toStaticPose();
 
 		HardwareSkinning=on;
 	}
 	return HardwareSkinning;
 }
 
+void CSkinnedMesh::toStaticPose()
+{
+	for (u32 i=0; i<AllJoints.size(); ++i)
+	{
+		SJoint *joint=AllJoints[i];
+		for (u32 j=0; j<joint->Weights.size(); ++j)
+		{
+			const u16 buffer_id=joint->Weights[j].buffer_id;
+			const u32 vertex_id=joint->Weights[j].vertex_id;
+			LocalBuffers[buffer_id]->getVertex(vertex_id)->Pos = joint->Weights[j].StaticPos;
+			LocalBuffers[buffer_id]->getVertex(vertex_id)->Normal = joint->Weights[j].StaticNormal;
+			LocalBuffers[buffer_id]->boundingBoxNeedsRecalculated();
+		}
+	}
+}
 
 void CSkinnedMesh::calculateGlobalMatrices(SJoint *joint,SJoint *parentJoint)
 {
@@ -1139,7 +1154,7 @@ void CSkinnedMesh::finalize()
 
 void CSkinnedMesh::updateBoundingBox(void)
 {
-	if(!SkinningBuffers)
+	if(HardwareSkinning || !SkinningBuffers)
 		return;
 
 	core::array<SSkinMeshBuffer*> & buffer = *SkinningBuffers;
@@ -1381,169 +1396,6 @@ void CSkinnedMesh::addJoints(core::array<IBoneSceneNode*> &jointChildSceneNodes,
 	}
 	SkinnedLastFrame=false;
 }
-
-
-void CSkinnedMesh::convertMeshToTangents()
-{
-	// now calculate tangents
-	for (u32 b=0; b < LocalBuffers.size(); ++b)
-	{
-		if (LocalBuffers[b])
-		{
-			LocalBuffers[b]->convertToTangents();
-
-			const s32 idxCnt = LocalBuffers[b]->getIndexCount();
-
-			u16* idx = LocalBuffers[b]->getIndices();
-			video::S3DVertexTangents* v =
-				(video::S3DVertexTangents*)LocalBuffers[b]->getVertices();
-
-			for (s32 i=0; i<idxCnt; i+=3)
-			{
-				calculateTangents(
-					v[idx[i+0]].Normal,
-					v[idx[i+0]].Tangent,
-					v[idx[i+0]].Binormal,
-					v[idx[i+0]].Pos,
-					v[idx[i+1]].Pos,
-					v[idx[i+2]].Pos,
-					v[idx[i+0]].TCoords,
-					v[idx[i+1]].TCoords,
-					v[idx[i+2]].TCoords);
-
-				calculateTangents(
-					v[idx[i+1]].Normal,
-					v[idx[i+1]].Tangent,
-					v[idx[i+1]].Binormal,
-					v[idx[i+1]].Pos,
-					v[idx[i+2]].Pos,
-					v[idx[i+0]].Pos,
-					v[idx[i+1]].TCoords,
-					v[idx[i+2]].TCoords,
-					v[idx[i+0]].TCoords);
-
-				calculateTangents(
-					v[idx[i+2]].Normal,
-					v[idx[i+2]].Tangent,
-					v[idx[i+2]].Binormal,
-					v[idx[i+2]].Pos,
-					v[idx[i+0]].Pos,
-					v[idx[i+1]].Pos,
-					v[idx[i+2]].TCoords,
-					v[idx[i+0]].TCoords,
-					v[idx[i+1]].TCoords);
-			}
-		}
-	}
-}
-
-
-void CSkinnedMesh::calculateTangents(
-	core::vector3df& normal,
-	core::vector3df& tangent,
-	core::vector3df& binormal,
-	core::vector3df& vt1, core::vector3df& vt2, core::vector3df& vt3, // vertices
-	core::vector2df& tc1, core::vector2df& tc2, core::vector2df& tc3) // texture coords
-{
-	core::vector3df v1 = vt1 - vt2;
-	core::vector3df v2 = vt3 - vt1;
-	normal = v2.crossProduct(v1);
-	normal.normalize();
-
-	// binormal
-
-	f32 deltaX1 = tc1.X - tc2.X;
-	f32 deltaX2 = tc3.X - tc1.X;
-	binormal = (v1 * deltaX2) - (v2 * deltaX1);
-	binormal.normalize();
-
-	// tangent
-
-	f32 deltaY1 = tc1.Y - tc2.Y;
-	f32 deltaY2 = tc3.Y - tc1.Y;
-	tangent = (v1 * deltaY2) - (v2 * deltaY1);
-	tangent.normalize();
-
-	// adjust
-
-	core::vector3df txb = tangent.crossProduct(binormal);
-	if (txb.dotProduct(normal) < 0.0f)
-	{
-		tangent *= -1.0f;
-		binormal *= -1.0f;
-	}
-}
-
-// ----------------------------------------------------------------------------
-/** Copies a mesh.
- */
-CSkinnedMesh *CSkinnedMesh::clone()
-{
-
-    CSkinnedMesh* skinned_mesh = new CSkinnedMesh();
-
-    for (u32 i = 0; i < getMeshBuffers().size(); i++)
-    {
-        SSkinMeshBuffer * buffer = skinned_mesh->addMeshBuffer();
-        *buffer = *(getMeshBuffers()[i]);
-    }
-
-    for (u32 j = 0; j < getAllJoints().size(); ++j)
-    {
-        ISkinnedMesh::SJoint *joint = skinned_mesh->addJoint();
-        *joint = *(getAllJoints()[j]);
-    }
-
-    // fix children pointers (they still have old pointers)
-    core::array<ISkinnedMesh::SJoint*> & new_joints = skinned_mesh->getAllJoints();
-    for (u32 i = 0; i < new_joints.size(); ++i)
-    {
-        ISkinnedMesh::SJoint * joint = new_joints[i];
-        for (u32 c = 0; c < joint->Children.size(); ++c)
-        {
-            // the child is one of the oldJoints and must be replaced by the newjoint on the same index
-            bool found = false;
-            for (u32 k = 0; k < AllJoints.size(); ++k)
-            {
-                if (joint->Children[c] == AllJoints[k])
-                {
-                    joint->Children[c] = new_joints[k];
-                    found = true;
-                    break;
-                }
-            }   // k < old_joints.size
-
-            if (!found)
-                found = true;
-        }   // c < joint->Children.size()
-    }   // i < new_joints.size()
-
-    // In finalize the values from LocalBuffers are copied into 
-    // Weights[].StaticPos. Since skinned_mesh already has the correct
-    // values in Weights, we have to copy the values from Weights
-    // into LocalBuffer (so that in the copy from LocalBuffer to weights
-    // no values are overwritten).
-    // FIXME: Not ideal, better would be not to copy the values in
-    // finalize().
-    for (unsigned int i = 0; i<AllJoints.size(); ++i)
-    {
-        SJoint *joint = AllJoints[i];
-        for (unsigned int j = 0; j<joint->Weights.size(); ++j)
-        {
-            const u16 buffer_id = joint->Weights[j].buffer_id;
-            const u32 vertex_id = joint->Weights[j].vertex_id;
-
-            skinned_mesh->LocalBuffers[buffer_id]->getVertex(vertex_id)->Pos = joint->Weights[j].StaticPos;
-            skinned_mesh->LocalBuffers[buffer_id]->getVertex(vertex_id)->Normal = joint->Weights[j].StaticNormal;
-        }
-    }
-    skinned_mesh->finalize();
-
-
-
-    return skinned_mesh;
-
-}   // clone
 
 } // end namespace scene
 } // end namespace irr
