@@ -240,8 +240,6 @@ void Network::setDefaultBroadcastAddresses()
 {
     // Add some common LAN addresses
     m_broadcast_address.emplace_back(std::string("192.168.255.255"));
-    m_broadcast_address.emplace_back(std::string("192.168.255.255"));
-    m_broadcast_address.emplace_back(std::string("192.168.255.255"));
     m_broadcast_address.emplace_back(std::string("192.168.0.255")  );
     m_broadcast_address.emplace_back(std::string("192.168.1.255")  );
     m_broadcast_address.emplace_back(std::string("172.31.255.255") );
