@@ -348,12 +348,16 @@ const std::vector<TransportAddress>& Network::getBroadcastAddresses()
         if (p->ifa_addr->sa_family == AF_INET)
         {
             struct sockaddr_in *sa = (struct sockaddr_in *) p->ifa_addr;
-            TransportAddress ta(sa->sin_addr, get);
-            char *addr = inet_ntoa(sa->sin_addr);
-            int ip = ((sockaddr_in*)(p->ifa_netmask))->sin_addr.s_addr;
-            ip = ~ip;
-            printf("Interface: %s\tAddress: %s\tmask: %x -> %x\n", p->ifa_name,
-                addr, p->ifa_netmask, htonl(ip));
+            TransportAddress ta(htonl(sa->sin_addr.s_addr), 0);
+            uint32_t u = ((sockaddr_in*)(p->ifa_netmask))->sin_addr.s_addr;
+            // Convert mask to #bits:  SWAT algorithm
+            u = u - ((u >> 1) & 0x55555555);
+            u = (u & 0x33333333) + ((u >> 2) & 0x33333333);
+            u = (((u + (u >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;            
+
+            printf("Interface: %s\tAddress: %s\tmask: %x\n", p->ifa_name,
+                ta.toString().c_str(), u);
+            addAllBroadcastAddresses(ta, u);
         }
     }
 
