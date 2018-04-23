@@ -2265,7 +2265,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
 void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 {
     int ticks_since_start = World::getWorld()->getTicksSinceStart();
-    if(ticks_since_start-m_ticks_last_crash < 0.5f) return;
+    if(ticks_since_start-m_ticks_last_crash < 60) return;
 
     m_ticks_last_crash = ticks_since_start;
     // After a collision disable the engine for a short time so that karts
@@ -2724,7 +2724,8 @@ void Kart::updateFlying()
  */
 void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
 {
-    bool always_animated = (type == RaceManager::KT_PLAYER && race_manager->getNumPlayers() == 1);
+    bool always_animated = (type == RaceManager::KT_PLAYER &&
+        race_manager->getNumLocalPlayers() == 1);
     m_node = m_kart_model->attachModel(is_animated_model, always_animated);
 
 #ifdef DEBUG

@@ -19,6 +19,7 @@
 #include "network/game_setup.hpp"
 
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
@@ -27,6 +28,8 @@
 #include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
 #include "utils/log.hpp"
+
+#include <algorithm>
 
 //-----------------------------------------------------------------------------
 /** Update and see if any player disconnects.
@@ -75,7 +78,8 @@ void GameSetup::loadWorld()
 {
     assert(!m_tracks.empty());
     // Disable accidentally unlocking of a challenge
-    PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
+    if (PlayerManager::getCurrentPlayer())
+        PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
     race_manager->setTimeTarget(0.0f);
     race_manager->setReverseTrack(m_reverse);
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
@@ -112,7 +116,10 @@ void GameSetup::addServerInfo(NetworkString* ns)
     {
         if (isGrandPrix())
         {
-            ns->addUInt8((uint8_t)2).addUInt8((uint8_t)m_tracks.size())
+            uint8_t cur_track = (uint8_t)m_tracks.size();
+            if (!isGrandPrixStarted())
+                cur_track = 0;
+            ns->addUInt8((uint8_t)2).addUInt8(cur_track)
                 .addUInt8(getExtraServerInfo());
         }
         else
@@ -128,3 +135,28 @@ void GameSetup::addServerInfo(NetworkString* ns)
     }
     ns->encodeString(NetworkConfig::get()->getMOTD());
 }   // addServerInfo
+
+//-----------------------------------------------------------------------------
+void GameSetup::sortPlayersForGrandPrix()
+{
+    if (!isGrandPrix() || m_tracks.size() == 1)
+        return;
+    std::lock_guard<std::mutex> lock(m_players_mutex);
+    std::sort(m_players.begin(), m_players.end(),
+        [](const std::weak_ptr<NetworkPlayerProfile>& a,
+        const std::weak_ptr<NetworkPlayerProfile>& b)
+        {
+            // They should never expired
+            auto c = a.lock();
+            assert(c);
+            auto d = b.lock();
+            assert(d);
+            return (c->getScore() < d->getScore()) ||
+                (c->getScore() == d->getScore() &&
+                c->getOverallTime() > d->getOverallTime());
+        });
+    if (UserConfigParams::m_gp_most_points_first)
+    {
+        std::reverse(m_players.begin(), m_players.end());
+    }
+}   // sortPlayersForGrandPrix

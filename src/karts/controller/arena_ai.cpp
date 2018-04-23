@@ -555,9 +555,6 @@ void ArenaAI::useItems(const float dt)
     case PowerupManager::POWERUP_PARACHUTE:
         break;   // POWERUP_PARACHUTE
 
-    case PowerupManager::POWERUP_ANVIL:
-        break;   // POWERUP_ANVIL
-
     case PowerupManager::POWERUP_RUBBERBALL:
         break;
 

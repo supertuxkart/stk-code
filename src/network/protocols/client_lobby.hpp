@@ -35,8 +35,7 @@ private:
         LINKED,
         REQUESTING_CONNECTION,
         CONNECTED,              // means in the lobby room
-        KART_SELECTION,         // Start kart selection, then go to next state
-        SELECTING_KARTS,        // in the network kart selection screen
+        SELECTING_ASSETS,       // in the kart selection or tracks screen
         PLAYING,                // racing
         RACE_FINISHED,          // race result shown
         DONE,

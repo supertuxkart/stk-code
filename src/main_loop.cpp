@@ -363,6 +363,7 @@ void MainLoop::run()
             GUIEngine::ModalDialog::dismiss();
             if (World::getWorld())
             {
+                race_manager->clearNetworkGrandPrixResult();
                 race_manager->exitRace();
             }
             if (!ProfileWorld::isNoGraphics())

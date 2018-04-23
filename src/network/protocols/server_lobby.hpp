@@ -143,8 +143,7 @@ public:
     void finishedLoadingWorld() OVERRIDE;
     ServerState getCurrentState() const { return m_state.load(); }
     void updateBanList();
-    virtual bool waitingForPlayers() const OVERRIDE
-                                { return m_state.load() == ACCEPTING_CLIENTS; }
+    virtual bool waitingForPlayers() const OVERRIDE;
     virtual bool allPlayersReady() const OVERRIDE
                             { return m_state.load() >= WAIT_FOR_RACE_STARTED; }
 
