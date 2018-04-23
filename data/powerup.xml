@@ -74,38 +74,123 @@
         force-updown="35"     force-to-target="15"
         max-distance="25"                               />
 
+    <!-- This defines the number of karts for which there is a
+       defined weight list. The value between two nodes will be
+       interpolated as a linear average of the value at each node,
+       except under the minimum node and above the maximum node
+       (in which case it stays identical to the minimum/maximum node)
+
+       The num of karts associated with each reference point should be
+       sorted in ascending order to guarantee correct behavior.
+
+       This doesn't apply to follow the leader, battle & tutorial weights
+       If the max karts number is increased, think to add values for
+       higher kart numbers. Otherwhise, it will default to value for 20. -->
+  <reference_points ref1="1" ref2="5" ref3="9" ref4="14" ref5="20" />
+
   <!-- Distribution of the items depending on position of the 
-       kart (first kart, top 33%, middle 33%, bottom 33% (but
-       not last), last kart. i
+       kart. There are defined value for first kart, last kart, and
+       at three equally spaced points between those.
+       For example, with 5 karts those points will match positon 2, 3, 4.
+       With 10 karts, they will correspond to 3,25 ; 5,5 ; 7,75.
+       It is not an issue for it to be a float, as the weights for positions
+       are linearly averaged.
        The order of items must correspond to powerup_manager.hpp.
-       The first line (w=...) corresponds to the weights of 
-       getting a single item, the second line (w-multi) to 
-       getting three identical items instead of just a single one.
-       E.g. as the first kart, you have 3/8 of a chance to get
-       a single bubble gum, 1/8 to get a bowling ball or switch,
-       and 3/8 to get a triple bubble gum.
-       'Global' items which affect all karts (switch) should
+
+       The first line (w1=...) corresponds to the weights of 
+       getting a specific item, the second line (w-multi1) to 
+       the weight at which it will yeld a triple item
+       rather than a single one
+
+       The probability to get an item is its weight divided by
+       sum of weights of all items (single AND multi). It is recommended 
+       to keep that sum equal to 200 to easily keep track of probabilities.
+
+       'Global' items which affect all karts (switch, parachute) should
        be quite rare, since otherwise the item might be used
        too often (compared with many items which will only
-       affect a karts or two).                                -->
+       affect a karts or two).
+
+       The distribution should give more similar item to different ranks
+       when there are few karts, but have more important differences when
+       there are more karts.                               -->
   <!--      bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
-  <first  w="25       5    15     5      10       10      10     0     0     0"
-    w-multi=" 0       0     5     0       0        0       0     0     0     0"    />
-  <top33  w="30      30    30    30      30       10      10    10    10     0"
-    w-multi=" 0      10    10     0      10        0       0     0     0     0"    />
-  <mid33  w="30      30    30    30      30       10      20    20    20     0"
-    w-multi=" 0      20    20    20      20        0       0     0     0     0"    />
-  <end33  w=" 0      30    30    30      30       10      20    30    30     0"
-    w-multi=" 0      30    30    30      30        0       0     0     0     0"    />
-  <last   w=" 0      30    10    90      60        0      10    60    60     0"
-    w-multi=" 0      30    30   100      60        0       0     0     0     0"    />
+  <first  w1="28       0    60    20      45       15      32     0     0     0"
+    w-multi1=" 0       0     0     0       0        0       0     0     0     0"
+          w2="26      16    52    15      46       12      33     0     0     0"
+    w-multi2=" 0       0     0     0       0        0       0     0     0     0"
+          w3="24      12    58    10      54        8      34     0     0     0"
+    w-multi3=" 0       0     0     0       0        0       0     0     0     0"
+          w4="22       8    64     5      60        6      35     0     0     0"
+    w-multi4=" 0       0     0     0       0        0       0     0     0     0"
+          w5="20       0    74     0      66        4      36     0     0     0"
+    w-multi5=" 0       0     0     0       0        0       0     0     0     0" 
+          wf="35       0    25    35      25       15      25     0     0     0"
+    w-multif="20       0     0    20       0        0       0     0     0     0"  />
+
+  <!--      bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
+  <top33  w1="30       0    59    26      40       14      27     0     0     0"
+    w-multi1=" 0       0     4     0       0        0       0     0     0     0"
+          w2="30      27    48    25      28       10      27     0     0     0"
+    w-multi2=" 0       0     5     0       0        0       0     0     0     0"
+          w3="29      30    45    24      32        7      27     0     0     0"
+    w-multi3=" 0       0     6     0       0        0       0     0     0     0"
+          w4="28      31    48    22      34        4      27     0     0     0"
+    w-multi4=" 0       0     6     0       0        0       0     0     0     0"
+          w5="27      32    48    20      37        3      27     0     0     0"
+    w-multi5=" 0       0     6     0       0        0       0     0     0     0"
+          wf="25       0    60    25      58        2      30     0     0     0"
+    w-multif=" 0       0     0     0       0        0       0     0     0     0"    />
+
+  <!--      bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
+  <mid33  w1="30       0    62    27      36       13      27     0     0     0"
+    w-multi1=" 0       0     5     0       0        0       0     0     0     0"
+          w2="30      27    45    27      27        9      27     3     0     0"
+    w-multi2=" 0       0     5     0       0        0       0     0     0     0"
+          w3="30      26    41    28      26        6      26    10     0     0"
+    w-multi3=" 0       0     7     0       0        0       0     0     0     0"
+          w4="30      25    42    29      29        3      24    10     0     0"
+    w-multi4=" 0       0     8     0       0        0       0     0     0     0"
+          w5="30      24    40    30      28        2      21    10     0     0"
+    w-multi5=" 0       0    10     0       5        0       0     0     0     0"
+          wf="35       0    55    35      25        3      25     0     0     0"
+    w-multif=" 0       0    10     0      12        0       0     0     0     0"    />
+
+  <!--      bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
+  <end33  w1="31       0    56    36      34       12      25     0     0     0"
+    w-multi1=" 0       0     6     0       0        0       0     0     0     0"
+          w2="32      24    28    38      22        7      20    16     6     0"
+    w-multi2=" 0       0     7     0       0        0       0     0     0     0"
+          w3="33      23    26    45      14        5      16    12     8     0"
+    w-multi3=" 0       0    12     0       6        0       0     0     0     0"
+          w4="27      21    23    44      12        3      14     8     6     0"
+    w-multi4=" 8       0    16     8      10        0       0     0     0     0"
+          w5="25      18    20    50      10        2      10     6     3     0"
+    w-multi5="10       0    20    10      16        0       0     0     0     0"
+          wf="25       0    40    45      15        5      15    10     5     0"
+    w-multif="10       0    15    15       0        0       0     0     0     0"    />
+
+  <!--      bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
+  <last   w1="34       0    36    55      30       10      17     0     0     0"
+    w-multi1=" 0       0    18     0       0        0       0     0     0     0"
+          w2="28      21     9    45       0        6       0    10    18     0"
+    w-multi2=" 8       0    16    35       4        0       0     0     0     0"
+          w3="20      16     7    37       0        3       0     4    15     0"
+    w-multi3="18       0    18    58       4        0       0     0     0     0"
+          w4="18      14     3    35       0        0       0     0    10     0"
+    w-multi4="24       0    25    65       6        0       0     0     0     0"
+          w5="15      12     0    25       0        0       0     0     7     0"
+    w-multi5="30       0    31    80       0        0       0     0     0     0"
+          wf="20       0    15    25       0        0       0     0    15     0"
+    w-multif="20       0    25    80       0        0       0     0     0     0"    />
+
+  <!--      bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
   <battle w="10      30    60     0       0       10      30     0     0     0"
     w-multi=" 0       0     5     0       0        0       0     0     0     0"    />
   <soccer w=" 0      30    60     0       0       10      30     0     0     0"
     w-multi=" 0       0     5     0       0        0       0     0     0     0"    />
   <tuto   w=" 0       0     0     0       0        0       0     0     0     0"
-    w-multi=" 0       0   100     0       0        0       0     0     0     0"    />
+    w-multi=" 0       0   100     0       0        0       0     0     0     0" />
 
     
 </powerup>
-
