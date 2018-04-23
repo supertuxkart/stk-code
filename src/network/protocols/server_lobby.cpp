@@ -1276,8 +1276,8 @@ void ServerLobby::finishedLoadingWorldClient(Event *event)
 {
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     m_peers_ready.at(peer) = true;
-    Log::info("ServerLobby", "Peer %d has finished loading world",
-        peer->getHostId());
+    Log::info("ServerLobby", "Peer %d has finished loading world at %lf",
+        peer->getHostId(), StkTime::getRealTime());
 }   // finishedLoadingWorldClient
 
 //-----------------------------------------------------------------------------

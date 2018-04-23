@@ -38,6 +38,7 @@
 //-----------------------------------------------------------------------------
 WorldStatus::WorldStatus()
 {
+    main_loop->setFrameBeforeLoadingWorld();
     m_clock_mode        = CLOCK_CHRONO;
 
     m_prestart_sound    = SFXManager::get()->createSoundSource("pre_start_race");
@@ -236,7 +237,7 @@ void WorldStatus::updateTime(int ticks)
             if (!UserConfigParams::m_sfx &&
                 m_auxiliary_ticks < stk_config->time2Ticks(3.0f))
                 return;
-            
+
             if (!m_play_track_intro_sound)
             {
                 startEngines();
@@ -246,24 +247,42 @@ void WorldStatus::updateTime(int ticks)
 
             m_auxiliary_ticks = 0;
 
-            if (m_play_ready_set_go_sounds)
-                m_prestart_sound->play();
-
             // In a networked game the client needs to wait for a notification
             // from the server that all clients and the server are ready to 
             // start the game. The server will actually wait for all clients
             // to confirm that they have started the race before starting
             // itself. In a normal race, this phase is skipped and the race
             // starts immediately.
-            m_phase = NetworkConfig::get()->isNetworking() ? WAIT_FOR_SERVER_PHASE
-                                                           : READY_PHASE;
+            if (NetworkConfig::get()->isNetworking())
+            {
+                m_phase = WAIT_FOR_SERVER_PHASE;
+                // In networked races, inform the start game protocol that
+                // the world has been setup
+                auto lobby = LobbyProtocol::get<LobbyProtocol>();
+                assert(lobby);
+                lobby->finishedLoadingWorld();
+            }
+            else
+            {
+                if (m_play_ready_set_go_sounds)
+                    m_prestart_sound->play();
+                m_phase = READY_PHASE;
+            }
             return;   // Don't increase time
         case WAIT_FOR_SERVER_PHASE:
         {
+            // Wait for all players to finish loading world
+            auto lobby = LobbyProtocol::get<LobbyProtocol>();
+            assert(lobby);
+            if (!lobby->allPlayersReady())
+                return;
             // This stage is only reached in case of a networked game.
             // The server waits for a confirmation from
             // each client that they have started (to guarantee that the
             // server is running with a local time behind all clients).
+            if (m_play_ready_set_go_sounds)
+                m_prestart_sound->play();
+
             if (NetworkConfig::get()->isServer() &&
                 m_server_is_ready.load() == false) return;
 

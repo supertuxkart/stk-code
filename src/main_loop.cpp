@@ -30,7 +30,6 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
-#include "network/protocols/lobby_protocol.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
@@ -55,6 +54,7 @@ MainLoop::MainLoop(unsigned parent_pid)
     m_prev_time       = 0;
     m_throttle_fps    = true;
     m_is_last_substep = false;
+    m_frame_before_loading_world = false;
 #ifdef WIN32
     if (parent_pid != 0)
     {
@@ -302,23 +302,6 @@ void MainLoop::run()
 
     while (!m_abort)
     {
-        bool loading_shutdown = false;
-        auto lb = LobbyProtocol::get<LobbyProtocol>();
-        if (World::getWorld() && lb &&
-            STKHost::existHost() && !STKHost::get()->requestedShutdown())
-        {
-            while (!lb->allPlayersReady())
-            {
-                if (STKHost::existHost() && STKHost::get()->requestedShutdown())
-                {
-                    loading_shutdown = true;
-                    break;
-                }
-                StkTime::sleep(1);
-                m_curr_time = irr_driver->getDevice()->getTimer()->getRealTime();
-            }
-        }
-
 #ifdef WIN32
         if (parent != 0 && parent != INVALID_HANDLE_VALUE)
         {
@@ -349,8 +332,7 @@ void MainLoop::run()
 
         // Shutdown next frame if shutdown request is sent while loading the
         // world
-        if (!loading_shutdown && STKHost::existHost() &&
-            STKHost::get()->requestedShutdown())
+        if (STKHost::existHost() && STKHost::get()->requestedShutdown())
         {
             SFXManager::get()->quickSound("anvil");
             core::stringw msg = _("Server connection timed out.");
@@ -428,7 +410,21 @@ void MainLoop::run()
             }
             PROFILER_POP_CPU_MARKER();
 
-            if (World::getWorld()) World::getWorld()->updateTime(1);
+            if (m_frame_before_loading_world)
+            {
+                m_frame_before_loading_world = false;
+                break;
+            }
+            if (World::getWorld())
+            {
+                if (World::getWorld()->getPhase() == WorldStatus::SETUP_PHASE)
+                {
+                    // Skip the large num steps contributed by loading time
+                    World::getWorld()->updateTime(1);
+                    break;
+                }
+                World::getWorld()->updateTime(1);
+            }
         }   // for i < num_steps
 
         m_is_last_substep = false;
