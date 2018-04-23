@@ -1446,7 +1446,7 @@ void SkiddingAI::handleBubblegum(int item_skill, const std::vector<const Item *>
     }
 
     //If the kart view is blocked by a plunger, use the shield
-    if(m_kart->getBlockedByPlungerTime()>0)
+    if(m_kart->getBlockedByPlungerTicks()>0)
     {
         m_controls->setFire(true);
         m_controls->setLookBack(false);
