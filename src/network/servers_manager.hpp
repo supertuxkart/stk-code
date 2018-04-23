@@ -19,7 +19,10 @@
 #ifndef HEADER_SERVERS_MANAGER_HPP
 #define HEADER_SERVERS_MANAGER_HPP
 
+#include <irrString.h>
+
 #include <atomic>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -48,16 +51,12 @@ private:
     // ------------------------------------------------------------------------
     void setWanServers(bool success, const XMLNode* input);
     // ------------------------------------------------------------------------
-    void setLanServers(std::vector<std::shared_ptr<Server> >& servers)
-    {
-        m_servers = std::move(servers);
-        m_list_updated = true;
-    }
-    // ------------------------------------------------------------------------
     Online::XMLRequest* getWANRefreshRequest() const;
     // ------------------------------------------------------------------------
     Online::XMLRequest* getLANRefreshRequest() const;
-
+    // ------------------------------------------------------------------------
+    void setLanServers(const std::map<irr::core::stringw, 
+                                      std::shared_ptr<Server> >& servers);
 public:
     // ------------------------------------------------------------------------
     // Singleton

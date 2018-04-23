@@ -31,7 +31,6 @@
 #include "utils/time.hpp"
 
 #include <assert.h>
-#include <irrString.h>
 #include <string>
 
 #define SERVER_REFRESH_INTERVAL 5.0f
@@ -136,11 +135,14 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             addr.host = STKHost::HOST_ANY;
             addr.port = STKHost::PORT_ANY;
             Network *broadcast = new Network(1, 1, 0, 0, &addr);
-
-            BareNetworkString s(std::string("stk-server"));
-            TransportAddress broadcast_address(-1, 
-                               NetworkConfig::get()->getServerDiscoveryPort());
-            broadcast->sendRawPacket(s, broadcast_address);
+            const std::vector<TransportAddress> &all_bcast =
+                broadcast->getBroadcastAddresses();
+            for (auto &bcast_addr : all_bcast)
+            {
+                Log::info("Server Discovery", "Broadcasting to %s",
+                          bcast_addr.toString().c_str());
+                broadcast->sendRawPacket(std::string("stk-server"), bcast_addr);
+            }
 
             Log::info("ServersManager", "Sent broadcast message.");
 
@@ -153,7 +155,12 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             const auto& servers = ServersManager::get()->getServers();
             int cur_server_id = (int)servers.size();
             assert(cur_server_id == 0);
-            std::vector<std::shared_ptr<Server> > servers_now;
+            // Use a map with the server name as key to automatically remove
+            // duplicated answers from a server (since we potentially do
+            // multiple broadcasts). We can not use the sender ip address,
+            // because e.g. a local client would answer as 127.0.0.1 and
+            // 192.168.**.
+            std::map<irr::core::stringw, std::shared_ptr<Server> > servers_now;
             while (StkTime::getRealTime() - start_time < DURATION)
             {
                 TransportAddress sender;
@@ -178,9 +185,10 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     uint8_t mode        = s.getUInt8();
                     sender.setPort(port);
                     uint8_t password    = s.getUInt8();
-                    servers_now.emplace_back(std::make_shared<Server>
+                    servers_now.emplace(name, std::make_shared<Server>
                         (cur_server_id++, name, max_players, players,
-                        difficulty, mode, sender, password == 1));
+                        difficulty, mode, sender, password == 1)       );
+                    //all_servers.[name] = servers_now.back();
                 }   // if received_data
             }    // while still waiting
             m_success = true;
@@ -199,6 +207,20 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
 
 }   // getLANRefreshRequest
 
+// ----------------------------------------------------------------------------
+/** Takes a mapping of server name to server data (to avoid having the same 
+ *  server listed more than once since the client will be doing multiple
+ *  broadcasts to find a server), and converts this into a list of servers.
+ *  \param servers Mapping of server name to Server object.
+ */
+void ServersManager::setLanServers(const std::map<irr::core::stringw,
+                                                  std::shared_ptr<Server> >& servers)
+{
+    m_servers.clear();
+    for (auto i : servers) m_servers.emplace_back(i.second);
+    m_list_updated = true;
+
+}
 // ----------------------------------------------------------------------------
 /** Factory function to create either a LAN or a WAN update-of-server
  *  requests. The current list of servers is also cleared.

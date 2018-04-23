@@ -577,12 +577,12 @@ void STKHost::setPublicAddress()
             // alternate NAT traversal methods.
             if (!xor_addr.isUnset())
             {
-                m_public_address.copy(xor_addr);
+                m_public_address = xor_addr;
             }
             else
             {
                 Log::warn("STKHost", "Only non xor-mapped address returned.");
-                m_public_address.copy(non_xor_addr);
+                m_public_address = non_xor_addr;
             }
             // Succeed, save ping
             UserConfigParams::m_stun_list[server_name] =

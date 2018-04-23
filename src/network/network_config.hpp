@@ -24,6 +24,7 @@
 
 #include "network/transport_address.hpp"
 #include "race/race_manager.hpp"
+#include "utils/no_copy.hpp"
 
 #include "irrString.h"
 #include <tuple>
@@ -42,7 +43,7 @@ namespace GUIEngine
 class InputDevice;
 class PlayerProfile;
 
-class NetworkConfig
+class NetworkConfig : public NoCopy
 {
 private:
     /** The singleton instance. */

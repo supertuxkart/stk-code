@@ -22,7 +22,6 @@
 #ifndef HEADER_TRANSPORT_ADDRESS_HPP
 #define HEADER_TRANSPORT_ADDRESS_HPP
 
-#include "utils/no_copy.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/types.hpp"
 
@@ -35,7 +34,7 @@
  *  \brief Describes a transport-layer address.
  *  For IP networks, a transport address is the couple ip:port.
  */
-class TransportAddress : public NoCopy
+class TransportAddress
 {
 private:
     uint32_t m_ip;    //!< The IPv4 address
@@ -48,6 +47,14 @@ public:
         m_ip = ip;
         m_port = port;
     }   // TransportAddress
+
+    // ------------------------------------------------------------------------
+    TransportAddress(uint8_t b1, uint8_t b2, uint8_t b3, uint8_t b4,
+                     uint16_t port=0)
+    {
+        m_ip   = (b1 << 24) + (b2 << 16) + (b3 << 8) + b4;
+        m_port = port;
+    }   // TransportAddress(uint8_t,...)
 
     // ------------------------------------------------------------------------
     /** Construct an transport address from an ENetAddress. */
@@ -92,15 +99,6 @@ public:
     ~TransportAddress() {}
     // ------------------------------------------------------------------------
     static void unitTesting();
-private:
-    friend class NetworkConfig;
-    /** The copy constructor is private, so that the friend class
-     *  NetworkConfig can access it to create a copy (getMyAddress), but
-     *  no other class can. */
-    TransportAddress(const TransportAddress &other)
-    {
-        copy(other);
-    }   // TransportAddress(const TransportAddress&)
 public:
     // ------------------------------------------------------------------------
     bool isPublicAddressLocalhost() const;
@@ -108,15 +106,6 @@ public:
     bool isLAN() const;
     // ------------------------------------------------------------------------
     bool isUnset() const { return m_ip == 0 || m_port == 0; }
-    // ------------------------------------------------------------------------
-    /** A copy function (to replace the copy constructor which is disabled
-     *  using NoCopy): it copies the data from the argument into this object.*/
-    void copy(const TransportAddress &other)
-    {
-        m_ip   = other.m_ip;
-        m_port = other.m_port;
-    }   // copy
-
     // ------------------------------------------------------------------------
     /** Resets ip and port to 0. */
     void clear()

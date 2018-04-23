@@ -116,11 +116,11 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
     m_server_owner       = 0;
     m_current_players    = current_players;
     m_max_players        = max_players;
-    m_address.copy(address);
+    m_address            = address;
     // In case of LAN server, public and private port are the same.
     m_private_port       = m_address.getPort();
-    m_difficulty = (RaceManager::Difficulty)difficulty;
-    m_server_mode = server_mode;
+    m_difficulty         = (RaceManager::Difficulty)difficulty;
+    m_server_mode        = server_mode;
     m_password_protected = password_protected;
     m_distance = 0.0f;
 }   // server(server_id, ...)
