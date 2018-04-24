@@ -372,7 +372,7 @@ void Kart::reset()
     m_speed                = 0.0f;
     m_smoothed_speed       = 0.0f;
     m_current_lean         = 0.0f;
-    m_falling_ticks        = 0;
+    m_falling_time         = 0.0f;
     m_view_blocked_by_plunger = 0;
     m_has_caught_nolok_bubblegum = false;
     m_is_jumping           = false;
@@ -1550,7 +1550,6 @@ void Kart::update(int ticks)
     }
 
     PROFILER_PUSH_CPU_MARKER("Kart::Update (material)", 0x60, 0x34, 0x7F);
-    handleMaterialGFX(ticks);
     const Material* material=m_terrain_info->getMaterial();
     if (!material)   // kart falling off the track
     {
@@ -1861,9 +1860,11 @@ void Kart::handleMaterialSFX(const Material *material)
  *  you are driving on, or the effect from a surface the kart is
  *  (partially) under. The surface effect is triggered, if either the
  *  kart is falling, or if the surface the kart is driving on has
- *  the 'isBelowSurface' property set.
+ *  the 'isBelowSurface' property set. This function is called once
+ *  per rendered frame from updateGraphics().
+ *  \param dt Time step size.
  */
-void Kart::handleMaterialGFX(int ticks)
+void Kart::handleMaterialGFX(float dt)
 {
     const Material *material = getMaterial();
 
@@ -1900,19 +1901,19 @@ void Kart::handleMaterialGFX(int ticks)
         bool falling = material && material->hasFallingEffect() && !m_flying;
         if (falling)
         {
-            m_falling_ticks -= ticks;
-            if (m_falling_ticks < 0)
-                m_falling_ticks = 0;
+            m_falling_time -= dt;
+            if (m_falling_time < 0)
+                m_falling_time = 0;
         }
         else
-            m_falling_ticks = stk_config->time2Ticks(0.35f);
+            m_falling_time = 0.35f;
 
         for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
             Camera *camera = Camera::getCamera(i);
             if(camera->getKart()!=this) continue;
 
-            if (falling && m_falling_ticks <= 0)
+            if (falling && m_falling_time <= 0)
             {
                 camera->setMode(Camera::CM_FALLING);
             }
@@ -2456,8 +2457,6 @@ void Kart::updatePhysics(int ticks)
     m_max_speed->setMinSpeed(min_speed);
     m_max_speed->update(ticks);
 
-
-    updateEngineSFX(stk_config->ticks2Time(ticks));
 #ifdef XX
     Log::info("Kart","angVel %f %f %f heading %f suspension %f %f %f %f"
        ,m_body->getAngularVelocity().getX()
@@ -2474,14 +2473,15 @@ void Kart::updatePhysics(int ticks)
 }   // updatephysics
 
 //-----------------------------------------------------------------------------
-/** Adjust the engine sound effect depending on the speed of the kart.
+/** Adjust the engine sound effect depending on the speed of the kart. This 
+ *  is called during updateGraphics, i.e. once per rendered frame only.
+ *  \param dt Time step size.
  */
 void Kart::updateEngineSFX(float dt)
 {
     // Only update SFX during the last substep (otherwise too many SFX commands
     // in one frame), and if sfx are enabled
-    if(!m_engine_sound || !SFXManager::get()->sfxAllowed() ||
-        !main_loop->isLastSubstep()                              )
+    if(!m_engine_sound || !SFXManager::get()->sfxAllowed()  )
         return;
 
     // when going faster, use higher pitch for engine
@@ -3039,32 +3039,8 @@ void Kart::updateGraphics(float dt)
     }
 #endif
 
-#ifdef XX
-    // cheap wheelie effect
-    if (m_controls.getNitro())
-    {
-        m_node->updateAbsolutePosition();
-        m_kart_model->getWheelNodes()[0]->updateAbsolutePosition();
-        float wheel_y = m_kart_model->getWheelNodes()[0]->getAbsolutePosition().Y;
-
-        core::vector3df rot = m_node->getRotation();
-
-        float ratio = 0.8f;  //float(m_zipper_fire->getCreationRate())
-                //   /float(m_zipper_fire->getParticlesInfo()->getMaxRate());
-
-        const float a = (13.4f - ratio*13.0f);
-        float dst = -45.0f*sin((a*a)/180.f*M_PI);
-
-        rot.X = dst;
-        m_node->setRotation(rot);
-
-        m_node->updateAbsolutePosition();
-        m_kart_model->getWheelNodes()[0]->updateAbsolutePosition();
-        float wheel_y_after = m_kart_model->getWheelNodes()[0]->getAbsolutePosition().Y;
-
-        m_node->setPosition(m_node->getPosition() + core::vector3df(0,wheel_y_after - wheel_y,0));
-    }
-#endif
+    handleMaterialGFX(dt);
+    updateEngineSFX(dt);
 
 }   // updateGraphics
 

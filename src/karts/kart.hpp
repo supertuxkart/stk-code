@@ -207,7 +207,7 @@ protected:
     float           m_finish_time;
     bool            m_finished_race;
 
-    int             m_falling_ticks;
+    float           m_falling_time;
 
     /** When a kart has its view blocked by the plunger, this variable will be
      *  > 0 the number it contains is the time left before removing plunger. */
@@ -245,7 +245,7 @@ protected:
 
     void          updatePhysics(int ticks);
     void          handleMaterialSFX(const Material *material);
-    void          handleMaterialGFX(int ticks);
+    void          handleMaterialGFX(float dt);
     void          updateFlying();
     void          updateSliding();
     void          updateEnginePowerAndBrakes(int ticks);
