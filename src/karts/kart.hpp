@@ -278,11 +278,11 @@ public:
     virtual void   startEngineSFX   ();
     virtual void   adjustSpeed      (float f);
     virtual void   increaseMaxSpeed(unsigned int category, float add_speed,
-                                    float engine_force, float duration,
-                                    float fade_out_time);
+                                    float engine_force, int duration,
+                                    int fade_out_time) OVERRIDE;
     virtual void   instantSpeedIncrease(unsigned int category, float add_max_speed,
-                                    float speed_boost, float engine_force, float duration,
-                                    float fade_out_time);
+                                    float speed_boost, float engine_force, 
+                                    int duration, int fade_out_time) OVERRIDE;
     virtual void   setSlowdown(unsigned int category, float max_speed_fraction,
                                int fade_in_time);
     virtual int   getSpeedIncreaseTicksLeft(unsigned int category) const;

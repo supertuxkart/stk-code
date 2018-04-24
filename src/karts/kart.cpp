@@ -460,23 +460,20 @@ void Kart::setXYZ(const Vec3& a)
 
 // -----------------------------------------------------------------------------
 void Kart::increaseMaxSpeed(unsigned int category, float add_speed,
-                            float engine_force, float duration,
-                            float fade_out_time)
+                            float engine_force, int duration,
+                            int fade_out_time)
 {
     m_max_speed->increaseMaxSpeed(category, add_speed, engine_force,
-                                  stk_config->time2Ticks(duration),
-                                  stk_config->time2Ticks(fade_out_time));
+                                  duration, fade_out_time);
 }   // increaseMaxSpeed
 
 // -----------------------------------------------------------------------------
 void Kart::instantSpeedIncrease(unsigned int category, float add_max_speed,
-                            float speed_boost, float engine_force, float duration,
-                            float fade_out_time)
+                               float speed_boost, float engine_force,
+                               int duration, int fade_out_time)
 {
     m_max_speed->instantSpeedIncrease(category, add_max_speed, speed_boost,
-                                      engine_force,
-                                      stk_config->time2Ticks(duration),
-                                      stk_config->time2Ticks(fade_out_time) );
+                                      engine_force, duration, fade_out_time);
 }   // instantSpeedIncrease
 
 // -----------------------------------------------------------------------------
