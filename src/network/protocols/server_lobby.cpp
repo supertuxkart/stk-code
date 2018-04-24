@@ -264,7 +264,7 @@ void ServerLobby::asynchronousUpdate()
         }
         else
         {
-            m_server_address.copy(STKHost::get()->getPublicAddress());
+            m_server_address = STKHost::get()->getPublicAddress();
             STKHost::get()->startListening();
             m_state = REGISTER_SELF_ADDRESS;
         }

@@ -145,7 +145,7 @@ void RewindManager::addEvent(EventRewinder *event_rewinder,
  *  \param buffer Pointer to the event data.
  */
 void RewindManager::addNetworkEvent(EventRewinder *event_rewinder,
-    BareNetworkString *buffer, int ticks)
+                                     BareNetworkString *buffer, int ticks)
 {
     m_rewind_queue.addNetworkEvent(event_rewinder, buffer, ticks);
 }   // addNetworkEvent

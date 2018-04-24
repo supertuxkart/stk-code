@@ -97,7 +97,7 @@ void ClientLobby::clearPlayers()
  */
 void ClientLobby::setAddress(const TransportAddress &address)
 {
-    m_server_address.copy(address);
+    m_server_address = address;
 }   // setAddress
 
 //-----------------------------------------------------------------------------

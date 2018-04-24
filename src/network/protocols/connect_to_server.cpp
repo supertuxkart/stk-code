@@ -46,8 +46,8 @@ ConnectToServer::ConnectToServer(std::shared_ptr<Server> server)
 {
     if (server)
     {
-        m_server = server;
-        m_server_address.copy(m_server->getAddress());
+        m_server         = server;
+        m_server_address = m_server->getAddress();
     }
     setHandleConnections(true);
 }   // ConnectToServer(server, host)
@@ -105,7 +105,7 @@ void ConnectToServer::asynchronousUpdate()
                             return a->getCurrentPlayers() < b->getCurrentPlayers();
                         });
                     m_server = servers[0];
-                    m_server_address.copy(m_server->getAddress());
+                    m_server_address = m_server->getAddress();
                 }
                 else
                 {
@@ -435,7 +435,7 @@ void ConnectToServer::waitingAloha(bool is_wan)
             if (sender.isPublicAddressLocalhost())
                 sender.setIP(0x7f000001); // 127.0.0.1
         }
-        m_server_address.copy(sender);
+        m_server_address = sender;
         m_state = CONNECTING;
         // Reset timer for next usage
         m_timer = 0.0;

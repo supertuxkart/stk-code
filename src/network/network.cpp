@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/transport_address.hpp"
 #include "utils/time.hpp"
@@ -27,12 +28,16 @@
 #include <string.h>
 #if defined(WIN32)
 #  include "ws2tcpip.h"
+#  include <iphlpapi.h>
 #  define inet_ntop InetNtop
 #else
 #  include <arpa/inet.h>
 #  include <errno.h>
+#  include <ifaddrs.h>
 #  include <sys/socket.h>
 #endif
+
+
 #include <pthread.h>
 #include <signal.h>
 
@@ -225,3 +230,138 @@ void Network::closeLog()
         m_log_file.unlock();
     }
 }   // closeLog
+
+// ----------------------------------------------------------------------------
+/** Sets a list of default broadcast addresses which is used in case no valid
+ *  broadcast address is found. This list includes default private network
+ *  addresses.
+ */
+void Network::setDefaultBroadcastAddresses()
+{
+    // Add some common LAN addresses
+    m_broadcast_address.emplace_back(std::string("192.168.255.255"));
+    m_broadcast_address.emplace_back(std::string("192.168.0.255")  );
+    m_broadcast_address.emplace_back(std::string("192.168.1.255")  );
+    m_broadcast_address.emplace_back(std::string("172.31.255.255") );
+    m_broadcast_address.emplace_back(std::string("172.16.255.255") );
+    m_broadcast_address.emplace_back(std::string("172.16.0.255")   );
+    m_broadcast_address.emplace_back(std::string("10.255.255.255") );
+    m_broadcast_address.emplace_back(std::string("10.0.255.255")   );
+    m_broadcast_address.emplace_back(std::string("10.0.0.255")     );
+    m_broadcast_address.emplace_back(std::string("255.255.255.255"));
+    m_broadcast_address.emplace_back(std::string("127.0.0.255")    );
+    m_broadcast_address.emplace_back(std::string("127.0.0.1")      );
+}   // setDefaultBroadcastAddresses
+
+// ----------------------------------------------------------------------------
+/** This masks various possible broadcast addresses. For example, in a /16
+ *  network it would first use *.*.255.255, then *.*.*.255. Also if the
+ *  length of the mask is not a multiple of 8, the original value will
+ *  be used, before multiple of 8 are create: /22 (*.3f.ff.ff), then
+ *  /16 (*.*.ff.ff), /8 (*.*.*.ff). While this is usually an overkill,
+ *  it can help in the case that the router does not forward a broadcast
+ *  as expected (this problem often happens with 255.255.255.255, which is
+ *  why this broadcast address creation code was added).
+ *  \param a The transport address for which the broadcast addresses need
+ *         to be created.
+ *  \param len Number of bits to be or'ed.
+ */
+void Network::addAllBroadcastAddresses(const TransportAddress &a, int len)
+{
+    // Try different broadcast addresses - by masking on
+    // byte boundaries
+    while (len > 0)
+    {
+        unsigned int mask = (1 << len) - 1;
+        TransportAddress bcast(a.getIP() | mask, 
+                               NetworkConfig::get()->getServerDiscoveryPort());
+        Log::info("Broadcast", "address %s length %d mask %x --> %s",
+            a.toString().c_str(),
+            len, mask,
+            bcast.toString().c_str());
+        m_broadcast_address.push_back(bcast);
+        if (len % 8 != 0)
+            len -= (len % 8);
+        else
+            len = len - 8;
+    }   // while len > 0
+}   // addAllBroadcastAddresses
+
+// ----------------------------------------------------------------------------
+/** Returns a list of all possible broadcast addresses on this machine.
+ *  It queries all adapters for active IPV4 interfaces, determines their
+ *  netmask to create the broadcast addresses. It will also add 'smaller'
+ *  broadcast addesses, e.g. in a /16 network, it will add *.*.255.255 and
+ *  *.*.*.255, since it was sometimes observed that routers would not let
+ *  all broadcast addresses through. Duplicated answers (from the same server
+ *  to different addersses) will be filtered out in ServersManager.
+ */
+const std::vector<TransportAddress>& Network::getBroadcastAddresses()
+{
+    if (m_broadcast_address.size() > 0) return m_broadcast_address;
+
+#ifdef WIN32
+    IP_ADAPTER_ADDRESSES *addresses;
+    int count = 100, return_code;
+
+    int iteration = 0;
+    do
+    {
+        addresses = new IP_ADAPTER_ADDRESSES[count];
+        ULONG buf_len = sizeof(IP_ADAPTER_ADDRESSES)*count;
+        long flags = 0;
+        return_code = GetAdaptersAddresses(AF_INET, flags, NULL, addresses,
+            &buf_len);
+        iteration++;
+    } while (return_code == ERROR_BUFFER_OVERFLOW && iteration<10);
+
+    if (return_code == ERROR_BUFFER_OVERFLOW)
+    {
+        Log::warn("NetworkConfig", "Can not get broadcast addresses.");
+        setDefaultBroadcastAddresses();
+        return m_broadcast_address;
+    }
+
+    for (IP_ADAPTER_ADDRESSES *p = addresses; p; p = p->Next)
+    {
+        // Check all operational IP4 adapters
+        if (p->OperStatus == IfOperStatusUp &&
+            p->FirstUnicastAddress->Address.lpSockaddr->sa_family == AF_INET)
+        {
+            const sockaddr_in *sa = (sockaddr_in*)p->FirstUnicastAddress->Address.lpSockaddr;
+            // Use sa->sin_addr.S_un.S_addr and htonl?
+            TransportAddress ta(sa->sin_addr.S_un.S_un_b.s_b1,
+                sa->sin_addr.S_un.S_un_b.s_b2,
+                sa->sin_addr.S_un.S_un_b.s_b3,
+                sa->sin_addr.S_un.S_un_b.s_b4);
+            int len = 32 - p->FirstUnicastAddress->OnLinkPrefixLength;
+            addAllBroadcastAddresses(ta, len);
+        }
+    }
+#else
+    struct ifaddrs *addresses, *p;
+
+    getifaddrs(&addresses);
+    for (p = addresses; p; p = p->ifa_next)
+    {
+        if (p->ifa_addr->sa_family == AF_INET)
+        {
+            struct sockaddr_in *sa = (struct sockaddr_in *) p->ifa_addr;
+            TransportAddress ta(htonl(sa->sin_addr.s_addr), 0);
+            uint32_t u = ((sockaddr_in*)(p->ifa_netmask))->sin_addr.s_addr;
+            // Convert mask to #bits:  SWAT algorithm
+            u = u - ((u >> 1) & 0x55555555);
+            u = (u & 0x33333333) + ((u >> 2) & 0x33333333);
+            u = (((u + (u >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;            
+
+            printf("Interface: %s\tAddress: %s\tmask: %x\n", p->ifa_name,
+                ta.toString().c_str(), u);
+            addAllBroadcastAddresses(ta, u);
+        }
+    }
+
+
+#endif
+    return m_broadcast_address;
+}   // getBroadcastAddresses
+

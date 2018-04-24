@@ -271,8 +271,8 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                     return false;
                 }
 
-                m_entered_server_address.copy(
-                    STKHost::get()->getServerPeerForClient()->getAddress());
+                m_entered_server_address = 
+                    STKHost::get()->getServerPeerForClient()->getAddress();
                 auto cl = LobbyProtocol::create<ClientLobby>();
                 cl->setAddress(m_entered_server_address);
                 cl->requestStart();
