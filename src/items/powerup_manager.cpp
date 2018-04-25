@@ -374,14 +374,14 @@ void PowerupManager::loadWeights(const XMLNode &root,
 
         if (!StringUtils::parseString(weight_list_inf[i].c_str(), &weight_inf))
         {
-            Log::error("[PowerupManager]","Incorrect reference point values, "
+            Log::error("[PowerupManager]","Incorrect powerup weight values, "
                                      "probabilities will be incorrect");
             weight_inf = 0;//default to zero
         }
 
         if (!StringUtils::parseString(weight_list_sup[i].c_str(), &weight_sup))
         {
-            Log::error("[PowerupManager]","Incorrect reference point values, "
+            Log::error("[PowerupManager]","Incorrect powerup weight values, "
                                      "probabilities will be incorrect");
             weight_sup = 0;
         }
