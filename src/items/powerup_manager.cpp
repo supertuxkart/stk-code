@@ -221,9 +221,12 @@ void PowerupManager::loadWeights(const XMLNode &root,
                                  const std::string &class_name,
                                  PositionClass position_class)
 {
-    const XMLNode *node = root.getNode(class_name), *node2 = root.getNode("reference_points");
-    std::string s_inf(""), s_inf_multi(""), s_sup(""), s_sup_multi(""), ref;
+    const XMLNode *class_node = root.getNode(class_name), *reference_points_node = root.getNode("reference_points");
+    std::string ref;
+    // Those are the strings which will contain the names of the nodes to load inside the class node
     std::string w_inf("w"), w_sup("w"), w_inf_multi("w-multi"), w_sup_multi("w-multi");
+    // Those are the strings where the raw weight values will be put when read from the XML nodes
+    std::string values_inf(""), values_inf_multi(""), values_sup(""), values_sup_multi("");
     int inf_num = 1, sup_num = 1; //The number of karts associated with the reference points
 
     /** Adds to w_inf and w_sup the suffixe of the closest num_karts reference classes
@@ -234,13 +237,13 @@ void PowerupManager::loadWeights(const XMLNode &root,
     {
         //First step : get the reference points
 
-        if(!node2)
+        if(!reference_points_node)
         {
             Log::error("[PowerupManager]","No reference points found, "
                          "probabilities will be incorrect");
         }
 
-        if (node2)
+        if (reference_points_node)
         {
             if(race_manager->isFollowMode())
             {
@@ -249,19 +252,25 @@ void PowerupManager::loadWeights(const XMLNode &root,
             
             else
             {
-                // With default config it won't loop more than five time
-                // This is mainly to let full config editing power
-                for(int i=1;i<=50;i++)
+                int i = 0;
+                while(1)
                 {
+                    i++;
                     ref = "ref" + StringUtils::toString(i);
                     std::string ref_pos;
-                    if (!node2->get(ref, &ref_pos))
+                    if (!reference_points_node->get(ref, &ref_pos))
                         break;
-                    unsigned int ref_value = atoi(ref_pos.c_str());
+                    unsigned int ref_value;
+                    if (!StringUtils::parseString(ref_pos.c_str(), &ref_value))
+                    {
+                        Log::error("[PowerupManager]","Incorrect reference point values, "
+                                     "probabilities will be incorrect");
+                        continue;
+                    }
                     if (ref_value <= num_karts)
                     {
                         inf_num = ref_value;
-                        //Useful if config is edited so num_kar > highest reference position
+                        //Useful if config is edited so num_kart > highest reference position
                         sup_num = ref_value;
                         w_inf = "w" + StringUtils::toString(i);
                         w_inf_multi = "w-multi" + StringUtils::toString(i);
@@ -274,7 +283,7 @@ void PowerupManager::loadWeights(const XMLNode &root,
                         w_sup_multi = w_sup_multi + StringUtils::toString(i);
                         break;
                     }
-                } // for i<=50
+                }
             } //else
         }
 
@@ -295,16 +304,16 @@ void PowerupManager::loadWeights(const XMLNode &root,
 
     }
     
-    //Second step : load the node values
-    if(node)
+    //Second step : load the class_node values
+    if(class_node)
     {
-        node->get(w_inf,       &s_inf       );
-        node->get(w_inf_multi, &s_inf_multi );
-        node->get(w_sup,       &s_sup       );
-        node->get(w_sup_multi, &s_sup_multi );
+        class_node->get(w_inf,       &values_inf       );
+        class_node->get(w_inf_multi, &values_inf_multi );
+        class_node->get(w_sup,       &values_sup       );
+        class_node->get(w_sup_multi, &values_sup_multi );
     }
 
-    if(!node || s_inf=="" || s_inf_multi=="" || s_sup=="" || s_sup_multi=="")
+    if(!class_node || values_inf=="" || values_inf_multi=="" || values_sup=="" || values_sup_multi=="")
     {
         Log::error("[PowerupManager]", "No weights found for class '%s'"
                     " - probabilities will be incorrect.",
@@ -313,8 +322,8 @@ void PowerupManager::loadWeights(const XMLNode &root,
     }
 
     //Third step : split in discrete values
-    std::vector<std::string> weight_list_inf = StringUtils::split(s_inf+" "+s_inf_multi,' ');
-    std::vector<std::string> weight_list_sup = StringUtils::split(s_sup+" "+s_sup_multi,' ');
+    std::vector<std::string> weight_list_inf = StringUtils::split(values_inf+" "+values_inf_multi,' ');
+    std::vector<std::string> weight_list_sup = StringUtils::split(values_sup+" "+values_sup_multi,' ');
 
     std::vector<std::string>::iterator i=weight_list_inf.begin();
     while(i!=weight_list_inf.end())
@@ -361,8 +370,21 @@ void PowerupManager::loadWeights(const XMLNode &root,
     //Fourth step : finally compute the searched values
     for(unsigned int i=0; i<2*(int)POWERUP_LAST; i++)
     {
-        int weight_inf = atoi(weight_list_inf[i].c_str());
-        int weight_sup = atoi(weight_list_sup[i].c_str());
+        int weight_inf, weight_sup;
+
+        if (!StringUtils::parseString(weight_list_inf[i].c_str(), &weight_inf))
+        {
+            Log::error("[PowerupManager]","Incorrect reference point values, "
+                                     "probabilities will be incorrect");
+            weight_inf = 0;//default to zero
+        }
+
+        if (!StringUtils::parseString(weight_list_sup[i].c_str(), &weight_sup))
+        {
+            Log::error("[PowerupManager]","Incorrect reference point values, "
+                                     "probabilities will be incorrect");
+            weight_sup = 0;
+        }
 
         //Do a linear average of the inf and sup values
         //Use float calculations to reduce the rounding errors
@@ -388,6 +410,9 @@ void PowerupManager::loadWeights(const XMLNode &root,
  */
 void PowerupManager::updateWeightsForRace(unsigned int num_karts)
 {
+    if (num_karts == 0)
+        return;
+
     //This loads the appropriate weights
     loadAllPowerups(num_karts);
 
