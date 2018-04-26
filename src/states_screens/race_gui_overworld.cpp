@@ -334,8 +334,7 @@ void RaceGUIOverworld::drawTrophyPoints()
     dest += core::position2di(size*2, 0);
     if (!m_close_to_a_challenge && !PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
     {
-        draw2DImage(m_trophy4, dest, source, NULL,
-                                                  NULL, true /* alpha */);
+        draw2DImage(m_trophy4, dest, source, NULL, NULL, true /* alpha */);
     }
     dest += core::position2di((int)(size*1.5f), 0);
     std::string bestTrophies = StringUtils::toString(player->getNumBestTrophies());
