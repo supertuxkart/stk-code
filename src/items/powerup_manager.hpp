@@ -54,7 +54,7 @@ namespace irr
  *  between the weights of the reference positions immediately lower and higher.
  *  e.g. ; if the reference positions are 1 and 4,5 ; the 3rd will have
  *  weights equal to (4,5-3)/(4,5-1) times the weight of the reference position
- *  at 4,5 and (3-1)/(4,5-1à times the weight of the reference position at 1.
+ *  at 4,5 and (3-1)/(4,5-1) times the weight of the reference position at 1.
  *
  *  At the start of each race three mappings are computed in updateWeightsForRace:
  *  m_position_to_class maps each postion to a list of class using
@@ -157,7 +157,7 @@ private:
 public:
                   PowerupManager  ();
                  ~PowerupManager  ();
-    void          loadAllPowerups (unsigned int num_karts=10);
+    void          loadAllPowerups (unsigned int num_karts);
     void          unloadPowerups  ();
     void          LoadPowerup     (PowerupType type, const XMLNode &node);
     void          updateWeightsForRace(unsigned int num_karts);
