@@ -87,8 +87,8 @@ void Skidding::reset()
 // ----------------------------------------------------------------------------
 /** Save the skidding state of a kart. It only saves the important physics
  *  values including m_remaining_jump_time (while this is mostly a graphical
- *  effect, ou ycan't skid while still doing a jump, so it does affect the 
- *  staet), but not visual only values like m_visual_rotation. Similarly 
+ *  effect, you can't skid while still doing a jump, so it does affect the
+ *  state), but not visual only values like m_visual_rotation. Similarly
  *  m_real_steering is output of updateRewind() and will be recomputed every
  *  frame when update() is called, and similar for m_skid_bonus_ready
  *  \param buffer Buffer for the state information. 
