@@ -942,7 +942,6 @@ void IrrDriver::applyResolutionSettings()
         material_manager->addSharedMaterial(materials_file);
     }
 
-    powerup_manager->loadAllPowerups ();
     ItemManager::loadDefaultItemMeshes();
     projectile_manager->loadData();
     Referee::init();
