@@ -83,7 +83,7 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(std::string model,
 // -------------------------------------------------------------------------------------
 
 
-FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(KartProperties* kart,
+FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(const KartProperties* kart,
                                                       irr::core::stringw msg)
 {
     m_unlocked_kart      = kart;
@@ -227,7 +227,7 @@ void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty diffic
     }
     for (unsigned int i = 0; i < karts.size(); i++)
     {
-        addUnlockedKart(const_cast<KartProperties*>(kart_properties_manager->getKart(karts[i])));
+        addUnlockedKart(kart_properties_manager->getKart(karts[i]));
     }
 }
 
@@ -291,16 +291,14 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty, bool
 
 // ----------------------------------------------------------------------------
 
-void FeatureUnlockedCutScene::addUnlockedKart(KartProperties* unlocked_kart)
+void FeatureUnlockedCutScene::addUnlockedKart(const KartProperties* unlocked_kart)
 {
     if (unlocked_kart == NULL)
     {
         Log::error("FeatureUnlockedCutScene::addUnlockedKart", "Unlocked kart does not exist");
         return;
     }
-    irr::core::stringw name = unlocked_kart->getName();
-    irr::core::stringw msg = _("You unlocked ");
-    msg = msg + name + _("!");
+    irr::core::stringw msg = _("You unlocked %s!", unlocked_kart->getName());
     m_unlocked_stuff.push_back( new UnlockedThing(unlocked_kart, msg) );
 }  // addUnlockedKart
 
