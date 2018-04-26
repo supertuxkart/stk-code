@@ -479,6 +479,10 @@ convert -scale 48x48 "$APP_ICON" "$DIRNAME/res/drawable-mdpi/icon.png"
 convert -scale 96x96 "$APP_ICON" "$DIRNAME/res/drawable-xhdpi/icon.png"
 convert -scale 144x144 "$APP_ICON" "$DIRNAME/res/drawable-xxhdpi/icon.png"
 
+if [ -f "/usr/lib/jvm/java-8-openjdk-amd64/bin/java" ]; then
+    export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+    export PATH=$JAVA_HOME/bin:$PATH
+fi
 
 if [ "$BUILD_TOOL" = "gradle" ]; then
     export ANDROID_HOME="$SDK_PATH"
