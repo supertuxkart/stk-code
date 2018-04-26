@@ -294,9 +294,6 @@ void StoryModeStatus::setCurrentChallenge(const std::string &challenge_id)
  */
 void StoryModeStatus::raceFinished()
 {
-    //This check over the specially unlocked features (by points, etc)
-    unlockFeatureByList();
-
     if(m_current_challenge                                           &&
         m_current_challenge->isActive(race_manager->getDifficulty()) &&
         m_current_challenge->getData()->isChallengeFulfilled()           )
@@ -307,6 +304,10 @@ void StoryModeStatus::raceFinished()
         unlockFeature(const_cast<ChallengeStatus*>(m_current_challenge),
                       race_manager->getDifficulty());
     }   // if isActive && challenge solved
+    
+    //This updates the number of points.
+    //It then calls unlockFeatureByList which checks the specially unlocked features (by points, etc)
+    computeActive();
 }   // raceFinished
 
 //-----------------------------------------------------------------------------
