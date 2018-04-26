@@ -88,10 +88,11 @@
        higher kart numbers. Otherwhise, it will default to value for 20. -->
   <reference_points ref1="1" ref2="5" ref3="9" ref4="14" ref5="20" />
 
-  <!-- Distribution of the items depending on position of the 
-       kart. There are defined value for first kart, last kart, and
+  <!-- This defines the probabilities to get each type of item depending on
+       the position of the kart.
+       There are defined value for first kart, last kart, and
        at three equally spaced points between those.
-       For example, with 5 karts those points will match positon 2, 3, 4.
+       For example, with 5 karts those points will match positions 2, 3, 4.
        With 10 karts, they will correspond to 3,25 ; 5,5 ; 7,75.
        It is not an issue for it to be a float, as the weights for positions
        are linearly averaged.
@@ -102,6 +103,13 @@
        the weight at which it will yeld a triple item
        rather than a single one
 
+       w1 corresponds to the weights at ref1, w2 to the weights at ref2, etc.
+       When the number of karts in the race fall between refi and refj,
+       the weights used are a weighted average between wi and wj.
+       
+       wf and w-multif are the weights associated with the follow-the-leader
+       mode. Those are the same for all kart numbers.
+
        The probability to get an item is its weight divided by
        sum of weights of all items (single AND multi). It is recommended 
        to keep that sum equal to 200 to easily keep track of probabilities.
@@ -111,7 +119,7 @@
        too often (compared with many items which will only
        affect a karts or two).
 
-       The distribution should give more similar item to different ranks
+       The distribution should give more similar items to different ranks
        when there are few karts, but have more important differences when
        there are more karts.                               -->
   <!--      bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
