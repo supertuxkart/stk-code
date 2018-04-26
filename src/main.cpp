@@ -1737,7 +1737,6 @@ int main(int argc, char *argv[] )
             material_manager->addSharedMaterial(materials_file);
         }
         Referee::init();
-        powerup_manager->loadAllPowerups();
         ItemManager::loadDefaultItemMeshes();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
