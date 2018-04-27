@@ -586,7 +586,6 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
 {
    int random = rand();
    int random_class = random%RAND_CLASS_RANGE;
-   int random_item = (random/RAND_CLASS_RANGE)%m_powerups_for_reference_pos[pos_class].size();
 
     //First step : select at random a class according to the weights of class for this position
     // Positions start with 1, while the index starts with 0 - so subtract 1
@@ -599,6 +598,8 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
 
     //Second step : select an item at random
     
+   int random_item = (random/RAND_CLASS_RANGE)%m_powerups_for_reference_pos[pos_class].size();
+
     int i=m_powerups_for_reference_pos[pos_class][random_item];
     if(i>=POWERUP_MAX)
     {
