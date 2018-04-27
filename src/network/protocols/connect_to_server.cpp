@@ -82,7 +82,7 @@ void ConnectToServer::asynchronousUpdate()
         {
             if (!m_server)
             {
-                while (!ServersManager::get()->refresh())
+                while (!ServersManager::get()->refresh(false))
                     StkTime::sleep(1);
                 while (!ServersManager::get()->listUpdated())
                     StkTime::sleep(1);

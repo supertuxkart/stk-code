@@ -51,12 +51,6 @@ private:
     /** Where to log packets. If NULL for FILE* logging is disabled. */
     static Synchronised<FILE*> m_log_file;
 
-    /** List of broadcast addresses to use. */
-    std::vector<TransportAddress> m_broadcast_address;
-
-    void setDefaultBroadcastAddresses();
-    void addAllBroadcastAddresses(const TransportAddress &a, int len);
-
 public:
               Network(int peer_count, int channel_limit,
                       uint32_t max_incoming_bandwidth,
@@ -75,7 +69,6 @@ public:
                          TransportAddress* sender, int max_tries = -1);
     void     broadcastPacket(NetworkString *data,
                              bool reliable = true);
-    const std::vector<TransportAddress>& getBroadcastAddresses();
 
     // ------------------------------------------------------------------------
     /** Returns a pointer to the ENet host object. */

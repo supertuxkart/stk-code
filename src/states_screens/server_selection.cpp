@@ -42,6 +42,7 @@ using namespace Online;
 ServerSelection::ServerSelection() : Screen("online/server_selection.stkgui")
 {
     m_refreshing_server = false;
+    m_refresh_timer = 0.0f;
 }   // ServerSelection
 
 // ----------------------------------------------------------------------------
@@ -65,15 +66,16 @@ void ServerSelection::tearDown()
 /** Requests the servers manager to update its list of servers, and disables
  *  the 'refresh' button (till the refresh was finished).
  */
-void ServerSelection::refresh()
+void ServerSelection::refresh(bool full_refresh)
 {
     // If the request was created (i.e. no error, and not re-requested within
     // 5 seconds), clear the list and display the waiting message:
-    if (ServersManager::get()->refresh())
+    if (ServersManager::get()->refresh(full_refresh))
     {
         m_server_list_widget->clear();
         m_reload_widget->setActive(false);
         m_refreshing_server = true;
+        m_refresh_timer = 0.0f;
     }
 }   // refresh
 
@@ -120,7 +122,7 @@ void ServerSelection::init()
     Screen::init();
     m_sort_desc = true;
     /** Triggers the loading of the server list in the servers manager. */
-    refresh();
+    refresh(true);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -215,7 +217,7 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
     }
     else if (name == "reload")
     {
-        refresh();
+        refresh(true);
     }
     else if (name == "private_server")
     {
@@ -250,6 +252,17 @@ void ServerSelection::onUpdate(float dt)
         ServerInfoDialog *sid = new ServerInfoDialog(m_servers[0]);
         sid->requestJoin();
     }
+    
+    if (ServersManager::get()->getServers().empty() && !m_refreshing_server &&
+        !NetworkConfig::get()->isWAN())
+    {
+        m_refresh_timer += dt;
+        
+        if (m_refresh_timer > 10.0f)
+        {
+            refresh(false);
+        }
+    }
 
     if (!m_refreshing_server) return;
 
@@ -269,8 +282,9 @@ void ServerSelection::onUpdate(float dt)
         else
         {
             SFXManager::get()->quickSound("anvil");
-            new MessageDialog(_("No server is available."));
             m_server_list_widget->clear();
+            m_server_list_widget->addItem("loading",
+                                          _("No server is available."));
         }
         m_reload_widget->setActive(true);
     }
