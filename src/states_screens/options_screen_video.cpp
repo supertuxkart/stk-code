@@ -50,7 +50,7 @@ void OptionsScreenVideo::initPresets()
     ({
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */,
-        false /* animatedCharacters */, 0 /* particles */, 0 /* image_quality */,
+        false /* animatedCharacters */, 1 /* particles */, 0 /* image_quality */,
         false /* depth of field */, true /* degraded IBL */
     });
 
@@ -58,7 +58,7 @@ void OptionsScreenVideo::initPresets()
     ({
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */,
-        true /* animatedCharacters */, 0 /* particles */, 0 /* image_quality */,
+        true /* animatedCharacters */, 2 /* particles */, 0 /* image_quality */,
         false /* depth of field */, true /* degraded IBL */
     });
 
@@ -66,7 +66,7 @@ void OptionsScreenVideo::initPresets()
     ({
         true /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */,
-        true /* animatedCharacters */, 1 /* particles */, 1 /* image_quality */,
+        true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
         false /* depth of field */, true /* degraded IBL */
     });
 
@@ -74,7 +74,7 @@ void OptionsScreenVideo::initPresets()
     ({
         true /* light */, 0 /* shadow */, false /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, false /* ssao */,
-        true /* animatedCharacters */, 1 /* particles */, 1 /* image_quality */,
+        true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
         false /* depth of field */, false /* degraded IBL */
     });
 
