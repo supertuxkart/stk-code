@@ -231,9 +231,9 @@ void PowerupManager::loadWeights(const XMLNode &root,
 
     /** Adds to w_inf and w_sup the suffixe of the closest num_karts reference classes
      */
-    if(position_class!=POSITION_BATTLE_MODE 
-    && position_class!=POSITION_TUTORIAL_MODE
-    && position_class!=POSITION_SOCCER_MODE)
+    if(position_class!=POSITION_BATTLE_MODE &&
+       position_class!=POSITION_TUTORIAL_MODE &&
+       position_class!=POSITION_SOCCER_MODE)
     {
         //First step : get the reference points
 
@@ -313,7 +313,8 @@ void PowerupManager::loadWeights(const XMLNode &root,
         class_node->get(w_sup_multi, &values_sup_multi );
     }
 
-    if(!class_node || values_inf=="" || values_inf_multi=="" || values_sup=="" || values_sup_multi=="")
+    if(!class_node || values_inf=="" || values_inf_multi==""
+                   || values_sup=="" || values_sup_multi=="")
     {
         Log::error("[PowerupManager]", "No weights found for class '%s'"
                     " - probabilities will be incorrect.",
@@ -583,11 +584,12 @@ unsigned int PowerupManager::convertPositionToClassWeight(unsigned int num_karts
 PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
                                                              unsigned int *n)
 {
+   int random = rand();
+   int random_class = random%RAND_CLASS_RANGE;
+   int random_item = (random/RAND_CLASS_RANGE)%m_powerups_for_reference_pos[pos_class].size();
+
     //First step : select at random a class according to the weights of class for this position
-
     // Positions start with 1, while the index starts with 0 - so subtract 1
-   int random_class = rand()%RAND_CLASS_RANGE;
-
     PositionClass pos_class =
         (race_manager->isBattleMode() ? POSITION_BATTLE_MODE :
          race_manager->isSoccerMode() ? POSITION_SOCCER_MODE :
@@ -596,9 +598,8 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
                                                          m_position_to_class_sup[pos-1]);
 
     //Second step : select an item at random
-
-    int random = rand()%m_powerups_for_reference_pos[pos_class].size();
-    int i=m_powerups_for_reference_pos[pos_class][random];
+    
+    int i=m_powerups_for_reference_pos[pos_class][random_item];
     if(i>=POWERUP_MAX)
     {
         i -= POWERUP_MAX;
