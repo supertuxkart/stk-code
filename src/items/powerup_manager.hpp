@@ -157,6 +157,7 @@ private:
 public:
                   PowerupManager  ();
                  ~PowerupManager  ();
+    void          loadPowerupsModels ();
     void          loadAllPowerups (unsigned int num_karts);
     void          unloadPowerups  ();
     void          LoadPowerup     (PowerupType type, const XMLNode &node);
