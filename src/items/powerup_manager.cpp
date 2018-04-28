@@ -107,10 +107,9 @@ PowerupManager::PowerupType
 }   // getPowerupType
 
 //-----------------------------------------------------------------------------
-/** Loads all powerups from the powerup.xml file.
- *  Uses num_karts to get the good weights
+/** Loads powerups models and icons from the powerup.xml file.
  */
-void PowerupManager::loadAllPowerups(unsigned int num_karts)
+void PowerupManager::loadPowerupsModels()
 {
     const std::string file_name = file_manager->getAsset("powerup.xml");
     XMLNode *root               = file_manager->createXMLTree(file_name);
@@ -131,6 +130,18 @@ void PowerupManager::loadAllPowerups(unsigned int num_karts)
             exit(-1);
         }
     }
+    delete root;
+}  // loadPowerupsModels
+
+//-----------------------------------------------------------------------------
+/** Loads all powerups weights from the powerup.xml file.
+ *  Uses num_karts to get the good weights
+ */
+void PowerupManager::loadAllPowerups(unsigned int num_karts)
+{
+    const std::string file_name = file_manager->getAsset("powerup.xml");
+    XMLNode *root               = file_manager->createXMLTree(file_name);
+
     //loadWeights takes care of loading specific weight in follow-the-leader
     //They also vary depending on rank in race, so they use the usual position classes
     loadWeights(*root, num_karts, "first",   POSITION_FIRST      );
