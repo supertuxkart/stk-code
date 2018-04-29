@@ -197,6 +197,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_skid_sound    = SFXManager::get()->createSoundSource( "skid"  );
     m_nitro_sound   = SFXManager::get()->createSoundSource( "nitro" );
     m_terrain_sound          = NULL;
+    m_last_sound_material    = NULL;
     m_previous_terrain_sound = NULL;
 
 }   // Kart
@@ -1202,7 +1203,8 @@ float Kart::getShieldTime() const
 // ------------------------------------------------------------------------
 /**
  * Decreases the kart's shield time.
- * \param t The time substracted from the shield timer. If t == 0.0f, the default amout of time is substracted.
+ * \param t The time substracted from the shield timer. If t == 0.0f, the
+             default amout of time is substracted.
  */
 void Kart::decreaseShieldTime()
 {
@@ -1583,7 +1585,6 @@ void Kart::update(int ticks)
             }
             body->setGravity(gravity);
         }   // if !flying
-        handleMaterialSFX(material);
         if     (material->isDriveReset() && isOnGround())
         {
             new RescueAnimation(this);
@@ -1777,7 +1778,7 @@ void Kart::setSquash(float time, float slowdown)
 //-----------------------------------------------------------------------------
 /** Plays any terrain specific sound effect.
  */
-void Kart::handleMaterialSFX(const Material *material)
+void Kart::handleMaterialSFX()
 {
     // If a terrain specific sfx is already being played, when a new
     // terrain is entered, an old sfx should be finished (once, not
@@ -1790,7 +1791,14 @@ void Kart::handleMaterialSFX(const Material *material)
     // FIXME: if there are already two sfx playing, don't add another
     // one. This should reduce the performance impact when driving 
     // on the bridge in Cocoa.
-    if(getLastMaterial()!=material && !m_previous_terrain_sound)
+    const Material *material = m_terrain_info->getMaterial();
+
+    // We can not use getLastMaterial() since, since the last material might
+    // be updated several times during the physics updates, not indicating
+    // that we have reached a new material with regards to the sound effect.
+    // So we separately save the material last used for a sound effect and
+    // then use this for comparison.
+    if(m_last_sound_material!=material)
     {
         // First stop any previously playing terrain sound
         // and remove it, so that m_previous_terrain_sound
@@ -1799,19 +1807,21 @@ void Kart::handleMaterialSFX(const Material *material)
         {
             m_previous_terrain_sound->deleteSFX();
         }
-        m_previous_terrain_sound = m_terrain_sound;
-        if(m_previous_terrain_sound)
-            m_previous_terrain_sound->setLoop(false);
 
-        const std::string &s = material->getSFXName();
+        // Disable looping for the current terrain sound, and
+        // make it the previous terrain sound.
+        if (m_terrain_sound) m_terrain_sound->setLoop(false);
+        m_previous_terrain_sound = m_terrain_sound;
+
+        const std::string &sound_name = material ? material->getSFXName() : "";
 
         // In multiplayer mode sounds are NOT positional, because we have
         // multiple listeners. This would make the sounds of all AIs be
         // audible at all times. So silence AI karts.
-        if (s.size()!=0 && (race_manager->getNumPlayers()==1 ||
-                            m_controller->isLocalPlayerController()  ) )
+        if (!sound_name.empty() && (race_manager->getNumPlayers()==1 ||
+                                    m_controller->isLocalPlayerController() ) )
         {
-            m_terrain_sound = SFXManager::get()->createSoundSource(s);
+            m_terrain_sound = SFXManager::get()->createSoundSource(sound_name);
             m_terrain_sound->play();
             m_terrain_sound->setLoop(true);
         }
@@ -1821,6 +1831,8 @@ void Kart::handleMaterialSFX(const Material *material)
         }
     }
 
+    // Check if a previous terrain sound (now not looped anymore)
+    // is finished and can be deleted.
     if(m_previous_terrain_sound &&
         m_previous_terrain_sound->getStatus()==SFXBase::SFX_STOPPED)
     {
@@ -1837,14 +1849,16 @@ void Kart::handleMaterialSFX(const Material *material)
 
     // terrain sound is not necessarily a looping sound so check its status before
     // setting its speed, to avoid 'ressuscitating' sounds that had already stopped
-    if(m_terrain_sound && main_loop->isLastSubstep() &&
-      (m_terrain_sound->getStatus()==SFXBase::SFX_PLAYING ||
-       m_terrain_sound->getStatus()==SFXBase::SFX_PAUSED))
+    if(m_terrain_sound && 
+        (m_terrain_sound->getStatus()==SFXBase::SFX_PLAYING ||
+         m_terrain_sound->getStatus()==SFXBase::SFX_PAUSED)    )
     {
         m_terrain_sound->setPosition(getXYZ());
-        material->setSFXSpeed(m_terrain_sound, m_speed, m_schedule_pause);
+        if(material)
+            material->setSFXSpeed(m_terrain_sound, m_speed, m_schedule_pause);
     }
 
+    m_last_sound_material = material;
 }   // handleMaterialSFX
 
 //-----------------------------------------------------------------------------
@@ -3038,7 +3052,7 @@ void Kart::updateGraphics(float dt)
 
     handleMaterialGFX(dt);
     updateEngineSFX(dt);
-
+    handleMaterialSFX();
 }   // updateGraphics
 
 // ----------------------------------------------------------------------------

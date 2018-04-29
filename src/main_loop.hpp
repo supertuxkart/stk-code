@@ -54,10 +54,6 @@ public:
     /** Returns true if STK is to be stoppe. */
     bool isAborted() const { return m_abort; }
     // ------------------------------------------------------------------------
-    /** Returns if this is the last substep. Used to reduce the amount
-     *  of updates (e.g. to sfx position) to once per rendered frame. */
-    bool isLastSubstep() const { return m_is_last_substep; }
-    // ------------------------------------------------------------------------
     void setFrameBeforeLoadingWorld()  { m_frame_before_loading_world = true; }
 };   // MainLoop
 

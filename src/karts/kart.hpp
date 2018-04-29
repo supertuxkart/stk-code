@@ -226,7 +226,12 @@ protected:
     static const int EMITTER_COUNT = 3;
     SFXBase      *m_emitters[EMITTER_COUNT];
     SFXBase      *m_engine_sound;
+    /** Sound to be played depending on terrain. */
     SFXBase      *m_terrain_sound;
+
+    /** The material for which the last sound effect was played. */
+    const Material *m_last_sound_material;
+
     SFXBase      *m_nitro_sound;
     /** A pointer to the previous terrain sound needs to be saved so that an
      *  'older' sfx can be finished and an abrupt end of the sfx is avoided. */
@@ -244,7 +249,7 @@ protected:
     int           m_min_nitro_ticks;
 
     void          updatePhysics(int ticks);
-    void          handleMaterialSFX(const Material *material);
+    void          handleMaterialSFX();
     void          handleMaterialGFX(float dt);
     void          updateFlying();
     void          updateSliding();
