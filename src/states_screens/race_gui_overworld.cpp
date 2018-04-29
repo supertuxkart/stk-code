@@ -385,8 +385,9 @@ void RaceGUIOverworld::drawTrophyPoints()
         pos.UpperLeftCorner.X -= (2*size + number_width*0.5f);
 
         font->draw(swg.c_str(), pos, time_color, false, vcenter, NULL, true /* ignore RTL */);
-        font->disableShadow();
     }
+
+    font->disableShadow();
 #endif
 }   // drawTrophyPoints
 
