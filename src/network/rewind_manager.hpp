@@ -145,7 +145,6 @@ public:
     void addNetworkEvent(EventRewinder *event_rewinder,
                          BareNetworkString *buffer, int ticks);
     void addNetworkState(BareNetworkString *buffer, int ticks);
-    void addNextTimeStep(int ticks, float dt);
     void saveState(bool local_save);
     void saveLocalState();
     void restoreState(BareNetworkString *buffer);

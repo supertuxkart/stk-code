@@ -98,21 +98,6 @@ void RewindManager::reset()
     m_rewind_queue.reset();
 }   // reset
 
-// ----------------------------------------------------------------------------
-/** Adds a new TimeStep entry. Only exception is time=0 (which happens during
- *  all of 'ready, set, go') - for which only one entry is created.
- */
-void RewindManager::addNextTimeStep(int time, float dt)
-{
-    // Add a timestep entry each timestep, except at 'ready, set, go'
-    // at which time is 0 - we add only one entry there
-    if ((time > 0 || m_rewind_queue.isEmpty()) &&
-        World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE)
-    {
-//        m_rewind_queue.addNewTimeStep(time, dt);
-    }
-}   // addNextTimeStep
-
 // ----------------------------------------------------------------------------    
 /** Adds an event to the rewind data. The data to be stored must be allocated
  *  and not freed by the caller!
