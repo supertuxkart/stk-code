@@ -403,8 +403,15 @@ void PowerupManager::loadWeights(const XMLNode &root,
         float ref_diff = (float) (sup_num - inf_num);
         float sup_diff = (float) (sup_num - num_karts);
         float inf_diff = (float) (num_karts - inf_num);
-        float weight = (sup_diff/ref_diff)*weight_inf
-                      +(inf_diff/ref_diff)*weight_sup;
+        float weight;
+        
+        if (ref_diff != 0)
+            weight = (sup_diff/ref_diff)*weight_inf
+                    +(inf_diff/ref_diff)*weight_sup;
+        
+        //the sup and inf weights are the same here, take one of them
+        else
+            weight = weight_inf;
         int rounded_weight = (int) weight;
 
         m_weights[position_class].push_back(rounded_weight);
