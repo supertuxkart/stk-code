@@ -318,18 +318,11 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         parts.push_back("featunlocked");
         ((CutsceneWorld*)World::getWorld())->setParts(parts);
 
-        scene->addTrophy(RaceManager::DIFFICULTY_EASY);
+        scene->addTrophy(RaceManager::DIFFICULTY_EASY, false);
 
         if (selection == "test_unlocked")
         {
-            // the passed kart will not be modified, that's why I allow myself
-            // to use const_cast
-            scene->addUnlockedKart(
-                                   const_cast<KartProperties*>(
-                                        kart_properties_manager->getKart("tux")
-                                                              ),
-                                    L"You unlocked <actual text would go here...>"
-                                   );
+            scene->addUnlockedKart(kart_properties_manager->getKart("tux"));
             scene->addUnlockedTrack(track_manager->getTrack("lighthouse"));
             scene->push();
         }

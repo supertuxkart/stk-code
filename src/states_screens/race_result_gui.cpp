@@ -298,14 +298,12 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             bool gameCompleted = false;
             for (unsigned int n = 0; n < unlocked.size(); n++)
             {
-                if (unlocked[n]->getId() == "fortmagma")
+                if (unlocked[n]->getChallengeId() == "fortmagma")
                 {
                     gameCompleted = true;
                     break;
                 }
             }
-
-            PlayerManager::getCurrentPlayer()->clearUnlocked();
 
             if (gameCompleted)
             {
@@ -343,8 +341,8 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 FeatureUnlockedCutScene* scene =
                     FeatureUnlockedCutScene::getInstance();
 
-                scene->addTrophy(race_manager->getDifficulty());
-                scene->findWhatWasUnlocked(race_manager->getDifficulty());
+                scene->addTrophy(race_manager->getDifficulty(),false);
+                scene->findWhatWasUnlocked(race_manager->getDifficulty(),unlocked);
                 scene->push();
                 race_manager->setAIKartOverride("");
 
@@ -352,6 +350,9 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 parts.push_back("featunlocked");
                 ((CutsceneWorld*)World::getWorld())->setParts(parts);
             }
+
+            PlayerManager::getCurrentPlayer()->clearUnlocked();
+
             return;
         }
         Log::warn("RaceResultGUI", "Incorrect event '%s' when things are unlocked.",
