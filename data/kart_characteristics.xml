@@ -403,7 +403,7 @@
     <player-characteristics>
         <characteristic name="normal" />
         <characteristic name="handicap">
-            <engine brake-factor="*0.8" brake-time-increase="*0.85" max-speed-reverse-ratio="*0.8" />
+            <engine power="*0.9" max-speed="*0.9" brake-factor="*0.8" brake-time-increase="*0.85" max-speed-reverse-ratio="*0.8" />
             <bubblegum duration="*1.5" speed-fraction="*1.5" torque="*1.5" />
             <zipper duration="*0.8" force="*0.8" speed-gain="*0.8" max-speed-increase="*0.8" />
             <swatter duration="*0.8" squash-duration="*1.5" squash-slowdown="*1.8" />
