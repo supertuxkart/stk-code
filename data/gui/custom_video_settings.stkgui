@@ -18,7 +18,7 @@
         <div layout="horizontal-row" width="100%" proportion="1">
             <checkbox id="dynamiclight"/>
             <spacer width="10" height="10"/>
-            <label text="Advanced pipeline (lights, etc.)" I18N="Video settings"/>
+            <label text="Advanced Pipeline (lights, etc.)" I18N="Video settings"/>
         </div>
 
         <spacer height="4" width="10" />
@@ -49,7 +49,7 @@
             <div layout="horizontal-row" proportion="1" height="fit">
                 <checkbox id="lightshaft"/>
                 <spacer width="10" height="10"/>
-                <label text="Light shaft (God rays)" I18N="Video settings"/>
+                <label text="Light Shaft (God Rays)" I18N="Video settings"/>
             </div>
         </div>
 
@@ -69,7 +69,7 @@
             <div layout="horizontal-row" proportion="1" height="fit">
                 <checkbox id="dof"/>
                 <spacer width="10" height="10"/>
-                <label text="Depth of field" I18N="Video settings"/>
+                <label text="Depth of Field" I18N="Video settings"/>
             </div>
         </div>
 
@@ -101,7 +101,7 @@
             <div layout="horizontal-row" proportion="1" height="fit">
                 <checkbox id="motionblur"/>
                 <spacer width="10" height="10"/>
-                <label text="Motion blur" I18N="Video settings"/>
+                <label text="Motion Blur" I18N="Video settings"/>
             </div>
 
             <spacer height="4" width="10" />
@@ -109,7 +109,7 @@
             <div layout="horizontal-row" proportion="1" height="fit">
                 <checkbox id="ibl"/>
                 <spacer width="10" height="10"/>
-                <label text="Image-based lighting" I18N="Video settings"/>
+                <label text="Image-based Lighting" I18N="Video settings"/>
             </div>
         </div>
         
@@ -127,7 +127,7 @@
             <div layout="horizontal-row" proportion="1" height="fit">
                 <checkbox id="texture_compression"/>
                 <spacer width="10" height="10"/>
-                <label text="Texture compression" I18N="Video settings"/>
+                <label text="Texture Compression" I18N="Video settings"/>
             </div>
         </div>
 
@@ -142,7 +142,7 @@
         <spacer height="4" width="10" />
 
         <div layout="horizontal-row" width="100%" proportion="1">
-            <label text="Rendered image quality" I18N="Video settings" width="40%"/>
+            <label text="Rendered Image Quality" I18N="Video settings" width="40%"/>
             <spacer width="10" height="10"/>
             <gauge id="image_quality" min_value="0" max_value="2" width="50%" />
         </div>
@@ -150,7 +150,7 @@
         <spacer height="4" width="10" />
 
         <div layout="horizontal-row" width="100%" proportion="1">
-            <label text="Geometry detail" I18N="Video settings" width="40%"/>
+            <label text="Geometry Detail" I18N="Video settings" width="40%"/>
             <spacer width="10" height="10"/>
             <gauge id="geometry_detail" min_value="0" max_value="2" width="50%" />
         </div>
