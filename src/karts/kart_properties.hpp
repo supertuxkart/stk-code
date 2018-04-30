@@ -207,7 +207,7 @@ private:
 
     void  load              (const std::string &filename,
                              const std::string &node);
-    void combineCharacteristics();
+    void combineCharacteristics(PerPlayerDifficulty d);
 
 public:
     /** Returns the string representation of a per-player difficulty. */
@@ -215,7 +215,8 @@ public:
 
           KartProperties    (const std::string &filename="");
          ~KartProperties    ();
-    void  copyForPlayer     (const KartProperties *source);
+    void  copyForPlayer     (const KartProperties *source,
+                             PerPlayerDifficulty d = PLAYER_DIFFICULTY_NORMAL);
     void  copyFrom          (const KartProperties *source);
     void  getAllData        (const XMLNode * root);
     void  checkAllSet       (const std::string &filename);

@@ -111,11 +111,14 @@ GUIEngine::EventPropagation
             const unsigned pid = m_profiles->getValue();
             assert(pid < PlayerManager::get()->getNumPlayers());
             PlayerProfile* p = m_available_players[pid];
-            const bool handicap = m_handicap->getState();
-            if (NetworkConfig::get()->addNetworkPlayer(m_device, p, handicap))
+            const PerPlayerDifficulty d = m_handicap->getState() ?
+                PLAYER_DIFFICULTY_HANDICAP : PLAYER_DIFFICULTY_NORMAL;
+            if (NetworkConfig::get()->addNetworkPlayer(m_device, p, d))
             {
-                NetworkingLobby::getInstance()
-                    ->addSplitscreenPlayer(p->getName());
+                core::stringw name = p->getName();
+                if (d == PLAYER_DIFFICULTY_HANDICAP)
+                    name = _("%s (handicapped)", name);
+                NetworkingLobby::getInstance()->addSplitscreenPlayer(name);
                 m_self_destroy = true;
                 return GUIEngine::EVENT_BLOCK;
             }

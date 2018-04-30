@@ -43,6 +43,11 @@ void NetworkKartSelectionScreen::init()
     for (auto& p : NetworkConfig::get()->getNetworkPlayers())
     {
         joinPlayer(std::get<0>(p), std::get<1>(p));
+        if (std::get<2>(p) == PLAYER_DIFFICULTY_HANDICAP)
+        {
+            m_kart_widgets.get(m_kart_widgets.size() -1)
+                ->enableHandicapForNetwork();
+        }
         w->updateItemDisplay();
         if (!w->setSelection(UserConfigParams::m_default_kart, 0, true))
         {
@@ -80,7 +85,7 @@ void NetworkKartSelectionScreen::allPlayersDone()
     {
         // If server recieve an invalid name, it will auto correct to a random
         // kart
-        kart.encodeString(m_kart_widgets[n].m_kartInternalName);
+        kart.encodeString(m_kart_widgets[n].m_kart_internal_name);
     }
     STKHost::get()->sendToServer(&kart, true);
 

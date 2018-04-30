@@ -367,7 +367,8 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     {
     case RaceManager::KT_PLAYER:
     {
-        controller = new LocalPlayerController(new_kart, local_player_id);
+        controller = new LocalPlayerController(new_kart, local_player_id,
+            difficulty);
         const PlayerProfile* p = StateManager::get()
             ->getActivePlayer(local_player_id)->getConstProfile();
         if (p && p->getDefaultKartColor() > 0.0f)

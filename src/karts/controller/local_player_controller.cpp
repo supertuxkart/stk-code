@@ -55,19 +55,19 @@
  *  \param init_pos The start coordinates and heading of the kart.
  */
 LocalPlayerController::LocalPlayerController(AbstractKart *kart,
-                                   const int local_playerID)
+                                             const int local_player_id,
+                                             PerPlayerDifficulty d)
                      : PlayerController(kart), m_sky_particles_emitter(NULL)
 {
-    
-    m_player = StateManager::get()->getActivePlayer(local_playerID);
+    m_difficulty = d;
+    m_player = StateManager::get()->getActivePlayer(local_player_id);
     if(m_player)
         m_player->setKart(kart);
 
     // Keep a pointer to the camera to remove the need to search for
     // the right camera once per frame later.
-    
-    Camera *camera = Camera::createCamera(kart, local_playerID);
-    
+    Camera *camera = Camera::createCamera(kart, local_player_id);
+
     m_camera_index = camera->getIndex();
     m_wee_sound    = SFXManager::get()->createSoundSource("wee");
     m_bzzt_sound   = SFXManager::get()->getBuffer("bzzt");
@@ -390,5 +390,10 @@ core::stringw LocalPlayerController::getName() const
 {
     if (NetworkConfig::get()->isNetworking())
         return PlayerController::getName();
-    return m_player->getProfile()->getName();
+
+    core::stringw name = m_player->getProfile()->getName();
+    if (m_difficulty == PLAYER_DIFFICULTY_HANDICAP)
+        name = _("%s (handicapped)", name);
+
+    return name;
 }   // getName

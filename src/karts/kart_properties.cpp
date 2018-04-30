@@ -132,7 +132,8 @@ KartProperties::~KartProperties()
  *  \param source The source kart properties from which to copy this objects'
  *         values.
  */
-void KartProperties::copyForPlayer(const KartProperties *source)
+void KartProperties::copyForPlayer(const KartProperties *source,
+                                   PerPlayerDifficulty d)
 {
     *this = *source;
 
@@ -146,7 +147,7 @@ void KartProperties::copyForPlayer(const KartProperties *source)
 
         // Combine the characteristics for this object. We can't copy it because
         // this object has other pointers (to m_characteristic).
-        combineCharacteristics();
+        combineCharacteristics(d);
     }
 }   // copyForPlayer
 
@@ -224,7 +225,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         }
         getAllData(root);
         m_characteristic = std::make_shared<XmlCharacteristic>(root);
-        combineCharacteristics();
+        combineCharacteristics(PLAYER_DIFFICULTY_NORMAL);
     }
     catch(std::exception& err)
     {
@@ -343,7 +344,7 @@ void KartProperties::setHatMeshName(const std::string &hat_name)
 }  // setHatMeshName
 
 //-----------------------------------------------------------------------------
-void KartProperties::combineCharacteristics()
+void KartProperties::combineCharacteristics(PerPlayerDifficulty difficulty)
 {
     m_combined_characteristic = std::make_shared<CombinedCharacteristic>();
     m_combined_characteristic->addCharacteristic(kart_properties_manager->
@@ -361,6 +362,9 @@ void KartProperties::combineCharacteristics()
     else
         // Kart type found
         m_combined_characteristic->addCharacteristic(characteristic);
+
+    m_combined_characteristic->addCharacteristic(kart_properties_manager->
+        getPlayerCharacteristic(getPerPlayerDifficultyAsString(difficulty)));
 
     m_combined_characteristic->addCharacteristic(m_characteristic.get());
     m_cached_characteristic = std::make_shared<CachedCharacteristic>

@@ -513,6 +513,9 @@ void ClientLobby::updatePlayerList(Event* event)
         // icon to be used, see NetworkingLobby::loadedFromFile
         std::get<3>(pl) = data.getUInt8() == 1 /*if server owner*/ ? 0 :
             std::get<1>(pl) != 0 /*if online account*/ ? 1 : 2;
+        PerPlayerDifficulty d = (PerPlayerDifficulty)data.getUInt8();
+        if (d == PLAYER_DIFFICULTY_HANDICAP)
+            std::get<2>(pl) = _("%s (handicapped)", std::get<2>(pl));
         players.push_back(pl);
     }
     NetworkingLobby::getInstance()->updatePlayers(players);

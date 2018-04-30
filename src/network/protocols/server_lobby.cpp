@@ -1045,6 +1045,7 @@ void ServerLobby::updatePlayerList()
         if (m_server_owner.lock() == profile->getPeer())
             server_owner = 1;
         pl->addUInt8(server_owner);
+        pl->addUInt8(profile->getPerPlayerDifficulty());
     }
     sendMessageToPeersChangingToken(pl);
     delete pl;

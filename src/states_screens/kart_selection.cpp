@@ -189,14 +189,14 @@ void KartHoverListener::onSelectionChanged(DynamicRibbonWidget* theWidget,
     {
         // discard events sent when putting back to the right kart
         if (selectionID ==
-                m_parent->m_kart_widgets[player_id].m_kartInternalName) return;
+                m_parent->m_kart_widgets[player_id].m_kart_internal_name) return;
 
         DynamicRibbonWidget* w =
             m_parent->getWidget<DynamicRibbonWidget>("karts");
         assert(w != NULL);
 
         w->setSelection(m_parent->m_kart_widgets[player_id]
-                        .m_kartInternalName, player_id, true);
+                        .m_kart_internal_name, player_id, true);
         return;
     }
 
@@ -516,7 +516,7 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, PlayerProfile* p)
 
     // ---- Create player/kart widget
     PlayerKartWidget* newPlayerWidget =
-        new PlayerKartWidget(this, aplayer, NULL, kartsArea, m_kart_widgets.size(),
+        new PlayerKartWidget(this, aplayer, kartsArea, m_kart_widgets.size(),
                              selected_kart_group);
 
     manualAddWidget(newPlayerWidget);
@@ -832,7 +832,7 @@ void KartSelectionScreen::updateKartStats(uint8_t widget_id,
 
     if (kp != NULL)
     {
-        w->setValues(kp);
+        w->setValues(kp, m_kart_widgets[widget_id].getDifficulty());
         w->update(0);
     }
 }
@@ -1206,7 +1206,7 @@ void KartSelectionScreen::allPlayersDone()
     const int kart_count = m_kart_widgets.size();
     for (int n = 0; n < kart_count; n++)
     {
-        std::string selected_kart = m_kart_widgets[n].m_kartInternalName;
+        std::string selected_kart = m_kart_widgets[n].m_kart_internal_name;
 
         if (selected_kart == RANDOM_KART_ID)
         {
@@ -1238,7 +1238,7 @@ void KartSelectionScreen::allPlayersDone()
             for (int i=0; i<item_count; i++)
             {
                 if (items[i].m_code_name ==
-                        m_kart_widgets[n].m_kartInternalName)
+                        m_kart_widgets[n].m_kart_internal_name)
                 {
                     items[i].m_code_name = ID_DONT_USE;
                     break;
@@ -1249,9 +1249,8 @@ void KartSelectionScreen::allPlayersDone()
         race_manager->setPlayerKart(n, selected_kart);
 
         // Set per player difficulty if needed
-        if (m_multiplayer && UserConfigParams::m_per_player_difficulty &&
-            m_kart_widgets[n].isHandicapped())
-            race_manager->setPlayerDifficulty(n, PLAYER_DIFFICULTY_HANDICAP);
+        if (m_multiplayer && UserConfigParams::m_per_player_difficulty)
+            race_manager->setPlayerDifficulty(n, m_kart_widgets[n].getDifficulty());
     }
 
     // ---- Switch to assign mode
