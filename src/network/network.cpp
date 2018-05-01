@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/transport_address.hpp"
 #include "utils/time.hpp"
@@ -27,12 +28,16 @@
 #include <string.h>
 #if defined(WIN32)
 #  include "ws2tcpip.h"
+#  include <iphlpapi.h>
 #  define inet_ntop InetNtop
 #else
 #  include <arpa/inet.h>
 #  include <errno.h>
+#  include <ifaddrs.h>
 #  include <sys/socket.h>
 #endif
+
+
 #include <pthread.h>
 #include <signal.h>
 

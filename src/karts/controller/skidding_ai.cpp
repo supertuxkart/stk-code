@@ -1361,7 +1361,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
 void SkiddingAI::handleBubblegum(int item_skill, const std::vector<const Item *> &items_to_collect,
                                                const std::vector<const Item *> &items_to_avoid)
 {
-    int shield_radius = m_ai_properties->m_shield_incoming_radius;
+    float shield_radius = m_ai_properties->m_shield_incoming_radius;
 
     int projectile_types[4]; //[3] basket, [2] cakes, [1] plunger, [0] bowling
     projectile_types[0] = projectile_manager->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_BOWLING);
@@ -1446,7 +1446,7 @@ void SkiddingAI::handleBubblegum(int item_skill, const std::vector<const Item *>
     }
 
     //If the kart view is blocked by a plunger, use the shield
-    if(m_kart->getBlockedByPlungerTime()>0)
+    if(m_kart->getBlockedByPlungerTicks()>0)
     {
         m_controls->setFire(true);
         m_controls->setLookBack(false);

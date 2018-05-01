@@ -34,6 +34,7 @@ private:
     /** True if the frame rate should be throttled. */
     bool m_throttle_fps;
 
+    bool m_frame_before_loading_world;
     /** True during the last substep of the inner main loop (where world
      *  is updated). Used to reduce amount of updates (e.g. sfx positions
       * etc). */
@@ -56,6 +57,8 @@ public:
     /** Returns if this is the last substep. Used to reduce the amount
      *  of updates (e.g. to sfx position) to once per rendered frame. */
     bool isLastSubstep() const { return m_is_last_substep; }
+    // ------------------------------------------------------------------------
+    void setFrameBeforeLoadingWorld()  { m_frame_before_loading_world = true; }
 };   // MainLoop
 
 extern MainLoop* main_loop;

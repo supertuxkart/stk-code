@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<challenge version="3">
+    <unlock_list list="true"/>
+    <!-- This is the (rounded) point equivalent of finishing all challenges
+         in easy, except the final challenge   -->
+    <requirements trophies="190"/>
+    <unlock kart="amanda"/>
+</challenge>

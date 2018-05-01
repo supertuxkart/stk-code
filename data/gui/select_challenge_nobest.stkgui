@@ -21,7 +21,7 @@
             <label id="novice_label" proportion="1" height="100%"/>
         </div>
 
-        <spacer height="6%" width="1"/>
+        <spacer height="8%" width="1"/>
 
         <div width="100%" proportion="1" layout="horizontal-row">
             <icon-button id="intermediate" icon="gui/difficulty_medium.png"
@@ -30,7 +30,7 @@
             <label id="intermediate_label" proportion="1" height="100%"/>
         </div>
 
-        <spacer height="6%" width="1"/>
+        <spacer height="8%" width="1"/>
 
         <div width="100%" proportion="1" layout="horizontal-row">
             <icon-button id="expert" icon="gui/difficulty_hard.png"
@@ -39,16 +39,8 @@
             <label id="difficult_label" proportion="1" height="100%"/>
         </div>
 
-        <spacer height="6%" width="1"/>
-
-        <div width="100%" proportion="1" layout="horizontal-row">
-            <icon-button id="supertux" icon="gui/difficulty_best.png"
-                    I18N="Difficulty" text="SuperTux" height="100%"/>
-            <spacer width="5%" height="1"/>
-            <label id="supertux_label" proportion="1" height="100%"/>
-        </div>
-
-        <spacer height="2%" width="1"/>
+        <spacer height="8%" width="1"/>
 
     </div>
 </stkgui>
+

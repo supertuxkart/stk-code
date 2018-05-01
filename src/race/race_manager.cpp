@@ -46,7 +46,6 @@
 #include "network/protocol_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
-#include "network/protocols/lobby_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "scriptengine/property_animator.hpp"
@@ -560,15 +559,6 @@ void RaceManager::startNextRace()
     {
         m_kart_status[i].m_last_score = m_kart_status[i].m_score;
         m_kart_status[i].m_last_time  = 0;
-    }
-
-    // In networked races, inform the start game protocol that
-    // the world has been setup
-    if(NetworkConfig::get()->isNetworking())
-    {
-        auto lobby = LobbyProtocol::get<LobbyProtocol>();
-        assert(lobby);
-        lobby->finishedLoadingWorld();
     }
 }   // startNextRace
 

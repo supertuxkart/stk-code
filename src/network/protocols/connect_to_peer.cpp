@@ -46,7 +46,7 @@ ConnectToPeer::ConnectToPeer(uint32_t peer_id)  : Protocol(PROTOCOL_CONNECTION)
 ConnectToPeer::ConnectToPeer(const TransportAddress &address)
              : Protocol(PROTOCOL_CONNECTION)
 {
-    m_peer_address.copy(address);
+    m_peer_address = address;
     // We don't need to find the peer address, so we can start
     // with the state when we found the peer address.
     m_state            = WAIT_FOR_CONNECTION;
@@ -84,7 +84,7 @@ void ConnectToPeer::asynchronousUpdate()
             assert(get_peer_address);
             if (get_peer_address->getAddress().isUnset())
                 return;
-            m_peer_address.copy(get_peer_address->getAddress());
+            m_peer_address = get_peer_address->getAddress();
             m_current_protocol = nullptr;
             if (m_peer_address.isUnset())
             {
@@ -117,7 +117,7 @@ void ConnectToPeer::asynchronousUpdate()
                 // The wan remote should already start its ping message to us now
                 // so we can send packet directly to it.
                 TransportAddress broadcast_address;
-                broadcast_address.copy(m_peer_address);
+                broadcast_address = m_peer_address;
 
                 BareNetworkString aloha(std::string("aloha_stk"));
                 STKHost::get()->sendRawPacket(aloha, broadcast_address);

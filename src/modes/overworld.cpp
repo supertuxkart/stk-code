@@ -65,7 +65,15 @@ void OverWorld::enterOverWorld()
     race_manager->setMinorMode (RaceManager::MINOR_MODE_OVERWORLD);
     race_manager->setNumKarts( 1 );
     race_manager->setTrack( "overworld" );
-    race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
+
+    if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+    {
+        race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
+    }
+    else
+    {
+        race_manager->setDifficulty(RaceManager::DIFFICULTY_BEST);
+    }
 
     // Use keyboard 0 by default (FIXME: let player choose?)
     InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
@@ -255,7 +263,7 @@ void OverWorld::onFirePressed(Controller* who)
                 if (unlocked)
                 {
                     race_manager->setKartLastPositionOnOverworld(kart_xyz);
-                    new SelectChallengeDialog(0.8f, 0.8f,
+                    new SelectChallengeDialog(0.9f, 0.9f,
                         challenges[n].m_challenge_id);
                 }
             }

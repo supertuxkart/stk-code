@@ -48,7 +48,7 @@ AbstractKart::AbstractKart(const std::string& ident,
             ident.c_str());
         kp = kart_properties_manager->getKart(std::string("tux"));
     }
-    m_kart_properties->copyForPlayer(kp);
+    m_kart_properties->copyForPlayer(kp, difficulty);
     m_difficulty = difficulty;
     m_kart_animation  = NULL;
     assert(m_kart_properties);

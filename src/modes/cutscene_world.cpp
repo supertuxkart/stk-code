@@ -422,11 +422,14 @@ void CutsceneWorld::enterRaceOverState()
             // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
             race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
+            //TODO : this code largely duplicate a similar code present in raceResultGUI.
+            //       Try to reduce duplication
             std::vector<const ChallengeData*> unlocked =
                 PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
+
             if (unlocked.size() > 0)
             {
-                //PlayerManager::getCurrentPlayer()->clearUnlocked();
+                PlayerManager::getCurrentPlayer()->clearUnlocked();
 
                 StateManager::get()->enterGameState();
                 race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
@@ -441,8 +444,8 @@ void CutsceneWorld::enterRaceOverState()
                 ((CutsceneWorld*)World::getWorld())->setParts(parts);
 
                 assert(unlocked.size() > 0);
-                scene->addTrophy(race_manager->getDifficulty());
-                scene->findWhatWasUnlocked(race_manager->getDifficulty());
+                scene->addTrophy(race_manager->getDifficulty(),true);
+                scene->findWhatWasUnlocked(race_manager->getDifficulty(),unlocked);
 
                 StateManager::get()->replaceTopMostScreen(scene, GUIEngine::INGAME_MENU);
             }
@@ -476,9 +479,10 @@ void CutsceneWorld::enterRaceOverState()
 
             std::vector<const ChallengeData*> unlocked =
                 PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
+
             if (unlocked.size() > 0)
             {
-                //PlayerManager::getCurrentPlayer()->clearUnlocked();
+                PlayerManager::getCurrentPlayer()->clearUnlocked();
 
                 StateManager::get()->enterGameState();
                 race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
@@ -492,8 +496,8 @@ void CutsceneWorld::enterRaceOverState()
                 parts.push_back("featunlocked");
                 ((CutsceneWorld*)World::getWorld())->setParts(parts);
 
-                scene->addTrophy(race_manager->getDifficulty());
-                scene->findWhatWasUnlocked(race_manager->getDifficulty());
+                scene->addTrophy(race_manager->getDifficulty(),true);
+                scene->findWhatWasUnlocked(race_manager->getDifficulty(),unlocked);
 
                 StateManager::get()->replaceTopMostScreen(scene, GUIEngine::INGAME_MENU);
             }
@@ -593,5 +597,4 @@ void CutsceneWorld::createRaceGUI()
 {
     m_race_gui = new CutsceneGUI();
 }   // createRaceGUI
-
 

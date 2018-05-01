@@ -111,7 +111,7 @@ void OnlineScreen::init()
     {
         NetworkConfig::get()->addNetworkPlayer(
             input_manager->getDeviceManager()->getLatestUsedDevice(),
-            PlayerManager::getCurrentPlayer(), false/*handicap*/);
+            PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
         NetworkConfig::get()->doneAddingNetworkPlayers();
     }
 }   // init
@@ -178,7 +178,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
             NetworkConfig::get()->cleanNetworkPlayers();
             NetworkConfig::get()->addNetworkPlayer(
                 input_manager->getDeviceManager()->getLatestUsedDevice(),
-                PlayerManager::getCurrentPlayer(), false/*handicap*/);
+                PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
             NetworkConfig::get()->doneAddingNetworkPlayers();
         }
         else
@@ -271,8 +271,8 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                     return false;
                 }
 
-                m_entered_server_address.copy(
-                    STKHost::get()->getServerPeerForClient()->getAddress());
+                m_entered_server_address = 
+                    STKHost::get()->getServerPeerForClient()->getAddress();
                 auto cl = LobbyProtocol::create<ClientLobby>();
                 cl->setAddress(m_entered_server_address);
                 cl->requestStart();

@@ -19,6 +19,7 @@
 #include "network/network_config.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "network/transport_address.hpp"
 #include "online/xml_request.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/networking_lobby.hpp"
@@ -78,7 +79,7 @@ void NetworkConfig::setIsServer(bool b)
 
 // ----------------------------------------------------------------------------
 void NetworkConfig::setServerMode(RaceManager::MinorRaceModeType minor,
-                                      RaceManager::MajorRaceModeType major)
+                                  RaceManager::MajorRaceModeType major)
 {
     if (major == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {

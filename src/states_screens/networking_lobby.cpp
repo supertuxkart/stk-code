@@ -258,8 +258,7 @@ void NetworkingLobby::sendChat(irr::core::stringw text)
             name = PlayerManager::getCurrentOnlineUserName();
         else
             name = player->getName();
-        // Max 80 words
-        chat.encodeString((name + L": " + text).subString(0, 80));
+        chat.encodeString16(name + L": " + text);
 
         STKHost::get()->sendToServer(&chat, true);
     }

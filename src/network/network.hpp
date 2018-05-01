@@ -32,6 +32,7 @@
 #include <enet/enet.h>
 
 #include <stdio.h>
+#include <vector>
 
 class BareNetworkString;
 class NetworkString;
@@ -68,6 +69,7 @@ public:
                          TransportAddress* sender, int max_tries = -1);
     void     broadcastPacket(NetworkString *data,
                              bool reliable = true);
+
     // ------------------------------------------------------------------------
     /** Returns a pointer to the ENet host object. */
     ENetHost* getENetHost() { return m_host; }

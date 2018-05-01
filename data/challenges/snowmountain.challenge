@@ -1,18 +1,24 @@
 <?xml version="1.0"?>
-<challenge version="2">
+<challenge version="3">
+    <unlock_list list="false"/>
     <track id="snowmountain" laps="3"/>
     <mode major="single" minor="quickrace"/>
-    <requirements trophies="60"/>
+    <requirements trophies="115"/>
+
+    <best>
+        <karts number="10"/>
+        <requirements position="1" time="120"/>
+    </best>
     <hard>
-        <karts number="5"/>
-        <requirements time="145"/>
+        <karts number="9"/>
+        <requirements position="2" time="145"/>
     </hard>
     <medium>
-        <karts number="4"/>
+        <karts number="8"/>
         <requirements time="187"/>
     </medium>
     <easy>
-        <karts number="4"/>
+        <karts number="7"/>
         <requirements time="250"/>
     </easy>
 </challenge>

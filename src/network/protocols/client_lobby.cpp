@@ -97,7 +97,7 @@ void ClientLobby::clearPlayers()
  */
 void ClientLobby::setAddress(const TransportAddress &address)
 {
-    m_server_address.copy(address);
+    m_server_address = address;
 }   // setAddress
 
 //-----------------------------------------------------------------------------
@@ -513,6 +513,9 @@ void ClientLobby::updatePlayerList(Event* event)
         // icon to be used, see NetworkingLobby::loadedFromFile
         std::get<3>(pl) = data.getUInt8() == 1 /*if server owner*/ ? 0 :
             std::get<1>(pl) != 0 /*if online account*/ ? 1 : 2;
+        PerPlayerDifficulty d = (PerPlayerDifficulty)data.getUInt8();
+        if (d == PLAYER_DIFFICULTY_HANDICAP)
+            std::get<2>(pl) = _("%s (handicapped)", std::get<2>(pl));
         players.push_back(pl);
     }
     NetworkingLobby::getInstance()->updatePlayers(players);
@@ -541,13 +544,12 @@ void ClientLobby::handleChat(Event* event)
     if (!UserConfigParams::m_lobby_chat)
         return;
     SFXManager::get()->quickSound("plopp");
-    std::string message;
-    event->data().decodeString(&message);
-    Log::info("ClientLobby", "%s", message.c_str());
+    core::stringw message;
+    event->data().decodeString16(&message);
+    Log::info("ClientLobby", "%s", StringUtils::wideToUtf8(message).c_str());
     if (message.size() > 0)
     {
-        NetworkingLobby::getInstance()->addMoreServerInfo(
-            StringUtils::utf8ToWide(message));
+        NetworkingLobby::getInstance()->addMoreServerInfo(message);
     }
 }   // handleChat
 

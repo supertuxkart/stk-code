@@ -59,13 +59,15 @@ private:
     bool m_sort_desc;
 
     bool m_refreshing_server;
+    
+    float m_refresh_timer;
 
     /** Load the servers into the main list.*/
     void loadList(unsigned sort_case);
 
     void copyFromServersManager();
 
-    void refresh();
+    void refresh(bool full_refresh);
 
 public:
     /** \brief implement callback from parent class GUIEngine::Screen */

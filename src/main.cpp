@@ -1094,7 +1094,7 @@ int handleCmdLine()
             !server_password.empty());
         NetworkConfig::get()->addNetworkPlayer(
             input_manager->getDeviceManager()->getLatestUsedDevice(),
-            PlayerManager::getCurrentPlayer(), false/*handicap*/);
+            PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
         NetworkConfig::get()->doneAddingNetworkPlayers();
         STKHost::create();
         auto cts = std::make_shared<ConnectToServer>(server);

@@ -31,8 +31,15 @@
 #include "utils/time.hpp"
 
 #include <assert.h>
-#include <irrString.h>
 #include <string>
+
+#if defined(WIN32)
+#  undef _WIN32_WINNT
+#  define _WIN32_WINNT 0x600
+#  include <iphlpapi.h>
+#else
+#  include <ifaddrs.h>
+#endif
 
 #define SERVER_REFRESH_INTERVAL 5.0f
 
@@ -136,11 +143,14 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             addr.host = STKHost::HOST_ANY;
             addr.port = STKHost::PORT_ANY;
             Network *broadcast = new Network(1, 1, 0, 0, &addr);
-
-            BareNetworkString s(std::string("stk-server"));
-            TransportAddress broadcast_address(-1, 
-                               NetworkConfig::get()->getServerDiscoveryPort());
-            broadcast->sendRawPacket(s, broadcast_address);
+            const std::vector<TransportAddress> &all_bcast =
+                ServersManager::get()->getBroadcastAddresses();
+            for (auto &bcast_addr : all_bcast)
+            {
+                Log::info("Server Discovery", "Broadcasting to %s",
+                          bcast_addr.toString().c_str());
+                broadcast->sendRawPacket(std::string("stk-server"), bcast_addr);
+            }
 
             Log::info("ServersManager", "Sent broadcast message.");
 
@@ -153,7 +163,12 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
             const auto& servers = ServersManager::get()->getServers();
             int cur_server_id = (int)servers.size();
             assert(cur_server_id == 0);
-            std::vector<std::shared_ptr<Server> > servers_now;
+            // Use a map with the server name as key to automatically remove
+            // duplicated answers from a server (since we potentially do
+            // multiple broadcasts). We can not use the sender ip address,
+            // because e.g. a local client would answer as 127.0.0.1 and
+            // 192.168.**.
+            std::map<irr::core::stringw, std::shared_ptr<Server> > servers_now;
             while (StkTime::getRealTime() - start_time < DURATION)
             {
                 TransportAddress sender;
@@ -178,9 +193,10 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     uint8_t mode        = s.getUInt8();
                     sender.setPort(port);
                     uint8_t password    = s.getUInt8();
-                    servers_now.emplace_back(std::make_shared<Server>
+                    servers_now.emplace(name, std::make_shared<Server>
                         (cur_server_id++, name, max_players, players,
-                        difficulty, mode, sender, password == 1));
+                        difficulty, mode, sender, password == 1)       );
+                    //all_servers.[name] = servers_now.back();
                 }   // if received_data
             }    // while still waiting
             m_success = true;
@@ -200,10 +216,24 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
 }   // getLANRefreshRequest
 
 // ----------------------------------------------------------------------------
+/** Takes a mapping of server name to server data (to avoid having the same 
+ *  server listed more than once since the client will be doing multiple
+ *  broadcasts to find a server), and converts this into a list of servers.
+ *  \param servers Mapping of server name to Server object.
+ */
+void ServersManager::setLanServers(const std::map<irr::core::stringw,
+                                                  std::shared_ptr<Server> >& servers)
+{
+    m_servers.clear();
+    for (auto i : servers) m_servers.emplace_back(i.second);
+    m_list_updated = true;
+
+}
+// ----------------------------------------------------------------------------
 /** Factory function to create either a LAN or a WAN update-of-server
  *  requests. The current list of servers is also cleared.
  */
-bool ServersManager::refresh()
+bool ServersManager::refresh(bool full_refresh)
 {
     if (StkTime::getRealTime() - m_last_load_time.load()
         < SERVER_REFRESH_INTERVAL)
@@ -214,10 +244,21 @@ bool ServersManager::refresh()
 
     cleanUpServers();
     m_list_updated = false;
+    
     if (NetworkConfig::get()->isWAN())
-       Online::RequestManager::get()->addRequest(getWANRefreshRequest());
+    {
+        Online::RequestManager::get()->addRequest(getWANRefreshRequest());
+    }
     else
-       Online::RequestManager::get()->addRequest(getLANRefreshRequest());
+    {
+        if (full_refresh)
+        {
+            updateBroadcastAddresses();
+        }
+        
+        Online::RequestManager::get()->addRequest(getLANRefreshRequest());
+    }
+    
     return true;
 }   // refresh
 
@@ -253,3 +294,147 @@ void ServersManager::setWanServers(bool success, const XMLNode* input)
     m_last_load_time.store((float)StkTime::getRealTime());
     m_list_updated = true;
 }   // refresh
+
+// ----------------------------------------------------------------------------
+/** Sets a list of default broadcast addresses which is used in case no valid
+ *  broadcast address is found. This list includes default private network
+ *  addresses.
+ */
+void ServersManager::setDefaultBroadcastAddresses()
+{
+    // Add some common LAN addresses
+    m_broadcast_address.emplace_back(std::string("192.168.255.255"));
+    m_broadcast_address.emplace_back(std::string("192.168.0.255")  );
+    m_broadcast_address.emplace_back(std::string("192.168.1.255")  );
+    m_broadcast_address.emplace_back(std::string("172.31.255.255") );
+    m_broadcast_address.emplace_back(std::string("172.16.255.255") );
+    m_broadcast_address.emplace_back(std::string("172.16.0.255")   );
+    m_broadcast_address.emplace_back(std::string("10.255.255.255") );
+    m_broadcast_address.emplace_back(std::string("10.0.255.255")   );
+    m_broadcast_address.emplace_back(std::string("10.0.0.255")     );
+    m_broadcast_address.emplace_back(std::string("255.255.255.255"));
+    m_broadcast_address.emplace_back(std::string("127.0.0.255")    );
+    m_broadcast_address.emplace_back(std::string("127.0.0.1")      );
+}   // setDefaultBroadcastAddresses
+
+// ----------------------------------------------------------------------------
+/** This masks various possible broadcast addresses. For example, in a /16
+ *  network it would first use *.*.255.255, then *.*.*.255. Also if the
+ *  length of the mask is not a multiple of 8, the original value will
+ *  be used, before multiple of 8 are create: /22 (*.3f.ff.ff), then
+ *  /16 (*.*.ff.ff), /8 (*.*.*.ff). While this is usually an overkill,
+ *  it can help in the case that the router does not forward a broadcast
+ *  as expected (this problem often happens with 255.255.255.255, which is
+ *  why this broadcast address creation code was added).
+ *  \param a The transport address for which the broadcast addresses need
+ *         to be created.
+ *  \param len Number of bits to be or'ed.
+ */
+void ServersManager::addAllBroadcastAddresses(const TransportAddress &a, int len)
+{
+    // Try different broadcast addresses - by masking on
+    // byte boundaries
+    while (len > 0)
+    {
+        unsigned int mask = (1 << len) - 1;
+        TransportAddress bcast(a.getIP() | mask, 
+                               NetworkConfig::get()->getServerDiscoveryPort());
+        Log::info("Broadcast", "address %s length %d mask %x --> %s",
+            a.toString().c_str(),
+            len, mask,
+            bcast.toString().c_str());
+        m_broadcast_address.push_back(bcast);
+        if (len % 8 != 0)
+            len -= (len % 8);
+        else
+            len = len - 8;
+    }   // while len > 0
+}   // addAllBroadcastAddresses
+
+// ----------------------------------------------------------------------------
+/** Updates a list of all possible broadcast addresses on this machine.
+ *  It queries all adapters for active IPV4 interfaces, determines their
+ *  netmask to create the broadcast addresses. It will also add 'smaller'
+ *  broadcast addesses, e.g. in a /16 network, it will add *.*.255.255 and
+ *  *.*.*.255, since it was sometimes observed that routers would not let
+ *  all broadcast addresses through. Duplicated answers (from the same server
+ *  to different addersses) will be filtered out in ServersManager.
+ */
+void ServersManager::updateBroadcastAddresses()
+{
+    m_broadcast_address.clear();
+    
+#ifdef WIN32
+    IP_ADAPTER_ADDRESSES *addresses;
+    int count = 100, return_code;
+
+    int iteration = 0;
+    do
+    {
+        addresses = new IP_ADAPTER_ADDRESSES[count];
+        ULONG buf_len = sizeof(IP_ADAPTER_ADDRESSES)*count;
+        long flags = 0;
+        return_code = GetAdaptersAddresses(AF_INET, flags, NULL, addresses,
+            &buf_len);
+        iteration++;
+    } while (return_code == ERROR_BUFFER_OVERFLOW && iteration<10);
+
+    if (return_code == ERROR_BUFFER_OVERFLOW)
+    {
+        Log::warn("NetworkConfig", "Can not get broadcast addresses.");
+        setDefaultBroadcastAddresses();
+        return;
+    }
+
+    for (IP_ADAPTER_ADDRESSES *p = addresses; p; p = p->Next)
+    {
+        // Check all operational IP4 adapters
+        if (p->OperStatus == IfOperStatusUp &&
+            p->FirstUnicastAddress->Address.lpSockaddr->sa_family == AF_INET)
+        {
+            const sockaddr_in *sa = (sockaddr_in*)p->FirstUnicastAddress->Address.lpSockaddr;
+            // Use sa->sin_addr.S_un.S_addr and htonl?
+            TransportAddress ta(sa->sin_addr.S_un.S_un_b.s_b1,
+                sa->sin_addr.S_un.S_un_b.s_b2,
+                sa->sin_addr.S_un.S_un_b.s_b3,
+                sa->sin_addr.S_un.S_un_b.s_b4);
+            int len = 32 - p->FirstUnicastAddress->OnLinkPrefixLength;
+            addAllBroadcastAddresses(ta, len);
+        }
+    }
+#else
+    struct ifaddrs *addresses, *p;
+
+    getifaddrs(&addresses);
+    for (p = addresses; p; p = p->ifa_next)
+    {
+        if (p->ifa_addr->sa_family == AF_INET)
+        {
+            struct sockaddr_in *sa = (struct sockaddr_in *) p->ifa_addr;
+            TransportAddress ta(htonl(sa->sin_addr.s_addr), 0);
+            uint32_t u = ((sockaddr_in*)(p->ifa_netmask))->sin_addr.s_addr;
+            // Convert mask to #bits:  SWAT algorithm
+            u = u - ((u >> 1) & 0x55555555);
+            u = (u & 0x33333333) + ((u >> 2) & 0x33333333);
+            u = (((u + (u >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;            
+
+            printf("Interface: %s\tAddress: %s\tmask: %x\n", p->ifa_name,
+                ta.toString().c_str(), u);
+            addAllBroadcastAddresses(ta, u);
+        }
+    }
+#endif
+}   // updateBroadcastAddresses
+
+// ----------------------------------------------------------------------------
+/** Returns a list of all possible broadcast addresses on this machine.
+ */
+const std::vector<TransportAddress>& ServersManager::getBroadcastAddresses()
+{
+    if (m_broadcast_address.empty())
+    {
+        updateBroadcastAddresses();
+    }
+
+    return m_broadcast_address;
+}   // getBroadcastAddresses

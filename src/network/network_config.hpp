@@ -24,6 +24,7 @@
 
 #include "network/transport_address.hpp"
 #include "race/race_manager.hpp"
+#include "utils/no_copy.hpp"
 
 #include "irrString.h"
 #include <tuple>
@@ -42,7 +43,7 @@ namespace GUIEngine
 class InputDevice;
 class PlayerProfile;
 
-class NetworkConfig
+class NetworkConfig : public NoCopy
 {
 private:
     /** The singleton instance. */
@@ -101,7 +102,7 @@ private:
     std::string m_server_id_file;
 
     std::vector<std::tuple<InputDevice*, PlayerProfile*,
-        /*is_handicap*/bool> > m_network_players;
+        PerPlayerDifficulty> > m_network_players;
 
     core::stringw m_motd;
 
@@ -189,7 +190,8 @@ public:
         m_password = "";
     }
     // ------------------------------------------------------------------------
-    const std::vector<std::tuple<InputDevice*, PlayerProfile*, bool> >&
+    const std::vector<std::tuple<InputDevice*, PlayerProfile*,
+                                 PerPlayerDifficulty> >&
                         getNetworkPlayers() const { return m_network_players; }
     // ------------------------------------------------------------------------
     bool isAddingNetworkPlayers() const
@@ -197,7 +199,8 @@ public:
     // ------------------------------------------------------------------------
     void doneAddingNetworkPlayers()   { m_done_adding_network_players = true; }
     // ------------------------------------------------------------------------
-    bool addNetworkPlayer(InputDevice* device, PlayerProfile* profile, bool h)
+    bool addNetworkPlayer(InputDevice* device, PlayerProfile* profile,
+                          PerPlayerDifficulty d)
     {
         for (auto& p : m_network_players)
         {
@@ -206,7 +209,7 @@ public:
             if (std::get<1>(p) == profile)
                 return false;
         }
-        m_network_players.emplace_back(device, profile, h);
+        m_network_players.emplace_back(device, profile, d);
         return true;
     }
     // ------------------------------------------------------------------------

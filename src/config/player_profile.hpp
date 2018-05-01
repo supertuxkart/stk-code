@@ -230,6 +230,8 @@ public:
     // ------------------------------------------------------------------------
     unsigned int getPoints() const { return m_story_mode_status->getPoints(); }
     // ------------------------------------------------------------------------
+    unsigned int getNextUnlockPoints() const { return m_story_mode_status->getNextUnlockPoints(); }
+    // ------------------------------------------------------------------------
     void setFirstTime(bool b) { m_story_mode_status->setFirstTime(b); }
     // ------------------------------------------------------------------------
     bool isFirstTime() const { return m_story_mode_status->isFirstTime(); }
@@ -263,7 +265,11 @@ public:
     unsigned int getNumHardTrophies() const
     {
         return m_story_mode_status->getNumHardTrophies();
-    }   // getNumHardTropies
+    }   // getNumHardTrophies
+    unsigned int getNumBestTrophies() const
+    {
+        return m_story_mode_status->getNumBestTrophies();
+    }   // getNumBestTrophies
     // ------------------------------------------------------------------------
     AchievementsStatus* getAchievementsStatus()
     {

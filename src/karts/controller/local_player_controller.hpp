@@ -48,6 +48,8 @@ private:
      *  camera object is managed in the Camera class, so no need to free it. */
     int  m_camera_index;
 
+    PerPlayerDifficulty m_difficulty;
+
     SFXBase     *m_wee_sound;
     SFXBuffer   *m_bzzt_sound;
     SFXBuffer   *m_ugh_sound;
@@ -58,7 +60,8 @@ private:
     virtual void displayPenaltyWarning() OVERRIDE;
 public:
                  LocalPlayerController(AbstractKart *kart,
-                                       const int local_playerID);
+                                       const int local_player_id,
+                                       PerPlayerDifficulty d);
                 ~LocalPlayerController();
     void         update            (int ticks) OVERRIDE;
     bool         action            (PlayerAction action, int value,

@@ -169,12 +169,12 @@ void ServerLobby::handleChat(Event* event)
         return;
     }
     core::stringw message;
-    event->data().decodeStringW(&message);
+    event->data().decodeString16(&message);
     if (message.size() > 0)
     {
         NetworkString* chat = getNetworkString();
         chat->setSynchronous(true);
-        chat->addUInt8(LE_CHAT).encodeString(message);
+        chat->addUInt8(LE_CHAT).encodeString16(message);
         sendMessageToPeersChangingToken(chat, /*reliable*/true);
         delete chat;
     }
@@ -264,7 +264,7 @@ void ServerLobby::asynchronousUpdate()
         }
         else
         {
-            m_server_address.copy(STKHost::get()->getPublicAddress());
+            m_server_address = STKHost::get()->getPublicAddress();
             STKHost::get()->startListening();
             m_state = REGISTER_SELF_ADDRESS;
         }
@@ -1045,6 +1045,7 @@ void ServerLobby::updatePlayerList()
         if (m_server_owner.lock() == profile->getPeer())
             server_owner = 1;
         pl->addUInt8(server_owner);
+        pl->addUInt8(profile->getPerPlayerDifficulty());
     }
     sendMessageToPeersChangingToken(pl);
     delete pl;
@@ -1276,8 +1277,8 @@ void ServerLobby::finishedLoadingWorldClient(Event *event)
 {
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
     m_peers_ready.at(peer) = true;
-    Log::info("ServerLobby", "Peer %d has finished loading world",
-        peer->getHostId());
+    Log::info("ServerLobby", "Peer %d has finished loading world at %lf",
+        peer->getHostId(), StkTime::getRealTime());
 }   // finishedLoadingWorldClient
 
 //-----------------------------------------------------------------------------
