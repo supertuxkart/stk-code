@@ -544,13 +544,12 @@ void ClientLobby::handleChat(Event* event)
     if (!UserConfigParams::m_lobby_chat)
         return;
     SFXManager::get()->quickSound("plopp");
-    std::string message;
-    event->data().decodeString(&message);
-    Log::info("ClientLobby", "%s", message.c_str());
+    core::stringw message;
+    event->data().decodeString16(&message);
+    Log::info("ClientLobby", "%s", StringUtils::wideToUtf8(message).c_str());
     if (message.size() > 0)
     {
-        NetworkingLobby::getInstance()->addMoreServerInfo(
-            StringUtils::utf8ToWide(message));
+        NetworkingLobby::getInstance()->addMoreServerInfo(message);
     }
 }   // handleChat
 

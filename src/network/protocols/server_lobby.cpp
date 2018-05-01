@@ -169,12 +169,12 @@ void ServerLobby::handleChat(Event* event)
         return;
     }
     core::stringw message;
-    event->data().decodeStringW(&message);
+    event->data().decodeString16(&message);
     if (message.size() > 0)
     {
         NetworkString* chat = getNetworkString();
         chat->setSynchronous(true);
-        chat->addUInt8(LE_CHAT).encodeString(message);
+        chat->addUInt8(LE_CHAT).encodeString16(message);
         sendMessageToPeersChangingToken(chat, /*reliable*/true);
         delete chat;
     }
