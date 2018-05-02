@@ -88,7 +88,8 @@ RaceGUI::RaceGUI()
     // and the map is in a player view, scale down the map
     if (race_manager->getNumLocalPlayers() >= 4 && !race_manager->getIfEmptyScreenSpaceExists())
     {
-        if (irr_driver->getFrameSize().Width / irr_driver->getFrameSize().Height > (4.1f/3.0f))
+        if ( ((float) irr_driver->getFrameSize().Width / (float) irr_driver->getFrameSize().Height) >
+             (4.1f/3.0f))
         {
             if (race_manager->getNumLocalPlayers() == 4)
                 map_size_splitscreen = 0.75f;
