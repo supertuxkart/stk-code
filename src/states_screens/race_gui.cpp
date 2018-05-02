@@ -82,9 +82,26 @@ RaceGUI::RaceGUI()
     else
         m_lap_width = font->getDimension(L"9/9").Width;
 
+    float map_size_splitscreen = 1.0f;
+
+    // If there are four players or more in splitscreen
+    // and the map is in a player view, scale down the map
+    if (race_manager->getNumLocalPlayers() >= 4 && !race_manager->getIfEmptyScreenSpaceExists())
+    {
+        if (irr_driver->getFrameSize().Width / irr_driver->getFrameSize().Height > (4.1f/3.0f))
+        {
+            if (race_manager->getNumLocalPlayers() == 4)
+                map_size_splitscreen = 0.75f;
+            else
+                map_size_splitscreen = 0.5f;
+        }
+        else
+            map_size_splitscreen = 0.5f;
+    }
+
     // Originally m_map_height was 100, and we take 480 as minimum res
     float scaling = irr_driver->getFrameSize().Height / 480.0f;
-    const float map_size = 180.0f;
+    const float map_size = 180.0f * map_size_splitscreen;
     const float top_margin = 3.5f * m_font_height;
     
     if (UserConfigParams::m_multitouch_enabled && 
