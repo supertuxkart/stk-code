@@ -84,7 +84,7 @@ RaceGUI::RaceGUI()
 
     // Originally m_map_height was 100, and we take 480 as minimum res
     float scaling = irr_driver->getFrameSize().Height / 480.0f;
-    const float map_size = 100.0f;
+    const float map_size = 180.0f;
     const float top_margin = 3.5f * m_font_height;
     
     if (UserConfigParams::m_multitouch_enabled && 
