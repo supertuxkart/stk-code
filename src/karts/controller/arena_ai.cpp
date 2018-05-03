@@ -581,10 +581,7 @@ void ArenaAI::tryCollectItem(Vec3* aim_point, int* target_node) const
         ItemManager::get()->getFirstItemInQuad(*target_node));
 
     // Don't look for a new item unless it's collected or swapped
-    if (selected && !(selected->wasCollected() ||
-        selected->getType() == Item::ITEM_BANANA ||
-        selected->getType() == Item::ITEM_BUBBLEGUM ||
-        selected->getType() == Item::ITEM_BUBBLEGUM_NOLOK))
+    if (selected && selected->isAvailable() && !selected->isNegativeItem())
     {
         *aim_point = selected->getXYZ();
         return;
@@ -594,10 +591,7 @@ void ArenaAI::tryCollectItem(Vec3* aim_point, int* target_node) const
     {
         Item* cur_item = ItemManager::get()->getFirstItemInQuad(i);
         if (cur_item == NULL) continue;
-        if (cur_item->wasCollected() ||
-            cur_item->getType() == Item::ITEM_BANANA ||
-            cur_item->getType() == Item::ITEM_BUBBLEGUM ||
-            cur_item->getType() == Item::ITEM_BUBBLEGUM_NOLOK)
+        if (!cur_item->isAvailable() || cur_item->isNegativeItem())
             continue;
 
         if ((cur_item->getType() == Item::ITEM_NITRO_BIG ||
@@ -667,10 +661,7 @@ void ArenaAI::determinePath(int forward, std::vector<int>* path)
         const int node = (*path)[i];
         Item* selected = ItemManager::get()->getFirstItemInQuad(node);
 
-        if (selected && !selected->wasCollected() &&
-            (selected->getType() == Item::ITEM_BANANA ||
-            selected->getType() == Item::ITEM_BUBBLEGUM ||
-            selected->getType() == Item::ITEM_BUBBLEGUM_NOLOK))
+        if (selected && selected->isAvailable() && selected->isNegativeItem())
         {
             bad_item_nodes.push_back(node);
         }

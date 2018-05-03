@@ -60,11 +60,11 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the mesh for a certain item. */
-    static scene::IMesh* getItemModel(Item::ItemType type)
+    static scene::IMesh* getItemModel(ItemState::ItemType type)
                                       { return m_item_mesh[type]; }
     // ------------------------------------------------------------------------
     /** Returns the glow color for an item. */
-    static video::SColorf& getGlowColor(Item::ItemType type)
+    static video::SColorf& getGlowColor(ItemState::ItemType type)
                                       { return m_glow_color[type]; }
     // ------------------------------------------------------------------------
     /** Return an instance of the item manager (it does not automatically
@@ -86,7 +86,7 @@ private:
     std::vector< AllItemTypes > *m_items_in_quads;
 
     /** What item this item is switched to. */
-    std::vector<Item::ItemType> m_switch_to;
+    std::vector<ItemState::ItemType> m_switch_to;
 
     /** Remaining time that items should remain switched. If the
      *  value is <0, it indicates that the items are not switched atm. */
@@ -101,7 +101,7 @@ private:
     void           setSwitchItems(const std::vector<int> &switch_items);
 
 public:
-    Item*          newItem         (Item::ItemType type, const Vec3& xyz,
+    Item*          newItem         (ItemState::ItemType type, const Vec3& xyz,
                                     const Vec3 &normal,
                                     AbstractKart* parent=NULL);
     Item*          newItem         (const Vec3& xyz, float distance,

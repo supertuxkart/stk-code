@@ -42,7 +42,7 @@ namespace irr
 }
 using namespace irr;
 
-// -----------------------------------------------------------------------------
+// ============================================================================
 
 /**
  * \ingroup items
@@ -55,17 +55,21 @@ public:
     virtual void onTriggerItemApproached() = 0;
 };
 
-/**
-  * \ingroup items
-  */
-class Item : public NoCopy
+// ============================================================================
+/** \ingroup items
+ *  Contains the state information of an item, i.e. all non-visual information
+ *  only, which also can change (e.g. position and AI information is constant
+ *  and therefore not stored here). This class is used as a base class for
+ *  item and for networking to save item states.
+ */
+class ItemState : public NoCopy
 {
 public:
     /**
-      * The list of all items. Important for the switch item function:
-      * bubblegum must be the last item (since bubble gum can't be
-      * switched with any other item, since it's a different objecct).
-      */
+    * The list of all items. Important for the switch item function:
+    * bubblegum must be the last item (since bubble gum can't be
+    * switched with any other item, since it's a different objecct).
+    */
     enum ItemType
     {
         ITEM_FIRST,
@@ -79,8 +83,8 @@ public:
         /** For easter egg mode only. */
         ITEM_EASTER_EGG,
         /** An invisible item that can be used to trigger some behavior when
-          * approaching a point
-          */
+        * approaching a point
+        */
         ITEM_TRIGGER,
         ITEM_LAST = ITEM_TRIGGER,
         ITEM_COUNT,
@@ -88,14 +92,165 @@ public:
     };
 
 private:
-    LEAK_CHECK();
-
     /** Item type. */
-    ItemType      m_type;
+    ItemType m_type;
 
     /** If the item is switched, this contains the original type.
-     *  It is ITEM_NONE if the item is not switched. */
-    ItemType      m_original_type;
+    *  It is ITEM_NONE if the item is not switched. */
+    ItemType m_original_type;
+
+    /** True if item was collected & is not displayed. */
+    bool m_collected;
+
+    /** Time till a collected item reappears. */
+    int m_ticks_till_return;
+
+    /** Index in item_manager field. */
+    unsigned int  m_item_id;
+
+    /** Optionally if item was placed by a kart, a timer can be used to
+    *  temporarly deactivate collision so a kart is not hit by its own item */
+    int m_deactive_ticks;
+
+    /** Counts how often an item is used before it disappears. Used for
+     *  bubble gum to make them disappear after a while. A value >0
+     *  indicates that the item still exists, =0 that the item can be
+     *  deleted, and <0 that the item will never be deleted. */
+    int m_disappear_counter;
+
+public:
+         /** Constructor. */
+         ItemState(ItemType type)
+         { 
+             m_item_id = -1;
+             setType(type); 
+         }
+    void setDisappearCounter();
+    void update(int ticks);
+    void collected(float t, const AbstractKart *kart);
+         
+    // -----------------------------------------------------------------------
+    void reset()
+    {
+        m_deactive_ticks    = 0;
+        m_ticks_till_return = 0;
+        m_collected         = false;
+        setDisappearCounter();
+        // If the item was switched:
+        if (m_original_type != ITEM_NONE)
+        {
+            setType(m_original_type);
+            m_original_type = ITEM_NONE;
+        }
+    }   // reset
+
+    // -----------------------------------------------------------------------
+    /** Initialises an item.
+    /*  \param type Type for this item.
+    */
+    void initItem(ItemType type)
+    {
+        setType(type);
+        m_original_type     = ITEM_NONE;
+        m_deactive_ticks    = 0;
+        m_ticks_till_return = 0;
+        m_item_id           = -1;
+        m_collected         = false;
+        setDisappearCounter();
+    }   // initItem
+
+    // ------------------------------------------------------------------------
+    /** Switches an item to be of a different type. Used for the switch
+     *  powerup.
+     *  \param type New type for this item.
+     */
+    void switchTo(ItemType type)
+    {
+        // triggers and easter eggs should not be switched
+        if (m_type == ITEM_TRIGGER || m_type == ITEM_EASTER_EGG) return;
+        m_original_type = m_type;
+        setType(type);
+    }   // switchTo
+    // ------------------------------------------------------------------------
+    /** Returns true if this item was not actually switched (e.g. trigger etc)
+     */
+    bool switchBack()
+    {
+        // triggers should not be switched
+        if (m_type == ITEM_TRIGGER) return true;
+         // If the item is not switched, do nothing. This can happen if a bubble
+        // gum is dropped while items are switched - when switching back, this
+        // bubble gum has no original type.
+        if (m_original_type == ITEM_NONE)
+            return true;
+        setType(m_original_type);
+        m_original_type = ITEM_NONE;
+        return false;
+    }   // switchBack
+
+    // ------------------------------------------------------------------------
+    /** Returns if this item is negative, i.e. a banana or bubblegum. */
+    bool isNegativeItem() const
+    {
+        return m_type == ITEM_BANANA || m_type == ITEM_BUBBLEGUM ||
+               m_type == ITEM_BUBBLEGUM_NOLOK;
+    }
+    // ------------------------------------------------------------------------
+    /** Sets how long an item should be disabled. While item itself sets
+     *  a default, this time is too short in case that a kart that has a bomb
+     *  hits a banana: by the time the explosion animation is ended and the
+     *  kart is back at its original position, the banana would be back again
+     *  and therefore hit the kart again. See Attachment::hitBanana for more
+     *  details.
+     *  \param f Time till the item can be used again.
+     */
+    void setTicksTillReturn(int t) { m_ticks_till_return = t; }
+    // ------------------------------------------------------------------------
+    /** Returns the time the item is disabled for. */
+    int getTicksTillReturn() const { return m_ticks_till_return; }
+    // ------------------------------------------------------------------------
+    /** Returns true if this item is currently collected. */
+    bool isAvailable() const { return m_ticks_till_return <= 0; }
+    // ------------------------------------------------------------------------
+    /** Useless function ;) But it makes some conditionals easier to read. */
+    bool isUnavailable() const { return m_collected; }
+    // ------------------------------------------------------------------------
+    /** Returns the type of this item. */
+    ItemType getType() const { return m_type; }
+    // ------------------------------------------------------------------------
+    void setType(ItemType type) { m_type = type; }
+    // ------------------------------------------------------------------------
+    /** Sets the index of this item in the item manager list. */
+    void setItemId(unsigned int n) { m_item_id = n; }
+    // ------------------------------------------------------------------------
+    /** Returns the index of this item in the item manager list. */
+    unsigned int getItemId() const { return m_item_id; }
+    // ------------------------------------------------------------------------
+    /** Returns true if this item is used up and can be removed. */
+    bool isUsedUp() const { return m_disappear_counter == 0; }
+    // ------------------------------------------------------------------------
+    /** Returns true if this item can be used up, and therefore needs to
+     *  be removed when the game is reset. */
+    bool canBeUsedUp()  const { return m_disappear_counter>-1; }
+    // ------------------------------------------------------------------------
+    /** Returns the number of ticks during which the item is deactivated (i.e.
+     *  it was collected). */
+    int getDeactivatedTicks() const { return m_deactive_ticks; }
+    // ------------------------------------------------------------------------
+    /** Sets the number of ticks during which the item is deactivated (i.e.
+     *  it was collected). */
+    void setDeactivatedTicks(int ticks) { m_deactive_ticks = ticks; }
+};   // class ItemState
+
+// ============================================================================
+/**
+  * \ingroup items
+  */
+class Item : public ItemState
+{
+
+private:
+    LEAK_CHECK();
 
     /** Stores the original rotation of an item. This is used in
      *  case of a switch to restore the rotation of a bubble gum
@@ -106,12 +261,6 @@ private:
 
     /** Used when rotating the item */
     float         m_rotation_angle;
-
-    /** True if item was collected & is not displayed. */
-    bool          m_collected;
-
-    /** Time till a collected item reappears. */
-    int           m_ticks_till_return;
 
     /** Scene node of this item. */
     LODNode *m_node;
@@ -124,9 +273,6 @@ private:
      * and then converting this value to a Vec3. */
     Vec3          m_xyz;
 
-    /** Index in item_manager field. */
-    unsigned int  m_item_id;
-
     /** Set to false if item should not rotate. */
     bool          m_rotate;
 
@@ -136,16 +282,6 @@ private:
 
     /** Kart that emitted this item if any */
     const AbstractKart   *m_emitter;
-
-    /** Optionally if item was placed by a kart, a timer can be used to
-     *  temporarly deactivate collision so a kart is not hit by its own item */
-    int           m_deactive_ticks;
-
-    /** Counts how often an item is used before it disappears. Used for
-     *  bubble gum to make them disappear after a while. A value >0
-     *  indicates that the item still exists, =0 that the item can be
-     *  deleted, and <0 that the item will never be deleted. */
-    int           m_disappear_counter;
 
     /** callback used if type == ITEM_TRIGGER */
     TriggerItemListener* m_listener;
@@ -163,11 +299,10 @@ private:
 
     /** The closest point to the left and right of this item at which it
      *  would not be collected. Used by the AI to avoid items. */
-    Vec3          *m_avoidance_points[2];
+    Vec3         *m_avoidance_points[2];
 
-
-    void          initItem(ItemType type, const Vec3 &xyz);
     void          setType(ItemType type);
+    void          initItem(ItemType type, const Vec3 &xyz);
     void          setMesh(scene::IMesh* mesh, scene::IMesh* lowres_mesh);
 
 public:
@@ -195,7 +330,7 @@ public:
      */
     bool hitKart(const Vec3 &xyz, const AbstractKart *kart=NULL) const
     {
-        if (m_event_handler == kart && m_deactive_ticks > 0)
+        if (m_event_handler == kart && getDeactivatedTicks() > 0)
             return false;
         Vec3 lc = quatRotate(m_original_rotation, xyz - m_xyz);
         // Don't be too strict if the kart is a bit above the item
@@ -216,7 +351,7 @@ protected:
     bool hitLine(const core::line3df &line,
                   const AbstractKart *kart=NULL) const
     {
-        if(m_event_handler==kart && m_deactive_ticks >0) return false;
+        if(m_event_handler==kart && getDeactivatedTicks() >0) return false;
 
         Vec3 closest = line.getClosestPoint(m_xyz.toIrrVector());
         return hitKart(closest, kart);
@@ -224,43 +359,11 @@ protected:
 
 public:
     // ------------------------------------------------------------------------
-    /** Sets the index of this item in the item manager list. */
-    void          setItemId(unsigned int n)  { m_item_id = n; }
-    // ------------------------------------------------------------------------
-    /** Returns the index of this item in the item manager list. */
-    unsigned int  getItemId()    const { return m_item_id;  }
-    // ------------------------------------------------------------------------
-    /** Returns the type of this item. */
-    ItemType      getType()      const { return m_type;     }
-    // ------------------------------------------------------------------------
-    /** Returns true if this item is currently collected. */
-    bool          wasCollected() const { return m_collected;}
-    // ------------------------------------------------------------------------
-    /** Returns true if this item is used up and can be removed. */
-    bool          isUsedUp()     const {return m_disappear_counter==0; }
-    // ------------------------------------------------------------------------
-    /** Returns true if this item can be used up, and therefore needs to
-     *  be removed when the game is reset. */
-    bool          canBeUsedUp()  const {return m_disappear_counter>-1; }
-    // ------------------------------------------------------------------------
-    /** Sets how long an item should be disabled. While item itself sets
-     *  a default, this time is too short in case that a kart that has a bomb
-     *  hits a banana: by the time the explosion animation is ended and the
-     *  kart is back at its original position, the banana would be back again
-     *  and therefore hit the kart again. See Attachment::hitBanana for more
-     *  details.
-     *  \param f Time till the item can be used again.
-     */
-    void          setDisableTicks(int t) { m_ticks_till_return = t; }
-    // ------------------------------------------------------------------------
-    /** Returns the time the item is disabled for. */
-    int           getDisableTicks() const { return m_ticks_till_return; }
-    // ------------------------------------------------------------------------
     /** Returns the XYZ position of the item. */
-    const Vec3&   getXYZ() const { return m_xyz; }
+    const Vec3& getXYZ() const { return m_xyz; }
     // ------------------------------------------------------------------------
     /** Returns the index of the graph node this item is on. */
-    int           getGraphNode() const { return m_graph_node; }
+    int getGraphNode() const { return m_graph_node; }
     // ------------------------------------------------------------------------
     /** Returns the distance from center: negative means left of center,
      *  positive means right of center. */

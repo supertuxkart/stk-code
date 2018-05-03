@@ -18,10 +18,6 @@
 
 #include "items/item_manager.hpp"
 
-#include <stdexcept>
-#include <string>
-#include <sstream>
-
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -40,6 +36,12 @@
 
 #include <IMesh.h>
 #include <IAnimatedMesh.h>
+
+#include <assert.h>
+#include <stdexcept>
+#include <sstream>
+#include <string>
+
 
 std::vector<scene::IMesh *> ItemManager::m_item_mesh;
 std::vector<scene::IMesh *> ItemManager::m_item_lowres_mesh;
@@ -69,28 +71,28 @@ void ItemManager::destroy()
  */
 void ItemManager::loadDefaultItemMeshes()
 {
-    m_item_mesh.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, NULL);
-    m_glow_color.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1,
+    m_item_mesh.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1, NULL);
+    m_glow_color.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1,
                         video::SColorf(255.0f, 255.0f, 255.0f) );
 
-    m_item_lowres_mesh.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, NULL);
+    m_item_lowres_mesh.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1, NULL);
 
     // A temporary mapping of items to names used in the XML file:
-    std::map<Item::ItemType, std::string> item_names;
-    item_names[Item::ITEM_BANANA     ] = "banana";
-    item_names[Item::ITEM_BONUS_BOX  ] = "bonus-box";
-    item_names[Item::ITEM_BUBBLEGUM  ] = "bubblegum";
-    item_names[Item::ITEM_NITRO_BIG  ] = "nitro-big";
-    item_names[Item::ITEM_NITRO_SMALL] = "nitro-small";
-    item_names[Item::ITEM_TRIGGER    ] = "trigger";
-    item_names[Item::ITEM_BUBBLEGUM_NOLOK] = "bubblegum-nolok";
-    item_names[Item::ITEM_EASTER_EGG ] = "easter-egg";
+    std::map<ItemState::ItemType, std::string> item_names;
+    item_names[ItemState::ITEM_BANANA     ] = "banana";
+    item_names[ItemState::ITEM_BONUS_BOX  ] = "bonus-box";
+    item_names[ItemState::ITEM_BUBBLEGUM  ] = "bubblegum";
+    item_names[ItemState::ITEM_NITRO_BIG  ] = "nitro-big";
+    item_names[ItemState::ITEM_NITRO_SMALL] = "nitro-small";
+    item_names[ItemState::ITEM_TRIGGER    ] = "trigger";
+    item_names[ItemState::ITEM_BUBBLEGUM_NOLOK] = "bubblegum-nolok";
+    item_names[ItemState::ITEM_EASTER_EGG ] = "easter-egg";
 
     const std::string file_name = file_manager->getAsset("items.xml");
     const XMLNode *root         = file_manager->createXMLTree(file_name);
-    for(unsigned int i=Item::ITEM_FIRST; i<=Item::ITEM_LAST; i++)
+    for(unsigned int i=ItemState::ITEM_FIRST; i<=ItemState::ITEM_LAST; i++)
     {
-        const std::string &name = item_names[(Item::ItemType)i];
+        const std::string &name = item_names[(ItemState::ItemType)i];
         const XMLNode *node = root->getNode(name);
         if (!node)  continue;
 
@@ -133,7 +135,7 @@ void ItemManager::loadDefaultItemMeshes()
  */
 void ItemManager::removeTextures()
 {
-    for(unsigned int i=0; i<Item::ITEM_LAST-Item::ITEM_FIRST+1; i++)
+    for(unsigned int i=0; i<ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1; i++)
     {
         if(m_item_mesh[i])
         {
@@ -162,9 +164,9 @@ ItemManager::ItemManager()
     // Prepare the switch to array, which stores which item should be
     // switched to what other item. Initialise it with a mapping that
     // each item is switched to itself, so basically a no-op.
-    m_switch_to.reserve(Item::ITEM_COUNT);
-    for(unsigned int i=Item::ITEM_FIRST; i<Item::ITEM_COUNT; i++)
-        m_switch_to.push_back((Item::ItemType)i);
+    m_switch_to.reserve(ItemState::ITEM_COUNT);
+    for(unsigned int i=ItemState::ITEM_FIRST; i<ItemState::ITEM_COUNT; i++)
+        m_switch_to.push_back((ItemState::ItemType)i);
     setSwitchItems(stk_config->m_switch_items);
 
     if(Graph::get())
@@ -187,8 +189,8 @@ ItemManager::ItemManager()
  */
 void ItemManager::setSwitchItems(const std::vector<int> &switch_items)
 {
-    for(unsigned int i=Item::ITEM_FIRST; i<Item::ITEM_COUNT; i++)
-        m_switch_to[i]=(Item::ItemType)stk_config->m_switch_items[i];
+    for(unsigned int i=ItemState::ITEM_FIRST; i<ItemState::ITEM_COUNT; i++)
+        m_switch_to[i]=(ItemState::ItemType)stk_config->m_switch_items[i];
 }   // setSwitchItems
 
 
@@ -252,13 +254,13 @@ void ItemManager::insertItem(Item *item)
  *  \param parent In case of a dropped item used to avoid that a kart
  *         is affected by its own items.
  */
-Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
+Item* ItemManager::newItem(ItemState::ItemType type, const Vec3& xyz,
                            const Vec3 &normal, AbstractKart *parent)
 {
-    Item::ItemType mesh_type = type;
-    if (type == Item::ITEM_BUBBLEGUM && parent->getIdent() == "nolok")
+    ItemState::ItemType mesh_type = type;
+    if (type == ItemState::ITEM_BUBBLEGUM && parent->getIdent() == "nolok")
     {
-        mesh_type = Item::ITEM_BUBBLEGUM_NOLOK;
+        mesh_type = ItemState::ITEM_BUBBLEGUM_NOLOK;
     }
 
     Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type],
@@ -268,7 +270,7 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
     if(parent != NULL) item->setParent(parent);
     if(m_switch_ticks>=0)
     {
-        Item::ItemType new_type = m_switch_to[item->getType()];
+        ItemState::ItemType new_type = m_switch_to[item->getType()];
         item->switchTo(new_type, m_item_mesh[(int)new_type],
                        m_item_lowres_mesh[(int)new_type]);
     }
@@ -298,8 +300,8 @@ void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
     assert(item);
     // Spare tire karts don't collect items
     if (dynamic_cast<SpareTireAI*>(kart->getController()) != NULL) return;
-    if( (item->getType() == Item::ITEM_BUBBLEGUM || 
-         item->getType() == Item::ITEM_BUBBLEGUM_NOLOK) && kart->isShielded())
+    if( (item->getType() == ItemState::ITEM_BUBBLEGUM ||
+         item->getType() == ItemState::ITEM_BUBBLEGUM_NOLOK) && kart->isShielded())
     {
         // shielded karts can simply drive over bubble gums without any effect.
         return;
@@ -327,7 +329,7 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
     for(AllItemTypes::iterator i =m_all_items.begin();
         i!=m_all_items.end();  i++)
     {
-        if((!*i) || (*i)->wasCollected()) continue;
+        if((!*i) || !(*i)->isAvailable()) continue;
         // To allow inlining and avoid including kart.hpp in item.hpp,
         // we pass the kart and the position separately.
         if((*i)->hitKart(kart->getXYZ(), kart))
@@ -376,7 +378,7 @@ void ItemManager::reset()
             i++;
             continue;
         }
-        if((*i)->canBeUsedUp() || (*i)->getType()==Item::ITEM_BUBBLEGUM)
+        if((*i)->canBeUsedUp() || (*i)->getType()==ItemState::ITEM_BUBBLEGUM)
         {
             deleteItem( *i );
             i++;
@@ -462,7 +464,8 @@ void ItemManager::switchItems()
     {
         if(!*i) continue;
 
-        if ((*i)->getType() == Item::ITEM_BUBBLEGUM || (*i)->getType() == Item::ITEM_BUBBLEGUM_NOLOK)
+        if ( (*i)->getType() == ItemState::ITEM_BUBBLEGUM ||
+             (*i)->getType() == ItemState::ITEM_BUBBLEGUM_NOLOK)
         {
             if (race_manager->getAISuperPower() == RaceManager::SUPERPOWER_NOLOK_BOSS)
             {
@@ -470,7 +473,7 @@ void ItemManager::switchItems()
             }
         }
 
-        Item::ItemType new_type = m_switch_to[(*i)->getType()];
+        ItemState::ItemType new_type = m_switch_to[(*i)->getType()];
 
         if(m_switch_ticks<0)
             (*i)->switchTo(new_type, m_item_mesh[(int)new_type], m_item_lowres_mesh[(int)new_type]);
@@ -572,9 +575,9 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
     for (unsigned int i = 0; i < TOTAL_ITEM; i++)
     {
         const int j = random.get(10);
-        Item::ItemType type = (j > BONUS_BOX ? Item::ITEM_BONUS_BOX :
-            j > NITRO_BIG ? Item::ITEM_NITRO_BIG :
-            j > NITRO_SMALL ? Item::ITEM_NITRO_SMALL : Item::ITEM_BANANA);
+        ItemState::ItemType type = (j > BONUS_BOX ? ItemState::ITEM_BONUS_BOX :
+            j > NITRO_BIG ? ItemState::ITEM_NITRO_BIG :
+            j > NITRO_SMALL ? ItemState::ITEM_NITRO_SMALL : ItemState::ITEM_BANANA);
 
         ArenaNode* an = ag->getNode(used_location[i]);
         Vec3 loc = an->getCenter();

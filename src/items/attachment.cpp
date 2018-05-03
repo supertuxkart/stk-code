@@ -361,9 +361,9 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         // default time. This is necessary to avoid that a kart lands on the
         // same banana again once the explosion animation is finished, giving
         // the kart the same penalty twice.
-        int ticks = std::max(item->getDisableTicks(), 
+        int ticks = std::max(item->getTicksTillReturn(), 
                              stk_config->time2Ticks(kp->getExplosionDuration() + 2.0f));
-        item->setDisableTicks(ticks);
+        item->setTicksTillReturn(ticks);
         break;
         }
     case ATTACH_ANVIL:

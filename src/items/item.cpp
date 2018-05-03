@@ -39,8 +39,77 @@
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
 
+
+// ------------------------------------------------------------------------
+/** Sets the disappear counter depending on type.  */
+void ItemState::setDisappearCounter()
+{
+    switch (m_type)
+    {
+    case ITEM_BUBBLEGUM:
+        m_disappear_counter = stk_config->m_bubblegum_counter; break;
+    case ITEM_EASTER_EGG:
+        m_disappear_counter = -1; break;
+    default:
+        m_disappear_counter = -1;
+    }   // switch
+}   // setDisappearCounter
+    
+// ----------------------------------------------------------------------------
+/** Update the state of the item, called once per physics frame.
+ *  \param ticks Number of ticks to simulate (typically 1).
+ */
+void ItemState::update(int ticks)
+{
+    if (m_deactive_ticks > 0) m_deactive_ticks -= ticks;
+    if (m_collected)
+    {
+        m_ticks_till_return -= ticks;
+        if (m_ticks_till_return<=0) m_collected = false;
+    }   // if collected
+
+}   // update
+
+// ----------------------------------------------------------------------------
+void ItemState::collected(float t, const AbstractKart *kart)
+{
+    m_collected = true;
+    if (m_type == ITEM_EASTER_EGG)
+    {
+        m_ticks_till_return = stk_config->time2Ticks(99999);
+        EasterEggHunt *world = dynamic_cast<EasterEggHunt*>(World::getWorld());
+        assert(world);
+        world->collectedEasterEgg(kart);
+    }
+    else if (m_type == ITEM_BUBBLEGUM && m_disappear_counter > 0)
+    {
+        m_disappear_counter--;
+        // Deactivates the item for a certain amount of time. It is used to
+        // prevent bubble gum from hitting a kart over and over again (in each
+        // frame) by giving it time to drive away.
+        m_deactive_ticks = stk_config->time2Ticks(0.5f);
+        // Set the time till reappear to -1 seconds --> the item will
+        // reappear immediately.
+        m_ticks_till_return = -1;
+    }
+    else
+    {
+        // Note if the time is negative, in update the m_collected flag will
+        // be automatically set to false again.
+        m_ticks_till_return = stk_config->time2Ticks(t);
+    }
+
+    if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)
+    {
+        m_ticks_till_return *= 3;
+    }
+}   // collected
+
+// ============================================================================
+
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            scene::IMesh* mesh, scene::IMesh* lowres_mesh)
+    : ItemState(type)
 {
     assert(type != ITEM_TRIGGER); // use other constructor for that
 
@@ -76,7 +145,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 
 #ifdef DEBUG
     std::string debug_name("item: ");
-    debug_name += m_type;
+    debug_name += getType();
     m_node->setName(debug_name.c_str());
 #endif
     m_node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
@@ -94,6 +163,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
   * approaching a point.
   */
 Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
+    : ItemState(ITEM_TRIGGER)
 {
     m_distance_2        = distance*distance;
     initItem(ITEM_TRIGGER, xyz);
@@ -112,25 +182,12 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
  */
 void Item::initItem(ItemType type, const Vec3 &xyz)
 {
-    m_type              = type;
+    ItemState::initItem(type);
     m_xyz               = xyz;
     m_event_handler     = NULL;
-    m_item_id           = -1;
-    m_collected         = false;
-    m_original_type     = ITEM_NONE;
-    m_deactive_ticks    = 0;
-    m_ticks_till_return = 0;  // not strictly necessary, see isCollected()
     m_emitter           = NULL;
-    m_rotate            = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER);
-    switch(m_type)
-    {
-    case ITEM_BUBBLEGUM:
-        m_disappear_counter = stk_config->m_bubblegum_counter; break;
-    case ITEM_EASTER_EGG:
-        m_disappear_counter = -1; break;
-    default:
-        m_disappear_counter = -1;
-    }
+    m_rotate            = (getType()!=ITEM_BUBBLEGUM) && 
+                          (getType()!=ITEM_TRIGGER    );
     // Now determine in which quad this item is, and its distance
     // from the center within this quad.
     m_graph_node = Graph::UNKNOWN_SECTOR;
@@ -167,7 +224,7 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
  */
 void Item::setType(ItemType type)
 {
-    m_type   = type;
+    ItemState::setType(type);
     m_rotate = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER);
     for (auto* node : m_node->getAllNodes())
     {
@@ -186,12 +243,8 @@ void Item::setType(ItemType type)
  */
 void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
 {
-    // triggers and easter eggs should not be switched
-    if (m_type == ITEM_TRIGGER || m_type == ITEM_EASTER_EGG) return;
-
-    m_original_type = m_type;
     setMesh(mesh, lowmesh);
-    setType(type);
+    ItemState::switchTo(type);
 }   // switchTo
 
 //-----------------------------------------------------------------------------
@@ -199,18 +252,9 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
  */
 void Item::switchBack()
 {
-    // triggers should not be switched
-    if (m_type == ITEM_TRIGGER) return;
-
-    // If the item is not switched, do nothing. This can happen if a bubble
-    // gum is dropped while items are switched - when switching back, this
-    // bubble gum has no original type.
-    if(m_original_type==ITEM_NONE)
-        return;
+    if (ItemState::switchBack()) return;
 
     setMesh(m_original_mesh, m_original_lowmesh);
-    setType(m_original_type);
-    m_original_type = ITEM_NONE;
 
     Vec3 hpr;
     hpr.setHPR(m_original_rotation);
@@ -264,24 +308,7 @@ Item::~Item()
  */
 void Item::reset()
 {
-    m_collected         = false;
-    m_ticks_till_return = 0;
-    m_deactive_ticks    = 0;
-    switch(m_type)
-    {
-    case ITEM_BUBBLEGUM:
-        m_disappear_counter = stk_config->m_bubblegum_counter; break;
-    case ITEM_EASTER_EGG:
-        m_disappear_counter = -1; break;
-    default:
-        m_disappear_counter = -1;
-    }
-    if(m_original_type!=ITEM_NONE)
-    {
-        setType(m_original_type);
-        m_original_type = ITEM_NONE;
-    }
-
+    ItemState::reset();
     if (m_node != NULL)
     {
         m_node->setScale(core::vector3df(1,1,1));
@@ -298,7 +325,7 @@ void Item::setParent(AbstractKart* parent)
 {
     m_event_handler  = parent;
     m_emitter        = parent;
-    m_deactive_ticks = stk_config->time2Ticks(1.5f);
+    ItemState::setDeactivatedTicks(stk_config->time2Ticks(1.5f));
 }   // setParent
 
 //-----------------------------------------------------------------------------
@@ -308,32 +335,24 @@ void Item::setParent(AbstractKart* parent)
  */
 void Item::update(int ticks)
 {
-    if(m_deactive_ticks > 0) m_deactive_ticks -= ticks;
+    bool was_collected = !isAvailable();
+    ItemState::update(ticks);
 
-    if(m_collected)
+    if (was_collected && isAvailable() && m_node)
     {
-        m_ticks_till_return -= ticks;
-        if(m_ticks_till_return<0)
-        {
-            m_collected=false;
-
-            if (m_node != NULL)
-            {
-                m_node->setScale(core::vector3df(1,1,1));
-            }
-        }   // time till return <0 --> is fully visible again
-        else if ( m_ticks_till_return <= stk_config->time2Ticks(1.0f) )
-        {
-            if (m_node != NULL)
-            {
-                // Make it visible by scaling it from 0 to 1:
-                m_node->setVisible(true);
-                float t = stk_config->ticks2Time(m_ticks_till_return);
-                m_node->setScale(core::vector3df(1,1,1)*(1-t));
-            }
-        }   // time till return < 1
-    }   // if collected
-    else
+        // This item is now available again - make sure it is not
+        // scaled anymore.
+        m_node->setScale(core::vector3df(1, 1, 1));
+    }
+    if (!isAvailable() && m_node &&
+        getTicksTillReturn() <= stk_config->time2Ticks(1.0f) )
+    {
+        // Make it visible by scaling it from 0 to 1:
+        m_node->setVisible(true);
+        float t = stk_config->ticks2Time(getTicksTillReturn());
+        m_node->setScale(core::vector3df(1, 1, 1)*(1 - t));
+    }
+    if(isAvailable())
     {   // not m_collected
 
         if(!m_rotate || m_node == NULL) return;
@@ -364,49 +383,17 @@ void Item::update(int ticks)
  */
 void Item::collected(const AbstractKart *kart, float t)
 {
-    m_collected     = true;
+    ItemState::collected(t, kart);
     m_event_handler = kart;
-    if(m_type==ITEM_EASTER_EGG)
+    if (m_node && (getType() != ITEM_BUBBLEGUM || isUsedUp() ) )
     {
-        m_ticks_till_return=stk_config->time2Ticks(99999);
-        EasterEggHunt *world = dynamic_cast<EasterEggHunt*>(World::getWorld());
-        assert(world);
-        world->collectedEasterEgg(kart);
-        if (m_node != NULL)
-        {
-            m_node->setVisible(false);
-        }
+        m_node->setVisible(false);
     }
-    else if(m_type==ITEM_BUBBLEGUM && m_disappear_counter>0)
-    {
-        m_disappear_counter --;
-        // Deactivates the item for a certain amount of time. It is used to
-        // prevent bubble gum from hitting a kart over and over again (in each
-        // frame) by giving it time to drive away.
-        m_deactive_ticks = stk_config->time2Ticks(0.5f);
-        // Set the time till reappear to -1 seconds --> the item will
-        // reappear immediately.
-        m_ticks_till_return = -1;
-    }
-    else
-    {
-        // Note if the time is negative, in update the m_collected flag will
-        // be automatically set to false again.
-        m_ticks_till_return = stk_config->time2Ticks(t);
-        if (m_node != NULL)
-        {
-            m_node->setVisible(false);
-        }
-    }
-
+    
     if (m_listener != NULL)
     {
         m_listener->onTriggerItemApproached();
     }
 
-    if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)
-    {
-        m_ticks_till_return *= 3;
-    }
 }   // isCollected
 
