@@ -429,8 +429,12 @@ void Skidding::update(int ticks, bool is_on_ground,
             float bonus_time, bonus_speed, bonus_force;
             unsigned int level = getSkidBonus(&bonus_time, &bonus_speed,
                                               &bonus_force);
+
+            // Show tiny sparks if bonus not yet reached
+            if (level == 0 && m_remaining_jump_time <= 0.0f)
+                m_kart->getKartGFX()->setSkidLevel(level);
             // If at least level 1 bonus is reached, show appropriate gfx
-            if(level>0)
+            else if (level>=1)
             {
                 m_skid_bonus_ready = true;
                 m_kart->getKartGFX()->setSkidLevel(level);
