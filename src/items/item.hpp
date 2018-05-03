@@ -127,7 +127,7 @@ public:
          }
     void setDisappearCounter();
     void update(int ticks);
-    void collected(float t, const AbstractKart *kart);
+    void collected(int ticks);
          
     // -----------------------------------------------------------------------
     void reset()
@@ -307,7 +307,7 @@ public:
                        TriggerItemListener* trigger);
     virtual       ~Item ();
     void          update(int ticks);
-    virtual void  collected(const AbstractKart *kart, float t=2.0f);
+    virtual void  collected(const AbstractKart *kart, int ticks);
     void          setParent(AbstractKart* parent);
     void          reset();
     void          switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh);

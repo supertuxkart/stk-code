@@ -25,7 +25,6 @@
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_node.hpp"
 #include "karts/abstract_kart.hpp"
-#include "modes/easter_egg_hunt.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
 #include "network/rewind_manager.hpp"
@@ -70,15 +69,14 @@ void ItemState::update(int ticks)
 
 // ----------------------------------------------------------------------------
 /** Called when the item is collected.
+ *  \param ticks Number of time step that the item will be unavailable.
  */
-void ItemState::collected(float t, const AbstractKart *kart)
+void ItemState::collected(int ticks)
 {
     if (m_type == ITEM_EASTER_EGG)
     {
+        // They will disappear 'forever'
         m_ticks_till_return = stk_config->time2Ticks(99999);
-        EasterEggHunt *world = dynamic_cast<EasterEggHunt*>(World::getWorld());
-        assert(world);
-        world->collectedEasterEgg(kart);
     }
     else if (m_used_up_counter > 0)
     {
@@ -93,7 +91,7 @@ void ItemState::collected(float t, const AbstractKart *kart)
     }
     else
     {
-        m_ticks_till_return = stk_config->time2Ticks(t);
+        m_ticks_till_return = ticks;
     }
 
     if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)
@@ -375,11 +373,11 @@ void Item::update(int ticks)
 //-----------------------------------------------------------------------------
 /** Is called when the item is hit by a kart.  It sets the flag that the item
  *  has been collected, and the time to return to the parameter.
- *  \param t Time till the object reappears (defaults to 2 seconds).
+ *  \param ticks Ticks till the object reappears.
  */
-void Item::collected(const AbstractKart *kart, float t)
+void Item::collected(const AbstractKart *kart, int ticks)
 {
-    ItemState::collected(t, kart);
+    ItemState::collected(ticks);
     m_event_handler = kart;
     if (m_node && (getType() != ITEM_BUBBLEGUM || isUsedUp() ) )
     {

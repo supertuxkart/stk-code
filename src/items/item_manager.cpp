@@ -25,6 +25,7 @@
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
+#include "modes/easter_egg_hunt.hpp"
 #include "network/network_config.hpp"
 #include "network/race_event_manager.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -306,7 +307,13 @@ void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
         // shielded karts can simply drive over bubble gums without any effect.
         return;
     }
-    item->collected(kart);
+    item->collected(kart, stk_config->time2Ticks(2.0f));
+    if (item->getType() == ItemState::ITEM_EASTER_EGG)
+    {
+        EasterEggHunt *world = dynamic_cast<EasterEggHunt*>(World::getWorld());
+        assert(world);
+        world->collectedEasterEgg(kart);
+    }
     kart->collectedItem(item, add_info);
 }   // collectedItem
 
