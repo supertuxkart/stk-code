@@ -24,6 +24,7 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/sp/sp_base.hpp"
 #include "utils/profiler.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/string_utils.hpp"
@@ -156,6 +157,17 @@ debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei le
 }
 #endif
 
+#ifdef USE_GLES2
+GL_APICALL void(*GL_APIENTRY glDebugMessageControl)(GLenum source, GLenum type,
+    GLenum severity, GLsizei count, const GLuint *ids, GLboolean enabled);
+GL_APICALL void(*GL_APIENTRY glDebugMessageInsert)(GLenum source, GLenum type,
+    GLuint id, GLenum severity, GLsizei length, const char *message);
+
+#define GL_DEBUG_SOURCE_APPLICATION 0x824A
+#define GL_DEBUG_TYPE_MARKER 0x8268
+#define GL_DEBUG_SEVERITY_NOTIFICATION 0x826B
+#endif
+
 void initGL()
 {
     if (is_gl_init)
@@ -187,10 +199,37 @@ void initGL()
     if (glDebugMessageCallbackARB)
         glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
 #endif
+
+#ifndef ANDROID
+    if (SP::sp_apitrace && hasGLExtension("GL_KHR_debug"))
+    {
+#ifdef USE_GLES2
+        glDebugMessageControl = (void(GL_APIENTRY*)(GLenum, GLenum, GLenum, GLsizei,
+            const GLuint*, GLboolean))eglGetProcAddress("glDebugMessageControlKHR");
+        glDebugMessageInsert = (void(GL_APIENTRY*)(GLenum, GLenum, GLuint, GLenum,
+            GLsizei, const char*))eglGetProcAddress("glDebugMessageInsertKHR");
+        assert(glDebugMessageControl && glDebugMessageInsert);
+#endif
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+    }
+    else
+    {
+        SP::sp_apitrace = false;
+    }
+#endif
 }
 
 ScopedGPUTimer::ScopedGPUTimer(GPUTimer &t) : timer(t)
 {
+#ifndef ANDROID
+    if (SP::sp_apitrace)
+    {
+        std::string msg = timer.getName();
+        msg += " begin";
+        glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 100,
+            GL_DEBUG_SEVERITY_NOTIFICATION, -1, msg.c_str());
+    }
+#endif
     if (!UserConfigParams::m_profiler_enabled) return;
     if (profiler.isFrozen()) return;
     if (!timer.canSubmitQuery) return;
@@ -205,6 +244,15 @@ ScopedGPUTimer::ScopedGPUTimer(GPUTimer &t) : timer(t)
 }
 ScopedGPUTimer::~ScopedGPUTimer()
 {
+#ifndef ANDROID
+    if (SP::sp_apitrace)
+    {
+        std::string msg = timer.getName();
+        msg += " end";
+        glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 100,
+            GL_DEBUG_SEVERITY_NOTIFICATION, -1, msg.c_str());
+    }
+#endif
     if (!UserConfigParams::m_profiler_enabled) return;
     if (profiler.isFrozen()) return;
     if (!timer.canSubmitQuery) return;
@@ -214,8 +262,10 @@ ScopedGPUTimer::~ScopedGPUTimer()
 #endif
 }
 
-GPUTimer::GPUTimer() : initialised(false), lastResult(0), canSubmitQuery(true)
+GPUTimer::GPUTimer(const char* name)
+        : m_name(name)
 {
+    reset();
 }
 
 unsigned GPUTimer::elapsedTimeus()

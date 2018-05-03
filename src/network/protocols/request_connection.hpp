@@ -4,11 +4,14 @@
 #include "network/protocol.hpp"
 #include "online/xml_request.hpp"
 
+#include <memory>
+class Server;
+
 class RequestConnection : public Protocol
 {
 protected:
     /** Id of the server to join. */
-    uint32_t           m_server_id;
+    std::shared_ptr<Server> m_server;
 
     /** The request to join a server. */
     Online::XMLRequest *m_request;
@@ -24,19 +27,8 @@ protected:
     STATE m_state;
 
 public:
-    // --------------------------------------------------------------------
-    /** A simple request class to ask to join a server.
-     */
-    class ServerJoinRequest : public Online::XMLRequest
-    {
-        virtual void callback();
-    public:
-        ServerJoinRequest() : Online::XMLRequest() {}
-    };   // ServerJoinRequest
-    // --------------------------------------------------------------------
-
-
-             RequestConnection(uint32_t server_id);
+    // ------------------------------------------------------------------------
+             RequestConnection(std::shared_ptr<Server> server);
     virtual ~RequestConnection();
     virtual void setup() OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
@@ -45,7 +37,7 @@ public:
     // ------------------------------------------------------------------------
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE { return true; }
     // ------------------------------------------------------------------------
-    virtual void update(float dt) OVERRIDE {}
+    virtual void update(int ticks) OVERRIDE {}
 
 
 };   // RequestConnection

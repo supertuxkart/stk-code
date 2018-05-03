@@ -141,6 +141,28 @@ public:
     /** Allows to read a buffer from the beginning again. */
     void reset() { m_current_offset = 0; }
     // ------------------------------------------------------------------------
+    BareNetworkString& encodeString16(const irr::core::stringw& value)
+    {
+        uint8_t str_len = (uint8_t)value.size();
+        if (value.size() > 255)
+            str_len = 255;
+        addUInt8(str_len);
+        for (unsigned i = 0; i < str_len; i++)
+            addUInt16((uint16_t)value[i]);
+        return *this;
+    }
+    // ------------------------------------------------------------------------
+    int decodeString16(irr::core::stringw* out) const
+    {
+        unsigned str_len = getUInt8();
+        for (unsigned i = 0; i < str_len; i++)
+        {
+            uint16_t c = getUInt16();
+            out->append((wchar_t)c);
+        }
+        return str_len + 1;
+    }
+    // ------------------------------------------------------------------------
     BareNetworkString& encodeString(const std::string &value);
     BareNetworkString& encodeString(const irr::core::stringw &value);
     int decodeString(std::string *out) const;
@@ -155,6 +177,22 @@ public:
     const char* getData() const { return (char*)(m_buffer.data()); };
 
     // ------------------------------------------------------------------------
+    /** Returns a byte pointer to the unread remaining content of the network
+     *  string. */
+    char* getCurrentData()
+    {
+        return (char*)(m_buffer.data()+m_current_offset);
+    }   // getCurrentData
+
+    // ------------------------------------------------------------------------
+    /** Returns a byte pointer to the unread remaining content of the network
+     *  string. */
+    const char* getCurrentData() const
+    {
+        return (char*)(m_buffer.data()+m_current_offset); 
+    }   // getCurrentData
+
+    // ------------------------------------------------------------------------
     /** Returns the remaining length of the network string. */
     unsigned int size() const { return (int)m_buffer.size()-m_current_offset; }
 
@@ -164,7 +202,7 @@ public:
     {
         m_current_offset += n;
         assert(m_current_offset >=0 &&
-               m_current_offset < (int)m_buffer.size());
+               m_current_offset <= (int)m_buffer.size());
     }   // skip
     // ------------------------------------------------------------------------
     /** Returns the send size, which is the full length of the buffer. A 
@@ -233,7 +271,7 @@ public:
     {
         return addFloat(f);
     }   // add
-        // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Adds the xyz components of a Vec3 to the string. */
     BareNetworkString& add(const Vec3 &xyz)
     {
@@ -353,6 +391,13 @@ public:
         m_current_offset = 5;   // ignore type and token
     }   // NetworkString
 
+    // ------------------------------------------------------------------------
+    /** Empties the string, but does not reset the pre-allocated size. */
+    void clear()
+    {
+        m_buffer.erase(m_buffer.begin() + 5, m_buffer.end());
+        m_current_offset = 5;
+    }   // clear
     // ------------------------------------------------------------------------
     /** Returns the protocol type of this message. */
     ProtocolType getProtocolType() const

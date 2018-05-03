@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "config/user_config.hpp"
 #include "font/font_manager.hpp"
 #include "font/regular_face.hpp"
 #include "graphics/irr_driver.hpp"
@@ -151,9 +152,12 @@ void DynamicRibbonWidget::add()
     unsigned int screen_height = irr_driver->getActualScreenSize().Height;
     m_arrows_w = (int)(screen_height / 15);
     m_arrows_w = std::max(m_arrows_w, 40);
-#ifdef ANDROID
-    m_arrows_w *= 1.5f;
-#endif
+    
+    if (UserConfigParams::m_hidpi_enabled)
+    {
+        m_arrows_w = int(m_arrows_w*1.5f);
+    }
+
     const int button_h = m_arrows_w;
 
     // right arrow

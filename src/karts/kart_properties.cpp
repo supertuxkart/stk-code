@@ -132,7 +132,8 @@ KartProperties::~KartProperties()
  *  \param source The source kart properties from which to copy this objects'
  *         values.
  */
-void KartProperties::copyForPlayer(const KartProperties *source)
+void KartProperties::copyForPlayer(const KartProperties *source,
+                                   PerPlayerDifficulty d)
 {
     *this = *source;
 
@@ -146,7 +147,7 @@ void KartProperties::copyForPlayer(const KartProperties *source)
 
         // Combine the characteristics for this object. We can't copy it because
         // this object has other pointers (to m_characteristic).
-        combineCharacteristics();
+        combineCharacteristics(d);
     }
 }   // copyForPlayer
 
@@ -224,7 +225,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         }
         getAllData(root);
         m_characteristic = std::make_shared<XmlCharacteristic>(root);
-        combineCharacteristics();
+        combineCharacteristics(PLAYER_DIFFICULTY_NORMAL);
     }
     catch(std::exception& err)
     {
@@ -343,7 +344,7 @@ void KartProperties::setHatMeshName(const std::string &hat_name)
 }  // setHatMeshName
 
 //-----------------------------------------------------------------------------
-void KartProperties::combineCharacteristics()
+void KartProperties::combineCharacteristics(PerPlayerDifficulty difficulty)
 {
     m_combined_characteristic = std::make_shared<CombinedCharacteristic>();
     m_combined_characteristic->addCharacteristic(kart_properties_manager->
@@ -361,6 +362,9 @@ void KartProperties::combineCharacteristics()
     else
         // Kart type found
         m_combined_characteristic->addCharacteristic(characteristic);
+
+    m_combined_characteristic->addCharacteristic(kart_properties_manager->
+        getPlayerCharacteristic(getPerPlayerDifficultyAsString(difficulty)));
 
     m_combined_characteristic->addCharacteristic(m_characteristic.get());
     m_cached_characteristic = std::make_shared<CachedCharacteristic>
@@ -773,13 +777,13 @@ float KartProperties::getParachuteFriction() const
 }  // getParachuteFriction
 
 // ----------------------------------------------------------------------------
-float KartProperties::getParachuteDuration() const
+int KartProperties::getParachuteDuration() const
 {
     return m_cached_characteristic->getParachuteDuration();
 }  // getParachuteDuration
 
 // ----------------------------------------------------------------------------
-float KartProperties::getParachuteDurationOther() const
+int KartProperties::getParachuteDurationOther() const
 {
     return m_cached_characteristic->getParachuteDurationOther();
 }  // getParachuteDurationOther
@@ -839,9 +843,10 @@ float KartProperties::getBubblegumTorque() const
 }  // getBubblegumTorque
 
 // ----------------------------------------------------------------------------
-float KartProperties::getBubblegumFadeInTime() const
+int KartProperties::getBubblegumFadeInTicks() const
 {
-    return m_cached_characteristic->getBubblegumFadeInTime();
+    return stk_config->time2Ticks(m_cached_characteristic
+                                  ->getBubblegumFadeInTime());
 }  // getBubblegumFadeInTime
 
 // ----------------------------------------------------------------------------
@@ -929,9 +934,10 @@ float KartProperties::getPlungerBandSpeedIncrease() const
 }  // getPlungerBandSpeedIncrease
 
 // ----------------------------------------------------------------------------
-float KartProperties::getPlungerBandFadeOutTime() const
+int KartProperties::getPlungerBandFadeOutTicks() const
 {
-    return m_cached_characteristic->getPlungerBandFadeOutTime();
+    return stk_config->time2Ticks(m_cached_characteristic
+                                   ->getPlungerBandFadeOutTime());
 }  // getPlungerBandFadeOutTime
 
 // ----------------------------------------------------------------------------
@@ -994,6 +1000,15 @@ float KartProperties::getNitroDuration() const
     return m_cached_characteristic->getNitroDuration();
 }  // getNitroDuration
 
+// ------------------------------------------------------------------------
+/** Returns minimum time during which nitro is consumed when pressing nitro
+ *  key, to prevent using nitro in very short bursts
+  */
+int KartProperties::getNitroMinConsumptionTicks() const
+{
+    return stk_config->time2Ticks(m_nitro_min_consumption);
+}
+
 // ----------------------------------------------------------------------------
 float KartProperties::getNitroEngineForce() const
 {
@@ -1037,10 +1052,16 @@ float KartProperties::getNitroMax() const
 }  // getNitroMax
 
 // ----------------------------------------------------------------------------
-float KartProperties::getSlipstreamDuration() const
+float KartProperties::getSlipstreamDurationFactor() const
 {
-    return m_cached_characteristic->getSlipstreamDuration();
-}  // getSlipstreamDuration
+    return m_cached_characteristic->getSlipstreamDurationFactor();
+}  // getSlipstreamDurationFactor
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSlipstreamBaseSpeed() const
+{
+    return m_cached_characteristic->getSlipstreamBaseSpeed();
+}  // getSlipstreamBaseSpeed
 
 // ----------------------------------------------------------------------------
 float KartProperties::getSlipstreamLength() const
@@ -1055,16 +1076,22 @@ float KartProperties::getSlipstreamWidth() const
 }  // getSlipstreamWidth
 
 // ----------------------------------------------------------------------------
-float KartProperties::getSlipstreamCollectTime() const
+float KartProperties::getSlipstreamInnerFactor() const
 {
-    return m_cached_characteristic->getSlipstreamCollectTime();
-}  // getSlipstreamCollectTime
+    return m_cached_characteristic->getSlipstreamInnerFactor();
+}  // getSlipstreamInnerFactor
 
 // ----------------------------------------------------------------------------
-float KartProperties::getSlipstreamUseTime() const
+float KartProperties::getSlipstreamMinCollectTime() const
 {
-    return m_cached_characteristic->getSlipstreamUseTime();
-}  // getSlipstreamUseTime
+    return m_cached_characteristic->getSlipstreamMinCollectTime();
+}  // getSlipstreamMinCollectTime
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSlipstreamMaxCollectTime() const
+{
+    return m_cached_characteristic->getSlipstreamMaxCollectTime();
+}  // getSlipstreamMaxCollectTime
 
 // ----------------------------------------------------------------------------
 float KartProperties::getSlipstreamAddPower() const
@@ -1085,9 +1112,10 @@ float KartProperties::getSlipstreamMaxSpeedIncrease() const
 }  // getSlipstreamMaxSpeedIncrease
 
 // ----------------------------------------------------------------------------
-float KartProperties::getSlipstreamFadeOutTime() const
+int KartProperties::getSlipstreamFadeOutTicks() const
 {
-    return m_cached_characteristic->getSlipstreamFadeOutTime();
+    return stk_config->time2Ticks(m_cached_characteristic
+                                  ->getSlipstreamFadeOutTime());
 }  // getSlipstreamFadeOutTime
 
 // ----------------------------------------------------------------------------
@@ -1199,4 +1227,3 @@ bool KartProperties::getSkidEnabled() const
 }  // getSkidEnabled
 
 /* <characteristics-end kpgetter> */
-

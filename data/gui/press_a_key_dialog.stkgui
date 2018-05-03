@@ -2,7 +2,7 @@
 <stkgui>
     <div x="2%" y="10%" width="96%" height="80%" layout="vertical-row" >
 
-        <label id="title" width="100%" text_align="center" text="Press a key" proportion="1" />
+        <label id="title" width="100%" text_align="center" text="Press fully and release..." proportion="1" I18N="When changing input configurations" word_wrap="true"/>
 
         <spacer height="25" width="10" />
 

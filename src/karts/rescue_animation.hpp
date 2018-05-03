@@ -46,11 +46,18 @@ protected:
     /** The velocity with which the kart is moved. */
     float m_velocity;
 
+    /* At what percent of the animation should the kart be on the track*/
+	/*0.75 means that for 3 quaters of the animation it'll be on track*/
+    const float rescue_moment = 0.6F;
+    /* Has the kart been moved onto the track */
+    bool kart_on_track = false;
+    
     /** The referee during a rescue operation. */
     Referee      *m_referee;
 
 public:
                  RescueAnimation(AbstractKart *kart, bool is_auto_rescue=false);
+    float maximumHeight();
     virtual     ~RescueAnimation();
     virtual void update(float dt);
 };   // RescueAnimation

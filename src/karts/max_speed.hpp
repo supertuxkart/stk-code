@@ -71,9 +71,9 @@ private:
          *  to the duration will be decreased. When the duration is <0, the
          *  fade out time starts, and duration will go down to
          *  -m_fade_out_time before this speed increase stops. */
-        float m_duration;
+        int m_duration;
         /** The fadeout time. */
-        float m_fade_out_time;
+        int m_fade_out_time;
         /** The current max speed increase value. */
         float m_current_speedup;
         /** Additional engine force. */
@@ -96,7 +96,7 @@ private:
             m_engine_force    = 0;
         }   // reset
         // --------------------------------------------------------------------
-        void update(float dt);
+        void update(int ticks);
         void saveState(BareNetworkString *buffer) const;
         void rewindTo(BareNetworkString *buffer, bool is_active);
         // --------------------------------------------------------------------
@@ -107,7 +107,7 @@ private:
          *  Note that this function will return a negative value if
          *  the fade_out time has started or this speed increase has
          *  expired. */
-        float getTimeLeft() const      {return m_duration;       }
+        int getTimeLeft() const      {return m_duration;       }
         // --------------------------------------------------------------------
         /** Returns the additional engine force for this speed increase. */
         float getEngineForce() const
@@ -127,14 +127,14 @@ private:
         /** The maximum slowdown to apply. */
         float m_max_speed_fraction;
         /** How long it should take for the full slowdown to take effect. */
-        float m_fade_in_time;
+        int m_fade_in_ticks;
         /** The current slowdown fraction, taking the fade-in time
          *  into account. */
         float m_current_fraction;
 
         /** How long the effect should last. A -1.0f as value indicates
          *  that this effect stays active till it is changed back. */
-        float m_duration;
+        int m_duration;
 
         /** The constructor initialises the data with data that won't
          *  affect top speed at all. */
@@ -147,12 +147,12 @@ private:
         void reset()
         {
             m_max_speed_fraction = 1.0f;
-            m_fade_in_time       = 0.0f;
             m_current_fraction   = 1.0f;
-            m_duration           = 0.0f;
+            m_fade_in_ticks      = 0;
+            m_duration           = 0;
         }   //reset
         // --------------------------------------------------------------------
-        void update(float dt);
+        void update(int ticks);
         void saveState(BareNetworkString *buffer) const;
         void rewindTo(BareNetworkString *buffer, bool is_active);
         // --------------------------------------------------------------------
@@ -179,16 +179,16 @@ public:
           MaxSpeed(AbstractKart *kart);
 
     void  increaseMaxSpeed(unsigned int category, float add_speed,
-                           float engine_force, float duration,
-                           float fade_out_time);
+                           float engine_force, int duration,
+                           int fade_out_time);
     void  instantSpeedIncrease(unsigned int category,
                                float add_speed, float speed_boost,
-                               float engine_force, float duration,
-                               float fade_out_time/*=1.0f*/);
+                               float engine_force, int duration,
+                               int fade_out_time);
     void  setSlowdown(unsigned int category, float max_speed_fraction,
-                      float fade_in_time, float duration=-1.0f);
-    float getSpeedIncreaseTimeLeft(unsigned int category);
-    void  update(float dt);
+                      int fade_in_time, int duration=-1);
+    int   getSpeedIncreaseTicksLeft(unsigned int category);
+    void  update(int ticks);
     void  reset();
     void  saveState(BareNetworkString *buffer) const;
     void  rewindTo(BareNetworkString *buffer);

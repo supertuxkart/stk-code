@@ -45,8 +45,6 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( OptionsScreenDevice );
-
 // ----------------------------------------------------------------------------
 
 OptionsScreenDevice::OptionsScreenDevice() : Screen("options_device.stkgui")
@@ -106,6 +104,11 @@ void OptionsScreenDevice::init()
 
         delete_button->setLabel(label);
     }
+    else if (m_config->isGamePadAndroid())
+    {
+        delete_button->setLabel(_("Delete Configuration"));
+        delete_button->setActive(false);
+    }
     else
     {
         delete_button->setLabel(_("Delete Configuration"));
@@ -160,7 +163,11 @@ void OptionsScreenDevice::init()
 
     // Disable deletion keyboard configurations
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
-    getWidget<ButtonWidget>("delete")->setActive(!in_game);
+    
+    if (in_game)
+    {
+        getWidget<ButtonWidget>("delete")->setActive(false);
+    }
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -539,7 +546,7 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
 
                 binding_to_set = (PlayerAction)n;
 
-                new PressAKeyDialog(0.4f, 0.4f);
+                new PressAKeyDialog(0.5f, 0.4f);
 
                 if (m_config->isKeyboard())
                 {

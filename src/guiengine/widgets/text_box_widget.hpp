@@ -33,6 +33,7 @@ namespace GUIEngine
     public:
         virtual ~ITextBoxWidgetListener() {}
         virtual void onTextUpdated() = 0;
+        virtual bool onEnterPressed(const irr::core::stringw& text) { return false; }
     };
     
     /** \brief A text field widget.

@@ -112,6 +112,8 @@ private:
 
 public:
     // ------------------------------------------------------------------------
+    static bool m_sp_shader_debug;
+    // ------------------------------------------------------------------------
     SPShader(const std::string& name,
              const std::function<void(SPShader*)>& init_func,
              bool transparent_shader = false, int drawing_priority = 0,
@@ -134,6 +136,8 @@ public:
     }
     // ------------------------------------------------------------------------
     bool hasShader(RenderPass rp)                { return m_program[rp] != 0; }
+    // ------------------------------------------------------------------------
+    GLuint getShaderProgram(RenderPass rp)            { return m_program[rp]; }
     // ------------------------------------------------------------------------
     void use(RenderPass rp = RP_1ST)
     {

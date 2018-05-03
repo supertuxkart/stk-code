@@ -24,13 +24,19 @@ title_font, by Marianne Gagnon (Auria), released under CC-BY-SA 3+
 
 screen*.png, by Marianne Gagnon (Auria), including elements from the public domain Tango icon set
 
-Gauge and bar by Totoplus62, released under CC-BY-SA 3
+speed.png by Alayan, with elements by Totoplus62, released under CC-BY-SA 3
+
+speed*.png by Alayan, released under CC-0
+
+gauge*.png by Alayan, released under CC-0
 
 menu_story by tavariz91, released under CC-0
 
 mass.png by Auria, released under CC-0
 
 power.png by Auria, based on https://openclipart.org/detail/193925/check-engine and https://openclipart.org/detail/144799/power-icon, released under CC-0
+
+crown.png by glitch, from https://openclipart.org/detail/210257/misc-game-crown, released under public domain
 
 ====
 

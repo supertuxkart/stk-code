@@ -194,11 +194,3 @@ void AbstractRenderer::drawJoint(bool drawline, bool drawname,
 } //drawJoint
 
 #endif //DEBUG
-
-AbstractRenderer::AbstractRenderer()
-{
-    resetObjectCount();
-    resetPolyCount();
-}
-
-

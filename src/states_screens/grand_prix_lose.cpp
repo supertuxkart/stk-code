@@ -69,8 +69,6 @@ const float KART_Z = 0.0f;
 
 const int MAX_KART_COUNT = 4;
 
-DEFINE_SCREEN_SINGLETON( GrandPrixLose );
-
 // -------------------------------------------------------------------------------------
 
 void GrandPrixLose::onCutsceneEnd()

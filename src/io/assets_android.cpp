@@ -36,6 +36,7 @@
 AssetsAndroid::AssetsAndroid(FileManager* file_manager)
 {
     m_file_manager = file_manager;
+    m_progress_bar = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -57,13 +58,13 @@ void AssetsAndroid::init()
 
     if (getenv("SUPERTUXKART_DATADIR"))
         paths.push_back(getenv("SUPERTUXKART_DATADIR"));
-
+        
     if (getenv("EXTERNAL_STORAGE"))
         paths.push_back(getenv("EXTERNAL_STORAGE"));
 
     if (getenv("SECONDARY_STORAGE"))
         paths.push_back(getenv("SECONDARY_STORAGE"));
-
+        
     if (global_android_app->activity->externalDataPath)
         paths.push_back(global_android_app->activity->externalDataPath);
 
@@ -73,22 +74,38 @@ void AssetsAndroid::init()
     paths.push_back("/sdcard/");
     paths.push_back("/storage/sdcard0/");
     paths.push_back("/storage/sdcard1/");
-    paths.push_back("/data/data/org.supertuxkart.stk/files/");
+    
+#if !defined(ANDROID_PACKAGE_NAME) || !defined(ANDROID_APP_DIR_NAME)
+    #error
+#endif
+
+    std::string package_name = ANDROID_PACKAGE_NAME;
+    paths.push_back("/data/data/" + package_name + "/files/");
+
+    std::string app_dir_name = ANDROID_APP_DIR_NAME;
 
     // Check if STK data for current version is available somewhere
     for (std::string path : paths)
     {
         Log::info("AssetsAndroid", "Check data files in: %s", path.c_str());
-
-        if (m_file_manager->fileExists(path + "/stk/data/" + version))
+        
+        if (!isWritable(path))
         {
-            m_stk_dir = path + "/stk";
-            break;
+            Log::info("AssetsAndroid", "Path doesn't have write access.");
+            continue;
         }
 
-        if (m_file_manager->fileExists(path + "/supertuxkart/data/" + version))
+        if (m_file_manager->fileExists(path + "/" + app_dir_name + "/data/" + version))
         {
-            m_stk_dir = path + "/supertuxkart";
+            m_stk_dir = path + "/" + app_dir_name;
+            break;
+        }
+        
+        // Stk is an alias of supertuxkart for compatibility with older version.
+        if (app_dir_name == "supertuxkart" && 
+            m_file_manager->fileExists(path + "/stk/data/" + version))
+        {
+            m_stk_dir = path + "/stk";
             break;
         }
     }
@@ -102,17 +119,25 @@ void AssetsAndroid::init()
         {
             Log::info("AssetsAndroid", "Check data files for different STK "
                                        "version in: %s", path.c_str());
-    
-            if (m_file_manager->fileExists(path + "/stk/.extracted"))
+                                       
+            if (!isWritable(path))
             {
-                m_stk_dir = path + "/stk";
+                Log::info("AssetsAndroid", "Path doesn't have write access.");
+                continue;
+            }
+    
+            if (m_file_manager->fileExists(path + "/" + app_dir_name + "/.extracted"))
+            {
+                m_stk_dir = path + "/" + app_dir_name;
                 needs_extract_data = true;
                 break;
             }
     
-            if (m_file_manager->fileExists(path + "/supertuxkart/.extracted"))
+            // Stk is an alias of supertuxkart for compatibility with older version.
+            if (app_dir_name == "supertuxkart" && 
+                m_file_manager->fileExists(path + "/stk/.extracted"))
             {
-                m_stk_dir = path + "/supertuxkart";
+                m_stk_dir = path + "/stk";
                 needs_extract_data = true;
                 break;
             }
@@ -132,12 +157,12 @@ void AssetsAndroid::init()
 
         if (preferred_path.length() > 0)
         {
-            if (m_file_manager->checkAndCreateDirectoryP(preferred_path +
-                                                                "/stk/data"))
+            if (m_file_manager->checkAndCreateDirectoryP(preferred_path + "/" +
+                                                        app_dir_name + "/data"))
             {
                 Log::info("AssetsAndroid", "Data directory created in: %s",
                           preferred_path.c_str());
-                m_stk_dir = preferred_path + "/stk";
+                m_stk_dir = preferred_path + "/" + app_dir_name;
                 needs_extract_data = true;
             }
         }
@@ -149,11 +174,12 @@ void AssetsAndroid::init()
     {
         for (std::string path : paths)
         {
-            if (m_file_manager->checkAndCreateDirectoryP(path + "/stk/data"))
+            if (m_file_manager->checkAndCreateDirectoryP(path + "/" + 
+                                                        app_dir_name + "/data"))
             {
                 Log::info("AssetsAndroid", "Data directory created in: %s",
                           path.c_str());
-                m_stk_dir = path + "/stk";
+                m_stk_dir = path + "/" + app_dir_name;
                 needs_extract_data = true;
                 break;
             }
@@ -190,8 +216,13 @@ void AssetsAndroid::init()
     // Extract data directory from apk if it's needed
     if (needs_extract_data)
     {
+        m_progress_bar = new ProgressBarAndroid();
+        m_progress_bar->draw(0.01f);
+            
         removeData();
         extractData();
+        
+        delete m_progress_bar;
 
         if (!m_file_manager->fileExists(m_stk_dir + "/.extracted"))
         {
@@ -249,8 +280,6 @@ void AssetsAndroid::extractData()
             file.clear();
             file.seekg(0, std::ios::beg);
 
-            ProgressBarAndroid* progress_bar = new ProgressBarAndroid();
-            progress_bar->draw(0.0f);
             unsigned int current_line = 1;
 
             while (!file.eof())
@@ -264,10 +293,11 @@ void AssetsAndroid::extractData()
                 success = extractDir(dir_name);
 
                 assert(lines_count > 0);
-                progress_bar->draw((float)(current_line) / lines_count);
+                float pos = 0.01f + (float)(current_line) / lines_count * 0.99f;
+                m_progress_bar->draw(pos);
                 current_line++;
 
-                if (progress_bar->closeEventReceived())
+                if (m_progress_bar->closeEventReceived())
                 {
                     success = false;
                 }
@@ -275,8 +305,6 @@ void AssetsAndroid::extractData()
                 if (!success)
                     break;
             }
-
-            delete progress_bar;
         }
     }
     else
@@ -415,10 +443,12 @@ void AssetsAndroid::removeData()
 #ifdef ANDROID
     if (m_stk_dir.length() == 0)
         return;
+        
+    std::string app_dir_name = ANDROID_APP_DIR_NAME;
 
     // Make sure that we are not accidentally removing wrong directory
-    if (m_stk_dir.find("/stk") == std::string::npos &&
-        m_stk_dir.find("/supertuxkart") == std::string::npos)
+    if (m_stk_dir.find("/" + app_dir_name) == std::string::npos &&
+        m_stk_dir.find("/stk") == std::string::npos)
     {
         Log::error("AssetsAndroid", "Invalid data directory: %s",
                    m_stk_dir.c_str());
@@ -481,6 +511,20 @@ void AssetsAndroid::touchFile(std::string path)
 }
 
 //-----------------------------------------------------------------------------
+/** Checks if there is write access for selected path
+ *  \param path A path that should be checked
+ *  \return True if there is write access
+ */
+bool AssetsAndroid::isWritable(std::string path)
+{
+#ifdef ANDROID
+    return access(path.c_str(), R_OK) == 0 && access(path.c_str(), W_OK) == 0;
+#endif
+
+    return false;
+}
+
+//-----------------------------------------------------------------------------
 /** Determines best path for extracting assets, depending on available disk
  *  space.
  *  \param paths A list of paths that should be checked
@@ -500,6 +544,9 @@ std::string AssetsAndroid::getPreferredPath(const std::vector<std::string>&
         // access to these directories and i.e. can't manually delete the files
         // to clean up device
         if (path.find("/data") == 0)
+            continue;
+            
+        if (!isWritable(path))
             continue;
 
         struct statfs stat;

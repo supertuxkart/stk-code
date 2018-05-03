@@ -5,27 +5,30 @@
         <header height="5%" width="80%" text="Race Setup" align="center" text_align="center" />
 
         <spacer height="5%" width="25"/>
-        <box width="100%" height="40%" padding="10" layout="vertical-row">
-            <bright width="100%" text="Select a difficulty" align="center" text_align="left" />
-
-            <ribbon id="difficulty" height="135" width="100%" align="center">
-                <icon-button id="novice" width="128" height="128" icon="gui/difficulty_easy.png"
+        <bright width="100%" text="Select a difficulty" align="center" text_align="left" />
+        <spacer height="10" width="25"/>
+        <box width="100%" proportion="3" padding="10" layout="vertical-row">
+            
+            <ribbon id="difficulty" height="85%" width="100%" align="center">
+                <icon-button id="novice" width="fit" height="fit" icon="gui/difficulty_easy.png"
                         I18N="Difficulty" text="Novice"/>
-                <icon-button id="intermediate" width="128" height="128" icon="gui/difficulty_medium.png"
+                <icon-button id="intermediate" width="fit" height="fit" icon="gui/difficulty_medium.png"
                         I18N="Difficulty" text="Intermediate"/>
-                <icon-button id="expert" width="128" height="128" icon="gui/difficulty_hard.png"
+                <icon-button id="expert" width="fit" height="fit" icon="gui/difficulty_hard.png"
                         I18N="Difficulty"  text="Expert"/>
-                <icon-button id="best" width="128" height="128" icon="gui/difficulty_best.png"
+                <icon-button id="best" width="fit" height="fit" icon="gui/difficulty_best.png"
                         I18N="Difficulty"  text="SuperTux"/>
             </ribbon>
         </box>
         <spacer height="5%" width="25"/>
 
-        <box width="100%" height="40%" padding="10" layout="vertical-row">
-            <bright width="100%" text="Select a game mode" align="center" text_align="left" />
-
-            <scrollable_toolbar id="gamemode" height="135" width="85%" label_location="bottom" align="center"
-                                child_width="135" child_height="135" />
+        <bright width="100%" text="Select a game mode" align="center" text_align="left" />
+        
+        <spacer height="10" width="25"/>
+        <box width="100%" proportion="4" padding="10" layout="vertical-row">
+            <spacer height="5%" width="25" />
+            <scrollable_toolbar id="gamemode" height="60%" width="95%" label_location="bottom" align="center"
+                                child_width="256" child_height="256" />
             <spacer proportion="1" width="25" />
         </box>
     </div>

@@ -98,7 +98,33 @@ using namespace irr;
 IrrDriver *irr_driver = NULL;
 
 #ifndef SERVER_ONLY
-GPUTimer          m_perf_query[Q_LAST];
+GPUTimer* m_perf_query[Q_LAST];
+static const char* m_perf_query_phase[Q_LAST] =
+{
+    "Shadows Cascade 0",
+    "Shadows Cascade 1",
+    "Shadows Cascade 2",
+    "Shadows Cascade 3",
+    "Solid Pass",
+    "Env Map",
+    "SunLight",
+    "PointLights",
+    "SSAO",
+    "Light Scatter",
+    "Glow",
+    "Combine Diffuse Color",
+    "Skybox",
+    "Transparent",
+    "Particles",
+    "Depth of Field",
+    "Godrays",
+    "Bloom",
+    "Tonemap",
+    "Motion Blur",
+    "Lightning",
+    "MLAA",
+    "GUI",
+};
 #endif
 
 const int MIN_SUPPORTED_HEIGHT = 768;
@@ -116,8 +142,7 @@ const bool ALLOW_1280_X_720    = true;
 IrrDriver::IrrDriver()
 {
     m_resolution_changing = RES_CHANGE_NONE;
-    m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
-    
+
     struct irr::SIrrlichtCreationParameters p;
     p.DriverType    = video::EDT_NULL;
     p.WindowSize    = core::dimension2d<u32>(640,480);
@@ -135,16 +160,21 @@ IrrDriver::IrrDriver()
     m_request_screenshot = false;
     m_renderer            = NULL;
     m_wind                = new Wind();
-
-    m_mipviz = m_wireframe = m_normals = m_ssaoviz = false;
-    m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = false;
-    m_boundingboxesviz           = false;
+    m_ssaoviz = false;
+    m_shadowviz = false;
+    m_boundingboxesviz = false;
     m_last_light_bucket_distance = 0;
     m_clear_color                = video::SColor(255, 100, 101, 140);
     m_skinning_joint             = 0;
     m_recording = false;
     m_sun_interposer = NULL;
 
+#ifndef SERVER_ONLY
+    for (unsigned i = 0; i < Q_LAST; i++)
+    {
+        m_perf_query[i] = new GPUTimer(m_perf_query_phase[i]);
+    }
+#endif
 }   // IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -158,11 +188,28 @@ IrrDriver::~IrrDriver()
     STKTexManager::getInstance()->kill();
     delete m_wind;
     delete m_renderer;
+#ifndef SERVER_ONLY
+    for (unsigned i = 0; i < Q_LAST; i++)
+    {
+        delete m_perf_query[i];
+    }
+#endif
     assert(m_device != NULL);
     m_device->drop();
     m_device = NULL;
     m_modes.clear();
 }   // ~IrrDriver
+
+// ----------------------------------------------------------------------------
+const char* IrrDriver::getGPUQueryPhaseName(unsigned q)
+{
+#ifndef SERVER_ONLY
+    assert(q < Q_LAST);
+    return m_perf_query_phase[q];
+#else
+    return "";
+#endif
+}   // getGPUQueryPhaseName
 
 // ----------------------------------------------------------------------------
 /** Called before a race is started, after all cameras are set up.
@@ -173,24 +220,6 @@ void IrrDriver::reset()
     m_renderer->resetPostProcessing();
 #endif
 }   // reset
-
-// ----------------------------------------------------------------------------
-void IrrDriver::setPhase(STKRenderingPass p)
-{
-    m_phase = p;
-}
-
-// ----------------------------------------------------------------------------
-STKRenderingPass IrrDriver::getPhase() const
-{
-  return m_phase;
-}
-
-#// ----------------------------------------------------------------------------
-void IrrDriver::increaseObjectCount()
-{
-    m_renderer->incObjectCount(m_phase);
-}   // increaseObjectCount
 
 // ----------------------------------------------------------------------------
 core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
@@ -204,7 +233,7 @@ core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
 
 GPUTimer &IrrDriver::getGPUTimer(unsigned i)
 {
-    return m_perf_query[i];
+    return *m_perf_query[i];
 }   // getGPUTimer
 #endif
 // ----------------------------------------------------------------------------
@@ -250,7 +279,38 @@ void IrrDriver::updateConfigIfRelevant()
     }
 #endif   // !SERVER_ONLY
 }   // updateConfigIfRelevant
+core::recti IrrDriver::getSplitscreenWindow(int WindowNum) 
+{
+    const int playernum = race_manager->getNumLocalPlayers();
+    const float playernum_sqrt = sqrtf((float)playernum);
+    
+    int rows = int(  UserConfigParams::split_screen_horizontally
+                   ? ceil(playernum_sqrt)
+                   : round(playernum_sqrt)                       );
+    int cols = int(  UserConfigParams::split_screen_horizontally
+                   ? round(playernum_sqrt)
+                   : ceil(playernum_sqrt)                        );
+    
+    if (rows == 0){rows = 1;}
+    if (cols == 0) {cols = 1;}
+    //This could add a bit of overhang
+    const int width_of_space =
+        int(ceil(   (float)irr_driver->getActualScreenSize().Width
+                  / (float)cols)                                  );
+    const int height_of_space =
+        int (ceil(  (float)irr_driver->getActualScreenSize().Height
+                  / (float)rows)                                   );
 
+    const int x_grid_Position = WindowNum % cols;
+    const int y_grid_Position = int(floor((WindowNum) / cols));
+
+//To prevent the viewport going over the right side, we use std::min to ensure the right corners are never larger than the total width
+    return core::recti(
+        x_grid_Position * width_of_space,
+        y_grid_Position * height_of_space,
+        (x_grid_Position * width_of_space) + width_of_space,
+        (y_grid_Position * height_of_space) + height_of_space);
+}
 // ----------------------------------------------------------------------------
 /** Gets a list of supported video modes from the irrlicht device. This data
  *  is stored in m_modes.
@@ -654,8 +714,8 @@ void IrrDriver::initDevice()
     // set cursor visible by default (what's the default is not too clearly documented,
     // so let's decide ourselves...)
     m_device->getCursorControl()->setVisible(true);
-    m_pointer_shown = true;
 #endif
+    m_pointer_shown = true;
 }   // initDevice
 
 // ----------------------------------------------------------------------------
@@ -725,16 +785,19 @@ void IrrDriver::getOpenGLData(std::string *vendor, std::string *renderer,
 //-----------------------------------------------------------------------------
 void IrrDriver::showPointer()
 {
+#ifndef SERVER_ONLY
     if (!m_pointer_shown)
     {
         m_pointer_shown = true;
         this->getDevice()->getCursorControl()->setVisible(true);
     }
+#endif
 }   // showPointer
 
 //-----------------------------------------------------------------------------
 void IrrDriver::hidePointer()
 {
+#ifndef SERVER_ONLY
     // always visible in artist debug mode, to be able to use the context menu
     if (UserConfigParams::m_artist_debug_mode)
     {
@@ -747,6 +810,7 @@ void IrrDriver::hidePointer()
         m_pointer_shown = false;
         this->getDevice()->getCursorControl()->setVisible(false);
     }
+#endif
 }   // hidePointer
 
 //-----------------------------------------------------------------------------
@@ -843,6 +907,13 @@ void IrrDriver::applyResolutionSettings()
     delete m_renderer;
     SharedGPUObjects::reset();
     initDevice();
+
+#ifndef SERVER_ONLY
+    for (unsigned i = 0; i < Q_LAST; i++)
+    {
+        m_perf_query[i]->reset();
+    }
+#endif
 
     font_manager = new FontManager();
     font_manager->loadFonts();
@@ -1673,7 +1744,18 @@ void IrrDriver::displayFPS()
                     m_skinning_joint);
     }
     else
-        fps_string = _("FPS: %d/%d/%d - %d KTris", min, fps, max, (int)roundf(kilotris)); 
+    {
+        if (CVS->isGLSL())
+        {
+            fps_string = _("FPS: %d/%d/%d - %d KTris", min, fps, max,
+                SP::sp_solid_poly_count / 1000);
+        }
+        else
+        {
+            fps_string = _("FPS: %d/%d/%d - %d KTris", min, fps, max,
+            (int)roundf(kilotris));
+        }
+    }
 
     static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
 
@@ -1975,3 +2057,14 @@ GLuint IrrDriver::getDepthStencilTexture()
     return m_renderer->getDepthStencilTexture();
 }   // getDepthStencilTexture
 
+// ----------------------------------------------------------------------------
+void IrrDriver::resetDebugModes()
+{
+    m_ssaoviz = false;
+    m_shadowviz = false;
+    m_lightviz = false;
+    m_boundingboxesviz = false;
+#ifndef SERVER_ONLY
+    SP::sp_debug_view = false;
+#endif
+}

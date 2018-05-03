@@ -111,8 +111,8 @@ public:
     static void resumeSavedSession();
     static void onSTKQuit();
     static void requestSignOut();
-    static Online::XMLRequest *requestSignIn(const irr::core::stringw &username,
-                                             const irr::core::stringw &password);
+    static void requestSignIn(const irr::core::stringw &username,
+                              const irr::core::stringw &password);
 
     // ------------------------------------------------------------------------
     /** Returns the current player. */

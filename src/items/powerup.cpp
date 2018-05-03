@@ -257,7 +257,7 @@ void Powerup::use()
     case PowerupManager::POWERUP_RUBBERBALL:
     case PowerupManager::POWERUP_BOWLING:
     case PowerupManager::POWERUP_PLUNGER:
-        if(stk_config->m_shield_restrict_weapos)
+        if(stk_config->m_shield_restrict_weapons)
             m_kart->setShieldTime(0.0f); // make weapon usage destroy the shield
         Powerup::adjustSound();
         m_sound_use->play();
@@ -267,7 +267,8 @@ void Powerup::use()
 
     case PowerupManager::POWERUP_SWATTER:
         m_kart->getAttachment()
-                ->set(Attachment::ATTACH_SWATTER, kp->getSwatterDuration());
+                ->set(Attachment::ATTACH_SWATTER,
+                      stk_config->time2Ticks(kp->getSwatterDuration()));
         break;
 
     case PowerupManager::POWERUP_BUBBLEGUM:
@@ -302,26 +303,35 @@ void Powerup::use()
             {
                 if (m_kart->getIdent() == "nolok")
                 {
-                    m_kart->getAttachment()->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
-                                                  kp->getBubblegumShieldDuration());
+                    m_kart->getAttachment()
+                          ->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
+                                stk_config->
+                                  time2Ticks(kp->getBubblegumShieldDuration()));
                 }
                 else
                 {
-                    m_kart->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
-                                                  kp->getBubblegumShieldDuration());
+                    m_kart->getAttachment()
+                          ->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
+                                stk_config->
+                                  time2Ticks(kp->getBubblegumShieldDuration()));
                 }
             }
             else // using a bubble gum while still having a shield
             {
                 if (m_kart->getIdent() == "nolok")
                 {
-                    m_kart->getAttachment()->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
-                                                  kp->getBubblegumShieldDuration() + m_kart->getShieldTime());
+                    m_kart->getAttachment()
+                          ->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
+                                stk_config->
+                                 time2Ticks(kp->getBubblegumShieldDuration()));
                 }
                 else
                 {
-                    m_kart->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
-                                                  kp->getBubblegumShieldDuration() + m_kart->getShieldTime());
+                    m_kart->getAttachment()
+                          ->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
+                                stk_config->
+                                time2Ticks(kp->getBubblegumShieldDuration()
+                                           + m_kart->getShieldTime()       ) );
                 }
             }
 
@@ -350,7 +360,8 @@ void Powerup::use()
             if(kart->getPosition() == 1)
             {
                 kart->getAttachment()->set(Attachment::ATTACH_ANVIL,
-                                           kp->getAnvilDuration());
+                                           stk_config->
+                                           time2Ticks(kp->getAnvilDuration()) );
                 kart->updateWeight();
                 kart->adjustSpeed(kp->getAnvilSpeedFactor() * 0.5f);
 
@@ -397,14 +408,17 @@ void Powerup::use()
                     {
                         float rank_factor;
 
-                        rank_factor = (float)(kart->getPosition() - 1) / (float)(m_kart->getPosition() - 2);
+                        rank_factor = (float)(kart->getPosition()   - 1) 
+                                    / (float)(m_kart->getPosition() - 2);
                         position_factor = 1.0f - rank_factor;
                     }
 
-                    rank_mult = 1 + (position_factor * (kp->getParachuteDurationRankMult() - 1));
+                    rank_mult = 1 + (position_factor * 
+                                     (kp->getParachuteDurationRankMult() - 1));
 
-                    kart->getAttachment()->set(Attachment::ATTACH_PARACHUTE,
-                                               (kp->getParachuteDurationOther() * rank_mult));
+                    kart->getAttachment()
+                        ->set(Attachment::ATTACH_PARACHUTE,
+                              int(kp->getParachuteDurationOther()*rank_mult) );
 
                     if(kart->getController()->isLocalPlayerController())
                         player_kart = kart;
@@ -464,7 +478,7 @@ void Powerup::hitBonusBox(const Item &item, int add_info)
     // Check if rubber ball is the current power up held by the kart. If so,
     // reset the bBallCollectTime to 0 before giving new powerup.
     if(m_type == PowerupManager::POWERUP_RUBBERBALL)
-        powerup_manager->setBallCollectTime(0);
+        powerup_manager->setBallCollectTicks(0);
 
     // Check if two bouncing balls are collected less than getRubberBallTimer()
     //seconds apart. If yes, then call getRandomPowerup again. If no, then break.
@@ -474,8 +488,8 @@ void Powerup::hitBonusBox(const Item &item, int add_info)
         {
             new_powerup = powerup_manager->getRandomPowerup(position, &n);
             if(new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
-                ( World::getWorld()->getTimeSinceStart() - powerup_manager->getBallCollectTime()) >
-                  RubberBall::getTimeBetweenRubberBalls() )
+                ( World::getWorld()->getTicksSinceStart() - powerup_manager->getBallCollectTicks()) >
+                  RubberBall::getTicksBetweenRubberBalls() )
                 break;
         }
     }
@@ -486,7 +500,7 @@ void Powerup::hitBonusBox(const Item &item, int add_info)
     }
 
     if(new_powerup == PowerupManager::POWERUP_RUBBERBALL)
-        powerup_manager->setBallCollectTime(World::getWorld()->getTime());
+        powerup_manager->setBallCollectTicks(World::getWorld()->getTimeTicks());
 
     // Always add a new powerup in ITEM_MODE_NEW (or if the kart
     // doesn't have a powerup atm).

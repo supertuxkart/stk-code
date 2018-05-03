@@ -31,7 +31,9 @@
 #include "graphics/shader.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_shader_manager.hpp"
+#include "graphics/sp/sp_shader.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
+#include "graphics/sp/sp_uniform_assigner.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "items/powerup_manager.hpp"
@@ -76,24 +78,23 @@ enum DebugMenuCommand
     //! graphics commands
     DEBUG_GRAPHICS_RELOAD_SHADERS,
     DEBUG_GRAPHICS_RESET,
-    DEBUG_GRAPHICS_WIREFRAME,
-    DEBUG_GRAPHICS_MIPMAP_VIZ,
-    DEBUG_GRAPHICS_NORMALS_VIZ,
     DEBUG_GRAPHICS_SSAO_VIZ,
-    DEBUG_GRAPHICS_RSM_VIZ,
-    DEBUG_GRAPHICS_RH_VIZ,
-    DEBUG_GRAPHICS_GI_VIZ,
     DEBUG_GRAPHICS_SHADOW_VIZ,
-    DEBUG_GRAPHICS_LIGHT_VIZ,
-    DEBUG_GRAPHICS_DISTORT_VIZ,
+    DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ,
     DEBUG_GRAPHICS_BULLET_1,
     DEBUG_GRAPHICS_BULLET_2,
-    DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ,
-    DEBUG_GRAPHICS_TOGGLE_CULLING,
     DEBUG_PROFILER,
     DEBUG_PROFILER_WRITE_REPORT,
     DEBUG_FONT_DUMP_GLYPH_PAGE,
     DEBUG_FONT_RELOAD,
+    DEBUG_SP_RESET,
+    DEBUG_SP_TOGGLE_CULLING,
+    DEBUG_SP_WN_VIZ,
+    DEBUG_SP_NORMALS_VIZ,
+    DEBUG_SP_TANGENTS_VIZ,
+    DEBUG_SP_BITANGENTS_VIZ,
+    DEBUG_SP_WIREFRAME_VIZ,
+    DEBUG_SP_TN_VIZ,
     DEBUG_FPS,
     DEBUG_SAVE_REPLAY,
     DEBUG_SAVE_HISTORY,
@@ -121,6 +122,7 @@ enum DebugMenuCommand
     DEBUG_GUI_CAM_NORMAL,
     DEBUG_GUI_CAM_SMOOTH,
     DEBUG_GUI_CAM_ATTACH,
+    DEBUG_VIEW_KART_PREVIOUS,
     DEBUG_VIEW_KART_ONE,
     DEBUG_VIEW_KART_TWO,
     DEBUG_VIEW_KART_THREE,
@@ -129,6 +131,7 @@ enum DebugMenuCommand
     DEBUG_VIEW_KART_SIX,
     DEBUG_VIEW_KART_SEVEN,
     DEBUG_VIEW_KART_EIGHT,
+    DEBUG_VIEW_KART_NEXT,
     DEBUG_HIDE_KARTS,
     DEBUG_THROTTLE_FPS,
     DEBUG_VISUAL_VALUES,
@@ -167,19 +170,21 @@ void addAttachment(Attachment::AttachmentType type)
         if (type == Attachment::ATTACH_ANVIL)
         {
             kart->getAttachment()
-                ->set(type, kart->getKartProperties()->getAnvilDuration());
+                ->set(type, 
+                      stk_config->time2Ticks(kart->getKartProperties()
+                                                 ->getAnvilDuration()) );
             kart->adjustSpeed(kart->getKartProperties()->getAnvilSpeedFactor());
             kart->updateWeight();
         }
         else if (type == Attachment::ATTACH_PARACHUTE)
         {
             kart->getAttachment()
-                ->set(type, kart->getKartProperties()->getParachuteDuration());
+                ->set(type, kart->getKartProperties()->getParachuteDuration() );
         }
         else if (type == Attachment::ATTACH_BOMB)
         {
             kart->getAttachment()
-                ->set(type, stk_config->m_bomb_time);
+                ->set(type, stk_config->time2Ticks(stk_config->m_bomb_time) );
         }
     }
 
@@ -241,9 +246,23 @@ LightNode* findNearestLight()
 
 bool handleContextMenuAction(s32 cmd_id)
 {
+    Camera* camera = Camera::getActiveCamera();
+    unsigned int kart_num = 0;
+    if (camera != NULL && camera->getKart() != NULL)
+    {
+        kart_num = camera->getKart()->getWorldKartId();
+    }
 
     World *world = World::getWorld();
     Physics *physics = Physics::getInstance();
+    SP::SPShader* nv = NULL;
+#ifndef SERVER_ONLY
+    if (SP::getNormalVisualizer())
+    {
+        nv = SP::getNormalVisualizer();
+    }
+#endif
+
     switch(cmd_id)
     {
     case DEBUG_GRAPHICS_RELOAD_SHADERS:
@@ -261,54 +280,12 @@ bool handleContextMenuAction(s32 cmd_id)
 
         irr_driver->resetDebugModes();
         break;
-    case DEBUG_GRAPHICS_WIREFRAME:
-        if (physics)
-            physics->setDebugMode(IrrDebugDrawer::DM_NONE);
-
-        irr_driver->resetDebugModes();
-        irr_driver->toggleWireframe();
-        break;
-    case DEBUG_GRAPHICS_MIPMAP_VIZ:
-        if (physics)
-            physics->setDebugMode(IrrDebugDrawer::DM_NONE);
-
-        irr_driver->resetDebugModes();
-        irr_driver->toggleMipVisualization();
-        break;
-    case DEBUG_GRAPHICS_NORMALS_VIZ:
-        if (physics)
-            physics->setDebugMode(IrrDebugDrawer::DM_NONE);
-
-        irr_driver->resetDebugModes();
-        irr_driver->toggleNormals();
-        break;
     case DEBUG_GRAPHICS_SSAO_VIZ:
         if (physics)
             physics->setDebugMode(IrrDebugDrawer::DM_NONE);
 
         irr_driver->resetDebugModes();
         irr_driver->toggleSSAOViz();
-        break;
-    case DEBUG_GRAPHICS_RSM_VIZ:
-        if (physics)
-            physics->setDebugMode(IrrDebugDrawer::DM_NONE);
-
-        irr_driver->resetDebugModes();
-        irr_driver->toggleRSM();
-        break;
-    case DEBUG_GRAPHICS_RH_VIZ:
-        if (physics)
-            physics->setDebugMode(IrrDebugDrawer::DM_NONE);
-
-        irr_driver->resetDebugModes();
-        irr_driver->toggleRH();
-        break;
-    case DEBUG_GRAPHICS_GI_VIZ:
-        if (physics)
-            physics->setDebugMode(IrrDebugDrawer::DM_NONE);
-
-        irr_driver->resetDebugModes();
-        irr_driver->toggleGI();
         break;
     case DEBUG_GRAPHICS_SHADOW_VIZ:
         if (physics)
@@ -317,19 +294,12 @@ bool handleContextMenuAction(s32 cmd_id)
         irr_driver->resetDebugModes();
         irr_driver->toggleShadowViz();
         break;
-    case DEBUG_GRAPHICS_LIGHT_VIZ:
+    case DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ:
         if (physics)
             physics->setDebugMode(IrrDebugDrawer::DM_NONE);
 
         irr_driver->resetDebugModes();
-        irr_driver->toggleLightViz();
-        break;
-    case DEBUG_GRAPHICS_DISTORT_VIZ:
-        if (physics)
-            physics->setDebugMode(IrrDebugDrawer::DM_NONE);
-
-        irr_driver->resetDebugModes();
-        irr_driver->toggleDistortViz();
+        irr_driver->toggleBoundingBoxesViz();
         break;
     case DEBUG_GRAPHICS_BULLET_1:
         irr_driver->resetDebugModes();
@@ -346,15 +316,142 @@ bool handleContextMenuAction(s32 cmd_id)
         physics->setDebugMode(IrrDebugDrawer::DM_NO_KARTS_GRAPHICS);
         break;
     }
-    case DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ:
+    case DEBUG_SP_RESET:
         irr_driver->resetDebugModes();
-        irr_driver->toggleBoundingBoxesViz();
+        if (physics)
+            physics->setDebugMode(IrrDebugDrawer::DM_NONE);
+#ifndef SERVER_ONLY
+        SP::sp_culling = true;
+#endif
         break;
-    case DEBUG_GRAPHICS_TOGGLE_CULLING:
+    case DEBUG_SP_TOGGLE_CULLING:
 #ifndef SERVER_ONLY
         SP::sp_culling = !SP::sp_culling;
 #endif
         break;
+    case DEBUG_SP_WN_VIZ:
+        irr_driver->resetDebugModes();
+        if (physics)
+            physics->setDebugMode(IrrDebugDrawer::DM_NONE);
+#ifndef SERVER_ONLY
+        SP::sp_debug_view = true;
+#endif
+        break;
+    case DEBUG_SP_NORMALS_VIZ:
+    {
+        irr_driver->resetDebugModes();
+        if (physics)
+            physics->setDebugMode(IrrDebugDrawer::DM_NONE);
+#ifndef SERVER_ONLY
+        SP::sp_debug_view = true;
+        int normal = 0;
+        if (nv)
+        {
+            SP::SPUniformAssigner* ua = nv->getUniformAssigner("enable_normals");
+            if (ua)
+            {
+                ua->getValue(nv->getShaderProgram(SP::RP_1ST), normal);
+                normal = normal == 0 ? 1 : 0;
+                nv->use();
+                ua->setValue(normal);
+                glUseProgram(0);
+            }
+        }
+#endif
+        break;
+    }
+    case DEBUG_SP_TANGENTS_VIZ:
+    {
+        irr_driver->resetDebugModes();
+        if (physics)
+            physics->setDebugMode(IrrDebugDrawer::DM_NONE);
+#ifndef SERVER_ONLY
+        SP::sp_debug_view = true;
+        int tangents = 0;
+        if (nv)
+        {
+            SP::SPUniformAssigner* ua = nv->getUniformAssigner("enable_tangents");
+            if (ua)
+            {
+                ua->getValue(nv->getShaderProgram(SP::RP_1ST), tangents);
+                tangents = tangents == 0 ? 1 : 0;
+                nv->use();
+                ua->setValue(tangents);
+                glUseProgram(0);
+            }
+        }
+#endif
+        break;
+    }
+    case DEBUG_SP_BITANGENTS_VIZ:
+    {
+        irr_driver->resetDebugModes();
+        if (physics)
+            physics->setDebugMode(IrrDebugDrawer::DM_NONE);
+#ifndef SERVER_ONLY
+        SP::sp_debug_view = true;
+        int bitangents = 0;
+        if (nv)
+        {
+            SP::SPUniformAssigner* ua = nv->getUniformAssigner("enable_bitangents");
+            if (ua)
+            {
+                ua->getValue(nv->getShaderProgram(SP::RP_1ST), bitangents);
+                bitangents = bitangents == 0 ? 1 : 0;
+                nv->use();
+                ua->setValue(bitangents);
+                glUseProgram(0);
+            }
+        }
+#endif
+        break;
+    }
+    case DEBUG_SP_WIREFRAME_VIZ:
+    {
+        irr_driver->resetDebugModes();
+        if (physics)
+            physics->setDebugMode(IrrDebugDrawer::DM_NONE);
+#ifndef SERVER_ONLY
+        SP::sp_debug_view = true;
+        int wireframe = 0;
+        if (nv)
+        {
+            SP::SPUniformAssigner* ua = nv->getUniformAssigner("enable_wireframe");
+            if (ua)
+            {
+                ua->getValue(nv->getShaderProgram(SP::RP_1ST), wireframe);
+                wireframe = wireframe == 0 ? 1 : 0;
+                nv->use();
+                ua->setValue(wireframe);
+                glUseProgram(0);
+            }
+        }
+#endif
+        break;
+    }
+    case DEBUG_SP_TN_VIZ:
+    {
+        irr_driver->resetDebugModes();
+        if (physics)
+            physics->setDebugMode(IrrDebugDrawer::DM_NONE);
+#ifndef SERVER_ONLY
+        SP::sp_debug_view = true;
+        int triangle_normals = 0;
+        if (nv)
+        {
+            SP::SPUniformAssigner* ua = nv->getUniformAssigner("enable_triangle_normals");
+            if (ua)
+            {
+                ua->getValue(nv->getShaderProgram(SP::RP_1ST), triangle_normals);
+                triangle_normals = triangle_normals == 0 ? 1 : 0;
+                nv->use();
+                ua->setValue(triangle_normals);
+                glUseProgram(0);
+            }
+        }
+#endif
+        break;
+    }
     case DEBUG_PROFILER:
         profiler.toggleStatus();
         break;
@@ -458,21 +555,25 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_GUI_CAM_TOP:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_TOP_OF_KART);
         Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
         break;
     case DEBUG_GUI_CAM_WHEEL:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_GROUND);
         Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
         break;
     case DEBUG_GUI_CAM_BEHIND_KART:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_BEHIND_KART);
         Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
         break;
     case DEBUG_GUI_CAM_SIDE_OF_KART:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_SIDE_OF_KART);
         Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
         break;
     case DEBUG_GUI_CAM_FREE:
@@ -493,6 +594,7 @@ bool handleContextMenuAction(s32 cmd_id)
     {
         Camera *camera = Camera::getActiveCamera();
         Camera::changeCamera(camera->getIndex(), Camera::CM_TYPE_NORMAL);
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
         break;
     }
@@ -512,6 +614,19 @@ bool handleContextMenuAction(s32 cmd_id)
         {
             cam->setAttachedFpsCam(!cam->getAttachedFpsCam());
         }
+        break;
+    }
+    case DEBUG_VIEW_KART_PREVIOUS:
+    {
+        if (kart_num == 0)
+        {
+            kart_num += World::getWorld()->getNumKarts() - 1;
+        }
+        else
+        {
+            kart_num--;
+        }
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         break;
     }
     case DEBUG_VIEW_KART_ONE:
@@ -538,6 +653,20 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_VIEW_KART_EIGHT:
         changeCameraTarget(8);
         break;
+    case DEBUG_VIEW_KART_NEXT:
+    {
+        if (kart_num == World::getWorld()->getNumKarts() - 1)
+        {
+            kart_num = 0;
+        }
+        else
+        {
+             kart_num++;
+        }
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
+        break;
+    }
+
     case DEBUG_PRINT_START_POS:
         if (!world) return false;
         for (unsigned int i = 0; i<world->getNumKarts(); i++)
@@ -756,22 +885,13 @@ bool onEvent(const SEvent &event)
             // graphics menu
             IGUIContextMenu* sub = mnu->getSubMenu(graphicsMenuIndex);
 
-            sub->addItem(L"Reload shaders", DEBUG_GRAPHICS_RELOAD_SHADERS );
-            sub->addItem(L"Wireframe", DEBUG_GRAPHICS_WIREFRAME );
-            sub->addItem(L"Mipmap viz", DEBUG_GRAPHICS_MIPMAP_VIZ );
-            sub->addItem(L"Normals viz", DEBUG_GRAPHICS_NORMALS_VIZ );
-            sub->addItem(L"SSAO viz", DEBUG_GRAPHICS_SSAO_VIZ );
-            sub->addItem(L"RSM viz", DEBUG_GRAPHICS_RSM_VIZ);
-            sub->addItem(L"RH viz", DEBUG_GRAPHICS_RH_VIZ);
-            sub->addItem(L"GI viz", DEBUG_GRAPHICS_GI_VIZ);
-            sub->addItem(L"Shadow viz", DEBUG_GRAPHICS_SHADOW_VIZ );
-            sub->addItem(L"Light viz", DEBUG_GRAPHICS_LIGHT_VIZ );
-            sub->addItem(L"Distort viz", DEBUG_GRAPHICS_DISTORT_VIZ );
+            sub->addItem(L"Reload shaders", DEBUG_GRAPHICS_RELOAD_SHADERS);
+            sub->addItem(L"SSAO viz", DEBUG_GRAPHICS_SSAO_VIZ);
+            sub->addItem(L"Shadow viz", DEBUG_GRAPHICS_SHADOW_VIZ);
+            sub->addItem(L"Bounding Boxes viz", DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ);
             sub->addItem(L"Physics debug", DEBUG_GRAPHICS_BULLET_1);
             sub->addItem(L"Physics debug (no kart)", DEBUG_GRAPHICS_BULLET_2);
-            sub->addItem(L"Bounding Boxes viz", DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ);
-            sub->addItem(L"Toggle Culling", DEBUG_GRAPHICS_TOGGLE_CULLING);
-            sub->addItem(L"Reset debug views", DEBUG_GRAPHICS_RESET );
+            sub->addItem(L"Reset debug views", DEBUG_GRAPHICS_RESET);
 
             mnu->addItem(L"Items >",-1,true,true);
             sub = mnu->getSubMenu(1);
@@ -813,6 +933,7 @@ bool onEvent(const SEvent &event)
 
             mnu->addItem(L"Change camera target >",-1,true, true);
             sub = mnu->getSubMenu(5);
+            sub->addItem(L"To previous kart (Ctrl + F5)", DEBUG_VIEW_KART_PREVIOUS);
             sub->addItem(L"To kart one", DEBUG_VIEW_KART_ONE);
             sub->addItem(L"To kart two", DEBUG_VIEW_KART_TWO);
             sub->addItem(L"To kart three", DEBUG_VIEW_KART_THREE);
@@ -821,11 +942,23 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"To kart six", DEBUG_VIEW_KART_SIX);
             sub->addItem(L"To kart seven", DEBUG_VIEW_KART_SEVEN);
             sub->addItem(L"To kart eight", DEBUG_VIEW_KART_EIGHT);
+            sub->addItem(L"To next kart (Ctrl + F6)", DEBUG_VIEW_KART_NEXT);
 
             mnu->addItem(L"Font >",-1,true, true);
             sub = mnu->getSubMenu(6);
             sub->addItem(L"Dump glyph pages of fonts", DEBUG_FONT_DUMP_GLYPH_PAGE);
             sub->addItem(L"Reload all fonts", DEBUG_FONT_RELOAD);
+
+            mnu->addItem(L"SP debug >",-1,true, true);
+            sub = mnu->getSubMenu(7);
+            sub->addItem(L"Reset SP debug", DEBUG_SP_RESET);
+            sub->addItem(L"Toggle culling", DEBUG_SP_TOGGLE_CULLING);
+            sub->addItem(L"Draw world normal in texture", DEBUG_SP_WN_VIZ);
+            sub->addItem(L"Toggle normals visualization", DEBUG_SP_NORMALS_VIZ);
+            sub->addItem(L"Toggle tangents visualization", DEBUG_SP_TANGENTS_VIZ);
+            sub->addItem(L"Toggle bitangents visualization", DEBUG_SP_BITANGENTS_VIZ);
+            sub->addItem(L"Toggle wireframe visualization", DEBUG_SP_WIREFRAME_VIZ);
+            sub->addItem(L"Toggle triangle normals visualization", DEBUG_SP_TN_VIZ);
 
             mnu->addItem(L"Adjust values", DEBUG_VISUAL_VALUES);
 
@@ -879,6 +1012,7 @@ bool onEvent(const SEvent &event)
 
 bool handleStaticAction(int key)
 {
+    unsigned int kart_num = Camera::getActiveCamera()->getKart()->getWorldKartId();
     if (key == IRR_KEY_F1)
     {
         handleContextMenuAction(DEBUG_GUI_CAM_FREE);
@@ -892,6 +1026,32 @@ bool handleStaticAction(int key)
 #ifndef SERVER_ONLY
         SP::SPTextureManager::get()->reloadTexture("");
 #endif
+        return true;
+    }
+    else if (key == IRR_KEY_F5)
+    {
+        if (kart_num == 0)
+        {
+            kart_num += World::getWorld()->getNumKarts() - 1;
+        }
+        else
+        {
+            kart_num--;
+        }
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
+        return true;
+    }
+    else if (key == IRR_KEY_F6)
+    {
+        if (kart_num == World::getWorld()->getNumKarts() - 1)
+        {
+            kart_num = 0;
+        }
+        else
+        {
+             kart_num++;
+        }
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         return true;
     }
     // TODO: create more keyboard shortcuts

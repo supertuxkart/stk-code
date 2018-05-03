@@ -152,7 +152,9 @@ Material::Material(const XMLNode *node, bool deprecated)
     node->get("ignore",              &m_ignore             );
 
     node->get("max-speed",           &m_max_speed_fraction );
-    node->get("slowdown-time",       &m_slowdown_time      );
+    float f = stk_config->ticks2Time(m_slowdown_ticks);
+    node->get("slowdown-time",       &f                    );
+    m_slowdown_ticks = stk_config->time2Ticks(f);
     node->get("colorizable",         &m_colorizable        );
     node->get("colorization-factor", &m_colorization_factor);
     node->get("hue-settings",        &m_hue_settings       );
@@ -484,7 +486,7 @@ void Material::init()
     m_colorization_factor       = 0.0f;
     m_colorization_mask         = "";
     m_max_speed_fraction        = 1.0f;
-    m_slowdown_time             = 1.0f;
+    m_slowdown_ticks            = stk_config->time2Ticks(1.0f);
     m_sfx_name                  = "";
     m_sfx_min_speed             = 0.0f;
     m_sfx_max_speed             = 30;

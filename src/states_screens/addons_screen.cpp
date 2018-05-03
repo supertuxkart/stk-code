@@ -35,8 +35,6 @@
 
 #include <iostream>
 
-DEFINE_SCREEN_SINGLETON( AddonsScreen );
-
 using namespace Online;
 // ----------------------------------------------------------------------------
 

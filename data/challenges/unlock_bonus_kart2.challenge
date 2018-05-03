@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<challenge version="3">
+    <unlock_list list="true"/>
+    <!-- This is the point equivalent of finishing the
+         story mode with 8 supertux challenges and the rest in gold  -->
+    <requirements trophies="280"/>
+    <unlock kart="sara_the_wizard"/>
+</challenge>

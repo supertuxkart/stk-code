@@ -28,18 +28,21 @@
 #include "guiengine/screen_keyboard.hpp"
 #include "input/device_manager.hpp"
 #include "input/gamepad_device.hpp"
+#include "input/input.hpp"
 #include "input/keyboard_device.hpp"
 #include "input/multitouch_device.hpp"
-#include "input/input.hpp"
+#include "input/wiimote_manager.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "replay/replay_recorder.hpp"
+#include "states_screens/dialogs/splitscreen_player_dialog.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_device.hpp"
@@ -84,6 +87,10 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
 // -----------------------------------------------------------------------------
 void InputManager::update(float dt)
 {
+#ifdef ENABLE_WIIUSE
+    wiimote_manager->update();
+#endif
+
     if(m_timer_in_use)
     {
         m_timer -= dt;
@@ -109,7 +116,8 @@ void InputManager::handleStaticAction(int key, int value)
 
     // When no players... a cutscene
     if (race_manager->getNumPlayers() == 0 && world != NULL && value > 0 &&
-        (key == IRR_KEY_SPACE || key == IRR_KEY_RETURN))
+        (key == IRR_KEY_SPACE || key == IRR_KEY_RETURN || 
+        key == IRR_KEY_BUTTON_A))
     {
         world->onFirePressed(NULL);
     }
@@ -289,14 +297,14 @@ void InputManager::handleStaticAction(int key, int value)
         case IRR_KEY_F11:
             if(value && shift_is_pressed && world && RewindManager::isEnabled())
             {
-                printf("Enter rewind to time:");
+                printf("Enter rewind to time in ticks:");
                 char s[256];
                 fgets(s, 256, stdin);
-                float t;
+                int t;
                 StringUtils::fromString(s,t);
-                RewindManager::get()->rewindTo(t);
-                Log::info("Rewind", "Rewinding from %f to %f",
-                          world->getTime(), t);
+                RewindManager::get()->rewindTo(t, world->getTimeTicks());
+                Log::info("Rewind", "Rewinding from %d to %d",
+                          world->getTimeTicks(), t);
             }
             break;
 
@@ -658,12 +666,17 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
     {
         action = PA_BEFORE_FIRST;
 
-        if      (button == IRR_KEY_UP)     action = PA_MENU_UP;
-        else if (button == IRR_KEY_DOWN)   action = PA_MENU_DOWN;
-        else if (button == IRR_KEY_LEFT)   action = PA_MENU_LEFT;
-        else if (button == IRR_KEY_RIGHT)  action = PA_MENU_RIGHT;
-        else if (button == IRR_KEY_SPACE)  action = PA_MENU_SELECT;
-        else if (button == IRR_KEY_RETURN) action = PA_MENU_SELECT;
+        if      (button == IRR_KEY_UP)            action = PA_MENU_UP;
+        else if (button == IRR_KEY_DOWN)          action = PA_MENU_DOWN;
+        else if (button == IRR_KEY_LEFT)          action = PA_MENU_LEFT;
+        else if (button == IRR_KEY_RIGHT)         action = PA_MENU_RIGHT;
+        else if (button == IRR_KEY_SPACE)         action = PA_MENU_SELECT;
+        else if (button == IRR_KEY_RETURN)        action = PA_MENU_SELECT;
+        else if (button == IRR_KEY_BUTTON_UP)     action = PA_MENU_DOWN;
+        else if (button == IRR_KEY_BUTTON_DOWN)   action = PA_MENU_UP;
+        else if (button == IRR_KEY_BUTTON_LEFT)   action = PA_MENU_LEFT;
+        else if (button == IRR_KEY_BUTTON_RIGHT)  action = PA_MENU_RIGHT;
+        else if (button == IRR_KEY_BUTTON_A)      action = PA_MENU_SELECT;
         else if (button == IRR_KEY_TAB)
         {
             if (shift_mask)
@@ -676,7 +689,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             }
         }
 
-        if (button == IRR_KEY_RETURN)
+        if (button == IRR_KEY_RETURN || button == IRR_KEY_BUTTON_A)
         {
             if (GUIEngine::ModalDialog::isADialogActive() &&
                 !GUIEngine::ScreenKeyboard::isActive())
@@ -699,6 +712,31 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         // when a device presses fire or rescue
         if (m_device_manager->getAssignMode() == DETECT_NEW)
         {
+            if (NetworkConfig::get()->isNetworking() &&
+                NetworkConfig::get()->isAddingNetworkPlayers())
+            {
+                // Ignore release event
+                if (value == 0)
+                    return;
+                InputDevice *device = NULL;
+                if (type == Input::IT_KEYBOARD)
+                {
+                    //Log::info("InputManager", "New Player Joining with Key %d", button);
+                    device = m_device_manager->getKeyboardFromBtnID(button);
+                }
+                else if (type == Input::IT_STICKBUTTON ||
+                        type == Input::IT_STICKMOTION    )
+                {
+                    device = m_device_manager->getGamePadFromIrrID(deviceID);
+                }
+                if (device && (action == PA_FIRE || action == PA_MENU_SELECT))
+                {
+                    if (!GUIEngine::ModalDialog::isADialogActive())
+                        new SplitscreenPlayerDialog(device);
+                    return;
+                }
+            }
+
             // Player is unjoining
             if ((player != NULL) && (action == PA_RESCUE ||
                                      action == PA_MENU_CANCEL ) )
@@ -738,7 +776,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
                     if (device != NULL)
                     {
-                        KartSelectionScreen::getRunningInstance()->joinPlayer(device);
+                        KartSelectionScreen::getRunningInstance()->joinPlayer(device, NULL/*player profile*/);
                     }
                 }
                 return; // we're done here, ignore devices that aren't
@@ -771,7 +809,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             Controller* controller = pk->getController();
             if (controller != NULL) controller->action(action, abs(value));
         }
-        else if (race_manager->isWatchingReplay())
+        else if (race_manager->isWatchingReplay() && !GUIEngine::ModalDialog::isADialogActive())
         {
             // Get the first ghost kart
             World::getWorld()->getKart(0)
@@ -1186,28 +1224,10 @@ EventPropagation InputManager::input(const SEvent& event)
         if (device && device->isAccelerometerActive())
         {
             m_device_manager->updateMultitouchDevice();
-
-            for (unsigned int i = 0; i < device->getButtonsCount(); i++)
-            {
-                MultitouchButton* button = device->getButton(i);
-
-                if (button->type != BUTTON_STEERING)
-                    continue;
-                    
-                float factor = UserConfigParams::m_multitouch_tilt_factor;
-                factor = std::max(factor, 0.1f);
-
-                if (UserConfigParams::m_multitouch_accelerometer == 1)
-                {
-                    button->axis_x = (float)-event.AccelerometerEvent.X / factor;
-                    device->handleControls(button);
-                }
-                else if (UserConfigParams::m_multitouch_accelerometer == 2)
-                {
-                    button->axis_x = (float)event.AccelerometerEvent.Y / factor;
-                    device->handleControls(button);
-                }
-            }
+            
+            float factor = UserConfigParams::m_multitouch_tilt_factor;
+            factor = std::max(factor, 0.1f);
+            device->updateAxisX(float(event.AccelerometerEvent.Y) / factor);
         }
     }
 

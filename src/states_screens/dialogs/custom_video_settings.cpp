@@ -63,6 +63,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     particles_effects->addLabel(_("Important only"));
     particles_effects->addLabel(_("Enabled"));
     particles_effects->setValue(UserConfigParams::m_particles_effects);
+	particles_effects->setMin(1);
 
     SpinnerWidget* geometry_level = getWidget<SpinnerWidget>("geometry_detail");
     //I18N: Geometry level disabled : lowest level, no details

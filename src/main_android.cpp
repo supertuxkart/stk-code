@@ -40,9 +40,17 @@ void override_default_params()
     // Disable advanced lighting by default to make the game playable
     UserConfigParams::m_dynamic_lights = false;
 
-    // Enable touch steering and screen keyboard
-    UserConfigParams::m_multitouch_enabled = true;
-    UserConfigParams::m_screen_keyboard = true;
+    // Enable touch steering and screen keyboard when touchscreen is available
+    int32_t touch = AConfiguration_getTouchscreen(global_android_app->config);
+    
+    if (touch != ACONFIGURATION_TOUCHSCREEN_NOTOUCH)
+    {
+        UserConfigParams::m_multitouch_enabled = true;
+        UserConfigParams::m_screen_keyboard = true;
+    }
+    
+    // Set bigger fonts and buttons
+    UserConfigParams::m_hidpi_enabled = true;
     
     // It shouldn't matter, but STK is always run in fullscreen on android
     UserConfigParams::m_fullscreen = true;
@@ -53,23 +61,20 @@ void override_default_params()
     
     // Create default user istead of showing login screen to make life easier
     UserConfigParams::m_enforce_current_player = true;
-    
-    // Just for debugging
-    UserConfigParams::m_log_errors_to_console = true;
 }
 
 void android_main(struct android_app* app) 
 {
     Log::info("AndroidMain", "Loading application...");
         
-    app_dummy();
+    global_android_app = app;
     
     // Initialize global Android window state variables
     CIrrDeviceAndroid::onCreate();
     
+    app_dummy();
     override_default_params();
 
-    global_android_app = app;
     main(0, {});
 
     Log::info("AndroidMain", "Closing STK...");

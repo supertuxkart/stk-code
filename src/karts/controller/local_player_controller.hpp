@@ -48,20 +48,24 @@ private:
      *  camera object is managed in the Camera class, so no need to free it. */
     int  m_camera_index;
 
+    PerPlayerDifficulty m_difficulty;
+
     SFXBase     *m_wee_sound;
     SFXBuffer   *m_bzzt_sound;
     SFXBuffer   *m_ugh_sound;
     SFXBuffer   *m_grab_sound;
     SFXBuffer   *m_full_sound;
 
-    virtual void steer(float, int) OVERRIDE;
+    virtual void steer(int, int) OVERRIDE;
     virtual void displayPenaltyWarning() OVERRIDE;
 public:
                  LocalPlayerController(AbstractKart *kart,
-                                       StateManager::ActivePlayer *player);
+                                       const int local_player_id,
+                                       PerPlayerDifficulty d);
                 ~LocalPlayerController();
-    void         update            (float) OVERRIDE;
-    void         action            (PlayerAction action, int value) OVERRIDE;
+    void         update            (int ticks) OVERRIDE;
+    bool         action            (PlayerAction action, int value,
+                                    bool dry_run=false) OVERRIDE;
     virtual void handleZipper      (bool play_sound) OVERRIDE;
     void         collectedItem     (const Item &item, int add_info=-1,
                                     float previous_energy=0) OVERRIDE;
@@ -77,7 +81,7 @@ public:
     virtual bool isLocalPlayerController() const OVERRIDE {return true;}
     // ------------------------------------------------------------------------
     /** Returns the name of the player profile. */
-    core::stringw getName() const OVERRIDE { return m_player->getProfile()->getName(); }
+    core::stringw getName() const OVERRIDE;
 
 
 };   // LocalPlayerController

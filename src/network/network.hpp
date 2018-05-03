@@ -32,6 +32,7 @@
 #include <enet/enet.h>
 
 #include <stdio.h>
+#include <vector>
 
 class BareNetworkString;
 class NetworkString;
@@ -54,7 +55,8 @@ public:
               Network(int peer_count, int channel_limit,
                       uint32_t max_incoming_bandwidth,
                       uint32_t max_outgoing_bandwidth,
-                      ENetAddress* address = NULL);
+                      ENetAddress* address,
+                      bool change_port_if_bound = false);
     virtual  ~Network();
 
     static void openLog();
@@ -67,6 +69,7 @@ public:
                          TransportAddress* sender, int max_tries = -1);
     void     broadcastPacket(NetworkString *data,
                              bool reliable = true);
+
     // ------------------------------------------------------------------------
     /** Returns a pointer to the ENet host object. */
     ENetHost* getENetHost() { return m_host; }

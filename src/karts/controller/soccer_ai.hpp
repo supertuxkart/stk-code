@@ -100,12 +100,9 @@ private:
 
 public:
                  SoccerAI(AbstractKart *kart);
-    // ------------------------------------------------------------------------
                 ~SoccerAI();
-    // ------------------------------------------------------------------------
-    virtual void update  (float delta) OVERRIDE;
-    // ------------------------------------------------------------------------
-    virtual void reset   () OVERRIDE;
+    virtual void update (int ticks) OVERRIDE;
+    virtual void reset() OVERRIDE;
 
 };
 

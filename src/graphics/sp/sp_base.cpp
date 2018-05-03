@@ -67,6 +67,10 @@ std::array<float, 16>* g_joint_ptr = NULL;
 // ----------------------------------------------------------------------------
 bool sp_culling = true;
 // ----------------------------------------------------------------------------
+bool sp_apitrace = false;
+// ----------------------------------------------------------------------------
+bool sp_debug_view = false;
+// ----------------------------------------------------------------------------
 bool g_handle_shadow = false;
 // ----------------------------------------------------------------------------
 SPShader* g_normal_visualizer = NULL;
@@ -178,7 +182,7 @@ void displaceShaderInit(SPShader* shader)
             glEnable(GL_STENCIL_TEST);
             glStencilFunc(GL_ALWAYS, 1, 0xFF);
             glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-            g_stk_sbr->getRTTs()->getFBO(FBO_TMP1_WITH_DS).bind(),
+            g_stk_sbr->getRTTs()->getFBO(FBO_RGBA_1).bind(),
             glClear(GL_COLOR_BUFFER_BIT);
         }, RP_1ST);
     shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_RESERVED);
@@ -196,16 +200,16 @@ void displaceShaderInit(SPShader* shader)
             glEnable(GL_STENCIL_TEST);
             glStencilFunc(GL_ALWAYS, 1, 0xFF);
             glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-            g_stk_sbr->getRTTs()->getFBO(FBO_DISPLACE).bind(),
+            g_stk_sbr->getRTTs()->getFBO(FBO_TMP1_WITH_DS).bind(),
             glClear(GL_COLOR_BUFFER_BIT);
         }, RP_RESERVED);
     SPShaderManager::addPrefilledTexturesToShader(shader,
-        {{ "displacement_tex", "displace.png", false/*srgb*/, ST_BILINEAR }},
-        RP_RESERVED);
+        {std::make_tuple("displacement_tex", "displace.png", false/*srgb*/,
+        ST_BILINEAR)}, RP_RESERVED);
     shader->addCustomPrefilledTextures(ST_BILINEAR,
         GL_TEXTURE_2D, "mask_tex", []()->GLuint
         {
-            return g_stk_sbr->getRTTs()->getFBO(FBO_TMP1_WITH_DS).getRTT()[0];
+            return g_stk_sbr->getRTTs()->getFBO(FBO_RGBA_1).getRTT()[0];
         }, RP_RESERVED);
     shader->addCustomPrefilledTextures(ST_BILINEAR,
         GL_TEXTURE_2D, "color_tex", []()->GLuint
@@ -218,7 +222,7 @@ void displaceShaderInit(SPShader* shader)
             g_stk_sbr->getRTTs()->getFBO(FBO_COLORS).bind();
             glStencilFunc(GL_EQUAL, 1, 0xFF);
             g_stk_sbr->getPostProcessing()->renderPassThrough
-                (g_stk_sbr->getRTTs()->getFBO(FBO_DISPLACE).getRTT()[0],
+                (g_stk_sbr->getRTTs()->getFBO(FBO_TMP1_WITH_DS).getRTT()[0],
                 g_stk_sbr->getRTTs()->getFBO(FBO_COLORS).getWidth(),
                 g_stk_sbr->getRTTs()->getFBO(FBO_COLORS).getHeight());
             glDisable(GL_STENCIL_TEST);
@@ -377,6 +381,7 @@ void loadShaders()
                     shader->linkShaderFiles(RP_1ST);
                     shader->use(RP_1ST);
                     shader->addBasicUniforms(RP_1ST);
+                    shader->addAllUniforms(RP_1ST);
                     shader->addAllTextures(RP_1ST);
                 });
             SPShaderManager::get()->addSPShader(sps->getName(), sps);
@@ -569,6 +574,7 @@ void init()
 void destroy()
 {
     g_dy_dc.clear();
+    SPTextureManager::get()->stopThreads();
     SPShaderManager::destroy();
     g_glow_shader = NULL;
     g_normal_visualizer = NULL;
@@ -1215,7 +1221,7 @@ void uploadAll()
 }
 
 // ----------------------------------------------------------------------------
-void drawNormal()
+void drawSPDebugView()
 {
     if (g_normal_visualizer == NULL)
     {

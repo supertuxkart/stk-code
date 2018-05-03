@@ -79,7 +79,7 @@ void CutsceneWorld::init()
 
     m_duration = -1.0f;
 
-    Camera* stk_cam = Camera::createCamera(NULL);
+    Camera* stk_cam = Camera::createCamera(NULL, 0);
     m_camera = stk_cam->getCameraSceneNode();
     m_camera->setFOV(stk_config->m_cutscene_fov);
     m_camera->bindTargetAndRotation(true); // no "look-at"
@@ -181,9 +181,9 @@ const std::string& CutsceneWorld::getIdent() const
 
 //-----------------------------------------------------------------------------
 /** Update the world and the track.
- *  \param dt Time step size.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void CutsceneWorld::update(float dt)
+void CutsceneWorld::update(int ticks)
 {
     /*
     {
@@ -234,9 +234,8 @@ void CutsceneWorld::update(float dt)
         double prev_time = m_time;
         double now = StkTime::getRealTime();
         m_time = now - m_time_at_second_reset;
-        dt = (float)(m_time - prev_time);
     }
-
+    
     float fade = 0.0f;
     float fadeIn = -1.0f;
     float fadeOut = -1.0f;
@@ -288,8 +287,8 @@ void CutsceneWorld::update(float dt)
     }
 
 
-    World::update((float)dt);
-    World::updateTrack((float)dt);
+    World::update(ticks);
+    World::updateTrack(ticks);
 
     PtrVector<TrackObject>& objects = Track::getCurrentTrack()
                                     ->getTrackObjectManager()->getObjects();
@@ -423,11 +422,14 @@ void CutsceneWorld::enterRaceOverState()
             // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
             race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
+            //TODO : this code largely duplicate a similar code present in raceResultGUI.
+            //       Try to reduce duplication
             std::vector<const ChallengeData*> unlocked =
                 PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
+
             if (unlocked.size() > 0)
             {
-                //PlayerManager::getCurrentPlayer()->clearUnlocked();
+                PlayerManager::getCurrentPlayer()->clearUnlocked();
 
                 StateManager::get()->enterGameState();
                 race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
@@ -442,8 +444,8 @@ void CutsceneWorld::enterRaceOverState()
                 ((CutsceneWorld*)World::getWorld())->setParts(parts);
 
                 assert(unlocked.size() > 0);
-                scene->addTrophy(race_manager->getDifficulty());
-                scene->findWhatWasUnlocked(race_manager->getDifficulty());
+                scene->addTrophy(race_manager->getDifficulty(),true);
+                scene->findWhatWasUnlocked(race_manager->getDifficulty(),unlocked);
 
                 StateManager::get()->replaceTopMostScreen(scene, GUIEngine::INGAME_MENU);
             }
@@ -477,9 +479,10 @@ void CutsceneWorld::enterRaceOverState()
 
             std::vector<const ChallengeData*> unlocked =
                 PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
+
             if (unlocked.size() > 0)
             {
-                //PlayerManager::getCurrentPlayer()->clearUnlocked();
+                PlayerManager::getCurrentPlayer()->clearUnlocked();
 
                 StateManager::get()->enterGameState();
                 race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
@@ -493,8 +496,8 @@ void CutsceneWorld::enterRaceOverState()
                 parts.push_back("featunlocked");
                 ((CutsceneWorld*)World::getWorld())->setParts(parts);
 
-                scene->addTrophy(race_manager->getDifficulty());
-                scene->findWhatWasUnlocked(race_manager->getDifficulty());
+                scene->addTrophy(race_manager->getDifficulty(),true);
+                scene->findWhatWasUnlocked(race_manager->getDifficulty(),unlocked);
 
                 StateManager::get()->replaceTopMostScreen(scene, GUIEngine::INGAME_MENU);
             }
@@ -594,5 +597,4 @@ void CutsceneWorld::createRaceGUI()
 {
     m_race_gui = new CutsceneGUI();
 }   // createRaceGUI
-
 

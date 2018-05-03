@@ -29,9 +29,13 @@
  */
 void Binding::save(std::ofstream& stream) const
 {
-    stream << "id=\""        << m_id        << "\" "
-           << "event=\""     << m_type      << "\" "
-           << "character=\"" << m_character << "\" ";
+    stream << "event=\"" << m_type << "\" ";
+    stream << "id=\"" << m_id << "\" ";
+
+    if (m_type == Input::IT_KEYBOARD)
+    {
+        stream << "character=\"" << m_character << "\" ";
+    }
 
     // Only serialize the direction and the range for stick motions
     if (m_type == Input::IT_STICKMOTION)

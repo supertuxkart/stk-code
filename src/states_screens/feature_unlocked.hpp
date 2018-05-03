@@ -54,7 +54,7 @@ class FeatureUnlockedCutScene : public GUIEngine::CutsceneScreen, public GUIEngi
     struct UnlockedThing
     {
         /** Will be non-null if this unlocked thing is a kart */
-        KartProperties* m_unlocked_kart;
+        const KartProperties* m_unlocked_kart;
 
         std::string m_unlock_model;
 
@@ -80,7 +80,7 @@ class FeatureUnlockedCutScene : public GUIEngine::CutsceneScreen, public GUIEngi
 
         UnlockedThing(std::string model, irr::core::stringw msg);
 
-        UnlockedThing(KartProperties* kart, irr::core::stringw msg);
+        UnlockedThing(const KartProperties* kart, irr::core::stringw msg);
 
         /**
           * Creates a 'picture' reward.
@@ -141,11 +141,11 @@ public:
     void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                        const int playerID) OVERRIDE;
 
-    void findWhatWasUnlocked(RaceManager::Difficulty difficulty);
+    void findWhatWasUnlocked(RaceManager::Difficulty difficulty,std::vector<const ChallengeData*>& unlocked);
 
     /** Call before showing up the screen to make a kart come out of the chest.
         'addUnlockedThings' will invoke this, so you generally don't need to call this directly. */
-    void addUnlockedKart(KartProperties* unlocked_kart, irr::core::stringw msg);
+    void addUnlockedKart(const KartProperties* unlocked_kart);
 
     /** Call before showing up the screen to make a picture come out of the chest
         'addUnlockedThings' will invoke this, so you generally don't need to call this directly. */
@@ -166,7 +166,7 @@ public:
     void addUnlockedThings(const std::vector<const ChallengeData*> unlocked);
     */
 
-    void addTrophy(RaceManager::Difficulty difficulty);
+    void addTrophy(RaceManager::Difficulty difficulty, bool is_grandprix);
 
     /** override from base class to handle escape press */
     virtual bool onEscapePressed() OVERRIDE;
@@ -175,4 +175,3 @@ public:
 };
 
 #endif
-

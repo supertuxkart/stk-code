@@ -25,6 +25,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "modes/world.hpp"
+#include "network/network_string.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
@@ -48,12 +49,12 @@ AIBaseController::AIBaseController(AbstractKart *kart)
 void AIBaseController::reset()
 {
     m_stuck = false;
-    m_collision_times.clear();
+    m_collision_ticks.clear();
 }   // reset
 
 //-----------------------------------------------------------------------------
 
-void AIBaseController::update(float dt)
+void AIBaseController::update(int ticks)
 {
     m_stuck = false;
 }
@@ -193,7 +194,7 @@ void AIBaseController::setSteering(float angle, float dt)
     if     (steer_fraction >  1.0f) steer_fraction =  1.0f;
     else if(steer_fraction < -1.0f) steer_fraction = -1.0f;
 
-    if(m_kart->getBlockedByPlungerTime()>0)
+    if(m_kart->getBlockedByPlungerTicks()>0)
     {
         if     (steer_fraction >  0.5f) steer_fraction =  0.5f;
         else if(steer_fraction < -0.5f) steer_fraction = -0.5f;
@@ -237,12 +238,12 @@ void AIBaseController::crashed(const Material *m)
     // the track again if it is stuck (i.e. time for the push back plus
     // time for the AI to accelerate and hit the terrain again).
     const unsigned int NUM_COLLISION = 3;
-    const float COLLISION_TIME       = 1.5f;
+    const int COLLISION_TICKS        = stk_config->time2Ticks(3.0f);
 
-    float time = World::getWorld()->getTimeSinceStart();
-    if(m_collision_times.size()==0)
+    int ticks = World::getWorld()->getTicksSinceStart();
+    if(m_collision_ticks.size()==0)
     {
-        m_collision_times.push_back(time);
+        m_collision_ticks.push_back(ticks);
         return;
     }
 
@@ -252,23 +253,24 @@ void AIBaseController::crashed(const Material *m)
     // collisions to happen). The time of 0.2 seconds was experimentally
     // found, typically it takes 0.5 seconds for a kart to be pushed back
     // from the terrain and accelerate to hit the same terrain again.
-    if(time - m_collision_times.back() < 0.2f)
+    if(5 * (ticks - m_collision_ticks.back()) < stk_config->time2Ticks(1.0f))
         return;
 
     // Remove all outdated entries, i.e. entries that are older than the
     // collision time plus 1 second. Older entries must be deleted,
     // otherwise a collision that happened (say) 10 seconds ago could
     // contribute to a stuck condition.
-    while(m_collision_times.size()>0 &&
-           time - m_collision_times[0] > 1.0f+COLLISION_TIME)
-           m_collision_times.erase(m_collision_times.begin());
+    while(m_collision_ticks.size()>0 &&
+           ticks - m_collision_ticks[0] > stk_config->time2Ticks(1.0f)
+                                        + COLLISION_TICKS              )
+           m_collision_ticks.erase(m_collision_ticks.begin());
 
-    m_collision_times.push_back(time);
+    m_collision_ticks.push_back(ticks);
 
     // Now detect if there are enough collision records in the
     // specified time interval.
-    if(time - m_collision_times.front() > COLLISION_TIME
-        && m_collision_times.size()>=NUM_COLLISION)
+    if(ticks - m_collision_ticks.front() > COLLISION_TICKS &&
+        m_collision_ticks.size()>=NUM_COLLISION               )
     {
         // We can't call m_kart->forceRescue here, since crased() is
         // called during physics processing, and forceRescue() removes the
@@ -327,3 +329,18 @@ void AIBaseController::determineTurnRadius(const Vec3 &end, Vec3 *center,
     }
 
 }   // determineTurnRadius
+
+//-----------------------------------------------------------------------------
+void AIBaseController::saveState(BareNetworkString *buffer) const
+{
+    // Endcontroller needs this for proper offset in kart rewinder
+    buffer->addUInt32(0).addUInt32(0).addUInt32(0);
+}   // copyToBuffer
+
+//-----------------------------------------------------------------------------
+void AIBaseController::rewindTo(BareNetworkString *buffer)
+{
+    // Endcontroller needs this for proper offset in kart rewinder
+    // Skip 3 uint32_t
+    buffer->skip(3 * 4);
+}   // rewindTo

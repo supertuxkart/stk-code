@@ -156,7 +156,7 @@ void ItemManager::removeTextures()
  *  of each race. */
 ItemManager::ItemManager()
 {
-    m_switch_time = -1.0f;
+    m_switch_ticks = -1;
     // The actual loading is done in loadDefaultItems
 
     // Prepare the switch to array, which stores which item should be
@@ -266,7 +266,7 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
 
     insertItem(item);
     if(parent != NULL) item->setParent(parent);
-    if(m_switch_time>=0)
+    if(m_switch_ticks>=0)
     {
         Item::ItemType new_type = m_switch_to[item->getType()];
         item->switchTo(new_type, m_item_mesh[(int)new_type],
@@ -333,7 +333,7 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
         if((*i)->hitKart(kart->getXYZ(), kart))
         {
             // if we're not playing online, pick the item.
-            if (!RaceEventManager::getInstance()->isRunning())
+            if (!NetworkConfig::get()->isNetworking())
                 collectedItem(*i, kart);
             else if (NetworkConfig::get()->isServer())
             {
@@ -354,14 +354,14 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
 void ItemManager::reset()
 {
     // If items are switched, switch them back first.
-    if(m_switch_time>=0)
+    if(m_switch_ticks>=0)
     {
         for(AllItemTypes::iterator i =m_all_items.begin();
                                    i!=m_all_items.end(); i++)
         {
             if(*i) (*i)->switchBack();
         }
-        m_switch_time = -1.0f;
+        m_switch_ticks = -1;
 
     }
 
@@ -388,36 +388,36 @@ void ItemManager::reset()
         }
     }  // whilem_all_items.end() i
 
-    m_switch_time = -1;
+    m_switch_ticks = -1;
 }   // reset
 
 //-----------------------------------------------------------------------------
 /** Updates all items, and handles switching items back if the switch time
  *  is over.
- *  \param dt Time step.
+ *  \param ticks Number of physics time steps - should be 1.
  */
-void ItemManager::update(float dt)
+void ItemManager::update(int ticks)
 {
     // If switch time is over, switch all items back
-    if(m_switch_time>=0)
+    if(m_switch_ticks>=0)
     {
-        m_switch_time -= dt;
-        if(m_switch_time<0)
+        m_switch_ticks -= ticks;
+        if(m_switch_ticks<0)
         {
             for(AllItemTypes::iterator i =m_all_items.begin();
                 i!=m_all_items.end();  i++)
             {
                 if(*i) (*i)->switchBack();
             }   // for m_all_items
-        }   // m_switch_time < 0
-    }   // m_switch_time>=0
+        }   // m_switch_ticks < 0
+    }   // m_switch_ticks>=0
 
     for(AllItemTypes::iterator i =m_all_items.begin();
         i!=m_all_items.end();  i++)
     {
         if(*i)
         {
-            (*i)->update(dt);
+            (*i)->update(ticks);
             if( (*i)->isUsedUp())
             {
                 deleteItem( *i );
@@ -472,16 +472,16 @@ void ItemManager::switchItems()
 
         Item::ItemType new_type = m_switch_to[(*i)->getType()];
 
-        if(m_switch_time<0)
+        if(m_switch_ticks<0)
             (*i)->switchTo(new_type, m_item_mesh[(int)new_type], m_item_lowres_mesh[(int)new_type]);
         else
             (*i)->switchBack();
     }   // for m_all_items
 
-    // if the items are already switched (m_switch_time >=0)
-    // then switch back, and set m_switch_time to -1 to indicate
+    // if the items are already switched (m_switch_ticks >=0)
+    // then switch back, and set m_switch_ticks to -1 to indicate
     // that the items are now back to normal.
-    m_switch_time = m_switch_time < 0 ? stk_config->m_item_switch_time : -1;
+    m_switch_ticks = m_switch_ticks < 0 ? stk_config->m_item_switch_ticks : -1;
 
 }   // switchItems
 

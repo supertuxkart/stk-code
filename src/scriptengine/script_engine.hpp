@@ -82,7 +82,7 @@ namespace Scripting
 
         void addPendingTimeout(double time, const std::string& callback_name);
         void addPendingTimeout(double time, asIScriptFunction* delegate_fn);
-        void update(double dt);
+        void update(int ticks);
 
         asIScriptEngine* getEngine() { return m_engine; }
 

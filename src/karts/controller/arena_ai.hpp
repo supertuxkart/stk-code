@@ -89,7 +89,7 @@ private:
      *  until facing in front of it. */
     Vec3 m_reverse_point;
 
-    /** Indicates that the kart is currently stuck, and m_time_since_reversing
+    /** Indicates that the kart is currently stuck, and m_ticks_since_reversing
      *  is counting down. */
     bool m_is_stuck;
 
@@ -105,7 +105,7 @@ private:
     float m_time_since_last_shot;
 
     /** This is a timer that counts down when the kart is reversing to get unstuck. */
-    float m_time_since_reversing;
+    float m_ticks_since_reversing;
 
     /** This is a timer that counts down when the kart is starting to drive. */
     float m_time_since_driving;
@@ -114,7 +114,7 @@ private:
     float m_time_since_uturn;
 
     /** This is a timer that counts when the kart start going off road. */
-    float m_time_since_off_road;
+    int m_ticks_since_off_road;
 
     /** Used to determine braking and nitro usage. */
     float m_turn_radius;
@@ -142,7 +142,7 @@ private:
     // ------------------------------------------------------------------------
     void          doUTurn(const float dt);
     // ------------------------------------------------------------------------
-    bool          gettingUnstuck(const float dt);
+    bool          gettingUnstuck(int ticks);
     // ------------------------------------------------------------------------
     bool          updateAimingPosition(Vec3* target_point);
     // ------------------------------------------------------------------------
@@ -183,11 +183,11 @@ public:
     // ------------------------------------------------------------------------
     virtual     ~ArenaAI() {}
     // ------------------------------------------------------------------------
-    virtual void update (float delta) OVERRIDE;
+    virtual void update(int ticks) OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual void reset  () OVERRIDE;
+    virtual void reset() OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual void newLap (int lap) OVERRIDE {}
+    virtual void newLap(int lap) OVERRIDE {}
 
 };
 

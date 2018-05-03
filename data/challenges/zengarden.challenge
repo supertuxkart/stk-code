@@ -1,9 +1,14 @@
 <?xml version="1.0"?>
-<challenge version="2">
-    <track id="zengarden" laps="3"/>
+<challenge version="3">
+    <unlock_list list="false"/>
+    <track id="zengarden" laps="4"/>
     <mode major="single" minor="timetrial"/>
-    <requirements trophies="45"/>
+    <requirements trophies="35"/>
     
+    <best>
+        <karts number="3"/>
+        <requirements position="1"/>
+    </best>
     <hard>
         <karts number="2"/>
         <requirements position="1"/>

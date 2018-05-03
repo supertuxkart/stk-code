@@ -31,6 +31,7 @@
 #include "guiengine/widgets/skill_level_widget.hpp"
 
 class KartProperties;
+enum PerPlayerDifficulty : uint8_t;
 
 namespace GUIEngine
 {
@@ -94,7 +95,7 @@ namespace GUIEngine
          * inside itself */
         void setSize(const int x, const int y, const int w, const int h);
 
-        void setValues(const KartProperties* props);
+        void setValues(const KartProperties* props, PerPlayerDifficulty d);
 
         /** Change the value of the widget, it must be a percent. */
         void setValue(Stats type, int value);

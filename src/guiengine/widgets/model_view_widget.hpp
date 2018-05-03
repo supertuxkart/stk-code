@@ -65,7 +65,7 @@ namespace GUIEngine
 
         std::shared_ptr<RenderInfo> m_render_info;
 
-        const unsigned m_rtt_size;
+        unsigned m_rtt_size;
 
     public:
 
@@ -84,6 +84,8 @@ namespace GUIEngine
                       const std::string& bone_name = std::string());
 
         void update(float delta);
+
+        void setRTTSize(unsigned rtt_size) { m_rtt_size = rtt_size; }
 
         virtual void elementRemoved();
 

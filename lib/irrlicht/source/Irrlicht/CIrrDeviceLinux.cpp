@@ -920,6 +920,13 @@ bool CIrrDeviceLinux::createWindow()
 				&visTempl, &visNumber);
 			visTempl.depth -= 8;
 		}
+		
+		if (!visual && !CreationParams.WithAlphaChannel)
+		{
+			visTempl.depth = 32;
+			visual = XGetVisualInfo(display, VisualScreenMask|VisualDepthMask,
+									&visTempl, &visNumber);
+		}
 	}
 
 	if (!visual)
@@ -984,88 +991,105 @@ bool CIrrDeviceLinux::createWindow()
 		Atom wmDelete;
 		wmDelete = XInternAtom(display, wmDeleteWindow, True);
 		XSetWMProtocols(display, window, &wmDelete, 1);
-
+		
 		if (CreationParams.Fullscreen)
 		{
-			if (netWM)
+			// Some window managers don't respect values from XCreateWindow and
+			// place window in random position. This may cause that fullscreen
+			// window is showed in wrong screen. It doesn't matter for vidmode
+			// which displays cloned image in all devices.
+			#ifdef _IRR_LINUX_X11_RANDR_
+			XMoveResizeWindow(display, window, crtc_x, crtc_y, Width, Height);
+			XRaiseWindow(display, window);
+			XFlush(display);
+			#endif
+		}
+		
+		unsigned int display_width = XDisplayWidth(display, screennr);
+		unsigned int display_height = XDisplayHeight(display, screennr);
+		
+		bool has_display_size = (Width == display_width && Height == display_height);
+		
+		if (netWM && (CreationParams.Fullscreen || has_display_size))
+		{
+			Atom WMStateAtom = XInternAtom(display, "_NET_WM_STATE", true);
+			Atom WMStateAtom1 = None;
+			Atom WMStateAtom2 = None;
+			
+			if (CreationParams.Fullscreen)
 			{
-				// Some window managers don't respect values from XCreateWindow and
-				// place window in random position. This may cause that fullscreen
-				// window is showed in wrong screen. It doesn't matter for vidmode
-				// which displays cloned image in all devices.
-				#ifdef _IRR_LINUX_X11_RANDR_
-				XMoveResizeWindow(display, window, crtc_x, crtc_y, Width, Height);
-				XRaiseWindow(display, window);
-				XFlush(display);
-				#endif
-
-				// Set the fullscreen mode via the window manager. This allows alt-tabing, volume hot keys & others.
-				// Get the needed atom from there freedesktop names
-				Atom WMStateAtom = XInternAtom(display, "_NET_WM_STATE", true);
-				Atom WMFullscreenAtom = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", true);
-
-				XEvent xev = {0}; // The event should be filled with zeros before setting its attributes
-				xev.type = ClientMessage;
-				xev.xclient.window = window;
-				xev.xclient.message_type = WMStateAtom;
-				xev.xclient.format = 32;
-				xev.xclient.data.l[0] = 1;
-				xev.xclient.data.l[1] = WMFullscreenAtom;
-				XSendEvent(display, RootWindow(display, visual->screen), false, 
-							SubstructureRedirectMask | SubstructureNotifyMask, &xev);
-
-				XFlush(display);
-				
-				// Wait until window state is already changed to fullscreen
-				bool fullscreen = false;
-				for (int i = 0; i < 500; i++)
-				{
-					Atom type;
-					int format;
-					unsigned long numItems, bytesAfter;
-					Atom* atoms = NULL;
-
-					int s = XGetWindowProperty(display, window, WMStateAtom,
-											0l, 1024, False, XA_ATOM, &type, 
-											&format,  &numItems, &bytesAfter, 
-											(unsigned char**)&atoms);
-
-					if (s == Success) 
-					{
-						for (unsigned int i = 0; i < numItems; ++i) 
-						{
-							if (atoms[i] == WMFullscreenAtom) 
-							{
-								fullscreen = true;
-								break;
-							}
-						}
-						
-						XFree(atoms);
-					}
-					
-					if (fullscreen == true)
-						break;
-					
-					usleep(1000);
-				}
-					
-				if (!fullscreen)
-				{
-					os::Printer::log("Warning! Got timeout while checking fullscreen sate", ELL_WARNING);
-				}        
+				WMStateAtom1 = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", true);
 			}
 			else
 			{
-				XSetInputFocus(display, window, RevertToParent, CurrentTime);
-				int grabKb = XGrabKeyboard(display, window, True, GrabModeAsync,
-					GrabModeAsync, CurrentTime);
-				IrrPrintXGrabError(grabKb, "XGrabKeyboard");
-				int grabPointer = XGrabPointer(display, window, True, ButtonPressMask,
-					GrabModeAsync, GrabModeAsync, window, None, CurrentTime);
-				IrrPrintXGrabError(grabPointer, "XGrabPointer");
-				XWarpPointer(display, None, window, 0, 0, 0, 0, 0, 0);
+				WMStateAtom1 = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_HORZ", true);
+				WMStateAtom2 = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_VERT", true);
 			}
+			
+			XEvent xev = {0}; // The event should be filled with zeros before setting its attributes
+			xev.type = ClientMessage;
+			xev.xclient.window = window;
+			xev.xclient.message_type = WMStateAtom;
+			xev.xclient.format = 32;
+			xev.xclient.data.l[0] = 1;
+			xev.xclient.data.l[1] = WMStateAtom1;
+			xev.xclient.data.l[2] = WMStateAtom2;
+			
+			XSendEvent(display, RootWindow(display, visual->screen), false, 
+						SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+
+			XFlush(display);
+			
+			// Wait until window state is already changed
+			bool changed = false;
+			for (int i = 0; i < 500; i++)
+			{
+				Atom type;
+				int format;
+				unsigned long numItems, bytesAfter;
+				Atom* atoms = NULL;
+
+				int s = XGetWindowProperty(display, window, WMStateAtom,
+										0l, 1024, False, XA_ATOM, &type, 
+										&format,  &numItems, &bytesAfter, 
+										(unsigned char**)&atoms);
+
+				if (s == Success) 
+				{
+					for (unsigned int i = 0; i < numItems; ++i) 
+					{
+						if (atoms[i] == WMStateAtom1) 
+						{
+							changed = true;
+							break;
+						}
+					}
+					
+					XFree(atoms);
+				}
+				
+				if (changed == true)
+					break;
+				
+				usleep(1000);
+			}
+				
+			if (!changed)
+			{
+				os::Printer::log("Warning! Got timeout when changing window state", ELL_WARNING);
+			}        
+		}
+			
+		if (!netWM && CreationParams.Fullscreen)
+		{
+			XSetInputFocus(display, window, RevertToParent, CurrentTime);
+			int grabKb = XGrabKeyboard(display, window, True, GrabModeAsync,
+				GrabModeAsync, CurrentTime);
+			IrrPrintXGrabError(grabKb, "XGrabKeyboard");
+			int grabPointer = XGrabPointer(display, window, True, ButtonPressMask,
+				GrabModeAsync, GrabModeAsync, window, None, CurrentTime);
+			IrrPrintXGrabError(grabPointer, "XGrabPointer");
+			XWarpPointer(display, None, window, 0, 0, 0, 0, 0, 0);
 		}
 	}
 	else

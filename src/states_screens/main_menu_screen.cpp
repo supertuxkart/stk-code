@@ -68,8 +68,6 @@
 using namespace GUIEngine;
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( MainMenuScreen );
-
 bool MainMenuScreen::m_enable_online = false;
 
 // ----------------------------------------------------------------------------
@@ -123,6 +121,7 @@ void MainMenuScreen::init()
     assert(m_user_id);
 
     // reset in case we're coming back from a race
+    NetworkConfig::get()->cleanNetworkPlayers();
     StateManager::get()->resetActivePlayers();
     input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
     input_manager->getDeviceManager()->setSinglePlayer( NULL );
@@ -148,8 +147,6 @@ void MainMenuScreen::init()
         w->resetAllBadges();
         w->setBadge(LOADING_BADGE);
     }
-
-    IconButtonWidget* online = getWidget<IconButtonWidget>("online");
 
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
@@ -321,18 +318,11 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         parts.push_back("featunlocked");
         ((CutsceneWorld*)World::getWorld())->setParts(parts);
 
-        scene->addTrophy(RaceManager::DIFFICULTY_EASY);
+        scene->addTrophy(RaceManager::DIFFICULTY_EASY, false);
 
         if (selection == "test_unlocked")
         {
-            // the passed kart will not be modified, that's why I allow myself
-            // to use const_cast
-            scene->addUnlockedKart(
-                                   const_cast<KartProperties*>(
-                                        kart_properties_manager->getKart("tux")
-                                                              ),
-                                    L"You unlocked <actual text would go here...>"
-                                   );
+            scene->addUnlockedKart(kart_properties_manager->getKart("tux"));
             scene->addUnlockedTrack(track_manager->getTrack("lighthouse"));
             scene->push();
         }
@@ -494,21 +484,22 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "online")
     {
+        if(UserConfigParams::m_internet_status!=RequestManager::IPERM_ALLOWED)
+        {
+            new MessageDialog(_("You can not play online without internet access. "
+                                "If you want to play online, go to options, select "
+                                " tab 'User Interface', and edit "
+                                "\"Connect to the Internet\"."));
+            return;
+        }
+        // Define this to require a login to the stk server (default behaviour)
+        // Undefine for testing LAN only.
         if (MainMenuScreen::m_enable_online)
         {
             OnlineScreen::getInstance()->push();
         }
         else
         {
-            if (UserConfigParams::m_internet_status != RequestManager::IPERM_ALLOWED)
-            {
-                new MessageDialog(_("You can not play online without internet access. "
-                    "If you want to play online, go to options, select "
-                    " tab 'User Interface', and edit "
-                    "\"Connect to the Internet\"."));
-                return;
-            }
-
             if (PlayerManager::getCurrentOnlineId())
             {
                 ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());

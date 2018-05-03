@@ -44,6 +44,9 @@ void CheckBoxWidget::add()
     m_id = m_element->getID();
     m_element->setTabOrder(m_id);
     m_element->setTabGroup(false);
+
+    if (!m_is_visible)
+        m_element->setVisible(false);
 }
 // -----------------------------------------------------------------------------
 EventPropagation CheckBoxWidget::transmitEvent(Widget* w,

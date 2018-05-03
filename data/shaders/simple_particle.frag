@@ -1,16 +1,16 @@
 uniform sampler2D tex;
 uniform sampler2D dtex;
+uniform float billboard;
 
 in vec2 tc;
 in vec4 pc;
-flat in float billboard_mix;
 out vec4 FragColor;
 
 #stk_include "utils/getPosFromUVDepth.frag"
 
 void main(void)
 {
-    float billboard_alpha = mix(1.0, texture(tex, tc).a, billboard_mix);
+    float billboard_alpha = mix(1.0, texture(tex, tc).a, billboard);
 #if defined(Advanced_Lighting_Enabled)
     vec2 xy = gl_FragCoord.xy / u_screen;
     float FragZ = gl_FragCoord.z;

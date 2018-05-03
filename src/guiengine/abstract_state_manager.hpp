@@ -59,11 +59,11 @@ namespace GUIEngine
 
         /**
          *  This stack will contain menu names (e.g. main.stkgui),
-         *  and/or 'race'.
+         *  and/or 'race' with screen instance pointer.
          */
-        std::vector<std::string> m_menu_stack;
+        std::vector<std::pair<std::string, Screen*>  > m_menu_stack;
 
-        void pushMenu(std::string name);
+        void pushMenu(Screen* screen);
 
         void setGameState(GameState state);
 
@@ -133,10 +133,10 @@ namespace GUIEngine
 
             T* instance = T::getInstance();
 
-            m_menu_stack.push_back(instance->getName());
+            m_menu_stack.emplace_back(instance->getName(), instance);
             setGameState(MENU);
 
-            switchToScreen(instance->getName().c_str());
+            switchToScreen(instance);
             getCurrentScreen()->init();
 
             onTopMostScreenChanged();

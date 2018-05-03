@@ -109,6 +109,14 @@ private:
                                 float min_ratio, int meter_width,
                                 int meter_height, float dt);
 
+    /* Helper functions for drawing meters */
+
+    void drawMeterTexture(video::ITexture *meter_texture, video::S3DVertex vertices[], unsigned int count);
+
+    unsigned int computeVerticesForMeter(core::vector2df position[], float threshold[], video::S3DVertex vertices[],
+                                         unsigned int vertices_count, float measure, int gauge_width,
+                                         int gauge_height, core::vector2df offset);
+
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
     void drawGlobalTimer       ();

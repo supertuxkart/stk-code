@@ -1,16 +1,16 @@
-flat in float hue_change;
-
+in vec3 bitangent;
 in vec4 color;
+in float hue_change;
+in vec3 normal;
+in vec3 tangent;
 in vec2 uv;
 
 layout(location = 0) out vec4 o_diffuse_color;
-layout(location = 1) out vec3 o_normal_depth;
-layout(location = 2) out vec2 o_gloss_map;
+layout(location = 1) out vec4 o_normal_color;
 
 #stk_include "utils/encode_normal.frag"
 #stk_include "utils/rgb_conversion.frag"
 #stk_include "utils/sp_texture_sampling.frag"
-#stk_include "utils/sp_normalMapOutput.frag"
 
 void main()
 {
@@ -33,11 +33,23 @@ void main()
     }
 
     vec3 final_color = col.xyz * color.xyz;
-    o_diffuse_color = vec4(final_color, 1.0);
 
 #if defined(Advanced_Lighting_Enabled)
-    vec4 layer_3 = sampleTextureLayer3(uv);
     vec4 layer_2 = sampleTextureLayer2(uv);
-    outputNormalMapPbrData(layer_3.rgb, layer_2.rgb);
+    vec4 layer_3 = sampleTextureLayer3(uv);
+    o_diffuse_color = vec4(final_color, layer_2.z);
+
+    vec3 tangent_space_normal = 2.0 * layer_3.xyz - 1.0;
+    vec3 frag_tangent = normalize(tangent);
+    vec3 frag_bitangent = normalize(bitangent);
+    vec3 frag_normal = normalize(normal);
+    mat3 t_b_n = mat3(frag_tangent, frag_bitangent, frag_normal);
+
+    vec3 world_normal = t_b_n * tangent_space_normal;
+
+    o_normal_color.xy = 0.5 * EncodeNormal(normalize(world_normal)) + 0.5;
+    o_normal_color.zw = layer_2.xy;
+#else
+    o_diffuse_color = vec4(final_color, 1.0);
 #endif
 }

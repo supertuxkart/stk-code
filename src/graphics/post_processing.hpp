@@ -20,7 +20,6 @@
 
 #include "graphics/gl_headers.hpp"
 
-#include <IReferenceCounted.h>
 #include <S3DVertex.h>
 #include <matrix4.h>
 #include <vector>
@@ -40,7 +39,7 @@ using namespace irr;
 /** \brief   Handles post processing, eg motion blur
  *  \ingroup graphics
  */
-class PostProcessing: public IReferenceCounted
+class PostProcessing
 {
 private:
     /** Boost time, how long the boost should be displayed. This also
@@ -48,17 +47,11 @@ private:
      *  have a stronger effect. */
     std::vector<float>  m_boost_time;
 
-    struct Quad { video::S3DVertex v0, v1, v2, v3; };
-
-    /** The vertices for the rectangle used for each camera. This includes
-     *  the vertex position, normal, and texture coordinate. */
-    std::vector<Quad> m_vertices;
-
     STKTexture* m_areamap;
 
 public:
-                 PostProcessing(video::IVideoDriver* video_driver);
-    virtual     ~PostProcessing();
+                 PostProcessing();
+    virtual     ~PostProcessing() {}
 
     void         reset();
     /** Those should be called around the part where we render the scene to be
@@ -88,7 +81,7 @@ public:
     void renderDoF(const FrameBuffer &framebuffer, GLuint color_texture, GLuint depth_stencil_texture);
     void renderGodRays(scene::ICameraSceneNode * const camnode,
                        const FrameBuffer &in_fbo,
-                       const FrameBuffer &out_fbo,
+                       const FrameBuffer &tmp_fbo,
                        const FrameBuffer &quarter1_fbo,
                        const FrameBuffer &quarter2_fbo);
 
@@ -96,13 +89,10 @@ public:
                    const FrameBuffer& mlaa_blend_framebuffer,
                    const FrameBuffer& mlaa_colors_framebuffer);
 
-    void renderMotionBlur(unsigned cam, const FrameBuffer &in_fbo,
+    void renderMotionBlur(const FrameBuffer &in_fbo,
                           FrameBuffer &out_fbo,
                           GLuint depth_stencil_texture);
-    void renderGlow(const FrameBuffer& glow_framebuffer,
-                    const FrameBuffer& half_framebuffer,
-                    const FrameBuffer& quarter_framebuffer,
-                    const FrameBuffer& color_framebuffer) const;
+    void renderGlow(const FrameBuffer& quarter_framebuffer) const;
     void renderLightning(core::vector3df intensity);
 
     /** Use motion blur for a short time */

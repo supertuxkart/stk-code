@@ -1,19 +1,24 @@
 <?xml version="1.0"?>
-<challenge version="2">
+<challenge version="3">
+    <unlock_list list="false"/>
     <track id="mines" laps="3"/>
     <mode major="single" minor="quickrace"/>
-    <requirements trophies="150"/>
+    <requirements trophies="140"/>
      
+    <best>
+        <karts number="10"/>
+        <requirements position="1" time="140"/>
+    </best>
     <hard>
-        <karts number="4"/>
-        <requirements time="170"/>
+        <karts number="9"/>
+        <requirements position="1" time="160"/>
     </hard>
     <medium>
-        <karts number="4"/>
-        <requirements time="190"/>
+        <karts number="8"/>
+        <requirements position="2" time="190"/>
     </medium>
     <easy>
-        <karts number="4"/>
+        <karts number="7"/>
         <requirements time="255"/>
     </easy>
 </challenge>

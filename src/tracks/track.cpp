@@ -1185,11 +1185,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         scene::CBatchingMesh *merged_mesh = new scene::CBatchingMesh();
         merged_mesh->addMesh(mesh);
         merged_mesh->finalize();
-#ifndef SERVER_ONLY
         tangent_mesh = merged_mesh;
-#else
-        tangent_mesh = merged_mesh;
-#endif
         // The reference count of the mesh is 1, since it is in irrlicht's
         // cache. So we only have to remove it from the cache.
         irr_driver->removeMeshFromCache(mesh);
@@ -1198,9 +1194,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     {
         // SPM does the combine for you
         tangent_mesh = mesh;
-#ifndef SERVER_ONLY
         tangent_mesh->grab();
-#endif
     }
     // The merged mesh is grabbed by the octtree, so we don't need
     // to keep a reference to it.
@@ -1527,24 +1521,35 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
 }   // handleAnimatedTextures
 
 // ----------------------------------------------------------------------------
-/** Update, called once per frame.
+/** This updates all only graphical elements. It is only called once per
+ *  rendered frame, not once per time step.
+ *  float dt Time since last rame.
+ */
+void Track::updateGraphics(float dt)
+{
+    m_track_object_manager->updateGraphics(dt);
+
+    for (unsigned int i = 0; i<m_animated_textures.size(); i++)
+    {
+        m_animated_textures[i]->update(dt);
+    }
+}   // updateGraphics
+
+// ----------------------------------------------------------------------------
+/** Update, called once per physics time step.
  *  \param dt Timestep.
  */
-void Track::update(float dt)
+void Track::update(int ticks)
 {
     if (!m_startup_run) // first time running update = good point to run startup script
     {
         Scripting::ScriptEngine::getInstance()->runFunction(false, "void onStart()");
         m_startup_run = true;
     }
+    float dt = stk_config->ticks2Time(ticks);
     m_track_object_manager->update(dt);
-
-    for(unsigned int i=0; i<m_animated_textures.size(); i++)
-    {
-        m_animated_textures[i]->update(dt);
-    }
     CheckManager::get()->update(dt);
-    ItemManager::get()->update(dt);
+    ItemManager::get()->update(ticks);
 
     // TODO: enable onUpdate scripts if we ever find a compelling use for them
     //Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();

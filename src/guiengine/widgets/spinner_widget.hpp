@@ -79,7 +79,7 @@ namespace GUIEngine
         /** \brief Keeps track of the custom text in spinner (a text which isn't related to a value)
         *   to remember it and set it back (example : when we deactivate the widget)
         */
-        core::stringw m_customText;
+        core::stringw m_custom_text;
         
         /** \brief implementing method from base class Widget */
         virtual EventPropagation transmitEvent(Widget* w,
@@ -197,6 +197,7 @@ namespace GUIEngine
 
         /** Display custom text in spinner */
         void setCustomText(const core::stringw& text);
+        const core::stringw& getCustomText() const { return m_custom_text; }
     };
 
 }

@@ -21,6 +21,7 @@
 #include "io/file_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
+#include "scriptengine/aswrappedcall.hpp"
 #include "scriptengine/script_audio.hpp"
 #include "scriptengine/script_challenges.hpp"
 #include "scriptengine/script_kart.hpp"
@@ -527,6 +528,12 @@ namespace Scripting
     {
         m_time = time;
         m_callback_delegate = callback_delegate;
+        
+        // This may be not needed in future angelscript versions
+        if (strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY"))
+        {
+            callback_delegate->AddRef();
+        }
     }
 
     //-----------------------------------------------------------------------------
@@ -555,8 +562,9 @@ namespace Scripting
 
     //-----------------------------------------------------------------------------
 
-    void ScriptEngine::update(double dt)
+    void ScriptEngine::update(int ticks)
     {
+        double dt = stk_config->ticks2Time(ticks);
         for (int i = m_pending_timeouts.size() - 1; i >= 0; i--)
         {
             PendingTimeout& curr = m_pending_timeouts[i];

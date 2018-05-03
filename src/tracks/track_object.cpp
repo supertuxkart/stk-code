@@ -521,10 +521,28 @@ void TrackObject::resetEnabled()
     {
         m_movable_children[i]->resetEnabled();
     }
-}
+}   // resetEnabled
 
 // ----------------------------------------------------------------------------
+/** This updates all only graphical elements. It is only called once per
+ *  rendered frame, not once per time step.
+ *  float dt Time since last rame.
+ */
+void TrackObject::updateGraphics(float dt)
+{
 
+    // FIXME: At this stage neither m_presentation nor m_animator
+    // have been converted to use separate updateGraphics() calls.
+
+    if (m_physical_object) m_physical_object->updateGraphics(dt);
+
+}   // update
+
+// ----------------------------------------------------------------------------
+/** This updates all only graphical elements. It is only called once per
+ *  rendered frame, not once per time step.
+ *  float dt Time since last rame.
+ */
 void TrackObject::update(float dt)
 {
     if (m_presentation) m_presentation->update(dt);
@@ -533,7 +551,6 @@ void TrackObject::update(float dt)
 
     if (m_animator) m_animator->update(dt);
 }   // update
-
 
 // ----------------------------------------------------------------------------
 /** Does a raycast against the track object. The object must have a physical
@@ -580,7 +597,8 @@ void TrackObject::move(const core::vector3df& xyz, const core::vector3df& hpr,
 
 // ----------------------------------------------------------------------------
 
-void TrackObject::movePhysicalBodyToGraphicalNode(const core::vector3df& xyz, const core::vector3df& hpr)
+void TrackObject::movePhysicalBodyToGraphicalNode(const core::vector3df& xyz,
+                                                  const core::vector3df& hpr)
 {
     // If we set a bullet position from an irrlicht position, we need to
     // get the absolute transform from the presentation object (as set in
@@ -598,7 +616,7 @@ void TrackObject::movePhysicalBodyToGraphicalNode(const core::vector3df& xyz, co
     {
         m_physical_object->move(xyz, hpr);
     }
-}
+}   // movePhysicalBodyToGraphicalNode
 
 // ----------------------------------------------------------------------------
 const core::vector3df& TrackObject::getPosition() const
@@ -618,7 +636,6 @@ const core::vector3df TrackObject::getAbsoluteCenterPosition() const
     else
         return m_init_xyz;
 }   // getAbsolutePosition
-
 
 // ----------------------------------------------------------------------------
 

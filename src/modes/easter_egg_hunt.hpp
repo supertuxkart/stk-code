@@ -57,7 +57,7 @@ public:
 
     virtual const std::string& getIdent() const OVERRIDE;
     virtual void terminateRace() OVERRIDE;
-    virtual void update(float dt) OVERRIDE;
+    virtual void update(int ticks) OVERRIDE;
     virtual void getKartsDisplayInfo(
                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
 

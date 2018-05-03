@@ -207,7 +207,7 @@ private:
 
     void  load              (const std::string &filename,
                              const std::string &node);
-    void combineCharacteristics();
+    void combineCharacteristics(PerPlayerDifficulty d);
 
 public:
     /** Returns the string representation of a per-player difficulty. */
@@ -215,7 +215,8 @@ public:
 
           KartProperties    (const std::string &filename="");
          ~KartProperties    ();
-    void  copyForPlayer     (const KartProperties *source);
+    void  copyForPlayer     (const KartProperties *source,
+                             PerPlayerDifficulty d = PLAYER_DIFFICULTY_NORMAL);
     void  copyFrom          (const KartProperties *source);
     void  getAllData        (const XMLNode * root);
     void  checkAllSet       (const std::string &filename);
@@ -353,11 +354,6 @@ public:
     const std::string& getKartDir   () const {return m_root;                  }
 
     // ------------------------------------------------------------------------
-    /** Returns minimum time during which nitro is consumed when pressing nitro
-     *  key, to prevent using nitro in very short bursts
-     */
-    float getNitroMinConsumptionTime() const { return m_nitro_min_consumption; }
-    // ------------------------------------------------------------------------
     /** Returns the bevel factor (!=0 indicates to use a bevelled box). */
     const Vec3 &getBevelFactor() const { return m_bevel_factor; }
     // ------------------------------------------------------------------------
@@ -427,8 +423,8 @@ public:
     float getAnvilSpeedFactor() const;
 
     float getParachuteFriction() const;
-    float getParachuteDuration() const;
-    float getParachuteDurationOther() const;
+    int   getParachuteDuration() const;
+    int   getParachuteDurationOther() const;
     float getParachuteDurationRankMult() const;
     float getParachuteDurationSpeedMult() const;
     float getParachuteLboundFraction() const;
@@ -440,7 +436,7 @@ public:
     float getBubblegumDuration() const;
     float getBubblegumSpeedFraction() const;
     float getBubblegumTorque() const;
-    float getBubblegumFadeInTime() const;
+    int   getBubblegumFadeInTicks() const;
     float getBubblegumShieldDuration() const;
 
     float getZipperDuration() const;
@@ -458,7 +454,7 @@ public:
     float getPlungerBandForce() const;
     float getPlungerBandDuration() const;
     float getPlungerBandSpeedIncrease() const;
-    float getPlungerBandFadeOutTime() const;
+    int   getPlungerBandFadeOutTicks() const;
     float getPlungerInFaceTime() const;
 
     std::vector<float> getStartupTime() const;
@@ -480,16 +476,20 @@ public:
     float getNitroMaxSpeedIncrease() const;
     float getNitroFadeOutTime() const;
     float getNitroMax() const;
+    int   getNitroMinConsumptionTicks() const;
+    // ------------------------------------------------------------------------
 
-    float getSlipstreamDuration() const;
+    float getSlipstreamDurationFactor() const;
+    float getSlipstreamBaseSpeed() const;
     float getSlipstreamLength() const;
     float getSlipstreamWidth() const;
-    float getSlipstreamCollectTime() const;
-    float getSlipstreamUseTime() const;
+    float getSlipstreamInnerFactor() const;
+    float getSlipstreamMinCollectTime() const;
+    float getSlipstreamMaxCollectTime() const;
     float getSlipstreamAddPower() const;
     float getSlipstreamMinSpeed() const;
     float getSlipstreamMaxSpeedIncrease() const;
-    float getSlipstreamFadeOutTime() const;
+    int getSlipstreamFadeOutTicks() const;
 
     float getSkidIncrease() const;
     float getSkidDecrease() const;

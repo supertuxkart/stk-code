@@ -23,6 +23,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "input/gamepad_android_config.hpp"
 #include "input/gamepad_device.hpp"
 #include "input/keyboard_device.hpp"
 #include "input/multitouch_device.hpp"
@@ -80,8 +81,27 @@ bool DeviceManager::initialize()
         if(UserConfigParams::logMisc())
             Log::info("Device manager","No keyboard configuration exists, creating one.");
         m_keyboard_configs.push_back(new KeyboardConfig());
+        
         created = true;
     }
+    
+#ifdef ANDROID
+    bool has_gamepad_android_config = false;
+    
+    for (unsigned int i = 0; i < m_keyboard_configs.size(); i++)
+    {
+        if (m_keyboard_configs[i].isGamePadAndroid())
+        {
+            has_gamepad_android_config = true;
+        }
+    }
+    
+    if (!has_gamepad_android_config)
+    {
+        m_keyboard_configs.push_back(new GamepadAndroidConfig());
+        created = true;
+    }
+#endif
 
     const int keyboard_amount = m_keyboard_configs.size();
     for (int n = 0; n < keyboard_amount; n++)
@@ -439,6 +459,8 @@ void DeviceManager::updateMultitouchDevice()
     {
         m_multitouch_device->setPlayer(NULL);
     }
+    
+    m_multitouch_device->updateController();
 }   // updateMultitouchDevice
 
 //-----------------------------------------------------------------------------
@@ -568,12 +590,13 @@ bool DeviceManager::load()
                       config->getName().c_str());
             continue;
         }
-        if(config->getName()=="keyboard")
+        if (config->getName() == "keyboard" ||
+            config->getName() == "gamepad_android")
         {
             KeyboardConfig *kc = static_cast<KeyboardConfig*>(device_config);
             m_keyboard_configs.push_back(kc);
         }
-        else if (config->getName()=="gamepad")
+        else if (config->getName() == "gamepad")
         {
             GamepadConfig *gc = static_cast<GamepadConfig*>(device_config);
             m_gamepad_configs.push_back(gc);
@@ -619,6 +642,18 @@ void DeviceManager::save()
 
 
     configfile << "<input version=\"" << INPUT_FILE_VERSION << "\">\n\n";
+
+    configfile << "<!--\n"
+        << "Event 1 : Keyboard button press\n"
+        << "    'id' indicates which button, as defined by irrlicht's EKEY_CODE enum\n"
+        << "    'character' contains the associated unicode character.\n"
+        << "        Only used as fallback when displaying special characters in the UI.\n"
+        << "Event 2 : Gamepad stick motion\n"
+        << "    'id' indicates which stick, starting from 0\n"
+        << "    'direction' 0 means negative, 1 means positive\n"
+        << "Event 3 : Gamepad button press\n"
+        << "    'id' indicates which button, starting from 0\n"
+        << "-->\n\n";
 
     for(unsigned int n=0; n<m_keyboard_configs.size(); n++)
     {

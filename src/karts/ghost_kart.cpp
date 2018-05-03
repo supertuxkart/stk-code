@@ -69,15 +69,30 @@ void GhostKart::addReplayEvent(float time,
 }   // addReplayEvent
 
 // ----------------------------------------------------------------------------
+/** Called once per rendered frame. It is used to only update any graphical
+ *  effects.
+ *  \param dt Time step size (since last call).
+ */
+void GhostKart::updateGraphics(float dt)
+{
+    Vec3 center_shift(0, m_graphical_y_offset, 0);
+    center_shift = getTrans().getBasis() * center_shift;
+
+    // Don't call Kart's updateGraphics, since it assumes physics. Instead
+    // immediately call Moveable's updateGraphics.
+    Moveable::updateGraphics(dt, center_shift, btQuaternion(0, 0, 0, 1));
+}   // updateGraphics
+
+// ----------------------------------------------------------------------------
 /** Updates the current event of the ghost kart using interpolation
  *  \param dt Time step size.
  */
-void GhostKart::update(float dt)
+void GhostKart::update(int ticks)
 {
     GhostController* gc = dynamic_cast<GhostController*>(getController());
     if (gc == NULL) return;
 
-    gc->update(dt);
+    gc->update(ticks);
     if (gc->isReplayEnd())
     {
         m_node->setVisible(false);
@@ -109,12 +124,8 @@ void GhostKart::update(float dt)
         .slerp(m_all_transform[idx + 1].getRotation(), rd);
     setRotation(q);
 
-    Vec3 center_shift(0, 0, 0);
-    center_shift.setY(m_graphical_y_offset);
-    center_shift = getTrans().getBasis() * center_shift;
-
-    Moveable::updateGraphics(dt, center_shift, btQuaternion(0, 0, 0, 1));
     Moveable::updatePosition();
+    float dt = stk_config->ticks2Time(ticks);
     getKartModel()->update(dt, dt*(m_all_physic_info[idx].m_speed),
         m_all_physic_info[idx].m_steer, m_all_physic_info[idx].m_speed,
         /*lean*/0.0f, idx);

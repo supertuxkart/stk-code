@@ -46,8 +46,6 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( OptionsScreenInput );
-
 // -----------------------------------------------------------------------------
 
 OptionsScreenInput::OptionsScreenInput() : Screen("options_input.stkgui")
@@ -89,15 +87,26 @@ void OptionsScreenInput::buildDeviceList()
 
     for (int i=0; i<keyboard_config_count; i++)
     {
-        //KeyboardConfig *config = input_manager->getDeviceList()->getKeyboardConfig(i);
-
+        KeyboardConfig *config = device_manager->getKeyboardConfig(i);
+        
         std::ostringstream kbname;
         kbname << "keyboard" << i;
         const std::string internal_name = kbname.str();
-
-        // since irrLicht's list widget has the nasty tendency to put the
-        // icons very close to the text, I'm adding spaces to compensate.
-        devices->addItem(internal_name, (core::stringw("   ") + _("Keyboard %i", i)).c_str(), 0 /* icon */);
+        
+        if (config->isGamePadAndroid())
+        {
+            // since irrLicht's list widget has the nasty tendency to put the
+            // icons very close to the text, I'm adding spaces to compensate.
+            devices->addItem(internal_name, (core::stringw("   ") + 
+                             _("Gamepad")).c_str(), 1 /* icon */);
+        }
+        else
+        {
+            // since irrLicht's list widget has the nasty tendency to put the
+            // icons very close to the text, I'm adding spaces to compensate.
+            devices->addItem(internal_name, (core::stringw("   ") + 
+                             _("Keyboard %i", i)).c_str(), 0 /* icon */);
+        }
     }
 
     const int gpad_config_count = device_manager->getGamePadConfigAmount();
