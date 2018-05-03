@@ -34,7 +34,6 @@
 #include "tracks/drive_node.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
-#include "utils/vec3.hpp"
 
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
@@ -47,11 +46,11 @@ void ItemState::setDisappearCounter()
     switch (m_type)
     {
     case ITEM_BUBBLEGUM:
-        m_disappear_counter = stk_config->m_bubblegum_counter; break;
+        m_used_up_counter = stk_config->m_bubblegum_counter; break;
     case ITEM_EASTER_EGG:
-        m_disappear_counter = -1; break;
+        m_used_up_counter = -1; break;
     default:
-        m_disappear_counter = -1;
+        m_used_up_counter = -1;
     }   // switch
 }   // setDisappearCounter
     
@@ -62,18 +61,18 @@ void ItemState::setDisappearCounter()
 void ItemState::update(int ticks)
 {
     if (m_deactive_ticks > 0) m_deactive_ticks -= ticks;
-    if (m_collected)
+    if (m_ticks_till_return>0)
     {
         m_ticks_till_return -= ticks;
-        if (m_ticks_till_return<=0) m_collected = false;
     }   // if collected
 
 }   // update
 
 // ----------------------------------------------------------------------------
+/** Called when the item is collected.
+ */
 void ItemState::collected(float t, const AbstractKart *kart)
 {
-    m_collected = true;
     if (m_type == ITEM_EASTER_EGG)
     {
         m_ticks_till_return = stk_config->time2Ticks(99999);
@@ -81,9 +80,9 @@ void ItemState::collected(float t, const AbstractKart *kart)
         assert(world);
         world->collectedEasterEgg(kart);
     }
-    else if (m_type == ITEM_BUBBLEGUM && m_disappear_counter > 0)
+    else if (m_used_up_counter > 0)
     {
-        m_disappear_counter--;
+        m_used_up_counter--;
         // Deactivates the item for a certain amount of time. It is used to
         // prevent bubble gum from hitting a kart over and over again (in each
         // frame) by giving it time to drive away.
@@ -94,8 +93,6 @@ void ItemState::collected(float t, const AbstractKart *kart)
     }
     else
     {
-        // Note if the time is negative, in update the m_collected flag will
-        // be automatically set to false again.
         m_ticks_till_return = stk_config->time2Ticks(t);
     }
 
@@ -353,8 +350,7 @@ void Item::update(int ticks)
         m_node->setScale(core::vector3df(1, 1, 1)*(1 - t));
     }
     if(isAvailable())
-    {   // not m_collected
-
+    { 
         if(!m_rotate || m_node == NULL) return;
         // have it rotate
         if (!RewindManager::get()->isRewinding())
@@ -373,7 +369,7 @@ void Item::update(int ticks)
         hpr.setHPR(r);
         m_node->setRotation(hpr.toIrrHPR());
         return;
-    }   // not m_collected
+    }   // if item is available
 }   // update
 
 //-----------------------------------------------------------------------------

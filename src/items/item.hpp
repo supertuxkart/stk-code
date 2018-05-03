@@ -99,10 +99,9 @@ private:
     *  It is ITEM_NONE if the item is not switched. */
     ItemType m_original_type;
 
-    /** True if item was collected & is not displayed. */
-    bool m_collected;
-
-    /** Time till a collected item reappears. */
+    /** Time till a collected item reappears. When this value is <=0 this
+     *  means that the item is availabe to be collected. When the value is
+     *  > 0 it means that the item is not available. */
     int m_ticks_till_return;
 
     /** Index in item_manager field. */
@@ -115,8 +114,9 @@ private:
     /** Counts how often an item is used before it disappears. Used for
      *  bubble gum to make them disappear after a while. A value >0
      *  indicates that the item still exists, =0 that the item can be
-     *  deleted, and <0 that the item will never be deleted. */
-    int m_disappear_counter;
+     *  deleted, and <0 that the item will never be deleted, i.e. it 
+     *  will always reappear after a while. */
+    int m_used_up_counter;
 
 public:
          /** Constructor. */
@@ -134,7 +134,6 @@ public:
     {
         m_deactive_ticks    = 0;
         m_ticks_till_return = 0;
-        m_collected         = false;
         setDisappearCounter();
         // If the item was switched:
         if (m_original_type != ITEM_NONE)
@@ -155,7 +154,6 @@ public:
         m_deactive_ticks    = 0;
         m_ticks_till_return = 0;
         m_item_id           = -1;
-        m_collected         = false;
         setDisappearCounter();
     }   // initItem
 
@@ -212,9 +210,6 @@ public:
     /** Returns true if this item is currently collected. */
     bool isAvailable() const { return m_ticks_till_return <= 0; }
     // ------------------------------------------------------------------------
-    /** Useless function ;) But it makes some conditionals easier to read. */
-    bool isUnavailable() const { return m_collected; }
-    // ------------------------------------------------------------------------
     /** Returns the type of this item. */
     ItemType getType() const { return m_type; }
     // ------------------------------------------------------------------------
@@ -227,11 +222,11 @@ public:
     unsigned int getItemId() const { return m_item_id; }
     // ------------------------------------------------------------------------
     /** Returns true if this item is used up and can be removed. */
-    bool isUsedUp() const { return m_disappear_counter == 0; }
+    bool isUsedUp() const { return m_used_up_counter == 0; }
     // ------------------------------------------------------------------------
     /** Returns true if this item can be used up, and therefore needs to
      *  be removed when the game is reset. */
-    bool canBeUsedUp()  const { return m_disappear_counter>-1; }
+    bool canBeUsedUp()  const { return m_used_up_counter>-1; }
     // ------------------------------------------------------------------------
     /** Returns the number of ticks during which the item is deactivated (i.e.
      *  it was collected). */
