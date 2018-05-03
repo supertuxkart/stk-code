@@ -42,7 +42,7 @@ public:
     /** All particle effects supported by this object.
      *  Nitro, zipper, terrain, and skidding effects.  Three different
      *  skid types are supported, but only one emitter node will be
-     *  created. So KGFX_SKID1/2 store the two types, and KGFX_SKID
+     *  created. So KGFX_SKID1/2/3 store the two types, and KGFX_SKID
      *  = KGFX_SKID1 stores the actual emitter node. KGFX_COUNT
      *  is the number of entries and must therefore be last. */
     enum KartGFXType { KGFX_NITRO1=0,
