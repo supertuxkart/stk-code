@@ -368,9 +368,6 @@ void Skidding::update(int ticks, bool is_on_ground,
             // Some karts might use a graphical-only jump. Set it up:
             m_remaining_jump_time = kp->getSkidGraphicalJumpTime();
 
-            // Don't "play-sound-than-pause-sound-when-jumping-then-play-sound-when-jump-done"
-            m_gfx_jump_offset = 0.001f;
-
 #ifdef SKID_DEBUG
 #define SPEED 20.0f
             m_real_steering = updateSteering(steering, dt);
