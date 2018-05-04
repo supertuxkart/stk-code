@@ -247,11 +247,16 @@ void KartGFX::setSkidLevel(const unsigned int level)
     assert(level <= 2);
     m_skid_level = level;
     const ParticleKind *pk;
-    if (level == 0) {
+    if (level == 0)
+    {
         pk = m_skid_kind0;
-    } else if (level == 1) {
+    }
+    else if (level == 1)
+    {
         pk = m_skid_kind1;
-    } else {
+    }
+    else
+    {
         pk = m_skid_kind2;
     }
 //    const ParticleKind *pk = level==1 ? m_skid_kind1 : m_skid_kind2;
