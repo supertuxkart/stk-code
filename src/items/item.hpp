@@ -254,10 +254,10 @@ private:
      *  (bubble gums don't rotate, but it will be replaced with
      *  a nitro which rotates, and so overwrites the original
      *  rotation). */
-    btQuaternion  m_original_rotation;
+    btQuaternion m_original_rotation;
 
     /** Used when rotating the item */
-    float         m_rotation_angle;
+    float m_rotation_angle;
 
     /** Scene node of this item. */
     LODNode *m_node;
@@ -268,31 +268,34 @@ private:
 
     /** The original position - saves calls to m_node->getPosition()
      * and then converting this value to a Vec3. */
-    Vec3          m_xyz;
+    Vec3 m_xyz;
 
     /** Set to false if item should not rotate. */
-    bool          m_rotate;
+    bool m_rotate;
+
+    /** Stores if the item was available in the previously rendered frame. */
+    bool m_was_available_previously;
 
     /** Optionally set this if this item was laid by a particular kart. in
      *  this case the 'm_deactive_ticks' will also be set - see below. */
-    const AbstractKart   *m_event_handler;
+    const AbstractKart *m_event_handler;
 
     /** Kart that emitted this item if any */
-    const AbstractKart   *m_emitter;
+    const AbstractKart *m_emitter;
 
     /** callback used if type == ITEM_TRIGGER */
     TriggerItemListener* m_listener;
 
     /** square distance at which item is collected */
-    float         m_distance_2;
+    float m_distance_2;
 
     /** The graph node this item is on. */
-    int           m_graph_node;
+    int m_graph_node;
 
     /** Distance from the center of the quad this item is in. This value is
      *  >0 if it is to the right of the center, and undefined if this quad
      *  is not on any quad. */
-    float         m_distance_from_center;
+    float m_distance_from_center;
 
     /** The closest point to the left and right of this item at which it
      *  would not be collected. Used by the AI to avoid items. */
@@ -308,7 +311,7 @@ public:
                   Item(const Vec3& xyz, float distance,
                        TriggerItemListener* trigger);
     virtual       ~Item ();
-    void          update(int ticks);
+    void          updateGraphics(float dt);
     virtual void  collected(const AbstractKart *kart, int ticks);
     void          setParent(AbstractKart* parent);
     void          reset();

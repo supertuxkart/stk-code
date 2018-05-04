@@ -432,6 +432,20 @@ void ItemManager::update(int ticks)
 }   // update
 
 //-----------------------------------------------------------------------------
+/** Updates the graphics, called once per rendered frame.
+ * \param dt Time based on frame rate.
+ */
+void ItemManager::updateGraphics(float dt)
+{
+    for (AllItemTypes::iterator i  = m_all_items.begin();
+                                i != m_all_items.end();  i++)
+    {
+        if (*i) (*i)->updateGraphics(dt);
+    }   // for m_all_items
+
+}   // updateGraphics
+
+//-----------------------------------------------------------------------------
 /** Removes an items from the items-in-quad list, from the list of all
  *  items, and then frees the item itself.
  *  \param The item to delete.

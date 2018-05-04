@@ -1533,6 +1533,8 @@ void Track::updateGraphics(float dt)
     {
         m_animated_textures[i]->update(dt);
     }
+    ItemManager::get()->updateGraphics(dt);
+
 }   // updateGraphics
 
 // ----------------------------------------------------------------------------

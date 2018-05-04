@@ -107,6 +107,7 @@ public:
     Item*          newItem         (const Vec3& xyz, float distance,
                                     TriggerItemListener* listener);
     void           update          (int ticks);
+    void           updateGraphics  (float dt);
     void           checkItemHit    (AbstractKart* kart);
     void           reset           ();
     void           collectedItem   (Item *item, AbstractKart *kart,

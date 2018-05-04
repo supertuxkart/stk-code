@@ -303,6 +303,7 @@ Item::~Item()
  */
 void Item::reset()
 {
+    m_was_available_previously = true;
     ItemState::reset();
     if (m_node != NULL)
     {
@@ -323,51 +324,45 @@ void Item::setParent(AbstractKart* parent)
     ItemState::setDeactivatedTicks(stk_config->time2Ticks(1.5f));
 }   // setParent
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Updated the item - rotates it, takes care of items coming back into
  *  the game after it has been collected.
  *  \param ticks Number of physics time steps - should be 1.
  */
-void Item::update(int ticks)
+void Item::updateGraphics(float dt)
 {
-    bool was_collected = !isAvailable();
-    ItemState::update(ticks);
+    if(!m_node) return;
 
-    if (was_collected && isAvailable() && m_node)
+    if (!m_was_available_previously && isAvailable() )
     {
         // This item is now available again - make sure it is not
         // scaled anymore.
         m_node->setScale(core::vector3df(1, 1, 1));
     }
-    if (!isAvailable() && m_node &&
-        getTicksTillReturn() <= stk_config->time2Ticks(1.0f) )
+
+    float time_till_return = stk_config->ticks2Time(getTicksTillReturn());
+    if (!isAvailable() && time_till_return <= 1.0f)
     {
         // Make it visible by scaling it from 0 to 1:
         m_node->setVisible(true);
-        float t = stk_config->ticks2Time(getTicksTillReturn());
-        m_node->setScale(core::vector3df(1, 1, 1)*(1 - t));
+        m_node->setScale(core::vector3df(1, 1, 1)*(1 - time_till_return));
     }
-    if(isAvailable())
-    { 
-        if(!m_rotate || m_node == NULL) return;
+    if (isAvailable() && m_rotate)
+    {
         // have it rotate
-        if (!RewindManager::get()->isRewinding())
-        {
-            float dt = stk_config->ticks2Time(ticks);
-            m_rotation_angle += dt * M_PI;
-        }
+        m_rotation_angle += dt * M_PI;
         if (m_rotation_angle > M_PI * 2) m_rotation_angle -= M_PI * 2;
 
         btMatrix3x3 m;
         m.setRotation(m_original_rotation);
         btQuaternion r = btQuaternion(m.getColumn(1), m_rotation_angle) *
-            m_original_rotation;
+                         m_original_rotation;
 
         Vec3 hpr;
         hpr.setHPR(r);
         m_node->setRotation(hpr.toIrrHPR());
-        return;
     }   // if item is available
+    m_was_available_previously = isAvailable();
 }   // update
 
 //-----------------------------------------------------------------------------
