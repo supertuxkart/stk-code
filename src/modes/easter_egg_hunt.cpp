@@ -18,6 +18,7 @@
 #include "modes/easter_egg_hunt.hpp"
 
 #include "io/file_manager.hpp"
+#include "items/item.hpp"
 #include "karts/abstract_kart.hpp"
 #include "tracks/track.hpp"
 
@@ -150,6 +151,8 @@ const std::string& EasterEggHunt::getIdent() const
  */
 void EasterEggHunt::collectedItem(const AbstractKart *kart, const Item *item)
 {
+    if(item->getType() != ItemState::ITEM_EASTER_EGG) return;
+
     m_eggs_collected[kart->getWorldKartId()]++;
     m_eggs_found++;
 }   // collectedEasterEgg
