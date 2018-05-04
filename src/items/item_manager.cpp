@@ -308,12 +308,8 @@ void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
         return;
     }
     item->collected(kart, stk_config->time2Ticks(2.0f));
-    if (item->getType() == ItemState::ITEM_EASTER_EGG)
-    {
-        EasterEggHunt *world = dynamic_cast<EasterEggHunt*>(World::getWorld());
-        assert(world);
-        world->collectedEasterEgg(kart);
-    }
+    // Inform the world - used for Easter egg hunt
+    World::getWorld()->collectedItem(kart, item);
     kart->collectedItem(item, add_info);
 }   // collectedItem
 

@@ -118,6 +118,10 @@ private:
      *  will always reappear after a while. */
     int m_used_up_counter;
 
+protected:
+    // ------------------------------------------------------------------------
+    void setType(ItemType type) { m_type = type; }
+
 public:
          /** Constructor. */
          ItemState(ItemType type)
@@ -176,7 +180,7 @@ public:
     {
         // triggers should not be switched
         if (m_type == ITEM_TRIGGER) return true;
-         // If the item is not switched, do nothing. This can happen if a bubble
+        // If the item is not switched, do nothing. This can happen if a bubble
         // gum is dropped while items are switched - when switching back, this
         // bubble gum has no original type.
         if (m_original_type == ITEM_NONE)
@@ -212,8 +216,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the type of this item. */
     ItemType getType() const { return m_type; }
-    // ------------------------------------------------------------------------
-    void setType(ItemType type) { m_type = type; }
     // ------------------------------------------------------------------------
     /** Sets the index of this item in the item manager list. */
     void setItemId(unsigned int n) { m_item_id = n; }
