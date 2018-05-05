@@ -102,7 +102,7 @@ RaceGUI::RaceGUI()
 
     // Originally m_map_height was 100, and we take 480 as minimum res
     float scaling = irr_driver->getFrameSize().Height / 480.0f;
-    const float map_size = 180.0f * map_size_splitscreen;
+    const float map_size = stk_config->m_minimap_size * map_size_splitscreen;
     const float top_margin = 3.5f * m_font_height;
     
     if (UserConfigParams::m_multitouch_enabled && 
@@ -125,8 +125,8 @@ RaceGUI::RaceGUI()
     
     // Marker texture has to be power-of-two for (old) OpenGL compliance
     //m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
-    m_minimap_ai_size       = (int)( 14.0f * scaling);
-    m_minimap_player_size   = (int)( 16.0f * scaling);
+    m_minimap_ai_size       = (int)( stk_config->m_minimap_ai_icon     * scaling);
+    m_minimap_player_size   = (int)( stk_config->m_minimap_player_icon * scaling);
     m_map_width             = (int)(map_size * scaling);
     m_map_height            = (int)(map_size * scaling);
     m_map_left              = (int)( 10.0f * scaling);
