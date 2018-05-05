@@ -122,9 +122,12 @@
   <replay max-time="600" delta-t="0.05"  delta-pos="0.1"
           delta-angle="0.5" />
 
-  <!--  Determines the minimap size. -->
+  <!--  Determines the minimap related values. 
+        size: The size of the minimap (scaled afterwards) 480 = full screen height)
+        ai-icon: The size of the icons for the AI karts on the minimap.
+        player-icon: The size of the icons for the player karts. -->
 
-  <minimap size="180.0f" />
+  <minimap size="180.0" ai-icon="16.0" player-icon="20.0"/>
 
   <!-- Skidmark data: maximum number of skid marks, and
        time for skidmarks to fade out. Maximum number will over
