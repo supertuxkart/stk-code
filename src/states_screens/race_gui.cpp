@@ -227,6 +227,9 @@ void RaceGUI::renderGlobal(float dt)
     if(world->getPhase() == World::GOAL_PHASE)
             drawGlobalGoal();
 
+    // MiniMap is drawn when the players wait for the start countdown to end
+    drawGlobalMiniMap();
+    
     // Timer etc. are not displayed unless the game is actually started.
     if(!world->isRacePhase()) return;
     if (!m_enabled) return;
@@ -244,8 +247,6 @@ void RaceGUI::renderGlobal(float dt)
             drawGlobalMusicDescription();
         }
     }
-
-    drawGlobalMiniMap();
 
     if (!m_is_tutorial)               drawGlobalPlayerIcons(m_map_height);
     if(Track::getCurrentTrack()->isSoccer()) drawScores();
