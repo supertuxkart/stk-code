@@ -74,6 +74,9 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
     m_ugh_sound    = SFXManager::get()->getBuffer("ugh");
     m_grab_sound   = SFXManager::get()->getBuffer("grab_collectable");
     m_full_sound   = SFXManager::get()->getBuffer("energy_bar_full");
+    m_unfull_sound = SFXManager::get()->getBuffer("energy_bar_unfull");
+
+    m_is_above_nitro_target = false;
 
     // Attach Particle System
     Track *track = Track::getCurrentTrack();
@@ -235,6 +238,10 @@ void LocalPlayerController::update(int ticks)
             }
         }
     }
+
+    if (m_is_above_nitro_target == true &&
+        m_kart->getEnergy() < race_manager->getCoinTarget())
+        nitroNotFullSound();
 #endif
     if (m_kart->getKartAnimation() && m_sound_schedule == false)
     {
@@ -347,9 +354,10 @@ void LocalPlayerController::collectedItem(const Item &item, int add_info,
     }
     else if (race_manager->getCoinTarget() > 0 &&
              old_energy < race_manager->getCoinTarget() &&
-             m_kart->getEnergy() == race_manager->getCoinTarget())
+             m_kart->getEnergy() >= race_manager->getCoinTarget())
     {
         m_kart->playSound(m_full_sound);
+        m_is_above_nitro_target = true;
     }
     else
     {
@@ -372,6 +380,15 @@ void LocalPlayerController::collectedItem(const Item &item, int add_info,
         }
     }
 }   // collectedItem
+
+//-----------------------------------------------------------------------------
+/** If the nitro level has gone under the nitro goal, play a bad effect sound 
+ */
+void LocalPlayerController::nitroNotFullSound()
+{
+    m_kart->playSound(m_unfull_sound);
+    m_is_above_nitro_target = false;
+} //nitroNotFullSound
 
 // ----------------------------------------------------------------------------
 /** Returns true if the player of this controller can collect achievements.

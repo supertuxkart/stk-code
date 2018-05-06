@@ -829,8 +829,7 @@ void SlipStream::update(int ticks)
                                 kp->getSlipstreamMaxSpeedIncrease(),
                                 kp->getSlipstreamMaxSpeedIncrease(),
                                 kp->getSlipstreamAddPower(),
-                                m_bonus_time,
-                                stk_config->ticks2Time(fade_out)      );
+                                stk_config->time2Ticks(m_bonus_time), fade_out);
     }
 
     if(!is_sstreaming)

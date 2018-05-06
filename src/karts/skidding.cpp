@@ -87,8 +87,8 @@ void Skidding::reset()
 // ----------------------------------------------------------------------------
 /** Save the skidding state of a kart. It only saves the important physics
  *  values including m_remaining_jump_time (while this is mostly a graphical
- *  effect, ou ycan't skid while still doing a jump, so it does affect the 
- *  staet), but not visual only values like m_visual_rotation. Similarly 
+ *  effect, you can't skid while still doing a jump, so it does affect the
+ *  state), but not visual only values like m_visual_rotation. Similarly
  *  m_real_steering is output of updateRewind() and will be recomputed every
  *  frame when update() is called, and similar for m_skid_bonus_ready
  *  \param buffer Buffer for the state information. 
@@ -429,8 +429,12 @@ void Skidding::update(int ticks, bool is_on_ground,
             float bonus_time, bonus_speed, bonus_force;
             unsigned int level = getSkidBonus(&bonus_time, &bonus_speed,
                                               &bonus_force);
+
+            // Show tiny sparks if bonus not yet reached
+            if (level == 0 && m_remaining_jump_time <= 0.0f)
+                m_kart->getKartGFX()->setSkidLevel(level);
             // If at least level 1 bonus is reached, show appropriate gfx
-            if(level>0)
+            else if (level>=1)
             {
                 m_skid_bonus_ready = true;
                 m_kart->getKartGFX()->setSkidLevel(level);

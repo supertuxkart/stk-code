@@ -307,8 +307,8 @@ public:
      *  \param fade_out_time How long the maximum speed will fade out linearly.
      */
     virtual void increaseMaxSpeed(unsigned int category, float add_speed,
-                                  float engine_force, float duration,
-                                  float fade_out_time) = 0;
+                                  float engine_force, int duration,
+                                  int fade_out_time) = 0;
 
     // ----------------------------------------------------------------------------
     /** This adjusts the top speed using increaseMaxSpeed, but additionally
@@ -323,8 +323,8 @@ public:
      *  \param fade_out_time How long the maximum speed will fade out linearly.
      */
     virtual void instantSpeedIncrease(unsigned int category, float add_max_speed,
-                                    float speed_boost, float engine_force, float duration,
-                                    float fade_out_time) = 0;
+                                     float speed_boost, float engine_force, 
+                                     int duration, int fade_out_time) = 0;
 
     // ------------------------------------------------------------------------
     /** Defines a slowdown, which is in fraction of top speed.
