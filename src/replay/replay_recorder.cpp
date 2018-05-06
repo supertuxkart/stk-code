@@ -20,9 +20,12 @@
 
 #include "config/stk_config.hpp"
 #include "io/file_manager.hpp"
+#include "items/attachment.hpp"
 #include "guiengine/message_queue.hpp"
 #include "karts/ghost_kart.hpp"
+#include "karts/skidding.hpp"
 #include "karts/kart_gfx.hpp"
+#include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "physics/btKart.hpp"
 #include "race/race_manager.hpp"
@@ -42,6 +45,12 @@ ReplayRecorder::ReplayRecorder()
 {
     m_complete_replay = false;
     m_incorrect_replay = false;
+
+    // Give margin to store extra events due to higher precision
+    // when a kart's tracked charateristic has suddenly changed
+    // in a non-interpolable way.
+    m_max_frames = (unsigned int)( 1.2f * stk_config->m_replay_max_time
+                                             / stk_config->m_replay_dt);
 }   // ReplayRecorder
 
 //-----------------------------------------------------------------------------
@@ -58,6 +67,7 @@ void ReplayRecorder::reset()
     m_incorrect_replay = false;
     m_transform_events.clear();
     m_physic_info.clear();
+    m_bonus_info.clear();
     m_kart_replay_event.clear();
     m_count_transforms.clear();
     m_last_saved_time.clear();
@@ -78,14 +88,15 @@ void ReplayRecorder::init()
     reset();
     m_transform_events.resize(race_manager->getNumberOfKarts());
     m_physic_info.resize(race_manager->getNumberOfKarts());
+    m_bonus_info.resize(race_manager->getNumberOfKarts());
     m_kart_replay_event.resize(race_manager->getNumberOfKarts());
-    unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time
-                                             / stk_config->m_replay_dt);
+
     for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
     {
-        m_transform_events[i].resize(max_frames);
-        m_physic_info[i].resize(max_frames);
-        m_kart_replay_event[i].resize(max_frames);
+        m_transform_events[i].resize(m_max_frames);
+        m_physic_info[i].resize(m_max_frames);
+        m_bonus_info[i].resize(m_max_frames);
+        m_kart_replay_event[i].resize(m_max_frames);
     }
 
     m_count_transforms.resize(race_manager->getNumberOfKarts(), 0);
@@ -116,7 +127,81 @@ void ReplayRecorder::update(int ticks)
 #ifdef DEBUG
         m_count++;
 #endif
-        if (time - m_last_saved_time[i] < stk_config->m_replay_dt)
+        // If one of the tracked kart data has significantly changed
+        // for the kart, update sooner than the usual dt
+        bool force_update = false;
+
+        int attachment;
+        if (kart->getAttachment()->getType() == Attachment::ATTACH_NOTHING)
+            attachment = 0;
+        else if (kart->getAttachment()->getType() == Attachment::ATTACH_PARACHUTE)
+            attachment = 1;
+        else if (kart->getAttachment()->getType() == Attachment::ATTACH_ANVIL)
+            attachment = 2;
+        else if (kart->getAttachment()->getType() == Attachment::ATTACH_BOMB)
+            attachment = 3;
+        else if (kart->getAttachment()->getType() == Attachment::ATTACH_SWATTER)
+            attachment = 4;
+        else if (kart->getAttachment()->getType() == Attachment::ATTACH_BUBBLEGUM_SHIELD)
+            attachment = 5;
+
+        if (m_count_transforms[i] >= 2)
+        {
+            BonusInfo *b_prev       = &(m_bonus_info[i][m_count_transforms[i]-1]);
+            BonusInfo *b_prev2      = &(m_bonus_info[i][m_count_transforms[i]-2]);
+            PhysicInfo *q_prev      = &(m_physic_info[i][m_count_transforms[i]-1]);
+
+            // If the kart starts or stops skidding
+            if (kart->getSkidding()->getSkidState() != q_prev->m_skidding_state)
+                force_update = true;
+
+            // If the kart changes speed brutally
+            // (booster, crash...)
+            if (fabsf(kart->getSpeed() - q_prev->m_speed) > 1.0f )
+                force_update = true;
+
+            // If the attachment has changed
+            if (attachment != b_prev->m_attachment)
+                force_update = true;
+    
+            // If the item amount has changed
+            if (kart->getNumPowerup() != b_prev->m_item_amount)
+                force_update = true;
+
+            // If nitro starts being used or is collected
+            if (kart->getEnergy() != b_prev->m_nitro_amount &&
+                b_prev->m_nitro_amount == b_prev2->m_nitro_amount)
+                force_update = true;
+
+            // If nitro stops being used
+            // (also generate an extra transform on collection,
+            //  should be negligble and better than heavier checks)
+            if (kart->getEnergy() == b_prev->m_nitro_amount &&
+                b_prev->m_nitro_amount != b_prev2->m_nitro_amount)
+                force_update = true;
+
+            // If close to the end of the race, reduce the time step
+            // for extra precision for the whole race time
+            if (race_manager->isLinearRaceMode())
+            {
+                float full_distance = race_manager->getNumLaps()
+                        * Track::getCurrentTrack()->getTrackLength();
+
+                const LinearWorld *linearworld = dynamic_cast<LinearWorld*>(World::getWorld());
+                if (full_distance + 0.5f >= linearworld->getOverallDistance(i) &&
+                    full_distance <= linearworld->getOverallDistance(i) + 10.0f)
+                {
+                    if (full_distance <= linearworld->getOverallDistance(i) + 0.5f)
+                        force_update = true;
+                    else if (time - m_last_saved_time[i] < (stk_config->m_replay_dt/2.0f))
+                        force_update = true;
+                }
+            }
+        }
+
+
+        if (time - m_last_saved_time[i] < stk_config->m_replay_dt &&
+            !force_update)
         {
 #ifdef DEBUG
             m_count_skipped_time++;
@@ -140,6 +225,7 @@ void ReplayRecorder::update(int ticks)
         }
         TransformEvent *p      = &(m_transform_events[i][m_count_transforms[i]-1]);
         PhysicInfo *q          = &(m_physic_info[i][m_count_transforms[i]-1]);
+        BonusInfo *b           = &(m_bonus_info[i][m_count_transforms[i]-1]);
         KartReplayEvent *r     = &(m_kart_replay_event[i][m_count_transforms[i]-1]);
 
         p->m_time              = World::getWorld()->getTime();
@@ -159,9 +245,23 @@ void ReplayRecorder::update(int ticks)
                     ->getWheelInfo(j).m_raycastInfo.m_suspensionLength;
             }
         }
+        q->m_skidding_state    = kart->getSkidding()->getSkidState();
+
+        b->m_attachment        = attachment;
+        b->m_nitro_amount      = kart->getEnergy();
+        b->m_item_amount       = kart->getNumPowerup();
+
+        //Only saves distance if recording a linear race
+        if (race_manager->isLinearRaceMode())
+        {
+            const LinearWorld *linearworld = dynamic_cast<LinearWorld*>(World::getWorld());
+            r->m_distance = linearworld->getOverallDistance(kart->getWorldKartId());
+        }
+        else
+            r->m_distance = 0.0f;
 
         kart->getKartGFX()->getGFXStatus(&(r->m_nitro_usage),
-            &(r->m_zipper_usage), &(r->m_skidding_state), &(r->m_red_skidding));
+            &(r->m_zipper_usage), &(r->m_skidding_effect), &(r->m_red_skidding));
         r->m_jumping = kart->isJumping();
     }   // for i
 
@@ -220,7 +320,8 @@ void ReplayRecorder::save()
         (file_manager->getReplayDir() + getReplayFilename()).c_str());
     MessageQueue::add(MessageQueue::MT_GENERIC, msg);
 
-    fprintf(fd, "version: %d\n",    getReplayVersion());
+    fprintf(fd, "version: %d\n", getCurrentReplayVersion());
+    fprintf(fd, "stk_version: %s\n", STK_VERSION);
     for (unsigned int real_karts = 0; real_karts < num_karts; real_karts++)
     {
         const AbstractKart *kart = world->getKart(real_karts);
@@ -231,28 +332,53 @@ void ReplayRecorder::save()
                 StringUtils::xmlEncode(kart->getController()->getName()).c_str());
     }
 
+    // Calculate the unique identifier
+    // Part of it is random
+    // Part of it is based on race data
+    unsigned long long int unique_identifier = 0;
+    int min_time_uid = (int) (min_time*10000);
+    int reverse = race_manager->getReverseTrack() ? 1 : 0;
+    unique_identifier += reverse;
+    unique_identifier += race_manager->getDifficulty()*2;
+    unique_identifier += (race_manager->getNumLaps()-1)*8;
+    unique_identifier += min_time_uid*160;
+
+    // Add a random value to make sure the identifier is unique
+    // and use it to make the non-random part non-obvious
+    int random = rand()%9998 + 2; //avoid 0 and 1
+    unique_identifier *= random*10000;
+    unique_identifier += (10000-random);
+
+    m_last_uid = unique_identifier;
+
     fprintf(fd, "kart_list_end\n");
     fprintf(fd, "reverse: %d\n",    (int)race_manager->getReverseTrack());
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
     fprintf(fd, "track: %s\n",      Track::getCurrentTrack()->getIdent().c_str());
     fprintf(fd, "laps: %d\n",       race_manager->getNumLaps());
     fprintf(fd, "min_time: %f\n",   min_time);
+    #ifdef _WIN32
+        /* format string for Windows */
+        #define ULONGLONG "%I64u"
+    #else
+        #define ULONGLONG "%Lu"
+    #endif
+    fprintf(fd, "replay_uid: " ULONGLONG "\n", unique_identifier);
 
-    unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time 
-                                             / stk_config->m_replay_dt      );
     for (unsigned int k = 0; k < num_karts; k++)
     {
         if (world->getKart(k)->isGhostKart()) continue;
         fprintf(fd, "size:     %d\n", m_count_transforms[k]);
 
-        unsigned int num_transforms = std::min(max_frames,
+        unsigned int num_transforms = std::min(m_max_frames,
                                                m_count_transforms[k]);
         for (unsigned int i = 0; i < num_transforms; i++)
         {
             const TransformEvent *p  = &(m_transform_events[k][i]);
             const PhysicInfo *q      = &(m_physic_info[k][i]);
+            const BonusInfo *b      = &(m_bonus_info[k][i]);
             const KartReplayEvent *r = &(m_kart_replay_event[k][i]);
-            fprintf(fd, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f  %d %d %d %d %d\n",
+            fprintf(fd, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f %d  %d %f %d  %f %d %d %d %d %d\n",
                     p->m_time,
                     p->m_transform.getOrigin().getX(),
                     p->m_transform.getOrigin().getY(),
@@ -267,9 +393,14 @@ void ReplayRecorder::save()
                     q->m_suspension_length[1],
                     q->m_suspension_length[2],
                     q->m_suspension_length[3],
+                    q->m_skidding_state,
+                    b->m_attachment,
+                    b->m_nitro_amount,
+                    b->m_item_amount,
+                    r->m_distance,
                     r->m_nitro_usage,
                     (int)r->m_zipper_usage,
-                    r->m_skidding_state,
+                    r->m_skidding_effect,
                     (int)r->m_red_skidding,
                     (int)r->m_jumping
                 );

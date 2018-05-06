@@ -38,6 +38,9 @@ private:
     /** A separate vector of Replay Events for all physic info. */
     std::vector< std::vector<PhysicInfo> > m_physic_info;
 
+    /** A separate vector of Replay Events for all item/nitro info. */
+    std::vector< std::vector<BonusInfo> > m_bonus_info;
+
     /** A separate vector of Replay Events for all other events. */
     std::vector< std::vector<KartReplayEvent> > m_kart_replay_event;
 
@@ -53,6 +56,11 @@ private:
     bool  m_complete_replay;
 
     bool  m_incorrect_replay;
+
+    /* The maximum number of frames saved */
+    unsigned int m_max_frames;
+
+    unsigned long long int m_last_uid;
 
 #ifdef DEBUG
     /** Counts overall number of events stored. */
@@ -74,6 +82,8 @@ public:
     void  save();
     void  update(int ticks);
 
+    unsigned long long int getLastUID() { return m_last_uid; }
+
     // ------------------------------------------------------------------------
     /** Creates a new instance of the replay object. */
     static void create() {
@@ -89,7 +99,7 @@ public:
     static void destroy() { delete m_replay_recorder; m_replay_recorder=NULL; }
     // ------------------------------------------------------------------------
     /** Returns the filename that was opened. */
-    virtual const std::string& getReplayFilename() const { return m_filename; }
+    virtual const std::string& getReplayFilename(int replay_file_number = 1) const { return m_filename; }
     // ------------------------------------------------------------------------
 };   // ReplayRecorder
 
