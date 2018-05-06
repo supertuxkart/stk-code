@@ -499,37 +499,117 @@ namespace StringUtils
     }   // ticksTimeToString(ticks)
 
     // ------------------------------------------------------------------------
-    /** Converts a time in seconds into a string of the form mm:ss:hh (minutes,
-     *  seconds, 1/100 seconds.
+    /** Converts a time in seconds into a string of the form mm:ss.hhh (minutes,
+     *  seconds, milliseconds)
      *  \param time Time in seconds.
+     *  \param precision The number of seconds decimals - 3 to display ms, default 2
      */
-    std::string timeToString(float time)
+    std::string timeToString(float time, unsigned int precision, bool display_minutes_if_zero)
     {
-        int int_time   = (int)(time*100.0f+0.5f);
+        //Time more detailed than ms are mostly meaningless
+        if (precision > 3)
+            precision = 3;
+
+        int int_time;
+        int precision_power = 1;
+
+        for (unsigned int i=0;i<precision;i++)
+        {
+            precision_power *=10;
+        }
+
+        float fprecision_power = (float) precision_power;
+
+        bool negative_time = (time < 0.0f);
+
+        // If the time is negative, make it positve
+        // And add a "-" later
+        if (negative_time) time *= -1.0f;
+
+        // cast to int truncates the value,
+        // so add 0.5f to get the closest int
+
+        int_time = (int)(time*fprecision_power+0.5f);
 
         // Avoid problems if time is negative or way too large (which
         // should only happen if something is broken in a track elsewhere,
         // and an incorrect finishing time is estimated.
         if(int_time<0)
-            return std::string("00:00:00");
-        else if(int_time >= 10000*60)  // up to 99:59.99
-            return std::string("99:59:99");
+        {
+            std::string final_append;
+            if (precision == 3)
+                final_append = ".000";
+            else if (precision == 2)
+                final_append = ".00";
+            else if (precision == 1)
+                final_append = ".0";
+            else
+                final_append = "";
+            // concatenate the strings with +
+            if (display_minutes_if_zero)
+                return (std::string("00:00") + final_append);
+            else
+                return (std::string("00") + final_append);
+        }
+        else if(int_time >= 100*60*precision_power)  // up to 99:59.999
+        {
+            std::string final_append;
+            if (precision == 3)
+                final_append = ".999";
+            else if (precision == 2)
+                final_append = ".99";
+            else if (precision == 1)
+                final_append = ".9";
+            else
+                final_append = "";
+            // concatenate the strings with +
+            return (std::string("99:59") + final_append);
+        }
 
-        int min        = int_time / 6000;
-        int sec        = (int_time-min*6000)/100;
-        int hundredths = (int_time - min*6000-sec*100);
-        // The proper c++ way would be:
-        // std::ostringstream s;
-        // s<<std::setw(2)<<std::setfill(' ')<<min<<":"
-        //     <<std::setw(2)<<std::setfill('0')<<sec<<":"
-        //     <<std::setw(2)<<std::setfill(' ')<<hundredths;
-        // return s.str();
-        // but that appears to be awfully complicated and slow, compared to
-        // which admittedly only works for min < 100000 - which is about 68
-        // days - good enough.
-        char s[12];
-        sprintf(s, "%02d:%02d:%02d", min,  sec,  hundredths);
-        return std::string(s);
+        // Principle of the computation in pseudo-code
+        // 1) Divide by (current_time_unit_duration/next_smaller_unit_duration)
+        //    (1 if no smaller)
+        // 2) Apply modulo (next_bigger_time_unit_duration/current_time_unit_duration)
+        //    (no modulo if no bigger)
+        int subseconds = int_time % precision_power;
+        int_time       = int_time/precision_power;
+        int sec        = int_time % 60;
+        int_time       = int_time/60;
+        if (int_time >= 100) int_time = 99;
+        int min        = int_time;
+
+        // Convert the times to string and add the missing zeroes if any
+
+        std::string s_min = std::to_string(min);
+        if (min < 10)
+            s_min = std::string("0") + s_min;
+        std::string s_sec = std::to_string(sec);
+        if (sec < 10)
+            s_sec = std::string("0") + s_sec;
+        std::string s_subsec = std::to_string(subseconds);
+
+        // If subseconds is 0 ; it is already in the string,
+        // so skip one step
+        for (unsigned int i=1;i<precision;i++)
+        {
+            precision_power = precision_power/10;
+            if (subseconds < precision_power)
+                s_subsec = std::string("0") + s_subsec;
+        }
+
+        std::string s_neg = "";
+
+        if(negative_time)
+            s_neg = "-";
+
+        std::string s_min_and_sec = s_sec;
+        if (display_minutes_if_zero || min > 0)
+            s_min_and_sec = s_min + std::string(":") + s_sec;
+
+        if (precision == 0)
+            return (s_neg + s_min_and_sec);
+        else
+            return (s_neg + s_min_and_sec + std::string(".") + s_subsec);
     }   // timeToString
 
     // ------------------------------------------------------------------------
