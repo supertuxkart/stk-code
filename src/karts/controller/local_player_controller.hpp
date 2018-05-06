@@ -55,9 +55,13 @@ private:
     SFXBuffer   *m_ugh_sound;
     SFXBuffer   *m_grab_sound;
     SFXBuffer   *m_full_sound;
+    SFXBuffer   *m_unfull_sound;
+
+    bool         m_is_above_nitro_target;
 
     virtual void steer(int, int) OVERRIDE;
     virtual void displayPenaltyWarning() OVERRIDE;
+    void         nitroNotFullSound();
 public:
                  LocalPlayerController(AbstractKart *kart,
                                        const int local_player_id,
