@@ -152,3 +152,11 @@ void AbstractKart::kartIsInRestNow()
     // after all karts are reset
     setTrans(getBody()->getWorldTransform());
 }   // kartIsInRest
+
+// ----------------------------------------------------------------------------
+/** Returns the time at which the kart was at a given distance.
+ * Returns -1.0f if none */
+float AbstractKart::getTimeForDistance(float distance)
+{
+    return -1.0f;
+}   // getTimeForDistance

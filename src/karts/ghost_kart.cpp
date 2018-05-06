@@ -16,11 +16,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "items/attachment.hpp"
+#include "items/powerup.hpp"
 #include "karts/ghost_kart.hpp"
 #include "karts/controller/ghost_controller.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_model.hpp"
 #include "graphics/render_info.hpp"
+#include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 
 #include "LinearMath/btQuaternion.h"
@@ -47,6 +50,7 @@ void GhostKart::reset()
 void GhostKart::addReplayEvent(float time,
                                const btTransform &trans,
                                const ReplayBase::PhysicInfo &pi,
+                               const ReplayBase::BonusInfo &bi,
                                const ReplayBase::KartReplayEvent &kre)
 {
     GhostController* gc = dynamic_cast<GhostController*>(getController());
@@ -54,6 +58,7 @@ void GhostKart::addReplayEvent(float time,
 
     m_all_transform.push_back(trans);
     m_all_physic_info.push_back(pi);
+    m_all_bonus_info.push_back(bi);
     m_all_replay_events.push_back(kre);
 
     // Use first frame of replay to calculate default suspension
@@ -130,9 +135,45 @@ void GhostKart::update(int ticks)
         m_all_physic_info[idx].m_steer, m_all_physic_info[idx].m_speed,
         /*lean*/0.0f, idx);
 
+    // Attachment
+    // Uses custom format so that replay files remain valid if
+    // internal numbering changes.
+
+    int attach_ticks = 9000;
+
+    if ( m_all_bonus_info[idx    ].m_attachment == 0)
+        m_attachment->clear();
+    else if ( m_all_bonus_info[idx    ].m_attachment == 1 &&
+              m_attachment->getType() != Attachment::ATTACH_PARACHUTE)
+        m_attachment->set(Attachment::ATTACH_PARACHUTE,attach_ticks);
+    else if ( m_all_bonus_info[idx    ].m_attachment== 2 &&
+              m_attachment->getType() != Attachment::ATTACH_ANVIL)
+        m_attachment->set(Attachment::ATTACH_ANVIL,attach_ticks);
+    else if ( m_all_bonus_info[idx    ].m_attachment == 3 &&
+              m_attachment->getType() != Attachment::ATTACH_BOMB)
+        m_attachment->set(Attachment::ATTACH_BOMB,attach_ticks);
+    else if ( m_all_bonus_info[idx    ].m_attachment == 4 &&
+              m_attachment->getType() != Attachment::ATTACH_SWATTER)
+        m_attachment->set(Attachment::ATTACH_SWATTER,attach_ticks);
+    else if ( m_all_bonus_info[idx    ].m_attachment == 5 &&
+              m_attachment->getType() != Attachment::ATTACH_BUBBLEGUM_SHIELD)
+        m_attachment->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,attach_ticks);
+
+    // So that the attachment's model size is updated
+    // FIXME : While this works mostly fine, the model seems to take more time
+    //         to reach its full size than for normal karts
+    m_attachment->update(ticks);
+
+    // Nitro and zipper amount (shown in the GUI in watch-only mode)
+    m_powerup->reset();
+    m_powerup->set(PowerupManager::POWERUP_ZIPPER, m_all_bonus_info[idx].m_item_amount);
+    m_collected_energy = (1- rd)*m_all_bonus_info[idx    ].m_nitro_amount
+                         +  rd  *m_all_bonus_info[idx + 1].m_nitro_amount;
+
+    // Graphical effects for nitro, zipper and skidding
     getKartGFX()->setGFXFromReplay(m_all_replay_events[idx].m_nitro_usage,
         m_all_replay_events[idx].m_zipper_usage,
-        m_all_replay_events[idx].m_skidding_state,
+        m_all_replay_events[idx].m_skidding_effect,
         m_all_replay_events[idx].m_red_skidding);
     getKartGFX()->update(dt);
 
@@ -162,3 +203,77 @@ float GhostKart::getSpeed() const
     assert(gc->getCurrentReplayIndex() < m_all_physic_info.size());
     return m_all_physic_info[gc->getCurrentReplayIndex()].m_speed;
 }   // getSpeed
+
+// ----------------------------------------------------------------------------
+/** Returns the time at which the kart was at a given distance.
+  * Returns -1.0f if none */
+float GhostKart::getTimeForDistance(float distance)
+{
+    const GhostController* gc = dynamic_cast<const GhostController*>(getController());
+    
+    int current_index = gc->getCurrentReplayIndex();
+
+    // Second, get the current distance
+    float current_distance = m_all_replay_events[current_index].m_distance;
+
+    // This determines in which direction we will search a matching frame
+    bool search_forward = (current_distance < distance);
+
+    // These are used to compute the time
+    // upper_frame is set to current index so that the timer still runs
+    // after the ghost has finished the race
+    int lower_frame_index = current_index-1;
+    unsigned int upper_frame_index = current_index;
+    float upper_ratio     = 0.0f;
+
+    // Third, search frame by frame in the good direction
+    // Binary search is not used because the kart might go backwards
+    // at some point (accident, rescue, wrong interpolation later corrected)
+    // The distances are stored in the replay file rather than being
+    // dynamically computed. Version 3 replay files thus don't support
+    // the live time difference, but this reduces tremendously the overhead
+    while (1)
+    {
+        // If we have reached the end of the replay file without finding the
+        // searched distance, break
+        if (upper_frame_index >= m_all_replay_events.size() ||
+            lower_frame_index < 0 )
+            break;
+
+        // The target distance was reached between those two frames
+        if (m_all_replay_events[lower_frame_index].m_distance <= distance &&
+            m_all_replay_events[upper_frame_index].m_distance >= distance )
+        {
+            float lower_diff = distance - m_all_replay_events[lower_frame_index].m_distance;
+            float upper_diff = m_all_replay_events[upper_frame_index].m_distance - distance;
+            if ((lower_diff + upper_diff) == 0)
+                upper_ratio = 0.0f;
+            else
+                upper_ratio = lower_diff/(lower_diff+upper_diff);
+                
+            break;
+        }
+
+        if (search_forward)
+        {
+            lower_frame_index++;
+            upper_frame_index++;
+        }
+        else
+        {
+            lower_frame_index--;
+            upper_frame_index--;
+        }
+    }
+
+    float ghost_time;
+
+    if (upper_frame_index >= m_all_replay_events.size() ||
+        lower_frame_index < 0 )
+        ghost_time = -1.0f;
+    else
+        ghost_time = gc->getTimeAtIndex(lower_frame_index)*(1.0f-upper_ratio)
+                    +gc->getTimeAtIndex(upper_frame_index)*(upper_ratio);
+
+    return ghost_time;
+}

@@ -42,6 +42,8 @@ private:
 
     std::vector<ReplayBase::PhysicInfo>      m_all_physic_info;
 
+    std::vector<ReplayBase::BonusInfo>       m_all_bonus_info;
+
     std::vector<ReplayBase::KartReplayEvent> m_all_replay_events;
 
 public:
@@ -66,6 +68,7 @@ public:
     void          addReplayEvent(float time,
                                  const btTransform &trans,
                                  const ReplayBase::PhysicInfo &pi,
+                                 const ReplayBase::BonusInfo &bi,
                                  const ReplayBase::KartReplayEvent &kre);
     // ------------------------------------------------------------------------
     /** Returns whether this kart is a ghost (replay) kart. */
@@ -76,6 +79,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. */
     virtual float getSpeed() const;
+
+    // ------------------------------------------------------------------------
+    /** Returns the time at which the kart was at a given distance.
+      * Returns -1.0f if none */
+    float getTimeForDistance(float distance);
+
     // ------------------------------------------------------------------------
     virtual void  kartIsInRestNow() {};
     // ------------------------------------------------------------------------
