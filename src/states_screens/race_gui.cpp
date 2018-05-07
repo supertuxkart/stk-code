@@ -88,6 +88,8 @@ RaceGUI::RaceGUI()
     // and the map is in a player view, scale down the map
     if (race_manager->getNumLocalPlayers() >= 4 && !race_manager->getIfEmptyScreenSpaceExists())
     {
+        // If the resolution is wider than 4:3, we don't have to scaledown the minimap as much
+        // Uses some margin, in case the game's screen is not exactly 4:3
         if ( ((float) irr_driver->getFrameSize().Width / (float) irr_driver->getFrameSize().Height) >
              (4.1f/3.0f))
         {
