@@ -60,6 +60,12 @@ private:
     /* The maximum number of frames saved */
     unsigned int m_max_frames;
 
+    const float FRAME_MARGIN_FOR_FORCED_UPDATES = 1.2f;
+
+    const float DISTANCE_FAST_UPDATES = 10.0f;
+
+    const float DISTANCE_MAX_UPDATES = 2.0f;
+
     unsigned long long int m_last_uid;
 
 #ifdef DEBUG
@@ -73,6 +79,9 @@ private:
     unsigned int m_count_skipped_interpolation;
 #endif
 
+    /** Compute the replay's UID ; partly based on race data ; partly randomly */
+    unsigned long long int computeUID(float min_time);
+
 
           ReplayRecorder();
          ~ReplayRecorder();
@@ -82,7 +91,7 @@ public:
     void  save();
     void  update(int ticks);
 
-    unsigned long long int getLastUID() { return m_last_uid; }
+    const unsigned long long int getLastUID() { return m_last_uid; }
 
     // ------------------------------------------------------------------------
     /** Creates a new instance of the replay object. */
@@ -104,3 +113,4 @@ public:
 };   // ReplayRecorder
 
 #endif
+

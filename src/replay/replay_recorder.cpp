@@ -49,8 +49,9 @@ ReplayRecorder::ReplayRecorder()
     // Give margin to store extra events due to higher precision
     // when a kart's tracked charateristic has suddenly changed
     // in a non-interpolable way.
-    m_max_frames = (unsigned int)( 1.2f * stk_config->m_replay_max_time
-                                             / stk_config->m_replay_dt);
+    m_max_frames = (unsigned int)( FRAME_MARGIN_FOR_FORCED_UPDATES
+                                   * stk_config->m_replay_max_time
+                                   / stk_config->m_replay_dt);
 }   // ReplayRecorder
 
 //-----------------------------------------------------------------------------
@@ -131,7 +132,7 @@ void ReplayRecorder::update(int ticks)
         // for the kart, update sooner than the usual dt
         bool force_update = false;
 
-        int attachment;
+        int attachment = -1;
         if (kart->getAttachment()->getType() == Attachment::ATTACH_NOTHING)
             attachment = 0;
         else if (kart->getAttachment()->getType() == Attachment::ATTACH_PARACHUTE)
@@ -144,6 +145,12 @@ void ReplayRecorder::update(int ticks)
             attachment = 4;
         else if (kart->getAttachment()->getType() == Attachment::ATTACH_BUBBLEGUM_SHIELD)
             attachment = 5;
+
+        if (attachment == -1)
+        {
+            Log::error("ReplayRecorder", "Unknown attachment type");
+            return;
+        }
 
         if (m_count_transforms[i] >= 2)
         {
@@ -188,10 +195,10 @@ void ReplayRecorder::update(int ticks)
                         * Track::getCurrentTrack()->getTrackLength();
 
                 const LinearWorld *linearworld = dynamic_cast<LinearWorld*>(World::getWorld());
-                if (full_distance + 0.5f >= linearworld->getOverallDistance(i) &&
-                    full_distance <= linearworld->getOverallDistance(i) + 10.0f)
+                if (full_distance + DISTANCE_MAX_UPDATES >= linearworld->getOverallDistance(i) &&
+                    full_distance <= linearworld->getOverallDistance(i) + DISTANCE_FAST_UPDATES)
                 {
-                    if (full_distance <= linearworld->getOverallDistance(i) + 0.5f)
+                    if (fabsf(full_distance - linearworld->getOverallDistance(i)) < DISTANCE_MAX_UPDATES)
                         force_update = true;
                     else if (time - m_last_saved_time[i] < (stk_config->m_replay_dt/2.0f))
                         force_update = true;
@@ -273,6 +280,42 @@ void ReplayRecorder::update(int ticks)
 }   // update
 
 //-----------------------------------------------------------------------------
+/** Compute the replay's UID ; partly based on race data ; partly randomly
+ */
+unsigned long long int ReplayRecorder::computeUID(float min_time)
+{
+    unsigned long long int unique_identifier = 0;
+
+    // First store some basic replay data
+    int min_time_uid = (int) (min_time*1000);
+    min_time_uid = min_time_uid%60000;
+
+    int day, month, year;
+    StkTime::getDate(&day, &month, &year);
+    unsigned long long int date_uid = year%10;
+    date_uid = date_uid*12 + (month-1);;
+    date_uid = date_uid*31 + (day-1);
+
+    int reverse = race_manager->getReverseTrack() ? 1 : 0;
+    unique_identifier += reverse;
+    unique_identifier += race_manager->getDifficulty()*2;
+    unique_identifier += (race_manager->getNumLaps()-1)*8;
+    unique_identifier += min_time_uid*160;
+    unique_identifier += date_uid*9600000;
+
+    // Add a random value to make sure the identifier is unique
+    // and use it to make the non-random part non-obvious
+    // using magic and arbitrary constants
+
+    int random = rand()%9998 + 2; //avoid 0 and 1
+    unique_identifier += random*47;
+    unique_identifier *= random*10000;
+    unique_identifier += (10000-random);
+
+    return unique_identifier;
+}
+
+//-----------------------------------------------------------------------------
 /** Saves the replay data stored in the internal data structures.
  */
 void ReplayRecorder::save()
@@ -332,24 +375,7 @@ void ReplayRecorder::save()
                 StringUtils::xmlEncode(kart->getController()->getName()).c_str());
     }
 
-    // Calculate the unique identifier
-    // Part of it is random
-    // Part of it is based on race data
-    unsigned long long int unique_identifier = 0;
-    int min_time_uid = (int) (min_time*10000);
-    int reverse = race_manager->getReverseTrack() ? 1 : 0;
-    unique_identifier += reverse;
-    unique_identifier += race_manager->getDifficulty()*2;
-    unique_identifier += (race_manager->getNumLaps()-1)*8;
-    unique_identifier += min_time_uid*160;
-
-    // Add a random value to make sure the identifier is unique
-    // and use it to make the non-random part non-obvious
-    int random = rand()%9998 + 2; //avoid 0 and 1
-    unique_identifier *= random*10000;
-    unique_identifier += (10000-random);
-
-    m_last_uid = unique_identifier;
+    m_last_uid = computeUID(min_time);
 
     fprintf(fd, "kart_list_end\n");
     fprintf(fd, "reverse: %d\n",    (int)race_manager->getReverseTrack());
@@ -363,7 +389,7 @@ void ReplayRecorder::save()
     #else
         #define ULONGLONG "%Lu"
     #endif
-    fprintf(fd, "replay_uid: " ULONGLONG "\n", unique_identifier);
+    fprintf(fd, "replay_uid: " ULONGLONG "\n", m_last_uid);
 
     for (unsigned int k = 0; k < num_karts; k++)
     {
@@ -408,3 +434,4 @@ void ReplayRecorder::save()
     }
     fclose(fd);
 }   // save
+
