@@ -49,6 +49,8 @@
 #include "network/stk_host.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "race/highscores.hpp"
+#include "replay/replay_play.hpp"
+#include "replay/replay_recorder.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
@@ -224,7 +226,10 @@ void RaceResultGUI::enableAllButtons()
         }
         else
         {
-            top->setText(_("Setup New Race"));
+            if (race_manager->isRecordingRace())
+                top->setText(_("Race against the new ghost replay"));
+            else
+                top->setText(_("Setup New Race"));
             top->setVisible(true);
             bottom->setText(_("Back to the menu"));
         }
@@ -385,6 +390,12 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     StateManager::get()->popMenu();
     if (name == "top")                 // Setup new race
     {
+        // Save current race data for race against new ghost
+        std::string track_name = race_manager->getTrackName();
+        int laps = race_manager->getNumLaps();
+        bool reverse = race_manager->getReverseTrack();
+        bool new_ghost_race = race_manager->isRecordingRace();
+
         race_manager->exitRace();
         race_manager->setAIKartOverride("");
 
@@ -393,6 +404,24 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         {
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
             OverWorld::enterOverWorld();
+        }
+        // Special case : race against a newly saved ghost
+        else if (new_ghost_race)
+        {
+            ReplayPlay::get()->loadAllReplayFile();
+            unsigned long long int last_uid = ReplayRecorder::get()->getLastUID();
+            ReplayPlay::get()->setReplayFileByUID(last_uid);
+
+            race_manager->setRecordRace(true);
+            race_manager->setRaceGhostKarts(true);
+
+            race_manager->setNumKarts(race_manager->getNumLocalPlayers());
+
+            // Disable accidentally unlocking of a challenge
+            PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
+
+            race_manager->setReverseTrack(reverse);
+            race_manager->startSingleRace(track_name, laps, false);
         }
         else
         {

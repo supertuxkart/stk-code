@@ -71,9 +71,18 @@ RaceGUI::RaceGUI()
     // Determine maximum length of the rank/lap text, in order to
     // align those texts properly on the right side of the viewport.
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-    core::dimension2du area = font->getDimension(L"99:99:99");
+    core::dimension2du area = font->getDimension(L"99:99.99");
     m_timer_width = area.Width;
     m_font_height = area.Height;
+
+    area = font->getDimension(L"99.999");
+    m_small_precise_timer_width = area.Width;
+
+    area = font->getDimension(L"99:99.999");
+    m_big_precise_timer_width = area.Width;
+
+    area = font->getDimension(L"-");
+    m_negative_timer_additional_width = area.Width;
 
     if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
         race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES     ||
@@ -220,6 +229,11 @@ void RaceGUI::renderGlobal(float dt)
         if (world->getPhase()<WorldStatus::DELAY_FINISH_PHASE)
            drawGlobalTimer();
 
+        if (race_manager->isLinearRaceMode() &&
+            race_manager->hasGhostKarts() &&
+            race_manager->getNumberOfKarts() >= 2 )
+            drawLiveDifference();
+
         if(world->getPhase() == WorldStatus::GO_PHASE ||
            world->getPhase() == WorldStatus::MUSIC_PHASE)
         {
@@ -328,7 +342,7 @@ void RaceGUI::drawScores()
 }   // drawScores
 
 //-----------------------------------------------------------------------------
-/** Displays the racing time on the screen.s
+/** Displays the racing time on the screen.
  */
 void RaceGUI::drawGlobalTimer()
 {
@@ -389,6 +403,65 @@ void RaceGUI::drawGlobalTimer()
                true /* ignore RTL */);
 
 }   // drawGlobalTimer
+
+
+//-----------------------------------------------------------------------------
+/** Displays the live difference with a ghost on screen.
+ */
+void RaceGUI::drawLiveDifference()
+{
+    assert(World::getWorld() != NULL);
+
+    if (!World::getWorld()->shouldDrawTimer())
+    {
+        return;
+    }
+
+    const LinearWorld *linearworld = dynamic_cast<LinearWorld*>(World::getWorld());
+    assert(linearworld != NULL);
+
+    // Don't display the live difference timer if its time is wrong
+    // (before crossing the start line at start or after crossing it at end)
+    if (!linearworld->hasValidTimeDifference())
+        return;
+
+    float live_difference = linearworld->getLiveTimeDifference();
+
+    int timer_width = m_small_precise_timer_width;
+    if (fabsf(live_difference) >= 59.9995f)
+        timer_width = m_big_precise_timer_width;
+
+    if (live_difference < 0.0f)
+        timer_width += m_negative_timer_additional_width;
+
+    core::stringw sw;
+    video::SColor time_color;
+
+    // Change color depending on value
+    if (live_difference > 1.0f)
+        time_color = video::SColor(255, 255, 0, 0);
+    else if (live_difference > 0.0f)
+        time_color = video::SColor(255, 255, 160, 0);
+    else if (live_difference > -1.0f)
+        time_color = video::SColor(255, 160, 255, 0);
+    else
+        time_color = video::SColor(255, 0, 255, 0);
+
+    int dist_from_right = 10 + timer_width;
+
+    sw = core::stringw (StringUtils::timeToString(live_difference,3,
+                        /* display_minutes_if_zero */ false).c_str() );
+
+    core::rect<s32> pos(irr_driver->getActualScreenSize().Width - dist_from_right, 55,
+                        irr_driver->getActualScreenSize().Width                  , 75);
+
+    gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+    font->setShadow(video::SColor(255, 128, 0, 0));
+    font->setScale(1.0f);
+    font->draw(sw.c_str(), pos, time_color, false, false, NULL,
+               true /* ignore RTL */);
+
+}   // drawLiveDifference
 
 //-----------------------------------------------------------------------------
 /** Draws the mini map and the position of all karts on it.
