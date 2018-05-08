@@ -1493,7 +1493,7 @@ int CIrrDeviceLinux::getNumlockMask(Display* display)
 
 EKEY_CODE CIrrDeviceLinux::getKeyCode(XEvent &event)
 {
-	EKEY_CODE keyCode = (EKEY_CODE)0;
+	int keyCode = 0;
 	SKeyMap mp;
 	
 	// First check for numpad keys
@@ -1515,30 +1515,25 @@ EKEY_CODE CIrrDeviceLinux::getKeyCode(XEvent &event)
 	const s32 idx = KeyMap.binary_search(mp);
 	if (idx != -1)
 	{
-		keyCode = (EKEY_CODE)KeyMap[idx].Win32Key;
+		keyCode = KeyMap[idx].Win32Key;
 	}
 	if (keyCode == 0)
 	{
 		// Any value is better than none, that allows at least using the keys.
 		// Worst case is that some keys will be identical, still better than _all_
 		// unknown keys being identical.
-		if ( !mp.X11Key )
+		if (mp.X11Key)
 		{
-			keyCode = (EKEY_CODE)event.xkey.keycode;
-			os::Printer::log("No such X11Key, using event keycode", core::stringc(event.xkey.keycode).c_str(), ELL_INFORMATION);
-		}
-		else if (idx == -1)
-		{
-			keyCode = (EKEY_CODE)mp.X11Key;
-			os::Printer::log("EKEY_CODE not found, using orig. X11 keycode", core::stringc(mp.X11Key).c_str(), ELL_INFORMATION);
+			keyCode = (int)IRR_KEY_CODES_COUNT + mp.X11Key;
 		}
 		else
 		{
-			keyCode = (EKEY_CODE)mp.X11Key;
-			os::Printer::log("EKEY_CODE is 0, using orig. X11 keycode", core::stringc(mp.X11Key).c_str(), ELL_INFORMATION);
+			keyCode = (int)IRR_KEY_CODES_COUNT + event.xkey.keycode;
 		}
+		
+		os::Printer::log("EKEY_CODE is 0, fallback keycode", core::stringc(keyCode).c_str(), ELL_INFORMATION);
 	}
-	return keyCode;
+	return (EKEY_CODE)keyCode;
 }
 #endif
 
