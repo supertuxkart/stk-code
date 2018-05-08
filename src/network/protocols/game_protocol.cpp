@@ -306,9 +306,6 @@ void GameProtocol::handleState(Event *event)
 
     // The memory for bns will be handled in the RewindInfoState object
     RewindManager::get()->addNetworkState(bns, ticks);
-
-    Log::info("GameProtocol", "Received at %d state from %d",
-              World::getWorld()->getTimeTicks(), ticks);
 }   // handleState
 
 // ----------------------------------------------------------------------------

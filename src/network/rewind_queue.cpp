@@ -255,10 +255,6 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
 
         insertRewindInfo(*i);
 
-        Log::info("Rewind", "Inserting %s from time %d",
-                  (*i)->isEvent() ? "event" : "state",
-                  (*i)->getTicks()                       );
-
         // Check if a rewind is necessary, i.e. a message is received in the
         // past of client (server never rewinds).
         if (NetworkConfig::get()->isClient() && (*i)->getTicks() < world_ticks)
