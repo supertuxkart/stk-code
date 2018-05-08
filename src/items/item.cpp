@@ -19,11 +19,11 @@
 
 #include "items/item.hpp"
 
-#include "items/item_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_node.hpp"
+#include "items/item_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"

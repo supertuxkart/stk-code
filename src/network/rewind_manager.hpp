@@ -163,6 +163,13 @@ public:
     bool isRewinding() const { return m_is_rewinding; }
     // ------------------------------------------------------------------------
     int getNotRewoundWorldTicks() const { return m_not_rewound_ticks;  }
+    // ------------------------------------------------------------------------
+    /** Returns the time of the latest confirmed state. */
+    int getLatestConfirmedState() const
+    {
+        return m_rewind_queue.getLatestConfirmedState(); 
+    }
+
 };   // RewindManager
 
 

@@ -45,9 +45,9 @@ public:
    virtual      ~KartRewinder() {};
    virtual void  saveTransform() OVERRIDE;
    virtual void  computeError() OVERRIDE;
-   virtual BareNetworkString* saveState() const;
+   virtual BareNetworkString* saveState();
    void          reset();
-   virtual void  rewindToState(BareNetworkString *p) OVERRIDE;
+   virtual void  restoreState(BareNetworkString *p, int count) OVERRIDE;
    virtual void  rewindToEvent(BareNetworkString *p) OVERRIDE;
    virtual void  update(int ticks) OVERRIDE;
 

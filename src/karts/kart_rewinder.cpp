@@ -79,7 +79,7 @@ void KartRewinder::computeError()
  *  \param[out] buffer  Address of the memory buffer.
  *  \returns    Size of allocated memory, or -1 in case of an error.
  */
-BareNetworkString* KartRewinder::saveState() const
+BareNetworkString* KartRewinder::saveState()
 {
     const int MEMSIZE = 17*sizeof(float) + 9+3;
 
@@ -124,8 +124,12 @@ BareNetworkString* KartRewinder::saveState() const
 }   // saveState
 
 // ----------------------------------------------------------------------------
-/** Actually rewind to the specified state. */
-void KartRewinder::rewindToState(BareNetworkString *buffer)
+/** Actually rewind to the specified state. 
+ *  \param buffer The buffer with the state info.
+ *  \param count Number of bytes that must be used up in this function (not
+ *         used).
+ */
+void KartRewinder::restoreState(BareNetworkString *buffer, int count)
 {
     // 1) Physics values: transform and velocities
     // -------------------------------------------
@@ -170,7 +174,7 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
     // -----------
     m_skidding->rewindTo(buffer);
     return;
-}   // rewindToState
+}   // restoreState
 
 // ----------------------------------------------------------------------------
 /** Called once a frame. It will add a new kart control event to the rewind

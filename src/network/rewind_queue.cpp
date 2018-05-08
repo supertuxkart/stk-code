@@ -356,7 +356,7 @@ void RewindQueue::replayAllEvents(int ticks)
     while ( hasMoreRewindInfo() && (*m_current)->getTicks() == ticks )
     {
         if ((*m_current)->isEvent())
-            (*m_current)->rewind();
+            (*m_current)->replay();
         m_current++;
     }   // while current->getTIcks == ticks
 
@@ -380,10 +380,10 @@ void RewindQueue::unitTesting()
     class DummyRewinder : public Rewinder, public EventRewinder
     {
     public:
-        BareNetworkString* saveState() const { return NULL; }
+        BareNetworkString* saveState() { return NULL; }
         virtual void undoEvent(BareNetworkString *s) {}
         virtual void rewindToEvent(BareNetworkString *s) {}
-        virtual void rewindToState(BareNetworkString *s) {}
+        virtual void restoreState(BareNetworkString *s, int count) {}
         virtual void undoState(BareNetworkString *s) {}
         virtual void undo(BareNetworkString *s) {}
         virtual void rewind(BareNetworkString *s) {}

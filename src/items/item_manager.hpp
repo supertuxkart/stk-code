@@ -50,6 +50,7 @@ private:
     /** Stores all low-resolution item models. */
     static std::vector<scene::IMesh *> m_item_lowres_mesh;
 
+protected:
     /** The instance of ItemManager while a race is on. */
     static ItemManager *m_item_manager;
 public:
@@ -75,11 +76,12 @@ public:
     }   // get
 
     // ========================================================================
-private:
+protected:
     /** The vector of all items of the current track. */
     typedef std::vector<Item*> AllItemTypes;
     AllItemTypes m_all_items;
 
+private:
     /** Stores which items are on which quad. m_items_in_quads[#quads]
      *  contains all items that are not on a quad. Note that this
      *  field is undefined if no Graph exist, e.g. arena without navmesh. */
@@ -95,9 +97,10 @@ private:
     void  insertItem(Item *item);
     void  deleteItem(Item *item);
 
+public:
     // Make those private so only create/destroy functions can call them.
                    ItemManager();
-                  ~ItemManager();
+    virtual       ~ItemManager();
     void           setSwitchItems(const std::vector<int> &switch_items);
 
 public:
@@ -110,14 +113,22 @@ public:
     void           updateGraphics  (float dt);
     void           checkItemHit    (AbstractKart* kart);
     void           reset           ();
-    void           collectedItem   (Item *item, AbstractKart *kart,
+    virtual void   collectedItem   (Item *item, AbstractKart *kart,
                                     int add_info=-1);
     void           switchItems     ();
-    // ------------------------------------------------------------------------
     bool           randomItemsForArena(const AlignedArray<btTransform>& pos);
     // ------------------------------------------------------------------------
+    /** Only used in the NetworkItemManager. */
+    virtual void setItemConfirmationTime(int host_id, int ticks)
+    {
+        assert(false);
+    }
+    // ------------------------------------------------------------------------
     /** Returns the number of items. */
-    unsigned int   getNumberOfItems() const { return (unsigned int) m_all_items.size(); }
+    unsigned int   getNumberOfItems() const
+    {
+        return (unsigned int) m_all_items.size();
+    }
     // ------------------------------------------------------------------------
     /** Returns a pointer to the n-th item. */
     const Item*   getItem(unsigned int n) const { return m_all_items[n]; };

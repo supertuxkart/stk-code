@@ -337,17 +337,7 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
         // we pass the kart and the position separately.
         if((*i)->hitKart(kart->getXYZ(), kart))
         {
-            // if we're not playing online, pick the item.
-            if (!NetworkConfig::get()->isNetworking())
-                collectedItem(*i, kart);
-            else if (NetworkConfig::get()->isServer())
-            {
-                // Only the server side detects item being collected
-                // A client does the collection upon receiving the 
-                // event from the server!
-                collectedItem(*i, kart);
-                RaceEventManager::getInstance()->collectedItem(*i, kart);
-            }
+            collectedItem(*i, kart);
         }   // if hit
     }   // for m_all_items
 }   // checkItemHit

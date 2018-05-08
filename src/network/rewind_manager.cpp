@@ -207,14 +207,13 @@ void RewindManager::restoreState(BareNetworkString *data)
 {
     data->reset();   
     int index = 0;
-    //AllRewinder::const_iterator rewinder;
-    for (auto rewinder = m_all_rewinder.begin(); rewinder != m_all_rewinder.end();
-                                          ++rewinder)
-    {
-        uint16_t count = data->getUInt16();
+    
+    for (auto rewinder  = m_all_rewinder.begin(); 
+              rewinder != m_all_rewinder.end();   ++rewinder)
+    {    uint16_t count = data->getUInt16();
         if (count > 0)
         {
-            (*rewinder)->rewindToState(data);
+            (*rewinder)->restoreState(data, count);
         }
     }   // for all rewinder
 }   // restoreState
@@ -339,9 +338,9 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     // -----------------------------------------
     // A loop in case that we should split states into several smaller ones:
     while (current && current->getTicks() == exact_rewind_ticks && 
-          current->isState()                                        )
+           current->isState()                                        )
     {
-        current->rewind();
+        current->restore();
         m_rewind_queue.next();
         current = m_rewind_queue.getCurrent();
     }

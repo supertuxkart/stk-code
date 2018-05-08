@@ -263,21 +263,41 @@ public:
         return addFloat(quat.getX()).addFloat(quat.getY())
               .addFloat(quat.getZ()).addFloat(quat.getW());
     }   // add
+    // ------------------------------------------------------------------------
+    /** Adds a function to add a time ticks value. Use this function instead
+     *  of addUInt32 because we might decide later to compress time values
+     *  (e.g. sending 16 bytes for as long as possible).
+     */
+    BareNetworkString& addTime(int ticks)
+    {
+        return addUInt32(ticks);
+    }   // addTime
 
     // Functions related to getting data from a network string
     // ------------------------------------------------------------------------
     /** Returns a unsigned 32 bit integer. */
     inline uint32_t getUInt32() const { return get<uint32_t, 4>(); }
     // ------------------------------------------------------------------------
+    /** Returns a unsigned 32 bit integer. */
+    inline uint32_t getTime() const { return get<uint32_t, 4>(); }
+    // ------------------------------------------------------------------------
     /** Returns an unsigned 16 bit integer. */
     inline uint16_t getUInt16() const { return get<uint16_t, 2>(); }
+    // ------------------------------------------------------------------------
+    /** Returns an unsigned 16 bit integer. */
+    inline int16_t getInt16() const { return get<int16_t, 2>(); }
     // ------------------------------------------------------------------------
     /** Returns an unsigned 8-bit integer. */
     inline uint8_t getUInt8() const
     {
         return m_buffer[m_current_offset++];
     }   // getUInt8
-
+    // ------------------------------------------------------------------------
+    /** Returns an unsigned 8-bit integer. */
+    inline uint8_t getInt8() const
+    {
+        return m_buffer[m_current_offset++];
+    }   // getUInt8
     // ------------------------------------------------------------------------
     /** Gets a 4 byte floating point value. */
     float getFloat() const

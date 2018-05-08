@@ -20,11 +20,9 @@
 #ifndef HEADER_ITEM_HPP
 #define HEADER_ITEM_HPP
 
-/**
-  * \defgroup items
-  * Defines the various collectibles and weapons of STK.
-  */
-
+/** \defgroup items
+ *  Defines the various collectibles and weapons of STK.
+ */
 
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
@@ -62,7 +60,7 @@ public:
  *  and therefore not stored here). This class is used as a base class for
  *  item and for networking to save item states.
  */
-class ItemState : public NoCopy
+class ItemState
 {
 public:
     /**
@@ -104,8 +102,9 @@ private:
      *  > 0 it means that the item is not available. */
     int m_ticks_till_return;
 
-    /** Index in item_manager field. */
-    unsigned int  m_item_id;
+    /** Index in item_manager field. This field can also take on a negative
+     *  value when used in the NetworkItemManager. */
+    int  m_item_id;
 
     /** Optionally if item was placed by a kart, a timer can be used to
     *  temporarly deactivate collision so a kart is not hit by its own item */
@@ -119,16 +118,20 @@ private:
     int m_used_up_counter;
 
 protected:
+    friend class ItemManager;
+    friend class NetworkItemManager;
     // ------------------------------------------------------------------------
     void setType(ItemType type) { m_type = type; }
 
 public:
          /** Constructor. */
-         ItemState(ItemType type)
+         ItemState(ItemType type, int id=-1)
          { 
-             m_item_id = -1;
+             m_item_id = id;
              setType(type); 
-         }
+         }   // ItemState(ItemType)
+             
+    // ------------------------------------------------------------------------
     void setDisappearCounter();
     void update(int ticks);
     void collected(int ticks);
@@ -243,7 +246,7 @@ public:
 /**
   * \ingroup items
   */
-class Item : public ItemState
+class Item : public ItemState, public NoCopy
 {
 
 private:

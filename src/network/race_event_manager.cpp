@@ -59,18 +59,3 @@ void RaceEventManager::kartFinishedRace(AbstractKart *kart, float time)
     if (auto game_events_protocol = m_game_events_protocol.lock())
         game_events_protocol->kartFinishedRace(kart, time);
 }   // kartFinishedRace
-
-// ----------------------------------------------------------------------------
-/** Called from the item manager on a server. It triggers a notification to
- *  all clients in the GameEventsProtocol.
- *  \param item The item that was collected.
- *  \param kart The kart that collected the item.
- */
-void RaceEventManager::collectedItem(Item *item, AbstractKart *kart)
-{
-    // this is only called in the server
-    assert(NetworkConfig::get()->isServer());
-    if (auto game_events_protocol = m_game_events_protocol.lock())
-        game_events_protocol->collectedItem(item, kart);
-}   // collectedItem
-
