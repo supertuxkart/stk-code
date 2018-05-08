@@ -38,8 +38,8 @@ void NetworkItemManager::create()
 /** Creates a new instance of the item manager. This is done at startup
  *  of each race. */
 NetworkItemManager::NetworkItemManager()
-                  : ItemManager()
-                  , Rewinder(/*can be deleted*/false)
+                  : Rewinder(/*can be deleted*/false),
+                    ItemManager()
 {
     m_last_confirmed_item_ticks.lock();
     m_last_confirmed_item_ticks.getData().clear();

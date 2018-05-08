@@ -152,8 +152,8 @@ public:
 
     // -----------------------------------------------------------------------
     /** Initialises an item.
-    /*  \param type Type for this item.
-    */
+     *  \param type Type for this item.
+     */
     void initItem(ItemType type)
     {
         setType(type);

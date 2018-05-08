@@ -90,7 +90,6 @@ public:
 
     virtual void undo(BareNetworkString *buffer) OVERRIDE;
     virtual void rewind(BareNetworkString *buffer) OVERRIDE;
-    void GameProtocol::sendUpdate();
     // ------------------------------------------------------------------------
     virtual void setup() OVERRIDE {};
     // ------------------------------------------------------------------------
