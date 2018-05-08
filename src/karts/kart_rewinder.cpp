@@ -104,19 +104,17 @@ BareNetworkString* KartRewinder::saveState()
     getControls().saveState(buffer);
     getController()->saveState(buffer);
 
-    // 3) Attachment
-    // -------------
+    // 3) Attachment, powerup, nitro
+    // -----------------------------
     getAttachment()->saveState(buffer);
-
-    // 4) Powerup
-    // ----------
     getPowerup()->saveState(buffer);
+    buffer->addFloat(getEnergy());
 
-    // 5) Max speed info
+    // 4) Max speed info
     // ------------------
     m_max_speed->saveState(buffer);
 
-    // 6) Skidding
+    // 5) Skidding
     // -----------
     m_skidding->saveState(buffer);
 
@@ -157,13 +155,12 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     getControls().rewindTo(buffer);
     getController()->rewindTo(buffer);
 
-    // 3) Attachment
-    // -------------
+    // 3) Attachment, powerup, nitro
+    // ------------------------------
     getAttachment()->rewindTo(buffer);
-
-    // 4) Powerup
-    // ----------
     getPowerup()->rewindTo(buffer);
+    float nitro = buffer->getFloat();
+    setEnergy(nitro);
 
     // 5) Max speed info
     // ------------------
