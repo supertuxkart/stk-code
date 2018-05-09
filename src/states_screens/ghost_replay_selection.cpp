@@ -95,6 +95,11 @@ void GhostReplaySelection::loadedFromFile()
     m_is_comparing = false;
     m_compare_toggle_widget->setVisible(false);
     getWidget<LabelWidget>("compare-toggle-text")->setVisible(false);
+
+    m_mode_tabs = getWidget<GUIEngine::RibbonWidget>("race_mode");
+    m_active_mode = RaceManager::MINOR_MODE_TIME_TRIAL;
+    m_active_mode_is_linear = true;
+    m_mode_tabs->select("tab_egg_hunt", PLAYER_ID_GAME_MASTER);//FIXME bugged
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -104,10 +109,12 @@ void GhostReplaySelection::beforeAddingWidget()
 {
     m_replay_list_widget->addColumn( _("Track"), 9 );
     m_replay_list_widget->addColumn( _("Players"), 3);
-    m_replay_list_widget->addColumn( _("Reverse"), 3);
+    if (m_active_mode_is_linear)
+        m_replay_list_widget->addColumn( _("Reverse"), 3);
     if (!m_same_difficulty)
         m_replay_list_widget->addColumn( _("Difficulty"), 4);
-    m_replay_list_widget->addColumn( _("Laps"), 3);
+    if (m_active_mode_is_linear)
+        m_replay_list_widget->addColumn( _("Laps"), 3);
     m_replay_list_widget->addColumn( _("Time"), 4);
     m_replay_list_widget->addColumn( _("User"), 5);
     if (!m_same_version)
@@ -282,6 +289,13 @@ void GhostReplaySelection::loadList()
                 if (compare_index == i)
                     continue;
         }
+        // Only display replays matching the current mode
+        if (m_active_mode == RaceManager::MINOR_MODE_TIME_TRIAL &&
+            rd.m_minor_mode != "time-trial")
+            continue;
+        else if (m_active_mode == RaceManager::MINOR_MODE_EASTER_EGG &&
+            rd.m_minor_mode != "egg-hunt")
+            continue;
 
         Track* track = track_manager->getTrack(rd.m_track_name);
         
@@ -294,15 +308,17 @@ void GhostReplaySelection::loadList()
             (translations->fribidize(track->getName()) , -1, 9));
         row.push_back(GUIEngine::ListWidget::ListCell
             (StringUtils::toWString(rd.m_kart_list.size()), -1, 3, true));
-        row.push_back(GUIEngine::ListWidget::ListCell
-            (rd.m_reverse ? _("Yes") : _("No"), -1, 3, true));
+        if (m_active_mode_is_linear)
+            row.push_back(GUIEngine::ListWidget::ListCell
+                (rd.m_reverse ? _("Yes") : _("No"), -1, 3, true));
         if (!m_same_difficulty)
             row.push_back(GUIEngine::ListWidget::ListCell
                 (rd.m_difficulty == 3 ? _("SuperTux") : rd.m_difficulty == 2 ?
                 _("Expert") : rd.m_difficulty == 1 ?
                 _("Intermediate") : _("Novice") , -1, 4, true));
-        row.push_back(GUIEngine::ListWidget::ListCell
-            (StringUtils::toWString(rd.m_laps), -1, 3, true));
+        if (m_active_mode_is_linear)
+            row.push_back(GUIEngine::ListWidget::ListCell
+                (StringUtils::toWString(rd.m_laps), -1, 3, true));
         row.push_back(GUIEngine::ListWidget::ListCell
             (StringUtils::toWString(rd.m_min_time) + L"s", -1, 4, true));
         row.push_back(GUIEngine::ListWidget::ListCell
@@ -340,11 +356,26 @@ void GhostReplaySelection::eventCallback(GUIEngine::Widget* widget,
             return;
         }
 
-        new GhostReplayInfoDialog(selected_index, &m_replay_to_compare_uid, &m_is_comparing);
+        new GhostReplayInfoDialog(selected_index, m_replay_to_compare_uid, m_is_comparing);
     }   // click on replay file
+    else if (name == "race_mode")
+    {
+        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
+        if (selection == "tab_time_trial")
+            m_active_mode = RaceManager::MINOR_MODE_TIME_TRIAL;
+        else if (selection == "tab_egg_hunt")
+            m_active_mode = RaceManager::MINOR_MODE_EASTER_EGG;
+
+        m_active_mode_is_linear = race_manager->isLinearRaceMode(m_active_mode);
+        m_is_comparing = false;
+        m_compare_toggle_widget->setState(false);
+        refresh(/*reload replay files*/ false, /* update columns */ true);
+    }
     else if (name == "record-ghost")
     {
         race_manager->setRecordRace(true);
+        race_manager->setMinorMode(m_active_mode);
         TracksScreen::getInstance()->push();
     }
     else if (name == "replay_difficulty_toggle")
@@ -396,48 +427,39 @@ void GhostReplaySelection::onConfirm()
  */
 void GhostReplaySelection::onColumnClicked(int column_id)
 {
-    switch (column_id)
-    {
-        case 0:
-            ReplayPlay::setSortOrder(ReplayPlay::SO_TRACK);
-            break;
-        case 1:
-            ReplayPlay::setSortOrder(ReplayPlay::SO_KART_NUM);
-            break;
-        case 2:
-            ReplayPlay::setSortOrder(ReplayPlay::SO_REV);
-            break;
-        case 3:
-            if (!m_same_difficulty)
-                ReplayPlay::setSortOrder(ReplayPlay::SO_DIFF);
-            else
-                ReplayPlay::setSortOrder(ReplayPlay::SO_LAPS);
-            break;
-        case 4:
-            if (!m_same_difficulty)
-                ReplayPlay::setSortOrder(ReplayPlay::SO_LAPS);
-            else
-                ReplayPlay::setSortOrder(ReplayPlay::SO_TIME);
-            break;
-        case 5:
-            if (!m_same_difficulty)
-                ReplayPlay::setSortOrder(ReplayPlay::SO_TIME);
-            else
-                ReplayPlay::setSortOrder(ReplayPlay::SO_USER);
-            break;
-        case 6:
-            if (!m_same_difficulty)
-                ReplayPlay::setSortOrder(ReplayPlay::SO_USER);
-            else
-                ReplayPlay::setSortOrder(ReplayPlay::SO_VERSION);
-            break;
-        case 7:
-            ReplayPlay::setSortOrder(ReplayPlay::SO_VERSION);
-            break;
-        default:
-            assert(0);
-            break;
-    }   // switch
+    int diff_difficulty = m_same_difficulty ? 1 : 0;
+    int diff_linear = m_active_mode_is_linear ? 0 : 1;
+
+    if (column_id >= 2)
+        column_id += diff_linear;
+
+    if (column_id >= 3)
+        column_id += diff_difficulty;
+
+    if (column_id >= 4)
+        column_id += diff_linear;
+
+    if (column_id == 0)
+        ReplayPlay::setSortOrder(ReplayPlay::SO_TRACK);
+    else if (column_id == 1)
+        ReplayPlay::setSortOrder(ReplayPlay::SO_KART_NUM);
+    else if (column_id == 2)
+        ReplayPlay::setSortOrder(ReplayPlay::SO_REV);
+    else if (column_id == 3)
+        ReplayPlay::setSortOrder(ReplayPlay::SO_DIFF);
+    else if (column_id == 4)
+        ReplayPlay::setSortOrder(ReplayPlay::SO_LAPS);
+    else if (column_id == 5)
+        ReplayPlay::setSortOrder(ReplayPlay::SO_TIME);
+    else if (column_id == 6)
+        ReplayPlay::setSortOrder(ReplayPlay::SO_USER);
+    else if (column_id == 7)    
+        ReplayPlay::setSortOrder(ReplayPlay::SO_VERSION);
+    else
+        assert(0);
+
+    printf("column_id is %d\n", column_id);
+
     /** \brief Toggle the sort order after column click **/
     m_sort_desc = !m_sort_desc;
     loadList();
