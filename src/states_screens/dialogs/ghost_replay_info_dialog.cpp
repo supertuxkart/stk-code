@@ -31,7 +31,7 @@ using namespace irr::core;
 
 // -----------------------------------------------------------------------------
 GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
-                   unsigned long long int* compare_replay_uid, bool* compare_ghost)
+                     uint64_t compare_replay_uid, bool compare_ghost)
                       : ModalDialog(0.85f,0.65f), m_replay_id(replay_id)
 {
     m_self_destroy         = false;
@@ -96,10 +96,10 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
     }
 
     m_record_widget->setState(false);
-    m_watch_widget->setState(*m_compare_ghost);
-    m_compare_widget->setState(*m_compare_ghost);
+    m_watch_widget->setState(m_compare_ghost);
+    m_compare_widget->setState(m_compare_ghost);
 
-    if (*m_compare_ghost)
+    if (m_compare_ghost)
     {
         m_watch_only = true;
         m_record_race = false;
@@ -109,8 +109,8 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
     }
 
     // Display this checkbox only if there is another replay file to compare with
-    getWidget<LabelWidget>("compare-ghost-text")->setVisible(*m_compare_ghost);
-    m_compare_widget->setVisible(*m_compare_ghost);
+    getWidget<LabelWidget>("compare-ghost-text")->setVisible(m_compare_ghost);
+    m_compare_widget->setVisible(m_compare_ghost);
 
 
     m_action_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
@@ -127,8 +127,10 @@ void GhostReplayInfoDialog::updateReplayDisplayedInfo()
     m_replay_info_widget->clear();
 
     int n=2;
-    if (*m_compare_ghost)
+    if (m_compare_ghost)
         n++;
+
+    bool is_linear = GhostReplaySelection::getInstance()->isActiveModeLinear();
 
     for (int i=0; i<n; i++)
     {
@@ -137,7 +139,7 @@ void GhostReplayInfoDialog::updateReplayDisplayedInfo()
         if (i<=1)
             id = m_replay_id;
         else
-            id = ReplayPlay::get()->getReplayIdByUID(*m_compare_replay_uid);
+            id = ReplayPlay::get()->getReplayIdByUID(m_compare_replay_uid);
 
         const ReplayPlay::ReplayData& rd = ReplayPlay::get()->getReplayData(id);
 
@@ -148,12 +150,14 @@ void GhostReplayInfoDialog::updateReplayDisplayedInfo()
         // as the header doesn't work with modal dialogs
         if (i==0)
         {
-            row.push_back(GUIEngine::ListWidget::ListCell
-                (_("Reverse"), -1, 3, true));
+            if (is_linear)
+                row.push_back(GUIEngine::ListWidget::ListCell
+                    (_("Reverse"), -1, 3, true));
             row.push_back(GUIEngine::ListWidget::ListCell
                 (_("Difficulty"), -1, 4, true));
-            row.push_back(GUIEngine::ListWidget::ListCell
-                (_("Laps"), -1, 3, true));
+            if (is_linear)
+                row.push_back(GUIEngine::ListWidget::ListCell
+                    (_("Laps"), -1, 3, true));
             row.push_back(GUIEngine::ListWidget::ListCell
                 (_("Time"), -1, 4, true));
             row.push_back(GUIEngine::ListWidget::ListCell
@@ -163,14 +167,16 @@ void GhostReplayInfoDialog::updateReplayDisplayedInfo()
         }
         else
         {
-            row.push_back(GUIEngine::ListWidget::ListCell
-                (rd.m_reverse ? _("Yes") : _("No"), -1, 3, true));
+            if (is_linear)
+                row.push_back(GUIEngine::ListWidget::ListCell
+                    (rd.m_reverse ? _("Yes") : _("No"), -1, 3, true));
             row.push_back(GUIEngine::ListWidget::ListCell
                 (rd.m_difficulty == 3 ? _("SuperTux") : rd.m_difficulty == 2 ?
                 _("Expert") : rd.m_difficulty == 1 ?
                 _("Intermediate") : _("Novice") , -1, 4, true));
-            row.push_back(GUIEngine::ListWidget::ListCell
-                (StringUtils::toWString(rd.m_laps), -1, 3, true));
+            if (is_linear)
+                row.push_back(GUIEngine::ListWidget::ListCell
+                    (StringUtils::toWString(rd.m_laps), -1, 3, true));
             row.push_back(GUIEngine::ListWidget::ListCell
                 (StringUtils::toWString(rd.m_min_time) + L"s", -1, 4, true));
             row.push_back(GUIEngine::ListWidget::ListCell
@@ -194,6 +200,9 @@ GUIEngine::EventPropagation
 
         if(selection == "start")
         {
+            // Make sure to enable the correct race mode
+            race_manager->setMinorMode(GhostReplaySelection::getInstance()->getActiveMode());
+
             bool reverse = m_rd.m_reverse;
             std::string track_name = m_rd.m_track_name;
             int laps = m_rd.m_laps;
@@ -204,11 +213,11 @@ GUIEngine::EventPropagation
 
             ModalDialog::dismiss();
             ReplayPlay::get()->setReplayFile(replay_id);
-            if (*m_compare_ghost)
+            if (m_compare_ghost)
             {
-                int second_replay_id = ReplayPlay::get()->getReplayIdByUID(*m_compare_replay_uid);
+                int second_replay_id = ReplayPlay::get()->getReplayIdByUID(m_compare_replay_uid);
                 ReplayPlay::get()->setSecondReplayFile(second_replay_id, /* use a second replay*/ true);
-                *m_compare_ghost = false;
+                m_compare_ghost = false;
             }
             else
                 ReplayPlay::get()->setSecondReplayFile(0, /* use a second replay*/ false);
@@ -222,6 +231,9 @@ GUIEngine::EventPropagation
 
             race_manager->setReverseTrack(reverse);
 
+            //Reset comparison if active
+            GhostReplaySelection::getInstance()->setCompare(false);
+
             if (race_manager->isWatchingReplay())
                 race_manager->startWatchingReplay(track_name, laps);
             else
@@ -232,13 +244,11 @@ GUIEngine::EventPropagation
         else if(selection == "add-ghost-to-compare")
         {
             // First set values for comparison
-            *m_compare_replay_uid = m_rd.m_replay_uid;
+            m_compare_replay_uid = m_rd.m_replay_uid;
 
-            *m_compare_ghost = true;
+            m_compare_ghost = true;
 
-            // Refresh the list to have only compatible replays
-            dynamic_cast<GhostReplaySelection*>(GUIEngine::getCurrentScreen())
-                ->refresh();
+            refreshMainScreen();
 
             // Now quit the dialog
             m_self_destroy = true;
@@ -271,13 +281,11 @@ GUIEngine::EventPropagation
         m_record_widget->setState(false);
         m_record_widget->setVisible(!m_watch_only);
         getWidget<LabelWidget>("record-race-text")->setVisible(!m_watch_only);
-        if (!m_watch_only && *m_compare_ghost)
+        if (!m_watch_only && m_compare_ghost)
         {
-            *m_compare_ghost = false;
+            m_compare_ghost = false;
             m_compare_widget->setState(false);
-            // Refresh the list to display all replays
-            dynamic_cast<GhostReplaySelection*>(GUIEngine::getCurrentScreen())
-                ->refresh();
+            refreshMainScreen();
 
             m_replay_id = ReplayPlay::get()->getReplayIdByUID(m_rd.m_replay_uid);
         }
@@ -285,10 +293,10 @@ GUIEngine::EventPropagation
 
     else if (event_source == "compare-ghost")
     {
-        *m_compare_ghost = m_compare_widget->getState();
+        m_compare_ghost = m_compare_widget->getState();
         m_record_race = false;
         m_record_widget->setState(false);
-        if (*m_compare_ghost)
+        if (m_compare_ghost)
         {
             m_watch_only = true;
             m_watch_widget->setState(true);
@@ -296,9 +304,7 @@ GUIEngine::EventPropagation
         m_record_widget->setVisible(!m_watch_only);
         getWidget<LabelWidget>("record-race-text")->setVisible(!m_watch_only);
 
-        // Refresh the list to have only compatible replays
-        dynamic_cast<GhostReplaySelection*>(GUIEngine::getCurrentScreen())
-            ->refresh();
+        refreshMainScreen();
 
         m_replay_id = ReplayPlay::get()->getReplayIdByUID(m_rd.m_replay_uid);
     }
@@ -324,3 +330,13 @@ void GhostReplayInfoDialog::onUpdate(float dt)
         return;
     }
 }   // onUpdate
+
+void GhostReplayInfoDialog::refreshMainScreen()
+{
+    GhostReplaySelection::getInstance()->setCompare(m_compare_ghost);
+    GhostReplaySelection::getInstance()->setCompareReplayUid(m_compare_replay_uid);
+
+    // Refresh the list to have only compatible replays
+    dynamic_cast<GhostReplaySelection*>(GUIEngine::getCurrentScreen())
+        ->refresh();
+}

@@ -35,11 +35,11 @@ private:
 
     bool  m_record_race;
     bool  m_watch_only;
-    bool* m_compare_ghost;
+    bool  m_compare_ghost;
 
     unsigned int m_replay_id; // May be updated on list refreshes
 
-    unsigned long long int* m_compare_replay_uid;
+    uint64_t m_compare_replay_uid;
 
     ReplayPlay::ReplayData m_rd;
 
@@ -53,9 +53,10 @@ private:
     GUIEngine::IconButtonWidget*  m_track_screenshot_widget;
 
     void updateReplayDisplayedInfo();
+    void refreshMainScreen();
 
 public:
-    GhostReplayInfoDialog(unsigned int replay_id, unsigned long long int* compare_replay_uid, bool* compare_ghost);
+    GhostReplayInfoDialog(unsigned int replay_id, uint64_t compare_replay_uid, bool compare_ghost);
     ~GhostReplayInfoDialog();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
