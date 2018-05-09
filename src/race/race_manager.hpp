@@ -511,6 +511,20 @@ public:
     // ------------------------------------------------------------------------
     MinorRaceModeType getMinorMode() const { return m_minor_mode; }
     // ------------------------------------------------------------------------
+    std::string getMinorModeName() const
+    {
+        switch (m_minor_mode)
+        {
+            case MINOR_MODE_NORMAL_RACE:    return "normal";
+            case MINOR_MODE_TIME_TRIAL:     return "time-trial";
+            case MINOR_MODE_FOLLOW_LEADER:  return "follow-the-leader";
+            case MINOR_MODE_3_STRIKES:      return "battle";
+            case MINOR_MODE_EASTER_EGG:     return "egg-hunt";
+            case MINOR_MODE_SOCCER:         return "soccer";
+            default: assert(false);         return "";
+        }
+    }
+    // ------------------------------------------------------------------------
     unsigned int getNumPlayers() const 
     {
         return (unsigned int) m_player_karts.size(); 
@@ -524,8 +538,10 @@ public:
      */
     int getNumLaps() const
     {
-        if(m_minor_mode==MINOR_MODE_3_STRIKES     ||
-            m_minor_mode==MINOR_MODE_FOLLOW_LEADER    )
+        if(m_minor_mode==MINOR_MODE_3_STRIKES      ||
+            m_minor_mode==MINOR_MODE_FOLLOW_LEADER ||
+            m_minor_mode==MINOR_MODE_SOCCER        ||
+            m_minor_mode==MINOR_MODE_EASTER_EGG  )
             return 9999;
         return m_num_laps[m_track_number];
     }   // getNumLaps
@@ -635,7 +651,7 @@ public:
         return m_ai_kart_list;
     }   // getAIKartList
     // ------------------------------------------------------------------------
-    /** \brief get information about given mode (returns true if 'mode' is of
+    /** \brief get information about current mode (returns true if 'mode' is of
     *  linear races type) */
     bool isLinearRaceMode()
     {
@@ -645,6 +661,19 @@ public:
         if(id > 999 && id < 2000) return true;
         else return false;
     }   // isLinearRaceMode
+
+    // ------------------------------------------------------------------------
+    /** \brief get information about given mode (returns true if 'mode' is of
+    *  linear races type) */
+    bool isLinearRaceMode(const MinorRaceModeType mode)
+    {
+        const int id = (int)mode;
+        // info is stored in its ID for conveniance, see the macros LINEAR_RACE
+        // and BATTLE_ARENA above for exact meaning.
+        if(id > 999 && id < 2000) return true;
+        else return false;
+    }   // isLinearRaceMode
+
     // ------------------------------------------------------------------------
     /** \brief Returns true if the current mode is a battle mode. */
     bool isBattleMode()
@@ -672,6 +701,18 @@ public:
     {
         return m_minor_mode == MINOR_MODE_TUTORIAL;
     }   // isTutorialMode
+
+    // ------------------------------------------------------------------------
+    bool isEggHuntMode()
+    {
+        return m_minor_mode == MINOR_MODE_EASTER_EGG;
+    }   //  isEggHuntMode
+
+    // ------------------------------------------------------------------------
+    bool isTimeTrialMode()
+    {
+        return m_minor_mode == MINOR_MODE_TIME_TRIAL;
+    }   //  isTimeTrialMode
     // ------------------------------------------------------------------------
     /** \brief Returns true if the current mode has laps. */
     bool modeHasLaps()
