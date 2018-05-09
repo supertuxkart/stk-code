@@ -40,7 +40,7 @@ private:
 
     /** A client stores a 'confirmed' item event state, which is based on the
       * server data. This is used in case of rewind. */
-    std::vector<ItemState> m_confirmed_state;
+    std::vector<ItemState*> m_confirmed_state;
 
     /** Time at which m_confirmed_state was taken. */
     int m_confirmed_state_time;
@@ -50,32 +50,62 @@ private:
 
     // ------------------------------------------------------------------------
     /** This class stores a delta, i.e. an item event (either collection of
-     *  an item, or an item switch being activated). All those deltas
-     *  will be applied to the confirmed state to get a new state. */
-    class ItemEventInfo : public ItemState
+     *  an item, adding a new item, or an item switch being activated). All
+     *  those deltas will be applied to the confirmed state to get a new state.
+     */
+    class ItemEventInfo
     {
     public:
-        /** The kart id that collected an item (if m_item_id>-1),
-        *  otherwise undefined. */
-        int m_kart_id;
-
         /** Time at which this event happens. */
         int m_ticks;
 
-        ItemEventInfo(ItemState::ItemType type,  int item_id,
-                      int ticks, int kart_id)
-                    : ItemState(type, item_id)
-                    , m_kart_id(kart_id), m_ticks(ticks)
-        { }
+        /** Index of this item in the item list. Only used when creating
+         *  new items (e.g. bubble gum). */
+        int m_index;
+
+        /** Additional info about the item: -1 if a switch is activated.
+         *  Otherwise it contains information about what item the kart gets
+         *  (e.g. banana --> anchor or bomb). */
+        int m_item_info;
+
+        /** The kart id that collected an item ,
+        *  otherwise undefined. */
+        int m_kart_id;
+
+        /** Constructor for collecting an existing item.
+         *  \param ticks Time of the event.
+         *  \param item_id The index of the item that was collected.
+         *  \param kart_id the kart that collected the item. */
+        ItemEventInfo(int ticks, int index, int kart_id, int item_info)
+                    : m_ticks(ticks), m_index(index), m_kart_id(kart_id),
+                      m_item_info(item_info)
+        {
+        }   // ItemEventInfo(collected existing item)
+
+        // --------------------------------------------------------------------
+        /** Constructor for creating a new item (i.e. a bubble gum is dropped).
+         */
+        ItemEventInfo(int ticks, ItemState::ItemType type,  int item_id,
+                      Vec3 xyz)            
+        {        
+        }   // ItemEventInfo(new item)
+        // --------------------------------------------------------------------
+        /** Constructor for switching items. */
+        ItemEventInfo(int ticks) 
+                    : m_ticks(ticks), m_kart_id(-1), m_item_info(-1)
+        {
+        }   // ItemEventInfo(switch)
 
     };   // class ItemEventInfo
 
     // ------------------------------------------------------------------------
     /** List of all items events. */
-    std::vector<ItemEventInfo> m_item_events;
+    Synchronised< std::vector<ItemEventInfo> > m_item_events;
 
     /** Time of the last confirmed event. */
     int m_last_confirmed_event;
+
+    void forwardTime(int ticks);
 
     NetworkItemManager();
     virtual ~NetworkItemManager();

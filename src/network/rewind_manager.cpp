@@ -327,7 +327,10 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
     // ----------------------------
     World *world = World::getWorld();
 
-    // Now start the rewind with the full state:
+    // Now start the rewind with the full state. It is important that the
+    // world time is set first, since e.g. the NetworkItem manager relies
+    // on having the access to the 'confirmed' state time using 
+    // the world timer.
     world->setTicks(exact_rewind_ticks);
 
     // Get the (first) full state to which we have to rewind

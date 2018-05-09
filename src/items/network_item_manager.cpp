@@ -75,7 +75,8 @@ void NetworkItemManager::saveInitialState()
     m_confirmed_state.clear();
     for(auto i : m_all_items)
     {
-        m_confirmed_state.emplace_back(*i);
+        ItemState *is = new ItemState(*i);
+        m_confirmed_state.push_back(is);
     }
 }   // saveInitialState
 
@@ -91,23 +92,61 @@ void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart,
 {
     if(NetworkConfig::get()->isServer())
     {
-        m_item_events.emplace_back(item->getType(), item->getItemId(), 
-                                   World::getWorld()->getTimeTicks(),
-                                   kart->getWorldKartId()             );
+        m_item_events.lock();
+        m_item_events.getData().emplace_back(World::getWorld()->getTimeTicks(), 
+                                             item->getItemId(),
+                                             kart->getWorldKartId(),
+                                             /*item_info*/0);
+        m_item_events.unlock();
         ItemManager::collectedItem(item, kart, add_info);
     }
 }   // collectedItem
 
 //-----------------------------------------------------------------------------
+/** Called by the GameProtocol when a confirmation for an item event is 
+ *  received by a host. Once all hosts have confirmed an event, it can be
+ *  deleted and won't be send to any clients again.
+ *  \param host_id Host identification of the host confirming the latest
+ *         event time received.
+ *  \param ticks Time at which the last event was received.
+ */
 void NetworkItemManager::setItemConfirmationTime(int host_id, int ticks)
 {
+    assert(NetworkConfig::get()->isServer());
     m_last_confirmed_item_ticks.lock();
     if (ticks > m_last_confirmed_item_ticks.getData()[host_id])
         m_last_confirmed_item_ticks.getData()[host_id] = ticks;
+
+    // Now discard unneeded events, i.e. all events that have
+    // been confirmed by all clients:
+    int min_time = 999999;
+    for (auto i : m_last_confirmed_item_ticks.getData())
+        if (i < min_time) min_time = i;
     m_last_confirmed_item_ticks.unlock();
+
+    // Find the last entry before the minimal confirmed time.
+    // Since the event list is sorted, all events up to this
+    // entry can be deleted.
+    m_item_events.lock();
+    auto p = m_item_events.getData().begin();
+    while (p != m_item_events.getData().end() && p->m_ticks < min_time)
+        p++;
+    m_item_events.getData().erase(m_item_events.getData().begin(), p);
+    m_item_events.unlock();
+
+    // TODO: Get informed when a client drops out!!!
 }   // setItemConfirmationTime
 
 //-----------------------------------------------------------------------------
+/** Saves the state of all items. This is done by using a state that has
+ *  been confirmed by all clients as a base, and then only adding any
+ *  changes applied to that state later. As clients keep on confirming events
+ *  the confirmed event will be moved forward in time, and older events can
+ *  be deleted (and not sent to the clients anymore).
+ *  This function is also called on the client in the first frame of a race
+ *  to save the initial state, which is the first confirmed state by all
+ *  clients.
+ */
 BareNetworkString* NetworkItemManager::saveState()
 {
     if(NetworkConfig::get()->isClient())
@@ -118,75 +157,119 @@ BareNetworkString* NetworkItemManager::saveState()
 
     // On the server:
     // ==============
-    // First discard unneeded events, i.e. all events that have
-    // been confirmed by all clients:
-    int min_time = World::getWorld()->getTimeTicks() + 1;
-    m_last_confirmed_item_ticks.lock();
-    for (auto i : m_last_confirmed_item_ticks.getData())
-        if (i < min_time) min_time = i;
-    m_last_confirmed_item_ticks.unlock();
-
-    auto p = m_item_events.begin();
-    while (p != m_item_events.end() && p->m_ticks < min_time)
-        p++;
-    m_item_events.erase(m_item_events.begin(), p);
-
-    uint16_t n = (uint16_t)m_item_events.size();
+    m_item_events.lock();
+    uint16_t n = (uint16_t)m_item_events.getData().size();
     if(n==0)
     {
         BareNetworkString *s =
             new BareNetworkString();
+        m_item_events.unlock();
         return s;
     }
 
     BareNetworkString *s = 
         new BareNetworkString(n * (sizeof(int) + sizeof(uint16_t) +
                                                + sizeof(uint8_t)   )  );
-    for (auto p : m_item_events)
+    for (auto p : m_item_events.getData())
     {
-        s->addTime(p.m_ticks).addUInt16(p.m_item_id);
-        if (p.m_item_id > -1) s->addUInt8(p.m_kart_id);
+        s->addTime(p.m_ticks).addUInt16(p.m_index);
+        if (p.m_index > -1) s->addUInt8(p.m_kart_id);
     }
+    m_item_events.unlock();
     Log::verbose("NIM", "Including %d item update at %d",
                  n, World::getWorld()->getTimeTicks());
     return s;
 }   // saveState
 
 //-----------------------------------------------------------------------------
-/** Restores a state, using exactly 'count' bytes of the message. 
+/** Progresses the time for all item by the given number of ticks. Used
+ *  when computing a new state from a confirmed state.
+ *  \param ticks Number of ticks that need to be simulated.
+ */
+void NetworkItemManager::forwardTime(int ticks)
+{
+    for(auto &i : m_confirmed_state)
+    {
+        if (i) i->update(ticks);
+    }   // for m_all_items
+}   // forwardTime
+
+//-----------------------------------------------------------------------------
+/** Restores the state of the items to the current world time. It takes the
+ *  last saved
+
+ *  using exactly 'count' bytes of the message. 
  *  \param buffer the state content.
  *  \param count Number of bytes used for this state.
  */
 void NetworkItemManager::restoreState(BareNetworkString *buffer, int count) 
 {
+    // The state at World::getTimeTicks() needs to be restored. The confirmed
+    // state in this instance was taken at m_confirmed_state_time. So first
+    // apply the new events to the confirmed state till we reach the end of
+    // all new events (which must be <= getTimeTicks() (since the server will
+    // only send events till the specified state time). Then forward the
+    // state to getTimeTicks().
+
+    int current_time = m_confirmed_state_time;
     while(count > 0)
     {
-        int ticks   = buffer->getTime();
-        int item_id = buffer->getUInt16();
-        int kart_id = -1;
-        count -= 6;
-        if(item_id>-1)
+        // 1) Decode the event in the message
+        // ----------------------------------
+        int ticks      = buffer->getTime();
+        int item_index = buffer->getUInt16();
+        int kart_id    = -1;
+        count         -= 6;
+        if(item_index>-1)
         {
-            // Not a global event, so we have a kart id
             kart_id = buffer->getUInt8();
             count --;
         }   // item_id>-1
-        // This event has already been received, and can be ignored now.
-        if(ticks <= m_last_confirmed_event) continue;
-        
-        // Now we certainly have a new event that needs to be added:
-        m_item_events.emplace_back(m_all_items[item_id]->getType(), item_id,
-                                   ticks, kart_id                           );
-        Log::info("NIM", "Received new event at %d", ticks);
+
+        // 2) If the event needs to be applied, forward
+        //    the time to the time of this event:
+        // --------------------------------------------
+        int dt = ticks - current_time;
+        // Skip an event that are 'in the past' (i.e. have been sent again by
+        // the server because it has not yet received confirmation from all
+        // clients.
+        if(dt<0) continue;
+
+        // Forward the saved state:
+        if (dt>0) forwardTime(dt);
+
+        // TODO: apply the various events types, atm only collection is supported:
+        ItemState *item_state = m_confirmed_state[item_index];
+        if (item_index > -1)
+        {
+            // An item on the track was collected:
+            AbstractKart *kart = World::getWorld()->getKart(kart_id);
+            m_confirmed_state[item_index]->collected(kart);
+        }
+
+        current_time = ticks;
     }   // while count >0
 
-    // At le
-    if(!m_item_events.empty())
-        m_last_confirmed_event = m_item_events.back().m_ticks;
-    m_last_confirmed_event = std::max(World::getWorld()->getTimeTicks(), 
-                                      m_last_confirmed_event             );
-    GameProtocol::lock()->sendItemEventConfirmation(m_last_confirmed_event);
-}   // undoState
+    // Inform the server which events have been received.
+    GameProtocol::lock()->sendItemEventConfirmation(World::getWorld()->getTimeTicks());
+
+    // Forward the confirmed item state till the world time:
+    int dt = World::getWorld()->getTimeTicks() - current_time;
+    if(dt>0) forwardTime(dt);
+
+    // Restore the state to the current world time:
+    // ============================================
+
+    for(unsigned int i=0; i<m_confirmed_state.size(); i++)
+    {
+        Item *item = m_all_items[i];
+        const ItemState *is = m_confirmed_state[i];
+        item->setTicksTillReturn(is->getTicksTillReturn());
+    }
+
+    // Now we save the current local
+    m_confirmed_state_time = m_last_confirmed_event;
+}   // restoreState
 
 //-----------------------------------------------------------------------------
 void NetworkItemManager::rewindToEvent(BareNetworkString *bns)
@@ -208,7 +291,7 @@ void NetworkItemManager::restoreStateAt(int ticks)
     for(auto i : m_confirmed_state)
     {
 
-      Item *it = m_all_items[i.m_item_id];
+      Item *it = m_all_items[i->getItemId()];
     }
 
 }   // restoreStateAt
