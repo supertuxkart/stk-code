@@ -116,15 +116,15 @@ public:
     void setSwitchItems(const std::vector<int> &switch_items);
     void sendItemUpdate();
     void saveInitialState();
-    void restoreStateAt(int ticks);
 
     virtual void reset();
-    virtual void setItemConfirmationTime(int host_id, int ticks);
+    virtual void setItemConfirmationTime(int host_id, int ticks) OVERRIDE;
     virtual void collectedItem(Item *item, AbstractKart *kart,
-                               int add_info = -1);
-    virtual void rewindToEvent(BareNetworkString *bns) OVERRIDE;
+                               int add_info = -1) OVERRIDE;
     virtual BareNetworkString* saveState() OVERRIDE;
     virtual void restoreState(BareNetworkString *buffer, int count) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void rewindToEvent(BareNetworkString *bns) OVERRIDE {};
     // ------------------------------------------------------------------------
     virtual void saveTransform() OVERRIDE {};
     // ------------------------------------------------------------------------

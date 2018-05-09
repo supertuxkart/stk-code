@@ -271,27 +271,3 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     m_confirmed_state_time = m_last_confirmed_event;
 }   // restoreState
 
-//-----------------------------------------------------------------------------
-void NetworkItemManager::rewindToEvent(BareNetworkString *bns)
-{
-}
-//-----------------------------------------------------------------------------
-void NetworkItemManager::restoreStateAt(int ticks)
-{
-    if (ticks < m_confirmed_state_time)
-    {
-        Log::error("ItemManager",
-            "Trying to restore state at t %d, but confirmed state is from %d.",
-            ticks, m_confirmed_state_time);
-        // Nothing much we can do about this - it should never happeb
-        m_confirmed_state_time = ticks;
-    }
-
-
-    for(auto i : m_confirmed_state)
-    {
-
-      Item *it = m_all_items[i->getItemId()];
-    }
-
-}   // restoreStateAt
