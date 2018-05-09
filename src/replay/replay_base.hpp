@@ -69,8 +69,13 @@ protected:
         int                 m_attachment;
         /** The nitro amount at a certain time. */
         float               m_nitro_amount;
-        /** The number of items (currently always zippers) at a certain time. */
+        /** The number of items at a certain time. */
         int                 m_item_amount;
+        /** The type of item at a certain time. */
+        int                 m_item_type;
+        /** Used to store mode-specific values : eggs in egg-hunt,
+            number of lives in battle-mode. */
+        int                 m_special_value;
     };   // StateInfo
 
 

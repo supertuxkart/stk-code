@@ -21,10 +21,14 @@
 #include "config/stk_config.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment.hpp"
+#include "items/powerup.hpp"
+#include "items/powerup_manager.hpp"
 #include "guiengine/message_queue.hpp"
+#include "karts/controller/player_controller.hpp"
 #include "karts/ghost_kart.hpp"
 #include "karts/skidding.hpp"
 #include "karts/kart_gfx.hpp"
+#include "modes/easter_egg_hunt.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "physics/btKart.hpp"
@@ -34,7 +38,7 @@
 #include <algorithm>
 #include <stdio.h>
 #include <string>
-#include <karts/controller/player_controller.hpp>
+#include <cinttypes>
 
 ReplayRecorder *ReplayRecorder::m_replay_recorder = NULL;
 
@@ -45,13 +49,10 @@ ReplayRecorder::ReplayRecorder()
 {
     m_complete_replay = false;
     m_incorrect_replay = false;
+    m_previous_steer   = 0.0f;
 
-    // Give margin to store extra events due to higher precision
-    // when a kart's tracked charateristic has suddenly changed
-    // in a non-interpolable way.
-    m_max_frames = (unsigned int)( FRAME_MARGIN_FOR_FORCED_UPDATES
-                                   * stk_config->m_replay_max_time
-                                   / stk_config->m_replay_dt);
+    assert(stk_config->m_replay_max_frames >= 0);
+    m_max_frames = stk_config->m_replay_max_frames;
 }   // ReplayRecorder
 
 //-----------------------------------------------------------------------------
@@ -132,23 +133,31 @@ void ReplayRecorder::update(int ticks)
         // for the kart, update sooner than the usual dt
         bool force_update = false;
 
-        int attachment = -1;
-        if (kart->getAttachment()->getType() == Attachment::ATTACH_NOTHING)
-            attachment = 0;
-        else if (kart->getAttachment()->getType() == Attachment::ATTACH_PARACHUTE)
-            attachment = 1;
-        else if (kart->getAttachment()->getType() == Attachment::ATTACH_ANVIL)
-            attachment = 2;
-        else if (kart->getAttachment()->getType() == Attachment::ATTACH_BOMB)
-            attachment = 3;
-        else if (kart->getAttachment()->getType() == Attachment::ATTACH_SWATTER)
-            attachment = 4;
-        else if (kart->getAttachment()->getType() == Attachment::ATTACH_BUBBLEGUM_SHIELD)
-            attachment = 5;
+        // Don't save directly the enum value, because any change
+        // to it would break the reading of old replays
+        int attachment = enumToCode(kart->getAttachment()->getType());
+        int powerup_type = enumToCode(kart->getPowerup()->getType());
+        int special_value = 0;
+
+        // In egg hunt mode, use store the number of eggs found so far
+        // This assumes that egg hunt mode is only available in single-player
+        // TODO : when adding battle mode support, store the number of lives here
+        if (race_manager->isEggHuntMode())
+        {
+            //TODO : figure out why the compiler don't like calling numberOfEggsFound
+            //       if easterworld is defined as constant
+            EasterEggHunt *easterworld = dynamic_cast<EasterEggHunt*>(World::getWorld());
+            special_value = easterworld->numberOfEggsFound();
+        }
 
         if (attachment == -1)
         {
             Log::error("ReplayRecorder", "Unknown attachment type");
+            return;
+        }
+        if (powerup_type == -1)
+        {
+            Log::error("ReplayRecorder", "Unknown powerup type");
             return;
         }
 
@@ -158,21 +167,42 @@ void ReplayRecorder::update(int ticks)
             BonusInfo *b_prev2      = &(m_bonus_info[i][m_count_transforms[i]-2]);
             PhysicInfo *q_prev      = &(m_physic_info[i][m_count_transforms[i]-1]);
 
+            // If the kart changes its steering
+            if (fabsf(kart->getControls().getSteer() - m_previous_steer) >
+                                            stk_config->m_replay_delta_steering)
+                force_update = true;
+
             // If the kart starts or stops skidding
             if (kart->getSkidding()->getSkidState() != q_prev->m_skidding_state)
                 force_update = true;
-
-            // If the kart changes speed brutally
-            // (booster, crash...)
-            if (fabsf(kart->getSpeed() - q_prev->m_speed) > 1.0f )
-                force_update = true;
+            // If the kart changes speed significantly
+            float speed_change = fabsf(kart->getSpeed() - q_prev->m_speed);
+            if ( speed_change > stk_config->m_replay_delta_speed )
+            {
+                if (speed_change > 4*stk_config->m_replay_delta_speed)
+                    force_update = true;
+                else if (speed_change > 2*stk_config->m_replay_delta_speed &&
+                         time - m_last_saved_time[i] > (stk_config->m_replay_dt/8.0f))
+                    force_update = true;
+                else if (time - m_last_saved_time[i] > (stk_config->m_replay_dt/3.0f))
+                    force_update = true;
+            }
 
             // If the attachment has changed
             if (attachment != b_prev->m_attachment)
-                force_update = true;
+                  force_update = true;
     
             // If the item amount has changed
             if (kart->getNumPowerup() != b_prev->m_item_amount)
+                force_update = true;
+
+            // If the item type has changed
+            if (powerup_type != b_prev->m_item_type)
+                force_update = true;
+
+            // In egg-hunt mode, if an egg has been collected
+            // In battle mode, if a live has been lost/gained
+            if (special_value != b_prev->m_special_value)
                 force_update = true;
 
             // If nitro starts being used or is collected
@@ -181,14 +211,15 @@ void ReplayRecorder::update(int ticks)
                 force_update = true;
 
             // If nitro stops being used
-            // (also generate an extra transform on collection,
-            //  should be negligble and better than heavier checks)
+            // (also generates an extra transform on collection,
+            //  should be negligible and better than heavier checks)
             if (kart->getEnergy() == b_prev->m_nitro_amount &&
                 b_prev->m_nitro_amount != b_prev2->m_nitro_amount)
                 force_update = true;
 
             // If close to the end of the race, reduce the time step
-            // for extra precision for the whole race time
+            // for extra precision
+            // TODO : fast updates when close to the last egg in egg hunt
             if (race_manager->isLinearRaceMode())
             {
                 float full_distance = race_manager->getNumLaps()
@@ -200,14 +231,14 @@ void ReplayRecorder::update(int ticks)
                 {
                     if (fabsf(full_distance - linearworld->getOverallDistance(i)) < DISTANCE_MAX_UPDATES)
                         force_update = true;
-                    else if (time - m_last_saved_time[i] < (stk_config->m_replay_dt/2.0f))
+                    else if (time - m_last_saved_time[i] > (stk_config->m_replay_dt/5.0f))
                         force_update = true;
                 }
             }
         }
 
 
-        if (time - m_last_saved_time[i] < stk_config->m_replay_dt &&
+        if ( time - m_last_saved_time[i] < (stk_config->m_replay_dt - stk_config->ticks2Time(1)) &&
             !force_update)
         {
 #ifdef DEBUG
@@ -215,6 +246,8 @@ void ReplayRecorder::update(int ticks)
 #endif
             continue;
         }
+
+        m_previous_steer = kart->getControls().getSteer();
         m_last_saved_time[i] = time;
         m_count_transforms[i]++;
         if (m_count_transforms[i] >= m_transform_events[i].size())
@@ -257,6 +290,8 @@ void ReplayRecorder::update(int ticks)
         b->m_attachment        = attachment;
         b->m_nitro_amount      = kart->getEnergy();
         b->m_item_amount       = kart->getNumPowerup();
+        b->m_item_type         = powerup_type;
+        b->m_special_value     = special_value;
 
         //Only saves distance if recording a linear race
         if (race_manager->isLinearRaceMode())
@@ -282,9 +317,9 @@ void ReplayRecorder::update(int ticks)
 //-----------------------------------------------------------------------------
 /** Compute the replay's UID ; partly based on race data ; partly randomly
  */
-unsigned long long int ReplayRecorder::computeUID(float min_time)
+uint64_t ReplayRecorder::computeUID(float min_time)
 {
-    unsigned long long int unique_identifier = 0;
+    uint64_t unique_identifier = 0;
 
     // First store some basic replay data
     int min_time_uid = (int) (min_time*1000);
@@ -292,7 +327,7 @@ unsigned long long int ReplayRecorder::computeUID(float min_time)
 
     int day, month, year;
     StkTime::getDate(&day, &month, &year);
-    unsigned long long int date_uid = year%10;
+    uint64_t date_uid = year%10;
     date_uid = date_uid*12 + (month-1);;
     date_uid = date_uid*31 + (day-1);
 
@@ -365,6 +400,8 @@ void ReplayRecorder::save()
 
     fprintf(fd, "version: %d\n", getCurrentReplayVersion());
     fprintf(fd, "stk_version: %s\n", STK_VERSION);
+
+    unsigned int player_count = 0;
     for (unsigned int real_karts = 0; real_karts < num_karts; real_karts++)
     {
         const AbstractKart *kart = world->getKart(real_karts);
@@ -373,23 +410,29 @@ void ReplayRecorder::save()
         // XML encode the username to handle Unicode
         fprintf(fd, "kart: %s %s\n", kart->getIdent().c_str(),
                 StringUtils::xmlEncode(kart->getController()->getName()).c_str());
+
+        if (kart->getController()->isPlayerController())
+        {
+            fprintf(fd, "kart_color: %f\n", StateManager::get()->getActivePlayer(player_count)->getConstProfile()->getDefaultKartColor());
+            player_count++;
+        }
+        else
+            fprintf(fd, "kart_color: 0\n");
     }
 
     m_last_uid = computeUID(min_time);
 
+    int num_laps = race_manager->getNumLaps();
+    if (num_laps == 9999) num_laps = 0; // no lap in that race mode
+
     fprintf(fd, "kart_list_end\n");
     fprintf(fd, "reverse: %d\n",    (int)race_manager->getReverseTrack());
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
+    fprintf(fd, "mode: %s\n",       race_manager->getMinorModeName().c_str());
     fprintf(fd, "track: %s\n",      Track::getCurrentTrack()->getIdent().c_str());
-    fprintf(fd, "laps: %d\n",       race_manager->getNumLaps());
+    fprintf(fd, "laps: %d\n",       num_laps);
     fprintf(fd, "min_time: %f\n",   min_time);
-    #ifdef _WIN32
-        /* format string for Windows */
-        #define ULONGLONG "%I64u"
-    #else
-        #define ULONGLONG "%Lu"
-    #endif
-    fprintf(fd, "replay_uid: " ULONGLONG "\n", m_last_uid);
+    fprintf(fd, "replay_uid: %" PRIu64 "\n", m_last_uid);
 
     for (unsigned int k = 0; k < num_karts; k++)
     {
@@ -404,7 +447,7 @@ void ReplayRecorder::save()
             const PhysicInfo *q      = &(m_physic_info[k][i]);
             const BonusInfo *b      = &(m_bonus_info[k][i]);
             const KartReplayEvent *r = &(m_kart_replay_event[k][i]);
-            fprintf(fd, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f %d  %d %f %d  %f %d %d %d %d %d\n",
+            fprintf(fd, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f %d  %d %f %d %d %d  %f %d %d %d %d %d\n",
                     p->m_time,
                     p->m_transform.getOrigin().getX(),
                     p->m_transform.getOrigin().getY(),
@@ -423,6 +466,8 @@ void ReplayRecorder::save()
                     b->m_attachment,
                     b->m_nitro_amount,
                     b->m_item_amount,
+                    b->m_item_type,
+                    b->m_special_value,
                     r->m_distance,
                     r->m_nitro_usage,
                     (int)r->m_zipper_usage,
@@ -435,3 +480,78 @@ void ReplayRecorder::save()
     fclose(fd);
 }   // save
 
+/* Returns an encoding value for a given attachment type.
+ * The internal values of the enum for attachments may change if attachments
+ * are introduced, removed or even reordered. To avoid compatibility issues
+ * with previous replay files, we add a layer to encode an enum semantical
+ * value the same way, independently of its internal value.
+ * \param type : the type of attachment to encode */
+
+int ReplayRecorder::enumToCode (Attachment::AttachmentType type)
+{
+    int code =
+        (type == Attachment::ATTACH_NOTHING)          ? 0 :
+        (type == Attachment::ATTACH_PARACHUTE)        ? 1 :
+        (type == Attachment::ATTACH_ANVIL)            ? 2 :
+        (type == Attachment::ATTACH_BOMB)             ? 3 :
+        (type == Attachment::ATTACH_SWATTER)          ? 4 :
+        (type == Attachment::ATTACH_BUBBLEGUM_SHIELD) ? 5 :
+                                                       -1 ;
+
+    return code;
+} // enumToCode
+
+/* Returns an encoding value for a given item type
+ * \param type : the type of item to encode */
+
+int ReplayRecorder::enumToCode (PowerupManager::PowerupType type)
+{
+    int code =
+        (type == PowerupManager::POWERUP_NOTHING)    ? 0 :
+        (type == PowerupManager::POWERUP_BUBBLEGUM)  ? 1 :
+        (type == PowerupManager::POWERUP_CAKE)       ? 2 :
+        (type == PowerupManager::POWERUP_BOWLING)    ? 3 :
+        (type == PowerupManager::POWERUP_ZIPPER)     ? 4 :
+        (type == PowerupManager::POWERUP_PLUNGER)    ? 5 :
+        (type == PowerupManager::POWERUP_SWITCH)     ? 6 :
+        (type == PowerupManager::POWERUP_SWATTER)    ? 7 :
+        (type == PowerupManager::POWERUP_RUBBERBALL) ? 8 :
+        (type == PowerupManager::POWERUP_PARACHUTE)  ? 9 :
+                                                      -1 ;
+
+    return code;
+} // enumToCode
+
+/* Returns the attachment enum value for a given replay code */
+Attachment::AttachmentType ReplayRecorder::codeToEnumAttach (int code)
+{
+    Attachment::AttachmentType type =
+        (code == 0) ? Attachment::ATTACH_NOTHING          :
+        (code == 1) ? Attachment::ATTACH_PARACHUTE        :
+        (code == 2) ? Attachment::ATTACH_ANVIL            :
+        (code == 3) ? Attachment::ATTACH_BOMB             :
+        (code == 4) ? Attachment::ATTACH_SWATTER          :
+        (code == 5) ? Attachment::ATTACH_BUBBLEGUM_SHIELD :
+                      Attachment::ATTACH_NOTHING ;
+
+    return type;
+} // codeToEnumAttach
+
+/* Returns the item enum value for a given replay code */
+PowerupManager::PowerupType ReplayRecorder::codeToEnumItem (int code)
+{
+    PowerupManager::PowerupType type =
+        (code == 0) ? PowerupManager::POWERUP_NOTHING    :
+        (code == 1) ? PowerupManager::POWERUP_BUBBLEGUM  :
+        (code == 2) ? PowerupManager::POWERUP_CAKE       :
+        (code == 3) ? PowerupManager::POWERUP_BOWLING    :
+        (code == 4) ? PowerupManager::POWERUP_ZIPPER     :
+        (code == 5) ? PowerupManager::POWERUP_PLUNGER    :
+        (code == 6) ? PowerupManager::POWERUP_SWITCH     :
+        (code == 7) ? PowerupManager::POWERUP_SWATTER    :
+        (code == 8) ? PowerupManager::POWERUP_RUBBERBALL :
+        (code == 9) ? PowerupManager::POWERUP_PARACHUTE  :
+                      PowerupManager::POWERUP_NOTHING ;
+
+    return type;
+} // codeToEnumItem

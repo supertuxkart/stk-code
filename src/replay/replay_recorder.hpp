@@ -19,6 +19,8 @@
 #ifndef HEADER_REPLAY_RECORDER_HPP
 #define HEADER_REPLAY_RECORDER_HPP
 
+#include "items/attachment.hpp"
+#include "items/powerup_manager.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "replay/replay_base.hpp"
 
@@ -57,16 +59,17 @@ private:
 
     bool  m_incorrect_replay;
 
-    /* The maximum number of frames saved */
     unsigned int m_max_frames;
 
-    const float FRAME_MARGIN_FOR_FORCED_UPDATES = 1.2f;
+    // Stores the steering value at the previous transform.
+    // Used to trigger the recording of new transforms.
+    float m_previous_steer = 0.0f;
 
     const float DISTANCE_FAST_UPDATES = 10.0f;
 
-    const float DISTANCE_MAX_UPDATES = 2.0f;
+    const float DISTANCE_MAX_UPDATES = 1.0f;
 
-    unsigned long long int m_last_uid;
+    uint64_t m_last_uid;
 
 #ifdef DEBUG
     /** Counts overall number of events stored. */
@@ -80,7 +83,7 @@ private:
 #endif
 
     /** Compute the replay's UID ; partly based on race data ; partly randomly */
-    unsigned long long int computeUID(float min_time);
+    uint64_t computeUID(float min_time);
 
 
           ReplayRecorder();
@@ -91,7 +94,15 @@ public:
     void  save();
     void  update(int ticks);
 
-    const unsigned long long int getLastUID() { return m_last_uid; }
+    const uint64_t getLastUID() { return m_last_uid; }
+
+    /** Functions to encode and decode attahcments and item types,
+        so that the stored value is independent from internal
+        representation and resilient to such changes. */
+    static int enumToCode (Attachment::AttachmentType type);
+    static int enumToCode (PowerupManager::PowerupType type);
+    static Attachment::AttachmentType codeToEnumAttach (int code);
+    static PowerupManager::PowerupType codeToEnumItem (int code);
 
     // ------------------------------------------------------------------------
     /** Creates a new instance of the replay object. */

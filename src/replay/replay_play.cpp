@@ -30,6 +30,7 @@
 #include <irrlicht.h>
 #include <stdio.h>
 #include <string>
+#include <cinttypes>
 
 ReplayPlay::SortOrder ReplayPlay::m_sort_order = ReplayPlay::SO_DEFAULT;
 ReplayPlay *ReplayPlay::m_replay_play = NULL;
@@ -182,6 +183,22 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
             // (see GhostController::getName)
             rd.m_name_list.push_back("");
         }
+
+        // Read kart color data
+        if (version >= 4)
+        {
+            float f = 0;
+            fgets(s, 1023, fd);
+            if(sscanf(s, "kart_color: %f", &f) != 1)
+            {
+                Log::warn("Replay", "Kart color missing in replay file.");
+                fclose(fd);
+                return false;
+            }
+            rd.m_kart_color.push_back(f);
+        }
+        else
+            rd.m_kart_color.push_back(0.0f); // Use default kart color
     }
 
     int reverse = 0;
@@ -201,6 +218,22 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
         fclose(fd);
         return false;
     }
+
+    if (version >= 4)
+    {
+        fgets(s, 1023, fd);
+        if (sscanf(s, "mode: %s", s1) != 1)
+        {
+            Log::warn("Replay", "Replay mode not found in replay file.");
+            fclose(fd);
+            return false;
+        }
+        rd.m_minor_mode = s1;
+    }
+    // Assume time-trial mode for old replays
+    else
+        rd.m_minor_mode = "time-trial";
+
 
     fgets(s, 1023, fd);
     if (sscanf(s, "track: %s", s1) != 1)
@@ -235,17 +268,10 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
         return false;
     }
 
-    #ifdef _WIN32
-        /* format string for Windows */
-        #define ULONGLONG "%I64u"
-    #else
-        #define ULONGLONG "%Lu"
-    #endif
-
     if (version >= 4)
     {
         fgets(s, 1023, fd);
-        if (sscanf(s, "replay_uid: " ULONGLONG, &rd.m_replay_uid) != 1)
+        if (sscanf(s, "replay_uid: %" PRIu64, &rd.m_replay_uid) != 1)
         {
             Log::warn("Replay", "Replay UID not found in replay file.");
             fclose(fd);
@@ -303,8 +329,9 @@ void ReplayPlay::loadFile(bool second_replay)
     Log::info("Replay", "Reading replay file '%s'.", getReplayFilename(replay_file_number).c_str());
 
     ReplayData &rd = m_replay_file_list[replay_index];
-    unsigned int lines_to_skip = (rd.m_replay_version == 3) ? 7 : 9;
-    lines_to_skip += m_replay_file_list.at(replay_index).m_kart_list.size();
+    unsigned int num_kart = m_replay_file_list.at(replay_index).m_kart_list.size();
+    unsigned int lines_to_skip = (rd.m_replay_version == 3) ? 7 : 10;
+    lines_to_skip += (rd.m_replay_version == 3) ? num_kart : 2*num_kart;
 
     for (unsigned int i = 0; i < lines_to_skip; i++)
         fgets(s, 1023, fd);
@@ -339,7 +366,8 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
 
     ReplayData &rd = m_replay_file_list[replay_index];
     m_ghost_karts.push_back(new GhostKart(rd.m_kart_list.at(kart_num-first_loaded_f_num),
-                                          kart_num, kart_num + 1));
+                                          kart_num, kart_num + 1,
+                                          rd.m_kart_color.at(kart_num-first_loaded_f_num)));
     m_ghost_karts[kart_num].init(RaceManager::KT_GHOST);
     Controller* controller = new GhostController(getGhostKart(kart_num),
                                                  rd.m_name_list[kart_num-first_loaded_f_num]);
@@ -354,7 +382,8 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
     {
         fgets(s, 1023, fd);
         float x, y, z, rx, ry, rz, rw, time, speed, steer, w1, w2, w3, w4, nitro_amount, distance;
-        int skidding_state, attachment, item_amount, nitro, zipper, skidding, red_skidding, jumping;
+        int skidding_state, attachment, item_amount, item_type, special_value,
+            nitro, zipper, skidding, red_skidding, jumping;
 
         // Check for EV_TRANSFORM event:
         // -----------------------------
@@ -386,6 +415,8 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
                 bi.m_attachment           = 0;    //not saved in version 3 replays
                 bi.m_nitro_amount         = 0;    //not saved in version 3 replays
                 bi.m_item_amount          = 0;    //not saved in version 3 replays
+                bi.m_item_type            = 0;    //not saved in version 3 replays
+                bi.m_special_value        = 0;    //not saved in version 3 replays
                 kre.m_distance            = 0.0f; //not saved in version 3 replays
                 kre.m_nitro_usage         = nitro;
                 kre.m_zipper_usage        = zipper!=0;
@@ -408,14 +439,14 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
         //version 4 replays (STK 0.9.4 and higher)
         else
         {
-            if(sscanf(s, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f %d  %d %f %d  %f %d %d %d %d %d\n",
+            if(sscanf(s, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f %d  %d %f %d %d %d  %f %d %d %d %d %d\n",
                 &time,
                 &x, &y, &z,
                 &rx, &ry, &rz, &rw,
                 &speed, &steer, &w1, &w2, &w3, &w4, &skidding_state,
-                &attachment, &nitro_amount, &item_amount,
+                &attachment, &nitro_amount, &item_amount, &item_type, &special_value,
                 &distance, &nitro, &zipper, &skidding, &red_skidding, &jumping
-                )==24)
+                )==26)
             {
                 btQuaternion q(rx, ry, rz, rw);
                 btVector3 xyz(x, y, z);
@@ -433,6 +464,8 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
                 bi.m_attachment           = attachment;
                 bi.m_nitro_amount         = nitro_amount;
                 bi.m_item_amount          = item_amount;
+                bi.m_item_type            = item_type;
+                bi.m_special_value        = special_value;
                 kre.m_distance            = distance;
                 kre.m_nitro_usage         = nitro;
                 kre.m_zipper_usage        = zipper!=0;
@@ -460,7 +493,7 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
  *  with a matching UID.
  *  \param uid The UID to match
  */
-void ReplayPlay::setReplayFileByUID(unsigned long long int uid)
+void ReplayPlay::setReplayFileByUID(uint64_t uid)
 {
     m_current_replay_file = getReplayIdByUID(uid);
 } //setReplayFileByUID
@@ -469,7 +502,7 @@ void ReplayPlay::setReplayFileByUID(unsigned long long int uid)
 /** Search among replay file and return the first index with a matching UID.
  *  \param uid The UID to match
  */
-unsigned int ReplayPlay::getReplayIdByUID(unsigned long long int uid)
+unsigned int ReplayPlay::getReplayIdByUID(uint64_t uid)
 {
     for(unsigned int i = 0; i < m_replay_file_list.size(); i++)
     {

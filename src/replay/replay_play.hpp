@@ -55,16 +55,18 @@ public:
     public:
         std::string                m_filename;
         std::string                m_track_name;
+        std::string                m_minor_mode;
         core::stringw              m_stk_version;
         core::stringw              m_user_name;
         std::vector<std::string>   m_kart_list;
         std::vector<core::stringw> m_name_list;
+        std::vector<float>         m_kart_color; //no sorting for this
         bool                       m_reverse;
         bool                       m_custom_replay_file;
         unsigned int               m_difficulty;
         unsigned int               m_laps;
         unsigned int               m_replay_version; //no sorting for this
-        unsigned long long int     m_replay_uid; //no sorting for this
+        uint64_t                   m_replay_uid; //no sorting for this
         float                      m_min_time;
 
         bool operator < (const ReplayData& r) const
@@ -143,9 +145,9 @@ public:
                              m_second_replay_enabled = second_replay_enabled;}
 
     // ------------------------------------------------------------------------
-    void               setReplayFileByUID(unsigned long long int uid);
+    void               setReplayFileByUID(uint64_t uid);
     // ------------------------------------------------------------------------
-    unsigned int       getReplayIdByUID(unsigned long long int uid);
+    unsigned int       getReplayIdByUID(uint64_t uid);
 
     // ------------------------------------------------------------------------
     bool               addReplayFile(const std::string& fn,
