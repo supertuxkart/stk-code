@@ -69,10 +69,11 @@ void ItemState::update(int ticks)
 
 // ----------------------------------------------------------------------------
 /** Called when the item is collected.
- *  \param ticks Number of time step that the item will be unavailable.
+ *  \param kart The kart that collected the item.
  */
-void ItemState::collected(int ticks)
+void ItemState::collected(const AbstractKart *kart)
 {
+    m_event_handler = kart;
     if (m_type == ITEM_EASTER_EGG)
     {
         // They will disappear 'forever'
@@ -91,7 +92,7 @@ void ItemState::collected(int ticks)
     }
     else
     {
-        m_ticks_till_return = ticks;
+        m_ticks_till_return = stk_config->time2Ticks(2.0f);
     }
 
     if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)
@@ -179,7 +180,6 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
 {
     ItemState::initItem(type);
     m_xyz               = xyz;
-    m_event_handler     = NULL;
     m_emitter           = NULL;
     m_rotate            = (getType()!=ITEM_BUBBLEGUM) && 
                           (getType()!=ITEM_TRIGGER    );
@@ -333,6 +333,12 @@ void Item::updateGraphics(float dt)
 {
     if(!m_node) return;
 
+    float time_till_return = stk_config->ticks2Time(getTicksTillReturn());
+    bool is_visible = isAvailable() || time_till_return <= 1.0f || 
+                      (getType() == ITEM_BUBBLEGUM && !isUsedUp() );
+
+    m_node->setVisible(is_visible);
+
     if (!m_was_available_previously && isAvailable() )
     {
         // This item is now available again - make sure it is not
@@ -340,7 +346,6 @@ void Item::updateGraphics(float dt)
         m_node->setScale(core::vector3df(1, 1, 1));
     }
 
-    float time_till_return = stk_config->ticks2Time(getTicksTillReturn());
     if (!isAvailable() && time_till_return <= 1.0f)
     {
         // Make it visible by scaling it from 0 to 1:
@@ -368,16 +373,11 @@ void Item::updateGraphics(float dt)
 //-----------------------------------------------------------------------------
 /** Is called when the item is hit by a kart.  It sets the flag that the item
  *  has been collected, and the time to return to the parameter.
- *  \param ticks Ticks till the object reappears.
+ *  \param kart The kart that collected the item.
  */
-void Item::collected(const AbstractKart *kart, int ticks)
+void Item::collected(const AbstractKart *kart)
 {
-    ItemState::collected(ticks);
-    m_event_handler = kart;
-    if (m_node && (getType() != ITEM_BUBBLEGUM || isUsedUp() ) )
-    {
-        m_node->setVisible(false);
-    }
+    ItemState::collected(kart);
     
     if (m_listener != NULL)
     {

@@ -24,6 +24,7 @@
  *  Defines the various collectibles and weapons of STK.
  */
 
+#include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
@@ -118,6 +119,10 @@ private:
     int m_used_up_counter;
 
 protected:
+    /** Optionally set this if this item was laid by a particular kart. in
+    *  this case the 'm_deactive_ticks' will also be set - see below. */
+    const AbstractKart *m_event_handler;
+
     friend class ItemManager;
     friend class NetworkItemManager;
     // ------------------------------------------------------------------------
@@ -134,7 +139,8 @@ public:
     // ------------------------------------------------------------------------
     void setDisappearCounter();
     void update(int ticks);
-    void collected(int ticks);
+    virtual void collected(const AbstractKart *kart);
+
          
     // -----------------------------------------------------------------------
     void reset()
@@ -157,6 +163,7 @@ public:
     void initItem(ItemType type)
     {
         setType(type);
+        m_event_handler     = NULL;
         m_original_type     = ITEM_NONE;
         m_deactive_ticks    = 0;
         m_ticks_till_return = 0;
@@ -279,10 +286,6 @@ private:
     /** Stores if the item was available in the previously rendered frame. */
     bool m_was_available_previously;
 
-    /** Optionally set this if this item was laid by a particular kart. in
-     *  this case the 'm_deactive_ticks' will also be set - see below. */
-    const AbstractKart *m_event_handler;
-
     /** Kart that emitted this item if any */
     const AbstractKart *m_emitter;
 
@@ -315,7 +318,7 @@ public:
                        TriggerItemListener* trigger);
     virtual       ~Item ();
     void          updateGraphics(float dt);
-    virtual void  collected(const AbstractKart *kart, int ticks);
+    virtual void  collected(const AbstractKart *kart) OVERRIDE;
     void          setParent(AbstractKart* parent);
     void          reset();
     void          switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh);

@@ -307,7 +307,7 @@ void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
         // shielded karts can simply drive over bubble gums without any effect.
         return;
     }
-    item->collected(kart, stk_config->time2Ticks(2.0f));
+    item->collected(kart);
     // Inform the world - used for Easter egg hunt
     World::getWorld()->collectedItem(kart, item);
     kart->collectedItem(item, add_info);
