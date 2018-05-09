@@ -46,9 +46,11 @@ private:
 
     std::vector<ReplayBase::KartReplayEvent> m_all_replay_events;
 
+    unsigned int                             m_last_egg_idx = 0;
+
 public:
-                  GhostKart(const std::string& ident,
-                            unsigned int world_kart_id, int position);
+                  GhostKart(const std::string& ident, unsigned int world_kart_id,
+                            int position, float colorHue);
     virtual void  update(int ticks) OVERRIDE;
     virtual void  updateGraphics(float dt) OVERRIDE;
     virtual void  reset();

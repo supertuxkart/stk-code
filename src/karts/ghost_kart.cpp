@@ -23,17 +23,19 @@
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_model.hpp"
 #include "graphics/render_info.hpp"
+#include "modes/easter_egg_hunt.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
+#include "replay/replay_recorder.hpp"
 
 #include "LinearMath/btQuaternion.h"
 
 GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
-                     int position)
+                     int position, float colorHue)
           : Kart(ident, world_kart_id,
                  position, btTransform(btQuaternion(0, 0, 0, 1)),
                  PLAYER_DIFFICULTY_NORMAL,
-                 std::make_shared<RenderInfo>(0.0f, true/*transparent*/))
+                 std::make_shared<RenderInfo>(colorHue, true/*transparent*/))
 {
 }   // GhostKart
 
@@ -44,6 +46,7 @@ void GhostKart::reset()
     Kart::reset();
     // This will set the correct start position
     update(0);
+    m_last_egg_idx = 0;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -135,38 +138,53 @@ void GhostKart::update(int ticks)
         m_all_physic_info[idx].m_steer, m_all_physic_info[idx].m_speed,
         /*lean*/0.0f, idx);
 
-    // Attachment
-    // Uses custom format so that replay files remain valid if
-    // internal numbering changes.
+    // Attachment management
+    // FIXME : don't handle if an attachment is renewed
+    //         e.g., a bubble shield is used again with another active
+    //         potentially reaching arbitrary high active time
 
-    int attach_ticks = 9000;
+    Attachment::AttachmentType attach_type = ReplayRecorder::codeToEnumAttach(m_all_bonus_info[idx].m_attachment); 
+    int attach_ticks = 0;
+    // FIXME The exact value depends on kart properties. Should it be written in the replay file ?
+    if (attach_type == Attachment::ATTACH_BUBBLEGUM_SHIELD)
+        stk_config->time2Ticks(10);
+    else if (attach_type == Attachment::ATTACH_BOMB)
+        stk_config->time2Ticks(30);
+    // The replay history will take care of clearing,
+    // just make sure it won't expire by itself
+    else
+        stk_config->time2Ticks(300);
 
-    if ( m_all_bonus_info[idx    ].m_attachment == 0)
+    if ( attach_type == Attachment::ATTACH_NOTHING )
         m_attachment->clear();
-    else if ( m_all_bonus_info[idx    ].m_attachment == 1 &&
-              m_attachment->getType() != Attachment::ATTACH_PARACHUTE)
-        m_attachment->set(Attachment::ATTACH_PARACHUTE,attach_ticks);
-    else if ( m_all_bonus_info[idx    ].m_attachment== 2 &&
-              m_attachment->getType() != Attachment::ATTACH_ANVIL)
-        m_attachment->set(Attachment::ATTACH_ANVIL,attach_ticks);
-    else if ( m_all_bonus_info[idx    ].m_attachment == 3 &&
-              m_attachment->getType() != Attachment::ATTACH_BOMB)
-        m_attachment->set(Attachment::ATTACH_BOMB,attach_ticks);
-    else if ( m_all_bonus_info[idx    ].m_attachment == 4 &&
-              m_attachment->getType() != Attachment::ATTACH_SWATTER)
-        m_attachment->set(Attachment::ATTACH_SWATTER,attach_ticks);
-    else if ( m_all_bonus_info[idx    ].m_attachment == 5 &&
-              m_attachment->getType() != Attachment::ATTACH_BUBBLEGUM_SHIELD)
-        m_attachment->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,attach_ticks);
+    // Setting again reinitialize the graphical size of the attachment,
+    // so do so only if the type change
+    else if ( attach_type != m_attachment->getType())
+        m_attachment->set(attach_type,attach_ticks);
 
     // So that the attachment's model size is updated
-    // FIXME : While this works mostly fine, the model seems to take more time
-    //         to reach its full size than for normal karts
     m_attachment->update(ticks);
 
     // Nitro and zipper amount (shown in the GUI in watch-only mode)
     m_powerup->reset();
-    m_powerup->set(PowerupManager::POWERUP_ZIPPER, m_all_bonus_info[idx].m_item_amount);
+
+    // Update item amount and type
+    PowerupManager::PowerupType item_type = ReplayRecorder::codeToEnumItem(m_all_bonus_info[idx].m_item_type); 
+    m_powerup->set(item_type, m_all_bonus_info[idx].m_item_amount);
+
+    // Update special values in easter egg and battle modes
+    if (race_manager->isEggHuntMode())
+    {
+        if (idx > m_last_egg_idx &&
+            m_all_bonus_info[idx].m_special_value > m_all_bonus_info[m_last_egg_idx].m_special_value)
+        {
+            EasterEggHunt *world = dynamic_cast<EasterEggHunt*>(World::getWorld());
+            assert(world);
+            world->collectedEasterEggGhost(getWorldKartId());
+            m_last_egg_idx = idx;
+        }
+    }
+
     m_collected_energy = (1- rd)*m_all_bonus_info[idx    ].m_nitro_amount
                          +  rd  *m_all_bonus_info[idx + 1].m_nitro_amount;
 
@@ -200,8 +218,16 @@ float GhostKart::getSpeed() const
     const GhostController* gc =
         dynamic_cast<const GhostController*>(getController());
 
+    unsigned int current_index = gc->getCurrentReplayIndex();
+    const float rd             = gc->getReplayDelta();
+
     assert(gc->getCurrentReplayIndex() < m_all_physic_info.size());
-    return m_all_physic_info[gc->getCurrentReplayIndex()].m_speed;
+
+    if (current_index == m_all_physic_info.size())
+        return m_all_physic_info[current_index].m_speed;
+
+    return (1-rd)*m_all_physic_info[current_index    ].m_speed
+           +  rd *m_all_physic_info[current_index + 1].m_speed;
 }   // getSpeed
 
 // ----------------------------------------------------------------------------
