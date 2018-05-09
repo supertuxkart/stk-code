@@ -213,8 +213,10 @@ namespace irr
 		IRR_KEY_DOLLAR           = 0x123,
 		IRR_KEY_EXCLAM           = 0x124,
 		IRR_KEY_TWOSUPERIOR      = 0x125,
+		IRR_KEY_MU               = 0x126,
+		IRR_KEY_SECTION          = 0x127,
 
-		IRR_KEY_CODES_COUNT      = 0x126 // this is not a key, but the amount of keycodes there are.
+		IRR_KEY_CODES_COUNT      = 0x128 // this is not a key, but the amount of keycodes there are.
 	};
 
 } // end namespace irr

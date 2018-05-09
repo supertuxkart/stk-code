@@ -2438,7 +2438,7 @@ void CIrrDeviceLinux::createKeyMap()
 	KeyMap.push_back(SKeyMap(XK_space, IRR_KEY_SPACE));
 	KeyMap.push_back(SKeyMap(XK_exclam, IRR_KEY_EXCLAM));
 	KeyMap.push_back(SKeyMap(XK_quotedbl, IRR_KEY_QUOTEDBL));
-	KeyMap.push_back(SKeyMap(XK_section, 0)); //?
+	KeyMap.push_back(SKeyMap(XK_section, IRR_KEY_SECTION)); //?
 	KeyMap.push_back(SKeyMap(XK_numbersign, IRR_KEY_OEM_2));
 	KeyMap.push_back(SKeyMap(XK_dollar, IRR_KEY_DOLLAR));
 	KeyMap.push_back(SKeyMap(XK_percent, 0)); //?
@@ -2469,7 +2469,7 @@ void CIrrDeviceLinux::createKeyMap()
 	KeyMap.push_back(SKeyMap(XK_greater, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_question, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_at, IRR_KEY_2)); //?
-	KeyMap.push_back(SKeyMap(XK_mu, 0)); //?
+	KeyMap.push_back(SKeyMap(XK_mu, IRR_KEY_MU)); //?
 	KeyMap.push_back(SKeyMap(XK_EuroSign, 0)); //?
 	KeyMap.push_back(SKeyMap(XK_A, IRR_KEY_A));
 	KeyMap.push_back(SKeyMap(XK_B, IRR_KEY_B));
