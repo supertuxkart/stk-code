@@ -199,7 +199,22 @@ namespace irr
 		IRR_KEY_BUTTON_SELECT    = 0x111,
 		IRR_KEY_BUTTON_MODE      = 0x112,
 
-		IRR_KEY_CODES_COUNT      = 0x113 // this is not a key, but the amount of keycodes there are.
+		// For Azerty layout
+		IRR_KEY_AMPERSAND        = 0x113,
+		IRR_KEY_EACUTE           = 0x114,
+		IRR_KEY_QUOTEDBL         = 0x115,
+		IRR_KEY_PARENLEFT        = 0x116,
+		IRR_KEY_EGRAVE           = 0x117,
+		IRR_KEY_CCEDILLA         = 0x118,
+		IRR_KEY_AGRAVE           = 0x119,
+		IRR_KEY_PARENRIGHT       = 0x120,
+		IRR_KEY_UGRAVE           = 0x121,
+		IRR_KEY_COLON            = 0x122,
+		IRR_KEY_DOLLAR           = 0x123,
+		IRR_KEY_EXCLAM           = 0x124,
+		IRR_KEY_TWOSUPERIOR      = 0x125,
+
+		IRR_KEY_CODES_COUNT      = 0x126 // this is not a key, but the amount of keycodes there are.
 	};
 
 } // end namespace irr
