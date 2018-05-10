@@ -130,8 +130,6 @@ private:
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
     void drawGlobalTimer       ();
-    //TODO : support live difference computation outside of ghost replays
-    //       this would make the live difference a player-specific value
     void drawLiveDifference    ();
     void drawScores();
 
