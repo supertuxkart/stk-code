@@ -126,67 +126,65 @@ void GhostReplayInfoDialog::updateReplayDisplayedInfo()
 {
     m_replay_info_widget->clear();
 
-    int n=2;
-    if (m_compare_ghost)
-        n++;
-
     bool is_linear = GhostReplaySelection::getInstance()->isActiveModeLinear();
+    std::vector<GUIEngine::ListWidget::ListCell> row;
 
-    for (int i=0; i<n; i++)
+    // Display the header in normal cells
+    // as the header doesn't work with modal dialogs
+    if (is_linear)
+        row.push_back(GUIEngine::ListWidget::ListCell
+            (_("Reverse"), -1, 3, true));
+    row.push_back(GUIEngine::ListWidget::ListCell
+        (_("Difficulty"), -1, 4, true));
+    if (is_linear)
+        row.push_back(GUIEngine::ListWidget::ListCell
+            (_("Laps"), -1, 3, true));
+    row.push_back(GUIEngine::ListWidget::ListCell
+        (_("Time"), -1, 4, true));
+    row.push_back(GUIEngine::ListWidget::ListCell
+        (_("User"), -1, 5, true));
+    row.push_back(GUIEngine::ListWidget::ListCell
+        (_("Version"), -1, 3, true));
+
+    m_replay_info_widget->addItem(StringUtils::toString(0), row);
+
+    // Now display the data from the selected replay,
+    // and if applicable from the replay to compare with
+    int num_replays_to_list = (m_compare_ghost) ? 2 : 1;
+
+    for (int i=1; i<=num_replays_to_list; i++)
     {
+        row.clear();
+
         int id;
 
-        if (i<=1)
+        if (i==1)
             id = m_replay_id;
         else
             id = ReplayPlay::get()->getReplayIdByUID(m_compare_replay_uid);
 
         const ReplayPlay::ReplayData& rd = ReplayPlay::get()->getReplayData(id);
 
+        if (is_linear)
+            row.push_back(GUIEngine::ListWidget::ListCell
+                (rd.m_reverse ? _("Yes") : _("No"), -1, 3, true));
+        row.push_back(GUIEngine::ListWidget::ListCell
+            (race_manager->
+                getDifficultyName((RaceManager::Difficulty) rd.m_difficulty),
+                                                              -1, 4, true));
+        if (is_linear)
+            row.push_back(GUIEngine::ListWidget::ListCell
+                (StringUtils::toWString(rd.m_laps), -1, 3, true));
+        row.push_back(GUIEngine::ListWidget::ListCell
+            (StringUtils::toWString(rd.m_min_time) + L"s", -1, 4, true));
+        row.push_back(GUIEngine::ListWidget::ListCell
+            (rd.m_user_name.empty() ? " " : rd.m_user_name, -1, 5, true));
+        row.push_back(GUIEngine::ListWidget::ListCell
+            (rd.m_stk_version.empty() ? " " : rd.m_stk_version, -1, 3, true));
 
-        std::vector<GUIEngine::ListWidget::ListCell> row;
-
-        // Display the header in normal cells
-        // as the header doesn't work with modal dialogs
-        if (i==0)
-        {
-            if (is_linear)
-                row.push_back(GUIEngine::ListWidget::ListCell
-                    (_("Reverse"), -1, 3, true));
-            row.push_back(GUIEngine::ListWidget::ListCell
-                (_("Difficulty"), -1, 4, true));
-            if (is_linear)
-                row.push_back(GUIEngine::ListWidget::ListCell
-                    (_("Laps"), -1, 3, true));
-            row.push_back(GUIEngine::ListWidget::ListCell
-                (_("Time"), -1, 4, true));
-            row.push_back(GUIEngine::ListWidget::ListCell
-                (_("User"), -1, 5, true));
-            row.push_back(GUIEngine::ListWidget::ListCell
-                (_("Version"), -1, 3, true));
-        }
-        else
-        {
-            if (is_linear)
-                row.push_back(GUIEngine::ListWidget::ListCell
-                    (rd.m_reverse ? _("Yes") : _("No"), -1, 3, true));
-            row.push_back(GUIEngine::ListWidget::ListCell
-                (rd.m_difficulty == 3 ? _("SuperTux") : rd.m_difficulty == 2 ?
-                _("Expert") : rd.m_difficulty == 1 ?
-                _("Intermediate") : _("Novice") , -1, 4, true));
-            if (is_linear)
-                row.push_back(GUIEngine::ListWidget::ListCell
-                    (StringUtils::toWString(rd.m_laps), -1, 3, true));
-            row.push_back(GUIEngine::ListWidget::ListCell
-                (StringUtils::toWString(rd.m_min_time) + L"s", -1, 4, true));
-            row.push_back(GUIEngine::ListWidget::ListCell
-                (rd.m_user_name.empty() ? " " : rd.m_user_name, -1, 5, true));
-            row.push_back(GUIEngine::ListWidget::ListCell
-                (rd.m_stk_version.empty() ? " " : rd.m_stk_version, -1, 3, true));
-        }
         m_replay_info_widget->addItem(StringUtils::toString(i), row);
-    }
-}
+    } // for num_replays_to_list
+} // updateReplayDisplayedInfo
 
 // -----------------------------------------------------------------------------
 GUIEngine::EventPropagation
