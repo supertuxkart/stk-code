@@ -169,7 +169,6 @@ void EasterEggHunt::collectedEasterEgg(const AbstractKart *kart)
 void EasterEggHunt::collectedEasterEggGhost(int world_id)
 {
     m_eggs_collected[world_id]++;
-    printf("Egg collected, new total is %d\n", m_eggs_collected[world_id]);
 }   // collectedEasterEgg
 
 //-----------------------------------------------------------------------------
@@ -191,7 +190,6 @@ bool EasterEggHunt::isRaceOver()
         return true;
     else if (m_only_ghosts)
     {
-        printf("The game think there are only ghosts\n");
         for (unsigned int i=0 ; i<m_eggs_collected.size();i++)
         {
             if (m_eggs_collected[i] == m_number_of_eggs)
