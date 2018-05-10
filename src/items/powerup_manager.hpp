@@ -103,26 +103,12 @@ private:
     /** The icon for each powerup. */
     Material*     m_all_icons [POWERUP_MAX];
 
-    /** A maximum distance for homing powerups. */
-    float         m_all_max_distance[POWERUP_MAX];
-
-    /** A force to steer a powerup towards a target. */
-    float         m_all_force_to_target[POWERUP_MAX];
-
-    /** Maximum turn angle for steering of homing powerups. */
-    float         m_all_max_turn_angle[POWERUP_MAX];
-
     /** Last time the bouncing ball was collected */
     int           m_rubber_ball_collect_ticks;
 
-public:
     /** The mesh for each model (if the powerup has a model), e.g. a switch
         has none. */
     irr::scene::IMesh *m_all_meshes[POWERUP_MAX];
-private:
-
-    /** Size of the corresponding mesh. */
-    btVector3     m_all_extends[POWERUP_MAX];
 
     /** For each powerup the weight (probability) used depending on the
      *  number of players. */
@@ -140,7 +126,6 @@ private:
     std::vector<PositionClass> m_position_to_class;
 
     PowerupType   getPowerupType(const std::string &name) const;
-
     void          loadWeights(const XMLNode &root,
                               const std::string &class_name,
                               PositionClass position_class);
@@ -153,22 +138,23 @@ public:
     void          unloadPowerups  ();
     void          LoadPowerup     (PowerupType type, const XMLNode &node);
     void          updateWeightsForRace(unsigned int num_karts);
-    Material*     getIcon         (int type) const {return m_all_icons [type];}
     PowerupManager::PowerupType
-                  getRandomPowerup(unsigned int pos, unsigned int *n);
+        getRandomPowerup(unsigned int pos, unsigned int *n);
+    // ------------------------------------------------------------------------
+    /** Returns the icon(material) for a powerup. */
+    Material* getIcon(int type) const {return m_all_icons [type];}
+    // ------------------------------------------------------------------------
     /** Returns the mesh for a certain powerup.
      *  \param type Mesh type for which the model is returned. */
-    irr::scene::IMesh
-                 *getMesh         (int type) const {return m_all_meshes[type];}
-    float         getForceToTarget(int type) const {return m_all_force_to_target[type];}
-    float         getMaxDistance  (int type) const {return m_all_max_distance[type];}
-    float         getMaxTurnAngle (int type) const {return m_all_max_turn_angle[type];}
-    const btVector3&
-                  getExtend       (int type) const {return m_all_extends[type];}
-    int           getBallCollectTicks() const {return m_rubber_ball_collect_ticks;}
-    void          setBallCollectTicks(int ticks) {m_rubber_ball_collect_ticks=ticks;}
-
-};
+    irr::scene::IMesh *getMesh(int type) const {return m_all_meshes[type];}
+    // ------------------------------------------------------------------------
+    /** Returns the last time a rubber ball was collected. */
+    int getBallCollectTicks() const {return m_rubber_ball_collect_ticks;}
+    // ------------------------------------------------------------------------
+    /** Updates the last time at which a rubber ball was collected. */
+    void setBallCollectTicks(int ticks) {m_rubber_ball_collect_ticks=ticks;}
+    // ------------------------------------------------------------------------
+};   // class PowerupManager
 
 extern PowerupManager* powerup_manager;
 

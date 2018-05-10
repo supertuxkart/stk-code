@@ -79,7 +79,8 @@ void PowerupManager::unloadPowerups()
         if(m_all_meshes[(PowerupType)i])
             m_all_meshes[(PowerupType)i]->drop();
 
-        //FIXME: I'm not sure if this is OK or if I need to ->drop(), or delete them, or...
+        //FIXME: I'm not sure if this is OK or if I need to ->drop(),
+        //       or delete them, or...
         m_all_icons[i]  = (Material*)NULL;
     }
 }   // removeTextures
@@ -125,8 +126,9 @@ void PowerupManager::loadAllPowerups()
             LoadPowerup(type, *node);
         else
         {
-            Log::fatal("[PowerupManager]", "Can't find item '%s' from powerup.xml, entry %d/",
-                        name.c_str(), i+1);
+            Log::fatal("PowerupManager",
+                       "Can't find item '%s' from powerup.xml, entry %d.",
+                       name.c_str(), i+1);
             exit(-1);
         }
     }
@@ -158,8 +160,9 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
 #ifdef DEBUG
     if (icon_file.size() == 0)
     {
-        Log::debug("[PowerupManager]", "Cannot load powerup %i, no 'icon' attribute under XML node", type);
-        assert(false);
+        Log::fatal("PowerupManager",
+                   "Cannot load powerup %i, no 'icon' attribute under XML node",
+                   type);
     }
 #endif
 
@@ -180,7 +183,8 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
         if(!m_all_meshes[type])
         {
             std::ostringstream o;
-            o<<"Can't load model '"<<model<<"' for powerup type '"<<type<<"', aborting.";
+            o << "Can't load model '" << model << "' for powerup type '" << type
+              << "', aborting.";
             throw std::runtime_error(o.str());
         }
         m_all_meshes[type]->grab();
@@ -188,7 +192,6 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
     else
     {
         m_all_meshes[type] = 0;
-        m_all_extends[type] = btVector3(0.0f,0.0f,0.0f);
     }
     // Load special attributes for certain powerups
     switch (type) {
@@ -247,10 +250,12 @@ void PowerupManager::loadWeights(const XMLNode &root,
 
     if(weight_list.size()!=2*(int)POWERUP_LAST)
     {
-        Log::error("[PowerupManager]", "Incorrect number of weights found in class '%s':",
-               class_name.c_str());
-        Log::error("[PowerupManager]", "%d instead of %d - probabilities will be incorrect.",
-               (int)weight_list.size(), (int)POWERUP_LAST);
+        Log::error("PowerupManager",
+                   "Incorrect number of weights found in class '%s':",
+                   class_name.c_str());
+        Log::error("PowerupManager",
+                   "%d instead of %d - probabilities will be incorrect.",
+                   (int)weight_list.size(), (int)POWERUP_LAST);
         return;
     }
 
