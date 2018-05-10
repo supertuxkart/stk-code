@@ -50,7 +50,7 @@ private:
 
 public:
                   GhostKart(const std::string& ident, unsigned int world_kart_id,
-                            int position, float colorHue);
+                            int position, float color_hue);
     virtual void  update(int ticks) OVERRIDE;
     virtual void  updateGraphics(float dt) OVERRIDE;
     virtual void  reset();

@@ -31,11 +31,11 @@
 #include "LinearMath/btQuaternion.h"
 
 GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
-                     int position, float colorHue)
+                     int position, float color_hue)
           : Kart(ident, world_kart_id,
                  position, btTransform(btQuaternion(0, 0, 0, 1)),
                  PLAYER_DIFFICULTY_NORMAL,
-                 std::make_shared<RenderInfo>(colorHue, true/*transparent*/))
+                 std::make_shared<RenderInfo>(color_hue, true/*transparent*/))
 {
 }   // GhostKart
 
@@ -139,21 +139,23 @@ void GhostKart::update(int ticks)
         /*lean*/0.0f, idx);
 
     // Attachment management
-    // FIXME : don't handle if an attachment is renewed
-    //         e.g., a bubble shield is used again with another active
-    //         potentially reaching arbitrary high active time
+    // Note that this doesn't get ticks value from replay file,
+    // and can't get the exact ticks values when it depends from kart
+    // properties. It also doesn't manage the case where a shield is
+    // renewed. These inaccuracies are minor as it is used for
+    // graphical effect only.
 
-    Attachment::AttachmentType attach_type = ReplayRecorder::codeToEnumAttach(m_all_bonus_info[idx].m_attachment); 
+    Attachment::AttachmentType attach_type =
+        ReplayRecorder::codeToEnumAttach(m_all_bonus_info[idx].m_attachment);
     int attach_ticks = 0;
-    // FIXME The exact value depends on kart properties. Should it be written in the replay file ?
     if (attach_type == Attachment::ATTACH_BUBBLEGUM_SHIELD)
-        stk_config->time2Ticks(10);
+        attach_ticks = stk_config->time2Ticks(10);
     else if (attach_type == Attachment::ATTACH_BOMB)
-        stk_config->time2Ticks(30);
+        attach_ticks = stk_config->time2Ticks(30);
     // The replay history will take care of clearing,
     // just make sure it won't expire by itself
     else
-        stk_config->time2Ticks(300);
+        attach_ticks = stk_config->time2Ticks(300);
 
     if ( attach_type == Attachment::ATTACH_NOTHING )
         m_attachment->clear();
@@ -169,14 +171,16 @@ void GhostKart::update(int ticks)
     m_powerup->reset();
 
     // Update item amount and type
-    PowerupManager::PowerupType item_type = ReplayRecorder::codeToEnumItem(m_all_bonus_info[idx].m_item_type); 
+    PowerupManager::PowerupType item_type =
+        ReplayRecorder::codeToEnumItem(m_all_bonus_info[idx].m_item_type); 
     m_powerup->set(item_type, m_all_bonus_info[idx].m_item_amount);
 
     // Update special values in easter egg and battle modes
     if (race_manager->isEggHuntMode())
     {
         if (idx > m_last_egg_idx &&
-            m_all_bonus_info[idx].m_special_value > m_all_bonus_info[m_last_egg_idx].m_special_value)
+            m_all_bonus_info[idx].m_special_value >
+            m_all_bonus_info[m_last_egg_idx].m_special_value)
         {
             EasterEggHunt *world = dynamic_cast<EasterEggHunt*>(World::getWorld());
             assert(world);
@@ -190,9 +194,9 @@ void GhostKart::update(int ticks)
 
     // Graphical effects for nitro, zipper and skidding
     getKartGFX()->setGFXFromReplay(m_all_replay_events[idx].m_nitro_usage,
-        m_all_replay_events[idx].m_zipper_usage,
-        m_all_replay_events[idx].m_skidding_effect,
-        m_all_replay_events[idx].m_red_skidding);
+                                   m_all_replay_events[idx].m_zipper_usage,
+                                   m_all_replay_events[idx].m_skidding_effect,
+                                   m_all_replay_events[idx].m_red_skidding);
     getKartGFX()->update(dt);
 
     Vec3 front(0, 0, getKartLength()*0.5f);
@@ -235,7 +239,8 @@ float GhostKart::getSpeed() const
   * Returns -1.0f if none */
 float GhostKart::getTimeForDistance(float distance)
 {
-    const GhostController* gc = dynamic_cast<const GhostController*>(getController());
+    const GhostController* gc =
+        dynamic_cast<const GhostController*>(getController());
     
     int current_index = gc->getCurrentReplayIndex();
 
@@ -270,8 +275,11 @@ float GhostKart::getTimeForDistance(float distance)
         if (m_all_replay_events[lower_frame_index].m_distance <= distance &&
             m_all_replay_events[upper_frame_index].m_distance >= distance )
         {
-            float lower_diff = distance - m_all_replay_events[lower_frame_index].m_distance;
-            float upper_diff = m_all_replay_events[upper_frame_index].m_distance - distance;
+            float lower_diff =
+                distance - m_all_replay_events[lower_frame_index].m_distance;
+            float upper_diff =
+                m_all_replay_events[upper_frame_index].m_distance - distance;
+
             if ((lower_diff + upper_diff) == 0)
                 upper_ratio = 0.0f;
             else
