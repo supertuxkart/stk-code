@@ -37,8 +37,6 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::video;
 
-DEFINE_SCREEN_SINGLETON( ArenasScreen );
-
 static const char ALL_ARENA_GROUPS_ID[] = "all";
 
 

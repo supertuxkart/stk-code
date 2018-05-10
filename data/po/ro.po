@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Nicolae Crefelean, 2015,2017
+# Nicolae Crefelean, 2015,2017-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-11-13 00:19+0000\n"
-"Last-Translator: Auria <auria.mg@gmail.com>\n"
+"PO-Revision-Date: 2018-03-02 21:38+0000\n"
+"Last-Translator: Nicolae Crefelean\n"
 "Language-Team: Romanian (http://www.transifex.com/supertuxkart/supertuxkart/language/ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -100,13 +100,13 @@ msgstr "Serios... e secret."
 
 #. I18N: ./data/achievements.xml
 msgid "Mosquito Hunter"
-msgstr ""
+msgstr "Vânătoarea de țânțari"
 
 #. I18N: ./data/achievements.xml
 msgid ""
 "Take your opponents for mosquitos! With the swatter, squash at least 5 of "
 "them in a race."
-msgstr ""
+msgstr "Tratează adversarii ca pe țânțari! Lovește-i cu pliciul de cel puțin 5 ori într-o cursă."
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 msgid "Penguin Playground"

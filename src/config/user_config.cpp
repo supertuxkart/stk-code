@@ -181,146 +181,6 @@ void GroupUserConfigParam::addChild(UserConfigParam* child)
     m_attributes.push_back(child);
 }   // addChild
 
-
-// ============================================================================
-template<typename T, typename U>
-ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
-                                           const char* comment)
-{
-    m_param_name = param_name;
-    all_params.push_back(this);
-    if(comment != NULL) m_comment = comment;
-}   // ListUserConfigParam
-
-// ============================================================================
-template<typename T, typename U>
-ListUserConfigParam<T,U>::ListUserConfigParam(const char* param_name,
-                                           const char* comment,
-                                           int nb_elements,
-                                           ...)
-{
-    m_param_name = param_name;
-    all_params.push_back(this);
-    if(comment != NULL) m_comment = comment;
-
-    // add the default list
-    va_list arguments;
-    va_start ( arguments, nb_elements );
-    for ( int i = 0; i < nb_elements; i++ )
-        m_elements.push_back(T(va_arg ( arguments, U )));
-    va_end ( arguments );                  // Cleans up the list
-}   // ListUserConfigParam
-
-// ============================================================================
-template<typename T, typename U>
-ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
-                                           GroupUserConfigParam* group,
-                                           const char* comment)
-{
-    m_param_name = param_name;
-    group->addChild(this);
-    if(comment != NULL) m_comment = comment;
-}   // ListUserConfigParam
-
-// ============================================================================
-template<typename T, typename U>
-ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
-                                           GroupUserConfigParam* group,
-                                           const char* comment,
-                                           int nb_elements,
-                                           ...)
-{
-    m_param_name = param_name;
-    group->addChild(this);
-    if(comment != NULL) m_comment = comment;
-
-    // add the default list
-    va_list arguments;
-    va_start ( arguments, nb_elements );
-    for ( int i = 0; i < nb_elements; i++ )
-        m_elements.push_back(va_arg ( arguments, T ));
-    va_end ( arguments );                  // Cleans up the list
-}   // ListUserConfigParam
-
-// ----------------------------------------------------------------------------
-template<typename T, typename U>
-void ListUserConfigParam<T, U>::write(std::ofstream& stream) const
-{
-    const int elts_amount = (int)m_elements.size();
-
-    // comment
-    if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str();
-    stream << " -->\n    <" << m_param_name.c_str() << "\n";
-
-    stream << "        Size=\"" << elts_amount << "\"\n";
-    // actual elements
-    for (int n=0; n<elts_amount; n++)
-    {
-        stream << "        " << n << "=\"" << m_elements[n].c_str() << "\"\n";
-    }
-    stream << "    >\n";
-    stream << "    </" << m_param_name.c_str() << ">\n\n";
-}   // write
-
-// ----------------------------------------------------------------------------
-
-template<typename T, typename U>
-void ListUserConfigParam<T, U>::findYourDataInAChildOf(const XMLNode* node)
-{
-    const XMLNode* child = node->getNode( m_param_name );
-    if (child == NULL)
-    {
-        //Log::error("User Config", "Couldn't find parameter group %s", m_param_name.c_str());
-        return;
-    }
-
-    int attr_count = 0;
-    child->get( "Size", &attr_count);
-    for (int n=0; n<attr_count; n++)
-    {
-        T elt;
-        std::string str;
-        child->get( StringUtils::toString(n), &str);
-        StringUtils::fromString<T>(str, elt);
-        
-        // check if the element is already there :
-        bool there = false;
-        for (unsigned int i = 0; i < m_elements.size(); i++)
-        {
-            if (elt == m_elements[i])
-            {
-                there = true;
-                break;
-            }
-        }
-        if (!there)
-        {
-            m_elements.push_back(elt);
-        }
-    }
-
-}   // findYourDataInAChildOf
-
-// ----------------------------------------------------------------------------
-template<typename T, typename U>
-void ListUserConfigParam<T, U>::findYourDataInAnAttributeOf(const XMLNode* node)
-{
-}   // findYourDataInAnAttributeOf
-
-// ----------------------------------------------------------------------------
-template<typename T, typename U>
-void ListUserConfigParam<T,U>::addElement(T element)
-{
-    m_elements.push_back(element);
-}   // findYourDataInAnAttributeOf
-
-// ----------------------------------------------------------------------------
-template<typename T, typename U>
-core::stringc ListUserConfigParam<T, U>::toString() const
-{
-    return "";
-}   // toString
-
 // ----------------------------------------------------------------------------
 template<typename T, typename U>
 MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
@@ -334,26 +194,12 @@ MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
 // ----------------------------------------------------------------------------
 template<typename T, typename U>
 MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
-    const char* comment,
-    int nb_elements,
-    ...)
+    const char* comment, std::map<T, U> default_value)
 {
     m_param_name = param_name;
     all_params.push_back(this);
     if (comment != NULL) m_comment = comment;
-
-    // add the default list
-    va_list arguments;
-    va_start(arguments, nb_elements);
-
-    struct pair_type { T key; U value; };
-
-    for (int i = 0; i < nb_elements; i++) 
-    {
-        pair_type key_value_pair = va_arg(arguments, pair_type);
-        m_elements.insert(std::pair<T, U>(key_value_pair.key, key_value_pair.value));
-    }
-    va_end(arguments);                  // Cleans up the list
+    m_elements = default_value;
 }   // MapUserConfigParam
 
 // ----------------------------------------------------------------------------
@@ -370,27 +216,14 @@ MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
 // ----------------------------------------------------------------------------
 template<typename T, typename U>
 MapUserConfigParam<T, U>::MapUserConfigParam(const char* param_name,
-    GroupUserConfigParam* group,
-    const char* comment,
-    int nb_elements,
-    ...)
+    GroupUserConfigParam* group, const char* comment,
+    std::map<T, U> default_value)
 {
     m_param_name = param_name;
     group->addChild(this);
     if (comment != NULL) m_comment = comment;
 
-    // add the default list
-    va_list arguments;
-    va_start(arguments, nb_elements);
-
-    struct pair_type { T key; U value; };
-
-    for (int i = 0; i < nb_elements; i++)
-    {
-        pair_type key_value_pair = va_arg(arguments, pair_type);
-        m_elements.insert(std::pair<T, U>(key_value_pair.key, key_value_pair.value));
-    }
-    va_end(arguments);                  // Cleans up the list
+    m_elements = default_value;
 }   // MapUserConfigParam
 
 // ----------------------------------------------------------------------------
@@ -401,7 +234,7 @@ void MapUserConfigParam<T, U>::write(std::ofstream& stream) const
     if (m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str();
     stream << " -->\n    <" << m_param_name.c_str() << "\n";
 
-    for (const auto& kv : m_elements) 
+    for (const auto& kv : m_elements)
     {
         stream << "        " << kv.first << "=\"" << kv.second << "\"\n";
     }
@@ -410,7 +243,6 @@ void MapUserConfigParam<T, U>::write(std::ofstream& stream) const
 }   // write
 
 // ----------------------------------------------------------------------------
-
 template<typename T, typename U>
 void MapUserConfigParam<T, U>::findYourDataInAChildOf(const XMLNode* node)
 {

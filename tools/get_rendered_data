@@ -1,0 +1,3 @@
+#!/bin/bash
+
+grep -a "^\[verbose  \] physicsafter" $1

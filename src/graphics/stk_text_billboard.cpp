@@ -184,7 +184,7 @@ void STKTextBillboard::init(core::stringw text, FontWithFace* face)
     glGenBuffers(1, &m_instanced_array);
     glBindBuffer(GL_ARRAY_BUFFER, m_instanced_array);
     glBufferData(GL_ARRAY_BUFFER,
-        12 /*position*/ + 4/*quaternion*/ + 8 /*scale*/, NULL,
+        12 /*position*/ + 16/*quaternion*/ + 8 /*scale*/, NULL,
         GL_DYNAMIC_DRAW);
     for (auto& p : m_gl_tbs)
     {
@@ -213,20 +213,17 @@ void STKTextBillboard::init(core::stringw text, FontWithFace* face)
         glBindBuffer(GL_ARRAY_BUFFER, m_instanced_array);
         // Origin
         glEnableVertexAttribArray(8);
-        glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, 24, (void*)0);
+        glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, 36, (void*)0);
         glVertexAttribDivisorARB(8, 1);
 
-        // Rotation (quaternion .xyz)
+        // Rotation (quaternion in 4 32bit floats)
         glEnableVertexAttribArray(9);
-        glVertexAttribPointer(9, 4, GL_INT_2_10_10_10_REV,
-            GraphicsRestrictions::isDisabled
-            (GraphicsRestrictions::GR_CORRECT_10BIT_NORMALIZATION) ?
-            GL_FALSE : GL_TRUE, 24, (void*)12);
+        glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, 36, (void*)12);
         glVertexAttribDivisorARB(9, 1);
 
-        // Scale (3 half floats and .w for quaternion .w)
+        // Scale (3 half floats and .w unused)
         glEnableVertexAttribArray(10);
-        glVertexAttribPointer(10, 4, GL_HALF_FLOAT, GL_FALSE, 24, (void*)16);
+        glVertexAttribPointer(10, 4, GL_HALF_FLOAT, GL_FALSE, 36, (void*)28);
         glVertexAttribDivisorARB(10, 1);
 
         glBindVertexArray(0);

@@ -111,7 +111,7 @@ private:
     bool          m_collected;
 
     /** Time till a collected item reappears. */
-    float         m_time_till_return;
+    int           m_ticks_till_return;
 
     /** Scene node of this item. */
     LODNode *m_node;
@@ -131,7 +131,7 @@ private:
     bool          m_rotate;
 
     /** Optionally set this if this item was laid by a particular kart. in
-     *  this case the 'm_deactive_time' will also be set - see below. */
+     *  this case the 'm_deactive_ticks' will also be set - see below. */
     const AbstractKart   *m_event_handler;
 
     /** Kart that emitted this item if any */
@@ -139,7 +139,7 @@ private:
 
     /** Optionally if item was placed by a kart, a timer can be used to
      *  temporarly deactivate collision so a kart is not hit by its own item */
-    float         m_deactive_time;
+    int           m_deactive_ticks;
 
     /** Counts how often an item is used before it disappears. Used for
      *  bubble gum to make them disappear after a while. A value >0
@@ -176,7 +176,7 @@ public:
                   Item(const Vec3& xyz, float distance,
                        TriggerItemListener* trigger);
     virtual       ~Item ();
-    void          update  (float delta);
+    void          update(int ticks);
     virtual void  collected(const AbstractKart *kart, float t=2.0f);
     void          setParent(AbstractKart* parent);
     void          reset();
@@ -195,7 +195,7 @@ public:
      */
     bool hitKart(const Vec3 &xyz, const AbstractKart *kart=NULL) const
     {
-        if (m_event_handler == kart && m_deactive_time > 0)
+        if (m_event_handler == kart && m_deactive_ticks > 0)
             return false;
         Vec3 lc = quatRotate(m_original_rotation, xyz - m_xyz);
         // Don't be too strict if the kart is a bit above the item
@@ -216,7 +216,7 @@ protected:
     bool hitLine(const core::line3df &line,
                   const AbstractKart *kart=NULL) const
     {
-        if(m_event_handler==kart && m_deactive_time >0) return false;
+        if(m_event_handler==kart && m_deactive_ticks >0) return false;
 
         Vec3 closest = line.getClosestPoint(m_xyz.toIrrVector());
         return hitKart(closest, kart);
@@ -251,10 +251,10 @@ public:
      *  details.
      *  \param f Time till the item can be used again.
      */
-    void          setDisableTime(float f) { m_time_till_return = f; }
+    void          setDisableTicks(int t) { m_ticks_till_return = t; }
     // ------------------------------------------------------------------------
     /** Returns the time the item is disabled for. */
-    float         getDisableTime() const { return m_time_till_return; }
+    int           getDisableTicks() const { return m_ticks_till_return; }
     // ------------------------------------------------------------------------
     /** Returns the XYZ position of the item. */
     const Vec3&   getXYZ() const { return m_xyz; }

@@ -38,7 +38,8 @@
 #include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
-#include "network/race_event_manager.hpp"
+#include "network/protocols/game_protocol.hpp"
+#include "network/rewind_manager.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
@@ -54,25 +55,28 @@
  *  \param init_pos The start coordinates and heading of the kart.
  */
 LocalPlayerController::LocalPlayerController(AbstractKart *kart,
-                                   const int local_playerID)
+                                             const int local_player_id,
+                                             PerPlayerDifficulty d)
                      : PlayerController(kart), m_sky_particles_emitter(NULL)
 {
-    
-    m_player = StateManager::get()->getActivePlayer(local_playerID);
+    m_difficulty = d;
+    m_player = StateManager::get()->getActivePlayer(local_player_id);
     if(m_player)
         m_player->setKart(kart);
 
     // Keep a pointer to the camera to remove the need to search for
     // the right camera once per frame later.
-    
-    Camera *camera = Camera::createCamera(kart, local_playerID);
-    
+    Camera *camera = Camera::createCamera(kart, local_player_id);
+
     m_camera_index = camera->getIndex();
     m_wee_sound    = SFXManager::get()->createSoundSource("wee");
     m_bzzt_sound   = SFXManager::get()->getBuffer("bzzt");
     m_ugh_sound    = SFXManager::get()->getBuffer("ugh");
     m_grab_sound   = SFXManager::get()->getBuffer("grab_collectable");
     m_full_sound   = SFXManager::get()->getBuffer("energy_bar_full");
+    m_unfull_sound = SFXManager::get()->getBuffer("energy_bar_unfull");
+
+    m_is_above_nitro_target = false;
 
     // Attach Particle System
     Track *track = Track::getCurrentTrack();
@@ -138,36 +142,51 @@ void LocalPlayerController::resetInputState()
  *                if between 1 and 32767, it indicates an analog value,
  *                and if it's 0 it indicates that the corresponding button
  *                was released.
+ *  \param dry_run If set it will return if this action will trigger a
+ *                 state change or not.
+ *  \return       True if dry_run==true and a state change would be triggered.
+ *                If dry_run==false, it returns true.
  */
-void LocalPlayerController::action(PlayerAction action, int value)
+bool LocalPlayerController::action(PlayerAction action, int value,
+                                   bool dry_run)
 {
-    PlayerController::action(action, value);
+    // If this event does not change the control state (e.g.
+    // it's a (auto) repeat event), do nothing. This especially
+    // optimises traffic to the server and other clients.
+    if (!PlayerController::action(action, value, /*dry_run*/true)) return false;
 
-    // If this is a client, send the action to the server
-    if (World::getWorld()->isNetworkWorld()      && 
-        NetworkConfig::get()->isClient()         &&
-        RaceEventManager::getInstance()->isRunning()    )
+    // Register event with history
+    if(!history->replayHistory())
+        history->addEvent(m_kart->getWorldKartId(), action, value);
+
+    // If this is a client, send the action to networking layer
+    if (World::getWorld()->isNetworkWorld() && 
+        NetworkConfig::get()->isClient()    &&
+        !RewindManager::get()->isRewinding()   )
     {
-        RaceEventManager::getInstance()->controllerAction(this, action, value);
+        if (auto gp = GameProtocol::lock())
+        {
+            gp->controllerAction(m_kart->getWorldKartId(), action, value,
+                m_steer_val_l, m_steer_val_r);
+        }
     }
-
+    return PlayerController::action(action, value, /*dry_run*/false);
 }   // action
 
 //-----------------------------------------------------------------------------
 /** Handles steering for a player kart.
  */
-void LocalPlayerController::steer(float dt, int steer_val)
+void LocalPlayerController::steer(int ticks, int steer_val)
 {
     if(UserConfigParams::m_gamepad_debug)
     {
-        Log::debug("LocalPlayerController", "steering: steer_val %d ", steer_val);
         RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
         gui_base->clearAllMessages();
         gui_base->addMessage(StringUtils::insertValues(L"steer_val %i", steer_val),
                              m_kart, 1.0f,
                              video::SColor(255, 255, 0, 255), false);
     }
-    PlayerController::steer(dt, steer_val);
+    PlayerController::steer(ticks, steer_val);
     
     if(UserConfigParams::m_gamepad_debug)
     {
@@ -179,7 +198,7 @@ void LocalPlayerController::steer(float dt, int steer_val)
 //-----------------------------------------------------------------------------
 /** Updates the player kart, called once each timestep.
  */
-void LocalPlayerController::update(float dt)
+void LocalPlayerController::update(int ticks)
 {
     if (UserConfigParams::m_gamepad_debug)
     {
@@ -188,7 +207,7 @@ void LocalPlayerController::update(float dt)
         Log::debug("LocalPlayerController", "irr_driver", "-------------------------------------");
     }
 
-    PlayerController::update(dt);
+    PlayerController::update(ticks);
 
     // look backward when the player requests or
     // if automatic reverse camera is active
@@ -219,6 +238,10 @@ void LocalPlayerController::update(float dt)
             }
         }
     }
+
+    if (m_is_above_nitro_target == true &&
+        m_kart->getEnergy() < race_manager->getCoinTarget())
+        nitroNotFullSound();
 #endif
     if (m_kart->getKartAnimation() && m_sound_schedule == false)
     {
@@ -331,9 +354,10 @@ void LocalPlayerController::collectedItem(const Item &item, int add_info,
     }
     else if (race_manager->getCoinTarget() > 0 &&
              old_energy < race_manager->getCoinTarget() &&
-             m_kart->getEnergy() == race_manager->getCoinTarget())
+             m_kart->getEnergy() >= race_manager->getCoinTarget())
     {
         m_kart->playSound(m_full_sound);
+        m_is_above_nitro_target = true;
     }
     else
     {
@@ -357,6 +381,15 @@ void LocalPlayerController::collectedItem(const Item &item, int add_info,
     }
 }   // collectedItem
 
+//-----------------------------------------------------------------------------
+/** If the nitro level has gone under the nitro goal, play a bad effect sound 
+ */
+void LocalPlayerController::nitroNotFullSound()
+{
+    m_kart->playSound(m_unfull_sound);
+    m_is_above_nitro_target = false;
+} //nitroNotFullSound
+
 // ----------------------------------------------------------------------------
 /** Returns true if the player of this controller can collect achievements.
  *  At the moment only the current player can collect them.
@@ -368,3 +401,16 @@ bool LocalPlayerController::canGetAchievements() const
 {
     return m_player->getConstProfile() == PlayerManager::getCurrentPlayer();
 }   // canGetAchievements
+
+// ----------------------------------------------------------------------------
+core::stringw LocalPlayerController::getName() const
+{
+    if (NetworkConfig::get()->isNetworking())
+        return PlayerController::getName();
+
+    core::stringw name = m_player->getProfile()->getName();
+    if (m_difficulty == PLAYER_DIFFICULTY_HANDICAP)
+        name = _("%s (handicapped)", name);
+
+    return name;
+}   // getName

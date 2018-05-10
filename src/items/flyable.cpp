@@ -70,7 +70,7 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
     m_animation                    = NULL;
     m_mass                         = mass;
     m_adjust_up_velocity           = true;
-    m_time_since_thrown            = 0;
+    m_ticks_since_thrown           = 0;
     m_position_offset              = Vec3(0,0,0);
     m_owner_has_temporary_immunity = true;
     m_do_terrain_info              = true;
@@ -372,22 +372,32 @@ void Flyable::setAnimation(AbstractKartAnimation *animation)
 }   // addAnimation
 
 //-----------------------------------------------------------------------------
+/** Called once per rendered frame. It is used to only update any graphical
+ *  effects.
+ *  \param dt Time step size (since last call).
+ */
+void Flyable::updateGraphics(float dt)
+{
+    Moveable::updateGraphics(dt, Vec3(0, 0, 0), btQuaternion(0, 0, 0, 1));
+}   // updateGraphics
+
+//-----------------------------------------------------------------------------
 /** Updates this flyable. It calls Moveable::update. If this function returns
  *  true, the flyable will be deleted by the projectile manager.
  *  \param dt Time step size.
  *  \returns True if this object can be deleted.
  */
-bool Flyable::updateAndDelete(float dt)
+bool Flyable::updateAndDelete(int ticks)
 {
     if (hasAnimation())
     {
-        m_animation->update(dt);
-        Moveable::update(dt);
+        m_animation->update(stk_config->ticks2Time(ticks));
+        Moveable::update(ticks);
         return false;
     }   // if animation
 
-    m_time_since_thrown += dt;
-    if(m_max_lifespan > -1 && m_time_since_thrown > m_max_lifespan)
+    m_ticks_since_thrown += ticks;
+    if(m_max_lifespan > -1 && m_ticks_since_thrown > m_max_lifespan)
         hit(NULL);
 
     if(m_has_hit_something) return true;
@@ -465,7 +475,7 @@ bool Flyable::updateAndDelete(float dt)
         setVelocity(v);
     }   // if m_adjust_up_velocity
 
-    Moveable::update(dt);
+    Moveable::update(ticks);
 
     return false;
 }   // updateAndDelete
@@ -478,8 +488,8 @@ bool Flyable::updateAndDelete(float dt)
 bool Flyable::isOwnerImmunity(const AbstractKart* kart_hit) const
 {
     return m_owner_has_temporary_immunity &&
-           kart_hit == m_owner            &&
-           m_time_since_thrown < 2.0f;
+        kart_hit == m_owner            &&
+        m_ticks_since_thrown < stk_config->time2Ticks(2.0f);
 }   // isOwnerImmunity
 
 // ----------------------------------------------------------------------------

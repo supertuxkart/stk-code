@@ -49,6 +49,9 @@ void override_default_params()
         UserConfigParams::m_screen_keyboard = true;
     }
     
+    // Set bigger fonts and buttons
+    UserConfigParams::m_hidpi_enabled = true;
+    
     // It shouldn't matter, but STK is always run in fullscreen on android
     UserConfigParams::m_fullscreen = true;
     
@@ -58,9 +61,6 @@ void override_default_params()
     
     // Create default user istead of showing login screen to make life easier
     UserConfigParams::m_enforce_current_player = true;
-    
-    // Just for debugging
-    UserConfigParams::m_log_errors_to_console = true;
 }
 
 void android_main(struct android_app* app) 

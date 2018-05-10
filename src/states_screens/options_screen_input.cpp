@@ -46,8 +46,6 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( OptionsScreenInput );
-
 // -----------------------------------------------------------------------------
 
 OptionsScreenInput::OptionsScreenInput() : Screen("options_input.stkgui")

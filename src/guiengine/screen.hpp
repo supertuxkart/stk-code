@@ -48,14 +48,9 @@ using namespace irr;
  */
 namespace GUIEngine
 {
-#define DEFINE_SCREEN_SINGLETON( ClassName )  \
-    template<> ClassName* GUIEngine::ScreenSingleton< ClassName >::singleton = NULL
-
     /**
      * \brief Declares a class to be a singleton.
      * Normally, all screens will be singletons.
-     * Note that you need to use the 'DEFINE_SCREEN_SINGLETON' macro in a .
-     * cpp file to actually define the instance (as this can't be done in a .h)
      * \ingroup guiengine
      */
     template<typename SCREEN>
@@ -83,6 +78,8 @@ namespace GUIEngine
         }
 
     };
+    template <typename SCREEN> SCREEN*
+        ScreenSingleton<SCREEN>::singleton = nullptr;
 
     /**
      * \brief Represents a single GUI screen.

@@ -22,6 +22,7 @@
 #include "network/event_rewinder.hpp"
 #include "network/network_string.hpp"
 #include "network/rewinder.hpp"
+#include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -44,8 +45,8 @@ class RewindInfo
 private:
     LEAK_CHECK();
 
-    /** Time when this state was taken. */
-    float m_time;
+    /** Time when this RewindInfo was taken. */
+    int m_ticks;
 
     /** A confirmed event is one that was sent from the server. When
      *  rewinding we have to start with a confirmed state for each
@@ -53,7 +54,7 @@ private:
     bool m_is_confirmed;
 
 public:
-    RewindInfo(float time, bool is_confirmed);
+    RewindInfo(int ticks, bool is_confirmed);
 
     /** Called when going back in time to undo any rewind information. */
     virtual void undo() = 0;
@@ -61,97 +62,44 @@ public:
     /** This is called while going forwards in time again to reach current
      *  time. */
     virtual void rewind() = 0;
-
+    void setTicks(int ticks);
     // ------------------------------------------------------------------------
     virtual ~RewindInfo() { }
     // ------------------------------------------------------------------------
-    /** Returns the time at which this rewind state was saved. */
-    float getTime() const { return m_time; }
+    /** Returns the time at which this RewindInfo was saved. */
+    int getTicks() const { return m_ticks; }
     // ------------------------------------------------------------------------
     /** Sets if this RewindInfo is confirmed or not. */
     void setConfirmed(bool b) { m_is_confirmed = b; }
     // ------------------------------------------------------------------------
-    /** Returns if this state is confirmed. */
+    /** Returns if this RewindInfo is confirmed. */
     bool isConfirmed() const { return m_is_confirmed; }
     // ------------------------------------------------------------------------
-    /** If this rewind info is an event. Subclasses will overwrite this. */
+    /** If this RewindInfo is an event. Subclasses will overwrite this. */
     virtual bool isEvent() const { return false; }
     // ------------------------------------------------------------------------
-    /** If this rewind info is time info. Subclasses will overwrite this. */
-    virtual bool isTime() const { return false; }
-    // ------------------------------------------------------------------------
-    /** If this rewind info is an event. Subclasses will overwrite this. */
+    /** If this RewindInfo is an event. Subclasses will overwrite this. */
     virtual bool isState() const { return false; }
     // ------------------------------------------------------------------------
 };   // RewindInfo
 
 // ============================================================================
-/** A rewind info abstract class that keeps track of a rewinder object, and
- *  has a BareNetworkString buffer which is used to store a state or event.
+/** A class that stores a game state and can rewind it.
  */
-class RewindInfoRewinder : public RewindInfo
+class RewindInfoState: public RewindInfo
 {
 private:
     /** Pointer to the buffer which stores all states. */
     BareNetworkString *m_buffer;
-
-protected:
-    /** The Rewinder instance for which this data is. */
-    Rewinder *m_rewinder;
-
 public:
-    RewindInfoRewinder(float time, Rewinder *rewinder,
-                       BareNetworkString *buffer, bool is_confirmed)
-        : RewindInfo(time, is_confirmed)
-    {
-        m_rewinder = rewinder;
-        m_buffer = buffer;
-    }   // RewindInfoRewinder
-    // ------------------------------------------------------------------------
-    virtual ~RewindInfoRewinder()
-    {
-        delete m_buffer;
-    }   // ~RewindInfoRewinder
+             RewindInfoState(int ticks,  BareNetworkString *buffer, 
+                             bool is_confirmed);
+    virtual ~RewindInfoState() { delete m_buffer; };
+    virtual void rewind();
+
     // ------------------------------------------------------------------------
     /** Returns a pointer to the state buffer. */
     BareNetworkString *getBuffer() const { return m_buffer; }
-};   // RewindInfoRewinder
-
-// ============================================================================
-class RewindInfoTime : public RewindInfo
-{
-private:
-
-public:
-             RewindInfoTime(float time);
-    virtual ~RewindInfoTime() {};
-
-    // ------------------------------------------------------------------------
-    virtual bool isTime() const { return true; }
-    // ------------------------------------------------------------------------
-    /** Called when going back in time to undo any rewind information.
-     *  Does actually nothing. */
-    virtual void undo() {} 
-    // ------------------------------------------------------------------------
-    /** Rewinds to this state. Nothing to be done for time info. */
-    virtual void rewind() {}
-};   // class RewindInfoTime
-
-// ============================================================================
-class RewindInfoState: public RewindInfoRewinder
-{
-private:
-    /** The 'left over' time from the physics. */
-    float m_local_physics_time;
-
-public:
-             RewindInfoState(float time, Rewinder *rewinder, 
-                             BareNetworkString *buffer, bool is_confirmed);
-    virtual ~RewindInfoState() {};
-
-    // ------------------------------------------------------------------------
-    /** Returns the left-over physics time. */
-    float getLocalPhysicsTime() const { return m_local_physics_time; }
     // ------------------------------------------------------------------------
     virtual bool isState() const { return true; }
     // ------------------------------------------------------------------------
@@ -159,22 +107,8 @@ public:
      *  It calls undoState in the rewinder. */
     virtual void undo()
     {
-        m_rewinder->undoState(getBuffer());
+        // Nothing being done in case of an undo that goes further back
     }   // undo
-    // ------------------------------------------------------------------------
-    /** Rewinds to this state. This is called while going forwards in time
-     *  again to reach current time. It will call rewindToState().
-     *  if the state is a confirmed state. */
-    virtual void rewind()
-    {
-        if (isConfirmed())
-            m_rewinder->rewindToState(getBuffer());
-        else
-        {
-            // TODO
-            // Handle replacing of stored states.
-        }
-    }   // rewind
 };   // class RewindInfoState
 
 // ============================================================================
@@ -187,7 +121,7 @@ private:
     /** Buffer with the event data. */
     BareNetworkString *m_buffer;
 public:
-             RewindInfoEvent(float time, EventRewinder *event_rewinder,
+             RewindInfoEvent(int ticks, EventRewinder *event_rewinder,
                              BareNetworkString *buffer, bool is_confirmed);
     virtual ~RewindInfoEvent()
     {
@@ -206,7 +140,7 @@ public:
     }   // undo
     // ------------------------------------------------------------------------
     /** This is called while going forwards in time again to reach current
-     *  time. Calls rewindEvent().
+     *  time. Calls rewind() in the event rewinder.
      */
     virtual void rewind()
     {

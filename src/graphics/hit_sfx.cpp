@@ -61,7 +61,7 @@ void HitSFX::setLocalPlayerKartHit()
  *  \param dt Time step size.
  *  \return true If the explosion is finished.
  */
-bool HitSFX::updateAndDelete(float dt)
+bool HitSFX::updateAndDelete(int ticks)
 {
     SFXBase::SFXStatus status = m_sfx->getStatus();
     return status!= SFXBase::SFX_PLAYING;

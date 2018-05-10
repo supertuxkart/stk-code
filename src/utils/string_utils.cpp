@@ -679,7 +679,8 @@ namespace StringUtils
         std::ostringstream output;
         for(unsigned int i=0; i<s.size(); i++)
         {
-            if (s[i] >= 128 || s[i] == '&' || s[i] == '<' || s[i] == '>' || s[i] == '\"')
+            if (s[i] >= 128 || s[i] == '&' || s[i] == '<' || s[i] == '>' ||
+                s[i] == '\"' || s[i] == ' ')
             {
                 output << "&#x" << std::hex << std::uppercase << s[i] << ";";
             }
@@ -786,6 +787,23 @@ namespace StringUtils
             Log::error("StringUtils", "Invalid version string '%s'.", s.c_str());
         return version;
     }   // versionToInt
+
+    // ------------------------------------------------------------------------
+    /** Searches for text in a string and replaces it with the desired text */
+    std::string findAndReplace(const std::string& source, const std::string& find, const std::string& replace)
+    {
+        std::string destination = source;
+        std::string::size_type found_position = 0;
+
+        // Replace until we can't find anymore the find string
+        while ((found_position = destination.find(find, found_position)) != std::string::npos)
+        {
+            destination.replace(found_position, find.length(), replace);
+            // Advanced pass the replaced string
+            found_position += replace.length();
+        }
+        return destination;
+    } //findAndReplace
 
 } // namespace StringUtils
 

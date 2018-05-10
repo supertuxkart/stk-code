@@ -29,7 +29,7 @@
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"
-#include "network/protocols/server_lobby.hpp"
+#include "network/rewind_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "tracks/track.hpp"
 
@@ -38,6 +38,7 @@
 //-----------------------------------------------------------------------------
 WorldStatus::WorldStatus()
 {
+    main_loop->setFrameBeforeLoadingWorld();
     m_clock_mode        = CLOCK_CHRONO;
 
     m_prestart_sound    = SFXManager::get()->createSoundSource("pre_start_race");
@@ -47,7 +48,7 @@ WorldStatus::WorldStatus()
     m_play_track_intro_sound = UserConfigParams::m_music;
     m_play_ready_set_go_sounds = true;
     m_play_racestart_sounds = true;
-    m_server_is_ready       = false;
+    m_server_is_ready.store(false);
 
     IrrlichtDevice *device = irr_driver->getDevice();
 
@@ -61,6 +62,7 @@ WorldStatus::WorldStatus()
 void WorldStatus::reset()
 {
     m_time            = 0.0f;
+    m_adjust_time_by  = 0.0f;
     m_time_ticks      = 0;
     m_auxiliary_ticks = 0;
     m_count_up_ticks  = 0;
@@ -97,7 +99,7 @@ void WorldStatus::reset()
     // In case of a networked race the race can only start once
     // all protocols are up. This flag is used to wait for
     // a confirmation before starting the actual race.
-    m_server_is_ready = false;
+    m_server_is_ready.store(false);
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -148,6 +150,11 @@ void WorldStatus::setClockMode(const ClockType mode, const float initial_time)
  */
 void WorldStatus::enterRaceOverState()
 {
+    // Waiting for server result info
+    auto cl = LobbyProtocol::get<ClientLobby>();
+    if (cl && !cl->receivedServerResult())
+        return;
+
     // Don't enter race over if it's already race over
     if (m_phase == DELAY_FINISH_PHASE || m_phase == RESULT_DISPLAY_PHASE ||
         m_phase == FINISH_PHASE)
@@ -170,7 +177,7 @@ void WorldStatus::terminateRace()
  *  updated.
  *  \param dt Time step.
  */
-void WorldStatus::update(float dt)
+void WorldStatus::update(int ticks)
 {
 }   // update
 
@@ -178,9 +185,9 @@ void WorldStatus::update(float dt)
 /** Updates the world time and clock (which might be running backwards), and
  *  all status information, called once per frame at the end of the main
  *  loop.
- *  \param dt Duration of time step.
+ *  \param ticks Number of ticks (physics time steps) - should be 1.
  */
-void WorldStatus::updateTime(const float dt)
+void WorldStatus::updateTime(int ticks)
 {
     switch (m_phase)
     {
@@ -208,6 +215,7 @@ void WorldStatus::updateTime(const float dt)
             m_auxiliary_ticks++;
 
             if (UserConfigParams::m_artist_debug_mode &&
+                !NetworkConfig::get()->isNetworking() &&
                 race_manager->getNumberOfKarts() -
                 race_manager->getNumSpareTireKarts() == 1 &&
                 race_manager->getTrackName() != "tutorial")
@@ -229,7 +237,7 @@ void WorldStatus::updateTime(const float dt)
             if (!UserConfigParams::m_sfx &&
                 m_auxiliary_ticks < stk_config->time2Ticks(3.0f))
                 return;
-            
+
             if (!m_play_track_intro_sound)
             {
                 startEngines();
@@ -239,31 +247,47 @@ void WorldStatus::updateTime(const float dt)
 
             m_auxiliary_ticks = 0;
 
-            if (m_play_ready_set_go_sounds)
-                m_prestart_sound->play();
-
             // In a networked game the client needs to wait for a notification
             // from the server that all clients and the server are ready to 
             // start the game. The server will actually wait for all clients
             // to confirm that they have started the race before starting
             // itself. In a normal race, this phase is skipped and the race
             // starts immediately.
-            m_phase = NetworkConfig::get()->isNetworking() ? WAIT_FOR_SERVER_PHASE
-                                                           : READY_PHASE;
+            if (NetworkConfig::get()->isNetworking())
+            {
+                m_phase = WAIT_FOR_SERVER_PHASE;
+                // In networked races, inform the start game protocol that
+                // the world has been setup
+                auto lobby = LobbyProtocol::get<LobbyProtocol>();
+                assert(lobby);
+                lobby->finishedLoadingWorld();
+            }
+            else
+            {
+                if (m_play_ready_set_go_sounds)
+                    m_prestart_sound->play();
+                m_phase = READY_PHASE;
+            }
             return;   // Don't increase time
         case WAIT_FOR_SERVER_PHASE:
         {
+            // Wait for all players to finish loading world
+            auto lobby = LobbyProtocol::get<LobbyProtocol>();
+            assert(lobby);
+            if (!lobby->allPlayersReady())
+                return;
             // This stage is only reached in case of a networked game.
-            // A client waits for a message from the server that it can
-            // start the race (i.e. that all clients and the server have
-            // loaded the world). The server waits for a confirmation from
+            // The server waits for a confirmation from
             // each client that they have started (to guarantee that the
             // server is running with a local time behind all clients).
-            if (!m_server_is_ready) return;
+            if (m_play_ready_set_go_sounds)
+                m_prestart_sound->play();
+
+            if (NetworkConfig::get()->isServer() &&
+                m_server_is_ready.load() == false) return;
 
             m_phase = READY_PHASE;
-            Protocol *p = LobbyProtocol::get();
-            ClientLobby *cl = dynamic_cast<ClientLobby*>(p);
+            auto cl = LobbyProtocol::get<ClientLobby>();
             if (cl)
                 cl->startingRaceNow();
             return;   // Don't increase time
@@ -285,7 +309,8 @@ void WorldStatus::updateTime(const float dt)
 
             // In artist debug mode, when without opponents, skip the
             // ready/set/go counter faster
-            if (UserConfigParams::m_artist_debug_mode &&
+            if (UserConfigParams::m_artist_debug_mode     &&
+                !NetworkConfig::get()->isNetworking()     &&
                 race_manager->getNumberOfKarts() -
                 race_manager->getNumSpareTireKarts() == 1 &&
                 race_manager->getTrackName() != "tutorial")
@@ -299,6 +324,15 @@ void WorldStatus::updateTime(const float dt)
             {
                 // set phase is over, go to the next one
                 m_phase = GO_PHASE;
+                // Save one initial state on a client, in case that an event
+                // is received from a client (trieggering a rollback) before
+                // a state from the server has been received.
+                if (NetworkConfig::get()->isNetworking() &&  
+                    NetworkConfig::get()->isClient()        )
+                {
+                    RewindManager::get()->saveLocalState();
+                    // FIXME TODO: save state in rewind queue!
+                }
                 if (m_play_ready_set_go_sounds)
                 {
                     m_start_sound->play();
@@ -313,6 +347,7 @@ void WorldStatus::updateTime(const float dt)
             // In artist debug mode, when without opponents, 
             // skip the ready/set/go counter faster
             if (UserConfigParams::m_artist_debug_mode &&
+                !NetworkConfig::get()->isNetworking() &&
                 race_manager->getNumberOfKarts() -
                 race_manager->getNumSpareTireKarts() == 1 &&
                 race_manager->getTrackName() != "tutorial")
@@ -387,16 +422,18 @@ void WorldStatus::updateTime(const float dt)
             break;
         }
         case FINISH_PHASE:
+        case IN_GAME_MENU_PHASE:
             // Nothing to do here.
             break;
         case GOAL_PHASE:
             // Nothing to do here as well.
+            break;
 
         default: break;
     }
 
     IrrlichtDevice *device = irr_driver->getDevice();
-
+    
     switch (m_clock_mode)
     {
         case CLOCK_CHRONO:
@@ -436,6 +473,41 @@ void WorldStatus::updateTime(const float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
+/** If the server requests that a client's time should be adjusted,
+ *  smoothly change the clock speed of this client to go a bit faster
+ *  or slower till the overall adjustment was reached.
+ *  \param dt Original time step size.
+ */
+float WorldStatus::adjustDT(float dt)
+{
+    // If request, adjust world time to go ahead (adjust>0) or
+    // slow down (<0). This is done in 5% of dt steps so that the
+    // user will not notice this.
+    const float FRACTION = 0.10f;   // fraction of dt to be adjusted
+    float time_adjust;
+    if (m_adjust_time_by >= 0)   // make it run faster
+    {
+        time_adjust = dt * FRACTION;
+        if (time_adjust > m_adjust_time_by) time_adjust = m_adjust_time_by;
+        if (m_adjust_time_by > 0)
+            Log::verbose("info", "At %f %f adjusting time by %f dt %f to dt %f for %f",
+                World::getWorld()->getTime(), StkTime::getRealTime(),
+                time_adjust, dt, dt - time_adjust, m_adjust_time_by);
+    }
+    else   // m_adjust_time negative, i.e. will go slower
+    {
+        time_adjust = -dt * FRACTION;
+        if (time_adjust < m_adjust_time_by) time_adjust = m_adjust_time_by;
+        Log::verbose("info", "At %f %f adjusting time by %f dt %f to dt %f for %f",
+            World::getWorld()->getTime(), StkTime::getRealTime(),
+            time_adjust, dt, dt - time_adjust, m_adjust_time_by);
+    }
+    m_adjust_time_by -= time_adjust;
+    dt -= time_adjust;
+    return dt;
+}  // adjustDT
+
+//-----------------------------------------------------------------------------
 /** Called on the client when it receives a notification from the server that
  *  all clients (and server) are ready to start the race. The server will
  *  then additionally wait for all clients to report back that they are
@@ -445,7 +517,7 @@ void WorldStatus::updateTime(const float dt)
  */
 void WorldStatus::startReadySetGo()
 {
-    m_server_is_ready = true;
+    m_server_is_ready.store(true);
 }   // startReadySetGo
 
 //-----------------------------------------------------------------------------
@@ -454,9 +526,22 @@ void WorldStatus::startReadySetGo()
  */
 void WorldStatus::setTime(const float time)
 {
-    m_time_ticks = stk_config->time2Ticks(time);
-    m_time       = stk_config->ticks2Time(m_time_ticks);
+    int new_time_ticks = stk_config->time2Ticks(time);
+    m_count_up_ticks  += (new_time_ticks - m_time_ticks);
+    m_time_ticks       = new_time_ticks;
+    m_time             = stk_config->ticks2Time(new_time_ticks);
 }   // setTime
+
+//-----------------------------------------------------------------------------
+/** Sets a new time for the world time, measured in ticks.
+ *  \param ticks New time in ticks to set.
+ */
+void WorldStatus::setTicks(int ticks)
+{
+    m_count_up_ticks += ticks - m_time_ticks;
+    m_time_ticks = ticks;
+    m_time = stk_config->ticks2Time(ticks);
+}   // setTicks
 
 //-----------------------------------------------------------------------------
 /** Pauses the game and switches to the specified phase.
@@ -470,7 +555,8 @@ void WorldStatus::pause(Phase phase)
     m_phase          = phase;
     IrrlichtDevice *device = irr_driver->getDevice();
 
-    if (!device->getTimer()->isStopped())
+    if (!device->getTimer()->isStopped() &&
+        !NetworkConfig::get()->isNetworking())
         device->getTimer()->stop();
 }   // pause
 
@@ -485,6 +571,7 @@ void WorldStatus::unpause()
     m_previous_phase = UNDEFINED_PHASE;
     IrrlichtDevice *device = irr_driver->getDevice();
 
-    if (device->getTimer()->isStopped())
+    if (device->getTimer()->isStopped() &&
+        !NetworkConfig::get()->isNetworking())
         device->getTimer()->start();
 }   // unpause

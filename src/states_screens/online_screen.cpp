@@ -20,36 +20,36 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
-#include "guiengine/scalable_font.hpp"
+#include "guiengine/message_queue.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include "input/device_manager.hpp"
-#include "input/input_manager.hpp"
-#include "input/keyboard_device.hpp"
-#include "io/file_manager.hpp"
-#include "main_loop.hpp"
+#include "network/protocols/connect_to_server.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
+#include "network/server.hpp"
+#include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "online/request_manager.hpp"
+#include "states_screens/networking_lobby.hpp"
 #include "states_screens/online_lan.hpp"
 #include "states_screens/online_profile_achievements.hpp"
 #include "states_screens/online_profile_servers.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
+#include "states_screens/dialogs/general_text_field_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
-#include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
-
 
 #include <string>
 
 
 using namespace GUIEngine;
 using namespace Online;
-
-DEFINE_SCREEN_SINGLETON( OnlineScreen );
 
 // ----------------------------------------------------------------------------
 
@@ -64,6 +64,9 @@ OnlineScreen::OnlineScreen() : Screen("online/online.stkgui")
 
 void OnlineScreen::loadedFromFile()
 {
+    m_enable_splitscreen = getWidget<CheckBoxWidget>("enable-splitscreen");
+    assert(m_enable_splitscreen);
+    m_enable_splitscreen->setState(false);
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -71,7 +74,6 @@ void OnlineScreen::loadedFromFile()
 void OnlineScreen::beforeAddingWidget()
 {
     bool is_logged_in = false;
-    PlayerProfile *player = PlayerManager::getCurrentPlayer();
     if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST ||
         PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
     {
@@ -79,8 +81,11 @@ void OnlineScreen::beforeAddingWidget()
     }
 
     IconButtonWidget* wan = getWidget<IconButtonWidget>("wan");
-    wan->setActive(is_logged_in);
-    wan->setVisible(is_logged_in);
+    if (wan)
+    {
+        wan->setActive(is_logged_in);
+        wan->setVisible(is_logged_in);
+    }
 } // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -100,6 +105,15 @@ void OnlineScreen::init()
     RibbonWidget* r = getWidget<RibbonWidget>("menu_toprow");
     r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
+    // Pre-add a default single player profile in network
+    if (!m_enable_splitscreen->getState() &&
+        NetworkConfig::get()->getNetworkPlayers().empty())
+    {
+        NetworkConfig::get()->addNetworkPlayer(
+            input_manager->getDeviceManager()->getLatestUsedDevice(),
+            PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
+        NetworkConfig::get()->doneAddingNetworkPlayers();
+    }
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -129,6 +143,13 @@ void OnlineScreen::onUpdate(float delta)
 
     m_online->setLabel(PlayerManager::getCurrentOnlineId() ? m_online_string
                                                            : m_login_string);
+    // In case for entering server address finished
+    if (auto lb = LobbyProtocol::get<LobbyProtocol>())
+    {
+        NetworkingLobby::getInstance()->setJoinedServer(nullptr);
+        StateManager::get()->resetAndSetStack(
+            NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
+    }
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -138,12 +159,33 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
 {
     if (name == "user-id")
     {
+        NetworkConfig::get()->cleanNetworkPlayers();
         UserScreen::getInstance()->push();
         return;
     }
     else if (name == "back")
     {
-        StateManager::get()->popMenu();
+        StateManager::get()->escapePressed();
+        return;
+    }
+    else if (name == "enable-splitscreen")
+    {
+        CheckBoxWidget* splitscreen = dynamic_cast<CheckBoxWidget*>(widget);
+        assert(splitscreen);
+        if (!splitscreen->getState())
+        {
+            // Default single player
+            NetworkConfig::get()->cleanNetworkPlayers();
+            NetworkConfig::get()->addNetworkPlayer(
+                input_manager->getDeviceManager()->getLatestUsedDevice(),
+                PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
+            NetworkConfig::get()->doneAddingNetworkPlayers();
+        }
+        else
+        {
+            // Let lobby add the players
+            NetworkConfig::get()->cleanNetworkPlayers();
+        }
         return;
     }
 
@@ -172,7 +214,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                                 "\"Connect to the Internet\"."));
             return;
         }
-        
+
         if (PlayerManager::getCurrentOnlineId())
         {
             ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
@@ -183,16 +225,74 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
             UserScreen::getInstance()->push();
         }
     }
+    else if (selection == "enter-address")
+    {
+        if (NetworkConfig::get()->isAddingNetworkPlayers())
+        {
+            core::stringw msg =
+                _("No player available for connecting to server.");
+            MessageQueue::add(MessageQueue::MT_ERROR, msg);
+            return;
+        }
+        core::stringw instruction =
+            _("Enter the server address with IP (optional) followed by : and"
+            " then port.");
+        auto gtfd = new GeneralTextFieldDialog(instruction.c_str(),
+            [] (const irr::core::stringw& text) {},
+            [this] (GUIEngine::LabelWidget* lw,
+                   GUIEngine::TextBoxWidget* tb)->bool
+            {
+                TransportAddress server_addr(
+                    StringUtils::wideToUtf8(tb->getText()));
+                if (server_addr.getIP() == 0)
+                {
+                    core::stringw err = _("Invalid server address: %s.",
+                        tb->getText());
+                    lw->setText(err, true);
+                    return false;
+                }
+                NetworkConfig::get()->setIsWAN();
+                NetworkConfig::get()->setIsServer(false);
+                NetworkConfig::get()->setPassword("");
+                auto server = std::make_shared<Server>(0, L"", 0, 0, 0, 0,
+                    server_addr, false);
+                STKHost::create();
+                auto cts = std::make_shared<ConnectToServer>(server);
+                cts->setup();
+                Log::info("OnlineScreen", "Trying to connect to server '%s'.",
+                    server_addr.toString().c_str());
+                if (!cts->handleDirectConnect(10000))
+                {
+                    core::stringw err = _("Cannot connect to server %s.",
+                        server_addr.toString().c_str());
+                    STKHost::get()->shutdown();
+                    NetworkConfig::get()->unsetNetworking();
+                    lw->setText(err, true);
+                    return false;
+                }
+
+                m_entered_server_address = 
+                    STKHost::get()->getServerPeerForClient()->getAddress();
+                auto cl = LobbyProtocol::create<ClientLobby>();
+                cl->setAddress(m_entered_server_address);
+                cl->requestStart();
+                return true;
+            });
+        if (!m_entered_server_address.isUnset())
+        {
+            gtfd->getTextField()->setText(StringUtils::utf8ToWide(
+                m_entered_server_address.toString()));
+        }
+    }
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
-
-void OnlineScreen::tearDown()
+/** Also called when pressing the back button. It resets the flags to indicate
+ *  a networked game.
+ */
+bool OnlineScreen::onEscapePressed()
 {
-}   // tearDown
-
-// ----------------------------------------------------------------------------
-
-void OnlineScreen::onDisabledItemClicked(const std::string& item)
-{
-}   // onDisabledItemClicked
+    NetworkConfig::get()->cleanNetworkPlayers();
+    NetworkConfig::get()->unsetNetworking();
+    return true;
+}   // onEscapePressed

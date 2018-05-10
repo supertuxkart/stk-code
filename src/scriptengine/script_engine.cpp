@@ -562,8 +562,9 @@ namespace Scripting
 
     //-----------------------------------------------------------------------------
 
-    void ScriptEngine::update(double dt)
+    void ScriptEngine::update(int ticks)
     {
+        double dt = stk_config->ticks2Time(ticks);
         for (int i = m_pending_timeouts.size() - 1; i >= 0; i--)
         {
             PendingTimeout& curr = m_pending_timeouts[i];

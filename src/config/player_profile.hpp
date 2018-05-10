@@ -138,8 +138,8 @@ public:
     virtual Online::OnlineProfile* getProfile() const = 0;
     virtual void requestPoll() const = 0;
     virtual void requestSavedSession() = 0;
-    virtual Online::XMLRequest* requestSignIn(const irr::core::stringw &username,
-                                              const irr::core::stringw &password) = 0;
+    virtual void requestSignIn(const irr::core::stringw &username,
+                               const irr::core::stringw &password) = 0;
     virtual void signIn(bool success, const XMLNode * input) = 0;
     virtual void signOut(bool success, const XMLNode * input,
                          const irr::core::stringw &info) = 0;
@@ -230,6 +230,8 @@ public:
     // ------------------------------------------------------------------------
     unsigned int getPoints() const { return m_story_mode_status->getPoints(); }
     // ------------------------------------------------------------------------
+    unsigned int getNextUnlockPoints() const { return m_story_mode_status->getNextUnlockPoints(); }
+    // ------------------------------------------------------------------------
     void setFirstTime(bool b) { m_story_mode_status->setFirstTime(b); }
     // ------------------------------------------------------------------------
     bool isFirstTime() const { return m_story_mode_status->isFirstTime(); }
@@ -263,7 +265,11 @@ public:
     unsigned int getNumHardTrophies() const
     {
         return m_story_mode_status->getNumHardTrophies();
-    }   // getNumHardTropies
+    }   // getNumHardTrophies
+    unsigned int getNumBestTrophies() const
+    {
+        return m_story_mode_status->getNumBestTrophies();
+    }   // getNumBestTrophies
     // ------------------------------------------------------------------------
     AchievementsStatus* getAchievementsStatus()
     {

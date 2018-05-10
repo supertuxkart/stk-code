@@ -38,6 +38,7 @@
 #include "input/input_manager.hpp"
 #include "items/item_manager.hpp"
 #include "karts/abstract_kart.hpp"
+#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
@@ -817,6 +818,8 @@ TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationBillboard::update(float dt)
 {
+    if (ProfileWorld::isNoGraphics()) return;
+#ifndef SERVER_ONLY
     if (m_fade_out_when_close)
     {
         scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()
@@ -841,6 +844,7 @@ void TrackObjectPresentationBillboard::update(float dt)
             node->setColor(video::SColor(a, 255, 255, 255));
         }
     }   // m_fade_out_when_close
+#endif
 }   // update
 
 // ----------------------------------------------------------------------------

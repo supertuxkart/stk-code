@@ -20,14 +20,19 @@
 
 #include "graphics/irr_driver.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "network/network_string.hpp"
+#include "network/protocols/game_protocol.hpp"
 #include "network/rewinder.hpp"
 #include "network/rewind_info.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "utils/log.hpp"
+#include "utils/profiler.hpp"
 
-RewindManager* RewindManager::m_rewind_manager        = NULL;
+#include <algorithm>
+
+RewindManager* RewindManager::m_rewind_manager = NULL;
 bool           RewindManager::m_enable_rewind_manager = false;
 
 /** Creates the singleton. */
@@ -61,13 +66,6 @@ RewindManager::RewindManager()
  */
 RewindManager::~RewindManager()
 {
-    // Destroying the 
-    for(unsigned int i=0; i<m_rewind_info.size(); i++)
-    {
-        delete m_rewind_info[i];
-        m_rewind_info[i] = NULL;
-    }
-    m_rewind_info.clear();
 }   // ~RewindManager
 
 // ----------------------------------------------------------------------------
@@ -75,331 +73,316 @@ RewindManager::~RewindManager()
  */
 void RewindManager::reset()
 {
-#ifdef REWIND_SEARCH_STATS
-    m_count_of_comparisons = 0;
-    m_count_of_searches    = 0;
-#endif
-    m_is_rewinding         = false;
-    m_overall_state_size   = 0;
-    m_state_frequency      = 0.1f;   // save 10 states a second
-    m_last_saved_state     = -9999.9f;  // forces initial state save
+    m_is_rewinding = false;
+    m_not_rewound_ticks = 0;
+    m_overall_state_size = 0;
+    m_last_saved_state = -1;  // forces initial state save
+    m_state_frequency =
+        stk_config->getPhysicsFPS() / stk_config->m_network_state_frequeny;
 
-    if(!m_enable_rewind_manager) return;
+    if (!m_enable_rewind_manager) return;
 
     AllRewinder::iterator r = m_all_rewinder.begin();
-    while(r!=m_all_rewinder.end())
+    while (r != m_all_rewinder.end())
     {
-        if(!(*r)->canBeDestroyed())
+        if (!(*r)->canBeDestroyed())
         {
             r++;
             continue;
         }
         Rewinder *rewinder = *r;
         r = m_all_rewinder.erase(r);
-        // FIXME Do we really want to delete this here?
         delete rewinder;
     }
 
-    for(unsigned int i=0; i<m_rewind_info.size(); i++)
-    {
-        delete m_rewind_info[i];
-    }
-    m_rewind_info.clear();
+    m_rewind_queue.reset();
 }   // reset
 
 // ----------------------------------------------------------------------------
-void RewindManager::insertRewindInfo(RewindInfo *ri)
-{
-#ifdef REWIND_SEARCH_STATS
-    m_count_of_searches++;
-#endif
-    float t = ri->getTime();
-
-    if(ri->isEvent())
-    {
-        // If there are several infos for the same time t,
-        // events must be inserted at the end 
-        AllRewindInfo::reverse_iterator i = m_rewind_info.rbegin();
-        while(i!=m_rewind_info.rend() && 
-            (*i)->getTime() > t)
-        {
-#ifdef REWIND_SEARCH_STATS
-            m_count_of_comparisons++;
-#endif
-            i++;
-        }
-        AllRewindInfo::iterator insert_point = i.base();
-        m_rewind_info.insert(insert_point,ri);
-        return;
-
-    }
-    else   // is a state
-    {
-        // If there are several infos for the same time t,
-        // a state must be inserted first
-        AllRewindInfo::reverse_iterator i = m_rewind_info.rbegin();
-        while(i!=m_rewind_info.rend() && (*i)->getTime() >= t)
-        {
-#ifdef REWIND_SEARCH_STATS
-            m_count_of_comparisons++;
-#endif
-            i++;
-        }
-        AllRewindInfo::iterator insert_point = i.base();
-        m_rewind_info.insert(insert_point,ri);
-        return;
-    }
-}   // insertRewindInfo
-
-// ----------------------------------------------------------------------------
-/** Returns the first (i.e. lowest) index i in m_rewind_info which fulfills 
- *  time(i) < target_time <= time(i+1) and is a state. This is the state
- *  from which a rewind can start - all states for the karts will be well
- *  defined.
- *  \param time Time for which an index is searched.
- *  \return Index in m_rewind_info after which to add rewind data.
+/** Adds a new TimeStep entry. Only exception is time=0 (which happens during
+ *  all of 'ready, set, go') - for which only one entry is created.
  */
-unsigned int RewindManager::findFirstIndex(float target_time) const
+void RewindManager::addNextTimeStep(int time, float dt)
 {
-    // For now do a linear search, even though m_rewind_info is sorted
-    // I would expect that most insertions will be towards the (very)
-    // end of the list, since rewinds should be for short periods of time. 
-    // Note that after finding an entry in a binary search, you still
-    // have to do a linear search to find the last entry with the same
-    // time in order to minimise the later necessary memory move.
-
-    // Gather some statistics about search for now:
-#ifdef REWIND_SEARCH_STATS
-    m_count_of_searches++;
-#endif
-    int index = (int)m_rewind_info.size()-1;
-    int index_last_state = -1;
-    while(index>=0)
+    // Add a timestep entry each timestep, except at 'ready, set, go'
+    // at which time is 0 - we add only one entry there
+    if ((time > 0 || m_rewind_queue.isEmpty()) &&
+        World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE)
     {
-#ifdef REWIND_SEARCH_STATS
-        m_count_of_comparisons++;
-#endif
-        if(m_rewind_info[index]->isState())
-        {
-            if(m_rewind_info[index]->getTime()<target_time)
-            {
-                return index;
-            }
-            index_last_state = index;
-        }
-        index--;
+//        m_rewind_queue.addNewTimeStep(time, dt);
     }
+}   // addNextTimeStep
 
-    if(index_last_state<0)
-    {
-        Log::fatal("RewindManager",
-                   "Can't find any state when rewinding to %f - aborting.",
-                   target_time);
-    }
-
-    // Otherwise use the last found state - not much we can do in this case.
-    Log::error("RewindManager",
-               "Can't find state to rewind to for time %f, using %f.",
-               target_time, m_rewind_info[index_last_state]->getTime());
-    return index_last_state;  // avoid compiler warning
-}   // findFirstIndex
-
-// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------    
 /** Adds an event to the rewind data. The data to be stored must be allocated
  *  and not freed by the caller!
- *  \param time Time at which the event was recorded.
- *  \param buffer Pointer to the event data. 
+ *  \param time Time at which the event was recorded. If time is not specified
+ *          (or set to -1), the current world time is used.
+ *  \param buffer Pointer to the event data.
  */
 void RewindManager::addEvent(EventRewinder *event_rewinder,
-                             BareNetworkString *buffer)
+                             BareNetworkString *buffer, bool confirmed,
+                             int ticks)
 {
-    if(m_is_rewinding) 
+    if (m_is_rewinding)
     {
         delete buffer;
         Log::error("RewindManager", "Adding event when rewinding");
         return;
     }
-    RewindInfo *ri = new RewindInfoEvent(getCurrentTime(), event_rewinder,
-                                         buffer, /*is confirmed*/true);
-    insertRewindInfo(ri);
+
+    if (ticks < 0)
+        ticks = World::getWorld()->getTimeTicks();
+    m_rewind_queue.addLocalEvent(event_rewinder, buffer, confirmed, ticks);
 }   // addEvent
+
+// ----------------------------------------------------------------------------
+/** Adds an event to the list of network rewind data. This function is
+ *  threadsafe so can be called by the network thread. The data is synched
+ *  to m_rewind_info by the main thread. The data to be stored must be
+ *  allocated and not freed by the caller!
+ *  \param time Time at which the event was recorded.
+ *  \param buffer Pointer to the event data.
+ */
+void RewindManager::addNetworkEvent(EventRewinder *event_rewinder,
+                                     BareNetworkString *buffer, int ticks)
+{
+    m_rewind_queue.addNetworkEvent(event_rewinder, buffer, ticks);
+}   // addNetworkEvent
+
+// ----------------------------------------------------------------------------
+/** Adds a state to the list of network rewind data. This function is
+ *  threadsafe so can be called by the network thread. The data is synched
+ *  to m_rewind_info by the main thread. The data to be stored must be
+ *  allocated and not freed by the caller!
+ *  \param time Time at which the event was recorded.
+ *  \param buffer Pointer to the event data.
+ */
+void RewindManager::addNetworkState(BareNetworkString *buffer, int ticks)
+{
+    assert(NetworkConfig::get()->isClient());
+    m_rewind_queue.addNetworkState(buffer, ticks);
+}   // addNetworkState
+
+// ----------------------------------------------------------------------------
+/** Saves a local state using the GameProtocol function to combine several
+ *  independent rewinders to write one state. Typically only the server needs
+ *  to save a state (which is then send to the clients), except that each
+ *  client needs one initial state (in case that it receives an event from
+ *  a client before a state from the serer).
+ *  \param allow_local_save Do a local save.
+ */
+void RewindManager::saveState(bool local_save)
+{
+    PROFILER_PUSH_CPU_MARKER("RewindManager - save state", 0x20, 0x7F, 0x20);
+    GameProtocol::lock()->startNewState(local_save);
+    AllRewinder::const_iterator rewinder;
+    for (rewinder = m_all_rewinder.begin(); rewinder != m_all_rewinder.end(); ++rewinder)
+    {
+        // TODO: check if it's worth passing in a sufficiently large buffer from
+        // GameProtocol - this would save the copy operation.
+        BareNetworkString *buffer = (*rewinder)->saveState();
+        if (buffer && buffer->size() >= 0)
+        {
+            m_overall_state_size += buffer->size();
+            GameProtocol::lock()->addState(buffer);
+        }   // size >= 0
+        delete buffer;    // buffer can be freed
+    }
+    PROFILER_POP_CPU_MARKER();
+}   // saveState
+
+// ----------------------------------------------------------------------------
+/** Saves a state on the client. Used to save an initial state at t=0 for each
+ *  client in case that we receive an event from another client (which will
+ *  trigger a rewind) before a state from the server.
+ */
+void RewindManager::saveLocalState()
+{
+    int ticks = World::getWorld()->getTimeTicks();
+
+    saveState(/*local_state*/true);
+    NetworkString *state = GameProtocol::lock()->getState();
+
+    // Copy the data to a new string, making the buffer in
+    // GameProtocol availble for again.
+    BareNetworkString *bns =
+        new BareNetworkString(state->getCurrentData(),
+                              state->size()           );
+    m_rewind_queue.addLocalState(bns, /*confirmed*/true, ticks);
+}   // saveLocalState
+
+// ----------------------------------------------------------------------------
+/** Restores a given state by calling rewindToState for each available rewinder
+ *  with its correct data.
+ *  \param data The data string used to store the whole game state.
+ *
+ */
+void RewindManager::restoreState(BareNetworkString *data)
+{
+    data->reset();   
+    int index = 0;
+    //AllRewinder::const_iterator rewinder;
+    for (auto rewinder = m_all_rewinder.begin(); rewinder != m_all_rewinder.end();
+                                          ++rewinder)
+    {
+        uint16_t count = data->getUInt16();
+        if (count > 0)
+        {
+            (*rewinder)->rewindToState(data);
+        }
+    }   // for all rewinder
+}   // restoreState
 
 // ----------------------------------------------------------------------------
 /** Determines if a new state snapshot should be taken, and if so calls all
  *  rewinder to do so.
- *  \param dt Time step size.
+ *  \param ticks_not_used NUmber of physics time steps - should be 1.
  */
-void RewindManager::saveStates()
+void RewindManager::update(int ticks_not_used)
 {
-    if(!m_enable_rewind_manager  || 
-        m_all_rewinder.size()==0 ||
-        m_is_rewinding              )  return;
-   
+    // FIXME: rename ticks_not_used
+    if (!m_enable_rewind_manager ||
+        m_all_rewinder.size() == 0 ||
+        m_is_rewinding)  return;
+
     float time = World::getWorld()->getTime();
-    if(time - m_last_saved_state < m_state_frequency)
+    int ticks = World::getWorld()->getTimeTicks();
+
+    m_not_rewound_ticks = ticks;
+
+    // Clients don't save state, so they just exit.
+    if (NetworkConfig::get()->isClient() ||
+        ticks - m_last_saved_state < m_state_frequency)
     {
-        // No full state necessary, add a dummy entry for the time
-        // which increases replay precision (same time step size)
-        RewindInfo *ri = new RewindInfoTime(getCurrentTime());
-        insertRewindInfo(ri);
         return;
     }
 
-    // For now always create a snapshot.
-    for(unsigned int i=0; i<m_all_rewinder.size(); i++)
-    {
-        BareNetworkString *buffer = m_all_rewinder[i]->saveState();
-        if(buffer && buffer->size()>=0)
-        {
-            m_overall_state_size += buffer->size();
-            RewindInfo *ri = new RewindInfoState(getCurrentTime(),
-                                                 m_all_rewinder[i], buffer,
-                                                 /*is_confirmed*/true);
-            assert(ri);
-            insertRewindInfo(ri);
-        }   // size >= 0
-        else
-            delete buffer;   // NULL or 0 byte buffer
-    }
-
-    Log::verbose("RewindManager", "%f allocated %ld bytes search %d/%d=%f",
-                 World::getWorld()->getTime(), m_overall_state_size,
-                 m_count_of_comparisons, m_count_of_searches,
-                 float(m_count_of_comparisons)/ float(m_count_of_searches) );
-
-    m_last_saved_state = time;
-}   // saveStates
+    // Save state
+    saveState(/**allow_local_save*/false);
+    PROFILER_PUSH_CPU_MARKER("RewindManager - send state", 0x20, 0x7F, 0x40);
+    GameProtocol::lock()->sendState();
+    PROFILER_POP_CPU_MARKER();
+    m_last_saved_state = ticks;
+}   // update
 
 // ----------------------------------------------------------------------------
-/** Rewinds to the specified time.
- *  \param t Time to rewind to.
+/** Replays all events from the last event played till the specified time.
+ *  \param world_ticks Up to (and inclusive) which time events will be replayed.
+ *  \param ticks Number of time steps - should be 1.
  */
-void RewindManager::rewindTo(float rewind_time)
+void RewindManager::playEventsTill(int world_ticks, int *ticks)
+{
+    bool needs_rewind;
+    int rewind_ticks;
+
+    // Merge in all network events that have happened at the current
+    // time step.
+    // merge and that have happened before the current time (which will
+    // be getTime()+dt - world time has not been updated yet).
+    m_rewind_queue.mergeNetworkData(world_ticks, &needs_rewind, &rewind_ticks);
+
+    if (needs_rewind)
+    {
+        Log::setPrefix("Rewind");
+        PROFILER_PUSH_CPU_MARKER("Rewind", 128, 128, 128);
+        rewindTo(rewind_ticks, world_ticks);
+        // This should replay everything up to 'now'
+        assert(World::getWorld()->getTimeTicks() == world_ticks);
+        PROFILER_POP_CPU_MARKER();
+        Log::setPrefix("");
+    }
+
+    assert(!m_is_rewinding);
+    if (m_rewind_queue.isEmpty()) return;
+
+    // This is necessary to avoid that rewinding an event will store the 
+    // event again as a seemingly new event.
+    m_is_rewinding = true;
+
+    // Now play all events that happened at the current time stamp.
+    m_rewind_queue.replayAllEvents(world_ticks);
+
+    m_is_rewinding = false;
+}   // playEventsTill
+
+// ----------------------------------------------------------------------------
+/** Rewinds to the specified time, then goes forward till the current
+ *  World::getTime() is reached again: it will replay everything before
+ *  World::getTime(), but not the events at World::getTime() (or later)/
+ *  \param rewind_ticks Time to rewind to.
+ *  \param now_ticks Up to which ticks events are replayed: up to but 
+ *         EXCLUDING new_ticks (the event at now_ticks are played in
+ *         the calling subroutine playEventsTill).
+ */
+void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
 {
     assert(!m_is_rewinding);
-    m_is_rewinding = true;
-    Log::info("rewind", "Rewinding to %f", rewind_time);
-    history->doReplayHistory(History::HISTORY_NONE);
+    bool is_history = history->replayHistory();
+    history->setReplayHistory(false);
 
-    // First find the state to which we need to rewind
-    // ------------------------------------------------
-    unsigned int index = findFirstIndex(rewind_time);
-
-    if(!m_rewind_info[index]->isState())
+    // First save all current transforms so that the error
+    // can be computed between the transforms before and after
+    // the rewind.
+    AllRewinder::iterator rewinder;
+    for (rewinder = m_all_rewinder.begin();
+        rewinder != m_all_rewinder.end(); ++rewinder)
     {
-        Log::error("RewindManager", "No state for rewind to %f, state %d.",
-                   rewind_time, index);
-        return;
+        (*rewinder)->saveTransform();
     }
 
     // Then undo the rewind infos going backwards in time
     // --------------------------------------------------
-    for(int i=(int)m_rewind_info.size()-1; i>=(int)index; i--)
-    {
-        m_rewind_info[i]->undo();
+    m_is_rewinding = true;
 
-        // Now all states after the time we rewind to are not confirmed
-        // anymore. They need to be rewritten when going forward during
-        // the rewind.
-        if(m_rewind_info[i]->isState() && 
-            m_rewind_info[i]->getTime() > m_rewind_info[index]->getTime() )
-            m_rewind_info[i]->setConfirmed(false);
-    }   // for i>state
-
+    // This will go back till the first confirmed state is found before
+    // the specified rewind ticks.
+    int exact_rewind_ticks = m_rewind_queue.undoUntil(rewind_ticks);
 
     // Rewind the required state(s)
     // ----------------------------
     World *world = World::getWorld();
-    float current_time = world->getTime();
-
-    // Get the (first) full state to which we have to rewind
-    RewindInfoState *state =
-                    dynamic_cast<RewindInfoState*>(m_rewind_info[index]);
-
-    // Store the time to which we have to replay to
-    float exact_rewind_time = state->getTime();
 
     // Now start the rewind with the full state:
-    world->setTime(exact_rewind_time);
-    float local_physics_time = state->getLocalPhysicsTime();
-    Physics::getInstance()->getPhysicsWorld()->setLocalTime(local_physics_time);
+    world->setTicks(exact_rewind_ticks);
 
-    // Restore all states from the current time - the full state of a race
-    // will be potentially stored in several state objects. State can be NULL
-    // if the next event is not a state
-    while(state && state->getTime()==exact_rewind_time)
+    // Get the (first) full state to which we have to rewind
+    RewindInfo *current = m_rewind_queue.getCurrent();
+    assert(current->isState());
+
+    // Restore states from the exact rewind time
+    // -----------------------------------------
+    // A loop in case that we should split states into several smaller ones:
+    while (current && current->getTicks() == exact_rewind_ticks && 
+          current->isState()                                        )
     {
-        state->rewind();
-        index++;
-        if(index>=m_rewind_info.size()) break;
-        state = dynamic_cast<RewindInfoState*>(m_rewind_info[index]);
+        current->rewind();
+        m_rewind_queue.next();
+        current = m_rewind_queue.getCurrent();
     }
 
-    // Now go forward through the list of rewind infos:
-    // ------------------------------------------------
-    while( world->getTime() < current_time &&
-          index < (int)m_rewind_info.size()                 )
-    {
-        // Now handle all states and events at the current time before
-        // updating the world:
-        while(index < (int)m_rewind_info.size() &&
-              m_rewind_info[index]->getTime()<=world->getTime()+0.001f)
-        {
-            if(m_rewind_info[index]->isState())
-            {
-                // TOOD: replace the old state with a new state. 
-                // For now just set it to confirmed
-                m_rewind_info[index]->setConfirmed(true);
-            }
-            else if(m_rewind_info[index]->isEvent())
-            {
-                m_rewind_info[index]->rewind();
-            }
-            index++;
-        }
-        float dt = determineTimeStepSize(index, current_time);
-        world->updateWorld(dt);
-#define SHOW_ROLLBACK
+    // Now go forward through the list of rewind infos till we reach 'now':
+    while(world->getTimeTicks() < now_ticks )
+    { 
+        m_rewind_queue.replayAllEvents(world->getTimeTicks());
+
+        // Now simulate the next time step
+        world->updateWorld(1);
+#undef SHOW_ROLLBACK
 #ifdef SHOW_ROLLBACK
-        irr_driver->update(dt);
+        irr_driver->update(stk_config->ticks2Time(1));
 #endif
-        world->updateTime(dt);
+        world->updateTime(1);
 
-    }
-    m_is_rewinding = false;
+    }   // while (world->getTicks() < current_ticks)
 
-}   // rewindTo
-
-// ----------------------------------------------------------------------------
-/** Determines the next time step size to use when recomputing the physics.
- *  The time step size is either 1/60 (default physics), or less, if there
- *  is an even to handle before that time.
- *  \param next_state The next state to replay.
- *  \param end_time The end time to which we must replay forward. Don't
- *         return a dt that would be bigger tham this value.
- *  \return The time step size to use in the next simulation step.
- */
-float RewindManager::determineTimeStepSize(int next_state, float end_time)
-{
-    // If there is a next state (which is known to have a different time)
-    // use the time difference to determine the time step size.
-    if(next_state < (int)m_rewind_info.size())
-        return m_rewind_info[next_state]->getTime() - World::getWorld()->getTime();
-
-    // Otherwise, i.e. we are rewinding the last state/event, take the
-    // difference between that time and the world time at which the rewind
-    // was triggered.
-    return end_time -  m_rewind_info[next_state-1]->getTime();
-
-
-
-    float dt = 1.0f/60.0f;
-    float t = World::getWorld()->getTime();
-    if(m_rewind_info[next_state]->getTime() < t + dt)
+    // Now compute the errors which need to be visually smoothed
+    for (rewinder = m_all_rewinder.begin();
+        rewinder != m_all_rewinder.end(); ++rewinder)
     {
-        // Since we have RewindInfo at that time, it is certain that
-        /// this time is before (or at) end_time, not after.
-        return m_rewind_info[next_state]->getTime()-t;
+        (*rewinder)->computeError();
     }
-    return t+dt < end_time ? dt : end_time - t;
-}   // determineTimeStepSize
+
+    history->setReplayHistory(is_history);
+    m_is_rewinding = false;
+}   // rewindTo

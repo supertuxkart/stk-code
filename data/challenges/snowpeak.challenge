@@ -1,19 +1,24 @@
 <?xml version="1.0"?>
-<challenge version="2">
+<challenge version="3">
+    <unlock_list list="false"/>
     <track id="snowtuxpeak" laps="3"/>
     <mode major="single" minor="quickrace"/>
-    <requirements trophies="60"/>
+    <requirements trophies="45"/>
     
+    <best>
+        <karts number="8"/>
+        <requirements position="1" time="120"/>
+    </best>
     <hard>
-        <karts number="5"/>
-        <requirements position="1" time="145"/>
+        <karts number="7"/>
+        <requirements position="1" time="140"/>
     </hard>
     <medium>
-        <karts number="4"/>
+        <karts number="6"/>
         <requirements time="170"/>
     </medium>
     <easy>
-        <karts number="4"/>
-        <requirements time="195"/>
+        <karts number="5"/>
+        <requirements time="210"/>
     </easy>
 </challenge>

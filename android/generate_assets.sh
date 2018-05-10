@@ -180,6 +180,9 @@ convert_image()
         echo "Couldn't convert $FILE file"
         return
     fi
+    
+    SCALE_CMD=""
+    QUALITY_CMD=""
 
     if [ $W -gt $TEXTURE_SIZE ] || [ $H -gt $TEXTURE_SIZE ]; then
         if [ $W -gt $H ]; then

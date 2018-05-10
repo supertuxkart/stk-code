@@ -76,7 +76,7 @@ public:
                                int position,
                                const btTransform& init_transform,
                                PerPlayerDifficulty difficulty);
-    virtual void update(float dt);
+    virtual void update(int ticks) OVERRIDE;
     virtual void reset();
     virtual void collectedItem(Item *item, int add_info);
     virtual void setKartAnimation(AbstractKartAnimation *ka);

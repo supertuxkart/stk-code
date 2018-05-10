@@ -37,7 +37,6 @@ Protocol::Protocol(ProtocolType type, CallbackObject* callback_object)
     m_callback_object       = callback_object;
     m_type                  = type;
     m_state                 = PROTOCOL_STATE_INITIALISING;
-    m_id                    = 0;
     m_handle_connections    = false;
     m_handle_disconnections = false;
 }   // Protocol
@@ -80,7 +79,8 @@ bool Protocol::checkDataSize(Event* event, unsigned int minimum_size)
  */
 void Protocol::requestStart()
 {
-    ProtocolManager::getInstance()->requestStart(this);
+    if (auto pm = ProtocolManager::lock())
+        pm->requestStart(shared_from_this());
 }   // requestStart
 
 // ----------------------------------------------------------------------------
@@ -88,7 +88,8 @@ void Protocol::requestStart()
  */
 void Protocol::requestPause()
 {
-    ProtocolManager::getInstance()->requestPause(this);
+    if (auto pm = ProtocolManager::lock())
+        pm->requestPause(shared_from_this());
 }   // requestPause
 
 // ----------------------------------------------------------------------------
@@ -96,7 +97,8 @@ void Protocol::requestPause()
  */
 void Protocol::requestUnpause()
 {
-    ProtocolManager::getInstance()->requestUnpause(this);
+    if (auto pm = ProtocolManager::lock())
+        pm->requestUnpause(shared_from_this());
 }   // requestUnpause
 
 // ----------------------------------------------------------------------------
@@ -104,22 +106,9 @@ void Protocol::requestUnpause()
  */
 void Protocol::requestTerminate()
 {
-    ProtocolManager::getInstance()->requestTerminate(this);
+    if (auto pm = ProtocolManager::lock())
+        pm->requestTerminate(shared_from_this());
 }   // requestTerminate
-
-// ----------------------------------------------------------------------------
-/** Finds a protocol with the given type and requests it to be terminated.
- *  If no such protocol exist, log an error message.
- *  \param type The protocol type to delete.
- */
-void Protocol::findAndTerminateProtocol(ProtocolType type)
-{
-    Protocol* protocol = ProtocolManager::getInstance()->getProtocol(type);
-    if (protocol)
-        protocol->requestTerminate();
-    else
-        Log::error("Protocol", "No protocol %d registered.", type);
-}   // findAndTerminateProtocol
 
 // ----------------------------------------------------------------------------
 /** Sends a message to all peers, inserting the peer's token into the message.
@@ -130,11 +119,7 @@ void Protocol::findAndTerminateProtocol(ProtocolType type)
 void Protocol::sendMessageToPeersChangingToken(NetworkString *message,
                                                bool reliable)
 {
-    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
-    for (unsigned int i = 0; i < peers.size(); i++)
-    {
-        peers[i]->sendPacket(message, reliable);
-    }
+    STKHost::get()->sendPacketToAllPeers(message, reliable);
 }   // sendMessageToPeersChangingToken
 
 // ----------------------------------------------------------------------------

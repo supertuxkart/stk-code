@@ -37,7 +37,6 @@
 #include "states_screens/state_manager.hpp"
 
 using namespace GUIEngine;
-DEFINE_SCREEN_SINGLETON( SoccerSetupScreen );
 
 #define KART_CONTINUOUS_ROTATION_SPEED      35.f
 #define KART_CONFIRMATION_ROTATION_SPEED    4.f

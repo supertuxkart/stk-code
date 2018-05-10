@@ -122,24 +122,24 @@ void Plunger::init(const XMLNode &node, scene::IMesh *plunger_model)
  *  \param dt Time step size.
  *  \returns True of this object should be removed.
  */
-bool Plunger::updateAndDelete(float dt)
+bool Plunger::updateAndDelete(int ticks)
 {
     // In keep-alive mode, just update the rubber band
     if(m_keep_alive >= 0)
     {
-        m_keep_alive -= dt;
+        m_keep_alive -= ticks;
         if(m_keep_alive<=0)
         {
             setHasHit();
             return true;
         }
-        if(m_rubber_band != NULL) m_rubber_band->update(dt);
+        if(m_rubber_band != NULL) m_rubber_band->update(ticks);
         return false;
     }
 
     // Else: update the flyable and rubber band
-    bool ret = Flyable::updateAndDelete(dt);
-    if(m_rubber_band != NULL) m_rubber_band->update(dt);
+    bool ret = Flyable::updateAndDelete(ticks);
+    if(m_rubber_band != NULL) m_rubber_band->update(ticks);
 
     return ret;
 
@@ -179,11 +179,12 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
     }
     else
     {
-        m_keep_alive = m_owner->getKartProperties()->getPlungerBandDuration();
+        m_keep_alive = stk_config->time2Ticks(m_owner->getKartProperties()
+                                             ->getPlungerBandDuration()    );
 
-        // Make this object invisible by placing it faaar down. Not that if this
-        // objects is simply removed from the scene graph, it might be auto-deleted
-        // because the ref count reaches zero.
+        // Make this object invisible by placing it faaar down. Not that if
+        // this objects is simply removed from the scene graph, it might be
+        // auto-deleted because the ref count reaches zero.
         scene::ISceneNode *node = getNode();
         if(node)
         {

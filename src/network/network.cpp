@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/transport_address.hpp"
 #include "utils/time.hpp"
@@ -27,12 +28,16 @@
 #include <string.h>
 #if defined(WIN32)
 #  include "ws2tcpip.h"
+#  include <iphlpapi.h>
 #  define inet_ntop InetNtop
 #else
 #  include <arpa/inet.h>
 #  include <errno.h>
+#  include <ifaddrs.h>
 #  include <sys/socket.h>
 #endif
+
+
 #include <pthread.h>
 #include <signal.h>
 
@@ -45,17 +50,26 @@ Synchronised<FILE*>Network::m_log_file = NULL;
  *  \param channel_limit : The maximum number of channels per peer.
  *  \param max_incoming_bandwidth : The maximum incoming bandwidth.
  *  \param max_outgoing_bandwidth : The maximum outgoing bandwidth.
+ *  \param change_port_if_bound : Use another port if the prefered port is
+ *                                already bound to a socket.
  */
 Network::Network(int peer_count, int channel_limit,
                  uint32_t max_incoming_bandwidth,
                  uint32_t max_outgoing_bandwidth,
-                 ENetAddress* address)
+                 ENetAddress* address, bool change_port_if_bound)
 {
     m_host = enet_host_create(address, peer_count, channel_limit, 0, 0);
-    if (!m_host)
+    if (m_host)
+        return;
+    if (change_port_if_bound)
     {
-        Log::fatal("Network", "An error occurred while trying to create an "
-                   "ENet client host.");
+        Log::warn("Network", "%d port is in used, use another port",
+            address->port);
+        ENetAddress new_addr;
+        new_addr.host = address->host;
+        // Any port
+        new_addr.port = 0;
+        m_host = enet_host_create(&new_addr, peer_count, channel_limit, 0, 0);
     }
 }   // Network
 
@@ -177,9 +191,9 @@ void Network::openLog()
         std::string s = file_manager
             ->getUserConfigFile(FileManager::getStdoutName()+".packet");
         m_log_file.setAtomic(fopen(s.c_str(), "w+"));
+        if (!m_log_file.getData())
+            Log::warn("STKHost", "Network packets won't be logged: no file.");
     }
-    if (!m_log_file.getData())
-        Log::warn("STKHost", "Network packets won't be logged: no file.");
 }   // openLog
 
 // ----------------------------------------------------------------------------

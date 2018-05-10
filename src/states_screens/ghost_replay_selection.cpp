@@ -27,8 +27,6 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( GhostReplaySelection );
-
 // ----------------------------------------------------------------------------
 /** Constructor, which loads the stkgui file.
  */
@@ -163,7 +161,6 @@ void GhostReplaySelection::eventCallback(GUIEngine::Widget* widget,
     else if (name == "record-ghost")
     {
         race_manager->setRecordRace(true);
-        TracksScreen::getInstance()->setOfficalTrack(false);
         TracksScreen::getInstance()->push();
     }
     else if (name == "replay_difficulty_toggle")

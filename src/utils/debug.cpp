@@ -246,7 +246,12 @@ LightNode* findNearestLight()
 
 bool handleContextMenuAction(s32 cmd_id)
 {
-    unsigned int kart_num = Camera::getActiveCamera()->getKart()->getWorldKartId();
+    Camera* camera = Camera::getActiveCamera();
+    unsigned int kart_num = 0;
+    if (camera != NULL && camera->getKart() != NULL)
+    {
+        kart_num = camera->getKart()->getWorldKartId();
+    }
 
     World *world = World::getWorld();
     Physics *physics = Physics::getInstance();
@@ -550,21 +555,25 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_GUI_CAM_TOP:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_TOP_OF_KART);
         Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
         break;
     case DEBUG_GUI_CAM_WHEEL:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_GROUND);
         Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
         break;
     case DEBUG_GUI_CAM_BEHIND_KART:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_BEHIND_KART);
         Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
         break;
     case DEBUG_GUI_CAM_SIDE_OF_KART:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_SIDE_OF_KART);
         Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
         break;
     case DEBUG_GUI_CAM_FREE:
@@ -585,6 +594,7 @@ bool handleContextMenuAction(s32 cmd_id)
     {
         Camera *camera = Camera::getActiveCamera();
         Camera::changeCamera(camera->getIndex(), Camera::CM_TYPE_NORMAL);
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
         break;
     }

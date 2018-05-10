@@ -31,13 +31,13 @@ namespace SP
 class SPInstancedData
 {
 private:
-    char m_data[32];
+    char m_data[44];
 
 public:
     // ------------------------------------------------------------------------
     SPInstancedData()
     {
-        memset(m_data, 0, 32);
+        memset(m_data, 0, 44);
     }
     // ------------------------------------------------------------------------
     SPInstancedData(const core::matrix4& model_mat,
@@ -65,21 +65,19 @@ public:
             rotation.W = -rotation.W;
         }
         memcpy(m_data, position, 12);
-        uint32_t _2101010 = normalizedSignedFloatsTo1010102(
-            {{ rotation.X, rotation.Y, rotation.Z, 0.0f }});
-        memcpy(m_data + 12, &_2101010, 4);
+        memcpy(m_data + 12, &rotation, 16);
         short s[4] = { toFloat16(scale.X), toFloat16(scale.Y),
-            toFloat16(scale.Z), toFloat16(rotation.W) };
-        memcpy(m_data + 16, s, 8);
+            toFloat16(scale.Z), 0 };
+        memcpy(m_data + 28, s, 8);
         short tm[2] =
             {
                 short(texture_trans_x * 32767.0f),
                 short(texture_trans_y * 32767.0f)
             };
-        memcpy(m_data + 24, tm, 4);
-        memcpy(m_data + 28, &skinning_offset, 2);
+        memcpy(m_data + 36, tm, 4);
+        memcpy(m_data + 40, &skinning_offset, 2);
         short hue_packed = short(core::clamp(int(hue * 100.0f), 0, 100));
-        memcpy(m_data + 30, &hue_packed, 2);
+        memcpy(m_data + 42, &hue_packed, 2);
     }
     // ------------------------------------------------------------------------
     const void* getData() const                              { return m_data; }

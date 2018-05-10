@@ -18,24 +18,25 @@
 
 #include "network/protocols/request_connection.hpp"
 
-#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/servers_manager.hpp"
+#include "network/server.hpp"
 #include "network/stk_host.hpp"
+#include "online/xml_request.hpp"
+#include "utils/string_utils.hpp"
 
 using namespace Online;
 
 /** Constructor. Stores the server id.
- *  \param server_id Id of the server.
+ *  \param server Server to be joined.
  */
-RequestConnection::RequestConnection(uint32_t server_id)
+RequestConnection::RequestConnection(std::shared_ptr<Server> server)
                  : Protocol(PROTOCOL_SILENT)
 {
-    m_server_id = server_id;
-    m_request   = NULL;
+    m_server  = server;
+    m_request = NULL;
 }   // RequestConnection
 
 // ----------------------------------------------------------------------------
@@ -52,20 +53,6 @@ void RequestConnection::setup()
 }   // setup
 
 // ----------------------------------------------------------------------------
-/** The callback for the server join request. It informs the server manager
- *  of a successful join request.
- */
-void RequestConnection::ServerJoinRequest::callback()
-{
-    if (isSuccess())
-    {
-        uint32_t server_id;
-        getXMLData()->get("serverid", &server_id);
-        ServersManager::get()->setJoinedServer(server_id);
-    }
-}   // ServerJoinRequest::callback
-
-// ----------------------------------------------------------------------------
 /** This implements a finite state machine to monitor the server join
  *  request asynchronously.
  */
@@ -75,21 +62,73 @@ void RequestConnection::asynchronousUpdate()
     {
         case NONE:
         {
-            if(NetworkConfig::get()->isLAN())
+            if ((!NetworkConfig::m_disable_lan &&
+                m_server->getAddress().getIP() ==
+                STKHost::get()->getPublicAddress().getIP()) ||
+                (NetworkConfig::get()->isLAN() ||
+                STKHost::get()->isClientServer()))
             {
-                const Server *server = 
-                    ServersManager::get()->getServerByID(m_server_id);
-                BareNetworkString message(std::string("connection-request"));
-                STKHost::get()->sendRawPacket(message, server->getAddress());
+                if (NetworkConfig::get()->isWAN())
+                {
+                    Log::info("RequestConnection",
+                        "LAN connection to WAN server will be used.");
+                }
+                if (STKHost::get()->isClientServer())
+                {
+                    // Allow up to 10 seconds for the separate process to
+                    // fully start-up
+                    double timeout = StkTime::getRealTime() + 10.;
+                    while (StkTime::getRealTime() < timeout)
+                    {
+                        const std::string& sid = NetworkConfig::get()
+                            ->getServerIdFile();
+                        assert(!sid.empty());
+                        if (file_manager->fileExists(sid))
+                        {
+                            file_manager->removeFile(sid);
+                            break;
+                        }
+                        StkTime::sleep(10);
+                    }
+                    NetworkConfig::get()->setServerIdFile("");
+                }
+                std::string str_msg("connection-request");
+                BareNetworkString message(str_msg +
+                    (STKHost::get()->isClientServer() ? "-localhost" :
+                    StringUtils::toString(m_server->getPrivatePort())));
+
+                TransportAddress server_addr;
+                if (!NetworkConfig::m_disable_lan &&
+                    m_server->getAddress().getIP() ==
+                    STKHost::get()->getPublicAddress().getIP() &&
+                    !STKHost::get()->isClientServer())
+                {
+                    // If use lan connection in wan server, send a broadcast
+                    server_addr.setIP(0xffffffff);
+                }
+                else
+                {
+                    server_addr.setIP(m_server->getAddress().getIP());
+                }
+                // Direct socket always listens on server discovery port
+                server_addr.setPort(NetworkConfig::get()
+                    ->getServerDiscoveryPort());
+                // Avoid possible packet loss, the connect to peer done by
+                // server will auto terminate if same peer from same port
+                // has connected already
+                for (int i = 0; i < 5; i++)
+                {
+                    STKHost::get()->sendRawPacket(message, server_addr);
+                    StkTime::sleep(1);
+                }
                 m_state = DONE;
             }
             else
             {
-                m_request = new ServerJoinRequest();
-                PlayerManager::setUserDetails(m_request, "request-connection",
-                                               Online::API::SERVER_PATH);
-
-                m_request->addParameter("server_id", m_server_id);
+                m_request = new Online::XMLRequest();
+                NetworkConfig::get()->setUserDetails(m_request,
+                    "request-connection");
+                m_request->addParameter("server_id", m_server->getServerId());
                 m_request->queue();
                 m_state = REQUEST_PENDING;
             }
@@ -114,7 +153,7 @@ void RequestConnection::asynchronousUpdate()
                 {
                     Log::error("RequestConnection",
                              "Fail to make a request to connecto to server %d",
-                               m_server_id);
+                               m_server->getServerId());
                 }
             }
             else

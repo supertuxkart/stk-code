@@ -2,7 +2,7 @@
 <stkgui>
     <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 
-    <div x="1%" y="1%" width="98%" height="96%" layout="vertical-row" >
+    <div id="all-track" x="1%" y="1%" width="60%" height="96%" layout="vertical-row" >
         <header width="80%" I18N="In the track selection screen" text="All Tracks"
                 align="center" text_align="center" />
 
@@ -17,5 +17,32 @@
         <tabs width="100%" height="5%" id="trackgroups"> </tabs>
 
         <spacer width="100%" height="2%" />
+        <box id="rect-box" width="100%" height="20%" padding="15" layout="vertical-row">
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label id="lap-text" proportion="1" I18N="In the track screen" text_align="right"/>
+                <spacer width="40"/>
+                <div proportion="1" height="fit" layout="horizontal-row">
+                    <spinner id="lap-spinner" width="50%" min_value="1" max_value="20" align="center"
+                             wrap_around="true" />
+                </div>
+            </div>
+            <spacer height="10"/>
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label id="reverse-text" proportion="1" I18N="In the track screen" text_align="right"/>
+                <spacer width="40"/>
+                <div proportion="1" height="fit" layout="horizontal-row">
+                    <div width="50%" height="fit" text-align="center" layout="vertical-row" >
+                        <checkbox id="reverse" align="center"/>
+                    </div>
+                </div>
+            </div>
+        </box>
+    </div>
+    <div id="vote" x="63%" y="1%" width="37%" height="96%" layout="vertical-row">
+        <div width="95%" proportion="2" layout="horizontal-row">
+            <box proportion="2" height="100%" layout="vertical-row">
+                <label id="vote-text" word_wrap="true" id="text" proportion="3" width="100%" height="100%" text_valign="top"/>
+            </box>
+        </div>
     </div>
 </stkgui>

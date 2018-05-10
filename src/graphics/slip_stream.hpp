@@ -44,45 +44,86 @@ class Material;
 /**
   * \ingroup graphics
   */
-class SlipStream : public MovingTexture
+class SlipStream
 {
 private:
     /** The kart to which this smoke belongs. */
     AbstractKart *m_kart;
 
+    /** The moving texture for the normal node */
+
+    MovingTexture *m_moving;
+
+    /** The moving texture for the fast node */
+
+    MovingTexture *m_moving_fast;
+
+    /** The moving texture for the fast node */
+
+    MovingTexture *m_moving_bonus;
+
     /** The scene node. */
     scene::ISceneNode *m_node;
+
+    /** The fast scene node. */
+    scene::ISceneNode *m_node_fast;
+
+    /** The node used when the bonus is active. */
+    scene::ISceneNode *m_bonus_node;
 
     /** For debugging: a simple quad to display where slipstream works. */
     std::shared_ptr<SP::SPDynamicDrawCall> m_debug_dc;
 
+    /** For debugging: a simple quad to display where inner slipstream works. */
+    std::shared_ptr<SP::SPDynamicDrawCall> m_debug_dc2;
+
     /** The length of the slipstream cylinder. This is used to scale
-     *  the actual scene node correctly. */
-    float              m_length;
+     *  the actual scene node correctly. Shared between node and node_fast */
+    float         m_length;
 
     /** The time a kart was in slipstream. */
     float         m_slipstream_time;
 
+    /** The remaining active time bonus */
+    float         m_bonus_time;
+
+    /** This bool is used to know the first time we're going out of the slipstreaming area */
+    bool          m_bonus_active;
+
+    /** Used to trigger automatically the slipstreaming bonus */
+
+    int          m_current_target_id;
+    int          m_previous_target_id;
+
+
     /** Slipstream mode: either nothing happening, or the kart is collecting
-     *  'slipstream credits', or the kart is using accumulated credits. */
-    enum         {SS_NONE, SS_COLLECT, SS_USE} m_slipstream_mode;
+     *  'slipstream credits'. Credits can be accumulated while the bonus is used */
+    enum         {SS_NONE, SS_COLLECT} m_slipstream_mode;
 
     /** This is slipstream area if the kart is at 0,0,0 without rotation. */
     Quad         *m_slipstream_quad;
+
+    /** This is the inner slipstream area if the kart is at 0,0,0 without rotation. */
+    Quad         *m_slipstream_inner_quad;
+
+    /** This is the outer slipstream area if the kart is at 0,0,0 without rotation. 
+        No slipstream time is accumulated there, but it's lost slower*/
+    Quad         *m_slipstream_outer_quad;
 
     /** The kart from which this kart gets slipstream. Used by the AI to
      ** overtake the right kart. */
     AbstractKart* m_target_kart;
 
-    SP::SPMesh*  createMesh(Material* material);
-    void         setDebugColor(const video::SColor &color);
+    SP::SPMesh*  createMesh(Material* material, bool bonus_mesh);
+    void         setDebugColor(const video::SColor &color, bool inner);
+    void         updateQuad();
+    void         updateSlipstreamingTextures(float f, const AbstractKart* kart);
+    void         updateBonusTexture();
 public:
                  SlipStream  (AbstractKart* kart);
     virtual     ~SlipStream  ();
     void         reset();
-    virtual void update(float dt);
-    void         setIntensity(float f, const AbstractKart* kart);
-    void         updateSlipstreamPower();
+    virtual void update(int ticks);
     bool         isSlipstreamReady() const;
 
     // ------------------------------------------------------------------------
@@ -94,7 +135,6 @@ public:
     const AbstractKart* getSlipstreamTarget() const {return m_target_kart;}
     // ------------------------------------------------------------------------
     /** Returns if slipstream is being used. */
-    bool        inUse() const {return m_slipstream_mode==SS_USE; }
+    bool        inUse() const {return m_bonus_time>0.0f; }
 };   // SlipStream
 #endif
-

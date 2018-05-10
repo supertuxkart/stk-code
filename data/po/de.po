@@ -9,7 +9,7 @@
 # Flakebi, 2015
 # hiker <joerg@chiu-henrichs.id.au>, 2015
 # konstin <konsti.schuetze@t-online.de>, 2015
-# Maximilian Wagenbach <foaly.f@web.de>, 2016
+# Maximilian Wagenbach <foaly@posteo.de>, 2016
 # Tobias Markus <tobbi@supertuxproject.org>, 2015-2016
 # Wasilis Mandratzis-Walz, 2015
 # wesen <yannick.lapp@web.de>, 2016
@@ -18,7 +18,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-04 20:58-0400\n"
-"PO-Revision-Date: 2017-11-13 00:19+0000\n"
+"PO-Revision-Date: 2017-11-26 08:20+0000\n"
 "Last-Translator: Wuzzy <almikes@aol.com>\n"
 "Language-Team: German (http://www.transifex.com/supertuxkart/supertuxkart/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -439,7 +439,7 @@ msgstr "Anzahl der Runden:"
 #. I18N: ./data/gui/edit_track.stkgui
 #. I18N: In the edit track screen
 msgid "Reverse:"
-msgstr "Umkehren:"
+msgstr "Rückwärts:"
 
 #. I18N: ./data/gui/edit_track.stkgui
 #. I18N: ./data/gui/general_text_field_dialog.stkgui
@@ -3324,7 +3324,7 @@ msgstr "Runden"
 
 #: src/states_screens/edit_gp_screen.cpp:68
 msgid "Reversed"
-msgstr "Umgekehrt"
+msgstr "Rückwärts"
 
 #: src/states_screens/edit_gp_screen.cpp:124
 #: src/states_screens/ghost_replay_selection.cpp:177
@@ -4031,7 +4031,7 @@ msgstr "Maximal unterstützte Spieler: %d"
 #. I18N: In the track info screen
 #: src/states_screens/track_info_screen.cpp:213
 msgid "Drive in reverse"
-msgstr "Spiegelverkehrte Strecke"
+msgstr "Rückwärts fahren"
 
 #. I18N: In the track info screen
 #: src/states_screens/track_info_screen.cpp:218

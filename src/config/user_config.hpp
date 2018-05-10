@@ -37,6 +37,7 @@
       cause an undefined game action now
    6: Added stick configurations.
 */
+#include <iterator>
 #include <string>
 #include <map>
 #include <vector>
@@ -99,44 +100,6 @@ public:
 
 // ============================================================================
 template<typename T, typename U>
-class ListUserConfigParam : public UserConfigParam
-{
-    std::vector<T> m_elements;
-
-public:
-    ListUserConfigParam(const char* param_name,
-                         const char* comment = NULL);
-    ListUserConfigParam(const char* param_name,
-                         const char* comment,
-                         int nb_elts,
-                         ...);
-    ListUserConfigParam(const char* param_name,
-                         GroupUserConfigParam* group,
-                         const char* comment = NULL);
-    ListUserConfigParam(const char* param_name,
-                         GroupUserConfigParam* group,
-                         const char* comment,
-                         int nb_elts,
-                         ...);
-
-    void write(std::ofstream& stream) const;
-    void findYourDataInAChildOf(const XMLNode* node);
-    void findYourDataInAnAttributeOf(const XMLNode* node);
-
-    void addElement(T element);
-
-    irr::core::stringc toString() const;
-
-    operator std::vector<T>() const
-            { return m_elements; }
-    float& operator=(const std::vector<T>& v)
-            { m_elements = std::vector<T>(v); return m_elements; }
-    float& operator=(const ListUserConfigParam& v)
-            { m_elements = std::vector<T>(v); return m_elements; }
-};   // ListUserConfigParam
-typedef ListUserConfigParam<std::string, const char*>    StringListUserConfigParam;
-
-template<typename T, typename U>
 class MapUserConfigParam : public UserConfigParam
 {
     std::map<T, U> m_elements;
@@ -146,16 +109,14 @@ public:
         const char* comment = NULL);
     MapUserConfigParam(const char* param_name,
         const char* comment,
-        int nb_elts,
-        ...);
+        std::map<T, U> default_value);
     MapUserConfigParam(const char* param_name,
         GroupUserConfigParam* group,
         const char* comment = NULL);
     MapUserConfigParam(const char* param_name,
         GroupUserConfigParam* group,
         const char* comment,
-        int nb_elts,
-        ...);
+        std::map<T, U> default_value);
 
     void write(std::ofstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
@@ -165,9 +126,17 @@ public:
 
     irr::core::stringc toString() const;
 
-    operator std::map<T,U>() const
+    operator std::map<T, U>() const
     {
         return m_elements;
+    }
+    typename std::map<T, U>::iterator begin()
+    {
+        return m_elements.begin();
+    }
+    typename std::map<T, U>::iterator end()
+    {
+        return m_elements.end();
     }
     std::map<T, U>& operator=(const std::map<T,U>& v)
     {
@@ -183,8 +152,9 @@ public:
     {
         return m_elements[key];
     }
-};   // ListUserConfigParam
-typedef MapUserConfigParam<int, int>    IntToIntUserConfigParam;
+};   // MapUserConfigParam
+typedef MapUserConfigParam<uint32_t, uint32_t> UIntToUIntUserConfigParam;
+typedef MapUserConfigParam<std::string, uint32_t> StringToUIntUserConfigParam;
 // ============================================================================
 class IntUserConfigParam : public UserConfigParam
 {
@@ -205,7 +175,7 @@ public:
 
     irr::core::stringc toString() const;
     void revertToDefaults()      { m_value = m_default_value;        }
-
+    int getDefaultValue()        { return  m_default_value;          }
     operator int() const         { return m_value;                   }
     int& operator++(int dummy)   { m_value++; return m_value;        }
     int& operator=(const int& v) { m_value = v; return m_value;      }
@@ -500,6 +470,11 @@ namespace UserConfigParams
             PARAM_DEFAULT( BoolUserConfigParam(false, "screen_keyboard",
             &m_multitouch_group,
             "Enable screen keyboard.") );
+            
+    PARAM_PREFIX BoolUserConfigParam         m_hidpi_enabled
+            PARAM_DEFAULT( BoolUserConfigParam(false, "hidpi_enabled",
+            &m_multitouch_group,
+            "Enable high-DPI support.") );
 
     // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
@@ -708,71 +683,69 @@ namespace UserConfigParams
      *  can store. */
     PARAM_PREFIX float m_profiler_buffer_duration PARAM_DEFAULT(20.0f);
 
-    // not saved to file
-
     // ---- Networking
-
-    PARAM_PREFIX IntUserConfigParam         m_server_max_players
-            PARAM_DEFAULT(  IntUserConfigParam(16, "server_max_players",
-                                       "Maximum number of players on the server.") );
-
-    PARAM_PREFIX StringListUserConfigParam         m_stun_servers
-            PARAM_DEFAULT(  StringListUserConfigParam("Stun_servers", "The stun servers"
-                            " that will be used to know the public address.",
-                            24,
-                            "provserver.televolution.net",
-                            "sip1.lakedestiny.cordiaip.com",
-                            "stun1.voiceeclipse.net",
-                            "stun01.sipphone.com",
-                            "stun.callwithus.com",
-                            "stun.counterpath.net",
-                            "stun.endigovoip.com",
-                            "stun.ekiga.net",
-                            "stun.ideasip.com",
-                            "stun.internetcalls.com",
-                            "stun.ipns.com",
-                            "stun.noc.ams-ix.net",
-                            "stun.phonepower.com",
-                            "stun.phoneserve.com",
-                            "stun.rnktel.com",
-                            "stun.softjoys.com",
-                            "stunserver.org",
-                            "stun.sipgate.net",
-                            "stun.stunprotocol.org",
-                            "stun.voip.aebc.com",
-                            "stun.voipbuster.com",
-                            "stun.voxalot.com",
-                            "stun.voxgratia.org",
-                            "stun.xten.com") );
-
-    // ---- Gamemode setup
-    PARAM_PREFIX IntToIntUserConfigParam m_num_karts_per_gamemode
-        PARAM_DEFAULT(IntToIntUserConfigParam("num_karts_per_gamemode",
-            "The Number of karts per gamemode.",
-            1,
-            std::make_pair(1100, 4)
+    PARAM_PREFIX StringToUIntUserConfigParam m_stun_list
+        PARAM_DEFAULT(StringToUIntUserConfigParam("stun_list",
+        "The stun servers that will be used to know the public address,"
+        " LHS: server address, RHS: ping time.",
+            {
+                { "numb.viagenie.ca", 0u },
+                { "stun.12connect.com", 0u },
+                { "stun.callwithus.com", 0u },
+                { "stun.cope.es", 0u },
+                { "stun.counterpath.net", 0u },
+                { "stun.ekiga.net", 0u },
+                { "stun.ivao.aero", 0u },
+                { "stun.schlund.de", 0u },
+                { "stun.stunprotocol.org", 0u },
+                { "stun.voip.aebc.com", 0u }
+            }
         ));
 
+    PARAM_PREFIX GroupUserConfigParam  m_network_group
+        PARAM_DEFAULT(GroupUserConfigParam("Network", "Network Settings"));
     PARAM_PREFIX BoolUserConfigParam m_log_packets
-            PARAM_DEFAULT( BoolUserConfigParam(false, "log-network-packets",
-                                                 "If all network packets should be logged") );
+        PARAM_DEFAULT(BoolUserConfigParam(false, "log-network-packets",
+        &m_network_group, "If all network packets should be logged"));
+    PARAM_PREFIX BoolUserConfigParam m_random_ports
+        PARAM_DEFAULT(BoolUserConfigParam(true, "random-ports",
+        &m_network_group, "Use random ports for client and server connection"));
+    PARAM_PREFIX BoolUserConfigParam m_lobby_chat
+        PARAM_DEFAULT(BoolUserConfigParam(false, "lobby-chat",
+        &m_network_group, "Enable chatting in networking lobby, if off than "
+        "no chat message will be displayed from any players."));
+    PARAM_PREFIX FloatUserConfigParam m_voting_timeout
+        PARAM_DEFAULT(FloatUserConfigParam(10.0f, "voting-timeout",
+        &m_network_group, "Timeout in seconds for voting tracks in server."));
+    PARAM_PREFIX IntUserConfigParam m_server_max_players
+        PARAM_DEFAULT(IntUserConfigParam(12, "server_max_players",
+        &m_network_group, "Maximum number of players on the server."));
+
+    PARAM_PREFIX StringToUIntUserConfigParam m_server_ban_list
+        PARAM_DEFAULT(StringToUIntUserConfigParam("server_ban_list",
+            "LHS: IP in x.x.x.x format, RHS: online id, if 0 than all players "
+            "from this IP will be banned.",
+            { { "0.0.0.0", 0u } }
+        ));
+
+    // ---- Gamemode setup
+    PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode
+        PARAM_DEFAULT(UIntToUIntUserConfigParam("num_karts_per_gamemode",
+            "The Number of karts per gamemode.",
+            {
+                { 0u, 4u },
+                { 1002u, 5u },
+                { 1100u, 4u },
+                { 1101u, 4u },
+                { 2000u, 4u },
+                { 2001u, 4u }
+            }
+        ));
 
     // ---- Graphic Quality
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality
             PARAM_DEFAULT( GroupUserConfigParam("GFX",
                                                 "Graphics Quality Settings") );
-
-    // On OSX 10.4 and before there may be driver issues with FBOs, so to be
-    // safe disable them by default
-#ifdef __APPLE__
-    #if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-    #define FBO_DEFAULT false
-    #else
-    #define FBO_DEFAULT true
-    #endif
-#else
-#define FBO_DEFAULT true
-#endif
 
     PARAM_PREFIX IntUserConfigParam        m_particles_effects
             PARAM_DEFAULT(  IntUserConfigParam(2, "particles-effecs",
@@ -837,17 +810,6 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_crashed
             PARAM_DEFAULT(  BoolUserConfigParam(false, "crashed") );
 
-#if defined(WIN32) && !defined(__CYGWIN__)
-    // No console on windows
-#  define CONSOLE_DEFAULT false
-#else
-#  define CONSOLE_DEFAULT true
-#endif
-    // No console on windows
-    PARAM_PREFIX BoolUserConfigParam        m_log_errors_to_console
-            PARAM_DEFAULT(  BoolUserConfigParam(
-            CONSOLE_DEFAULT, "log_errors", "Enable logging to console.") );
-    
     // ---- Camera
     PARAM_PREFIX GroupUserConfigParam        m_camera
             PARAM_DEFAULT( GroupUserConfigParam("camera",

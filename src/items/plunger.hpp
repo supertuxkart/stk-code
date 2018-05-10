@@ -40,8 +40,10 @@ class Plunger : public Flyable
 private:
     /** The rubber band attached to a plunger. */
     RubberBand  *m_rubber_band;
-    /** Timer to keep the plunger alive while the rubber band is working. */
-    float        m_keep_alive;
+
+    /** Ticks to keep the plunger alive while the rubber band is working. */
+    int         m_keep_alive;
+
     btVector3    m_initial_velocity;
 
     bool m_reverse_mode;
@@ -49,7 +51,7 @@ public:
                  Plunger(AbstractKart *kart);
                 ~Plunger();
     static  void init(const XMLNode &node, scene::IMesh* missile);
-    virtual bool updateAndDelete(float dt);
+    virtual bool updateAndDelete(int ticks);
     virtual void hitTrack ();
     virtual bool hit      (AbstractKart *kart, PhysicalObject *obj=NULL);
 
@@ -57,7 +59,7 @@ public:
     /** Sets the keep-alive value. Setting it to 0 will remove the plunger
      *  at the next update - which is used if the rubber band snaps.
      */
-    void         setKeepAlive(float t) {m_keep_alive = t;}
+    void setKeepAlive(int ticks) {m_keep_alive = ticks;}
     // ------------------------------------------------------------------------
     /** No hit effect when it ends. */
     virtual HitEffect *getHitEffect() const {return NULL; }

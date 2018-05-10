@@ -68,48 +68,55 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
 
     // If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
     // the road, so we have to use search for the closest graph node.
-    if(m_current_graph_node == Graph::UNKNOWN_SECTOR)
+    if (m_current_graph_node == Graph::UNKNOWN_SECTOR)
     {
         m_current_graph_node = Graph::get()->findOutOfRoadSector(xyz,
             prev_sector, test_nodes, ignore_vertical);
-        // ArenaGraph (battle and soccer mode) doesn't need the code below
-        if (ag) return;
+    }
+
+    // ArenaGraph (battle and soccer mode) doesn't need the code below
+    if (ag) return;
+
+    // keep the current quad as the latest valid one IF the player has one
+    // of the required checklines
+    const DriveNode* dn = DriveGraph::get()->getNode(m_current_graph_node);
+    const std::vector<int>& checkline_requirements = dn->getChecklineRequirements();
+
+    bool isValidQuad = false;
+    if (checkline_requirements.size() == 0)
+    {
+        isValidQuad = true;
+        if (m_on_road)
+            m_last_valid_graph_node = m_current_graph_node;
     }
     else
     {
-        if (ag) return;
-        // keep the current quad as the latest valid one IF the player has one
-        // of the required checklines
-        const DriveNode* dn = DriveGraph::get()->getNode(m_current_graph_node);
-        const std::vector<int>& checkline_requirements = dn->getChecklineRequirements();
-
-        if (checkline_requirements.size() == 0)
+        for (unsigned int i=0; i<checkline_requirements.size(); i++)
         {
-            m_last_valid_graph_node = m_current_graph_node;
-        }
-        else
-        {
-            //bool has_prerequisite = false;
-
-            for (unsigned int i=0; i<checkline_requirements.size(); i++)
+            if (m_last_triggered_checkline == checkline_requirements[i])
             {
-                if (m_last_triggered_checkline == checkline_requirements[i])
-                {
-                    //has_prerequisite = true;
+                //has_prerequisite = true;
+                if (m_on_road)
                     m_last_valid_graph_node = m_current_graph_node;
-                    break;
-                }
+                isValidQuad = true;
+                break;
             }
-
-            // TODO: show a message when we detect a user cheated.
-
         }
+
+        // TODO: show a message when we detect a user cheated.
+
     }
 
     // Now determine the 'track' coords, i.e. ow far from the start of the
     // track, and how far to the left or right of the center driveline.
     DriveGraph::get()->spatialToTrack(&m_current_track_coords, xyz,
-                                      m_current_graph_node);
+        m_current_graph_node);
+
+    if (m_last_valid_graph_node != Graph::UNKNOWN_SECTOR)
+    {
+        DriveGraph::get()->spatialToTrack(&m_latest_valid_track_coords, xyz,
+            m_last_valid_graph_node);
+    }
 }   // update
 
 // ----------------------------------------------------------------------------

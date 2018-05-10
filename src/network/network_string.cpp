@@ -30,7 +30,7 @@ void NetworkString::unitTesting()
 {
     NetworkString s(PROTOCOL_LOBBY_ROOM);
     assert(s.getProtocolType() == PROTOCOL_LOBBY_ROOM);
-    assert(s.getProtocolType() != PROTOCOL_KART_UPDATE);
+    assert(s.getProtocolType() != PROTOCOL_CONTROLLER_EVENTS);
     assert(!s.isSynchronous());
     s.setSynchronous(true);
     assert(s.isSynchronous());

@@ -43,9 +43,9 @@ core::stringw getLabel(RaceManager::Difficulty difficulty, const ChallengeData* 
 {
     core::stringw label;
 
-    if (c->getPosition(difficulty) != -1)
+    if (c->getMaxPosition(difficulty) != -1)
     {
-        int r = c->getPosition(difficulty);
+        int r = c->getMaxPosition(difficulty);
         if (c->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER) r--;
 
         if (label.size() > 0) label.append(L"\n");
@@ -80,7 +80,10 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
                                              std::string challenge_id) :
     ModalDialog(percentWidth, percentHeight)
 {
-    loadFromFile("select_challenge.stkgui");
+    if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+        loadFromFile("select_challenge_nobest.stkgui");
+    else
+        loadFromFile("select_challenge.stkgui");
     m_challenge_id = challenge_id;
     World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
 
@@ -95,6 +98,14 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
         case 2:
             getWidget("expert")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
             break;
+        case 3:
+        {
+            if(PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+                getWidget("expert")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+            else
+                getWidget("supertux")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+            break;
+        }
     }
 
     const ChallengeStatus* c = PlayerManager::getCurrentPlayer()
@@ -121,6 +132,14 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
                      IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     }
 
+    if (c->isSolved(RaceManager::DIFFICULTY_BEST)
+        && !PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+    {
+        IconButtonWidget* btn = getWidget<IconButtonWidget>("supertux");
+        btn->setImage(file_manager->getAsset(FileManager::GUI,"cup_platinum.png"),
+                     IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    }
+
 
     LabelWidget* novice_label = getWidget<LabelWidget>("novice_label");
     LabelWidget* medium_label = getWidget<LabelWidget>("intermediate_label");
@@ -129,6 +148,12 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     novice_label->setText( getLabel(RaceManager::DIFFICULTY_EASY,   c->getData()), false );
     medium_label->setText( getLabel(RaceManager::DIFFICULTY_MEDIUM, c->getData()), false );
     expert_label->setText( getLabel(RaceManager::DIFFICULTY_HARD,   c->getData()), false );
+
+    if (!PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+    {
+        LabelWidget* supertux_label = getWidget<LabelWidget>("supertux_label");
+        supertux_label->setText( getLabel(RaceManager::DIFFICULTY_BEST,   c->getData()), false );
+    }
 
     if (c->getData()->isGrandPrix())
     {
@@ -167,7 +192,7 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
 {
     std::string eventSource = eventSourceParam;
     if (eventSource == "novice" || eventSource == "intermediate" ||
-        eventSource == "expert")
+        eventSource == "expert" || eventSource == "supertux")
     {
         const ChallengeData* challenge = unlock_manager->getChallengeData(m_challenge_id);
 
@@ -229,6 +254,11 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
             challenge->setRace(RaceManager::DIFFICULTY_HARD);
             UserConfigParams::m_difficulty = 2;
         }
+        else if (eventSource == "supertux")
+        {
+            challenge->setRace(RaceManager::DIFFICULTY_BEST);
+            UserConfigParams::m_difficulty = 3;
+        }
         else
         {
             Log::error("SelectChallenge", "Unknown widget <%s>\n",
@@ -250,4 +280,3 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
 }
 
 // ----------------------------------------------------------------------------
-
