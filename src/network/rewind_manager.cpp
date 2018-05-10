@@ -210,11 +210,9 @@ void RewindManager::restoreState(BareNetworkString *data)
     
     for (auto rewinder  = m_all_rewinder.begin(); 
               rewinder != m_all_rewinder.end();   ++rewinder)
-    {    uint16_t count = data->getUInt16();
-        if (count > 0)
-        {
-            (*rewinder)->restoreState(data, count);
-        }
+    {
+        uint16_t count = data->getUInt16();
+        (*rewinder)->restoreState(data, count);
     }   // for all rewinder
 }   // restoreState
 
