@@ -330,9 +330,16 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
     // the original, simple and stable algorithm is left in place.
 
     for(AllItemTypes::iterator i =m_all_items.begin();
-        i!=m_all_items.end();  i++)
+                               i!=m_all_items.end();  i++)
     {
         if((!*i) || !(*i)->isAvailable()) continue;
+
+        // DEBUG: This line can be used so that the server does NOT collect
+        // any items, to test that the (then) incorrect client-side prediction
+        // is fixed correctly.
+        //if ((*i)->hitKart(kart->getXYZ(), kart) && 
+        //    !NetworkConfig::get()->isServer())
+
         // To allow inlining and avoid including kart.hpp in item.hpp,
         // we pass the kart and the position separately.
         if((*i)->hitKart(kart->getXYZ(), kart))
