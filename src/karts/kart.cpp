@@ -1612,12 +1612,7 @@ void Kart::update(int ticks)
     }   // if there is material
     PROFILER_POP_CPU_MARKER();
 
-    // Check if any item was hit.
-    // check it if we're not in a network world, or if we're on the server
-    // (when network mode is on)
-    if(!NetworkConfig::get()->isNetworking() ||
-        NetworkConfig::get()->isServer()       )
-        ItemManager::get()->checkItemHit(this);
+    ItemManager::get()->checkItemHit(this);
 
     const bool emergency = getKartAnimation()!=NULL;
 

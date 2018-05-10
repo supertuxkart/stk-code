@@ -22,6 +22,7 @@
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/game_protocol.hpp"
+#include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
 
 
@@ -60,7 +61,6 @@ NetworkItemManager::~NetworkItemManager()
 //-----------------------------------------------------------------------------
 void NetworkItemManager::reset()
 {
-    m_last_confirmed_event = 0;
     ItemManager::reset();
 }   // reset
 
@@ -70,7 +70,6 @@ void NetworkItemManager::reset()
 void NetworkItemManager::saveInitialState()
 {
     m_confirmed_state_time = 0;
-    m_last_confirmed_event = 0;
 
     m_confirmed_state.clear();
     for(auto i : m_all_items)
@@ -98,6 +97,12 @@ void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart,
                                              kart->getWorldKartId(),
                                              /*item_info*/0);
         m_item_events.unlock();
+        ItemManager::collectedItem(item, kart, add_info);
+    }
+    else if (!RewindManager::get()->isRewinding())
+    {
+        // If we are predicting (i.e. not rewinding), the client
+        // predicts item collection:
         ItemManager::collectedItem(item, kart, add_info);
     }
 }   // collectedItem
@@ -265,9 +270,10 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         Item *item = m_all_items[i];
         const ItemState *is = m_confirmed_state[i];
         item->setTicksTillReturn(is->getTicksTillReturn());
+        *(ItemState*)item = *is;
     }
 
     // Now we save the current local
-    m_confirmed_state_time = m_last_confirmed_event;
+    m_confirmed_state_time = World::getWorld()->getTimeTicks();
 }   // restoreState
 

@@ -102,9 +102,6 @@ private:
     /** List of all items events. */
     Synchronised< std::vector<ItemEventInfo> > m_item_events;
 
-    /** Time of the last confirmed event. */
-    int m_last_confirmed_event;
-
     void forwardTime(int ticks);
 
     NetworkItemManager();
