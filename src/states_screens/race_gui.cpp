@@ -406,8 +406,10 @@ void RaceGUI::drawGlobalTimer()
         }
     }
 
-    core::rect<s32> pos(irr_driver->getActualScreenSize().Width - dist_from_right, 30,
-                        irr_driver->getActualScreenSize().Width                  , 50);
+    core::rect<s32> pos(irr_driver->getActualScreenSize().Width - dist_from_right,
+                        irr_driver->getActualScreenSize().Height*2/100,
+                        irr_driver->getActualScreenSize().Width,
+                        irr_driver->getActualScreenSize().Height*6/100);
 
     // special case : when 3 players play, use available 4th space for such things
     if (race_manager->getIfEmptyScreenSpaceExists())
@@ -449,6 +451,9 @@ void RaceGUI::drawLiveDifference()
     float live_difference = linearworld->getLiveTimeDifference();
 
     int timer_width = m_small_precise_timer_width;
+    
+    // 59.9995 is the smallest number of seconds that could get rounded to 1 minute
+    // when rounding at the closest ms
     if (fabsf(live_difference) >= 59.9995f)
         timer_width = m_big_precise_timer_width;
 
@@ -473,8 +478,10 @@ void RaceGUI::drawLiveDifference()
     sw = core::stringw (StringUtils::timeToString(live_difference,3,
                         /* display_minutes_if_zero */ false).c_str() );
 
-    core::rect<s32> pos(irr_driver->getActualScreenSize().Width - dist_from_right, 55,
-                        irr_driver->getActualScreenSize().Width                  , 75);
+    core::rect<s32> pos(irr_driver->getActualScreenSize().Width - dist_from_right,
+                        irr_driver->getActualScreenSize().Height*7/100,
+                        irr_driver->getActualScreenSize().Width,
+                        irr_driver->getActualScreenSize().Height*11/100);
 
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
     font->setShadow(video::SColor(255, 128, 0, 0));
