@@ -313,9 +313,9 @@ void GhostReplaySelection::loadList()
                 (rd.m_reverse ? _("Yes") : _("No"), -1, 3, true));
         if (!m_same_difficulty)
             row.push_back(GUIEngine::ListWidget::ListCell
-                (rd.m_difficulty == 3 ? _("SuperTux") : rd.m_difficulty == 2 ?
-                _("Expert") : rd.m_difficulty == 1 ?
-                _("Intermediate") : _("Novice") , -1, 4, true));
+                (race_manager->
+                    getDifficultyName((RaceManager::Difficulty) rd.m_difficulty),
+                                                                   -1, 4, true));
         if (m_active_mode_is_linear)
             row.push_back(GUIEngine::ListWidget::ListCell
                 (StringUtils::toWString(rd.m_laps), -1, 3, true));
