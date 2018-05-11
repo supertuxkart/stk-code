@@ -123,7 +123,7 @@ private:
             }
         }
     }
-    std::tuple<std::string, uint8_t, bool> handleVote();
+    std::tuple<std::string, uint8_t, bool, bool> handleVote();
     void stopCurrentRace();
 
 public:

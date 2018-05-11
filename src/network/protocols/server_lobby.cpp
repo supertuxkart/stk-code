@@ -330,10 +330,16 @@ void ServerLobby::asynchronousUpdate()
         }
         break;
     case SELECTING:
-        if (m_timeout.load() < (float)StkTime::getRealTime())
+    {
+        auto result = handleVote();
+        if (m_timeout.load() < (float)StkTime::getRealTime() ||
+            (std::get<3>(result) &&
+            m_timeout.load() - (UserConfigParams::m_voting_timeout / 2.0f) <
+            (float)StkTime::getRealTime()))
         {
+            m_game_setup->setRace(std::get<0>(result), std::get<1>(result),
+                std::get<2>(result));
             std::lock_guard<std::mutex> lock(m_connection_mutex);
-            auto result = handleVote();
             // Remove disconnected player (if any) one last time
             m_game_setup->update(true);
             m_game_setup->sortPlayersForGrandPrix();
@@ -370,6 +376,7 @@ void ServerLobby::asynchronousUpdate()
             delete load_world;
         }
         break;
+    }
     default:
         break;
     }
@@ -1183,7 +1190,7 @@ void ServerLobby::playerVote(Event* event)
 }   // playerVote
 
 // ----------------------------------------------------------------------------
-std::tuple<std::string, uint8_t, bool> ServerLobby::handleVote()
+std::tuple<std::string, uint8_t, bool, bool> ServerLobby::handleVote()
 {
     // Default settings if no votes at all
     RandomGenerator rg;
@@ -1196,6 +1203,20 @@ std::tuple<std::string, uint8_t, bool> ServerLobby::handleVote()
     std::map<std::string, unsigned> tracks;
     std::map<unsigned, unsigned> laps;
     std::map<bool, unsigned> reverses;
+
+    float cur_players = 0.0f;
+    auto peers = STKHost::get()->getPeers();
+    for (auto peer : peers)
+    {
+        if (peer->hasPlayerProfiles())
+            cur_players += 1.0f;
+    }
+    if (cur_players == 0.0f)
+        return std::make_tuple(final_track, final_laps, final_reverse, false);
+    float tracks_rate = 0.0f;
+    float laps_rate = 0.0f;
+    float reverses_rate = 0.0f;
+
     for (auto p : m_peers_votes)
     {
         if (p.first.expired())
@@ -1228,7 +1249,10 @@ std::tuple<std::string, uint8_t, bool> ServerLobby::handleVote()
         }
     }
     if (track_vote != tracks.end())
+    {
         final_track = track_vote->first;
+        tracks_rate = float(track_vote->second) / cur_players;
+    }
 
     vote = 0;
     auto lap_vote = laps.begin();
@@ -1241,7 +1265,10 @@ std::tuple<std::string, uint8_t, bool> ServerLobby::handleVote()
         }
     }
     if (lap_vote != laps.end())
+    {
         final_laps = lap_vote->first;
+        laps_rate = float(lap_vote->second) / cur_players;
+    }
 
     vote = 0;
     auto reverse_vote = reverses.begin();
@@ -1254,10 +1281,14 @@ std::tuple<std::string, uint8_t, bool> ServerLobby::handleVote()
         }
     }
     if (reverse_vote != reverses.end())
+    {
         final_reverse = reverse_vote->first;
+        reverses_rate = float(reverse_vote->second) / cur_players;
+    }
 
-    m_game_setup->setRace(final_track, final_laps, final_reverse);
-    return std::make_tuple(final_track, final_laps, final_reverse);
+    return std::make_tuple(final_track, final_laps, final_reverse,
+        tracks_rate > 0.5f && laps_rate > 0.5f && reverses_rate > 0.5f ?
+        true : false);
 }   // handleVote
 
 // ----------------------------------------------------------------------------

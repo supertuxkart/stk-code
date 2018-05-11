@@ -715,7 +715,7 @@ namespace UserConfigParams
         &m_network_group, "Enable chatting in networking lobby, if off than "
         "no chat message will be displayed from any players."));
     PARAM_PREFIX FloatUserConfigParam m_voting_timeout
-        PARAM_DEFAULT(FloatUserConfigParam(10.0f, "voting-timeout",
+        PARAM_DEFAULT(FloatUserConfigParam(20.0f, "voting-timeout",
         &m_network_group, "Timeout in seconds for voting tracks in server."));
     PARAM_PREFIX IntUserConfigParam m_server_max_players
         PARAM_DEFAULT(IntUserConfigParam(12, "server_max_players",
