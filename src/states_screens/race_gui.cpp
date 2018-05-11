@@ -274,7 +274,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     
     drawPlungerInFace(camera, dt);
 
-    if (viewport.getWidth() != irr_driver->getActualScreenSize().Width)
+    if (viewport.getWidth() != (int)irr_driver->getActualScreenSize().Width)
     {
         scaling *= float(viewport.getWidth()) / float(irr_driver->getActualScreenSize().Width); // scale race GUI along screen size
     }
@@ -458,7 +458,23 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()+marker_half_size),
                                  m_map_left+(int)(draw_at.getX()+marker_half_size),
                                  lower_y   -(int)(draw_at.getY()-marker_half_size));
+
+        // Highlight the player icons with some backgorund image.
+        if (kart->getController()->isLocalPlayerController())
+        {
+            video::SColor colors[4];
+            for (unsigned int i=0;i<4;i++)
+            {
+                colors[i]=kart->getKartProperties()->getColor();
+            }
+            const core::rect<s32> rect(core::position2d<s32>(0,0),
+                                        m_icons_frame->getSize());
+
+            draw2DImage(m_icons_frame, position, rect, NULL, colors, true);
+        }   // if isPlayerController
+
         draw2DImage(icon, position, source, NULL, NULL, true);
+
     }   // for i<getNumKarts
 
     SoccerWorld *sw = dynamic_cast<SoccerWorld*>(World::getWorld());
