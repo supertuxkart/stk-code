@@ -444,6 +444,8 @@ bool SPTexture::threadedLoad()
     std::shared_ptr<video::IImage> image = getTextureImage();
     if (!image)
     {
+        m_width.store(2);
+        m_height.store(2);
         return true;
     }
     std::shared_ptr<video::IImage> mask = getMask(image->getDimension());
@@ -641,12 +643,6 @@ void SPTexture::applyMask(video::IImage* texture, video::IImage* mask)
         }
     }
 }   // applyMask
-
-// ----------------------------------------------------------------------------
-bool SPTexture::initialized() const
-{
-    return m_width.load() != 0 && m_height.load() != 0;
-}   // initialized
 
 // ----------------------------------------------------------------------------
 void SPTexture::generateQuickMipmap(std::shared_ptr<video::IImage> first_image,
