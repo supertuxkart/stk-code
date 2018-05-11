@@ -26,6 +26,7 @@
 #include "utils/cpp2011.hpp"
 #include "utils/singleton.hpp"
 
+#include <map>
 #include <vector>
 
 class BareNetworkString;
@@ -69,6 +70,8 @@ private:
     void handleState(Event *event);
     void handleAdjustTime(Event *event);
     static std::weak_ptr<GameProtocol> m_game_protocol;
+    std::map<STKPeer*, int> m_initial_ticks;
+
 public:
              GameProtocol();
     virtual ~GameProtocol();
@@ -104,6 +107,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the NetworkString in which a state was saved. */
     NetworkString* getState() const { return m_data_to_send;  }
+    // ------------------------------------------------------------------------
+    void addInitialTicks(STKPeer* p, int ticks);
 
 };   // class GameProtocol
 

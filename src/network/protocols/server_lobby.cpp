@@ -1024,7 +1024,7 @@ void ServerLobby::connectionRequested(Event* event)
     peer->sendPacket(server_info);
     delete server_info;
 
-    m_peers_ready[peer] = false;
+    m_peers_ready[peer] = std::make_pair(false, 0.0);
     for (std::shared_ptr<NetworkPlayerProfile> npp : peer->getPlayerProfiles())
     {
         m_game_setup->addPlayer(npp);
@@ -1307,7 +1307,7 @@ void ServerLobby::finishedLoadingWorld()
 void ServerLobby::finishedLoadingWorldClient(Event *event)
 {
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
-    m_peers_ready.at(peer) = true;
+    m_peers_ready.at(peer) = std::make_pair(true, StkTime::getRealTime());
     Log::info("ServerLobby", "Peer %d has finished loading world at %lf",
         peer->getHostId(), StkTime::getRealTime());
 }   // finishedLoadingWorldClient
@@ -1324,12 +1324,40 @@ void ServerLobby::finishedLoadingWorldClient(Event *event)
 void ServerLobby::startedRaceOnClient(Event *event)
 {
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
-    m_peers_ready.at(peer) = true;
+    m_peers_ready.at(peer) = std::make_pair(true, StkTime::getRealTime());
     Log::info("ServerLobby", "Peer %d has started race at %lf",
         peer->getHostId(), StkTime::getRealTime());
 
     if (checkPeersReady())
     {
+        std::vector<std::pair<STKPeer*, double> > mapping;
+        for (auto p : m_peers_ready)
+        {
+            auto peer = p.first.lock();
+            if (!peer)
+                continue;
+            mapping.emplace_back(peer.get(), p.second.second);
+        }
+        std::sort(mapping.begin(), mapping.end(),
+            [](const std::pair<STKPeer*, double>& a,
+            const std::pair<STKPeer*, double>& b)->bool
+            {
+                return a.second > b.second;
+            });
+        for (unsigned i = 0; i < mapping.size(); i++)
+        {
+            // Server delay is 0.1, so it's around 12 ticks
+            // (0.1 * 120 (physics fps)) for the highest ping client
+            if (i == 0)
+                GameProtocol::lock()->addInitialTicks(mapping[0].first, 12);
+            else
+            {
+                const double diff = mapping[0].second - mapping[i].second;
+                assert(diff >= 0.0);
+                GameProtocol::lock()->addInitialTicks(mapping[i].first,
+                    12 + stk_config->time2Ticks((float)diff));
+            }
+        }
         m_state = DELAY_SERVER;
         m_server_delay = StkTime::getRealTime() + 0.1;
         Log::verbose("ServerLobby", "Started delay at %lf set delay to %lf",
@@ -1346,7 +1374,7 @@ void ServerLobby::playerFinishedResult(Event *event)
     if (m_state.load() != RESULT_DISPLAY)
         return;
     std::shared_ptr<STKPeer> peer = event->getPeerSP();
-    m_peers_ready.at(peer) = true;
+    m_peers_ready.at(peer) = std::make_pair(true, StkTime::getRealTime());
 }   // playerFinishedResult
 
 //-----------------------------------------------------------------------------

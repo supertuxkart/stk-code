@@ -25,6 +25,7 @@
 #include "utils/synchronised.hpp"
 
 #include <assert.h>
+#include <atomic>
 #include <list>
 #include <vector>
 
@@ -109,7 +110,7 @@ private:
     /** This stores the original World time in ticks during a rewind. It is
      *  used to detect if a client's local time need adjustment to reduce
      *  rewinds. */
-    int m_not_rewound_ticks;
+    std::atomic<int> m_not_rewound_ticks;
 
     RewindManager();
    ~RewindManager();
@@ -163,7 +164,8 @@ public:
     /** Returns true if currently a rewind is happening. */
     bool isRewinding() const { return m_is_rewinding; }
     // ------------------------------------------------------------------------
-    int getNotRewoundWorldTicks() const { return m_not_rewound_ticks;  }
+    int getNotRewoundWorldTicks() const
+                { return m_not_rewound_ticks.load(std::memory_order_relaxed); }
 };   // RewindManager
 
 

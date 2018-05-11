@@ -48,7 +48,7 @@ private:
     std::atomic_bool m_server_has_loaded_world;
 
     /** Counts how many peers have finished loading the world. */
-    std::map<std::weak_ptr<STKPeer>, bool,
+    std::map<std::weak_ptr<STKPeer>, std::pair<bool, double>,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_ready;
 
     /** Vote from each peer. */
@@ -102,7 +102,7 @@ private:
         {
             if (p.first.expired())
                 continue;
-            all_ready = all_ready && p.second;
+            all_ready = all_ready && p.second.first;
             if (!all_ready)
                 return false;
         }
@@ -118,7 +118,8 @@ private:
             }
             else
             {
-                it->second = false;
+                it->second.first = false;
+                it->second.second = 0.0;
                 it++;
             }
         }

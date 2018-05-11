@@ -74,7 +74,7 @@ RewindManager::~RewindManager()
 void RewindManager::reset()
 {
     m_is_rewinding = false;
-    m_not_rewound_ticks = 0;
+    m_not_rewound_ticks.store(0);
     m_overall_state_size = 0;
     m_last_saved_state = -1;  // forces initial state save
     m_state_frequency =
@@ -249,7 +249,7 @@ void RewindManager::update(int ticks_not_used)
     float time = World::getWorld()->getTime();
     int ticks = World::getWorld()->getTimeTicks();
 
-    m_not_rewound_ticks = ticks;
+    m_not_rewound_ticks.store(ticks, std::memory_order_relaxed);
 
     // Clients don't save state, so they just exit.
     if (NetworkConfig::get()->isClient() ||
