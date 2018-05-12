@@ -38,7 +38,6 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
     m_record_race          = false;
     m_watch_only           = false;
 
-    // Pointers towards values tracked in GhostReplaySelection
     m_compare_ghost        = compare_ghost;
     m_compare_replay_uid   = compare_replay_uid;
 
@@ -208,8 +207,7 @@ GUIEngine::EventPropagation
 
             race_manager->setRecordRace(m_record_race);
             race_manager->setWatchingReplay(m_watch_only);
-
-            ModalDialog::dismiss();
+          
             ReplayPlay::get()->setReplayFile(replay_id);
             if (m_compare_ghost)
             {
@@ -222,6 +220,8 @@ GUIEngine::EventPropagation
 
             race_manager->setRaceGhostKarts(true);
 
+            // The race manager automatically adds karts for the ghosts
+            // so only set it to the number of human players
             race_manager->setNumKarts(race_manager->getNumLocalPlayers());
 
             // Disable accidentally unlocking of a challenge
@@ -232,6 +232,8 @@ GUIEngine::EventPropagation
             //Reset comparison if active
             GhostReplaySelection::getInstance()->setCompare(false);
 
+            ModalDialog::dismiss();
+          
             if (race_manager->isWatchingReplay())
                 race_manager->startWatchingReplay(track_name, laps);
             else
