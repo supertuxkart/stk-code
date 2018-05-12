@@ -99,7 +99,6 @@ void GhostReplaySelection::loadedFromFile()
     m_mode_tabs = getWidget<GUIEngine::RibbonWidget>("race_mode");
     m_active_mode = RaceManager::MINOR_MODE_TIME_TRIAL;
     m_active_mode_is_linear = true;
-    m_mode_tabs->select("tab_egg_hunt", PLAYER_ID_GAME_MASTER);//FIXME bugged
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
