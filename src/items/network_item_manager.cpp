@@ -99,7 +99,7 @@ void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart,
         m_item_events.unlock();
         ItemManager::collectedItem(item, kart, add_info);
     }
-    else if (!RewindManager::get()->isRewinding())
+    else
     {
         // If we are predicting (i.e. not rewinding), the client
         // predicts item collection:
@@ -269,7 +269,6 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     {
         Item *item = m_all_items[i];
         const ItemState *is = m_confirmed_state[i];
-        item->setTicksTillReturn(is->getTicksTillReturn());
         *(ItemState*)item = *is;
     }
 

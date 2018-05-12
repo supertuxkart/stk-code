@@ -480,16 +480,25 @@ void Powerup::hitBonusBox(const Item &item, int add_info)
     if(m_type == PowerupManager::POWERUP_RUBBERBALL)
         powerup_manager->setBallCollectTicks(0);
 
+    World *world = World::getWorld();
     // Check if two bouncing balls are collected less than getRubberBallTimer()
     //seconds apart. If yes, then call getRandomPowerup again. If no, then break.
     if (add_info<0)
     {
         for(int i=0; i<20; i++)
         {
-            new_powerup = powerup_manager->getRandomPowerup(position, &n);
+            // Determine the item based on index and time - random enough for
+            // the player, and reduces network synchronisation overhead.
+            // Dividing the time by 10 does not really allow exploiting the
+            // non-random selection (e.g. by displaying which item is collecte
+            // where), since it's only around 83 ms - but it is bit more
+            // relaxed when client prediction should be a frame or so earlier.
+            int random_number = item.getItemId() + world->getTimeTicks()/10;
+            new_powerup = 
+                powerup_manager->getRandomPowerup(position, &n, random_number);
             if(new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
-                ( World::getWorld()->getTicksSinceStart() - powerup_manager->getBallCollectTicks()) >
-                  RubberBall::getTicksBetweenRubberBalls() )
+                ( world->getTicksSinceStart() - powerup_manager->getBallCollectTicks()) 
+                    > RubberBall::getTicksBetweenRubberBalls()                         )
                 break;
         }
     }
@@ -500,7 +509,7 @@ void Powerup::hitBonusBox(const Item &item, int add_info)
     }
 
     if(new_powerup == PowerupManager::POWERUP_RUBBERBALL)
-        powerup_manager->setBallCollectTicks(World::getWorld()->getTimeTicks());
+        powerup_manager->setBallCollectTicks(world->getTimeTicks());
 
     // Always add a new powerup in ITEM_MODE_NEW (or if the kart
     // doesn't have a powerup atm).

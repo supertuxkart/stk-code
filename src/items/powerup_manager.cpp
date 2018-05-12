@@ -354,10 +354,13 @@ PowerupManager::PositionClass
  *  items depending on the weights defined. See updateWeightsForRace()
  *  \param pos Position of the kart (1<=pos<=number of karts) - ignored in
  *         case of a battle mode.
- *  \param n Number of times this item is given to the kart
+ *  \param n Number of times this item is given to the kart.
+ *  \param random_number A random number used to select the item. Important
+ *         for networking to be able to reproduce item selection.
  */
 PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
-                                                             unsigned int *n)
+                                                             unsigned int *n,
+                                                             int random_number)
 {
     // Positions start with 1, while the index starts with 0 - so subtract 1
     PositionClass pos_class =
@@ -366,7 +369,7 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
          (race_manager->isTutorialMode() ? POSITION_TUTORIAL_MODE :
                                      m_position_to_class[pos-1]));
 
-    int random = rand()%m_powerups_for_position[pos_class].size();
+    int random = random_number%m_powerups_for_position[pos_class].size();
     int i=m_powerups_for_position[pos_class][random];
     if(i>=POWERUP_MAX)
     {

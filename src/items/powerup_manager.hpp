@@ -139,7 +139,7 @@ public:
     void          LoadPowerup     (PowerupType type, const XMLNode &node);
     void          updateWeightsForRace(unsigned int num_karts);
     PowerupManager::PowerupType
-        getRandomPowerup(unsigned int pos, unsigned int *n);
+        getRandomPowerup(unsigned int pos, unsigned int *n, int random_number);
     // ------------------------------------------------------------------------
     /** Returns the icon(material) for a powerup. */
     Material* getIcon(int type) const {return m_all_icons [type];}
