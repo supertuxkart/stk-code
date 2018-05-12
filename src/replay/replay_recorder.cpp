@@ -141,11 +141,8 @@ void ReplayRecorder::update(int ticks)
 
         // In egg hunt mode, use store the number of eggs found so far
         // This assumes that egg hunt mode is only available in single-player
-        // TODO : when adding battle mode support, store the number of lives here
         if (race_manager->isEggHuntMode())
         {
-            //TODO : figure out why the compiler don't like calling numberOfEggsFound
-            //       if easterworld is defined as constant
             EasterEggHunt *easterworld = dynamic_cast<EasterEggHunt*>(World::getWorld());
             special_value = easterworld->numberOfEggsFound();
         }
