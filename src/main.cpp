@@ -584,6 +584,8 @@ void cmdLineHelp()
     // "       --test-ai=n        Use the test-ai for every n-th AI kart.\n"
     // "                          (so n=1 means all Ais will be the test ai)\n"
     // "
+    // "    --disable-item-collection Disable item collection. Useful for\n"
+    // "                          debugging client/server item management.\n"
     "       --network-console  Enable network console.\n"
     "       --wan-server=name  Start a Wan server (not a playing client).\n"
     "       --public-server    Allow direct connection to the server (without stk server)\n"
@@ -1050,6 +1052,9 @@ int handleCmdLine()
     // Networking command lines
     if(CommandLine::has("--network-console"))
         STKHost::m_enable_console = true;
+
+    if (CommandLine::has("--disable-item-collection"))
+        ItemManager::disableItemCollection();
 
     std::string server_password;
     if (CommandLine::has("--server-password", &s))

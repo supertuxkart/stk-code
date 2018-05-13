@@ -47,6 +47,7 @@
 std::vector<scene::IMesh *> ItemManager::m_item_mesh;
 std::vector<scene::IMesh *> ItemManager::m_item_lowres_mesh;
 std::vector<video::SColorf> ItemManager::m_glow_color;
+bool                        ItemManager::m_disable_item_collection = false;
 ItemManager *               ItemManager::m_item_manager = NULL;
 
 
@@ -329,16 +330,13 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
     // Since at this stace item detection is by far not a bottle neck,
     // the original, simple and stable algorithm is left in place.
 
+    /** Disable item collection detection for debug purposes. */
+    if(m_disable_item_collection) return;
+
     for(AllItemTypes::iterator i =m_all_items.begin();
                                i!=m_all_items.end();  i++)
     {
         if((!*i) || !(*i)->isAvailable()) continue;
-
-        // DEBUG: This line can be used so that the server does NOT collect
-        // any items, to test that the (then) incorrect client-side prediction
-        // is fixed correctly.
-        //if ((*i)->hitKart(kart->getXYZ(), kart) && 
-        //    !NetworkConfig::get()->isServer())
 
         // To allow inlining and avoid including kart.hpp in item.hpp,
         // we pass the kart and the position separately.

@@ -50,6 +50,9 @@ private:
     /** Stores all low-resolution item models. */
     static std::vector<scene::IMesh *> m_item_lowres_mesh;
 
+    /** Disable item collection (for debugging purposes). */
+    static bool m_disable_item_collection;
+
 protected:
     /** The instance of ItemManager while a race is on. */
     static ItemManager *m_item_manager;
@@ -58,6 +61,13 @@ public:
     static void removeTextures();
     static void create();
     static void destroy();
+
+    /** Disable item collection, useful to test client mispreditions or
+     *  client/server disagreements. */
+    static void disableItemCollection()
+    {
+        m_disable_item_collection = true;
+    }   // disableItemCollection
 
     // ------------------------------------------------------------------------
     /** Returns the mesh for a certain item. */
