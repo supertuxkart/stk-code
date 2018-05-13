@@ -59,7 +59,7 @@ public:
     Material*       getIcon      () const;
     void            adjustSound  ();
     void            use          ();
-    void            hitBonusBox (const Item &item, int newC=-1);
+    void            hitBonusBox (const Item &item);
     void            saveState(BareNetworkString *buffer) const;
     void            rewindTo(BareNetworkString *buffer);
 

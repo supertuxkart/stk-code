@@ -84,10 +84,8 @@ void NetworkItemManager::saveInitialState()
  *  acts on this event.
  *  \param item The item that was collected.
  *  \param kart The kart that collected the item.
- *  \param add_info 
  */
-void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart,
-                                       int add_info)
+void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart)
 {
     if(NetworkConfig::get()->isServer())
     {
@@ -97,13 +95,13 @@ void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart,
                                              kart->getWorldKartId(),
                                              /*item_info*/0);
         m_item_events.unlock();
-        ItemManager::collectedItem(item, kart, add_info);
+        ItemManager::collectedItem(item, kart);
     }
     else
     {
         // If we are predicting (i.e. not rewinding), the client
         // predicts item collection:
-        ItemManager::collectedItem(item, kart, add_info);
+        ItemManager::collectedItem(item, kart);
     }
 }   // collectedItem
 

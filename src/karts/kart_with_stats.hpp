@@ -77,9 +77,9 @@ public:
                                const btTransform& init_transform,
                                PerPlayerDifficulty difficulty);
     virtual void update(int ticks) OVERRIDE;
-    virtual void reset();
-    virtual void collectedItem(Item *item, int add_info);
-    virtual void setKartAnimation(AbstractKartAnimation *ka);
+    virtual void reset() OVERRIDE;
+    virtual void collectedItem(Item *item) OVERRIDE;
+    virtual void setKartAnimation(AbstractKartAnimation *ka) OVERRIDE;
 
     /** Returns the top speed of this kart. */
     float getTopSpeed() const { return m_top_speed; }

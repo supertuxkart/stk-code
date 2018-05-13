@@ -288,7 +288,7 @@ public:
     virtual int   getSpeedIncreaseTicksLeft(unsigned int category) const;
     virtual void  setBoostAI     (bool boosted);
     virtual bool  getBoostAI     () const;
-    virtual void  collectedItem(Item *item, int random_attachment);
+    virtual void  collectedItem(Item *item) OVERRIDE;
     virtual float getStartupBoost() const;
 
     virtual const Material *getMaterial() const;

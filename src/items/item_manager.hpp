@@ -123,8 +123,7 @@ public:
     void           updateGraphics  (float dt);
     void           checkItemHit    (AbstractKart* kart);
     void           reset           ();
-    virtual void   collectedItem   (Item *item, AbstractKart *kart,
-                                    int add_info=-1);
+    virtual void   collectedItem   (Item *item, AbstractKart *kart);
     void           switchItems     ();
     bool           randomItemsForArena(const AlignedArray<btTransform>& pos);
     // ------------------------------------------------------------------------

@@ -1038,11 +1038,8 @@ void Kart::setRaceResult()
 /** Called when an item is collected. It will either adjust the collected
  *  energy, or update the attachment or powerup for this kart.
  *  \param item The item that was hit.
- *  \param add_info Additional info, used in networking games to force
- *         a specific item to be used (instead of a random item) to keep
- *         all karts in synch.
  */
-void Kart::collectedItem(Item *item, int add_info)
+void Kart::collectedItem(Item *item)
 {
     float old_energy          = m_collected_energy;
     const Item::ItemType type = item->getType();
@@ -1050,7 +1047,7 @@ void Kart::collectedItem(Item *item, int add_info)
     switch (type)
     {
     case Item::ITEM_BANANA:
-        m_attachment->hitBanana(item, add_info);
+        m_attachment->hitBanana(item);
         break;
     case Item::ITEM_NITRO_SMALL:
         m_collected_energy += m_kart_properties->getNitroSmallContainer();
@@ -1060,7 +1057,7 @@ void Kart::collectedItem(Item *item, int add_info)
         break;
     case Item::ITEM_BONUS_BOX  :
         {
-            m_powerup->hitBonusBox(*item, add_info);
+            m_powerup->hitBonusBox(*item);
             break;
         }
     case Item::ITEM_BUBBLEGUM:
@@ -1087,7 +1084,7 @@ void Kart::collectedItem(Item *item, int add_info)
 
     if ( m_collected_energy > m_kart_properties->getNitroMax())
         m_collected_energy = m_kart_properties->getNitroMax();
-    m_controller->collectedItem(*item, add_info, old_energy);
+    m_controller->collectedItem(*item, old_energy);
 
 }   // collectedItem
 

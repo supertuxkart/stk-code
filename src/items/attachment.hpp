@@ -111,7 +111,7 @@ public:
           Attachment(AbstractKart* kart);
          ~Attachment();
     void  clear ();
-    void  hitBanana(Item *item, int new_attachment=-1);
+    void  hitBanana(Item *item);
     void  update(int ticks);
     void  handleCollisionWithKart(AbstractKart *other);
     void  set (AttachmentType type, int ticks,

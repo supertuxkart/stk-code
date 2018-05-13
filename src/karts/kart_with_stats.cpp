@@ -101,13 +101,10 @@ void KartWithStats::setKartAnimation(AbstractKartAnimation *ka)
 /** Called when an item is collected. It will increment private variables that
  *  represent counters for each type of item hit.
  *  \param item The item that was hit.
- *  \param add_info Additional info, used in networking games to force
- *         a specific item to be used (instead of a random item) to keep
- *         all karts in synch.
  */
-void KartWithStats::collectedItem(Item *item, int add_info)
+void KartWithStats::collectedItem(Item *item)
 {
-    Kart::collectedItem(item, add_info);
+    Kart::collectedItem(item);
     const Item::ItemType type = item->getType();
 
     switch (type)
@@ -116,6 +113,7 @@ void KartWithStats::collectedItem(Item *item, int add_info)
         m_banana_count++;
         break;
     case Item::ITEM_NITRO_SMALL:
+
         m_small_nitro_count++;
         break;
     case Item::ITEM_NITRO_BIG:

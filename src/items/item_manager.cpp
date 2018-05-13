@@ -296,8 +296,11 @@ Item* ItemManager::newItem(const Vec3& xyz, float distance,
 //-----------------------------------------------------------------------------
 /** Set an item as collected.
  *  This function is called on the server when an item is collected, or on
- *  the client upon receiving information about collected items.             */
-void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
+ *  the client upon receiving information about collected items.
+ *  \param item The item that was collected.
+ *  \param kart The kart that collected the item.
+ */
+void ItemManager::collectedItem(Item *item, AbstractKart *kart)
 {
     assert(item);
     // Spare tire karts don't collect items
@@ -311,7 +314,7 @@ void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
     item->collected(kart);
     // Inform the world - used for Easter egg hunt
     World::getWorld()->collectedItem(kart, item);
-    kart->collectedItem(item, add_info);
+    kart->collectedItem(item);
 }   // collectedItem
 
 //-----------------------------------------------------------------------------

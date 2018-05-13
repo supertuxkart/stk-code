@@ -462,11 +462,8 @@ void Powerup::use()
  *  \param item The item (bonux box) that was hit. This is necessary
  *         for servers so that the clients can be informed which item
  *         was collected.
- *  \param add_info Additional information. This is used for network games
- *         so that the server can overwrite which item is collectted
- *         (otherwise a random choice is done).
  */
-void Powerup::hitBonusBox(const Item &item, int add_info)
+void Powerup::hitBonusBox(const Item &item)
 {
     // Position can be -1 in case of a battle mode (which doesn't have
     // positions), but this case is properly handled in getRandomPowerup.
@@ -483,29 +480,21 @@ void Powerup::hitBonusBox(const Item &item, int add_info)
     World *world = World::getWorld();
     // Check if two bouncing balls are collected less than getRubberBallTimer()
     //seconds apart. If yes, then call getRandomPowerup again. If no, then break.
-    if (add_info<0)
+    for (int i = 0; i < 20; i++)
     {
-        for(int i=0; i<20; i++)
-        {
-            // Determine the item based on index and time - random enough for
-            // the player, and reduces network synchronisation overhead.
-            // Dividing the time by 10 does not really allow exploiting the
-            // non-random selection (e.g. by displaying which item is collecte
-            // where), since it's only around 83 ms - but it is bit more
-            // relaxed when client prediction should be a frame or so earlier.
-            int random_number = item.getItemId() + world->getTimeTicks()/10;
-            new_powerup = 
-                powerup_manager->getRandomPowerup(position, &n, random_number);
-            if(new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
-                ( world->getTicksSinceStart() - powerup_manager->getBallCollectTicks()) 
-                    > RubberBall::getTicksBetweenRubberBalls()                         )
-                break;
-        }
-    }
-    else // set powerup manually
-    {
-        new_powerup = (PowerupManager::PowerupType)((add_info>>4)&0x0f); // highest 4 bits for the type
-        n = (add_info&0x0f); // last 4 bits for the amount
+        // Determine the item based on index and time - random enough for
+        // the player, and reduces network synchronisation overhead.
+        // Dividing the time by 10 does not really allow exploiting the
+        // non-random selection (e.g. by displaying which item is collecte
+        // where), since it's only around 83 ms - but it is bit more
+        // relaxed when client prediction should be a frame or so earlier.
+        int random_number = item.getItemId() + world->getTimeTicks() / 10;
+        new_powerup =
+            powerup_manager->getRandomPowerup(position, &n, random_number);
+        if (new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
+            (world->getTicksSinceStart() - powerup_manager->getBallCollectTicks())
+            > RubberBall::getTicksBetweenRubberBalls())
+            break;
     }
 
     if(new_powerup == PowerupManager::POWERUP_RUBBERBALL)

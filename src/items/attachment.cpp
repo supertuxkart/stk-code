@@ -316,10 +316,8 @@ void Attachment::rewind(BareNetworkString *buffer)
 /** Randomly selects the new attachment. For a server process, the
 *   attachment can be passed into this function.
 *  \param item The item that was collected.
-*  \param new_attachment Optional: only used on the clients, it
-*                        specifies the new attachment to use
 */
-void Attachment::hitBanana(Item *item, int new_attachment)
+void Attachment::hitBanana(Item *item)
 {
     if(m_kart->getController()->canGetAchievements())
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_BANANA,
@@ -343,6 +341,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         return;
     }
 
+    int new_attachment = -1;
     const KartProperties *kp = m_kart->getKartProperties();
     switch(getType())   // If there already is an attachment, make it worse :)
     {
@@ -355,8 +354,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         projectile_manager->addHitEffect(he);
         ExplosionAnimation::create(m_kart);
         clear();
-        if(new_attachment==-1)
-            new_attachment = m_random.get(3);
+        new_attachment = m_random.get(3);
         // Disable the banana on which the kart just is for more than the
         // default time. This is necessary to avoid that a kart lands on the
         // same banana again once the explosion animation is finished, giving
@@ -381,13 +379,10 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         // so play the character sound ("Uh-Oh")
         m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
 
-        if(new_attachment==-1)
-        {
-            if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
-                new_attachment = m_random.get(2);
-            else
-                new_attachment = m_random.get(3);
-        }
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
+            new_attachment = m_random.get(2);
+        else
+            new_attachment = m_random.get(3);
     }   // switch
 
     if (add_a_new_item)

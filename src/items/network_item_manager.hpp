@@ -116,8 +116,7 @@ public:
 
     virtual void reset();
     virtual void setItemConfirmationTime(int host_id, int ticks) OVERRIDE;
-    virtual void collectedItem(Item *item, AbstractKart *kart,
-                               int add_info = -1) OVERRIDE;
+    virtual void collectedItem(Item *item, AbstractKart *kart) OVERRIDE;
     virtual BareNetworkString* saveState() OVERRIDE;
     virtual void restoreState(BareNetworkString *buffer, int count) OVERRIDE;
     // ------------------------------------------------------------------------
