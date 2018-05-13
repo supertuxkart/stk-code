@@ -110,10 +110,11 @@ private:
     /** In networked game the world clock might be adjusted (without the
      *  player noticing), e.g. if a client causes rewinds in the server,
      *  that client needs to speed up to be further ahead of the server
-     *  and so reduce the number of rollbacks. This is the amount of time
+     *  or slow down if time in client goes too far from server time
+     *  to reduce the number of rollbacks. This is the amount of time
      *  by which the client's clock needs to be adjusted (positive or 
      *  negative). */
-    float m_adjust_time_by;
+    std::atomic<int> m_adjust_time_by;
 
     /** The clock mode: normal counting forwards, or countdown */ 
     ClockType       m_clock_mode;
@@ -221,7 +222,7 @@ public:
     // ------------------------------------------------------------------------
     /** Sets a time by which the clock should be adjusted. Used by networking
      *  if too many rewinds are detected. */
-    void setAdjustTime(float t) { m_adjust_time_by = t; }
+    void setAdjustTime(int t) { m_adjust_time_by.fetch_add(t); }
 };   // WorldStatus
 
 

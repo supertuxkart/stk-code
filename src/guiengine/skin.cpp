@@ -1327,26 +1327,25 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         const float value = (float)(w->getValue() - w->getMin())
                           / (w->getMax() - w->getMin());
 
-
-        const core::recti dest_area(rect.UpperLeftCorner.X + handle_size,
-                                    rect.UpperLeftCorner.Y,
-                                    rect.UpperLeftCorner.X + handle_size +
-                                           (int)((widget->m_w
-                                                  - 2*handle_size)*value),
-                                    rect.UpperLeftCorner.Y + widget->m_h);
-
-        const ITexture* texture =
-            SkinConfig::m_render_params["gaugefill::neutral"].getImage();
-        const int texture_w = texture->getSize().Width;
-        const int texture_h = texture->getSize().Height;
-
-        const core::recti source_area(0, 0, texture_w, texture_h);
-
-        draw2DImage(texture,
-                    dest_area, source_area,
-                    0 /* no clipping */, 0,
-                    true /* alpha */);
-
+        if (value > 0.0f)
+        {
+            const core::recti dest_area(rect.UpperLeftCorner.X + handle_size,
+                                        rect.UpperLeftCorner.Y,
+                                        rect.UpperLeftCorner.X + handle_size +
+                                               (int)((widget->m_w
+                                                      - 2*handle_size)*value),
+                                        rect.UpperLeftCorner.Y + widget->m_h);
+    
+            const ITexture* texture =
+                SkinConfig::m_render_params["gaugefill::neutral"].getImage();
+            const int texture_w = texture->getSize().Width;
+            const int texture_h = texture->getSize().Height;
+    
+            const core::recti source_area(0, 0, texture_w, texture_h);
+    
+            draw2DImage(texture, dest_area, source_area, 0 /* no clipping */, 0,
+                        true /* alpha */);
+        }
     }
 
     if (focused && widget->hasTooltip())

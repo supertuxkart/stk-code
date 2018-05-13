@@ -163,6 +163,13 @@ public:
      *  be generated. */
     float m_replay_delta_angle;
 
+    /** The minimap size */
+    float m_minimap_size;
+
+    /* The size of icons for AIs and human players, respectively */
+    float m_minimap_ai_icon;
+    float m_minimap_player_icon;
+
     /** The field of view for 1, 2, 3, 4 player split screen. */
     float m_camera_fov[MAX_PLAYER_COUNT];
 

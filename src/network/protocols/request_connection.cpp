@@ -23,6 +23,7 @@
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/server.hpp"
+#include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
 #include "online/xml_request.hpp"
 #include "utils/string_utils.hpp"
@@ -97,30 +98,40 @@ void RequestConnection::asynchronousUpdate()
                     (STKHost::get()->isClientServer() ? "-localhost" :
                     StringUtils::toString(m_server->getPrivatePort())));
 
-                TransportAddress server_addr;
                 if (!NetworkConfig::m_disable_lan &&
                     m_server->getAddress().getIP() ==
                     STKHost::get()->getPublicAddress().getIP() &&
                     !STKHost::get()->isClientServer())
                 {
-                    // If use lan connection in wan server, send a broadcast
-                    server_addr.setIP(0xffffffff);
+                    // If use lan connection in wan server, send to all
+                    // broadcast address
+                    for (auto& addr :
+                        ServersManager::get()->getBroadcastAddresses())
+                    {
+                        for (int i = 0; i < 5; i++)
+                        {
+                            STKHost::get()->sendRawPacket(message, addr);
+                            StkTime::sleep(1);
+                        }
+                    }
                 }
                 else
                 {
+                    TransportAddress server_addr;
                     server_addr.setIP(m_server->getAddress().getIP());
+                    // Direct socket always listens on server discovery port
+                    server_addr.setPort(NetworkConfig::get()
+                        ->getServerDiscoveryPort());
+                    // Avoid possible packet loss, the connect to peer done by
+                    // server will auto terminate if same peer from same port
+                    // has connected already
+                    for (int i = 0; i < 5; i++)
+                    {
+                        STKHost::get()->sendRawPacket(message, server_addr);
+                        StkTime::sleep(1);
+                    }
                 }
-                // Direct socket always listens on server discovery port
-                server_addr.setPort(NetworkConfig::get()
-                    ->getServerDiscoveryPort());
-                // Avoid possible packet loss, the connect to peer done by
-                // server will auto terminate if same peer from same port
-                // has connected already
-                for (int i = 0; i < 5; i++)
-                {
-                    STKHost::get()->sendRawPacket(message, server_addr);
-                    StkTime::sleep(1);
-                }
+
                 m_state = DONE;
             }
             else

@@ -17,9 +17,9 @@
 
 #include "network/protocols/game_protocol.hpp"
 
-#include "modes/world.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/player_controller.hpp"
+#include "modes/world.hpp"
 #include "network/event.hpp"
 #include "network/network_config.hpp"
 #include "network/game_setup.hpp"
@@ -160,20 +160,19 @@ void GameProtocol::handleControllerAction(Event *event)
     uint8_t count = data.getUInt8();
     bool will_trigger_rewind = false;
     int rewind_delta = 0;
+    int cur_ticks = 0;
+    const int not_rewound = RewindManager::get()->getNotRewoundWorldTicks();
     for (unsigned int i = 0; i < count; i++)
     {
-        int ticks = data.getUInt32();
-
+        cur_ticks = data.getUInt32();
         // Since this is running in a thread, it might be called during
         // a rewind, i.e. with an incorrect world time. So the event
         // time needs to be compared with the World time independent
         // of any rewinding.
-        if (ticks < RewindManager::get()->getNotRewoundWorldTicks() &&
-            !will_trigger_rewind                                     )
+        if (cur_ticks < not_rewound && !will_trigger_rewind)
         {
             will_trigger_rewind = true;
-            rewind_delta = ticks 
-                         - RewindManager::get()->getNotRewoundWorldTicks();
+            rewind_delta = not_rewound - cur_ticks;
         }
         uint8_t kart_id = data.getUInt8();
         assert(kart_id < World::getWorld()->getNumKarts());
@@ -183,11 +182,11 @@ void GameProtocol::handleControllerAction(Event *event)
         int value_l = data.getUInt32();
         int value_r = data.getUInt32();
         Log::info("GameProtocol", "Action at %d: %d %d %d %d %d",
-                  ticks, kart_id, action, value, value_l, value_r);
+                  cur_ticks, kart_id, action, value, value_l, value_r);
         BareNetworkString *s = new BareNetworkString(3);
         s->addUInt8(kart_id).addUInt8(action).addUInt32(value)
                             .addUInt32(value_l).addUInt32(value_r);
-        RewindManager::get()->addNetworkEvent(this, s, ticks);
+        RewindManager::get()->addNetworkEvent(this, s, cur_ticks);
     }
 
     if (data.size() > 0)
@@ -200,16 +199,37 @@ void GameProtocol::handleControllerAction(Event *event)
         // Send update to all clients except the original sender.
         STKHost::get()->sendPacketExcept(event->getPeer(),
                                          &data, false);
+
+        if (not_rewound == 0 ||
+            m_initial_ticks.find(event->getPeer()) == m_initial_ticks.end())
+            return;
+        int cur_diff = cur_ticks - not_rewound;
+        const int max_adjustment = 12;
+        const int ticks_difference = m_initial_ticks.at(event->getPeer());
         if (will_trigger_rewind)
         {
-            Log::info("GameProtocol",
-                "At %d %f %d requesting time adjust of %d for host %d",
+            if (rewind_delta > max_adjustment)
+                rewind_delta = max_adjustment;
+            Log::info("GameProtocol", "At %d %f %d requesting time adjust"
+                " (speed up) of %d for host %d",
                 World::getWorld()->getTimeTicks(), StkTime::getRealTime(),
-                RewindManager::get()->getNotRewoundWorldTicks(),
-                rewind_delta, event->getPeer()->getHostId());
+                not_rewound, rewind_delta, event->getPeer()->getHostId());
             // This message from a client triggered a rewind in the server.
-            // To avoid this, signal to the client that it should slow down.
+            // To avoid this, signal to the client that it should speed up.
             adjustTimeForClient(event->getPeer(), rewind_delta);
+            return;
+        }
+
+        if (cur_diff > 0 &&
+            cur_diff - ticks_difference > max_adjustment)
+        {
+            // 80% slow down
+            const int adjustment = -max_adjustment * 8 / 10;
+            Log::info("GameProtocol", "At %d %f %d requesting time adjust"
+                " (slow down) of %d for host %d",
+                World::getWorld()->getTimeTicks(), StkTime::getRealTime(),
+                not_rewound, adjustment, event->getPeer()->getHostId());
+            adjustTimeForClient(event->getPeer(), adjustment);
         }
     }   // if server
 
@@ -220,7 +240,7 @@ void GameProtocol::handleControllerAction(Event *event)
  *  reduce rewinds). This function sends a a (unreliable) message to the 
  *  client.
  *  \param peer The peer that triggered the rewind.
- *  \param t Time that the peer needs to slowdown (<0) or sped up(>0).
+ *  \param t Time that the peer needs to slowdown (<0) or speed up(>0).
  */
 void GameProtocol::adjustTimeForClient(STKPeer *peer, int ticks)
 {
@@ -240,8 +260,10 @@ void GameProtocol::adjustTimeForClient(STKPeer *peer, int ticks)
 void GameProtocol::handleAdjustTime(Event *event)
 {
     int ticks = event->data().getUInt32();
-    World::getWorld()->setAdjustTime(stk_config->ticks2Time(ticks));
+    World::getWorld()->setAdjustTime(
+        int(stk_config->ticks2Time(ticks) * 1000.0f));
 }   // handleAdjustTime
+
 // ----------------------------------------------------------------------------
 /** Called by the server before assembling a new message containing the full
  *  state of the race to be sent to a client.
@@ -338,3 +360,11 @@ void GameProtocol::rewind(BareNetworkString *buffer)
     if (pc)
         pc->actionFromNetwork(action, value, value_l, value_r);
 }   // rewind
+
+// ----------------------------------------------------------------------------
+void GameProtocol::addInitialTicks(STKPeer* p, int ticks)
+{
+    Log::verbose("GameProtocol", "Host %d with ticks difference %d",
+        p->getHostId(), ticks);
+    m_initial_ticks[p] = ticks;
+}   // addInitialTicks
