@@ -529,11 +529,12 @@ namespace Scripting
         m_time = time;
         m_callback_delegate = callback_delegate;
         
-        // This may be not needed in future angelscript versions
+        #if ANGELSCRIPT_VERSION < 23300
         if (strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY"))
         {
             callback_delegate->AddRef();
         }
+        #endif
     }
 
     //-----------------------------------------------------------------------------
