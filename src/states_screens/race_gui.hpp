@@ -78,6 +78,16 @@ private:
     /** Maximum string length for the timer */
     int              m_timer_width;
 
+    /** Maximum string length for a small precise timer
+     *  (like the live difference timer under a minute) */
+    int              m_small_precise_timer_width;
+
+    /** Maximum string length for a big precise timer
+     *  (like the live difference timer over a minute) */
+    int              m_big_precise_timer_width;
+
+    int              m_negative_timer_additional_width;
+
     /** Height of the digit font. */
     int              m_font_height;
 
@@ -120,6 +130,7 @@ private:
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
     void drawGlobalTimer       ();
+    void drawLiveDifference    ();
     void drawScores();
 
 

@@ -54,18 +54,43 @@ protected:
         float               m_steer;
         /** The suspension length of 4 wheels at a certain time. */
         float               m_suspension_length[4];
+        /** The skidding state */
+        int                 m_skidding_state;
     };   // PhysicInfo
+
+    // ------------------------------------------------------------------------
+    struct BonusInfo
+    {
+        /** The attachment. This is stored using a custom format
+            0 = none ; 1 = parachute ; 2 = anvil ; 3 = bomb ;
+            4 = swatter ; 5 = bubblegum
+            This is necessary so replay files are not broken if the
+            game internal attachment format/ordering is changed. */
+        int                 m_attachment;
+        /** The nitro amount at a certain time. */
+        float               m_nitro_amount;
+        /** The number of items at a certain time. */
+        int                 m_item_amount;
+        /** The type of item at a certain time. */
+        int                 m_item_type;
+        /** Used to store mode-specific values : eggs in egg-hunt,
+            number of lives in battle-mode. */
+        int                 m_special_value;
+    };   // StateInfo
+
 
     // ------------------------------------------------------------------------
     /** Records all other events. */
     struct KartReplayEvent
     {
+        /** distance on track for the kart recorded. */
+        float  m_distance;
         /** Nitro usage for the kart recorded. */
         int    m_nitro_usage;
         /** Zipper usage for the kart recorded. */
         bool   m_zipper_usage;
-        /** Skidding state for the kart recorded. */
-        int    m_skidding_state;
+        /** Skidding effect for the kart recorded. */
+        int    m_skidding_effect;
         /** Kart skidding showing red flame or not. */
         bool   m_red_skidding;
         /** True if the kart recorded is jumping. */
@@ -73,15 +98,19 @@ protected:
     };   // KartReplayEvent
 
     // ------------------------------------------------------------------------
-    FILE *openReplayFile(bool writeable, bool full_path = false);
+    FILE *openReplayFile(bool writeable, bool full_path = false, int replay_file_number=1);
     // ------------------------------------------------------------------------
     /** Returns the filename that was opened. */
-    virtual const std::string& getReplayFilename() const = 0;
+    virtual const std::string& getReplayFilename(int replay_file_number = 1) const = 0;
     // ------------------------------------------------------------------------
-    /** Returns the version number of the replay file. This is used to check
-     *  that a loaded replay file can still be understood by this
-     *  executable. */
-    unsigned int getReplayVersion() const { return 3; }
+    /** Returns the version number of the replay file recorderd by this executable.
+     *  This is also used as a maximum supported version by this exexcutable. */
+    unsigned int getCurrentReplayVersion() const { return 4; }
+
+    // ------------------------------------------------------------------------
+    /** This is used to check that a loaded replay file can still
+     *  be understood by this executable. */
+    unsigned int getMinSupportedReplayVersion() const { return 3; }
 
 public:
              ReplayBase();
