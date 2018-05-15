@@ -65,7 +65,18 @@ private:
     /** Overall time if grand prix. */
     float m_overall_time;
 
+    /** Multi-session ranking points */
+    int m_ranking_points;
+
+    /** The maximum ranking achieved by this player */
+    int m_max_ranking_points;
+
+    /** Number of ranked races */
+    unsigned int m_ranked_races;
+
+
 public:
+
     NetworkPlayerProfile(std::shared_ptr<STKPeer> peer,
                          const irr::core::stringw &name, uint32_t host_id,
                          float default_kart_color, uint32_t online_id,
@@ -121,6 +132,18 @@ public:
     // ------------------------------------------------------------------------
     void setOverallTime(float time)                  { m_overall_time = time; }
     // ------------------------------------------------------------------------
+    int getRankingPoints() const                   { return m_ranking_points; }
+    // ------------------------------------------------------------------------
+    void setRankingPoints(int points)            { m_ranking_points = points;
+            if (points > m_max_ranking_points) m_max_ranking_points = points; }
+    // ------------------------------------------------------------------------
+    int getMaxRankingPoints() const            { return m_max_ranking_points; }
+    // ------------------------------------------------------------------------
+    unsigned int getNumRankedRaces() const           { return m_ranked_races; }
+    // ------------------------------------------------------------------------
+    void incrementNumRankedRaces()                        { m_ranked_races++; }
+    // ------------------------------------------------------------------------
+
     void resetGrandPrixData()
     {
         m_score = 0;
