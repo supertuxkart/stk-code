@@ -751,6 +751,9 @@ void ServerLobby::checkRaceFinished()
             total->addUInt32(last_score).addUInt32(cur_score)
                 .addFloat(overall_time);            
         }
+
+        if (NetworkConfig::get()->isRankedServer())
+            computeNewRankings();
     }
     else if (race_manager->modeHasLaps())
     {
@@ -769,6 +772,137 @@ void ServerLobby::checkRaceFinished()
     Log::info("ServerLobby", "End of game message sent");
 
 }   // checkRaceFinished
+
+//-----------------------------------------------------------------------------
+/** Compute the new player's rankings in ranked servers
+ */
+void ServerLobby::computeNewRankings()
+{
+    //TODO : this is overall a rather naive implementation
+    //       several possibilities to speed up the computation exist,
+    //       though this is minor in importance as it's not done
+    //       during racing.
+
+    //TODO : make some numerical parts of the formulas
+    //       depend of a single constant value
+
+    // No ranking yet for battle mode
+    // TODO : separate rankings for time-trial and normal and FTL ??
+    if (!race_manager->modeHasLaps())
+        return;
+
+    auto& players = m_game_setup->getPlayers();
+
+    std::vector<double> ranking_change;
+
+    for (unsigned i = 0; i < players.size(); i++)
+    {
+        ranking_change.push_back(0);
+
+        //FIXME : if the players have been kicked out, there is no way to retrieve the data !
+
+        //FIXME : can't use a weak_ptr like that
+        int player1_ranking = players[i]->getRankingPoints();
+        float player1_time  = race_manager->getKartRaceTime(i);
+        float player1_factor = computeRankingFactor(i);
+
+        for (unsigned j = 0; j < players.size(); i++)
+        {
+            // Don't compare a player with itself
+            if (i == j)
+                continue;
+
+            double result = 0.0f;
+            double expected_result = 0.0f;
+            double ranking_importance = 0.0f;
+
+            // No change between two quitting players
+            if (!players[i].lock() && !players[j].lock())
+                continue;
+
+            int player2_ranking = players[i]->getRankingPoints();
+            float player2_time  = race_manager->getKartRaceTime(j);
+
+            // Compute the expected result
+            double diff = (double) player2_ranking - player1_ranking;
+            expected_result = 1.0f/(1.0f+std::pow(10.0f, diff/(BASE_RANKING_POINTS/2.0f)));
+
+            // Compute the result and race ranking importance
+            float player_factors = std::max(player1_factor,
+                                            computeRankingFactor(j) );
+
+            if (!players[i].lock())
+            {
+                result = 0.0f;
+                ranking_importance = (MAX_SCALING_TIME/20.0f)*player_factors;
+            }
+            else if (!players[j].lock())
+            {
+                result = 1.0f;
+                ranking_importance = (MAX_SCALING_TIME/20.0f)*player_factors;
+            }
+            else
+            {
+                // If time difference > 2,5% ; the result is 1 or 0
+                // Otherwise, it is averaged between 0 and 1.
+                if (player1_time <= player2_time)
+                {
+                    result = (player2_time - player1_time)/(player1_time/20);
+                    result = std::min( (double) 1.0f, 0.5f + result);
+                }
+                else
+                {
+                    result = (player1_time - player2_time)/(player2_time/20);
+                    result = std::max( (double) 0.0f, 0.5f - result);
+                }
+                ranking_importance = std::min ( std::max (player1_time, player2_time),
+                                                MAX_SCALING_TIME ) * player_factors/20.0f;
+            }
+            // Compute the ranking change
+            ranking_change[i] += ranking_importance * (result - expected_result);
+        }
+    }
+
+    // Don't merge it in the main loop as long as getRankingPoints
+    // is called in it
+    for (unsigned i = 0; i < players.size(); i++)
+    {
+        // Add or substract 0.5f so that the cast to int acts like rounding
+        ranking_change[i] += (ranking_change[i] > 0 ) ? 0.5f : -0.5f;
+        int old_ranking_points = players[i]->getRankingPoints();
+        players[i]->setRankingPoints(old_ranking_points + ((int) ranking_change[i]));
+    }
+} //computeNewRankings
+
+//-----------------------------------------------------------------------------
+/** Compute the ranking factor, used to make top rankings more stable
+ *  and to allow new players to faster get to an appropriate ranking
+ */
+float ServerLobby::computeRankingFactor(unsigned int player_id)
+{
+    auto& players = m_game_setup->getPlayers();
+
+    assert(player_id < players.size());
+
+    int max_points = players[player_id].getMaxRankingPoints();
+    int num_races  = players[player_id].getNumRankedRaces();
+
+    if (max_points >= (int) (BASE_RANKING_POINTS * 2.0f))
+        return 1.0f;
+    else if (max_points >= (int) (BASE_RANKING_POINTS * 1.75f)  || num_races > 500)
+        return 1.25f;
+    else if (max_points >= (int) (BASE_RANKING_POINTS * 1.5f)   || num_races > 250)
+        return 1.5f;
+    else if (max_points >= (int) (BASE_RANKING_POINTS * 1.25f)  || num_races > 100)
+        return 1.75f;
+    // The base ranking points are not distributed all at once
+    // So it's not guaranteed a player reach them
+    else if (max_points >= (int) (BASE_RANKING_POINTS        ) || num_races > 50)
+        return 2.0f;
+    else
+        return 2.5f; 
+
+} //computeRankingFactor
 
 //-----------------------------------------------------------------------------
 /** Stop any race currently in server, should only be called in main thread.

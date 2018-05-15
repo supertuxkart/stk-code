@@ -78,6 +78,11 @@ private:
 
     TransportAddress m_server_address;
 
+    /* Ranking related variables */
+
+    const float BASE_RANKING_POINTS = 4000.0f;
+    const float MAX_SCALING_TIME = 600.0f;
+
     // connection management
     void clientDisconnected(Event* event);
     void connectionRequested(Event* event);
@@ -126,6 +131,8 @@ private:
     }
     std::tuple<std::string, uint8_t, bool, bool> handleVote();
     void stopCurrentRace();
+    void computeNewRankings();
+    float computeRankingFactor(unsigned int player_id);
 
 public:
              ServerLobby();
