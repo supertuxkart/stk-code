@@ -61,22 +61,26 @@ public:
 
     // --------------------------------------------------------------------
     /** Constructor for creating a new item (i.e. a bubble gum is dropped).
+     *  At the moment only bubble gums can be droppes, so there is no
+     *  need to encode the new item type.
      */
     ItemEventInfo(int ticks, ItemState::ItemType type, int index,
-        const Vec3 &xyz)
+                  const Vec3 &xyz)
         : m_ticks(ticks), m_index(index), m_kart_id(-1), m_xyz(xyz)
     {
     }   // ItemEventInfo(new item)
+
     // --------------------------------------------------------------------
     /** Constructor for switching items. */
     ItemEventInfo(int ticks) : m_ticks(ticks), m_kart_id(-2)
     {
     }   // ItemEventInfo(switch)
+
     // --------------------------------------------------------------------
-    ItemEventInfo(BareNetworkString *buffer, int *count);
-    // --------------------------------------------------------------------
+         ItemEventInfo(BareNetworkString *buffer, int *count);
     void saveState(BareNetworkString *buffer);
 
+    // --------------------------------------------------------------------
     /** Returns if this event represents a new item. */
     bool isNewItem() const { return m_kart_id == -1; }
     // --------------------------------------------------------------------

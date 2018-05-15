@@ -32,9 +32,9 @@
 ItemEventInfo::ItemEventInfo(BareNetworkString *buffer, int *count)
 {
     m_ticks   = buffer->getTime();
-    m_kart_id = buffer->getUInt8();
+    m_kart_id = buffer->getInt8();
     m_index   = buffer->getUInt16();
-    *count -= 7;
+    *count   -= 7;
 }   // ItemEventInfo(BareNetworkString, int *count)
 
 //-----------------------------------------------------------------------------

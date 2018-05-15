@@ -294,10 +294,10 @@ public:
     }   // getUInt8
     // ------------------------------------------------------------------------
     /** Returns an unsigned 8-bit integer. */
-    inline uint8_t getInt8() const
+    inline int8_t getInt8() const
     {
         return m_buffer[m_current_offset++];
-    }   // getUInt8
+    }   // getInt8
     // ------------------------------------------------------------------------
     /** Gets a 4 byte floating point value. */
     float getFloat() const
