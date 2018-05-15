@@ -113,14 +113,18 @@
 
   <!--  Replay related values, mostly concerned with saving less data
         and using interpolation instead.
-        max-time: Maximum race time that can be saved in a replay/history file.
-        delta-t Minumum time between saving consecutive transform events.
-        delta-pos If the interpolated position is within this delta, a
-                transform event is not generated.
-        delta-angle If the interpolated angle is within this delta,
-                a transform event is not generated. -->
-  <replay max-time="600" delta-t="0.05"  delta-pos="0.1"
-          delta-angle="0.5" />
+        max-frames: Maximum number of transform events that can be saved
+                   in a replay/history file. With normal play, 900 are
+                   enough to store at least one minute, usually more.
+        delta-t Maximum time between saving consecutive transform events.
+            The recording will do more transform events when some kart data
+            changes significantly.
+        delta-speed If the speed difference exceeds this delta, a
+                new transform event is generated before maximum time.
+        delta-steering If the steering angle difference exceeds this delta,
+                new transform event is generated before maximum time. -->
+  <replay max-frames="12000" delta-t="0.200"  delta-speed="0.6"
+          delta-steering="0.35" />
 
   <!--  Determines the minimap related values. 
         size: The size of the minimap (scaled afterwards) 480 = full screen height)

@@ -46,7 +46,8 @@ public:
         SO_DIFF,
         SO_LAPS,
         SO_TIME,
-        SO_USER
+        SO_USER,
+        SO_VERSION
     };
 
     class ReplayData
@@ -54,13 +55,18 @@ public:
     public:
         std::string                m_filename;
         std::string                m_track_name;
+        std::string                m_minor_mode;
+        core::stringw              m_stk_version;
         core::stringw              m_user_name;
         std::vector<std::string>   m_kart_list;
         std::vector<core::stringw> m_name_list;
+        std::vector<float>         m_kart_color; //no sorting for this
         bool                       m_reverse;
         bool                       m_custom_replay_file;
         unsigned int               m_difficulty;
         unsigned int               m_laps;
+        unsigned int               m_replay_version; //no sorting for this
+        uint64_t                   m_replay_uid; //no sorting for this
         float                      m_min_time;
 
         bool operator < (const ReplayData& r) const
@@ -88,6 +94,9 @@ public:
                 case SO_USER:
                     return m_user_name < r.m_user_name;
                     break;
+                case SO_VERSION:
+                    return m_stk_version < r.m_stk_version;
+                    break;
             }   // switch
             return true;
         }   // operator <
@@ -100,6 +109,10 @@ private:
 
     unsigned int             m_current_replay_file;
 
+    unsigned int             m_second_replay_file;
+
+    bool                     m_second_replay_enabled;
+
     std::vector<ReplayData>  m_replay_file_list;
 
     /** All ghost karts. */
@@ -107,10 +120,11 @@ private:
 
           ReplayPlay();
          ~ReplayPlay();
-    void  readKartData(FILE *fd, char *next_line);
+    void  readKartData(FILE *fd, char *next_line, bool second_replay);
 public:
     void  reset();
     void  load();
+    void  loadFile(bool second_replay);
     void  loadAllReplayFile();
     // ------------------------------------------------------------------------
     static void        setSortOrder(SortOrder so)       { m_sort_order = so; }
@@ -124,9 +138,21 @@ public:
     // ------------------------------------------------------------------------
     void               setReplayFile(unsigned int n)
                                                 { m_current_replay_file = n; }
+
+    // ------------------------------------------------------------------------
+    void               setSecondReplayFile(unsigned int n, bool second_replay_enabled)
+                           { m_second_replay_file = n; 
+                             m_second_replay_enabled = second_replay_enabled;}
+
+    // ------------------------------------------------------------------------
+    void               setReplayFileByUID(uint64_t uid);
+    // ------------------------------------------------------------------------
+    unsigned int       getReplayIdByUID(uint64_t uid);
+
     // ------------------------------------------------------------------------
     bool               addReplayFile(const std::string& fn,
-                                     bool custom_replay = false);
+                                     bool custom_replay = false,
+                                     int call_index = 0);
     // ------------------------------------------------------------------------
     const ReplayData&  getReplayData(unsigned int n) const
                                           { return m_replay_file_list.at(n); }
@@ -139,14 +165,25 @@ public:
     const unsigned int getNumGhostKart() const
     {
         assert(m_replay_file_list.size() > 0);
-        return (unsigned int)m_replay_file_list.at(m_current_replay_file)
+        unsigned int num = m_replay_file_list.at(m_current_replay_file)
                                                .m_kart_list.size();
+        unsigned int second_file_num = m_replay_file_list.at(m_second_replay_file)
+                                               .m_kart_list.size();
+
+        num = (m_second_replay_enabled) ? num + second_file_num : num;
+
+        return num;
     }   // getNumGhostKart
     // ------------------------------------------------------------------------
-    const std::string& getGhostKartName(int n) const
+    const std::string& getGhostKartName(unsigned int n) const
     {
         assert(m_replay_file_list.size() > 0);
-        return m_replay_file_list.at(m_current_replay_file).m_kart_list.at(n);
+
+        unsigned int fkn = m_replay_file_list.at(m_current_replay_file).m_kart_list.size();
+        if (n < fkn)
+            return m_replay_file_list.at(m_current_replay_file).m_kart_list.at(n);
+        else
+            return m_replay_file_list.at(m_second_replay_file).m_kart_list.at(n-fkn);
     }
     // ------------------------------------------------------------------------
     /** Creates a new instance of the replay object. */
@@ -160,10 +197,13 @@ public:
                                { delete m_replay_play; m_replay_play = NULL; }
     // ------------------------------------------------------------------------
     /** Returns the filename that was opened. */
-    virtual const std::string& getReplayFilename() const
+    virtual const std::string& getReplayFilename(int replay_file_number = 1) const
     {
         assert(m_replay_file_list.size() > 0);
-        return m_replay_file_list.at(m_current_replay_file).m_filename;
+        if (replay_file_number == 2)
+            return m_replay_file_list.at(m_second_replay_file).m_filename;
+        else
+            return m_replay_file_list.at(m_current_replay_file).m_filename;
     }
     // ------------------------------------------------------------------------
 };   // Replay

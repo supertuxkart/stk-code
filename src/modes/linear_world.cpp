@@ -52,6 +52,8 @@ LinearWorld::LinearWorld() : WorldWithRank()
     m_last_lap_sfx_played  = false;
     m_last_lap_sfx_playing = false;
     m_fastest_lap_ticks    = INT_MAX;
+    m_valid_reference_time = false;
+    m_live_time_difference = 0.0f;
 }   // LinearWorld
 
 // ----------------------------------------------------------------------------
@@ -204,6 +206,10 @@ void LinearWorld::update(int ticks)
         m_kart_info[i].m_estimated_finish =
                 estimateFinishTimeForKart(m_karts[i]);
     }
+    // If one player and a ghost, or two compared ghosts,
+    // compute the live time difference
+    if(race_manager->hasGhostKarts() && race_manager->getNumberOfKarts() == 2)
+        updateLiveDifference();
 
 #ifdef DEBUG
     // Debug output in case that the double position error occurs again.
@@ -261,6 +267,45 @@ void LinearWorld::updateGraphics(float dt)
     }
 
 }   // updateGraphics
+
+// ----------------------------------------------------------------------------
+/** This calculate the time difference between the second kart in the
+ *  race and the first kart in the race (who must be a ghost)
+ */
+void LinearWorld::updateLiveDifference()
+{
+    // First check that the call requirements are verified
+    assert (race_manager->hasGhostKarts() && race_manager->getNumberOfKarts() >= 2);
+
+    AbstractKart* ghost_kart = getKart(0);
+
+    // Get the distance at which the second kart is
+    float second_kart_distance = getOverallDistance(1);
+
+    // Check when the ghost what at this position
+    float ghost_time;
+
+    // If there are two ghost karts, the view is set to kart 0,
+    // so switch roles in the comparison. Note that
+    // we can't simply multiply the time by -1, as they are assymetrical.
+    // When one kart don't increase its distance (rescue, etc),
+    // the difference increases linearly for one and jump for the other.
+    if (getKart(1)->isGhostKart())
+    {
+        ghost_kart = getKart(1);
+        second_kart_distance = getOverallDistance(0);
+    }
+    ghost_time = ghost_kart->getTimeForDistance(second_kart_distance);
+
+    if (ghost_time >= 0.0f)
+        m_valid_reference_time = true;
+    else
+        m_valid_reference_time = false;
+
+    float current_time = World::getWorld()->getTime();
+
+    m_live_time_difference = current_time - ghost_time;
+}
 
 //-----------------------------------------------------------------------------
 /** Is called by check structures if a kart starts a new lap.

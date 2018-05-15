@@ -40,8 +40,10 @@ private:
     /** Overall number of easter eggs. */
     int   m_number_of_eggs;
 
-    /** Number of eggs found so far. */
+    /** Number of eggs found so far by players. */
     int   m_eggs_found;
+
+    bool  m_only_ghosts;
 public:
              EasterEggHunt();
     virtual ~EasterEggHunt();
@@ -61,8 +63,11 @@ public:
     virtual void getKartsDisplayInfo(
                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
 
+    const int  numberOfEggsFound() { return m_eggs_found; }
+
     void updateKartRanks();
     void collectedEasterEgg(const AbstractKart *kart);
+    void collectedEasterEggGhost(int world_id);
     void readData(const std::string &filename);
 
     virtual void checkForWrongDirection(unsigned int i, float dt) OVERRIDE;

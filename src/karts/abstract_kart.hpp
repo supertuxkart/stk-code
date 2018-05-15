@@ -186,6 +186,11 @@ public:
      *  overwriting this function is possible, but this implementation must
      *  be called. */
     virtual void kartIsInRestNow();
+
+    // ------------------------------------------------------------------------
+    /** Returns the time at which the kart was at a given distance.
+      * Returns -1.0f if none */
+    virtual float getTimeForDistance(float distance);
     // ------------------------------------------------------------------------
     /** Returns true if this kart has no wheels. */
     bool isWheeless() const;
@@ -323,8 +328,8 @@ public:
      *  \param fade_out_time How long the maximum speed will fade out linearly.
      */
     virtual void instantSpeedIncrease(unsigned int category, float add_max_speed,
-                                     float speed_boost, float engine_force, 
-                                     int duration, int fade_out_time) = 0;
+                                    float speed_boost, float engine_force,
+                                    int duration, int fade_out_time) = 0;
 
     // ------------------------------------------------------------------------
     /** Defines a slowdown, which is in fraction of top speed.
@@ -410,6 +415,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the last used powerup type. */
     virtual PowerupManager::PowerupType getLastUsedPowerup() = 0;
+    // ------------------------------------------------------------------------
+    /** Returns the number of powerups. */
+    virtual int getNumPowerup() const = 0;
     // ------------------------------------------------------------------------
     /** Returns a points to this kart's graphical effects. */
     virtual KartGFX* getKartGFX() = 0;
