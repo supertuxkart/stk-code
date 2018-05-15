@@ -112,8 +112,7 @@ void NetworkItemManager::collectedItem(Item *item, AbstractKart *kart)
         m_item_events.lock();
         m_item_events.getData().emplace_back(World::getWorld()->getTimeTicks(), 
                                              item->getItemId(),
-                                             kart->getWorldKartId(),
-                                             /*item_info*/0);
+                                             kart->getWorldKartId());
         m_item_events.unlock();
         ItemManager::collectedItem(item, kart);
     }
@@ -172,7 +171,7 @@ void NetworkItemManager::setItemConfirmationTime(int host_id, int ticks)
     // entry can be deleted.
     m_item_events.lock();
     auto p = m_item_events.getData().begin();
-    while (p != m_item_events.getData().end() && p->m_ticks < min_time)
+    while (p != m_item_events.getData().end() && p->getTicks() < min_time)
         p++;
     m_item_events.getData().erase(m_item_events.getData().begin(), p);
     m_item_events.unlock();
@@ -215,8 +214,7 @@ BareNetworkString* NetworkItemManager::saveState()
                                                + sizeof(uint8_t)   )  );
     for (auto p : m_item_events.getData())
     {
-        s->addTime(p.m_ticks).addUInt16(p.m_index);
-        if (p.m_index > -1) s->addUInt8(p.m_kart_id);
+        p.saveState(s);
     }
     m_item_events.unlock();
     Log::verbose("NIM", "Including %d item update at %d",
@@ -259,20 +257,12 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     {
         // 1) Decode the event in the message
         // ----------------------------------
-        int ticks      = buffer->getTime();
-        int item_index = buffer->getUInt16();
-        int kart_id    = -1;
-        count         -= 6;
-        if(item_index>-1)
-        {
-            kart_id = buffer->getUInt8();
-            count --;
-        }   // item_id>-1
+        ItemEventInfo iei(buffer, &count);
 
         // 2) If the event needs to be applied, forward
         //    the time to the time of this event:
         // --------------------------------------------
-        int dt = ticks - current_time;
+        int dt = iei.getTicks() - current_time;
         // Skip an event that are 'in the past' (i.e. have been sent again by
         // the server because it has not yet received confirmation from all
         // clients.
@@ -282,15 +272,15 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         if (dt>0) forwardTime(dt);
 
         // TODO: apply the various events types, atm only collection is supported:
-        ItemState *item_state = m_confirmed_state[item_index];
-        if (item_index > -1)
+        ItemState *item_state = m_confirmed_state[iei.getIndex()];
+        if(iei.isItemCollection())
         {
             // An item on the track was collected:
-            AbstractKart *kart = World::getWorld()->getKart(kart_id);
-            m_confirmed_state[item_index]->collected(kart);
+            AbstractKart *kart = World::getWorld()->getKart(iei.getKartId());
+            m_confirmed_state[iei.getIndex()]->collected(kart);
         }
 
-        current_time = ticks;
+        current_time = iei.getTicks();
     }   // while count >0
 
     // Inform the server which events have been received.
