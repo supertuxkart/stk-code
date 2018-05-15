@@ -18,7 +18,7 @@
 #include <string>
 #ifdef _WIN32
 #include <windows.h>
-#include <ShellApi.h>
+#include <shellapi.h>
 #endif
 
 using namespace Online;
