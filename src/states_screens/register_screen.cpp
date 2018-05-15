@@ -187,15 +187,6 @@ void RegisterScreen::makeEntryFieldsVisible()
     }
 
     getWidget<ButtonWidget >("password_reset")->setVisible(online && !new_account);
-//    if (online && !new_account)
-//    {
-//        getWidget<ButtonWidget>("password_reset")->m_properties[GUIEngine::PROP_HEIGHT] = "100";
-//    }
-//    else
-//    {
-//        getWidget<ButtonWidget>("password_reset")->m_properties[GUIEngine::PROP_HEIGHT] = "0";
-//    }
-//    calculateLayout();
 }   // makeEntryFieldsVisible
 
 // -----------------------------------------------------------------------------
